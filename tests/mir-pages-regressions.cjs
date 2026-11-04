@@ -276,4 +276,24 @@ test('Pliage MIR : retour écrasé avec traits droits et sans arc de dessin', ()
  assert.equal(section.segments[1][0][1],-10,'repli à 10 pixels du premier trait');
 });
 
+
+test('Repères A-B-C : les côtés serrés gardent leurs étiquettes hors du dessin', () => {
+ const code=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
+ const begin=code.indexOf('function profileSideMarkers(');
+ const end=code.indexOf('\nfunction diagramSVG(',begin);
+ assert.ok(begin>0&&end>begin);
+ const place=new Function('fmt','esc',code.slice(begin,end)+'\nreturn profileSideMarkers;')(
+   v=>String(Math.round(v*100)/100),s=>String(s));
+ const segments=[[[140,200],[390,200]],[[390,200],[390,300]],[[390,300],[500,300]]];
+ const labels={segments:[{label:'A'},{label:'B'},{label:'C'}]};
+ const normal=place({segments,folds:[]},labels,[]);
+ assert.ok(normal.includes('>A</text>')&&normal.includes('>B</text>')&&normal.includes('>C</text>'));
+ const tiny=place({segments:[[[1,1],[2,1]]],folds:[]},{segments:[{label:'A'}]},[]);
+ assert.ok(tiny.includes('profile-marker-overflow'));
+ assert.ok(tiny.includes('cy="495"'));
+ assert.ok(tiny.includes('>A</text>'));
+ const count=(tiny.match(/>A<\/text>/g)||[]).length;
+ assert.equal(count,1,'un seul badge par segment');
+});
+
 console.log('Tests MIR : '+total+'/'+total+' réussis.');

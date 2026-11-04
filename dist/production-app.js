@@ -148,9 +148,11 @@ function profileSideMarkers({segments,folds},model,handles){
   const t=lengthSquared?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/lengthSquared)):0;
   return distance(p,[a[0]+t*dx,a[1]+t*dy]);
  }
- return segments.map(([a,b],index)=>{
+ const missing=[];
+ const markers=segments.map(([a,b],index)=>{
+  const label=model.segments?.[index]?.label||String.fromCharCode(65+index);
   const length=distance(a,b);
-  if(!length)return '';
+  if(!length){missing.push(label);return '';}
   const nx=(a[1]-b[1])/length,ny=(b[0]-a[0])/length;
   for(const gap of [24,32,42,54,70]){
    for(const t of [.5,.32,.68]){
@@ -161,13 +163,23 @@ function profileSideMarkers({segments,folds},model,handles){
       handles.some(q=>distance(p,q)<22)||
       segments.some(line=>distanceToSide(p,line)<18||line.some(q=>distance(p,q)<31)))continue;
      placed.push(p);
-     const label=model.segments?.[index]?.label||String.fromCharCode(65+index);
      return `<g class="profile-side-marker" pointer-events="none" aria-hidden="true"><circle cx="${fmt(x)}" cy="${fmt(y)}" r="11" fill="#fff" stroke="#779068"/><text x="${fmt(x)}" y="${fmt(y+4)}" text-anchor="middle" font-size="12" font-weight="700" fill="#345d3d">${esc(label)}</text></g>`;
     }
    }
   }
+  missing.push(label);
   return '';
  }).join('');
+ if(!missing.length)return markers;
+ // La tôle et ses cotes occupent la zone centrale; le bandeau inférieur est
+ // réservé aux repères trop serrés pour être affichés près de leur côté.
+ const spacing=Math.min(30,748/Math.max(1,missing.length-1));
+ const startX=400-(missing.length-1)*spacing/2;
+ const fallback=missing.map((label,index)=>{
+  const x=fmt(startX+index*spacing);
+  return `<g class="profile-side-marker" pointer-events="none" aria-hidden="true"><circle cx="${x}" cy="495" r="11" fill="#fff" stroke="#779068"/><text x="${x}" y="499" text-anchor="middle" font-size="12" font-weight="700" fill="#345d3d">${esc(label)}</text></g>`;
+ }).join('');
+ return markers+`<g class="profile-marker-overflow" aria-label="Repères de côtés trop serrés"><rect x="8" y="466" width="784" height="49" rx="8" fill="#f6f9f1" stroke="#dde7d5"/><text x="22" y="479" font-size="10" fill="#68825d">CÔTÉS TROP SERRÉS POUR UN REPÈRE DIRECT</text>${fallback}</g>`;
 }
 function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
