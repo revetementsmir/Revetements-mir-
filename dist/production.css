@@ -54,3 +54,49 @@
 .mir-default-lock input{min-height:18px;min-width:18px;width:18px;height:18px}
 .mir-default-readonly{display:block;font-size:11px;color:#4d7147;margin-top:3px}
 @media(max-width:520px){.mir-default-row{grid-template-columns:1fr}.mir-default-lock{padding-bottom:0}}
+
+/* Atelier pliage : le dessin et ses cotes occupent le premier plan. */
+.piece-finish>summary,.profile-face-options>summary,.angle-details>summary{
+ cursor:pointer;color:var(--green);font-weight:700;padding-block:10px;
+}
+.piece-finish>summary #finish-summary{
+ display:inline-block;margin-inline-start:.5em;font-size:.85em;font-weight:500;color:var(--muted);
+}
+.finish-fields{margin-top:8px}
+.view-3d-tag{font-size:.8em;margin-inline-start:.25em}
+body[data-profile-admin=true] .workshop-banner,
+body[data-profile-admin=true] .kind-explanation{display:none}
+body[data-profile-admin=true] .production-intro{
+ display:flex;align-items:end;justify-content:space-between;gap:16px;padding:26px 0 18px;
+}
+body[data-profile-admin=true] .production-intro h1{
+ font-size:clamp(32px,5vw,54px);letter-spacing:-.035em;line-height:1.05;margin:6px 0 0;
+}
+body[data-profile-admin=true] .intro-copy{margin:0}
+body[data-profile-admin=true] .intro-copy p{margin:0}
+body[data-profile-admin=true] .workflow-tabs{margin-bottom:14px}
+body[data-profile-admin=true] .template-section{padding-block:14px}
+body[data-profile-admin=true] .template-button{min-height:60px;padding:8px;line-height:1.3}
+body[data-profile-admin=true] .drawing-tools:not([hidden]){gap:7px;flex-wrap:wrap}
+body[data-profile-admin=true] .drawing-tools button{min-height:44px}
+body[data-profile-admin=true] .drawing-tools button.draw-primary{background:var(--green);color:white}
+.draw-help{flex-basis:100%;color:var(--muted);font-size:12px;margin:0;line-height:1.45}
+body[data-profile-admin=true] #profile-dimension-list:not([hidden]){padding-inline:16px}
+body[data-profile-admin=true] .drawing-stage[data-view=face][data-tool=select]>svg{touch-action:pan-y}
+body[data-profile-admin=true] .view-switch button{min-height:44px}
+body[data-profile-admin=true] .angle-details>summary,
+body[data-profile-admin=true] .profile-face-options>summary,
+body[data-profile-admin=true] .piece-finish>summary{min-height:44px}
+body[data-profile-admin=true] .angle-details .bend-fields{margin-top:0}
+@media(max-width:600px){
+ body[data-profile-admin=true] .production-intro{align-items:start;flex-direction:column;gap:8px;padding:18px 0 12px}
+ body[data-profile-admin=true] .intro-copy .text-link{margin-top:7px}
+ body[data-profile-admin=true] .drawing-head{flex-wrap:wrap}
+ body[data-profile-admin=true] .config-card input:not([type=checkbox]),
+ body[data-profile-admin=true] .config-card select,
+ body[data-profile-admin=true] .config-card textarea{font-size:16px}
+ body[data-profile-admin=true] .drawing-tools{padding-inline:12px}
+ body[data-profile-admin=true] .drawing-tools button{font-size:11px}
+ body[data-profile-admin=true] .drawing-stage[data-kind=profile],
+ body[data-profile-admin=true] .drawing-stage[data-kind=profile]>svg{min-height:225px}
+}

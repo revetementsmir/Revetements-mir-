@@ -1,51 +1,93 @@
-<!doctype html><html lang="fr-CA"><head><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-Mgxd2ELdKrsFmAY4lSRAAzn4bCKMCK1XdAbRHht8Yts='; object-src 'none'; base-uri 'none'; connect-src 'none'; form-action 'none'"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MIR — Solin brique et coins architecturaux</title><style>
-:root{--bg:#0b0f0c;--card:#121915;--card2:#172019;--line:#2c3a31;--txt:#eff6f0;--muted:#9fb0a5;--accent:#b8ff3d;--warn:#ffd46a;--bad:#ff9f8f}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.42 system-ui,-apple-system,Segoe UI,sans-serif}header{padding:24px max(16px,4vw) 16px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:clamp(23px,4vw,35px)}header p{color:var(--muted);margin:7px 0 0}main{max-width:1500px;margin:auto;padding:20px max(12px,3vw) 60px}.notice,.warning,.accept{padding:12px 14px;border-radius:13px;margin-bottom:14px}.notice{border:1px solid #64552b;background:#251f0e;color:#ffe9a9}.warning{border:1px solid #7d4d44;background:#2a1714;color:#ffd7cf}.accept{border:1px solid #516d59;background:#132118}.tabs{display:flex;gap:8px;overflow:auto;padding:1px 0 14px}.tab,button{border:1px solid var(--line);background:var(--card);color:var(--txt);padding:10px 13px;border-radius:10px;font-weight:750;cursor:pointer}.tab{white-space:nowrap}.tab.active{color:var(--accent);border-color:#7fad42;background:#1d2b1e}.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(350px,.75fr);gap:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px}.topline{display:flex;justify-content:space-between;gap:8px;align-items:center}.badge{font-size:12px;font-weight:900;padding:5px 8px;border-radius:100px;background:#253127;color:#cbe7d1}.badge.published{background:#234322;color:#cfff9b}.drawing{min-height:410px;display:grid;place-items:center;overflow:hidden;background:#0e1510;border-radius:12px;margin-top:10px}.drawing svg{width:100%;height:auto;max-height:530px}h2{font-size:18px;margin:0 0 11px}h3{font-size:14px;margin:16px 0 8px;color:#cee0d2}.field-row{display:grid;grid-template-columns:1fr 120px 112px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #202c24}.field-row.piece{grid-template-columns:1fr 130px}.field-row small{display:block;color:var(--muted);font-size:11px}input{border:1px solid #35463b;background:#0d130f;color:var(--txt);border-radius:9px;padding:9px;min-width:0}.lock{font-size:12px;color:var(--muted);white-space:nowrap}.angles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}.angle{display:flex;align-items:center;gap:6px;background:#0e1510;border:1px solid #26332b;padding:7px;border-radius:9px}.angle span{font-size:11px;flex:1;color:var(--muted)}.angle input{width:72px}.checks{display:grid;gap:8px}.checks label,.checkbox{display:flex;gap:8px;align-items:flex-start;background:#0e1510;padding:9px;border-radius:9px}.checks input,.checkbox input{width:auto;margin-top:3px}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.primary{background:var(--accent);color:#10170c;border-color:var(--accent)}.secondary{background:#172b1c}.beam-options{background:#101b13;border:1px solid #35513d;padding:10px;border-radius:10px;margin:10px 0}.muted{color:var(--muted);font-size:12px}.error{color:var(--bad);min-height:20px}pre{white-space:pre-wrap;word-break:break-word;background:#0a0e0b;border:1px solid #202c24;border-radius:9px;padding:10px;color:#b9c8be;font-size:11px;max-height:240px;overflow:auto}.success{margin-top:8px;padding:8px;border-radius:8px;background:#17351b;color:#cfffbc}.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;background:#e8f7e9;color:#101610;padding:10px 14px;border-radius:11px;max-width:min(680px,90vw);transition:.2s;z-index:20;font-weight:700}.toast.show{opacity:1;transform:translate(-50%,0)}@media(max-width:980px){.layout{grid-template-columns:1fr}}@media(max-width:560px){.field-row{grid-template-columns:1fr 88px}.field-row .lock{grid-column:1/-1}.drawing{min-height:300px}.actions button{flex:1 1 140px}}
-</style>
-<style id="mir-responsive-hardening">
-/* MIR_RESPONSIVE_V1 — shared candidate contract */
-html,body{width:100%;max-width:100%;overflow-x:hidden}
+<!doctype html><html lang="fr-CA"><head><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-7RZVpyCMZf1s1oZfs7pSU6/r7YUL0gljCcImBd3w2Hc='; object-src 'none'; base-uri 'none'; connect-src 'none'; form-action 'none'"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MIR — Solin brique et coins architecturaux</title><style>
+:root{color-scheme:dark;--bg:#0b110e;--card:#131c17;--line:#33483b;--text:#edf6ed;--muted:#b6c8b8;--accent:#b8ee85;--error:#ffb6a6}
 *,*::before,*::after{box-sizing:border-box}
-body{min-width:0}
-main,.wrap,.container,.shell,.card,.panel,.section,.notice,.dispatch{min-width:0;max-width:100%}
-.grid>*,.layout>*,.form-grid>*,.fields>*,.field-grid>*,.summary-grid>*,.stats>*,.kpis>*{min-width:0}
-img,svg,canvas,video{max-width:100%;height:auto}
-p,li,label,.muted,.notice,.card{overflow-wrap:anywhere}
-input,select,textarea,button,[role="button"]{font:inherit;max-width:100%}
-button,[role="button"],input[type="button"],input[type="submit"],input[type="reset"],select{min-height:44px;touch-action:manipulation}
-pre,code{max-width:100%;overflow-x:auto}
-table{max-width:100%}
-.table-wrap,[data-table-wrap]{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-@media (pointer:coarse){
-  button,[role="button"],input[type="button"],input[type="submit"],input[type="reset"],select{min-height:44px}
-}
-@media (max-width:760px){
-  body{overflow-x:hidden}
-  main,.wrap,.container,.shell{width:100%;max-width:100%;padding-left:12px!important;padding-right:12px!important}
-  .grid,.layout,.form-grid,.fields,.field-grid,.summary-grid,.stats,.kpis{grid-template-columns:minmax(0,1fr)!important}
-  .row,.actions,.toolbar,.button-row,.controls{flex-wrap:wrap!important;max-width:100%}
-  .actions>button,.toolbar>button,.button-row>button,.controls>button{flex:1 1 140px}
-  table{display:block;width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  th,td{white-space:nowrap}
-  input:not([type="checkbox"]):not([type="radio"]),select,textarea{width:100%;min-width:0}
-  dialog{width:calc(100vw - 24px);max-width:calc(100vw - 24px);margin:12px}
-  pre{max-height:55vh}
-  .card,.notice,.dispatch{max-width:100%}
-  h1{font-size:clamp(22px,7vw,32px);line-height:1.1}
-  h2{font-size:clamp(18px,5.5vw,24px);line-height:1.15}
-}
-@media (max-width:430px){
-  main,.wrap,.container,.shell{padding-left:10px!important;padding-right:10px!important}
-  .card,.notice,.dispatch{padding:12px!important}
-  .actions>button,.toolbar>button,.button-row>button,.controls>button,.row>button{flex:1 1 100%}
-  .row>input,.row>select,.row>textarea{flex:1 1 100%;width:100%}
-}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,sans-serif}
+main{max-width:1170px;margin:auto;padding:20px clamp(14px,3vw,32px) 42px}
+header{margin-bottom:18px}
+h1,h2,p{margin:0}
+h1{font-size:clamp(25px,5vw,38px);line-height:1.13;margin:.45rem 0 .25rem}
+h2{font-size:1.15rem}
+h3{font-size:.95rem;margin:14px 0 8px}
+a{color:var(--accent)}
+label,summary,button{font-weight:650}
+button,input{font:inherit;border:1px solid var(--line);border-radius:8px;color:inherit}
+button,summary{cursor:pointer}
+button{min-height:44px;padding:8px 13px;background:#17241c}
+button:hover{border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:#263b2a}
+input:not([type=checkbox]){width:100%;min-height:44px;padding:8px 10px;background:#0d1610}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+input:disabled{opacity:.72}
+[hidden]{display:none!important}
+.muted,.hint{color:var(--muted);font-size:.875rem}
+.tabs,.actions,.topline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tabs{margin-bottom:14px}
+.tab{font-size:.875rem}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,1fr);gap:14px;align-items:start}
+.card{min-width:0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:clamp(12px,2.2vw,21px)}
+.topline{justify-content:space-between}
+.badge{padding:4px 8px;border-radius:6px;background:#24382a;color:#cceccc;font-size:.72rem;font-weight:750}
+.drawing{min-height:180px;display:grid;place-items:center;background:#0d1610;border-radius:8px;margin:10px 0}
+.drawing svg{display:block;width:100%;height:auto}
+.drawing:has(> .muted){padding:14px;text-align:center}
+.error{color:var(--error);margin:8px 0}
+.error:empty{display:none}
+details{border-top:1px solid var(--line);margin-top:12px;padding-top:6px}
+summary{padding:9px 0;min-height:44px}
+.field-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(78px,114px);gap:7px 10px;align-items:center;margin:8px 0}
+.field-row small{display:block;color:var(--muted);font-size:.78rem}
+.field-row .lock{grid-column:1/-1}
+.lock,.checkbox,.checks label{display:flex;align-items:center;gap:6px;font-size:.85rem}
+.angles,.piece-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.angle{display:grid;grid-template-columns:1fr auto;gap:4px;align-items:center}
+.angle span{grid-column:1/-1;color:var(--muted);font-size:.8rem}
+.actions{margin-top:10px}
+.primary{background:var(--accent);color:#13200f;border-color:var(--accent);font-weight:750}
+.full{width:100%;margin-top:10px}
+.warning,.accept{padding:10px;border:1px solid var(--line);border-radius:8px;margin:10px 0;background:#1a2d20}
+.warning{border-color:#81513d;background:#36251e}
+.local-state{margin:8px 0;color:var(--muted);font-size:.85rem}
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:max-content;max-width:min(90vw,580px);padding:10px 14px;border-radius:9px;background:#e5f4df;color:#13200f;visibility:hidden;z-index:20}
+.toast.show{visibility:visible}
+@media(max-width:780px){.layout{grid-template-columns:minmax(0,1fr)}.tab{flex:1 1 auto}}
+@media(max-width:390px){.angles{grid-template-columns:minmax(0,1fr)}.actions button{flex:1 1 110px}}
 </style>
-</head><body><aside style="padding:12px;background:#f3e8cf;color:#261e0e;font:16px system-ui"><a href="../production.html">← Retour au dossier de production</a> · Configuration locale, sans transmission de commande.</aside><header><h1>MIR · Solin brique et coins architecturaux</h1><p>Solin brique · coins architecturaux · J intégré · cotes éditables · exceptions explicites.</p><a href="../production.html" style="display:inline-block;color:#b8ff3d;margin-top:8px">← Retour au configurateur principal</a></header><main>
-<div class="notice"><b>Préparation locale sur GitHub Pages.</b> Mesures, modèles et snapshots restent sur cet appareil. Les options « Publier au magasin » et « Publier à la boutique » ne transmettent rien au serveur et ne créent aucun article réel. Le transfert au dossier de production reste local.</div>
-<div id="tabs" class="tabs"></div>
-<div class="layout"><section class="card"><div class="topline"><div><h2>Dessin technique</h2><span id="stateBadge" class="badge">PRIVÉ</span></div><button id="resetPiece">Remettre la pièce aux défauts</button></div><div id="beamBox"></div><div id="drawing" class="drawing"></div><div id="drawError" class="error"></div><h3>Angles de pli</h3><div id="angles" class="angles"></div><h3>Données dessin / commande / production</h3><pre id="dataState">—</pre></section>
-<aside><section class="card"><h2>Mesures par défaut admin</h2><p class="muted">Préremplir une mesure ou la verrouiller. Les nouveaux profils sans cote confirmée restent vides.</p><div id="adminFields"></div><div class="actions"><button id="saveDefaults" class="primary">Enregistrer les défauts</button><button id="makePrivate">Remettre privé</button></div><h3>Publication explicite seulement</h3><div class="checks"><label><input id="employeePub" type="checkbox"> Publier au magasin employés</label><label><input id="shopPub" type="checkbox"> Publier à la boutique</label></div></section>
-<section class="card" style="margin-top:16px"><h2>Pièce ponctuelle / commande</h2><div id="pieceFields"></div><div id="jRule"></div><div class="actions"><button id="createOrder" class="primary">Créer snapshot</button><button id="reloadOrder">Recharger dernier snapshot</button><div id="mainProduction" hidden><label>Longueur de la pièce (po)<input id="productionLength" inputmode="decimal"></label><label>Quantité<input id="productionQty" type="number" min="1" max="999" value="1"></label><button id="sendMainProduction" type="button">Transférer au dossier de production</button></div><button id="toSupplierPO">Créer bon fournisseur</button></div><h3>Snapshot</h3><pre id="orderState">Aucun snapshot.</pre><h3>Production</h3><pre id="productionState">Aucune reprise.</pre></section></aside></div></main><div id="toast" class="toast"></div>
+</head><body><main>
+<header>
+  <a href="../production.html">← Configurateur et dossier</a>
+  <h1>Solins et coins architecturaux</h1>
+  <p class="muted">Choisis le profil, entre tes cotes, puis prépare la pièce. Le dossier et les réglages sont conservés sur cet appareil.</p>
+</header>
+<div id="tabs" class="tabs" role="group" aria-label="Choisir le profil"></div>
+<div class="layout">
+  <section class="card" aria-labelledby="profile-drawing-heading">
+    <div class="topline"><h2 id="profile-drawing-heading">Dessin de la pièce</h2><span id="stateBadge" class="badge"></span></div>
+    <div id="drawing" class="drawing"></div><p id="drawError" class="error"></p>
+    <details><summary>Angles de pli</summary><div id="angles" class="angles"></div></details>
+  </section>
+  <section class="card" aria-labelledby="profile-dimensions-heading">
+    <h2 id="profile-dimensions-heading">Cotes de la pièce</h2>
+    <p class="hint">Mesures en pouces. Tu peux saisir des fractions, comme 2 ¼.</p>
+    <div id="beamBox"></div><div id="pieceFields"></div><div id="jRule"></div>
+    <div id="mainProduction" hidden>
+      <div class="piece-meta"><label>Longueur totale (po)<input id="productionLength" inputmode="decimal"></label><label>Quantité<input id="productionQty" type="number" min="1" max="999" value="1"></label></div>
+      <button id="sendMainProduction" type="button" class="primary full">Ajouter au dossier de production</button>
+    </div>
+    <button id="createOrder" type="button" class="primary full">Enregistrer la pièce</button>
+    <p id="orderState" class="local-state" role="status"></p>
+    <details><summary>Pièces enregistrées</summary>
+      <div class="actions"><button id="reloadOrder" type="button">Reprendre la dernière pièce</button><button id="toSupplierPO" type="button">Préparer un bon fournisseur</button></div>
+    </details>
+    <details><summary>Réglages du modèle</summary>
+      <h3>Cotes par défaut</h3><div id="adminFields"></div>
+      <div class="actions"><button id="saveDefaults" type="button">Enregistrer les cotes par défaut</button><button id="resetPiece" type="button">Réinitialiser les cotes de la pièce</button></div>
+      <h3>Visibilité sur cet appareil</h3>
+      <div class="checks"><label><input id="employeePub" type="checkbox"> Inclure au magasin employés</label><label><input id="shopPub" type="checkbox"> Inclure à la boutique</label></div>
+      <div class="actions"><button id="makePrivate" type="button">Réserver à l’atelier</button></div>
+    </details>
+  </section>
+</div></main><div id="toast" class="toast" role="status"></div>
 <script src="mir-calepinage-extension.js?v=trace-repli-1"></script><script src="../profile-production-transfer.js"></script><script>
 const X=window.MIRCalepinageExtension;const $=s=>document.querySelector(s);const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const STORE_STATES='mir:pliages:defaults-v3',STORE_LAST='mir:pliages:last-order-v3';
@@ -57,27 +99,39 @@ function template(){return X.PROFILE_TEMPLATES[active]}
 function visibleFields(){return template().fields.filter(f=>!f.visibleWhen||(f.visibleWhen==='beamHems'&&beamHems))}
 function syncOverrides(force=false){overrides[active]??={};for(const f of visibleFields()){const d=states[active].defaults[f.id];if(force||!(f.id in overrides[active]))overrides[active][f.id]=d?.value??f.defaultValue}}
 function resolved(){return X.resolveProfileValues(active,states[active],overrides[active]||{},{withBeamHems:beamHems})}
-function renderTabs(){$('#tabs').innerHTML=ids.map(id=>`<button class="tab ${id===active?'active':''}" data-id="${id}">${esc(X.PROFILE_TEMPLATES[id].name)}</button>`).join('');document.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{active=b.dataset.id;beamHems=false;acceptedException=null;syncOverrides(true);render()})}
-function renderBeam(){if(active!=='beam'){$('#beamBox').innerHTML='';return}$('#beamBox').innerHTML=`<div class="beam-options"><label class="checkbox"><input id="beamHems" type="checkbox" ${beamHems?'checked':''}><span><b>Avec replis</b><br><span class="muted">Deux cotes indépendantes; aucune valeur inventée.</span></span></label></div>`;$('#beamHems').onchange=e=>{beamHems=e.target.checked;if(!beamHems){delete overrides[active].leftHem;delete overrides[active].rightHem}syncOverrides(true);renderAdmin();renderPiece();renderDrawing()}}
-function renderAdmin(){const defs=visibleFields();$('#adminFields').innerHTML=defs.map(f=>{const d=states[active].defaults[f.id]||{value:f.defaultValue,locked:false};return `<div class="field-row"><div><b>${esc(f.label)}</b><small>${f.required?'requis':'facultatif'} · pouces</small></div><input data-admin="${f.id}" inputmode="decimal" value="${esc(d.value??'')}" placeholder="${f.defaultValue===''?'À préciser':''}"><label class="lock"><input data-lock="${f.id}" type="checkbox" ${d.locked?'checked':''}> verrouiller</label></div>`}).join('');document.querySelectorAll('[data-admin]').forEach(el=>el.oninput=()=>{const id=el.dataset.admin;states[active]=X.updateTemplateDefault(states[active],id,el.value,states[active].defaults[id]?.locked);syncOverrides(false);renderPiece();renderDrawing()});document.querySelectorAll('[data-lock]').forEach(el=>el.onchange=()=>{const id=el.dataset.lock;states[active]=X.updateTemplateDefault(states[active],id,states[active].defaults[id].value,el.checked);syncOverrides(false);renderPiece();renderDrawing()})}
-function renderPiece(){syncOverrides(false);$('#pieceFields').innerHTML=visibleFields().map(f=>{const d=states[active].defaults[f.id]||{locked:false};if(d.locked)overrides[active][f.id]=d.value;return `<div class="field-row piece"><div><b>${esc(f.label)}</b><small>${d.locked?'verrouillé admin':'prérempli modifiable'} · fractions acceptées</small></div><input data-piece="${f.id}" inputmode="decimal" value="${esc(overrides[active][f.id]??'')}" ${d.locked?'disabled':''} placeholder="Ex. 2 1/4"></div>`}).join('');document.querySelectorAll('[data-piece]').forEach(el=>el.oninput=()=>{overrides[active][el.dataset.piece]=el.value;acceptedException=null;renderDrawing();renderJ()})}
-function renderAngles(){const segs=template().segments.slice(1);$('#angles').innerHTML=segs.map(seg=>{const value=angles[active]?.[seg.id]??seg.turnDeg??0;return `<label class="angle"><span>${esc(seg.id)}</span><input data-angle="${seg.id}" type="number" step="1" value="${value}"><small>°</small></label>`}).join('');document.querySelectorAll('[data-angle]').forEach(el=>el.oninput=()=>{angles[active]??={};angles[active][el.dataset.angle]=Number(el.value);renderDrawing()})}
-function renderDrawing(){try{const vals=resolved();const opts={width:760,height:420,withBeamHems:beamHems,angleOverrides:angles[active]||{}};$('#drawing').innerHTML=X.renderProfileSvg(active,vals,opts);$('#drawError').textContent='';$('#dataState').textContent=JSON.stringify(X.buildProfileGeometry(active,vals,opts),null,2)}catch(e){$('#drawing').innerHTML='<span class="muted">Entrez les cotes requises; aucune cote absente n’est inventée.</span>';$('#drawError').textContent=e.message;$('#dataState').textContent=JSON.stringify({templateId:active,values:overrides[active]||{},angles:angles[active]||{}},null,2)}}
-function renderPublication(){const s=states[active];$('#stateBadge').textContent=s.visibility==='private'?'PRIVÉ':'PUBLIÉ EXPLICITEMENT';$('#stateBadge').className='badge '+(s.visibility==='private'?'':'published');$('#employeePub').checked=!!s.publishedToEmployeeStore;$('#shopPub').checked=!!s.publishedToShop}
-function renderJ(){const box=$('#jRule');if(active!=='coin_arch_j'){box.innerHTML='';return}let vals;try{vals=resolved()}catch{box.innerHTML='<p class="muted">La règle J sera vérifiée lorsque Retour du J et Clouage seront saisis.</p>';return}const c=X.checkJRule(vals);if(c.ok){box.innerHTML='<div class="accept"><b>Règle J conforme.</b> Minimum respecté.</div>';return}box.innerHTML=`<div class="warning"><b>Clouage hors règle.</b><br>Actuel : <b>${esc(X.formatInches(c.currentIn))}</b><br>Minimum : <b>${esc(X.formatInches(c.minimumIn))}</b><div class="actions"><button id="fixJ" class="primary">Corriger automatiquement</button><button id="keepJ">Garder quand même</button></div><div id="exceptionBox"></div></div>`;$('#fixJ').onclick=()=>{const corrected=X.autoCorrectJ(vals);overrides[active].nailing=String(corrected.nailing);acceptedException=null;renderPiece();renderDrawing();renderJ()};$('#keepJ').onclick=()=>{$('#exceptionBox').innerHTML='<div class="accept"><label class="checkbox"><input id="acceptCheck" type="checkbox"><span>J’accepte explicitement la valeur hors règle.</span></label><div class="field-row piece"><div><b>Approuvé par</b><small>requis pour la traçabilité</small></div><input id="acceptedBy" placeholder="Nom / identifiant"></div><div class="field-row piece"><div><b>Note</b><small>facultatif</small></div><input id="exceptionNote" placeholder="Contexte chantier"></div><button id="confirmException" class="secondary">Confirmer l’exception</button></div>';$('#confirmException').onclick=()=>{if(!$('#acceptCheck').checked)return toast('Acceptation explicite requise.');const who=$('#acceptedBy').value.trim();if(!who)return toast('Indiquez qui accepte l’exception.');acceptedException={accepted:true,acceptedBy:who,note:$('#exceptionNote').value.trim()};X.acceptJException(vals,acceptedException);toast('Exception prête à être enregistrée dans le snapshot.')}}}
-function renderOrder(){if(!lastOrder){$('#orderState').textContent='Aucun snapshot.';$('#productionState').textContent='Aucune reprise.';return}$('#orderState').textContent=JSON.stringify(lastOrder,null,2);$('#productionState').textContent=JSON.stringify(X.profileOrderToProductionPiece(lastOrder),null,2)}
+function renderTabs(){$('#tabs').innerHTML=ids.map(id=>`<button class="tab" aria-pressed="${id===active}" data-id="${id}">${esc(X.PROFILE_TEMPLATES[id].name)}</button>`).join('');document.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{active=b.dataset.id;beamHems=false;acceptedException=null;syncOverrides(true);render();document.querySelector('[data-id][aria-pressed="true"]')?.focus()})}
+function renderBeam(){if(active!=='beam'){$('#beamBox').innerHTML='';return}$('#beamBox').innerHTML=`<div class="beam-options"><label class="checkbox"><input id="beamHems" type="checkbox" ${beamHems?'checked':''}><span><b>Avec replis</b><br><span class="muted">Entre la cote de chaque repli.</span></span></label></div>`;$('#beamHems').onchange=e=>{beamHems=e.target.checked;if(!beamHems){delete overrides[active].leftHem;delete overrides[active].rightHem}syncOverrides(true);renderAdmin();renderPiece();renderDrawing()}}
+function renderAdmin(){const defs=visibleFields();$('#adminFields').innerHTML=defs.map(f=>{const d=states[active].defaults[f.id]||{value:f.defaultValue,locked:false};return `<div class="field-row"><div><b>${esc(f.label)}</b><small>${f.required?'requis':'facultatif'} · pouces</small></div><input data-admin="${f.id}" inputmode="decimal" value="${esc(d.value??'')}" aria-label="Cote par défaut : ${esc(f.label)}" placeholder="${f.defaultValue===''?'À préciser':''}"><label class="lock"><input data-lock="${f.id}" type="checkbox" aria-label="Verrouiller : ${esc(f.label)}" ${d.locked?'checked':''}> verrouiller</label></div>`}).join('');document.querySelectorAll('[data-admin]').forEach(el=>el.oninput=()=>{const id=el.dataset.admin;states[active]=X.updateTemplateDefault(states[active],id,el.value,states[active].defaults[id]?.locked);syncOverrides(false);renderPiece();renderDrawing()});document.querySelectorAll('[data-lock]').forEach(el=>el.onchange=()=>{const id=el.dataset.lock;states[active]=X.updateTemplateDefault(states[active],id,states[active].defaults[id].value,el.checked);syncOverrides(false);renderPiece();renderDrawing()})}
+function renderPiece(){syncOverrides(false);$('#pieceFields').innerHTML=visibleFields().map(f=>{const d=states[active].defaults[f.id]||{locked:false};if(d.locked)overrides[active][f.id]=d.value;return `<div class="field-row piece"><div><b>${esc(f.label)}</b><small>${d.locked?'verrouillé admin':'prérempli modifiable'} · fractions acceptées</small></div><input data-piece="${f.id}" inputmode="decimal" aria-label="${esc(f.label)}" value="${esc(overrides[active][f.id]??'')}" ${d.locked?'disabled':''} placeholder="Ex. 2 1/4"></div>`}).join('');document.querySelectorAll('[data-piece]').forEach(el=>el.oninput=()=>{overrides[active][el.dataset.piece]=el.value;acceptedException=null;renderDrawing();renderJ()})}
+function renderAngles(){const segs=template().segments.slice(1);$('#angles').innerHTML=segs.map(seg=>{const value=angles[active]?.[seg.id]??seg.turnDeg??0;return `<label class="angle"><span>${esc(seg.id)}</span><input data-angle="${seg.id}" aria-label="Angle du pli : ${esc(seg.id)}" type="number" step="1" value="${value}"><small>°</small></label>`}).join('');document.querySelectorAll('[data-angle]').forEach(el=>el.oninput=()=>{angles[active]??={};angles[active][el.dataset.angle]=Number(el.value);renderDrawing()})}
+function renderDrawing(){
+  try{
+    const opts={width:760,height:420,withBeamHems:beamHems,angleOverrides:angles[active]||{}};
+    $('#drawing').innerHTML=X.renderProfileSvg(active,resolved(),opts);
+    $('#drawError').textContent='';
+  }catch(error){
+    $('#drawing').innerHTML='<p class="muted">Complète les cotes requises pour afficher la pièce.</p>';
+    $('#drawError').textContent=error.message;
+  }
+}
+function renderPublication(){const s=states[active];$('#stateBadge').textContent=s.visibility==='private'?'Atelier seulement':'Partage local';$('#employeePub').checked=!!s.publishedToEmployeeStore;$('#shopPub').checked=!!s.publishedToShop}
+function renderJ(){const box=$('#jRule');if(active!=='coin_arch_j'){box.innerHTML='';return}let vals;try{vals=resolved()}catch{box.innerHTML='<p class="muted">La règle J sera vérifiée lorsque Retour du J et Clouage seront saisis.</p>';return}const c=X.checkJRule(vals);if(c.ok){box.innerHTML='<div class="accept"><b>Règle J conforme.</b> Minimum respecté.</div>';return}box.innerHTML=`<div class="warning"><b>Clouage hors règle.</b><br>Actuel : <b>${esc(X.formatInches(c.currentIn))}</b><br>Minimum : <b>${esc(X.formatInches(c.minimumIn))}</b><div class="actions"><button id="fixJ" class="primary">Corriger automatiquement</button><button id="keepJ">Garder quand même</button></div><div id="exceptionBox"></div></div>`;$('#fixJ').onclick=()=>{const corrected=X.autoCorrectJ(vals);overrides[active].nailing=String(corrected.nailing);acceptedException=null;renderPiece();renderDrawing();renderJ()};$('#keepJ').onclick=()=>{$('#exceptionBox').innerHTML='<div class="accept"><label class="checkbox"><input id="acceptCheck" type="checkbox"><span>J’accepte explicitement la valeur hors règle.</span></label><div class="field-row piece"><div><b>Approuvé par</b><small>requis pour la traçabilité</small></div><input id="acceptedBy" placeholder="Nom / identifiant"></div><div class="field-row piece"><div><b>Note</b><small>facultatif</small></div><input id="exceptionNote" placeholder="Contexte chantier"></div><button id="confirmException" class="secondary">Confirmer l’exception</button></div>';$('#confirmException').onclick=()=>{if(!$('#acceptCheck').checked)return toast('Acceptation explicite requise.');const who=$('#acceptedBy').value.trim();if(!who)return toast('Indiquez qui accepte l’exception.');acceptedException={accepted:true,acceptedBy:who,note:$('#exceptionNote').value.trim()};X.acceptJException(vals,acceptedException);toast('Exception prête à être enregistrée avec la pièce.')}}}
+function renderOrder(){
+  const profile=lastOrder&&X.PROFILE_TEMPLATES[lastOrder.templateId];
+  $('#orderState').textContent=profile?'Dernière pièce enregistrée ici · '+profile.name:'';
+}
 function render(){renderTabs();renderBeam();renderAdmin();renderPiece();renderAngles();renderPublication();renderDrawing();renderJ();renderOrder()}
 loadStates();syncOverrides(true);render();
-$('#saveDefaults').onclick=()=>{localStorage.setItem(STORE_STATES,JSON.stringify(states));toast('Défauts enregistrés dans cet aperçu local; backend partagé non revendiqué.')};
-$('#resetPiece').onclick=()=>{syncOverrides(true);acceptedException=null;renderPiece();renderDrawing();renderJ();toast('Pièce remise aux défauts du modèle.')};
-$('#makePrivate').onclick=()=>{states[active]=X.setTemplatePublication(X.setTemplatePublication(states[active],'employeeStore',false),'shop',false);renderPublication();toast('Modèle privé; aucun article créé.')};
+$('#saveDefaults').onclick=()=>{localStorage.setItem(STORE_STATES,JSON.stringify(states));toast('Cotes par défaut enregistrées sur cet appareil.')};
+$('#resetPiece').onclick=()=>{syncOverrides(true);acceptedException=null;renderPiece();renderDrawing();renderJ();toast('Cotes de la pièce réinitialisées.')};
+$('#makePrivate').onclick=()=>{states[active]=X.setTemplatePublication(X.setTemplatePublication(states[active],'employeeStore',false),'shop',false);renderPublication();toast('Modèle réservé à l’atelier sur cet appareil.')};
 $('#employeePub').onchange=e=>{states[active]=X.setTemplatePublication(states[active],'employeeStore',e.target.checked);renderPublication()};$('#shopPub').onchange=e=>{states[active]=X.setTemplatePublication(states[active],'shop',e.target.checked);renderPublication()};
-$('#createOrder').onclick=()=>{try{const vals=resolved();const options={withBeamHems:beamHems,angleOverrides:angles[active]||{},publication:{employeeStore:states[active].publishedToEmployeeStore,shop:states[active].publishedToShop},metadata:{source:'candidate intégration MIR Pliages'}};if(active==='coin_arch_j'&&acceptedException)options.exception=acceptedException;lastOrder=X.finalizeProfileOrder(active,vals,options);localStorage.setItem(STORE_LAST,X.serializeProfileOrder(lastOrder));renderOrder();toast('Snapshot immuable créé; production reprend sans redessin.')}catch(e){toast(e.message);renderJ()}};
-$('#toSupplierPO').onclick=()=>{try{if(!lastOrder){const raw=localStorage.getItem(STORE_LAST);if(raw)lastOrder=X.restoreProfileOrder(raw)}if(!lastOrder)throw new Error('Créez d’abord un snapshot de pièce.');const production=X.profileOrderToProductionPiece(lastOrder);localStorage.setItem('mir:supplier-po:transfer-piece-v1',JSON.stringify(production));window.location.href='supplier-purchase-order-candidate.html'}catch(e){toast(e.message)}};
+$('#createOrder').onclick=()=>{try{const vals=resolved();const options={withBeamHems:beamHems,angleOverrides:angles[active]||{},publication:{employeeStore:states[active].publishedToEmployeeStore,shop:states[active].publishedToShop},metadata:{source:'candidate intégration MIR Pliages'}};if(active==='coin_arch_j'&&acceptedException)options.exception=acceptedException;lastOrder=X.finalizeProfileOrder(active,vals,options);localStorage.setItem(STORE_LAST,X.serializeProfileOrder(lastOrder));renderOrder();toast('Pièce enregistrée sur cet appareil.')}catch(e){toast(e.message);renderJ()}};
+$('#toSupplierPO').onclick=()=>{try{if(!lastOrder){const raw=localStorage.getItem(STORE_LAST);if(raw)lastOrder=X.restoreProfileOrder(raw)}if(!lastOrder)throw new Error('Enregistre la pièce avant de préparer le bon fournisseur.');const production=X.profileOrderToProductionPiece(lastOrder);localStorage.setItem('mir:supplier-po:transfer-piece-v1',JSON.stringify(production));window.location.href='supplier-purchase-order-candidate.html'}catch(e){toast(e.message)}};
 const mainProduction=new URLSearchParams(location.search).get('production')==='1';
 $('#mainProduction').hidden=!mainProduction;
 if(mainProduction){
-  document.querySelector('body > aside').textContent='Préparation de pièce MIR · dossier de production local sur cet appareil.';
+  $('#createOrder').classList.remove('primary');
   document.querySelector('header h1').textContent='MIR · Pliages et coins';
 }
 $('#sendMainProduction').onclick=()=>{
@@ -92,5 +146,6 @@ $('#sendMainProduction').onclick=()=>{
     location.href='../production.html?profil-mir=1';
   }catch(error){toast(error.message);renderJ();}
 };
-$('#reloadOrder').onclick=()=>{try{const raw=localStorage.getItem(STORE_LAST);if(!raw)throw new Error('Aucun snapshot local à recharger.');lastOrder=X.restoreProfileOrder(raw);active=lastOrder.templateId;beamHems=!!lastOrder.options?.withBeamHems;angles[active]=lastOrder.options?.angleOverrides||{};overrides[active]=Object.fromEntries(Object.entries(lastOrder.values||{}).filter(([,v])=>v!==null).map(([k,v])=>[k,String(v)]));acceptedException=lastOrder.ruleExceptions?.[0]?{accepted:true,acceptedBy:lastOrder.ruleExceptions[0].acceptedBy,note:lastOrder.ruleExceptions[0].note}:null;render();toast('Snapshot rechargé avec ses exceptions et mesures.')}catch(e){toast(e.message)}};
+$('#reloadOrder').onclick=()=>{try{const raw=localStorage.getItem(STORE_LAST);if(!raw)throw new Error('Aucune pièce enregistrée sur cet appareil.');lastOrder=X.restoreProfileOrder(raw);active=lastOrder.templateId;beamHems=!!lastOrder.options?.withBeamHems;angles[active]=lastOrder.options?.angleOverrides||{};overrides[active]=Object.fromEntries(Object.entries(lastOrder.values||{}).filter(([,v])=>v!==null).map(([k,v])=>[k,String(v)]));acceptedException=lastOrder.ruleExceptions?.[0]?{accepted:true,acceptedBy:lastOrder.ruleExceptions[0].acceptedBy,note:lastOrder.ruleExceptions[0].note}:null;render();toast('Pièce reprise avec ses mesures et exceptions.')}catch(e){toast(e.message)}};
 </script></body></html>
+
