@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f2ed">
+  <title>Studio matières — MIR</title>
+  <meta name="description" content="Explorez des matières et des teintes génériques sur une maison de démonstration en trois dimensions.">
+  <style>
+    :root{--ivory:#f4f2ed;--ink:#19221d;--green:#a7b97a;--line:#d9ddd2;--muted:#626b60;--paper:#fffef9;--soft:#e9ede2}
+    *{box-sizing:border-box}body{margin:0;background:var(--ivory);color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}button,input{font:inherit}button,a,input,label{-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{cursor:pointer}a{color:inherit}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #526c2d;outline-offset:4px}button{color:var(--ink)}
+    .site-header{height:84px;max-width:1500px;margin:auto;padding:0 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:20px}.identity{display:flex;align-items:center;gap:16px;text-decoration:none}.wordmark{font-size:34px;font-weight:900;letter-spacing:-3px;line-height:1}.identity span:last-child{border-left:1px solid #b9bfb1;padding-left:16px;font-size:10px;line-height:1.5;letter-spacing:2px;text-transform:uppercase}.back{font-size:12px;text-decoration:none;display:flex;align-items:center;gap:10px}.back:hover{text-decoration:underline}.back svg{width:17px;height:17px}
+    main{max-width:1500px;margin:auto;padding:43px 48px 30px}.intro{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:29px}.eyebrow{margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:2.3px;text-transform:uppercase;color:#58644b}.intro h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(32px,3.1vw,48px);font-weight:400;line-height:1.09;letter-spacing:-1.8px;margin:0 0 13px}.intro p.description{max-width:600px;margin:0;font-size:13px;line-height:1.7;color:var(--muted)}.demo-stamp{display:flex;gap:9px;align-items:center;font-size:10px;text-transform:uppercase;letter-spacing:1.3px;white-space:nowrap;padding-bottom:4px}.demo-stamp:before{content:'';width:6px;height:6px;border-radius:50%;background:#7f9257}
+    .studio{display:grid;grid-template-columns:minmax(0,1fr) 326px;gap:22px;align-items:start}.viewer{min-width:0;border:1px solid var(--line);border-radius:3px;overflow:hidden;background:#e9ece3}.stage{position:relative;height:clamp(420px,43vw,630px);isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#f9faf5 0%,#eef0e7 55%,#e4e8de 100%)}canvas{display:block;width:100%;height:100%;cursor:default}.stage-label{position:absolute;left:23px;top:22px;pointer-events:none}.stage-label strong{display:block;font-size:10px;font-weight:700;letter-spacing:1.8px}.stage-label span{display:block;font-size:10px;color:var(--muted);margin-top:7px}.stage-tools{position:absolute;right:18px;top:17px;display:flex;gap:7px}.quiet-btn{border:1px solid #cdd3c3;background:#f8faf3e8;border-radius:3px;font-size:11px;padding:10px 12px;min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:6px}.quiet-btn:hover{background:#fff}.quiet-btn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}.quiet-btn svg{width:14px;height:14px}.view-note{position:absolute;left:22px;bottom:21px;pointer-events:none;font-size:10px;line-height:1.65;color:#627056;max-width:62%}.compass{position:absolute;right:25px;bottom:23px;text-align:center;color:#69745e;font-size:9px;letter-spacing:1px}.compass svg{display:block;width:33px;height:40px;margin:4px auto 0}.measure-strip{display:flex;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#f7f8f2}.measure{padding:16px 22px;flex:1;min-width:0}.measure+.measure{border-left:1px solid var(--line)}.measure small{display:block;font-size:8px;text-transform:uppercase;letter-spacing:1.4px;color:#64705a;margin-bottom:5px}.measure strong{font-size:16px;font-weight:400;font-variant-numeric:tabular-nums}.measure span{font-size:10px;color:#64705a}.rotation{padding:18px 22px 19px;background:#fdfdf8}.rotation-head{display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:11px}.rotation-head output{font-variant-numeric:tabular-nums;color:var(--muted);min-width:37px;text-align:right}.range-row{display:flex;align-items:center;gap:12px;margin:10px 0 13px}.rotate-arrow{width:32px;height:32px;background:none;border:1px solid #d1d7c8;border-radius:50%;font-size:17px;flex:none}.rotate-arrow:hover{background:var(--soft)}input[type="range"]{width:100%;accent-color:#516738;cursor:pointer;min-height:28px}.presets{display:flex;gap:7px;flex-wrap:wrap}.preset{border:1px solid #d5dacd;background:transparent;border-radius:2px;padding:7px 11px;font-size:10px}.preset:hover,.preset[aria-pressed="true"]{background:#e9eedf;border-color:#a9ba8c}.viewer-caption{margin:13px 2px 0;display:flex;justify-content:space-between;gap:20px;color:#71786b;font-size:10px;line-height:1.6}.viewer-caption strong{font-weight:400;color:#384a30}.canvas-status{max-width:440px}
+    .controls{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:24px 22px 21px}.control-heading{display:flex;align-items:center;gap:9px;margin:0 0 23px;font-size:10px;letter-spacing:1.7px;text-transform:uppercase}.control-heading:before{content:'';width:16px;height:1px;background:#758c51}fieldset{border:0;margin:0 0 24px;padding:0;min-width:0}legend{padding:0;margin-bottom:12px;width:100%;font-size:12px;font-weight:600;display:block}.step-no{font-size:9px;color:#81916c;font-weight:400;margin-right:9px}.zone-list{display:grid;gap:6px}.radio-input{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.zone-option{position:relative}.zone-label{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;background:#f7f8f2;border:1px solid #e1e5da;border-radius:2px;cursor:pointer;min-height:42px;font-size:11px}.zone-left{display:flex;gap:10px;align-items:center}.zone-icon{display:inline-block;width:17px;height:16px;border:1px solid #869477;position:relative}.zone-icon.front:after{content:'';position:absolute;inset:3px;background:#a8b88f}.zone-icon.side:after{content:'';position:absolute;right:2px;top:2px;bottom:2px;width:5px;background:#a8b88f}.zone-icon.gable{height:13px;border:0;clip-path:polygon(50% 0,100% 100%,0 100%);background:#9dac88}.zone-dot{width:8px;height:8px;border-radius:50%;border:1px solid #b1bb9e}.radio-input:checked+.zone-label{background:#edf2e2;border-color:#7e925c}.radio-input:checked+.zone-label .zone-dot{background:#61793f;border-color:#61793f}.radio-input:focus-visible+label{outline:3px solid #526c2d;outline-offset:3px}.material-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.material-label{display:block;cursor:pointer;border:1px solid #d9dfd1;padding:5px;border-radius:2px;background:#fffef9}.material-label>span:last-child{display:block;padding:7px 3px 3px;font-size:10px}.material-sample{display:block;height:37px;background-color:#d4d6c8;position:relative;overflow:hidden}.sample-clin{background:repeating-linear-gradient(0deg,#c3c8b6 0,#e0e3d7 2px,#d2d7c7 10px,#a4ad94 11px)}.sample-bois{background:repeating-linear-gradient(90deg,#c0a47c 0,#c8ad86 5px,#b89b72 7px,#c5aa81 12px,#8c7654 13px,#c0a47c 14px)}.sample-metal{background:repeating-linear-gradient(90deg,#788579 0,#7f8b7b 24px,#4f5e50 25px,#526051 27px,#81907c 29px)}.sample-brique{background-color:#ae8068;background-image:linear-gradient(0deg,transparent 90%,#e7dfd0 90%),linear-gradient(90deg,transparent 94%,#e7dfd0 94%);background-size:100% 10px,27px 20px}.radio-input:checked+.material-label{border-color:#71874b;box-shadow:0 0 0 1px #71874b}.material-hint{margin:9px 0 0;font-size:9px;line-height:1.55;color:#78806f}.color-title{display:flex;justify-content:space-between;align-items:baseline}.color-title output{font-size:10px;font-weight:400;color:#78806f}.color-options{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.color-label{display:flex;justify-content:center;align-items:center;cursor:pointer;min-height:43px;border:1px solid transparent;border-radius:50%}.color-chip{display:block;width:31px;height:31px;background:var(--swatch);border:1px solid #19221d20;border-radius:50%;transition:transform .15s}.radio-input:checked+.color-label{border-color:#61793f}.radio-input:checked+.color-label .color-chip{transform:scale(.84)}.color-label:hover .color-chip{transform:scale(.9)}.generic-note{color:#76816c;font-size:9px;line-height:1.55;margin:11px 0 0}.summary{border-top:1px solid #e0e5d7;padding-top:15px;margin-top:-2px}.summary-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#7c866f;margin:0 0 11px}.summary-row{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:9px;margin:9px 0;color:#636e59}.summary-row b{font-weight:400;color:#35472e;text-align:right}.summary-color{display:inline-block;width:7px;height:7px;border:1px solid #19221d25;background:var(--swatch);border-radius:50%;margin-right:5px}.actions{display:flex;gap:7px;margin-top:18px}.export{background:var(--ink);color:white;border:1px solid var(--ink);font-size:10px;padding:12px 10px;flex:1;border-radius:2px;min-height:40px}.export:hover{background:#35452f}.reset{border:1px solid #d3dac8;background:transparent;font-size:10px;padding:10px;border-radius:2px;min-height:40px}.reset:hover{background:var(--soft)}.export-note{font-size:8px;line-height:1.6;color:#7b8473;margin:8px 0 0;text-align:center}.requirements{margin-top:14px;padding:16px 17px;border:1px solid #d6ddca;background:#e9eedf;border-radius:2px}.requirements h2{font-size:11px;font-weight:600;margin:0 0 6px}.requirements p{margin:0;font-size:10px;line-height:1.65;color:#65715a}.requirements strong{font-weight:600;color:#48583b}.disclaimer{max-width:900px;line-height:1.7;font-size:10px;color:#77816d;margin:28px 0 0}.footer{display:flex;justify-content:space-between;gap:18px;margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-size:9px;letter-spacing:1px;color:#6e7864;text-transform:uppercase}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(min-width:1250px){.controls{padding:26px 25px 23px}.studio{grid-template-columns:minmax(0,1fr) 344px;gap:25px}}
+    @media(max-width:1000px){main{padding:30px 25px}.site-header{padding:0 25px;height:73px}.intro{align-items:flex-start}.demo-stamp{margin-top:5px}.studio{grid-template-columns:minmax(0,1fr) 292px;gap:16px}.controls{padding:20px 16px}.stage{height:480px}.measure{padding:14px}.viewer-caption{flex-direction:column;gap:2px}.view-note{max-width:70%}}
+    @media(max-width:760px){.site-header{padding:0 20px;height:68px}.identity span:last-child{font-size:8px;letter-spacing:1.2px;padding-left:12px}.identity{gap:12px}.wordmark{font-size:30px}.back{font-size:10px;gap:6px}main{padding:28px 18px 22px}.intro{display:block;margin-bottom:23px}.intro h1{font-size:35px;letter-spacing:-1.3px;max-width:350px}.intro p.description{font-size:12px;max-width:490px}.demo-stamp{margin-top:17px;font-size:9px}.eyebrow{font-size:9px;margin-bottom:12px}.studio{display:flex;flex-direction:column;gap:22px}.visual-column,.control-column{width:100%}.stage{height:410px}.stage-label{left:17px;top:20px}.stage-label strong{font-size:9px}.stage-label span{max-width:130px;font-size:9px}.stage-tools{right:13px;top:14px}.quiet-btn{font-size:10px;padding:9px 10px}.view-note{font-size:9px;left:17px;bottom:17px;max-width:70%}.compass{right:20px;bottom:17px}.measure{padding:13px 16px}.measure strong{font-size:15px}.measure small{font-size:8px;letter-spacing:1px}.rotation{padding:16px 17px}.viewer-caption{font-size:9px;gap:4px}.controls{padding:23px}.control-heading{margin-bottom:20px}.material-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.material-label>span:last-child{font-size:9px;line-height:1.4}.zone-label{font-size:12px;padding:12px}.color-options{max-width:310px}.color-label{width:44px}.color-title output{margin-left:10px}.color-title{justify-content:flex-start}.summary-row{font-size:10px}.actions button{font-size:11px}.export-note{font-size:9px}.requirements h2{font-size:12px}.requirements p{font-size:11px}.disclaimer{margin-top:23px;font-size:9px}.footer{font-size:8px;line-height:1.6}.footer span:last-child{text-align:right}}
+    @media(max-width:380px){.stage{height:365px}.identity span:last-child{display:none}.intro h1{font-size:31px}.controls{padding:20px 16px}.material-grid{gap:5px}.material-label{padding:4px}.measure{padding:12px 11px}.measure small{letter-spacing:.6px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="identity" href="./index.html" aria-label="MIR, retour au concept"><span class="wordmark">MIR</span><span>Studio<br>matières</span></a>
+    <a class="back" href="./index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>Retour au concept</a>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div><p class="eyebrow">Imaginer avant de choisir</p><h1 id="page-title">Donnez matière à votre projet.</h1><p class="description">Une maison, plusieurs façons de l’habiter. Composez ses façades avec des matières et des teintes génériques, puis explorez votre combinaison sous tous les angles.</p></div>
+      <div class="demo-stamp">Étude de façade · 01</div>
+    </section>
+    <div class="studio">
+      <div class="visual-column">
+        <section class="viewer" aria-label="Vue de la maison hypothétique">
+          <div class="stage" id="stage">
+            <canvas id="house-canvas" role="img" aria-label="Maison hypothétique en trois dimensions. Utilisez les contrôles de zone, de matière, de teinte et de rotation pour la personnaliser." aria-describedby="model-caption"></canvas>
+            <div class="stage-label"><strong>MAISON 01</strong><span>Volume principal · modèle hypothétique</span></div>
+            <div class="stage-tools"><button type="button" class="quiet-btn" id="dimension-toggle" aria-pressed="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 6v8m14-8v8M3 10h14M6 8v4m4-4v4m4-4v4"/></svg>Cotes</button></div>
+            <div class="view-note">Sélectionnez une zone dans le panneau<br>ou cliquez directement sur une façade.</div>
+            <div class="compass" aria-hidden="true">N<svg viewBox="0 0 36 44"><g id="compass-needle" transform="rotate(-32 18 22)"><path d="M18 3 24 32 18 27 12 32Z" fill="#8d9e72"/><path d="M18 3v24l6 5Z" fill="#485c37"/></g></svg></div>
+          </div>
+          <div class="measure-strip" aria-label="Dimensions hypothétiques du volume principal, hors débords de toit">
+            <div class="measure"><small>Largeur</small><strong>12,0 <span>m</span></strong></div>
+            <div class="measure"><small>Profondeur</small><strong>8,0 <span>m</span></strong></div>
+            <div class="measure"><small>Hauteur au faîte</small><strong>6,0 <span>m</span></strong></div>
+          </div>
+          <div class="rotation">
+            <div class="rotation-head"><label for="rotation">Faites tourner votre point de vue</label><output id="angle-output" for="rotation">32°</output></div>
+            <div class="range-row"><button type="button" class="rotate-arrow" id="rotate-left" aria-label="Tourner la vue de 15 degrés vers la gauche">↶</button><input id="rotation" type="range" min="-180" max="180" step="1" value="32" aria-valuetext="32 degrés"><button type="button" class="rotate-arrow" id="rotate-right" aria-label="Tourner la vue de 15 degrés vers la droite">↷</button></div>
+            <div class="presets" aria-label="Points de vue prédéfinis"><button type="button" class="preset" data-angle="0" aria-pressed="false">Vue avant</button><button type="button" class="preset" data-angle="32" aria-pressed="true">Trois quarts</button><button type="button" class="preset" data-angle="180" aria-pressed="false">Vue arrière</button></div>
+          </div>
+        </section>
+        <div class="viewer-caption"><span id="model-caption">Modèle de démonstration — aucun plan client importé.</span><strong class="canvas-status" id="selection-status" role="status" aria-live="polite">Façade avant · Clin horizontal · Ivoire</strong></div>
+      </div>
+      <aside class="control-column" aria-label="Personnaliser les matières">
+        <div class="controls">
+          <h2 class="control-heading">Votre composition</h2>
+          <fieldset><legend><span class="step-no">01</span>Choisir une zone</legend><div class="zone-list">
+            <div class="zone-option"><input class="radio-input" type="radio" name="zone" id="zone-facade" value="facade" checked><label class="zone-label" for="zone-facade"><span class="zone-left"><span class="zone-icon front" aria-hidden="true"></span>Façade avant</span><span class="zone-dot" aria-hidden="true"></span></label></div>
+            <div class="zone-option"><input class="radio-input" type="radio" name="zone" id="zone-laterales" value="laterales"><label class="zone-label" for="zone-laterales"><span class="zone-left"><span class="zone-icon side" aria-hidden="true"></span>Côtés et façade arrière</span><span class="zone-dot" aria-hidden="true"></span></label></div>
+            <div class="zone-option"><input class="radio-input" type="radio" name="zone" id="zone-pignons" value="pignons"><label class="zone-label" for="zone-pignons"><span class="zone-left"><span class="zone-icon gable" aria-hidden="true"></span>Pignons</span><span class="zone-dot" aria-hidden="true"></span></label></div>
+          </div></fieldset>
+          <fieldset><legend><span class="step-no">02</span>Explorer les matières</legend><div class="material-grid">
+            <div><input class="radio-input" type="radio" name="material" id="material-clin" value="clin" checked><label class="material-label" for="material-clin"><span class="material-sample sample-clin" aria-hidden="true"></span><span>Clin horizontal</span></label></div>
+            <div><input class="radio-input" type="radio" name="material" id="material-bois" value="bois"><label class="material-label" for="material-bois"><span class="material-sample sample-bois" aria-hidden="true"></span><span>Bois vertical</span></label></div>
+            <div><input class="radio-input" type="radio" name="material" id="material-metal" value="metal"><label class="material-label" for="material-metal"><span class="material-sample sample-metal" aria-hidden="true"></span><span>Métal</span></label></div>
+            <div><input class="radio-input" type="radio" name="material" id="material-brique" value="brique"><label class="material-label" for="material-brique"><span class="material-sample sample-brique" aria-hidden="true"></span><span>Brique</span></label></div>
+          </div><p class="material-hint" id="material-hint">Clin générique · pas de 190 mm dans le modèle.</p><p class="material-hint">Maçonnerie : visualisation seulement.</p></fieldset>
+          <fieldset><legend class="color-title"><span><span class="step-no">03</span>Trouver une teinte</span><output id="color-name">Ivoire</output></legend><div class="color-options">
+            <div><input class="radio-input" type="radio" name="color" id="color-ivoire" value="ivoire" checked><label class="color-label" for="color-ivoire" title="Ivoire"><span class="color-chip" style="--swatch:#deded0"></span><span class="sr-only">Ivoire</span></label></div>
+            <div><input class="radio-input" type="radio" name="color" id="color-sauge" value="sauge"><label class="color-label" for="color-sauge" title="Sauge"><span class="color-chip" style="--swatch:#9ba78a"></span><span class="sr-only">Sauge</span></label></div>
+            <div><input class="radio-input" type="radio" name="color" id="color-graphite" value="graphite"><label class="color-label" for="color-graphite" title="Graphite"><span class="color-chip" style="--swatch:#48524b"></span><span class="sr-only">Graphite</span></label></div>
+            <div><input class="radio-input" type="radio" name="color" id="color-sable" value="sable"><label class="color-label" for="color-sable" title="Sable"><span class="color-chip" style="--swatch:#c6b18e"></span><span class="sr-only">Sable</span></label></div>
+            <div><input class="radio-input" type="radio" name="color" id="color-terre" value="terre"><label class="color-label" for="color-terre" title="Terre cuite"><span class="color-chip" style="--swatch:#a36f55"></span><span class="sr-only">Terre cuite</span></label></div>
+          </div><p class="generic-note">Teintes de démonstration, sans correspondance avec un nuancier fabricant.</p></fieldset>
+          <section class="summary" aria-label="Récapitulatif des trois zones"><p class="summary-label">L’ensemble de votre maison</p><div id="summary-rows"></div></section>
+          <div class="actions"><button type="button" class="reset" id="reset">Réinitialiser</button><button type="button" class="export" id="export">Exporter mes choix ↗</button></div><p class="export-note">Un fichier .json sur votre appareil. Aucun envoi.</p>
+        </div>
+        <section class="requirements"><h2>Et pour votre vraie maison ?</h2><p>La prochaine étape nécessitera vos <strong>plans cotés et vos élévations</strong>, puis la validation des profils et teintes disponibles.</p></section>
+      </aside>
+    </div>
+    <p class="disclaimer">Les dimensions et motifs appartiennent à cette maison hypothétique. Les joints et les stries sont construits dans les unités du modèle, puis projetés selon la vue. Ce rendu schématique ne fournit ni quantité commandable, ni devis, ni validation de pose. Les couleurs à l’écran ne remplacent pas un échantillon réel.</p>
+    <footer class="footer"><span>Les Revêtements MIR · Studio matières</span><span>Concept exploratoire · Maison hypothétique</span></footer>
+  </main>
+  <script>
+  (()=>{
+    'use strict';
+    const canvas=document.getElementById('house-canvas'),ctx=canvas.getContext('2d'),stage=document.getElementById('stage');
+    const zones={facade:'Façade avant',laterales:'Côtés et arrière',pignons:'Pignons'};
+    const materials={clin:{name:'Clin horizontal',hint:'Clin générique · pas de 190 mm dans le modèle.',pitch:.19},bois:{name:'Bois vertical',hint:'Planches génériques · pas de 145 mm dans le modèle.',pitch:.145},metal:{name:'Métal',hint:'Métal générique · joints tous les 420 mm dans le modèle.',pitch:.42},brique:{name:'Brique',hint:'Module générique de 240 × 75 mm · visualisation seulement.',pitch:.075}};
+    const colors={ivoire:{name:'Ivoire',hex:'#deded0'},sauge:{name:'Sauge',hex:'#9ba78a'},graphite:{name:'Graphite',hex:'#48524b'},sable:{name:'Sable',hex:'#c6b18e'},terre:{name:'Terre cuite',hex:'#a36f55'}};
+    const defaults={facade:{material:'clin',color:'ivoire'},laterales:{material:'bois',color:'sable'},pignons:{material:'metal',color:'sauge'}};
+    let choices=JSON.parse(JSON.stringify(defaults)),selected='facade',angle=32,showDimensions=true,W=0,H=0,scale=1,hitFaces=[];
+    let co=1,si=0;const elevation=27*Math.PI/180,ce=Math.cos(elevation),se=Math.sin(elevation);
+    const faces=[
+      {id:'front',zone:'facade',normal:[0,-1,0],base:[-6,-4,0],u:[1,0,0],width:12,poly:[[-6,-4,0],[6,-4,0],[6,-4,4.2],[-6,-4,4.2]]},
+      {id:'back',zone:'laterales',normal:[0,1,0],base:[6,4,0],u:[-1,0,0],width:12,poly:[[6,4,0],[-6,4,0],[-6,4,4.2],[6,4,4.2]]},
+      {id:'right',zone:'laterales',normal:[1,0,0],base:[6,-4,0],u:[0,1,0],width:8,poly:[[6,-4,0],[6,4,0],[6,4,4.2],[6,-4,4.2]]},
+      {id:'left',zone:'laterales',normal:[-1,0,0],base:[-6,4,0],u:[0,-1,0],width:8,poly:[[-6,4,0],[-6,-4,0],[-6,-4,4.2],[-6,4,4.2]]},
+      {id:'gable-front',zone:'pignons',normal:[0,-1,0],base:[-6,-4,0],u:[1,0,0],width:12,poly:[[-6,-4,4.2],[6,-4,4.2],[0,-4,6]]},
+      {id:'gable-back',zone:'pignons',normal:[0,1,0],base:[6,4,0],u:[-1,0,0],width:12,poly:[[6,4,4.2],[-6,4,4.2],[0,4,6]]},
+      {id:'roof-left',roof:true,normal:[-.3,0,1],poly:[[-6.3,-4.3,4.11],[0,-4.3,6],[0,4.3,6],[-6.3,4.3,4.11]]},
+      {id:'roof-right',roof:true,normal:[.3,0,1],poly:[[0,-4.3,6],[6.3,-4.3,4.11],[6.3,4.3,4.11],[0,4.3,6]]}
+    ];
+    function project(p){return [W*.5+(p[0]*co+p[1]*si)*scale,H*.67+((p[0]*si-p[1]*co)*se-p[2]*ce)*scale]}
+    function depth(p){return (p[0]*si-p[1]*co)*ce+p[2]*se}
+    function path(points){const p=new Path2D();points.forEach((v,i)=>{const q=project(v);i?p.lineTo(q[0],q[1]):p.moveTo(q[0],q[1])});p.closePath();return p}
+    function fill(points,color){ctx.fillStyle=color;ctx.fill(path(points))}
+    function line(a,b,color,width=1){const p=project(a),q=project(b);ctx.beginPath();ctx.moveTo(...p);ctx.lineTo(...q);ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke()}
+    function local(face,u,v){return [face.base[0]+face.u[0]*u,face.base[1]+face.u[1]*u,v]}
+    function localPatch(f,u0,v0,u1,v1,color){fill([local(f,u0,v0),local(f,u1,v0),local(f,u1,v1),local(f,u0,v1)],color)}
+    function localLine(f,u0,v0,u1,v1,color,width){line(local(f,u0,v0),local(f,u1,v1),color,width)}
+    function tint(hex,factor){const a=hex.slice(1).match(/../g).map(x=>parseInt(x,16));return 'rgb('+a.map(v=>Math.max(0,Math.min(255,Math.round(v*factor)))).join(',')+')'}
+    function windows(f){
+      const glass=(u,v,w,h,divisions=1,door=false)=>{
+        localPatch(f,u-.055,v-.055,u+w+.055,v+h+.055,'#202e28');
+        localPatch(f,u,v,u+w,v+h,door?'#485448':'#6f8a84');
+        localPatch(f,u+.025,v+h*.55,u+w-.025,v+h-.025,'#a5bbb0');
+        fill([local(f,u,v+h*.15),local(f,u+w,v+h*.65),local(f,u+w,v+h*.84),local(f,u,v+h*.34)],'#c7d4c02b');
+        for(let i=1;i<divisions;i++)localPatch(f,u+w*i/divisions-.022,v,u+w*i/divisions+.022,v+h,'#26362e');
+        if(door){localPatch(f,u+w*.82,v+.95,u+w*.82+.035,v+1.3,'#c3c6b2');localPatch(f,u,v,u+w,v+.35,'#25372c')}
+        localLine(f,u-.08,v-.075,u+w+.08,v-.075,'#56604d',1.8);
+      };
+      if(f.id==='front'){glass(1.05,.65,1.55,2.5);glass(3.05,.65,1.55,2.5);glass(7.45,0,1.25,2.8,1,true);glass(9.5,.65,1.45,2.5)}
+      if(f.id==='back'){glass(1.1,.65,3.1,2.45,2);glass(6.8,.2,3.7,2.8,3)}
+      if(f.id==='right'){glass(1.5,1.15,4.9,1.95,3)}
+      if(f.id==='left'){glass(1.05,1.1,1.7,2.05);glass(4.6,1.1,1.7,2.05)}
+      if(f.id==='gable-front'||f.id==='gable-back'){glass(5.6,4.45,.8,.9)}
+    }
+    function renderWall(f){
+      const choice=choices[f.zone],mat=choice.material,hex=colors[choice.color].hex;
+      const light=.91+.12*(f.normal[0]*-.35+f.normal[1]*-.65);
+      ctx.save();const p=path(f.poly);ctx.clip(p);ctx.fillStyle=tint(hex,light);ctx.fill(p);
+      if(mat==='clin'){
+        for(let z=0,row=0;z<6.2;z+=.19,row++){
+          if(row%3===1)localPatch(f,0,z,f.width,z+.19,'#ffffff09');
+          localPatch(f,0,z,f.width,z+.021,'#19221d16');
+          localLine(f,0,z+.184,f.width,z+.184,'#ffffff2b',.65);
+        }
+      }else if(mat==='bois'){
+        for(let u=0,n=0;u<f.width;u+=.145,n++){
+          localPatch(f,u,0,u+.145,6.2,n%4===0?'#19221d0e':n%3===0?'#ffffff12':'#ffffff04');
+          localLine(f,u,0,u,6.2,'#19221d40',.72);
+          for(let grain=1;grain<=2;grain++){
+            ctx.beginPath();for(let v=0;v<=6.3;v+=.2){const x=u+grain*.045+Math.sin(v*3+n*.8+grain)*.009;const q=project(local(f,x,v));v===0?ctx.moveTo(...q):ctx.lineTo(...q)}ctx.strokeStyle='#19221d12';ctx.lineWidth=.5;ctx.stroke();
+          }
+        }
+      }else if(mat==='metal'){
+        for(let u=0,n=0;u<f.width;u+=.42,n++){
+          localPatch(f,u,0,u+.42,6.2,n%2?'#ffffff05':'#19221d05');
+          localPatch(f,u,0,u+.017,6.2,'#19221d4c');
+          localLine(f,u+.022,0,u+.022,6.2,'#ffffff45',.9);
+        }
+      }else{
+        for(let z=0,row=0;z<6.2;z+=.075,row++){
+          localLine(f,0,z,f.width,z,'#e5e1d7bb',Math.max(.55,scale*.008));
+          for(let u=(row%2)*.12-.24;u<f.width;u+=.24){
+            const variance=(row*7+Math.round(u*100))%5;
+            if(variance===0)localPatch(f,u+.012,z+.01,u+.23,z+.067,'#19221d0c');
+            localLine(f,u,z,u,z+.075,'#e5e1d7aa',Math.max(.5,scale*.007));
+          }
+        }
+      }
+      windows(f);ctx.restore();ctx.strokeStyle=f.zone===selected?'#617b40':'#1d2d221f';ctx.lineWidth=f.zone===selected?1.5:.7;ctx.stroke(p);
+      hitFaces.push({zone:f.zone,points:f.poly.map(project)});
+    }
+    function renderRoof(f){
+      const p=path(f.poly);ctx.save();ctx.clip(p);ctx.fillStyle=f.id==='roof-left'?'#45514a':'#536056';ctx.fill(p);
+      for(let y=-4.3;y<=4.31;y+=.52){const x=f.id==='roof-left'?-6.3:6.3;line([0,y,6],[x,y,4.11],'#202f2966',1);line([0,y+.025,6],[x,y+.025,4.11],'#9eafa733',.7)}
+      ctx.restore();ctx.strokeStyle='#2c3932';ctx.lineWidth=1.2;ctx.stroke(p);
+      hitFaces.push({zone:null,points:f.poly.map(project)});
+    }
+    function label(text,p){const [x,y]=project(p);ctx.font='10px Arial';const width=ctx.measureText(text).width;ctx.fillStyle='#f4f6eef0';ctx.fillRect(x-width/2-6,y-9,width+12,17);ctx.fillStyle='#637650';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,x,y-.5)}
+    function dimension(a,b,text,point){line(a,b,'#8b9c76',.8);const A=project(a),B=project(b);const dx=B[0]-A[0],dy=B[1]-A[1],length=Math.hypot(dx,dy);if(length<20)return;const ux=-dy/length*3,uy=dx/length*3;ctx.strokeStyle='#7a8d63';ctx.lineWidth=1;for(const P of [A,B]){ctx.beginPath();ctx.moveTo(P[0]-ux,P[1]-uy);ctx.lineTo(P[0]+ux,P[1]+uy);ctx.stroke()}label(text,point)}
+    function render(){
+      if(!W||!H||!ctx)return;co=Math.cos(angle*Math.PI/180);si=Math.sin(angle*Math.PI/180);scale=Math.min(W/20,H/13);ctx.clearRect(0,0,W,H);hitFaces=[];
+      for(let g=-18;g<=18;g+=2){line([-18,g,-.08],[18,g,-.08],'#7c8c6510',.7);line([g,-18,-.08],[g,18,-.08],'#7c8c6510',.7)}
+      ctx.save();ctx.shadowColor='#26371c22';ctx.shadowBlur=25;ctx.shadowOffsetX=12;ctx.shadowOffsetY=9;fill([[-6.6,-4.5,-.02],[7.3,-4.5,-.02],[7.3,5,-.02],[-6.6,5,-.02]],'#27381f18');ctx.restore();
+      fill([[-7.0,-4.9,-.03],[7.0,-4.9,-.03],[7.0,4.9,-.03],[-7.0,4.9,-.03]],'#e1e4d9');
+      fill([[1.1,-5.1,.01],[3.1,-5.1,.01],[3.1,-4,.01],[1.1,-4,.01]],'#c7cec0');
+      const camera=[si*ce,-co*ce,se];
+      faces.filter(f=>f.normal.reduce((sum,n,i)=>sum+n*camera[i],0)>.001).map(f=>({f,d:f.poly.reduce((sum,p)=>sum+depth(p),0)/f.poly.length})).sort((a,b)=>a.d-b.d).forEach(({f})=>f.roof?renderRoof(f):renderWall(f));
+      if(showDimensions){
+        line([-6,-4,0],[-6,-5.65,0],'#8b9c7660',.7);line([6,-4,0],[6,-5.65,0],'#8b9c7660',.7);
+        dimension([-6,-5.5,0],[6,-5.5,0],'12,0 m',[0,-5.5,0]);
+        line([6,-4,0],[7.6,-4,0],'#8b9c7660',.7);line([6,4,0],[7.6,4,0],'#8b9c7660',.7);
+        dimension([7.45,-4,0],[7.45,4,0],'8,0 m',[7.45,0,0]);
+        dimension([-7.2,-4,0],[-7.2,-4,6],'6,0 m',[-7.2,-4,3]);
+      }
+      document.getElementById('compass-needle').setAttribute('transform','rotate('+(-angle)+' 18 22)');
+    }
+    function resize(){const r=stage.getBoundingClientRect();W=r.width;H=r.height;const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);render()}
+    function updateUI(announce=true){
+      const choice=choices[selected];document.querySelectorAll('input[name="zone"]').forEach(el=>el.checked=el.value===selected);document.querySelectorAll('input[name="material"]').forEach(el=>el.checked=el.value===choice.material);document.querySelectorAll('input[name="color"]').forEach(el=>el.checked=el.value===choice.color);
+      document.getElementById('color-name').textContent=colors[choice.color].name;document.getElementById('material-hint').textContent=materials[choice.material].hint;
+      document.getElementById('summary-rows').replaceChildren(...Object.entries(zones).map(([id,name])=>{const row=document.createElement('div');row.className='summary-row';const label=document.createElement('span');label.textContent=name;const value=document.createElement('b');const dot=document.createElement('span');dot.className='summary-color';dot.style.setProperty('--swatch',colors[choices[id].color].hex);dot.setAttribute('aria-hidden','true');value.append(dot,document.createTextNode(materials[choices[id].material].name+' · '+colors[choices[id].color].name));row.append(label,value);return row}));
+      if(announce)document.getElementById('selection-status').textContent=zones[selected]+' · '+materials[choice.material].name+' · '+colors[choice.color].name;
+      canvas.setAttribute('aria-label','Maison hypothétique, largeur 12 mètres, profondeur 8 mètres, hauteur au faîte 6 mètres. Vue à '+angle+' degrés. Zone sélectionnée : '+zones[selected]+', '+materials[choice.material].name+', teinte '+colors[choice.color].name+'.');render();
+    }
+    function setAngle(v){angle=Math.max(-180,Math.min(180,Math.round(v)));const slider=document.getElementById('rotation');slider.value=angle;slider.setAttribute('aria-valuetext',angle+' degrés');document.getElementById('angle-output').textContent=angle+'°';document.querySelectorAll('[data-angle]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.angle)===angle)));updateUI(false)}
+    function inside(p,polygon){let yes=false;for(let i=0,j=polygon.length-1;i<polygon.length;j=i++){const a=polygon[i],b=polygon[j];if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])yes=!yes}return yes}
+    function hit(event){const r=canvas.getBoundingClientRect(),p=[event.clientX-r.left,event.clientY-r.top];for(let i=hitFaces.length-1;i>=0;i--){if(inside(p,hitFaces[i].points))return hitFaces[i].zone}return null}
+    document.querySelectorAll('input[name="zone"]').forEach(el=>el.addEventListener('change',()=>{if(el.checked){selected=el.value;updateUI()}}));
+    document.querySelectorAll('input[name="material"]').forEach(el=>el.addEventListener('change',()=>{if(el.checked){choices[selected].material=el.value;updateUI()}}));
+    document.querySelectorAll('input[name="color"]').forEach(el=>el.addEventListener('change',()=>{if(el.checked){choices[selected].color=el.value;updateUI()}}));
+    document.getElementById('rotation').addEventListener('input',e=>setAngle(Number(e.target.value)));document.querySelectorAll('[data-angle]').forEach(b=>b.addEventListener('click',()=>setAngle(Number(b.dataset.angle))));
+    document.getElementById('rotate-left').addEventListener('click',()=>setAngle(angle-15< -180?angle-15+360:angle-15));document.getElementById('rotate-right').addEventListener('click',()=>setAngle(angle+15>180?angle+15-360:angle+15));
+    document.getElementById('dimension-toggle').addEventListener('click',e=>{showDimensions=!showDimensions;e.currentTarget.setAttribute('aria-pressed',String(showDimensions));render()});
+    canvas.addEventListener('click',e=>{const zone=hit(e);if(zone){selected=zone;updateUI()}});canvas.addEventListener('pointermove',e=>canvas.style.cursor=hit(e)?'pointer':'default');canvas.addEventListener('pointerleave',()=>canvas.style.cursor='default');
+    document.getElementById('reset').addEventListener('click',()=>{choices=JSON.parse(JSON.stringify(defaults));selected='facade';showDimensions=true;document.getElementById('dimension-toggle').setAttribute('aria-pressed','true');setAngle(32);updateUI();document.getElementById('selection-status').textContent='Composition réinitialisée · Façade avant sélectionnée.'});
+    document.getElementById('export').addEventListener('click',()=>{
+      const config={schemaVersion:1,type:'MIR_STUDIO_DEMONSTRATION',createdAt:new Date().toISOString(),notice:'Maison hypothétique. Aucun plan client importé. Matières et teintes génériques. Aucune quantité commandable ni validation de pose.',geometry:{units:'metres',width:12,depth:8,wallHeight:4.2,ridgeHeight:6,roofOverhang:.3},view:{rotationDegrees:angle,dimensionsVisible:showDimensions},zones:Object.entries(choices).map(([id,c])=>({id,name:zones[id],material:c.material,materialName:materials[c.material].name,color:c.color,colorName:colors[c.color].name,colorHex:colors[c.color].hex,patternPitchMetres:materials[c.material].pitch,...(c.material==='brique'?{brickModuleWidthMetres:.24,restriction:'Visualisation seulement'}:{})}))};
+      const blob=new Blob([JSON.stringify(config,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='mir-studio-mes-choix.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);document.getElementById('selection-status').textContent='Export local de vos choix préparé · fichier .json.';
+    });
+    if(!ctx){document.getElementById('selection-status').textContent='Votre navigateur ne permet pas d’afficher ce rendu Canvas.';return}
+    updateUI(false);new ResizeObserver(resize).observe(stage);window.addEventListener('resize',resize);resize();
+  })();
+  </script>
+</body>
+</html>

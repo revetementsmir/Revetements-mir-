@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#2d4032">
+  <title>MIR — Le portail chantier</title>
+  <link rel="stylesheet" href="chantier.css">
+  <link rel="stylesheet" href="custom-model-cards.css">
+  <script src="employee-store-model.js" defer></script>
+  <script src="material-preview.js" defer></script>
+  <script src="production-model.js" defer></script>
+  <script src="custom-model-cards.js" defer></script>
+  <script src="portal-config.js" defer></script>
+  <script src="vendor/supabase-client.js" defer></script>
+  <script src="portal-client.js" defer></script>
+  <script src="chantier-app.js" defer></script>
+</head>
+<body data-portal-mode="login" data-portal-connection="loading">
+  <a class="portal-skip" href="#portal-main">Aller au contenu</a>
+  <div class="demo-banner" hidden>
+    <div><span class="demo-dot" aria-hidden="true"></span><strong>Aperçu du portail — données de démonstration</strong><span class="demo-subline">Simulation locale · connexion Google et courriel à intégrer</span></div>
+    <button type="button" id="demo-about">À propos de cet aperçu <span aria-hidden="true">↗</span></button>
+  </div>
+  <header class="portal-header">
+    <a class="portal-brand" href="index.html" aria-label="Les Revêtements MIR, accueil"><img src="assets/MIR-logo-HD.png" alt="Les Revêtements MIR" width="2172" height="724"></a>
+    <span class="portal-title">LE PORTAIL<br><b>CHANTIER</b></span>
+    <nav aria-label="Navigation du site"><a href="boutique.html">Boutique <span aria-hidden="true">↗</span></a><a href="metres.html" data-management-link>Atelier <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <div class="account-bar" id="account-bar" hidden>
+    <p><span class="account-dot" aria-hidden="true"></span><strong id="account-name"></strong><span id="account-role"></span></p>
+    <div><button type="button" id="portal-refresh">Actualiser</button><button type="button" id="portal-signout">Déconnexion</button></div>
+  </div>
+  <div class="demo-controls" hidden>
+    <div class="demo-mode" role="group" aria-label="Présentation de démonstration">
+      <button type="button" data-demo-mode="employee" aria-pressed="true">Aperçu employé</button>
+      <button type="button" data-demo-mode="admin" aria-pressed="false">Aperçu gestion</button>
+    </div>
+    <label class="demo-profile-label" for="demo-profile">Profil d’exemple<select id="demo-profile" aria-label="Profil employé de démonstration"><option>Chargement…</option></select></label>
+  </div>
+  <div class="portal-shell">
+    <aside class="portal-sidebar">
+      <p class="sidebar-caption">VOTRE QUOTIDIEN</p>
+      <nav id="portal-navigation" aria-label="Sections du portail"></nav>
+      <div class="sidebar-help"><span class="help-mark" aria-hidden="true">M</span><strong>Les bonnes pièces.<br>Au bon chantier.</strong><p>Plans, demandes et livraisons au même endroit.</p><a href="metres.html" data-management-link>Ouvrir l’atelier <span aria-hidden="true">↗</span></a></div>
+    </aside>
+    <main id="portal-main" tabindex="-1">
+      <div id="portal-operation" class="operation-banner" role="status" hidden></div>
+      <div id="portal-content" aria-live="off"><section class="portal-loading"><span class="loading-dot"></span><h1>Votre chantier, bien organisé.</h1><p>Ouverture du portail…</p></section></div>
+      <noscript><div class="portal-empty"><h1>Activez JavaScript pour ouvrir le portail.</h1><p>Les Revêtements MIR — plans, matériel et suivi des demandes.</p></div></noscript>
+    </main>
+  </div>
+  <footer class="portal-footer"><span id="portal-footer-label">Les Revêtements MIR · Le portail chantier</span><div><a href="chantier.html" id="demo-exit" hidden>Retour à la connexion</a><button type="button" id="demo-reset" hidden>Réinitialiser les données de démonstration</button></div></footer>
+  <dialog id="portal-dialog" aria-labelledby="portal-dialog-title"><button type="button" class="dialog-close" data-close-dialog aria-label="Fermer la fenêtre">×</button><div id="portal-dialog-content"></div></dialog>
+  <div id="portal-toast" role="status" aria-live="polite"></div>
+</body>
+</html>

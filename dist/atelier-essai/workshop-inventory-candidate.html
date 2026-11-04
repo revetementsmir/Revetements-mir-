@@ -1,0 +1,41 @@
+<!doctype html><html lang="fr-CA"><head><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-L31HWpGRDIpdaSXTH2MtosfUwmWK8HrYTRfOJTQcopI='; object-src 'none'; base-uri 'none'; connect-src 'none'; form-action 'none'"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MIR — Matériel atelier</title><style>body{margin:0;background:#0b100d;color:#f1f6f2;font:14px system-ui}.wrap{max-width:980px;margin:auto;padding:20px}.card{background:#121914;border:1px solid #2c3b31;border-radius:16px;padding:16px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}label{display:grid;gap:5px;color:#9aaba0}input,textarea,button{background:#090e0b;color:#f1f6f2;border:1px solid #2c3b31;border-radius:9px;padding:10px;font:inherit}button{font-weight:800}.primary{background:#b9ff42;color:#081008}.muted{color:#93a399}@media(max-width:650px){.grid{grid-template-columns:1fr}}</style>
+<style id="mir-responsive-hardening">
+/* MIR_RESPONSIVE_V1 — shared candidate contract */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+*,*::before,*::after{box-sizing:border-box}
+body{min-width:0}
+main,.wrap,.container,.shell,.card,.panel,.section,.notice,.dispatch{min-width:0;max-width:100%}
+.grid>*,.layout>*,.form-grid>*,.fields>*,.field-grid>*,.summary-grid>*,.stats>*,.kpis>*{min-width:0}
+img,svg,canvas,video{max-width:100%;height:auto}
+p,li,label,.muted,.notice,.card{overflow-wrap:anywhere}
+input,select,textarea,button,[role="button"]{font:inherit;max-width:100%}
+button,[role="button"],input[type="button"],input[type="submit"],input[type="reset"],select{min-height:44px;touch-action:manipulation}
+pre,code{max-width:100%;overflow-x:auto}
+table{max-width:100%}
+.table-wrap,[data-table-wrap]{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media (pointer:coarse){
+  button,[role="button"],input[type="button"],input[type="submit"],input[type="reset"],select{min-height:44px}
+}
+@media (max-width:760px){
+  body{overflow-x:hidden}
+  main,.wrap,.container,.shell{width:100%;max-width:100%;padding-left:12px!important;padding-right:12px!important}
+  .grid,.layout,.form-grid,.fields,.field-grid,.summary-grid,.stats,.kpis{grid-template-columns:minmax(0,1fr)!important}
+  .row,.actions,.toolbar,.button-row,.controls{flex-wrap:wrap!important;max-width:100%}
+  .actions>button,.toolbar>button,.button-row>button,.controls>button{flex:1 1 140px}
+  table{display:block;width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  th,td{white-space:nowrap}
+  input:not([type="checkbox"]):not([type="radio"]),select,textarea{width:100%;min-width:0}
+  dialog{width:calc(100vw - 24px);max-width:calc(100vw - 24px);margin:12px}
+  pre{max-height:55vh}
+  .card,.notice,.dispatch{max-width:100%}
+  h1{font-size:clamp(22px,7vw,32px);line-height:1.1}
+  h2{font-size:clamp(18px,5.5vw,24px);line-height:1.15}
+}
+@media (max-width:430px){
+  main,.wrap,.container,.shell{padding-left:10px!important;padding-right:10px!important}
+  .card,.notice,.dispatch{padding:12px!important}
+  .actions>button,.toolbar>button,.button-row>button,.controls>button,.row>button{flex:1 1 100%}
+  .row>input,.row>select,.row>textarea{flex:1 1 100%;width:100%}
+}
+</style>
+</head><body><aside style="padding:12px;background:#f3e8cf;color:#261e0e;font:16px system-ui"><a href="index.html">Retour aux essais MIR</a> · Démonstration locale. Utilisez des données fictives.</aside><main class="wrap"><div class="muted">MIR · ATELIER · INVENTAIRE</div><h1>Sortie / retour de matériel atelier</h1><section class="card"><p class="muted">Aucune consommation n’est calculée automatiquement. Chaque quantité est saisie explicitement et liée à une libération + tâche atelier.</p><div class="grid"><label>Libération<input id="releaseId"></label><label>Tâche atelier<input id="jobId"></label><label>Article inventaire<input id="itemId"></label><label>Quantité<input id="quantity" inputmode="decimal"></label><label>Employé<input id="actor"></label><label>Clé opération<input id="key" placeholder="scan, reçu ou UUID"></label></div><div style="display:flex;gap:8px;margin-top:12px"><button id="issue" class="primary">Sortir pour atelier</button><button id="return">Retour inventaire</button></div></section><section class="card"><label>Inventaire JSON<textarea id="store" rows="12"></textarea></label><pre id="state" class="muted"></pre></section></main><script type="module">import{issueWorkshopMaterial,returnWorkshopMaterial,workshopInventorySummary}from'./workshop-inventory.js';const $=id=>document.getElementById(id);let st=null;function data(){return{releaseId:$('releaseId').value,jobId:$('jobId').value,itemId:$('itemId').value,quantity:$('quantity').value,idempotencyKey:$('key').value,actor:$('actor').value,authorized:true}}function load(){st=JSON.parse($('store').value)}function save(r){st=r.store;$('store').value=JSON.stringify(st,null,2);$('state').textContent=JSON.stringify({movement:r,summary:workshopInventorySummary(st,{releaseId:$('releaseId').value,jobId:$('jobId').value})},null,2)}$('issue').onclick=()=>{try{load();save(issueWorkshopMaterial(st,data(),{expectedRevision:st.revision}))}catch(e){$('state').textContent=e.message}};$('return').onclick=()=>{try{load();save(returnWorkshopMaterial(st,data(),{expectedRevision:st.revision}))}catch(e){$('state').textContent=e.message}};</script></body></html>

@@ -1,0 +1,41 @@
+<!doctype html><html lang="fr-CA"><head><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-r2NX6sfqkLTO9yn0p86MwklNf6Oft9k5RNNJdiCmc8U='; object-src 'none'; base-uri 'none'; connect-src 'none'; form-action 'none'"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MIR · Magasin employés — candidate</title><style>body{margin:0;background:#0d1110;color:#eef5ef;font:15px system-ui}.wrap{max-width:980px;margin:auto;padding:20px}.card{background:#151b18;border:1px solid #334039;border-radius:14px;padding:16px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}input,button{font:inherit;padding:10px;border-radius:8px;border:1px solid #405047;background:#0b100e;color:#fff}.primary{background:#b8ff3d;color:#071008;font-weight:800}.warn{color:#ffd28a}pre{white-space:pre-wrap;max-height:320px;overflow:auto}@media(max-width:650px){.grid{grid-template-columns:1fr}}</style>
+<style id="mir-responsive-hardening">
+/* MIR_RESPONSIVE_V1 — shared candidate contract */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+*,*::before,*::after{box-sizing:border-box}
+body{min-width:0}
+main,.wrap,.container,.shell,.card,.panel,.section,.notice,.dispatch{min-width:0;max-width:100%}
+.grid>*,.layout>*,.form-grid>*,.fields>*,.field-grid>*,.summary-grid>*,.stats>*,.kpis>*{min-width:0}
+img,svg,canvas,video{max-width:100%;height:auto}
+p,li,label,.muted,.notice,.card{overflow-wrap:anywhere}
+input,select,textarea,button,[role="button"]{font:inherit;max-width:100%}
+button,[role="button"],input[type="button"],input[type="submit"],input[type="reset"],select{min-height:44px;touch-action:manipulation}
+pre,code{max-width:100%;overflow-x:auto}
+table{max-width:100%}
+.table-wrap,[data-table-wrap]{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media (pointer:coarse){
+  button,[role="button"],input[type="button"],input[type="submit"],input[type="reset"],select{min-height:44px}
+}
+@media (max-width:760px){
+  body{overflow-x:hidden}
+  main,.wrap,.container,.shell{width:100%;max-width:100%;padding-left:12px!important;padding-right:12px!important}
+  .grid,.layout,.form-grid,.fields,.field-grid,.summary-grid,.stats,.kpis{grid-template-columns:minmax(0,1fr)!important}
+  .row,.actions,.toolbar,.button-row,.controls{flex-wrap:wrap!important;max-width:100%}
+  .actions>button,.toolbar>button,.button-row>button,.controls>button{flex:1 1 140px}
+  table{display:block;width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  th,td{white-space:nowrap}
+  input:not([type="checkbox"]):not([type="radio"]),select,textarea{width:100%;min-width:0}
+  dialog{width:calc(100vw - 24px);max-width:calc(100vw - 24px);margin:12px}
+  pre{max-height:55vh}
+  .card,.notice,.dispatch{max-width:100%}
+  h1{font-size:clamp(22px,7vw,32px);line-height:1.1}
+  h2{font-size:clamp(18px,5.5vw,24px);line-height:1.15}
+}
+@media (max-width:430px){
+  main,.wrap,.container,.shell{padding-left:10px!important;padding-right:10px!important}
+  .card,.notice,.dispatch{padding:12px!important}
+  .actions>button,.toolbar>button,.button-row>button,.controls>button,.row>button{flex:1 1 100%}
+  .row>input,.row>select,.row>textarea{flex:1 1 100%;width:100%}
+}
+</style>
+</head><body><aside style="padding:12px;background:#f3e8cf;color:#261e0e;font:16px system-ui"><a href="index.html">Retour aux essais MIR</a> · Démonstration locale. Utilisez des données fictives.</aside><div class="wrap"><h1>Magasin employés · candidate</h1><p class="warn">Données fictives locales. Les droits doivent être imposés par le backend/RLS avant activation réelle.</p><div class="card"><h2>Stock</h2><div class="grid"><input id="stock" value="30"><button id="seed" class="primary">Initialiser PRIME 30644</button></div></div><div class="card"><h2>Commande chantier</h2><div class="grid"><input id="qty" value="10"><button id="order">Demander 10 boîtes</button><button id="reserve">Réserver</button><button id="deliver4">Livrer 4</button><button id="deliverRest">Livrer le restant</button></div></div><div class="card"><h2>État</h2><pre id="out"></pre></div><script type="module">import{createStoreState,upsertCatalogItem,adjustStock,createEmployeeOrder,reserveOrder,recordEmployeeDelivery,orderSummary,inventoryView}from'./employee-store-model.js';let s=createStoreState();const $=id=>document.getElementById(id);function show(msg=''){ $('out').textContent=msg+'\n'+JSON.stringify({revision:s.revision,inventory:s.inventory,orders:s.orders.map(o=>({...o,summary:orderSummary(o)}))},null,2)}$('seed').onclick=()=>{try{s=upsertCatalogItem(s,{id:'PRIME30644',name:'Clous PRIME 2 po',unit:'boîte'},{expectedRevision:s.revision});s=adjustStock(s,{itemId:'PRIME30644',delta:Number($('stock').value),idempotencyKey:'seed-stock'},{expectedRevision:s.revision});show('Stock fictif initialisé.')}catch(e){show(e.message)}};$('order').onclick=()=>{try{s=createEmployeeOrder(s,{id:'DEMO-ORDER',organizationId:'MIR',chantierId:'C851',requestedBy:'Employé démo',authorized:true,lines:[{lineId:'L1',itemId:'PRIME30644',quantity:Number($('qty').value)}]},{expectedRevision:s.revision});show('Commande fictive créée.')}catch(e){show(e.message)}};$('reserve').onclick=()=>{try{s=reserveOrder(s,{orderId:'DEMO-ORDER',quantities:{L1:Number($('qty').value)},idempotencyKey:'reserve-demo'},{expectedRevision:s.revision});show('Réservation effectuée une seule fois.')}catch(e){show(e.message)}};$('deliver4').onclick=()=>{try{s=recordEmployeeDelivery(s,{orderId:'DEMO-ORDER',lines:[{lineId:'L1',quantity:4}],idempotencyKey:'delivery-4',deliveredBy:'Admin démo'},{expectedRevision:s.revision});show('Livraison partielle 4.')}catch(e){show(e.message)}};$('deliverRest').onclick=()=>{try{const o=s.orders.find(x=>x.id==='DEMO-ORDER');const remain=orderSummary(o).remaining;s=recordEmployeeDelivery(s,{orderId:'DEMO-ORDER',lines:[{lineId:'L1',quantity:remain}],idempotencyKey:'delivery-rest',deliveredBy:'Admin démo'},{expectedRevision:s.revision});show('Solde livré.')}catch(e){show(e.message)}};show();</script></div></body></html>

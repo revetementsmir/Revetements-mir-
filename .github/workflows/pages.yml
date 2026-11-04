@@ -2,7 +2,7 @@ name: Publish MIR copy
 on:
   push:
     branches: [main]
-    paths: ['dist/**']
+    paths: ['dist/.nojekyll']
   workflow_dispatch:
 permissions:
   contents: read

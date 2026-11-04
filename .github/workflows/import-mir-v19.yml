@@ -33,6 +33,11 @@ jobs:
               expected, path = entry
               file = Path(path)
               assert file.parts[0] == 'dist' and '..' not in file.parts
+              if file.is_file():
+                  data = file.read_bytes()
+                  actual = sha1(f'blob {len(data)}\0'.encode() + data).hexdigest()
+                  if actual == expected:
+                      return None
               relative = file.relative_to('dist').as_posix()
               request = Request(origin + '/' + quote(relative, safe='/'), headers={'Accept-Encoding': 'identity', 'User-Agent': 'MIR-GitHub-Pages-Import/1'})
               for attempt in range(3):
