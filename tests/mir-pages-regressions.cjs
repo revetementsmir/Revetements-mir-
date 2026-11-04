@@ -207,4 +207,20 @@ test('Studio : le grain du fibrociment reste indépendant de la couvrance', () =
   assert.ok(surface.includes('Changing 5 in to 7 in'));
 });
 
+
+test('MIR : les nouveaux modèles restent privés et une diffusion existante est préservée', () => {
+  const app=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
+  const begin=app.indexOf('function saveTemplateDialog()');
+  const end=app.indexOf('function renderRequests()',begin);
+  assert.ok(begin>=0&&end>begin,'dialogue de modèle localisé');
+  const form=app.slice(begin,end);
+  assert.ok(form.includes("old?.channels?.client===true?' checked':''"));
+  assert.ok(form.includes("old?.channels?.store===true?' checked':''"));
+  assert.ok(!form.includes('old?.channels?.client===false'));
+  assert.ok(!form.includes('old?.channels?.store===false'));
+  assert.ok(form.includes('Nouveau modèle privé par défaut sur cet appareil'));
+  assert.ok(app.includes("channels:{client:data.has('client'),store:data.has('store')}"));
+  assert.ok(app.includes('record.channels?.[catalogueChannel]===true'));
+});
+
 console.log('Tests MIR : '+total+'/'+total+' réussis.');
