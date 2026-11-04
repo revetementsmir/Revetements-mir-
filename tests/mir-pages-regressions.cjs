@@ -134,4 +134,17 @@ test('Les profils sont chargés directement sur la page de production', () => {
   assert.ok(app.includes('mir-j-exception-form'));
 });
 
+test('La page calepinage expose les contrôles préparés', () => {
+  const html=fs.readFileSync(path.join(__dirname,'../dist/calepinage.html'),'utf8');
+  const app=fs.readFileSync(path.join(__dirname,'../dist/calepinage-app.js'),'utf8');
+  assert.ok(html.includes('id="outline-right-angle"'));
+  assert.ok(html.includes('id="roof-pitch"'));
+  assert.ok(html.includes('id="apply-roof-pitch"'));
+  assert.ok(html.includes('id="piece-width-lock"'));
+  assert.ok(html.includes('id="unlock-all"'));
+  assert.ok(app.includes('event.shiftKey||outlineRightAngle'));
+  assert.ok(app.includes('A?.gableFromPitch?.(width,eave,leftPitch,rightPitch)'));
+  assert.ok(app.includes('E.setPanelSize(layout.config,axis'));
+});
+
 console.log('Tests MIR : '+total+'/'+total+' réussis.');

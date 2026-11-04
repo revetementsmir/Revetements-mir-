@@ -49,6 +49,14 @@ jobs:
           grep -F 'MIR — Solin brique et coins architecturaux' /tmp/coins.html
           fetch "$base/atelier-essai/mir-calepinage-extension.js" /tmp/extension.js
           grep -F 'const pitch = value =>' /tmp/extension.js
+          fetch "$base/calepinage.html" /tmp/calepinage.html
+          grep -F 'id="outline-right-angle"' /tmp/calepinage.html
+          grep -F 'id="roof-pitch"' /tmp/calepinage.html
+          grep -F 'id="piece-width-lock"' /tmp/calepinage.html
+          fetch "$base/calepinage-app.js" /tmp/calepinage-app.js
+          grep -F 'event.shiftKey||outlineRightAngle' /tmp/calepinage-app.js
+          grep -F 'A?.gableFromPitch?.(width,eave,leftPitch,rightPitch)' /tmp/calepinage-app.js
+          grep -F 'E.setPanelSize(layout.config,axis' /tmp/calepinage-app.js
           fetch "$base/atelier-essai/index.html" /tmp/atelier.html
           grep -F 'Atelier d’essai MIR' /tmp/atelier.html
           echo "MIR Pages verified at $base/"
