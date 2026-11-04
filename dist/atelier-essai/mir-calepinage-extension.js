@@ -116,7 +116,15 @@
   }
 
   function gableFromPitch(widthIn, eaveIn, leftPitch, rightPitch = leftPitch) {
-    const w=parseDimension(widthIn), e=parseDimension(eaveIn), lp=parseDimension(leftPitch), rp=parseDimension(rightPitch);
+    // « 6/12 » est une montée de 6 po par 12 po de portée, pas 0,5 po.
+    const pitch = value => {
+      if (typeof value === 'string') {
+        const match = value.trim().replace(',', '.').match(/^([+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*\/\s*12$/);
+        if (match) return Number(match[1]);
+      }
+      return parseDimension(value);
+    };
+    const w=parseDimension(widthIn), e=parseDimension(eaveIn), lp=pitch(leftPitch), rp=pitch(rightPitch);
     if (![w,e,lp,rp].every(finite) || w<=0 || e<0 || lp<=0 || rp<=0) return null;
     const peakXIn = w * rp / (lp + rp);
     const riseIn = peakXIn * lp / 12;

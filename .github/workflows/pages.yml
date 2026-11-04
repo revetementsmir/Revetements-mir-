@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Test MIR architectural profiles
+        run: node tests/mir-pages-regressions.cjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -39,6 +41,11 @@ jobs:
           grep -F 'href="atelier-essai/index.html"' /tmp/metres.html
           fetch "$base/production.html" /tmp/production.html
           grep -F 'href="atelier-essai/index.html" data-admin-only' /tmp/production.html
+          grep -F 'href="atelier-essai/pliages-integration-candidate.html?production=1"' /tmp/production.html
+          fetch "$base/atelier-essai/pliages-integration-candidate.html?production=1" /tmp/coins.html
+          grep -F 'MIR — Solin brique et coins architecturaux' /tmp/coins.html
+          fetch "$base/atelier-essai/mir-calepinage-extension.js" /tmp/extension.js
+          grep -F 'const pitch = value =>' /tmp/extension.js
           fetch "$base/atelier-essai/index.html" /tmp/atelier.html
           grep -F 'Atelier d’essai MIR' /tmp/atelier.html
           echo "MIR Pages verified at $base/"
