@@ -22,6 +22,7 @@ jobs:
       - name: Test MIR architectural profiles
         run: |
           node --check dist/model-measure-defaults.js
+          node --check dist/template-library-backup.js
           node --check dist/production-app.js
           node tests/mir-pages-regressions.cjs
       - uses: actions/configure-pages@v5
@@ -52,6 +53,10 @@ jobs:
           grep -F 'function prepare(template,source)' /tmp/model-measure-defaults.js
           fetch "$base/production.html" /tmp/mir-production.html
           grep -F 'model-measure-defaults.js?v=defaults-1' /tmp/mir-production.html
+          fetch "$base/template-library-backup.js" /tmp/mir-template-backup.js
+          grep -F "mir-template-library-backup-1" /tmp/mir-template-backup.js
+          fetch "$base/production.html" /tmp/mir-backup-page.html
+          grep -F 'template-library-backup.js?v=backup-1' /tmp/mir-backup-page.html
           fetch "$base/production-app.js" /tmp/production-app.js
           grep -F 'old?.channels?.client===true' /tmp/production-app.js
           grep -F 'old?.channels?.store===true' /tmp/production-app.js

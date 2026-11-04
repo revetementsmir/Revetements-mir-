@@ -324,4 +324,56 @@ test('Tracé MIR : un repli manuel reste écrasé après une petite retouche', (
  assert.equal(drawn.bends[0].mode,'hem','un retour quasi 180° dessiné est détecté');
 });
 
+
+const TemplateBackup=require('../dist/template-library-backup.js');
+test('Sauvegarde MIR : modèles et mesures seulement, pas de commandes', () => {
+ const t=P.createTemplate({kind:'profile',template:'custom',unit:'in',segments:[{label:'A',length:3},{label:'B',length:1.5}],bends:[{mode:'interior',angle:90,direction:'left'}],length:120},{id:'mir-backup-test-1',name:'L MIR standard'}).template;
+ assert.ok(t);
+ const record={id:t.id,name:t.name,versions:[t],currentVersion:1,allowed:{materials:['acier'],colorSystems:['manufacturer']},
+  measurementDefaults:{unit:'in',templateVersion:1,values:{A:{value:'3',locked:true},B:{value:'1½',locked:false},length:{value:'120',locked:false}}},
+  channels:{client:true,store:true},archived:false,updatedAt:'2026-11-04'};
+ const exported=TemplateBackup.create([record]);
+ assert.equal(exported.ok,true,exported.error);
+ assert.equal(exported.count,1);
+ assert.ok(!exported.content.includes('orders'));
+ assert.ok(!exported.content.includes('requests'));
+ const restored=TemplateBackup.merge(exported.content,[]);
+ assert.equal(restored.ok,true,restored.error);
+ assert.equal(restored.added,1);
+ assert.equal(restored.records[0].channels.client,false);
+ assert.equal(restored.records[0].channels.store,false);
+ assert.equal(restored.records[0].measurementDefaults.values.A.locked,true);
+ assert.equal(restored.records[0].measurementDefaults.values.B.value,'1½');
+});
+test('Sauvegarde MIR : ne jamais remplacer un modèle local par une vieille version', () => {
+ const t=P.createTemplate({kind:'profile',template:'custom',unit:'in',segments:[{label:'A',length:6},{label:'B',length:2}],bends:[{mode:'interior',angle:90,direction:'left'}],length:120},{id:'mir-backup-test-2',name:'Profil existant'}).template;
+ const imported={id:t.id,name:'Ancienne version',versions:[t],currentVersion:1,allowed:{materials:['aluminium'],colorSystems:['ral']},channels:{client:true,store:true},archived:false};
+ const exported=TemplateBackup.create([imported]);
+ assert.equal(exported.ok,true);
+ const local={...imported,name:'Révision locale',channels:{client:false,store:false}};
+ const result=TemplateBackup.merge(exported.content,[local]);
+ assert.equal(result.ok,true);
+ assert.equal(result.added,0);
+ assert.equal(result.skipped,1);
+ assert.deepEqual(result.records,[local]);
+});
+test('Sauvegarde MIR : rejeter fichiers erronés et doublons sans écriture', () => {
+ assert.equal(TemplateBackup.merge('oops',[]).ok,false);
+ assert.equal(TemplateBackup.merge(JSON.stringify({schema:'other',records:[]}),[]).ok,false);
+ const t=P.createTemplate({kind:'profile',template:'custom',unit:'in',segments:[{label:'A',length:5},{label:'B',length:4}],bends:[{mode:'interior',angle:90,direction:'left'}],length:120},{id:'mir-backup-test-3',name:'Profil'}).template;
+ const row={id:t.id,name:t.name,versions:[t],currentVersion:1,channels:{client:false,store:false},archived:false};
+ const duplicate={schema:TemplateBackup.SCHEMA,records:[row,row]};
+ assert.equal(TemplateBackup.merge(JSON.stringify(duplicate),[]).ok,false);
+});
+test('Sauvegarde MIR : interface réservée à l’atelier local', () => {
+ const html=fs.readFileSync(path.join(__dirname,'../dist/production.html'),'utf8');
+ const app=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
+ assert.ok(html.includes('template-library-backup.js?v=backup-1'));
+ assert.ok(html.indexOf('template-library-backup.js')<html.indexOf('production-app.js'));
+ assert.ok(app.includes('data-export-mir-models="1"'));
+ assert.ok(app.includes('data-import-mir-models="1"'));
+ assert.ok(app.includes('if(!store(KEYS.templates,{version:1,records:result.records}))return;'));
+ assert.ok(app.includes("record.channels?.store===true?'Magasin':'"));
+});
+
 console.log('Tests MIR : '+total+'/'+total+' réussis.');
