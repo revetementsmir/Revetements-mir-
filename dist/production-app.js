@@ -86,13 +86,32 @@ function updateFinish(){if(authoring){$('#selected-finish').innerHTML='';return;
 function fitModel(model){const p=model.pointsMM||[],xs=p.map(v=>v[0]),ys=p.map(v=>v[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const scale=Math.min(580/Math.max(1,maxX-minX),340/Math.max(1,maxY-minY));return {scale,ox:400-(minX+maxX)*scale/2,oy:255+(minY+maxY)*scale/2};}
 function pointOnView(point,tr){return [tr.ox+point[0]*tr.scale,tr.oy-point[1]*tr.scale];}
 function drawingModel(){const actual=build();if(actual.valid)return {model:actual,illustrative:authoring};const example=selectedTemplate&&M.templatePreview(selectedTemplate);return {model:example?.ok?example.model:build(sampleSpec(kind,kind==='profile'?draft.template:draft.shape)),illustrative:true};}
+function profileSectionPath(points,bends){
+ let offsetX=0,offsetY=0;
+ let path=`M${points[0].map(fmt).join(' ')}`;
+ for(let i=1;i<points.length;i++){
+  const [x,y]=points[i];
+  path+=` L${fmt(x+offsetX)} ${fmt(y+offsetY)}`;
+  if(bends[i-1]?.mode!=='hem'||i===points.length-1)continue;
+  const dx=points[i+1][0]-x,dy=points[i+1][1]-y,length=Math.hypot(dx,dy);
+  if(!length)continue;
+  const radius=5;
+  offsetX-=dy/length*2*radius;
+  offsetY+=dx/length*2*radius;
+  path+=` A${radius} ${radius} 0 0 0 ${fmt(x+offsetX)} ${fmt(y+offsetY)}`;
+ }
+ return path;
+}
 function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
  const points=tool==='draw'?drawPoints:model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520"><text x="400" y="250" text-anchor="middle" font-family="Arial" font-size="19" fill="#7b8b6c">Cliquez pour dessiner votre premier segment.</text></svg>`;
  const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});if(interactive&&!drag)drawTransform=tr;
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>`;
- if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else output+=`<polyline points="${pointString}" fill="none" stroke="#97a68b" stroke-width="9" stroke-linejoin="miter"/><polyline points="${pointString}" fill="none" stroke="#dbe3d4" stroke-width="4" stroke-linejoin="miter"/>`;
- const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}else{const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i),x=mid[0]+normal[0]*31,y=mid[1]+normal[1]*31;output+=`<rect x="${fmt(x-(illustrative?13:60))}" y="${fmt(y-14)}" width="${illustrative?26:120}" height="28" rx="7" fill="#f1f5e9"/><text x="${fmt(x)}" y="${fmt(y+5)}" text-anchor="middle" font-size="${small?20:14}" fill="#4d703c" font-weight="600">${esc(label+(illustrative?'':' · '+M.formatMeasurement(segment?.lengthMM,model.unit)))}</text>`;
+ if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
+ const section=profileSectionPath(mapped,tool==='draw'?[]:model.bends||[]);
+ output+=`<path d="${section}" fill="none" stroke="#97a68b" stroke-width="9" stroke-linejoin="miter"/><path d="${section}" fill="none" stroke="#dbe3d4" stroke-width="4" stroke-linejoin="miter"/>`;
+ }
+ const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}else{const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
  if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;output+=`<path d="M${fmt(mid[0]+normal[0]*9*side)},${fmt(mid[1]+normal[1]*9*side)}L${fmt(mid[0]+normal[0]*26*side)},${fmt(mid[1]+normal[1]*26*side)}" stroke="#4f8538" stroke-width="2"/><text x="${fmt(mid[0]+normal[0]*39*side)}" y="${fmt(mid[1]+normal[1]*39*side+5)}" text-anchor="middle" font-size="22" fill="#427c2a">*</text>`;}}
  }
  if(polygon){const xs=mapped.map(p=>p[0]),ys=mapped.map(p=>p[1]),left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bottom=Math.max(...ys);output+=`<path d="M${fmt(left)},${fmt(bottom+35)}H${fmt(right)}M${fmt(left)},${fmt(bottom+29)}V${fmt(bottom+41)}M${fmt(right)},${fmt(bottom+29)}V${fmt(bottom+41)}" fill="none" stroke="#8ba475" stroke-width="1.4"/><text x="${fmt((left+right)/2)}" y="${fmt(bottom+60)}" text-anchor="middle" font-size="18" fill="#577c3d">${esc(illustrative?'A · largeur':'A · '+M.formatMeasurement(model.widthMM,model.unit))}</text><text x="${fmt(right+25)}" y="${fmt((top+bottom)/2)}" font-size="17" fill="#577c3d">B</text>`;if(!illustrative)output+=`<text x="400" y="495" text-anchor="middle" font-size="14" fill="#7b8e6b">${esc('B · '+M.formatMeasurement(model.heightMM,model.unit)+' / C · '+M.formatMeasurement(model.reliefMM,model.unit))}</text>`;
@@ -127,6 +146,10 @@ function updateDrawing({keepForm=false}={}){
  $('#drawing-title').textContent=authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
  const stage=$('#production-drawing');stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;
  stage.innerHTML=view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
+ const dimensions=$('#profile-dimension-list');
+ dimensions.hidden=kind!=='profile'||shown.illustrative||!shown.model.segments?.length;
+ dimensions.innerHTML=dimensions.hidden?'':shown.model.segments.map(segment=>`<li>${esc(segment.label)} · ${esc(M.formatMeasurement(segment.lengthMM,shown.model.unit))}</li>`).join('');
+
  $('#drawing-navigation').hidden=kind!=='panel'&&view!=='volume';$('#zoom-controls').hidden=kind!=='panel';$('#panel-zoom-value').textContent=Math.round(zoom*100)+' %';$('#panel-zoom-out').disabled=zoom<=.5;$('#panel-zoom-in').disabled=zoom>=4;
  $('#drawing-gesture-hint').textContent=view==='volume'?'Glissez pour tourner · molette ou pincement pour zoomer':'Molette ou pincement pour zoomer';
  document.querySelectorAll('[data-preview]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.preview===view)));
