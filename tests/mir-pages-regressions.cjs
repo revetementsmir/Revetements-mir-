@@ -185,7 +185,7 @@ test('Studio : panneaux 4×8 / 4×10 gardent leur format et leur orientation', (
 test('Studio : la vue 2D ne repeint plus le soffite comme une bande sur le mur', () => {
   const app=fs.readFileSync(path.join(__dirname,'../dist/plan-app.js'),'utf8');
   const start=app.indexOf('function facadeSVG');
-  const end=app.indexOf('\\n  function threeViews',start);
+  const end=app.indexOf('function threeViews',start);
   assert.ok(start>=0&&end>start);
   const facade=app.slice(start,end);
   assert.ok(facade.includes('The stored soffit paths locate undersides'));
