@@ -418,9 +418,13 @@ function toCustom(points,base=draft){
   const c=points[i+2],nextHeading=heading(b,c);
   const turn=((nextHeading-renderedHeading+540)%360+360)%360-180;
   const departure=180-Math.abs(turn);
-  const nearReturn=tool==='draw'&&departure<=12&&length>=Math.hypot(c[0]-b[0],c[1]-b[1]);
+  const oldHem=base?.bends?.[i]?.mode==='hem';
+  // Le tracé crée un repli à la main; une retouche de ses points conserve
+  // ce repli tant que l'écart avec 180° reste dans la tolérance de 12°.
+  const nearReturn=departure<=12&&(
+    tool==='draw'&&length>=Math.hypot(c[0]-b[0],c[1]-b[1])||oldHem);
   if(departure<1e-5||nearReturn){
-   bends.push({mode:'hem',angle:180,direction:departure<1e-5||turn>0?'left':'right'});
+   bends.push({mode:'hem',angle:180,direction:oldHem?base.bends[i].direction:(departure<1e-5||turn>0?'left':'right')});
    renderedHeading+=180;
   }else{
    bends.push({mode:'signed',angle:Number(fmt(turn))});

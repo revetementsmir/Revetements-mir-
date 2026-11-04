@@ -296,4 +296,32 @@ test('Repères A-B-C : les côtés serrés gardent leurs étiquettes hors du des
  assert.equal(count,1,'un seul badge par segment');
 });
 
+
+test('Tracé MIR : un repli manuel reste écrasé après une petite retouche', () => {
+ const code=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
+ const start=code.indexOf('function toCustom(');
+ const end=code.indexOf('\nfunction unlockCustom(',start);
+ assert.ok(start>0&&end>start);
+ function makeTracer(tool){
+  return new Function('draft','tool','fmt','unitValue','copy','authoring',
+   code.slice(start,end)+'\nreturn toCustom;')(
+    {},tool,v=>String(Math.round(v*10000)/10000),
+    (length,unit)=>unit==='mm'?length:length/25.4,
+    value=>JSON.parse(JSON.stringify(value)),false);
+ }
+ const points=[[0,0],[100,0],[5,5],[5,85]];
+ const base={unit:'in',name:'Retour serré',template:'custom',
+  bends:[{mode:'hem',angle:180,direction:'right'},{mode:'signed',angle:-90}]};
+ const after=makeTracer('edit')(points,base);
+ assert.equal(after.segments.length,3);
+ assert.equal(after.bends.length,2);
+ assert.equal(after.bends[0].mode,'hem');
+ assert.equal(after.bends[0].direction,'right');
+ assert.equal(after.bends[1].mode,'signed');
+ const withoutHem=makeTracer('edit')(points,{...base,bends:[]});
+ assert.equal(withoutHem.bends[0].mode,'signed','pas de repli créé silencieusement en édition');
+ const drawn=makeTracer('draw')(points,{...base,bends:[]});
+ assert.equal(drawn.bends[0].mode,'hem','un retour quasi 180° dessiné est détecté');
+});
+
 console.log('Tests MIR : '+total+'/'+total+' réussis.');
