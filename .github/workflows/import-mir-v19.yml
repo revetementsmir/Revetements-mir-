@@ -1,0 +1,68 @@
+name: Import MIR v19 static copy
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/import-mir-v19.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: import-mir-v19
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch and verify the pinned public v19 assets
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from concurrent.futures import ThreadPoolExecutor
+          from hashlib import sha1
+          from pathlib import Path
+          from urllib.parse import quote, urlparse
+          from urllib.request import Request, urlopen
+          from time import sleep
+
+          origin = 'https://mir-realisations-studio.frederickmessely.chatgpt.site'
+          entries = [line.split('\t', 1) for line in Path('.github/mir-v19-manifest.tsv').read_text().splitlines()]
+          assert len(entries) == 792 and len({path for _, path in entries}) == 792
+
+          def import_file(entry):
+              expected, path = entry
+              file = Path(path)
+              assert file.parts[0] == 'dist' and '..' not in file.parts
+              relative = file.relative_to('dist').as_posix()
+              request = Request(origin + '/' + quote(relative, safe='/'), headers={'Accept-Encoding': 'identity', 'User-Agent': 'MIR-GitHub-Pages-Import/1'})
+              for attempt in range(3):
+                  try:
+                      with urlopen(request, timeout=45) as response:
+                          assert urlparse(response.url).netloc == urlparse(origin).netloc
+                          data = response.read()
+                      actual = sha1(f'blob {len(data)}\0'.encode() + data).hexdigest()
+                      if actual != expected:
+                          raise ValueError(f'{path}: expected {expected}, got {actual}')
+                      file.parent.mkdir(parents=True, exist_ok=True)
+                      file.write_bytes(data)
+                      return None
+                  except Exception as error:
+                      if attempt == 2:
+                          return f'{path}: {error}'
+                      sleep(2 ** attempt)
+          with ThreadPoolExecutor(max_workers=8) as pool:
+              errors = [result for result in pool.map(import_file, entries) if result]
+          if errors:
+              raise SystemExit('\n'.join(errors))
+          print(f'{len(entries)} files verified')
+          PY
+      - name: Commit the verified copy
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          touch dist/.nojekyll
+          git add -f dist
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Import verified MIR v19 static site'
+          git push origin HEAD:main
