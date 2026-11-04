@@ -508,15 +508,16 @@
       let a=map(seg.start), b=map(seg.end);
       if (seg.foldKind==='hem') {
         const vx=b.x-a.x, vy=b.y-a.y, len=Math.hypot(vx,vy)||1;
-        const ox=-vy/len*6, oy=vx/len*6;
-        const connector=`<line x1="${a.x}" y1="${a.y}" x2="${a.x+ox}" y2="${a.y+oy}" class="hem-connector"/>`;
+        // Separate the two visible brins in screen space; the geometry keeps its finished dimensions.
+        const radius=5, ox=-vy/len*2*radius, oy=vx/len*2*radius;
+        const connector=`<path d="M${a.x} ${a.y} A${radius} ${radius} 0 0 0 ${a.x+ox} ${a.y+oy}" class="hem-connector"/>`;
         a={x:a.x+ox,y:a.y+oy}; b={x:b.x+ox,y:b.y+oy};
         return connector+`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="profile hem-line"/>`;
       }
       return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="profile"/>`;
     }).join('');
     const labels=drawable.map(seg=>{const a=map(seg.start),b=map(seg.end),x=(a.x+b.x)/2,y=(a.y+b.y)/2;return `<g><rect x="${x-42}" y="${y-13}" width="84" height="26" rx="8"/><text x="${x}" y="${y+4}">${esc(formatInches(seg.length))}</text></g>`;}).join('');
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(PROFILE_TEMPLATES[templateId].name)}"><style>.bg{fill:#0f1411}.grid{stroke:#223129;stroke-width:1}.profile{stroke:#fff;stroke-width:4;stroke-linecap:square}.hem-line{stroke:#d8f4de}.hem-connector{stroke:#819889;stroke-width:2}.title{fill:#fff;font:800 20px system-ui}.sub{fill:#9ec8aa;font:600 12px system-ui}g rect{fill:#17351b;stroke:#6ed889}g text{fill:#fff;font:700 12px system-ui;text-anchor:middle}</style><defs><pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" class="grid"/></pattern></defs><rect width="100%" height="100%" class="bg"/><rect width="100%" height="100%" fill="url(#g)"/><text x="18" y="28" class="title">${esc(PROFILE_TEMPLATES[templateId].name)}</text><text x="18" y="48" class="sub">cotes finies · développé non calculé · aucune cote absente inventée</text>${drawn}${labels}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(PROFILE_TEMPLATES[templateId].name)}"><style>.bg{fill:#0f1411}.grid{stroke:#223129;stroke-width:1}.profile{stroke:#fff;stroke-width:4;stroke-linecap:square}.hem-line{stroke:#d8f4de}.hem-connector{fill:none;stroke:#fff;stroke-width:4}.title{fill:#fff;font:800 20px system-ui}.sub{fill:#9ec8aa;font:600 12px system-ui}g rect{fill:#17351b;stroke:#6ed889}g text{fill:#fff;font:700 12px system-ui;text-anchor:middle}</style><defs><pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" class="grid"/></pattern></defs><rect width="100%" height="100%" class="bg"/><rect width="100%" height="100%" fill="url(#g)"/><text x="18" y="28" class="title">${esc(PROFILE_TEMPLATES[templateId].name)}</text><text x="18" y="48" class="sub">cotes finies · développé non calculé · aucune cote absente inventée</text>${drawn}${labels}</svg>`;
   }
 
   return Object.freeze({
