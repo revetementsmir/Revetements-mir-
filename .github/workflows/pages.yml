@@ -2,7 +2,7 @@ name: Publish MIR copy
 on:
   push:
     branches: [main]
-    paths: ['dist/**']
+    paths: ['dist/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,3 +25,20 @@ jobs:
           path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify published MIR pages
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          base="${PAGE_URL%/}"
+          fetch() {
+            curl --fail --silent --show-error --location \
+              --retry 20 --retry-delay 3 --retry-all-errors "$1" -o "$2"
+          }
+          fetch "$base/metres.html" /tmp/metres.html
+          grep -F 'href="atelier-essai/index.html"' /tmp/metres.html
+          fetch "$base/production.html" /tmp/production.html
+          grep -F 'href="atelier-essai/index.html" data-admin-only' /tmp/production.html
+          fetch "$base/atelier-essai/index.html" /tmp/atelier.html
+          grep -F 'Atelier d’essai MIR' /tmp/atelier.html
+          echo "MIR Pages verified at $base/"
