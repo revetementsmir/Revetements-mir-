@@ -6,6 +6,7 @@ const path = require('node:path');
 const X = require('../dist/atelier-essai/mir-calepinage-extension.js');
 const P = require('../dist/production-model.js');
 const Transfer = require('../dist/profile-production-transfer.js');
+const StudioCoverage = require('../dist/material-coverage.js');
 let total = 0;
 function test(name, fn) { fn(); total++; console.log('PASS ' + name); }
 test('6/12 : portée 108 po, montée 27 po et pointe 123 po', () => {
@@ -145,6 +146,65 @@ test('La page calepinage expose les contrôles préparés', () => {
   assert.ok(app.includes('event.shiftKey||outlineRightAngle'));
   assert.ok(app.includes('A?.gableFromPitch?.(width,eave,leftPitch,rightPitch)'));
   assert.ok(app.includes('E.setPanelSize(layout.config,axis'));
+});
+
+
+test('Studio : clin 7 po sur 10 pi = 17 rangs complets + coupe de 1 po', () => {
+  const material={id:'test-lap',applications:['siding'],renderPattern:'lap',
+    allowedPatterns:['lap'],allowedOrientations:['horizontal'],
+    coverage:{exposureIn:7,verified:true}};
+  const spec=StudioCoverage.coverageSpec(material,{pattern:'lap',orientation:'horizontal'});
+  const layout=StudioCoverage.courseLayout([0,0,100,120],1/12,spec);
+  assert.equal(spec.exposureIn,7);
+  assert.equal(layout.count,18);
+  assert.equal(layout.fullCount,17);
+  assert.equal(layout.partialCount,1);
+  assert.deepEqual(layout.partialWidthsIn,[1]);
+});
+
+test('Studio : panneaux 4×8 / 4×10 gardent leur format et leur orientation', () => {
+  const material={id:'test-panel',applications:['siding'],renderPattern:'panel',
+    allowedPatterns:['panel'],allowedOrientations:['horizontal','vertical'],
+    formats:[
+      {id:'48x96',label:'4 × 8',measurementKind:'physical_piece',verified:true,widthIn:48,lengthIn:96},
+      {id:'48x120',label:'4 × 10',measurementKind:'physical_piece',verified:true,widthIn:48,lengthIn:120}
+    ]};
+  const vertical10=StudioCoverage.coverageSpec(material,{pattern:'panel',orientation:'vertical',formatId:'48x120'});
+  assert.equal(vertical10.displayWidthIn,48);
+  assert.equal(vertical10.displayHeightIn,120);
+  const horizontal8=StudioCoverage.coverageSpec(material,{pattern:'panel',orientation:'horizontal',formatId:'48x96'});
+  assert.equal(horizontal8.displayWidthIn,96);
+  assert.equal(horizontal8.displayHeightIn,48);
+  const grid=StudioCoverage.panelGrid([0,0,100,120],1/12,material,{pattern:'panel',orientation:'vertical',formatId:'48x120'});
+  assert.equal(grid.columnCount,3);
+  assert.equal(grid.rowCount,1);
+  assert.equal(grid.columns.at(-1).widthIn,4);
+  assert.equal(grid.columns.at(-1).full,false);
+});
+
+test('Studio : la vue 2D ne repeint plus le soffite comme une bande sur le mur', () => {
+  const app=fs.readFileSync(path.join(__dirname,'../dist/plan-app.js'),'utf8');
+  const start=app.indexOf('function facadeSVG');
+  const end=app.indexOf('\\n  function threeViews',start);
+  assert.ok(start>=0&&end>start);
+  const facade=app.slice(start,end);
+  assert.ok(facade.includes('The stored soffit paths locate undersides'));
+  assert.ok(!facade.includes('state.soffitColor'));
+  assert.ok(!facade.includes('stroke-width="12"'));
+});
+
+test('Studio : le retrait central reste continu sur les deux étages', () => {
+  const renderer=fs.readFileSync(path.join(__dirname,'../dist/plan-3d.js'),'utf8');
+  assert.ok(renderer.includes("upperStorey:'recessed-confirmed'"));
+  assert.ok(renderer.includes("'recessed-assumption' and 'recessed-confirmed' both continue to wallHeight"));
+  assert.ok(renderer.includes('The porch ceiling stays independent at its own supplied height'));
+});
+
+test('Studio : le grain du fibrociment reste indépendant de la couvrance', () => {
+  const surface=fs.readFileSync(path.join(__dirname,'../dist/material-surface.js'),'utf8');
+  assert.ok(surface.includes('The grain field is independent from the exposure'));
+  assert.ok(surface.includes('step:scaledProfile ? exposureIn * pxPerIn : null'));
+  assert.ok(surface.includes('Changing 5 in to 7 in'));
 });
 
 console.log('Tests MIR : '+total+'/'+total+' réussis.');

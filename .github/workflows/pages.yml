@@ -2,7 +2,7 @@ name: Publish MIR copy
 on:
   push:
     branches: [main]
-    paths: ['dist/**', '.github/workflows/pages.yml']
+    paths: ['dist/**', 'tests/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -57,6 +57,19 @@ jobs:
           grep -F 'event.shiftKey||outlineRightAngle' /tmp/calepinage-app.js
           grep -F 'A?.gableFromPitch?.(width,eave,leftPitch,rightPitch)' /tmp/calepinage-app.js
           grep -F 'E.setPanelSize(layout.config,axis' /tmp/calepinage-app.js
+          fetch "$base/plan.html" /tmp/plan.html
+          grep -F 'material-coverage.js' /tmp/plan.html
+          grep -F 'id="material-format"' /tmp/plan.html
+          grep -F 'id="coverage-input"' /tmp/plan.html
+          fetch "$base/material-coverage.js" /tmp/material-coverage.js
+          grep -F 'function courseLayout' /tmp/material-coverage.js
+          grep -F 'function panelGrid' /tmp/material-coverage.js
+          fetch "$base/material-surface.js" /tmp/material-surface.js
+          grep -F 'Changing 5 in to 7 in' /tmp/material-surface.js
+          fetch "$base/plan-app.js" /tmp/plan-app.js
+          grep -F 'The stored soffit paths locate undersides' /tmp/plan-app.js
+          fetch "$base/plan-3d.js" /tmp/plan-3d.js
+          grep -F "'recessed-assumption' and 'recessed-confirmed' both continue to wallHeight" /tmp/plan-3d.js
           fetch "$base/atelier-essai/index.html" /tmp/atelier.html
           grep -F 'Atelier d’essai MIR' /tmp/atelier.html
           echo "MIR Pages verified at $base/"
