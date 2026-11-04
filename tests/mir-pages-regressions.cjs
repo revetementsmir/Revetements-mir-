@@ -223,4 +223,42 @@ test('MIR : les nouveaux modèles restent privés et une diffusion existante est
   assert.ok(app.includes('record.channels?.[catalogueChannel]===true'));
 });
 
+
+const ModelDefaults=require('../dist/model-measure-defaults.js');
+test('Mesures standard MIR : fractions, verrouillage et longueur', () => {
+ const t=P.createTemplate({kind:'profile',template:'custom',unit:'in',segments:[{label:'A',length:3},{label:'B',length:1.5}],bends:[{mode:'interior',angle:90,direction:'left'}],length:120},{name:'L standard'}).template;
+ assert.ok(t);
+ const raw={A:{value:'3',locked:true},B:{value:'1½',locked:false},length:{value:'120',locked:true}};
+ const validated=ModelDefaults.validate(t,raw);
+ assert.equal(validated.ok,true,validated.errors.join('; '));
+ const applied=ModelDefaults.prepare(t,validated.data);
+ assert.deepEqual(applied.measurements,{A:'3',B:'1½'});
+ assert.equal(applied.length,'120');
+ assert.equal(applied.locks.A,true);
+ assert.equal(applied.locks.length,true);
+ const instance=P.instantiateTemplate(t,{unit:'in',measurements:applied.measurements,length:applied.length,quantity:1});
+ assert.equal(instance.spec.segments[0].length,'3');
+ assert.equal(instance.spec.segments[1].length,'1½');
+ assert.equal(instance.snapshot.spec.segments[0].length,'3');
+ raw.A.value='9';
+ assert.equal(instance.snapshot.spec.segments[0].length,'3');
+});
+test('Mesures standard MIR : cote verrouillée vide interdite', () => {
+ const t=P.createTemplate({kind:'profile',template:'custom',unit:'in',segments:[{label:'A',length:3},{label:'B',length:2}],bends:[{mode:'interior',angle:90,direction:'right'}],length:120},{name:'Test'}).template;
+ assert.equal(ModelDefaults.validate(t,{A:{value:'',locked:true}}).ok,false);
+ assert.equal(ModelDefaults.validate(t,{A:{value:'abc',locked:false}}).ok,false);
+ assert.equal(ModelDefaults.validate(t,{A:{value:'2 1/4',locked:true}}).ok,true);
+});
+test('Mesures standard MIR : nouvelles fiches privées et usage magasin contrôlé', () => {
+ const app=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
+ const html=fs.readFileSync(path.join(__dirname,'../dist/production.html'),'utf8');
+ assert.ok(html.indexOf('model-measure-defaults.js')<html.indexOf('production-app.js'));
+ assert.ok(app.includes('MIRModelDefaults?.prepare(t,record.measurementDefaults)'));
+ assert.ok(app.includes('measurementDefaults:checked.data'));
+ assert.ok(app.includes('input.readOnly=true'));
+ assert.ok(app.includes("catalogueChannel==='store'"));
+ assert.ok(app.includes("old?.channels?.client===true?' checked':''"));
+ assert.ok(app.includes("old?.channels?.store===true?' checked':''"));
+});
+
 console.log('Tests MIR : '+total+'/'+total+' réussis.');

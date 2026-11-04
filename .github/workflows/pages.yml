@@ -20,7 +20,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Test MIR architectural profiles
-        run: node tests/mir-pages-regressions.cjs
+        run: |
+          node --check dist/model-measure-defaults.js
+          node --check dist/production-app.js
+          node tests/mir-pages-regressions.cjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -45,6 +48,10 @@ jobs:
           grep -F 'mir-bending-presets.js?v=profils-1' /tmp/production.html
           fetch "$base/mir-bending-presets.js" /tmp/mir-profiles.js
           grep -F "id:'coin_arch_j'" /tmp/mir-profiles.js
+          fetch "$base/model-measure-defaults.js" /tmp/model-measure-defaults.js
+          grep -F 'function prepare(template,source)' /tmp/model-measure-defaults.js
+          fetch "$base/production.html" /tmp/mir-production.html
+          grep -F 'model-measure-defaults.js?v=defaults-1' /tmp/mir-production.html
           fetch "$base/production-app.js" /tmp/production-app.js
           grep -F 'old?.channels?.client===true' /tmp/production-app.js
           grep -F 'old?.channels?.store===true' /tmp/production-app.js
