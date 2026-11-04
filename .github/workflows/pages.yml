@@ -61,7 +61,7 @@ jobs:
           grep -F 'old?.channels?.client===true' /tmp/production-app.js
           grep -F 'old?.channels?.store===true' /tmp/production-app.js
           grep -F 'Nouveau modèle privé par défaut sur cet appareil' /tmp/production-app.js
-          grep -F 'const gap=10, side=bends[i-1].direction' /tmp/production-app.js
+          grep -F 'const radius=5, side=bends[i-1].direction' /tmp/production-app.js
           grep -F 'class="profile-marker-overflow"' /tmp/production-app.js
           grep -F "const oldHem=base?.bends?.[i]?.mode==='hem'" /tmp/production-app.js
           fetch "$base/atelier-essai/pliages-integration-candidate.html?production=1" /tmp/coins.html

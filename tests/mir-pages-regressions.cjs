@@ -262,7 +262,7 @@ test('Mesures standard MIR : nouvelles fiches privées et usage magasin contrôl
 });
 
 
-test('Pliage MIR : retour écrasé avec traits droits et sans arc de dessin', () => {
+test('Pliage MIR : retour écrasé avec un raccord arrondi', () => {
  const code=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
  const start=code.indexOf('function profileSectionPath(');
  const end=code.indexOf('\nfunction profileSideMarkers(',start);
@@ -271,8 +271,11 @@ test('Pliage MIR : retour écrasé avec traits droits et sans arc de dessin', ()
  const section=draw([[0,0],[100,0],[0,0]],[{mode:'hem',angle:180,direction:'left'}]);
  assert.equal(section.folds.length,1);
  assert.equal(section.segments.length,2);
- assert.ok(!/[AQ]/.test(section.path),'pas de courbe SVG sur un retour écrasé');
- assert.equal((section.path.match(/ L/g)||[]).length,3,'deux côtés et un raccord droit');
+ assert.match(section.path,/ A5 5 0 0 0 /);
+ const mirrored=draw([[0,0],[100,0],[0,0]],[{mode:'hem',angle:180,direction:'right'}]);
+ assert.match(mirrored.path,/ A5 5 0 0 1 /);
+ assert.doesNotMatch(draw([[0,0],[100,0],[100,100]],[{mode:'signed',angle:90}]).path,/ A/);
+ assert.equal((section.path.match(/ L/g)||[]).length,2,'deux côtés droits reliés par un arc');
  assert.equal(section.segments[1][0][1],-10,'repli à 10 pixels du premier trait');
 });
 

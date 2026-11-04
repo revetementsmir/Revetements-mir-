@@ -129,14 +129,12 @@ function profileSectionPath(points,bends){
   if(bends[i-1]?.mode!=='hem'||i===points.length-1)continue;
   const dx=points[i+1][0]-x,dy=points[i+1][1]-y,length=Math.hypot(dx,dy);
   if(!length)continue;
-  // Un retour écrasé doit rester composé de traits droits rapprochés.
-  // Le connecteur n'ajoute pas de rayon ni de longueur au modèle métier.
-  const gap=10, side=bends[i-1].direction==='right'?-1:1;
-  offsetX-=dy/length*gap*side;
-  offsetY+=dx/length*gap*side;
+  const radius=5, side=bends[i-1].direction==='right'?-1:1;
+  offsetX-=dy/length*2*radius*side;
+  offsetY+=dx/length*2*radius*side;
   start=[x+offsetX,y+offsetY];
   folds.push([(end[0]+start[0])/2,(end[1]+start[1])/2]);
-  path+=` L${fmt(start[0])} ${fmt(start[1])}`;
+  path+=` A${radius} ${radius} 0 0 ${side<0?1:0} ${fmt(start[0])} ${fmt(start[1])}`;
  }
  return {path,segments,folds};
 }
