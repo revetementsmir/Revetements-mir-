@@ -518,10 +518,9 @@
     }).join('');
     // Keep measurement text in a reserved band below the entire drawing.
     const columns=width>=550?2:1, rowHeight=28, legendHeight=32+Math.ceil(drawable.length/columns)*rowHeight;
-    const fields=PROFILE_TEMPLATES[templateId].fields;
     const labels=drawable.map((seg,index)=>{
       const x=18+(index%columns)*(width/columns), y=height+46+Math.floor(index/columns)*rowHeight;
-      const name=fields.find(field=>field.id===seg.fieldId)?.label||seg.id;
+      const name=String.fromCharCode(65+index);
       return `<text x="${x}" y="${y}" class="dimension-value">${esc(name)} · ${esc(formatInches(seg.length))}</text>`;
     }).join('');
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height+legendHeight}" role="img" aria-label="${esc(PROFILE_TEMPLATES[templateId].name)}"><style>.bg{fill:#0f1411}.grid{stroke:#223129;stroke-width:1}.profile{stroke:#fff;stroke-width:4;stroke-linecap:square}.hem-line{stroke:#d8f4de}.hem-connector{fill:none;stroke:#fff;stroke-width:4}.title{fill:#fff;font:800 20px system-ui}.sub{fill:#9ec8aa;font:600 12px system-ui}.dimension-value{fill:#e1f6e5;font:600 16px system-ui}</style><defs><pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" class="grid"/></pattern></defs><rect width="100%" height="100%" class="bg"/><rect width="100%" height="${height}" fill="url(#g)"/><text x="18" y="28" class="title">${esc(PROFILE_TEMPLATES[templateId].name)}</text><text x="18" y="48" class="sub">cotes finies · développé non calculé · aucune cote absente inventée</text>${drawn}<g class="dimension-legend"><line x1="18" x2="${width-18}" y1="${height}" y2="${height}" stroke="#48634c"/><text x="18" y="${height+22}" class="sub">COTES DE LA TÔLE</text>${labels}</g></svg>`;
