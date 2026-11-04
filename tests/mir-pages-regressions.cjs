@@ -59,4 +59,79 @@ test('La page des coins charge les composants de production', () => {
   assert.ok(html.includes('../profile-production-transfer.js'));
   assert.ok(html.includes('MIR — Solin brique et coins architecturaux'));
 });
+const Presets = require('../dist/mir-bending-presets.js');
+test('Les onze profils MIR sont disponibles dans le configurateur', () => {
+  assert.equal(Presets.VARIANTS.length,11);
+  for(const preset of Presets.VARIANTS){
+    const s=Presets.create(preset.id);
+    assert.equal(s.template,'custom');
+    assert.equal(s.mirProfileId,preset.id);
+    assert.ok(Presets.icon(preset.id).includes('<svg'));
+    assert.ok(s.segments.every((part,i)=>part.label===String.fromCharCode(65+i)));
+    const template=P.createTemplate({kind:'profile',unit:'in',...s,length:120});
+    assert.equal(template.ok,true,preset.id+' : '+JSON.stringify(template.errors));
+    assert.equal(P.templatePreview(template.template).ok,true,preset.id+' : aperçu');
+  }
+});
+test('Fascia et L replié gardent le retour écrasé', () => {
+  for(const id of ['fascia','l_replie']){
+    const s=Presets.create(id);
+    assert.equal(s.bends.at(-1).mode,'hem');
+    assert.equal(s.segments.length,3);
+    assert.equal(P.buildProfile({kind:'profile',unit:'in',...s,length:120}).valid,true);
+  }
+});
+test('Beam avec replis : sept segments, deux retours écrasés', () => {
+  const s=Presets.create('beam_replis');
+  assert.equal(s.segments.length,7);
+  assert.equal(s.bends.filter(b=>b.mode==='hem').length,2);
+  assert.equal(s.segments[0].length,'');
+  assert.equal(s.segments.at(-1).length,'');
+});
+test('Les solins brique ne préremplissent aucune cote inconnue', () => {
+  for(const id of ['solin_brique','solin_brique_goutte']){
+    const s=Presets.create(id);
+    assert.ok(s.segments.every(p=>p.length===''));
+  }
+  assert.equal(Presets.create('solin_brique_goutte').segments.length,4);
+});
+test('Le J intégré avertit pour le clouage inférieur au minimum', () => {
+  const s=Presets.create('coin_arch_j');
+  s.segments.forEach(p=>{p.length=p.mirFieldId==='jReturn'?1:p.mirFieldId==='nailing'?2:5;});
+  const result=Presets.checkJ({...s,kind:'profile',unit:'in'});
+  assert.equal(result.ok,false);
+  assert.equal(result.minimumIn,2.25);
+});
+test('La correction automatique du J respecte le minimum', () => {
+  const s=Presets.create('coin_arch_j');
+  s.segments.forEach(p=>{p.length=p.mirFieldId==='jReturn'?1:p.mirFieldId==='nailing'?2:5;});
+  const after=Presets.autoCorrectJ({...s,kind:'profile',unit:'in'});
+  assert.equal(Presets.checkJ(after).ok,true);
+  assert.equal(s.segments.at(-1).length,2);
+});
+test('Une exception J exige une acceptation nominative', () => {
+  const s=Presets.create('coin_arch_j');
+  s.segments.forEach(p=>{p.length=p.mirFieldId==='jReturn'?1:p.mirFieldId==='nailing'?2:5;});
+  s.kind='profile';s.unit='in';
+  assert.throws(()=>Presets.finalizeJ(s));
+  const x=Presets.checkJ(s);
+  const accepted=X.acceptJException({jReturn:x.jReturnIn,nailing:x.nailingIn},
+    {accepted:true,acceptedBy:'Contremaître test',note:'À revoir'});
+  const result=Presets.finalizeJ(s,accepted);
+  assert.equal(result.ruleExceptions[0].minimumIn,2.25);
+  assert.equal(result.ruleExceptions[0].acceptedBy,'Contremaître test');
+});
+test('Le J ne peut pas contourner la règle après modification de la topologie', () => {
+  const s=Presets.create('coin_arch_j');
+  s.segments.push({label:'F',length:1});
+  assert.equal(Presets.checkJ(s).valid,false);
+});
+test('Les profils sont chargés directement sur la page de production', () => {
+  const html=fs.readFileSync(path.join(__dirname,'../dist/production.html'),'utf8');
+  const app=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
+  assert.ok(html.includes('mir-bending-presets.js?v=profils-1'));
+  assert.ok(app.includes('...window.MIRBendingPresets?.catalog()'));
+  assert.ok(app.includes('mir-j-exception-form'));
+});
+
 console.log('Tests MIR : '+total+'/'+total+' réussis.');

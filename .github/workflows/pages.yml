@@ -42,6 +42,9 @@ jobs:
           fetch "$base/production.html" /tmp/production.html
           grep -F 'href="atelier-essai/index.html" data-admin-only' /tmp/production.html
           grep -F 'href="atelier-essai/pliages-integration-candidate.html?production=1"' /tmp/production.html
+          grep -F 'mir-bending-presets.js?v=profils-1' /tmp/production.html
+          fetch "$base/mir-bending-presets.js" /tmp/mir-profiles.js
+          grep -F "id:'coin_arch_j'" /tmp/mir-profiles.js
           fetch "$base/atelier-essai/pliages-integration-candidate.html?production=1" /tmp/coins.html
           grep -F 'MIR — Solin brique et coins architecturaux' /tmp/coins.html
           fetch "$base/atelier-essai/mir-calepinage-extension.js" /tmp/extension.js

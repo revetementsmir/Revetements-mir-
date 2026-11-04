@@ -35,3 +35,13 @@
  list-style:none;
  font-variant-numeric:tabular-nums;
 }
+
+/* Profils MIR intégrés : repères lisibles et validation explicite du coin avec J. */
+.template-strip{grid-template-columns:repeat(auto-fit,minmax(125px,1fr))}
+.mir-j-rule{margin-top:14px;border:1px solid #ccdcbc;background:#f2f7ec;color:#365737;border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.5}
+.mir-j-rule.warn{border-color:#d9b78d;background:#fff7e9;color:#734b23}
+.mir-j-rule.good{border-color:#afceac;background:#ebf6eb}
+.mir-j-rule p{margin-top:6px;font-size:11px}
+.mir-j-rule-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.mir-j-rule-actions button{border:1px solid #b58b5b;border-radius:6px;background:white;color:#694420;padding:8px 12px;font-size:11px;min-height:42px}
+@media(max-width:850px){.template-strip{display:flex;overflow-x:auto}.template-button{flex:0 0 115px}}
