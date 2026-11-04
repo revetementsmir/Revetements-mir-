@@ -100,3 +100,8 @@ body[data-profile-admin=true] .angle-details .bend-fields{margin-top:0}
  body[data-profile-admin=true] .drawing-stage[data-kind=profile],
  body[data-profile-admin=true] .drawing-stage[data-kind=profile]>svg{min-height:225px}
 }
+#piece-guidance:not([hidden]){
+ flex-basis:100%;padding:10px 12px;background:#f2f5ed;color:#344b36;
+ border-radius:7px;font-size:13px;line-height:1.5;
+}
+#piece-guidance button{color:#315a37;text-decoration:underline;min-height:36px;padding-inline:4px}

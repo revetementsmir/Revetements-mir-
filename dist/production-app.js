@@ -257,8 +257,39 @@ function updateDrawing({keepForm=false}={}){
  const jRule=window.MIRBendingPresets?.checkJ(draft);
   const blockJ=jRule&&!jRule.pending&&(!jRule.valid||(!jRule.ok&&!window.MIRBendingPresets.exceptionMatches(jRule,jException)));
   $('#add-production-piece').disabled=!actual.valid||geometryErrors.length>0||busy||!!blockJ;
+  renderPieceGuidance(actual,blockJ);
  const quote=M.quotePolicy(draft);$('#custom-color-quote').hidden=authoring||!quote.required;renderPiecePrice(actual,geometryErrors);
  $('#add-production-piece').innerHTML=authoring?'Enregistrer le modèle <span aria-hidden="true">＋</span>':editingItemId?'Enregistrer la révision <span aria-hidden="true">✓</span>':quote.required?'Ajouter à ma soumission <span aria-hidden="true">＋</span>':'Ajouter au dossier <span aria-hidden="true">＋</span>';if(!keepForm)renderTools();
+}
+function renderPieceGuidance(model,blockJ){
+ const box=$('#piece-guidance');
+ box.hidden=client||kind!=='profile'||authoring;
+ if(box.hidden)return;
+ const blocking=model.validation.errors||[];
+ const pending=model.validation.pending||[];
+ const first=blocking[0]||(blockJ?null:pending[0]);
+ const field=first?.path;
+ const indexed=/^(segments|bends)\.(\d+)(?:\.(length))?$/.exec(field||'');
+ const targets={
+  length:'[data-measure="length"]',quantity:'#production-quantity',
+  'material.type':'#material-type',material:'#material-thickness',
+  'material.thickness':'#material-thickness',finish:'#color-system',
+  'coloredFace.side':'#profile-painted-side',segments:'[data-new-drawing]',unit:'#production-unit'
+ };
+ let target=blockJ&&!blocking.length?'[data-mir-fix-j]':targets[field];
+ let message=first?.message||(blockJ?'Vérifie le clouage du coin J.':'Pièce prête à ajouter au dossier.');
+ if(indexed){
+  const [,type,index,length]=indexed;
+  if(type==='segments'&&length){
+   const label=model.segments[Number(index)]?.label;
+   message=label?'Côté '+label+' : '+message:message;
+   target=draft.template==='custom'?`[data-segment-length="${index}"]`:
+    /^[A-Z][A-Z0-9]*$/.test(label||'')?`[data-measure="${label}"]`:'';
+  }else if(type==='bends')target=`[data-bend-angle="${index}"]:not(:disabled), [data-bend-direction="${index}"]:not(:disabled)`;
+ }
+ const heading=blocking.length||blockJ?'À corriger':pending.length?'À compléter pour la fabrication':'';
+ const html=`${heading?`<strong>${heading}</strong> `:''}${esc(message)}${target&&$(target)?` <button type="button" data-piece-focus="${esc(target)}">Aller au champ</button>`:''}`;
+ if(box.dataset.guidance!==html){box.innerHTML=html;box.dataset.guidance=html;}
 }
 function setZoom(value){zoom=Math.max(.5,Math.min(4,value));updateDrawing({keepForm:true});}
 
@@ -282,9 +313,10 @@ function formMetadata(){draft.material=draft.material||{};draft.material.type=$(
 function renderFormMetadata(){const m=draft.material||{};if(kind==='panel'&&m.thickness!==''&&m.thickness!==null&&m.thickness!==undefined&&(m.thicknessUnit||draft.unit)!=='mm'){const parsed=M.parseMeasurement(m.thickness,m.thicknessUnit||draft.unit);if(parsed.ok){m.thickness=fmt(parsed.mm);m.thicknessUnit='mm';}}renderPanelMaterialControls();$('#material-type').value=m.type||(kind==='panel'?'':'aluminium');$('#material-thickness').value=m.thickness??'';$('#material-gauge').value=m.gauge||'';$('#production-quantity').value=draft.quantity||1;$('#production-location').value=draft.location||'';$('#production-note').value=draft.note||'';$('#cancel-piece-edit').hidden=!editingItemId;for(const el of document.querySelectorAll('.config-card>.config-section'))el.hidden=authoring;$('#add-production-piece').closest('.config-section').hidden=false;if(authoring){for(const child of $('#add-production-piece').closest('.config-section').children)child.hidden=!child.classList.contains('piece-submit');}else for(const child of $('#add-production-piece').closest('.config-section').children)child.hidden=false;}
 function hasPanelGeometryIssue(item){const model=build(item.spec||item);if(model.kind!=='panel')return false;const mesh=window.MIRProductionVolume.buildMesh(model);if(item.sourceLayout&&model.valid&&mesh.errors?.length&&mesh.errors.every(error=>error.code==='PROJECTION_REQUIRED'))return !window.MIRProductionVolume.buildMesh(M.buildPanel({...model.spec,relief:0})).valid;return !mesh.valid;}
 function invalidPanelItems(){return (order.items||[]).filter(hasPanelGeometryIssue);}
-function renderOrder(){const validItems=order.items||[];$('#order-head-count').textContent=String(validItems.length).padStart(2,'0');$('#production-count').textContent=String(validItems.length).padStart(2,'0');for(const [id,key] of [['order-project','project'],['order-po','poNumber'],['order-foreman','foreman'],['order-date','date'],['order-revision','revision'],['order-notes','notes']])$('#'+id).value=order[key]||'';
+function renderOrder(){const validItems=order.items||[];
+$('#order-head-count').textContent=String(validItems.length).padStart(2,'0');$('#production-count').textContent=String(validItems.length).padStart(2,'0');for(const [id,key] of [['order-project','project'],['order-po','poNumber'],['order-foreman','foreman'],['order-date','date'],['order-revision','revision'],['order-notes','notes']])$('#'+id).value=order[key]||'';
  $('#production-items').innerHTML=validItems.length?validItems.map(item=>{const model=build(item.spec),geometryIssue=hasPanelGeometryIssue(item),snapshot=item.snapshot,thumb=diagramSVG(model,{small:true,interactive:false});return `<article class="production-item" data-production-item="${esc(item.id)}"><div class="production-item-thumb">${thumb}</div><div class="production-item-info"><span class="production-item-label">${esc(item.id)}${snapshot?` · modèle V${snapshot.templateVersion} / pièce R${snapshot.revision}`:''}</span><h3>${esc(model.name)}</h3><p>${esc(model.kind==='profile'?model.segments.map(s=>s.label+' '+M.formatMeasurement(s.lengthMM,model.unit)).join(' · ')+' · L '+M.formatMeasurement(model.lengthMM,model.unit):M.formatMeasurement(model.widthMM,model.unit)+' × '+M.formatMeasurement(model.heightMM,model.unit)+' · C '+M.formatMeasurement(model.reliefMM,model.unit))}</p><p>${esc([model.finish.manufacturer||model.finish.system,model.finish.name||model.finish.code,model.location].filter(Boolean).join(' · '))}</p><span class="item-status${model.complete&&!geometryIssue?' complete':''}">${geometryIssue?'Géométrie à corriger':M.quotePolicy(item.spec).required?'Soumission obligatoire · couleur personnalisée':model.complete?'Renseignée · validation atelier':'Précisions à compléter'}</span>${linePriceMarkup(item.spec)}</div><label class="production-item-qty">Quantité<input data-item-quantity="${esc(item.id)}" type="number" min="1" step="1" value="${model.quantity||1}" aria-label="Quantité de la pièce ${esc(item.id)}"></label><div class="production-item-actions"><button type="button" data-edit-piece="${esc(item.id)}">Modifier ↗</button><button type="button" data-duplicate-piece="${esc(item.id)}">Dupliquer</button><button type="button" class="remove-piece" data-remove-piece="${esc(item.id)}">Retirer</button></div></article>`;}).join(''):'<div class="production-empty"><strong>La bonne pièce commence ici.</strong><p>Ajoutez vos pièces pour préparer leur dossier coté et leur bon de commande.</p></div>';
- const qty=validItems.reduce((n,item)=>n+(item.spec.quantity||0),0),pending=validItems.filter(item=>!build(item.spec).complete||hasPanelGeometryIssue(item)).length;$('#production-total').textContent=validItems.length?`${validItems.length} référence${validItems.length>1?'s':''} · ${qty} pièce${qty>1?'s':''}${pending?' · '+pending+' fiche'+(pending>1?'s':'')+' à compléter':''}`:'Votre dossier attend sa première pièce.';$('#production-json').disabled=!validItems.length;$('#production-pdf').disabled=!validItems.length||busy||invalidPanelItems().length>0;$('#prepare-local-request').hidden=!client;$('#prepare-local-request').disabled=!validItems.length||busy||invalidPanelItems().length>0;const pricing=dossierPricing();renderDossierPrice(pricing);$('#prepare-local-request').textContent=pricing.requiresQuote?'Préparer ma demande de soumission ↗':'Préparer ma demande ↗';$('#production-pdf').textContent=pricing.requiresQuote?'Dossier de soumission PDF ↓':'Bon de commande PDF ↓';$('.document-status').textContent=pricing.requiresQuote?'Soumission obligatoire pour les pièces personnalisées':'Brouillon à valider';
+ const qty=validItems.reduce((n,item)=>n+(item.spec.quantity||0),0),pending=validItems.filter(item=>!build(item.spec).complete||hasPanelGeometryIssue(item)).length;$('#production-total').textContent=validItems.length?`${validItems.length} référence${validItems.length>1?'s':''} · ${qty} pièce${qty>1?'s':''}${pending?' · '+pending+' fiche'+(pending>1?'s':'')+' à compléter':''}`:'Votre dossier attend sa première pièce.';$('#production-json').disabled=!validItems.length;$('#production-pdf').disabled=!validItems.length||busy||invalidPanelItems().length>0;$('#prepare-local-request').hidden=!client;$('#prepare-local-request').disabled=!validItems.length||busy||invalidPanelItems().length>0;const pricing=dossierPricing();renderDossierPrice(pricing);$('#prepare-local-request').textContent=pricing.requiresQuote?'Préparer ma demande de soumission ↗':'Préparer ma demande ↗';$('#production-pdf').textContent=pricing.requiresQuote?'Dossier de soumission PDF ↓':'Bon de commande PDF ↓';$('.document-status').textContent=pricing.requiresQuote?'Soumission obligatoire pour les pièces personnalisées':!client&&kind==='profile'?'Brouillon sur cet appareil':'Brouillon à valider';
  renderLayoutImport();
 }
 function renderLayoutImport(){
@@ -346,9 +378,11 @@ function addPiece(){
  const result=makeItem(spec,id,{old});
  if(!result.ok)return toast(result.errors?.map(e=>e.message).join(' ')||'La pièce n’a pas pu être configurée.');
  if(jSnapshot&&!old)result.item.sourceProfile=jSnapshot;
- if(old)order.items[order.items.indexOf(old)]=result.item;
- else{order.items.push(result.item);order.nextNumber=(order.nextNumber||1)+1;}
- persist();editingItemId=null;renderOrder();renderFormMetadata();updateDrawing();
+ const nextOrder={...order,items:old?order.items.map(item=>item===old?result.item:item):[...order.items,result.item]};
+ if(!old)nextOrder.nextNumber=(order.nextNumber||1)+1;
+ if(!store(KEYS.draft,{version:1,order:nextOrder}))return;
+ order=nextOrder;
+ editingItemId=null;renderOrder();renderFormMetadata();updateDrawing();
  toast(old?'Nouvelle révision enregistrée. La version précédente reste conservée.':id+' ajouté au dossier.');
 }
 function offerProfileImport(){
@@ -510,6 +544,14 @@ async function importMirTemplates(input){
  finally{input.value='';}
 }
 function handleClick(event){const button=event.target.closest('button,[data-select-bottom]');if(!button)return;const d=button.dataset;
+ if(d.pieceFocus){
+  const target=$(d.pieceFocus);
+  if(target){
+   for(let section=target.closest('details');section;section=section.parentElement.closest('details'))section.open=true;
+   target.focus();
+  }
+  return;
+ }
  if(d.exportMirModels&&!client){exportMirTemplates();return;}
  if(d.importMirModels&&!client){$('#mir-template-backup-file')?.click();return;}
   if(d.mirFixJ){try{draft=window.MIRBendingPresets.autoCorrectJ(draft);jException=null;renderDimensions();renderProfileOptions();updateDrawing();toast('Clouage ajusté au minimum requis.');}catch(error){toast(error.message);}return;}
