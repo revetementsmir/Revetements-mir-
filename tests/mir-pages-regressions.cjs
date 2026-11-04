@@ -261,4 +261,19 @@ test('Mesures standard MIR : nouvelles fiches privées et usage magasin contrôl
  assert.ok(app.includes("old?.channels?.store===true?' checked':''"));
 });
 
+
+test('Pliage MIR : retour écrasé avec traits droits et sans arc de dessin', () => {
+ const code=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
+ const start=code.indexOf('function profileSectionPath(');
+ const end=code.indexOf('\nfunction profileSideMarkers(',start);
+ assert.ok(start>=0&&end>start);
+ const draw=new Function('fmt',code.slice(start,end)+'\nreturn profileSectionPath;')(v=>String(Math.round(v*100)/100));
+ const section=draw([[0,0],[100,0],[0,0]],[{mode:'hem',angle:180,direction:'left'}]);
+ assert.equal(section.folds.length,1);
+ assert.equal(section.segments.length,2);
+ assert.ok(!/[AQ]/.test(section.path),'pas de courbe SVG sur un retour écrasé');
+ assert.equal((section.path.match(/ L/g)||[]).length,3,'deux côtés et un raccord droit');
+ assert.equal(section.segments[1][0][1],-10,'repli à 10 pixels du premier trait');
+});
+
 console.log('Tests MIR : '+total+'/'+total+' réussis.');
