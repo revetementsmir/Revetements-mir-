@@ -303,7 +303,7 @@ function renderTools(){
  const moreStart=compact?'<details class="trace-more"><summary>Autres actions</summary><div>':'';
  const settingsEnd=compact?'</div></details>':'';
  el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button>${fullscreen}${settingsStart}<label>Grille<select id="drawing-snap"><option value="off"${snap?'':' selected'}>Désactivée</option>${draft.unit==='mm'?'<option value="metric"'+(snap?' selected':'')+'>1 mm</option>':[[8,'⅛ po'],[4,'¼ po']].map(([divisor,label])=>`<option value="${divisor}"${snap&&traceGridDivisor===divisor?' selected':''}>${label}</option>`).join('')}</select></label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 45° / 90°</label><label>Hauteur du plan<select id="trace-height">${traceHeights.map(height=>`<option value="${height}"${traceHeight===height?' selected':''}>${height} po</option>`).join('')}</select></label>${settingsEnd}<p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
- `${tool==='select'?'<button type="button" class="draw-primary" data-end-hem>Ajouter un double pli</button>':''}<button type="button" class="draw-primary" data-new-drawing>Nouveau dessin</button>${tool==='select'?moreStart:''}<button type="button" data-draw-tool="edit" aria-pressed="${tool==='edit'}">${tool==='edit'?'Terminer la retouche':'Déplacer les points'}</button><button type="button" data-draw-tool="draw" aria-pressed="false">Continuer le tracé</button><button type="button" data-focus-dimensions>Cotes et angles ↓</button>${hemNotice}${tool==='select'?settingsEnd:''}`;
+ `${tool==='select'?'<button type="button" class="draw-primary" data-end-hem>Ajouter un double pli</button>':''}<button type="button" class="draw-primary" data-new-drawing>Nouveau dessin</button><button type="button" class="draw-primary" data-focus-dimensions>Cotes et angles ↓</button>${tool==='select'?moreStart:''}<button type="button" data-draw-tool="edit" aria-pressed="${tool==='edit'}">${tool==='edit'?'Terminer la retouche':'Déplacer les points'}</button><button type="button" data-draw-tool="draw" aria-pressed="false">Continuer le tracé</button>${hemNotice}${tool==='select'?settingsEnd:''}`;
 }
 function profileMeasureInput(index,label){
  const selector=draft.template==='custom'? `[data-segment-length="${index}"]`:
@@ -998,9 +998,16 @@ function magneticTapPoint(point, previousDegrees){
  return [start[0]+along*Math.cos(heading),start[1]+along*Math.sin(heading)];
 }
 function focusProfileDimensions(bendIndex){
- const target=bendIndex===undefined?$('#configure-heading'):$('[data-angle-details="'+bendIndex+'"] summary');
+ // La refonte admin place les cotes dans un accordéon fermé sur mobile.
+ // Le titre historique est masqué; diriger l'action vers un vrai champ visible.
+ const group=$('#mir-v4-dimensions');
+ if(group&&group.tagName==='DETAILS')group.open=true;
+ const target=bendIndex===undefined
+  ?$('#production-dimensions input:not(:disabled)')||$('#production-unit')||$('#configure-heading')
+  :$('[data-angle-details="'+bendIndex+'"] summary');
  if(!target)return;
  if(bendIndex!==undefined)target.parentElement.open=true;
+ target.scrollIntoView?.({behavior:'smooth',block:'center'});
  target.focus();
 }
 function appendTracePoint(point, start){

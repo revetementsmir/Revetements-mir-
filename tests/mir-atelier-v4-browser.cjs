@@ -52,6 +52,14 @@ function available() {
       if(viewport.width>1150)assert.ok(layout.config.left>=layout.drawing.right-5,'Desktop side by side: '+JSON.stringify(layout));
       else assert.ok(layout.config.top>=layout.drawing.bottom-10,'Mobile/tablet stack: '+JSON.stringify(layout));
       assert.ok(await page.locator('.config-card').isVisible());
+      // Vérification du retour aux mesures après le tracé sur chaque écran.
+      await page.locator('#mir-v4-dimensions').evaluate(node=>{node.open=false;});
+      const focusCotes=page.locator('#drawing-tools [data-focus-dimensions]');
+      assert.equal(await focusCotes.isVisible(),true,viewport.name+' : action Cotes et angles visible sans ouvrir Autres actions');
+      await focusCotes.click();
+      assert.equal(await page.locator('#mir-v4-dimensions').evaluate(node=>node.open),true,viewport.name+' : dimensions ouvertes');
+      assert.equal(await page.evaluate(()=>document.activeElement?.closest('#mir-v4-dimensions')?.id||''),'mir-v4-dimensions',viewport.name+' : focus sur une vraie cote');
+      assert.equal(await page.locator('#production-dimensions input').first().isVisible(),true,viewport.name+' : champ de mesure visible');
       await page.screenshot({path:path.join(__dirname,'../artifacts/atelier-v4-'+viewport.name+'.png'),fullPage:true});
       // Tout profil doit garder le calcul et le changement de vue.
       await page.locator('.mir-v4-picker > summary').click();
