@@ -245,7 +245,7 @@
     const archivedPO=status=>['termine','annule'].includes(status);
     function poMenu(){
       return '<div class="mir-proc-top"><h2>Bons de commande</h2><p>Créer un bon, gérer les bons en attente ou retrouver l’historique.</p></div>'
-        +'<nav class="mir-po-tabs" aria-label="Suivi des bons">'+[['create','＋ Créer un bon'],['pending','En attente'],['history','Historique']].map(([key,label])=>'<button type="button" data-mir-po-view="'+key+'"'+(poView===key?' aria-current="page"':'')+'>'+label+'</button>').join('')+'</nav><button type="button" class="mir-po-suppliers" data-mir-tab="suppliers">Gérer les fournisseurs</button>';
+        +'<nav class="mir-po-tabs" aria-label="Suivi des bons">'+[['create','＋ Créer un bon'],['pending','En attente'],['history','Historique']].map(([key,label])=>'<button type="button" data-mir-po-view="'+key+'"'+(poView===key?' aria-current="page"':'')+'>'+label+'</button>').join('')+'</nav>'+(poView==='create'?'':'<button type="button" class="mir-po-suppliers" data-mir-tab="suppliers">Gérer les fournisseurs</button>');
     }
     function orderListsHTML(){
       const archived=poView==='history';
