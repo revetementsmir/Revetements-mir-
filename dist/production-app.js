@@ -125,7 +125,7 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
  const points=freehand?(drawPoints.length>=3&&model.pointsMM.length===drawPoints.length
-  ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520"><text x="400" y="250" text-anchor="middle" font-family="Arial" font-size="19" fill="#7b8b6c">Cliquez pour dessiner votre premier segment.</text></svg>`;
+  ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520"><text x="400" y="250" text-anchor="middle" font-family="Arial" font-size="19" fill="#7b8b6c">Glisse pour tracer le premier côté.</text></svg>`;
  const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});
  if(interactive&&!small&&view==='face'&&tool!=='draw'&&drag?.type!=='point'&&zoom!==1){tr.scale*=zoom;tr.ox=400+(tr.ox-400)*zoom;tr.oy=260+(tr.oy-260)*zoom;}
  if(interactive&&!drag)drawTransform=tr;
@@ -258,10 +258,12 @@ function renderTools(){
  const recentHem=draft.template==='custom'?(draft.bends||[]).findLastIndex(bend=>bend.mode==='hem'):-1;
  const hemNotice=recentHem<0?'':`<p class="draw-help hem-notice">Double pli · ${esc(draft.segments[recentHem].label)} → ${esc(draft.segments[recentHem+1].label)} <button type="button" data-focus-bend="${recentHem}">Modifier le pli</button></p>`;
  const compact=matchMedia('(any-pointer: coarse)').matches;
+ const fullscreen=compact&&!$('.drawing-card').classList.contains('mobile-trace')
+  ?'<button type="button" data-open-mobile-trace>Plein écran</button>':'';
  const settingsStart=compact?'<details class="trace-more"><summary>Réglages du tracé</summary><div>':'';
  const moreStart=compact?'<details class="trace-more"><summary>Autres actions</summary><div>':'';
  const settingsEnd=compact?'</div></details>':'';
- el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button>${settingsStart}<label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 45° / 90°</label><label>Hauteur du plan<select id="trace-height"><option value="10"${traceHeight===10?' selected':''}>10 po</option><option value="14"${traceHeight===14?' selected':''}>14 po</option></select></label>${settingsEnd}<p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
+ el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button>${fullscreen}${settingsStart}<label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 45° / 90°</label><label>Hauteur du plan<select id="trace-height"><option value="10"${traceHeight===10?' selected':''}>10 po</option><option value="14"${traceHeight===14?' selected':''}>14 po</option></select></label>${settingsEnd}<p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
  `${tool==='select'?'<button type="button" class="draw-primary" data-end-hem>Ajouter un double pli</button>':''}<button type="button" class="draw-primary" data-new-drawing>Nouveau dessin</button>${tool==='select'?moreStart:''}<button type="button" data-draw-tool="edit" aria-pressed="${tool==='edit'}">${tool==='edit'?'Terminer la retouche':'Déplacer les points'}</button><button type="button" data-draw-tool="draw" aria-pressed="false">Continuer le tracé</button><button type="button" data-focus-dimensions>Cotes et angles ↓</button>${hemNotice}${tool==='select'?settingsEnd:''}`;
 }
 function profileMeasureInput(index,label){
@@ -605,7 +607,7 @@ function render(){
   $('#order-metadata').open=!profileAdmin;
   $('#production-title').textContent=profileAdmin?'Créer une moulure':'Panneaux architecturaux';
   $('#production-eyebrow').textContent='ATELIER MIR';
-  $('#production-description').textContent=profileAdmin?'Choisis une forme de départ ou trace ta moulure avec Nouveau dessin.':'Tracez et configurez vos panneaux architecturaux sur mesure.';
+  $('#production-description').textContent=profileAdmin?'Trace ta moulure sur la grille ou choisis une forme de départ.':'Tracez et configurez vos panneaux architecturaux sur mesure.';
  }document.querySelectorAll('[data-kind]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.kind===kind)));document.querySelectorAll('[data-workflow]').forEach(button=>button.setAttribute('aria-current',button.dataset.workflow===workflow?'page':'false'));$('#request-count').textContent=requests.length;const configure=workflow==='configure';for(const selector of ['.kind-bar','.template-section','.production-workspace'])$(selector).hidden=!configure;$('#production-order').hidden=!configure||authoring;$('#production-library').hidden=workflow!=='models';$('#production-requests').hidden=workflow!=='requests';$('#author-banner').hidden=!authoring||!configure;if(authoring)$('#author-banner').innerHTML=`<div><strong>Édition d’un modèle${editingTemplateId?' · nouvelle version':''}</strong><span>La forme et les angles sont définis ici. Les mesures de commande restent vides pour le client.</span></div><button type="button" data-cancel-author>Quitter les modèles</button>`;if(configure){renderTemplates();renderDimensions();renderProfileOptions();renderPanelOptions();renderFormMetadata();renderColors();updateDrawing();renderOrder();}if(workflow==='models')renderModels();if(workflow==='requests')renderRequests();}
 function renderModels(){const records=templates.filter(record=>!record.archived);$('#production-library').innerHTML=`<div class="library-heading"><div><p class="eyebrow">VOS MODÈLES RÉUTILISABLES</p><h2>Une forme. <em>Toutes les mesures.</em></h2><p>Dessinez le modèle une fois. Le client saisit ses cotes, et sa pièce arrive dans les demandes avec son dessin enregistré.</p></div><div><button type="button" class="primary-button" data-new-model="profile">Dessiner un pliage ＋</button><button type="button" class="secondary-button" data-new-model="panel">Créer un panneau ＋</button></div></div><div class="mir-template-backup-actions"><button type="button" class="secondary-button" data-export-mir-models="1">Exporter mes modèles (JSON)</button><button type="button" class="secondary-button" data-import-mir-models="1">Importer une sauvegarde</button><input id="mir-template-backup-file" type="file" accept=".json,application/json" hidden aria-label="Fichier JSON de modèles MIR"></div><div class="local-scope-note"><strong>Catalogue de modèles local</strong><p><a class="text-link" href="gestion-boutique.html">Gérer la visibilité du catalogue public ↗</a></p><p>Les modèles disponibles apparaissent dans le parcours client et le magasin sur ce navigateur. Leur partage entre appareils reste à connecter.</p></div><div class="model-library-grid">${records.length?records.map(record=>{const t=latest(record),preview=M.templatePreview(t);return `<article class="model-library-card"><div class="model-preview">${preview.ok?diagramSVG(preview.model,{illustrative:true,small:true,interactive:false}):''}</div><div class="model-library-body"><span class="eyebrow">${t.kind==='profile'?'PLIAGE':'PANNEAU MÉTALLIQUE'} · VERSION ${t.version}</span><h3>${esc(t.name)}</h3><p>${t.fields.filter(f=>f.required).length} cotes requises · ${Object.values(record.measurementDefaults?.values||{}).filter(v=>String(v?.value??'').trim()).length} cote(s) préremplie(s) pour le magasin</p><p class="model-channels">${[record.channels?.client===true?'Boutique':'',record.channels?.store===true?'Magasin employés':'',record.channels?.po!==false?'Bon de commande':''].filter(Boolean).join(' · ')||'Usage interne'}</p><div class="model-actions"><button type="button" class="primary-button" data-use-saved-model="${esc(record.id)}">Remplir les cotes ↗</button><button type="button" class="plain-button" data-edit-model="${esc(record.id)}">Nouvelle version</button><button type="button" class="plain-button" data-archive-model="${esc(record.id)}">Retirer du catalogue</button></div></div></article>`;}).join(''):'<div class="production-empty"><strong>Votre premier modèle, prêt à servir.</strong><p>Les modèles contiennent la forme, les angles et les champs à remplir. Aucune cote de commande n’est publiée.</p></div>'}</div>`;}
 function beginAuthor(type,record=null){workflow='configure';authoring=true;editingItemId=null;activeDefaultLocks={};editingTemplateId=record?.id||null;kind=type;selectedTemplate=record?latest(record):null;if(record){const p=M.templatePreview(selectedTemplate);if(!p.ok){toast('Ce modèle est invalide.');return;}draft=copy(p.model.spec);draft.name=selectedTemplate.name;draft.kind=type;}else draft=sampleSpec(type,type==='profile'?'custom':'rectangle');tool='select';view='face';drawPoints=[];render();$('.production-workspace').scrollIntoView({behavior:'smooth',block:'start'});}
@@ -1002,13 +1004,13 @@ async function openMobileTrace(card){
   // The fixed drawing card remains available in either orientation.
  }
 }
-function startProfileDrawing(){
+function startProfileDrawing({fullscreen=true}={}){
  kind='profile';
  draft={...draft,kind:'profile',template:'custom',segments:[],bends:[],startAngle:0,name:'Profil dessiné'};
  delete draft.dimensions;
  tool='draw';view='face';drawPoints=[];
  drawTransform={scale:520/(traceHeight*25.4),ox:140,oy:395};
- if(matchMedia('(any-pointer: coarse)').matches)void openMobileTrace($('.drawing-card'));
+ if(fullscreen&&matchMedia('(any-pointer: coarse)').matches)void openMobileTrace($('.drawing-card'));
  renderDimensions();
  updateDrawing();
 }
@@ -1079,7 +1081,8 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
   if(d.newModel==='profile'&&matchMedia('(any-pointer: coarse)').matches)startProfileDrawing();
   return;
  }
- if(d.exitMobileTrace!==undefined){closeMobileTrace();return;}
+ if(d.openMobileTrace!==undefined&&canDrawProfile()){void openMobileTrace($('.drawing-card'));renderTools();return;}
+ if(d.exitMobileTrace!==undefined){closeMobileTrace();if(canDrawProfile())renderTools();return;}
  if(d.editModel){const record=templates.find(r=>r.id===d.editModel);if(record)beginAuthor(latest(record).kind,record);return;}
  if(d.archiveModel){const record=templates.find(r=>r.id===d.archiveModel);if(record){record.archived=true;store(KEYS.templates,{version:1,records:templates});renderModels();toast('Modèle retiré du catalogue local. Les demandes existantes conservent leur version.');}return;}
  if(button.hasAttribute('data-cancel-author')){authoring=false;workflow='models';render();return;}
@@ -1248,6 +1251,11 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  $('#production-dialog').addEventListener('click',event=>{if(event.target!==$('#production-dialog'))return;const r=$('#production-dialog').getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeDialog();});
  choose(kind,kind==='panel'?'rectangle':'l');const requestedMaterial=params.get('material');if(kind==='panel'&&['unico-up1-acier','unico-up1-aluminium'].includes(requestedMaterial)){const type=requestedMaterial.endsWith('aluminium')?'aluminium':'acier';draft.material={type,name:'Unico U-P1 — '+(type==='acier'?'Acier':'Aluminium plié'),productRef:requestedMaterial,thickness:'',thicknessUnit:'mm',gauge:''};materialId=availableMaterials()[0]?.id||'';colorSystem='manufacturer';const requestedColor=params.get('color'),palette=availableMaterials().find(m=>m.colors.some(c=>c.id===requestedColor));if(palette){materialId=palette.id;colorId=requestedColor;}render();}const linked=params.get('template');if(linked&&templates.some(record=>record.id===linked))useSavedTemplate(linked);if(!client&&params.get('view')==='models'){workflow='models';render();}if(!client&&params.get('view')==='requests'){workflow='requests';render();}if(client&&params.get('kind')==='profile'&&!linked)choose('profile','l');
  if(!client)window.addEventListener('storage',event=>{if([KEYS.draft,window.MIRPanelLayoutOutput?.STORAGE_KEY].includes(event.key))renderLayoutImport();});
+ if(!client&&workflow==='configure'&&!linked&&params.get('profil-mir')!=='1'&&location.hash!=='#production-order'){
+  selectedTemplate=null;
+  startProfileDrawing({fullscreen:false});
+  renderTemplates();
+ }
  offerProfileImport();
  window.MIRProductionWorkspace=Object.freeze({version:'1.0.0',storageKeys:{...KEYS},localOnly:true});
 }
