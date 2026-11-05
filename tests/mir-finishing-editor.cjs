@@ -1,0 +1,32 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const D=path.resolve(__dirname,'../dist'),read=n=>fs.readFileSync(path.join(D,n),'utf8');
+const sandbox={window:{}};vm.runInNewContext(read('plan-3d.js'),sandbox);
+const E=sandbox.window.MIR3D,study=E.studyDefaults();
+const corners=E.mesh({...study,dimensions:E.defaults,cornerFinishes:{enabled:true,color:'#c37d42',metal:'aluminum',widthMeters:.08}});
+const c=corners.faces.filter(f=>f.role==='aluminum-corner-proposal');
+assert.equal(c.length,48,'8 proposed corners from 4 exterior walls and the recess');
+assert.ok(c.every(f=>f.fillColor==='#c37d42'&&f.notCertifiedTakeoff));
+const noCorners=E.mesh({...study,dimensions:E.defaults,cornerFinishes:{enabled:false}});
+assert.equal(noCorners.faces.filter(f=>f.role==='aluminum-corner-proposal').length,0);
+const step=E.mesh({...study,dimensions:E.defaults,concreteSteps:{enabled:true,count:5}});
+const stairTop=step.faces.filter(f=>f.role==='concrete-step'&&f.id.endsWith('-top'));
+assert.equal(stairTop.length,5);
+assert.ok(Math.abs(stairTop[4].poly[0][2]-study.porch.floorHeight)<.01,'Proposed stairs should reach the known porch deck height');
+const h=require('../dist/plan-structure-notes.js').detect([{text:'COIN ALUMINIUM',box:[8,8,92,20]}]);
+assert.equal(h[0].type,'corner');assert.equal(h[0].structuralVerification,false);
+const S=require('../dist/plan-stair-vision.js'),w=560,height=420,img={width:w,height,data:new Uint8ClampedArray(w*height*4).fill(255)};
+const black=(x,y)=>{const i=(y*w+x)*4;img.data[i]=img.data[i+1]=img.data[i+2]=29;};
+for(let i=0;i<3;i++)for(let x=130;x<=300;x++)black(x,140+i*28);
+for(let y=140;y<=196;y++){black(130,y);black(300,y);}
+const guess=S.detect({image:img,crop:[0,0,w,height],feetPerPixel:.027,kind:'floor',textHints:[{type:'balcony',box:[190,118,275,136]}]});
+assert.ok(guess.some(c=>c.count===3&&c.context==='balcony-stairs'));
+assert.ok(guess.every(c=>c.riserFt===null&&c.needsReview));
+const app=read('plan-app.js'),ui=read('plan.html'),features=read('studio-features.js');
+for(const selector of ['mir-edit-accent','mir-remove-accent','edit-auto-transitions','restore-auto-transitions','opening-door-color','opening-frame-color','batten-color','mir-stairs-toggle'])
+ assert.ok(ui.includes('id="'+selector+'"'),selector);
+assert.ok(app.includes('manualizeSuggestedTransitions')&&app.includes('restoreAutomaticTransitions'));
+assert.ok(app.includes('data-mir-opening-design')&&app.includes('openingStyles:state.openingStyles'));
+assert.ok(features.includes('structure-finish-metal')&&features.includes('structure-custom-color'));
+assert.ok(features.includes('mir-corner-enabled')&&features.includes('cornerFinishes:c.cornerFinishes'));
+console.log('MIR finition 3D et contrôles — coins, teintes, portes, marches, transitions et accents : 20 contrôles réussis');
