@@ -233,7 +233,7 @@ function updateDrawing({keepForm=false}={}){
  $('#finish-summary').textContent=draft.finish?.name||draft.finish?.code||'';
  $('#drawing-finish').textContent=authoring?'Proportions de présentation seulement':draft.finish?.name||draft.finish?.code||'Finition à sélectionner';
  $('#drawing-basis').textContent=shown.illustrative?'Modèle sans cotes de fabrication':kind==='panel'?'Hors tout, lèvres comprises':'Cotes de la pièce finie';
- $('#drawing-note').textContent=authoring?'Dessinez la forme et réglez ses angles. Les cotes restent des champs vides dans le modèle publié.':kind==='panel'?'A et B comprennent les lips. C est la projection. Les coins sont schématiques; les détails de fabrication seront validés par l’atelier.':'La face colorée est repérée par *. Le développé, les rayons et les corrections de pliage seront validés par l’atelier.';
+ $('#drawing-note').textContent=authoring?'Dessinez la forme et réglez ses angles. Les cotes restent des champs vides dans le modèle publié.':kind==='panel'?'A et B comprennent les lips. C est la projection. Les coins sont schématiques; les détails de fabrication seront validés par l’atelier.':'Le liseré bleu indique la face colorée. Touche-le pour inverser le côté. Le développé, les rayons et les corrections de pliage seront validés par l’atelier.';
  renderValidation({...actual,validation:{...actual.validation,errors:[...(actual.validation.errors||[]),...geometryErrors]}});
  const jRule=window.MIRBendingPresets?.checkJ(draft);
   const blockJ=jRule&&!jRule.pending&&(!jRule.valid||(!jRule.ok&&!window.MIRBendingPresets.exceptionMatches(jRule,jException)));

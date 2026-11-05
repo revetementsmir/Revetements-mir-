@@ -658,7 +658,7 @@
     if (item.kind === 'profile') {
       const lines = item.segments.map(s => s.label + ' = ' + formatMeasurement(s.lengthMM, item.unit));
       for (const b of item.bends) if (b) lines.push('Pli ' + b.from + '–' + b.to + ' : ' + b.label);
-      lines.push('* Face : ' + (item.coloredFace.side ? (item.coloredFace.side === 'left' ? 'gauche' : 'droite') + ' de A → ' + item.segments.at(-1).label : 'à préciser'));
+      lines.push('Face colorée : ' + (item.coloredFace.side ? (item.coloredFace.side === 'left' ? 'gauche' : 'droite') + ' de A → ' + item.segments.at(-1).label : 'à préciser'));
       return lines;
     }
     const lines = ['A hors tout, lips compris = ' + formatMeasurement(item.widthMM, item.unit), 'B hors tout, lips compris = ' + formatMeasurement(item.heightMM, item.unit), 'C projection = ' + formatMeasurement(item.reliefMM, item.unit)];
@@ -714,25 +714,39 @@ function profileSideMarkers({segments,folds},model,handles){
   const t=lengthSquared?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/lengthSquared)):0;
   return distance(p,[a[0]+t*dx,a[1]+t*dy]);
  }
+ const points=segments.flat();
+ const center=[0,1].map(axis=>{
+  const coordinates=points.map(point=>point[axis]);
+  return (Math.min(...coordinates)+Math.max(...coordinates))/2;
+ });
  const missing=[],leaders=[];
  const markers=segments.map(([a,b],index)=>{
   const label=model.segments?.[index]?.label||String.fromCharCode(65+index);
   const mm=model.segments?.[index]?.lengthMM;
   const caption=Number.isFinite(mm)?label+' · '+formatMeasurement(mm,model.unit):label;
   const length=distance(a,b),halfWidth=caption===label?11:Math.ceil(caption.length*4.1+8);
-  const radius=caption===label?11:Math.hypot(halfWidth,12);
   const anchor=[(a[0]+b[0])/2,(a[1]+b[1])/2];
-  const clear=([x,y])=>x>=halfWidth+2&&x<=798-halfWidth&&y>=14&&y<=452&&
-   !placed.some(q=>distance([x,y],q.point)<radius+q.radius+3)&&
-   !folds.some(q=>distance([x,y],q)<radius+12)&&
-   !handles.some(q=>distance([x,y],q)<radius+16)&&
-   !segments.some(line=>distanceToSide([x,y],line)<radius+7||line.some(q=>distance([x,y],q)<radius+20));
-  let position=null;
+  const clear=([x,y])=>{
+   const near=(q,margin)=>Math.abs(x-q[0])<halfWidth+margin&&Math.abs(y-q[1])<12+margin;
+   const relative=([px,py])=>[(px-x)/(halfWidth+7),(py-y)/19];
+   return x>=halfWidth+2&&x<=798-halfWidth&&y>=14&&y<=462&&
+    !placed.some(q=>near(q.point,q.halfWidth+4)&&Math.abs(y-q.point[1])<28)&&
+    !folds.some(q=>near(q,10))&&!handles.some(q=>near(q,12))&&
+    !segments.some(line=>distanceToSide([0,0],line.map(relative))<1.42);
+  };
+  let position=null, adjacent=false;
   if(length){
    const nx=(a[1]-b[1])/length,ny=(b[0]-a[0])/length;
-   for(const gap of [24,32,42,54,70,90,112,140,175]){
-    position=[1,-1].map(side=>[anchor[0]+side*gap*nx,anchor[1]+side*gap*ny]).find(clear);
-    if(position)break;
+   const outward=(anchor[0]-center[0])*nx+(anchor[1]-center[1])*ny>=0?1:-1;
+   const gap=Math.max(36,Math.ceil(1.42/Math.hypot(nx/(halfWidth+7),ny/19))+1);
+   const candidate=(side,extra)=>[anchor[0]+side*(gap+extra)*nx,anchor[1]+side*(gap+extra)*ny];
+   position=[candidate(outward,0),candidate(outward,8),candidate(-outward,0),candidate(-outward,8)].find(clear);
+   adjacent=!!position;
+   if(!position){
+    for(const extra of [20,34,50,76,105,140]){
+     position=[candidate(outward,extra),candidate(-outward,extra)].find(clear);
+     if(position)break;
+    }
    }
   }
   if(!position&&caption!==label){
@@ -746,7 +760,7 @@ function profileSideMarkers({segments,folds},model,handles){
    missing.push({label,caption,anchor,halfWidth});
    return '';
   }
-  placed.push({point:position,radius,anchor:caption===label?null:anchor});
+  placed.push({point:position,halfWidth,anchor:caption===label||adjacent?null:anchor});
   return badge(position,caption,halfWidth,caption===label);
  }).join('');
  function badge([x,y],caption,halfWidth,letterOnly){
@@ -789,11 +803,13 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
  if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;
  const at=gap=>[mid[0]+normal[0]*gap*side,mid[1]+normal[1]*gap*side];
- const [sx,sy]=at(48),tip=at(9),base=at(21),tail=at(35);
- const wing=sign=>[base[0]+dx/len*9*sign,base[1]+dy/len*9*sign].map(decimal).join(',');
- reserved.push(at(12),at(24),at(36),at(48));
+ const stripeCenter=at(9),half=Math.min(24,len*.34);
+ const point=sign=>[stripeCenter[0]+dx/len*half*sign,stripeCenter[1]+dy/len*half*sign];
+ const ends=[point(-1),point(1)];
+ reserved.push(stripeCenter,...ends);
  const action=togglePaintedFace?' data-toggle-painted-face role="button" tabindex="0" aria-label="Inverser la face colorée" style="cursor:pointer"':'';
- output+=`<g${action}>${togglePaintedFace?`<circle cx="${decimal(sx)}" cy="${decimal(sy)}" r="27" fill="transparent"/>`:''}<path d="M${tail.map(decimal).join(',')}L${tip.map(decimal).join(',')} M${wing(-1)}L${tip.map(decimal).join(',')}L${wing(1)}" fill="none" stroke="#285c27" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="${decimal(sx)}" y="${decimal(sy+8)}" text-anchor="middle" font-size="34" font-weight="700" fill="#285c27">*</text></g>`;}
+ const stripe=`M${ends[0].map(decimal).join(',')}L${ends[1].map(decimal).join(',')}`;
+ output+=`<g${action}>${togglePaintedFace?`<path d="${stripe}" fill="none" stroke="transparent" stroke-width="38" stroke-linecap="round"/>`:''}<path class="profile-painted-stripe" d="${stripe}" fill="none" stroke="#175b94" stroke-width="5" stroke-linecap="round"/></g>`;}
  });
  if(markers)output=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved)+output;
  return output;
@@ -860,7 +876,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     });
     for(const [family,items] of groupProfiles(order.items,profileGroups))for(const item of items){
       const title=lines([item.id+' · '+item.name],55);
-      const face=item.coloredFace?.side?['* Face '+(item.coloredFace.side==='left'?'gauche':'droite')+' · côté '+item.coloredFace.segmentId]:[];
+      const face=item.coloredFace?.side?['Face colorée : '+(item.coloredFace.side==='left'?'gauche':'droite')+' · côté '+item.coloredFace.segmentId]:[];
       const details=lines([...compactLengths(item),...face,...(item.location?['Repère : '+item.location]:[]),...(item.note?[item.note]:[])],33);
       const material=lines(materialLines(item),13),finish=lines(finishLines(item),16);
       const checks=lines([...item.validation.errors,...item.validation.pending].map(issue=>issue.message),90).filter(Boolean);
@@ -932,7 +948,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         if(!row.continuation)svg+=multiline(740,y+18,[formatMeasurement(item.lengthMM,item.unit)],{width:11,lineHeight,attrs:bodyText}).svg;
       }
       svg+='<line x1="40" x2="810" y1="1031" y2="1031" stroke="#aebcaa"/>';
-      svg+=svgText(40,1046,'* Face colorée. Cotes de la pièce finie. Rayons et développé à valider par l’atelier.','font-size="11"');
+      svg+=svgText(40,1046,'Liseré bleu : face colorée. Cotes de la pièce finie. Rayons et développé à valider par l’atelier.','font-size="11"');
       svg+=svgText(40,1068,'Validation MIR avant transmission.','font-size="11"');
       svg+=svgText(810,1068,'Feuille '+(index+1)+' / '+pages.length,'font-size="12" text-anchor="end"');
       return {name:'Mise en production · '+(index+1)+'/'+pages.length,svg:svg+svgClose,layout:'bending-sheet'};
@@ -983,7 +999,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg += multiline(1254, y + 42, lengthLines, { width: 12, lineHeight: 23, attrs: 'font-size="14"' }).svg;
       });
       const footY = 904;
-      svg += svgText(32, footY, '* Face colorée. Les cotes sont celles de la pièce finie; les rayons, le développé et les réglages de pliage restent à valider.', 'font-size="14"');
+      svg += svgText(32, footY, 'Liseré bleu : face colorée. Les cotes sont celles de la pièce finie; les rayons, le développé et les réglages de pliage restent à valider.', 'font-size="14"');
       svg += svgText(32, footY + 25, 'La référence Zoho Books est saisie localement. Aucun bon de commande n’a été envoyé ni synchronisé.', 'font-size="13" fill="#5b685e"');
       if (hasPricedLines) {
         const totalLine = order.pricing.totalCents !== null ? 'Total de base : ' + priceText(order.pricing.totalCents) : order.pricing.pricedSubtotalCents !== null ? 'Sous-total des lignes tarifées : ' + priceText(order.pricing.pricedSubtotalCents) + '; autres pièces à chiffrer.' : 'Montant du dossier à vérifier; aucun total automatique.';
