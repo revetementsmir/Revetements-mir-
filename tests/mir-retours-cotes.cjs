@@ -71,4 +71,20 @@ test('Toutes les étiquettes A-D sont présentes une seule fois avec un identifi
  }
  assert.ok(svg.includes('A5 5 0 0'),'retour visible dans le dessin');
 });
+test('Le retour symétrique fonctionne aussi en miroir',()=>{
+ const mirrored=points.map(([x,y])=>[x,520-y]);
+ const opposite=bends.map(b=>b.mode==='hem'?{...b,direction:'left'}:b);
+ const result=display(mirrored,opposite);
+ assert.equal(result.closedReturn,true);
+ assert.equal((result.path.match(/ A5 5 0 0 [01] /g)||[]).length,2);
+});
+test('Les cotes de la capture A=2, B=1½, C=1 7/16, D=1¼ restent ouvertes',()=>{
+ const actual=[[110,110],[520,110],[520,410],[520,122.5],[263.75,122.5]];
+ const result=display(actual,bends);
+ assert.ok(!result.closedReturn,'D est différent de A, aucune fermeture inventée');
+ const fake={...model,segments:[{label:'A',lengthMM:50.8},{label:'B',lengthMM:38.1},
+   {label:'C',lengthMM:36.5125},{label:'D',lengthMM:31.75}]};
+ const svg=M.profileDiagramContent(fake,actual,{bends,markers:true});
+ for(const letter of ['A','B','C','D'])assert.ok(svg.includes('data-marker-label="'+letter+'"'));
+});
 console.log('MIR A-D: '+passed+'/'+passed+' tests réussis');
