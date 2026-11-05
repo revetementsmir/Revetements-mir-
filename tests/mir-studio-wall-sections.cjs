@@ -38,10 +38,11 @@ test('La hauteur du fond et des retours correspond au mur, sans translation Z',(
 test('Trois sections détachées avec une brique à la même altitude',()=>{
  const vb=right.bbox;
  const original='<svg xmlns="http://www.w3.org/2000/svg" viewBox="'+vb.join(' ')+'" width="'+vb[2]+'" height="'+vb[3]+'"><rect x="740" y="550" width="1090" height="612"/></svg>';
- const drawn=parts.explodeSideSVG(original,{sideFace:right,dimensions:data.dimensions,mesh,brickBand:parts.masonryBand(front,data.dimensions),brickPattern:'<pattern id="mir-exploded-brick" width="20" height="10" patternUnits="userSpaceOnUse"/>',colors:{front:'#526052','return-left':'#667267','return-right':'#667267'}});
+ const drawn=parts.explodeSideSVG(original,{sideFace:right,dimensions:data.dimensions,mesh,brickBand:parts.masonryBand(front,data.dimensions),frontFace:front,brickPattern:'<pattern id="mir-exploded-brick" width="20" height="10" patternUnits="userSpaceOnUse"/>',colors:{front:'#526052','return-left':'#667267','return-right':'#667267'}});
  assert.ok(drawn&&drawn.expandedViewBox[2]>vb[2]);
  assert.equal((drawn.svg.match(/data-mir-wall-part="/g)||[]).length,3);
  assert.equal((drawn.svg.match(/data-mir-masonry-band="/g)||[]).length,3);
+ assert.equal((drawn.svg.match(/data-mir-wall-opening="/g)||[]).length,4,'Les 2 portes et les 2 fenêtres du centre restent visibles');
  assert.equal(drawn.svg.includes('data-mir-three-wall-explode="true"'),true);
  assert.equal((drawn.svg.match(/data-world-top="/g)||[]).length,3);
  assert.ok(Math.abs(drawn.bandHeightMeters-parts.masonryBand(front,data.dimensions).heightMeters)<.0001);
