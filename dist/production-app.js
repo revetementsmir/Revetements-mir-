@@ -179,7 +179,7 @@ function updateDrawing({keepForm=false}={}){
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  $('#drawing-title').textContent=authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
- const stage=$('#production-drawing');stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()?'none':'';$('#trace-readout').hidden=!canDrawProfile();
+ const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')$('.drawing-card').classList.remove('mobile-trace');stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()?'none':'';$('#trace-readout').hidden=!canDrawProfile();
  stage.innerHTML=view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
  const dimensions=$('#profile-dimension-list');
  const sides=tool==='draw'?drawPoints.slice(1).map((point,index)=>({
@@ -783,6 +783,16 @@ function toggleProfilePaintedFace(){
  if(select)select.value=face.side;
  updateDrawing();
 }
+function startProfileDrawing(){
+ kind='profile';
+ draft={...draft,kind:'profile',template:'custom',segments:[],bends:[],startAngle:0,name:'Profil dessiné'};
+ delete draft.dimensions;
+ tool='draw';view='face';drawPoints=[];
+ drawTransform={scale:520/(traceHeight*25.4),ox:140,oy:395};
+ $('.drawing-card').classList.toggle('mobile-trace',matchMedia('(pointer: coarse) and (max-width: 1024px)').matches);
+ renderDimensions();
+ updateDrawing();
+}
 function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom]');if(!button)return;const d=button.dataset;
  if(d.editProfileMeasure!==undefined){
   const index=Number(d.editProfileMeasure),label=build().segments?.[index]?.label;
@@ -844,7 +854,12 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.id==='production-pdf')return exportPDF();
  if(button.id==='prepare-local-request')return prepareRequest();
  if(d.downloadRequest){const request=requests.find(r=>r.id===d.downloadRequest);if(request)downloadJSON({schema:'mir-production-request-1',localOnly:true,request},request.id+'.json');return;}
- if(d.newModel)return beginAuthor(d.newModel);
+ if(d.newModel){
+  beginAuthor(d.newModel);
+  if(d.newModel==='profile'&&matchMedia('(pointer: coarse) and (max-width: 1024px)').matches)startProfileDrawing();
+  return;
+ }
+ if(d.exitMobileTrace!==undefined){$('.drawing-card').classList.remove('mobile-trace');return;}
  if(d.editModel){const record=templates.find(r=>r.id===d.editModel);if(record)beginAuthor(latest(record).kind,record);return;}
  if(d.archiveModel){const record=templates.find(r=>r.id===d.archiveModel);if(record){record.archived=true;store(KEYS.templates,{version:1,records:templates});renderModels();toast('Modèle retiré du catalogue local. Les demandes existantes conservent leur version.');}return;}
  if(button.hasAttribute('data-cancel-author')){authoring=false;workflow='models';render();return;}
@@ -856,7 +871,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.hasAttribute('data-add-segment')){if(!unlockCustom())return;if(draft.segments.length>=26)return toast('Maximum 26 segments.');draft.segments.push({label:String.fromCharCode(65+draft.segments.length),length:draft.unit==='mm'?25.4:1});draft.bends.push({mode:'interior',angle:90,direction:'left'});renderDimensions();renderProfileOptions();updateDrawing();return;}
  if(d.removeSegment!==undefined){if(client||editingItemId||draft.segments.length<=2)return;const index=Number(d.removeSegment);draft.segments.splice(index,1);draft.bends.splice(Math.max(0,index-1),1);draft.segments.forEach((s,i)=>s.label=String.fromCharCode(65+i));renderDimensions();renderProfileOptions();updateDrawing();return;}
  if(d.drawTool){if(client||editingItemId)return;if(tool===d.drawTool){const finished=tool==='draw';tool='select';updateDrawing();if(finished)focusProfileDimensions();return;}if(!unlockCustom())return;tool=d.drawTool;view='face';const model=build();drawPoints=copy(model.pointsMM);drawTransform=fitModel(model);renderDimensions();updateDrawing();return;}
- if(button.hasAttribute('data-new-drawing')){if(client||editingItemId)return;kind='profile';draft={...draft,kind:'profile',template:'custom',segments:[],bends:[],startAngle:0,name:'Profil dessiné'};delete draft.dimensions;tool='draw';view='face';drawPoints=[];drawTransform={scale:520/(traceHeight*25.4),ox:140,oy:395};renderDimensions();updateDrawing();return;}
+ if(button.hasAttribute('data-new-drawing')){if(!client&&!editingItemId)startProfileDrawing();return;}
  if(button.hasAttribute('data-drawing-undo')){if(!drawPoints.length||client||editingItemId)return;drawPoints.pop();const next=toCustom(drawPoints);if(next)draft=next;else{draft.segments=[];draft.bends=[];}renderDimensions();updateDrawing();return;}
 }
 function handleInput(event){const e=event.target,d=e.dataset;
