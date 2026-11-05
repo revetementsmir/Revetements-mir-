@@ -288,7 +288,10 @@ function updateV4Totals(model){
  if(totalNode&&totalValue){
   const isProfile=model.kind==='profile';
   totalNode.hidden=!isProfile;
-  totalValue.textContent=isProfile&&Number.isFinite(model.finishedSegmentSumMM)?M.formatMeasurement(model.finishedSegmentSumMM,model.unit):'À préciser';
+  const rawWidth=isProfile&&Number.isFinite(model.finishedSegmentSumMM)?M.formatMeasurement(model.finishedSegmentSumMM,model.unit):'À préciser';
+  const glyphs={'1/2':'½','1/4':'¼','3/4':'¾','1/8':'⅛','3/8':'⅜','5/8':'⅝','7/8':'⅞'};
+  const mixed=/^(-?[0-9]+) ([0-9]+\/[0-9]+) po$/.exec(rawWidth);
+  totalValue.textContent=mixed&&glyphs[mixed[2]]?mixed[1]+glyphs[mixed[2]]+' po':rawWidth;
  }
  const put=(selector,value)=>{const node=$(selector);if(node)node.textContent=value||'À préciser';};
  const materialLabels={'acier':'Acier','aluminium':'Aluminium','acier-inoxydable':'Acier inoxydable','autre':'Autre matériau'};
