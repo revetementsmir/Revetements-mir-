@@ -12,7 +12,7 @@ const server=http.createServer((req,res)=>{
  fs.createReadStream(fp).pipe(res);
 });
 const pages=['boutique','produit','selection','materiaux','pliage','plan','chantier'];
-const sizes=[{id:'mobile',width:390,height:844},{id:'desktop',width:1440,height:900},{id:'ultrawide',width:2560,height:1080}];
+const sizes=[{id:'mobile360',width:360,height:780},{id:'mobile',width:390,height:844},{id:'desktop',width:1440,height:900},{id:'ultrawide',width:2560,height:1080}];
 async function main(){
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  let browser;
@@ -31,11 +31,16 @@ async function main(){
         return {theme:document.body.classList.contains('mir-signature'),css,
           accent:getComputedStyle(document.body).getPropertyValue('--mir-accent').trim(),
           paper:getComputedStyle(document.body).getPropertyValue('--mir-surface').trim(),
-          logo:!!logo};
+          logo:!!logo,estimate:(()=>{
+            const b=document.querySelector('header.mir-client-header .mir-home-estimate');
+            const rect=b?.getBoundingClientRect();
+            return !!(b&&rect&&rect.width>0&&getComputedStyle(b).display!=='none'&&rect.left>=-2&&rect.right<=innerWidth+2);
+          })()};
       });
       assert.ok(result.theme&&result.css&&result.logo,name+' '+size.id+': thème ou logo absent');
       assert.equal(result.accent,'#348511',name+' '+size.id+': accent');
       assert.equal(result.paper,'#fafaf7',name+' '+size.id+': fond');
+      assert.ok(result.estimate,name+' '+size.id+': bouton Estimation masqué ou hors écran');
       if(['boutique','produit','selection','pliage','plan'].includes(name)){
         await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-signature-'+name+'-'+size.id+'.png')});
       }

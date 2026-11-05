@@ -76,6 +76,7 @@ test('Galerie en grand, clavier et retours accessibles',()=>{
 test('Quatrième réalisation publiée en AVIF, originale et variante mobile',()=>{
   const h=read('realisations.html'),js=read('mir-realisations.js'),css=read('mir-realisations.css');
   assert.match(h,/Architecture urbaine au crépuscule/);
+  assert.match(h,/Visuel retouché · aménagement paysager illustratif/);
   assert.match(h,/data-photo="3"/);
   assert.match(h,/aria-live="polite">1 \/ 4/);
   assert.match(js,/Architecture urbaine au crépuscule/);

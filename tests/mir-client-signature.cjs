@@ -63,4 +63,10 @@ test('Direction photo Québec documentée sans changer les maisons',()=>{
   assert.match(md,/original intact/);
   assert.match(md,/visuel retouché/);
 });
+test('Estimation reste accessible en mobile et le Studio revient aux réalisations',()=>{
+  const css=text('mir-client-signature.css');
+  assert.match(css,/Mobile MIR : le contact\/estimation reste actionnable/);
+  assert.match(css,/mir-client-header \.mir-home-estimate/);
+  assert.match(text('plan.html'),/href="realisations\.html">← Retour aux réalisations/);
+});
 console.log('MIR Signature : '+checks+'/'+checks+' tests réussis');

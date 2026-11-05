@@ -214,3 +214,17 @@ body.mir-signature :is(.portfolio-footnote,.footer-small){
     animation-duration:0.01ms!important;
   }
 }
+
+/* Mobile MIR : le contact/estimation reste actionnable, plutôt que caché à 760 px. */
+@media(max-width:760px){
+  body.mir-signature .mir-client-header .mir-client-actions{
+    display:flex;flex-direction:column;align-items:stretch;
+    justify-content:center;gap:5px;margin-left:auto;min-width:0
+  }
+  body.mir-signature .mir-client-header .mir-home-account,
+  body.mir-signature .mir-client-header .mir-home-estimate{
+    display:inline-flex!important;align-items:center;justify-content:center;
+    min-height:44px;padding:9px 10px;font-size:11px;line-height:1.2;
+    text-align:center;white-space:nowrap
+  }
+}

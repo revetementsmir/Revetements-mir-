@@ -62,3 +62,6 @@ body.mir-gallery-page{background:#fafaf7;color:#18251d;min-width:0}
 .mir-gallery-card-twilight .mir-gallery-card-body{order:1}
 .mir-gallery-card-twilight .mir-gallery-photo-button img{object-position:center 48%}
 @media(max-width:1050px){.mir-gallery-card-twilight{grid-template-columns:1fr}.mir-gallery-card-twilight .mir-gallery-photo-button,.mir-gallery-card-twilight .mir-gallery-card-body{order:0}}
+
+/* Les modifications de décor sont clairement identifiées, sans nuire à la photo. */
+.mir-gallery-card-body>div>.mir-gallery-retouch-note{margin:13px 0 0;font-size:12px;line-height:1.5;color:#5d745d;font-weight:600}
