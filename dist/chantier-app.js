@@ -334,7 +334,7 @@
     }else if(phase==='loading'){
       body='<div class="auth-loading"><span class="loading-dot"></span><p>Vérification de votre accès…</p></div>';
     }else if(!config.enabled){
-      body='<div class="auth-activation"><span class="pill">En préparation</span><h2>Les accès employés arrivent ici.</h2><p>La connexion et les données partagées sont en cours d’activation. Vous pouvez déjà parcourir une démonstration avec des exemples fictifs.</p></div><a class="button full" href="chantier.html?demo=1">Essayer la démonstration '+icon('arrow')+'</a><p class="auth-footnote">La démonstration ne crée aucun compte et n’envoie aucune demande.</p>';
+      body='<div class="auth-activation"><span class="pill">Activation sécurisée en attente</span><h2>Connexion MIR — Admin et employés</h2><p>Une seule connexion donnera accès aux fonctions correspondant à votre rôle : administration ou chantiers attribués.</p><p>Le service sécurisé MIR doit être raccordé et vérifié avant que les connexions Google, courriel et les invitations soient activées.</p></div><p class="auth-footnote">Aucun compte n’est créé ici et aucune donnée privée n’est accessible sans autorisation serveur.</p>';
     }else if(user&&['access_denied','error'].includes(phase)){
       title=phase==='access_denied'?'Votre accès<br><em>reste à confirmer.</em>':'La connexion<br><em>a été interrompue.</em>';
       intro=phase==='access_denied'?'Votre compte est reconnu. Le responsable MIR doit activer votre accès ou vous envoyer une invitation.':'Vos demandes sont conservées par le service. Vérifiez la connexion avant de poursuivre.';
@@ -347,7 +347,7 @@
     }
     const expectedInvitation=invitationToken&&user&&clientStatus?.error?.code==='MEMBERSHIP_REQUIRED';
     const message=authError||(expectedInvitation?'':clientStatus?.error?.message);
-    $('#portal-content').innerHTML=`<section class="auth-grid"><div class="auth-intro"><p class="portal-eyebrow">LES REVÊTEMENTS MIR · PORTAIL CHANTIER</p><h1>${title}</h1><p>${esc(intro)}</p><ul class="auth-benefits"><li>${icon('plan')}Les plans de vos chantiers</li><li>${icon('cart')}Votre matériel en quelques gestes</li><li>${icon('orders')}Le suivi des quantités reçues</li></ul></div><div class="auth-card">${body}${authMessage?`<p class="auth-message" role="status">${esc(authMessage)}</p>`:''}${message?`<p class="auth-error" role="alert">${esc(message)}</p>`:''}${config.enabled?'<a class="auth-demo-link" href="chantier.html?demo=1">Voir la démonstration avec des données fictives</a>':''}</div></section>`;
+    $('#portal-content').innerHTML=`<section class="auth-grid"><div class="auth-intro"><p class="portal-eyebrow">LES REVÊTEMENTS MIR · PORTAIL CHANTIER</p><h1>${title}</h1><p>${esc(intro)}</p><ul class="auth-benefits"><li>${icon('plan')}Les plans de vos chantiers</li><li>${icon('cart')}Votre matériel en quelques gestes</li><li>${icon('orders')}Le suivi des quantités reçues</li></ul></div><div class="auth-card">${body}${authMessage?`<p class="auth-message" role="status">${esc(authMessage)}</p>`:''}${message?`<p class="auth-error" role="alert">${esc(message)}</p>`:''}</div></section>`;
   }
   function connectedUI(snapshot) {
     uiStorageKey=`mir_employee_portal_ui_connected_${portalClient.config.projectRef}_${snapshot.actorId}`;
