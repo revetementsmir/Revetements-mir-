@@ -355,7 +355,7 @@ function updateDrawing({keepForm=false}={}){
   renderPieceGuidance(actual,blockJ);
   updateV4Totals(actual);
  const quote=M.quotePolicy(draft);$('#custom-color-quote').hidden=authoring||!quote.required;renderPiecePrice(actual,geometryErrors);
- $('#add-production-piece').innerHTML=authoring?'Enregistrer le modèle <span aria-hidden="true">＋</span>':editingItemId?'Enregistrer la révision <span aria-hidden="true">✓</span>':quote.required?'Ajouter à ma soumission <span aria-hidden="true">＋</span>':(client?'Ajouter au dossier':'Enregistrer la pièce')+' <span aria-hidden="true">＋</span>';if(!keepForm)renderTools();
+ $('#add-production-piece').innerHTML=authoring?'Enregistrer le modèle <span aria-hidden="true">＋</span>':editingItemId?'Enregistrer la révision <span aria-hidden="true">✓</span>':quote.required?'Ajouter à ma soumission <span aria-hidden="true">＋</span>':(client?'Ajouter au dossier':'Enregistrer la pièce')+' <span aria-hidden="true">'+(client?'＋':'✓')+'</span>';if(!keepForm)renderTools();
 }
 function renderPieceGuidance(model,blockJ){
  const box=$('#piece-guidance');
