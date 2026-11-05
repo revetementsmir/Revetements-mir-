@@ -36,8 +36,23 @@
    if(!finite(s.cameraZoom))s.cameraZoom=1;
    s.cameraZoom=Math.max(.7,Math.min(3.5,s.cameraZoom));
    if(!['commercial','none'].includes(s.siteStyle))s.siteStyle=imported?'none':'commercial';
-   if(!s.concreteSteps||typeof s.concreteSteps!=='object'||Array.isArray(s.concreteSteps))
-     s.concreteSteps={enabled:false,count:4,width:1.8,tread:.30,riser:.16};
+   const existingSteps=!!s.concreteSteps&&typeof s.concreteSteps==='object'&&!Array.isArray(s.concreteSteps);
+   if(!existingSteps)s.concreteSteps={enabled:false,count:4,width:1.8,tread:.30,riser:.16};
+   // Une nouvelle étude PDF peut proposer des marches sans mot OCR explicite.
+   // Ne jamais écraser un choix déjà enregistré sur un appareil.
+   if(imported&&!existingSteps){
+     const c=(data().stairCandidates||[]).filter(x=>x.source==='pdf-pixels'&&x.confidence>=.72&&x.widthFt>0&&x.treadFt>0)
+       .sort((a,b)=>b.confidence-a.confidence)[0];
+     if(c){
+       const d=s.volumeOverride||data().dimensions;
+       const x=Number.isFinite(d?.width)?(c.relativeCenter[0]-.5)*d.width:0;
+       s.concreteSteps={...s.concreteSteps,enabled:true,count:Math.max(1,Math.min(12,c.count)),
+         width:Math.max(.8,Math.min(4,metres(c.widthFt))),tread:Math.max(.22,Math.min(.55,metres(c.treadFt))),
+         centerX:x,sourceCandidateId:c.id,sourcePage:c.page,
+         sourceStatus:'calibrated-pixels-position-to-verify',widthMeasuredFromPdf:true,
+         treadMeasuredFromPdf:true,riserHeightVerified:false,positionVerified:false,needsReview:true};
+     }
+   }
    if(!s.returnFinishes||typeof s.returnFinishes!=='object'||Array.isArray(s.returnFinishes))s.returnFinishes={};
    if(!s.roofId&&roofs.length){s.roofId=roofs[0].id;const colors=colorsFor(roofs[0]),c=colors.find(c=>c.id==='bp-mystique-noir-2-tons')||colors[0];s.roofColorId=c?.id;}
    // The admin keeps the client's roof appearance, without a roof editing panel.
@@ -166,10 +181,24 @@
     modify(()=>{state().volumeOverride=Object.fromEntries(['width','depth','wallHeight','roofRise'].map(k=>[k,metres(vals[k])]));state().roofStyle=style;state().recessOverride={...r,enabled:vals.recessWidth>0&&vals.recessDepth>0,start:Math.max(0,Math.min(r.start||metres((vals.width-(vals.recessWidth||0))/2),metres(vals.width-(vals.recessWidth||0)))),width:metres(vals.recessWidth||0),depth:metres(vals.recessDepth||0),height:r.upperStorey==='recessed-confirmed'?metres(vals.wallHeight):Math.min(r.height||metres(vals.wallHeight),metres(vals.wallHeight))};state().porch={...state().porch,enabled:vals.porchProjection>0,projection:metres(vals.porchProjection||0),balconyEnabled:box.querySelector('#porch-balcony-enabled').checked};state().siteStyle=box.querySelector('#mir-site-style').value;state().concreteSteps={...state().concreteSteps,enabled:box.querySelector('#mir-concrete-steps').checked,count:Math.max(1,Math.min(12,Number(box.querySelector('#mir-steps-count').value)||4))};state().volumeProvenance='user-confirmed';});box.close();toast('Volume mis à jour. Les cotes du plan conservent leur propre échelle.');};
   }
   function addStructure(type){if(!canRender())return openVolume();const d=dimensions(),id='element-'+Date.now().toString(36),column=type==='column';modify(()=>{state().structures.push({id,type,label:column?'Nouvelle colonne':'Nouvelle poutre',origin:[-.0762,-d.depth/2-.2,0],size:column?[.1524,.1524,2.7]:[2.5,.2,.3],material:'unknown',sourceStatus:'user-added',color:'#a9aaa7'});state().selected={kind:'structure',id};if(!column)state().structures.at(-1).origin=[-1.25,-d.depth/2-.2,2.7];});selectPart('structure',id);}
+  function applyPixelStairs(index){
+   const c=(data().stairCandidates||[]).filter(x=>x.source==='pdf-pixels')[index];
+   if(!c||!(c.widthFt>0&&c.treadFt>0))return toast('Dimensions des marches non déterminées.');
+   const d=dimensions(),x=Number.isFinite(d?.width)?(c.relativeCenter[0]-.5)*d.width:0;
+   modify(()=>state().concreteSteps={...state().concreteSteps,enabled:true,
+     count:Math.max(1,Math.min(12,c.count)),
+     width:Math.max(.8,Math.min(4,metres(c.widthFt))),tread:Math.max(.22,Math.min(.55,metres(c.treadFt))),
+     centerX:x,sourceCandidateId:c.id,sourcePage:c.page,needsReview:true,
+     widthMeasuredFromPdf:true,treadMeasuredFromPdf:true,
+     positionVerified:false,riserHeightVerified:false,sourceStatus:'calibrated-pixels-position-to-verify'});
+   toast('Dimensions reprises des pixels et cotes du PDF. Vérifiez nombre, position et hauteur avant commande.');
+  }
   function addDetectedHint(index){
    const h=data().structuralHints?.[index];if(!h||!['column','beam','stairs'].includes(h.type))return;
    if(!canRender())return openVolume();
    if(h.type==='stairs'){
+     const pixel=(data().stairCandidates||[]).filter(x=>x.source==='pdf-pixels'),index=pixel.findIndex(c=>c.page===h.page);
+     if(index>=0)return applyPixelStairs(index);
      modify(()=>state().concreteSteps={...state().concreteSteps,enabled:true,count:4,needsReview:true,sourceHintId:'hint-'+index,sourcePage:h.page});
      toast('Marches proposées en 3D. Nombre, position et matière à confirmer sur le PDF.');
      return;
@@ -205,11 +234,11 @@
    }catch(e){toast('Aperçu non créé : '+e.message);}finally{root.MIR3D?.dispose?.(canvas);button.disabled=false;button.innerHTML='Créer mon aperçu HD <span>↗</span>';}
   }
   $('#extra-controls').onclick=e=>{
-   const rc=e.target.closest('[data-roof-color]'),sc=e.target.closest('[data-structure-color]'),ret=e.target.closest('[data-return-color]'),add=e.target.closest('[data-add-structure]'),hint=e.target.closest('[data-add-hint]'),sel=e.target.closest('[data-select-return]');
+   const rc=e.target.closest('[data-roof-color]'),sc=e.target.closest('[data-structure-color]'),ret=e.target.closest('[data-return-color]'),add=e.target.closest('[data-add-structure]'),hint=e.target.closest('[data-add-hint]'),pixelStair=e.target.closest('[data-use-pixel-stair]'),sel=e.target.closest('[data-select-return]');
    if(rc&&roofControls&&colorsFor(byId.get(state().roofId)).some(c=>c.id===rc.dataset.roofColor)){const colorId=rc.dataset.roofColor;modify(()=>{state().roofColorId=colorId;normalizeRoof();});[...$('#extra-controls').querySelectorAll('[data-roof-color]')].find(b=>b.dataset.roofColor===colorId)?.focus({preventScroll:true});}
    if(sc){const o=currentStructure();if(o)modify(()=>{o.colorId=sc.dataset.structureColor;o.color=officialColor(byId.get(o.finishMaterialId),{colorId:o.colorId}).color;});}
    if(ret)modify(()=>state().returnFinishes[returnId]=api.normalChoice({...returnChoice(returnId),colorId:ret.dataset.returnColor}));
-   if(add)addStructure(add.dataset.addStructure);if(hint)addDetectedHint(Number(hint.dataset.addHint));if(sel)selectPart('return',sel.dataset.selectReturn);
+   if(add)addStructure(add.dataset.addStructure);if(pixelStair)applyPixelStairs(Number(pixelStair.dataset.usePixelStair));if(hint)addDetectedHint(Number(hint.dataset.addHint));if(sel)selectPart('return',sel.dataset.selectReturn);
    if(roofControls&&e.target.closest('[data-roof-docs]'))openMaterial(state().roofId);
    if(e.target.closest('[data-delete-structure]')){const o=currentStructure();if(o)modify(()=>{state().structures=state().structures.filter(x=>x.id!==o.id);state().selected={kind:'structure',id:state().structures[0]?.id||null};});}
   };
