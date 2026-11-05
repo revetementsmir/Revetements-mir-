@@ -24,8 +24,12 @@ async function ready(){
    page.on('pageerror',error=>errors.push(error.message));
    page.on('dialog',dialog=>dialog.accept());
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
-   await page.waitForSelector('a.mir-proc-reset-link',{timeout:25000});
+   await page.waitForSelector('a.mir-proc-reset-link',{state:'attached',timeout:25000});
    assert.equal(await page.locator('#mir-procurement-tabs > button').count(),4);
+   // Le plein écran de dessin masque volontairement les outils secondaires.
+   // Ouvrir la bibliothèque via le bouton visible avant le nettoyage.
+   await page.locator('#mir-proc-shortcuts [data-mir-tab="models"]').click();
+   await page.waitForSelector('a.mir-proc-reset-link',{state:'visible',timeout:25000});
    await page.evaluate(()=>{
     localStorage.setItem('mir_production_templates_v1',JSON.stringify({version:1,records:[{id:'test-model'}]}));
     localStorage.setItem('mir_production_admin_dossier_v1',JSON.stringify({version:1,order:{id:'test-order',items:[{id:'test-piece'}]}}));
