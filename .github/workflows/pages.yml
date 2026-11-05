@@ -1,4 +1,4 @@
-name: Publish MIR copy
+name: Publier le site principal MIR
 on:
   push:
     branches: [main]
@@ -31,9 +31,22 @@ jobs:
           node tests/mir-pages-regressions.cjs
           node tests/mir-atelier-v4.cjs
       - uses: actions/configure-pages@v5
+      - name: Préparer uniquement le site MIR principal
+        run: |
+          mkdir -p _site_mir
+          cp -a dist/. _site_mir/
+          # Conserver les moteurs techniques nécessaires au vrai site, mais ne pas publier les écrans d'essai.
+          find _site_mir/atelier-essai -type f -name '*-candidate.html' -delete
+          rm -f _site_mir/atelier-essai/index.html
+          test ! -f _site_mir/atelier-essai/index.html
+          test -f _site_mir/atelier-essai/mir-calepinage-extension.js
+          if find _site_mir/atelier-essai -type f -name '*-candidate.html' | grep -q .; then
+            echo "Les écrans de démonstration ne doivent pas être publiés." >&2
+            exit 1
+          fi
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: _site_mir
       - id: deployment
         uses: actions/deploy-pages@v4
       - name: Verify published MIR pages
