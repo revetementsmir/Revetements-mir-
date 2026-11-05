@@ -118,7 +118,7 @@
     if(new URLSearchParams(win.location.search).get('mode')==='client') return;
     const doc=win.document,main=doc.querySelector('#production-main');
     if(!main||!win.localStorage||doc.querySelector('#mir-procurement-tabs'))return;
-    let state=readState(win.localStorage),tab='draw',supplierEditing=null;
+    let state=readState(win.localStorage),tab='draw',supplierEditing=null,pendingWorkflowObserver=null;
     const ui={supplierId:'unico',poNumber:'',job:'',foreman:'',shipTo:'',requestedDate:'',terms:'',notes:''};
     function save(){try{win.localStorage.setItem(KEY,JSON.stringify(state));return true;}catch{win.alert('Stockage local indisponible : impossible d’enregistrer.');return false;}}
     save();
@@ -170,12 +170,20 @@
         +'<p id="mir-supplier-error" class="mir-proc-error" role="alert" hidden></p><div class="mir-proc-actions"><button type="submit" class="mir-proc-primary">Enregistrer la fiche</button><button type="button" id="mir-new-supplier">Nouvelle fiche</button></div></form>';
     }
     function switchTab(next){
+      if(pendingWorkflowObserver){pendingWorkflowObserver.disconnect();pendingWorkflowObserver=null;}
       tab=['draw','models','orders','suppliers'].includes(next)?next:'draw';
       doc.body.dataset.mirTab=tab;panel.hidden=tab!=='orders'&&tab!=='suppliers';
       tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===tab?'page':'false'));
       if(tab==='draw'||tab==='models'){
         const workflow=doc.querySelector('#production-workflow [data-workflow="'+(tab==='draw'?'configure':'models')+'"]');
-        if(workflow)workflow.click();else if(tab==='models')win.location.href='production.html?view=models';
+        if(workflow) workflow.click();
+        else if(win.MutationObserver){
+          pendingWorkflowObserver=new win.MutationObserver(()=>{
+            const button=doc.querySelector('#production-workflow [data-workflow="'+(tab==='models'?'models':'configure')+'"]');
+            if(button){pendingWorkflowObserver.disconnect();pendingWorkflowObserver=null;button.click();}
+          });
+          pendingWorkflowObserver.observe(main,{childList:true,subtree:true});
+        }
         return;
       }
       panel.innerHTML=tab==='orders'?ordersHTML():supplierHTML();
@@ -228,7 +236,8 @@
     panel.addEventListener('input',function(e){if(e.target.dataset.mirPo)ui[e.target.dataset.mirPo]=e.target.value;});
     panel.addEventListener('change',function(e){if(e.target.dataset.mirPo)ui[e.target.dataset.mirPo]=e.target.value;});
     panel.addEventListener('submit',function(e){if(e.target.id==='mir-supplier-form'){e.preventDefault();saveSupplier(e.target);}});
-    switchTab('draw');
+    const requestedView=new URLSearchParams(win.location.search).get('view');
+    switchTab(['orders','suppliers','models'].includes(requestedView)?requestedView:'draw');
   }
   return {VERSION,SOURCES,seed,normalizeSupplier,mergeSuppliers,readState,getDossier,validatePo,createPo,mailtoDraft,printHTML,init};
 });
