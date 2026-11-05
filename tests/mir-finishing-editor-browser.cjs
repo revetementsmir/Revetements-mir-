@@ -33,6 +33,7 @@ async function ready(){for(let i=0;i<80;i++){
    await page.locator('#material-manufacturer').selectOption('CanExel');
    await page.locator('#material').selectOption('canexel-vstyle');
    await page.locator('#orientation').selectOption('vertical');
+   await page.locator('details:has(#edit-auto-transitions) summary').click();
    assert.equal(await page.locator('#edit-auto-transitions').isVisible(),true);
    await page.locator('#edit-auto-transitions').click();
    assert.ok(await page.locator('#transition-list [data-transition-position]').count()>0);
