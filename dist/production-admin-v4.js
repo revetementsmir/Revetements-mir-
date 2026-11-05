@@ -14,7 +14,7 @@
     const details = make('details', 'mir-v4-section');
     details.id = id;
     details.open = open;
-    const summary = make('summary', '', '<span class="mir-v4-section-label">' + label + '</span><span class="mir-v4-chevron" aria-hidden="true">⌄</span>');
+    const summary = make('summary', '', '<span class="mir-v4-section-label">' + label + '</span><span class="mir-v4-section-status" id="' + id + '-status"></span><span class="mir-v4-chevron" aria-hidden="true">⌄</span>');
     const content = make('div', 'mir-v4-section-body');
     details.append(summary, content);
     return { details, content };
@@ -72,27 +72,27 @@
 
     const finish = $('.piece-finish', config);
     const finishSummary = $('summary', finish);
-    if (finishSummary) finishSummary.innerHTML = '<span class="mir-v4-section-label">Matériaux</span><span class="mir-v4-chevron" aria-hidden="true">⌄</span><span id="finish-summary" hidden></span>';
+    if (finishSummary) finishSummary.innerHTML = '<span class="mir-v4-section-label">Matériaux</span><span class="mir-v4-section-status" id="mir-v4-material-status"></span><span class="mir-v4-chevron" aria-hidden="true">⌄</span><span id="finish-summary" hidden></span>';
     finish.classList.add('mir-v4-section', 'mir-v4-materials');
-    finish.open = matchMedia('(min-width: 1151px)').matches;
+    finish.open = false;
     const matLabel = $('#material-type')?.closest('label');
     if (matLabel?.firstChild?.nodeType === Node.TEXT_NODE) matLabel.firstChild.textContent = 'Matériau';
 
-    const colors = section('Couleur', 'mir-v4-colors', matchMedia('(min-width: 1151px)').matches);
+    const colors = section('Couleur', 'mir-v4-colors', false);
     const colorSystem = $('#color-system')?.closest('label');
     for (const element of [colorSystem, $('#production-color-fields'), $('#selected-finish'), $('#custom-color-quote'), $('#panel-price')]) {
       if (element) colors.content.append(element);
     }
     finish.after(colors.details);
 
-    const face = section('Face colorée', 'mir-v4-face', matchMedia('(min-width: 1151px)').matches);
+    const face = section('Face colorée', 'mir-v4-face', false);
     face.content.append($('#production-profile-options'));
     colors.details.after(face.details);
 
     const footer = $('#add-production-piece')?.closest('.config-section');
     if (footer) {
       footer.classList.add('mir-v4-footer');
-      const extras = section('Détails de la pièce', 'mir-v4-details', matchMedia('(min-width: 1151px)').matches);
+      const extras = section('Détails de la pièce', 'mir-v4-details', false);
       const fields = $('.two-fields', footer);
       const note = Array.from(footer.children).find(el => el.tagName === 'LABEL');
       if (fields) extras.content.append(fields);
@@ -132,6 +132,22 @@
 
     const toolsMore = make('details', 'mir-v4-actions', '<summary>Autres actions</summary><div class="mir-v4-actions-list"><button type="button" data-workflow="models">Mes modèles</button><button type="button" data-workflow="requests">Demandes clients</button></div>');
     if (drawingTools) drawingTools.after(toolsMore);
+    const consolidateActions = () => {
+      const original = Array.from(drawingTools?.querySelectorAll('details.trace-more') || [])
+        .find(node => node.querySelector('summary')?.textContent?.trim() === 'Autres actions');
+      if (original) {
+        const target = original.querySelector('div');
+        if (target && !target.querySelector('[data-workflow="models"]')) {
+          for (const button of toolsMore.querySelectorAll('.mir-v4-actions-list button'))
+            target.append(button.cloneNode(true));
+        }
+        toolsMore.hidden = true;
+      } else toolsMore.hidden = false;
+    };
+    if (drawingTools) {
+      new MutationObserver(consolidateActions).observe(drawingTools, {childList:true,subtree:true});
+      consolidateActions();
+    }
 
     const restoreNav = () => {
       const workflow = $('#production-workflow');
@@ -161,8 +177,9 @@
     // présentent des accordéons sans cacher le bouton d'enregistrement.
     const media = matchMedia('(max-width: 1150px)');
     const applyDevice = () => {
-      for (const group of [dim.details, finish, colors.details, face.details, extrasSafe()]) {
-        if (group) group.open = !media.matches;
+      dim.details.open = !media.matches;
+      for (const group of [finish, colors.details, face.details, extrasSafe()]) {
+        if (group) group.open = false;
       }
     };
     function extrasSafe() { return $('#mir-v4-details'); }
