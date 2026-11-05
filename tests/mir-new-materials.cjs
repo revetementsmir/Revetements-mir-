@@ -1,0 +1,31 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const base=path.resolve(__dirname,'../dist'),src=n=>fs.readFileSync(path.join(base,n),'utf8');
+const c=JSON.parse(src('catalogue-fd6866b49d21.json')).materials;
+const byId=id=>{const m=c.find(x=>x.id===id);assert.ok(m,'Produit absent : '+id);return m;};
+const can=byId('canexel-vstyle'),st=byId('st-laurent-v-groove-825'),bb=byId('hardie-board-batten');
+assert.equal(can.verticalLayout.maxRunIn,144);
+assert.equal(st.verticalLayout.maxRunIn,144);
+assert.equal(can.allowedOrientations[0],'vertical');
+assert.equal(st.allowedOrientations[0],'vertical');
+assert.equal(bb.verticalLayout.maxRunIn,120);
+assert.deepEqual(bb.verticalLayout.battenSpacingOptionsIn,[8,12,16]);
+assert.ok(bb.documents.some(d=>d.url.includes('hardie-trim-batten-boards')));
+assert.ok(bb.formats.some(f=>f.id==='48x96')&&bb.formats.some(f=>f.id==='48x120'));
+const profilec=c.filter(m=>m.brand==='Profilec');
+assert.ok(profilec.length>=10);
+assert.deepEqual(new Set(profilec.map(m=>m.id)).size,profilec.length);
+for(const m of profilec){
+ assert.ok(m.sourceUrl.startsWith('https://www.profilec.ca/'));
+ assert.ok(m.documents.some(d=>d.url.startsWith('https://www.profilec.ca/')));
+ assert.notEqual(m.commercialStatus,'orderable');
+ assert.ok(m.colors.every(color=>color.hex===null||/^#[0-9a-fA-F]{6}$/.test(color.hex)));
+}
+assert.ok(byId('profilec-la-muralys').applications.includes('siding'));
+assert.ok(byId('profilec-la-capitale').applications.includes('roofing'));
+assert.ok(byId('profilec-lancestra').applications.includes('roofing'));
+const app=src('plan-app.js'),html=src('plan.html');
+assert.ok(app.includes('V.breaks(')&&app.includes('V.battens('));
+assert.ok(app.includes('data-mir-auto-transition')&&app.includes('data-mir-batten-spacing'));
+assert.ok(html.includes('id="batten-spacing"')&&html.includes('mir-vertical-layout.js'));
+console.log('MIR nouvelles matières : '+c.length+' fiches, '+profilec.length+' Profilec, 3 produits verticaux réglés et rendu activé');
