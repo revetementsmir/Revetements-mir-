@@ -46,7 +46,7 @@
    // Ne jamais écraser un choix déjà enregistré sur un appareil.
    if(imported&&!existingSteps){
      const c=(data().stairCandidates||[]).filter(x=>x.source==='pdf-pixels'&&x.confidence>=.72&&x.widthFt>0&&x.treadFt>0)
-       .sort((a,b)=>b.confidence-a.confidence)[0];
+       .sort((a,b)=>Number(b.context==='balcony-stairs')-Number(a.context==='balcony-stairs')||b.confidence-a.confidence)[0];
      if(c){
        const d=s.volumeOverride||data().dimensions;
        const x=Number.isFinite(d?.width)?(c.relativeCenter[0]-.5)*d.width:0;
@@ -101,7 +101,7 @@
   function selectRoof(id,focusId='roof-product'){const m=roofs.find(m=>m.id===id);if(!roofControls||!m)return;modify(()=>{state().roofId=m.id;state().roofColorId=(colorsFor(m).find(c=>c.id===m.defaultColorId)||colorsFor(m)[0])?.id||null;normalizeRoof();});$('#'+focusId)?.focus({preventScroll:true});}
   function structurePanel(){
    const notes=Array.isArray(data().structuralHints)?data().structuralHints:[];
-   const evidence=notes.length?`<section class="mir-structure-evidence"><p class="eyebrow">REPÈRES PDF · À CONFIRMER</p><p>${notes.length} mention(s) trouvée(s) dans les pages sélectionnées. Le nom, la position et la portée doivent être vérifiés.</p>${notes.slice(0,12).map((h,i)=>{const linked=h.type==='stairs'?state().concreteSteps?.sourceHintId==='hint-'+i:state().structures.some(s=>s.sourceHintId==='hint-'+i);return `<p><strong>${esc(h.type==='column'?'Poteau / colonne':h.type==='beam'?'Poutre':h.type==='stairs'?'Marches / escalier'+(h.concreteMaterialHint?' en béton':' · matière à vérifier'):'Balcon / galerie')}</strong> · page ${esc(h.page||'?')} · ${esc(h.label||'mention détectée')} ${h.type==='balcony'?'(voir Volume & retours)':linked?'(proposé dans le modèle)':`<button type="button" data-add-hint="${i}">Ajouter une proposition 3D</button>`}</p>`;}).join('')}</section>`:'';
+   const evidence=notes.length?`<section class="mir-structure-evidence"><p class="eyebrow">REPÈRES PDF · À CONFIRMER</p><p>${notes.length} mention(s) trouvée(s) dans les pages sélectionnées. Le nom, la position et la portée doivent être vérifiés.</p>${notes.slice(0,12).map((h,i)=>{const linked=h.type==='stairs'?state().concreteSteps?.sourceHintId==='hint-'+i:state().structures.some(s=>s.sourceHintId==='hint-'+i);return `<p><strong>${esc(h.type==='column'?'Poteau / colonne':h.type==='beam'?'Poutre':h.type==='stairs'?'Marches / escalier'+(h.concreteMaterialHint?' en béton':' · matière à vérifier'):h.type==='corner'?'Coin / moulure d’angle':'Balcon / galerie')}</strong> · page ${esc(h.page||'?')} · ${esc(h.label||'mention détectée')} ${h.type==='balcony'?'(voir Volume & retours)':h.type==='corner'?'(voir l’onglet Coins aluminium)':linked?'(proposé dans le modèle)':`<button type="button" data-add-hint="${i}">Ajouter une proposition 3D</button>`}</p>`;}).join('')}</section>`:'';
    const pixelStairs=(data().stairCandidates||[]).filter(c=>c.source==='pdf-pixels');
    const pixelEvidence=pixelStairs.length?
      '<section class="mir-structure-evidence"><p class="eyebrow">MARCHES DÉTECTÉES DANS LES PIXELS</p><p>Échelle du plan appliquée aux traits répétés. Emplacement, nombre réel et hauteur à confirmer.</p>'+
