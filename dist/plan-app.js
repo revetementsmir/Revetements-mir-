@@ -95,7 +95,7 @@
   const facadeMaterials = materials.filter(m=>m.applications.some(a=>['siding','masonry'].includes(a)));
   const soffits = materials.filter(m=>m.applications.includes('soffit'));
   const fascias = materials.filter(m=>m.applications.includes('fascia'));
-  const L=window.MIRPlanLayout, E=window.MIRTakeoff, C=window.MIRMaterialCoverage;
+  const L=window.MIRPlanLayout, E=window.MIRTakeoff, C=window.MIRMaterialCoverage, V=window.MIRVerticalLayout;
   if(!L||!E||!C){$('#elevation').textContent='Les outils de dessin et de métrés n’ont pas chargé. Rechargez la page.';return;}
   const NEUTRAL='#d3d6cd', patternNames={lap:'Clin',vertical:'Lames verticales',panel:'Panneau',brick:'Maçonnerie',plain:'Uni',shingle:'Bardeau'};
   const orientationNames={horizontal:'Horizontale',vertical:'Verticale'};
@@ -133,7 +133,9 @@
       const directed=orientation==='vertical'?'vertical':'lap';if(patterns.includes(directed))pattern=directed;
     }
     const sizing=C.coverageSpec(m,{...raw,pattern,orientation});
-    return {...raw,materialId:m.id,...officialColor(m,raw),pattern,orientation,...(pattern==='panel'&&sizing.formatId?{formatId:sizing.formatId}:{})};
+    const spacingOptions=m.verticalLayout?.battenSpacingOptionsIn||[];
+    const battenSpacingIn=spacingOptions.includes(Number(raw.battenSpacingIn))?Number(raw.battenSpacingIn):spacingOptions[0]||null;
+    return {...raw,materialId:m.id,...officialColor(m,raw),pattern,orientation,...(battenSpacingIn?{battenSpacingIn}:{}),...(pattern==='panel'&&sizing.formatId?{formatId:sizing.formatId}:{})};
   }
   function defaultChoice(z){return normalChoice({},z.kind==='masonry'?'generic-brick-preview':z.id.includes('insert')||z.custom?'mac-norwood':z.id.includes('pignon')||z.id==='pilier'?'hardiepanel':'canexel-ridgewood-d5');}
   function choice(f,z){return normalChoice(state.selections[key(f.key,z.id)]||defaultChoice(z));}
@@ -220,7 +222,7 @@
   function save(){for(const field of ['bands','openingTrims'])for(const [id,config] of Object.entries(state[field]))state[field][id]={...config,...officialColor(materialById.get(config.materialId),config)};for(const f of data.faces)for(const z of allZones(f))if(choice(f,z).pattern==='panel')state.panelLayouts[key(f.key,z.id)]=panelLayoutFor(f,z);try{localStorage.setItem(STORAGE,JSON.stringify(state));notifyStudy();$('#saved-label').textContent='Choix enregistrés sur cet appareil';}catch(_){$('#saved-label').textContent='Mémoire locale indisponible · exportez vos choix';}}
   function checkpoint() {history.push(clone(state));if(history.length>30)history.shift();$('#undo').disabled=false;}
   function modify(fn) {checkpoint();fn();save();render();}
-  function setChoice(patch){const z=currentZone();if(!z)return;modify(()=>{const old=choice(face(),z),changedProduct=patch.materialId&&patch.materialId!==old.materialId,raw={...old,...patch};if(changedProduct){delete raw.formatId;delete raw.exposureIn;}state.selections[key(state.face,z.id)]=normalChoice(raw);if(changedProduct||Object.hasOwn(patch,'formatId')||Object.hasOwn(patch,'orientation'))delete state.panelLayouts[key(state.face,z.id)];selectedJoint=null;});}
+  function setChoice(patch){const z=currentZone();if(!z)return;modify(()=>{const old=choice(face(),z),changedProduct=patch.materialId&&patch.materialId!==old.materialId,raw={...old,...patch};if(changedProduct){delete raw.formatId;delete raw.exposureIn;delete raw.battenSpacingIn;}state.selections[key(state.face,z.id)]=normalChoice(raw);if(changedProduct||Object.hasOwn(patch,'formatId')||Object.hasOwn(patch,'orientation'))delete state.panelLayouts[key(state.face,z.id)];selectedJoint=null;});}
   function ensureSelected() {if(!data.faces.some(f=>f.key===state.face))state.face=data.faces[0].key;if((state.selected.kind==='zone'&&!currentZone())||(state.selected.kind==='opening'&&!currentOpening()))state.selected={kind:'zone',id:allZones(face())[0]?.id||null};}
   function renderPattern(c){return c.pattern==='lap'&&c.orientation==='vertical'?'vertical':c.pattern;}
   function patternDef(id,c,f,z,monochrome=neutral){
@@ -571,6 +573,20 @@
       const patterns=patternsFor(m),orientations=orientationsFor(m);$('#pattern').innerHTML=patterns.length?patterns.map(v=>`<option value="${esc(v)}">${esc(patternNames[v]||v)}</option>`).join(''):'<option value="plain">Aspect non spécifié</option>';$('#pattern').value=c.pattern;$('#pattern').disabled=patterns.length<=1;
       $('#orientation').innerHTML=orientations.length?orientations.map(v=>`<option value="${esc(v)}">${esc(orientationNames[v]||v)}</option>`).join(''):'<option value="">Pose à confirmer</option>';$('#orientation').value=c.orientation||'';$('#orientation').disabled=orientations.length<=1;
       $('#pattern-note').textContent=orientations.length?'Seuls les sens de pose documentés sont proposés. Pour les panneaux, changer de format ou de sens rétablit la trame à la taille réelle.':'Aucun sens de pose validé dans cette fiche. Consultez les instructions du fabricant avant spécification.';
+      const rule=V?.verticalRule(m,c),ruleSummary=$('#vertical-rule-summary'),battenField=$('#batten-spacing-field');
+      const battenOptions=rule?.battenSpacingOptionsIn||[];
+      battenField.hidden=!battenOptions.length;
+      $('#batten-spacing').value=String(c.battenSpacingIn||battenOptions[0]||12);
+      if(rule){
+        const auto=V.breaks({polygon:item.polygon,feetPerPixel:feetPerPixel(f),material:m,choice:c,openings:allOpenings(f),
+          manualTransitions:state.transitions.filter(t=>t.face===f.key&&t.zoneId===item.id)});
+        const aligned=auto.items.filter(t=>t.source==='top-of-window').length;
+        ruleSummary.hidden=false;
+        ruleSummary.textContent=auto.complete?
+          'Maximum '+(rule.maxRunIn/12)+' pi entre transitions · '+auto.items.length+' transition(s) automatique(s), dont '+aligned+' au-dessus des châssis.'+
+          (battenOptions.length?' Battens '+(c.battenSpacingIn||battenOptions[0])+' po c/c.':''):
+          'Maximum '+(rule.maxRunIn/12)+' pi : échelle du plan nécessaire pour dessiner les joints.';
+      } else {ruleSummary.hidden=true;battenField.hidden=true;}
       renderPanelEditor(f,item,c,m);renderTransitions(f,item);
       const band=bandConfig(f,item);$('#band-enabled').checked=band.enabled;$('#band-fields').hidden=!band.enabled;$('#band-height').value=band.heightIn;const bm=productOptions('#band-brand','#band-product',bandMaterials(),band.materialId);colorOptions('#band-color',bm,band.colorId);$('#band-docs').disabled=!bm;
     }else{
@@ -656,6 +672,7 @@
   $('#material-format').onchange=e=>setChoice({formatId:e.target.value});
   $('#coverage-input').onchange=e=>{const value=e.target.value.trim(),n=value===''?null:Number(value),m=materialById.get(choice(face(),currentZone()).materialId),c=choice(face(),currentZone());if(value!==''&&(!(n>=.125&&n<=96)||!C.coverageSpec(m,{...c,exposureIn:n}).exposureIn)){toast('Saisissez une couvrance de pose valide en pouces.');renderControl();return;}setChoice({exposureIn:n});};
   $('#pattern').onchange=e=>{const m=materialById.get(choice(face(),currentZone()).materialId),pattern=e.target.value,orientation=pattern==='vertical'?'vertical':'horizontal';setChoice({pattern,...(['lap','vertical'].includes(pattern)&&orientationsFor(m).includes(orientation)?{orientation}:{})});};$('#orientation').onchange=e=>setChoice({orientation:e.target.value});
+  $('#batten-spacing').onchange=e=>{const c=choice(face(),currentZone()),m=materialById.get(c.materialId),n=Number(e.target.value);if((m.verticalLayout?.battenSpacingOptionsIn||[]).includes(n))setChoice({battenSpacingIn:n});};
   $('#zone-colors').onclick=e=>{const b=e.target.closest('[data-color-id]');if(b)setChoice({colorId:b.dataset.colorId});};
   for(const kind of ['soffit','fascia']){
     $('#'+kind+'-brand').onchange=e=>{const rows=kind==='soffit'?soffits:fascias,m=rows.find(m=>m.brand===e.target.value);if(m)touchFinish(kind,m.id);};
