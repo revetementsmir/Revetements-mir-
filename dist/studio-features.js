@@ -99,6 +99,9 @@
   function returnViews(patternDef){
    ensureState();
    const geo=api.sceneGeometryBase(),r=geo.recess;if(!r||r.enabled===false||!(r.depth>0&&r.height>0))return {};
+   const front=data().faces.find(f=>f.key==='front'),masonry=front?.zones?.find(z=>z.kind==='masonry');
+   const band=!imported?root.MIRStudioWallParts?.masonryBand(front,dimensions()):null;
+   const brickChoice=band&&masonry?api.choice(front,masonry):null;
    return Object.fromEntries(['return-left','return-right'].map(id=>{
     const c=returnChoice(id),m=byId.get(c.materialId),w=ft(r.depth)*100,h=ft(r.height)*100;
     // Each return is calibrated at 100 drawing units per foot. The bottom is
@@ -106,7 +109,14 @@
     const f={key:id,renderFeetPerPixel:.01,textureBox:[0,0,w,h],textureBottom:0},z={id,polygon:[[0,0],[w,0],[w,h],[0,h]]};
     const p=patternDef('return-pattern-'+id,c,f,z,false),grid=C?.panelGrid([0,0,w,h],.01,m||{},c);
     const joints=grid?.complete?`<g data-panel-layout="product" data-format-id="${esc(grid.formatId)}" fill="none" stroke="#485044" stroke-width="2">${grid.vertical.map(j=>`<path d="M${j.coordinate} 0V${h}"/>`).join('')}${grid.horizontal.map(j=>`<path d="M0 ${j.coordinate}H${w}"/>`).join('')}</g>`:'';
-    return [id,`<svg xmlns="http://www.w3.org/2000/svg" data-meters-per-unit="0.003048" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}"><defs>${p}</defs><rect width="${w}" height="${h}" fill="url(#return-pattern-${id})"/>${joints}</svg>`];
+    // Rétablir sur chaque retour la maçonnerie du soubassement frontal,
+    // à la même altitude physique. Ne pas changer le matériau du mur au-dessus.
+    const bandH=band&&brickChoice?Math.max(0,Math.min(h,band.heightMeters/.003048)):0;
+    const bandTop=Math.max(0,h-bandH),brickId='return-masonry-'+id;
+    const zBrick={id:brickId,polygon:[[0,bandTop],[w,bandTop],[w,h],[0,h]]};
+    const brickDef=bandH>0?patternDef(brickId,brickChoice,f,zBrick,false):'';
+    const brickOverlay=bandH>0?`<rect data-mir-continuous-masonry="${id}" x="0" y="${fmt(bandTop)}" width="${fmt(w)}" height="${fmt(bandH)}" fill="url(#${brickId})"/>`:'';
+    return [id,`<svg xmlns="http://www.w3.org/2000/svg" data-meters-per-unit="0.003048" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}"><defs>${p}${brickDef}</defs><rect width="${w}" height="${h}" fill="url(#return-pattern-${id})"/>${joints}${brickOverlay}</svg>`];
    }));
   }
   function modal(id,title,body){let d=document.getElementById(id);if(d){if(d.open)d.close();d.remove();}d=document.createElement('dialog');d.id=id;d.className='studio-dialog';d.innerHTML=`<div class="dialog-top"><h2>${title}</h2><button class="close-dialog" aria-label="Fermer">Fermer ×</button></div>${body}`;document.body.appendChild(d);d.querySelector('.close-dialog').onclick=()=>d.close();d.showModal();return d;}
