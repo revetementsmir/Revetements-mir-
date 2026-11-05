@@ -95,7 +95,7 @@ async function ready(){
    assert.equal(await page.locator('#mir-procurement-panel .mir-po-tabs [data-mir-po-view]').count(),3);
    await page.locator('[data-mir-po-view="history"]').click();
    assert.match(await page.locator('#mir-procurement-panel').textContent(),/Historique/);
-   await page.locator('[data-mir-po-view="create"]').click();
+   await page.locator('#mir-procurement-panel .mir-po-tabs [data-mir-po-view="create"]').click();
    assert.equal(await page.locator('#mir-create-po').isVisible(),true);
    await page.locator('#mir-procurement-panel [data-mir-tab="suppliers"]').click();
    assert.equal(await page.locator('body').getAttribute('data-mir-tab'),'suppliers');
