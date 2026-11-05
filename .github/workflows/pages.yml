@@ -238,6 +238,8 @@ jobs:
           grep -F 'E.setPanelSize(layout.config,axis' /tmp/calepinage-app.js
           fetch "$base/plan.html" /tmp/plan.html
           grep -F 'studio-wall-sections.js?v=1' /tmp/plan.html
+          grep -F 'plan.css?v=murs-detaches-20261105' /tmp/plan.html
+          grep -F 'id="mir-side-wall-scroll"' /tmp/plan.html
           fetch "$base/studio-wall-sections.js" /tmp/studio-wall-sections.js
           grep -F 'function masonryBand(' /tmp/studio-wall-sections.js
           fetch "$base/studio-features.js" /tmp/studio-features.js
