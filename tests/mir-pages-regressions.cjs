@@ -263,11 +263,11 @@ test('Mesures standard MIR : nouvelles fiches privées et usage magasin contrôl
 
 
 test('Pliage MIR : retour écrasé avec un raccord arrondi', () => {
- const code=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
+ const code=fs.readFileSync(path.join(__dirname,'../dist/production-model.js'),'utf8');
  const start=code.indexOf('function profileSectionPath(');
  const end=code.indexOf('\nfunction profileSideMarkers(',start);
  assert.ok(start>=0&&end>start);
- const draw=new Function('fmt',code.slice(start,end)+'\nreturn profileSectionPath;')(v=>String(Math.round(v*100)/100));
+ const draw=new Function('decimal',code.slice(start,end)+'\nreturn profileSectionPath;')(v=>String(Math.round(v*100)/100));
  const section=draw([[0,0],[100,0],[0,0]],[{mode:'hem',angle:180,direction:'left'}]);
  assert.equal(section.folds.length,1);
  assert.equal(section.segments.length,2);
@@ -281,11 +281,11 @@ test('Pliage MIR : retour écrasé avec un raccord arrondi', () => {
 
 
 test('Repères A-B-C : les côtés serrés gardent leurs étiquettes hors du dessin', () => {
- const code=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
+ const code=fs.readFileSync(path.join(__dirname,'../dist/production-model.js'),'utf8');
  const begin=code.indexOf('function profileSideMarkers(');
- const end=code.indexOf('\nfunction diagramSVG(',begin);
+ const end=code.indexOf('\nfunction profileDiagramContent(',begin);
  assert.ok(begin>0&&end>begin);
- const place=new Function('fmt','esc',code.slice(begin,end)+'\nreturn profileSideMarkers;')(
+ const place=new Function('decimal','esc',code.slice(begin,end)+'\nreturn profileSideMarkers;')(
    v=>String(Math.round(v*100)/100),s=>String(s));
  const segments=[[[140,200],[390,200]],[[390,200],[390,300]],[[390,300],[500,300]]];
  const labels={segments:[{label:'A'},{label:'B'},{label:'C'}]};
