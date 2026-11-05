@@ -307,7 +307,7 @@
     $('#demo-reset')?.setAttribute('hidden','');$('#demo-exit')?.setAttribute('hidden','');
     $('#portal-footer-label').textContent=isDemo()?'Les Revêtements MIR · Aperçu avec données fictives':'Les Revêtements MIR · Le portail chantier';
     document.querySelectorAll('[data-management-link]').forEach(link=>link.hidden=!showPortal||mode!=='admin');
-    const shopLink=document.querySelector('.portal-header nav a');if(shopLink)shopLink.hidden=!isDemo()&&showPortal&&mode==='employee';
+    // Le bandeau public reste accessible; seuls les droits serveur ouvrent les fonctions privées.
     if(!showPortal)$('#portal-operation').hidden=true;
   }
   function clearInvitation() {invitationToken=null;try{sessionStorage.removeItem(INVITATION_KEY);}catch(_) {}}
