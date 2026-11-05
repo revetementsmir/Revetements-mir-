@@ -24,7 +24,22 @@ async function ready(){
    const page=await context.newPage(),errors=[];
    page.on('pageerror',error=>errors.push(error.message));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
-   await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version&&window.MIRAdminWizard?.active,{timeout:30000});
+   await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version,{timeout:30000});
+   const diagnostics=await page.evaluate(()=>({
+     wizard:window.MIRAdminWizard?.version,
+     live3d:window.MIRLiveProfile3D?.version,
+     active:window.MIRAdminWizard?.active,
+     step:window.MIRAdminWizard?.step,
+     classes:document.body.className,
+     profile:document.body.dataset.profileAdmin,
+     tab:document.body.dataset.mirTab,
+     editor:document.querySelector('#author-banner')?.hidden,
+     cancel:document.querySelector('#cancel-piece-edit')?.hidden,
+     controls:!!document.querySelector('#mir-guide-3d'),
+     drawing:document.querySelector('#production-drawing')?.getAttribute('data-tool')
+   }));
+   console.log('GUIDE DIAGNOSTIC '+size.name+' '+JSON.stringify(diagnostics)+' pageerrors '+JSON.stringify(errors));
+   await page.waitForFunction(()=>window.MIRAdminWizard?.active,{timeout:15000});
    const names=await page.locator('#mir-procurement-tabs button').allTextContents();
    assert.deepEqual(names,['Créer','Boutique','Magasin employés','Bons de commande']);
    assert.equal(await page.locator('#mir-guide-steps button').count(),4);
