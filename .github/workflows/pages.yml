@@ -183,10 +183,13 @@ jobs:
           grep -F 'href="realisations.html"' /tmp/mir-boutique.html
           grep -F 'mir-client-header.css?v=1' /tmp/mir-boutique.html
           grep -F 'mir-client-signature.css?v=1' /tmp/mir-boutique.html
-          fetch "$base/plan.html" /tmp/mir-plan-public.html
+          fetch "$base/plan.html?verification=$GITHUB_SHA" /tmp/mir-plan-public.html
+          cmp /tmp/mir-plan-public.html _site_mir/plan.html
           grep -F 'mir-client-header.css?v=1' /tmp/mir-plan-public.html
-          fetch "$base/plan-import.js?verification=$GITHUB_SHA" /tmp/mir-plan-import.js
-          cmp /tmp/mir-plan-import.js _site_mir/plan-import.js
+          for asset in plan-import.js plan-scan-ocr.js plan-sheet-detection.js plan-spatial-dimensions.js plan.css; do
+            fetch "$base/$asset?verification=$GITHUB_SHA" "/tmp/mir-$asset"
+            cmp "/tmp/mir-$asset" "_site_mir/$asset"
+          done
           grep -F 'MIRSheetDetection' /tmp/mir-plan-import.js
           fetch "$base/assets/mir-home-hero-20261105.avif" /tmp/mir-home-hero.avif
           fetch "$base/assets/mir-home-hero-20261105.webp" /tmp/mir-home-hero.webp
@@ -268,17 +271,16 @@ jobs:
           grep -F 'event.shiftKey||outlineRightAngle' /tmp/calepinage-app.js
           grep -F 'A?.gableFromPitch?.(width,eave,leftPitch,rightPitch)' /tmp/calepinage-app.js
           grep -F 'E.setPanelSize(layout.config,axis' /tmp/calepinage-app.js
-          fetch "$base/plan.html" /tmp/plan.html
-          grep -F 'studio-wall-sections.js?v=1' /tmp/plan.html
-          grep -F 'plan.css?v=murs-detaches-20261105' /tmp/plan.html
-          grep -F 'id="mir-side-wall-scroll"' /tmp/plan.html
+          grep -F 'studio-wall-sections.js?v=1' /tmp/mir-plan-public.html
+          grep -F 'href="plan.css?v=' /tmp/mir-plan-public.html
+          grep -F 'id="mir-side-wall-scroll"' /tmp/mir-plan-public.html
           fetch "$base/studio-wall-sections.js" /tmp/studio-wall-sections.js
           grep -F 'function masonryBand(' /tmp/studio-wall-sections.js
           fetch "$base/studio-features.js" /tmp/studio-features.js
           grep -F 'data-mir-continuous-masonry' /tmp/studio-features.js
-          grep -F 'material-coverage.js' /tmp/plan.html
-          grep -F 'id="material-format"' /tmp/plan.html
-          grep -F 'id="coverage-input"' /tmp/plan.html
+          grep -F 'material-coverage.js' /tmp/mir-plan-public.html
+          grep -F 'id="material-format"' /tmp/mir-plan-public.html
+          grep -F 'id="coverage-input"' /tmp/mir-plan-public.html
           fetch "$base/material-coverage.js" /tmp/material-coverage.js
           grep -F 'function courseLayout' /tmp/material-coverage.js
           grep -F 'function panelGrid' /tmp/material-coverage.js
