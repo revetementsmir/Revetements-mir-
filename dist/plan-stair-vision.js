@@ -70,7 +70,7 @@
    return clustered.map(o=>({...o,v:o.v-(o.thickness-1)/2}));
   }
   const horizontal=runs(false),vertical=runs(true);
-  const hints=(Array.isArray(textHints)?textHints:[]).filter(h=>h?.type==='stairs');
+  const hints=(Array.isArray(textHints)?textHints:[]).filter(h=>h?.type==='stairs'||h?.type==='balcony');
   function propose(lines,cross,axis){
    const out=[];
    for(let i=0;i<lines.length;i++){
@@ -89,9 +89,9 @@
        if(common<Math.min(first.len,row.len)*.75||Math.abs(row.len-first.len)>first.len*.25)continue;
        group.push(row);target+=spacing;
       }
-      if(group.length>=4&&group.length>best.length){best.splice(0,best.length,...group);}
+      if(group.length>=3&&group.length>best.length){best.splice(0,best.length,...group);}
     }
-    if(best.length<4)continue;
+    if(best.length<3)continue;
     const start=median(best.map(r=>r.start)),end=median(best.map(r=>r.end));
     const pitch=median(best.slice(1).map((r,j)=>r.v-best[j].v));
     const gaps=best.slice(1).map((r,j)=>r.v-best[j].v);
@@ -112,6 +112,14 @@
       const hCenter=[(h.box[0]+h.box[2])/2,(h.box[1]+h.box[3])/2];
       return dist(center,hCenter)<Math.max(100*stride,Math.max(box[2]-box[0],box[3]-box[1])*1.6);
     });
+    const nearBalcony=hints.some(h=>{
+      if(h.type!=='balcony'||!Array.isArray(h.box))return false;
+      const mid=[(h.box[0]+h.box[2])/2,(h.box[1]+h.box[3])/2];
+      return dist(center,mid)<Math.max(100*stride,Math.max(box[2]-box[0],box[3]-box[1])*1.6);
+    });
+    // Trois traits seuls ne suffisent pas : il faut un porche annoté ou deux
+    // bordures latérales complètes pour éviter de détecter des joints de mur.
+    if(best.length===3&&!(nearBalcony||railCount===2))continue;
     const confidence=clamp(.35+.15*(1-Math.min(cv,1))+.14*(Math.min(best.length,9)/9)+.14*(railCount/2)+
       .13*(kind==='floor')+.10*(nearHint?1:0),.2,.98);
     if(kind==='elevation'&&!nearHint)continue;
@@ -121,14 +129,14 @@
       type:'stairs',method:'raster-parallel-risers-calibrated',source:'pdf-pixels',
       box:box.map(Math.round),cropBox:box.map((v,i)=>Math.round(v-(i%2?cy:cx))),
       relativeCenter:relative.map(v=>clamp(v,0,1)),axis,
-      detectedLines:best.length,count:best.length,
+      detectedLines:best.length,count:best.length,context:nearBalcony?'balcony-stairs':'unclassified-stairs',
       widthFt:Number(widthFt.toFixed(3)),depthFt:Number(depthFt.toFixed(3)),
       treadFt:Number((pitch*fpp).toFixed(3)),riserFt:null,
       feetPerPixel,scaleSource:'dimension-line-calibration',confidence:Number(confidence.toFixed(2)),
       confidenceLabel:confidence>=.78?'good':'review',needsReview:true,
       positionVerified:false,riserHeightVerified:false,concreteVerified:false,
       statement:'Forme mesurée sur pixels; nombre de marches, implantation et hauteur à vérifier sur une coupe.',
-      evidence:{regularity:Number((1-cv).toFixed(3)),rails:railCount,nearStairAnnotation:nearHint}
+      evidence:{regularity:Number((1-cv).toFixed(3)),rails:railCount,nearStairAnnotation:nearHint,nearBalcony}
     });
    }
    return out;
