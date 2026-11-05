@@ -66,3 +66,9 @@
   #stage:has(#elevation.mir-studio-detached-side) #stage-subtitle{display:none}
   #stage:has(#elevation.mir-studio-detached-side) .stage-label{align-items:center}
 }
+
+/* Dans le cadrage 3 murs, ne jamais laisser apparaître un bout de toit
+   ou de mur de la maison hors champ : seul le groupe détaché est visible. */
+#elevation svg[data-mir-wall-focus="true"] > :not(defs):not(.mir-exploded-side-walls){
+  visibility:hidden;
+}
