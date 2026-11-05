@@ -12,8 +12,9 @@
     objects.set(1,bytes('<< /Type /Catalog /Pages 2 0 R >>'));
     objects.set(2,bytes(`<< /Type /Pages /Count ${pages.length} /Kids [${pages.map((_,i)=>`${3+i*3} 0 R`).join(' ')}] >>`));
     pages.forEach((page,i)=>{
-      const id=3+i*3,content=bytes('q\n1190.551 0 0 841.890 0 0 cm\n/Im0 Do\nQ\n');
-      objects.set(id,bytes(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 1190.551 841.890] /Resources << /XObject << /Im0 ${id+2} 0 R >> >> /Contents ${id+1} 0 R >>`));
+      const id=3+i*3,{width,height}=page.paper||{width:1190.551,height:841.890};
+      const content=bytes(`q\n${width} 0 0 ${height} 0 0 cm\n/Im0 Do\nQ\n`);
+      objects.set(id,bytes(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width} ${height}] /Resources << /XObject << /Im0 ${id+2} 0 R >> >> /Contents ${id+1} 0 R >>`));
       objects.set(id+1,concat([bytes(`<< /Length ${content.length} >>\nstream\n`),content,bytes('endstream')]));
       objects.set(id+2,concat([bytes(`<< /Type /XObject /Subtype /Image /Width ${page.width} /Height ${page.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${page.jpeg.length} >>\nstream\n`),page.jpeg,bytes('\nendstream')]));
     });
@@ -54,12 +55,29 @@
   function summaryLines(ctx,summary,width){
     return (summary||[]).flatMap(item=>{const label=typeof item==='string'?item:item.label||item.text||'';return wrap(ctx,label,width).map((text,i)=>({text,color:i===0&&typeof item==='object'?item.color:null}));});
   }
+  function canvasJPEG(canvas){
+    return new Promise((resolve,reject)=>{
+      const timer=setTimeout(()=>reject(new Error('La création de la page a pris trop de temps.')),15000);
+      canvas.toBlob(blob=>{clearTimeout(timer);blob?resolve(blob):reject(new Error('Le dessin ne peut pas être exporté.'));},'image/jpeg',.94);
+    });
+  }
   async function makePlan({faces,title='MIR — Plan annoté',subtitle='Étude de revêtement',filename='MIR-plan-annote.pdf',onProgress=()=>{}}={}){
     if(!Array.isArray(faces)||!faces.length)throw new Error('Aucune élévation disponible pour l’export.');
     const pages=[];let pageNumber=0;
     for(const face of faces){
       onProgress(`Préparation du dessin : ${face.name||'élévation'}…`);
-      const drawing=await svgImage(face.svg),canvas=document.createElement('canvas');canvas.width=2976;canvas.height=2105;
+      const drawing=await svgImage(face.svg),canvas=document.createElement('canvas');
+      if(face.layout==='bending-sheet'){
+        canvas.width=2125;canvas.height=2750;
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(drawing.image,0,0,canvas.width,canvas.height);
+        const jpeg=await canvasJPEG(canvas);
+        pages.push({width:canvas.width,height:canvas.height,paper:{width:612,height:792},jpeg:new Uint8Array(await jpeg.arrayBuffer())});
+        pageNumber++;
+        continue;
+      }
+      canvas.width=2976;canvas.height=2105;
       onProgress(`Mise en page : ${face.name||'élévation'}…`);
       const ctx=canvas.getContext('2d'),wide=face.layout==='wide';ctx.font='27px Arial';
       // Fabrication pages use the full printable width. Their summaries are
@@ -97,7 +115,7 @@
         ctx.font='20px Arial';ctx.fillText(face.footerNote||'Document de travail — choix, dimensions et détails de pose à vérifier avant fabrication.',85,2050);
         ctx.textAlign='right';ctx.fillText(`MIR / ${String(pageNumber).padStart(2,'0')}`,2890,2035);ctx.textAlign='left';
         onProgress(`Création de la page ${pageNumber}…`);
-        const jpegBlob=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('La création de la page a pris trop de temps.')),15000);canvas.toBlob(b=>{clearTimeout(timer);b?resolve(b):reject(new Error('Le dessin ne peut pas être exporté.'));},'image/jpeg',.94);});
+        const jpegBlob=await canvasJPEG(canvas);
         pages.push({width:canvas.width,height:canvas.height,jpeg:new Uint8Array(await jpegBlob.arrayBuffer())});
       }
     }

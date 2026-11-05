@@ -683,8 +683,138 @@
     // Flatten nested SVG roots: this also renders consistently in PDF rasterizers.
     return '<g transform="translate(' + x + ' ' + y + ')">' + String(svg).replace(/^<svg\b[^>]*>/, '').replace(/<\/svg>\s*$/, '') + '</g>';
   }
-  function productionPages(input = {}) {
+  function bendingSheetSketch(item) {
+    if (!item.valid || item.pointsMM.length < 2) return svgText(16,65,'Croquis à compléter','font-size="12" fill="#8b5526"');
+    const project=projection(item.pointsMM,{x:24,y:21,w:149,h:96});
+    const points=item.pointsMM.map(project), segments=[], folds=[];
+    let start=points[0], offset=[0,0], path='M '+start.map(decimal).join(',');
+    for(let i=1;i<points.length;i++){
+      const point=points[i],end=[point[0]+offset[0],point[1]+offset[1]];
+      segments.push([start,end]);
+      path+=' L '+end.map(decimal).join(',');
+      start=end;
+      const bend=item.bends[i-1],next=points[i+1];
+      if(bend?.mode!=='hem'||!next)continue;
+      const length=dist(next,point);
+      if(length<EPS)continue;
+      const radius=3.5,side=bend.direction==='right'?-1:1;
+      offset=[offset[0]-(next[1]-point[1])/length*2*radius*side,offset[1]+(next[0]-point[0])/length*2*radius*side];
+      start=[point[0]+offset[0],point[1]+offset[1]];
+      folds.push([(end[0]+start[0])/2,(end[1]+start[1])/2]);
+      path+=` A ${radius} ${radius} 0 0 ${side<0?1:0} ${start.map(decimal).join(',')}`;
+    }
+    const lineDistance=(p,[a,b])=>{
+      const dx=b[0]-a[0],dy=b[1]-a[1],squared=dx*dx+dy*dy;
+      const t=squared?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/squared)):0;
+      return dist(p,[a[0]+t*dx,a[1]+t*dy]);
+    };
+    const placed=[];
+    let drawing='<path d="'+path+'" fill="none" stroke="#283b2f" stroke-width="2.7" stroke-linejoin="miter"/>';
+    segments.forEach(([a,b],index)=>{
+      const length=dist(a,b),segment=item.segments[index];
+      if(length<EPS)return;
+      const label=segment.label+(item.coloredFace.side&&item.coloredFace.segmentId===segment.id?'*':'');
+      for(const offset of [17,-17,25,-25,33,-33]){
+        for(const t of [.5,.33,.67]){
+          const p=[a[0]+(b[0]-a[0])*t-(b[1]-a[1])/length*offset,a[1]+(b[1]-a[1])*t+(b[0]-a[0])/length*offset];
+          if(p[0]<10||p[0]>184||p[1]<10||p[1]>132||placed.some(q=>dist(p,q)<20)||folds.some(q=>dist(p,q)<15)||segments.some(line=>lineDistance(p,line)<13||line.some(q=>dist(p,q)<17)))continue;
+          placed.push(p);
+          drawing+=`<circle cx="${decimal(p[0])}" cy="${decimal(p[1])}" r="8" fill="#f1f5ef" stroke="#b7c6b6"/>`;
+          drawing+=svgText(p[0],p[1]+3,label,'font-size="8.5" font-weight="700" text-anchor="middle" fill="#3a6636"');
+          return;
+        }
+      }
+    });
+    const endpoints=segments.flat().concat(folds.flatMap(([x,y])=>[[x-4,y-4],[x+4,y+4]]));
+    const fitted=bounds(endpoints.concat([[3,3],[193,141]]));
+    const scale=Math.min(190/(fitted.maxX-fitted.minX),138/(fitted.maxY-fitted.minY));
+    return scale<1?'<g transform="translate('+decimal(3-fitted.minX*scale)+' '+decimal(3-fitted.minY*scale)+') scale('+decimal(scale)+')">'+drawing+'</g>':drawing;
+  }
+  function bendingSheetPages(order) {
+    const width=850,height=1100,columns=[40,458,550,665,733,810],lineHeight=14;
+    const project=wrapLines('CHANTIER : '+(order.project||'À préciser'),88);
+    const foreman=wrapLines('CONTREMAÎTRE : '+(order.foreman||'À préciser'),88);
+    const po=wrapLines('PO / BON : '+(order.poNumber||'À préciser'),67);
+    const tableY=130+(po.length-1)*lineHeight,headingH=28;
+    const footerY=1002-(project.length+foreman.length-2)*lineHeight;
+    const bodyLimit=footerY-15,rows=[],pages=[[]];
+    const lines=(values,max)=>values.flatMap(value=>wrapLines(value,max));
+    const take=(values,start)=>values.slice(start,start+23);
+    const bodyText='font-size="11.5"';
+    const compactLengths=item=>item.segments.flatMap((segment,index)=>{
+      const bend=item.bends[index];
+      return [segment.label+' = '+formatMeasurement(segment.lengthMM,item.unit),...(bend?['Pli '+bend.from+'–'+bend.to+' : '+bend.label]:[])];
+    });
+    for(const item of order.items){
+      const title=lines([item.id+' · '+item.name],55);
+      const face=item.coloredFace?.side?['* Face '+(item.coloredFace.side==='left'?'gauche':'droite')+' · côté '+item.coloredFace.segmentId]:[];
+      const details=lines([...compactLengths(item),...face,...(item.location?['Repère : '+item.location]:[]),...(item.note?[item.note]:[])],33);
+      const material=lines(materialLines(item),13),finish=lines(finishLines(item),16);
+      const checks=lines([...item.validation.errors,...item.validation.pending].map(issue=>issue.message),90).filter(Boolean);
+      for(let start=0;start<Math.max(details.length,material.length,finish.length,1);start+=23){
+        const fragment={item,title:start?lines([item.id+' · Suite des cotes'],55):title,details:take(details,start),material:take(material,start),finish:take(finish,start),continuation:start>0};
+        const textHeight=Math.max(fragment.details.length,fragment.material.length,fragment.finish.length,1)*lineHeight;
+        fragment.height=Math.max(215,fragment.title.length*lineHeight+textHeight+24);
+        rows.push(fragment);
+      }
+      for(let start=0;start<checks.length;start+=23){
+        const content=take(checks,start);
+        rows.push({title:[item.id+' · Points à compléter'],note:content,height:content.length*lineHeight+42});
+      }
+    }
+    const orderNotes=lines([...(order.notes?['Notes du dossier : '+order.notes]:[]),...order.errors.map(error=>error.message)],90);
+    for(let start=0;start<orderNotes.length;start+=23){
+      const note=take(orderNotes,start);
+      rows.push({title:[start?'Dossier · Suite':'Dossier'],note,height:note.length*lineHeight+42});
+    }
+    let y=tableY+headingH;
+    for(const row of rows){
+      if(y+row.height>bodyLimit&&pages.at(-1).length){pages.push([]);y=tableY+headingH;}
+      pages.at(-1).push({...row,y});y+=row.height;
+    }
+    const rect=(x,y,w,h,fill)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="#727c72"/>`;
+    return pages.map((page,index)=>{
+      let svg=svgOpen(width,height,'MIR · Mise en production · Feuille '+(index+1)).replace('<svg ','<svg xmlns:xlink="http://www.w3.org/1999/xlink" ');
+      svg+=svgText(40,64,'MISE EN PRODUCTION','font-size="28" font-weight="700"');
+      svg+='<image xlink:href="assets/MIR-logo-HD.png" x="622" y="36" width="188" height="64" preserveAspectRatio="xMaxYMid meet"/>';
+      svg+=svgText(40,94,'Date souhaitée : '+(order.date||'À préciser'),'font-size="14"');
+      svg+=multiline(40,114,po,{width:67,lineHeight,attrs:'font-size="14"'}).svg;
+      if(order.revision)svg+=svgText(810,114,'Révision '+order.revision,'font-size="12" text-anchor="end"');
+      svg+=rect(40,tableY,770,headingH,'#edf2eb');
+      ['MOULURES','GAGE','COULEUR','QUANTITÉ','LONGUEUR'].forEach((label,column)=>{
+        svg+=svgText(columns[column]+7,tableY+18,label,'font-size="11" font-weight="700"');
+      });
+      for(const x of columns.slice(1,-1))svg+=`<path d="M${x} ${tableY}v${headingH}" stroke="#727c72"/>`;
+      for(const row of page){
+        const {item,y}=row;
+        svg+=rect(40,y,770,row.height,'#fff');
+        svg+=multiline(49,y+17,row.title,{width:55,lineHeight,attrs:'font-size="12" font-weight="700"'}).svg;
+        if(row.note){
+          svg+=multiline(49,y+35,row.note,{width:90,lineHeight,attrs:bodyText}).svg;
+          continue;
+        }
+        for(const x of columns.slice(1,-1))svg+=`<path d="M${x} ${y}v${row.height}" stroke="#727c72"/>`;
+        const detailY=y+20+row.title.length*lineHeight;
+        if(!row.continuation)svg+='<g transform="translate(48 '+(detailY+3)+')">'+bendingSheetSketch(item)+'</g>';
+        svg+=multiline(254,detailY,row.details,{width:33,lineHeight,attrs:bodyText}).svg;
+        svg+=multiline(465,y+18,row.material,{width:13,lineHeight,attrs:bodyText}).svg;
+        svg+=multiline(557,y+18,row.finish,{width:16,lineHeight,attrs:bodyText}).svg;
+        svg+=svgText(699,y+21,row.continuation?'—':item.quantity??'À préciser','font-size="15" font-weight="700" text-anchor="middle"');
+        if(!row.continuation)svg+=multiline(740,y+18,[formatMeasurement(item.lengthMM,item.unit)],{width:11,lineHeight,attrs:bodyText}).svg;
+      }
+      const footer={width:88,lineHeight,attrs:'font-size="13"'};
+      const footProject=multiline(40,footerY,project,footer);
+      const footForeman=multiline(40,footProject.bottom+3,foreman,footer);
+      svg+=footProject.svg+footForeman.svg;
+      svg+=svgText(40,1046,'* Face colorée. Cotes de la pièce finie. Rayons et développé à valider par l’atelier.','font-size="11"');
+      svg+=svgText(40,1068,'Validation MIR avant transmission.','font-size="11"');
+      svg+=svgText(810,1068,'Feuille '+(index+1)+' / '+pages.length,'font-size="12" text-anchor="end"');
+      return {name:'Mise en production · '+(index+1)+'/'+pages.length,svg:svg+svgClose,layout:'bending-sheet'};
+    });
+  }
+  function productionPages(input = {}, {layout} = {}) {
     const order = buildOrder(input), fragments = [];
+    if (layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return bendingSheetPages(order);
     const documentTitle = order.requiresQuote ? 'Demande de soumission' : 'Mise en production';
     for (const item of order.items) {
       const details = productionDetailLines(item).flatMap(line => wrapLines(line, 37));
