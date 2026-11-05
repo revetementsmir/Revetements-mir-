@@ -503,6 +503,9 @@
     $('#view-2d').setAttribute('aria-pressed',state.view==='2d');$('#view-3d').setAttribute('aria-pressed',state.view==='3d');
     $('#mir-fullscreen').hidden=state.view!=='3d';
     $('#mir-site-toggle').hidden=state.view!=='3d';
+    $('#mir-stairs-toggle').hidden=state.view!=='3d';
+    $('#mir-stairs-toggle').setAttribute('aria-pressed',String(state.concreteSteps?.enabled===true));
+    $('#mir-stairs-toggle').textContent=state.concreteSteps?.enabled?'Masquer les marches':'Marches du balcon';
     $('#mir-zoom-controls').hidden=state.view!=='3d';
     $('#mir-zoom-label').textContent=Math.round((state.cameraZoom||1)*100)+' %';
     $('#mir-site-toggle').setAttribute('aria-pressed',String(state.siteStyle==='commercial'));
@@ -911,6 +914,17 @@
   $('#mir-zoom-in').onclick=()=>zoom3D((state.cameraZoom||1)*1.25);
   $('#mir-zoom-out').onclick=()=>zoom3D((state.cameraZoom||1)/1.25);
   $('#mir-site-toggle').onclick=()=>{state.siteStyle=state.siteStyle==='commercial'?'none':'commercial';save();renderDrawing();};
+  $('#mir-stairs-toggle').onclick=()=>{
+    studioFeatures?.ensureState();
+    const previous=state.concreteSteps||{count:4,width:1.8,tread:.30,riser:.16};
+    const proposed=state.porch?.enabled&&Number.isFinite(state.porch.floorHeight)?
+      Math.max(3,Math.min(12,Math.ceil(state.porch.floorHeight/.18))):previous.count;
+    state.concreteSteps={...previous,enabled:!previous.enabled,
+      count:previous.sourceCandidateId||previous.manuallyEdited?previous.count:proposed,
+      sourceStatus:previous.sourceCandidateId?'pdf-pixel-proposed-unverified':'porch-geometry-proposed-unverified',
+      riserHeightVerified:false,positionVerified:false,needsReview:true};
+    save();renderDrawing();toast('Marches du balcon : proposition à valider sur le plan, sans métré certifié.');
+  };
   const stage3D=$('#stage');
   function syncFull(){
     const on=document.fullscreenElement===stage3D||stage3D.classList.contains('mir-stage-fullscreen');

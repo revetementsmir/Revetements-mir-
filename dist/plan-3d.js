@@ -569,7 +569,8 @@
       const count=Math.max(1,Math.min(12,Math.round(positive(steps.count,4))));
       const width=Math.max(.8,Math.min(4,positive(steps.width,1.8)));
       const tread=Math.max(.22,Math.min(.55,positive(steps.tread,.30)));
-      const riser=Math.max(.09,Math.min(.22,positive(steps.riser,.16)));
+      const riser=Math.max(.09,Math.min(.22,
+        porch.enabled&&!steps.riserHeightVerified?porch.floorHeight/count:positive(steps.riser,.16)));
       // Le PDF donne largeur et giron par pixels. La position devant le mur
       // et la contremarche restent schématiques tant qu'aucune coupe ne les établit.
       const lateral=Number.isFinite(Number(steps.centerX))?
