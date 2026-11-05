@@ -10,6 +10,8 @@ on:
       - 'dist/commerce.css'
       - 'dist/mir-procurement.css'
       - 'tests/mir-miniatures*.cjs'
+      - 'tests/mir-procurement.cjs'
+      - '.github/workflows/pages.yml'
       - 'dist/kaycan-flat-preview.js'
       - 'tests/mir-kaycan-flat-preview.cjs'
       - 'tests/mir-atelier-v4.cjs'
@@ -39,7 +41,9 @@ jobs:
           node --check tests/mir-atelier-v4-browser.cjs
           node --check tests/mir-moulure-renaming-browser.cjs
       - name: Existing MIR regression suite
-        run: node tests/mir-pages-regressions.cjs
+        run: |
+          node tests/mir-pages-regressions.cjs
+          node tests/mir-procurement.cjs
       - name: Atelier maquette 4 scenarios
         run: |
           node tests/mir-atelier-v4.cjs
