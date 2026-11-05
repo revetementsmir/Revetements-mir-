@@ -50,6 +50,23 @@ async function ready(){for(let i=0;i<80;i++){
    await page.locator('#batten-color').dispatchEvent('change');
    await page.waitForFunction(()=>document.querySelector('#elevation')?.innerHTML.includes('#b36143'));
    assert.ok(await page.locator('#elevation [data-mir-batten-spacing="16"]').count()>0);
+   // La transition Hardie n'est pas une simple ligne : elle partage la découpe du panneau.
+   const linked=()=>page.evaluate(()=>Object.values(JSON.parse(localStorage.getItem('mir-plan-study-v2')).panelLayouts||{})
+     .find(x=>x.linkedTransitionMaxIn===120));
+   const initialCut=await linked();
+   assert.ok(initialCut?.horizontal?.length>0,'Les raccords Hardie doivent diviser les pièces de panneaux');
+   if(!await page.locator('#edit-auto-transitions').isVisible())await page.locator('details:has(#edit-auto-transitions) summary').click();
+   await page.locator('#edit-auto-transitions').click();
+   const field=page.locator('#transition-list [data-transition-position]').first();
+   await field.fill('80');await field.dispatchEvent('change');
+   const changedCut=await linked();
+   assert.ok(changedCut?.horizontal?.some(x=>Math.abs(x.position-initialCut.horizontal[0].position)>.02));
+   const cutsBeforeDelete=changedCut.horizontal.length;
+   await page.locator('#transition-list [data-delete-transition]').first().click();
+   const afterDelete=await linked();
+   assert.equal(afterDelete.horizontal.length,cutsBeforeDelete-1,'Supprimer la moulure supprime aussi le joint de panneau');
+   await page.locator('#restore-auto-transitions').click();
+   assert.ok((await linked())?.horizontal.length>0,'Les joints proposés peuvent être rétablis');
    // 4) Fenêtres, portes et cadres ont leurs propres réglages et profils.
    await page.evaluate(()=>document.querySelector('#elevation [data-opening="porte_gauche"]').dispatchEvent(new MouseEvent('click',{bubbles:true})));
    await page.locator('#opening-door-color').fill('#304e64');
