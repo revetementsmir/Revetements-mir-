@@ -16,7 +16,7 @@ test('MAC (avec ou sans accents) est reconnu sans transformer Gentek',()=>{
  assert.equal(Preview.isFlatPreview({manufacturer:'Kaycan'}),true);
  assert.equal(Preview.isFlatPreview({manufacturer:'Gentek'}),false);
 });
-test('Les images JPEG MAC sont acceptées pour l'échantillon uniquement',()=>{
+test("Les images JPEG MAC sont acceptées pour l'échantillon uniquement",()=>{
  const url='./assets/catalogue-swatches/mac-bouleau-fume-efcc24f8.jpeg';
  assert.equal(Preview.get(url),null);
  assert.equal(Preview.sample('https://untrusted.example/image.jpeg'),null);
