@@ -67,4 +67,11 @@ test('Liens principaux locaux présents sans site de démonstration',()=>{
 test('Les accès réels restent fermés tant que Auth et RLS ne sont pas actifs',()=>{
   assert.match(read('portal-config.js'),/enabled: false/);
 });
+test('Le logo Illustrator original est utilisé sur les pages publiques principales',()=>{
+  for(const name of ['boutique.html','pliage.html','chantier.html','plan.html','calepinage.html','production.html','materiaux.html','produit.html','selection.html']){
+    const source=read(name);
+    assert.match(source,/src="assets\/MIR-logo-officiel-original\.svg"/,name);
+    assert.doesNotMatch(source,/src="assets\/MIR-logo-HD\.png"/,name);
+  }
+});
 console.log('MIR accueil premium : '+n+'/'+n+' tests réussis.');
