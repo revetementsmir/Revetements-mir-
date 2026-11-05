@@ -141,3 +141,7 @@ body.mir-admin-v4 .mir-proc-model-form .mir-proc-actions{margin-top:12px}
  }
  body.mir-admin-v4 .mir-proc-model-form .mir-proc-actions button{flex:1 1 46%;min-width:0}
 }
+
+/* Accès au nettoyage local, visible sans ajouter un cinquième onglet. */
+body.mir-admin-v4 .mir-proc-reset-link{display:block;width:max-content;max-width:100%;font-size:13px;font-weight:650;text-decoration:underline;text-underline-offset:3px;color:#48604c;margin:-10px 0 18px auto}
+body.mir-admin-v4 .mir-proc-reset-link:focus-visible{outline:3px solid #90b666;outline-offset:3px}
