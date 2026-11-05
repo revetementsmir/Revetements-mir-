@@ -23,13 +23,15 @@ async function online(){
    const page=await browser.newPage({viewport:{width:screen.width,height:screen.height},hasTouch:screen.width<600});
    const errors=[];page.on('pageerror',e=>errors.push(String(e.message)));
    await page.goto(base+'/plan.html',{waitUntil:'domcontentloaded',timeout:30000});
-   await page.waitForFunction(()=>!!window.MIRStudioWallParts&&!!window.MIR3D&&!!document.querySelector('#zone-list .zone-button')&&document.querySelector('#project-name')?.textContent!=='Ouverture de votre projet…',{timeout:30000});
+   await page.waitForFunction(()=>!!window.MIRStudioWallParts&&!!window.MIR3D&&!!document.querySelector('#zone-list .zone-button')&&typeof document.querySelector('#view-2d')?.onclick==='function',{timeout:30000});
    await page.locator('#view-2d').click();
    await page.locator('[data-face="right"]').click();
    const diagnostic=await page.evaluate(()=>({
      warning:window.MIR_SIDE_WALL_WARNING||null,
      loaded:!!window.MIRStudioWallParts,
      face:document.querySelector('[data-face="right"]')?.getAttribute('aria-pressed'),
+     view2dWired:typeof document.querySelector('#view-2d')?.onclick==='function',
+     projectName:document.querySelector('#project-name')?.textContent,
      svg:document.querySelector('#elevation svg')?.outerHTML.slice(0,300),
      excerpt:document.querySelector('#stage-subtitle')?.textContent
    }));
