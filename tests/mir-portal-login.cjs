@@ -41,6 +41,16 @@ test('Une configuration activée sans clé publiable est refusée',()=>{
     siteOrigin:'https://revetementsmirweb.github.io',callbackPath:'/chantier.html'},
     'https://revetementsmirweb.github.io'));
 });
+test('Le retour Auth reste strictement limité au vrai chemin MIR',()=>{
+  const config={enabled:true,projectRef:'gccltmaulvrnthrbnrpd',
+    supabaseUrl:'https://gccltmaulvrnthrbnrpd.supabase.co',
+    publishableKey:'sb_publishable_'+'a'.repeat(48),
+    siteOrigin:'https://revetementsmirweb.github.io',
+    callbackPath:'/MIR/chantier.html'};
+  const validated=Auth.validateConfig(config,'https://revetementsmirweb.github.io');
+  assert.equal(validated.redirectTo,'https://revetementsmirweb.github.io/MIR/chantier.html');
+  assert.throws(()=>Auth.validateConfig({...config,callbackPath:'/autre.html'},'https://revetementsmirweb.github.io'));
+});
 test('Aucun rôle admin n’est attribué sans preuve serveur',()=>{
   assert.throws(()=>Auth.checkedSnapshot({
     mode:'connected',demo:false,actorId:'fake-user',members:[{id:'fake-user',role:'admin',active:false}],
@@ -51,6 +61,7 @@ test('Aucun rôle admin n’est attribué sans preuve serveur',()=>{
 test('Une seule page connexion est visible dans le site principal',()=>{
   const login=read('chantier.html'),index=read('index.html'),pliage=read('pliage.html'),boutique=read('boutique.html');
   assert.match(login,/Connexion équipe — Les Revêtements MIR/);
+  assert.doesNotMatch(login,/class="demo-banner"|class="demo-controls"|id="demo-reset"/);
   for(const html of [index,pliage,boutique]) assert.match(html,/href="chantier\.html"[^>]*>Connexion équipe/);
 });
 test('Le portail verrouillé ne propose aucun lien de démo',()=>{
