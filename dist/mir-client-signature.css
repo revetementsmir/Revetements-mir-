@@ -196,6 +196,18 @@ body.mir-signature :is(.portfolio-footnote,.footer-small){
     max-width:100%;
   }
 }
+/* Mobile : les liens principaux restent tous visibles sans glissement horizontal. */
+@media(max-width:760px){
+  body.mir-signature .site-header.mir-client-header nav.mir-client-links,
+  body.mir-signature header.header.mir-client-header nav.mir-client-links,
+  body.mir-signature header.portal-header.mir-client-header nav.mir-client-links{
+    flex-wrap:wrap!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    justify-content:flex-start!important;
+    gap:10px 18px!important;
+  }
+}
 @media(prefers-reduced-motion:reduce){
   body.mir-signature *,body.mir-signature *::before,body.mir-signature *::after{
     transition-duration:0s!important;
