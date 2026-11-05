@@ -45,6 +45,8 @@ jobs:
           node --check tests/mir-atelier-v4-browser.cjs
           node --check dist/production-admin-v4.js
           node --check dist/mir-procurement.js
+          node --check dist/mir-workshop-reset.js
+          node --check tests/mir-workshop-reset-browser.cjs
           node --check dist/custom-model-cards.js
           node --check tests/mir-pliage-audit-browser.cjs
           node --check dist/portal-client.js
@@ -52,6 +54,7 @@ jobs:
           node --check tests/mir-portal-login.cjs
           node tests/mir-portal-login.cjs
           node tests/mir-procurement.cjs
+          node tests/mir-workshop-reset.cjs
           node --check tests/mir-pliage-audit-commercial.cjs
           node tests/mir-pliage-audit-commercial.cjs
           node --check dist/plan-import.js
@@ -121,6 +124,7 @@ jobs:
           node tests/mir-drawing-pan-browser.cjs
           node tests/mir-atelier-v4-browser.cjs
           node tests/mir-pliage-audit-browser.cjs
+          node tests/mir-workshop-reset-browser.cjs
           node tests/mir-studio-wall-sections-browser.cjs
           node tests/mir-balcony-browser.cjs
           node tests/mir-studio-terrain-browser.cjs
@@ -138,6 +142,7 @@ jobs:
             artifacts/mir-realisations-*.png
             artifacts/mir-miniatures-*.png
             artifacts/mir-direct-po-*.png
+            artifacts/mir-reset-*.png
             artifacts/mir-pan-*.png
             artifacts/mir-retours-*.png
             artifacts/mir-studio-wall-parts-*.png
@@ -266,6 +271,10 @@ jobs:
           grep -F 'body.mir-admin-v4 .kind-bar' /tmp/mir-admin-v4.css
           fetch "$base/mir-procurement.js" /tmp/mir-procurement.js
           grep -F 'mir_admin_procurement_v1' /tmp/mir-procurement.js
+          fetch "$base/vider-atelier.html" /tmp/mir-reset-page.html
+          grep -F 'Remettre mon atelier à zéro' /tmp/mir-reset-page.html
+          fetch "$base/mir-workshop-reset.js" /tmp/mir-reset-app.js
+          grep -F 'mir_production_templates_v1' /tmp/mir-reset-app.js
           fetch "$base/mir-procurement.css" /tmp/mir-procurement.css
           grep -F '#mir-procurement-tabs' /tmp/mir-procurement.css
           grep -F 'mir-procurement.js?v=2' /tmp/production.html
