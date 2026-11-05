@@ -55,7 +55,7 @@ async function ready(){
    assert.ok(post.mir_production_client_dossier_v1,'Le dossier client ne doit pas être supprimé');
    assert.equal(JSON.parse(post.mir_admin_procurement_v1).suppliers[0].name,'Fournisseur à conserver');
    await page.locator('#mir-reset-success .secondary-link').click();
-   await page.waitForSelector('#production-workflow',{timeout:25000});
+   await page.waitForSelector('#production-workflow',{state:'attached',timeout:25000});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version,{timeout:25000});
    await page.locator('#mir-procurement-tabs [data-mir-tab="models"]').click();
    await page.waitForSelector('#production-library');
