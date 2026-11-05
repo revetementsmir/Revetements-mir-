@@ -20,12 +20,13 @@ async function main(){
     return {mode:document.documentElement.classList.contains('mir-production-client'),
       color:getComputedStyle(document.documentElement).getPropertyValue('--green').trim(),
       bg:getComputedStyle(document.body).backgroundColor,
-      steps:!!steps&&getComputedStyle(steps).display!=='none',scroll:document.documentElement.scrollWidth,inner:innerWidth};
+      steps:!!steps&&getComputedStyle(steps).display!=='none',scroll:document.documentElement.scrollWidth,inner:innerWidth,
+      overflowers:[...document.querySelectorAll('body *')].filter(el=>{const box=el.getBoundingClientRect(),style=getComputedStyle(el);return style.display!=='none'&&style.visibility!=='hidden'&&box.width>0&&box.right>innerWidth+2}).slice(0,24).map(el=>({tag:el.tagName,cls:String(el.className||'').slice(0,95),id:el.id,right:Math.round(el.getBoundingClientRect().right),width:Math.round(el.getBoundingClientRect().width)}))};
    });
    assert.ok(result.mode&&result.steps,'Parcours client '+width);
    assert.equal(result.color,'#348511','Couleur MIR '+width);
    assert.equal(result.bg,'rgb(250, 250, 247)','Fond MIR '+width);
-   assert.ok(result.scroll<=result.inner+2,'Débordement client '+width+': '+result.scroll);
+   assert.ok(result.scroll<=result.inner+2,'Débordement client '+width+': '+result.scroll+' ; éléments: '+JSON.stringify(result.overflowers));
    if(width===390||width===1440||width===3440)await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-production-signature-'+width+'.png'),fullPage:true});
    await page.close();console.log('PASS Production client '+width+' px');
   }
