@@ -541,6 +541,29 @@
       }
     }
     for(const s of structures)addBox('structure-'+s.id,s.origin,s.size,s.type,s.color,{structureId:s.id,material:s.material,sourceStatus:s.sourceStatus,role:s.type==='column'?'vertical-post':'horizontal-beam'});
+    // Propositions géométriques des coins de finition depuis les arêtes du
+    // volume. Les angles présents n'établissent jamais que l'alu est installé.
+    const trim=options.cornerFinishes&&typeof options.cornerFinishes==='object'?options.cornerFinishes:null;
+    if(trim?.enabled===true){
+      const width=Math.max(.035,Math.min(.24,positive(trim.widthMeters,.08)));
+      const shade=cleanColor(trim.color,'#8d9690'),positions=[
+        [-a,-b],[-a,b],[a,-b],[a,b]
+      ];
+      if(recess.enabled&&recess.width>0&&recess.depth>0){
+        const L=-a+recess.start,R=L+recess.width,y=-b+recess.depth;
+        positions.push([L,-b],[R,-b],[L,y],[R,y]);
+      }
+      const used=new Set();
+      positions.forEach(([x,y],index)=>{
+        const code=Math.round(x*1000)+'-'+Math.round(y*1000);
+        if(used.has(code))return;used.add(code);
+        addBox('corner-trim-'+index,[x-width/2,y-width/2,0],[width,width,h],
+          'corner',shade,{role:'aluminum-corner-proposal',cornerIndex:index,
+            sourceStatus:'geometric-outer-edge-proposed-not-verified',
+            finishMetal:trim.metal||'aluminum',notCertifiedTakeoff:true});
+      });
+    }
+
     const steps=options.concreteSteps&&typeof options.concreteSteps==='object'?options.concreteSteps:null;
     if(steps?.enabled===true){
       const count=Math.max(1,Math.min(12,Math.round(positive(steps.count,4))));
@@ -719,7 +742,7 @@
       code:'TEXTURE_MODEL_WIDTH_MISMATCH',view,message:'Volume et élévation à recaler : la couvrance garde l’échelle du dessin.',
       ...info,toleranceRelative:TEXTURE_WIDTH_TOLERANCE
     }));
-    const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,column:4,beam:4,concrete:4};
+    const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,column:4,beam:4,concrete:4,corner:4};
     const visible = mesh.faces.filter(f=>dot(f.normal,camera)>.0001).map(f=>({...f,depth:f.poly.reduce((sum,p)=>sum+dot(p,camera),0)/f.poly.length})).sort((a,b)=>a.depth-b.depth || faceOrder[a.type]-faceOrder[b.type]);
 
     function paintWall(face) {
@@ -798,7 +821,7 @@
       if(face.type==='wall')paintWall(face);
       else if(face.type==='roof')paintRoof(face);
       else if(face.type==='soffit')paintSoffit(face);
-      else if(['column','beam','divider','balcony','concrete'].includes(face.type))paintSolid(face);
+      else if(['column','beam','divider','balcony','concrete','corner'].includes(face.type))paintSolid(face);
       else patch(face.poly,fascia);
       trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';ctx.stroke();
     }
