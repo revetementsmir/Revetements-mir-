@@ -369,6 +369,29 @@
     return promise;
   }
 
+
+  // Paysagement commercial purement illustratif. Il ne modifie aucun métré.
+  function commercialSitePlan(d,options={}){
+    if(options.siteStyle!=='commercial')return null;
+    const a=d.width/2,b=d.depth/2,z=0;
+    const rect=(x0,y0,x1,y1)=>[[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]];
+    const xl=-a-2.0,xr=a+2.0,front=-b-7.5,walk=-b-1.65,back=-b-.35;
+    const surfaces=[
+      {id:'terrain-gazon',poly:rect(xl-1,front-1.2,xr+1,b+1.2),color:'#b6c8a5'},
+      {id:'stationnement-asphalte',poly:rect(xl,front,xr,walk),color:'#626869'},
+      {id:'entree-asphalte',poly:rect(xr-3.1,front-1.2,xr,walk),color:'#626869'},
+      {id:'trottoir',poly:rect(xl,walk,xr,back),color:'#d8d4cb'},
+      {id:'bordure',poly:rect(xl,walk-.17,xr,walk),color:'#aaa9a2'}
+    ];
+    const bays=Math.max(3,Math.min(7,Math.floor((xr-xl)/2.7)));
+    const lines=[];
+    for(let i=0;i<=bays;i++){const x=xl+(xr-xl)*i/bays;lines.push({id:'case-'+i,from:[x,front+.5,z+.02],to:[x,walk-.29,z+.02],width:.044,color:'#f5f5e9'});}
+    for(let x=xl+2.4;x<xr;x+=2.4)lines.push({id:'joint-'+x,from:[x,walk,z+.02],to:[x,back,z+.02],width:.015,color:'#acaeaa'});
+    const plants=[{point:[xl-.5,walk-.5,z],radius:.38},{point:[xr+.5,walk-.5,z],radius:.38}];
+    return {surfaces,lines,plants,parkingBayCount:bays,noVehicles:true,
+      sourceStatus:'illustrative-commercial-landscape-unmeasured',notCertifiedTakeoff:true};
+  }
+
   function build(d, options) {
     const faces = [], a = d.width / 2, b = d.depth / 2, h = d.wallHeight, rise = d.roofRise;
     const foundationDrop = positive(options.foundationDrop, 0), ground = -foundationDrop;
@@ -514,6 +537,17 @@
       }
     }
     for(const s of structures)addBox('structure-'+s.id,s.origin,s.size,s.type,s.color,{structureId:s.id,material:s.material,sourceStatus:s.sourceStatus,role:s.type==='column'?'vertical-post':'horizontal-beam'});
+    const steps=options.concreteSteps&&typeof options.concreteSteps==='object'?options.concreteSteps:null;
+    if(steps?.enabled===true){
+      const count=Math.max(1,Math.min(12,Math.round(positive(steps.count,4))));
+      const width=Math.max(.8,Math.min(4,positive(steps.width,1.8)));
+      const tread=Math.max(.22,Math.min(.55,positive(steps.tread,.30)));
+      const riser=Math.max(.09,Math.min(.22,positive(steps.riser,.16)));
+      const landing=-b-(porch.enabled?porch.projection:.35)-.07;
+      for(let i=0;i<count;i++)addBox('concrete-stair-'+(i+1),
+        [-width/2,landing-(count-i)*tread,0],[width,tread,(i+1)*riser],
+        'concrete','#b7b8b3',{role:'concrete-step',sourceStatus:'proposition-a-valider-sur-le-PDF',notCertifiedTakeoff:true});
+    }
     return { faces, a, b, e, top, ground, foundationDrop, dimensions:d, roofStyle, recess, footprint, porch, structures,
       sourcePlan:typeof options.sourcePlan==='string'?options.sourcePlan:roofStyle==='duplex'&&recess.enabled?'rez-de-chaussée, page 5 / A-7':'caller-supplied working geometry'};
   }
@@ -625,16 +659,18 @@
     const mesh = build(d, options);
     const angle = Number.isFinite(Number(options.angle)) ? Number(options.angle) : 32;
     const requestedElevation=options.elevation??options.cameraElevation;
-    const elevationDegrees=Number.isFinite(Number(requestedElevation))?Math.max(-20,Math.min(75,Number(requestedElevation))):22;
+    const elevationDegrees=Number.isFinite(Number(requestedElevation))?Math.max(5,Math.min(75,Number(requestedElevation))):22;
     const az = angle * PI / 180, elevation = elevationDegrees * PI / 180;
     const co = Math.cos(az), si = Math.sin(az), ce = Math.cos(elevation), se = Math.sin(elevation);
     const camera = [si * ce, -co * ce, se];
     const flat = p => [p[0] * co + p[1] * si, (p[0] * si - p[1] * co) * se - p[2] * ce];
-    const extent = mesh.faces.flatMap(f => f.poly).map(flat);
+    const site=commercialSitePlan(d,options);
+    const extent = mesh.faces.flatMap(f => f.poly).concat(site?site.surfaces.flatMap(p=>p.poly):[]).map(flat);
     const minX = Math.min(...extent.map(p=>p[0])), maxX = Math.max(...extent.map(p=>p[0]));
     const minY = Math.min(...extent.map(p=>p[1])), maxY = Math.max(...extent.map(p=>p[1]));
     const padX = Math.max(18, W * .065), padTop = Math.max(18, H * .08), padBottom = Math.max(24, H * .13);
-    const scale = Math.max(.001, Math.min((W - 2*padX)/(maxX-minX), (H-padTop-padBottom)/(maxY-minY)));
+    const zoom=Math.max(.7,Math.min(3.5,Number.isFinite(Number(options.zoom))?Number(options.zoom):1));
+    const scale = Math.max(.001, Math.min((W - 2*padX)/(maxX-minX), (H-padTop-padBottom)/(maxY-minY)))*zoom);
     const tx = W/2 - (minX+maxX)/2*scale;
     const ty = padTop + (H-padTop-padBottom-(maxY-minY)*scale)/2 - minY*scale;
     const project = p => { const q=flat(p); return [tx+q[0]*scale,ty+q[1]*scale]; };
@@ -648,6 +684,15 @@
     const floor = [[-mesh.a-.6,-mesh.b-.6,floorZ],[mesh.a+.9,-mesh.b-.6,floorZ],[mesh.a+.9,mesh.b+.85,floorZ],[-mesh.a-.6,mesh.b+.85,floorZ]];
     ctx.save(); ctx.shadowColor='rgba(28,37,29,.19)';ctx.shadowBlur=Math.max(12,scale*.55);ctx.shadowOffsetY=7;
     patch(floor,'rgba(62,73,55,.055)');ctx.restore();
+    if(site){
+      for(const surface of site.surfaces)patch(surface.poly,surface.color);
+      for(const seam of site.lines)line(seam.from,seam.to,seam.color,Math.max(.8,scale*seam.width));
+      for(const plant of site.plants){
+        const [sx,sy]=project(plant.point);
+        ctx.beginPath();ctx.ellipse(sx,sy,Math.max(3,scale*plant.radius),Math.max(2,scale*plant.radius*.48),0,0,PI*2);
+        ctx.fillStyle='#799c74';ctx.fill();ctx.strokeStyle='#4b704c';ctx.lineWidth=.8;ctx.stroke();
+      }
+    }
     const fascia = cleanColor(options.fasciaColor, '#303735');
     const soffit = cleanColor(options.soffitColor, '#d8dbd1');
     const roofColor=cleanColor(options.roofColor,'#505658');
@@ -664,7 +709,7 @@
       code:'TEXTURE_MODEL_WIDTH_MISMATCH',view,message:'Volume et élévation à recaler : la couvrance garde l’échelle du dessin.',
       ...info,toleranceRelative:TEXTURE_WIDTH_TOLERANCE
     }));
-    const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,column:4,beam:4};
+    const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,column:4,beam:4,concrete:4};
     const visible = mesh.faces.filter(f=>dot(f.normal,camera)>.0001).map(f=>({...f,depth:f.poly.reduce((sum,p)=>sum+dot(p,camera),0)/f.poly.length})).sort((a,b)=>a.depth-b.depth || faceOrder[a.type]-faceOrder[b.type]);
 
     function paintWall(face) {
@@ -685,6 +730,21 @@
         const iw=item.image.naturalWidth || item.image.width, ih=item.image.naturalHeight || item.image.height;
         ctx.save();ctx.transform((B[0]-A[0])/iw,(B[1]-A[1])/iw,(C[0]-A[0])/ih,(C[1]-A[1])/ih,A[0],A[1]);
         ctx.drawImage(item.image,0,0,iw,ih);ctx.restore();
+      }
+      if(face.role==='recess-return'&&options.returnMasonry?.heightMeters>0){
+        const height=Math.min(d.wallHeight,Number(options.returnMasonry.heightMeters)),w=face.width;
+        if(height>0&&w>0){
+          // Même altitude physique et joints que le soubassement frontal.
+          // Surimpression géométrique : la brique reste visible même si
+          // la texture SVG du petit retour n'est pas chargée.
+          patch([local(face,0,0),local(face,w,0),local(face,w,height),local(face,0,height)],
+            cleanColor(options.returnMasonry.color,'#ab9383'));
+          for(let row=0,z=.075;z<height;row++,z+=.075){
+            line(local(face,0,z),local(face,w,z),'rgba(70,53,42,.46)',.7);
+            for(let u=(row%2)*.14;u<w;u+=.28)
+              line(local(face,u,Math.max(0,z-.075)),local(face,u,z),'rgba(70,53,42,.42)',.65);
+          }
+        }
       }
       const shade = Math.max(0,.105 - dot(face.normal,[-.35,-.85,.4])*.07);
       trace(face.poly);ctx.fillStyle=`rgba(21,32,26,${shade})`;ctx.fill();ctx.restore();
@@ -728,7 +788,7 @@
       if(face.type==='wall')paintWall(face);
       else if(face.type==='roof')paintRoof(face);
       else if(face.type==='soffit')paintSoffit(face);
-      else if(['column','beam','divider','balcony'].includes(face.type))paintSolid(face);
+      else if(['column','beam','divider','balcony','concrete'].includes(face.type))paintSolid(face);
       else patch(face.poly,fascia);
       trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';ctx.stroke();
     }
@@ -751,7 +811,7 @@
       const layout=type==='roof'?roofCourses(face.poly,options.roofExposureIn):soffitCourses(face.poly,options.soffitCoverageIn);
       return {surfaceId:face.id,spacingMeters:layout.spacingMeters,lineCount:layout.segments.length,reason:layout.reason};
     });
-    return { rendered:true, renderId:token, angle,elevation:elevationDegrees,roofColor, ...geometrySummary(mesh), foundationDrop:mesh.foundationDrop, groundZ:mesh.ground, soffitVisualization:soffitType, missingViews:['front','right','back','left'].filter(key=>!images[key]), visibleFaces:visible.map(f=>f.id), hitSurfaces:state.hitSurfaces,textureWorldHeights, textureBounds, textureScales,textureScaleWarnings,coveringLayouts:{roof:coveringLayouts('roof'),soffit:coveringLayouts('soffit')},errors };
+    return { rendered:true, renderId:token, angle,elevation:elevationDegrees,zoom,siteStyle:site?'commercial':'none',sitePlan:site?{parkingBayCount:site.parkingBayCount,sourceStatus:site.sourceStatus,noVehicles:true}:null,returnMasonry:options.returnMasonry||null,roofColor, ...geometrySummary(mesh), foundationDrop:mesh.foundationDrop, groundZ:mesh.ground, soffitVisualization:soffitType, missingViews:['front','right','back','left'].filter(key=>!images[key]), visibleFaces:visible.map(f=>f.id), hitSurfaces:state.hitSurfaces,textureWorldHeights, textureBounds, textureScales,textureScaleWarnings,coveringLayouts:{roof:coveringLayouts('roof'),soffit:coveringLayouts('soffit')},errors };
   }
 
   async function render(canvas, options = {}) {
@@ -793,5 +853,5 @@
     if(state.frame)global.cancelAnimationFrame(state.frame);states.delete(canvas);
   }
 
-  global.MIR3D=Object.freeze({render,dispose,geometry,mesh:exportMesh,pick,projectPoint,roofCourses,soffitCourses,studyDefaults,studyStructureDefaults,version:'1.7.0',defaults:DEFAULTS,recessDefaults:RECESS_DEFAULTS,porchDefaults:PORCH_DEFAULTS});
+  global.MIR3D=Object.freeze({render,dispose,geometry,mesh:exportMesh,pick,projectPoint,roofCourses,soffitCourses,commercialSitePlan,studyDefaults,studyStructureDefaults,version:'1.8.0',defaults:DEFAULTS,recessDefaults:RECESS_DEFAULTS,porchDefaults:PORCH_DEFAULTS});
 })(window);

@@ -54,6 +54,8 @@ jobs:
           node --check dist/plan-structure-notes.js
           node --check tests/mir-structure-hints.cjs
           node tests/mir-structure-hints.cjs
+          node --check tests/mir-studio-grounds.cjs
+          node tests/mir-studio-grounds.cjs
           node tests/mir-pages-regressions.cjs
           node tests/mir-atelier-v4.cjs
           node tests/mir-miniatures.cjs

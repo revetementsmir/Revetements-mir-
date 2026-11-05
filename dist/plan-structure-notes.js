@@ -9,7 +9,8 @@
  const patterns=[
   ['column',/\b(?:poteaux?|colonnes?|piliers?|posts?|columns?)\b/g],
   ['beam',/\b(?:poutres?|beams?|linteaux?)\b/g],
-  ['balcony',/\b(?:balcons?|galeries?|porches?|perrons?|terrasses?|balconies?)\b/g]
+  ['balcony',/\b(?:balcons?|galeries?|porches?|perrons?|terrasses?|balconies?)\b/g],
+  ['stairs',/\b(?:marches?|escaliers?|emmarchements?|steps?|stairs?)\b/g]
  ];
  function detect(words=[],pageText=''){
   const found=[],seen=new Set();
@@ -19,6 +20,7 @@
    const key=type+'|'+(okay?box.map(n=>Math.round(n/12)).join(':'):normal(label).slice(0,70));
    if(seen.has(key))return;seen.add(key);
    found.push({type,label:String(label).trim().slice(0,110),box:okay?box.slice():null,
+    concreteMaterialHint:type==='stairs'?/\b(?:beton|concrete?|conc\.?|ciment)\b/.test(normal(label)):false,
     source:source==='ocr'?'ocr':source==='pdf-text'?'pdf-text':'page-text',
     status:'text-hint-location-to-confirm',needsReview:true,structuralVerification:false});
   }
@@ -48,5 +50,5 @@
    return cx>=x&&cx<=x+w&&cy>=y&&cy<=y+h;
   });
  }
- return Object.freeze({detect,withinCrop,version:'1.0.0'});
+ return Object.freeze({detect,withinCrop,version:'1.1.0'});
 });
