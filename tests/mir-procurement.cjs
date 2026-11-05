@@ -6,7 +6,7 @@ const P=require('../dist/mir-procurement.js');
 const M=require('../dist/production-model.js');
 let n=0;
 function test(name,fn){fn();n++;console.log('PASS '+name);}
-const sampleSpec={kind:'profile',template:'l',unit:'in',dimensions:{A:3,B:2},length:120,quantity:2,material:{type:'acier',gauge:'26'},finish:{name:'Noir',manufacturer:'Test'},coloredFace:{side:'left',segmentId:'A'}};
+const sampleSpec={kind:'profile',template:'l',unit:'in',dimensions:{A:3,B:2},length:120,quantity:2,material:{type:'acier',gauge:'26'},finish:{name:'Noir',manufacturer:'Test',code:'NOIR-TEST'},coloredFace:{side:'left',segmentId:'A'}};
 const dossier={id:'DOS-TEST',poNumber:'PO-2026-1',project:'Chantier de test',items:[{id:'M001',kind:'profile',spec:sampleSpec}]};
 const form={poNumber:'PO-2026-TEST',job:'Chantier fictif',shipTo:'123 rue Test, Québec',foreman:'Responsable',requestedDate:'2026-11-20',terms:'Sur compte',notes:''};
 function supplier(){return {...P.seed()[0],verified:true};}
