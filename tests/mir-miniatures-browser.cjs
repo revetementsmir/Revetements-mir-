@@ -57,6 +57,9 @@ async function online(){
    assert.ok(Math.abs(info.geometry.cx-60)<3&&Math.abs(info.geometry.cy-60)<3,name+' décentré '+JSON.stringify(info));
    const metrics=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
    assert.ok(metrics.scroll<=metrics.viewport+2,name+' débordement horizontal '+JSON.stringify(metrics));
+   const heightRow=await row.evaluate(el=>el.getBoundingClientRect().height);
+   if(width>600)assert.ok(heightRow<250,name+' carte trop haute '+heightRow);
+   await page.addStyleTag({content:'#production-toast{display:none!important}'});
    await row.screenshot({path:path.join(artifact,'mir-miniatures-'+name+'.png')});
    await row.locator('[data-rename-piece]').click();
    await row.locator('[data-rename-form] input[name="name"]').fill('Fascia façade arrière');
