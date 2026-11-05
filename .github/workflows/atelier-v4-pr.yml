@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'dist/production*'
+      - 'tests/mir-retours-cotes*.cjs'
       - 'dist/mir-miniature.js'
       - 'dist/custom-model-cards*'
       - 'dist/boutique.html'
@@ -30,6 +31,8 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check dist/production-model.js
+          node --check tests/mir-retours-cotes.cjs
+          node --check tests/mir-retours-cotes-browser.cjs
           node --check dist/production-app.js
           node --check dist/mir-miniature.js
           node --check tests/mir-miniatures.cjs
@@ -48,6 +51,7 @@ jobs:
         run: |
           node tests/mir-atelier-v4.cjs
           node tests/mir-miniatures.cjs
+          node tests/mir-retours-cotes.cjs
       - name: Responsive real-browser QA (Chrome)
         run: |
           npm install --no-save playwright@1.58.2
@@ -55,6 +59,7 @@ jobs:
           node tests/mir-kaycan-flat-preview.cjs
           node tests/mir-moulure-renaming-browser.cjs
           node tests/mir-miniatures-browser.cjs
+          node tests/mir-retours-cotes-browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -64,4 +69,5 @@ jobs:
             artifacts/kaycan-fix-*.png
             artifacts/mir-rename-*.png
             artifacts/mir-miniatures-*.png
+            artifacts/mir-retours-*.png
           if-no-files-found: ignore
