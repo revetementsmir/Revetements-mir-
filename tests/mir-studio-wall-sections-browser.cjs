@@ -1,5 +1,5 @@
 'use strict';
-/* MIR — vérification Chrome des 3 surfaces 2D à leur Z réel. */
+/* MIR — vérification Chrome des deux retours 2D à leur Z réel. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {spawn}=require('node:child_process'),{chromium}=require('playwright');
@@ -38,10 +38,10 @@ async function online(){
    console.log('STUDIO DIAGNOSTIC '+screen.name+' '+JSON.stringify(diagnostic));
    await page.locator('#elevation svg[data-mir-three-wall-explode="true"]').waitFor({timeout:6000});
    const svg=page.locator('#elevation svg');
-   assert.equal(await svg.locator('[data-mir-wall-part]').count(),3);
-   assert.equal(await svg.locator('[data-mir-masonry-band]').count(),3);
-   assert.equal(await svg.locator('[data-mir-wall-opening]').count(),4,'Les ouvertures du mur du fond doivent rester visibles');
-   for(const name of ['return-left','front','return-right']){
+   assert.equal(await svg.locator('[data-mir-wall-part]').count(),2);
+   assert.equal(await svg.locator('[data-mir-masonry-band]').count(),2);
+   assert.equal(await svg.locator('[data-mir-wall-opening]').count(),0,'Les ouvertures déjà visibles de face ne sont pas reprises');
+   for(const name of ['return-left','return-right']){
     assert.equal(await svg.locator('[data-mir-wall-part="'+name+'"]').count(),1);
    }
    const view=await svg.evaluate(node=>{
@@ -53,24 +53,24 @@ async function online(){
     }));
     return {viewBox:[vb.x,vb.y,vb.width,vb.height],parts};
    });
-   if(screen.width>650)assert.ok(view.viewBox[2]>1500,'Desktop should show three detached walls beside the house');
-   else assert.ok(await svg.getAttribute('data-mir-walls-view-box'),'Mobile should offer the focused three-wall view');
-   assert.equal(view.parts.length,3);
+   if(screen.width>650)assert.ok(view.viewBox[2]>1500,'Bureau : les retours sont affichés à côté de la maison');
+   else assert.ok(await svg.getAttribute('data-mir-walls-view-box'),'Téléphone : la vue recadre les retours');
+   assert.equal(view.parts.length,2);
    assert.ok(view.parts.every(part=>Math.abs(part.top-6.2611)<.005),JSON.stringify(view.parts));
    const baseZ=view.parts.map(part=>part.bottom);
    assert.ok(Math.max(...baseZ)-Math.min(...baseZ)<.001);
    await page.locator('#stage').screenshot({path:path.join(artifact,'mir-studio-wall-parts-'+screen.name+'.png')});
    if(screen.width<=650){
      const nav=page.locator('#mir-side-wall-scroll'),svgElement=page.locator('#elevation svg');
-     assert.equal(await nav.isVisible(),true,'Le bouton 3 murs doit être accessible sur téléphone');
+     assert.equal(await nav.isVisible(),true,'Le bouton des retours doit être accessible sur téléphone');
      const metrics=await page.evaluate(()=>({doc:document.documentElement.scrollWidth,view:innerWidth}));
      assert.ok(metrics.doc<=metrics.view+2,'Aucun débordement horizontal de page '+JSON.stringify(metrics));
      const home=await svgElement.getAttribute('viewBox');
      assert.equal(home,await svgElement.getAttribute('data-mir-home-view-box'));
      await nav.click();
      const detail=await svgElement.getAttribute('viewBox');
-     assert.notEqual(detail,home,'Le bouton doit recadrer la vue sur les trois murs');
-     assert.ok(Number(detail.split(' ')[2])<Number(home.split(' ')[2]),'La vue des trois murs doit être agrandie');
+     assert.notEqual(detail,home,'Le bouton doit recadrer la vue sur les retours');
+     assert.ok(Number(detail.split(' ')[2])<Number(home.split(' ')[2]),'La vue des retours doit être agrandie');
      assert.equal(await nav.textContent(),'← Voir la maison');
      await page.locator('#stage').screenshot({path:path.join(artifact,'mir-studio-wall-parts-mobile-details.png')});
      await nav.click();
@@ -78,7 +78,7 @@ async function online(){
    }
    await page.locator('[data-face="left"]').click();
    await page.locator('#elevation svg[data-mir-three-wall-explode="true"]').waitFor();
-   assert.equal(await page.locator('#elevation [data-mir-wall-part]').count(),3);
+   assert.equal(await page.locator('#elevation [data-mir-wall-part]').count(),2);
    await page.locator('[data-face="front"]').click();
    assert.equal(await page.locator('#elevation [data-mir-wall-part]').count(),0);
    // Never change geometry or supplier choices when toggling detached views.
@@ -92,7 +92,7 @@ async function online(){
    await page.locator('[data-face="right"]').click();
    assert.deepEqual(await stable(),saved,'Les surfaces détachées ne doivent pas modifier les matières, le volume ou les zones.');
    assert.deepEqual(errors,[]);
-   console.log('PASS '+screen.name+': trois murs réels et maçonnerie à la même altitude, façade originale intacte');
+   console.log('PASS '+screen.name+': deux retours réels et maçonnerie à la même altitude, façade originale intacte');
    await page.close();
   }
  } finally {if(browser)await browser.close();server.kill();}

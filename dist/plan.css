@@ -111,3 +111,17 @@ html.mir-stage-locked,body.mir-stage-locked{overflow:hidden!important}
 #mir-stairs-toggle{background:#fffefaeb;color:#21362a;border:1px solid #bfcabc;border-radius:6px;padding:9px 11px;min-height:42px;font:700 12px/1.25 Arial,sans-serif;pointer-events:auto}
 #mir-stairs-toggle[aria-pressed=true]{background:#e4f0e0;border-color:#719670}
 @media(max-width:700px){#mir-stairs-toggle{font-size:11px;padding:7px 9px}}
+.mir-jump-controls{display:none}
+@media(max-width:800px){
+  .mir-jump-controls{display:flex;min-height:44px;align-items:center;justify-content:space-between;padding:8px 16px;background:#eef3e8;border-block:1px solid #d1ddca;color:#243c2b;font-size:13px;font-weight:650}
+  #studio-controls{scroll-margin-top:12px}
+  .drawing-column .part-nav button,.view-toolbar button,.display-toolbar button,.edit-toolbar button{min-height:44px}
+  .view-toolbar button,.display-toolbar button{min-width:44px}
+  .zone-controls select,.finish-content select{min-height:44px}
+}
+
+/* Les consignes du dessin restent lisibles sur un toit ou un terrain sombre. */
+#stage-title,#stage-subtitle,.stage-bottom>span{
+  width:fit-content;padding:4px 7px;border-radius:4px;
+  color:#263d2e;background:#fffffff2;
+}

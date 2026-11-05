@@ -24,8 +24,30 @@ for(const m of profilec){
 assert.ok(byId('profilec-la-muralys').applications.includes('siding'));
 assert.ok(byId('profilec-la-capitale').applications.includes('roofing'));
 assert.ok(byId('profilec-lancestra').applications.includes('roofing'));
+const masonry=c.filter(m=>m.applications.includes('masonry'));
+const surface=require('../dist/material-surface.js'),coverage=require('../dist/material-coverage.js');
+assert.equal(masonry.filter(m=>m.name.startsWith('Brique')).length,3);
+assert.equal(masonry.filter(m=>m.name.startsWith('Pierre')).length,3);
+const layouts=new Set();
+for(const material of masonry){
+ assert.equal(material.status,'visualization_only');
+ assert.equal(material.commercialStatus,'not_for_sale');
+ assert.equal(material.colors.length,0);
+ assert.ok(material.previewColors.length>=5);
+ assert.equal(new Set(material.previewColors.map(c=>c.id)).size,material.previewColors.length);
+ assert.equal(new Set(material.previewColors.map(c=>c.hex)).size,material.previewColors.length);
+ assert.ok(material.previewColors.every(c=>/^#[0-9a-f]{6}$/i.test(c.hex)));
+ assert.equal(coverage.coverageSpec(material).complete,false);
+ const pattern=color=>surface.patternDef({id:'preview',material,choice:{color},feetPerPixel:.031,anchorY:13});
+ const drawing=pattern('#98644e');
+ assert.match(drawing,/data-scale-status="illustrative"/);
+ assert.notEqual(drawing,pattern('#8b8c84'));
+ layouts.add([...drawing.matchAll(/<polygon points="([^"]+)"/g)].map(m=>m[1]).join(' '));
+}
+assert.ok([...layouts].every(Boolean));
+assert.equal(layouts.size,masonry.length,'Chaque profil possède son propre dessin de joints');
 const app=src('plan-app.js'),html=src('plan.html');
 assert.ok(app.includes('V.breaks(')&&app.includes('V.battens('));
 assert.ok(app.includes('data-mir-auto-transition')&&app.includes('data-mir-batten-spacing'));
 assert.ok(html.includes('id="batten-spacing"')&&html.includes('mir-vertical-layout.js'));
-console.log('MIR nouvelles matières : '+c.length+' fiches, '+profilec.length+' Profilec, 3 produits verticaux réglés et rendu activé');
+console.log('MIR nouvelles matières : '+c.length+' fiches, '+profilec.length+' Profilec, 3 produits verticaux et '+masonry.length+' styles de maçonnerie illustratifs');

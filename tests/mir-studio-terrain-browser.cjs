@@ -41,7 +41,7 @@ async function ready(){for(let i=0;i<70;i++){
    const first=await page.evaluate(()=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas")));
    assert.equal(first.siteStyle,'commercial','Terrain commercial absent : '+width);
    assert.ok(first.sitePlan?.parkingBayCount>=3);
-   assert.ok(first.returnMasonry?.heightMeters>0.5,'Brick return drawing not enabled');
+   assert.ok(first.returnMasonry?.bottomMeters>.4&&first.returnMasonry?.topMeters>1.4,'Le soubassement reprend les deux altitudes de la façade');
    assert.ok(first.elevation>=5);
    await page.locator('#mir-zoom-in').click();
    await page.waitForFunction(()=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas"))?.zoom>=1.24);
@@ -80,13 +80,15 @@ async function ready(){for(let i=0;i<70;i++){
   await page.waitForFunction(()=>window.MIR3D?.render&&window.MIR3D?.studyDefaults);
   const pixels=await page.evaluate(async()=>{
     const E=window.MIR3D,s=E.studyDefaults(),base={...s,dimensions:E.defaults,views:{},angle:23,elevation:24,exportSize:{width:960,height:660},siteStyle:'none'};
-    async function render(v){let c=document.createElement('canvas'),result=await E.render(c,{...base,returnMasonry:v});return {c,result};}
-    const a=await render(null),b=await render({heightMeters:1.0,color:'#9a806c'});
-    const x=a.c.getContext('2d').getImageData(0,0,960,660).data,y=b.c.getContext('2d').getImageData(0,0,960,660).data;
-    let delta=0;for(let i=0;i<x.length;i+=4)if(Math.abs(x[i]-y[i])+Math.abs(x[i+1]-y[i+1])+Math.abs(x[i+2]-y[i+2])>15)delta++;
-    return delta;
+    const v={heightMeters:1.0,bottomMeters:.5,topMeters:1.5,color:'#9a806c'};
+    const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 2000" width="200" height="2000" data-meters-per-unit="0.003048"><rect width="200" height="2000" fill="#6e7469"/><rect y="1508" width="200" height="328" fill="#ee00aa"/></svg>';
+    const views={'return-left':svg,'return-right':svg};
+    async function render(masonry,views){const c=document.createElement('canvas');await E.render(c,{...base,views,returnMasonry:masonry});return c.getContext('2d').getImageData(0,0,960,660).data;}
+    const delta=(a,b)=>{let n=0;for(let i=0;i<a.length;i+=4)if(Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])+Math.abs(a[i+2]-b[i+2])>15)n++;return n;};
+    return {fallback:delta(await render(null,{}),await render(v,{})),overpaint:delta(await render(null,views),await render(v,views))};
   });
-  assert.ok(pixels>60,'Brick on return walls must change visible pixels: '+pixels);
-  console.log('PASS Brique réelle sur les petits murs de retrait, pixels modifiés : '+pixels);
+  assert.ok(pixels.fallback>60,'Un retour sans texture reçoit la couleur de repli : '+JSON.stringify(pixels));
+  assert.equal(pixels.overpaint,0,'Le rendu SVG chargé conserve la vraie pierre ou brique : '+JSON.stringify(pixels));
+  console.log('PASS Texture de maçonnerie conservée et repli sans texture vérifié');
  }finally{if(browser)await browser.close();server.kill();}
 })().catch(e=>{console.error(e.stack||e);process.exitCode=1;});

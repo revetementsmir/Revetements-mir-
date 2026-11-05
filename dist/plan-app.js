@@ -55,7 +55,7 @@
 
   $('#import-pdf').onclick=()=>window.MIRPlanImport?.open?window.MIRPlanImport.open({onImport:()=>location.reload()}):null;
   try {
-    const responses = await Promise.all([fetch('plan-data.json'),fetch('catalogue-fd6866b49d21.json'),fetch('takeoff-data.json')]);
+    const responses = await Promise.all([fetch('plan-data.json'),fetch('catalogue-fd6866b49d21.json?v=maconnerie-1'),fetch('takeoff-data.json')]);
     if(responses.some(r=>!r.ok)) throw Error('Chargement indisponible');
     [data, {materials}, takeoffSeed] = await Promise.all(responses.map(r=>r.json()));
     activeProject=await window.MIRProjectStore?.getActive();
@@ -128,7 +128,8 @@
       state.openingStyles[k]={...openingAppearance(face(),o),...patch};
     });
   }
-  const colorsFor=m=>(m?.colors||[]).filter(c=>c&&typeof c==='object'&&c.id&&c.name);
+  const hasPreviewPalette=m=>m?.status==='visualization_only'&&Array.isArray(m.previewColors);
+  const colorsFor=m=>((hasPreviewPalette(m)?m.previewColors:m?.colors)||[]).filter(c=>c&&typeof c==='object'&&c.id&&c.name);
   const patternsFor=m=>Array.isArray(m?.allowedPatterns)?m.allowedPatterns:[];
   const orientationsFor=m=>Array.isArray(m?.allowedOrientations)?m.allowedOrientations:[];
   function officialColor(m,old={}){
@@ -136,8 +137,9 @@
     const hadChoice=['colorId','colorName','color'].some(k=>Object.prototype.hasOwnProperty.call(old,k))||old.colorSelectionStatus==='unassigned';
     // Only a documented identifier for this product can carry an existing finish.
     // A fresh MIR proposal may use its first swatch; a stale choice is never replaced.
-    const color=matched||(!hadChoice?colors[0]:null),sample=swatchImages.get(color?.swatchUrl);
-    return {colorId:color?.id||null,colorName:color?.name||null,colorSelectionStatus:color?'documented':'unassigned',color:validHex(color?.hex||'')?color.hex:sample?.displayHex||NEUTRAL,colorSwatchUrl:color?.swatchUrl||null,colorValueSource:validHex(color?.hex||'')?'official_hex':sample?.displayHex?'sampled_official_swatch_for_display':'neutral_placeholder',brand:m?.brand||null};
+    const illustrative=hasPreviewPalette(m);
+    const color=matched||(illustrative||!hadChoice?colors[0]:null),sample=swatchImages.get(color?.swatchUrl);
+    return {colorId:color?.id||null,colorName:color?.name||null,colorSelectionStatus:color?(illustrative?'illustrative':'documented'):'unassigned',color:validHex(color?.hex||'')?color.hex:sample?.displayHex||NEUTRAL,colorSwatchUrl:color?.swatchUrl||null,colorValueSource:validHex(color?.hex||'')?(illustrative?'illustrative_hex':'official_hex'):sample?.displayHex?'sampled_official_swatch_for_display':'neutral_placeholder',brand:m?.brand||null};
   }
   function normalChoice(raw={},fallback){
     const m=materialById.get(raw.materialId)||materialById.get(fallback)||facadeMaterials[0];
@@ -307,7 +309,8 @@
     }
     let content=texture?'':`<ellipse cx="${vb[0]+vb[2]/2}" cy="${vb[1]+vb[3]-38}" rx="${vb[2]*.45}" ry="12" fill="#2430240b"/>`;
     if(!texture&&f.sourceImage)content+=`<image href="${esc(f.sourceImage)}" x="${f.sourceImageBox?.[0]||0}" y="${f.sourceImageBox?.[1]||0}" width="${f.sourceImageBox?.[2]||f.sourceWidth||f.bbox[2]}" height="${f.sourceImageBox?.[3]||f.sourceHeight||f.bbox[3]}" opacity=".45" preserveAspectRatio="none"/>`;
-    content+=poly(f.roof,`fill="url(#${prefix}roof)" stroke="#485244" stroke-width="2"`)+poly(f.base,`fill="${monochrome?'#fff':'#d7d7cc'}" stroke="#9ca594" stroke-width="2"`);
+    if(!texture)content+=poly(f.roof,`fill="url(#${prefix}roof)" stroke="#485244" stroke-width="2"`);
+    content+=poly(f.base,`fill="${monochrome?'#fff':'#d7d7cc'}" stroke="#9ca594" stroke-width="2"`);
     for(const z of zones){
       const [a,b]=ancestorClips(z,zones,prefix),target=z.decorationType==='opening-trim'?`data-opening="${esc(z.sourceOpeningId)}"`:`data-zone="${esc(z.sourceZoneId||z.id)}"`;
       const select=interactive?`class="paint-zone" ${target} role="button" tabindex="0" aria-label="${esc(z.name)}"`:'';
@@ -368,7 +371,7 @@
       }
       if(lines)content+=a+`<g mask="url(#${prefix}mask-${esc(z.id)})">${lines}</g>`+b;
     }
-    if(f.extraRoof)content+=poly(f.extraRoof,`fill="url(#${prefix}roof)" stroke="#46503f" stroke-width="2"`);
+    if(!texture&&f.extraRoof)content+=poly(f.extraRoof,`fill="url(#${prefix}roof)" stroke="#46503f" stroke-width="2"`);
     // The stored soffit paths locate undersides; they are not vertical faces.
     // Thick strokes here painted a false strip onto the wall in orthographic
     // elevations and their SVG/PDF exports. Soffit finishes remain on the real
@@ -432,6 +435,16 @@
     return {...textureCache.views,...(studioFeatures?.returnViews(patternDef)||{})};
   }
 
+  function frontMasonryBand(f,dim){
+    const visual=facadeVisuals.get(f.key);
+    const zones=allZones(f).map(zone=>{
+      const material=materialById.get(choice(f,zone).materialId);
+      return {...zone,kind:material?.applications.includes('masonry')?'masonry':'siding'};
+    });
+    const source={...f,zones,textureBox:visual?.box||f.textureBox};
+    return window.MIRStudioWallParts?.masonryBand(source,dim,{feetPerPixel:feetPerPixel(f),fitWall:!!visual});
+  }
+
   // Vues de côté 2D : afficher côte à côte les deux retours et le mur du
   // fond de l'entrée, avec les Z du même volume que la vue 3D. Import PDF
   // et facades non concernées conservent exactement leur vue actuelle.
@@ -441,11 +454,11 @@
     try{
       const front=data.faces.find(row=>row.key==='front');
       const dim=state.volumeOverride||data.dimensions;
-      const band=parts.masonryBand(front,dim);
+      const band=front&&frontMasonryBand(front,dim);
       const mesh=window.MIR3D.mesh({dimensions:data.dimensions,...sceneGeometry(),foundationDrop:.8});
       const scale=parts.sideScale(f,dim.wallHeight);
       if(!scale)return plain;
-      const masonry=front?.zones.find(z=>z.kind==='masonry');
+      const masonry=band&&allZones(front).find(z=>z.id===band.sourceZoneId);
       const masonrySelection=band&&masonry?choice(front,masonry):null;
       let brickPattern='';
       if(masonrySelection){
@@ -455,14 +468,12 @@
         const z={id:'mir-exploded-brick',polygon:[[0,0],[100,0],[100,100],[0,100]]};
         brickPattern=patternDef('mir-exploded-brick',masonrySelection,source,z,false);
       }
-      const middle=front?.zones.find(z=>z.id==='centre_RDC');
       const colors={
-        front:middle?choice(front,middle).color:'#5a665e',
         'return-left':studioFeatures.returnChoice('return-left').color,
         'return-right':studioFeatures.returnChoice('return-right').color
       };
       const rendered=parts.explodeSideSVG(plain,{sideFace:f,dimensions:dim,mesh,
-        brickBand:band,brickPattern,colors,frontFace:front});
+        brickBand:band,brickPattern,colors});
       return rendered?.svg||plain;
     }catch(error){
       // Une élévation 2D existante ne disparaît jamais si une surface manque.
@@ -500,14 +511,14 @@
     } else sideView.classList.remove('mir-studio-detached-side');
     if(sideButton){
       sideButton.hidden=!homeViewBox||!detachedViewBox;
-      sideButton.textContent='Voir les 3 murs →';
+      sideButton.textContent='Voir les retours →';
       let showingWalls=false;
       sideButton.onclick=()=>{
         const svg=sideView.querySelector('svg[data-mir-three-wall-explode="true"]');
         if(!svg||!homeViewBox||!detachedViewBox)return;
         showingWalls=!showingWalls;
         svg.setAttribute('viewBox',(showingWalls?detachedViewBox:homeViewBox).join(' '));
-        sideButton.textContent=showingWalls?'← Voir la maison':'Voir les 3 murs →';
+        sideButton.textContent=showingWalls?'← Voir la maison':'Voir les retours →';
       };
     }
     $('#stage-title').textContent=state.view==='3d'?'VOTRE PROJET / VUE 360°':`${f.page?String(f.page).padStart(2,'0')+' / ':''}ÉLÉVATION ${f.name.toLocaleUpperCase('fr')}`;
@@ -705,6 +716,13 @@
       const cs=colorsFor(m),chosen=cs.find(v=>v.id===c.colorId);$('#color-name').textContent=c.colorName||'Choisissez un fini';if(chosen?.swatchUrl&&!/lisse|smooth/i.test(`${m.finish||''} ${m.name||''}`))$('#material-sample').style.backgroundImage=`url("${chosen.swatchUrl.replace(/"/g,'%22')}")`;
       $('#zone-colors').innerHTML=cs.map(color=>`<button class="product-swatch" data-color-id="${esc(color.id)}" aria-pressed="${color.id===c.colorId}" title="${esc(color.name)}"><i class="${validHex(color.hex||'')?'':'no-swatch'}" ${validHex(color.hex||'')?`style="background:${color.hex}"`:''}>${color.swatchUrl?`<img src="${esc(color.swatchUrl)}" alt="" loading="lazy" width="20" height="20">`:''}</i><span>${esc(color.name)}</span></button>`).join('');
       $('#color-note').textContent=cs.length&&!chosen?'Aucun fini fabricant n’est attribué à cette zone. Choisissez un échantillon ci-dessus ; une ancienne teinte d’étude ne constitue pas une référence produit.':!cs.length?'Nuancier exact à associer. Aperçu neutre, sans couleur commerciale inventée.':chosen?.assetKind==='manufacturer_material_sphere'?'Échantillon fabricant présenté en volume dans le nuancier. Le dessin utilise un motif de profil et une teinte approximative ; la sphère n’est pas répétée comme une texture plane.':swatchImages.has(chosen?.swatchUrl)&&m.family==='Fibrociment'?(/lisse|smooth/i.test(`${m.finish||''} ${m.name||''}`)?'Fini lisse : couleur issue du nuancier, sans grain ajouté. L’échantillon physique reste la référence.':`Grain issu de l’échantillon officiel. Relief, grain et éclairage illustratifs; validez le fini sur un échantillon physique.`):swatchImages.has(chosen?.swatchUrl)?'Teinte issue de l’échantillon officiel. Les espacements suivent la couvrance documentée; l’aspect de surface reste illustratif.':!validHex(chosen?.hex||'')?'Fini nommé dans les ressources du fabricant. Image locale indisponible : aperçu neutre sur le dessin ; consultez le nuancier et l’échantillon.':'Couleur numérique documentée. L’écran ne remplace pas l’échantillon physique.';
+      $('#zone-colors').previousElementSibling.querySelector('label').textContent=hasPreviewPalette(m)?'Teintes d’aperçu':'Fini du fabricant';
+      if(hasPreviewPalette(m)){
+        $('#color-note').textContent='Teintes et motifs d’aperçu. Choisissez une référence fournisseur pour la commande.';
+        const id='mir-masonry-sample',def=window.MIRMaterialSurface.patternDef({id,material:m,choice:c,bounds:[0,0,150,72]});
+        const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 72"><defs>'+def+'</defs><rect width="150" height="72" fill="url(#'+id+')"/></svg>';
+        $('#material-sample').style.backgroundImage='url("data:image/svg+xml,'+encodeURIComponent(svg)+'")';
+      }
       if(m.colorStatus==='collection_only')$('#color-note').textContent+=' Association à ce profil et disponibilité à confirmer.';
       const link=chosen?.sourceUrl||m.colorSourceUrl||m.sourceUrl;$('#color-source').hidden=!link;if(link)$('#color-source').href=link;
       const patterns=patternsFor(m),orientations=orientationsFor(m);$('#pattern').innerHTML=patterns.length?patterns.map(v=>`<option value="${esc(v)}">${esc(patternNames[v]||v)}</option>`).join(''):'<option value="plain">Aspect non spécifié</option>';$('#pattern').value=c.pattern;$('#pattern').disabled=patterns.length<=1;
@@ -757,7 +775,7 @@
     const docs=m.documents.map(d=>`<a class="document-link" href="${esc(d.url)}" target="_blank" rel="noopener"><span class="document-badge">${esc(kinds[d.kind]||d.kind)} · ${d.scope==='resource-center'?'Centre de ressources':d.scope==='product'?'Produit':'Gamme / système'}</span><strong>${esc(d.title)} ↗</strong><span>${d.verified?'Source officielle consultée.':'Lien officiel repéré; ouverture du document à vérifier.'} ${esc(d.note||'')}</span></a>`).join('');
     const missing=['technical','installation'].filter(kind=>!m.documents.some(d=>d.kind===kind&&d.exactProductMatch!==false));
     const colors=m.colors||[];
-    $('#material-detail').innerHTML=`<div class="doc-intro"><h2 id="doc-title">${esc(m.name)}</h2><p>${esc(m.description)}</p>${m.sourceUrl?`<a href="${esc(m.sourceUrl)}" target="_blank" rel="noopener">Consulter la page officielle ↗</a>`:''}</div><section class="doc-section"><h3>Format & application</h3><dl><dt>Famille</dt><dd>${esc(m.family)}</dd>${m.manufacturerCode?`<dt>Code fabricant</dt><dd>${esc(m.manufacturerCode)}</dd>`:''}${dimensions}<dt>Unité</dt><dd>${esc(m.unit||'À confirmer')}</dd>${m.exposureMm?`<dt>Exposition indiquée</dt><dd>${new Intl.NumberFormat('fr-CA',{maximumFractionDigits:2}).format(m.exposureMm)} mm</dd>`:''}${m.soffitType?`<dt>Ventilation</dt><dd>${m.soffitType==='vented'?'Ventilé':m.soffitType==='solid'?'Plein':m.soffitType==='concealed'?'Ventilation dissimulée':'À confirmer pour cette référence'}</dd>`:''}</dl><p>La disponibilité, le prix, l’unité de vente MIR et les conditions du chantier restent à confirmer.</p></section><section class="doc-section"><h3>Documentation du matériau</h3>${docs||'<p class="doc-missing">Brique générique de visualisation : aucun document fabricant associé. Une référence commerciale précise sera nécessaire pour spécifier ou acheter la maçonnerie.</p>'}${missing.length&&m.id!=='generic-brick-preview'?`<p class="doc-missing">À compléter : ${missing.map(k=>kinds[k].toLocaleLowerCase('fr')).join(', ')} pour cette référence exacte.</p>`:''}</section><section class="doc-section"><h3>Palette & finition</h3>${colors.length?`<div class="doc-colors">${colors.map(c=>`<span>${esc(typeof c==='string'?c:c.name)}${c.code?` · ${esc(c.code)}`:''}</span>`).join('')}</div><p>Finitions issues des ressources du fabricant. Association exacte au profil et disponibilité locale à confirmer; une image de nuancier ne constitue pas une valeur colorimétrique.</p>`:'<p>Le nuancier exact de cette référence reste à associer. Le dessin conserve un aperçu neutre tant qu’aucune couleur numérique documentée n’est associée.</p>'}<p>Les couleurs à l’écran ne remplacent pas un échantillon physique.</p></section>${m.notes?.length?`<section class="doc-section"><h3>Points à vérifier</h3><ul>${m.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul></section>`:''}`;
+    $('#material-detail').innerHTML=`<div class="doc-intro"><h2 id="doc-title">${esc(m.name)}</h2><p>${esc(m.description)}</p>${m.sourceUrl?`<a href="${esc(m.sourceUrl)}" target="_blank" rel="noopener">Consulter la page officielle ↗</a>`:''}</div><section class="doc-section"><h3>Format & application</h3><dl><dt>Famille</dt><dd>${esc(m.family)}</dd>${m.manufacturerCode?`<dt>Code fabricant</dt><dd>${esc(m.manufacturerCode)}</dd>`:''}${dimensions}<dt>Unité</dt><dd>${esc(m.unit||'À confirmer')}</dd>${m.exposureMm?`<dt>Exposition indiquée</dt><dd>${new Intl.NumberFormat('fr-CA',{maximumFractionDigits:2}).format(m.exposureMm)} mm</dd>`:''}${m.soffitType?`<dt>Ventilation</dt><dd>${m.soffitType==='vented'?'Ventilé':m.soffitType==='solid'?'Plein':m.soffitType==='concealed'?'Ventilation dissimulée':'À confirmer pour cette référence'}</dd>`:''}</dl><p>La disponibilité, le prix, l’unité de vente MIR et les conditions du chantier restent à confirmer.</p></section><section class="doc-section"><h3>Documentation du matériau</h3>${docs||'<p class="doc-missing">Maçonnerie d’aperçu. Choisissez une référence fournisseur pour spécifier ou acheter le produit.</p>'}${missing.length&&!hasPreviewPalette(m)?`<p class="doc-missing">À compléter : ${missing.map(k=>kinds[k].toLocaleLowerCase('fr')).join(', ')} pour cette référence exacte.</p>`:''}</section><section class="doc-section"><h3>Palette & finition</h3>${colors.length?`<div class="doc-colors">${colors.map(c=>`<span>${esc(typeof c==='string'?c:c.name)}${c.code?` · ${esc(c.code)}`:''}</span>`).join('')}</div><p>Finitions issues des ressources du fabricant. Association exacte au profil et disponibilité locale à confirmer; une image de nuancier ne constitue pas une valeur colorimétrique.</p>`:'<p>Le nuancier exact de cette référence reste à associer. Le dessin conserve un aperçu neutre tant qu’aucune couleur numérique documentée n’est associée.</p>'}<p>Les couleurs à l’écran ne remplacent pas un échantillon physique.</p></section>${m.notes?.length?`<section class="doc-section"><h3>Points à vérifier</h3><ul>${m.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul></section>`:''}`;
     if(!$('#material-dialog').open)$('#material-dialog').showModal();
   }
   function makeAccent(poly){
@@ -1030,8 +1048,8 @@
   });}
   $('#export-svg').onclick=()=>{exportFile(`MIR_${state.face}_etude.svg`,'image/svg+xml',facadeSVG(face(),{export:true,annotated:state.displayMode==='atelier'}));toast('Vue SVG exportée · échelles et contours à calibrer.');};
   $('#export-pdf').onclick=async()=>{if(!window.MIRPDF?.exportPlan)return toast('L’export PDF n’a pas chargé. Rechargez la page.');const button=$('#export-pdf');button.disabled=true;button.textContent='Préparation du PDF…';try{await window.MIRPDF.exportPlan({title:'MIR · étude des quatre élévations',subtitle:'Choix fabricants, calepinage et estimations à calibrer — sans valeur de construction',filename:'MIR_Etude_annotee_4_elevations.pdf',faces:exportFaces()});toast('PDF des quatre élévations préparé avec les choix et annotations actuels.');}catch(e){toast('Le PDF n’a pas pu être créé : '+String(e.message||e));}finally{button.disabled=false;button.textContent='PDF des 4 élévations ↗';}};
-  $('#export-project').onclick=()=>{const result={...clone(state),project:data.title||'MIR · étude',exportedAt:new Date().toISOString(),sourceSha256:data.sourceSha256,...sceneGeometry(),disclaimer:'Choix d’étude et estimations à calibrer. Finitions documentées, images de nuanciers officiels si disponibles ; teintes moyennes calculées pour le rendu 3D, sans valeur colorimétrique officielle. Quantités à valider avant commande.',facades:data.faces.map(f=>({face:f.key,zones:allZones(f).map(z=>({...z,selection:choice(f,z)})),openings:allOpenings(f)})),soffit:materialById.get(state.soffitId),fascia:materialById.get(state.fasciaId)};exportFile('MIR_choix_du_projet.json','application/json',JSON.stringify(result,null,2));toast('Choix, joints, contours et géométrie exportés.');};
-  const sharedFields=['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','openingStyles','panelLayouts','transitions','manualTransitionModes','panelStockRotation','soffitId','soffitColorId','soffitColor','fasciaId','fasciaColorId','fasciaColor','roofId','roofColorId','roofColor','roofStyle','porch','structures','concreteSteps','siteStyle','returnFinishes','volumeOverride','recessOverride'];
+  $('#export-project').onclick=()=>{const result={...clone(state),project:data.title||'MIR · étude',exportedAt:new Date().toISOString(),sourceSha256:data.sourceSha256,...sceneGeometry(),disclaimer:'Choix d’étude et estimations à calibrer. Finitions documentées quand une référence fabricant est indiquée. Maçonneries génériques et teintes numériques utilisées pour la visualisation. Quantités à valider avant commande.',facades:data.faces.map(f=>({face:f.key,zones:allZones(f).map(z=>({...z,selection:choice(f,z)})),openings:allOpenings(f)})),soffit:materialById.get(state.soffitId),fascia:materialById.get(state.fasciaId)};exportFile('MIR_choix_du_projet.json','application/json',JSON.stringify(result,null,2));toast('Choix, joints, contours et géométrie exportés.');};
+  const sharedFields=['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','openingStyles','panelLayouts','transitions','manualTransitionModes','panelStockRotation','soffitId','soffitColorId','soffitColor','fasciaId','fasciaColorId','fasciaColor','roofId','roofColorId','roofColor','roofStyle','gableCornices','porch','structures','concreteSteps','siteStyle','returnFinishes','volumeOverride','recessOverride'];
   function syncStudy(){
     if((window.MIRProjectStore?.activeId()||null)!==(activeProject?.id||null)){location.reload();return;}
     let incoming;try{incoming=JSON.parse(localStorage.getItem(STORAGE));}catch(_){return;}if(incoming?.version!==2)return;
@@ -1050,13 +1068,7 @@
   if(['2d','3d'].includes(incoming.searchParams.get('view')))state.view=incoming.searchParams.get('view');
   if(materialId&&facadeMaterials.some(m=>m.id===materialId)){ensureSelected();if(state.selected.kind!=='zone')state.selected={kind:'zone',id:allZones(face())[0]?.id||null};state.selections[key(state.face,state.selected.id)]=normalChoice({materialId});incoming.searchParams.delete('material');window.history.replaceState(null,'',incoming.pathname+incoming.search+incoming.hash);}
   window.MIR_STUDY={snapshot:()=>clone({face:state.face,view:state.view,displayMode:state.displayMode,alignWindow:state.alignWindow!==false,selected:state.selected,zoneCount:allZones(face()).length,openingCount:allOpenings(face()).length,soffitId:state.soffitId,soffitColor:state.soffitColor,fasciaId:state.fasciaId,fasciaColor:state.fasciaColor,choices:state.selections,bands:state.bands,openingTrims:state.openingTrims,panelLayouts:state.panelLayouts,transitions:state.transitions,...sceneGeometry(),paintOrder:orderedZones(decoratedFace(face()).zones).map(z=>z.id)}),exportFaces,pickThree,embedded,swatches:{loaded:swatchImages.size,missing:missingSwatchCount},source:data.analysis};
-  studioFeatures=window.MIRStudioFeatures?.setup({$,state:()=>state,data:()=>data,materials,roofControls:!adminContext,modify,save,render,renderDrawing,officialColor,colorsFor,openMaterial,toast,normalChoice,choice,allZones,face,currentZone,feetPerPixel,readTakeoff,takeoffSeed,sceneGeometryBase,sceneGeometry,patternDef,threeViews,facadeSVG,renderBrief:()=>{
-    const lines=['Créer une visualisation architecturale photoréaliste à partir de la vue jointe. Conserver strictement les volumes, ouvertures, toiture, porche, poutres et colonnes du plan. Ne pas inventer de fenêtres ni de dimensions.','Toiture : '+(materialById.get(state.roofId)?.brand||'')+' '+(materialById.get(state.roofId)?.name||'à confirmer')+' · '+(colorsFor(materialById.get(state.roofId)).find(c=>c.id===state.roofColorId)?.name||'à confirmer')];
-    for(const f of data.faces)for(const z of allZones(f)){const c=choice(f,z),m=materialById.get(c.materialId);lines.push(f.name+' / '+z.name+' : '+m.brand+' '+m.name+' · '+(c.colorName||'fini à confirmer')+' · '+(c.orientation||'pose à confirmer'));}
-    for(const k of ['soffit','fascia']){const m=materialById.get(state[k+'Id']);lines.push(k+' : '+(m?.brand||'')+' '+(m?.name||'')+' · '+(colorsFor(m).find(c=>c.id===state[k+'ColorId'])?.name||'à confirmer'));}
-    for(const o of state.structures||[])lines.push((o.label||o.type)+' : '+(materialById.get(o.finishMaterialId)?.brand||'habillage à confirmer')+' · '+(colorsFor(materialById.get(o.finishMaterialId)).find(c=>c.id===o.colorId)?.name||'teinte à confirmer'));
-    lines.push('Respecter les échantillons physiques; le rendu généré est illustratif et ne sert pas aux mesures.');return lines.join('\n');
-  }});
+  studioFeatures=window.MIRStudioFeatures?.setup({$,state:()=>state,data:()=>data,materials,roofControls:!adminContext,modify,save,render,renderDrawing,officialColor,colorsFor,openMaterial,toast,normalChoice,choice,allZones,face,currentZone,feetPerPixel,readTakeoff,takeoffSeed,sceneGeometryBase,patternDef,frontMasonryBand});
   $('#duplicate-zone').onclick=()=>{const z=currentZone();if(!z)return toast('Choisissez une zone à reproduire.');const b=bounds(z.polygon),dx=(b[2]-b[0])*.05,dy=(b[3]-b[1])*.05,id=newId('copie');modify(()=>{const copyZone={...clone(z),id,name:z.name+' · copie',parent:z.parent||z.id,custom:true,polygon:z.polygon.map(([x,y])=>[x+dx,y+dy])};state.customZones[state.face].push(copyZone);state.selections[key(state.face,id)]=normalChoice(choice(face(),z));if(state.panelLayouts[key(state.face,z.id)])state.panelLayouts[key(state.face,id)]=clone(state.panelLayouts[key(state.face,z.id)]);state.selected={kind:'zone',id};state.view='2d';});$('#geometry-controls').open=true;toast('Zone reproduite avec sa matière. Ajustez sa position et sa taille.');};
   if(data.projectKind==='imported-pdf'&&!studioFeatures?.canRender())state.view='2d';
   save();render();

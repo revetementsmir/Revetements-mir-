@@ -8001,12 +8001,12 @@
     {
       "id": "generic-brick-preview",
       "brand": "Générique",
-      "name": "Brique — visualisation seulement",
+      "name": "Brique classique",
       "family": "Maçonnerie",
       "applications": [
         "masonry"
       ],
-      "description": "Aperçu de composition et de nuances de brique sans fabricant ni référence commerciale. Les couleurs sont génériques et ne représentent aucun nuancier officiel.",
+      "description": "Briques rectangulaires et joints décalés. Aperçu illustratif du Studio. Aucun fabricant ni produit commercial associé.",
       "sourceUrl": null,
       "documents": [],
       "colors": [],
@@ -8021,33 +8021,43 @@
       "colorSelectionIndependent": true,
       "previewColors": [
         {
+          "id": "rouge-argile",
           "name": "Rouge argile",
           "hex": "#98644e"
         },
         {
-          "name": "Sable pierre",
+          "id": "sable-pierre",
+          "name": "Sable",
           "hex": "#b5a58c"
         },
         {
+          "id": "gris-mineral",
           "name": "Gris minéral",
           "hex": "#8b8c84"
         },
         {
+          "id": "brun-profond",
           "name": "Brun profond",
           "hex": "#66594e"
+        },
+        {
+          "id": "charbon",
+          "name": "Charbon",
+          "hex": "#555550"
+        },
+        {
+          "id": "blanc-casse",
+          "name": "Blanc cassé",
+          "hex": "#d2cbb9"
         }
       ],
       "rendering": {
         "status": "hypothetical_visualization_only",
-        "assumedModuleMm": {
-          "length": 240,
-          "height": 75
-        },
-        "note": "Module graphique hypothétique; dimensions de produit, joints et couverture réelle non connus."
+        "masonryStyle": "brick-running",
+        "note": "Motif illustratif. Ne définit ni dimensions du produit, ni joints de pose, ni rendement."
       },
       "notes": [
-        "Aucun document fabricant, calcul de quantité ou promesse de disponibilité.",
-        "previewColors est générique; colors ne contient aucun fabricant."
+        "Les teintes et le motif sont illustratifs. Choisir une référence commerciale avant tout achat."
       ],
       "allowedPatterns": [
         "brick"
@@ -8058,11 +8068,375 @@
       "colorStatus": "visualization_only",
       "paletteComplete": false,
       "gaps": [],
-      "researchedOn": "2026-11-03",
       "images": [],
       "primaryImage": null,
       "imageStatus": "visualization_only",
-      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU"
+      "catalogueScope": "illustrative_preview"
+    },
+    {
+      "id": "generic-brick-long-preview",
+      "brand": "Générique",
+      "name": "Brique allongée",
+      "family": "Maçonnerie",
+      "applications": [
+        "masonry"
+      ],
+      "description": "Briques minces et longues, posées en rangées décalées. Aperçu illustratif du Studio. Aucun fabricant ni produit commercial associé.",
+      "sourceUrl": null,
+      "documents": [],
+      "colors": [],
+      "dimensions": {},
+      "coverage": null,
+      "unit": null,
+      "exposureMm": null,
+      "renderPattern": "brick",
+      "soffitType": null,
+      "status": "visualization_only",
+      "commercialStatus": "not_for_sale",
+      "colorSelectionIndependent": true,
+      "previewColors": [
+        {
+          "id": "rouge-cuivre",
+          "name": "Rouge cuivré",
+          "hex": "#a36e55"
+        },
+        {
+          "id": "terre-brulee",
+          "name": "Terre brûlée",
+          "hex": "#795e51"
+        },
+        {
+          "id": "sable-pierre",
+          "name": "Sable",
+          "hex": "#b5a58c"
+        },
+        {
+          "id": "gris-ardoise",
+          "name": "Gris ardoise",
+          "hex": "#696e73"
+        },
+        {
+          "id": "charbon",
+          "name": "Charbon",
+          "hex": "#555550"
+        },
+        {
+          "id": "blanc-casse",
+          "name": "Blanc cassé",
+          "hex": "#d2cbb9"
+        }
+      ],
+      "rendering": {
+        "status": "hypothetical_visualization_only",
+        "masonryStyle": "brick-long",
+        "note": "Motif illustratif. Ne définit ni dimensions du produit, ni joints de pose, ni rendement."
+      },
+      "notes": [
+        "Les teintes et le motif sont illustratifs. Choisir une référence commerciale avant tout achat."
+      ],
+      "allowedPatterns": [
+        "brick"
+      ],
+      "allowedOrientations": [],
+      "installationOrientationSource": null,
+      "maxPiece": {},
+      "colorStatus": "visualization_only",
+      "paletteComplete": false,
+      "gaps": [],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "visualization_only",
+      "catalogueScope": "illustrative_preview"
+    },
+    {
+      "id": "generic-brick-stack-preview",
+      "brand": "Générique",
+      "name": "Brique à joints alignés",
+      "family": "Maçonnerie",
+      "applications": [
+        "masonry"
+      ],
+      "description": "Briques en rangées à joints verticaux alignés. Aperçu illustratif du Studio. Aucun fabricant ni produit commercial associé.",
+      "sourceUrl": null,
+      "documents": [],
+      "colors": [],
+      "dimensions": {},
+      "coverage": null,
+      "unit": null,
+      "exposureMm": null,
+      "renderPattern": "brick",
+      "soffitType": null,
+      "status": "visualization_only",
+      "commercialStatus": "not_for_sale",
+      "colorSelectionIndependent": true,
+      "previewColors": [
+        {
+          "id": "blanc-casse",
+          "name": "Blanc cassé",
+          "hex": "#d2cbb9"
+        },
+        {
+          "id": "rouge-argile",
+          "name": "Rouge argile",
+          "hex": "#98644e"
+        },
+        {
+          "id": "gris-grege",
+          "name": "Grège",
+          "hex": "#a69a89"
+        },
+        {
+          "id": "gris-mineral",
+          "name": "Gris minéral",
+          "hex": "#8b8c84"
+        },
+        {
+          "id": "charbon",
+          "name": "Charbon",
+          "hex": "#555550"
+        }
+      ],
+      "rendering": {
+        "status": "hypothetical_visualization_only",
+        "masonryStyle": "brick-stack",
+        "note": "Motif illustratif. Ne définit ni dimensions du produit, ni joints de pose, ni rendement."
+      },
+      "notes": [
+        "Les teintes et le motif sont illustratifs. Choisir une référence commerciale avant tout achat."
+      ],
+      "allowedPatterns": [
+        "brick"
+      ],
+      "allowedOrientations": [],
+      "installationOrientationSource": null,
+      "maxPiece": {},
+      "colorStatus": "visualization_only",
+      "paletteComplete": false,
+      "gaps": [],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "visualization_only",
+      "catalogueScope": "illustrative_preview"
+    },
+    {
+      "id": "generic-stone-cut-preview",
+      "brand": "Générique",
+      "name": "Pierre de taille",
+      "family": "Maçonnerie",
+      "applications": [
+        "masonry"
+      ],
+      "description": "Blocs rectangulaires de tailles variées et joints réguliers. Aperçu illustratif du Studio. Aucun fabricant ni produit commercial associé.",
+      "sourceUrl": null,
+      "documents": [],
+      "colors": [],
+      "dimensions": {},
+      "coverage": null,
+      "unit": null,
+      "exposureMm": null,
+      "renderPattern": "brick",
+      "soffitType": null,
+      "status": "visualization_only",
+      "commercialStatus": "not_for_sale",
+      "colorSelectionIndependent": true,
+      "previewColors": [
+        {
+          "id": "calcaire",
+          "name": "Calcaire crème",
+          "hex": "#c9bda4"
+        },
+        {
+          "id": "sable-pierre",
+          "name": "Sable",
+          "hex": "#b5a58c"
+        },
+        {
+          "id": "gris-mineral",
+          "name": "Gris minéral",
+          "hex": "#8b8c84"
+        },
+        {
+          "id": "gris-grege",
+          "name": "Grège",
+          "hex": "#a69a89"
+        },
+        {
+          "id": "gris-ardoise",
+          "name": "Gris ardoise",
+          "hex": "#696e73"
+        },
+        {
+          "id": "charbon",
+          "name": "Charbon",
+          "hex": "#555550"
+        }
+      ],
+      "rendering": {
+        "status": "hypothetical_visualization_only",
+        "masonryStyle": "stone-cut",
+        "note": "Motif illustratif. Ne définit ni dimensions du produit, ni joints de pose, ni rendement."
+      },
+      "notes": [
+        "Les teintes et le motif sont illustratifs. Choisir une référence commerciale avant tout achat."
+      ],
+      "allowedPatterns": [
+        "brick"
+      ],
+      "allowedOrientations": [],
+      "installationOrientationSource": null,
+      "maxPiece": {},
+      "colorStatus": "visualization_only",
+      "paletteComplete": false,
+      "gaps": [],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "visualization_only",
+      "catalogueScope": "illustrative_preview"
+    },
+    {
+      "id": "generic-stone-ledgestone-preview",
+      "brand": "Générique",
+      "name": "Pierre empilée",
+      "family": "Maçonnerie",
+      "applications": [
+        "masonry"
+      ],
+      "description": "Petites pierres allongées en couches fines et irrégulières. Aperçu illustratif du Studio. Aucun fabricant ni produit commercial associé.",
+      "sourceUrl": null,
+      "documents": [],
+      "colors": [],
+      "dimensions": {},
+      "coverage": null,
+      "unit": null,
+      "exposureMm": null,
+      "renderPattern": "brick",
+      "soffitType": null,
+      "status": "visualization_only",
+      "commercialStatus": "not_for_sale",
+      "colorSelectionIndependent": true,
+      "previewColors": [
+        {
+          "id": "gris-ardoise",
+          "name": "Gris ardoise",
+          "hex": "#696e73"
+        },
+        {
+          "id": "charbon",
+          "name": "Charbon",
+          "hex": "#555550"
+        },
+        {
+          "id": "gris-mineral",
+          "name": "Gris minéral",
+          "hex": "#8b8c84"
+        },
+        {
+          "id": "calcaire",
+          "name": "Calcaire crème",
+          "hex": "#c9bda4"
+        },
+        {
+          "id": "gris-grege",
+          "name": "Grège",
+          "hex": "#a69a89"
+        },
+        {
+          "id": "terre-brulee",
+          "name": "Terre brûlée",
+          "hex": "#795e51"
+        }
+      ],
+      "rendering": {
+        "status": "hypothetical_visualization_only",
+        "masonryStyle": "stone-ledgestone",
+        "note": "Motif illustratif. Ne définit ni dimensions du produit, ni joints de pose, ni rendement."
+      },
+      "notes": [
+        "Les teintes et le motif sont illustratifs. Choisir une référence commerciale avant tout achat."
+      ],
+      "allowedPatterns": [
+        "brick"
+      ],
+      "allowedOrientations": [],
+      "installationOrientationSource": null,
+      "maxPiece": {},
+      "colorStatus": "visualization_only",
+      "paletteComplete": false,
+      "gaps": [],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "visualization_only",
+      "catalogueScope": "illustrative_preview"
+    },
+    {
+      "id": "generic-stone-field-preview",
+      "brand": "Générique",
+      "name": "Pierre des champs",
+      "family": "Maçonnerie",
+      "applications": [
+        "masonry"
+      ],
+      "description": "Pierres de formes et tailles irrégulières avec joints apparents. Aperçu illustratif du Studio. Aucun fabricant ni produit commercial associé.",
+      "sourceUrl": null,
+      "documents": [],
+      "colors": [],
+      "dimensions": {},
+      "coverage": null,
+      "unit": null,
+      "exposureMm": null,
+      "renderPattern": "brick",
+      "soffitType": null,
+      "status": "visualization_only",
+      "commercialStatus": "not_for_sale",
+      "colorSelectionIndependent": true,
+      "previewColors": [
+        {
+          "id": "sable-pierre",
+          "name": "Sable",
+          "hex": "#b5a58c"
+        },
+        {
+          "id": "calcaire",
+          "name": "Calcaire crème",
+          "hex": "#c9bda4"
+        },
+        {
+          "id": "gris-mineral",
+          "name": "Gris minéral",
+          "hex": "#8b8c84"
+        },
+        {
+          "id": "gris-ardoise",
+          "name": "Gris ardoise",
+          "hex": "#696e73"
+        },
+        {
+          "id": "terre-brulee",
+          "name": "Terre brûlée",
+          "hex": "#795e51"
+        }
+      ],
+      "rendering": {
+        "status": "hypothetical_visualization_only",
+        "masonryStyle": "stone-field",
+        "note": "Motif illustratif. Ne définit ni dimensions du produit, ni joints de pose, ni rendement."
+      },
+      "notes": [
+        "Les teintes et le motif sont illustratifs. Choisir une référence commerciale avant tout achat."
+      ],
+      "allowedPatterns": [
+        "brick"
+      ],
+      "allowedOrientations": [],
+      "installationOrientationSource": null,
+      "maxPiece": {},
+      "colorStatus": "visualization_only",
+      "paletteComplete": false,
+      "gaps": [],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "visualization_only",
+      "catalogueScope": "illustrative_preview"
     },
     {
       "id": "hardieplank-select-625",

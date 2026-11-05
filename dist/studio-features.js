@@ -15,7 +15,7 @@
     /acier|steel|vicwest/i.test(m.name+' '+m.family+' '+m.brand):
     metal==='aluminum'?/aluminium|aluminum|kaycan|gentek/i.test(m.name+' '+m.family+' '+m.brand):true);
   const siding=materials.filter(m=>m.applications.some(a=>['siding','masonry'].includes(a)));
-  let part='facade',returnId=state().selected?.kind==='return'&&state().selected.id==='return-right'?'return-right':'return-left',objectUrl=null;
+  let part='facade',returnId=state().selected?.kind==='return'&&state().selected.id==='return-right'?'return-right':'return-left';
   const study=!imported&&root.MIR3D?.studyDefaults?root.MIR3D.studyDefaults(data().dimensions):{};
   const copy=value=>JSON.parse(JSON.stringify(value));
   function ensureState(){
@@ -130,7 +130,7 @@
    finish.querySelector('.finish-divider').hidden=true;
    if(part==='roof'){
     const m=byId.get(state().roofId),cs=colorsFor(m),selected=cs.find(c=>c.id===state().roofColorId),rows=roofs.filter(r=>r.brand===m?.brand);
-    extra.innerHTML=`<div class="extra-panel roof-panel"><p class="eyebrow">LE BARDEAU</p><h2>Le toit qui complète votre façade.</h2><p>Choisissez votre fabricant, votre gamme et sa couleur.</p><label for="roof-brand">Fabricant du bardeau</label><select id="roof-brand">${roofBrands.map(brand=>`<option value="${esc(brand)}"${brand===m?.brand?' selected':''}>${esc(brand)}</option>`).join('')}</select><label for="roof-product">Gamme de bardeaux</label><select id="roof-product">${rows.map(r=>`<option value="${esc(r.id)}"${r.id===m?.id?' selected':''}>${esc(r.collection||r.name)}</option>`).join('')}</select><p class="roof-palette-label">${cs.length} couleurs de cette gamme</p>${choiceHTML(m,state().roofColorId,'data-roof-color')}<p class="roof-selection" role="status">${selected?`Couleur choisie : <strong>${esc(selected.name)}</strong>`:'Choisissez une couleur de cette gamme.'}</p><p class="small-note">${esc(m?.regionalAvailabilityNote||'Nuancier du fabricant. Disponibilité locale à confirmer.')} Le rendu à l’écran est indicatif; l’échantillon physique reste la référence.</p><button data-roof-docs class="small-link">Couleurs & documentation du fabricant ↗</button><p class="small-note roof-visualization-note">Choix visuel seulement, enregistré avec votre projet.</p></div>`;
+    extra.innerHTML=`<div class="extra-panel roof-panel"><p class="eyebrow">LE BARDEAU</p><h2>Le toit qui complète votre façade.</h2><p>Choisissez votre fabricant, votre gamme et sa couleur.</p><label for="roof-brand">Fabricant du bardeau</label><select id="roof-brand">${roofBrands.map(brand=>`<option value="${esc(brand)}"${brand===m?.brand?' selected':''}>${esc(brand)}</option>`).join('')}</select><label for="roof-product">Gamme de bardeaux</label><select id="roof-product">${rows.map(r=>`<option value="${esc(r.id)}"${r.id===m?.id?' selected':''}>${esc(r.collection||r.name)}</option>`).join('')}</select><p class="roof-palette-label">${cs.length} couleurs de cette gamme</p>${choiceHTML(m,state().roofColorId,'data-roof-color')}<p class="roof-selection" role="status">${selected?`Couleur choisie : <strong>${esc(selected.name)}</strong>`:'Choisissez une couleur de cette gamme.'}</p><p class="small-note">${esc(m?.regionalAvailabilityNote||'Nuancier du fabricant. Disponibilité locale à confirmer.')} Le rendu à l’écran est indicatif; l’échantillon physique reste la référence.</p><button data-roof-docs class="small-link">Couleurs & documentation du fabricant ↗</button><p class="small-note roof-visualization-note">Choix visuel seulement, enregistré avec votre projet.</p>${roofDetails()}</div>`;
    }else if(part==='structure')extra.innerHTML=structurePanel();
    else if(part==='corner'){
      const c=state().cornerFinishes,code=(data().structuralHints||[]).filter(h=>h.type==='corner').slice(0,8);
@@ -151,24 +151,48 @@
    const f=api.face(),cal=api.readTakeoff().calibrations?.[f.key]||api.takeoffSeed.calibrations?.[f.key];
    $('#project-scale').textContent=imported?(api.feetPerPixel(f)>0?`Échelle issue des cotes · ${f.name}`:`${f.name} · échelle non déterminée`):'Plan MIR · cotes de référence enregistrées';
    $('#dimension-note').textContent=data().dimensionNote||(imported?'Cotes du PDF · quantités à vérifier avant commande':'Étude MIR · dimensions de référence');
-   $('#export-render').disabled=!canRender()&&state().view==='3d';
+  }
+  const hardieAluminumMatches={
+   'hardie-beige-navajo':'431 Amande','hardie-gris-fer':'447 Gris cendre',
+   'hardie-ecorce':'4H1 Brun grange','hardie-blanc-arctique':'4H2 Blanc pur',
+   'hardie-taupe-monterey':'4H5 Sable du désert','hardie-gris-perle':'4H4 Gris pierre'
+  };
+  function upperFlashing(){
+   const s=state(),front=data().faces.find(f=>f.key==='front');
+   const upper=front&&api.allZones(front).find(z=>z.id==='centre_etage');
+   if(!s.porch?.enabled||byId.get(s.roofId)?.renderPattern!=='shingle'||!upper)return null;
+   const finish=api.choice(front,upper);
+   if(!finish.colorId||!/^#[0-9a-f]{6}$/i.test(finish.color))return null;
+   const match=byId.get(finish.materialId)?.brand==='James Hardie'?hardieAluminumMatches[finish.colorId]:null;
+   return {color:finish.color,match};
+  }
+  function roofDetails(){
+   const s=state(),flashing=upperFlashing();
+   const cornices=['gable','duplex'].includes(s.roofStyle)?'<div class="compact-actions"><button type="button" data-gable-cornices aria-pressed="'+(s.gableCornices===true)+'">'+
+     (s.gableCornices?'Retirer les corniches de pignon':'＋ Ajouter des corniches de pignon')+'</button></div>':'';
+   return cornices+
+     (flashing?.match?'<p class="small-note">Éloignement des eaux · Gentek aluminium 3037, '+esc(flashing.match)+
+       ' · <a href="https://www.gentek.ca/wp-content/uploads/sites/2/2023/08/Gentek-Product-Directory-FRE-Mars2026.pdf#page=63" target="_blank" rel="noopener">Table fabricant ↗</a></p>':
+       flashing?'<p class="small-note">Éloignement des eaux · aluminium assorti au revêtement supérieur dans l’aperçu. Teinte fournisseur à confirmer.</p>':'');
   }
   function threeOptions(){
    ensureState();
    const c=state(),rs={};for(const id of ['return-left','return-right'])rs[id]=returnChoice(id).color;
    const roof=C?.coverageSpec(byId.get(c.roofId)||{}),soffit=C?.coverageSpec(byId.get(c.soffitId)||{});
-   const front=data().faces.find(f=>f.key==='front'),masonry=front?.zones?.find(z=>z.kind==='masonry');
-   const band=root.MIRStudioWallParts?.masonryBand(front,dimensions());
-   const brick=band&&masonry?api.choice(front,masonry):null;
-   const returnMasonry=brick&&band?.heightMeters>0?{heightMeters:band.heightMeters,color:brick.color,sourceStatus:'same-front-masonry-Z-unverified'}:null;
-   return {zoom:c.cameraZoom,siteStyle:c.siteStyle,concreteSteps:c.concreteSteps,cornerFinishes:c.cornerFinishes,returnMasonry,roofColor:c.roofColor||'#4a4c4b',roofStyle:c.roofStyle,foundationDrop:data().detectedVolume?(data().detectedVolume.foundationDrop??0):.8,roofExposureIn:roof?.exposureIn||null,soffitCoverageIn:soffit?.pieceCoverageIn||soffit?.exposureIn||null,elevation:c.cameraElevation,porch:c.porch,structures:c.structures.map(o=>({...o,color:o.finishColorOverride|| (o.finishMaterialId?officialColor(byId.get(o.finishMaterialId),{colorId:o.colorId}).color:o.color||'#a9aaa7')})),dimensions:dimensions(),returnColors:rs};
+   const front=data().faces.find(f=>f.key==='front');
+   const band=front&&api.frontMasonryBand(front,dimensions());
+   const masonry=band&&api.allZones(front).find(z=>z.id===band.sourceZoneId);
+   const brick=masonry&&api.choice(front,masonry);
+   const returnMasonry=brick?{...band,color:brick.color,materialId:brick.materialId,sourceStatus:'same-front-masonry-Z-unverified'}:null;
+   return {zoom:c.cameraZoom,siteStyle:c.siteStyle,concreteSteps:c.concreteSteps,cornerFinishes:c.cornerFinishes,returnMasonry,gableCornices:c.gableCornices===true,waterDiverterColor:upperFlashing()?.color||null,roofColor:c.roofColor||'#4a4c4b',roofStyle:c.roofStyle,foundationDrop:data().detectedVolume?(data().detectedVolume.foundationDrop??0):.8,roofExposureIn:roof?.exposureIn||null,soffitCoverageIn:soffit?.pieceCoverageIn||soffit?.exposureIn||null,elevation:c.cameraElevation,porch:c.porch,structures:c.structures.map(o=>({...o,color:o.finishColorOverride|| (o.finishMaterialId?officialColor(byId.get(o.finishMaterialId),{colorId:o.colorId}).color:o.color||'#a9aaa7')})),dimensions:dimensions(),returnColors:rs};
   }
   function returnViews(patternDef){
    ensureState();
    const geo=api.sceneGeometryBase(),r=geo.recess;if(!r||r.enabled===false||!(r.depth>0&&r.height>0))return {};
-   const front=data().faces.find(f=>f.key==='front'),masonry=front?.zones?.find(z=>z.kind==='masonry');
-   const band=!imported?root.MIRStudioWallParts?.masonryBand(front,dimensions()):null;
-   const brickChoice=band&&masonry?api.choice(front,masonry):null;
+   const front=data().faces.find(f=>f.key==='front');
+   const band=front&&api.frontMasonryBand(front,dimensions());
+   const masonry=band&&api.allZones(front).find(z=>z.id===band.sourceZoneId);
+   const brickChoice=masonry&&api.choice(front,masonry);
    return Object.fromEntries(['return-left','return-right'].map(id=>{
     const c=returnChoice(id),m=byId.get(c.materialId),w=ft(r.depth)*100,h=ft(r.height)*100;
     // Each return is calibrated at 100 drawing units per foot. The bottom is
@@ -178,9 +202,10 @@
     const joints=grid?.complete?`<g data-panel-layout="product" data-format-id="${esc(grid.formatId)}" fill="none" stroke="#485044" stroke-width="2">${grid.vertical.map(j=>`<path d="M${j.coordinate} 0V${h}"/>`).join('')}${grid.horizontal.map(j=>`<path d="M0 ${j.coordinate}H${w}"/>`).join('')}</g>`:'';
     // Rétablir sur chaque retour la maçonnerie du soubassement frontal,
     // à la même altitude physique. Ne pas changer le matériau du mur au-dessus.
-    const bandH=band&&brickChoice?Math.max(0,Math.min(h,band.heightMeters/.003048)):0;
-    const bandTop=Math.max(0,h-bandH),brickId='return-masonry-'+id;
-    const zBrick={id:brickId,polygon:[[0,bandTop],[w,bandTop],[w,h],[0,h]]};
+    const bandTop=band&&brickChoice?Math.max(0,h-band.topMeters/.003048):h;
+    const bandBottom=band&&brickChoice?Math.min(h,h-band.bottomMeters/.003048):h;
+    const bandH=Math.max(0,bandBottom-bandTop),brickId='return-masonry-'+id;
+    const zBrick={id:brickId,polygon:[[0,bandTop],[w,bandTop],[w,bandBottom],[0,bandBottom]]};
     const brickDef=bandH>0?patternDef(brickId,brickChoice,f,zBrick,false):'';
     const brickOverlay=bandH>0?`<rect data-mir-continuous-masonry="${id}" x="0" y="${fmt(bandTop)}" width="${fmt(w)}" height="${fmt(bandH)}" fill="url(#${brickId})"/>`:'';
     return [id,`<svg xmlns="http://www.w3.org/2000/svg" data-meters-per-unit="0.003048" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}"><defs>${p}${brickDef}</defs><rect width="${w}" height="${h}" fill="url(#return-pattern-${id})"/>${joints}${brickOverlay}</svg>`];
@@ -257,17 +282,8 @@
   function openSource(){const available=data().faces.filter(f=>f.sourceImage||f.sourceImageDataUrl);if(!available.length){const box=modal('source-dialog','Le plan de référence',`<p>Étude issue du PDF MIR. Les pages anonymisées peuvent être ouvertes séparément.</p><a class="download-link" href="assets/MIR_Plan_anonymise_niveaux_de_gris.pdf" target="_blank" rel="noopener">Ouvrir le PDF de référence ↗</a>`);return;}
    const box=modal('source-dialog','Votre plan importé',`<div class="source-pages">${available.map(f=>`<button data-source-face="${f.key}">${esc(f.name)}</button>`).join('')}</div><img class="source-image" alt="Page du plan importé"><p id="source-scale-note"></p>`);function show(f){box.querySelector('img').src=f.sourceImage||f.sourceImageDataUrl;box.querySelectorAll('[data-source-face]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sourceFace===f.key));box.querySelector('#source-scale-note').textContent=f.calibrationStatus==='unresolved'?'Cotes insuffisantes ou ambiguës. Aucun métré fiable n’est calculé.':'Les cotes détectées sont conservées avec cette élévation.';}box.querySelectorAll('[data-source-face]').forEach(b=>b.onclick=()=>show(available.find(f=>f.key===b.dataset.sourceFace)));show(available.find(f=>f.key===state().face)||available[0]);
   }
-  async function exportRender(){
-   const button=$('#export-render');button.disabled=true;button.textContent='Création de votre aperçu…';const canvas=document.createElement('canvas');canvas.width=2200;canvas.height=1500;try{
-    if(state().view==='3d'){if(!canRender())throw Error('Complétez le volume ou choisissez le plan 2D.');const rendered=await root.MIR3D.render(canvas,{views:api.threeViews(),angle:state().rotation,...api.sceneGeometry(),...threeOptions(),exportSize:{width:2200,height:1500},fasciaColor:state().fasciaColor,soffitColor:state().soffitColor,soffitType:byId.get(state().soffitId)?.soffitType||'unknown',textureBottoms:Object.fromEntries(data().faces.map(f=>[f.key,f.textureBottom||0]))});if(!rendered?.rendered)throw Error('La vue 3D n’a pas pu être rendue.');}
-    else{const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(api.facadeSVG(api.face(),{export:true,annotated:false}));await img.decode();const ctx=canvas.getContext('2d');ctx.fillStyle='#f6f7f0';ctx.fillRect(0,0,canvas.width,canvas.height);const ratio=Math.min(2000/img.width,1250/img.height);ctx.drawImage(img,(2200-img.width*ratio)/2,(1500-img.height*ratio)/2,img.width*ratio,img.height*ratio);}
-    const ctx=canvas.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#294332';ctx.font='22px Arial';ctx.fillText('MIR · Aperçu de vos matières — rendu illustratif',45,canvas.height-36);
-    const blob=await new Promise((resolve,reject)=>canvas.toBlob(x=>x?resolve(x):reject(Error('Export image indisponible')),'image/png'));if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=URL.createObjectURL(blob);
-    const box=modal('render-dialog','Votre aperçu est prêt',`<img class="render-preview" src="${objectUrl}" alt="Aperçu de vos choix de matériaux"><p class="export-note">Cette image reprend les choix et la vue du studio. C’est un rendu illustratif, pas une photographie ni un plan de construction.</p><div class="dialog-actions"><a class="download-link" href="${objectUrl}" download="MIR_mon_apercu.png">Télécharger mon aperçu PNG ↓</a><button id="render-brief" class="primary">Préparer un rendu photoréaliste</button></div><div id="realistic-brief" hidden></div>`);
-    box.querySelector('#render-brief').onclick=()=>{const summary=api.renderBrief(),target=box.querySelector('#realistic-brief');target.hidden=false;target.innerHTML=`<p>Le dossier de rendu rassemble votre vue et les choix exacts. La génération photoréaliste depuis le site demande un service de rendu connecté; elle n’est pas active dans cet aperçu.</p><label for="render-prompt">Consignes de rendu</label><textarea id="render-prompt" rows="8" style="width:100%;padding:12px;font:12px/1.6 Arial">${esc(summary)}</textarea><p class="small-note">Une image générée peut modifier les formes et les teintes. Les mesures restent celles du plan et des cotes vérifiées.</p>`;};
-   }catch(e){toast('Aperçu non créé : '+e.message);}finally{root.MIR3D?.dispose?.(canvas);button.disabled=false;button.innerHTML='Créer mon aperçu HD <span>↗</span>';}
-  }
   $('#extra-controls').onclick=e=>{
+   if(roofControls&&e.target.closest('[data-gable-cornices]'))modify(()=>{state().gableCornices=state().gableCornices!==true;});
    const rc=e.target.closest('[data-roof-color]'),sc=e.target.closest('[data-structure-color]'),ret=e.target.closest('[data-return-color]'),add=e.target.closest('[data-add-structure]'),hint=e.target.closest('[data-add-hint]'),pixelStair=e.target.closest('[data-use-pixel-stair]'),sel=e.target.closest('[data-select-return]');
    if(rc&&roofControls&&colorsFor(byId.get(state().roofId)).some(c=>c.id===rc.dataset.roofColor)){const colorId=rc.dataset.roofColor;modify(()=>{state().roofColorId=colorId;normalizeRoof();});[...$('#extra-controls').querySelectorAll('[data-roof-color]')].find(b=>b.dataset.roofColor===colorId)?.focus({preventScroll:true});}
    if(sc){const o=currentStructure();if(o)modify(()=>{o.colorId=sc.dataset.structureColor;o.finishColorOverride=null;o.color=officialColor(byId.get(o.finishMaterialId),{colorId:o.colorId}).color;});}
@@ -326,8 +342,7 @@
   $('#project-menu').onclick=openProjects;$('#show-source').onclick=openSource;
   $('#import-pdf').onclick=()=>root.MIRPlanImport?.open?root.MIRPlanImport.open({onImport:()=>location.reload()}):toast('L’import PDF n’a pas chargé. Rechargez la page.');
   $('#orbit-left').onclick=()=>{state().rotation=(state().rotation-30+360)%360;save();renderDrawing();};$('#orbit-right').onclick=()=>{state().rotation=(state().rotation+30)%360;save();renderDrawing();};$('#orbit-under').onclick=()=>{state().cameraElevation=5;save();renderDrawing();toast('Caméra maintenue au niveau du sol.');};$('#orbit-reset').onclick=()=>{state().rotation=28;state().cameraElevation=22;state().cameraZoom=1;save();renderDrawing();};
-  $('#export-render').onclick=exportRender;
-  function handleHit(hit){if(hit.returnId){selectPart('return',hit.returnId);return true;}if(['roof','fascia','soffit'].includes(hit.type)){selectPart(hit.type);return true;}if(['beam','column'].includes(hit.type)){selectPart('structure',hit.structureId);return true;}
+  function handleHit(hit){if(hit.returnId){selectPart('return',hit.returnId);return true;}if(hit.type==='roof-detail'){selectPart('roof');return true;}if(['roof','fascia','soffit'].includes(hit.type)){selectPart(hit.type);return true;}if(['beam','column'].includes(hit.type)){selectPart('structure',hit.structureId);return true;}
    if(hit.type==='corner'||hit.role==='aluminum-corner-proposal'){selectPart('corner');return true;}return false;}
   return {renderUI,threeOptions,returnViews,handleHit,selectPart,canRender,returnChoice,dimensions,normalizeRoof,ensureState};
  }

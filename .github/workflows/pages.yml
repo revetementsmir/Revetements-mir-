@@ -204,7 +204,7 @@ jobs:
           fetch "$base/plan.html?verification=$GITHUB_SHA" /tmp/mir-plan-public.html
           cmp /tmp/mir-plan-public.html _site_mir/plan.html
           grep -F 'mir-client-header.css?v=1' /tmp/mir-plan-public.html
-          for asset in plan-import.js plan-stair-vision.js mir-vertical-layout.js plan-scan-ocr.js plan-sheet-detection.js plan-spatial-dimensions.js plan-facade-visual.js plan-app.js plan-3d.js plan.css plan-annotations.js plan-annotations.css; do
+          for asset in plan-import.js plan-stair-vision.js mir-vertical-layout.js plan-scan-ocr.js plan-sheet-detection.js plan-spatial-dimensions.js plan-facade-visual.js plan-app.js plan-3d.js plan.css plan-annotations.js plan-annotations.css studio-wall-sections.js studio-features.js material-surface.js catalogue-fd6866b49d21.json; do
             fetch "$base/$asset?verification=$GITHUB_SHA" "/tmp/mir-$asset"
             cmp "/tmp/mir-$asset" "_site_mir/$asset"
           done
@@ -294,7 +294,7 @@ jobs:
           grep -F 'event.shiftKey||outlineRightAngle' /tmp/calepinage-app.js
           grep -F 'A?.gableFromPitch?.(width,eave,leftPitch,rightPitch)' /tmp/calepinage-app.js
           grep -F 'E.setPanelSize(layout.config,axis' /tmp/calepinage-app.js
-          grep -F 'studio-wall-sections.js?v=1' /tmp/mir-plan-public.html
+          grep -F 'studio-wall-sections.js?v=' /tmp/mir-plan-public.html
           grep -F 'href="plan.css?v=' /tmp/mir-plan-public.html
           grep -F 'id="mir-side-wall-scroll"' /tmp/mir-plan-public.html
           fetch "$base/studio-wall-sections.js" /tmp/studio-wall-sections.js

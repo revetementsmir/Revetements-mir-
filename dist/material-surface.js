@@ -12,6 +12,57 @@
   const num = value => Number(Number(value).toFixed(5));
   const positive = value => typeof value === 'number' && Number.isFinite(value) && value > 0;
   const smooth = material => /lisse|smooth/i.test(`${material?.finish || ''} ${material?.name || ''}`);
+  const modulo = (value,period) => ((value%period)+period)%period;
+  // Tile coordinates are drawing units: the preview has no product dimensions
+  // or joint specification. Varying offsets and course heights show the style.
+  const masonryTiles = {
+    'brick-running': {width:96, rows:[10,10,10,10], joints:[[0,32,64],[16,48,80],[0,32,64],[16,48,80]], mortar:1.3, variation:8},
+    'brick-long': {width:150, rows:[7,7,7,7], joints:[[0,50,100],[25,75,125],[0,50,100],[25,75,125]], mortar:1.15, variation:7},
+    'brick-stack': {width:90, rows:[10,10,10], joints:[[0,30,60],[0,30,60],[0,30,60]], mortar:1.3, variation:5},
+    'stone-cut': {width:144, rows:[18,12,22,15], joints:[[0,46,103],[13,52,91,127],[0,56,86,122],[17,70,111]], mortar:1.7, variation:14},
+    'stone-ledgestone': {width:132, rows:[5,10,6,8,5,9], joints:[[0,35,83],[14,57,77,116],[0,32,53,91],[9,45,85,119],[0,51,76,108],[18,59,99]], rough:1.25, skew:4, mortar:.85, variation:20},
+    'stone-field': {width:192, rows:[24,28,22,25,20], joints:[[4,35,69,104,153],[19,49,88,121,168],[0,32,70,109,138,164],[13,45,84,117,147,178],[5,43,78,111,164]], rough:6, skew:11, mortar:2.4, variation:22},
+  };
+
+  function tinted(hex, offset, blend=0) {
+    return '#'+[1,3,5].map((i,k)=>Math.max(0,Math.min(255,Math.round(parseInt(hex.slice(i,i+2),16)*(1-blend)+[230,224,211][k]*blend+offset))).toString(16).padStart(2,'0')).join('');
+  }
+
+  function masonryPattern(id, material, color, monochrome, feetPerPixel, anchorX, anchorY) {
+    const wanted=material.rendering?.masonryStyle,style=Object.hasOwn(masonryTiles,wanted)?wanted:'brick-running';
+    const {width,rows,joints,rough=0,skew=0,mortar,variation}=masonryTiles[style], n=rows.length;
+    const levels=rows.reduce((all,h)=>[...all,all.at(-1)+h],[0]), height=levels[n];
+    // Use a consistent preview density across elevation raster resolutions. The
+    // calibration affects the drawing only and never turns the tile into sizing.
+    const scale=positive(feetPerPixel)?Math.max(.02,Math.min(100,.031/feetPerPixel)):1;
+    const xPhase=num(modulo(Number.isFinite(anchorX)?anchorX:0,width*scale)),yPhase=num(modulo(Number.isFinite(anchorY)?anchorY:0,height*scale));
+    const jointColor=monochrome?'#a9b0a3':tinted(color,0,style==='stone-ledgestone'?.28:.72),cells=[];
+    const step=width/8;
+    function edgeNodes(x0,x1,y,level) {
+      const offset=i=>rough*([-.76,.58,-.45,.89,-.59,.32,.64,-.37][modulo(i+level*3,8)]);
+      const point=x=>{const i=Math.floor(x/step),t=x/step-i;return [num(x),num(y+(1-t)*offset(i)+t*offset(i+1))];};
+      if(!rough)return [[x0,y],[x1,y]];
+      const out=[point(x0)];
+      for(let x=(Math.floor(x0/step)+1)*step;x<x1;x+=step)out.push(point(x));
+      out.push(point(x1));return out;
+    }
+    // Wrapped cells cross tile edges so no artificial seam appears at repeats.
+    for(let row=rough?-1:0;row<(rough?n+1:n);row++){
+      const r=modulo(row,n),y=levels[r]+Math.floor(row/n)*height,sy=rows[r],cuts=joints[r];
+      const slant=i=>skew*[.59,-.47,.35,-.64,.18][modulo(i+r*2,5)];
+      const kink=i=>skew*[.22,-.3,.38,-.18][modulo(i+r,4)];
+      for(let piece=-1;piece<=cuts.length;piece++){
+        const i=modulo(piece,cuts.length),j=modulo(piece+1,cuts.length);
+        const x0=cuts[i]+Math.floor(piece/cuts.length)*width,x1=cuts[j]+Math.floor((piece+1)/cuts.length)*width;
+        if(x1+skew<0||x0-skew>width)continue;
+        const top=edgeNodes(x0,x1,y,r), bottom=edgeNodes(x0+slant(i),x1+slant(j),y+sy,(r+1)%n).reverse();
+        const pts=[...top,...(skew?[[num(x1+slant(j)*.5+kink(j)),num(y+sy*.48)]]:[]),...bottom,...(skew?[[num(x0+slant(i)*.5+kink(i)),num(y+sy*.48)]]:[])];
+        const offset=variation*([-.69,.23,-.14,.76,-.44,.48,-.25][(r*3+i*2)%7]);
+        cells.push(`<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="${monochrome?color:tinted(color,offset)}"/>`);
+      }
+    }
+    return `<pattern id="${id}" patternUnits="userSpaceOnUse" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" patternTransform="translate(${xPhase} ${yPhase}) scale(${num(scale)})" data-profile="brick" data-masonry-style="${style}" data-scale-status="illustrative"><rect width="${width}" height="${height}" fill="${jointColor}"/><g stroke="${jointColor}" stroke-width="${mortar}" stroke-linejoin="round">${cells.join('')}</g></pattern>`;
+  }
 
   function specification(material = {}, choice = {}, feetPerPixel, sample) {
     const sizing = coverage?.coverageSpec(material,choice);
@@ -36,6 +87,7 @@
   function patternDef({id, material = {}, choice = {}, feetPerPixel, sample, monochrome = false, anchorX = 0, anchorY = 0, bounds = [0,0,1000,1000]}) {
     const s = specification(material, choice, feetPerPixel, sample), safeId = esc(id);
     const color = monochrome ? '#fbfcf7' : /^#[\da-f]{6}$/i.test(choice.color || '') ? choice.color : '#d3d6cd';
+    if(s.pattern==='brick')return masonryPattern(safeId,material,color,monochrome,feetPerPixel,anchorX,anchorY);
     const step = num(s.step), line = monochrome ? '#a9b0a3' : '#00000035';
     const definition = [], rect = (w,h,fill,extra='') => `<rect width="${num(w)}" height="${num(h)}" fill="${fill}" ${extra}/>`;
     const board = ['lap','vertical','shingle'].includes(s.pattern) && positive(s.step);
@@ -76,19 +128,15 @@
       const phase=(((vertical?anchorX:anchorY)%step)+step)%step;
       definition.push(`<pattern id="${profileId}" patternUnits="userSpaceOnUse" patternTransform="translate(${vertical?num(phase):0} ${vertical?0:num(phase)})" width="${step}" height="${step}" viewBox="0 0 ${step} ${step}">${profile}</pattern>`);
       profile = profileId;
-    } else if (s.pattern === 'brick') {
-      width=62;height=24;grain='';profile=`<path d="M0 0H62M0 12H62M0 24H62M31 0V12M0 12V24M62 12V24" fill="none" stroke="${monochrome?'#abb2a7':'#e8e4d9'}" stroke-width="1.8"/>`;
     }
     // One bounded surface viewport keeps independent profile and grain scales.
     // It also avoids oversized pattern buffers on mobile. Panel seams remain
     // the actual configured layout drawn by the caller, without a fake grid.
-    if (s.pattern !== 'brick') {
-      const [x,y,x1,y1] = bounds.map(Number), w = Math.max(1,x1-x), h = Math.max(1,y1-y);
-      const surfaceRect = (fill,extra='') => `<rect x="${num(x)}" y="${num(y)}" width="${num(w)}" height="${num(h)}" fill="${fill}" ${extra}/>`;
-      grain = !monochrome && s.hasSample ? surfaceRect(`url(#${safeId}-grain)`,'opacity=".58"') : '';
-      profile = board ? surfaceRect(`url(#${profile})`) : '';
-      definition.push(`<pattern id="${safeId}" patternUnits="objectBoundingBox" width="1" height="1" viewBox="${[x,y,w,h].map(num).join(' ')}" preserveAspectRatio="none" data-profile="${esc(s.pattern)}" data-exposure-in="${s.exposureIn == null ? '' : num(s.exposureIn)}" data-coverage-status="${esc(s.coverageStatus)}" data-scale-status="${esc(s.profileScaleStatus)}" data-grain-scale="${s.grainScaleStatus}">${surfaceRect(color)}${grain}${profile}</pattern>`);
-    } else definition.push(`<pattern id="${safeId}" patternUnits="userSpaceOnUse" width="${num(width)}" height="${num(height)}">${rect(width,height,color)}${grain}${profile}</pattern>`);
+    const [x,y,x1,y1] = bounds.map(Number), w = Math.max(1,x1-x), h = Math.max(1,y1-y);
+    const surfaceRect = (fill,extra='') => `<rect x="${num(x)}" y="${num(y)}" width="${num(w)}" height="${num(h)}" fill="${fill}" ${extra}/>`;
+    grain = !monochrome && s.hasSample ? surfaceRect(`url(#${safeId}-grain)`,'opacity=".58"') : '';
+    profile = board ? surfaceRect(`url(#${profile})`) : '';
+    definition.push(`<pattern id="${safeId}" patternUnits="objectBoundingBox" width="1" height="1" viewBox="${[x,y,w,h].map(num).join(' ')}" preserveAspectRatio="none" data-profile="${esc(s.pattern)}" data-exposure-in="${s.exposureIn == null ? '' : num(s.exposureIn)}" data-coverage-status="${esc(s.coverageStatus)}" data-scale-status="${esc(s.profileScaleStatus)}" data-grain-scale="${s.grainScaleStatus}">${surfaceRect(color)}${grain}${profile}</pattern>`);
     return definition.join('');
   }
   return {specification, patternDef, isSmooth:smooth};

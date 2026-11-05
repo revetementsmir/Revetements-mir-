@@ -6,7 +6,7 @@
   panel.className = 'mir-annotations';
   panel.setAttribute('aria-label', 'Annotations du Studio');
   panel.innerHTML = `
-    <strong>Annotations du Studio</strong>
+    <strong>Annotations du Studio</strong><button type="button" data-collapse aria-expanded="true">Réduire</button>
     <button type="button" aria-pressed="false">Pointer un élément</button>
     <p role="status">Active le pointeur, puis clique sur un élément de la page.</p>
     <label>Note<textarea rows="2"></textarea></label>
@@ -15,7 +15,7 @@
     <ol></ol>
     <textarea hidden readonly aria-label="Notes à copier manuellement"></textarea>`;
   document.body.append(panel);
-  const [point, add, copy] = panel.querySelectorAll('button');
+  const [collapse, point, add, copy] = panel.querySelectorAll('button');
   const [note, manual] = panel.querySelectorAll('textarea');
   const status = panel.querySelector('p');
   const list = panel.querySelector('ol');
@@ -85,6 +85,12 @@
     reticle.hidden = lens.hidden = true;
     if (active) status.textContent = 'Vise avec la croix, puis clique. Échap annule la sélection.';
   }
+  collapse.onclick = () => {
+    const compact = panel.classList.toggle('mir-annotations-compact');
+    collapse.setAttribute('aria-expanded', String(!compact));
+    collapse.textContent = compact ? 'Ouvrir les annotations' : 'Réduire';
+    if (compact) setPicking(false);
+  };
   point.onclick = () => setPicking(!picking);
   note.oninput = () => { add.disabled = !selection || !note.value.trim(); };
   document.addEventListener('keydown', event => {

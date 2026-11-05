@@ -8,7 +8,6 @@ assert.ok(js.includes('Math.max(5,Math.min(75,Number(v)||22))'));
 assert.ok(js.includes('Math.hypot(a[0]-b[0],a[1]-b[1])'));
 assert.ok(js.includes("addEventListener('wheel'")&&js.includes('{passive:false}'));
 assert.ok(js.includes('requestFullscreen')&&js.includes('mir-stage-fullscreen'));
-assert.ok(s.includes('returnMasonry=brick&&band?.heightMeters>0'));
 assert.ok(s.includes("s.siteStyle=imported?'none':'commercial'"));
 assert.ok(s.includes("['column','beam','stairs'].includes(h.type)"));
 assert.ok(read('plan.css').includes('#three-canvas{touch-action:none'));

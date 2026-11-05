@@ -107,8 +107,11 @@
   const dot = (a, b) => a.reduce((sum, v, i) => sum + v * b[i], 0);
   const sub = (a, b) => a.map((v, i) => v - b[i]);
   function normal(poly) {
-    const a = sub(poly[1], poly[0]), b = sub(poly[2], poly[0]);
-    const n = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+    const n = [0,0,0];
+    for(let i=1;i+1<poly.length;i++){
+      const a=sub(poly[i],poly[0]),b=sub(poly[i+1],poly[0]);
+      n[0]+=a[1]*b[2]-a[2]*b[1];n[1]+=a[2]*b[0]-a[0]*b[2];n[2]+=a[0]*b[1]-a[1]*b[0];
+    }
     const length = Math.hypot(...n) || 1;
     return n.map(v => v / length);
   }
@@ -482,6 +485,7 @@
       add('roof-flat',[[-X,-Y,Z],[X,-Y,Z],[X,Y,Z],[-X,Y,Z]],'roof');
     }
 
+    const cornicesEnabled=options.gableCornices===true||options.gableCornices?.enabled===true;
     function trim(id, start, end, inward, outward, innerEnds) {
       const lowerA = [start[0], start[1], start[2] - fasciaDrop];
       const lowerB = [end[0], end[1], end[2] - fasciaDrop];
@@ -491,33 +495,48 @@
       const innerB = innerEnds?[innerEnds[1][0],innerEnds[1][1],lowerB[2]]:[lowerB[0] + inward[0] * e, lowerB[1] + inward[1] * e, lowerB[2]];
       add('soffit-' + id, [lowerA,lowerB,innerB,innerA], 'soffit',null,{role:role==='gable-edge'?'gable-underside':'eave-underside'});
       // Short horizontal leg under the board: the visible L of fascia cladding.
-      const leg=Math.min(.025,e*.15),legA=[lowerA[0]+inward[0]*leg,lowerA[1]+inward[1]*leg,lowerA[2]-.001],legB=[lowerB[0]+inward[0]*leg,lowerB[1]+inward[1]*leg,lowerB[2]-.001];
+      const legFraction=Math.min(.025/e,.15),legA=mix(lowerA,innerA,legFraction),legB=mix(lowerB,innerB,legFraction);
+      legA[2]-=.001;legB[2]-=.001;
       const underside=[lowerA,lowerB,legB,legA],n=normal(underside);
       add('fascia-leg-'+id,underside,'fascia',n[2]>0?n.map(v=>-v):n,{role:'fascia-bottom-return'});
+      if(cornicesEnabled&&role==='gable-edge'){
+        const [low,high,inner]=start[2]<end[2]?[start,end,innerA]:[end,start,innerB];
+        // Short horizontal boxed return at the foot of the rake, following
+        // the existing overhang. No cornice is inferred on flat or hip edges.
+        const axis=Math.abs(start[0]-end[0])>Math.abs(start[1]-end[1])?0:1,depthAxis=1-axis;
+        const direction=Math.sign(high[axis]-low[axis]),length=Math.min(.46,Math.abs(high[axis]-low[axis])*.34);
+        const out=low[depthAxis]+outward[depthAxis]*.018,inside=inner[depthAxis];
+        const origin=[0,0,low[2]-fasciaDrop-.026],size=[0,0,.13];
+        origin[axis]=Math.min(low[axis],low[axis]+direction*length);size[axis]=length;
+        origin[depthAxis]=Math.min(out,inside);size[depthAxis]=Math.abs(out-inside);
+        if(length>.03&&size[depthAxis]>.02)addBox('cornice-'+id,origin,size,'roof-detail',cleanColor(options.fasciaColor,'#303735'),
+          {role:'gable-cornice',sourceStatus:'user-enabled-preview',notCertifiedTakeoff:true});
+      }
     }
     const frontEdge = roofStyle==='duplex'?[[-X,-Y,Z],[leftRidge,-Y,P],[roofLeftInner,-Y,Z],[roofRightInner,-Y,Z],[rightRidge,-Y,P],[X,-Y,Z]]:[[-X,-Y,Z],[X,-Y,Z]];
     if(notchedDuplex){
-      trim('front-0',frontEdge[0],frontEdge[1],[0,1,0],[0,-1,0]);
-      trim('front-1',frontEdge[1],frontEdge[2],[0,1,0],[0,-1,0]);
+      trim('front-0',frontEdge[0],frontEdge[1],[0,1,0],[0,-1,0],[[-a,-b],[leftRidge,-b]]);
+      trim('front-1',frontEdge[1],frontEdge[2],[0,1,0],[0,-1,0],[[leftRidge,-b],[leftInner,-b]]);
       const L=[roofLeftInner,centreFrontY,Z],R=[roofRightInner,centreFrontY,Z],wallY=-b+recess.depth;
       // Mitred inner endpoints share the actual wall corners. Plain strips
       // would leave an e×e hole at each re-entrant corner of the soffit.
-      trim('return-left',frontEdge[2],L,[-1,0,0],[1,0,0],[[leftInner,-Y],[leftInner,wallY]]);
+      trim('return-left',frontEdge[2],L,[-1,0,0],[1,0,0],[[leftInner,-b],[leftInner,wallY]]);
       trim('front-2',L,R,[0,1,0],[0,-1,0],[[leftInner,wallY],[rightInner,wallY]]);
-      trim('return-right',R,frontEdge[3],[1,0,0],[-1,0,0],[[rightInner,wallY],[rightInner,-Y]]);
-      trim('front-3',frontEdge[3],frontEdge[4],[0,1,0],[0,-1,0]);
-      trim('front-4',frontEdge[4],frontEdge[5],[0,1,0],[0,-1,0]);
-    }else for (let i = 0; i < frontEdge.length - 1; i++) trim('front-' + i, frontEdge[i], frontEdge[i+1], [0,1,0], [0,-1,0]);
+      trim('return-right',R,frontEdge[3],[1,0,0],[-1,0,0],[[rightInner,wallY],[rightInner,-b]]);
+      trim('front-3',frontEdge[3],frontEdge[4],[0,1,0],[0,-1,0],[[rightInner,-b],[rightRidge,-b]]);
+      trim('front-4',frontEdge[4],frontEdge[5],[0,1,0],[0,-1,0],[[rightRidge,-b],[a,-b]]);
+    }else for (let i = 0; i < frontEdge.length - 1; i++) trim('front-' + i, frontEdge[i], frontEdge[i+1], [0,1,0], [0,-1,0],
+      [[i===0?-a:frontEdge[i][0],-b],[i===frontEdge.length-2?a:frontEdge[i+1][0],-b]]);
     if(roofStyle==='gable'){
-      trim('right-front',[X,-Y,Z],[X,0,P],[-1,0,0],[1,0,0]);
-      trim('right-back',[X,0,P],[X,Y,Z],[-1,0,0],[1,0,0]);
-      trim('left-back',[-X,Y,Z],[-X,0,P],[1,0,0],[-1,0,0]);
-      trim('left-front',[-X,0,P],[-X,-Y,Z],[1,0,0],[-1,0,0]);
+      trim('right-front',[X,-Y,Z],[X,0,P],[-1,0,0],[1,0,0],[[a,-b],[a,0]]);
+      trim('right-back',[X,0,P],[X,Y,Z],[-1,0,0],[1,0,0],[[a,0],[a,b]]);
+      trim('left-back',[-X,Y,Z],[-X,0,P],[1,0,0],[-1,0,0],[[-a,b],[-a,0]]);
+      trim('left-front',[-X,0,P],[-X,-Y,Z],[1,0,0],[-1,0,0],[[-a,0],[-a,-b]]);
     }else{
-      trim('right', [X,-Y,Z], [X,Y,Z], [-1,0,0], [1,0,0]);
-      trim('left', [-X,Y,Z], [-X,-Y,Z], [1,0,0], [-1,0,0]);
+      trim('right', [X,-Y,Z], [X,Y,Z], [-1,0,0], [1,0,0],[[a,-b],[a,b]]);
+      trim('left', [-X,Y,Z], [-X,-Y,Z], [1,0,0], [-1,0,0],[[-a,b],[-a,-b]]);
     }
-    trim('back', [X,Y,Z], [-X,Y,Z], [0,-1,0], [0,1,0]);
+    trim('back', [X,Y,Z], [-X,Y,Z], [0,-1,0], [0,1,0],[[a,b],[-a,b]]);
     if(porch.enabled){
       const L=-a+porch.start,R=L+porch.width,F=-b-porch.projection,B=-b+porch.backOffset,C=porch.ceilingHeight,T=C+porch.fasciaHeight,RT=T+porch.roofRise;
       if(porch.balconyEnabled){
@@ -528,6 +547,17 @@
           {role:'balcony-platform',sourceStatus:porch.sourceStatus,notCertifiedTakeoff:true});
       }
       add('roof-porch',[[L,F,T],[R,F,T],[R,B,RT],[L,B,RT]],'roof',null,{role:'porch-roof',measurementStatus:porch.sourceStatus});
+      const diverterColor=cleanColor(options.waterDiverterColor,null);
+      if(diverterColor&&porch.roofRise>0){
+        const left=recess.enabled?Math.max(L,-a+recess.start):L,right=recess.enabled?Math.min(R,-a+recess.start+recess.width):R;
+        const depth=Math.min(.12,(B-F)*.2),span=B-F;
+        if(right-left>.03&&depth>.01){
+          const y=B-.005,lower=y-depth,z=RT+.008-porch.roofRise*.005/span,zLower=z-porch.roofRise*depth/span;
+          const meta={role:'water-diverter',parentSurfaceId:'roof-porch',fillColor:diverterColor,sourceStatus:'roof-wall-joint-preview',notCertifiedTakeoff:true};
+          add('water-diverter-upstand',[[left,y,z],[right,y,z],[right,y,z+.105],[left,y,z+.105]],'roof-detail',[0,-1,0],meta);
+          add('water-diverter-apron',[[left,lower,zLower],[right,lower,zLower],[right,y,z],[left,y,z]],'roof-detail',null,meta);
+        }
+      }
       add('soffit-porch',[[L,F,C],[R,F,C],[R,B,C],[L,B,C]],'soffit',[0,0,-1],{role:'porch-ceiling',measurementStatus:porch.sourceStatus});
       add('fascia-porch-front',[[L,F,T],[R,F,T],[R,F,C],[L,F,C]],'fascia',[0,-1,0],{role:'gutter-edge'});
       const leg=Math.min(.025,porch.projection*.1);
@@ -605,7 +635,7 @@
         structures:mesh.structures.map(s=>({...s,origin:s.origin.slice(),size:s.size.slice(),grossBoxArea:2*(s.size[0]*s.size[1]+s.size[0]*s.size[2]+s.size[1]*s.size[2]),netArea:null,notCertifiedTakeoff:true})),
         walls:mesh.faces.filter(f=>f.type==='wall').map(f=>({id:f.id,grossModelArea:area3D(f.poly),netArea:null,openingsDeducted:false})),
         areaUnit:'m2',notCertifiedTakeoff:true},
-      wallParts:mesh.faces.filter(f=>f.type==='wall').map(f=>({id:f.id,poly:f.poly,normal:f.normal,textureView:f.textureView||(['front','right','back','left'].includes(f.id)?f.id:null),texturePhysicalWidth:f.texturePhysicalWidth||f.width})),
+      wallParts:mesh.faces.filter(f=>f.type==='wall').map(f=>({id:f.id,type:f.type,role:f.role||null,poly:f.poly,normal:f.normal,textureView:f.textureView||(['front','right','back','left'].includes(f.id)?f.id:null),texturePhysicalWidth:f.texturePhysicalWidth||f.width})),
       assumptions:r.enabled?[
         'Recess depth is raster-estimated or caller-supplied; 2 ft is not a printed source dimension.',
         r.upperStorey==='recessed-confirmed'?'Same setback on both storeys is user-confirmed; no upper-floor sheet was supplied.':'Only the ground-floor plan is supplied; upper-storey continuation is assumed.',
@@ -743,20 +773,22 @@
       code:'TEXTURE_MODEL_WIDTH_MISMATCH',view,message:'Volume et élévation à recaler : la couvrance garde l’échelle du dessin.',
       ...info,toleranceRelative:TEXTURE_WIDTH_TOLERANCE
     }));
-    const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,column:4,beam:4,concrete:4,corner:4};
-    const visible = mesh.faces.filter(f=>dot(f.normal,camera)>.0001).map(f=>({...f,depth:f.poly.reduce((sum,p)=>sum+dot(p,camera),0)/f.poly.length})).sort((a,b)=>a.depth-b.depth || faceOrder[a.type]-faceOrder[b.type]);
+    const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,'roof-detail':4,column:4,beam:4,concrete:4,corner:4,balcony:4};
+    const visible = mesh.faces.filter(f=>dot(f.normal,camera)>.0001).map(f=>({...f,depth:f.poly.reduce((sum,p)=>sum+dot(p,camera),0)/f.poly.length}));
+    const visibleById=new Map(visible.map(face=>[face.id,face]));
+    for(const face of visible){
+      const parent=visibleById.get(face.parentSurfaceId);
+      // The apron lies on the upslope end, behind the roof's centroid. Its
+      // tiny real offset above the roof must still paint in front of shingles.
+      if(parent)face.depth=Math.max(face.depth,parent.depth+.00001);
+    }
+    visible.sort((a,b)=>a.depth-b.depth || faceOrder[a.type]-faceOrder[b.type]);
 
     function paintWall(face) {
       trace(face.poly);ctx.save();ctx.clip();ctx.fillStyle=face.fillColor||'#d7d8d0';ctx.fill();
       if (mesh.foundationDrop > 0) patch([local(face,0,mesh.ground),local(face,face.width,mesh.ground),local(face,face.width,0),local(face,0,0)],'#b9bcb3');
       const sourceView = face.textureView || face.id;
       const item = images[sourceView];
-      const stoneHeight = face.role==='recess-return'||item?.fitWall?0:Math.min(.86,d.wallHeight*.18);
-      if(stoneHeight>0)patch([local(face,0,0),local(face,face.width,0),local(face,face.width,stoneHeight),local(face,0,stoneHeight)],'#b2b2a5');
-      for(let z=.13,row=0;z<stoneHeight;z+=.145,row++) {
-        line(local(face,0,z),local(face,face.width,z),'rgba(244,241,228,.75)',.7);
-        for(let u=(row%2)*.31;u<face.width;u+=.62) line(local(face,u,z),local(face,u,Math.min(z+.145,stoneHeight)),'rgba(244,241,228,.65)',.6);
-      }
       if (item) {
         const {widthMeters:worldWidth,heightMeters:worldHeight}=textureScales[sourceView];
         const bottom = textureBottoms[sourceView];
@@ -764,21 +796,12 @@
         const iw=item.image.naturalWidth || item.image.width, ih=item.image.naturalHeight || item.image.height;
         ctx.save();ctx.transform((B[0]-A[0])/iw,(B[1]-A[1])/iw,(C[0]-A[0])/ih,(C[1]-A[1])/ih,A[0],A[1]);
         ctx.drawImage(item.image,0,0,iw,ih);ctx.restore();
-      }
-      if(face.role==='recess-return'&&options.returnMasonry?.heightMeters>0){
-        const height=Math.min(d.wallHeight,Number(options.returnMasonry.heightMeters)),w=face.width;
-        if(height>0&&w>0){
-          // Même altitude physique et joints que le soubassement frontal.
-          // Surimpression géométrique : la brique reste visible même si
-          // la texture SVG du petit retour n'est pas chargée.
-          patch([local(face,0,0),local(face,w,0),local(face,w,height),local(face,0,height)],
-            cleanColor(options.returnMasonry.color,'#ab9383'));
-          for(let row=0,z=.075;z<height;row++,z+=.075){
-            line(local(face,0,z),local(face,w,z),'rgba(70,53,42,.46)',.7);
-            for(let u=(row%2)*.14;u<w;u+=.28)
-              line(local(face,u,Math.max(0,z-.075)),local(face,u,z),'rgba(70,53,42,.42)',.65);
-          }
-        }
+      }else if(face.role==='recess-return'&&options.returnMasonry?.heightMeters>0){
+        // Keep a colour fallback if the SVG is unavailable. A loaded return
+        // texture already carries the selected stone/brick pattern.
+        const base=Number(options.returnMasonry.bottomMeters??0),top=Number(options.returnMasonry.topMeters??options.returnMasonry.heightMeters),w=face.width;
+        const color=cleanColor(options.returnMasonry.color,null);
+        if(color&&top>base&&w>0)patch([local(face,0,base),local(face,w,base),local(face,w,top),local(face,0,top)],color);
       }
       const shade = Math.max(0,.105 - dot(face.normal,[-.35,-.85,.4])*.07);
       trace(face.poly);ctx.fillStyle=`rgba(21,32,26,${shade})`;ctx.fill();ctx.restore();
@@ -822,7 +845,7 @@
       if(face.type==='wall')paintWall(face);
       else if(face.type==='roof')paintRoof(face);
       else if(face.type==='soffit')paintSoffit(face);
-      else if(['column','beam','divider','balcony','concrete','corner'].includes(face.type))paintSolid(face);
+      else if(['column','beam','divider','balcony','concrete','corner','roof-detail'].includes(face.type))paintSolid(face);
       else patch(face.poly,fascia);
       trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';ctx.stroke();
     }
@@ -873,6 +896,7 @@
     const token=++renderCounter;state.token=token;
     // Snapshot all caller data before awaiting images: slider changes cannot mutate this render.
     const snapshot={...options,exportSize,views:{...(options.views||{})},dimensions:{...(options.dimensions||{})},textureBottoms:{...(options.textureBottoms||{})},
+      gableCornices:options.gableCornices===true||options.gableCornices?.enabled===true,returnMasonry:options.returnMasonry?{...options.returnMasonry}:null,
       recess:options.recess&&typeof options.recess==='object'?{...options.recess,returnColors:{...(options.recess.returnColors||{})}}:options.recess,
       porch:options.porch&&typeof options.porch==='object'?{...options.porch,divider:options.porch.divider&&typeof options.porch.divider==='object'?{...options.porch.divider}:options.porch.divider}:options.porch,
       structures:Array.isArray(options.structures)?options.structures.map(s=>s&&({...s,origin:Array.isArray(s.origin)?s.origin.slice():s.origin,size:Array.isArray(s.size)?s.size.slice():s.size})):options.structures,
