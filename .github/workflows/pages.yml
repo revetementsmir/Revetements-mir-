@@ -289,7 +289,7 @@ jobs:
           grep -F 'mir_production_templates_v1' /tmp/mir-reset-app.js
           fetch "$base/mir-procurement.css" /tmp/mir-procurement.css
           grep -F '#mir-procurement-tabs' /tmp/mir-procurement.css
-          grep -F 'mir-procurement.js?v=2' /tmp/production.html
+          grep -F 'mir-procurement.js?v=moon-guided-20261105' /tmp/production.html
           fetch "$base/production-admin-v4.js" /tmp/mir-admin-v4.js
           grep -F 'mir-v4-sheet-total' /tmp/mir-admin-v4.js
           grep -F 'href="production.html?view=orders" data-admin-only' /tmp/production.html
