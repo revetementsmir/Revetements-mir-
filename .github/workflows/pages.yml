@@ -31,6 +31,7 @@ jobs:
           node --check tests/mir-moulure-renaming-browser.cjs
           node --check dist/kaycan-flat-preview.js
           node --check tests/mir-mac-flat-preview.cjs
+          node --check tests/mir-direct-po-browser.cjs
           node --check dist/production-admin-v4.js
           node --check dist/mir-procurement.js
           node --check dist/portal-client.js
@@ -54,6 +55,7 @@ jobs:
           node tests/mir-homepage-browser.cjs
           node tests/mir-client-header-browser.cjs
           node tests/mir-miniatures-browser.cjs
+          node tests/mir-direct-po-browser.cjs
           node tests/mir-retours-cotes-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
@@ -64,6 +66,7 @@ jobs:
             artifacts/mir-accueil-*.png
             artifacts/mir-entete-*.png
             artifacts/mir-miniatures-*.png
+            artifacts/mir-direct-po-*.png
             artifacts/mir-retours-*.png
           if-no-files-found: ignore
       - uses: actions/configure-pages@v5
@@ -138,16 +141,16 @@ jobs:
           fetch "$base/production.html" /tmp/production.html
           grep -F 'mir-miniature.js?v=1' /tmp/production.html
           grep -F 'production-model.js?v=retours-cotes-20261105' /tmp/production.html
-          grep -F 'production-admin-v4.css?v=miniatures-20261105' /tmp/production.html
+          grep -F 'production-admin-v4.css?v=po-direct-20261105' /tmp/production.html
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
           grep -F 'kaycan-flat-preview.js?v=mac-2' /tmp/production.html
-          grep -F 'production-app.js?v=mac-metal-20261105' /tmp/production.html
-          grep -F 'production-app.js?v=mac-metal-20261105' /tmp/production.html
+          grep -F 'production-app.js?v=po-direct-20261105' /tmp/production.html
+          grep -F 'production-app.js?v=po-direct-20261105' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
           grep -F 'function medianRgb' /tmp/kaycan-flat-preview.js
           grep -F 'function isMAC' /tmp/kaycan-flat-preview.js
-          grep -F 'production-admin-v4.css?v=miniatures-20261105' /tmp/production.html
+          grep -F 'production-admin-v4.css?v=po-direct-20261105' /tmp/production.html
           grep -F 'production-admin-v4.js?v=1' /tmp/production.html
           grep -F 'id="production-piece-name"' /tmp/production.html
           fetch "$base/production-admin-v4.css" /tmp/mir-admin-v4.css
