@@ -25,13 +25,14 @@
    const views=doc.createElement('div');views.className='mir-guide-views';views.id='mir-guide-views';
    stage.parentNode.insertBefore(views,stage);views.append(stage);
    const mini=doc.createElement('aside');mini.className='mir-guide-3d';mini.id='mir-guide-3d';mini.setAttribute('aria-label','Miniature 3D synchronisée');
-   mini.innerHTML='<div class="mir-guide-3d-head"><strong>MINIATURE 3D LIVE</strong><button type="button" id="mir-guide-3d-reset" aria-label="Recentrer la miniature 3D">↻</button></div><div id="mir-guide-3d-canvas" tabindex="0" aria-label="Tourner la miniature 3D avec le doigt ou la souris"></div><p class="mir-guide-3d-caption">Glisse pour tourner · échantillon 10 po</p>';
+   mini.innerHTML='<div class="mir-guide-3d-head"><strong>MINIATURE 3D</strong><div><button type="button" id="mir-guide-3d-reset" aria-label="Recentrer la miniature 3D">↻</button><button type="button" id="mir-guide-3d-close" aria-label="Fermer la miniature 3D">✕</button></div></div><div id="mir-guide-3d-canvas" tabindex="0" aria-label="Tourner la miniature 3D avec le doigt ou la souris"></div><p class="mir-guide-3d-caption">Glisse pour tourner · échantillon 10 po</p>';
    views.append(mini);
+   const mobileOpen=doc.createElement("button");mobileOpen.type="button";mobileOpen.id="mir-guide-3d-open";mobileOpen.className="secondary-button";mobileOpen.textContent="Voir en 3D";mobileOpen.setAttribute("aria-controls","mir-guide-3d");mobileOpen.setAttribute("aria-expanded","false");views.after(mobileOpen);
    const nav=doc.createElement('nav');nav.className='mir-guide-steps';nav.id='mir-guide-steps';nav.setAttribute('aria-label','Étapes de création');
    nav.innerHTML=LABELS.map((name,i)=>'<button type="button" data-mir-guide-step="'+(i+1)+'"><span class="mir-guide-num">'+(i+1)+'</span><span>'+safe(name)+'</span></button>').join('');
    const instruction=doc.createElement('section');instruction.id='mir-guide-instruction';instruction.className='mir-guide-instruction';
    const actions=doc.createElement('div');actions.className='mir-guide-actions';actions.id='mir-guide-actions';
-   actions.innerHTML='<p role="status" id="mir-guide-feedback" aria-live="polite"></p><div class="mir-guide-actions-buttons"><button type="button" id="mir-guide-back" class="secondary-button">← Retour</button><button type="button" id="mir-guide-next" class="primary-button">Continuer →</button></div>';
+   actions.innerHTML='<p role="status" id="mir-guide-feedback" aria-live="polite"></p><div class="mir-guide-actions-buttons"><button type="button" id="mir-guide-back" class="secondary-button">← Retour</button><button type="button" id="mir-guide-next" class="primary-button">Continuer →</button><div class="mir-guide-destinations" hidden><button type="button" id="mir-guide-add-po" class="primary-button">＋ Ajouter à un bon (sans modèle)</button><button type="button" id="mir-guide-save-model" class="secondary-button">Enregistrer comme modèle…</button></div></div>';
    config.prepend(nav,instruction);config.append(actions);
    let step=1,active=false,lastStep=0,session=false,confirmed=null,faceChosen=false,prevTool=null,prevPoints=0,state=null,yaw=-42,pitch=24,drag=null;
    const selector=s=>doc.querySelector(s);
@@ -56,7 +57,7 @@
    }
    function apply(){
     const visible=allowed();
-    if(active!==visible){active=visible;body.classList.toggle('mir-admin-guided-active',visible);}
+    if(active!==visible){active=visible;lastStep=0;body.classList.toggle('mir-admin-guided-active',visible);if(!visible){body.classList.remove('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','false');}}
     if(!visible)return;
     if(lastStep===step)return;
     lastStep=step;
@@ -77,7 +78,7 @@
     if(step===3){const d=selector('#production-profile-options details');if(d)d.open=true;}
     if(step===4){const f=selector('.piece-finish');if(f)f.open=true;}
     const titles=[
-      '<strong>1. Trace la moulure</strong><p>Glisse pour créer tes segments; la miniature 3D suit chaque côté. Quand la forme est complète, termine le tracé.</p>',
+      '<strong>1. Trace la moulure</strong><p>Glisse pour créer tes segments. Sur PC, la miniature suit ton dessin; sur téléphone, utilise « Voir en 3D » au besoin.</p>',
       '<strong>2. Confirme les mesures</strong><p>Vérifie A, B, C… au 1/16 po et corrige une cote directement. Le tracé reste en place.</p>',
       '<strong>3. Choisis la face colorée</strong><p>Regarde le sens de ton tracé et sélectionne la face gauche ou droite. Tourne la 3D pour contrôler.</p><div class="mir-guide-face-choices" role="group" aria-label="Confirmer le côté peint"><button type="button" data-mir-guide-face="left">Face gauche</button><button type="button" data-mir-guide-face="right">Face droite</button></div>',
       '<strong>4. Choisis le métal et la couleur</strong><p>Choisis aluminium ou acier, puis une teinte du fabricant. Vérifie la miniature avant d’enregistrer la pièce ou de l’ajouter au bon.</p>'
@@ -86,11 +87,12 @@
     const back=selector('#mir-guide-back'),next=selector('#mir-guide-next');
     back.hidden=step===1;
     next.hidden=step===4;
+    selector('.mir-guide-destinations').hidden=step!==4;
     next.textContent=step===1?'Terminer le tracé →':step===2?'Confirmer les cotes →':'Confirmer la face →';
     if(step===1)warning('Dessine au moins deux côtés avant de continuer.');
     else if(step===2)warning('Confirme les cotes pour accéder au choix de la face.');
     else if(step===3)warning(faceChosen?'Face choisie : confirme pour continuer.':'Appuie sur le côté de couleur souhaité.');
-    else warning('Dernière étape : termine par le bouton de sauvegarde ci-dessous.');
+    else warning('Choisis : ajouter directement au bon, ou enregistrer un modèle réutilisable. Tu n’as pas besoin d’un modèle pour préparer un bon.');
     refreshFace();
    }
    function refreshFace(){
@@ -140,6 +142,10 @@
      apply();if(active){scene();refreshFace();}
    }
    doc.addEventListener('click',event=>{
+     if(event.target.closest('#mir-guide-3d-open')){if(!active)return;body.classList.add('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','true');selector('#mir-guide-3d-canvas')?.focus();scene();return;}
+     if(event.target.closest('#mir-guide-3d-close')){body.classList.remove('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','false');mobileOpen.focus();return;}
+     if(event.target.closest('#mir-guide-add-po')){if(step===4&&active){const native=selector('#mir-direct-po-add');if(native&&!native.disabled)native.click();else warning('Complète les détails de la pièce avant de l’ajouter au bon.');}return;}
+     if(event.target.closest('#mir-guide-save-model')){if(step===4&&active&&!win.MIRProductionWorkspace?.openModelFromCurrent?.())warning('Ce profil doit être valide avant de créer un modèle.');return;}
      if(event.target.closest('#mir-guide-3d-reset')){
        yaw=-42;pitch=24;scene();return;
      }
@@ -158,6 +164,7 @@
    doc.addEventListener('click',event=>{
      if(event.target.closest('[data-focus-dimensions]')&&active&&step===1){step=2;lastStep=0;apply();}
    });
+   doc.addEventListener('keydown',event=>{if(event.key==='Escape'&&body.classList.contains('mir-guide-3d-open')){body.classList.remove('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','false');mobileOpen.focus();}});
    const canvas=selector('#mir-guide-3d-canvas');
    canvas.addEventListener('pointerdown',event=>{
      if(!active)return;drag={x:event.clientX,y:event.clientY,id:event.pointerId};canvas.setPointerCapture?.(event.pointerId);
