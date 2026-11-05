@@ -312,7 +312,7 @@
         'return-right':studioFeatures.returnChoice('return-right').color
       };
       const rendered=parts.explodeSideSVG(plain,{sideFace:f,dimensions:dim,mesh,
-        brickBand:band,brickPattern,colors});
+        brickBand:band,brickPattern,colors,frontFace:front});
       return rendered?.svg||plain;
     }catch(error){
       // Une élévation 2D existante ne disparaît jamais si une surface manque.
