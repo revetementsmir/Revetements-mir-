@@ -72,9 +72,12 @@ async function online(){
      assert.notEqual(detail,home,'Le bouton doit recadrer la vue sur les trois murs');
      assert.ok(Number(detail.split(' ')[2])<Number(home.split(' ')[2]),'La vue des trois murs doit être agrandie');
      assert.equal(await nav.textContent(),'← Voir la maison');
+     assert.equal(await svgElement.getAttribute('data-mir-wall-focus'),'true');
+     assert.equal(await page.locator('#elevation svg > polygon').first().evaluate(node=>getComputedStyle(node).visibility),'hidden','Le toit hors champ ne doit plus être visible');
      await page.locator('#stage').screenshot({path:path.join(artifact,'mir-studio-wall-parts-mobile-details.png')});
      await nav.click();
      assert.equal(await svgElement.getAttribute('viewBox'),home,'Retour à la vue complète de la maison');
+     assert.equal(await svgElement.getAttribute('data-mir-wall-focus'),'false');
    }
    await page.locator('[data-face="left"]').click();
    await page.locator('#elevation svg[data-mir-three-wall-explode="true"]').waitFor();
