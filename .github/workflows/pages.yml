@@ -24,6 +24,7 @@ jobs:
           node --check dist/model-measure-defaults.js
           node --check dist/template-library-backup.js
           node --check dist/production-app.js
+          node --check tests/mir-moulure-renaming-browser.cjs
           node --check dist/kaycan-flat-preview.js
           node --check dist/production-admin-v4.js
           node --check dist/mir-procurement.js
@@ -77,11 +78,12 @@ jobs:
           grep -F "mode: 'connected'" /tmp/mir-portal-client.js
           fetch "$base/production.html" /tmp/production.html
           grep -F 'kaycan-flat-preview.js?v=1' /tmp/production.html
-          grep -F 'production-app.js?v=site-principal-20261105' /tmp/production.html
+          grep -F 'production-app.js?v=nommoulure-20261105' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
           grep -F 'function medianRgb' /tmp/kaycan-flat-preview.js
-          grep -F 'production-admin-v4.css?v=1' /tmp/production.html
+          grep -F 'production-admin-v4.css?v=nommoulure-20261105' /tmp/production.html
           grep -F 'production-admin-v4.js?v=1' /tmp/production.html
+          grep -F 'id="production-piece-name"' /tmp/production.html
           fetch "$base/production-admin-v4.css" /tmp/mir-admin-v4.css
           grep -F 'body.mir-admin-v4 .kind-bar' /tmp/mir-admin-v4.css
           fetch "$base/mir-procurement.js" /tmp/mir-procurement.js
@@ -109,6 +111,8 @@ jobs:
           grep -F 'old?.channels?.client===true' /tmp/production-app.js
           grep -F 'old?.channels?.store===true' /tmp/production-app.js
           grep -F 'Nouveau modèle privé par défaut sur cet appareil' /tmp/production-app.js
+          grep -F 'data-rename-piece=' /tmp/production-app.js
+          grep -F 'M.reviseInstance({snapshot:old.snapshot' /tmp/production-app.js
           grep -F "const requestedProfile=params.get('profile')" /tmp/production-app.js
           fetch "$base/production-model.js" /tmp/production-model.js
           grep -F 'const radius=5, side=bends[i-1].direction' /tmp/production-model.js
