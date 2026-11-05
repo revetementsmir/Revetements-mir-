@@ -86,7 +86,10 @@ async function ready(){
      await prompt.waitFor({state:'hidden'});
     };
     const arc=()=>stage.locator('svg > path[d*=" A5 5 "]').first().getAttribute('d');
-    await page.locator('[data-new-drawing]').click();
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
+    await page.locator('#production-drawing[data-tool="draw"] svg').waitFor();
+    if(viewport.name==='mobile')await page.locator('[data-open-mobile-trace]').tap();
     await trace(210,275);await trace(520,275);await trace(365,275);
     await choose('Annuler');
     assert.equal(await stage.locator('[data-draw-point]').count(),2);
