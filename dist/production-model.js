@@ -756,7 +756,7 @@ function profileSideMarkers({segments,folds},model,handles){
  return markers+`<g class="profile-marker-overflow" aria-label="Repères de côtés trop serrés"><rect x="8" y="466" width="784" height="49" rx="8" fill="#f6f9f1" stroke="#dde7d5"/><text x="22" y="479" font-size="10" fill="#68825d">CÔTÉS TROP SERRÉS POUR UN REPÈRE DIRECT</text>${fallback}</g>`;
 }
 
-function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false}={}){
+function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false}={}){
  const section=profileSectionPath(mapped,bends);
  let output=`<path d="${section.path}" fill="none" stroke="#97a68b" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="#dbe3d4" stroke-width="4" stroke-linejoin="miter"/>`;
  const reserved=[...handles];
@@ -764,8 +764,12 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-dy/len,dx/len];
  const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
  if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;
- reserved.push(...[12,24,39].map(gap=>[mid[0]+normal[0]*gap*side,mid[1]+normal[1]*gap*side]));
- output+=`<path d="M${decimal(mid[0]+normal[0]*9*side)},${decimal(mid[1]+normal[1]*9*side)}L${decimal(mid[0]+normal[0]*26*side)},${decimal(mid[1]+normal[1]*26*side)}" stroke="#4f8538" stroke-width="2"/><text x="${decimal(mid[0]+normal[0]*39*side)}" y="${decimal(mid[1]+normal[1]*39*side+5)}" text-anchor="middle" font-size="22" fill="#427c2a">*</text>`;}
+ const at=gap=>[mid[0]+normal[0]*gap*side,mid[1]+normal[1]*gap*side];
+ const [sx,sy]=at(48),tip=at(9),base=at(21),tail=at(35);
+ const wing=sign=>[base[0]+dx/len*9*sign,base[1]+dy/len*9*sign].map(decimal).join(',');
+ reserved.push(at(12),at(24),at(36),at(48));
+ const action=togglePaintedFace?' data-toggle-painted-face role="button" tabindex="0" aria-label="Inverser la face colorée" style="cursor:pointer"':'';
+ output+=`<g${action}>${togglePaintedFace?`<circle cx="${decimal(sx)}" cy="${decimal(sy)}" r="27" fill="transparent"/>`:''}<path d="M${tail.map(decimal).join(',')}L${tip.map(decimal).join(',')} M${wing(-1)}L${tip.map(decimal).join(',')}L${wing(1)}" fill="none" stroke="#285c27" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="${decimal(sx)}" y="${decimal(sy+8)}" text-anchor="middle" font-size="34" font-weight="700" fill="#285c27">*</text></g>`;}
  });
  if(markers)output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved);
  return output;
