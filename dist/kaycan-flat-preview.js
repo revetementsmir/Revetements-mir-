@@ -1,4 +1,4 @@
-/* MIR — aperçu de couleur unie à partir des images d'échantillon Kaycan.
+/* MIR — aperçu de couleur unie à partir des images de référence Kaycan et MAC Métal.
  * Le fabricant ne fournit pas de code hexadécimal officiel dans notre catalogue.
  * Le résultat est seulement une approximation locale d'écran et n'est jamais
  * enregistré comme couleur certifiée dans les commandes ou fiches de production.
@@ -11,11 +11,17 @@
   'use strict';
   const cache = new Map(), loading = new Set();
   const asset = url => typeof url === 'string' &&
-    /^(?:\.\/)?assets\/catalogue-swatches\/[a-z0-9._/-]+\.webp$/i.test(url);
+    /^(?:\.\/)?assets\/catalogue-swatches\/[a-z0-9._/-]+\.(?:webp|jpe?g|png)$/i.test(url);
 
   function isKaycan(finish) {
     return String(finish?.manufacturer || '').trim().toLowerCase() === 'kaycan';
   }
+  function isMAC(finish) {
+    const name=String(finish?.manufacturer||'').trim().normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    return name==='mac metal architectural'||name==='mac metal';
+  }
+  function isFlatPreview(finish) { return isKaycan(finish)||isMAC(finish); }
   function get(url) { return asset(url) ? cache.get(url) || null : null; }
 
   // La médiane d'un carré central atténue les lignes, reliefs et perforations
@@ -71,5 +77,5 @@
     const rgb = [1,3,5].map(i => parseInt(hex.slice(i,i+2),16));
     return rgb[0]*.299 + rgb[1]*.587 + rgb[2]*.114 < 130 ? '#ffffff' : '#203526';
   }
-  return Object.freeze({version:'1.0.0',isKaycan,get,sample,medianRgb,foreground});
+  return Object.freeze({version:'1.1.0',isKaycan,isMAC,isFlatPreview,get,sample,medianRgb,foreground});
 });

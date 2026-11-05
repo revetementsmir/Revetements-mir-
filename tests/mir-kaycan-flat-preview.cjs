@@ -22,15 +22,19 @@ check('Ne pas traiter une autre marque comme Kaycan',()=>{
  assert.equal(Preview.isKaycan({manufacturer:'Kaycan'}),true);
  assert.equal(Preview.isKaycan({manufacturer:'Gentek'}),false);
  assert.equal(Preview.isKaycan({manufacturer:'MAC Métal'}),false);
+ assert.equal(Preview.isMAC({manufacturer:'MAC Métal architectural'}),true);
+ assert.equal(Preview.isFlatPreview({manufacturer:'MAC Métal'}),true);
+ assert.equal(Preview.isFlatPreview({manufacturer:'Gentek'}),false);
 });
 check('Pas de photo de soffite dans le SVG des moulures Kaycan',()=>{
  const app=source('production-app.js');
- assert.ok(app.includes('const swatch=flatKaycan?null:safeAsset(finish.swatchUrl)'));
+ assert.ok(app.includes('const swatch=flatPreview?null:safeAsset(finish.swatchUrl)'));
  assert.ok(app.includes("paint||'#c0c7bc'"));
 });
 check('Le nuancier conserve les vraies références produit et les autres fabricants',()=>{
  const app=source('production-app.js');
  assert.ok(app.includes("chosenMaterial()?.brand==='Kaycan'"));
+ assert.ok(app.includes("chosenMaterial()?.brand==='MAC Métal architectural'"));
  assert.ok(app.includes('flat?\`<span class="color-text">'));
  assert.ok(app.includes('image?\`<img src='));
 });
