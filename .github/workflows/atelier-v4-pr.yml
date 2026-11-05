@@ -4,6 +4,12 @@ on:
     branches: [main]
     paths:
       - 'dist/production*'
+      - 'dist/studio-wall-sections.js'
+      - 'dist/studio-features.js'
+      - 'dist/plan-app.js'
+      - 'dist/plan.html'
+      - 'dist/plan.css'
+      - 'tests/mir-studio-wall-sections*.cjs'
       - 'tests/mir-retours-cotes*.cjs'
       - 'dist/mir-miniature.js'
       - 'dist/custom-model-cards*'
@@ -34,6 +40,11 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check dist/production-model.js
+          node --check dist/studio-wall-sections.js
+          node --check dist/studio-features.js
+          node --check dist/plan-app.js
+          node --check tests/mir-studio-wall-sections.cjs
+          node --check tests/mir-studio-wall-sections-browser.cjs
           node --check tests/mir-retours-cotes.cjs
           node --check tests/mir-retours-cotes-browser.cjs
           node --check dist/production-app.js
@@ -58,6 +69,7 @@ jobs:
           node tests/mir-atelier-v4.cjs
           node tests/mir-miniatures.cjs
           node tests/mir-retours-cotes.cjs
+          node tests/mir-studio-wall-sections.cjs
       - name: Responsive real-browser QA (Chrome)
         run: |
           npm install --no-save playwright@1.58.2
@@ -69,6 +81,7 @@ jobs:
           node tests/mir-moulure-renaming-browser.cjs
           node tests/mir-miniatures-browser.cjs
           node tests/mir-retours-cotes-browser.cjs
+          node tests/mir-studio-wall-sections-browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -82,4 +95,5 @@ jobs:
             artifacts/mir-rename-*.png
             artifacts/mir-miniatures-*.png
             artifacts/mir-retours-*.png
+            artifacts/mir-studio-wall-parts-*.png
           if-no-files-found: ignore

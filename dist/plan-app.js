@@ -282,11 +282,84 @@
     return {...textureCache.views,...(studioFeatures?.returnViews(patternDef)||{})};
   }
 
+  // Vues de côté 2D : afficher côte à côte les deux retours et le mur du
+  // fond de l'entrée, avec les Z du même volume que la vue 3D. Import PDF
+  // et facades non concernées conservent exactement leur vue actuelle.
+  function sideStudyWithDetachedWalls(f,plain){
+    const parts=window.MIRStudioWallParts;
+    if(!parts||data.projectKind==='imported-pdf'||!['right','left'].includes(f.key)||!studioFeatures?.canRender())return plain;
+    try{
+      const front=data.faces.find(row=>row.key==='front');
+      const dim=state.volumeOverride||data.dimensions;
+      const band=parts.masonryBand(front,dim);
+      const mesh=window.MIR3D.mesh({dimensions:data.dimensions,...sceneGeometry(),foundationDrop:.8});
+      const scale=parts.sideScale(f,dim.wallHeight);
+      if(!scale)return plain;
+      const masonry=front?.zones.find(z=>z.kind==='masonry');
+      const masonrySelection=band&&masonry?choice(front,masonry):null;
+      let brickPattern='';
+      if(masonrySelection){
+        const pxPerFoot=1/(scale.pixelsPerMeter*.3048);
+        const source={key:'mir-side-exploded',renderFeetPerPixel:pxPerFoot,
+          textureBox:[0,0,1,scale.groundY],textureBottom:0};
+        const z={id:'mir-exploded-brick',polygon:[[0,0],[100,0],[100,100],[0,100]]};
+        brickPattern=patternDef('mir-exploded-brick',masonrySelection,source,z,false);
+      }
+      const middle=front?.zones.find(z=>z.id==='centre_RDC');
+      const colors={
+        front:middle?choice(front,middle).color:'#5a665e',
+        'return-left':studioFeatures.returnChoice('return-left').color,
+        'return-right':studioFeatures.returnChoice('return-right').color
+      };
+      const rendered=parts.explodeSideSVG(plain,{sideFace:f,dimensions:dim,mesh,
+        brickBand:band,brickPattern,colors,frontFace:front});
+      return rendered?.svg||plain;
+    }catch(error){
+      // Une élévation 2D existante ne disparaît jamais si une surface manque.
+      window.MIR_SIDE_WALL_WARNING=String(error?.message||error);
+      return plain;
+    }
+  }
   async function renderDrawing(){
     const f=face(),n=++rendering;
     renderCoverageSummary();
     $('#elevation').hidden=state.view==='3d';$('#three-canvas').hidden=state.view!=='3d';$('#rotate-control').hidden=state.view!=='3d';
-    $('#volume-unavailable').hidden=true;if(state.view==='2d')$('#elevation').innerHTML=facadeSVG(f);
+    $('#volume-unavailable').hidden=true;
+    const sideView=$('#elevation'),sideButton=$('#mir-side-wall-scroll');
+    let homeViewBox=null,detachedViewBox=null;
+    if(state.view==='2d'){
+      const original=facadeSVG(f),view=sideStudyWithDetachedWalls(f,original);
+      sideView.innerHTML=view;
+      const sideSvg=sideView.querySelector('svg[data-mir-three-wall-explode="true"]');
+      sideView.classList.toggle('mir-studio-detached-side',!!sideSvg);
+      sideView.dataset.mode=state.displayMode;
+      if(sideSvg&&matchMedia('(max-width:650px)').matches){
+        // Sur un téléphone, garder toute la maison lisible. Le même SVG
+        // affiche les trois murs à leur altitude sur une deuxième vue ciblée.
+        const source=original.match(/viewBox="([^"]+)"/)?.[1].split(/[\s,]+/).map(Number);
+        const full=sideSvg.viewBox.baseVal;
+        if(source?.length===4&&source.every(Number.isFinite)&&full.width>source[2]){
+          homeViewBox=source;
+          const startX=source[0]+source[2]+40;
+          detachedViewBox=[startX,source[1],Math.max(1,full.x+full.width-startX),source[3]];
+          sideSvg.setAttribute('viewBox',homeViewBox.join(' '));
+          sideSvg.dataset.mirHomeViewBox=homeViewBox.join(' ');
+          sideSvg.dataset.mirWallsViewBox=detachedViewBox.join(' ');
+        }
+      }
+    } else sideView.classList.remove('mir-studio-detached-side');
+    if(sideButton){
+      sideButton.hidden=!homeViewBox||!detachedViewBox;
+      sideButton.textContent='Voir les 3 murs →';
+      let showingWalls=false;
+      sideButton.onclick=()=>{
+        const svg=sideView.querySelector('svg[data-mir-three-wall-explode="true"]');
+        if(!svg||!homeViewBox||!detachedViewBox)return;
+        showingWalls=!showingWalls;
+        svg.setAttribute('viewBox',(showingWalls?detachedViewBox:homeViewBox).join(' '));
+        sideButton.textContent=showingWalls?'← Voir la maison':'Voir les 3 murs →';
+      };
+    }
     $('#stage-title').textContent=state.view==='3d'?'VOTRE PROJET / VUE 360°':`${String(f.page).padStart(2,'0')} / ÉLÉVATION ${f.name.toLocaleUpperCase('fr')}`;
     $('#stage-subtitle').textContent=state.view==='3d'?'Cliquez pour choisir · glissez pour tourner et incliner':state.displayMode==='atelier'?'Déplacez les joints · cotes en pouces':'Cliquez sur une matière pour la modifier';
     $('#stage-note').textContent=state.view==='3d'?'Matières et finitions · vue interactive':'Fenêtres et portes protégées';

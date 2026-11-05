@@ -24,6 +24,11 @@ jobs:
           node --check dist/model-measure-defaults.js
           node --check dist/template-library-backup.js
           node --check dist/production-app.js
+          node --check dist/studio-wall-sections.js
+          node --check dist/studio-features.js
+          node --check dist/plan-app.js
+          node --check tests/mir-studio-wall-sections.cjs
+          node --check tests/mir-studio-wall-sections-browser.cjs
           node --check dist/mir-miniature.js
           node --check tests/mir-retours-cotes.cjs
           node --check tests/mir-retours-cotes-browser.cjs
@@ -44,6 +49,7 @@ jobs:
           node tests/mir-atelier-v4.cjs
           node tests/mir-miniatures.cjs
           node tests/mir-retours-cotes.cjs
+          node tests/mir-studio-wall-sections.cjs
           node --check tests/mir-homepage.cjs
           node --check tests/mir-homepage-browser.cjs
           node tests/mir-homepage.cjs
@@ -71,6 +77,7 @@ jobs:
           node tests/mir-direct-po-browser.cjs
           node tests/mir-drawing-pan-browser.cjs
           node tests/mir-retours-cotes-browser.cjs
+          node tests/mir-studio-wall-sections-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
         uses: actions/upload-artifact@v4
@@ -85,6 +92,7 @@ jobs:
             artifacts/mir-direct-po-*.png
             artifacts/mir-pan-*.png
             artifacts/mir-retours-*.png
+            artifacts/mir-studio-wall-parts-*.png
           if-no-files-found: ignore
       - uses: actions/configure-pages@v5
       - name: Préparer uniquement le site MIR principal
@@ -238,6 +246,13 @@ jobs:
           grep -F 'A?.gableFromPitch?.(width,eave,leftPitch,rightPitch)' /tmp/calepinage-app.js
           grep -F 'E.setPanelSize(layout.config,axis' /tmp/calepinage-app.js
           fetch "$base/plan.html" /tmp/plan.html
+          grep -F 'studio-wall-sections.js?v=1' /tmp/plan.html
+          grep -F 'plan.css?v=murs-detaches-20261105' /tmp/plan.html
+          grep -F 'id="mir-side-wall-scroll"' /tmp/plan.html
+          fetch "$base/studio-wall-sections.js" /tmp/studio-wall-sections.js
+          grep -F 'function masonryBand(' /tmp/studio-wall-sections.js
+          fetch "$base/studio-features.js" /tmp/studio-features.js
+          grep -F 'data-mir-continuous-masonry' /tmp/studio-features.js
           grep -F 'material-coverage.js' /tmp/plan.html
           grep -F 'id="material-format"' /tmp/plan.html
           grep -F 'id="coverage-input"' /tmp/plan.html

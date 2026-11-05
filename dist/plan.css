@@ -28,3 +28,41 @@
 
 /* Physical material coverage, next to the result on every viewport. */
 .coverage-summary{padding:15px 22px;border-top:1px solid #d5dcd0;background:#f0f4e9;line-height:1.5;font-size:13px}.coverage-summary strong{display:block;color:#294332;font-size:16px;margin-bottom:3px}.coverage-summary p{margin:4px 0}.coverage-summary small{display:block;color:#59624f;font-size:12px}.coverage-summary.is-unresolved{background:#f5f1e7}.coverage-label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#526349;margin-bottom:5px}.coverage-summary>a{display:inline-block;margin-top:7px;color:#344a35;text-underline-offset:3px;font-size:12px}.coverage-summary[hidden]{display:none}#material-format-field,#coverage-input-field{margin:14px 0}#coverage-input{width:100%;min-height:46px;border:1px solid #d4d8d0;border-radius:5px;padding:10px;font:inherit}
+
+/* MIR Studio — trois murs à leur Z réel; sur téléphone, deux vues
+   cadrées dans le même SVG, sans rétrécir ni faire défiler la page. */
+#mir-side-wall-scroll[hidden]{display:none!important}
+#mir-side-wall-scroll{
+  pointer-events:auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  padding:8px 12px;
+  border:1px solid #b4c7a9;
+  border-radius:8px;
+  background:#ecf3e5;
+  color:#285239;
+  font:650 12px/1.25 system-ui,sans-serif;
+  cursor:pointer;
+}
+#mir-side-wall-scroll:focus-visible{outline:3px solid #8baa82;outline-offset:2px}
+@media(max-width:650px){
+  #elevation.mir-studio-detached-side{
+    overflow:hidden;
+    justify-content:center;
+    align-items:center;
+    padding:40px 14px 24px;
+  }
+  #elevation.mir-studio-detached-side svg[data-mir-three-wall-explode]{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    height:100%;
+    max-height:430px;
+    flex:0 1 auto;
+    touch-action:none;
+  }
+  #stage:has(#elevation.mir-studio-detached-side) #stage-subtitle{display:none}
+  #stage:has(#elevation.mir-studio-detached-side) .stage-label{align-items:center}
+}
