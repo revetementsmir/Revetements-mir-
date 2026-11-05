@@ -72,14 +72,17 @@ async function ready(){
      await stage.scrollIntoViewIfNeeded();
      const point=await stage.locator('svg').evaluate((svg,p)=>{
       const point=new DOMPoint(...p).matrixTransform(svg.getScreenCTM());
-      return {x:point.x,y:point.y};
+      const hit=document.elementFromPoint(point.x,point.y);
+      return {x:point.x,y:point.y,onDrawing:hit?.closest('svg')===svg,hit:hit?.tagName};
      },[x,y]);
+     assert.ok(point.onDrawing,'Le geste doit toucher le dessin : '+JSON.stringify(point));
      if(viewport.name==='mobile')await page.touchscreen.tap(point.x,point.y);
      else await page.mouse.click(point.x,point.y);
     };
     const choose=async(label)=>{
-     const prompt=page.getByRole('dialog',{name:'De quel côté va le double pli ?'});
-     await prompt.waitFor();
+     const prompt=page.locator('#production-dialog');
+     await prompt.waitFor({timeout:5000});
+     assert.equal(await prompt.locator('h2').textContent(),'De quel côté va le double pli ?');
      const face=prompt.locator('[name=face]');
      if(await face.count())await face.selectOption('left');
      await prompt.getByRole('button',{name:label,exact:true}).click();
@@ -88,9 +91,13 @@ async function ready(){
     const arc=()=>stage.locator('svg > path[d*=" A5 5 "]').first().getAttribute('d');
     await page.reload({waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
+    await page.addStyleTag({content:'html{scroll-behavior:auto!important}'});
     await page.locator('#production-drawing[data-tool="draw"] svg').waitFor();
-    if(viewport.name==='mobile')await page.locator('[data-open-mobile-trace]').tap();
-    await trace(210,275);await trace(520,275);await trace(365,275);
+    await trace(210,275);
+    assert.equal(await stage.locator('[data-draw-point]').count(),1,'Premier point tracé');
+    await trace(520,275);
+    assert.equal(await stage.locator('[data-draw-point]').count(),2,'Deuxième point tracé');
+    await trace(365,275);
     await choose('Annuler');
     assert.equal(await stage.locator('[data-draw-point]').count(),2);
     await trace(365,275);await choose('Intérieur');
