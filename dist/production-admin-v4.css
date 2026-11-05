@@ -767,3 +767,47 @@ body.mir-admin-v4 .model-preview {
     min-width: 140px;
   }
 }
+
+/* Action sans détour : dessiner -> choisir le bon -> une ligne de bon locale.
+   Enregistrer dans le dossier reste une action secondaire non destructrice. */
+body.mir-admin-v4 .mir-v4-footer .piece-submit {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  gap: 9px;
+}
+body.mir-admin-v4 .mir-v4-footer .piece-submit #piece-guidance {
+  grid-column: 1 / -1;
+}
+body.mir-admin-v4 #mir-direct-po-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  width: 100%;
+  min-height: 53px;
+  padding: 12px 16px;
+  border: 1px solid #28583a;
+  border-radius: 9px;
+  background: #28583a;
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+}
+body.mir-admin-v4 #mir-direct-po-add[hidden] {display:none !important}
+body.mir-admin-v4 #mir-direct-po-add:disabled {opacity:.48;cursor:not-allowed}
+body.mir-admin-v4 .mir-v4-footer #add-production-piece {
+  min-height: 48px;
+  border: 1px solid #d3e0cf;
+  border-radius: 9px;
+  color: #345d40;
+  background: #f5f8f1;
+  font-size: 13px;
+}
+body.mir-admin-v4 #mir-direct-po-add:focus-visible,
+body.mir-admin-v4 #add-production-piece:focus-visible {
+  outline: 3px solid #9cb887;
+  outline-offset: 2px;
+}
+@media(max-width:650px){
+  body.mir-admin-v4 #mir-direct-po-add {font-size:14px;min-height:52px}
+}

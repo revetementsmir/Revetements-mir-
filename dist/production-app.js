@@ -415,10 +415,15 @@ function updateDrawing({keepForm=false}={}){
  const jRule=window.MIRBendingPresets?.checkJ(draft);
   const blockJ=jRule&&!jRule.pending&&(!jRule.valid||(!jRule.ok&&!window.MIRBendingPresets.exceptionMatches(jRule,jException)));
   $('#add-production-piece').disabled=!actual.valid||geometryErrors.length>0||busy||!!blockJ||!availableForPO();
+ const directPO=$('#mir-direct-po-add');
+ if(directPO){
+   directPO.hidden=client||kind!=='profile'||authoring||!!editingItemId;
+   directPO.disabled=!actual.valid||geometryErrors.length>0||busy||!!blockJ||!availableForPO();
+ }
   renderPieceGuidance(actual,blockJ);
   updateV4Totals(actual);
  const quote=M.quotePolicy(draft);$('#custom-color-quote').hidden=authoring||!quote.required;renderPiecePrice(actual,geometryErrors);
- $('#add-production-piece').innerHTML=authoring?'Enregistrer le modèle <span aria-hidden="true">＋</span>':editingItemId?'Enregistrer la révision <span aria-hidden="true">✓</span>':quote.required?'Ajouter à ma soumission <span aria-hidden="true">＋</span>':(client?'Ajouter au dossier':'Enregistrer la pièce')+' <span aria-hidden="true">'+(client?'＋':'✓')+'</span>';if(!keepForm)renderTools();
+ $('#add-production-piece').innerHTML=authoring?'Enregistrer le modèle <span aria-hidden="true">＋</span>':editingItemId?'Enregistrer la révision <span aria-hidden="true">✓</span>':quote.required?'Ajouter à ma soumission <span aria-hidden="true">＋</span>':(client?'Ajouter au dossier':'Enregistrer dans mon dossier')+' <span aria-hidden="true">'+(client?'＋':'✓')+'</span>';if(!keepForm)renderTools();
 }
 function renderPieceGuidance(model,blockJ){
  const box=$('#piece-guidance');
@@ -518,7 +523,7 @@ function pickPO(number){
 function choosePODialog(intent='',description=''){
  const rows=[order,...openOrders().filter(row=>row.id!==order.id)]
   .filter(row=>row.poNumber||row.items.length);
- dialog(intent?'Choisir le bon pour cette pièce':'Bons de commande en cours',
+ dialog(intent==='add'?'Ajouter la moulure à un bon de commande':intent?'Choisir le bon pour cette pièce':'Bons de commande en cours',
   (description?description+' · ':'')+'Entre un numéro pour créer un bon ou retrouver un bon enregistré sur cet appareil.',
   `<form id="mir-po-form" data-po-intent="${intent}" class="dialog-form"><label>Numéro du bon<input name="po" maxlength="100" list="mir-po-list" required placeholder="Ex. PO-2026-084"></label><datalist id="mir-po-list">${rows.filter(row=>row.poNumber).map(row=>`<option value="${esc(row.poNumber)}">${esc(row.project)}</option>`).join('')}</datalist><button class="primary-button" type="submit">${intent?'Ajouter à ce bon':'Ouvrir ce bon'}</button></form>`+
   (rows.length?`<ul class="mir-po-list">${rows.map(row=>`<li><button type="button" class="secondary-button" data-open-po="${esc(row.id)}" data-po-intent="${intent}"${intent&&!row.poNumber?' disabled':''}>${esc(row.poNumber||'Brouillon sans numéro')} · ${row.items.length} ligne(s)${row.project?' · '+esc(row.project):''}</button></li>`).join('')}</ul>`:''));
@@ -1127,6 +1132,16 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.id==='panel-view-reset'){zoom=1;orbit=-35;pitch=23;updateDrawing();return;}
  if(d.productionColor){colorId=d.productionColor;renderColorGrid();if($('#production-ral'))$('#production-ral').value=colorId;updateFinish();showProfilePaintedFace();updateDrawing();return;}
  if(d.selectBottom&&!authoring){draft.bottomEdgeId=d.selectBottom;draft.perforation={...draft.perforation,edgeId:d.selectBottom};renderPanelOptions();updateDrawing();return;}
+ if(button.id==='mir-direct-po-add'&&!client){
+  formMetadata();
+  const model=build();
+  if(kind!=='profile'||authoring||editingItemId||!model.valid||!availableForPO())
+    return toast('Complète les cotes et sélectionne une moulure avant de l’ajouter au bon.');
+  const check=window.MIRBendingPresets?.checkJ(draft);
+  if(check&&!check.valid||check&&!check.ok&&!window.MIRBendingPresets.exceptionMatches(check,jException))
+    return toast(check.message||'Corrige d’abord le clouage de cette moulure.');
+  return choosePODialog('add',model.name+' · '+M.formatMeasurement(model.lengthMM,model.unit)+' · quantité '+(model.quantity||1));
+ }
  if(button.id==='add-production-piece')return addPiece();
  if(button.id==='cancel-piece-edit'){editingItemId=null;choose(kind,kind==='panel'?'rectangle':'l');return;}
  if(d.renamePiece&&!client){
