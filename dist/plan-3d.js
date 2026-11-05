@@ -91,7 +91,7 @@
 
   const DEFAULTS = Object.freeze({ width: 13.4112, depth: 10.3632, wallHeight: 6.2611, roofRise: 1.7145 });
   const RECESS_DEFAULTS = Object.freeze({ enabled:true, start:3.6576, width:6.096, depth:0.6096, height:3.4, upperStorey:'flush-assumption' });
-  const PORCH_DEFAULTS = Object.freeze({ enabled:false, projection:.9327, ceilingHeight:3.4, roofRise:.56, fasciaHeight:.1524, floorHeight:.86,
+  const PORCH_DEFAULTS = Object.freeze({ enabled:false, projection:.9327, ceilingHeight:3.4, roofRise:.56, fasciaHeight:.1524, floorHeight:.86,balconyEnabled:false,floorDeckThickness:.16,
     divider:Object.freeze({enabled:true,width:.20,color:'#d7d8d0'}),
     sourceStatus:'schematic-from-raster-confirm-dimensions', sourcePage:5, sourceSheet:'A-7' });
   const states = new WeakMap();
@@ -173,12 +173,13 @@
     // A wall setback can span two storeys; it never sets the porch elevation.
     const ceilingHeight=read('ceilingHeight',PORCH_DEFAULTS.ceilingHeight),roofRise=read('roofRise',PORCH_DEFAULTS.roofRise);
     const fasciaHeight=read('fasciaHeight',PORCH_DEFAULTS.fasciaHeight),floorHeight=read('floorHeight',PORCH_DEFAULTS.floorHeight);
+    const balconyEnabled=supplied.balconyEnabled===true, floorDeckThickness=read('floorDeckThickness',PORCH_DEFAULTS.floorDeckThickness);
     const div=supplied.divider&&typeof supplied.divider==='object'?supplied.divider:{};
     const divider={enabled:supplied.divider!==false&&div.enabled!==false,width:positive(div.width,PORCH_DEFAULTS.divider.width),color:cleanColor(div.color,PORCH_DEFAULTS.divider.color)};
     const enabled=supplied.enabled===true&&width>0&&projection>0&&ceilingHeight>0;
     if(enabled&&(start<0||start+width>d.width||ceilingHeight+fasciaHeight+roofRise>d.wallHeight))throw new RangeError('Le porche doit rester sous le haut du mur et dans la largeur du bâtiment.');
-    if(enabled&&(floorHeight>=ceilingHeight||divider.width>=width))throw new RangeError('La hauteur libre et la largeur de la cloison du porche doivent rester cohérentes.');
-    return {enabled,start,width,projection,ceilingHeight,roofRise,fasciaHeight,floorHeight,divider,
+    if(enabled&&(floorHeight>=ceilingHeight||divider.width>=width||floorDeckThickness>=floorHeight))throw new RangeError('La hauteur libre, le plancher du balcon et la largeur du porche doivent rester cohérents.');
+    return {enabled,start,width,projection,ceilingHeight,roofRise,fasciaHeight,floorHeight,balconyEnabled,floorDeckThickness,divider,
       backOffset:recess.enabled?recess.depth:0,sourceStatus:String(supplied.sourceStatus||PORCH_DEFAULTS.sourceStatus),
       inferredStructuralMaterial:false,netArea:null,notCertifiedTakeoff:true};
   }
@@ -202,17 +203,24 @@
   function studyStructureDefaults(options={}) {
     const d=dimensionsFrom(options),r=recessFrom(d,options),p=porchFrom(d,r,{...options,porch:{...PORCH_DEFAULTS,...(options.porch||{}),enabled:true}});
     const a=d.width/2,b=d.depth/2,w=.1524,x=-a+p.start,y=-b-p.projection;
-    return [0,1].map(i=>({id:i?'porch-column-right':'porch-column-left',type:'column',
+    const posts=[0,1].map(i=>({id:i?'porch-column-right':'porch-column-left',type:'column',
       label:i?'Colonne extérieure droite du porche':'Colonne extérieure gauche du porche',
       origin:[i?x+p.width-w:x,y,p.floorHeight],size:[w,w,p.ceilingHeight-p.floorHeight],
       color:'#424943',material:'unknown',sourceStatus:'position-visible-on-A-7-section-and-height-schematic',
       sourcePage:5,sourceSheet:'A-7',structuralVerification:false}));
+    // Horizontal roof support is a schematic placement, not a load calculation.
+    const beamHeight=.23;
+    posts.push({id:'porch-front-beam',type:'beam',label:'Poutre sous le toit du porche',
+      origin:[x,y,p.ceilingHeight-beamHeight],size:[p.width,.1524,beamHeight],
+      color:'#424943',material:'unknown',sourceStatus:'emplacement-schematique-A-7-a-valider',
+      sourcePage:5,sourceSheet:'A-7',structuralVerification:false});
+    return posts;
   }
 
   function studyDefaults(dimensions={}) {
     const d=dimensionsFrom({dimensions});
     const recess={...RECESS_DEFAULTS,start:d.width*12/44,width:d.width*20/44,height:d.wallHeight,upperStorey:'recessed-confirmed'};
-    const porch={...PORCH_DEFAULTS,enabled:true,divider:{...PORCH_DEFAULTS.divider},
+    const porch={...PORCH_DEFAULTS,enabled:true,balconyEnabled:true,divider:{...PORCH_DEFAULTS.divider},
       provenance:'A-7 : emprise du porche et deux poteaux extérieurs visibles; projection et hauteurs lues sur raster, à confirmer. Le centre est une cloison séparative.'};
     return {footprint:{type:'front-recess'},recess,recessRevision:4,porch,structures:studyStructureDefaults({dimensions,recess,porch}),roofStyle:'duplex',
       sourceStatus:'schematic-from-supplied-duplex-only',
@@ -485,6 +493,13 @@
     trim('back', [X,Y,Z], [-X,Y,Z], [0,-1,0], [0,1,0]);
     if(porch.enabled){
       const L=-a+porch.start,R=L+porch.width,F=-b-porch.projection,B=-b+porch.backOffset,C=porch.ceilingHeight,T=C+porch.fasciaHeight,RT=T+porch.roofRise;
+      if(porch.balconyEnabled){
+        // Show the balcony/porch deck independently from the roof. No unproven
+        // guardrails, stairs or structural capacity are inferred from a raster.
+        addBox('balcony-deck',[L,F,porch.floorHeight-porch.floorDeckThickness],
+          [porch.width,B-F,porch.floorDeckThickness],'balcony','#c6c8be',
+          {role:'balcony-platform',sourceStatus:porch.sourceStatus,notCertifiedTakeoff:true});
+      }
       add('roof-porch',[[L,F,T],[R,F,T],[R,B,RT],[L,B,RT]],'roof',null,{role:'porch-roof',measurementStatus:porch.sourceStatus});
       add('soffit-porch',[[L,F,C],[R,F,C],[R,B,C],[L,B,C]],'soffit',[0,0,-1],{role:'porch-ceiling',measurementStatus:porch.sourceStatus});
       add('fascia-porch-front',[[L,F,T],[R,F,T],[R,F,C],[L,F,C]],'fascia',[0,-1,0],{role:'gutter-edge'});
@@ -713,7 +728,7 @@
       if(face.type==='wall')paintWall(face);
       else if(face.type==='roof')paintRoof(face);
       else if(face.type==='soffit')paintSoffit(face);
-      else if(['column','beam','divider'].includes(face.type))paintSolid(face);
+      else if(['column','beam','divider','balcony'].includes(face.type))paintSolid(face);
       else patch(face.poly,fascia);
       trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';ctx.stroke();
     }
@@ -778,5 +793,5 @@
     if(state.frame)global.cancelAnimationFrame(state.frame);states.delete(canvas);
   }
 
-  global.MIR3D=Object.freeze({render,dispose,geometry,mesh:exportMesh,pick,projectPoint,roofCourses,soffitCourses,studyDefaults,studyStructureDefaults,version:'1.6.0',defaults:DEFAULTS,recessDefaults:RECESS_DEFAULTS,porchDefaults:PORCH_DEFAULTS});
+  global.MIR3D=Object.freeze({render,dispose,geometry,mesh:exportMesh,pick,projectPoint,roofCourses,soffitCourses,studyDefaults,studyStructureDefaults,version:'1.7.0',defaults:DEFAULTS,recessDefaults:RECESS_DEFAULTS,porchDefaults:PORCH_DEFAULTS});
 })(window);
