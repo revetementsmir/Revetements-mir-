@@ -707,6 +707,52 @@ function profileSectionPath(points,bends,hemRadius=5){
  }
  return {path,segments,folds};
 }
+
+// Rendu 2D seulement : lorsque les extrémités A/D sont jointives, que leurs
+// côtés ont la même cote et sont antiparallèles, dessiner le retour symétrique
+// de celui déjà présent entre B/C. Ne JAMAIS modifier les cotes ni les bends.
+function profileDrawingSection(points,bends){
+ const original=profileSectionPath(points,bends);
+ if(!Array.isArray(points)||points.length<5||!Array.isArray(bends)||
+    !bends.slice(1,-1).some(b=>b?.mode==='hem'))return original;
+ const sides=original.segments,first=sides[0],last=sides.at(-1);
+ if(!first||!last)return original;
+ const v=[first[1][0]-first[0][0],first[1][1]-first[0][1]],
+       w=[last[1][0]-last[0][0],last[1][1]-last[0][1]];
+ const vl=Math.hypot(...v),wl=Math.hypot(...w);
+ if(vl<15||wl<15||Math.abs(vl-wl)>Math.max(3,vl*.025)||
+    (v[0]*w[0]+v[1]*w[1])/(vl*wl)>-.985)return original;
+ const start=first[0],end=last[1],u=v.map(q=>q/vl),normal=[-u[1],u[0]];
+ const delta=[end[0]-start[0],end[1]-start[1]];
+ const along=delta[0]*u[0]+delta[1]*u[1],across=delta[0]*normal[0]+delta[1]*normal[1];
+ // Si les extrémités sont trop éloignées, aucune fermeture ne doit être inventée.
+ if(Math.abs(along)>20||Math.abs(across)>20)return original;
+ const middle=sides[1]||first;
+ const mid=[(middle[0][0]+middle[1][0])/2,(middle[0][1]+middle[1][1])/2];
+ const inside=(mid[0]-start[0])*normal[0]+(mid[1]-start[1])*normal[1];
+ const side=inside<0?-1:1,radius=5;
+ const target=[start[0]+normal[0]*side*radius*2,start[1]+normal[1]*side*radius*2];
+ const visual=points.map(p=>p.slice());
+ // Déplacer uniquement la fin schématique du retour, pas le modèle de fabrication.
+ // Garder la même longueur graphique pour le dernier côté.
+ let section=original;
+ for(let attempt=0;attempt<3;attempt++){
+  const tip=section.segments.at(-1)[1],dx=target[0]-tip[0],dy=target[1]-tip[1];
+  if(Math.hypot(dx,dy)<.02)break;
+  for(const index of [visual.length-2,visual.length-1]){
+   visual[index][0]+=dx;
+   visual[index][1]+=dy;
+  }
+  section=profileSectionPath(visual,bends);
+ }
+ const tip=section.segments.at(-1)[1];
+ if(Math.hypot(tip[0]-target[0],tip[1]-target[1])>1)return original;
+ section.path+=' A'+radius+' '+radius+' 0 0 '+(side>0?1:0)+' '+start.map(decimal).join(' ');
+ section.folds.push([(tip[0]+start[0])/2,(tip[1]+start[1])/2]);
+ section.closedReturn=true;
+ return section;
+}
+
 function profileSideMarkers({segments,folds},model,handles){
  const placed=[];
  const distance=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
@@ -738,14 +784,22 @@ function profileSideMarkers({segments,folds},model,handles){
   let position=null, adjacent=false;
   if(length){
    const nx=(a[1]-b[1])/length,ny=(b[0]-a[0])/length;
-   const outward=(anchor[0]-center[0])*nx+(anchor[1]-center[1])*ny>=0?1:-1;
-   const gap=Math.max(36,Math.ceil(1.42/Math.hypot(nx/(halfWidth+7),ny/19))+1);
-   const candidate=(side,extra)=>[anchor[0]+side*(gap+extra)*nx,anchor[1]+side*(gap+extra)*ny];
-   position=[candidate(outward,0),candidate(outward,8),candidate(-outward,0),candidate(-outward,8)].find(clear);
+   // Repères du côté droit du tracé : A au-dessus, B à droite,
+   // C à gauche, D sous le retour. Les plis voisins ne partagent plus
+   // la même rangée de badges ni des flèches traversant le profil.
+   const preferred=-1;
+   const gap=Math.max(38,Math.ceil(1.48/Math.hypot(nx/(halfWidth+7),ny/19))+2);
+   const candidate=(side,extra,slide=0)=>[
+    anchor[0]+side*(gap+extra)*nx+slide*(b[0]-a[0])/length,
+    anchor[1]+side*(gap+extra)*ny+slide*(b[1]-a[1])/length
+   ];
+   position=[candidate(preferred,0),candidate(preferred,10),
+    candidate(preferred,24),candidate(preferred,8,22),candidate(preferred,8,-22)].find(clear);
    adjacent=!!position;
    if(!position){
-    for(const extra of [20,34,50,76,105,140]){
-     position=[candidate(outward,extra),candidate(-outward,extra)].find(clear);
+    for(const extra of [18,35,55,85,120,160]){
+     position=[candidate(preferred,extra),candidate(-preferred,extra),
+       candidate(preferred,extra,26),candidate(-preferred,extra,-26)].find(clear);
      if(position)break;
     }
    }
@@ -767,7 +821,7 @@ function profileSideMarkers({segments,folds},model,handles){
  function badge([x,y],caption,halfWidth,letterOnly){
   const shape=letterOnly?`<circle cx="${decimal(x)}" cy="${decimal(y)}" r="11"`:
    `<rect x="${decimal(x-halfWidth)}" y="${decimal(y-12)}" width="${halfWidth*2}" height="24" rx="9"`;
-  return `<g class="profile-side-marker" pointer-events="none" aria-hidden="true">${shape} fill="#fff" stroke="#779068"/><text x="${decimal(x)}" y="${decimal(y+4)}" text-anchor="middle" font-size="${letterOnly?12:14}" font-weight="700" fill="#345d3d">${esc(caption)}</text></g>`;
+  return `<g class="profile-side-marker" data-marker-label="${esc(caption.split(" · ")[0])}" pointer-events="none" aria-hidden="true">${shape} fill="#fff" stroke="#779068"/><text x="${decimal(x)}" y="${decimal(y+4)}" text-anchor="middle" font-size="${letterOnly?12:14}" font-weight="700" fill="#345d3d">${esc(caption)}</text></g>`;
  }
  function leader(from,to){
   const gap=distance(from,to);
@@ -796,7 +850,7 @@ function profileSideMarkers({segments,folds},model,handles){
 }
 
 function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false}={}){
- const section=profileSectionPath(mapped,bends);
+ const section=profileDrawingSection(mapped,bends);
  let output=`<path d="${section.path}" fill="none" stroke="#97a68b" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="#dbe3d4" stroke-width="4" stroke-linejoin="miter"/>`;
  const reserved=[...handles];
  section.segments.forEach(([a,b],i)=>{
@@ -812,7 +866,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  const stripe=`M${ends[0].map(decimal).join(',')}L${ends[1].map(decimal).join(',')}`;
  output+=`<g${action}>${togglePaintedFace?`<path d="${stripe}" fill="none" stroke="transparent" stroke-width="38" stroke-linecap="round"/>`:''}<path class="profile-painted-stripe" d="${stripe}" fill="none" stroke="#175b94" stroke-width="5" stroke-linecap="round"/></g>`;}
  });
- if(markers)output=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved)+output;
+ if(markers)output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved);
  return output;
 }
 

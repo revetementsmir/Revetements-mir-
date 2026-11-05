@@ -25,6 +25,8 @@ jobs:
           node --check dist/template-library-backup.js
           node --check dist/production-app.js
           node --check dist/mir-miniature.js
+          node --check tests/mir-retours-cotes.cjs
+          node --check tests/mir-retours-cotes-browser.cjs
           node --check tests/mir-miniatures.cjs
           node --check tests/mir-moulure-renaming-browser.cjs
           node --check dist/kaycan-flat-preview.js
@@ -38,6 +40,7 @@ jobs:
           node tests/mir-pages-regressions.cjs
           node tests/mir-atelier-v4.cjs
           node tests/mir-miniatures.cjs
+          node tests/mir-retours-cotes.cjs
           node --check tests/mir-homepage.cjs
           node --check tests/mir-homepage-browser.cjs
           node tests/mir-homepage.cjs
@@ -50,6 +53,7 @@ jobs:
           node tests/mir-homepage-browser.cjs
           node tests/mir-client-header-browser.cjs
           node tests/mir-miniatures-browser.cjs
+          node tests/mir-retours-cotes-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
         uses: actions/upload-artifact@v4
@@ -59,6 +63,7 @@ jobs:
             artifacts/mir-accueil-*.png
             artifacts/mir-entete-*.png
             artifacts/mir-miniatures-*.png
+            artifacts/mir-retours-*.png
           if-no-files-found: ignore
       - uses: actions/configure-pages@v5
       - name: Préparer uniquement le site MIR principal
@@ -121,6 +126,7 @@ jobs:
           grep -F "mode: 'connected'" /tmp/mir-portal-client.js
           fetch "$base/production.html" /tmp/production.html
           grep -F 'mir-miniature.js?v=1' /tmp/production.html
+          grep -F 'production-model.js?v=retours-cotes-20261105' /tmp/production.html
           grep -F 'production-admin-v4.css?v=miniatures-20261105' /tmp/production.html
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
@@ -164,6 +170,7 @@ jobs:
           fetch "$base/production-model.js" /tmp/production-model.js
           grep -F 'const radius=5, side=bends[i-1].direction' /tmp/production-model.js
           grep -F 'class="profile-marker-overflow"' /tmp/production-model.js
+          grep -F 'function profileDrawingSection(' /tmp/production-model.js
           grep -F "const oldHem=base?.bends?.[i]?.mode==='hem'" /tmp/production-app.js
           fetch "$base/atelier-essai/mir-calepinage-extension.js" /tmp/extension.js
           grep -F 'const pitch = value =>' /tmp/extension.js
