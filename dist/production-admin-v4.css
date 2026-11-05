@@ -324,3 +324,38 @@ body.mir-admin-v4 .mir-v4-actions[hidden] { display: none !important; }
 @media(max-width:650px){
   body.mir-admin-v4 .mir-v4-section-status { max-width: 45%; font-size: 10px; }
 }
+
+/* Kaycan : une couleur de tôle ne doit jamais reproduire les perforations
+   d'un produit de soffite. La teinte unie est un aperçu indicatif seulement. */
+body.mir-admin-v4 .color-choice.kaycan-flat-choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px;
+  min-height: 51px;
+  background-image: none !important;
+}
+body.mir-admin-v4 .color-choice.kaycan-flat-choice .color-text {
+  display: block;
+  max-height: none;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: none;
+  overflow-wrap: anywhere;
+}
+body.mir-admin-v4 .selected-finish .kaycan-flat-chip {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 58px;
+  height: 58px;
+  border: 1px solid #b8c5b3;
+  border-radius: 7px;
+}
+@media(max-width:650px) {
+  body.mir-admin-v4 .color-choice.kaycan-flat-choice .color-text { font-size: 9px; }
+  body.mir-admin-v4 .selected-finish .kaycan-flat-chip { width: 44px; height: 44px; }
+}

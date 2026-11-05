@@ -34,7 +34,10 @@ function available() {
       page.on('pageerror',error=>errors.push(String(error)));
       await page.goto(base+'/production.html',{waitUntil:'domcontentloaded',timeout:25000});
       await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version,{timeout:25000});
-      assert.equal(await page.locator('#production-title').textContent(),'Moulures sur mesure');
+      assert.equal(await page.locator('#production-title').textContent(),'Créer une moulure');
+      assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'À préciser');
+      await page.locator('.mir-v4-picker > summary').click();
+      await page.locator('.mir-v4-picker [data-template="l"]').click();
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'5 po');
       assert.equal(await page.locator('.mir-v4-sheet-total').count(),1);
       assert.equal(await page.locator('body.mir-admin-v4').count(),1);
@@ -60,7 +63,7 @@ function available() {
       assert.equal(await page.locator('#production-title').textContent(),'Panneaux architecturaux');
       assert.equal(await page.locator('#mir-v4-sheet-total').isVisible(),false);
       await page.locator('.kind-bar [data-kind="profile"]').click();
-      assert.equal(await page.locator('#production-title').textContent(),'Moulures sur mesure');
+      assert.equal(await page.locator('#production-title').textContent(),'Créer une moulure');
       if(errors.length)throw new Error(viewport.name+' JS errors: '+errors.join('; '));
       console.log('PASS '+viewport.name+' '+viewport.width+'x'+viewport.height+', no overflow, profile and panel, zoom 2D');
       await page.close();
@@ -68,6 +71,8 @@ function available() {
     const page=await browser.newPage({viewport:{width:1440,height:900}});
     await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
+    await page.locator('.mir-v4-picker > summary').click();
+    await page.locator('.mir-v4-picker [data-template="l"]').click();
     await page.locator('#production-unit').selectOption('mm');
     assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'127 mm','Somme en mm');
     await page.locator('#production-unit').selectOption('in');

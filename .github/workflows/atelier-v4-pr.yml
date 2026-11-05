@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - 'dist/production*'
+      - 'dist/kaycan-flat-preview.js'
+      - 'tests/mir-kaycan-flat-preview.cjs'
       - 'tests/mir-atelier-v4.cjs'
       - 'tests/mir-atelier-v4-browser.cjs'
       - '.github/workflows/atelier-v4-pr.yml'
@@ -20,6 +22,8 @@ jobs:
         run: |
           node --check dist/production-model.js
           node --check dist/production-app.js
+          node --check dist/kaycan-flat-preview.js
+          node --check tests/mir-kaycan-flat-preview.cjs
           node --check dist/production-admin-v4.js
           node --check tests/mir-atelier-v4.cjs
           node --check tests/mir-atelier-v4-browser.cjs
@@ -31,9 +35,12 @@ jobs:
         run: |
           npm install --no-save playwright@1.58.2
           node tests/mir-atelier-v4-browser.cjs
+          node tests/mir-kaycan-flat-preview.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: mir-atelier-v4-responsive-screenshots
-          path: artifacts/atelier-v4-*.png
+          path: |
+            artifacts/atelier-v4-*.png
+            artifacts/kaycan-fix-*.png
           if-no-files-found: ignore
