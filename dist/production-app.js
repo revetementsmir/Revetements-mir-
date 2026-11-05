@@ -371,7 +371,17 @@ function updateV4Totals(model){
   :(Number.isFinite(model.widthMM)?'A '+M.formatMeasurement(model.widthMM,model.unit):'');
  put('#mir-v4-dimensions-status',dims);
 }
+function syncPieceNameField(){
+ const field=$('#mir-piece-name-field'),input=$('#production-piece-name');
+ if(!field||!input)return;
+ field.hidden=client||kind!=='profile'||authoring;
+ if(document.activeElement!==input){
+  const name=String(draft?.name||'');
+  input.value=['Profil dessiné','Profil personnalisé','Profil libre'].includes(name)?'':name;
+ }
+}
 function updateDrawing({keepForm=false}={}){
+ syncPieceNameField();
  renderFractionPickers();
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
@@ -522,10 +532,23 @@ function updateOrderReference(){
  const reference=String(order.poNumber||'').trim();
  box.textContent=reference?' · '+reference:' · PO à préciser';
 }
+function renameFormMarkup(item,model){
+ if(client||model.kind!=='profile')return '';
+ const id=esc(item.id),name=esc(model.name);
+ return '<form class="production-rename-form" data-rename-form="'+id+'" hidden>'+
+  '<label>Nom de la moulure<input type="text" name="name" maxlength="140" required autocomplete="off" value="'+name+'" placeholder="Ex. Solin fenêtre avant"></label>'+
+  '<div class="production-rename-actions"><button type="submit">Enregistrer le nom</button>'+
+  '<button type="button" data-cancel-rename="'+id+'">Annuler</button></div></form>';
+}
+function renameButtonMarkup(item,model){
+ if(client||model.kind!=='profile')return '';
+ return '<button type="button" class="rename-piece" data-rename-piece="'+esc(item.id)+
+  '" aria-label="Renommer la moulure '+esc(model.name)+'">✎ Renommer</button>';
+}
 function renderOrder(){const validItems=order.items||[];
  updateOrderReference();
 $('#order-head-count').textContent=String(validItems.length).padStart(2,'0');$('#production-count').textContent=String(validItems.length).padStart(2,'0');for(const [id,key] of [['order-project','project'],['order-po','poNumber'],['order-foreman','foreman'],['order-date','date'],['order-revision','revision'],['order-notes','notes']])$('#'+id).value=order[key]||'';
- const renderItem=item=>{const model=build(item.spec),geometryIssue=hasPanelGeometryIssue(item),snapshot=item.snapshot,thumb=diagramSVG(model,{small:true,interactive:false});return `<article class="production-item" data-production-item="${esc(item.id)}"><div class="production-item-thumb">${thumb}</div><div class="production-item-info"><span class="production-item-label">${esc(item.id)}${snapshot?` · modèle V${snapshot.templateVersion} / pièce R${snapshot.revision}`:''}</span><h3>${esc(model.name)}</h3><p>${esc(model.kind==='profile'?model.segments.map(s=>s.label+' '+M.formatMeasurement(s.lengthMM,model.unit)).join(' · ')+' · L '+M.formatMeasurement(model.lengthMM,model.unit):M.formatMeasurement(model.widthMM,model.unit)+' × '+M.formatMeasurement(model.heightMM,model.unit)+' · C '+M.formatMeasurement(model.reliefMM,model.unit))}</p><p>${esc([model.finish.manufacturer||model.finish.system,model.finish.name||model.finish.code,model.location].filter(Boolean).join(' · '))}</p><span class="item-status${model.complete&&!geometryIssue?' complete':''}">${geometryIssue?'Géométrie à corriger':M.quotePolicy(item.spec).required?'Soumission obligatoire · couleur personnalisée':model.complete?'Renseignée · validation atelier':'Précisions à compléter'}</span>${linePriceMarkup(item.spec)}</div><label class="production-item-qty">Quantité<input data-item-quantity="${esc(item.id)}" type="number" min="1" step="1" value="${model.quantity||1}" aria-label="Quantité de la pièce ${esc(item.id)}"></label><div class="production-item-actions">${!client&&model.kind==='profile'?profileGroupControl(item):''}<button type="button" data-edit-piece="${esc(item.id)}">Modifier ↗</button><button type="button" data-duplicate-piece="${esc(item.id)}">Dupliquer</button><button type="button" class="remove-piece" data-remove-piece="${esc(item.id)}">Retirer</button></div></article>`;};
+ const renderItem=item=>{const model=build(item.spec),geometryIssue=hasPanelGeometryIssue(item),snapshot=item.snapshot,thumb=diagramSVG(model,{small:true,interactive:false});return `<article class="production-item" data-production-item="${esc(item.id)}"><div class="production-item-thumb">${thumb}</div><div class="production-item-info"><span class="production-item-label">${esc(item.id)}${snapshot?` · modèle V${snapshot.templateVersion} / pièce R${snapshot.revision}`:''}</span><h3>${esc(model.name)}</h3>${renameFormMarkup(item,model)}<p>${esc(model.kind==='profile'?model.segments.map(s=>s.label+' '+M.formatMeasurement(s.lengthMM,model.unit)).join(' · ')+' · L '+M.formatMeasurement(model.lengthMM,model.unit):M.formatMeasurement(model.widthMM,model.unit)+' × '+M.formatMeasurement(model.heightMM,model.unit)+' · C '+M.formatMeasurement(model.reliefMM,model.unit))}</p><p>${esc([model.finish.manufacturer||model.finish.system,model.finish.name||model.finish.code,model.location].filter(Boolean).join(' · '))}</p><span class="item-status${model.complete&&!geometryIssue?' complete':''}">${geometryIssue?'Géométrie à corriger':M.quotePolicy(item.spec).required?'Soumission obligatoire · couleur personnalisée':model.complete?'Renseignée · validation atelier':'Précisions à compléter'}</span>${linePriceMarkup(item.spec)}</div><label class="production-item-qty">Quantité<input data-item-quantity="${esc(item.id)}" type="number" min="1" step="1" value="${model.quantity||1}" aria-label="Quantité de la pièce ${esc(item.id)}"></label><div class="production-item-actions">${!client&&model.kind==='profile'?profileGroupControl(item):''}${renameButtonMarkup(item,model)}<button type="button" data-edit-piece="${esc(item.id)}">Modifier le dessin ↗</button><button type="button" data-duplicate-piece="${esc(item.id)}">Dupliquer</button><button type="button" class="remove-piece" data-remove-piece="${esc(item.id)}">Retirer</button></div></article>`;};
  if(!validItems.length)$('#production-items').innerHTML='<div class="production-empty"><strong>La bonne pièce commence ici.</strong><p>Ajoutez vos pièces pour préparer leur dossier coté et leur bon de commande.</p></div>';
  else if(client)$('#production-items').innerHTML=validItems.map(renderItem).join('');
  else{
@@ -1105,6 +1128,16 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(d.selectBottom&&!authoring){draft.bottomEdgeId=d.selectBottom;draft.perforation={...draft.perforation,edgeId:d.selectBottom};renderPanelOptions();updateDrawing();return;}
  if(button.id==='add-production-piece')return addPiece();
  if(button.id==='cancel-piece-edit'){editingItemId=null;choose(kind,kind==='panel'?'rectangle':'l');return;}
+ if(d.renamePiece&&!client){
+  const item=order.items.find(row=>row.id===d.renamePiece);
+  const form=button.closest('[data-production-item]')?.querySelector('[data-rename-form]');
+  if(!item||!form)return;
+  form.hidden=false;
+  const input=form.querySelector('input[name="name"]');
+  if(input){input.value=build(item.spec).name;input.setCustomValidity('');input.focus();input.select();}
+  return;
+ }
+ if(d.cancelRename&&!client){const form=button.closest('[data-rename-form]');if(form)form.hidden=true;return;}
  if(d.editPiece)return editPiece(d.editPiece);
  if(d.removePiece){order.items=order.items.filter(item=>item.id!==d.removePiece);if(editingItemId===d.removePiece)editingItemId=null;persist();renderOrder();renderFormMetadata();updateDrawing();return;}
  if(d.duplicatePiece){const original=order.items.find(item=>item.id===d.duplicatePiece);if(!original)return;if(hasPanelGeometryIssue(original))return toast('Corrigez les lips de cette pièce avant de la dupliquer.');const id='M'+String(order.nextNumber||1).padStart(3,'0'),result=M.instantiateTemplate(original.snapshot.templateSnapshot,{...copy(original.snapshot.values),id,instanceId:id});if(!result.ok)return toast(result.errors.map(e=>e.message).join(' '));order.items.push({...copy(original),id,spec:copy(result.spec),snapshot:copy(result.snapshot),history:[],savedAt:new Date().toISOString()});order.nextNumber=(order.nextNumber||1)+1;persist();renderOrder();toast(`${id} créée à partir de ${original.id}.`);return;}
@@ -1135,6 +1168,11 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.hasAttribute('data-drawing-undo')){if(!drawPoints.length||client||editingItemId)return;drawPoints.pop();const next=toCustom(drawPoints);if(next)draft=next;else{draft.segments=[];draft.bends=[];}renderDimensions();updateDrawing();return;}
 }
 function handleInput(event){const e=event.target,d=e.dataset;
+ if(e.id==='production-piece-name'&&!client&&kind==='profile'&&!authoring){
+  draft.name=e.value;
+  updateDrawing({keepForm:true});
+  return;
+ }
  if(d.measure){if(kind==='profile'&&d.measure!=='length'){draft.dimensions=draft.dimensions||{};draft.dimensions[d.measure]=e.value;}else draft[d.measure]=e.value;if(kind==='panel'&&draft.shape==='square'&&d.measure==='width')draft.height=e.value;updateDrawing({keepForm:true});return;}
  if(d.segmentLength!==undefined){draft.segments[Number(d.segmentLength)].length=e.value;jException=null;renderProfileOptions();updateDrawing({keepForm:true});return;}
  if(d.bendAngle!==undefined){if(client||editingItemId)return;draft.bends[Number(d.bendAngle)].angle=e.value===''?'':Number(e.value);updateDrawing({keepForm:true});return;}
@@ -1191,7 +1229,35 @@ function handleChange(event){const e=event.target,d=e.dataset;
  if(e.id==='drawing-right-angle'){rightAngleSnap=e.checked;return;}
  if(d.itemQuantity){const item=order.items.find(row=>row.id===d.itemQuantity),quantity=Number(e.value);if(!item||!Number.isSafeInteger(quantity)||quantity<1){e.value=item?.spec.quantity||1;toast('Indiquez une quantité entière supérieure à zéro.');return;}const out=M.reviseInstance({snapshot:item.snapshot,history:item.history||[]},{quantity});if(!out.ok){toast(out.errors.map(err=>err.message).join(' '));return;}item.spec=copy(out.spec);item.snapshot=copy(out.snapshot);item.history=copy(out.history);persist();renderOrder();if(editingItemId===item.id){draft.quantity=quantity;$('#production-quantity').value=quantity;}return;}
 }
-function handleSubmit(event){const form=event.target;if(!form.matches('#end-hem-form,#double-fold-form,#save-production-template,#mir-j-exception-form,#mir-po-form'))return;event.preventDefault();const data=new FormData(form);
+function handleSubmit(event){
+ const form=event.target;
+ if(form.matches('[data-rename-form]')){
+  event.preventDefault();
+  if(client)return;
+  const id=form.dataset.renameForm,old=order.items.find(item=>item.id===id);
+  const input=form.querySelector('input[name="name"]');
+  const name=String(input?.value||'').trim();
+  if(!old)return toast('Moulure introuvable dans ce dossier.');
+  if(!name||name.length>140){
+   if(input){input.setCustomValidity('Entre un nom de 1 à 140 caractères.');input.reportValidity();}
+   return;
+  }
+  input?.setCustomValidity('');
+  if(!activeWorkshopOrderMatches())return;
+  if(name===build(old.spec).name){form.hidden=true;return;}
+  const result=M.reviseInstance({snapshot:old.snapshot,history:old.history||[]},{name});
+  if(!result.ok)return toast(result.errors?.map(error=>error.message).join(' ')||'Impossible de renommer cette pièce.');
+  const renamed={...old,spec:copy(result.spec),snapshot:copy(result.snapshot),history:copy(result.history),savedAt:new Date().toISOString()};
+  const nextOrder={...order,items:order.items.map(item=>item.id===id?renamed:item)};
+  if(!store(KEYS.draft,{version:1,order:nextOrder}))return;
+  order=nextOrder;
+  if(editingItemId===id){draft.name=name;updateDrawing({keepForm:true});}
+  renderOrder();
+  toast('Moulure '+id+' renommée : '+name);
+  return;
+ }
+ if(!form.matches('#end-hem-form,#double-fold-form,#save-production-template,#mir-j-exception-form,#mir-po-form'))return;
+ event.preventDefault();const data=new FormData(form);
  if(form.id==='end-hem-form'){
   const model=build(),atStart=data.get('end')==='start',length=String(data.get('length')||'').trim();
   const parsed=M.parseMeasurement(length,draft.unit),edge=atStart?model.segments[0]:model.segments.at(-1);
