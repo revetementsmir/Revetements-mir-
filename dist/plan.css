@@ -125,3 +125,6 @@ html.mir-stage-locked,body.mir-stage-locked{overflow:hidden!important}
   width:fit-content;padding:4px 7px;border-radius:4px;
   color:#263d2e;background:#fffffff2;
 }
+
+.mir-window-batten-toggle{display:flex;align-items:center;gap:9px;font-weight:600;font-size:12px}
+.mir-window-batten-toggle input{min-width:20px;min-height:20px}
