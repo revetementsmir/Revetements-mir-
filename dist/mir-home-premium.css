@@ -52,3 +52,31 @@ body.mir-home-premium{background:#fafaf7;color:#18251d}
 @media(max-width:425px){.mir-home-showcase{min-height:660px}.mir-home-showcase-inner{padding-top:225px}.mir-home-showcase h1{font-size:clamp(40px,10.3vw,48px)}.mir-home-main-cta,.mir-home-second-cta{width:100%;justify-content:center}.mir-home-premium .site-header nav{gap:22px}}
 @media(prefers-reduced-motion:reduce){.mir-home-main-cta,.mir-home-second-cta{transition:none}}
 @media(max-width:430px){.mir-home-service{min-height:166px;grid-template-columns:36% minmax(0,1fr)}.mir-home-service-studio{grid-template-columns:minmax(0,1fr) 36%}.mir-home-service-copy{padding:13px 14px;gap:6px}.mir-home-service-copy strong{font-size:17px}.mir-home-service-copy>span{font-size:12px;line-height:1.35}.mir-home-service-copy>b{font-size:12px;padding-top:5px}}
+
+/* Visuels approuvés : vraies images générées sélectionnées par MIR, non des photos de chantier. */
+.mir-home-hero-asset{position:absolute;inset:0;z-index:-2;display:block;overflow:hidden;background:#18231c;pointer-events:none}
+.mir-home-hero-asset .mir-home-showcase-photo{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%;object-fit:cover;object-position:50% 52%}
+.mir-home-service-media img{width:100%;height:100%;object-fit:cover;display:block}
+/* 21:9 / 32:9 : image de maison entière à droite et texte protégé à gauche. */
+@media(min-width:2200px){
+  .mir-home-premium .site-header{width:min(2420px,calc(100% - 160px));min-height:125px}
+  .mir-home-premium .mir-home-brand{width:315px}
+  .mir-home-premium .site-header nav{gap:clamp(24px,1.2vw,42px);font-size:16px}
+  .mir-home-premium .mir-home-account,.mir-home-premium .mir-home-estimate{font-size:15px;min-height:52px;padding:15px 21px}
+  .mir-home-showcase{height:clamp(740px,25vw,970px);min-height:0;background:#17231c}
+  .mir-home-hero-asset::before{content:"";position:absolute;inset:-6%;z-index:0;background:url("assets/mir-home-hero-20261105.webp") center/cover no-repeat;filter:blur(22px) brightness(.48);opacity:.58;transform:scale(1.015)}
+  .mir-home-hero-asset .mir-home-showcase-photo{left:auto;right:clamp(0px,calc((100vw - 3600px)/2),800px);top:0;bottom:0;width:min(64vw,2050px);height:100%;object-fit:contain;object-position:right center;-webkit-mask-image:linear-gradient(90deg,transparent 0%,black 25%);mask-image:linear-gradient(90deg,transparent 0%,black 25%)}
+  .mir-home-showcase::after{background:linear-gradient(90deg,rgba(8,19,12,.95) 0%,rgba(8,19,12,.81) 29%,rgba(8,19,12,.40) 47%,transparent 80%)}
+  .mir-home-showcase-inner{width:min(2450px,calc(100% - 200px));padding:65px 0 75px}
+  .mir-home-showcase h1{font-size:clamp(90px,4.6vw,133px);max-width:1120px}
+  .mir-home-lead{font-size:23px;max-width:630px}
+  .mir-home-kicker{font-size:14px}
+  .mir-home-main-cta,.mir-home-second-cta{min-height:64px;font-size:17px;padding:17px 29px}
+  .mir-home-premium .mir-home-services{width:min(2500px,calc(100% - 180px));max-width:none;gap:24px;padding-top:30px;padding-bottom:60px}
+  .mir-home-service{min-height:245px}
+  .mir-home-service-copy strong{font-size:clamp(24px,1.1vw,30px)}
+  .mir-home-service-copy>span{font-size:16px}
+  .mir-home-service-copy>b{font-size:15px}
+}
+@media(min-width:4100px){.mir-home-showcase h1{font-size:133px}.mir-home-showcase-inner{width:min(2700px,calc(100% - 220px))}}
+@media(max-width:760px){.mir-home-hero-asset .mir-home-showcase-photo{object-fit:cover;object-position:60% center}}

@@ -15,7 +15,7 @@ const services=html.match(/<section class="mir-home-services\b[^"]*"[\s\S]*?<\/s
 
 test('Accueil principal et logo original Illustrator inchangé dans la marque',()=>{
   assert.ok(header&&hero&&services);
-  assert.ok(html.includes('mir-home-premium.css?v=20261105'));
+  assert.ok(html.includes('mir-home-premium.css?v=images-ultrawide-20261105'));
   assert.equal((html.match(/MIR-logo-officiel-original\.svg/g)||[]).length,2);
   const logo=read('assets/MIR-logo-officiel-original.svg');
   assert.match(logo,/^<svg[^>]*viewBox="0 0 363\.68 91\.133"/);
@@ -40,7 +40,10 @@ test('Le visiteur peut entrer sans compte ni action de connexion obligatoire',()
   assert.match(header,/href="#nous-joindre"[^>]*>Demander une estimation<\/a>/);
 });
 test('Maison du portfolio MIR utilisée, aucune image IA nouvelle ni palmiers',()=>{
-  assert.match(hero,/src="assets\/mir-01\.jpg"/);
+  assert.match(hero,/src="assets\/mir-home-hero-20261105\.webp"/);
+  assert.match(hero,/srcset="assets\/mir-home-hero-20261105\.avif"/);
+  assert.ok(fs.existsSync(path.join(dist,"assets/mir-home-hero-20261105.avif")));
+  assert.ok(fs.existsSync(path.join(dist,"assets/mir-home-hero-20261105.webp")));
   assert.ok(fs.existsSync(path.join(dist,'assets/mir-01.jpg')));
   assert.doesNotMatch(hero,/palmier|généré par IA|image synthétique/i);
 });
@@ -48,9 +51,25 @@ test('Pas de pictogrammes dans le nouveau bloc de services',()=>{
   assert.equal((services.match(/class="mir-home-service(?: mir-home-service-studio)?"/g)||[]).length,3);
   assert.equal((services.match(/<img\b/g)||[]).length,3);
   assert.doesNotMatch(services,/<svg|<i\b|data-icon|lucide/i);
-  assert.match(services,/src="assets\/mir-03\.jpg"/);
-  assert.match(services,/src="assets\/mir-01\.jpg"/);
-  assert.match(services,/src="assets\/mir-02\.jpg"/);
+  assert.match(services,/src="assets\/mir-home-card-revetement-20261105\.webp"/);
+  assert.match(services,/src="assets\/mir-home-card-pliage-20261105\.webp"/);
+  assert.match(services,/src="assets\/mir-home-card-studio-20261105\.webp"/);
+});
+test('Quatre images approuvées téléchargées sans reconversion du rendu en simple maquette',()=>{
+  const assets=['mir-home-hero-20261105.avif','mir-home-hero-20261105.webp','mir-home-card-revetement-20261105.webp','mir-home-card-pliage-20261105.webp','mir-home-card-studio-20261105.webp'];
+  for(const name of assets){
+    const binary=fs.readFileSync(path.join(dist,'assets',name));
+    assert.ok(binary.length>10000,name+' : fichier vide ou invalide');
+    if(name.endsWith('.webp')){assert.equal(binary.toString('ascii',0,4),'RIFF');assert.equal(binary.toString('ascii',8,12),'WEBP');}
+    else assert.ok(binary.toString('ascii',4,12).includes('ftypavif')||binary.toString('ascii',4,16).includes('avif'));
+  }
+});
+test('Adaptation ultrawide sans étirer la photo ni cacher la façade',()=>{
+  assert.match(css,/@media\(min-width:2200px\)/);
+  assert.match(css,/\.mir-home-hero-asset \.mir-home-showcase-photo\{[^}]*object-fit:contain/);
+  assert.match(css,/\.mir-home-hero-asset::before\{[^}]*background:url\("assets\/mir-home-hero-20261105\.webp"\)/);
+  assert.match(css,/\.mir-home-premium \.mir-home-services\{width:min\(2500px/);
+  assert.match(css,/@media\(min-width:4100px\)/);
 });
 test('3D / plan PDF au troisième niveau et métier MIR au premier',()=>{
   assert.ok(services.indexOf('Revêtements extérieurs')<services.indexOf('Moulures et pliage'));

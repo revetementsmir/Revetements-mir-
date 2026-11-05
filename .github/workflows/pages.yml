@@ -77,6 +77,7 @@ jobs:
           test -f _site_mir/atelier-essai/mir-calepinage-extension.js
           test -f _site_mir/assets/MIR-logo-officiel-original.svg
           test -f _site_mir/mir-home-premium.css
+          for image in mir-home-hero-20261105.avif mir-home-hero-20261105.webp mir-home-card-revetement-20261105.webp mir-home-card-pliage-20261105.webp mir-home-card-studio-20261105.webp; do test -s "_site_mir/assets/$image"; done
           if find _site_mir/atelier-essai -type f -name '*-candidate.html' | grep -q .; then
             echo "Les écrans de démonstration ne doivent pas être publiés." >&2
             exit 1
@@ -97,11 +98,13 @@ jobs:
               --retry 20 --retry-delay 3 --retry-all-errors "$1" -o "$2"
           }
           fetch "$base/index.html" /tmp/mir-homepage.html
-          grep -F 'mir-home-premium.css?v=20261105' /tmp/mir-homepage.html
+          grep -F 'mir-home-premium.css?v=images-ultrawide-20261105' /tmp/mir-homepage.html
           grep -F 'assets/MIR-logo-officiel-original.svg' /tmp/mir-homepage.html
           grep -F 'Mon compte' /tmp/mir-homepage.html
           grep -F 'Découvrir nos revêtements' /tmp/mir-homepage.html
           grep -F 'Voir notre boutique' /tmp/mir-homepage.html
+          grep -F 'mir-home-card-revetement-20261105.webp' /tmp/mir-homepage.html
+          grep -F 'mir-home-hero-20261105.avif' /tmp/mir-homepage.html
           fetch "$base/assets/MIR-logo-officiel-original.svg" /tmp/mir-logo.svg
           grep -F 'viewBox="0 0 363.68 91.133"' /tmp/mir-logo.svg
           fetch "$base/mir-client-header.css" /tmp/mir-client-header.css
@@ -110,6 +113,13 @@ jobs:
           grep -F 'mir-client-header.css?v=1' /tmp/mir-boutique.html
           fetch "$base/plan.html" /tmp/mir-plan-public.html
           grep -F 'mir-client-header.css?v=1' /tmp/mir-plan-public.html
+          fetch "$base/assets/mir-home-hero-20261105.avif" /tmp/mir-home-hero.avif
+          fetch "$base/assets/mir-home-hero-20261105.webp" /tmp/mir-home-hero.webp
+          fetch "$base/assets/mir-home-card-revetement-20261105.webp" /tmp/mir-card-revetement.webp
+          fetch "$base/assets/mir-home-card-pliage-20261105.webp" /tmp/mir-card-pliage.webp
+          fetch "$base/assets/mir-home-card-studio-20261105.webp" /tmp/mir-card-studio.webp
+          test "$(wc -c </tmp/mir-home-hero.avif)" -gt 50000
+          for image in revetement pliage studio; do test -s "/tmp/mir-card-$image.webp"; done
           fetch "$base/mir-home-premium.css" /tmp/mir-home-premium.css
           grep -F '.mir-home-showcase' /tmp/mir-home-premium.css
           fetch "$base/metres.html" /tmp/metres.html

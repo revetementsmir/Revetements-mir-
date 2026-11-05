@@ -77,3 +77,16 @@ html.mir-production-client .production-header #mode-link:hover{background:#2b720
 @media(max-width:1280px){html.mir-production-client .production-header{width:calc(100% - 56px);gap:18px}html.mir-production-client .production-header .production-brand{width:220px}}
 @media(max-width:1100px){html.mir-production-client .production-header{flex-wrap:wrap;min-height:102px;gap:8px}html.mir-production-client .production-header .production-brand{width:235px}html.mir-production-client .production-header .mir-production-client-nav{order:3;flex:1 0 100%;justify-content:space-between;border-top:1px solid #e3e8df;gap:20px;overflow-x:auto;scrollbar-width:thin;padding:8px 0}}
 @media(max-width:760px){html.mir-production-client .production-header{width:calc(100% - 32px)}html.mir-production-client .production-header .production-brand{width:clamp(165px,43vw,230px)}html.mir-production-client .production-header .mir-production-client-nav{justify-content:flex-start;font-size:12px;gap:25px}html.mir-production-client .production-header #mode-link{display:inline-flex!important;flex:1 0 100%;max-width:100%;order:4;min-height:42px}html.mir-production-client .production-header .mir-production-client-account{padding:10px 12px;font-size:12px;min-height:42px}}
+
+/* En-tête proportionné aux écrans 21:9 et 32:9, sans toucher à l'Admin. */
+@media(min-width:2200px){
+  .site-header.mir-client-header,header.header.mir-client-header,header.portal-header.mir-client-header{
+    width:min(2420px,calc(100% - 160px));min-height:125px
+  }
+  .mir-client-header .mir-client-brand,header.portal-header.mir-client-header .mir-client-brand{width:315px}
+  .site-header.mir-client-header nav.mir-client-links,header.header.mir-client-header nav.mir-client-links,header.portal-header.mir-client-header nav.mir-client-links{font-size:16px;gap:clamp(24px,1.2vw,42px)}
+  .mir-client-header .mir-home-account,.mir-client-header .mir-home-estimate{font-size:15px;min-height:52px;padding:15px 21px}
+  html.mir-production-client .production-header{width:min(2420px,calc(100% - 160px));min-height:125px}
+  html.mir-production-client .production-header .production-brand{width:315px}
+  html.mir-production-client .production-header .mir-production-client-nav{font-size:16px;gap:clamp(24px,1.2vw,42px)}
+}

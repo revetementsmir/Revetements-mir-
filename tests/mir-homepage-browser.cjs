@@ -6,7 +6,7 @@ const path=require('node:path');
 const http=require('node:http');
 const {chromium}=require('playwright');
 const dist=path.resolve(__dirname,'../dist');
-const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.json':'application/json'};
+const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.json':'application/json','.webp':'image/webp','.avif':'image/avif'};
 const server=http.createServer((req,res)=>{
   const target=path.resolve(dist,'.'+decodeURIComponent((req.url||'/').split('?')[0]));
   if(!target.startsWith(dist+path.sep)){res.writeHead(403);res.end('Interdit');return}
@@ -14,7 +14,7 @@ const server=http.createServer((req,res)=>{
   res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream'});
   fs.createReadStream(file).pipe(res);
 });
-const sizes=[{name:'desktop',w:1440,h:900},{name:'large',w:1920,h:1080},{name:'tablette',w:820,h:1180},{name:'mobile',w:390,h:844},{name:'mobile-petit',w:360,h:780}];
+const sizes=[{name:'desktop',w:1440,h:900},{name:'large',w:1920,h:1080},{name:'tablette',w:820,h:1180},{name:'mobile',w:390,h:844},{name:'mobile-petit',w:360,h:780},{name:'ultrawide-2560',w:2560,h:1080},{name:'ultrawide-3440',w:3440,h:1440},{name:'ultrawide-3840',w:3840,h:1080},{name:'super-ultrawide-5120',w:5120,h:1440}];
 async function main(){
   fs.mkdirSync(path.resolve(__dirname,'../artifacts'),{recursive:true});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -41,12 +41,17 @@ async function main(){
         const bb=selector=>{const r=document.querySelector(selector)?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height,right:r.right}:null};
         const logo=document.querySelector('.mir-home-brand img');
         const photo=document.querySelector('.mir-home-showcase-photo');
-        return {screen:innerWidth,page:document.documentElement.scrollWidth,logo:{loaded:logo.complete&&logo.naturalWidth>0,src:logo.getAttribute('src')},photo:{loaded:photo.complete&&photo.naturalWidth>0,src:photo.getAttribute('src')},headline:bb('#hero-title'),nav:bb('.site-header'),cta:bb('.mir-home-main-cta'),account:bb('.mir-home-account'),services:document.querySelectorAll('.mir-home-service').length,cardPhotos:[...document.querySelectorAll('.mir-home-service-media img')].filter(img=>img.complete&&img.naturalWidth>0).length,pictos:document.querySelectorAll('.mir-home-services svg,.mir-home-services i').length};
+        return {screen:innerWidth,page:document.documentElement.scrollWidth,logo:{loaded:logo.complete&&logo.naturalWidth>0,src:logo.getAttribute('src')},photo:{loaded:photo.complete&&photo.naturalWidth>0,src:photo.getAttribute('src'),currentSrc:photo.currentSrc,objectFit:getComputedStyle(photo).objectFit},headline:bb('#hero-title'),nav:bb('.site-header'),cta:bb('.mir-home-main-cta'),account:bb('.mir-home-account'),services:document.querySelectorAll('.mir-home-service').length,cardPhotos:[...document.querySelectorAll('.mir-home-service-media img')].filter(img=>img.complete&&img.naturalWidth>0).length,pictos:document.querySelectorAll('.mir-home-services svg,.mir-home-services i').length};
       });
       assert.equal(metrics.logo.loaded,true,size.name+': logo original non chargé');
-      assert.equal(metrics.photo.loaded,true,size.name+': photo MIR non chargée');
+      assert.equal(metrics.photo.loaded,true,size.name+': nouvelle photo de maison non chargée');
+      assert.match(metrics.photo.currentSrc,/mir-home-hero-20261105\.(?:avif|webp)/,size.name+': mauvais visuel maison');
+      if(size.w>=2200) assert.equal(metrics.photo.objectFit,'contain',size.name+': la maison est rognée en ultrawide');
       assert.equal(metrics.services,3,size.name+': services');
       assert.equal(metrics.cardPhotos,3,size.name+': trois images de cartes doivent charger');
+      const images=await page.locator('.mir-home-service-media img').evaluateAll(imgs=>imgs.map(img=>img.currentSrc));
+      for(const name of ['revetement','pliage','studio']) assert.ok(images.some(src=>src.includes('mir-home-card-'+name+'-20261105.webp')),size.name+': carte '+name+' non chargée');
+
       assert.equal(metrics.pictos,0,size.name+': pictos');
       assert.ok(metrics.page<=size.w+2,size.name+': débordement horizontal '+metrics.page+' > '+size.w);
       assert.ok(metrics.headline.x>=-1&&metrics.headline.right<=size.w+2,size.name+': titre rogné');
