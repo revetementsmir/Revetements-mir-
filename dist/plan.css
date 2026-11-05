@@ -92,3 +92,10 @@ html.mir-stage-locked,body.mir-stage-locked{overflow:hidden!important}
 
 #edit-auto-transitions,#restore-auto-transitions{min-height:44px;border-radius:6px;border:1px solid #5e775a;background:#eef3e9;color:#253a29;padding:9px 12px;font-weight:650}
 #auto-transition-note{padding:8px 2px;line-height:1.55}
+
+/* Accents modifiables : accessible sur mobile sans chercher un menu caché. */
+.mir-accent-actions{padding:12px;margin:12px 0;background:#ecf2e8;border:1px solid #d2dfcd;border-radius:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mir-accent-actions button{min-height:44px;padding:8px;border:1px solid #9fb39c;border-radius:6px;background:#fff;font-weight:650}
+.mir-accent-actions button.mir-danger{color:#923b32;border-color:#d0a59c}
+.mir-accent-actions p{grid-column:1/-1;font-size:12px;line-height:1.55;color:#435847}
+@media(max-width:550px){.mir-accent-actions{grid-template-columns:1fr}}

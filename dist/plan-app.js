@@ -622,6 +622,9 @@
     $('#selected-title').textContent=opening?(item.type==='door'?'Porte':'Fenêtre'):item.name;
     $('#zone-origin').textContent=opening?(item.occluded?'Partiellement cachée sur le PDF · à valider':'Ouverture protégée du revêtement'):(item.viewOnly==='2d'?'Contour latéral étudié en 2D. Les retours sont réglés dans les métrés.':item.parent?'Accent indépendant, limité à la zone parente.':data.projectKind==='imported-pdf'?'Contour proposé sur votre plan · matériau initial à personnaliser.':'Tracé d’étude revu sur le PDF · contours masqués à valider.');
     $('#material-controls').hidden=opening;$('#opening-controls').hidden=!opening;
+    const accentSelected=!opening&&item.custom===true;
+    $('#mir-accent-actions').hidden=!accentSelected;
+    if(accentSelected){$('#geometry-controls').open=true;$('#geometry-note').textContent='Déplacez ou redimensionnez l’accent avec Gauche, Haut, Largeur et Hauteur (% de l’élévation) ou glissez-le directement.';}
     if(!opening){
       const c=choice(f,item),m=materialById.get(c.materialId);productOptions('#material-manufacturer','#material',facadeMaterials,c.materialId);
       renderCoverageControls(m,c);
@@ -654,8 +657,8 @@
       const t=trimConfig(f,item);$('#trim-mode').value=t.mode;$('#trim-fields').hidden=t.mode==='none';$('#trim-width').value=t.faceWidthIn;const tm=productOptions('#trim-brand','#trim-product',trimMaterials(t.mode),t.materialId);colorOptions('#trim-color',tm,t.colorId);$('#trim-docs').disabled=!tm;
       $('#trim-note').textContent=`${item.type==='door'?'Trois côtés, sans seuil.':'Quatre côtés.'} Largeur apparente extérieure à la baie. Les surfaces de contour remplacent le parement qu’elles recouvrent. ${t.mode!=='none'&&!tm?'Référence commerciale de contour à compléter.':''}`;
     }
-    const editable=opening||item.polygon.length===4;$('#geometry-controls').hidden=!editable;
-    if(editable){const [x0,y0,x1,y1]=bounds(item.polygon),[bx,by,bw,bh]=f.bbox,vs={x:(x0-bx)/bw*100,y:(y0-by)/bh*100,w:(x1-x0)/bw*100,h:(y1-y0)/bh*100};for(const [k,v] of Object.entries(vs))$(`#geo-${k}`).value=Number(v.toFixed(1));$('#delete-region').textContent=item.custom?'Supprimer '+(opening?'cette ouverture':'cet accent'):'Rétablir le contour du plan';$('#geometry-note').textContent='Proportions du tracé. Échelle et contours à valider dans le dossier de métrés.';}
+    const editable=opening||item.polygon.length===4||item.custom===true;$('#geometry-controls').hidden=!editable;
+    if(editable){const [x0,y0,x1,y1]=bounds(item.polygon),[bx,by,bw,bh]=f.bbox,vs={x:(x0-bx)/bw*100,y:(y0-by)/bh*100,w:(x1-x0)/bw*100,h:(y1-y0)/bh*100};for(const [k,v] of Object.entries(vs))$(`#geo-${k}`).value=Number(v.toFixed(1));$('#delete-region').textContent=item.custom?'Supprimer '+(opening?'cette ouverture':'cet accent'):'Rétablir le contour du plan';$('#geometry-note').textContent=item.custom?'Accent modifiable : choisissez sa position et ses dimensions en % de la façade, ou glissez-le dans le plan 2D.':'Proportions du tracé. Échelle et contours à valider dans le dossier de métrés.';}
   }
   function renderFinish(){for(const kind of ['soffit','fascia']){const rows=kind==='soffit'?soffits:fascias,m=productOptions('#'+kind+'-brand','#'+kind+'-product',rows,state[kind+'Id']);colorOptions('#'+kind+'-color',m,state[kind+'ColorId']);}const sm=materialById.get(state.soffitId);$('#soffit-type').textContent=sm?.soffitType==='vented'?'Ventilé / perforé · échantillon à valider':sm?.soffitType==='solid'?'Plein / non perforé · ventilation du système à vérifier':sm?.soffitType==='concealed'?'Ventilation cachée · ouvertures dans les rainures du profil':'Ventilation à confirmer · rendu neutre';}
   function render(){ensureSelected();$('#align-window').checked=state.alignWindow!==false;renderDrawing();renderZones();renderControl();renderFinish();studioFeatures?.renderUI();$('#undo').disabled=!history.length;$('#display-client').setAttribute('aria-pressed',state.displayMode==='client');$('#display-atelier').setAttribute('aria-pressed',state.displayMode==='atelier');$('#display-note').textContent=state.displayMode==='atelier'?'Dimensions de découpe en pouces · échelle à valider.':'Une vue claire des matières et des finitions.';}
@@ -755,6 +758,8 @@
   $('#suggest-board-joints').onclick=()=>{const f=face(),z=currentZone(),c=choice(f,z),m=materialById.get(c.materialId),orientation=c.orientation==='vertical'?'horizontal':'vertical',dimension=layoutDimension(f,z,orientation),positions=L.splitPositions(dimension,m.maxPiece?.lengthIn);modify(()=>{state.transitions=state.transitions.filter(t=>!(t.face===f.key&&t.zoneId===z.id&&t.orientation===orientation));for(const p of positions)state.transitions.push({id:newId('joint-longueur'),face:f.key,zoneId:z.id,orientation,position:p.position,profile:orientation==='vertical'?'panel-l-7/8':'panel-z',color:c.color});});toast('Joints proposés selon la longueur maximale. Le profil et le détail de pose restent à valider.');};
   $('#open-material').onclick=()=>openMaterial(choice(face(),currentZone()).materialId);$('#open-library').onclick=openLibrary;$('#open-library-bottom').onclick=openLibrary;$('#library-search').oninput=renderLibrary;$('#library-family').onchange=renderLibrary;$('#library-grid').onclick=e=>{const b=e.target.closest('[data-doc]');if(b)openMaterial(b.dataset.doc);};$$('.close-dialog').forEach(b=>b.onclick=()=>b.closest('dialog').close());
   $('#align-window').onchange=e=>{state.alignWindow=e.target.checked;save();};
+  $('#mir-edit-accent').onclick=()=>{const g=$('#geometry-controls');g.open=true;g.scrollIntoView({behavior:'smooth',block:'nearest'});$('#geo-x').focus({preventScroll:true});};
+  $('#mir-remove-accent').onclick=()=>{if(currentZone()?.custom&&state.selected.kind==='zone')$('#delete-region').click();};
   $('#add-accent').onclick=addAccent;$('#draw-accent').onclick=()=>{if(state.selected.kind!=='zone')state.selected={kind:'zone',id:allZones(face())[0]?.id||null};state.view='2d';render();drawMode=drawMode?null:'accent';$('#mode-help').hidden=!drawMode;$('#mode-help').textContent='Tracez la nouvelle zone. L’option d’alignement cale ses deux côtés sur la fenêtre située dessous lorsqu’elle est identifiable. Les autres bords proches restent aimantés. Échap annule ; les dimensions restent modifiables.';};
   function zoneContains(point,z,zones){
     if(!pointInside(point,z.polygon))return false;const seen=new Set([z.id]);let parent=z.parent;
@@ -870,14 +875,35 @@
   $('#elevation').addEventListener('pointerdown',e=>{
     if(state.view!=='2d'||e.button>0)return;
     const joint=e.target.closest('[data-joint]'),transition=e.target.closest('[data-transition]');
+    const accent=e.target.closest('[data-zone]'),selected=accent&&allZones(face()).find(z=>z.id===accent.dataset.zone);
+    if(!drawMode&&!joint&&!transition&&selected?.custom===true&&state.selected.kind==='zone'&&state.selected.id===selected.id){
+      const p=snappedPoint(e);
+      drag={type:'move-accent',zoneId:selected.id,id:e.pointerId,original:selected.polygon.map(p=>p.slice()),
+        start:p,moved:false,changed:false};
+      try{$('#elevation').setPointerCapture(e.pointerId);}catch(_){}
+      e.preventDefault();return;
+    }
     if(!drawMode&&(joint||transition)){
       e.preventDefault();checkpoint();const t=transition&&state.transitions.find(t=>t.id===transition.dataset.transition),zoneId=joint?.dataset.jointZone||t.zoneId,orientation=joint?.dataset.orientation||t.orientation,lineId=joint?.dataset.joint||t.id;
       state.selected={kind:'zone',id:zoneId};if(joint)state.panelLayouts[key(state.face,zoneId)]={...clone(panelLayoutFor(face(),currentZone())),mode:'manual'};selectedJoint=joint?{zoneId,orientation,id:lineId}:null;drag={type:joint?'joint':'transition',zoneId,orientation,lineId,id:e.pointerId,changed:false};$('#elevation').setPointerCapture(e.pointerId);renderControl();return;
     }
     if(!drawMode)return;e.preventDefault();const p=snappedPoint(e);drag={type:'accent',x:p.x,y:p.y,id:e.pointerId};$('#elevation').setPointerCapture(e.pointerId);
   });
-  $('#elevation').addEventListener('pointermove',e=>{if(!drag)return;if(drag.type!=='accent')return dragLine(e);const p=snappedPoint(e),svg=$('svg',$('#elevation'));$('#drag-preview',svg)?.remove();const r=document.createElementNS('http://www.w3.org/2000/svg','rect');r.id='drag-preview';for(const [k,v] of Object.entries({x:Math.min(drag.x,p.x),y:Math.min(drag.y,p.y),width:Math.abs(drag.x-p.x),height:Math.abs(drag.y-p.y),fill:'#a8bb7c66',stroke:'#5a733e','stroke-width':3,'pointer-events':'none'}))r.setAttribute(k,v);svg.appendChild(r);});
-  $('#elevation').addEventListener('pointerup',e=>{if(!drag)return;suppressClick=true;try{$('#elevation').releasePointerCapture(e.pointerId);}catch(_){}if(drag.type!=='accent'){if(!drag.changed)history.pop();drag=null;save();render();return;}const p=snappedPoint(e),x=Math.min(drag.x,p.x),y=Math.min(drag.y,p.y),w=Math.abs(drag.x-p.x),h=Math.abs(drag.y-p.y);drag=null;drawMode=null;$('#mode-help').hidden=true;if(w>10&&h>10){const z=currentZone(),parent=z?bounds(z.polygon):null;if(parent&&(x+w<parent[0]||x>parent[2]||y+h<parent[1]||y>parent[3])){toast('Tracez l’accent dans la zone sélectionnée.');renderDrawing();return;}makeAccent(rect(x,y,w,h));}else{renderDrawing();toast('Le rectangle est trop petit. Réessayez ou utilisez « Ajouter un accent ».');}});
+  $('#elevation').addEventListener('pointermove',e=>{
+    if(!drag)return;
+    if(drag.type==='move-accent'){
+      const pointNow=snappedPoint(e),dx=pointNow.x-drag.start.x,dy=pointNow.y-drag.start.y;
+      if(Math.hypot(dx,dy)<2&&!drag.moved)return;
+      drag.moved=true;drag.changed=true;
+      const source=allZones(face()).find(z=>z.id===drag.zoneId),parent=allZones(face()).find(z=>z.id===source?.parent);
+      const bb=bounds(drag.original),limit=parent?bounds(parent.polygon):[face().bbox[0],face().bbox[1],face().bbox[0]+face().bbox[2],face().bbox[1]+face().bbox[3]];
+      const offsetX=Math.max(limit[0]-bb[0],Math.min(limit[2]-bb[2],dx));
+      const offsetY=Math.max(limit[1]-bb[1],Math.min(limit[3]-bb[3],dy));
+      state.zoneOverrides[key(state.face,drag.zoneId)]=drag.original.map(([x,y])=>[x+offsetX,y+offsetY]);
+      renderDrawing();return;
+    }
+    if(drag.type!=='accent')return dragLine(e);const p=snappedPoint(e),svg=$('svg',$('#elevation'));$('#drag-preview',svg)?.remove();const r=document.createElementNS('http://www.w3.org/2000/svg','rect');r.id='drag-preview';for(const [k,v] of Object.entries({x:Math.min(drag.x,p.x),y:Math.min(drag.y,p.y),width:Math.abs(drag.x-p.x),height:Math.abs(drag.y-p.y),fill:'#a8bb7c66',stroke:'#5a733e','stroke-width':3,'pointer-events':'none'}))r.setAttribute(k,v);svg.appendChild(r);});
+  $('#elevation').addEventListener('pointerup',e=>{if(!drag)return;suppressClick=true;try{$('#elevation').releasePointerCapture(e.pointerId);}catch(_){}if(drag.type!=='accent'){if(!drag.changed&&history.length&&drag.type!=='move-accent')history.pop();const changed=drag.changed,moved=drag.type==='move-accent';drag=null;if(moved&&changed)suppressClick=true;save();render();return;}const p=snappedPoint(e),x=Math.min(drag.x,p.x),y=Math.min(drag.y,p.y),w=Math.abs(drag.x-p.x),h=Math.abs(drag.y-p.y);drag=null;drawMode=null;$('#mode-help').hidden=true;if(w>10&&h>10){const z=currentZone(),parent=z?bounds(z.polygon):null;if(parent&&(x+w<parent[0]||x>parent[2]||y+h<parent[1]||y>parent[3])){toast('Tracez l’accent dans la zone sélectionnée.');renderDrawing();return;}makeAccent(rect(x,y,w,h));}else{renderDrawing();toast('Le rectangle est trop petit. Réessayez ou utilisez « Ajouter un accent ».');}});
   function cancelDrag(){if(drag&&drag.type!=='accent'&&history.length)state=history.pop();drag=null;drawMode=null;$('#mode-help').hidden=true;render();}
   $('#elevation').addEventListener('pointercancel',cancelDrag);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(drawMode||drag))cancelDrag();});
   ['x','y','w','h'].forEach(k=>$(`#geo-${k}`).onchange=updateGeometry);
