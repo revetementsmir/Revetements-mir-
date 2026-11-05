@@ -21,7 +21,7 @@
     if(responses.some(r=>!r.ok)) throw Error('Chargement indisponible');
     [data, {materials}, takeoffSeed] = await Promise.all(responses.map(r=>r.json()));
     activeProject=await window.MIRProjectStore?.getActive();
-    if(activeProject?.planData){for(const link of document.querySelectorAll('footer a[href^="assets/"]'))link.hidden=true;data=activeProject.planData;takeoffSeed=activeProject.takeoffSeed;STORAGE+=':'+activeProject.id;TAKEOFF_STORAGE+=':'+activeProject.id;}
+    if(activeProject?.planData){for(const link of document.querySelectorAll('.studio-source-links a[href^="assets/"]'))link.hidden=true;data=activeProject.planData;takeoffSeed=activeProject.takeoffSeed;STORAGE+=':'+activeProject.id;TAKEOFF_STORAGE+=':'+activeProject.id;}
     if(!Array.isArray(data.faces)||!data.faces.length)throw Error('Aucune élévation dans le dossier');
     for(const f of data.faces){for(const k of ['zones','openings','roof','base','fascia','soffit','detected'])if(!Array.isArray(f[k]))f[k]=[];f.candidates||=0;f.textureBox||=f.bbox;}
 
@@ -58,7 +58,7 @@
   if(!L||!E||!C){$('#elevation').textContent='Les outils de dessin et de métrés n’ont pas chargé. Rechargez la page.';return;}
   const NEUTRAL='#d3d6cd', patternNames={lap:'Clin',vertical:'Lames verticales',panel:'Panneau',brick:'Maçonnerie',plain:'Uni',shingle:'Bardeau'};
   const orientationNames={horizontal:'Horizontale',vertical:'Verticale'};
-  const defaults = () => ({version:2,catalogueVersion:4,face:'front',view:'3d',displayMode:'client',alignWindow:true,selected:{kind:'zone',id:'pignon_gauche'},selections:{},customZones:{front:[],right:[],back:[],left:[]},zoneOverrides:{},openingOverrides:{},addedOpenings:{front:[],right:[],back:[],left:[]},bands:{},openingTrims:{},panelLayouts:{},transitions:[],panelStockRotation:true,volumeOverride:null,recessOverride:null,soffitId:'kaycan-sp600-vented',soffitColor:NEUTRAL,fasciaId:'kaycan-fascia-6-0480',fasciaColor:NEUTRAL,rotation:28});
+  const defaults = () => ({version:2,catalogueVersion:4,face:data.faces.find(f=>f.importedStatus==='assigned')?.key||'front',view:'3d',displayMode:'client',alignWindow:true,selected:{kind:'zone',id:'pignon_gauche'},selections:{},customZones:{front:[],right:[],back:[],left:[]},zoneOverrides:{},openingOverrides:{},addedOpenings:{front:[],right:[],back:[],left:[]},bands:{},openingTrims:{},panelLayouts:{},transitions:[],panelStockRotation:true,volumeOverride:null,recessOverride:null,soffitId:'kaycan-sp600-vented',soffitColor:NEUTRAL,fasciaId:'kaycan-fascia-6-0480',fasciaColor:NEUTRAL,rotation:28});
   let state=defaults(),history=[],detection=false,neutral=false,drawMode=null,drag=null,toastTimer,selectedJoint=null,suppressClick=false;
   try {const old=JSON.parse(localStorage.getItem(STORAGE));if(old?.version===2&&data.faces.some(f=>f.key===old.face))state={...state,...old};}catch(_){}
   for(const field of ['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','panelLayouts'])if(!state[field]||typeof state[field]!=='object'||Array.isArray(state[field]))state[field]=defaults()[field];
@@ -360,7 +360,7 @@
         sideButton.textContent=showingWalls?'← Voir la maison':'Voir les 3 murs →';
       };
     }
-    $('#stage-title').textContent=state.view==='3d'?'VOTRE PROJET / VUE 360°':`${String(f.page).padStart(2,'0')} / ÉLÉVATION ${f.name.toLocaleUpperCase('fr')}`;
+    $('#stage-title').textContent=state.view==='3d'?'VOTRE PROJET / VUE 360°':`${f.page?String(f.page).padStart(2,'0')+' / ':''}ÉLÉVATION ${f.name.toLocaleUpperCase('fr')}`;
     $('#stage-subtitle').textContent=state.view==='3d'?'Cliquez pour choisir · glissez pour tourner et incliner':state.displayMode==='atelier'?'Déplacez les joints · cotes en pouces':'Cliquez sur une matière pour la modifier';
     $('#stage-note').textContent=state.view==='3d'?'Matières et finitions · vue interactive':'Fenêtres et portes protégées';
     $('#view-2d').setAttribute('aria-pressed',state.view==='2d');$('#view-3d').setAttribute('aria-pressed',state.view==='3d');
@@ -371,7 +371,7 @@
     if(state.view==='3d'){
       if(studioFeatures&&!studioFeatures.canRender()){$('#three-canvas').hidden=true;$('#volume-unavailable').hidden=false;$('#stage-note').textContent='Volume incomplet · vos élévations 2D restent accessibles';return;}
       try {
-        const result=await window.MIR3D.render($('#three-canvas'),{views:threeViews(),angle:state.rotation,fasciaColor:state.fasciaColor,soffitColor:state.soffitColor,soffitType:materialById.get(state.soffitId)?.soffitType||'unknown',dimensions:data.dimensions,...sceneGeometry(),foundationDrop:.8,textureBottoms:Object.fromEntries(data.faces.map(v=>[v.key,v.textureBottom||0]))});
+        const result=await window.MIR3D.render($('#three-canvas'),{views:threeViews(),angle:state.rotation,fasciaColor:state.fasciaColor,soffitColor:state.soffitColor,soffitType:materialById.get(state.soffitId)?.soffitType||'unknown',dimensions:data.dimensions,...sceneGeometry(),textureBottoms:Object.fromEntries(data.faces.map(v=>[v.key,v.textureBottom||0]))});
         if(n!==rendering)return;
         if(result.errors?.length)$('#stage-note').textContent='Une texture n’a pas chargé · revenez à l’élévation';
         else if(result.textureScaleWarnings?.length)$('#stage-note').textContent='Volume et élévation à recaler · les matériaux gardent leur taille réelle';
