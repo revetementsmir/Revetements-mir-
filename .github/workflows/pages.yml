@@ -55,6 +55,9 @@ jobs:
           node --check dist/plan-structure-notes.js
           node --check tests/mir-structure-hints.cjs
           node tests/mir-structure-hints.cjs
+          node --check dist/plan-stair-vision.js
+          node --check tests/mir-stair-vision.cjs
+          node tests/mir-stair-vision.cjs
           node --check tests/mir-studio-grounds.cjs
           node tests/mir-studio-grounds.cjs
           node --check dist/plan-app.js
