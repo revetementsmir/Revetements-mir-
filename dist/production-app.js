@@ -553,25 +553,42 @@ function draggedSegment(event, gesture){
  const previous=gesture.heading;
  const rawHeading=Math.atan2(dy,dx);
  const base=previous??0;
- const heading=event.shiftKey?base+Math.round((rawHeading-base)/(Math.PI/2))*Math.PI/2:rawHeading;
- const length=event.shiftKey?Math.abs(dx*Math.cos(heading)+dy*Math.sin(heading)):Math.hypot(dx,dy);
- const step=draft.unit==='mm'?1:25.4/16;
+ const snapped=rightAngleSnap&&previous!==undefined?snapDrawRightAngle([[start[0]-Math.cos(previous),start[1]-Math.sin(previous)],start],end,previous*180/Math.PI):end;
+ const heading=event.shiftKey?base+Math.round((rawHeading-base)/(Math.PI/2))*Math.PI/2:Math.atan2(snapped[1]-start[1],snapped[0]-start[0]);
+ const length=event.shiftKey||snapped!==end?Math.abs(dx*Math.cos(heading)+dy*Math.sin(heading)):Math.hypot(dx,dy);
+ const step=draft.unit==='mm'?1:25.4/(snap?4:16);
  const rounded=Math.round(length/step)*step;
  if(!rounded)return null;
  const point=[start[0]+rounded*Math.cos(heading),start[1]+rounded*Math.sin(heading)];
  const turn=previous===undefined?null:Math.abs(Math.atan2(Math.sin(heading-previous),Math.cos(heading-previous)))*180/Math.PI;
- const angle=turn===null?'':(' · '+Math.round((180-turn)*10)/10+'° intérieur');
- return {point, label:M.formatMeasurement(rounded,draft.unit)+angle};
+ const angle=turn===null?null:Math.round((180-turn)*10)/10;
+ return {point, lengthLabel:M.formatMeasurement(rounded,draft.unit), angle};
 }
 function drawDragPreview(segment, gesture){
  const readout=$('#trace-readout');
- readout.textContent=segment?.label||'Glisse pour tracer un côté';
+ readout.textContent=segment?'Relâche pour ajouter le côté':'Glisse pour tracer un côté';
  const svg=$('#production-drawing svg');
  if(!svg)return;
  svg.querySelector('[data-trace-preview]')?.remove();
  if(!segment)return;
- const [x1,y1]=pointOnView(gesture.start,drawTransform),[x2,y2]=pointOnView(segment.point,drawTransform);
- svg.insertAdjacentHTML('beforeend',`<g data-trace-preview pointer-events="none"><line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="#9c5a22" stroke-width="3" stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/></g>`);
+ const [x,y]=pointOnView(gesture.start,drawTransform),[ex,ey]=pointOnView(segment.point,drawTransform);
+ const scale=Math.max(1,Math.min(2.2,800/svg.clientWidth));
+ const label=(x,y,value)=>`<text x="${fmt(x)}" y="${fmt(y)}" text-anchor="middle" dominant-baseline="central" font-size="${fmt(17*scale)}" font-weight="700" fill="#603b20" stroke="#fff5e3" stroke-width="${fmt(6*scale)}" stroke-linejoin="round" paint-order="stroke">${esc(value)}</text>`;
+ const size=Math.hypot(ex-x,ey-y), outgoing=Math.atan2(ey-y,ex-x);
+ let angle='';
+ if(segment.angle!==null){
+  const incoming=Math.PI-gesture.heading;
+  const sweep=Math.atan2(Math.sin(outgoing-incoming),Math.cos(outgoing-incoming));
+  const r=Math.min(38*scale,size*.36), mid=incoming+sweep/2;
+  const ray=(direction,distance)=>[x+Math.cos(direction)*distance,y+Math.sin(direction)*distance];
+  const [ax,ay]=ray(mid,r+16*scale);
+  angle=`<path d="M ${ray(incoming,r).map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep>=0?1:0} ${ray(outgoing,r).map(fmt).join(' ')}" fill="none" stroke="#9c5a22" stroke-width="2"/>`+label(ax,ay,segment.angle+'°');
+ }
+ const line=`<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(ex)}" y2="${fmt(ey)}" stroke="#9c5a22" stroke-width="3" stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/>`;
+ const content=`<g data-trace-preview pointer-events="none">${line}${angle}${label((x+ex)/2,(y+ey)/2,segment.lengthLabel)}</g>`;
+ const marker=svg.querySelector('.profile-side-marker');
+ if(marker)marker.insertAdjacentHTML('beforebegin',content);
+ else svg.insertAdjacentHTML('beforeend',content);
 }
 function traceShift(event){
  if(event.key!=='Shift'||drag?.type!=='trace'||!drag.last)return;
