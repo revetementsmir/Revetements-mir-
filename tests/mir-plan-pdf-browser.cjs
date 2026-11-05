@@ -139,7 +139,10 @@ const server=http.createServer((req,res)=>{
    assert.equal(active.status,'detected');
    assert.ok(active.hints.some(h=>h.type==='beam'&&h.assignedView==='front'));
    await page.locator('#three-canvas').waitFor();
-   await page.waitForFunction(()=>window.MIR_RENDER_DIAGNOSTICS?.rendered===true);
+   await page.waitForFunction(()=>window.MIR_RENDER_DIAGNOSTICS?.rendered===true).catch(async error=>{
+    const status=await page.evaluate(()=>({render:window.MIR_RENDER_DIAGNOSTICS,stage:document.querySelector('#stage-note')?.textContent}));
+    throw Error(`Rendu du PDF à ${width}px : ${JSON.stringify(status)}\n${[...warnings,...errors].join('\n')}`,{cause:error});
+   });
    assert.equal(active.frontScale,null,'Le vitrage du PDF est visible même sans échelle de métrés');
    const texture=await page.evaluate(()=>{
     const canvas=document.querySelector('#three-canvas'),diagnostics=window.MIR_RENDER_DIAGNOSTICS;

@@ -829,7 +829,9 @@
     }
     if(!exportSize&&!state.observer&&typeof global.ResizeObserver==='function') {
       state.observer=new global.ResizeObserver(()=>{
-        if(!state.options||state.options.exportSize)return;
+        // An in-flight render reads the current canvas size after its images
+        // load. Replacing it here would cancel the caller's initial render.
+        if(!state.options||state.options.exportSize||state.pending)return;
         const box=canvas.getBoundingClientRect(),dpr=Math.max(1,Math.min(global.devicePixelRatio||1,2.5));
         if(state.size&&Math.abs(state.size[0]-box.width)<.5&&Math.abs(state.size[1]-box.height)<.5&&state.size[2]===dpr)return;
         if(state.frame)global.cancelAnimationFrame(state.frame);
@@ -837,6 +839,7 @@
       });
       state.observer.observe(canvas);
     }
+    if(state.frame){global.cancelAnimationFrame(state.frame);state.frame=null;}
     const token=++renderCounter;state.token=token;
     // Snapshot all caller data before awaiting images: slider changes cannot mutate this render.
     const snapshot={...options,exportSize,views:{...(options.views||{})},dimensions:{...(options.dimensions||{})},textureBottoms:{...(options.textureBottoms||{})},
@@ -846,11 +849,16 @@
       footprint:options.footprint&&typeof options.footprint==='object'?{...options.footprint,recess:options.footprint.recess&&typeof options.footprint.recess==='object'?{...options.footprint.recess}:options.footprint.recess}:options.footprint};
     state.options=snapshot;
     const names=['front','right','back','left','return-left','return-right'];
-    const settled=await Promise.allSettled(names.map(key=>loadSVG(snapshot.views[key])));
-    if(state.token!==token)return {rendered:false,cancelled:true,renderId:token};
-    const images={},errors=[];
-    settled.forEach((result,i)=>{if(result.status==='fulfilled')images[names[i]]=result.value;else{images[names[i]]=null;errors.push({view:names[i],message:String(result.reason.message||result.reason)});}});
-    return draw(canvas,snapshot,images,state,token,errors);
+    state.pending=true;
+    try {
+      const settled=await Promise.allSettled(names.map(key=>loadSVG(snapshot.views[key])));
+      if(state.token!==token)return {rendered:false,cancelled:true,renderId:token};
+      const images={},errors=[];
+      settled.forEach((result,i)=>{if(result.status==='fulfilled')images[names[i]]=result.value;else{images[names[i]]=null;errors.push({view:names[i],message:String(result.reason.message||result.reason)});}});
+      return draw(canvas,snapshot,images,state,token,errors);
+    } finally {
+      if(state.token===token)state.pending=false;
+    }
   }
 
   function diagnostics(canvas) {
