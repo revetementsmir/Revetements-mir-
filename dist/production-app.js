@@ -192,6 +192,19 @@ function orderProfileStrips(strips,eye){
  const leftNear=dx*eye[1]-dy*eye[0]>0;
  return [...orderProfileStrips(leftNear?right:left,eye),...flat,...orderProfileStrips(leftNear?left:right,eye)];
 }
+function showProfilePaintedFace(){
+ if(kind!=='profile'||view!=='volume')return;
+ const model=drawingModel().model,face=model.coloredFace;
+ if(!face?.side||!model.valid)return;
+ const segment=model.segments.find(s=>s.label===face.segmentId);
+ if(!segment)return;
+ const heading=segment.headingDeg*Math.PI/180,sign=face.side==='left'?1:-1;
+ const nx=-Math.sin(heading)*sign,ny=Math.cos(heading)*sign;
+ const yaw=orbit*Math.PI/180,tilt=pitch*Math.PI/180;
+ if(-nx*Math.sin(yaw)*Math.cos(tilt)+ny*Math.sin(tilt)>.12)return;
+ orbit=-Math.atan2(nx,.75)*180/Math.PI;
+ pitch=Math.atan2(ny,Math.hypot(nx,.75))*180/Math.PI;
+}
 function profileVolumeSVG(model,illustrative){
  const yaw=orbit*Math.PI/180,tilt=pitch*Math.PI/180;
  const eye=[-Math.sin(yaw)*Math.cos(tilt),Math.sin(tilt)];
@@ -211,7 +224,7 @@ function profileVolumeSVG(model,illustrative){
  const scale=zoom*Math.min(610/Math.max(1,Math.max(...xs)-Math.min(...xs)),355/Math.max(1,Math.max(...ys)-Math.min(...ys)));
  const cx=(Math.max(...xs)+Math.min(...xs))/2,cy=(Math.max(...ys)+Math.min(...ys))/2;
  const pixel=([x,y])=>[fmt(400+(x-cx)*scale),fmt(255-(y-cy)*scale)].join(',');
- const finish=model.spec?.finish||model.finish||{};
+ const finish=illustrative&&!authoring?draft.finish||{}:model.spec?.finish||model.finish||{};
  const swatch=safeAsset(finish.swatchUrl);
  const paint=/^#[0-9a-f]{6}$/i.test(finish.hex||'')?finish.hex:null;
  const pattern=swatch?`<defs><pattern id="production-paint" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${paint||'#a9adb1'}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern></defs>`:'';
@@ -1044,12 +1057,12 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(d.kind){kind=d.kind;choose(kind,kind==='panel'?'rectangle':'l');return;}
  if(d.template){choose(kind,d.template,{empty:client&&!authoring});return;}
  if(d.savedTemplate||d.useSavedModel){useSavedTemplate(d.savedTemplate||d.useSavedModel);return;}
- if(d.preview){view=d.preview;tool='select';updateDrawing();return;}
+ if(d.preview){view=d.preview;tool='select';showProfilePaintedFace();updateDrawing();return;}
  if(button.id==='mirror-panel'){draft=M.mirrorPanelSpec(draft);renderDimensions();renderPanelOptions();updateDrawing();toast('Panneau inversé. Les lips et le bas suivent la pièce.');return;}
  if(button.id==='panel-zoom-in'){setZoom(zoom*1.2);return;}
  if(button.id==='panel-zoom-out'){setZoom(zoom/1.2);return;}
  if(button.id==='panel-view-reset'){zoom=1;orbit=-35;pitch=23;updateDrawing();return;}
- if(d.productionColor){colorId=d.productionColor;renderColorGrid();if($('#production-ral'))$('#production-ral').value=colorId;updateFinish();updateDrawing();return;}
+ if(d.productionColor){colorId=d.productionColor;renderColorGrid();if($('#production-ral'))$('#production-ral').value=colorId;updateFinish();showProfilePaintedFace();updateDrawing();return;}
  if(d.selectBottom&&!authoring){draft.bottomEdgeId=d.selectBottom;draft.perforation={...draft.perforation,edgeId:d.selectBottom};renderPanelOptions();updateDrawing();return;}
  if(button.id==='add-production-piece')return addPiece();
  if(button.id==='cancel-piece-edit'){editingItemId=null;choose(kind,kind==='panel'?'rectangle':'l');return;}
@@ -1113,7 +1126,7 @@ function handleChange(event){const e=event.target,d=e.dataset;
  if(e.id==='panel-perforation'){draft.perforation={...draft.perforation,enabled:e.checked,edgeId:draft.bottomEdgeId,details:draft.perforation?.details||''};renderPanelOptions();updateDrawing();return;}
  if(e.id==='color-system'){colorSystem=e.value;colorId='';colorQuery='';draft.finish={};renderColors();updateDrawing();return;}
  if(e.id==='production-material'){materialId=e.value;colorId='';draft.finish={};const m=chosenMaterial();if(m){const type=/acier/i.test(m.family||m.name)?'acier':'aluminium';draft.material.type=type;$('#material-type').value=type;}renderColors();updateDrawing();return;}
- if(e.id==='production-ral'){colorId=e.value;renderColorGrid();updateFinish();updateDrawing();return;}
+ if(e.id==='production-ral'){colorId=e.value;renderColorGrid();updateFinish();showProfilePaintedFace();updateDrawing();return;}
  if(e.id==='material-type'){draft.material={type:e.value,name:kind==='panel'&&e.value!=='aluminium-extrude'?'Unico U-P1 — '+(e.value==='acier'?'Acier':'Aluminium plié'):'',productRef:kind==='panel'&&e.value!=='aluminium-extrude'?'unico-up1-'+e.value:null,thickness:'',thicknessUnit:kind==='panel'?'mm':draft.unit,gauge:''};colorId='';draft.finish={};colorSystem=kind==='panel'?(e.value==='aluminium-extrude'?'ral':'manufacturer'):colorSystem;materialId=availableMaterials().find(m=>m.metalType===e.value)?.id||availableMaterials()[0]?.id||'';renderFormMetadata();renderColors();updateDrawing();return;}
  if(e.id==='material-thickness'){formMetadata();updateDrawing();return;}
  if(e.id==='material-gauge'&&kind==='panel'){formMetadata();if(!availableMaterials().some(m=>m.id===materialId)){materialId=availableMaterials()[0]?.id||'';colorId='';draft.finish={};}renderColors();updateDrawing();return;}
@@ -1173,6 +1186,47 @@ function handleSubmit(event){const form=event.target;if(!form.matches('#end-hem-
  const record={measurementDefaults:checked.data,id:result.template.id,name:result.template.name,currentVersion:result.template.version,versions:old?[...old.versions,copy(result.template)]:[copy(result.template)],channels:{client:data.has('client'),store:data.has('store'),po:data.has('po')},allowed,archived:false,updatedAt:new Date().toISOString()};if(old)templates[templates.indexOf(old)]=record;else templates.push(record);store(KEYS.templates,{version:1,records:templates});closeDialog();authoring=false;editingTemplateId=null;workflow='models';render();toast('Modèle enregistré. Les mesures standards sont prêtes pour le magasin local.');
 }
 function handleKey(event){if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
+function expandAluminumPalettes(catalogue){
+ const find=id=>catalogue.find(product=>product.id===id);
+ const normalize=name=>name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+ const kaycan=find('kaycan-coil-0721-30m');
+ if(kaycan){
+  const kaycanSource='https://www.kaycan.com/product/aluminum/aluminum-siding/acm/';
+  const samples=[...(find('kaycan-fascia-6-0480')?.colors||[]),...(find('kaycan-urbanix-coil-0747')?.colors||[])];
+  const names=[
+   'Noir','Noir LG','Noir SG','Étain Bruni','Cactus','Noir Charbon','Charbon','Brun Chocolat',
+   'Brun Chocolat LG','Brun Chocolat SG','Chocolat SG','Rouge Colonial','Brun Commercial','Vert Forêt',
+   'Gris Gothique','Gris Grafton','Récolte de Cèdre','Ivoire','Ivoire LG','Ivoire SG','Vert Lierre',
+   'Kaki','Lin','Beige MC','Santal MC','Mocha','Gris Perle','Blanc Polaire','Beige Prestige','Rockwood',
+   'Granite Rustique','Sable','Santal','Gris Argenté','Gris Ardoise','Gris Soho','Blanc','Blanc LG','Blanc SG','Osier','Blanc Loup'
+  ];
+  const references=names.map((name,index)=>{
+   const sample=samples.find(c=>normalize(c.name)===normalize(name));
+   return {...sample,id:sample?.id||'kaycan-reference-'+(index+1),name,sourceUrl:kaycanSource,
+    availabilityAtProfile:'unverified',availabilityNote:'Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.'};
+  });
+  const existing=new Set(kaycan.colors.map(c=>normalize(c.name)));
+  kaycan.colors=[...kaycan.colors,...references.filter(c=>!existing.has(normalize(c.name)))];
+  kaycan.name='Rouleau aluminium 0721 · références de couleur à confirmer';
+ }
+ const gentek=find('gentek-coil-3037');
+ if(gentek){
+  const sourceUrl='https://www.gentek.ca/wp-content/uploads/sites/2/2023/08/Gentek-Product-Directory-ENG-March2026.pdf';
+  const documented={
+   'Blanc Pur 30':'431','Amande':'432','Noir':'425','Brownstone':'471',
+   'Bleu littoral':'4P9','Espresso':'43P','Gris Hudson':'4C2',
+   'Minerai de fer':'4P6','Rouge majestueux':'4C5','Bleu crépuscule':'4C6','Fougère des prés':'4C3',
+   'Vagues de minuit':'409','Poussière de lune':'416','Brun Rockport':'4C4','Bleu Rockwell':'4P2'
+  };
+  const existing=new Set(gentek.colors.map(c=>c.id));
+  const references=(find('gentek-fascia6-ribbed')?.colors||[]).filter(c=>!existing.has(c.id)).map(c=>{
+   const code=documented[c.name];
+   return {...c,code:code||c.code,sourceUrl:code?sourceUrl:c.sourceUrl,availabilityAtProfile:code?'documented':'unverified',
+    availabilityNote:code?'Teinte indiquée pour le 3037 dans la matrice Gentek. Stock et fini à confirmer.':'Référence aluminium Gentek. Disponibilité du rouleau 3037 à confirmer.'};
+  });
+  gentek.colors=[...gentek.colors,...references];
+ }
+}
 function macSteelPalette(catalogue){
  const sourceUrl='https://macmetalarchitectural.com/nos-couleurs/';
  const swatches=new Map(catalogue.filter(m=>m.brand==='MAC Métal architectural').flatMap(m=>(m.colors||[]).map(c=>[c.name,c.swatchUrl||c.swatchImage])));
@@ -1184,7 +1238,7 @@ function macSteelPalette(catalogue){
  return {id:'mac-acier-moulures',brand:'MAC Métal architectural',name:'Nuancier acier pour moulures',family:'acier',steelProfileOnly:true,sourceUrl,
   colors:collections.flatMap(([collection,entries])=>entries.map(([code,name])=>({id:'mac-acier-'+code,code:String(code),name,collection,sourceUrl,swatchUrl:swatches.get(name),availabilityNote:'Référence MAC. Disponibilité du rouleau, calibre et fini à confirmer pour cette moulure.'})))};
 }
-async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Error('Le moteur de modèles n’est pas disponible.');const fetched=await Promise.allSettled([fetch('catalogue-fd6866b49d21.json').then(r=>{if(!r.ok)throw new Error('catalogue');return r.json();}),fetch('ral-classic.json').then(r=>{if(!r.ok)throw new Error('nuancier RAL');return r.json();})]);if(fetched[0].status==='fulfilled'){const raw=fetched[0].value;const catalogue=Array.isArray(raw)?raw:raw.materials||[];materials=catalogue.filter(m=>(m.applications||[]).includes('bending'));materials.push(macSteelPalette(catalogue));}if(fetched[1].status==='fulfilled'&&Array.isArray(fetched[1].value.colors))ral=fetched[1].value;
+async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Error('Le moteur de modèles n’est pas disponible.');const fetched=await Promise.allSettled([fetch('catalogue-fd6866b49d21.json').then(r=>{if(!r.ok)throw new Error('catalogue');return r.json();}),fetch('ral-classic.json').then(r=>{if(!r.ok)throw new Error('nuancier RAL');return r.json();})]);if(fetched[0].status==='fulfilled'){const raw=fetched[0].value;const catalogue=Array.isArray(raw)?raw:raw.materials||[];expandAluminumPalettes(catalogue);materials=catalogue.filter(m=>(m.applications||[]).includes('bending'));materials.push(macSteelPalette(catalogue));}if(fetched[1].status==='fulfilled'&&Array.isArray(fetched[1].value.colors))ral=fetched[1].value;
  const unico=window.MIRUnico;if(unico)for(const palette of unico.palettes){const usable=palette.colors.filter(c=>!c.publishedGauges||c.publishedGauges.some(g=>[18,20,22].includes(g)));if(!usable.length)continue;materials.push({id:'unico-palette-'+palette.id,brand:'Unico',name:'U-P1 · '+palette.label,architecturalPanel:true,metalType:palette.materialId,family:palette.materialId,allowedGauges:palette.id==='signature'?[22]:null,sourceUrl:palette.sourceUrl,colors:usable.map(c=>({...c,availabilityNote:c.uP1Compatibility.note+' Écran indicatif.'}))});}materialId=materials[0]?.id||'';
  const savedTemplates=read(KEYS.templates,{version:1,records:[]});templates=Array.isArray(savedTemplates.records)?savedTemplates.records.filter(record=>record?.id&&latest(record)&&M.templatePreview(latest(record)).ok):[];const savedRequests=read(KEYS.requests,{version:1,requests:[]});requests=Array.isArray(savedRequests.requests)?savedRequests.requests.filter(request=>request?.id&&Array.isArray(request.items)&&request.items.every(item=>item.spec&&item.snapshot?.schema==='mir-production-instance-1')):[];
  const saved=read(KEYS.draft,null);order=saved?.version===1&&Array.isArray(saved.order?.items)?normalizeWorkshopOrder(saved.order):defaultOrder();
