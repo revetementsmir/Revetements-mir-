@@ -95,7 +95,7 @@ jobs:
           fetch "$base/pliage.html" /tmp/pliage.html
           grep -F 'href="production.html?mode=client&amp;kind=profile&amp;profile=coin_arch_j"' /tmp/pliage.html
           fetch "$base/chantier.html" /tmp/mir-connexion.html
-          grep -F 'Connexion équipe — Les Revêtements MIR' /tmp/mir-connexion.html
+          grep -F 'Mon compte — Les Revêtements MIR' /tmp/mir-connexion.html
           fetch "$base/portal-config.js" /tmp/mir-portal-config.js
           grep -F 'enabled: false' /tmp/mir-portal-config.js
           fetch "$base/chantier-app.js" /tmp/mir-chantier-app.js
