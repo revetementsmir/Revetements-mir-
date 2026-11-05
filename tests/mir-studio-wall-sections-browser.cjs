@@ -60,20 +60,20 @@ async function online(){
    assert.ok(Math.max(...baseZ)-Math.min(...baseZ)<.001);
    await page.locator('#stage').screenshot({path:path.join(artifact,'mir-studio-wall-parts-'+screen.name+'.png')});
    if(screen.width<=650){
-     const nav=page.locator('#mir-side-wall-scroll');
+     const nav=page.locator('#mir-side-wall-scroll'),svgElement=page.locator('#elevation svg');
      assert.equal(await nav.isVisible(),true,'Le bouton 3 murs doit être accessible sur téléphone');
-     const metrics=await page.evaluate(()=>({
-       doc:document.documentElement.scrollWidth,view:innerWidth,
-       scroll:document.querySelector('#elevation').scrollWidth,
-       client:document.querySelector('#elevation').clientWidth
-     }));
+     const metrics=await page.evaluate(()=>({doc:document.documentElement.scrollWidth,view:innerWidth}));
      assert.ok(metrics.doc<=metrics.view+2,'Aucun débordement horizontal de page '+JSON.stringify(metrics));
-     assert.ok(metrics.scroll>metrics.client,'La vue mobile doit pouvoir déplacer horizontalement les trois murs');
+     const home=await svgElement.getAttribute('viewBox');
+     assert.equal(home,await svgElement.getAttribute('data-mir-home-view-box'));
      await nav.click();
-     await page.waitForFunction(()=>document.querySelector('#elevation').scrollLeft>150,{timeout:2500});
+     const detail=await svgElement.getAttribute('viewBox');
+     assert.notEqual(detail,home,'Le bouton doit recadrer la vue sur les trois murs');
+     assert.ok(Number(detail.split(' ')[2])<Number(home.split(' ')[2]),'La vue des trois murs doit être agrandie');
+     assert.equal(await nav.textContent(),'← Voir la maison');
      await page.locator('#stage').screenshot({path:path.join(artifact,'mir-studio-wall-parts-mobile-details.png')});
      await nav.click();
-     await page.waitForFunction(()=>document.querySelector('#elevation').scrollLeft<10,{timeout:2500});
+     assert.equal(await svgElement.getAttribute('viewBox'),home,'Retour à la vue complète de la maison');
    }
    await page.locator('[data-face="left"]').click();
    await page.locator('#elevation svg[data-mir-three-wall-explode="true"]').waitFor();
