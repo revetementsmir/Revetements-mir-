@@ -43,8 +43,10 @@
     if (site.protocol !== 'https:' || site.origin !== config.siteOrigin || site.username || site.password || site.search || site.hash || site.pathname !== '/')
       fail('CONFIGURATION', 'L’adresse du portail doit être vérifiée.');
     if (origin && origin !== site.origin) fail('ORIGIN_MISMATCH', 'Ouvrez le portail depuis son adresse MIR officielle.');
-    if (config.callbackPath !== '/chantier.html') fail('CONFIGURATION', 'Le retour de connexion doit être vérifié.');
-    return { ...config, enabled: true, redirectTo: `${site.origin}/chantier.html` };
+    const expectedCallback = site.origin === 'https://revetementsmirweb.github.io'
+      ? '/MIR/chantier.html' : '/chantier.html';
+    if (config.callbackPath !== expectedCallback) fail('CONFIGURATION', 'Le retour de connexion doit être vérifié.');
+    return { ...config, enabled: true, redirectTo: `${site.origin}${expectedCallback}` };
   }
   function captureEntry(href) {
     const url = new URL(href), query = url.searchParams, hash = new URLSearchParams(url.hash.replace(/^#/, ''));
