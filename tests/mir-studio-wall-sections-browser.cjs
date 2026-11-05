@@ -23,7 +23,7 @@ async function online(){
    const page=await browser.newPage({viewport:{width:screen.width,height:screen.height},hasTouch:screen.width<600});
    const errors=[];page.on('pageerror',e=>errors.push(String(e.message)));
    await page.goto(base+'/plan.html',{waitUntil:'domcontentloaded',timeout:30000});
-   await page.waitForFunction(()=>!!window.MIRStudioWallParts&&!!window.MIR3D&&document.querySelector('#view-2d')?.disabled!==true,{timeout:30000});
+   await page.waitForFunction(()=>!!window.MIRStudioWallParts&&!!window.MIR3D&&!!document.querySelector('#zone-list .zone-button')&&document.querySelector('#project-name')?.textContent!=='Ouverture de votre projet…',{timeout:30000});
    await page.locator('#view-2d').click();
    await page.locator('[data-face="right"]').click();
    const diagnostic=await page.evaluate(()=>({
