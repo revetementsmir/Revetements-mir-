@@ -30,6 +30,7 @@ async function ready(){
    await page.locator('#production-drawing').scrollIntoViewIfNeeded();
    const shape=page.locator('#production-drawing svg > path').first();
    const before=await shape.boundingBox();
+   const beforeScroll=await page.evaluate(()=>scrollY);
    const count=await page.locator('#mir-v4-sheet-value').textContent();
    const dimensions=await page.locator('#production-dimensions input[data-measure]').evaluateAll(inputs=>inputs.map(e=>e.value));
    const area=await page.locator('#production-drawing').boundingBox();
@@ -54,7 +55,8 @@ async function ready(){
    await page.locator('#production-drawing').screenshot({path:path.join(folder,'mir-pan-'+s.name+'.png')});
    await page.locator('#panel-view-reset').click();
    const reset=await shape.boundingBox();
-   assert.ok(Math.abs(reset.x-before.x)<3&&Math.abs(reset.y-before.y)<3,
+   const resetScroll=await page.evaluate(()=>scrollY);
+   assert.ok(Math.abs(reset.x-before.x)<3&&Math.abs((reset.y+resetScroll)-(before.y+beforeScroll))<3,
     'Vue complète must recenter '+JSON.stringify({before,reset,s}));
    assert.deepEqual(errors,[]);
    console.log('PASS '+s.name+' glisser la vue + recentrer sans changer les cotes');
