@@ -359,3 +359,136 @@ body.mir-admin-v4 .selected-finish .kaycan-flat-chip {
   body.mir-admin-v4 .color-choice.kaycan-flat-choice .color-text { font-size: 9px; }
   body.mir-admin-v4 .selected-finish .kaycan-flat-chip { width: 44px; height: 44px; }
 }
+
+/* Nommer une moulure sans quitter le dessin ni ouvrir le configurateur complet. */
+body.mir-admin-v4 .mir-piece-name {
+  display: grid;
+  gap: 5px;
+  margin: 10px 15px 6px;
+  padding: 12px 13px;
+  border: 1px solid #d9e5ce;
+  border-radius: 10px;
+  background: #f0f5ea;
+  min-width: 0;
+}
+body.mir-admin-v4 .mir-piece-name[hidden],
+body.mir-admin-v4 .production-rename-form[hidden] { display: none !important; }
+body.mir-admin-v4 .mir-piece-name > span {
+  color: #2b5137;
+  font-size: 14px;
+  font-weight: 700;
+}
+body.mir-admin-v4 .mir-piece-name input {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  border: 1px solid #b8ceb2;
+  border-radius: 8px;
+  background: #fff;
+  color: #284333;
+  font-size: 16px;
+  padding: 10px 12px;
+}
+body.mir-admin-v4 .mir-piece-name small {
+  display: block;
+  font-size: 11px;
+  color: #667a62;
+  line-height: 1.45;
+}
+body.mir-admin-v4 .drawing-card.mobile-trace .mir-piece-name {
+  display: none !important;
+}
+body.mir-admin-v4 .mir-v4-picker > summary strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+body.mir-admin-v4 .production-item-info h3 {
+  overflow-wrap: anywhere;
+}
+body.mir-admin-v4 .production-rename-form {
+  display: grid;
+  gap: 9px;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 9px;
+  border: 1px solid #cbdcbe;
+  background: #f4f8f0;
+}
+body.mir-admin-v4 .production-rename-form label {
+  display: grid;
+  gap: 5px;
+  color: #385b41;
+  font-size: 13px;
+  font-weight: 700;
+}
+body.mir-admin-v4 .production-rename-form input {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 46px;
+  font-size: 16px;
+  color: #253a2d;
+  background: #fff;
+  border: 1px solid #b7cbb0;
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+body.mir-admin-v4 .production-rename-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+body.mir-admin-v4 .production-rename-actions button {
+  flex: 1 1 110px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #c6d7bf;
+  border-radius: 7px;
+  background: #fff;
+  color: #2c573a;
+  font-size: 13px;
+}
+body.mir-admin-v4 .production-rename-actions button[type="submit"] {
+  background: #2b5a3c;
+  color: #fff;
+  border-color: #2b5a3c;
+  font-weight: 700;
+}
+body.mir-admin-v4 .production-item-actions .rename-piece {
+  border: 1px solid #afc6a7;
+  border-radius: 8px;
+  background: #edf5e8;
+  color: #244f31;
+  font-weight: 700;
+}
+@media(max-width:650px){
+  body.mir-admin-v4 .mir-piece-name { margin: 9px 9px 5px; padding: 11px; }
+  body.mir-admin-v4 .production-item-actions {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 8px;
+    align-items: start;
+  }
+  body.mir-admin-v4 .production-item-actions .profile-group-choice {
+    grid-column: 1/-1;
+    width: 100%;
+    min-width: 0;
+  }
+  body.mir-admin-v4 .production-item-actions .profile-group-choice select {
+    width: 100%;
+    max-width: 100%;
+    font-size: 14px;
+  }
+  body.mir-admin-v4 .production-item-actions button {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    font-size: 12px;
+    line-height: 1.25;
+    text-align: center;
+    padding: 8px 6px;
+    white-space: normal;
+  }
+}
