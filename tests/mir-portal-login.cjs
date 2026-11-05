@@ -60,13 +60,12 @@ test('Aucun rôle admin n’est attribué sans preuve serveur',()=>{
 });
 test('Une seule page connexion est visible dans le site principal',()=>{
   const login=read('chantier.html'),index=read('index.html'),pliage=read('pliage.html'),boutique=read('boutique.html');
-  assert.match(login,/Connexion équipe — Les Revêtements MIR/);
+  assert.match(login,/Mon compte — Les Revêtements MIR/);
   assert.doesNotMatch(login,/class="demo-banner"|class="demo-controls"|id="demo-reset"/);
-  // L'accueil public emploie « Mon compte » depuis sa refonte premium.
-  // La destination reste la même page sécurisée de connexion; les autres pages
-  // conservent le libellé « Connexion équipe ».
+  // Le compte reste neutre pour les clients futurs et l’équipe actuelle.
+  // L’authentification demeure désactivée sans backend sécurisé.
   assert.match(index,/href="chantier\.html"[^>]*>Mon compte<\/a>/);
-  for(const html of [pliage,boutique]) assert.match(html,/href="chantier\.html"[^>]*>Connexion équipe/);
+  for(const html of [pliage,boutique]) assert.match(html,/href="chantier\.html"[^>]*>Mon compte/);
 });
 test('Le portail verrouillé ne propose aucun lien de démo',()=>{
   const portal=read('chantier-app.js');
