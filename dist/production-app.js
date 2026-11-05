@@ -48,7 +48,8 @@ function latest(record){return record?.versions?.find(t=>t.version===record.curr
 function reloadLocalTemplates(){
  const saved=read(KEYS.templates,{version:1,records:[]});
  templates=Array.isArray(saved.records)?saved.records.filter(record=>record?.id&&latest(record)&&M.templatePreview(latest(record)).ok):[];
- if(!$('#production-templates'))return;
+ // Pendant boot(), le dossier de travail n'est pas encore initialisé.
+ if(!draft||!$('#production-workflow'))return;
  if(workflow==='models')renderModels();else if(workflow==='configure')renderTemplates();
 }
 function availableForPO(){return client||authoring||editingItemId||templates.find(record=>record.id===selectedTemplate?.id)?.channels?.po!==false;}
