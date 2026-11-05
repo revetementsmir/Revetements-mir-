@@ -1168,6 +1168,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.hasAttribute('data-drawing-undo')){if(!drawPoints.length||client||editingItemId)return;drawPoints.pop();const next=toCustom(drawPoints);if(next)draft=next;else{draft.segments=[];draft.bends=[];}renderDimensions();updateDrawing();return;}
 }
 function handleInput(event){const e=event.target,d=e.dataset;
+ if(e.matches('[data-rename-form] input[name="name"]')){e.setCustomValidity('');return;}
  if(e.id==='production-piece-name'&&!client&&kind==='profile'&&!authoring){
   draft.name=e.value;
   updateDrawing({keepForm:true});
