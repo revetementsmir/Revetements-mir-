@@ -182,6 +182,7 @@ const server=http.createServer((req,res)=>{
    await annotations.getByRole('button',{name:'Ajouter',exact:true}).click();
    assert.match(await annotations.getByRole('listitem').innerText(),/Importer mon plan PDF.*Agrandir ce bouton/);
    assert.equal(await page.locator('#import-pdf.mir-annotation-selected').count(),1);
+   assert.ok(await page.locator(".mir-annotation-pin").isVisible());
    assert.ok(await annotations.getByRole('button',{name:'Copier les notes'}).isEnabled());
    console.log('PASS '+width+' px : sélection et ajout d’une annotation du Studio');
    await page.close();

@@ -6,5 +6,12 @@
 .mir-annotations textarea[hidden]{display:none}
 .mir-annotations ol{margin:.4rem 0;overflow-wrap:anywhere}
 .mir-annotation-selected{outline:3px solid #16844e!important;outline-offset:2px}
-.mir-annotation-picking :not(.mir-annotations,.mir-annotations *){cursor:crosshair!important}
 @media(max-width:650px){.mir-annotations{top:auto;bottom:.75rem;max-height:37vh}}
+.mir-annotation-reticle,.mir-annotation-pin,.mir-annotation-lens{position:fixed;pointer-events:none;z-index:1001}
+.mir-annotation-reticle,.mir-annotation-pin{transform:translate(-50%,-50%);width:27px;height:27px}
+.mir-annotation-reticle:before,.mir-annotation-reticle:after,.mir-annotation-pin:before,.mir-annotation-pin:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#0079e8;box-shadow:0 0 0 1px white}
+.mir-annotation-reticle:before,.mir-annotation-pin:before{width:25px;height:1px}
+.mir-annotation-reticle:after,.mir-annotation-pin:after{width:1px;height:25px}
+.mir-annotation-pin{border:2px solid #0079e8;border-radius:50%;box-shadow:0 0 0 1px white}
+.mir-annotation-lens{width:144px;height:144px;border:2px solid #0079e8;border-radius:6px;background:#fff;box-shadow:0 2px 8px #0005}
+.mir-annotation-picking :not(.mir-annotations,.mir-annotations *){cursor:none!important}
