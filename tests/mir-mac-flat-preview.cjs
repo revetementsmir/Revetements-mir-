@@ -70,6 +70,12 @@ async function ready(url){
    const svg=await page.locator('#production-drawing svg').innerHTML();
    assert.ok(!svg.includes('<image'),'MAC 3D must not contain an image');
    assert.ok(!svg.includes('url(#production-paint)'),'MAC 3D must not tile product photos');
+   if(!svg.includes('fill="'+color+'"')){
+    console.log('MAC DIAGNOSTIC '+JSON.stringify({expected:color,
+     actualFills:[...svg.matchAll(/fill="([^"]+)"/g)].map(m=>m[1]).slice(0,12),
+     profileFace:await page.locator('#profile-painted-side').inputValue(),
+     selectedText:(await page.locator('#selected-finish').innerText()).slice(0,140)}));
+   }
    assert.ok(svg.includes('fill="'+color+'"'),'Colored metal must use a single sampled color');
    await page.locator('#production-drawing').screenshot({path:path.join(__dirname,'../artifacts/mac-flat-'+screen.name+'.png')});
    assert.deepEqual(errors,[]);
