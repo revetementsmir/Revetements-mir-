@@ -5,6 +5,8 @@
   const BASE = new URL('.', document.currentScript?.src || location.href);
   const asset = path => new URL(path, BASE).href;
   const FACE_NAMES = { front: 'Avant', right: 'Droite', back: 'Arrière', left: 'Gauche' };
+  const REFERENCE_NAMES = { foundation: 'Solage / fondations', floor: 'Plan d’étage', reference: 'Autre référence' };
+  const MIB = 1024 * 1024, MAX_FILE_MB = 150, MAX_VISIBLE_PAGES = 60;
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = (n, digits = 2) => Number.isFinite(n) ? new Intl.NumberFormat('fr-CA', { maximumFractionDigits: digits }).format(n) : 'À confirmer';
   const statusNames = { cross_checked: 'Échelle trouvée', single_dimension: 'Une cote trouvée', selected_dimension: 'Cote sélectionnée', conflict: 'Échelles à départager', low_confidence: 'Lecture à vérifier', not_found: 'Échelle à vérifier', manual: 'Cote corrigée' };
@@ -23,29 +25,40 @@
   }
   function progress(message, percent) { if (!root) return; $('#mir-pdf-status').textContent = message; const bar = $('#mir-pdf-progress'); bar.hidden = percent == null; if (percent != null) bar.value = Math.max(0, Math.min(100, percent)); }
   function error(message) { if (!root) return; $('#mir-pdf-error').textContent = message; $('#mir-pdf-error').hidden = !message; }
-  function busy(value) { current.busy = value; $$('[data-page]').forEach(b => b.disabled = value); $('#mir-pdf-file').disabled = value; $('#mir-pdf-assign').disabled = value || !current.page; $('#mir-pdf-final').disabled = value || !Object.keys(current.assignments).length; }
+  function busy(value) { current.busy = value; $$('[data-page], #mir-pdf-page-filter input, #mir-pdf-page-filter button, [data-remove-pdf-sheet]').forEach(b => b.disabled = value); $('#mir-pdf-file').disabled = value; $('#mir-pdf-assign').disabled = value || !current.page; $('#mir-pdf-final').disabled = value || !Object.keys(current.assignments).length; }
   function element() {
     if (dialog) return;
     if (!document.querySelector('link[data-mir-pdf-style]')) { const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = asset('plan-import.css'); css.dataset.mirPdfStyle = ''; document.head.append(css); }
     dialog = document.createElement('dialog'); dialog.id = 'mir-pdf-import'; dialog.className = 'mir-pdf-dialog'; dialog.setAttribute('aria-labelledby', 'mir-pdf-title');
     dialog.innerHTML = `<div class="mir-pdf-shell"><header class="mir-pdf-head"><div><p class="mir-pdf-eyebrow">VOTRE MAISON, VOTRE PROJET</p><h2 id="mir-pdf-title">Importez votre plan.</h2><p>Les cotes du dessin servent à trouver l’échelle automatiquement.</p></div><button type="button" id="mir-pdf-close" aria-label="Fermer l’import du PDF">Fermer ×</button></header>
       <div class="mir-pdf-steps" aria-label="Étapes de l’import"><span><b>1</b> Votre PDF</span><span><b>2</b> Vos façades</span><span><b>3</b> Votre studio</span></div>
-      <div class="mir-pdf-upload"><label for="mir-pdf-file"><strong>Choisir mon PDF</strong><span>Fichier de 50 Mo maximum · jusqu’à 60 pages</span><input id="mir-pdf-file" type="file" accept="application/pdf,.pdf"></label><p>Votre fichier reste sur cet appareil. La lecture des cotes se fait dans votre navigateur.</p></div>
+      <div class="mir-pdf-upload"><label for="mir-pdf-file"><strong>Choisir mon PDF</strong><span>Fichier de ${MAX_FILE_MB} Mo maximum</span><input id="mir-pdf-file" type="file" accept="application/pdf,.pdf"></label><p>Votre fichier reste sur cet appareil. La lecture des cotes se fait dans votre navigateur.</p></div>
       <div id="mir-pdf-error" class="mir-pdf-error" role="alert" hidden></div><div class="mir-pdf-working"><p id="mir-pdf-status" role="status" aria-live="polite">Choisissez le PDF de votre projet.</p><progress id="mir-pdf-progress" max="100" hidden></progress></div>
-      <section id="mir-pdf-workspace" class="mir-pdf-workspace" hidden><nav class="mir-pdf-pages" aria-label="Pages du PDF"><h3>Pages</h3><div id="mir-pdf-pages"></div></nav><div class="mir-pdf-drawing"><div class="mir-pdf-view-tools"><h3 id="mir-pdf-page-title">Page 1</h3><div><button type="button" id="mir-pdf-crop">Ajuster le cadrage</button><button type="button" id="mir-pdf-full">Page entière</button></div></div><p id="mir-pdf-canvas-help">Choisissez la page d’une façade, puis affectez-la à la bonne vue.</p><div class="mir-pdf-canvas-shell"><canvas id="mir-pdf-canvas" aria-label="Page du PDF sélectionnée"></canvas><svg id="mir-pdf-overlay" role="img" aria-label="Cadrage et cotes détectées"></svg></div></div>
+      <form id="mir-pdf-page-filter" hidden><label for="mir-pdf-page-range">Choisir les pages à afficher</label><p id="mir-pdf-page-hint" class="mir-pdf-fine"></p><div><input id="mir-pdf-page-range" type="text" placeholder="Ex. 3, 7-10, 14" aria-describedby="mir-pdf-page-hint"><button type="submit">Afficher les pages</button><button type="reset">Réinitialiser</button></div></form>
+      <section id="mir-pdf-workspace" class="mir-pdf-workspace" hidden><nav class="mir-pdf-pages" aria-label="Pages du PDF"><h3>Pages</h3><div id="mir-pdf-pages"></div></nav><div class="mir-pdf-drawing"><div class="mir-pdf-view-tools"><h3 id="mir-pdf-page-title">Page 1</h3><div><button type="button" id="mir-pdf-crop">Ajuster le cadrage</button><button type="button" id="mir-pdf-full">Page entière</button></div></div><p id="mir-pdf-canvas-help">Choisissez la page, cadrez la vue, puis indiquez ce qu’elle représente.</p><div class="mir-pdf-canvas-shell"><canvas id="mir-pdf-canvas" aria-label="Page du PDF sélectionnée"></canvas><svg id="mir-pdf-overlay" role="img" aria-label="Cadrage et cotes détectées"></svg></div></div>
       <aside class="mir-pdf-options"><div class="mir-pdf-scale"><span id="mir-pdf-scale-badge">Lecture des cotes</span><h3>L’échelle du dessin</h3><p id="mir-pdf-scale-message"></p><p id="mir-pdf-scale-value"></p><details id="mir-pdf-evidence"><summary>Voir les cotes utilisées</summary><div id="mir-pdf-cotes"></div><label for="mir-pdf-cote-select">Choisir une cote détectée</label><select id="mir-pdf-cote-select"></select><p class="mir-pdf-fine">Une échelle peut différer entre deux vues de la même page. Cadrez la vue concernée et choisissez sa cote si nécessaire.</p></details><details class="mir-pdf-manual"><summary>Corriger une cote illisible</summary><p>Si la lecture automatique échoue, entrez la cote écrite sur le plan et pointez ses deux extrémités.</p><label for="mir-pdf-manual-value">Dimension indiquée</label><input id="mir-pdf-manual-value" placeholder="Ex. 22′-0″ ou 6705 mm"><button type="button" id="mir-pdf-manual-points">Pointer les deux extrémités</button></details></div>
       <div class="mir-pdf-zone-summary"><h3>Surfaces repérées</h3><p id="mir-pdf-zone-count"></p><label class="mir-pdf-check"><input id="mir-pdf-keep-zones" type="checkbox" checked> Reprendre les zones proposées</label><p class="mir-pdf-fine">Vous pourrez modifier, tracer ou dupliquer les zones dans le studio. Les surfaces masquées par des notes ne sont pas inventées.</p></div>
-      <label for="mir-pdf-face">Cette page représente</label><select id="mir-pdf-face"><option value="front">La façade avant</option><option value="right">Le côté droit</option><option value="back">La façade arrière</option><option value="left">Le côté gauche</option><option value="reference">Un plan d’étage ou une vue de référence</option></select><button type="button" id="mir-pdf-assign" class="mir-pdf-primary" disabled>Utiliser cette vue</button><p id="mir-pdf-assignment-note" class="mir-pdf-fine"></p></aside></section>
-      <footer class="mir-pdf-bottom"><div><h3>Votre dossier</h3><div id="mir-pdf-assigned" class="mir-pdf-assigned">Aucune façade sélectionnée.</div><p class="mir-pdf-fine">Une façade suffit pour commencer en 2D. Le volume 3D demande les vues et dimensions complémentaires.</p></div><button type="button" id="mir-pdf-final" class="mir-pdf-primary" disabled>Ouvrir mon projet →</button></footer></div>`;
+      <label for="mir-pdf-face">Cette vue représente</label><select id="mir-pdf-face"><optgroup label="Élévations extérieures"><option value="front">La façade avant</option><option value="right">Le côté droit</option><option value="back">La façade arrière</option><option value="left">Le côté gauche</option></optgroup><optgroup label="Feuilles de référence">${Object.entries(REFERENCE_NAMES).map(([key, label]) => `<option value="${key}">${label}</option>`).join('')}</optgroup></select><div id="mir-pdf-level-field" hidden><label for="mir-pdf-level">Nom de l’étage (facultatif)</label><input id="mir-pdf-level" maxlength="60" placeholder="Ex. Rez-de-chaussée, 2e étage"></div><button type="button" id="mir-pdf-assign" class="mir-pdf-primary" disabled>Ajouter cette vue au dossier</button><p id="mir-pdf-assignment-note" class="mir-pdf-fine"></p></aside></section>
+      <footer class="mir-pdf-bottom"><div><h3>Votre dossier</h3><div id="mir-pdf-assigned" class="mir-pdf-assigned">Aucune vue sélectionnée.</div><p class="mir-pdf-fine">Une élévation suffit pour commencer en 2D. Pour préparer le volume 3D, ajoutez le solage, les plans de chaque étage et les élévations extérieures, puis confirmez les dimensions dans le studio.</p></div><button type="button" id="mir-pdf-final" class="mir-pdf-primary" disabled>Ouvrir mon projet →</button></footer></div>`;
     document.body.append(dialog); root = dialog;
     $('#mir-pdf-close').onclick = close; dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
     $('#mir-pdf-file').onchange = e => load(e.target.files?.[0]);
+    $('#mir-pdf-page-filter').onsubmit = e => { e.preventDefault(); filterPages($('#mir-pdf-page-range').value); };
+    $('#mir-pdf-page-filter').onreset = () => filterPages('');
     $('#mir-pdf-crop').onclick = () => { if (!current.page) return; mode = mode === 'crop' ? null : 'crop'; $('#mir-pdf-crop').setAttribute('aria-pressed', mode === 'crop'); $('#mir-pdf-canvas-help').textContent = mode === 'crop' ? 'Glissez sur le dessin pour entourer uniquement la façade. L’échelle ne change pas.' : 'Les repères verts montrent les cotes qui ont servi au calcul.'; };
     $('#mir-pdf-full').onclick = () => { if (!current.page) return; current.crop = [0, 0, current.page.canvas.width, current.page.canvas.height]; refreshZones(); draw(); };
     $('#mir-pdf-cote-select').onchange = e => chooseCote(Number(e.target.value));
     $('#mir-pdf-manual-points').onclick = beginManual;
     $('#mir-pdf-face').onchange = () => assignmentHint();
     $('#mir-pdf-assign').onclick = assign;
+    $('#mir-pdf-assigned').onclick = e => {
+      const button = e.target.closest('[data-remove-pdf-sheet]');
+      if (!button || current.busy) return;
+      const key = button.dataset.removePdfSheet;
+      if (Object.hasOwn(FACE_NAMES, key)) delete current.assignments[key];
+      else current.references.splice(Number(key), 1);
+      renderAssignments(); assignmentHint();
+    };
     $('#mir-pdf-final').onclick = finish;
     const overlay = $('#mir-pdf-overlay');
     overlay.onpointerdown = e => { if (!current.page || current.busy || !mode) return; const p = point(e); if (mode === 'calibration') { calibrationClicks.push(p); if (calibrationClicks.length === 2) completeManual(); draw(); return; } pointerStart = p; overlay.setPointerCapture(e.pointerId); e.preventDefault(); };
@@ -61,22 +74,48 @@
   async function load(file) {
     if (!file) return;
     if (!/\.pdf$/i.test(file.name) && file.type !== 'application/pdf') return error('Choisissez un fichier PDF.');
-    if (file.size > 50 * 1024 * 1024) return error('Ce PDF dépasse 50 Mo. Exportez une copie contenant seulement les pages utiles.');
+    if (file.size > MAX_FILE_MB * MIB) return error(`Ce PDF dépasse ${MAX_FILE_MB} Mo. Exportez une copie contenant seulement les pages utiles.`);
     if (file.size < 32) return error('Ce fichier est vide ou incomplet.');
-    const token = ++sequence; if (current?.pdf) await current.pdf.destroy(); current = fresh(); current.file = file; busy(true); error(''); $('#mir-pdf-workspace').hidden = true; $('#mir-pdf-assigned').textContent = 'Aucune façade sélectionnée.';
+    const token = ++sequence, previous = current.pdf;
+    current = fresh(); current.file = file; busy(true); error('');
+    $('#mir-pdf-workspace').hidden = $('#mir-pdf-page-filter').hidden = true;
+    $('#mir-pdf-page-range').value = ''; $('#mir-pdf-level').value = ''; renderAssignments();
     try {
+      if (previous) await previous.destroy();
+      if (token !== sequence) return;
       progress('Ouverture de votre PDF…', 4); await dependencies(); if (token !== sequence) return; const buffer = await file.arrayBuffer(); if (token !== sequence) return;
       const header = new TextDecoder('latin1').decode(buffer.slice(0, 1024)); if (!header.includes('%PDF-')) throw new Error('Le contenu de ce fichier ne correspond pas à un PDF.');
-      // The optional audit fingerprint must not block PDF import in an HTTP
-      // preview, where browsers intentionally do not expose crypto.subtle.
-      if (globalThis.crypto?.subtle?.digest) { const digest = await crypto.subtle.digest('SHA-256', buffer); if (token !== sequence) return; current.sha256 = [...new Uint8Array(digest)].map(n => n.toString(16).padStart(2, '0')).join(''); }
+      // Avoid copying the entire buffer again for an optional fingerprint on large files.
+      if (file.size <= 50 * MIB && globalThis.crypto?.subtle?.digest) { const digest = await crypto.subtle.digest('SHA-256', buffer); if (token !== sequence) return; current.sha256 = [...new Uint8Array(digest)].map(n => n.toString(16).padStart(2, '0')).join(''); }
       const job = pdfLibrary.getDocument({ data: new Uint8Array(buffer), isEvalSupported: false, enableXfa: false, cMapUrl: asset('vendor/pdfjs/cmaps/'), cMapPacked: true, standardFontDataUrl: asset('vendor/pdfjs/standard_fonts/'), wasmUrl: asset('vendor/pdfjs/wasm/'), stopAtErrors: false });
       const pdf = await job.promise; if (token !== sequence) { await pdf.destroy(); return; }
-      if (pdf.numPages > 60) { await pdf.destroy(); throw new Error('Ce PDF contient plus de 60 pages. Exportez les plans d’élévation et les vues utiles dans un PDF plus court.'); }
-      current.pdf = pdf; $('#mir-pdf-pages').innerHTML = Array.from({ length: pdf.numPages }, (_, i) => `<button type="button" data-page="${i + 1}" aria-pressed="false"><span>${i + 1}</span>Page ${i + 1}</button>`).join('');
-      $$('[data-page]').forEach(button => button.onclick = () => showPage(Number(button.dataset.page)));
-      $('#mir-pdf-workspace').hidden = false; progress(`${pdf.numPages} pages disponibles.`, null); busy(false); await showPage(1);
+      current.pdf = pdf;
+      $('#mir-pdf-page-hint').textContent = `${pdf.numPages} page(s) dans le PDF. Entrez les numéros ou plages à afficher, par exemple 3, 7-10, 14. Jusqu’à ${MAX_VISIBLE_PAGES} à la fois.`;
+      $('#mir-pdf-page-filter').hidden = $('#mir-pdf-workspace').hidden = false;
+      busy(false); filterPages('');
     } catch (e) { if (token === sequence) { error(readableError(e)); progress('Le PDF n’a pas été importé.', null); busy(false); } }
+  }
+  function filterPages(value) {
+    if (!current.pdf || current.busy) return;
+    const count = current.pdf.numPages, numbers = new Set();
+    if (value.trim()) {
+      for (const part of value.trim().split(/\s*[,;]\s*/)) {
+        const match = /^(\d+)(?:\s*[-–]\s*(\d+))?$/.exec(part);
+        if (!match) return error('Indiquez des numéros ou des plages de pages, par exemple 3, 7-10, 14.');
+        const first = Number(match[1]), last = Number(match[2] || first);
+        if (first < 1 || last < first || last > count) return error(`Choisissez des pages de 1 à ${count}, dans l’ordre croissant pour chaque plage.`);
+        if (last - first >= MAX_VISIBLE_PAGES) return error(`Choisissez au plus ${MAX_VISIBLE_PAGES} pages à afficher à la fois.`);
+        for (let page = first; page <= last; page++) numbers.add(page);
+        if (numbers.size > MAX_VISIBLE_PAGES) return error(`Choisissez au plus ${MAX_VISIBLE_PAGES} pages à afficher à la fois.`);
+      }
+    } else {
+      for (let page = 1; page <= Math.min(count, MAX_VISIBLE_PAGES); page++) numbers.add(page);
+    }
+    const pages = [...numbers].sort((a, b) => a - b);
+    error('');
+    $('#mir-pdf-pages').innerHTML = pages.map(page => `<button type="button" data-page="${page}" aria-pressed="${page === current.pageNumber}"><span aria-hidden="true">${page}</span>Page ${page}</button>`).join('');
+    $$('[data-page]').forEach(button => button.onclick = () => showPage(Number(button.dataset.page)));
+    if (!numbers.has(current.pageNumber)) void showPage(pages[0]);
   }
   function readableError(e) { if (e?.name === 'PasswordException') return 'Ce PDF est protégé par un mot de passe. Importez une copie déverrouillée.'; if (e?.name === 'InvalidPDFException') return 'Ce PDF semble endommagé. Essayez une nouvelle exportation.'; if (e?.name === 'QuotaExceededError') return 'L’espace disponible sur cet appareil est insuffisant pour conserver ce PDF.'; const message = String(e?.message || ''); if (/^(?:Ce |Le |La |Les |Choisissez |Importez |Un |Une |Fermez |L’|L'|Votre )/.test(message)) return message; console.warn('MIR PDF : lecture interrompue', e); return 'La lecture de ce PDF n’a pas réussi. Réessayez ou importez une nouvelle exportation de votre plan.'; }
   async function renderPage(number) {
@@ -130,7 +169,8 @@
       const canvas = $('#mir-pdf-canvas'); canvas.width = page.canvas.width; canvas.height = page.canvas.height; canvas.getContext('2d').drawImage(page.canvas, 0, 0); $('#mir-pdf-overlay').setAttribute('viewBox', `0 0 ${canvas.width} ${canvas.height}`); draw();
       if (!page.scale) await analyze(page, token); if (token !== sequence) return; current.cache.set(number, page);
       // Avoid holding dozens of full-resolution pages in memory on a phone.
-      for (const [k, cached] of current.cache) if (current.cache.size > 3 && k !== number) { cached.canvas.width = cached.canvas.height = 1; current.cache.delete(k); }
+      const cacheLimit = current.file.size > 50 * MIB ? 1 : 3;
+      for (const [k, cached] of current.cache) if (current.cache.size > cacheLimit && k !== number) { cached.canvas.width = cached.canvas.height = 1; current.cache.delete(k); }
       refreshZones(); renderScale(); draw(); assignmentHint(); progress(`Page ${number} prête. ${page.scale.message}`, null); busy(false);
     } catch (e) { if (token === sequence) { error(readableError(e)); progress('Vous pouvez réessayer cette page ou choisir une autre page.', null); busy(false); } }
   }
@@ -152,7 +192,15 @@
     for (const p of calibrationClicks) html += `<circle cx="${p[0]}" cy="${p[1]}" r="9" fill="#b2783b"/>`;
     $('#mir-pdf-overlay').innerHTML = html;
   }
-  function assignmentHint() { const key = $('#mir-pdf-face').value; $('#mir-pdf-assignment-note').textContent = key === 'reference' ? 'Cette page reste une référence pour comprendre les retraits et les détails. Elle ne devient pas une façade mesurée.' : current.assignments[key] ? `La page ${current.assignments[key].page} sera remplacée dans cette préparation. Le projet existant ne change pas avant l’ouverture finale.` : 'Choisissez la façade correspondant au dessin; passez ensuite à une autre page si nécessaire.'; }
+  function assignmentHint() {
+    const key = $('#mir-pdf-face').value;
+    $('#mir-pdf-level-field').hidden = key !== 'floor';
+    $('#mir-pdf-assignment-note').textContent = Object.hasOwn(REFERENCE_NAMES, key)
+      ? 'Cette vue sera disponible avec les dimensions du volume dans le studio.'
+      : current.assignments[key]
+        ? `La vue de la page ${current.assignments[key].page} sera remplacée dans votre dossier.`
+        : 'Une feuille peut contenir plusieurs élévations. Cadrez et ajoutez chacune à la façade correspondante.';
+  }
   function placeholder(key) { return { key, name: FACE_NAMES[key], page: null, bbox: [0, 0, 1200, 800], textureBox: [0, 0, 1200, 800], physicalWidth: null, zones: [], openings: [], roof: [], base: [], fascia: [], soffit: [], detected: {}, candidates: [], occlusions: [], printedDimensions: [], importedStatus: 'unassigned', calibrationStatus: 'not_found', textureBottom: 0, textureReference: 'Façade non importée.', sourceImage: null }; }
   function calibration(page, crop) {
     const s = page.scale, [x, y] = crop;
@@ -164,21 +212,39 @@
     if (w < 40 || h < 40) return error('Le cadrage est trop petit. Entourez la façade complète.');
     const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(page.canvas, x, y, w, h, 0, 0, w, h); const sourceImage = canvas.toDataURL('image/png'); canvas.width = canvas.height = 1;
     const cal = calibration(page, crop);
-    if (key === 'reference') { current.references = current.references.filter(r => r.page !== page.number); current.references.push({ page: page.number, crop, sourceImage, calibration: cal, name: `Référence · page ${page.number}` }); } else {
+    const isReference = Object.hasOwn(REFERENCE_NAMES, key);
+    if (isReference) {
+      const level = key === 'floor' ? $('#mir-pdf-level').value.trim() : '';
+      const name = level ? `${REFERENCE_NAMES[key]} · ${level}` : REFERENCE_NAMES[key];
+      const ref = { page: page.number, crop, sourceImage, calibration: cal, kind: key, name };
+      const index = current.references.findIndex(r => r.kind === key && r.page === page.number && r.crop.every((v, i) => v === crop[i]));
+      if (index < 0) current.references.push(ref); else current.references[index] = ref;
+    } else {
       const regions = $('#mir-pdf-keep-zones').checked ? current.regions : [], zones = regions.map((r, i) => ({ id: `pdf-zone-${i + 1}`, name: `Zone ${i + 1}`, polygon: r.polygon, kind: 'siding', parent: null, provenance: r.provenance, needsReview: true, detected: true }));
       const openings = regions.flatMap((r, i) => r.holes.filter(p => { const b = MIRPDFAnalysis.bbox(p); return b[2] - b[0] > 15 && b[3] - b[1] > 15; }).map((p, j) => ({ id: `pdf-opening-${i + 1}-${j + 1}`, type: 'window', polygon: p, bbox: MIRPDFAnalysis.bbox(p), occluded: false, dimension: 'Dimension issue de l’échelle; ouverture à vérifier.', provenance: 'Vide repéré dans une zone colorée; nature fenêtre/porte à confirmer.', needsReview: true })));
       current.assignments[key] = { ...placeholder(key), page: page.number, bbox: [0, 0, w, h], textureBox: [0, 0, w, h], zones, openings, sourceImage, sourceImageBox: [0, 0, w, h], sourceWidth: w, sourceHeight: h, sourcePageSize: [page.canvas.width, page.canvas.height], sourceCrop: crop, calibration: cal, importedStatus: 'assigned', calibrationStatus: cal.status, detected: { regions: zones.length, openings: openings.length, method: 'Surfaces colorées et vides repérés localement; aucune reconstruction des parties cachées.' }, candidates: [], printedDimensions: cal.evidence.map(c => c.normalized || c.text), textureReference: 'Cadrage du PDF importé; volume 3D à compléter avec les autres vues.' };
     }
-    error(''); renderAssignments(); assignmentHint(); progress(key === 'reference' ? `Page ${page.number} ajoutée aux références.` : `La façade ${FACE_NAMES[key].toLowerCase()} utilise la page ${page.number}.`, null);
-    const next = Object.keys(FACE_NAMES).find(k => !current.assignments[k]); if (next && key !== 'reference') $('#mir-pdf-face').value = next;
+    const next = Object.keys(FACE_NAMES).find(k => !current.assignments[k]);
+    if (next && !isReference) $('#mir-pdf-face').value = next;
+    error(''); renderAssignments(); assignmentHint();
+    progress(isReference ? `Page ${page.number} ajoutée · ${REFERENCE_NAMES[key]}.` : `La façade ${FACE_NAMES[key].toLowerCase()} utilise la page ${page.number}.`, null);
   }
-  function renderAssignments() { $('#mir-pdf-assigned').innerHTML = Object.keys(FACE_NAMES).map(key => { const f = current.assignments[key]; return `<span class="${f ? 'ready' : ''}"><b>${FACE_NAMES[key]}</b>${f ? `Page ${f.page} · ${f.calibration.referenceFt ? 'échelle trouvée' : 'échelle à vérifier'}` : 'À ajouter'}</span>`; }).join('') + (current.references.length ? `<p>${current.references.length} page${current.references.length > 1 ? 's' : ''} de référence ajoutée${current.references.length > 1 ? 's' : ''}.</p>` : ''); $('#mir-pdf-final').disabled = !Object.keys(current.assignments).length || current.busy; }
+  function renderAssignments() {
+    const sheet = (label, page, key) => page
+      ? `<span class="ready"><b>${esc(label)}</b><small>Page ${page}</small><button type="button" data-remove-pdf-sheet="${key}" aria-label="Retirer ${esc(label)}, page ${page}">Retirer</button></span>`
+      : `<span><b>${label}</b>À ajouter</span>`;
+    const refs = current.references;
+    $('#mir-pdf-assigned').innerHTML = Object.entries(FACE_NAMES).map(([key, label]) => sheet(label, current.assignments[key]?.page, key)).join('')
+      + ['foundation', 'floor'].filter(key => !refs.some(ref => ref.kind === key)).map(key => sheet(REFERENCE_NAMES[key])).join('')
+      + refs.map((ref, index) => sheet(ref.name, ref.page, index)).join('');
+    $('#mir-pdf-final').disabled = !Object.keys(current.assignments).length || current.busy;
+  }
   async function finish() {
     if (current.busy || !Object.keys(current.assignments).length) return; busy(true); error(''); progress('Préparation de votre studio…', 95);
     try {
       const id = `pdf-${crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)}`, faces = Object.keys(FACE_NAMES).map(k => current.assignments[k] || placeholder(k));
       const calibrations = Object.fromEntries(faces.map(f => [f.key, f.calibration || { referenceFt: null, anchors: [], verified: false, status: 'not_found', provenance: 'Façade non importée.', evidence: [] }]));
-      const source = { filename: current.file.name, bytes: current.file.size, pageCount: current.pdf.numPages, sha256: current.sha256, fingerprintStatus: current.sha256 ? 'sha256' : 'unavailable-in-this-context', privacy: 'browser-local', importedAt: new Date().toISOString() };
+      const source = { filename: current.file.name, bytes: current.file.size, pageCount: current.pdf.numPages, sha256: current.sha256, fingerprintStatus: current.sha256 ? 'sha256' : current.file.size > 50 * MIB ? 'skipped-for-large-file' : 'unavailable-in-this-context', privacy: 'browser-local', importedAt: new Date().toISOString() };
       const planData = { version: 2, projectKind: 'imported-pdf', id, title: current.file.name.replace(/\.pdf$/i, ''), source: `PDF importé · ${current.pdf.numPages} pages`, sourceSha256: current.sha256, analysis: 'Lecture locale des cotes, liaison aux lignes de dimension, vérification de cohérence et propositions de surfaces colorées. Les zones restent modifiables et les volumes cachés non déduits restent inconnus.', faces, dimensions: { width: null, depth: null, wallHeight: null, roofRise: null }, dimensionStatus: 'incomplete', dimensionNote: 'Échelles calculées à partir des cotes détectées. Géométrie 3D à compléter; aucune dimension de la démonstration MIR n’est réutilisée.', recess: { enabled: false, confirmed: false }, footprint: { type: 'unknown' }, referencePages: current.references, sourceMetadata: source };
       const takeoffSeed = { version: 1, calibrations, geometry: { buildingWidthFt: null, buildingDepthFt: null, recessStartFt: null, recessWidthFt: null, recessDepthFt: null, recessHeightFt: null, returnCladHeightFt: null, confirmed: false }, footprintEvidence: null, note: 'Échelles automatiques proposées à partir des cotes. Contrôler les contours, les masques et les mesures avant une commande.' };
       const entry = { id, planData, takeoffSeed, source, sourceFile: current.file, createdAt: new Date().toISOString() };

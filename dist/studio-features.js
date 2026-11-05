@@ -120,8 +120,26 @@
    }));
   }
   function modal(id,title,body){let d=document.getElementById(id);if(d){if(d.open)d.close();d.remove();}d=document.createElement('dialog');d.id=id;d.className='studio-dialog';d.innerHTML=`<div class="dialog-top"><h2>${title}</h2><button class="close-dialog" aria-label="Fermer">Fermer ×</button></div>${body}`;document.body.appendChild(d);d.querySelector('.close-dialog').onclick=()=>d.close();d.showModal();return d;}
+  function volumeSheets(box){
+   const project=data(),sheets=[...(project.referencePages||[]),...project.faces]
+    .filter(sheet=>Number.isInteger(sheet.page)&&/^data:image\/(?:png|jpeg);base64,/.test(sheet.sourceImage||''));
+   if(!sheets.length)return;
+   const section=document.createElement('details');
+   section.className='volume-sheets';
+   section.innerHTML=`<summary>Feuilles du PDF utilisées pour le volume</summary><label for="volume-sheet">Vue de référence</label><select id="volume-sheet"><option value="">Choisir une vue</option>${sheets.map((sheet,i)=>`<option value="${i}">${esc(sheet.name)} · page ${sheet.page}</option>`).join('')}</select><img alt="" hidden>`;
+   box.querySelector('.field-grid').before(section);
+   const select=section.querySelector('select'),image=section.querySelector('img');
+   select.onchange=()=>{
+    const sheet=select.value===''?null:sheets[Number(select.value)];
+    image.hidden=!sheet;
+    if(!sheet){image.removeAttribute('src');return;}
+    image.alt=`${sheet.name} · page ${sheet.page}`;
+    image.src=sheet.sourceImage;
+   };
+  }
   function openVolume(){const d=dimensions()||{},r=api.sceneGeometryBase().recess||{},p=state().porch||{};const fields=[['width','Largeur totale (pi)',ft(d.width)],['depth','Profondeur totale (pi)',ft(d.depth)],['wallHeight','Hauteur du mur (pi)',ft(d.wallHeight)],['roofRise','Montée du toit (pi)',ft(d.roofRise)],['recessWidth','Largeur du retrait (pi)',ft(r.width)],['recessDepth','Profondeur du retrait (pi)',ft(r.depth)],['porchProjection','Avancée du porche (pi)',p.enabled?ft(p.projection):0]];
    const box=modal('volume-dialog','Le volume de votre maison',`<p>Les cotes du PDF sont utilisées lorsqu’elles sont reliées au dessin. Une élévation seule ne montre pas la profondeur : complétez uniquement les dimensions manquantes ou incertaines. Ces réglages modifient le volume 3D; ils ne changent pas l’échelle des élévations.</p>${r.upperStorey==='recessed-confirmed'?'<p>Le retrait reste identique au rez-de-chaussée et à l’étage. Le porche conserve sa hauteur propre.</p>':''}<label for="roof-style">Forme de toiture</label><select id="roof-style">${[['duplex','Deux pignons avant — étude MIR'],['gable','Deux versants'],['hip','Quatre versants'],['flat','Toit plat / volume provisoire']].map(([v,l])=>`<option value="${v}"${v===state().roofStyle?' selected':''}>${l}</option>`).join('')}</select><div class="field-grid">${fields.map(([k,l,v])=>`<label><span>${l}</span><input data-volume="${k}" type="number" min="0" max="1000" step="0.125" value="${fmt(v)}"></label>`).join('')}</div><p id="volume-error" role="alert"></p><div class="dialog-actions"><button id="apply-volume" class="primary">Appliquer au volume 3D</button></div>`);
+   if(imported)volumeSheets(box);
    box.querySelector('#apply-volume').onclick=()=>{const vals=Object.fromEntries([...box.querySelectorAll('[data-volume]')].map(i=>[i.dataset.volume,i.value.trim()===''?null:Number(i.value)]));if(['width','depth','wallHeight'].some(k=>!(vals[k]>0&&vals[k]<=1000))||!finite(vals.roofRise)||vals.roofRise<0||vals.roofRise>1000||['recessWidth','recessDepth','porchProjection'].some(k=>vals[k]!==null&&(!finite(vals[k])||vals[k]<0||vals[k]>1000))||vals.recessWidth>=vals.width||vals.recessDepth>=vals.depth){box.querySelector('#volume-error').textContent='Précisez les dimensions positives du bâtiment et la montée du toit. Le retrait doit tenir dans la largeur et la profondeur du bâtiment; chaque valeur doit rester entre 0 et 1 000 pi.';return;}
     modify(()=>{state().volumeOverride=Object.fromEntries(['width','depth','wallHeight','roofRise'].map(k=>[k,metres(vals[k])]));state().roofStyle=box.querySelector('#roof-style').value;state().recessOverride={...r,enabled:vals.recessWidth>0&&vals.recessDepth>0,start:Math.max(0,Math.min(r.start||metres((vals.width-(vals.recessWidth||0))/2),metres(vals.width-(vals.recessWidth||0)))),width:metres(vals.recessWidth||0),depth:metres(vals.recessDepth||0),height:r.upperStorey==='recessed-confirmed'?metres(vals.wallHeight):Math.min(r.height||metres(vals.wallHeight),metres(vals.wallHeight))};state().porch={...state().porch,enabled:vals.porchProjection>0,projection:metres(vals.porchProjection||0)};state().volumeProvenance='user-confirmed';});box.close();toast('Volume mis à jour. Les cotes du plan conservent leur propre échelle.');};
   }

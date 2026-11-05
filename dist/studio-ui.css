@@ -9,3 +9,7 @@
 /* Manufacturer-specific roof choices belong to the client studio. */
 .part-nav button[hidden]{display:none!important}.roof-panel .roof-palette-label{font-size:11px;font-weight:600;letter-spacing:.02em;margin:20px 0 8px;color:#46533f}.roof-panel .roof-selection{font-size:12px;margin:12px 0;padding:10px 12px;background:#f1f4eb;border-left:2px solid #70885b}.roof-panel .roof-visualization-note{margin-top:16px;padding-top:12px;border-top:1px solid #e1e5d8}.roof-panel select:focus-visible,.roof-panel .extra-colors button:focus-visible{outline:2px solid #294832;outline-offset:3px}
 .roof-panel label,.roof-panel select{font-size:12px}.roof-panel .extra-colors button{font-size:12px;line-height:1.4;min-height:52px}
+
+.volume-sheets{margin:14px 0;padding:12px;border:1px solid var(--mir-border,#dfe5dc);border-radius:8px}
+.volume-sheets summary{cursor:pointer;font-weight:700}
+.volume-sheets img:not([hidden]){display:block;max-width:100%;max-height:55dvh;margin:12px auto 0;object-fit:contain;background:#fff}

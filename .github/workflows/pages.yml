@@ -72,6 +72,7 @@ jobs:
           node tests/mir-client-header-browser.cjs
           node tests/mir-client-signature-browser.cjs
           node tests/mir-production-signature-browser.cjs
+          node tests/mir-plan-pdf-browser.cjs
           node tests/mir-realisations-browser.cjs
           node tests/mir-miniatures-browser.cjs
           node tests/mir-direct-po-browser.cjs
