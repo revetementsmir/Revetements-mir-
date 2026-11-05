@@ -172,7 +172,7 @@ function updateDrawing({keepForm=false}={}){
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  $('#drawing-title').textContent=authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
- const stage=$('#production-drawing');stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;
+ const stage=$('#production-drawing');stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()?'none':'';$('#trace-readout').hidden=!canDrawProfile();
  stage.innerHTML=view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
  const dimensions=$('#profile-dimension-list');
  const sides=tool==='draw'?drawPoints.slice(1).map((point,index)=>({
@@ -564,13 +564,14 @@ function draggedSegment(event, gesture){
  return {point, label:M.formatMeasurement(rounded,draft.unit)+angle};
 }
 function drawDragPreview(segment, gesture){
+ const readout=$('#trace-readout');
+ readout.textContent=segment?.label||'Glisse pour tracer un côté';
  const svg=$('#production-drawing svg');
  if(!svg)return;
  svg.querySelector('[data-trace-preview]')?.remove();
  if(!segment)return;
  const [x1,y1]=pointOnView(gesture.start,drawTransform),[x2,y2]=pointOnView(segment.point,drawTransform);
- const x=Math.max(107,Math.min(693,(x1+x2)/2)),y=Math.max(30,Math.min(499,(y1+y2)/2-24));
- svg.insertAdjacentHTML('beforeend',`<g data-trace-preview pointer-events="none"><line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="#9c5a22" stroke-width="3" stroke-dasharray="8 6"/><rect x="${fmt(x-104)}" y="${fmt(y-21)}" width="208" height="28" rx="6" fill="#fff5e3" stroke="#b78049"/><text x="${fmt(x)}" y="${fmt(y-2)}" text-anchor="middle" font-size="16" font-weight="700" fill="#603b20">${esc(segment.label)}</text></g>`);
+ svg.insertAdjacentHTML('beforeend',`<g data-trace-preview pointer-events="none"><line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="#9c5a22" stroke-width="3" stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/></g>`);
 }
 function traceShift(event){
  if(event.key!=='Shift'||drag?.type!=='trace'||!drag.last)return;
@@ -587,6 +588,7 @@ function beginPointDrag(event){
   const before=drawPoints.at(-2);
   const heading=finite(prior)?prior*Math.PI/180:before?Math.atan2(start[1]-before[1],start[0]-before[0]):undefined;
   drag={type:'trace',id:event.pointerId,x:event.clientX,y:event.clientY,start,heading,moved:false};
+  if(event.pointerType==='touch')stage.setPointerCapture?.(event.pointerId);
   return;
  }
 
@@ -622,7 +624,11 @@ function endPoint(event){
   const gesture=drag;
   drag=null;
   drawDragPreview(null,gesture);
-  if(!gesture.moved||event.type!=='pointerup'||!canDrawProfile())return;
+  if(event.type!=='pointerup'||!canDrawProfile())return;
+  if(!gesture.moved){
+   if(event.pointerType==='touch'){const point=localPoint(event);if(point)appendTracePoint(point);suppressClick=true;}
+   return;
+  }
   suppressClick=true;
   const segment=draggedSegment(event,gesture);
   if(segment)appendTracePoint(segment.point,gesture.start);

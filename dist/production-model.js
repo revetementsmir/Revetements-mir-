@@ -751,12 +751,15 @@ function profileSideMarkers({segments,folds},model,handles){
 function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false}={}){
  const section=profileSectionPath(mapped,bends);
  let output=`<path d="${section.path}" fill="none" stroke="#97a68b" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="#dbe3d4" stroke-width="4" stroke-linejoin="miter"/>`;
- if(markers)output+=profileSideMarkers(section,markerModel,handles);
+ const reserved=[...handles];
  section.segments.forEach(([a,b],i)=>{
  const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-dy/len,dx/len];
  const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
- if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;output+=`<path d="M${decimal(mid[0]+normal[0]*9*side)},${decimal(mid[1]+normal[1]*9*side)}L${decimal(mid[0]+normal[0]*26*side)},${decimal(mid[1]+normal[1]*26*side)}" stroke="#4f8538" stroke-width="2"/><text x="${decimal(mid[0]+normal[0]*39*side)}" y="${decimal(mid[1]+normal[1]*39*side+5)}" text-anchor="middle" font-size="22" fill="#427c2a">*</text>`;}
+ if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;
+ reserved.push(...[12,24,39].map(gap=>[mid[0]+normal[0]*gap*side,mid[1]+normal[1]*gap*side]));
+ output+=`<path d="M${decimal(mid[0]+normal[0]*9*side)},${decimal(mid[1]+normal[1]*9*side)}L${decimal(mid[0]+normal[0]*26*side)},${decimal(mid[1]+normal[1]*26*side)}" stroke="#4f8538" stroke-width="2"/><text x="${decimal(mid[0]+normal[0]*39*side)}" y="${decimal(mid[1]+normal[1]*39*side+5)}" text-anchor="middle" font-size="22" fill="#427c2a">*</text>`;}
  });
+ if(markers)output+=profileSideMarkers(section,markerModel,reserved);
  return output;
 }
 
