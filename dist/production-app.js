@@ -20,7 +20,7 @@ let jException=null;
 let rightAngleSnap=true;
 const traceHeights=[6,8,10,12,14];
 let traceHeight=14,traceGridDivisor=4;
-let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
+let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,viewPan={x:0,y:0},pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
 const profiles={l:{name:'Pliage en L',dimensions:{A:3,B:2}},j:{name:'Pliage en J',dimensions:{A:1,B:3,C:1}},z:{name:'Pliage en Z',dimensions:{A:2,B:4,C:2}},beam5:{name:'Cache-poutre · 5 côtés',dimensions:{A:1,B:6,C:8,D:6,E:1}},omega:{name:'Oméga',dimensions:{A:1,B:2,C:4,D:2,E:1}},custom:{name:'Profil personnalisé',segments:[{label:'A',length:4},{label:'B',length:3},{label:'C',length:2}],bends:[{mode:'interior',angle:90,direction:'left'},{mode:'interior',angle:90,direction:'right'}],startAngle:0},...window.MIRBendingPresets?.catalog()};
 const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','Triangle rectangle'],['trapezoid','Trapèze'],['parallelogram','Parallélogramme'],['pointed','Côté en pointe']];
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true;}catch{toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
@@ -69,7 +69,7 @@ function choose(type,id,{template=null,spec=null,empty=client}={}){
  kind=type;editingItemId=null;activeDefaultLocks={};selectedTemplate=template||templateForBuiltin(type,id);
  draft=spec?copy(spec):(empty?blankMeasurements(sampleSpec(type,id)):sampleSpec(type,id));draft.kind=type;
  if(draft.shape!=='right-triangle')draft.mirrorX=false;
- tool='select';view='face';zoom=1;pointers.clear();drawPoints=[];colorId='';colorSystem='manufacturer';draft.finish={};
+ tool='select';view='face';zoom=1;viewPan={x:0,y:0};pointers.clear();drawPoints=[];colorId='';colorSystem='manufacturer';draft.finish={};
  materialId=availableMaterials()[0]?.id||'';render();
 }
 function injectWorkflow(){const node=document.createElement('nav');node.id='production-workflow';node.className='workflow-tabs';node.setAttribute('aria-label','Espace de fabrication');node.dataset.adminOnly='';node.innerHTML='<button type="button" data-workflow="configure" aria-current="page">Bon de commande</button><button type="button" data-workflow="models">Mes modèles</button><button type="button" data-workflow="requests">Demandes clients <span id="request-count">0</span></button>';$('.production-intro').after(node);node.insertAdjacentHTML('afterend','<section id="production-library" hidden></section><section id="production-requests" hidden></section><div id="author-banner" class="author-banner" hidden></div>');$('#order-heading');$('.order-bottom>div').insertAdjacentHTML('beforeend','<button type="button" class="primary-button" id="prepare-local-request" hidden>Préparer ma demande ↗</button>');}
@@ -164,6 +164,7 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
   ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">${grid}<text x="400" y="250" text-anchor="middle" font-family="Arial" font-size="19" fill="#7b8b6c">Glisse pour tracer le premier côté.</text></svg>`;
  const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});
  if(interactive&&!small&&view==='face'&&tool!=='draw'&&drag?.type!=='point'&&zoom!==1){tr.scale*=zoom;tr.ox=400+(tr.ox-400)*zoom;tr.oy=260+(tr.oy-260)*zoom;}
+ if(interactive&&!small&&view==='face'&&tool==='select'&&kind==='profile'){tr.ox+=viewPan.x;tr.oy+=viewPan.y;}
  if(interactive&&!drag)drawTransform=tr;
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>${grid}`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
@@ -405,7 +406,7 @@ function updateDrawing({keepForm=false}={}){
  }
 
  $('#drawing-navigation').hidden=client&&kind!=='panel'&&view!=='volume';$('#zoom-controls').hidden=client&&kind!=='panel'&&view!=='volume';$('#panel-zoom-value').textContent=Math.round(zoom*100)+' %';$('#panel-zoom-out').disabled=zoom<=.5;$('#panel-zoom-in').disabled=zoom>=4;
- $('#drawing-gesture-hint').textContent=view==='volume'?'Glissez pour tourner · molette ou pincement pour zoomer':'Molette ou pincement pour zoomer';
+ $('#drawing-gesture-hint').textContent=view==='volume'?'Glissez pour tourner · molette ou pincement pour zoomer':kind==='profile'&&!client?'Glisse dans la vue pour déplacer · Vue complète pour recentrer':'Molette ou pincement pour zoomer';
  document.querySelectorAll('[data-preview]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.preview===view)));
  $('#finish-summary').textContent=draft.finish?.name||draft.finish?.code||'';
  $('#drawing-finish').textContent=authoring?'Proportions de présentation seulement':draft.finish?.name||draft.finish?.code||'Finition à sélectionner';
@@ -882,6 +883,16 @@ function traceShift(event){
  drag.last={...drag.last,shiftKey:event.shiftKey};
  drawDragPreview(draggedSegment(drag.last,drag),drag);
 }
+function viewCursorPoint(event){
+ const svg=$('#production-drawing svg');if(!svg)return null;
+ if(svg.createSVGPoint&&svg.getScreenCTM){
+  const p=svg.createSVGPoint();p.x=event.clientX;p.y=event.clientY;
+  const matrix=svg.getScreenCTM();
+  if(matrix){const v=p.matrixTransform(matrix.inverse());return [v.x,v.y];}
+ }
+ const r=svg.getBoundingClientRect();
+ return r.width&&r.height?[(event.clientX-r.left)*800/r.width,(event.clientY-r.top)*520/r.height]:null;
+}
 function beginPointDrag(event){
  const stage=$('#production-drawing');if(!stage.contains(event.target))return;
  if(canDrawProfile()&&event.target.closest('svg')&&event.button===0&&event.isPrimary){
@@ -901,6 +912,13 @@ function beginPointDrag(event){
   pointers.set(event.pointerId,[event.clientX,event.clientY]);stage.setPointerCapture?.(event.pointerId);
   if(pointers.size===2){const a=[...pointers.values()];drag={type:'pinch',distance:Math.hypot(a[1][0]-a[0][0],a[1][1]-a[0][1]),zoom};event.preventDefault();return;}
  }
+ if(!client&&kind==='profile'&&view==='face'&&tool==='select'&&
+   (event.button===0||event.pointerType==='touch')&&
+   !event.target.closest('[data-toggle-painted-face]')){
+  const at=viewCursorPoint(event);
+  if(at){drag={type:'pan',id:event.pointerId,x:at[0],y:at[1],
+   originX:viewPan.x,originY:viewPan.y,moved:false};return;}
+ }
  if(view==='volume'){drag={type:'orbit',id:event.pointerId,x:event.clientX,y:event.clientY,orbit,pitch,moved:false};stage.setPointerCapture?.(event.pointerId);return;}
  const circle=event.target.closest('[data-draw-point]');if(circle&&tool==='edit'&&!client&&!editingItemId){event.preventDefault();const model=build();if(!model.valid)return;drawPoints=copy(model.pointsMM);drawTransform=fitModel(model);drag={type:'point',index:Number(circle.dataset.drawPoint),pointerId:event.pointerId,moved:false};stage.setPointerCapture?.(event.pointerId);}
 }
@@ -908,6 +926,16 @@ function beginPointDrag(event){
 function movePoint(event){
  if(pointers.has(event.pointerId))pointers.set(event.pointerId,[event.clientX,event.clientY]);
  if(!drag)return;
+ if(drag.type==='pan'){
+  if(event.pointerId!==drag.id)return;
+  const p=viewCursorPoint(event);if(!p)return;
+  const dx=p[0]-drag.x,dy=p[1]-drag.y;
+  if(!drag.moved&&Math.hypot(dx,dy)<5)return;
+  drag.moved=true;viewPan={x:Math.max(-650,Math.min(650,drag.originX+dx)),
+   y:Math.max(-650,Math.min(650,drag.originY+dy))};
+  $('#production-drawing').dataset.moving='true';
+  updateDrawing({keepForm:true});event.preventDefault();return;
+ }
  if(drag.type==='trace'){
   if(event.pointerId!==drag.id)return;
   if(!drag.moved&&Math.hypot(event.clientX-drag.x,event.clientY-drag.y)<4)return;
@@ -924,6 +952,12 @@ function movePoint(event){
 
 function endPoint(event){
  const tracked=pointers.delete(event.pointerId);const stage=$('#production-drawing');if(stage.hasPointerCapture?.(event.pointerId))stage.releasePointerCapture(event.pointerId);
+ if(drag?.type==='pan'){
+  if(event.pointerId!==drag.id)return;
+  const moved=drag.moved;drag=null;stage.dataset.moving='false';suppressClick=moved;
+  if(moved)updateDrawing({keepForm:true});
+  return;
+ }
  if(drag?.type==='trace'){
   if(event.pointerId!==drag.id)return;
   const gesture=drag;
@@ -1074,7 +1108,7 @@ function startProfileDrawing({fullscreen=true}={}){
  kind='profile';
  draft={...draft,kind:'profile',template:'custom',segments:[],bends:[],startAngle:0,name:'Profil dessiné'};
  delete draft.dimensions;
- tool='draw';view='face';drawPoints=[];
+ tool='draw';view='face';drawPoints=[];viewPan={x:0,y:0};
  drawTransform={scale:520/(traceHeight*25.4),ox:140,oy:395};
  if(fullscreen&&matchMedia('(any-pointer: coarse)').matches)void openMobileTrace($('.drawing-card'));
  renderDimensions();
@@ -1129,7 +1163,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.id==='mirror-panel'){draft=M.mirrorPanelSpec(draft);renderDimensions();renderPanelOptions();updateDrawing();toast('Panneau inversé. Les lips et le bas suivent la pièce.');return;}
  if(button.id==='panel-zoom-in'){setZoom(zoom*1.2);return;}
  if(button.id==='panel-zoom-out'){setZoom(zoom/1.2);return;}
- if(button.id==='panel-view-reset'){zoom=1;orbit=-35;pitch=23;updateDrawing();return;}
+ if(button.id==='panel-view-reset'){zoom=1;viewPan={x:0,y:0};orbit=-35;pitch=23;updateDrawing();return;}
  if(d.productionColor){colorId=d.productionColor;renderColorGrid();if($('#production-ral'))$('#production-ral').value=colorId;updateFinish();showProfilePaintedFace();updateDrawing();return;}
  if(d.selectBottom&&!authoring){draft.bottomEdgeId=d.selectBottom;draft.perforation={...draft.perforation,edgeId:d.selectBottom};renderPanelOptions();updateDrawing();return;}
  if(button.id==='mir-direct-po-add'&&!client){
