@@ -26,7 +26,15 @@ async function online(){
    await page.waitForFunction(()=>!!window.MIRStudioWallParts&&!!window.MIR3D&&document.querySelector('#view-2d')?.disabled!==true,{timeout:30000});
    await page.locator('#view-2d').click();
    await page.locator('[data-face="right"]').click();
-   await page.locator('#elevation svg[data-mir-three-wall-explode="true"]').waitFor({timeout:30000});
+   const diagnostic=await page.evaluate(()=>({
+     warning:window.MIR_SIDE_WALL_WARNING||null,
+     loaded:!!window.MIRStudioWallParts,
+     face:document.querySelector('[data-face="right"]')?.getAttribute('aria-pressed'),
+     svg:document.querySelector('#elevation svg')?.outerHTML.slice(0,300),
+     excerpt:document.querySelector('#stage-subtitle')?.textContent
+   }));
+   console.log('STUDIO DIAGNOSTIC '+screen.name+' '+JSON.stringify(diagnostic));
+   await page.locator('#elevation svg[data-mir-three-wall-explode="true"]').waitFor({timeout:6000});
    const svg=page.locator('#elevation svg');
    assert.equal(await svg.locator('[data-mir-wall-part]').count(),3);
    assert.equal(await svg.locator('[data-mir-masonry-band]').count(),3);
