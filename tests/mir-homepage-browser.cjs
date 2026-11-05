@@ -22,8 +22,10 @@ async function main(){
   try {
     browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
   } catch(error) {
-    if(!process.env.MIR_CHROMIUM_BIN) throw error;
-    browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN,headless:true,args:['--no-sandbox']});
+    const found=[process.env.MIR_CHROMIUM_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser']
+      .find(file=>file&&fs.existsSync(file));
+    if(!found) throw error;
+    browser=await chromium.launch({executablePath:found,headless:true,args:['--no-sandbox']});
   }
   try{
     let checks=0;
