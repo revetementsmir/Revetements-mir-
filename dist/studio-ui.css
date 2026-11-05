@@ -23,3 +23,9 @@
 
 .mir-balcony-toggle[for=mir-site-style]{display:block;margin:14px 0 7px}
 #mir-site-style,#mir-steps-count{max-width:100%;min-height:44px}
+
+/* Coins architecturaux proposés depuis les arêtes du plan */
+.mir-corner-panel{display:grid;gap:10px}
+.mir-corner-panel input[type=color]{min-height:48px;width:100%;border:1px solid #ccd8ca;border-radius:6px;padding:4px}
+.mir-corner-panel select,.mir-corner-panel input[type=number]{min-height:44px;width:100%}
+.mir-corner-toggle{display:flex;align-items:center;gap:8px;min-height:44px}

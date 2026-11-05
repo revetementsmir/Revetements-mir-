@@ -10,7 +10,8 @@
   ['column',/\b(?:poteaux?|colonnes?|piliers?|posts?|columns?)\b/g],
   ['beam',/\b(?:poutres?|beams?|linteaux?)\b/g],
   ['balcony',/\b(?:balcons?|galeries?|porches?|perrons?|terrasses?|balconies?)\b/g],
-  ['stairs',/\b(?:marches?|escaliers?|emmarchements?|steps?|stairs?)\b/g]
+  ['stairs',/\b(?:marches?|escaliers?|emmarchements?|steps?|stairs?)\b/g],
+  ['corner',/\b(?:coins?\s+(?:exterieurs?|aluminium|aluminum|en\s+metal|metalliques?)|moulures?\s+de\s+coins?|angles?\s+exterieurs?|corner\s+trims?)\b/g]
  ];
  function detect(words=[],pageText=''){
   const found=[],seen=new Set();

@@ -58,6 +58,10 @@
      }
    }
    if(!s.returnFinishes||typeof s.returnFinishes!=='object'||Array.isArray(s.returnFinishes))s.returnFinishes={};
+   if(!s.cornerFinishes||typeof s.cornerFinishes!=='object'||Array.isArray(s.cornerFinishes))
+     s.cornerFinishes={enabled:!imported||data().dimensionStatus==='detected',metal:'aluminum',color:'#8d9690',widthMeters:.08,
+       sourceStatus:'geometric-corners-proposed-not-certified'};
+   s.cornerFinishes.widthMeters=Math.max(.035,Math.min(.24,Number(s.cornerFinishes.widthMeters)||.08));
    if(!s.roofId&&roofs.length){s.roofId=roofs[0].id;const colors=colorsFor(roofs[0]),c=colors.find(c=>c.id==='bp-mystique-noir-2-tons')||colors[0];s.roofColorId=c?.id;}
    // The admin keeps the client's roof appearance, without a roof editing panel.
    if(!roofControls&&s.selected?.kind==='roof')s.selected={kind:'zone',id:api.allZones(api.face())[0]?.id||null};
@@ -74,11 +78,12 @@
    if(next==='roof'&&!roofControls)return;
    part=next;if(next==='return')returnId=id||'return-left';
    if(next==='structure')state().selected={kind:'structure',id:id||state().structures?.[0]?.id||null};
+   else if(next==='corner')state().selected={kind:'corner',id:'corner-trim'};
    else if(['roof','soffit','fascia','return'].includes(next))state().selected={kind:next,id:id||next};
    else if(next==='facade'&&!['zone','opening'].includes(state().selected.kind))state().selected={kind:'zone',id:api.allZones(api.face())[0]?.id||null};
    save();render();if(window.innerWidth<801)$('#studio-controls').scrollIntoView({behavior:'smooth',block:'start'});
   }
-  function inferredPart(){const kind=state().selected.kind;return kind==='zone'||kind==='opening'?'facade':['roof','soffit','fascia','structure','return'].includes(kind)?kind:part;}
+  function inferredPart(){const kind=state().selected.kind;return kind==='zone'||kind==='opening'?'facade':['roof','soffit','fascia','structure','return','corner'].includes(kind)?kind:part;}
   function choiceHTML(m,colorId,attr){const cs=colorsFor(m);return `<div class="extra-colors">${cs.map(c=>`<button ${attr}="${esc(c.id)}" aria-pressed="${c.id===colorId}" title="${esc(c.name)}">${c.swatchUrl?`<img src="${esc(c.swatchUrl)}" alt="" loading="lazy">`:''}<span>${esc(c.name)}</span></button>`).join('')}</div>${cs.length?'':'<p>Le nuancier exact de ce produit reste à confirmer.</p>'}`;}
   function returnSizeHTML(m,c){
    if(!C||!m)return '';
@@ -115,11 +120,11 @@
   function renderUI(){
    ensureState();
    part=inferredPart();if(part==='return'&&['return-left','return-right'].includes(state().selected.id))returnId=state().selected.id;const extra=$('#extra-controls');if(!extra)return;
-   const names={facade:'FAÇADE',roof:'TOITURE',soffit:'SOFFITE',fascia:'FASCIA',structure:'POUTRES & COLONNES',return:'RETOUR DE MUR'};
+   const names={facade:'FAÇADE',roof:'TOITURE',soffit:'SOFFITE',fascia:'FASCIA',structure:'POUTRES & COLONNES',corner:'COINS EN ALUMINIUM',return:'RETOUR DE MUR'};
    $('#control-part-name').textContent=names[part];
    document.querySelectorAll('[data-part]').forEach(b=>{b.hidden=b.dataset.part==='roof'&&!roofControls;b.setAttribute('aria-pressed',b.dataset.part===(part==='return'?'facade':part));});
    $('.zone-controls').hidden=part!=='facade';$('#finish-controls').hidden=!['soffit','fascia'].includes(part);$('#finish-controls').open=['soffit','fascia'].includes(part);
-   extra.hidden=!['roof','structure','return'].includes(part);
+   extra.hidden=!['roof','structure','return','corner'].includes(part);
    const finish=$('#finish-controls');finish.querySelector('summary span:nth-child(2)').textContent=part==='fascia'?'Fascia · bord de toiture':'Soffite · dessous de toiture';
    for(const k of ['soffit','fascia']){for(const e of finish.querySelectorAll(`[id^="${k}-"],label[for^="${k}-"]`))e.hidden=part!==k;}
    finish.querySelector('.finish-divider').hidden=true;
@@ -127,6 +132,17 @@
     const m=byId.get(state().roofId),cs=colorsFor(m),selected=cs.find(c=>c.id===state().roofColorId),rows=roofs.filter(r=>r.brand===m?.brand);
     extra.innerHTML=`<div class="extra-panel roof-panel"><p class="eyebrow">LE BARDEAU</p><h2>Le toit qui complète votre façade.</h2><p>Choisissez votre fabricant, votre gamme et sa couleur.</p><label for="roof-brand">Fabricant du bardeau</label><select id="roof-brand">${roofBrands.map(brand=>`<option value="${esc(brand)}"${brand===m?.brand?' selected':''}>${esc(brand)}</option>`).join('')}</select><label for="roof-product">Gamme de bardeaux</label><select id="roof-product">${rows.map(r=>`<option value="${esc(r.id)}"${r.id===m?.id?' selected':''}>${esc(r.collection||r.name)}</option>`).join('')}</select><p class="roof-palette-label">${cs.length} couleurs de cette gamme</p>${choiceHTML(m,state().roofColorId,'data-roof-color')}<p class="roof-selection" role="status">${selected?`Couleur choisie : <strong>${esc(selected.name)}</strong>`:'Choisissez une couleur de cette gamme.'}</p><p class="small-note">${esc(m?.regionalAvailabilityNote||'Nuancier du fabricant. Disponibilité locale à confirmer.')} Le rendu à l’écran est indicatif; l’échantillon physique reste la référence.</p><button data-roof-docs class="small-link">Couleurs & documentation du fabricant ↗</button><p class="small-note roof-visualization-note">Choix visuel seulement, enregistré avec votre projet.</p></div>`;
    }else if(part==='structure')extra.innerHTML=structurePanel();
+   else if(part==='corner'){
+     const c=state().cornerFinishes,code=(data().structuralHints||[]).filter(h=>h.type==='corner').slice(0,8);
+     extra.innerHTML='<div class="extra-panel mir-corner-panel"><p class="eyebrow">COINS DE MÉTAL</p><h2>Coins aluminium et acier.</h2>'+
+       '<p>Angles proposés d’après le périmètre du bâtiment et ses retraits, sans supposer le fournisseur ni les longueurs. Un coin est détecté géométriquement; son matériau reste à confirmer.</p>'+
+       (code.length?'<p>'+code.length+' mention(s) de coin relevée(s) sur le PDF : '+code.map(h=>'page '+esc(h.page)+' « '+esc(h.label)+' »').join(', ')+'</p>':'')+
+       '<label class="mir-corner-toggle"><input type="checkbox" id="mir-corner-enabled" '+(c.enabled?'checked':'')+'> Afficher les coins sur le bâtiment 3D</label>'+
+       '<label for="mir-corner-metal">Matière visible</label><select id="mir-corner-metal"><option value="aluminum" '+(c.metal==='aluminum'?'selected':'')+'>Aluminium</option><option value="steel" '+(c.metal==='steel'?'selected':'')+'>Acier</option></select>'+
+       '<label for="mir-corner-color">Couleur des coins (aperçu)</label><input type="color" id="mir-corner-color" value="'+esc(c.color)+'">'+
+       '<label for="mir-corner-width">Largeur visible approximative (po)</label><input id="mir-corner-width" type="number" min="1.5" max="9" step=".125" value="'+fmt(c.widthMeters/.0254)+'">'+
+       '<p class="small-note">Aucune couleur, épaisseur, quantité ou fixation commerciale n’est certifiée par cette proposition.</p></div>';
+   }
    else if(part==='return'){
     const c=returnChoice(returnId),m=byId.get(c.materialId);extra.innerHTML=`<div class="extra-panel"><p class="eyebrow">LES COINS DU BÂTIMENT</p><h2>${returnId==='return-left'?'Retour gauche':'Retour droit'} du retrait</h2><p>Cette surface latérale a son propre revêtement. Sa profondeur suit le volume du retrait.</p><label for="return-product">Matériau de ce retour</label><select id="return-product">${optionHTML(siding,c.materialId)}</select>${choiceHTML(m,c.colorId,'data-return-color')}${returnSizeHTML(m,c)}<label for="return-orientation">Sens de pose</label><select id="return-orientation">${(m.allowedOrientations||[]).map(v=>`<option value="${v}"${v===c.orientation?' selected':''}>${v==='vertical'?'Vertical':'Horizontal'}</option>`).join('')}</select><div class="compact-actions"><button data-select-return="return-left">Retour gauche</button><button data-select-return="return-right">Retour droit</button></div></div>`;
    }
@@ -145,7 +161,7 @@
    const band=root.MIRStudioWallParts?.masonryBand(front,dimensions());
    const brick=band&&masonry?api.choice(front,masonry):null;
    const returnMasonry=brick&&band?.heightMeters>0?{heightMeters:band.heightMeters,color:brick.color,sourceStatus:'same-front-masonry-Z-unverified'}:null;
-   return {zoom:c.cameraZoom,siteStyle:c.siteStyle,concreteSteps:c.concreteSteps,returnMasonry,roofColor:c.roofColor||'#4a4c4b',roofStyle:c.roofStyle,foundationDrop:data().detectedVolume?(data().detectedVolume.foundationDrop??0):.8,roofExposureIn:roof?.exposureIn||null,soffitCoverageIn:soffit?.pieceCoverageIn||soffit?.exposureIn||null,elevation:c.cameraElevation,porch:c.porch,structures:c.structures.map(o=>({...o,color:o.finishColorOverride|| (o.finishMaterialId?officialColor(byId.get(o.finishMaterialId),{colorId:o.colorId}).color:o.color||'#a9aaa7')})),dimensions:dimensions(),returnColors:rs};
+   return {zoom:c.cameraZoom,siteStyle:c.siteStyle,concreteSteps:c.concreteSteps,cornerFinishes:c.cornerFinishes,returnMasonry,roofColor:c.roofColor||'#4a4c4b',roofStyle:c.roofStyle,foundationDrop:data().detectedVolume?(data().detectedVolume.foundationDrop??0):.8,roofExposureIn:roof?.exposureIn||null,soffitCoverageIn:soffit?.pieceCoverageIn||soffit?.exposureIn||null,elevation:c.cameraElevation,porch:c.porch,structures:c.structures.map(o=>({...o,color:o.finishColorOverride|| (o.finishMaterialId?officialColor(byId.get(o.finishMaterialId),{colorId:o.colorId}).color:o.color||'#a9aaa7')})),dimensions:dimensions(),returnColors:rs};
   }
   function returnViews(patternDef){
    ensureState();
@@ -279,6 +295,11 @@
      o.finishColorOverride=t.value;o.color=t.value;o.colorId=null;
    });}
    if(t.id==='structure-support'){const o=currentStructure();if(o)modify(()=>o.material=t.value);}
+   if(t.id==='mir-corner-enabled')modify(()=>state().cornerFinishes.enabled=t.checked);
+   if(t.id==='mir-corner-metal'&&['steel','aluminum'].includes(t.value))modify(()=>state().cornerFinishes.metal=t.value);
+   if(t.id==='mir-corner-color'&&/^#[0-9a-f]{6}$/i.test(t.value))modify(()=>state().cornerFinishes.color=t.value);
+   if(t.id==='mir-corner-width'&&Number(t.value)>=1.5&&Number(t.value)<=9)
+     modify(()=>state().cornerFinishes.widthMeters=Number(t.value)*.0254);
    if(t.dataset.structureField)updateStructure(t.dataset.structureField,Number(t.value));
    if(t.id==='return-product')modify(()=>state().returnFinishes[returnId]=api.normalChoice({materialId:t.value}));
    if(t.id==='return-orientation')modify(()=>state().returnFinishes[returnId]=api.normalChoice({...returnChoice(returnId),orientation:t.value}));
@@ -306,7 +327,8 @@
   $('#import-pdf').onclick=()=>root.MIRPlanImport?.open?root.MIRPlanImport.open({onImport:()=>location.reload()}):toast('L’import PDF n’a pas chargé. Rechargez la page.');
   $('#orbit-left').onclick=()=>{state().rotation=(state().rotation-30+360)%360;save();renderDrawing();};$('#orbit-right').onclick=()=>{state().rotation=(state().rotation+30)%360;save();renderDrawing();};$('#orbit-under').onclick=()=>{state().cameraElevation=5;save();renderDrawing();toast('Caméra maintenue au niveau du sol.');};$('#orbit-reset').onclick=()=>{state().rotation=28;state().cameraElevation=22;state().cameraZoom=1;save();renderDrawing();};
   $('#export-render').onclick=exportRender;
-  function handleHit(hit){if(hit.returnId){selectPart('return',hit.returnId);return true;}if(['roof','fascia','soffit'].includes(hit.type)){selectPart(hit.type);return true;}if(['beam','column'].includes(hit.type)){selectPart('structure',hit.structureId);return true;}return false;}
+  function handleHit(hit){if(hit.returnId){selectPart('return',hit.returnId);return true;}if(['roof','fascia','soffit'].includes(hit.type)){selectPart(hit.type);return true;}if(['beam','column'].includes(hit.type)){selectPart('structure',hit.structureId);return true;}
+   if(hit.type==='corner'||hit.role==='aluminum-corner-proposal'){selectPart('corner');return true;}return false;}
   return {renderUI,threeOptions,returnViews,handleHit,selectPart,canRender,returnChoice,dimensions,normalizeRoof,ensureState};
  }
  root.MIRStudioFeatures={setup};
