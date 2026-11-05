@@ -6,10 +6,14 @@
   <title>MIR — Votre projet, matière par matière</title>
   <link rel="stylesheet" href="plan.css"><link rel="stylesheet" href="studio-ui.css"><link rel="stylesheet" href="plan-import.css">
   <script src="project-store.js" defer></script><script src="plan-import.js" defer></script><script src="studio-features.js" defer></script><script src="takeoff-engine.js" defer></script><script src="plan-layout.js" defer></script><script src="plan-3d.js" defer></script><script src="material-coverage.js" defer></script><script src="material-surface.js" defer></script><script src="annotated-pdf.js" defer></script><script src="plan-app.js" defer></script>
-</head>
+<link rel="stylesheet" href="mir-home-premium.css?v=20261105"><link rel="stylesheet" href="mir-client-header.css?v=1"></head>
 <body>
   <a class="skip" href="#workspace">Aller au configurateur</a>
-  <header class="header"><a class="brand" href="index.html"><img src="assets/MIR-logo-officiel-original.svg" width="111" height="28" alt="Revêtements MIR"></a><nav aria-label="Navigation principale"><a href="index.html">Accueil</a><a href="boutique.html">Boutique</a><a href="plan.html" aria-current="page">Mon studio</a><button id="open-library">Les matériaux ↗</button></nav><span class="private-label"><i></i> APERÇU PRIVÉ</span></header>
+  <header class="header mir-client-header">
+  <a class="brand mir-client-brand" href="index.html" aria-label="Les Revêtements MIR, accueil"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="364" height="91"></a>
+  <nav class="mir-client-links" aria-label="Navigation principale"><a href="boutique.html">Revêtements</a><a href="index.html#realisations">Réalisations</a><a href="pliage.html">Pliage sur mesure</a><a href="plan.html" aria-current="page">Studio 3D</a><a href="index.html#nous-joindre">Nous joindre</a></nav>
+  <div class="mir-home-header-actions mir-client-actions"><a class="mir-home-account" href="chantier.html">Mon compte</a><a class="mir-home-estimate" href="index.html#nous-joindre">Demander une estimation</a></div>
+</header><div class="mir-studio-tools"><button id="open-library" type="button">Choisir les matériaux du studio</button></div>
   <main>
     <section class="intro studio-intro"><div><p class="eyebrow">LE STUDIO MIR</p><h1>Imaginez votre <em>façade.</em></h1><p class="intro-copy">Importez votre plan. Choisissez une partie de la maison. Essayez vos matières.</p></div><div class="studio-start"><button id="import-pdf" class="primary">Importer mon plan PDF <span>↑</span></button><button id="project-menu" class="small-link">Mes plans sur cet appareil</button></div></section>
     <div class="project-bar"><span id="project-name">Ouverture de votre projet…</span><span id="project-scale">Lecture des cotes du plan</span><button id="show-source" class="small-link">Voir mon plan</button><button id="volume-settings" class="small-link">Volume & retours</button></div>
