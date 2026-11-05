@@ -543,10 +543,10 @@
     for(const s of structures)addBox('structure-'+s.id,s.origin,s.size,s.type,s.color,{structureId:s.id,material:s.material,sourceStatus:s.sourceStatus,role:s.type==='column'?'vertical-post':'horizontal-beam'});
     // Propositions géométriques des coins de finition depuis les arêtes du
     // volume. Les angles présents n'établissent jamais que l'alu est installé.
-    const trim=options.cornerFinishes&&typeof options.cornerFinishes==='object'?options.cornerFinishes:null;
-    if(trim?.enabled===true){
-      const width=Math.max(.035,Math.min(.24,positive(trim.widthMeters,.08)));
-      const shade=cleanColor(trim.color,'#8d9690'),positions=[
+    const cornerConfig=options.cornerFinishes&&typeof options.cornerFinishes==='object'?options.cornerFinishes:null;
+    if(cornerConfig?.enabled===true){
+      const width=Math.max(.035,Math.min(.24,positive(cornerConfig.widthMeters,.08)));
+      const shade=cleanColor(cornerConfig.color,'#8d9690'),positions=[
         [-a,-b],[-a,b],[a,-b],[a,b]
       ];
       if(recess.enabled&&recess.width>0&&recess.depth>0){
@@ -560,7 +560,7 @@
         addBox('corner-trim-'+index,[x-width/2,y-width/2,0],[width,width,h],
           'corner',shade,{role:'aluminum-corner-proposal',cornerIndex:index,
             sourceStatus:'geometric-outer-edge-proposed-not-verified',
-            finishMetal:trim.metal||'aluminum',notCertifiedTakeoff:true});
+            finishMetal:cornerConfig.metal||'aluminum',notCertifiedTakeoff:true});
       });
     }
 
