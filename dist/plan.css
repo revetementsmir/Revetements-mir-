@@ -66,3 +66,20 @@
   #stage:has(#elevation.mir-studio-detached-side) #stage-subtitle{display:none}
   #stage:has(#elevation.mir-studio-detached-side) .stage-label{align-items:center}
 }
+
+/* MIR 3D : plein écran et zoom mobile sans défilement de la page. */
+#three-canvas{touch-action:none;user-select:none;-webkit-user-select:none}
+.mir-stage-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
+#mir-fullscreen,#mir-site-toggle{background:#fffefaeb;color:#21362a;border:1px solid #bfcabc;border-radius:6px;padding:9px 11px;min-height:42px;font:700 12px/1.25 Arial,sans-serif;pointer-events:auto}
+#mir-fullscreen:focus-visible,#mir-site-toggle:focus-visible,.mir-zoom-controls button:focus-visible{outline:3px solid #348511;outline-offset:2px}
+.mir-zoom-controls{position:absolute;bottom:54px;right:16px;z-index:8;display:flex;align-items:center;gap:8px;background:#fffefaee;padding:5px;border:1px solid #d3ddd1;border-radius:8px;box-shadow:0 6px 22px #1a302222}
+.mir-zoom-controls button{min-width:44px;min-height:44px;border:1px solid #ced9ca;border-radius:6px;background:#f7fbf4;font:700 22px Arial,sans-serif;color:#1b3122}
+.mir-zoom-controls span{font-size:12px;font-weight:700;color:#3c5441;min-width:52px;text-align:center}
+.stage:fullscreen,.stage.mir-stage-fullscreen{width:100vw!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;margin:0!important;background:#f6f8f2}
+.stage.mir-stage-fullscreen{position:fixed!important;inset:0!important;z-index:99999!important;overflow:hidden}
+.stage:fullscreen #three-canvas,.stage.mir-stage-fullscreen #three-canvas{width:100%!important;height:100%!important;max-height:none!important;display:block}
+.stage:fullscreen .stage-label,.stage.mir-stage-fullscreen .stage-label{top:max(12px,env(safe-area-inset-top));left:14px;right:14px;z-index:15}
+.stage:fullscreen .mir-zoom-controls,.stage.mir-stage-fullscreen .mir-zoom-controls{bottom:max(24px,env(safe-area-inset-bottom));right:14px}
+.stage:fullscreen .stage-bottom,.stage.mir-stage-fullscreen .stage-bottom{bottom:max(6px,env(safe-area-inset-bottom));max-width:calc(100% - 230px)}
+html.mir-stage-locked,body.mir-stage-locked{overflow:hidden!important}
+@media(max-width:700px){.mir-stage-actions{gap:4px}#mir-fullscreen,#mir-site-toggle{font-size:11px;padding:7px 9px}.stage-label:has(#mir-fullscreen:not([hidden])) #stage-subtitle{display:none}.mir-zoom-controls{bottom:46px;right:8px;gap:3px}.mir-zoom-controls span{min-width:46px}}

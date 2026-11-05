@@ -1,0 +1,15 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const D=path.resolve(__dirname,'../dist'),read=n=>fs.readFileSync(path.join(D,n),'utf8');
+const h=read('plan.html'),js=read('plan-app.js'),s=read('studio-features.js');
+for(const id of ['mir-fullscreen','mir-zoom-in','mir-zoom-out','mir-zoom-label','mir-site-toggle'])assert.ok(h.includes('id="'+id+'"'));
+assert.ok(h.includes('Vue au niveau du sol')&&!h.includes('Voir le dessous'));
+assert.ok(js.includes('Math.max(5,Math.min(75,Number(v)||22))'));
+assert.ok(js.includes('Math.hypot(a[0]-b[0],a[1]-b[1])'));
+assert.ok(js.includes("addEventListener('wheel'")&&js.includes('{passive:false}'));
+assert.ok(js.includes('requestFullscreen')&&js.includes('mir-stage-fullscreen'));
+assert.ok(s.includes('returnMasonry=brick&&band?.heightMeters>0'));
+assert.ok(s.includes("s.siteStyle=imported?'none':'commercial'"));
+assert.ok(s.includes("['column','beam','stairs'].includes(h.type)"));
+assert.ok(read('plan.css').includes('#three-canvas{touch-action:none'));
+console.log('MIR interface plein écran, zoom tactile, terrain et caméra : contrôles réussis');

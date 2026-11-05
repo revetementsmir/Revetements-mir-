@@ -20,3 +20,6 @@
 .mir-structure-evidence p+p{padding-top:10px;border-top:1px solid #d6e3d1}
 .mir-structure-evidence button{min-height:40px;border:1px solid #4c7947;border-radius:5px;background:#fff;color:#21482d;padding:8px 12px;cursor:pointer}
 .mir-structure-evidence button:focus-visible{outline:3px solid #348511;outline-offset:2px}
+
+.mir-balcony-toggle[for=mir-site-style]{display:block;margin:14px 0 7px}
+#mir-site-style,#mir-steps-count{max-width:100%;min-height:44px}

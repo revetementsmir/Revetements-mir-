@@ -364,6 +364,12 @@
     $('#stage-subtitle').textContent=state.view==='3d'?'Cliquez pour choisir · glissez pour tourner et incliner':state.displayMode==='atelier'?'Déplacez les joints · cotes en pouces':'Cliquez sur une matière pour la modifier';
     $('#stage-note').textContent=state.view==='3d'?'Matières et finitions · vue interactive':'Fenêtres et portes protégées';
     $('#view-2d').setAttribute('aria-pressed',state.view==='2d');$('#view-3d').setAttribute('aria-pressed',state.view==='3d');
+    $('#mir-fullscreen').hidden=state.view!=='3d';
+    $('#mir-site-toggle').hidden=state.view!=='3d';
+    $('#mir-zoom-controls').hidden=state.view!=='3d';
+    $('#mir-zoom-label').textContent=Math.round((state.cameraZoom||1)*100)+' %';
+    $('#mir-site-toggle').setAttribute('aria-pressed',String(state.siteStyle==='commercial'));
+    $('#mir-site-toggle').textContent=state.siteStyle==='commercial'?'Masquer le terrain':'Terrain commercial';
     $('#rotation').value=state.rotation;$('#rotation-value').textContent=`${state.rotation}°`;
     $('#toggle-lines').setAttribute('aria-pressed',neutral);
     $('#draw-accent').disabled=false;
@@ -638,13 +644,89 @@
     $('#stage-note').textContent=hit.sharedFinish?'Retour du retrait · fini partagé avec le centre RDC':`${f.name} · ${target.kind==='opening'?'ouverture sélectionnée':currentZone()?.name||'zone sélectionnée'}`;
     return true;
   }
-  let orbitDrag=null,orbitFrame=null;
-  const threeCanvas=$('#three-canvas');
-  threeCanvas.addEventListener('pointerdown',e=>{if(state.view!=='3d'||e.button>0)return;e.preventDefault();orbitDrag={id:e.pointerId,x:e.clientX,y:e.clientY,angle:state.rotation,elevation:state.cameraElevation??22,moved:false};threeCanvas.setPointerCapture(e.pointerId);});
-  threeCanvas.addEventListener('pointermove',e=>{if(!orbitDrag)return;const dx=e.clientX-orbitDrag.x,dy=e.clientY-orbitDrag.y;if(Math.hypot(dx,dy)>6)orbitDrag.moved=true;if(!orbitDrag.moved)return;state.rotation=Math.round((orbitDrag.angle+dx/Math.max(200,threeCanvas.clientWidth)*180+720)%360);state.cameraElevation=Math.max(-20,Math.min(75,orbitDrag.elevation-dy/Math.max(200,threeCanvas.clientHeight)*90));if(!orbitFrame)orbitFrame=window.requestAnimationFrame(()=>{orbitFrame=null;renderDrawing();});});
-  threeCanvas.addEventListener('pointerup',e=>{if(!orbitDrag)return;const moved=orbitDrag.moved;orbitDrag=null;try{threeCanvas.releasePointerCapture(e.pointerId);}catch(_){}if(moved){save();return;}pickThree(e.clientX,e.clientY);});
-  threeCanvas.addEventListener('pointercancel',()=>{orbitDrag=null;save();});
-  threeCanvas.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(e.key==='ArrowLeft'||e.key==='ArrowRight')state.rotation=(state.rotation+(e.key==='ArrowRight'?10:-10)+360)%360;else state.cameraElevation=Math.max(-20,Math.min(75,(state.cameraElevation??22)+(e.key==='ArrowUp'?5:-5)));save();renderDrawing();}});
+  let orbitDrag=null,orbitFrame=null,pinch=null,pinching=false,saveWheel=null;
+  const threeCanvas=$('#three-canvas'),touch=new Map();
+  const zoomLimit=v=>Math.max(.7,Math.min(3.5,Number(v)||1));
+  const groundAngle=v=>Math.max(5,Math.min(75,Number(v)||22));
+  function repaint3D(){if(!orbitFrame)orbitFrame=requestAnimationFrame(()=>{orbitFrame=null;renderDrawing();});}
+  function zoom3D(v,store=true){state.cameraZoom=zoomLimit(v);repaint3D();if(store)save();}
+  threeCanvas.addEventListener('pointerdown',e=>{
+    if(state.view!=='3d'||e.button>0)return;e.preventDefault();
+    if(e.pointerType==='touch'){
+      touch.set(e.pointerId,[e.clientX,e.clientY]);
+      if(touch.size>=2){
+        const [a,b]=[...touch.values()];
+        pinch={distance:Math.max(5,Math.hypot(a[0]-b[0],a[1]-b[1])),zoom:state.cameraZoom||1};
+        orbitDrag=null;pinching=true;
+      }else orbitDrag={id:e.pointerId,x:e.clientX,y:e.clientY,angle:state.rotation,elevation:state.cameraElevation??22,moved:false};
+    }else orbitDrag={id:e.pointerId,x:e.clientX,y:e.clientY,angle:state.rotation,elevation:state.cameraElevation??22,moved:false};
+    try{threeCanvas.setPointerCapture(e.pointerId);}catch(_){}
+  });
+  threeCanvas.addEventListener('pointermove',e=>{
+    if(e.pointerType==='touch'&&touch.has(e.pointerId)){
+      touch.set(e.pointerId,[e.clientX,e.clientY]);
+      if(touch.size>=2&&pinch){
+        const [a,b]=[...touch.values()];
+        state.cameraZoom=zoomLimit(pinch.zoom*Math.hypot(a[0]-b[0],a[1]-b[1])/pinch.distance);
+        repaint3D();return;
+      }
+    }
+    if(!orbitDrag||orbitDrag.id!==e.pointerId||pinching)return;
+    const dx=e.clientX-orbitDrag.x,dy=e.clientY-orbitDrag.y;
+    if(Math.hypot(dx,dy)>6)orbitDrag.moved=true;
+    if(!orbitDrag.moved)return;
+    state.rotation=Math.round((orbitDrag.angle+dx/Math.max(200,threeCanvas.clientWidth)*180+720)%360);
+    state.cameraElevation=groundAngle(orbitDrag.elevation-dy/Math.max(200,threeCanvas.clientHeight)*90);
+    repaint3D();
+  });
+  threeCanvas.addEventListener('pointerup',e=>{
+    const didPinch=pinching||!!pinch,moved=orbitDrag?.id===e.pointerId&&orbitDrag.moved;
+    touch.delete(e.pointerId);if(touch.size<2)pinch=null;if(touch.size===0)pinching=false;
+    if(orbitDrag?.id===e.pointerId)orbitDrag=null;
+    try{threeCanvas.releasePointerCapture(e.pointerId);}catch(_){}
+    if(didPinch||moved){save();return;}
+    if(e.pointerType==='touch'&&touch.size)return;
+    if(state.view==='3d')pickThree(e.clientX,e.clientY);
+  });
+  threeCanvas.addEventListener('pointercancel',e=>{touch.delete(e.pointerId);pinch=null;orbitDrag=null;pinching=false;save();});
+  threeCanvas.addEventListener('wheel',e=>{
+    if(state.view!=='3d')return;e.preventDefault();
+    zoom3D((state.cameraZoom||1)*Math.exp(-e.deltaY*.0012),false);
+    clearTimeout(saveWheel);saveWheel=setTimeout(save,150);
+  },{passive:false});
+  threeCanvas.addEventListener('keydown',e=>{
+    if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){
+      e.preventDefault();
+      if(e.key==='ArrowLeft'||e.key==='ArrowRight')state.rotation=(state.rotation+(e.key==='ArrowRight'?10:-10)+360)%360;
+      else state.cameraElevation=groundAngle((state.cameraElevation??22)+(e.key==='ArrowUp'?5:-5));
+      save();renderDrawing();
+    }
+  });
+  $('#mir-zoom-in').onclick=()=>zoom3D((state.cameraZoom||1)*1.25);
+  $('#mir-zoom-out').onclick=()=>zoom3D((state.cameraZoom||1)/1.25);
+  $('#mir-site-toggle').onclick=()=>{state.siteStyle=state.siteStyle==='commercial'?'none':'commercial';save();renderDrawing();};
+  const stage3D=$('#stage');
+  function syncFull(){
+    const on=document.fullscreenElement===stage3D||stage3D.classList.contains('mir-stage-fullscreen');
+    $('#mir-fullscreen').setAttribute('aria-pressed',String(on));
+    $('#mir-fullscreen').textContent=on?'Quitter le plein écran ×':'Plein écran ⛶';
+    $('#mir-fullscreen').setAttribute('aria-label',on?'Quitter le plein écran':'Agrandir la vue 3D');
+    repaint3D();
+  }
+  async function leaveFull(){
+    if(document.fullscreenElement===stage3D&&document.exitFullscreen)await document.exitFullscreen().catch(()=>{});
+    stage3D.classList.remove('mir-stage-fullscreen');
+    document.documentElement.classList.remove('mir-stage-locked');document.body.classList.remove('mir-stage-locked');
+    syncFull();
+  }
+  $('#mir-fullscreen').onclick=async()=>{
+    if(document.fullscreenElement===stage3D||stage3D.classList.contains('mir-stage-fullscreen'))return leaveFull();
+    try{if(!stage3D.requestFullscreen)throw Error('Full screen unsupported');await stage3D.requestFullscreen();}
+    catch(_){stage3D.classList.add('mir-stage-fullscreen');document.documentElement.classList.add('mir-stage-locked');document.body.classList.add('mir-stage-locked');}
+    syncFull();
+  };
+  document.addEventListener('fullscreenchange',syncFull);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&stage3D.classList.contains('mir-stage-fullscreen'))leaveFull();});
   const point=e=>{const svg=$('svg',$('#elevation')),p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse());};
   const snappedPoint=e=>{const p=point(e),svg=$('svg',$('#elevation')),threshold=face().bbox[2]/Math.max(1,svg.getBoundingClientRect().width)*8;return L.snapPoint(p,normalFace(face()),threshold);};
   function dragLine(e){const p=point(e),z=allZones(face()).find(z=>z.id===drag.zoneId),b=bounds(z.polygon),orientation=drag.orientation,position=Math.max(.001,Math.min(.999,(orientation==='vertical'?p.x-b[0]:p.y-b[1])/(orientation==='vertical'?b[2]-b[0]:b[3]-b[1])));if(drag.type==='joint'){state.panelLayouts[key(state.face,z.id)][orientation].find(l=>l.id===drag.lineId).position=position;}else{state.transitions.find(t=>t.id===drag.lineId).position=position;}drag.changed=true;renderDrawing();}
