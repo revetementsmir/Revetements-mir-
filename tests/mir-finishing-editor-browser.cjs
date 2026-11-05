@@ -77,6 +77,11 @@ async function ready(){for(let i=0;i<80;i++){
    assert.equal(await page.locator('#elevation [data-opening="porte_gauche"]').getAttribute('data-mir-opening-design'),'solid');
    assert.equal(await page.locator('#elevation [data-opening="porte_gauche"]').getAttribute('data-mir-frame-color'),'#d7b282');
    assert.ok((await page.locator('#elevation [data-opening="porte_gauche"]').innerHTML()).includes('#304e64'));
+   await page.evaluate(()=>document.querySelector('#elevation [data-opening="fenetre_gauche_basse"]').dispatchEvent(new MouseEvent('click',{bubbles:true})));
+   await page.locator('#opening-batten-color').fill('#bd8d5e');
+   await page.locator('#opening-batten-color').dispatchEvent('change');
+   assert.equal(await page.locator('#elevation [data-opening="fenetre_gauche_basse"] [data-mir-window-batten]').count(),1);
+   assert.ok((await page.locator('#elevation [data-opening="fenetre_gauche_basse"] [data-mir-window-batten]').getAttribute('stroke'))==='#bd8d5e');
    // 5) Coins de finition et revêtements de poteaux/beam réellement reliés.
    await page.locator('[data-part="corner"]').click();
    assert.equal(await page.locator('#mir-corner-enabled').isChecked(),true);
