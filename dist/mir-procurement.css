@@ -95,3 +95,49 @@ body.mir-admin-v4 #mir-procurement-panel .mir-proc-field textarea {
 body.mir-admin-v4 #mir-procurement-panel .mir-proc-row {
   border-bottom-color:#edf1e9;
 }
+
+
+/* MOON 1.3.5 — 4 destinations exclusives. Les fournisseurs restent sous Commandes. */
+body.mir-admin-v4.mir-procurement-ready .mir-destinations{display:none!important}
+body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{
+  position:sticky;top:6px;z-index:25;scroll-margin-top:10px
+}
+body.mir-admin-v4[data-mir-tab="boutique"] :is(.kind-bar,.production-intro,.production-workspace,.mir-v4-technical,.production-order,.template-section,#production-library,#production-requests,#author-banner){
+  display:none!important
+}
+body.mir-admin-v4 .mir-proc-model-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap
+}
+body.mir-admin-v4 .mir-proc-model-head p{margin:3px 0 8px;color:#5a685d}
+body.mir-admin-v4 .mir-proc-model-state{
+  display:inline-block;padding:7px 11px;border-radius:99px;border:1px solid #b8c9b5;
+  color:#284936;background:#eff5eb;font:700 12px/1.3 system-ui,sans-serif
+}
+body.mir-admin-v4 .mir-proc-local-note{
+  border-left:3px solid #537f5d;padding:7px 12px;background:#f7f9f4;margin:8px 0 14px
+}
+body.mir-admin-v4 .mir-proc-channel{
+  display:flex;flex-wrap:wrap;gap:12px 22px;margin:8px 0 16px
+}
+body.mir-admin-v4 .mir-proc-channel label{
+  display:flex;align-items:center;gap:8px;min-height:44px;font-size:14px
+}
+body.mir-admin-v4 .mir-proc-channel input{width:20px;height:20px;accent-color:#28553a}
+body.mir-admin-v4 .mir-proc-back{margin:0 0 15px}
+body.mir-admin-v4 #mir-boutique-feedback:not(:empty){
+  background:#eef5e9;border:1px solid #b8c9b5;border-radius:10px;padding:12px
+}
+body.mir-admin-v4 .mir-proc-model-form .mir-proc-actions{margin-top:12px}
+.mir-custom-model-price{font-weight:750;color:#28553a;line-height:1.55}
+@media(max-width:600px){
+ body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{
+   grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;padding:4px
+ }
+ body.mir-admin-v4 #mir-procurement-tabs button{
+   min-height:46px;padding:9px 2px;font-size:clamp(10px,2.9vw,13px);overflow-wrap:break-word
+ }
+ body.mir-admin-v4 .mir-proc-model-form .mir-proc-actions{
+   position:sticky;bottom:0;background:#fff;padding:10px 0;border-top:1px solid #e4e9e1;z-index:6
+ }
+ body.mir-admin-v4 .mir-proc-model-form .mir-proc-actions button{flex:1 1 46%;min-width:0}
+}

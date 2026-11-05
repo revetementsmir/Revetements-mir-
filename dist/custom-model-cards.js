@@ -18,11 +18,16 @@
   if(!M?.templatePreview)return {items:[],total:0,channel,status:'engine_missing',storageUnavailable};
   const items=[];for(const record of Array.isArray(records)?records:[]){
    if(record?.archived!==false||record.channels?.[channel]!==true)continue;
+   // Les nouveaux brouillons commerciaux ne doivent pas rester visibles après retrait.
+   if(channel==='client'&&record.commercial&&record.commercial.status!=='published')continue;
    const template=activeTemplate(record);if(!template||!['profile','panel'].includes(template.kind)||options.kind&&template.kind!==options.kind)continue;
    let preview;try{preview=M.templatePreview(template);}catch{continue;}if(!preview.ok||!preview.model?.valid)continue;
    const kindLabel=template.kind==='profile'?'Pliage sur mesure':'Panneau métallique',text=searchText([template.name,template.description,kindLabel,'modèle atelier MIR',(template.fields||[]).map(field=>field.label).join(' ')].join(' '));
    if(!words.every(word=>text.includes(word)))continue;
-   items.push({id:template.id,name:template.name,version:template.version,description:template.description||'',kind:template.kind,kindLabel,requiredMeasureCount:(template.fields||[]).filter(field=>field.required).length,template,preview:preview.model,href:linkFor(template.id,{channel})});
+   const offer=record.commercial?.status==='published'&&record.commercial?.lengthIn===120?record.commercial:null;
+   const priceCents=offer?.priceCentsByMetal||{};
+   const offerText=offer?['aluminium','acier'].filter(m=>Number.isSafeInteger(priceCents[m])).map(m=>(m==='acier'?'Acier':'Aluminium')+' '+(priceCents[m]/100).toFixed(2).replace('.',',')+' $ CA / 10 pi').join(' · '):'';
+   items.push({id:template.id,name:template.name,version:template.version,description:template.description||'',kind:template.kind,kindLabel,offerText,requiredMeasureCount:(template.fields||[]).filter(field=>field.required).length,template,preview:preview.model,href:linkFor(template.id,{channel})});
   }
   items.sort((a,b)=>a.name.localeCompare(b.name,'fr',{numeric:true}));return {items,total:items.length,channel,status:storageUnavailable?'storage_unavailable':'ready',storageUnavailable};
  }
@@ -38,7 +43,7 @@
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n(width)} ${n(height)}" role="img" aria-label="${esc((value?.name||model.name||'Modèle MIR')+' — proportions illustratives, cotes à renseigner')}" font-family="Arial,sans-serif"><title>${esc(value?.name||model.name||'Modèle MIR')} · illustration sans cotes de commande</title>${body}</svg>`;
  }
- function cardHTML(item,{channel='client',newTab=channel==='store'}={}){return `<article class="mir-custom-model-card" data-custom-model-id="${esc(item.id)}"><a class="mir-custom-model-preview" href="${esc(item.href)}"${newTab?' target="_blank" rel="noopener"':''} tabindex="-1" aria-hidden="true">${previewSVG(item)}<span class="mir-custom-model-version">MODÈLE MIR · V${item.version}</span></a><div class="mir-custom-model-body"><p class="mir-custom-model-kind">${esc(item.kindLabel)}</p><h3>${esc(item.name)}</h3>${item.description?`<p class="mir-custom-model-description">${esc(item.description)}</p>`:''}<p class="mir-custom-model-fields">${item.requiredMeasureCount} cote${item.requiredMeasureCount>1?'s':''} à renseigner · aucune mesure imposée</p><a class="mir-custom-model-action" href="${esc(item.href)}"${newTab?' target="_blank" rel="noopener"':''}>Choisir mes dimensions <span aria-hidden="true">↗</span><span class="mir-custom-sr-only"> — ${esc(item.name)}${newTab?', nouvel onglet':''}</span></a></div></article>`;}
+ function cardHTML(item,{channel='client',newTab=channel==='store'}={}){return `<article class="mir-custom-model-card" data-custom-model-id="${esc(item.id)}"><a class="mir-custom-model-preview" href="${esc(item.href)}"${newTab?' target="_blank" rel="noopener"':''} tabindex="-1" aria-hidden="true">${previewSVG(item)}<span class="mir-custom-model-version">MODÈLE MIR · V${item.version}</span></a><div class="mir-custom-model-body"><p class="mir-custom-model-kind">${esc(item.kindLabel)}</p><h3>${esc(item.name)}</h3>${item.description?`<p class="mir-custom-model-description">${esc(item.description)}</p>`:''}${item.offerText?`<p class="mir-custom-model-price">${esc(item.offerText)}</p>`:''}<p class="mir-custom-model-fields">${item.requiredMeasureCount} cote${item.requiredMeasureCount>1?'s':''} à renseigner · aucune mesure imposée</p><a class="mir-custom-model-action" href="${esc(item.href)}"${newTab?' target="_blank" rel="noopener"':''}>Choisir mes dimensions <span aria-hidden="true">↗</span><span class="mir-custom-sr-only"> — ${esc(item.name)}${newTab?', nouvel onglet':''}</span></a></div></article>`;}
  function renderHTML(result,options={}){
   const title=options.title||'Les modèles de l’atelier',level=[2,3,4].includes(Number(options.headingLevel))?Number(options.headingLevel):2,limit=Number.isSafeInteger(options.limit)&&options.limit>0?options.limit:result.items.length,items=result.items.slice(0,limit),compact=options.compact?' mir-custom-models-compact':'',kind='mir-custom-models'+compact;
   const empty=options.query?'Aucun modèle ne correspond à cette recherche.':'Aucun modèle n’est disponible dans ce catalogue sur cet appareil.';

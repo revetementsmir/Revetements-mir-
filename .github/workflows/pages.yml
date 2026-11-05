@@ -45,11 +45,15 @@ jobs:
           node --check tests/mir-atelier-v4-browser.cjs
           node --check dist/production-admin-v4.js
           node --check dist/mir-procurement.js
+          node --check dist/custom-model-cards.js
+          node --check tests/mir-pliage-audit-browser.cjs
           node --check dist/portal-client.js
           node --check dist/chantier-app.js
           node --check tests/mir-portal-login.cjs
           node tests/mir-portal-login.cjs
           node tests/mir-procurement.cjs
+          node --check tests/mir-pliage-audit-commercial.cjs
+          node tests/mir-pliage-audit-commercial.cjs
           node --check dist/plan-import.js
           node --check dist/plan-facade-visual.js
           node tests/mir-plan-sheet-detection.cjs
@@ -116,6 +120,7 @@ jobs:
           node tests/mir-direct-po-browser.cjs
           node tests/mir-drawing-pan-browser.cjs
           node tests/mir-atelier-v4-browser.cjs
+          node tests/mir-pliage-audit-browser.cjs
           node tests/mir-studio-wall-sections-browser.cjs
           node tests/mir-balcony-browser.cjs
           node tests/mir-studio-terrain-browser.cjs

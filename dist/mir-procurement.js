@@ -12,7 +12,7 @@
   }
 })(typeof window === 'object' ? window : null, function () {
   'use strict';
-  const KEY='mir_admin_procurement_v1', DRAFT='mir_production_admin_dossier_v1', VERSION=1;
+  const KEY='mir_admin_procurement_v1', DRAFT='mir_production_admin_dossier_v1', MODEL_KEY='mir_production_templates_v1', VERSION=1;
   const SOURCES=[
     {id:'unico',name:'Unico Revêtement Métallique',email:'commande@unicorevetement.com',phone:'418-827-5588',address:'5, rue Industrielle, Beaupré (Québec) G0A 1E0',website:'https://unicorevetement.com/contact',source:'https://www.unicorevetement.com/contact',note:'Courriel commande indiqué sur le site officiel; confirmer le destinataire avant un premier envoi.'},
     {id:'breton',name:'Breton Revêtements Métalliques',email:'info@bretonrm.com',phone:'418-475-9999',address:'110, rue des Entreprises, Saint-Bernard (Québec) G0S 2G0',website:'https://bretonrevetements.com',source:'https://aeclafontaine.ca/images/Magazine_partenaires_edition_2022.pdf',note:'Courriel publié en 2022, À RECONFIRMER; adresse et téléphone recensés par la municipalité de Saint-Bernard.'},
@@ -22,6 +22,33 @@
   const safe=(v,max=500)=>String(v==null?'':v).replace(/[\u0000-\u001f\u007f]/g,' ').trim().slice(0,max);
   const esc=v=>safe(v,4000).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const mailValid=email=>/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(safe(email,254));
+
+  // Tarifs de vente de la longueur 10 pi uniquement. L'enregistrement local n'est
+  // jamais une publication multiu​tilisateur ou un prix de commande rétroactif.
+  function parsePrice(value) {
+    const normalized=String(value??'').trim().replace(',','.');
+    if(!normalized)return null;
+    if(!/^\d{1,6}(?:\.\d{1,2})?$/.test(normalized))return NaN;
+    const parts=normalized.split('.'),cents=Number(parts[0])*100+Number((parts[1]||'').padEnd(2,'0'));
+    return Number.isSafeInteger(cents)&&cents>0&&cents<=10000000?cents:NaN;
+  }
+  const priceLabel=cents=>Number.isSafeInteger(cents)?(cents/100).toFixed(2).replace('.',',')+' $ CA':'Prix à définir';
+  function commercialUpdate(record,values={}) {
+    const status=values.action==='published'?'published':'draft',prices={},errors=[];
+    for(const metal of ['aluminium','acier']){
+      const parsed=parsePrice(values[metal]);
+      if(Number.isNaN(parsed))errors.push('Prix '+metal+' invalide : utilisez un montant positif avec deux décimales maximum.');
+      else if(parsed!==null)prices[metal]=parsed;
+    }
+    const metals=(Array.isArray(record?.allowed?.materials)?record.allowed.materials:['aluminium','acier']).filter(m=>m==='aluminium'||m==='acier');
+    if(status==='published'&&record?.archived!==false)errors.push('Ce modèle est archivé : impossible de le rendre disponible.');
+    if(status==='published'&&metals.some(m=>!Number.isSafeInteger(prices[m])))errors.push('Renseignez le tarif de chaque métal autorisé avant la mise en boutique locale.');
+    if(status==='published'&&!metals.length)errors.push('Ce modèle ne propose ni aluminium ni acier avec un tarif de 10 pi.');
+    if(errors.length)return {ok:false,errors};
+    const next={...record,channels:{...record.channels,client:status==='published',store:values.store===true,po:values.po===true},
+      commercial:{status,lengthIn:120,currency:'CAD',priceCentsByMetal:prices,conditions:safe(values.conditions,600),updatedAt:values.now||new Date().toISOString()}};
+    return {ok:true,record:next};
+  }
   const seed=()=>SOURCES.map(x=>Object.assign({verified:false,archived:false,terms:'',contact:''},x));
   function normalizeSupplier(input) {
     const s=input||{};
@@ -123,7 +150,7 @@
     function save(){try{win.localStorage.setItem(KEY,JSON.stringify(state));return true;}catch{win.alert('Stockage local indisponible : impossible d’enregistrer.');return false;}}
     save();
     const tabs=doc.createElement('nav');tabs.id='mir-procurement-tabs';tabs.setAttribute('aria-label','Administration du pliage');
-    tabs.innerHTML='<button type="button" data-mir-tab="draw">Créer une moulure</button><button type="button" data-mir-tab="models">Mes moulures</button><button type="button" data-mir-tab="orders">Bons de commande</button><button type="button" data-mir-tab="suppliers">Fournisseurs</button>';
+    tabs.innerHTML='<button type="button" data-mir-tab="draw">Créer</button><button type="button" data-mir-tab="models">Modèles</button><button type="button" data-mir-tab="boutique">Boutique</button><button type="button" data-mir-tab="orders">Commandes</button>';
     const panel=doc.createElement('section');panel.id='mir-procurement-panel';panel.hidden=true;
     main.insertBefore(tabs,main.firstChild);main.append(panel);doc.body.classList.add('mir-procurement-ready');
     function currentOrder(){return getDossier(win.localStorage);}
@@ -154,11 +181,57 @@
         +'<div class="mir-proc-actions"><button type="button" class="mir-proc-primary" id="mir-create-po">Enregistrer le bon brouillon</button></div></div>'
         +'<div class="mir-proc-card"><h3>4. Bons enregistrés sur cet appareil</h3>'+ (list||'<p>Aucun bon enregistré.</p>')+'</div>';
     }
+
+    function readModelRecords(){
+      try{
+        const saved=JSON.parse(win.localStorage.getItem(MODEL_KEY)||'null');
+        return saved?.version===1&&Array.isArray(saved.records)?saved.records:[];
+      }catch{return [];}
+    }
+    function boutiqueHTML(){
+      const records=readModelRecords().filter(record=>record?.id&&record.archived===false&&Array.isArray(record.versions));
+      const cards=records.map(record=>{
+        const commercial=record.commercial||{},prices=commercial.priceCentsByMetal||{},allowed=record.allowed?.materials||['aluminium','acier'];
+        const published=commercial.status==='published'&&record.channels?.client===true;
+        const field=metal=>!allowed.includes(metal)?'':('<label class="mir-proc-field"><span>Prix '+(metal==='aluminium'?'aluminium':'acier')+' / longueur 10 pi (CAD)</span><input name="'+metal+'" data-mir-price="'+metal+'" type="text" inputmode="decimal" placeholder="Ex. 7,99" autocomplete="off" value="'+esc(Number.isSafeInteger(prices[metal])?(prices[metal]/100).toFixed(2):'')+'"></label>');
+        return '<form class="mir-proc-card mir-proc-model-form" data-mir-boutique-form="'+esc(record.id)+'">'
+          +'<div class="mir-proc-model-head"><div><h3>'+esc(record.name||'Modèle sans nom')+'</h3><p>Version '+esc(record.currentVersion)+' · '+esc(record.versions?.find(t=>t.version===record.currentVersion)?.kind==='panel'?'Panneau':'Moulure')+'</p></div>'
+          +'<span class="mir-proc-model-state">'+(published?'Visible localement':'Brouillon / privé')+'</span></div>'
+          +'<p class="mir-proc-local-note">Une longueur vendue = <strong>10 pi (120 po)</strong>. Les prix n’affectent pas les commandes enregistrées.</p>'
+          +'<div class="mir-proc-grid">'+field('aluminium')+field('acier')+'</div>'
+          +'<label class="mir-proc-field"><span>Conditions de vente / précisions</span><textarea name="conditions" rows="2" maxlength="600" placeholder="Ex. Fabrication sur confirmation">'+esc(commercial.conditions||'')+'</textarea></label>'
+          +'<div class="mir-proc-channel"><label><input type="checkbox" name="store" '+(record.channels?.store===true?'checked':'')+'> Magasin employés</label><label><input type="checkbox" name="po" '+(record.channels?.po!==false?'checked':'')+'> Bon de commande fournisseur</label></div>'
+          +'<p class="mir-proc-error" data-mir-boutique-error role="alert" hidden></p>'
+          +'<div class="mir-proc-actions"><button type="submit" name="action" value="draft">Garder en brouillon</button><button type="submit" class="mir-proc-primary" name="action" value="published">Rendre visible sur cet appareil</button></div></form>';
+      }).join('');
+      return '<div class="mir-proc-top"><h2>Boutique de pliages</h2><p>Définissez les prix et les canaux de chaque modèle, sans refaire son dessin.</p></div>'
+        +'<p class="mir-proc-alert">Mode local : ces prix et modèles ne sont visibles que sur ce navigateur. Une vraie boutique partagée exige un serveur et une connexion administrateur sécurisée. Aucun paiement ni synchronisation Shopify n’est actif.</p>'
+        +'<p id="mir-boutique-feedback" role="status" aria-live="polite"></p>'
+        +(cards||'<div class="mir-proc-card"><h3>Pas encore de modèles enregistrés</h3><p>Dessinez puis enregistrez votre première moulure dans Modèles. Les tarifs ne sont jamais imposés par défaut.</p><button type="button" data-mir-tab="models">Créer mon premier modèle</button></div>');
+    }
+    function saveBoutique(form,action){
+      const rows=readModelRecords(),index=rows.findIndex(row=>row.id===form.dataset.mirBoutiqueForm);
+      const error=form.querySelector('[data-mir-boutique-error]');
+      if(index<0){error.hidden=false;error.textContent='Modèle introuvable. Rechargez cette page avant de réessayer.';return;}
+      const values={action,aluminium:form.elements.namedItem('aluminium')?.value||'',acier:form.elements.namedItem('acier')?.value||'',
+        conditions:form.elements.namedItem('conditions')?.value||'',store:form.elements.namedItem('store')?.checked===true,po:form.elements.namedItem('po')?.checked===true};
+      const updated=commercialUpdate(rows[index],values);
+      if(!updated.ok){error.hidden=false;error.textContent=updated.errors.join(' ');return;}
+      rows[index]=updated.record;
+      try{win.localStorage.setItem(MODEL_KEY,JSON.stringify({version:1,records:rows}));}
+      catch{error.hidden=false;error.textContent='Sauvegarde locale impossible. Exportez vos modèles depuis Modèles.';return;}
+      // Ne pas transformer une simple visibilité locale en véritable publication.
+      panel.innerHTML=boutiqueHTML();
+      const feedback=panel.querySelector('#mir-boutique-feedback');
+      if(feedback)feedback.textContent=updated.record.name+(action==='published'?' : disponible dans le catalogue de ce navigateur.': ' : conservé en brouillon privé.');
+      win.dispatchEvent(new win.Event('mir-template-catalogue-updated'));
+      win.MIRCustomModelCards?.refresh?.();
+    }
     function supplierHTML(){
       const cards=state.suppliers.filter(s=>!s.archived).map(s=>'<article class="mir-proc-row"><div><b>'+esc(s.name)+'</b><small>'+esc(s.email||'Courriel à renseigner')+' · '+esc(s.phone)+'</small><small>'+(s.verified?'Courriel confirmé par MIR':'Courriel à confirmer avant envoi')+'</small></div><button type="button" data-mir-edit="'+esc(s.id)+'">Modifier</button></article>').join('');
       const s=state.suppliers.find(s=>s.id===supplierEditing)||{id:'',name:'',email:'',phone:'',address:'',website:'',source:'',contact:'',terms:'',note:'',verified:false};
       function sf(name,label){return '<label class="mir-proc-field"><span>'+esc(label)+'</span><input data-mir-supplier="'+name+'" value="'+esc(s[name])+'" maxlength="400"></label>';}
-      return '<h2>Fournisseurs de pliage</h2><p>Quatre fiches préremplies avec leurs sources publiques. Vérifie les contacts avant une première commande.</p><p class="mir-proc-alert">Les fournisseurs et les bons sont sauvegardés seulement dans ce navigateur; aucun compte employé ni envoi automatique n’est activé.</p>'
+      return '<button type="button" class="mir-proc-back" data-mir-tab="orders">← Retour aux commandes</button><h2>Fournisseurs de pliage</h2><p>Quatre fiches préremplies avec leurs sources publiques. Vérifie les contacts avant une première commande.</p><p class="mir-proc-alert">Les fournisseurs et les bons sont sauvegardés seulement dans ce navigateur; aucun compte employé ni envoi automatique n’est activé.</p>'
         +'<div class="mir-proc-card"><h3>Répertoire</h3>'+cards+'<button type="button" id="mir-new-supplier">Ajouter un fournisseur</button></div>'
         +'<form id="mir-supplier-form" class="mir-proc-card"><h3>'+(s.id?'Modifier le fournisseur':'Nouveau fournisseur')+'</h3><div class="mir-proc-grid">'
         +sf('name','Nom de la compagnie')+sf('email','Courriel pour les commandes')+sf('phone','Téléphone')
@@ -171,9 +244,9 @@
     }
     function switchTab(next){
       if(pendingWorkflowObserver){pendingWorkflowObserver.disconnect();pendingWorkflowObserver=null;}
-      tab=['draw','models','orders','suppliers'].includes(next)?next:'draw';
-      doc.body.dataset.mirTab=tab;panel.hidden=tab!=='orders'&&tab!=='suppliers';
-      tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===tab?'page':'false'));
+      tab=['draw','models','boutique','orders','suppliers'].includes(next)?next:'draw';
+      doc.body.dataset.mirTab=tab;panel.hidden=tab!=='orders'&&tab!=='suppliers'&&tab!=='boutique';
+      tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===(tab==='suppliers'?'orders':tab)?'page':'false'));
       if(tab==='draw'||tab==='models'){
         const workflow=doc.querySelector('#production-workflow [data-workflow="'+(tab==='draw'?'configure':'models')+'"]');
         if(workflow) workflow.click();
@@ -186,7 +259,7 @@
         }
         return;
       }
-      panel.innerHTML=tab==='orders'?ordersHTML():supplierHTML();
+      panel.innerHTML=tab==='orders'?ordersHTML():tab==='boutique'?boutiqueHTML():supplierHTML();
       panel.scrollIntoView({block:'start',behavior:'smooth'});
     }
     function editSupplier(id){supplierEditing=id;switchTab('suppliers');}
@@ -235,9 +308,9 @@
     });
     panel.addEventListener('input',function(e){if(e.target.dataset.mirPo)ui[e.target.dataset.mirPo]=e.target.value;});
     panel.addEventListener('change',function(e){if(e.target.dataset.mirPo)ui[e.target.dataset.mirPo]=e.target.value;});
-    panel.addEventListener('submit',function(e){if(e.target.id==='mir-supplier-form'){e.preventDefault();saveSupplier(e.target);}});
+    panel.addEventListener('submit',function(e){if(e.target.matches('[data-mir-boutique-form]')){e.preventDefault();saveBoutique(e.target,e.submitter?.value);return;}if(e.target.id==='mir-supplier-form'){e.preventDefault();saveSupplier(e.target);}});
     const requestedView=new URLSearchParams(win.location.search).get('view');
-    switchTab(['orders','suppliers','models'].includes(requestedView)?requestedView:'draw');
+    switchTab(['orders','suppliers','models'].includes(requestedView)||requestedView==='boutique'?requestedView:'draw');
   }
-  return {VERSION,SOURCES,seed,normalizeSupplier,mergeSuppliers,readState,getDossier,validatePo,createPo,mailtoDraft,printHTML,init};
+  return {VERSION,SOURCES,seed,normalizeSupplier,mergeSuppliers,readState,getDossier,validatePo,createPo,mailtoDraft,printHTML,parsePrice,priceLabel,commercialUpdate,init};
 });

@@ -18,6 +18,7 @@ on:
       - 'dist/mir-procurement.css'
       - 'tests/mir-miniatures*.cjs'
       - 'tests/mir-procurement.cjs'
+      - 'tests/mir-pliage-audit-*.cjs'
       - '.github/workflows/pages.yml'
       - 'dist/kaycan-flat-preview.js'
       - 'tests/mir-kaycan-flat-preview.cjs'
@@ -48,6 +49,9 @@ jobs:
           node --check tests/mir-retours-cotes.cjs
           node --check tests/mir-retours-cotes-browser.cjs
           node --check dist/production-app.js
+          node --check dist/mir-procurement.js
+          node --check dist/custom-model-cards.js
+          node --check tests/mir-pliage-audit-browser.cjs
           node --check dist/mir-miniature.js
           node --check tests/mir-miniatures.cjs
           node --check tests/mir-miniatures-browser.cjs
@@ -64,6 +68,8 @@ jobs:
         run: |
           node tests/mir-pages-regressions.cjs
           node tests/mir-procurement.cjs
+          node --check tests/mir-pliage-audit-commercial.cjs
+          node tests/mir-pliage-audit-commercial.cjs
       - name: Atelier maquette 4 scenarios
         run: |
           node tests/mir-atelier-v4.cjs
@@ -74,6 +80,7 @@ jobs:
         run: |
           npm install --no-save playwright@1.58.2
           node tests/mir-atelier-v4-browser.cjs
+          node tests/mir-pliage-audit-browser.cjs
           node tests/mir-kaycan-flat-preview.cjs
           node tests/mir-mac-flat-preview.cjs
           node tests/mir-direct-po-browser.cjs
