@@ -16,9 +16,12 @@
   <script src="architectural-wall-geometry.js" defer></script>
   <script src="panel-layout-engine.js" defer></script>
   <script src="panel-layout-output.js" defer></script>
-  <script src="atelier-essai/mir-calepinage-extension.js" defer></script><script src="profile-production-transfer.js" defer></script><script src="mir-bending-presets.js?v=profils-1" defer></script><script src="model-measure-defaults.js?v=defaults-1" defer></script><script src="template-library-backup.js?v=backup-1&destinations=1" defer></script><script src="production-app.js?v=table-mobile-9" defer></script>
+  <script src="atelier-essai/mir-calepinage-extension.js" defer></script><script src="profile-production-transfer.js" defer></script><script src="mir-bending-presets.js?v=profils-1" defer></script><script src="model-measure-defaults.js?v=defaults-1" defer></script><script src="template-library-backup.js?v=backup-1&destinations=1" defer></script><script src="production-app.js?v=fractions-10" defer></script>
   <script type="module" src="studio-capture.mjs"></script>
   <style>
+    .fraction-field{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+    .fraction-field>input{flex:1 1 70px;min-width:0;width:auto}
+    .fraction-field>select{flex:0 1 auto;width:auto;min-height:44px;padding:5px;font-size:12px}
     .mobile-trace-notice,.mobile-trace-exit{display:none}
     @media (pointer:coarse) and (max-width:1024px) {
       .mobile-trace .mobile-trace-notice{display:block;padding:8px 16px;background:#fff4df;color:#67481d;font-size:13px}

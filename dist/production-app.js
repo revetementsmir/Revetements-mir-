@@ -175,7 +175,34 @@ function profileMeasureInput(index,label){
  const input=selector&&$('#production-dimensions').querySelector(selector);
  return input&&!input.disabled&&!input.readOnly?input:null;
 }
+function renderFractionPickers(){
+ if(draft.unit!=='in')return;
+ const fields=document.querySelectorAll('#production-dimensions input[data-measure], #production-dimensions input[data-segment-length], #panel-lip, input[data-panel-lip]');
+ const options=Array.from({length:16},(_,i)=>`<option value="${i}">${i?M.formatMeasurement(i*25.4/16,'in').replace(/ po$/,''):'0 · Sans fraction'}</option>`).join('');
+ for(const input of fields){
+  if(input.readOnly||input.disabled||input.parentElement.classList.contains('fraction-field'))continue;
+  const row=document.createElement('span');
+  row.className='fraction-field';
+  input.before(row);
+  row.append(input);
+  const name=input.getAttribute('aria-label')||row.closest('label')?.textContent.trim()||'la mesure';
+  row.insertAdjacentHTML('beforeend',`<select data-pick-fraction aria-label="Choisir la fraction pour ${esc(name)}"><option value="">Fraction</option>${options}</select>`);
+ }
+}
+function applyMeasureFraction(select){
+ const input=select.previousElementSibling;
+ const fraction=Number(select.value);
+ if(!select.value||!Number.isInteger(fraction)||fraction<0||fraction>15||draft.unit!=='in'||!input||input.readOnly||input.disabled)return;
+ select.value='';
+ const parsed=M.parseMeasurement(input.value,'in');
+ if(!parsed.ok&&input.value.trim())return toast('Corrige la mesure avant de choisir sa fraction.');
+ const value=parsed.ok?parsed.value:0;
+ const amount=(Math.trunc(Math.abs(value))+fraction/16)*(value<0?-1:1);
+ input.value=M.formatMeasurement(amount*25.4,'in').replace(/ po$/,'');
+ handleInput({target:input});
+}
 function updateDrawing({keepForm=false}={}){
+ renderFractionPickers();
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  $('#drawing-title').textContent=authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
@@ -887,6 +914,7 @@ function handleInput(event){const e=event.target,d=e.dataset;
 }
 function changeUnit(next){const previous=draft.unit||'in';if(next===previous)return;jException=null;const convert=value=>{if(value===''||value===null||value===undefined)return value;const p=M.parseMeasurement(value,previous);return p.ok?fmt(unitValue(p.mm,next)):value;};if(kind==='profile'){if(draft.template==='custom')draft.segments.forEach(s=>s.length=convert(s.length));else for(const k of Object.keys(draft.dimensions||{}))draft.dimensions[k]=convert(draft.dimensions[k]);draft.length=convert(draft.length);}else{for(const k of ['width','height','relief','lip','apexX','topWidth','topOffset','offset','tipDepth','apexOffset'])draft[k]=convert(draft[k]);for(const k of Object.keys(draft.lips||{}))draft.lips[k]=convert(draft.lips[k]);}if(draft.material?.thickness&&kind!=='panel'){draft.material.thickness=convert(draft.material.thickness);draft.material.thicknessUnit=next;}draft.unit=next;tool='select';renderDimensions();renderProfileOptions();renderPanelOptions();renderFormMetadata();updateDrawing();}
 function handleChange(event){const e=event.target,d=e.dataset;
+ if(d.pickFraction!==undefined)return applyMeasureFraction(e);
  if(d.profileGroup&&!client){
   const profileGroup=M.PROFILE_GROUPS.includes(e.value)?e.value:'';
   const nextOrder={...order,items:order.items.map(item=>item.id===d.profileGroup?{...item,profileGroup}:item)};
