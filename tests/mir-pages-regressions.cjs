@@ -60,6 +60,17 @@ test('Solin brique et coin avec J sont directement accessibles sur la vraie page
   assert.ok(!html.includes('href="atelier-essai/index.html"'));
   assert.ok(!html.includes('href="atelier-essai/pliages-integration-candidate.html'));
 });
+test('Les pages principales ne renvoient plus vers les écrans de démonstration', () => {
+  for(const name of ['production.html','pliage.html','metres.html']){
+    const html=fs.readFileSync(path.join(__dirname,'../dist',name),'utf8');
+    assert.doesNotMatch(html,/href=["']atelier-essai\/[^"']*(?:candidate\.html|index\.html)/);
+  }
+  const pliage=fs.readFileSync(path.join(__dirname,'../dist/pliage.html'),'utf8');
+  const metres=fs.readFileSync(path.join(__dirname,'../dist/metres.html'),'utf8');
+  assert.ok(pliage.includes('profile=solin_brique'));
+  assert.ok(pliage.includes('profile=coin_arch_j'));
+  assert.ok(metres.includes('production.html?view=orders'));
+});
 test('La page des coins charge les composants de production', () => {
   const html=fs.readFileSync(path.join(__dirname,'../dist/atelier-essai/pliages-integration-candidate.html'),'utf8');
   assert.ok(html.includes('../profile-production-transfer.js'));
