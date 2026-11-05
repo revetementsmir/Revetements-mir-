@@ -17,6 +17,7 @@ on:
       - 'tests/mir-kaycan-flat-preview.cjs'
       - 'tests/mir-mac-flat-preview.cjs'
       - 'tests/mir-direct-po-browser.cjs'
+      - 'tests/mir-drawing-pan-browser.cjs'
       - 'tests/mir-atelier-v4.cjs'
       - 'tests/mir-atelier-v4-browser.cjs'
       - 'tests/mir-moulure-renaming-browser.cjs'
@@ -43,6 +44,7 @@ jobs:
           node --check tests/mir-kaycan-flat-preview.cjs
           node --check tests/mir-mac-flat-preview.cjs
           node --check tests/mir-direct-po-browser.cjs
+          node --check tests/mir-drawing-pan-browser.cjs
           node --check dist/production-admin-v4.js
           node --check tests/mir-atelier-v4.cjs
           node --check tests/mir-atelier-v4-browser.cjs
@@ -63,6 +65,7 @@ jobs:
           node tests/mir-kaycan-flat-preview.cjs
           node tests/mir-mac-flat-preview.cjs
           node tests/mir-direct-po-browser.cjs
+          node tests/mir-drawing-pan-browser.cjs
           node tests/mir-moulure-renaming-browser.cjs
           node tests/mir-miniatures-browser.cjs
           node tests/mir-retours-cotes-browser.cjs
@@ -75,6 +78,7 @@ jobs:
             artifacts/kaycan-fix-*.png
             artifacts/mac-flat-*.png
             artifacts/mir-direct-po-*.png
+            artifacts/mir-pan-*.png
             artifacts/mir-rename-*.png
             artifacts/mir-miniatures-*.png
             artifacts/mir-retours-*.png
