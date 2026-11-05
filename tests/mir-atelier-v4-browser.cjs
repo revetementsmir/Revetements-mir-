@@ -68,6 +68,10 @@ function available() {
     const page=await browser.newPage({viewport:{width:1440,height:900}});
     await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
+    await page.locator('#production-unit').selectOption('mm');
+    assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'127 mm','Somme en mm');
+    await page.locator('#production-unit').selectOption('in');
+    assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'5 po','Retour en pouces');
     await page.locator('#add-production-piece').click();
     assert.equal((await page.locator('#order-head-count').textContent()).trim(),'01','Saving must not require PO');
     await page.locator('#mode-link').click();
