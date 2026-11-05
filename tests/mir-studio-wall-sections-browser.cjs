@@ -59,6 +59,22 @@ async function online(){
    const baseZ=view.parts.map(part=>part.bottom);
    assert.ok(Math.max(...baseZ)-Math.min(...baseZ)<.001);
    await page.locator('#stage').screenshot({path:path.join(artifact,'mir-studio-wall-parts-'+screen.name+'.png')});
+   if(screen.width<=650){
+     const nav=page.locator('#mir-side-wall-scroll');
+     assert.equal(await nav.isVisible(),true,'Le bouton 3 murs doit être accessible sur téléphone');
+     const metrics=await page.evaluate(()=>({
+       doc:document.documentElement.scrollWidth,view:innerWidth,
+       scroll:document.querySelector('#elevation').scrollWidth,
+       client:document.querySelector('#elevation').clientWidth
+     }));
+     assert.ok(metrics.doc<=metrics.view+2,'Aucun débordement horizontal de page '+JSON.stringify(metrics));
+     assert.ok(metrics.scroll>metrics.client,'La vue mobile doit pouvoir déplacer horizontalement les trois murs');
+     await nav.click();
+     await page.waitForFunction(()=>document.querySelector('#elevation').scrollLeft>150,{timeout:2500});
+     await page.locator('#stage').screenshot({path:path.join(artifact,'mir-studio-wall-parts-mobile-details.png')});
+     await nav.click();
+     await page.waitForFunction(()=>document.querySelector('#elevation').scrollLeft<10,{timeout:2500});
+   }
    await page.locator('[data-face="left"]').click();
    await page.locator('#elevation svg[data-mir-three-wall-explode="true"]').waitFor();
    assert.equal(await page.locator('#elevation [data-mir-wall-part]').count(),3);
