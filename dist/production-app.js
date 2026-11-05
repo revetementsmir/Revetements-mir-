@@ -1429,7 +1429,21 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  injectWorkflow();if(client){$('#production-eyebrow').textContent='L’ATELIER MIR / VOS PIÈCES SUR MESURE';$('#production-title').innerHTML='Votre pièce.<br>À vos <em>mesures.</em>';$('#production-description').textContent='Choisissez la forme. Entrez vos cotes, votre métal et votre couleur. Votre dessin suit vos choix.';$('#mode-link').href='#production-order';$('#mode-link').innerHTML='Mon dossier <span aria-hidden="true">↘</span>';$('#order-metadata').open=false;}
  document.addEventListener('click',handleClick);document.addEventListener('input',handleInput);document.addEventListener('change',handleChange);document.addEventListener('submit',handleSubmit);document.addEventListener('keydown',handleKey);document.addEventListener('keydown',traceShift);document.addEventListener('keyup',traceShift);
  const stage=$('#production-drawing');stage.addEventListener('pointerdown',beginPointDrag);stage.addEventListener('pointermove',movePoint);stage.addEventListener('pointerup',endPoint);stage.addEventListener('pointercancel',endPoint);stage.addEventListener('pointerleave',event=>{if(drag?.type==='trace'&&!drag.moved)endPoint(event);});stage.addEventListener('click',drawingClick);stage.addEventListener('wheel',event=>{if(client&&kind!=='panel'&&view!=='volume')return;event.preventDefault();setZoom(zoom*Math.exp(-event.deltaY*.001));},{passive:false});
- $('#production-dialog').addEventListener('click',event=>{if(event.target!==$('#production-dialog'))return;const r=$('#production-dialog').getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeDialog();});
+ const modal=$('#production-dialog');
+ let modalPressed=false,backdropPressed=false;
+ modal.addEventListener('pointerdown',event=>{
+  const bounds=modal.getBoundingClientRect();
+  modalPressed=true;
+  backdropPressed=event.target===modal&&(event.clientX<bounds.left||event.clientX>bounds.right||event.clientY<bounds.top||event.clientY>bounds.bottom);
+ });
+ modal.addEventListener('click',event=>{
+  // A touch that ends on the drawing can open this dialog before the browser
+  // sends its click. Wait for a new press while keeping keyboard clicks.
+  if(event.detail>0&&!modalPressed){event.preventDefault();event.stopPropagation();}
+  else if(event.target===modal&&backdropPressed)closeDialog();
+  modalPressed=backdropPressed=false;
+ },true);
+ modal.addEventListener('close',()=>{modalPressed=backdropPressed=false;});
  choose(kind,kind==='panel'?'rectangle':'l');const requestedMaterial=params.get('material');if(kind==='panel'&&['unico-up1-acier','unico-up1-aluminium'].includes(requestedMaterial)){const type=requestedMaterial.endsWith('aluminium')?'aluminium':'acier';draft.material={type,name:'Unico U-P1 — '+(type==='acier'?'Acier':'Aluminium plié'),productRef:requestedMaterial,thickness:'',thicknessUnit:'mm',gauge:''};materialId=availableMaterials()[0]?.id||'';colorSystem='manufacturer';const requestedColor=params.get('color'),palette=availableMaterials().find(m=>m.colors.some(c=>c.id===requestedColor));if(palette){materialId=palette.id;colorId=requestedColor;}render();}const linked=params.get('template');if(linked&&templates.some(record=>record.id===linked))useSavedTemplate(linked);if(!client&&params.get('view')==='models'){workflow='models';render();}if(!client&&params.get('view')==='requests'){workflow='requests';render();}if(client&&params.get('kind')==='profile'&&!linked)choose('profile','l');
  const requestedProfile=params.get('profile');
  if(requestedProfile&&Object.prototype.hasOwnProperty.call(profiles,requestedProfile)) choose('profile',requestedProfile);

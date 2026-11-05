@@ -21,10 +21,10 @@ async function ready(){
   await ready();
   browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
   for(const viewport of [
+   {name:'bureau',width:1440,height:900},
    {name:'mobile',width:390,height:844},
    {name:'mobile-compact',width:360,height:780},
-   {name:'tablette',width:1024,height:900},
-   {name:'bureau',width:1440,height:900}
+   {name:'tablette',width:1024,height:900}
   ]){
    const page=await browser.newPage({viewport:{width:viewport.width,height:viewport.height},hasTouch:viewport.width<1100});
    const errors=[];page.on('pageerror',err=>errors.push(err.message));
@@ -81,7 +81,10 @@ async function ready(){
     };
     const choose=async(label)=>{
      const prompt=page.locator('#production-dialog');
-     await prompt.waitFor({timeout:5000});
+     await prompt.waitFor({timeout:5000}).catch(async error=>{
+      const drawing=await stage.locator('[data-draw-point]').evaluateAll(nodes=>nodes.map(e=>[e.getAttribute('cx'),e.getAttribute('cy')]));
+      throw new Error(error.message+' ; points : '+JSON.stringify(drawing)+' ; dernière fenêtre : '+await prompt.locator('#production-dialog-content').textContent()+' ; erreurs : '+errors.join(', '));
+     });
      assert.equal(await prompt.locator('h2').textContent(),'De quel côté va le double pli ?');
      const face=prompt.locator('[name=face]');
      if(await face.count())await face.selectOption('left');

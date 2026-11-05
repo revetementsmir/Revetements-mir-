@@ -71,6 +71,7 @@ jobs:
       - name: Vérifier l'accueil MIR en vrai navigateur Chrome
         run: |
           npm install --no-save playwright@1.58.2
+          node tests/mir-retours-cotes-browser.cjs
           node tests/mir-homepage-browser.cjs
           node tests/mir-client-header-browser.cjs
           node tests/mir-client-signature-browser.cjs
@@ -80,7 +81,6 @@ jobs:
           node tests/mir-miniatures-browser.cjs
           node tests/mir-direct-po-browser.cjs
           node tests/mir-drawing-pan-browser.cjs
-          node tests/mir-retours-cotes-browser.cjs
           node tests/mir-studio-wall-sections-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
