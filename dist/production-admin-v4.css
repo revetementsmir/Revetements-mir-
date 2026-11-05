@@ -811,3 +811,15 @@ body.mir-admin-v4 #add-production-piece:focus-visible {
 @media(max-width:650px){
   body.mir-admin-v4 #mir-direct-po-add {font-size:14px;min-height:52px}
 }
+
+/* Le drag modifie la vue 2D, jamais les cotes ni les plis enregistrés. */
+body.mir-admin-v4 #production-drawing[data-kind="profile"][data-tool="select"]{
+ cursor:grab;
+ touch-action:none;
+}
+body.mir-admin-v4 #production-drawing[data-kind="profile"][data-tool="select"][data-moving="true"]{
+ cursor:grabbing;
+}
+body.mir-admin-v4 #production-drawing[data-kind="profile"][data-tool="select"] [data-toggle-painted-face]{
+ cursor:pointer;
+}
