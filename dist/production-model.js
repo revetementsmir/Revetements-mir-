@@ -720,16 +720,24 @@ function profileSideMarkers({segments,folds},model,handles){
   const length=distance(a,b);
   if(!length){missing.push(label);return '';}
   const nx=(a[1]-b[1])/length,ny=(b[0]-a[0])/length;
-  for(const gap of [24,32,42,54,70]){
-   for(const t of [.5,.32,.68]){
-    for(const side of [1,-1]){
-     const x=a[0]+(b[0]-a[0])*t+side*gap*nx,y=a[1]+(b[1]-a[1])*t+side*gap*ny,p=[x,y];
-     if(x<13||x>787||y<13||y>507||
-      placed.some(q=>distance(p,q)<25)||folds.some(q=>distance(p,q)<23)||
-      handles.some(q=>distance(p,q)<22)||
-      segments.some(line=>distanceToSide(p,line)<18||line.some(q=>distance(p,q)<31)))continue;
-     placed.push(p);
-     return `<g class="profile-side-marker" pointer-events="none" aria-hidden="true"><circle cx="${decimal(x)}" cy="${decimal(y)}" r="11" fill="#fff" stroke="#779068"/><text x="${decimal(x)}" y="${decimal(y+4)}" text-anchor="middle" font-size="12" font-weight="700" fill="#345d3d">${esc(label)}</text></g>`;
+  const mm=model.segments?.[index]?.lengthMM;
+  const captions=Number.isFinite(mm)?[label+' · '+formatMeasurement(mm,model.unit),label]:[label];
+  for(const caption of captions){
+   const halfWidth=caption===label?11:Math.ceil(caption.length*4.1+8);
+   const radius=caption===label?11:Math.hypot(halfWidth,12);
+   for(const gap of [24,32,42,54,70,90,112]){
+    for(const t of [.5,.32,.68]){
+     for(const side of [1,-1]){
+      const x=a[0]+(b[0]-a[0])*t+side*gap*nx,y=a[1]+(b[1]-a[1])*t+side*gap*ny,p=[x,y];
+      if(x<halfWidth+2||x>798-halfWidth||y<14||y>452||
+       placed.some(q=>distance(p,q.point)<radius+q.radius+3)||folds.some(q=>distance(p,q)<radius+12)||
+       handles.some(q=>distance(p,q)<radius+11)||
+       segments.some(line=>distanceToSide(p,line)<radius+7||line.some(q=>distance(p,q)<radius+20)))continue;
+      placed.push({point:p,radius});
+      const badge=caption===label?`<circle cx="${decimal(x)}" cy="${decimal(y)}" r="11"`:
+       `<rect x="${decimal(x-halfWidth)}" y="${decimal(y-12)}" width="${halfWidth*2}" height="24" rx="9"`;
+      return `<g class="profile-side-marker" pointer-events="none" aria-hidden="true">${badge} fill="#fff" stroke="#779068"/><text x="${decimal(x)}" y="${decimal(y+4)}" text-anchor="middle" font-size="${caption===label?12:14}" font-weight="700" fill="#345d3d">${esc(caption)}</text></g>`;
+     }
     }
    }
   }
@@ -759,7 +767,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  reserved.push(...[12,24,39].map(gap=>[mid[0]+normal[0]*gap*side,mid[1]+normal[1]*gap*side]));
  output+=`<path d="M${decimal(mid[0]+normal[0]*9*side)},${decimal(mid[1]+normal[1]*9*side)}L${decimal(mid[0]+normal[0]*26*side)},${decimal(mid[1]+normal[1]*26*side)}" stroke="#4f8538" stroke-width="2"/><text x="${decimal(mid[0]+normal[0]*39*side)}" y="${decimal(mid[1]+normal[1]*39*side+5)}" text-anchor="middle" font-size="22" fill="#427c2a">*</text>`;}
  });
- if(markers)output+=profileSideMarkers(section,markerModel,reserved);
+ if(markers)output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved);
  return output;
 }
 
