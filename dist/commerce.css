@@ -194,3 +194,25 @@
  .shop-filterbar>label,.shop-filterbar label:nth-child(3),.shop-filterbar label:last-of-type{grid-column:auto}
 }
 @media(prefers-reduced-motion:reduce){.category-card{transition:none}}
+
+/* Palette MIR partagée : boutique, panneaux et catalogues sans lourds cadres. */
+body.commerce { background:#f7f8f3; }
+body.commerce .category-card,
+body.commerce .shop-card {
+  background:#fff;
+  border:0;
+  border-radius:12px;
+  box-shadow:0 2px 13px rgb(27 57 35 / 5%);
+  overflow:hidden;
+}
+body.commerce .category-card .category-photo,
+body.commerce .shop-card .product-placeholder { background:#f2f5ee; }
+body.commerce .shop-filterbar :is(input,select){
+  background:#fff;
+  border-color:#e0e7dc;
+  border-radius:9px;
+}
+@media(max-width:650px){
+  body.commerce .category-card,
+  body.commerce .shop-card { border-radius:11px; }
+}
