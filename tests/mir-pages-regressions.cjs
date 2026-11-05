@@ -224,18 +224,20 @@ test('Studio : le grain du fibrociment reste indépendant de la couvrance', () =
 });
 
 
-test('MIR : les nouveaux modèles restent privés et une diffusion existante est préservée', () => {
+test('MIR : nouvelle version conservée en brouillon jusqu’au tarif, ancienne version intacte', () => {
   const app=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
   const begin=app.indexOf('function saveTemplateDialog()');
   const end=app.indexOf('function renderRequests()',begin);
   assert.ok(begin>=0&&end>begin,'dialogue de modèle localisé');
   const form=app.slice(begin,end);
-  assert.ok(form.includes("old?.channels?.client===true?' checked':''"));
+  assert.ok(form.includes("old?.commercial?.wantsClient===true||old?.channels?.client===true?' checked':''"));
   assert.ok(form.includes("old?.channels?.store===true?' checked':''"));
   assert.ok(!form.includes('old?.channels?.client===false'));
   assert.ok(!form.includes('old?.channels?.store===false'));
   assert.ok(form.includes('Nouveau modèle privé par défaut sur cet appareil'));
-  assert.ok(app.includes("channels:{client:data.has('client'),store:data.has('store'),po:data.has('po')}"));
+  assert.ok(app.includes("channels:{client:false,store:data.has('store'),po:data.has('po')}"));
+  assert.ok(app.includes("commercial:{...(old?.commercial||{}),status:'draft'"));
+  assert.ok(app.includes('versions:old?[...old.versions,copy(result.template)]:[copy(result.template)]'));
   assert.ok(app.includes('record.channels?.[catalogueChannel]===true'));
 });
 
