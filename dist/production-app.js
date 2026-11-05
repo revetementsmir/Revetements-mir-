@@ -164,7 +164,7 @@ function renderTools(){
  const drawing=tool==='draw';
  const recentHem=draft.template==='custom'?(draft.bends||[]).findLastIndex(bend=>bend.mode==='hem'):-1;
  const hemNotice=recentHem<0?'':`<p class="draw-help hem-notice">Double pli · ${esc(draft.segments[recentHem].label)} → ${esc(draft.segments[recentHem+1].label)} <button type="button" data-focus-bend="${recentHem}">Modifier le pli</button></p>`;
- el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 90°</label><p class="draw-help">Place au moins trois points. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
+ el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 90°</label><p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
  `<button type="button" class="draw-primary" data-new-drawing>Nouveau dessin</button><button type="button" data-draw-tool="edit" aria-pressed="${tool==='edit'}">${tool==='edit'?'Terminer la retouche':'Déplacer les points'}</button><button type="button" data-draw-tool="draw" aria-pressed="false">Continuer le tracé</button><button type="button" data-focus-dimensions>Cotes et angles ↓</button>${hemNotice}`;
 }
 function updateDrawing({keepForm=false}={}){
@@ -541,9 +541,54 @@ function toCustom(points,base=draft){
 }
 function unlockCustom(){if(client||editingItemId){toast('Cette pièce conserve la forme de son modèle. Modifiez les cotes ou créez un nouveau modèle.');return false;}const model=build();if(!model.valid){toast('Complétez les cotes de section pour modifier sa forme.');return false;}if(draft.template!=='custom'){draft={...draft,template:'custom',segments:model.segments.map(s=>({label:s.label,name:s.name,length:fmt(unitValue(s.lengthMM,draft.unit))})),bends:model.bends.map(b=>({mode:b.mode,angle:b.angle,direction:b.direction})),startAngle:model.segments[0].headingDeg};delete draft.dimensions;}return true;}
 function doubleFoldDialog(){if(client||editingItemId)return toast('Créez une nouvelle version du modèle pour modifier sa forme.');const model=build();if(!model.valid)return toast('Renseignez la section avant d’ajouter deux plis.');dialog('Ajouter un double pli','Remplacez un côté par trois segments : avant le pli, entre les deux plis et après le second. Ces deux plis sont distincts d’un retour écrasé de 180°.',`<form id="double-fold-form" class="dialog-form"><label>Côté à remplacer<select name="segmentIndex">${model.segments.map((s,i)=>`<option value="${i}">${esc(s.label+' · '+M.formatMeasurement(s.lengthMM,model.unit))}</option>`).join('')}</select></label><div class="three-fields"><label>Avant le premier pli<input name="beforeLength" inputmode="decimal" required></label><label>Entre les deux plis<input name="betweenLength" inputmode="decimal" required></label><label>Après le second pli<input name="afterLength" inputmode="decimal" required></label></div><div class="two-fields"><label>Angle intérieur du pli 1<input name="firstAngle" type="number" value="90" min="0.1" max="180" step="any" required></label><label>Sens du pli 1<select name="firstDirection"><option value="left">Gauche</option><option value="right">Droite</option></select></label></div><div class="two-fields"><label>Angle intérieur du pli 2<input name="secondAngle" type="number" value="90" min="0.1" max="180" step="any" required></label><label>Sens du pli 2<select name="secondDirection"><option value="right">Droite</option><option value="left">Gauche</option></select></label></div><p class="field-hint">${authoring?'Proportions illustratives : aucune cote de commande ne sera publiée.':'Mesures de pièce finie en '+(draft.unit==='mm'?'millimètres':'pouces')+'.'}</p><p id="production-dialog-error" class="dialog-error" role="alert"></p><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button><button type="submit" class="primary-button">Ajouter les deux plis</button></div></form>`);}
-function localPoint(event){const svg=$('#production-drawing svg'),tr=drawTransform;if(!svg||!tr)return null;let x,y;if(svg.createSVGPoint&&svg.getScreenCTM){const p=svg.createSVGPoint();p.x=event.clientX;p.y=event.clientY;const matrix=svg.getScreenCTM();if(!matrix)return null;const q=p.matrixTransform(matrix.inverse());x=q.x;y=q.y;}else{const r=svg.getBoundingClientRect();if(!r.width||!r.height)return null;const scale=Math.min(r.width/800,r.height/520);x=(event.clientX-r.left-(r.width-800*scale)/2)/scale;y=(event.clientY-r.top-(r.height-520*scale)/2)/scale;}let result=[(x-tr.ox)/tr.scale,(tr.oy-y)/tr.scale];if(snap){const step=draft.unit==='mm'?1:6.35;result=result.map(v=>Math.round(v/step)*step);}return result;}
+function localPoint(event, useGrid=snap){const svg=$('#production-drawing svg'),tr=drawTransform;if(!svg||!tr)return null;let x,y;if(svg.createSVGPoint&&svg.getScreenCTM){const p=svg.createSVGPoint();p.x=event.clientX;p.y=event.clientY;const matrix=svg.getScreenCTM();if(!matrix)return null;const q=p.matrixTransform(matrix.inverse());x=q.x;y=q.y;}else{const r=svg.getBoundingClientRect();if(!r.width||!r.height)return null;const scale=Math.min(r.width/800,r.height/520);x=(event.clientX-r.left-(r.width-800*scale)/2)/scale;y=(event.clientY-r.top-(r.height-520*scale)/2)/scale;}let result=[(x-tr.ox)/tr.scale,(tr.oy-y)/tr.scale];if(useGrid){const step=draft.unit==='mm'?1:6.35;result=result.map(v=>Math.round(v/step)*step);}return result;}
+function canDrawProfile(){
+ return kind==='profile'&&tool==='draw'&&view==='face'&&!client&&!editingItemId;
+}
+function draggedSegment(event, gesture){
+ const end=localPoint(event,false);
+ if(!end)return null;
+ const start=gesture.start,dx=end[0]-start[0],dy=end[1]-start[1];
+ const previous=gesture.heading;
+ const rawHeading=Math.atan2(dy,dx);
+ const base=previous??0;
+ const heading=event.shiftKey?base+Math.round((rawHeading-base)/(Math.PI/2))*Math.PI/2:rawHeading;
+ const length=event.shiftKey?Math.abs(dx*Math.cos(heading)+dy*Math.sin(heading)):Math.hypot(dx,dy);
+ const step=draft.unit==='mm'?1:25.4/16;
+ const rounded=Math.round(length/step)*step;
+ if(!rounded)return null;
+ const point=[start[0]+rounded*Math.cos(heading),start[1]+rounded*Math.sin(heading)];
+ const turn=previous===undefined?null:Math.abs(Math.atan2(Math.sin(heading-previous),Math.cos(heading-previous)))*180/Math.PI;
+ const angle=turn===null?'':(' · '+Math.round((180-turn)*10)/10+'° intérieur');
+ return {point, label:M.formatMeasurement(rounded,draft.unit)+angle};
+}
+function drawDragPreview(segment, gesture){
+ const svg=$('#production-drawing svg');
+ if(!svg)return;
+ svg.querySelector('[data-trace-preview]')?.remove();
+ if(!segment)return;
+ const [x1,y1]=pointOnView(gesture.start,drawTransform),[x2,y2]=pointOnView(segment.point,drawTransform);
+ const x=Math.max(107,Math.min(693,(x1+x2)/2)),y=Math.max(30,Math.min(499,(y1+y2)/2-24));
+ svg.insertAdjacentHTML('beforeend',`<g data-trace-preview pointer-events="none"><line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="#9c5a22" stroke-width="3" stroke-dasharray="8 6"/><rect x="${fmt(x-104)}" y="${fmt(y-21)}" width="208" height="28" rx="6" fill="#fff5e3" stroke="#b78049"/><text x="${fmt(x)}" y="${fmt(y-2)}" text-anchor="middle" font-size="16" font-weight="700" fill="#603b20">${esc(segment.label)}</text></g>`);
+}
+function traceShift(event){
+ if(event.key!=='Shift'||drag?.type!=='trace'||!drag.last)return;
+ drag.last={...drag.last,shiftKey:event.shiftKey};
+ drawDragPreview(draggedSegment(drag.last,drag),drag);
+}
 function beginPointDrag(event){
  const stage=$('#production-drawing');if(!stage.contains(event.target))return;
+ if(canDrawProfile()&&event.target.closest('svg')&&event.button===0&&event.isPrimary){
+  suppressClick=false;
+  const start=drawPoints.at(-1)||localPoint(event,false);
+  if(!start)return;
+  const prior=drawPoints.length>=3?build().segments.at(-1)?.headingDeg:undefined;
+  const before=drawPoints.at(-2);
+  const heading=finite(prior)?prior*Math.PI/180:before?Math.atan2(start[1]-before[1],start[0]-before[0]):undefined;
+  drag={type:'trace',id:event.pointerId,x:event.clientX,y:event.clientY,start,heading,moved:false};
+  return;
+ }
+
  if(kind==='panel'){
   pointers.set(event.pointerId,[event.clientX,event.clientY]);stage.setPointerCapture?.(event.pointerId);
   if(pointers.size===2){const a=[...pointers.values()];drag={type:'pinch',distance:Math.hypot(a[1][0]-a[0][0],a[1][1]-a[0][1]),zoom};event.preventDefault();return;}
@@ -555,6 +600,15 @@ function beginPointDrag(event){
 function movePoint(event){
  if(pointers.has(event.pointerId))pointers.set(event.pointerId,[event.clientX,event.clientY]);
  if(!drag)return;
+ if(drag.type==='trace'){
+  if(event.pointerId!==drag.id)return;
+  if(!drag.moved&&Math.hypot(event.clientX-drag.x,event.clientY-drag.y)<4)return;
+  if(!drag.moved)$('#production-drawing').setPointerCapture?.(event.pointerId);
+  drag.moved=true;
+  drag.last={clientX:event.clientX,clientY:event.clientY,shiftKey:event.shiftKey};
+  drawDragPreview(draggedSegment(drag.last,drag),drag);
+  return;
+ }
  if(drag.type==='pinch'){const a=[...pointers.values()];if(a.length===2&&drag.distance>0){event.preventDefault();setZoom(drag.zoom*Math.hypot(a[1][0]-a[0][0],a[1][1]-a[0][1])/drag.distance);}return;}
  if(drag.type==='orbit'){const dx=event.clientX-drag.x,dy=event.clientY-drag.y;drag.moved=drag.moved||Math.hypot(dx,dy)>3;orbit=drag.orbit+dx*.55;pitch=Math.max(-85,Math.min(85,drag.pitch+dy*.3));updateDrawing({keepForm:true});return;}
  const p=localPoint(event);if(!p)return;drawPoints[drag.index]=p;const spec=toCustom(drawPoints);if(spec){draft=spec;drag.moved=true;updateDrawing({keepForm:true});}
@@ -562,6 +616,17 @@ function movePoint(event){
 
 function endPoint(event){
  pointers.delete(event.pointerId);const stage=$('#production-drawing');if(stage.hasPointerCapture?.(event.pointerId))stage.releasePointerCapture(event.pointerId);
+ if(drag?.type==='trace'){
+  if(event.pointerId!==drag.id)return;
+  const gesture=drag;
+  drag=null;
+  drawDragPreview(null,gesture);
+  if(!gesture.moved||event.type!=='pointerup'||!canDrawProfile())return;
+  suppressClick=true;
+  const segment=draggedSegment(event,gesture);
+  if(segment)appendTracePoint(segment.point,gesture.start);
+  return;
+ }
  if(!drag)return;const moved=drag.type==='point'&&drag.moved;
  suppressClick=drag.type==='pinch'||!!drag.moved;drag=null;
  if(moved){renderDimensions();renderProfileOptions();updateDrawing();}
@@ -584,7 +649,28 @@ function focusProfileDimensions(bendIndex){
  if(bendIndex!==undefined)target.parentElement.open=true;
  target.focus();
 }
-function drawingClick(event){if(suppressClick){suppressClick=false;return;}if(tool!=='draw'||view!=='face'||client||editingItemId||!$('#production-drawing').contains(event.target))return;const raw=localPoint(event);if(!raw)return;const p=rightAngleSnap?snapDrawRightAngle(drawPoints,raw,drawPoints.length>=3?build().segments.at(-1)?.headingDeg:undefined):raw;if(drawPoints.length>=27)return toast('Un profil peut contenir au maximum 26 segments.');if(drawPoints.length&&Math.hypot(p[0]-drawPoints.at(-1)[0],p[1]-drawPoints.at(-1)[1])<.01)return;drawPoints.push(p);const spec=toCustom(drawPoints);if(spec){draft=spec;renderDimensions();}renderTools();updateDrawing({keepForm:true});}
+function appendTracePoint(point, start){
+ if(drawPoints.length>=27)return toast('Un profil peut contenir au maximum 26 segments.');
+ const last=drawPoints.at(-1);
+ if(last&&Math.hypot(point[0]-last[0],point[1]-last[1])<.01)return;
+ if(!last&&start)drawPoints.push(start);
+ drawPoints.push(point);
+ const spec=toCustom(drawPoints);
+ if(spec){draft=spec;renderDimensions();}
+ renderTools();
+ updateDrawing({keepForm:true});
+}
+function drawingClick(event){
+ if(suppressClick){suppressClick=false;return;}
+ if(!canDrawProfile())return;
+ const raw=localPoint(event);
+ if(!raw)return;
+ const heading=drawPoints.length>=3?build().segments.at(-1)?.headingDeg:undefined;
+ const point=event.shiftKey&&drawPoints.length
+  ?draggedSegment(event,{start:drawPoints.at(-1),heading:finite(heading)?heading*Math.PI/180:drawPoints.length===2?Math.atan2(drawPoints[1][1]-drawPoints[0][1],drawPoints[1][0]-drawPoints[0][0]):undefined})?.point
+  :rightAngleSnap?snapDrawRightAngle(drawPoints,raw,heading):raw;
+ if(point)appendTracePoint(point);
+}
 function exportMirTemplates(){
  const output=window.MIRTemplateBackup?.create(templates);
  if(!output?.ok)return toast(output?.error||'Sauvegarde de modèles indisponible.');
@@ -750,8 +836,8 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  const savedTemplates=read(KEYS.templates,{version:1,records:[]});templates=Array.isArray(savedTemplates.records)?savedTemplates.records.filter(record=>record?.id&&latest(record)&&M.templatePreview(latest(record)).ok):[];const savedRequests=read(KEYS.requests,{version:1,requests:[]});requests=Array.isArray(savedRequests.requests)?savedRequests.requests.filter(request=>request?.id&&Array.isArray(request.items)&&request.items.every(item=>item.spec&&item.snapshot?.schema==='mir-production-instance-1')):[];
  const saved=read(KEYS.draft,null);order=saved?.version===1&&Array.isArray(saved.order?.items)?normalizeWorkshopOrder(saved.order):defaultOrder();
  injectWorkflow();if(client){$('#production-eyebrow').textContent='L’ATELIER MIR / VOS PIÈCES SUR MESURE';$('#production-title').innerHTML='Votre pièce.<br>À vos <em>mesures.</em>';$('#production-description').textContent='Choisissez la forme. Entrez vos cotes, votre métal et votre couleur. Votre dessin suit vos choix.';$('#mode-link').href='#production-order';$('#mode-link').innerHTML='Mon dossier <span aria-hidden="true">↘</span>';$('#order-metadata').open=false;}
- document.addEventListener('click',handleClick);document.addEventListener('input',handleInput);document.addEventListener('change',handleChange);document.addEventListener('submit',handleSubmit);document.addEventListener('keydown',handleKey);
- const stage=$('#production-drawing');stage.addEventListener('pointerdown',beginPointDrag);stage.addEventListener('pointermove',movePoint);stage.addEventListener('pointerup',endPoint);stage.addEventListener('pointercancel',endPoint);stage.addEventListener('click',drawingClick);stage.addEventListener('wheel',event=>{if(kind!=='panel'&&view!=='volume')return;event.preventDefault();setZoom(zoom*Math.exp(-event.deltaY*.001));},{passive:false});
+ document.addEventListener('click',handleClick);document.addEventListener('input',handleInput);document.addEventListener('change',handleChange);document.addEventListener('submit',handleSubmit);document.addEventListener('keydown',handleKey);document.addEventListener('keydown',traceShift);document.addEventListener('keyup',traceShift);
+ const stage=$('#production-drawing');stage.addEventListener('pointerdown',beginPointDrag);stage.addEventListener('pointermove',movePoint);stage.addEventListener('pointerup',endPoint);stage.addEventListener('pointercancel',endPoint);stage.addEventListener('pointerleave',event=>{if(drag?.type==='trace'&&!drag.moved)endPoint(event);});stage.addEventListener('click',drawingClick);stage.addEventListener('wheel',event=>{if(kind!=='panel'&&view!=='volume')return;event.preventDefault();setZoom(zoom*Math.exp(-event.deltaY*.001));},{passive:false});
  $('#production-dialog').addEventListener('click',event=>{if(event.target!==$('#production-dialog'))return;const r=$('#production-dialog').getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeDialog();});
  choose(kind,kind==='panel'?'rectangle':'l');const requestedMaterial=params.get('material');if(kind==='panel'&&['unico-up1-acier','unico-up1-aluminium'].includes(requestedMaterial)){const type=requestedMaterial.endsWith('aluminium')?'aluminium':'acier';draft.material={type,name:'Unico U-P1 — '+(type==='acier'?'Acier':'Aluminium plié'),productRef:requestedMaterial,thickness:'',thicknessUnit:'mm',gauge:''};materialId=availableMaterials()[0]?.id||'';colorSystem='manufacturer';const requestedColor=params.get('color'),palette=availableMaterials().find(m=>m.colors.some(c=>c.id===requestedColor));if(palette){materialId=palette.id;colorId=requestedColor;}render();}const linked=params.get('template');if(linked&&templates.some(record=>record.id===linked))useSavedTemplate(linked);if(!client&&params.get('view')==='models'){workflow='models';render();}if(!client&&params.get('view')==='requests'){workflow='requests';render();}if(client&&params.get('kind')==='profile'&&!linked)choose('profile','l');
  if(!client)window.addEventListener('storage',event=>{if([KEYS.draft,window.MIRPanelLayoutOutput?.STORAGE_KEY].includes(event.key))renderLayoutImport();});
