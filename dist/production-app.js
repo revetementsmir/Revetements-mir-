@@ -121,7 +121,8 @@ function renderColorGrid(){
   ?ral.colors.filter(c=>`${c.code} ${c.nameEn||''} ${c.family||c.familyFR||''}`.toLocaleLowerCase('fr').includes(colorQuery.toLocaleLowerCase('fr')))
   :chosenMaterial()?.colors||[];
  if($('#color-count'))$('#color-count').textContent=`${colors.length} codes · aperçus indicatifs`;
- const flat=kind==='profile'&&colorSystem==='manufacturer'&&chosenMaterial()?.brand==='Kaycan'
+ const flat=kind==='profile'&&colorSystem==='manufacturer'&&
+  (chosenMaterial()?.brand==='Kaycan'||chosenMaterial()?.brand==='MAC Métal architectural')
   ?window.MIRKaycanFlatPreview:null;
  grid.innerHTML=colors.map(c=>{
   const image=safeAsset(c.swatchUrl||c.swatchImage),
@@ -144,7 +145,7 @@ function renderColorGrid(){
   });
  }
 }
-function updateFinish(){if(authoring){$('#selected-finish').innerHTML='';return;}draft.finish=currentFinish();const c=chosenColor(),image=safeAsset(c?.swatchUrl||c?.swatchImage),finish=draft.finish,source=safeURL(c?.sourceUrl||chosenMaterial()?.sourceUrl||''),flat=kind==='profile'&&window.MIRKaycanFlatPreview?.isKaycan(finish)?window.MIRKaycanFlatPreview:null,flatHex=flat?.get(image)||'#e5e9e0';$('#selected-finish').innerHTML=(finish.code||finish.name)?`${flat?`<span class="kaycan-flat-chip" role="img" aria-label="Aperçu uni indicatif de ${esc(finish.name)}" style="background:${flatHex}"></span>`:image?`<img src="${esc(image)}" alt="Échantillon fabricant de ${esc(finish.name)}">`:''}<div><strong>${esc(finish.name||finish.code)}</strong><span>${esc(finish.code||'Code à confirmer')} · ${esc(finish.manufacturer||finish.system||'Référence spéciale')}</span><p>${esc(colorSystem==='ral'?ral.displayNotice:colorSystem==='special'?'Demande spéciale : faisabilité, teinte et disponibilité à confirmer.':flat?'Aperçu uni estimé d’un visuel Kaycan, non certifié. Teinte et disponibilité à confirmer sur un échantillon réel.':c?.availabilityNote||'Disponibilité sur ce profil à confirmer. Écran indicatif.')}</p>${colorSystem==='manufacturer'&&source?`<a href="${esc(source)}" target="_blank" rel="noopener">Source du fabricant ↗</a>`:''}</div>`:'<div><strong>La teinte reste à choisir.</strong><p>Choisissez une référence précise pour votre pièce.</p></div>';}
+function updateFinish(){if(authoring){$('#selected-finish').innerHTML='';return;}draft.finish=currentFinish();const c=chosenColor(),image=safeAsset(c?.swatchUrl||c?.swatchImage),finish=draft.finish,source=safeURL(c?.sourceUrl||chosenMaterial()?.sourceUrl||''),flat=kind==='profile'&&window.MIRKaycanFlatPreview?.isFlatPreview(finish)?window.MIRKaycanFlatPreview:null,flatHex=flat?.get(image)||'#e5e9e0';$('#selected-finish').innerHTML=(finish.code||finish.name)?`${flat?`<span class="kaycan-flat-chip" role="img" aria-label="Aperçu uni indicatif de ${esc(finish.name)}" style="background:${flatHex}"></span>`:image?`<img src="${esc(image)}" alt="Échantillon fabricant de ${esc(finish.name)}">`:''}<div><strong>${esc(finish.name||finish.code)}</strong><span>${esc(finish.code||'Code à confirmer')} · ${esc(finish.manufacturer||finish.system||'Référence spéciale')}</span><p>${esc(colorSystem==='ral'?ral.displayNotice:colorSystem==='special'?'Demande spéciale : faisabilité, teinte et disponibilité à confirmer.':flat?'Aperçu uni estimé du visuel fabricant, non certifié. Teinte, texture et disponibilité à confirmer sur un échantillon réel.':c?.availabilityNote||'Disponibilité sur ce profil à confirmer. Écran indicatif.')}</p>${colorSystem==='manufacturer'&&source?`<a href="${esc(source)}" target="_blank" rel="noopener">Source du fabricant ↗</a>`:''}</div>`:'<div><strong>La teinte reste à choisir.</strong><p>Choisissez une référence précise pour votre pièce.</p></div>';}
 function fitModel(model){const p=model.pointsMM||[],xs=p.map(v=>v[0]),ys=p.map(v=>v[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const scale=Math.min(580/Math.max(1,maxX-minX),340/Math.max(1,maxY-minY));return {scale,ox:400-(minX+maxX)*scale/2,oy:255+(minY+maxY)*scale/2};}
 function pointOnView(point,tr){return [tr.ox+point[0]*tr.scale,tr.oy-point[1]*tr.scale];}
 function drawingModel(){const actual=build();if(actual.valid)return {model:actual,illustrative:authoring};const example=selectedTemplate&&M.templatePreview(selectedTemplate);return {model:example?.ok?example.model:build(sampleSpec(kind,kind==='profile'?draft.template:draft.shape)),illustrative:true};}
@@ -260,14 +261,14 @@ function profileVolumeSVG(model,illustrative){
  const cx=(Math.max(...xs)+Math.min(...xs))/2,cy=(Math.max(...ys)+Math.min(...ys))/2;
  const pixel=([x,y])=>[fmt(400+(x-cx)*scale),fmt(255-(y-cy)*scale)].join(',');
  const finish=illustrative&&!authoring?draft.finish||{}:model.spec?.finish||model.finish||{};
- const flatKaycan=window.MIRKaycanFlatPreview?.isKaycan(finish)===true;
- const swatch=flatKaycan?null:safeAsset(finish.swatchUrl);
+ const flatPreview=window.MIRKaycanFlatPreview?.isFlatPreview(finish)===true;
+ const swatch=flatPreview?null:safeAsset(finish.swatchUrl);
  const paint=/^#[0-9a-f]{6}$/i.test(finish.hex||'')?finish.hex
-  :(flatKaycan?window.MIRKaycanFlatPreview.get(safeAsset(finish.swatchUrl)):null);
+  :(flatPreview?window.MIRKaycanFlatPreview.get(safeAsset(finish.swatchUrl)):null);
  const pattern=swatch?`<defs><pattern id="production-paint" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${paint||'#a9adb1'}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern></defs>`:'';
  const polygons=orderProfileStrips(strips,eye).map(({a,b,facing})=>{
   const side=facing>0?'left':'right';
-  const painted=side===model.coloredFace?.side&&!!(paint||swatch||flatKaycan);
+  const painted=side===model.coloredFace?.side&&!!(paint||swatch||flatPreview);
   const angle=Math.atan2(b[1]-a[1],b[0]-a[0]);
   const gray=Math.round(170+30*Math.abs(Math.sin(angle)));
   const fill=painted?(swatch?'url(#production-paint)':paint||'#c0c7bc'):`rgb(${gray},${gray+3},${gray+6})`;
