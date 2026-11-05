@@ -56,14 +56,15 @@
     }
     @media (orientation:landscape){.mobile-trace .mobile-trace-notice{display:none}}
   </style>
-</head>
+<link rel="stylesheet" href="mir-home-premium.css?v=20261105"><link rel="stylesheet" href="mir-client-header.css?v=1"><script>document.documentElement.classList.toggle("mir-production-client",new URLSearchParams(location.search).get("mode")==="client");</script></head>
 <body>
   <a class="skip-link" href="#production-main">Aller au configurateur</a>
   <div class="workshop-banner"><span><i aria-hidden="true"></i> Un dessin précis. Une finition à votre mesure.</span><span>Dossier local · validation par l’atelier</span></div>
   <header class="production-header">
     <a class="production-brand" href="index.html" aria-label="Les Revêtements MIR, accueil"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="364" height="91"></a>
     <nav aria-label="Navigation du site"><a href="boutique.html">Boutique</a><a href="pliage.html">Pliage sur mesure</a><a href="metres.html" data-admin-only>Atelier</a><a href="calepinage.html" data-admin-only>Calepinage</a><a href="production.html?view=orders" data-admin-only>Bons de commande</a><a href="production.html?view=suppliers" data-admin-only>Fournisseurs</a></nav>
-    <a class="header-link" href="production.html?mode=client" id="mode-link">Voir le parcours client <span aria-hidden="true">↗</span></a>
+    <nav class="mir-client-links mir-production-client-nav" aria-label="Navigation principale client"><a href="boutique.html">Revêtements</a><a href="index.html#realisations">Réalisations</a><a href="pliage.html">Pliage sur mesure</a><a href="plan.html">Studio 3D</a><a href="index.html#nous-joindre">Nous joindre</a></nav>
+    <a class="mir-home-account mir-production-client-account" href="chantier.html">Mon compte</a><a class="header-link" href="production.html?mode=client" id="mode-link">Voir le parcours client <span aria-hidden="true">↗</span></a>
   </header>
   <main id="production-main" class="production-wrap">
     <section class="production-intro"><div><p class="eyebrow" id="production-eyebrow">L’ATELIER MIR / PRÉPARATION DE PRODUCTION</p><h1 id="production-title">Du dessin à<br>la <em>fabrication.</em></h1></div><div class="intro-copy"><p id="production-description">Un profil, des cotes, une couleur. Préparez vos pièces avec les repères dont l’atelier a besoin.</p><a class="text-link" href="#production-order">Mon dossier <span id="order-head-count">00</span> <span aria-hidden="true">↘</span></a></div></section>
