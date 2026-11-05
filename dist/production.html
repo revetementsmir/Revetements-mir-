@@ -17,10 +17,15 @@
   <script src="architectural-wall-geometry.js" defer></script>
   <script src="panel-layout-engine.js" defer></script>
   <script src="panel-layout-output.js" defer></script>
-  <script src="atelier-essai/mir-calepinage-extension.js" defer></script><script src="profile-production-transfer.js" defer></script><script src="mir-bending-presets.js?v=profils-1" defer></script><script src="model-measure-defaults.js?v=defaults-1" defer></script><script src="template-library-backup.js?v=backup-1&destinations=1" defer></script><script src="production-app.js?v=echantillon-3d-17" defer></script>
+  <script src="atelier-essai/mir-calepinage-extension.js" defer></script><script src="profile-production-transfer.js" defer></script><script src="mir-bending-presets.js?v=profils-1" defer></script><script src="model-measure-defaults.js?v=defaults-1" defer></script><script src="template-library-backup.js?v=backup-1&destinations=1" defer></script><script src="production-app.js?v=apercu-enregistrement-18" defer></script>
   <script src="production-admin-v4.js?v=1" defer></script>
   <script type="module" src="studio-capture.mjs"></script>
   <style>
+    .save-template-preview{position:sticky;top:-28px;z-index:2;margin:0 0 16px;padding:8px;background:#fcfcf8;border:1px solid #ccd8c4;border-radius:8px;box-shadow:0 3px 9px #253b2d18}
+    .save-template-preview figcaption{font-size:12px;color:#345d3d;text-align:center}
+    .save-template-preview svg{display:block;width:100%;height:190px}
+    @media(max-height:550px){.save-template-preview svg{height:110px}}
+
     .trace-more{width:100%}
     .trace-more summary{padding:8px 2px;cursor:pointer}
     .trace-more>div{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
