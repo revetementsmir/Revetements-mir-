@@ -51,6 +51,10 @@ jobs:
           node tests/mir-client-header.cjs
           node --check tests/mir-client-signature.cjs
           node tests/mir-client-signature.cjs
+          node --check tests/mir-realisations.cjs
+          node tests/mir-realisations.cjs
+          node --check dist/mir-realisations.js
+          node --check tests/mir-realisations-browser.cjs
           node --check tests/mir-client-signature-browser.cjs
           node --check tests/mir-client-header-browser.cjs
       - name: Vérifier l'accueil MIR en vrai navigateur Chrome
@@ -59,6 +63,7 @@ jobs:
           node tests/mir-homepage-browser.cjs
           node tests/mir-client-header-browser.cjs
           node tests/mir-client-signature-browser.cjs
+          node tests/mir-realisations-browser.cjs
           node tests/mir-miniatures-browser.cjs
           node tests/mir-direct-po-browser.cjs
           node tests/mir-drawing-pan-browser.cjs
@@ -72,6 +77,7 @@ jobs:
             artifacts/mir-accueil-*.png
             artifacts/mir-entete-*.png
             artifacts/mir-signature-*.png
+            artifacts/mir-realisations-*.png
             artifacts/mir-miniatures-*.png
             artifacts/mir-direct-po-*.png
             artifacts/mir-pan-*.png
@@ -89,6 +95,8 @@ jobs:
           test -f _site_mir/atelier-essai/mir-calepinage-extension.js
           test -f _site_mir/assets/MIR-logo-officiel-original.svg
           test -f _site_mir/mir-home-premium.css
+          test -s _site_mir/realisations.html
+          for photo in realisations-mir-contemporain-brun-large.webp realisations-mir-contemporain-brun-mobile.webp realisations-mir-contrastes-large.webp realisations-mir-contrastes-mobile.webp realisations-mir-classique-large.webp realisations-mir-classique-mobile.webp; do test -s "_site_mir/assets/realisations/$photo"; done
           for image in mir-home-hero-20261105.avif mir-home-hero-20261105.webp mir-home-card-revetement-20261105.webp mir-home-card-pliage-20261105.webp mir-home-card-studio-20261105.webp; do test -s "_site_mir/assets/$image"; done
           if find _site_mir/atelier-essai -type f -name '*-candidate.html' | grep -q .; then
             echo "Les écrans de démonstration ne doivent pas être publiés." >&2
@@ -124,7 +132,17 @@ jobs:
           grep -F -- '--mir-accent:#348511' /tmp/mir-client-signature.css
           fetch "$base/mir-client-header.css" /tmp/mir-client-header.css
           grep -F '.mir-client-header' /tmp/mir-client-header.css
+          fetch "$base/realisations.html" /tmp/mir-realisations.html
+          grep -F 'Nos réalisations' /tmp/mir-realisations.html
+          grep -F 'realisations-mir-contemporain-brun-large.webp' /tmp/mir-realisations.html
+          grep -F 'realisations-mir-contrastes-large.webp' /tmp/mir-realisations.html
+          grep -F 'realisations-mir-classique-large.webp' /tmp/mir-realisations.html
+          fetch "$base/assets/realisations/realisations-mir-contemporain-brun-large.webp" /tmp/mir-realisations-1.webp
+          test "$(wc -c </tmp/mir-realisations-1.webp)" -gt 100000
+          fetch "$base/mir-realisations.css" /tmp/mir-realisations.css
+          grep -F '.mir-gallery-grid' /tmp/mir-realisations.css
           fetch "$base/boutique.html" /tmp/mir-boutique.html
+          grep -F 'href="realisations.html"' /tmp/mir-boutique.html
           grep -F 'mir-client-header.css?v=1' /tmp/mir-boutique.html
           grep -F 'mir-client-signature.css?v=1' /tmp/mir-boutique.html
           fetch "$base/plan.html" /tmp/mir-plan-public.html

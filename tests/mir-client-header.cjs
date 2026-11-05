@@ -7,7 +7,7 @@ const read=p=>fs.readFileSync(path.join(dir,p),'utf8');
 let count=0;
 function test(name,fn){fn();console.log('PASS '+name);count++}
 const customerPages=['boutique.html','produit.html','selection.html','pliage.html','materiaux.html','plan.html','chantier.html'];
-const navTargets=['boutique.html','index.html#realisations','pliage.html','plan.html','index.html#nous-joindre'];
+const navTargets=['boutique.html','realisations.html','pliage.html','plan.html','index.html#nous-joindre'];
 test('Entête client commun sur toutes les pages publiques',()=>{
  for(const name of customerPages){
   const h=read(name);

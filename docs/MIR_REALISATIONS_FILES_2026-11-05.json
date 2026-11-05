@@ -1,0 +1,38 @@
+[
+  {
+    "slug": "realisations-mir-contemporain-brun",
+    "originalFilename": "96084.jpg",
+    "sha256": "951ec75cd712e68e983bcca5b93b08d17d0d9f544d4f2db322c1f76aa9e6db04",
+    "originalBytes": 461597,
+    "resolution": [
+      1536,
+      1152
+    ],
+    "webpLarge": "realisations-mir-contemporain-brun-large.webp",
+    "webpMobile": "realisations-mir-contemporain-brun-mobile.webp"
+  },
+  {
+    "slug": "realisations-mir-contrastes",
+    "originalFilename": "96083.jpg",
+    "sha256": "84e8b991dbf79abd57e94a4ddbcbea1c54b0d0e5f8eccdbda0982f76c8394746",
+    "originalBytes": 480930,
+    "resolution": [
+      1536,
+      1423
+    ],
+    "webpLarge": "realisations-mir-contrastes-large.webp",
+    "webpMobile": "realisations-mir-contrastes-mobile.webp"
+  },
+  {
+    "slug": "realisations-mir-classique",
+    "originalFilename": "96085.jpg",
+    "sha256": "ac67b0a79029260f4a14a71f6bcdf7d4a85db01354eb579c530f86a130a1c708",
+    "originalBytes": 489136,
+    "resolution": [
+      1536,
+      1152
+    ],
+    "webpLarge": "realisations-mir-classique-large.webp",
+    "webpMobile": "realisations-mir-classique-mobile.webp"
+  }
+]

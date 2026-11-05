@@ -12,7 +12,7 @@ const server=http.createServer((req,res)=>{
  fs.createReadStream(file).pipe(res);
 });
 const views=[{name:'pc',width:1440,height:900},{name:'tablette',width:820,height:1100},{name:'mobile',width:390,height:844}];
-const routes=['index.html','boutique.html','pliage.html','materiaux.html','produit.html','selection.html','plan.html','chantier.html','production.html?mode=client'];
+const routes=['index.html','realisations.html','boutique.html','pliage.html','materiaux.html','produit.html','selection.html','plan.html','chantier.html','production.html?mode=client'];
 async function main(){
  await new Promise(ok=>server.listen(0,'127.0.0.1',ok));
  const base='http://127.0.0.1:'+server.address().port+'/';
