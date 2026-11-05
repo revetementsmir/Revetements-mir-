@@ -174,6 +174,16 @@ const server=http.createServer((req,res)=>{
    assert.equal(await page.locator('[data-volume="width"]').inputValue(),'40');
    assert.deepEqual(errors,[]);
    console.log('PASS '+width+' px : PDF 108 Mo / 67 pages, cinq vues repérées sans sélection et rendu 3D automatique');
+   await page.goto('http://127.0.0.1:'+server.address().port+'/plan.html?annoter');
+   const annotations=page.getByRole('complementary',{name:'Annotations du Studio'});
+   await annotations.getByRole('button',{name:'Pointer un élément'}).click();
+   await page.locator('#import-pdf').click();
+   await annotations.getByRole('textbox',{name:'Note',exact:true}).fill('Agrandir ce bouton');
+   await annotations.getByRole('button',{name:'Ajouter',exact:true}).click();
+   assert.match(await annotations.getByRole('listitem').innerText(),/Importer mon plan PDF.*Agrandir ce bouton/);
+   assert.equal(await page.locator('#import-pdf.mir-annotation-selected').count(),1);
+   assert.ok(await annotations.getByRole('button',{name:'Copier les notes'}).isEnabled());
+   console.log('PASS '+width+' px : sélection et ajout d’une annotation du Studio');
    await page.close();
   }
  }finally{if(browser)await browser.close();server.close();fs.rmSync(tmp,{recursive:true,force:true});}
