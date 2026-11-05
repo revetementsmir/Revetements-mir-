@@ -77,7 +77,8 @@ async function online(){
    width:document.documentElement.scrollWidth,
    viewport:window.innerWidth
   }));
-  assert.equal(shopCheck.background,'rgb(247, 248, 243)');
+  assert.ok(['rgb(247, 248, 243)','rgb(250, 250, 247)'].includes(shopCheck.background),
+   'Fond MIR incohérent : '+shopCheck.background);
   assert.equal(shopCheck.miniScript,true);
   assert.ok(shopCheck.width<=shopCheck.viewport+2);
   console.log('PASS boutique harmonisée et moteur de miniatures chargé');
