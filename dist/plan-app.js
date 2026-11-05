@@ -324,7 +324,25 @@
     const f=face(),n=++rendering;
     renderCoverageSummary();
     $('#elevation').hidden=state.view==='3d';$('#three-canvas').hidden=state.view!=='3d';$('#rotate-control').hidden=state.view!=='3d';
-    $('#volume-unavailable').hidden=true;if(state.view==='2d')$('#elevation').innerHTML=sideStudyWithDetachedWalls(f,facadeSVG(f));
+    $('#volume-unavailable').hidden=true;
+    const sideView=$('#elevation'),sideButton=$('#mir-side-wall-scroll');
+    if(state.view==='2d'){
+      const view=sideStudyWithDetachedWalls(f,facadeSVG(f));
+      sideView.innerHTML=view;
+      sideView.classList.toggle('mir-studio-detached-side',view.includes('data-mir-three-wall-explode="true"'));
+      sideView.dataset.mode=state.displayMode;
+      sideView.scrollLeft=0;
+    } else sideView.classList.remove('mir-studio-detached-side');
+    if(sideButton){
+      sideButton.hidden=!sideView.classList.contains('mir-studio-detached-side')||!matchMedia('(max-width:650px)').matches;
+      sideButton.textContent='Voir les 3 murs →';
+      sideButton.onclick=()=>{
+        const far=sideView.scrollWidth-sideView.clientWidth;
+        const toRight=sideView.scrollLeft<far*.5;
+        sideView.scrollTo({left:toRight?far:0,behavior:'smooth'});
+        sideButton.textContent=toRight?'← Voir la maison':'Voir les 3 murs →';
+      };
+    }
     $('#stage-title').textContent=state.view==='3d'?'VOTRE PROJET / VUE 360°':`${String(f.page).padStart(2,'0')} / ÉLÉVATION ${f.name.toLocaleUpperCase('fr')}`;
     $('#stage-subtitle').textContent=state.view==='3d'?'Cliquez pour choisir · glissez pour tourner et incliner':state.displayMode==='atelier'?'Déplacez les joints · cotes en pouces':'Cliquez sur une matière pour la modifier';
     $('#stage-note').textContent=state.view==='3d'?'Matières et finitions · vue interactive':'Fenêtres et portes protégées';
