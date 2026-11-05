@@ -61,7 +61,7 @@
     if (drawingTools && drawingNav) drawingNav.after(drawingTools);
 
     const originalHeading = $('.config-card > .section-heading');
-    const dim = section('Dimensions', 'mir-v4-dimensions', matchMedia('(min-width: 851px)').matches);
+    const dim = section('Dimensions', 'mir-v4-dimensions', matchMedia('(min-width: 1151px)').matches);
     const unitField = $('.unit-field', originalHeading);
     const hint = $('#measure-hint');
     if (unitField) dim.content.append(unitField);
@@ -74,25 +74,25 @@
     const finishSummary = $('summary', finish);
     if (finishSummary) finishSummary.innerHTML = '<span class="mir-v4-section-label">Matériaux</span><span class="mir-v4-chevron" aria-hidden="true">⌄</span><span id="finish-summary" hidden></span>';
     finish.classList.add('mir-v4-section', 'mir-v4-materials');
-    finish.open = matchMedia('(min-width: 851px)').matches;
+    finish.open = matchMedia('(min-width: 1151px)').matches;
     const matLabel = $('#material-type')?.closest('label');
     if (matLabel?.firstChild?.nodeType === Node.TEXT_NODE) matLabel.firstChild.textContent = 'Matériau';
 
-    const colors = section('Couleur', 'mir-v4-colors', matchMedia('(min-width: 851px)').matches);
+    const colors = section('Couleur', 'mir-v4-colors', matchMedia('(min-width: 1151px)').matches);
     const colorSystem = $('#color-system')?.closest('label');
     for (const element of [colorSystem, $('#production-color-fields'), $('#selected-finish'), $('#custom-color-quote'), $('#panel-price')]) {
       if (element) colors.content.append(element);
     }
     finish.after(colors.details);
 
-    const face = section('Face colorée', 'mir-v4-face', matchMedia('(min-width: 851px)').matches);
+    const face = section('Face colorée', 'mir-v4-face', matchMedia('(min-width: 1151px)').matches);
     face.content.append($('#production-profile-options'));
     colors.details.after(face.details);
 
     const footer = $('#add-production-piece')?.closest('.config-section');
     if (footer) {
       footer.classList.add('mir-v4-footer');
-      const extras = section('Détails de la pièce', 'mir-v4-details', matchMedia('(min-width: 851px)').matches);
+      const extras = section('Détails de la pièce', 'mir-v4-details', matchMedia('(min-width: 1151px)').matches);
       const fields = $('.two-fields', footer);
       const note = Array.from(footer.children).find(el => el.tagName === 'LABEL');
       if (fields) extras.content.append(fields);
@@ -159,7 +159,7 @@
 
     // La version ordinateur garde les réglages ouverts ; mobile et tablette
     // présentent des accordéons sans cacher le bouton d'enregistrement.
-    const media = matchMedia('(max-width: 850px)');
+    const media = matchMedia('(max-width: 1150px)');
     const applyDevice = () => {
       for (const group of [dim.details, finish, colors.details, face.details, extrasSafe()]) {
         if (group) group.open = !media.matches;
