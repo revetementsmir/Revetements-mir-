@@ -697,7 +697,8 @@
       if(bend?.mode!=='hem'||!next)continue;
       const length=dist(next,point);
       if(length<EPS)continue;
-      const radius=3.5,side=bend.direction==='right'?-1:1;
+      // Rayon visuel du croquis, en unités SVG. Les cotes restent celles du profil.
+      const radius=2,side=bend.direction==='right'?-1:1;
       offset=[offset[0]-(next[1]-point[1])/length*2*radius*side,offset[1]+(next[0]-point[0])/length*2*radius*side];
       start=[point[0]+offset[0],point[1]+offset[1]];
       folds.push([(end[0]+start[0])/2,(end[1]+start[1])/2]);
