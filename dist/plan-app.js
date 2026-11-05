@@ -326,21 +326,38 @@
     $('#elevation').hidden=state.view==='3d';$('#three-canvas').hidden=state.view!=='3d';$('#rotate-control').hidden=state.view!=='3d';
     $('#volume-unavailable').hidden=true;
     const sideView=$('#elevation'),sideButton=$('#mir-side-wall-scroll');
+    let homeViewBox=null,detachedViewBox=null;
     if(state.view==='2d'){
-      const view=sideStudyWithDetachedWalls(f,facadeSVG(f));
+      const original=facadeSVG(f),view=sideStudyWithDetachedWalls(f,original);
       sideView.innerHTML=view;
-      sideView.classList.toggle('mir-studio-detached-side',view.includes('data-mir-three-wall-explode="true"'));
+      const sideSvg=sideView.querySelector('svg[data-mir-three-wall-explode="true"]');
+      sideView.classList.toggle('mir-studio-detached-side',!!sideSvg);
       sideView.dataset.mode=state.displayMode;
-      sideView.scrollLeft=0;
+      if(sideSvg&&matchMedia('(max-width:650px)').matches){
+        // Sur un téléphone, garder toute la maison lisible. Le même SVG
+        // affiche les trois murs à leur altitude sur une deuxième vue ciblée.
+        const source=original.match(/viewBox="([^"]+)"/)?.[1].split(/[\\s,]+/).map(Number);
+        const full=sideSvg.viewBox.baseVal;
+        if(source?.length===4&&source.every(Number.isFinite)&&full.width>source[2]){
+          homeViewBox=source;
+          const startX=source[0]+source[2]+40;
+          detachedViewBox=[startX,source[1],Math.max(1,full.x+full.width-startX),source[3]];
+          sideSvg.setAttribute('viewBox',homeViewBox.join(' '));
+          sideSvg.dataset.mirHomeViewBox=homeViewBox.join(' ');
+          sideSvg.dataset.mirWallsViewBox=detachedViewBox.join(' ');
+        }
+      }
     } else sideView.classList.remove('mir-studio-detached-side');
     if(sideButton){
-      sideButton.hidden=!sideView.classList.contains('mir-studio-detached-side')||!matchMedia('(max-width:650px)').matches;
+      sideButton.hidden=!homeViewBox||!detachedViewBox;
       sideButton.textContent='Voir les 3 murs →';
+      let showingWalls=false;
       sideButton.onclick=()=>{
-        const far=sideView.scrollWidth-sideView.clientWidth;
-        const toRight=sideView.scrollLeft<far*.5;
-        sideView.scrollTo({left:toRight?far:0,behavior:'smooth'});
-        sideButton.textContent=toRight?'← Voir la maison':'Voir les 3 murs →';
+        const svg=sideView.querySelector('svg[data-mir-three-wall-explode="true"]');
+        if(!svg||!homeViewBox||!detachedViewBox)return;
+        showingWalls=!showingWalls;
+        svg.setAttribute('viewBox',(showingWalls?detachedViewBox:homeViewBox).join(' '));
+        sideButton.textContent=showingWalls?'← Voir la maison':'Voir les 3 murs →';
       };
     }
     $('#stage-title').textContent=state.view==='3d'?'VOTRE PROJET / VUE 360°':`${String(f.page).padStart(2,'0')} / ÉLÉVATION ${f.name.toLocaleUpperCase('fr')}`;
