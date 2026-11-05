@@ -176,10 +176,23 @@
     return {maxWidthIn:spec.physicalDisplayWidthIn||null,maxLengthIn:spec.physicalDisplayHeightIn||null,rotationAllowed:state.panelStockRotation!==false,formatId:spec.formatId,known:!!spec.complete,stockKnown:!!spec.complete};
   }
   function panelLayoutFor(f,z){
-    const c=z.selection||choice(f,z),m=materialById.get(c.materialId),b=bounds(z.polygon),scale=feetPerPixel(f),saved=state.panelLayouts[key(f.key,z.id)];
+    const c=z.selection||choice(f,z),m=materialById.get(c.materialId),b=bounds(z.polygon),scale=feetPerPixel(f),id=key(f.key,z.id),saved=state.panelLayouts[id];
     const generated=C.panelGrid(b,scale,m,c);
-    if(saved&&saved.mode!=='product'&&!C.isLegacyAutomatic?.(saved,b,scale,m))return {...saved,mode:'manual',vertical:L.normaliseLines(saved.vertical),horizontal:L.normaliseLines(saved.horizontal)};
-    return generated;
+    const manual=saved&&saved.mode!=='product'&&!C.isLegacyAutomatic?.(saved,b,scale,m);
+    const layout=manual?{...saved,mode:'manual',vertical:L.normaliseLines(saved.vertical),horizontal:L.normaliseLines(saved.horizontal)}:generated;
+    const rule=V?.verticalRule(m,c);
+    if(!rule||c.pattern!=='panel')return layout;
+    // Pour Board & Batten, la moulure de transition EST la jointure
+    // horizontale du panneau, pas un trait décoratif indépendant.
+    const existing=state.transitions.filter(t=>t.face===f.key&&t.zoneId===z.id&&t.orientation==='horizontal');
+    const automatic=state.manualTransitionModes[id]?[]:V.breaks({
+      polygon:z.polygon,feetPerPixel:scale,material:m,choice:c,openings:allOpenings(f),
+      manualTransitions:existing
+    }).items.map(t=>({position:t.position,source:'auto'}));
+    const horizontal=L.normaliseLines([...existing.map(t=>({id:'transition-'+t.id,position:t.position})),
+      ...automatic.map((t,i)=>({id:'auto-transition-'+i,position:t.position}))]);
+    return {...layout,mode:'mir-transition-linked',horizontal,
+      linkedTransitionMaxIn:rule.maxRunIn,linkedTransitionCount:horizontal.length};
   }
   function panelResult(f,z,prepared){
     const spec=panelSpec(materialById.get(choice(f,z).materialId),choice(f,z));
@@ -625,10 +638,13 @@
   }
   function renderPanelEditor(f,z,c,m){
     const isPanel=c.pattern==='panel';$('#panel-editor').hidden=!isPanel;
+    const linkedPanels=!!V?.verticalRule(m,c)&&isPanel;
+    const manualHorizontalButton=$('[data-add-joint="horizontal"]');
+    if(manualHorizontalButton)manualHorizontalButton.hidden=linkedPanels;
     const alerts=[];
     if(isPanel){
       const layout=panelLayoutFor(f,z),result=panelResult(f,z),spec=panelSpec(m,c);
-      $('#joint-list').innerHTML=['vertical','horizontal'].flatMap(orientation=>layout[orientation].map((joint,i)=>{const selected=selectedJoint?.zoneId===z.id&&selectedJoint.id===joint.id&&selectedJoint.orientation===orientation;return `<div class="joint-row ${selected?'is-selected':''}"><label for="joint-${esc(orientation+joint.id)}">${orientation==='vertical'?'Vertical':'Horizontal'} ${i+1}<small>Depuis ${orientation==='vertical'?'le bord gauche':'le haut'} · po</small></label><input id="joint-${esc(orientation+joint.id)}" data-joint-position="${esc(joint.id)}" data-orientation="${orientation}" inputmode="decimal" value="${positionText(layoutDimension(f,z,orientation)*joint.position)}" aria-label="Position du joint ${orientation} ${i+1} en pouces"><button data-delete-joint="${esc(joint.id)}" data-orientation="${orientation}" aria-label="Retirer ce joint">×</button></div>`;})).join('')||`<p class="small-note">${spec.known?'Aucun joint intérieur dans cette zone.':'Format à confirmer. Vous pouvez placer des joints personnalisés.'}</p>`;
+      $('#joint-list').innerHTML=['vertical','horizontal'].filter(orientation=>!(linkedPanels&&orientation==='horizontal')).flatMap(orientation=>layout[orientation].map((joint,i)=>{const selected=selectedJoint?.zoneId===z.id&&selectedJoint.id===joint.id&&selectedJoint.orientation===orientation;return `<div class="joint-row ${selected?'is-selected':''}"><label for="joint-${esc(orientation+joint.id)}">${orientation==='vertical'?'Vertical':'Horizontal'} ${i+1}<small>Depuis ${orientation==='vertical'?'le bord gauche':'le haut'} · po</small></label><input id="joint-${esc(orientation+joint.id)}" data-joint-position="${esc(joint.id)}" data-orientation="${orientation}" inputmode="decimal" value="${positionText(layoutDimension(f,z,orientation)*joint.position)}" aria-label="Position du joint ${orientation} ${i+1} en pouces"><button data-delete-joint="${esc(joint.id)}" data-orientation="${orientation}" aria-label="Retirer ce joint">×</button></div>`;})).join('')||`<p class="small-note">${linkedPanels?'Les joints horizontaux sont les moulures de transition; modifiez-les dans « Joints & transitions ».':spec.known?'Aucun joint intérieur dans cette zone.':'Format à confirmer. Vous pouvez placer des joints personnalisés.'}</p>`;
       const invalid=(result.cells||[]).filter(c=>c.fits===false&&c.areaFt2>0),cells=(result.cells||[]).filter(c=>c.areaFt2>0);
       if(spec.known)alerts.push(`<div class="layout-alert ${invalid.length?'':'good'}"><strong>${invalid.length?`${invalid.length} pièce${invalid.length>1?'s':''} dépasse${invalid.length>1?'nt':''} le format`:`${cells.length} section${cells.length>1?'s':''} de panneau dessinée${cells.length>1?'s':''}`}</strong><p>Format choisi : ${coverageInches(spec.maxWidthIn)} × ${coverageInches(spec.maxLengthIn)}. Rotation ${spec.rotationAllowed?'autorisée':'désactivée'} pour le contrôle de découpe.</p>${invalid.slice(0,3).map(c=>`<p>${esc(L.inches(c.widthIn))} × ${esc(L.inches(c.heightIn))} : ajoutez ou déplacez un joint.</p>`).join('')}</div>`);
       else alerts.push('<div class="layout-alert">Format physique fournisseur à confirmer. Aucun contrôle de découpe dans un panneau supposé n’est validé.</div>');
