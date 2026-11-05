@@ -1,0 +1,27 @@
+name: MIR atelier v4 — validation PR
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'dist/production*'
+      - 'tests/mir-atelier-v4.cjs'
+      - '.github/workflows/atelier-v4-pr.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    name: Geometry, JS and responsive contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: |
+          node --check dist/production-model.js
+          node --check dist/production-app.js
+          node --check dist/production-admin-v4.js
+          node --check tests/mir-atelier-v4.cjs
+      - name: Existing MIR regression suite
+        run: node tests/mir-pages-regressions.cjs
+      - name: Atelier maquette 4 scenarios
+        run: node tests/mir-atelier-v4.cjs
