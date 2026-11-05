@@ -357,6 +357,7 @@
         if(!svg||!homeViewBox||!detachedViewBox)return;
         showingWalls=!showingWalls;
         svg.setAttribute('viewBox',(showingWalls?detachedViewBox:homeViewBox).join(' '));
+        svg.dataset.mirWallFocus=String(showingWalls);
         sideButton.textContent=showingWalls?'← Voir la maison':'Voir les 3 murs →';
       };
     }
