@@ -41,6 +41,7 @@ check('Kaycan flat preview est chargé avant le moteur',()=>{
 function online(url){return new Promise(resolve=>http.get(url,r=>{r.resume();resolve(r.statusCode===200);}).on('error',()=>resolve(false)));}
 (async()=>{
  const port=8778,base='http://127.0.0.1:'+port;
+ fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});
  const server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1','--directory',path.join(__dirname,'../dist')],{stdio:'ignore'});
  let browser;
  try{
@@ -71,7 +72,7 @@ function online(url){return new Promise(resolve=>http.get(url,r=>{r.resume();res
    assert.equal(diagram.includes('url(#production-paint)'),false,'Kaycan metal must not use a picture pattern');
    assert.equal(diagram.includes('fill="'+sampled+'"'),true,'Kaycan colored side uses sampled flat tint '+sampled);
    assert.deepEqual(errors,[]);
-   await page.screenshot({path:path.join(__dirname,'../kaycan-fix-'+layout.name+'.png'),fullPage:true});
+   await page.screenshot({path:path.join(__dirname,'../artifacts/kaycan-fix-'+layout.name+'.png'),fullPage:true});
    console.log('PASS '+layout.name+' Kaycan flat tint '+sampled+' without perforations or photographic swatches');
    await page.close();
   }
