@@ -48,6 +48,8 @@ jobs:
           node tests/mir-homepage.cjs
           node --check tests/mir-client-header.cjs
           node tests/mir-client-header.cjs
+          node --check tests/mir-client-signature.cjs
+          node tests/mir-client-signature.cjs
           node --check tests/mir-client-header-browser.cjs
       - name: Vérifier l'accueil MIR en vrai navigateur Chrome
         run: |
@@ -111,10 +113,14 @@ jobs:
           grep -F 'mir-home-hero-20261105.avif' /tmp/mir-homepage.html
           fetch "$base/assets/MIR-logo-officiel-original.svg" /tmp/mir-logo.svg
           grep -F 'viewBox="0 0 363.68 91.133"' /tmp/mir-logo.svg
+          fetch "$base/mir-client-signature.css" /tmp/mir-client-signature.css
+          grep -F 'body.mir-signature' /tmp/mir-client-signature.css
+          grep -F -- '--mir-accent:#348511' /tmp/mir-client-signature.css
           fetch "$base/mir-client-header.css" /tmp/mir-client-header.css
           grep -F '.mir-client-header' /tmp/mir-client-header.css
           fetch "$base/boutique.html" /tmp/mir-boutique.html
           grep -F 'mir-client-header.css?v=1' /tmp/mir-boutique.html
+          grep -F 'mir-client-signature.css?v=1' /tmp/mir-boutique.html
           fetch "$base/plan.html" /tmp/mir-plan-public.html
           grep -F 'mir-client-header.css?v=1' /tmp/mir-plan-public.html
           fetch "$base/assets/mir-home-hero-20261105.avif" /tmp/mir-home-hero.avif
