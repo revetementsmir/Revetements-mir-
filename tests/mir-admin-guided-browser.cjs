@@ -92,7 +92,7 @@ async function ready(){
    await page.waitForSelector('.mir-store-card');
    assert.match(await page.locator('.mir-store-card').first().textContent(),/Solin test guidé/);
    await page.locator('#mir-procurement-tabs [data-mir-tab="orders"]').click();
-   assert.equal(await page.locator('#mir-procurement-panel [data-mir-po-view]').count(),3);
+   assert.equal(await page.locator('#mir-procurement-panel .mir-po-tabs [data-mir-po-view]').count(),3);
    await page.locator('[data-mir-po-view="history"]').click();
    assert.match(await page.locator('#mir-procurement-panel').textContent(),/Historique/);
    await page.locator('[data-mir-po-view="create"]').click();
