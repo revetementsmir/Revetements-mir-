@@ -307,6 +307,17 @@ function updateV4Totals(model){
  const lengthTitle=$('#mir-v4-recap-length')?.previousElementSibling;if(lengthTitle)lengthTitle.textContent=model.kind==='profile'?'Longueur de la pièce':'Dimensions du panneau';
  const faceTitle=$('#mir-v4-recap-face')?.previousElementSibling;if(faceTitle)faceTitle.textContent=model.kind==='profile'?'Face colorée':'Perforation';
  put('#mir-v4-recap-quantity',String(model.quantity||draft.quantity||1));
+ const typeLabel=model.material?.name||materialLabels[model.material?.type]||materialLabels[draft.material?.type];
+ put('#mir-v4-material-status',typeLabel);
+ put('#mir-v4-colors-status',model.finish?.name||model.finish?.code);
+ put('#mir-v4-face-status',model.kind==='profile'
+  ?(model.coloredFace?.side?(model.coloredFace.side==='left'?'Gauche':'Droite')+' · '+(model.coloredFace.segmentId||'A'):'À préciser')
+  :(model.perforation?.enabled?'Bas perforé':'Sans perforation'));
+ put('#mir-v4-details-status','Qté '+String(model.quantity||draft.quantity||1));
+ const dims=model.kind==='profile'
+  ?(model.segments||[]).map(segment=>segment.label+' '+M.formatMeasurement(segment.lengthMM,model.unit)).join(' · ')
+  :(Number.isFinite(model.widthMM)?'A '+M.formatMeasurement(model.widthMM,model.unit):'');
+ put('#mir-v4-dimensions-status',dims);
 }
 function updateDrawing({keepForm=false}={}){
  renderFractionPickers();
@@ -577,7 +588,7 @@ function render(){
  const previous=document.body.dataset.profileAdmin;
  document.body.dataset.profileAdmin=String(profileAdmin);
  if(previous!==String(profileAdmin)&&!client){
-  $('.piece-finish').open=matchMedia('(min-width: 1151px)').matches;
+  $('.piece-finish').open=false;
   $('#order-metadata').open=!profileAdmin;
   $('#production-title').textContent=profileAdmin?'Moulures sur mesure':'Panneaux architecturaux';
   $('#production-eyebrow').textContent='ATELIER MIR';
