@@ -134,3 +134,9 @@ body.mir-admin-guided-active #mir-guide-3d-open{display:none}
 @media(prefers-reduced-motion:reduce){
   body.mir-admin-guided-active *{scroll-behavior:auto!important}
 }
+/* La fiche du modèle commence par le nom et les destinations ;
+   les réglages avancés restent disponibles, mais non imposés. */
+#save-production-template .mir-guide-model-advanced{border:1px solid #d7e3d2;border-radius:10px;padding:10px;margin:10px 0;background:#f8faf5}
+#save-production-template .mir-guide-model-advanced>summary{font-weight:700;color:#2b5339;cursor:pointer;padding:5px}
+#save-production-template .mir-guide-model-advanced fieldset{margin:12px 0}
+#save-production-template>.choice-checks{padding:12px;border:1px solid #d3e1cc;border-radius:10px;background:#f1f6eb;margin:10px 0}
