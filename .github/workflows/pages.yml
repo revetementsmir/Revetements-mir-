@@ -125,6 +125,7 @@ jobs:
             artifacts/mir-accueil-*.png
             artifacts/mir-entete-*.png
             artifacts/mir-signature-*.png
+            artifacts/mir-production-signature-*.png
             artifacts/mir-realisations-*.png
             artifacts/mir-miniatures-*.png
             artifacts/mir-direct-po-*.png
@@ -244,7 +245,7 @@ jobs:
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
           grep -F 'kaycan-flat-preview.js?v=mac-2' /tmp/production.html
-          grep -F 'production-app.js?v=double-pli-tactile' /tmp/production.html
+          grep -F 'production-app.js?v=client-5-etapes' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
           grep -F 'function medianRgb' /tmp/kaycan-flat-preview.js
           grep -F 'function isMAC' /tmp/kaycan-flat-preview.js

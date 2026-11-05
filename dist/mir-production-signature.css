@@ -45,3 +45,100 @@ html.mir-production-client .mir-production-steps p{color:#596f5b;font-size:12px;
   html.mir-production-client .fraction-field{min-width:0;max-width:100%}
   html.mir-production-client .fraction-field > input{min-width:0;max-width:100%}
 }
+
+/* Five guided steps for customer mouldings. Panels keep their own form. */
+#client-step-scroll[hidden],#client-step-actions[hidden],#client-step-list[hidden]{display:none!important}
+body[data-client-stage] .mir-production-steps>ol:first-child,
+body[data-client-stage] .mir-production-steps>p,
+body[data-client-stage]:not([data-client-stage="1"]) .kind-bar,
+body[data-client-stage] #production-validation,
+body[data-client-stage] #add-production-piece,
+body[data-client-stage] .config-card .piece-submit+p,
+body[data-client-stage] .piece-finish>summary,
+body[data-client-stage] .template-section>.section-heading,
+body[data-client-stage] #client-step-scroll>.section-heading>div,
+body[data-client-stage] #client-step-scroll>.config-section .piece-submit:not(:has(#cancel-piece-edit:not([hidden]))),
+body[data-client-trace="true"] .view-switch,
+body[data-client-stage]:not([data-client-stage="1"]) [data-client-stage="1"],
+body[data-client-stage]:not([data-client-stage="2"]) [data-client-stage="2"],
+body[data-client-stage]:not([data-client-stage="3"]) [data-client-stage="3"],
+body[data-client-stage]:not([data-client-stage="4"]) [data-client-stage="4"],
+body[data-client-stage]:not([data-client-stage="5"]) [data-client-stage="5"]{display:none!important}
+
+html.mir-production-client body[data-client-stage="1"] .kind-bar [data-kind="profile"],
+html.mir-production-client body[data-public-production="true"]:not([data-client-stage]) .kind-bar [data-kind="profile"]{display:inline-flex!important}
+html.mir-production-client body[data-client-stage] .mir-production-steps{padding:10px;margin-bottom:14px}
+html.mir-production-client #client-step-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+#client-step-list li{display:block;min-width:0}
+#client-step-list button{display:flex;align-items:center;gap:7px;width:100%;min-height:44px;padding:7px 8px;border:1px solid transparent;border-radius:8px;background:transparent;color:#244329;font:inherit;text-align:left}
+#client-step-list button>span{display:grid;place-items:center;flex:0 0 23px;height:23px;background:#e3ecdf;border-radius:50%;font-weight:700}
+#client-step-list button:disabled{color:#5d6c60;cursor:default;opacity:1}
+#client-step-list button[aria-current="step"]{border-color:#38832a;background:#fff;font-weight:700}
+#client-step-list button:is([aria-current="step"],.is-complete)>span{background:#2d681d;color:#fff}
+body[data-client-stage] .config-card{padding:0}
+#client-step-scroll{min-width:0;padding:22px 22px 18px;outline-offset:-3px}
+#client-step-count{margin:0 0 6px;letter-spacing:.13em}
+#client-step-title{margin:0;color:#18251d;font-size:clamp(23px,2vw,29px);line-height:1.15}
+#client-step-hint{margin:9px 0 18px;color:#4d6052;font-size:14px;line-height:1.5}
+#client-step-actions{background:#f3f7f1;border-top:1px solid #dce6d8;padding:11px 22px 15px;border-radius:0 0 12px 12px}
+#client-step-status{color:#405745;font-size:13px;line-height:1.4;margin:0 0 8px}
+#client-step-status:empty{display:none}
+.client-step-buttons{display:flex;gap:8px;align-items:stretch}
+#client-step-next{flex:1;justify-content:center}
+#client-step-next:disabled{background:#e0e8dd;border-color:#d6e1d3;color:#516754;opacity:1;cursor:default}
+#client-step-actions button,#client-step-scroll button:not(.color-choice),#client-step-scroll :is(input,select){min-height:44px}
+#client-step-scroll :is(input,select,textarea){font-size:16px}
+#client-step-scroll>.section-heading{justify-content:flex-end;margin-bottom:6px}
+#client-step-scroll>.section-heading .unit-field{margin:0}
+#client-step-type .template-section{margin:12px 0 0;padding:0;border:0;background:none}
+#client-step-type .template-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,112px),1fr));gap:8px;overflow:visible;padding:0}
+#client-step-type .template-button{min-width:0;width:100%;min-height:79px;font-size:12px;padding:6px;white-space:normal;line-height:1.2}
+#client-step-type .template-button svg{height:32px}
+#client-step-length .letter-label{font-size:14px}
+.client-face-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.client-face-choices button{justify-content:center;text-align:center}
+.client-face-choices button[aria-pressed="true"]{border:2px solid #23715a;background:#e8f7f0;color:#174f3e}
+.client-preview-link{display:none}
+.client-trace-help{width:100%;margin:0;color:#314b39;font-size:13px;line-height:1.5}
+body[data-client-stage] .piece-finish{padding:0;border:0}
+body[data-client-stage] .piece-finish .finish-fields{padding:0}
+body[data-client-stage] #production-preview .drawing-hint{min-height:210px;color:#4d6052;display:grid;place-items:center}
+body[data-client-stage] .production-workspace{scroll-margin-top:14px}
+body[data-client-stage] .color-choice{min-height:44px}
+body[data-client-stage] .kaycan-flat-choice .color-text{color:inherit;font-size:10px;font-weight:600}
+#client-optional-metal{margin-top:14px;padding:10px 0;border-top:1px solid #dce6d8}
+#client-optional-metal summary{cursor:pointer;color:#344d3a;padding:5px 0}
+#client-optional-metal[open] summary{margin-bottom:9px}
+
+@media(min-width:951px){
+ body[data-client-stage] .production-workspace{height:clamp(420px,70dvh,740px);align-items:stretch;grid-template-columns:minmax(0,1.18fr) minmax(380px,1fr)}
+ body[data-client-stage] .drawing-card{position:static;overflow-y:auto;scrollbar-gutter:stable}
+ body[data-client-stage] .config-card{min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto}
+ #client-step-scroll{overflow-y:auto;scrollbar-gutter:stable}
+ body[data-client-stage] .drawing-card:not(.mobile-trace) .drawing-stage,
+ body[data-client-stage] .drawing-card:not(.mobile-trace) .drawing-stage>svg{min-height:0}
+ body[data-client-stage] .drawing-card:not(.mobile-trace) .drawing-stage>svg{height:auto;max-height:54dvh}
+ body[data-client-stage] .drawing-card:not(.mobile-trace) .drawing-stage[data-tool="draw"]>svg{min-height:280px}
+}
+@media(max-width:950px){
+ body[data-client-stage] .production-workspace{grid-template-columns:minmax(0,1fr)}
+ body[data-client-stage] .drawing-card:not(.mobile-trace){position:static;order:2}
+ body[data-client-trace="true"] .drawing-card:not(.mobile-trace){order:0}
+ body[data-client-stage] .drawing-card:not(.mobile-trace) .drawing-stage,
+ body[data-client-stage] .drawing-card:not(.mobile-trace) .drawing-stage>svg{min-height:0}
+ .client-preview-link{display:inline-block;margin-top:10px;color:#236b24;font-weight:700}
+}
+@media(max-width:600px){
+ html.mir-production-client #client-step-list{gap:3px}
+ #client-step-list button{flex-direction:column;gap:3px;justify-content:flex-start;padding:4px 1px;text-align:center;font-size:10px;line-height:1.2;min-height:59px}
+ #client-step-list button>span{flex-basis:22px;width:22px}
+ #client-step-scroll{padding:17px 15px 14px}
+ #client-step-actions{padding:10px 15px 12px}
+ body[data-client-stage] .production-intro .text-link{display:none}
+ #client-step-type .template-strip{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+body[data-client-stage] .production-intro{padding-top:22px;padding-bottom:18px;gap:16px}
+body[data-client-stage] .production-intro h1{font-size:clamp(29px,4vw,49px);margin-top:7px}
+@media(max-width:950px){
+ #client-step-actions{position:sticky;bottom:0;z-index:2}
+}
