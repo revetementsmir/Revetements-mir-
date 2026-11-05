@@ -30,7 +30,8 @@ function makePdf(file){
   for(let n=1;n<=count;n++)object('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 620 420] /Resources << /Font << /F1 3 0 R >> >> /Contents '+(separate.get(n)||common)+' 0 R >>');
   const draw='0.3 0.4 0.6 RG 2 w 35 80 240 150 re S 335 80 240 150 re S';
   const stream=lines=>{
-   const content=draw+' '+lines.map(([x,y,text])=>'BT /F1 14 Tf 1 0 0 1 '+x+' '+y+' Tm ('+text+') Tj ET').join(' ');
+   const glass=lines.some(([, ,text])=>text==='ELEVATION AVANT')?' 0.13 0.11 0.52 rg 110 98 130 45 re f 0 g':'';
+   const content=draw+glass+' '+lines.map(([x,y,text])=>'BT /F1 14 Tf 1 0 0 1 '+x+' '+y+' Tm ('+text+') Tj ET').join(' ');
    object('<< /Length '+content.length+' >>\nstream\n'+content+'\nendstream');
   };
   stream([[35,35,'FICHE TECHNIQUE DES MATERIAUX - DONNEES GENERALES DU PROJET']]);
@@ -128,7 +129,7 @@ const server=http.createServer((req,res)=>{
    await page.waitForFunction(()=>document.querySelector('#project-name').textContent==='plan-108mo');
    const active=await page.evaluate(async()=>{
     const p=await MIRProjectStore.getActive();
-    return {bytes:p.source.bytes,ref:p.planData.referencePages.map(({page,kind})=>[page,kind]),faces:p.planData.faces.filter(f=>f.page).map(f=>[f.key,f.page,f.sourceCrop]),dimensions:p.planData.dimensions,status:p.planData.dimensionStatus,hints:p.planData.structuralHints};
+    return {bytes:p.source.bytes,ref:p.planData.referencePages.map(({page,kind})=>[page,kind]),faces:p.planData.faces.filter(f=>f.page).map(f=>[f.key,f.page,f.sourceCrop]),frontScale:p.planData.faces.find(f=>f.key==='front').calibration.referenceFt,dimensions:p.planData.dimensions,status:p.planData.dimensionStatus,hints:p.planData.structuralHints};
    });
    assert.ok(active.bytes>108*1024*1024);
    assert.deepEqual(active.ref,[[2,'foundation'],[3,'floor'],[5,'section']]);
@@ -139,6 +140,28 @@ const server=http.createServer((req,res)=>{
    assert.ok(active.hints.some(h=>h.type==='beam'&&h.assignedView==='front'));
    await page.locator('#three-canvas').waitFor();
    await page.waitForFunction(()=>window.MIR_RENDER_DIAGNOSTICS?.rendered===true);
+   assert.equal(active.frontScale,null,'Le vitrage du PDF est visible même sans échelle de métrés');
+   const texture=await page.evaluate(()=>{
+    const canvas=document.querySelector('#three-canvas'),diagnostics=window.MIR_RENDER_DIAGNOSTICS;
+    const front=diagnostics.hitSurfaces.find(surface=>surface.type==='wall'&&surface.view==='front');
+    const {width,height}=canvas.getBoundingClientRect(),pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
+    const polygon=front?.screenPolygon||[];
+    const inside=(x,y)=>polygon.reduce((hit,[a,b],i)=>{
+     const [c,d]=polygon[(i+1)%polygon.length];
+     if((b>y)===(d>y))return hit;
+     return x<(c-a)*(y-b)/(d-b)+a?!hit:hit;
+    },false);
+    let glassPixels=0;
+    for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++){
+     const i=(y*canvas.width+x)*4;
+     if(pixels[i+2]-pixels[i]>35&&pixels[i+2]-pixels[i+1]>35&&inside((x+.5)*width/canvas.width,(y+.5)*height/canvas.height))glassPixels++;
+    }
+    return {errors:diagnostics.errors,missing:diagnostics.missingViews,scale:diagnostics.textureScales.front?.scaleStatus,glassPixels};
+   });
+   assert.deepEqual(texture.errors,[]);
+   assert.ok(!texture.missing.includes('front'));
+   assert.equal(texture.scale,'fit-to-wall');
+   assert.ok(texture.glassPixels>20,`Vitrage bleu absent du mur avant en ${width} px (${texture.glassPixels} pixels)`);
    assert.equal(await page.evaluate(()=>window.MIR_RENDER_DIAGNOSTICS.foundationDrop),2*.3048);
    assert.equal(await page.evaluate(()=>window.MIR_STUDY.snapshot().roofStyle),'gable');
    await page.locator('#volume-settings').click();

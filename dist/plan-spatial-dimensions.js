@@ -262,11 +262,17 @@
     return fraction < .12 ? 'triangle' : null;
   }
 
-  function evidence({ rows, words = [], verticalRows = [], page, view, crop, accepted = [], geometry }, parseDimension) {
-    if (!view.face && view.kind !== 'section') return [];
+  function readAnchors({ rows, words = [], crop, accepted = [], geometry }, parseDimension) {
     const image = geometry?.image;
     const levels = readLevels(rows, image, crop, parseDimension, words);
-    const span = readSpan(rows, accepted, image, crop, levels, parseDimension);
+    return { levels, span: readSpan(rows, accepted, image, crop, levels, parseDimension) };
+  }
+
+  function evidence(args, parseDimension, anchors) {
+    const { rows, verticalRows = [], page, view, crop, accepted = [], geometry } = args;
+    if (!view.face && view.kind !== 'section') return [];
+    const image = geometry?.image;
+    const { levels, span } = anchors || readAnchors(args, parseDimension);
     const feetPerPixel = span ? span.feet / span.span : null;
     const entries = [];
     const add = (field, value, text, method, details = {}) => entries.push({ field, value, text, method, page, view: view.name, ...details });
@@ -298,5 +304,5 @@
     return entries;
   }
 
-  return Object.freeze({ evidence });
+  return Object.freeze({ evidence, readAnchors });
 });

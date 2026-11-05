@@ -25,7 +25,8 @@
       script('plan-structure-notes.js', 'MIRStructuralNotes'),
       script('plan-sheet-detection.js?v=architecture', 'MIRSheetDetection'),
       script('plan-scan-ocr.js?v=1', 'MIRScanOCR'),
-      script('plan-spatial-dimensions.js?v=1', 'MIRSpatialDimensions'),
+      script('plan-spatial-dimensions.js?v=2', 'MIRSpatialDimensions'),
+      script('plan-facade-visual.js?v=1', 'MIRFacadeVisual'),
       script('project-store.js', 'MIRProjectStore')
     ]);
     if (!pdfLibrary) {
@@ -306,12 +307,23 @@
           const localRows = rows.filter(word => inCrop(word, crop));
           const calibrationScale = measureLines(canvas, geometry.image, words, verticalWords, crop);
           const structuralHints = window.MIRStructuralNotes.withinCrop(hints, crop);
-          const result = prepareView(canvas, crop, structuralHints, sheet.number, view, calibrationScale);
           evidence.push(...detector.volumeEvidence(localRows, view, sheet.number, MIRPDFAnalysis.parseDimension, calibrationScale.feetPerPixel ? calibrationScale.accepted : []));
-          evidence.push(...window.MIRSpatialDimensions.evidence({
+          const spatial = window.MIRSpatialDimensions;
+          const reading = {
             rows: localRows, words: words.filter(word => inCrop(word, crop)), verticalRows: verticalRows.filter(word => inCrop(word, crop)),
             page: sheet.number, view, crop, accepted: calibrationScale.accepted || [], geometry
-          }, MIRPDFAnalysis.parseDimension));
+          };
+          const anchors = view.face ? spatial.readAnchors(reading, MIRPDFAnalysis.parseDimension) : undefined;
+          evidence.push(...spatial.evidence(reading, MIRPDFAnalysis.parseDimension, anchors));
+          let visualFrame;
+          if (view.face && window.MIRFacadeVisual) try {
+            const detected = window.MIRFacadeVisual.detect({ image: geometry.image, crop, anchors });
+            if (detected) {
+              const [x,y,w,h] = detected.box;
+              visualFrame = [x-crop[0],y-crop[1],w,h];
+            }
+          } catch (error) { console.warn('MIR PDF : cadrage 3D de la façade indisponible', view.face, error); }
+          const result = prepareView(canvas, crop, structuralHints, sheet.number, view, calibrationScale, visualFrame);
           if (view.face && !imported.assignments[view.face]) imported.assignments[view.face] = result;
           else imported.references.push(result);
         }
@@ -345,7 +357,7 @@
     }
     return A.resolveScale(candidates.filter(candidate => candidate.anchors.every(([a, b]) => a >= x && a <= x + width && b >= y && b <= y + height)));
   }
-  function prepareView(canvas, crop, structuralHints, number, view, scale) {
+  function prepareView(canvas, crop, structuralHints, number, view, scale, visualFrame) {
     const [x, y, w, h] = crop, A = window.MIRPDFAnalysis;
     const image = document.createElement('canvas'); image.width = w; image.height = h;
     const context = image.getContext('2d', { willReadFrequently: true });
@@ -359,7 +371,7 @@
     if (!view.face) return { page: number, crop, sourceImage, calibration: cal, kind: view.kind, name: view.name, structuralHints };
     const zones = regions.map((r, i) => ({ id: `pdf-zone-${i + 1}`, name: `Zone ${i + 1}`, polygon: r.polygon, kind: 'siding', parent: null, provenance: r.provenance, needsReview: true, detected: true }));
     const openings = regions.flatMap((r, i) => r.holes.filter(p => { const b = A.bbox(p); return b[2] - b[0] > 15 && b[3] - b[1] > 15; }).map((p, j) => ({ id: `pdf-opening-${i + 1}-${j + 1}`, type: 'window', polygon: p, bbox: A.bbox(p), occluded: false, dimension: 'Ouverture détectée à vérifier.', needsReview: true })));
-    return { ...placeholder(view.face), kind: 'elevation', page: number, bbox: [0, 0, w, h], textureBox: [0, 0, w, h], zones, openings, sourceImage, sourceImageBox: [0, 0, w, h], sourceWidth: w, sourceHeight: h, sourcePageSize: [canvas.width, canvas.height], sourceCrop: crop, calibration: cal, importedStatus: 'assigned', calibrationStatus: cal.status, structuralHints, detected: { regions: zones.length, openings: openings.length, method: 'Surfaces colorées repérées localement.' }, printedDimensions: cal.evidence.map(c => c.normalized || c.text), textureReference: view.split ? 'Cadrage automatique d’une feuille avec plusieurs vues.' : 'Élévation repérée par le titre de la feuille.' };
+    return { ...placeholder(view.face), kind: 'elevation', page: number, bbox: [0, 0, w, h], textureBox: [0, 0, w, h], zones, openings, sourceImage, sourceImageBox: [0, 0, w, h], sourceWidth: w, sourceHeight: h, sourcePageSize: [canvas.width, canvas.height], sourceCrop: crop, ...(visualFrame&&{visualFrame}), calibration: cal, importedStatus: 'assigned', calibrationStatus: cal.status, structuralHints, detected: { regions: zones.length, openings: openings.length, method: 'Surfaces colorées repérées localement.' }, printedDimensions: cal.evidence.map(c => c.normalized || c.text), textureReference: view.split ? 'Cadrage automatique d’une feuille avec plusieurs vues.' : 'Élévation repérée par le titre de la feuille.' };
   }
   function placeholder(key) { return { key, name: FACE_NAMES[key], page: null, bbox: [0, 0, 1200, 800], textureBox: [0, 0, 1200, 800], physicalWidth: null, zones: [], openings: [], roof: [], base: [], fascia: [], soffit: [], detected: {}, candidates: [], occlusions: [], printedDimensions: [], importedStatus: 'unassigned', calibrationStatus: 'not_found', textureBottom: 0, textureReference: 'Façade non importée.', sourceImage: null }; }
   function calibration(s, crop) {

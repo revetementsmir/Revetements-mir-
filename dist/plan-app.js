@@ -15,6 +15,44 @@
   let TAKEOFF_STORAGE = 'mir-takeoff-v1';
   const RECESS_FIELDS = {recessStartFt:'start',recessWidthFt:'width',recessDepthFt:'depth',recessHeightFt:'height'};
   let data, materials, takeoffSeed, activeProject=null, studioFeatures=null;
+  const facadeVisuals = new Map();
+
+  async function prepareFacadeVisual(f) {
+    const source = f.sourceImage || f.sourceImageDataUrl;
+    if (!/^data:image\/(?:png|jpeg);base64,/.test(source||'')) return;
+    const image = new Image();
+    image.src = source;
+    await image.decode();
+    const w = image.naturalWidth, h = image.naturalHeight;
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    try {
+      const ctx = canvas.getContext('2d', {willReadFrequently:true});
+      ctx.drawImage(image,0,0);
+      const width = ['front','back'].includes(f.key)?data.dimensions?.width:data.dimensions?.depth;
+      const ratio = width / data.dimensions?.wallHeight;
+      const frame = f.visualFrame || window.MIRFacadeVisual?.detect({
+        image:ctx.getImageData(0,0,w,h),crop:[0,0,w,h],ratio
+      })?.box;
+      if (!Array.isArray(frame) || frame.length!==4 || !frame.every(Number.isFinite)) return;
+      const [x,y,fw,fh] = frame.map(Math.round);
+      if (x<0 || y<0 || fw<20 || fh<20 || x+fw>w || y+fh>h) return;
+      const ink = ctx.getImageData(x,y,fw,fh);
+      for(let i=0;i<ink.data.length;i+=4){
+        const red=ink.data[i],green=ink.data[i+1],blue=ink.data[i+2];
+        const light=.213*red+.715*green+.072*blue;
+        const chroma=Math.max(red,green,blue)-Math.min(red,green,blue);
+        if(chroma<40){ink.data[i]=28;ink.data[i+1]=32;ink.data[i+2]=30;}
+        ink.data[i+3]=ink.data[i+3]/255*Math.max(0,Math.min(245,(238-light)*1.65,chroma<40?245:chroma*1.4));
+      }
+      canvas.width=fw; canvas.height=fh;
+      ctx.putImageData(ink,0,0);
+      const imageBox=f.sourceImageBox;
+      const [sx,sy,sw,sh] = Array.isArray(imageBox)&&imageBox.length===4&&imageBox.every(Number.isFinite)?imageBox:[0,0,w,h];
+      facadeVisuals.set(f.key,{box:[sx+x*sw/w,sy+y*sh/h,fw*sw/w,fh*sh/h],linework:canvas.toDataURL('image/png')});
+    } finally { canvas.width=canvas.height=1; }
+  }
+
   $('#import-pdf').onclick=()=>window.MIRPlanImport?.open?window.MIRPlanImport.open({onImport:()=>location.reload()}):null;
   try {
     const responses = await Promise.all([fetch('plan-data.json'),fetch('catalogue-fd6866b49d21.json'),fetch('takeoff-data.json')]);
@@ -24,6 +62,9 @@
     if(activeProject?.planData){for(const link of document.querySelectorAll('.studio-source-links a[href^="assets/"]'))link.hidden=true;data=activeProject.planData;takeoffSeed=activeProject.takeoffSeed;STORAGE+=':'+activeProject.id;TAKEOFF_STORAGE+=':'+activeProject.id;}
     if(!Array.isArray(data.faces)||!data.faces.length)throw Error('Aucune élévation dans le dossier');
     for(const f of data.faces){for(const k of ['zones','openings','roof','base','fascia','soffit','detected'])if(!Array.isArray(f[k]))f[k]=[];f.candidates||=0;f.textureBox||=f.bbox;}
+    if(data.projectKind==='imported-pdf')for(const f of data.faces){
+      try{await prepareFacadeVisual(f);}catch(error){console.warn('MIR : dessin de façade indisponible',f.key,error);}
+    }
 
   } catch(e) {$('#elevation').textContent='Le dossier n’a pas pu être chargé. Rechargez cette page pour réessayer.';return;}
   const swatchImages=new Map();
@@ -105,7 +146,14 @@
   function readTakeoff(){try{const item=JSON.parse(localStorage.getItem(TAKEOFF_STORAGE));return item?.version===1?item:{};}catch(_){return {};}}
   function feetPerPixel(f){if(f.renderFeetPerPixel>0)return f.renderFeetPerPixel;const c=readTakeoff().calibrations?.[f.key]||takeoffSeed.calibrations?.[f.key];return E.calibrate(c?.anchors,c?.referenceFt);}
   function normalFace(f){return {...f,feetPerPixel:feetPerPixel(f),zones:allZones(f).map(z=>({...z,selection:choice(f,z)})),openings:allOpenings(f)};}
-  const decoratedFace=f=>L.decorateFace(normalFace(f),state,materials);
+  function decoratedFace(f,projected=false){
+    const prepared=normalFace(f);
+    if(projected)prepared.openings=prepared.openings.filter(o=>{
+      const id=key(f.key,o.id),trim=state.openingTrims[id]?.mode;
+      return !o.needsReview||o.custom||state.openingOverrides[id]||(trim&&trim!=='none');
+    });
+    return L.decorateFace(prepared,state,materials);
+  }
   function panelSpec(m,c={}){
     const spec=C.coverageSpec(m,c);
     return {maxWidthIn:spec.physicalDisplayWidthIn||null,maxLengthIn:spec.physicalDisplayHeightIn||null,rotationAllowed:state.panelStockRotation!==false,formatId:spec.formatId,known:!!spec.complete,stockKnown:!!spec.complete};
@@ -216,7 +264,8 @@
   function facadeSVG(f,options={}){
     if(options===true)options={texture:true};
     const texture=!!options.texture,interactive=!texture&&!options.export,annotated=options.annotated??(!texture&&state.displayMode==='atelier'),monochrome=options.monochrome??neutral;
-    const prepared=decoratedFace(f),zones=orderedZones(prepared.zones),openings=prepared.openings,vb=texture?f.textureBox:f.bbox,prefix=`v${f.key}-`;
+    const visual=texture?facadeVisuals.get(f.key):null;
+    const prepared=decoratedFace(f,!!visual),zones=orderedZones(prepared.zones),openings=prepared.openings,vb=visual?.box||(texture?f.textureBox:f.bbox),prefix=`v${f.key}-`;
     const poly=(points,attrs='')=>`<polygon points="${pts(points)}" ${attrs}/>`;
     const holes=openings.map(o=>poly(o.polygon,'fill="black"')).join(''),defs=[];
     defs.push(`<pattern id="${prefix}roof" width="35" height="13" patternUnits="userSpaceOnUse"><rect width="35" height="13" fill="${monochrome?'#f1f2ec':state.roofColor||'#59605a'}"/><path d="M0 12H35M17 0V12" stroke="${monochrome?'#a6ada2':'#414941'}" stroke-width=".8"/></pattern>`);
@@ -268,17 +317,20 @@
     // 3D undersides and in the takeoff data; only the fascia faces this view.
     const fasciaColor=monochrome?'#75816e':state.fasciaColor;
     if(!texture)roofTrimPaths(f,'fascia').forEach(p=>content+=`<polyline points="${pts(p)}" fill="none" stroke="${fasciaColor}" stroke-linejoin="round" stroke-width="10"/>`);
+    if(visual)content+=`<image data-mir-plan-linework="true" href="${visual.linework}" x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" preserveAspectRatio="none"/>`;
     for(const o of openings){const [x0,y0,x1,y1]=bounds(o.polygon),mid=(x0+x1)/2;
       content+=`<g ${interactive?`data-opening="${esc(o.id)}" class="opening-hit" role="button" tabindex="0" aria-label="${o.type==='door'?'Porte':'Fenêtre'} ${esc(o.id)}"`:''}>${poly(o.polygon,`fill="${monochrome?'#fff':o.type==='door'?'#c6ccc3':'#d3ded7'}" stroke="${monochrome?'#515e49':'#2f3730'}" stroke-width="4"`)}<clipPath id="${prefix}opening-${esc(o.id)}">${poly(o.polygon)}</clipPath><g clip-path="url(#${prefix}opening-${esc(o.id)})"><path d="M${mid} ${y0}V${y1}" stroke="${monochrome?'#7b8772':'#f0f1e9'}" stroke-width="3"/>${o.type==='window'?`<path d="M${x0} ${y1-(y1-y0)*.37}L${x1} ${y0+(y1-y0)*.1}" stroke="#ffffff65" stroke-width="5"/>`:''}</g></g>`;
     }
     if(interactive&&detection){content+=(f.detected||[]).map(z=>poly(z.polygon,`fill="${z.color}" fill-opacity=".17" stroke="${z.color}" stroke-width="2.5" pointer-events="none"`)).join('');content+=(f.occlusions||[]).map(b=>`<rect x="${b[0]}" y="${b[1]}" width="${b[2]-b[0]}" height="${b[3]-b[1]}" fill="url(#${prefix}occlusion)" pointer-events="none"/>`).join('');}
     if((interactive||options.selection)&&f.key===state.face){const selected=state.selected.kind==='zone'?zones.find(z=>z.id===state.selected.id):openings.find(o=>o.id===state.selected.id);if(selected){const [a,b]=ancestorClips(selected,zones,prefix);content+=a+poly(selected.polygon,'fill="none" stroke="#91a863" stroke-width="3" stroke-dasharray="9 5" class="selection-outline"')+b;}}
-    return `<svg xmlns="http://www.w3.org/2000/svg" data-meters-per-unit="${feetPerPixel(f)>0?feetPerPixel(f)*.3048:''}" viewBox="${vb.join(' ')}" width="${vb[2]}" height="${vb[3]}" aria-label="Élévation ${esc(f.name)}"><defs>${defs.join('')}</defs>${content}</svg>`;
+    const scale=feetPerPixel(f);
+    const placement=visual?' data-fit-wall-height="true"':Number.isFinite(scale)&&scale>0?` data-meters-per-unit="${scale*.3048}"`:'';
+    return `<svg xmlns="http://www.w3.org/2000/svg"${placement} viewBox="${vb.join(' ')}" width="${vb[2]}" height="${vb[3]}" aria-label="Élévation ${esc(f.name)}"><defs>${defs.join('')}</defs>${content}</svg>`;
   }
   let rendering=0,textureCache={signature:null,views:null};
   function threeViews(){
     const signature=JSON.stringify({face:state.face,selected:state.selected,mode:state.displayMode,neutral,roofColor:state.roofColor,returnFinishes:state.returnFinishes,selections:state.selections,customZones:state.customZones,zoneOverrides:state.zoneOverrides,openingOverrides:state.openingOverrides,addedOpenings:state.addedOpenings,bands:state.bands,openingTrims:state.openingTrims,panelLayouts:state.panelLayouts,transitions:state.transitions,calibrations:readTakeoff().calibrations||takeoffSeed.calibrations});
-    if(signature!==textureCache.signature){textureCache={signature,views:Object.fromEntries(data.faces.map(f=>[f.key,facadeSVG(f,{texture:true,annotated:state.displayMode==='atelier',selection:true})]))};}
+    if(signature!==textureCache.signature){textureCache={signature,views:Object.fromEntries(data.faces.filter(f=>f.importedStatus!=='unassigned').map(f=>[f.key,facadeSVG(f,{texture:true,annotated:state.displayMode==='atelier',selection:true})]))};}
     return {...textureCache.views,...(studioFeatures?.returnViews(patternDef)||{})};
   }
 
@@ -381,6 +433,8 @@
         if(n!==rendering)return;
         if(result.errors?.length)$('#stage-note').textContent='Une texture n’a pas chargé · revenez à l’élévation';
         else if(result.textureScaleWarnings?.length)$('#stage-note').textContent='Volume et élévation à recaler · les matériaux gardent leur taille réelle';
+        else if(data.projectKind==='imported-pdf'&&data.faces.some(v=>v.sourceImage&&!facadeVisuals.has(v.key)))$('#stage-note').textContent='Certaines élévations restent à cadrer · ouvrez le plan 2D';
+        else if(facadeVisuals.size)$('#stage-note').textContent='Détails des élévations projetés sur le volume';
         window.MIR_RENDER_DIAGNOSTICS=result;
       } catch(error) {
         if(n!==rendering)return;
@@ -634,9 +688,10 @@
     let target,decoration;
     if(hit.sharedFinish&&hit.zoneId)target={kind:'zone',id:hit.zoneId};
     else if(hit.sourcePoint){
-      const opening=allOpenings(f).slice().reverse().find(o=>pointInside(hit.sourcePoint,o.polygon));
+      const prepared=decoratedFace(f,facadeVisuals.has(f.key));
+      const opening=prepared.openings.slice().reverse().find(o=>pointInside(hit.sourcePoint,o.polygon));
       if(opening)target={kind:'opening',id:opening.id};
-      else{const zones=orderedZones(decoratedFace(f).zones),z=zones.slice().reverse().find(z=>zoneContains(hit.sourcePoint,z,zones));if(z){decoration=z.decorationType;target=z.decorationType==='opening-trim'?{kind:'opening',id:z.sourceOpeningId}:{kind:'zone',id:z.sourceZoneId||z.id};}}
+      else{const zones=orderedZones(prepared.zones),z=zones.slice().reverse().find(z=>zoneContains(hit.sourcePoint,z,zones));if(z){decoration=z.decorationType;target=z.decorationType==='opening-trim'?{kind:'opening',id:z.sourceOpeningId}:{kind:'zone',id:z.sourceZoneId||z.id};}}
     }
     if(!target){toast('Cette partie du volume n’a pas de zone de revêtement attribuée. Utilisez la liste des zones pour poursuivre.');return false;}
     state.face=f.key;state.selected=target;selectedJoint=null;save();render();

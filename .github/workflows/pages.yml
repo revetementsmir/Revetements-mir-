@@ -46,6 +46,7 @@ jobs:
           node tests/mir-portal-login.cjs
           node tests/mir-procurement.cjs
           node --check dist/plan-import.js
+          node --check dist/plan-facade-visual.js
           node tests/mir-plan-sheet-detection.cjs
           node --check dist/plan-3d.js
           node --check tests/mir-balcony.cjs
@@ -186,7 +187,7 @@ jobs:
           fetch "$base/plan.html?verification=$GITHUB_SHA" /tmp/mir-plan-public.html
           cmp /tmp/mir-plan-public.html _site_mir/plan.html
           grep -F 'mir-client-header.css?v=1' /tmp/mir-plan-public.html
-          for asset in plan-import.js plan-scan-ocr.js plan-sheet-detection.js plan-spatial-dimensions.js plan.css; do
+          for asset in plan-import.js plan-scan-ocr.js plan-sheet-detection.js plan-spatial-dimensions.js plan-facade-visual.js plan-app.js plan-3d.js plan.css; do
             fetch "$base/$asset?verification=$GITHUB_SHA" "/tmp/mir-$asset"
             cmp "/tmp/mir-$asset" "_site_mir/$asset"
           done

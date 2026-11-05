@@ -267,7 +267,10 @@
     return Number(value);
   }
 
-  function textureScale(item, modelWidthMeters) {
+  function textureScale(item, modelWidthMeters, wallHeightMeters) {
+    if (item.fitWall) return {calibrated:false, metersPerUnit:modelWidthMeters/item.viewBox[2],
+      widthMeters:modelWidthMeters, heightMeters:wallHeightMeters, modelWidthMeters,
+      widthDifferenceMeters:0, relativeWidthDifference:0, scaleStatus:'fit-to-wall'};
     const calibrated = Number.isFinite(item.metersPerUnit) && item.metersPerUnit > 0;
     const metersPerUnit = calibrated ? item.metersPerUnit : modelWidthMeters / item.viewBox[2];
     const widthMeters = item.viewBox[2] * metersPerUnit, heightMeters = item.viewBox[3] * metersPerUnit;
@@ -350,12 +353,13 @@
         root.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         if (!root.hasAttribute('viewBox')) root.setAttribute('viewBox', `0 0 ${w} ${h}`);
         const metersPerUnit = svgMetersPerUnit(root);
-        const pixels = 1800;
+        const fitWall = root.getAttribute('data-fit-wall-height') === 'true';
+        const pixels = fitWall ? Math.max(1, Math.round(1280 * Math.min(1, w / h))) : 1800;
         root.setAttribute('width', String(pixels));
         root.setAttribute('height', String(Math.max(1, Math.round(pixels * h / w))));
         const img = new Image();
         url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(root)], { type: 'image/svg+xml;charset=utf-8' }));
-        img.onload = () => { URL.revokeObjectURL(url); resolve({ image: img, ratio: h / w,viewBox:vb.length===4&&vb.every(Number.isFinite)?vb:[0,0,w,h],metersPerUnit }); };
+        img.onload = () => { URL.revokeObjectURL(url); resolve({ image: img, ratio: h / w,viewBox:vb.length===4&&vb.every(Number.isFinite)?vb:[0,0,w,h],metersPerUnit,fitWall }); };
         img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Décodage de la vue SVG impossible.')); };
         img.src = url;
       } catch (error) {
@@ -703,7 +707,7 @@
       textureBottoms[name] = value != null && Number.isFinite(Number(value)) ? Number(value) : 0;
     }
     const textureScales=Object.fromEntries(Object.entries(images).filter(([,item])=>item).map(([view,item])=>[
-      view,textureScale(item,view.startsWith('return-')?mesh.recess.depth:(view==='front'||view==='back'?d.width:d.depth))
+      view,textureScale(item,view.startsWith('return-')?mesh.recess.depth:(view==='front'||view==='back'?d.width:d.depth),d.wallHeight)
     ]));
     const textureScaleWarnings=Object.entries(textureScales).filter(([,info])=>info.calibrated&&info.relativeWidthDifference>TEXTURE_WIDTH_TOLERANCE).map(([view,info])=>({
       code:'TEXTURE_MODEL_WIDTH_MISMATCH',view,message:'Volume et élévation à recaler : la couvrance garde l’échelle du dessin.',
@@ -715,14 +719,14 @@
     function paintWall(face) {
       trace(face.poly);ctx.save();ctx.clip();ctx.fillStyle=face.fillColor||'#d7d8d0';ctx.fill();
       if (mesh.foundationDrop > 0) patch([local(face,0,mesh.ground),local(face,face.width,mesh.ground),local(face,face.width,0),local(face,0,0)],'#b9bcb3');
-      const stoneHeight = face.role==='recess-return'?0:Math.min(.86,d.wallHeight*.18);
+      const sourceView = face.textureView || face.id;
+      const item = images[sourceView];
+      const stoneHeight = face.role==='recess-return'||item?.fitWall?0:Math.min(.86,d.wallHeight*.18);
       if(stoneHeight>0)patch([local(face,0,0),local(face,face.width,0),local(face,face.width,stoneHeight),local(face,0,stoneHeight)],'#b2b2a5');
       for(let z=.13,row=0;z<stoneHeight;z+=.145,row++) {
         line(local(face,0,z),local(face,face.width,z),'rgba(244,241,228,.75)',.7);
         for(let u=(row%2)*.31;u<face.width;u+=.62) line(local(face,u,z),local(face,u,Math.min(z+.145,stoneHeight)),'rgba(244,241,228,.65)',.6);
       }
-      const sourceView = face.textureView || face.id;
-      const item = images[sourceView];
       if (item) {
         const {widthMeters:worldWidth,heightMeters:worldHeight}=textureScales[sourceView];
         const bottom = textureBottoms[sourceView];

@@ -2,6 +2,7 @@
 const assert = require('node:assert/strict');
 const S = require('../dist/plan-sheet-detection.js');
 const Spatial = require('../dist/plan-spatial-dimensions.js');
+const Visual = require('../dist/plan-facade-visual.js');
 const {parseDimension} = require('../dist/plan-import-core.js');
 assert.deepEqual(S.classify('Élévation latérale droite'), {kind:'elevation',face:'right'});
 assert.deepEqual(S.classify('02. Élévation arrière'), {kind:'elevation',face:'back'});
@@ -72,4 +73,34 @@ const levelVolume = S.volumeFrom(Spatial.evidence({
 },parseDimension));
 assert.ok(Math.abs(levelVolume.dimensions.wallHeight-9)<1e-10);
 assert.ok(Math.abs(levelVolume.dimensions.roofRise-2.75)<1e-10);
+
+// A scan can be off center, and the dimensions can outlive OCR in a saved
+// project. Windows distinguish the elevation from an unmarked rectangle.
+const sampleElevation = (width, height, rectangles) => {
+  const data = new Uint8ClampedArray(width * height * 4).fill(255);
+  const ink = (x, y) => data.fill(38, (y * width + x) * 4, (y * width + x) * 4 + 3);
+  const outline = (x, y, w, h) => {
+    for (let i = x; i <= x + w; i++) { ink(i,y); ink(i,y+h); }
+    for (let j = y; j <= y + h; j++) { ink(x,j); ink(x+w,j); }
+  };
+  for (const [x,y,w,h,blank] of rectangles) {
+    outline(x,y,w,h);
+    if (!blank) for (const floor of [.2,.6]) for (const column of [.12,.33,.54,.75]) {
+      outline(x+Math.round(w*column),y+Math.round(h*floor),Math.round(w*.11),Math.round(h*.19));
+    }
+  }
+  return {width,height,data};
+};
+const frame = [36,38,160,100];
+const ratio = frame[2]/frame[3];
+const scan = sampleElevation(240,150,[frame]);
+const near = (detected, expected) => assert.ok(detected?.box.every((v,i)=>Math.abs(v-expected[i])<=3), JSON.stringify(detected));
+near(Visual.detect({image:scan,ratio}),frame);
+const anchors = {span:{start:36,end:196},levels:{eaves:{line:{y:38}},grade:{line:{y:138}}}};
+near(Visual.detect({image:scan,anchors}),frame);
+assert.equal(Visual.detect({image:sampleElevation(240,150,[[...frame,true]]),ratio}),null);
+const otherFrame = [260,38,160,100];
+const doubled = sampleElevation(470,150,[frame,otherFrame]);
+assert.equal(Visual.detect({image:doubled,ratio}),null);
+near(Visual.detect({image:doubled,crop:[240,0,230,150],ratio}),otherFrame);
 console.log('MIR PDF : titres, cadrages multiples, cotes traçables et conflits vérifiés');
