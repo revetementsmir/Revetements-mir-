@@ -120,70 +120,6 @@ function updateFinish(){if(authoring){$('#selected-finish').innerHTML='';return;
 function fitModel(model){const p=model.pointsMM||[],xs=p.map(v=>v[0]),ys=p.map(v=>v[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const scale=Math.min(580/Math.max(1,maxX-minX),340/Math.max(1,maxY-minY));return {scale,ox:400-(minX+maxX)*scale/2,oy:255+(minY+maxY)*scale/2};}
 function pointOnView(point,tr){return [tr.ox+point[0]*tr.scale,tr.oy-point[1]*tr.scale];}
 function drawingModel(){const actual=build();if(actual.valid)return {model:actual,illustrative:authoring};const example=selectedTemplate&&M.templatePreview(selectedTemplate);return {model:example?.ok?example.model:build(sampleSpec(kind,kind==='profile'?draft.template:draft.shape)),illustrative:true};}
-function profileSectionPath(points,bends){
- let offsetX=0,offsetY=0;
- const segments=[],folds=[];
- let start=points[0];
- let path=`M${points[0].map(fmt).join(' ')}`;
- for(let i=1;i<points.length;i++){
-  const [x,y]=points[i];
-  const end=[x+offsetX,y+offsetY];
-  segments.push([start,end]);
-  start=end;
-  path+=` L${end.map(fmt).join(' ')}`;
-  if(bends[i-1]?.mode!=='hem'||i===points.length-1)continue;
-  const dx=points[i+1][0]-x,dy=points[i+1][1]-y,length=Math.hypot(dx,dy);
-  if(!length)continue;
-  const radius=5, side=bends[i-1].direction==='right'?-1:1;
-  offsetX-=dy/length*2*radius*side;
-  offsetY+=dx/length*2*radius*side;
-  start=[x+offsetX,y+offsetY];
-  folds.push([(end[0]+start[0])/2,(end[1]+start[1])/2]);
-  path+=` A${radius} ${radius} 0 0 ${side<0?1:0} ${fmt(start[0])} ${fmt(start[1])}`;
- }
- return {path,segments,folds};
-}
-function profileSideMarkers({segments,folds},model,handles){
- const placed=[];
- const distance=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
- function distanceToSide(p,[a,b]){
-  const dx=b[0]-a[0],dy=b[1]-a[1],lengthSquared=dx*dx+dy*dy;
-  const t=lengthSquared?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/lengthSquared)):0;
-  return distance(p,[a[0]+t*dx,a[1]+t*dy]);
- }
- const missing=[];
- const markers=segments.map(([a,b],index)=>{
-  const label=model.segments?.[index]?.label||String.fromCharCode(65+index);
-  const length=distance(a,b);
-  if(!length){missing.push(label);return '';}
-  const nx=(a[1]-b[1])/length,ny=(b[0]-a[0])/length;
-  for(const gap of [24,32,42,54,70]){
-   for(const t of [.5,.32,.68]){
-    for(const side of [1,-1]){
-     const x=a[0]+(b[0]-a[0])*t+side*gap*nx,y=a[1]+(b[1]-a[1])*t+side*gap*ny,p=[x,y];
-     if(x<13||x>787||y<13||y>507||
-      placed.some(q=>distance(p,q)<25)||folds.some(q=>distance(p,q)<23)||
-      handles.some(q=>distance(p,q)<22)||
-      segments.some(line=>distanceToSide(p,line)<18||line.some(q=>distance(p,q)<31)))continue;
-     placed.push(p);
-     return `<g class="profile-side-marker" pointer-events="none" aria-hidden="true"><circle cx="${fmt(x)}" cy="${fmt(y)}" r="11" fill="#fff" stroke="#779068"/><text x="${fmt(x)}" y="${fmt(y+4)}" text-anchor="middle" font-size="12" font-weight="700" fill="#345d3d">${esc(label)}</text></g>`;
-    }
-   }
-  }
-  missing.push(label);
-  return '';
- }).join('');
- if(!missing.length)return markers;
- // La tôle et ses cotes occupent la zone centrale; le bandeau inférieur est
- // réservé aux repères trop serrés pour être affichés près de leur côté.
- const spacing=Math.min(30,748/Math.max(1,missing.length-1));
- const startX=400-(missing.length-1)*spacing/2;
- const fallback=missing.map((label,index)=>{
-  const x=fmt(startX+index*spacing);
-  return `<g class="profile-side-marker" pointer-events="none" aria-hidden="true"><circle cx="${x}" cy="495" r="11" fill="#fff" stroke="#779068"/><text x="${x}" y="499" text-anchor="middle" font-size="12" font-weight="700" fill="#345d3d">${esc(label)}</text></g>`;
- }).join('');
- return markers+`<g class="profile-marker-overflow" aria-label="Repères de côtés trop serrés"><rect x="8" y="466" width="784" height="49" rx="8" fill="#f6f9f1" stroke="#dde7d5"/><text x="22" y="479" font-size="10" fill="#68825d">CÔTÉS TROP SERRÉS POUR UN REPÈRE DIRECT</text>${fallback}</g>`;
-}
 function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
@@ -192,12 +128,9 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});if(interactive&&!drag)drawTransform=tr;
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
- const section=profileSectionPath(mapped,freehand&&drawPoints.length<3?[]:model.bends||[]);
- output+=`<path d="${section.path}" fill="none" stroke="#97a68b" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="#dbe3d4" stroke-width="4" stroke-linejoin="miter"/>`;
- if(!small)output+=profileSideMarkers(section,freehand?{}:model,tool==='draw'||tool==='edit'?mapped:[]);
+ output+=M.profileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand?{}:model,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative});
  }
- const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}else{const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
- if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;output+=`<path d="M${fmt(mid[0]+normal[0]*9*side)},${fmt(mid[1]+normal[1]*9*side)}L${fmt(mid[0]+normal[0]*26*side)},${fmt(mid[1]+normal[1]*26*side)}" stroke="#4f8538" stroke-width="2"/><text x="${fmt(mid[0]+normal[0]*39*side)}" y="${fmt(mid[1]+normal[1]*39*side+5)}" text-anchor="middle" font-size="22" fill="#427c2a">*</text>`;}}
+ const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}
  }
  if(polygon){const xs=mapped.map(p=>p[0]),ys=mapped.map(p=>p[1]),left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bottom=Math.max(...ys);output+=`<path d="M${fmt(left)},${fmt(bottom+35)}H${fmt(right)}M${fmt(left)},${fmt(bottom+29)}V${fmt(bottom+41)}M${fmt(right)},${fmt(bottom+29)}V${fmt(bottom+41)}" fill="none" stroke="#8ba475" stroke-width="1.4"/><text x="${fmt((left+right)/2)}" y="${fmt(bottom+60)}" text-anchor="middle" font-size="18" fill="#577c3d">${esc(illustrative?'A · largeur':'A · '+M.formatMeasurement(model.widthMM,model.unit))}</text><text x="${fmt(right+25)}" y="${fmt((top+bottom)/2)}" font-size="17" fill="#577c3d">B</text>`;if(!illustrative)output+=`<text x="400" y="495" text-anchor="middle" font-size="14" fill="#7b8e6b">${esc('B · '+M.formatMeasurement(model.heightMM,model.unit)+' / C · '+M.formatMeasurement(model.reliefMM,model.unit))}</text>`;
  }

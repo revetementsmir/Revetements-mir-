@@ -683,54 +683,89 @@
     // Flatten nested SVG roots: this also renders consistently in PDF rasterizers.
     return '<g transform="translate(' + x + ' ' + y + ')">' + String(svg).replace(/^<svg\b[^>]*>/, '').replace(/<\/svg>\s*$/, '') + '</g>';
   }
-  function bendingSheetSketch(item) {
-    if (!item.valid || item.pointsMM.length < 2) return svgText(16,65,'Croquis à compléter','font-size="12" fill="#8b5526"');
-    const project=projection(item.pointsMM,{x:24,y:21,w:149,h:96});
-    const points=item.pointsMM.map(project), segments=[], folds=[];
-    let start=points[0], offset=[0,0], path='M '+start.map(decimal).join(',');
-    for(let i=1;i<points.length;i++){
-      const point=points[i],end=[point[0]+offset[0],point[1]+offset[1]];
-      segments.push([start,end]);
-      path+=' L '+end.map(decimal).join(',');
-      start=end;
-      const bend=item.bends[i-1],next=points[i+1];
-      if(bend?.mode!=='hem'||!next)continue;
-      const length=dist(next,point);
-      if(length<EPS)continue;
-      // Rayon visuel du croquis, en unités SVG. Les cotes restent celles du profil.
-      const radius=2,side=bend.direction==='right'?-1:1;
-      offset=[offset[0]-(next[1]-point[1])/length*2*radius*side,offset[1]+(next[0]-point[0])/length*2*radius*side];
-      start=[point[0]+offset[0],point[1]+offset[1]];
-      folds.push([(end[0]+start[0])/2,(end[1]+start[1])/2]);
-      path+=` A ${radius} ${radius} 0 0 ${side<0?1:0} ${start.map(decimal).join(',')}`;
+function profileSectionPath(points,bends){
+ let offsetX=0,offsetY=0;
+ const segments=[],folds=[];
+ let start=points[0];
+ let path=`M${points[0].map(decimal).join(' ')}`;
+ for(let i=1;i<points.length;i++){
+  const [x,y]=points[i];
+  const end=[x+offsetX,y+offsetY];
+  segments.push([start,end]);
+  start=end;
+  path+=` L${end.map(decimal).join(' ')}`;
+  if(bends[i-1]?.mode!=='hem'||i===points.length-1)continue;
+  const dx=points[i+1][0]-x,dy=points[i+1][1]-y,length=Math.hypot(dx,dy);
+  if(!length)continue;
+  const radius=5, side=bends[i-1].direction==='right'?-1:1;
+  offsetX-=dy/length*2*radius*side;
+  offsetY+=dx/length*2*radius*side;
+  start=[x+offsetX,y+offsetY];
+  folds.push([(end[0]+start[0])/2,(end[1]+start[1])/2]);
+  path+=` A${radius} ${radius} 0 0 ${side<0?1:0} ${decimal(start[0])} ${decimal(start[1])}`;
+ }
+ return {path,segments,folds};
+}
+function profileSideMarkers({segments,folds},model,handles){
+ const placed=[];
+ const distance=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
+ function distanceToSide(p,[a,b]){
+  const dx=b[0]-a[0],dy=b[1]-a[1],lengthSquared=dx*dx+dy*dy;
+  const t=lengthSquared?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/lengthSquared)):0;
+  return distance(p,[a[0]+t*dx,a[1]+t*dy]);
+ }
+ const missing=[];
+ const markers=segments.map(([a,b],index)=>{
+  const label=model.segments?.[index]?.label||String.fromCharCode(65+index);
+  const length=distance(a,b);
+  if(!length){missing.push(label);return '';}
+  const nx=(a[1]-b[1])/length,ny=(b[0]-a[0])/length;
+  for(const gap of [24,32,42,54,70]){
+   for(const t of [.5,.32,.68]){
+    for(const side of [1,-1]){
+     const x=a[0]+(b[0]-a[0])*t+side*gap*nx,y=a[1]+(b[1]-a[1])*t+side*gap*ny,p=[x,y];
+     if(x<13||x>787||y<13||y>507||
+      placed.some(q=>distance(p,q)<25)||folds.some(q=>distance(p,q)<23)||
+      handles.some(q=>distance(p,q)<22)||
+      segments.some(line=>distanceToSide(p,line)<18||line.some(q=>distance(p,q)<31)))continue;
+     placed.push(p);
+     return `<g class="profile-side-marker" pointer-events="none" aria-hidden="true"><circle cx="${decimal(x)}" cy="${decimal(y)}" r="11" fill="#fff" stroke="#779068"/><text x="${decimal(x)}" y="${decimal(y+4)}" text-anchor="middle" font-size="12" font-weight="700" fill="#345d3d">${esc(label)}</text></g>`;
     }
-    const lineDistance=(p,[a,b])=>{
-      const dx=b[0]-a[0],dy=b[1]-a[1],squared=dx*dx+dy*dy;
-      const t=squared?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/squared)):0;
-      return dist(p,[a[0]+t*dx,a[1]+t*dy]);
-    };
-    const placed=[];
-    let drawing='<path d="'+path+'" fill="none" stroke="#283b2f" stroke-width="2.7" stroke-linejoin="miter"/>';
-    segments.forEach(([a,b],index)=>{
-      const length=dist(a,b),segment=item.segments[index];
-      if(length<EPS)return;
-      const label=segment.label+(item.coloredFace.side&&item.coloredFace.segmentId===segment.id?'*':'');
-      for(const offset of [17,-17,25,-25,33,-33]){
-        for(const t of [.5,.33,.67]){
-          const p=[a[0]+(b[0]-a[0])*t-(b[1]-a[1])/length*offset,a[1]+(b[1]-a[1])*t+(b[0]-a[0])/length*offset];
-          if(p[0]<10||p[0]>184||p[1]<10||p[1]>132||placed.some(q=>dist(p,q)<20)||folds.some(q=>dist(p,q)<15)||segments.some(line=>lineDistance(p,line)<13||line.some(q=>dist(p,q)<17)))continue;
-          placed.push(p);
-          drawing+=`<circle cx="${decimal(p[0])}" cy="${decimal(p[1])}" r="8" fill="#f1f5ef" stroke="#b7c6b6"/>`;
-          drawing+=svgText(p[0],p[1]+3,label,'font-size="8.5" font-weight="700" text-anchor="middle" fill="#3a6636"');
-          return;
-        }
-      }
-    });
-    const endpoints=segments.flat().concat(folds.flatMap(([x,y])=>[[x-4,y-4],[x+4,y+4]]));
-    const fitted=bounds(endpoints.concat([[3,3],[193,141]]));
-    const scale=Math.min(190/(fitted.maxX-fitted.minX),138/(fitted.maxY-fitted.minY));
-    return scale<1?'<g transform="translate('+decimal(3-fitted.minX*scale)+' '+decimal(3-fitted.minY*scale)+') scale('+decimal(scale)+')">'+drawing+'</g>':drawing;
+   }
   }
+  missing.push(label);
+  return '';
+ }).join('');
+ if(!missing.length)return markers;
+ // La tôle et ses cotes occupent la zone centrale; le bandeau inférieur est
+ // réservé aux repères trop serrés pour être affichés près de leur côté.
+ const spacing=Math.min(30,748/Math.max(1,missing.length-1));
+ const startX=400-(missing.length-1)*spacing/2;
+ const fallback=missing.map((label,index)=>{
+  const x=decimal(startX+index*spacing);
+  return `<g class="profile-side-marker" pointer-events="none" aria-hidden="true"><circle cx="${x}" cy="495" r="11" fill="#fff" stroke="#779068"/><text x="${x}" y="499" text-anchor="middle" font-size="12" font-weight="700" fill="#345d3d">${esc(label)}</text></g>`;
+ }).join('');
+ return markers+`<g class="profile-marker-overflow" aria-label="Repères de côtés trop serrés"><rect x="8" y="466" width="784" height="49" rx="8" fill="#f6f9f1" stroke="#dde7d5"/><text x="22" y="479" font-size="10" fill="#68825d">CÔTÉS TROP SERRÉS POUR UN REPÈRE DIRECT</text>${fallback}</g>`;
+}
+
+function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false}={}){
+ const section=profileSectionPath(mapped,bends);
+ let output=`<path d="${section.path}" fill="none" stroke="#97a68b" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="#dbe3d4" stroke-width="4" stroke-linejoin="miter"/>`;
+ if(markers)output+=profileSideMarkers(section,markerModel,handles);
+ section.segments.forEach(([a,b],i)=>{
+ const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-dy/len,dx/len];
+ const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
+ if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;output+=`<path d="M${decimal(mid[0]+normal[0]*9*side)},${decimal(mid[1]+normal[1]*9*side)}L${decimal(mid[0]+normal[0]*26*side)},${decimal(mid[1]+normal[1]*26*side)}" stroke="#4f8538" stroke-width="2"/><text x="${decimal(mid[0]+normal[0]*39*side)}" y="${decimal(mid[1]+normal[1]*39*side+5)}" text-anchor="middle" font-size="22" fill="#427c2a">*</text>`;}
+ });
+ return output;
+}
+
+  function bendingSheetSketch(item, scale=.25) {
+    if (!item.valid || item.pointsMM.length < 2) return svgText(16,65,'Croquis à compléter','font-size="12" fill="#8b5526"');
+    const project=projection(item.pointsMM,{x:110,y:85,w:580,h:340});
+    return '<g font-family="Arial,sans-serif" transform="scale('+scale+')">'+profileDiagramContent(item,item.pointsMM.map(project))+'</g>';
+  }
+
   const PROFILE_GROUPS = ['L','L replié','J','Z','Fascia','Oméga','Beam','Colonne','Solin brique','Coin architectural','Éloignement des eaux','Profils personnalisés'];
   function profileFamily(item) {
     const name=item.name.toLowerCase();
@@ -898,7 +933,7 @@
         if (fragment.empty) { svg += svgText(60, y + 70, 'Aucune pièce dans ce dossier.', 'font-size="22"'); return; }
         const item = fragment.item, header = item.id + ' · ' + item.name + (fragment.continuation ? ' · SUITE, ne pas recompter' : '');
         svg += svgText(48, y + 27, header, 'font-size="16" font-weight="700"');
-        const drawing = item.kind === 'profile' ? profileSVG(item, { width: 408, height: 270, legend: false, header: false, notes: false }) : panelSVG(item, { width: 408, height: 270, legend: false, header: false, notes: false });
+        const drawing = item.kind === 'profile' ? bendingSheetSketch(item,.5) : panelSVG(item, { width: 408, height: 270, legend: false, header: false, notes: false });
         svg += placeSVG(drawing, 42, y + 44);
         svg += multiline(466, y + 53, fragment.details, { width: 37, lineHeight: 20, attrs: 'font-size="14"' }).svg;
         svg += multiline(822, y + 42, materialLines(item), { width: 16, lineHeight: 24, attrs: 'font-size="15"' }).svg;
@@ -1104,5 +1139,5 @@
   }
 
   function validate(spec) { return modelOf(spec).validation; }
-  return Object.freeze({ version: VERSION, TEMPLATES, SHAPES, PROFILE_GROUPS:Object.freeze(PROFILE_GROUPS), groupProfiles, parseMeasurement, formatMeasurement, quotePolicy, pricePiece, priceDossier, buildProfile, buildPanel, mirrorPanelSpec, insertDoubleFold, validate, profileSVG, panelSVG, buildOrder, productionPages, createTemplate, templatePreview, instantiateTemplate, configureTemplate: instantiateTemplate, createOrderSnapshot: instantiateTemplate, reviseInstance, revision: reviseInstance, createTemplateRevision });
+  return Object.freeze({ version: VERSION, TEMPLATES, SHAPES, PROFILE_GROUPS:Object.freeze(PROFILE_GROUPS), groupProfiles, parseMeasurement, formatMeasurement, quotePolicy, pricePiece, priceDossier, buildProfile, buildPanel, mirrorPanelSpec, insertDoubleFold, validate, profileSVG, profileDiagramContent, panelSVG, buildOrder, productionPages, createTemplate, templatePreview, instantiateTemplate, configureTemplate: instantiateTemplate, createOrderSnapshot: instantiateTemplate, reviseInstance, revision: reviseInstance, createTemplateRevision });
 });
