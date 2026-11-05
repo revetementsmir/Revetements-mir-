@@ -281,6 +281,15 @@ jobs:
           fetch "$base/production.html" /tmp/mir-backup-page.html
           grep -F 'template-library-backup.js?v=backup-1' /tmp/mir-backup-page.html
           fetch "$base/production-app.js" /tmp/production-app.js
+          grep -F 'mir-bending-lengths.js' /tmp/production.html
+          grep -F 'mir-bending-lengths.js' /tmp/pliage.html
+          fetch "$base/mir-bending-lengths.js?verification=$GITHUB_SHA" /tmp/mir-bending-lengths.js
+          cmp /tmp/mir-bending-lengths.js _site_mir/mir-bending-lengths.js
+          grep -F 'SOFFIT_J_IN=144' /tmp/mir-bending-lengths.js
+          grep -F "j_soffite:{name:" /tmp/production-app.js
+          fetch "$base/pliage.js?verification=$GITHUB_SHA" /tmp/mir-pliage.js
+          cmp /tmp/mir-pliage.js _site_mir/pliage.js
+          grep -F "j_soffite:{name:" /tmp/mir-pliage.js
           grep -F 'old?.channels?.client===true' /tmp/production-app.js
           grep -F 'old?.channels?.store===true' /tmp/production-app.js
           grep -F 'Nouveau modèle privé par défaut sur cet appareil' /tmp/production-app.js

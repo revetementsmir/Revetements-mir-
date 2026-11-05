@@ -95,6 +95,48 @@ function available() {
     assert.equal(await page.locator('#production-order').isVisible(),true);
     console.log('PASS save draft without PO and open local dossier');
     await page.close();
+    // Un dossier antérieur de 8 pi reste lisible et révisable sans altération.
+    const legacy=await browser.newPage({viewport:{width:1440,height:900}});
+    await legacy.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
+    await legacy.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
+    const built=await legacy.evaluate(()=>{
+      const M=window.MIRProduction;
+      const source={kind:'profile',template:'l',unit:'in',dimensions:{A:3,B:2},
+        length:96,quantity:2,coloredFace:{side:'left',segmentId:'A'},
+        material:{type:'aluminium'},finish:{}};
+      const template=M.createTemplate(source,{id:'modele-ancien-test',name:'Ancienne L 8 pi'});
+      if(!template.ok)return {ok:false,errors:template.errors};
+      const instance=M.instantiateTemplate(template.template,{
+        id:'M001',instanceId:'M001',name:'Ancienne L 8 pi',unit:'in',
+        measurements:{A:3,B:2,length:96},length:96,quantity:2,
+        coloredFace:{side:'left',segmentId:'A'},material:{type:'aluminium'},finish:{}
+      });
+      if(!instance.ok)return {ok:false,errors:instance.errors};
+      const order={id:'DOS-ANCIEN',project:'Dossier historique MIR',poNumber:'',
+        foreman:'',date:'',revision:'A',notes:'',nextNumber:2,items:[{
+          id:'M001',kind:'profile',spec:instance.spec,snapshot:instance.snapshot,
+          history:[],selection:{colorSystem:'manufacturer',materialId:'',colorId:''}
+        }]};
+      localStorage.setItem('mir_production_admin_dossier_v1',JSON.stringify({version:1,order}));
+      return {ok:true};
+    });
+    assert.equal(built.ok,true,'Ancien bon préparable : '+JSON.stringify(built.errors));
+    await legacy.reload({waitUntil:'domcontentloaded'});
+    await legacy.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
+    await legacy.locator('#mode-link').click();
+    assert.equal(await legacy.locator('[data-production-item="M001"]').count(),1,'Le bon de 8 pi doit rester visible');
+    await legacy.locator('[data-edit-piece="M001"]').click();
+    assert.equal(await legacy.locator('[data-measure="length"]').inputValue(),'96','Longueur historique intacte');
+    assert.equal(await legacy.locator('[data-measure="length"]').evaluate(node=>node.readOnly),true);
+    assert.match(await legacy.locator('.mir-profile-stock-note').first().textContent(),/historique/i);
+    await legacy.locator('#add-production-piece').click();
+    const saved=await legacy.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')).order.items);
+    assert.equal(saved.length,1,'La révision ne duplique pas la pièce');
+    assert.equal(Number(saved[0].spec.length),96,'Aucune modification silencieuse de longueur');
+    assert.equal(saved[0].history.length,1,'Snapshot précédent conservé');
+    assert.equal(Number(saved[0].history[0].spec.length),96);
+    console.log('PASS ancien dossier 8 pi : lecture, révision et historique préservés');
+    await legacy.close();
     // Le parcours client conserve sa présentation et ses fonctions.
     const client=await browser.newPage({viewport:{width:390,height:844}});
     await client.goto(base+'/production.html?mode=client',{waitUntil:'domcontentloaded'});
