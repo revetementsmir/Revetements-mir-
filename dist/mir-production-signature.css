@@ -1,0 +1,36 @@
+/* MIR Signature — uniquement en mode client du configurateur de production.
+   Aucun style actif sur l'interface Admin ni sur le moteur géométrique. */
+.mir-production-steps{display:none}
+html.mir-production-client{
+  --paper:#fafaf7;--ink:#18251d;--muted:#5b695d;
+  --line:#dfe5dc;--green:#348511;--sage:#f3f6f0
+}
+html.mir-production-client body{background:#fafaf7;color:#18251d;font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+html.mir-production-client .workshop-banner{background:#1b2b20;color:#dbe9d8}
+html.mir-production-client .production-intro h1{font-family:Arial,Helvetica,sans-serif;font-weight:700;letter-spacing:-.05em;line-height:1.06;text-wrap:balance}
+html.mir-production-client .production-intro h1 em{font-family:inherit;font-style:normal;font-weight:inherit;color:#327d22}
+html.mir-production-client .eyebrow{color:#347e22;font-weight:700}
+html.mir-production-client :is(.drawing-card,.config-card,.template-button,.order-card,.production-order){
+  border-color:#dfe5dc;border-radius:12px
+}
+html.mir-production-client :is(.drawing-card,.config-card,.order-card){box-shadow:0 8px 28px #10241612}
+html.mir-production-client .section-heading h2,html.mir-production-client .drawing-head h2{font-weight:700;color:#18251d}
+html.mir-production-client .kind-bar button[aria-pressed=true]{color:#245c21;background:#eaf5e5;border-bottom-color:#348511}
+html.mir-production-client .template-button[aria-pressed=true]{color:#245c21;background:#eaf5e5;border-color:#348511}
+html.mir-production-client :is(.primary-button,.mir-button){background:#348511;border-color:#348511;color:#fff}
+html.mir-production-client :is(.primary-button,.mir-button):not(:disabled):hover{background:#286b0d;border-color:#286b0d}
+html.mir-production-client :is(a,button,input,select,textarea,summary):focus-visible{outline:3px solid #348511;outline-offset:3px}
+html.mir-production-client .mir-production-steps{display:block;margin:0 0 25px;padding:18px 22px;background:#f2f7ee;border:1px solid #d9e7d4;border-radius:12px}
+html.mir-production-client .mir-production-steps ol{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0;padding:0}
+html.mir-production-client .mir-production-steps li{display:flex;gap:9px;align-items:baseline;color:#244329;font:600 13px/1.45 Arial,Helvetica,sans-serif;min-width:0}
+html.mir-production-client .mir-production-steps strong{color:#348511;font:700 12px/1.4 Arial,Helvetica,sans-serif}
+html.mir-production-client .mir-production-steps p{color:#596f5b;font-size:12px;line-height:1.5;margin:12px 0 0}
+@media(min-width:2200px){html.mir-production-client .production-wrap{max-width:1900px}}
+@media(max-width:1050px){html.mir-production-client .mir-production-steps ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+  html.mir-production-client .mir-production-steps{padding:15px;margin-bottom:19px}
+  html.mir-production-client .mir-production-steps ol{gap:10px}
+  html.mir-production-client .mir-production-steps li{font-size:12px}
+  html.mir-production-client .production-intro h1{font-size:clamp(37px,9.5vw,52px);letter-spacing:-.045em}
+}
+@media(prefers-reduced-motion:reduce){html.mir-production-client *{scroll-behavior:auto}}

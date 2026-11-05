@@ -56,6 +56,8 @@ jobs:
           node --check dist/mir-realisations.js
           node --check tests/mir-realisations-browser.cjs
           node --check tests/mir-client-signature-browser.cjs
+          node --check tests/mir-production-signature-browser.cjs
+          test -s dist/mir-production-signature.css
           node --check tests/mir-client-header-browser.cjs
       - name: Vérifier l'accueil MIR en vrai navigateur Chrome
         run: |
@@ -63,6 +65,7 @@ jobs:
           node tests/mir-homepage-browser.cjs
           node tests/mir-client-header-browser.cjs
           node tests/mir-client-signature-browser.cjs
+          node tests/mir-production-signature-browser.cjs
           node tests/mir-realisations-browser.cjs
           node tests/mir-miniatures-browser.cjs
           node tests/mir-direct-po-browser.cjs
