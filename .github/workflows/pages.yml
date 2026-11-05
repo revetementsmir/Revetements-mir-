@@ -77,12 +77,12 @@ jobs:
       - name: Vérifier l'accueil MIR en vrai navigateur Chrome
         run: |
           npm install --no-save playwright@1.58.2
+          node tests/mir-plan-pdf-browser.cjs
           node tests/mir-retours-cotes-browser.cjs
           node tests/mir-homepage-browser.cjs
           node tests/mir-client-header-browser.cjs
           node tests/mir-client-signature-browser.cjs
           node tests/mir-production-signature-browser.cjs
-          node tests/mir-plan-pdf-browser.cjs
           node tests/mir-realisations-browser.cjs
           node tests/mir-miniatures-browser.cjs
           node tests/mir-direct-po-browser.cjs

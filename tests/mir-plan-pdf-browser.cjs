@@ -88,12 +88,18 @@ const server=http.createServer((req,res)=>{
   browser=await chromium.launch({channel:'chrome',args:['--no-sandbox']});
   for(const width of [390,1440]){
    const page=await browser.newPage({viewport:{width,height:900},hasTouch:width===390});
-   const errors=[];
+   const errors=[], warnings=[];
    page.on('pageerror',error=>errors.push(error.message));
+   page.on('console',message=>{if(['warning','error'].includes(message.type()))warnings.push(message.text());});
    await page.goto(('http://127.0.0.1:'+server.address().port)+'/plan.html');
    await page.locator('#import-pdf').click();
    assert.match(await page.locator('.mir-pdf-upload').innerText(),/150 Mo/);
    const file=page.locator('#mir-pdf-file');
+   async function assertImportReady(){
+    await page.waitForFunction(()=>!document.querySelector('#mir-pdf-file').disabled,null,{timeout:45000});
+    const status=await page.locator('#mir-pdf-status').textContent(),message=await page.locator('#mir-pdf-error').textContent();
+    assert.ok(await page.locator('#mir-pdf-final').isEnabled(),[status,message,...warnings,...errors].filter(Boolean).join('\n'));
+   }
    if(width===390){
     await file.setInputFiles(path.join(tmp,'plan-hors-limite.pdf'));
     await page.locator('#mir-pdf-error').filter({hasText:/dépasse 150 Mo/}).waitFor();
@@ -106,14 +112,14 @@ const server=http.createServer((req,res)=>{
     const scan=path.join(tmp,'plan-scanné.pdf');
     makeScan(scan,Buffer.from(jpeg,'base64'));
     await file.setInputFiles(scan);
-    await page.waitForFunction(()=>!document.querySelector('#mir-pdf-final').disabled,null,{timeout:45000});
+    await assertImportReady();
     assert.match(await page.locator('#mir-pdf-assigned').innerText(),/Avant/);
     assert.match(await page.locator('#mir-pdf-volume-note').innerText(),/À compléter/);
     console.log('PASS 390 px : élévation repérée sur une feuille scannée, cotes manquantes signalées');
    }
    await file.setInputFiles(path.join(tmp,'plan-108mo.pdf'));
    await page.locator('#mir-pdf-final').waitFor();
-   await page.waitForFunction(()=>!document.querySelector('#mir-pdf-final').disabled,null,{timeout:45000});
+   await assertImportReady();
    assert.equal(await page.locator('#mir-pdf-page-range, #mir-pdf-face, [data-page]').count(),0);
    assert.match(await page.locator('#mir-pdf-assigned').innerText(),/PLAN DES FONDATIONS[\s\S]*PLAN DU REZ-DE-CHAUSSEE/);
    assert.match(await page.locator('#mir-pdf-volume-note').innerText(),/s’ouvrira automatiquement/);

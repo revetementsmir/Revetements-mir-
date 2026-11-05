@@ -191,7 +191,7 @@
           const {x0, y0, x1, y1} = word.bbox;
           words.push({ text: word.text, box: [x0, y0, x1, y1].map(value => value / scale), confidence: word.confidence, source: 'ocr' });
         }
-      return words;
+      return { words, text: result.data.text || '' };
     } finally { canvas.width = canvas.height = 1; }
   }
   const inCrop = (word, [x, y, w, h]) => {
@@ -216,7 +216,13 @@
           try {
             const scanned = await recognize(page, base, imported);
             if (token !== sequence) return;
-            if (scanned.length) { words = scanned; rows = detector.lines(words); views = detector.viewsForPage(rows); }
+            if (scanned.words.length) { words = scanned.words; rows = detector.lines(words); views = detector.viewsForPage(rows); }
+            if (!views.length) {
+              // Some OCR results include text without useful word boxes. A
+              // single clear title can identify a full sheet in that case.
+              const titles = [...new Set(scanned.text.split(/\r?\n/).map(text => text.trim()).filter(text => text.length <= 105 && detector.classify(text)))];
+              if (titles.length === 1) views = [{ ...detector.classify(titles[0]), name: titles[0], box: [0, 0, base.width, base.height], source: 'ocr' }];
+            }
           } catch (e) { ocrFailed = true; if (token === sequence) console.warn('MIR PDF : lecture des feuilles scannées indisponible', e); }
         }
         if (views.length) prepared.push({ number, words, views: detector.divideViews(views, base.width, base.height) });
@@ -240,7 +246,7 @@
         if (!hints.length && !ocrFailed && sheet.views.some(view => view.face) && words.every(word => word.source === 'pdf-text')) {
           try {
             const scanned = await recognize(page, base, imported);
-            hints = window.MIRStructuralNotes.detect(detector.lines(scanned.map(word => ({ ...word, box: word.box.map(value => value * scale) }))), '');
+            hints = window.MIRStructuralNotes.detect(detector.lines(scanned.words.map(word => ({ ...word, box: word.box.map(value => value * scale) }))), scanned.text);
           } catch (e) { ocrFailed = true; if (token === sequence) console.warn('MIR PDF : lecture des repères dessinés indisponible', e); }
           if (token !== sequence) return;
         }
