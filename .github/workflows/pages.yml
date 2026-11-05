@@ -26,6 +26,8 @@ jobs:
           node --check dist/production-app.js
           node --check dist/kaycan-flat-preview.js
           node --check dist/production-admin-v4.js
+          node --check dist/mir-procurement.js
+          node tests/mir-procurement.cjs
           node tests/mir-pages-regressions.cjs
           node tests/mir-atelier-v4.cjs
       - uses: actions/configure-pages@v5
@@ -54,6 +56,11 @@ jobs:
           grep -F 'production-admin-v4.js?v=1' /tmp/production.html
           fetch "$base/production-admin-v4.css" /tmp/mir-admin-v4.css
           grep -F 'body.mir-admin-v4 .kind-bar' /tmp/mir-admin-v4.css
+          fetch "$base/mir-procurement.js" /tmp/mir-procurement.js
+          grep -F 'mir_admin_procurement_v1' /tmp/mir-procurement.js
+          fetch "$base/mir-procurement.css" /tmp/mir-procurement.css
+          grep -F '#mir-procurement-tabs' /tmp/mir-procurement.css
+          grep -F 'mir-procurement.js?v=1' /tmp/production.html
           fetch "$base/production-admin-v4.js" /tmp/mir-admin-v4.js
           grep -F 'mir-v4-sheet-total' /tmp/mir-admin-v4.js
           grep -F 'href="atelier-essai/index.html" data-admin-only' /tmp/production.html
