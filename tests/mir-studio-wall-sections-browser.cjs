@@ -40,6 +40,7 @@ async function online(){
    const svg=page.locator('#elevation svg');
    assert.equal(await svg.locator('[data-mir-wall-part]').count(),3);
    assert.equal(await svg.locator('[data-mir-masonry-band]').count(),3);
+   assert.equal(await svg.locator('[data-mir-wall-opening]').count(),4,'Les ouvertures du mur du fond doivent rester visibles');
    for(const name of ['return-left','front','return-right']){
     assert.equal(await svg.locator('[data-mir-wall-part="'+name+'"]').count(),1);
    }
