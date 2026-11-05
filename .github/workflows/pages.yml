@@ -50,12 +50,14 @@ jobs:
           node tests/mir-client-header.cjs
           node --check tests/mir-client-signature.cjs
           node tests/mir-client-signature.cjs
+          node --check tests/mir-client-signature-browser.cjs
           node --check tests/mir-client-header-browser.cjs
       - name: Vérifier l'accueil MIR en vrai navigateur Chrome
         run: |
           npm install --no-save playwright@1.58.2
           node tests/mir-homepage-browser.cjs
           node tests/mir-client-header-browser.cjs
+          node tests/mir-client-signature-browser.cjs
           node tests/mir-miniatures-browser.cjs
           node tests/mir-direct-po-browser.cjs
           node tests/mir-retours-cotes-browser.cjs
@@ -67,6 +69,7 @@ jobs:
           path: |
             artifacts/mir-accueil-*.png
             artifacts/mir-entete-*.png
+            artifacts/mir-signature-*.png
             artifacts/mir-miniatures-*.png
             artifacts/mir-direct-po-*.png
             artifacts/mir-retours-*.png
