@@ -115,11 +115,11 @@
         '<rect x="'+round(x)+'" y="'+round(y0)+'" width="'+round(w)+'" height="'+round(height)+'" fill="'+safeFill(part)+'" fill-opacity=".96" stroke="#536855" stroke-width="2"/>'+
         (bandH>0?'<rect data-mir-masonry-band="'+part.id+'" x="'+round(x)+'" y="'+round(masonryY)+'" width="'+round(w)+'" height="'+round(bandH)+'" fill="'+(brickPattern?'url(#mir-exploded-brick)':'#a3a59a')+'"/>':'')+
         (part.id==='front'?frontOpenings(frontFace,dimensions,{x,width:w,yGround:grade,pixelsPerMeter:ppm,top:y0,bottom}):'')+
-        '<text x="'+round(x+w/2)+'" y="'+round(Math.max(vb[1]+55,top-13))+'" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#40533d" paint-order="stroke" stroke="#fafbf5" stroke-width="3">'+label+'</text>'+
+        '<text x="'+round(x+w/2)+'" y="'+round(Math.max(vb[1]+55,top-13))+'" text-anchor="middle" font-size="20" font-family="Arial,sans-serif" fill="#40533d" paint-order="stroke" stroke="#fafbf5" stroke-width="3">'+label+'</text>'+
         '<title>'+part.name+' — sommet '+round(part.topMeters)+' m, pied '+round(part.bottomMeters)+' m</title></g>';
       x+=w+gap;return node;
     }).join('');
-    const note='<text x="'+round(startX)+'" y="'+round(vb[1]+34)+'" font-size="16" font-weight="700" fill="#3f5944">3 murs détachés · hauteurs du volume</text>'+
+    const note='<text x="'+round(startX)+'" y="'+round(vb[1]+34)+'" font-size="23" font-weight="700" fill="#3f5944">3 murs détachés · hauteurs du volume</text>'+
       '<path d="M'+round(startX)+' '+round(grade)+'H'+round(x-gap)+'" stroke="#8ca18a" stroke-width="1.7" stroke-dasharray="10 6"/>';
     const overlay='<g class="mir-exploded-side-walls" data-mir-three-wall-explode="true" pointer-events="none">'+
       (brickPattern?'<defs>'+brickPattern+'</defs>':'')+note+blocks+'</g>';
