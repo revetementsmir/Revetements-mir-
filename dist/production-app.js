@@ -126,7 +126,9 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
  const points=freehand?(drawPoints.length>=3&&model.pointsMM.length===drawPoints.length
   ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520"><text x="400" y="250" text-anchor="middle" font-family="Arial" font-size="19" fill="#7b8b6c">Cliquez pour dessiner votre premier segment.</text></svg>`;
- const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});if(interactive&&!drag)drawTransform=tr;
+ const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});
+ if(interactive&&!small&&view==='face'&&tool!=='draw'&&drag?.type!=='point'&&zoom!==1){tr.scale*=zoom;tr.ox=400+(tr.ox-400)*zoom;tr.oy=260+(tr.oy-260)*zoom;}
+ if(interactive&&!drag)drawTransform=tr;
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
  output+=M.profileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand?{}:model,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative});
@@ -281,12 +283,48 @@ function applyMeasureFraction(select){
  input.value=M.formatMeasurement(amount*25.4,'in').replace(/ po$/,'');
  handleInput({target:input});
 }
+function updateV4Totals(model){
+ const totalNode=$('#mir-v4-sheet-total'),totalValue=$('#mir-v4-sheet-value');
+ if(totalNode&&totalValue){
+  const isProfile=model.kind==='profile';
+  totalNode.hidden=!isProfile;
+  const rawWidth=isProfile&&Number.isFinite(model.finishedSegmentSumMM)?M.formatMeasurement(model.finishedSegmentSumMM,model.unit):'À préciser';
+  const glyphs={'1/2':'½','1/4':'¼','3/4':'¾','1/8':'⅛','3/8':'⅜','5/8':'⅝','7/8':'⅞'};
+  const mixed=/^(-?[0-9]+) ([0-9]+\/[0-9]+) po$/.exec(rawWidth);
+  totalValue.textContent=mixed&&glyphs[mixed[2]]?mixed[1]+glyphs[mixed[2]]+' po':rawWidth;
+ }
+ const put=(selector,value)=>{const node=$(selector);if(node)node.textContent=value||'À préciser';};
+ const materialLabels={'acier':'Acier','aluminium':'Aluminium','acier-inoxydable':'Acier inoxydable','autre':'Autre matériau'};
+ put('#mir-v4-recap-material',model.material?.name||materialLabels[model.material?.type]||materialLabels[draft.material?.type]);
+ put('#mir-v4-recap-color',model.finish?.name||model.finish?.code);
+ if(model.kind==='profile'){
+  put('#mir-v4-recap-face',model.coloredFace?.side?(model.coloredFace.side==='left'?'Gauche':'Droite')+' · '+(model.coloredFace.segmentId||'A'):'À préciser');
+  put('#mir-v4-recap-length',Number.isFinite(model.lengthMM)?M.formatMeasurement(model.lengthMM,model.unit):'À préciser');
+ }else{
+  put('#mir-v4-recap-face',model.perforation?.enabled?'Bas perforé':'Sans perforation');
+  put('#mir-v4-recap-length',Number.isFinite(model.widthMM)&&Number.isFinite(model.heightMM)?M.formatMeasurement(model.widthMM,model.unit)+' × '+M.formatMeasurement(model.heightMM,model.unit):'À préciser');
+ }
+ const lengthTitle=$('#mir-v4-recap-length')?.previousElementSibling;if(lengthTitle)lengthTitle.textContent=model.kind==='profile'?'Longueur de la pièce':'Dimensions du panneau';
+ const faceTitle=$('#mir-v4-recap-face')?.previousElementSibling;if(faceTitle)faceTitle.textContent=model.kind==='profile'?'Face colorée':'Perforation';
+ put('#mir-v4-recap-quantity',String(model.quantity||draft.quantity||1));
+ const typeLabel=model.material?.name||materialLabels[model.material?.type]||materialLabels[draft.material?.type];
+ put('#mir-v4-material-status',typeLabel);
+ put('#mir-v4-colors-status',model.finish?.name||model.finish?.code);
+ put('#mir-v4-face-status',model.kind==='profile'
+  ?(model.coloredFace?.side?(model.coloredFace.side==='left'?'Gauche':'Droite')+' · '+(model.coloredFace.segmentId||'A'):'À préciser')
+  :(model.perforation?.enabled?'Bas perforé':'Sans perforation'));
+ put('#mir-v4-details-status','Qté '+String(model.quantity||draft.quantity||1));
+ const dims=model.kind==='profile'
+  ?(model.segments||[]).map(segment=>segment.label+' '+M.formatMeasurement(segment.lengthMM,model.unit)).join(' · ')
+  :(Number.isFinite(model.widthMM)?'A '+M.formatMeasurement(model.widthMM,model.unit):'');
+ put('#mir-v4-dimensions-status',dims);
+}
 function updateDrawing({keepForm=false}={}){
  renderFractionPickers();
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  $('#drawing-title').textContent=authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
- const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()||view==='volume'?'none':'';$('#trace-readout').hidden=!canDrawProfile();
+ const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()||view==='volume'||(!client&&kind==='profile')?'none':'';$('#trace-readout').hidden=!canDrawProfile();
  stage.innerHTML=view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
  const dimensions=$('#profile-dimension-list');
  const sides=tool==='draw'?drawPoints.slice(1).map((point,index)=>({
@@ -303,7 +341,7 @@ function updateDrawing({keepForm=false}={}){
   }).join('');
  }
 
- $('#drawing-navigation').hidden=kind!=='panel'&&view!=='volume';$('#zoom-controls').hidden=kind!=='panel'&&(client||view!=='volume');$('#panel-zoom-value').textContent=Math.round(zoom*100)+' %';$('#panel-zoom-out').disabled=zoom<=.5;$('#panel-zoom-in').disabled=zoom>=4;
+ $('#drawing-navigation').hidden=client&&kind!=='panel'&&view!=='volume';$('#zoom-controls').hidden=client&&kind!=='panel'&&view!=='volume';$('#panel-zoom-value').textContent=Math.round(zoom*100)+' %';$('#panel-zoom-out').disabled=zoom<=.5;$('#panel-zoom-in').disabled=zoom>=4;
  $('#drawing-gesture-hint').textContent=view==='volume'?'Glissez pour tourner · molette ou pincement pour zoomer':'Molette ou pincement pour zoomer';
  document.querySelectorAll('[data-preview]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.preview===view)));
  $('#finish-summary').textContent=draft.finish?.name||draft.finish?.code||'';
@@ -315,8 +353,9 @@ function updateDrawing({keepForm=false}={}){
   const blockJ=jRule&&!jRule.pending&&(!jRule.valid||(!jRule.ok&&!window.MIRBendingPresets.exceptionMatches(jRule,jException)));
   $('#add-production-piece').disabled=!actual.valid||geometryErrors.length>0||busy||!!blockJ||!availableForPO();
   renderPieceGuidance(actual,blockJ);
+  updateV4Totals(actual);
  const quote=M.quotePolicy(draft);$('#custom-color-quote').hidden=authoring||!quote.required;renderPiecePrice(actual,geometryErrors);
- $('#add-production-piece').innerHTML=authoring?'Enregistrer le modèle <span aria-hidden="true">＋</span>':editingItemId?'Enregistrer la révision <span aria-hidden="true">✓</span>':quote.required?'Ajouter à ma soumission <span aria-hidden="true">＋</span>':(client?'Ajouter au dossier':order.poNumber?'Ajouter au bon '+esc(order.poNumber):'Choisir un bon et ajouter')+' <span aria-hidden="true">＋</span>';if(!keepForm)renderTools();
+ $('#add-production-piece').innerHTML=authoring?'Enregistrer le modèle <span aria-hidden="true">＋</span>':editingItemId?'Enregistrer la révision <span aria-hidden="true">✓</span>':quote.required?'Ajouter à ma soumission <span aria-hidden="true">＋</span>':(client?'Ajouter au dossier':'Enregistrer la pièce')+' <span aria-hidden="true">'+(client?'＋':'✓')+'</span>';if(!keepForm)renderTools();
 }
 function renderPieceGuidance(model,blockJ){
  const box=$('#piece-guidance');
@@ -477,7 +516,7 @@ function makeItem(spec,id,{old=null,template=selectedTemplate}={}){let result;if
 function addPiece(){
  formMetadata();if(authoring)return saveTemplateDialog();
  if(!client&&!activeWorkshopOrderMatches())return;
- if(!client&&!editingItemId&&!order.poNumber)return choosePODialog('add');
+ // La saisie d'un bon reste optionnelle dans l'atelier de traçage admin.
  if(!availableForPO())return toast('Activez Bon de commande pour ce modèle dans Mes modèles.');
  const imported=order.items.find(item=>item.id===editingItemId)?.sourceProfile;
  if(imported&&draft.template==='custom'){
@@ -513,7 +552,7 @@ function addPiece(){
  if(!store(KEYS.draft,{version:1,order:nextOrder}))return;
  order=nextOrder;
  editingItemId=null;renderOrder();renderFormMetadata();updateDrawing();
- toast(old?'Nouvelle révision enregistrée. La version précédente reste conservée.':id+(client?' ajouté au dossier.':' ajouté au bon. Aucune diffusion en boutique ou au magasin.'));
+ toast(old?'Nouvelle révision enregistrée. La version précédente reste conservée.':id+(client?' ajouté au dossier.':order.poNumber?' ajouté au bon.':' enregistré dans le dossier local.'));
 }
 function offerProfileImport(confirmedPO=false){
  const bridge=window.MIRProfileProductionTransfer;
@@ -549,11 +588,11 @@ function render(){
  const previous=document.body.dataset.profileAdmin;
  document.body.dataset.profileAdmin=String(profileAdmin);
  if(previous!==String(profileAdmin)&&!client){
-  $('.piece-finish').open=!profileAdmin;
+  $('.piece-finish').open=false;
   $('#order-metadata').open=!profileAdmin;
-  $('#production-title').textContent=profileAdmin?'Pliage sur mesure':'Panneaux métalliques';
+  $('#production-title').textContent=profileAdmin?'Moulures sur mesure':'Panneaux architecturaux';
   $('#production-eyebrow').textContent='ATELIER MIR';
-  $('#production-description').textContent=profileAdmin?'Choisis un profil ou dessine-le, puis entre tes cotes.':'Configurez vos panneaux sur mesure.';
+  $('#production-description').textContent=profileAdmin?'Tracez, cotez et configurez votre pièce de moulure.':'Tracez et configurez vos panneaux architecturaux sur mesure.';
  }document.querySelectorAll('[data-kind]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.kind===kind)));document.querySelectorAll('[data-workflow]').forEach(button=>button.setAttribute('aria-current',button.dataset.workflow===workflow?'page':'false'));$('#request-count').textContent=requests.length;const configure=workflow==='configure';for(const selector of ['.kind-bar','.template-section','.production-workspace'])$(selector).hidden=!configure;$('#production-order').hidden=!configure||authoring;$('#production-library').hidden=workflow!=='models';$('#production-requests').hidden=workflow!=='requests';$('#author-banner').hidden=!authoring||!configure;if(authoring)$('#author-banner').innerHTML=`<div><strong>Édition d’un modèle${editingTemplateId?' · nouvelle version':''}</strong><span>La forme et les angles sont définis ici. Les mesures de commande restent vides pour le client.</span></div><button type="button" data-cancel-author>Quitter les modèles</button>`;if(configure){renderTemplates();renderDimensions();renderProfileOptions();renderPanelOptions();renderFormMetadata();renderColors();updateDrawing();renderOrder();}if(workflow==='models')renderModels();if(workflow==='requests')renderRequests();}
 function renderModels(){const records=templates.filter(record=>!record.archived);$('#production-library').innerHTML=`<div class="library-heading"><div><p class="eyebrow">VOS MODÈLES RÉUTILISABLES</p><h2>Une forme. <em>Toutes les mesures.</em></h2><p>Dessinez le modèle une fois. Le client saisit ses cotes, et sa pièce arrive dans les demandes avec son dessin enregistré.</p></div><div><button type="button" class="primary-button" data-new-model="profile">Dessiner un pliage ＋</button><button type="button" class="secondary-button" data-new-model="panel">Créer un panneau ＋</button></div></div><div class="mir-template-backup-actions"><button type="button" class="secondary-button" data-export-mir-models="1">Exporter mes modèles (JSON)</button><button type="button" class="secondary-button" data-import-mir-models="1">Importer une sauvegarde</button><input id="mir-template-backup-file" type="file" accept=".json,application/json" hidden aria-label="Fichier JSON de modèles MIR"></div><div class="local-scope-note"><strong>Catalogue de modèles local</strong><p><a class="text-link" href="gestion-boutique.html">Gérer la visibilité du catalogue public ↗</a></p><p>Les modèles disponibles apparaissent dans le parcours client et le magasin sur ce navigateur. Leur partage entre appareils reste à connecter.</p></div><div class="model-library-grid">${records.length?records.map(record=>{const t=latest(record),preview=M.templatePreview(t);return `<article class="model-library-card"><div class="model-preview">${preview.ok?diagramSVG(preview.model,{illustrative:true,small:true,interactive:false}):''}</div><div class="model-library-body"><span class="eyebrow">${t.kind==='profile'?'PLIAGE':'PANNEAU MÉTALLIQUE'} · VERSION ${t.version}</span><h3>${esc(t.name)}</h3><p>${t.fields.filter(f=>f.required).length} cotes requises · ${Object.values(record.measurementDefaults?.values||{}).filter(v=>String(v?.value??'').trim()).length} cote(s) préremplie(s) pour le magasin</p><p class="model-channels">${[record.channels?.client===true?'Boutique':'',record.channels?.store===true?'Magasin employés':'',record.channels?.po!==false?'Bon de commande':''].filter(Boolean).join(' · ')||'Usage interne'}</p><div class="model-actions"><button type="button" class="primary-button" data-use-saved-model="${esc(record.id)}">Remplir les cotes ↗</button><button type="button" class="plain-button" data-edit-model="${esc(record.id)}">Nouvelle version</button><button type="button" class="plain-button" data-archive-model="${esc(record.id)}">Retirer du catalogue</button></div></div></article>`;}).join(''):'<div class="production-empty"><strong>Votre premier modèle, prêt à servir.</strong><p>Les modèles contiennent la forme, les angles et les champs à remplir. Aucune cote de commande n’est publiée.</p></div>'}</div>`;}
 function beginAuthor(type,record=null){workflow='configure';authoring=true;editingItemId=null;activeDefaultLocks={};editingTemplateId=record?.id||null;kind=type;selectedTemplate=record?latest(record):null;if(record){const p=M.templatePreview(selectedTemplate);if(!p.ok){toast('Ce modèle est invalide.');return;}draft=copy(p.model.spec);draft.name=selectedTemplate.name;draft.kind=type;}else draft=sampleSpec(type,type==='profile'?'custom':'rectangle');tool='select';view='face';drawPoints=[];render();$('.production-workspace').scrollIntoView({behavior:'smooth',block:'start'});}
@@ -776,7 +815,7 @@ function beginPointDrag(event){
   return;
  }
 
- if(kind==='panel'||(view==='volume'&&event.pointerType==='touch')){
+ if(kind==='panel'||(view==='volume'&&event.pointerType==='touch')||(!client&&kind==='profile'&&view==='face'&&tool==='select'&&event.pointerType==='touch')){
   if(pointers.size>=2)return;
   pointers.set(event.pointerId,[event.clientX,event.clientY]);stage.setPointerCapture?.(event.pointerId);
   if(pointers.size===2){const a=[...pointers.values()];drag={type:'pinch',distance:Math.hypot(a[1][0]-a[0][0],a[1][1]-a[0][1]),zoom};event.preventDefault();return;}
@@ -1133,7 +1172,7 @@ function handleSubmit(event){const form=event.target;if(!form.matches('#end-hem-
  if(!checked?.ok)return messageError(checked?.errors?.join(' ')||'Vérification des cotes standards indisponible.');
  const record={measurementDefaults:checked.data,id:result.template.id,name:result.template.name,currentVersion:result.template.version,versions:old?[...old.versions,copy(result.template)]:[copy(result.template)],channels:{client:data.has('client'),store:data.has('store'),po:data.has('po')},allowed,archived:false,updatedAt:new Date().toISOString()};if(old)templates[templates.indexOf(old)]=record;else templates.push(record);store(KEYS.templates,{version:1,records:templates});closeDialog();authoring=false;editingTemplateId=null;workflow='models';render();toast('Modèle enregistré. Les mesures standards sont prêtes pour le magasin local.');
 }
-function handleKey(event){if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&kind==='panel'){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
+function handleKey(event){if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
 function macSteelPalette(catalogue){
  const sourceUrl='https://macmetalarchitectural.com/nos-couleurs/';
  const swatches=new Map(catalogue.filter(m=>m.brand==='MAC Métal architectural').flatMap(m=>(m.colors||[]).map(c=>[c.name,c.swatchUrl||c.swatchImage])));
@@ -1151,7 +1190,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  const saved=read(KEYS.draft,null);order=saved?.version===1&&Array.isArray(saved.order?.items)?normalizeWorkshopOrder(saved.order):defaultOrder();
  injectWorkflow();if(client){$('#production-eyebrow').textContent='L’ATELIER MIR / VOS PIÈCES SUR MESURE';$('#production-title').innerHTML='Votre pièce.<br>À vos <em>mesures.</em>';$('#production-description').textContent='Choisissez la forme. Entrez vos cotes, votre métal et votre couleur. Votre dessin suit vos choix.';$('#mode-link').href='#production-order';$('#mode-link').innerHTML='Mon dossier <span aria-hidden="true">↘</span>';$('#order-metadata').open=false;}
  document.addEventListener('click',handleClick);document.addEventListener('input',handleInput);document.addEventListener('change',handleChange);document.addEventListener('submit',handleSubmit);document.addEventListener('keydown',handleKey);document.addEventListener('keydown',traceShift);document.addEventListener('keyup',traceShift);
- const stage=$('#production-drawing');stage.addEventListener('pointerdown',beginPointDrag);stage.addEventListener('pointermove',movePoint);stage.addEventListener('pointerup',endPoint);stage.addEventListener('pointercancel',endPoint);stage.addEventListener('pointerleave',event=>{if(drag?.type==='trace'&&!drag.moved)endPoint(event);});stage.addEventListener('click',drawingClick);stage.addEventListener('wheel',event=>{if(kind!=='panel'&&view!=='volume')return;event.preventDefault();setZoom(zoom*Math.exp(-event.deltaY*.001));},{passive:false});
+ const stage=$('#production-drawing');stage.addEventListener('pointerdown',beginPointDrag);stage.addEventListener('pointermove',movePoint);stage.addEventListener('pointerup',endPoint);stage.addEventListener('pointercancel',endPoint);stage.addEventListener('pointerleave',event=>{if(drag?.type==='trace'&&!drag.moved)endPoint(event);});stage.addEventListener('click',drawingClick);stage.addEventListener('wheel',event=>{if(client&&kind!=='panel'&&view!=='volume')return;event.preventDefault();setZoom(zoom*Math.exp(-event.deltaY*.001));},{passive:false});
  $('#production-dialog').addEventListener('click',event=>{if(event.target!==$('#production-dialog'))return;const r=$('#production-dialog').getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeDialog();});
  choose(kind,kind==='panel'?'rectangle':'l');const requestedMaterial=params.get('material');if(kind==='panel'&&['unico-up1-acier','unico-up1-aluminium'].includes(requestedMaterial)){const type=requestedMaterial.endsWith('aluminium')?'aluminium':'acier';draft.material={type,name:'Unico U-P1 — '+(type==='acier'?'Acier':'Aluminium plié'),productRef:requestedMaterial,thickness:'',thicknessUnit:'mm',gauge:''};materialId=availableMaterials()[0]?.id||'';colorSystem='manufacturer';const requestedColor=params.get('color'),palette=availableMaterials().find(m=>m.colors.some(c=>c.id===requestedColor));if(palette){materialId=palette.id;colorId=requestedColor;}render();}const linked=params.get('template');if(linked&&templates.some(record=>record.id===linked))useSavedTemplate(linked);if(!client&&params.get('view')==='models'){workflow='models';render();}if(!client&&params.get('view')==='requests'){workflow='requests';render();}if(client&&params.get('kind')==='profile'&&!linked)choose('profile','l');
  if(!client)window.addEventListener('storage',event=>{if([KEYS.draft,window.MIRPanelLayoutOutput?.STORAGE_KEY].includes(event.key))renderLayoutImport();});
