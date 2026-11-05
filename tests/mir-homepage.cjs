@@ -23,6 +23,11 @@ test('Accueil principal et logo original Illustrator inchangé dans la marque',(
   assert.match(logo,/fill="#a3a5a8"/);
   assert.doesNotMatch(logo,/<script|onload=|onerror=|<foreignObject/i);
 });
+test('Les couleurs des deux boutons reprennent la maquette validée',()=>{
+  assert.match(css,/\.mir-home-main-cta\{background:#348511;color:#fff;border:1px solid #348511/);
+  assert.match(css,/\.mir-home-second-cta\{color:#fff;border:1px solid rgba\(255,255,255,.78\);background:rgba\(5,20,10,.15\)/);
+  assert.match(css,/\.mir-home-estimate\{background:#348511;color:#fff;border-color:#348511/);
+});
 test('Le compte est neutre pour futurs clients et équipe',()=>{
   assert.match(header,/href="chantier\.html"[^>]*>Mon compte<\/a>/);
   assert.doesNotMatch(header,/admin|employé|employer|connexion équipe/i);
@@ -31,7 +36,7 @@ test('Le compte est neutre pour futurs clients et équipe',()=>{
 test('Le visiteur peut entrer sans compte ni action de connexion obligatoire',()=>{
   assert.match(header,/href="boutique\.html"[^>]*>Revêtements<\/a>/);
   assert.match(hero,/href="boutique\.html"[^>]*>Découvrir nos revêtements<\/a>/);
-  assert.match(hero,/href="#realisations"[^>]*>Voir nos réalisations<\/a>/);
+  assert.match(hero,/href="boutique\.html"[^>]*>Voir notre boutique<\/a>/);
   assert.match(header,/href="#nous-joindre"[^>]*>Demander une estimation<\/a>/);
 });
 test('Maison du portfolio MIR utilisée, aucune image IA nouvelle ni palmiers',()=>{
@@ -40,8 +45,12 @@ test('Maison du portfolio MIR utilisée, aucune image IA nouvelle ni palmiers',(
   assert.doesNotMatch(hero,/palmier|généré par IA|image synthétique/i);
 });
 test('Pas de pictogrammes dans le nouveau bloc de services',()=>{
-  assert.equal((services.match(/class="mir-home-service"/g)||[]).length,3);
-  assert.doesNotMatch(services,/<svg|<i\b|data-icon|lucide|<img\b/i);
+  assert.equal((services.match(/class="mir-home-service(?: mir-home-service-studio)?"/g)||[]).length,3);
+  assert.equal((services.match(/<img\b/g)||[]).length,3);
+  assert.doesNotMatch(services,/<svg|<i\b|data-icon|lucide/i);
+  assert.match(services,/src="assets\/mir-03\.jpg"/);
+  assert.match(services,/src="assets\/mir-01\.jpg"/);
+  assert.match(services,/src="assets\/mir-02\.jpg"/);
 });
 test('3D / plan PDF au troisième niveau et métier MIR au premier',()=>{
   assert.ok(services.indexOf('Revêtements extérieurs')<services.indexOf('Moulures et pliage'));
