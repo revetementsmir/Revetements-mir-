@@ -335,7 +335,7 @@
     }else if(phase==='loading'){
       body='<div class="auth-loading"><span class="loading-dot"></span><p>Vérification de votre accès…</p></div>';
     }else if(!config.enabled){
-      body='<div class="auth-activation"><span class="pill">Activation sécurisée en attente</span><h2>Connexion MIR — Admin et employés</h2><p>Une seule connexion donnera accès aux fonctions correspondant à votre rôle : administration ou chantiers attribués.</p><p>Le service sécurisé MIR doit être raccordé et vérifié avant que les connexions Google, courriel et les invitations soient activées.</p></div><p class="auth-footnote">Aucun compte n’est créé ici et aucune donnée privée n’est accessible sans autorisation serveur.</p>';
+      body='<div class="auth-activation"><span class="pill">Activation sécurisée en attente</span><h2>L’espace MIR se prépare.</h2><p>Un espace commun permettra plus tard aux clients de retrouver leurs commandes, et à l’équipe d’accéder à ses chantiers et à l’administration selon ses droits.</p><p>Le service sécurisé MIR doit être raccordé et vérifié avant que les connexions Google, courriel et les invitations soient activées.</p></div><p class="auth-footnote">Aucun compte n’est créé ici et aucune donnée privée n’est accessible sans autorisation serveur.</p>';
     }else if(user&&['access_denied','error'].includes(phase)){
       title=phase==='access_denied'?'Votre accès<br><em>reste à confirmer.</em>':'La connexion<br><em>a été interrompue.</em>';
       intro=phase==='access_denied'?'Votre compte est reconnu. Le responsable MIR doit activer votre accès ou vous envoyer une invitation.':'Vos demandes sont conservées par le service. Vérifiez la connexion avant de poursuivre.';
