@@ -330,26 +330,48 @@ function openOrders(){
  const saved=read(PO_ARCHIVE,[]);
  return Array.isArray(saved)?saved.filter(row=>row?.id&&Array.isArray(row.items)):[];
 }
-function pickPO(number){
- const reference=String(number||'').trim();
- if(!reference)return false;
- if(poKey(order.poNumber)===poKey(reference))return true;
- const orders=openOrders().filter(row=>row.id!==order.id);
- const found=orders.find(row=>poKey(row.poNumber)===poKey(reference));
- const current=order;
- const next=found||(!current.poNumber?{...current,poNumber:reference}:{...defaultOrder(),poNumber:reference});
- if(current.id!==next.id)orders.push(current);
- if(!store(PO_ARCHIVE,orders)||!store(KEYS.draft,{version:1,order:next}))return false;
- order=next;editingItemId=null;renderOrder();renderFormMetadata();updateDrawing();
+function normalizeWorkshopOrder(saved){
+ const items=saved.items.filter(item=>item?.spec&&item.snapshot?.schema==='mir-production-instance-1'&&build(item.spec).valid);
+ const nextNumber=Math.max(saved.nextNumber||1,1+Math.max(0,...items.map(item=>Number(/^M(\d{1,12})$/.exec(String(item.id))?.[1]||0))));
+ return {...saved,items,nextNumber};
+}
+function activeWorkshopOrderMatches(){
+ const stored=read(KEYS.draft,null)?.order;
+ if(!stored||Array.isArray(stored.items)&&JSON.stringify(normalizeWorkshopOrder(stored))===JSON.stringify(order))return true;
+ toast('Le dossier a changé dans un autre onglet. Rechargez cette page.');
+ return false;
+}
+function switchWorkshopOrder(next){
+ if(!activeWorkshopOrderMatches())return false;
+ next=normalizeWorkshopOrder(next);
+ const saved=openOrders().filter(row=>row.id!==order.id);
+ if(order.id!==next.id&&(order.poNumber||order.items.length||order.sourceRequestId||order.project||order.notes||order.foreman))saved.push(order);
+ if(!store(PO_ARCHIVE,saved)||!store(KEYS.draft,{version:1,order:next}))return false;
+ order=next;editingItemId=null;
  return true;
 }
-function choosePODialog(addAfter=false){
+function pickPO(number){
+ const reference=String(number||'').trim();
+ if(!reference){toast('Entre un numéro de bon.');return false;}
+ if(poKey(order.poNumber)===poKey(reference))return true;
+ const found=openOrders().find(row=>row.id!==order.id&&poKey(row.poNumber)===poKey(reference));
+ const next=found||(!order.poNumber?{...order,poNumber:reference}:{...defaultOrder(),poNumber:reference});
+ if(!switchWorkshopOrder(next))return false;
+ renderOrder();renderFormMetadata();updateDrawing();
+ return true;
+}
+function choosePODialog(intent='',description=''){
  const rows=[order,...openOrders().filter(row=>row.id!==order.id)]
   .filter(row=>row.poNumber||row.items.length);
- dialog(addAfter?'Choisir le bon pour cette pièce':'Bons de commande en cours',
-  'Entre un numéro pour créer un bon ou retrouver un bon enregistré sur cet appareil.',
-  `<form id="mir-po-form" data-add-after="${addAfter}" class="dialog-form"><label>Numéro du bon<input name="po" maxlength="100" list="mir-po-list" required placeholder="Ex. PO-2026-084"></label><datalist id="mir-po-list">${rows.filter(row=>row.poNumber).map(row=>`<option value="${esc(row.poNumber)}">${esc(row.project)}</option>`).join('')}</datalist><button class="primary-button" type="submit">${addAfter?'Ajouter à ce bon':'Ouvrir ce bon'}</button></form>`+
-  (rows.length?`<ul class="mir-po-list">${rows.map(row=>`<li><button type="button" class="secondary-button" data-open-po="${esc(row.id)}" data-add-after="${addAfter}"${addAfter&&!row.poNumber?' disabled':''}>${esc(row.poNumber||'Brouillon sans numéro')} · ${row.items.length} ligne(s)${row.project?' · '+esc(row.project):''}</button></li>`).join('')}</ul>`:''));
+ dialog(intent?'Choisir le bon pour cette pièce':'Bons de commande en cours',
+  (description?description+' · ':'')+'Entre un numéro pour créer un bon ou retrouver un bon enregistré sur cet appareil.',
+  `<form id="mir-po-form" data-po-intent="${intent}" class="dialog-form"><label>Numéro du bon<input name="po" maxlength="100" list="mir-po-list" required placeholder="Ex. PO-2026-084"></label><datalist id="mir-po-list">${rows.filter(row=>row.poNumber).map(row=>`<option value="${esc(row.poNumber)}">${esc(row.project)}</option>`).join('')}</datalist><button class="primary-button" type="submit">${intent?'Ajouter à ce bon':'Ouvrir ce bon'}</button></form>`+
+  (rows.length?`<ul class="mir-po-list">${rows.map(row=>`<li><button type="button" class="secondary-button" data-open-po="${esc(row.id)}" data-po-intent="${intent}"${intent&&!row.poNumber?' disabled':''}>${esc(row.poNumber||'Brouillon sans numéro')} · ${row.items.length} ligne(s)${row.project?' · '+esc(row.project):''}</button></li>`).join('')}</ul>`:''));
+}
+function finishPOChoice(intent){
+ closeDialog();
+ if(intent==='add')addPiece();
+ if(intent==='transfer')offerProfileImport(true);
 }
 function updateOrderReference(){
  const box=$('#order-po-summary');
@@ -401,7 +423,8 @@ function valuesFromDraft(spec,id){const measurements={};if(spec.kind==='profile'
 function makeItem(spec,id,{old=null,template=selectedTemplate}={}){let result;if(old?.snapshot){result=M.reviseInstance({snapshot:old.snapshot,history:old.history||[]},valuesFromDraft(spec,id));}else{let source=template;const created=M.createTemplate(spec,{id:source?.id||`modele-piece-${id}-${uid()}`,name:spec.name||source?.name,version:source?.version||1});if(!created.ok)return created;const structural=topology=>{const value=copy(topology);delete value.coloredFace;return JSON.stringify(value);};if(!source)source=created.template;else if(structural(source.topology)!==structural(created.template.topology)){if(client&&!source.id.startsWith('mir-standard-'))return {ok:false,errors:[{message:'La forme de ce modèle est fixe. Choisissez un autre modèle pour changer ses angles.'}]};const variant=M.createTemplate(spec,{id:source.id+'-variante-'+uid(),name:spec.name||source.name,version:1});if(!variant.ok)return variant;source=variant.template;}result=M.instantiateTemplate(source,valuesFromDraft(spec,id));}if(!result.ok)return result;return {ok:true,item:{id,kind:result.model.kind,spec:copy(result.spec),snapshot:copy(result.snapshot),history:copy(result.history||[]),...(old?.profileGroup?{profileGroup:old.profileGroup}:{}),...(old?.sourceProfile?{sourceProfile:copy(old.sourceProfile)}:{}),...(old?.sourceLayout?{sourceLayout:copy(old.sourceLayout)}:{}),selection:{materialId,colorSystem,colorId},savedAt:new Date().toISOString()},model:result.model};}
 function addPiece(){
  formMetadata();if(authoring)return saveTemplateDialog();
- if(!client&&!editingItemId&&!order.poNumber)return choosePODialog(true);
+ if(!client&&!activeWorkshopOrderMatches())return;
+ if(!client&&!editingItemId&&!order.poNumber)return choosePODialog('add');
  if(!availableForPO())return toast('Activez Bon de commande pour ce modèle dans Mes modèles.');
  const imported=order.items.find(item=>item.id===editingItemId)?.sourceProfile;
  if(imported&&draft.template==='custom'){
@@ -439,19 +462,19 @@ function addPiece(){
  editingItemId=null;renderOrder();renderFormMetadata();updateDrawing();
  toast(old?'Nouvelle révision enregistrée. La version précédente reste conservée.':id+(client?' ajouté au dossier.':' ajouté au bon. Aucune diffusion en boutique ou au magasin.'));
 }
-function offerProfileImport(){
+function offerProfileImport(confirmedPO=false){
  const bridge=window.MIRProfileProductionTransfer;
  if(client||params.get('profil-mir')!=='1'||!bridge)return;
  const pending=read(bridge.KEY,null);
  if(!pending?.id)return toast('Aucune pièce de pliage à transférer sur cet appareil.');
- if(order.profileImports?.includes(pending.id))return toast('Cette pièce est déjà dans le dossier.');
- const expected=JSON.stringify(order);
+ if([order,...openOrders()].some(row=>row.profileImports?.includes(pending.id)))return toast('Cette pièce a déjà été transférée dans un bon.');
  try{
   const prepared=bridge.prepare(window.MIRCalepinageExtension,pending.snapshot,pending.length,pending.quantity);
-  dialog('Ajouter au dossier de production',prepared.spec.name+' · '+pending.length+' po · quantité '+pending.quantity+(prepared.spec.note?' · '+prepared.spec.note:''),'<div class="dialog-actions"><button type="button" class="primary-button" id="confirm-profile-import">Ajouter la pièce</button></div>');
+  if(!confirmedPO||!order.poNumber)return choosePODialog('transfer',prepared.spec.name+' · '+pending.length+' po · quantité '+pending.quantity);
+  dialog('Ajouter au bon '+order.poNumber,prepared.spec.name+' · '+pending.length+' po · quantité '+pending.quantity+(prepared.spec.note?' · '+prepared.spec.note:''),'<div class="dialog-actions"><button type="button" class="primary-button" id="confirm-profile-import">Ajouter la pièce</button></div>');
   $('#confirm-profile-import').onclick=()=>{
    if(read(bridge.KEY,null)?.id!==pending.id)return toast('Le transfert a changé. Retournez dans Pliage.');
-   if(JSON.stringify(read(KEYS.draft,{order}).order)!==expected)return toast('Le dossier a changé dans un autre onglet. Rechargez cette page.');
+   if(!activeWorkshopOrderMatches())return;
    const id='M'+String(order.nextNumber||1).padStart(3,'0');
    const result=makeItem({...prepared.spec,id},id,{template:null});
    if(!result.ok)return toast(result.errors?.map(e=>e.message).join(' ')||'La pièce est invalide.');
@@ -509,7 +532,25 @@ function prepareRequest(){
  dialog(pricing.requiresQuote?'Votre demande de soumission est préparée.':'Votre demande est préparée.','Les pièces et les dessins sont conservés ensemble. Dans cet aperçu, la demande est disponible uniquement sur ce navigateur.',`<div class="local-scope-note"><strong>${esc(request.id)}</strong><p>${request.items.length} référence${request.items.length>1?'s':''} · ${esc(order.project||'Projet à nommer')}<br>${pricing.requiresQuote?'Couleur personnalisée : prix à établir par MIR. Aucun prix automatique.<br>':''}Aucun envoi, achat ni paiement n’a eu lieu.</p></div><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Continuer</button><button type="button" class="primary-button" data-download-request="${esc(request.id)}">Télécharger le dossier JSON ↓</button></div>`);
 }
 function showRequest(id){const request=requests.find(r=>r.id===id);if(!request)return;dialog(request.id,request.order?.project||'Demande locale',`<div class="request-piece-list">${request.items.map(item=>{const model=build(item.spec);return `<article><strong>${esc(item.id+' · '+model.name)}</strong><span>${model.quantity||'À préciser'} pièce(s) · modèle V${item.snapshot?.templateVersion||'?'} · révision R${item.snapshot?.revision||1}</span><div>${diagramSVG(model,{interactive:false,small:true})}</div></article>`;}).join('')}</div><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Fermer</button><button type="button" class="primary-button" data-open-request="${esc(id)}">Reprendre une copie en production</button></div>`);}
-function openRequest(id,confirmed=false){const request=requests.find(r=>r.id===id);if(!request)return;if(order.items.length&&!confirmed){dialog('Reprendre cette demande ?','Votre dossier de production actuel sera remplacé par une copie de cette demande. Exportez-le d’abord si vous souhaitez le conserver.',`<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Garder le dossier actuel</button><button type="button" class="primary-button" data-confirm-open-request="${esc(id)}">Reprendre la demande</button></div>`);return;}order={...defaultOrder(),...copy(request.order),sourceRequestId:request.id,items:copy(request.items),nextNumber:Math.max(0,...request.items.map(item=>Number(String(item.id).replace(/\D/g,''))||0))+1};persist();workflow='configure';authoring=false;if($('#production-dialog').open)closeDialog();render();$('#production-order').scrollIntoView({behavior:'smooth',block:'start'});toast('Demande reprise avec ses dessins enregistrés. L’original reste conservé.');}
+function openRequest(id,confirmed=false){
+ const request=requests.find(r=>r.id===id);
+ if(client||!request)return;
+ if((order.poNumber||order.items.length)&&!confirmed){
+  dialog('Reprendre cette demande ?','Le dossier actuel sera conservé dans Bons en cours. La demande s’ouvrira dans un dossier séparé.',`<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Garder le dossier actuel</button><button type="button" class="primary-button" data-confirm-open-request="${esc(id)}">Reprendre la demande</button></div>`);
+  return;
+ }
+ const existing=[order,...openOrders()].find(row=>row.sourceRequestId===id);
+ const {poNumber:clientReference,notes='',...metadata}=request.order||{};
+ const next=existing||{...defaultOrder(),...metadata,poNumber:'',
+  notes:[clientReference?'Référence du client : '+clientReference:'',notes].filter(Boolean).join(' · '),
+  sourceRequestId:id,items:copy(request.items),
+  nextNumber:Math.max(0,...request.items.map(item=>Number(String(item.id).replace(/\D/g,''))||0))+1};
+ if(next.id!==order.id&&!switchWorkshopOrder(next))return;
+ workflow='configure';authoring=false;
+ if($('#production-dialog').open)closeDialog();
+ render();$('#production-order').scrollIntoView({behavior:'smooth',block:'start'});
+ toast('Demande ouverte. Tes autres bons sont conservés.');
+}
 function downloadJSON(value,filename){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
 function usesBendingSheet(requiresQuote){
  return !client&&!requiresQuote&&order.items.length>0&&order.items.every(item=>item.spec.kind==='profile');
@@ -646,12 +687,9 @@ function handleClick(event){const button=event.target.closest('button,[data-sele
  if(d.openPo&&!client){
   const row=[order,...openOrders()].find(value=>value.id===d.openPo);
   if(!row)return;
-  if(row.id===order.id||row.poNumber&&pickPO(row.poNumber)){
-   closeDialog();if(d.addAfter==='true')addPiece();
-  }else if(!row.poNumber){
-   const saved=openOrders().filter(value=>value.id!==row.id&&value.id!==order.id);
-   if(!store(PO_ARCHIVE,[...saved,order])||!store(KEYS.draft,{version:1,order:row}))return;
-   order=row;editingItemId=null;closeDialog();renderOrder();renderFormMetadata();updateDrawing();
+  if(row.id===order.id||row.poNumber&&pickPO(row.poNumber))finishPOChoice(d.poIntent);
+  else if(!row.poNumber&&switchWorkshopOrder(row)){
+   closeDialog();renderOrder();renderFormMetadata();updateDrawing();
   }
   return;
  }
@@ -745,7 +783,7 @@ function handleChange(event){const e=event.target,d=e.dataset;
 }
 function handleSubmit(event){const form=event.target;if(!form.matches('#double-fold-form,#save-production-template,#mir-j-exception-form,#mir-po-form'))return;event.preventDefault();const data=new FormData(form);
  if(form.id==='mir-po-form'){
-  if(!client&&pickPO(data.get('po'))){closeDialog();if(form.dataset.addAfter==='true')addPiece();}
+  if(!client&&pickPO(data.get('po')))finishPOChoice(form.dataset.poIntent);
   return;
  }
  if(form.id==='mir-j-exception-form'){
@@ -777,7 +815,7 @@ function handleKey(event){if(event.target.id==='production-drawing'&&kind==='pan
 async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Error('Le moteur de modèles n’est pas disponible.');const fetched=await Promise.allSettled([fetch('catalogue-fd6866b49d21.json').then(r=>{if(!r.ok)throw new Error('catalogue');return r.json();}),fetch('ral-classic.json').then(r=>{if(!r.ok)throw new Error('nuancier RAL');return r.json();})]);if(fetched[0].status==='fulfilled'){const raw=fetched[0].value;materials=(Array.isArray(raw)?raw:raw.materials||[]).filter(m=>(m.applications||[]).includes('bending'));}if(fetched[1].status==='fulfilled'&&Array.isArray(fetched[1].value.colors))ral=fetched[1].value;
  const unico=window.MIRUnico;if(unico)for(const palette of unico.palettes){const usable=palette.colors.filter(c=>!c.publishedGauges||c.publishedGauges.some(g=>[18,20,22].includes(g)));if(!usable.length)continue;materials.push({id:'unico-palette-'+palette.id,brand:'Unico',name:'U-P1 · '+palette.label,architecturalPanel:true,metalType:palette.materialId,family:palette.materialId,allowedGauges:palette.id==='signature'?[22]:null,sourceUrl:palette.sourceUrl,colors:usable.map(c=>({...c,availabilityNote:c.uP1Compatibility.note+' Écran indicatif.'}))});}materialId=materials[0]?.id||'';
  const savedTemplates=read(KEYS.templates,{version:1,records:[]});templates=Array.isArray(savedTemplates.records)?savedTemplates.records.filter(record=>record?.id&&latest(record)&&M.templatePreview(latest(record)).ok):[];const savedRequests=read(KEYS.requests,{version:1,requests:[]});requests=Array.isArray(savedRequests.requests)?savedRequests.requests.filter(request=>request?.id&&Array.isArray(request.items)&&request.items.every(item=>item.spec&&item.snapshot?.schema==='mir-production-instance-1')):[];
- const saved=read(KEYS.draft,null);order=saved?.version===1&&Array.isArray(saved.order?.items)?saved.order:defaultOrder();order.items=order.items.filter(item=>item?.spec&&item.snapshot?.schema==='mir-production-instance-1'&&build(item.spec).valid);order.nextNumber=Math.max(order.nextNumber||1,1+Math.max(0,...order.items.map(item=>(/^M(\d{1,12})$/.exec(String(item.id))?.[1]*1)||0)));
+ const saved=read(KEYS.draft,null);order=saved?.version===1&&Array.isArray(saved.order?.items)?normalizeWorkshopOrder(saved.order):defaultOrder();
  injectWorkflow();if(client){$('#production-eyebrow').textContent='L’ATELIER MIR / VOS PIÈCES SUR MESURE';$('#production-title').innerHTML='Votre pièce.<br>À vos <em>mesures.</em>';$('#production-description').textContent='Choisissez la forme. Entrez vos cotes, votre métal et votre couleur. Votre dessin suit vos choix.';$('#mode-link').href='#production-order';$('#mode-link').innerHTML='Mon dossier <span aria-hidden="true">↘</span>';$('#order-metadata').open=false;}
  document.addEventListener('click',handleClick);document.addEventListener('input',handleInput);document.addEventListener('change',handleChange);document.addEventListener('submit',handleSubmit);document.addEventListener('keydown',handleKey);
  const stage=$('#production-drawing');stage.addEventListener('pointerdown',beginPointDrag);stage.addEventListener('pointermove',movePoint);stage.addEventListener('pointerup',endPoint);stage.addEventListener('pointercancel',endPoint);stage.addEventListener('click',drawingClick);stage.addEventListener('wheel',event=>{if(kind!=='panel'&&view!=='volume')return;event.preventDefault();setZoom(zoom*Math.exp(-event.deltaY*.001));},{passive:false});
