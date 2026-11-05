@@ -35,12 +35,12 @@ async function ready(){
     templates:JSON.parse(localStorage.getItem('mir_production_templates_v1')||'null')?.records||[]
    }));
    const before=await storage();
-   assert.equal(before.order.items.length,0);
+   assert.equal(before.order?.items?.length||0,0);
    await button.click();
    assert.equal(await page.locator('#mir-po-form').isVisible(),true);
-   assert.equal((await storage()).order.items.length,0,'Selecting PO must not save before confirmation');
+   assert.equal((await storage()).order?.items?.length||0,0,'Selecting PO must not save before confirmation');
    await page.locator('#production-dialog').evaluate(node=>node.close());
-   assert.equal((await storage()).order.items.length,0,'Cancel keeps drawing and local PO unchanged');
+   assert.equal((await storage()).order?.items?.length||0,0,'Cancel keeps drawing and local PO unchanged');
    assert.equal((await page.locator('#production-piece-name').inputValue()),'Solin porte entrée');
    await button.click();
    await page.locator('#mir-po-form input[name="po"]').fill('PO-TEST-715');
