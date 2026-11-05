@@ -285,7 +285,7 @@ function updateDrawing({keepForm=false}={}){
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  $('#drawing-title').textContent=authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
- const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()?'none':'';$('#trace-readout').hidden=!canDrawProfile();
+ const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()||view==='volume'?'none':'';$('#trace-readout').hidden=!canDrawProfile();
  stage.innerHTML=view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
  const dimensions=$('#profile-dimension-list');
  const sides=tool==='draw'?drawPoints.slice(1).map((point,index)=>({
@@ -772,11 +772,12 @@ function beginPointDrag(event){
   return;
  }
 
- if(kind==='panel'){
+ if(kind==='panel'||(view==='volume'&&event.pointerType==='touch')){
+  if(pointers.size>=2)return;
   pointers.set(event.pointerId,[event.clientX,event.clientY]);stage.setPointerCapture?.(event.pointerId);
   if(pointers.size===2){const a=[...pointers.values()];drag={type:'pinch',distance:Math.hypot(a[1][0]-a[0][0],a[1][1]-a[0][1]),zoom};event.preventDefault();return;}
  }
- if(view==='volume'){drag={type:'orbit',x:event.clientX,y:event.clientY,orbit,pitch,moved:false};stage.setPointerCapture?.(event.pointerId);return;}
+ if(view==='volume'){drag={type:'orbit',id:event.pointerId,x:event.clientX,y:event.clientY,orbit,pitch,moved:false};stage.setPointerCapture?.(event.pointerId);return;}
  const circle=event.target.closest('[data-draw-point]');if(circle&&tool==='edit'&&!client&&!editingItemId){event.preventDefault();const model=build();if(!model.valid)return;drawPoints=copy(model.pointsMM);drawTransform=fitModel(model);drag={type:'point',index:Number(circle.dataset.drawPoint),pointerId:event.pointerId,moved:false};stage.setPointerCapture?.(event.pointerId);}
 }
 
@@ -792,13 +793,13 @@ function movePoint(event){
   drawDragPreview(draggedSegment(drag.last,drag),drag);
   return;
  }
- if(drag.type==='pinch'){const a=[...pointers.values()];if(a.length===2&&drag.distance>0){event.preventDefault();setZoom(drag.zoom*Math.hypot(a[1][0]-a[0][0],a[1][1]-a[0][1])/drag.distance);}return;}
- if(drag.type==='orbit'){const dx=event.clientX-drag.x,dy=event.clientY-drag.y;drag.moved=drag.moved||Math.hypot(dx,dy)>3;orbit=drag.orbit+dx*.55;pitch=Math.max(-85,Math.min(85,drag.pitch+dy*.3));updateDrawing({keepForm:true});return;}
+ if(drag.type==='pinch'){const a=[...pointers.values()];if(pointers.has(event.pointerId)&&a.length===2&&drag.distance>0){event.preventDefault();setZoom(drag.zoom*Math.hypot(a[1][0]-a[0][0],a[1][1]-a[0][1])/drag.distance);}return;}
+ if(drag.type==='orbit'){if(event.pointerId!==drag.id)return;const dx=event.clientX-drag.x,dy=event.clientY-drag.y;drag.moved=drag.moved||Math.hypot(dx,dy)>3;orbit=drag.orbit+dx*.55;pitch=Math.max(-85,Math.min(85,drag.pitch+dy*.3));updateDrawing({keepForm:true});return;}
  const p=localPoint(event);if(!p)return;drawPoints[drag.index]=p;const spec=toCustom(drawPoints);if(spec){draft=spec;drag.moved=true;updateDrawing({keepForm:true});}
 }
 
 function endPoint(event){
- pointers.delete(event.pointerId);const stage=$('#production-drawing');if(stage.hasPointerCapture?.(event.pointerId))stage.releasePointerCapture(event.pointerId);
+ const tracked=pointers.delete(event.pointerId);const stage=$('#production-drawing');if(stage.hasPointerCapture?.(event.pointerId))stage.releasePointerCapture(event.pointerId);
  if(drag?.type==='trace'){
   if(event.pointerId!==drag.id)return;
   const gesture=drag;
@@ -814,8 +815,18 @@ function endPoint(event){
   if(segment)appendTracePoint(segment.point,gesture.start);
   return;
  }
+ if(drag?.type==='pinch'){
+  if(!tracked)return;
+  const [remaining]=pointers;
+  drag=remaining&&view==='volume'
+   ?{type:'orbit',id:remaining[0],x:remaining[1][0],y:remaining[1][1],orbit,pitch,moved:true}
+   :null;
+  suppressClick=true;
+  return;
+ }
+ if(drag?.type==='orbit'&&drag.id!==event.pointerId)return;
  if(!drag)return;const moved=drag.type==='point'&&drag.moved;
- suppressClick=drag.type==='pinch'||!!drag.moved;drag=null;
+ suppressClick=!!drag.moved;drag=null;
  if(moved){renderDimensions();renderProfileOptions();updateDrawing();}
 }
 
