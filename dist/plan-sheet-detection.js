@@ -13,6 +13,11 @@
     ['right', /(?:droit[e]?|right)(?:\s|$)/]
   ];
   const center = (box, axis) => (box[axis] + box[axis + 2]) / 2;
+  const titleText = text => normal(text)
+    .replace(/^[^a-z0-9]+/, '')
+    .replace(/^(?:[a-z]\d{0,2}|\d{1,2})\s*[^a-z0-9\s]+\s*(?=elevations?|facades?|plan|coupe|section|[a-z]+\s+elevation)/, '')
+    .replace(/^\d{1,2}\s+(?=elevations?|facades?|plan|coupe|section)/, '')
+    .replace(/\s*[:;,.]+$/, '');
 
   function lines(words) {
     const sorted = words.filter(w => w.box && w.text.trim()).slice(0, 10000)
@@ -39,32 +44,47 @@
   }
 
   function classify(text) {
-    const title = normal(text).replace(/^\s*\d{1,2}\s*(?:[.)/–-]\s*|\s+)/, '');
+    const title = titleText(text);
     if (/\b(?:existant[e]?s?|demolition|existing|detail|details|typique|typical|legende|legend|voir|see)\b/.test(title)) return null;
     const frontTitle = title.match(/^(?:elevations?|facades?|vues?\s+(?:de\s+)?(?:face\s+)?|cote)\s+(?:(?:exterieur[e]?s?|facade|laterale|du|de la)\s+)*(.*)$/);
-    const englishTitle = title.match(/^(front|rear|back|left(?: side)?|right(?: side)?)\s+elevation\b/);
-    const direction = frontTitle?.[1] || englishTitle?.[1];
+    const reverseTitle = title.match(/^(front|rear|back|left(?: side)?|right(?: side)?|nord|sud|est|ouest|north|south|east|west)\s*(?:[-–:]\s*)?elevation\b/);
+    const direction = (frontTitle?.[1] || reverseTitle?.[1])?.replace(/^[([]\s*/, '').replace(/[)\]]\s*$/, '');
     if (direction) {
       const side = directions.find(([, re]) => re.test(direction));
       if (side) return { kind: 'elevation', face: side[0] };
-      if (/\b(?:nord|sud|est|ouest|north|south|east|west)\b/.test(direction)) return { kind: 'reference' };
+      if (/^(?:nord|sud|est|ouest|north|south|east|west)\b/.test(direction)) return { kind: 'reference' };
     }
     if (/^(?:plan\s+(?:(?:du|de|des|d'|de la)\s*)?(?:solage|fondations?)|(?:solage|fondations?)\s*(?:[-–:]|$)|foundation\s+plan\b)/.test(title)) return { kind: 'foundation' };
-    if (/^(?:plan\s+(?:(?:du|des|de la|de l'|de|d')\s*)?(?:rez[ -]de[ -]chaussee|sous[ -]sol|etages?|niveaux?|niveau|(?:\d{1,2}(?:e|er|eme)?|premier|deuxieme|troisieme)\s+etage)|rez[ -]de[ -]chaussee\s*(?:[-–:]|$)|(?:basement|ground|first|second|third|upper|main)\s+floor\s+plan\b|floor\s+plan\b)/.test(title)) return { kind: 'floor' };
-    if (/^(?:coupe|(?:building |cross )?section)\s+(?:[a-z]\s*[-–/]\s*[a-z]|[a-z0-9]{1,3}\b|(?:du\s+)?batiment\b)/.test(title)) return { kind: 'section' };
+    if (/^(?:plan\s+(?:(?:du|des|de la|de l'|de|d')\s*)?(?:rez[ -]de[ -]chaussee|sous[ -]sol|etages?\b|niveaux?\s+\d{1,2}\b|(?:\d{1,2}(?:e|er|eme)?|premier|deuxieme|troisieme)\s+etage)|rez[ -]de[ -]chaussee\s*(?:[-–:]|$)|(?:basement|ground|first|second|third|upper|main|\d{1,2}(?:st|nd|rd|th))\s+floor\s+plan\b|level\s+\d{1,2}\s+(?:floor\s+)?plan\b|floor\s+plan\b)/.test(title)) return { kind: 'floor' };
+    if (/^(?:plan\s+(?:(?:du|de la|de)\s+)?(?:toiture|toit|couverture)\b|roof\s+plan\b)/.test(title)) return { kind: 'roof' };
+    if (/^(?:coupe|(?:building |cross )?section)\s+(?:[a-z]\s*[-–/]\s*[a-z]|(?!(?:et|de|du|en|des|la|les|of|and)\b)[a-z0-9]{1,3}\b|(?:du\s+)?batiment\b|schematique\b|transversale\b|longitudinale\b|schematic\b)/.test(title) || /^schematic section\b/.test(title)) return { kind: 'section' };
     return null;
   }
 
-  function viewsForPage(rows) {
+  function viewsForPage(rows, width = 0, height = 0) {
     const result = [];
     for (const row of rows) {
       if (row.confidence < 55 || row.text.length > 105) continue;
       const view = classify(row.text);
       if (!view) continue;
-      const title = normal(row.text), previous = result.find(r => r.title === title && Math.abs(center(r.box, 0) - center(row.box, 0)) < 6 && Math.abs(center(r.box, 1) - center(row.box, 1)) < 6);
-      if (!previous) result.push({ ...view, name: row.text, title, box: row.box, source: row.source });
+      const title = titleText(row.text).split(/\s+(?:echelle|scale)\b/)[0].trim();
+      const floor = title.match(/\b(?:niveau|etage)\s+(\d+)\b/)?.[1];
+      const key = view.face || (view.kind === 'floor' && floor ? 'floor-' + floor : title);
+      const previous = result.findIndex(r => r.key === key);
+      const outsideDrawing = width > 0 && center(row.box, 0) > width * .84;
+      const record = { ...view, key, name: row.text, title, box: row.box, source: row.source, outsideDrawing };
+      if (previous < 0) result.push(record);
+      else if (result[previous].outsideDrawing && !outsideDrawing) result[previous] = record;
     }
-    return result;
+    const hasDrawingTitle = result.some(view => view.face || view.kind === 'section');
+    return result.filter(view => {
+      if (hasDrawingTitle && view.source === 'ocr' && /^(?:solage|fondations?)$/.test(view.title)) return false;
+      if (!width || !height) return true;
+      // A list of short, left-aligned titles close together is a drawing index.
+      const stacked = result.filter(other => Math.abs(view.box[0] - other.box[0]) <= width * .022 &&
+        Math.abs(center(view.box, 1) - center(other.box, 1)) <= height * .11);
+      return stacked.length < 3;
+    });
   }
 
   function divideViews(views, width, height) {
@@ -93,8 +113,8 @@
   ];
   const roofStyles = [
     ['flat', /^(?:(?:toit|toiture)\s+plat[e]?|flat roof)$/],
-    ['gable', /^(?:(?:toit|toiture)\s+(?:a\s+)?(?:deux|2)\s+versants|gable roof)$/],
-    ['hip', /^(?:(?:toit|toiture)\s+(?:a\s+)?(?:quatre|4)\s+versants|hip roof)$/]
+    ['gable', /^(?:(?:toit|toiture)\s+(?:(?:a\s+)?(?:deux|2)\s+versants|a pignon)|gable roof)$/],
+    ['hip', /^(?:(?:toit|toiture)\s+(?:(?:a\s+)?(?:quatre|4)\s+versants|en croupe)|hip roof)$/]
   ];
   const levels = [
     ['base', /^(?:base du mur(?: exterieur)?|dessus (?:du solage|des fondations?)|top of foundation)\s*[:=]?\s*/],
@@ -163,14 +183,31 @@
     return [...entries, ...outlineEvidence(accepted, view, page).filter(e => !entries.some(explicit => explicit.field === e.field))];
   }
 
+  function roofFromProfiles(evidence) {
+    const profiles = axis => new Set(evidence.filter(entry => entry.field === 'roofProfile' && axis.includes(entry.face)).map(entry => entry.value));
+    const width = profiles(['front', 'back']), depth = profiles(['left', 'right']);
+    if (width.size !== 1 || depth.size !== 1) return null;
+    const shapes = new Set([...width, ...depth]);
+    if (shapes.size === 1 && shapes.has('flat')) return 'flat';
+    if (shapes.has('triangle') && shapes.has('trapezoid')) return 'hip';
+    if (shapes.has('triangle') && shapes.has('flat')) return 'gable';
+    return null;
+  }
+
   function volumeFrom(evidence) {
-    const result = {}, conflicts = [];
+    const result = {}, conflicts = [], approximated = [];
     for (const field of [...dimensions.map(([field]) => field), 'roofStyle']) {
-      const values = evidence.filter(e => e.field === field).map(e => e.value);
-      const agrees = values.every(v => typeof v === 'number' ? Math.abs(v - values[0]) <= .015 : v === values[0]);
+      const candidates = evidence.filter(e => e.field === field);
+      const written = candidates.filter(e => !e.estimated);
+      const estimated = !written.length && candidates.length > 0;
+      const values = (estimated ? candidates : written).map(e => e.value);
+      const tolerance = estimated ? Math.min(.2, Math.max(.045, values[0] * .018)) : .015;
+      const agrees = values.every(v => typeof v === 'number' ? Math.abs(v - values[0]) <= tolerance : v === values[0]);
       result[field] = values.length && agrees ? values[0] : null;
       if (values.length && !agrees) conflicts.push(field);
+      else if (estimated) approximated.push(field);
     }
+    if (!result.roofStyle && !conflicts.includes('roofStyle')) result.roofStyle = roofFromProfiles(evidence);
     if (result.roofStyle === 'flat') {
       if (result.roofRise > 0 || conflicts.includes('roofRise')) {
         result.roofStyle = null;
@@ -178,7 +215,7 @@
         conflicts.push('roofStyle');
       } else result.roofRise = 0;
     }
-    return { dimensions: { width: result.width, depth: result.depth, wallHeight: result.wallHeight, roofRise: result.roofRise }, roofStyle: result.roofStyle, foundationDrop: result.foundationDrop, conflicts, evidence };
+    return { dimensions: { width: result.width, depth: result.depth, wallHeight: result.wallHeight, roofRise: result.roofRise }, roofStyle: result.roofStyle, foundationDrop: result.foundationDrop, conflicts, approximated, evidence };
   }
 
   return Object.freeze({ lines, classify, viewsForPage, divideViews, volumeEvidence, volumeFrom });

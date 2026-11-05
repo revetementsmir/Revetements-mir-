@@ -23,7 +23,9 @@
     await Promise.all([
       script('plan-import-core.js', 'MIRPDFAnalysis'),
       script('plan-structure-notes.js', 'MIRStructuralNotes'),
-      script('plan-sheet-detection.js?v=1', 'MIRSheetDetection'),
+      script('plan-sheet-detection.js?v=architecture', 'MIRSheetDetection'),
+      script('plan-scan-ocr.js?v=1', 'MIRScanOCR'),
+      script('plan-spatial-dimensions.js?v=1', 'MIRSpatialDimensions'),
       script('project-store.js', 'MIRProjectStore')
     ]);
     if (!pdfLibrary) {
@@ -178,26 +180,38 @@
     })();
     return imported.ocrPromise;
   }
-  async function recognize(page, base, imported) {
-    const scale = Math.min(3, 1550 / Math.max(base.width, base.height));
-    const canvas = await raster(page, page.getViewport({ scale }));
-    try {
-      const worker = await ocr(imported);
-      const result = await worker.recognize(canvas, {}, { blocks: true });
-      const words = [];
-      for (const block of result.data.blocks || []) for (const paragraph of block.paragraphs || [])
-        for (const line of paragraph.lines || []) for (const word of line.words || []) {
-          if (!word.text?.trim() || !word.bbox) continue;
-          const {x0, y0, x1, y1} = word.bbox;
-          words.push({ text: word.text, box: [x0, y0, x1, y1].map(value => value / scale), confidence: word.confidence, source: 'ocr' });
-        }
-      return { words, text: result.data.text || '' };
-    } finally { canvas.width = canvas.height = 1; }
+  async function recognize(page, base, imported, options = {}) {
+    return window.MIRScanOCR.scan(page, base, { worker: await ocr(imported), ...options });
+  }
+  async function containsScannedDrawing(page) {
+    const { fnArray, argsArray } = await page.getOperatorList();
+    const { paintImageXObject } = pdfLibrary.OPS;
+    return fnArray.some((op, index) => op === paintImageXObject && argsArray[index][1] >= 750 && argsArray[index][2] >= 750);
   }
   const inCrop = (word, [x, y, w, h]) => {
     const [left, top, right, bottom] = word.box;
     return (left + right) / 2 >= x && (left + right) / 2 <= x + w && (top + bottom) / 2 >= y && (top + bottom) / 2 <= y + h;
   };
+  function mergeWords(detail, overview) {
+    return [...detail, ...overview.filter(word => !detail.some(candidate => {
+      const [a, b, c, d] = word.box, [x, y, w, h] = candidate.box;
+      const overlap = Math.max(0, Math.min(c, w) - Math.max(a, x)) * Math.max(0, Math.min(d, h) - Math.max(b, y));
+      return overlap > Math.min((c - a) * (d - b), (w - x) * (h - y)) * .7;
+    }))];
+  }
+  function rotatedBox([x, y, right, bottom], width, height, orientation) {
+    return orientation === 'ccw' ? [y, width - right, bottom, width - x] : [height - bottom, x, height - y, right];
+  }
+  function verticalLines(words, width, height, detector) {
+    return ['cw', 'ccw'].flatMap(orientation => detector.lines(words.filter(word => word.orientation === orientation)
+      .map(word => ({ ...word, box: rotatedBox(word.box, width, height, orientation) })))
+      .map(row => ({ ...row, box: rotatedBox(row.box, height, width, orientation === 'cw' ? 'ccw' : 'cw') })));
+  }
+  function recognizedTitles(text, width, height, detector) {
+    return detector.viewsForPage(text.split(/\r?\n/).map(line => ({
+      text: line.trim(), box: [0, 0, width, height], confidence: 100, source: 'ocr'
+    })));
+  }
 
   async function detectSheets(pdf, imported, token) {
     const detector = window.MIRSheetDetection, prepared = [];
@@ -210,22 +224,32 @@
         page = await pdf.getPage(number);
         const base = page.getViewport({ scale: 1 }), items = (await page.getTextContent()).items;
         if (token !== sequence) return;
-        let words = pdfWords(items, base), rows = detector.lines(words), views = detector.viewsForPage(rows);
+        let words = pdfWords(items, base), rows = detector.lines(words), views = detector.viewsForPage(rows, base.width, base.height), scannedSheet = false;
         const textLength = words.reduce((total, word) => total + word.text.trim().length, 0);
-        if (!views.length && textLength < 45 && !ocrFailed) {
+        if (views.length && !ocrFailed) scannedSheet = await containsScannedDrawing(page);
+        if (!views.length && !ocrFailed && (textLength < 45 || await containsScannedDrawing(page))) {
           try {
-            const scanned = await recognize(page, base, imported);
+            const scanned = await recognize(page, base, imported, {
+              mode: 'overview', cancelled: () => token !== sequence,
+              hasTitles: ({ rows, text }) => detector.viewsForPage(rows, base.width, base.height).length > 0 ||
+                (!rows.length && recognizedTitles(text, base.width, base.height, detector).length > 0)
+            });
             if (token !== sequence) return;
-            if (scanned.words.length) { words = scanned.words; rows = detector.lines(words); views = detector.viewsForPage(rows); }
+            scannedSheet = true;
+            if (scanned.words.length) {
+              words = mergeWords(scanned.words, words);
+              rows = [...(scanned.rows || []), ...detector.lines(words)];
+              views = detector.viewsForPage(rows, base.width, base.height);
+            }
             if (!views.length) {
               // Some OCR results include text without useful word boxes. A
               // single clear title can identify a full sheet in that case.
-              const titles = [...new Set(scanned.text.split(/\r?\n/).map(text => text.trim()).filter(text => text.length <= 105 && detector.classify(text)))];
-              if (titles.length === 1) views = [{ ...detector.classify(titles[0]), name: titles[0], box: [0, 0, base.width, base.height], source: 'ocr' }];
+              const titles = recognizedTitles(scanned.text, base.width, base.height, detector);
+              if (titles.length === 1) views = titles;
             }
           } catch (e) { ocrFailed = true; if (token === sequence) console.warn('MIR PDF : lecture des feuilles scannées indisponible', e); }
         }
-        if (views.length) prepared.push({ number, words, views: detector.divideViews(views, base.width, base.height) });
+        if (views.length) prepared.push({ number, words, scanned: scannedSheet, views: detector.divideViews(views, base.width, base.height) });
       } catch (e) { if (token === sequence) { skipped++; console.warn('MIR PDF : feuille illisible', number, e); } }
       finally { page?.cleanup(); }
     }
@@ -237,15 +261,30 @@
       try {
         page = await pdf.getPage(sheet.number);
         const base = page.getViewport({ scale: 1 }), scale = Math.min(3, 2100 / Math.max(base.width, base.height));
+        let sourceWords = sheet.words, scannedVertical = [], detailedRows = [];
+        const detailedViews = sheet.views.filter(view => view.face || ['section', 'foundation', 'roof'].includes(view.kind));
+        if (sheet.scanned && detailedViews.length && !ocrFailed) {
+          try {
+            const detailed = await recognize(page, base, imported, {
+              mode: 'detail', regions: detailedViews.map(view => view.crop),
+              vertical: detailedViews.some(view => view.kind !== 'roof'), cancelled: () => token !== sequence
+            });
+            sourceWords = mergeWords(detailed.words, sourceWords);
+            scannedVertical = detailed.verticalWords;
+            detailedRows = detailed.rows || [];
+          } catch (e) { if (token === sequence) console.warn('MIR PDF : certaines cotes fines n’ont pas pu être lues', e); }
+          if (token !== sequence) return;
+        }
         const viewport = page.getViewport({ scale });
         canvas = await raster(page, viewport);
         if (token !== sequence) return;
-        const words = sheet.words.map(word => ({ ...word, box: word.box.map(value => value * scale) }));
-        const rows = detector.lines(words);
+        const atRasterScale = word => ({ ...word, box: word.box.map(value => value * scale) });
+        const words = sourceWords.map(atRasterScale);
+        const rows = [...detailedRows.map(atRasterScale), ...detector.lines(words)];
         let hints = window.MIRStructuralNotes.detect(rows, '');
         if (!hints.length && !ocrFailed && sheet.views.some(view => view.face) && words.every(word => word.source === 'pdf-text')) {
           try {
-            const scanned = await recognize(page, base, imported);
+            const scanned = await recognize(page, base, imported, { mode: 'overview', cancelled: () => token !== sequence });
             hints = window.MIRStructuralNotes.detect(detector.lines(scanned.words.map(word => ({ ...word, box: word.box.map(value => value * scale) }))), scanned.text);
           } catch (e) { ocrFailed = true; if (token === sequence) console.warn('MIR PDF : lecture des repères dessinés indisponible', e); }
           if (token !== sequence) return;
@@ -253,17 +292,26 @@
         hints = hints.map(hint => ({ ...hint, page: sheet.number, needsReview: true }));
         const items = (await page.getTextContent()).items;
         if (token !== sequence) return;
-        const verticalWords = pdfWords(items, viewport, true);
+        const vertical = scannedVertical.map(atRasterScale);
+        const verticalRows = verticalLines(vertical, canvas.width, canvas.height, detector);
+        const verticalWords = pdfWords(items, viewport, true).map(word => ({ ...word, orientation: 'cw' })).concat(vertical.map(word => ({
+          ...word, box: rotatedBox(word.box, canvas.width, canvas.height, word.orientation)
+        })));
+        const geometry = { image: canvas.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, canvas.width, canvas.height), width: canvas.width, height: canvas.height };
         for (const view of sheet.views) {
           const crop = view.crop.map(value => Math.round(value * scale));
           crop[2] = Math.min(crop[2], canvas.width - crop[0]);
           crop[3] = Math.min(crop[3], canvas.height - crop[1]);
           if (crop[2] < 40 || crop[3] < 40) continue;
           const localRows = rows.filter(word => inCrop(word, crop));
-          const calibrationScale = measureLines(canvas, words, verticalWords, crop);
+          const calibrationScale = measureLines(canvas, geometry.image, words, verticalWords, crop);
           const structuralHints = window.MIRStructuralNotes.withinCrop(hints, crop);
           const result = prepareView(canvas, crop, structuralHints, sheet.number, view, calibrationScale);
           evidence.push(...detector.volumeEvidence(localRows, view, sheet.number, MIRPDFAnalysis.parseDimension, calibrationScale.feetPerPixel ? calibrationScale.accepted : []));
+          evidence.push(...window.MIRSpatialDimensions.evidence({
+            rows: localRows, words: words.filter(word => inCrop(word, crop)), verticalRows: verticalRows.filter(word => inCrop(word, crop)),
+            page: sheet.number, view, crop, accepted: calibrationScale.accepted || [], geometry
+          }, MIRPDFAnalysis.parseDimension));
           if (view.face && !imported.assignments[view.face]) imported.assignments[view.face] = result;
           else imported.references.push(result);
         }
@@ -275,21 +323,24 @@
     imported.ocrFailed = ocrFailed;
   }
 
-  function measureLines(canvas, words, verticalWords, crop) {
+  function measureLines(canvas, image, words, verticalWords, crop) {
     const A = window.MIRPDFAnalysis, [x, y, width, height] = crop;
     const isDimension = word => /^[\d\s'’′"″“”¼½¾⅛⅜⅝⅞.,+\-–—/⁄]+$/.test(word.text) || A.parseDimension(word.text);
     const select = (list, box) => list.filter(word => inCrop(word, box) && isDimension(word)).slice(0, 800);
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     const horizontal = select(words, crop);
-    const vertical = select(verticalWords, [canvas.height - y - height, x, height, width]);
-    const candidates = horizontal.length ? A.matchDimensionLines(ctx.getImageData(0, 0, canvas.width, canvas.height), horizontal) : [];
-    if (vertical.length) {
+    const candidates = horizontal.length ? A.matchDimensionLines(image, horizontal) : [];
+    for (const orientation of ['cw', 'ccw']) {
+      const vertical = select(verticalWords.filter(word => word.orientation === orientation), orientation === 'cw'
+        ? [canvas.height - y - height, x, height, width] : [y, canvas.width - x - width, height, width]);
+      if (!vertical.length) continue;
       const turned = document.createElement('canvas'); turned.width = canvas.height; turned.height = canvas.width;
       try {
         const context = turned.getContext('2d', { willReadFrequently: true });
-        context.translate(turned.width, 0); context.rotate(Math.PI / 2); context.drawImage(canvas, 0, 0);
+        if (orientation === 'cw') { context.translate(turned.width, 0); context.rotate(Math.PI / 2); }
+        else { context.translate(0, turned.height); context.rotate(-Math.PI / 2); }
+        context.drawImage(canvas, 0, 0);
         const matches = A.matchDimensionLines(context.getImageData(0, 0, turned.width, turned.height), vertical, { axis: 'y' });
-        candidates.push(...matches.map(c => A.unrotateCandidate(c, canvas.width, canvas.height, 'cw')));
+        candidates.push(...matches.map(c => A.unrotateCandidate(c, canvas.width, canvas.height, orientation)));
       } finally { turned.width = turned.height = 1; }
     }
     return A.resolveScale(candidates.filter(candidate => candidate.anchors.every(([a, b]) => a >= x && a <= x + width && b >= y && b <= y + height)));
@@ -324,6 +375,7 @@
     const missing = Object.entries(VOLUME_NAMES).filter(([key]) => (key === 'roofStyle' ? volume.roofStyle : volume.dimensions[key]) == null).map(([, label]) => label);
     const cautions = [];
     if (volume.conflicts.length) cautions.push('Des cotes se contredisent.');
+    if (volume.approximated.length) cautions.push('Certaines dimensions sont estimées à partir du dessin.');
     if (current.skipped || current.ocrFailed) cautions.push('Certaines feuilles n’ont pas pu être lues.');
     if (!Object.keys(current.assignments).length) cautions.push('Aucune élévation orientée avant, arrière, gauche ou droite n’a été reconnue.');
     $('#mir-pdf-volume-note').textContent = [
@@ -349,7 +401,7 @@
         version: 2, projectKind: 'imported-pdf', id, title: imported.file.name.replace(/\.pdf$/i, ''), source: `PDF importé · ${imported.pageCount} pages`,
         sourceSha256: imported.sha256, analysis: 'Titres et cotes du PDF relevés automatiquement. Les contours et la maquette restent à vérifier.',
         faces, referencePages: imported.references, sourceMetadata: source, structuralHints,
-        dimensions: volume.dimensions, dimensionStatus, detectedVolume: { roofStyle: volume.roofStyle, foundationDrop: volume.foundationDrop, conflicts: volume.conflicts, evidence: volume.evidence },
+        dimensions: volume.dimensions, dimensionStatus, detectedVolume: { roofStyle: volume.roofStyle, foundationDrop: volume.foundationDrop, conflicts: volume.conflicts, approximated: volume.approximated, evidence: volume.evidence },
         dimensionNote: dimensionStatus === 'detected' ? 'Volume préliminaire à partir des cotes repérées dans le PDF.' : 'Géométrie 3D à compléter dans Volume & retours.',
         recess: { enabled: false, confirmed: false }, footprint: { type: 'unknown' }
       };

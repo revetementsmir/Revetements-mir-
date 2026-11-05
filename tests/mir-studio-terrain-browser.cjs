@@ -16,7 +16,28 @@ async function ready(){for(let i=0;i<70;i++){
    const page=await browser.newPage({viewport:{width,height:900},hasTouch:width===390});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'/plan.html',{waitUntil:'domcontentloaded'});
-   await page.waitForFunction(()=>window.MIR_RENDER_DIAGNOSTICS?.rendered===true,{},{timeout:45000});
+   try {
+    await page.waitForFunction(()=>typeof window.MIR_STUDY?.snapshot==='function',null,{timeout:45000});
+    assert.match(await page.locator('#project-name').textContent(),/^Étude MIR\b/,'Le studio doit ouvrir le projet de démonstration');
+    const initialView=await page.evaluate(()=>window.MIR_STUDY.snapshot().view);
+    assert.ok(['2d','3d'].includes(initialView),'Vue initiale inconnue : '+initialView);
+    if(initialView!=='3d')await page.locator('#view-3d').click();
+    await page.waitForFunction(()=>window.MIR_RENDER_DIAGNOSTICS?.rendered===true,null,{timeout:45000});
+   } catch(error) {
+    const startup=await page.evaluate(()=>{
+     const canvas=document.querySelector('#three-canvas'),rect=canvas?.getBoundingClientRect();
+     return {
+      project:document.querySelector('#project-name')?.textContent,
+      view:document.querySelector('#view-3d')?.getAttribute('aria-pressed'),
+      note:document.querySelector('#stage-note')?.textContent,
+      subtitle:document.querySelector('#stage-subtitle')?.textContent,
+      canvas:rect&&{width:rect.width,height:rect.height,hidden:canvas.hidden},
+      diagnostics:window.MIR_RENDER_DIAGNOSTICS
+     };
+    }).catch(()=>null);
+    console.error('Studio terrain au démarrage '+width+'px : '+JSON.stringify({startup,errors}));
+    throw error;
+   }
    const first=await page.evaluate(()=>window.MIR_RENDER_DIAGNOSTICS);
    assert.equal(first.siteStyle,'commercial','Terrain commercial absent : '+width);
    assert.ok(first.sitePlan?.parkingBayCount>=3);
