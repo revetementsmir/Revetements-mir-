@@ -17,7 +17,7 @@ const safeAsset=value=>typeof value==='string'&&/^(\.\/)?assets\/[A-Za-z0-9._/-]
 const safeURL=value=>{try{const u=new URL(value,location.href);return /^https?:$/.test(u.protocol)?u.href:null;}catch{return null;}};
 let layoutImportBusy=false;
 let jException=null;
-let rightAngleSnap=false;
+let rightAngleSnap=true;
 let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
 const profiles={l:{name:'Pliage en L',dimensions:{A:3,B:2}},j:{name:'Pliage en J',dimensions:{A:1,B:3,C:1}},z:{name:'Pliage en Z',dimensions:{A:2,B:4,C:2}},beam5:{name:'Cache-poutre · 5 côtés',dimensions:{A:1,B:6,C:8,D:6,E:1}},omega:{name:'Oméga',dimensions:{A:1,B:2,C:4,D:2,E:1}},custom:{name:'Profil personnalisé',segments:[{label:'A',length:4},{label:'B',length:3},{label:'C',length:2}],bends:[{mode:'interior',angle:90,direction:'left'},{mode:'interior',angle:90,direction:'right'}],startAngle:0},...window.MIRBendingPresets?.catalog()};
 const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','Triangle rectangle'],['trapezoid','Trapèze'],['parallelogram','Parallélogramme'],['pointed','Côté en pointe']];
@@ -165,7 +165,7 @@ function renderTools(){
  const drawing=tool==='draw';
  const recentHem=draft.template==='custom'?(draft.bends||[]).findLastIndex(bend=>bend.mode==='hem'):-1;
  const hemNotice=recentHem<0?'':`<p class="draw-help hem-notice">Double pli · ${esc(draft.segments[recentHem].label)} → ${esc(draft.segments[recentHem+1].label)} <button type="button" data-focus-bend="${recentHem}">Modifier le pli</button></p>`;
- el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 90°</label><p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
+ el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 45° / 90°</label><p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
  `<button type="button" class="draw-primary" data-new-drawing>Nouveau dessin</button><button type="button" data-draw-tool="edit" aria-pressed="${tool==='edit'}">${tool==='edit'?'Terminer la retouche':'Déplacer les points'}</button><button type="button" data-draw-tool="draw" aria-pressed="false">Continuer le tracé</button><button type="button" data-focus-dimensions>Cotes et angles ↓</button>${hemNotice}`;
 }
 function updateDrawing({keepForm=false}={}){
@@ -546,6 +546,25 @@ function localPoint(event, useGrid=snap){const svg=$('#production-drawing svg'),
 function canDrawProfile(){
  return kind==='profile'&&tool==='draw'&&view==='face'&&!client&&!editingItemId;
 }
+function magneticHeading(raw, gesture){
+ const difference=target=>Math.abs(Math.atan2(Math.sin(raw-target),Math.cos(raw-target)));
+ if(gesture.magnetHeading!==undefined){
+  if(difference(gesture.magnetHeading)<=5*Math.PI/180)return gesture.magnetHeading;
+  delete gesture.magnetHeading;
+ }
+ const step=Math.PI/4;
+ let target=Math.round(raw/step)*step;
+ if(gesture.heading!==undefined){
+  for(const normal of [gesture.heading-Math.PI/2,gesture.heading+Math.PI/2]){
+   if(difference(normal)<difference(target))target=normal;
+  }
+ }
+ if(difference(target)<=2.5*Math.PI/180){
+  gesture.magnetHeading=target;
+  return target;
+ }
+ return raw;
+}
 function draggedSegment(event, gesture){
  const end=localPoint(event,false);
  if(!end)return null;
@@ -553,9 +572,8 @@ function draggedSegment(event, gesture){
  const previous=gesture.heading;
  const rawHeading=Math.atan2(dy,dx);
  const base=previous??0;
- const snapped=rightAngleSnap&&previous!==undefined?snapDrawRightAngle([[start[0]-Math.cos(previous),start[1]-Math.sin(previous)],start],end,previous*180/Math.PI):end;
- const heading=event.shiftKey?base+Math.round((rawHeading-base)/(Math.PI/2))*Math.PI/2:Math.atan2(snapped[1]-start[1],snapped[0]-start[0]);
- const length=event.shiftKey||snapped!==end?Math.abs(dx*Math.cos(heading)+dy*Math.sin(heading)):Math.hypot(dx,dy);
+ const heading=event.shiftKey?base+Math.round((rawHeading-base)/(Math.PI/2))*Math.PI/2:rightAngleSnap?magneticHeading(rawHeading,gesture):rawHeading;
+ const length=heading!==rawHeading?Math.abs(dx*Math.cos(heading)+dy*Math.sin(heading)):Math.hypot(dx,dy);
  const step=draft.unit==='mm'?1:25.4/(snap?4:16);
  const rounded=Math.round(length/step)*step;
  if(!rounded)return null;
@@ -656,16 +674,14 @@ function endPoint(event){
  if(moved){renderDimensions();renderProfileOptions();updateDrawing();}
 }
 
-function snapDrawRightAngle(points,point,heading){
- if(points.length<2)return point;
- const [a,b]=points.slice(-2),dx=b[0]-a[0],dy=b[1]-a[1];
- const sideLength=Math.hypot(dx,dy);
- if(!sideLength)return point;
- const angle=finite(heading)?heading*Math.PI/180:Math.atan2(dy,dx);
- const x=point[0]-b[0],y=point[1]-b[1],nx=-Math.sin(angle),ny=Math.cos(angle);
- const along=x*nx+y*ny,across=x*ny-y*nx;
- if(!along||Math.abs(across)>Math.abs(along)*Math.tan(Math.PI/15))return point;
- return [b[0]+along*nx,b[1]+along*ny];
+function magneticTapPoint(point, previousDegrees){
+ const start=drawPoints.at(-1),before=drawPoints.at(-2);
+ const dx=point[0]-start[0],dy=point[1]-start[1],raw=Math.atan2(dy,dx);
+ const previous=finite(previousDegrees)?previousDegrees*Math.PI/180:before?Math.atan2(start[1]-before[1],start[0]-before[0]):undefined;
+ const heading=magneticHeading(raw,{heading:previous});
+ if(heading===raw)return point;
+ const along=dx*Math.cos(heading)+dy*Math.sin(heading);
+ return [start[0]+along*Math.cos(heading),start[1]+along*Math.sin(heading)];
 }
 function focusProfileDimensions(bendIndex){
  const target=bendIndex===undefined?$('#configure-heading'):$('[data-angle-details="'+bendIndex+'"] summary');
@@ -692,7 +708,7 @@ function drawingClick(event){
  const heading=drawPoints.length>=3?build().segments.at(-1)?.headingDeg:undefined;
  const point=event.shiftKey&&drawPoints.length
   ?draggedSegment(event,{start:drawPoints.at(-1),heading:finite(heading)?heading*Math.PI/180:drawPoints.length===2?Math.atan2(drawPoints[1][1]-drawPoints[0][1],drawPoints[1][0]-drawPoints[0][0]):undefined})?.point
-  :rightAngleSnap?snapDrawRightAngle(drawPoints,raw,heading):raw;
+  :rightAngleSnap&&drawPoints.length?magneticTapPoint(raw,heading):raw;
  if(point)appendTracePoint(point);
 }
 function exportMirTemplates(){
