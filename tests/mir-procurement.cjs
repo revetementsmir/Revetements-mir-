@@ -73,7 +73,7 @@ test('Stockage local restaure sans détruire les fournisseurs déjà saisis',()=
 });
 test('Page admin charge les scripts et styles du module',()=>{
  const html=fs.readFileSync(path.join(__dirname,'../dist/production.html'),'utf8');
- assert.match(html,/mir-procurement\.js\?v=1/);
+ assert.match(html,/mir-procurement\.js\?v=2/);
  assert.match(html,/mir-procurement\.css\?v=1/);
 });
 console.log('MIR procurement: '+n+' tests OK');
