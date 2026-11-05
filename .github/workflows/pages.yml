@@ -47,7 +47,7 @@ jobs:
               --retry 20 --retry-delay 3 --retry-all-errors "$1" -o "$2"
           }
           fetch "$base/metres.html" /tmp/metres.html
-          grep -F 'href="atelier-essai/index.html"' /tmp/metres.html
+          grep -F 'href="production.html?view=orders"' /tmp/metres.html
           fetch "$base/production.html" /tmp/production.html
           grep -F 'kaycan-flat-preview.js?v=1' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
@@ -63,8 +63,9 @@ jobs:
           grep -F 'mir-procurement.js?v=1' /tmp/production.html
           fetch "$base/production-admin-v4.js" /tmp/mir-admin-v4.js
           grep -F 'mir-v4-sheet-total' /tmp/mir-admin-v4.js
-          grep -F 'href="atelier-essai/index.html" data-admin-only' /tmp/production.html
-          grep -F 'href="atelier-essai/pliages-integration-candidate.html?production=1"' /tmp/production.html
+          grep -F 'href="production.html?view=orders" data-admin-only' /tmp/production.html
+          grep -F 'href="production.html?profile=solin_brique"' /tmp/production.html
+          grep -F 'href="production.html?profile=coin_arch_j"' /tmp/production.html
           grep -F 'mir-bending-presets.js?v=profils-1' /tmp/production.html
           fetch "$base/mir-bending-presets.js" /tmp/mir-profiles.js
           grep -F "id:'coin_arch_j'" /tmp/mir-profiles.js
@@ -80,12 +81,11 @@ jobs:
           grep -F 'old?.channels?.client===true' /tmp/production-app.js
           grep -F 'old?.channels?.store===true' /tmp/production-app.js
           grep -F 'Nouveau modèle privé par défaut sur cet appareil' /tmp/production-app.js
+          grep -F "const requestedProfile=params.get('profile')" /tmp/production-app.js
           fetch "$base/production-model.js" /tmp/production-model.js
           grep -F 'const radius=5, side=bends[i-1].direction' /tmp/production-model.js
           grep -F 'class="profile-marker-overflow"' /tmp/production-model.js
           grep -F "const oldHem=base?.bends?.[i]?.mode==='hem'" /tmp/production-app.js
-          fetch "$base/atelier-essai/pliages-integration-candidate.html?production=1" /tmp/coins.html
-          grep -F 'MIR — Solin brique et coins architecturaux' /tmp/coins.html
           fetch "$base/atelier-essai/mir-calepinage-extension.js" /tmp/extension.js
           grep -F 'const pitch = value =>' /tmp/extension.js
           fetch "$base/calepinage.html" /tmp/calepinage.html
@@ -109,6 +109,4 @@ jobs:
           grep -F 'The stored soffit paths locate undersides' /tmp/plan-app.js
           fetch "$base/plan-3d.js" /tmp/plan-3d.js
           grep -F "'recessed-assumption' and 'recessed-confirmed' both continue to wallHeight" /tmp/plan-3d.js
-          fetch "$base/atelier-essai/index.html" /tmp/atelier.html
-          grep -F 'Atelier d’essai MIR' /tmp/atelier.html
           echo "MIR Pages verified at $base/"
