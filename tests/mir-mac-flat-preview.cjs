@@ -58,7 +58,7 @@ async function ready(url){
    await page.locator('#material-type').selectOption('acier');
    await page.locator('#mir-v4-colors > summary').click();
    await page.locator('#production-material').selectOption('mac-acier-moulures');
-   await page.locator('[data-production-color="mac-acier-301"]').click();
+   await page.locator('[data-production-color="mac-acier-304"]').click();
    const url='./assets/catalogue-swatches/mac-bouleau-fume-efcc24f8.jpeg';
    await page.waitForFunction(u=>/^#[0-9a-f]{6}$/i.test(window.MIRKaycanFlatPreview?.get(u)||''),url,{timeout:25000});
    const color=await page.evaluate(u=>window.MIRKaycanFlatPreview.get(u),url);
