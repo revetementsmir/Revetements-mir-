@@ -198,5 +198,5 @@
    return controller;
  }
  function updatePreview(payload){controller?.updatePreview(payload);}
- return {version:'1.0.0',init,updatePreview,geometryKey,LABELS};
+ return {version:'1.0.0',init,updatePreview,geometryKey,LABELS,get active(){return controller?.active===true;},get step(){return controller?.step??0;}};
 });
