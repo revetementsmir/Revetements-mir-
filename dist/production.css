@@ -115,3 +115,5 @@ body[data-profile-admin=true] .angle-details .bend-fields{margin-top:0}
 .production-family>h3 small{font-weight:400}
 .profile-group-choice{font-size:11px}
 .profile-group-choice select{display:block;max-width:100%;min-height:34px;margin-top:4px}
+.order-metadata>summary>.order-summary-label{min-width:0;font-size:inherit;color:var(--ink);overflow-wrap:anywhere}
+#order-po-summary{color:var(--green);font-weight:700}

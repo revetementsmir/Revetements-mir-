@@ -765,12 +765,17 @@
   }
   function bendingSheetPages(order, profileGroups) {
     const width=850,height=1100,columns=[40,458,550,665,733,810],lineHeight=14;
-    const project=wrapLines('CHANTIER : '+(order.project||'À préciser'),88);
-    const foreman=wrapLines('CONTREMAÎTRE : '+(order.foreman||'À préciser'),88);
-    const po=wrapLines('PO / BON : '+(order.poNumber||'À préciser'),67);
-    const tableY=130+(po.length-1)*lineHeight,headingH=28;
-    const footerY=1002-(project.length+foreman.length-2)*lineHeight;
-    const bodyLimit=footerY-15,rows=[],pages=[[]];
+    const documentFields=[
+      ['BON DE COMMANDE',order.poNumber],['CHANTIER',order.project],
+      ['DATE SOUHAITÉE',order.date],['CONTREMAÎTRE',order.foreman]
+    ].map(([label,value])=>[label,wrapLines(value||'À préciser',44)]);
+    const topLines=Math.max(documentFields[0][1].length,documentFields[1][1].length);
+    const bottomLines=Math.max(documentFields[2][1].length,documentFields[3][1].length);
+    const firstFieldY=111,secondFieldY=firstFieldY+30+topLines*lineHeight;
+    const tableY=secondFieldY+43+bottomLines*lineHeight,headingH=28;
+    const bodyLimit=1016,rows=[],pages=[[]];
+    const missingOrderFields=!order.poNumber||!order.project||!order.date||!order.foreman;
+    const status=missingOrderFields||!order.complete?'BROUILLON · À COMPLÉTER':'À VALIDER PAR L’ATELIER';
     const lines=(values,max)=>values.flatMap(value=>wrapLines(value,max));
     const take=(values,start)=>values.slice(start,start+23);
     const bodyText='font-size="11.5"';
@@ -812,14 +817,22 @@
     const rect=(x,y,w,h,fill)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="#727c72"/>`;
     return pages.map((page,index)=>{
       let svg=svgOpen(width,height,'MIR · Mise en production · Feuille '+(index+1)).replace('<svg ','<svg xmlns:xlink="http://www.w3.org/1999/xlink" ');
-      svg+=svgText(40,64,'MISE EN PRODUCTION','font-size="28" font-weight="700"');
-      svg+='<image xlink:href="assets/MIR-logo-HD.png" x="622" y="36" width="188" height="64" preserveAspectRatio="xMaxYMid meet"/>';
-      svg+=svgText(40,94,'Date souhaitée : '+(order.date||'À préciser'),'font-size="14"');
-      svg+=multiline(40,114,po,{width:67,lineHeight,attrs:'font-size="14"'}).svg;
-      if(order.revision)svg+=svgText(810,114,'Révision '+order.revision,'font-size="12" text-anchor="end"');
-      svg+=rect(40,tableY,770,headingH,'#edf2eb');
-      ['MOULURES','GAGE','COULEUR','QUANTITÉ','LONGUEUR'].forEach((label,column)=>{
-        svg+=svgText(columns[column]+7,tableY+18,label,'font-size="11" font-weight="700"');
+      svg+='<rect x="40" y="30" width="5" height="59" rx="2" fill="#518944"/>';
+      svg+=svgText(55,51,'BON DE COMMANDE','font-size="26" font-weight="700" fill="#244733"');
+      svg+=svgText(55,76,'MISE EN PRODUCTION · MOULURES','font-size="13" font-weight="700" fill="#506650"');
+      svg+='<image xlink:href="assets/MIR-logo-HD.png" x="654" y="25" width="156" height="55" preserveAspectRatio="xMaxYMid meet"/>';
+      svg+=svgText(810,95,status,'font-size="11" font-weight="700" text-anchor="end" fill="#52684e"');
+      svg+=`<rect x="40" y="101" width="770" height="${tableY-122}" rx="6" fill="#f3f6f0" stroke="#d5ded1"/>`;
+      documentFields.forEach(([label,values],i)=>{
+        const x=i%2?434:53,y=i<2?firstFieldY:secondFieldY;
+        svg+=svgText(x,y+11,label,'font-size="10" font-weight="700" fill="#52684e"');
+        svg+=multiline(x,y+27,values,{width:44,lineHeight,attrs:'font-size="13" font-weight="700"'}).svg;
+      });
+      svg+=svgText(40,tableY-7,order.items.length+' ligne'+(order.items.length>1?'s':'')+' · '+order.knownQuantity+' pièce'+(order.knownQuantity>1?'s':'' )+' (quantités renseignées)','font-size="11" fill="#52684e"');
+      if(order.revision)svg+=svgText(810,tableY-7,'Rév. '+order.revision,'font-size="11" text-anchor="end" fill="#52684e"');
+      svg+='<rect x="40" y="'+tableY+'" width="770" height="'+headingH+'" fill="#244733"/>';
+      ['MOULURES','MÉTAL / GAGE','COULEUR','QUANTITÉ','LONGUEUR'].forEach((label,column)=>{
+        svg+=svgText(columns[column]+7,tableY+18,label,'font-size="10.5" font-weight="700" fill="#fff"');
       });
       for(const x of columns.slice(1,-1))svg+=`<path d="M${x} ${tableY}v${headingH}" stroke="#727c72"/>`;
       for(const row of page){
@@ -843,10 +856,7 @@
         svg+=svgText(699,y+21,row.continuation?'—':item.quantity??'À préciser','font-size="15" font-weight="700" text-anchor="middle"');
         if(!row.continuation)svg+=multiline(740,y+18,[formatMeasurement(item.lengthMM,item.unit)],{width:11,lineHeight,attrs:bodyText}).svg;
       }
-      const footer={width:88,lineHeight,attrs:'font-size="13"'};
-      const footProject=multiline(40,footerY,project,footer);
-      const footForeman=multiline(40,footProject.bottom+3,foreman,footer);
-      svg+=footProject.svg+footForeman.svg;
+      svg+='<line x1="40" x2="810" y1="1031" y2="1031" stroke="#aebcaa"/>';
       svg+=svgText(40,1046,'* Face colorée. Cotes de la pièce finie. Rayons et développé à valider par l’atelier.','font-size="11"');
       svg+=svgText(40,1068,'Validation MIR avant transmission.','font-size="11"');
       svg+=svgText(810,1068,'Feuille '+(index+1)+' / '+pages.length,'font-size="12" text-anchor="end"');
