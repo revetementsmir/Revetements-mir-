@@ -169,6 +169,12 @@ function renderTools(){
  el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 45° / 90°</label><label>Hauteur du plan<select id="trace-height"><option value="10"${traceHeight===10?' selected':''}>10 po</option><option value="14"${traceHeight===14?' selected':''}>14 po</option></select></label><p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
  `<button type="button" class="draw-primary" data-new-drawing>Nouveau dessin</button><button type="button" data-draw-tool="edit" aria-pressed="${tool==='edit'}">${tool==='edit'?'Terminer la retouche':'Déplacer les points'}</button><button type="button" data-draw-tool="draw" aria-pressed="false">Continuer le tracé</button><button type="button" data-focus-dimensions>Cotes et angles ↓</button>${hemNotice}`;
 }
+function profileMeasureInput(index,label){
+ const selector=draft.template==='custom'? `[data-segment-length="${index}"]`:
+  /^[A-Z][A-Z0-9]*$/.test(label)?`[data-measure="${label}"]`:'';
+ const input=selector&&$('#production-dimensions').querySelector(selector);
+ return input&&!input.disabled&&!input.readOnly?input:null;
+}
 function updateDrawing({keepForm=false}={}){
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
@@ -182,7 +188,12 @@ function updateDrawing({keepForm=false}={}){
  })):shown.illustrative?[]:shown.model.segments||[];
  if(dimensions){
   dimensions.hidden=kind!=='profile'||!sides.length;
-  dimensions.innerHTML=dimensions.hidden?'':sides.map(segment=>`<li>${esc(segment.label)} · ${esc(M.formatMeasurement(segment.lengthMM,draft.unit))}</li>`).join('');
+  dimensions.innerHTML=dimensions.hidden?'':sides.map((segment,index)=>{
+   const text=esc(segment.label)+' · '+esc(M.formatMeasurement(segment.lengthMM,draft.unit));
+   return tool==='select'&&profileMeasureInput(index,segment.label)
+    ?`<li><button type="button" class="secondary-button" data-edit-profile-measure="${index}" aria-label="Modifier la cote ${esc(segment.label)} : ${esc(M.formatMeasurement(segment.lengthMM,draft.unit))}">${text}</button></li>`
+    :`<li>${text}</li>`;
+  }).join('');
  }
 
  $('#drawing-navigation').hidden=kind!=='panel'&&view!=='volume';$('#zoom-controls').hidden=kind!=='panel'&&(client||view!=='volume');$('#panel-zoom-value').textContent=Math.round(zoom*100)+' %';$('#panel-zoom-out').disabled=zoom<=.5;$('#panel-zoom-in').disabled=zoom>=4;
@@ -765,6 +776,17 @@ async function importMirTemplates(input){
  finally{input.value='';}
 }
 function handleClick(event){const button=event.target.closest('button,[data-select-bottom]');if(!button)return;const d=button.dataset;
+ if(d.editProfileMeasure!==undefined){
+  const index=Number(d.editProfileMeasure),label=build().segments?.[index]?.label;
+  const input=label&&profileMeasureInput(index,label);
+  if(input){
+   const details=input.closest('details');
+   if(details)details.open=true;
+   input.focus();
+   input.select();
+  }
+  return;
+ }
  if(button.hasAttribute('data-focus-dimensions'))return focusProfileDimensions();
  if(d.focusBend!==undefined){
   if(tool==='draw'){tool='select';updateDrawing();}
