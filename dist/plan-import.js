@@ -260,10 +260,10 @@
           crop[3] = Math.min(crop[3], canvas.height - crop[1]);
           if (crop[2] < 40 || crop[3] < 40) continue;
           const localRows = rows.filter(word => inCrop(word, crop));
-          const scale = measureLines(canvas, words, verticalWords, crop);
+          const calibrationScale = measureLines(canvas, words, verticalWords, crop);
           const structuralHints = window.MIRStructuralNotes.withinCrop(hints, crop);
-          const result = prepareView(canvas, crop, structuralHints, sheet.number, view, scale);
-          evidence.push(...detector.volumeEvidence(localRows, view, sheet.number, MIRPDFAnalysis.parseDimension, scale.feetPerPixel ? scale.accepted : []));
+          const result = prepareView(canvas, crop, structuralHints, sheet.number, view, calibrationScale);
+          evidence.push(...detector.volumeEvidence(localRows, view, sheet.number, MIRPDFAnalysis.parseDimension, calibrationScale.feetPerPixel ? calibrationScale.accepted : []));
           if (view.face && !imported.assignments[view.face]) imported.assignments[view.face] = result;
           else imported.references.push(result);
         }
