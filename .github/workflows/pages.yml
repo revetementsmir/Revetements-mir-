@@ -35,6 +35,20 @@ jobs:
           node tests/mir-procurement.cjs
           node tests/mir-pages-regressions.cjs
           node tests/mir-atelier-v4.cjs
+          node --check tests/mir-homepage.cjs
+          node --check tests/mir-homepage-browser.cjs
+          node tests/mir-homepage.cjs
+      - name: Vérifier l'accueil MIR en vrai navigateur Chrome
+        run: |
+          npm install --no-save playwright@1.58.2
+          node tests/mir-homepage-browser.cjs
+      - name: Captures accueil PC, tablette et mobile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-accueil-responsive
+          path: artifacts/mir-accueil-*.png
+          if-no-files-found: ignore
       - uses: actions/configure-pages@v5
       - name: Préparer uniquement le site MIR principal
         run: |
@@ -45,6 +59,8 @@ jobs:
           rm -f _site_mir/atelier-essai/index.html
           test ! -f _site_mir/atelier-essai/index.html
           test -f _site_mir/atelier-essai/mir-calepinage-extension.js
+          test -f _site_mir/assets/MIR-logo-officiel-original.svg
+          test -f _site_mir/mir-home-premium.css
           if find _site_mir/atelier-essai -type f -name '*-candidate.html' | grep -q .; then
             echo "Les écrans de démonstration ne doivent pas être publiés." >&2
             exit 1
@@ -64,6 +80,16 @@ jobs:
             curl --fail --silent --show-error --location \
               --retry 20 --retry-delay 3 --retry-all-errors "$1" -o "$2"
           }
+          fetch "$base/index.html" /tmp/mir-homepage.html
+          grep -F 'mir-home-premium.css?v=20261105' /tmp/mir-homepage.html
+          grep -F 'assets/MIR-logo-officiel-original.svg' /tmp/mir-homepage.html
+          grep -F 'Mon compte' /tmp/mir-homepage.html
+          grep -F 'Découvrir nos revêtements' /tmp/mir-homepage.html
+          grep -F 'Voir nos réalisations' /tmp/mir-homepage.html
+          fetch "$base/assets/MIR-logo-officiel-original.svg" /tmp/mir-logo.svg
+          grep -F 'viewBox="0 0 363.68 91.133"' /tmp/mir-logo.svg
+          fetch "$base/mir-home-premium.css" /tmp/mir-home-premium.css
+          grep -F '.mir-home-showcase' /tmp/mir-home-premium.css
           fetch "$base/metres.html" /tmp/metres.html
           grep -F 'href="production.html?view=orders"' /tmp/metres.html
           fetch "$base/pliage.html" /tmp/pliage.html
