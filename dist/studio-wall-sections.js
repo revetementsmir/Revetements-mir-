@@ -60,7 +60,38 @@
   function safeColor(value,alternative){
     return typeof value==='string'&&/^#[0-9a-f]{6}$/i.test(value)?value:alternative;
   }
-  function explodeSideSVG(mainSvg,{sideFace,dimensions,mesh,brickBand:band,brickPattern='',colors={}}={}){
+  // Montrer les vraies baies du mur du fond : les positions viennent des
+  // ouvertures de l'élévation de face, et non d'une maquette inventée.
+  function frontOpenings(front,dimensions,{x,width,yGround,pixelsPerMeter,top,bottom}){
+    const zones=(front?.zones||[]).filter(z=>['centre_RDC','centre_etage'].includes(z.id));
+    const boxes=zones.map(z=>bound(z.polygon)).filter(Boolean);
+    const masonry=bound(front?.zones?.find(z=>z.kind==='masonry')?.polygon);
+    const gables=(front?.zones||[]).filter(z=>z.polygon?.length===5&&z.id?.includes('pignon'));
+    const shoulders=gables.flatMap(z=>[z.polygon[0]?.[1],z.polygon[2]?.[1]]).filter(finite);
+    if(!boxes.length||!masonry||!shoulders.length||!Array.isArray(front?.openings))return '';
+    const fromX=Math.min(...boxes.map(b=>b.minX)),toX=Math.max(...boxes.map(b=>b.maxX));
+    const eave=shoulders.reduce((sum,v)=>sum+v,0)/shoulders.length;
+    if(toX-fromX<1||masonry.maxY-eave<1)return '';
+    const zPerPixel=dimensions.wallHeight/(masonry.maxY-eave);
+    const shape=(p,i)=>{
+      const b=bound(p.polygon);if(!b)return '';
+      const center=(b.minX+b.maxX)/2;
+      if(center<fromX||center>toX)return '';
+      const pts=p.polygon.map(([px,py])=>[
+        x+(px-fromX)/(toX-fromX)*width,
+        yGround-(masonry.maxY-py)*zPerPixel*pixelsPerMeter
+      ]);
+      const points=pts.map(pt=>pt.map(round).join(',')).join(' ');
+      const fill=p.type==='door'?'#c8cec5':'#cbded7';
+      return '<polygon data-mir-wall-opening="'+String(p.id||'baie-'+i).replace(/[^a-zA-Z0-9_-]/g,'')+
+        '" points="'+points+'" fill="'+fill+'" stroke="#3e5145" stroke-width="2.2"/>';
+    };
+    const nodes=front.openings.map(shape).join('');
+    if(!nodes)return '';
+    return '<defs><clipPath id="mir-explode-recess-openings"><rect x="'+round(x)+'" y="'+round(top)+'" width="'+round(width)+'" height="'+round(bottom-top)+'"/></clipPath></defs>'+
+      '<g clip-path="url(#mir-explode-recess-openings)">'+nodes+'</g>';
+  }
+  function explodeSideSVG(mainSvg,{sideFace,dimensions,mesh,brickBand:band,brickPattern='',colors={},frontFace=null}={}){
     if(!mainSvg||!sideFace||!dimensions||!mesh)return null;
     const parts=wallSections(mesh),frame=sideScale(sideFace,dimensions.wallHeight);
     const match=/viewBox="([^"]+)"/.exec(mainSvg);
@@ -83,6 +114,7 @@
       const node='<g data-mir-wall-part="'+part.id+'" data-world-top="'+round(part.topMeters)+'" data-world-bottom="'+round(part.bottomMeters)+'" data-width-m="'+round(part.widthMeters)+'" pointer-events="none">'+
         '<rect x="'+round(x)+'" y="'+round(y0)+'" width="'+round(w)+'" height="'+round(height)+'" fill="'+safeFill(part)+'" fill-opacity=".96" stroke="#536855" stroke-width="2"/>'+
         (bandH>0?'<rect data-mir-masonry-band="'+part.id+'" x="'+round(x)+'" y="'+round(masonryY)+'" width="'+round(w)+'" height="'+round(bandH)+'" fill="'+(brickPattern?'url(#mir-exploded-brick)':'#a3a59a')+'"/>':'')+
+        (part.id==='front'?frontOpenings(frontFace,dimensions,{x,width:w,yGround:grade,pixelsPerMeter:ppm,top:y0,bottom}):'')+
         '<text x="'+round(x+w/2)+'" y="'+round(Math.max(vb[1]+55,top-13))+'" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#40533d" paint-order="stroke" stroke="#fafbf5" stroke-width="3">'+label+'</text>'+
         '<title>'+part.name+' — sommet '+round(part.topMeters)+' m, pied '+round(part.bottomMeters)+' m</title></g>';
       x+=w+gap;return node;
