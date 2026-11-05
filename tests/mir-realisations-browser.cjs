@@ -35,7 +35,7 @@ async function main(){await new Promise(r=>server.listen(0,'127.0.0.1',r));let b
     await page.locator('#mir-gallery-close').click();
     assert.equal(await page.locator('#mir-gallery-dialog').evaluate(el=>el.open),false);
     await page.locator('[data-photo="3"]').click();
-    assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Architecture urbaine au crépuscule');
+    assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Au cœur du centre-ville de Québec');
     await page.locator('#mir-gallery-next').click();
     assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Jeux de matières');
     await page.locator('#mir-gallery-close').click();
