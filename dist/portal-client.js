@@ -62,11 +62,12 @@
       (!authCallback && ['code', 'token_hash', 'access_token', 'refresh_token'].some(key => query.has(key) || hash.has(key)));
     const sensitive = ['invitation', 'code', 'token_hash', 'type', 'access_token', 'refresh_token', 'expires_at', 'expires_in', 'token_type', 'provider_token', 'provider_refresh_token', 'error', 'error_code', 'error_description'];
     sensitive.forEach(key => { query.delete(key); hash.delete(key); });
-    if (rawInvitation || authCallback || callbackError) query.delete('demo');
+    // Le site MIR principal n'expose jamais l'ancien mode démonstration.
+    query.delete('demo');
     url.hash = hash.toString() ? `#${hash.toString()}` : '';
     return { cleanURL: url.href, invitationToken, authCallback, callbackError,
       invalidInvitation: !!rawInvitation && !invitationToken,
-      mode: query.get('demo') === '1' ? 'demo' : 'connected' };
+      mode: 'connected' };
   }
   function checkedSnapshot(raw, userId) {
     if (!raw || raw.mode !== 'connected' || raw.demo !== false || raw.actorId !== userId)
