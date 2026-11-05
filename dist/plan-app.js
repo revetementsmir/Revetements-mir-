@@ -336,7 +336,7 @@
       if(sideSvg&&matchMedia('(max-width:650px)').matches){
         // Sur un téléphone, garder toute la maison lisible. Le même SVG
         // affiche les trois murs à leur altitude sur une deuxième vue ciblée.
-        const source=original.match(/viewBox="([^"]+)"/)?.[1].split(/[\\s,]+/).map(Number);
+        const source=original.match(/viewBox="([^"]+)"/)?.[1].split(/[\s,]+/).map(Number);
         const full=sideSvg.viewBox.baseVal;
         if(source?.length===4&&source.every(Number.isFinite)&&full.width>source[2]){
           homeViewBox=source;
