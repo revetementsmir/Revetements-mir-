@@ -99,12 +99,13 @@
   if(!L||!E||!C){$('#elevation').textContent='Les outils de dessin et de métrés n’ont pas chargé. Rechargez la page.';return;}
   const NEUTRAL='#d3d6cd', patternNames={lap:'Clin',vertical:'Lames verticales',panel:'Panneau',brick:'Maçonnerie',plain:'Uni',shingle:'Bardeau'};
   const orientationNames={horizontal:'Horizontale',vertical:'Verticale'};
-  const defaults = () => ({version:2,catalogueVersion:4,face:data.faces.find(f=>f.importedStatus==='assigned')?.key||'front',view:'3d',displayMode:'client',alignWindow:true,selected:{kind:'zone',id:'pignon_gauche'},selections:{},customZones:{front:[],right:[],back:[],left:[]},zoneOverrides:{},openingOverrides:{},addedOpenings:{front:[],right:[],back:[],left:[]},bands:{},openingTrims:{},panelLayouts:{},transitions:[],panelStockRotation:true,volumeOverride:null,recessOverride:null,soffitId:'kaycan-sp600-vented',soffitColor:NEUTRAL,fasciaId:'kaycan-fascia-6-0480',fasciaColor:NEUTRAL,rotation:28});
+  const defaults = () => ({version:2,catalogueVersion:4,face:data.faces.find(f=>f.importedStatus==='assigned')?.key||'front',view:'3d',displayMode:'client',alignWindow:true,selected:{kind:'zone',id:'pignon_gauche'},selections:{},customZones:{front:[],right:[],back:[],left:[]},zoneOverrides:{},openingOverrides:{},addedOpenings:{front:[],right:[],back:[],left:[]},bands:{},openingTrims:{},panelLayouts:{},transitions:[],manualTransitionModes:{},panelStockRotation:true,volumeOverride:null,recessOverride:null,soffitId:'kaycan-sp600-vented',soffitColor:NEUTRAL,fasciaId:'kaycan-fascia-6-0480',fasciaColor:NEUTRAL,rotation:28});
   let state=defaults(),history=[],detection=false,neutral=false,drawMode=null,drag=null,toastTimer,selectedJoint=null,suppressClick=false;
   try {const old=JSON.parse(localStorage.getItem(STORAGE));if(old?.version===2&&data.faces.some(f=>f.key===old.face))state={...state,...old};}catch(_){}
   for(const field of ['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','panelLayouts'])if(!state[field]||typeof state[field]!=='object'||Array.isArray(state[field]))state[field]=defaults()[field];
   for(const f of data.faces){if(!Array.isArray(state.customZones[f.key]))state.customZones[f.key]=[];if(!Array.isArray(state.addedOpenings[f.key]))state.addedOpenings[f.key]=[];}
   if(!Array.isArray(state.transitions))state.transitions=[];
+  if(!state.manualTransitionModes||typeof state.manualTransitionModes!=='object'||Array.isArray(state.manualTransitionModes))state.manualTransitionModes={};
   if(!['client','atelier'].includes(state.displayMode))state.displayMode='client';
   if(!materialById.has(state.soffitId))state.soffitId=soffits[0]?.id;
   if(!materialById.has(state.fasciaId))state.fasciaId=fascias[0]?.id;
@@ -222,7 +223,7 @@
   function save(){for(const field of ['bands','openingTrims'])for(const [id,config] of Object.entries(state[field]))state[field][id]={...config,...officialColor(materialById.get(config.materialId),config)};for(const f of data.faces)for(const z of allZones(f))if(choice(f,z).pattern==='panel')state.panelLayouts[key(f.key,z.id)]=panelLayoutFor(f,z);try{localStorage.setItem(STORAGE,JSON.stringify(state));notifyStudy();$('#saved-label').textContent='Choix enregistrés sur cet appareil';}catch(_){$('#saved-label').textContent='Mémoire locale indisponible · exportez vos choix';}}
   function checkpoint() {history.push(clone(state));if(history.length>30)history.shift();$('#undo').disabled=false;}
   function modify(fn) {checkpoint();fn();save();render();}
-  function setChoice(patch){const z=currentZone();if(!z)return;modify(()=>{const old=choice(face(),z),changedProduct=patch.materialId&&patch.materialId!==old.materialId,raw={...old,...patch};if(changedProduct){delete raw.formatId;delete raw.exposureIn;delete raw.battenSpacingIn;}state.selections[key(state.face,z.id)]=normalChoice(raw);if(changedProduct||Object.hasOwn(patch,'formatId')||Object.hasOwn(patch,'orientation'))delete state.panelLayouts[key(state.face,z.id)];selectedJoint=null;});}
+  function setChoice(patch){const z=currentZone();if(!z)return;modify(()=>{const old=choice(face(),z),changedProduct=patch.materialId&&patch.materialId!==old.materialId,raw={...old,...patch};if(changedProduct){delete raw.formatId;delete raw.exposureIn;delete raw.battenSpacingIn;delete state.manualTransitionModes[key(state.face,z.id)];}state.selections[key(state.face,z.id)]=normalChoice(raw);if(changedProduct||Object.hasOwn(patch,'formatId')||Object.hasOwn(patch,'orientation'))delete state.panelLayouts[key(state.face,z.id)];selectedJoint=null;});}
   function ensureSelected() {if(!data.faces.some(f=>f.key===state.face))state.face=data.faces[0].key;if((state.selected.kind==='zone'&&!currentZone())||(state.selected.kind==='opening'&&!currentOpening()))state.selected={kind:'zone',id:allZones(face())[0]?.id||null};}
   function renderPattern(c){return c.pattern==='lap'&&c.orientation==='vertical'?'vertical':c.pattern;}
   function patternDef(id,c,f,z,monochrome=neutral){
@@ -313,7 +314,7 @@
       // Transitions horizontales : longueur du profil (10 ou 12 pi) et
       // préférence pour le dessus d'un châssis, même dans la texture 3D.
       const rule=V?.verticalRule(materialById.get(c.materialId),c);
-      if(rule){
+      if(rule&&!state.manualTransitionModes[key(f.key,z.id)]){
         const proposed=V.breaks({polygon:z.polygon,feetPerPixel:feetPerPixel(f),
           material:materialById.get(c.materialId),choice:c,openings,
           manualTransitions:state.transitions.filter(t=>t.face===f.key&&t.zoneId===z.id)});
@@ -582,8 +583,40 @@
     }
     $('#layout-alerts').innerHTML=alerts.join('');
   }
+
+  function manualizeSuggestedTransitions(){
+    const z=currentZone();if(!z)return;
+    const c=choice(face(),z),m=materialById.get(c.materialId),rule=V?.verticalRule(m,c);
+    if(!rule)return toast('Aucune règle de longueur verticale pour ce matériau.');
+    const id=key(state.face,z.id);
+    if(state.manualTransitionModes[id])return toast('Ces transitions sont déjà modifiables.');
+    const proposal=V.breaks({polygon:z.polygon,feetPerPixel:feetPerPixel(face()),material:m,choice:c,
+      openings:allOpenings(face()),manualTransitions:state.transitions.filter(t=>t.face===state.face&&t.zoneId===z.id)});
+    if(!proposal.complete)return toast('L’échelle du plan doit être vérifiée avant le placement des joints.');
+    modify(()=>{
+      proposal.items.forEach(t=>state.transitions.push({id:newId('transition'),face:state.face,zoneId:z.id,
+        orientation:'horizontal',position:t.position,profile:'panel-z',color:c.color,
+        source:'mir-auto-converted',sourceRuleLengthIn:rule.maxRunIn,needsReview:true}));
+      state.manualTransitionModes[id]=true;
+    });
+    toast('Joints devenus modifiables : glissez chaque ligne ou saisissez sa position. Vous pouvez en supprimer.');
+  }
+  function restoreAutomaticTransitions(){
+    const z=currentZone();if(!z)return;
+    const id=key(state.face,z.id);
+    modify(()=>{
+      state.transitions=state.transitions.filter(t=>!(t.face===state.face&&t.zoneId===z.id&&t.source==='mir-auto-converted'));
+      delete state.manualTransitionModes[id];
+    });
+    toast('Proposition automatique recalculée. Les transitions ajoutées manuellement sont conservées.');
+  }
   const profileNames={'panel-z':'Z · raccord horizontal','panel-l-7/8':'L 7/8 · raccord vertical','brick-j':'J · transition','brick-l':'L · transition'};
-  function renderTransitions(f,z){$('#transition-list').innerHTML=state.transitions.filter(t=>t.face===f.key&&t.zoneId===z.id).map(t=>`<div class="joint-row"><label for="transition-${esc(t.id)}">${t.orientation==='vertical'?'Verticale':'Horizontale'}<small>Position depuis ${t.orientation==='vertical'?'la gauche':'le haut'} · po</small></label><input id="transition-${esc(t.id)}" data-transition-position="${esc(t.id)}" inputmode="decimal" value="${positionText(layoutDimension(f,z,t.orientation)*t.position)}"><button data-delete-transition="${esc(t.id)}" aria-label="Retirer cette transition">×</button><select data-transition-profile="${esc(t.id)}" aria-label="Profil de la transition">${Object.entries(profileNames).map(([id,name])=>`<option value="${id}" ${t.profile===id?'selected':''}>${name}</option>`).join('')}</select></div>`).join('');}
+  function renderTransitions(f,z){
+    const mode=!!state.manualTransitionModes[key(f.key,z.id)],c=choice(f,z),m=materialById.get(c.materialId),rule=V?.verticalRule(m,c);
+    $('#edit-auto-transitions').hidden=!rule||mode;$('#restore-auto-transitions').hidden=!rule||!mode;
+    $('#auto-transition-note').hidden=!rule;
+    if(rule)$('#auto-transition-note').textContent=mode?'Joints ajustables : cliquez sur la ligne, glissez-la ou modifiez sa cote. La limite de '+rule.maxRunIn/12+' pi reste à vérifier.':'Joints proposés automatiquement (maximum '+rule.maxRunIn/12+' pi). Activez leur édition pour les déplacer ou supprimer.';
+    $('#transition-list').innerHTML=state.transitions.filter(t=>t.face===f.key&&t.zoneId===z.id).map(t=>`<div class="joint-row"><label for="transition-${esc(t.id)}">${t.orientation==='vertical'?'Verticale':'Horizontale'}<small>Position depuis ${t.orientation==='vertical'?'la gauche':'le haut'} · po</small></label><input id="transition-${esc(t.id)}" data-transition-position="${esc(t.id)}" inputmode="decimal" value="${positionText(layoutDimension(f,z,t.orientation)*t.position)}"><button data-delete-transition="${esc(t.id)}" aria-label="Retirer cette transition">×</button><select data-transition-profile="${esc(t.id)}" aria-label="Profil de la transition">${Object.entries(profileNames).map(([id,name])=>`<option value="${id}" ${t.profile===id?'selected':''}>${name}</option>`).join('')}</select></div>`).join('');}
   function renderControl(){
     const f=face(),opening=state.selected.kind==='opening',item=opening?currentOpening():currentZone();if(!['zone','opening'].includes(state.selected.kind))return;if(!item){$('#selected-title').textContent='Choisissez une zone';$('#zone-origin').textContent='Tracez une zone sur le plan pour lui attribuer un revêtement.';$('#material-controls').hidden=true;$('#opening-controls').hidden=true;$('#geometry-controls').hidden=true;return;}
     $('#selected-title').textContent=opening?(item.type==='door'?'Porte':'Fenêtre'):item.name;
@@ -715,6 +748,8 @@
   $('#joint-list').onchange=e=>{const input=e.target.closest('[data-joint-position]');if(input)setJointPosition(input.dataset.jointPosition,input.dataset.orientation,input.value);};
   $('#joint-list').onclick=e=>{const b=e.target.closest('[data-delete-joint]');if(b)editLayout(layout=>layout[b.dataset.orientation]=layout[b.dataset.orientation].filter(l=>l.id!==b.dataset.deleteJoint));};
   $$('[data-add-transition]').forEach(b=>b.onclick=()=>addTransition(b.dataset.addTransition));
+  $('#edit-auto-transitions').onclick=manualizeSuggestedTransitions;
+  $('#restore-auto-transitions').onclick=restoreAutomaticTransitions;
   $('#transition-list').onchange=e=>{const p=e.target.closest('[data-transition-position]'),profile=e.target.closest('[data-transition-profile]');if(p){const t=state.transitions.find(t=>t.id===p.dataset.transitionPosition),z=currentZone(),dim=layoutDimension(face(),z,t.orientation),inch=parseInches(p.value);if(!(inch>0&&inch<dim)){toast('Saisissez une position intérieure à la zone.');renderControl();return;}modify(()=>t.position=inch/dim);}else if(profile)modify(()=>{const t=state.transitions.find(t=>t.id===profile.dataset.transitionProfile);t.profile=profile.value;});};
   $('#transition-list').onclick=e=>{const b=e.target.closest('[data-delete-transition]');if(b)modify(()=>state.transitions=state.transitions.filter(t=>t.id!==b.dataset.deleteTransition));};
   $('#suggest-board-joints').onclick=()=>{const f=face(),z=currentZone(),c=choice(f,z),m=materialById.get(c.materialId),orientation=c.orientation==='vertical'?'horizontal':'vertical',dimension=layoutDimension(f,z,orientation),positions=L.splitPositions(dimension,m.maxPiece?.lengthIn);modify(()=>{state.transitions=state.transitions.filter(t=>!(t.face===f.key&&t.zoneId===z.id&&t.orientation===orientation));for(const p of positions)state.transitions.push({id:newId('joint-longueur'),face:f.key,zoneId:z.id,orientation,position:p.position,profile:orientation==='vertical'?'panel-l-7/8':'panel-z',color:c.color});});toast('Joints proposés selon la longueur maximale. Le profil et le détail de pose restent à valider.');};
@@ -876,7 +911,7 @@
   $('#export-svg').onclick=()=>{exportFile(`MIR_${state.face}_etude.svg`,'image/svg+xml',facadeSVG(face(),{export:true,annotated:state.displayMode==='atelier'}));toast('Vue SVG exportée · échelles et contours à calibrer.');};
   $('#export-pdf').onclick=async()=>{if(!window.MIRPDF?.exportPlan)return toast('L’export PDF n’a pas chargé. Rechargez la page.');const button=$('#export-pdf');button.disabled=true;button.textContent='Préparation du PDF…';try{await window.MIRPDF.exportPlan({title:'MIR · étude des quatre élévations',subtitle:'Choix fabricants, calepinage et estimations à calibrer — sans valeur de construction',filename:'MIR_Etude_annotee_4_elevations.pdf',faces:exportFaces()});toast('PDF des quatre élévations préparé avec les choix et annotations actuels.');}catch(e){toast('Le PDF n’a pas pu être créé : '+String(e.message||e));}finally{button.disabled=false;button.textContent='PDF des 4 élévations ↗';}};
   $('#export-project').onclick=()=>{const result={...clone(state),project:data.title||'MIR · étude',exportedAt:new Date().toISOString(),sourceSha256:data.sourceSha256,...sceneGeometry(),disclaimer:'Choix d’étude et estimations à calibrer. Finitions documentées, images de nuanciers officiels si disponibles ; teintes moyennes calculées pour le rendu 3D, sans valeur colorimétrique officielle. Quantités à valider avant commande.',facades:data.faces.map(f=>({face:f.key,zones:allZones(f).map(z=>({...z,selection:choice(f,z)})),openings:allOpenings(f)})),soffit:materialById.get(state.soffitId),fascia:materialById.get(state.fasciaId)};exportFile('MIR_choix_du_projet.json','application/json',JSON.stringify(result,null,2));toast('Choix, joints, contours et géométrie exportés.');};
-  const sharedFields=['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','panelLayouts','transitions','panelStockRotation','soffitId','soffitColorId','soffitColor','fasciaId','fasciaColorId','fasciaColor','roofId','roofColorId','roofColor','roofStyle','porch','structures','concreteSteps','siteStyle','returnFinishes','volumeOverride','recessOverride'];
+  const sharedFields=['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','panelLayouts','transitions','manualTransitionModes','panelStockRotation','soffitId','soffitColorId','soffitColor','fasciaId','fasciaColorId','fasciaColor','roofId','roofColorId','roofColor','roofStyle','porch','structures','concreteSteps','siteStyle','returnFinishes','volumeOverride','recessOverride'];
   function syncStudy(){
     if((window.MIRProjectStore?.activeId()||null)!==(activeProject?.id||null)){location.reload();return;}
     let incoming;try{incoming=JSON.parse(localStorage.getItem(STORAGE));}catch(_){return;}if(incoming?.version!==2)return;

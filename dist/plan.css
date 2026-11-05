@@ -89,3 +89,6 @@ html.mir-stage-locked,body.mir-stage-locked{overflow:hidden!important}
 .mir-batten-spacing label{font-weight:700;display:block;margin-bottom:7px}
 .mir-batten-spacing select{width:100%;min-height:44px}
 #vertical-rule-summary{padding:12px 14px;color:#294532;background:#eff4ea;border-left:3px solid #6d9466;line-height:1.55}
+
+#edit-auto-transitions,#restore-auto-transitions{min-height:44px;border-radius:6px;border:1px solid #5e775a;background:#eef3e9;color:#253a29;padding:9px 12px;font-weight:650}
+#auto-transition-note{padding:8px 2px;line-height:1.55}
