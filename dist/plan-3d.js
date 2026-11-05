@@ -547,9 +547,15 @@
       const width=Math.max(.8,Math.min(4,positive(steps.width,1.8)));
       const tread=Math.max(.22,Math.min(.55,positive(steps.tread,.30)));
       const riser=Math.max(.09,Math.min(.22,positive(steps.riser,.16)));
-      const landing=-b-(porch.enabled?porch.projection:.35)-.07;
+      // Le PDF donne largeur et giron par pixels. La position devant le mur
+      // et la contremarche restent schématiques tant qu'aucune coupe ne les établit.
+      const lateral=Number.isFinite(Number(steps.centerX))?
+        Math.max(-a+width/2,Math.min(a-width/2,Number(steps.centerX))):0;
+      const projection=Number.isFinite(Number(steps.frontOffset))&&Number(steps.frontOffset)>0?
+        Math.min(10,Number(steps.frontOffset)):(porch.enabled?porch.projection:.35)+.07;
+      const landing=-b-projection;
       for(let i=0;i<count;i++)addBox('concrete-stair-'+(i+1),
-        [-width/2,landing-(count-i)*tread,0],[width,tread,(i+1)*riser],
+        [lateral-width/2,landing-(count-i)*tread,0],[width,tread,(i+1)*riser],
         'concrete','#b7b8b3',{role:'concrete-step',sourceStatus:'proposition-a-valider-sur-le-PDF',notCertifiedTakeoff:true});
     }
     return { faces, a, b, e, top, ground, foundationDrop, dimensions:d, roofStyle, recess, footprint, porch, structures,
