@@ -753,3 +753,17 @@ body.mir-admin-v4 .model-preview {
   }
   body.mir-admin-v4 .document-status { max-width: 96px; }
 }
+
+/* Sur PC/tablette, rétablir explicitement une rangée d'actions :
+   la base historique imposait flex-direction:column aux cartes. */
+@media(min-width:601px){
+  body.mir-admin-v4 .production-item-actions {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  body.mir-admin-v4 .production-item-actions .profile-group-choice {
+    flex: 0 0 172px;
+    min-width: 140px;
+  }
+}
