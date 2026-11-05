@@ -22,7 +22,7 @@ async function ready(){for(let i=0;i<70;i++){
     const initialView=await page.evaluate(()=>window.MIR_STUDY.snapshot().view);
     assert.ok(['2d','3d'].includes(initialView),'Vue initiale inconnue : '+initialView);
     if(initialView!=='3d')await page.locator('#view-3d').click();
-    await page.waitForFunction(()=>window.MIR_RENDER_DIAGNOSTICS?.rendered===true,null,{timeout:45000});
+    await page.waitForFunction(()=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas"))?.rendered===true,null,{timeout:45000});
    } catch(error) {
     const startup=await page.evaluate(()=>{
      const canvas=document.querySelector('#three-canvas'),rect=canvas?.getBoundingClientRect();
@@ -32,25 +32,25 @@ async function ready(){for(let i=0;i<70;i++){
       note:document.querySelector('#stage-note')?.textContent,
       subtitle:document.querySelector('#stage-subtitle')?.textContent,
       canvas:rect&&{width:rect.width,height:rect.height,hidden:canvas.hidden},
-      diagnostics:window.MIR_RENDER_DIAGNOSTICS
+      diagnostics:window.MIR3D?.diagnostics(document.querySelector("#three-canvas"))
      };
     }).catch(()=>null);
     console.error('Studio terrain au démarrage '+width+'px : '+JSON.stringify({startup,errors}));
     throw error;
    }
-   const first=await page.evaluate(()=>window.MIR_RENDER_DIAGNOSTICS);
+   const first=await page.evaluate(()=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas")));
    assert.equal(first.siteStyle,'commercial','Terrain commercial absent : '+width);
    assert.ok(first.sitePlan?.parkingBayCount>=3);
    assert.ok(first.returnMasonry?.heightMeters>0.5,'Brick return drawing not enabled');
    assert.ok(first.elevation>=5);
    await page.locator('#mir-zoom-in').click();
-   await page.waitForFunction(()=>window.MIR_RENDER_DIAGNOSTICS?.zoom>=1.24);
-   const beforeWheel=await page.evaluate(()=>window.MIR_RENDER_DIAGNOSTICS.zoom);
+   await page.waitForFunction(()=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas"))?.zoom>=1.24);
+   const beforeWheel=await page.evaluate(()=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas")).zoom);
    const center=await page.locator('#three-canvas').boundingBox();
    await page.mouse.move(center.x+center.width*.5,center.y+center.height*.5);
    await page.mouse.wheel(0,-240);
-   await page.waitForFunction(n=>window.MIR_RENDER_DIAGNOSTICS?.zoom>n,beforeWheel);
-   const beforePinch=await page.evaluate(()=>window.MIR_RENDER_DIAGNOSTICS.zoom);
+   await page.waitForFunction(n=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas"))?.zoom>n,beforeWheel);
+   const beforePinch=await page.evaluate(()=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas")).zoom);
    await page.evaluate(()=>{
     const c=document.querySelector('#three-canvas'),r=c.getBoundingClientRect(),x=r.left+r.width*.55,y=r.top+r.height*.55;
     function send(type,id,dx){c.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:id,pointerType:'touch',button:0,clientX:x+dx,clientY:y}));}
@@ -58,13 +58,13 @@ async function ready(){for(let i=0;i<70;i++){
     send('pointermove',101,-68);send('pointermove',102,68);
     send('pointerup',101,-68);send('pointerup',102,68);
    });
-   await page.waitForFunction(n=>window.MIR_RENDER_DIAGNOSTICS?.zoom>n,beforePinch);
+   await page.waitForFunction(n=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas"))?.zoom>n,beforePinch);
    await page.locator('#mir-site-toggle').click();
-   await page.waitForFunction(()=>window.MIR_RENDER_DIAGNOSTICS?.siteStyle==='none');
+   await page.waitForFunction(()=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas"))?.siteStyle==='none');
    await page.locator('#mir-site-toggle').click();
-   await page.waitForFunction(()=>window.MIR_RENDER_DIAGNOSTICS?.siteStyle==='commercial');
+   await page.waitForFunction(()=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas"))?.siteStyle==='commercial');
    await page.locator('#orbit-under').click();
-   await page.waitForFunction(()=>window.MIR_RENDER_DIAGNOSTICS?.elevation===5);
+   await page.waitForFunction(()=>window.MIR3D?.diagnostics(document.querySelector("#three-canvas"))?.elevation===5);
    await page.locator('#mir-fullscreen').click();
    await page.waitForFunction(()=>document.fullscreenElement===document.querySelector('#stage')||document.querySelector('#stage').classList.contains('mir-stage-fullscreen'));
    fs.mkdirSync(path.resolve(__dirname,'../artifacts'),{recursive:true});
