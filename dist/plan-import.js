@@ -236,6 +236,15 @@
         if (token !== sequence) return;
         const words = sheet.words.map(word => ({ ...word, box: word.box.map(value => value * scale) }));
         const rows = detector.lines(words);
+        let hints = window.MIRStructuralNotes.detect(rows, '');
+        if (!hints.length && !ocrFailed && sheet.views.some(view => view.face) && words.every(word => word.source === 'pdf-text')) {
+          try {
+            const scanned = await recognize(page, base, imported);
+            hints = window.MIRStructuralNotes.detect(detector.lines(scanned.map(word => ({ ...word, box: word.box.map(value => value * scale) }))), '');
+          } catch (e) { ocrFailed = true; if (token === sequence) console.warn('MIR PDF : lecture des repères dessinés indisponible', e); }
+          if (token !== sequence) return;
+        }
+        hints = hints.map(hint => ({ ...hint, page: sheet.number, needsReview: true }));
         const items = (await page.getTextContent()).items;
         if (token !== sequence) return;
         const verticalWords = pdfWords(items, viewport, true);
@@ -246,7 +255,8 @@
           if (crop[2] < 40 || crop[3] < 40) continue;
           const localRows = rows.filter(word => inCrop(word, crop));
           const scale = measureLines(canvas, words, verticalWords, crop);
-          const result = prepareView(canvas, crop, localRows, sheet.number, view, scale);
+          const structuralHints = window.MIRStructuralNotes.withinCrop(hints, crop);
+          const result = prepareView(canvas, crop, structuralHints, sheet.number, view, scale);
           evidence.push(...detector.volumeEvidence(localRows, view, sheet.number, MIRPDFAnalysis.parseDimension, scale.feetPerPixel ? scale.accepted : []));
           if (view.face && !imported.assignments[view.face]) imported.assignments[view.face] = result;
           else imported.references.push(result);
@@ -278,7 +288,7 @@
     }
     return A.resolveScale(candidates.filter(candidate => candidate.anchors.every(([a, b]) => a >= x && a <= x + width && b >= y && b <= y + height)));
   }
-  function prepareView(canvas, crop, rows, number, view, scale) {
+  function prepareView(canvas, crop, structuralHints, number, view, scale) {
     const [x, y, w, h] = crop, A = window.MIRPDFAnalysis;
     const image = document.createElement('canvas'); image.width = w; image.height = h;
     const context = image.getContext('2d', { willReadFrequently: true });
@@ -288,7 +298,6 @@
       sourceImage = image.toDataURL('image/jpeg', .91);
       regions = view.face ? A.proposeColoredZones(context.getImageData(0, 0, w, h)) : [];
     } finally { image.width = image.height = 1; }
-    const structuralHints = window.MIRStructuralNotes.detect(rows, '').map(hint => ({ ...hint, page: number, needsReview: true }));
     const cal = calibration(scale, crop);
     if (!view.face) return { page: number, crop, sourceImage, calibration: cal, kind: view.kind, name: view.name, structuralHints };
     const zones = regions.map((r, i) => ({ id: `pdf-zone-${i + 1}`, name: `Zone ${i + 1}`, polygon: r.polygon, kind: 'siding', parent: null, provenance: r.provenance, needsReview: true, detected: true }));
