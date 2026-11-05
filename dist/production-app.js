@@ -197,7 +197,8 @@ function profileVolumeSVG(model,illustrative){
   const depth=-x*Math.sin(yaw)+z*Math.cos(yaw);
   return [x*Math.cos(yaw)+z*Math.sin(yaw),y*Math.cos(tilt)-depth*Math.sin(tilt)];
  };
- const length=model.lengthMM||Math.max(...model.pointsMM.flat().map(Math.abs),100)*2;
+ const sampleLengthMM=10*25.4;
+ const length=Math.min(model.lengthMM||sampleLengthMM,sampleLengthMM);
  const strips=profileVolumeStrips(model).map(strip=>{
   const facing=(strip.b[0]-strip.a[0])*eye[1]-(strip.b[1]-strip.a[1])*eye[0];
   return {...strip,facing};
@@ -221,7 +222,7 @@ function profileVolumeSVG(model,illustrative){
   const corners=[project(a,0),project(b,0),project(b,length),project(a,length)];
   return `<polygon points="${corners.map(pixel).join(' ')}" fill="${fill}" data-profile-finish="${painted?'painted':'metal'}"/>`;
  }).join('');
- return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="img" aria-label="Volume schématique de ${esc(model.name)}" font-family="Arial,sans-serif">${pattern}<text x="400" y="35" text-anchor="middle" font-size="12" fill="#7c8e6a">VOLUME SCHÉMATIQUE · GLISSEZ POUR TOURNER</text>${polygons}<text x="400" y="482" text-anchor="middle" font-size="13" fill="#7c8e6b">${esc(illustrative?'Proportions du modèle · aucune cote de fabrication renseignée':'Longueur : '+M.formatMeasurement(model.lengthMM,model.unit))}</text></svg>`;
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="img" aria-label="Volume schématique de ${esc(model.name)}" font-family="Arial,sans-serif">${pattern}<text x="400" y="35" text-anchor="middle" font-size="12" fill="#7c8e6a">VOLUME SCHÉMATIQUE · GLISSEZ POUR TOURNER</text>${polygons}<text x="400" y="482" text-anchor="middle" font-size="13" fill="#7c8e6b">${esc('Échantillon 3D · '+M.formatMeasurement(length,model.unit))}</text></svg>`;
 }
 function volumeSVG(model,{illustrative=false}={}){
  if(model.kind==='profile'&&model.pointsMM?.length>=2)return profileVolumeSVG(model,illustrative);
