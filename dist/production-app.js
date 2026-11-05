@@ -129,7 +129,7 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});if(interactive&&!drag)drawTransform=tr;
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
- output+=M.profileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand?{}:model,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative,togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative});
+ output+=M.profileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand?{}:model,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative});
  }
  const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}
  }
@@ -166,8 +166,12 @@ function renderTools(){
  const drawing=tool==='draw';
  const recentHem=draft.template==='custom'?(draft.bends||[]).findLastIndex(bend=>bend.mode==='hem'):-1;
  const hemNotice=recentHem<0?'':`<p class="draw-help hem-notice">Double pli · ${esc(draft.segments[recentHem].label)} → ${esc(draft.segments[recentHem+1].label)} <button type="button" data-focus-bend="${recentHem}">Modifier le pli</button></p>`;
- el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 45° / 90°</label><label>Hauteur du plan<select id="trace-height"><option value="10"${traceHeight===10?' selected':''}>10 po</option><option value="14"${traceHeight===14?' selected':''}>14 po</option></select></label><p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
- `<button type="button" class="draw-primary" data-new-drawing>Nouveau dessin</button><button type="button" data-draw-tool="edit" aria-pressed="${tool==='edit'}">${tool==='edit'?'Terminer la retouche':'Déplacer les points'}</button><button type="button" data-draw-tool="draw" aria-pressed="false">Continuer le tracé</button><button type="button" data-focus-dimensions>Cotes et angles ↓</button>${hemNotice}`;
+ const compact=matchMedia('(any-pointer: coarse)').matches;
+ const settingsStart=compact?'<details class="trace-more"><summary>Réglages du tracé</summary><div>':'';
+ const moreStart=compact?'<details class="trace-more"><summary>Autres actions</summary><div>':'';
+ const settingsEnd=compact?'</div></details>':'';
+ el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button>${settingsStart}<label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 45° / 90°</label><label>Hauteur du plan<select id="trace-height"><option value="10"${traceHeight===10?' selected':''}>10 po</option><option value="14"${traceHeight===14?' selected':''}>14 po</option></select></label>${settingsEnd}<p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
+ `${tool==='select'?'<button type="button" class="draw-primary" data-end-hem>Ajouter un double pli</button>':''}<button type="button" class="draw-primary" data-new-drawing>Nouveau dessin</button>${tool==='select'?moreStart:''}<button type="button" data-draw-tool="edit" aria-pressed="${tool==='edit'}">${tool==='edit'?'Terminer la retouche':'Déplacer les points'}</button><button type="button" data-draw-tool="draw" aria-pressed="false">Continuer le tracé</button><button type="button" data-focus-dimensions>Cotes et angles ↓</button>${hemNotice}${tool==='select'?settingsEnd:''}`;
 }
 function profileMeasureInput(index,label){
  const selector=draft.template==='custom'? `[data-segment-length="${index}"]`:
@@ -802,6 +806,33 @@ async function importMirTemplates(input){
  }catch(error){toast('Import impossible : '+error.message);}
  finally{input.value='';}
 }
+function endHemDialog(){
+ const model=build();
+ if(!model.valid)return toast('Complète les cotes avant d’ajouter un double pli.');
+ if(model.segments.length>=26)return toast('Le profil contient déjà 26 côtés.');
+ const first=model.segments[0],last=model.segments.at(-1);
+ const side=(x,other)=>Math.abs(x-other)<.001?'':x<other?' · à gauche':' · à droite';
+ const start=first.start[0],end=last.end[0];
+ dialog('Ajouter un double pli','Choisis une extrémité, la longueur du retour et son sens.',`<form id="end-hem-form" class="dialog-form"><label>Extrémité<select name="end"><option value="start">Début · ${esc(first.label+side(start,end))}</option><option value="end">Fin · ${esc(last.label+side(end,start))}</option></select></label><label>Longueur du retour (${draft.unit==='mm'?'mm':'po'})<input name="length" value="${draft.unit==='mm'?'13':'1/2'}" required></label><label>Sens du retour<select name="direction"><option value="left">Gauche du tracé</option><option value="right">Droite du tracé</option></select></label><p id="production-dialog-error" class="dialog-error" role="alert"></p><button class="primary-button" type="submit">Ajouter le retour</button></form>`);
+}
+function profileWithEndHem(spec,model,atStart,length,direction){
+ const segments=model.segments.map((segment,index)=>({
+  ...spec.segments?.[index],label:segment.label,name:segment.name,
+  length:spec.template==='custom'?spec.segments[index].length:spec.dimensions[segment.label]
+ }));
+ const bends=model.bends.map(({mode,angle,direction})=>({mode,angle,direction}));
+ const hem={mode:'hem',angle:180,direction};
+ const added={length};
+ if(atStart){segments.unshift(added);bends.unshift(hem);}
+ else{segments.push(added);bends.push(hem);}
+ const coloredIndex=segments.findIndex(s=>s.label===model.coloredFace.segmentId);
+ segments.forEach((segment,index)=>{segment.label=String.fromCharCode(65+index);});
+ const startAngle=model.segments[0].headingDeg+(atStart?180:0);
+ const next={...spec,template:'custom',segments,bends,startAngle:((startAngle%360)+360)%360,
+  coloredFace:{...model.coloredFace,segmentId:segments[coloredIndex]?.label||'A'}};
+ delete next.dimensions;
+ return next;
+}
 function toggleProfilePaintedFace(){
  const face=draft.coloredFace;
  if(kind!=='profile'||view!=='face'||tool!=='select'||!face?.side)return;
@@ -896,6 +927,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.id==='production-pdf')return exportPDF();
  if(button.id==='prepare-local-request')return prepareRequest();
  if(d.downloadRequest){const request=requests.find(r=>r.id===d.downloadRequest);if(request)downloadJSON({schema:'mir-production-request-1',localOnly:true,request},request.id+'.json');return;}
+ if(d.endHem!==undefined&&!client&&!editingItemId&&tool==='select')return endHemDialog();
  if(d.newModel){
   beginAuthor(d.newModel);
   if(d.newModel==='profile'&&matchMedia('(any-pointer: coarse)').matches)startProfileDrawing();
@@ -966,7 +998,17 @@ function handleChange(event){const e=event.target,d=e.dataset;
  if(e.id==='drawing-right-angle'){rightAngleSnap=e.checked;return;}
  if(d.itemQuantity){const item=order.items.find(row=>row.id===d.itemQuantity),quantity=Number(e.value);if(!item||!Number.isSafeInteger(quantity)||quantity<1){e.value=item?.spec.quantity||1;toast('Indiquez une quantité entière supérieure à zéro.');return;}const out=M.reviseInstance({snapshot:item.snapshot,history:item.history||[]},{quantity});if(!out.ok){toast(out.errors.map(err=>err.message).join(' '));return;}item.spec=copy(out.spec);item.snapshot=copy(out.snapshot);item.history=copy(out.history);persist();renderOrder();if(editingItemId===item.id){draft.quantity=quantity;$('#production-quantity').value=quantity;}return;}
 }
-function handleSubmit(event){const form=event.target;if(!form.matches('#double-fold-form,#save-production-template,#mir-j-exception-form,#mir-po-form'))return;event.preventDefault();const data=new FormData(form);
+function handleSubmit(event){const form=event.target;if(!form.matches('#end-hem-form,#double-fold-form,#save-production-template,#mir-j-exception-form,#mir-po-form'))return;event.preventDefault();const data=new FormData(form);
+ if(form.id==='end-hem-form'){
+  const model=build(),atStart=data.get('end')==='start',length=String(data.get('length')||'').trim();
+  const parsed=M.parseMeasurement(length,draft.unit),edge=atStart?model.segments[0]:model.segments.at(-1);
+  if(!model.valid||!parsed.ok||parsed.mm<=0||parsed.mm>edge.lengthMM)return messageError('Le retour doit être positif et au plus aussi long que le côté choisi.');
+  const next=profileWithEndHem(draft,model,atStart,length,data.get('direction')==='right'?'right':'left');
+  if(!build(next).valid)return messageError('Le retour ne peut pas être ajouté à ce profil.');
+  draft=next;jException=null;drawPoints=[];
+  closeDialog();renderDimensions();renderProfileOptions();updateDrawing();
+  return;
+ }
  if(form.id==='mir-po-form'){
   if(!client&&pickPO(data.get('po')))finishPOChoice(form.dataset.poIntent);
   return;

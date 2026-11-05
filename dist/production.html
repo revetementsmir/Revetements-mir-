@@ -16,9 +16,18 @@
   <script src="architectural-wall-geometry.js" defer></script>
   <script src="panel-layout-engine.js" defer></script>
   <script src="panel-layout-output.js" defer></script>
-  <script src="atelier-essai/mir-calepinage-extension.js" defer></script><script src="profile-production-transfer.js" defer></script><script src="mir-bending-presets.js?v=profils-1" defer></script><script src="model-measure-defaults.js?v=defaults-1" defer></script><script src="template-library-backup.js?v=backup-1&destinations=1" defer></script><script src="production-app.js?v=table-samsung-11" defer></script>
+  <script src="atelier-essai/mir-calepinage-extension.js" defer></script><script src="profile-production-transfer.js" defer></script><script src="mir-bending-presets.js?v=profils-1" defer></script><script src="model-measure-defaults.js?v=defaults-1" defer></script><script src="template-library-backup.js?v=backup-1&destinations=1" defer></script><script src="production-app.js?v=trace-mobile-12" defer></script>
   <script type="module" src="studio-capture.mjs"></script>
   <style>
+    .trace-more{width:100%}
+    .trace-more summary{padding:8px 2px;cursor:pointer}
+    .trace-more>div{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+    @media (any-pointer:coarse){
+      .drawing-card:has(#production-drawing[data-kind="profile"]) .drawing-tools button{min-height:44px}
+      .drawing-card:has(#production-drawing[data-kind="profile"][data-tool="draw"]) .draw-help{display:none}
+      .mobile-trace .trace-more{width:auto}
+      .mobile-trace .trace-more>div{padding:4px}
+    }
     .fraction-field{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
     .fraction-field>input{flex:1 1 70px;min-width:0;width:auto}
     .fraction-field>select{flex:0 1 auto;width:auto;min-height:44px;padding:5px;font-size:12px}
