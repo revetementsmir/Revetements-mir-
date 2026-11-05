@@ -1,0 +1,202 @@
+/* MIR SIGNATURE — première couche d'harmonisation des pages clients.
+   Le logo, les photographies de réalisation, les moteurs, et l'Admin ne changent pas.
+   Priorité : un site chaleureux, architectural, lisible et cohérent avec l'accueil. */
+body.mir-signature {
+  --mir-surface:#fafaf7;
+  --mir-white:#fff;
+  --mir-ink:#18251d;
+  --mir-muted:#5b695d;
+  --mir-accent:#348511;
+  --mir-accent-hover:#286b0d;
+  --mir-border:#dfe5dc;
+  --mir-soft:#f3f6f0;
+  --mir-radius:12px;
+  --mir-shadow:0 8px 28px rgba(16,36,22,.07);
+  --paper:var(--mir-surface);
+  --ink:var(--mir-ink);
+  --muted:var(--mir-muted);
+  --line:var(--mir-border);
+  --green:var(--mir-accent);
+  background:var(--mir-surface);
+  color:var(--mir-ink);
+  font-family:Arial,Helvetica,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-wrap:break-word;
+}
+body.mir-signature * { box-sizing:border-box; }
+body.mir-signature .shop-topline { display:none; }
+body.mir-signature :is(.site-header.mir-client-header,header.header.mir-client-header,header.portal-header.mir-client-header){
+  background:var(--mir-surface);
+  color:var(--mir-ink);
+}
+body.mir-signature :is(.page-heading,.shop-section-title,.collection-intro,.studio-intro,.bend-heading){
+  color:var(--mir-ink);
+}
+body.mir-signature :is(.page-heading h1,.shop-section-title h2,.collection-intro h2,.shop-hero h1,.bend-heading h1,.studio-intro h1){
+  color:var(--mir-ink);
+  font-family:Arial,Helvetica,sans-serif;
+  font-weight:700;
+  line-height:1.075;
+  letter-spacing:-.047em;
+  text-wrap:balance;
+}
+body.mir-signature :is(.page-heading p,.shop-section-title p,.collection-intro p,.studio-intro p,.bend-heading p){
+  color:var(--mir-muted);
+  line-height:1.65;
+}
+body.mir-signature :is(.eyebrow,.field-label,.shop-section-title .eyebrow){
+  color:#397d29;
+  font-weight:700;
+}
+body.mir-signature :is(a,button,input,select,textarea):focus-visible{
+  outline:3px solid #348511;
+  outline-offset:3px;
+}
+body.mir-signature :is(.mir-button,.button-light,.button-primary,.primary-button,.shop-hero-copy .shop-cta){
+  background:var(--mir-accent);
+  color:var(--mir-white);
+  border-color:var(--mir-accent);
+  border-radius:6px;
+  box-shadow:none;
+  transition:background-color .16s ease,box-shadow .16s ease;
+}
+body.mir-signature :is(.mir-button,.button-light,.button-primary,.primary-button):not(:disabled):hover{
+  background:var(--mir-accent-hover);
+  border-color:var(--mir-accent-hover);
+  color:var(--mir-white);
+}
+body.mir-signature :is(.quiet-button,.secondary-button){
+  background:#fff;
+  color:var(--mir-ink);
+  border:1px solid #bfcbbf;
+  border-radius:6px;
+}
+body.mir-signature :is(.quiet-button,.secondary-button):hover{background:var(--mir-soft)}
+body.mir-signature :is(input,select,textarea){
+  accent-color:var(--mir-accent);
+  color:var(--mir-ink);
+  background:#fff;
+}
+body.mir-signature :is(.page-main input,.page-main select,.page-main textarea,.bend-form input,.bend-form select,.catalogue-controls input,.catalogue-controls select){
+  border:1px solid #bacabb;
+  border-radius:7px;
+  min-height:44px;
+}
+body.mir-signature :is(.product-detail,.selection-page,.catalogue-main,.bend-view,.bend-form){
+  min-width:0;
+}
+body.mir-signature :is(.product-detail,.selection-page,.catalogue-guidance,.bend-form){
+  color:var(--mir-ink);
+}
+body.mir-signature :is(.shop-categories,.shop-collection,.materials,.selection-page,.page-main,.bend-heading){
+  scroll-margin-top:140px;
+}
+body.mir-signature .shop-hero{
+  background:#1d2a22;
+  overflow:hidden;
+}
+body.mir-signature .shop-hero>img{
+  object-fit:cover;
+  object-position:55% 48%;
+}
+body.mir-signature .shop-hero-copy{
+  position:relative;
+  z-index:2;
+}
+body.mir-signature :is(.category-card,.product-card,.brand-card,.selection-card,.shop-grid article){
+  border-radius:var(--mir-radius);
+  overflow:hidden;
+  box-shadow:var(--mir-shadow);
+  border-color:var(--mir-border);
+}
+body.mir-signature :is(.category-card,.product-card,.brand-card,.selection-card,.shop-grid article) img{
+  object-fit:cover;
+}
+body.mir-signature :is(.product-docs,.product-related,.catalogue-guidance,.shop-bottom-links){
+  border-color:var(--mir-border);
+}
+body.mir-signature :is(.product-detail,.selection-page){
+  max-width:1600px;
+  margin-left:auto;
+  margin-right:auto;
+}
+body.mir-signature .catalogue-main{
+  border-color:var(--mir-border);
+}
+body.mir-signature .brand-sidebar{
+  background:var(--mir-soft);
+  border-color:var(--mir-border);
+}
+body.mir-signature .bend-form{
+  background:#fff;
+  border:1px solid var(--mir-border);
+  border-radius:var(--mir-radius);
+  box-shadow:var(--mir-shadow);
+}
+body.mir-signature .bend-view{
+  background:var(--mir-soft);
+  border-radius:var(--mir-radius);
+  overflow:hidden;
+}
+body.mir-signature .studio-intro{
+  background:var(--mir-surface);
+}
+body.mir-signature .workspace{
+  color:var(--mir-ink);
+}
+body.mir-signature .studio-controls,
+body.mir-signature #studio-controls{
+  border-color:var(--mir-border);
+}
+body.mir-signature .site-footer,
+body.mir-signature .shop-footer{
+  background:var(--mir-surface);
+  border-color:var(--mir-border);
+}
+body.mir-signature :is(.portfolio-footnote,.footer-small){
+  color:var(--mir-muted);
+}
+@media(min-width:1700px){
+  body.mir-signature :is(.wrap,.site-header.mir-client-header){
+    width:min(1640px,calc(100% - 120px));
+  }
+  body.mir-signature :is(.product-detail,.selection-page){
+    max-width:1640px;
+  }
+}
+@media(min-width:2560px){
+  /* Conserver des contenus et formulaires lisibles en 21:9 et 32:9. */
+  body.mir-signature :is(.wrap,.site-header.mir-client-header){
+    width:min(1900px,calc(100% - 170px));
+  }
+  body.mir-signature :is(.product-detail,.selection-page){
+    max-width:1800px;
+  }
+}
+@media(max-width:900px){
+  body.mir-signature :is(.page-heading h1,.shop-hero h1,.studio-intro h1){
+    letter-spacing:-.035em;
+  }
+  body.mir-signature .shop-hero>img{object-position:62% 50%}
+}
+@media(max-width:700px){
+  body.mir-signature :is(.page-heading,.shop-section-title,.collection-intro,.bend-heading){
+    padding-top:14px;
+  }
+  body.mir-signature :is(.page-heading h1,.shop-hero h1,.studio-intro h1){
+    font-size:clamp(34px,9vw,54px);
+    line-height:1.09;
+  }
+  body.mir-signature :is(.mir-button,.button-light,.quiet-button,.secondary-button){
+    min-height:44px;
+  }
+  body.mir-signature :is(.product-detail,.selection-page,.catalogue-main,.bend-form){
+    max-width:100%;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body.mir-signature *,body.mir-signature *::before,body.mir-signature *::after{
+    transition-duration:0s!important;
+    animation-duration:0.01ms!important;
+  }
+}
