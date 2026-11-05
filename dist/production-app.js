@@ -206,7 +206,7 @@ function updateDrawing({keepForm=false}={}){
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  $('#drawing-title').textContent=authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
- const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')$('.drawing-card').classList.remove('mobile-trace');stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()?'none':'';$('#trace-readout').hidden=!canDrawProfile();
+ const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()?'none':'';$('#trace-readout').hidden=!canDrawProfile();
  stage.innerHTML=view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
  const dimensions=$('#profile-dimension-list');
  const sides=tool==='draw'?drawPoints.slice(1).map((point,index)=>({
@@ -810,13 +810,28 @@ function toggleProfilePaintedFace(){
  if(select)select.value=face.side;
  updateDrawing();
 }
+function closeMobileTrace(){
+ const card=$('.drawing-card');
+ card.classList.remove('mobile-trace');
+ if(document.fullscreenElement===card)document.exitFullscreen().catch(()=>{});
+}
+async function openMobileTrace(card){
+ card.classList.add('mobile-trace');
+ try{
+  await card.requestFullscreen?.();
+  if(document.fullscreenElement===card&&card.classList.contains('mobile-trace'))await screen.orientation?.lock?.('landscape');
+ }catch{
+  // Embedded browsers can reject fullscreen or orientation locking.
+  // The fixed drawing card remains available in either orientation.
+ }
+}
 function startProfileDrawing(){
  kind='profile';
  draft={...draft,kind:'profile',template:'custom',segments:[],bends:[],startAngle:0,name:'Profil dessiné'};
  delete draft.dimensions;
  tool='draw';view='face';drawPoints=[];
  drawTransform={scale:520/(traceHeight*25.4),ox:140,oy:395};
- $('.drawing-card').classList.toggle('mobile-trace',matchMedia('(pointer: coarse) and (max-width: 1024px)').matches);
+ if(matchMedia('(any-pointer: coarse)').matches)void openMobileTrace($('.drawing-card'));
  renderDimensions();
  updateDrawing();
 }
@@ -883,10 +898,10 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(d.downloadRequest){const request=requests.find(r=>r.id===d.downloadRequest);if(request)downloadJSON({schema:'mir-production-request-1',localOnly:true,request},request.id+'.json');return;}
  if(d.newModel){
   beginAuthor(d.newModel);
-  if(d.newModel==='profile'&&matchMedia('(pointer: coarse) and (max-width: 1024px)').matches)startProfileDrawing();
+  if(d.newModel==='profile'&&matchMedia('(any-pointer: coarse)').matches)startProfileDrawing();
   return;
  }
- if(d.exitMobileTrace!==undefined){$('.drawing-card').classList.remove('mobile-trace');return;}
+ if(d.exitMobileTrace!==undefined){closeMobileTrace();return;}
  if(d.editModel){const record=templates.find(r=>r.id===d.editModel);if(record)beginAuthor(latest(record).kind,record);return;}
  if(d.archiveModel){const record=templates.find(r=>r.id===d.archiveModel);if(record){record.archived=true;store(KEYS.templates,{version:1,records:templates});renderModels();toast('Modèle retiré du catalogue local. Les demandes existantes conservent leur version.');}return;}
  if(button.hasAttribute('data-cancel-author')){authoring=false;workflow='models';render();return;}
