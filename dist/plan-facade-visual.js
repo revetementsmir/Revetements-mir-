@@ -208,5 +208,55 @@
     return facadeBox(image, crop || (image && [0, 0, image.width, image.height]), anchors, ratio);
   }
 
-  return Object.freeze({ detect });
+  // The PDF guides identify the upper edge of the foundation and the
+  // finished grade. Where two materials have different levels, use the
+  // common visible band under the lower guide rather than coating siding.
+  function foundation({image,box,anchors}={}){
+    if(!Array.isArray(box)||box.length!==4||!box.every(Number.isFinite))return null;
+    const [x,y,width,height]=box,bottom=y+height;
+    const grade=anchors?.levels?.grade?.line?.y;
+    const tolerance=Math.max(4,height*.047);
+    if(Number.isFinite(grade)&&Math.abs(grade-bottom)<=tolerance){
+      const validTop=top=>Number.isFinite(top)&&grade-top>=Math.max(2,height*.008)&&grade-top<=height*.31;
+      const choices=(anchors.levels.foundations||[]).map(level=>{
+        if(validTop(level.line?.y))return level.line.y;
+        if(!validTop(level.y)||!image?.data)return null;
+        // Captions sometimes sit on a dotted leader that OCR cannot trace.
+        // Require the source drawing to corroborate the candidate level.
+        const pad=Math.max(3,Math.round(height*.012)),start=Math.max(0,Math.round(level.y)-pad);
+        const rows=Math.min(image.height-start,pad*2+1);
+        if(rows<3)return null;
+        const sample=scan(image,[x,start,width,rows]).lines
+          .filter(edge=>edge.right-edge.left>width*.4&&edge.quality>.52);
+        return sample.length?start+sample.sort((a,b)=>(b.right-b.left)-(a.right-a.left))[0].y:null;
+      }).filter(validTop);
+      if(choices.length){
+        const top=Math.max(...choices);
+        return {box:[x,top,width,grade-top],source:'pdf-foundation-guides',multipleLevels:choices.some(other=>top-other>3)};
+      }
+    }
+    if(!image?.data||width<80||height<60||x<0||y<0||x+width>image.width||bottom>image.height)return null;
+    const depth=Math.round(height*.25),start=bottom-depth;
+    const {lines,area,verticalInk,radius}=scan(image,[x,start,width,depth]);
+    const inset=Math.round(width*.06),sample=Math.max(4,Math.round(height*.019));
+    const candidates=[];
+    for(const edge of lines){
+      if(edge.y<sample+radius||edge.y>depth-sample*2||edge.right-edge.left<width*.67||edge.quality<.7)continue;
+      const top=area(inset,edge.y-sample-radius,width-inset,edge.y-radius);
+      const below=area(inset,edge.y+radius,width-inset,edge.y+sample+radius);
+      const base=area(inset,depth-sample,width-inset,depth-1);
+      // A siding/brick hatch must stop above a comparatively quiet concrete
+      // field bounded by the same two exterior walls.
+      const sides=Math.min(verticalInk(edge.left,edge.y+radius,depth),verticalInk(edge.right-1,edge.y+radius,depth));
+      if(top<.09||below>top*.48||base>top*.55||top-below<.065||sides<.19)continue;
+      candidates.push({y:edge.y,score:(top-below)*2+sides*.45+edge.quality*.1});
+    }
+    candidates.sort((a,b)=>b.score-a.score);
+    const best=candidates[0];
+    if(!best||candidates.some(other=>Math.abs(other.y-best.y)>sample&&other.score>best.score-.11))return null;
+    return {box:[x,start+best.y,width,depth-best.y],source:'pdf-pixel-transition',needsReview:true};
+  }
+
+  return Object.freeze({ detect, foundation });
+
 });

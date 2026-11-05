@@ -24,6 +24,7 @@ jobs:
           node --check dist/model-measure-defaults.js
           node --check dist/template-library-backup.js
           node --check dist/production-app.js
+          node --check dist/mir-bending-finishes.js
           node --check dist/studio-wall-sections.js
           node --check dist/studio-features.js
           node --check dist/plan-app.js
@@ -207,7 +208,7 @@ jobs:
           fetch "$base/plan.html?verification=$GITHUB_SHA" /tmp/mir-plan-public.html
           cmp /tmp/mir-plan-public.html _site_mir/plan.html
           grep -F 'mir-client-header.css?v=1' /tmp/mir-plan-public.html
-          for asset in plan-import.js plan-stair-vision.js mir-vertical-layout.js plan-scan-ocr.js plan-sheet-detection.js plan-spatial-dimensions.js plan-facade-visual.js plan-app.js plan-3d.js plan.css plan-annotations.js plan-annotations.css studio-wall-sections.js studio-features.js material-surface.js catalogue-fd6866b49d21.json; do
+          for asset in mir-bending-finishes.js plan-import.js plan-stair-vision.js mir-vertical-layout.js plan-scan-ocr.js plan-sheet-detection.js plan-spatial-dimensions.js plan-facade-visual.js plan-app.js plan-3d.js plan.css plan-annotations.js plan-annotations.css studio-wall-sections.js studio-features.js material-surface.js catalogue-fd6866b49d21.json; do
             fetch "$base/$asset?verification=$GITHUB_SHA" "/tmp/mir-$asset"
             cmp "/tmp/mir-$asset" "_site_mir/$asset"
           done
@@ -245,7 +246,8 @@ jobs:
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
           grep -F 'kaycan-flat-preview.js?v=mac-2' /tmp/production.html
-          grep -F 'production-app.js?v=client-5-etapes' /tmp/production.html
+          grep -F 'production-app.js?v=client-5-etapes-2' /tmp/production.html
+          grep -F 'mir-bending-finishes.js?v=1' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
           grep -F 'function medianRgb' /tmp/kaycan-flat-preview.js
           grep -F 'function isMAC' /tmp/kaycan-flat-preview.js

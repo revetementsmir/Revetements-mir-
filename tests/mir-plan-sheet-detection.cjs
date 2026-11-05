@@ -104,3 +104,23 @@ const doubled = sampleElevation(470,150,[frame,otherFrame]);
 assert.equal(Visual.detect({image:doubled,ratio}),null);
 near(Visual.detect({image:doubled,crop:[240,0,230,150],ratio}),otherFrame);
 console.log('MIR PDF : titres, cadrages multiples, cotes traçables et conflits vérifiés');
+
+// Each elevation keeps its own exposed foundation height and accepts common
+// PDF labels without mistaking a foundation plan for an exposed wall.
+const concrete=(width,height,top,grade)=>{
+ const image={width,height,data:new Uint8ClampedArray(width*height*4).fill(255)};
+ const line=(y,start,end)=>{for(let x=start;x<end;x++){const i=(y*width+x)*4;image.data.fill(25,i,i+3);}};
+ line(top,12,width-12);line(grade,12,width-12);
+ const rows=[
+  {text:'FONDATION',box:[20,top-9,85,top-1],confidence:95,source:'ocr'},
+  {text:'NIVEAU SOL FINI',box:[20,grade-9,120,grade-1],confidence:95,source:'ocr'}
+ ];
+ const crop=[0,0,width,height],anchors=Spatial.readAnchors({rows,crop,geometry:{image}},parseDimension);
+ const found=Visual.foundation({image,box:[12,12,width-24,grade-12],anchors});
+ assert.deepEqual(found?.box,[12,top,width-24,grade-top]);
+ assert.equal(found.source,'pdf-foundation-guides');
+};
+concrete(280,260,181,228);
+concrete(445,330,250,282);
+assert.equal(Visual.foundation({box:[12,12,256,216],anchors:{levels:{grade:{line:{y:228}},foundations:[]}}}),null);
+console.log('PASS Solage visible repéré sur deux élévations indépendantes');

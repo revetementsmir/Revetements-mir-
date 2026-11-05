@@ -86,6 +86,7 @@
     ['ridge', /^(?:(?:niveau (?:du )?)?faite(?: (?:de la |du )?(?:toit(?:ure)?)(?: principal[e]?)?)?|ridge (?:level|height)|roof ridge)\b\s*[:=]?\s*/],
     ['eaves', /^(?:(?:plafond|ceiling)\s+(?:(?:du |de l')?(?:niv(?:eau)?\.?|etage|level|floor)(?:\s*\d{1,2})?|(?:dernier|last|top)\s+(?:etage|floor))|(?:niveau |ligne de )?(?:la )?sabliere|haut (?:du mur|des murs)(?: exterieurs?)?|top of (?:exterior )?walls?|eaves? level)\b\s*[:=]?\s*/],
     ['grade', /^(?:niveau (?:du )?sol fini?|sol fini|terrain (?:fini|naturel)|finished (?:ground|grade)(?: level)?|ground level)\b\s*[:=]?\s*/],
+    ['foundation', /^(?:(?:dessus|haut|niveau supérieur) (?:du |des |de la )?(?:solage|fondations?)|fondations?(?=\s*(?:$|rev\b|revetement\b|maconnerie\b))|top of (?:the )?foundation)\b\s*[:=]?\s*/],
     ['floor', /^(?:(?:plancher|floor)\s+(?:(?:du )?(?:niv(?:eau)?\.?|level|etage)\s*\d{1,2}))\b\s*[:=]?\s*/]
   ];
 
@@ -100,7 +101,7 @@
   }
 
   function readLevels(rows, image, crop, parseDimension, words = []) {
-    const levels = { storeys: [] };
+    const levels = { storeys: [], foundations: [] };
     for (const row of rows) {
       if (row.confidence < 15 || !row.box || row.text.length > 120) continue;
       const label = normal(row.text);
@@ -109,14 +110,17 @@
         if (!prefix) continue;
         const annotation = label.slice(prefix.length);
         const value = dimension(annotation, parseDimension, row.source === 'ocr');
-        const box = captionBox(row.box, words);
+        const foundationWord=key==='foundation'&&words.find(word=>word.confidence>=65&&/^fondations?$/.test(normal(word.text))&&
+          word.box[0]>=row.box[0]-1&&word.box[2]<=row.box[2]+1&&word.box[1]>=row.box[1]-1&&word.box[3]<=row.box[3]+1);
+        const box = foundationWord?.box||captionBox(row.box, words);
         let line = image && guide(image, box, crop);
-        if (row.confidence < 40 && (key !== 'ridge' || !line || !/toitur|ridge/.test(label))) continue;
+        if (row.confidence < 40 && !foundationWord && (!line||key!=='foundation'&&(key!=='ridge'||!/toitur|ridge/.test(label)))) continue;
         if (key === 'grade' && image) line = gradeGuide(image, line, box, crop);
         const signedValue = value && value.valueFt * (/^[-−]\s*\d/.test(annotation) ? -1 : 1);
         const record = { text: row.text, y: line?.y ?? box[3], line, box, value: signedValue,
           explicit: value && !value.corrected, ceiling: /^(?:plafond|ceiling)/.test(label), storey: Number(prefix.trim().match(/\b\d{1,2}$/)?.[0]) };
         if (line && (key === 'floor' || record.ceiling)) levels.storeys.push(record);
+        if (key === 'foundation'){if(line||foundationWord||row.confidence>=65)levels.foundations.push(record);break;}
         if (key === 'floor') break;
         if (!levels[key]) levels[key] = record;
         else if (key === 'eaves' || key === 'ridge') {

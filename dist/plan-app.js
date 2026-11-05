@@ -31,9 +31,10 @@
       ctx.drawImage(image,0,0);
       const width = ['front','back'].includes(f.key)?data.dimensions?.width:data.dimensions?.depth;
       const ratio = width / data.dimensions?.wallHeight;
-      const frame = f.visualFrame || window.MIRFacadeVisual?.detect({
-        image:ctx.getImageData(0,0,w,h),crop:[0,0,w,h],ratio
-      })?.box;
+      const pixels=ctx.getImageData(0,0,w,h);
+      const saved=f.visualFrame;
+      const plausible=Array.isArray(saved)&&(!Number.isFinite(ratio)||Math.abs(saved[2]/saved[3]/ratio-1)<.2);
+      const frame=(plausible?saved:null)||window.MIRFacadeVisual?.detect({image:pixels,crop:[0,0,w,h],ratio})?.box||saved;
       if (!Array.isArray(frame) || frame.length!==4 || !frame.every(Number.isFinite)) return;
       const [x,y,fw,fh] = frame.map(Math.round);
       if (x<0 || y<0 || fw<20 || fh<20 || x+fw>w || y+fh>h) return;
@@ -49,7 +50,12 @@
       ctx.putImageData(ink,0,0);
       const imageBox=f.sourceImageBox;
       const [sx,sy,sw,sh] = Array.isArray(imageBox)&&imageBox.length===4&&imageBox.every(Number.isFinite)?imageBox:[0,0,w,h];
-      facadeVisuals.set(f.key,{box:[sx+x*sw/w,sy+y*sh/h,fw*sw/w,fh*sh/h],linework:canvas.toDataURL('image/png')});
+      const storedFoundation=f.foundation;
+      const sameFrame=storedFoundation?.box&&Math.abs(storedFoundation.box[0]-x)<fw*.06&&Math.abs(storedFoundation.box[2]-fw)<fw*.06;
+      const sourceFoundation=(sameFrame?storedFoundation:null)||window.MIRFacadeVisual?.foundation({image:pixels,box:[x,y,fw,fh],anchors:f.foundationGuides});
+      const toSource=([a,b,c,d])=>[sx+a*sw/w,sy+b*sh/h,c*sw/w,d*sh/h];
+      facadeVisuals.set(f.key,{box:toSource([x,y,fw,fh]),linework:canvas.toDataURL('image/png'),
+        foundation:Array.isArray(sourceFoundation?.box)&&sourceFoundation.box.length===4&&sourceFoundation.box.every(Number.isFinite)?{...sourceFoundation,box:toSource(sourceFoundation.box)}:null});
     } finally { canvas.width=canvas.height=1; }
   }
 
@@ -58,6 +64,8 @@
     const responses = await Promise.all([fetch('plan-data.json'),fetch('catalogue-fd6866b49d21.json?v=maconnerie-1'),fetch('takeoff-data.json')]);
     if(responses.some(r=>!r.ok)) throw Error('Chargement indisponible');
     [data, {materials}, takeoffSeed] = await Promise.all(responses.map(r=>r.json()));
+    const bending=window.MIRBendingFinishes?.catalogue(materials)||[];
+    for(const product of bending)if(!materials.some(m=>m.id===product.id))materials.push({...product,applications:['bending']});
     activeProject=await window.MIRProjectStore?.getActive();
     if(activeProject?.planData){for(const link of document.querySelectorAll('.studio-source-links a[href^="assets/"]'))link.hidden=true;data=activeProject.planData;takeoffSeed=activeProject.takeoffSeed;STORAGE+=':'+activeProject.id;TAKEOFF_STORAGE+=':'+activeProject.id;}
     if(!Array.isArray(data.faces)||!data.faces.length)throw Error('Aucune élévation dans le dossier');
@@ -298,7 +306,7 @@
   function facadeSVG(f,options={}){
     if(options===true)options={texture:true};
     const texture=!!options.texture,interactive=!texture&&!options.export,annotated=options.annotated??(!texture&&state.displayMode==='atelier'),monochrome=options.monochrome??neutral;
-    const visual=texture?facadeVisuals.get(f.key):null;
+    const sourceVisual=facadeVisuals.get(f.key),visual=texture?sourceVisual:null;
     const prepared=decoratedFace(f,!!visual),zones=orderedZones(prepared.zones),openings=prepared.openings,vb=visual?.box||(texture?f.textureBox:f.bbox),prefix=`v${f.key}-`;
     const poly=(points,attrs='')=>`<polygon points="${pts(points)}" ${attrs}/>`;
     const holes=openings.map(o=>poly(o.polygon,'fill="black"')).join(''),defs=[];
@@ -380,16 +388,29 @@
     // 3D undersides and in the takeoff data; only the fascia faces this view.
     const fasciaColor=monochrome?'#75816e':state.fasciaColor;
     if(!texture)roofTrimPaths(f,'fascia').forEach(p=>content+=`<polyline points="${pts(p)}" fill="none" stroke="${fasciaColor}" stroke-linejoin="round" stroke-width="10"/>`);
-    if(visual)content+=`<image data-mir-plan-linework="true" href="${visual.linework}" x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" preserveAspectRatio="none"/>`;
-    // Vitrages et portes MIR : échelle du PDF conservée, rendu illustratif.
+    if(sourceVisual?.foundation){
+      const [fx,fy,fw,fh]=sourceVisual.foundation.box;
+      content+=`<rect data-mir-foundation="${esc(sourceVisual.foundation.source)}" x="${fx}" y="${fy}" width="${fw}" height="${fh}" fill="${monochrome?'#eeeeea':'#c3c5bc'}"><title>Solage repéré sur le PDF</title></rect>`;
+    }
+    // Reference the facade raster once, even if dozens of windows use it.
+    const windowLineworkId=prefix+'window-linework';
+    if(sourceVisual&&(visual||openings.some(o=>o.type==='window'&&!o.custom))){
+      const [sx,sy,sw,sh]=sourceVisual.box;
+      defs.push(`<image id="${windowLineworkId}" href="${sourceVisual.linework}" x="${sx}" y="${sy}" width="${sw}" height="${sh}" preserveAspectRatio="none"/>`);
+    }
+    if(visual)content+=`<use data-mir-plan-linework="true" href="#${windowLineworkId}"/>`;
+    // Vitrages et portes MIR : échelle du PDF conservée.
     for(const o of openings){
       const [x0,y0,x1,y1]=bounds(o.polygon),w=x1-x0,h=y1-y0,mid=(x0+x1)/2;
       const style=openingAppearance(f,o),frame=monochrome?'#59645b':style.frameColor;
       const door=monochrome?'#b0b7b0':style.doorColor;
-      const rim=Math.max(2,Math.min(w,h)*.06),glass=monochrome?'#e1e5df':'#cee1dd';
+      const scale=feetPerPixel(f),side=Math.min(w,h);
+      const rim=o.type==='door'?Math.max(2,side*.06):Math.min(side*.026,Number.isFinite(scale)&&scale>0?2/12/scale:Infinity);
+      const planWindow=o.type==='window'&&sourceVisual&&!o.custom&&!state.openingOverrides[key(f.key,o.id)];
+      const glass=monochrome?'#e1e5df':'#cee1dd';
       const clip=prefix+'opening-'+esc(o.id);
       const attrs=interactive?' data-opening="'+esc(o.id)+'" class="opening-hit" role="button" tabindex="0" aria-label="'+(o.type==='door'?'Porte ':'Fenêtre ')+esc(o.id)+'"':'';
-      let art='<g'+attrs+' data-mir-opening-type="'+o.type+'" data-mir-opening-design="'+esc(style.design)+'" data-mir-frame-color="'+esc(frame)+'">';
+      let art='<g'+attrs+' data-mir-opening-type="'+o.type+'" data-mir-opening-design="'+esc(style.design)+'" data-mir-frame-color="'+esc(frame)+'" data-mir-frame-width="'+rim.toFixed(3)+'">';
       art+='<clipPath id="'+clip+'">'+poly(o.polygon)+'</clipPath>';
       art+=poly(o.polygon,'fill="'+(o.type==='door'?door:glass)+'" stroke="'+frame+'" stroke-width="'+(rim*1.45)+'"');
       art+='<g clip-path="url(#'+clip+')">';
@@ -415,15 +436,17 @@
           art+='<rect x="'+(ix+iw*.81)+'" y="'+(iy+ih*.56)+'" width="'+Math.max(1,rim*.19)+'" height="'+Math.max(3,ih*.105)+'" rx="1" fill="#dee3df"/>';
         }
         art+='<rect x="'+x0+'" y="'+(y1-Math.max(2,rim*.4))+'" width="'+w+'" height="'+Math.max(2,rim*.4)+'" fill="#8c9690"/>';
+      } else if(planWindow){
+        art+=`<use data-mir-window-source="pdf" href="#${windowLineworkId}"/>`;
       } else {
         art+='<path d="M'+x0+' '+(y1-h*.18)+'L'+x1+' '+(y0+h*.18)+'" stroke="#fff" stroke-opacity=".27" stroke-width="'+Math.max(1,rim)+'"/>';
-        art+='<path d="M'+mid+' '+y0+'V'+y1+'" stroke="'+frame+'" stroke-width="'+Math.max(2,rim*.65)+'"/>';
-        art+='<path d="M'+x0+' '+(y1-h*.28)+'H'+x1+'" stroke="'+frame+'" stroke-width="'+Math.max(1,rim*.47)+'"/>';
+        art+='<path d="M'+mid+' '+y0+'V'+y1+'" stroke="'+frame+'" stroke-width="'+Math.max(.55,rim*.65)+'"/>';
+        art+='<path d="M'+x0+' '+(y1-h*.28)+'H'+x1+'" stroke="'+frame+'" stroke-width="'+Math.max(.45,rim*.47)+'"/>';
         art+='<path d="M'+(x0+rim*.5)+' '+(y0+rim*.6)+'H'+(x1-rim*.5)+'" stroke="#f0f7f1" stroke-opacity=".43" stroke-width="'+Math.max(1,rim*.34)+'"/>';
       }
       art+='</g>'+poly(o.polygon,'fill="none" stroke="'+frame+'" stroke-width="'+Math.max(1,rim*.63)+'"');
       if(o.type==='window'&&style.showBatten)art+=poly(o.polygon,'fill="none" stroke="'+style.battenColor+
-        '" stroke-width="'+Math.max(2,rim*1.9)+'" stroke-linejoin="miter" data-mir-window-batten="true"');
+        '" stroke-width="'+Math.max(1,rim*1.45)+'" stroke-linejoin="miter" data-mir-window-batten="true"');
       art+='</g>';
       content+=art;
     }
@@ -440,6 +463,15 @@
     return {...textureCache.views,...(studioFeatures?.returnViews(patternDef)||{})};
   }
 
+  function frontFoundationHeight(f,dim){
+    const visual=facadeVisuals.get(f.key);
+    if(visual?.foundation)return visual.foundation.box[3]/visual.box[3]*dim.wallHeight;
+    if(data.projectKind==='imported-pdf'||!f.base.length)return 0;
+    // The reviewed study drawing marks the base of the masonry above the
+    // exposed concrete. Convert its PDF drawing distance into the same Z datum.
+    const box=f.textureBox,scale=f.physicalWidth/box[2];
+    return Math.max(0,(box[1]+box[3]-bounds(f.base)[3])*scale);
+  }
   function frontMasonryBand(f,dim){
     const visual=facadeVisuals.get(f.key);
     const zones=allZones(f).map(zone=>{
@@ -888,6 +920,11 @@
     let target,decoration;
     if(hit.sharedFinish&&hit.zoneId)target={kind:'zone',id:hit.zoneId};
     else if(hit.sourcePoint){
+      const foundation=facadeVisuals.get(f.key)?.foundation?.box;
+      if(foundation){
+        const [x,y,w,h]=foundation,[px,py]=hit.sourcePoint;
+        if(px>=x&&px<=x+w&&py>=y&&py<=y+h){toast('Solage repéré sur le PDF.');return true;}
+      }
       const prepared=decoratedFace(f,facadeVisuals.has(f.key));
       const opening=prepared.openings.slice().reverse().find(o=>pointInside(hit.sourcePoint,o.polygon));
       if(opening)target={kind:'opening',id:opening.id};
@@ -1080,7 +1117,7 @@
   if(['2d','3d'].includes(incoming.searchParams.get('view')))state.view=incoming.searchParams.get('view');
   if(materialId&&facadeMaterials.some(m=>m.id===materialId)){ensureSelected();if(state.selected.kind!=='zone')state.selected={kind:'zone',id:allZones(face())[0]?.id||null};state.selections[key(state.face,state.selected.id)]=normalChoice({materialId});incoming.searchParams.delete('material');window.history.replaceState(null,'',incoming.pathname+incoming.search+incoming.hash);}
   window.MIR_STUDY={snapshot:()=>clone({face:state.face,view:state.view,displayMode:state.displayMode,alignWindow:state.alignWindow!==false,selected:state.selected,zoneCount:allZones(face()).length,openingCount:allOpenings(face()).length,soffitId:state.soffitId,soffitColor:state.soffitColor,fasciaId:state.fasciaId,fasciaColor:state.fasciaColor,choices:state.selections,bands:state.bands,openingTrims:state.openingTrims,panelLayouts:state.panelLayouts,transitions:state.transitions,...sceneGeometry(),paintOrder:orderedZones(decoratedFace(face()).zones).map(z=>z.id)}),exportFaces,pickThree,embedded,swatches:{loaded:swatchImages.size,missing:missingSwatchCount},source:data.analysis};
-  studioFeatures=window.MIRStudioFeatures?.setup({$,state:()=>state,data:()=>data,materials,roofControls:!adminContext,modify,save,render,renderDrawing,officialColor,colorsFor,openMaterial,toast,normalChoice,choice,allZones,face,currentZone,feetPerPixel,readTakeoff,takeoffSeed,sceneGeometryBase,patternDef,frontMasonryBand});
+  studioFeatures=window.MIRStudioFeatures?.setup({$,state:()=>state,data:()=>data,materials,roofControls:!adminContext,modify,save,render,renderDrawing,officialColor,colorsFor,openMaterial,toast,normalChoice,choice,allZones,face,currentZone,feetPerPixel,readTakeoff,takeoffSeed,sceneGeometryBase,patternDef,frontMasonryBand,frontFoundationHeight});
   $('#duplicate-zone').onclick=()=>{const z=currentZone();if(!z)return toast('Choisissez une zone à reproduire.');const b=bounds(z.polygon),dx=(b[2]-b[0])*.05,dy=(b[3]-b[1])*.05,id=newId('copie');modify(()=>{const copyZone={...clone(z),id,name:z.name+' · copie',parent:z.parent||z.id,custom:true,polygon:z.polygon.map(([x,y])=>[x+dx,y+dy])};state.customZones[state.face].push(copyZone);state.selections[key(state.face,id)]=normalChoice(choice(face(),z));if(state.panelLayouts[key(state.face,z.id)])state.panelLayouts[key(state.face,id)]=clone(state.panelLayouts[key(state.face,z.id)]);state.selected={kind:'zone',id};state.view='2d';});$('#geometry-controls').open=true;toast('Zone reproduite avec sa matière. Ajustez sa position et sa taille.');};
   if(data.projectKind==='imported-pdf'&&!studioFeatures?.canRender())state.view='2d';
   save();render();

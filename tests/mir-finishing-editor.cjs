@@ -28,5 +28,5 @@ for(const selector of ['mir-edit-accent','mir-remove-accent','edit-auto-transiti
 assert.ok(app.includes('manualizeSuggestedTransitions')&&app.includes('restoreAutomaticTransitions'));
 assert.ok(app.includes('data-mir-opening-design')&&app.includes('openingStyles:state.openingStyles'));
 assert.ok(features.includes('structure-finish-metal')&&features.includes('structure-custom-color'));
-assert.ok(features.includes('mir-corner-enabled')&&features.includes('cornerFinishes:c.cornerFinishes'));
+assert.ok(features.includes('mir-corner-enabled')&&features.includes('setCornerFinish'));
 console.log('MIR finition 3D et contrôles — coins, teintes, portes, marches, transitions et accents : 20 contrôles réussis');

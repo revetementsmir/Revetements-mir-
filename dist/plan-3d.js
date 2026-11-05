@@ -576,7 +576,7 @@
     const cornerConfig=options.cornerFinishes&&typeof options.cornerFinishes==='object'?options.cornerFinishes:null;
     if(cornerConfig?.enabled===true){
       const width=Math.max(.035,Math.min(.24,positive(cornerConfig.widthMeters,.08)));
-      const shade=cleanColor(cornerConfig.color,'#8d9690'),positions=[
+      const positions=[
         [-a,-b],[-a,b],[a,-b],[a,b]
       ];
       if(recess.enabled&&recess.width>0&&recess.depth>0){
@@ -587,10 +587,12 @@
       positions.forEach(([x,y],index)=>{
         const code=Math.round(x*1000)+'-'+Math.round(y*1000);
         if(used.has(code))return;used.add(code);
+        const group=index===1||index===3?'back':'front';
+        const finish={...cornerConfig,...cornerConfig.groups?.[group],...cornerConfig.individual?.[index]};
         addBox('corner-trim-'+index,[x-width/2,y-width/2,0],[width,width,h],
-          'corner',shade,{role:'aluminum-corner-proposal',cornerIndex:index,
-            sourceStatus:'geometric-outer-edge-proposed-not-verified',
-            finishMetal:cornerConfig.metal||'aluminum',notCertifiedTakeoff:true});
+          'corner',cleanColor(finish.color,'#8d9690'),{role:'aluminum-corner-proposal',cornerIndex:index,
+            sourceStatus:'geometric-outer-edge-proposed-not-verified',finishMaterialId:finish.materialId||null,
+            finishColorId:finish.colorId||null,finishMetal:finish.metal||'aluminum',notCertifiedTakeoff:true});
       });
     }
 
@@ -677,6 +679,7 @@
     const point=[(clientX-(box.left||0))*state.size[0]/box.width,(clientY-(box.top||0))*state.size[1]/box.height];
     const surface=surfaceAt(state,point);if(!surface)return null;
     const hit={surfaceId:surface.surfaceId,type:surface.type,role:surface.role||null,view:surface.view||null,screenPoint:point,renderId:state.pickingRenderId};
+    if(Number.isInteger(surface.cornerIndex))hit.cornerIndex=surface.cornerIndex;
     if(surface.structureId){hit.structureId=surface.structureId;hit.material=surface.material;}
     if(surface.returnId)hit.returnId=surface.returnId;
     if(surface.role==='porch-divider')return {...hit,type:'wall',view:'front',zoneId:'pilier',sharedFinish:true};
@@ -854,6 +857,7 @@
     state.hitSurfaces=visible.map(face=>{
       const view=face.textureView||(['front','right','back','left'].includes(face.id)?face.id:null),item=images[view];
       const surface={surfaceId:face.id,type:face.type,role:face.role||null,view,screenPolygon:face.poly.map(project)};
+      if(Number.isInteger(face.cornerIndex))surface.cornerIndex=face.cornerIndex;
       if(face.structureId){surface.structureId=face.structureId;surface.material=face.material;surface.sourceStatus=face.sourceStatus;}
       if(face.returnId){surface.returnId=face.returnId;surface.independentFinish=!!mesh.recess.returnFinishAssigned?.[face.returnId];}
       if(face.type==='wall'&&item){

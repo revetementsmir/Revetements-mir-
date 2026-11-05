@@ -93,6 +93,45 @@ async function ready(){for(let i=0;i<80;i++){
    });
    assert.equal(corners.length,48);
    assert.ok(corners.every(f=>f.fillColor==='#a7bf78'));
+   const frames=await page.locator('#elevation [data-mir-opening-type="window"]').evaluateAll(windows=>windows.map(window=>{
+    const box=window.getBBox();
+    return Number(window.dataset.mirFrameWidth)/Math.min(box.width,box.height);
+   }));
+   assert.ok(frames.length>0&&frames.every(ratio=>ratio<=.027),'Les cadres de fenêtre restent minces');
+   await page.locator('#mir-corner-scope').selectOption('front');
+   assert.ok(await page.locator('#mir-corner-product option[value="gentek-coil-3037"]').count());
+   await page.locator('#mir-corner-product').selectOption('kaycan-coil-0721-30m');
+   const kaycanColor=await page.locator('[data-corner-color]').last().getAttribute('data-corner-color');
+   await page.locator('[data-corner-color]').last().click();
+   await page.locator('#mir-corner-scope').selectOption('back');
+   await page.locator('#mir-corner-metal').selectOption('steel');
+   assert.ok(await page.locator('#mir-corner-product option[value="mac-acier-moulures"]').count());
+   await page.locator('#mir-corner-product').selectOption('vicwest-bellara-flat-sheet');
+   const vicwestColor=await page.locator('[data-corner-color]').first().getAttribute('data-corner-color');
+   await page.locator('[data-corner-color]').first().click();
+   await page.locator('#view-3d').click();
+   await page.waitForFunction(()=>window.MIR3D.diagnostics(document.querySelector('#three-canvas'))?.hitSurfaces.some(s=>Number.isInteger(s.cornerIndex)));
+   const picked=await page.evaluate(()=>{
+    const canvas=document.querySelector('#three-canvas'),box=canvas.getBoundingClientRect();
+    const corners=window.MIR3D.diagnostics(canvas).hitSurfaces.filter(s=>s.cornerIndex!==undefined).reverse();
+    for(const c of corners){
+     const [x,y]=c.screenPolygon.reduce(([x,y],[a,b])=>[x+a/c.screenPolygon.length,y+b/c.screenPolygon.length],[0,0]);
+     const hit=window.MIR3D.pick(canvas,box.left+x,box.top+y);
+     if(hit?.cornerIndex===c.cornerIndex&&window.MIR_STUDY.pickThree(box.left+x,box.top+y))return hit.cornerIndex;
+    }
+    return null;
+   });
+   assert.ok(Number.isInteger(picked),'Un coin du volume peut être sélectionné directement');
+   assert.equal(await page.locator('#mir-corner-scope').inputValue(),'single');
+   await page.locator('#mir-corner-color').fill('#a96d42');
+   await page.locator('#mir-corner-color').dispatchEvent('change');
+   const split=await page.evaluate(()=>{
+    const v=window.MIR_STUDY.snapshot();
+    return window.MIR3D.mesh({...v,dimensions:window.MIR3D.defaults}).faces.filter(f=>f.role==='aluminum-corner-proposal');
+   });
+   assert.ok(split.every(f=>f.cornerIndex===picked?f.fillColor==='#a96d42':
+     [1,3].includes(f.cornerIndex)?f.finishColorId===vicwestColor:f.finishColorId===kaycanColor));
+
    await page.locator('[data-part="structure"]').click();
    await page.locator('#structure-finish-metal').selectOption('steel');
    await page.locator('#structure-wrap').selectOption('vicwest-bellara-flat-sheet');
@@ -118,5 +157,33 @@ async function ready(){for(let i=0;i<80;i++){
    console.log('PASS MIR finitions '+screen.kind+': transitions, accents, portes, battens, structures, coins, marches');
    await page.close();
   }
+  const imported=await browser.newPage({viewport:{width:1280,height:900}});
+  await imported.goto(base+'/plan.html');
+  await imported.waitForFunction(()=>window.MIR_STUDY?.snapshot);
+  await imported.evaluate(async()=>{
+   const plan=await fetch('plan-data.json').then(r=>r.json()),takeoffSeed=await fetch('takeoff-data.json').then(r=>r.json());
+   const front=plan.faces.find(f=>f.key==='front'),canvas=document.createElement('canvas');
+   canvas.width=2000;canvas.height=1320;
+   const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,2000,1320);
+   ctx.strokeStyle='#333';ctx.strokeRect(416,362,1428,849);
+   ctx.strokeRect(499,890,209,160);ctx.beginPath();ctx.moveTo(560,890);ctx.lineTo(560,1050);ctx.stroke();
+   ctx.beginPath();ctx.moveTo(416,1160);ctx.lineTo(1844,1160);ctx.stroke();
+   const sourceImage=canvas.toDataURL('image/png'),id='pdf-studio-foundation-test';
+   Object.assign(front,{sourceImage,sourceImageBox:[0,0,2000,1320],visualFrame:[416,362,1428,849],importedStatus:'assigned',
+    foundationGuides:{levels:{grade:{line:{y:1211}},foundations:[{line:{y:1160}}]}}});
+   Object.assign(plan,{id,projectKind:'imported-pdf',dimensionStatus:'detected',detectedVolume:{roofStyle:'duplex'}});
+   await MIRProjectStore.saveActive({id,planData:plan,takeoffSeed});
+  });
+  await imported.reload();
+  await imported.waitForFunction(()=>window.MIR_STUDY?.snapshot);
+  await imported.locator('#view-2d').click();
+  assert.equal(await imported.locator('#elevation [data-mir-foundation]').getAttribute('height'),'51');
+  const source=imported.locator('#elevation [data-opening="fenetre_gauche_basse"] [data-mir-window-source]');
+  assert.equal(await source.count(),1);
+  assert.equal(await source.getAttribute('href'),'#vfront-window-linework');
+  await imported.locator('#view-3d').click();
+  await imported.waitForFunction(()=>window.MIR3D.diagnostics(document.querySelector('#three-canvas'))?.textureBounds?.front);
+  await imported.close();
+  console.log('PASS PDF : bande de solage conservée en 2D/3D et traits de vitrage repris du plan');
  }finally{if(browser)await browser.close();server.kill();}
 })().catch(e=>{console.error(e.stack||e);process.exitCode=1;});
