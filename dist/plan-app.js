@@ -310,6 +310,34 @@
         lines+=`<path d="${d}" fill="none" stroke="${validHex(t.color)?t.color:'#56654d'}" stroke-width="4" stroke-dasharray="${annotated?'9 3':''}" pointer-events="none"/>`;
         if(interactive)for(const segment of E.clipLineToZone(prepared,z.id,t.orientation,t.position).segments)lines+=`<path d="M${segment[0].join(' ')}L${segment[1].join(' ')}" fill="none" stroke="transparent" stroke-width="17" data-transition="${esc(t.id)}" class="joint-hit ${t.orientation}" role="button" tabindex="0" aria-label="Déplacer la transition de ${esc(z.name)}"/>`;
       }
+      // Transitions horizontales : longueur du profil (10 ou 12 pi) et
+      // préférence pour le dessus d'un châssis, même dans la texture 3D.
+      const rule=V?.verticalRule(materialById.get(c.materialId),c);
+      if(rule){
+        const proposed=V.breaks({polygon:z.polygon,feetPerPixel:feetPerPixel(f),
+          material:materialById.get(c.materialId),choice:c,openings,
+          manualTransitions:state.transitions.filter(t=>t.face===f.key&&t.zoneId===z.id)});
+        for(const t of proposed.items){
+          lines+='<path data-mir-auto-transition="'+esc(z.id)+'" data-mir-max-length="'+rule.maxRunIn+
+            '" data-mir-transition-origin="'+esc(t.source)+'" d="M'+x0+' '+t.y+'H'+x1+
+            '" stroke="#425c4b" stroke-width="3" stroke-dasharray="'+(annotated?'7 3':'none')+
+            '" fill="none" pointer-events="none"/>';
+        }
+        const battens=V.battens({polygon:z.polygon,feetPerPixel:feetPerPixel(f),
+          material:materialById.get(c.materialId),choice:c,openings});
+        if(battens.complete&&battens.lines.length){
+          const perIn=1/(feetPerPixel(f)*12),under=Math.max(1,1.7*perIn),visible=Math.max(.8,1.35*perIn);
+          for(const line of battens.lines){
+            const d='M'+line.x+' '+y0+'V'+y1;
+            lines+='<path data-mir-batten-spacing="'+battens.spacingIn+
+              '" data-mir-batten-anchor="'+esc(battens.alignment)+'" d="'+d+
+              '" fill="none" stroke="#1d2b22" stroke-width="'+under+
+              '" stroke-opacity=".48" pointer-events="none"/>'+
+              '<path d="'+d+'" fill="none" stroke="'+esc(c.color||'#d3d6cd')+
+              '" stroke-width="'+visible+'" pointer-events="none"/>';
+          }
+        }
+      }
       if(lines)content+=a+`<g mask="url(#${prefix}mask-${esc(z.id)})">${lines}</g>`+b;
     }
     if(f.extraRoof)content+=poly(f.extraRoof,`fill="url(#${prefix}roof)" stroke="#46503f" stroke-width="2"`);
@@ -831,6 +859,14 @@
       if(z.viewOnly==='2d'||z.id.startsWith('retour_'))continue;
       const c=choice(f,z),m=materialById.get(c.materialId),area=measurement.zones.find(x=>x.id===z.id);
       summary.push(`${z.name} : ${m.brand} · ${m.name} · ${c.colorName||'Fini à choisir'} · ${format(area?.netFt2)} pi².`);
+      const rule=V?.verticalRule(m,c);
+      if(rule){
+        const auto=V.breaks({polygon:z.polygon,feetPerPixel:feetPerPixel(f),
+          material:m,choice:c,openings:allOpenings(f),
+          manualTransitions:state.transitions.filter(t=>t.face===f.key&&t.zoneId===z.id)});
+        summary.push('  Profils verticaux : '+(rule.maxRunIn/12)+' pi maximum entre raccords; '+auto.items.length+' transitions de hauteur proposées ('+auto.items.filter(t=>t.source==='top-of-window').length+' au-dessus des châssis).');
+        if(rule.battenSpacingOptionsIn?.length)summary.push('  Battens : '+(c.battenSpacingIn||12)+' po c/c, centrés sur le pignon ou alignés avec les fenêtres, vérification terrain requise.');
+      }
       if(c.pattern==='panel'){const result=panelResult(f,z,prepared);for(const cell of result.cells||[])if(cell.areaFt2>0)summary.push(`  ${cell.id} : ${L.inches(cell.widthIn)} × ${L.inches(cell.heightIn)}${cell.fits===false?' · FORMAT DÉPASSÉ':cell.rotationRequired?' · rotation de débit':''}${cell.special?' · coupe spéciale à valider':''}`);}
       const band=state.bands[key(f.key,z.id)];if(band?.enabled)summary.push(`  Bandeau de haut de mur : ${L.inches(band.heightIn)} de hauteur apparente.`);
     }
