@@ -53,7 +53,8 @@ async function online(){
     }));
     return {viewBox:[vb.x,vb.y,vb.width,vb.height],parts};
    });
-   assert.ok(view.viewBox[2]>1500,'Expanded 2D view must fit the separate walls');
+   if(screen.width>650)assert.ok(view.viewBox[2]>1500,'Desktop should show three detached walls beside the house');
+   else assert.ok(await svg.getAttribute('data-mir-walls-view-box'),'Mobile should offer the focused three-wall view');
    assert.equal(view.parts.length,3);
    assert.ok(view.parts.every(part=>Math.abs(part.top-6.2611)<.005),JSON.stringify(view.parts));
    const baseZ=view.parts.map(part=>part.bottom);
