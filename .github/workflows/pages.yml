@@ -48,6 +48,9 @@ jobs:
           node --check dist/plan-3d.js
           node --check tests/mir-balcony.cjs
           node tests/mir-balcony.cjs
+          node --check dist/plan-structure-notes.js
+          node --check tests/mir-structure-hints.cjs
+          node tests/mir-structure-hints.cjs
           node tests/mir-pages-regressions.cjs
           node tests/mir-atelier-v4.cjs
           node tests/mir-miniatures.cjs

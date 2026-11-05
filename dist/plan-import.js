@@ -19,6 +19,7 @@
   }
   async function dependencies() {
     if (!window.MIRPDFAnalysis) await script('plan-import-core.js', 'MIRPDFAnalysis');
+    if (!window.MIRStructuralNotes) await script('plan-structure-notes.js', 'MIRStructuralNotes');
     if (!window.MIRProjectStore) await script('project-store.js', 'MIRProjectStore');
     if (!pdfLibrary) { pdfLibrary = await import(asset('vendor/pdfjs/pdf.min.mjs')); pdfLibrary.GlobalWorkerOptions.workerSrc = asset('vendor/pdfjs/pdf.worker.min.mjs'); }
     return pdfLibrary;
@@ -38,6 +39,7 @@
       <section id="mir-pdf-workspace" class="mir-pdf-workspace" hidden><nav class="mir-pdf-pages" aria-label="Pages du PDF"><h3>Pages</h3><div id="mir-pdf-pages"></div></nav><div class="mir-pdf-drawing"><div class="mir-pdf-view-tools"><h3 id="mir-pdf-page-title">Page 1</h3><div><button type="button" id="mir-pdf-crop">Ajuster le cadrage</button><button type="button" id="mir-pdf-full">Page entière</button></div></div><p id="mir-pdf-canvas-help">Choisissez la page, cadrez la vue, puis indiquez ce qu’elle représente.</p><div class="mir-pdf-canvas-shell"><canvas id="mir-pdf-canvas" aria-label="Page du PDF sélectionnée"></canvas><svg id="mir-pdf-overlay" role="img" aria-label="Cadrage et cotes détectées"></svg></div></div>
       <aside class="mir-pdf-options"><div class="mir-pdf-scale"><span id="mir-pdf-scale-badge">Lecture des cotes</span><h3>L’échelle du dessin</h3><p id="mir-pdf-scale-message"></p><p id="mir-pdf-scale-value"></p><details id="mir-pdf-evidence"><summary>Voir les cotes utilisées</summary><div id="mir-pdf-cotes"></div><label for="mir-pdf-cote-select">Choisir une cote détectée</label><select id="mir-pdf-cote-select"></select><p class="mir-pdf-fine">Une échelle peut différer entre deux vues de la même page. Cadrez la vue concernée et choisissez sa cote si nécessaire.</p></details><details class="mir-pdf-manual"><summary>Corriger une cote illisible</summary><p>Si la lecture automatique échoue, entrez la cote écrite sur le plan et pointez ses deux extrémités.</p><label for="mir-pdf-manual-value">Dimension indiquée</label><input id="mir-pdf-manual-value" placeholder="Ex. 22′-0″ ou 6705 mm"><button type="button" id="mir-pdf-manual-points">Pointer les deux extrémités</button></details></div>
       <div class="mir-pdf-zone-summary"><h3>Surfaces repérées</h3><p id="mir-pdf-zone-count"></p><label class="mir-pdf-check"><input id="mir-pdf-keep-zones" type="checkbox" checked> Reprendre les zones proposées</label><p class="mir-pdf-fine">Vous pourrez modifier, tracer ou dupliquer les zones dans le studio. Les surfaces masquées par des notes ne sont pas inventées.</p></div>
+      <section class="mir-pdf-zone-summary" aria-label="Repères structurels du PDF"><h3>Balcons, poutres et poteaux</h3><p id="mir-pdf-structure-count" aria-live="polite">Aucun repère analysé.</p><p class="mir-pdf-fine">Repérage des mentions du plan, à vérifier : aucun dimensionnement porteur n’est déduit automatiquement.</p></section>
       <label for="mir-pdf-face">Cette vue représente</label><select id="mir-pdf-face"><optgroup label="Élévations extérieures"><option value="front">La façade avant</option><option value="right">Le côté droit</option><option value="back">La façade arrière</option><option value="left">Le côté gauche</option></optgroup><optgroup label="Feuilles de référence">${Object.entries(REFERENCE_NAMES).map(([key, label]) => `<option value="${key}">${label}</option>`).join('')}</optgroup></select><div id="mir-pdf-level-field" hidden><label for="mir-pdf-level">Nom de l’étage (facultatif)</label><input id="mir-pdf-level" maxlength="60" placeholder="Ex. Rez-de-chaussée, 2e étage"></div><button type="button" id="mir-pdf-assign" class="mir-pdf-primary" disabled>Ajouter cette vue au dossier</button><p id="mir-pdf-assignment-note" class="mir-pdf-fine"></p></aside></section>
       <footer class="mir-pdf-bottom"><div><h3>Votre dossier</h3><div id="mir-pdf-assigned" class="mir-pdf-assigned">Aucune vue sélectionnée.</div><p class="mir-pdf-fine">Une élévation suffit pour commencer en 2D. Pour préparer le volume 3D, ajoutez le solage, les plans de chaque étage et les élévations extérieures, puis confirmez les dimensions dans le studio.</p></div><button type="button" id="mir-pdf-final" class="mir-pdf-primary" disabled>Ouvrir mon projet →</button></footer></div>`;
     document.body.append(dialog); root = dialog;
@@ -147,7 +149,9 @@
       const verticalCandidates = A.matchDimensionLines(rotatedImage, verticalWords, { axis: 'y' }).map(c => A.unrotateCandidate(c, page.canvas.width, page.canvas.height, 'cw'));
       candidates.push(...verticalCandidates); rotated.width = rotated.height = 1; found = A.resolveScale(candidates);
     } else page.detectedWith = 'pdf-text';
-    page.words = words; page.candidates = candidates; page.scale = found; return page;
+    page.words = words; page.candidates = candidates; page.scale = found;
+    page.structuralHints=window.MIRStructuralNotes.detect(words,[page.text,page.ocrText].filter(Boolean).join('\n')).map(h=>({...h,page:page.number,needsReview:true}));
+    return page;
   }
   function suggestedCrop(page) {
     const all = MIRPDFAnalysis.proposeColoredZones(page.image); if (!all.length) return [0, 0, page.canvas.width, page.canvas.height];
@@ -178,6 +182,8 @@
   function renderScale() {
     const s = current.page?.scale; if (!s) return; $('#mir-pdf-scale-badge').textContent = statusNames[s.status] || 'À vérifier'; $('#mir-pdf-scale-badge').dataset.state = s.feetPerPixel ? 'found' : 'warning'; $('#mir-pdf-scale-message').textContent = s.message;
     $('#mir-pdf-scale-value').textContent = s.feetPerPixel ? `1 pixel = ${fmt(s.feetPerPixel, 6)} pi · ${s.accepted?.length || 1} cote${s.accepted?.length > 1 ? 's' : ''}${s.scaleX && s.scaleY ? ' · largeur et hauteur comparées' : ' · contrôle vertical à compléter'}` : 'Les superficies restent inconnues tant que l’échelle n’est pas déterminée.';
+    const hints=current.page.structuralHints||[];
+    $('#mir-pdf-structure-count').textContent=hints.length?hints.slice(0,12).map(h=>(h.type==='column'?'Poteau':h.type==='beam'?'Poutre':'Balcon')+' : « '+h.label+' »').join(' · ')+' — positions à valider.':'Aucune mention explicite repérée. Si le dessin n’est pas légendé, ses supports restent à tracer manuellement.';
     const cs = current.page.candidates;
     $('#mir-pdf-cotes').innerHTML = (s.accepted || []).map(c => `<p><strong>${esc(c.normalized || c.text)}</strong> · ${fmt(c.spanPx, 0)} pixels entre les repères${c.corrected ? ' · caractères OCR rapprochés' : ''}</p>`).join('') || '<p>Aucune cote retenue automatiquement.</p>';
     $('#mir-pdf-cote-select').innerHTML = `<option value="-1">Choix automatique</option>${cs.map((c, i) => `<option value="${i}">${esc(c.normalized || c.text)} · ${c.axis === 'y' ? 'verticale' : 'horizontale'} · ${fmt(c.spanPx, 0)} px</option>`).join('')}`; $('#mir-pdf-cote-select').disabled = !cs.length;
@@ -189,6 +195,9 @@
     if (!current.page) return; const c = current.page.canvas, crop = current.crop || [0, 0, c.width, c.height], [x, y, w, h] = crop; let html = `<path d="M0 0H${c.width}V${c.height}H0Z M${x} ${y}V${y + h}H${x + w}V${y}Z" fill="#14241b" fill-opacity=".26" fill-rule="evenodd"/><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="#557746" stroke-width="4" stroke-dasharray="14 7"/>`;
     for (const r of current.regions || []) html += `<polygon points="${r.polygon.map(p => `${p[0] + x},${p[1] + y}`).join(' ')}" fill="#8bc062" fill-opacity=".08" stroke="#416a34" stroke-width="2"/>`;
     for (const cote of current.page.scale?.accepted || []) { const [a, b] = cote.anchors; html += `<path d="M${a.join(' ')}L${b.join(' ')}" stroke="#117555" stroke-width="5"/><circle cx="${a[0]}" cy="${a[1]}" r="8" fill="#fff" stroke="#117555" stroke-width="4"/><circle cx="${b[0]}" cy="${b[1]}" r="8" fill="#fff" stroke="#117555" stroke-width="4"/><text x="${(a[0] + b[0]) / 2}" y="${(a[1] + b[1]) / 2 - 15}" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="#155d44" paint-order="stroke" stroke="#fff" stroke-width="5">${esc(fmt(cote.referenceFt) + ' pi')}</text>`; }
+    for(const h of current.page.structuralHints||[]){if(!Array.isArray(h.box))continue;const [x0,y0,x1,y1]=h.box;
+      html+=`<rect x="${x0-4}" y="${y0-4}" width="${x1-x0+8}" height="${y1-y0+8}" rx="3" fill="none" stroke="#a06b25" stroke-width="3" stroke-dasharray="6 3"><title>${esc(h.label)} · repère à vérifier</title></rect>`;
+    }
     for (const p of calibrationClicks) html += `<circle cx="${p[0]}" cy="${p[1]}" r="9" fill="#b2783b"/>`;
     $('#mir-pdf-overlay').innerHTML = html;
   }
@@ -207,8 +216,23 @@
     if (!s?.feetPerPixel || !s.referenceFt || !s.anchors) return { referenceFt: null, anchors: [], verified: false, status: s?.status || 'not_found', provenance: 'Aucune échelle retenue; aucune surface calculable.', evidence: [] };
     return { referenceFt: s.referenceFt, anchors: s.anchors.map(p => [p[0] - x, p[1] - y]), verified: false, status: s.status, provenance: s.source === 'manual-correction' ? 'Cote et repères corrigés par la personne.' : 'Cote écrite reliée automatiquement aux intersections de sa ligne et de ses rappels; échelle proposée à vérifier.', evidence: (s.accepted || []).map(c => ({ text: c.text, normalized: c.normalized, referenceFt: c.referenceFt, anchors: c.anchors.map(p => [p[0] - x, p[1] - y]), spanPx: c.spanPx, axis: c.axis, source: c.source, ocrConfidence: c.confidence ?? null, correctedCharacters: !!c.corrected })), spread: s.spread ?? null, axesCompared: !!(s.scaleX && s.scaleY) };
   }
-  function assign() {
-    if (!current.page || current.busy) return; const key = $('#mir-pdf-face').value, page = current.page, crop = current.crop.map(Math.round), [x, y, w, h] = crop;
+  async function assign() {
+    if (!current.page || current.busy) return;
+    const key = $('#mir-pdf-face').value,page=current.page,token=sequence;
+    // Scan only an explicitly assigned sheet with selectable PDF text where no
+    // structural label was found. Raster-only pages already pass through OCR.
+    if(!page.structuralHints?.length&&!page.supportOcrAttempted&&page.detectedWith==='pdf-text'){
+      page.supportOcrAttempted=true;busy(true);progress('Lecture locale des repères de poutre et de poteau…',32);
+      try{const ocr=await worker(token),result=await ocr.recognize(page.canvas,{}, {blocks:true});
+        if(token!==sequence)return;
+        const notes=window.MIRStructuralNotes.detect(ocrWords(result),result.data.text||'');
+        page.structuralHints=notes.map(h=>({...h,page:page.number,needsReview:true}));renderScale();draw();
+      }catch(_){/* OCR optional: keep the plan usable and don't fabricate supports. */}
+      finally{if(token===sequence)busy(false);}
+    }
+    if(token!==sequence)return;
+    const crop=current.crop.map(Math.round),[x,y,w,h]=crop;
+    const structuralHints=window.MIRStructuralNotes.withinCrop(page.structuralHints,crop);
     if (w < 40 || h < 40) return error('Le cadrage est trop petit. Entourez la façade complète.');
     const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(page.canvas, x, y, w, h, 0, 0, w, h); const sourceImage = canvas.toDataURL('image/png'); canvas.width = canvas.height = 1;
     const cal = calibration(page, crop);
@@ -216,13 +240,13 @@
     if (isReference) {
       const level = key === 'floor' ? $('#mir-pdf-level').value.trim() : '';
       const name = level ? `${REFERENCE_NAMES[key]} · ${level}` : REFERENCE_NAMES[key];
-      const ref = { page: page.number, crop, sourceImage, calibration: cal, kind: key, name };
+      const ref = { page: page.number, crop, sourceImage, calibration: cal, kind: key, name, structuralHints };
       const index = current.references.findIndex(r => r.kind === key && r.page === page.number && r.crop.every((v, i) => v === crop[i]));
       if (index < 0) current.references.push(ref); else current.references[index] = ref;
     } else {
       const regions = $('#mir-pdf-keep-zones').checked ? current.regions : [], zones = regions.map((r, i) => ({ id: `pdf-zone-${i + 1}`, name: `Zone ${i + 1}`, polygon: r.polygon, kind: 'siding', parent: null, provenance: r.provenance, needsReview: true, detected: true }));
       const openings = regions.flatMap((r, i) => r.holes.filter(p => { const b = MIRPDFAnalysis.bbox(p); return b[2] - b[0] > 15 && b[3] - b[1] > 15; }).map((p, j) => ({ id: `pdf-opening-${i + 1}-${j + 1}`, type: 'window', polygon: p, bbox: MIRPDFAnalysis.bbox(p), occluded: false, dimension: 'Dimension issue de l’échelle; ouverture à vérifier.', provenance: 'Vide repéré dans une zone colorée; nature fenêtre/porte à confirmer.', needsReview: true })));
-      current.assignments[key] = { ...placeholder(key), page: page.number, bbox: [0, 0, w, h], textureBox: [0, 0, w, h], zones, openings, sourceImage, sourceImageBox: [0, 0, w, h], sourceWidth: w, sourceHeight: h, sourcePageSize: [page.canvas.width, page.canvas.height], sourceCrop: crop, calibration: cal, importedStatus: 'assigned', calibrationStatus: cal.status, detected: { regions: zones.length, openings: openings.length, method: 'Surfaces colorées et vides repérés localement; aucune reconstruction des parties cachées.' }, candidates: [], printedDimensions: cal.evidence.map(c => c.normalized || c.text), textureReference: 'Cadrage du PDF importé; volume 3D à compléter avec les autres vues.' };
+      current.assignments[key] = { ...placeholder(key), page: page.number, bbox: [0, 0, w, h], textureBox: [0, 0, w, h], zones, openings, sourceImage, sourceImageBox: [0, 0, w, h], sourceWidth: w, sourceHeight: h, sourcePageSize: [page.canvas.width, page.canvas.height], sourceCrop: crop, calibration: cal, importedStatus: 'assigned', calibrationStatus: cal.status, structuralHints, detected: { regions: zones.length, openings: openings.length, method: 'Surfaces colorées et vides repérés localement; aucune reconstruction des parties cachées.' }, candidates: [], printedDimensions: cal.evidence.map(c => c.normalized || c.text), textureReference: 'Cadrage du PDF importé; volume 3D à compléter avec les autres vues.' };
     }
     const next = Object.keys(FACE_NAMES).find(k => !current.assignments[k]);
     if (next && !isReference) $('#mir-pdf-face').value = next;
@@ -245,11 +269,12 @@
       const id = `pdf-${crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)}`, faces = Object.keys(FACE_NAMES).map(k => current.assignments[k] || placeholder(k));
       const calibrations = Object.fromEntries(faces.map(f => [f.key, f.calibration || { referenceFt: null, anchors: [], verified: false, status: 'not_found', provenance: 'Façade non importée.', evidence: [] }]));
       const source = { filename: current.file.name, bytes: current.file.size, pageCount: current.pdf.numPages, sha256: current.sha256, fingerprintStatus: current.sha256 ? 'sha256' : current.file.size > 50 * MIB ? 'skipped-for-large-file' : 'unavailable-in-this-context', privacy: 'browser-local', importedAt: new Date().toISOString() };
-      const planData = { version: 2, projectKind: 'imported-pdf', id, title: current.file.name.replace(/\.pdf$/i, ''), source: `PDF importé · ${current.pdf.numPages} pages`, sourceSha256: current.sha256, analysis: 'Lecture locale des cotes, liaison aux lignes de dimension, vérification de cohérence et propositions de surfaces colorées. Les zones restent modifiables et les volumes cachés non déduits restent inconnus.', faces, dimensions: { width: null, depth: null, wallHeight: null, roofRise: null }, dimensionStatus: 'incomplete', dimensionNote: 'Échelles calculées à partir des cotes détectées. Géométrie 3D à compléter; aucune dimension de la démonstration MIR n’est réutilisée.', recess: { enabled: false, confirmed: false }, footprint: { type: 'unknown' }, referencePages: current.references, sourceMetadata: source };
+      const structuralHints=[...faces.flatMap(f=>(f.structuralHints||[]).map(h=>({...h,assignedView:f.key}))),...current.references.flatMap(r=>(r.structuralHints||[]).map(h=>({...h,assignedView:r.kind})))];
+      const planData = { structuralHints, version: 2, projectKind: 'imported-pdf', id, title: current.file.name.replace(/\.pdf$/i, ''), source: `PDF importé · ${current.pdf.numPages} pages`, sourceSha256: current.sha256, analysis: 'Lecture locale des cotes, liaison aux lignes de dimension, vérification de cohérence et propositions de surfaces colorées. Les zones restent modifiables et les volumes cachés non déduits restent inconnus.', faces, dimensions: { width: null, depth: null, wallHeight: null, roofRise: null }, dimensionStatus: 'incomplete', dimensionNote: 'Échelles calculées à partir des cotes détectées. Géométrie 3D à compléter; aucune dimension de la démonstration MIR n’est réutilisée.', recess: { enabled: false, confirmed: false }, footprint: { type: 'unknown' }, referencePages: current.references, sourceMetadata: source };
       const takeoffSeed = { version: 1, calibrations, geometry: { buildingWidthFt: null, buildingDepthFt: null, recessStartFt: null, recessWidthFt: null, recessDepthFt: null, recessHeightFt: null, returnCladHeightFt: null, confirmed: false }, footprintEvidence: null, note: 'Échelles automatiques proposées à partir des cotes. Contrôler les contours, les masques et les mesures avant une commande.' };
       const entry = { id, planData, takeoffSeed, source, sourceFile: current.file, createdAt: new Date().toISOString() };
       await MIRProjectStore.saveActive(entry); progress('Votre projet est prêt.', 100); busy(false); const done = callback; close(); if (done) await done({ ...entry, projectData: planData, takeoffData: takeoffSeed }); else location.reload();
     } catch (e) { error(readableError(e)); progress('Votre projet précédent est conservé. Réessayez l’enregistrement.', null); busy(false); }
   }
-  window.MIRPlanImport = Object.freeze({ open, close, version: 1 });
+  window.MIRPlanImport = Object.freeze({ open, close, version: '1.1-structure-hints' });
 })();
