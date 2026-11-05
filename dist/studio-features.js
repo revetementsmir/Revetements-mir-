@@ -245,7 +245,7 @@
   $('#volume-settings').onclick=openVolume;$('#complete-volume').onclick=openVolume;$('#stay-2d').onclick=()=>{state().view='2d';save();render();};
   $('#project-menu').onclick=openProjects;$('#show-source').onclick=openSource;
   $('#import-pdf').onclick=()=>root.MIRPlanImport?.open?root.MIRPlanImport.open({onImport:()=>location.reload()}):toast('L’import PDF n’a pas chargé. Rechargez la page.');
-  $('#orbit-left').onclick=()=>{state().rotation=(state().rotation-30+360)%360;save();renderDrawing();};$('#orbit-right').onclick=()=>{state().rotation=(state().rotation+30)%360;save();renderDrawing();};$('#orbit-under').onclick=()=>{state().cameraElevation=-12;save();renderDrawing();toast('Vue par dessous : les soffites sont sous les débords de toit.');};$('#orbit-reset').onclick=()=>{state().rotation=28;state().cameraElevation=22;save();renderDrawing();};
+  $('#orbit-left').onclick=()=>{state().rotation=(state().rotation-30+360)%360;save();renderDrawing();};$('#orbit-right').onclick=()=>{state().rotation=(state().rotation+30)%360;save();renderDrawing();};$('#orbit-under').onclick=()=>{state().cameraElevation=5;save();renderDrawing();toast('Caméra maintenue au niveau du sol.');};$('#orbit-reset').onclick=()=>{state().rotation=28;state().cameraElevation=22;state().cameraZoom=1;save();renderDrawing();};
   $('#export-render').onclick=exportRender;
   function handleHit(hit){if(hit.returnId){selectPart('return',hit.returnId);return true;}if(['roof','fascia','soffit'].includes(hit.type)){selectPart(hit.type);return true;}if(['beam','column'].includes(hit.type)){selectPart('structure',hit.structureId);return true;}return false;}
   return {renderUI,threeOptions,returnViews,handleHit,selectPart,canRender,returnChoice,dimensions,normalizeRoof,ensureState};
