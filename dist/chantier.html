@@ -20,10 +20,6 @@
 </head>
 <body data-portal-mode="login" data-portal-connection="loading">
   <a class="portal-skip" href="#portal-main">Aller au contenu</a>
-  <div class="demo-banner" hidden>
-    <div><span class="demo-dot" aria-hidden="true"></span><strong>Aperçu du portail — données de démonstration</strong><span class="demo-subline">Simulation locale · connexion Google et courriel à intégrer</span></div>
-    <button type="button" id="demo-about">À propos de cet aperçu <span aria-hidden="true">↗</span></button>
-  </div>
   <header class="portal-header">
     <a class="portal-brand" href="index.html" aria-label="Les Revêtements MIR, accueil"><img src="assets/MIR-logo-HD.png" alt="Les Revêtements MIR" width="2172" height="724"></a>
     <span class="portal-title">ESPACE<br><b>ÉQUIPE MIR</b></span>
@@ -32,13 +28,6 @@
   <div class="account-bar" id="account-bar" hidden>
     <p><span class="account-dot" aria-hidden="true"></span><strong id="account-name"></strong><span id="account-role"></span></p>
     <div><button type="button" id="portal-refresh">Actualiser</button><button type="button" id="portal-signout">Déconnexion</button></div>
-  </div>
-  <div class="demo-controls" hidden>
-    <div class="demo-mode" role="group" aria-label="Présentation de démonstration">
-      <button type="button" data-demo-mode="employee" aria-pressed="true">Aperçu employé</button>
-      <button type="button" data-demo-mode="admin" aria-pressed="false">Aperçu gestion</button>
-    </div>
-    <label class="demo-profile-label" for="demo-profile">Profil d’exemple<select id="demo-profile" aria-label="Profil employé de démonstration"><option>Chargement…</option></select></label>
   </div>
   <div class="portal-shell">
     <aside class="portal-sidebar">
@@ -52,7 +41,7 @@
       <noscript><div class="portal-empty"><h1>Activez JavaScript pour ouvrir le portail.</h1><p>Les Revêtements MIR — plans, matériel et suivi des demandes.</p></div></noscript>
     </main>
   </div>
-  <footer class="portal-footer"><span id="portal-footer-label">Les Revêtements MIR · Le portail chantier</span><div><a href="chantier.html" id="demo-exit" hidden>Retour à la connexion</a><button type="button" id="demo-reset" hidden>Réinitialiser les données de démonstration</button></div></footer>
+  <footer class="portal-footer"><span id="portal-footer-label">Les Revêtements MIR · Espace équipe</span></footer>
   <dialog id="portal-dialog" aria-labelledby="portal-dialog-title"><button type="button" class="dialog-close" data-close-dialog aria-label="Fermer la fenêtre">×</button><div id="portal-dialog-content"></div></dialog>
   <div id="portal-toast" role="status" aria-live="polite"></div>
 </body>
