@@ -51,9 +51,14 @@ test('Snapshot J avec exception transférable en production', () => {
   assert.equal(P.buildProfile(prepared.spec).valid,true);
 });
 test('Tracé SHIFT orthogonal', () => assert.deepEqual(X.applyDrawingConstraint([0,0],[9,3],{keyboardShift:true}),[9,0]));
-test('Le lien production vers coins/solin est présent', () => {
+test('Solin brique et coin avec J sont directement accessibles sur la vraie page de production', () => {
   const html=fs.readFileSync(path.join(__dirname,'../dist/production.html'),'utf8');
-  assert.ok(html.includes('atelier-essai/pliages-integration-candidate.html?production=1'));
+  const app=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
+  assert.ok(html.includes('production.html?profile=solin_brique'));
+  assert.ok(html.includes('production.html?profile=coin_arch_j'));
+  assert.ok(app.includes("params.get('profile')"));
+  assert.ok(!html.includes('href="atelier-essai/index.html"'));
+  assert.ok(!html.includes('href="atelier-essai/pliages-integration-candidate.html'));
 });
 test('La page des coins charge les composants de production', () => {
   const html=fs.readFileSync(path.join(__dirname,'../dist/atelier-essai/pliages-integration-candidate.html'),'utf8');
