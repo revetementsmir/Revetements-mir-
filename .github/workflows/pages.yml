@@ -48,6 +48,8 @@ jobs:
           }
           fetch "$base/metres.html" /tmp/metres.html
           grep -F 'href="production.html?view=orders"' /tmp/metres.html
+          fetch "$base/pliage.html" /tmp/pliage.html
+          grep -F 'href="production.html?mode=client&amp;kind=profile&amp;profile=coin_arch_j"' /tmp/pliage.html
           fetch "$base/production.html" /tmp/production.html
           grep -F 'kaycan-flat-preview.js?v=1' /tmp/production.html
           grep -F 'production-app.js?v=site-principal-20261105' /tmp/production.html
