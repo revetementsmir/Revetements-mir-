@@ -194,6 +194,7 @@
    if(new URLSearchParams(win.location.search).get('mode')==='client')return;
    if(controller)return controller;
    controller=createController(win,win.document.querySelector('.config-card'),win.document.querySelector('.drawing-card'));
+   if(controller){const sync=()=>{const snapshot=win.MIRProductionWorkspace?.getLivePreviewState?.();if(snapshot)controller.updatePreview(snapshot);};win.addEventListener('mir-production-ready',sync);sync();}
    return controller;
  }
  function updatePreview(payload){controller?.updatePreview(payload);}
