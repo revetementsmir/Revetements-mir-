@@ -298,12 +298,13 @@
   function setChrome(showPortal) {
     document.body.dataset.portalConnection=isDemo()?'demo':showPortal?'connected':'login';
     document.body.dataset.portalMode=showPortal?mode:'login';
-    document.querySelector('.demo-banner').hidden=!isDemo();
-    document.querySelector('.demo-controls').hidden=!isDemo();
+    // La connexion principale n'affiche jamais de contrôles de démonstration.
+    document.querySelector('.demo-banner')?.setAttribute('hidden','');
+    document.querySelector('.demo-controls')?.setAttribute('hidden','');
     document.querySelector('.portal-sidebar').hidden=!showPortal;
     document.querySelector('.portal-shell').classList.toggle('auth-shell',!showPortal);
     $('#account-bar').hidden=isDemo()||!showPortal;
-    $('#demo-reset').hidden=!isDemo();$('#demo-exit').hidden=!isDemo();
+    $('#demo-reset')?.setAttribute('hidden','');$('#demo-exit')?.setAttribute('hidden','');
     $('#portal-footer-label').textContent=isDemo()?'Les Revêtements MIR · Aperçu avec données fictives':'Les Revêtements MIR · Le portail chantier';
     document.querySelectorAll('[data-management-link]').forEach(link=>link.hidden=!showPortal||mode!=='admin');
     const shopLink=document.querySelector('.portal-header nav a');if(shopLink)shopLink.hidden=!isDemo()&&showPortal&&mode==='employee';
