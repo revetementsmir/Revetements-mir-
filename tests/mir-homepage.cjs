@@ -11,7 +11,7 @@ const html=read('index.html');
 const css=read('mir-home-premium.css');
 const header=html.match(/<header class="site-header mir-home-header">[\s\S]*?<\/header>/)?.[0];
 const hero=html.match(/<section class="mir-home-showcase"[\s\S]*?<\/section>/)?.[0];
-const services=html.match(/<section class="mir-home-services"[\s\S]*?<\/section>/)?.[0];
+const services=html.match(/<section class="mir-home-services\b[^"]*"[\s\S]*?<\/section>/)?.[0];
 
 test('Accueil principal et logo original Illustrator inchangé dans la marque',()=>{
   assert.ok(header&&hero&&services);
