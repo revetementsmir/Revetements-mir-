@@ -32,9 +32,9 @@ async function verifyMouldingWizard(browser,base,artifacts){
  assert.equal(await stage(),'3');
  const length=desktop.locator('[data-measure="length"]');
  assert.equal(await length.inputValue(),'120');
- await length.fill('0');
- assert.equal(await next.isDisabled(),true);
- await length.fill('96');
+ assert.equal(await length.evaluate(input=>input.readOnly),true,'La longueur de vente est fixée par MIR');
+ assert.equal(await desktop.evaluate(()=>window.MIRBendingLengths.check({profileId:'j',lengthIn:96}).ok),false,'96 po ne peut plus être commandé');
+ assert.equal(await next.isEnabled(),true);
  await next.click();
  assert.equal(await stage(),'4');
  assert.equal(await desktop.locator('.piece-finish').isVisible(),false);
@@ -67,7 +67,7 @@ async function verifyMouldingWizard(browser,base,artifacts){
  await next.click();
  const stored=await desktop.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_client_dossier_v1')).order.items);
  assert.equal(stored.length,1);
- assert.equal(Number(stored[0].spec.length),96);
+ assert.equal(Number(stored[0].spec.length),120);
  assert.equal(stored[0].spec.coloredFace.side,'right');
  assert.equal(stored[0].spec.material.type,'aluminium');
  assert.equal(stored[0].snapshot.geometry.segments[1].lengthMM,57.15);
@@ -80,6 +80,13 @@ async function verifyMouldingWizard(browser,base,artifacts){
  assert.deepEqual(errors,[]);
  await desktop.close();
  console.log('PASS Moulure client PC : étapes, validations, deux défilements et dossier');
+ const soffit=await browser.newPage({viewport:{width:390,height:844}});
+ await soffit.goto(base+'/production.html?mode=client&kind=profile&profile=j_soffite');
+ await soffit.waitForFunction(()=>!!window.MIRProductionWorkspace);
+ assert.equal(await soffit.locator('[data-measure="length"]').inputValue(),'144','J à soffite vendu en 12 pi');
+ assert.equal(await soffit.locator('[data-measure="length"]').evaluate(input=>input.readOnly),true);
+ assert.equal(await soffit.locator('[data-template="j_soffite"]').getAttribute('aria-pressed'),'true');
+ await soffit.close();
 
  const mobile=await browser.newPage({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
  mobile.on('pageerror',error=>errors.push(error.message));

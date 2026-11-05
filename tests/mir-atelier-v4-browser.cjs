@@ -65,6 +65,10 @@ function available() {
       await page.locator('.mir-v4-picker > summary').click();
       await page.locator('.mir-v4-picker [data-template="j"]').click();
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'5 po');
+      await page.locator('.mir-v4-picker > summary').click();
+      await page.locator('.mir-v4-picker [data-template="j_soffite"]').click();
+      assert.equal(await page.locator('[data-measure="length"]').inputValue(),'144');
+      assert.equal(await page.locator('[data-measure="length"]').evaluate(input=>input.readOnly),true);
       await page.locator('#panel-zoom-in').click();
       assert.ok((await page.locator('#panel-zoom-value').textContent()).includes('120'));
       await page.locator('.kind-bar [data-kind="panel"]').click();
