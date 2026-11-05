@@ -27,8 +27,8 @@ async function main(){
    for(const route of routes){
     await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:25000});
     const result=await page.evaluate(()=>{
-      const header=document.querySelector('header.mir-client-header') || document.querySelector('html.mir-production-client header.production-header');
-      const nav=header?.querySelector('nav.mir-client-links');
+      const header=document.querySelector('header.mir-client-header') || document.querySelector('header.mir-home-header') || document.querySelector('html.mir-production-client header.production-header');
+      const nav=header?.querySelector('nav.mir-client-links') || header?.querySelector('nav[aria-label="Navigation principale"]');
       const logo=header?.querySelector('img[src="assets/MIR-logo-officiel-original.svg"]');
       const account=header?.querySelector('a[href="chantier.html"]');
       const box=header?.getBoundingClientRect();
@@ -44,7 +44,7 @@ async function main(){
     assert.ok(result.left>=-2&&result.right<=view.width+2,route+' '+view.name+' : en-tête rogné');
     count++;
     if(['index.html','boutique.html','plan.html'].includes(route)){
-      await page.locator('header').screenshot({path:path.resolve(__dirname,'../artifacts/mir-entete-'+route.split('.')[0]+'-'+view.name+'.png')});
+      await page.locator(route==='index.html'?'header.mir-home-header':'header.mir-client-header').screenshot({path:path.resolve(__dirname,'../artifacts/mir-entete-'+route.split('.')[0]+'-'+view.name+'.png')});
     }
    }
    await page.close();
