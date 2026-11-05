@@ -145,7 +145,25 @@
      if(event.target.closest('#mir-guide-3d-open')){if(!active)return;body.classList.add('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','true');selector('#mir-guide-3d-canvas')?.focus();scene();return;}
      if(event.target.closest('#mir-guide-3d-close')){body.classList.remove('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','false');mobileOpen.focus();return;}
      if(event.target.closest('#mir-guide-add-po')){if(step===4&&active){const native=selector('#mir-direct-po-add');if(native&&!native.disabled)native.click();else warning('Complète les détails de la pièce avant de l’ajouter au bon.');}return;}
-     if(event.target.closest('#mir-guide-save-model')){if(step===4&&active&&!win.MIRProductionWorkspace?.openModelFromCurrent?.())warning('Ce profil doit être valide avant de créer un modèle.');return;}
+     if(event.target.closest('#mir-guide-save-model')){
+       if(step===4&&active){
+         if(!win.MIRProductionWorkspace?.openModelFromCurrent?.())warning('Ce profil doit être valide avant de créer un modèle.');
+         else {
+           const form=selector('#save-production-template');
+           if(form){
+             const destination=Array.from(form.querySelectorAll('.choice-checks')).find(node=>node.querySelector('input[name="store"]'));
+             const description=form.querySelector('textarea[name="description"]')?.closest('label');
+             const advanced=doc.createElement('details');advanced.className='mir-guide-model-advanced';
+             advanced.innerHTML='<summary>Options avancées : matériaux, cotes fixes et précisions</summary>';
+             if(destination&&description)form.insertBefore(destination,description);
+             for(const node of [description,...form.querySelectorAll('fieldset')])if(node)advanced.append(node);
+             const before=form.querySelector('#production-dialog-error');
+             if(before)form.insertBefore(advanced,before);
+           }
+         }
+       }
+       return;
+     }
      if(event.target.closest('#mir-guide-3d-reset')){
        yaw=-42;pitch=24;scene();return;
      }
