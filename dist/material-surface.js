@@ -62,7 +62,7 @@
       else {
         // A short contact shadow and a subdued lower edge describe the lap.
         // V-grooves have symmetric edges; smooth finishes never inherit grain.
-        const vGroove = /v[ -]?groove|rainure en v/i.test(`${material.id} ${material.name} ${material.finish}`);
+        const vGroove = /v[ -]?(?:groove|style)|rainure en v/i.test(`${material.id} ${material.name} ${material.finish}`);
         const axis = vertical ? 'x2="1" y2="0"' : 'x2="0" y2="1"';
         const stops = vGroove
           ? '<stop offset="0" stop-color="#17201a" stop-opacity=".32"/><stop offset=".035" stop-color="#17201a" stop-opacity="0"/><stop offset=".94" stop-color="#fff" stop-opacity="0"/><stop offset=".975" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#17201a" stop-opacity=".32"/>'
