@@ -219,7 +219,7 @@ test('MIR : les nouveaux modèles restent privés et une diffusion existante est
   assert.ok(!form.includes('old?.channels?.client===false'));
   assert.ok(!form.includes('old?.channels?.store===false'));
   assert.ok(form.includes('Nouveau modèle privé par défaut sur cet appareil'));
-  assert.ok(app.includes("channels:{client:data.has('client'),store:data.has('store')}"));
+  assert.ok(app.includes("channels:{client:data.has('client'),store:data.has('store'),po:data.has('po')}"));
   assert.ok(app.includes('record.channels?.[catalogueChannel]===true'));
 });
 
@@ -376,7 +376,7 @@ test('Sauvegarde MIR : interface réservée à l’atelier local', () => {
  assert.ok(app.includes('data-export-mir-models="1"'));
  assert.ok(app.includes('data-import-mir-models="1"'));
  assert.ok(app.includes('if(!store(KEYS.templates,{version:1,records:result.records}))return;'));
- assert.ok(app.includes("record.channels?.store===true?'Magasin':'"));
+ assert.ok(app.includes("record.channels?.store===true?'Magasin employés':'"));
 });
 
 console.log('Tests MIR : '+total+'/'+total+' réussis.');

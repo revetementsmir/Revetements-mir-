@@ -117,3 +117,9 @@ body[data-profile-admin=true] .angle-details .bend-fields{margin-top:0}
 .profile-group-choice select{display:block;max-width:100%;min-height:34px;margin-top:4px}
 .order-metadata>summary>.order-summary-label{min-width:0;font-size:inherit;color:var(--ink);overflow-wrap:anywhere}
 #order-po-summary{color:var(--green);font-weight:700}
+.mir-destinations{display:flex;flex-wrap:wrap;gap:8px;margin-block:0 15px}
+.mir-destinations a{border:1px solid var(--line);border-radius:7px;padding:9px 13px;color:var(--green);font-weight:700}
+.mir-destinations small{display:block;font-weight:400;color:var(--muted)}
+#mir-choose-po{margin-bottom:12px}
+.mir-po-list{display:grid;gap:8px;padding:0;list-style:none}
+.mir-po-list button{max-width:100%;text-align:left}

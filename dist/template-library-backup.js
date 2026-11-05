@@ -41,7 +41,7 @@
    if(!safeMaterials.length||!safeColors.length)error('matières ou couleurs autorisées invalides.');
    return {id:record.id,name:current.name,currentVersion:record.currentVersion,
      versions:clone(record.versions),allowed:{materials:[...new Set(safeMaterials)],colorSystems:[...new Set(safeColors)]},
-     measurementDefaults:defaults,channels:{client:record.channels?.client===true,store:record.channels?.store===true},
+     measurementDefaults:defaults,channels:{client:record.channels?.client===true,store:record.channels?.store===true,...(record.channels?.po===false?{po:false}:{})},
      archived:record.archived===true,updatedAt:typeof record.updatedAt==='string'?record.updatedAt:''};
  }
  function validate(records){
@@ -77,7 +77,7 @@
    for(const record of restored.records){
      if(ids.has(record.id))continue; // Ne jamais remplacer une variante locale plus récente.
      ids.add(record.id);
-     add.push({...record,channels:{client:false,store:false},updatedAt:new Date().toISOString()});
+     add.push({...record,channels:{client:false,store:false,...(record.channels?.po===false?{po:false}:{})},updatedAt:new Date().toISOString()});
    }
    if(local.records.length+add.length>MAX_MODELS)return fail('L’import dépasserait '+MAX_MODELS+' modèles.');
    return {ok:true,records:[...clone(existing),...add],added:add.length,skipped:restored.records.length-add.length,
@@ -85,3 +85,4 @@
  }
  return Object.freeze({SCHEMA,MAX_BYTES,create,merge,validate});
 });
+
