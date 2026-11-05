@@ -308,3 +308,19 @@ body.mir-admin-v4 .mir-v4-section:focus-within {
   body.mir-admin-v4 .mir-v4-technical-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   body.mir-admin-v4 .mir-v4-technical-grid p { padding: 9px; }
 }
+
+/* Les cotes demeurent lisibles sur chaque segment du croquis ; pas de
+   deuxième rangée de boutons A/B sous la pièce. */
+body.mir-admin-v4 #profile-dimension-list { display: none !important; }
+body.mir-admin-v4 .mir-v4-section-status {
+  display: block; min-width: 0; margin-left: auto;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 50%; color: #71856d; font-size: 11px; font-weight: 500;
+}
+body.mir-admin-v4 .mir-v4-section > summary .mir-v4-chevron {
+  flex-shrink: 0; margin-left: 7px;
+}
+body.mir-admin-v4 .mir-v4-actions[hidden] { display: none !important; }
+@media(max-width:650px){
+  body.mir-admin-v4 .mir-v4-section-status { max-width: 45%; font-size: 10px; }
+}
