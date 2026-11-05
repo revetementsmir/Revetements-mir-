@@ -83,3 +83,9 @@
 .stage:fullscreen .stage-bottom,.stage.mir-stage-fullscreen .stage-bottom{bottom:max(6px,env(safe-area-inset-bottom));max-width:calc(100% - 230px)}
 html.mir-stage-locked,body.mir-stage-locked{overflow:hidden!important}
 @media(max-width:700px){.mir-stage-actions{gap:4px}#mir-fullscreen,#mir-site-toggle{font-size:11px;padding:7px 9px}.stage-label:has(#mir-fullscreen:not([hidden])) #stage-subtitle{display:none}.mir-zoom-controls{bottom:46px;right:8px;gap:3px}.mir-zoom-controls span{min-width:46px}}
+
+/* CanExel / St-Laurent / Hardie Board & Batten : réglages MIR */
+.mir-batten-spacing{padding:12px 14px;margin:10px 0;background:#eef2e9;border:1px solid #d4ddcc;border-radius:7px}
+.mir-batten-spacing label{font-weight:700;display:block;margin-bottom:7px}
+.mir-batten-spacing select{width:100%;min-height:44px}
+#vertical-rule-summary{padding:12px 14px;color:#294532;background:#eff4ea;border-left:3px solid #6d9466;line-height:1.55}
