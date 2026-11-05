@@ -12931,7 +12931,8 @@
       "colorStatus": "verified_product_palette",
       "paletteComplete": true,
       "notes": [
-        "Nuancier fibrociment officiel; valider le fini sur échantillon."
+        "Nuancier fibrociment officiel; valider le fini sur échantillon.",
+        "Règle de calepinage MIR : hauteur max 12 pi entre transitions, favoriser un raccord au-dessus des châssis. Joints et fixations à valider auprès de St-Laurent."
       ],
       "gaps": [
         "Guide propre au V-Groove non confirmé; téléchargement actuel HardiePlank."
@@ -12990,8 +12991,8 @@
         "vertical"
       ],
       "allowedOrientations": [
-        "horizontal",
-        "vertical"
+        "vertical",
+        "horizontal"
       ],
       "installationOrientationSource": "https://www.fabstlaurent.com/produit/v-groove-architectural/",
       "images": [
@@ -13015,7 +13016,14 @@
       ],
       "primaryImage": "./assets/products/st-vgroove-9.jpg",
       "imageStatus": "official_range_reference",
-      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU"
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "verticalLayout": {
+        "maxRunIn": 144,
+        "transitionLengthRule": "MIR-12ft-between-horizontal-joints",
+        "preferWindowHead": true,
+        "sourceStatus": "user-project-rule",
+        "sourceUrl": "https://www.fabstlaurent.com/produit/v-groove-architectural/"
+      }
     },
     {
       "id": "st-laurent-trim-35",
@@ -15557,14 +15565,14 @@
       },
       "unit": "paquet de 4 planches — unité MIR à confirmer",
       "exposureMm": 139.7,
-      "renderPattern": "lap",
+      "renderPattern": "vertical",
       "allowedPatterns": [
         "lap",
         "vertical"
       ],
       "allowedOrientations": [
-        "horizontal",
-        "vertical"
+        "vertical",
+        "horizontal"
       ],
       "installationOrientationSource": "https://maibec.com/wp-content/uploads/2025/05/CANEXEL_FT-2025-05_VStyle_FR-v2.pdf",
       "maxPiece": {
@@ -15578,7 +15586,9 @@
         "lengthIn": 144
       },
       "gaps": [],
-      "notes": [],
+      "notes": [
+        "Règle de calepinage MIR : hauteur verticale max 12 pi entre transitions, de préférence à la tête des fenêtres. Vérifier détails et solins avec le guide de pose du fabricant."
+      ],
       "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
       "researchedOn": "2026-11-03",
       "images": [
@@ -15602,7 +15612,14 @@
       ],
       "primaryImage": "./assets/products/canexel-2.webp",
       "imageStatus": "official_product_visual",
-      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU"
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "verticalLayout": {
+        "maxRunIn": 144,
+        "transitionLengthRule": "MIR-12ft-between-horizontal-joints",
+        "preferWindowHead": true,
+        "sourceStatus": "user-project-rule",
+        "sourceUrl": "https://maibec.com/fr/produits/canexel/"
+      }
     },
     {
       "id": "canexel-cedrvue-9",
@@ -30264,10 +30281,1442 @@
       "primaryImage": "./assets/unico/u-p1.png",
       "imageStatus": "official_product_visual",
       "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU"
+    },
+    {
+      "id": "hardie-board-batten",
+      "brand": "James Hardie",
+      "name": "HardiePanel + HardieTrim — Board & Batten",
+      "family": "Fibrociment",
+      "applications": [
+        "siding"
+      ],
+      "description": "Système de panneaux HardiePanel à pose verticale, avec couvre-joints HardieTrim. Espacement MIR des battens : 8, 12 ou 16 po centre-à-centre. Maximum de 10 pi entre transitions (8 pi si panneau 4×8 retenu).",
+      "sourceUrl": "https://www.jameshardie.com/product-catalog/exterior-siding-products/hardie-panel-siding/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Catalogue Canada Est — dimensions et gammes",
+          "url": "https://www.jameshardie.ca/JamesHardieNorthAmerica/media/Canada-Product-Catalog/james-hardie-product-catalog-canada-eastern-canada-french.pdf",
+          "scope": "system",
+          "verified": true,
+          "verificationStatus": "opened_official_source",
+          "sourceRef": "turn97view0",
+          "note": "Catalogue Canada Est consulté; la brochure Québec 06/2025 précise une offre régionale plus restreinte."
+        },
+        {
+          "kind": "installation",
+          "title": "Centre de documentation — instructions de pose James Hardie",
+          "url": "https://www.jameshardie.com/installation-instructions-technical-docs/?category=installation-instructions&filter-by=document",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "opened_official_source",
+          "sourceRef": "turn73view3",
+          "note": "Choisir le produit et la région; ce lien n’est pas un guide exact déjà sélectionné."
+        },
+        {
+          "kind": "technical",
+          "title": "Produits et couleurs disponibles au Québec — James Hardie 06/2025",
+          "url": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "scope": "system",
+          "verified": true,
+          "verificationStatus": "official_pdf_read_directly",
+          "sourceRef": "turn109search9",
+          "note": "Document James Hardie diffusé par Gentek; pages PDF8–9 : palette et formats.",
+          "exactProductMatch": true
+        },
+        {
+          "kind": "technical",
+          "title": "ESR-1844 — orientation des panneaux, §4.2.2 (IBC/IRC)",
+          "url": "https://assets.ctfassets.net/dzi2asncd44t/5jBAtvs8UmovgQMjKjCE3T/69e8e2742ff5ed20188fbcb3f64f8f15/ESR-1844__Hardie_Panel__Hardie_Architectural_Panel__CemPanel_.pdf",
+          "scope": "system",
+          "verified": true,
+          "verificationStatus": "opened_official_source",
+          "note": "Rapport réémis en novembre 2025. Les deux orientations sont admises sous conditions de fixation/appuis/joints. Le supplément CA signifie Californie, pas Canada."
+        },
+        {
+          "kind": "technical",
+          "title": "HardieTrim Batten Boards — présentation officielle",
+          "url": "https://www.jameshardie.com/product-catalog/hardie-trim-products/hardie-trim-batten-boards/",
+          "scope": "product",
+          "verified": true,
+          "verificationStatus": "official_product_page",
+          "note": "L’offre et les longueurs du batten par région sont à confirmer."
+        }
+      ],
+      "colors": [
+        {
+          "id": "hardie-blanc-arctique",
+          "name": "Blanc arctique",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 181,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/blanc-arctique.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-pierre-des-champs",
+          "name": "Pierre des champs",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 170,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/pierre-des-champs.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-beige-navajo",
+          "name": "Beige Navajo",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 180,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/beige-navajo.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-brun-kaki",
+          "name": "Brun kaki",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 169,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/brun-kaki.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-taupe-monterey",
+          "name": "Taupe Monterey",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 175,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/taupe-monterey.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-ecorce",
+          "name": "Écorce",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 172,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/ecorce.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-espresso",
+          "name": "Espresso",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 173,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/espresso.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-sauge",
+          "name": "Sauge",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 174,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/sauge.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-gris-ardoise",
+          "name": "Gris ardoise",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 182,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/gris-ardoise.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-bleu-acier",
+          "name": "Bleu acier",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 183,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/bleu-acier.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-brume-legere",
+          "name": "Brume légère",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 184,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/brume-legere.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-gris-perle",
+          "name": "Gris perle",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 185,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/gris-perle.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-etain-vieilli",
+          "name": "Étain vieilli",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 186,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/etain-vieilli.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-gris-nocturne",
+          "name": "Gris nocturne",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 187,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/gris-nocturne.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-bleu-de-soiree",
+          "name": "Bleu de soirée",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 171,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/bleu-de-soiree.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-bleu-ocean",
+          "name": "Bleu océan",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 179,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/bleu-ocean.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-gris-fer",
+          "name": "Gris fer",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 176,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/gris-fer.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-rouge-campagnard",
+          "name": "Rouge campagnard",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 177,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/rouge-campagnard.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        },
+        {
+          "id": "hardie-noir-minuit",
+          "name": "Noir minuit",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=8",
+          "collection": "Statement — Québec 06/2025",
+          "verified": true,
+          "availabilityNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+          "pdfImageXref": 178,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/noir-minuit.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts."
+        }
+      ],
+      "dimensions": {
+        "widthIn": 48,
+        "thicknessIn": 0.3125,
+        "availableLengthsIn": [
+          96,
+          120
+        ],
+        "battenSpacingOptionsIn": [
+          8,
+          12,
+          16
+        ]
+      },
+      "coverage": null,
+      "unit": "panneau — format et unité MIR à confirmer",
+      "exposureMm": null,
+      "renderPattern": "panel",
+      "soffitType": null,
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "colorSelectionIndependent": true,
+      "sourceRefs": [
+        "turn77view0"
+      ],
+      "notes": [
+        "Aucun format de panneau ni espacement de joint n’est présumé à partir du nom présent sur un plan.",
+        "Le rapport ESR-1844, §4.2.2, permet le grand côté parallèle ou perpendiculaire à l’ossature. Les appuis, les fixations et les joints, dont les solins en Z aux joints horizontaux, restent soumis au détail applicable. Le rapport vise les codes IBC/IRC; il ne constitue pas une certification pour le Québec.",
+        "Le sens de pose se choisit séparément du format et du sens du grain; la rotation permise au débit ne remplace pas les prescriptions de pose.",
+        "Assemblage HardiePanel et HardieTrim pour esthétique planche et tasseau; cotes de fixation et largeur réelle des battens à confirmer. Espacements c/c proposés dans MIR et non comme prescription du fabricant."
+      ],
+      "allowedPatterns": [
+        "panel"
+      ],
+      "allowedOrientations": [
+        "vertical"
+      ],
+      "installationOrientationSource": "https://assets.ctfassets.net/dzi2asncd44t/5jBAtvs8UmovgQMjKjCE3T/69e8e2742ff5ed20188fbcb3f64f8f15/ESR-1844__Hardie_Panel__Hardie_Architectural_Panel__CemPanel_.pdf",
+      "maxPiece": {
+        "widthIn": 48,
+        "lengthIn": 120,
+        "measurementKind": "physical_piece",
+        "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+        "verified": true,
+        "rotationAllowed": true,
+        "rotationBasis": "project_user_rule",
+        "note": "Rotation de débit selon la règle de projet; ne valide ni pose, ni grain, ni assemblage."
+      },
+      "colorStatus": "verified_product_palette",
+      "paletteComplete": true,
+      "gaps": [
+        "Stock, prix et délai MIR non vérifiés.",
+        "Le contrôle d’encombrement ne valide pas les joints ni les appuis.",
+        "Largeur exacte/hauteur de la baguette et quantités de tasseaux : à confirmer avant la commande."
+      ],
+      "researchedOn": "2026-11-05",
+      "finish": "HardiePanel lisse + battens HardieTrim (système composé)",
+      "formats": [
+        {
+          "id": "48x96",
+          "widthIn": 48,
+          "lengthIn": 96,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "label": "4 × 8 pi",
+          "measurementKind": "physical_piece",
+          "selectionScope": "format_only_color_and_MIR_stock_unverified"
+        },
+        {
+          "id": "48x120",
+          "widthIn": 48,
+          "lengthIn": 120,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "label": "4 × 10 pi",
+          "measurementKind": "physical_piece",
+          "selectionScope": "format_only_color_and_MIR_stock_unverified"
+        }
+      ],
+      "images": [],
+      "imageStatus": "official_product_visual_not_associated_with_assembly",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "installationOrientationNote": "Le rapport ESR-1844, §4.2.2, permet le grand côté parallèle ou perpendiculaire à l’ossature. Les appuis, les fixations et les joints, dont les solins en Z aux joints horizontaux, restent soumis au détail applicable. Le rapport vise les codes IBC/IRC; il ne constitue pas une certification pour le Québec.",
+      "verticalLayout": {
+        "maxRunIn": 120,
+        "preferWindowHead": true,
+        "sourceStatus": "user-project-rule",
+        "battenSpacingOptionsIn": [
+          8,
+          12,
+          16
+        ],
+        "battenSpacingDefaultIn": 12,
+        "centerMode": "gable-apex-else-window-jambs",
+        "note": "Espacements 8/12/16 po demandés par MIR, non présentés comme entraxes de fixation approuvés."
+      }
+    },
+    {
+      "id": "profilec-la-renommee",
+      "brand": "Profilec",
+      "name": "La Renommée",
+      "family": "Acier architectural",
+      "applications": [
+        "siding",
+        "roofing"
+      ],
+      "description": "Profilé d’acier pour revêtement mural et toiture, finition et couleurs au choix selon fournisseur.",
+      "sourceUrl": "https://www.profilec.ca/nos-produits/la-renommee/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Présentation et accès aux fiches techniques Profilec",
+          "url": "https://www.profilec.ca/nos-produits/la-renommee/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_product_landing_page",
+          "note": "Consulter la fiche technique applicable au profil exact; mesures et couleurs à confirmer."
+        },
+        {
+          "kind": "installation",
+          "title": "Guides et catalogues Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_resource_center",
+          "note": "Guide de pose à sélectionner selon profil et toiture/mur."
+        },
+        {
+          "kind": "colors",
+          "title": "Charte de couleurs Profilec",
+          "url": "https://www.profilec.ca/charte-de-couleurs/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_color_page",
+          "note": "Couleur et fini exacts à confirmer auprès de Profilec."
+        }
+      ],
+      "colors": [],
+      "colorStatus": "palette_to_confirm",
+      "paletteComplete": false,
+      "colorSelectionIndependent": true,
+      "dimensions": {},
+      "coverage": null,
+      "unit": "référence Profilec — unité et prix MIR à confirmer",
+      "exposureMm": null,
+      "soffitType": null,
+      "renderPattern": "vertical",
+      "allowedPatterns": [
+        "vertical"
+      ],
+      "allowedOrientations": [
+        "vertical",
+        "horizontal"
+      ],
+      "installationOrientationSource": "https://www.profilec.ca/nos-produits/la-renommee/",
+      "maxPiece": null,
+      "formats": [],
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "researchedOn": "2026-11-05",
+      "sourceRefs": [],
+      "notes": [
+        "Les dimensions utiles, longueurs, lots, prix et couleurs du profil exact ne sont pas tous confirmés. Aperçu neutre tant que le nuancier exact est indisponible."
+      ],
+      "gaps": [
+        "Formats et longueurs exacts à confirmer avant débit et commande."
+      ],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "manufacturer_image_not_integrated"
+    },
+    {
+      "id": "profilec-la-petite-renommee",
+      "brand": "Profilec",
+      "name": "La Petite Renommée",
+      "family": "Acier architectural",
+      "applications": [
+        "siding",
+        "roofing"
+      ],
+      "description": "Variante documentée de La Renommée, incluse dans le centre technique Profilec; portée, largeur utile et longueur à confirmer.",
+      "sourceUrl": "https://www.profilec.ca/guide-et-catalogue/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Présentation et accès aux fiches techniques Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_product_landing_page",
+          "note": "Consulter la fiche technique applicable au profil exact; mesures et couleurs à confirmer."
+        },
+        {
+          "kind": "installation",
+          "title": "Guides et catalogues Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_resource_center",
+          "note": "Guide de pose à sélectionner selon profil et toiture/mur."
+        },
+        {
+          "kind": "colors",
+          "title": "Charte de couleurs Profilec",
+          "url": "https://www.profilec.ca/charte-de-couleurs/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_color_page",
+          "note": "Couleur et fini exacts à confirmer auprès de Profilec."
+        }
+      ],
+      "colors": [],
+      "colorStatus": "palette_to_confirm",
+      "paletteComplete": false,
+      "colorSelectionIndependent": true,
+      "dimensions": {},
+      "coverage": null,
+      "unit": "référence Profilec — unité et prix MIR à confirmer",
+      "exposureMm": null,
+      "soffitType": null,
+      "renderPattern": "vertical",
+      "allowedPatterns": [
+        "vertical"
+      ],
+      "allowedOrientations": [
+        "vertical",
+        "horizontal"
+      ],
+      "installationOrientationSource": "https://www.profilec.ca/guide-et-catalogue/",
+      "maxPiece": null,
+      "formats": [],
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "researchedOn": "2026-11-05",
+      "sourceRefs": [],
+      "notes": [
+        "Les dimensions utiles, longueurs, lots, prix et couleurs du profil exact ne sont pas tous confirmés. Aperçu neutre tant que le nuancier exact est indisponible."
+      ],
+      "gaps": [
+        "Formats et longueurs exacts à confirmer avant débit et commande."
+      ],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "manufacturer_image_not_integrated"
+    },
+    {
+      "id": "profilec-la-multi-r-13-75",
+      "brand": "Profilec",
+      "name": "La Multi-R — 13¾ po",
+      "family": "Acier architectural",
+      "applications": [
+        "siding",
+        "roofing"
+      ],
+      "description": "Profilé Multi-R à attaches dissimulées, panneaux pré-perforés, format annoncé de 13¾ po.",
+      "sourceUrl": "https://www.profilec.ca/nos-produits/la-multi-r/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Présentation et accès aux fiches techniques Profilec",
+          "url": "https://www.profilec.ca/nos-produits/la-multi-r/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_product_landing_page",
+          "note": "Consulter la fiche technique applicable au profil exact; mesures et couleurs à confirmer."
+        },
+        {
+          "kind": "installation",
+          "title": "Guides et catalogues Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_resource_center",
+          "note": "Guide de pose à sélectionner selon profil et toiture/mur."
+        },
+        {
+          "kind": "colors",
+          "title": "Charte de couleurs Profilec",
+          "url": "https://www.profilec.ca/charte-de-couleurs/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_color_page",
+          "note": "Couleur et fini exacts à confirmer auprès de Profilec."
+        }
+      ],
+      "colors": [],
+      "colorStatus": "palette_to_confirm",
+      "paletteComplete": false,
+      "colorSelectionIndependent": true,
+      "dimensions": {
+        "profileWidthIn": 13.75
+      },
+      "coverage": null,
+      "unit": "référence Profilec — unité et prix MIR à confirmer",
+      "exposureMm": null,
+      "soffitType": null,
+      "renderPattern": "vertical",
+      "allowedPatterns": [
+        "vertical"
+      ],
+      "allowedOrientations": [
+        "vertical",
+        "horizontal"
+      ],
+      "installationOrientationSource": "https://www.profilec.ca/nos-produits/la-multi-r/",
+      "maxPiece": null,
+      "formats": [],
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "researchedOn": "2026-11-05",
+      "sourceRefs": [],
+      "notes": [
+        "Les dimensions utiles, longueurs, lots, prix et couleurs du profil exact ne sont pas tous confirmés. Aperçu neutre tant que le nuancier exact est indisponible."
+      ],
+      "gaps": [
+        "Formats et longueurs exacts à confirmer avant débit et commande."
+      ],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "manufacturer_image_not_integrated"
+    },
+    {
+      "id": "profilec-la-multi-r-17-75",
+      "brand": "Profilec",
+      "name": "La Multi-R — 17¾ po",
+      "family": "Acier architectural",
+      "applications": [
+        "siding",
+        "roofing"
+      ],
+      "description": "Profilé Multi-R à attaches dissimulées, panneaux pré-perforés, format annoncé de 17¾ po.",
+      "sourceUrl": "https://www.profilec.ca/nos-produits/la-multi-r/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Présentation et accès aux fiches techniques Profilec",
+          "url": "https://www.profilec.ca/nos-produits/la-multi-r/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_product_landing_page",
+          "note": "Consulter la fiche technique applicable au profil exact; mesures et couleurs à confirmer."
+        },
+        {
+          "kind": "installation",
+          "title": "Guides et catalogues Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_resource_center",
+          "note": "Guide de pose à sélectionner selon profil et toiture/mur."
+        },
+        {
+          "kind": "colors",
+          "title": "Charte de couleurs Profilec",
+          "url": "https://www.profilec.ca/charte-de-couleurs/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_color_page",
+          "note": "Couleur et fini exacts à confirmer auprès de Profilec."
+        }
+      ],
+      "colors": [],
+      "colorStatus": "palette_to_confirm",
+      "paletteComplete": false,
+      "colorSelectionIndependent": true,
+      "dimensions": {
+        "profileWidthIn": 17.75
+      },
+      "coverage": null,
+      "unit": "référence Profilec — unité et prix MIR à confirmer",
+      "exposureMm": null,
+      "soffitType": null,
+      "renderPattern": "vertical",
+      "allowedPatterns": [
+        "vertical"
+      ],
+      "allowedOrientations": [
+        "vertical",
+        "horizontal"
+      ],
+      "installationOrientationSource": "https://www.profilec.ca/nos-produits/la-multi-r/",
+      "maxPiece": null,
+      "formats": [],
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "researchedOn": "2026-11-05",
+      "sourceRefs": [],
+      "notes": [
+        "Les dimensions utiles, longueurs, lots, prix et couleurs du profil exact ne sont pas tous confirmés. Aperçu neutre tant que le nuancier exact est indisponible."
+      ],
+      "gaps": [
+        "Formats et longueurs exacts à confirmer avant débit et commande."
+      ],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "manufacturer_image_not_integrated"
+    },
+    {
+      "id": "profilec-la-multi-r-21-75",
+      "brand": "Profilec",
+      "name": "La Multi-R — 21¾ po",
+      "family": "Acier architectural",
+      "applications": [
+        "siding",
+        "roofing"
+      ],
+      "description": "Profilé Multi-R à attaches dissimulées, panneaux pré-perforés, format annoncé de 21¾ po.",
+      "sourceUrl": "https://www.profilec.ca/nos-produits/la-multi-r/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Présentation et accès aux fiches techniques Profilec",
+          "url": "https://www.profilec.ca/nos-produits/la-multi-r/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_product_landing_page",
+          "note": "Consulter la fiche technique applicable au profil exact; mesures et couleurs à confirmer."
+        },
+        {
+          "kind": "installation",
+          "title": "Guides et catalogues Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_resource_center",
+          "note": "Guide de pose à sélectionner selon profil et toiture/mur."
+        },
+        {
+          "kind": "colors",
+          "title": "Charte de couleurs Profilec",
+          "url": "https://www.profilec.ca/charte-de-couleurs/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_color_page",
+          "note": "Couleur et fini exacts à confirmer auprès de Profilec."
+        }
+      ],
+      "colors": [],
+      "colorStatus": "palette_to_confirm",
+      "paletteComplete": false,
+      "colorSelectionIndependent": true,
+      "dimensions": {
+        "profileWidthIn": 21.75
+      },
+      "coverage": null,
+      "unit": "référence Profilec — unité et prix MIR à confirmer",
+      "exposureMm": null,
+      "soffitType": null,
+      "renderPattern": "vertical",
+      "allowedPatterns": [
+        "vertical"
+      ],
+      "allowedOrientations": [
+        "vertical",
+        "horizontal"
+      ],
+      "installationOrientationSource": "https://www.profilec.ca/nos-produits/la-multi-r/",
+      "maxPiece": null,
+      "formats": [],
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "researchedOn": "2026-11-05",
+      "sourceRefs": [],
+      "notes": [
+        "Les dimensions utiles, longueurs, lots, prix et couleurs du profil exact ne sont pas tous confirmés. Aperçu neutre tant que le nuancier exact est indisponible."
+      ],
+      "gaps": [
+        "Formats et longueurs exacts à confirmer avant débit et commande."
+      ],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "manufacturer_image_not_integrated"
+    },
+    {
+      "id": "profilec-la-muralys",
+      "brand": "Profilec",
+      "name": "La Muralys",
+      "family": "Acier architectural",
+      "applications": [
+        "siding"
+      ],
+      "description": "Panneau mural en acier peint à attaches dissimulées, calibre 22, pose verticale ou horizontale.",
+      "sourceUrl": "https://www.profilec.ca/nos-produits/la-muralys/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Présentation et accès aux fiches techniques Profilec",
+          "url": "https://www.profilec.ca/nos-produits/la-muralys/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_product_landing_page",
+          "note": "Consulter la fiche technique applicable au profil exact; mesures et couleurs à confirmer."
+        },
+        {
+          "kind": "installation",
+          "title": "Guides et catalogues Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_resource_center",
+          "note": "Guide de pose à sélectionner selon profil et toiture/mur."
+        },
+        {
+          "kind": "colors",
+          "title": "Charte de couleurs Profilec",
+          "url": "https://www.profilec.ca/charte-de-couleurs/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_color_page",
+          "note": "Couleur et fini exacts à confirmer auprès de Profilec."
+        }
+      ],
+      "colors": [],
+      "colorStatus": "palette_to_confirm",
+      "paletteComplete": false,
+      "colorSelectionIndependent": true,
+      "dimensions": {
+        "steelGauge": 22
+      },
+      "coverage": null,
+      "unit": "référence Profilec — unité et prix MIR à confirmer",
+      "exposureMm": null,
+      "soffitType": null,
+      "renderPattern": "vertical",
+      "allowedPatterns": [
+        "vertical"
+      ],
+      "allowedOrientations": [
+        "vertical",
+        "horizontal"
+      ],
+      "installationOrientationSource": "https://www.profilec.ca/nos-produits/la-muralys/",
+      "maxPiece": null,
+      "formats": [],
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "researchedOn": "2026-11-05",
+      "sourceRefs": [],
+      "notes": [
+        "Les dimensions utiles, longueurs, lots, prix et couleurs du profil exact ne sont pas tous confirmés. Aperçu neutre tant que le nuancier exact est indisponible."
+      ],
+      "gaps": [
+        "Formats et longueurs exacts à confirmer avant débit et commande."
+      ],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "manufacturer_image_not_integrated"
+    },
+    {
+      "id": "profilec-muralys-soffite",
+      "brand": "Profilec",
+      "name": "La Muralys — Soffite",
+      "family": "Soffite métallique",
+      "applications": [
+        "soffit"
+      ],
+      "description": "Variante de soffite indiquée dans les ressources techniques Profilec; ventilation et dimensions à confirmer par fiche fabricant.",
+      "sourceUrl": "https://www.profilec.ca/nos-produits/la-muralys/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Présentation et accès aux fiches techniques Profilec",
+          "url": "https://www.profilec.ca/nos-produits/la-muralys/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_product_landing_page",
+          "note": "Consulter la fiche technique applicable au profil exact; mesures et couleurs à confirmer."
+        },
+        {
+          "kind": "installation",
+          "title": "Guides et catalogues Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_resource_center",
+          "note": "Guide de pose à sélectionner selon profil et toiture/mur."
+        },
+        {
+          "kind": "colors",
+          "title": "Charte de couleurs Profilec",
+          "url": "https://www.profilec.ca/charte-de-couleurs/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_color_page",
+          "note": "Couleur et fini exacts à confirmer auprès de Profilec."
+        }
+      ],
+      "colors": [],
+      "colorStatus": "palette_to_confirm",
+      "paletteComplete": false,
+      "colorSelectionIndependent": true,
+      "dimensions": {},
+      "coverage": null,
+      "unit": "référence Profilec — unité et prix MIR à confirmer",
+      "exposureMm": null,
+      "soffitType": "unknown",
+      "renderPattern": "plain",
+      "allowedPatterns": [
+        "plain"
+      ],
+      "allowedOrientations": [],
+      "installationOrientationSource": "https://www.profilec.ca/nos-produits/la-muralys/",
+      "maxPiece": null,
+      "formats": [],
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "researchedOn": "2026-11-05",
+      "sourceRefs": [],
+      "notes": [
+        "Les dimensions utiles, longueurs, lots, prix et couleurs du profil exact ne sont pas tous confirmés. Aperçu neutre tant que le nuancier exact est indisponible."
+      ],
+      "gaps": [
+        "Formats et longueurs exacts à confirmer avant débit et commande."
+      ],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "manufacturer_image_not_integrated"
+    },
+    {
+      "id": "profilec-la-mural-bloc",
+      "brand": "Profilec",
+      "name": "La Mural-Bloc",
+      "family": "Acier architectural",
+      "applications": [
+        "siding"
+      ],
+      "description": "Panneau mural géométrique acier peint à fixations dissimulées. Pose verticale, horizontale, diagonale ou décalée documentée; seules les deux premières sont visualisées dans MIR.",
+      "sourceUrl": "https://www.profilec.ca/nos-produits/la-mural-bloc/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Présentation et accès aux fiches techniques Profilec",
+          "url": "https://www.profilec.ca/nos-produits/la-mural-bloc/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_product_landing_page",
+          "note": "Consulter la fiche technique applicable au profil exact; mesures et couleurs à confirmer."
+        },
+        {
+          "kind": "installation",
+          "title": "Guides et catalogues Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_resource_center",
+          "note": "Guide de pose à sélectionner selon profil et toiture/mur."
+        },
+        {
+          "kind": "colors",
+          "title": "Charte de couleurs Profilec",
+          "url": "https://www.profilec.ca/charte-de-couleurs/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_color_page",
+          "note": "Couleur et fini exacts à confirmer auprès de Profilec."
+        }
+      ],
+      "colors": [],
+      "colorStatus": "palette_to_confirm",
+      "paletteComplete": false,
+      "colorSelectionIndependent": true,
+      "dimensions": {},
+      "coverage": null,
+      "unit": "référence Profilec — unité et prix MIR à confirmer",
+      "exposureMm": null,
+      "soffitType": null,
+      "renderPattern": "vertical",
+      "allowedPatterns": [
+        "vertical"
+      ],
+      "allowedOrientations": [
+        "vertical",
+        "horizontal"
+      ],
+      "installationOrientationSource": "https://www.profilec.ca/nos-produits/la-mural-bloc/",
+      "maxPiece": null,
+      "formats": [],
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "researchedOn": "2026-11-05",
+      "sourceRefs": [],
+      "notes": [
+        "Les dimensions utiles, longueurs, lots, prix et couleurs du profil exact ne sont pas tous confirmés. Aperçu neutre tant que le nuancier exact est indisponible."
+      ],
+      "gaps": [
+        "Formats et longueurs exacts à confirmer avant débit et commande."
+      ],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "manufacturer_image_not_integrated"
+    },
+    {
+      "id": "profilec-la-capitale",
+      "brand": "Profilec",
+      "name": "La Capitale",
+      "family": "Acier architectural",
+      "applications": [
+        "siding",
+        "roofing"
+      ],
+      "description": "Profilé d’acier avec attaches apparentes et nervures, toiture et mur. Pente toiture minimale indiquée par le fabricant de 3/12, calibre 29.",
+      "sourceUrl": "https://www.profilec.ca/nos-produits/la-capitale/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Présentation et accès aux fiches techniques Profilec",
+          "url": "https://www.profilec.ca/nos-produits/la-capitale/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_product_landing_page",
+          "note": "Consulter la fiche technique applicable au profil exact; mesures et couleurs à confirmer."
+        },
+        {
+          "kind": "installation",
+          "title": "Guides et catalogues Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_resource_center",
+          "note": "Guide de pose à sélectionner selon profil et toiture/mur."
+        },
+        {
+          "kind": "colors",
+          "title": "Charte de couleurs Profilec",
+          "url": "https://www.profilec.ca/charte-de-couleurs/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_color_page",
+          "note": "Couleur et fini exacts à confirmer auprès de Profilec."
+        }
+      ],
+      "colors": [
+        {
+          "id": "profilec-pro-455-007",
+          "name": "Blanc vif",
+          "code": "PRO 455-007",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8273",
+          "name": "Blanc os",
+          "code": "PRO 8273",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8695",
+          "name": "Blanc Cambridge",
+          "code": "PRO 8695",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8262",
+          "name": "Noir",
+          "code": "PRO 8262",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8306",
+          "name": "Fusain",
+          "code": "PRO 8306",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8229",
+          "name": "Brun foncé",
+          "code": "PRO 8229",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8326",
+          "name": "Brun café",
+          "code": "PRO 8326",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8730",
+          "name": "Gris régent",
+          "code": "PRO 8730",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8305",
+          "name": "Gris pierre",
+          "code": "PRO 8305",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8398",
+          "name": "Minerai de fer",
+          "code": "PRO 8398",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8740",
+          "name": "Graphite",
+          "code": "PRO 8740",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8259",
+          "name": "Rouge tuile",
+          "code": "PRO 8259",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8234",
+          "name": "Orange",
+          "code": "PRO 8234",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8307",
+          "name": "Vert Melchers",
+          "code": "PRO 8307",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8011",
+          "name": "Bourgogne",
+          "code": "PRO 8011",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8330",
+          "name": "Bleu héron",
+          "code": "PRO 8330",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-8260",
+          "name": "Bleu ardoise",
+          "code": "PRO 8260",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-455-004",
+          "name": "Béryllium",
+          "code": "PRO 455-004",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-455-002",
+          "name": "Météorite",
+          "code": "PRO 455-002",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-455-003",
+          "name": "Graphite Signature",
+          "code": "PRO 455-003",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-455-005",
+          "name": "Bauxite",
+          "code": "PRO 455-005",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        },
+        {
+          "id": "profilec-pro-455-006",
+          "name": "Basalt",
+          "code": "PRO 455-006",
+          "hex": null,
+          "collection": "Profilec La Capitale, charte fabricant",
+          "verified": true,
+          "sourceUrl": "https://www.profilec.ca/wp-content/uploads/2025/12/Charte_Couleurs_Signature_Capitale.pdf",
+          "availabilityNote": "Code de la charte Profilec; correspondance et disponibilité au format choisi à confirmer."
+        }
+      ],
+      "colorStatus": "verified_manufacturer_color_codes_unlinked_to_sku",
+      "paletteComplete": false,
+      "colorSelectionIndependent": true,
+      "dimensions": {
+        "steelGauge": 29
+      },
+      "coverage": null,
+      "unit": "référence Profilec — unité et prix MIR à confirmer",
+      "exposureMm": null,
+      "soffitType": null,
+      "renderPattern": "vertical",
+      "allowedPatterns": [
+        "vertical"
+      ],
+      "allowedOrientations": [
+        "vertical",
+        "horizontal"
+      ],
+      "installationOrientationSource": "https://www.profilec.ca/nos-produits/la-capitale/",
+      "maxPiece": null,
+      "formats": [],
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "researchedOn": "2026-11-05",
+      "sourceRefs": [],
+      "notes": [
+        "Les dimensions utiles, longueurs, lots, prix et couleurs du profil exact ne sont pas tous confirmés. Aperçu neutre tant que le nuancier exact est indisponible."
+      ],
+      "gaps": [
+        "Formats et longueurs exacts à confirmer avant débit et commande."
+      ],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "manufacturer_image_not_integrated"
+    },
+    {
+      "id": "profilec-lancestra",
+      "brand": "Profilec",
+      "name": "L’Ancestra",
+      "family": "Acier architectural",
+      "applications": [
+        "roofing"
+      ],
+      "description": "Profilé métallique à joints debout et attaches dissimulées, couverture de toiture sur support avec membrane prévue par le fabricant.",
+      "sourceUrl": "https://www.profilec.ca/nos-produits/lancestra/",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "Présentation et accès aux fiches techniques Profilec",
+          "url": "https://www.profilec.ca/nos-produits/lancestra/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_product_landing_page",
+          "note": "Consulter la fiche technique applicable au profil exact; mesures et couleurs à confirmer."
+        },
+        {
+          "kind": "installation",
+          "title": "Guides et catalogues Profilec",
+          "url": "https://www.profilec.ca/guide-et-catalogue/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_resource_center",
+          "note": "Guide de pose à sélectionner selon profil et toiture/mur."
+        },
+        {
+          "kind": "colors",
+          "title": "Charte de couleurs Profilec",
+          "url": "https://www.profilec.ca/charte-de-couleurs/",
+          "scope": "resource-center",
+          "verified": true,
+          "verificationStatus": "official_color_page",
+          "note": "Couleur et fini exacts à confirmer auprès de Profilec."
+        }
+      ],
+      "colors": [],
+      "colorStatus": "palette_to_confirm",
+      "paletteComplete": false,
+      "colorSelectionIndependent": true,
+      "dimensions": {},
+      "coverage": null,
+      "unit": "référence Profilec — unité et prix MIR à confirmer",
+      "exposureMm": null,
+      "soffitType": null,
+      "renderPattern": "plain",
+      "allowedPatterns": [
+        "plain"
+      ],
+      "allowedOrientations": [],
+      "installationOrientationSource": "https://www.profilec.ca/nos-produits/lancestra/",
+      "maxPiece": null,
+      "formats": [],
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
+      "researchedOn": "2026-11-05",
+      "sourceRefs": [],
+      "notes": [
+        "Les dimensions utiles, longueurs, lots, prix et couleurs du profil exact ne sont pas tous confirmés. Aperçu neutre tant que le nuancier exact est indisponible."
+      ],
+      "gaps": [
+        "Formats et longueurs exacts à confirmer avant débit et commande."
+      ],
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "manufacturer_image_not_integrated"
     }
   ],
   "schemaVersion": "5.2",
-  "researchedOn": "2026-11-04",
+  "researchedOn": "2026-11-05",
   "purpose": "Références fabricant pour le configurateur MIR; choix de demande, sans inventaire, prix ni disponibilité MIR confirmés.",
   "method": {
     "sources": "Sources primaires officielles; recherches system1 ciblées et ouverture des pages et PDF accessibles.",
@@ -30329,7 +31778,7 @@
       "architecturalPanel": "U-P1 : acier plié 18/20/22 ga ou aluminium plié 2/3,2 mm. Dimensions sur mesure, sans maximum automatique. Couleurs issues d’une sélection officielle partielle; chaque combinaison de fini, calibre et épaisseur reste à confirmer."
     }
   ],
-  "catalogueCompleteness": "Catalogue MIR documenté, avec audit de cohérence de toutes les fiches présentes et vérifications primaires ciblées. Les 12 familles de la page Light Trim fournie sont intégrées; catalogue global des fournisseurs et combinaisons commerciales non exhaustifs.",
+  "catalogueCompleteness": "Catalogue MIR enrichi avec la gamme Profilec (six gammes principales, variantes documentées), CanExel VStyle et St-Laurent V-Groove calibrés, HardiePanel/HardieTrim Board & Batten à options de pas. Prix, stocks, approvisionnement et gammes non exhaustives restent à confirmer.",
   "assetPolicy": {
     "sources": "Original manufacturer pages or original embedded PDF images",
     "recoloring": false,
