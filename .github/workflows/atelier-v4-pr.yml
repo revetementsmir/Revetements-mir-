@@ -5,6 +5,7 @@ on:
     paths:
       - 'dist/production*'
       - 'tests/mir-atelier-v4.cjs'
+      - 'tests/mir-atelier-v4-browser.cjs'
       - '.github/workflows/atelier-v4-pr.yml'
   workflow_dispatch:
 permissions:
@@ -21,7 +22,18 @@ jobs:
           node --check dist/production-app.js
           node --check dist/production-admin-v4.js
           node --check tests/mir-atelier-v4.cjs
+          node --check tests/mir-atelier-v4-browser.cjs
       - name: Existing MIR regression suite
         run: node tests/mir-pages-regressions.cjs
       - name: Atelier maquette 4 scenarios
         run: node tests/mir-atelier-v4.cjs
+      - name: Responsive real-browser QA (Chrome)
+        run: |
+          npm install --no-save playwright@1.58.2
+          node tests/mir-atelier-v4-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-atelier-v4-responsive-screenshots
+          path: artifacts/atelier-v4-*.png
+          if-no-files-found: ignore
