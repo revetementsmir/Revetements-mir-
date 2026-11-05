@@ -4,6 +4,12 @@ on:
     branches: [main]
     paths:
       - 'dist/production*'
+      - 'dist/mir-miniature.js'
+      - 'dist/custom-model-cards*'
+      - 'dist/boutique.html'
+      - 'dist/commerce.css'
+      - 'dist/mir-procurement.css'
+      - 'tests/mir-miniatures*.cjs'
       - 'dist/kaycan-flat-preview.js'
       - 'tests/mir-kaycan-flat-preview.cjs'
       - 'tests/mir-atelier-v4.cjs'
@@ -23,6 +29,9 @@ jobs:
         run: |
           node --check dist/production-model.js
           node --check dist/production-app.js
+          node --check dist/mir-miniature.js
+          node --check tests/mir-miniatures.cjs
+          node --check tests/mir-miniatures-browser.cjs
           node --check dist/kaycan-flat-preview.js
           node --check tests/mir-kaycan-flat-preview.cjs
           node --check dist/production-admin-v4.js
@@ -32,13 +41,16 @@ jobs:
       - name: Existing MIR regression suite
         run: node tests/mir-pages-regressions.cjs
       - name: Atelier maquette 4 scenarios
-        run: node tests/mir-atelier-v4.cjs
+        run: |
+          node tests/mir-atelier-v4.cjs
+          node tests/mir-miniatures.cjs
       - name: Responsive real-browser QA (Chrome)
         run: |
           npm install --no-save playwright@1.58.2
           node tests/mir-atelier-v4-browser.cjs
           node tests/mir-kaycan-flat-preview.cjs
           node tests/mir-moulure-renaming-browser.cjs
+          node tests/mir-miniatures-browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -47,4 +59,5 @@ jobs:
             artifacts/atelier-v4-*.png
             artifacts/kaycan-fix-*.png
             artifacts/mir-rename-*.png
+            artifacts/mir-miniatures-*.png
           if-no-files-found: ignore

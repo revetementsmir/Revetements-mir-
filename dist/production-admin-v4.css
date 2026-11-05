@@ -492,3 +492,278 @@ body.mir-admin-v4 .production-item-actions .rename-piece {
     white-space: normal;
   }
 }
+
+/* MIR — Dossier de moulures, vocabulaire visuel validé : carré, sauge, sans cadre.
+   Les miniatures sont de vrais SVG 120×120 ajustés aux bornes géométriques. */
+body.mir-admin-v4 {
+  --mir-surface-page: #f7f8f3;
+  --mir-surface-soft: #f2f5ee;
+  --mir-surface-wash: #edf3e7;
+  --mir-surface-ink: #294b36;
+  background: var(--mir-surface-page);
+}
+body.mir-admin-v4 .production-order {
+  padding-top: 36px;
+}
+body.mir-admin-v4 .production-family {
+  min-width: 0;
+  margin: 0 0 15px;
+}
+body.mir-admin-v4 .production-family > h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: max-content;
+  max-width: 100%;
+  padding: 8px 11px;
+  margin: 13px 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--mir-surface-wash);
+  color: #355a41;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+body.mir-admin-v4 .production-family > h3 small {
+  font-size: 11px;
+  font-weight: 450;
+  color: #6c846e;
+}
+body.mir-admin-v4 .production-items {
+  gap: 11px;
+}
+body.mir-admin-v4 .production-item {
+  display: grid;
+  grid-template-columns: 118px minmax(0,1fr) 86px;
+  align-items: start;
+  gap: 12px 16px;
+  margin: 0 0 9px;
+  padding: 16px 17px;
+  border: 0;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 13px rgb(27 57 35 / 5%);
+  min-width: 0;
+}
+body.mir-admin-v4 .production-item-thumb {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-width: 118px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  padding: 7px;
+  margin: 0;
+  border: 0;
+  border-radius: 11px;
+  background: var(--mir-surface-soft);
+  overflow: hidden;
+}
+body.mir-admin-v4 .production-item-thumb > svg,
+body.mir-admin-v4 .model-preview > svg[data-mir-miniature] {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  background: transparent !important;
+  object-fit: contain;
+}
+body.mir-admin-v4 .production-item-label {
+  color: #71836f;
+  font-size: 10px;
+  letter-spacing: .12px;
+  font-variant-numeric: tabular-nums;
+}
+body.mir-admin-v4 .production-item-info {
+  min-width: 0;
+}
+body.mir-admin-v4 .production-item-info h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #283f31;
+  line-height: 1.35;
+  letter-spacing: -.2px;
+  margin: 6px 0 7px;
+}
+body.mir-admin-v4 .production-item-info > p {
+  color: #657668;
+  font-size: 12px;
+  line-height: 1.55;
+  margin: 2px 0;
+}
+body.mir-admin-v4 .production-item-info .item-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  margin-top: 9px;
+  border: 0;
+  border-radius: 999px;
+  background: #f5f3e9;
+  color: #82744f;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: normal;
+  line-height: 1.3;
+}
+body.mir-admin-v4 .production-item-info .item-status.complete {
+  color: #4d7055;
+  background: var(--mir-surface-wash);
+}
+body.mir-admin-v4 .production-item-qty {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: #67806b;
+  font-size: 11px;
+}
+body.mir-admin-v4 .production-item-qty input {
+  width: 100%;
+  min-height: 44px;
+  min-width: 0;
+  border: 1px solid #dce5d9;
+  border-radius: 8px;
+  background: var(--mir-surface-page);
+  color: #284b36;
+  padding: 8px;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+body.mir-admin-v4 .production-item-actions {
+  grid-column: 2 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: flex-start;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
+}
+body.mir-admin-v4 .production-item-actions button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #4c6e53;
+  padding: 8px 10px;
+  line-height: 1.35;
+  font-size: 12px;
+  font-weight: 550;
+  text-align: center;
+}
+body.mir-admin-v4 .production-item-actions button:hover {
+  background: var(--mir-surface-soft);
+}
+body.mir-admin-v4 .production-item-actions .rename-piece {
+  border: 0;
+  border-radius: 8px;
+  background: var(--mir-surface-wash);
+  color: #30593d;
+  font-weight: 700;
+}
+body.mir-admin-v4 .production-item-actions .remove-piece {
+  color: #997c74;
+}
+body.mir-admin-v4 .production-item-actions .profile-group-choice {
+  flex: 0 1 205px;
+  min-width: 130px;
+  margin-right: 4px;
+}
+body.mir-admin-v4 .production-item-actions .profile-group-choice select {
+  max-width: 100%;
+  min-height: 42px;
+  background: var(--mir-surface-page);
+  border: 1px solid #dce5d9;
+  border-radius: 8px;
+  color: #345841;
+  font-size: 13px;
+}
+body.mir-admin-v4 .document-status {
+  border: 0;
+  background: var(--mir-surface-wash);
+  color: #59725f;
+  box-shadow: none;
+}
+body.mir-admin-v4 .order-metadata {
+  background: var(--mir-surface-soft);
+  border: 0;
+  border-radius: 12px;
+}
+body.mir-admin-v4 .model-library-card,
+body.mir-admin-v4 .model-preview {
+  border-color: transparent;
+}
+body.mir-admin-v4 .model-preview {
+  background: var(--mir-surface-soft);
+}
+@media (max-width: 850px) {
+  body.mir-admin-v4 .production-item { grid-template-columns: 106px minmax(0,1fr) 72px; gap: 9px 11px; }
+  body.mir-admin-v4 .production-item-thumb { max-width: 106px; }
+  body.mir-admin-v4 .production-item-actions { grid-column: 2 / -1; }
+}
+@media (max-width: 600px) {
+  body.mir-admin-v4 .production-order { padding-top: 25px; }
+  body.mir-admin-v4 .production-family > h3 { margin: 8px 0 10px; font-size: 13px; }
+  body.mir-admin-v4 .production-item {
+    grid-template-columns: 92px minmax(0,1fr);
+    gap: 7px 12px;
+    align-items: start;
+    padding: 13px;
+    border-radius: 13px;
+  }
+  body.mir-admin-v4 .production-item-thumb {
+    grid-row: 1 / span 2;
+    max-width: 92px;
+    padding: 6px;
+    border-radius: 10px;
+  }
+  body.mir-admin-v4 .production-item-info { grid-column: 2; grid-row: 1; }
+  body.mir-admin-v4 .production-item-info h3 { font-size: 15px; margin: 4px 0 5px; }
+  body.mir-admin-v4 .production-item-info > p { font-size: 11px; line-height: 1.45; }
+  body.mir-admin-v4 .production-item-qty {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  body.mir-admin-v4 .production-item-qty input { width: 76px; max-width: 100%; }
+  body.mir-admin-v4 .production-item-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 6px;
+    margin-top: 7px;
+    align-items: stretch;
+  }
+  body.mir-admin-v4 .production-item-actions .profile-group-choice {
+    grid-column: 1 / -1;
+    margin: 0;
+    width: 100%;
+    min-width: 0;
+  }
+  body.mir-admin-v4 .production-item-actions .profile-group-choice select { width: 100%; }
+  body.mir-admin-v4 .production-item-actions button {
+    display: block; width: 100%;
+    min-height: 44px;
+    padding: 9px 7px;
+    font-size: 12px;
+  }
+  body.mir-admin-v4 .document-status { max-width: 96px; }
+}
+
+/* Sur PC/tablette, rétablir explicitement une rangée d'actions :
+   la base historique imposait flex-direction:column aux cartes. */
+@media(min-width:601px){
+  body.mir-admin-v4 .production-item-actions {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  body.mir-admin-v4 .production-item-actions .profile-group-choice {
+    flex: 0 0 172px;
+    min-width: 140px;
+  }
+}

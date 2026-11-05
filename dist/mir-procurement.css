@@ -72,3 +72,26 @@ body.mir-admin-v4[data-mir-tab="models"] .mir-v4-technical{display:none!importan
  body.mir-admin-v4 .mir-proc-actions{width:100%}
  body.mir-admin-v4 .mir-proc-actions button{flex:1 1 auto}
 }
+
+/* Harmonisation de surfaces avec les miniatures de l'atelier MIR. */
+body.mir-admin-v4 #mir-procurement-tabs {
+  background: #f1f4ed;
+  border: 0;
+  box-shadow: none;
+}
+body.mir-admin-v4 #mir-procurement-tabs button:not([aria-current="page"]) { background:#f7f8f3; }
+body.mir-admin-v4 #mir-procurement-panel .mir-proc-card {
+  background: #fff;
+  border: 0;
+  border-radius: 13px;
+  box-shadow: 0 2px 13px rgb(27 57 35 / 5%);
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-proc-field input,
+body.mir-admin-v4 #mir-procurement-panel .mir-proc-field select,
+body.mir-admin-v4 #mir-procurement-panel .mir-proc-field textarea {
+  background:#f7f8f3;
+  border-color:#dce5d9;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-proc-row {
+  border-bottom-color:#edf1e9;
+}
