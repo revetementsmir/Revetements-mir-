@@ -27,6 +27,8 @@
   items.sort((a,b)=>a.name.localeCompare(b.name,'fr',{numeric:true}));return {items,total:items.length,channel,status:storageUnavailable?'storage_unavailable':'ready',storageUnavailable};
  }
  function previewSVG(value,{width=420,height=240}={}){
+  const mini=root?.MIRMiniature?.render(value?.preview||value,root.MIRProduction);
+  if(mini)return mini;
   const model=value?.preview||value,points=model?.pointsMM;if(!Array.isArray(points)||points.length<2||points.some(p=>!Array.isArray(p)||p.length<2||!p.every(Number.isFinite)))return '';
   const minX=Math.min(...points.map(p=>p[0])),maxX=Math.max(...points.map(p=>p[0])),minY=Math.min(...points.map(p=>p[1])),maxY=Math.max(...points.map(p=>p[1])),scale=Math.min((width-110)/Math.max(1,maxX-minX),(height-80)/Math.max(1,maxY-minY));
   const mapped=points.map(p=>[width/2+(p[0]-(minX+maxX)/2)*scale,height/2-(p[1]-(minY+maxY)/2)*scale]),shape=mapped.map(p=>p.map(n).join(',')).join(' '),panel=model.kind==='panel';
