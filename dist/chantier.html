@@ -17,14 +17,14 @@
   <script src="vendor/supabase-client.js" defer></script>
   <script src="portal-client.js" defer></script>
   <script src="chantier-app.js" defer></script>
-</head>
+<link rel="stylesheet" href="mir-home-premium.css?v=20261105"><link rel="stylesheet" href="mir-client-header.css?v=1"></head>
 <body data-portal-mode="login" data-portal-connection="loading">
   <a class="portal-skip" href="#portal-main">Aller au contenu</a>
-  <header class="portal-header">
-    <a class="portal-brand" href="index.html" aria-label="Les Revêtements MIR, accueil"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="364" height="91"></a>
-    <span class="portal-title">MON COMPTE<br><b>MIR</b></span>
-    <nav aria-label="Navigation du site"><a href="boutique.html">Boutique <span aria-hidden="true">↗</span></a><a href="metres.html" data-management-link>Atelier <span aria-hidden="true">↗</span></a></nav>
-  </header>
+  <header class="portal-header mir-client-header">
+  <a class="portal-brand mir-client-brand" href="index.html" aria-label="Les Revêtements MIR, accueil"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="364" height="91"></a>
+  <nav class="mir-client-links" aria-label="Navigation principale"><a href="boutique.html">Revêtements</a><a href="index.html#realisations">Réalisations</a><a href="pliage.html">Pliage sur mesure</a><a href="plan.html">Studio 3D</a><a href="index.html#nous-joindre">Nous joindre</a></nav>
+  <div class="mir-home-header-actions mir-client-actions"><a class="mir-home-account" href="chantier.html" aria-current="page">Mon compte</a><a class="mir-home-estimate" href="index.html#nous-joindre">Demander une estimation</a></div>
+</header>
   <div class="account-bar" id="account-bar" hidden>
     <p><span class="account-dot" aria-hidden="true"></span><strong id="account-name"></strong><span id="account-role"></span></p>
     <div><button type="button" id="portal-refresh">Actualiser</button><button type="button" id="portal-signout">Déconnexion</button></div>
