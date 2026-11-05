@@ -224,6 +224,7 @@
       panel.innerHTML=boutiqueHTML();
       const feedback=panel.querySelector('#mir-boutique-feedback');
       if(feedback)feedback.textContent=updated.record.name+(action==='published'?' : disponible dans le catalogue de ce navigateur.': ' : conservé en brouillon privé.');
+      win.dispatchEvent(new win.Event('mir-template-catalogue-updated'));
       win.MIRCustomModelCards?.refresh?.();
     }
     function supplierHTML(){
