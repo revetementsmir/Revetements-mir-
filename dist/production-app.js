@@ -1007,9 +1007,29 @@ function appendTracePoint(point, start){
  if(drawPoints.length>=27)return toast('Un profil peut contenir au maximum 26 segments.');
  const last=drawPoints.at(-1);
  if(last&&Math.hypot(point[0]-last[0],point[1]-last[1])<.01)return;
- if(!last&&start)drawPoints.push(start);
- drawPoints.push(point);
- const spec=toCustom(drawPoints);
+ const points=!last&&start?[start,point]:[...drawPoints,point];
+ const spec=toCustom(points);
+ const bend=spec?.bends.at(-1);
+ if(bend?.mode==='hem'){
+  const face=spec.coloredFace?.side;
+  dialog('De quel côté va le double pli ?','Intérieur replie la tôle du côté non peint. Extérieur replie la tôle du côté de la face colorée.',
+   `<form id="trace-hem-form" class="dialog-form">${face?'':`<label>Côté de la face colorée, en suivant le tracé<select name="face" required><option value="">Choisir le côté</option><option value="left">À gauche</option><option value="right">À droite</option></select></label>`}<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button><button type="submit" class="secondary-button" value="interior">Intérieur</button><button type="submit" class="primary-button" value="exterior">Extérieur</button></div></form>`);
+  $('#trace-hem-form').onsubmit=event=>{
+   event.preventDefault();
+   const side=face||new FormData(event.currentTarget).get('face');
+   const choice=event.submitter?.value;
+   if(!side||!['interior','exterior'].includes(choice))return;
+   bend.direction=choice==='exterior'?side:side==='left'?'right':'left';
+   if(!face)spec.coloredFace={...spec.coloredFace,side};
+   closeDialog();
+   commitTrace(points,spec);
+  };
+  return;
+ }
+ commitTrace(points,spec);
+}
+function commitTrace(points,spec){
+ drawPoints=points;
  if(spec){draft=spec;renderDimensions();}
  renderTools();
  updateDrawing({keepForm:true});

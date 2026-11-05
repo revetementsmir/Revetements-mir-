@@ -12,6 +12,7 @@ body.mir-signature {
   --mir-soft:#f3f6f0;
   --mir-radius:12px;
   --mir-shadow:0 8px 28px rgba(16,36,22,.07);
+  --mir-display-size:clamp(2.75rem,5.7vw,5.5rem);
   --paper:var(--mir-surface);
   --ink:var(--mir-ink);
   --muted:var(--mir-muted);
@@ -100,11 +101,20 @@ body.mir-signature .shop-hero>img{
   object-position:55% 48%;
 }
 body.mir-signature .shop-hero-copy{
-  position:relative;
+  position:absolute;
+  max-width:min(43rem,86%);
   z-index:2;
 }
 body.mir-signature .shop-hero-copy h1,
 body.mir-signature .shop-hero-copy p { color:#fff; }
+body.mir-signature :is(.shop-hero h1,.mir-gallery-intro h1,.bend-heading h1,.page-main .page-heading h1){
+  font-size:var(--mir-display-size);
+  letter-spacing:-.047em;
+  line-height:1.075;
+}
+body.mir-signature :is(.mir-gallery-intro h1,.bend-heading h1,.page-main .page-heading h1) em{
+  color:var(--mir-accent);
+}
 body.mir-signature :is(.category-card,.product-card,.brand-card,.selection-card,.shop-grid article){
   border-radius:var(--mir-radius);
   overflow:hidden;
@@ -159,7 +169,7 @@ body.mir-signature :is(.portfolio-footnote,.footer-small){
   color:var(--mir-muted);
 }
 @media(min-width:1700px){
-  body.mir-signature :is(.wrap,.site-header.mir-client-header){
+  body.mir-signature .wrap{
     width:min(1640px,calc(100% - 120px));
   }
   body.mir-signature :is(.product-detail,.selection-page){
@@ -168,7 +178,7 @@ body.mir-signature :is(.portfolio-footnote,.footer-small){
 }
 @media(min-width:2560px){
   /* Conserver des contenus et formulaires lisibles en 21:9 et 32:9. */
-  body.mir-signature :is(.wrap,.site-header.mir-client-header){
+  body.mir-signature .wrap{
     width:min(1900px,calc(100% - 170px));
   }
   body.mir-signature :is(.product-detail,.selection-page){
@@ -182,6 +192,7 @@ body.mir-signature :is(.portfolio-footnote,.footer-small){
   body.mir-signature .shop-hero>img{object-position:62% 50%}
 }
 @media(max-width:700px){
+  body.mir-signature{--mir-display-size:clamp(2.125rem,9vw,3.375rem)}
   body.mir-signature :is(.page-heading,.shop-section-title,.collection-intro,.bend-heading){
     padding-top:14px;
   }

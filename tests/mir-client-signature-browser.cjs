@@ -11,8 +11,8 @@ const server=http.createServer((req,res)=>{
  res.writeHead(200,{'Content-Type':types[path.extname(fp)]||'application/octet-stream'});
  fs.createReadStream(fp).pipe(res);
 });
-const pages=['boutique','produit','selection','materiaux','pliage','plan','chantier'];
-const sizes=[{id:'mobile360',width:360,height:780},{id:'mobile',width:390,height:844},{id:'desktop',width:1440,height:900},{id:'ultrawide',width:2560,height:1080}];
+const pages=['boutique','produit','selection','materiaux','pliage','plan','chantier','realisations'];
+const sizes=[{id:'mobile360',width:360,height:780},{id:'mobile',width:390,height:844},{id:'tablette',width:820,height:900},{id:'desktop',width:1440,height:900},{id:'ultrawide',width:2560,height:1080}];
 async function main(){
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  let browser;
@@ -28,9 +28,15 @@ async function main(){
       const result=await page.evaluate(()=>{
         const css=Array.from(document.styleSheets).some(sheet=>String(sheet.href||'').includes('mir-client-signature.css'));
         const logo=document.querySelector('header img[src="assets/MIR-logo-officiel-original.svg"]');
+        const footer=document.querySelector('.mir-signature-footer');
+        const box=footer?.getBoundingClientRect();
+        const hero=document.querySelector('.shop-hero'),copy=hero?.querySelector('.shop-hero-copy');
+        const frame=hero?.getBoundingClientRect(),content=copy?.getBoundingClientRect();
         return {theme:document.body.classList.contains('mir-signature'),css,
           accent:getComputedStyle(document.body).getPropertyValue('--mir-accent').trim(),
           paper:getComputedStyle(document.body).getPropertyValue('--mir-surface').trim(),
+          footer:box?.width>0&&box.left>=0&&box.right<=innerWidth&&footer.querySelectorAll('nav a').length===5,
+          heroFits:!hero||(content.top>=frame.top&&content.bottom<=frame.bottom&&content.left>=frame.left&&content.right<=frame.right),
           logo:!!logo,estimate:(()=>{
             const b=document.querySelector('header.mir-client-header .mir-home-estimate');
             const rect=b?.getBoundingClientRect();
@@ -41,6 +47,8 @@ async function main(){
       assert.equal(result.accent,'#348511',name+' '+size.id+': accent');
       assert.equal(result.paper,'#fafaf7',name+' '+size.id+': fond');
       assert.ok(result.estimate,name+' '+size.id+': bouton Estimation masqué ou hors écran');
+      assert.ok(result.footer,name+' '+size.id+': pied de page commun absent ou hors écran');
+      assert.ok(result.heroFits,name+' '+size.id+': texte ou bouton du hero rogné');
       if(['boutique','produit','selection','pliage','plan'].includes(name)){
         await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-signature-'+name+'-'+size.id+'.png')});
       }

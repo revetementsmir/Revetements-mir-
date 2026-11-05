@@ -22,7 +22,7 @@ test('Toutes les pages client utilisent le thème, aucun nouveau site ni formula
   for(const p of pages){
     const html=text(p);
     assert.match(html,/<body\b[^>]*class="mir-signature(?: [^"]*)?"/,p);
-    assert.match(html,/href="mir-client-signature\.css\?v=1"/,p);
+    assert.match(html,/href="mir-client-signature\.css\?v=1-harmony"/,p);
     assert.match(html,/assets\/MIR-logo-officiel-original\.svg/,p);
     assert.match(html,/>Mon compte<\/a>/,p);
     assert.match(html,/>Demander une estimation<\/a>/,p);

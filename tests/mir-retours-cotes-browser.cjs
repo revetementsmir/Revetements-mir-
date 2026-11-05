@@ -66,6 +66,39 @@ async function ready(){
     assert.ok(!overlap,'Overlapping '+facts.markers[i].label+' / '+facts.markers[j].label);
    }
    await page.locator('#production-drawing').screenshot({path:path.join(output,'mir-retours-'+viewport.name+'.png')});
+   if(viewport.name==='mobile'||viewport.name==='bureau'){
+    const stage=page.locator('#production-drawing');
+    const trace=async(x,y)=>{
+     await stage.scrollIntoViewIfNeeded();
+     const point=await stage.locator('svg').evaluate((svg,p)=>{
+      const point=new DOMPoint(...p).matrixTransform(svg.getScreenCTM());
+      return {x:point.x,y:point.y};
+     },[x,y]);
+     if(viewport.name==='mobile')await page.touchscreen.tap(point.x,point.y);
+     else await page.mouse.click(point.x,point.y);
+    };
+    const choose=async(label)=>{
+     const prompt=page.getByRole('dialog',{name:'De quel côté va le double pli ?'});
+     await prompt.waitFor();
+     const face=prompt.locator('[name=face]');
+     if(await face.count())await face.selectOption('left');
+     await prompt.getByRole('button',{name:label,exact:true}).click();
+     await prompt.waitFor({state:'hidden'});
+    };
+    const arc=()=>stage.locator('svg > path[d*=" A5 5 "]').first().getAttribute('d');
+    await page.locator('[data-new-drawing]').click();
+    await trace(210,275);await trace(520,275);await trace(365,275);
+    await choose('Annuler');
+    assert.equal(await stage.locator('[data-draw-point]').count(),2);
+    await trace(365,275);await choose('Intérieur');
+    assert.match(await arc(),/ A5 5 0 0 1 /,'le retour intérieur est du côté opposé à la peinture');
+    await page.locator('[data-drawing-undo]').click();
+    await trace(365,275);await choose('Extérieur');
+    assert.match(await arc(),/ A5 5 0 0 0 /,'le retour extérieur suit la face colorée');
+    await page.locator('[data-draw-tool="draw"]').click();
+    assert.match(await arc(),/ A5 5 0 0 0 /,'le sens reste appliqué après Terminer');
+    console.log('PASS '+viewport.name+' double pli tracé : annulation, intérieur et extérieur');
+   }
    assert.deepEqual(errors,[],'JavaScript errors: '+viewport.name);
    console.log('PASS '+viewport.name+' A/D et B/C arrondis, labels opposés, aucun chevauchement');
    await page.close();
