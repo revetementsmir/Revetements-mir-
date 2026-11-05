@@ -192,10 +192,10 @@ jobs:
           grep -F 'realisations-mir-classique-large.webp' /tmp/mir-realisations.html
           fetch "$base/assets/realisations/realisations-mir-contemporain-brun-large.webp" /tmp/mir-realisations-1.webp
           test "$(wc -c </tmp/mir-realisations-1.webp)" -gt 100000
-          grep -F 'realisations-mir-urbain-crepuscule-large.avif' /tmp/mir-realisations.html
-          grep -F 'Visuel retouché · aménagement paysager illustratif' /tmp/mir-realisations.html
-          fetch "$base/assets/realisations/realisations-mir-urbain-crepuscule-large.avif" /tmp/mir-realisations-4.avif
-          fetch "$base/assets/realisations/realisations-mir-urbain-crepuscule-mobile.avif" /tmp/mir-realisations-4-mobile.avif
+          grep -F 'realisations-mir-quebec-avec-voiture-large.avif' /tmp/mir-realisations.html
+          grep -F 'Photo originale fournie par MIR · voiture conservée' /tmp/mir-realisations.html
+          fetch "$base/assets/realisations/realisations-mir-quebec-avec-voiture-large.avif" /tmp/mir-realisations-4.avif
+          fetch "$base/assets/realisations/realisations-mir-quebec-avec-voiture-mobile.avif" /tmp/mir-realisations-4-mobile.avif
           test "$(wc -c </tmp/mir-realisations-4.avif)" -gt 50000
           test "$(wc -c </tmp/mir-realisations-4-mobile.avif)" -gt 15000
           fetch "$base/mir-realisations.css" /tmp/mir-realisations.css

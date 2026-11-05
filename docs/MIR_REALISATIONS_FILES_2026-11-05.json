@@ -36,19 +36,19 @@
     "webpMobile": "realisations-mir-classique-mobile.webp"
   },
   {
-    "slug": "realisations-mir-urbain-crepuscule",
-    "originalFilename": "96091.jpg",
-    "sha256": "775c8f523d6e35dab895b173b9b4f3238e3806c386942be61956414a1959c277",
-    "originalBytes": 349356,
+    "slug": "realisations-mir-quebec-avec-voiture",
+    "originalFilename": "1f93591b-c239-4f62-85b9-a7c7446d6c21.jpg",
+    "sha256": "3d0dd55d28501aa7f9c3a6eaa37873b3c6603f9fa41e9f3d25c81c6cf16a02d0",
+    "originalBytes": 255895,
     "resolution": [
-      1536,
-      1131
+      1461,
+      1076
     ],
-    "retouched": true,
-    "retouchSummary": "Éclairage, paysage et ambiance du crépuscule retravaillés; automobile supprimée. Original conservé séparément, aucun changement architectural intentionnel.",
-    "avifLarge": "realisations-mir-urbain-crepuscule-large.avif",
-    "avifMobile": "realisations-mir-urbain-crepuscule-mobile.avif",
-    "sha256Large": "fe992ab1db9938f10889f9619a596277f38bceb4d3a397a9e2a730348fdedf3a",
-    "sha256Mobile": "80e3d8110a0e7d56e497e2279ae489de013ba4633e1983bdf79dde204edc7ff2"
+    "retouched": false,
+    "retouchSummary": "Photographie originale fournie par MIR, voiture noire volontairement conservée. Conversions AVIF sans suppression d'objets.",
+    "avifLarge": "realisations-mir-quebec-avec-voiture-large.avif",
+    "avifMobile": "realisations-mir-quebec-avec-voiture-mobile.avif",
+    "sha256Large": "d644817624956b90bc28e162247e84aa7714c353da29812b351084055c129c8a",
+    "sha256Mobile": "629b11d9299d4f74f6b9a005e844b09bf6df6e07fdadb117e2949fd0236142b3"
   }
 ]

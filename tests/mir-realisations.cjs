@@ -20,7 +20,7 @@ test('Les trois maisons de MIR sont présentes dans Réalisations sans changemen
  for(const id of names){assert.match(h,new RegExp(id+'-large\\.webp'));assert.match(h,new RegExp(id+'-mobile\\.webp'))}
  assert.equal((h.match(/class="mir-gallery-photo-button"/g)||[]).length,4);
  assert.match(h,/Nos réalisations/);
- assert.doesNotMatch(h,/image générée pour la page d’accueil|voiture|palmier|véhicule/i);
+ assert.doesNotMatch(h,/image générée pour la page d’accueil|palmier/i);
 });
 test('La section Réalisations existante conserve ses filtres et sélection',()=>{
  const h=read('index.html');
@@ -76,13 +76,13 @@ test('Galerie en grand, clavier et retours accessibles',()=>{
 test('Quatrième réalisation publiée en AVIF, originale et variante mobile',()=>{
   const h=read('realisations.html'),js=read('mir-realisations.js'),css=read('mir-realisations.css');
   assert.match(h,/Au cœur du centre-ville de Québec/);
-  assert.match(h,/Visuel retouché · aménagement paysager illustratif/);
+  assert.match(h,/Photo originale fournie par MIR · voiture conservée/);
   assert.match(h,/data-photo="3"/);
   assert.match(h,/aria-live="polite">1 \/ 4/);
   assert.match(js,/Au cœur du centre-ville de Québec/);
   assert.match(css,/mir-gallery-card-twilight/);
   for(const kind of ['large','mobile']){
-    const file='assets/realisations/realisations-mir-urbain-crepuscule-'+kind+'.avif';
+    const file='assets/realisations/realisations-mir-quebec-avec-voiture-'+kind+'.avif';
     assert.match(h,new RegExp(file.replaceAll('.','\\.')));
     const b=fs.readFileSync(path.join(root,file));
     assert.ok(b.length>15000,file);
