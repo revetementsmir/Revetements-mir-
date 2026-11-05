@@ -99,10 +99,10 @@
   if(!L||!E||!C){$('#elevation').textContent='Les outils de dessin et de métrés n’ont pas chargé. Rechargez la page.';return;}
   const NEUTRAL='#d3d6cd', patternNames={lap:'Clin',vertical:'Lames verticales',panel:'Panneau',brick:'Maçonnerie',plain:'Uni',shingle:'Bardeau'};
   const orientationNames={horizontal:'Horizontale',vertical:'Verticale'};
-  const defaults = () => ({version:2,catalogueVersion:4,face:data.faces.find(f=>f.importedStatus==='assigned')?.key||'front',view:'3d',displayMode:'client',alignWindow:true,selected:{kind:'zone',id:'pignon_gauche'},selections:{},customZones:{front:[],right:[],back:[],left:[]},zoneOverrides:{},openingOverrides:{},addedOpenings:{front:[],right:[],back:[],left:[]},bands:{},openingTrims:{},panelLayouts:{},transitions:[],manualTransitionModes:{},panelStockRotation:true,volumeOverride:null,recessOverride:null,soffitId:'kaycan-sp600-vented',soffitColor:NEUTRAL,fasciaId:'kaycan-fascia-6-0480',fasciaColor:NEUTRAL,rotation:28});
+  const defaults = () => ({version:2,catalogueVersion:4,face:data.faces.find(f=>f.importedStatus==='assigned')?.key||'front',view:'3d',displayMode:'client',alignWindow:true,selected:{kind:'zone',id:'pignon_gauche'},selections:{},customZones:{front:[],right:[],back:[],left:[]},zoneOverrides:{},openingOverrides:{},addedOpenings:{front:[],right:[],back:[],left:[]},bands:{},openingTrims:{},openingStyles:{},panelLayouts:{},transitions:[],manualTransitionModes:{},panelStockRotation:true,volumeOverride:null,recessOverride:null,soffitId:'kaycan-sp600-vented',soffitColor:NEUTRAL,fasciaId:'kaycan-fascia-6-0480',fasciaColor:NEUTRAL,rotation:28});
   let state=defaults(),history=[],detection=false,neutral=false,drawMode=null,drag=null,toastTimer,selectedJoint=null,suppressClick=false;
   try {const old=JSON.parse(localStorage.getItem(STORAGE));if(old?.version===2&&data.faces.some(f=>f.key===old.face))state={...state,...old};}catch(_){}
-  for(const field of ['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','panelLayouts'])if(!state[field]||typeof state[field]!=='object'||Array.isArray(state[field]))state[field]=defaults()[field];
+  for(const field of ['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','openingStyles','panelLayouts'])if(!state[field]||typeof state[field]!=='object'||Array.isArray(state[field]))state[field]=defaults()[field];
   for(const f of data.faces){if(!Array.isArray(state.customZones[f.key]))state.customZones[f.key]=[];if(!Array.isArray(state.addedOpenings[f.key]))state.addedOpenings[f.key]=[];}
   if(!Array.isArray(state.transitions))state.transitions=[];
   if(!state.manualTransitionModes||typeof state.manualTransitionModes!=='object'||Array.isArray(state.manualTransitionModes))state.manualTransitionModes={};
@@ -114,6 +114,20 @@
   const allOpenings=f=>[...f.openings,...(state.addedOpenings[f.key]||[])].map(o=>({...o,polygon:state.openingOverrides[key(f.key,o.id)]||o.polygon}));
   const currentZone=()=>allZones(face()).find(z=>z.id===state.selected.id);
   const currentOpening=()=>allOpenings(face()).find(o=>o.id===state.selected.id);
+  const openingAppearance=(f,o)=>{
+    const saved=state.openingStyles[key(f.key,o.id)]||{};
+    const b=bounds(o.polygon),wide=o.type==='door'&&(b[2]-b[0])>(b[3]-b[1])*.65;
+    return {frameColor:validHex(saved.frameColor)?saved.frameColor:'#596b62',
+      doorColor:validHex(saved.doorColor)?saved.doorColor:'#374944',
+      design:['solid','half-glass','patio'].includes(saved.design)?saved.design:(wide?'patio':'half-glass')};
+  };
+  function setOpeningAppearance(patch){
+    const o=currentOpening();if(!o)return;
+    modify(()=>{
+      const k=key(state.face,o.id);
+      state.openingStyles[k]={...openingAppearance(face(),o),...patch};
+    });
+  }
   const colorsFor=m=>(m?.colors||[]).filter(c=>c&&typeof c==='object'&&c.id&&c.name);
   const patternsFor=m=>Array.isArray(m?.allowedPatterns)?m.allowedPatterns:[];
   const orientationsFor=m=>Array.isArray(m?.allowedOrientations)?m.allowedOrientations:[];
@@ -334,7 +348,7 @@
               '" data-mir-batten-anchor="'+esc(battens.alignment)+'" d="'+d+
               '" fill="none" stroke="#1d2b22" stroke-width="'+under+
               '" stroke-opacity=".48" pointer-events="none"/>'+
-              '<path d="'+d+'" fill="none" stroke="'+esc(c.color||'#d3d6cd')+
+              '<path d="'+d+'" fill="none" stroke="'+esc(c.battenColor||c.color||'#d3d6cd')+
               '" stroke-width="'+visible+'" pointer-events="none"/>';
           }
         }
@@ -641,6 +655,7 @@
       const battenOptions=rule?.battenSpacingOptionsIn||[];
       battenField.hidden=!battenOptions.length;
       $('#batten-spacing').value=String(c.battenSpacingIn||battenOptions[0]||12);
+      $('#batten-color').value=validHex(c.battenColor)?c.battenColor:(validHex(c.color)?c.color:'#d3d6cd');
       if(rule){
         const auto=V.breaks({polygon:item.polygon,feetPerPixel:feetPerPixel(f),material:m,choice:c,openings:allOpenings(f),
           manualTransitions:state.transitions.filter(t=>t.face===f.key&&t.zoneId===item.id)});
@@ -654,6 +669,11 @@
       renderPanelEditor(f,item,c,m);renderTransitions(f,item);
       const band=bandConfig(f,item);$('#band-enabled').checked=band.enabled;$('#band-fields').hidden=!band.enabled;$('#band-height').value=band.heightIn;const bm=productOptions('#band-brand','#band-product',bandMaterials(),band.materialId);colorOptions('#band-color',bm,band.colorId);$('#band-docs').disabled=!bm;
     }else{
+      const appearance=openingAppearance(f,item);
+      $('#opening-frame-color').value=appearance.frameColor;
+      $('#opening-door-color').value=appearance.doorColor;
+      $('#opening-door-design').value=appearance.design;
+      $('#mir-door-style-controls').hidden=item.type!=='door';
       const t=trimConfig(f,item);$('#trim-mode').value=t.mode;$('#trim-fields').hidden=t.mode==='none';$('#trim-width').value=t.faceWidthIn;const tm=productOptions('#trim-brand','#trim-product',trimMaterials(t.mode),t.materialId);colorOptions('#trim-color',tm,t.colorId);$('#trim-docs').disabled=!tm;
       $('#trim-note').textContent=`${item.type==='door'?'Trois côtés, sans seuil.':'Quatre côtés.'} Largeur apparente extérieure à la baie. Les surfaces de contour remplacent le parement qu’elles recouvrent. ${t.mode!=='none'&&!tm?'Référence commerciale de contour à compléter.':''}`;
     }
@@ -737,6 +757,7 @@
   $('#coverage-input').onchange=e=>{const value=e.target.value.trim(),n=value===''?null:Number(value),m=materialById.get(choice(face(),currentZone()).materialId),c=choice(face(),currentZone());if(value!==''&&(!(n>=.125&&n<=96)||!C.coverageSpec(m,{...c,exposureIn:n}).exposureIn)){toast('Saisissez une couvrance de pose valide en pouces.');renderControl();return;}setChoice({exposureIn:n});};
   $('#pattern').onchange=e=>{const m=materialById.get(choice(face(),currentZone()).materialId),pattern=e.target.value,orientation=pattern==='vertical'?'vertical':'horizontal';setChoice({pattern,...(['lap','vertical'].includes(pattern)&&orientationsFor(m).includes(orientation)?{orientation}:{})});};$('#orientation').onchange=e=>setChoice({orientation:e.target.value});
   $('#batten-spacing').onchange=e=>{const c=choice(face(),currentZone()),m=materialById.get(c.materialId),n=Number(e.target.value);if((m.verticalLayout?.battenSpacingOptionsIn||[]).includes(n))setChoice({battenSpacingIn:n});};
+  $('#batten-color').onchange=e=>{if(validHex(e.target.value))setChoice({battenColor:e.target.value});};
   $('#zone-colors').onclick=e=>{const b=e.target.closest('[data-color-id]');if(b)setChoice({colorId:b.dataset.colorId});};
   for(const kind of ['soffit','fascia']){
     $('#'+kind+'-brand').onchange=e=>{const rows=kind==='soffit'?soffits:fascias,m=rows.find(m=>m.brand===e.target.value);if(m)touchFinish(kind,m.id);};
@@ -744,6 +765,9 @@
   }
   $('#band-enabled').onchange=e=>setBand({enabled:e.target.checked});$('#band-height').onchange=e=>{const n=Number(e.target.value);if(n>0)setBand({heightIn:n});else renderControl();};
   $('#band-brand').onchange=e=>{const m=bandMaterials().find(m=>m.brand===e.target.value);if(m)setBand({materialId:m.id,colorId:null});};$('#band-product').onchange=e=>setBand({materialId:e.target.value,colorId:null});$('#band-color').onchange=e=>setBand({colorId:e.target.value});$('#band-docs').onclick=()=>openMaterial(bandConfig(face(),currentZone()).materialId);
+  $('#opening-frame-color').onchange=e=>{if(validHex(e.target.value))setOpeningAppearance({frameColor:e.target.value});};
+  $('#opening-door-color').onchange=e=>{if(validHex(e.target.value))setOpeningAppearance({doorColor:e.target.value});};
+  $('#opening-door-design').onchange=e=>setOpeningAppearance({design:e.target.value});
   $('#trim-mode').onchange=e=>{const m=trimMaterials(e.target.value)[0];setTrim({mode:e.target.value,materialId:m?.id||null,colorId:null});};$('#trim-width').onchange=e=>{const n=Number(e.target.value);if(n>0)setTrim({faceWidthIn:n});else renderControl();};
   $('#trim-brand').onchange=e=>{const m=trimMaterials(trimConfig(face(),currentOpening()).mode).find(m=>m.brand===e.target.value);if(m)setTrim({materialId:m.id,colorId:null});};$('#trim-product').onchange=e=>setTrim({materialId:e.target.value,colorId:null});$('#trim-color').onchange=e=>setTrim({colorId:e.target.value});$('#trim-docs').onclick=()=>openMaterial(trimConfig(face(),currentOpening()).materialId);
   $$('[data-add-joint]').forEach(b=>b.onclick=()=>{const orientation=b.dataset.addJoint;editLayout(layout=>{layout[orientation].push({id:newId('joint'),position:nextPosition(layout[orientation])});});});
@@ -937,7 +961,7 @@
   $('#export-svg').onclick=()=>{exportFile(`MIR_${state.face}_etude.svg`,'image/svg+xml',facadeSVG(face(),{export:true,annotated:state.displayMode==='atelier'}));toast('Vue SVG exportée · échelles et contours à calibrer.');};
   $('#export-pdf').onclick=async()=>{if(!window.MIRPDF?.exportPlan)return toast('L’export PDF n’a pas chargé. Rechargez la page.');const button=$('#export-pdf');button.disabled=true;button.textContent='Préparation du PDF…';try{await window.MIRPDF.exportPlan({title:'MIR · étude des quatre élévations',subtitle:'Choix fabricants, calepinage et estimations à calibrer — sans valeur de construction',filename:'MIR_Etude_annotee_4_elevations.pdf',faces:exportFaces()});toast('PDF des quatre élévations préparé avec les choix et annotations actuels.');}catch(e){toast('Le PDF n’a pas pu être créé : '+String(e.message||e));}finally{button.disabled=false;button.textContent='PDF des 4 élévations ↗';}};
   $('#export-project').onclick=()=>{const result={...clone(state),project:data.title||'MIR · étude',exportedAt:new Date().toISOString(),sourceSha256:data.sourceSha256,...sceneGeometry(),disclaimer:'Choix d’étude et estimations à calibrer. Finitions documentées, images de nuanciers officiels si disponibles ; teintes moyennes calculées pour le rendu 3D, sans valeur colorimétrique officielle. Quantités à valider avant commande.',facades:data.faces.map(f=>({face:f.key,zones:allZones(f).map(z=>({...z,selection:choice(f,z)})),openings:allOpenings(f)})),soffit:materialById.get(state.soffitId),fascia:materialById.get(state.fasciaId)};exportFile('MIR_choix_du_projet.json','application/json',JSON.stringify(result,null,2));toast('Choix, joints, contours et géométrie exportés.');};
-  const sharedFields=['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','panelLayouts','transitions','manualTransitionModes','panelStockRotation','soffitId','soffitColorId','soffitColor','fasciaId','fasciaColorId','fasciaColor','roofId','roofColorId','roofColor','roofStyle','porch','structures','concreteSteps','siteStyle','returnFinishes','volumeOverride','recessOverride'];
+  const sharedFields=['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','openingStyles','panelLayouts','transitions','manualTransitionModes','panelStockRotation','soffitId','soffitColorId','soffitColor','fasciaId','fasciaColorId','fasciaColor','roofId','roofColorId','roofColor','roofStyle','porch','structures','concreteSteps','siteStyle','returnFinishes','volumeOverride','recessOverride'];
   function syncStudy(){
     if((window.MIRProjectStore?.activeId()||null)!==(activeProject?.id||null)){location.reload();return;}
     let incoming;try{incoming=JSON.parse(localStorage.getItem(STORAGE));}catch(_){return;}if(incoming?.version!==2)return;

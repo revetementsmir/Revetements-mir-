@@ -99,3 +99,11 @@ html.mir-stage-locked,body.mir-stage-locked{overflow:hidden!important}
 .mir-accent-actions button.mir-danger{color:#923b32;border-color:#d0a59c}
 .mir-accent-actions p{grid-column:1/-1;font-size:12px;line-height:1.55;color:#435847}
 @media(max-width:550px){.mir-accent-actions{grid-template-columns:1fr}}
+
+.mir-opening-colors{padding:13px 14px;border:1px solid #c8d9c2;background:#f0f5ed;border-radius:7px;margin:12px 0;display:grid;gap:9px}
+.mir-opening-colors h3{font-size:14px;line-height:1.4}
+.mir-opening-colors label{font-weight:650;font-size:12px}
+.mir-opening-colors input[type=color],#batten-color{width:100%;min-height:44px;height:48px;background:#fff;border:1px solid #d5dfcf;border-radius:6px;padding:4px}
+.mir-opening-colors select{width:100%;min-height:44px}
+#mir-door-style-controls{display:grid;gap:9px}
+#mir-door-style-controls[hidden]{display:none}
