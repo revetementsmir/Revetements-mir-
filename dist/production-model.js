@@ -790,8 +790,8 @@ function profileSideMarkers({segments,folds},model,handles){
    const preferred=-1;
    const gap=Math.max(38,Math.ceil(1.48/Math.hypot(nx/(halfWidth+7),ny/19))+2);
    const candidate=(side,extra,slide=0)=>[
-    anchor[0]+side*(gap+extra)*nx+slide*dx/length,
-    anchor[1]+side*(gap+extra)*ny+slide*dy/length
+    anchor[0]+side*(gap+extra)*nx+slide*(b[0]-a[0])/length,
+    anchor[1]+side*(gap+extra)*ny+slide*(b[1]-a[1])/length
    ];
    position=[candidate(preferred,0),candidate(preferred,10),
     candidate(preferred,24),candidate(preferred,8,22),candidate(preferred,8,-22)].find(clear);
