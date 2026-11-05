@@ -59,6 +59,7 @@ jobs:
           node --check dist/plan-app.js
           node --check dist/studio-features.js
           node --check tests/mir-studio-interactions.cjs
+          node --check tests/mir-studio-terrain-browser.cjs
           node tests/mir-studio-interactions.cjs
           node tests/mir-pages-regressions.cjs
           node tests/mir-atelier-v4.cjs
@@ -95,6 +96,7 @@ jobs:
           node tests/mir-drawing-pan-browser.cjs
           node tests/mir-studio-wall-sections-browser.cjs
           node tests/mir-balcony-browser.cjs
+          node tests/mir-studio-terrain-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
         uses: actions/upload-artifact@v4
@@ -111,6 +113,7 @@ jobs:
             artifacts/mir-retours-*.png
             artifacts/mir-studio-wall-parts-*.png
             artifacts/mir-balcon-3d-*.png
+            artifacts/mir-terrain-fullscreen-*.png
           if-no-files-found: ignore
       - uses: actions/configure-pages@v5
       - name: Préparer uniquement le site MIR principal
