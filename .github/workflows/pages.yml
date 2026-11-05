@@ -38,6 +38,7 @@ jobs:
           node --check tests/mir-mac-flat-preview.cjs
           node --check tests/mir-direct-po-browser.cjs
           node --check tests/mir-drawing-pan-browser.cjs
+          node --check tests/mir-atelier-v4-browser.cjs
           node --check dist/production-admin-v4.js
           node --check dist/mir-procurement.js
           node --check dist/portal-client.js
@@ -110,6 +111,7 @@ jobs:
           node tests/mir-miniatures-browser.cjs
           node tests/mir-direct-po-browser.cjs
           node tests/mir-drawing-pan-browser.cjs
+          node tests/mir-atelier-v4-browser.cjs
           node tests/mir-studio-wall-sections-browser.cjs
           node tests/mir-balcony-browser.cjs
           node tests/mir-studio-terrain-browser.cjs
