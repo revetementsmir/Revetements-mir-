@@ -18,6 +18,7 @@ const safeURL=value=>{try{const u=new URL(value,location.href);return /^https?:$
 let layoutImportBusy=false;
 let jException=null;
 let rightAngleSnap=true;
+let traceHeight=14;
 let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
 const profiles={l:{name:'Pliage en L',dimensions:{A:3,B:2}},j:{name:'Pliage en J',dimensions:{A:1,B:3,C:1}},z:{name:'Pliage en Z',dimensions:{A:2,B:4,C:2}},beam5:{name:'Cache-poutre · 5 côtés',dimensions:{A:1,B:6,C:8,D:6,E:1}},omega:{name:'Oméga',dimensions:{A:1,B:2,C:4,D:2,E:1}},custom:{name:'Profil personnalisé',segments:[{label:'A',length:4},{label:'B',length:3},{label:'C',length:2}],bends:[{mode:'interior',angle:90,direction:'left'},{mode:'interior',angle:90,direction:'right'}],startAngle:0},...window.MIRBendingPresets?.catalog()};
 const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','Triangle rectangle'],['trapezoid','Trapèze'],['parallelogram','Parallélogramme'],['pointed','Côté en pointe']];
@@ -165,7 +166,7 @@ function renderTools(){
  const drawing=tool==='draw';
  const recentHem=draft.template==='custom'?(draft.bends||[]).findLastIndex(bend=>bend.mode==='hem'):-1;
  const hemNotice=recentHem<0?'':`<p class="draw-help hem-notice">Double pli · ${esc(draft.segments[recentHem].label)} → ${esc(draft.segments[recentHem+1].label)} <button type="button" data-focus-bend="${recentHem}">Modifier le pli</button></p>`;
- el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 45° / 90°</label><p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
+ el.innerHTML=drawing?`<button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3?' disabled':''}>Terminer et coter</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button><label><input id="drawing-snap" type="checkbox"${snap?' checked':''}>Grille ${draft.unit==='mm'?'1 mm':'1/4 po'}</label><label><input id="drawing-right-angle" type="checkbox"${rightAngleSnap?' checked':''}>Aimant 45° / 90°</label><label>Hauteur du plan<select id="trace-height"><option value="10"${traceHeight===10?' selected':''}>10 po</option><option value="14"${traceHeight===14?' selected':''}>14 po</option></select></label><p class="draw-help">Clique-glisse et relâche pour ajouter un côté. Shift verrouille à 90°. Pour un double pli, reviens presque sur le trait précédent.</p>${hemNotice}`:
  `<button type="button" class="draw-primary" data-new-drawing>Nouveau dessin</button><button type="button" data-draw-tool="edit" aria-pressed="${tool==='edit'}">${tool==='edit'?'Terminer la retouche':'Déplacer les points'}</button><button type="button" data-draw-tool="draw" aria-pressed="false">Continuer le tracé</button><button type="button" data-focus-dimensions>Cotes et angles ↓</button>${hemNotice}`;
 }
 function updateDrawing({keepForm=false}={}){
@@ -565,6 +566,30 @@ function magneticHeading(raw, gesture){
  }
  return raw;
 }
+function traceAlignment(start, heading, length, gesture){
+ const direction=[Math.cos(heading),Math.sin(heading)];
+ const tolerance=10/drawTransform.scale;
+ const match=target=>{
+  const component=direction[target.axis];
+  if(Math.abs(component)<.2)return null;
+  const distance=(target.anchor[target.axis]-start[target.axis])/component;
+  return distance>0?{...target,distance,error:Math.abs(distance-length)}:null;
+ };
+ if(gesture.alignment){
+  const held=match(gesture.alignment);
+  if(held&&held.error<=tolerance*1.8)return held;
+  delete gesture.alignment;
+ }
+ let best=null;
+ for(const anchor of drawPoints.slice(0,-1)){
+  for(const axis of [0,1]){
+   const candidate=match({anchor,axis});
+   if(candidate&&candidate.error<=tolerance&&(!best||candidate.error<best.error))best=candidate;
+  }
+ }
+ gesture.alignment=best;
+ return best;
+}
 function draggedSegment(event, gesture){
  const end=localPoint(event,false);
  if(!end)return null;
@@ -575,12 +600,13 @@ function draggedSegment(event, gesture){
  const heading=event.shiftKey?base+Math.round((rawHeading-base)/(Math.PI/2))*Math.PI/2:rightAngleSnap?magneticHeading(rawHeading,gesture):rawHeading;
  const length=heading!==rawHeading?Math.abs(dx*Math.cos(heading)+dy*Math.sin(heading)):Math.hypot(dx,dy);
  const step=draft.unit==='mm'?1:25.4/(snap?4:16);
- const rounded=Math.round(length/step)*step;
+ const aligned=rightAngleSnap?traceAlignment(start,heading,length,gesture):null;
+ const rounded=aligned?.distance??Math.round(length/step)*step;
  if(!rounded)return null;
  const point=[start[0]+rounded*Math.cos(heading),start[1]+rounded*Math.sin(heading)];
  const turn=previous===undefined?null:Math.abs(Math.atan2(Math.sin(heading-previous),Math.cos(heading-previous)))*180/Math.PI;
  const angle=turn===null?null:Math.round((180-turn)*10)/10;
- return {point, lengthLabel:M.formatMeasurement(rounded,draft.unit), angle};
+ return {point, lengthLabel:M.formatMeasurement(rounded,draft.unit), angle, guide:aligned?.anchor};
 }
 function drawDragPreview(segment, gesture){
  const readout=$('#trace-readout');
@@ -603,7 +629,9 @@ function drawDragPreview(segment, gesture){
   angle=`<path d="M ${ray(incoming,r).map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep>=0?1:0} ${ray(outgoing,r).map(fmt).join(' ')}" fill="none" stroke="#9c5a22" stroke-width="2"/>`+label(ax,ay,segment.angle+'°');
  }
  const line=`<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(ex)}" y2="${fmt(ey)}" stroke="#9c5a22" stroke-width="3" stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/>`;
- const content=`<g data-trace-preview pointer-events="none">${line}${angle}${label((x+ex)/2,(y+ey)/2,segment.lengthLabel)}</g>`;
+ const guide=segment.guide?pointOnView(segment.guide,drawTransform):null;
+ const alignment=guide?`<line x1="${fmt(guide[0])}" y1="${fmt(guide[1])}" x2="${fmt(ex)}" y2="${fmt(ey)}" stroke="#517e48" stroke-width="2" stroke-dasharray="4 5" vector-effect="non-scaling-stroke"/>`:'';
+ const content=`<g data-trace-preview pointer-events="none">${alignment}${line}${angle}${label((x+ex)/2,(y+ey)/2,segment.lengthLabel)}</g>`;
  const marker=svg.querySelector('.profile-side-marker');
  if(marker)marker.insertAdjacentHTML('beforebegin',content);
  else svg.insertAdjacentHTML('beforeend',content);
@@ -798,7 +826,7 @@ function handleClick(event){const button=event.target.closest('button,[data-sele
  if(button.hasAttribute('data-add-segment')){if(!unlockCustom())return;if(draft.segments.length>=26)return toast('Maximum 26 segments.');draft.segments.push({label:String.fromCharCode(65+draft.segments.length),length:draft.unit==='mm'?25.4:1});draft.bends.push({mode:'interior',angle:90,direction:'left'});renderDimensions();renderProfileOptions();updateDrawing();return;}
  if(d.removeSegment!==undefined){if(client||editingItemId||draft.segments.length<=2)return;const index=Number(d.removeSegment);draft.segments.splice(index,1);draft.bends.splice(Math.max(0,index-1),1);draft.segments.forEach((s,i)=>s.label=String.fromCharCode(65+i));renderDimensions();renderProfileOptions();updateDrawing();return;}
  if(d.drawTool){if(client||editingItemId)return;if(tool===d.drawTool){const finished=tool==='draw';tool='select';updateDrawing();if(finished)focusProfileDimensions();return;}if(!unlockCustom())return;tool=d.drawTool;view='face';const model=build();drawPoints=copy(model.pointsMM);drawTransform=fitModel(model);renderDimensions();updateDrawing();return;}
- if(button.hasAttribute('data-new-drawing')){if(client||editingItemId)return;kind='profile';draft={...draft,kind:'profile',template:'custom',segments:[],bends:[],startAngle:0,name:'Profil dessiné'};delete draft.dimensions;tool='draw';view='face';drawPoints=[];drawTransform={scale:1,ox:140,oy:395};renderDimensions();updateDrawing();return;}
+ if(button.hasAttribute('data-new-drawing')){if(client||editingItemId)return;kind='profile';draft={...draft,kind:'profile',template:'custom',segments:[],bends:[],startAngle:0,name:'Profil dessiné'};delete draft.dimensions;tool='draw';view='face';drawPoints=[];drawTransform={scale:520/(traceHeight*25.4),ox:140,oy:395};renderDimensions();updateDrawing();return;}
  if(button.hasAttribute('data-drawing-undo')){if(!drawPoints.length||client||editingItemId)return;drawPoints.pop();const next=toCustom(drawPoints);if(next)draft=next;else{draft.segments=[];draft.bends=[];}renderDimensions();updateDrawing();return;}
 }
 function handleInput(event){const e=event.target,d=e.dataset;
@@ -836,6 +864,16 @@ function handleChange(event){const e=event.target,d=e.dataset;
  if(e.id==='material-type'){draft.material={type:e.value,name:kind==='panel'&&e.value!=='aluminium-extrude'?'Unico U-P1 — '+(e.value==='acier'?'Acier':'Aluminium plié'):'',productRef:kind==='panel'&&e.value!=='aluminium-extrude'?'unico-up1-'+e.value:null,thickness:'',thicknessUnit:kind==='panel'?'mm':draft.unit,gauge:''};colorId='';draft.finish={};colorSystem=kind==='panel'?(e.value==='aluminium-extrude'?'ral':'manufacturer'):colorSystem;materialId=availableMaterials().find(m=>m.metalType===e.value)?.id||availableMaterials()[0]?.id||'';renderFormMetadata();renderColors();updateDrawing();return;}
  if(e.id==='material-thickness'){formMetadata();updateDrawing();return;}
  if(e.id==='material-gauge'&&kind==='panel'){formMetadata();if(!availableMaterials().some(m=>m.id===materialId)){materialId=availableMaterials()[0]?.id||'';colorId='';draft.finish={};}renderColors();updateDrawing();return;}
+ if(e.id==='trace-height'){
+  traceHeight=Number(e.value);
+  const scale=520/(traceHeight*25.4);
+  const old=drawTransform;
+  drawTransform=drawPoints.length
+   ?{scale,ox:400+(old.ox-400)*scale/old.scale,oy:260+(old.oy-260)*scale/old.scale}
+   :{scale,ox:140,oy:395};
+  updateDrawing({keepForm:true});
+  return;
+ }
  if(e.id==='drawing-snap'){snap=e.checked;return;}
  if(e.id==='drawing-right-angle'){rightAngleSnap=e.checked;return;}
  if(d.itemQuantity){const item=order.items.find(row=>row.id===d.itemQuantity),quantity=Number(e.value);if(!item||!Number.isSafeInteger(quantity)||quantity<1){e.value=item?.spec.quantity||1;toast('Indiquez une quantité entière supérieure à zéro.');return;}const out=M.reviseInstance({snapshot:item.snapshot,history:item.history||[]},{quantity});if(!out.ok){toast(out.errors.map(err=>err.message).join(' '));return;}item.spec=copy(out.spec);item.snapshot=copy(out.snapshot);item.history=copy(out.history);persist();renderOrder();if(editingItemId===item.id){draft.quantity=quantity;$('#production-quantity').value=quantity;}return;}
