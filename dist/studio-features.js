@@ -10,6 +10,10 @@
   const roofControls=api.roofControls!==false;
   const roofBrands=[...new Set(roofs.map(m=>m.brand))];
   const wraps=materials.filter(m=>m.applications.includes('bending'));
+  // L'habillage métallique est distinct de la matière porteuse.
+  const metalWraps=metal=>wraps.filter(m=>metal==='steel'?
+    /acier|steel|vicwest/i.test(m.name+' '+m.family+' '+m.brand):
+    metal==='aluminum'?/aluminium|aluminum|kaycan|gentek/i.test(m.name+' '+m.family+' '+m.brand):true);
   const siding=materials.filter(m=>m.applications.some(a=>['siding','masonry'].includes(a)));
   let part='facade',returnId=state().selected?.kind==='return'&&state().selected.id==='return-right'?'return-right':'return-left',objectUrl=null;
   const study=!imported&&root.MIR3D?.studyDefaults?root.MIR3D.studyDefaults(data().dimensions):{};
@@ -101,8 +105,12 @@
        ' % <button type="button" data-use-pixel-stair="'+i+'">Placer ces dimensions en 3D</button></p>').join('')+'</section>':'';
    const o=currentStructure();if(!o)return `<div class="extra-panel"><p class="eyebrow">LES ÉLÉMENTS MÉTALLIQUES</p><h2>Poutres & colonnes</h2>${pixelEvidence}${evidence}<p>Ajoutez un élément repéré sur votre plan pour choisir son habillage. Un poteau dessiné ne permet pas, à lui seul, de connaître sa matière.</p><div class="compact-actions"><button data-add-structure="column">＋ Colonne</button><button data-add-structure="beam">＋ Poutre</button></div></div>`;
    const m=byId.get(o.finishMaterialId),c=officialColor(m,{colorId:o.colorId}),d=dimensions()||{width:0,depth:0};
+   const metal=o.finishMetal||'aluminum';
+   const compatible=metalWraps(metal);
+   const selectedColor=/^#[0-9a-f]{6}$/i.test(o.finishColorOverride||'')?o.finishColorOverride:
+     /^#[0-9a-f]{6}$/i.test(c.color||'')?c.color:/^#[0-9a-f]{6}$/i.test(o.color||'')?o.color:'#a9aaa7';
    const fields=[['x','Depuis la gauche (pi)',ft(o.origin[0]+d.width/2)],['y','Devant la façade (pi)',ft(-o.origin[1]-d.depth/2)],['z','Hauteur de départ (pi)',ft(o.origin[2])],['w','Largeur (po)',o.size[0]/.0254],['depth','Profondeur (po)',o.size[1]/.0254],['h','Hauteur (pi)',ft(o.size[2])]];
-   return `<div class="extra-panel"><p class="eyebrow">POUTRES & COLONNES</p><h2>Les détails qui changent tout.</h2>${pixelEvidence}${evidence}<label for="structure-select">Élément à modifier</label><select id="structure-select">${state().structures.map(x=>`<option value="${esc(x.id)}"${x.id===o.id?' selected':''}>${esc(x.label||x.id)}</option>`).join('')}</select><p class="structure-meta">${esc(o.sourceStatus==='user-added'?'Élément ajouté au projet.':o.provenance||'Repéré sur le plan; dimensions de représentation à confirmer.')} Le support et son habillage sont deux choix distincts.</p><label for="structure-wrap">Habillage / métal de finition</label><select id="structure-wrap"><option value="">Choisir un produit de finition</option>${optionHTML(wraps,o.finishMaterialId)}</select>${choiceHTML(m,o.colorId,'data-structure-color')}<p class="small-note">${esc(m?.colorStatus==='collection_only'?'Teintes de collection; disponibilité du rouleau à confirmer.':'Choisissez une couleur documentée du produit d’habillage.')}</p><details><summary>Position et dimensions</summary><div class="pair">${fields.map(([k,label,v])=>`<label>${label}<input type="number" data-structure-field="${k}" value="${fmt(v)}" step="0.125"></label>`).join('')}</div><label for="structure-support">Matière du support</label><select id="structure-support"><option value="unknown">À confirmer sur le plan</option><option value="steel"${o.material==='steel'?' selected':''}>Acier</option><option value="aluminum"${o.material==='aluminum'?' selected':''}>Aluminium</option><option value="wood"${o.material==='wood'?' selected':''}>Bois</option></select><button data-delete-structure class="delete-region">Retirer cet élément du projet</button></details><div class="compact-actions"><button data-add-structure="column">＋ Colonne</button><button data-add-structure="beam">＋ Poutre</button></div></div>`;
+   return `<div class="extra-panel"><p class="eyebrow">POUTRES & COLONNES</p><h2>Les détails qui changent tout.</h2>${pixelEvidence}${evidence}<label for="structure-select">Élément à modifier</label><select id="structure-select">${state().structures.map(x=>`<option value="${esc(x.id)}"${x.id===o.id?' selected':''}>${esc(x.label||x.id)}</option>`).join('')}</select><p class="structure-meta">${esc(o.sourceStatus==='user-added'?'Élément ajouté au projet.':o.provenance||'Repéré sur le plan; dimensions de représentation à confirmer.')} Le support et son habillage sont deux choix distincts.</p><label for="structure-finish-metal">Métal de l'habillage (indépendant du support)</label><select id="structure-finish-metal"><option value="aluminum"${metal==='aluminum'?' selected':''}>Aluminium</option><option value="steel"${metal==='steel'?' selected':''}>Acier</option></select><label for="structure-wrap">Fournisseur / feuille de finition</label><select id="structure-wrap"><option value="">Sélectionner la feuille ou le rouleau</option>${optionHTML(compatible,o.finishMaterialId)}</select><label for="structure-custom-color">Couleur visible de l'habillage / poutre / colonne</label><input type="color" id="structure-custom-color" value="${selectedColor}" aria-label="Choisir la couleur de l'habillage de la poutre ou colonne"><p class="small-note">La couleur manuelle sert à la visualisation. Utilisez un nuancier fabricant pour la référence à commander.</p>${choiceHTML(m,o.colorId,'data-structure-color')}<p class="small-note">${esc(m?.colorStatus==='collection_only'?'Teintes de collection; disponibilité du rouleau à confirmer.':'Choisissez une couleur documentée du produit d’habillage.')}</p><details><summary>Position et dimensions</summary><div class="pair">${fields.map(([k,label,v])=>`<label>${label}<input type="number" data-structure-field="${k}" value="${fmt(v)}" step="0.125"></label>`).join('')}</div><label for="structure-support">Matière du support</label><select id="structure-support"><option value="unknown">À confirmer sur le plan</option><option value="steel"${o.material==='steel'?' selected':''}>Acier</option><option value="aluminum"${o.material==='aluminum'?' selected':''}>Aluminium</option><option value="wood"${o.material==='wood'?' selected':''}>Bois</option></select><button data-delete-structure class="delete-region">Retirer cet élément du projet</button></details><div class="compact-actions"><button data-add-structure="column">＋ Colonne</button><button data-add-structure="beam">＋ Poutre</button></div></div>`;
   }
   function renderUI(){
    ensureState();
@@ -137,7 +145,7 @@
    const band=root.MIRStudioWallParts?.masonryBand(front,dimensions());
    const brick=band&&masonry?api.choice(front,masonry):null;
    const returnMasonry=brick&&band?.heightMeters>0?{heightMeters:band.heightMeters,color:brick.color,sourceStatus:'same-front-masonry-Z-unverified'}:null;
-   return {zoom:c.cameraZoom,siteStyle:c.siteStyle,concreteSteps:c.concreteSteps,returnMasonry,roofColor:c.roofColor||'#4a4c4b',roofStyle:c.roofStyle,foundationDrop:data().detectedVolume?(data().detectedVolume.foundationDrop??0):.8,roofExposureIn:roof?.exposureIn||null,soffitCoverageIn:soffit?.pieceCoverageIn||soffit?.exposureIn||null,elevation:c.cameraElevation,porch:c.porch,structures:c.structures.map(o=>({...o,color:o.finishMaterialId?officialColor(byId.get(o.finishMaterialId),{colorId:o.colorId}).color:o.color||'#a9aaa7'})),dimensions:dimensions(),returnColors:rs};
+   return {zoom:c.cameraZoom,siteStyle:c.siteStyle,concreteSteps:c.concreteSteps,returnMasonry,roofColor:c.roofColor||'#4a4c4b',roofStyle:c.roofStyle,foundationDrop:data().detectedVolume?(data().detectedVolume.foundationDrop??0):.8,roofExposureIn:roof?.exposureIn||null,soffitCoverageIn:soffit?.pieceCoverageIn||soffit?.exposureIn||null,elevation:c.cameraElevation,porch:c.porch,structures:c.structures.map(o=>({...o,color:o.finishColorOverride|| (o.finishMaterialId?officialColor(byId.get(o.finishMaterialId),{colorId:o.colorId}).color:o.color||'#a9aaa7')})),dimensions:dimensions(),returnColors:rs};
   }
   function returnViews(patternDef){
    ensureState();
@@ -246,7 +254,7 @@
   $('#extra-controls').onclick=e=>{
    const rc=e.target.closest('[data-roof-color]'),sc=e.target.closest('[data-structure-color]'),ret=e.target.closest('[data-return-color]'),add=e.target.closest('[data-add-structure]'),hint=e.target.closest('[data-add-hint]'),pixelStair=e.target.closest('[data-use-pixel-stair]'),sel=e.target.closest('[data-select-return]');
    if(rc&&roofControls&&colorsFor(byId.get(state().roofId)).some(c=>c.id===rc.dataset.roofColor)){const colorId=rc.dataset.roofColor;modify(()=>{state().roofColorId=colorId;normalizeRoof();});[...$('#extra-controls').querySelectorAll('[data-roof-color]')].find(b=>b.dataset.roofColor===colorId)?.focus({preventScroll:true});}
-   if(sc){const o=currentStructure();if(o)modify(()=>{o.colorId=sc.dataset.structureColor;o.color=officialColor(byId.get(o.finishMaterialId),{colorId:o.colorId}).color;});}
+   if(sc){const o=currentStructure();if(o)modify(()=>{o.colorId=sc.dataset.structureColor;o.finishColorOverride=null;o.color=officialColor(byId.get(o.finishMaterialId),{colorId:o.colorId}).color;});}
    if(ret)modify(()=>state().returnFinishes[returnId]=api.normalChoice({...returnChoice(returnId),colorId:ret.dataset.returnColor}));
    if(add)addStructure(add.dataset.addStructure);if(pixelStair)applyPixelStairs(Number(pixelStair.dataset.usePixelStair));if(hint)addDetectedHint(Number(hint.dataset.addHint));if(sel)selectPart('return',sel.dataset.selectReturn);
    if(roofControls&&e.target.closest('[data-roof-docs]'))openMaterial(state().roofId);
@@ -257,7 +265,19 @@
    if(t.id==='roof-brand'&&roofControls){const m=roofs.find(m=>m.brand===t.value);if(m)selectRoof(m.id,'roof-brand');}
    if(t.id==='roof-product')selectRoof(t.value);
    if(t.id==='structure-select')selectPart('structure',t.value);
-   if(t.id==='structure-wrap'){const o=currentStructure();if(o)modify(()=>{o.finishMaterialId=t.value;o.colorId=null;o.color='#a9aaa7';});}
+   if(t.id==='structure-finish-metal'){
+    const o=currentStructure();if(o)modify(()=>{o.finishMetal=t.value;o.finishMaterialId=null;o.colorId=null;
+      o.finishColorOverride=null;o.color=t.value==='steel'?'#70777b':'#a9aaa7';});
+   }
+   if(t.id==='structure-wrap'){const o=currentStructure();if(o)modify(()=>{
+     const m=byId.get(t.value);
+     if(m&&!metalWraps(o.finishMetal||'aluminum').some(p=>p.id===m.id))return;
+     o.finishMaterialId=m?.id||null;o.colorId=null;o.finishColorOverride=null;
+     o.color=m?officialColor(m,{}).color:(o.finishMetal==='steel'?'#70777b':'#a9aaa7');
+   });}
+   if(t.id==='structure-custom-color'){const o=currentStructure();if(o&&/^#[0-9a-f]{6}$/i.test(t.value))modify(()=>{
+     o.finishColorOverride=t.value;o.color=t.value;o.colorId=null;
+   });}
    if(t.id==='structure-support'){const o=currentStructure();if(o)modify(()=>o.material=t.value);}
    if(t.dataset.structureField)updateStructure(t.dataset.structureField,Number(t.value));
    if(t.id==='return-product')modify(()=>state().returnFinishes[returnId]=api.normalChoice({materialId:t.value}));
