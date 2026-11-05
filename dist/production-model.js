@@ -730,7 +730,40 @@
     const scale=Math.min(190/(fitted.maxX-fitted.minX),138/(fitted.maxY-fitted.minY));
     return scale<1?'<g transform="translate('+decimal(3-fitted.minX*scale)+' '+decimal(3-fitted.minY*scale)+') scale('+decimal(scale)+')">'+drawing+'</g>':drawing;
   }
-  function bendingSheetPages(order) {
+  const PROFILE_GROUPS = ['L','L replié','J','Z','Fascia','Oméga','Beam','Colonne','Solin brique','Coin architectural','Éloignement des eaux','Profils personnalisés'];
+  function profileFamily(item) {
+    const name=item.name.toLowerCase();
+    for(const [pattern,label] of [[/^fascia/,'Fascia'],[/^beam|^cache-poutre/,'Beam'],[/^colonne/,'Colonne'],[/solin brique/,'Solin brique'],[/^coin architectural/,'Coin architectural'],[/^éloignement des eaux/,'Éloignement des eaux'],[/^oméga/,'Oméga']]){
+      if(pattern.test(name))return label;
+    }
+    const bends=item.bends.filter(bend=>bend&&Math.abs(bend.turnDeg)>1e-5);
+    const regular=bends.filter(bend=>bend.mode!=='hem');
+    if(regular.length===1)return bends.length===1?'L':'L replié';
+    if(regular.length===2&&bends.length===2)return Math.sign(regular[0].turnDeg)===Math.sign(regular[1].turnDeg)?'J':'Z';
+    return null;
+  }
+  function groupProfiles(items,overrides={}) {
+    const groups=new Map(), customLabels=new Map(), counts=new Map();
+    for(const item of items){
+      let group=item.kind==='profile'?(PROFILE_GROUPS.includes(overrides[item.id])?overrides[item.id]:profileFamily(item)):'Panneaux';
+      if(!group){
+        const turns=item.bends.map(bend=>bend?.mode==='hem'?'R':!bend?.turnDeg?'D':bend.turnDeg>0?'+':'-').join('');
+        const mirror=value=>value.replace(/[+-]/g,sign=>sign==='+'?'-':'+');
+        const reverse=[...turns].reverse().join('');
+        const signature=[turns,mirror(turns),reverse,mirror(reverse)].sort()[0];
+        if(!customLabels.has(signature)){
+          const sides=item.segments.length,index=(counts.get(sides)||0)+1;
+          counts.set(sides,index);
+          customLabels.set(signature,'Profil personnalisé · '+sides+' côtés · type '+index);
+        }
+        group=customLabels.get(signature);
+      }
+      if(!groups.has(group))groups.set(group,[]);
+      groups.get(group).push(item);
+    }
+    return groups;
+  }
+  function bendingSheetPages(order, profileGroups) {
     const width=850,height=1100,columns=[40,458,550,665,733,810],lineHeight=14;
     const project=wrapLines('CHANTIER : '+(order.project||'À préciser'),88);
     const foreman=wrapLines('CONTREMAÎTRE : '+(order.foreman||'À préciser'),88);
@@ -745,21 +778,21 @@
       const bend=item.bends[index];
       return [segment.label+' = '+formatMeasurement(segment.lengthMM,item.unit),...(bend?['Pli '+bend.from+'–'+bend.to+' : '+bend.label]:[])];
     });
-    for(const item of order.items){
+    for(const [family,items] of groupProfiles(order.items,profileGroups))for(const item of items){
       const title=lines([item.id+' · '+item.name],55);
       const face=item.coloredFace?.side?['* Face '+(item.coloredFace.side==='left'?'gauche':'droite')+' · côté '+item.coloredFace.segmentId]:[];
       const details=lines([...compactLengths(item),...face,...(item.location?['Repère : '+item.location]:[]),...(item.note?[item.note]:[])],33);
       const material=lines(materialLines(item),13),finish=lines(finishLines(item),16);
       const checks=lines([...item.validation.errors,...item.validation.pending].map(issue=>issue.message),90).filter(Boolean);
       for(let start=0;start<Math.max(details.length,material.length,finish.length,1);start+=23){
-        const fragment={item,title:start?lines([item.id+' · Suite des cotes'],55):title,details:take(details,start),material:take(material,start),finish:take(finish,start),continuation:start>0};
+        const fragment={family,item,title:start?lines([item.id+' · Suite des cotes'],55):title,details:take(details,start),material:take(material,start),finish:take(finish,start),continuation:start>0};
         const textHeight=Math.max(fragment.details.length,fragment.material.length,fragment.finish.length,1)*lineHeight;
         fragment.height=Math.max(215,fragment.title.length*lineHeight+textHeight+24);
         rows.push(fragment);
       }
       for(let start=0;start<checks.length;start+=23){
         const content=take(checks,start);
-        rows.push({title:[item.id+' · Points à compléter'],note:content,height:content.length*lineHeight+42});
+        rows.push({family,title:[item.id+' · Points à compléter'],note:content,height:content.length*lineHeight+42});
       }
     }
     const orderNotes=lines([...(order.notes?['Notes du dossier : '+order.notes]:[]),...order.errors.map(error=>error.message)],90);
@@ -769,8 +802,12 @@
     }
     let y=tableY+headingH;
     for(const row of rows){
-      if(y+row.height>bodyLimit&&pages.at(-1).length){pages.push([]);y=tableY+headingH;}
-      pages.at(-1).push({...row,y});y+=row.height;
+      let heading=row.family&&pages.at(-1).at(-1)?.family!==row.family;
+      if(y+row.height+(heading?23:0)>bodyLimit&&pages.at(-1).length){
+        pages.push([]);y=tableY+headingH;heading=!!row.family;
+      }
+      if(heading)y+=23;
+      pages.at(-1).push({...row,y,heading});y+=row.height;
     }
     const rect=(x,y,w,h,fill)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="#727c72"/>`;
     return pages.map((page,index)=>{
@@ -787,6 +824,10 @@
       for(const x of columns.slice(1,-1))svg+=`<path d="M${x} ${tableY}v${headingH}" stroke="#727c72"/>`;
       for(const row of page){
         const {item,y}=row;
+        if(row.heading){
+          svg+=rect(40,y-23,770,23,'#edf2eb');
+          svg+=svgText(49,y-7,row.family,'font-size="12" font-weight="700"');
+        }
         svg+=rect(40,y,770,row.height,'#fff');
         svg+=multiline(49,y+17,row.title,{width:55,lineHeight,attrs:'font-size="12" font-weight="700"'}).svg;
         if(row.note){
@@ -812,9 +853,9 @@
       return {name:'Mise en production · '+(index+1)+'/'+pages.length,svg:svg+svgClose,layout:'bending-sheet'};
     });
   }
-  function productionPages(input = {}, {layout} = {}) {
+  function productionPages(input = {}, {layout, profileGroups} = {}) {
     const order = buildOrder(input), fragments = [];
-    if (layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return bendingSheetPages(order);
+    if (layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return bendingSheetPages(order,profileGroups);
     const documentTitle = order.requiresQuote ? 'Demande de soumission' : 'Mise en production';
     for (const item of order.items) {
       const details = productionDetailLines(item).flatMap(line => wrapLines(line, 37));
@@ -1052,5 +1093,5 @@
   }
 
   function validate(spec) { return modelOf(spec).validation; }
-  return Object.freeze({ version: VERSION, TEMPLATES, SHAPES, parseMeasurement, formatMeasurement, quotePolicy, pricePiece, priceDossier, buildProfile, buildPanel, mirrorPanelSpec, insertDoubleFold, validate, profileSVG, panelSVG, buildOrder, productionPages, createTemplate, templatePreview, instantiateTemplate, configureTemplate: instantiateTemplate, createOrderSnapshot: instantiateTemplate, reviseInstance, revision: reviseInstance, createTemplateRevision });
+  return Object.freeze({ version: VERSION, TEMPLATES, SHAPES, PROFILE_GROUPS:Object.freeze(PROFILE_GROUPS), groupProfiles, parseMeasurement, formatMeasurement, quotePolicy, pricePiece, priceDossier, buildProfile, buildPanel, mirrorPanelSpec, insertDoubleFold, validate, profileSVG, panelSVG, buildOrder, productionPages, createTemplate, templatePreview, instantiateTemplate, configureTemplate: instantiateTemplate, createOrderSnapshot: instantiateTemplate, reviseInstance, revision: reviseInstance, createTemplateRevision });
 });
