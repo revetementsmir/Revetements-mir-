@@ -815,7 +815,9 @@
       const layout=type==='roof'?roofCourses(face.poly,options.roofExposureIn):soffitCourses(face.poly,options.soffitCoverageIn);
       return {surfaceId:face.id,spacingMeters:layout.spacingMeters,lineCount:layout.segments.length,reason:layout.reason};
     });
-    return { rendered:true, renderId:token, angle,elevation:elevationDegrees,zoom,siteStyle:site?'commercial':'none',sitePlan:site?{parkingBayCount:site.parkingBayCount,sourceStatus:site.sourceStatus,noVehicles:true}:null,returnMasonry:options.returnMasonry||null,roofColor, ...geometrySummary(mesh), foundationDrop:mesh.foundationDrop, groundZ:mesh.ground, soffitVisualization:soffitType, missingViews:['front','right','back','left'].filter(key=>!images[key]), visibleFaces:visible.map(f=>f.id), hitSurfaces:state.hitSurfaces,textureWorldHeights, textureBounds, textureScales,textureScaleWarnings,coveringLayouts:{roof:coveringLayouts('roof'),soffit:coveringLayouts('soffit')},errors };
+    const result = { rendered:true, renderId:token, angle,elevation:elevationDegrees,zoom,siteStyle:site?'commercial':'none',sitePlan:site?{parkingBayCount:site.parkingBayCount,sourceStatus:site.sourceStatus,noVehicles:true}:null,returnMasonry:options.returnMasonry||null,roofColor, ...geometrySummary(mesh), foundationDrop:mesh.foundationDrop, groundZ:mesh.ground, soffitVisualization:soffitType, missingViews:['front','right','back','left'].filter(key=>!images[key]), visibleFaces:visible.map(f=>f.id), hitSurfaces:state.hitSurfaces,textureWorldHeights, textureBounds, textureScales,textureScaleWarnings,coveringLayouts:{roof:coveringLayouts('roof'),soffit:coveringLayouts('soffit')},errors };
+    state.lastResult=result;
+    return result;
   }
 
   async function render(canvas, options = {}) {
@@ -851,11 +853,15 @@
     return draw(canvas,snapshot,images,state,token,errors);
   }
 
+  function diagnostics(canvas) {
+    return states.get(canvas)?.lastResult || null;
+  }
+
   function dispose(canvas) {
     const state=states.get(canvas);if(!state)return;
     state.token=++renderCounter;if(state.observer)state.observer.disconnect();
     if(state.frame)global.cancelAnimationFrame(state.frame);states.delete(canvas);
   }
 
-  global.MIR3D=Object.freeze({render,dispose,geometry,mesh:exportMesh,pick,projectPoint,roofCourses,soffitCourses,commercialSitePlan,studyDefaults,studyStructureDefaults,version:'1.8.0',defaults:DEFAULTS,recessDefaults:RECESS_DEFAULTS,porchDefaults:PORCH_DEFAULTS});
+  global.MIR3D=Object.freeze({render,dispose,diagnostics,geometry,mesh:exportMesh,pick,projectPoint,roofCourses,soffitCourses,commercialSitePlan,studyDefaults,studyStructureDefaults,version:'1.8.0',defaults:DEFAULTS,recessDefaults:RECESS_DEFAULTS,porchDefaults:PORCH_DEFAULTS});
 })(window);
