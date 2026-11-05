@@ -41,10 +41,14 @@ jobs:
           node --check tests/mir-homepage.cjs
           node --check tests/mir-homepage-browser.cjs
           node tests/mir-homepage.cjs
+          node --check tests/mir-client-header.cjs
+          node tests/mir-client-header.cjs
+          node --check tests/mir-client-header-browser.cjs
       - name: Vérifier l'accueil MIR en vrai navigateur Chrome
         run: |
           npm install --no-save playwright@1.58.2
           node tests/mir-homepage-browser.cjs
+          node tests/mir-client-header-browser.cjs
           node tests/mir-miniatures-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
@@ -53,6 +57,7 @@ jobs:
           name: mir-accueil-responsive
           path: |
             artifacts/mir-accueil-*.png
+            artifacts/mir-entete-*.png
             artifacts/mir-miniatures-*.png
           if-no-files-found: ignore
       - uses: actions/configure-pages@v5
@@ -91,9 +96,15 @@ jobs:
           grep -F 'assets/MIR-logo-officiel-original.svg' /tmp/mir-homepage.html
           grep -F 'Mon compte' /tmp/mir-homepage.html
           grep -F 'Découvrir nos revêtements' /tmp/mir-homepage.html
-          grep -F 'Voir nos réalisations' /tmp/mir-homepage.html
+          grep -F 'Voir notre boutique' /tmp/mir-homepage.html
           fetch "$base/assets/MIR-logo-officiel-original.svg" /tmp/mir-logo.svg
           grep -F 'viewBox="0 0 363.68 91.133"' /tmp/mir-logo.svg
+          fetch "$base/mir-client-header.css" /tmp/mir-client-header.css
+          grep -F '.mir-client-header' /tmp/mir-client-header.css
+          fetch "$base/boutique.html" /tmp/mir-boutique.html
+          grep -F 'mir-client-header.css?v=1' /tmp/mir-boutique.html
+          fetch "$base/plan.html" /tmp/mir-plan-public.html
+          grep -F 'mir-client-header.css?v=1' /tmp/mir-plan-public.html
           fetch "$base/mir-home-premium.css" /tmp/mir-home-premium.css
           grep -F '.mir-home-showcase' /tmp/mir-home-premium.css
           fetch "$base/metres.html" /tmp/metres.html
