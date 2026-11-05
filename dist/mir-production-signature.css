@@ -34,3 +34,14 @@ html.mir-production-client .mir-production-steps p{color:#596f5b;font-size:12px;
   html.mir-production-client .production-intro h1{font-size:clamp(37px,9.5vw,52px);letter-spacing:-.045em}
 }
 @media(prefers-reduced-motion:reduce){html.mir-production-client *{scroll-behavior:auto}}
+
+/* Sur petits téléphones, une seule colonne de cotes évite les champs coupés.
+   Les gabarits restent défilables dans leur bande, pas dans la page. */
+@media(max-width:600px){
+  html.mir-production-client .dimension-fields,
+  html.mir-production-client .two-fields,
+  html.mir-production-client .three-fields{grid-template-columns:minmax(0,1fr)}
+  html.mir-production-client .dimension-fields > *,
+  html.mir-production-client .fraction-field{min-width:0;max-width:100%}
+  html.mir-production-client .fraction-field > input{min-width:0;max-width:100%}
+}
