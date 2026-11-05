@@ -5,7 +5,8 @@
   const names=[
     {title:'Jeux de matières',file:'realisations-mir-contemporain-brun-large.webp',alt:'Maison contemporaine à revêtement brun et maçonnerie claire',caption:'Les volumes, les revêtements et la pierre de cette réalisation MIR.'},
     {title:'Lignes contemporaines',file:'realisations-mir-contrastes-large.webp',alt:'Maison à toit incliné avec panneaux noirs, clins pâles et pierres grises',caption:'Jeux de panneaux, joints et lignes horizontales sur cette réalisation MIR.'},
-    {title:'Un classique réinventé',file:'realisations-mir-classique-large.webp',alt:'Maison à pignons gris et blancs avec galerie donnant sur le jardin',caption:'Un revêtement gris et des encadrements clairs autour de grands pignons.'}
+    {title:'Un classique réinventé',file:'realisations-mir-classique-large.webp',alt:'Maison à pignons gris et blancs avec galerie donnant sur le jardin',caption:'Un revêtement gris et des encadrements clairs autour de grands pignons.'},
+    {title:'Architecture urbaine au crépuscule',file:'realisations-mir-urbain-crepuscule-large.avif',alt:'Immeuble résidentiel d’angle avec façade de brique, revêtement métallique et galerie vitrée',caption:'Photographie retouchée pour la présentation : ambiance lumineuse et aménagement paysager retravaillés, sans modifier intentionnellement l’architecture.'}
   ];
   let index=0;
   const img=dialog.querySelector('#mir-gallery-dialog-photo');

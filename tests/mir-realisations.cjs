@@ -18,7 +18,7 @@ test('L’accueil approuvé est préservé avant sa section Réalisations',()=>{
 test('Les trois maisons de MIR sont présentes dans Réalisations sans changement d’architecture',()=>{
  const h=read('realisations.html');
  for(const id of names){assert.match(h,new RegExp(id+'-large\\.webp'));assert.match(h,new RegExp(id+'-mobile\\.webp'))}
- assert.equal((h.match(/class="mir-gallery-photo-button"/g)||[]).length,3);
+ assert.equal((h.match(/class="mir-gallery-photo-button"/g)||[]).length,4);
  assert.match(h,/Nos réalisations/);
  assert.doesNotMatch(h,/image générée pour la page d’accueil|voiture|palmier|véhicule/i);
 });
@@ -34,7 +34,7 @@ test('La section Réalisations existante conserve ses filtres et sélection',()=
 });
 test('Les trois fichiers originaux ne sont ni écrasés ni publiés comme modèles artificiels',()=>{
  const h=read('realisations.html');
- assert.match(h,/Maisons réelles présentées par MIR/);
+ assert.match(h,/Réalisations réelles présentées par MIR/);
  assert.doesNotMatch(h,/src="assets\/mir-home-hero/);
  const count=names.flatMap(id=>['large','mobile'].map(fmt=>id+'-'+fmt+'.webp'));
  for(const name of count){
@@ -72,5 +72,20 @@ test('Galerie en grand, clavier et retours accessibles',()=>{
  assert.match(css,/@media\(max-width:680px\)/);
  assert.match(css,/@media\(min-width:2200px\)/);
  assert.match(css,/object-fit:cover/);
+});
+test('Quatrième réalisation publiée en AVIF, originale et variante mobile',()=>{
+  const h=read('realisations.html'),js=read('mir-realisations.js'),css=read('mir-realisations.css');
+  assert.match(h,/Architecture urbaine au crépuscule/);
+  assert.match(h,/data-photo="3"/);
+  assert.match(h,/aria-live="polite">1 \/ 4/);
+  assert.match(js,/Architecture urbaine au crépuscule/);
+  assert.match(css,/mir-gallery-card-twilight/);
+  for(const kind of ['large','mobile']){
+    const file='assets/realisations/realisations-mir-urbain-crepuscule-'+kind+'.avif';
+    assert.match(h,new RegExp(file.replaceAll('.','\\.')));
+    const b=fs.readFileSync(path.join(root,file));
+    assert.ok(b.length>15000,file);
+    assert.equal(b.toString('ascii',4,8),'ftyp',file);
+  }
 });
 console.log('MIR Réalisations : '+tests+'/'+tests+' tests réussis');

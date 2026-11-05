@@ -34,5 +34,21 @@
     ],
     "webpLarge": "realisations-mir-classique-large.webp",
     "webpMobile": "realisations-mir-classique-mobile.webp"
+  },
+  {
+    "slug": "realisations-mir-urbain-crepuscule",
+    "originalFilename": "96091.jpg",
+    "sha256": "775c8f523d6e35dab895b173b9b4f3238e3806c386942be61956414a1959c277",
+    "originalBytes": 349356,
+    "resolution": [
+      1536,
+      1131
+    ],
+    "retouched": true,
+    "retouchSummary": "Éclairage, paysage et ambiance du crépuscule retravaillés; automobile supprimée. Original conservé séparément, aucun changement architectural intentionnel.",
+    "avifLarge": "realisations-mir-urbain-crepuscule-large.avif",
+    "avifMobile": "realisations-mir-urbain-crepuscule-mobile.avif",
+    "sha256Large": "fe992ab1db9938f10889f9619a596277f38bceb4d3a397a9e2a730348fdedf3a",
+    "sha256Mobile": "80e3d8110a0e7d56e497e2279ae489de013ba4633e1983bdf79dde204edc7ff2"
   }
 ]

@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict');const http=require('node:http');
 const fs=require('node:fs'),path=require('node:path');const {chromium}=require('playwright');
 const dist=path.resolve(__dirname,'../dist');
-const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.svg':'image/svg+xml','.webp':'image/webp','.jpg':'image/jpeg','.png':'image/png'};
+const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.svg':'image/svg+xml','.avif':'image/avif','.webp':'image/webp','.jpg':'image/jpeg','.png':'image/png'};
 const server=http.createServer((req,res)=>{
  const rel=decodeURIComponent((req.url||'/').split('?')[0]);const f=path.resolve(dist,'.'+rel);
  if(!f.startsWith(dist+path.sep)||!fs.existsSync(f)||!fs.statSync(f).isFile()){res.writeHead(404);res.end('Absent');return;}
@@ -22,7 +22,7 @@ async function main(){await new Promise(r=>server.listen(0,'127.0.0.1',r));let b
    await page.locator('.mir-gallery-photo-button img').evaluateAll(imgs=>Promise.all(imgs.map(img=>{img.loading='eager';return img.decode()})));
    const data=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,images:[...document.querySelectorAll('.mir-gallery-photo-button img')].map(x=>x.naturalWidth>0),links:document.querySelectorAll('header.mir-client-header nav a').length}));
    assert.ok(data.scroll<=vp.width+2,vp.name+': débordement '+data.scroll+' > '+vp.width);
-   assert.equal(data.images.length,3);
+   assert.equal(data.images.length,4);
    assert.ok(data.images.every(Boolean),vp.name+': image manquante');
    assert.ok(data.links>=5,vp.name+': menu incomplet');
    assert.equal(errors.length,0,vp.name+': '+errors.join('; '));
@@ -34,6 +34,11 @@ async function main(){await new Promise(r=>server.listen(0,'127.0.0.1',r));let b
     assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Un classique réinventé');
     await page.locator('#mir-gallery-close').click();
     assert.equal(await page.locator('#mir-gallery-dialog').evaluate(el=>el.open),false);
+    await page.locator('[data-photo="3"]').click();
+    assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Architecture urbaine au crépuscule');
+    await page.locator('#mir-gallery-next').click();
+    assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Jeux de matières');
+    await page.locator('#mir-gallery-close').click();
    }
    await page.close();console.log('PASS Réalisations '+vp.name+' px');
   }
