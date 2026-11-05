@@ -8,6 +8,7 @@ on:
       - 'dist/studio-features.js'
       - 'dist/plan-app.js'
       - 'dist/plan.html'
+      - 'dist/plan.css'
       - 'tests/mir-studio-wall-sections*.cjs'
       - 'tests/mir-retours-cotes*.cjs'
       - 'dist/mir-miniature.js'
