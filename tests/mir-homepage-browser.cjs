@@ -35,15 +35,18 @@ async function main(){
       page.on('pageerror',e=>failures.push(e.message));
       await page.goto('http://127.0.0.1:'+server.address().port+'/index.html',{waitUntil:'networkidle'});
       await page.locator('.mir-home-showcase-photo').evaluate(img=>img.decode());
+      await page.locator('.mir-home-services').scrollIntoViewIfNeeded();
+      await page.locator('.mir-home-service-media img').evaluateAll(images=>Promise.all(images.map(img=>img.decode())));
       const metrics=await page.evaluate(()=>{
         const bb=selector=>{const r=document.querySelector(selector)?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height,right:r.right}:null};
         const logo=document.querySelector('.mir-home-brand img');
         const photo=document.querySelector('.mir-home-showcase-photo');
-        return {screen:innerWidth,page:document.documentElement.scrollWidth,logo:{loaded:logo.complete&&logo.naturalWidth>0,src:logo.getAttribute('src')},photo:{loaded:photo.complete&&photo.naturalWidth>0,src:photo.getAttribute('src')},headline:bb('#hero-title'),nav:bb('.site-header'),cta:bb('.mir-home-main-cta'),account:bb('.mir-home-account'),services:document.querySelectorAll('.mir-home-service').length,pictos:document.querySelectorAll('.mir-home-services svg,.mir-home-services i').length};
+        return {screen:innerWidth,page:document.documentElement.scrollWidth,logo:{loaded:logo.complete&&logo.naturalWidth>0,src:logo.getAttribute('src')},photo:{loaded:photo.complete&&photo.naturalWidth>0,src:photo.getAttribute('src')},headline:bb('#hero-title'),nav:bb('.site-header'),cta:bb('.mir-home-main-cta'),account:bb('.mir-home-account'),services:document.querySelectorAll('.mir-home-service').length,cardPhotos:[...document.querySelectorAll('.mir-home-service-media img')].filter(img=>img.complete&&img.naturalWidth>0).length,pictos:document.querySelectorAll('.mir-home-services svg,.mir-home-services i').length};
       });
       assert.equal(metrics.logo.loaded,true,size.name+': logo original non chargé');
       assert.equal(metrics.photo.loaded,true,size.name+': photo MIR non chargée');
       assert.equal(metrics.services,3,size.name+': services');
+      assert.equal(metrics.cardPhotos,3,size.name+': trois images de cartes doivent charger');
       assert.equal(metrics.pictos,0,size.name+': pictos');
       assert.ok(metrics.page<=size.w+2,size.name+': débordement horizontal '+metrics.page+' > '+size.w);
       assert.ok(metrics.headline.x>=-1&&metrics.headline.right<=size.w+2,size.name+': titre rogné');
