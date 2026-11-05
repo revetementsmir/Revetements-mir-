@@ -15,6 +15,7 @@ on:
       - '.github/workflows/pages.yml'
       - 'dist/kaycan-flat-preview.js'
       - 'tests/mir-kaycan-flat-preview.cjs'
+      - 'tests/mir-mac-flat-preview.cjs'
       - 'tests/mir-atelier-v4.cjs'
       - 'tests/mir-atelier-v4-browser.cjs'
       - 'tests/mir-moulure-renaming-browser.cjs'
@@ -39,6 +40,7 @@ jobs:
           node --check tests/mir-miniatures-browser.cjs
           node --check dist/kaycan-flat-preview.js
           node --check tests/mir-kaycan-flat-preview.cjs
+          node --check tests/mir-mac-flat-preview.cjs
           node --check dist/production-admin-v4.js
           node --check tests/mir-atelier-v4.cjs
           node --check tests/mir-atelier-v4-browser.cjs
@@ -57,6 +59,7 @@ jobs:
           npm install --no-save playwright@1.58.2
           node tests/mir-atelier-v4-browser.cjs
           node tests/mir-kaycan-flat-preview.cjs
+          node tests/mir-mac-flat-preview.cjs
           node tests/mir-moulure-renaming-browser.cjs
           node tests/mir-miniatures-browser.cjs
           node tests/mir-retours-cotes-browser.cjs
@@ -67,6 +70,7 @@ jobs:
           path: |
             artifacts/atelier-v4-*.png
             artifacts/kaycan-fix-*.png
+            artifacts/mac-flat-*.png
             artifacts/mir-rename-*.png
             artifacts/mir-miniatures-*.png
             artifacts/mir-retours-*.png
