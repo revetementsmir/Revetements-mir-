@@ -23,6 +23,7 @@
     await Promise.all([
       script('plan-import-core.js', 'MIRPDFAnalysis'),
       script('plan-structure-notes.js', 'MIRStructuralNotes'),
+      script('plan-stair-vision.js', 'MIRStairVision'),
       script('plan-sheet-detection.js?v=architecture', 'MIRSheetDetection'),
       script('plan-scan-ocr.js?v=1', 'MIRScanOCR'),
       script('plan-spatial-dimensions.js?v=2', 'MIRSpatialDimensions'),
@@ -323,7 +324,17 @@
               visualFrame = [x-crop[0],y-crop[1],w,h];
             }
           } catch (error) { console.warn('MIR PDF : cadrage 3D de la façade indisponible', view.face, error); }
-          const result = prepareView(canvas, crop, structuralHints, sheet.number, view, calibrationScale, visualFrame);
+          // Marches : analyser les traits réels du dessin et convertir via les
+          // cotes reliées au PDF. Pas de dimensions si l'échelle est ambiguë.
+          const measuredStairs=window.MIRStairVision.detect({
+            image:geometry.image,crop,
+            feetPerPixel:['conflict','not_found','low_confidence'].includes(calibrationScale.status)
+              ? null : calibrationScale.feetPerPixel,
+            kind:view.kind,
+            textHints:structuralHints,maxCandidates:8
+          }).map(candidate=>({...candidate,page:sheet.number,viewKind:view.kind,
+            viewName:view.name,needsReview:true}));
+          const result = prepareView(canvas, crop, structuralHints, sheet.number, view, calibrationScale, visualFrame, measuredStairs);
           if (view.face && !imported.assignments[view.face]) imported.assignments[view.face] = result;
           else imported.references.push(result);
         }
@@ -357,7 +368,7 @@
     }
     return A.resolveScale(candidates.filter(candidate => candidate.anchors.every(([a, b]) => a >= x && a <= x + width && b >= y && b <= y + height)));
   }
-  function prepareView(canvas, crop, structuralHints, number, view, scale, visualFrame) {
+  function prepareView(canvas, crop, structuralHints, number, view, scale, visualFrame, stairCandidates=[]) {
     const [x, y, w, h] = crop, A = window.MIRPDFAnalysis;
     const image = document.createElement('canvas'); image.width = w; image.height = h;
     const context = image.getContext('2d', { willReadFrequently: true });
@@ -368,10 +379,10 @@
       regions = view.face ? A.proposeColoredZones(context.getImageData(0, 0, w, h)) : [];
     } finally { image.width = image.height = 1; }
     const cal = calibration(scale, crop);
-    if (!view.face) return { page: number, crop, sourceImage, calibration: cal, kind: view.kind, name: view.name, structuralHints };
+    if (!view.face) return { page: number, crop, sourceImage, calibration: cal, kind: view.kind, name: view.name, structuralHints,stairCandidates };
     const zones = regions.map((r, i) => ({ id: `pdf-zone-${i + 1}`, name: `Zone ${i + 1}`, polygon: r.polygon, kind: 'siding', parent: null, provenance: r.provenance, needsReview: true, detected: true }));
     const openings = regions.flatMap((r, i) => r.holes.filter(p => { const b = A.bbox(p); return b[2] - b[0] > 15 && b[3] - b[1] > 15; }).map((p, j) => ({ id: `pdf-opening-${i + 1}-${j + 1}`, type: 'window', polygon: p, bbox: A.bbox(p), occluded: false, dimension: 'Ouverture détectée à vérifier.', needsReview: true })));
-    return { ...placeholder(view.face), kind: 'elevation', page: number, bbox: [0, 0, w, h], textureBox: [0, 0, w, h], zones, openings, sourceImage, sourceImageBox: [0, 0, w, h], sourceWidth: w, sourceHeight: h, sourcePageSize: [canvas.width, canvas.height], sourceCrop: crop, ...(visualFrame&&{visualFrame}), calibration: cal, importedStatus: 'assigned', calibrationStatus: cal.status, structuralHints, detected: { regions: zones.length, openings: openings.length, method: 'Surfaces colorées repérées localement.' }, printedDimensions: cal.evidence.map(c => c.normalized || c.text), textureReference: view.split ? 'Cadrage automatique d’une feuille avec plusieurs vues.' : 'Élévation repérée par le titre de la feuille.' };
+    return { ...placeholder(view.face), kind: 'elevation', page: number, bbox: [0, 0, w, h], textureBox: [0, 0, w, h], zones, openings, sourceImage, sourceImageBox: [0, 0, w, h], sourceWidth: w, sourceHeight: h, sourcePageSize: [canvas.width, canvas.height], sourceCrop: crop, ...(visualFrame&&{visualFrame}), calibration: cal, importedStatus: 'assigned', calibrationStatus: cal.status, structuralHints,stairCandidates, detected: { regions: zones.length, openings: openings.length, method: 'Surfaces colorées repérées localement.' }, printedDimensions: cal.evidence.map(c => c.normalized || c.text), textureReference: view.split ? 'Cadrage automatique d’une feuille avec plusieurs vues.' : 'Élévation repérée par le titre de la feuille.' };
   }
   function placeholder(key) { return { key, name: FACE_NAMES[key], page: null, bbox: [0, 0, 1200, 800], textureBox: [0, 0, 1200, 800], physicalWidth: null, zones: [], openings: [], roof: [], base: [], fascia: [], soffit: [], detected: {}, candidates: [], occlusions: [], printedDimensions: [], importedStatus: 'unassigned', calibrationStatus: 'not_found', textureBottom: 0, textureReference: 'Façade non importée.', sourceImage: null }; }
   function calibration(s, crop) {
@@ -382,6 +393,7 @@
   function renderSummary() {
     const rows = [...Object.values(current.assignments), ...current.references];
     $('#mir-pdf-assigned').innerHTML = rows.map(row => `<span class="ready"><b>${esc(row.name)}</b><small>Page ${row.page}</small></span>`).join('') || '<p>Les vues détectées apparaîtront ici.</p>';
+    const floorStairs=rows.flatMap(r=>r.stairCandidates||[]);
     const volume = current.volume;
     if (!volume) { $('#mir-pdf-volume-note').textContent = ''; return; }
     const missing = Object.entries(VOLUME_NAMES).filter(([key]) => (key === 'roofStyle' ? volume.roofStyle : volume.dimensions[key]) == null).map(([, label]) => label);
@@ -390,6 +402,7 @@
     if (volume.approximated.length) cautions.push('Certaines dimensions sont estimées à partir du dessin.');
     if (current.skipped || current.ocrFailed) cautions.push('Certaines feuilles n’ont pas pu être lues.');
     if (!Object.keys(current.assignments).length) cautions.push('Aucune élévation orientée avant, arrière, gauche ou droite n’a été reconnue.');
+    if (floorStairs.length) cautions.push(floorStairs.length+' escalier(s) ou groupe(s) de marches repérés par pixels et cotes, à valider dans le Studio.');
     $('#mir-pdf-volume-note').textContent = [
       missing.length ? `À compléter dans Volume & retours : ${missing.join(', ')}.` : 'Cotes principales repérées. La maquette 3D s’ouvrira automatiquement.',
       ...cautions
@@ -407,12 +420,14 @@
       const calibrations = Object.fromEntries(faces.map(f => [f.key, f.calibration || { referenceFt: null, anchors: [], verified: false, status: 'not_found', provenance: 'Façade non repérée.', evidence: [] }]));
       const source = { filename: imported.file.name, bytes: imported.file.size, pageCount: imported.pageCount, sha256: imported.sha256, fingerprintStatus: imported.sha256 ? 'sha256' : imported.file.size > 50 * MIB ? 'skipped-for-large-file' : 'unavailable-in-this-context', privacy: 'browser-local', importedAt: new Date().toISOString() };
       const structuralHints = [...faces.flatMap(f => (f.structuralHints || []).map(h => ({ ...h, assignedView: f.key }))), ...imported.references.flatMap(r => (r.structuralHints || []).map(h => ({ ...h, assignedView: r.kind })))];
+      const stairCandidates=[...faces.flatMap(f=>(f.stairCandidates||[]).map(c=>({...c,assignedView:f.key}))),
+        ...imported.references.flatMap(r=>(r.stairCandidates||[]).map(c=>({...c,assignedView:r.kind})))];
       const volume = imported.volume;
       const dimensionStatus = Object.values(volume.dimensions).every(Number.isFinite) && volume.roofStyle ? 'detected' : 'incomplete';
       const planData = {
         version: 2, projectKind: 'imported-pdf', id, title: imported.file.name.replace(/\.pdf$/i, ''), source: `PDF importé · ${imported.pageCount} pages`,
-        sourceSha256: imported.sha256, analysis: 'Titres et cotes du PDF relevés automatiquement. Les contours et la maquette restent à vérifier.',
-        faces, referencePages: imported.references, sourceMetadata: source, structuralHints,
+        sourceSha256: imported.sha256, analysis: 'Titres et cotes du PDF relevés automatiquement; motifs de marches mesurés dans les pixels lorsque l’échelle est disponible. Les contours, emplacements et hauteurs restent à vérifier.',
+        faces, referencePages: imported.references, sourceMetadata: source, structuralHints,stairCandidates,
         dimensions: volume.dimensions, dimensionStatus, detectedVolume: { roofStyle: volume.roofStyle, foundationDrop: volume.foundationDrop, conflicts: volume.conflicts, approximated: volume.approximated, evidence: volume.evidence },
         dimensionNote: dimensionStatus === 'detected' ? 'Volume préliminaire à partir des cotes repérées dans le PDF.' : 'Géométrie 3D à compléter dans Volume & retours.',
         recess: { enabled: false, confirmed: false }, footprint: { type: 'unknown' }
