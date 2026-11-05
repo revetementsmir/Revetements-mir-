@@ -16,6 +16,10 @@ on:
       - 'dist/boutique.html'
       - 'dist/commerce.css'
       - 'dist/mir-procurement.css'
+      - 'dist/mir-procurement.js'
+      - 'dist/mir-workshop-reset*'
+      - 'dist/vider-atelier.html'
+      - 'tests/mir-workshop-reset*.cjs'
       - 'tests/mir-miniatures*.cjs'
       - 'tests/mir-procurement.cjs'
       - 'tests/mir-pliage-audit-*.cjs'
@@ -50,6 +54,8 @@ jobs:
           node --check tests/mir-retours-cotes-browser.cjs
           node --check dist/production-app.js
           node --check dist/mir-procurement.js
+          node --check dist/mir-workshop-reset.js
+          node --check tests/mir-workshop-reset-browser.cjs
           node --check dist/custom-model-cards.js
           node --check tests/mir-pliage-audit-browser.cjs
           node --check dist/mir-miniature.js
@@ -68,6 +74,7 @@ jobs:
         run: |
           node tests/mir-pages-regressions.cjs
           node tests/mir-procurement.cjs
+          node tests/mir-workshop-reset.cjs
           node --check tests/mir-pliage-audit-commercial.cjs
           node tests/mir-pliage-audit-commercial.cjs
       - name: Atelier maquette 4 scenarios
@@ -81,6 +88,7 @@ jobs:
           npm install --no-save playwright@1.58.2
           node tests/mir-atelier-v4-browser.cjs
           node tests/mir-pliage-audit-browser.cjs
+          node tests/mir-workshop-reset-browser.cjs
           node tests/mir-kaycan-flat-preview.cjs
           node tests/mir-mac-flat-preview.cjs
           node tests/mir-direct-po-browser.cjs
@@ -98,6 +106,7 @@ jobs:
             artifacts/kaycan-fix-*.png
             artifacts/mac-flat-*.png
             artifacts/mir-direct-po-*.png
+            artifacts/mir-reset-*.png
             artifacts/mir-pan-*.png
             artifacts/mir-rename-*.png
             artifacts/mir-miniatures-*.png
