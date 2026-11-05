@@ -64,9 +64,15 @@ async function online(){
    await page.locator('[data-face="front"]').click();
    assert.equal(await page.locator('#elevation [data-mir-wall-part]').count(),0);
    // Never change geometry or supplier choices when toggling detached views.
-   const save=await page.evaluate(()=>localStorage.getItem('mir-plan-study-v2'));
+   const stable=async()=>page.evaluate(()=>{
+     const state=JSON.parse(localStorage.getItem('mir-plan-study-v2')||'null')||{};
+     return {selections:state.selections,customZones:state.customZones,
+       zoneOverrides:state.zoneOverrides,openingOverrides:state.openingOverrides,
+       recessOverride:state.recessOverride,volumeOverride:state.volumeOverride};
+   });
+   const saved=await stable();
    await page.locator('[data-face="right"]').click();
-   assert.equal(await page.evaluate(()=>localStorage.getItem('mir-plan-study-v2')),save);
+   assert.deepEqual(await stable(),saved,'Les surfaces détachées ne doivent pas modifier les matières, le volume ou les zones.');
    assert.deepEqual(errors,[]);
    console.log('PASS '+screen.name+': trois murs réels et maçonnerie à la même altitude, façade originale intacte');
    await page.close();
