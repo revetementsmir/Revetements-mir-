@@ -149,7 +149,82 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
  const dims=[['A','Largeur hors tout',model.widthMM],['B','Hauteur hors tout',model.heightMM],['C','Projection',model.reliefMM]];
  svg+=dims.map(([letter,label,value],i)=>`<text x="${135+i*265}" y="448" text-anchor="middle" font-size="13" fill="#6f8064">${letter} · ${label}</text><text x="${135+i*265}" y="478" text-anchor="middle" font-size="24" fill="#294734" font-weight="600">${esc(illustrative?'À saisir':M.formatMeasurement(value,model.unit))}</text>`).join('');return svg+'</svg>';
 }
+function profileVolumeStrips(model){
+ const radius=Math.min(1.5,Math.max(.5,model.material?.thicknessMM||.65));
+ const section=M.profileSectionPath(model.pointsMM.map(([x,y])=>[x,-y]),model.bends,radius);
+ const runs=section.segments.map(pair=>pair.map(([x,y])=>[x,-y]));
+ return runs.flatMap(([a,b],index)=>{
+  const result=[{a,b}];
+  if(model.bends[index]?.mode!=='hem'||!runs[index+1])return result;
+  const c=runs[index+1][0],length=Math.hypot(b[0]-a[0],b[1]-a[1]);
+  if(!length)return result;
+  const center=[(b[0]+c[0])/2,(b[1]+c[1])/2];
+  let last=b;
+  for(let step=1;step<=8;step++){
+   const angle=step*Math.PI/8;
+   const end=step===8?c:[0,1].map(axis=>center[axis]+(b[axis]-center[axis])*Math.cos(angle)+(b[axis]-a[axis])/length*radius*Math.sin(angle));
+   result.push({a:last,b:end});
+   last=end;
+  }
+  return result;
+ });
+}
+// Extruded faces share the same longitudinal axis. A partition in the
+// cross-section orders the opaque faces and splits any intersecting strips.
+function orderProfileStrips(strips,eye){
+ if(strips.length<2)return strips;
+ const [split,...rest]=strips;
+ const dx=split.b[0]-split.a[0],dy=split.b[1]-split.a[1];
+ const side=([x,y])=>dx*(y-split.a[1])-dy*(x-split.a[0]);
+ const left=[],right=[],flat=[split];
+ const epsilon=1e-7;
+ for(const strip of rest){
+  const a=side(strip.a),b=side(strip.b);
+  if(Math.abs(a)<=epsilon&&Math.abs(b)<=epsilon){flat.push(strip);continue;}
+  if(Math.min(a,b)>=-epsilon){left.push(strip);continue;}
+  if(Math.max(a,b)<=epsilon){right.push(strip);continue;}
+  const intersection=strip.a.map((value,i)=>value+(strip.b[i]-value)*a/(a-b));
+  (a>0?left:right).push({...strip,b:intersection});
+  (b>0?left:right).push({...strip,a:intersection});
+ }
+ const leftNear=dx*eye[1]-dy*eye[0]>0;
+ return [...orderProfileStrips(leftNear?right:left,eye),...flat,...orderProfileStrips(leftNear?left:right,eye)];
+}
+function profileVolumeSVG(model,illustrative){
+ const yaw=orbit*Math.PI/180,tilt=pitch*Math.PI/180;
+ const eye=[-Math.sin(yaw)*Math.cos(tilt),Math.sin(tilt)];
+ const project=([x,y],z)=>{
+  const depth=-x*Math.sin(yaw)+z*Math.cos(yaw);
+  return [x*Math.cos(yaw)+z*Math.sin(yaw),y*Math.cos(tilt)-depth*Math.sin(tilt)];
+ };
+ const length=model.lengthMM||Math.max(...model.pointsMM.flat().map(Math.abs),100)*2;
+ const strips=profileVolumeStrips(model).map(strip=>{
+  const facing=(strip.b[0]-strip.a[0])*eye[1]-(strip.b[1]-strip.a[1])*eye[0];
+  return {...strip,facing};
+ }).filter(strip=>Math.abs(strip.facing)>1e-8);
+ const points=strips.flatMap(({a,b})=>[project(a,0),project(b,0),project(a,length),project(b,length)]);
+ if(!points.length)return diagramSVG(model,{illustrative});
+ const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+ const scale=zoom*Math.min(610/Math.max(1,Math.max(...xs)-Math.min(...xs)),355/Math.max(1,Math.max(...ys)-Math.min(...ys)));
+ const cx=(Math.max(...xs)+Math.min(...xs))/2,cy=(Math.max(...ys)+Math.min(...ys))/2;
+ const pixel=([x,y])=>[fmt(400+(x-cx)*scale),fmt(255-(y-cy)*scale)].join(',');
+ const finish=model.spec?.finish||model.finish||{};
+ const swatch=safeAsset(finish.swatchUrl);
+ const paint=/^#[0-9a-f]{6}$/i.test(finish.hex||'')?finish.hex:null;
+ const pattern=swatch?`<defs><pattern id="production-paint" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${paint||'#a9adb1'}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern></defs>`:'';
+ const polygons=orderProfileStrips(strips,eye).map(({a,b,facing})=>{
+  const side=facing>0?'left':'right';
+  const painted=side===model.coloredFace?.side&&!!(paint||swatch);
+  const angle=Math.atan2(b[1]-a[1],b[0]-a[0]);
+  const gray=Math.round(170+30*Math.abs(Math.sin(angle)));
+  const fill=painted?(swatch?'url(#production-paint)':paint):`rgb(${gray},${gray+3},${gray+6})`;
+  const corners=[project(a,0),project(b,0),project(b,length),project(a,length)];
+  return `<polygon points="${corners.map(pixel).join(' ')}" fill="${fill}" data-profile-finish="${painted?'painted':'metal'}"/>`;
+ }).join('');
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="img" aria-label="Volume schématique de ${esc(model.name)}" font-family="Arial,sans-serif">${pattern}<text x="400" y="35" text-anchor="middle" font-size="12" fill="#7c8e6a">VOLUME SCHÉMATIQUE · GLISSEZ POUR TOURNER</text>${polygons}<text x="400" y="482" text-anchor="middle" font-size="13" fill="#7c8e6b">${esc(illustrative?'Proportions du modèle · aucune cote de fabrication renseignée':'Longueur : '+M.formatMeasurement(model.lengthMM,model.unit))}</text></svg>`;
+}
 function volumeSVG(model,{illustrative=false}={}){
+ if(model.kind==='profile'&&model.pointsMM?.length>=2)return profileVolumeSVG(model,illustrative);
  if(model.kind==='panel'&&window.MIRProductionVolume)return window.MIRProductionVolume.render(model,{yaw:orbit,pitch,zoom,illustrative,formatMeasurement:M.formatMeasurement});
  const points=model.pointsMM||[];if(points.length<2)return diagramSVG(model,{illustrative});const z=model.kind==='profile'?(model.lengthMM||Math.max(...points.flat().map(Math.abs),100)*2):(model.reliefMM||0),yaw=orbit*Math.PI/180,tilt=pitch*Math.PI/180;
  const project=([x,y,z])=>{const xx=x*Math.cos(yaw)+z*Math.sin(yaw),zz=-x*Math.sin(yaw)+z*Math.cos(yaw);return [xx,y*Math.cos(tilt)-zz*Math.sin(tilt),y*Math.sin(tilt)+zz*Math.cos(tilt)];};
@@ -806,6 +881,10 @@ async function importMirTemplates(input){
  }catch(error){toast('Import impossible : '+error.message);}
  finally{input.value='';}
 }
+function endHemDirection(headingDegrees, choice){
+ const leftIsUp=Math.cos(headingDegrees*Math.PI/180)>=0;
+ return (choice==='up')===leftIsUp?'left':'right';
+}
 function endHemDialog(){
  const model=build();
  if(!model.valid)return toast('Complète les cotes avant d’ajouter un double pli.');
@@ -813,7 +892,7 @@ function endHemDialog(){
  const first=model.segments[0],last=model.segments.at(-1);
  const side=(x,other)=>Math.abs(x-other)<.001?'':x<other?' · à gauche':' · à droite';
  const start=first.start[0],end=last.end[0];
- dialog('Ajouter un double pli','Choisis une extrémité, la longueur du retour et son sens.',`<form id="end-hem-form" class="dialog-form"><label>Extrémité<select name="end"><option value="start">Début · ${esc(first.label+side(start,end))}</option><option value="end">Fin · ${esc(last.label+side(end,start))}</option></select></label><label>Longueur du retour (${draft.unit==='mm'?'mm':'po'})<input name="length" value="${draft.unit==='mm'?'13':'1/2'}" required></label><label>Sens du retour<select name="direction"><option value="left">Gauche du tracé</option><option value="right">Droite du tracé</option></select></label><p id="production-dialog-error" class="dialog-error" role="alert"></p><button class="primary-button" type="submit">Ajouter le retour</button></form>`);
+ dialog('Ajouter un double pli','Choisis une extrémité, la longueur du retour et son sens.',`<form id="end-hem-form" class="dialog-form"><label>Extrémité<select name="end"><option value="start">Début · ${esc(first.label+side(start,end))}</option><option value="end">Fin · ${esc(last.label+side(end,start))}</option></select></label><label>Longueur du retour (${draft.unit==='mm'?'mm':'po'})<input name="length" value="${draft.unit==='mm'?'13':'1/2'}" required></label><label>Sens du retour<select name="direction"><option value="up">Vers le haut</option><option value="down">Vers le bas</option></select></label><p id="production-dialog-error" class="dialog-error" role="alert"></p><button class="primary-button" type="submit">Ajouter le retour</button></form>`);
 }
 function profileWithEndHem(spec,model,atStart,length,direction){
  const segments=model.segments.map((segment,index)=>({
@@ -1003,7 +1082,8 @@ function handleSubmit(event){const form=event.target;if(!form.matches('#end-hem-
   const model=build(),atStart=data.get('end')==='start',length=String(data.get('length')||'').trim();
   const parsed=M.parseMeasurement(length,draft.unit),edge=atStart?model.segments[0]:model.segments.at(-1);
   if(!model.valid||!parsed.ok||parsed.mm<=0||parsed.mm>edge.lengthMM)return messageError('Le retour doit être positif et au plus aussi long que le côté choisi.');
-  const next=profileWithEndHem(draft,model,atStart,length,data.get('direction')==='right'?'right':'left');
+  const direction=endHemDirection(edge.headingDeg,data.get('direction'));
+  const next=profileWithEndHem(draft,model,atStart,length,direction);
   if(!build(next).valid)return messageError('Le retour ne peut pas être ajouté à ce profil.');
   draft=next;jException=null;drawPoints=[];
   closeDialog();renderDimensions();renderProfileOptions();updateDrawing();

@@ -683,7 +683,7 @@
     // Flatten nested SVG roots: this also renders consistently in PDF rasterizers.
     return '<g transform="translate(' + x + ' ' + y + ')">' + String(svg).replace(/^<svg\b[^>]*>/, '').replace(/<\/svg>\s*$/, '') + '</g>';
   }
-function profileSectionPath(points,bends){
+function profileSectionPath(points,bends,hemRadius=5){
  let offsetX=0,offsetY=0;
  const segments=[],folds=[];
  let start=points[0];
@@ -698,11 +698,12 @@ function profileSectionPath(points,bends){
   const dx=points[i+1][0]-x,dy=points[i+1][1]-y,length=Math.hypot(dx,dy);
   if(!length)continue;
   const radius=5, side=bends[i-1].direction==='right'?-1:1;
-  offsetX-=dy/length*2*radius*side;
-  offsetY+=dx/length*2*radius*side;
+  const foldRadius=hemRadius===5?radius:hemRadius;
+  offsetX-=dy/length*2*foldRadius*side;
+  offsetY+=dx/length*2*foldRadius*side;
   start=[x+offsetX,y+offsetY];
   folds.push([(end[0]+start[0])/2,(end[1]+start[1])/2]);
-  path+=` A${radius} ${radius} 0 0 ${side<0?1:0} ${decimal(start[0])} ${decimal(start[1])}`;
+  path+=` A${foldRadius} ${foldRadius} 0 0 ${side<0?1:0} ${decimal(start[0])} ${decimal(start[1])}`;
  }
  return {path,segments,folds};
 }
@@ -1194,5 +1195,5 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
   }
 
   function validate(spec) { return modelOf(spec).validation; }
-  return Object.freeze({ version: VERSION, TEMPLATES, SHAPES, PROFILE_GROUPS:Object.freeze(PROFILE_GROUPS), groupProfiles, parseMeasurement, formatMeasurement, quotePolicy, pricePiece, priceDossier, buildProfile, buildPanel, mirrorPanelSpec, insertDoubleFold, validate, profileSVG, profileDiagramContent, panelSVG, buildOrder, productionPages, createTemplate, templatePreview, instantiateTemplate, configureTemplate: instantiateTemplate, createOrderSnapshot: instantiateTemplate, reviseInstance, revision: reviseInstance, createTemplateRevision });
+  return Object.freeze({ version: VERSION, TEMPLATES, SHAPES, PROFILE_GROUPS:Object.freeze(PROFILE_GROUPS), groupProfiles, parseMeasurement, formatMeasurement, quotePolicy, pricePiece, priceDossier, buildProfile, buildPanel, mirrorPanelSpec, insertDoubleFold, validate, profileSVG, profileSectionPath, profileDiagramContent, panelSVG, buildOrder, productionPages, createTemplate, templatePreview, instantiateTemplate, configureTemplate: instantiateTemplate, createOrderSnapshot: instantiateTemplate, reviseInstance, revision: reviseInstance, createTemplateRevision });
 });
