@@ -670,7 +670,7 @@
     const minY = Math.min(...extent.map(p=>p[1])), maxY = Math.max(...extent.map(p=>p[1]));
     const padX = Math.max(18, W * .065), padTop = Math.max(18, H * .08), padBottom = Math.max(24, H * .13);
     const zoom=Math.max(.7,Math.min(3.5,Number.isFinite(Number(options.zoom))?Number(options.zoom):1));
-    const scale = Math.max(.001, Math.min((W - 2*padX)/(maxX-minX), (H-padTop-padBottom)/(maxY-minY)))*zoom);
+    const scale = Math.max(.001, Math.min((W - 2*padX)/(maxX-minX), (H-padTop-padBottom)/(maxY-minY)))*zoom;
     const tx = W/2 - (minX+maxX)/2*scale;
     const ty = padTop + (H-padTop-padBottom-(maxY-minY)*scale)/2 - minY*scale;
     const project = p => { const q=flat(p); return [tx+q[0]*scale,ty+q[1]*scale]; };
