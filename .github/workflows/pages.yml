@@ -103,6 +103,9 @@ jobs:
           node --check tests/mir-homepage-browser.cjs
           node tests/mir-homepage.cjs
           node --check dist/mir-public-menu.js
+          node --check dist/mir-selection-pdf.js
+          node --check tests/mir-selection-pdf-browser.cjs
+          node tests/mir-selection-pdf.cjs
           node --check tests/mir-public-menu-browser.cjs
           node tests/mir-public-menu.cjs
           node --check tests/mir-client-header.cjs
@@ -127,6 +130,7 @@ jobs:
           node tests/mir-homepage-browser.cjs
           node tests/mir-client-header-browser.cjs
           node tests/mir-public-menu-browser.cjs
+          node tests/mir-selection-pdf-browser.cjs
           node tests/mir-client-signature-browser.cjs
           node tests/mir-production-signature-browser.cjs
           node tests/mir-realisations-browser.cjs
@@ -215,6 +219,10 @@ jobs:
           grep -F -- '--mir-accent:#348511' /tmp/mir-client-signature.css
           fetch "$base/mir-public-menu.css" /tmp/mir-public-menu.css
           grep -F "mir-client-menu-toggle" /tmp/mir-public-menu.css
+          fetch "$base/mir-selection-pdf.js" /tmp/mir-selection-pdf.js
+          grep -F 'buildOptions' /tmp/mir-selection-pdf.js
+          fetch "$base/selection.html" /tmp/mir-selection.html
+          grep -F 'id="selection-export-pdf"' /tmp/mir-selection.html
           fetch "$base/mir-public-menu.js" /tmp/mir-public-menu.js
           grep -F "aria-expanded" /tmp/mir-public-menu.js
           fetch "$base/pliage.html" /tmp/mir-menu-pliage.html
