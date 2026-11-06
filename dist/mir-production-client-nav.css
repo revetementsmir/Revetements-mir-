@@ -80,3 +80,11 @@ html.mir-production-client .production-header .mir-production-client-nav a[aria-
   width:min(185px,49vw)
  }
 }
+
+/* Raccourci dossier commun réservé au client, jamais aux écrans Admin. */
+.mir-unified-client-shortcut{display:none}
+html.mir-production-client .mir-unified-client-shortcut{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin:25px 0 3px;padding:20px 22px;border:1px solid #d9e6d5;border-radius:12px;background:#f3f8f0;color:#24402b}
+html.mir-production-client .mir-unified-client-shortcut strong{font-size:18px}
+html.mir-production-client .mir-unified-client-shortcut p{font-size:13px;max-width:65ch;margin-top:5px}
+html.mir-production-client .mir-unified-client-shortcut .secondary-button{flex:0 0 auto}
+@media(max-width:600px){html.mir-production-client .mir-unified-client-shortcut{display:grid;grid-template-columns:minmax(0,1fr);padding:16px}html.mir-production-client .mir-unified-client-shortcut .secondary-button{width:100%}}
