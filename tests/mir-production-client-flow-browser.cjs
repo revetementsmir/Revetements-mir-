@@ -59,7 +59,7 @@ async function verifyNavigation(browser,base){
    assert.equal(await toggle.getAttribute('aria-expanded'),'false','Échap ferme le menu '+width);
    assert.equal(await toggle.evaluate(el=>document.activeElement===el),true,'focus rendu au bouton '+width);
    await toggle.click();
-   await page.mouse.click(3,innerHeight-4);
+   await page.mouse.click(3,846);
    assert.equal(await toggle.getAttribute('aria-expanded'),'false','clic extérieur ferme le menu '+width);
   }else{
    assert.equal(await toggle.isVisible(),false,'menu déroulant réservé au mobile '+width);
