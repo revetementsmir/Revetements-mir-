@@ -18,6 +18,7 @@ on:
       - 'dist/commerce.js'
       - 'dist/mir-selection-pdf.js'
       - 'tests/mir-selection-pdf*.cjs'
+      - 'tests/mir-client-signature.cjs'
       - 'dist/mir-public-menu.*'
       - 'dist/realisations.html'
       - 'dist/materiaux.html'
@@ -99,6 +100,7 @@ jobs:
           node tests/mir-pages-regressions.cjs
           node tests/mir-public-menu.cjs
           node tests/mir-selection-pdf.cjs
+          node tests/mir-client-signature.cjs
           node tests/mir-procurement.cjs
           node tests/mir-admin-guided.cjs
           node tests/mir-workshop-reset.cjs
