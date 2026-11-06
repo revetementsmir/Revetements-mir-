@@ -129,6 +129,53 @@ test('Socle PostgreSQL : contraintes, RLS et sauvegardes',async t=>{
       await actor(id(1),sql,[id(10),id(40),1,{...settings,archived:true}]);
       assert.equal((await actor(id(3),count('model_publications')))[0].n,0);
     });
+    await db.exec(fs.readFileSync(path.join(__dirname,'../supabase/migrations/202611060004_connected_catalogue.sql'),'utf8'));
+    await t.test('Demandes partagées : sessions indépendantes, prix serveur et reprise idempotente',async()=>{
+      await db.exec("update mir_core.memberships set active=true;update mir_core.model_publications set archived=false");
+      const snapshot=(await actor(id(3),'select public.mir_shared_snapshot($1) as data',[id(10)]))[0].data;
+      assert.equal(snapshot.catalogue.length,1);
+      const model=snapshot.catalogue[0],config={metal:'acier',quantity:2,color:'Noir',measures:{A:'3 1/2',length:'120'}};
+      const sql='select public.mir_submit_request($1,$2,$3,$4,$5) as id',args=[id(10),id(91),id(40),model.revision,config];
+      const first=(await actor(id(3),sql,args))[0].id;
+      assert.equal((await actor(id(3),sql,args))[0].id,first);
+      await reject(id(3),sql,[...args.slice(0,4),{...config,quantity:3}],'22023');
+      await assert.rejects(actor(id(3),sql,[id(10),id(92),id(40),model.revision,{...config,measures:{A:'99'}}]));
+      await assert.rejects(actor(id(3),sql,[id(10),id(93),id(40),model.revision,{...config,price:1}]));
+      const before=(await actor(id(3),'select public.mir_shared_snapshot($1) as data',[id(10)]))[0].data.orders.find(o=>o.id===first);
+      assert.equal(before.snapshot.unitPriceCents,3000);assert.equal(before.snapshot.totalCents,6000);
+      await db.exec('update mir_core.model_publications set steel_cents=9000,revision=revision+1');
+      const after=(await actor(id(3),'select public.mir_shared_snapshot($1) as data',[id(10)]))[0].data;
+      assert.equal(after.catalogue[0].steelCents,9000);assert.equal(after.orders.find(o=>o.id===first).snapshot.totalCents,6000);
+      assert.equal((await actor(id(6),'select public.mir_shared_snapshot($1) as data',[id(10)]))[0].data.orders.some(o=>o.id===first),false);
+      const admin=(await actor(id(1),'select public.mir_shared_snapshot($1) as data',[id(10)]))[0].data;assert.ok(admin.orders.some(o=>o.id===first));
+      const employee=(await actor(id(2),'select public.mir_shared_snapshot($1) as data',[id(10)]))[0].data;
+      assert.equal(employee.catalogue[0].steelCents,null);
+      await actor(id(1),'select public.mir_assign_job($1,$2,$3)',[id(10),'Chantier test',id(2)]);
+      const jid=(await actor(id(2),'select public.mir_shared_snapshot($1) as data',[id(10)]))[0].data.jobs[0].id;
+      await actor(id(2),sql,[id(10),id(94),id(40),employee.catalogue[0].revision,{...config,chantier:jid}]);
+      await reject(id(4),'select public.mir_shared_snapshot($1)',[id(10)],'42501');
+    });
+    await t.test('Import explicite sans doublon et nouvelle version sans écrasement',async()=>{
+      const M=require('../dist/production-model.js'),template=M.createTemplate({kind:'profile',template:'l',unit:'in',dimensions:{A:3,B:2}},{id:'local',name:'Solin'}).template;
+      const record={id:'local',name:'Solin',currentVersion:1,versions:[template]};
+      const query='select public.mir_import_master($1,$2) as id';
+      await reject(id(2),query,[id(10),record],'42501');
+      const model=(await actor(id(1),query,[id(10),record]))[0].id;
+      assert.equal((await actor(id(1),query,[id(10),record]))[0].id,model);
+      await reject(id(1),query,[id(10),{...record,name:'Autre'}],'40001');
+      const next=M.createTemplate({kind:'profile',template:'l',unit:'in',dimensions:{A:4,B:2}},{id:'local',name:'Solin',version:2}).template;
+      await actor(id(1),'select public.mir_add_master_version($1,$2,1,$3)',[id(10),model,next]);
+      const versions=await actor(id(1),'select version from mir_core.model_versions where model_id=$1 order by version',[model]);assert.deepEqual(versions.map(r=>r.version),[1,2]);
+      const p=(await actor(id(1),'select * from mir_core.model_publications where model_id=$1',[model]))[0];assert.equal(p.boutique,false);assert.equal(p.store,false);assert.equal(p.revision,2);
+    });
+    await t.test('J à soffite 12 pi : demande de soumission sans prix inventé',async()=>{
+      const M=require('../dist/production-model.js'),t=M.createTemplate({kind:'profile',template:'j',unit:'in',dimensions:{A:1,B:3,C:1}},{id:'j-soffite',name:'J à soffite'}).template;
+      const model=(await actor(id(1),'select public.mir_import_master($1,$2) as id',[id(10),{id:'j-soffite',name:'J à soffite',currentVersion:1,versions:[t]}]))[0].id;
+      const settings={boutique:true,store:true,sale_length_in:144,standard_measures:{},locked_measures:{}};
+      await actor(id(1),'select public.mir_admin_publish_model($1,$2,1,$3)',[id(10),model,settings]);
+      const oid=(await actor(id(3),'select public.mir_submit_request($1,$2,$3,2,$4) as id',[id(10),id(97),model,{metal:'acier',quantity:1,color:'Noir',measures:{A:'1',B:'3',C:'1',length:'144'}}]))[0].id;
+      const snap=(await actor(id(3),'select snapshot from mir_core.order_revisions where order_id=$1',[oid]))[0].snapshot;assert.equal(snap.saleLengthIn,144);assert.equal(snap.unitPriceCents,null);
+    });
     await t.test('Toutes les tables du schéma sont sous RLS',async()=>{
       const r=await db.query("select relname from pg_class join pg_namespace n on n.oid=relnamespace where n.nspname='mir_core' and relkind='r' and not relrowsecurity");assert.equal(r.rows.length,0);
     });
