@@ -23,10 +23,19 @@ test('Les sept pages clients utilisent les mêmes fichiers de menu, sans bibliot
    assert.match(html,/href="index.html#nous-joindre"[^>]*>Demander une estimation<\/a>/,route);
  }
 });
-test('L accueil approuvé, le configurateur Admin et le portail ne sont pas injectés',()=>{
- for(const route of ['index','production','chantier']){
+test('L accueil et le portail ne sont pas injectés et le mode Admin reste isolé',()=>{
+ for(const route of ['index','chantier']){
    assert.doesNotMatch(read(route+'.html'),/mir-public-menu\.(?:css|js)/,route);
  }
+ const production=read('production.html'),bridge=read('mir-production-client-nav.js');
+ assert.match(production,/mir-public-menu\.css\?v=1/);
+ assert.match(production,/mir-public-menu\.js\?v=1/);
+ assert.match(production,/mir-production-client-nav\.js\?v=1/);
+ assert.match(bridge,/classList\.contains\('mir-production-client'\)/,
+   'seul le mode client doit être activé');
+ assert.match(bridge,/header\.classList\.add\('mir-client-header'\)/);
+ assert.match(production,/nav aria-label="Navigation du site"/,
+   'le menu Admin original est conservé');
 });
 test('Le JavaScript conserve aria-controls, aria-expanded et le support Échap',()=>{
  const code=read('mir-public-menu.js');

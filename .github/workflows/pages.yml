@@ -105,6 +105,8 @@ jobs:
           node --check tests/mir-homepage-browser.cjs
           node tests/mir-homepage.cjs
           node --check dist/mir-public-menu.js
+          node --check dist/mir-production-client-nav.js
+          node --check tests/mir-production-client-flow-browser.cjs
           node --check dist/mir-selection-pdf.js
           node --check tests/mir-selection-pdf-browser.cjs
           node tests/mir-selection-pdf.cjs
@@ -132,6 +134,7 @@ jobs:
           node tests/mir-homepage-browser.cjs
           node tests/mir-client-header-browser.cjs
           node tests/mir-public-menu-browser.cjs
+          node tests/mir-production-client-flow-browser.cjs
           node tests/mir-selection-pdf-browser.cjs
           node tests/mir-client-signature-browser.cjs
           node tests/mir-production-signature-browser.cjs
@@ -158,6 +161,7 @@ jobs:
             artifacts/mir-accueil-*.png
             artifacts/mir-entete-*.png
             artifacts/mir-menu-*.png
+            artifacts/mir-client-parcours-*.png
             artifacts/mir-signature-*.png
             artifacts/mir-production-signature-*.png
             artifacts/mir-realisations-*.png
@@ -337,6 +341,13 @@ jobs:
           fetch "$base/production.html" /tmp/mir-backup-page.html
           grep -F 'template-library-backup.js?v=backup-1' /tmp/mir-backup-page.html
           fetch "$base/production-app.js" /tmp/production-app.js
+          fetch "$base/mir-production-client-nav.js?verification=$GITHUB_SHA" /tmp/mir-production-client-nav.js
+          cmp /tmp/mir-production-client-nav.js _site_mir/mir-production-client-nav.js
+          grep -F "MIRProductionClientNavigation" /tmp/mir-production-client-nav.js
+          fetch "$base/mir-production-client-nav.css?verification=$GITHUB_SHA" /tmp/mir-production-client-nav.css
+          cmp /tmp/mir-production-client-nav.css _site_mir/mir-production-client-nav.css
+          grep -F "mir-production-client-nav.js?v=1" /tmp/production.html
+          grep -F "mir-public-menu.js?v=1" /tmp/production.html
           grep -F 'mir-bending-lengths.js' /tmp/production.html
           grep -F 'mir-bending-lengths.js' /tmp/pliage.html
           fetch "$base/mir-bending-lengths.js?verification=$GITHUB_SHA" /tmp/mir-bending-lengths.js
