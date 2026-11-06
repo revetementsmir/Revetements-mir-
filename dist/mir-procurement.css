@@ -145,3 +145,27 @@ body.mir-admin-v4 .mir-proc-model-form .mir-proc-actions{margin-top:12px}
 /* Accès au nettoyage local, visible sans ajouter un cinquième onglet. */
 body.mir-admin-v4 .mir-proc-reset-link{display:block;width:max-content;max-width:100%;font-size:13px;font-weight:650;text-decoration:underline;text-underline-offset:3px;color:#48604c;margin:-10px 0 18px auto}
 body.mir-admin-v4 .mir-proc-reset-link:focus-visible{outline:3px solid #90b666;outline-offset:3px}
+
+/* Quatre sections 2026 et sous-navigation de l'atelier. */
+body.mir-admin-v4[data-mir-tab="store"] :is(.kind-bar,.production-intro,.production-workspace,.mir-v4-technical,.production-order,.template-section,#production-library,#production-requests,#author-banner){display:none!important}
+body.mir-admin-v4 #mir-proc-shortcuts{display:flex;justify-content:flex-end;align-items:center;gap:9px;flex-wrap:wrap;margin:-6px 0 11px}
+body.mir-admin-v4 #mir-proc-shortcuts[hidden]{display:none!important}
+body.mir-admin-v4 #mir-proc-shortcuts button{padding:8px 12px;min-height:39px;border:1px solid #becdb8;background:#fff;border-radius:10px;color:#28553a;font:650 13px system-ui,sans-serif;cursor:pointer}
+body.mir-admin-v4 #mir-proc-shortcuts button[aria-current="page"]{background:#e6eee3}
+body.mir-admin-v4 .mir-po-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 17px}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-tabs button{background:#f0f4e8;border-color:#d7e0d2;font-weight:750;min-height:49px}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-tabs button[aria-current="page"]{background:#28553a;color:#fff;border-color:#28553a}
+body.mir-admin-v4 .mir-po-tracked{max-width:100%}
+body.mir-admin-v4 .mir-po-tracked .mir-proc-field{max-width:440px}
+body.mir-admin-v4 .mir-store-card{display:grid;grid-template-columns:150px minmax(0,1fr);gap:17px;align-items:center}
+body.mir-admin-v4 .mir-store-visual{width:100%;aspect-ratio:1;max-width:150px;border-radius:10px;background:#f2f6ef;display:grid;place-items:center;overflow:hidden}
+body.mir-admin-v4 .mir-store-visual svg{width:100%;height:100%}
+body.mir-admin-v4 .mir-store-card p{margin:3px 0 9px;color:#617166}
+@media(max-width:600px){
+ body.mir-admin-v4 .mir-store-card{grid-template-columns:95px minmax(0,1fr);gap:10px}
+ body.mir-admin-v4 .mir-store-visual{max-width:95px}
+ body.mir-admin-v4 #mir-proc-shortcuts{justify-content:center;margin:-2px 0 9px}
+ body.mir-admin-v4 #mir-proc-shortcuts button{flex:1 1 42%;font-size:12px}
+ body.mir-admin-v4 .mir-po-tabs{gap:4px}
+ body.mir-admin-v4 #mir-procurement-panel .mir-po-tabs button{font-size:12px;padding:9px 4px}
+}

@@ -1,0 +1,147 @@
+/* MIR — Atelier Admin guidé. Le parcours client et les autres onglets ne changent pas. */
+
+/* Le conteneur des vues garde TOUJOURS la surface 2D quand on change
+   pour un profil standard, un modèle existant ou un autre parcours Admin. */
+body.mir-admin-v4:not(.mir-admin-guided-active) #mir-guide-views{display:block}
+body.mir-admin-v4:not(.mir-admin-guided-active) #mir-guide-3d{display:none!important}
+body.mir-admin-v4 #mir-guide-3d-open,
+body.mir-admin-v4 #mir-guide-views,
+body.mir-admin-v4 #mir-guide-steps,
+body.mir-admin-v4 #mir-guide-instruction,
+body.mir-admin-v4 #mir-guide-actions{display:none}
+body.mir-admin-guided-active{
+  height:100dvh;overflow:hidden;overscroll-behavior:contain
+}
+body.mir-admin-guided-active #production-main{padding-top:6px;padding-bottom:0}
+body.mir-admin-guided-active :is(.production-intro,.kind-bar,.mir-v4-technical,#mir-v4-sheet-total,.mir-proc-reset-link,.drawing-note,.drawing-legend:not(#trace-readout),.drawing-head .view-switch){display:none!important}
+body.mir-admin-guided-active #mir-procurement-tabs{position:relative;top:0;margin-bottom:5px}
+body.mir-admin-guided-active .production-workspace{
+  display:grid;grid-template-columns:minmax(0,1.6fr) minmax(330px,1fr);
+  align-items:stretch;gap:10px;margin:0;height:calc(100dvh - 158px);min-height:0
+}
+body.mir-admin-guided-active .drawing-card{
+  min-height:0;height:100%;overflow:hidden;display:flex;flex-direction:column
+}
+body.mir-admin-guided-active .drawing-head{flex:0 0 auto;padding:8px 11px}
+body.mir-admin-guided-active .mir-v4-picker{flex-basis:auto;min-width:185px}
+body.mir-admin-guided-active #mir-guide-views{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,.48fr);
+  align-items:stretch;flex:1 1 auto;min-height:140px;gap:6px;padding:7px
+}
+body.mir-admin-guided-active #production-drawing{
+  min-width:0;min-height:0;margin:0!important;height:100%;overflow:hidden;border-radius:9px
+}
+body.mir-admin-guided-active #production-drawing svg{
+  display:block;min-height:0!important;max-height:100%!important;width:100%;height:100%;
+  object-fit:contain
+}
+body.mir-admin-guided-active #drawing-tools{flex:0 0 auto;max-height:121px;overflow-y:auto;padding:6px;gap:5px}
+body.mir-admin-guided-active #drawing-navigation{flex:0 0 auto;padding:4px}
+body.mir-admin-guided-active .mir-v4-actions{display:none!important}
+body.mir-admin-guided-active .mir-guide-3d{
+  border:1px solid #ccdaca;border-radius:11px;background:#f9fbf7;
+  display:flex;flex-direction:column;overflow:hidden;min-width:0;min-height:0;padding:7px
+}
+body.mir-admin-guided-active .mir-guide-3d-head{display:flex;align-items:center;justify-content:space-between;gap:6px;font:750 11px/1.3 system-ui,sans-serif;color:#42664c;letter-spacing:.035em}
+body.mir-admin-guided-active .mir-guide-3d-head>div{display:flex;gap:4px}
+body.mir-admin-guided-active .mir-guide-3d-head button{
+  background:#fff;border:1px solid #b5c6b4;border-radius:8px;min-width:32px;min-height:31px;color:#375642;font-size:18px;cursor:pointer
+}
+body.mir-admin-guided-active #mir-guide-3d-close{display:none}
+body.mir-admin-guided-active #mir-guide-3d-canvas{
+  min-height:0;min-width:0;flex:1 1 auto;touch-action:none;cursor:grab;outline-offset:2px
+}
+body.mir-admin-guided-active #mir-guide-3d-canvas:active{cursor:grabbing}
+body.mir-admin-guided-active #mir-guide-3d-canvas svg{display:block;width:100%;height:100%}
+body.mir-admin-guided-active .mir-guide-3d-caption{font-size:11px;text-align:center;margin:0;color:#5d7263}
+body.mir-admin-guided-active .config-card{
+  min-height:0;height:100%;overflow:hidden;display:flex;flex-direction:column;
+  padding:8px;gap:0
+}
+body.mir-admin-guided-active .config-card > :not(.mir-guide-visible){display:none!important}
+body.mir-admin-guided-active #mir-guide-steps{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;padding:3px;
+  background:#f0f4eb;border-radius:11px;flex:0 0 auto
+}
+body.mir-admin-guided-active #mir-guide-steps button{
+  border:0;background:transparent;border-radius:8px;min-width:0;min-height:44px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  padding:5px 2px;color:#3c6047;font:650 11px/1.15 system-ui,sans-serif;cursor:pointer
+}
+body.mir-admin-guided-active #mir-guide-steps button[aria-current=step]{background:#28553a;color:#fff}
+body.mir-admin-guided-active #mir-guide-steps button:disabled{opacity:.48;cursor:default}
+body.mir-admin-guided-active .mir-guide-num{font-size:14px;font-weight:800}
+body.mir-admin-guided-active #mir-guide-instruction{display:block;padding:9px 6px 7px;flex:0 0 auto}
+body.mir-admin-guided-active #mir-guide-instruction strong{font-size:16px}
+body.mir-admin-guided-active #mir-guide-instruction p{margin:5px 0 0;color:#546b59;font-size:12px;line-height:1.3}
+body.mir-admin-guided-active :is(#mir-v4-dimensions,#mir-v4-face,#mir-v4-colors,.piece-finish,.mir-v4-footer){
+  display:block;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+}
+body.mir-admin-guided-active .mir-v4-footer .piece-submit{display:none!important}
+body.mir-admin-guided-active #mir-guide-actions{
+  display:flex;flex-direction:column;gap:4px;padding:7px 4px 4px;
+  border-top:1px solid #dee6dc;background:#fff;flex:0 0 auto
+}
+body.mir-admin-guided-active #mir-guide-feedback{font-size:12px;color:#536a57;line-height:1.3;margin:0;min-height:16px}
+body.mir-admin-guided-active .mir-guide-actions-buttons{display:flex;gap:7px;flex-wrap:wrap}
+body.mir-admin-guided-active .mir-guide-actions-buttons>button{flex:1 1 120px;min-height:46px}
+body.mir-admin-guided-active .mir-guide-destinations:not([hidden]){display:grid;grid-template-columns:1fr;gap:6px;width:100%}
+body.mir-admin-guided-active .mir-guide-destinations button{min-height:47px}
+body.mir-admin-guided-active .mir-guide-face-choices{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+body.mir-admin-guided-active .mir-guide-face-choices button{
+  flex:1 1 110px;min-height:44px;border:1px solid #a9beab;border-radius:10px;
+  background:#f5f8f2;color:#32513a;font-weight:750;cursor:pointer
+}
+body.mir-admin-guided-active .mir-guide-face-choices button[aria-pressed=true]{background:#28553a;color:#fff}
+body.mir-admin-guided-active .mir-guide-face-choices button:focus-visible,
+body.mir-admin-guided-active #mir-guide-steps button:focus-visible{outline:3px solid #83b078;outline-offset:2px}
+body.mir-admin-guided-active #mir-guide-3d-open{display:none}
+@media(max-width:1150px){
+  body.mir-admin-guided-active #production-main{padding:5px 8px 0}
+  body.mir-admin-guided-active .production-workspace{
+    display:flex;flex-direction:column;height:calc(100dvh - 146px);gap:6px
+  }
+  body.mir-admin-guided-active .drawing-card{flex:0 0 47%;height:47%;min-height:0}
+  body.mir-admin-guided-active .config-card{flex:1 1 auto;height:auto;min-height:0}
+  body.mir-admin-guided-active #mir-guide-views{grid-template-columns:minmax(0,1fr)}
+  /* La 3D n'occupe aucune place pendant le traçage sur mobile/tablette. */
+  body.mir-admin-guided-active #mir-guide-3d{display:none!important}
+  body.mir-admin-guided-active #mir-guide-3d-open{
+    display:block;width:calc(100% - 14px);margin:3px 7px;padding:7px;
+    min-height:42px;flex:0 0 auto;font-size:13px
+  }
+  body.mir-admin-guided-active.mir-guide-3d-open #mir-guide-3d{
+    display:flex!important;position:fixed;z-index:1010;
+    inset:max(18px,env(safe-area-inset-top)) 12px max(18px,env(safe-area-inset-bottom));
+    padding:16px;border:1px solid #a9c1a9;background:#fff;
+    box-shadow:0 0 0 120vmax #16261bc2;border-radius:16px
+  }
+  body.mir-admin-guided-active.mir-guide-3d-open #mir-guide-3d-close{display:inline-flex;align-items:center;justify-content:center}
+  body.mir-admin-guided-active.mir-guide-3d-open .mir-guide-3d-head{font-size:15px}
+  body.mir-admin-guided-active.mir-guide-3d-open .mir-guide-3d-caption{font-size:13px;padding:10px 0}
+  body.mir-admin-guided-active #drawing-tools{max-height:74px}
+}
+@media(max-width:650px){
+  body.mir-admin-guided-active #mir-procurement-tabs{margin:0 0 4px;padding:3px}
+  body.mir-admin-guided-active .production-workspace{height:calc(100dvh - 129px)}
+  body.mir-admin-guided-active .drawing-card{flex-basis:44%;height:44%}
+  body.mir-admin-guided-active .drawing-head{padding:5px 8px}
+  body.mir-admin-guided-active .mir-v4-picker{min-width:0;width:100%}
+  body.mir-admin-guided-active #mir-guide-views{padding:2px 5px;gap:0;min-height:90px}
+  body.mir-admin-guided-active .config-card{padding:6px}
+  body.mir-admin-guided-active #mir-guide-steps button{min-height:40px;font-size:10px}
+  body.mir-admin-guided-active #mir-guide-instruction{padding:6px 5px}
+  body.mir-admin-guided-active #mir-guide-instruction strong{font-size:14px}
+  body.mir-admin-guided-active #mir-guide-instruction p{font-size:11px}
+  body.mir-admin-guided-active #mir-guide-actions{padding:5px}
+  body.mir-admin-guided-active #mir-guide-3d-open{min-height:36px;font-size:12px;margin:2px 7px}
+}
+@media(prefers-reduced-motion:reduce){
+  body.mir-admin-guided-active *{scroll-behavior:auto!important}
+}
+/* La fiche du modèle commence par le nom et les destinations ;
+   les réglages avancés restent disponibles, mais non imposés. */
+#save-production-template .mir-guide-model-advanced{border:1px solid #d7e3d2;border-radius:10px;padding:10px;margin:10px 0;background:#f8faf5}
+#save-production-template .mir-guide-model-advanced>summary{font-weight:700;color:#2b5339;cursor:pointer;padding:5px}
+#save-production-template .mir-guide-model-advanced fieldset{margin:12px 0}
+#save-production-template>.choice-checks{padding:12px;border:1px solid #d3e1cc;border-radius:10px;background:#f1f6eb;margin:10px 0}
