@@ -130,24 +130,7 @@
     if (count) new MutationObserver(updateDossier).observe(count, { childList: true, characterData: true, subtree: true });
     updateDossier();
 
-    const toolsMore = make('details', 'mir-v4-actions', '<summary>Autres actions</summary><div class="mir-v4-actions-list"><button type="button" data-workflow="models">Mes modèles</button><button type="button" data-workflow="requests">Demandes clients</button></div>');
-    if (drawingTools) drawingTools.after(toolsMore);
-    const consolidateActions = () => {
-      const original = Array.from(drawingTools?.querySelectorAll('details.trace-more') || [])
-        .find(node => node.querySelector('summary')?.textContent?.trim() === 'Autres actions');
-      if (original) {
-        const target = original.querySelector('div');
-        if (target && !target.querySelector('[data-workflow="models"]')) {
-          for (const button of toolsMore.querySelectorAll('.mir-v4-actions-list button'))
-            target.append(button.cloneNode(true));
-        }
-        toolsMore.hidden = true;
-      } else toolsMore.hidden = false;
-    };
-    if (drawingTools) {
-      new MutationObserver(consolidateActions).observe(drawingTools, {childList:true,subtree:true});
-      consolidateActions();
-    }
+    // La navigation avancée existe déjà dans les onglets Admin; ne pas ajouter « Autres actions » au tracé.
 
     const restoreNav = () => {
       const workflow = $('#production-workflow');
