@@ -99,6 +99,9 @@ jobs:
           node --check tests/mir-homepage.cjs
           node --check tests/mir-homepage-browser.cjs
           node tests/mir-homepage.cjs
+          node --check dist/mir-public-menu.js
+          node --check tests/mir-public-menu-browser.cjs
+          node tests/mir-public-menu.cjs
           node --check tests/mir-client-header.cjs
           node tests/mir-client-header.cjs
           node --check tests/mir-client-signature.cjs
@@ -120,6 +123,7 @@ jobs:
           node tests/mir-retours-cotes-browser.cjs
           node tests/mir-homepage-browser.cjs
           node tests/mir-client-header-browser.cjs
+          node tests/mir-public-menu-browser.cjs
           node tests/mir-client-signature-browser.cjs
           node tests/mir-production-signature-browser.cjs
           node tests/mir-realisations-browser.cjs
@@ -142,6 +146,7 @@ jobs:
           path: |
             artifacts/mir-accueil-*.png
             artifacts/mir-entete-*.png
+            artifacts/mir-menu-*.png
             artifacts/mir-signature-*.png
             artifacts/mir-production-signature-*.png
             artifacts/mir-realisations-*.png
@@ -203,6 +208,11 @@ jobs:
           fetch "$base/mir-client-signature.css" /tmp/mir-client-signature.css
           grep -F 'body.mir-signature' /tmp/mir-client-signature.css
           grep -F -- '--mir-accent:#348511' /tmp/mir-client-signature.css
+          fetch "$base/mir-public-menu.css" /tmp/mir-public-menu.css
+          grep -F "mir-client-menu-toggle" /tmp/mir-public-menu.css
+          fetch "$base/mir-public-menu.js" /tmp/mir-public-menu.js
+          grep -F "aria-expanded" /tmp/mir-public-menu.js
+          grep -F "mir-public-menu.js?v=1" /tmp/pliage.html
           fetch "$base/mir-client-header.css" /tmp/mir-client-header.css
           grep -F '.mir-client-header' /tmp/mir-client-header.css
           fetch "$base/realisations.html" /tmp/mir-realisations.html
