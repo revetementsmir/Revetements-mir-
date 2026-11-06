@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const P=require('../dist/mir-procurement.js');
 const Cards=require('../dist/custom-model-cards.js');
+const StoreColor=require('../dist/mir-store-color-policy.js');
 let count=0;
 function test(label,fn){fn();count++;console.log('PASS '+label);}
 const mockTemplate={id:'mir-modele-test',version:1,kind:'profile',name:'Solin personnalisé',
@@ -11,6 +12,35 @@ const mockTemplate={id:'mir-modele-test',version:1,kind:'profile',name:'Solin pe
 const model={id:mockTemplate.id,name:mockTemplate.name,currentVersion:1,versions:[mockTemplate],
  channels:{client:false,store:false,po:true},allowed:{materials:['aluminium','acier'],colorSystems:['manufacturer']},archived:false};
 const engine={templatePreview:()=>({ok:true,model:{valid:true,kind:'profile',name:mockTemplate.name,pointsMM:[[0,0],[30,0],[30,35]],segments:[{label:'A'},{label:'B'}]}})};
+
+test('Magasin : choix de la couleur libre par défaut, compatible avec un modèle ancien',()=>{
+ assert.deepEqual(StoreColor.create({channelStore:true,mode:'employee'}),{ok:true,policy:{mode:'employee'}});
+ assert.deepEqual(StoreColor.resolve(undefined,[]),{ok:true,locked:false});
+ assert.deepEqual(StoreColor.create({channelStore:false,mode:'fixed'}),{ok:true,policy:{mode:'employee'}});
+});
+test('Magasin : une couleur fabricant précise peut être conservée',()=>{
+ const material={id:'kaycan-coil',brand:'Kaycan'};
+ const color={id:'kaycan-noir',name:'Noir',code:'N001'};
+ const creation=StoreColor.create({channelStore:true,mode:'fixed',material,color,metalType:'aluminium'});
+ assert.equal(creation.ok,true);
+ assert.equal(creation.policy.mode,'fixed');
+ assert.equal(creation.policy.manufacturer,'Kaycan');
+ assert.equal(creation.policy.colorId,'kaycan-noir');
+ assert.deepEqual(StoreColor.resolve(creation.policy,[{...material,colors:[color]}]),{
+  ok:true,locked:true,materialId:'kaycan-coil',manufacturer:'Kaycan',
+  metalType:'aluminium',colorId:'kaycan-noir',colorName:'Noir',colorCode:'N001'
+ });
+});
+test('Magasin : aucune correspondance automatique entre fabricants',()=>{
+ const material={id:'kaycan-coil',brand:'Kaycan'},color={id:'noir',name:'Noir',code:'N001'};
+ const policy=StoreColor.create({channelStore:true,mode:'fixed',material,color,metalType:'aluminium'}).policy;
+ assert.equal(StoreColor.resolve(policy,[{id:'gentek-coil',brand:'Gentek',colors:[color]}]).ok,false);
+ assert.equal(StoreColor.resolve(policy,[{...material,colors:[{...color,code:'N002'}]}]).ok,false);
+});
+test('Magasin : bloquer une couleur fixe non référencée ou RAL',()=>{
+ assert.equal(StoreColor.create({channelStore:true,mode:'fixed',colorSystem:'ral'}).ok,false);
+ assert.equal(StoreColor.create({channelStore:true,mode:'fixed',material:{id:'kaycan',brand:'Kaycan'},color:null,metalType:'aluminium'}).ok,false);
+});
 test('Tarifs français et anglais convertis en cents exacts',()=>{
  assert.equal(P.parsePrice('7,99'),799);assert.equal(P.parsePrice('10.99'),1099);
  assert.equal(P.parsePrice('100'),10000);assert.equal(P.priceLabel(799),'7,99 $ CA');
