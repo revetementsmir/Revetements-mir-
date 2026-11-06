@@ -60,6 +60,12 @@ const sizes=[
             ariaControls:b.getAttribute('aria-controls')===n.id
           };
         });
+        if(state.scroll>state.view+2){
+          const violations=await page.evaluate(()=>[...document.querySelectorAll('body *')].map(el=>{
+            const r=el.getBoundingClientRect();return {node:el.tagName.toLowerCase(),id:el.id,cls:String(el.className||'').slice(0,90),left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),scrollWidth:el.scrollWidth};
+          }).filter(x=>x.right>innerWidth+3).sort((a,b)=>b.right-a.right).slice(0,12));
+          console.log('MIR OVERFLOW '+size.name+' '+route+' '+JSON.stringify(violations));
+        }
         assert.ok(state.scroll<=state.view+2,size.name+' '+route+' : débordement horizontal '+JSON.stringify(state));
         assert.ok(state.estimateVisible,size.name+' '+route+' : estimation invisible');
         assert.equal(state.selection,1,size.name+' '+route+' : lien de sélection absent ou doublé');
