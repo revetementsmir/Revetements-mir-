@@ -110,6 +110,10 @@ jobs:
           node --check tests/mir-unified-dossier.cjs
           node --check tests/mir-unified-dossier-browser.cjs
           node tests/mir-unified-dossier.cjs
+          node --check dist/mir-unified-client-dossier.js
+          node --check tests/mir-unified-dossier.cjs
+          node --check tests/mir-unified-dossier-browser.cjs
+          node tests/mir-unified-dossier.cjs
           node --check tests/mir-production-client-flow-browser.cjs
           node --check dist/mir-selection-pdf.js
           node --check tests/mir-selection-pdf-browser.cjs
@@ -140,6 +144,7 @@ jobs:
           node tests/mir-public-menu-browser.cjs
           node tests/mir-production-client-flow-browser.cjs
           node tests/mir-unified-dossier-browser.cjs
+          node tests/mir-unified-dossier-browser.cjs
           node tests/mir-selection-pdf-browser.cjs
           node tests/mir-client-signature-browser.cjs
           node tests/mir-production-signature-browser.cjs
@@ -167,6 +172,7 @@ jobs:
             artifacts/mir-entete-*.png
             artifacts/mir-menu-*.png
             artifacts/mir-client-parcours-*.png
+            artifacts/mir-dossier-commun-*.png
             artifacts/mir-dossier-commun-*.png
             artifacts/mir-signature-*.png
             artifacts/mir-production-signature-*.png
@@ -359,6 +365,12 @@ jobs:
           fetch "$base/mir-production-client-nav.js?verification=$GITHUB_SHA" /tmp/mir-production-client-nav.js
           cmp /tmp/mir-production-client-nav.js _site_mir/mir-production-client-nav.js
           grep -F "MIRProductionClientNavigation" /tmp/mir-production-client-nav.js
+          fetch "$base/mir-unified-client-dossier.js?verification=$GITHUB_SHA" /tmp/mir-unified-client-dossier.js
+          cmp /tmp/mir-unified-client-dossier.js _site_mir/mir-unified-client-dossier.js
+          fetch "$base/mir-unified-dossier.css?verification=$GITHUB_SHA" /tmp/mir-unified-dossier.css
+          cmp /tmp/mir-unified-dossier.css _site_mir/mir-unified-dossier.css
+          fetch "$base/selection.html?verification=$GITHUB_SHA" /tmp/mir-dossier-selection.html
+          grep -F "mir-unified-client-dossier.js?v=1" /tmp/mir-dossier-selection.html
           fetch "$base/mir-production-client-nav.css?verification=$GITHUB_SHA" /tmp/mir-production-client-nav.css
           cmp /tmp/mir-production-client-nav.css _site_mir/mir-production-client-nav.css
           grep -F "mir-production-client-nav.js?v=1" /tmp/production.html
