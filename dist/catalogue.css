@@ -9,3 +9,24 @@
 .catalogue-product-photo img{padding:9%;object-fit:contain;mix-blend-mode:normal;filter:none}
 
 .catalogue-group-heading{grid-column:1/-1;margin:20px 0 0;border-bottom:1px solid #cdd8c4;padding-bottom:14px;font-size:21px;font-weight:500;letter-spacing:-.4px}.official-color[href]{text-decoration:none;color:inherit}.official-color[href]:hover{outline:1px solid #5e7b4f;outline-offset:4px}
+
+/* MIR : empêcher la rangée de fabricants d'élargir toute la page sur mobile.
+   La grille et ses enfants doivent pouvoir rétrécir; seul le ruban des
+   marques défile horizontalement. Ne pas masquer un débordement du body. */
+@media(max-width:700px){
+  body.mir-signature .catalogue-layout{
+    width:100%;min-width:0;
+    grid-template-columns:minmax(0,1fr)
+  }
+  body.mir-signature .catalogue-layout > .brand-sidebar,
+  body.mir-signature .catalogue-layout > .catalogue-main{
+    min-width:0;max-width:100%
+  }
+  body.mir-signature .brand-buttons{
+    min-width:0;max-width:100%;
+    overflow-x:auto;overscroll-behavior-x:contain
+  }
+  body.mir-signature .catalogue-toolbar{min-width:0}
+  body.mir-signature .catalogue-controls{grid-template-columns:minmax(0,1fr)}
+  body.mir-signature .catalogue-controls > label{min-width:0}
+}
