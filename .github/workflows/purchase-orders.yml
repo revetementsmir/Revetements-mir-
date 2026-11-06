@@ -1,7 +1,7 @@
 name: MIR purchase orders and send safety
 on:
   pull_request:
-    paths: ['dist/mir-po-workflow.js', 'dist/mir-procurement*', 'dist/production*', 'server/**', 'supabase/**', 'tests/mir-po*', 'tests/mir-supplier-send.cjs', 'tools/database/**', '.github/workflows/purchase-orders.yml']
+    paths: ['dist/mir-po-workflow.js', 'dist/mir-procurement*', 'dist/production*', 'server/**', 'dist/mir-shared*', 'dist/espace-partage.html', 'dist/shared-config.js', 'tests/mir-shared*', 'tests/mir-shopify*', 'supabase/**', 'tests/mir-po*', 'tests/mir-supplier-send.cjs', 'tools/database/**', '.github/workflows/purchase-orders.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,3 +22,5 @@ jobs:
       - run: node tests/mir-po-workflow.cjs
       - run: node tests/mir-supplier-send.cjs
       - run: node tests/mir-procurement.cjs
+      - run: node tests/mir-shared-client.cjs
+      - run: node tests/mir-shopify-projection.cjs
