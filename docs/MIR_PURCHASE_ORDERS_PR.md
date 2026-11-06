@@ -2,7 +2,7 @@
 
 Les bons de pliage peuvent maintenant être rouverts depuis les trois vues Créer / En attente / Historique, modifiés avec l'éditeur existant et retrouvés après rechargement. Une version avec PDF ou transmission déclarée est conservée; sa modification crée une nouvelle révision. L'original binaire du PDF reste téléchargeable. L'envoi réel est volontairement désactivé, faute de services connectés.
 
-Cette PR dépend de #16 : base `codex/shared-data-security-foundation`, tête `codex/purchase-orders-pdf`. Elle conserve le socle précédent et montre uniquement la mission 2. Après intégration de #16, rebaser au besoin et recibler main. Ne pas fusionner ou publier automatiquement.
+Cette PR dépend de #16 : base `codex/shared-data-security-foundation`, tête `codex/purchase-orders-pdf`. Elle conserve le socle précédent et montre uniquement la mission 2. Après intégration de #16, rebaser au besoin et recibler main. Les deux branches de travail ont également été synchronisées sans conflit avec main `0abe3aa` (menu mobile et catalogue responsive), sans modifier main ni réécrire l’historique. Ne pas fusionner ou publier automatiquement.
 
 ## Changements
 
@@ -15,9 +15,9 @@ Cette PR dépend de #16 : base `codex/shared-data-security-foundation`, tête `c
 
 ## Validation locale
 
-- 28 scripts Node réussis, incluant toutes les régressions précédentes, les tests PostgreSQL/RLS et de sauvegarde, 5 scénarios de workflow et 9 scénarios serveur d'envoi (plus leur test conteneur).
+- 29 scripts Node réussis, incluant toutes les régressions précédentes, les tests PostgreSQL/RLS et de sauvegarde, 5 scénarios de workflow et 9 scénarios serveur d'envoi (plus leur test conteneur).
 - Nouvelle recette Chromium PC 1440, tablette 1024 et mobile 390 : ajout direct sans modèle, sauvegarde/rechargement, duplication/suppression/quantité, vrai PDF original et révisé, empreintes différentes entre révisions et identiques au retéléchargement de l'original, prévisualisation, recherche, Historique et Recommander, envoi désactivé.
-- Sept scripts Chromium existants réussis : ajout direct, atelier, guide Admin (dont 3D à la demande), accueil (9 résolutions), miniatures/Boutique, Studio terrain et signature client (40 contrôles). Magasin et fournisseurs vérifiés dans le guide Admin.
+- Neuf scripts Chromium existants réussis : ajout direct, atelier, guide Admin (dont 3D à la demande), accueil (9 résolutions), miniatures/Boutique, Studio terrain et signature client (40 contrôles), menu public et en-tête client. Magasin et fournisseurs vérifiés dans le guide Admin.
 - Aucun courriel externe. Aucun test ne prétend certifier un Supabase distant ou une livraison réelle. PDF fictif également généré pour contrôle visuel des feuilles cotées.
 
 ## Limites et activation ultérieure

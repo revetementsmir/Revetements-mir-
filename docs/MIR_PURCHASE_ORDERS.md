@@ -2,7 +2,7 @@
 
 ## Base et dépendance de revue
 
-`main` vérifiée à `02493d0517899f5fa1bfdbde0e96129989229a33`. La PR #16 pointe vers `3016a4d667fb9a4d8e5420dc649f7744ce69950f` et n'est pas intégrée à cette main lors de la vérification. Branche mission 2 : `codex/purchase-orders-pdf`, basée sur `codex/shared-data-security-foundation`. Créer la PR avec cette dernière comme base pour montrer uniquement la mission 2; fusionner/rebaser la dépendance avant de recibler main. Aucun déploiement, changement Supabase distant ou envoi réel.
+`main` initialement vérifiée à `02493d0517899f5fa1bfdbde0e96129989229a33`, puis synchronisée à `0abe3aa9edbb4863c7be3c1e7148a3966bad57ab` lors du contrôle final. La PR #16, initialement à `3016a4d667fb9a4d8e5420dc649f7744ce69950f`, reste non fusionnée. Sa branche et celle de mission 2 ont été synchronisées avec cette nouvelle main, sans modifier main et sans réécriture d’historique, pour conserver le nouveau menu mobile et le catalogue responsive. Branche mission 2 : `codex/purchase-orders-pdf`, basée sur `codex/shared-data-security-foundation`. Créer la PR avec cette dernière comme base pour montrer uniquement la mission 2; fusionner/rebaser la dépendance avant de recibler main. Aucun déploiement, changement Supabase distant ou envoi réel.
 
 ## Fonctionnel sur le site statique
 
