@@ -65,7 +65,7 @@
   function readState(storage) {
     let old={};
     try{old=JSON.parse(storage.getItem(KEY)||'{}')||{};}catch{}
-    return {version:VERSION,suppliers:mergeSuppliers(old.suppliers),orders:Array.isArray(old.orders)?old.orders:[]};
+    return {...old,version:VERSION,suppliers:mergeSuppliers(old.suppliers),orders:Array.isArray(old.orders)?old.orders:[]};
   }
   function getDossier(storage) {
     try{
@@ -145,9 +145,12 @@
     if(new URLSearchParams(win.location.search).get('mode')==='client') return;
     const doc=win.document,main=doc.querySelector('#production-main');
     if(!main||!win.localStorage||doc.querySelector('#mir-procurement-tabs'))return;
+    const W=win.MIRPOWorkflow;
+    let stored=win.localStorage.getItem(KEY);
     let state=readState(win.localStorage),tab='draw',supplierEditing=null,pendingWorkflowObserver=null,poView='pending';
-    const ui={supplierId:'unico',poNumber:'',job:'',foreman:'',shipTo:'',requestedDate:'',terms:'',notes:''};
-    function save(){try{win.localStorage.setItem(KEY,JSON.stringify(state));return true;}catch{win.alert('Stockage local indisponible : impossible d’enregistrer.');return false;}}
+    const ui={supplierId:'unico',poNumber:'',job:'',foreman:'',shipTo:'',requestedDate:'',terms:'',notes:'',...state.formDraft};
+    let query='',filterDate='';
+    function save(){try{if(win.localStorage.getItem(KEY)!==stored)throw Error('Le suivi a changé dans un autre onglet. Rechargez la page.');const raw=JSON.stringify(state);win.localStorage.setItem(KEY,raw);stored=raw;return true;}catch{win.alert('Sauvegarde impossible ou données modifiées dans un autre onglet. Rechargez avant de continuer.');return false;}}
     save();
     const tabs=doc.createElement('nav');tabs.id='mir-procurement-tabs';tabs.setAttribute('aria-label','Administration du pliage');
     tabs.innerHTML='<button type="button" data-mir-tab="draw">Créer</button><button type="button" data-mir-tab="boutique">Boutique</button><button type="button" data-mir-tab="store">Magasin employés</button><button type="button" data-mir-tab="orders">Bons de commande</button>';
@@ -157,7 +160,7 @@
     tabs.after(shortcuts);
     const clearLink=doc.createElement('a');clearLink.href='vider-atelier.html';clearLink.className='mir-proc-reset-link';clearLink.textContent='Vider mes profils et essais enregistrés';tabs.insertAdjacentElement('afterend',clearLink);
     function currentOrder(){return getDossier(win.localStorage);}
-    function populateOrder(){const o=currentOrder();if(o){if(!ui.poNumber)ui.poNumber=o.poNumber||'';if(!ui.job)ui.job=o.project||'';if(!ui.foreman)ui.foreman=o.foreman||'';if(!ui.requestedDate)ui.requestedDate=o.date||'';}}
+    function populateOrder(){const o=currentOrder();if(o&&state.formSource!==o.id&&!state.editingId){ui.poNumber=o.poNumber||'';ui.job=o.project||'';ui.foreman=o.foreman||'';ui.requestedDate=o.date||'';state.formSource=o.id;}if(o){if(!ui.poNumber)ui.poNumber=o.poNumber||'';if(!ui.job)ui.job=o.project||'';if(!ui.foreman)ui.foreman=o.foreman||'';if(!ui.requestedDate)ui.requestedDate=o.date||'';}}
     function field(name,label,kind='text',extra='') {
       const value=ui[name]||'';
       return '<label class="mir-proc-field"><span>'+esc(label)+'</span><input type="'+kind+'" data-mir-po="'+name+'" value="'+esc(value)+'" '+extra+'></label>';
@@ -168,10 +171,10 @@
       populateOrder();
       const dossier=currentOrder(),number=dossier?.items?.filter(i=>i.spec?.kind==='profile'||i.kind==='profile').length||0;
       const warnings=!dossier?'Aucun dossier de moulures sur cet appareil.':dossier.items?.length+' pièce(s) dans le dossier courant.';
-      const list=state.orders.slice().reverse().slice(0,30).map(o=>'<article class="mir-proc-row"><div><b>'+esc(o.poNumber)+'</b><small>'+esc(o.supplier?.name||'')+' · '+esc(o.job)+' · '+esc(o.status)+'</small></div><div class="mir-proc-actions"><button data-mir-print="'+esc(o.id)+'" type="button">PDF</button><button data-mir-mail="'+esc(o.id)+'" type="button">Préparer courriel</button></div></article>').join('');
-      return poMenu()+'<div class="mir-proc-top"><div><h2>Créer un bon de pliage</h2><p>Une commande = un fournisseur + le dessin exact des pièces au moment de la création.</p></div></div>'
-        +'<p class="mir-proc-alert">Démonstration locale : aucune commande n’est envoyée automatiquement. Ouvrir un courriel n’est pas une preuve d’envoi; le PDF doit être joint manuellement.</p>'
-        +'<div class="mir-proc-grid"><div class="mir-proc-card"><h3>1. Pièces à commander</h3><p>'+esc(warnings)+'</p><p>'+number+' moulure(s) reconnue(s). Les panneaux restent dans leur propre parcours.</p><button type="button" data-mir-tab="draw">Dessiner / ajouter une moulure</button></div>'
+      const list=state.orders.slice().reverse().slice(0,30).map(o=>'<article class="mir-proc-row"><div><b>'+esc(o.poNumber)+'</b><small>'+esc(o.supplier?.name||'')+' · '+esc(o.job)+' · '+esc(o.status)+'</small></div><div class="mir-proc-actions"><button data-mir-open="'+esc(o.id)+'" type="button">Ouvrir / réviser</button><button data-mir-print="'+esc(o.id)+'" type="button">PDF</button><button data-mir-mail="'+esc(o.id)+'" type="button">Préparer courriel</button></div></article>').join('');
+      return poMenu()+'<div class="mir-proc-top"><div><h2>Créer / modifier un bon de pliage</h2><button type="button" id="mir-new-draft">＋ Nouveau bon</button><p>Une commande = un fournisseur + le dessin exact des pièces au moment de la création.</p></div></div>'
+        +'<p class="mir-proc-alert">Brouillon sauvegardé sur cet appareil. Pour modifier les pièces, revenez au dessin : modifier, dupliquer ou retirer. L’envoi automatique reste désactivé : aucune commande n’est envoyée automatiquement.</p>'
+        +'<div class="mir-proc-grid"><div class="mir-proc-card"><h3>1. Pièces à commander</h3><p>'+esc(warnings)+'</p><p>'+number+' moulure(s) reconnue(s). Les panneaux restent dans leur propre parcours.</p><button type="button" data-mir-tab="draw">Dessiner / ajouter une moulure</button><button type="button" id="mir-edit-lines">Modifier les lignes du bon</button></div>'
         +'<div class="mir-proc-card"><h3>2. Fournisseur</h3><label class="mir-proc-field"><span>Choisir</span><select data-mir-po="supplierId">'+supplierOptions()+'</select></label><button type="button" data-mir-tab="suppliers">Gérer les fournisseurs</button></div></div>'
         +'<div class="mir-proc-card"><h3>3. Chantier et livraison</h3><div class="mir-proc-grid">'
         +field('poNumber','Numéro du bon de commande','text','required maxlength="100"')
@@ -181,7 +184,7 @@
         +field('shipTo','Adresse de livraison ou cueillette','text','required maxlength="360"')
         +field('terms','Conditions / transport','text','maxlength="300"')+'</div>'
         +'<label class="mir-proc-field"><span>Notes au fournisseur</span><textarea data-mir-po="notes" rows="3" maxlength="800">'+esc(ui.notes)+'</textarea></label>'
-        +'<p id="mir-proc-error" role="alert" class="mir-proc-error" hidden></p>'
+        +'<p id="mir-proc-error" role="alert" class="mir-proc-error" hidden></p><p id="mir-draft-feedback" role="status" aria-live="polite"></p>'
         +'<div class="mir-proc-actions"><button type="button" class="mir-proc-primary" id="mir-create-po">Enregistrer le bon brouillon</button></div></div>'
         +'<div class="mir-proc-card"><h3>4. Bons enregistrés sur cet appareil</h3>'+ (list||'<p>Aucun bon enregistré.</p>')+'</div>';
     }
@@ -232,7 +235,7 @@
       win.MIRCustomModelCards?.refresh?.();
     }
 
-    const PO_STATUS=Object.freeze([
+    const PO_STATUS=W?.statuses||Object.freeze([
       ['brouillon','Brouillon'],
       ['a_valider','À valider'],
       ['pret','Prêt à commander'],
@@ -249,20 +252,20 @@
     }
     function orderListsHTML(){
       const archived=poView==='history';
-      const rows=state.orders.filter(o=>archivedPO(o.status)===archived).slice().reverse().slice(0,120);
+      const rows=W?W.search(state.orders,{history:archived,query,date:filterDate}):state.orders.filter(o=>archivedPO(o.status)===archived).slice().reverse();
       const cards=rows.map(o=>{
         const status=PO_STATUS.find(([id])=>id===o.status)?.[1]||'Brouillon';
         const supplier=o.supplier?.name||'Fournisseur à préciser';
         const updates=Array.isArray(o.events)?o.events.length:0;
         return '<article class="mir-proc-card mir-po-tracked" data-mir-order-id="'+esc(o.id)+'">'
-         +'<div class="mir-proc-model-head"><div><h3>'+esc(o.poNumber||'Bon sans numéro')+'</h3><p>'+esc(supplier)+' · '+esc(o.job||'Chantier à préciser')+'</p></div><span class="mir-proc-model-state">'+esc(status)+'</span></div>'
+         +'<div class="mir-proc-model-head"><div><h3>'+esc(o.poNumber||'Bon sans numéro')+' · R'+esc(o.revision||1)+'</h3><p>'+esc(supplier)+' · '+esc(o.job||'Chantier à préciser')+'</p></div><span class="mir-proc-model-state">'+esc(status)+'</span></div>'
          +'<p>'+esc(o.items?.length||0)+' moulure(s) · '+updates+' événement(s) dans le suivi local.</p>'
          +'<label class="mir-proc-field"><span>Faire évoluer le suivi</span><select data-mir-order-status="'+esc(o.id)+'" aria-label="Statut du bon '+esc(o.poNumber)+'">'
-         +PO_STATUS.map(([value,label])=>'<option value="'+value+'"'+((o.status||'brouillon')===value?' selected':'')+'>'+label+'</option>').join('')+'</select></label>'
-         +'<div class="mir-proc-actions"><button type="button" data-mir-print="'+esc(o.id)+'">PDF coté</button><button type="button" data-mir-mail="'+esc(o.id)+'">Préparer courriel manuel</button></div>'
-         +'</article>';
+         +PO_STATUS.filter(([value])=>value!=='envoye'||o.status==='envoye').map(([value,label])=>'<option value="'+value+'"'+((o.status||'brouillon')===value?' selected':'')+'>'+label+'</option>').join('')+'</select></label>'
+         +'<div class="mir-proc-actions"><button type="button" data-mir-open="'+esc(o.id)+'">'+(W?.frozen(o)?'Créer une révision':'Modifier le bon')+'</button><button type="button" data-mir-review="'+esc(o.id)+'">Vérifier / envoyer</button><button type="button" data-mir-pdf="'+esc(o.id)+'">Télécharger le PDF</button></div>'
+         +'<details><summary>Versions et historique · révision '+esc(o.revision||1)+'</summary><div class="mir-proc-actions"><button type="button" data-mir-repeat="'+esc(o.id)+'">Recommander ce bon</button><button type="button" data-mir-print="'+esc(o.id)+'">Prévisualiser le PDF coté</button><button type="button" data-mir-mail="'+esc(o.id)+'">Préparer courriel manuel</button></div><ul>'+(o.events||[]).map(event=>'<li>'+esc(event.at)+' · '+esc(event.type)+'</li>').join('')+'</ul></details></article>';
       }).join('');
-      return poMenu()+'<p class="mir-proc-alert">Suivi local sur cet appareil. « Envoyé manuellement » est une déclaration, pas une preuve d’envoi. Aucun envoi automatique avec pièce jointe n’est branché.</p>'
+      return poMenu()+'<div class="mir-proc-grid"><label class="mir-proc-field"><span>Rechercher fournisseur, chantier ou numéro</span><input id="mir-po-search" value="'+esc(query)+'"></label><label class="mir-proc-field"><span>Date de création ou livraison</span><input id="mir-po-date" type="date" value="'+esc(filterDate)+'"></label></div><p id="mir-po-feedback" role="status" aria-live="polite"></p>'+'<p class="mir-proc-alert">Suivi local sur cet appareil. « Envoyé manuellement » est une déclaration, pas une preuve d’envoi. Aucun envoi automatique avec pièce jointe n’est branché.</p>'
        +(cards||'<div class="mir-proc-card"><h3>'+ (archived?'Aucun bon terminé':'Aucun bon en attente') +'</h3><p>Les bons sauvegardés apparaîtront ici.</p><button type="button" data-mir-po-view="create">Créer un bon</button></div>');
     }
     function storeHTML(){
@@ -332,10 +335,62 @@
     function newPo() {
       const supplier=state.suppliers.find(s=>s.id===ui.supplierId),dossier=currentOrder(),errs=validatePo(ui,supplier,dossier,win.MIRProduction).filter(text=>!/^(Vérifier le courriel|Adresse courriel du fournisseur)/.test(text));
       if(errs.length){const e=doc.querySelector('#mir-proc-error');e.hidden=false;e.innerHTML='<strong>À compléter :</strong><ul>'+errs.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>';return;}
-      if(state.orders.some(o=>o.poNumber.toLowerCase()===ui.poNumber.toLowerCase())){const e=doc.querySelector('#mir-proc-error');e.hidden=false;e.textContent='Ce numéro de bon existe déjà. Change le numéro pour créer une autre commande.';return;}
-      const po=createPo(ui,supplier,dossier);state.orders.push(po);
+      if(state.orders.some(o=>o.id!==state.editingId&&o.poNumber.toLowerCase()===ui.poNumber.toLowerCase()&&(!state.editingId||(o.rootId||o.id)!==(state.orders.find(x=>x.id===state.editingId)?.rootId||state.editingId)))){const e=doc.querySelector('#mir-proc-error');e.hidden=false;e.textContent='Ce numéro existe déjà : ouvre ce bon depuis En attente ou Historique pour le modifier ou créer une révision.';return;}
+      const previous=state.orders.find(o=>o.id===state.editingId);
+      const fresh=createPo(ui,supplier,dossier);
+      const po=previous&&W?W.saveDraft(previous,{...fresh,id:previous.id,createdAt:previous.createdAt,events:[...(previous.events||[]),{type:'brouillon-enregistre',at:fresh.updatedAt}]}):fresh;
+      if(previous)state.orders[state.orders.indexOf(previous)]=po;else state.orders.push(po);state.editingId=po.id;state.formDraft={...ui};
       if(save()){poView='pending';switchTab('orders');const notice=panel.querySelector('.mir-proc-alert');if(notice)notice.insertAdjacentText('afterbegin','Bon brouillon enregistré localement. ');}
     }
+    function autosave(){
+      state.formDraft={...ui};
+      const index=state.orders.findIndex(o=>o.id===state.editingId),source=currentOrder();
+      if(index>=0&&W&&!W.frozen(state.orders[index])){
+        const old=state.orders[index],supplier=state.suppliers.find(s=>s.id===ui.supplierId)||old.supplier;
+        const patch={...ui,supplier:{...supplier}};
+        if(source?.id===old.sourceDossierId)patch.items=JSON.parse(JSON.stringify(source.items));
+        state.orders[index]=W.saveDraft(old,patch);
+      }
+      const saved=save(),feedback=doc.querySelector('#mir-draft-feedback');if(feedback)feedback.textContent=saved?'Brouillon enregistré sur cet appareil.':'Sauvegarde non confirmée.';return saved;
+    }
+    function openEditor(id,reorder=false){
+      const old=state.orders.find(o=>o.id===id);if(!old||!W)return;
+      const number=reorder?win.prompt('Nouveau numéro pour recommander ce bon') : null;
+      if(reorder&&!number)return;
+      if(reorder&&state.orders.some(o=>o.poNumber.toLowerCase()===number.trim().toLowerCase()))return win.alert('Ce numéro existe déjà.');
+      const next=W.edit(old,state.orders,{reorder,number});
+      if(!win.MIRProductionWorkspace?.openPurchaseOrder(next))return;
+      next.sourceDossierId='procurement-'+next.id;
+      const i=state.orders.findIndex(o=>o.id===next.id);if(i<0)state.orders.push(next);else state.orders[i]=next;
+      state.editingId=next.id;
+      Object.assign(ui,{supplierId:next.supplier.id,poNumber:next.poNumber,job:next.job,foreman:next.foreman,shipTo:next.shipTo,requestedDate:next.requestedDate,terms:next.terms,notes:next.notes});
+      state.formDraft={...ui};if(save()){poView='create';switchTab('orders');}
+    }
+    async function downloadPdf(id,button,preview=false){
+      const po=state.orders.find(o=>o.id===id);if(!po||!W)return;
+      const popup=preview?win.open('','_blank'):null;if(preview&&!popup)return win.alert('Autorisez la fenêtre du PDF.');
+      button.disabled=true;doc.body.inert=true;const progress=doc.querySelector('#mir-po-feedback');if(progress)progress.textContent='Préparation et archivage du PDF…';
+      try{
+        const record=await W.archivePDF(po,()=>win.MIRPDF.makePlan({faces:W.pdfFaces(po,win.MIRProduction),title:'Bon MIR '+po.poNumber,subtitle:po.supplier.name}));
+        const url=win.URL.createObjectURL(record.blob),a=doc.createElement('a');a.href=url;a.download='MIR-BC-'+String(po.poNumber).replace(/[^a-zA-Z0-9_-]/g,'-')+'-R'+po.revision+'.pdf';if(popup)popup.location.href=url;else a.click();win.setTimeout(()=>win.URL.revokeObjectURL(url),60000);
+        po.pdf={key:record.key,sha256:record.sha256,createdAt:record.createdAt};
+        po.events=[...(po.events||[]),{type:'pdf-archive',sha256:record.sha256,at:new Date().toISOString()}];
+        if(save()){if(state.editingId===po.id)state.editingId=null;save();switchTab('orders');}
+      }catch(error){popup?.close();win.alert('PDF non préparé : '+error.message);}finally{doc.body.inert=false;button.disabled=false;}
+    }
+    function review(id){
+      const po=state.orders.find(o=>o.id===id);if(!po)return;
+      const supplier=state.suppliers.find(s=>s.id===po.supplier.id);
+      const errors=validatePo({poNumber:po.poNumber,job:po.job,shipTo:po.shipTo},supplier,{items:po.items},win.MIRProduction);
+      if(supplier?.email!==po.supplier.email)errors.push('Le contact a changé : créer une révision et confirmer le destinataire.');
+      const box=doc.createElement('section');box.className='mir-proc-card';box.id='mir-send-review';
+      box.innerHTML='<h3>Vérifier → PDF → Destinataire → Envoi</h3>'+(errors.length?'<ul>'+errors.map(e=>'<li>'+esc(e)+'</li>').join('')+'</ul>':'<p>Bon complet. Destinataire : <strong>'+esc(po.supplier.email)+'</strong></p>')
+        +'<div class="mir-proc-actions"><button type="button" data-mir-preview="'+esc(id)+'">Prévisualiser le PDF coté</button><button type="button" data-mir-pdf="'+esc(id)+'">Télécharger et archiver le PDF</button></div>'
+        +'<label class="mir-proc-check"><input type="checkbox" '+(errors.length?'disabled':'')+'> Je confirme le destinataire '+esc(po.supplier.email)+'</label>'
+        +'<button type="button" disabled>Envoyer le PDF — service non connecté</button><p>À connecter : authentification Admin serveur, base Supabase, stockage privé et expéditeur MIR vérifié auprès du service courriel. Aucun courriel automatique ne sera envoyé.</p><button type="button" data-mir-po-view="pending">Retour aux bons sans perdre le travail</button>';
+      doc.querySelector('#mir-send-review')?.remove();panel.prepend(box);box.scrollIntoView({block:'start'});
+    }
+    win.addEventListener('mir:workshop-saved',()=>{const selected=state.orders.find(o=>o.id===state.editingId),source=currentOrder();if(selected&&source?.id!==selected.sourceDossierId){state.editingId=null;state.formSource=null;populateOrder();}if(state.editingId)autosave();});
     function printPo(id){
       const po=state.orders.find(o=>o.id===id);if(!po)return;
       const popup=win.open('','_blank');if(!popup){win.alert('Fenêtre bloquée : autorise une nouvelle fenêtre pour ouvrir le PDF.');return;}
@@ -357,20 +412,28 @@
       if(b.dataset.mirPoView){poView=b.dataset.mirPoView;switchTab('orders');return;}
       if(b.dataset.mirEdit){editSupplier(b.dataset.mirEdit);return;}
       if(b.id==='mir-new-supplier'){supplierEditing=null;switchTab('suppliers');return;}
+      if(b.id==='mir-edit-lines'){switchTab('draw');doc.body.classList.add('mir-v4-dossier-open');doc.querySelector('#mode-link')?.setAttribute('aria-expanded','true');doc.querySelector('#production-order')?.scrollIntoView({block:'start'});return;}
+      if(b.id==='mir-new-draft'){if(win.MIRProductionWorkspace?.newPurchaseOrder()){state.editingId=null;Object.assign(ui,{poNumber:'',job:'',foreman:'',shipTo:'',requestedDate:'',terms:'',notes:''});state.formDraft={...ui};save();poView='create';switchTab('orders');}return;}
       if(b.id==='mir-create-po'){newPo();return;}
+      if(b.dataset.mirOpen){openEditor(b.dataset.mirOpen);return;}
+      if(b.dataset.mirRepeat){openEditor(b.dataset.mirRepeat,true);return;}
+      if(b.dataset.mirReview){review(b.dataset.mirReview);return;}
+      if(b.dataset.mirPreview){downloadPdf(b.dataset.mirPreview,b,true);return;}
+      if(b.dataset.mirPdf){downloadPdf(b.dataset.mirPdf,b);return;}
       if(b.dataset.mirPrint){printPo(b.dataset.mirPrint);return;}
       if(b.dataset.mirMail){mailPo(b.dataset.mirMail);}
     });
-    panel.addEventListener('input',function(e){if(e.target.dataset.mirPo)ui[e.target.dataset.mirPo]=e.target.value;});
+    panel.addEventListener('input',function(e){if(e.target.id==='mir-po-search'){query=e.target.value;const start=e.target.selectionStart;switchTab('orders');const field=doc.querySelector('#mir-po-search');field.focus();field.setSelectionRange(start,start);return;}if(e.target.dataset.mirPo){ui[e.target.dataset.mirPo]=e.target.value;autosave();}});
     panel.addEventListener('change',function(e){
-      if(e.target.dataset.mirPo)ui[e.target.dataset.mirPo]=e.target.value;
+      if(e.target.id==='mir-po-date'){filterDate=e.target.value;switchTab('orders');return;}
+      if(e.target.dataset.mirPo){ui[e.target.dataset.mirPo]=e.target.value;autosave();}
       const id=e.target.dataset.mirOrderStatus;
       if(id){
         const index=state.orders.findIndex(o=>o.id===id),po=state.orders[index];
         if(index<0||!PO_STATUS.some(([value])=>value===e.target.value))return;
         if(po.status===e.target.value)return;
         const previous=po.status||'brouillon',next=e.target.value,now=new Date().toISOString();
-        state.orders[index]={...po,status:next,updatedAt:now,events:[...(po.events||[]),{type:'statut-manuel',from:previous,to:next,at:now}]};
+        try{state.orders[index]=W?W.changeStatus(po,next):{...po,status:next,updatedAt:now,events:[...(po.events||[]),{type:'statut-manuel',from:previous,to:next,at:now}]};}catch(error){win.alert(error.message);return;}
         if(!save()){state.orders[index]=po;return;}
         switchTab('orders');
       }
