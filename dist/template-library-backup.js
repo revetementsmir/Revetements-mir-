@@ -39,9 +39,23 @@
    const safeMaterials=Array.isArray(allowed.materials)?allowed.materials.filter(v=>materials.includes(v)):['aluminium','acier'];
    const safeColors=Array.isArray(allowed.colorSystems)?allowed.colorSystems.filter(v=>colors.includes(v)):['manufacturer','ral','special'];
    if(!safeMaterials.length||!safeColors.length)error('matières ou couleurs autorisées invalides.');
+   // Préserver la règle de couleur du Magasin lors des sauvegardes et imports.
+   // Aucune correspondance d'une marque à une autre n'est déduite ici.
+   const raw=record.storeColor;let storeColor={mode:'employee'};
+   if(raw!==undefined&&raw!==null){
+     if(!raw||typeof raw!=='object'||Array.isArray(raw)||!['employee','fixed'].includes(raw.mode))
+       error('règle de couleur Magasin invalide.');
+     if(raw.mode==='fixed'){
+       const keys=['materialId','manufacturer','metalType','colorId','colorCode','colorName'];
+       if(!record.channels?.store||!safeColors.includes('manufacturer')||
+          !keys.every(k=>typeof raw[k]==='string'&&raw[k].trim().length>0&&raw[k].length<=180)||
+          !safeMaterials.includes(raw.metalType))error('couleur conservée du Magasin incomplète ou non autorisée.');
+       storeColor={mode:'fixed',...Object.fromEntries(keys.map(k=>[k,raw[k].trim()]))};
+     }
+   }
    return {id:record.id,name:current.name,currentVersion:record.currentVersion,
      versions:clone(record.versions),allowed:{materials:[...new Set(safeMaterials)],colorSystems:[...new Set(safeColors)]},
-     measurementDefaults:defaults,channels:{client:record.channels?.client===true,store:record.channels?.store===true,...(record.channels?.po===false?{po:false}:{})},
+     storeColor,measurementDefaults:defaults,channels:{client:record.channels?.client===true,store:record.channels?.store===true,...(record.channels?.po===false?{po:false}:{})},
      archived:record.archived===true,updatedAt:typeof record.updatedAt==='string'?record.updatedAt:''};
  }
  function validate(records){

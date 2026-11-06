@@ -823,3 +823,29 @@ body.mir-admin-v4 #production-drawing[data-kind="profile"][data-tool="select"][d
 body.mir-admin-v4 #production-drawing[data-kind="profile"][data-tool="select"] [data-toggle-painted-face]{
  cursor:pointer;
 }
+
+/* MIR Magasin — choix explicite de conservation de couleur, utilisable au téléphone. */
+.mir-store-color-choice{
+ display:flex;flex-direction:column;gap:10px;
+ border:1px solid #d4ddd0;background:#f8faf6;
+ padding:14px;border-radius:10px;
+}
+.mir-store-color-choice[hidden]{display:none}
+.mir-store-color-choice>strong{font-size:15px;color:#283f31}
+.mir-store-color-choice .check-field{
+ display:flex;align-items:flex-start;gap:10px;
+ line-height:1.4;font-size:14px;
+}
+.mir-store-color-choice .check-field input{flex:0 0 auto;margin-top:3px}
+body.mir-admin-v4 #drawing-tools .discard-current-drawing{
+ border:1px solid #cba7a0;background:#fff;
+ color:#873c30;font-weight:650;border-radius:8px;
+}
+body.mir-admin-v4 #drawing-tools .discard-current-drawing:disabled{opacity:.45;cursor:not-allowed}
+body.mir-admin-v4 #drawing-tools .discard-current-drawing:focus-visible{
+ outline:3px solid #a65d4e;outline-offset:2px;
+}
+@media(max-width:600px){
+ .mir-store-color-choice{padding:12px}
+ body.mir-admin-v4 #drawing-tools .discard-current-drawing{min-height:44px}
+}
