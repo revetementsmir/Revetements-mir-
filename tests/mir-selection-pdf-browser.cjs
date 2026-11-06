@@ -36,7 +36,7 @@ async function run(){
       await page.reload({waitUntil:'domcontentloaded'});
       await page.waitForFunction(()=>document.querySelectorAll('.selection-item').length===1&&document.querySelector('#selection-export-pdf')&&!document.querySelector('#selection-export-pdf').disabled);
       assert.equal(await page.locator('#selection-project-name').inputValue(),'Maison de test MIR');
-      assert.ok((await page.locator('.selection-item').innerText()).includes(material.brand));
+      assert.ok((await page.locator('.selection-item').textContent()).includes(material.brand),'le fabricant doit être présent dans la fiche sélection');
       assert.equal(await page.locator('#selection-export').isEnabled(),true);
       const jsonDownload=page.waitForEvent('download');
       await page.locator('#selection-export').click();
