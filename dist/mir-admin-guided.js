@@ -32,8 +32,11 @@
    nav.innerHTML=LABELS.map((name,i)=>'<button type="button" data-mir-guide-step="'+(i+1)+'"><span class="mir-guide-num">'+(i+1)+'</span><span>'+safe(name)+'</span></button>').join('');
    const instruction=doc.createElement('section');instruction.id='mir-guide-instruction';instruction.className='mir-guide-instruction';
    const actions=doc.createElement('div');actions.className='mir-guide-actions';actions.id='mir-guide-actions';
-   actions.innerHTML='<p role="status" id="mir-guide-feedback" aria-live="polite"></p><div class="mir-guide-actions-buttons"><button type="button" id="mir-guide-back" class="secondary-button">← Retour</button><button type="button" id="mir-guide-next" class="primary-button">Continuer →</button><div class="mir-guide-destinations" hidden><button type="button" id="mir-guide-add-po" class="primary-button">＋ Ajouter à un bon (sans modèle)</button><button type="button" id="mir-guide-save-model" class="secondary-button">Enregistrer comme modèle…</button></div></div>';
-   config.prepend(nav,instruction);config.append(actions);
+   actions.innerHTML='<p role="status" id="mir-guide-feedback" aria-live="polite"></p><div class="mir-guide-actions-buttons"><button type="button" id="mir-guide-back" class="secondary-button">← Retour</button><button type="button" id="mir-guide-next" class="primary-button">Continuer →</button><button type="button" class="secondary-button" id="mir-guide-restart" hidden>↶ Recommencer le dessin</button><div class="mir-guide-destinations" hidden><button type="button" id="mir-guide-add-po" class="primary-button">＋ Ajouter à un bon (sans modèle)</button><button type="button" id="mir-guide-save-model" class="secondary-button">Enregistrer comme modèle…</button></div></div>';
+   // Une seule barre d'étapes au-dessus du canevas (aucune seconde page).
+   const guide=doc.createElement('section');guide.className='mir-guide-header';
+   guide.id='mir-guide-header';guide.setAttribute('aria-label','Création guidée');
+   guide.append(nav,instruction);drawing.before(guide);config.append(actions);
    let step=1,active=false,lastStep=0,session=false,confirmed=null,faceChosen=false,prevTool=null,prevPoints=0,state=null,yaw=-42,pitch=24,drag=null;
    const selector=s=>doc.querySelector(s);
    const feedback=selector('#mir-guide-feedback');
@@ -80,7 +83,7 @@
     const titles=[
       '<strong>1. Trace la moulure</strong><p>Glisse pour créer tes segments. Sur PC, la miniature suit ton dessin; sur téléphone, utilise « Voir en 3D » au besoin.</p>',
       '<strong>2. Confirme les mesures</strong><p>Vérifie A, B, C… au 1/16 po et corrige une cote directement. Le tracé reste en place.</p>',
-      '<strong>3. Choisis la face colorée</strong><p>Regarde le sens de ton tracé et sélectionne la face gauche ou droite. Tourne la 3D pour contrôler.</p><div class="mir-guide-face-choices" role="group" aria-label="Confirmer le côté peint"><button type="button" data-mir-guide-face="left">Face gauche</button><button type="button" data-mir-guide-face="right">Face droite</button></div>',
+       '<strong>3. Choisis la face colorée</strong><p>La ligne verte montre le côté à peindre. Touche le dessin qui correspond à ta moulure.</p>'+faceCards(),
       '<strong>4. Choisis le métal et la couleur</strong><p>Choisis aluminium ou acier, puis une teinte du fabricant. Vérifie la miniature avant d’enregistrer la pièce ou de l’ajouter au bon.</p>'
     ];
     instruction.innerHTML=titles[step-1];
@@ -88,12 +91,38 @@
     back.hidden=step===1;
     next.hidden=step===4;
     selector('.mir-guide-destinations').hidden=step!==4;
+    selector('#mir-guide-restart').hidden=step!==1||!(state?.drawPointsMM?.length);
     next.textContent=step===1?'Terminer le tracé →':step===2?'Confirmer les cotes →':'Confirmer la face →';
     if(step===1)warning('Dessine au moins deux côtés avant de continuer.');
     else if(step===2)warning('Confirme les cotes pour accéder au choix de la face.');
     else if(step===3)warning(faceChosen?'Face choisie : confirme pour continuer.':'Appuie sur le côté de couleur souhaité.');
     else warning('Choisis : ajouter directement au bon, ou enregistrer un modèle réutilisable. Tu n’as pas besoin d’un modèle pour préparer un bon.');
     refreshFace();
+   }
+      function paintPreview(side){
+    const points=Array.isArray(state?.model?.pointsMM)?state.model.pointsMM:[];
+    if(points.length<2)return '<svg viewBox="0 0 220 110" aria-hidden="true"><text x="110" y="55" text-anchor="middle">Trace un profil</text></svg>';
+    const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+    const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+    const scale=Math.min(163/Math.max(1,maxX-minX),70/Math.max(1,maxY-minY));
+    const cx=(minX+maxX)/2,cy=(minY+maxY)/2;
+    const map=p=>[110+(p[0]-cx)*scale,55-(p[1]-cy)*scale];
+    const line=(a,b,color,width)=>'<line x1="'+a[0].toFixed(2)+'" y1="'+a[1].toFixed(2)+'" x2="'+b[0].toFixed(2)+'" y2="'+b[1].toFixed(2)+'" stroke="'+color+'" stroke-width="'+width+'" stroke-linecap="round"/>';
+    const metal=points.slice(1).map((p,i)=>line(map(points[i]),map(p),'#88938a',6)).join('');
+    const colored=points.slice(1).map((p,i)=>{
+      const a=points[i],dx=p[0]-a[0],dy=p[1]-a[1],length=Math.hypot(dx,dy)||1;
+      const direction=side==='left'?1:-1;
+      const off=[-dy/length*direction*6,dx/length*direction*6];
+      return line(map([a[0]+off[0]/scale,a[1]+off[1]/scale]),map([p[0]+off[0]/scale,p[1]+off[1]/scale]),'#348511',4.5);
+    }).join('');
+    return '<svg viewBox="0 0 220 110" role="img" aria-label="Aperçu du côté coloré"><rect width="220" height="110" rx="10" fill="#f7faf5"/>'+metal+colored+'</svg>';
+   }
+   function faceCards(){
+     return '<div class="mir-guide-face-options" role="group" aria-label="Choisir la face à peindre">'+
+       ['left','right'].map((side,i)=>'<button type="button" class="mir-guide-face-card" data-mir-guide-face="'+side+'" aria-pressed="false">'+
+       '<span class="mir-guide-face-preview">'+paintPreview(side)+'</span>'+
+       '<strong>Choix '+(i+1)+'</strong><small>Vert = face peinte</small></button>').join('')+
+       '</div><p class="mir-guide-face-note">Choisis le dessin qui montre le bon côté. L’aperçu 3D se met à jour immédiatement.</p>';
    }
    function refreshFace(){
     if(step!==3)return;
@@ -142,7 +171,11 @@
      apply();if(active){scene();refreshFace();}
    }
    doc.addEventListener('click',event=>{
-     if(event.target.closest('#mir-guide-3d-open')){if(!active)return;body.classList.add('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','true');selector('#mir-guide-3d-canvas')?.focus();scene();return;}
+     if(event.target.closest('#mir-guide-restart')&&active&&step===1){
+        const native=selector('#drawing-tools [data-discard-current-piece]');
+        if(native&&!native.disabled)native.click();return;
+      }
+      if(event.target.closest('#mir-guide-3d-open')){if(!active)return;body.classList.add('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','true');selector('#mir-guide-3d-canvas')?.focus();scene();return;}
      if(event.target.closest('#mir-guide-3d-close')){body.classList.remove('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','false');mobileOpen.focus();return;}
      if(event.target.closest('#mir-guide-add-po')){if(step===4&&active){const native=selector('#mir-direct-po-add');if(native&&!native.disabled)native.click();else warning('Complète les détails de la pièce avant de l’ajouter au bon.');}return;}
      if(event.target.closest('#mir-guide-save-model')){
