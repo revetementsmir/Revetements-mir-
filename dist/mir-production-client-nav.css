@@ -22,6 +22,10 @@ html.mir-production-client .production-header .mir-production-client-actions .mi
 html.mir-production-client .production-header .mir-production-client-nav a[aria-current="page"]{
  color:#328522
 }
+@media(min-width:1101px){
+ /* Le lien Dossier existe déjà dans le titre : ne pas surcharger l'en-tête PC. */
+ html.mir-production-client .production-header #mode-link{display:none!important}
+}
 @media(max-width:1350px) and (min-width:1101px){
  html.mir-production-client .production-header{gap:12px}
  html.mir-production-client .production-header .production-brand{width:190px}
