@@ -1,0 +1,21 @@
+name: MIR shared database foundation
+on:
+  pull_request:
+    paths: ['supabase/**', 'tools/database/**', 'dist/mir-local-backup.js', 'tests/mir-database.cjs', 'tests/mir-local-backup*.cjs', '.github/workflows/shared-foundation.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: tools/database/package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+        working-directory: tools/database
+      - run: node tests/mir-database.cjs
+      - run: node tests/mir-local-backup.cjs
