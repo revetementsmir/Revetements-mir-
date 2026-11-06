@@ -33,15 +33,28 @@ async function main(){
       const account=header?.querySelector('a[href="chantier.html"]');
       const box=header?.getBoundingClientRect();
       const bar=nav?.getBoundingClientRect();
+      const menu=header?.querySelector('.mir-client-menu-toggle');
       return {header:!!header,nav:!!nav,logo:!!logo,account:!!account,
         navVisible:nav?getComputedStyle(nav).display!=='none':false,
+        menuVisible:!!menu&&getComputedStyle(menu).display!=='none',
+        collapsed:!!nav?.hidden&&!!menu&&getComputedStyle(menu).display!=='none',
         left:box?.left,right:box?.right,navLeft:bar?.left,navRight:bar?.right,
         accountVisible:account?getComputedStyle(account).display!=='none':false};
     });
     assert.ok(result.header,route+' '+view.name+' : entête client absent');
     assert.ok(result.nav&&result.logo&&result.account,route+' '+view.name+' : éléments manquants');
-    assert.ok(result.navVisible&&result.accountVisible,route+' '+view.name+' : en-tête caché');
+    assert.ok((result.navVisible||result.collapsed)&&result.accountVisible,route+' '+view.name+' : navigation ou compte inaccessible');
     assert.ok(result.left>=-2&&result.right<=view.width+2,route+' '+view.name+' : en-tête rogné');
+    if(result.collapsed){
+      const menu=page.locator('header.mir-client-header .mir-client-menu-toggle');
+      const nav=page.locator('header.mir-client-header nav.mir-client-links');
+      await menu.click();
+      assert.equal(await menu.getAttribute('aria-expanded'),'true');
+      assert.equal(await nav.isVisible(),true,route+' '+view.name+' : menu ne s’ouvre pas');
+      await page.keyboard.press('Escape');
+      assert.equal(await menu.getAttribute('aria-expanded'),'false');
+      assert.equal(await nav.isVisible(),false,route+' '+view.name+' : menu ne se ferme pas');
+    }
     count++;
     if(['index.html','boutique.html','plan.html'].includes(route)){
       await page.locator(route==='index.html'?'header.mir-home-header':'header.mir-client-header').screenshot({path:path.resolve(__dirname,'../artifacts/mir-entete-'+route.split('.')[0]+'-'+view.name+'.png')});
