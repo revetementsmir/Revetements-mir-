@@ -27,9 +27,11 @@
  }
  function read(storage,{allowedMaterialIndices=null}={}){
   const errors=[];
-  let materialsRaw,piecesRaw;
+  let materialsRaw,piecesRaw,legacyRaw;
   try{
-   const m=parse(storage,KEYS.materials),p=parse(storage,KEYS.pieces);
+   const m=parse(storage,KEYS.materials),p=parse(storage,KEYS.pieces),legacy=parse(storage,'mir-bending-v1');
+   if(legacy.error)errors.push(legacy.error);
+   legacyRaw=legacy.value;
    if(m.error)errors.push(m.error);
    if(p.error)errors.push(p.error);
    materialsRaw=m.value;piecesRaw=p.value;
@@ -38,6 +40,8 @@
     (materialsRaw.version!==1||!Array.isArray(materialsRaw.items)))errors.push('Format de sélection de matériaux inconnu.');
   if(piecesRaw!==undefined&&piecesRaw!==null&&
     (piecesRaw.version!==1||!piecesRaw.order||!Array.isArray(piecesRaw.order.items)))errors.push('Format de dossier de fabrication inconnu.');
+  if(legacyRaw!=null&&(legacyRaw.version!==1||!Array.isArray(legacyRaw.items)))errors.push('Ancien dossier de pliage illisible.');
+  const legacyCount=Array.isArray(legacyRaw?.items)?legacyRaw.items.length:0;
   const allMaterials=Array.isArray(materialsRaw?.items)?materialsRaw.items:[];
   const allowed=allowedMaterialIndices==null?null:new Set(allowedMaterialIndices.filter(n=>Number.isInteger(n)&&n>=0));
   const materials=allMaterials.filter((item,i)=>{
@@ -64,9 +68,10 @@
   const project=materialProject||pieceProject;
   const state={schema:'mir-unified-client-view-1',materialProject,pieceProject,project,
    materials:copy(materials),pieces:copy(pieces),order:order?copy(order):null,
-   excludedMaterials:allMaterials.length-materials.length,link,
+   excludedMaterials:allMaterials.length-materials.length,legacyCount,link,
    errors:[...new Set(errors)]};
-  state.ready=state.errors.length===0&&state.link==='ready'&&(state.materials.length+state.pieces.length)>0;
+  // Les anciens pliages rapides ne sont pas des dessins de fabrication versionnés : ne pas les exclure silencieusement.
+  state.ready=state.errors.length===0&&state.legacyCount===0&&state.link==='ready'&&(state.materials.length+state.pieces.length)>0;
   return state;
  }
  function payload(state,now=new Date().toISOString()){
@@ -149,6 +154,9 @@
     message.textContent='Ajoutez un matériau ou une moulure pour préparer votre dossier.';
    }else{
     message.textContent='Même projet pour les matériaux et les pièces. Aucun nouvel espace de sauvegarde ni envoi automatique.';
+   }
+   if(current.legacyCount){
+    message.textContent+=' '+current.legacyCount+' ancien(s) pliage(s) du formulaire rapide restent séparés. Leur reprise dans le configurateur coté est nécessaire avant un PDF déclaré complet; rien n’a été effacé.';
    }
    const active=current.ready&&current.pieces.length>0&&!busy;
    pdf.disabled=!active;json.disabled=!active;
