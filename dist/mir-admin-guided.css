@@ -254,3 +254,37 @@ body.mir-admin-guided-active .mir-guide-face-note{font-size:12px;color:#4d684d}
   }
   body.mir-admin-guided-active .mir-guide-face-card{min-height:144px}
 }
+
+/* Les deux choix affichent le VRAI profil et le retour orange;
+   un simple mot «haut/bas» n'est plus nécessaire pour décider. */
+.mir-hem-choice-fieldset{border:0;padding:0;margin:7px 0 14px;min-width:0}
+.mir-hem-choice-fieldset legend{color:#294c36;font-size:14px;font-weight:750;padding:0 0 8px}
+.mir-hem-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+.mir-hem-option{
+  box-sizing:border-box;min-width:0;display:flex;flex-direction:column;
+  justify-content:flex-start;align-items:center;gap:6px;padding:10px 8px;
+  border:2px solid #cad8ca;border-radius:12px;background:#f9fbf8;
+  color:#24412d;text-align:center;cursor:pointer;min-height:180px;
+}
+button.mir-hem-option{font:inherit}
+.mir-hem-option input[type=radio]{width:20px;height:20px;align-self:flex-end;accent-color:#348511}
+.mir-hem-option:has(input:checked),button.mir-hem-option:active{
+  border-color:#348511;background:#ecf5e8;
+}
+.mir-hem-option:has(input:disabled){opacity:.55;cursor:not-allowed}
+.mir-hem-option:focus-within,button.mir-hem-option:focus-visible{
+  outline:3px solid #7fad64;outline-offset:3px;
+}
+.mir-hem-option>span{display:block;width:100%;min-width:0}
+.mir-hem-option svg{display:block;width:100%;height:130px;max-height:145px}
+.mir-hem-option strong{font-size:15px}
+.mir-hem-option small{font-size:12px;line-height:1.3;color:#5b7060}
+.mir-hem-invalid{display:block;padding:20px 3px;color:#926234;font-size:12px}
+.mir-hem-note{color:#597160;font-size:12px;line-height:1.5}
+@media(max-width:650px){
+  .mir-hem-choice-grid{gap:7px}
+  .mir-hem-option{min-height:150px;padding:7px 4px}
+  .mir-hem-option svg{height:105px}
+  .mir-hem-option strong{font-size:13px}
+  .mir-hem-option small{font-size:11px}
+}
