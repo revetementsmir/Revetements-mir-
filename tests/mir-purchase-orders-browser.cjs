@@ -38,7 +38,24 @@ const hash=b=>createHash('sha256').update(b).digest('hex');
       assert.ok((pdf.toString('latin1').match(/\/Type \/Page\b/g)||[]).length>=2,'cover and drawings');
       await page.waitForFunction(()=>JSON.parse(localStorage.getItem('mir_admin_procurement_v1')).orders[0].pdf);
       state=await get();assert.equal(state.orders[0].pdf.sha256,hash(pdf));
-      await page.locator('[data-mir-review]').click();const popup=page.waitForEvent('popup');await page.locator('[data-mir-preview]').click();const preview=await popup;await preview.waitForURL('blob:**');await preview.close();
+      await page.locator('[data-mir-review]').click();
+      // Le lecteur PDF interne de Chrome peut interrompre un load blob: avec
+      // net::ERR_ABORTED. Vérifier l'URL créée et la vraie fenêtre ouverte.
+      await page.evaluate(()=>{
+        const original=URL.createObjectURL.bind(URL);
+        URL.createObjectURL=blob=>{
+          const url=original(blob);
+          if(blob.type==='application/pdf')window.__mirPreviewPdfURL=url;
+          return url;
+        };
+      });
+      const popup=page.waitForEvent('popup');
+      await page.locator('[data-mir-preview]').click();
+      const preview=await popup;
+      await page.waitForFunction(()=>String(window.__mirPreviewPdfURL||'').startsWith('blob:'));
+      assert.match(await page.evaluate(()=>window.__mirPreviewPdfURL),/^blob:/,'La prévisualisation doit préparer un Blob PDF');
+      if(!preview.isClosed())await preview.close().catch(()=>{});
+
       await page.locator('[data-mir-open]').click();await page.waitForSelector('#mir-create-po');
       await page.locator('[data-mir-po="notes"]').fill('Révision test');
       await page.locator('#mir-edit-lines').click();
