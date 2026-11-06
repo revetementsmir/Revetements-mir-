@@ -83,6 +83,7 @@ async function ready(){
    assert.equal(await fractionSelect.count(),1,'sélecteur de fraction à côté de la cote A');
    for(const [initial,selection,expected] of [
      ['', '8', '0.5'],      // 1/2
+     ['', '4', '0.25'],     // 1/4
      ['', '6', '0.375'],    // 3/8
      ['2 1/4', '8', '2.5'], // conserve les pouces entiers
      ['', '1', '0.0625']   // 1/16
