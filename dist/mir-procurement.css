@@ -129,6 +129,11 @@ body.mir-admin-v4 #mir-boutique-feedback:not(:empty){
 }
 body.mir-admin-v4 .mir-proc-model-form .mir-proc-actions{margin-top:12px}
 .mir-custom-model-price{font-weight:750;color:#28553a;line-height:1.55}
+#mir-procurement-panel button{min-height:44px;touch-action:manipulation}
+#mir-procurement-panel .mir-proc-actions{flex-wrap:wrap;gap:8px}
+#mir-procurement-panel input,#mir-procurement-panel select{max-width:100%;min-width:0}
+#mir-send-review{border:2px solid #348511}
+#mir-procurement-panel button:disabled{opacity:.65;cursor:not-allowed}
 @media(max-width:600px){
  body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{
    grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;padding:4px
