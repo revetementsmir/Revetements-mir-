@@ -123,3 +123,5 @@ body[data-profile-admin=true] .angle-details .bend-fields{margin-top:0}
 #mir-choose-po{margin-bottom:12px}
 .mir-po-list{display:grid;gap:8px;padding:0;list-style:none}
 .mir-po-list button{max-width:100%;text-align:left}
+
+.shared-model-save{padding:18px;border:2px solid #345d3d;border-radius:10px;background:#fff;margin:14px 0}.shared-model-save p{margin-bottom:12px}.shared-model-save a,.shared-model-save button{display:inline-flex;align-items:center;min-height:44px;padding:10px 16px;margin:4px;border:1px solid #345d3d;border-radius:8px}.shared-model-save[role=alert]{border-color:#a54532}

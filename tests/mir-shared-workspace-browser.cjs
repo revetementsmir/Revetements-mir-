@@ -31,8 +31,10 @@ try{
  // Import the same backup a second time: one master model, no duplicate.
  await admin.locator('#import').setInputFiles({name:'backup-again.json',mimeType:'application/json',buffer:Buffer.from(require('../dist/template-library-backup.js').create([record]).content)});
  await admin.waitForTimeout(150);assert.equal(await admin.locator('#catalogue article').count(),1);
- const inputs=admin.locator('#catalogue form input');await inputs.nth(0).check();await inputs.nth(1).check();await inputs.nth(4).fill('2500');await inputs.nth(5).fill('3000');await inputs.nth(8).fill('3');await inputs.nth(9).check();await inputs.nth(10).fill('2');await admin.locator('#catalogue form button').click();
- await admin.waitForFunction(()=>document.querySelector('#catalogue article')?.dataset.revision==='2');
+ const inputs=admin.locator('#catalogue form input');await inputs.nth(0).check();await inputs.nth(1).check();await inputs.nth(4).fill('2500');await inputs.nth(5).fill('3000');await inputs.nth(8).fill('3');await inputs.nth(9).check();await inputs.nth(10).fill('2');await admin.route('**/test-rpc',route=>{const body=route.request().postDataJSON();return body.name==='mir_admin_publish_model'?route.abort():route.continue();});
+ await admin.locator('#catalogue form button').click();await admin.waitForFunction(()=>document.querySelector('.shared-save-feedback')?.textContent.includes('Enregistrement non confirmé'));assert.equal(await inputs.nth(4).inputValue(),'2500');assert.equal(await admin.locator('.shared-save').isEnabled(),true);
+ await admin.unroute('**/test-rpc');await admin.locator('#catalogue form button').click();
+ await admin.waitForFunction(()=>document.querySelector('#catalogue article')?.dataset.revision==='2');assert.match(await admin.locator('.shared-save-feedback').textContent(),/enregistrée sur le serveur/);const appearance=await admin.locator('.shared-save').evaluate(n=>({background:getComputedStyle(n).backgroundColor,height:n.getBoundingClientRect().height}));assert.notEqual(appearance.background,'rgba(0, 0, 0, 0)');assert.ok(appearance.height>=44);
  await admin.locator('#job-admin input').fill('Chantier test');await admin.locator('#job-admin button').click();
  const client=await login('client@example.invalid',390);await client.locator('#catalogue article').waitFor();assert.equal(await client.locator('#catalogue h2').textContent(),'Solin partagé');
  await client.locator('#catalogue form input').nth(0).fill('Noir');await client.locator('#catalogue form button[type=submit]').click();await client.locator('#orders article').waitFor();assert.match(await client.locator('#orders').textContent(),/25\.00/);
@@ -42,6 +44,16 @@ try{
  const employee=await login('employee@example.invalid',1024);await employee.locator('#catalogue article').waitFor();const fields=employee.locator('#catalogue form input');assert.equal(await fields.nth(2).isDisabled(),true);await fields.nth(0).fill('Noir');await employee.locator('#catalogue form select').last().selectOption({label:'Chantier test'});await employee.locator('#catalogue form button[type=submit]').click();await employee.locator('#orders article').waitFor();
  await admin.locator('#refresh').click();await admin.waitForFunction(()=>document.querySelectorAll('#orders article').length===2);
  const sourceId=(await admin.locator('#orders h3').first().textContent()).split(' · ')[0];await admin.locator('#orders button').first().click();await admin.waitForFunction(()=>window.MIRProductionWorkspace);const copied=await admin.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')));assert.equal(copied.order.sourceRequestId,sourceId);assert.equal(copied.order.items.length,1);
- console.log('PASS : import sans doublon, publication Admin, client indépendant mobile, demande employé tablette avec cote verrouillée, récupération Admin');
+ // Save from the real drawing editor into the same private central catalogue, with no JSON file.
+ const drawingAdmin=await login('admin@example.invalid',1024);await drawingAdmin.goto(base+'/production.html');await drawingAdmin.waitForFunction(()=>window.MIRAdminWizard?.active);
+ const rect=await drawingAdmin.locator('#production-drawing').boundingBox();for(const [u,v] of [[.30,.62],[.66,.62],[.66,.35]])await drawingAdmin.mouse.click(rect.x+rect.width*u,rect.y+rect.height*v);
+ for(const step of [2,3,4]){if(step===4)await drawingAdmin.locator('[data-mir-guide-face=right]').click();await drawingAdmin.locator('#mir-guide-next').click();await drawingAdmin.waitForFunction(n=>window.MIRAdminWizard?.step===n,step);}
+ await drawingAdmin.locator('#mir-guide-save-model').click();await drawingAdmin.locator('#save-production-template [name=name]').fill('Moulure dessinée sans fichier');
+ assert.equal(await drawingAdmin.locator('[name=saveTarget][value=shared]').isChecked(),true);await drawingAdmin.locator('#save-production-template button[type=submit]').click();
+ await drawingAdmin.waitForFunction(()=>document.querySelector('#mir-direct-model-save')?.textContent.includes('Modèle enregistré dans le catalogue partagé'));
+ assert.equal(await drawingAdmin.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_templates_v1')).records.length),1);
+ const direct=await db.query("select m.name,p.boutique,p.store from mir_core.models m join mir_core.model_publications p on p.model_id=m.id where m.name='Moulure dessinée sans fichier'");assert.equal(direct.rows.length,1);assert.equal(direct.rows[0].boutique,false);assert.equal(direct.rows[0].store,false);
+ await drawingAdmin.locator('#mir-direct-model-save a').click();await drawingAdmin.waitForSelector('#catalogue article');assert.equal(await drawingAdmin.locator('#catalogue article').count(),2);
+ console.log('PASS : import sans doublon, publication Admin, client indépendant mobile, demande employé tablette avec cote verrouillée, récupération Admin, sauvegarde directe du dessin en brouillon partagé');
  for(const c of contexts)await c.close();
 }finally{if(browser)await browser.close();if(server)await new Promise(r=>server.close(r));await db.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

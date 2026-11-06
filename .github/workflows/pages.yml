@@ -24,6 +24,8 @@ jobs:
           node --check dist/model-measure-defaults.js
           node --check dist/template-library-backup.js
           node --check dist/production-app.js
+          node --check dist/mir-direct-model-save.js
+          node tests/mir-direct-model-save.cjs
           node --check dist/mir-bending-lengths.js
           node --check tests/mir-bending-lengths.cjs
           node tests/mir-bending-lengths.cjs
@@ -289,7 +291,7 @@ jobs:
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
           grep -F 'kaycan-flat-preview.js?v=mac-2' /tmp/production.html
-          grep -F 'production-app.js?v=shared-workspace-1' /tmp/production.html
+          grep -F 'production-app.js?v=direct-shared-save-1' /tmp/production.html
           grep -F 'mir-bending-finishes.js?v=1' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
           grep -F 'function medianRgb' /tmp/kaycan-flat-preview.js
