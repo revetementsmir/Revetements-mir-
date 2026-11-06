@@ -72,7 +72,8 @@
     const blocks=Array.from(config.children);
     const show=new Set([nav,instruction,actions]);
     if(step===2)show.add(selector('#mir-v4-dimensions'));
-    if(step===3)show.add(selector('#mir-v4-face'));
+    // Le choix visuel de la face remplace le vieux formulaire gauche/droite.
+    // Les sélecteurs natifs restent dans le DOM pour préserver le moteur.
     if(step===4){
       for(const el of [selector('.piece-finish'),selector('#mir-v4-colors'),selector('.mir-v4-footer')])if(el)show.add(el);
     }
