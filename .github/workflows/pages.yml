@@ -280,7 +280,7 @@ jobs:
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
           grep -F 'kaycan-flat-preview.js?v=mac-2' /tmp/production.html
-          grep -F 'production-app.js?v=orders-pdf-2' /tmp/production.html
+          grep -F 'production-app.js?v=shared-workspace-1' /tmp/production.html
           grep -F 'mir-bending-finishes.js?v=1' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
           grep -F 'function medianRgb' /tmp/kaycan-flat-preview.js
@@ -375,4 +375,11 @@ jobs:
           grep -F 'The stored soffit paths locate undersides' /tmp/plan-app.js
           fetch "$base/plan-3d.js" /tmp/plan-3d.js
           grep -F "'recessed-assumption' and 'recessed-confirmed' both continue to wallHeight" /tmp/plan-3d.js
+          fetch "$base/espace-partage.html?verification=$GITHUB_SHA" /tmp/mir-shared-public.html
+          cmp /tmp/mir-shared-public.html _site_mir/espace-partage.html
+          grep -Fq 'mir-shared-client.js' /tmp/mir-shared-public.html
+          grep -Fq 'mir-shared-workspace.js' /tmp/mir-shared-public.html
+          fetch "$base/shared-config.js?verification=$GITHUB_SHA" /tmp/mir-shared-config.js
+          cmp /tmp/mir-shared-config.js _site_mir/shared-config.js
+          grep -Fq 'enabled:true' /tmp/mir-shared-config.js
           echo "MIR Pages verified at $base/"
