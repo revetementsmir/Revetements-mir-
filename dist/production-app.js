@@ -397,7 +397,10 @@ function applyMeasureFraction(select){
  if(!parsed.ok&&input.value.trim())return toast('Corrige la mesure avant de choisir sa fraction.');
  const value=parsed.ok?parsed.value:0;
  const amount=(Math.trunc(Math.abs(value))+fraction/16)*(value<0?-1:1);
- input.value=M.formatMeasurement(amount*25.4,'in').replace(/ po$/,'');
+ // Les valeurs en seizièmes ont une écriture décimale exacte (4 chiffres au maximum).
+ // Le moteur accepte aussi les fractions saisies à la main; ici seul le sélecteur
+ // remplit visiblement le champ en décimal pour éviter l'ambiguïté sur iPad.
+ input.value=String(amount);
  handleInput({target:input});
 }
 function updateV4Totals(model){
