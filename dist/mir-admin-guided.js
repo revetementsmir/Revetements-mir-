@@ -32,7 +32,7 @@
    nav.innerHTML=LABELS.map((name,i)=>'<button type="button" data-mir-guide-step="'+(i+1)+'"><span class="mir-guide-num">'+(i+1)+'</span><span>'+safe(name)+'</span></button>').join('');
    const instruction=doc.createElement('section');instruction.id='mir-guide-instruction';instruction.className='mir-guide-instruction';
    const actions=doc.createElement('div');actions.className='mir-guide-actions';actions.id='mir-guide-actions';
-   actions.innerHTML='<p role="status" id="mir-guide-feedback" aria-live="polite"></p><div class="mir-guide-actions-buttons"><button type="button" id="mir-guide-back" class="secondary-button">← Retour</button><button type="button" id="mir-guide-next" class="primary-button">Continuer →</button><button type="button" class="secondary-button" id="mir-guide-restart" hidden>↶ Recommencer le dessin</button><div class="mir-guide-destinations" hidden><button type="button" id="mir-guide-add-po" class="primary-button">＋ Ajouter à un bon (sans modèle)</button><button type="button" id="mir-guide-save-model" class="secondary-button">Enregistrer comme modèle…</button></div></div>';
+   actions.innerHTML='<p role="status" id="mir-guide-feedback" aria-live="polite"></p><div class="mir-guide-actions-buttons"><button type="button" id="mir-guide-back" class="secondary-button">← Retour</button><button type="button" id="mir-guide-next" class="primary-button">Continuer →</button><button type="button" class="secondary-button" id="mir-guide-restart" hidden>↶ Recommencer le dessin</button><button type="button" class="secondary-button" id="mir-guide-extend" hidden>＋ Prolonger le tracé</button><button type="button" class="secondary-button" id="mir-guide-add-hem" hidden>↶ Ajouter un retour écrasé</button><div class="mir-guide-destinations" hidden><button type="button" id="mir-guide-add-po" class="primary-button">＋ Ajouter à un bon (sans modèle)</button><button type="button" id="mir-guide-save-model" class="secondary-button">Enregistrer comme modèle…</button></div></div>';
    // Une seule barre d'étapes au-dessus du canevas (aucune seconde page).
    const guide=doc.createElement('section');guide.className='mir-guide-header';
    guide.id='mir-guide-header';guide.setAttribute('aria-label','Création guidée');
@@ -92,6 +92,8 @@
     next.hidden=step===4;
     selector('.mir-guide-destinations').hidden=step!==4;
     selector('#mir-guide-restart').hidden=step!==1||!(state?.drawPointsMM?.length);
+    selector('#mir-guide-extend').hidden=step!==2;
+    selector('#mir-guide-add-hem').hidden=step!==2||!validProfile();
     next.textContent=step===1?'Terminer le tracé →':step===2?'Confirmer les cotes →':'Confirmer la face →';
     if(step===1)warning('Dessine au moins deux côtés avant de continuer.');
     else if(step===2)warning('Confirme les cotes pour accéder au choix de la face.');
@@ -174,6 +176,14 @@
      if(event.target.closest('#mir-guide-restart')&&active&&step===1){
         const native=selector('#drawing-tools [data-discard-current-piece]');
         if(native&&!native.disabled)native.click();return;
+      }
+      if(event.target.closest('#mir-guide-extend')&&active&&step===2){
+        const native=selector('#drawing-tools [data-draw-tool="draw"]');
+        if(native){step=1;lastStep=0;native.click();apply();}return;
+      }
+      if(event.target.closest('#mir-guide-add-hem')&&active&&step===2){
+        const native=selector('#drawing-tools [data-end-hem]');
+        if(native&&!native.disabled)native.click();else warning('Termine les cotes avant d’ajouter un retour.');return;
       }
       if(event.target.closest('#mir-guide-3d-open')){if(!active)return;body.classList.add('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','true');selector('#mir-guide-3d-canvas')?.focus();scene();return;}
      if(event.target.closest('#mir-guide-3d-close')){body.classList.remove('mir-guide-3d-open');mobileOpen.setAttribute('aria-expanded','false');mobileOpen.focus();return;}
