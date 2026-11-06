@@ -19,7 +19,7 @@ async function ready(){
  try{
   await ready();
   browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
-  for(const size of [{name:'bureau',width:1440,height:900},{name:'tablette',width:1024,height:768},{name:'mobile',width:390,height:844}]){
+  for(const size of [{name:'bureau',width:1440,height:900},{name:'tablette',width:1024,height:768},{name:'tablette-portrait',width:768,height:1024},{name:'mobile',width:390,height:844}]){
    const context=await browser.newContext({viewport:{width:size.width,height:size.height},hasTouch:size.width<1100});
    const page=await context.newPage(),errors=[];
    page.on('pageerror',error=>errors.push(error.message));
@@ -52,10 +52,18 @@ async function ready(){
      await page.locator('#mir-guide-3d-close').click();
      assert.equal(await page.locator('#mir-guide-3d').isVisible(),false);
    }
+   await page.locator('#production-drawing').scrollIntoViewIfNeeded();
    const rect=await page.locator('#production-drawing').boundingBox();
-   assert.ok(rect?.height>80,size.name+' dessin disponible : '+JSON.stringify(rect));
+   assert.ok(rect?.height>(size.width<=650?330:size.width<=1150?440:80),size.name+' canevas iPad trop petit : '+JSON.stringify(rect));
+   if(size.width<=1150){
+     const doc=await page.evaluate(()=>({scrollHeight:document.scrollingElement.scrollHeight,innerHeight,overflow:getComputedStyle(document.body).overflowY}));
+     assert.equal(doc.overflow,'auto',size.name+' le document doit défiler');
+     assert.ok(doc.scrollHeight>doc.innerHeight+100,size.name+' les réglages ne doivent pas être coupés : '+JSON.stringify(doc));
+   }
    for(const [u,v] of [[.30,.62],[.66,.62],[.66,.35]]){
-     await page.mouse.click(rect.x+rect.width*u,rect.y+rect.height*v);
+     const x=rect.x+rect.width*u,y=rect.y+rect.height*v;
+     if(size.width<=1150)await page.touchscreen.tap(x,y);
+     else await page.mouse.click(x,y);
    }
    await page.waitForFunction(()=>document.querySelector('[data-mir-live-3d="ready"]')!==null,{timeout:12000});
    assert.equal(await page.locator('body.mir-admin-guided-active').count(),1);
@@ -76,7 +84,7 @@ async function ready(){
      width:document.documentElement.scrollWidth,viewport:innerWidth,
      models:JSON.parse(localStorage.getItem('mir_production_templates_v1')||'{"records":[]}').records.length
    }));
-   assert.equal(st.overflow,'hidden');
+   assert.equal(st.overflow,size.width<=1150?'auto':'hidden');
    assert.ok(st.width<=st.viewport+2,size.name+' débordement horizontal '+JSON.stringify(st));
    assert.equal(st.models,0,'Le dessin ne doit pas créer un modèle automatiquement.');
    await page.screenshot({path:path.join(__dirname,'../artifacts/mir-admin-guide-'+size.name+'.png'),fullPage:true});
