@@ -14,6 +14,14 @@ on:
       - 'dist/mir-miniature.js'
       - 'dist/custom-model-cards*'
       - 'dist/boutique.html'
+      - 'dist/mir-public-menu.*'
+      - 'dist/realisations.html'
+      - 'dist/materiaux.html'
+      - 'dist/produit.html'
+      - 'dist/selection.html'
+      - 'dist/pliage.html'
+      - 'tests/mir-public-menu*.cjs'
+      - 'tests/mir-client-header-browser.cjs'
       - 'dist/commerce.css'
       - 'dist/mir-procurement.css'
       - 'dist/mir-admin-guided*'
@@ -56,6 +64,8 @@ jobs:
           node --check tests/mir-retours-cotes.cjs
           node --check tests/mir-retours-cotes-browser.cjs
           node --check dist/production-app.js
+          node --check dist/mir-public-menu.js
+          node --check tests/mir-public-menu-browser.cjs
           node --check dist/mir-procurement.js
           node --check dist/mir-admin-guided.js
           node --check dist/mir-admin-live3d.js
@@ -79,6 +89,7 @@ jobs:
       - name: Existing MIR regression suite
         run: |
           node tests/mir-pages-regressions.cjs
+          node tests/mir-public-menu.cjs
           node tests/mir-procurement.cjs
           node tests/mir-admin-guided.cjs
           node tests/mir-workshop-reset.cjs
@@ -93,6 +104,8 @@ jobs:
       - name: Responsive real-browser QA (Chrome)
         run: |
           npm install --no-save playwright@1.58.2
+          node tests/mir-public-menu-browser.cjs
+          node tests/mir-client-header-browser.cjs
           node tests/mir-atelier-v4-browser.cjs
           node tests/mir-pliage-audit-browser.cjs
           node tests/mir-admin-guided-browser.cjs
@@ -116,6 +129,7 @@ jobs:
             artifacts/mir-direct-po-*.png
             artifacts/mir-reset-*.png
             artifacts/mir-admin-guide-*.png
+            artifacts/mir-menu-*.png
             artifacts/mir-pan-*.png
             artifacts/mir-rename-*.png
             artifacts/mir-miniatures-*.png
