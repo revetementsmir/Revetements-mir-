@@ -1218,6 +1218,29 @@ function focusProfileDimensions(bendIndex){
  target.scrollIntoView?.({behavior:'smooth',block:'center'});
  target.focus();
 }
+
+/* Vue schématique issue du même modèle que la fabrication. Le trait orange
+   décale seulement visuellement un retour écrasé, sans modifier ses cotes. */
+function hemChoiceSketch(spec,direction,atStart=false){
+ const model=build(spec),points=model.valid?model.pointsMM:[];
+ if(points.length<2)return '<p class="mir-hem-invalid">Précise une longueur admissible pour afficher ce choix.</p>';
+ const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+ const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+ const scale=Math.min(220/Math.max(1,maxX-minX),97/Math.max(1,maxY-minY));
+ const cx=(minX+maxX)/2,cy=(minY+maxY)/2;
+ const project=p=>[145+(p[0]-cx)*scale,72-(p[1]-cy)*scale];
+ const line=(a,b,color,width)=>'<line x1="'+fmt(a[0])+'" y1="'+fmt(a[1])+'" x2="'+fmt(b[0])+'" y2="'+fmt(b[1])+'" stroke="'+color+'" stroke-width="'+width+'" stroke-linecap="round" stroke-linejoin="round"/>';
+ const wire=points.slice(1).map((p,i)=>line(project(points[i]),project(p),'#687f75',5)).join('');
+ const a=atStart?points[0]:points[points.length-2],b=atStart?points[1]:points.at(-1);
+ const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1;
+ const normal=(direction==='left'?1:-1)*7,shift=[-dy/len*normal,dx/len*normal];
+ const move=p=>{const v=project(p);return [v[0]+shift[0],v[1]-shift[1]];};
+ const high=line(move(a),move(b),'#d27b25',7);
+ const endpoint=move(b);
+ return '<svg viewBox="0 0 290 160" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Prévisualisation du sens du retour"><rect width="290" height="160" fill="#f7faf5" rx="12"/>'+wire+high+
+  '<circle cx="'+fmt(endpoint[0])+'" cy="'+fmt(endpoint[1])+'" r="5" fill="#ad5010"/>'+
+  '<text x="145" y="148" text-anchor="middle" font-size="12" fill="#995c23">Orange = retour écrasé</text></svg>';
+}
 function appendTracePoint(point, start){
  if(drawPoints.length>=27)return toast('Un profil peut contenir au maximum 26 segments.');
  const last=drawPoints.at(-1);
@@ -1234,19 +1257,23 @@ function appendTracePoint(point, start){
   return;
  }
  if(bend?.mode==='hem'){
-  const face=spec.coloredFace?.side;
-  dialog('De quel côté va le double pli ?','Intérieur replie la tôle du côté non peint. Extérieur replie la tôle du côté de la face colorée.',
-   `<form id="trace-hem-form" class="dialog-form">${face?'':`<label>Côté de la face colorée, en suivant le tracé<select name="face" required><option value="">Choisir le côté</option><option value="left">À gauche</option><option value="right">À droite</option></select></label>`}<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button><button type="submit" class="secondary-button" value="interior">Intérieur</button><button type="submit" class="primary-button" value="exterior">Extérieur</button></div></form>`);
-  $('#trace-hem-form').onsubmit=event=>{
-   event.preventDefault();
-   const side=face||new FormData(event.currentTarget).get('face');
-   const choice=event.submitter?.value;
-   if(!side||!['interior','exterior'].includes(choice))return;
-   bend.direction=choice==='exterior'?side:side==='left'?'right':'left';
-   if(!face)spec.coloredFace={...spec.coloredFace,side};
-   closeDialog();
-   commitTrace(points,spec);
+  // Le côté de la couleur sera demandé à l'étape 3 du guidage.
+  // Ici, seul le sens du retour écrasé est choisi visuellement.
+  const button=direction=>{
+    const candidate=copy(spec);
+    candidate.bends.at(-1).direction=direction;
+    return '<button type="button" class="mir-hem-option" data-trace-hem-direction="'+direction+'">'+
+      hemChoiceSketch(candidate,direction)+
+      '<strong>Choix '+(direction==='left'?'1':'2')+'</strong><small>Choisir ce sens de repli</small></button>';
   };
+  dialog('De quel côté replier le bord ?',
+   'Compare les deux dessins. L’orange montre le retour écrasé; la face colorée sera choisie ensuite.',
+   '<div class="mir-hem-choice-grid" role="group" aria-label="Choix du sens du retour">'+button('left')+button('right')+'</div>'+
+   '<p class="mir-hem-note">Le décalage orange sert seulement à montrer le sens du repli; il ne change pas les mesures.</p>'+
+   '<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button></div>');
+  $('#production-dialog-content').querySelectorAll('[data-trace-hem-direction]').forEach(choice=>{
+   choice.onclick=()=>{bend.direction=choice.dataset.traceHemDirection;closeDialog();commitTrace(points,spec);};
+  });
   return;
  }
  commitTrace(points,spec);
@@ -1299,12 +1326,49 @@ function endHemDirection(headingDegrees, choice){
 }
 function endHemDialog(){
  const model=build();
- if(!model.valid)return toast('Complète les cotes avant d’ajouter un double pli.');
+ if(!model.valid)return toast('Complète les cotes avant d’ajouter un retour écrasé.');
  if(model.segments.length>=26)return toast('Le profil contient déjà 26 côtés.');
  const first=model.segments[0],last=model.segments.at(-1);
  const side=(x,other)=>Math.abs(x-other)<.001?'':x<other?' · à gauche':' · à droite';
  const start=first.start[0],end=last.end[0];
- dialog('Ajouter un double pli','Choisis une extrémité, la longueur du retour et son sens.',`<form id="end-hem-form" class="dialog-form"><label>Extrémité<select name="end"><option value="start">Début · ${esc(first.label+side(start,end))}</option><option value="end">Fin · ${esc(last.label+side(end,start))}</option></select></label><label>Longueur du retour (${draft.unit==='mm'?'mm':'po'})<input name="length" value="${draft.unit==='mm'?'13':'1/2'}" required></label><label>Sens du retour<select name="direction"><option value="up">Vers le haut</option><option value="down">Vers le bas</option></select></label><p id="production-dialog-error" class="dialog-error" role="alert"></p><button class="primary-button" type="submit">Ajouter le retour</button></form>`);
+ dialog('Ajouter un retour écrasé',
+  'Choisis l’extrémité et la longueur, puis touche le dessin du résultat souhaité.',
+  `<form id="end-hem-form" class="dialog-form">
+    <label>Extrémité<select name="end"><option value="start">Début · ${esc(first.label+side(start,end))}</option><option value="end">Fin · ${esc(last.label+side(end,start))}</option></select></label>
+    <label>Longueur du retour (${draft.unit==='mm'?'mm':'po'})<input name="length" value="${draft.unit==='mm'?'13':'1/2'}" inputmode="decimal" required></label>
+    <fieldset class="mir-hem-choice-fieldset"><legend>Quel résultat veux-tu ?</legend>
+    <div class="mir-hem-choice-grid" role="radiogroup" aria-label="Sens du retour">
+      <label class="mir-hem-option"><input type="radio" name="direction" value="up" required>
+        <span data-hem-preview="up"></span><strong>Choix 1</strong><small>Le retour orange de ce côté</small></label>
+      <label class="mir-hem-option"><input type="radio" name="direction" value="down" required>
+        <span data-hem-preview="down"></span><strong>Choix 2</strong><small>Le retour orange de ce côté</small></label>
+    </div></fieldset>
+    <p class="mir-hem-note">Orange = sens du retour écrasé. Le décalage est illustratif, pas une cote.</p>
+    <p id="production-dialog-error" class="dialog-error" role="alert"></p>
+    <div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button><button class="primary-button" type="submit">Ajouter ce retour</button></div>
+   </form>`);
+ const form=$('#end-hem-form');
+ const showChoices=()=>{
+  const atStart=form.elements.namedItem('end').value==='start';
+  const edge=atStart?model.segments[0]:model.segments.at(-1);
+  const length=String(form.elements.namedItem('length').value||'').trim();
+  const parsed=M.parseMeasurement(length,draft.unit);
+  for(const choice of ['up','down']){
+   const preview=form.querySelector('[data-hem-preview="'+choice+'"]');
+   const radio=form.querySelector('input[name="direction"][value="'+choice+'"]');
+   const valid=parsed.ok&&parsed.mm>0&&parsed.mm<=edge.lengthMM;
+   const direction=endHemDirection(edge.headingDeg,choice);
+   const spec=valid?profileWithEndHem(draft,model,atStart,length,direction):null;
+   const possible=!!spec&&build(spec).valid;
+   preview.innerHTML=possible?hemChoiceSketch(spec,direction,atStart):
+     '<span class="mir-hem-invalid">Longueur incompatible avec ce retour.</span>';
+   radio.disabled=!possible;
+   if(!possible)radio.checked=false;
+  }
+ };
+ form.addEventListener('input',showChoices);
+ form.addEventListener('change',showChoices);
+ showChoices();
 }
 function profileWithEndHem(spec,model,atStart,length,direction){
  const segments=model.segments.map((segment,index)=>({
@@ -1610,6 +1674,7 @@ function handleSubmit(event){
   const model=build(),atStart=data.get('end')==='start',length=String(data.get('length')||'').trim();
   const parsed=M.parseMeasurement(length,draft.unit),edge=atStart?model.segments[0]:model.segments.at(-1);
   if(!model.valid||!parsed.ok||parsed.mm<=0||parsed.mm>edge.lengthMM)return messageError('Le retour doit être positif et au plus aussi long que le côté choisi.');
+  if(!['up','down'].includes(data.get('direction')))return messageError('Choisis l’un des deux dessins du retour.');
   const direction=endHemDirection(edge.headingDeg,data.get('direction'));
   const next=profileWithEndHem(draft,model,atStart,length,direction);
   if(!build(next).valid)return messageError('Le retour ne peut pas être ajouté à ce profil.');
