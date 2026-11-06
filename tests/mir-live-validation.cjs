@@ -17,8 +17,10 @@ test('Audit SQL seulement en lecture : 19 tables RLS et 7 RPC authentifiées de 
  const {PGlite}=require('../tools/database/node_modules/@electric-sql/pglite'),db=new PGlite();
  try{
   await db.exec("create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;");
-  const dir=path.join(__dirname,'../supabase/migrations');for(const f of fs.readdirSync(dir).sort())await db.exec(fs.readFileSync(path.join(dir,f),'utf8'));
+  const dir=path.join(__dirname,'../supabase/migrations');for(const f of fs.readdirSync(dir).sort().filter(f=>f<'202611060004'))await db.exec(fs.readFileSync(path.join(dir,f),'utf8'));
   const sql=fs.readFileSync(path.join(__dirname,'../supabase/verification/mission-4-read-only.sql'),'utf8');assert.match(sql,/BEGIN READ ONLY/);assert.doesNotMatch(sql,/set_config|SET ROLE|CREATE|INSERT|UPDATE|DELETE/i);
+  const before=(await db.exec(sql)).find(r=>r.rows[0]?.audit).rows[0].audit;assert.equal(before.saleLengthColumn,false);assert.ok(before.tables.some(t=>!t.exists));assert.ok(before.routines.every(r=>!r.exists),'une 004 absente ne doit jamais être annoncée installée');
+  await db.exec(fs.readFileSync(path.join(dir,'202611060004_connected_catalogue.sql'),'utf8'));
   const rows=await db.exec(sql),audit=rows.find(r=>r.rows[0]?.audit)?.rows[0].audit;assert.ok(audit);assert.equal(audit.tables.length,19);assert.ok(audit.tables.every(t=>t.exists&&t.rls));assert.equal(audit.routines.length,7);assert.ok(audit.routines.every(r=>r.exists&&r.securityDefiner&&!r.anonymousExecute&&r.authenticatedExecute));assert.equal(audit.saleLengthColumn,true);assert.equal(audit.migrationHistoryPresent,false);
   assert.equal((await db.query('select count(*)::int as n from mir_core.models')).rows[0].n,0,'audit leaves data unchanged');
  }finally{await db.close();}
