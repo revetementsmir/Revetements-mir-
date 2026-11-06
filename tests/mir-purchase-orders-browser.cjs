@@ -38,7 +38,36 @@ const hash=b=>createHash('sha256').update(b).digest('hex');
       assert.ok((pdf.toString('latin1').match(/\/Type \/Page\b/g)||[]).length>=2,'cover and drawings');
       await page.waitForFunction(()=>JSON.parse(localStorage.getItem('mir_admin_procurement_v1')).orders[0].pdf);
       state=await get();assert.equal(state.orders[0].pdf.sha256,hash(pdf));
-      await page.locator('[data-mir-review]').click();const popup=page.waitForEvent('popup');await page.locator('[data-mir-preview]').click();const preview=await popup;await preview.waitForURL('blob:**');await preview.close();
+      await page.locator('[data-mir-review]').click();
+      // Le plugin PDF natif de Chromium peut interrompre la navigation blob:
+      // ou faire planter le runner headless. Le vrai PDF a déjà été téléchargé,
+      // contrôlé (%PDF-, pages, SHA-256). Vérifier ici que l'action demande
+      // l'ouverture de CE blob PDF, sans charger le lecteur natif en CI.
+      await page.evaluate(()=>{
+        const original=URL.createObjectURL.bind(URL);
+        URL.createObjectURL=blob=>{
+          const url=original(blob);
+          if(blob.type==='application/pdf')window.__mirPreviewPdfURL=url;
+          return url;
+        };
+        window.__mirPreviewOpenCount=0;
+        window.__mirPreviewTarget='';
+        window.open=()=>{
+          window.__mirPreviewOpenCount++;
+          return {location:{set href(url){window.__mirPreviewTarget=url;}},close(){}};
+        };
+      });
+      await page.locator('[data-mir-preview]').click();
+      await page.waitForFunction(()=>String(window.__mirPreviewTarget||'').startsWith('blob:'));
+      const previewIntent=await page.evaluate(()=>({
+        count:window.__mirPreviewOpenCount,url:window.__mirPreviewTarget,
+        pdf:window.__mirPreviewPdfURL
+      }));
+      assert.equal(previewIntent.count,1,'Prévisualiser doit demander une seule fenêtre');
+      assert.match(previewIntent.pdf||'',/^blob:/,'Un Blob PDF doit être préparé');
+      assert.equal(previewIntent.url,previewIntent.pdf,'La fenêtre doit recevoir le PDF réellement généré');
+      // L'affichage visuel du PDF natif reste à vérifier sur appareil réel.
+
       await page.locator('[data-mir-open]').click();await page.waitForSelector('#mir-create-po');
       await page.locator('[data-mir-po="notes"]').fill('Révision test');
       await page.locator('#mir-edit-lines').click();
