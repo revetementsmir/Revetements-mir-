@@ -64,7 +64,7 @@
     return pages;
   }
   function drawing(rows,project,page,total,excluded){
-    const drawingHeight=260+rows.reduce((a,x)=>a+x.height,0)+160;
+    const drawingHeight=347+rows.reduce((a,x)=>a+x.height,0)+175;
     const h=Math.max(1150,drawingHeight),parts=[];
     parts.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 '+h+'">');
     parts.push('<rect width="1600" height="'+h+'" fill="#ffffff"/>');
