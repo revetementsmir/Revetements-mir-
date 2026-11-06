@@ -307,7 +307,9 @@ jobs:
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
           grep -F 'kaycan-flat-preview.js?v=mac-2' /tmp/production.html
-          grep -F 'production-app.js?v=direct-shared-save-1' /tmp/production.html
+          grep -F 'production-app.js?v=guided-visual-20261106' /tmp/production.html
+          grep -F 'mir-admin-guided.css?v=guided-visual-20261106' /tmp/production.html
+          grep -F 'mir-admin-guided.js?v=guided-visual-20261106' /tmp/production.html
           grep -F 'mir-bending-finishes.js?v=1' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
           grep -F 'function medianRgb' /tmp/kaycan-flat-preview.js
@@ -319,6 +321,8 @@ jobs:
           grep -F 'body.mir-admin-v4 .kind-bar' /tmp/mir-admin-v4.css
           fetch "$base/mir-admin-guided.js" /tmp/mir-admin-guided.js
           grep -F "mir-admin-guided-active" /tmp/mir-admin-guided.js
+          grep -F "function paintPreview(side)" /tmp/mir-admin-guided.js
+          grep -F "mir-guide-header" /tmp/mir-admin-guided.js
           fetch "$base/mir-admin-live3d.js" /tmp/mir-admin-live3d.js
           grep -F "data-mir-live-3d" /tmp/mir-admin-live3d.js
           fetch "$base/mir-admin-guided.css" /tmp/mir-admin-guided.css
@@ -353,6 +357,7 @@ jobs:
           fetch "$base/production.html" /tmp/mir-backup-page.html
           grep -F 'template-library-backup.js?v=backup-1' /tmp/mir-backup-page.html
           fetch "$base/production-app.js" /tmp/production-app.js
+          grep -F "function hemChoiceSketch(spec,direction,atStart=false)" /tmp/production-app.js
           fetch "$base/mir-unified-client-dossier.js?verification=$GITHUB_SHA" /tmp/mir-unified-dossier.js
           cmp /tmp/mir-unified-dossier.js _site_mir/mir-unified-client-dossier.js
           grep -F "mir-unified-client-dossier-1" /tmp/mir-unified-dossier.js
