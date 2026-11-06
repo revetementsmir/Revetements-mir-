@@ -26,10 +26,10 @@ try{
  const admin=await login('admin@example.invalid',1440);
  const template=M.createTemplate({kind:'profile',template:'l',unit:'in',dimensions:{A:3,B:2}},{id:'local-l',name:'Solin partagé'}).template;
  const record={id:'local-l',name:'Solin partagé',currentVersion:1,versions:[template],allowed:{materials:['aluminium','acier']}};
- await admin.locator('#import').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:1,records:[record]}))});
+ await admin.locator('#import').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:Buffer.from(require('../dist/template-library-backup.js').create([record]).content)});
  await admin.locator('#catalogue article').waitFor();
  // Import the same backup a second time: one master model, no duplicate.
- await admin.locator('#import').setInputFiles({name:'backup-again.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:1,records:[record]}))});
+ await admin.locator('#import').setInputFiles({name:'backup-again.json',mimeType:'application/json',buffer:Buffer.from(require('../dist/template-library-backup.js').create([record]).content)});
  await admin.waitForTimeout(150);assert.equal(await admin.locator('#catalogue article').count(),1);
  const inputs=admin.locator('#catalogue form input');await inputs.nth(0).check();await inputs.nth(1).check();await inputs.nth(4).fill('2500');await inputs.nth(5).fill('3000');await inputs.nth(8).fill('3');await inputs.nth(9).check();await inputs.nth(10).fill('2');await admin.locator('#catalogue form button').click();
  await admin.waitForFunction(()=>document.querySelector('#catalogue article')?.dataset.revision==='2');
