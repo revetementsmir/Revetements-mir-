@@ -116,6 +116,19 @@ test('Socle PostgreSQL : contraintes, RLS et sauvegardes',async t=>{
       assert.equal((await actor(id(2),count('orders')))[0].n,0);
       assert.equal((await actor(id(2),count('catalogue_items')))[0].n,0);
     });
+    await db.exec(fs.readFileSync(path.join(__dirname,'../supabase/migrations/202611060003_shared_catalogue.sql'),'utf8'));
+    await t.test('Publication unique, prix serveur et isolation du catalogue',async()=>{
+      const sql='select mir_core.publish_model($1,$2,1,$3,$4) as revision';
+      const settings={boutique:true,store:true,supplier_po:true,aluminum_cents:2500,steel_cents:3000,locked_measures:{A:'3 1/2'}};
+      await reject(id(3),sql,[id(10),id(40),0,settings],'42501');
+      assert.equal((await actor(id(1),sql,[id(10),id(40),0,settings]))[0].revision,1);
+      assert.equal((await actor(id(3),count('model_publications')))[0].n,1);
+      assert.equal((await actor(id(4),count('model_publications')))[0].n,0);
+      await reject(id(3),'update mir_core.model_publications set steel_cents=1',[],'42501');
+      await reject(id(1),sql,[id(10),id(40),0,settings],'40001');
+      await actor(id(1),sql,[id(10),id(40),1,{...settings,archived:true}]);
+      assert.equal((await actor(id(3),count('model_publications')))[0].n,0);
+    });
     await t.test('Toutes les tables du schéma sont sous RLS',async()=>{
       const r=await db.query("select relname from pg_class join pg_namespace n on n.oid=relnamespace where n.nspname='mir_core' and relkind='r' and not relrowsecurity");assert.equal(r.rows.length,0);
     });
