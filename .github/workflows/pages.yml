@@ -142,6 +142,7 @@ jobs:
           node tests/mir-balcony-browser.cjs
           node tests/mir-studio-terrain-browser.cjs
           node tests/mir-finishing-editor-browser.cjs
+          node tests/mir-shared-startup-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
         uses: actions/upload-artifact@v4

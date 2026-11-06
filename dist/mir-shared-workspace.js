@@ -2,7 +2,8 @@
  const $=s=>document.querySelector(s),config=window.MIRSharedConfig;
  const status=message=>$('#status').textContent=message;
  if(!config?.enabled||!/^sb_publishable_[A-Za-z0-9_-]+$/.test(config.publishableKey||'')){status('Espace partagé non activé. Le raccordement Supabase reste à valider.');return;}
- const client=MIRSharedClient.create({sdk:supabase.createClient(config.supabaseUrl,config.publishableKey),storage:localStorage});let snapshot,readSequence=0;
+ if(!window.MIRSupabase?.createClient){status('Le module de connexion n’a pas pu être chargé. Rechargez cette page.');return;}
+ const client=MIRSharedClient.create({sdk:window.MIRSupabase.createClient(config.supabaseUrl,config.publishableKey),storage:localStorage});let snapshot,readSequence=0;
  const text=(tag,value,parent)=>{const node=document.createElement(tag);node.textContent=value;parent.append(node);return node;};
  const org=()=>$('#organization').value;
  async function refresh(){
@@ -66,4 +67,4 @@
  $('#retry').onclick=async()=>{try{const p=await client.pending(org());if(p){await client.submit(org(),p.model,p.configuration);await refresh();}}catch(e){status(e.message);}};
  $('#logout').onclick=async()=>{readSequence++;try{await client.logout();}finally{$('#workspace').hidden=true;$('#catalogue').replaceChildren();$('#orders').replaceChildren();$('#login').hidden=false;}};
  try{await start();}catch(e){status(e.message);}
-})();
+})().catch(()=>{document.querySelector('#status').textContent='Impossible de démarrer la connexion. Rechargez cette page.';});
