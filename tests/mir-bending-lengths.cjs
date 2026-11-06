@@ -4,6 +4,8 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const L=require('../dist/mir-bending-lengths.js');
 const P=require('../dist/production-model.js');
+const Transfer=require('../dist/profile-production-transfer.js');
+const X=require('../dist/atelier-essai/mir-calepinage-extension.js');
 const source=name=>fs.readFileSync(path.join(__dirname,'../dist',name),'utf8');
 let n=0;
 function test(name,fn){fn();n++;console.log('PASS '+name);}
@@ -23,4 +25,28 @@ test('Le configurateur principal charge le moteur avant son application',()=>{co
 test('Le configurateur standalone réutilise la même règle',()=>{const s=source('pliage.html');assert.ok(s.indexOf('mir-bending-lengths.js')<s.indexOf('pliage.js'));});
 test('L identifiant J soffite est distinct dans le configurateur',()=>{assert.ok(source('production-app.js').includes("j_soffite:{name:"));assert.ok(source('pliage.js').includes("j_soffite:{name:"));});
 test('Les modifications historiques restent séparées des snapshots',()=>{const s=source('production-app.js');assert.ok(s.includes('stockProfileType:spec.mirProfileId'));assert.ok(s.includes('previousLengthIn:former?.ok'));});
+test('Le transfert de profil applique la même longueur fixe que le configurateur',()=>{
+  const snapshot=X.finalizeProfileOrder('coin_arch_j',{faceA:5,faceB:6,jDepth:1,jReturn:1,nailing:2.25});
+  const sourceBefore=JSON.stringify(snapshot);
+  const accepted=Transfer.prepare(X,snapshot,120,1);
+  assert.equal(accepted.spec.length,120);
+  assert.equal(accepted.spec.mirProfileId,'coin_arch_j');
+  assert.equal(P.buildProfile(accepted.spec).valid,true);
+  assert.equal(JSON.stringify(snapshot),sourceBefore,'le snapshot historique ne change pas');
+  assert.throws(()=>Transfer.prepare(X,snapshot,96,1),/10 pi/);
+  assert.throws(()=>Transfer.prepare(X,snapshot,144,1),/10 pi/);
+});
+test('Le transfert refuse une quantité invalide sans toucher à la géométrie',()=>{
+  const snapshot=X.finalizeProfileOrder('coin_arch_j',{faceA:5,faceB:6,jDepth:1,jReturn:1,nailing:2.25});
+  assert.throws(()=>Transfer.prepare(X,snapshot,120,0),/quantité entière/);
+  assert.throws(()=>Transfer.prepare(X,snapshot,120,1.5),/quantité entière/);
+  assert.throws(()=>Transfer.prepare(X,snapshot,NaN,1),/10 pi/);
+});
+test('La dérogation J reste figée au transfert et ne permet pas le 12 pi',()=>{
+  const snapshot=X.finalizeProfileOrder('coin_arch_j',{faceA:5,faceB:6,jDepth:1,jReturn:1,nailing:2},{exception:{accepted:true,acceptedBy:'Test MIR',note:'Vérification'}});
+  const result=Transfer.prepare(X,snapshot,120,2);
+  assert.equal(result.source.ruleExceptions[0].minimumIn,2.25);
+  assert.match(result.spec.note,/Test MIR/);
+  assert.throws(()=>Transfer.prepare(X,snapshot,144,2),/10 pi/);
+});
 console.log('MIR longueurs: '+n+' tests réussis.');
