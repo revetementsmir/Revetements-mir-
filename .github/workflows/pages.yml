@@ -45,6 +45,9 @@ jobs:
           node --check tests/mir-atelier-v4-browser.cjs
           node --check dist/production-admin-v4.js
           node --check dist/mir-procurement.js
+          node --check dist/mir-po-workflow.js
+          node --check tests/mir-purchase-orders-browser.cjs
+          node tests/mir-po-workflow.cjs
           node --check dist/mir-admin-guided.js
           node --check dist/mir-admin-live3d.js
           node --check tests/mir-admin-guided-browser.cjs
@@ -131,6 +134,7 @@ jobs:
           node tests/mir-direct-po-browser.cjs
           node tests/mir-drawing-pan-browser.cjs
           node tests/mir-atelier-v4-browser.cjs
+          node tests/mir-purchase-orders-browser.cjs
           node tests/mir-pliage-audit-browser.cjs
           node tests/mir-admin-guided-browser.cjs
           node tests/mir-workshop-reset-browser.cjs
@@ -276,7 +280,7 @@ jobs:
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
           grep -F 'kaycan-flat-preview.js?v=mac-2' /tmp/production.html
-          grep -F 'production-app.js?v=moon-guided-20261105' /tmp/production.html
+          grep -F 'production-app.js?v=orders-pdf-2' /tmp/production.html
           grep -F 'mir-bending-finishes.js?v=1' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
           grep -F 'function medianRgb' /tmp/kaycan-flat-preview.js
@@ -300,7 +304,11 @@ jobs:
           grep -F 'mir_production_templates_v1' /tmp/mir-reset-app.js
           fetch "$base/mir-procurement.css" /tmp/mir-procurement.css
           grep -F '#mir-procurement-tabs' /tmp/mir-procurement.css
-          grep -F 'mir-procurement.js?v=moon-guided-20261105' /tmp/production.html
+          grep -F 'mir-procurement.js?v=orders-pdf-2' /tmp/production.html
+          grep -F 'mir-procurement.css?v=orders-pdf-2' /tmp/production.html
+          grep -F 'mir-po-workflow.js?v=orders-2' /tmp/production.html
+          fetch "$base/mir-po-workflow.js" /tmp/mir-po-workflow.js
+          grep -F 'function pdfFaces(' /tmp/mir-po-workflow.js
           fetch "$base/production-admin-v4.js" /tmp/mir-admin-v4.js
           grep -F 'mir-v4-sheet-total' /tmp/mir-admin-v4.js
           grep -F 'href="production.html?view=orders" data-admin-only' /tmp/production.html
