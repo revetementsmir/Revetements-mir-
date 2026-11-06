@@ -76,6 +76,26 @@ async function ready(){
    await page.locator('#mir-guide-next').click();
    await page.waitForFunction(()=>window.MIRAdminWizard?.step===2,{timeout:15000});
    assert.equal(await page.locator('#mir-v4-dimensions').evaluate(node=>node.open),true);
+   // Les fractions du chantier doivent remplir immédiatement le champ en décimal.
+   // Les quatre formats couvrent le 1/16 po, une fraction seule et une cote mixte.
+   const firstMeasure=page.locator('#production-dimensions input[data-segment-length="0"]');
+   const fractionSelect=page.locator('#production-dimensions input[data-segment-length="0"] + select[data-pick-fraction]');
+   assert.equal(await fractionSelect.count(),1,'sélecteur de fraction à côté de la cote A');
+   for(const [initial,selection,expected] of [
+     ['', '8', '0.5'],      // 1/2
+     ['', '6', '0.375'],    // 3/8
+     ['2 1/4', '8', '2.5'], // conserve les pouces entiers
+     ['', '1', '0.0625']   // 1/16
+   ]){
+     await firstMeasure.fill(initial);
+     await fractionSelect.selectOption(selection);
+     assert.equal(await firstMeasure.inputValue(),expected,size.name+' choix '+selection+'/16');
+     const parsed=await page.evaluate(()=>window.MIRProduction.parseMeasurement(document.querySelector('#production-dimensions input[data-segment-length="0"]').value,'in'));
+     assert.ok(parsed.ok&&Math.abs(parsed.value-Number(expected))<1e-10,'conversion exacte du calcul de pliage');
+   }
+   // Revenir à une cote de chantier ordinaire avant de poursuivre le dossier.
+   await firstMeasure.fill('2');
+
    assert.equal(await page.locator('#mir-guide-add-hem').isVisible(),true,'retour écrasé disponible dans le parcours guidé');
    assert.equal(await page.locator('#mir-guide-extend').isVisible(),true);
    await page.locator('#mir-guide-add-hem').click();
