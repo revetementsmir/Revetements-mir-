@@ -88,6 +88,7 @@ async function ready(){
 
    await page.locator('#mir-guide-next').click();
    await page.waitForFunction(()=>window.MIRAdminWizard?.step===3,{timeout:12000});
+   assert.equal(await page.locator('#mir-v4-face').isVisible(),false,'ancien choix gauche/droite masqué sous les nouvelles cartes');
    assert.equal(await page.locator('.mir-guide-face-card').count(),2);
    assert.equal(await page.locator('.mir-guide-face-card svg').count(),2,'deux aperçus du profil réel');
    const facePreviews=await page.locator('.mir-guide-face-card svg').evaluateAll(nodes=>nodes.map(n=>n.outerHTML));
