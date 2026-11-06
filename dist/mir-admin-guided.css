@@ -1,4 +1,9 @@
 /* MIR — Atelier Admin guidé. Le parcours client et les autres onglets ne changent pas. */
+
+/* Le conteneur des vues garde TOUJOURS la surface 2D quand on change
+   pour un profil standard, un modèle existant ou un autre parcours Admin. */
+body.mir-admin-v4:not(.mir-admin-guided-active) #mir-guide-views{display:block}
+body.mir-admin-v4:not(.mir-admin-guided-active) #mir-guide-3d{display:none!important}
 body.mir-admin-v4 #mir-guide-3d-open,
 body.mir-admin-v4 #mir-guide-views,
 body.mir-admin-v4 #mir-guide-steps,
