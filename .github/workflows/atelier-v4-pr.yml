@@ -25,10 +25,12 @@ on:
       - 'dist/produit.html'
       - 'dist/selection.html'
       - 'dist/pliage.html'
+      - 'tests/mir-production-client-flow-browser.cjs'
       - 'tests/mir-public-menu*.cjs'
       - 'tests/mir-client-header-browser.cjs'
       - 'dist/commerce.css'
       - 'dist/mir-procurement.css'
+      - 'dist/mir-production-client-nav.*'
       - 'dist/mir-admin-guided*'
       - 'dist/mir-admin-live3d.js'
       - 'tests/mir-admin-guided*.cjs'
@@ -71,6 +73,8 @@ jobs:
           node --check tests/mir-retours-cotes-browser.cjs
           node --check dist/production-app.js
           node --check dist/mir-public-menu.js
+          node --check dist/mir-production-client-nav.js
+          node --check tests/mir-production-client-flow-browser.cjs
           node --check dist/mir-selection-pdf.js
           node --check tests/mir-selection-pdf-browser.cjs
           node --check tests/mir-public-menu-browser.cjs
@@ -116,6 +120,7 @@ jobs:
         run: |
           npm install --no-save playwright@1.58.2
           node tests/mir-public-menu-browser.cjs
+          node tests/mir-production-client-flow-browser.cjs
           node tests/mir-selection-pdf-browser.cjs
           node tests/mir-client-header-browser.cjs
           node tests/mir-atelier-v4-browser.cjs
@@ -143,6 +148,7 @@ jobs:
             artifacts/mir-reset-*.png
             artifacts/mir-admin-guide-*.png
             artifacts/mir-menu-*.png
+            artifacts/mir-client-parcours-*.png
             artifacts/mir-pan-*.png
             artifacts/mir-rename-*.png
             artifacts/mir-miniatures-*.png
