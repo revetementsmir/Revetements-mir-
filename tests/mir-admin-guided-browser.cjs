@@ -43,6 +43,11 @@ async function ready(){
    const names=await page.locator('#mir-procurement-tabs button').allTextContents();
    assert.deepEqual(names,['Créer','Boutique','Magasin employés','Bons de commande']);
    assert.equal(await page.locator('#mir-guide-steps button').count(),4);
+   assert.equal(await page.locator('#mir-guide-header').isVisible(),true,'Un seul parcours guidé en haut du dessin');
+   assert.equal(await page.locator('#mir-guide-header').evaluate(n=>n.parentElement.classList.contains('production-workspace')),true);
+   assert.equal(await page.locator('#drawing-tools [data-draw-tool="draw"]').isVisible(),false,'ancien bouton Terminer masqué pendant le guidage');
+   assert.equal(await page.locator('#mir-proc-shortcuts [data-mir-tab="draw"]').isVisible(),false,'ancien raccourci Nouveau dessin masqué');
+
    assert.equal(await page.locator('body').getAttribute('data-mir-guide-step'),'1');
    assert.equal(await page.locator('#mir-guide-3d').isVisible(),size.width>1150);
    assert.equal(await page.locator('#mir-guide-3d-open').isVisible(),size.width<=1150);
@@ -71,8 +76,22 @@ async function ready(){
    await page.locator('#mir-guide-next').click();
    await page.waitForFunction(()=>window.MIRAdminWizard?.step===2,{timeout:15000});
    assert.equal(await page.locator('#mir-v4-dimensions').evaluate(node=>node.open),true);
+   assert.equal(await page.locator('#mir-guide-add-hem').isVisible(),true,'retour écrasé disponible dans le parcours guidé');
+   assert.equal(await page.locator('#mir-guide-extend').isVisible(),true);
+   await page.locator('#mir-guide-add-hem').click();
+   await page.locator('#end-hem-form').waitFor({state:'visible'});
+   assert.equal(await page.locator('#end-hem-form [data-hem-preview]').count(),2);
+   const hemPreviews=await page.locator('#end-hem-form [data-hem-preview]').evaluateAll(nodes=>nodes.map(n=>n.innerHTML));
+   assert.ok(hemPreviews.every(html=>html.includes('<svg')),'les deux orientations sont calculées depuis le profil');
+   assert.notEqual(hemPreviews[0],hemPreviews[1],'les choix de sens doivent être visuellement distincts');
+   await page.locator('#end-hem-form [data-close-production-dialog]').click();
+
    await page.locator('#mir-guide-next').click();
    await page.waitForFunction(()=>window.MIRAdminWizard?.step===3,{timeout:12000});
+   assert.equal(await page.locator('.mir-guide-face-card').count(),2);
+   assert.equal(await page.locator('.mir-guide-face-card svg').count(),2,'deux aperçus du profil réel');
+   const facePreviews=await page.locator('.mir-guide-face-card svg').evaluateAll(nodes=>nodes.map(n=>n.outerHTML));
+   assert.notEqual(facePreviews[0],facePreviews[1],'face verte différente selon le choix');
    await page.locator('[data-mir-guide-face="right"]').click();
    assert.equal(await page.locator('[data-mir-guide-face="right"]').getAttribute('aria-pressed'),'true');
    await page.locator('#mir-guide-next').click();
