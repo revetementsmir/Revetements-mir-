@@ -24,5 +24,14 @@ function create({sdk,storage}){
  async logout(){generation++;identity=null;const {error}=await sdk.auth.signOut({scope:'local'});if(error)throw error;}
  };
 }
-return {create};
+function readModelBackup(content,validator){
+ if(typeof content!=='string'||new TextEncoder().encode(content).length>3*1024*1024)throw Error('Sauvegarde trop volumineuse (maximum 3 Mo)');
+ const backup=JSON.parse(content);
+ if(!backup||!(backup.schema==='mir-template-library-backup-1'||(!backup.schema&&backup.version===1))||!Array.isArray(backup.records))throw Error('Sauvegarde de modèles MIR requise');
+ if(!validator?.validate)throw Error('Contrôle des modèles indisponible');
+ const checked=validator.validate(backup.records);if(!checked.ok)throw Error(checked.error);
+ // Validation does not rewrite the source: metadata and existing tariffs survive.
+ return backup.records;
+}
+return {create,readModelBackup};
 });
