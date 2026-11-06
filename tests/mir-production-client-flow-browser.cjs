@@ -77,7 +77,9 @@ async function verifyNavigation(browser,base){
  await admin.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
  await admin.waitForFunction(()=>!!window.MIRProductionWorkspace);
  assert.equal(await admin.locator('header.production-header .mir-client-menu-toggle').count(),0,'Admin sans menu public');
- assert.equal(await admin.locator('header.production-header nav[aria-label="Navigation du site"]').isVisible(),true,'Admin conserve son menu');
+ assert.equal(await admin.locator('header.production-header nav[aria-label="Navigation du site"] a[data-admin-only]').count(),4,'liens Admin originaux conservés');
+ assert.equal(await admin.locator('header.production-header').evaluate(el=>el.classList.contains('mir-client-header')),false,'menu public non activé chez Admin');
+ assert.equal(await admin.locator('#mir-procurement-tabs').isVisible(),true,'onglets Admin actifs');
  assert.equal(await admin.locator('body').evaluate(el=>el.classList.contains('mir-signature')),false,'Admin ne change pas de thème');
  await admin.close();
  console.log('PASS Admin isolé du menu public');
