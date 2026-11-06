@@ -27,6 +27,7 @@ on:
       - 'dist/pliage.html'
       - 'tests/mir-unified-dossier*.cjs'
       - 'tests/mir-production-client-flow-browser.cjs'
+      - 'tests/mir-unified-dossier*.cjs'
       - 'tests/mir-public-menu*.cjs'
       - 'tests/mir-client-header-browser.cjs'
       - 'dist/commerce.css'
@@ -34,6 +35,8 @@ on:
       - 'dist/mir-unified-*'
       - 'dist/selection.html'
       - 'dist/mir-production-client-nav.*'
+      - 'dist/mir-unified-dossier.*'
+      - 'dist/mir-unified-client-dossier.js'
       - 'dist/mir-admin-guided*'
       - 'dist/mir-admin-live3d.js'
       - 'tests/mir-admin-guided*.cjs'
@@ -80,6 +83,9 @@ jobs:
           node --check dist/mir-unified-client-dossier.js
           node --check tests/mir-unified-dossier.cjs
           node --check tests/mir-unified-dossier-browser.cjs
+          node --check dist/mir-unified-client-dossier.js
+          node --check tests/mir-unified-dossier.cjs
+          node --check tests/mir-unified-dossier-browser.cjs
           node --check tests/mir-production-client-flow-browser.cjs
           node --check dist/mir-selection-pdf.js
           node --check tests/mir-selection-pdf-browser.cjs
@@ -108,6 +114,7 @@ jobs:
       - name: Existing MIR regression suite
         run: |
           node tests/mir-pages-regressions.cjs
+          node tests/mir-unified-dossier.cjs
           node tests/mir-public-menu.cjs
           node tests/mir-unified-dossier.cjs
           node tests/mir-selection-pdf.cjs
@@ -128,6 +135,7 @@ jobs:
           npm install --no-save playwright@1.58.2
           node tests/mir-public-menu-browser.cjs
           node tests/mir-production-client-flow-browser.cjs
+          node tests/mir-unified-dossier-browser.cjs
           node tests/mir-unified-dossier-browser.cjs
           node tests/mir-selection-pdf-browser.cjs
           node tests/mir-client-header-browser.cjs
@@ -157,6 +165,7 @@ jobs:
             artifacts/mir-admin-guide-*.png
             artifacts/mir-menu-*.png
             artifacts/mir-client-parcours-*.png
+            artifacts/mir-dossier-commun-*.png
             artifacts/mir-dossier-commun-*.png
             artifacts/mir-pan-*.png
             artifacts/mir-rename-*.png
