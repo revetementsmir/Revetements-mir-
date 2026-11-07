@@ -193,6 +193,23 @@ declare ln mir_core.order_lines;item mir_core.warehouse_skus;ord mir_core.orders
  return true;
 end$$;
 
+create function public.mir_warehouse_search(org uuid,term text) returns jsonb
+language plpgsql stable security definer set search_path=pg_catalog,mir_core as $
+declare out jsonb;q text;begin
+ if not mir_core.warehouse_allowed(org) then raise exception 'Accès Entrepôt requis' using errcode='42501';end if;
+ q:=left(btrim(coalesce(term,'')),100);
+ select coalesce(jsonb_agg(jsonb_build_object('id',x.id,'sku',x.sku,'name',x.name,
+  'qrToken',x.qr_token,'unit',x.unit,'sourceKind',x.source_kind,'onHand',x.on_hand)
+  order by x.name),'[]'::jsonb) into out
+ from (select s.id,s.sku,s.name,s.qr_token,s.unit,s.source_kind,coalesce(b.on_hand,0) as on_hand
+ from mir_core.warehouse_skus s left join mir_core.warehouse_stock b
+ on (b.organization_id,b.sku_id)=(s.organization_id,s.id)
+ where s.organization_id=org and not s.archived
+ and (q='' or s.sku ilike '%'||q||'%' or s.name ilike '%'||q||'%')
+ order by s.name limit 40)x;
+ return out;
+end$;
+
 create function public.mir_warehouse_snapshot(org uuid,qr uuid) returns jsonb
 language plpgsql stable security definer set search_path=pg_catalog,mir_core as $$
 declare product mir_core.warehouse_skus;stock mir_core.warehouse_stock;pending jsonb;log_rows jsonb;begin
@@ -307,6 +324,7 @@ do $$declare item record;begin
  ('public.mir_warehouse_grant_access(uuid,uuid,boolean)'),
  ('public.mir_warehouse_register(uuid,text,text,text,text,text,numeric)'),
  ('public.mir_warehouse_link_order_line(uuid,uuid,uuid)'),
+ ('public.mir_warehouse_search(uuid,text)'),
  ('public.mir_warehouse_snapshot(uuid,uuid)'),
  ('public.mir_warehouse_queue(uuid)'),
  ('public.mir_warehouse_move(uuid,uuid,uuid,numeric,uuid,text)')
