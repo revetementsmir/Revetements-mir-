@@ -62,10 +62,12 @@ async function verifyMouldingWizard(browser,base,artifacts){
  assert.equal(await next.isEnabled(),true);
  const scroll=await desktop.evaluate(()=>{
   const preview=document.querySelector('.drawing-card'),form=document.querySelector('#client-step-scroll');
+  const previewBefore=preview.scrollTop;
   form.scrollTop=100;
-  return {preview:getComputedStyle(preview).overflowY,form:getComputedStyle(form).overflowY,previewTop:preview.scrollTop,formTop:form.scrollTop};
+  return {preview:getComputedStyle(preview).overflowY,form:getComputedStyle(form).overflowY,previewBefore,previewAfter:preview.scrollTop,formTop:form.scrollTop};
  });
- assert.deepEqual([scroll.preview,scroll.form,scroll.previewTop],['auto','auto',0]);
+ assert.deepEqual([scroll.preview,scroll.form],['auto','auto']);
+ assert.equal(scroll.previewAfter,scroll.previewBefore,'Le défilement du formulaire ne déplace pas le dessin');
  assert.ok(scroll.formTop>0,'The form scrolls independently of the drawing');
  await desktop.locator('[data-client-step="2"]').click();
  await desktop.locator('[data-segment-length="1"]').fill('');
