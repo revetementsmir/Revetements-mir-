@@ -1,4 +1,5 @@
 'use strict';
+const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
 /* MIR — prévenir les photos perforées de soffite sur les pliages Kaycan. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -57,8 +58,7 @@ function online(url){return new Promise(resolve=>http.get(url,r=>{r.resume();res
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('[data-freeform-add]').click();
-   await page.locator('[data-freeform-add]').click();
+   await drawTwoSides(page);
    await page.locator('[data-freeform-finish]').click();
     if(!(await page.locator('.mir-v4-materials').evaluate(node=>node.open)))await page.locator('.mir-v4-materials > summary').click();
     if(!(await page.locator('#mir-v4-colors').evaluate(node=>node.open)))await page.locator('#mir-v4-colors > summary').click();
