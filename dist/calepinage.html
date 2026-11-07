@@ -15,6 +15,7 @@
   <script src="architectural-wall-geometry.js" defer></script>
   <script src="architectural-wall-input.js" defer></script>
   <script src="panel-layout-engine.js" defer></script>
+  <script src="mir-architect-measures.js?v=1" defer></script>
   <script src="architectural-wall-view.js" defer></script>
   <script src="panel-layout-pdf.js" defer></script>
   <script src="panel-layout-output.js" defer></script>
@@ -71,11 +72,13 @@
         <p id="wall-gap-method" class="hint" hidden>Le lousse réduit les dimensions hors tout suivant les axes largeur et hauteur. Les angles de coupe sont calculés sur ce contour net; ce n’est pas un retrait perpendiculaire constant aux pentes.</p>
         <label class="check"><input type="checkbox" id="dimensions-confirmed"><span>Cotes et jeux de pose vérifiés</span></label>
         <div class="card-title section-title"><span class="step">02</span><h2>Les panneaux</h2></div>
-        <div class="fields two"><label>Colonnes<input id="columns" type="number" min="1" max="16" value="4"></label><label>Rangées<input id="rows" type="number" min="1" max="16" value="2"></label></div>
+        <p class="hint mir-architect-next">Après le tracé du mur, choisis combien de panneaux tu veux en largeur et en hauteur. MIR calcule la répartition automatiquement.</p>
+  <div class="fields two"><label>Panneaux de large<input id="columns" type="number" min="1" max="16" value="4"></label><label>Panneaux de haut<input id="rows" type="number" min="1" max="16" value="2"></label></div>
+  <output id="mir-wall-panel-count" class="mir-wall-panel-count" aria-live="polite">4 × 2 = 8 panneaux (proposition)</output>
         <label>Lip commun / recouvrement (po)<input id="lip" inputmode="decimal" placeholder="À renseigner"></label><p class="hint">Inclus dans le hors tout. Un recouvrement par joint.</p>
         <label>Répartition<select id="distribution"><option value="equal">Panneaux hors tout égaux</option><option value="axes">Axes de joints espacés également</option></select></label><p id="distribution-note" class="hint"></p>
         <label>Précision de fabrication<select id="precision"><option value="0">Conserver les valeurs exactes</option><option value="0.0625">Répartir au 1/16 po</option></select></label>
-        <button id="redistribute" class="primary full">Répartir les panneaux <span>→</span></button>
+        <button id="redistribute" class="primary full">Calculer / répartir les panneaux <span>→</span></button>
         <button id="unlock-all" class="text-button">Libérer les cotes verrouillées</button>
       </aside>
       <section class="canvas-column" aria-label="Plan de calepinage">
@@ -83,12 +86,27 @@
           <div class="drawing-toolbar"><button id="select-tool" aria-pressed="true">Sélectionner</button><button id="draw-zone" aria-pressed="false">Zone rectangulaire</button><button id="draw-outline" class="draw-section-direct" aria-pressed="false" title="Tracer les sommets du mur comme une moulure, avant ou après les mesures">Tracer une section libre</button><span class="toolbar-spacer"></span><button id="zoom-out" aria-label="Réduire le plan">−</button><output id="zoom-value">100 %</output><button id="zoom-in" aria-label="Agrandir le plan">＋</button><button id="zoom-reset">Cadrer</button></div>
           <div id="outline-actions" class="outline-actions" hidden><button id="outline-right-angle" type="button" class="quiet" aria-pressed="false">Angle droit à 90°</button><span id="outline-progress" role="status" aria-live="polite">Cliquez ou glissez pour créer un côté · 3 sommets minimum.</span><button id="outline-back" class="quiet">↶ Dernier point</button><button id="outline-close" class="primary" disabled>Fermer le contour</button><button id="outline-cancel" class="quiet">Annuler le tracé</button></div>
           <div id="wall-orbit-controls" class="orbit-controls" hidden><button id="orbit-left" aria-label="Tourner le mur vers la gauche">↶</button><button id="orbit-right" aria-label="Tourner le mur vers la droite">↷</button><button id="orbit-up" aria-label="Voir le mur de plus haut">↑</button><button id="orbit-down" aria-label="Voir le mur de plus bas">↓</button><button id="orbit-front">Vue de face</button><span id="wall-3d-status"></span></div>
-          <div id="drawing-stage" class="drawing-stage" tabindex="0" aria-label="Dessin interactif des panneaux"><svg id="layout-svg" viewBox="0 0 1000 680" role="img" aria-label="Zone à définir"></svg></div>
+          <div class="mir-wall-views"><div id="drawing-stage" class="drawing-stage" tabindex="0" aria-label="Dessin interactif des panneaux"><svg id="layout-svg" viewBox="0 0 1000 680" role="img" aria-label="Zone à définir"></svg></div><section id="mir-wall-live-3d" class="mir-wall-live-3d" role="region" aria-label="Deuxième vue synchronisée des panneaux" hidden></section></div>
           <div class="drawing-footer"><span><i class="legend-band"></i> Recouvrement commun</span><span><i class="legend-selected"></i> Pièce sélectionnée</span><span id="drawing-hint">Cliquez une pièce ou déplacez un joint.</span></div>
         </div>
         <div id="calculation-errors" class="notice error" role="alert" hidden></div>
         <div id="calculation-warnings" class="notice" role="status" hidden></div>
         <div id="layout-summary" class="summary-grid"></div>
+  <details id="mir-architect-panel-dimensions" class="card mir-architect-panel-dimensions" open>
+   <summary><strong>Mesures des panneaux selon le plan d'architecte</strong></summary>
+   <div class="mir-architect-toolbar"><label>Unité de saisie <select id="mir-architect-unit" aria-label="Unité du plan d'architecte"><option value="in">Pouces et fractions</option><option value="mm">Millimètres (mm)</option></select></label>
+   <output id="mir-architect-piece-count" role="status">Trace le mur et entre tes mesures.</output></div>
+   <p class="hint">Chaque panneau a ses cotes affichées. Dans la grille actuelle, une largeur règle la colonne correspondante, et une hauteur règle la rangée. Le reste est redistribué uniquement après ta confirmation. Les panneaux découpés en pente gardent leur forme de coupe réelle.</p>
+   <div class="table-wrap mir-architect-table-wrap"><table aria-label="Cotes individuelles des panneaux du mur">
+    <thead><tr><th>Panneau</th><th>Largeur de grille</th><th>Hauteur de grille</th><th>Cote nette / coupe</th><th>Verrouiller</th><th>Valider</th></tr></thead>
+    <tbody id="mir-architect-panel-table"></tbody>
+   </table></div>
+   <div class="mir-architect-review" id="mir-architect-review" hidden role="status" aria-live="polite">
+    <p id="mir-architect-review-summary"></p>
+    <button type="button" id="mir-architect-confirm" class="primary">Confirmer ces cotes et recalculer</button>
+    <button type="button" id="mir-architect-cancel" class="quiet">Annuler</button>
+   </div>
+  </details>
         <div class="card proof-card"><div><p class="eyebrow">LES COTES SE REJOIGNENT</p><h3>Une seule largeur au joint.</h3></div><p id="closure-proof">Les dimensions assemblées seront vérifiées ici.</p></div>
         <details class="card wall-measures"><summary>Longueurs et angles du mur</summary><div id="wall-edge-list"></div></details>
       </section>
