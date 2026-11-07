@@ -672,3 +672,70 @@ body.mir-admin-v4.mir-mobile-stepper[data-mir-mobile-step="3"] #production-color
   display:none!important;
  }
 }
+
+
+/* MIR — sections admin accessibles par un menu compact sans défilement du tracé. */
+#mir-mobile-section-toggle,#mir-mobile-section-menu{display:none!important}
+@media(max-width:650px), (max-width:950px) and (max-height:520px) and (pointer:coarse){
+ body.mir-admin-v4.mir-mobile-stepper>.production-header{
+  display:flex!important;flex-wrap:nowrap!important;align-items:center!important;
+  gap:5px!important;width:100%;max-width:100%;min-width:0;
+  box-sizing:border-box;position:relative;z-index:70;
+ }
+ body.mir-admin-v4.mir-mobile-stepper .production-header .production-brand{
+  flex:0 0 auto;min-width:0;max-width:92px;
+ }
+ body.mir-admin-v4.mir-mobile-stepper .production-header .production-brand img{
+  width:clamp(76px,20vw,92px)!important;height:auto!important;
+ }
+ body.mir-admin-v4.mir-mobile-stepper .production-header #mir-freeform-title{
+  display:flex!important;flex:1 1 80px;min-width:0;margin-right:0!important;overflow:hidden;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-freeform-title strong{
+  display:block;font-size:12px!important;line-height:1.2;white-space:normal;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-freeform-title small{display:none!important}
+ body.mir-admin-v4.mir-mobile-stepper .production-header .header-link{
+  flex:0 0 auto!important;min-width:0!important;max-width:90px!important;
+  padding:7px 5px!important;font-size:10px!important;gap:3px!important;
+  margin-left:0!important;white-space:nowrap;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-toggle{
+  display:inline-flex!important;align-items:center;justify-content:center;
+  flex:0 0 40px!important;width:40px!important;max-width:40px;height:42px;
+  min-height:42px;min-width:40px;order:99;
+  padding:0!important;margin:0!important;border:1px solid #afc2ad;
+  background:#fafaf7;color:#18251d;border-radius:6px;
+  font:700 24px/1 Arial,Helvetica,sans-serif;cursor:pointer;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-toggle[aria-expanded="true"]{
+  border-color:#348511;background:#edf5e8;color:#286b0d;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-toggle:focus-visible,
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-menu button:focus-visible{
+  outline:3px solid #348511;outline-offset:2px;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-menu:not([hidden]){
+  display:grid!important;gap:4px;position:fixed;z-index:150;
+  top:calc(env(safe-area-inset-top) + 57px);
+  right:max(8px,env(safe-area-inset-right));left:auto;
+  width:min(300px,calc(100vw - 16px));min-width:0;
+  max-height:calc(100dvh - 90px);overflow-y:auto;overscroll-behavior:contain;
+  padding:9px;border:1px solid #c8d7c2;border-radius:10px;
+  background:#fafaf7;box-shadow:0 10px 35px #18251d3c;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-menu button{
+  display:block;width:100%;min-height:44px;text-align:left;
+  padding:9px 12px;border:0;border-radius:6px;background:#f3f6f0;
+  color:#18251d;font:700 13px/1.3 Arial,Helvetica,sans-serif;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-menu button:hover{
+  background:#e5f1dd;color:#286b0d;
+ }
+}
+@media(max-width:950px) and (max-height:520px) and (pointer:coarse){
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-menu:not([hidden]){
+  top:43px;max-height:calc(100dvh - 66px);
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-toggle{height:38px;min-height:38px}
+}
