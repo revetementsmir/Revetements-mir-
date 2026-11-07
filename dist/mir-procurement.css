@@ -174,3 +174,137 @@ body.mir-admin-v4 .mir-store-card p{margin:3px 0 9px;color:#617166}
  body.mir-admin-v4 .mir-po-tabs{gap:4px}
  body.mir-admin-v4 #mir-procurement-panel .mir-po-tabs button{font-size:12px;padding:9px 4px}
 }
+
+
+/* Bon MIR — design officiel de la page d'accueil et du catalogue.
+   Les panneaux défilent, mais la page PC elle-même reste fixe. */
+body.mir-admin-v4 #mir-procurement-panel .mir-po-editor{
+ color:var(--mir-ink,#18251d);font-family:Arial,Helvetica,sans-serif;
+ display:grid;grid-template-columns:minmax(0,1.28fr) minmax(320px,.72fr);
+ grid-template-areas:"heading heading" "lines supplier" "lines project";
+ align-items:start;gap:12px;margin:0 auto;max-width:1500px;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-editor-heading{
+ grid-area:heading;display:flex;align-items:center;justify-content:space-between;
+ gap:15px;flex-wrap:wrap;padding:7px 4px 2px;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-editor-heading h2{
+ margin:0 0 3px!important;font-size:clamp(22px,2.4vw,30px);
+ letter-spacing:-.035em;color:var(--mir-ink,#18251d);
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-editor-heading p{
+ color:var(--mir-muted,#5b695d);font-size:13px;margin:0;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-lines{grid-area:lines;margin:0}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-supplier-card{grid-area:supplier;margin:0}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-project-card{grid-area:project;margin:0}
+body.mir-admin-v4 #mir-procurement-panel .mir-proc-card{
+ border:1px solid var(--mir-border,#dfe5dc);border-radius:10px;
+ box-shadow:0 5px 17px rgba(16,36,22,.055);
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-proc-card h3{
+ margin:0 0 7px;color:var(--mir-ink,#18251d);
+ font-size:16px;font-weight:750;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-card-heading{
+ display:flex;align-items:start;justify-content:space-between;
+ gap:9px;flex-wrap:wrap;margin:0 0 12px;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-card-heading p{
+ margin:0;color:var(--mir-muted,#5b695d);font-size:12px;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-list{display:grid;gap:12px}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece{
+ border:1px solid var(--mir-border,#dfe5dc);border-radius:9px;
+ background:var(--mir-surface,#fafaf7);min-width:0;overflow:hidden;
+ display:grid;grid-template-columns:minmax(170px,.8fr) minmax(0,1.2fr);gap:12px;padding:12px;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-visual{
+ background:white;border:1px solid #dfe5dc;border-radius:6px;
+ min-width:0;min-height:125px;display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-visual svg{
+ width:100%;height:auto;max-height:220px;display:block;overflow:visible;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-info{min-width:0}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-index{
+ display:block;color:var(--mir-accent,#348511);font-size:10px;
+ letter-spacing:.045em;font-weight:750;margin:0 0 3px;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece h4{
+ color:var(--mir-ink,#18251d);font-size:16px;line-height:1.2;margin:0 0 8px;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece p{font-size:12px;line-height:1.5;margin:4px 0}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-angles{color:#37583e}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-actions{display:flex;align-items:end;gap:7px;flex-wrap:wrap;margin-top:9px}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-actions .mir-proc-field{margin:0;max-width:100px;flex:0 0 90px}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-actions input{min-height:42px;padding:7px}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-actions button{flex:1 1 130px}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-suppliers{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-supplier-choice{
+ border:1px solid #bdcbbb!important;border-radius:6px!important;background:var(--mir-soft,#f3f6f0)!important;
+ min-width:0;text-align:left!important;padding:10px!important;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-supplier-choice strong{
+ display:block;font-size:13px;line-height:1.2;overflow-wrap:anywhere;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-supplier-choice small{
+ display:block;font-size:10px;font-weight:500;color:var(--mir-muted,#5b695d);margin-top:4px;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-supplier-choice[aria-pressed="true"]{
+ background:#e8f4df!important;border-color:var(--mir-accent,#348511)!important;
+ outline:2px solid var(--mir-accent,#348511);outline-offset:0;color:#223d22!important;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-contact{font-size:12px;color:#3e5543;line-height:1.6}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-manage-supplier{font-size:12px}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-fields{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px;min-width:0;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-fields>.mir-proc-field:nth-child(3){grid-column:1/-1}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-extra{
+ border-top:1px solid var(--mir-border,#dfe5dc);margin:5px 0;padding-top:9px;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-extra>summary{
+ cursor:pointer;font-size:13px;font-weight:700;color:var(--mir-ink,#18251d);padding:6px 0;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-editor-actions{
+ display:flex;justify-content:space-between;align-items:center;gap:12px;
+ margin-top:10px;padding-top:11px;border-top:1px solid var(--mir-border,#dfe5dc);
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-editor-actions p{font-size:11px;color:var(--mir-muted,#5b695d);margin:0;max-width:400px}
+body.mir-admin-v4 #mir-procurement-panel .mir-proc-primary{
+ background:var(--mir-accent,#348511)!important;color:white!important;border-color:var(--mir-accent,#348511)!important;
+ border-radius:6px!important;
+}
+body.mir-admin-v4 #mir-procurement-panel .mir-proc-primary:hover{
+ background:var(--mir-accent-hover,#286b0d)!important;
+}
+@media (min-width:1100px) and (min-height:720px){
+ body.mir-admin-v4.mir-procurement-ready #mir-procurement-panel:not([hidden]){
+  min-height:0;flex:1 1 auto;overflow-y:auto;scrollbar-width:thin;
+ }
+ body.mir-admin-v4 #mir-procurement-panel .mir-po-editor{
+  align-content:start;min-height:0;
+ }
+}
+@media(max-width:1080px){
+ body.mir-admin-v4 #mir-procurement-panel .mir-po-editor{
+  grid-template-columns:minmax(0,1fr);
+  grid-template-areas:"heading" "lines" "supplier" "project";
+ }
+}
+@media(max-width:600px){
+ body.mir-admin-v4 #mir-procurement-panel .mir-po-piece{grid-template-columns:1fr;}
+ body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-visual{min-height:125px}
+ body.mir-admin-v4 #mir-procurement-panel .mir-po-fields{grid-template-columns:1fr;}
+ body.mir-admin-v4 #mir-procurement-panel .mir-po-piece-actions button{flex:1}
+ body.mir-admin-v4 #mir-procurement-panel .mir-po-editor-actions{flex-direction:column;align-items:stretch;}
+ body.mir-admin-v4 #mir-procurement-panel .mir-po-suppliers{gap:7px}
+}
+
+body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field{display:flex;align-items:end;gap:7px;min-width:0}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field>.mir-proc-field{flex:1 1 auto;margin:0 0 13px;min-width:0}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field>button{flex:0 0 auto;min-height:45px;margin-bottom:13px;font-size:11px!important;padding:6px 9px!important}
+@media(max-width:600px){body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field{flex-wrap:wrap}body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field>button{margin:0 0 13px}}

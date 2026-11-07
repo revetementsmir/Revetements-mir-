@@ -1,4 +1,5 @@
 'use strict';
+const {drawTwoSides,openWorkshopStep}=require('./mir-draw-freeform-helper.cjs');
 /* MIR : renommer sans quitter le dessin ni modifier les mesures. */
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -38,8 +39,8 @@ async function ready(){
    const errors=[];page.on('pageerror',error=>errors.push(error.message));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('.mir-v4-picker > summary').click();
-   await page.locator('.mir-v4-picker [data-template="l"]').click();
+   await drawTwoSides(page);
+   await openWorkshopStep(page,4);
    const input=page.locator('#production-piece-name');
    assert.equal(await input.isVisible(),true,'Nom de la moulure doit être visible');
    assert.equal(await page.locator('#mir-piece-name-field').innerText().then(s=>s.includes('Nom de la moulure')),true);

@@ -90,13 +90,15 @@ test('Navigation exclusive, Fournisseurs sous Commandes, aucune transmission imp
  const js=fs.readFileSync(path.join(__dirname,'../dist/mir-procurement.js'),'utf8');
  const nav=js.match(/tabs\.innerHTML='([^']+)'/);
  assert.ok(nav);
- assert.equal((nav[1].match(/data-mir-tab=/g)||[]).length,4);
+ assert.equal((nav[1].match(/data-mir-tab=/g)||[]).length,5,'Créer, Mes pliages, Boutique, Magasin, Bons');
+ assert.ok(nav[1].includes('data-mir-tab="models"'))
  assert.ok(nav[1].includes('data-mir-tab="boutique"'));
  assert.ok(!nav[1].includes('data-mir-tab="suppliers"'));
  assert.ok(js.includes('data-mir-tab="orders">← Retour aux commandes'));
  assert.ok(js.includes('aucune commande n’est envoyée automatiquement'));
  const workspace=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
- assert.ok(workspace.includes("channels:{client:false,store:data.has('store')"));
+  assert.ok(workspace.includes("channels:{client:data.has('client'),store:data.has('store')"),'Une nouvelle moulure n entre dans la boutique que par la case opt-in');
+  assert.ok(workspace.includes("commercial:{...(old?.commercial||{}),status:'draft'"),'La destination Boutique ne publie pas un produit sans prix');
  assert.ok(workspace.includes('reloadLocalTemplates'));
 });
 console.log('MIR audit pliage : '+count+' contrôles métier réussis');

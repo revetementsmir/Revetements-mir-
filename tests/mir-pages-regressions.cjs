@@ -230,12 +230,15 @@ test('MIR : nouvelle version conservée en brouillon jusqu’au tarif, ancienne 
   const end=app.indexOf('function renderRequests()',begin);
   assert.ok(begin>=0&&end>begin,'dialogue de modèle localisé');
   const form=app.slice(begin,end);
-  assert.ok(form.includes("old?.commercial?.wantsClient===true||old?.channels?.client===true?' checked':''"));
-  assert.ok(form.includes("old?.channels?.store===true?' checked':''"));
+  assert.ok(form.includes("old?.commercial?.wantsClient===true||old?.channels?.client===true||boutiqueChecked?' checked':''"),'Le canal Boutique ne se préremplit que par historique ou sélection explicite de la nouvelle pièce');
+  assert.ok(form.includes("boutiqueChecked=document.querySelector('#mir-freeform-client-toggle')?.checked===true"),'Le choix Boutique est décoché par défaut et lu explicitement');
+   assert.ok(form.includes("storeChecked=document.querySelector('#mir-freeform-store-toggle')?.checked===true"),'Le Magasin est indépendant du choix Boutique');
+  assert.ok(form.includes("old?.channels?.store===true||storeChecked?' checked':''"));
   assert.ok(!form.includes('old?.channels?.client===false'));
   assert.ok(!form.includes('old?.channels?.store===false'));
   assert.ok(form.includes('Nouveau modèle privé par défaut sur cet appareil'));
-  assert.ok(app.includes("channels:{client:false,store:data.has('store'),po:data.has('po')}"));
+  assert.ok(app.includes("channels:{client:data.has('client'),store:data.has('store'),po:data.has('po')}"),'Une moulure rejoint la boutique uniquement si la case correspondante est cochée');
+  assert.ok(app.includes("commercial:{...(old?.commercial||{}),status:'draft'"),'La sélection Boutique ne publie pas un produit sans prix');
   assert.ok(app.includes("commercial:{...(old?.commercial||{}),status:'draft'"));
   assert.ok(app.includes('versions:old?[...old.versions,copy(result.template)]:[copy(result.template)]'));
   assert.ok(app.includes('record.channels?.[catalogueChannel]===true'));
@@ -275,8 +278,8 @@ test('Mesures standard MIR : nouvelles fiches privées et usage magasin contrôl
  assert.ok(app.includes('measurementDefaults:checked.data'));
  assert.ok(app.includes('input.readOnly=true'));
  assert.ok(app.includes("catalogueChannel==='store'"));
- assert.ok(app.includes("old?.channels?.client===true?' checked':''"));
- assert.ok(app.includes("old?.channels?.store===true?' checked':''"));
+  assert.ok(app.includes("old?.commercial?.wantsClient===true||old?.channels?.client===true||boutiqueChecked?' checked':''"),'Le catalogue existant conserve son choix; Boutique facultative pour un nouveau tracé');
+ assert.ok(app.includes("old?.channels?.store===true||storeChecked?' checked':''"));
 });
 
 

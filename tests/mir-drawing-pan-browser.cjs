@@ -1,4 +1,5 @@
 'use strict';
+const {drawTwoSides,openWorkshopStep}=require('./mir-draw-freeform-helper.cjs');
 /* MIR : déplacer tout le dessin depuis la vue sans modifier cotes ou forme. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -25,14 +26,15 @@ async function ready(){
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('.mir-v4-picker > summary').click();
-   await page.locator('.mir-v4-picker [data-template="l"]').click();
+   await drawTwoSides(page);
+   await openWorkshopStep(page,4);
    await page.locator('#production-drawing').scrollIntoViewIfNeeded();
    const shape=page.locator('#production-drawing svg > path').first();
    const before=await shape.boundingBox();
+   const stageBefore=await page.locator('#production-drawing').boundingBox();
    const beforeScroll=await page.evaluate(()=>scrollY);
    const count=await page.locator('#mir-v4-sheet-value').textContent();
-   const dimensions=await page.locator('#production-dimensions input[data-measure]').evaluateAll(inputs=>inputs.map(e=>e.value));
+   const dimensions=await page.locator('#production-dimensions input[data-segment-length]').evaluateAll(inputs=>inputs.map(e=>e.value));
    const area=await page.locator('#production-drawing').boundingBox();
    const start={x:area.x+area.width*.23,y:area.y+area.height*.45};
    if(s.width<600){
@@ -51,13 +53,17 @@ async function ready(){
    assert.ok(after.x-before.x>25,'View should shift right '+JSON.stringify({before,after,s}));
    assert.ok(after.y-before.y>13,'View should shift down '+JSON.stringify({before,after,s}));
    assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),count);
-   assert.deepEqual(await page.locator('#production-dimensions input[data-measure]').evaluateAll(inputs=>inputs.map(e=>e.value)),dimensions);
+   assert.deepEqual(await page.locator('#production-dimensions input[data-segment-length]').evaluateAll(inputs=>inputs.map(e=>e.value)),dimensions);
    await page.locator('#production-drawing').screenshot({path:path.join(folder,'mir-pan-'+s.name+'.png')});
    await page.locator('#panel-view-reset').click();
    const reset=await shape.boundingBox();
-   const resetScroll=await page.evaluate(()=>scrollY);
-   assert.ok(Math.abs(reset.x-before.x)<3&&Math.abs((reset.y+resetScroll)-(before.y+beforeScroll))<3,
-    'Vue complète must recenter '+JSON.stringify({before,reset,s}));
+   const stageReset=await page.locator('#production-drawing').boundingBox();
+   // Une zone scrollable peut décaler le tableau quand le bouton « Vue complète »
+   // reçoit le focus. Comparer la géométrie relative au SVG, sans ignorer le pan.
+   const relativeBefore={x:before.x-stageBefore.x,y:before.y-stageBefore.y};
+   const relativeReset={x:reset.x-stageReset.x,y:reset.y-stageReset.y};
+   assert.ok(Math.abs(relativeReset.x-relativeBefore.x)<3&&Math.abs(relativeReset.y-relativeBefore.y)<3,
+    'Vue complète recentre réellement dans son tableau '+JSON.stringify({relativeBefore,relativeReset,s}));
    assert.deepEqual(errors,[]);
    console.log('PASS '+s.name+' glisser la vue + recentrer sans changer les cotes');
    await page.close();

@@ -11,6 +11,15 @@ async function ready(){
  }
  throw Error('Serveur local MIR indisponible');
 }
+async function openModels(page){
+ const native=page.locator('#mir-procurement-tabs [data-mir-tab="models"]');
+ if(await native.isVisible())return native.click();
+ // Sur téléphone, la navigation est dans le menu compact plutôt que sur le tableau.
+ const toggle=page.locator('#mir-mobile-section-toggle');
+ await toggle.click();
+ await page.locator('#mir-mobile-section-menu [data-mir-mobile-tab="models"]').click();
+ assert.equal(await toggle.isVisible(),false,'menu compact masqué hors du tracé');
+}
 (async()=>{
  fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});
  const server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1','--directory',path.join(__dirname,'../dist')],{stdio:'ignore'});
@@ -25,10 +34,10 @@ async function ready(){
    page.on('dialog',dialog=>dialog.accept());
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForSelector('a.mir-proc-reset-link',{state:'attached',timeout:25000});
-   assert.equal(await page.locator('#mir-procurement-tabs > button').count(),4);
+   assert.equal(await page.locator('#mir-procurement-tabs > button').count(),5,'onglet Mes pliages indépendant');
    // Le plein écran de dessin masque volontairement les outils secondaires.
    // Ouvrir la bibliothèque via le bouton visible avant le nettoyage.
-   await page.locator('#mir-proc-shortcuts [data-mir-tab="models"]').click();
+   await openModels(page);
    await page.waitForSelector('a.mir-proc-reset-link',{state:'visible',timeout:25000});
    await page.evaluate(()=>{
     localStorage.setItem('mir_production_templates_v1',JSON.stringify({version:1,records:[{id:'test-model'}]}));
@@ -61,7 +70,7 @@ async function ready(){
    await page.locator('#mir-reset-success .secondary-link').click();
    await page.waitForSelector('#production-workflow',{state:'attached',timeout:25000});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version,{timeout:25000});
-   await page.locator('#mir-proc-shortcuts [data-mir-tab="models"]').click();
+   await openModels(page);
    await page.waitForSelector('#production-library');
    assert.equal(await page.locator('.model-library-card').count(),0);
    assert.deepEqual(errors,[]);

@@ -50,6 +50,10 @@ jobs:
           node --check dist/mir-po-workflow.js
           node --check tests/mir-purchase-orders-browser.cjs
           node tests/mir-po-workflow.cjs
+          node --check dist/mir-freeform-workshop.js
+          node --check dist/mir-profile-recognition.js
+          node --check tests/mir-profile-recognition.cjs
+          node tests/mir-profile-recognition.cjs
           node --check dist/mir-admin-guided.js
           node --check dist/mir-admin-live3d.js
           node --check tests/mir-admin-guided-browser.cjs

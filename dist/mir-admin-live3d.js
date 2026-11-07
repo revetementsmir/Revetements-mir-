@@ -27,6 +27,34 @@
    }
    return points.slice(1).map((p,i)=>[points[i],p]).filter(([a,b])=>Math.hypot(a[0]-b[0],a[1]-b[1])>.01);
  }
+
+/* Recommandation de caméra : montrer en priorité la face réellement peinte
+ * du côté sélectionné, sans modifier le profil ni la matière. */
+ function preferredView(model, previous={}){
+   const startYaw=finite(previous.yaw)?previous.yaw:-42,startPitch=finite(previous.pitch)?previous.pitch:24;
+   const side=model?.coloredFace?.side;
+   const selected=Array.isArray(model?.segments)?model.segments.findIndex(row=>row.label===model?.coloredFace?.segmentId):-1;
+   if(!['left','right'].includes(side)||selected<0)return {yaw:startYaw,pitch:startPitch,score:0};
+   const segment=model.segments[selected],a=model.pointsMM?.[selected],b=model.pointsMM?.[selected+1];
+   const heading=finite(segment?.headingDeg)?segment.headingDeg:
+     a&&b?Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI:NaN;
+   if(!finite(heading))return {yaw:startYaw,pitch:startPitch,score:0};
+   const h=heading*Math.PI/180,sign=side==='left'?1:-1;
+   const visibility=(yaw,pitch)=>sign*(Math.cos(h)*Math.sin(pitch*Math.PI/180)+
+     Math.sin(h)*Math.sin(yaw*Math.PI/180)*Math.cos(pitch*Math.PI/180));
+   let best={yaw:startYaw,pitch:startPitch,score:visibility(startYaw,startPitch)};
+   if(best.score>=.48)return best;
+   const yaws=[-155,-120,-90,-60,-42,-25,0,25,42,60,90,120,155,startYaw];
+   const pitches=[-55,-42,-28,-18,18,28,42,55,startPitch];
+   let quality=-Infinity;
+   for(const yaw of yaws)for(const pitch of pitches){
+     const score=visibility(yaw,pitch);
+     const displacement=Math.abs(yaw-startYaw)/310+Math.abs(pitch-startPitch)/150;
+     const suitability=score-.12*displacement-.05*Math.abs(pitch)/55;
+     if(suitability>quality){best={yaw,pitch,score};quality=suitability;}
+   }
+   return best;
+ }
  function render(model,options={}){
    const pts=Array.isArray(options.pointsMM)?options.pointsMM:model?.pointsMM||[];
    const points=pts.filter(isPoint);
@@ -71,7 +99,7 @@
      return '<polygon points="'+verts+'" fill="'+fill+'" stroke="'+(filled?'#4a748b':'#7e8b89')+'" stroke-width="1.5" stroke-linejoin="round" data-face="'+(filled?'painted':'metal')+'" data-edge="'+i+'"/>';
    }).join('');
    const sideLabel=side==='left'?'gauche':side==='right'?'droite':'à sélectionner';
-   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 250" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Miniature 3D du profil '+label+'" data-mir-live-3d="ready" data-side="'+esc(side||'none')+'" data-metal="'+esc(metal)+'"><title>Miniature 3D : '+label+'</title><rect width="360" height="250" rx="10" fill="#f9fbf7"/><g>'+rows+'</g><text x="180" y="227" font-family="Arial,sans-serif" font-size="12" fill="#5c725d" text-anchor="middle">Échantillon 10 po · Face '+sideLabel+'</text></svg>';
+   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 250" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Miniature 3D du profil '+label+'" data-mir-live-3d="ready" data-side="'+esc(side||'none')+'" data-view-yaw="'+n(finite(options.yaw)?options.yaw:-42)+'" data-view-pitch="'+n(finite(options.pitch)?options.pitch:24)+'" data-metal="'+esc(metal)+'"><title>Miniature 3D : '+label+'</title><rect width="360" height="250" rx="10" fill="#f9fbf7"/><g>'+rows+'</g><text x="180" y="227" font-family="Arial,sans-serif" font-size="12" fill="#5c725d" text-anchor="middle">Échantillon 10 po · Face '+sideLabel+'</text></svg>';
  }
- return Object.freeze({SAMPLE_MM,render,version:'1.0.0'});
+ return Object.freeze({SAMPLE_MM,render,preferredView,version:'1.1.0'});
 });

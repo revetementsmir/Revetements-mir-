@@ -1,0 +1,741 @@
+/* MIR — Atelier de pliage libre tablette, basé sur la maquette approuvée. */
+body.mir-admin-v4.mir-freeform-active{--mir-tap:#004a32;background:#f8f8f6;}
+body.mir-freeform-active .production-intro{display:none!important}
+body.mir-freeform-active .mir-v4-picker,
+body.mir-freeform-active .template-section{display:none!important}
+body.mir-freeform-active .drawing-head>div:first-of-type{position:static!important;width:auto!important;height:auto!important;clip-path:none!important;white-space:normal!important}
+body.mir-freeform-active #drawing-title{font-size:17px}
+body.mir-freeform-active .drawing-head{align-items:center}
+body.mir-freeform-active .mir-freeform-detected{margin:0;flex-basis:100%;font-size:12px;font-weight:650;color:#365745}
+body.mir-freeform-active .drawing-tools [data-drawing-undo],
+body.mir-freeform-active .drawing-tools [data-draw-tool="draw"],
+body.mir-freeform-active .drawing-tools [data-new-drawing],
+body.mir-freeform-active .drawing-tools [data-discard-current-piece],
+body.mir-freeform-active .drawing-tools [data-add-segment]{display:none!important}
+body.mir-freeform-active .production-header{background:#0a3025;border-bottom-color:#145b41;color:#f8fff8}
+body.mir-freeform-active .production-header #mir-freeform-title{display:flex;flex-direction:column;gap:3px;margin-right:auto}
+body.mir-freeform-active #mir-freeform-title strong{font-size:19px;line-height:1.2;font-weight:750}
+body.mir-freeform-active #mir-freeform-title small{font-size:12px;opacity:.85}
+body.mir-freeform-active #mir-freeform-save{display:inline-flex;border:1px solid #a5cbaf;background:#f5faf1;color:#063c29;border-radius:9px;padding:10px 16px;min-height:44px;font-weight:750}
+body.mir-freeform-active #mir-freeform-save:disabled{opacity:.5}
+body.mir-admin-v4:not(.mir-freeform-active) #mir-freeform-title,
+body.mir-admin-v4:not(.mir-freeform-active) #mir-freeform-save,
+body.mir-admin-v4:not(.mir-freeform-active) #mir-freeform-destination,
+body.mir-admin-v4:not(.mir-freeform-active) #mir-freeform-3d,
+body.mir-admin-v4:not(.mir-freeform-active) #mir-freeform-detected{display:none!important}
+body.mir-freeform-active .header-link{color:#e9f9ee;background:#174b35;border:1px solid #2d6546}
+body.mir-freeform-active .kind-bar{margin:0 0 8px;max-width:330px;padding:3px;border-radius:9px}
+body.mir-freeform-active .kind-bar button{font-size:12px;min-height:42px;padding:6px;gap:5px}
+body.mir-freeform-active .kind-icon{font-size:17px}
+body.mir-freeform-active .production-workspace{align-items:start;gap:12px}
+body.mir-freeform-active .drawing-card,body.mir-freeform-active .config-card{border-radius:13px}
+body.mir-freeform-active .drawing-stage{margin-top:8px;min-height:280px}
+body.mir-freeform-active .drawing-stage>svg{min-height:280px;max-height:480px}
+body.mir-freeform-active .mir-freeform-3d{display:flex;flex-direction:column;margin:10px 12px;padding:8px 12px;border:1px solid #dce6de;border-radius:12px;background:linear-gradient(135deg,#f2f5f0,#fff)}
+body.mir-freeform-active .mir-freeform-3d-head{display:flex;align-items:center;justify-content:space-between;font-size:11px;letter-spacing:.06em;color:#31533d}
+body.mir-freeform-active .mir-freeform-3d-head button{border:1px solid #b6c9bc;border-radius:8px;background:#fff;min-height:36px;min-width:40px;font-size:22px}
+body.mir-freeform-active #mir-freeform-3d-canvas{height:155px;touch-action:none;cursor:grab;outline-offset:2px}
+body.mir-freeform-active #mir-freeform-3d-canvas svg{height:100%;width:100%;display:block}
+body.mir-freeform-active #mir-freeform-3d-legend{font-size:11px;color:#516756;margin:0}
+body.mir-freeform-active #mir-freeform-destination{padding:12px;margin:0 0 9px;background:#f0f5ef;border:1px solid #c9d9c8;border-radius:10px}
+body.mir-freeform-active #mir-freeform-destination>strong{display:block;font-size:13px;margin-bottom:7px}
+body.mir-freeform-active #mir-freeform-destination label{display:flex;gap:8px;align-items:center;min-height:44px;font-size:14px;font-weight:730}
+body.mir-freeform-active #mir-freeform-destination label input{width:21px;height:21px;accent-color:#004a32;flex:none}
+body.mir-freeform-active #mir-freeform-destination label small{font-size:12px;font-weight:400}
+body.mir-freeform-active #mir-freeform-destination p{margin:3px 0 0;font-size:11px;line-height:1.45;color:#526656}
+body.mir-freeform-active #mir-freeform-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 52px minmax(130px,.7fr) minmax(0,2fr);gap:9px;position:sticky;bottom:0;z-index:40;background:#f8f8f6;border-top:1px solid #dee5db;padding:12px 4px max(12px,env(safe-area-inset-bottom));box-shadow:0 -9px 19px #1734230a}
+body.mir-freeform-active #mir-freeform-toolbar[hidden]{display:none!important}
+body.mir-freeform-active #mir-freeform-toolbar>button{font:700 15px/1.2 system-ui,sans-serif;border:1px solid #cdd9cc;border-radius:10px;min-height:54px;cursor:pointer;padding:8px;color:#183e2b;background:#f2f0ec}
+body.mir-freeform-active #mir-freeform-toolbar button:disabled{opacity:.45;cursor:not-allowed}
+body.mir-freeform-active #mir-freeform-toolbar .mir-freeform-previous{display:flex;align-items:center;justify-content:center;gap:7px;text-align:left}
+body.mir-freeform-active .mir-freeform-previous small{display:block;font-weight:400;font-size:10px;margin-top:3px}
+body.mir-freeform-active #mir-freeform-toolbar .mir-freeform-redo{font-size:25px}
+body.mir-freeform-active #mir-freeform-toolbar .mir-freeform-finish{font-size:13px;background:#e8eee8}
+body.mir-freeform-active #mir-freeform-toolbar .mir-freeform-add{background:#004a32;color:#fff;border-color:#004a32;font-size:17px}
+body.mir-freeform-active #mir-freeform-toolbar>button:focus-visible{outline:3px solid #83bb8a;outline-offset:3px}
+@media (min-width:900px) and (orientation:landscape){
+ body.mir-freeform-active .production-wrap{max-width:none;padding:7px 14px 55px}
+ body.mir-freeform-active .production-workspace{display:grid!important;grid-template-columns:minmax(0,1.7fr) minmax(290px,1fr)!important}
+ body.mir-freeform-active .drawing-card{position:sticky;top:6px}
+ body.mir-freeform-active .config-card{max-height:calc(100dvh - 157px);overflow:auto;overscroll-behavior:contain}
+ body.mir-freeform-active .drawing-stage{min-height:260px;height:clamp(270px,39dvh,580px)}
+ body.mir-freeform-active .drawing-stage>svg{width:100%;height:100%;min-height:0!important;max-height:none}
+}
+@media(max-width:899px), (orientation:portrait){
+ body.mir-freeform-active .production-workspace{display:flex!important;flex-direction:column}
+ body.mir-freeform-active .drawing-card,.mir-freeform-active .config-card{width:100%}
+ body.mir-freeform-active .drawing-stage{min-height:300px}
+ body.mir-freeform-active #mir-freeform-toolbar{grid-template-columns:minmax(0,1fr) 48px minmax(0,1.4fr)}
+ body.mir-freeform-active .mir-freeform-finish{grid-column:1 / -1;grid-row:2}
+ body.mir-freeform-active .mir-freeform-add{grid-column:3;grid-row:1}
+ body.mir-freeform-active .mir-freeform-3d{margin:8px}
+}
+@media(max-width:650px){
+ body.mir-freeform-active .production-header{gap:8px;padding:8px 12px}
+ body.mir-freeform-active .production-brand img{width:95px}
+ body.mir-freeform-active #mir-freeform-title strong{font-size:14px}
+ body.mir-freeform-active #mir-freeform-title small{font-size:10px}
+ body.mir-freeform-active #mir-freeform-save{padding:8px;font-size:11px;min-height:42px}
+ body.mir-freeform-active #mir-freeform-toolbar{gap:5px;padding:7px 2px max(9px,env(safe-area-inset-bottom))}
+ body.mir-freeform-active #mir-freeform-toolbar>button{font-size:12px;min-height:48px}
+ body.mir-freeform-active .mir-freeform-previous small{font-size:9px}
+ body.mir-freeform-active .mir-freeform-3d #mir-freeform-3d-canvas{height:130px}
+}
+
+/* Les plus petits iPhone/Android gardent tous les contrôles sans largeur forcée. */
+@media(max-width:650px){
+ body.mir-freeform-active .production-header{box-sizing:border-box;max-width:100%;flex-wrap:wrap}
+ body.mir-freeform-active .production-header>*{min-width:0;max-width:100%}
+ body.mir-freeform-active #mir-freeform-title{flex:1 1 125px;overflow-wrap:anywhere}
+ body.mir-freeform-active .drawing-head{flex-wrap:wrap}
+ body.mir-freeform-active .drawing-head>*{min-width:0;max-width:100%}
+ body.mir-freeform-active .mir-freeform-detected{flex:1 1 100%;overflow-wrap:anywhere}
+ body.mir-freeform-active #mir-freeform-toolbar{min-width:0;width:100%;box-sizing:border-box}
+ body.mir-freeform-active #mir-freeform-toolbar>button{min-width:0;max-width:100%;box-sizing:border-box;white-space:normal;overflow-wrap:anywhere}
+ body.mir-freeform-active #mir-freeform-toolbar .mir-freeform-previous span{min-width:0;overflow-wrap:anywhere}
+ body.mir-freeform-active #mir-freeform-toolbar .mir-freeform-add{font-size:13px}
+}
+
+/* Sur téléphone, la barre suit le contenu pour ne jamais recouvrir un point à tracer. Sur iPad paysage, elle reste épinglée. */
+@media(max-width:650px){
+ body.mir-freeform-active #mir-freeform-toolbar{position:static;bottom:auto;box-shadow:none}
+}
+
+/* Densité de chantier : le tableau démarre immédiatement après la navigation. */
+body.mir-freeform-active #mir-procurement-tabs{position:relative!important;top:auto!important;margin:0 0 5px!important;padding:3px!important;gap:4px!important;border-radius:11px}
+body.mir-freeform-active #mir-procurement-tabs button{min-height:40px!important;padding:7px 6px!important;font-size:12px!important}
+body.mir-freeform-active #mir-proc-shortcuts{min-height:0;justify-content:flex-end;margin:0 0 6px!important;gap:6px}
+body.mir-freeform-active #mir-proc-shortcuts button{min-height:35px;padding:7px 10px;font-size:11px}
+body.mir-freeform-active #mir-proc-shortcuts .mir-proc-reset-link{font-size:10px;font-weight:550;text-decoration:underline;line-height:1.2;margin:0 0 0 8px!important;align-self:center}
+body.mir-freeform-active .kind-bar{margin:0 0 7px!important;padding:2px!important;gap:2px}
+body.mir-freeform-active .kind-bar button{min-height:36px!important;padding:5px 7px!important;font-size:11px!important}
+body.mir-freeform-active .drawing-head{padding:9px 12px!important;gap:6px!important}
+body.mir-freeform-active .drawing-head .eyebrow{display:none!important}
+body.mir-freeform-active .drawing-head h2{font-size:16px!important}
+body.mir-freeform-active .drawing-head .view-switch button{min-height:36px!important}
+body.mir-freeform-active .mir-piece-name{margin:0 0 7px!important;padding:9px!important;border-radius:10px!important}
+body.mir-freeform-active .mir-piece-name input{min-height:44px!important}
+body.mir-freeform-active .mir-piece-name small{margin:2px 0 0}
+body.mir-freeform-active .mir-freeform-detected{font-size:11px}
+@media(min-width:900px) and (orientation:landscape){
+ body.mir-freeform-active .production-header{min-height:58px!important;padding:7px 17px!important}
+ body.mir-freeform-active .production-brand img{width:135px!important;height:auto!important}
+ body.mir-freeform-active #mir-freeform-title strong{font-size:16px}
+ body.mir-freeform-active #mir-freeform-title small{font-size:10px}
+ body.mir-freeform-active .production-wrap{padding:5px 12px 45px!important}
+ body.mir-freeform-active .drawing-stage{height:clamp(300px,42dvh,545px)!important;min-height:0!important}
+ body.mir-freeform-active .drawing-stage>svg{width:100%;height:100%;min-height:0!important;max-height:none!important}
+ body.mir-freeform-active .config-card{max-height:calc(100dvh - 174px)}
+ body.mir-freeform-active .mir-freeform-3d{margin:7px 10px;padding:6px 8px}
+ body.mir-freeform-active #mir-freeform-3d-canvas{height:118px}
+}
+@media(max-width:899px){
+ body.mir-freeform-active .production-wrap{padding-top:6px}
+ body.mir-freeform-active #mir-proc-shortcuts{flex-wrap:wrap}
+ body.mir-freeform-active .drawing-stage{min-height:330px}
+}
+
+/* ==========================================================
+   HARMONY MIR — référence unique : styles officiels du site
+   dist/mir-home-premium.css & dist/mir-client-signature.css
+   La maquette iPad définit la disposition, PAS les couleurs.
+   ========================================================== */
+body.mir-admin-v4.mir-procurement-ready{
+ --mir-surface:#fafaf7;--mir-ink:#18251d;--mir-muted:#5b695d;
+ --mir-accent:#348511;--mir-accent-hover:#286b0d;--mir-border:#dfe5dc;
+ --mir-soft:#f3f6f0;--mir-white:#fff;
+ --mir-v4-green:var(--mir-accent);--mir-v4-line:var(--mir-border);
+ --mir-v4-ink:var(--mir-ink);--mir-v4-pale:var(--mir-soft);
+ background:var(--mir-surface);color:var(--mir-ink);
+ font-family:Arial,Helvetica,sans-serif;
+}
+body.mir-admin-v4.mir-freeform-active .production-header{
+ background:var(--mir-surface)!important;color:var(--mir-ink)!important;
+ border-bottom:1px solid var(--mir-border)!important;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-title strong{color:var(--mir-ink);}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-title small{color:var(--mir-muted);opacity:1;}
+body.mir-admin-v4.mir-freeform-active .header-link{
+ background:#fff!important;border:1px solid #bdcbbb!important;
+ color:var(--mir-ink)!important;border-radius:4px;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-save{
+ border-color:var(--mir-accent)!important;background:var(--mir-accent)!important;
+ color:#fff!important;border-radius:5px;box-shadow:none;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-save:not(:disabled):hover{background:var(--mir-accent-hover)!important}
+body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{
+ grid-template-columns:repeat(5,minmax(0,1fr))!important;
+ background:var(--mir-soft)!important;border:1px solid var(--mir-border)!important;
+}
+body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs button{
+ background:var(--mir-surface);color:var(--mir-ink);border-radius:4px;
+ font-family:Arial,Helvetica,sans-serif;font-weight:700;
+}
+body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs button[aria-current="page"]{
+ background:var(--mir-accent)!important;color:#fff!important;
+}
+body.mir-admin-v4.mir-freeform-active .kind-bar,
+body.mir-admin-v4.mir-freeform-active .drawing-card,
+body.mir-admin-v4.mir-freeform-active .config-card{
+ border-color:var(--mir-border)!important;box-shadow:0 8px 28px rgba(16,36,22,.055);
+ background:#fff;
+}
+body.mir-admin-v4.mir-freeform-active .kind-bar button[aria-pressed="true"]{
+ background:var(--mir-accent);color:#fff;border-radius:5px;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-destination{
+ background:var(--mir-soft);border-color:var(--mir-border);
+}
+body.mir-admin-v4.mir-freeform-active .mir-freeform-3d{
+ background:linear-gradient(135deg,var(--mir-soft),#fff);
+ border-color:var(--mir-border);box-shadow:none;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-toolbar{
+ grid-template-columns:minmax(0,.42fr) minmax(0,1.58fr);
+ border-top-color:var(--mir-border);background:var(--mir-surface);
+ box-shadow:0 -6px 16px rgba(16,36,22,.045);
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-toolbar .mir-freeform-previous{
+ background:#fff;color:var(--mir-ink);border:1px solid #bfcbbf;border-radius:6px;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-toolbar .mir-freeform-add{
+ background:var(--mir-accent);border-color:var(--mir-accent);color:#fff;
+ border-radius:6px;font-size:17px;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-toolbar .mir-freeform-add:not(:disabled):hover{background:var(--mir-accent-hover)}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-finish-top{
+ border-radius:5px;background:#fff;color:var(--mir-ink);
+ border:1px solid #bfcbbf;min-height:40px;padding:7px 10px;
+ font-size:12px;font-weight:700;cursor:pointer;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-finish-top:disabled{opacity:.45;cursor:not-allowed}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch{
+ display:flex;flex-direction:row;align-items:center;justify-content:space-between;
+ gap:12px;padding:6px 0;min-height:46px;
+}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch+ .mir-workshop-switch{border-top:1px solid var(--mir-border)}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch span{font-weight:700;font-size:13px;min-width:0}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch small{
+ display:block;color:var(--mir-muted);font-size:11px;font-weight:400;
+}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch input[type="checkbox"]{
+ appearance:none;-webkit-appearance:none;position:relative;flex:0 0 47px;
+ width:47px;height:27px;border:1px solid #9dae9f;border-radius:30px;
+ margin:0;background:#d9e1d7;cursor:pointer;transition:background .18s,border .18s;
+}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch input[type="checkbox"]::after{
+ content:"";position:absolute;top:3px;left:3px;border-radius:50%;
+ width:19px;height:19px;background:#fff;box-shadow:0 1px 3px #172d1c40;
+ transition:transform .18s;
+}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch input[type="checkbox"]:checked{
+ background:var(--mir-accent);border-color:var(--mir-accent);
+}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch input[type="checkbox"]:checked::after{transform:translateX(20px)}
+body.mir-admin-v4.mir-freeform-active :is(button,input,select):focus-visible{
+ outline:3px solid var(--mir-accent);outline-offset:2px;
+}
+@media(max-width:650px){
+ body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{
+  display:flex!important;overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;
+  grid-template-columns:none!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs button{
+  flex:0 0 auto;min-width:97px;padding:9px 8px!important;
+ }
+ body.mir-admin-v4.mir-freeform-active #mir-freeform-toolbar{
+  grid-template-columns:minmax(0,1fr) minmax(0,1.8fr);
+ }
+ body.mir-admin-v4.mir-freeform-active .mir-freeform-previous small{font-size:10px}
+}
+/* PC : la page ne défile pas; le panneau droit et chaque onglet possèdent
+   leur propre zone de défilement. Les petits écrans restent accessibles. */
+@media(min-width:768px) and (min-height:650px){
+ body.mir-admin-v4.mir-procurement-ready{
+  height:100dvh;max-height:100dvh;display:flex;flex-direction:column;overflow:hidden;
+ }
+ body.mir-admin-v4.mir-procurement-ready>.production-header{
+  flex:0 0 auto;min-height:58px!important;padding:7px 18px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready>.mir-signature-footer,
+ body.mir-admin-v4.mir-procurement-ready>.workshop-banner{display:none!important}
+ body.mir-admin-v4.mir-procurement-ready>.production-wrap{
+  flex:1 1 auto;min-height:0;max-height:none!important;height:auto!important;
+  display:flex;flex-direction:column;overflow:hidden;gap:0;
+  padding:5px 14px 7px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{flex:none;margin:0 0 4px!important;}
+ body.mir-admin-v4.mir-procurement-ready #mir-proc-shortcuts{flex:none;margin:0 0 4px!important;}
+ body.mir-admin-v4.mir-procurement-ready .kind-bar{flex:none;margin-bottom:4px!important;}
+ body.mir-admin-v4.mir-procurement-ready .production-workspace:not([hidden]){
+  flex:1 1 auto;min-height:0;height:auto!important;max-height:none;
+  overflow:hidden;display:grid!important;align-items:stretch!important;
+  grid-template-columns:minmax(0,1.7fr) minmax(305px,1fr)!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready .drawing-card{
+  position:relative!important;top:auto!important;
+  height:100%;max-height:100%;min-height:0;min-width:0;
+  overflow:hidden!important;display:flex;flex-direction:column;
+ }
+ body.mir-admin-v4.mir-procurement-ready .drawing-card>.drawing-stage{
+  flex:1 1 auto;min-height:150px!important;height:auto!important;
+  max-height:none;overflow:hidden;margin:4px 9px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready .drawing-card>.drawing-stage svg{
+  height:100%!important;width:100%;max-height:none!important;min-height:0!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready .drawing-card>#mir-freeform-3d{
+  flex:0 0 auto;margin:4px 9px!important;padding:5px 7px;min-height:0;
+ }
+ body.mir-admin-v4.mir-procurement-ready #mir-freeform-3d-canvas{height:105px;}
+ body.mir-admin-v4.mir-procurement-ready .drawing-head,
+ body.mir-admin-v4.mir-procurement-ready .drawing-tools,
+ body.mir-admin-v4.mir-procurement-ready .drawing-navigation,
+ body.mir-admin-v4.mir-procurement-ready .drawing-legend,
+ body.mir-admin-v4.mir-procurement-ready .drawing-note,
+ body.mir-admin-v4.mir-procurement-ready .production-validation,
+ body.mir-admin-v4.mir-procurement-ready #profile-dimension-list{
+  flex:0 0 auto;
+ }
+ body.mir-admin-v4.mir-procurement-ready .drawing-card>.drawing-note{display:none}
+ body.mir-admin-v4.mir-procurement-ready .config-card{
+  position:relative;height:100%;min-height:0;max-height:none!important;
+  overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+  scrollbar-width:thin;
+ }
+ body.mir-admin-v4.mir-procurement-ready #mir-freeform-toolbar:not([hidden]){
+  flex:0 0 auto;position:relative;bottom:auto;z-index:20;
+  padding:6px 0!important;min-height:52px;
+ }
+ body.mir-admin-v4.mir-procurement-ready :is(#production-library,#production-requests,#mir-procurement-panel,#production-order):not([hidden]){
+  min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:thin;overscroll-behavior:contain;
+ }
+ body.mir-admin-v4.mir-procurement-ready .mir-v4-technical,
+ body.mir-admin-v4.mir-procurement-ready .mir-unified-client-shortcut,
+ body.mir-admin-v4.mir-procurement-ready .production-footnote{display:none!important}
+}
+
+/* L’étape est informative : toutes les fonctions restent accessibles sans
+ * changer de page. Le seul ajout de côté se fait dans le SVG du tableau. */
+body.mir-admin-v4:not(.mir-freeform-active) #mir-freeform-step-label{display:none!important}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-step-label{
+ display:block;flex:0 0 auto;padding:2px 4px 5px;margin:0;
+ font:700 11px/1.35 Arial,Helvetica,sans-serif;color:var(--mir-muted,#5b695d);
+}
+body.mir-freeform-active .drawing-tools [data-add-segment],
+body.mir-freeform-active .segment-actions [data-add-segment]{display:none!important}
+body.mir-freeform-active .drawing-card:has(#production-drawing[data-tool="select"])
+ .drawing-tools [data-draw-tool="draw"]{display:inline-flex!important}
+body.mir-freeform-active #mir-freeform-toolbar [data-freeform-next]::before{content:"";display:none}
+
+
+/* Fenêtre finale combinable : aucune étape de mesures/couleur n’est créée. */
+body.mir-admin-v4 #production-dialog .mir-continue-summary{
+ border:1px solid var(--mir-border,#dfe5dc);border-radius:8px;
+ background:var(--mir-surface,#fafaf7);padding:10px 13px;margin:8px 0 12px;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-summary strong{display:block;font-size:15px;color:var(--mir-ink,#18251d)}
+body.mir-admin-v4 #production-dialog .mir-continue-summary p{font-size:12px;line-height:1.4;color:var(--mir-muted,#5b695d);margin:5px 0 0}
+body.mir-admin-v4 #production-dialog .mir-continue-save-choice{
+ display:flex;align-items:flex-start;gap:12px;padding:13px;
+ background:var(--mir-soft,#f3f6f0);border:1px solid var(--mir-border,#dfe5dc);
+ border-radius:8px;margin:7px 0 11px;cursor:pointer;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-save-choice input{
+ width:23px;height:23px;flex:none;accent-color:var(--mir-accent,#348511);margin-top:0;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-save-choice span{display:block;min-width:0;}
+body.mir-admin-v4 #production-dialog .mir-continue-save-choice strong{font-size:14px;color:var(--mir-ink,#18251d)}
+body.mir-admin-v4 #production-dialog .mir-continue-save-choice small{display:block;font-size:12px;color:var(--mir-muted,#5b695d);line-height:1.45;margin-top:4px}
+body.mir-admin-v4 #production-dialog .mir-continue-actions{display:grid;gap:8px}
+body.mir-admin-v4 #production-dialog .mir-continue-actions button,
+body.mir-admin-v4 #production-dialog .mir-continue-existing button{
+ display:block;text-align:left;min-height:59px;border:1px solid #bfcbbf;
+ border-radius:7px;padding:12px 14px;background:#fff;
+ width:100%;font-family:Arial,Helvetica,sans-serif;cursor:pointer;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-actions button:hover,
+body.mir-admin-v4 #production-dialog .mir-continue-existing button:hover{
+ border-color:var(--mir-accent,#348511);background:#f2f7ee;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-actions button strong,
+body.mir-admin-v4 #production-dialog .mir-continue-existing button strong{display:block;color:var(--mir-ink,#18251d);font-weight:750}
+body.mir-admin-v4 #production-dialog .mir-continue-actions button small,
+body.mir-admin-v4 #production-dialog .mir-continue-existing button small{
+ display:block;color:var(--mir-muted,#5b695d);font-size:12px;font-weight:400;margin-top:3px;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-existing{
+ display:grid;gap:7px;max-height:50dvh;overflow:auto;padding:2px;
+}
+
+
+/* MIR — parcours téléphone 4 étapes, moteur de tracé commun à PC/iPad. */
+@media(max-width:650px), (max-width:950px) and (max-height:520px) and (pointer:coarse){
+ body.mir-admin-v4.mir-mobile-stepper{
+  display:flex;flex-direction:column;width:100%;max-width:100%;
+  height:100dvh;max-height:100dvh;min-width:0;box-sizing:border-box;
+  overflow:hidden!important;background:#fafaf7;color:#18251d;
+ }
+ body.mir-mobile-stepper>.production-header{
+  flex:0 0 auto!important;min-height:55px!important;
+  padding:6px 10px!important;
+ }
+ body.mir-mobile-stepper #mir-freeform-title strong{font-size:14px}
+ body.mir-mobile-stepper #mir-freeform-title small{font-size:10px}
+ body.mir-mobile-stepper #mir-freeform-save{min-height:40px}
+ body.mir-mobile-stepper:not([data-mir-mobile-step="4"]) #mir-freeform-save{display:none!important}
+ body.mir-mobile-stepper>.production-wrap{
+  display:flex!important;flex-direction:column;flex:1 1 auto;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;min-height:0;
+  height:auto!important;max-height:none!important;overflow:hidden!important;
+  padding:5px 8px calc(76px + env(safe-area-inset-bottom))!important;
+ }
+ body.mir-mobile-stepper :is(.production-intro,.kind-bar,#mir-procurement-tabs,#mir-proc-shortcuts,
+  .mir-v4-technical,.mir-unified-client-shortcut,.production-order,.production-footnote,
+  .mir-destinations){display:none!important}
+ body.mir-mobile-stepper .mir-mobile-steps{
+  flex:0 0 auto;display:block!important;padding:8px 10px 11px;
+  background:#fff;border:1px solid #dfe5dc;border-radius:8px;margin:0 0 6px;
+ }
+ body.mir-mobile-stepper .mir-mobile-steps[hidden]{display:none!important}
+ body.mir-mobile-stepper .mir-mobile-step-title{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font:700 13px/1.3 Arial,Helvetica,sans-serif;color:#18251d;
+ }
+ body.mir-mobile-stepper .mir-mobile-step-title span{font-weight:500;color:#5b695d}
+ body.mir-mobile-stepper .mir-mobile-step-progress{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:9px}
+ body.mir-mobile-stepper .mir-mobile-step-progress span{height:5px;background:#dfe5dc;border-radius:5px}
+ body.mir-mobile-stepper .mir-mobile-step-progress span.done{background:#348511}
+ body.mir-mobile-stepper .production-workspace:not([hidden]){
+  display:flex!important;flex:1 1 auto;flex-direction:column;gap:6px;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;min-height:0;max-height:none;height:100%;overflow:hidden;
+ }
+ body.mir-mobile-stepper .drawing-card,
+ body.mir-mobile-stepper .config-card{
+  border:1px solid #dfe5dc!important;border-radius:9px!important;
+  box-shadow:none!important;min-height:0;min-width:0;width:100%;
+ }
+ body.mir-mobile-stepper .drawing-card>.drawing-note,
+ body.mir-mobile-stepper .drawing-legend:not(#trace-readout),
+ body.mir-mobile-stepper #profile-dimension-list,
+ body.mir-mobile-stepper .production-validation{display:none!important}
+ body.mir-mobile-stepper .drawing-card>.drawing-head{padding:5px 8px!important;flex:0 0 auto}
+ body.mir-mobile-stepper .drawing-head .mir-freeform-detected{display:none!important}
+ body.mir-mobile-stepper .drawing-stage{margin:0!important;width:100%;min-width:0;overflow:hidden}
+ body.mir-mobile-stepper .drawing-stage>svg{display:block;width:100%;height:100%;min-height:0!important;max-height:none!important}
+ body.mir-mobile-stepper #mir-freeform-toolbar:not([hidden]){
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.8fr)!important;
+  position:fixed!important;left:0;right:0;bottom:0;z-index:45;
+  width:100%!important;min-width:0;box-sizing:border-box;gap:9px!important;
+  padding:9px max(9px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(9px,env(safe-area-inset-left))!important;
+  border-top:1px solid #dfe5dc;background:#fafaf7;box-shadow:0 -3px 14px #18251d15;
+ }
+ body.mir-mobile-stepper #mir-freeform-toolbar>button{min-height:50px!important;font-size:13px!important}
+ /* Étape 1 : tableau de tracé occupent tout l'espace utilisable; aucun scroll. */
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .config-card{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card{
+  display:flex!important;flex:1 1 auto;flex-direction:column;overflow:hidden!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>.drawing-stage{
+  flex:1 1 auto;height:auto!important;min-height:0!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>#mir-freeform-3d{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-navigation{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-tools{flex:0 0 auto;padding:4px 6px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-tools button{min-height:38px;font-size:11px}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] #mir-freeform-finish-top{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] #trace-readout{flex:0 0 auto;padding:4px 8px;font-size:11px}
+ /* Les étapes 2 à 4 peuvent faire défiler leur contenu intérieur seulement. */
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card{
+  display:flex!important;flex:0 0 160px;flex-direction:column;overflow:hidden!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card>:not(.drawing-stage):not(.drawing-head){display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card>.drawing-stage{
+  flex:1 1 auto;height:125px!important;min-height:0!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .drawing-card{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .config-card,
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .config-card{
+  display:block!important;flex:1 1 auto;height:auto!important;max-height:none!important;
+  overflow-y:auto!important;overflow-x:hidden;overscroll-behavior:contain;
+  padding:10px!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .config-card>*,
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .config-card>*{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .config-card>#mir-v4-dimensions,
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .config-card>#mir-v4-sheet-total{display:block!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .config-card>.mir-v4-materials,
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .config-card>#mir-v4-colors,
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .config-card>#mir-v4-face{display:block!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] #mir-v4-dimensions,
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] :is(.mir-v4-materials,#mir-v4-colors,#mir-v4-face){margin:0 0 8px!important}
+ /* Confirmation: deux rendus existants, puis quantité et destinations. */
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .production-workspace{
+  overflow-y:auto!important;overscroll-behavior:contain;
+  scroll-padding-bottom:calc(105px + env(safe-area-inset-bottom));
+  padding-bottom:calc(105px + env(safe-area-inset-bottom))!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] :is(#mir-direct-po-add,#add-production-piece,#production-piece-name){
+  scroll-margin-bottom:calc(105px + env(safe-area-inset-bottom));
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card{display:flex!important;flex:0 0 auto;flex-direction:column}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card>.drawing-tools,
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] #trace-readout{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card>.drawing-navigation{
+  display:flex!important;align-items:center;justify-content:center;padding:5px 7px!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-gesture-hint{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-stage{height:170px!important;min-height:0!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .mir-freeform-3d{display:flex!important;margin:5px!important;padding:7px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .mir-freeform-3d #mir-freeform-3d-canvas{height:150px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card{
+  display:block!important;flex:0 0 auto;overflow:visible!important;max-height:none!important;padding:10px!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>*{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>#mir-freeform-destination,
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>#mir-piece-name-field,
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>#mir-v4-sheet-total,
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>.mir-v4-footer{display:block!important}
+}
+
+/* MIR — adaptation paysage tactile à faible hauteur, même tracé et même source de données. */
+@media(max-width:950px) and (max-height:520px) and (pointer:coarse){
+ body.mir-mobile-stepper>.production-header{min-height:44px!important;max-height:55px!important;padding:4px 8px!important}
+ body.mir-mobile-stepper #mir-freeform-title small{display:none!important}
+ body.mir-mobile-stepper .mir-mobile-steps{padding:4px 8px 6px!important;margin:0 0 3px!important}
+ body.mir-mobile-stepper .mir-mobile-step-progress{margin-top:4px!important}
+ body.mir-mobile-stepper .mir-mobile-step-progress span{height:3px}
+ body.mir-mobile-stepper>.production-wrap{padding:2px 7px calc(57px + env(safe-area-inset-bottom))!important}
+ body.mir-mobile-stepper #mir-freeform-toolbar:not([hidden]){padding:5px 8px max(5px,env(safe-area-inset-bottom))!important}
+ body.mir-mobile-stepper #mir-freeform-toolbar>button{min-height:43px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>.drawing-head{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>.drawing-tools{padding:2px 5px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>.drawing-tools button{min-height:33px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] #trace-readout{padding:2px 6px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card{flex-basis:90px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card>.drawing-head{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-stage{height:120px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .mir-freeform-3d #mir-freeform-3d-canvas{height:108px!important}
+}
+
+
+/* MIR visual QA — corrections du panneau 2D et du vrai pied de page mobile. */
+/* Les styles du portail ont plus de spécificité que l'ancien masquage mobile. */
+body.mir-admin-v4.mir-procurement-ready.mir-mobile-stepper #mir-procurement-tabs,
+body.mir-admin-v4.mir-mobile-stepper #mir-proc-shortcuts{display:none!important}
+@media(min-width:768px) and (min-height:650px){
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-head{
+  flex:0 0 auto;min-height:42px;padding:6px 10px!important;gap:6px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-head .mir-freeform-detected{
+  flex:0 1 auto!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:10px!important;line-height:1.25;margin:0!important;max-width:45%;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>#mir-freeform-3d{
+  flex:0 0 auto;min-height:0;max-height:116px;
+  padding:3px 7px!important;margin:2px 8px!important;overflow:hidden;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) #mir-freeform-3d-canvas{
+  height:68px!important;min-height:0!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) #mir-freeform-3d-legend{
+  margin:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-navigation{
+  flex:0 0 auto;min-height:35px;padding:3px 7px!important;gap:7px;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-tools{
+  flex:0 0 auto;min-height:0;padding:4px 8px!important;gap:6px;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-legend{padding:4px 8px!important}
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.production-validation{
+  flex:0 0 auto;max-height:56px;overflow:auto;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-stage{
+  flex:1 1 auto!important;height:auto!important;min-height:0!important;max-height:none!important;
+ }
+}
+/* Pied mobile : deux vraies colonnes, sans colonne implicite ni rangée qui s'étire. */
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar:not([hidden]){
+ display:grid!important;
+ grid-template-columns:minmax(112px,.67fr) minmax(0,1.33fr)!important;
+ grid-template-rows:52px!important;
+ align-items:stretch!important;
+ gap:8px!important;
+ min-height:0!important;max-height:calc(76px + env(safe-area-inset-bottom));
+ height:auto!important;
+ padding:7px 8px max(7px,env(safe-area-inset-bottom))!important;
+}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-previous,
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-add{
+ min-height:50px!important;height:52px!important;max-height:52px!important;
+ max-width:100%!important;width:100%!important;min-width:0!important;
+ margin:0!important;align-self:stretch!important;box-sizing:border-box!important;
+ overflow:hidden;line-height:1.2!important;
+}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-previous{
+ grid-column:1!important;grid-row:1!important;display:flex!important;
+ align-items:center;justify-content:center;gap:4px!important;
+ white-space:nowrap!important;font-size:12px!important;flex-wrap:nowrap!important;
+}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-previous span{
+ white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important;
+}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-previous small{display:none!important}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-add{
+ grid-column:2!important;grid-row:1!important;
+ display:flex!important;align-items:center;justify-content:center;
+ font-size:13px!important;white-space:normal;overflow-wrap:normal;word-break:normal;
+ text-align:center;padding:5px 8px!important;
+}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-save{display:none!important}
+body.mir-admin-v4.mir-mobile-stepper .mir-mobile-step-title{font-size:15px!important}
+body.mir-admin-v4.mir-mobile-stepper[data-mir-mobile-step="3"] #production-color-grid{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:8px!important;max-height:none!important;overflow:visible!important;
+}
+body.mir-admin-v4.mir-mobile-stepper[data-mir-mobile-step="3"] #production-color-grid .color-choice{
+ min-height:56px!important;height:auto!important;padding:6px 4px!important;overflow:visible!important;
+}
+body.mir-admin-v4.mir-mobile-stepper[data-mir-mobile-step="3"] #production-color-grid .color-text{
+ font-size:11px!important;line-height:1.25!important;overflow-wrap:break-word!important;
+ word-break:normal!important;hyphens:none!important;
+}
+
+
+/* MIR QA — priorité à la vraie surface 2D sur PC et tablette. */
+@media(min-width:768px) and (min-height:650px){
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card{
+  display:flex!important;flex-direction:column!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-stage{
+  flex:1 1 0%!important;
+  min-height:clamp(170px,26dvh,320px)!important;
+  height:auto!important;max-height:none!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-tools{
+  display:flex!important;flex-wrap:wrap!important;align-items:center;
+  flex:0 0 auto!important;gap:5px 9px!important;
+  min-height:0!important;max-height:58px!important;
+  overflow:visible!important;padding:3px 6px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-tools .draw-help,
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-tools .hem-notice{
+  display:none!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-tools button{
+  min-height:34px!important;padding:5px 8px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-tools .trace-more{
+  width:auto!important;min-width:0!important;flex:0 0 auto!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-tools .trace-more summary{
+  min-height:34px!important;padding:5px 8px!important;
+  border:1px solid #dfe5dc;border-radius:5px;background:#fff;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-legend{
+  min-height:0!important;padding:2px 7px!important;font-size:10px;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.production-validation{
+  min-height:0!important;max-height:37px!important;overflow-y:auto!important;
+ }
+}
+@media(min-width:768px) and (max-width:1100px) and (min-height:650px){
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>#mir-freeform-3d{
+  flex:0 0 auto!important;max-height:80px!important;min-height:0!important;
+  margin:2px 8px!important;padding:2px 6px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) #mir-freeform-3d-canvas{
+  height:48px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-navigation{
+  padding:1px 6px!important;min-height:30px!important;
+ }
+}
+/* Paysage sur téléphone : garder quelques pixels libres de plus pour la grille 2D. */
+@media(max-width:950px) and (max-height:520px) and (pointer:coarse){
+ body.mir-admin-v4.mir-mobile-stepper .mir-mobile-steps{
+  padding:1px 6px 3px!important;margin:0 0 2px!important;
+ }
+ body.mir-admin-v4.mir-mobile-stepper .mir-mobile-step-progress{margin-top:2px!important}
+ body.mir-admin-v4.mir-mobile-stepper .production-header{
+  min-height:38px!important;max-height:43px!important;padding:2px 6px!important;
+ }
+ body.mir-admin-v4.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>.drawing-tools{
+  gap:3px!important;margin:0!important;padding:1px 4px!important;
+ }
+ body.mir-admin-v4.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>.drawing-tools .draw-help{
+  display:none!important;
+ }
+}
+
+
+/* MIR — sections admin accessibles par un menu compact sans défilement du tracé. */
+#mir-mobile-section-toggle,#mir-mobile-section-menu{display:none!important}
+@media(max-width:650px), (max-width:950px) and (max-height:520px) and (pointer:coarse){
+ body.mir-admin-v4.mir-mobile-stepper>.production-header{
+  display:flex!important;flex-wrap:nowrap!important;align-items:center!important;
+  gap:5px!important;width:100%;max-width:100%;min-width:0;
+  box-sizing:border-box;position:relative;z-index:70;
+ }
+ body.mir-admin-v4.mir-mobile-stepper .production-header .production-brand{
+  flex:0 0 auto;min-width:0;max-width:92px;
+ }
+ body.mir-admin-v4.mir-mobile-stepper .production-header .production-brand img{
+  width:clamp(76px,20vw,92px)!important;height:auto!important;
+ }
+ body.mir-admin-v4.mir-mobile-stepper .production-header #mir-freeform-title{
+  display:flex!important;flex:1 1 80px;min-width:0;margin-right:0!important;overflow:hidden;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-freeform-title strong{
+  display:block;font-size:12px!important;line-height:1.2;white-space:normal;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-freeform-title small{display:none!important}
+ body.mir-admin-v4.mir-mobile-stepper .production-header .header-link{
+  flex:0 0 auto!important;min-width:0!important;max-width:90px!important;
+  padding:7px 5px!important;font-size:10px!important;gap:3px!important;
+  margin-left:0!important;white-space:nowrap;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-toggle{
+  display:inline-flex!important;align-items:center;justify-content:center;
+  flex:0 0 40px!important;width:40px!important;max-width:40px;height:42px;
+  min-height:42px;min-width:40px;order:99;
+  padding:0!important;margin:0!important;border:1px solid #afc2ad;
+  background:#fafaf7;color:#18251d;border-radius:6px;
+  font:700 24px/1 Arial,Helvetica,sans-serif;cursor:pointer;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-toggle[aria-expanded="true"]{
+  border-color:#348511;background:#edf5e8;color:#286b0d;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-toggle:focus-visible,
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-menu button:focus-visible{
+  outline:3px solid #348511;outline-offset:2px;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-menu:not([hidden]){
+  display:grid!important;gap:4px;position:fixed;z-index:150;
+  top:calc(env(safe-area-inset-top) + 57px);
+  right:max(8px,env(safe-area-inset-right));left:auto;
+  width:min(300px,calc(100vw - 16px));min-width:0;
+  max-height:calc(100dvh - 90px);overflow-y:auto;overscroll-behavior:contain;
+  padding:9px;border:1px solid #c8d7c2;border-radius:10px;
+  background:#fafaf7;box-shadow:0 10px 35px #18251d3c;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-menu button{
+  display:block;width:100%;min-height:44px;text-align:left;
+  padding:9px 12px;border:0;border-radius:6px;background:#f3f6f0;
+  color:#18251d;font:700 13px/1.3 Arial,Helvetica,sans-serif;
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-menu button:hover{
+  background:#e5f1dd;color:#286b0d;
+ }
+}
+@media(max-width:950px) and (max-height:520px) and (pointer:coarse){
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-menu:not([hidden]){
+  top:43px;max-height:calc(100dvh - 66px);
+ }
+ body.mir-admin-v4.mir-mobile-stepper #mir-mobile-section-toggle{height:38px;min-height:38px}
+}

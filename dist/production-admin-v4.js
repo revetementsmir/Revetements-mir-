@@ -103,7 +103,7 @@
     const sheet = make('div', 'mir-v4-sheet-total');
     sheet.id = 'mir-v4-sheet-total';
     sheet.setAttribute('aria-live', 'polite');
-    sheet.innerHTML = '<span class="mir-v4-sheet-heading">Largeur totale de tôle <small>(somme des côtés)</small></span><strong id="mir-v4-sheet-value">À préciser</strong><span class="mir-v4-sheet-note">Avant corrections de pliage</span>';
+    sheet.innerHTML = '<span class="mir-v4-sheet-heading">Somme des côtés finis <small>(ce n’est pas le développé de fabrication)</small></span><strong id="mir-v4-sheet-value">À préciser</strong><span class="mir-v4-sheet-note">Longueur de la pièce vendue : 10 pi sauf J à soffite</span>';
     config.insertBefore(sheet, config.firstChild);
 
     const summary = make('section', 'mir-v4-technical', '<h2>Résumé technique</h2><div class="mir-v4-technical-grid"><p><span>Matériaux</span><strong id="mir-v4-recap-material">À préciser</strong></p><p><span>Couleur</span><strong id="mir-v4-recap-color">À préciser</strong></p><p><span>Face colorée</span><strong id="mir-v4-recap-face">À préciser</strong></p><p><span>Longueur de la pièce</span><strong id="mir-v4-recap-length">À préciser</strong></p><p><span>Quantité</span><strong id="mir-v4-recap-quantity">1</strong></p></div>');

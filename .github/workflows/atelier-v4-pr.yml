@@ -45,6 +45,9 @@ on:
       - 'dist/mir-unified-dossier.*'
       - 'dist/mir-unified-client-dossier.js'
       - 'dist/mir-admin-guided*'
+      - 'dist/mir-freeform-workshop.*'
+      - 'dist/mir-profile-recognition.js'
+      - 'tests/mir-profile-recognition.cjs'
       - 'dist/mir-admin-live3d.js'
       - 'tests/mir-admin-guided*.cjs'
       - 'dist/mir-procurement.js'
@@ -59,6 +62,7 @@ on:
       - 'tests/mir-kaycan-flat-preview.cjs'
       - 'tests/mir-mac-flat-preview.cjs'
       - 'tests/mir-direct-po-browser.cjs'
+      - 'tests/mir-continue-combinations-browser.cjs'
       - 'tests/mir-purchase-orders-browser.cjs'
       - 'tests/mir-drawing-pan-browser.cjs'
       - 'tests/mir-atelier-v4.cjs'
@@ -98,6 +102,9 @@ jobs:
           node --check tests/mir-selection-pdf-browser.cjs
           node --check tests/mir-public-menu-browser.cjs
           node --check dist/mir-procurement.js
+          node --check dist/mir-freeform-workshop.js
+          node --check dist/mir-profile-recognition.js
+          node --check tests/mir-profile-recognition.cjs
           node --check dist/mir-admin-guided.js
           node --check dist/mir-admin-live3d.js
           node --check tests/mir-admin-guided-browser.cjs
@@ -112,6 +119,7 @@ jobs:
           node --check tests/mir-kaycan-flat-preview.cjs
           node --check tests/mir-mac-flat-preview.cjs
           node --check tests/mir-direct-po-browser.cjs
+          node --check tests/mir-continue-combinations-browser.cjs
           node --check tests/mir-purchase-orders-browser.cjs
           node --check tests/mir-drawing-pan-browser.cjs
           node --check dist/production-admin-v4.js
@@ -133,6 +141,7 @@ jobs:
           node tests/mir-selection-pdf.cjs
           node tests/mir-client-signature.cjs
           node tests/mir-procurement.cjs
+          node tests/mir-profile-recognition.cjs
           node tests/mir-admin-guided.cjs
           node tests/mir-workshop-reset.cjs
           node --check tests/mir-pliage-audit-commercial.cjs
@@ -159,6 +168,7 @@ jobs:
           node tests/mir-kaycan-flat-preview.cjs
           node tests/mir-mac-flat-preview.cjs
           node tests/mir-direct-po-browser.cjs
+          node tests/mir-continue-combinations-browser.cjs
           node tests/mir-purchase-orders-browser.cjs
           node tests/mir-drawing-pan-browser.cjs
           node tests/mir-moulure-renaming-browser.cjs
@@ -174,6 +184,7 @@ jobs:
             artifacts/kaycan-fix-*.png
             artifacts/mac-flat-*.png
             artifacts/mir-direct-po-*.png
+            artifacts/mir-continue-combinations-*.png
             artifacts/mir-reset-*.png
             artifacts/mir-admin-guide-*.png
             artifacts/mir-menu-*.png

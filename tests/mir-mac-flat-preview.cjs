@@ -1,4 +1,5 @@
 'use strict';
+const {drawTwoSides,openWorkshopStep}=require('./mir-draw-freeform-helper.cjs');
 /* MAC Métal: une teinte de tôle n'est PAS une photo de clin répétée. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -52,11 +53,11 @@ async function ready(url){
    page.on('pageerror',e=>errors.push(String(e.message)));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('.mir-v4-picker > summary').click();
-   await page.locator('.mir-v4-picker [data-template="l"]').click();
-   await page.locator('.mir-v4-materials > summary').click();
+   await drawTwoSides(page);
+   await openWorkshopStep(page,3);
+    if(!(await page.locator('.mir-v4-materials').evaluate(node=>node.open)))await page.locator('.mir-v4-materials > summary').click();
    await page.locator('#material-type').selectOption('acier');
-   await page.locator('#mir-v4-colors > summary').click();
+    if(!(await page.locator('#mir-v4-colors').evaluate(node=>node.open)))await page.locator('#mir-v4-colors > summary').click();
    await page.locator('#production-material').selectOption('mac-acier-moulures');
    await page.locator('[data-production-color="mac-acier-304"]').click();
    const url='./assets/catalogue-swatches/mac-bouleau-fume-efcc24f8.jpeg';
@@ -65,6 +66,7 @@ async function ready(url){
    assert.equal(await page.locator('#production-color-grid img').count(),0,'MAC swatches must not be photos');
    assert.equal(await page.locator('#selected-finish img').count(),0,'MAC selected finish must be a solid chip');
    assert.equal(await page.locator('#selected-finish .kaycan-flat-chip').count(),1);
+   await openWorkshopStep(page,4);
    await page.locator('[data-preview="volume"]').click();
    await page.waitForTimeout(150);
    const svg=await page.locator('#production-drawing svg').innerHTML();

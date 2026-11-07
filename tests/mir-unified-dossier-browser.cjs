@@ -18,9 +18,26 @@ async function runAt(browser,base,width){
  await page.goto(base+'/production.html?mode=client&kind=profile',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
  const next=page.locator('#client-step-next');
- await page.locator('[data-template="l"]').click();await next.click();
- await page.locator('[data-measure="A"]').fill('3 1/2');
- await page.locator('[data-measure="B"]').fill('2 1/4');
+ await page.evaluate(()=>{
+  const spec={kind:'profile',template:'custom',unit:'in',
+   segments:[{label:'A',length:'3 1/2'},{label:'B',length:'2 1/4'}],
+   bends:[{mode:'interior',angle:90,direction:'left'}],startAngle:0,
+   length:120,quantity:1,material:{type:'aluminium'},finish:{},coloredFace:{side:'left',segmentId:'A'}};
+  const generated=window.MIRProduction.createTemplate(spec,{name:'Solin généré dans Atelier MIR'});
+  if(!generated.ok)throw Error('Forme test non valide');
+  const t=generated.template;
+  localStorage.setItem('mir_production_templates_v1',JSON.stringify({version:1,records:[
+   {id:t.id,name:t.name,currentVersion:1,versions:[t],channels:{client:true,store:false,po:true},
+    archived:false,allowed:{materials:['aluminium','acier'],colorSystems:['manufacturer','special']},
+    commercial:{status:'draft',wantsClient:true}}]}));
+ });
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
+ assert.equal(await page.locator('#production-templates [data-template]').count(),0,'plus de profils prédéfinis');
+ await page.locator('[data-saved-template]').click();
+ await next.click();
+ await page.locator('[data-segment-length="0"]').fill('3 1/2');
+ await page.locator('[data-segment-length="1"]').fill('2 1/4');
  await next.click();assert.equal(await page.locator('[data-measure="length"]').inputValue(),'120');
  await next.click();await page.locator('[data-client-face="left"]').click();await next.click();
  await page.locator('#material-type').selectOption('aluminium');
