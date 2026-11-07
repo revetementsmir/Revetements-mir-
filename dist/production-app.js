@@ -729,6 +729,7 @@ function goClientStep(step,{confirm=false}={}){
  $('#client-step-title').scrollIntoView({block:'nearest'});
 }
 function updateDrawing({keepForm=false}={}){
+ document.body.dataset.panelSketch=String(kind==='panel'&&tool==='panel-trace');
  syncPieceNameField();
  renderFractionPickers();
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
