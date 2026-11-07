@@ -465,7 +465,9 @@
       if(b.dataset.mirPoView){poView=b.dataset.mirPoView;switchTab('orders');return;}
       if(b.dataset.mirEdit){editSupplier(b.dataset.mirEdit);return;}
       if(b.id==='mir-new-supplier'){supplierEditing=null;switchTab('suppliers');return;}
-      if(b.id==='mir-edit-lines'){switchTab('draw');doc.body.classList.add('mir-v4-dossier-open');doc.querySelector('#mode-link')?.setAttribute('aria-expanded','true');doc.querySelector('#production-order')?.scrollIntoView({block:'start'});return;}
+      if(b.id==='mir-edit-lines'){switchTab('draw');doc.querySelector('#production-drawing')?.focus({preventScroll:true});return;}
+      if(b.dataset.mirPoEditLine){if(win.MIRProductionWorkspace?.editOrderItem?.(b.dataset.mirPoEditLine))switchTab('draw');return;}
+      if(b.dataset.mirPoSupplier){const supplier=state.suppliers.find(row=>row.id===b.dataset.mirPoSupplier&&!row.archived);if(!supplier)return;ui.supplierId=supplier.id;autosave();switchTab('orders');return;}
       if(b.id==='mir-new-draft'){if(win.MIRProductionWorkspace?.newPurchaseOrder()){state.editingId=null;Object.assign(ui,{poNumber:'',job:'',foreman:'',shipTo:'',requestedDate:'',terms:'',notes:''});state.formDraft={...ui};save();poView='create';switchTab('orders');}return;}
       if(b.id==='mir-create-po'){newPo();return;}
       if(b.dataset.mirOpen){openEditor(b.dataset.mirOpen);return;}
@@ -478,6 +480,15 @@
     });
     panel.addEventListener('input',function(e){if(e.target.id==='mir-po-search'){query=e.target.value;const start=e.target.selectionStart;switchTab('orders');const field=doc.querySelector('#mir-po-search');field.focus();field.setSelectionRange(start,start);return;}if(e.target.dataset.mirPo){ui[e.target.dataset.mirPo]=e.target.value;autosave();}});
     panel.addEventListener('change',function(e){
+      if(e.target.dataset.mirPoQty){
+        const id=e.target.dataset.mirPoQty,result=win.MIRProductionWorkspace?.setOrderItemQuantity?.(id,e.target.value);
+        if(!result?.ok){
+          const error=doc.querySelector('#mir-proc-error');
+          if(error){error.hidden=false;error.textContent=result?.error||'Impossible de modifier la quantité.';}
+          return;
+        }
+        switchTab('orders');return;
+      }
       if(e.target.id==='mir-po-date'){filterDate=e.target.value;switchTab('orders');return;}
       if(e.target.dataset.mirPo){ui[e.target.dataset.mirPo]=e.target.value;autosave();}
       const id=e.target.dataset.mirOrderStatus;
@@ -492,6 +503,40 @@
       }
     });
     panel.addEventListener('submit',function(e){if(e.target.matches('[data-mir-boutique-form]')){e.preventDefault();saveBoutique(e.target,e.submitter?.value);return;}if(e.target.id==='mir-supplier-form'){e.preventDefault();saveSupplier(e.target);}});
+    /* API de navigation du bon : reprend les fournisseurs et le dossier
+       existants, sans inventer une deuxième base de commandes. */
+    win.MIRProcurementUI=Object.freeze({
+      version:'1.0.0',
+      isFrozenNumber(number){
+        const key=String(number||'').trim().toLowerCase();
+        return state.orders.some(po=>String(po.poNumber||'').trim().toLowerCase()===key&&!!W?.frozen?.(po));
+      },
+      openCreate({newOrder=false}={}){
+        const dossier=currentOrder();if(!dossier)return false;
+        const oldUi={...ui},oldState={editingId:state.editingId,formSource:state.formSource,formDraft:state.formDraft};
+        const saved=!newOrder&&state.orders.find(po=>(
+          po.sourceDossierId===dossier.id||!!dossier.poNumber&&po.poNumber===dossier.poNumber
+        )&&!W?.frozen?.(po));
+        if(!newOrder&&dossier.poNumber&&state.orders.some(po=>po.poNumber===dossier.poNumber&&W?.frozen?.(po))){
+          win.alert('Ce bon a déjà été finalisé. Crée une révision avant d’ajouter une pièce.');
+          return false;
+        }
+        state.editingId=saved?.id||null;state.formSource=dossier.id;
+        Object.assign(ui,{
+          supplierId:saved?.supplier?.id||oldUi.supplierId||state.suppliers.find(x=>!x.archived)?.id||'',
+          poNumber:newOrder?'':saved?.poNumber||dossier.poNumber||'',
+          job:newOrder?'':saved?.job||dossier.project||'',
+          foreman:newOrder?'':saved?.foreman||dossier.foreman||'',
+          requestedDate:saved?.requestedDate||dossier.date||'',
+          shipTo:saved?.shipTo||'',
+          terms:saved?.terms||'',
+          notes:saved?.notes||''
+        });
+        state.formDraft={...ui};
+        if(!save()){Object.assign(ui,oldUi);Object.assign(state,oldState);return false;}
+        poView='create';switchTab('orders');return true;
+      }
+    });
     const requestedView=new URLSearchParams(win.location.search).get('view');
     switchTab(['orders','suppliers','models'].includes(requestedView)||['boutique','store'].includes(requestedView)?requestedView:'draw');
   }
