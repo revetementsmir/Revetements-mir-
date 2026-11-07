@@ -1,0 +1,44 @@
+name: MIR — panneaux GOD MODE (pente, lips, métrés et 2D/3D)
+on:
+  push:
+    branches: [moon/mir-panneaux-godmode-live-20261107]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'dist/production-*.js'
+      - 'dist/production.html'
+      - 'dist/production.css'
+      - 'dist/mir-panel-*.js'
+      - 'dist/calepinage*'
+      - 'dist/mir-architect-measures.js'
+      - 'dist/panel-layout-engine.js'
+      - 'tests/mir-panneaux-godmode*'
+      - '.github/workflows/mir-panneaux-godmode-pr.yml'
+permissions:
+  contents: read
+jobs:
+  panels:
+    name: Géométrie / Lips / Pente / Plan architecte
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntaxe JS et invariants de fabrication
+        run: |
+          node --check dist/production-model.js
+          node --check dist/production-app.js
+          node --check dist/calepinage-app.js
+          node --check dist/mir-panel-roof.js
+          node --check dist/mir-panel-sketch.js
+          node --check dist/mir-architect-measures.js
+          node --check tests/mir-panneaux-godmode.cjs
+          node tests/mir-panneaux-godmode.cjs
+      - name: Chrome responsive PC iPad téléphone
+        run: |
+          npm install --no-save playwright@1.58.2
+          node tests/mir-panneaux-godmode-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-panneaux-godmode-captures
+          path: artifacts/mir-panneaux-godmode-*.png
+          if-no-files-found: ignore
