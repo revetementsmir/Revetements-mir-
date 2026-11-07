@@ -140,6 +140,100 @@
         notes:['Longueur, tête et teinte demandées par MIR. Fournisseur de la vis, code de couleur Kaycan, calibre, protection et conditionnement à identifier.']}
     ];
     for(const item of pendingItems)add({...item,status:'to_identify',statusLabel:'Référence à confirmer',referencePending:true});
+
+    // Import ciblé de la revue du magasin ChatGPT Sites (annotations MIR v32).
+    // Les IDs existants restent les clés des paniers et commandes historiques.
+    const revise=(id,changes)=>{const target=items.find(item=>item.id===id);if(target)Object.assign(target,changes);};
+    revise('mir-request-soffit-staples-1in',{
+      name:'PRIME 40713 — Agrafes à soffite 1 po · 5 000/boîte',brand:'PRIME',
+      manufacturerReference:'40713',packaging:{piecesPerBox:5000},dimensions:{lengthIn:1},
+      notes:['Référence PRIME 40713 confirmée par MIR : 1 po, 5 000 par boîte. Vérifier la compatibilité de l’agrafeuse et la couronne avant préparation.'],
+      status:'reference',statusLabel:'Référence MIR',referencePending:false
+    });
+    revise('mir-request-adfast',{
+      name:'ADSEAL — Lingettes nettoyantes universelles',brand:'Adfast',category:'lames-consommables',
+      unit:'contenant',packaging:{piecesPerBox:90},
+      sourceUrl:'https://lesideesdepoxy.com/products/lingettes-nettoyantes-universelles-adseal',
+      notes:['Nettoyage des résidus non durcis de scellant, silicone, colle ou mousse. Nombre de lingettes et photo de l’emballage à confirmer avant achat : des contenants ADFAST de 72 existent aussi.'],
+      status:'to_identify',statusLabel:'Emballage à confirmer',referencePending:true
+    });
+    const kaycanColorRequests=paletteFor(source,'Kaycan').filter(color=>!/^(noir|blanc)(?:\s|$)/i.test(color.name));
+    revise('pending-kaycan-fascia-hex-quarter-inch',{
+      name:'Vis à fascia — 2 po · hex ¼ po · couleur Kaycan',brand:'Kaycan',
+      dimensions:{lengthIn:2,hexHeadIn:0.25},
+      colorPolicy:kaycanColorRequests.length?'required':'none',colors:kaycanColorRequests,
+      colorScope:'manufacturer_request_only',
+      colorNote:'Teinte demandée selon la palette Kaycan; la disponibilité sur les vis doit être confirmée.',
+      notes:['Vis à fascia 2 po, tête hexagonale ¼ po, sans rondelle. Vérifier code et conditionnement fournisseur.']
+    });
+    revise('mir-request-fascia-screws-black-2in',{
+      name:'Vis à fascia — 2 po · hex ¼ po · noir',baseColorName:'Noir',
+      notes:['Sans rondelle. La tête et l’ourlet sont noirs; filets métalliques. Vérifier les caractéristiques et le conditionnement.']
+    });
+    revise('mir-request-fascia-screws-white-2in',{
+      name:'Vis à fascia — 2 po · hex ¼ po · blanc',baseColorName:'Blanc',
+      notes:['Sans rondelle. La tête et l’ourlet sont blancs; filets métalliques. Vérifier les caractéristiques et le conditionnement.']
+    });
+    // Une fiche par profil CanExel. La palette indique une demande de couleur,
+    // jamais une preuve de stock pour la moulure de joint.
+    const canexelColors=[...new Map(source.filter(m=>/canexel/i.test((m.brand||'')+' '+(m.name||'')))
+      .flatMap(m=>m.colors||[]).filter(c=>c.id&&c.name&&c.verified!==false)
+      .map(c=>[c.id,{id:c.id,name:c.name,swatchImage:c.swatchImage||c.swatchUrl||null,scope:'manufacturer_request_only',availabilityConfirmedForItem:false}])).values()];
+    [
+      ['canexel-joint-cedrvue-6','Ced’R-Vue 6 po',false],
+      ['canexel-joint-cedrvue-9','Ced’R-Vue 9 po',true],
+      ['canexel-joint-ridgewood-d5-12','Ridgewood D-5 12 po',true],
+      ['canexel-joint-vstyle-12','VStyle 12 po',true]
+    ].forEach(([id,profile,documented])=>add({
+      id,name:'CanExel — Moulure de joint '+profile,brand:'Maibec CanExel',
+      category:'membranes-joints',unit:'pièce',colors:copy(canexelColors),
+      colorPolicy:canexelColors.length?'required':'none',colorScope:'manufacturer_request_only',
+      colorNote:documented?'Couleur demandée; stock et compatibilité à valider.':'Moulure de joint aluminium 6 po non confirmée par le guide Maibec 2026.',
+      sourceUrl:'https://maibec.com/fr/produits/canexel/',
+      notes:[documented?'Moulure de joint aluminium documentée dans le guide Maibec 2026; photo exacte et couleur à confirmer.':'Profil Ced’R-Vue 6 po documenté, mais moulure de joint aluminium 6 po non confirmée; ne pas substituer une moulure 9 po.'],
+      status:'to_identify',statusLabel:'Moulure à vérifier',referencePending:true
+    }));
+    [
+      {id:'mir-caulk-nozzle-45-5',name:'Embouts 45° pour pistolet à calfeutrer · 5/pqt',brand:'Canac',unit:'paquet',packaging:{piecesPerBox:5},
+        sourceUrl:'https://www.canac.ca/canac/fr/2/p/embouts-45-pour-pistolet-a-calfeutrer-pqt-5/55001518',notes:['Article Canac 55001518; compatibilité à confirmer.']},
+      {id:'mir-adfast-yellow-nozzles-5',name:'ADFAST — Embouts jaunes pour saucisse · 5/pqt',brand:'Adfast',unit:'paquet',packaging:{piecesPerBox:5},manufacturerReference:'YELLOW NOZZLE/5',
+        sourceUrl:'https://www.rona.ca/fr/produit/embout-en-plastique-de-rechange-pour-scellant-de-adfast-jaune-5-pqt-13485024',
+        notes:['Article RONA 13485024; modèle YELLOW NOZZLE/5; compatibilité Adseal600MG indiquée par le détaillant.']},
+      {id:'mir-caulk-sausage-nozzle',name:'Embout pour fusil à calfeutrer type saucisse',brand:'Canac',unit:'pièce',
+        sourceUrl:'https://www.canac.ca/canac/fr/2/p/embout-pour-fusil-a-calfeutrer-type-saucisse/5081112',
+        notes:['Article Canac 5081112; marque, emballage et compatibilité à confirmer.']},
+      {id:'mir-bates-caulk-gun',name:'Bates Choice — Pistolet à calfeutrer 18:1',brand:'Bates Choice',unit:'pièce',manufacturerReference:'FPMS001B351',
+        sourceUrl:'https://www.amazon.com/Bates-Choice-FPMS001B351-Bates-Caulking/dp/B0CQZ3HWY7',
+        notes:['Modèle FPMS001B351, ASIN B0CQZ3HWY7, rapport 18:1; 1 pistolet.']}
+    ].forEach(row=>add({...row,category:'lames-consommables',status:'to_identify',
+      statusLabel:'Commande à confirmer',referencePending:true}));
+    // Demandé sur ChatGPT Sites : conserver noir/blanc à 100 pi et
+    // permettre les demandes couleur en 10, 20, 50 ou 100 pi sans inventer de SKU.
+    for(const [id,name,color,base] of [
+      ['mir-coil-black-100ft','Rouleau aluminium noir · 100 pi','Noir','requested-black'],
+      ['mir-coil-white-100ft','Rouleau aluminium blanc · 100 pi','Blanc','requested-white']
+    ])add({id,name,category:'pliages',unit:'rouleau',brand:'MIR',stockLengthIn:1200,
+      dimensions:{lengthIn:1200},baseColorId:base,baseColorName:color,
+      notes:['Demande d’atelier 100 pi; fabricant, largeur, calibre et référence fournisseur à confirmer.'],
+      referencePending:true,status:'to_identify',statusLabel:'Format à confirmer'});
+    for(const brand of ['Kaycan','Gentek Canada']){
+      const bid=brand==='Kaycan'?'kaycan':'gentek';
+      const palette=paletteFor(source,brand);
+      add({id:'mir-coil-color-'+bid,name:'Rouleau aluminium couleur — '+brand,brand,
+        category:'pliages',unit:'rouleau',
+        colors:palette,colorPolicy:palette.length?'required':'none',
+        colorScope:'manufacturer_request_only',
+        formats:[10,20,50,100].map(feet=>({id:bid+'-'+feet+'ft',label:feet+' pi',lengthIn:feet*12})),
+        notes:['Longueurs 10/20/50/100 pi demandées par MIR; confirmer stock, coupe et teinte avant préparation.'],
+        referencePending:true,status:'to_identify',statusLabel:'Longueur à confirmer'});
+    }
+    for(const item of items){
+      if(!/kaycan|quality edge|truvent/i.test(item.brand||''))continue;
+      if(!/soffit|soffite|truvent/i.test(item.name||''))continue;
+      const black=item.colors?.find(c=>/\bnoir\b|^black$/i.test(c.name||''));
+      if(black&&item.colorPolicy==='required'){item.baseColorId=black.id;item.baseColorName=black.name;}
+    }
+
     const brands=[{id:'kaycan',name:'Kaycan',metal:'aluminium'},{id:'gentek',name:'Gentek Canada',metal:'aluminium'},{id:'vicwest',name:'Vicwest',metal:'acier'}];
     const trimProfiles=[
       ['window-l','L de fenêtre','L',120],['soffit-j','J à soffite','J',144],
