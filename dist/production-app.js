@@ -406,7 +406,18 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
  const map=pts=>pts.map(p=>pointOnView(p,tr).map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#b8c5ae',swatch=safeAsset(model.spec?.finish?.swatchUrl||model.finish?.swatchUrl),suffix=small?'thumb-'+esc(model.spec?.id||'panel'):'main',paint='panel-face-paint-'+suffix,clip='panel-face-clip-'+suffix;
  let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — vue cotée, lips compris" data-panel-face="true" data-zoom="${z}" font-family="Arial,sans-serif"><title>${esc(model.name)} — dimensions hors tout avec lèvres</title><defs><clipPath id="${clip}"><rect x="16" y="45" width="768" height="365"/></clipPath>${swatch?`<pattern id="${paint}" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${hex}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern>`:''}</defs><text x="400" y="30" text-anchor="middle" font-size="12" fill="#6f8064">${illustrative?'PROPORTIONS DU MODÈLE · COTES À SAISIR':'VUE DE FACE · LIPS INCLUS DANS LE HORS TOUT'}</text><g clip-path="url(#${clip})"><polygon points="${map(mesh.outer)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="1.5"/><polygon points="${map(mesh.front)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="2.2"/>`;
  (model.edges||[]).forEach((edge,i)=>{const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr);if(edge.id===model.bottomEdgeId&&!illustrative)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="5"${model.perforation?.enabled?' stroke-dasharray="10 5"':''}/>`;if(interactive&&!authoring)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="transparent" stroke-width="22" data-select-bottom="${esc(edge.id)}" tabindex="0" role="button" aria-label="Choisir ${esc(edge.name)} comme bas"/>`;});
- svg+='</g><rect x="0" y="420" width="800" height="100" fill="#fcfcf8"/>';
+ svg+='</g>';
+ if(!small&&!illustrative)(model.edges||[]).forEach((edge,i)=>{
+  const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr),
+   len=Math.hypot(b[0]-a[0],b[1]-a[1]),cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2;
+  if(len<52)return;
+  const center=pointOnView([(mesh.bounds.minX+mesh.bounds.maxX)/2,(mesh.bounds.minY+mesh.bounds.maxY)/2],tr);
+  const vx=center[0]-cx,vy=center[1]-cy,dist=Math.hypot(vx,vy)||1;
+  const x=cx+vx/dist*22,y=cy+vy/dist*22;
+  const label=edge.lipMM===0?'Sans lip':'Lip '+M.formatMeasurement(edge.lipMM,model.unit);
+  svg+='<text data-panel-edge-lip="'+esc(edge.id)+'" x="'+fmt(x)+'" y="'+fmt(y)+'" font-size="12" font-weight="700" text-anchor="middle" fill="#284d30" stroke="#fafcf7" stroke-width="4" paint-order="stroke">'+esc((i+1)+' · '+label)+'</text>';
+ });
+ svg+='<rect x="0" y="420" width="800" height="100" fill="#fcfcf8"/>';
  const dims=[['A','Largeur hors tout',model.widthMM],['B','Hauteur hors tout',model.heightMM],['C','Projection',model.reliefMM]];
  svg+=dims.map(([letter,label,value],i)=>`<text x="${135+i*265}" y="448" text-anchor="middle" font-size="13" fill="#6f8064">${letter} · ${label}</text><text x="${135+i*265}" y="478" text-anchor="middle" font-size="24" fill="#294734" font-weight="600">${esc(illustrative?'À saisir':M.formatMeasurement(value,model.unit))}</text>`).join('');return svg+'</svg>';
 }
@@ -732,6 +743,39 @@ function updateDrawing({keepForm=false}={}){
  stage.innerHTML=tool==='panel-trace'&&kind==='panel'?window.MIRPanelSketch.svg(panelSketchPoints,panelSketchHover):
   waiting?'<div class="drawing-hint">Choisissez une moulure pour voir son profil ici.</div>':
   view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
+
+ const twin=$('#mir-panel-live-alt');
+ if(twin){
+  twin.hidden=kind!=='panel';
+  if(kind==='panel'){
+   const points=tool==='panel-trace'&&panelSketchHover&&panelSketchPoints.length>=2?
+    [...panelSketchPoints,panelSketchHover]:panelSketchPoints;
+   const twinModel=tool==='panel-trace'?panelSketchPreview(points):shown.model;
+   const twinValid=twinModel?.valid&&window.MIRProductionVolume?.buildMesh(twinModel)?.valid;
+   const volume=view!=='volume';
+   twin.dataset.panelTwin=volume?'3d':'2d';
+   twin.dataset.geometryStatus=twinValid?(tool==='panel-trace'||shown.illustrative?'illustrative':'measured'):'pending';
+   twin.dataset.syncedShape=twinModel?.shape||'pending';
+   twin.innerHTML='<header class="mir-panel-live-heading"><strong>'+(volume?'Volume 3D':'Vue 2D cotée')+
+    '</strong><small> même géométrie</small></header>'+
+    (twinValid?(volume?volumeSVG(twinModel,{illustrative:tool==='panel-trace'||shown.illustrative}):
+      panelDiagramSVG(twinModel,{illustrative:shown.illustrative,small:true,interactive:false})):
+     '<p class="field-hint mir-panel-live-empty">Tracez trois sommets pour afficher le volume 3D, sans inventer de cotes.</p>');
+  }
+ }
+ const net=$('#mir-panel-net-summary');
+ if(net){
+  const face=actual.valid&&mesh?.valid?window.MIRPanelRoof?.visibleFace(mesh):null;
+  if(face){
+   const outside=M.formatMeasurement(actual.widthMM,actual.unit)+' × '+M.formatMeasurement(actual.heightMM,actual.unit);
+   const inside=M.formatMeasurement(face.widthMM,actual.unit)+' × '+M.formatMeasurement(face.heightMM,actual.unit);
+   net.innerHTML='<p><strong>Hors tout de fabrication</strong> <span>'+esc(outside)+'</span></p>'+
+    '<p><strong>Face nette hors lèvres</strong> <span>'+esc(inside)+'</span></p>'+
+    '<p class="field-hint">Les lèvres sont comprises dans le hors tout, jamais ajoutées au calcul. Pour les rampants, la face nette est la boîte englobante du contour avant.</p>';
+  }else net.textContent=actual.valid?'Les lèvres ne permettent pas une face nette valide : corrigez les côtés.':
+    'Renseignez les cotes réelles A/B et les lèvres pour connaître la face nette, sans compter les lips.';
+ }
+ roofReadout();
  const dimensions=$('#profile-dimension-list');
  const sides=tool==='draw'?drawPoints.slice(1).map((point,index)=>({
   label:String.fromCharCode(65+index),
