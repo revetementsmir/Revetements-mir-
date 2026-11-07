@@ -1,4 +1,5 @@
 'use strict';
+const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
 /* Vérification réelle Chromium de l'atelier admin (captures PC/tablette/mobile). */
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
@@ -37,8 +38,7 @@ function available() {
       assert.equal(await page.locator('#production-title').textContent(),'Créer une moulure');
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'À préciser');
       assert.equal(await page.locator('#production-templates [data-template]').count(),0,'aucun profil imposé');
-      await page.locator('[data-freeform-add]').click();
-      await page.locator('[data-freeform-add]').click();
+      await drawTwoSides(page);
       await page.locator('[data-freeform-finish]').click();
       await page.locator('[data-segment-length="0"]').fill('3');
       await page.locator('[data-segment-length="1"]').fill('2');
@@ -83,8 +83,7 @@ function available() {
     const page=await browser.newPage({viewport:{width:1440,height:900}});
     await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-    await page.locator('[data-freeform-add]').click();
-    await page.locator('[data-freeform-add]').click();
+    await drawTwoSides(page);
     await page.locator('[data-freeform-finish]').click();
     await page.locator('[data-segment-length="0"]').fill('3');
     await page.locator('[data-segment-length="1"]').fill('2');
