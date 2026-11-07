@@ -147,8 +147,11 @@
     const points=measuredPoints(),old=Number($('#wall-vertex').value)||0,index=Math.min(old,Math.max(0,points.length-1));
     $('#wall-vertex').innerHTML=points.map((p,i)=>'<option value="'+i+'">Sommet '+(i+1)+'</option>').join('');$('#wall-vertex').value=String(index);
     $('#vertex-x').value=points[index]?val(points[index][0]):'';$('#vertex-height').value=points[index]?val(d.height-points[index][1]):'';
-    $('#apply-vertex').disabled=!points.length;
-    $('#wall-coordinate-list').innerHTML=points.map((p,i)=>'<div><strong>S'+(i+1)+'</strong><span>X '+inch(p[0])+' · H '+inch(d.height-p[1])+'</span></div>').join('');
+    const waiting=Array.isArray(s.sketchRatios)&&!(d.width>0&&d.height>0);
+    $('#apply-vertex').disabled=!points.length||waiting;
+    $('#wall-coordinate-list').innerHTML=waiting?
+      '<p class="hint mir-wall-unmeasured">La forme est enregistrée sans mesure inventée. Entrez largeur et hauteur réelles avant de régler les sommets.</p>':
+      points.map((p,i)=>'<div><strong>'+wallLetter(i)+'</strong><span>X '+inch(p[0])+' · H '+inch(d.height-p[1])+'</span></div>').join('');
   }
   function renderSummary() {
     const z=zone(),valid=layout.ok,d=dimensions(z),errors=layout.errors||[];
@@ -178,6 +181,33 @@
   function polygonMeasures(points) {
     const area2=points.reduce((s,p,i)=>{const q=points[(i+1)%points.length];return s+p[0]*q[1]-q[0]*p[1];},0),winding=Math.sign(area2)||1;
     return points.map((p,i)=>{const prev=points[(i+points.length-1)%points.length],q=points[(i+1)%points.length],a=[p[0]-prev[0],p[1]-prev[1]],b=[q[0]-p[0],q[1]-p[1]],turn=Math.atan2(a[0]*b[1]-a[1]*b[0],a[0]*b[0]+a[1]*b[1]);return {length:Math.hypot(...b),angle:180-winding*turn*180/Math.PI,inclination:Math.atan2(-b[1],b[0])*180/Math.PI};});
+  }
+
+  function wallLetter(i) {
+    let n=i+1,s='';do{n--;s=String.fromCharCode(65+n%26)+s;n=Math.floor(n/26);}while(n>0);return s;
+  }
+  function wallEdgeAnnotations(points,{closed=false,measured=false,span=1000}={}) {
+    if(!Array.isArray(points)||!points.length)return '';
+    const size=Math.max(1.7,Math.min(16,span/75)),end=closed?points.length:Math.max(0,points.length-1),
+      bends=closed&&points.length>=3?polygonMeasures(points):[];
+    let markup='<g class="mir-wall-edge-annotations">';
+    for(let i=0;i<end;i++){
+      const a=points[i],b=points[(i+1)%points.length],dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy);
+      if(!(len>1e-7))continue;
+      const name=wallLetter(i)+'–'+wallLetter((i+1)%points.length),label=name+(measured?' '+inch(len).replace(' po',''):'');
+      const x=(a[0]+b[0])/2-dy/len*size*1.65,y=(a[1]+b[1])/2+dx/len*size*1.65;
+      if(len>=size*3)markup+=svgText(x,y,label,
+        'data-wall-edge="'+i+'" tabindex="0" role="button" aria-label="'+esc(name+(measured?' '+inch(len):' non coté'))+'" text-anchor="middle" font-size="'+size+'" font-weight="700" class="mir-wall-edge-label"');
+    }
+    const r=size*.34;
+    for(let i=0;i<points.length;i++){
+      const p=points[i];
+      markup+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+r+'" fill="#348511" stroke="#fff" stroke-width="'+r*.3+'"/>';
+      markup+=svgText(p[0]+r*2,p[1]-r*1.7,wallLetter(i),'font-size="'+size+'" font-weight="700" class="mir-wall-vertex-label"');
+      if(measured&&bends.length&&Number.isFinite(bends[i].angle))
+        markup+=svgText(p[0]+r*2,p[1]+r*3.3,number(bends[i].angle)+'°','font-size="'+size*.78+'" class="mir-wall-angle-label"');
+    }
+    return markup+'</g>';
   }
   function renderPieceMeasures(p) {
     $('#piece-measurements').hidden=!p;if(!p)return;
@@ -238,6 +268,8 @@
       const wall=wallGeometry(),wallPoints=wall.measuredPointsIn;
       out=wallPoints&&wall.type!=='rectangle'?'<polygon points="'+wallPoints.map(q=>q.join(',')).join(' ')+'" fill="#e8e9df" stroke="#879977" vector-effect="non-scaling-stroke"/>':'<rect x="0" y="0" width="'+d.width+'" height="'+d.height+'" fill="#e8e9df" stroke="#879977" vector-effect="non-scaling-stroke"/>';
       if(valid)out+=panelDrawing();
+      if(z.shape?.type==='free'&&tool!=='outline'&&Array.isArray(wall.measuredPointsIn))
+        out+=wallEdgeAnnotations(wall.measuredPointsIn,{closed:true,measured:true,span:baseWidth});
       const fs=Math.max(d.width,d.height)*.026,dim=margin*.52;
       out+=svgLine(0,-dim,d.width,-dim,'stroke="#677d5b" vector-effect="non-scaling-stroke"');
       out+=svgLine(0,-dim-fs*.45,0,-dim+fs*.45,'stroke="#677d5b" vector-effect="non-scaling-stroke"')+svgLine(d.width,-dim-fs*.45,d.width,-dim+fs*.45,'stroke="#677d5b" vector-effect="non-scaling-stroke"');
@@ -248,7 +280,18 @@
       if(!valid)out+=svgText(d.width/2,d.height/2,'Renseignez le lip et la répartition','font-size="'+fs+'" text-anchor="middle" fill="#687d5e"');
     } else {
       baseWidth=1000;baseHeight=680;transform=null;
-      out='<rect x="160" y="100" width="680" height="460" rx="3" fill="#eff3e8" stroke="#afbea0" stroke-dasharray="8 7"/>'+svgText(500,306,z.drawn?'Zone tracée':'Votre zone commence ici','font-size="27" text-anchor="middle" fill="#49613d"')+svgText(500,345,'Entrez la largeur, la hauteur et le lip.','font-size="17" text-anchor="middle" fill="#748769"');
+      const waiting=Array.isArray(z.shape?.sketchRatios)&&z.shape.sketchRatios.length>=3;
+      const activeDraft=tool==='outline'&&outlineDraft.length>0;
+      out='<rect x="160" y="100" width="680" height="460" rx="3" fill="#eff3e8" stroke="#afbea0" stroke-dasharray="8 7"/>';
+      if(waiting&&!activeDraft){
+        const pts=z.shape.sketchRatios.map(p=>[160+p[0]*680,100+p[1]*460]);
+        out+='<polygon data-wall-sketch="pending" points="'+pts.map(p=>p.join(',')).join(' ')+'" fill="#e0edce" fill-opacity=".7" stroke="#348511" stroke-width="3" vector-effect="non-scaling-stroke"/>';
+        out+=wallEdgeAnnotations(pts,{closed:true,span:baseWidth});
+        out+=svgText(500,605,'Contour sauvegardé · entrez les dimensions chantier exactes','font-size="16" text-anchor="middle" fill="#395335"');
+      }else if(!activeDraft){
+        out+=svgText(500,306,z.drawn?'Zone tracée':'Tracez une section de mur ici','font-size="27" text-anchor="middle" fill="#49613d"');
+        out+=svgText(500,345,'Mesurez et cotez après le tracé.','font-size="17" text-anchor="middle" fill="#748769"');
+      }
     }
     if(drag?.type==='draw'){const b=drag.box;out+='<rect x="'+b[0]+'" y="'+b[1]+'" width="'+b[2]+'" height="'+b[3]+'" fill="#adc79855" stroke="#456637" stroke-width="2" vector-effect="non-scaling-stroke"/>';}
     if(tool==='calibrate')calibrationPoints.forEach(p=>{out+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+Math.max(baseWidth/150,3)+'" fill="#bc7b35" stroke="white" stroke-width="2"/>';});
@@ -256,16 +299,21 @@
       const start=outlineDraft.at(-1), end=outlinePoint(outlineCursor,outlineOrthogonal||outlineRightAngle);
       out+=svgLine(start[0],start[1],end[0],end[1],'data-outline-preview stroke="#ba7136" stroke-width="2" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" pointer-events="none"');
     }
-    if(tool==='outline'&&outlineDraft.length){const r=baseWidth/150;out+='<polyline points="'+outlineDraft.map(p=>p.join(',')).join(' ')+'" fill="#9eb98733" stroke="#ba7136" stroke-width="2" vector-effect="non-scaling-stroke"/>';outlineDraft.forEach((p,i)=>{out+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+r+'" fill="'+(i?'#ba7136':'#3f6536')+'" stroke="white" stroke-width="1.3" vector-effect="non-scaling-stroke"/>'+svgText(p[0]+r*1.4,p[1]-r*1.4,String(i+1),'font-size="'+r*2+'" fill="#7b4b28"');});}
+    if(tool==='outline'&&outlineDraft.length){
+      const r=baseWidth/170;
+      out+='<polyline points="'+outlineDraft.map(p=>p.join(',')).join(' ')+'" fill="none" stroke="#ba7136" stroke-width="2.5" vector-effect="non-scaling-stroke"/>';
+      out+=wallEdgeAnnotations(outlineDraft,{closed:false,span:baseWidth});
+      if(outlineDraft.length===1)out+='<circle cx="'+outlineDraft[0][0]+'" cy="'+outlineDraft[0][1]+'" r="'+r+'" fill="#348511" stroke="white" stroke-width="1.3"/>';
+    }
     const vw=baseWidth/zoom,vh=baseHeight/zoom;
     svg.setAttribute('viewBox',[originX+(baseWidth-vw)/2,originY+(baseHeight-vh)/2,vw,vh].join(' '));svg.innerHTML=out;
     svg.setAttribute('aria-label',valid?z.name+', '+layout.pieces.length+' panneaux, '+inch(layout.widthIn)+' par '+inch(layout.heightIn):'Zone à définir');
     $('#drawing-stage').dataset.tool=tool;$('#zoom-value').textContent=Math.round(zoom*100)+' %';
     $('#view-zone').setAttribute('aria-pressed',String(view==='zone'));$('#view-plan').setAttribute('aria-pressed',String(view==='plan'));$('#view-3d').setAttribute('aria-pressed',String(view==='3d'));
     $('#select-tool').setAttribute('aria-pressed',String(tool==='select'));$('#draw-zone').setAttribute('aria-pressed',String(tool==='draw'));
-    $('#draw-outline').setAttribute('aria-pressed',String(tool==='outline'));$('#outline-actions').hidden=tool!=='outline';$('#outline-close').disabled=outlineDraft.length<3;$('#outline-back').disabled=!outlineDraft.length;$('#outline-progress').textContent=outlineDraft.length+' sommet(s) · '+(outlineDraft.length<3?'placez au moins 3 sommets.':'fermez le contour pour calculer.');
+    $('#draw-outline').setAttribute('aria-pressed',String(tool==='outline'));$('#outline-actions').hidden=tool!=='outline';$('#outline-close').disabled=outlineDraft.length<3;$('#outline-back').disabled=!outlineDraft.length;$('#outline-progress').textContent=outlineDraft.length+' sommet(s) · '+(outlineDraft.length<3?'cliquez ou glissez pour tracer.':'tapez le premier point ou Fermer le contour.');
     $('#outline-right-angle').setAttribute('aria-pressed',String(outlineRightAngle));
-    $('#drawing-hint').textContent=tool==='outline'?'Placez chaque sommet. Activez Angle droit à 90° ou maintenez Maj (Shift).':view==='3d'?'Glissez pour tourner. Cliquez une pièce pour lire ses cotes.':tool==='draw'?'Glissez entre deux coins de la zone.':tool==='calibrate'?'Cliquez les deux extrémités de votre cote.':'Cliquez une pièce ou déplacez un joint.';
+    $('#drawing-hint').textContent=tool==='outline'?'Cliquez ou glissez comme une moulure. Maj = 90°. Fermez puis cotez.':view==='3d'?'Glissez pour tourner. Cliquez une pièce pour lire ses cotes.':tool==='draw'?'Glissez entre deux coins de la zone.':tool==='calibrate'?'Cliquez les deux extrémités de votre cote.':'Cliquez une pièce ou déplacez un joint.';
   }
   function render() {
     layout=compute();if(layout.ok){zone().rules=clone(layout.config);if((!selected||selected.type==='piece'&&!layout.pieces.some(p=>p.id===selected.id))&&layout.pieces.length)selected={type:'piece',id:layout.pieces[0].id};}
