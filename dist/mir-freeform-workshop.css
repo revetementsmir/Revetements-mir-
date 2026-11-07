@@ -251,7 +251,7 @@ body.mir-admin-v4.mir-freeform-active :is(button,input,select):focus-visible{
 }
 /* PC : la page ne défile pas; le panneau droit et chaque onglet possèdent
    leur propre zone de défilement. Les petits écrans restent accessibles. */
-@media(min-width:1100px) and (min-height:720px){
+@media(min-width:768px) and (min-height:650px){
  body.mir-admin-v4.mir-procurement-ready{
   height:100dvh;max-height:100dvh;display:flex;flex-direction:column;overflow:hidden;
  }
