@@ -10,7 +10,8 @@ function test(label,fn){fn();count++;console.log('PASS '+label);}
 const mockTemplate={id:'mir-modele-test',version:1,kind:'profile',name:'Solin personnalisé',
  fields:[{key:'A',label:'A',required:true},{key:'B',label:'B',required:true}]};
 const model={id:mockTemplate.id,name:mockTemplate.name,currentVersion:1,versions:[mockTemplate],
- channels:{client:false,store:false,po:true},allowed:{materials:['aluminium','acier'],colorSystems:['manufacturer']},archived:false};
+  assert.ok(workspace.includes("channels:{client:data.has('client'),store:data.has('store')"),'La boutique exige une sélection explicite; le modèle reste brouillon jusqu aux prix et à sa publication');
+  assert.ok(workspace.includes("commercial:{...(old?.commercial||{}),status:'draft'"),'Aucune vente n est automatiquement activée');
 const engine={templatePreview:()=>({ok:true,model:{valid:true,kind:'profile',name:mockTemplate.name,pointsMM:[[0,0],[30,0],[30,35]],segments:[{label:'A'},{label:'B'}]}})};
 
 test('Magasin : choix de la couleur libre par défaut, compatible avec un modèle ancien',()=>{
