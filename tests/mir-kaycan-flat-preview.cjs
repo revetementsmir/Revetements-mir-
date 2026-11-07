@@ -60,8 +60,8 @@ function online(url){return new Promise(resolve=>http.get(url,r=>{r.resume();res
    await page.locator('[data-freeform-add]').click();
    await page.locator('[data-freeform-add]').click();
    await page.locator('[data-freeform-finish]').click();
-   await page.locator('.mir-v4-materials > summary').click();
-   await page.locator('#mir-v4-colors > summary').click();
+    if(!(await page.locator('.mir-v4-materials').evaluate(node=>node.open)))await page.locator('.mir-v4-materials > summary').click();
+    if(!(await page.locator('#mir-v4-colors').evaluate(node=>node.open)))await page.locator('#mir-v4-colors > summary').click();
    await page.locator('#material-type').selectOption('aluminium');
    await page.locator('#production-material').selectOption('kaycan-urbanix-coil-0747');
    await page.locator('[data-production-color="kaycan-urbanix-etain-bruni"]').click();
