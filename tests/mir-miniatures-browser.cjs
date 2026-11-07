@@ -1,5 +1,5 @@
 'use strict';
-const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
+const {drawTwoSides,openWorkshopStep}=require('./mir-draw-freeform-helper.cjs');
 /* MIR — captures et assertions depuis un VRAI navigateur Chrome. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -32,7 +32,7 @@ async function online(){
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
    await drawTwoSides(page);
-   await page.locator('[data-freeform-finish]').click();
+   await openWorkshopStep(page,4);
    await page.locator('#production-piece-name').fill('Fascia de fenêtre');
    await page.locator('#add-production-piece').click();
    await page.locator('#mode-link').click();
