@@ -3,6 +3,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium}=require('playwright'),{spawn}=require('node:child_process');
+const {openWorkshopStep}=require('./mir-draw-freeform-helper.cjs');
 const port=8790,base='http://127.0.0.1:'+port,root=path.join(__dirname,'../dist'),output=path.join(__dirname,'../artifacts');
 const pause=n=>new Promise(r=>setTimeout(r,n));
 async function ready(){
@@ -138,7 +139,7 @@ async function ready(){
     await page.locator('[data-freeform-undo]').click();
     await trace(365,275);await choose('left');
     assert.match(await arc(),/ A5 5 0 0 0 /,'choix 1 : sens opposé, sans modifier les cotes');
-    await page.locator('[data-freeform-finish]').click();
+    await openWorkshopStep(page,2);
     assert.match(await arc(),/ A5 5 0 0 0 /,'le sens reste appliqué après Terminer le tracé');
     console.log('PASS '+viewport.name+' double pli visuel : annulation, choix 1/2 et fabrication');
    }
