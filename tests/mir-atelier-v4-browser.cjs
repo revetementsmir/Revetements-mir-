@@ -29,7 +29,7 @@ function available() {
   try {
     await available();
     browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
-    for(const viewport of [{width:1440,height:900,name:'bureau'},{width:1024,height:768,name:'tablette-paysage'},{width:820,height:1180,name:'tablette-portrait'},{width:390,height:844,name:'mobile'},{width:360,height:780,name:'mobile-compact'}]){
+    for(const viewport of [{width:1440,height:900,name:'bureau'},{width:1024,height:768,name:'tablette-paysage'},{width:820,height:1180,name:'tablette-portrait'},{width:390,height:844,name:'mobile'},{width:360,height:780,name:'mobile-compact'},{width:844,height:390,name:'mobile-landscape'}]){
       const page=await browser.newPage({viewport:{width:viewport.width,height:viewport.height},deviceScaleFactor:1,hasTouch:viewport.width<1100});
       const errors=[];
       page.on('pageerror',error=>errors.push(String(error)));
@@ -39,7 +39,7 @@ function available() {
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'À préciser');
       assert.equal(await page.locator('#production-templates [data-template]').count(),0,'aucun profil imposé');
       await drawTwoSides(page);
-      const phone=viewport.width<=650;
+      const phone=viewport.width<=650||viewport.width<=950&&viewport.height<=520;
       // Sur téléphone, Suivant termine le tracé via le vrai moteur : pas de second bouton caché.
       if(!phone)await page.locator('[data-freeform-finish]').click();
       if(phone){
@@ -77,7 +77,7 @@ function available() {
         return {scrollWidth:document.documentElement.scrollWidth,viewport:window.innerWidth,scrollHeight:document.documentElement.scrollHeight,screenHeight:window.innerHeight,drawing:box('.drawing-card'),config:box('.config-card')};
       });
       assert.ok(layout.scrollWidth<=layout.viewport+2,viewport.name+' horizontal overflow: '+JSON.stringify(layout));
-      if(viewport.width>=768){
+      if(!phone&&viewport.width>=768){
         assert.ok(layout.config.left>=layout.drawing.right-5,'Tablet/PC two panes: '+JSON.stringify(layout));
         assert.ok(layout.scrollHeight<=layout.screenHeight+4,'Tablet/PC no global vertical scroll: '+JSON.stringify(layout));
       }else assert.ok(layout.config.top>=layout.drawing.bottom-10,'Phone stack: '+JSON.stringify(layout));
