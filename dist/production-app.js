@@ -224,7 +224,36 @@ function renderProfileOptions(){
   ${faceChoiceCards(draft.coloredFace?.side||'',draft.coloredFace?.segmentId||labels[0]||'A')}
   <div class="two-fields mir-face-details"><label>Choix textuel de la face<select id="profile-painted-side"><option value="">Choisir le côté</option><option value="left"${draft.coloredFace?.side==='left'?' selected':''}>À gauche du tracé</option><option value="right"${draft.coloredFace?.side==='right'?' selected':''}>À droite du tracé</option></select></label><label>Repère sur le côté<select id="profile-painted-segment">${labels.map(label=>`<option${draft.coloredFace?.segmentId===label?' selected':''}>${esc(label)}</option>`).join('')}</select></label></div></details>`+rule;
 }
-function renderPanelOptions(){if(kind!=='panel'||authoring){$('#production-panel-options').innerHTML='';return;}const model=build(),reference=model.edges.length?model:build(sampleSpec('panel',draft.shape)),edges=reference.edges||[];$('#production-panel-options').innerHTML=`<div class="config-section"><div class="section-heading compact"><div><span class="step-dot">↳</span><h2>Les lèvres & le bas</h2></div></div><p class="field-hint">Les lips sont compris dans A et B. Ils réduisent la face centrale, sans augmenter le hors tout.</p><label>Lip commun à tous les côtés<input id="panel-lip" inputmode="decimal" value="${esc(draft.lip??'')}" placeholder="0 = sans lip"></label><details class="options-details"><summary>Un lip différent selon le côté</summary><div class="dimension-fields">${edges.map((edge,index)=>`<label>${index+1} · ${esc(edge.name)}<input data-panel-lip="${esc(edge.id)}" inputmode="decimal" value="${esc(draft.lips?.[edge.id]??'')}" placeholder="Lip commun"></label>`).join('')}</div></details><label>Quel côté est en bas après pose ?<select id="panel-bottom"><option value="">Choisir le bas</option>${edges.map((edge,index)=>`<option value="${esc(edge.id)}"${draft.bottomEdgeId===edge.id?' selected':''}>${index+1} · ${esc(edge.name)}</option>`).join('')}</select></label><label class="check-field"><input id="panel-perforation" type="checkbox"${draft.perforation?.enabled?' checked':''}><span>Demander la perforation du bas<small>Le côté choisi est repéré en bleu sur le dessin.</small></span></label>${draft.perforation?.enabled?`<label>Détail ou référence de perforation<textarea id="panel-perforation-details" rows="2" placeholder="À définir avec l’atelier" maxlength="300">${esc(draft.perforation.details||'')}</textarea></label><p class="field-hint">Le diamètre et l’espacement des trous restent à préciser. Aucun motif de perforation n’est présumé.</p>`:''}</div>`;}
+
+function renderPanelOptions(){
+ if(kind!=='panel'||authoring){$('#production-panel-options').innerHTML='';return;}
+ const actual=build();
+ const tentative=draft.shape==='polygon'&&Array.isArray(draft.contourRatios)
+  ?build({...draft,width:48,height:36,relief:0,lip:draft.lip||'0'})
+  :build(sampleSpec('panel',draft.shape));
+ const edges=actual.edges.length?actual.edges:tentative.edges||[];
+ const perEdge=edges.map((edge,i)=>{
+  const override=draft.lips?.[edge.id],withoutLip=String(override)==='0';
+  return `<div class="mir-lip-side"><label>${i+1} · ${esc(edge.name)}
+    <input data-panel-lip="${esc(edge.id)}" inputmode="decimal" value="${esc(override??'')}" placeholder="Commun · 0 = sans lip"
+    aria-label="Lip du côté ${esc(edge.name)}"></label>
+    <button type="button" class="secondary-button mir-no-lip" data-panel-no-lip="${esc(edge.id)}" aria-pressed="${withoutLip}" aria-label="Supprimer le lip du côté ${esc(edge.name)}">Sans lip</button></div>`;
+ }).join('');
+ $('#production-panel-options').innerHTML=`<div class="config-section mir-panel-lips"><div class="section-heading compact"><div>
+  <span class="step-dot">↳</span><h2>Lips et face visible</h2></div></div>
+  <p class="field-hint">Les cotes A/B sont HORS TOUT de fabrication. Les lèvres restent à l'intérieur du hors tout; elles ne sont jamais ajoutées deux fois.</p>
+  <label>Lip commun à tous les côtés<input id="panel-lip" inputmode="decimal" value="${esc(draft.lip??'')}" placeholder="0 = sans lip"></label>
+  <details class="options-details mir-panel-edge-options" open><summary>Lip de chaque côté, y compris sans lip (0)</summary>
+  <div class="mir-lip-sides">${perEdge||'<p class="field-hint">Fermez d’abord le dessin pour identifier les côtés.</p>'}</div></details>
+  <div id="mir-panel-net-summary" class="mir-panel-net-summary" role="status" aria-live="polite">Entrez vos cotes pour voir la face nette, sans les lips.</div>
+  <label>Quel côté est en bas après pose ?<select id="panel-bottom">
+    <option value="">Choisir le bas</option>${edges.map((edge,i)=>`<option value="${esc(edge.id)}"${draft.bottomEdgeId===edge.id?' selected':''}>${i+1} · ${esc(edge.name)}</option>`).join('')}
+  </select></label>
+  <label class="check-field"><input id="panel-perforation" type="checkbox"${draft.perforation?.enabled?' checked':''}>
+    <span>Demander la perforation du bas<small>Le côté choisi est repéré en bleu sur le dessin.</small></span>
+  </label>${draft.perforation?.enabled?`<label>Détail ou référence de perforation<textarea id="panel-perforation-details" rows="2" placeholder="À définir avec l’atelier" maxlength="300">${esc(draft.perforation.details||'')}</textarea></label><p class="field-hint">Le motif exact doit être confirmé par l’atelier.</p>`:''}
+  </div>`;
+}
 function renderColors(){const block=$('#production-color-fields');$('#color-system').value=colorSystem;if(colorSystem==='manufacturer'){block.innerHTML=`<div class="color-source-field"><label>Fabricant / produit de référence<select id="production-material"><option value="">Choisir le fabricant et le produit</option>${availableMaterials().map(m=>`<option value="${esc(m.id)}"${m.id===materialId?' selected':''}>${esc(m.brand+' · '+m.name)}</option>`).join('')}</select></label>${(chosenMaterial()?.colors||[]).length>20?`<label>Rechercher une teinte du fabricant<input id="production-color-search" class="color-search" type="search" placeholder="Nom ou code, ex. 56068, noir…" value="${esc(colorQuery)}"></label><p id="color-count" class="color-count"></p>`:""}<div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Couleurs du fabricant"></div><p class="field-hint">${kind==='panel'?'Références Unico publiées. La disponibilité du fini sur le calibre choisi reste à confirmer.':'Chaque échantillon appartient au nuancier de ce produit. L’offre sur votre pièce doit être confirmée.'}</p></div>`;renderColorGrid();}else if(colorSystem==='ral'){block.innerHTML=`<div class="color-source-field"><label>Rechercher un code RAL Classic<input id="production-color-search" class="color-search" type="search" placeholder="Ex. 7016, black, vert…" value="${esc(colorQuery)}"></label><label>Code de la couleur<select id="production-ral"><option value="">Choisir un code RAL</option>${ral.colors.map(c=>`<option value="${esc(c.id)}"${c.id===colorId?' selected':''}>${esc(c.code+' · '+(c.nameEn||c.name))}</option>`).join('')}</select></label><p id="color-count" class="color-count"></p><div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Codes RAL Classic"></div><p class="field-hint">${esc(ral.displayNotice||'Aperçu écran indicatif. Valider la teinte demandée sur un nuancier physique avant fabrication.')}</p></div>`;renderColorGrid();}else{block.innerHTML=`<div class="color-source-field"><label>Nuancier ou fabricant<input id="special-color-system" value="${esc(draft.finish?.system||'')}" maxlength="60" placeholder="Ex. Nuancier à préciser"></label><div class="two-fields"><label>Code exact<input id="special-color-code" value="${esc(draft.finish?.code||'')}" maxlength="80" placeholder="Référence demandée"></label><label>Nom de la couleur<input id="special-color-name" value="${esc(draft.finish?.name||'')}" maxlength="100" placeholder="Si connu"></label></div><p class="field-hint">Cette référence est une demande spéciale à faire confirmer. Aucun équivalent fabricant ni teinte numérique n’est inventé.</p></div>`;}updateFinish();applyStoreColorLock();}
 function renderColorGrid(){
  const grid=$('#production-color-grid');if(!grid)return;
@@ -1720,6 +1749,10 @@ function startProfileDrawing({fullscreen=true}={}){
  updateDrawing();
 }
 function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom]');if(!button)return;const d=button.dataset;
+ if(d.panelNoLip&&kind==='panel'&&!editingItemId){
+  draft.lips={...draft.lips,[d.panelNoLip]:'0'};
+  renderPanelOptions();updateDrawing();return;
+ }
  if(d.faceSelect){
   if(client||editingItemId||!['left','right'].includes(d.faceSelect))return;
   draft.coloredFace={...draft.coloredFace,side:d.faceSelect,segmentId:$('#profile-painted-segment')?.value||draft.coloredFace?.segmentId||'A'};
