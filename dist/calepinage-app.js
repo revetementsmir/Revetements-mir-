@@ -362,6 +362,51 @@
     if(shaped)out+='</g>';
     return '<g transform="translate('+d.g.left+' '+d.g.top+')">'+out+'</g>';
   }
+
+  /* Deux vues du même calcul, sans recalcul parallèle des quantités.
+   * Avant les cotes, seul un volume illustratif suit les points du croquis. */
+  function schematicWallVolume(points){
+    if(!Array.isArray(points)||points.length<3)return '<p class="hint mir-wall-live-empty">La vue 3D apparaîtra dès trois sommets.</p>';
+    const x=points.map(q=>q[0]),y=points.map(q=>q[1]),minX=Math.min(...x),maxX=Math.max(...x),
+      minY=Math.min(...y),maxY=Math.max(...y),spanX=Math.max(1,maxX-minX),spanY=Math.max(1,maxY-minY),
+      scale=Math.min(300/spanX,168/spanY);
+    const front=points.map(([a,b])=>[45+(a-minX)*scale,72+(b-minY)*scale]);
+    const behind=front.map(([a,b])=>[a+26,b-29]);
+    const str=poly=>poly.map(q=>q.map(v=>Math.round(v*100)/100).join(',')).join(' ');
+    let svg='<svg viewBox="0 0 440 285" role="img" aria-label="Volume 3D illustratif du contour non coté">';
+    svg+='<rect width="440" height="285" fill="#fafcf8"/><polygon points="'+str(behind)+'" fill="#d7e4c9" stroke="#6a8760" stroke-width="1.5"/>';
+    for(let i=0;i<front.length;i++){
+      const j=(i+1)%front.length;
+      svg+='<polygon points="'+str([front[i],front[j],behind[j],behind[i]])+'" fill="'+(i%2?'#a9c59c':'#bfd4b4')+'" stroke="#618252" stroke-width="1.2"/>';
+    }
+    svg+='<polygon points="'+str(front)+'" fill="#e5f0d8" stroke="#416c39" stroke-width="2.5"/>'+
+      '<text x="220" y="270" text-anchor="middle" font-size="14" fill="#456d43">FORME ILLUSTRATIVE · AUCUNE COTE INVENTÉE</text></svg>';
+    return svg;
+  }
+  function renderWallTwin(){
+    const twin=$('#mir-wall-live-3d');if(!twin)return;
+    const actual=layout.ok&&V;
+    const sketch=tool==='outline'&&outlineDraft.length>=3?outlineDraft:
+      Array.isArray(zone().shape?.sketchRatios)&&zone().shape.sketchRatios.length>=3?
+       zone().shape.sketchRatios.map(p=>[p[0]*100,p[1]*100]):null;
+    twin.hidden=!actual&&!sketch;
+    if(twin.hidden){twin.innerHTML='';return;}
+    if(actual){
+      const other2D=view==='3d';
+      twin.dataset.synchronizedRevision=String(zone().revision);
+      twin.dataset.pieceCount=String(layout.pieces.length);
+      const material=other2D?
+        '<svg viewBox="'+(-layout.widthIn*.07)+' '+(-layout.heightIn*.07)+' '+(layout.widthIn*1.14)+' '+(layout.heightIn*1.14)+'" role="img" aria-label="Vue 2D synchronisée du mur">'+panelDrawing()+'</svg>'
+        :(V.render(layout,{projectionIn:parse(zone().meta.projection),yaw:wallYaw,pitch:wallPitch,
+             selectedId:selected?.type==='piece'?selected.id:null,format:inch}).svg);
+      twin.innerHTML='<header><strong>'+(other2D?'2D du calepinage':'3D du calepinage')+
+       '</strong><small>'+layout.pieces.length+' panneaux · même révision</small></header>'+material;
+    }else{
+      twin.dataset.synchronizedRevision='unmeasured';
+      twin.dataset.pieceCount='0';
+      twin.innerHTML='<header><strong>Aperçu 3D du croquis</strong><small>Sans mesures</small></header>'+schematicWallVolume(sketch);
+    }
+  }
   function draw() {
     const z=zone(),s=z.source,d=dimensions(),svg=$('#layout-svg');
     document.body.classList.toggle('mir-wall-tracing',tool==='outline');
@@ -433,6 +478,7 @@
     }
     const vw=baseWidth/zoom,vh=baseHeight/zoom;
     svg.setAttribute('viewBox',[originX+(baseWidth-vw)/2,originY+(baseHeight-vh)/2,vw,vh].join(' '));svg.innerHTML=out;
+    renderWallTwin();
     svg.setAttribute('aria-label',valid?z.name+', '+layout.pieces.length+' panneaux, '+inch(layout.widthIn)+' par '+inch(layout.heightIn):'Zone à définir');
     $('#drawing-stage').dataset.tool=tool;$('#zoom-value').textContent=Math.round(zoom*100)+' %';
     $('#view-zone').setAttribute('aria-pressed',String(view==='zone'));$('#view-plan').setAttribute('aria-pressed',String(view==='plan'));$('#view-3d').setAttribute('aria-pressed',String(view==='3d'));
