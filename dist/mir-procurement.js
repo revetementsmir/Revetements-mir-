@@ -226,7 +226,7 @@
         '<section class="mir-proc-card mir-po-supplier-card"><h3>2. Fournisseur</h3><p>Choisis directement un des fournisseurs enregistrés. Le contact reste modifiable.</p>'+
         supplierQuickPick()+'</section>'+
         '<section class="mir-proc-card mir-po-project-card"><h3>3. Chantier et livraison</h3><div class="mir-po-fields">'+
-        field('poNumber','Numéro de bon','text','required maxlength="100"')+
+        '<div class="mir-po-number-field">'+field('poNumber','Numéro de bon','text','required maxlength="100"')+'<button type="button" id="mir-po-suggest-number" title="Proposer un numéro local modifiable">Proposer un numéro</button></div>'+
         field('job','Chantier / numéro de job','text','required maxlength="160"')+
         field('shipTo','Adresse de livraison ou cueillette','text','required maxlength="360"')+
         field('requestedDate','Date souhaitée','date')+
@@ -385,6 +385,13 @@
       state.suppliers=state.suppliers.filter(s=>s.id!==next.id).concat(next);
       if(save()){supplierEditing=next.id;ui.supplierId=next.id;switchTab('suppliers');}
     }
+    function suggestedPONumber(){
+      const date=new Date(),stamp=date.getFullYear().toString()+String(date.getMonth()+1).padStart(2,'0')+String(date.getDate()).padStart(2,'0');
+      const prefix='MIR-'+stamp+'-',used=new Set(state.orders.map(po=>String(po.poNumber||'').trim().toLowerCase()));
+      const current=currentOrder()?.poNumber;if(current)used.add(String(current).trim().toLowerCase());
+      let n=1;while(used.has((prefix+String(n).padStart(3,'0')).toLowerCase()))n++;
+      return prefix+String(n).padStart(3,'0');
+    }
     function newPo() {
       const supplier=state.suppliers.find(s=>s.id===ui.supplierId),dossier=currentOrder(),errs=validatePo(ui,supplier,dossier,win.MIRProduction).filter(text=>!/^(Vérifier le courriel|Adresse courriel du fournisseur)/.test(text));
       if(errs.length){const e=doc.querySelector('#mir-proc-error');e.hidden=false;e.innerHTML='<strong>À compléter :</strong><ul>'+errs.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>';return;}
@@ -465,6 +472,11 @@
       if(b.dataset.mirPoView){poView=b.dataset.mirPoView;switchTab('orders');return;}
       if(b.dataset.mirEdit){editSupplier(b.dataset.mirEdit);return;}
       if(b.id==='mir-new-supplier'){supplierEditing=null;switchTab('suppliers');return;}
+      if(b.id==='mir-po-suggest-number'){
+        const field=panel.querySelector('[data-mir-po="poNumber"]');if(!field)return;
+        if(field.value.trim()&&!win.confirm('Remplacer ce numéro de bon par une proposition locale ?'))return;
+        ui.poNumber=suggestedPONumber();field.value=ui.poNumber;autosave();field.focus();return;
+      }
       if(b.id==='mir-edit-lines'){switchTab('draw');doc.querySelector('#production-drawing')?.focus({preventScroll:true});return;}
       if(b.dataset.mirPoEditLine){if(win.MIRProductionWorkspace?.editOrderItem?.(b.dataset.mirPoEditLine))switchTab('draw');return;}
       if(b.dataset.mirPoSupplier){const supplier=state.suppliers.find(row=>row.id===b.dataset.mirPoSupplier&&!row.archived);if(!supplier)return;ui.supplierId=supplier.id;autosave();switchTab('orders');return;}
