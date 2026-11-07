@@ -173,7 +173,11 @@
       ymin=Math.min(...cut.map(q=>q[1])),ymax=Math.max(...cut.map(q=>q[1]));
     const mm=n=>number(Math.round(n*25.4*100)/100);
     const cutWidth=xmax-xmin,cutHeight=ymax-ymin;
+    const face=p.facePolygonIn?.length?p.facePolygonIn:null;
+    const faceWidth=face?Math.max(...face.map(q=>q[0]))-Math.min(...face.map(q=>q[0])):p.faceWidthIn;
+    const faceHeight=face?Math.max(...face.map(q=>q[1]))-Math.min(...face.map(q=>q[1])):p.faceHeightIn;
     return '<small>Coupe : '+esc(inch(cutWidth))+' × '+esc(inch(cutHeight))+'</small>'+
+      '<small>Face nette : '+esc(inch(faceWidth))+' × '+esc(inch(faceHeight))+'</small>'+
       '<small>Plan mm : '+mm(cutWidth)+' × '+mm(cutHeight)+'</small>';
   }
   function resetArchitectPreview(){
@@ -386,7 +390,8 @@
   function renderWallTwin(){
     const twin=$('#mir-wall-live-3d');if(!twin)return;
     const actual=layout.ok&&V;
-    const sketch=tool==='outline'&&outlineDraft.length>=3?outlineDraft:
+    const sketch=tool==='outline'&&outlineDraft.length>=2&&outlineCursor?[...outlineDraft,outlineCursor]:
+      tool==='outline'&&outlineDraft.length>=3?outlineDraft:
       Array.isArray(zone().shape?.sketchRatios)&&zone().shape.sketchRatios.length>=3?
        zone().shape.sketchRatios.map(p=>[p[0]*100,p[1]*100]):null;
     twin.hidden=!actual&&!sketch;
