@@ -31,7 +31,7 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
  let browser;
  try{
   await ready();browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
-  const viewports=[{name:'pc',w:1440,h:900},{name:'ipad',w:1024,h:768},{name:'phone',w:390,h:844}];
+  const viewports=[{name:'pc',w:1440,h:900},{name:'ipad-landscape',w:1024,h:768},{name:'ipad-portrait',w:820,h:1180},{name:'phone',w:390,h:844},{name:'phone-compact',w:360,h:780},{name:'phone-landscape',w:844,h:390}];
   for(const v of viewports){
    const page=await browser.newPage({viewport:{width:v.w,height:v.h},hasTouch:v.w<1100});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -41,12 +41,10 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    assert.equal(await page.locator('#drawing-stage').getAttribute('data-tool'),'outline','New section starts drawing tool');
    assert.equal(await page.locator('#zone-width').inputValue(),'');
    assert.equal(await page.locator('#zone-height').inputValue(),'');
-   if(v.w<741){
-    assert.equal(await page.locator('body.mir-wall-tracing').count(),1,'Phone full-height no scroll tracing');
-    const bounds=await page.evaluate(()=>({scroll:document.documentElement.scrollHeight,height:innerHeight,svg:document.getElementById('layout-svg').getBoundingClientRect().height}));
-    assert.ok(bounds.scroll<=bounds.height+4,'Phone no global page scroll during trace '+JSON.stringify(bounds));
-    assert.ok(bounds.svg>180,'Phone usable drawing canvas '+JSON.stringify(bounds));
-   }
+   assert.equal(await page.locator('body.mir-wall-tracing').count(),1,'Full-height tracing on every screen');
+   const bounds=await page.evaluate(()=>({scroll:document.documentElement.scrollHeight,height:innerHeight,svg:document.getElementById('layout-svg').getBoundingClientRect().height}));
+   assert.ok(bounds.scroll<=bounds.height+4,'No global scroll during tracing '+v.name+' '+JSON.stringify(bounds));
+   assert.ok(bounds.svg>(v.h<520?90:180),'Usable drawing canvas '+v.name+' '+JSON.stringify(bounds));
    await tap(page,240,165);await tap(page,760,165);await tap(page,760,515);await tap(page,240,515);
    assert.equal(await page.locator('#layout-svg .mir-wall-edge-label').count(),3,'Side A-B B-C C-D previewed');
    await page.screenshot({path:path.join(artifact,'mir-wall-trace-active-'+v.name+'.png'),fullPage:false});
