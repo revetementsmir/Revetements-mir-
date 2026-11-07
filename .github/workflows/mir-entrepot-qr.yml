@@ -5,7 +5,7 @@ on:
       - moon/mir-entrepot-qr-inventaire-20261107
   pull_request:
     branches:
-      - moon/ipad-atelier-trace-libre-20261107
+      - main
     paths:
       - 'dist/entrepot.*'
       - 'dist/mir-warehouse-*'
