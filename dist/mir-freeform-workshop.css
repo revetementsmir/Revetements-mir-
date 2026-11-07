@@ -329,3 +329,43 @@ body.mir-freeform-active .segment-actions [data-add-segment]{display:none!import
 body.mir-freeform-active .drawing-card:has(#production-drawing[data-tool="select"])
  .drawing-tools [data-draw-tool="draw"]{display:inline-flex!important}
 body.mir-freeform-active #mir-freeform-toolbar [data-freeform-next]::before{content:"";display:none}
+
+
+/* Fenêtre finale combinable : aucune étape de mesures/couleur n’est créée. */
+body.mir-admin-v4 #production-dialog .mir-continue-summary{
+ border:1px solid var(--mir-border,#dfe5dc);border-radius:8px;
+ background:var(--mir-surface,#fafaf7);padding:10px 13px;margin:8px 0 12px;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-summary strong{display:block;font-size:15px;color:var(--mir-ink,#18251d)}
+body.mir-admin-v4 #production-dialog .mir-continue-summary p{font-size:12px;line-height:1.4;color:var(--mir-muted,#5b695d);margin:5px 0 0}
+body.mir-admin-v4 #production-dialog .mir-continue-save-choice{
+ display:flex;align-items:flex-start;gap:12px;padding:13px;
+ background:var(--mir-soft,#f3f6f0);border:1px solid var(--mir-border,#dfe5dc);
+ border-radius:8px;margin:7px 0 11px;cursor:pointer;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-save-choice input{
+ width:23px;height:23px;flex:none;accent-color:var(--mir-accent,#348511);margin-top:0;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-save-choice span{display:block;min-width:0;}
+body.mir-admin-v4 #production-dialog .mir-continue-save-choice strong{font-size:14px;color:var(--mir-ink,#18251d)}
+body.mir-admin-v4 #production-dialog .mir-continue-save-choice small{display:block;font-size:12px;color:var(--mir-muted,#5b695d);line-height:1.45;margin-top:4px}
+body.mir-admin-v4 #production-dialog .mir-continue-actions{display:grid;gap:8px}
+body.mir-admin-v4 #production-dialog .mir-continue-actions button,
+body.mir-admin-v4 #production-dialog .mir-continue-existing button{
+ display:block;text-align:left;min-height:59px;border:1px solid #bfcbbf;
+ border-radius:7px;padding:12px 14px;background:#fff;
+ width:100%;font-family:Arial,Helvetica,sans-serif;cursor:pointer;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-actions button:hover,
+body.mir-admin-v4 #production-dialog .mir-continue-existing button:hover{
+ border-color:var(--mir-accent,#348511);background:#f2f7ee;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-actions button strong,
+body.mir-admin-v4 #production-dialog .mir-continue-existing button strong{display:block;color:var(--mir-ink,#18251d);font-weight:750}
+body.mir-admin-v4 #production-dialog .mir-continue-actions button small,
+body.mir-admin-v4 #production-dialog .mir-continue-existing button small{
+ display:block;color:var(--mir-muted,#5b695d);font-size:12px;font-weight:400;margin-top:3px;
+}
+body.mir-admin-v4 #production-dialog .mir-continue-existing{
+ display:grid;gap:7px;max-height:50dvh;overflow:auto;padding:2px;
+}
