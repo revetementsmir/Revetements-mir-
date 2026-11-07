@@ -12,6 +12,19 @@ declare result jsonb;begin
  return result;
 end$$;
 
+-- Liste d'anciens bons MIR encore modifiables pour le même fournisseur.
+create function public.mir_coordination_supplier_orders(org uuid,supplier uuid) returns jsonb
+language plpgsql stable security definer set search_path=pg_catalog,mir_core as $$
+declare result jsonb;begin
+ if not mir_core.coordination_allowed(org) then raise exception 'Adjointe MIR requise' using errcode='42501';end if;
+ select coalesce(jsonb_agg(jsonb_build_object('id',o.id,'job',coalesce(r.snapshot->>'job',''),
+  'number',coalesce(r.snapshot->>'poNumber',left(o.id::text,12))) order by o.created_at desc),'[]'::jsonb)
+ into result from mir_core.orders o left join mir_core.order_revisions r on
+ (r.organization_id,r.order_id,r.revision)=(o.organization_id,o.id,o.revision)
+ where o.organization_id=org and o.kind='supplier' and o.supplier_id=supplier and o.status='draft';
+ return result;
+end$$;
+
 create function public.mir_coordination_metadata(
  org uuid,coord_id uuid,expected_revision integer,vals jsonb,request_id uuid
 ) returns jsonb language plpgsql security definer set search_path=pg_catalog,mir_core as $$
@@ -123,6 +136,7 @@ end$$;
 
 do $$declare item record;begin
  for item in select * from (values
+  ('public.mir_coordination_supplier_orders(uuid,uuid)'),
   ('public.mir_coordination_suppliers(uuid)'),
   ('public.mir_coordination_metadata(uuid,uuid,integer,jsonb,uuid)'),
   ('public.mir_coordination_supplier_po(uuid,uuid,uuid,uuid,integer,uuid)'),
