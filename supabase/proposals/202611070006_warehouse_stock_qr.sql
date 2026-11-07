@@ -125,7 +125,7 @@ create function public.mir_warehouse_memberships() returns jsonb
 language plpgsql stable security definer set search_path=pg_catalog,mir_core as $$
 declare out jsonb;begin
  if auth.uid() is null then raise exception 'Connexion requise' using errcode='42501';end if;
- select coalesce(jsonb_agg(jsonb_build_object('id',o.id,'name',o.name)), '[]'::jsonb)
+ select coalesce(jsonb_agg(jsonb_build_object('id',o.id,'name',o.name,'isAdmin',mir_core.has_role(o.id,array['admin']))), '[]'::jsonb)
  into out from mir_core.organizations o where mir_core.warehouse_allowed(o.id);
  return out;
 end$$;
