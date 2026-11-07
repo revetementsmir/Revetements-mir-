@@ -167,7 +167,7 @@
     $('#piece-table').innerHTML=valid?layout.pieces.map(p=>'<tr class="'+(selected?.type==='piece'&&selected.id===p.id?'selected':'')+'"><td><button data-table-piece="'+p.id+'">'+p.id+'</button></td><td>Rangée '+(p.row+1)+' · colonne '+(p.col+1)+'</td><td>'+inch(p.widthIn)+'</td><td>'+inch(p.heightIn)+'</td><td>'+inch(layout.lipIn)+'</td><td>1</td></tr>').join(''):'<tr><td colspan="6">Entrez les dimensions et la largeur du lip pour calculer les panneaux.</td></tr>';
     $('#export-site').disabled=!valid||exporting;$('#send-production').disabled=!valid||exporting;$('#undo').disabled=!history.length;
     const contour=valid?(layout.config.contourIn||[[0,0],[layout.widthIn,0],[layout.widthIn,layout.heightIn],[0,layout.heightIn]]):[];
-    $('#wall-edge-list').innerHTML=valid?'<p class="hint">Contour utile après lousse · '+inch(layout.widthIn)+' × '+inch(layout.heightIn)+'. Angles mesurés dans le plan.</p><div class="table-wrap"><table><thead><tr><th>Côté du contour</th><th>Longueur réelle</th><th>Angle intérieur au départ</th></tr></thead><tbody>'+polygonMeasures(contour).map((e,i)=>'<tr><td>C'+(i+1)+'</td><td>'+inch(e.length)+'</td><td>'+number(e.angle)+'°</td></tr>').join('')+'</tbody></table></div>':'Entrez des mesures valides pour calculer le contour.';
+    $('#wall-edge-list').innerHTML=valid?'<p class="hint">Contour utile après lousse · '+inch(layout.widthIn)+' × '+inch(layout.heightIn)+'. Angles mesurés dans le plan.</p><div class="table-wrap"><table><thead><tr><th>Côté du contour</th><th>Longueur réelle</th><th>Angle intérieur au départ</th></tr></thead><tbody>'+polygonMeasures(contour).map((e,i)=>'<tr><td><button type="button" data-wall-edge="'+i+'" aria-label="Modifier le sommet du côté '+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'">'+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'</button></td><td>'+inch(e.length)+'</td><td>'+number(e.angle)+'°</td></tr>').join('')+'</tbody></table></div>':'Entrez des mesures valides pour calculer le contour.';
   }
   function renderInspector() {
     const valid=layout.ok,p=valid&&selected?.type==='piece'?layout.pieces.find(p=>p.id===selected.id):null,j=valid&&selected?.type==='joint'?selected:null;
@@ -296,7 +296,8 @@
     if(drag?.type==='draw'){const b=drag.box;out+='<rect x="'+b[0]+'" y="'+b[1]+'" width="'+b[2]+'" height="'+b[3]+'" fill="#adc79855" stroke="#456637" stroke-width="2" vector-effect="non-scaling-stroke"/>';}
     if(tool==='calibrate')calibrationPoints.forEach(p=>{out+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+Math.max(baseWidth/150,3)+'" fill="#bc7b35" stroke="white" stroke-width="2"/>';});
     if(tool==='outline'&&outlineDraft.length&&outlineCursor){
-      const start=outlineDraft.at(-1), end=outlinePoint(outlineCursor,outlineOrthogonal||outlineRightAngle);
+      const start=drag?.type==='outline'&&drag.added?outlineDraft.at(-2)||outlineDraft.at(-1):outlineDraft.at(-1),
+        end=outlinePoint(outlineCursor,outlineOrthogonal||outlineRightAngle,start);
       out+=svgLine(start[0],start[1],end[0],end[1],'data-outline-preview stroke="#ba7136" stroke-width="2" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" pointer-events="none"');
     }
     if(tool==='outline'&&outlineDraft.length){
@@ -326,8 +327,7 @@
     if(t.dataset.piece)return {type:'piece',id:t.dataset.piece};
     return {type:'joint',axis:t.hasAttribute('data-joint-x')?'x':'y',index:Number(t.getAttribute('data-joint-x')??t.getAttribute('data-joint-y'))};
   }
-  function outlinePoint(point, orthogonal) {
-    const last=outlineDraft.at(-1);
+  function outlinePoint(point, orthogonal, last=outlineDraft.at(-1)) {
     if(!orthogonal||!last)return point;
     const [x,y]=point, [lastX,lastY]=last, [firstX,firstY]=outlineDraft[0];
     const matrix=$('#layout-svg').getScreenCTM();
@@ -339,21 +339,51 @@
     const aligned=alignFirst&&Math.abs(y-firstY)*Math.abs(matrix?.d||1)<=12;
     return [lastX,aligned?firstY:y];
   }
+
+  function nearOutlinePoint(a,b,tolerance=13) {
+    if(!a||!b)return false;
+    const m=$('#layout-svg').getScreenCTM();
+    const sx=Math.hypot(m?.a||1,m?.b||0),sy=Math.hypot(m?.c||0,m?.d||1);
+    return Math.hypot((a[0]-b[0])*sx,(a[1]-b[1])*sy)<=tolerance;
+  }
+  function selectWallEdge(index) {
+    const pts=measuredPoints(),d=dimensions();
+    if(!Number.isInteger(index)||index<0||index>=pts.length)return;
+    if(!(d.width>0&&d.height>0))return toast('Entrez les cotes chantier avant de modifier les côtés.');
+    const endpoint=(index+1)%pts.length;
+    const controls=$('#wall-coordinate-details');
+    if(controls)controls.open=true;
+    $('#wall-vertex').value=String(endpoint);
+    $('#wall-vertex').dispatchEvent(new Event('change'));
+    $('#vertex-x').focus({preventScroll:false});
+    toast('Côté '+wallLetter(index)+'–'+wallLetter(endpoint)+' : modifiez les cotes du sommet '+wallLetter(endpoint)+', puis cliquez Appliquer.');
+  }
   function onPointerDown(event) {
     if(event.button!==0)return;const p=svgPoint(event);if(!p)return;
     if(tool==='outline'){
       event.preventDefault();
-      const next=outlinePoint(p,event.shiftKey||outlineRightAngle), first=outlineDraft[0], last=outlineDraft.at(-1);
-      if(last&&Math.hypot(last[0]-next[0],last[1]-next[1])<1e-7)return;
-      if((event.shiftKey||outlineRightAngle)&&outlineDraft.length>=3&&next[0]===first[0]&&next[1]===first[1])return closeOutline();
-      if(outlineDraft.length>=64)return toast('Le contour accepte jusqu’à 64 sommets.');
-      outlineCursor=null;outlineDraft.push(next);draw();return;
+      const first=outlineDraft[0],last=outlineDraft.at(-1),hadBefore=outlineDraft.length>0;
+      if(outlineDraft.length>=3&&nearOutlinePoint(p,first))return closeOutline();
+      const onLast=last&&nearOutlinePoint(p,last,9);
+      if(outlineDraft.length>=64&&!onLast)return toast('Le contour accepte jusqu’à 64 sommets.');
+      let added=false;
+      if(!onLast){
+        const next=outlinePoint(p,event.shiftKey||outlineRightAngle);
+        if(!last||Math.hypot(last[0]-next[0],last[1]-next[1])>1e-7){
+          outlineDraft.push(next);added=true;
+        }
+      }
+      drag={type:'outline',pointerId:event.pointerId,x:event.clientX,y:event.clientY,added,hadBefore};
+      $('#drawing-stage').setPointerCapture(event.pointerId);
+      outlineCursor=null;draw();return;
     }
     if(view==='3d'){
       drag={type:'orbit',start:[event.clientX,event.clientY],yaw:wallYaw,pitch:wallPitch,moved:false,selection:picked(event)};$('#drawing-stage').setPointerCapture(event.pointerId);event.preventDefault();return;
     }
     if(tool==='calibrate'){calibrationPoints.push(p);if(calibrationPoints.length===2)finishCalibration();else draw();return;}
     if(tool==='draw'){drag={type:'draw',start:p,box:[p[0],p[1],0,0]};$('#drawing-stage').setPointerCapture(event.pointerId);event.preventDefault();draw();return;}
+    const wallSide=event.target.closest('[data-wall-edge]');
+    if(wallSide&&tool==='select'){event.preventDefault();selectWallEdge(Number(wallSide.dataset.wallEdge));return;}
     const selection=picked(event);if(!selection||!layout.ok)return;selected=selection;
     if(selection.type==='joint'&&transform){drag={type:'joint',axis:selection.axis,index:selection.index,original:clone(layout.config),baseWorkspace:clone(workspace),moved:false,lastResult:layout};$('#drawing-stage').setPointerCapture(event.pointerId);event.preventDefault();}
     renderInspector();renderSummary();draw();
@@ -373,6 +403,24 @@
   function finishPointer(event,cancelled=false) {
     if(!drag)return;const current=drag;drag=null;
     if($('#drawing-stage').hasPointerCapture(event.pointerId))$('#drawing-stage').releasePointerCapture(event.pointerId);
+    if(current.type==='outline'){
+      if(cancelled){if(current.added)outlineDraft.pop();outlineCursor=null;draw();return;}
+      const moved=Math.hypot(event.clientX-current.x,event.clientY-current.y)>9;
+      if(moved){
+        const p=svgPoint(event),anchor=current.added?outlineDraft.at(-2):outlineDraft.at(-1);
+        if(p){
+          const next=outlinePoint(p,event.shiftKey||outlineRightAngle,anchor);
+          if(!current.hadBefore&&current.added&&outlineDraft.length===1){
+            if(!nearOutlinePoint(next,outlineDraft[0],8))outlineDraft.push(next);
+          }else if(current.added&&outlineDraft.length){
+            if(anchor&&!nearOutlinePoint(next,anchor,7))outlineDraft[outlineDraft.length-1]=next;
+            else outlineDraft.pop();
+          }else if(outlineDraft.length<64&&(!anchor||!nearOutlinePoint(next,anchor,7)))
+            outlineDraft.push(next);
+        }
+      }
+      outlineCursor=null;draw();return;
+    }
     if(current.type==='orbit'){if(cancelled){wallYaw=current.yaw;wallPitch=current.pitch;}else if(!current.moved&&current.selection){selected=current.selection;renderInspector();renderSummary();}draw();return;}
     if(current.type==='joint'){
       if(cancelled){workspace=current.baseWorkspace;render();return;}
@@ -511,6 +559,7 @@
     for(const [key,id] of [['leftHeight','wall-left-height'],['rightHeight','wall-right-height'],['peakX','wall-peak-x']])$('#'+id).onchange=()=>commit(z=>{z.shape={...z.shape,[key]:$('#'+id).value};});
     $('#center-peak').onclick=()=>{const d=dimensions();if(d.width>0)commit(z=>{z.shape={...z.shape,peakX:val(d.width/2)};});};
     $('#wall-vertex').onchange=()=>{const p=measuredPoints()[Number($('#wall-vertex').value)],d=dimensions();if(p){$('#vertex-x').value=val(p[0]);$('#vertex-height').value=val(d.height-p[1]);}};
+    $('#wall-edge-list').addEventListener('click',e=>{const b=e.target.closest('[data-wall-edge]');if(b)selectWallEdge(Number(b.dataset.wallEdge));});
     $('#apply-vertex').onclick=applyVertex;
     $('#outline-right-angle').onclick=()=>{outlineRightAngle=!outlineRightAngle;draw();};
     $('#start-free-outline').onclick=beginOutline;$('#draw-outline').onclick=beginOutline;
@@ -560,7 +609,7 @@
     window.addEventListener('keydown',updateOutlineModifier);
     window.addEventListener('keyup',updateOutlineModifier);
     stage.addEventListener('keydown',e=>{if(tool!=='outline')return;if(e.key==='Escape'){e.preventDefault();outlineDraft=[];tool='select';draw();}else if(e.key==='Enter'){e.preventDefault();closeOutline();}else if(e.key==='Backspace'){e.preventDefault();outlineDraft.pop();draw();}});
-    stage.addEventListener('keydown',e=>{const s=picked(e);if(!s||!layout.ok)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();selected=s;renderInspector();draw();}else if(s.type==='joint'&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();selected=s;const pos=(s.axis==='x'?layout.xAxesIn:layout.yAxesIn)[s.index],sign=['ArrowLeft','ArrowUp'].includes(e.key)?-1:1;configFromResult(E.moveJoint(layout.config,s.axis,s.index,pos+sign*(e.shiftKey?1:1/16)));$('#layout-svg').querySelector('[data-joint-'+s.axis+'="'+s.index+'"]')?.focus();}});
+    stage.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)&&e.target.closest('[data-wall-edge]')){e.preventDefault();selectWallEdge(Number(e.target.closest('[data-wall-edge]').dataset.wallEdge));return;}const s=picked(e);if(!s||!layout.ok)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();selected=s;renderInspector();draw();}else if(s.type==='joint'&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();selected=s;const pos=(s.axis==='x'?layout.xAxesIn:layout.yAxesIn)[s.index],sign=['ArrowLeft','ArrowUp'].includes(e.key)?-1:1;configFromResult(E.moveJoint(layout.config,s.axis,s.index,pos+sign*(e.shiftKey?1:1/16)));$('#layout-svg').querySelector('[data-joint-'+s.axis+'="'+s.index+'"]')?.focus();}});
     $('#piece-table').addEventListener('click',e=>{const b=e.target.closest('[data-table-piece]');if(!b)return;selected={type:'piece',id:b.dataset.tablePiece};renderInspector();renderSummary();draw();$('#selection-title').scrollIntoView({behavior:'smooth',block:'center'});});
     $('#import-pdf').onclick=()=>$('#pdf-file').click();$('#pdf-file').onchange=e=>attachPDF(e.target.files[0]);
     $('#pdf-page').onchange=()=>showPDFPage(Number($('#pdf-page').value));
