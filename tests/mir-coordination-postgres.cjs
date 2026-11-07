@@ -103,12 +103,48 @@ const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
    [org,co,supplierRoute.id,uuid(160)]))[0].result;
   assert.equal(samePO.supplierOrderId,poResult.supplierOrderId);
   ok('Bon fournisseur réel réutilise les tables MIR, sans doublon ni envoi automatique');
-  const received=(await actor(assistant,'select public.mir_coordination_supplier_receive($1,$2,$3,3,6,$4) as result',
+  const ordered=(await db.query('select production_status from mir_core.coordination_routes where organization_id=$1 and id=$2',
+   [org,supplierRoute.id])).rows[0].production_status;
+  assert.equal(ordered,'ordered','un bon brouillon place la fabrication à commandé');
+  const inProduction=(await actor(assistant,'select public.mir_coordination_supplier_status($1,$2,$3,$4,6,$5) as result',
+   [org,co,supplierRoute.id,'in_production',uuid(163)]))[0].result;
+  assert.equal(inProduction.state,'in_production');
+  const ready=(await actor(assistant,'select public.mir_coordination_supplier_status($1,$2,$3,$4,7,$5) as result',
+   [org,co,supplierRoute.id,'ready',uuid(164)]))[0].result;
+  assert.equal(ready.state,'ready');
+  await failAs(assistant,'select public.mir_coordination_supplier_status($1,$2,$3,$4,8,$5)',
+   [org,co,supplierRoute.id,'ordered',uuid(165)],/revenir en arrière/);
+  ok('Statuts de production externe commandé, fabrication et prêt avec progression auditée');
+  const received=(await actor(assistant,'select public.mir_coordination_supplier_receive($1,$2,$3,3,8,$4) as result',
    [org,co,supplierRoute.id,uuid(161)]))[0].result;
   assert.equal(Number(received.remainingQty),2);
-  await failAs(assistant,'select public.mir_coordination_supplier_receive($1,$2,$3,3,7,$4)',
+  assert.equal((await db.query('select production_status from mir_core.coordination_routes where organization_id=$1 and id=$2',
+   [org,supplierRoute.id])).rows[0].production_status,'received_partial');
+  await failAs(assistant,'select public.mir_coordination_supplier_receive($1,$2,$3,3,9,$4)',
    [org,co,supplierRoute.id,uuid(162)],/supérieure/);
-  ok('Réception externe partielle et reliquat, distincts de la sortie QR Entrepôt');
+  await failAs(assistant,'select public.mir_coordination_supplier_status($1,$2,$3,$4,9,$5)',
+   [org,co,supplierRoute.id,'ordered',uuid(166)],/Réception déjà commencée/);
+  ok('Réception externe partielle conserve le reliquat et interdit de réinitialiser la fabrication');
+  const final=(await actor(assistant,'select public.mir_coordination_supplier_receive($1,$2,$3,2,9,$4) as result',
+   [org,co,supplierRoute.id,uuid(167)]))[0].result;
+  assert.equal(Number(final.remainingQty),0);
+  assert.equal((await db.query('select production_status from mir_core.coordination_routes where organization_id=$1 and id=$2',
+   [org,supplierRoute.id])).rows[0].production_status,'received');
+  ok('Réception complète de la production externe, sans mouvement de stock Entrepôt supplémentaire');
+  const secondOrder=uuid(62);
+  await db.query('insert into mir_core.orders(organization_id,id,kind,owner_id) values($1,$2,$3,$4)',
+   [org,secondOrder,'employee',employee]);
+  await db.query('insert into mir_core.order_revisions(organization_id,order_id,revision,snapshot,created_by) values($1,$2,1,$3,$4)',
+   [org,secondOrder,{job:'Chantier secondaire'},employee]);
+  await db.query('insert into mir_core.order_lines(organization_id,order_id,revision,quantity,unit,specification) values($1,$2,1,4,$3,$4)',
+   [org,secondOrder,'tube',{name:'Tube Mono',stockKey}]);
+  const fresh=(await actor(assistant,'select public.mir_coordination_open($1,$2) as result',[org,secondOrder]))[0].result;
+  const metadata=(await actor(assistant,'select public.mir_coordination_metadata($1,$2,1,$3,$4) as result',
+   [org,fresh.id,{job:'JOB 454',address:'456 rue du chantier',team:'Équipe B',priority:'urgent',notes:'Porte arrière'},uuid(168)]))[0].result;
+  assert.equal(metadata.revision,2);
+  const detailMeta=(await actor(assistant,'select public.mir_coordination_detail($1,$2) as result',[org,fresh.id]))[0].result;
+  assert.equal(detailMeta.job,'JOB 454');assert.equal(detailMeta.team,'Équipe B');
+  ok('Adjointe modifie le job, l’adresse, la priorité et l’équipe via SQL');
   await failAs(employee,'select * from mir_core.coordination_ops',[],/permission|denied/i);
   ok('Aucun accès direct aux opérations');
   console.log('MIR coordination PostgreSQL: '+checks+' tests réussis; simulation Auth, AUCUN service hébergé.');
