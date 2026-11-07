@@ -102,4 +102,16 @@ check('Invalid JSON est refusé sans toucher aux notes existantes',()=>{
  assert.throws(()=>Review.importAnnotations('{}',old),/incompatible/);
  assert.equal(old.annotations['mir-request-adfast'],'À conserver');
 });
+check('Aperçu de revue chargé sans accès aux données client',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const html=fs.readFileSync(path.join(__dirname,'../dist/magasin-revue.html'),'utf8');
+ const script=fs.readFileSync(path.join(__dirname,'../dist/magasin-revue.js'),'utf8');
+ assert.match(html,/Mode revue uniquement/);
+ assert.match(html,/mir-store-review\.js/);
+ assert.match(html,/magasin-revue\.js/);
+ assert.match(script,/Store\.configureLine/);
+ assert.match(script,/Review\.importAnnotations/);
+ assert.match(script,/Review\.present\(catalogue,\{demo:true\}\)/);
+ assert.doesNotMatch(script,/service_role|sb_secret_/i);
+});
 console.log('MIR magasin: '+tests+' vérifications réussies.');
