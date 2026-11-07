@@ -1,0 +1,42 @@
+name: MIR — panneau seul, pente 6/12 et 2D/3D synchronisées
+on:
+  push:
+    branches:
+      - moon/mir-panneau-seul-clean-20261107
+  pull_request:
+    branches: [main]
+    paths:
+      - 'dist/production*'
+      - 'dist/mir-panel-roof.js'
+      - 'dist/mir-panel-sketch.js'
+      - 'tests/mir-panel-roof-lips.cjs'
+      - 'tests/mir-single-panel-live-browser.cjs'
+      - '.github/workflows/mir-single-panel-live-pr.yml'
+permissions:
+  contents: read
+jobs:
+  single-panel:
+    name: Pente X/12, lips par côté, tracé libre et double vue
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax, shape calculation and legacy regression
+        run: |
+          node --check dist/production-app.js
+          node --check dist/production-model.js
+          node --check dist/production-volume.js
+          node --check dist/mir-panel-roof.js
+          node --check dist/mir-panel-sketch.js
+          node --check tests/mir-panel-roof-lips.cjs
+          node --check tests/mir-single-panel-live-browser.cjs
+          node tests/mir-panel-roof-lips.cjs
+      - name: Real browser PC, iPad and phone
+        run: |
+          npm install --no-save playwright@1.58.2
+          node tests/mir-single-panel-live-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-single-panel-live-captures
+          path: artifacts/mir-single-*.png
+          if-no-files-found: ignore
