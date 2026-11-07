@@ -143,7 +143,18 @@ function renderDimensions(){
   input.insertAdjacentHTML('afterend','<small class="mir-default-readonly">Mesure fixe du magasin MIR</small>');
  }
 }
-function bendFields(bend,index,expanded){const b=bend||{mode:'interior',angle:90,direction:'left'};if(client||editingItemId)return `<p class="field-hint">Pli ${index+1} : ${b.mode==='hem'?'retour écrasé 180°':esc(b.angle)+'° '+(b.mode==='interior'?'intérieur':'de rotation')}${b.direction?' · '+(b.direction==='left'?'gauche':'droite'):''} · défini par le modèle</p>`;return `<details class="angle-details" data-angle-details="${index}"${expanded||draft.bends.length===1?' open':''}><summary>Pli ${esc(draft.segments[index].label)} → ${esc(draft.segments[index+1].label)}</summary><div class="bend-fields"><label>Type du pli<select data-bend-mode="${index}"><option value="interior"${b.mode==='interior'?' selected':''}>Angle intérieur</option><option value="signed"${b.mode==='signed'?' selected':''}>Rotation signée</option><option value="hem"${b.mode==='hem'?' selected':''}>Retour écrasé 180°</option></select></label><label>Angle (°)<input data-bend-angle="${index}" type="number" step="any" value="${esc(b.mode==='hem'?180:b.angle)}"${b.mode==='hem'?' disabled':''}></label><label>Sens<select data-bend-direction="${index}"${b.mode==='signed'?' disabled':''}><option value="left"${b.direction==='left'?' selected':''}>Gauche</option><option value="right"${b.direction==='right'?' selected':''}>Droite</option></select></label></div></details>`;}
+function bendFields(bend,index,expanded){
+ const b=bend||{mode:'interior',angle:90,direction:'left'};
+ if(client||editingItemId)return `<p class="field-hint">Pli ${index+1} : ${b.mode==='hem'?'retour écrasé 180°':esc(b.angle)+'° '+(b.mode==='interior'?'intérieur':'de rotation')}${b.direction?' · '+(b.direction==='left'?'gauche':'droite'):''} · défini par le modèle</p>`;
+ const sense=b.mode==='signed'?
+  '<p class="field-hint">Le signe de l’angle indique le sens de la rotation.</p>':
+  bendChoiceMarkup('bend-direction-'+index,b.direction||'left',b.mode==='hem'?180:b.angle,{index,legend:'Sens du pli '+(index+1)});
+ return `<details class="angle-details" data-angle-details="${index}"${expanded||draft.bends.length===1?' open':''}><summary>Pli ${esc(draft.segments[index].label)} → ${esc(draft.segments[index+1].label)}</summary>
+ <div class="bend-fields mir-bend-controls">
+ <label>Type du pli<select data-bend-mode="${index}"><option value="interior"${b.mode==='interior'?' selected':''}>Angle intérieur</option><option value="signed"${b.mode==='signed'?' selected':''}>Rotation signée</option><option value="hem"${b.mode==='hem'?' selected':''}>Retour écrasé 180°</option></select></label>
+ <label>Angle (°)<input data-bend-angle="${index}" type="number" step="any" value="${esc(b.mode==='hem'?180:b.angle)}"${b.mode==='hem'?' disabled':''}></label>
+ </div>${sense}</details>`;
+}
 function renderProfileOptions(){
  if(kind!=='profile'||authoring){$('#production-profile-options').innerHTML='';return;}
  const labels=draft.template==='custom'?(draft.segments||[]).map(s=>s.label):M.TEMPLATES[draft.template]?.labels||[];
@@ -1078,7 +1089,34 @@ function toCustom(points,base=draft){
  return spec;
 }
 function unlockCustom(){if(client||editingItemId){toast('Cette pièce conserve la forme de son modèle. Modifiez les cotes ou créez un nouveau modèle.');return false;}const model=build();if(!model.valid){toast('Complétez les cotes de section pour modifier sa forme.');return false;}if(draft.template!=='custom'){draft={...draft,template:'custom',segments:model.segments.map(s=>({label:s.label,name:s.name,length:fmt(unitValue(s.lengthMM,draft.unit))})),bends:model.bends.map(b=>({mode:b.mode,angle:b.angle,direction:b.direction})),startAngle:model.segments[0].headingDeg};delete draft.dimensions;}return true;}
-function doubleFoldDialog(){if(client||editingItemId)return toast('Créez une nouvelle version du modèle pour modifier sa forme.');const model=build();if(!model.valid)return toast('Renseignez la section avant d’ajouter deux plis.');dialog('Ajouter un double pli','Remplacez un côté par trois segments : avant le pli, entre les deux plis et après le second. Ces deux plis sont distincts d’un retour écrasé de 180°.',`<form id="double-fold-form" class="dialog-form"><label>Côté à remplacer<select name="segmentIndex">${model.segments.map((s,i)=>`<option value="${i}">${esc(s.label+' · '+M.formatMeasurement(s.lengthMM,model.unit))}</option>`).join('')}</select></label><div class="three-fields"><label>Avant le premier pli<input name="beforeLength" inputmode="decimal" required></label><label>Entre les deux plis<input name="betweenLength" inputmode="decimal" required></label><label>Après le second pli<input name="afterLength" inputmode="decimal" required></label></div><div class="two-fields"><label>Angle intérieur du pli 1<input name="firstAngle" type="number" value="90" min="0.1" max="180" step="any" required></label><label>Sens du pli 1<select name="firstDirection"><option value="left">Gauche</option><option value="right">Droite</option></select></label></div><div class="two-fields"><label>Angle intérieur du pli 2<input name="secondAngle" type="number" value="90" min="0.1" max="180" step="any" required></label><label>Sens du pli 2<select name="secondDirection"><option value="right">Droite</option><option value="left">Gauche</option></select></label></div><p class="field-hint">${authoring?'Proportions illustratives : aucune cote de commande ne sera publiée.':'Mesures de pièce finie en '+(draft.unit==='mm'?'millimètres':'pouces')+'.'}</p><p id="production-dialog-error" class="dialog-error" role="alert"></p><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button><button type="submit" class="primary-button">Ajouter les deux plis</button></div></form>`);}
+function doubleFoldDialog(){
+ if(client||editingItemId)return toast('Créez une nouvelle version du modèle pour modifier sa forme.');
+ const model=build();if(!model.valid)return toast('Renseignez la section avant d’ajouter deux plis.');
+ dialog('Ajouter deux plis consécutifs',
+  'Choisissez les cotes et le sens de chaque pli en touchant ou cliquant sur le dessin. Ces deux plis sont différents d’un retour écrasé de 180°.',
+  `<form id="double-fold-form" class="dialog-form">
+   <label>Côté à remplacer<select name="segmentIndex">${model.segments.map((segment,i)=>`<option value="${i}">${esc(segment.label+' · '+M.formatMeasurement(segment.lengthMM,model.unit))}</option>`).join('')}</select></label>
+   <div class="three-fields">
+   <label>Avant le premier pli<input name="beforeLength" inputmode="decimal" required></label>
+   <label>Entre les deux plis<input name="betweenLength" inputmode="decimal" required></label>
+   <label>Après le second pli<input name="afterLength" inputmode="decimal" required></label>
+   </div>
+   <label>Angle intérieur du pli 1 (°)<input name="firstAngle" type="number" value="90" min="0.1" max="180" step="any" required></label>
+   ${bendChoiceMarkup('firstDirection','left',90,{legend:'Sens du premier pli'})}
+   <label>Angle intérieur du pli 2 (°)<input name="secondAngle" type="number" value="90" min="0.1" max="180" step="any" required></label>
+   ${bendChoiceMarkup('secondDirection','right',90,{legend:'Sens du deuxième pli'})}
+   <p class="field-hint">Schémas du sens des angles, sans modification des cotes. ${authoring?'Proportions illustratives : aucune cote de commande ne sera publiée.':'Mesures de pièce finie en '+(draft.unit==='mm'?'millimètres':'pouces')+'.'}</p>
+   <p id="production-dialog-error" class="dialog-error" role="alert"></p>
+   <div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button><button type="submit" class="primary-button">Ajouter les deux plis</button></div>
+  </form>`);
+ const form=$('#double-fold-form');
+ for(const prefix of ['first','second']){
+  const input=form.elements.namedItem(prefix+'Angle');
+  input?.addEventListener('input',()=>{
+   form.querySelectorAll('[data-bend-pick="'+prefix+'Direction"] [data-bend-icon]').forEach(icon=>{icon.innerHTML=bendTurnSketch(icon.dataset.bendIcon,input.value);});
+  });
+ }
+}
 /* Seul le SVG du tableau produit des nouveaux côtés. La sortie du
  * tableau annule le geste, y compris avec la capture du pointeur tactile. */
 function drawingCanvasHit(event,{targetRequired=true}={}){
@@ -1347,6 +1385,30 @@ function hemChoiceSketch(spec,direction,atStart=false){
   '<circle cx="'+fmt(endpoint[0])+'" cy="'+fmt(endpoint[1])+'" r="5" fill="#ad5010"/>'+
   '<text x="145" y="148" text-anchor="middle" font-size="12" fill="#995c23">Orange = retour écrasé</text></svg>';
 }
+/* Même composant de direction sur PC, téléphone et tablette. */
+function bendTurnSketch(direction,angle=90){
+ const numeric=Number(angle), interior=Number.isFinite(numeric)&&numeric>0&&numeric<=180?numeric:90;
+ const turn=(180-interior)*Math.PI/180,pivot=[115,76];
+ const end=[pivot[0]+72*Math.cos(turn),pivot[1]+(direction==='left'?-1:1)*72*Math.sin(turn)];
+ return '<svg viewBox="0 0 240 158" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Illustration du pli vers '+(direction==='left'?'la gauche':'la droite')+'">'
+  +'<rect x="1" y="1" width="238" height="156" rx="12" fill="#f7faf5"/>'
+  +'<path d="M 22,76 L 115,76" stroke="#536c61" stroke-width="7" stroke-linecap="round" fill="none"/>'
+  +'<path d="M 115,76 L '+end.map(fmt).join(' ')+'" stroke="#d27b25" stroke-width="8" stroke-linecap="round" fill="none"/>'
+  +'<circle cx="115" cy="76" r="6" fill="#28553a"/>'
+  +'<circle cx="'+fmt(end[0])+'" cy="'+fmt(end[1])+'" r="5" fill="#b25c11"/>'
+  +'<text x="120" y="148" fill="#805026" font-size="12" text-anchor="middle">Orange = côté replié</text></svg>';
+}
+function bendChoiceMarkup(name,selected,angle,{index=null,legend='Sens du pli'}={}){
+ const options=['left','right'].map((direction,i)=>{
+  const extra=index===null?'':' data-bend-direction="'+index+'"';
+  return '<label class="mir-bend-option"><input type="radio" name="'+esc(name)+'" value="'+direction+'"'+extra+
+   (selected===direction?' checked':'')+' required aria-label="'+esc(legend+(direction==='left?' vers la gauche':' vers la droite'))+'">'+
+   '<span class="mir-bend-diagram" data-bend-icon="'+direction+'">'+bendTurnSketch(direction,angle)+'</span>'+
+   '<strong>Choix '+(i+1)+' · '+(direction==='left'?'Gauche':'Droite')+'</strong></label>';
+ }).join('');
+ return '<fieldset class="mir-bend-direction" data-bend-pick="'+esc(name)+'"><legend>'+esc(legend)+'</legend>'+
+  '<div class="mir-bend-direction-grid" role="radiogroup" aria-label="'+esc(legend)+'">'+options+'</div></fieldset>';
+}
 function appendTracePoint(point, start){
  if(drawPoints.length>=27)return toast('Un profil peut contenir au maximum 26 segments.');
  const last=drawPoints.at(-1);
@@ -1354,17 +1416,8 @@ function appendTracePoint(point, start){
  const points=!last&&start?[start,point]:[...drawPoints,point];
  const spec=toCustom(points);
  const bend=spec?.bends.at(-1);
- if(bend?.mode==='hem'&&clientProfileWizard()){
-  dialog('Vers où revient le pli ?','Choisissez le sens du repli en suivant le tracé. La face colorée se choisit à l’étape 4.',
-   '<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button><button type="button" class="secondary-button" value="left">À gauche du tracé</button><button type="button" class="primary-button" value="right">À droite du tracé</button></div>');
-  for(const button of $('#production-dialog-content').querySelectorAll('button[value]')){
-   button.onclick=()=>{bend.direction=button.value;closeDialog();commitTrace(points,spec);};
-  }
-  return;
- }
  if(bend?.mode==='hem'){
-  // Le côté de la couleur sera demandé à l'étape 3 du guidage.
-  // Ici, seul le sens du retour écrasé est choisi visuellement.
+  // Même question illustrée sur tous les appareils, client et admin; la couleur se règle séparément.
   const button=direction=>{
     const candidate=copy(spec);
     candidate.bends.at(-1).direction=direction;
@@ -1373,7 +1426,7 @@ function appendTracePoint(point, start){
       '<strong>Choix '+(direction==='left'?'1':'2')+'</strong><small>Choisir ce sens de repli</small></button>';
   };
   dialog('De quel côté replier le bord ?',
-   'Compare les deux dessins. L’orange montre le retour écrasé; la face colorée sera choisie ensuite.',
+   'Compare les deux dessins : l’orange montre le retour écrasé. Le côté coloré se choisit séparément.',
    '<div class="mir-hem-choice-grid" role="group" aria-label="Choix du sens du retour">'+button('left')+button('right')+'</div>'+
    '<p class="mir-hem-note">Le décalage orange sert seulement à montrer le sens du repli; il ne change pas les mesures.</p>'+
    '<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button></div>');
@@ -1754,7 +1807,7 @@ function handleInput(event){const e=event.target,d=e.dataset;
  }
  if(d.measure){if(kind==='profile'&&d.measure!=='length'){draft.dimensions=draft.dimensions||{};draft.dimensions[d.measure]=e.value;}else draft[d.measure]=e.value;if(kind==='panel'&&draft.shape==='square'&&d.measure==='width')draft.height=e.value;updateDrawing({keepForm:true});return;}
  if(d.segmentLength!==undefined){draft.segments[Number(d.segmentLength)].length=e.value;jException=null;renderProfileOptions();updateDrawing({keepForm:true});return;}
- if(d.bendAngle!==undefined){if(client||editingItemId)return;draft.bends[Number(d.bendAngle)].angle=e.value===''?'':Number(e.value);updateDrawing({keepForm:true});return;}
+ if(d.bendAngle!==undefined){if(client||editingItemId)return;draft.bends[Number(d.bendAngle)].angle=e.value===''?'':Number(e.value);e.closest('details[data-angle-details]')?.querySelectorAll('[data-bend-icon]').forEach(icon=>{icon.innerHTML=bendTurnSketch(icon.dataset.bendIcon,e.value);});updateDrawing({keepForm:true});return;}
  if(d.panelLip){draft.lips=draft.lips||{};if(e.value.trim())draft.lips[d.panelLip]=e.value;else delete draft.lips[d.panelLip];updateDrawing({keepForm:true});return;}
  if(e.id==='panel-lip'){draft.lip=e.value;updateDrawing({keepForm:true});return;}
  if(e.id==='panel-perforation-details'){draft.perforation.details=e.value;updateDrawing({keepForm:true});return;}
