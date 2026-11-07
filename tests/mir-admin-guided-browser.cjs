@@ -22,7 +22,7 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
   await ready();
   browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
   const sizes=[{name:'bureau',width:1440,height:900},{name:'tablette',width:1024,height:768},
-   {name:'tablette-portrait',width:768,height:1024},{name:'mobile',width:390,height:844}];
+   {name:'tablette-portrait',width:768,height:1024},{name:'mobile',width:390,height:844},{name:'mobile-paysage',width:844,height:390}];
   for(const size of sizes){
    const context=await browser.newContext({viewport:{width:size.width,height:size.height},hasTouch:size.width<1100});
    const page=await context.newPage(),errors=[];
@@ -32,7 +32,7 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    const nav=await page.locator('#mir-procurement-tabs button').allTextContents();
    assert.deepEqual(nav,['Créer','Mes pliages','Boutique','Magasin employés','Bons de commande']);
    assert.equal(await page.locator('#mir-guide-steps').count(),0,'ancien assistant retiré');
-   const phone=size.width<=650;
+   const phone=size.width<=650||size.width<=950&&size.height<=520;
    assert.equal(await page.locator('#mir-mobile-steps').isVisible(),phone,'4 étapes réservées au téléphone');
    assert.equal(await page.locator('#production-templates [data-template]').count(),0,'aucun profil prédéfini');
    assert.equal(await page.locator('.mir-v4-picker').isVisible(),false,'ancien sélecteur masqué');
