@@ -98,7 +98,7 @@ async function verifyMouldingWizard(browser,base,artifacts){
  await soffit.waitForFunction(()=>!!window.MIRProductionWorkspace);
  assert.equal(await soffit.locator('[data-measure="length"]').inputValue(),'144','J à soffite vendu en 12 pi');
  assert.equal(await soffit.locator('[data-measure="length"]').evaluate(input=>input.readOnly),true);
- assert.equal(await soffit.evaluate(()=>window.MIRProductionWorkspace.getLivePreviewState().model.spec.template),'j_soffite','Le lien direct conserve la géométrie J à soffite');
+ assert.equal(await soffit.evaluate(()=>window.MIRProductionWorkspace.getLivePreviewState().model.spec.mirProfileId),'j_soffite','Le lien direct conserve la géométrie J à soffite');
  await soffit.close();
 
  const mobile=await browser.newPage({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
