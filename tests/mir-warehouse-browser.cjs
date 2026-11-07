@@ -27,14 +27,14 @@ async function ready(){for(let i=0;i<80;i++){const ok=await new Promise(r=>http.
    assert.match(await page.locator('#wh-preview').textContent(),/85.*65/);
    assert.match(await page.locator('#wh-preview').textContent(),/reste 5/i);
    await page.locator('#wh-submit').click();
-   await page.waitForFunction(()=>document.querySelector('#wh-stock-qty').textContent()==='65');
+   await page.waitForFunction(()=>document.querySelector('#wh-stock-qty').textContent==='65');
    assert.match(await page.locator('#wh-current-order').textContent(),/Reste 5/);
    await page.locator('#wh-order-select').selectOption('');
    await page.locator('#wh-delta').fill('-10');
    await page.locator('#wh-reason').fill('Sortie stock inventaire');
    assert.match(await page.locator('#wh-preview').textContent(),/65.*55/);
    await page.locator('#wh-submit').click();
-   await page.waitForFunction(()=>document.querySelector('#wh-stock-qty').textContent()==='55');
+   await page.waitForFunction(()=>document.querySelector('#wh-stock-qty').textContent==='55');
    assert.equal(await page.evaluate(()=>window.__warehouseFixture.delivered),20,'sortie libre ne change pas le bon');
    assert.equal(await page.evaluate(()=>window.__warehouseFixture.movements.length),2);
    await page.locator('#wh-qr-input').fill('https://evil.example/entrepot.html?qr='+token);
