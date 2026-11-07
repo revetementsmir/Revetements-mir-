@@ -25,7 +25,7 @@ async function storeModel(page,name){
  await page.locator('#save-production-template').waitFor({state:'visible'});
  await page.locator('#save-production-template input[name="name"]').fill(name);
  await page.locator('#save-production-template button[type="submit"]').click();
- await page.locator('#save-production-template').waitFor({state:'detached'});
+ await page.locator('#save-production-template').waitFor({state:'hidden'});
 }
 (async()=>{
  fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});
