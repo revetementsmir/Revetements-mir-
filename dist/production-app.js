@@ -774,6 +774,26 @@ function renameButtonMarkup(item,model){
  return '<button type="button" class="rename-piece" data-rename-piece="'+esc(item.id)+
   '" aria-label="Renommer la moulure '+esc(model.name)+'">✎ Renommer</button>';
 }
+
+/* Bon de commande : la quantité modifiée ici passe par le moteur de révisions.
+ * Le cliché de fabrication et ses cotes restent synchronisés et sauvegardés. */
+function setOrderItemQuantity(id,value){
+ if(client||!activeWorkshopOrderMatches())return {ok:false,error:'Dossier indisponible ou modifié dans un autre onglet.'};
+ const old=order.items.find(item=>item.id===id),quantity=Number(value);
+ if(!old)return {ok:false,error:'Pièce introuvable dans le dossier.'};
+ if(!Number.isSafeInteger(quantity)||quantity<1)return {ok:false,error:'Choisir une quantité entière supérieure à zéro.'};
+ if(quantity===Number(old.spec?.quantity))return {ok:true,quantity,unchanged:true};
+ const revised=M.reviseInstance({snapshot:old.snapshot,history:old.history||[]},{quantity});
+ if(!revised.ok)return {ok:false,error:revised.errors?.map(error=>error.message).join(' ')||'Quantité invalide.'};
+ const nextOrder={...order,items:order.items.map(item=>item.id!==id?item:{
+  ...item,spec:copy(revised.spec),snapshot:copy(revised.snapshot),history:copy(revised.history),savedAt:new Date().toISOString()
+ })};
+ if(!store(KEYS.draft,{version:1,order:nextOrder}))return {ok:false,error:'Échec de sauvegarde du dossier.'};
+ order=nextOrder;
+ if(editingItemId===id){draft.quantity=quantity;const input=$('#production-quantity');if(input)input.value=quantity;}
+ renderOrder();
+ return {ok:true,quantity};
+}
 function renderOrder(){const validItems=order.items||[];
  updateOrderReference();
 $('#order-head-count').textContent=String(validItems.length).padStart(2,'0');$('#production-count').textContent=String(validItems.length).padStart(2,'0');for(const [id,key] of [['order-project','project'],['order-po','poNumber'],['order-foreman','foreman'],['order-date','date'],['order-revision','revision'],['order-notes','notes']])$('#'+id).value=order[key]||'';
@@ -1899,7 +1919,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  }
  offerProfileImport();
  if(!client&&params.get('shared-request'))openRequest(params.get('shared-request'));
- window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:freeformCanUndo(),canRedo:freeformRedo.length>0};},openContinueMenu,finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
+ window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:freeformCanUndo(),canRedo:freeformRedo.length>0};},setOrderItemQuantity,openContinueMenu,finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
  window.dispatchEvent(new Event('mir-production-ready'));
 }
 boot().catch(error=>{console.error('MIR production',error);$('#production-drawing').innerHTML=`<div class="drawing-hint"><strong>Le configurateur n’a pas pu démarrer.</strong><p>${esc(error.message)}</p><button type="button" class="secondary-button" onclick="location.reload()">Réessayer</button></div>`;$('#add-production-piece').disabled=true;});
