@@ -310,16 +310,18 @@ jobs:
           grep -F 'Activation sécurisée en attente' /tmp/mir-chantier-app.js
           fetch "$base/portal-client.js" /tmp/mir-portal-client.js
           grep -F "mode: 'connected'" /tmp/mir-portal-client.js
-          fetch "$base/production.html" /tmp/production.html
+          # La page publiée doit être exactement celle de ce commit, et non une version CDN périmée.
+          fetch "$base/production.html?verification=$GITHUB_SHA" /tmp/production.html
+          cmp /tmp/production.html _site_mir/production.html
           grep -F 'mir-miniature.js?v=1' /tmp/production.html
           grep -F 'production-model.js?v=retours-cotes-20261105' /tmp/production.html
           grep -F 'production-admin-v4.css?v=deplacer-vue-20261105' /tmp/production.html
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
           grep -F 'kaycan-flat-preview.js?v=mac-2' /tmp/production.html
-          grep -F 'production-app.js?v=fractions-decimales-20261106' /tmp/production.html
-          grep -F 'mir-admin-guided.css?v=guided-visual-20261106' /tmp/production.html
-          grep -F 'mir-admin-guided.js?v=guided-visual-20261106' /tmp/production.html
+          grep -F 'production-app.js?v=atelier-ipad-libre-1' /tmp/production.html
+          grep -F 'mir-freeform-workshop.css?v=atelier-ipad-libre-1' /tmp/production.html
+          grep -F 'mir-freeform-workshop.js?v=atelier-ipad-libre-1' /tmp/production.html
           grep -F 'mir-bending-finishes.js?v=1' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
           grep -F 'function medianRgb' /tmp/kaycan-flat-preview.js
@@ -329,14 +331,18 @@ jobs:
           grep -F 'id="production-piece-name"' /tmp/production.html
           fetch "$base/production-admin-v4.css" /tmp/mir-admin-v4.css
           grep -F 'body.mir-admin-v4 .kind-bar' /tmp/mir-admin-v4.css
-          fetch "$base/mir-admin-guided.js" /tmp/mir-admin-guided.js
-          grep -F "mir-admin-guided-active" /tmp/mir-admin-guided.js
-          grep -F "function paintPreview(side)" /tmp/mir-admin-guided.js
-          grep -F "mir-guide-header" /tmp/mir-admin-guided.js
-          fetch "$base/mir-admin-live3d.js" /tmp/mir-admin-live3d.js
-          grep -F "data-mir-live-3d" /tmp/mir-admin-live3d.js
-          fetch "$base/mir-admin-guided.css" /tmp/mir-admin-guided.css
-          grep -F "mir-guide-3d-open" /tmp/mir-admin-guided.css
+          # Le nouvel atelier MIR remplace l'ancien assistant guidé.
+          fetch "$base/mir-freeform-workshop.js?verification=$GITHUB_SHA" /tmp/mir-freeform-workshop.js
+          cmp /tmp/mir-freeform-workshop.js _site_mir/mir-freeform-workshop.js
+          grep -Fq "function renderMobileStep()" /tmp/mir-freeform-workshop.js
+          grep -Fq "mir-mobile-section-toggle" /tmp/mir-freeform-workshop.js
+          grep -Fq "mobileStepNames=['Tracé libre'" /tmp/mir-freeform-workshop.js
+          fetch "$base/mir-freeform-workshop.css?verification=$GITHUB_SHA" /tmp/mir-freeform-workshop.css
+          cmp /tmp/mir-freeform-workshop.css _site_mir/mir-freeform-workshop.css
+          grep -Fq "mir-mobile-stepper" /tmp/mir-freeform-workshop.css
+          fetch "$base/mir-admin-live3d.js?verification=$GITHUB_SHA" /tmp/mir-admin-live3d.js
+          cmp /tmp/mir-admin-live3d.js _site_mir/mir-admin-live3d.js
+          grep -Fq "data-mir-live-3d" /tmp/mir-admin-live3d.js
           fetch "$base/mir-procurement.js" /tmp/mir-procurement.js
           grep -F 'mir_admin_procurement_v1' /tmp/mir-procurement.js
           fetch "$base/vider-atelier.html" /tmp/mir-reset-page.html
@@ -366,8 +372,11 @@ jobs:
           grep -F "mir-template-library-backup-1" /tmp/mir-template-backup.js
           fetch "$base/production.html" /tmp/mir-backup-page.html
           grep -F 'template-library-backup.js?v=backup-1' /tmp/mir-backup-page.html
-          fetch "$base/production-app.js" /tmp/production-app.js
+          fetch "$base/production-app.js?verification=$GITHUB_SHA" /tmp/production-app.js
+          cmp /tmp/production-app.js _site_mir/production-app.js
           grep -F "function hemChoiceSketch(spec,direction,atStart=false)" /tmp/production-app.js
+          grep -Fq "function faceChoiceCards(" /tmp/production-app.js
+          grep -Fq "function profileAnglesOverlay(" /tmp/production-app.js
           fetch "$base/mir-unified-client-dossier.js?verification=$GITHUB_SHA" /tmp/mir-unified-dossier.js
           cmp /tmp/mir-unified-dossier.js _site_mir/mir-unified-client-dossier.js
           grep -F "mir-unified-client-dossier-1" /tmp/mir-unified-dossier.js
