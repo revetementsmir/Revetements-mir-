@@ -75,13 +75,15 @@ function create({sdk,config,storage,uuid=()=>globalThis.crypto?.randomUUID?.()}=
   org,coord_id:coordId,route_id:routeId,po_id:poId,expected_revision:revision});
  const supplierReceive=(org,coordId,routeId,amount,revision)=>operation('mir_coordination_supplier_receive',{
   org,coord_id:coordId,route_id:routeId,quantity:amount,expected_revision:revision});
+ const supplierStatus=(org,coordId,routeId,state,revision)=>operation('mir_coordination_supplier_status',{
+  org,coord_id:coordId,route_id:routeId,next_status:state,expected_revision:revision});
  const warehouseQueue=org=>rpc('mir_coordination_warehouse_queue',{org});
  const acknowledge=(org,coordId)=>rpc('mir_coordination_ack',{org,coord_id:coordId});
  const ship=(org,coordId,revision)=>operation('mir_coordination_ship',{org,coord_id:coordId,expected_revision:revision});
  const grant=(org,member,allowed)=>rpc('mir_coordination_grant',{org,member,allowed});
  function close(){changed();subscription?.data?.subscription?.unsubscribe?.();}
  return Object.freeze({login,logout,memberships,inbox,open,detail,suppliers,route,add,metadata,linkPO,
-  supplierReceive,warehouseQueue,acknowledge,ship,grant,checkPending:async()=>getPending((await verified()).id),
+  supplierReceive,supplierStatus,warehouseQueue,acknowledge,ship,grant,checkPending:async()=>getPending((await verified()).id),
   supplierOrders,close,version:'1.1.0'});
 }
 return Object.freeze({create});
