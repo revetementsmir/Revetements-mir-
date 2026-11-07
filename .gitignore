@@ -1,2 +1,3 @@
 artifacts/
 tools/database/node_modules/
+supabase/.temp/

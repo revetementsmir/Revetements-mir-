@@ -160,6 +160,7 @@
     tabs.after(shortcuts);
     const clearLink=doc.createElement('a');clearLink.href='vider-atelier.html';clearLink.className='mir-proc-reset-link';clearLink.textContent='Vider mes profils et essais enregistrés';tabs.insertAdjacentElement('afterend',clearLink);
     function currentOrder(){return getDossier(win.localStorage);}
+    function sharedCatalogue(destination,label){return win.MIRSharedConfig?.enabled===true?'<p><a class="primary-button" href="espace-partage.html?destination='+destination+'">'+label+'</a></p>':'';}
     function populateOrder(){const o=currentOrder();if(o&&state.formSource!==o.id&&!state.editingId){ui.poNumber=o.poNumber||'';ui.job=o.project||'';ui.foreman=o.foreman||'';ui.requestedDate=o.date||'';state.formSource=o.id;}if(o){if(!ui.poNumber)ui.poNumber=o.poNumber||'';if(!ui.job)ui.job=o.project||'';if(!ui.foreman)ui.foreman=o.foreman||'';if(!ui.requestedDate)ui.requestedDate=o.date||'';}}
     function field(name,label,kind='text',extra='') {
       const value=ui[name]||'';
@@ -212,7 +213,8 @@
           +'<div class="mir-proc-actions"><button type="submit" name="action" value="draft">Garder en brouillon</button><button type="submit" class="mir-proc-primary" name="action" value="published">Rendre visible sur cet appareil</button></div></form>';
       }).join('');
       return '<div class="mir-proc-top"><h2>Boutique de pliages</h2><p>Définissez les prix et les canaux de chaque modèle, sans refaire son dessin.</p></div>'
-        +'<p class="mir-proc-alert">Mode local : ces prix et modèles ne sont visibles que sur ce navigateur. Une vraie boutique partagée exige un serveur et une connexion administrateur sécurisée. Aucun paiement ni synchronisation Shopify n’est actif.</p>'
+        +sharedCatalogue('boutique','Ouvrir la Boutique partagée')
+        +'<p class="mir-proc-alert">Mode local : les anciens prix et modèles ci-dessous restent sur cet appareil. Le catalogue partagé permet de retrouver les modèles publiés avec votre compte autorisé. Aucun paiement ni synchronisation Shopify n’est actif.</p>'
         +'<p id="mir-boutique-feedback" role="status" aria-live="polite"></p>'
         +(cards||'<div class="mir-proc-card"><h3>Pas encore de modèles enregistrés</h3><p>Dessinez puis enregistrez votre première moulure dans Modèles. Les tarifs ne sont jamais imposés par défaut.</p><button type="button" data-mir-tab="models">Créer mon premier modèle</button></div>');
     }
@@ -278,7 +280,8 @@
         return '<article class="mir-proc-card mir-store-card"><div class="mir-store-visual">'+thumb+'</div><div><h3>'+esc(record.name||'Modèle')+'</h3><p>Version '+esc(record.currentVersion)+' · '+locks+' cote(s) verrouillée(s) · Usage employés.</p><p>'+esc((record.allowed?.materials||[]).join(' / '))+'</p><button type="button" data-mir-tab="models">Modifier ce modèle dans ma bibliothèque</button></div></article>';
       }).join('');
       return '<div class="mir-proc-top"><h2>Magasin employés</h2><p>Les moulures autorisées pour les employés, distinctes de celles vendues aux clients.</p></div>'
-      +'<p class="mir-proc-alert">Catalogue local à cet appareil. Le partage entre comptes employés nécessite un serveur et des accès sécurisés; aucune commande n’est envoyée.</p>'
+      +sharedCatalogue('store','Ouvrir le Magasin partagé')
+      +'<p class="mir-proc-alert">Catalogue local à cet appareil : les anciens modèles ci-dessous sont conservés. Le Magasin partagé nécessite un compte employé ou Admin autorisé; aucune commande n’est envoyée automatiquement.</p>'
       +(cards||'<div class="mir-proc-card"><h3>Aucune moulure offerte au magasin</h3><p>Enregistre un modèle et coche « Magasin employés ». Aucun tarif public obligatoire.</p><button type="button" data-mir-tab="models">Voir mes modèles</button></div>');
     }
 

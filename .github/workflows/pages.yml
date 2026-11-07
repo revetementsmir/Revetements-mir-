@@ -433,6 +433,12 @@ jobs:
           cmp /tmp/mir-shared-public.html _site_mir/espace-partage.html
           grep -Fq 'mir-shared-client.js' /tmp/mir-shared-public.html
           grep -Fq 'mir-shared-workspace.js' /tmp/mir-shared-public.html
+          fetch "$base/mir-shared-client.js?verification=$GITHUB_SHA" /tmp/mir-shared-client.js
+          cmp /tmp/mir-shared-client.js _site_mir/mir-shared-client.js
+          grep -Fq 'onSessionInvalidated' /tmp/mir-shared-client.js
+          fetch "$base/mir-shared-workspace.js?verification=$GITHUB_SHA" /tmp/mir-shared-workspace.js
+          cmp /tmp/mir-shared-workspace.js _site_mir/mir-shared-workspace.js
+          grep -Fq 'publicationRules' /tmp/mir-shared-workspace.js
           fetch "$base/shared-config.js?verification=$GITHUB_SHA" /tmp/mir-shared-config.js
           cmp /tmp/mir-shared-config.js _site_mir/shared-config.js
           grep -Fq 'enabled:true' /tmp/mir-shared-config.js

@@ -1,15 +1,22 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;if(root)root.MIRSharedClient=api;})(typeof window==='object'?window:null,function(){
 'use strict';
-function create({sdk,storage}){
+function create({sdk,storage,onSessionInvalidated=()=>{}}){
  let identity=null,generation=0;
+ // Auth callbacks stay synchronous: never call another Auth method under its lock.
+ const subscription=sdk.auth.onAuthStateChange?.((event,session)=>{
+  const next=session?.user?.id||null;
+  if(event==='SIGNED_OUT'||(identity&&next&&identity!==next)){
+   generation++;identity=null;onSessionInvalidated();
+  }
+ });
  async function rpc(name,args){const epoch=generation;const {data,error}=await sdk.rpc(name,args);if(epoch!==generation)throw Error('Session modifiée');if(error)throw error;return data;}
- async function verify(){const epoch=generation;const {data,error}=await sdk.auth.getUser();if(epoch!==generation)throw Error('Session modifiée');if(error||!data?.user?.id)throw Error('Connexion requise');identity=data.user.id;return identity;}
+ async function verify(){const epoch=generation;const {data,error}=await sdk.auth.getUser();if(epoch!==generation)throw Error('Session modifiée');if(error||!data?.user?.id)throw Error('Connexion requise');if(identity&&identity!==data.user.id){generation++;identity=null;onSessionInvalidated();throw Error('Session modifiée');}identity=data.user.id;return identity;}
  return {
  async login(email,password){generation++;const {error}=await sdk.auth.signInWithPassword({email,password});if(error)throw error;await verify();return rpc('mir_my_memberships',{});},
  async memberships(){await verify();return rpc('mir_my_memberships',{});},
  async snapshot(org){await verify();return rpc('mir_shared_snapshot',{org});},
  async submit(org,model,configuration){
-  await verify();const key='mir_shared_pending_'+identity+'_'+org,signature=JSON.stringify({model:model.id,revision:model.revision,configuration});
+  const user=await verify();const key='mir_shared_pending_'+user+'_'+org,signature=JSON.stringify({model:model.id,revision:model.revision,configuration});
   let pending=JSON.parse(storage.getItem(key)||'null');
   if(pending&&pending.signature!==signature)throw Error('Une demande attend confirmation. Reprenez-la avant de changer son contenu.');
   if(!pending){pending={signature,requestId:globalThis.crypto.randomUUID(),model,configuration};storage.setItem(key,JSON.stringify(pending));}
@@ -21,7 +28,8 @@ function create({sdk,storage}){
  async importMaster(org,record){await verify();return rpc('mir_import_master',{org,record});},
  async addVersion(org,model,template){await verify();return rpc('mir_add_master_version',{org,model:model.id,expected_revision:model.revision,template});},
  async publish(org,model,settings){await verify();return rpc('mir_admin_publish_model',{org,model:model.id,expected_revision:model.revision,settings});},
- async logout(){generation++;identity=null;const {error}=await sdk.auth.signOut({scope:'local'});if(error)throw error;}
+ async logout(){generation++;identity=null;onSessionInvalidated();const {error}=await sdk.auth.signOut({scope:'local'});if(error)throw error;},
+ dispose(){generation++;identity=null;subscription?.data?.subscription?.unsubscribe();}
  };
 }
 function readModelBackup(content,validator){
