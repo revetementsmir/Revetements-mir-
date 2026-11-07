@@ -1,0 +1,37 @@
+{
+  "observedAt": "2026-11-07T01:27:10.982Z",
+  "projectUrl": "https://gccltmaulvrnthrbnrpd.supabase.co",
+  "mode": "read-only-business-data",
+  "results": [
+    {
+      "role": "admin",
+      "status": "PASS",
+      "identityConfirmed": true,
+      "membershipsConfirmed": true,
+      "signedOut": true,
+      "publicationRules": true,
+      "anonymousDenied": true,
+      "adminWriteDenied": true
+    },
+    {
+      "role": "employee",
+      "status": "PASS",
+      "identityConfirmed": true,
+      "membershipsConfirmed": true,
+      "signedOut": true,
+      "publicationRules": true,
+      "anonymousDenied": true,
+      "adminWriteDenied": true
+    },
+    {
+      "role": "client",
+      "status": "PASS",
+      "identityConfirmed": true,
+      "membershipsConfirmed": true,
+      "signedOut": true,
+      "publicationRules": true,
+      "anonymousDenied": true,
+      "adminWriteDenied": true
+    }
+  ]
+}
