@@ -124,7 +124,7 @@ declare o mir_core.coordination_orders;r mir_core.coordination_routes;
  if not found or r.route<>'supplier' or r.supplier_order_id is null then raise exception 'Bon fournisseur inexistant' using errcode='22023';end if;
  if quantity is null or quantity<=0 or scale(quantity)>3 or r.received_qty+quantity>r.quantity
  then raise exception 'Réception supérieure à la quantité fournisseur' using errcode='22023';end if;
- update mir_core.coordination_routes set received_qty=received_qty+quantity where organization_id=org and id=r.id;
+ update mir_core.coordination_routes set received_qty=coordination_routes.received_qty+mir_coordination_supplier_receive.quantity where organization_id=org and id=r.id;
  rev:=o.revision+1;update mir_core.coordination_orders set revision=rev,updated_at=now() where organization_id=org and id=o.id;
  insert into mir_core.coordination_events(organization_id,coordination_id,revision,event_type,payload,actor_id)
  values(org,o.id,rev,'supplier_received',jsonb_build_object('supplierId',r.supplier_id,'poId',r.supplier_order_id,
