@@ -155,6 +155,20 @@ function bendFields(bend,index,expanded){
  <label>Angle (°)<input data-bend-angle="${index}" type="number" step="any" value="${esc(b.mode==='hem'?180:b.angle)}"${b.mode==='hem'?' disabled':''}></label>
  </div>${sense}</details>`;
 }
+/* Deux vrais aperçus du même profil MIR : seule la face peinte change,
+   jamais la géométrie ni les cotes du modèle. */
+function faceChoiceCards(side,segment,clientChoice=false){
+ const options=['left','right'].map((direction,index)=>{
+  const next={...copy(draft),coloredFace:{...draft.coloredFace,side:direction,segmentId:segment}};
+  const model=build(next);
+  const fallback='<svg viewBox="0 0 260 115" role="img" aria-label="Face '+(index+1)+'"><path d="M25 32H130V84H230" fill="none" stroke="#a3a5a8" stroke-width="7"/><path d="M25 '+(direction==='left'?'22':'42')+'H130" stroke="#348511" stroke-width="7" stroke-linecap="round"/></svg>';
+  const preview=model.valid?diagramSVG(model,{small:true,interactive:false}):fallback;
+  return '<button type="button" class="mir-face-choice" '+(clientChoice?'data-client-face':'data-face-select')+'="'+direction+'" aria-pressed="'+(side===direction)+'" aria-label="Colorer la face '+(index+1)+(direction==='left'?', côté gauche':', côté droit')+' du tracé">'+
+   '<span class="mir-face-choice-image">'+preview+'</span><strong>Face '+(index+1)+'</strong><small>'+(direction==='left'?'Gauche du tracé':'Droite du tracé')+'</small></button>';
+ }).join('');
+ return '<div class="mir-face-choice-grid" role="group" aria-label="Deux images pour sélectionner la face colorée">'+options+'</div>'+
+  '<p class="field-hint mir-face-choice-help">Le trait vert représente la face colorée. Suivez A, puis B, C… pour définir le sens.</p>';
+}
 function renderProfileOptions(){
  if(kind!=='profile'||authoring){$('#production-profile-options').innerHTML='';return;}
  const labels=draft.template==='custom'?(draft.segments||[]).map(s=>s.label):M.TEMPLATES[draft.template]?.labels||[];
@@ -175,15 +189,14 @@ function renderProfileOptions(){
  }
  if(clientProfileWizard()){
   const face=draft.coloredFace||{},side=face.side;
-  $('#production-profile-options').innerHTML=`<div data-client-stage="4"><div class="client-face-choices" role="group" aria-label="Côté coloré">
-   <button type="button" class="secondary-button" data-client-face="left" aria-pressed="${side==='left'}">À gauche du tracé</button>
-   <button type="button" class="secondary-button" data-client-face="right" aria-pressed="${side==='right'}">À droite du tracé</button>
-   </div><p class="field-hint">Le trait bleu indique la face choisie sur le dessin.</p>
-   <label>Repère du trait bleu<select id="profile-painted-segment">${labels.map(label=>`<option${face.segmentId===label?' selected':''}>${esc(label)}</option>`).join('')}</select></label><a class="client-preview-link" href="#production-preview">Voir le dessin ↑</a></div>${rule?`<div data-client-stage="2">${rule}</div>`:''}`;
+  $('#production-profile-options').innerHTML=`<div data-client-stage="4">${faceChoiceCards(side,face.segmentId||labels[0]||'A',true)}
+   <label>Repère du côté coloré<select id="profile-painted-segment">${labels.map(label=>`<option${face.segmentId===label?' selected':''}>${esc(label)}</option>`).join('')}</select></label><a class="client-preview-link" href="#production-preview">Voir le dessin coté ↑</a></div>${rule?`<div data-client-stage="2">${rule}</div>`:''}`;
   return;
  }
  const faceOpen=$('#production-profile-options details')?.open||draft.coloredFace?.side;
- $('#production-profile-options').innerHTML=`<details class="profile-face-options"${faceOpen?' open':''}><summary>Face colorée</summary><div class="two-fields"><label>Sens de la face<select id="profile-painted-side"><option value="">Choisir le côté</option><option value="left"${draft.coloredFace?.side==='left'?' selected':''}>À gauche du tracé</option><option value="right"${draft.coloredFace?.side==='right'?' selected':''}>À droite du tracé</option></select></label><label>Repère sur le côté<select id="profile-painted-segment">${labels.map(label=>`<option${draft.coloredFace?.segmentId===label?' selected':''}>${esc(label)}</option>`).join('')}</select></label></div><p class="field-hint">La gauche et la droite se lisent en suivant A, puis B et les côtés suivants. Le côté peint est marqué sur le dessin.</p></details>`+rule;
+ $('#production-profile-options').innerHTML=`<details class="profile-face-options"${faceOpen?' open':''}><summary>Face colorée</summary>
+  ${faceChoiceCards(draft.coloredFace?.side||'',draft.coloredFace?.segmentId||labels[0]||'A')}
+  <div class="two-fields mir-face-details"><label>Choix textuel de la face<select id="profile-painted-side"><option value="">Choisir le côté</option><option value="left"${draft.coloredFace?.side==='left'?' selected':''}>À gauche du tracé</option><option value="right"${draft.coloredFace?.side==='right'?' selected':''}>À droite du tracé</option></select></label><label>Repère sur le côté<select id="profile-painted-segment">${labels.map(label=>`<option${draft.coloredFace?.segmentId===label?' selected':''}>${esc(label)}</option>`).join('')}</select></label></div></details>`+rule;
 }
 function renderPanelOptions(){if(kind!=='panel'||authoring){$('#production-panel-options').innerHTML='';return;}const model=build(),reference=model.edges.length?model:build(sampleSpec('panel',draft.shape)),edges=reference.edges||[];$('#production-panel-options').innerHTML=`<div class="config-section"><div class="section-heading compact"><div><span class="step-dot">↳</span><h2>Les lèvres & le bas</h2></div></div><p class="field-hint">Les lips sont compris dans A et B. Ils réduisent la face centrale, sans augmenter le hors tout.</p><label>Lip commun à tous les côtés<input id="panel-lip" inputmode="decimal" value="${esc(draft.lip??'')}" placeholder="0 = sans lip"></label><details class="options-details"><summary>Un lip différent selon le côté</summary><div class="dimension-fields">${edges.map((edge,index)=>`<label>${index+1} · ${esc(edge.name)}<input data-panel-lip="${esc(edge.id)}" inputmode="decimal" value="${esc(draft.lips?.[edge.id]??'')}" placeholder="Lip commun"></label>`).join('')}</div></details><label>Quel côté est en bas après pose ?<select id="panel-bottom"><option value="">Choisir le bas</option>${edges.map((edge,index)=>`<option value="${esc(edge.id)}"${draft.bottomEdgeId===edge.id?' selected':''}>${index+1} · ${esc(edge.name)}</option>`).join('')}</select></label><label class="check-field"><input id="panel-perforation" type="checkbox"${draft.perforation?.enabled?' checked':''}><span>Demander la perforation du bas<small>Le côté choisi est repéré en bleu sur le dessin.</small></span></label>${draft.perforation?.enabled?`<label>Détail ou référence de perforation<textarea id="panel-perforation-details" rows="2" placeholder="À définir avec l’atelier" maxlength="300">${esc(draft.perforation.details||'')}</textarea></label><p class="field-hint">Le diamètre et l’espacement des trous restent à préciser. Aucun motif de perforation n’est présumé.</p>`:''}</div>`;}
 function renderColors(){const block=$('#production-color-fields');$('#color-system').value=colorSystem;if(colorSystem==='manufacturer'){block.innerHTML=`<div class="color-source-field"><label>Fabricant / produit de référence<select id="production-material"><option value="">Choisir le fabricant et le produit</option>${availableMaterials().map(m=>`<option value="${esc(m.id)}"${m.id===materialId?' selected':''}>${esc(m.brand+' · '+m.name)}</option>`).join('')}</select></label>${(chosenMaterial()?.colors||[]).length>20?`<label>Rechercher une teinte du fabricant<input id="production-color-search" class="color-search" type="search" placeholder="Nom ou code, ex. 56068, noir…" value="${esc(colorQuery)}"></label><p id="color-count" class="color-count"></p>`:""}<div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Couleurs du fabricant"></div><p class="field-hint">${kind==='panel'?'Références Unico publiées. La disponibilité du fini sur le calibre choisi reste à confirmer.':'Chaque échantillon appartient au nuancier de ce produit. L’offre sur votre pièce doit être confirmée.'}</p></div>`;renderColorGrid();}else if(colorSystem==='ral'){block.innerHTML=`<div class="color-source-field"><label>Rechercher un code RAL Classic<input id="production-color-search" class="color-search" type="search" placeholder="Ex. 7016, black, vert…" value="${esc(colorQuery)}"></label><label>Code de la couleur<select id="production-ral"><option value="">Choisir un code RAL</option>${ral.colors.map(c=>`<option value="${esc(c.id)}"${c.id===colorId?' selected':''}>${esc(c.code+' · '+(c.nameEn||c.name))}</option>`).join('')}</select></label><p id="color-count" class="color-count"></p><div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Codes RAL Classic"></div><p class="field-hint">${esc(ral.displayNotice||'Aperçu écran indicatif. Valider la teinte demandée sur un nuancier physique avant fabrication.')}</p></div>`;renderColorGrid();}else{block.innerHTML=`<div class="color-source-field"><label>Nuancier ou fabricant<input id="special-color-system" value="${esc(draft.finish?.system||'')}" maxlength="60" placeholder="Ex. Nuancier à préciser"></label><div class="two-fields"><label>Code exact<input id="special-color-code" value="${esc(draft.finish?.code||'')}" maxlength="80" placeholder="Référence demandée"></label><label>Nom de la couleur<input id="special-color-name" value="${esc(draft.finish?.name||'')}" maxlength="100" placeholder="Si connu"></label></div><p class="field-hint">Cette référence est une demande spéciale à faire confirmer. Aucun équivalent fabricant ni teinte numérique n’est inventé.</p></div>`;}updateFinish();applyStoreColorLock();}
@@ -1642,6 +1655,12 @@ function startProfileDrawing({fullscreen=true}={}){
  updateDrawing();
 }
 function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom]');if(!button)return;const d=button.dataset;
+ if(d.faceSelect){
+  if(client||editingItemId||!['left','right'].includes(d.faceSelect))return;
+  draft.coloredFace={...draft.coloredFace,side:d.faceSelect,segmentId:$('#profile-painted-segment')?.value||draft.coloredFace?.segmentId||'A'};
+  renderProfileOptions();updateDrawing();
+  return;
+ }
  if(d.freeformUndo!==undefined)return freeformUndoLast();
  if(d.freeformRedo!==undefined)return freeformRedoLast();
  if(d.freeformFinish!==undefined)return freeformFinish();
