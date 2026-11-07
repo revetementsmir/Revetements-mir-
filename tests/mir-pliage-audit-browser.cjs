@@ -53,7 +53,18 @@ async function ready(){
    assert.equal(saved.channels.client,true);assert.equal(saved.channels.store,true);
    assert.equal(await page.locator('body').getAttribute('data-mir-tab'),'boutique');
    await page.locator('#mir-procurement-tabs [data-mir-tab="draw"]').click();
-   await page.locator('#mir-procurement-tabs [data-mir-tab="models"]').click();
+   if(size.width<=650){
+     // En mode traçage plein écran, l'accès réel aux autres sections passe
+     // par le menu compact, sans réintroduire les onglets au-dessus du dessin.
+     const opener=page.locator('#mir-mobile-section-toggle');
+     assert.equal(await opener.isVisible(),true,'navigation admin accessible sans scroll');
+     await opener.click();
+     assert.equal(await opener.getAttribute('aria-expanded'),'true','menu réellement ouvert');
+     await page.locator('#mir-mobile-section-menu [data-mir-mobile-tab="models"]').click();
+     assert.equal(await opener.isVisible(),false,'menu non affiché hors du tracé mobile');
+   }else{
+     await page.locator('#mir-procurement-tabs [data-mir-tab="models"]').click();
+   }
    await page.waitForSelector('.model-library-card');
    assert.match(await page.locator('.model-library-card').first().textContent(),/Solin test MIR/);
    await page.goto(base+'/pliage.html',{waitUntil:'domcontentloaded'});
