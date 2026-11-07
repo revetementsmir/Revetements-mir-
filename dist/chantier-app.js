@@ -292,8 +292,37 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(button.dataset.category){category=button.dataset.category;document.querySelectorAll('[data-category]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.category===category)));return renderCatalogueGrid();}
     if(button.id==='favorites-filter'){favoritesOnly=!favoritesOnly;button.setAttribute('aria-pressed',String(favoritesOnly));return renderCatalogueGrid();}
     if(button.dataset.favorite){const out=await act('TOGGLE_FAVORITE',{itemId:button.dataset.favorite});if(out.ok){if(favoritesOnly)renderCatalogueGrid();else{const selected=favoriteIds().includes(button.dataset.favorite);button.setAttribute('aria-pressed',String(selected));button.setAttribute('aria-label',`${selected?'Retirer des favoris':'Ajouter aux favoris'} : ${itemById(button.dataset.favorite)?.name||''}`);}}return;}
-    if(button.dataset.configure)return showFold(button.dataset.configure);
-    if(button.dataset.addItem){const card=button.closest('[data-product]'),out=addToCart({itemId:button.dataset.addItem,quantity:Number(card.querySelector('[data-product-qty]').value),colorId:card.querySelector('[data-product-color]')?.value||undefined,formatId:card.querySelector('[data-product-format]')?.value||undefined});if(!out.ok)toast(errorMessage(out.error));else{renderCart();toast('Article ajouté à votre demande.');}return;}
+    
+     if(isDemo()&&button.id==='review-export'&&reviewAPI){
+       const json=reviewAPI.exportAnnotations(reviewState,state.catalogue);
+       const blob=new Blob([JSON.stringify(json,null,2)],{type:'application/json;charset=utf-8'});
+       const url=URL.createObjectURL(blob),link=document.createElement('a');
+       link.href=url;link.download='MIR-annotations-magasin.json';
+       document.body.append(link);link.click();link.remove();
+       setTimeout(()=>URL.revokeObjectURL(url),2000);toast('Notes exportées en JSON.');return;
+     }
+     if(isDemo()&&button.id==='review-import'){document.querySelector('#review-import-file')?.click();return;}
+     if(isDemo()&&button.id==='review-hidden-toggle'){
+       reviewState.showHidden=!reviewState.showHidden;
+       const y=window.scrollY;render();window.scrollTo(0,y);return;
+     }
+     if(isDemo()&&button.dataset.reviewNote){
+       const id=button.dataset.reviewNote,item=itemById(id);if(!item)return;
+       openDialog(dialogHeader('REVUE MAGASIN','Annoter '+item.name,'La note reste sur cet appareil, et peut être exportée.')+
+         '<form id="review-annotation-form" data-review-item="'+esc(id)+'">'+
+         '<label>Note<textarea name="note" maxlength="2000" rows="6">'+esc(reviewState.annotations[id]||'')+'</textarea></label>'+
+         '<div class="dialog-actions"><button class="button secondary" type="button" data-close-dialog>Annuler</button>'+
+         '<button class="button" type="submit">Enregistrer la note</button></div></form>');return;
+     }
+     if(isDemo()&&button.dataset.reviewRemove){
+       const id=button.dataset.reviewRemove;if(!itemById(id))return;
+       const hidden=new Set(reviewState.hidden);hidden.has(id)?hidden.delete(id):hidden.add(id);
+       reviewState.hidden=[...hidden];writeReview();
+       const y=window.scrollY;render();window.scrollTo(0,y);
+       toast(hidden.has(id)?'Article masqué uniquement dans cette revue.':'Article remis au magasin.');return;
+     }
+     if(button.dataset.configure)return showFold(button.dataset.configure);
+    if(button.dataset.addItem){const card=button.closest('[data-product]'),chosen=reviewAPI?.selection(card,itemById),item=chosen?.item||itemById(button.dataset.addItem),out=addToCart({itemId:item?.id||button.dataset.addItem,quantity:Number(card.querySelector('[data-product-qty]').value),colorId:chosen?.colorId||card.querySelector('[data-product-color]')?.value||undefined,formatId:card.querySelector('[data-product-format]')?.value||item?.formats?.[0]?.id||undefined});if(!out.ok)toast(errorMessage(out.error));else{renderCart();toast('Article ajouté à votre demande.');}return;}
     if(button.dataset.cartRemove){ui.carts[actorId]=currentCart().filter(line=>line.cartKey!==button.dataset.cartRemove);save();return renderCart();}
     if(button.hasAttribute('data-scroll-cart')){$('#order-cart').scrollIntoView({behavior:'smooth',block:'start'});$('#order-cart').focus({preventScroll:true});return;}
     if(button.dataset.orderFilter){orderFilter=button.dataset.orderFilter;return render();}
@@ -311,7 +340,25 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(element.id==='demo-profile'&&isDemo()){actorId=element.value;view=mode==='admin'?'admin-orders':'projects';orderFilter='pending';render();return;}
     if(element.id==='order-job'){ui.jobs[actorId]=element.value;save();renderCart();return;}
     if(element.dataset.cartQty){const old=currentCart().find(line=>line.cartKey===element.dataset.cartQty);if(!old)return;const out=model.configureLine(state,{...old,quantity:Number(element.value)});if(!out.ok){toast(errorMessage(out.error));element.value=old.quantity;}else{Object.assign(old,out.line,{cartKey:old.cartKey});save();renderCart();}return;}
-    if(element.dataset.productColor||element.dataset.productFormat){const card=element.closest('[data-product]');updateProductPreview(card,itemById(card.dataset.product));return;}
+    
+     if(element.dataset.productVariant){
+       const card=element.closest('[data-product]'),chosen=reviewAPI?.selection(card,itemById);
+       if(chosen?.item){const sample=card.querySelector('[data-product-sample]');
+         if(sample)sample.innerHTML=productVisual(chosen.item);
+         updateProductPreview(card,chosen.item);}
+       return;
+     }
+     if(element.id==='review-import-file'&&isDemo()&&reviewAPI){
+       const file=element.files?.[0];if(!file)return;
+       if(file.size>500000){toast('Fichier JSON trop volumineux.');element.value='';return;}
+       file.text().then(raw=>{
+         const result=reviewAPI.importAnnotations(raw,reviewState);reviewState=result.state;
+         writeReview();const y=window.scrollY;render();window.scrollTo(0,y);
+         toast(result.count+' notes importées; aucun article supprimé.');
+       }).catch(e=>toast('Import impossible : '+e.message)).finally(()=>{element.value='';});
+       return;
+     }
+     if(element.dataset.productColor||element.dataset.productFormat){const card=element.closest('[data-product]');updateProductPreview(card,itemById(card.dataset.product));return;}
     if(element.dataset.inventoryColor||element.dataset.inventoryFormat){const item=itemById(element.dataset.inventoryColor||element.dataset.inventoryFormat),form=element.closest('form'),out=model.configureLine(state,{itemId:item.id,quantity:item.quantityStep||1,colorId:form.elements.colorId?.value||undefined,formatId:form.elements.formatId?.value||undefined}),stock=out.ok?stockFor(out.line.stockKey):{known:false};form.querySelector('.stock-value').innerHTML=stockHTML(stock,item.unit);form.elements.quantity.value=stock.known?stock.onHand:'';}
   }
   function handleInput(event) {const element=event.target;if(element.id==='catalogue-search'){query=element.value;renderCatalogueGrid();}else if(element.id==='inventory-search'){query=element.value;renderInventoryList();}else if(element.dataset.foldDimension){const form=element.closest('form'),values={};form.querySelectorAll('[data-fold-dimension]').forEach(input=>values[input.dataset.foldDimension]=input.value);$('#fold-diagram').innerHTML=foldSVG(itemById(form.dataset.item),values);}}
@@ -322,7 +369,20 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
       event.preventDefault();const email=String(new FormData(form).get('email')||'');
       return runAuth(async()=>{const result=await portalClient.sendEmail(email);authMessage=result.message;});
     }
-    if(!form.matches('#create-order-form,#fold-form,#delivery-form,#assignment-form,#invitation-form,#create-job-form,[data-inventory-form],[data-fabricated-stock]'))return;
+    
+     if(isDemo()&&form.id==='review-annotation-form'){
+       event.preventDefault();const id=form.dataset.reviewItem,note=String(new FormData(form).get('note')||'').trim();
+       if(!id||!itemById(id))return;
+       if(note)reviewState.annotations[id]=note;else delete reviewState.annotations[id];
+       writeReview();closeDialog();
+       const card=Array.from(document.querySelectorAll('[data-product]')).find(c=>c.dataset.product===id);
+       const button=card?.querySelector('[data-review-note]');if(button)button.textContent=note?'Modifier la note':'Annoter';
+       const tools=card?.querySelector('.mir-review-tools');
+       if(tools){tools.querySelector('.mir-review-note')?.remove();
+         if(note){const p=document.createElement('p');p.className='mir-review-note';p.textContent=note;tools.append(p);}}
+       toast('Note enregistrée sans déplacer la liste.');return;
+     }
+     if(!form.matches('#create-order-form,#fold-form,#delivery-form,#assignment-form,#invitation-form,#create-job-form,[data-inventory-form],[data-fabricated-stock]'))return;
     if(!state)return;
     if(!isDemo()&&(clientStatus?.busy||clientStatus?.pending)){event.preventDefault();toast('Vérifiez d’abord l’action en attente de confirmation.');return;}
     event.preventDefault();const data=new FormData(form);
