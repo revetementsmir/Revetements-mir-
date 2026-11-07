@@ -162,7 +162,7 @@ declare sku_row mir_core.warehouse_skus;begin
  ) then raise exception 'Moulure introuvable dans Mes pliages partagés' using errcode='22023';end if;
  insert into mir_core.warehouse_skus(organization_id,source_kind,source_ref,sku,name,unit,quantity_step)
  values(org,kind,source_ref,sku_code,btrim(display_name),btrim(unit_name),step)
- on conflict(organization_id,source_kind,source_ref) do nothing;
+ on conflict on constraint warehouse_skus_organization_id_source_kind_source_ref_key do nothing;
  select * into sku_row from mir_core.warehouse_skus
  where organization_id=org and source_kind=kind and warehouse_skus.source_ref=mir_warehouse_register.source_ref;
  if sku_row.sku<>sku_code or sku_row.name<>btrim(display_name) or sku_row.unit<>btrim(unit_name) or sku_row.quantity_step<>step then
