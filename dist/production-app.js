@@ -1402,7 +1402,7 @@ function bendChoiceMarkup(name,selected,angle,{index=null,legend='Sens du pli'}=
  const options=['left','right'].map((direction,i)=>{
   const extra=index===null?'':' data-bend-direction="'+index+'"';
   return '<label class="mir-bend-option"><input type="radio" name="'+esc(name)+'" value="'+direction+'"'+extra+
-   (selected===direction?' checked':'')+' required aria-label="'+esc(legend+(direction==='left?' vers la gauche':' vers la droite'))+'">'+
+   (selected===direction?' checked':'')+' required aria-label="'+esc(legend+(direction==='left'?' vers la gauche':' vers la droite'))+'">'+
    '<span class="mir-bend-diagram" data-bend-icon="'+direction+'">'+bendTurnSketch(direction,angle)+'</span>'+
    '<strong>Choix '+(i+1)+' · '+(direction==='left'?'Gauche':'Droite')+'</strong></label>';
  }).join('');
