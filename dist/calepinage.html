@@ -60,7 +60,14 @@
           <p id="roof-pitch-result" class="hint" role="status"></p>
         </details>
         <div id="wall-free-fields" hidden><button id="start-free-outline" class="secondary full">Tracer le contour directement</button><p class="hint">Cliquez pour placer les points, ou glissez depuis le dernier point comme une moulure. Maj (Shift) = angle droit. Fermez la section, puis saisissez les mesures exactes; aucune cote n’est inventée. Le tracé s’adapte aux dimensions chantier.</p></div>
-        <details id="wall-coordinate-details"><summary>Cotes exactes des sommets</summary><p class="hint">X depuis la gauche. Hauteur depuis le bas. Appliquer une cote passe en forme libre et conserve les sommets saisis.</p><label>Sommet<select id="wall-vertex"></select></label><div class="fields two"><label>X depuis la gauche<input id="vertex-x" inputmode="decimal"></label><label>Hauteur depuis le bas<input id="vertex-height" inputmode="decimal"></label></div><button id="apply-vertex" class="secondary full">Fixer ces cotes</button><div id="wall-coordinate-list" class="coordinate-list"></div></details>
+        <details id="wall-coordinate-details"><summary>Cotes exactes des sommets</summary><p class="hint">X depuis la gauche. Hauteur depuis le bas. Appliquer une cote passe en forme libre et conserve les sommets saisis.</p><label>Sommet<select id="wall-vertex"></select></label><div class="fields two"><label>X depuis la gauche<input id="vertex-x" inputmode="decimal"></label><label>Hauteur depuis le bas<input id="vertex-height" inputmode="decimal"></label></div><button id="apply-vertex" class="secondary full">Fixer ces cotes</button><div id="wall-coordinate-list" class="coordinate-list"></div></details><details id="wall-edge-details" hidden><summary>Modifier une longueur et un angle</summary>
+          <p id="wall-edge-name" class="hint" role="status">Sélectionnez un côté sur le dessin.</p>
+          <div class="fields two"><label>Longueur du côté (po)<input id="wall-edge-length" inputmode="decimal" placeholder="Ex. 32 1/2"></label>
+          <label>Angle intérieur au départ (°)<input id="wall-edge-angle" inputmode="decimal" placeholder="Ex. 90"></label></div>
+          <button id="apply-wall-edge" class="secondary full" type="button">Appliquer longueur et angle</button>
+          <p class="hint">Le point de départ reste fixe. Le sommet d’arrivée peut bouger et le côté suivant change en conséquence. Les autres sommets, la largeur et la hauteur du mur restent fixes. Une forme impossible est refusée.</p>
+          <p id="wall-edge-error" class="notice error" role="alert" hidden></p>
+          </details>
         <p id="wall-gap-method" class="hint" hidden>Le lousse réduit les dimensions hors tout suivant les axes largeur et hauteur. Les angles de coupe sont calculés sur ce contour net; ce n’est pas un retrait perpendiculaire constant aux pentes.</p>
         <label class="check"><input type="checkbox" id="dimensions-confirmed"><span>Cotes et jeux de pose vérifiés</span></label>
         <div class="card-title section-title"><span class="step">02</span><h2>Les panneaux</h2></div>
