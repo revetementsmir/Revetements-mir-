@@ -1150,7 +1150,23 @@ function editPiece(id){const item=order.items.find(row=>row.id===id);if(!item)re
  clientStep=clientUnlocked=2;
  draft.length=draft.length||unitValue(120*25.4,draft.unit);
  }render();$('.production-workspace').scrollIntoView({behavior:'smooth',block:'start'});toast(`${id} : la correction sera enregistrée comme une nouvelle révision.`);}
+function reconcilePanelStageDOM(){
+ // Les moulures doivent garder le dessin DIRECTEMENT dans la carte, comme
+ // avant l'ajout des deux aperçus panneaux. Les événements du SVG suivent
+ // l'élément déplacé, sans retirer aucun gestionnaire tactile/clavier.
+ const stage=$('#production-drawing'),twin=$('#mir-panel-live-alt');
+ if(!stage||!twin)return;
+ const wrapper=stage.parentElement?.classList.contains('mir-panel-synced-views')?stage.parentElement:null;
+ if(kind==='panel'){
+  if(wrapper)return;
+  const newWrapper=document.createElement('div');newWrapper.className='mir-panel-synced-views';
+  stage.before(newWrapper);newWrapper.append(stage,twin);
+ }else if(wrapper){
+  wrapper.before(stage);stage.after(twin);wrapper.remove();
+ }
+}
 function render(){
+ reconcilePanelStageDOM();
  const freeButton=$('#mir-draw-single-panel');if(freeButton)freeButton.hidden=kind!=='panel'||!!editingItemId||authoring;
  document.body.dataset.panelSync=String(kind==='panel');
  document.body.dataset.client=String(client);
