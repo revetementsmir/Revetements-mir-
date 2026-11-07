@@ -86,12 +86,21 @@ function supplierOptions(value=''){
 function linkedPo(route){
  if(route.lane!=='supplier')return '';
  const id=route.id||'',supplier=suppliers.find(s=>s.id===route.supplierId);
- const saved=route.supplierOrderId;
+ const saved=route.supplierOrderId,production=route.productionStatus||'to_order';
+ const labels={to_order:'À commander',ordered:'Commandé',in_production:'En production externe',
+  ready:'Prêt chez fournisseur',received_partial:'Réception partielle',received:'Tout reçu'};
+ const selector=Number(route.receivedQty||0)>0?'':'<label>État fournisseur<select data-co-production-status="'+esc(id)+'">'+
+  [['ordered','Commandé'],['in_production','En production'],['ready','Prêt à recevoir']].map(([v,label])=>
+  '<option value="'+v+'"'+(production===v?' selected':'')+'>'+label+'</option>').join('')+
+  '</select></label><button type="button" data-co-action="supplier-state" data-route="'+esc(id)+'">Mettre à jour</button>';
  return '<div class="co-route-po" data-co-po-route="'+esc(id)+'"><strong>'+esc(supplier?.name||route.supplierId||'Fournisseur')+
-   ' · '+fmt(route.quantity)+' · reçu '+fmt(route.receivedQty||0)+'</strong>'+
+  ' · '+fmt(route.quantity)+' · reçu '+fmt(route.receivedQty||0)+'</strong>'+
+  '<span class="co-badge">'+esc(labels[production]||'À confirmer')+'</span>'+
   (saved?
    '<span class="co-badge">Bon '+esc(String(saved).slice(0,13))+'</span>'+
-   (Number(route.receivedQty||0)<Number(route.quantity)?'<label>Réception<input type="number" min="1" step="1" data-co-receipt="'+esc(id)+'" placeholder="Quantité"></label><button type="button" data-co-action="receive" data-route="'+esc(id)+'">Recevoir</button>':''):
+   selector+
+   (Number(route.receivedQty||0)<Number(route.quantity)?
+   '<label>Réception<input type="number" min="1" step="1" data-co-receipt="'+esc(id)+'" placeholder="Quantité"></label><button type="button" data-co-action="receive" data-route="'+esc(id)+'">Recevoir</button>':''):
    '<button type="button" data-co-action="po" data-route="'+esc(id)+'">Créer un bon</button>'+
    '<label>Ou bon existant<select data-co-existing-po="'+esc(id)+'"><option value="">Choisir après recherche</option></select></label>'+
    '<button type="button" data-co-action="existing-po" data-route="'+esc(id)+'">Ajouter à ce bon</button>'
@@ -205,6 +214,10 @@ async function actionRun(action){
   }else if(action.dataset.coAction==='receive'){
    const amount=Number(action.closest('.co-route-po')?.querySelector('[data-co-receipt]')?.value);
    response=await api.supplierReceive(org(),id,routeId,amount,rev);
+  }else if(action.dataset.coAction==='supplier-state'){
+   const value=action.closest('.co-route-po')?.querySelector('[data-co-production-status]')?.value;
+   if(!['ordered','in_production','ready'].includes(value))throw Error('Choisis un état fournisseur valide.');
+   response=await api.supplierStatus(org(),id,routeId,value,rev);
   }else return;
   status('Modification conservée côté serveur. Révision '+fmt(response.revision||rev)+'.');
   await detailReload();
