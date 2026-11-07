@@ -46,7 +46,7 @@
   async function search(org,term=''){return rpc('mir_warehouse_search',{org,term});}
   async function queue(org){return rpc('mir_warehouse_queue',{org});}
   async function register(org,data){
-   return rpc('mir_warehouse_register',{org,kind:data.kind,source_ref:data.sourceRef,sku_code:data.sku,name:data.name,display_name:data.name,unit_name:data.unit,step:data.step});
+   return rpc('mir_warehouse_register',{org,kind:data.kind,source_ref:data.sourceRef,sku_code:data.sku,display_name:data.name,unit_name:data.unit,step:data.step});
   }
   async function move({org,token,lineId=null,delta,reason}){
    const user=await verified();
