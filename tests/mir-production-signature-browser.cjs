@@ -24,10 +24,10 @@ async function verifyMouldingWizard(browser,base,artifacts){
  // Tester le vrai tracé libre, sans modifier le configurateur pour un ancien test.
  assert.equal(await desktop.locator('#production-templates [data-template]').count(),0);
  await desktop.locator('#client-draw-profile').click();
- const trace=desktop.locator('#production-drawing svg');
- await trace.waitFor({state:'visible'});
+ const desktopTrace=desktop.locator('#production-drawing svg');
+ await desktopTrace.waitFor({state:'visible'});
  for(const point of [[220,330],[465,330],[465,195]]){
-  const screen=await trace.evaluate((svg,[x,y])=>new DOMPoint(x,y).matrixTransform(svg.getScreenCTM()).toJSON(),point);
+  const screen=await desktopTrace.evaluate((svg,[x,y])=>new DOMPoint(x,y).matrixTransform(svg.getScreenCTM()).toJSON(),point);
   await desktop.mouse.click(screen.x,screen.y);
  }
  const finish=desktop.locator('#drawing-tools [data-draw-tool="draw"]');
