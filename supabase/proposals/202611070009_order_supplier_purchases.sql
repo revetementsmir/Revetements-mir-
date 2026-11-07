@@ -94,8 +94,8 @@ declare o mir_core.coordination_orders;r mir_core.coordination_routes;
   jsonb_build_object('sourceEmployeeOrderId',o.employee_order_id,'coordinationOrderId',o.id,
    'coordinationRouteId',r.id,'job',o.job,'address',o.delivery_address,'needsProductionReview',true),
   src.model_id,src.model_version) returning id into po_line;
- update mir_core.coordination_routes set supplier_order_id=po.id,supplier_line_id=po_line
- where organization_id=org and id=r.id;
+ update mir_core.coordination_routes set supplier_order_id=po.id,supplier_line_id=po_line,
+ production_status='ordered' where organization_id=org and id=r.id;
  rev:=o.revision+1;update mir_core.coordination_orders set revision=rev,updated_at=now()
  where organization_id=org and id=o.id;
  insert into mir_core.coordination_events(organization_id,coordination_id,revision,event_type,payload,actor_id)
@@ -104,6 +104,42 @@ declare o mir_core.coordination_orders;r mir_core.coordination_routes;
  result:=jsonb_build_object('revision',rev,'supplierOrderId',po.id,'supplierLineId',po_line,
   'created',new_po,'status','draft','sent',false);
  return mir_core.coordination_receipt(org,request_id,'supplier_po',payload,result);
+end$$;
+
+-- État fabrication EXTERNE : ne signifie jamais réception physique ni sortie de stock.
+create function public.mir_coordination_supplier_status(
+ org uuid,coord_id uuid,route_id uuid,next_status text,expected_revision integer,request_id uuid
+) returns jsonb language plpgsql security definer set search_path=pg_catalog,mir_core as $$
+declare o mir_core.coordination_orders;route_row mir_core.coordination_routes;
+ line_row mir_core.coordination_lines;prior jsonb;payload jsonb;result jsonb;rev integer;
+ old_rank integer;new_rank integer;begin
+ if not mir_core.coordination_allowed(org) then raise exception 'Adjointe MIR requise' using errcode='42501';end if;
+ if next_status not in ('ordered','in_production','ready') or next_status is null then
+  raise exception 'État de fabrication inconnu' using errcode='22023';end if;
+ payload:=jsonb_build_object('coord',coord_id,'route',route_id,'state',next_status,'expectedRevision',expected_revision);
+ prior:=mir_core.coordination_replay(org,request_id,'supplier_status',payload);if prior is not null then return prior;end if;
+ select * into o from mir_core.coordination_orders where organization_id=org and id=coord_id for update;
+ if not found then raise exception 'Commande inconnue' using errcode='22023';end if;
+ if o.revision<>expected_revision then raise exception 'Révision modifiée : actualiser' using errcode='40001';end if;
+ select * into route_row from mir_core.coordination_routes where organization_id=org and id=route_id for update;
+ if not found or route_row.route<>'supplier' or route_row.supplier_order_id is null then
+  raise exception 'Bon fournisseur requis' using errcode='22023';end if;
+ select * into line_row from mir_core.coordination_lines where organization_id=org
+ and id=route_row.coordination_line_id and coordination_id=o.id;
+ if not found then raise exception 'Ligne fournisseur hors commande' using errcode='22023';end if;
+ if route_row.received_qty>0 then
+  raise exception 'Réception déjà commencée : état fondé sur les quantités réellement reçues' using errcode='40001';end if;
+ old_rank:=case route_row.production_status when 'to_order' then 0 when 'ordered' then 1 when 'in_production' then 2 when 'ready' then 3 else 4 end;
+ new_rank:=case next_status when 'ordered' then 1 when 'in_production' then 2 else 3 end;
+ if new_rank<old_rank then raise exception 'Impossible de revenir en arrière sans révision explicite' using errcode='40001';end if;
+ rev:=o.revision+1;
+ update mir_core.coordination_routes set production_status=next_status where organization_id=org and id=route_id;
+ update mir_core.coordination_orders set revision=rev,updated_at=now() where organization_id=org and id=o.id;
+ insert into mir_core.coordination_events(organization_id,coordination_id,revision,event_type,payload,actor_id)
+ values(org,o.id,rev,'supplier_status',jsonb_build_object('routeId',route_id,'poId',route_row.supplier_order_id,
+ 'previous',route_row.production_status,'status',next_status,'name',line_row.item_name),auth.uid());
+ result:=jsonb_build_object('revision',rev,'state',next_status,'supplierOrderId',route_row.supplier_order_id);
+ return mir_core.coordination_receipt(org,request_id,'supplier_status',payload,result);
 end$$;
 
 -- Réception fournisseur distincte de la sortie Entrepôt : une livraison de
@@ -124,7 +160,9 @@ declare o mir_core.coordination_orders;r mir_core.coordination_routes;
  if not found or r.route<>'supplier' or r.supplier_order_id is null then raise exception 'Bon fournisseur inexistant' using errcode='22023';end if;
  if quantity is null or quantity<=0 or scale(quantity)>3 or r.received_qty+quantity>r.quantity
  then raise exception 'Réception supérieure à la quantité fournisseur' using errcode='22023';end if;
- update mir_core.coordination_routes set received_qty=coordination_routes.received_qty+mir_coordination_supplier_receive.quantity where organization_id=org and id=r.id;
+ update mir_core.coordination_routes set received_qty=coordination_routes.received_qty+mir_coordination_supplier_receive.quantity,
+ production_status=case when coordination_routes.received_qty+mir_coordination_supplier_receive.quantity=coordination_routes.quantity
+ then 'received' else 'received_partial' end where organization_id=org and id=r.id;
  rev:=o.revision+1;update mir_core.coordination_orders set revision=rev,updated_at=now() where organization_id=org and id=o.id;
  insert into mir_core.coordination_events(organization_id,coordination_id,revision,event_type,payload,actor_id)
  values(org,o.id,rev,'supplier_received',jsonb_build_object('supplierId',r.supplier_id,'poId',r.supplier_order_id,
@@ -140,7 +178,8 @@ do $$declare item record;begin
   ('public.mir_coordination_suppliers(uuid)'),
   ('public.mir_coordination_metadata(uuid,uuid,integer,jsonb,uuid)'),
   ('public.mir_coordination_supplier_po(uuid,uuid,uuid,uuid,integer,uuid)'),
-  ('public.mir_coordination_supplier_receive(uuid,uuid,uuid,numeric,integer,uuid)')
+  ('public.mir_coordination_supplier_receive(uuid,uuid,uuid,numeric,integer,uuid)'),
+  ('public.mir_coordination_supplier_status(uuid,uuid,uuid,text,integer,uuid)')
  ) as signatures(signature) loop
  execute format('revoke all on function %s from public,anon',item.signature);
  execute format('grant execute on function %s to authenticated',item.signature);
