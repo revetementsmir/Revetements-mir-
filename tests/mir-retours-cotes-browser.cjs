@@ -65,6 +65,32 @@ async function ready(){
       Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>0;
     assert.ok(!overlap,'Overlapping '+facts.markers[i].label+' / '+facts.markers[j].label);
    }
+   // Labels A-B-C-D après changements de plis dont un angle 86°.
+   const angled=await page.evaluate(()=>{
+     const P=window.MIRProduction;
+     const points=[[135,170],[485,170],[490,335],[650,349],[670,437]];
+     const bends=[{mode:'signed',turnDeg:90},{mode:'signed',turnDeg:-86},{mode:'signed',turnDeg:90}];
+     const spec={kind:'profile',name:'A à D angle 86°',unit:'in',
+       segments:[{label:'A',lengthMM:152.4},{label:'B',lengthMM:38.1},{label:'C',lengthMM:31.75},{label:'D',lengthMM:22.225}],
+       coloredFace:{side:'left',segmentId:'A'},bends};
+     const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+     svg.setAttribute('viewBox','0 0 800 520');
+     svg.style.cssText='position:absolute;left:-2000px;top:0;width:800px;height:520px';
+     svg.innerHTML=P.profileDiagramContent(spec,points,{bends,markers:true});
+     document.body.append(svg);
+     const boxes=[...svg.querySelectorAll('.profile-side-marker')].map(node=>{
+       const b=node.getBBox();return {label:node.dataset.markerLabel,x:b.x,y:b.y,w:b.width,h:b.height};
+     });
+     svg.remove();return boxes;
+   });
+   assert.deepEqual(angled.map(b=>b.label).sort(),['A','B','C','D'],'repères après pli à 86°');
+   for(const b of angled)assert.ok(b.x>=-1&&b.y>=-1&&b.x+b.w<=801&&b.y+b.h<=521,
+     'repère dans le tableau : '+JSON.stringify(b));
+   for(let i=0;i<angled.length;i++)for(let j=i+1;j<angled.length;j++){
+     const a=angled[i],b=angled[j],overlap=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>0&&
+       Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>0;
+     assert.ok(!overlap,'étiquettes qui se chevauchent : '+a.label+'/'+b.label);
+   }
    await page.locator('#production-drawing').screenshot({path:path.join(output,'mir-retours-'+viewport.name+'.png')});
    if(viewport.name==='mobile'||viewport.name==='bureau'){
     const stage=page.locator('#production-drawing');
