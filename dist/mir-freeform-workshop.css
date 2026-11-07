@@ -81,3 +81,17 @@ body.mir-freeform-active #mir-freeform-toolbar>button:focus-visible{outline:3px 
  body.mir-freeform-active .mir-freeform-previous small{font-size:9px}
  body.mir-freeform-active .mir-freeform-3d #mir-freeform-3d-canvas{height:130px}
 }
+
+/* Les plus petits iPhone/Android gardent tous les contrôles sans largeur forcée. */
+@media(max-width:650px){
+ body.mir-freeform-active .production-header{box-sizing:border-box;max-width:100%;flex-wrap:wrap}
+ body.mir-freeform-active .production-header>*{min-width:0;max-width:100%}
+ body.mir-freeform-active #mir-freeform-title{flex:1 1 125px;overflow-wrap:anywhere}
+ body.mir-freeform-active .drawing-head{flex-wrap:wrap}
+ body.mir-freeform-active .drawing-head>*{min-width:0;max-width:100%}
+ body.mir-freeform-active .mir-freeform-detected{flex:1 1 100%;overflow-wrap:anywhere}
+ body.mir-freeform-active #mir-freeform-toolbar{min-width:0;width:100%;box-sizing:border-box}
+ body.mir-freeform-active #mir-freeform-toolbar>button{min-width:0;max-width:100%;box-sizing:border-box;white-space:normal;overflow-wrap:anywhere}
+ body.mir-freeform-active #mir-freeform-toolbar .mir-freeform-previous span{min-width:0;overflow-wrap:anywhere}
+ body.mir-freeform-active #mir-freeform-toolbar .mir-freeform-add{font-size:13px}
+}
