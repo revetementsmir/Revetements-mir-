@@ -83,3 +83,20 @@ body.mir-wall-tracing .canvas-column> :not(.canvas-card){display:none!important}
 @media(min-width:741px){
  body.mir-wall-tracing .canvas-column>.canvas-card{max-width:min(1500px,96vw);width:100%;margin:0 auto}
 }
+
+
+/* MIR — masquer la page longue sous la surface de traçage plein écran. */
+html:has(body.mir-wall-tracing){height:100dvh;max-height:100dvh;overflow:hidden!important}
+body.mir-wall-tracing>.site-header,
+body.mir-wall-tracing>footer{display:none!important}
+body.mir-wall-tracing main{
+ height:100dvh!important;max-height:100dvh!important;min-height:0!important;
+ width:100%!important;max-width:none!important;margin:0!important;padding:0!important;
+ overflow:hidden!important;
+}
+body.mir-wall-tracing main>:not(.workspace){display:none!important}
+body.mir-wall-tracing .workspace{
+ display:block!important;height:100dvh!important;max-height:100dvh!important;
+ min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;
+}
+body.mir-wall-tracing .workspace>:not(.canvas-column){display:none!important}
