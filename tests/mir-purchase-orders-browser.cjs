@@ -1,5 +1,5 @@
 'use strict';
-const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
+const {drawTwoSides,openWorkshopStep}=require('./mir-draw-freeform-helper.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium}=require('playwright'),{spawn}=require('node:child_process'),{createHash}=require('node:crypto');
 const port=8883,base='http://127.0.0.1:'+port;
@@ -15,7 +15,7 @@ const hash=b=>createHash('sha256').update(b).digest('hex');
       const dismiss=d=>{console.log('DIALOG '+d.message());return d.dismiss();};page.on('pageerror',e=>errors.push(e.message));page.on('dialog',dismiss);
       await page.goto(base+'/production.html');await page.waitForFunction(()=>window.MIRProductionWorkspace);
       await drawTwoSides(page);
-      await page.locator('[data-freeform-finish]').click();
+      await openWorkshopStep(page,4);
       await page.locator('#production-piece-name').fill('Solin test 3½');
       await page.locator('#mir-direct-po-add').click();await page.locator('#mir-po-form input[name="po"]').fill('PO-PDF-01');await page.locator('#mir-po-form button[type="submit"]').click();
       // Explicit, known finish fixture for PDF validity; direct drawing and PO
