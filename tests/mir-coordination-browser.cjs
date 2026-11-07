@@ -50,7 +50,8 @@ async function ready(){for(let i=0;i<60;i++){const ok=await new Promise(resolve=
    await meta.locator('[name=address]').fill('321 rue neuve');
    await meta.locator('button[type=submit]').click();
    await page.waitForFunction(()=>window.__state.team==='Équipe B');
-   assert.match(await page.locator('#co-detail').textContent(),/Équipe B/);
+   assert.equal(await page.locator('#co-meta [name=team]').inputValue(),'Équipe B');
+   assert.equal(await page.locator('#co-meta [name=address]').inputValue(),'321 rue neuve');
    const widths=await page.evaluate(()=>({root:document.documentElement.scrollWidth,viewport:innerWidth}));
    assert.ok(widths.root<=widths.viewport+2,'pas de débordement horizontal '+JSON.stringify(widths));
    assert.deepEqual(errors,[],'Erreurs page '+size.name);
