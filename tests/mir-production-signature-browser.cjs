@@ -30,9 +30,9 @@ async function verifyMouldingWizard(browser,base,artifacts){
   const screen=await desktopTrace.evaluate((svg,[x,y])=>new DOMPoint(x,y).matrixTransform(svg.getScreenCTM()).toJSON(),point);
   await desktop.mouse.click(screen.x,screen.y);
  }
- const finish=desktop.locator('#drawing-tools [data-draw-tool="draw"]');
- assert.equal(await finish.isEnabled(),true);
- await finish.click();
+ const desktopFinish=desktop.locator('#drawing-tools [data-draw-tool="draw"]');
+ assert.equal(await desktopFinish.isEnabled(),true);
+ await desktopFinish.click();
  assert.equal(await stage(),'2');
  assert.equal(await desktop.locator('#client-step-length').isVisible(),false);
  await desktop.locator('[data-segment-length="0"]').fill('3½');
