@@ -83,6 +83,14 @@ function init(){
   target.innerHTML='<strong>Destination de cette moulure</strong><label><input id="mir-freeform-client-toggle" type="checkbox"> Boutique client <small>(facultatif)</small></label><p>Sans cette sélection, la moulure ne sera pas proposée à la boutique client. Prix et publication partagée à valider séparément.</p>';
   const dimension=$('#mir-v4-dimensions');if(dimension)dimension.before(target);else config.prepend(target);
  }
+ // Les utilitaires historiques restent accessibles sans occuper deux rangées.
+ const shortcuts=$('#mir-proc-shortcuts'),clear=$('.mir-proc-reset-link');
+ if(shortcuts&&clear&&!shortcuts.contains(clear))shortcuts.append(clear);
+ const models=shortcuts?.querySelector('[data-mir-tab="models"]');
+ if(models)models.textContent='Mes créations';
+ // Le nom se règle avec les autres informations de la pièce, jamais au-dessus du tableau.
+ const pieceName=$('#mir-piece-name-field'),destination=$('#mir-freeform-destination');
+ if(pieceName&&destination&&!config.contains(pieceName))destination.before(pieceName);
  if(!$('#mir-freeform-toolbar')){
   const toolbar=document.createElement('div');toolbar.id='mir-freeform-toolbar';toolbar.hidden=true;
   toolbar.setAttribute('role','toolbar');toolbar.setAttribute('aria-label','Actions du tracé');
