@@ -369,3 +369,119 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing button small{
 body.mir-admin-v4 #production-dialog .mir-continue-existing{
  display:grid;gap:7px;max-height:50dvh;overflow:auto;padding:2px;
 }
+
+
+/* MIR — parcours téléphone 4 étapes, moteur de tracé commun à PC/iPad. */
+@media(max-width:650px){
+ body.mir-admin-v4.mir-mobile-stepper{
+  display:flex;flex-direction:column;height:100dvh;max-height:100dvh;
+  overflow:hidden!important;background:#fafaf7;color:#18251d;
+ }
+ body.mir-mobile-stepper>.production-header{
+  flex:0 0 auto!important;min-height:55px!important;
+  padding:6px 10px!important;
+ }
+ body.mir-mobile-stepper #mir-freeform-title strong{font-size:14px}
+ body.mir-mobile-stepper #mir-freeform-title small{font-size:10px}
+ body.mir-mobile-stepper #mir-freeform-save{min-height:40px}
+ body.mir-mobile-stepper:not([data-mir-mobile-step="4"]) #mir-freeform-save{display:none!important}
+ body.mir-mobile-stepper>.production-wrap{
+  display:flex!important;flex-direction:column;flex:1 1 auto;min-height:0;
+  height:auto!important;max-height:none!important;overflow:hidden!important;
+  padding:5px 8px calc(76px + env(safe-area-inset-bottom))!important;
+ }
+ body.mir-mobile-stepper :is(.production-intro,.kind-bar,#mir-procurement-tabs,#mir-proc-shortcuts,
+  .mir-v4-technical,.mir-unified-client-shortcut,.production-order,.production-footnote,
+  .mir-destinations){display:none!important}
+ body.mir-mobile-stepper .mir-mobile-steps{
+  flex:0 0 auto;display:block!important;padding:8px 10px 11px;
+  background:#fff;border:1px solid #dfe5dc;border-radius:8px;margin:0 0 6px;
+ }
+ body.mir-mobile-stepper .mir-mobile-steps[hidden]{display:none!important}
+ body.mir-mobile-stepper .mir-mobile-step-title{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font:700 13px/1.3 Arial,Helvetica,sans-serif;color:#18251d;
+ }
+ body.mir-mobile-stepper .mir-mobile-step-title span{font-weight:500;color:#5b695d}
+ body.mir-mobile-stepper .mir-mobile-step-progress{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:9px}
+ body.mir-mobile-stepper .mir-mobile-step-progress span{height:5px;background:#dfe5dc;border-radius:5px}
+ body.mir-mobile-stepper .mir-mobile-step-progress span.done{background:#348511}
+ body.mir-mobile-stepper .production-workspace:not([hidden]){
+  display:flex!important;flex:1 1 auto;flex-direction:column;gap:6px;
+  min-height:0;max-height:none;height:100%;overflow:hidden;
+ }
+ body.mir-mobile-stepper .drawing-card,
+ body.mir-mobile-stepper .config-card{
+  border:1px solid #dfe5dc!important;border-radius:9px!important;
+  box-shadow:none!important;min-height:0;min-width:0;width:100%;
+ }
+ body.mir-mobile-stepper .drawing-card>.drawing-note,
+ body.mir-mobile-stepper .drawing-legend:not(#trace-readout),
+ body.mir-mobile-stepper #profile-dimension-list,
+ body.mir-mobile-stepper .production-validation{display:none!important}
+ body.mir-mobile-stepper .drawing-card>.drawing-head{padding:5px 8px!important;flex:0 0 auto}
+ body.mir-mobile-stepper .drawing-head .mir-freeform-detected{display:none!important}
+ body.mir-mobile-stepper .drawing-stage{margin:0!important;width:100%;min-width:0;overflow:hidden}
+ body.mir-mobile-stepper .drawing-stage>svg{display:block;width:100%;height:100%;min-height:0!important;max-height:none!important}
+ body.mir-mobile-stepper #mir-freeform-toolbar:not([hidden]){
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.8fr)!important;
+  position:fixed!important;left:0;right:0;bottom:0;z-index:45;
+  width:100%!important;min-width:0;box-sizing:border-box;gap:9px!important;
+  padding:9px max(9px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(9px,env(safe-area-inset-left))!important;
+  border-top:1px solid #dfe5dc;background:#fafaf7;box-shadow:0 -3px 14px #18251d15;
+ }
+ body.mir-mobile-stepper #mir-freeform-toolbar>button{min-height:50px!important;font-size:13px!important}
+ /* Étape 1 : tableau de tracé occupent tout l'espace utilisable; aucun scroll. */
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .config-card{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card{
+  display:flex!important;flex:1 1 auto;flex-direction:column;overflow:hidden!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>.drawing-stage{
+  flex:1 1 auto;height:auto!important;min-height:0!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>#mir-freeform-3d{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-navigation{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-tools{flex:0 0 auto;padding:4px 6px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-tools button{min-height:38px;font-size:11px}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] #trace-readout{flex:0 0 auto;padding:4px 8px;font-size:11px}
+ /* Les étapes 2 à 4 peuvent faire défiler leur contenu intérieur seulement. */
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card{
+  display:flex!important;flex:0 0 160px;flex-direction:column;overflow:hidden!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card>:not(.drawing-stage):not(.drawing-head){display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card>.drawing-stage{
+  flex:1 1 auto;height:125px!important;min-height:0!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .drawing-card{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .config-card,
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .config-card{
+  display:block!important;flex:1 1 auto;height:auto!important;max-height:none!important;
+  overflow-y:auto!important;overflow-x:hidden;overscroll-behavior:contain;
+  padding:10px!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .config-card>*,
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .config-card>*{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .config-card>#mir-v4-dimensions,
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .config-card>#mir-v4-sheet-total{display:block!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .config-card>.mir-v4-materials,
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .config-card>#mir-v4-colors,
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] .config-card>#mir-v4-face{display:block!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] #mir-v4-dimensions,
+ body.mir-mobile-stepper[data-mir-mobile-step="3"] :is(.mir-v4-materials,#mir-v4-colors,#mir-v4-face){margin:0 0 8px!important}
+ /* Confirmation: deux rendus existants, puis quantité et destinations. */
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .production-workspace{overflow-y:auto!important;overscroll-behavior:contain}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card{display:flex!important;flex:0 0 auto;flex-direction:column}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card>.drawing-tools,
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card>.drawing-navigation,
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] #trace-readout{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-stage{height:170px!important;min-height:0!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .mir-freeform-3d{display:flex!important;margin:5px!important;padding:7px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .mir-freeform-3d #mir-freeform-3d-canvas{height:150px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card{
+  display:block!important;flex:0 0 auto;overflow:visible!important;max-height:none!important;padding:10px!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>*{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>#mir-freeform-destination,
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>#mir-v4-sheet-total,
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>.mir-v4-footer{display:block!important}
+}
