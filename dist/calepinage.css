@@ -127,3 +127,80 @@ body.mir-wall-tracing .workspace>:not(.canvas-column){display:none!important}
  body.mir-wall-tracing #outline-progress{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis}
  body.mir-wall-tracing .drawing-footer{display:none!important}
 }
+
+
+/* MIR — cotes de plans individuels & 2D/3D simultanés, harmonie Atelier Pliage. */
+.mir-architect-next{margin:5px 0 10px;line-height:1.5}
+.mir-wall-panel-count{display:block;padding:9px 12px;margin:8px 0 14px;
+ border:1px solid #c7d7bc;border-radius:7px;background:#f0f6e9;color:#2b5c2a;font-size:12px;font-weight:700}
+.mir-architect-panel-dimensions{margin:14px 0 16px;padding:14px;background:#fafcf8;border:1px solid #c7d5c0;border-radius:9px}
+.mir-architect-panel-dimensions>summary{font-size:13px;color:#294934;cursor:pointer;min-height:38px;font-weight:700}
+.mir-architect-toolbar{display:flex;flex-wrap:wrap;gap:9px 20px;align-items:center;justify-content:space-between;margin:12px 0 8px}
+.mir-architect-toolbar label{display:flex;gap:9px;align-items:center;font-size:11px;font-weight:700;color:#2d4b33}
+.mir-architect-toolbar select{width:auto;min-height:43px;margin:0;padding:7px 9px;font-size:13px}
+#mir-architect-piece-count{font-size:11px;color:#45623b;font-variant-numeric:tabular-nums}
+.mir-architect-table-wrap{max-height:490px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;border-radius:7px}
+.mir-architect-table-wrap table{width:100%;border-collapse:collapse;white-space:normal}
+.mir-architect-table-wrap th{position:sticky;top:0;z-index:2;font-size:10px;min-width:72px;background:#eff4e9}
+.mir-architect-table-wrap td{vertical-align:middle;padding:8px 7px;font-size:11px;color:#2c4733;min-width:66px}
+.mir-architect-table-wrap td:first-child{min-width:68px}
+.mir-architect-table-wrap td button[data-architect-select]{color:#286b0d;font-weight:700;min-height:40px}
+.mir-architect-table-wrap td input[data-architect-width],.mir-architect-table-wrap td input[data-architect-height]{
+ display:block;min-width:94px;width:100%;max-width:132px;min-height:44px;margin:0;padding:7px 9px;
+ font:600 14px/1.25 Arial,Helvetica,sans-serif;border:1px solid #b3c6aa;border-radius:6px;color:#243d2b;background:white
+}
+.mir-architect-table-wrap td input:focus-visible,.mir-architect-table-wrap td button:focus-visible{
+ outline:2px solid #348511;outline-offset:2px
+}
+.mir-architect-table-wrap td small{display:block;font-size:10px;line-height:1.4;color:#5c7160;white-space:nowrap}
+.mir-architect-lock{display:block;font-size:10px;font-weight:700;color:#49604a;white-space:nowrap}
+.mir-architect-lock input{width:16px;height:16px;min-height:0;margin:0 5px 0 0;vertical-align:middle;accent-color:#348511}
+.mir-architect-table-wrap [data-architect-prepare]{min-height:44px;padding:8px 11px;font-weight:700;border-radius:6px}
+.mir-architect-review{padding:13px;margin-top:12px;border:1px solid #adcb9f;border-radius:9px;background:#edf5e7}
+.mir-architect-review p{font-size:12px;line-height:1.65;color:#284d30;margin:0 0 11px}
+.mir-architect-review button{min-height:44px;margin:4px 7px 4px 0}
+.mir-wall-views{display:grid;grid-template-columns:minmax(0,1.58fr) minmax(245px,.84fr);
+ gap:9px;min-width:0;min-height:0;align-items:stretch;position:relative;background:#fafcf8}
+.mir-wall-views>.drawing-stage{min-width:0;min-height:400px}
+.mir-wall-live-3d{display:flex;min-height:0;min-width:0;flex-direction:column;overflow:hidden;
+ border-left:1px solid #d2dfca;background:#f5f9f0}
+.mir-wall-live-3d[hidden]{display:none!important}
+.mir-wall-live-3d>header{padding:9px 11px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
+ gap:4px;background:#edf5e8;border-bottom:1px solid #d3ddcc}
+.mir-wall-live-3d>header strong{font-size:11px;color:#294d2a}
+.mir-wall-live-3d>header small{font-size:9px;color:#5f7459}
+.mir-wall-live-3d svg{display:block;width:100%;height:100%;min-height:185px;max-height:470px;flex:1;object-fit:contain}
+.mir-wall-live-empty{padding:16px 12px;text-align:center;margin:auto}
+@media(max-width:1000px){
+ .mir-wall-views{display:flex;flex-direction:column}
+ .mir-wall-views>.drawing-stage{min-height:330px}
+ .mir-wall-live-3d{min-height:190px;max-height:250px;border:1px solid #d1ddc9;border-radius:6px}
+ .mir-wall-live-3d svg{min-height:152px;max-height:208px}
+}
+@media(max-width:740px){
+ .mir-architect-panel-dimensions{padding:10px 8px}
+ .mir-architect-table-wrap{max-height:400px}
+ .mir-architect-toolbar{align-items:flex-start}
+ .mir-architect-table-wrap td{padding:8px 5px}
+ .mir-architect-table-wrap td input[data-architect-width],.mir-architect-table-wrap td input[data-architect-height]{min-width:86px}
+ .mir-wall-views{min-height:0}
+ .mir-wall-views>.drawing-stage{min-height:310px}
+ body.mir-wall-tracing .mir-wall-views{
+  display:flex!important;position:relative;flex:1 1 auto;min-height:0!important;height:100%
+ }
+ body.mir-wall-tracing .mir-wall-views>.drawing-stage{
+  flex:1 1 auto!important;min-height:0!important;width:100%;height:100%
+ }
+ body.mir-wall-tracing .mir-wall-live-3d:not([hidden]){
+  position:absolute;right:5px;bottom:5px;z-index:5;width:36%;height:min(25vh,166px);min-height:0;max-height:170px;
+  background:#f7faf5ed;box-shadow:0 3px 9px #293e2945;pointer-events:none
+ }
+ body.mir-wall-tracing .mir-wall-live-3d header{padding:3px 5px}
+ body.mir-wall-tracing .mir-wall-live-3d header small{display:none}
+ body.mir-wall-tracing .mir-wall-live-3d svg{height:100%;min-height:0;max-height:none}
+}
+@media(min-width:741px){
+ body.mir-wall-tracing .mir-wall-views{display:flex!important;flex:1 1 auto;min-height:0}
+ body.mir-wall-tracing .mir-wall-views>.drawing-stage{flex:1 1 auto;min-height:0!important}
+ body.mir-wall-tracing .mir-wall-live-3d:not([hidden]){flex:0 0 31%;min-width:200px;max-width:340px}
+}
