@@ -461,4 +461,33 @@ jobs:
           fetch "$base/shared-config.js?verification=$GITHUB_SHA" /tmp/mir-shared-config.js
           cmp /tmp/mir-shared-config.js _site_mir/shared-config.js
           grep -Fq 'enabled:true' /tmp/mir-shared-config.js
+
+          # QR / inventaire et coordination : vérifier les pages réellement publiées,
+          # le bon projet MIR (clé publique seulement), et tous les scripts en ligne.
+          fetch "$base/entrepot.html?verification=$GITHUB_SHA" /tmp/mir-entrepot-live.html
+          cmp /tmp/mir-entrepot-live.html _site_mir/entrepot.html
+          grep -Fq 'noindex,nofollow' /tmp/mir-entrepot-live.html
+          grep -Fq 'mir-warehouse-coordination-ui.js?v=1' /tmp/mir-entrepot-live.html
+          grep -Fq 'mir-warehouse-client.js?v=1' /tmp/mir-entrepot-live.html
+          fetch "$base/coordination.html?verification=$GITHUB_SHA" /tmp/mir-coordination-live.html
+          cmp /tmp/mir-coordination-live.html _site_mir/coordination.html
+          grep -Fq 'noindex,nofollow' /tmp/mir-coordination-live.html
+          grep -Fq 'mir-coordination-client.js?v=1' /tmp/mir-coordination-live.html
+          grep -Fq 'coordination-app.js?v=1' /tmp/mir-coordination-live.html
+          fetch "$base/entrepot-app.js?verification=$GITHUB_SHA" /tmp/mir-entrepot-app.js
+          cmp /tmp/mir-entrepot-app.js _site_mir/entrepot-app.js
+          fetch "$base/mir-warehouse-client.js?verification=$GITHUB_SHA" /tmp/mir-warehouse-client.js
+          cmp /tmp/mir-warehouse-client.js _site_mir/mir-warehouse-client.js
+          fetch "$base/mir-warehouse-coordination-ui.js?verification=$GITHUB_SHA" /tmp/mir-warehouse-coordination-ui.js
+          cmp /tmp/mir-warehouse-coordination-ui.js _site_mir/mir-warehouse-coordination-ui.js
+          fetch "$base/coordination-app.js?verification=$GITHUB_SHA" /tmp/mir-coordination-app.js
+          cmp /tmp/mir-coordination-app.js _site_mir/coordination-app.js
+          fetch "$base/mir-coordination-client.js?verification=$GITHUB_SHA" /tmp/mir-coordination-client.js
+          cmp /tmp/mir-coordination-client.js _site_mir/mir-coordination-client.js
+          fetch "$base/vendor/supabase-client.js?verification=$GITHUB_SHA" /tmp/mir-supabase-sdk.js
+          cmp /tmp/mir-supabase-sdk.js _site_mir/vendor/supabase-client.js
+          fetch "$base/vendor/qrcode.min.js?verification=$GITHUB_SHA" /tmp/mir-qrcode-sdk.js
+          cmp /tmp/mir-qrcode-sdk.js _site_mir/vendor/qrcode.min.js
+          grep -Fq 'https://gccltmaulvrnthrbnrpd.supabase.co' /tmp/mir-shared-config.js
+          echo "MIR Warehouse + Coordination pages validated"
           echo "MIR Pages verified at $base/"
