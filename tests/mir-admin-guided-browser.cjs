@@ -105,7 +105,7 @@ async function ready(){
    await context.close();
   }
   const client=await browser.newPage({viewport:{width:390,height:844}});
-  await client.goto(base+'/production.html?mode=client',{waitUntil:'domcontentloaded'});
+  await client.goto(base+'/production.html?mode=client&kind=profile',{waitUntil:'domcontentloaded'});
   await client.waitForFunction(()=>!!window.MIRProductionWorkspace?.version,{timeout:30000});
   assert.equal(await client.locator('#mir-freeform-toolbar').count(),0,'refonte admin non chargée en mode client');
   assert.equal(await client.locator('body.mir-freeform-active').count(),0);
