@@ -63,7 +63,19 @@ async function measure(page,key,value){
    await drawSegment(page,100,140,520,143,true);
    await tap(page,650,310);
    await tap(page,500,420);
-   assert.ok(await page.locator('#production-drawing svg circle').count()>=3,'Trace has live labelled points');
+   const sketchCount=await page.locator('#production-drawing svg circle').count();
+   if(sketchCount<3){
+    const debug=await page.evaluate(()=>({
+     points:document.querySelectorAll('#production-drawing svg circle').length,
+     dataTool:document.querySelector('#production-drawing')?.dataset.tool,
+     svg:document.querySelector('#production-drawing svg')?.outerHTML.slice(0,900),
+     toolbar:document.querySelector('#drawing-tools')?.textContent,
+     stage:document.querySelector('#production-drawing')?.getBoundingClientRect().toJSON()
+    }));
+    console.log('SKETCH DEBUG '+v.name+' '+JSON.stringify(debug));
+    await page.screenshot({path:path.join(art,'mir-single-debug-'+v.name+'.png'),fullPage:false});
+   }
+   assert.ok(sketchCount>=3,'Trace has live labelled points');
    assert.equal(await page.locator('#mir-panel-live-alt').getAttribute('data-panel-twin'),'3d');
    assert.ok(await page.locator('#mir-panel-live-alt svg').count()>=1,'Live illustrative 3D from current sketch');
    await page.locator('[data-panel-sketch-finish]').click();
