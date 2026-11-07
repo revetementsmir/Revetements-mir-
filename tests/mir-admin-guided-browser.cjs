@@ -1,16 +1,19 @@
 'use strict';
-/* MIR — recette Chromium du nouvel atelier libre, sans étapes ni profils imposés. */
+/* Recette réelle Chrome de l'atelier MIR : SVG seul = ajout de côtés,
+ * Continuer = étape suivante, jamais nouvelle géométrie, 2 destinations. */
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright'),{spawn}=require('node:child_process');
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
+const {pointOnDrawing,tapDrawing,drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
 const port=8851,base='http://127.0.0.1:'+port;
 async function ready(){
  for(let i=0;i<80;i++){
   const ok=await new Promise(resolve=>http.get(base+'/production.html',r=>{r.resume();resolve(r.statusCode===200)}).on('error',()=>resolve(false)));
   if(ok)return;await new Promise(r=>setTimeout(r,150));
  }
- throw Error('Serveur de test MIR non démarré.');
+ throw Error('Serveur de test MIR indisponible');
 }
+async function state(page){return page.evaluate(()=>window.MIRProductionWorkspace.getLivePreviewState());}
 (async()=>{
  fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});
  const server=spawn('python3',['-m','http.server',String(port),'--directory',path.join(__dirname,'../dist'),'--bind','127.0.0.1'],{stdio:'ignore'});
@@ -26,91 +29,119 @@ async function ready(){
    page.on('pageerror',error=>errors.push(error.message));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version&&window.MIRAdminWizard?.active,{timeout:30000});
-   const names=await page.locator('#mir-procurement-tabs button').allTextContents();
-   assert.deepEqual(names,['Créer','Boutique','Magasin employés','Bons de commande']);
-   assert.equal(await page.locator('#mir-guide-steps').count(),0,'plus de guide en 4 étapes');
-   assert.equal(await page.locator('#production-templates [data-template]').count(),0,'aucun profil de départ prédéfini');
-   assert.equal(await page.locator('.mir-v4-picker').isVisible(),false,'ancien sélecteur de profil masqué');
-   assert.equal(await page.locator('#mir-freeform-toolbar').isVisible(),true,'barre du tracé permanente');
-   assert.equal(await page.locator('#mir-freeform-3d').isVisible(),true,'miniature 3D sur même page');
-   assert.equal(await page.locator('#mir-freeform-client-toggle').isChecked(),false,'boutique désactivée par défaut');
-   assert.equal(await page.locator('[data-freeform-undo]').isDisabled(),true,'impossible d effacer un tracé vide');
-   await page.locator('[data-freeform-add]').click();
-   await page.locator('[data-freeform-add]').click();
-   const state=()=>page.evaluate(()=>window.MIRProductionWorkspace.getLivePreviewState());
-   let snapshot=await state();
-   assert.equal(snapshot.model.segments.length,2,'deux côtés ajoutés sans modèle');
-   assert.equal(snapshot.model.valid,true);
-   assert.match(await page.locator('#mir-freeform-detected').textContent(),/L/,'la reconnaissance suggère une forme en L');
+   const nav=await page.locator('#mir-procurement-tabs button').allTextContents();
+   assert.deepEqual(nav,['Créer','Mes pliages','Boutique','Magasin employés','Bons de commande']);
+   assert.equal(await page.locator('#mir-guide-steps').count(),0,'aucune navigation obligatoire en quatre pages');
+   assert.equal(await page.locator('#production-templates [data-template]').count(),0,'aucun profil prédéfini');
+   assert.equal(await page.locator('.mir-v4-picker').isVisible(),false,'ancien sélecteur masqué');
+   assert.equal(await page.locator('#mir-freeform-toolbar').isVisible(),true,'barre de tracé présente');
+   assert.equal(await page.locator('[data-freeform-redo]').count(),0,'Rétablir supprimé');
+   assert.equal(await page.locator('[data-freeform-add]').count(),0,'Ajouter un côté supprimé');
+   assert.match(await page.locator('[data-freeform-next]').innerText(),/Continuer/);
+   assert.equal(await page.locator('[data-freeform-next]').isDisabled(),true,'Continuer attend une forme dessinée');
+   assert.equal(await page.locator('#mir-freeform-client-toggle').isChecked(),false,'Boutique décochée');
+   assert.equal(await page.locator('#mir-freeform-store-toggle').isChecked(),false,'Magasin décoché');
+   assert.equal(await page.locator('#mir-freeform-3d').isVisible(),true,'3D sur la même page');
+   assert.equal(await page.locator('[data-freeform-undo]').isDisabled(),true,'aucun côté à effacer au départ');
+
+   // Aucune interaction en dehors du vrai SVG ne doit créer de segment.
+   await page.locator('.drawing-head').click({position:{x:8,y:8}});
+   await page.locator('#mir-freeform-3d-canvas').click({position:{x:18,y:18}});
+   await page.locator('#mir-freeform-destination').click({position:{x:7,y:7}});
+   await page.locator('#production-drawing').evaluate(node=>{
+    node.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:0,clientY:0}));
+   });
+   assert.equal((await state(page)).drawPointsMM.length,0,'clic hors tableau sans création de point');
+   await drawTwoSides(page);
+   assert.equal((await state(page)).model.segments.length,2,'deux côtés tracés depuis le SVG');
+   assert.equal((await state(page)).model.valid,true);
+   assert.match(await page.locator('#mir-freeform-detected').textContent(),/L/);
    assert.equal(await page.locator('#mir-freeform-3d-canvas [data-mir-live-3d="ready"]').count(),1);
+
+   const drawingBefore=JSON.stringify((await state(page)).drawPointsMM);
+   for(const selector of ['.drawing-head','#mir-freeform-3d-canvas','#mir-freeform-destination']){
+    await page.locator(selector).click({position:{x:7,y:7}});
+    assert.equal(JSON.stringify((await state(page)).drawPointsMM),drawingBefore,'clic hors SVG ne crée pas de côté : '+selector);
+   }
+   // Glisser depuis le tableau puis terminer nettement à l’extérieur : annuler ce geste.
+   const inside=await pointOnDrawing(page,395,190);
+   const bounds=await page.locator('#production-drawing').boundingBox();
+   const outside={x:Math.max(4,bounds.x-18),y:inside.y};
+   await page.mouse.move(inside.x,inside.y);
+   await page.mouse.down();
+   await page.mouse.move(outside.x,outside.y,{steps:5});
+   await page.mouse.up();
+   assert.equal(JSON.stringify((await state(page)).drawPointsMM),drawingBefore,'relâcher hors du tableau annule le nouveau trait');
+
    await page.locator('[data-freeform-undo]').click();
-   snapshot=await state();
-   assert.equal(snapshot.drawPointsMM.length,2,'précédent efface le dernier côté et son pli');
-   await page.locator('[data-freeform-redo]').click();
-   assert.equal((await state()).model.segments.length,2,'rétablir rend le profil intact');
-   await page.locator('[data-freeform-finish]').click();
-   assert.equal((await state()).tool,'select','tracé terminé sans changer de page');
-   await page.locator('[data-freeform-add]').click();
-   assert.equal((await state()).model.segments.length,3,'ajout de côté après cotation');
-   await page.locator('[data-freeform-undo]').click();
-   assert.equal((await state()).model.segments.length,2,'effacement fonctionne aussi après cotation');
-   await page.locator('[data-freeform-redo]').click();
-   assert.equal((await state()).model.segments.length,3,'rétablissement depuis cotes');
-   assert.equal(await page.locator('#mir-v4-dimensions').evaluate(e=>e.open),true,'cotes visibles');
+   assert.equal((await state(page)).drawPointsMM.length,2,'Précédent efface le dernier côté');
+   await tapDrawing(page,440,140);
+   assert.equal((await state(page)).model.segments.length,2,'nouveau trait créé uniquement sur le tableau');
+
+   // Continuer fait avancer les contrôles sans changer la géométrie.
+   const geometry=JSON.stringify((await state(page)).model.pointsMM);
+   await page.locator('[data-freeform-next]').click();
+   assert.equal(await page.evaluate(()=>window.MIRAdminWizard.step),2,'Continuer passe aux mesures');
+   assert.equal((await state(page)).tool,'select','le tracé est terminé pour éditer les mesures');
+   assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'Continuer ne dessine aucun côté');
+   assert.equal(await page.locator('#mir-v4-dimensions').evaluate(e=>e.open),true);
+   await page.locator('[data-freeform-next]').click();
+   assert.equal(await page.evaluate(()=>window.MIRAdminWizard.step),3,'pli et couleur');
+   await page.locator('[data-freeform-next]').click();
+   assert.equal(await page.evaluate(()=>window.MIRAdminWizard.step),4,'choix Boutique/Magasin');
+   await page.locator('[data-freeform-next]').click();
+   assert.equal(await page.evaluate(()=>window.MIRAdminWizard.step),5,'enregistrement ou bon');
+   assert.equal(await page.locator('[data-freeform-next]').isDisabled(),true);
+   assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'aucune étape ne change les points');
+
    const first=page.locator('#production-dimensions input[data-segment-length="0"]');
    const fraction=page.locator('#production-dimensions input[data-segment-length="0"] + select[data-pick-fraction]');
    await first.fill('');
    await fraction.selectOption('8');
-   assert.equal(await first.inputValue(),'0.5','fraction 1/2 donne 0.5');
+   assert.equal(await first.inputValue(),'0.5','fraction 1/2 = 0.5');
    await first.fill('6');
-   const layout=await page.evaluate(()=>{
-    const rect=selector=>{const b=document.querySelector(selector).getBoundingClientRect();return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,width:b.width,height:b.height};};
-    return {viewport:innerWidth,scroll:document.documentElement.scrollWidth,draw:rect('.drawing-card'),settings:rect('.config-card')};
+
+   const positions=await page.evaluate(()=>{
+    const box=selector=>{const b=document.querySelector(selector).getBoundingClientRect();return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,width:b.width,height:b.height};};
+    const root=document.documentElement;
+    return {scrollWidth:root.scrollWidth,viewport:innerWidth,draw:box('.drawing-card'),settings:box('.config-card')};
    });
-   assert.ok(layout.scroll<=layout.viewport+2,'pas de débordement horizontal '+size.name+' '+JSON.stringify(layout));
-   if(size.width>=900){
-    assert.ok(layout.settings.left>=layout.draw.right-5,size.name+' : dessin et réglages côte à côte');
-   }else assert.ok(layout.settings.top>=layout.draw.bottom-10,size.name+' : panneau disponible en portrait');
+   assert.ok(positions.scrollWidth<=positions.viewport+2,'pas de débordement horizontal '+size.name+' '+JSON.stringify(positions));
+   if(size.width>=900)assert.ok(positions.settings.left>=positions.draw.right-5,'deux colonnes en paysage');
+   else assert.ok(positions.settings.top>=positions.draw.bottom-10,'colonne de réglages accessible en portrait');
+   if(size.width===1440){
+    const scroll=await page.evaluate(()=>({body:getComputedStyle(document.body).overflowY,config:getComputedStyle(document.querySelector('.config-card')).overflowY,
+      mainBottom:document.querySelector('#production-main').getBoundingClientRect().bottom,viewport:innerHeight}));
+    assert.equal(scroll.body,'hidden','PC fixe sans défilement de page');
+    assert.equal(scroll.config,'auto','réglages défilables dans leur panneau');
+    assert.ok(scroll.mainBottom<=scroll.viewport+2);
+   }
    await page.screenshot({path:path.join(__dirname,'../artifacts/mir-admin-guide-'+size.name+'.png'),fullPage:true});
    if(size.name==='bureau'){
-    assert.equal(await page.locator('#mir-freeform-save').isDisabled(),false);
+    await page.locator('#mir-freeform-store-toggle').check();
     await page.locator('#mir-freeform-save').click();
     await page.locator('#save-production-template').waitFor({state:'visible'});
-    assert.equal(await page.locator('#save-production-template input[name="client"]').isChecked(),false,'aucune boutique sans sélection');
-    await page.locator('#save-production-template input[name="name"]').fill('Création privée A');
+    assert.equal(await page.locator('#save-production-template input[name="store"]').isChecked(),true,'Magasin repris de son interrupteur');
+    assert.equal(await page.locator('#save-production-template input[name="client"]').isChecked(),false,'Boutique reste indépendante');
+    await page.locator('#save-production-template input[name="name"]').fill('Solin employés ABC');
     await page.locator('#save-production-template button[type="submit"]').click();
     await page.waitForFunction(()=>JSON.parse(localStorage.getItem('mir_production_templates_v1')||'{"records":[]}').records.length===1);
-    let records=await page.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_templates_v1')).records);
-    assert.equal(records[0].channels.client,false,'création non publiée en boutique');
-    await page.locator('#production-library [data-new-model="profile"]').click();
-    await page.waitForFunction(()=>window.MIRAdminWizard?.active);
-    await page.locator('[data-freeform-add]').click();
-    await page.locator('[data-freeform-add]').click();
-    await page.locator('#mir-freeform-client-toggle').check();
-    await page.locator('#mir-freeform-save').click();
-    await page.locator('#save-production-template').waitFor({state:'visible'});
-    assert.equal(await page.locator('#save-production-template input[name="client"]').isChecked(),true,'boutique pré-cochée explicitement');
-    await page.locator('#save-production-template input[name="name"]').fill('Moulure boutique B');
-    await page.locator('#save-production-template button[type="submit"]').click();
-    records=await page.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_templates_v1')).records);
-    assert.equal(records.length,2);
-    assert.equal(records[1].channels.client,true);
-    assert.equal(records[1].commercial.status,'draft','la publication serveur et les prix ne sont pas simulés');
-    await page.locator('#mir-procurement-tabs [data-mir-tab="store"]').click();
-    await page.locator('#mir-procurement-tabs [data-mir-tab="orders"]').click();
-    assert.equal(await page.locator('#mir-procurement-panel .mir-po-tabs [data-mir-po-view]').count(),3,'bons préservés');
+    const records=await page.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_templates_v1')).records);
+    assert.equal(records[0].channels.store,true);
+    assert.equal(records[0].channels.client,false);
+    assert.equal(records[0].commercial.status,'draft','Boutique sans publication implicite');
+    await page.locator('#mir-procurement-tabs [data-mir-tab="models"]').click();
+    assert.equal(await page.locator('#production-library .model-library-card').count(),1,'Mes pliages contient le pliage enregistré');
    }
-   assert.deepEqual(errors,[],size.name+' erreurs navigateur');
-   console.log('PASS '+size.name+' '+size.width+'x'+size.height+': atelier libre, Précédent, Rétablir, reconnaissance, boutique facultative');
+   assert.deepEqual(errors,[],size.name+' erreurs de page');
+   console.log('PASS '+size.name+' : SVG seul, Continuer sans trait, deux interrupteurs, PC/iPad et commandes protégés');
    await context.close();
   }
   const client=await browser.newPage({viewport:{width:390,height:844}});
   await client.goto(base+'/production.html?mode=client&kind=profile',{waitUntil:'domcontentloaded'});
   await client.waitForFunction(()=>!!window.MIRProductionWorkspace?.version,{timeout:30000});
-  assert.equal(await client.locator('#mir-freeform-toolbar').count(),0,'refonte admin non chargée en mode client');
-  assert.equal(await client.locator('body.mir-freeform-active').count(),0);
-  assert.equal(await client.locator('#production-templates [data-template]').count(),0,'client sans profils prédéfinis');
-  console.log('PASS parcours client protégé des changements admin et sans profils imposés');
+  assert.equal(await client.locator('#mir-freeform-toolbar').count(),0,'atelier admin non chargé chez client');
+  assert.equal(await client.locator('#production-templates [data-template]').count(),0);
   await client.close();
  }finally{if(browser)await browser.close();server.kill();}
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1;});
