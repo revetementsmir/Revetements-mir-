@@ -77,6 +77,17 @@ async function measure(page,key,value){
    }
    assert.ok(sketchCount>=3,'Trace has live labelled points');
    assert.equal(await page.locator('#mir-panel-live-alt').getAttribute('data-panel-twin'),'3d');
+   if(!(await page.locator('#mir-panel-live-alt svg').count())){
+    const debug=await page.evaluate(()=>{
+     const circles=[...document.querySelectorAll('#production-drawing svg circle')].map(n=>[Number(n.getAttribute('cx')),Number(n.getAttribute('cy'))]);
+     const ratio=window.MIRPanelSketch.normalize(circles);
+     const spec={kind:'panel',shape:'polygon',contourRatios:ratio,width:48,height:36,relief:0,lip:'0',lips:{},bottomEdgeId:'edge-1',perforation:{enabled:false}};
+     const model=window.MIRProduction.buildPanel(spec),mesh=window.MIRProductionVolume.buildMesh(model);
+     return {circles,ratio,modelValid:model.valid,modelErrors:model.validation.errors,meshValid:mesh.valid,meshErrors:mesh.errors,alt:document.querySelector('#mir-panel-live-alt')?.outerHTML.slice(0,1000)};
+    });
+    console.log('MIR PREVIEW DEBUG '+v.name+': '+JSON.stringify(debug));
+    await page.screenshot({path:path.join(art,'mir-single-3d-debug-'+v.name+'.png'),fullPage:false});
+   }
    assert.ok(await page.locator('#mir-panel-live-alt svg').count()>=1,'Live illustrative 3D from current sketch');
    await page.locator('[data-panel-sketch-finish]').click();
    assert.equal(await page.locator('#production-drawing svg[data-mir-panel-sketch]').count(),0);
