@@ -6,7 +6,7 @@ const $=selector=>document.querySelector(selector), Core=window.MIRWarehouseCore
 const status=message=>{$('#wh-status').textContent=String(message||'');};
 const live=message=>{$('#wh-live').textContent=String(message||'');};
 const fmt=n=>new Intl.NumberFormat('fr-CA',{maximumFractionDigits:3}).format(Number(n)||0);
-let client=null,orgs=[],current=null,selectedLineId='',lastQueue=[],busy=false,scannerStream=null,scanFrame=0;
+let client=null,orgs=[],current=null,selectedLineId='',lastQueue=[],busy=false,scannerStream=null,scanFrame=0,catalogueItems=[];
 const node=(tag,text='',parent)=>{const el=document.createElement(tag);el.textContent=String(text??'');if(parent)parent.append(el);return el;};
 function fail(error){const message=error?.message||String(error||'Opération non confirmée');status(message);live(message);return message;}
 function clearChildren(selector){const el=$(selector);if(el)el.replaceChildren();return el;}
@@ -19,10 +19,60 @@ function clearIdentity(){
  clearChildren('#wh-queue');clearChildren('#wh-history');clearChildren('#wh-results');
  $('#wh-submit').disabled=true;
 }
+async function loadCatalogue(){
+ if(catalogueItems.length||!activeOrg()?.isAdmin||!window.MIREmployeeStore?.buildCatalogue)return;
+ try{
+  const response=await fetch('catalogue-fd6866b49d21.json',{cache:'no-cache'});
+  if(!response.ok)throw Error('Le catalogue MIR ne répond pas.');
+  const raw=await response.json();
+  catalogueItems=window.MIREmployeeStore.buildCatalogue(raw.materials||[]);
+  catalogueResults();
+ }catch(error){status('Catalogue non chargé : '+error.message);}
+}
+function catalogueResults(){
+ const selector=clearChildren('#wh-catalogue-select'),term=$('#wh-catalogue-query').value.trim().toLocaleLowerCase('fr-CA');
+ const first=node('option','Choisir la référence exacte',selector);first.value='';
+ const entries=catalogueItems.filter(item=>item.active!==false&&!item.referencePending&&
+  (item.name+' '+item.brand+' '+item.id).toLocaleLowerCase('fr-CA').includes(term)).slice(0,60);
+ for(const item of entries){const o=node('option',item.name+' · '+(item.brand||'MIR')+' · '+item.unit,selector);o.value=item.id;}
+ catalogueOptions();
+}
+function catalogueOptions(){
+ const item=catalogueItems.find(row=>row.id===$('#wh-catalogue-select').value);
+ const colors=clearChildren('#wh-catalogue-color'),formats=clearChildren('#wh-catalogue-format');
+ const c=node('option',item?.colorPolicy==='required'?'Choisir une couleur exacte':'Aucune couleur requise',colors);c.value='';
+ for(const row of item?.colors||[]){const o=node('option',row.name,colors);o.value=row.id;}
+ const base=node('option',item?.formats?.length>1?'Choisir un format exact':'Format standard',formats);base.value='';
+ for(const row of item?.formats||[]){const o=node('option',row.label||row.id,formats);o.value=row.id;}
+ colors.disabled=!item||item.colorPolicy==='none';
+ formats.disabled=!item||item.formats?.length<=1;
+}
+function useCatalogue(){
+ const item=catalogueItems.find(row=>row.id===$('#wh-catalogue-select').value),catalogue=window.MIREmployeeStore;
+ if(!item)return status('Choisis un article existant du catalogue MIR.');
+ if(item.measureFields?.length)return status('Ce pliage demande des cotes : crée-le et enregistre-le d’abord dans Mes pliages.');
+ const configured=catalogue.configureLine({catalogue:catalogueItems},{itemId:item.id,quantity:1,
+  colorId:$('#wh-catalogue-color').value||undefined,formatId:$('#wh-catalogue-format').value||undefined});
+ if(!configured.ok)return status(configured.error?.message||'Choisis la bonne couleur et le bon format.');
+ const line=configured.line,form=$('#wh-register-form');
+ if(line.stockKey.length>300)return status('Variante trop longue : associe cette référence depuis Mes pliages avec l’Admin.');
+ // Les pièces personnalisées du catalogue partagé ont un autre identifiant stable.
+ // Une ancienne ligne du magasin reste une référence matérielle, sans inventer un UUID modèle.
+ form.elements.kind.value='hardware';
+ form.elements.sourceRef.value=line.stockKey;
+ form.elements.sku.value=(item.id+(line.colorId?'-'+line.colorId:'')+(line.formatId?'-'+line.formatId:''))
+   .replace(/[^a-zA-Z0-9._-]/g,'-').slice(0,80);
+ form.elements.name.value=item.name+(line.colorName?' · '+line.colorName:'')+(line.formatLabel?' · '+line.formatLabel:'');
+ form.elements.unit.value=item.unit;
+ form.elements.step.value=item.quantityStep||1;
+ status('Référence exacte reprise : '+item.name+'. Confirme les champs avant de créer son QR.');
+ form.elements.sku.focus();
+}
 function renderOrgs(){
  const element=clearChildren('#wh-org');
  for(const row of orgs){const opt=node('option',row.name||'Organisation MIR',element);opt.value=row.id;}
  $('#wh-register-section').hidden=!activeOrg()?.isAdmin;
+ if(activeOrg()?.isAdmin)void loadCatalogue();
 }
 async function session(){
  if(!client)return;
@@ -212,6 +262,9 @@ $('#wh-search-form').addEventListener('submit',async event=>{
  try{renderSearch(await client.search(org(),$('#wh-search').value.trim()));}catch(error){fail(error);}
 });
 $('#wh-queue-refresh').addEventListener('click',refreshQueue);
+$('#wh-catalogue-query').addEventListener('input',catalogueResults);
+$('#wh-catalogue-select').addEventListener('change',catalogueOptions);
+$('#wh-catalogue-use').addEventListener('click',useCatalogue);
 $('#wh-order-select').addEventListener('change',showOrder);
 $('#wh-delta').addEventListener('input',preview);
 $('#wh-reason').addEventListener('input',event=>{event.target.dataset.auto='0';preview();});
