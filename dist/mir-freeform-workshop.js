@@ -18,7 +18,7 @@ function updatePreview(state){
  current=state||null;
  const active=!!state&&state.kind==='profile'&&!state.authoring&&!state.editingItemId&&
    (!document.body.dataset.mirTab||document.body.dataset.mirTab==='draw')&&!document.body.classList.contains('mir-v4-secondary-view');
- document.body.classList.toggle('mir-freeform-active',active);
+ if(document.body.classList.contains('mir-freeform-active')!==active)document.body.classList.toggle('mir-freeform-active',active);
  const toolbar=$('#mir-freeform-toolbar');
  if(toolbar)toolbar.hidden=!active;
  if(active&&!wasActive){const b=$('#mir-freeform-client-toggle');if(b)b.checked=false;}
