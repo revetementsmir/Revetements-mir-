@@ -153,12 +153,12 @@
     function save(){try{if(win.localStorage.getItem(KEY)!==stored)throw Error('Le suivi a changé dans un autre onglet. Rechargez la page.');const raw=JSON.stringify(state);win.localStorage.setItem(KEY,raw);stored=raw;return true;}catch{win.alert('Sauvegarde impossible ou données modifiées dans un autre onglet. Rechargez avant de continuer.');return false;}}
     save();
     const tabs=doc.createElement('nav');tabs.id='mir-procurement-tabs';tabs.setAttribute('aria-label','Administration du pliage');
-    tabs.innerHTML='<button type="button" data-mir-tab="draw">Créer</button><button type="button" data-mir-tab="boutique">Boutique</button><button type="button" data-mir-tab="store">Magasin employés</button><button type="button" data-mir-tab="orders">Bons de commande</button>';
+    tabs.innerHTML='<button type="button" data-mir-tab="draw">Créer</button><button type="button" data-mir-tab="models">Mes pliages</button><button type="button" data-mir-tab="boutique">Boutique</button><button type="button" data-mir-tab="store">Magasin employés</button><button type="button" data-mir-tab="orders">Bons de commande</button>';
     const panel=doc.createElement('section');panel.id='mir-procurement-panel';panel.hidden=true;
     main.insertBefore(tabs,main.firstChild);main.append(panel);doc.body.classList.add('mir-procurement-ready');
-    const shortcuts=doc.createElement('div');shortcuts.id='mir-proc-shortcuts';shortcuts.innerHTML='<button type="button" data-mir-tab="models">Mes modèles enregistrés</button><button type="button" data-mir-tab="draw">＋ Nouveau dessin</button>';
+    const shortcuts=doc.createElement('div');shortcuts.id='mir-proc-shortcuts';shortcuts.innerHTML='<button type="button" data-mir-tab="draw">＋ Nouveau dessin</button>';
     tabs.after(shortcuts);
-    const clearLink=doc.createElement('a');clearLink.href='vider-atelier.html';clearLink.className='mir-proc-reset-link';clearLink.textContent='Vider mes profils et essais enregistrés';tabs.insertAdjacentElement('afterend',clearLink);
+    const clearLink=doc.createElement('a');clearLink.href='vider-atelier.html';clearLink.className='mir-proc-reset-link';clearLink.textContent='Gérer les sauvegardes locales';tabs.insertAdjacentElement('afterend',clearLink);
     function currentOrder(){return getDossier(win.localStorage);}
     function sharedCatalogue(destination,label){return win.MIRSharedConfig?.enabled===true?'<p><a class="primary-button" href="espace-partage.html?destination='+destination+'">'+label+'</a></p>':'';}
     function populateOrder(){const o=currentOrder();if(o&&state.formSource!==o.id&&!state.editingId){ui.poNumber=o.poNumber||'';ui.job=o.project||'';ui.foreman=o.foreman||'';ui.requestedDate=o.date||'';state.formSource=o.id;}if(o){if(!ui.poNumber)ui.poNumber=o.poNumber||'';if(!ui.job)ui.job=o.project||'';if(!ui.foreman)ui.foreman=o.foreman||'';if(!ui.requestedDate)ui.requestedDate=o.date||'';}}
@@ -304,7 +304,7 @@
       if(pendingWorkflowObserver){pendingWorkflowObserver.disconnect();pendingWorkflowObserver=null;}
       tab=['draw','models','boutique','store','orders','suppliers'].includes(next)?next:'draw';
       doc.body.dataset.mirTab=tab;shortcuts.hidden=tab!=='draw'&&tab!=='models';panel.hidden=!['orders','suppliers','boutique','store'].includes(tab);
-      tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===(tab==='suppliers'?'orders':tab==='models'?'draw':tab)?'page':'false'));
+      tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===(tab==='suppliers'?'orders':tab)?'page':'false'));
       shortcuts.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===tab?'page':'false'));
       if(tab==='draw'||tab==='models'){
         const workflow=doc.querySelector('#production-workflow [data-workflow="'+(tab==='draw'?'configure':'models')+'"]');
