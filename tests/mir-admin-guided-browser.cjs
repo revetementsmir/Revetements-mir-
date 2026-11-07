@@ -1,6 +1,6 @@
 'use strict';
-/* Recette réelle Chrome de l'atelier MIR : SVG seul = ajout de côtés,
- * Continuer = étape suivante, jamais nouvelle géométrie, 2 destinations. */
+/* Recette réelle Chrome MIR : SVG seul ajoute les côtés; Continuer ouvre
+ * le menu final combinable, jamais une étape de configuration. */
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright'),{spawn}=require('node:child_process');
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
@@ -90,21 +90,19 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    await tapDrawing(page,440,140);
    assert.equal((await state(page)).model.segments.length,2,'nouveau trait créé uniquement sur le tableau');
 
-   // Continuer fait avancer les contrôles sans changer la géométrie.
+   // « Continuer » est l'unique ouverture du choix de sortie. Aucun sous-écran
+   // n'impose de progression parmi mesures, angles, couleurs et destinations.
    const geometry=JSON.stringify((await state(page)).model.pointsMM);
    await page.locator('[data-freeform-next]').click();
-   assert.equal(await page.evaluate(()=>window.MIRAdminWizard.step),2,'Continuer passe aux mesures');
-   assert.equal((await state(page)).tool,'select','le tracé est terminé pour éditer les mesures');
-   assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'Continuer ne dessine aucun côté');
-   assert.equal(await page.locator('#mir-v4-dimensions').evaluate(e=>e.open),true);
-   await page.locator('[data-freeform-next]').click();
-   assert.equal(await page.evaluate(()=>window.MIRAdminWizard.step),3,'pli et couleur');
-   await page.locator('[data-freeform-next]').click();
-   assert.equal(await page.evaluate(()=>window.MIRAdminWizard.step),4,'choix Boutique/Magasin');
-   await page.locator('[data-freeform-next]').click();
-   assert.equal(await page.evaluate(()=>window.MIRAdminWizard.step),5,'enregistrement ou bon');
-   assert.equal(await page.locator('[data-freeform-next]').isDisabled(),true);
-   assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'aucune étape ne change les points');
+   assert.equal(await page.locator('#production-dialog').evaluate(node=>node.open),true,'Continuer ouvre le dialogue final');
+   assert.match(await page.locator('#production-dialog-title').textContent(),/moulure/i);
+   assert.equal(await page.locator('[data-mir-continue-action]').count(),3,'Enregistrer, bon existant, nouveau bon');
+   assert.equal(await page.locator('#mir-continue-save').isChecked(),false,'aucun enregistrement implicite');
+   assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'Continuer ne modifie aucun côté');
+   assert.equal((await state(page)).tool,'select','les cotes restent modifiables');
+   assert.equal(await page.locator('#mir-v4-dimensions').evaluate(node=>node.open),true,'mesures toujours sur la même page');
+   await page.locator('#production-dialog [data-close-production-dialog]').click();
+   assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'fermer sans toucher au dessin');
 
    const first=page.locator('#production-dimensions input[data-segment-length="0"]');
    const fraction=page.locator('#production-dimensions input[data-segment-length="0"] + select[data-pick-fraction]');
