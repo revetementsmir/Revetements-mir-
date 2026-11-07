@@ -72,6 +72,18 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    await page.mouse.move(outside.x,outside.y,{steps:5});
    await page.mouse.up();
    assert.equal(JSON.stringify((await state(page)).drawPointsMM),drawingBefore,'relâcher hors du tableau annule le nouveau trait');
+   if(size.width<1100){
+     // Vrai événement tactile : capture du doigt puis sortie du SVG.
+     const start=await pointOnDrawing(page,395,190);
+     const stageBox=await page.locator('#production-drawing').boundingBox();
+     const endpoint={x:Math.max(4,stageBox.x-18),y:start.y};
+     const cdp=await context.newCDPSession(page);
+     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[start]});
+     await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:start.x+35,y:start.y+7}]});
+     await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[endpoint]});
+     await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+     assert.equal(JSON.stringify((await state(page)).drawPointsMM),drawingBefore,'le doigt relâché hors tableau n’ajoute jamais de côté');
+   }
 
    await page.locator('[data-freeform-undo]').click();
    assert.equal((await state(page)).drawPointsMM.length,2,'Précédent efface le dernier côté');
