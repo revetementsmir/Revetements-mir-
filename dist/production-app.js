@@ -23,6 +23,7 @@ const traceHeights=[6,8,10,12,14];
 let traceHeight=14,traceGridDivisor=4;
 let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,viewPan={x:0,y:0},pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
 let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces=[];
+let panelSketchPoints=[],panelSketchHover=null,panelSketchBefore=null;
 const clientProfileWizard=()=>client&&catalogueChannel!=='store'&&kind==='profile';
 let activeStoreColorLock=false;
 function applyStoreColorLock(){
@@ -39,15 +40,15 @@ function applyStoreColorLock(){
  }
 }
 const profiles={l:{name:'Pliage en L',dimensions:{A:3,B:2}},j:{name:'Pliage en J',dimensions:{A:1,B:3,C:1}},z:{name:'Pliage en Z',dimensions:{A:2,B:4,C:2}},beam5:{name:'Cache-poutre · 5 côtés',dimensions:{A:1,B:6,C:8,D:6,E:1}},omega:{name:'Oméga',dimensions:{A:1,B:2,C:4,D:2,E:1}},custom:{name:'Profil personnalisé',segments:[{label:'A',length:4},{label:'B',length:3},{label:'C',length:2}],bends:[{mode:'interior',angle:90,direction:'left'},{mode:'interior',angle:90,direction:'right'}],startAngle:0},...window.MIRBendingPresets?.catalog(),j_soffite:{name:'J à soffite · 12 pi',template:'j',mirProfileId:'j_soffite',dimensions:{A:1,B:3,C:1}}};
-const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','Triangle rectangle'],['trapezoid','Trapèze'],['parallelogram','Parallélogramme'],['pointed','Côté en pointe']];
+const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','Triangle rectangle'],['triangle','Triangle à sommet'],['roof-slope','Panneau haut rampant X/12'],['trapezoid','Trapèze'],['parallelogram','Parallélogramme'],['pointed','Côté en pointe']];
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));return true;}catch{toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
 function persist(){store(KEYS.draft,{version:1,order});}
 function toast(text){$('#production-toast').textContent=text;$('#production-toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#production-toast').classList.remove('visible'),4400);}
 function closeDialog(){pendingPOAfterSave=null;$('#production-dialog').close();}
 function dialog(title,text,body){$('#production-dialog-content').innerHTML=`<p class="eyebrow">L’ATELIER MIR</p><h2 id="production-dialog-title" class="dialog-heading">${esc(title)}</h2>${text?`<p class="dialog-intro">${esc(text)}</p>`:''}${body}`;if(!$('#production-dialog').open)$('#production-dialog').showModal();}
 function messageError(message){let el=$('#production-dialog-error');if(!el){el=document.createElement('p');el.id='production-dialog-error';el.className='dialog-error';el.setAttribute('role','alert');$('#production-dialog-content').append(el);}el.textContent=message;}
-function sampleSpec(type,id){const spec={kind:type,unit:'in',quantity:1,material:{type:'aluminium',thickness:'',gauge:''},finish:{},coloredFace:{side:'left',segmentId:'A'},location:'',note:''};if(type==='profile')return {...spec,template:id,...copy(profiles[id]||profiles.custom),length:window.MIRBendingLengths.requiredLengthIn(id)};return {...spec,material:{type:'acier',name:'Unico U-P1 — Acier',productRef:'unico-up1-acier',thickness:'',thicknessUnit:'mm',gauge:''},mirrorX:false,dimensionBasis:'overall-including-lips',shape:id,name:shapes.find(s=>s[0]===id)?.[1]||'Panneau',width:48,height:id==='square'?48:36,relief:2,lip:1,apexX:24,topWidth:30,topOffset:9,offset:10,pointSide:'top',tipDepth:12,apexOffset:24,rightAngle:'bottom-left',bottomEdgeId:'bottom',perforation:{enabled:false,edgeId:'bottom',details:''},lips:{}};}
-function blankMeasurements(spec){const out=copy(spec);if(out.kind==='profile'){if(out.template==='custom')out.segments.forEach(s=>s.length='');else Object.keys(out.dimensions).forEach(k=>out.dimensions[k]='');out.length='';out.coloredFace={side:'',segmentId:'A'};}else{['width','height','relief','lip','apexX','topWidth','topOffset','offset','tipDepth','apexOffset'].forEach(k=>out[k]='');out.lips={};}out.finish={};out.material={type:out.kind==='panel'?'acier':'aluminium',name:out.kind==='panel'?'Unico U-P1 — Acier':'',productRef:out.kind==='panel'?'unico-up1-acier':null,thickness:'',thicknessUnit:out.kind==='panel'?'mm':'in',gauge:''};return out;}
+function sampleSpec(type,id){const spec={kind:type,unit:'in',quantity:1,material:{type:'aluminium',thickness:'',gauge:''},finish:{},coloredFace:{side:'left',segmentId:'A'},location:'',note:''};if(type==='profile')return {...spec,template:id,...copy(profiles[id]||profiles.custom),length:window.MIRBendingLengths.requiredLengthIn(id)};return {...spec,material:{type:'acier',name:'Unico U-P1 — Acier',productRef:'unico-up1-acier',thickness:'',thicknessUnit:'mm',gauge:''},mirrorX:false,dimensionBasis:'overall-including-lips',shape:id,name:shapes.find(s=>s[0]===id)?.[1]||'Panneau',width:48,height:id==='square'?48:36,relief:2,lip:1,apexX:24,topWidth:30,topOffset:9,offset:10,pointSide:'top',tipDepth:12,apexOffset:24,rightAngle:'bottom-left',roofPitch:id==='roof-slope'?'6/12':'',roofDirection:'right',bottomEdgeId:'bottom',perforation:{enabled:false,edgeId:'bottom',details:''},lips:{}};}
+function blankMeasurements(spec){const out=copy(spec);if(out.kind==='profile'){if(out.template==='custom')out.segments.forEach(s=>s.length='');else Object.keys(out.dimensions).forEach(k=>out.dimensions[k]='');out.length='';out.coloredFace={side:'',segmentId:'A'};}else{['width','height','relief','lip','apexX','topWidth','topOffset','offset','tipDepth','apexOffset','roofPitch'].forEach(k=>out[k]='');out.lips={};}out.finish={};out.material={type:out.kind==='panel'?'acier':'aluminium',name:out.kind==='panel'?'Unico U-P1 — Acier':'',productRef:out.kind==='panel'?'unico-up1-acier':null,thickness:'',thicknessUnit:out.kind==='panel'?'mm':'in',gauge:''};return out;}
 function defaultOrder(){return {id:'DOS-'+uid(),project:'',poNumber:'',foreman:'',date:new Date().toISOString().slice(0,10),revision:'A',notes:'',items:[],nextNumber:1};}
 function build(spec=draft){return spec.kind==='panel'?M.buildPanel(spec):M.buildProfile(spec);}
 function existingItem(){return order?.items?.find(item=>item.id===editingItemId)||null;}
@@ -117,11 +118,35 @@ function injectWorkflow(){const node=document.createElement('nav');node.id='prod
 function templateIcon(type,id){if(type==='profile'&&window.MIRBendingPresets?.icon(id))return window.MIRBendingPresets.icon(id);let path;if(type==='profile')path=({l:'M20 8V40H60',j:'M20 8V40H59V27',z:'M12 10H38V40H66',beam5:'M67 8H55V39H26V8H14',omega:'M10 40H22V10H57V40H70',custom:'M8 37H23L36 12H49V37H70'})[id]||'M10 37H28V12H48L68 37';else path=({rectangle:'M12 10H68V40H12Z',square:'M23 5H58V40H23Z','right-triangle':'M18 7V42H68Z',triangle:'M8 42L40 7L72 42Z',trapezoid:'M10 42L24 9H57L70 42Z',parallelogram:'M10 42L24 9H70L56 42Z',pointed:'M14 42V21L40 5L66 21V42Z'})[id]||'M12 10H68V40H12Z';return `<svg viewBox="0 0 80 50" aria-hidden="true"><path d="${path}" fill="${type==='panel'?'#dfe8d4':'none'}" stroke="currentColor" stroke-width="2" stroke-linejoin="miter"/></svg>`;}
 function renderTemplates(){const current=draft.kind==='profile'?draft.template:draft.shape;$('#template-heading').textContent=kind==='profile'?'Moulures dessinées':'Choisir la forme';const entries=kind==='profile'?[]:shapes;const records=templates.filter(record=>visibleTemplate(record)&&latest(record)?.kind===kind);$('#production-templates').innerHTML=entries.filter(([id])=>!clientProfileWizard()||id!=='custom').map(([id,name])=>`<button type="button" class="template-button" data-template="${id}" aria-pressed="${(!clientProfileWizard()||clientProfileSelected)&&(!editingTemplateId&&selectedTemplate?.id===`mir-standard-${kind}-${id}`||!selectedTemplate&&current===id)}">${templateIcon(kind,id)}<span>${esc(name)}</span></button>`).join('')+(!authoring&&(client||kind==='panel')?records.map(record=>`<button type="button" class="template-button saved-template" data-saved-template="${esc(record.id)}" aria-pressed="${selectedTemplate?.id===record.id}">${templateIcon(kind,latest(record).topology?.template||'custom')}<span>${esc(record.name||latest(record).name)}</span><small>MODÈLE MIR · V${latest(record).version}</small></button>`).join(''):'');}
 function measureField(key,label,value,letter='',extra=''){return `<label${extra?' class="'+extra+'"':''}><span class="letter-label">${letter?`<b>${esc(letter)}</b>`:''}${esc(label)}</span><input data-measure="${esc(key)}" inputmode="decimal" value="${esc(value??'')}" placeholder="${authoring?'Proportion':'Votre cote'}" aria-label="${esc((letter?letter+' — ':'')+label)}"></label>`;}
+
+function roofFactor(){return window.MIRPanelRoof?.pitchFactor(draft.roofPitch);}
+function updateRoofDerivedHeight(){
+ if(kind!=='panel'||!['triangle','right-triangle'].includes(draft.shape)||!String(draft.roofPitch||'').trim())return false;
+ const factor=roofFactor(),w=M.parseMeasurement(draft.shape==='triangle'?draft.apexX:draft.width,draft.unit||'in');
+ if(!finite(factor)||factor<=0||!w.ok||w.mm<=0)return false;
+ draft.height=fmt(unitValue(w.mm*factor,draft.unit||'in'));
+ return true;
+}
+function roofReadout(){
+ const target=$('#mir-panel-roof-result');if(!target||kind!=='panel')return;
+ const factor=roofFactor();if(!String(draft.roofPitch||'').trim()){target.textContent='Aucune pente imposée. Les cotes sont prises au chantier.';return;}
+ if(!finite(factor)||factor<=0){target.textContent='Pente invalide. Entrez 6 ou 6/12.';return;}
+ const run=M.parseMeasurement(draft.shape==='triangle'?draft.apexX:draft.width,draft.unit||'in');
+ if(!run.ok){target.textContent='Entrez la portée horizontale pour calculer la montée.';return;}
+ const rise=window.MIRPanelRoof.riseForRun(run.mm,draft.roofPitch);
+ target.textContent='Pente '+draft.roofPitch+' · portée '+M.formatMeasurement(run.mm,draft.unit)+' · montée '+M.formatMeasurement(rise,draft.unit)+(draft.shape==='roof-slope'?' · vers la '+(draft.roofDirection==='left'?'gauche':'droite'):'');
+}
 function renderDimensions(){
  const openBends=new Set(Array.from($('#production-dimensions').querySelectorAll('details[data-angle-details][open]'),el=>el.dataset.angleDetails));
  const unit=draft.unit||'in';$('#production-unit').value=unit;$('#measure-hint').textContent=authoring?'Les proportions servent seulement au dessin du modèle. Les clients saisiront toutes les cotes de fabrication.':unit==='in'?(kind==='panel'?'A et B incluent les lips. ':'')+'Fractions acceptées : 3 1/2 ou 3½.':(kind==='panel'?'A et B incluent les lips. ':'')+'Cotes en millimètres.';let body='';
  if(kind==='profile'){if(draft.template==='custom')body=`<div class="segment-editor">${(draft.segments||[]).map((segment,index)=>`<div class="segment-row"><div class="segment-top"><span class="segment-id">${esc(segment.label)}</span><label>${authoring?'Proportion du segment':esc(segment.name||'Longueur du côté')}<input data-segment-length="${index}" inputmode="decimal" value="${esc(segment.length??'')}" placeholder="${authoring?'Proportion':'Votre cote'}" aria-label="Côté ${esc(segment.label)}"></label>${!client&&!editingItemId?`<button type="button" data-remove-segment="${index}" aria-label="Retirer le segment ${esc(segment.label)}"${draft.segments.length<=2?' disabled':''}>×</button>`:''}</div>${index<draft.segments.length-1?bendFields(draft.bends[index],index,openBends.has(String(index))):''}</div>`).join('')}</div>${!client&&!editingItemId?'<div class="segment-actions"><button type="button" data-add-segment>＋ Segment</button><button type="button" data-add-double>Ajouter deux angles</button></div>':''}`;else{const definition=M.TEMPLATES[draft.template];body=`<div class="dimension-fields">${(definition?.labels||[]).map((key,index)=>measureField(key,definition.fieldLabels[index],draft.dimensions?.[key],key)).join('')}</div>${!client&&!editingItemId?'<div class="segment-actions"><button type="button" data-customize>Modifier les angles et les côtés</button><button type="button" data-add-double>Ajouter deux angles</button></div>':''}`;}if(!authoring&&!clientProfileWizard())body+=`<div class="dimension-fields">${measureField('length','Longueur de vente',draft.length,'L','full-field')}</div>`;
- }else{body=`<div class="dimension-fields">${measureField('width',draft.shape==='square'?'Côté du carré':'Largeur hors tout',draft.width,'A')}${draft.shape==='square'?'':measureField('height','Hauteur hors tout',draft.height,'B')}${!authoring?measureField('relief','Projection de la pièce finie',draft.relief,'C'):''}</div>`;if(draft.shape==='triangle')body+=`<div class="dimension-fields">${measureField('apexX','Sommet depuis la gauche',draft.apexX,'S','full-field')}</div>`;if(draft.shape==='right-triangle')body+=`<label class="shape-field">Angle droit<select data-spec-select="rightAngle"${editingItemId||client&&selectedTemplate&&!selectedTemplate.id.startsWith('mir-standard-')?' disabled':''}>${[['bottom-left','En bas à gauche'],['bottom-right','En bas à droite'],['top-left','En haut à gauche'],['top-right','En haut à droite']].map(([id,name])=>`<option value="${id}"${(draft.mirrorX?({'bottom-left':'bottom-right','bottom-right':'bottom-left','top-left':'top-right','top-right':'top-left'}[draft.rightAngle]):draft.rightAngle)===id?' selected':''}>${name}</option>`).join('')}</select></label><div class="panel-mirror-row"><button type="button" class="secondary-button" id="mirror-panel" aria-pressed="${draft.mirrorX===true}">↔ Miroir gauche / droite</button><span>${draft.mirrorX?'Vue inversée':'Vue d’origine'}</span></div>`;if(draft.shape==='trapezoid')body+=`<div class="dimension-fields">${measureField('topWidth','Largeur du haut',draft.topWidth,'D')}${measureField('topOffset','Décalage du haut à gauche',draft.topOffset,'E')}</div>`;if(draft.shape==='parallelogram')body+=`<div class="dimension-fields">${measureField('offset','Décalage du haut (+ droite / − gauche)',draft.offset,'D','full-field')}</div><p class="field-hint">A est la largeur hors tout. Le décalage reste distinct de la longueur de base.</p>`;if(draft.shape==='pointed')body+=`<label class="shape-field">Côté terminé en pointe<select data-spec-select="pointSide"${editingItemId||client&&selectedTemplate&&!selectedTemplate.id.startsWith('mir-standard-')?' disabled':''}>${[['top','Haut'],['right','Droite'],['bottom','Bas'],['left','Gauche']].map(([id,name])=>`<option value="${id}"${draft.pointSide===id?' selected':''}>${name}</option>`).join('')}</select></label><div class="dimension-fields">${measureField('tipDepth','Profondeur de la pointe',draft.tipDepth,'D')}${measureField('apexOffset','Position du sommet sur ce côté',draft.apexOffset,'E')}</div>`;
+ }else{body=`<div class="dimension-fields">${measureField('width',draft.shape==='square'?'Côté du carré':'Largeur hors tout',draft.width,'A')}${draft.shape==='square'?'':measureField('height','Hauteur hors tout',draft.height,'B')}${!authoring?measureField('relief','Projection de la pièce finie',draft.relief,'C'):''}</div>`;if(draft.shape==='triangle')body+=`<div class="dimension-fields">${measureField('apexX','Sommet depuis la gauche',draft.apexX,'S','full-field')}</div>`;
+  if(['roof-slope','triangle','right-triangle'].includes(draft.shape)){
+    body+=`<section class="mir-panel-roof-settings" aria-label="Pente de toit du panneau"><label>Pente de toiture X/12
+    <input id="mir-panel-roof-pitch" inputmode="decimal" value="${esc(draft.roofPitch??'')}" placeholder="Ex. 6/12"></label>
+    ${draft.shape==='roof-slope'?'<label>Montée du haut<select id="mir-panel-roof-direction"><option value="right"'+(draft.roofDirection!=='left'?' selected':'')+'>Vers la droite</option><option value="left"'+(draft.roofDirection==='left'?' selected':'')+'>Vers la gauche</option></select></label>':''}
+    <p id="mir-panel-roof-result" class="field-hint" role="status">Montée = portée horizontale × X/12. Les mesures exactes restent visibles.</p></section>`;
+  }if(draft.shape==='right-triangle')body+=`<label class="shape-field">Angle droit<select data-spec-select="rightAngle"${editingItemId||client&&selectedTemplate&&!selectedTemplate.id.startsWith('mir-standard-')?' disabled':''}>${[['bottom-left','En bas à gauche'],['bottom-right','En bas à droite'],['top-left','En haut à gauche'],['top-right','En haut à droite']].map(([id,name])=>`<option value="${id}"${(draft.mirrorX?({'bottom-left':'bottom-right','bottom-right':'bottom-left','top-left':'top-right','top-right':'top-left'}[draft.rightAngle]):draft.rightAngle)===id?' selected':''}>${name}</option>`).join('')}</select></label><div class="panel-mirror-row"><button type="button" class="secondary-button" id="mirror-panel" aria-pressed="${draft.mirrorX===true}">↔ Miroir gauche / droite</button><span>${draft.mirrorX?'Vue inversée':'Vue d’origine'}</span></div>`;if(draft.shape==='trapezoid')body+=`<div class="dimension-fields">${measureField('topWidth','Largeur du haut',draft.topWidth,'D')}${measureField('topOffset','Décalage du haut à gauche',draft.topOffset,'E')}</div>`;if(draft.shape==='parallelogram')body+=`<div class="dimension-fields">${measureField('offset','Décalage du haut (+ droite / − gauche)',draft.offset,'D','full-field')}</div><p class="field-hint">A est la largeur hors tout. Le décalage reste distinct de la longueur de base.</p>`;if(draft.shape==='pointed')body+=`<label class="shape-field">Côté terminé en pointe<select data-spec-select="pointSide"${editingItemId||client&&selectedTemplate&&!selectedTemplate.id.startsWith('mir-standard-')?' disabled':''}>${[['top','Haut'],['right','Droite'],['bottom','Bas'],['left','Gauche']].map(([id,name])=>`<option value="${id}"${draft.pointSide===id?' selected':''}>${name}</option>`).join('')}</select></label><div class="dimension-fields">${measureField('tipDepth','Profondeur de la pointe',draft.tipDepth,'D')}${measureField('apexOffset','Position du sommet sur ce côté',draft.apexOffset,'E')}</div>`;
  }
  if(kind==='profile'&&draft.template==='custom')body+='<section id="mir-angle-summary" class="mir-angle-summary" aria-label="Angles des jonctions A-B, B-C et suivantes"></section>';
  $('#production-dimensions').innerHTML=body;
@@ -200,7 +225,36 @@ function renderProfileOptions(){
   ${faceChoiceCards(draft.coloredFace?.side||'',draft.coloredFace?.segmentId||labels[0]||'A')}
   <div class="two-fields mir-face-details"><label>Choix textuel de la face<select id="profile-painted-side"><option value="">Choisir le côté</option><option value="left"${draft.coloredFace?.side==='left'?' selected':''}>À gauche du tracé</option><option value="right"${draft.coloredFace?.side==='right'?' selected':''}>À droite du tracé</option></select></label><label>Repère sur le côté<select id="profile-painted-segment">${labels.map(label=>`<option${draft.coloredFace?.segmentId===label?' selected':''}>${esc(label)}</option>`).join('')}</select></label></div></details>`+rule;
 }
-function renderPanelOptions(){if(kind!=='panel'||authoring){$('#production-panel-options').innerHTML='';return;}const model=build(),reference=model.edges.length?model:build(sampleSpec('panel',draft.shape)),edges=reference.edges||[];$('#production-panel-options').innerHTML=`<div class="config-section"><div class="section-heading compact"><div><span class="step-dot">↳</span><h2>Les lèvres & le bas</h2></div></div><p class="field-hint">Les lips sont compris dans A et B. Ils réduisent la face centrale, sans augmenter le hors tout.</p><label>Lip commun à tous les côtés<input id="panel-lip" inputmode="decimal" value="${esc(draft.lip??'')}" placeholder="0 = sans lip"></label><details class="options-details"><summary>Un lip différent selon le côté</summary><div class="dimension-fields">${edges.map((edge,index)=>`<label>${index+1} · ${esc(edge.name)}<input data-panel-lip="${esc(edge.id)}" inputmode="decimal" value="${esc(draft.lips?.[edge.id]??'')}" placeholder="Lip commun"></label>`).join('')}</div></details><label>Quel côté est en bas après pose ?<select id="panel-bottom"><option value="">Choisir le bas</option>${edges.map((edge,index)=>`<option value="${esc(edge.id)}"${draft.bottomEdgeId===edge.id?' selected':''}>${index+1} · ${esc(edge.name)}</option>`).join('')}</select></label><label class="check-field"><input id="panel-perforation" type="checkbox"${draft.perforation?.enabled?' checked':''}><span>Demander la perforation du bas<small>Le côté choisi est repéré en bleu sur le dessin.</small></span></label>${draft.perforation?.enabled?`<label>Détail ou référence de perforation<textarea id="panel-perforation-details" rows="2" placeholder="À définir avec l’atelier" maxlength="300">${esc(draft.perforation.details||'')}</textarea></label><p class="field-hint">Le diamètre et l’espacement des trous restent à préciser. Aucun motif de perforation n’est présumé.</p>`:''}</div>`;}
+
+function renderPanelOptions(){
+ if(kind!=='panel'||authoring){$('#production-panel-options').innerHTML='';return;}
+ const actual=build();
+ const tentative=draft.shape==='polygon'&&Array.isArray(draft.contourRatios)
+  ?build({...draft,width:48,height:36,relief:0,lip:draft.lip||'0'})
+  :build(sampleSpec('panel',draft.shape));
+ const edges=actual.edges.length?actual.edges:tentative.edges||[];
+ const perEdge=edges.map((edge,i)=>{
+  const override=draft.lips?.[edge.id],withoutLip=String(override)==='0';
+  return `<div class="mir-lip-side"><label>${i+1} · ${esc(edge.name)}
+    <input data-panel-lip="${esc(edge.id)}" inputmode="decimal" value="${esc(override??'')}" placeholder="Commun · 0 = sans lip"
+    aria-label="Lip du côté ${esc(edge.name)}"></label>
+    <button type="button" class="secondary-button mir-no-lip" data-panel-no-lip="${esc(edge.id)}" aria-pressed="${withoutLip}" aria-label="Supprimer le lip du côté ${esc(edge.name)}">Sans lip</button></div>`;
+ }).join('');
+ $('#production-panel-options').innerHTML=`<div class="config-section mir-panel-lips"><div class="section-heading compact"><div>
+  <span class="step-dot">↳</span><h2>Lips et face visible</h2></div></div>
+  <p class="field-hint">Les cotes A/B sont HORS TOUT de fabrication. Les lèvres restent à l'intérieur du hors tout; elles ne sont jamais ajoutées deux fois.</p>
+  <label>Lip commun à tous les côtés<input id="panel-lip" inputmode="decimal" value="${esc(draft.lip??'')}" placeholder="0 = sans lip"></label>
+  <details class="options-details mir-panel-edge-options" open><summary>Lip de chaque côté, y compris sans lip (0)</summary>
+  <div class="mir-lip-sides">${perEdge||'<p class="field-hint">Fermez d’abord le dessin pour identifier les côtés.</p>'}</div></details>
+  <div id="mir-panel-net-summary" class="mir-panel-net-summary" role="status" aria-live="polite">Entrez vos cotes pour voir la face nette, sans les lips.</div>
+  <label>Quel côté est en bas après pose ?<select id="panel-bottom">
+    <option value="">Choisir le bas</option>${edges.map((edge,i)=>`<option value="${esc(edge.id)}"${draft.bottomEdgeId===edge.id?' selected':''}>${i+1} · ${esc(edge.name)}</option>`).join('')}
+  </select></label>
+  <label class="check-field"><input id="panel-perforation" type="checkbox"${draft.perforation?.enabled?' checked':''}>
+    <span>Demander la perforation du bas<small>Le côté choisi est repéré en bleu sur le dessin.</small></span>
+  </label>${draft.perforation?.enabled?`<label>Détail ou référence de perforation<textarea id="panel-perforation-details" rows="2" placeholder="À définir avec l’atelier" maxlength="300">${esc(draft.perforation.details||'')}</textarea></label><p class="field-hint">Le motif exact doit être confirmé par l’atelier.</p>`:''}
+  </div>`;
+}
 function renderColors(){const block=$('#production-color-fields');$('#color-system').value=colorSystem;if(colorSystem==='manufacturer'){block.innerHTML=`<div class="color-source-field"><label>Fabricant / produit de référence<select id="production-material"><option value="">Choisir le fabricant et le produit</option>${availableMaterials().map(m=>`<option value="${esc(m.id)}"${m.id===materialId?' selected':''}>${esc(m.brand+' · '+m.name)}</option>`).join('')}</select></label>${(chosenMaterial()?.colors||[]).length>20?`<label>Rechercher une teinte du fabricant<input id="production-color-search" class="color-search" type="search" placeholder="Nom ou code, ex. 56068, noir…" value="${esc(colorQuery)}"></label><p id="color-count" class="color-count"></p>`:""}<div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Couleurs du fabricant"></div><p class="field-hint">${kind==='panel'?'Références Unico publiées. La disponibilité du fini sur le calibre choisi reste à confirmer.':'Chaque échantillon appartient au nuancier de ce produit. L’offre sur votre pièce doit être confirmée.'}</p></div>`;renderColorGrid();}else if(colorSystem==='ral'){block.innerHTML=`<div class="color-source-field"><label>Rechercher un code RAL Classic<input id="production-color-search" class="color-search" type="search" placeholder="Ex. 7016, black, vert…" value="${esc(colorQuery)}"></label><label>Code de la couleur<select id="production-ral"><option value="">Choisir un code RAL</option>${ral.colors.map(c=>`<option value="${esc(c.id)}"${c.id===colorId?' selected':''}>${esc(c.code+' · '+(c.nameEn||c.name))}</option>`).join('')}</select></label><p id="color-count" class="color-count"></p><div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Codes RAL Classic"></div><p class="field-hint">${esc(ral.displayNotice||'Aperçu écran indicatif. Valider la teinte demandée sur un nuancier physique avant fabrication.')}</p></div>`;renderColorGrid();}else{block.innerHTML=`<div class="color-source-field"><label>Nuancier ou fabricant<input id="special-color-system" value="${esc(draft.finish?.system||'')}" maxlength="60" placeholder="Ex. Nuancier à préciser"></label><div class="two-fields"><label>Code exact<input id="special-color-code" value="${esc(draft.finish?.code||'')}" maxlength="80" placeholder="Référence demandée"></label><label>Nom de la couleur<input id="special-color-name" value="${esc(draft.finish?.name||'')}" maxlength="100" placeholder="Si connu"></label></div><p class="field-hint">Cette référence est une demande spéciale à faire confirmer. Aucun équivalent fabricant ni teinte numérique n’est inventé.</p></div>`;}updateFinish();applyStoreColorLock();}
 function renderColorGrid(){
  const grid=$('#production-color-grid');if(!grid)return;
@@ -235,7 +289,53 @@ function renderColorGrid(){
 function updateFinish(){if(authoring){$('#selected-finish').innerHTML='';return;}draft.finish=currentFinish();const c=chosenColor(),image=safeAsset(c?.swatchUrl||c?.swatchImage),finish=draft.finish,source=safeURL(c?.sourceUrl||chosenMaterial()?.sourceUrl||''),flat=kind==='profile'&&window.MIRKaycanFlatPreview?.isFlatPreview(finish)?window.MIRKaycanFlatPreview:null,flatHex=flat?.get(image)||'#e5e9e0';$('#selected-finish').innerHTML=(finish.code||finish.name)?`${flat?`<span class="kaycan-flat-chip" role="img" aria-label="Aperçu uni indicatif de ${esc(finish.name)}" style="background:${flatHex}"></span>`:image?`<img src="${esc(image)}" alt="Échantillon fabricant de ${esc(finish.name)}">`:''}<div><strong>${esc(finish.name||finish.code)}</strong><span>${esc(finish.code||'Code à confirmer')} · ${esc(finish.manufacturer||finish.system||'Référence spéciale')}</span><p>${esc(colorSystem==='ral'?ral.displayNotice:colorSystem==='special'?'Demande spéciale : faisabilité, teinte et disponibilité à confirmer.':flat?'Aperçu uni estimé du visuel fabricant, non certifié. Teinte, texture et disponibilité à confirmer sur un échantillon réel.':c?.availabilityNote||'Disponibilité sur ce profil à confirmer. Écran indicatif.')}</p>${colorSystem==='manufacturer'&&source?`<a href="${esc(source)}" target="_blank" rel="noopener">Source du fabricant ↗</a>`:''}</div>`:'<div><strong>La teinte reste à choisir.</strong><p>Choisissez une référence précise pour votre pièce.</p></div>';}
 function fitModel(model){const p=model.pointsMM||[],xs=p.map(v=>v[0]),ys=p.map(v=>v[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const scale=Math.min(580/Math.max(1,maxX-minX),340/Math.max(1,maxY-minY));return {scale,ox:400-(minX+maxX)*scale/2,oy:255+(minY+maxY)*scale/2};}
 function pointOnView(point,tr){return [tr.ox+point[0]*tr.scale,tr.oy-point[1]*tr.scale];}
-function drawingModel(){const actual=build();if(actual.valid)return {model:actual,illustrative:authoring};const example=selectedTemplate&&M.templatePreview(selectedTemplate);return {model:example?.ok?example.model:build(sampleSpec(kind,kind==='profile'?draft.template:draft.shape)),illustrative:true};}
+
+function panelSketchPreview(points=panelSketchPoints){
+ const ratios=window.MIRPanelSketch?.normalize(points);if(!ratios)return null;
+ const model=build({...draft,shape:'polygon',contourRatios:ratios,width:48,height:36,
+  relief:0,lip:'0',lips:{},bottomEdgeId:'edge-1',perforation:{enabled:false}});
+ if(!model.valid)return null;
+ return window.MIRProductionVolume?.buildMesh(model)?.valid?model:null;
+}
+function startPanelSketch(){
+ if(editingItemId)return toast('Un panneau d’une commande doit conserver sa forme. Crée une nouvelle pièce pour un autre contour.');
+ panelSketchBefore=copy(draft);panelSketchPoints=[];panelSketchHover=null;
+ draft={...draft,kind:'panel',shape:'polygon',contourRatios:undefined,width:'',height:'',relief:'',
+  lip:'0',lips:{},roofPitch:'',bottomEdgeId:'',perforation:{enabled:false,edgeId:'',details:''}};
+ selectedTemplate=null;tool='panel-trace';view='face';zoom=1;render();
+}
+function cancelPanelSketch(){
+ if(panelSketchBefore)draft=panelSketchBefore;
+ panelSketchBefore=null;panelSketchHover=null;panelSketchPoints=[];tool='select';render();
+}
+function finishPanelSketch(){
+ const ratios=window.MIRPanelSketch?.normalize(panelSketchPoints);
+ if(!ratios)return toast('Ferme un contour de 3 à 64 sommets non alignés.');
+ const model=panelSketchPreview();
+ if(!model)return toast('La forme se croise ou elle est incompatible avec les lips. Corrige les sommets.');
+ draft.shape='polygon';draft.contourRatios=ratios;draft.width='';draft.height='';draft.relief='';
+ draft.lip='0';draft.lips=Object.fromEntries(panelSketchPoints.map((_,i)=>['edge-'+(i+1),'0']));
+ draft.bottomEdgeId='edge-1';draft.perforation={enabled:false,edgeId:'edge-1',details:''};
+ panelSketchPoints=[];panelSketchHover=null;panelSketchBefore=null;tool='select';view='face';
+ render();toast('Panneau dessiné. Entre les cotes A/B réelles, puis choisis les lips côté par côté.');
+}
+function panelSketchHit(event){
+ const svg=$('#production-drawing svg');if(!svg||!drawingCanvasHit(event,{targetRequired:false}))return null;
+ const m=svg.getScreenCTM?.();if(m&&svg.createSVGPoint){const p=svg.createSVGPoint();p.x=event.clientX;p.y=event.clientY;const q=p.matrixTransform(m.inverse());return [q.x,q.y];}
+ const r=svg.getBoundingClientRect();return[(event.clientX-r.left)*800/r.width,(event.clientY-r.top)*520/r.height];
+}
+function appendPanelSketchPoint(point){
+ if(!point||panelSketchPoints.length>=64)return;
+ const first=panelSketchPoints[0],last=panelSketchPoints.at(-1);
+ if(last&&Math.hypot(point[0]-last[0],point[1]-last[1])<4)return;
+ if(first&&panelSketchPoints.length>=3&&Math.hypot(point[0]-first[0],point[1]-first[1])<=14)return finishPanelSketch();
+ panelSketchPoints.push(point);panelSketchHover=null;updateDrawing();
+}
+function drawingModel(){const actual=build();if(actual.valid)return {model:actual,illustrative:authoring};
+ if(kind==='panel'&&draft.shape==='polygon'&&Array.isArray(draft.contourRatios)){
+  const preview=build({...draft,width:48,height:36,relief:0,lip:draft.lip??'0'});
+  if(preview.valid)return {model:preview,illustrative:true};
+ }const example=selectedTemplate&&M.templatePreview(selectedTemplate);return {model:example?.ok?example.model:build(sampleSpec(kind,kind==='profile'?draft.template:draft.shape)),illustrative:true};}
 function traceGridStepMM(unit=draft.unit){return unit==='mm'?1:25.4/traceGridDivisor;}
 function traceGridSVG(unit){
  if(!snap||!drawTransform)return '';
@@ -306,7 +406,18 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
  const map=pts=>pts.map(p=>pointOnView(p,tr).map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#b8c5ae',swatch=safeAsset(model.spec?.finish?.swatchUrl||model.finish?.swatchUrl),suffix=small?'thumb-'+esc(model.spec?.id||'panel'):'main',paint='panel-face-paint-'+suffix,clip='panel-face-clip-'+suffix;
  let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — vue cotée, lips compris" data-panel-face="true" data-zoom="${z}" font-family="Arial,sans-serif"><title>${esc(model.name)} — dimensions hors tout avec lèvres</title><defs><clipPath id="${clip}"><rect x="16" y="45" width="768" height="365"/></clipPath>${swatch?`<pattern id="${paint}" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${hex}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern>`:''}</defs><text x="400" y="30" text-anchor="middle" font-size="12" fill="#6f8064">${illustrative?'PROPORTIONS DU MODÈLE · COTES À SAISIR':'VUE DE FACE · LIPS INCLUS DANS LE HORS TOUT'}</text><g clip-path="url(#${clip})"><polygon points="${map(mesh.outer)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="1.5"/><polygon points="${map(mesh.front)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="2.2"/>`;
  (model.edges||[]).forEach((edge,i)=>{const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr);if(edge.id===model.bottomEdgeId&&!illustrative)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="5"${model.perforation?.enabled?' stroke-dasharray="10 5"':''}/>`;if(interactive&&!authoring)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="transparent" stroke-width="22" data-select-bottom="${esc(edge.id)}" tabindex="0" role="button" aria-label="Choisir ${esc(edge.name)} comme bas"/>`;});
- svg+='</g><rect x="0" y="420" width="800" height="100" fill="#fcfcf8"/>';
+ svg+='</g>';
+ if(!small&&!illustrative)(model.edges||[]).forEach((edge,i)=>{
+  const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr),
+   len=Math.hypot(b[0]-a[0],b[1]-a[1]),cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2;
+  if(len<52)return;
+  const center=pointOnView([(mesh.bounds.minX+mesh.bounds.maxX)/2,(mesh.bounds.minY+mesh.bounds.maxY)/2],tr);
+  const vx=center[0]-cx,vy=center[1]-cy,dist=Math.hypot(vx,vy)||1;
+  const x=cx+vx/dist*22,y=cy+vy/dist*22;
+  const label=edge.lipMM===0?'Sans lip':'Lip '+M.formatMeasurement(edge.lipMM,model.unit);
+  svg+='<text data-panel-edge-lip="'+esc(edge.id)+'" x="'+fmt(x)+'" y="'+fmt(y)+'" font-size="12" font-weight="700" text-anchor="middle" fill="#284d30" stroke="#fafcf7" stroke-width="4" paint-order="stroke">'+esc((i+1)+' · '+label)+'</text>';
+ });
+ svg+='<rect x="0" y="420" width="800" height="100" fill="#fcfcf8"/>';
  const dims=[['A','Largeur hors tout',model.widthMM],['B','Hauteur hors tout',model.heightMM],['C','Projection',model.reliefMM]];
  svg+=dims.map(([letter,label,value],i)=>`<text x="${135+i*265}" y="448" text-anchor="middle" font-size="13" fill="#6f8064">${letter} · ${label}</text><text x="${135+i*265}" y="478" text-anchor="middle" font-size="24" fill="#294734" font-weight="600">${esc(illustrative?'À saisir':M.formatMeasurement(value,model.unit))}</text>`).join('');return svg+'</svg>';
 }
@@ -413,6 +524,17 @@ function volumeSVG(model,{illustrative=false}={}){
 }
 function renderTools(){
  const el=$('#drawing-tools');
+ if(kind==='panel'){
+  el.hidden=!!editingItemId;
+  if(el.hidden){el.innerHTML='';return;}
+  el.innerHTML=tool==='panel-trace'
+   ?'<p class="draw-help">Clique ou glisse pour les sommets · Maj = 90° · cote après le dessin.</p>'+
+    '<button type="button" class="secondary-button" data-panel-sketch-undo'+(!panelSketchPoints.length?' disabled':'')+'>↶ Dernier point</button>'+
+    '<button type="button" class="secondary-button" data-panel-sketch-cancel>Annuler</button>'+
+    '<button type="button" class="primary-button" data-panel-sketch-finish'+(panelSketchPoints.length<3?' disabled':'')+'>Terminer le panneau</button>'
+   :'<button type="button" class="secondary-button" data-panel-sketch-start>✎ Dessiner un panneau libre</button><span class="draw-help">Comme une moulure · 2D/3D synchronisés · sans lip possible.</span>';
+  return;
+ }
  el.hidden=kind!=='profile'||client&&!(clientProfileWizard()&&tool==='draw')||view==='volume'||!!editingItemId;
  if(el.hidden){el.innerHTML='';return;}
  const drawing=tool==='draw';
@@ -617,8 +739,43 @@ function updateDrawing({keepForm=false}={}){
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  const waiting=clientProfileWizard()&&!clientProfileSelected&&tool!=='draw';
  $('#drawing-title').textContent=waiting?'Aperçu de la moulure':authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
- const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()||view==='volume'||(!client&&kind==='profile')?'none':'';$('#trace-readout').hidden=!canDrawProfile();
- stage.innerHTML=waiting?'<div class="drawing-hint">Choisissez une moulure pour voir son profil ici.</div>':view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
+ const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=tool==='panel-trace'||canDrawProfile()||view==='volume'||(!client&&kind==='profile')?'none':'';$('#trace-readout').hidden=!canDrawProfile();
+ stage.innerHTML=tool==='panel-trace'&&kind==='panel'?window.MIRPanelSketch.svg(panelSketchPoints,panelSketchHover):
+  waiting?'<div class="drawing-hint">Choisissez une moulure pour voir son profil ici.</div>':
+  view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
+
+ const twin=$('#mir-panel-live-alt');
+ if(twin){
+  twin.hidden=kind!=='panel';
+  if(kind==='panel'){
+   const points=tool==='panel-trace'&&panelSketchHover&&panelSketchPoints.length>=2?
+    [...panelSketchPoints,panelSketchHover]:panelSketchPoints;
+   const twinModel=tool==='panel-trace'?panelSketchPreview(points):shown.model;
+   const twinValid=twinModel?.valid&&window.MIRProductionVolume?.buildMesh(twinModel)?.valid;
+   const volume=view!=='volume';
+   twin.dataset.panelTwin=volume?'3d':'2d';
+   twin.dataset.geometryStatus=twinValid?(tool==='panel-trace'||shown.illustrative?'illustrative':'measured'):'pending';
+   twin.dataset.syncedShape=twinModel?.shape||'pending';
+   twin.innerHTML='<header class="mir-panel-live-heading"><strong>'+(volume?'Volume 3D':'Vue 2D cotée')+
+    '</strong><small> même géométrie</small></header>'+
+    (twinValid?(volume?volumeSVG(twinModel,{illustrative:tool==='panel-trace'||shown.illustrative}):
+      panelDiagramSVG(twinModel,{illustrative:shown.illustrative,small:true,interactive:false})):
+     '<p class="field-hint mir-panel-live-empty">Tracez trois sommets pour afficher le volume 3D, sans inventer de cotes.</p>');
+  }
+ }
+ const net=$('#mir-panel-net-summary');
+ if(net){
+  const face=actual.valid&&mesh?.valid?window.MIRPanelRoof?.visibleFace(mesh):null;
+  if(face){
+   const outside=M.formatMeasurement(actual.widthMM,actual.unit)+' × '+M.formatMeasurement(actual.heightMM,actual.unit);
+   const inside=M.formatMeasurement(face.widthMM,actual.unit)+' × '+M.formatMeasurement(face.heightMM,actual.unit);
+   net.innerHTML='<p><strong>Hors tout de fabrication</strong> <span>'+esc(outside)+'</span></p>'+
+    '<p><strong>Face nette hors lèvres</strong> <span>'+esc(inside)+'</span></p>'+
+    '<p class="field-hint">Les lèvres sont comprises dans le hors tout, jamais ajoutées au calcul. Pour les rampants, la face nette est la boîte englobante du contour avant.</p>';
+  }else net.textContent=actual.valid?'Les lèvres ne permettent pas une face nette valide : corrigez les côtés.':
+    'Renseignez les cotes réelles A/B et les lèvres pour connaître la face nette, sans compter les lips.';
+ }
+ roofReadout();
  const dimensions=$('#profile-dimension-list');
  const sides=tool==='draw'?drawPoints.slice(1).map((point,index)=>({
   label:String.fromCharCode(65+index),
@@ -913,7 +1070,7 @@ async function importPanelLayout(){
  }catch(error){toast('Le calepinage n’a pas été ajouté : '+error.message);}
  finally{layoutImportBusy=false;renderLayoutImport();}
 }
-function valuesFromDraft(spec,id){const measurements={};if(spec.kind==='profile'){if(spec.template==='custom')for(const s of spec.segments||[])measurements[s.label]=s.length;else Object.assign(measurements,spec.dimensions||{});measurements.length=spec.length;}else{for(const key of ['width','height','relief','lip','apexX','topWidth','topOffset','offset','tipDepth','apexOffset'])measurements[key]=spec[key];measurements.lips=copy(spec.lips||{});}return {id,instanceId:id,name:spec.name,unit:spec.unit,measurements,quantity:spec.quantity,material:copy(spec.material||{}),finish:{manufacturer:'',selectionType:null,hex:null,swatchUrl:null,swatchImage:null,source:null,availabilityNote:'',displayOnly:false,...copy(spec.finish||{})},length:spec.length,coloredFace:copy(spec.coloredFace||{}),mirrorX:spec.mirrorX===true,dimensionBasis:spec.dimensionBasis,bottomEdgeId:spec.bottomEdgeId,perforation:copy(spec.perforation||{}),lips:copy(spec.lips||{}),location:spec.location,note:spec.note};}
+function valuesFromDraft(spec,id){const measurements={};if(spec.kind==='profile'){if(spec.template==='custom')for(const s of spec.segments||[])measurements[s.label]=s.length;else Object.assign(measurements,spec.dimensions||{});measurements.length=spec.length;}else{for(const key of ['width','height','relief','lip','apexX','topWidth','topOffset','offset','tipDepth','apexOffset','roofPitch'])measurements[key]=spec[key];measurements.lips=copy(spec.lips||{});}return {id,instanceId:id,name:spec.name,unit:spec.unit,measurements,quantity:spec.quantity,material:copy(spec.material||{}),finish:{manufacturer:'',selectionType:null,hex:null,swatchUrl:null,swatchImage:null,source:null,availabilityNote:'',displayOnly:false,...copy(spec.finish||{})},length:spec.length,coloredFace:copy(spec.coloredFace||{}),mirrorX:spec.mirrorX===true,dimensionBasis:spec.dimensionBasis,bottomEdgeId:spec.bottomEdgeId,perforation:copy(spec.perforation||{}),lips:copy(spec.lips||{}),location:spec.location,note:spec.note};}
 function makeItem(spec,id,{old=null,template=selectedTemplate}={}){let result;const stock=spec.kind==='profile'?stockLengthCheck(spec,old):{ok:true};if(!stock.ok)return {ok:false,errors:[{message:stock.message}]};if(old?.snapshot){result=M.reviseInstance({snapshot:old.snapshot,history:old.history||[]},valuesFromDraft(spec,id));}else{let source=template;const created=M.createTemplate(spec,{id:source?.id||`modele-piece-${id}-${uid()}`,name:spec.name||source?.name,version:source?.version||1});if(!created.ok)return created;const structural=topology=>{const value=copy(topology);delete value.coloredFace;return JSON.stringify(value);};if(!source)source=created.template;else if(structural(source.topology)!==structural(created.template.topology)){if(client&&!source.id.startsWith('mir-standard-'))return {ok:false,errors:[{message:'La forme de ce modèle est fixe. Choisissez un autre modèle pour changer ses angles.'}]};const variant=M.createTemplate(spec,{id:source.id+'-variante-'+uid(),name:spec.name||source.name,version:1});if(!variant.ok)return variant;source=variant.template;}result=M.instantiateTemplate(source,valuesFromDraft(spec,id));}if(!result.ok)return result;return {ok:true,item:{id,kind:result.model.kind,spec:copy(result.spec),snapshot:copy(result.snapshot),history:copy(result.history||[]),...(old?.profileGroup?{profileGroup:old.profileGroup}:{}),...(old?.sourceProfile?{sourceProfile:copy(old.sourceProfile)}:{}),...(old?.sourceLayout?{sourceLayout:copy(old.sourceLayout)}:{}),selection:{materialId,colorSystem,colorId,storeColorMode:client&&catalogueChannel==='store'&&activeStoreColorLock?'fixed':'employee'},...(spec.mirProfileId||old?.stockProfileType?{stockProfileType:spec.mirProfileId||old.stockProfileType}:{}),savedAt:new Date().toISOString()},model:result.model};}
 function addPiece(){
  formMetadata();if(authoring)return saveTemplateDialog();
@@ -993,6 +1150,8 @@ function editPiece(id){const item=order.items.find(row=>row.id===id);if(!item)re
  draft.length=draft.length||unitValue(120*25.4,draft.unit);
  }render();$('.production-workspace').scrollIntoView({behavior:'smooth',block:'start'});toast(`${id} : la correction sera enregistrée comme une nouvelle révision.`);}
 function render(){
+ const freeButton=$('#mir-draw-single-panel');if(freeButton)freeButton.hidden=kind!=='panel'||!!editingItemId||authoring;
+ document.body.dataset.panelSync=String(kind==='panel');
  document.body.dataset.client=String(client);
  document.body.dataset.publicProduction=String(client&&catalogueChannel!=='store');
  const profileAdmin=!client&&kind==='profile';
@@ -1300,6 +1459,11 @@ function viewCursorPoint(event){
 }
 function beginPointDrag(event){
  const stage=$('#production-drawing');if(!stage.contains(event.target))return;
+ if(tool==='panel-trace'&&kind==='panel'&&event.isPrimary&&(event.button===0||event.pointerType==='touch')){
+  const pt=panelSketchHit(event);if(!pt)return;
+  drag={type:'panel-sketch',id:event.pointerId,start:pt,x:event.clientX,y:event.clientY,hadBefore:panelSketchPoints.length>0};
+  stage.setPointerCapture?.(event.pointerId);event.preventDefault();return;
+ }
  if(canDrawProfile()&&drawingCanvasHit(event)&&event.button===0&&event.isPrimary){
   suppressClick=false;
   const start=drawPoints.at(-1)||localPoint(event);
@@ -1329,6 +1493,12 @@ function beginPointDrag(event){
 }
 
 function movePoint(event){
+ if(drag?.type==='panel-sketch'){
+  if(event.pointerId!==drag.id)return;
+  const pt=panelSketchHit(event);if(!pt)return;
+  panelSketchHover=window.MIRPanelSketch.orthogonal(panelSketchPoints.at(-1),pt,event.shiftKey);
+  updateDrawing({keepForm:true});event.preventDefault();return;
+ }
  if(pointers.has(event.pointerId))pointers.set(event.pointerId,[event.clientX,event.clientY]);
  if(!drag)return;
  if(drag.type==='pan'){
@@ -1357,7 +1527,20 @@ function movePoint(event){
 }
 
 function endPoint(event){
- const tracked=pointers.delete(event.pointerId);const stage=$('#production-drawing');if(stage.hasPointerCapture?.(event.pointerId))stage.releasePointerCapture(event.pointerId);
+ const tracked=pointers.delete(event.pointerId);const stage=$('#production-drawing');
+ if(drag?.type==='panel-sketch'){
+  if(event.pointerId!==drag.id)return;
+  const previous=drag;const endpoint=panelSketchHit(event),moved=Math.hypot(event.clientX-previous.x,event.clientY-previous.y)>8;
+  if(stage.hasPointerCapture?.(event.pointerId))stage.releasePointerCapture(event.pointerId);
+  drag=null;panelSketchHover=null;suppressClick=true;
+  if(event.type==='pointerup'&&endpoint){
+   if(!previous.hadBefore&&moved)panelSketchPoints.push(previous.start);
+   const point=window.MIRPanelSketch.orthogonal(panelSketchPoints.at(-1),endpoint,event.shiftKey);
+   appendPanelSketchPoint(point);
+  }else updateDrawing();
+  return;
+ }
+ if(stage.hasPointerCapture?.(event.pointerId))stage.releasePointerCapture(event.pointerId);
  if(drag?.type==='pan'){
   if(event.pointerId!==drag.id)return;
   const moved=drag.moved;drag=null;stage.dataset.moving='false';suppressClick=moved;
@@ -1696,6 +1879,14 @@ function startProfileDrawing({fullscreen=true}={}){
  updateDrawing();
 }
 function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom]');if(!button)return;const d=button.dataset;
+ if(d.panelSketchStart!==undefined||button.id==='mir-draw-single-panel'){startPanelSketch();return;}
+ if(d.panelSketchUndo!==undefined){panelSketchPoints.pop();panelSketchHover=null;updateDrawing();return;}
+ if(d.panelSketchCancel!==undefined){cancelPanelSketch();return;}
+ if(d.panelSketchFinish!==undefined){finishPanelSketch();return;}
+ if(d.panelNoLip&&kind==='panel'&&!editingItemId){
+  draft.lips={...draft.lips,[d.panelNoLip]:'0'};
+  renderPanelOptions();updateDrawing();return;
+ }
  if(d.faceSelect){
   if(client||editingItemId||!['left','right'].includes(d.faceSelect))return;
   draft.coloredFace={...draft.coloredFace,side:d.faceSelect,segmentId:$('#profile-painted-segment')?.value||draft.coloredFace?.segmentId||'A'};
@@ -1865,7 +2056,11 @@ function handleInput(event){const e=event.target,d=e.dataset;
   updateDrawing({keepForm:true});
   return;
  }
- if(d.measure){if(kind==='profile'&&d.measure!=='length'){draft.dimensions=draft.dimensions||{};draft.dimensions[d.measure]=e.value;}else draft[d.measure]=e.value;if(kind==='panel'&&draft.shape==='square'&&d.measure==='width')draft.height=e.value;updateDrawing({keepForm:true});return;}
+ if(d.measure){if(kind==='profile'&&d.measure!=='length'){draft.dimensions=draft.dimensions||{};draft.dimensions[d.measure]=e.value;}else draft[d.measure]=e.value;if(kind==='panel'&&draft.shape==='square'&&d.measure==='width')draft.height=e.value;
+ if(kind==='panel'&&['width','apexX'].includes(d.measure)&&updateRoofDerivedHeight()){
+  const field=$('#production-dimensions [data-measure="height"]');if(field)field.value=draft.height;
+ }
+ updateDrawing({keepForm:true});roofReadout();return;}
  if(d.segmentLength!==undefined){draft.segments[Number(d.segmentLength)].length=e.value;jException=null;renderProfileOptions();updateDrawing({keepForm:true});return;}
  if(d.bendAngle!==undefined){if(client||editingItemId)return;draft.bends[Number(d.bendAngle)].angle=e.value===''?'':Number(e.value);e.closest('details[data-angle-details]')?.querySelectorAll('[data-bend-icon]').forEach(icon=>{icon.innerHTML=bendTurnSketch(icon.dataset.bendIcon,e.value);});updateDrawing({keepForm:true});return;}
  if(d.panelLip){draft.lips=draft.lips||{};if(e.value.trim())draft.lips[d.panelLip]=e.value;else delete draft.lips[d.panelLip];updateDrawing({keepForm:true});return;}
@@ -1893,6 +2088,12 @@ function handleChange(event){const e=event.target,d=e.dataset;
  }
  if(e.id==='mir-template-backup-file'&&!client){void importMirTemplates(e);return;}
  if(e.id==='production-unit')return changeUnit(e.value);
+ if(e.id==='mir-panel-roof-pitch'&&kind==='panel'){
+  draft.roofPitch=e.value;updateRoofDerivedHeight();renderDimensions();renderPanelOptions();updateDrawing();roofReadout();return;
+ }
+ if(e.id==='mir-panel-roof-direction'&&kind==='panel'){
+  draft.roofDirection=e.value;renderDimensions();renderPanelOptions();updateDrawing();roofReadout();return;
+ }
  if(d.specSelect){draft[d.specSelect]=e.value;if(d.specSelect==='rightAngle'){draft.mirrorX=false;renderDimensions();}if(d.specSelect==='pointSide'&&authoring){const p=sampleSpec('panel','pointed');draft.apexOffset=['top','bottom'].includes(e.value)?(M.parseMeasurement(draft.width,draft.unit).value||p.width)/2:(M.parseMeasurement(draft.height,draft.unit).value||p.height)/2;}renderPanelOptions();updateDrawing();return;}
  if(d.bendMode!==undefined){if(client||editingItemId)return;freeformRedo=[];const index=Number(d.bendMode),old=draft.bends[index];draft.bends[index]={mode:e.value,angle:e.value==='hem'?180:e.value==='signed'?0:90,direction:old.direction||'left'};renderDimensions();updateDrawing();return;}
  if(d.bendDirection!==undefined){if(client||editingItemId)return;freeformRedo=[];draft.bends[Number(d.bendDirection)].direction=e.value;updateDrawing();return;}
