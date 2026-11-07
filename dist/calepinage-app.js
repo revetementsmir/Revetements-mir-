@@ -2,7 +2,7 @@
  * imported PDF pixels are references, never a substitute for a confirmed cote. */
 (function () {
   'use strict';
-  const $ = s => document.querySelector(s), M = window.MIRProduction, E = window.MIRPanelLayout, O = window.MIRPanelLayoutOutput, A = window.MIRArchitecturalInput, V = window.MIRArchitecturalWallView;
+  const $ = s => document.querySelector(s), M = window.MIRProduction, E = window.MIRPanelLayout, O = window.MIRPanelLayoutOutput, A = window.MIRArchitecturalInput, V = window.MIRArchitecturalWallView, D = window.MIRPanelDimensions;
   const clone = v => JSON.parse(JSON.stringify(v)), finite = Number.isFinite;
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const uid = () => 'zone-' + (globalThis.crypto?.randomUUID?.() || Date.now().toString(36) + '-' + Math.random().toString(36).slice(2));
@@ -22,6 +22,14 @@
   let pdfSession=null, pdfId=null, pdfSequence=0, dbPromise, saveTimer, saveChain=Promise.resolve(), saveSequence=0, toastTimer, exporting=false, ready=false;
   let outlineDraft=[], outlineCursor=null, outlineOrthogonal=false, outlineRightAngle=false, wallYaw=-24, wallPitch=12, selectedWallEdge=null;
   const DB='mir-panel-layout-v1';
+  const panelUnit=()=>workspace.panelDimensionUnit==='mm'?'mm':'in';
+  const panelLabel=inches=>D?.label(inches,panelUnit(),inch)||inch(inches);
+  const panelBoth=inches=>D?.both(inches,inch)||inch(inches);
+  function panelError(message){
+   const node=$('#mir-panel-dimension-error');
+   if(node){node.textContent=message||'';node.hidden=!message;}
+   if(message)toast(message);
+  }
   function database() {
     if (!window.indexedDB) return Promise.reject(new Error('Le stockage local est indisponible. Sauvegardez votre dossier JSON.'));
     if (!dbPromise) dbPromise=new Promise((resolve,reject) => {
@@ -175,7 +183,7 @@
     $('#closure-proof').innerHTML=valid?'Largeur : '+inch(layout.columnWidthsIn.reduce((a,b)=>a+b,0))+' − '+(layout.columns-1)+' × '+inch(layout.lipIn)+' = <strong>'+inch(layout.widthIn)+'</strong><br>Hauteur : '+inch(layout.rowHeightsIn.reduce((a,b)=>a+b,0))+' − '+(layout.rows-1)+' × '+inch(layout.lipIn)+' = <strong>'+inch(layout.heightIn)+'</strong>':'Les dimensions assemblées seront vérifiées ici.';
     $('#distribution-note').textContent=valid&&z.values.mode==='equal'&&(!layout.checks.equalColumns||!layout.checks.equalRows)?'Certaines dimensions diffèrent après ajustement. La largeur et la hauteur assemblées restent exactes.':'';
     $('#piece-count').textContent=valid?layout.pieces.length+' panneaux · mêmes repères en production':'Liste des panneaux';
-    $('#piece-table').innerHTML=valid?layout.pieces.map(p=>'<tr class="'+(selected?.type==='piece'&&selected.id===p.id?'selected':'')+'"><td><button data-table-piece="'+p.id+'">'+p.id+'</button></td><td>Rangée '+(p.row+1)+' · colonne '+(p.col+1)+'</td><td>'+inch(p.widthIn)+'</td><td>'+inch(p.heightIn)+'</td><td>'+inch(layout.lipIn)+'</td><td>1</td></tr>').join(''):'<tr><td colspan="6">Entrez les dimensions et la largeur du lip pour calculer les panneaux.</td></tr>';
+    $('#piece-table').innerHTML=valid?layout.pieces.map(p=>'<tr class="'+(selected?.type==='piece'&&selected.id===p.id?'selected':'')+'"><td><button data-table-piece="'+p.id+'" aria-label="Modifier les dimensions de '+p.id+'">'+p.id+' ✎</button></td><td>Rangée '+(p.row+1)+' · colonne '+(p.col+1)+'</td><td>'+esc(panelBoth(p.widthIn))+'</td><td>'+esc(panelBoth(p.heightIn))+'</td><td>'+esc(panelBoth(p.faceWidthIn))+' × '+esc(panelBoth(p.faceHeightIn))+'</td><td>'+inch(layout.lipIn)+'</td><td>1</td></tr>').join(''):'<tr><td colspan="7">Tracez et mesurez le mur, puis entrez le nombre de panneaux et le lip pour calculer automatiquement.</td></tr>';
     $('#export-site').disabled=!valid||exporting;$('#send-production').disabled=!valid||exporting;$('#undo').disabled=!history.length;
     const contour=valid?(layout.config.contourIn||[[0,0],[layout.widthIn,0],[layout.widthIn,layout.heightIn],[0,layout.heightIn]]):[];
     $('#wall-edge-list').innerHTML=valid?'<p class="hint">Contour utile après lousse · '+inch(layout.widthIn)+' × '+inch(layout.heightIn)+'. Angles mesurés dans le plan.</p><div class="table-wrap"><table><thead><tr><th>Côté du contour</th><th>Longueur réelle</th><th>Angle intérieur au départ</th></tr></thead><tbody>'+polygonMeasures(contour).map((e,i)=>'<tr><td><button type="button" data-wall-edge="'+i+'" aria-label="Modifier le sommet du côté '+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'">'+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'</button></td><td>'+inch(e.length)+'</td><td>'+number(e.angle)+'°</td></tr>').join('')+'</tbody></table></div>':'Entrez des mesures valides pour calculer le contour.';
@@ -183,7 +191,20 @@
   function renderInspector() {
     const valid=layout.ok,p=valid&&selected?.type==='piece'?layout.pieces.find(p=>p.id===selected.id):null,j=valid&&selected?.type==='joint'?selected:null;
     $('#piece-inspector').hidden=!p;$('#joint-inspector').hidden=!j;
-    if(p){const shaped=!!layout.config.contourIn;$('#selection-title').textContent=p.id;$('#selection-help').textContent='Rangée '+(p.row+1)+' · colonne '+(p.col+1)+(shaped?' · pièce découpée au contour':'');$('#piece-width-label').textContent=shaped?'Gabarit de colonne hors tout (po)':'Largeur hors tout (po)';$('#piece-height-label').textContent=shaped?'Gabarit de rangée hors tout (po)':'Hauteur hors tout (po)';$('#piece-width').value=val(shaped?layout.columnWidthsIn[p.col]:p.widthIn);$('#piece-height').value=val(shaped?layout.rowHeightsIn[p.row]:p.heightIn);$('#piece-width-lock').checked=layout.config.widthLocks?.[p.col]!=null;$('#piece-height-lock').checked=layout.config.heightLocks?.[p.row]!=null;}
+    if(p){
+      const shaped=!!layout.config.contourIn,unit=panelUnit(),suffix=unit==='mm'?'mm':'po';
+      $('#mir-panel-dimension-unit').value=unit;
+      $('#selection-title').textContent=p.id;
+      $('#selection-help').textContent='Rangée '+(p.row+1)+' · colonne '+(p.col+1)+(shaped?' · panneau découpé au contour':'')+
+       ' · face nette '+panelLabel(p.faceWidthIn)+' × '+panelLabel(p.faceHeightIn);
+      $('#piece-width-label').textContent=(shaped?'Gabarit de colonne':'Largeur du panneau')+' hors tout ('+suffix+')';
+      $('#piece-height-label').textContent=(shaped?'Gabarit de rangée':'Hauteur du panneau')+' hors tout ('+suffix+')';
+      $('#piece-width').value=D.display(shaped?layout.columnWidthsIn[p.col]:p.widthIn,unit);
+      $('#piece-height').value=D.display(shaped?layout.rowHeightsIn[p.row]:p.heightIn,unit);
+      $('#piece-width-lock').checked=layout.config.widthLocks?.[p.col]!=null;
+      $('#piece-height-lock').checked=layout.config.heightLocks?.[p.row]!=null;
+      panelError('');
+    }
     else if(j){const axes=j.axis==='x'?layout.xAxesIn:layout.yAxesIn;if(j.index>=axes.length){selected=null;return renderInspector();}$('#selection-title').textContent='Joint '+(j.axis==='x'?'vertical ':'horizontal ')+(j.index+1);$('#selection-help').textContent=j.axis==='x'?'Cote depuis la gauche de la zone utile.':'Cote depuis le haut de la zone utile.';$('#joint-position').value=val(axes[j.index]);$('#joint-lock').checked=(j.axis==='x'?layout.config.xLocks:layout.config.yLocks)?.[j.index]!=null;}
     else{$('#selection-title').textContent='Votre panneau';$('#selection-help').textContent='Cliquez sur une pièce pour régler ses dimensions.';}
     renderPieceMeasures(p);
@@ -227,7 +248,10 @@
     let svg='<polygon points="'+ps.map(q=>q.join(',')).join(' ')+'" fill="#e8eee0" stroke="#526c45" stroke-width="1.6"/>';
     ps.forEach((q,i)=>{svg+='<circle cx="'+q[0]+'" cy="'+q[1]+'" r="2.5" fill="#45613a"/>'+svgText(q[0]+(q[0]>150?9:-9),q[1]+(q[1]>110?13:-7),'S'+(i+1),'text-anchor="middle" font-size="10" fill="#3f5937"');});
     svg+=svgText(150,220,p.id+' · '+inch(p.widthIn)+' × '+inch(p.heightIn),'text-anchor="middle" font-size="11" fill="#3f5937"');$('#piece-detail-svg').innerHTML=svg;
-    $('#piece-dimensions').innerHTML='<strong>Pièce réelle hors tout</strong><br>'+inch(p.widthIn)+' × '+inch(p.heightIn)+'<br>Surface : '+number(p.areaSqIn/144)+' pi² · '+points.length+' côtés<br>Projection C : '+inch(parse(zone().meta.projection));
+    $('#piece-dimensions').innerHTML='<strong>Hors tout de fabrication</strong><br>'+esc(panelBoth(p.widthIn))+' × '+esc(panelBoth(p.heightIn))+
+      '<br><strong>Face nette sans les lèvres</strong><br>'+esc(panelBoth(p.faceWidthIn))+' × '+esc(panelBoth(p.faceHeightIn))+
+      '<br>Surface : '+number(p.areaSqIn/144)+' pi² · '+points.length+' côtés<br>Projection C : '+inch(parse(zone().meta.projection))+
+      '<br><small>Le gabarit du contour coupé et les raccords des lèvres doivent être validés par l’atelier.</small>';
     $('#piece-edge-table').innerHTML=edges.map((e,i)=>'<tr><td>S'+(i+1)+' → S'+((i+1)%points.length+1)+'</td><td>'+inch(e.length)+'</td><td>'+number(e.angle)+'°</td></tr>').join('');
   }
   function panelDrawing() {
@@ -575,9 +599,24 @@
     const data=clone(workspace),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='MIR-calepinage.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);toast('Dossier JSON préparé avec les cotes et les fonds de page.');
   }
   function applySelectedSize(axis) {
-    if(!layout.ok||selected?.type!=='piece')return;const p=layout.pieces.find(p=>p.id===selected.id),input=$('#piece-'+(axis==='x'?'width':'height')),value=parse(input.value),lock=$('#piece-'+(axis==='x'?'width':'height')+'-lock').checked;
-    if(value===null||value<=0){toast('Entrez une dimension positive, en pouces ou en fraction.');input.focus();return;}
-    configFromResult(E.setPanelSize(layout.config,axis,axis==='x'?p.col:p.row,value,{lock}));
+    if(!layout.ok||selected?.type!=='piece')return;
+    const p=layout.pieces.find(p=>p.id===selected.id),input=$('#piece-'+(axis==='x'?'width':'height')),
+      unit=panelUnit(),value=D.inputInches(input.value,unit,M),
+      lock=$('#piece-'+(axis==='x'?'width':'height')+'-lock').checked;
+    if(value===null){panelError('Entrez une cote positive en '+(unit==='mm'?'millimètres':'pouces ou fraction')+'.');input.focus();return;}
+    const next=E.setPanelSize(layout.config,axis,axis==='x'?p.col:p.row,value,{lock});
+    if(!next.ok){panelError(next.errors?.map(e=>e.message).join(' ')||'La cote ne ferme pas le mur.');return;}
+    configFromResult(next);panelError('');
+  }
+  function applyBothPanelDimensions(){
+    if(!layout.ok||selected?.type!=='piece')return;
+    const p=layout.pieces.find(p=>p.id===selected.id),unit=panelUnit(),
+      width=D.inputInches($('#piece-width').value,unit,M),
+      height=D.inputInches($('#piece-height').value,unit,M);
+    if(width===null||height===null)return panelError('Entrez les deux cotes positives en '+(unit==='mm'?'millimètres':'pouces ou fractions')+'.');
+    const next=D.setPiece(layout,p,width,height,E,{lock:true});
+    if(!next.ok)return panelError((next.errors||[]).map(e=>e.message).join(' ')||'Les deux cotes sont incompatibles avec le mur.');
+    if(configFromResult(next))toast('Panneau '+p.id+' : largeur de colonne et hauteur de rangée verrouillées. Les autres cotes libres sont recalculées.');
   }
   function applyRoofPitch() {
     const {width}=dimensions(), eave=parse($('#roof-eave-height').value);
@@ -646,6 +685,11 @@
     $('#redistribute').onclick=()=>commit(z=>{delete z.rules.xAxesIn;delete z.rules.yAxesIn;});
     $('#unlock-all').onclick=()=>commit(z=>{for(const k of ['widthLocks','heightLocks','xLocks','yLocks'])delete z.rules[k];},{invalidate:false});
     $('#apply-width').onclick=()=>applySelectedSize('x');$('#apply-height').onclick=()=>applySelectedSize('y');
+    $('#apply-panel-dimensions').onclick=applyBothPanelDimensions;
+    $('#mir-panel-dimension-unit').onchange=()=>{
+      workspace.panelDimensionUnit=$('#mir-panel-dimension-unit').value==='mm'?'mm':'in';
+      scheduleSave();renderInspector();renderSummary();draw();
+    };
     for(const axis of ['x','y'])$('#piece-'+(axis==='x'?'width':'height')+'-lock').onchange=()=>applySelectedSize(axis);
     $('#apply-joint').onclick=()=>{if(selected?.type!=='joint'||!layout.ok)return;const p=parse($('#joint-position').value);if(p===null)return toast('Entrez une position en pouces.');configFromResult(E.moveJoint(layout.config,selected.axis,selected.index,p));};
     $('#center-joint').onclick=()=>{if(selected?.type==='joint'&&layout.ok)configFromResult(E.centerJoint(layout.config,selected.axis,selected.index));};
