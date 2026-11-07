@@ -277,7 +277,7 @@ test('Mesures standard MIR : nouvelles fiches privées et usage magasin contrôl
  assert.ok(app.includes('measurementDefaults:checked.data'));
  assert.ok(app.includes('input.readOnly=true'));
  assert.ok(app.includes("catalogueChannel==='store'"));
- assert.ok(app.includes("old?.channels?.client===true?' checked':''"));
+  assert.ok(app.includes("old?.commercial?.wantsClient===true||old?.channels?.client===true||boutiqueChecked?' checked':''"),'Le catalogue existant conserve son choix; Boutique facultative pour un nouveau tracé');
  assert.ok(app.includes("old?.channels?.store===true?' checked':''"));
 });
 
