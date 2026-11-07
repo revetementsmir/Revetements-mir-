@@ -706,9 +706,54 @@ function choosePODialog(intent='',description=''){
   `<form id="mir-po-form" data-po-intent="${intent}" class="dialog-form"><label>Numéro du bon<input name="po" maxlength="100" list="mir-po-list" required placeholder="Ex. PO-2026-084"></label><datalist id="mir-po-list">${rows.filter(row=>row.poNumber).map(row=>`<option value="${esc(row.poNumber)}">${esc(row.project)}</option>`).join('')}</datalist><button class="primary-button" type="submit">${intent?'Ajouter à ce bon':'Ouvrir ce bon'}</button></form>`+
   (rows.length?`<ul class="mir-po-list">${rows.map(row=>`<li><button type="button" class="secondary-button" data-open-po="${esc(row.id)}" data-po-intent="${intent}"${intent&&!row.poNumber?' disabled':''}>${esc(row.poNumber||'Brouillon sans numéro')} · ${row.items.length} ligne(s)${row.project?' · '+esc(row.project):''}</button></li>`).join('')}</ul>`:''));
 }
+
+/* Continuer ouvre trois destinations FINALES et ne crée jamais de côté.
+ * Mesures, plis et couleurs restent disponibles sur une même page. */
+function openContinueMenu(){
+ if(client||kind!=='profile'||authoring||editingItemId)return false;
+ formMetadata();
+ const model=build();
+ if(!model.valid||(draft.segments||[]).length<2){toast('Trace au moins deux côtés et corrige les cotes avant de continuer.');return false;}
+ if(tool==='draw')freeformFinish();
+ const measures=model.segments.map(segment=>esc(segment.label)+' '+esc(M.formatMeasurement(segment.lengthMM,model.unit))).join(' · ');
+ const bends=(model.bends||[]).map((bend,index)=>esc(model.segments[index]?.label||'')+'→'+esc(model.segments[index+1]?.label||'')+' '+(bend.mode==='hem'?'180°':esc(Math.round(Number(bend.angle)*10)/10)+'°')).join(' · ');
+ const note=model.complete?'Moulure prête pour la préparation du bon.':'Certaines informations de fabrication restent à vérifier avant la validation du bon.';
+ dialog('Que veux-tu faire avec cette moulure ?',note,
+   '<div class="mir-continue-summary"><strong>'+esc(model.name||'Moulure dessinée')+'</strong><p>'+measures+'</p><p>'+bends+'</p><p>Longueur : '+esc(M.formatMeasurement(model.lengthMM,model.unit))+' · Qté : '+esc(model.quantity||1)+'</p></div>'+
+   '<div class="mir-continue-actions" role="group" aria-label="Destination du pliage">'+
+   '<button type="button" data-mir-continue-action="save"><strong>Enregistrer dans Mes pliages</strong><small>Réutiliser la moulure et conserver les choix Boutique / Magasin.</small></button>'+
+   '<button type="button" data-mir-continue-action="existing"><strong>Ajouter à un bon existant</strong><small>Sélectionner un bon déjà créé, sans enregistrer un modèle.</small></button>'+
+   '<button type="button" data-mir-continue-action="new"><strong>Créer un nouveau bon</strong><small>Ajouter cette pièce et compléter fournisseur, chantier et livraison.</small></button>'+
+   '</div><p class="field-hint">Les deux choix Bon ne créent pas de fiche dans Mes pliages. Aucun envoi automatique.</p>'+
+   '<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Retour au dessin</button></div>');
+ return true;
+}
+function existingPOChoice(){
+ const rows=[order,...openOrders().filter(row=>row.id!==order.id)].filter(row=>String(row.poNumber||'').trim());
+ if(!rows.length){
+  dialog('Aucun bon existant','Aucun bon numéroté n’est disponible sur cet appareil.',
+   '<p>Crée un bon sans perdre ton dessin.</p><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Retour au dessin</button><button type="button" class="primary-button" data-mir-continue-action="new">Créer un nouveau bon</button></div>');
+  return;
+ }
+ dialog('Choisir un bon existant','Choisis le bon à compléter. Mes pliages ne sera pas modifié.',
+  '<div class="mir-continue-existing">'+rows.map(row=>'<button type="button" class="secondary-button" data-open-po="'+esc(row.id)+'" data-po-intent="add"><strong>'+esc(row.poNumber)+'</strong><small>'+esc(row.project||'Chantier à nommer')+' · '+row.items.length+' référence(s)</small></button>').join('')+
+  '</div><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button></div>');
+}
+function continueChoice(action){
+ if(client||kind!=='profile'||authoring||editingItemId)return;
+ if(action==='save'){closeDialog();saveTemplateDialog();return;}
+ if(action==='existing'){existingPOChoice();return;}
+ if(action!=='new')return;
+ closeDialog();
+ if(!switchWorkshopOrder(defaultOrder()))return;
+ const count=order.items.length;
+ addPiece();
+ if(order.items.length>count)window.MIRProcurementUI?.openCreate?.();
+ else toast('Le bon vide est conservé : vérifie les mesures et les paramètres de la pièce.');
+}
 function finishPOChoice(intent){
  closeDialog();
- if(intent==='add')addPiece();
+ if(intent==='add'){const count=order.items.length;addPiece();if(order.items.length>count)window.MIRProcurementUI?.openCreate?.();}
  if(intent==='transfer')offerProfileImport(true);
 }
 function updateOrderReference(){
@@ -1514,6 +1559,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(d.freeformUndo!==undefined)return freeformUndoLast();
  if(d.freeformRedo!==undefined)return freeformRedoLast();
  if(d.freeformFinish!==undefined)return freeformFinish();
+ if(d.mirContinueAction!==undefined)return continueChoice(d.mirContinueAction);
  if(clientProfileWizard()){
   if(d.clientStep)return goClientStep(Number(d.clientStep));
   if(button.id==='client-step-back')return goClientStep(clientStep-1);
@@ -1853,7 +1899,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  }
  offerProfileImport();
  if(!client&&params.get('shared-request'))openRequest(params.get('shared-request'));
- window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:freeformCanUndo(),canRedo:freeformRedo.length>0};},finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
+ window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:freeformCanUndo(),canRedo:freeformRedo.length>0};},openContinueMenu,finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
  window.dispatchEvent(new Event('mir-production-ready'));
 }
 boot().catch(error=>{console.error('MIR production',error);$('#production-drawing').innerHTML=`<div class="drawing-hint"><strong>Le configurateur n’a pas pu démarrer.</strong><p>${esc(error.message)}</p><button type="button" class="secondary-button" onclick="location.reload()">Réessayer</button></div>`;$('#add-production-piece').disabled=true;});
