@@ -477,8 +477,11 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing{
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .production-workspace{overflow-y:auto!important;overscroll-behavior:contain}
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card{display:flex!important;flex:0 0 auto;flex-direction:column}
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card>.drawing-tools,
- body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card>.drawing-navigation,
  body.mir-mobile-stepper[data-mir-mobile-step="4"] #trace-readout{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card>.drawing-navigation{
+  display:flex!important;align-items:center;justify-content:center;padding:5px 7px!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-gesture-hint{display:none!important}
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-stage{height:170px!important;min-height:0!important}
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .mir-freeform-3d{display:flex!important;margin:5px!important;padding:7px!important}
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .mir-freeform-3d #mir-freeform-3d-canvas{height:150px!important}
@@ -487,6 +490,7 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing{
  }
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>*{display:none!important}
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>#mir-freeform-destination,
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>#mir-piece-name-field,
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>#mir-v4-sheet-total,
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>.mir-v4-footer{display:block!important}
 }
