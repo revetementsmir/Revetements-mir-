@@ -92,12 +92,30 @@ async function verifyQuoteAndExports(browser,base,width){
  await page.goto(base+'/production.html?mode=client&kind=profile',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
  const next=page.locator('#client-step-next');
- // Profil L de solin de fenêtre : 3 1/2 × 2 1/4 po, longueur MIR de 120 po.
- await page.locator('[data-template="l"]').click();
+ // Le client choisit un dessin de l'atelier MIR préalablement sélectionné pour Boutique.
+ // Aucun profil L/J/Z de départ n'est proposé.
+ await page.evaluate(()=>{
+   const geometry={kind:'profile',template:'custom',unit:'in',name:'Solin de fenêtre dessiné MIR',
+     segments:[{label:'A',length:'3 1/2'},{label:'B',length:'2 1/4'}],
+     bends:[{mode:'interior',angle:90,direction:'left'}],startAngle:0,
+     length:120,quantity:1,material:{type:'aluminium'},finish:{},
+     coloredFace:{side:'left',segmentId:'A'}};
+   const created=window.MIRProduction.createTemplate(geometry,{name:'Solin de fenêtre dessiné MIR'});
+   if(!created.ok)throw Error('Moulure de test non valide : '+JSON.stringify(created.errors));
+   const t=created.template;
+   const record={id:t.id,name:t.name,currentVersion:1,versions:[t],
+     channels:{client:true,store:false,po:true},allowed:{materials:['aluminium','acier'],colorSystems:['manufacturer','special']},
+     archived:false,commercial:{status:'draft',wantsClient:true}};
+   localStorage.setItem('mir_production_templates_v1',JSON.stringify({version:1,records:[record]}));
+ });
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
+ assert.equal(await page.locator('#production-templates [data-template]').count(),0,'pas de profils prédéfinis');
+ await page.locator('[data-saved-template]').click();
  await next.click();
  assert.equal(await page.locator('body').getAttribute('data-client-stage'),'2');
- await page.locator('[data-measure="A"]').fill('3 1/2');
- await page.locator('[data-measure="B"]').fill('2 1/4');
+ await page.locator('[data-segment-length="0"]').fill('3 1/2');
+ await page.locator('[data-segment-length="1"]').fill('2 1/4');
  assert.equal(await next.isEnabled(),true);
  await next.click();
  assert.equal(await page.locator('[data-measure="length"]').inputValue(),'120');
