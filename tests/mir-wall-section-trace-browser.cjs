@@ -69,11 +69,13 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    assert.equal(await page.locator('#wall-edge-details').isVisible(),true,'Clicking side opens direct length/angle editor');
    assert.ok(Math.abs(Number(await page.locator('#wall-edge-length').inputValue())-120)<.01,'Side A-B measured length');
    assert.ok(Math.abs(Number(await page.locator('#wall-edge-angle').inputValue())-90)<.01,'Angle at A measured');
+   await page.waitForFunction(()=>document.querySelector('#save-state')?.textContent?.includes('Enregistré'),{timeout:12000});
    const prior=await idb(page);
    await page.locator('#wall-edge-length').fill('108 1/2');
    await page.locator('#wall-edge-angle').fill('80');
    await page.locator('#apply-wall-edge').click();
    assert.equal(await page.locator('#wall-edge-error').isVisible(),false,'Valid length and angle accepted');
+   await page.waitForFunction(()=>document.querySelector('#save-state')?.textContent?.includes('Enregistré'),{timeout:12000});
    const changed=await idb(page);
    const p0=prior.zones.at(-1).shape.pointsIn,p1=changed.zones.at(-1).shape.pointsIn;
    assert.deepEqual(p0[0],p1[0],'Side start A fixed');
