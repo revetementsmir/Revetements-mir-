@@ -183,7 +183,7 @@ declare ln mir_core.order_lines;item mir_core.warehouse_skus;ord mir_core.orders
  if ord.kind<>'employee' or ord.status='cancelled' then raise exception 'Commande employé active requise' using errcode='22023';end if;
  select * into item from mir_core.warehouse_skus where organization_id=org and id=sku_id and not archived;
  if not found then raise exception 'Référence de stock introuvable' using errcode='22023';end if;
- ref:=coalesce(ln.specification->>'stockKey',ln.specification->>'inventoryKey',ln.model_id::text);
+ ref:=coalesce(ln.specification->>'stockKey',ln.specification->>'inventoryKey');
  if ref is null or ref<>item.source_ref then raise exception 'SKU/variante différente de la commande' using errcode='22023';end if;
  insert into mir_core.warehouse_fulfillment(organization_id,order_line_id,sku_id)
  values(org,line_id,sku_id) on conflict do nothing;
@@ -209,6 +209,31 @@ declare out jsonb;q text;begin
  order by s.name limit 40)x;
  return out;
 end$;
+
+-- Les commandes employé sont reliées automatiquement UNIQUEMENT lorsqu'elles
+-- enregistrent l'identité exacte de variante. Jamais de rapprochement par nom.
+create function mir_core.warehouse_auto_link_line() returns trigger
+language plpgsql security definer set search_path=pg_catalog,mir_core as $
+declare candidate text;matched uuid;kind text;begin
+ select o.kind into kind from mir_core.orders o
+ where o.organization_id=new.organization_id and o.id=new.order_id;
+ if kind is distinct from 'employee' then return new;end if;
+ candidate:=coalesce(new.specification->>'stockKey',new.specification->>'inventoryKey');
+ if candidate is null then return new;end if;
+ select s.id into matched from mir_core.warehouse_skus s
+ where s.organization_id=new.organization_id and s.source_ref=candidate
+ and s.source_kind=case when new.model_id is null then 'hardware' else 'bending' end
+ and not s.archived;
+ if matched is not null then
+  insert into mir_core.warehouse_fulfillment(organization_id,order_line_id,sku_id)
+  values(new.organization_id,new.id,matched) on conflict do nothing;
+ end if;
+ return new;
+end$;
+revoke all on function mir_core.warehouse_auto_link_line() from public,anon,authenticated;
+create trigger mir_warehouse_link_employee_lines
+ after insert on mir_core.order_lines
+ for each row execute function mir_core.warehouse_auto_link_line();
 
 create function public.mir_warehouse_snapshot(org uuid,qr uuid) returns jsonb
 language plpgsql stable security definer set search_path=pg_catalog,mir_core as $$
