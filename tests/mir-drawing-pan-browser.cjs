@@ -25,14 +25,15 @@ async function ready(){
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('.mir-v4-picker > summary').click();
-   await page.locator('.mir-v4-picker [data-template="l"]').click();
+   await page.locator('[data-freeform-add]').click();
+   await page.locator('[data-freeform-add]').click();
+   await page.locator('[data-freeform-finish]').click();
    await page.locator('#production-drawing').scrollIntoViewIfNeeded();
    const shape=page.locator('#production-drawing svg > path').first();
    const before=await shape.boundingBox();
    const beforeScroll=await page.evaluate(()=>scrollY);
    const count=await page.locator('#mir-v4-sheet-value').textContent();
-   const dimensions=await page.locator('#production-dimensions input[data-measure]').evaluateAll(inputs=>inputs.map(e=>e.value));
+   const dimensions=await page.locator('#production-dimensions input[data-segment-length]').evaluateAll(inputs=>inputs.map(e=>e.value));
    const area=await page.locator('#production-drawing').boundingBox();
    const start={x:area.x+area.width*.23,y:area.y+area.height*.45};
    if(s.width<600){
@@ -51,7 +52,7 @@ async function ready(){
    assert.ok(after.x-before.x>25,'View should shift right '+JSON.stringify({before,after,s}));
    assert.ok(after.y-before.y>13,'View should shift down '+JSON.stringify({before,after,s}));
    assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),count);
-   assert.deepEqual(await page.locator('#production-dimensions input[data-measure]').evaluateAll(inputs=>inputs.map(e=>e.value)),dimensions);
+   assert.deepEqual(await page.locator('#production-dimensions input[data-segment-length]').evaluateAll(inputs=>inputs.map(e=>e.value)),dimensions);
    await page.locator('#production-drawing').screenshot({path:path.join(folder,'mir-pan-'+s.name+'.png')});
    await page.locator('#panel-view-reset').click();
    const reset=await shape.boundingBox();
