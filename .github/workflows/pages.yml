@@ -60,6 +60,11 @@ jobs:
           node --check dist/portal-client.js
           node --check dist/chantier-app.js
           node --check tests/mir-portal-login.cjs
+          node --check dist/employee-store-model.js
+          node --check dist/mir-store-review.js
+          node --check dist/chantier-app.js
+          node --check tests/mir-magasin-merge.cjs
+          node tests/mir-magasin-merge.cjs
           node tests/mir-portal-login.cjs
           node tests/mir-procurement.cjs
           node tests/mir-admin-guided.cjs
