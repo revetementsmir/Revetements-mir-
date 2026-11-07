@@ -84,10 +84,34 @@
       (jobs.length?`<div class="project-grid">${jobs.map((job,index)=>{const version=state.planVersions.find(v=>v.id===job.publishedVersionId),jobOrders=orders.filter(order=>order.jobId===job.id);return `<article class="project-card">${isDemo()?`<div class="project-cover"><img src="assets/${index%2?'mir-03.jpg':'mir-01.jpg'}" alt="Réalisation MIR illustrant un chantier de démonstration" loading="lazy"><span>CHANTIER DE DÉMONSTRATION</span></div>`:`<div class="project-cover project-cover-neutral">${icon('house')}<span>DOSSIER MIR</span></div>`}<div class="project-body"><div class="project-meta"><span>ÉQUIPE MIR</span><span>${jobOrders.length} demande${jobOrders.length>1?'s':''} en cours</span></div><h3>${esc(job.name)}</h3><p>${esc(job.address||(isDemo()?'Dossier fictif pour essayer le portail':'Adresse à préciser'))}</p><div class="project-plan-row">${icon('plan')}<div><strong>${esc(version?.label||'Plan à publier')}</strong><small>${esc(version?.revision||'Aucune version publiée')}</small></div><span class="pill muted">${version?(isDemo()?'Publié · démo':'Publié'):'À venir'}</span></div><div class="project-actions"><button type="button" class="button secondary" data-job="${esc(job.id)}">Consulter le dossier</button><button type="button" class="button" data-order-for="${esc(job.id)}">Commander ${icon('arrow')}</button></div></div></article>`;}).join('')}</div>`:empty('house',admin?'Votre premier chantier':'Aucun chantier assigné',admin?'Créez un dossier, puis attribuez-le aux membres de votre équipe.':'Un gestionnaire pourra vous attribuer vos dossiers.'))+
       (isDemo()?note('Une version claire pour chaque chantier','Les affectations et les publications de cet aperçu sont simulées. Les vrais plans et les accès seront reliés au service de publication.'):note('Les documents utiles sur le chantier','Retrouvez ici les versions de plan publiées par MIR et les demandes de matériel associées.'));
   }
-  function imageFor(item) {const path=item.primaryImage||item.image||materialMap.get(item.materialId)?.primaryImage;return typeof path==='string'&&/^(\.\/)?assets\//.test(path)?path:null;}
+  
+  const reviewAPI=window.MIRStoreReview;
+  let reviewState=reviewAPI?.empty()||{annotations:{},hidden:[],showHidden:false};
+  function writeReview(){
+    try{if(!reviewAPI?.save(localStorage,reviewState))toast('Sauvegarde indisponible : exportez vos notes.');}
+    catch(_){toast('Sauvegarde indisponible : exportez vos notes.');}
+  }
+  function reviewTools(item){
+    if(!isDemo()||!reviewAPI)return '';
+    const note=reviewState.annotations[item.id]||'',hidden=reviewState.hidden.includes(item.id);
+    return '<div class="mir-review-tools"><button type="button" data-review-note="'+esc(item.id)+'">'+
+      (note?'Modifier la note':'Annoter')+'</button><button type="button" data-review-remove="'+esc(item.id)+'">'+
+      (hidden?'Remettre au magasin':'Retirer du magasin')+'</button>'+
+      (note?'<p class="mir-review-note">'+esc(note)+'</p>':'')+'</div>';
+  }
+  function reviewToolbar(){
+    if(!isDemo()||!reviewAPI)return '';
+    return '<div class="mir-review-toolbar">'+
+      '<button type="button" id="review-export">Exporter les notes JSON</button>'+
+      '<button type="button" id="review-import">Importer des notes</button>'+
+      '<input type="file" id="review-import-file" accept="application/json,.json" hidden>'+
+      (reviewState.hidden.length?'<button type="button" id="review-hidden-toggle">'+
+      (reviewState.showHidden?'Masquer les retirés':'Voir les retirés ('+reviewState.hidden.length+')')+'</button>':'')+'</div>';
+  }
+function imageFor(item) {const path=item.primaryImage||item.image||materialMap.get(item.materialId)?.primaryImage;return typeof path==='string'&&/^(\.\/)?assets\//.test(path)?path:null;}
   function productVisual(item) {const path=imageFor(item);return path?`<img src="${esc(path)}" alt="${esc(item.name)} — illustration du profil ou de la gamme" loading="lazy">`:isFold(item)?foldSVG(item):icon(item.category==='lames-consommables'?'tool':'box');}
   const favoriteIds=()=>state.favorites[actorId]||[];
-  function colorOptions(item,value='') {return `<option value="">${item.colors?.length?'Choisir la couleur':'Teinte à confirmer'}</option>`+(item.colors||[]).map(color=>`<option value="${esc(color.id)}"${value===color.id?' selected':''}>${esc(color.name)}</option>`).join('');}
+  function colorOptions(item,value='') {const selected=value||item.baseColorId||'';return `<option value=""${selected?'':' selected'}>${item.colors?.length?'Choisir la couleur':'Teinte à confirmer'}</option>`+(item.colors||[]).map(color=>`<option value="${esc(color.id)}"${selected===color.id?' selected':''}>${esc(color.name)}</option>`).join('');}
   function formatLabel(format){return format?.label||(format?.widthIn?`${num(format.widthIn)} × ${num(format.lengthIn)} po`:format?.lengthIn?`${num(format.lengthIn)} po`:'');}
   function formatOptions(item,value=''){return '<option value="">Choisir le format</option>'+(item.formats||[]).map(format=>`<option value="${esc(format.id)}"${value===format.id?' selected':''}>${esc(formatLabel(format))}</option>`).join('');}
   async function updateProductPreview(card,item){
@@ -108,19 +132,38 @@
     return customModelController.total;
   }
   function productCard(item) {
-    const custom=isFold(item),favorite=favoriteIds().includes(item.id),needsColor=item.colorPolicy!=='none'&&item.colors?.length;
-    return `<article class="product-card" data-product="${esc(item.id)}"><div class="product-visual"><div class="product-sample" data-product-sample>${productVisual(item)}</div><button type="button" class="favorite-button" data-favorite="${esc(item.id)}" aria-pressed="${favorite}" aria-label="${favorite?'Retirer des favoris':'Ajouter aux favoris'} : ${esc(item.name)}">${icon('heart')}</button></div><p class="product-preview-caption"></p><div class="product-body"><span class="product-brand">${esc(item.brand||'MIR · À confirmer')}</span><h3>${esc(item.name)}</h3><p class="product-description">${esc(custom?'Votre profil, chaque côté à vos mesures.':item.description||materialMap.get(item.materialId)?.finish||'Référence et disponibilité à confirmer à la préparation.')}</p><span class="pill${item.referencePending?' amber':' muted'}">${custom?'Sur mesure':item.referencePending?'Référence à confirmer':'Disponibilité à confirmer'}</span>${!custom&&(item.formats||[]).length>1?`<label>Format<select data-product-format="${esc(item.id)}" aria-label="Format de ${esc(item.name)}">${formatOptions(item)}</select></label>`:!custom&&item.formats?.length===1?`<p class="product-format">${esc(formatLabel(item.formats[0]))}</p>`:''}${needsColor&&!custom?`<label>Couleur / finition<select data-product-color="${esc(item.id)}" aria-label="Couleur de ${esc(item.name)}">${colorOptions(item)}</select></label>`:''}${item.colorNote&&!custom?`<p class="product-color-note">${esc(item.colorNote)}</p>`:''}<p class="product-reference">${item.manufacturerReference?'Réf. '+esc(item.manufacturerReference):''}${item.mirPreferred?' · Référence MIR':''}</p><p class="product-unit">${custom?'Mesures '+(item.measureFields||[]).map(field=>esc(field.key)).join(' / ')+' · pouces':'Quantité en '+esc(item.unit)+(packageLabel(item)?' · '+esc(packageLabel(item)):'' )}</p>${item.materialId?`<a class="product-source-link" href="produit.html?id=${encodeURIComponent(item.materialId)}" target="_blank" rel="noopener">Voir la fiche du produit ↗</a>`:''}${custom?`<button type="button" class="button secondary full" data-configure="${esc(item.id)}">Configurer le pliage ${icon('arrow')}</button>`:`<div class="product-add"><input type="number" id="qty-${esc(item.id)}" data-product-qty="${esc(item.id)}" min="${item.quantityStep||1}" step="${item.quantityStep||1}" value="${item.quantityStep||1}" aria-label="Quantité de ${esc(item.name)}"><button type="button" class="button" data-add-item="${esc(item.id)}">${icon('plus')}Ajouter</button></div>`}</div></article>`;
+    const custom=isFold(item),favorite=favoriteIds().includes(item.id),group=item.reviewVariants?.length>1,
+      needsColor=!group&&item.colorPolicy!=='none'&&item.colors?.length;
+    const variant=group?'<label>Couleur / type<select data-product-variant="'+esc(item.id)+'" aria-label="Couleur ou type de '+esc(item.name)+'">'+
+      item.reviewVariants.map((v,i)=>'<option value="'+i+'" data-item-id="'+esc(v.itemId)+'" data-color-id="'+esc(v.colorId||'')+'">'+esc(v.label)+'</option>').join('')+'</select></label>':'';
+    return '<article class="product-card mir-simple-card'+(item.id==='mir-request-soffit-staples-1in'?' mir-prime-card':'')+
+      '" data-product="'+esc(item.id)+'"><div class="product-visual"><div class="product-sample" data-product-sample>'+productVisual(item)+
+      '</div><button type="button" class="favorite-button" data-favorite="'+esc(item.id)+'" aria-pressed="'+favorite+'" aria-label="'+
+      (favorite?'Retirer des favoris':'Ajouter aux favoris')+' : '+esc(item.name)+'">'+icon('heart')+'</button></div>'+
+      '<p class="product-preview-caption"></p><div class="product-body"><h3>'+esc(item.name)+'</h3>'+
+      variant+
+      (!custom&&!group&&(item.formats||[]).length>1?'<label>Longueur / format<select data-product-format="'+esc(item.id)+'">'+formatOptions(item)+'</select></label>':'')+
+      (!custom&&!group&&item.formats?.length===1?'<p class="product-format">'+esc(formatLabel(item.formats[0]))+'</p>':'')+
+      (needsColor&&!custom?'<label>Couleur<select data-product-color="'+esc(item.id)+'">'+colorOptions(item)+'</select></label>':'')+
+      (item.referencePending?'<small class="mir-review-pending">Référence ou disponibilité à confirmer</small>':'')+
+      '<p class="product-unit">'+esc(item.unit)+(packageLabel(item)?' · '+esc(packageLabel(item)):'')+'</p>'+
+      (custom?'<button type="button" class="button secondary full" data-configure="'+esc(item.id)+'">Configurer le pliage</button>':
+      '<div class="product-add"><input type="number" data-product-qty="'+esc(item.id)+'" min="'+(item.quantityStep||1)+
+      '" step="'+(item.quantityStep||1)+'" value="'+(item.quantityStep||1)+'" aria-label="Quantité de '+esc(item.name)+'">'+
+      '<button type="button" class="button" data-add-item="'+esc(item.id)+'">Ajouter</button></div>')+
+      reviewTools(item)+'</div></article>';
   }
   function renderCatalogue() {
     return heading('LE MATÉRIEL DU CHANTIER','Tout pour <em>avancer.</em>',isDemo()?'Choisissez votre chantier, ajoutez vos articles et envoyez une demande de démonstration.':'Choisissez votre chantier, ajoutez vos articles et transmettez votre demande à l’équipe MIR.',`<div class="job-choice"><label for="order-job">Pour quel chantier ?<select id="order-job">${jobsForActor().map(job=>`<option value="${esc(job.id)}"${job.id===currentJobId()?' selected':''}>${esc(job.name)}</option>`).join('')||'<option value="">Aucun chantier assigné</option>'}</select></label></div>`)+
-      `<div class="order-workspace"><section aria-label="Catalogue du chantier"><div class="catalogue-tools"><label class="search-field"><span class="sr-only">Rechercher un article</span>${icon('search')}<input id="catalogue-search" type="search" placeholder="Clous, soffite, pliage…" value="${esc(query)}"></label><button type="button" class="favorites-filter" id="favorites-filter" aria-pressed="${favoritesOnly}">${icon('heart')}Mes favoris</button></div><div class="category-tabs" aria-label="Catégories"><button type="button" data-category="all" aria-pressed="${category==='all'}">Tout le matériel</button>${Object.entries(categoryNames).map(([id,label])=>`<button type="button" data-category="${id}" aria-pressed="${category===id}">${label}</button>`).join('')}</div><p class="catalogue-results" id="catalogue-count"></p><div id="store-custom-models" hidden></div><div class="catalogue-grid" id="catalogue-grid"></div></section><aside class="order-cart" id="order-cart" tabindex="-1" aria-label="Votre demande"></aside></div><div id="mobile-cart"></div>`;
+      `<div class="order-workspace"><section aria-label="Catalogue du chantier"><div class="catalogue-tools"><label class="search-field"><span class="sr-only">Rechercher un article</span>${icon('search')}<input id="catalogue-search" type="search" placeholder="Clous, soffite, pliage…" value="${esc(query)}"></label><button type="button" class="favorites-filter" id="favorites-filter" aria-pressed="${favoritesOnly}">${icon('heart')}Mes favoris</button>${reviewToolbar()}</div><div class="category-tabs" aria-label="Catégories"><button type="button" data-category="all" aria-pressed="${category==='all'}">Tout le matériel</button>${Object.entries(categoryNames).map(([id,label])=>`<button type="button" data-category="${id}" aria-pressed="${category===id}">${label}</button>`).join('')}</div><p class="catalogue-results" id="catalogue-count"></p><div id="store-custom-models" hidden></div><div class="catalogue-grid" id="catalogue-grid"></div></section><aside class="order-cart" id="order-cart" tabindex="-1" aria-label="Votre demande"></aside></div><div id="mobile-cart"></div>`;
   }
   function renderCatalogueGrid() {
     const words=query.trim().toLocaleLowerCase('fr').split(/\s+/).filter(Boolean),favs=favoriteIds();
     const items=state.catalogue.filter(item=>(category==='all'||item.category===category)&&(!favoritesOnly||favs.includes(item.id))&&words.every(word=>`${item.name} ${item.brand} ${item.manufacturerReference||''} ${categoryNames[item.category]||''} ${item.description||''} ${packageLabel(item)}`.toLocaleLowerCase('fr').includes(word)));
+    const presented=(reviewAPI?.present(items,{demo:isDemo()})||items).filter(item=>!isDemo()||reviewState.showHidden||!reviewState.hidden.includes(item.id));
     const modelCount=renderCustomModels();
-    $('#catalogue-count').textContent=`${items.length} article${items.length>1?'s':''}${modelCount?' · '+modelCount+' modèle'+(modelCount>1?'s':'')+' sur mesure':''} · Disponibilités à confirmer`;
-    $('#catalogue-grid').innerHTML=items.length?items.map(productCard).join(''):empty('search','Aucun article trouvé','Essayez un autre mot ou une autre catégorie.');
+    $('#catalogue-count').textContent=`${presented.length} article${presented.length>1?'s':''}${modelCount?' · '+modelCount+' modèle'+(modelCount>1?'s':'')+' sur mesure':''} · Disponibilités à confirmer`;
+    $('#catalogue-grid').innerHTML=presented.length?presented.map(productCard).join(''):empty('search','Aucun article trouvé','Essayez un autre mot ou une autre catégorie.');
   }
   function lineDescription(line) {const reference=line.manufacturerReference||line.snapshot?.manufacturerReference,packaging=line.packaging||line.snapshot?.packaging;return [line.brand,reference?'Réf. '+reference:null,line.formatLabel||line.snapshot?.formatLabel,packageLabel({...line,packaging}),line.colorName,...Object.entries(line.dimensionsIn||{}).map(([key,value])=>`${key} ${num(value)} po`)].filter(Boolean).join(' · ');}
   function renderCart() {
@@ -404,6 +447,7 @@
     connectionMode='demo';
     const saved=load(STORE_KEY,null),restored=saved&&model.restoreState?model.restoreState(saved,materials):null;
     state=restored?.ok?restored.state:model.createDemoState(materials,{seedExamples:true});
+    try{reviewState=reviewAPI?.load(localStorage)||reviewState;}catch(_){}
     ui=load(UI_KEY,{carts:{},jobs:{}});if(!ui||typeof ui!=='object')ui={carts:{},jobs:{}};if(!ui.carts||typeof ui.carts!=='object')ui.carts={};if(!ui.jobs||typeof ui.jobs!=='object')ui.jobs={};
     actorId=state.members.find(member=>member.id==='demo-employee-1'&&member.active)?.id||state.members.find(member=>member.role==='employee'&&member.active)?.id||state.members[0]?.id;
     mode=actor()?.role||'employee';view=mode==='admin'?'admin-orders':'projects';setChrome(true);render();
