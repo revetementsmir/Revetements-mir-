@@ -248,8 +248,14 @@ function traceGridSVG(unit){
    sans changer la géométrie sauvegardée. */
 function bendAngleLabel(bend){
  if(bend?.mode==='hem')return '180° repli';
- if(bend?.mode==='signed')return 'rotation '+fmt(Number(bend.angle)||0)+'°';
- return fmt(Number(bend?.angle)||90)+'°';
+ if(bend?.mode==='signed'){
+  // La rotation du tracé n'est PAS l'angle intérieur entre deux côtés.
+  // Exemple : rotation de 30° => angle intérieur réel de 150°.
+  const turn=Number(bend.angle);
+  return Number.isFinite(turn)?fmt(180-Math.abs(turn))+'°':'À préciser';
+ }
+ const angle=Number(bend?.angle);
+ return Number.isFinite(angle)?fmt(angle)+'°':'À préciser';
 }
 function profileAnglesOverlay(model,points){
  if(!model?.bends?.length||points.length<3)return '';
