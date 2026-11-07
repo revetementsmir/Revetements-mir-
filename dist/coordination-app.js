@@ -125,6 +125,27 @@ function renderLine(item){
  '<p class="co-small">L’ajout garde l’ancienne ligne intacte, crée une nouvelle ligne et notifie l’entrepôt. À répartir ensuite.</p></div>'+
  '</article>';
 }
+async function fillExistingPOs(){
+ if(!detail||!api?.supplierOrders)return;
+ const version=detail.id+':'+detail.revision,routeById=new Map(
+  (detail.lines||[]).flatMap(l=>l.routes||[]).map(r=>[r.id,r]));
+ const selected=[...document.querySelectorAll('#co-line-list select[data-co-existing-po]')],cache=new Map();
+ for(const select of selected){
+  const route=routeById.get(select.dataset.coExistingPo);if(!route?.supplierId)continue;
+  try{
+   if(!cache.has(route.supplierId))cache.set(route.supplierId,api.supplierOrders(org(),route.supplierId));
+   const rows=await cache.get(route.supplierId);
+   if(!detail||detail.id+':'+detail.revision!==version||!select.isConnected)return;
+   select.replaceChildren();const empty=document.createElement('option');empty.value='';
+   empty.textContent='Choisir un bon existant';select.append(empty);
+   for(const row of Array.isArray(rows)?rows:[]){
+    const opt=document.createElement('option');opt.value=row.id;
+    opt.textContent=(row.number||String(row.id||'').slice(0,12))+' · '+(row.job||'Chantier à préciser');
+    select.append(opt);
+   }
+  }catch(error){if(select.isConnected)select.title='Bons non disponibles : '+error.message;}
+ }
+}
 function renderDetail(){
  if(!detail)return;
  $('#co-none').hidden=true;$('#co-detail').hidden=false;
@@ -155,6 +176,7 @@ function renderDetail(){
  '<p>'+esc(e.payload?.name||'Commande')+(e.type==='quantity_added'?' +'+fmt(e.payload?.delta)+' '+esc(e.payload?.unit):'')+'</p></div>').join('')||'<p>Aucun changement à communiquer.</p>';
  $('#co-meta').querySelector('button').disabled=!!detail.shippedAt;
  $('#co-overall-status').className='co-badge';
+ void fillExistingPOs();
 }
 async function openOrder(sourceOrderId){
  if(!sessionReady||busy)return;locked(true);status('Lecture de la commande et de ses références…');
