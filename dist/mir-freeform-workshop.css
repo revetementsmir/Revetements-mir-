@@ -316,3 +316,16 @@ body.mir-admin-v4.mir-freeform-active :is(button,input,select):focus-visible{
  body.mir-admin-v4.mir-procurement-ready .mir-unified-client-shortcut,
  body.mir-admin-v4.mir-procurement-ready .production-footnote{display:none!important}
 }
+
+/* L’étape est informative : toutes les fonctions restent accessibles sans
+ * changer de page. Le seul ajout de côté se fait dans le SVG du tableau. */
+body.mir-admin-v4:not(.mir-freeform-active) #mir-freeform-step-label{display:none!important}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-step-label{
+ display:block;flex:0 0 auto;padding:2px 4px 5px;margin:0;
+ font:700 11px/1.35 Arial,Helvetica,sans-serif;color:var(--mir-muted,#5b695d);
+}
+body.mir-freeform-active .drawing-tools [data-add-segment],
+body.mir-freeform-active .segment-actions [data-add-segment]{display:none!important}
+body.mir-freeform-active .drawing-card:has(#production-drawing[data-tool="select"])
+ .drawing-tools [data-draw-tool="draw"]{display:inline-flex!important}
+body.mir-freeform-active #mir-freeform-toolbar [data-freeform-next]::before{content:"";display:none}
