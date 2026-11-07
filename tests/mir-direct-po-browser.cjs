@@ -24,8 +24,9 @@ async function ready(){
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('.mir-v4-picker > summary').click();
-   await page.locator('.mir-v4-picker [data-template="l"]').click();
+   await page.locator('[data-freeform-add]').click();
+   await page.locator('[data-freeform-add]').click();
+   await page.locator('[data-freeform-finish]').click();
    await page.locator('#production-piece-name').fill('Solin porte entrée');
    const button=page.locator('#mir-direct-po-add');
    assert.equal(await button.isVisible(),true);
