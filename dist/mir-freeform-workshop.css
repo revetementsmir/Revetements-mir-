@@ -372,7 +372,7 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing{
 
 
 /* MIR — parcours téléphone 4 étapes, moteur de tracé commun à PC/iPad. */
-@media(max-width:650px){
+@media(max-width:650px), (max-width:950px) and (max-height:520px) and (pointer:coarse){
  body.mir-admin-v4.mir-mobile-stepper{
   display:flex;flex-direction:column;width:100%;max-width:100%;
   height:100dvh;max-height:100dvh;min-width:0;box-sizing:border-box;
@@ -500,4 +500,24 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing{
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>#mir-piece-name-field,
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>#mir-v4-sheet-total,
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .config-card>.mir-v4-footer{display:block!important}
+}
+
+/* MIR — adaptation paysage tactile à faible hauteur, même tracé et même source de données. */
+@media(max-width:950px) and (max-height:520px) and (pointer:coarse){
+ body.mir-mobile-stepper>.production-header{min-height:44px!important;max-height:55px!important;padding:4px 8px!important}
+ body.mir-mobile-stepper #mir-freeform-title small{display:none!important}
+ body.mir-mobile-stepper .mir-mobile-steps{padding:4px 8px 6px!important;margin:0 0 3px!important}
+ body.mir-mobile-stepper .mir-mobile-step-progress{margin-top:4px!important}
+ body.mir-mobile-stepper .mir-mobile-step-progress span{height:3px}
+ body.mir-mobile-stepper>.production-wrap{padding:2px 7px calc(57px + env(safe-area-inset-bottom))!important}
+ body.mir-mobile-stepper #mir-freeform-toolbar:not([hidden]){padding:5px 8px max(5px,env(safe-area-inset-bottom))!important}
+ body.mir-mobile-stepper #mir-freeform-toolbar>button{min-height:43px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>.drawing-head{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>.drawing-tools{padding:2px 5px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-card>.drawing-tools button{min-height:33px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] #trace-readout{padding:2px 6px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card{flex-basis:90px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card>.drawing-head{display:none!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-stage{height:120px!important}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .mir-freeform-3d #mir-freeform-3d-canvas{height:108px!important}
 }
