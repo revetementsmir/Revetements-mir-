@@ -291,7 +291,8 @@
       if(valid)out+=svgText(d.width/2,d.height+dim+fs*.3,inch(layout.widthIn)+' × '+inch(layout.heightIn)+' utiles après lousse','font-size="'+fs*.75+'" text-anchor="middle" fill="#395335"');
       if(!valid)out+=svgText(d.width/2,d.height/2,'Renseignez le lip et la répartition','font-size="'+fs+'" text-anchor="middle" fill="#687d5e"');
     } else {
-      baseWidth=1000;baseHeight=680;transform=null;
+      // Enlarged trace viewport; still no fabricated chantier dimensions.
+      originX=65;originY=45;baseWidth=870;baseHeight=590;transform=null;
       const waiting=Array.isArray(z.shape?.sketchRatios)&&z.shape.sketchRatios.length>=3;
       const activeDraft=tool==='outline'&&outlineDraft.length>0;
       out='<rect x="160" y="100" width="680" height="460" rx="3" fill="#eff3e8" stroke="#afbea0" stroke-dasharray="8 7"/>';
