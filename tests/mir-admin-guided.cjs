@@ -40,6 +40,18 @@ test('La face peinte suit le côté et la couleur, les valeurs HTML sont échapp
  const malicious=live.render({...model,name:'<script>bonjour</script>'});
  assert.doesNotMatch(malicious,/<script>/);
 });
+test('Rotation automatique : chaque face colorée est orientée vers la caméra',()=>{
+ const left=live.preferredView(model,{yaw:-42,pitch:24});
+ const flipped=modelAPI.buildProfile({...spec,coloredFace:{side:'right',segmentId:'A'}});
+ const right=live.preferredView(flipped,{yaw:left.yaw,pitch:left.pitch});
+ assert.ok(left.score>.45,'Face gauche visible : '+JSON.stringify(left));
+ assert.ok(right.score>.45,'Face droite visible : '+JSON.stringify(right));
+ assert.notDeepEqual([left.yaw,left.pitch],[right.yaw,right.pitch],'La caméra doit pivoter quand la face change');
+ const leftRender=live.render(model,{...left,side:'left',hex:'#aa0033'});
+ const rightRender=live.render(flipped,{...right,side:'right',hex:'#aa0033'});
+ assert.match(leftRender,/data-face="painted"/);
+ assert.match(rightRender,/data-face="painted"/);
+});
 test('Les mêmes mesures ont la même clé; changer le métal ne déforme pas la géométrie',()=>{
  const a=wizard.geometryKey(model);
  const changed={...model,spec:{...model.spec,material:{type:'acier'},finish:{hex:'#ffffff'}}};
