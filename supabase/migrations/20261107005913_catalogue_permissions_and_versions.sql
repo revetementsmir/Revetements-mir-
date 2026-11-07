@@ -1,5 +1,18 @@
 -- Additive, not applied remotely by CI or Pages. Inspect hosted schema before applying.
 begin;
+-- Refuse to replace a function changed by another contributor since the audit.
+do $$
+declare item record;begin
+ for item in select * from (values
+ ('public.mir_shared_snapshot(uuid)',array['8c5bc3a1954aa2958098f74476210628']),
+ ('public.mir_submit_request(uuid,uuid,uuid,integer,jsonb)',array['6299362c756b6071529ec32434c79300']),
+ ('public.mir_admin_publish_model(uuid,uuid,integer,jsonb)',array['79f43161228c0e7e45b3fdd3a2b113d6']),
+ ('public.mir_add_master_version(uuid,uuid,integer,jsonb)',array['6b63c4845499272b6a2bf8eae9c21617','70aa54f7edcf682d377109f58511d2cb'])
+ ) as expected(signature,hashes) loop
+ if to_regprocedure(item.signature) is null or not(md5(pg_get_functiondef(to_regprocedure(item.signature)))=any(item.hashes)) then
+ raise exception 'Fonction absente ou modifiée depuis audit : %. Arrêter et examiner les changements.',item.signature using errcode='40001';end if;
+ end loop;
+end $$;
 alter table mir_core.model_publications add column configuration_rules jsonb not null default '{}' check(jsonb_typeof(configuration_rules)='object');
 -- Pure validator: no privileged lookup and no new public RPC.
 create function mir_core.validate_configuration_rules(rules jsonb) returns void
@@ -23,20 +36,23 @@ declare k text;v jsonb;begin
  if rules ? 'fixed_color' and (jsonb_typeof(rules->'fixed_color') is distinct from 'string' or length(btrim(rules->>'fixed_color')) not between 1 and 200 or (jsonb_array_length(coalesce(rules->'colors','[]'))>0 and not(rules->'colors' @> jsonb_build_array(rules->>'fixed_color')))) then raise exception 'Couleur fixe non autorisée' using errcode='22023';end if;
 end $$;
 revoke all on function mir_core.validate_configuration_rules(jsonb) from public,anon,authenticated;
-create or replace function mir_core.publish_model(org uuid,model uuid,model_version integer,expected_revision integer,settings jsonb)
-returns integer language plpgsql security definer set search_path=pg_catalog,mir_core as $$
-declare current_revision integer; result integer; begin
+create or replace function public.mir_admin_publish_model(org uuid,model uuid,expected_revision integer,settings jsonb) returns integer
+language plpgsql security definer set search_path=pg_catalog,mir_core as $$
+declare ver integer;new_revision integer;begin
  if not mir_core.has_role(org,array['admin']) then raise exception 'Admin requis' using errcode='42501';end if;
- if (settings->>'sale_length_in')::integer=144 and not exists(select 1 from mir_core.models where organization_id=org and id=model and name ilike 'J%soffite%') then raise exception 'Exception 12 pi réservée au J à soffite';end if;
- perform mir_core.validate_configuration_rules(coalesce(settings->'configuration_rules','{}'));
+ if jsonb_typeof(settings->'standard_measures') is distinct from 'object' or jsonb_typeof(settings->'locked_measures') is distinct from 'object' then raise exception 'Mesures invalides';end if;
  perform 1 from mir_core.models where organization_id=org and id=model for update;
- if not found then raise exception 'Modèle absent';end if;
- select revision into current_revision from mir_core.model_publications where organization_id=org and model_id=model;
- if coalesce(current_revision,0) is distinct from expected_revision then raise exception 'Conflit de révision' using errcode='40001';end if;
- insert into mir_core.model_publications(organization_id,model_id,version,sale_length_in,boutique,store,supplier_po,aluminum_cents,steel_cents,conditions,standard_measures,locked_measures,archived,configuration_rules)
- values(org,model,model_version,coalesce((settings->>'sale_length_in')::integer,(select sale_length_in from mir_core.model_publications where organization_id=org and model_id=model),120),coalesce((settings->>'boutique')::boolean,false),coalesce((settings->>'store')::boolean,false),coalesce((settings->>'supplier_po')::boolean,false),(settings->>'aluminum_cents')::bigint,(settings->>'steel_cents')::bigint,coalesce(settings->>'conditions',''),coalesce(settings->'standard_measures','{}'),coalesce(settings->'locked_measures','{}'),coalesce((settings->>'archived')::boolean,false),coalesce(settings->'configuration_rules',(select configuration_rules from mir_core.model_publications where organization_id=org and model_id=model),'{}'))
- on conflict(organization_id,model_id) do update set version=excluded.version,sale_length_in=excluded.sale_length_in,boutique=excluded.boutique,store=excluded.store,supplier_po=excluded.supplier_po,aluminum_cents=excluded.aluminum_cents,steel_cents=excluded.steel_cents,conditions=excluded.conditions,standard_measures=excluded.standard_measures,locked_measures=excluded.locked_measures,archived=excluded.archived,configuration_rules=excluded.configuration_rules,revision=mir_core.model_publications.revision+1
- returning revision into result;return result;
+ select version into ver from mir_core.model_publications where organization_id=org and model_id=model;
+ if settings ? 'sale_length_in' then
+ if (settings->>'sale_length_in')::integer=144 and not exists(select 1 from mir_core.models where organization_id=org and id=model and name ilike 'J%soffite%') then raise exception 'Exception 12 pi réservée au J à soffite';end if;
+ update mir_core.model_publications set sale_length_in=(settings->>'sale_length_in')::integer,aluminum_cents=(settings->>'aluminum_cents')::bigint,steel_cents=(settings->>'steel_cents')::bigint where organization_id=org and model_id=model;
+ end if;
+ if settings ? 'configuration_rules' then
+ perform mir_core.validate_configuration_rules(settings->'configuration_rules');
+ update mir_core.model_publications set configuration_rules=settings->'configuration_rules' where organization_id=org and model_id=model;
+ end if;
+ new_revision:=mir_core.publish_model(org,model,ver,expected_revision,settings);
+ return new_revision;
 end $$;
 
 create or replace function public.mir_shared_snapshot(org uuid) returns jsonb
@@ -122,6 +138,6 @@ declare v integer;p mir_core.model_publications;begin
  update mir_core.model_publications set version=v,revision=revision+1,boutique=false,store=false,supplier_po=false where organization_id=org and model_id=model;
  return p.revision+1;
 end $$;
-revoke all on function public.mir_shared_snapshot(uuid),public.mir_submit_request(uuid,uuid,uuid,integer,jsonb),public.mir_add_master_version(uuid,uuid,integer,jsonb) from public,anon;
-grant execute on function public.mir_shared_snapshot(uuid),public.mir_submit_request(uuid,uuid,uuid,integer,jsonb),public.mir_add_master_version(uuid,uuid,integer,jsonb) to authenticated;
+revoke all on function public.mir_shared_snapshot(uuid),public.mir_submit_request(uuid,uuid,uuid,integer,jsonb),public.mir_add_master_version(uuid,uuid,integer,jsonb),public.mir_admin_publish_model(uuid,uuid,integer,jsonb) from public,anon;
+grant execute on function public.mir_shared_snapshot(uuid),public.mir_submit_request(uuid,uuid,uuid,integer,jsonb),public.mir_add_master_version(uuid,uuid,integer,jsonb),public.mir_admin_publish_model(uuid,uuid,integer,jsonb) to authenticated;
 commit;

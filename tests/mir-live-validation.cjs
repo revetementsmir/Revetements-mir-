@@ -33,5 +33,12 @@ test('Audit SQL seulement en lecture : 19 tables RLS et 7 RPC authentifiées de 
   await db.exec(fs.readFileSync(path.join(dir,'202611060004_connected_catalogue.sql'),'utf8'));
   const rows=await db.exec(sql),audit=rows.find(r=>r.rows[0]?.audit)?.rows[0].audit;assert.ok(audit);assert.equal(audit.tables.length,19);assert.ok(audit.tables.every(t=>t.exists&&t.rls));assert.equal(audit.routines.length,7);assert.ok(audit.routines.every(r=>r.exists&&r.securityDefiner&&!r.anonymousExecute&&r.authenticatedExecute));assert.equal(audit.saleLengthColumn,true);assert.equal(audit.migrationHistoryPresent,false);
   assert.equal((await db.query('select count(*)::int as n from mir_core.models')).rows[0].n,0,'audit leaves data unchanged');
+  const original=(await db.query("select pg_get_functiondef('public.mir_shared_snapshot(uuid)'::regprocedure) as definition")).rows[0].definition;
+  const publisher=(await db.query("select pg_get_functiondef('mir_core.publish_model(uuid,uuid,integer,integer,jsonb)'::regprocedure) as definition")).rows[0].definition;
+  await db.exec("create or replace function public.mir_shared_snapshot(org uuid) returns jsonb language sql as $$select '{}'::jsonb$$");
+  const migration=fs.readFileSync(path.join(dir,'20261107005913_catalogue_permissions_and_versions.sql'),'utf8');
+  await assert.rejects(db.exec(migration),e=>e.code==='40001','refuser une fonction modifiée par un autre intervenant');await db.exec('rollback');
+  await db.exec(original);await db.exec(migration);
+  assert.equal((await db.query("select pg_get_functiondef('mir_core.publish_model(uuid,uuid,integer,integer,jsonb)'::regprocedure) as definition")).rows[0].definition,publisher,'la fonction privée non auditée reste intacte');
  }finally{await db.close();}
 });
