@@ -75,6 +75,9 @@ const hash=b=>createHash('sha256').update(b).digest('hex');
       await page.locator('details.mir-po-extra > summary').click();
       await page.locator('[data-mir-po="notes"]').fill('Révision test');
       await page.locator('#mir-edit-lines').click();
+      // L'atelier admin masque volontairement le dossier tant que son onglet n'est pas ouvert.
+      // Rendre l'action visible par le vrai bouton utilisateur sans contourner le test métier.
+      if(!(await page.locator('[data-duplicate-piece]').isVisible()))await page.locator('#mode-link').click();
       await page.locator('[data-duplicate-piece]').click();assert.equal(await page.locator('[data-production-item]').count(),2);
       await page.locator('[data-remove-piece]').last().click();assert.equal(await page.locator('[data-production-item]').count(),1);
       await page.locator('[data-item-quantity]').fill('4');await page.locator('[data-item-quantity]').dispatchEvent('change');
