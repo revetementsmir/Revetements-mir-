@@ -1560,7 +1560,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.id==='import-panel-layout')return importPanelLayout();
  if(button.hasAttribute('data-close-production-dialog'))return closeDialog();
  if(d.workflow){workflow=d.workflow;authoring=false;editingTemplateId=null;render();return;}
- if(d.kind){if(!clientProfileWizard()||d.kind!==kind)choose(d.kind,d.kind==='panel'?'rectangle':'l');return;}
+ if(d.kind){if(!clientProfileWizard()||d.kind!==kind){choose(d.kind,d.kind==='panel'?'rectangle':'custom');if(!client&&d.kind==='profile')startProfileDrawing({fullscreen:false});}return;}
  if(d.template){
   if(clientProfileWizard()&&clientProfileSelected&&button.getAttribute('aria-pressed')==='true')return;
   choose(kind,d.template,{empty:client&&!authoring,profileChosen:true});
