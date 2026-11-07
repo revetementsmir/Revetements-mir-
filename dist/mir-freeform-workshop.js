@@ -4,7 +4,38 @@
 if(new URLSearchParams(location.search).get('mode')==='client')return;
 const $=(selector,root=document)=>root.querySelector(selector);
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let yaw=-42,pitch=24,drag=null,current=null,wasActive=false,lastFaceView='';
+let yaw=-42,pitch=24,drag=null,current=null,wasActive=false,lastFaceView='',workStep=0;
+const workStages=[
+ {label:'Tracé',target:'#production-drawing'},
+ {label:'Cotes et mesures',target:'#mir-v4-dimensions'},
+ {label:'Plis et couleur',target:'#mir-v4-face'},
+ {label:'Boutique et magasin',target:'#mir-freeform-destination'},
+ {label:'Enregistrement et bon',target:'#mir-freeform-save'}
+];
+function navigateToStep(index,{focus=true}={}){
+ workStep=Math.max(0,Math.min(workStages.length-1,index));
+ const info=$('#mir-freeform-step-label');
+ if(info)info.textContent='Étape '+(workStep+1)+' / '+workStages.length+' · '+workStages[workStep].label;
+ const next=$('[data-freeform-next]');
+ if(next){next.disabled=workStep===workStages.length-1||workStep===0&&!current?.model?.valid;next.textContent='Continuer';}
+ const section=$(workStages[workStep].target);
+ if(!section||!focus)return;
+ const detail=section.matches('details')?section:section.closest('details');
+ if(detail)detail.open=true;
+ const config=$('.config-card');
+ if(config?.contains(section)){
+  const start=config.getBoundingClientRect().top,y=section.getBoundingClientRect().top;
+  config.scrollTop+=y-start-8;
+ }else if(section.id==='mir-freeform-save'&&!section.disabled)section.focus({preventScroll:true});
+ else if(section.id==='production-drawing')section.focus({preventScroll:true});
+ else section.querySelector('input,select,button,summary')?.focus({preventScroll:true});
+}
+function nextWorkStep(){
+ if(workStep>=workStages.length-1)return;
+ if(workStep===0&&!window.MIRProductionWorkspace?.finishFreeformTrace?.())return;
+ navigateToStep(workStep+1);
+}
+
 function scene(){
  const canvas=$('#mir-freeform-3d-canvas'),V=window.MIRLiveProfile3D;
  if(!canvas||!V?.render)return;
@@ -21,7 +52,7 @@ function updatePreview(state){
  if(document.body.classList.contains('mir-freeform-active')!==active)document.body.classList.toggle('mir-freeform-active',active);
  const toolbar=$('#mir-freeform-toolbar');
  if(toolbar)toolbar.hidden=!active;
- if(active&&!wasActive){for(const id of ['#mir-freeform-client-toggle','#mir-freeform-store-toggle']){const toggle=$(id);if(toggle)toggle.checked=false;}lastFaceView='';}
+ if(active&&!wasActive){for(const id of ['#mir-freeform-client-toggle','#mir-freeform-store-toggle']){const toggle=$(id);if(toggle)toggle.checked=false;}lastFaceView='';navigateToStep(0,{focus:false});}
  wasActive=active;
  if(!active)return;
  // Positionner la caméra sur la vraie face peinte lors d'une inversion.
@@ -43,6 +74,7 @@ function updatePreview(state){
  if(undo)undo.disabled=!state.canUndo;
  if(finishButton)finishButton.disabled=state.tool!=='draw'||!state.model?.valid||(state.drawPointsMM||[]).length<3;
  if(save)save.disabled=!state.model?.valid;
+ navigateToStep(workStep,{focus:false});
  scene();
 }
 function init(){
@@ -100,9 +132,11 @@ function init(){
  if(!$('#mir-freeform-toolbar')){
   const toolbar=document.createElement('div');toolbar.id='mir-freeform-toolbar';toolbar.hidden=true;
   toolbar.setAttribute('role','toolbar');toolbar.setAttribute('aria-label','Actions du tracé');
-  toolbar.innerHTML='<button type="button" class="mir-freeform-previous" data-freeform-undo title="Supprimer le dernier côté ou pli du tracé">↶ <span>Précédent<small>Effacer le dernier pli</small></span></button><button type="button" class="mir-freeform-add" data-freeform-add title="Continuer le tracé en ajoutant le prochain côté"><span aria-hidden="true">＋</span> Continuer</button>';
+  toolbar.innerHTML='<button type="button" class="mir-freeform-previous" data-freeform-undo title="Supprimer le dernier côté ou pli du tracé">↶ <span>Précédent<small>Effacer le dernier pli</small></span></button><button type="button" class="mir-freeform-add" data-freeform-next title="Passer à l’étape suivante, sans créer de côté">Continuer</button>';
+  toolbar.addEventListener('click',event=>{if(event.target.closest('[data-freeform-next]'))nextWorkStep();});
   workspace.after(toolbar);
  }
+ if(!$('#mir-freeform-step-label')){const label=document.createElement('p');label.id='mir-freeform-step-label';label.className='mir-freeform-step-label';label.setAttribute('aria-live','polite');workspace.before(label);}
  if(!$('#mir-freeform-finish-top')){
   const topTools=$('#drawing-tools');
   if(topTools){const finish=document.createElement('button');finish.type='button';finish.id='mir-freeform-finish-top';finish.dataset.freeformFinish='1';finish.textContent='Terminer le tracé';finish.setAttribute('aria-label','Terminer le tracé et modifier les cotes');topTools.append(finish);}
@@ -117,6 +151,6 @@ function init(){
  watcher.observe(document.body,{attributes:true,attributeFilter:['class','data-profile-admin','data-mir-tab']});
  sync();
 }
-window.MIRAdminWizard=Object.freeze({version:'freeform-1.0.0',updatePreview,get active(){return document.body.classList.contains('mir-freeform-active');}});
+window.MIRAdminWizard=Object.freeze({version:'freeform-1.1.0',updatePreview,get step(){return workStep+1;},get active(){return document.body.classList.contains('mir-freeform-active');}});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
