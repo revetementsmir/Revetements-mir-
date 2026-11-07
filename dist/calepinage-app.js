@@ -46,8 +46,18 @@
     $('#save-state').textContent='Enregistrement…';
     saveTimer=setTimeout(()=>{const data=clone(workspace);saveChain=saveChain.catch(()=>{}).then(()=>dbRequest('drafts','readwrite','workspace',data)).then(()=>{if(seq===saveSequence)$('#save-state').textContent='Enregistré sur cet appareil';}).catch(()=>{if(seq===saveSequence)$('#save-state').textContent='Sauvegarde indisponible · exportez le JSON';});},180);
   }
+
+  // A section may be sketched before its survey dimensions are known.
+  // Only dimension entry turns relative sketch proportions into authoritative inches.
+  function materializeSketch(z) {
+    const ratios=z.shape?.sketchRatios,d=dimensions(z);
+    if(!Array.isArray(ratios)||!(d.width>0&&d.height>0))return false;
+    if(ratios.length<3||ratios.length>64||ratios.some(p=>!Array.isArray(p)||p.length!==2||p.some(n=>!finite(n)||n<0||n>1)))return false;
+    z.shape={type:'free',pointsIn:ratios.map(p=>[p[0]*d.width,p[1]*d.height])};
+    return true;
+  }
   function commit(fn,options={}) {
-    snapshot();fn(zone());zone().revision++;if(options.invalidate!==false)zone().confirmed=false;
+    snapshot();fn(zone());materializeSketch(zone());zone().revision++;if(options.invalidate!==false)zone().confirmed=false;
     if(options.clearAxes){for(const axis of options.clearAxes===true?['x','y']:options.clearAxes)delete zone().rules[axis+'AxesIn'];}
     scheduleSave();render();
   }
@@ -56,7 +66,7 @@
   function dimensions(z=zone()) { const g=gaps(z),width=parse(z.values.width),height=parse(z.values.height);return {width,height,g,usableWidth:finite(width)&&finite(g.left)&&finite(g.right)?width-g.left-g.right:null,usableHeight:finite(height)&&finite(g.top)&&finite(g.bottom)?height-g.top-g.bottom:null}; }
   function wallGeometry(z=zone()) {
     const d=dimensions(z),s=z.shape||{type:'rectangle'};
-    if(A)return A.prepare({widthIn:d.width,heightIn:d.height,clearances:d.g,shape:{type:s.type||'rectangle',leftHeightIn:parse(s.leftHeight),rightHeightIn:parse(s.rightHeight),peakXIn:parse(s.peakX),pointsIn:s.pointsIn}});
+    if(A)return A.prepare({widthIn:d.width,heightIn:d.height,clearances:d.g,shape:{type:s.type||'rectangle',leftHeightIn:parse(s.leftHeight),rightHeightIn:parse(s.rightHeight),peakXIn:parse(s.peakX),pointsIn:Array.isArray(s.pointsIn)?s.pointsIn:Array.isArray(s.sketchRatios)&&d.width>0&&d.height>0?s.sketchRatios.map(p=>[p[0]*d.width,p[1]*d.height]):undefined}});
     // Preserve legacy rectangular drafts when the optional outline component
     // is unavailable; never silently replace an authored contour by a rectangle.
     if(s.type&&s.type!=='rectangle')return {ok:false,errors:[{message:'Le module de contour n’a pas chargé. Rechargez la page.'}]};
@@ -64,6 +74,8 @@
   }
   function measuredPoints(z=zone()) {
     if(z.shape?.type==='free'&&Array.isArray(z.shape.pointsIn))return z.shape.pointsIn;
+    const ratios=z.shape?.sketchRatios,d=dimensions(z);
+    if(Array.isArray(ratios)&&d.width>0&&d.height>0)return ratios.map(p=>[p[0]*d.width,p[1]*d.height]);
     return wallGeometry(z).measuredPointsIn||[];
   }
   function compute(z=zone()) {
@@ -332,19 +344,26 @@
     commit(z=>{z.values.width=val(s.box[2]*s.widthPx*s.scaleInPerPx);z.values.height=val(s.box[3]*s.heightPx*s.scaleInPerPx);z.dimensionSource='scale';},{clearAxes:true});
   }
   function beginOutline() {
-    const d=dimensions();if(!(d.width>0&&d.height>0)){toast('Entrez d’abord la largeur et la hauteur totales prises au chantier. Elles resteront fixes pendant le tracé.');$('#zone-width').focus();return;}
+    // Same trace-first workflow as a folded profile; do not fabricate site dimensions.
     outlineDraft=[];outlineCursor=null;if(view==='3d')view='zone';tool='outline';zoom=1;selected=null;renderInspector();draw();
   }
   function closeOutline() {
     if(outlineDraft.length<3||!A)return;
-    const d=dimensions(),points=A.normalizeSketch(outlineDraft,d.width,d.height);if(!points)return toast('Le contour doit avoir une largeur et une hauteur.');
-    const candidate=clone(zone());candidate.shape={type:'free',pointsIn:points};
-    const net=A.prepare({widthIn:d.width,heightIn:d.height,clearances:d.g,shape:candidate.shape});
+    const d=dimensions(),hasMeasures=d.width>0&&d.height>0;
+    const ratios=A.normalizeSketch(outlineDraft,1,1);
+    if(!ratios)return toast('Tracez au moins 3 sommets qui forment une largeur et une hauteur.');
+    const points=hasMeasures?A.normalizeSketch(outlineDraft,d.width,d.height):ratios;
+    if(!points)return toast('Le contour ne peut pas être coté. Vérifiez ses sommets.');
+    const shape=hasMeasures?{type:'free',pointsIn:points}:{type:'free',sketchRatios:ratios};
+    // Validate even an unmeasured sketch as a unit shape; this is never a real 1-inch wall.
+    const net=A.prepare({widthIn:hasMeasures?d.width:1,heightIn:hasMeasures?d.height:1,
+      clearances:hasMeasures?d.g:{left:0,right:0,top:0,bottom:0},shape:{type:'free',pointsIn:points}});
     const check=net.ok?E.build({widthIn:net.widthIn,heightIn:net.heightIn,lipIn:0,columns:1,rows:1,contourIn:net.contourIn}):net;
     if(!check.ok){toast(check.errors.map(e=>e.message).join(' '));return;}
     const raw=outlineDraft.slice(),fromPDF=view==='plan'&&zone().source;tool='select';outlineDraft=[];
-    commit(z=>{z.shape=candidate.shape;if(fromPDF){const s=z.source,x=Math.max(0,Math.min(...raw.map(p=>p[0]))),y=Math.max(0,Math.min(...raw.map(p=>p[1]))),x2=Math.min(s.widthPx,Math.max(...raw.map(p=>p[0]))),y2=Math.min(s.heightPx,Math.max(...raw.map(p=>p[1])));if(x2>x&&y2>y)s.box=[x/s.widthPx,y/s.heightPx,(x2-x)/s.widthPx,(y2-y)/s.heightPx];}});
-    toast('Contour fermé. Les dimensions chantier sont conservées. Fixez les cotes exactes des sommets avant la fabrication.');
+    commit(z=>{z.shape=shape;if(fromPDF){const s=z.source,x=Math.max(0,Math.min(...raw.map(p=>p[0]))),y=Math.max(0,Math.min(...raw.map(p=>p[1]))),x2=Math.min(s.widthPx,Math.max(...raw.map(p=>p[0]))),y2=Math.min(s.heightPx,Math.max(...raw.map(p=>p[1])));if(x2>x&&y2>y)s.box=[x/s.widthPx,y/s.heightPx,(x2-x)/s.widthPx,(y2-y)/s.heightPx];}});
+    toast(hasMeasures?'Contour fermé. Les dimensions chantier sont conservées. Vérifiez ses sommets.':
+      'Section dessinée et sauvegardée sans cotes. Saisissez la largeur et la hauteur réelles pour calculer les panneaux.');
   }
   function applyVertex() {
     const points=clone(measuredPoints()),i=Number($('#wall-vertex').value),d=dimensions(),x=parse($('#vertex-x').value),height=parse($('#vertex-height').value);
@@ -435,6 +454,7 @@
     };
     $('#wall-shape').onchange=()=>{
       const type=$('#wall-shape').value,d=dimensions();
+      if(type==='free'){beginOutline();return;}
       if(type!=='rectangle'&&!(d.width>0&&d.height>0)){toast('Entrez d’abord la largeur et la hauteur totales du mur.');renderWallControls();return;}
       const current=measuredPoints();
       commit(z=>{z.shape=type==='free'?{type,pointsIn:current.length?clone(current):[[0,0],[d.width,0],[d.width,d.height],[0,d.height]]}:type==='rectangle'?{type}:{type,leftHeight:val(type==='slope'?d.height:d.height*.75),rightHeight:val(d.height*.75),peakX:val(d.width/2)};});
@@ -465,6 +485,12 @@
     for(const [key,id] of Object.entries(metadataControls))$('#'+id).addEventListener('change',()=>commit(z=>{z.meta[key]=$('#'+id).value;if(key==='material'){z.meta.thickness='';z.meta.color='';}else if(key==='thickness'&&z.meta.material==='acier')z.meta.color='';},{invalidate:false}));
     $('#zone-select').onchange=()=>{workspace.activeId=$('#zone-select').value;selected=null;view='zone';zoom=1;tool='select';outlineDraft=[];scheduleSave();render();restoreSession();};
     $('#new-zone').onclick=()=>{if(workspace.zones.length>=30)return toast('Ce dossier contient déjà 30 zones. Sauvegardez-le avant de poursuivre.');snapshot();const z=blankZone(workspace.zones.length+1);workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();};
+    $('#new-traced-section').onclick=()=>{
+      if(workspace.zones.length>=30)return toast('Le dossier accepte 30 sections. Enregistrez ou exportez avant de continuer.');
+      snapshot();const z=blankZone(workspace.zones.length+1);z.name='Section de mur '+(workspace.zones.length+1);
+      workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';
+      scheduleSave();render();restoreSession();beginOutline();
+    };
     $('#load-example').onclick=()=>{if(workspace.zones.length>=30)return toast('Ce dossier contient déjà 30 zones. Sauvegardez-le avant de poursuivre.');snapshot();const z=blankZone(workspace.zones.length+1);z.name='Exemple · entre deux fenêtres';Object.assign(z.values,{width:'108 1/2',height:'83 3/4',lip:'1',columns:4,rows:2});z.dimensionSource='example';workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();toast('Exemple chargé. Le lip de 1 po reste modifiable.');};
     $('#undo').onclick=()=>{if(!history.length)return;const current=new Map(workspace.zones.map(z=>[z.id,z])),restored=history.pop();for(const z of restored.zones){const before=current.get(z.id);if(!before)continue;const oldContent={...before,revision:0},restoredContent={...z,revision:0};z.revision=JSON.stringify(oldContent)===JSON.stringify(restoredContent)?before.revision:Math.max(before.revision,z.revision)+1;}workspace=restored;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();};
     $('#redistribute').onclick=()=>commit(z=>{delete z.rules.xAxesIn;delete z.rules.yAxesIn;});
