@@ -20,14 +20,25 @@ async function verifyMouldingWizard(browser,base,artifacts){
  assert.equal(await next.isDisabled(),true);
  assert.equal(await desktop.locator('[data-client-step]:disabled').count(),4);
  assert.equal(await desktop.locator('#production-dimensions').isVisible(),false);
- await desktop.locator('[data-template="l"]').click();
- assert.equal(await next.isEnabled(),true);
- await next.click();
+ // Le parcours actuel n'affiche pas de profils L/J/Z imposés.
+ // Tester le vrai tracé libre, sans modifier le configurateur pour un ancien test.
+ assert.equal(await desktop.locator('#production-templates [data-template]').count(),0);
+ await desktop.locator('#client-draw-profile').click();
+ const desktopTrace=desktop.locator('#production-drawing svg');
+ await desktopTrace.waitFor({state:'visible'});
+ for(const point of [[220,330],[465,330],[465,195]]){
+  const screen=await desktopTrace.evaluate((svg,[x,y])=>new DOMPoint(x,y).matrixTransform(svg.getScreenCTM()).toJSON(),point);
+  await desktop.mouse.click(screen.x,screen.y);
+ }
+ const desktopFinish=desktop.locator('#drawing-tools [data-draw-tool="draw"]');
+ assert.equal(await desktopFinish.isEnabled(),true);
+ await desktopFinish.click();
  assert.equal(await stage(),'2');
  assert.equal(await desktop.locator('#client-step-length').isVisible(),false);
- await desktop.locator('[data-measure="A"]').fill('3½');
+ await desktop.locator('[data-segment-length="0"]').fill('3½');
+ await desktop.locator('[data-segment-length="1"]').fill('');
  assert.equal(await next.isDisabled(),true);
- await desktop.locator('[data-measure="B"]').fill('2');
+ await desktop.locator('[data-segment-length="1"]').fill('2');
  await next.click();
  assert.equal(await stage(),'3');
  const length=desktop.locator('[data-measure="length"]');
@@ -51,15 +62,17 @@ async function verifyMouldingWizard(browser,base,artifacts){
  assert.equal(await next.isEnabled(),true);
  const scroll=await desktop.evaluate(()=>{
   const preview=document.querySelector('.drawing-card'),form=document.querySelector('#client-step-scroll');
+  const previewBefore=preview.scrollTop;
   form.scrollTop=100;
-  return {preview:getComputedStyle(preview).overflowY,form:getComputedStyle(form).overflowY,previewTop:preview.scrollTop,formTop:form.scrollTop};
+  return {preview:getComputedStyle(preview).overflowY,form:getComputedStyle(form).overflowY,previewBefore,previewAfter:preview.scrollTop,formTop:form.scrollTop};
  });
- assert.deepEqual([scroll.preview,scroll.form,scroll.previewTop],['auto','auto',0]);
+ assert.deepEqual([scroll.preview,scroll.form],['auto','auto']);
+ assert.equal(scroll.previewAfter,scroll.previewBefore,'Le défilement du formulaire ne déplace pas le dessin');
  assert.ok(scroll.formTop>0,'The form scrolls independently of the drawing');
  await desktop.locator('[data-client-step="2"]').click();
- await desktop.locator('[data-measure="B"]').fill('');
+ await desktop.locator('[data-segment-length="1"]').fill('');
  assert.equal(await desktop.locator('[data-client-step="5"]').isDisabled(),true);
- await desktop.locator('[data-measure="B"]').fill('2 1/4');
+ await desktop.locator('[data-segment-length="1"]').fill('2 1/4');
  await desktop.locator('[data-client-step="5"]').click();
  assert.equal(await next.isEnabled(),true,'Valid edits preserve the choices already confirmed');
  await desktop.locator('.production-workspace').scrollIntoViewIfNeeded();
@@ -85,7 +98,7 @@ async function verifyMouldingWizard(browser,base,artifacts){
  await soffit.waitForFunction(()=>!!window.MIRProductionWorkspace);
  assert.equal(await soffit.locator('[data-measure="length"]').inputValue(),'144','J à soffite vendu en 12 pi');
  assert.equal(await soffit.locator('[data-measure="length"]').evaluate(input=>input.readOnly),true);
- assert.equal(await soffit.locator('[data-template="j_soffite"]').getAttribute('aria-pressed'),'true');
+ assert.equal(await soffit.evaluate(()=>window.MIRProductionWorkspace.getLivePreviewState().model.spec.mirProfileId),'j_soffite','Le lien direct conserve la géométrie J à soffite');
  await soffit.close();
 
  const mobile=await browser.newPage({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
