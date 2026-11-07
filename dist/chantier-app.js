@@ -160,7 +160,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
   function renderCatalogueGrid() {
     const words=query.trim().toLocaleLowerCase('fr').split(/\s+/).filter(Boolean),favs=favoriteIds();
     const items=state.catalogue.filter(item=>(category==='all'||item.category===category)&&(!favoritesOnly||favs.includes(item.id))&&words.every(word=>`${item.name} ${item.brand} ${item.manufacturerReference||''} ${categoryNames[item.category]||''} ${item.description||''} ${packageLabel(item)}`.toLocaleLowerCase('fr').includes(word)));
-    const presented=(reviewAPI?.present(items,{demo:isDemo()})||items).filter(item=>!isDemo()||reviewState.showHidden||!reviewState.hidden.includes(item.id));
+    const presented=(reviewAPI?.present(items,{demo:true})||items).filter(item=>!isDemo()||reviewState.showHidden||!reviewState.hidden.includes(item.id));
     const modelCount=renderCustomModels();
     $('#catalogue-count').textContent=`${presented.length} article${presented.length>1?'s':''}${modelCount?' · '+modelCount+' modèle'+(modelCount>1?'s':'')+' sur mesure':''} · Disponibilités à confirmer`;
     $('#catalogue-grid').innerHTML=presented.length?presented.map(productCard).join(''):empty('search','Aucun article trouvé','Essayez un autre mot ou une autre catégorie.');
