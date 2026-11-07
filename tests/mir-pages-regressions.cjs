@@ -232,7 +232,8 @@ test('MIR : nouvelle version conservée en brouillon jusqu’au tarif, ancienne 
   const form=app.slice(begin,end);
   assert.ok(form.includes("old?.commercial?.wantsClient===true||old?.channels?.client===true||boutiqueChecked?' checked':''"),'Le canal Boutique ne se préremplit que par historique ou sélection explicite de la nouvelle pièce');
   assert.ok(form.includes("boutiqueChecked=document.querySelector('#mir-freeform-client-toggle')?.checked===true"),'Le choix Boutique est décoché par défaut et lu explicitement');
-  assert.ok(form.includes("old?.channels?.store===true?' checked':''"));
+   assert.ok(form.includes("storeChecked=document.querySelector('#mir-freeform-store-toggle')?.checked===true"),'Le Magasin est indépendant du choix Boutique');
+  assert.ok(form.includes("old?.channels?.store===true||storeChecked?' checked':''"));
   assert.ok(!form.includes('old?.channels?.client===false'));
   assert.ok(!form.includes('old?.channels?.store===false'));
   assert.ok(form.includes('Nouveau modèle privé par défaut sur cet appareil'));
@@ -278,7 +279,7 @@ test('Mesures standard MIR : nouvelles fiches privées et usage magasin contrôl
  assert.ok(app.includes('input.readOnly=true'));
  assert.ok(app.includes("catalogueChannel==='store'"));
   assert.ok(app.includes("old?.commercial?.wantsClient===true||old?.channels?.client===true||boutiqueChecked?' checked':''"),'Le catalogue existant conserve son choix; Boutique facultative pour un nouveau tracé');
- assert.ok(app.includes("old?.channels?.store===true?' checked':''"));
+ assert.ok(app.includes("old?.channels?.store===true||storeChecked?' checked':''"));
 });
 
 
