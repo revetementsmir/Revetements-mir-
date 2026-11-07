@@ -29,7 +29,7 @@ function available() {
   try {
     await available();
     browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
-    for(const viewport of [{width:1440,height:900,name:'bureau'},{width:1024,height:768,name:'tablette'},{width:390,height:844,name:'mobile'},{width:360,height:780,name:'mobile-compact'}]){
+    for(const viewport of [{width:1440,height:900,name:'bureau'},{width:1024,height:768,name:'tablette-paysage'},{width:820,height:1180,name:'tablette-portrait'},{width:390,height:844,name:'mobile'},{width:360,height:780,name:'mobile-compact'}]){
       const page=await browser.newPage({viewport:{width:viewport.width,height:viewport.height},deviceScaleFactor:1,hasTouch:viewport.width<1100});
       const errors=[];
       page.on('pageerror',error=>errors.push(String(error)));
@@ -60,11 +60,13 @@ function available() {
       assert.equal(await page.locator('#production-order').isVisible(),false);
       const layout=await page.evaluate(()=>{
         const box=selector=>{const b=document.querySelector(selector).getBoundingClientRect();return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,width:b.width};};
-        return {scrollWidth:document.documentElement.scrollWidth,viewport:window.innerWidth,drawing:box('.drawing-card'),config:box('.config-card')};
+        return {scrollWidth:document.documentElement.scrollWidth,viewport:window.innerWidth,scrollHeight:document.documentElement.scrollHeight,screenHeight:window.innerHeight,drawing:box('.drawing-card'),config:box('.config-card')};
       });
       assert.ok(layout.scrollWidth<=layout.viewport+2,viewport.name+' horizontal overflow: '+JSON.stringify(layout));
-      if(viewport.width>=900)assert.ok(layout.config.left>=layout.drawing.right-5,'Landscape side by side: '+JSON.stringify(layout));
-      else assert.ok(layout.config.top>=layout.drawing.bottom-10,'Portrait stack: '+JSON.stringify(layout));
+      if(viewport.width>=768){
+        assert.ok(layout.config.left>=layout.drawing.right-5,'Tablet/PC two panes: '+JSON.stringify(layout));
+        assert.ok(layout.scrollHeight<=layout.screenHeight+4,'Tablet/PC no global vertical scroll: '+JSON.stringify(layout));
+      }else assert.ok(layout.config.top>=layout.drawing.bottom-10,'Phone stack: '+JSON.stringify(layout));
       assert.ok(await page.locator('.config-card').isVisible());
       // Contrats PC / iPad et parcours tactile en quatre étapes avec le même dessin.
       if(phone){
