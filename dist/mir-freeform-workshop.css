@@ -447,6 +447,7 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing{
  body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-navigation{display:none!important}
  body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-tools{flex:0 0 auto;padding:4px 6px!important}
  body.mir-mobile-stepper[data-mir-mobile-step="1"] .drawing-tools button{min-height:38px;font-size:11px}
+ body.mir-mobile-stepper[data-mir-mobile-step="1"] #mir-freeform-finish-top{display:none!important}
  body.mir-mobile-stepper[data-mir-mobile-step="1"] #trace-readout{flex:0 0 auto;padding:4px 8px;font-size:11px}
  /* Les étapes 2 à 4 peuvent faire défiler leur contenu intérieur seulement. */
  body.mir-mobile-stepper[data-mir-mobile-step="2"] .drawing-card{
