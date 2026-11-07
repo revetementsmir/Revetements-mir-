@@ -21,7 +21,7 @@ function setMobileStep(value){
  renderMobileStep();
 }
 function renderMobileStep(){
- const on=phoneLayout()&&document.body.classList.contains('mir-freeform-active');
+ const on=phoneLayout()&&document.body.classList.contains('mir-freeform-active')&&!document.body.classList.contains('mir-v4-dossier-open');
  document.body.classList.toggle('mir-mobile-stepper',on);
  document.body.dataset.mirMobileStep=on?String(mobileStep):'0';
  const header=$('#mir-mobile-steps');
@@ -169,6 +169,15 @@ function init(){
  const sync=()=>{const state=window.MIRProductionWorkspace?.getLivePreviewState?.();if(state)updatePreview(state);};
  window.addEventListener('mir-production-ready',sync);
  window.addEventListener('resize',renderMobileStep);
+ // Le dossier reste ouvrable sur téléphone : sortir temporairement des 4 étapes
+ // sans perdre la pièce, puis les rétablir quand le dossier se referme.
+ $('#mode-link')?.addEventListener('click',()=>{
+  requestAnimationFrame(()=>{
+   renderMobileStep();
+   if(phoneLayout()&&document.body.classList.contains('mir-v4-dossier-open'))
+    $('#production-order')?.scrollIntoView({block:'start',behavior:'instant'});
+  });
+ });
  const watcher=new MutationObserver(sync);
  watcher.observe(document.body,{attributes:true,attributeFilter:['class','data-profile-admin','data-mir-tab']});
  sync();
