@@ -49,6 +49,7 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    }
    await tap(page,240,165);await tap(page,760,165);await tap(page,760,515);await tap(page,240,515);
    assert.equal(await page.locator('#layout-svg .mir-wall-edge-label').count(),3,'Side A-B B-C C-D previewed');
+   await page.screenshot({path:path.join(artifact,'mir-wall-trace-active-'+v.name+'.png'),fullPage:false});
    await page.locator('#outline-close').click();
    assert.equal(await page.locator('#drawing-stage').getAttribute('data-tool'),'select');
    assert.equal(await page.locator('#layout-svg [data-wall-sketch="pending"]').count(),1,'Shape stays visible without pretending to know dimensions');
@@ -58,6 +59,8 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    await page.locator('#lip').fill('1');await page.locator('#lip').press('Tab');
    assert.equal(await page.locator('#layout-svg [data-wall-sketch="pending"]').count(),0,'Sketch materialized once real measurements entered');
    assert.ok(await page.locator('#layout-svg .mir-wall-edge-label').count()>=3,'Actual side names persist');
+   assert.equal(await page.locator('#layout-svg .mir-wall-angle-label').count(),4,'Angles shown at all four corners');
+   assert.ok((await page.locator('#layout-svg .mir-wall-angle-label').allTextContents()).every(v=>v.includes('90')),'Right angles measured from geometry');
    assert.equal(await page.locator('#send-production').isDisabled(),false,'Panel layout can be calculated');
    assert.ok((await page.locator('#wall-edge-list').textContent()).includes('A–B'),'Side labels agree with the worksheet');
    // Clicking a real side opens the exact endpoint controls, never edits dimensions silently.
@@ -66,10 +69,14 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    assert.equal(await page.locator('#wall-coordinate-details').evaluate(n=>n.open),true);
    assert.equal(await page.locator('#wall-vertex').inputValue(),'1');
    assert.equal(await page.locator('#zone-width').inputValue(),before);
+   await page.locator('#zone-width').fill('120 1/2');await page.locator('#zone-width').press('Tab');
+   assert.equal(await page.locator('#send-production').isDisabled(),true,'Changing outer width cannot silently stretch confirmed wall corners');
+   await page.locator('#zone-width').fill('120');await page.locator('#zone-width').press('Tab');
+   assert.equal(await page.locator('#send-production').isDisabled(),false,'Valid measured contour restored unchanged');
    await page.locator('#new-traced-section').click();
-   await drag(page,200,190,690,190,true);
-   await drag(page,690,190,690,460,true);
-   await drag(page,690,460,200,460,true);
+   await drag(page,200,190,690,215,true);
+   await drag(page,690,190,720,460,true);
+   await drag(page,690,460,200,495,true);
    await tap(page,200,190); // Close near original point, no extra vertex.
    assert.equal(await page.locator('#drawing-stage').getAttribute('data-tool'),'select','Drag tracing closes at first vertex');
    assert.equal(await page.locator('#layout-svg [data-wall-sketch="pending"]').count(),1);
@@ -77,6 +84,10 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    const saved=await idb(page);
    assert.ok(saved.zones.length>=3,'Each traced section remains independent');
    assert.equal(saved.zones.at(-1).shape.sketchRatios.length,4);
+   const corners=saved.zones.at(-1).shape.sketchRatios;
+   assert.equal(corners[0][1],corners[1][1],'Shift horizontal segment');
+   assert.equal(corners[1][0],corners[2][0],'Shift vertical segment');
+   assert.equal(corners[2][1],corners[3][1],'Shift horizontal top/bottom');
    assert.equal(saved.zones.at(-1).values.width,'');
    assert.equal(saved.zones.at(-2).values.width,'120');
    assert.equal(saved.zones.at(-2).shape.pointsIn.length,4);
