@@ -2,7 +2,7 @@
  * imported PDF pixels are references, never a substitute for a confirmed cote. */
 (function () {
   'use strict';
-  const $ = s => document.querySelector(s), M = window.MIRProduction, E = window.MIRPanelLayout, O = window.MIRPanelLayoutOutput, A = window.MIRArchitecturalInput, V = window.MIRArchitecturalWallView;
+  const $ = s => document.querySelector(s), M = window.MIRProduction, E = window.MIRPanelLayout, O = window.MIRPanelLayoutOutput, A = window.MIRArchitecturalInput, V = window.MIRArchitecturalWallView, H = window.MIRArchitectMeasures;
   const clone = v => JSON.parse(JSON.stringify(v)), finite = Number.isFinite;
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const uid = () => 'zone-' + (globalThis.crypto?.randomUUID?.() || Date.now().toString(36) + '-' + Math.random().toString(36).slice(2));
@@ -21,6 +21,7 @@
   let workspace = {schema:'mir-panel-layout-workspace-1', zones:[], activeId:null}, layout, selected=null, history=[], view='zone', tool='select', zoom=1, drag=null, calibrationPoints=[], calibrationValue=null, transform=null;
   let pdfSession=null, pdfId=null, pdfSequence=0, dbPromise, saveTimer, saveChain=Promise.resolve(), saveSequence=0, toastTimer, exporting=false, ready=false;
   let outlineDraft=[], outlineCursor=null, outlineOrthogonal=false, outlineRightAngle=false, wallYaw=-24, wallPitch=12, selectedWallEdge=null;
+ let architectUnit='in', pendingArchitectChange=null;
   const DB='mir-panel-layout-v1';
   function database() {
     if (!window.indexedDB) return Promise.reject(new Error('Le stockage local est indisponible. Sauvegardez votre dossier JSON.'));
@@ -164,6 +165,105 @@
       $('#wall-edge-error').hidden=true;$('#wall-edge-error').textContent='';
     }
   }
+
+  /* Un champ visible par panneau. La largeur est partagée par sa colonne et la
+   * hauteur par sa rangée : aucun redimensionnement des autres sans confirmation. */
+  function architectCutLabel(p) {
+    const cut=piecePolygon(p),xmin=Math.min(...cut.map(q=>q[0])),xmax=Math.max(...cut.map(q=>q[0])),
+      ymin=Math.min(...cut.map(q=>q[1])),ymax=Math.max(...cut.map(q=>q[1]));
+    const mm=n=>number(Math.round(n*25.4*100)/100);
+    const cutWidth=xmax-xmin,cutHeight=ymax-ymin;
+    return '<small>Coupe : '+esc(inch(cutWidth))+' × '+esc(inch(cutHeight))+'</small>'+
+      '<small>Plan mm : '+mm(cutWidth)+' × '+mm(cutHeight)+'</small>';
+  }
+  function resetArchitectPreview(){
+    pendingArchitectChange=null;
+    const box=$('#mir-architect-review');if(box)box.hidden=true;
+  }
+  function renderArchitectPlanTable(){
+    const count=$('#mir-wall-panel-count'),table=$('#mir-architect-panel-table'),status=$('#mir-architect-piece-count');
+    if(!count||!table||!status||!H)return;
+    const columns=Number(zone().values.columns),rows=Number(zone().values.rows);
+    count.textContent=columns+' de large × '+rows+' de haut = '+(columns*rows)+' panneaux '+(layout.ok?'calculés':'prévus');
+    architectUnit=zone().values.architectUnit==='mm'?'mm':'in';
+    $('#mir-architect-unit').value=architectUnit;
+    if(!layout.ok){
+      status.textContent='Cote d’abord le mur, son lousse et la largeur des lips.';
+      table.innerHTML='<tr><td colspan="6">La répartition se calcule dès que le mur a ses dimensions exactes.</td></tr>';
+      resetArchitectPreview();return;
+    }
+    status.textContent=layout.pieces.length+' panneaux · '+layout.columns+' colonnes · '+layout.rows+' rangées';
+    const unit=architectUnit;
+    table.innerHTML=layout.pieces.map(p=>{
+      const width=layout.columnWidthsIn[p.col],height=layout.rowHeightsIn[p.row],
+        xLock=layout.config.widthLocks?.[p.col]!=null,yLock=layout.config.heightLocks?.[p.row]!=null,
+        aria='Panneau '+p.id;
+      const unitLabel=unit==='mm'?'mm':'po';
+      return '<tr data-architect-piece="'+esc(p.id)+'"><td><button type="button" data-architect-select="'+esc(p.id)+'">'+esc(p.id)+'</button>'+
+        '<small>C'+(p.col+1)+' · R'+(p.row+1)+'</small></td>'+
+        '<td><label class="sr-only" for="architect-w-'+p.id+'">Largeur hors tout '+esc(aria)+'</label>'+
+        '<input id="architect-w-'+p.id+'" data-architect-width inputmode="decimal" value="'+esc(H.display(width,unit,M))+'" aria-label="Largeur '+esc(aria)+' en '+unitLabel+'"></td>'+
+        '<td><label class="sr-only" for="architect-h-'+p.id+'">Hauteur hors tout '+esc(aria)+'</label>'+
+        '<input id="architect-h-'+p.id+'" data-architect-height inputmode="decimal" value="'+esc(H.display(height,unit,M))+'" aria-label="Hauteur '+esc(aria)+' en '+unitLabel+'"></td>'+
+        '<td>'+architectCutLabel(p)+'</td>'+
+        '<td><label class="mir-architect-lock"><input data-architect-lock-width type="checkbox"'+(xLock?' checked':'')+'> L</label>'+
+        '<label class="mir-architect-lock"><input data-architect-lock-height type="checkbox"'+(yLock?' checked':'')+'> H</label></td>'+
+        '<td><button type="button" class="secondary" data-architect-prepare="'+esc(p.id)+'">Vérifier</button></td></tr>';
+    }).join('');
+    resetArchitectPreview();
+  }
+  function prepareArchitectEdit(button){
+    if(!layout.ok||!H)return;
+    const row=button.closest('[data-architect-piece]'),id=row?.dataset.architectPiece,
+      p=layout.pieces.find(piece=>piece.id===id);
+    if(!row||!p)return;
+    const proposal=H.propose(layout,p,{
+      unit:architectUnit,width:row.querySelector('[data-architect-width]')?.value,
+      height:row.querySelector('[data-architect-height]')?.value,
+      lockWidth:row.querySelector('[data-architect-lock-width]')?.checked,
+      lockHeight:row.querySelector('[data-architect-lock-height]')?.checked
+    },E,M);
+    const box=$('#mir-architect-review'),summary=$('#mir-architect-review-summary');
+    box.hidden=false;box.scrollIntoView({block:'nearest'});
+    if(!proposal.ok){
+      pendingArchitectChange=null;summary.textContent=proposal.error||'Cotes non compatibles.';
+      $('#mir-architect-confirm').disabled=true;return;
+    }
+    pendingArchitectChange={id,zoneId:zone().id,revision:zone().revision,
+      config:clone(proposal.config),requested:proposal.requested};
+    $('#mir-architect-confirm').disabled=false;
+    const impacted=proposal.others;
+    summary.textContent='Vérification '+id+' : largeur '+inch(proposal.requested.widthIn)+' et hauteur '+
+      inch(proposal.requested.heightIn)+'. Cette largeur règle toute la colonne '+proposal.column+
+      ', et cette hauteur toute la rangée '+proposal.row+'. '+
+      (impacted.length?'Autres panneaux ajustés : '+impacted.slice(0,12).join(', ')+
+        (impacted.length>12?' et '+(impacted.length-12)+' autres':'')+'. ':'Aucun autre panneau ne change de dimension. ')+
+      'Aucune cote n’a été enregistrée. Clique Confirmer pour appliquer.';
+  }
+  function confirmArchitectEdit(){
+    const pending=pendingArchitectChange;
+    if(!pending)return;
+    if(pending.zoneId!==zone().id||pending.revision!==zone().revision){
+      toast('Les cotes ont changé depuis la vérification. Refais Vérifier avant de confirmer.');
+      resetArchitectPreview();return;
+    }
+    selected={type:'piece',id:pending.id};
+    const config=clone(pending.config);
+    resetArchitectPreview();
+    commit(z=>{z.rules=config;},{invalidate:false});
+    toast('Cotes du plan appliquées et joints recalculés. Les dimensions chantier restent inchangées.');
+  }
+  function switchArchitectUnit(next){
+    if(!['in','mm'].includes(next)||architectUnit===next)return;
+    const previous=architectUnit;
+    for(const input of document.querySelectorAll('#mir-architect-panel-table [data-architect-width],#mir-architect-panel-table [data-architect-height]')){
+      const value=H.parseDimension(input.value,previous,M);
+      if(value===null){toast('Corrige les champs non numériques avant de changer les unités.');$('#mir-architect-unit').value=previous;return;}
+      input.value=H.display(value,next,M);
+      input.setAttribute('aria-label',input.getAttribute('aria-label').replace(/ en (po|mm)$/,' en '+(next==='mm'?'mm':'po')));
+    }
+    architectUnit=next;zone().values.architectUnit=next;scheduleSave();resetArchitectPreview();
+  }
   function renderSummary() {
     const z=zone(),valid=layout.ok,d=dimensions(z),errors=layout.errors||[];
     const started=z.values.width!==''&&z.values.height!==''&&z.values.lip!=='';
@@ -179,6 +279,7 @@
     $('#export-site').disabled=!valid||exporting;$('#send-production').disabled=!valid||exporting;$('#undo').disabled=!history.length;
     const contour=valid?(layout.config.contourIn||[[0,0],[layout.widthIn,0],[layout.widthIn,layout.heightIn],[0,layout.heightIn]]):[];
     $('#wall-edge-list').innerHTML=valid?'<p class="hint">Contour utile après lousse · '+inch(layout.widthIn)+' × '+inch(layout.heightIn)+'. Angles mesurés dans le plan.</p><div class="table-wrap"><table><thead><tr><th>Côté du contour</th><th>Longueur réelle</th><th>Angle intérieur au départ</th></tr></thead><tbody>'+polygonMeasures(contour).map((e,i)=>'<tr><td><button type="button" data-wall-edge="'+i+'" aria-label="Modifier le sommet du côté '+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'">'+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'</button></td><td>'+inch(e.length)+'</td><td>'+number(e.angle)+'°</td></tr>').join('')+'</tbody></table></div>':'Entrez des mesures valides pour calculer le contour.';
+    renderArchitectPlanTable();
   }
   function renderInspector() {
     const valid=layout.ok,p=valid&&selected?.type==='piece'?layout.pieces.find(p=>p.id===selected.id):null,j=valid&&selected?.type==='joint'?selected:null;
@@ -646,6 +747,21 @@
     $('#redistribute').onclick=()=>commit(z=>{delete z.rules.xAxesIn;delete z.rules.yAxesIn;});
     $('#unlock-all').onclick=()=>commit(z=>{for(const k of ['widthLocks','heightLocks','xLocks','yLocks'])delete z.rules[k];},{invalidate:false});
     $('#apply-width').onclick=()=>applySelectedSize('x');$('#apply-height').onclick=()=>applySelectedSize('y');
+    $('#mir-architect-unit').onchange=e=>switchArchitectUnit(e.target.value);
+    $('#mir-architect-panel-table').addEventListener('click',e=>{
+      const select=e.target.closest('[data-architect-select]');
+      if(select){
+        const id=select.dataset.architectSelect;
+        selected={type:'piece',id};renderInspector();renderSummary();draw();
+        $('#piece-inspector').scrollIntoView({block:'nearest'});return;
+      }
+      const check=e.target.closest('[data-architect-prepare]');
+      if(check)prepareArchitectEdit(check);
+    });
+    $('#mir-architect-panel-table').addEventListener('input',resetArchitectPreview);
+    $('#mir-architect-panel-table').addEventListener('change',resetArchitectPreview);
+    $('#mir-architect-confirm').onclick=confirmArchitectEdit;
+    $('#mir-architect-cancel').onclick=resetArchitectPreview;
     for(const axis of ['x','y'])$('#piece-'+(axis==='x'?'width':'height')+'-lock').onchange=()=>applySelectedSize(axis);
     $('#apply-joint').onclick=()=>{if(selected?.type!=='joint'||!layout.ok)return;const p=parse($('#joint-position').value);if(p===null)return toast('Entrez une position en pouces.');configFromResult(E.moveJoint(layout.config,selected.axis,selected.index,p));};
     $('#center-joint').onclick=()=>{if(selected?.type==='joint'&&layout.ok)configFromResult(E.centerJoint(layout.config,selected.axis,selected.index));};
