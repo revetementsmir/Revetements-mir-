@@ -187,6 +187,7 @@ begin
  from mir_core.coordination_routes r
  join mir_core.coordination_lines l on(l.organization_id,l.id)=(r.organization_id,r.coordination_line_id)
  where l.organization_id=org and l.coordination_id=o.id and r.route='warehouse';
+ payload:=jsonb_build_object('lines',payload,'job',o.job,'address',o.delivery_address,'team',o.team);
  new_revision:=o.revision+1;
  update mir_core.coordination_orders set shipped_at=now(),shipped_by=auth.uid(),
  revision=new_revision,updated_at=now() where organization_id=org and id=o.id;
