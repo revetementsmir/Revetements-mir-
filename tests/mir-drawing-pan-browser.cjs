@@ -31,6 +31,7 @@ async function ready(){
    await page.locator('#production-drawing').scrollIntoViewIfNeeded();
    const shape=page.locator('#production-drawing svg > path').first();
    const before=await shape.boundingBox();
+   const stageBefore=await page.locator('#production-drawing').boundingBox();
    const beforeScroll=await page.evaluate(()=>scrollY);
    const count=await page.locator('#mir-v4-sheet-value').textContent();
    const dimensions=await page.locator('#production-dimensions input[data-segment-length]').evaluateAll(inputs=>inputs.map(e=>e.value));
@@ -56,9 +57,13 @@ async function ready(){
    await page.locator('#production-drawing').screenshot({path:path.join(folder,'mir-pan-'+s.name+'.png')});
    await page.locator('#panel-view-reset').click();
    const reset=await shape.boundingBox();
-   const resetScroll=await page.evaluate(()=>scrollY);
-   assert.ok(Math.abs(reset.x-before.x)<3&&Math.abs((reset.y+resetScroll)-(before.y+beforeScroll))<3,
-    'Vue complète must recenter '+JSON.stringify({before,reset,s}));
+   const stageReset=await page.locator('#production-drawing').boundingBox();
+   // Une zone scrollable peut décaler le tableau quand le bouton « Vue complète »
+   // reçoit le focus. Comparer la géométrie relative au SVG, sans ignorer le pan.
+   const relativeBefore={x:before.x-stageBefore.x,y:before.y-stageBefore.y};
+   const relativeReset={x:reset.x-stageReset.x,y:reset.y-stageReset.y};
+   assert.ok(Math.abs(relativeReset.x-relativeBefore.x)<3&&Math.abs(relativeReset.y-relativeBefore.y)<3,
+    'Vue complète recentre réellement dans son tableau '+JSON.stringify({relativeBefore,relativeReset,s}));
    assert.deepEqual(errors,[]);
    console.log('PASS '+s.name+' glisser la vue + recentrer sans changer les cotes');
    await page.close();
