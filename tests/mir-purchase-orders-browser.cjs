@@ -13,7 +13,9 @@ const hash=b=>createHash('sha256').update(b).digest('hex');
       const context=await browser.newContext({viewport:size,acceptDownloads:true}),page=await context.newPage(),errors=[];
       const dismiss=d=>{console.log('DIALOG '+d.message());return d.dismiss();};page.on('pageerror',e=>errors.push(e.message));page.on('dialog',dismiss);
       await page.goto(base+'/production.html');await page.waitForFunction(()=>window.MIRProductionWorkspace);
-      await page.locator('.mir-v4-picker > summary').click();await page.locator('.mir-v4-picker [data-template="l"]').click();
+      await page.locator('[data-freeform-add]').click();
+      await page.locator('[data-freeform-add]').click();
+      await page.locator('[data-freeform-finish]').click();
       await page.locator('#production-piece-name').fill('Solin test 3½');
       await page.locator('#mir-direct-po-add').click();await page.locator('#mir-po-form input[name="po"]').fill('PO-PDF-01');await page.locator('#mir-po-form button[type="submit"]').click();
       // Explicit, known finish fixture for PDF validity; direct drawing and PO
