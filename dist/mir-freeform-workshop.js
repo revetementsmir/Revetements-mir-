@@ -17,7 +17,7 @@ function scene(){
 function updatePreview(state){
  current=state||null;
  const active=!!state&&state.kind==='profile'&&!state.authoring&&!state.editingItemId&&
-   document.body.dataset.mirTab!=='store'&&!document.body.classList.contains('mir-v4-secondary-view');
+   (!document.body.dataset.mirTab||document.body.dataset.mirTab==='draw')&&!document.body.classList.contains('mir-v4-secondary-view');
  document.body.classList.toggle('mir-freeform-active',active);
  const toolbar=$('#mir-freeform-toolbar');
  if(toolbar)toolbar.hidden=!active;
