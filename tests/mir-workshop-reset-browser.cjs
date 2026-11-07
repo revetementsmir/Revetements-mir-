@@ -25,7 +25,7 @@ async function ready(){
    page.on('dialog',dialog=>dialog.accept());
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForSelector('a.mir-proc-reset-link',{state:'attached',timeout:25000});
-   assert.equal(await page.locator('#mir-procurement-tabs > button').count(),4);
+   assert.equal(await page.locator('#mir-procurement-tabs > button').count(),5,'onglet Mes pliages indépendant');
    // Le plein écran de dessin masque volontairement les outils secondaires.
    // Ouvrir la bibliothèque via le bouton visible avant le nettoyage.
    await page.locator('#mir-procurement-tabs [data-mir-tab="models"]').click();
