@@ -252,6 +252,7 @@
   }
   function draw() {
     const z=zone(),s=z.source,d=dimensions(),svg=$('#layout-svg');
+    document.body.classList.toggle('mir-wall-tracing',tool==='outline');
     let out='',baseWidth,baseHeight,originX=0,originY=0;
     const planView=view==='plan'&&s,valid=layout.ok;
     $('#wall-orbit-controls').hidden=view!=='3d';$('#drawing-stage').dataset.view=view;
@@ -263,6 +264,17 @@
       baseWidth=s.widthPx;baseHeight=s.heightPx;out='<image href="'+s.imageDataUrl+'" x="0" y="0" width="'+baseWidth+'" height="'+baseHeight+'"/>';transform=null;
       if(s.box&&d.width>0&&d.height>0){const b=s.box,bx=b[0]*baseWidth,by=b[1]*baseHeight,bw=b[2]*baseWidth,bh=b[3]*baseHeight;transform={x:bx,y:by,sx:bw/d.width,sy:bh/d.height};if(valid)out+='<g opacity=".88" transform="translate('+bx+' '+by+') scale('+(bw/d.width)+' '+(bh/d.height)+')">'+panelDrawing()+'</g>';out+='<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" fill="none" stroke="#537340" stroke-width="2" vector-effect="non-scaling-stroke"/>';}
       else if(s.box){const b=s.box;out+='<rect x="'+b[0]*baseWidth+'" y="'+b[1]*baseHeight+'" width="'+b[2]*baseWidth+'" height="'+b[3]*baseHeight+'" fill="#bbcbac55" stroke="#537340" stroke-width="2"/>';}
+      if(tool!=='outline'&&z.shape?.type==='free'&&s.box){
+        const b=s.box,bx=b[0]*baseWidth,by=b[1]*baseHeight,bw=b[2]*baseWidth,bh=b[3]*baseHeight;
+        const ratios=Array.isArray(z.shape.sketchRatios)?z.shape.sketchRatios:null;
+        const exact=d.width>0&&d.height>0?measuredPoints(z):null;
+        const points=exact?.length>=3?exact.map(p=>[bx+p[0]*bw/d.width,by+p[1]*bh/d.height]):
+          ratios?.length>=3?ratios.map(p=>[bx+p[0]*bw,by+p[1]*bh]):[];
+        if(points.length>=3){
+          out+='<polygon points="'+points.map(p=>p.join(',')).join(' ')+'" fill="#e0edce" fill-opacity=".25" stroke="#348511" stroke-width="2.5" vector-effect="non-scaling-stroke"/>';
+          out+=wallEdgeAnnotations(points,{closed:true,measured:!!exact?.length,span:baseWidth});
+        }
+      }
     } else if(d.width>0&&d.height>0) {
       const margin=Math.max(d.width,d.height)*.12;originX=-margin;originY=-margin;baseWidth=d.width+2*margin;baseHeight=d.height+2*margin;transform={x:0,y:0,sx:1,sy:1};
       const wall=wallGeometry(),wallPoints=wall.measuredPointsIn;
