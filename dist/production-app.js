@@ -23,6 +23,7 @@ const traceHeights=[6,8,10,12,14];
 let traceHeight=14,traceGridDivisor=4;
 let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,viewPan={x:0,y:0},pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
 let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces=[];
+let panelSketchPoints=[],panelSketchHover=null,panelSketchBefore=null;
 const clientProfileWizard=()=>client&&catalogueChannel!=='store'&&kind==='profile';
 let activeStoreColorLock=false;
 function applyStoreColorLock(){
@@ -288,7 +289,53 @@ function renderColorGrid(){
 function updateFinish(){if(authoring){$('#selected-finish').innerHTML='';return;}draft.finish=currentFinish();const c=chosenColor(),image=safeAsset(c?.swatchUrl||c?.swatchImage),finish=draft.finish,source=safeURL(c?.sourceUrl||chosenMaterial()?.sourceUrl||''),flat=kind==='profile'&&window.MIRKaycanFlatPreview?.isFlatPreview(finish)?window.MIRKaycanFlatPreview:null,flatHex=flat?.get(image)||'#e5e9e0';$('#selected-finish').innerHTML=(finish.code||finish.name)?`${flat?`<span class="kaycan-flat-chip" role="img" aria-label="Aperçu uni indicatif de ${esc(finish.name)}" style="background:${flatHex}"></span>`:image?`<img src="${esc(image)}" alt="Échantillon fabricant de ${esc(finish.name)}">`:''}<div><strong>${esc(finish.name||finish.code)}</strong><span>${esc(finish.code||'Code à confirmer')} · ${esc(finish.manufacturer||finish.system||'Référence spéciale')}</span><p>${esc(colorSystem==='ral'?ral.displayNotice:colorSystem==='special'?'Demande spéciale : faisabilité, teinte et disponibilité à confirmer.':flat?'Aperçu uni estimé du visuel fabricant, non certifié. Teinte, texture et disponibilité à confirmer sur un échantillon réel.':c?.availabilityNote||'Disponibilité sur ce profil à confirmer. Écran indicatif.')}</p>${colorSystem==='manufacturer'&&source?`<a href="${esc(source)}" target="_blank" rel="noopener">Source du fabricant ↗</a>`:''}</div>`:'<div><strong>La teinte reste à choisir.</strong><p>Choisissez une référence précise pour votre pièce.</p></div>';}
 function fitModel(model){const p=model.pointsMM||[],xs=p.map(v=>v[0]),ys=p.map(v=>v[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const scale=Math.min(580/Math.max(1,maxX-minX),340/Math.max(1,maxY-minY));return {scale,ox:400-(minX+maxX)*scale/2,oy:255+(minY+maxY)*scale/2};}
 function pointOnView(point,tr){return [tr.ox+point[0]*tr.scale,tr.oy-point[1]*tr.scale];}
-function drawingModel(){const actual=build();if(actual.valid)return {model:actual,illustrative:authoring};const example=selectedTemplate&&M.templatePreview(selectedTemplate);return {model:example?.ok?example.model:build(sampleSpec(kind,kind==='profile'?draft.template:draft.shape)),illustrative:true};}
+
+function panelSketchPreview(points=panelSketchPoints){
+ const ratios=window.MIRPanelSketch?.normalize(points);if(!ratios)return null;
+ const model=build({...draft,shape:'polygon',contourRatios:ratios,width:48,height:36,
+  relief:0,lip:'0',lips:{},bottomEdgeId:'edge-1',perforation:{enabled:false}});
+ if(!model.valid)return null;
+ return window.MIRProductionVolume?.buildMesh(model)?.valid?model:null;
+}
+function startPanelSketch(){
+ if(editingItemId)return toast('Un panneau d’une commande doit conserver sa forme. Crée une nouvelle pièce pour un autre contour.');
+ panelSketchBefore=copy(draft);panelSketchPoints=[];panelSketchHover=null;
+ draft={...draft,kind:'panel',shape:'polygon',contourRatios:undefined,width:'',height:'',relief:'',
+  lip:'0',lips:{},roofPitch:'',bottomEdgeId:'',perforation:{enabled:false,edgeId:'',details:''}};
+ selectedTemplate=null;tool='panel-trace';view='face';zoom=1;render();
+}
+function cancelPanelSketch(){
+ if(panelSketchBefore)draft=panelSketchBefore;
+ panelSketchBefore=null;panelSketchHover=null;panelSketchPoints=[];tool='select';render();
+}
+function finishPanelSketch(){
+ const ratios=window.MIRPanelSketch?.normalize(panelSketchPoints);
+ if(!ratios)return toast('Ferme un contour de 3 à 64 sommets non alignés.');
+ const model=panelSketchPreview();
+ if(!model)return toast('La forme se croise ou elle est incompatible avec les lips. Corrige les sommets.');
+ draft.shape='polygon';draft.contourRatios=ratios;draft.width='';draft.height='';draft.relief='';
+ draft.lip='0';draft.lips=Object.fromEntries(panelSketchPoints.map((_,i)=>['edge-'+(i+1),'0']));
+ draft.bottomEdgeId='edge-1';draft.perforation={enabled:false,edgeId:'edge-1',details:''};
+ panelSketchPoints=[];panelSketchHover=null;panelSketchBefore=null;tool='select';view='face';
+ render();toast('Panneau dessiné. Entre les cotes A/B réelles, puis choisis les lips côté par côté.');
+}
+function panelSketchHit(event){
+ const svg=$('#production-drawing svg');if(!svg||!drawingCanvasHit(event,{targetRequired:false}))return null;
+ const m=svg.getScreenCTM?.();if(m&&svg.createSVGPoint){const p=svg.createSVGPoint();p.x=event.clientX;p.y=event.clientY;const q=p.matrixTransform(m.inverse());return [q.x,q.y];}
+ const r=svg.getBoundingClientRect();return[(event.clientX-r.left)*800/r.width,(event.clientY-r.top)*520/r.height];
+}
+function appendPanelSketchPoint(point){
+ if(!point||panelSketchPoints.length>=64)return;
+ const first=panelSketchPoints[0],last=panelSketchPoints.at(-1);
+ if(last&&Math.hypot(point[0]-last[0],point[1]-last[1])<4)return;
+ if(first&&panelSketchPoints.length>=3&&Math.hypot(point[0]-first[0],point[1]-first[1])<=14)return finishPanelSketch();
+ panelSketchPoints.push(point);panelSketchHover=null;updateDrawing();
+}
+function drawingModel(){const actual=build();if(actual.valid)return {model:actual,illustrative:authoring};
+ if(kind==='panel'&&draft.shape==='polygon'&&Array.isArray(draft.contourRatios)){
+  const preview=build({...draft,width:48,height:36,relief:0,lip:draft.lip??'0'});
+  if(preview.valid)return {model:preview,illustrative:true};
+ }const example=selectedTemplate&&M.templatePreview(selectedTemplate);return {model:example?.ok?example.model:build(sampleSpec(kind,kind==='profile'?draft.template:draft.shape)),illustrative:true};}
 function traceGridStepMM(unit=draft.unit){return unit==='mm'?1:25.4/traceGridDivisor;}
 function traceGridSVG(unit){
  if(!snap||!drawTransform)return '';
@@ -466,6 +513,17 @@ function volumeSVG(model,{illustrative=false}={}){
 }
 function renderTools(){
  const el=$('#drawing-tools');
+ if(kind==='panel'){
+  el.hidden=!!editingItemId;
+  if(el.hidden){el.innerHTML='';return;}
+  el.innerHTML=tool==='panel-trace'
+   ?'<p class="draw-help">Clique ou glisse pour les sommets · Maj = 90° · cote après le dessin.</p>'+
+    '<button type="button" class="secondary-button" data-panel-sketch-undo'+(!panelSketchPoints.length?' disabled':'')+'>↶ Dernier point</button>'+
+    '<button type="button" class="secondary-button" data-panel-sketch-cancel>Annuler</button>'+
+    '<button type="button" class="primary-button" data-panel-sketch-finish'+(panelSketchPoints.length<3?' disabled':'')+'>Terminer le panneau</button>'
+   :'<button type="button" class="secondary-button" data-panel-sketch-start>✎ Dessiner un panneau libre</button><span class="draw-help">Comme une moulure · 2D/3D synchronisés · sans lip possible.</span>';
+  return;
+ }
  el.hidden=kind!=='profile'||client&&!(clientProfileWizard()&&tool==='draw')||view==='volume'||!!editingItemId;
  if(el.hidden){el.innerHTML='';return;}
  const drawing=tool==='draw';
@@ -1046,6 +1104,8 @@ function editPiece(id){const item=order.items.find(row=>row.id===id);if(!item)re
  draft.length=draft.length||unitValue(120*25.4,draft.unit);
  }render();$('.production-workspace').scrollIntoView({behavior:'smooth',block:'start'});toast(`${id} : la correction sera enregistrée comme une nouvelle révision.`);}
 function render(){
+ const freeButton=$('#mir-draw-single-panel');if(freeButton)freeButton.hidden=kind!=='panel'||!!editingItemId||authoring;
+ document.body.dataset.panelSync=String(kind==='panel');
  document.body.dataset.client=String(client);
  document.body.dataset.publicProduction=String(client&&catalogueChannel!=='store');
  const profileAdmin=!client&&kind==='profile';
@@ -1749,6 +1809,10 @@ function startProfileDrawing({fullscreen=true}={}){
  updateDrawing();
 }
 function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom]');if(!button)return;const d=button.dataset;
+ if(d.panelSketchStart!==undefined||button.id==='mir-draw-single-panel'){startPanelSketch();return;}
+ if(d.panelSketchUndo!==undefined){panelSketchPoints.pop();panelSketchHover=null;updateDrawing();return;}
+ if(d.panelSketchCancel!==undefined){cancelPanelSketch();return;}
+ if(d.panelSketchFinish!==undefined){finishPanelSketch();return;}
  if(d.panelNoLip&&kind==='panel'&&!editingItemId){
   draft.lips={...draft.lips,[d.panelNoLip]:'0'};
   renderPanelOptions();updateDrawing();return;
