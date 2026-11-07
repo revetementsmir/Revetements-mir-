@@ -55,7 +55,7 @@ function updatePreview(state){
  if(toolbar)toolbar.hidden=!active;
  if(active&&!wasActive){for(const id of ['#mir-freeform-client-toggle','#mir-freeform-store-toggle']){const toggle=$(id);if(toggle)toggle.checked=false;}lastFaceView='';mobileStep=1;}
  wasActive=active;
- if(!active)return;
+ if(!active){renderMobileStep();return;}
  // Positionner la caméra sur la vraie face peinte lors d'une inversion.
  const V=window.MIRLiveProfile3D,face=state.model?.coloredFace,segment=state.model?.segments?.find(item=>item.label===face?.segmentId);
  const faceView=face?.side&&segment?`${face.side}:${face.segmentId}:${Math.round(segment.headingDeg*10)/10}`:'';
