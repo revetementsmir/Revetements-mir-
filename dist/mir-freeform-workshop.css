@@ -96,7 +96,7 @@ body.mir-freeform-active #mir-freeform-toolbar>button:focus-visible{outline:3px 
  body.mir-freeform-active #mir-freeform-toolbar .mir-freeform-add{font-size:13px}
 }
 
-/* À 360–380 px, la barre ne doit pas recouvrir la zone de geste du dessin. */
-@media(max-width:380px){
+/* Sur téléphone, la barre suit le contenu pour ne jamais recouvrir un point à tracer. Sur iPad paysage, elle reste épinglée. */
+@media(max-width:650px){
  body.mir-freeform-active #mir-freeform-toolbar{position:static;bottom:auto;box-shadow:none}
 }
