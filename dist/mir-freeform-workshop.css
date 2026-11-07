@@ -134,3 +134,185 @@ body.mir-freeform-active .mir-freeform-detected{font-size:11px}
  body.mir-freeform-active #mir-proc-shortcuts{flex-wrap:wrap}
  body.mir-freeform-active .drawing-stage{min-height:330px}
 }
+
+/* ==========================================================
+   HARMONY MIR — référence unique : styles officiels du site
+   dist/mir-home-premium.css & dist/mir-client-signature.css
+   La maquette iPad définit la disposition, PAS les couleurs.
+   ========================================================== */
+body.mir-admin-v4.mir-procurement-ready{
+ --mir-surface:#fafaf7;--mir-ink:#18251d;--mir-muted:#5b695d;
+ --mir-accent:#348511;--mir-accent-hover:#286b0d;--mir-border:#dfe5dc;
+ --mir-soft:#f3f6f0;--mir-white:#fff;
+ --mir-v4-green:var(--mir-accent);--mir-v4-line:var(--mir-border);
+ --mir-v4-ink:var(--mir-ink);--mir-v4-pale:var(--mir-soft);
+ background:var(--mir-surface);color:var(--mir-ink);
+ font-family:Arial,Helvetica,sans-serif;
+}
+body.mir-admin-v4.mir-freeform-active .production-header{
+ background:var(--mir-surface)!important;color:var(--mir-ink)!important;
+ border-bottom:1px solid var(--mir-border)!important;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-title strong{color:var(--mir-ink);}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-title small{color:var(--mir-muted);opacity:1;}
+body.mir-admin-v4.mir-freeform-active .header-link{
+ background:#fff!important;border:1px solid #bdcbbb!important;
+ color:var(--mir-ink)!important;border-radius:4px;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-save{
+ border-color:var(--mir-accent)!important;background:var(--mir-accent)!important;
+ color:#fff!important;border-radius:5px;box-shadow:none;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-save:not(:disabled):hover{background:var(--mir-accent-hover)!important}
+body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{
+ grid-template-columns:repeat(5,minmax(0,1fr))!important;
+ background:var(--mir-soft)!important;border:1px solid var(--mir-border)!important;
+}
+body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs button{
+ background:var(--mir-surface);color:var(--mir-ink);border-radius:4px;
+ font-family:Arial,Helvetica,sans-serif;font-weight:700;
+}
+body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs button[aria-current="page"]{
+ background:var(--mir-accent)!important;color:#fff!important;
+}
+body.mir-admin-v4.mir-freeform-active .kind-bar,
+body.mir-admin-v4.mir-freeform-active .drawing-card,
+body.mir-admin-v4.mir-freeform-active .config-card{
+ border-color:var(--mir-border)!important;box-shadow:0 8px 28px rgba(16,36,22,.055);
+ background:#fff;
+}
+body.mir-admin-v4.mir-freeform-active .kind-bar button[aria-pressed="true"]{
+ background:var(--mir-accent);color:#fff;border-radius:5px;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-destination{
+ background:var(--mir-soft);border-color:var(--mir-border);
+}
+body.mir-admin-v4.mir-freeform-active .mir-freeform-3d{
+ background:linear-gradient(135deg,var(--mir-soft),#fff);
+ border-color:var(--mir-border);box-shadow:none;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-toolbar{
+ grid-template-columns:minmax(0,.42fr) minmax(0,1.58fr);
+ border-top-color:var(--mir-border);background:var(--mir-surface);
+ box-shadow:0 -6px 16px rgba(16,36,22,.045);
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-toolbar .mir-freeform-previous{
+ background:#fff;color:var(--mir-ink);border:1px solid #bfcbbf;border-radius:6px;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-toolbar .mir-freeform-add{
+ background:var(--mir-accent);border-color:var(--mir-accent);color:#fff;
+ border-radius:6px;font-size:17px;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-toolbar .mir-freeform-add:not(:disabled):hover{background:var(--mir-accent-hover)}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-finish-top{
+ border-radius:5px;background:#fff;color:var(--mir-ink);
+ border:1px solid #bfcbbf;min-height:40px;padding:7px 10px;
+ font-size:12px;font-weight:700;cursor:pointer;
+}
+body.mir-admin-v4.mir-freeform-active #mir-freeform-finish-top:disabled{opacity:.45;cursor:not-allowed}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch{
+ display:flex;flex-direction:row;align-items:center;justify-content:space-between;
+ gap:12px;padding:6px 0;min-height:46px;
+}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch+ .mir-workshop-switch{border-top:1px solid var(--mir-border)}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch span{font-weight:700;font-size:13px;min-width:0}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch small{
+ display:block;color:var(--mir-muted);font-size:11px;font-weight:400;
+}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch input[type="checkbox"]{
+ appearance:none;-webkit-appearance:none;position:relative;flex:0 0 47px;
+ width:47px;height:27px;border:1px solid #9dae9f;border-radius:30px;
+ margin:0;background:#d9e1d7;cursor:pointer;transition:background .18s,border .18s;
+}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch input[type="checkbox"]::after{
+ content:"";position:absolute;top:3px;left:3px;border-radius:50%;
+ width:19px;height:19px;background:#fff;box-shadow:0 1px 3px #172d1c40;
+ transition:transform .18s;
+}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch input[type="checkbox"]:checked{
+ background:var(--mir-accent);border-color:var(--mir-accent);
+}
+body.mir-admin-v4.mir-freeform-active .mir-workshop-switch input[type="checkbox"]:checked::after{transform:translateX(20px)}
+body.mir-admin-v4.mir-freeform-active :is(button,input,select):focus-visible{
+ outline:3px solid var(--mir-accent);outline-offset:2px;
+}
+@media(max-width:650px){
+ body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{
+  display:flex!important;overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;
+  grid-template-columns:none!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs button{
+  flex:0 0 auto;min-width:97px;padding:9px 8px!important;
+ }
+ body.mir-admin-v4.mir-freeform-active #mir-freeform-toolbar{
+  grid-template-columns:minmax(0,1fr) minmax(0,1.8fr);
+ }
+ body.mir-admin-v4.mir-freeform-active .mir-freeform-previous small{font-size:10px}
+}
+/* PC : la page ne défile pas; le panneau droit et chaque onglet possèdent
+   leur propre zone de défilement. Les petits écrans restent accessibles. */
+@media(min-width:1100px) and (min-height:720px){
+ body.mir-admin-v4.mir-procurement-ready{
+  height:100dvh;max-height:100dvh;display:flex;flex-direction:column;overflow:hidden;
+ }
+ body.mir-admin-v4.mir-procurement-ready>.production-header{
+  flex:0 0 auto;min-height:58px!important;padding:7px 18px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready>.mir-signature-footer,
+ body.mir-admin-v4.mir-procurement-ready>.workshop-banner{display:none!important}
+ body.mir-admin-v4.mir-procurement-ready>.production-wrap{
+  flex:1 1 auto;min-height:0;max-height:none!important;height:auto!important;
+  display:flex;flex-direction:column;overflow:hidden;gap:0;
+  padding:5px 14px 7px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{flex:none;margin:0 0 4px!important;}
+ body.mir-admin-v4.mir-procurement-ready #mir-proc-shortcuts{flex:none;margin:0 0 4px!important;}
+ body.mir-admin-v4.mir-procurement-ready .kind-bar{flex:none;margin-bottom:4px!important;}
+ body.mir-admin-v4.mir-procurement-ready .production-workspace:not([hidden]){
+  flex:1 1 auto;min-height:0;height:auto!important;max-height:none;
+  overflow:hidden;display:grid!important;align-items:stretch!important;
+  grid-template-columns:minmax(0,1.7fr) minmax(305px,1fr)!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready .drawing-card{
+  position:relative!important;top:auto!important;
+  height:100%;max-height:100%;min-height:0;min-width:0;
+  overflow:hidden!important;display:flex;flex-direction:column;
+ }
+ body.mir-admin-v4.mir-procurement-ready .drawing-card>.drawing-stage{
+  flex:1 1 auto;min-height:150px!important;height:auto!important;
+  max-height:none;overflow:hidden;margin:4px 9px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready .drawing-card>.drawing-stage svg{
+  height:100%!important;width:100%;max-height:none!important;min-height:0!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready .drawing-card>#mir-freeform-3d{
+  flex:0 0 auto;margin:4px 9px!important;padding:5px 7px;min-height:0;
+ }
+ body.mir-admin-v4.mir-procurement-ready #mir-freeform-3d-canvas{height:105px;}
+ body.mir-admin-v4.mir-procurement-ready .drawing-head,
+ body.mir-admin-v4.mir-procurement-ready .drawing-tools,
+ body.mir-admin-v4.mir-procurement-ready .drawing-navigation,
+ body.mir-admin-v4.mir-procurement-ready .drawing-legend,
+ body.mir-admin-v4.mir-procurement-ready .drawing-note,
+ body.mir-admin-v4.mir-procurement-ready .production-validation,
+ body.mir-admin-v4.mir-procurement-ready #profile-dimension-list{
+  flex:0 0 auto;
+ }
+ body.mir-admin-v4.mir-procurement-ready .drawing-card>.drawing-note{display:none}
+ body.mir-admin-v4.mir-procurement-ready .config-card{
+  position:relative;height:100%;min-height:0;max-height:none!important;
+  overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+  scrollbar-width:thin;
+ }
+ body.mir-admin-v4.mir-procurement-ready #mir-freeform-toolbar:not([hidden]){
+  flex:0 0 auto;position:relative;bottom:auto;z-index:20;
+  padding:6px 0!important;min-height:52px;
+ }
+ body.mir-admin-v4.mir-procurement-ready :is(#production-library,#production-requests,#mir-procurement-panel,#production-order):not([hidden]){
+  min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:thin;overscroll-behavior:contain;
+ }
+ body.mir-admin-v4.mir-procurement-ready .mir-v4-technical,
+ body.mir-admin-v4.mir-procurement-ready .mir-unified-client-shortcut,
+ body.mir-admin-v4.mir-procurement-ready .production-footnote{display:none!important}
+}
