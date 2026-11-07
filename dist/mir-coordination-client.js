@@ -64,12 +64,13 @@ function create({sdk,config,storage,uuid=()=>globalThis.crypto?.randomUUID?.()}=
  const open=(org,sourceOrderId)=>rpc('mir_coordination_open',{org,source_order:sourceOrderId});
  const detail=(org,coordId)=>rpc('mir_coordination_detail',{org,coord_id:coordId});
  const suppliers=org=>rpc('mir_coordination_suppliers',{org});
+ const supplierOrders=(org,supplier)=>rpc('mir_coordination_supplier_orders',{org,supplier});
  const route=(org,coordId,lineId,warehouseQty,ext,revision)=>operation('mir_coordination_route',{
   org,coord_id:coordId,coord_line:lineId,warehouse_qty:warehouseQty,suppliers:ext,expected_revision:revision});
  const add=(org,coordId,lineId,amount,revision)=>operation('mir_coordination_add',{
   org,coord_id:coordId,existing_coord_line:lineId,additional_qty:amount,expected_revision:revision});
  const metadata=(org,coordId,revision,values)=>operation('mir_coordination_metadata',{
-  org,coord_id:coordId,expected_revision:revision,values});
+  org,coord_id:coordId,expected_revision:revision,vals:values});
  const linkPO=(org,coordId,routeId,poId,revision)=>operation('mir_coordination_supplier_po',{
   org,coord_id:coordId,route_id:routeId,po_id:poId,expected_revision:revision});
  const supplierReceive=(org,coordId,routeId,amount,revision)=>operation('mir_coordination_supplier_receive',{
@@ -81,7 +82,7 @@ function create({sdk,config,storage,uuid=()=>globalThis.crypto?.randomUUID?.()}=
  function close(){changed();subscription?.data?.subscription?.unsubscribe?.();}
  return Object.freeze({login,logout,memberships,inbox,open,detail,suppliers,route,add,metadata,linkPO,
   supplierReceive,warehouseQueue,acknowledge,ship,grant,checkPending:async()=>getPending((await verified()).id),
-  close,version:'1.0.0'});
+  supplierOrders,close,version:'1.1.0'});
 }
 return Object.freeze({create});
 });
