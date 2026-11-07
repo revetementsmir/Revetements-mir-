@@ -1,5 +1,5 @@
 'use strict';
-const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
+const {drawTwoSides,openWorkshopStep}=require('./mir-draw-freeform-helper.cjs');
 /* MIR — ajout d'une moulure au bon de commande sans étape de modèle enregistré. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -26,7 +26,7 @@ async function ready(){
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
    await drawTwoSides(page);
-   await page.locator('[data-freeform-finish]').click();
+   await openWorkshopStep(page,4);
    await page.locator('#production-piece-name').fill('Solin porte entrée');
    const button=page.locator('#mir-direct-po-add');
    assert.equal(await button.isVisible(),true);
