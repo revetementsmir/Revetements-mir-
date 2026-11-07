@@ -4,6 +4,14 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {chromium}=require('playwright'),{spawn}=require('node:child_process'),{createHash}=require('node:crypto');
 const port=8883,base='http://127.0.0.1:'+port;
 const hash=b=>createHash('sha256').update(b).digest('hex');
+async function openOrders(page){
+ const tab=page.locator('#mir-procurement-tabs [data-mir-tab="orders"]');
+ if(!(await tab.isVisible())){
+  // Sur téléphone, le dossier ouvre l'espace admin sans perdre le dessin.
+  await page.locator('#mode-link').click();
+ }
+ await tab.click();
+}
 (async()=>{
   const server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1','--directory',path.join(__dirname,'../dist')],{stdio:'ignore'});let browser;
   try{
@@ -22,10 +30,10 @@ const hash=b=>createHash('sha256').update(b).digest('hex');
       // addition above use the real UI. No model is created.
       await page.evaluate(()=>{const key='mir_production_admin_dossier_v1',data=JSON.parse(localStorage.getItem(key));const item=data.order.items[0],result=MIRProduction.reviseInstance({snapshot:item.snapshot,history:[]},{finish:{name:'Noir',manufacturer:'Test',code:'NOIR'},material:{type:'acier',gauge:'26'}});if(!result.ok)throw Error('Fixture finition invalide');item.spec=result.spec;item.snapshot=result.snapshot;item.history=result.history;localStorage.setItem(key,JSON.stringify(data));});
       await page.reload();await page.waitForFunction(()=>window.MIRProductionWorkspace);
-      await page.locator('#mir-procurement-tabs [data-mir-tab="orders"]').click();await page.locator('.mir-po-tabs [data-mir-po-view="create"]').click();
+      await openOrders(page);await page.locator('.mir-po-tabs [data-mir-po-view="create"]').click();
       await page.locator('[data-mir-po="job"]').fill('École test');await page.locator('[data-mir-po="shipTo"]').fill('123 rue Test');
       await page.reload();await page.waitForFunction(()=>window.MIRProductionWorkspace);
-      await page.locator('#mir-procurement-tabs [data-mir-tab="orders"]').click();await page.locator('.mir-po-tabs [data-mir-po-view="create"]').click();
+      await openOrders(page);await page.locator('.mir-po-tabs [data-mir-po-view="create"]').click();
       assert.equal(await page.locator('[data-mir-po="shipTo"]').inputValue(),'123 rue Test','form draft autosave');
       await page.locator('#mir-create-po').click();if(await page.locator('#mir-proc-error').isVisible())throw Error(await page.locator('#mir-proc-error').textContent());await page.waitForSelector('[data-mir-order-id]');
       const get=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mir_admin_procurement_v1')));
@@ -81,14 +89,14 @@ const hash=b=>createHash('sha256').update(b).digest('hex');
       await page.locator('[data-duplicate-piece]').click();assert.equal(await page.locator('[data-production-item]').count(),2);
       await page.locator('[data-remove-piece]').last().click();assert.equal(await page.locator('[data-production-item]').count(),1);
       await page.locator('[data-item-quantity]').fill('4');await page.locator('[data-item-quantity]').dispatchEvent('change');
-      await page.locator('#mir-procurement-tabs [data-mir-tab="orders"]').click();await page.locator('.mir-po-tabs [data-mir-po-view="create"]').click();
+      await openOrders(page);await page.locator('.mir-po-tabs [data-mir-po-view="create"]').click();
       await page.locator('#mir-create-po').click();if(await page.locator('#mir-proc-error').isVisible())throw Error(await page.locator('#mir-proc-error').textContent());await page.waitForSelector('[data-mir-order-id]');
       state=await get();assert.equal(state.orders.length,2);assert.equal(state.orders.find(o=>o.id===originalId).items&&JSON.stringify(state.orders.find(o=>o.id===originalId).items),originalItems);
       const revised=state.orders.find(o=>o.id!==originalId);assert.equal(revised.revision,2);assert.equal(revised.notes,'Révision test');assert.equal(revised.items[0].spec.quantity,4);
       const changed=page.waitForEvent('download');await page.locator('[data-mir-order-id="'+revised.id+'"] [data-mir-pdf]').click();const changedPdf=fs.readFileSync(await (await changed).path());assert.notEqual(hash(changedPdf),hash(pdf));
       await page.waitForFunction(id=>JSON.parse(localStorage.getItem('mir_admin_procurement_v1')).orders.find(o=>o.id===id).pdf,revised.id);
       const again=page.waitForEvent('download');await page.locator('[data-mir-order-id="'+originalId+'"] [data-mir-pdf]').click();const pdf2=fs.readFileSync(await (await again).path());assert.equal(hash(pdf2),hash(pdf),'exact original PDF retained');
-      await page.reload();await page.waitForFunction(()=>window.MIRProductionWorkspace);await page.locator('#mir-procurement-tabs [data-mir-tab="orders"]').click();
+      await page.reload();await page.waitForFunction(()=>window.MIRProductionWorkspace);await openOrders(page);
       assert.equal(await page.locator('[data-mir-order-id]').count(),2);
       await page.locator('#mir-po-search').fill('Introuvable');assert.equal(await page.locator('[data-mir-order-id]').count(),0);await page.locator('#mir-po-search').fill('PO-PDF-01');assert.equal(await page.locator('[data-mir-order-id]').count(),2);
       await page.locator('[data-mir-order-id="'+originalId+'"] [data-mir-order-status]').selectOption('termine');
