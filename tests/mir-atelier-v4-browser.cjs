@@ -36,8 +36,12 @@ function available() {
       await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version,{timeout:25000});
       assert.equal(await page.locator('#production-title').textContent(),'Créer une moulure');
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'À préciser');
-      await page.locator('.mir-v4-picker > summary').click();
-      await page.locator('.mir-v4-picker [data-template="l"]').click();
+      assert.equal(await page.locator('#production-templates [data-template]').count(),0,'aucun profil imposé');
+      await page.locator('[data-freeform-add]').click();
+      await page.locator('[data-freeform-add]').click();
+      await page.locator('[data-freeform-finish]').click();
+      await page.locator('[data-segment-length="0"]').fill('3');
+      await page.locator('[data-segment-length="1"]').fill('2');
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'5 po');
       assert.equal(await page.locator('.mir-v4-sheet-total').count(),1);
       assert.equal(await page.locator('body.mir-admin-v4').count(),1);
@@ -49,8 +53,8 @@ function available() {
         return {scrollWidth:document.documentElement.scrollWidth,viewport:window.innerWidth,drawing:box('.drawing-card'),config:box('.config-card')};
       });
       assert.ok(layout.scrollWidth<=layout.viewport+2,viewport.name+' horizontal overflow: '+JSON.stringify(layout));
-      if(viewport.width>1150)assert.ok(layout.config.left>=layout.drawing.right-5,'Desktop side by side: '+JSON.stringify(layout));
-      else assert.ok(layout.config.top>=layout.drawing.bottom-10,'Mobile/tablet stack: '+JSON.stringify(layout));
+      if(viewport.width>=900)assert.ok(layout.config.left>=layout.drawing.right-5,'Landscape side by side: '+JSON.stringify(layout));
+      else assert.ok(layout.config.top>=layout.drawing.bottom-10,'Portrait stack: '+JSON.stringify(layout));
       assert.ok(await page.locator('.config-card').isVisible());
       // Vérification du retour aux mesures après le tracé sur chaque écran.
       await page.locator('#mir-v4-dimensions').evaluate(node=>{node.open=false;});
@@ -61,13 +65,9 @@ function available() {
       assert.equal(await page.evaluate(()=>document.activeElement?.closest('#mir-v4-dimensions')?.id||''),'mir-v4-dimensions',viewport.name+' : focus sur une vraie cote');
       assert.equal(await page.locator('#production-dimensions input').first().isVisible(),true,viewport.name+' : champ de mesure visible');
       await page.screenshot({path:path.join(__dirname,'../artifacts/atelier-v4-'+viewport.name+'.png'),fullPage:true});
-      // Tout profil doit garder le calcul et le changement de vue.
-      await page.locator('.mir-v4-picker > summary').click();
-      await page.locator('.mir-v4-picker [data-template="j"]').click();
-      assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'5 po');
-      await page.locator('.mir-v4-picker > summary').click();
-      await page.locator('.mir-v4-picker [data-template="j_soffite"]').click();
-      assert.equal(await page.locator('[data-measure="length"]').inputValue(),'144');
+      // La longueur de vente reste fixée à 10 pi pour les nouvelles moulures,
+      // contrairement aux anciens J à soffite de 12 pi préservés en historique.
+      assert.equal(await page.locator('[data-measure="length"]').inputValue(),'120');
       assert.equal(await page.locator('[data-measure="length"]').evaluate(input=>input.readOnly),true);
       await page.locator('#panel-zoom-in').click();
       assert.ok((await page.locator('#panel-zoom-value').textContent()).includes('120'));
@@ -83,8 +83,11 @@ function available() {
     const page=await browser.newPage({viewport:{width:1440,height:900}});
     await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-    await page.locator('.mir-v4-picker > summary').click();
-    await page.locator('.mir-v4-picker [data-template="l"]').click();
+    await page.locator('[data-freeform-add]').click();
+    await page.locator('[data-freeform-add]').click();
+    await page.locator('[data-freeform-finish]').click();
+    await page.locator('[data-segment-length="0"]').fill('3');
+    await page.locator('[data-segment-length="1"]').fill('2');
     await page.locator('#production-unit').selectOption('mm');
     assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'127 mm','Somme en mm');
     await page.locator('#production-unit').selectOption('in');
