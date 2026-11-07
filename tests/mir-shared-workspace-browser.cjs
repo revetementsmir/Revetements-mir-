@@ -31,7 +31,7 @@ try{
  // Import the same backup a second time: one master model, no duplicate.
  await admin.locator('#import').setInputFiles({name:'backup-again.json',mimeType:'application/json',buffer:Buffer.from(require('../dist/template-library-backup.js').create([record]).content)});
  await admin.waitForTimeout(150);assert.equal(await admin.locator('#catalogue article').count(),1);
- const inputs=admin.locator('#catalogue form input');await inputs.nth(0).check();await inputs.nth(1).check();await inputs.nth(4).fill('2500');await inputs.nth(5).fill('3000');await inputs.nth(8).fill('3');await inputs.nth(9).check();await inputs.nth(10).fill('2');await admin.route('**/test-rpc',route=>{const body=route.request().postDataJSON();return body.name==='mir_admin_publish_model'?route.abort():route.continue();});
+ const inputs=admin.locator('#catalogue form input');await inputs.nth(0).check();await inputs.nth(1).check();await inputs.nth(2).check();await inputs.nth(4).fill('2500');await inputs.nth(5).fill('3000');await inputs.nth(8).fill('3');await inputs.nth(9).check();await inputs.nth(10).fill('2');await admin.route('**/test-rpc',route=>{const body=route.request().postDataJSON();return body.name==='mir_admin_publish_model'?route.abort():route.continue();});
  await admin.locator('#catalogue form button').click();await admin.waitForFunction(()=>document.querySelector('.shared-save-feedback')?.textContent.includes('Enregistrement non confirmé'));assert.equal(await inputs.nth(4).inputValue(),'2500');assert.equal(await admin.locator('.shared-save').isEnabled(),true);
  await admin.unroute('**/test-rpc');await admin.locator('#catalogue form button').click();
  await admin.waitForFunction(()=>document.querySelector('#catalogue article')?.dataset.revision==='2');assert.match(await admin.locator('.shared-save-feedback').textContent(),/enregistrée sur le serveur/);const appearance=await admin.locator('.shared-save').evaluate(n=>({background:getComputedStyle(n).backgroundColor,height:n.getBoundingClientRect().height}));assert.notEqual(appearance.background,'rgba(0, 0, 0, 0)');assert.ok(appearance.height>=44);
@@ -69,6 +69,10 @@ try{
  await client.locator('#refresh').click();await client.waitForFunction(()=>document.querySelector('#catalogue form select option[value=Blanc]'));
  assert.equal(await client.locator('#catalogue form select').nth(1).isEnabled(),true,'couleur encore modifiable par le client');
  await client.locator('#catalogue form select').nth(1).selectOption('Blanc');
+ const otherAdmin=await login('admin@example.invalid',1440);await otherAdmin.locator('[data-shared-model-po]').first().click();await otherAdmin.waitForFunction(()=>window.MIRProductionWorkspace);
+ const supplierCopy=await otherAdmin.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')).order);
+ assert.equal(supplierCopy.items.length,1);assert.equal(supplierCopy.items[0].sourceSharedModel.version,1);assert.equal(supplierCopy.items[0].spec.finish.name,'Noir');
+ assert.equal(await otherAdmin.evaluate(()=>localStorage.getItem('mir_production_templates_v1')),null,'aucune deuxième bibliothèque créée pour le bon');
  console.log('PASS : import sans doublon, publication Admin, client indépendant mobile, demande employé tablette avec cote verrouillée, récupération Admin, sauvegarde directe du dessin en brouillon partagé');
  await drawingAdmin.locator('#logout').click();await drawingAdmin.locator('#login').waitFor({state:'visible'});
  assert.equal(await drawingAdmin.locator('#workspace').isVisible(),false);assert.equal(await drawingAdmin.locator('#catalogue article').count(),0);assert.equal(await drawingAdmin.locator('#organization option').count(),0);

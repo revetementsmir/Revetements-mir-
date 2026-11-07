@@ -4,7 +4,7 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {spawnSync}=require('node:child_process'),{randomUUID}=require('node:crypto');
 const {configuration}=require('./config.cjs');
-const cases=['01-authentication','02-permissions-organizations','03-create-model','04-publish','05-independent-sessions','06-submit-requests','07-admin-retrieval','08-price-history','09-network-reconnection','10-existing-data-preservation','11-hosted-sql-audit','12-publication-rules-and-versions'];
+const cases=['01-authentication','02-permissions-organizations','03-create-model','04-publish','05-independent-sessions','06-submit-requests','07-admin-retrieval','08-price-history','09-network-reconnection','10-existing-data-preservation','11-hosted-sql-audit','12-publication-rules-and-versions','13-shared-model-to-supplier-draft'];
 async function main(){
  if(process.argv.includes('--read-only')){
   const c=configuration();if(!['admin','employee','client'].every(role=>c.accounts[role]))throw Error('Read-only accounts required');
@@ -87,7 +87,7 @@ except Exception:print(json.dumps({'reachable':False,'reason':'Network/proxy con
   await check('12-publication-rules-and-versions',async()=>{
    if(!(await snapshot(admin)).capabilities?.publicationRules){result('12-publication-rules-and-versions','BLOCKED','New catalogue migration not installed on this target');return 'blocked';}
    const rules={materials:['aluminium'],colors:['Noir','Blanc'],fixed_color:'Noir',color_edit_roles:['client'],measure_edit_roles:['client']};
-   settings={...settings,configuration_rules:rules,standard_measures:{A:'3',B:'2'}};
+   settings={...settings,supplier_po:true,configuration_rules:rules,standard_measures:{A:'3',B:'2'}};
    await ok(admin,'mir_admin_publish_model',{org:c.org,model:fixture,expected_revision:model.revision,settings});model=(await snapshot(admin)).catalogue.find(m=>m.id===fixture);config.color='Noir';
    const invalidColor=await rpc(pages.client,'mir_submit_request',{org:c.org,request_id:randomUUID(),model:fixture,publication_revision:model.revision,configuration:{...config,color:'Rouge'}});assert.equal(invalidColor.error?.code,'22023');
    const employeeConfig={...config,chantier:(await snapshot(pages.employee)).jobs.find(j=>j.name==='MIR TEST '+run).id};
@@ -103,6 +103,15 @@ except Exception:print(json.dumps({'reachable':False,'reason':'Network/proxy con
    model=(await snapshot(admin)).catalogue.find(m=>m.id===fixture);assert.equal(model.version,2);assert.equal(model.boutique,false);assert.equal(model.store,false);assert.equal(model.supplierPo,false);assert.deepEqual(model.specification.allowed,record.allowed);assert.deepEqual(model.configurationRules,rules);
    assert.deepEqual((await snapshot(pages.client)).orders.find(o=>o.id===request),old,'Revision never rewrites an old request');
    await ok(admin,'mir_admin_publish_model',{org:c.org,model:fixture,expected_revision:model.revision,settings});model=(await snapshot(admin)).catalogue.find(m=>m.id===fixture);
+  });
+  await check('13-shared-model-to-supplier-draft',async()=>{
+   if(!model.supplierPo){result('13-shared-model-to-supplier-draft','BLOCKED','New catalogue migration not installed on this target');return 'blocked';}
+   const copy=await login('admin',1440);pages.admin=admin;
+   await copy.p.locator('[data-shared-model-po="'+fixture+'"]').click();await copy.p.waitForFunction(()=>window.MIRProductionWorkspace);
+   const order=await copy.p.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')).order);
+   assert.equal(order.items.length,1);assert.equal(order.items[0].sourceSharedModel.modelId,fixture);assert.equal(order.items[0].sourceSharedModel.version,2);assert.equal(order.items[0].spec.finish.name,'Noir');
+   assert.equal(await copy.p.evaluate(()=>localStorage.getItem('mir_production_templates_v1')),null,'Shared model reused without a second local model library');
+   const svg=await copy.p.evaluate(()=>{const item=JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')).order.items[0];return MIRProduction.profileSVG(item.spec,{width:620,height:260});});assert.ok(svg.includes('<svg'));
   });
   await check('02-permissions-organizations',async()=>{
    const anon=await pages.client.evaluate(async org=>{const cfg=window.MIRSharedConfig;const sdk=window.MIRSupabase.createClient(cfg.supabaseUrl,cfg.publishableKey,{auth:{storageKey:'mir-mission4-anonymous',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});const r=await sdk.rpc('mir_shared_snapshot',{org});return {code:r.error?.code};},c.org);assert.equal(anon.code,'42501','Anonymous RPC must be denied, not simply unavailable');

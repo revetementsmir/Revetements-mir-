@@ -8,6 +8,14 @@
  const client=MIRSharedClient.create({sdk:window.MIRSupabase.createClient(config.supabaseUrl,config.publishableKey),storage:localStorage,onSessionInvalidated:clearWorkspace});
  const text=(tag,value,parent)=>{const node=document.createElement(tag);node.textContent=value;parent.append(node);return node;};
  const org=()=>$('#organization').value;
+ function openLocalRequest(request){
+  const key='mir_production_requests_v1',raw=localStorage.getItem(key),saved=raw?JSON.parse(raw):{version:1,requests:[]};
+  if(saved.version!==1||!Array.isArray(saved.requests))throw Error('Anciennes données non reconnues : sauvegarde nécessaire');
+  if(!saved.requests.some(row=>row.id===request.id)){
+   saved.requests.push(request);if(localStorage.getItem(key)!==raw)throw Error('Un autre onglet a modifié les demandes');localStorage.setItem(key,JSON.stringify(saved));
+  }
+  location.href='production.html?shared-request='+encodeURIComponent(request.id);
+ }
  async function refresh(){
   const sequence=++readSequence,requestedOrg=org(),next=await client.snapshot(requestedOrg);if(sequence!==readSequence||requestedOrg!==org())return;snapshot=next;$('#import-label').hidden=snapshot.role!=='admin';$('#catalogue').replaceChildren();$('#orders').replaceChildren();$('#job-admin').replaceChildren();
   if(snapshot.role==='admin'){const f=document.createElement('form'),name=document.createElement('input'),employee=document.createElement('select');name.placeholder='Nom du chantier';name.required=true;for(const m of snapshot.members.filter(m=>m.role==='employee')){const o=document.createElement('option');o.value=m.id;o.textContent=m.email||('Employé '+m.id);employee.append(o);}f.append(name,employee);text('button','Créer / affecter le chantier',f);$('#job-admin').append(f);f.onsubmit=async e=>{e.preventDefault();try{await client.assignJob(org(),name.value,employee.value);await refresh();}catch(e){status(e.message);}};}
@@ -16,6 +24,20 @@
    text('p','Version '+model.version+' · '+model.conditions,article);
    const template=model.specification.template||model.specification,rules=model.configurationRules||{};
    if(snapshot.role==='admin'){
+    if(model.supplierPo&&!model.archived){
+     const prepare=text('button','Préparer un bon avec ce modèle partagé',article);prepare.type='button';prepare.dataset.sharedModelPo=model.id;
+     prepare.onclick=async()=>{prepare.disabled=true;try{
+      const requestedOrg=org(),current=await client.snapshot(requestedOrg),fresh=current.catalogue.find(row=>row.id===model.id);
+      if(requestedOrg!==org()||current.role!=='admin'||!fresh||fresh.archived||!fresh.supplierPo||fresh.revision!==model.revision)throw Error('Publication modifiée : actualisez le catalogue');
+      const options=fresh.configurationRules||{},t=fresh.specification.template||fresh.specification;
+      const metal=(options.materials||fresh.specification.allowed?.materials||['aluminium','acier'])[0],color=options.fixed_color||options.colors?.[0]||'À confirmer';
+      const result=MIRProduction.instantiateTemplate(t,{id:'M001',instanceId:'M001',measurements:{...fresh.standards,...fresh.locks,length:String(fresh.saleLengthIn)},unit:'in',length:fresh.saleLengthIn,quantity:1,material:{type:metal},finish:{name:color}});
+      if(!result.ok)throw Error('Renseignez les mesures standards du modèle avant de préparer le bon');
+      const id='MIR-MODELE-'+fresh.id+'-V'+fresh.version+'-P'+fresh.revision;
+      openLocalRequest({id,createdAt:new Date().toISOString(),source:'shared-model-snapshot',status:'prepared_local',order:{notes:'Modèle partagé '+fresh.name+' · V'+fresh.version+' · '+fresh.conditions},items:[{id:'M001',kind:'profile',spec:result.spec,snapshot:result.snapshot,history:[],sourceSharedModel:{organizationId:requestedOrg,modelId:fresh.id,version:fresh.version,publicationRevision:fresh.revision}}]});
+     }catch(e){status('Bon non préparé : '+e.message);}finally{prepare.disabled=false;}};
+     text('p','Le bon de travail et son PDF seront préparés sur cet appareil. Aucun envoi automatique.',article);
+    }
     const form=document.createElement('form');article.append(form);const controls={};
     for(const [key,label,value,type] of [['boutique','Boutique',model.boutique,'checkbox'],['store','Magasin employés',model.store,'checkbox'],['supplier_po','Bons fournisseurs',model.supplierPo,'checkbox'],['archived','Archivé',model.archived,'checkbox'],['aluminum_cents','Prix aluminium en cents / 10 pi',model.aluminumCents,'number'],['steel_cents','Prix acier en cents / 10 pi',model.steelCents,'number'],['sale_length_in','Longueur de vente (120 po; 144 uniquement J à soffite)',model.saleLengthIn,'number'],['conditions','Conditions',model.conditions,'text']]){
      const input=document.createElement('input');input.type=type;input.value=value??'';input.checked=value===true;if(type==='number'){input.min='1';input.step='1';}text('label',label,form).append(input);controls[key]=input;
@@ -61,13 +83,7 @@
      const s=order.snapshot,c=s.configuration,t=s.specification.template||s.specification;
      const result=MIRProduction.instantiateTemplate(t,{id:'M001',instanceId:'M001',measurements:c.measures,unit:'in',length:s.saleLengthIn,quantity:c.quantity,material:{type:c.metal},finish:{name:c.color}});
      if(!result.ok)throw Error('Configuration à corriger avant production');
-     const key='mir_production_requests_v1',raw=localStorage.getItem(key),saved=raw?JSON.parse(raw):{version:1,requests:[]};
-     if(saved.version!==1||!Array.isArray(saved.requests))throw Error('Anciennes données non reconnues : sauvegarde nécessaire');
-     if(!saved.requests.some(r=>r.id===order.id)){
-      saved.requests.push({id:order.id,createdAt:order.createdAt,status:'submitted',order:{project:c.chantier||'',notes:'Demande partagée '+order.id},items:[{id:'M001',kind:'profile',spec:result.spec,snapshot:result.snapshot,history:[]}]});
-      if(localStorage.getItem(key)!==raw)throw Error('Un autre onglet a modifié les demandes');localStorage.setItem(key,JSON.stringify(saved));
-     }
-     location.href='production.html?shared-request='+encodeURIComponent(order.id);
+     openLocalRequest({id:order.id,createdAt:order.createdAt,status:'submitted',order:{project:c.chantier||'',notes:'Demande partagée '+order.id},items:[{id:'M001',kind:'profile',spec:result.spec,snapshot:result.snapshot,history:[]}]});
     }catch(e){status('Copie non préparée : '+e.message);}};
    }
   }

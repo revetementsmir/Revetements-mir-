@@ -1,7 +1,7 @@
 {
   "schema": "mir-real-validation-1",
-  "startedAt": "2026-11-07T01:15:16.496Z",
-  "commit": "ab59eb83fa045fc5b244e83c94f7885230ae7ee1",
+  "startedAt": "2026-11-07T01:20:26.678Z",
+  "commit": "e2eb5bc8c931157405e0b4bca76181e98499de04",
   "mode": "real-service-only",
   "results": [
     {
@@ -63,6 +63,11 @@
       "name": "12-publication-rules-and-versions",
       "status": "PASS",
       "detail": "Real authenticated Supabase requests completed"
+    },
+    {
+      "name": "13-shared-model-to-supplier-draft",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
     }
   ],
   "connectivity": {
@@ -72,15 +77,15 @@
   "missingVariables": [],
   "transport": "Real HTTPS through Python CA trust and the managed proxy; browser TLS is not certified",
   "fixture": {
-    "run": "mission4-e946b4bc-b24c-4e64-9099-de1fd9622c0a",
-    "model": "d1bff0a0-a00f-4b4c-985e-6bc88140569b",
+    "run": "mission4-7974631e-a903-4b86-b08c-9e9b6349a753",
+    "model": "95398af9-8e23-424c-b4dc-de188b620471",
     "state": "archived",
     "note": "Test requests/job retained as audit evidence; no deletion"
   },
-  "finishedAt": "2026-11-07T01:16:09.592Z",
+  "finishedAt": "2026-11-07T01:21:30.928Z",
   "sourceFileHashes": {
-    "tools/validation/real-supabase.cjs": "9b28f1b89a7159a454ddf908a0baa3d5640016b1ecbdd573dc278d50f68871e6",
+    "tools/validation/real-supabase.cjs": "49bae92c79d6033108af8b7cadb3c04c503807401f0153d51a1244fdb7009036",
     "dist/mir-shared-client.js": "e25a24fdbc831e5d927fbaf44c609ee0fbf5b313e672c4b7be2e2dc25ff414ec",
-    "dist/mir-shared-workspace.js": "f87985910be72af0266868d7a7ed73100ba31df1516608746ab80d4a37a27358"
+    "dist/mir-shared-workspace.js": "b5d343939234fed97d487a9070e847f2bc06845baa280c383ee2df56d9e07732"
   }
 }
