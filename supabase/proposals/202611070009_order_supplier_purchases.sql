@@ -54,7 +54,7 @@ declare o mir_core.coordination_orders;r mir_core.coordination_routes;
  payload:=jsonb_build_object('coord',coord_id,'route',route_id,'po',po_id,'expectedRevision',expected_revision);
  prior:=mir_core.coordination_replay(org,request_id,'supplier_po',payload);if prior is not null then return prior;end if;
  select * into o from mir_core.coordination_orders where organization_id=org and id=coord_id for update;
- if not found or o.shipped_at is not null then raise exception 'Commande inconnue ou partie Entrepôt déjà expédiée' using errcode='40001';end if;
+ if not found then raise exception 'Commande inconnue' using errcode='22023';end if;
  if o.revision<>expected_revision then raise exception 'Commande modifiée : actualiser' using errcode='40001';end if;
  select * into r from mir_core.coordination_routes where organization_id=org and id=route_id for update;
  select * into l from mir_core.coordination_lines where organization_id=org and id=r.coordination_line_id and coordination_id=o.id;
