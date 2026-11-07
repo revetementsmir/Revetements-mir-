@@ -32,7 +32,7 @@ function navigateToStep(index,{focus=true}={}){
 }
 function nextWorkStep(){
  if(workStep>=workStages.length-1)return;
- if(workStep===0&&!window.MIRProductionWorkspace?.finishFreeformTrace?.())return;
+ if(current?.tool==='draw'&&!window.MIRProductionWorkspace?.finishFreeformTrace?.())return;
  navigateToStep(workStep+1);
 }
 
