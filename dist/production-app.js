@@ -122,7 +122,9 @@ function renderDimensions(){
  const unit=draft.unit||'in';$('#production-unit').value=unit;$('#measure-hint').textContent=authoring?'Les proportions servent seulement au dessin du modèle. Les clients saisiront toutes les cotes de fabrication.':unit==='in'?(kind==='panel'?'A et B incluent les lips. ':'')+'Fractions acceptées : 3 1/2 ou 3½.':(kind==='panel'?'A et B incluent les lips. ':'')+'Cotes en millimètres.';let body='';
  if(kind==='profile'){if(draft.template==='custom')body=`<div class="segment-editor">${(draft.segments||[]).map((segment,index)=>`<div class="segment-row"><div class="segment-top"><span class="segment-id">${esc(segment.label)}</span><label>${authoring?'Proportion du segment':esc(segment.name||'Longueur du côté')}<input data-segment-length="${index}" inputmode="decimal" value="${esc(segment.length??'')}" placeholder="${authoring?'Proportion':'Votre cote'}" aria-label="Côté ${esc(segment.label)}"></label>${!client&&!editingItemId?`<button type="button" data-remove-segment="${index}" aria-label="Retirer le segment ${esc(segment.label)}"${draft.segments.length<=2?' disabled':''}>×</button>`:''}</div>${index<draft.segments.length-1?bendFields(draft.bends[index],index,openBends.has(String(index))):''}</div>`).join('')}</div>${!client&&!editingItemId?'<div class="segment-actions"><button type="button" data-add-segment>＋ Segment</button><button type="button" data-add-double>Ajouter deux angles</button></div>':''}`;else{const definition=M.TEMPLATES[draft.template];body=`<div class="dimension-fields">${(definition?.labels||[]).map((key,index)=>measureField(key,definition.fieldLabels[index],draft.dimensions?.[key],key)).join('')}</div>${!client&&!editingItemId?'<div class="segment-actions"><button type="button" data-customize>Modifier les angles et les côtés</button><button type="button" data-add-double>Ajouter deux angles</button></div>':''}`;}if(!authoring&&!clientProfileWizard())body+=`<div class="dimension-fields">${measureField('length','Longueur de vente',draft.length,'L','full-field')}</div>`;
  }else{body=`<div class="dimension-fields">${measureField('width',draft.shape==='square'?'Côté du carré':'Largeur hors tout',draft.width,'A')}${draft.shape==='square'?'':measureField('height','Hauteur hors tout',draft.height,'B')}${!authoring?measureField('relief','Projection de la pièce finie',draft.relief,'C'):''}</div>`;if(draft.shape==='triangle')body+=`<div class="dimension-fields">${measureField('apexX','Sommet depuis la gauche',draft.apexX,'S','full-field')}</div>`;if(draft.shape==='right-triangle')body+=`<label class="shape-field">Angle droit<select data-spec-select="rightAngle"${editingItemId||client&&selectedTemplate&&!selectedTemplate.id.startsWith('mir-standard-')?' disabled':''}>${[['bottom-left','En bas à gauche'],['bottom-right','En bas à droite'],['top-left','En haut à gauche'],['top-right','En haut à droite']].map(([id,name])=>`<option value="${id}"${(draft.mirrorX?({'bottom-left':'bottom-right','bottom-right':'bottom-left','top-left':'top-right','top-right':'top-left'}[draft.rightAngle]):draft.rightAngle)===id?' selected':''}>${name}</option>`).join('')}</select></label><div class="panel-mirror-row"><button type="button" class="secondary-button" id="mirror-panel" aria-pressed="${draft.mirrorX===true}">↔ Miroir gauche / droite</button><span>${draft.mirrorX?'Vue inversée':'Vue d’origine'}</span></div>`;if(draft.shape==='trapezoid')body+=`<div class="dimension-fields">${measureField('topWidth','Largeur du haut',draft.topWidth,'D')}${measureField('topOffset','Décalage du haut à gauche',draft.topOffset,'E')}</div>`;if(draft.shape==='parallelogram')body+=`<div class="dimension-fields">${measureField('offset','Décalage du haut (+ droite / − gauche)',draft.offset,'D','full-field')}</div><p class="field-hint">A est la largeur hors tout. Le décalage reste distinct de la longueur de base.</p>`;if(draft.shape==='pointed')body+=`<label class="shape-field">Côté terminé en pointe<select data-spec-select="pointSide"${editingItemId||client&&selectedTemplate&&!selectedTemplate.id.startsWith('mir-standard-')?' disabled':''}>${[['top','Haut'],['right','Droite'],['bottom','Bas'],['left','Gauche']].map(([id,name])=>`<option value="${id}"${draft.pointSide===id?' selected':''}>${name}</option>`).join('')}</select></label><div class="dimension-fields">${measureField('tipDepth','Profondeur de la pointe',draft.tipDepth,'D')}${measureField('apexOffset','Position du sommet sur ce côté',draft.apexOffset,'E')}</div>`;
- }$('#production-dimensions').innerHTML=body;
+ }
+ if(kind==='profile'&&draft.template==='custom')body+='<section id="mir-angle-summary" class="mir-angle-summary" aria-label="Angles des jonctions A-B, B-C et suivantes"></section>';
+ $('#production-dimensions').innerHTML=body;
  $('#client-step-length').innerHTML=clientProfileWizard()
   ?measureField('length','Longueur de vente ('+(unit==='mm'?'mm':'po')+')',draft.length,'L'):'';
  if(kind==='profile'&&!authoring){
@@ -241,6 +243,34 @@ function traceGridSVG(unit){
  const step=fmt(traceGridStepMM(unit)*scale);
  return `<defs><pattern id="mir-trace-grid" width="${step}" height="${step}" x="${fmt(ox)}" y="${fmt(oy)}" patternUnits="userSpaceOnUse"><path d="M${step} 0H0V${step}" fill="none" stroke="#c3cebc" stroke-opacity=".58" stroke-width="1"/></pattern></defs><g aria-hidden="true" pointer-events="none"><rect width="800" height="520" fill="#fcfcf8"/><rect width="800" height="520" fill="url(#mir-trace-grid)"/></g>`;
 }
+
+/* Les arcs et les étiquettes sont calculés à partir des cotes du profil,
+   sans changer la géométrie sauvegardée. */
+function bendAngleLabel(bend){
+ if(bend?.mode==='hem')return '180° repli';
+ if(bend?.mode==='signed')return 'rotation '+fmt(Number(bend.angle)||0)+'°';
+ return fmt(Number(bend?.angle)||90)+'°';
+}
+function profileAnglesOverlay(model,points){
+ if(!model?.bends?.length||points.length<3)return '';
+ return model.bends.map((bend,i)=>{
+  const a=points[i],joint=points[i+1],b=points[i+2];
+  if(!a||!joint||!b)return '';
+  const left=[a[0]-joint[0],a[1]-joint[1]],right=[b[0]-joint[0],b[1]-joint[1]];
+  const d1=Math.hypot(...left),d2=Math.hypot(...right);if(d1<.5||d2<.5)return '';
+  const u=left.map(v=>v/d1),w=right.map(v=>v/d2),sum=[u[0]+w[0],u[1]+w[1]];
+  const len=Math.hypot(...sum),bis=len>.1?sum.map(v=>v/len):[-u[1],u[0]],r=23;
+  const start=[joint[0]+u[0]*r,joint[1]+u[1]*r],end=[joint[0]+w[0]*r,joint[1]+w[1]*r];
+  const sweep=u[0]*w[1]-u[1]*w[0]>=0?1:0;
+  const x=Math.max(65,Math.min(735,joint[0]+bis[0]*60)),y=Math.max(26,Math.min(484,joint[1]+bis[1]*60));
+  const name=(model.segments[i]?.label||String.fromCharCode(65+i))+'–'+
+   (model.segments[i+1]?.label||String.fromCharCode(66+i))+' · '+bendAngleLabel(bend);
+  return '<g class="mir-angle-annotation" pointer-events="none" aria-label="Angle '+esc(name)+'">'+
+   '<path d="M '+start.map(fmt).join(' ')+' A '+r+' '+r+' 0 0 '+sweep+' '+end.map(fmt).join(' ')+'" fill="none" stroke="#348511" stroke-width="2.5"/>'+
+   '<rect x="'+fmt(x-60)+'" y="'+fmt(y-13)+'" width="120" height="26" rx="5" fill="#fafaf7" stroke="#cad6c7"/>'+
+   '<text x="'+fmt(x)+'" y="'+fmt(y+4)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#18251d">'+esc(name)+'</text></g>';
+ }).join('');
+}
 function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
@@ -254,6 +284,7 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>${grid}`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
  output+=M.profileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand?{}:model,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative&&(!clientProfileWizard()||clientStep===4)});
+  if(!small&&!illustrative)output+=profileAnglesOverlay(model,mapped);
  }
  const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}
  }
@@ -573,6 +604,10 @@ function updateDrawing({keepForm=false}={}){
  syncPieceNameField();
  renderFractionPickers();
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
+ const angleList=$('#mir-angle-summary');
+ if(angleList)angleList.innerHTML=actual.valid&&(actual.bends||[]).length?
+  actual.bends.map((bend,i)=>'<p><strong>Angle '+esc(actual.segments[i]?.label||'A')+'–'+esc(actual.segments[i+1]?.label||'B')+'</strong><span>'+esc(bendAngleLabel(bend))+'</span></p>').join(''):'';
+
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  const waiting=clientProfileWizard()&&!clientProfileSelected&&tool!=='draw';
  $('#drawing-title').textContent=waiting?'Aperçu de la moulure':authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
