@@ -1624,7 +1624,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
   return;
  }
  if(d.newModel){
-  if(d.newModel==='profile'){workflow='configure';authoring=false;editingTemplateId=null;startProfileDrawing({fullscreen:false});return;}
+  if(d.newModel==='profile'){workflow='configure';authoring=false;editingTemplateId=null;startProfileDrawing({fullscreen:false});render();return;}
   beginAuthor(d.newModel);
   if(d.newModel==='profile'&&matchMedia('(any-pointer: coarse)').matches)startProfileDrawing();
   return;
