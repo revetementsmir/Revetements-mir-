@@ -4,7 +4,7 @@
 if(new URLSearchParams(location.search).get('mode')==='client')return;
 const $=(selector,root=document)=>root.querySelector(selector);
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let yaw=-42,pitch=24,drag=null,current=null,wasActive=false;
+let yaw=-42,pitch=24,drag=null,current=null,wasActive=false,lastFaceView='';
 function scene(){
  const canvas=$('#mir-freeform-3d-canvas'),V=window.MIRLiveProfile3D;
  if(!canvas||!V?.render)return;
@@ -21,9 +21,14 @@ function updatePreview(state){
  if(document.body.classList.contains('mir-freeform-active')!==active)document.body.classList.toggle('mir-freeform-active',active);
  const toolbar=$('#mir-freeform-toolbar');
  if(toolbar)toolbar.hidden=!active;
- if(active&&!wasActive){const b=$('#mir-freeform-client-toggle');if(b)b.checked=false;}
+ if(active&&!wasActive){for(const id of ['#mir-freeform-client-toggle','#mir-freeform-store-toggle']){const toggle=$(id);if(toggle)toggle.checked=false;}lastFaceView='';}
  wasActive=active;
  if(!active)return;
+ // Positionner la caméra sur la vraie face peinte lors d'une inversion.
+ const V=window.MIRLiveProfile3D,face=state.model?.coloredFace,segment=state.model?.segments?.find(item=>item.label===face?.segmentId);
+ const faceView=face?.side&&segment?`${face.side}:${face.segmentId}:${Math.round(segment.headingDeg*10)/10}`:'';
+ if(faceView&&faceView!==lastFaceView&&V?.preferredView){const view=V.preferredView(state.model,{yaw,pitch});yaw=view.yaw;pitch=view.pitch;}
+ lastFaceView=faceView;
  const result=window.MIRProfileRecognition?.recognize(state.model)||{label:'Profil sur mesure',sides:0,certainty:'none'};
  const output=$('#mir-freeform-detected');
  if(output)output.textContent=result.sides>=2
@@ -32,9 +37,8 @@ function updatePreview(state){
  const metal=state.model?.material?.type||'à préciser',finish=state.model?.finish?.name||state.model?.finish?.code||'à choisir';
  const legend=$('#mir-freeform-3d-legend');
  if(legend)legend.textContent='Face colorée : '+finish+' · Métal : '+metal;
- const undo=$('[data-freeform-undo]'),redo=$('[data-freeform-redo]'),finishButton=$('[data-freeform-finish]'),save=$('#mir-freeform-save');
+ const undo=$('[data-freeform-undo]'),finishButton=$('[data-freeform-finish]'),save=$('#mir-freeform-save');
  if(undo)undo.disabled=!state.canUndo;
- if(redo)redo.disabled=!state.canRedo;
  if(finishButton)finishButton.disabled=state.tool!=='draw'||!state.model?.valid||(state.drawPointsMM||[]).length<3;
  if(save)save.disabled=!state.model?.valid;
  scene();
@@ -80,22 +84,26 @@ function init(){
  }
  if(!$('#mir-freeform-destination')){
   const target=document.createElement('section');target.id='mir-freeform-destination';
-  target.innerHTML='<strong>Destination de cette moulure</strong><label><input id="mir-freeform-client-toggle" type="checkbox"> Boutique client <small>(facultatif)</small></label><p>Sans cette sélection, la moulure ne sera pas proposée à la boutique client. Prix et publication partagée à valider séparément.</p>';
+  target.innerHTML='<strong>Destination de cette moulure</strong><label class="mir-workshop-switch"><span>Boutique client <small>(optionnel)</small></span><input id="mir-freeform-client-toggle" type="checkbox" aria-label="Ajouter aux créations destinées à la Boutique client"></label><label class="mir-workshop-switch"><span>Magasin employés <small>(optionnel)</small></span><input id="mir-freeform-store-toggle" type="checkbox" aria-label="Ajouter aux créations disponibles pour le Magasin employés"></label><p>Les deux choix sont indépendants. Le bon de commande direct n’enregistre pas la moulure dans Mes pliages. La Boutique attend les tarifs et la validation avant publication.</p>';
   const dimension=$('#mir-v4-dimensions');if(dimension)dimension.before(target);else config.prepend(target);
  }
  // Les utilitaires historiques restent accessibles sans occuper deux rangées.
  const shortcuts=$('#mir-proc-shortcuts'),clear=$('.mir-proc-reset-link');
  if(shortcuts&&clear&&!shortcuts.contains(clear))shortcuts.append(clear);
  const models=shortcuts?.querySelector('[data-mir-tab="models"]');
- if(models)models.textContent='Mes créations';
+ if(models)models.textContent='Mes pliages';
  // Le nom se règle avec les autres informations de la pièce, jamais au-dessus du tableau.
  const pieceName=$('#mir-piece-name-field'),destination=$('#mir-freeform-destination');
  if(pieceName&&destination&&!config.contains(pieceName))destination.before(pieceName);
  if(!$('#mir-freeform-toolbar')){
   const toolbar=document.createElement('div');toolbar.id='mir-freeform-toolbar';toolbar.hidden=true;
   toolbar.setAttribute('role','toolbar');toolbar.setAttribute('aria-label','Actions du tracé');
-  toolbar.innerHTML='<button type="button" class="mir-freeform-previous" data-freeform-undo title="Effacer le dernier côté du dessin">↶ <span>Précédent<small>Effacer le dernier côté</small></span></button><button type="button" class="mir-freeform-redo" data-freeform-redo title="Rétablir le côté effacé" aria-label="Rétablir le côté effacé">↷</button><button type="button" class="mir-freeform-finish" data-freeform-finish>Terminer le tracé</button><button type="button" class="mir-freeform-add" data-freeform-add><span aria-hidden="true">＋</span> Ajouter un côté</button>';
+  toolbar.innerHTML='<button type="button" class="mir-freeform-previous" data-freeform-undo title="Supprimer le dernier côté ou pli du tracé">↶ <span>Précédent<small>Effacer le dernier pli</small></span></button><button type="button" class="mir-freeform-add" data-freeform-add title="Continuer le tracé en ajoutant le prochain côté"><span aria-hidden="true">＋</span> Continuer</button>';
   workspace.after(toolbar);
+ }
+ if(!$('#mir-freeform-finish-top')){
+  const topTools=$('#drawing-tools');
+  if(topTools){const finish=document.createElement('button');finish.type='button';finish.id='mir-freeform-finish-top';finish.dataset.freeformFinish='1';finish.textContent='Terminer le tracé';finish.setAttribute('aria-label','Terminer le tracé et modifier les cotes');topTools.append(finish);}
  }
  for(const id of ['mir-v4-dimensions','mir-v4-face','mir-v4-colors']){
   const section=$('#'+id);if(section)section.open=true;
