@@ -285,6 +285,56 @@
     if(shaped)out+='</g>';
     return '<g transform="translate('+d.g.left+' '+d.g.top+')">'+out+'</g>';
   }
+
+  // Same trusted layout drives both 2D and 3D; dimensions never come from pixels.
+  // Until measured, display only an explicitly illustrative volume.
+  function illustrativeWallVolume(points){
+    if(!Array.isArray(points)||points.length<3)return '<p class="hint mir-wall-twin-empty">Tracez trois sommets pour prévisualiser le volume. Les mesures restent à saisir.</p>';
+    const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+    const bounds=[Math.min(...xs),Math.max(...xs),Math.min(...ys),Math.max(...ys)],w=bounds[1]-bounds[0],h=bounds[3]-bounds[2];
+    if(w<1||h<1)return '<p class="hint mir-wall-twin-empty">Tracez un contour ayant une surface réelle.</p>';
+    const scale=Math.min(240/w,112/h),vertices=points.map(p=>[34+(p[0]-bounds[0])*scale,74+(p[1]-bounds[2])*scale]);
+    const path=coords=>coords.map(p=>p.map(n=>Math.round(n*100)/100).join(',')).join(' ');
+    let out='<svg viewBox="0 0 320 210" data-mir-wall-twin="unmeasured" role="img" aria-label="Volume de prévisualisation non coté du mur" xmlns="http://www.w3.org/2000/svg">';
+    out+='<rect width="320" height="210" fill="#fafbf6"/>';
+    for(let i=0;i<vertices.length;i++){
+      const a=vertices[i],b=vertices[(i+1)%vertices.length];
+      out+='<polygon points="'+path([a,b,[b[0]+18,b[1]-17],[a[0]+18,a[1]-17]])+'" fill="#8c9e82" stroke="#586b52" stroke-width="1.1"/>';
+    }
+    out+='<polygon points="'+path(vertices.map(([x,y])=>[x+18,y-17]))+'" fill="#c4d6b5" stroke="#718b67"/>';
+    out+='<polygon points="'+path(vertices)+'" fill="#6d8e61" stroke="#35513b" stroke-width="1.5"/>';
+    out+='<text x="160" y="197" fill="#596e59" font-size="12" text-anchor="middle">Forme indicative · aucune cote inventée</text></svg>';
+    return out;
+  }
+  function renderWallTwin(){
+    const host=$('#mir-wall-live-3d-stage'),card=$('#mir-wall-live-3d');
+    if(!host||!card)return;
+    const label=card.querySelector('strong'),note=card.querySelector('small');
+    if(layout.ok&&V){
+      if(view==='3d'){
+        // Main view is already 3D; show a faithful 2D miniature from the same layout.
+        const w=layout.widthIn,h=layout.heightIn,pad=Math.max(w,h)*.10;
+        label.textContent='2D · même calepinage';
+        host.innerHTML='<svg data-mir-wall-twin="2d" viewBox="'+[-pad,-pad,w+2*pad,h+2*pad].join(' ')+'" role="img" aria-label="Vue 2D synchronisée des '+layout.pieces.length+' panneaux">'+panelDrawing()+'</svg>';
+      }else{
+        label.textContent='3D · même calepinage';
+        const model=V.render(layout,{projectionIn:parse(zone().meta.projection),yaw:wallYaw,pitch:wallPitch,selectedId:selected?.type==='piece'?selected.id:null,format:inch});
+        host.innerHTML='<svg data-mir-wall-twin="3d" viewBox="'+model.viewBox+'" role="img" aria-label="Volume des '+layout.pieces.length+' panneaux, synchronisé avec le plan">'+model.svg+'</svg>';
+      }
+      note.textContent=layout.pieces.length+' panneaux · mêmes cotes · lips comptés une fois par joint';
+      card.dataset.syncedPieces=String(layout.pieces.length);
+      card.dataset.geometryStatus='measured';
+      return;
+    }
+    label.textContent='3D · contour provisoire';
+    const z=zone(),d=dimensions(),ratios=z.shape?.sketchRatios;
+    const points=tool==='outline'&&outlineDraft.length>=3?outlineDraft:
+      Array.isArray(ratios)&&ratios.length>=3?ratios.map(([x,y])=>[x*300,y*175]):
+      d.width>0&&d.height>0?wallGeometry().measuredPointsIn||[]:[];
+    host.innerHTML=illustrativeWallVolume(points);
+    note.textContent='Contour seulement · les panneaux se calculent après les mesures';
+    card.dataset.syncedPieces='0';card.dataset.geometryStatus='unmeasured';
+  }
   function draw() {
     const z=zone(),s=z.source,d=dimensions(),svg=$('#layout-svg');
     document.body.classList.toggle('mir-wall-tracing',tool==='outline');
@@ -357,6 +407,7 @@
     const vw=baseWidth/zoom,vh=baseHeight/zoom;
     svg.setAttribute('viewBox',[originX+(baseWidth-vw)/2,originY+(baseHeight-vh)/2,vw,vh].join(' '));svg.innerHTML=out;
     svg.setAttribute('aria-label',valid?z.name+', '+layout.pieces.length+' panneaux, '+inch(layout.widthIn)+' par '+inch(layout.heightIn):'Zone à définir');
+    renderWallTwin();
     $('#drawing-stage').dataset.tool=tool;$('#zoom-value').textContent=Math.round(zoom*100)+' %';
     $('#view-zone').setAttribute('aria-pressed',String(view==='zone'));$('#view-plan').setAttribute('aria-pressed',String(view==='plan'));$('#view-3d').setAttribute('aria-pressed',String(view==='3d'));
     $('#select-tool').setAttribute('aria-pressed',String(tool==='select'));$('#draw-zone').setAttribute('aria-pressed',String(tool==='draw'));
