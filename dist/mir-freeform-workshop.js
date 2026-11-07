@@ -7,6 +7,49 @@ const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
 let yaw=-42,pitch=24,drag=null,current=null,wasActive=false,lastFaceView='',mobileStep=1;
 const phoneLayout=()=>matchMedia('(max-width:650px), (max-width:950px) and (max-height:520px) and (pointer:coarse)').matches;
 const mobileStepNames=['Tracé libre','Mesures et angles','Matériau et couleur','Confirmation 2D/3D'];
+function closeMobileSections({restoreFocus=false}={}){
+ const menu=$('#mir-mobile-section-menu'),toggle=$('#mir-mobile-section-toggle');
+ if(!menu||menu.hidden)return;
+ menu.hidden=true;
+ document.body.classList.remove('mir-mobile-sections-open');
+ if(toggle){toggle.setAttribute('aria-expanded','false');if(restoreFocus)toggle.focus({preventScroll:true});}
+}
+function initMobileSections(header){
+ if(!header||$('#mir-mobile-section-toggle'))return;
+ const toggle=document.createElement('button');
+ toggle.type='button';toggle.id='mir-mobile-section-toggle';
+ toggle.setAttribute('aria-label','Ouvrir les sections de l’atelier MIR');
+ toggle.setAttribute('aria-controls','mir-mobile-section-menu');
+ toggle.setAttribute('aria-expanded','false');
+ toggle.textContent='☰';
+ const menu=document.createElement('nav');
+ menu.id='mir-mobile-section-menu';menu.hidden=true;
+ menu.setAttribute('aria-label','Naviguer dans les sections MIR');
+ const sections=[['draw','Créer'],['models','Mes pliages'],['boutique','Boutique'],['store','Magasin employés'],['orders','Bons de commande']];
+ menu.innerHTML=sections.map(([id,name])=>
+  '<button type="button" data-mir-mobile-tab="'+id+'">'+escape(name)+'</button>').join('');
+ header.append(toggle,menu);
+ toggle.addEventListener('click',()=>{
+  const isOpen=!menu.hidden;
+  if(!document.body.classList.contains('mir-mobile-stepper'))return;
+  menu.hidden=isOpen;
+  document.body.classList.toggle('mir-mobile-sections-open',!isOpen);
+  toggle.setAttribute('aria-expanded',String(!isOpen));
+  if(!isOpen)menu.querySelector('button')?.focus({preventScroll:true});
+ });
+ menu.addEventListener('click',event=>{
+  const button=event.target.closest('[data-mir-mobile-tab]');if(!button)return;
+  const tab=$('#mir-procurement-tabs [data-mir-tab="'+button.dataset.mirMobileTab+'"]');
+  closeMobileSections();
+  tab?.click(); // Réutiliser la vraie navigation et les permissions existantes.
+ });
+ document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&!menu.hidden){event.preventDefault();closeMobileSections({restoreFocus:true});}
+ });
+ document.addEventListener('click',event=>{
+  if(!menu.hidden&&!menu.contains(event.target)&&event.target!==toggle)closeMobileSections();
+ });
+}
 function setMobileStep(value){
  if(!phoneLayout()||!document.body.classList.contains('mir-freeform-active'))return;
  const requested=Math.max(1,Math.min(4,Number(value)||1));
@@ -24,6 +67,7 @@ function renderMobileStep(){
  const on=phoneLayout()&&document.body.classList.contains('mir-freeform-active')&&!document.body.classList.contains('mir-v4-dossier-open');
  document.body.classList.toggle('mir-mobile-stepper',on);
  document.body.dataset.mirMobileStep=on?String(mobileStep):'0';
+ if(!on)closeMobileSections();
  const header=$('#mir-mobile-steps');
  if(header){
   header.hidden=!on;
@@ -88,6 +132,7 @@ function init(){
  const workspace=$('.production-workspace'),drawing=$('.drawing-card'),config=$('.config-card');
  if(!workspace||!drawing||!config)return;
  const header=$('.production-header'),brand=$('.production-brand');
+ initMobileSections(header);
  if(brand&&!$('#mir-freeform-title')){
   const title=document.createElement('div');title.id='mir-freeform-title';
   title.innerHTML='<strong>Atelier de pliage</strong><small>Création de moulure sur mesure</small>';
