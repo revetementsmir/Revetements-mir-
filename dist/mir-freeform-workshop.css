@@ -100,3 +100,37 @@ body.mir-freeform-active #mir-freeform-toolbar>button:focus-visible{outline:3px 
 @media(max-width:650px){
  body.mir-freeform-active #mir-freeform-toolbar{position:static;bottom:auto;box-shadow:none}
 }
+
+/* Densité de chantier : le tableau démarre immédiatement après la navigation. */
+body.mir-freeform-active #mir-procurement-tabs{position:relative!important;top:auto!important;margin:0 0 5px!important;padding:3px!important;gap:4px!important;border-radius:11px}
+body.mir-freeform-active #mir-procurement-tabs button{min-height:40px!important;padding:7px 6px!important;font-size:12px!important}
+body.mir-freeform-active #mir-proc-shortcuts{min-height:0;justify-content:flex-end;margin:0 0 6px!important;gap:6px}
+body.mir-freeform-active #mir-proc-shortcuts button{min-height:35px;padding:7px 10px;font-size:11px}
+body.mir-freeform-active #mir-proc-shortcuts .mir-proc-reset-link{font-size:10px;font-weight:550;text-decoration:underline;line-height:1.2;margin:0 0 0 8px!important;align-self:center}
+body.mir-freeform-active .kind-bar{margin:0 0 7px!important;padding:2px!important;gap:2px}
+body.mir-freeform-active .kind-bar button{min-height:36px!important;padding:5px 7px!important;font-size:11px!important}
+body.mir-freeform-active .drawing-head{padding:9px 12px!important;gap:6px!important}
+body.mir-freeform-active .drawing-head .eyebrow{display:none!important}
+body.mir-freeform-active .drawing-head h2{font-size:16px!important}
+body.mir-freeform-active .drawing-head .view-switch button{min-height:36px!important}
+body.mir-freeform-active .mir-piece-name{margin:0 0 7px!important;padding:9px!important;border-radius:10px!important}
+body.mir-freeform-active .mir-piece-name input{min-height:44px!important}
+body.mir-freeform-active .mir-piece-name small{margin:2px 0 0}
+body.mir-freeform-active .mir-freeform-detected{font-size:11px}
+@media(min-width:900px) and (orientation:landscape){
+ body.mir-freeform-active .production-header{min-height:58px!important;padding:7px 17px!important}
+ body.mir-freeform-active .production-brand img{width:135px!important;height:auto!important}
+ body.mir-freeform-active #mir-freeform-title strong{font-size:16px}
+ body.mir-freeform-active #mir-freeform-title small{font-size:10px}
+ body.mir-freeform-active .production-wrap{padding:5px 12px 45px!important}
+ body.mir-freeform-active .drawing-stage{height:clamp(300px,42dvh,545px)!important;min-height:0!important}
+ body.mir-freeform-active .drawing-stage>svg{width:100%;height:100%;min-height:0!important;max-height:none!important}
+ body.mir-freeform-active .config-card{max-height:calc(100dvh - 174px)}
+ body.mir-freeform-active .mir-freeform-3d{margin:7px 10px;padding:6px 8px}
+ body.mir-freeform-active #mir-freeform-3d-canvas{height:118px}
+}
+@media(max-width:899px){
+ body.mir-freeform-active .production-wrap{padding-top:6px}
+ body.mir-freeform-active #mir-proc-shortcuts{flex-wrap:wrap}
+ body.mir-freeform-active .drawing-stage{min-height:330px}
+}
