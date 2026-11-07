@@ -18,4 +18,21 @@ async function tapDrawing(page,x,y){
 async function drawTwoSides(page){
  for(const [x,y] of [[190,260],[440,260],[440,140]])await tapDrawing(page,x,y);
 }
-module.exports={pointOnDrawing,tapDrawing,drawTwoSides};
+async function openWorkshopStep(page,targetStep=4){
+ const isMobile=await page.locator('body.mir-mobile-stepper').count()>0;
+ if(isMobile){
+  const target=Math.max(2,Math.min(4,targetStep));
+  for(let attempt=0;attempt<4;attempt++){
+   const step=Number(await page.locator('body').getAttribute('data-mir-mobile-step'))||1;
+   if(step>=target)return true;
+   await page.locator('#mir-freeform-toolbar [data-freeform-next]').click();
+   const now=Number(await page.locator('body').getAttribute('data-mir-mobile-step'))||1;
+   if(now!==step+1)throw Error('Étape MIR mobile bloquée : '+step+' → '+now);
+  }
+  throw Error('Étape MIR mobile '+target+' inaccessible');
+ }
+ const finish=page.locator('[data-freeform-finish]');
+ if(await finish.isVisible()&&await finish.isEnabled())await finish.click();
+ return false;
+}
+module.exports={pointOnDrawing,tapDrawing,drawTwoSides,openWorkshopStep};
