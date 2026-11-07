@@ -40,6 +40,16 @@ function available() {
       assert.equal(await page.locator('#production-templates [data-template]').count(),0,'aucun profil imposé');
       await drawTwoSides(page);
       await page.locator('[data-freeform-finish]').click();
+      const phone=viewport.width<=650;
+      if(phone){
+        assert.equal(await page.locator('body.mir-mobile-stepper').count(),1,viewport.name+': atelier téléphone à 4 étapes actif');
+        assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'1');
+        const trace=await page.evaluate(()=>({scroll:document.documentElement.scrollHeight,window:innerHeight,stage:document.querySelector('#production-drawing').getBoundingClientRect().height}));
+        assert.ok(trace.scroll<=trace.window+4,viewport.name+': tracé sans défilement global '+JSON.stringify(trace));
+        assert.ok(trace.stage>120,viewport.name+': surface de tracé accessible '+JSON.stringify(trace));
+        await page.locator('#mir-freeform-toolbar [data-freeform-next]').click();
+        assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'2');
+      }
       await page.locator('[data-segment-length="0"]').fill('3');
       await page.locator('[data-segment-length="1"]').fill('2');
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'5 po');
@@ -56,26 +66,42 @@ function available() {
       if(viewport.width>=900)assert.ok(layout.config.left>=layout.drawing.right-5,'Landscape side by side: '+JSON.stringify(layout));
       else assert.ok(layout.config.top>=layout.drawing.bottom-10,'Portrait stack: '+JSON.stringify(layout));
       assert.ok(await page.locator('.config-card').isVisible());
-      // Vérification du retour aux mesures après le tracé sur chaque écran.
-      await page.locator('#mir-v4-dimensions').evaluate(node=>{node.open=false;});
-      const focusCotes=page.locator('#drawing-tools [data-focus-dimensions]');
-      assert.equal(await focusCotes.isVisible(),true,viewport.name+' : action Cotes et angles visible sans ouvrir Autres actions');
-      await focusCotes.click();
-      assert.equal(await page.locator('#mir-v4-dimensions').evaluate(node=>node.open),true,viewport.name+' : dimensions ouvertes');
-      assert.equal(await page.evaluate(()=>document.activeElement?.closest('#mir-v4-dimensions')?.id||''),'mir-v4-dimensions',viewport.name+' : focus sur une vraie cote');
-      assert.equal(await page.locator('#production-dimensions input').first().isVisible(),true,viewport.name+' : champ de mesure visible');
+      // Contrats PC / iPad et parcours tactile en quatre étapes avec le même dessin.
+      if(phone){
+        assert.ok(await page.locator('#mir-angle-summary p').count()>=1,viewport.name+': angles entre les côtés');
+        assert.ok(await page.locator('.mir-angle-annotation').count()>=1,viewport.name+': angles aussi sur le dessin');
+        await page.locator('#mir-freeform-toolbar [data-freeform-next]').click();
+        assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'3');
+        assert.equal(await page.locator('.mir-face-choice').count(),2,viewport.name+': deux images de face peinte');
+        await page.locator('[data-face-select="right"]').click();
+        assert.equal(await page.locator('[data-face-select="right"]').getAttribute('aria-pressed'),'true');
+        assert.equal(await page.locator('#profile-painted-side').inputValue(),'right');
+        await page.locator('#mir-freeform-toolbar [data-freeform-next]').click();
+        assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'4');
+        assert.ok(await page.locator('#mir-freeform-3d-canvas').isVisible(),viewport.name+': vue 3D confirmée');
+        await page.locator('#mir-freeform-toolbar [data-freeform-undo]').click();
+        assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'3','Précédent ne détruit pas le dessin');
+        assert.equal(await page.locator('[data-face-select="right"]').getAttribute('aria-pressed'),'true','Face peinte conservée');
+      }else{
+        await page.locator('#mir-v4-dimensions').evaluate(node=>{node.open=false;});
+        const focusCotes=page.locator('#drawing-tools [data-focus-dimensions]');
+        assert.equal(await focusCotes.isVisible(),true,viewport.name+' : action Cotes et angles visible sans ouvrir Autres actions');
+        await focusCotes.click();
+        assert.equal(await page.locator('#mir-v4-dimensions').evaluate(node=>node.open),true,viewport.name+' : dimensions ouvertes');
+        assert.equal(await page.evaluate(()=>document.activeElement?.closest('#mir-v4-dimensions')?.id||''),'mir-v4-dimensions',viewport.name+' : focus sur une vraie cote');
+        assert.equal(await page.locator('#production-dimensions input').first().isVisible(),true,viewport.name+' : champ de mesure visible');
+        assert.equal(await page.locator('.mir-face-choice').count(),2,viewport.name+': deux aperçus de la face colorée');
+        await page.locator('#panel-zoom-in').click();
+        assert.ok((await page.locator('#panel-zoom-value').textContent()).includes('120'));
+        await page.locator('.kind-bar [data-kind="panel"]').click();
+        assert.equal(await page.locator('#production-title').textContent(),'Panneaux architecturaux');
+        assert.equal(await page.locator('#mir-v4-sheet-total').isVisible(),false);
+        await page.locator('.kind-bar [data-kind="profile"]').click();
+        assert.equal(await page.locator('#production-title').textContent(),'Créer une moulure');
+      }
       await page.screenshot({path:path.join(__dirname,'../artifacts/atelier-v4-'+viewport.name+'.png'),fullPage:true});
-      // La longueur de vente reste fixée à 10 pi pour les nouvelles moulures,
-      // contrairement aux anciens J à soffite de 12 pi préservés en historique.
       assert.equal(await page.locator('[data-measure="length"]').inputValue(),'120');
       assert.equal(await page.locator('[data-measure="length"]').evaluate(input=>input.readOnly),true);
-      await page.locator('#panel-zoom-in').click();
-      assert.ok((await page.locator('#panel-zoom-value').textContent()).includes('120'));
-      await page.locator('.kind-bar [data-kind="panel"]').click();
-      assert.equal(await page.locator('#production-title').textContent(),'Panneaux architecturaux');
-      assert.equal(await page.locator('#mir-v4-sheet-total').isVisible(),false);
-      await page.locator('.kind-bar [data-kind="profile"]').click();
-      assert.equal(await page.locator('#production-title').textContent(),'Créer une moulure');
       if(errors.length)throw new Error(viewport.name+' JS errors: '+errors.join('; '));
       console.log('PASS '+viewport.name+' '+viewport.width+'x'+viewport.height+', no overflow, profile and panel, zoom 2D');
       await page.close();
