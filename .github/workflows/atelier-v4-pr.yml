@@ -3,6 +3,13 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - 'dist/employee-store-model.js'
+      - 'dist/mir-store-review.js'
+      - 'dist/magasin-revue.*'
+      - 'dist/chantier-app.js'
+      - 'dist/chantier.html'
+      - 'dist/chantier.css'
+      - 'tests/mir-magasin-merge.cjs'
       - 'dist/production*'
       - 'dist/studio-wall-sections.js'
       - 'dist/studio-features.js'
@@ -113,6 +120,12 @@ jobs:
           node --check tests/mir-moulure-renaming-browser.cjs
       - name: Existing MIR regression suite
         run: |
+          node --check dist/employee-store-model.js
+          node --check dist/mir-store-review.js
+          node --check dist/magasin-revue.js
+          node --check dist/chantier-app.js
+          node --check tests/mir-magasin-merge.cjs
+          node tests/mir-magasin-merge.cjs
           node tests/mir-pages-regressions.cjs
           node tests/mir-unified-dossier.cjs
           node tests/mir-public-menu.cjs
