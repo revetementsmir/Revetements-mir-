@@ -1,5 +1,5 @@
 'use strict';
-const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
+const {drawTwoSides,openWorkshopStep}=require('./mir-draw-freeform-helper.cjs');
 /* MAC Métal: une teinte de tôle n'est PAS une photo de clin répétée. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -54,7 +54,7 @@ async function ready(url){
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
    await drawTwoSides(page);
-   await page.locator('[data-freeform-finish]').click();
+   await openWorkshopStep(page,3);
     if(!(await page.locator('.mir-v4-materials').evaluate(node=>node.open)))await page.locator('.mir-v4-materials > summary').click();
    await page.locator('#material-type').selectOption('acier');
     if(!(await page.locator('#mir-v4-colors').evaluate(node=>node.open)))await page.locator('#mir-v4-colors > summary').click();
@@ -66,6 +66,7 @@ async function ready(url){
    assert.equal(await page.locator('#production-color-grid img').count(),0,'MAC swatches must not be photos');
    assert.equal(await page.locator('#selected-finish img').count(),0,'MAC selected finish must be a solid chip');
    assert.equal(await page.locator('#selected-finish .kaycan-flat-chip').count(),1);
+   await openWorkshopStep(page,4);
    await page.locator('[data-preview="volume"]').click();
    await page.waitForTimeout(150);
    const svg=await page.locator('#production-drawing svg').innerHTML();
