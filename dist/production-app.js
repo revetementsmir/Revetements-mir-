@@ -1162,7 +1162,12 @@ function reconcilePanelStageDOM(){
   const newWrapper=document.createElement('div');newWrapper.className='mir-panel-synced-views';
   stage.before(newWrapper);newWrapper.append(stage,twin);
  }else if(wrapper){
-  wrapper.before(stage);stage.after(twin);wrapper.remove();
+  // Le module Pliage ajoute son aperçu 3D juste après le dessin. Conserver
+  // TOUS les enfants de la grille, pas seulement le dessin : autrement
+  // l'aperçu 3D des quatre étapes mobiles est détruit à la sortie du wrapper.
+  const parent=wrapper.parentElement;
+  while(wrapper.firstChild)parent.insertBefore(wrapper.firstChild,wrapper);
+  wrapper.remove();
  }
 }
 function render(){
