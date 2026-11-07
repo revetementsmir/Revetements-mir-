@@ -374,7 +374,8 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing{
 /* MIR — parcours téléphone 4 étapes, moteur de tracé commun à PC/iPad. */
 @media(max-width:650px){
  body.mir-admin-v4.mir-mobile-stepper{
-  display:flex;flex-direction:column;height:100dvh;max-height:100dvh;
+  display:flex;flex-direction:column;width:100%;max-width:100%;
+  height:100dvh;max-height:100dvh;min-width:0;box-sizing:border-box;
   overflow:hidden!important;background:#fafaf7;color:#18251d;
  }
  body.mir-mobile-stepper>.production-header{
@@ -386,7 +387,9 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing{
  body.mir-mobile-stepper #mir-freeform-save{min-height:40px}
  body.mir-mobile-stepper:not([data-mir-mobile-step="4"]) #mir-freeform-save{display:none!important}
  body.mir-mobile-stepper>.production-wrap{
-  display:flex!important;flex-direction:column;flex:1 1 auto;min-height:0;
+  display:flex!important;flex-direction:column;flex:1 1 auto;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;min-height:0;
   height:auto!important;max-height:none!important;overflow:hidden!important;
   padding:5px 8px calc(76px + env(safe-area-inset-bottom))!important;
  }
@@ -408,7 +411,8 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing{
  body.mir-mobile-stepper .mir-mobile-step-progress span.done{background:#348511}
  body.mir-mobile-stepper .production-workspace:not([hidden]){
   display:flex!important;flex:1 1 auto;flex-direction:column;gap:6px;
-  min-height:0;max-height:none;height:100%;overflow:hidden;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;min-height:0;max-height:none;height:100%;overflow:hidden;
  }
  body.mir-mobile-stepper .drawing-card,
  body.mir-mobile-stepper .config-card{
