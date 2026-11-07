@@ -47,7 +47,8 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    assert.equal(await page.locator('[data-freeform-undo]').isDisabled(),true,'aucun côté à effacer au départ');
 
    // Aucune interaction en dehors du vrai SVG ne doit créer de segment.
-   await page.locator('.drawing-head').click({position:{x:8,y:8}});
+   const outsideDrawing=phone&&!(await page.locator('.drawing-head').isVisible())?'#mir-mobile-steps':'.drawing-head';
+   await page.locator(outsideDrawing).click({position:{x:8,y:8}});
    if(!phone){
     await page.locator('#mir-freeform-3d-canvas').click({position:{x:18,y:18}});
     await page.locator('#mir-freeform-destination').click({position:{x:7,y:7}});
@@ -68,7 +69,7 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    assert.equal(await page.locator('#mir-freeform-3d-canvas [data-mir-live-3d="ready"]').count(),1);
 
    const drawingBefore=JSON.stringify((await state(page)).drawPointsMM);
-   for(const selector of (phone?['.drawing-head']:['.drawing-head','#mir-freeform-3d-canvas','#mir-freeform-destination'])){
+   for(const selector of (phone?[outsideDrawing]:['.drawing-head','#mir-freeform-3d-canvas','#mir-freeform-destination'])){
     await page.locator(selector).click({position:{x:7,y:7}});
     assert.equal(JSON.stringify((await state(page)).drawPointsMM),drawingBefore,'clic hors SVG ne crée pas de côté : '+selector);
    }
