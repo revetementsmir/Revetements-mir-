@@ -45,6 +45,9 @@ on:
       - 'dist/mir-unified-dossier.*'
       - 'dist/mir-unified-client-dossier.js'
       - 'dist/mir-admin-guided*'
+      - 'dist/mir-freeform-workshop.*'
+      - 'dist/mir-profile-recognition.js'
+      - 'tests/mir-profile-recognition.cjs'
       - 'dist/mir-admin-live3d.js'
       - 'tests/mir-admin-guided*.cjs'
       - 'dist/mir-procurement.js'
@@ -98,6 +101,9 @@ jobs:
           node --check tests/mir-selection-pdf-browser.cjs
           node --check tests/mir-public-menu-browser.cjs
           node --check dist/mir-procurement.js
+          node --check dist/mir-freeform-workshop.js
+          node --check dist/mir-profile-recognition.js
+          node --check tests/mir-profile-recognition.cjs
           node --check dist/mir-admin-guided.js
           node --check dist/mir-admin-live3d.js
           node --check tests/mir-admin-guided-browser.cjs
@@ -133,6 +139,7 @@ jobs:
           node tests/mir-selection-pdf.cjs
           node tests/mir-client-signature.cjs
           node tests/mir-procurement.cjs
+          node tests/mir-profile-recognition.cjs
           node tests/mir-admin-guided.cjs
           node tests/mir-workshop-reset.cjs
           node --check tests/mir-pliage-audit-commercial.cjs
