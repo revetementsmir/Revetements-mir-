@@ -14,7 +14,11 @@ function setMobileStep(value){
   if(!current?.model?.valid||(current.model.segments||[]).length<2)return;
   if(window.MIRProductionWorkspace?.finishFreeformTrace?.()===false)return;
  }
- mobileStep=requested;renderMobileStep();
+ mobileStep=requested;
+ const config=$('.config-card'),workspace=$('.production-workspace');
+ if(config)config.scrollTop=0;
+ if(workspace)workspace.scrollTop=0;
+ renderMobileStep();
 }
 function renderMobileStep(){
  const on=phoneLayout()&&document.body.classList.contains('mir-freeform-active');
