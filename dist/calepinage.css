@@ -57,3 +57,29 @@
  body.mir-wall-tracing .drawing-footer>span:not(#drawing-hint){display:none!important}
  body.mir-wall-tracing .drawing-footer #drawing-hint{width:100%;margin:0}
 }
+
+
+/* MIR — canvas de tracé plein écran sur PC, iPad et téléphone; aucun scroll au dessin. */
+body.mir-wall-tracing{overflow:hidden!important;height:100dvh;max-height:100dvh}
+body.mir-wall-tracing .workspace>.canvas-column{
+ position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;
+ min-width:0;max-width:100vw;overflow:hidden;background:#fafaf7;
+ padding:max(7px,env(safe-area-inset-top)) max(7px,env(safe-area-inset-right))
+         max(7px,env(safe-area-inset-bottom)) max(7px,env(safe-area-inset-left));
+}
+body.mir-wall-tracing .canvas-column>.canvas-card{
+ display:flex;flex:1 1 auto;flex-direction:column;min-width:0;min-height:0;
+ overflow:hidden;border-radius:9px;
+}
+body.mir-wall-tracing .canvas-toolbar{flex:0 0 auto;padding:9px 14px}
+body.mir-wall-tracing .drawing-toolbar{flex:0 0 auto;padding:5px 10px;gap:5px}
+body.mir-wall-tracing .drawing-stage{
+ flex:1 1 auto;height:auto!important;min-height:0!important;max-height:none!important;
+}
+body.mir-wall-tracing .drawing-stage svg{display:block;width:100%;height:100%!important;min-height:0!important;max-height:none!important}
+body.mir-wall-tracing .outline-actions{flex:0 0 auto;max-height:135px;overflow-y:auto}
+body.mir-wall-tracing .drawing-footer{flex:0 0 auto;padding:6px 12px}
+body.mir-wall-tracing .canvas-column> :not(.canvas-card){display:none!important}
+@media(min-width:741px){
+ body.mir-wall-tracing .canvas-column>.canvas-card{max-width:min(1500px,96vw);width:100%;margin:0 auto}
+}
