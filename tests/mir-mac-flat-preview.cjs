@@ -52,8 +52,9 @@ async function ready(url){
    page.on('pageerror',e=>errors.push(String(e.message)));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('.mir-v4-picker > summary').click();
-   await page.locator('.mir-v4-picker [data-template="l"]').click();
+   await page.locator('[data-freeform-add]').click();
+   await page.locator('[data-freeform-add]').click();
+   await page.locator('[data-freeform-finish]').click();
    await page.locator('.mir-v4-materials > summary').click();
    await page.locator('#material-type').selectOption('acier');
    await page.locator('#mir-v4-colors > summary').click();
