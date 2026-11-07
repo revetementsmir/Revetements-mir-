@@ -521,3 +521,87 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing{
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-stage{height:120px!important}
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .mir-freeform-3d #mir-freeform-3d-canvas{height:108px!important}
 }
+
+
+/* MIR visual QA — corrections du panneau 2D et du vrai pied de page mobile. */
+/* Les styles du portail ont plus de spécificité que l'ancien masquage mobile. */
+body.mir-admin-v4.mir-procurement-ready.mir-mobile-stepper #mir-procurement-tabs,
+body.mir-admin-v4.mir-mobile-stepper #mir-proc-shortcuts{display:none!important}
+@media(min-width:768px) and (min-height:650px){
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-head{
+  flex:0 0 auto;min-height:42px;padding:6px 10px!important;gap:6px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-head .mir-freeform-detected{
+  flex:0 1 auto!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:10px!important;line-height:1.25;margin:0!important;max-width:45%;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>#mir-freeform-3d{
+  flex:0 0 auto;min-height:0;max-height:116px;
+  padding:3px 7px!important;margin:2px 8px!important;overflow:hidden;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) #mir-freeform-3d-canvas{
+  height:68px!important;min-height:0!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) #mir-freeform-3d-legend{
+  margin:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-navigation{
+  flex:0 0 auto;min-height:35px;padding:3px 7px!important;gap:7px;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-tools{
+  flex:0 0 auto;min-height:0;padding:4px 8px!important;gap:6px;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-legend{padding:4px 8px!important}
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.production-validation{
+  flex:0 0 auto;max-height:56px;overflow:auto;
+ }
+ body.mir-admin-v4.mir-procurement-ready.mir-freeform-active:not(.mir-mobile-stepper) .drawing-card>.drawing-stage{
+  flex:1 1 auto!important;height:auto!important;min-height:0!important;max-height:none!important;
+ }
+}
+/* Pied mobile : deux vraies colonnes, sans colonne implicite ni rangée qui s'étire. */
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar:not([hidden]){
+ display:grid!important;
+ grid-template-columns:minmax(112px,.67fr) minmax(0,1.33fr)!important;
+ grid-template-rows:52px!important;
+ align-items:stretch!important;
+ gap:8px!important;
+ min-height:0!important;max-height:calc(76px + env(safe-area-inset-bottom));
+ height:auto!important;
+ padding:7px 8px max(7px,env(safe-area-inset-bottom))!important;
+}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-previous,
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-add{
+ min-height:50px!important;height:52px!important;max-height:52px!important;
+ max-width:100%!important;width:100%!important;min-width:0!important;
+ margin:0!important;align-self:stretch!important;box-sizing:border-box!important;
+ overflow:hidden;line-height:1.2!important;
+}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-previous{
+ grid-column:1!important;grid-row:1!important;display:flex!important;
+ align-items:center;justify-content:center;gap:4px!important;
+ white-space:nowrap!important;font-size:12px!important;flex-wrap:nowrap!important;
+}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-previous span{
+ white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important;
+}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-previous small{display:none!important}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-toolbar .mir-freeform-add{
+ grid-column:2!important;grid-row:1!important;
+ display:flex!important;align-items:center;justify-content:center;
+ font-size:13px!important;white-space:normal;overflow-wrap:normal;word-break:normal;
+ text-align:center;padding:5px 8px!important;
+}
+body.mir-admin-v4.mir-mobile-stepper #mir-freeform-save{display:none!important}
+body.mir-admin-v4.mir-mobile-stepper .mir-mobile-step-title{font-size:15px!important}
+body.mir-admin-v4.mir-mobile-stepper[data-mir-mobile-step="3"] #production-color-grid{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:8px!important;max-height:none!important;overflow:visible!important;
+}
+body.mir-admin-v4.mir-mobile-stepper[data-mir-mobile-step="3"] #production-color-grid .color-choice{
+ min-height:56px!important;height:auto!important;padding:6px 4px!important;overflow:visible!important;
+}
+body.mir-admin-v4.mir-mobile-stepper[data-mir-mobile-step="3"] #production-color-grid .color-text{
+ font-size:11px!important;line-height:1.25!important;overflow-wrap:break-word!important;
+ word-break:normal!important;hyphens:none!important;
+}
