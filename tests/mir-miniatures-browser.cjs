@@ -30,8 +30,9 @@ async function online(){
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('.mir-v4-picker > summary').click();
-   await page.locator('.mir-v4-picker [data-template="l"]').click();
+   await page.locator('[data-freeform-add]').click();
+   await page.locator('[data-freeform-add]').click();
+   await page.locator('[data-freeform-finish]').click();
    await page.locator('#production-piece-name').fill('Fascia de fenêtre');
    await page.locator('#add-production-piece').click();
    await page.locator('#mode-link').click();
