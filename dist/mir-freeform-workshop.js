@@ -37,6 +37,8 @@ function updatePreview(state){
  const metal=state.model?.material?.type||'à préciser',finish=state.model?.finish?.name||state.model?.finish?.code||'à choisir';
  const legend=$('#mir-freeform-3d-legend');
  if(legend)legend.textContent='Face colorée : '+finish+' · Métal : '+metal;
+ const tools=$('#drawing-tools');
+ if(tools&&!$('#mir-freeform-finish-top')){const finish=document.createElement('button');finish.type='button';finish.id='mir-freeform-finish-top';finish.dataset.freeformFinish='1';finish.textContent='Terminer le tracé';finish.setAttribute('aria-label','Terminer le tracé et modifier les cotes');tools.append(finish);}
  const undo=$('[data-freeform-undo]'),finishButton=$('[data-freeform-finish]'),save=$('#mir-freeform-save');
  if(undo)undo.disabled=!state.canUndo;
  if(finishButton)finishButton.disabled=state.tool!=='draw'||!state.model?.valid||(state.drawPointsMM||[]).length<3;
