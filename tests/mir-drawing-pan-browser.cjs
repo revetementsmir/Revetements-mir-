@@ -1,4 +1,5 @@
 'use strict';
+const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
 /* MIR : déplacer tout le dessin depuis la vue sans modifier cotes ou forme. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -25,8 +26,7 @@ async function ready(){
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('[data-freeform-add]').click();
-   await page.locator('[data-freeform-add]').click();
+   await drawTwoSides(page);
    await page.locator('[data-freeform-finish]').click();
    await page.locator('#production-drawing').scrollIntoViewIfNeeded();
    const shape=page.locator('#production-drawing svg > path').first();
