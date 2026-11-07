@@ -71,6 +71,8 @@ const hash=b=>createHash('sha256').update(b).digest('hex');
       // L'affichage visuel du PDF natif reste à vérifier sur appareil réel.
 
       await page.locator('[data-mir-open]').click();await page.waitForSelector('#mir-create-po');
+      // Les notes sont dans « Autres détails (facultatifs) » : l'ouvrir comme un utilisateur.
+      await page.locator('details.mir-po-extra > summary').click();
       await page.locator('[data-mir-po="notes"]').fill('Révision test');
       await page.locator('#mir-edit-lines').click();
       await page.locator('[data-duplicate-piece]').click();assert.equal(await page.locator('[data-production-item]').count(),2);
