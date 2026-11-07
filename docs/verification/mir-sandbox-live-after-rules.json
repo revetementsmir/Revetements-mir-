@@ -1,0 +1,86 @@
+{
+  "schema": "mir-real-validation-1",
+  "startedAt": "2026-11-07T01:15:16.496Z",
+  "commit": "ab59eb83fa045fc5b244e83c94f7885230ae7ee1",
+  "mode": "real-service-only",
+  "results": [
+    {
+      "name": "01-authentication",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
+    },
+    {
+      "name": "02-permissions-organizations",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
+    },
+    {
+      "name": "03-create-model",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
+    },
+    {
+      "name": "04-publish",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
+    },
+    {
+      "name": "05-independent-sessions",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
+    },
+    {
+      "name": "06-submit-requests",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
+    },
+    {
+      "name": "07-admin-retrieval",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
+    },
+    {
+      "name": "08-price-history",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
+    },
+    {
+      "name": "09-network-reconnection",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
+    },
+    {
+      "name": "10-existing-data-preservation",
+      "status": "BLOCKED",
+      "detail": "Visible pre-existing server snapshots unchanged; actual iPad models/PO backups not available, full preservation not certified"
+    },
+    {
+      "name": "11-hosted-sql-audit",
+      "status": "BLOCKED",
+      "detail": "Read-only SQL audit must be executed on hosted database; browser RPC isolation does not prove table RLS policies"
+    },
+    {
+      "name": "12-publication-rules-and-versions",
+      "status": "PASS",
+      "detail": "Real authenticated Supabase requests completed"
+    }
+  ],
+  "connectivity": {
+    "reachable": true,
+    "status": 401
+  },
+  "missingVariables": [],
+  "transport": "Real HTTPS through Python CA trust and the managed proxy; browser TLS is not certified",
+  "fixture": {
+    "run": "mission4-e946b4bc-b24c-4e64-9099-de1fd9622c0a",
+    "model": "d1bff0a0-a00f-4b4c-985e-6bc88140569b",
+    "state": "archived",
+    "note": "Test requests/job retained as audit evidence; no deletion"
+  },
+  "finishedAt": "2026-11-07T01:16:09.592Z",
+  "sourceFileHashes": {
+    "tools/validation/real-supabase.cjs": "9b28f1b89a7159a454ddf908a0baa3d5640016b1ecbdd573dc278d50f68871e6",
+    "dist/mir-shared-client.js": "e25a24fdbc831e5d927fbaf44c609ee0fbf5b313e672c4b7be2e2dc25ff414ec",
+    "dist/mir-shared-workspace.js": "f87985910be72af0266868d7a7ed73100ba31df1516608746ab80d4a37a27358"
+  }
+}

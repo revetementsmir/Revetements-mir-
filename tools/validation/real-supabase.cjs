@@ -4,7 +4,7 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {spawnSync}=require('node:child_process'),{randomUUID}=require('node:crypto');
 const {configuration}=require('./config.cjs');
-const cases=['01-authentication','02-permissions-organizations','03-create-model','04-publish','05-independent-sessions','06-submit-requests','07-admin-retrieval','08-price-history','09-network-reconnection','10-existing-data-preservation','11-hosted-sql-audit'];
+const cases=['01-authentication','02-permissions-organizations','03-create-model','04-publish','05-independent-sessions','06-submit-requests','07-admin-retrieval','08-price-history','09-network-reconnection','10-existing-data-preservation','11-hosted-sql-audit','12-publication-rules-and-versions'];
 async function main(){
  if(process.argv.includes('--read-only')){
   const c=configuration();if(!['admin','employee','client'].every(role=>c.accounts[role]))throw Error('Read-only accounts required');
@@ -84,6 +84,26 @@ except Exception:print(json.dumps({'reachable':False,'reason':'Network/proxy con
   await check('06-submit-requests',async()=>{for(const [role,p] of Object.entries(pages))originalOrders.set(role,(await snapshot(p)).orders);const job=await ok(admin,'mir_assign_job',{org:c.org,job_name:'MIR TEST '+run,employee:employeeId});clientOrder=await submit(pages.client,randomUUID(),config);employeeOrder=await submit(pages.employee,randomUUID(),{...config,chantier:job});assert.notEqual(clientOrder,employeeOrder);});
   await check('07-admin-retrieval',async()=>{const s=await snapshot(admin);assert.ok(s.orders.some(o=>o.id===clientOrder));assert.ok(s.orders.some(o=>o.id===employeeOrder));await admin.locator('#refresh').click();await admin.waitForFunction(id=>document.querySelector('#orders').textContent.includes(id),clientOrder);});
   await check('08-price-history',async()=>{const before=(await snapshot(pages.client)).orders.find(o=>o.id===clientOrder);assert.equal(before.snapshot.unitPriceCents,1234);settings={...settings,aluminum_cents:3456};await ok(admin,'mir_admin_publish_model',{org:c.org,model:fixture,expected_revision:model.revision,settings});model=(await snapshot(admin)).catalogue.find(m=>m.id===fixture);const after=await snapshot(pages.client);assert.equal(after.catalogue.find(m=>m.id===fixture).aluminumCents,3456);assert.deepEqual(after.orders.find(o=>o.id===clientOrder),before);});
+  await check('12-publication-rules-and-versions',async()=>{
+   if(!(await snapshot(admin)).capabilities?.publicationRules){result('12-publication-rules-and-versions','BLOCKED','New catalogue migration not installed on this target');return 'blocked';}
+   const rules={materials:['aluminium'],colors:['Noir','Blanc'],fixed_color:'Noir',color_edit_roles:['client'],measure_edit_roles:['client']};
+   settings={...settings,configuration_rules:rules,standard_measures:{A:'3',B:'2'}};
+   await ok(admin,'mir_admin_publish_model',{org:c.org,model:fixture,expected_revision:model.revision,settings});model=(await snapshot(admin)).catalogue.find(m=>m.id===fixture);config.color='Noir';
+   const invalidColor=await rpc(pages.client,'mir_submit_request',{org:c.org,request_id:randomUUID(),model:fixture,publication_revision:model.revision,configuration:{...config,color:'Rouge'}});assert.equal(invalidColor.error?.code,'22023');
+   const employeeConfig={...config,chantier:(await snapshot(pages.employee)).jobs.find(j=>j.name==='MIR TEST '+run).id};
+   await denied(pages.employee,'mir_submit_request',{org:c.org,request_id:randomUUID(),model:fixture,publication_revision:model.revision,configuration:{...employeeConfig,color:'Blanc'}});
+   await denied(pages.employee,'mir_submit_request',{org:c.org,request_id:randomUUID(),model:fixture,publication_revision:model.revision,configuration:{...employeeConfig,measures:{...config.measures,B:'4'}}});
+   const metal=await rpc(pages.client,'mir_submit_request',{org:c.org,request_id:randomUUID(),model:fixture,publication_revision:model.revision,configuration:{...config,metal:'acier'}});assert.ok(metal.error);assert.notEqual(metal.error.code,'PGRST202');
+   const request=await submit(pages.client,randomUUID(),{...config,color:'Blanc',measures:{...config.measures,B:'4'}});
+   await pages.employee.locator('#refresh').click();await pages.employee.locator('[data-model-id="'+fixture+'"] select[disabled]').waitFor();
+   const card=pages.employee.locator('[data-model-id="'+fixture+'"]');assert.equal(await card.locator('select[disabled]').inputValue(),'Noir');assert.equal(await card.locator('select').first().locator('option').count(),1);
+   const old=(await snapshot(pages.client)).orders.find(o=>o.id===request);
+   const next=M.createTemplate({kind:'profile',template:'l',unit:'in',dimensions:{A:4,B:2}},{id:run,name:record.name,version:2}).template;
+   await ok(admin,'mir_add_master_version',{org:c.org,model:fixture,expected_revision:model.revision,template:next});
+   model=(await snapshot(admin)).catalogue.find(m=>m.id===fixture);assert.equal(model.version,2);assert.equal(model.boutique,false);assert.equal(model.store,false);assert.equal(model.supplierPo,false);assert.deepEqual(model.specification.allowed,record.allowed);assert.deepEqual(model.configurationRules,rules);
+   assert.deepEqual((await snapshot(pages.client)).orders.find(o=>o.id===request),old,'Revision never rewrites an old request');
+   await ok(admin,'mir_admin_publish_model',{org:c.org,model:fixture,expected_revision:model.revision,settings});model=(await snapshot(admin)).catalogue.find(m=>m.id===fixture);
+  });
   await check('02-permissions-organizations',async()=>{
    const anon=await pages.client.evaluate(async org=>{const cfg=window.MIRSharedConfig;const sdk=window.MIRSupabase.createClient(cfg.supabaseUrl,cfg.publishableKey,{auth:{storageKey:'mir-mission4-anonymous',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});const r=await sdk.rpc('mir_shared_snapshot',{org});return {code:r.error?.code};},c.org);assert.equal(anon.code,'42501','Anonymous RPC must be denied, not simply unavailable');
 
