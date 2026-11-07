@@ -101,7 +101,7 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'Continuer ne modifie aucun côté');
    assert.equal((await state(page)).tool,'select','les cotes restent modifiables');
    assert.equal(await page.locator('#mir-v4-dimensions').evaluate(node=>node.open),true,'mesures toujours sur la même page');
-   await page.locator('#production-dialog [data-close-production-dialog]').click();
+   await page.getByRole('button',{name:'Retour au dessin',exact:true}).click();
    assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'fermer sans toucher au dessin');
 
    const first=page.locator('#production-dimensions input[data-segment-length="0"]');
