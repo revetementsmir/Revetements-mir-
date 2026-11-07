@@ -54,6 +54,19 @@ function available() {
       await page.locator('[data-segment-length="0"]').fill('3');
       await page.locator('[data-segment-length="1"]').fill('2');
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'5 po');
+      // Vrai angle intérieur aux sommets A–B : une rotation 30° signifie 150° entre côtés.
+      const angleInput=page.locator('[data-bend-angle="0"]');
+      const originalAngle=await angleInput.inputValue();
+      await angleInput.fill('30');
+      assert.match(await page.locator('#mir-angle-summary').textContent(),/150°/,
+        viewport.name+' : angle intérieur, pas rotation 30°');
+      assert.match(await page.locator('#production-drawing .mir-angle-annotation').first().textContent(),/150°/,
+        viewport.name+' : angle directement localisé au sommet du dessin');
+      await angleInput.fill(originalAngle);
+      // Les deux boutons doivent afficher des profils graphiquement différents, pas une même icône.
+      const variants=await page.locator('.mir-face-choice-image svg').evaluateAll(nodes=>nodes.map(node=>node.outerHTML));
+      assert.equal(variants.length,2,'deux aperçus réels de la face peinte');
+      assert.notEqual(variants[0],variants[1],'les deux faces affichent des résultats opposés');
       assert.equal(await page.locator('.mir-v4-sheet-total').count(),1);
       assert.equal(await page.locator('body.mir-admin-v4').count(),1);
       assert.equal(await page.locator('.kind-bar button').count(),2);
