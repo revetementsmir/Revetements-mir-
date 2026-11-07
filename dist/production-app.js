@@ -728,8 +728,10 @@ function updateDrawing({keepForm=false}={}){
  const geometryErrors=mesh&&!mesh.valid?mesh.errors:[];
  const waiting=clientProfileWizard()&&!clientProfileSelected&&tool!=='draw';
  $('#drawing-title').textContent=waiting?'Aperçu de la moulure':authoring?'Modèle · '+(draft.name||actual.name):draft.name||actual.name;
- const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=canDrawProfile()||view==='volume'||(!client&&kind==='profile')?'none':'';$('#trace-readout').hidden=!canDrawProfile();
- stage.innerHTML=waiting?'<div class="drawing-hint">Choisissez une moulure pour voir son profil ici.</div>':view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
+ const stage=$('#production-drawing');if(tool!=='draw'||view!=='face')closeMobileTrace();stage.dataset.tool=tool;stage.dataset.view=view;stage.dataset.kind=kind;stage.style.touchAction=tool==='panel-trace'||canDrawProfile()||view==='volume'||(!client&&kind==='profile')?'none':'';$('#trace-readout').hidden=!canDrawProfile();
+ stage.innerHTML=tool==='panel-trace'&&kind==='panel'?window.MIRPanelSketch.svg(panelSketchPoints,panelSketchHover):
+  waiting?'<div class="drawing-hint">Choisissez une moulure pour voir son profil ici.</div>':
+  view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
  const dimensions=$('#profile-dimension-list');
  const sides=tool==='draw'?drawPoints.slice(1).map((point,index)=>({
   label:String.fromCharCode(65+index),
@@ -1413,6 +1415,11 @@ function viewCursorPoint(event){
 }
 function beginPointDrag(event){
  const stage=$('#production-drawing');if(!stage.contains(event.target))return;
+ if(tool==='panel-trace'&&kind==='panel'&&event.isPrimary&&(event.button===0||event.pointerType==='touch')){
+  const pt=panelSketchHit(event);if(!pt)return;
+  drag={type:'panel-sketch',id:event.pointerId,start:pt,x:event.clientX,y:event.clientY,hadBefore:panelSketchPoints.length>0};
+  stage.setPointerCapture?.(event.pointerId);event.preventDefault();return;
+ }
  if(canDrawProfile()&&drawingCanvasHit(event)&&event.button===0&&event.isPrimary){
   suppressClick=false;
   const start=drawPoints.at(-1)||localPoint(event);
@@ -1442,6 +1449,12 @@ function beginPointDrag(event){
 }
 
 function movePoint(event){
+ if(drag?.type==='panel-sketch'){
+  if(event.pointerId!==drag.id)return;
+  const pt=panelSketchHit(event);if(!pt)return;
+  panelSketchHover=window.MIRPanelSketch.orthogonal(panelSketchPoints.at(-1),pt,event.shiftKey);
+  updateDrawing({keepForm:true});event.preventDefault();return;
+ }
  if(pointers.has(event.pointerId))pointers.set(event.pointerId,[event.clientX,event.clientY]);
  if(!drag)return;
  if(drag.type==='pan'){
@@ -1470,7 +1483,20 @@ function movePoint(event){
 }
 
 function endPoint(event){
- const tracked=pointers.delete(event.pointerId);const stage=$('#production-drawing');if(stage.hasPointerCapture?.(event.pointerId))stage.releasePointerCapture(event.pointerId);
+ const tracked=pointers.delete(event.pointerId);const stage=$('#production-drawing');
+ if(drag?.type==='panel-sketch'){
+  if(event.pointerId!==drag.id)return;
+  const previous=drag;const endpoint=panelSketchHit(event),moved=Math.hypot(event.clientX-previous.x,event.clientY-previous.y)>8;
+  if(stage.hasPointerCapture?.(event.pointerId))stage.releasePointerCapture(event.pointerId);
+  drag=null;panelSketchHover=null;suppressClick=true;
+  if(event.type==='pointerup'&&endpoint){
+   if(!previous.hadBefore&&moved)panelSketchPoints.push(previous.start);
+   const point=window.MIRPanelSketch.orthogonal(panelSketchPoints.at(-1),endpoint,event.shiftKey);
+   appendPanelSketchPoint(point);
+  }else updateDrawing();
+  return;
+ }
+ if(stage.hasPointerCapture?.(event.pointerId))stage.releasePointerCapture(event.pointerId);
  if(drag?.type==='pan'){
   if(event.pointerId!==drag.id)return;
   const moved=drag.moved;drag=null;stage.dataset.moving='false';suppressClick=moved;
