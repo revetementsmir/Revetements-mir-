@@ -1,0 +1,50 @@
+name: MIR — traçage des sections de mur (audit et tests)
+on:
+  push:
+    branches:
+      - moon/mir-panels-wall-tracing-20261107
+  pull_request:
+    branches: [main]
+    paths:
+      - 'dist/calepinage.html'
+      - 'dist/calepinage.css'
+      - 'dist/calepinage-app.js'
+      - 'dist/architectural-wall-input.js'
+      - 'dist/architectural-wall-geometry.js'
+      - 'dist/panel-layout-engine.js'
+      - 'tests/mir-wall-section-trace-browser.cjs'
+      - '.github/workflows/mir-wall-section-trace-pr.yml'
+permissions:
+  contents: read
+jobs:
+  wall-trace:
+    name: Éditeur mur / calepinage / mobile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax and geometry contracts
+        run: |
+          node --check dist/calepinage-app.js
+          node --check dist/architectural-wall-input.js
+          node --check dist/architectural-wall-geometry.js
+          node --check dist/panel-layout-engine.js
+          node --check tests/mir-wall-section-trace-browser.cjs
+          node - <<'NODE'
+          const a=require('./dist/architectural-wall-input.js');
+          const p=a.normalizeSketch([[10,15],[610,15],[610,360],[10,360]],120,96);
+          if(!p||p.length!==4||p[1][0]!==120||p[2][1]!==96)throw Error('Sketch measurements incorrect');
+          const wall=a.prepare({widthIn:120,heightIn:96,clearances:{left:0.1875,right:0.1875,top:0.125,bottom:0.125},shape:{type:'free',pointsIn:p}});
+          if(!wall.ok||Math.abs(wall.widthIn-119.625)>1e-7||Math.abs(wall.heightIn-95.75)>1e-7)
+            throw Error('Existing total allowances changed');
+          console.log('PASS original geometry and allowances');
+          NODE
+      - name: Real browser, desktop, iPad, phone
+        run: |
+          npm install --no-save playwright@1.58.2
+          node tests/mir-wall-section-trace-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-wall-trace-browser-captures
+          path: artifacts/mir-wall-trace-*.png
+          if-no-files-found: ignore

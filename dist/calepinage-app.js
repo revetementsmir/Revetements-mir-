@@ -20,7 +20,7 @@
   const svgText = (x,y,t,attrs='') => '<text x="'+x+'" y="'+y+'" '+attrs+'>'+esc(t)+'</text>';
   let workspace = {schema:'mir-panel-layout-workspace-1', zones:[], activeId:null}, layout, selected=null, history=[], view='zone', tool='select', zoom=1, drag=null, calibrationPoints=[], calibrationValue=null, transform=null;
   let pdfSession=null, pdfId=null, pdfSequence=0, dbPromise, saveTimer, saveChain=Promise.resolve(), saveSequence=0, toastTimer, exporting=false, ready=false;
-  let outlineDraft=[], outlineCursor=null, outlineOrthogonal=false, outlineRightAngle=false, wallYaw=-24, wallPitch=12;
+  let outlineDraft=[], outlineCursor=null, outlineOrthogonal=false, outlineRightAngle=false, wallYaw=-24, wallPitch=12, selectedWallEdge=null;
   const DB='mir-panel-layout-v1';
   function database() {
     if (!window.indexedDB) return Promise.reject(new Error('Le stockage local est indisponible. Sauvegardez votre dossier JSON.'));
@@ -46,8 +46,18 @@
     $('#save-state').textContent='Enregistrement…';
     saveTimer=setTimeout(()=>{const data=clone(workspace);saveChain=saveChain.catch(()=>{}).then(()=>dbRequest('drafts','readwrite','workspace',data)).then(()=>{if(seq===saveSequence)$('#save-state').textContent='Enregistré sur cet appareil';}).catch(()=>{if(seq===saveSequence)$('#save-state').textContent='Sauvegarde indisponible · exportez le JSON';});},180);
   }
+
+  // A section may be sketched before its survey dimensions are known.
+  // Only dimension entry turns relative sketch proportions into authoritative inches.
+  function materializeSketch(z) {
+    const ratios=z.shape?.sketchRatios,d=dimensions(z);
+    if(!Array.isArray(ratios)||!(d.width>0&&d.height>0))return false;
+    if(ratios.length<3||ratios.length>64||ratios.some(p=>!Array.isArray(p)||p.length!==2||p.some(n=>!finite(n)||n<0||n>1)))return false;
+    z.shape={type:'free',pointsIn:ratios.map(p=>[p[0]*d.width,p[1]*d.height])};
+    return true;
+  }
   function commit(fn,options={}) {
-    snapshot();fn(zone());zone().revision++;if(options.invalidate!==false)zone().confirmed=false;
+    snapshot();fn(zone());materializeSketch(zone());zone().revision++;if(options.invalidate!==false)zone().confirmed=false;
     if(options.clearAxes){for(const axis of options.clearAxes===true?['x','y']:options.clearAxes)delete zone().rules[axis+'AxesIn'];}
     scheduleSave();render();
   }
@@ -56,7 +66,7 @@
   function dimensions(z=zone()) { const g=gaps(z),width=parse(z.values.width),height=parse(z.values.height);return {width,height,g,usableWidth:finite(width)&&finite(g.left)&&finite(g.right)?width-g.left-g.right:null,usableHeight:finite(height)&&finite(g.top)&&finite(g.bottom)?height-g.top-g.bottom:null}; }
   function wallGeometry(z=zone()) {
     const d=dimensions(z),s=z.shape||{type:'rectangle'};
-    if(A)return A.prepare({widthIn:d.width,heightIn:d.height,clearances:d.g,shape:{type:s.type||'rectangle',leftHeightIn:parse(s.leftHeight),rightHeightIn:parse(s.rightHeight),peakXIn:parse(s.peakX),pointsIn:s.pointsIn}});
+    if(A)return A.prepare({widthIn:d.width,heightIn:d.height,clearances:d.g,shape:{type:s.type||'rectangle',leftHeightIn:parse(s.leftHeight),rightHeightIn:parse(s.rightHeight),peakXIn:parse(s.peakX),pointsIn:Array.isArray(s.pointsIn)?s.pointsIn:Array.isArray(s.sketchRatios)&&d.width>0&&d.height>0?s.sketchRatios.map(p=>[p[0]*d.width,p[1]*d.height]):undefined}});
     // Preserve legacy rectangular drafts when the optional outline component
     // is unavailable; never silently replace an authored contour by a rectangle.
     if(s.type&&s.type!=='rectangle')return {ok:false,errors:[{message:'Le module de contour n’a pas chargé. Rechargez la page.'}]};
@@ -64,6 +74,8 @@
   }
   function measuredPoints(z=zone()) {
     if(z.shape?.type==='free'&&Array.isArray(z.shape.pointsIn))return z.shape.pointsIn;
+    const ratios=z.shape?.sketchRatios,d=dimensions(z);
+    if(Array.isArray(ratios)&&d.width>0&&d.height>0)return ratios.map(p=>[p[0]*d.width,p[1]*d.height]);
     return wallGeometry(z).measuredPointsIn||[];
   }
   function compute(z=zone()) {
@@ -135,8 +147,22 @@
     const points=measuredPoints(),old=Number($('#wall-vertex').value)||0,index=Math.min(old,Math.max(0,points.length-1));
     $('#wall-vertex').innerHTML=points.map((p,i)=>'<option value="'+i+'">Sommet '+(i+1)+'</option>').join('');$('#wall-vertex').value=String(index);
     $('#vertex-x').value=points[index]?val(points[index][0]):'';$('#vertex-height').value=points[index]?val(d.height-points[index][1]):'';
-    $('#apply-vertex').disabled=!points.length;
-    $('#wall-coordinate-list').innerHTML=points.map((p,i)=>'<div><strong>S'+(i+1)+'</strong><span>X '+inch(p[0])+' · H '+inch(d.height-p[1])+'</span></div>').join('');
+    const waiting=Array.isArray(s.sketchRatios)&&!(d.width>0&&d.height>0);
+    $('#apply-vertex').disabled=!points.length||waiting;
+    $('#wall-coordinate-list').innerHTML=waiting?
+      '<p class="hint mir-wall-unmeasured">La forme est enregistrée sans mesure inventée. Entrez largeur et hauteur réelles avant de régler les sommets.</p>':
+      points.map((p,i)=>'<div><strong>'+wallLetter(i)+'</strong><span>X '+inch(p[0])+' · H '+inch(d.height-p[1])+'</span></div>').join('');
+
+    const edgeDetails=$('#wall-edge-details'),edge=Number.isInteger(selectedWallEdge)&&selectedWallEdge>=0&&selectedWallEdge<points.length?selectedWallEdge:null;
+    const editable=type==='free'&&edge!==null&&points.length>=3&&d.width>0&&d.height>0;
+    edgeDetails.hidden=!editable;
+    if(editable){
+      const measure=polygonMeasures(points)[edge],next=(edge+1)%points.length;
+      $('#wall-edge-name').textContent='Côté '+wallLetter(edge)+'–'+wallLetter(next)+' · angle intérieur au sommet '+wallLetter(edge);
+      $('#wall-edge-length').value=val(measure.length);
+      $('#wall-edge-angle').value=number(measure.angle);
+      $('#wall-edge-error').hidden=true;$('#wall-edge-error').textContent='';
+    }
   }
   function renderSummary() {
     const z=zone(),valid=layout.ok,d=dimensions(z),errors=layout.errors||[];
@@ -152,7 +178,7 @@
     $('#piece-table').innerHTML=valid?layout.pieces.map(p=>'<tr class="'+(selected?.type==='piece'&&selected.id===p.id?'selected':'')+'"><td><button data-table-piece="'+p.id+'">'+p.id+'</button></td><td>Rangée '+(p.row+1)+' · colonne '+(p.col+1)+'</td><td>'+inch(p.widthIn)+'</td><td>'+inch(p.heightIn)+'</td><td>'+inch(layout.lipIn)+'</td><td>1</td></tr>').join(''):'<tr><td colspan="6">Entrez les dimensions et la largeur du lip pour calculer les panneaux.</td></tr>';
     $('#export-site').disabled=!valid||exporting;$('#send-production').disabled=!valid||exporting;$('#undo').disabled=!history.length;
     const contour=valid?(layout.config.contourIn||[[0,0],[layout.widthIn,0],[layout.widthIn,layout.heightIn],[0,layout.heightIn]]):[];
-    $('#wall-edge-list').innerHTML=valid?'<p class="hint">Contour utile après lousse · '+inch(layout.widthIn)+' × '+inch(layout.heightIn)+'. Angles mesurés dans le plan.</p><div class="table-wrap"><table><thead><tr><th>Côté du contour</th><th>Longueur réelle</th><th>Angle intérieur au départ</th></tr></thead><tbody>'+polygonMeasures(contour).map((e,i)=>'<tr><td>C'+(i+1)+'</td><td>'+inch(e.length)+'</td><td>'+number(e.angle)+'°</td></tr>').join('')+'</tbody></table></div>':'Entrez des mesures valides pour calculer le contour.';
+    $('#wall-edge-list').innerHTML=valid?'<p class="hint">Contour utile après lousse · '+inch(layout.widthIn)+' × '+inch(layout.heightIn)+'. Angles mesurés dans le plan.</p><div class="table-wrap"><table><thead><tr><th>Côté du contour</th><th>Longueur réelle</th><th>Angle intérieur au départ</th></tr></thead><tbody>'+polygonMeasures(contour).map((e,i)=>'<tr><td><button type="button" data-wall-edge="'+i+'" aria-label="Modifier le sommet du côté '+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'">'+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'</button></td><td>'+inch(e.length)+'</td><td>'+number(e.angle)+'°</td></tr>').join('')+'</tbody></table></div>':'Entrez des mesures valides pour calculer le contour.';
   }
   function renderInspector() {
     const valid=layout.ok,p=valid&&selected?.type==='piece'?layout.pieces.find(p=>p.id===selected.id):null,j=valid&&selected?.type==='joint'?selected:null;
@@ -166,6 +192,33 @@
   function polygonMeasures(points) {
     const area2=points.reduce((s,p,i)=>{const q=points[(i+1)%points.length];return s+p[0]*q[1]-q[0]*p[1];},0),winding=Math.sign(area2)||1;
     return points.map((p,i)=>{const prev=points[(i+points.length-1)%points.length],q=points[(i+1)%points.length],a=[p[0]-prev[0],p[1]-prev[1]],b=[q[0]-p[0],q[1]-p[1]],turn=Math.atan2(a[0]*b[1]-a[1]*b[0],a[0]*b[0]+a[1]*b[1]);return {length:Math.hypot(...b),angle:180-winding*turn*180/Math.PI,inclination:Math.atan2(-b[1],b[0])*180/Math.PI};});
+  }
+
+  function wallLetter(i) {
+    let n=i+1,s='';do{n--;s=String.fromCharCode(65+n%26)+s;n=Math.floor(n/26);}while(n>0);return s;
+  }
+  function wallEdgeAnnotations(points,{closed=false,measured=false,span=1000}={}) {
+    if(!Array.isArray(points)||!points.length)return '';
+    const size=Math.max(1.7,Math.min(16,span/75)),end=closed?points.length:Math.max(0,points.length-1),
+      bends=closed&&points.length>=3?polygonMeasures(points):[];
+    let markup='<g class="mir-wall-edge-annotations">';
+    for(let i=0;i<end;i++){
+      const a=points[i],b=points[(i+1)%points.length],dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy);
+      if(!(len>1e-7))continue;
+      const name=wallLetter(i)+'–'+wallLetter((i+1)%points.length),label=name+(measured?' '+inch(len).replace(' po',''):'');
+      const x=(a[0]+b[0])/2-dy/len*size*1.65,y=(a[1]+b[1])/2+dx/len*size*1.65;
+      if(len>=size*3)markup+=svgText(x,y,label,
+        'data-wall-edge="'+i+'" tabindex="0" role="button" aria-label="'+esc(name+(measured?' '+inch(len):' non coté'))+'" text-anchor="middle" font-size="'+size+'" font-weight="700" class="mir-wall-edge-label"');
+    }
+    const r=size*.34;
+    for(let i=0;i<points.length;i++){
+      const p=points[i];
+      markup+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+r+'" fill="#348511" stroke="#fff" stroke-width="'+r*.3+'"/>';
+      markup+=svgText(p[0]+r*2,p[1]-r*1.7,wallLetter(i),'font-size="'+size+'" font-weight="700" class="mir-wall-vertex-label"');
+      if(measured&&bends.length&&Number.isFinite(bends[i].angle))
+        markup+=svgText(p[0]+r*2,p[1]+r*3.3,number(bends[i].angle)+'°','font-size="'+size*.78+'" class="mir-wall-angle-label"');
+    }
+    return markup+'</g>';
   }
   function renderPieceMeasures(p) {
     $('#piece-measurements').hidden=!p;if(!p)return;
@@ -210,6 +263,7 @@
   }
   function draw() {
     const z=zone(),s=z.source,d=dimensions(),svg=$('#layout-svg');
+    document.body.classList.toggle('mir-wall-tracing',tool==='outline');
     let out='',baseWidth,baseHeight,originX=0,originY=0;
     const planView=view==='plan'&&s,valid=layout.ok;
     $('#wall-orbit-controls').hidden=view!=='3d';$('#drawing-stage').dataset.view=view;
@@ -221,11 +275,24 @@
       baseWidth=s.widthPx;baseHeight=s.heightPx;out='<image href="'+s.imageDataUrl+'" x="0" y="0" width="'+baseWidth+'" height="'+baseHeight+'"/>';transform=null;
       if(s.box&&d.width>0&&d.height>0){const b=s.box,bx=b[0]*baseWidth,by=b[1]*baseHeight,bw=b[2]*baseWidth,bh=b[3]*baseHeight;transform={x:bx,y:by,sx:bw/d.width,sy:bh/d.height};if(valid)out+='<g opacity=".88" transform="translate('+bx+' '+by+') scale('+(bw/d.width)+' '+(bh/d.height)+')">'+panelDrawing()+'</g>';out+='<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" fill="none" stroke="#537340" stroke-width="2" vector-effect="non-scaling-stroke"/>';}
       else if(s.box){const b=s.box;out+='<rect x="'+b[0]*baseWidth+'" y="'+b[1]*baseHeight+'" width="'+b[2]*baseWidth+'" height="'+b[3]*baseHeight+'" fill="#bbcbac55" stroke="#537340" stroke-width="2"/>';}
+      if(tool!=='outline'&&z.shape?.type==='free'&&s.box){
+        const b=s.box,bx=b[0]*baseWidth,by=b[1]*baseHeight,bw=b[2]*baseWidth,bh=b[3]*baseHeight;
+        const ratios=Array.isArray(z.shape.sketchRatios)?z.shape.sketchRatios:null;
+        const exact=d.width>0&&d.height>0?measuredPoints(z):null;
+        const points=exact?.length>=3?exact.map(p=>[bx+p[0]*bw/d.width,by+p[1]*bh/d.height]):
+          ratios?.length>=3?ratios.map(p=>[bx+p[0]*bw,by+p[1]*bh]):[];
+        if(points.length>=3){
+          out+='<polygon points="'+points.map(p=>p.join(',')).join(' ')+'" fill="#e0edce" fill-opacity=".25" stroke="#348511" stroke-width="2.5" vector-effect="non-scaling-stroke"/>';
+          out+=wallEdgeAnnotations(points,{closed:true,measured:!!exact?.length,span:baseWidth});
+        }
+      }
     } else if(d.width>0&&d.height>0) {
       const margin=Math.max(d.width,d.height)*.12;originX=-margin;originY=-margin;baseWidth=d.width+2*margin;baseHeight=d.height+2*margin;transform={x:0,y:0,sx:1,sy:1};
       const wall=wallGeometry(),wallPoints=wall.measuredPointsIn;
       out=wallPoints&&wall.type!=='rectangle'?'<polygon points="'+wallPoints.map(q=>q.join(',')).join(' ')+'" fill="#e8e9df" stroke="#879977" vector-effect="non-scaling-stroke"/>':'<rect x="0" y="0" width="'+d.width+'" height="'+d.height+'" fill="#e8e9df" stroke="#879977" vector-effect="non-scaling-stroke"/>';
       if(valid)out+=panelDrawing();
+      if(z.shape?.type==='free'&&tool!=='outline'&&Array.isArray(wall.measuredPointsIn))
+        out+=wallEdgeAnnotations(wall.measuredPointsIn,{closed:true,measured:true,span:baseWidth});
       const fs=Math.max(d.width,d.height)*.026,dim=margin*.52;
       out+=svgLine(0,-dim,d.width,-dim,'stroke="#677d5b" vector-effect="non-scaling-stroke"');
       out+=svgLine(0,-dim-fs*.45,0,-dim+fs*.45,'stroke="#677d5b" vector-effect="non-scaling-stroke"')+svgLine(d.width,-dim-fs*.45,d.width,-dim+fs*.45,'stroke="#677d5b" vector-effect="non-scaling-stroke"');
@@ -235,25 +302,43 @@
       if(valid)out+=svgText(d.width/2,d.height+dim+fs*.3,inch(layout.widthIn)+' × '+inch(layout.heightIn)+' utiles après lousse','font-size="'+fs*.75+'" text-anchor="middle" fill="#395335"');
       if(!valid)out+=svgText(d.width/2,d.height/2,'Renseignez le lip et la répartition','font-size="'+fs+'" text-anchor="middle" fill="#687d5e"');
     } else {
-      baseWidth=1000;baseHeight=680;transform=null;
-      out='<rect x="160" y="100" width="680" height="460" rx="3" fill="#eff3e8" stroke="#afbea0" stroke-dasharray="8 7"/>'+svgText(500,306,z.drawn?'Zone tracée':'Votre zone commence ici','font-size="27" text-anchor="middle" fill="#49613d"')+svgText(500,345,'Entrez la largeur, la hauteur et le lip.','font-size="17" text-anchor="middle" fill="#748769"');
+      // Enlarged trace viewport; still no fabricated chantier dimensions.
+      originX=65;originY=45;baseWidth=870;baseHeight=590;transform=null;
+      const waiting=Array.isArray(z.shape?.sketchRatios)&&z.shape.sketchRatios.length>=3;
+      const activeDraft=tool==='outline'&&outlineDraft.length>0;
+      out='<rect x="160" y="100" width="680" height="460" rx="3" fill="#eff3e8" stroke="#afbea0" stroke-dasharray="8 7"/>';
+      if(waiting&&!activeDraft){
+        const pts=z.shape.sketchRatios.map(p=>[160+p[0]*680,100+p[1]*460]);
+        out+='<polygon data-wall-sketch="pending" points="'+pts.map(p=>p.join(',')).join(' ')+'" fill="#e0edce" fill-opacity=".7" stroke="#348511" stroke-width="3" vector-effect="non-scaling-stroke"/>';
+        out+=wallEdgeAnnotations(pts,{closed:true,span:baseWidth});
+        out+=svgText(500,605,'Contour sauvegardé · entrez les dimensions chantier exactes','font-size="16" text-anchor="middle" fill="#395335"');
+      }else if(!activeDraft){
+        out+=svgText(500,306,z.drawn?'Zone tracée':'Tracez une section de mur ici','font-size="27" text-anchor="middle" fill="#49613d"');
+        out+=svgText(500,345,'Mesurez et cotez après le tracé.','font-size="17" text-anchor="middle" fill="#748769"');
+      }
     }
     if(drag?.type==='draw'){const b=drag.box;out+='<rect x="'+b[0]+'" y="'+b[1]+'" width="'+b[2]+'" height="'+b[3]+'" fill="#adc79855" stroke="#456637" stroke-width="2" vector-effect="non-scaling-stroke"/>';}
     if(tool==='calibrate')calibrationPoints.forEach(p=>{out+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+Math.max(baseWidth/150,3)+'" fill="#bc7b35" stroke="white" stroke-width="2"/>';});
     if(tool==='outline'&&outlineDraft.length&&outlineCursor){
-      const start=outlineDraft.at(-1), end=outlinePoint(outlineCursor,outlineOrthogonal||outlineRightAngle);
+      const start=drag?.type==='outline'&&drag.added?outlineDraft.at(-2)||outlineDraft.at(-1):outlineDraft.at(-1),
+        end=outlinePoint(outlineCursor,outlineOrthogonal||outlineRightAngle,start);
       out+=svgLine(start[0],start[1],end[0],end[1],'data-outline-preview stroke="#ba7136" stroke-width="2" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" pointer-events="none"');
     }
-    if(tool==='outline'&&outlineDraft.length){const r=baseWidth/150;out+='<polyline points="'+outlineDraft.map(p=>p.join(',')).join(' ')+'" fill="#9eb98733" stroke="#ba7136" stroke-width="2" vector-effect="non-scaling-stroke"/>';outlineDraft.forEach((p,i)=>{out+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+r+'" fill="'+(i?'#ba7136':'#3f6536')+'" stroke="white" stroke-width="1.3" vector-effect="non-scaling-stroke"/>'+svgText(p[0]+r*1.4,p[1]-r*1.4,String(i+1),'font-size="'+r*2+'" fill="#7b4b28"');});}
+    if(tool==='outline'&&outlineDraft.length){
+      const r=baseWidth/170;
+      out+='<polyline points="'+outlineDraft.map(p=>p.join(',')).join(' ')+'" fill="none" stroke="#ba7136" stroke-width="2.5" vector-effect="non-scaling-stroke"/>';
+      out+=wallEdgeAnnotations(outlineDraft,{closed:false,span:baseWidth});
+      if(outlineDraft.length===1)out+='<circle cx="'+outlineDraft[0][0]+'" cy="'+outlineDraft[0][1]+'" r="'+r+'" fill="#348511" stroke="white" stroke-width="1.3"/>';
+    }
     const vw=baseWidth/zoom,vh=baseHeight/zoom;
     svg.setAttribute('viewBox',[originX+(baseWidth-vw)/2,originY+(baseHeight-vh)/2,vw,vh].join(' '));svg.innerHTML=out;
     svg.setAttribute('aria-label',valid?z.name+', '+layout.pieces.length+' panneaux, '+inch(layout.widthIn)+' par '+inch(layout.heightIn):'Zone à définir');
     $('#drawing-stage').dataset.tool=tool;$('#zoom-value').textContent=Math.round(zoom*100)+' %';
     $('#view-zone').setAttribute('aria-pressed',String(view==='zone'));$('#view-plan').setAttribute('aria-pressed',String(view==='plan'));$('#view-3d').setAttribute('aria-pressed',String(view==='3d'));
     $('#select-tool').setAttribute('aria-pressed',String(tool==='select'));$('#draw-zone').setAttribute('aria-pressed',String(tool==='draw'));
-    $('#draw-outline').setAttribute('aria-pressed',String(tool==='outline'));$('#outline-actions').hidden=tool!=='outline';$('#outline-close').disabled=outlineDraft.length<3;$('#outline-back').disabled=!outlineDraft.length;$('#outline-progress').textContent=outlineDraft.length+' sommet(s) · '+(outlineDraft.length<3?'placez au moins 3 sommets.':'fermez le contour pour calculer.');
+    $('#draw-outline').setAttribute('aria-pressed',String(tool==='outline'));$('#outline-actions').hidden=tool!=='outline';$('#outline-close').disabled=outlineDraft.length<3;$('#outline-back').disabled=!outlineDraft.length;$('#outline-progress').textContent=outlineDraft.length+' sommet(s) · '+(outlineDraft.length<3?'cliquez ou glissez pour tracer.':'tapez le premier point ou Fermer le contour.');
     $('#outline-right-angle').setAttribute('aria-pressed',String(outlineRightAngle));
-    $('#drawing-hint').textContent=tool==='outline'?'Placez chaque sommet. Activez Angle droit à 90° ou maintenez Maj (Shift).':view==='3d'?'Glissez pour tourner. Cliquez une pièce pour lire ses cotes.':tool==='draw'?'Glissez entre deux coins de la zone.':tool==='calibrate'?'Cliquez les deux extrémités de votre cote.':'Cliquez une pièce ou déplacez un joint.';
+    $('#drawing-hint').textContent=tool==='outline'?'Cliquez ou glissez comme une moulure. Maj = 90°. Fermez puis cotez.':view==='3d'?'Glissez pour tourner. Cliquez une pièce pour lire ses cotes.':tool==='draw'?'Glissez entre deux coins de la zone.':tool==='calibrate'?'Cliquez les deux extrémités de votre cote.':'Cliquez une pièce ou déplacez un joint.';
   }
   function render() {
     layout=compute();if(layout.ok){zone().rules=clone(layout.config);if((!selected||selected.type==='piece'&&!layout.pieces.some(p=>p.id===selected.id))&&layout.pieces.length)selected={type:'piece',id:layout.pieces[0].id};}
@@ -266,8 +351,7 @@
     if(t.dataset.piece)return {type:'piece',id:t.dataset.piece};
     return {type:'joint',axis:t.hasAttribute('data-joint-x')?'x':'y',index:Number(t.getAttribute('data-joint-x')??t.getAttribute('data-joint-y'))};
   }
-  function outlinePoint(point, orthogonal) {
-    const last=outlineDraft.at(-1);
+  function outlinePoint(point, orthogonal, last=outlineDraft.at(-1)) {
     if(!orthogonal||!last)return point;
     const [x,y]=point, [lastX,lastY]=last, [firstX,firstY]=outlineDraft[0];
     const matrix=$('#layout-svg').getScreenCTM();
@@ -279,21 +363,79 @@
     const aligned=alignFirst&&Math.abs(y-firstY)*Math.abs(matrix?.d||1)<=12;
     return [lastX,aligned?firstY:y];
   }
+
+  function nearOutlinePoint(a,b,tolerance=13) {
+    if(!a||!b)return false;
+    const m=$('#layout-svg').getScreenCTM();
+    const sx=Math.hypot(m?.a||1,m?.b||0),sy=Math.hypot(m?.c||0,m?.d||1);
+    return Math.hypot((a[0]-b[0])*sx,(a[1]-b[1])*sy)<=tolerance;
+  }
+
+  function selectWallEdge(index) {
+    const pts=measuredPoints(),d=dimensions();
+    if(!Number.isInteger(index)||index<0||index>=pts.length)return;
+    if(!(d.width>0&&d.height>0))return toast('Entrez les cotes chantier avant de modifier les côtés.');
+    const endpoint=(index+1)%pts.length;
+    selectedWallEdge=index;
+    const coords=$('#wall-coordinate-details');if(coords)coords.open=true;
+    $('#wall-vertex').value=String(endpoint);$('#wall-vertex').dispatchEvent(new Event('change'));
+    renderWallControls();
+    const editor=$('#wall-edge-details');editor.hidden=false;editor.open=true;
+    $('#wall-edge-length').focus({preventScroll:false});
+    toast('Côté '+wallLetter(index)+'–'+wallLetter(endpoint)+' : modifiez longueur et angle, puis Appliquer.');
+  }
+  function applyWallEdge(){
+    const points=clone(measuredPoints()),i=selectedWallEdge,d=dimensions();
+    if(!Number.isInteger(i)||i<0||i>=points.length||!(d.width>0&&d.height>0))return;
+    const length=parse($('#wall-edge-length').value),angle=Number(String($('#wall-edge-angle').value).trim().replace(',','.'));
+    const error=$('#wall-edge-error'),invalid=message=>{error.textContent=message;error.hidden=false;toast(message);return false;};
+    if(!(length>0)||!Number.isFinite(length)||length>100000)return invalid('Entrez une longueur positive en pouces, ex. 32 1/2.');
+    if(!Number.isFinite(angle)||angle<=0||angle>=360)return invalid('Entrez un angle intérieur supérieur à 0° et inférieur à 360°.');
+    const count=points.length,prev=points[(i+count-1)%count],start=points[i],
+      previous=[start[0]-prev[0],start[1]-prev[1]];
+    if(Math.hypot(...previous)<=1e-7)return invalid('Le côté précédent a une longueur nulle. Vérifiez les sommets.');
+    const signedArea=points.reduce((sum,p,j)=>{const q=points[(j+1)%count];return sum+p[0]*q[1]-q[0]*p[1];},0);
+    if(Math.abs(signedArea)<=1e-7)return invalid('La surface du mur doit être positive.');
+    const heading=Math.atan2(previous[1],previous[0])+Math.sign(signedArea)*(180-angle)*Math.PI/180;
+    const next=(i+1)%count,proposed=points.map(p=>p.slice());
+    proposed[next]=[Number((start[0]+Math.cos(heading)*length).toFixed(8)),Number((start[1]+Math.sin(heading)*length).toFixed(8))];
+    const wall=A?.prepare({widthIn:d.width,heightIn:d.height,clearances:d.g,shape:{type:'free',pointsIn:proposed}});
+    if(!wall?.ok)return invalid((wall?.errors||[]).map(e=>e.message).join(' ')||'La cote brise les dimensions fixes du mur.');
+    const checked=E.build({widthIn:wall.widthIn,heightIn:wall.heightIn,lipIn:0,columns:1,rows:1,contourIn:wall.contourIn});
+    if(!checked?.ok)return invalid((checked?.errors||[]).map(e=>e.message).join(' ')||'Les nouveaux côtés se croisent.');
+    const candidate=clone(zone());candidate.shape={type:'free',pointsIn:proposed};
+    if(layout.ok){const rebuilt=compute(candidate);if(!rebuilt.ok)return invalid((rebuilt.errors||[]).map(e=>e.message).join(' ')||'Les panneaux verrouillés ne permettent pas cette cote.');}
+    commit(z=>{z.shape={type:'free',pointsIn:proposed};});
+    error.hidden=true;error.textContent='';$('#wall-edge-details').open=true;
+    toast('Côté '+wallLetter(i)+'–'+wallLetter(next)+' mis à jour. Les autres sommets restent fixes.');
+    return true;
+  }
   function onPointerDown(event) {
     if(event.button!==0)return;const p=svgPoint(event);if(!p)return;
     if(tool==='outline'){
       event.preventDefault();
-      const next=outlinePoint(p,event.shiftKey||outlineRightAngle), first=outlineDraft[0], last=outlineDraft.at(-1);
-      if(last&&Math.hypot(last[0]-next[0],last[1]-next[1])<1e-7)return;
-      if((event.shiftKey||outlineRightAngle)&&outlineDraft.length>=3&&next[0]===first[0]&&next[1]===first[1])return closeOutline();
-      if(outlineDraft.length>=64)return toast('Le contour accepte jusqu’à 64 sommets.');
-      outlineCursor=null;outlineDraft.push(next);draw();return;
+      const first=outlineDraft[0],last=outlineDraft.at(-1),hadBefore=outlineDraft.length>0;
+      if(outlineDraft.length>=3&&nearOutlinePoint(p,first))return closeOutline();
+      const onLast=last&&nearOutlinePoint(p,last,9);
+      if(outlineDraft.length>=64&&!onLast)return toast('Le contour accepte jusqu’à 64 sommets.');
+      let added=false;
+      if(!onLast){
+        const next=outlinePoint(p,event.shiftKey||outlineRightAngle);
+        if(!last||Math.hypot(last[0]-next[0],last[1]-next[1])>1e-7){
+          outlineDraft.push(next);added=true;
+        }
+      }
+      drag={type:'outline',pointerId:event.pointerId,x:event.clientX,y:event.clientY,added,hadBefore};
+      $('#drawing-stage').setPointerCapture(event.pointerId);
+      outlineCursor=null;draw();return;
     }
     if(view==='3d'){
       drag={type:'orbit',start:[event.clientX,event.clientY],yaw:wallYaw,pitch:wallPitch,moved:false,selection:picked(event)};$('#drawing-stage').setPointerCapture(event.pointerId);event.preventDefault();return;
     }
     if(tool==='calibrate'){calibrationPoints.push(p);if(calibrationPoints.length===2)finishCalibration();else draw();return;}
     if(tool==='draw'){drag={type:'draw',start:p,box:[p[0],p[1],0,0]};$('#drawing-stage').setPointerCapture(event.pointerId);event.preventDefault();draw();return;}
+    const wallSide=event.target.closest('[data-wall-edge]');
+    if(wallSide&&tool==='select'){event.preventDefault();selectWallEdge(Number(wallSide.dataset.wallEdge));return;}
     const selection=picked(event);if(!selection||!layout.ok)return;selected=selection;
     if(selection.type==='joint'&&transform){drag={type:'joint',axis:selection.axis,index:selection.index,original:clone(layout.config),baseWorkspace:clone(workspace),moved:false,lastResult:layout};$('#drawing-stage').setPointerCapture(event.pointerId);event.preventDefault();}
     renderInspector();renderSummary();draw();
@@ -313,6 +455,24 @@
   function finishPointer(event,cancelled=false) {
     if(!drag)return;const current=drag;drag=null;
     if($('#drawing-stage').hasPointerCapture(event.pointerId))$('#drawing-stage').releasePointerCapture(event.pointerId);
+    if(current.type==='outline'){
+      if(cancelled){if(current.added)outlineDraft.pop();outlineCursor=null;draw();return;}
+      const moved=Math.hypot(event.clientX-current.x,event.clientY-current.y)>9;
+      if(moved){
+        const p=svgPoint(event),anchor=current.added?outlineDraft.at(-2):outlineDraft.at(-1);
+        if(p){
+          const next=outlinePoint(p,event.shiftKey||outlineRightAngle,anchor);
+          if(!current.hadBefore&&current.added&&outlineDraft.length===1){
+            if(!nearOutlinePoint(next,outlineDraft[0],8))outlineDraft.push(next);
+          }else if(current.added&&outlineDraft.length){
+            if(anchor&&!nearOutlinePoint(next,anchor,7))outlineDraft[outlineDraft.length-1]=next;
+            else outlineDraft.pop();
+          }else if(outlineDraft.length<64&&(!anchor||!nearOutlinePoint(next,anchor,7)))
+            outlineDraft.push(next);
+        }
+      }
+      outlineCursor=null;draw();return;
+    }
     if(current.type==='orbit'){if(cancelled){wallYaw=current.yaw;wallPitch=current.pitch;}else if(!current.moved&&current.selection){selected=current.selection;renderInspector();renderSummary();}draw();return;}
     if(current.type==='joint'){
       if(cancelled){workspace=current.baseWorkspace;render();return;}
@@ -332,19 +492,26 @@
     commit(z=>{z.values.width=val(s.box[2]*s.widthPx*s.scaleInPerPx);z.values.height=val(s.box[3]*s.heightPx*s.scaleInPerPx);z.dimensionSource='scale';},{clearAxes:true});
   }
   function beginOutline() {
-    const d=dimensions();if(!(d.width>0&&d.height>0)){toast('Entrez d’abord la largeur et la hauteur totales prises au chantier. Elles resteront fixes pendant le tracé.');$('#zone-width').focus();return;}
+    // Same trace-first workflow as a folded profile; do not fabricate site dimensions.
     outlineDraft=[];outlineCursor=null;if(view==='3d')view='zone';tool='outline';zoom=1;selected=null;renderInspector();draw();
   }
   function closeOutline() {
     if(outlineDraft.length<3||!A)return;
-    const d=dimensions(),points=A.normalizeSketch(outlineDraft,d.width,d.height);if(!points)return toast('Le contour doit avoir une largeur et une hauteur.');
-    const candidate=clone(zone());candidate.shape={type:'free',pointsIn:points};
-    const net=A.prepare({widthIn:d.width,heightIn:d.height,clearances:d.g,shape:candidate.shape});
+    const d=dimensions(),hasMeasures=d.width>0&&d.height>0;
+    const ratios=A.normalizeSketch(outlineDraft,1,1);
+    if(!ratios)return toast('Tracez au moins 3 sommets qui forment une largeur et une hauteur.');
+    const points=hasMeasures?A.normalizeSketch(outlineDraft,d.width,d.height):ratios;
+    if(!points)return toast('Le contour ne peut pas être coté. Vérifiez ses sommets.');
+    const shape=hasMeasures?{type:'free',pointsIn:points}:{type:'free',sketchRatios:ratios};
+    // Validate even an unmeasured sketch as a unit shape; this is never a real 1-inch wall.
+    const net=A.prepare({widthIn:hasMeasures?d.width:1,heightIn:hasMeasures?d.height:1,
+      clearances:hasMeasures?d.g:{left:0,right:0,top:0,bottom:0},shape:{type:'free',pointsIn:points}});
     const check=net.ok?E.build({widthIn:net.widthIn,heightIn:net.heightIn,lipIn:0,columns:1,rows:1,contourIn:net.contourIn}):net;
     if(!check.ok){toast(check.errors.map(e=>e.message).join(' '));return;}
     const raw=outlineDraft.slice(),fromPDF=view==='plan'&&zone().source;tool='select';outlineDraft=[];
-    commit(z=>{z.shape=candidate.shape;if(fromPDF){const s=z.source,x=Math.max(0,Math.min(...raw.map(p=>p[0]))),y=Math.max(0,Math.min(...raw.map(p=>p[1]))),x2=Math.min(s.widthPx,Math.max(...raw.map(p=>p[0]))),y2=Math.min(s.heightPx,Math.max(...raw.map(p=>p[1])));if(x2>x&&y2>y)s.box=[x/s.widthPx,y/s.heightPx,(x2-x)/s.widthPx,(y2-y)/s.heightPx];}});
-    toast('Contour fermé. Les dimensions chantier sont conservées. Fixez les cotes exactes des sommets avant la fabrication.');
+    commit(z=>{z.shape=shape;if(fromPDF){const s=z.source,x=Math.max(0,Math.min(...raw.map(p=>p[0]))),y=Math.max(0,Math.min(...raw.map(p=>p[1]))),x2=Math.min(s.widthPx,Math.max(...raw.map(p=>p[0]))),y2=Math.min(s.heightPx,Math.max(...raw.map(p=>p[1])));if(x2>x&&y2>y)s.box=[x/s.widthPx,y/s.heightPx,(x2-x)/s.widthPx,(y2-y)/s.heightPx];}});
+    toast(hasMeasures?'Contour fermé. Les dimensions chantier sont conservées. Vérifiez ses sommets.':
+      'Section dessinée et sauvegardée sans cotes. Saisissez la largeur et la hauteur réelles pour calculer les panneaux.');
   }
   function applyVertex() {
     const points=clone(measuredPoints()),i=Number($('#wall-vertex').value),d=dimensions(),x=parse($('#vertex-x').value),height=parse($('#vertex-height').value);
@@ -435,6 +602,7 @@
     };
     $('#wall-shape').onchange=()=>{
       const type=$('#wall-shape').value,d=dimensions();
+      if(type==='free'){beginOutline();return;}
       if(type!=='rectangle'&&!(d.width>0&&d.height>0)){toast('Entrez d’abord la largeur et la hauteur totales du mur.');renderWallControls();return;}
       const current=measuredPoints();
       commit(z=>{z.shape=type==='free'?{type,pointsIn:current.length?clone(current):[[0,0],[d.width,0],[d.width,d.height],[0,d.height]]}:type==='rectangle'?{type}:{type,leftHeight:val(type==='slope'?d.height:d.height*.75),rightHeight:val(d.height*.75),peakX:val(d.width/2)};});
@@ -443,7 +611,9 @@
     for(const [key,id] of [['leftHeight','wall-left-height'],['rightHeight','wall-right-height'],['peakX','wall-peak-x']])$('#'+id).onchange=()=>commit(z=>{z.shape={...z.shape,[key]:$('#'+id).value};});
     $('#center-peak').onclick=()=>{const d=dimensions();if(d.width>0)commit(z=>{z.shape={...z.shape,peakX:val(d.width/2)};});};
     $('#wall-vertex').onchange=()=>{const p=measuredPoints()[Number($('#wall-vertex').value)],d=dimensions();if(p){$('#vertex-x').value=val(p[0]);$('#vertex-height').value=val(d.height-p[1]);}};
+    $('#wall-edge-list').addEventListener('click',e=>{const b=e.target.closest('[data-wall-edge]');if(b)selectWallEdge(Number(b.dataset.wallEdge));});
     $('#apply-vertex').onclick=applyVertex;
+    $('#apply-wall-edge').onclick=applyWallEdge;
     $('#outline-right-angle').onclick=()=>{outlineRightAngle=!outlineRightAngle;draw();};
     $('#start-free-outline').onclick=beginOutline;$('#draw-outline').onclick=beginOutline;
     $('#outline-close').onclick=closeOutline;$('#outline-back').onclick=()=>{outlineDraft.pop();draw();};$('#outline-cancel').onclick=()=>{outlineDraft=[];tool='select';draw();};
@@ -465,6 +635,12 @@
     for(const [key,id] of Object.entries(metadataControls))$('#'+id).addEventListener('change',()=>commit(z=>{z.meta[key]=$('#'+id).value;if(key==='material'){z.meta.thickness='';z.meta.color='';}else if(key==='thickness'&&z.meta.material==='acier')z.meta.color='';},{invalidate:false}));
     $('#zone-select').onchange=()=>{workspace.activeId=$('#zone-select').value;selected=null;view='zone';zoom=1;tool='select';outlineDraft=[];scheduleSave();render();restoreSession();};
     $('#new-zone').onclick=()=>{if(workspace.zones.length>=30)return toast('Ce dossier contient déjà 30 zones. Sauvegardez-le avant de poursuivre.');snapshot();const z=blankZone(workspace.zones.length+1);workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();};
+    $('#new-traced-section').onclick=()=>{
+      if(workspace.zones.length>=30)return toast('Le dossier accepte 30 sections. Enregistrez ou exportez avant de continuer.');
+      snapshot();const z=blankZone(workspace.zones.length+1);z.name='Section de mur '+(workspace.zones.length+1);
+      workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';
+      scheduleSave();render();restoreSession();beginOutline();
+    };
     $('#load-example').onclick=()=>{if(workspace.zones.length>=30)return toast('Ce dossier contient déjà 30 zones. Sauvegardez-le avant de poursuivre.');snapshot();const z=blankZone(workspace.zones.length+1);z.name='Exemple · entre deux fenêtres';Object.assign(z.values,{width:'108 1/2',height:'83 3/4',lip:'1',columns:4,rows:2});z.dimensionSource='example';workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();toast('Exemple chargé. Le lip de 1 po reste modifiable.');};
     $('#undo').onclick=()=>{if(!history.length)return;const current=new Map(workspace.zones.map(z=>[z.id,z])),restored=history.pop();for(const z of restored.zones){const before=current.get(z.id);if(!before)continue;const oldContent={...before,revision:0},restoredContent={...z,revision:0};z.revision=JSON.stringify(oldContent)===JSON.stringify(restoredContent)?before.revision:Math.max(before.revision,z.revision)+1;}workspace=restored;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();};
     $('#redistribute').onclick=()=>commit(z=>{delete z.rules.xAxesIn;delete z.rules.yAxesIn;});
@@ -486,7 +662,7 @@
     window.addEventListener('keydown',updateOutlineModifier);
     window.addEventListener('keyup',updateOutlineModifier);
     stage.addEventListener('keydown',e=>{if(tool!=='outline')return;if(e.key==='Escape'){e.preventDefault();outlineDraft=[];tool='select';draw();}else if(e.key==='Enter'){e.preventDefault();closeOutline();}else if(e.key==='Backspace'){e.preventDefault();outlineDraft.pop();draw();}});
-    stage.addEventListener('keydown',e=>{const s=picked(e);if(!s||!layout.ok)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();selected=s;renderInspector();draw();}else if(s.type==='joint'&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();selected=s;const pos=(s.axis==='x'?layout.xAxesIn:layout.yAxesIn)[s.index],sign=['ArrowLeft','ArrowUp'].includes(e.key)?-1:1;configFromResult(E.moveJoint(layout.config,s.axis,s.index,pos+sign*(e.shiftKey?1:1/16)));$('#layout-svg').querySelector('[data-joint-'+s.axis+'="'+s.index+'"]')?.focus();}});
+    stage.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)&&e.target.closest('[data-wall-edge]')){e.preventDefault();selectWallEdge(Number(e.target.closest('[data-wall-edge]').dataset.wallEdge));return;}const s=picked(e);if(!s||!layout.ok)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();selected=s;renderInspector();draw();}else if(s.type==='joint'&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();selected=s;const pos=(s.axis==='x'?layout.xAxesIn:layout.yAxesIn)[s.index],sign=['ArrowLeft','ArrowUp'].includes(e.key)?-1:1;configFromResult(E.moveJoint(layout.config,s.axis,s.index,pos+sign*(e.shiftKey?1:1/16)));$('#layout-svg').querySelector('[data-joint-'+s.axis+'="'+s.index+'"]')?.focus();}});
     $('#piece-table').addEventListener('click',e=>{const b=e.target.closest('[data-table-piece]');if(!b)return;selected={type:'piece',id:b.dataset.tablePiece};renderInspector();renderSummary();draw();$('#selection-title').scrollIntoView({behavior:'smooth',block:'center'});});
     $('#import-pdf').onclick=()=>$('#pdf-file').click();$('#pdf-file').onchange=e=>attachPDF(e.target.files[0]);
     $('#pdf-page').onchange=()=>showPDFPage(Number($('#pdf-page').value));
@@ -504,7 +680,7 @@
     if(!workspace.zones.length){const z=blankZone(1);workspace.zones.push(z);workspace.activeId=z.id;}
     if(!workspace.zones.some(z=>z.id===workspace.activeId))workspace.activeId=workspace.zones[0].id;
     let requested='';try{requested=decodeURIComponent(location.hash.slice(1));}catch{}if(workspace.zones.some(z=>z.id===requested))workspace.activeId=requested;
-    ready=true;bind();render();restoreSession();
+    ready=true;bind();render();$('#new-traced-section').disabled=false;restoreSession();
   }
   boot().catch(error=>{const el=$('#calculation-errors');el.hidden=false;el.textContent=error.message||'Le calculateur n’a pas pu démarrer.';});
 })();
