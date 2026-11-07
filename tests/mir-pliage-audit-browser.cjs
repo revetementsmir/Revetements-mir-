@@ -25,7 +25,7 @@ async function ready(){
    await page.goto(base+'/production.html?view=boutique',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version,{timeout:25000});
    const nav=page.locator('#mir-procurement-tabs > button');
-   assert.deepEqual(await nav.allTextContents(),['Créer','Boutique','Magasin employés','Bons de commande']);
+   assert.deepEqual(await nav.allTextContents(),['Créer','Mes pliages','Boutique','Magasin employés','Bons de commande']);
    await page.evaluate(()=>{
      const M=window.MIRProduction;
      const data={kind:'profile',template:'l',unit:'in',dimensions:{A:3,B:2},length:120,quantity:1,material:{type:'aluminium'},finish:{},coloredFace:{side:'left',segmentId:'A'}};
@@ -53,7 +53,7 @@ async function ready(){
    assert.equal(saved.channels.client,true);assert.equal(saved.channels.store,true);
    assert.equal(await page.locator('body').getAttribute('data-mir-tab'),'boutique');
    await page.locator('#mir-procurement-tabs [data-mir-tab="draw"]').click();
-   await page.locator('#mir-proc-shortcuts [data-mir-tab="models"]').click();
+   await page.locator('#mir-procurement-tabs [data-mir-tab="models"]').click();
    await page.waitForSelector('.model-library-card');
    assert.match(await page.locator('.model-library-card').first().textContent(),/Solin test MIR/);
    await page.goto(base+'/pliage.html',{waitUntil:'domcontentloaded'});
