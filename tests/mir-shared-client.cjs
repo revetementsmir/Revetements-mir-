@@ -1,4 +1,20 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');const {create}=require('../dist/mir-shared-client.js');
+test('Déconnexion dans un autre onglet : réponse tardive rejetée et brouillon conservé',async()=>{
+ let authChange,resolve,cleared=0;const entries=new Map();
+ const sdk={auth:{onAuthStateChange:fn=>{authChange=fn;return {};},getUser:async()=>({data:{user:{id:'first'}}})},rpc:()=>new Promise(r=>{resolve=r;})};
+ const client=create({sdk,onSessionInvalidated:()=>cleared++,storage:{getItem:k=>entries.get(k)||null,setItem:(k,v)=>entries.set(k,v),removeItem:k=>entries.delete(k)}});
+ const sending=client.submit('org',{id:'model',revision:1},{quantity:1});
+ while(!resolve)await new Promise(r=>setImmediate(r));
+ authChange('SIGNED_OUT',null);resolve({data:'committed-order'});
+ await assert.rejects(sending,/Session modifiée/);assert.equal(cleared,1);assert.equal(entries.size,1);
+});
+test('Changement d’identité pendant une lecture : aucune donnée de l’ancien compte renvoyée',async()=>{
+ let authChange,resolve,cleared=0;
+ const sdk={auth:{onAuthStateChange:fn=>{authChange=fn;return {};},getUser:async()=>({data:{user:{id:'first'}}})},rpc:()=>new Promise(r=>{resolve=r;})};
+ const client=create({sdk,storage:{},onSessionInvalidated:()=>cleared++});const reading=client.snapshot('org');
+ while(!resolve)await new Promise(r=>setImmediate(r));authChange('SIGNED_IN',{user:{id:'second'}});resolve({data:{private:'old'}});
+ await assert.rejects(reading,/Session modifiée/);assert.equal(cleared,1);
+});
 test('Coupure après commit : même référence conservée, pas de doublon',async()=>{
  const entries=new Map(),calls=[];let fail=true;
  const sdk={auth:{getUser:async()=>({data:{user:{id:'client'}}})},rpc:async(name,p)=>{calls.push(p);if(fail)throw Error('network');return {data:'order-id'};}};

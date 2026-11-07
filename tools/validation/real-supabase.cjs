@@ -6,6 +6,13 @@ const {spawnSync}=require('node:child_process'),{randomUUID}=require('node:crypt
 const {configuration}=require('./config.cjs');
 const cases=['01-authentication','02-permissions-organizations','03-create-model','04-publish','05-independent-sessions','06-submit-requests','07-admin-retrieval','08-price-history','09-network-reconnection','10-existing-data-preservation','11-hosted-sql-audit'];
 async function main(){
+ if(process.argv.includes('--read-only')){
+  const c=configuration();if(!['admin','employee','client'].every(role=>c.accounts[role]))throw Error('Read-only accounts required');
+  const run=spawnSync('python3',[path.join(__dirname,'auth-read-only.py')],{input:JSON.stringify({publicConfig:c.publicConfig,accounts:c.accounts}),encoding:'utf8',timeout:180000,maxBuffer:2*1024*1024});
+  if(run.status!==0)throw Error('Read-only verification unavailable');const report=JSON.parse(run.stdout);report.observedAt=new Date().toISOString();
+  const output=process.env.MIR_TEST_REPORT||path.resolve(__dirname,'../../artifacts/mir-auth-read-only.json');fs.mkdirSync(path.dirname(output),{recursive:true});fs.writeFileSync(output,JSON.stringify(report,null,2),{mode:0o600});
+  for(const row of report.results)console.log(row.status+' real read-only '+row.role);process.exitCode=report.results.some(r=>r.status!=='PASS')?1:0;return;
+ }
  const c=configuration(),report={schema:'mir-real-validation-1',startedAt:new Date().toISOString(),commit:spawnSync('git',['rev-parse','HEAD'],{cwd:c.root,encoding:'utf8'}).stdout.trim(),mode:'real-service-only',results:cases.map(name=>({name,status:'BLOCKED',detail:'Not executed'}))};
  const result=(name,status,detail)=>{Object.assign(report.results.find(r=>r.name===name),{status,detail});console.log(status+' '+name+': '+detail);};
  const output=process.env.MIR_TEST_REPORT||path.join(c.root,'artifacts/mission-4-real.json');
@@ -28,15 +35,34 @@ except Exception:print(json.dumps({'reachable':False,'reason':'Network/proxy con
  const ok=async(p,name,args)=>{const r=await rpc(p,name,args);if(r.error)throw Error(name+': '+r.error.code+' '+r.error.message);return r.data;};
  const denied=async(p,name,args)=>{const r=await rpc(p,name,args);assert.equal(r.error?.code,'42501','Expected a permission refusal, not a missing RPC or network failure');};
  const snapshot=p=>ok(p,'mir_shared_snapshot',{org:c.org});
+ const forward=async request=>{
+  const body=request.postDataBuffer();
+  const response=spawnSync('python3',[path.join(__dirname,'https-relay.py')],{input:JSON.stringify({url:request.url(),method:request.method(),headers:await request.allHeaders(),body:body?.toString('base64')}),encoding:'utf8',timeout:30000,maxBuffer:30*1024*1024});
+  let data;try{data=JSON.parse(response.stdout);}catch{}
+  if(response.status!==0||!data||data.transportError)throw Error('Verified HTTPS transport failed');
+  const headers={};for(const [key,value] of Object.entries(data.headers))if(!['content-length','transfer-encoding','connection'].includes(key.toLowerCase()))headers[key]=value;
+  return {status:data.status,headers,body:Buffer.from(data.body,'base64')};
+ };
  try{
-  server=http.createServer((req,res)=>{const target=path.resolve(c.root,'dist','.'+new URL(req.url,'http://localhost').pathname);if(!target.startsWith(path.join(c.root,'dist')+path.sep)||!fs.existsSync(target)||!fs.statSync(target).isFile()){res.statusCode=404;res.end();return;}res.setHeader('content-type',({'.js':'application/javascript','.html':'text/html','.css':'text/css'})[path.extname(target)]||'application/octet-stream');fs.createReadStream(target).pipe(res);});
+  server=http.createServer((req,res)=>{if(new URL(req.url,'http://localhost').pathname==='/shared-config.js'){res.setHeader('content-type','application/javascript');res.end('window.MIRSharedConfig=Object.freeze('+JSON.stringify(c.publicConfig)+');');return;}const target=path.resolve(c.root,'dist','.'+new URL(req.url,'http://localhost').pathname);if(!target.startsWith(path.join(c.root,'dist')+path.sep)||!fs.existsSync(target)||!fs.statSync(target).isFile()){res.statusCode=404;res.end();return;}res.setHeader('content-type',({'.js':'application/javascript','.html':'text/html','.css':'text/css'})[path.extname(target)]||'application/octet-stream');fs.createReadStream(target).pipe(res);});
   await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});
   const base='http://127.0.0.1:'+server.address().port,executable=process.env.MIR_CHROMIUM_EXECUTABLE||['/usr/bin/chromium','/usr/bin/google-chrome'].find(p=>fs.existsSync(p));
   const proxy=process.env.HTTPS_PROXY||process.env.HTTP_PROXY;
   browser=await chromium.launch({...(executable?{executablePath:executable}:{}),headless:true,args:['--no-sandbox'],...(proxy?{proxy:{server:proxy,bypass:'127.0.0.1,localhost'}}:{})});
   const login=async(role,width)=>{
    const context=await browser.newContext({viewport:{width,height:900},hasTouch:width<1100});contexts.push(context);const p=await context.newPage();p.setDefaultTimeout(20000);
-   await p.goto(base+'/espace-partage.html');await p.locator('[name=email]').fill(c.accounts[role].email);await p.locator('[name=password]').fill(c.accounts[role].password);await p.locator('#login button').click();await p.locator('#workspace').waitFor({state:'visible'});
+   if(process.env.MIR_TEST_HTTPS_RELAY==='yes'){
+    report.transport='Real HTTPS through Python CA trust and the managed proxy; browser TLS is not certified';
+    await context.route(c.publicConfig.supabaseUrl+'/**',async route=>{
+     try{await route.fulfill(await forward(route.request()));}catch{await route.abort('failed');}
+    });
+   }
+   const networkErrors=[];p.on('requestfailed',r=>{if(new URL(r.url()).hostname===new URL(c.publicConfig.supabaseUrl).hostname)networkErrors.push(r.failure()?.errorText||'network-failure');});
+   await p.goto(base+'/espace-partage.html');await p.locator('[name=email]').fill(c.accounts[role].email);await p.locator('[name=password]').fill(c.accounts[role].password);
+   // Managed credentials can be proxy placeholders, replaced only at the HTTPS boundary.
+   // Let Supabase validate them; browser email syntax cannot validate a placeholder.
+   await p.locator('#login').evaluate(f=>{f.noValidate=true;});
+   await p.locator('#login button').click();try{await p.locator('#workspace').waitFor({state:'visible'});}catch{throw Error('Connexion '+role+' non confirmée : '+await p.locator('#status').textContent()+' · réseau : '+networkErrors.join(', '));}
    await p.evaluate(()=>{window.__missionSdk=window.MIRSupabase.createClient(window.MIRSharedConfig.supabaseUrl,window.MIRSharedConfig.publishableKey);});
    const user=await p.evaluate(async()=>{const r=await window.__missionSdk.auth.getUser();return r.error?null:r.data.user?.id;});assert.ok(user,'Real Auth getUser confirmation required');
    const memberships=await ok(p,'mir_my_memberships',{}),membership=memberships.find(m=>m.id===c.org);
@@ -56,7 +82,7 @@ except Exception:print(json.dumps({'reachable':False,'reason':'Network/proxy con
   let clientOrder,employeeOrder;const config={metal:'aluminium',quantity:2,color:'TEST couleur à valider',measures:{A:'3',B:'2',length:'120'}};
   const submit=(p,request_id,configuration,revision=model.revision)=>ok(p,'mir_submit_request',{org:c.org,request_id,model:fixture,publication_revision:revision,configuration});
   await check('06-submit-requests',async()=>{for(const [role,p] of Object.entries(pages))originalOrders.set(role,(await snapshot(p)).orders);const job=await ok(admin,'mir_assign_job',{org:c.org,job_name:'MIR TEST '+run,employee:employeeId});clientOrder=await submit(pages.client,randomUUID(),config);employeeOrder=await submit(pages.employee,randomUUID(),{...config,chantier:job});assert.notEqual(clientOrder,employeeOrder);});
-  await check('07-admin-retrieval',async()=>{const s=await snapshot(admin);assert.ok(s.orders.some(o=>o.id===clientOrder));assert.ok(s.orders.some(o=>o.id===employeeOrder));await admin.locator('#refresh').click();assert.match(await admin.locator('#orders').textContent(),new RegExp(clientOrder));});
+  await check('07-admin-retrieval',async()=>{const s=await snapshot(admin);assert.ok(s.orders.some(o=>o.id===clientOrder));assert.ok(s.orders.some(o=>o.id===employeeOrder));await admin.locator('#refresh').click();await admin.waitForFunction(id=>document.querySelector('#orders').textContent.includes(id),clientOrder);});
   await check('08-price-history',async()=>{const before=(await snapshot(pages.client)).orders.find(o=>o.id===clientOrder);assert.equal(before.snapshot.unitPriceCents,1234);settings={...settings,aluminum_cents:3456};await ok(admin,'mir_admin_publish_model',{org:c.org,model:fixture,expected_revision:model.revision,settings});model=(await snapshot(admin)).catalogue.find(m=>m.id===fixture);const after=await snapshot(pages.client);assert.equal(after.catalogue.find(m=>m.id===fixture).aluminumCents,3456);assert.deepEqual(after.orders.find(o=>o.id===clientOrder),before);});
   await check('02-permissions-organizations',async()=>{
    const anon=await pages.client.evaluate(async org=>{const cfg=window.MIRSharedConfig;const sdk=window.MIRSupabase.createClient(cfg.supabaseUrl,cfg.publishableKey,{auth:{storageKey:'mir-mission4-anonymous',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});const r=await sdk.rpc('mir_shared_snapshot',{org});return {code:r.error?.code};},c.org);assert.equal(anon.code,'42501','Anonymous RPC must be denied, not simply unavailable');
@@ -71,10 +97,12 @@ except Exception:print(json.dumps({'reachable':False,'reason':'Network/proxy con
   });
   await check('09-network-reconnection',async()=>{
    const p=pages.client;await p.evaluate(()=>{window.__missionClient=window.MIRSharedClient.create({sdk:window.__missionSdk,storage:localStorage});});
-   await p.context().setOffline(true);const offline=await p.evaluate(async({org,model,configuration})=>{try{await window.__missionClient.submit(org,model,configuration);return false;}catch{return true;}},{org:c.org,model,configuration:config});assert.equal(offline,true);await p.context().setOffline(false);
+   // Disconnect after user verification so that the pending draft is persisted.
+   await p.route('**/rest/v1/rpc/mir_submit_request',route=>route.abort('internetdisconnected'));
+   const offline=await p.evaluate(async({org,model,configuration})=>{try{await window.__missionClient.submit(org,model,configuration);return false;}catch{return true;}},{org:c.org,model,configuration:config});assert.equal(offline,true);await p.unroute('**/rest/v1/rpc/mir_submit_request');
    const request=await p.evaluate(async org=>window.__missionClient.pending(org),c.org);assert.ok(request?.requestId);
    // A real commit whose response is lost. No auth, SDK or RPC response is fabricated.
-   let dropped=false;await p.route('**/rest/v1/rpc/mir_submit_request',async route=>{if(dropped)return route.continue();const response=await route.fetch();assert.equal(response.ok(),true);dropped=true;await route.abort('failed');});
+   let dropped=false;await p.route('**/rest/v1/rpc/mir_submit_request',async route=>{if(dropped)return route.fallback();if(process.env.MIR_TEST_HTTPS_RELAY==='yes'){const response=await forward(route.request());assert.ok(response.status>=200&&response.status<300);}else{const response=await route.fetch();assert.equal(response.ok(),true);}dropped=true;await route.abort('failed');});
    const retry=()=>p.evaluate(async({org,model,configuration})=>{try{return {id:await window.__missionClient.submit(org,model,configuration)};}catch{return {failed:true};}},{org:c.org,model,configuration:config});
    assert.equal((await retry()).failed,true);await p.unroute('**/rest/v1/rpc/mir_submit_request');
    await p.locator('#logout').click();await p.locator('#login').waitFor({state:'visible'});await p.waitForFunction(async()=>!(await window.__missionSdk.auth.getSession()).data.session);await denied(p,'mir_shared_snapshot',{org:c.org});

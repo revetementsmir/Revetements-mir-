@@ -13,6 +13,16 @@ test('Comptes distincts, organisation valide et serveur MIR imposés',()=>{
  assert.throws(()=>configuration({...env,MIR_TEST_CLIENT_EMAIL:env.MIR_TEST_ADMIN_EMAIL}),/distincts/);
  assert.equal(configuration({...env,MIR_TEST_SUPABASE_URL:'https://untrusted.invalid'}).publicConfig.supabaseUrl,'https://gccltmaulvrnthrbnrpd.supabase.co','credentials cannot be redirected by a URL override');
 });
+test('Le bac à sable sélectionne ses propres secrets et refuse toute autre destination',()=>{
+ const env={MIR_TEST_TARGET:'sandbox',MIR_SANDBOX_PUBLISHABLE_KEY:'sb_publishable_test',MIR_SANDBOX_ORG_ID:'00000000-0000-4000-8000-000000000010',MIR_TEST_ADMIN_EMAIL:'production@example.invalid',MIR_TEST_ADMIN_PASSWORD:'must-not-be-used'};
+ assert.equal(configuration(env).accounts.admin,undefined);
+ assert.equal(configuration(env).publicConfig.supabaseUrl,'https://hxtztkmbfpmzrieccwsg.supabase.co');
+ assert.ok(configuration(env).missing.includes('MIR_TEST_ADMIN_PASSWORD'));
+ for(const r of ['ADMIN','EMPLOYEE','CLIENT']){env[`MIR_SANDBOX_${r}_EMAIL`]=r+'@example.invalid';env[`MIR_SANDBOX_${r}_PASSWORD`]='sandbox-only';}
+ assert.equal(configuration(env).missing.length,0);assert.equal(configuration(env).accounts.admin.password,'sandbox-only');
+ assert.throws(()=>configuration({...env,MIR_TEST_TARGET:'other'}),/inconnue/);
+ assert.throws(()=>configuration({...env,MIR_SANDBOX_PUBLISHABLE_KEY:'sb_secret_forbidden'}),/publique/);
+});
 test('Audit SQL seulement en lecture : 19 tables RLS et 7 RPC authentifiées de la migration 004',async()=>{
  const {PGlite}=require('../tools/database/node_modules/@electric-sql/pglite'),db=new PGlite();
  try{

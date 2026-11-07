@@ -21,7 +21,7 @@ try{
   const target=path.resolve(__dirname,'../dist','.'+req.url.split('?')[0]);if(!target.startsWith(path.resolve(__dirname,'../dist')+path.sep)||!fs.existsSync(target)){res.statusCode=404;res.end();return;}
   res.setHeader('content-type',({'.js':'application/javascript','.mjs':'application/javascript','.html':'text/html','.css':'text/css'})[path.extname(target)]||'application/octet-stream');fs.createReadStream(target).pipe(res);
  });await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;
- browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+ browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||['/usr/bin/chromium','/usr/bin/google-chrome'].find(p=>fs.existsSync(p)),headless:true,args:['--no-sandbox']});
  const contexts=[];async function login(email,width){const context=await browser.newContext({viewport:{width,height:900}});contexts.push(context);const p=await context.newPage();p.on('pageerror',e=>{console.error(e);});await p.goto(base+'/espace-partage.html');await p.locator('[name=email]').fill(email);await p.locator('[name=password]').fill('test-only');await p.locator('#login button').click();await p.locator('#workspace').waitFor({state:'visible'});return p;}
  const admin=await login('admin@example.invalid',1440);
  const template=M.createTemplate({kind:'profile',template:'l',unit:'in',dimensions:{A:3,B:2}},{id:'local-l',name:'Solin partagé'}).template;
@@ -46,14 +46,31 @@ try{
  const sourceId=(await admin.locator('#orders h3').first().textContent()).split(' · ')[0];await admin.locator('#orders button').first().click();await admin.waitForFunction(()=>window.MIRProductionWorkspace);const copied=await admin.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')));assert.equal(copied.order.sourceRequestId,sourceId);assert.equal(copied.order.items.length,1);
  // Save from the real drawing editor into the same private central catalogue, with no JSON file.
  const drawingAdmin=await login('admin@example.invalid',1024);await drawingAdmin.goto(base+'/production.html');await drawingAdmin.waitForFunction(()=>window.MIRAdminWizard?.active);
+ await drawingAdmin.locator('#production-drawing').scrollIntoViewIfNeeded();
  const rect=await drawingAdmin.locator('#production-drawing').boundingBox();for(const [u,v] of [[.30,.62],[.66,.62],[.66,.35]])await drawingAdmin.mouse.click(rect.x+rect.width*u,rect.y+rect.height*v);
- for(const step of [2,3,4]){if(step===4)await drawingAdmin.locator('[data-mir-guide-face=right]').click();await drawingAdmin.locator('#mir-guide-next').click();await drawingAdmin.waitForFunction(n=>window.MIRAdminWizard?.step===n,step);}
+ await drawingAdmin.locator('#mir-guide-next').click();await drawingAdmin.waitForFunction(()=>window.MIRAdminWizard?.step===2);
+ await drawingAdmin.locator('#mir-guide-next').click();await drawingAdmin.waitForFunction(()=>window.MIRAdminWizard?.step===3);
+ await drawingAdmin.locator('[data-mir-guide-face=right]').click();await drawingAdmin.locator('#mir-guide-next').click();await drawingAdmin.waitForFunction(()=>window.MIRAdminWizard?.step===4);
  await drawingAdmin.locator('#mir-guide-save-model').click();await drawingAdmin.locator('#save-production-template [name=name]').fill('Moulure dessinée sans fichier');
  assert.equal(await drawingAdmin.locator('[name=saveTarget][value=shared]').isChecked(),true);await drawingAdmin.locator('#save-production-template button[type=submit]').click();
  await drawingAdmin.waitForFunction(()=>document.querySelector('#mir-direct-model-save')?.textContent.includes('Modèle enregistré dans le catalogue partagé'));
  assert.equal(await drawingAdmin.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_templates_v1')).records.length),1);
  const direct=await db.query("select m.name,p.boutique,p.store from mir_core.models m join mir_core.model_publications p on p.model_id=m.id where m.name='Moulure dessinée sans fichier'");assert.equal(direct.rows.length,1);assert.equal(direct.rows[0].boutique,false);assert.equal(direct.rows[0].store,false);
  await drawingAdmin.locator('#mir-direct-model-save a').click();await drawingAdmin.waitForSelector('#catalogue article');assert.equal(await drawingAdmin.locator('#catalogue article').count(),2);
+ const publication=drawingAdmin.locator('#catalogue article').filter({has:drawingAdmin.getByRole('heading',{name:'Solin partagé',exact:true})});
+ await publication.locator('[data-rule=materials][value=acier]').uncheck();
+ await publication.locator('[data-rule=colors]').fill('Noir\nBlanc');await publication.locator('[data-rule=fixed_color]').fill('Noir');
+ await publication.locator('[data-rule=color_edit_roles][value=employee]').uncheck();await publication.locator('[data-rule=measure_edit_roles][value=employee]').uncheck();
+ await publication.locator('.shared-save').click();await drawingAdmin.waitForFunction(()=>document.querySelector('.shared-save-feedback')?.textContent.includes('Publication enregistrée'));
+ await employee.locator('#refresh').click();await employee.waitForFunction(()=>document.querySelector('#catalogue label select[disabled]'));
+ assert.equal(await employee.locator('#catalogue form select').first().locator('option').count(),1,'métal autorisé unique');
+ assert.equal(await employee.locator('#catalogue form select[disabled]').inputValue(),'Noir','couleur fixée par Admin');
+ assert.equal(await employee.locator('#catalogue form input:not([type=number]):enabled').count(),0,'mesures employé verrouillées');
+ await client.locator('#refresh').click();await client.waitForFunction(()=>document.querySelector('#catalogue form select option[value=Blanc]'));
+ assert.equal(await client.locator('#catalogue form select').nth(1).isEnabled(),true,'couleur encore modifiable par le client');
+ await client.locator('#catalogue form select').nth(1).selectOption('Blanc');
  console.log('PASS : import sans doublon, publication Admin, client indépendant mobile, demande employé tablette avec cote verrouillée, récupération Admin, sauvegarde directe du dessin en brouillon partagé');
+ await drawingAdmin.locator('#logout').click();await drawingAdmin.locator('#login').waitFor({state:'visible'});
+ assert.equal(await drawingAdmin.locator('#workspace').isVisible(),false);assert.equal(await drawingAdmin.locator('#catalogue article').count(),0);assert.equal(await drawingAdmin.locator('#organization option').count(),0);
  for(const c of contexts)await c.close();
 }finally{if(browser)await browser.close();if(server)await new Promise(r=>server.close(r));await db.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

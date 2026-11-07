@@ -180,6 +180,36 @@ test('Socle PostgreSQL : contraintes, RLS et sauvegardes',async t=>{
       const oid=(await actor(id(3),'select public.mir_submit_request($1,$2,$3,2,$4) as id',[id(10),id(97),model,{metal:'acier',quantity:1,color:'Noir',measures:{A:'1',B:'3',C:'1',length:'144'}}]))[0].id;
       const snap=(await actor(id(3),'select snapshot from mir_core.order_revisions where order_id=$1',[oid]))[0].snapshot;assert.equal(snap.saleLengthIn,144);assert.equal(snap.unitPriceCents,null);
     });
+    await db.exec(fs.readFileSync(path.join(__dirname,'../supabase/migrations/20261107005913_catalogue_permissions_and_versions.sql'),'utf8'));
+    await t.test('Permissions de catalogue : métaux, couleurs et rôles vérifiés au serveur',async()=>{
+      const M=require('../dist/production-model.js'),template=M.createTemplate({kind:'profile',template:'l',unit:'in',dimensions:{A:3,B:2}},{id:'rules',name:'Règles'}).template;
+      const model=(await actor(id(1),'select public.mir_import_master($1,$2) as id',[id(10),{id:'rules',name:'Règles',currentVersion:1,versions:[template],allowed:{materials:['aluminium']}}]))[0].id;
+      const rules={materials:['aluminium'],colors:['Noir','Blanc'],fixed_color:'Noir',color_edit_roles:['client'],measure_edit_roles:['client']};
+      const settings={boutique:true,store:true,supplier_po:true,aluminum_cents:2500,steel_cents:3000,standard_measures:{A:'3',B:'2'},locked_measures:{},configuration_rules:rules};
+      const publish='select public.mir_admin_publish_model($1,$2,$3,$4)';
+      await reject(id(2),publish,[id(10),model,1,settings],'42501');
+      await reject(id(1),publish,[id(10),model,1,{...settings,configuration_rules:{materials:[]}}],'22023');
+      await reject(id(1),publish,[id(10),model,1,{...settings,configuration_rules:{color_edit_roles:[]}}],'22023');
+      await actor(id(1),publish,[id(10),model,1,settings]);
+      const snap=(await actor(id(2),'select public.mir_shared_snapshot($1) as data',[id(10)]))[0].data;
+      assert.equal(snap.capabilities.publicationRules,true);assert.deepEqual(snap.catalogue.find(m=>m.id===model).configurationRules,rules);
+      const jid=snap.jobs[0].id,config={metal:'aluminium',quantity:2,color:'Noir',measures:{A:'3',B:'2',length:'120'},chantier:jid};
+      const submit='select public.mir_submit_request($1,$2,$3,2,$4) as id';
+      await reject(id(2),submit,[id(10),id(140),model,{...config,color:'Blanc'}],'42501');
+      await reject(id(2),submit,[id(10),id(141),model,{...config,measures:{...config.measures,A:'4'}}],'42501');
+      await reject(id(3),submit,[id(10),id(142),model,{...config,color:'Rouge'}],'22023');
+      await assert.rejects(actor(id(3),submit,[id(10),id(143),model,{...config,metal:'acier'}]));
+      const oid=(await actor(id(2),submit,[id(10),id(144),model,config]))[0].id;
+      await actor(id(3),submit,[id(10),id(145),model,{...config,color:'Blanc',measures:{...config.measures,A:'4'}}]);
+      const next=M.createTemplate({kind:'profile',template:'l',unit:'in',dimensions:{A:4,B:2}},{id:'rules',name:'Règles',version:2}).template;
+      await actor(id(1),'select public.mir_add_master_version($1,$2,2,$3)',[id(10),model,next]);
+      const publication=(await actor(id(1),'select * from mir_core.model_publications where model_id=$1',[model]))[0];
+      assert.equal(publication.supplier_po,false);assert.deepEqual(publication.configuration_rules,rules);
+      const version=(await actor(id(1),'select specification from mir_core.model_versions where model_id=$1 and version=2',[model]))[0];assert.deepEqual(version.specification.allowed,{materials:['aluminium']});
+      const old=(await actor(id(2),'select snapshot from mir_core.order_revisions where order_id=$1',[oid]))[0].snapshot;
+      assert.equal(old.modelVersion,1);assert.deepEqual(old.configurationRules,rules);assert.deepEqual(old.specification.template,template);
+      assert.equal((await actor(id(2),submit,[id(10),id(144),model,config]))[0].id,oid,'reprise idempotente après retrait de publication');
+    });
     await t.test('Toutes les tables du schéma sont sous RLS',async()=>{
       const r=await db.query("select relname from pg_class join pg_namespace n on n.oid=relnamespace where n.nspname='mir_core' and relkind='r' and not relrowsecurity");assert.equal(r.rows.length,0);
     });
