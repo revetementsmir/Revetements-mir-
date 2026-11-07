@@ -29,7 +29,7 @@ create function public.mir_coordination_metadata(
  org uuid,coord_id uuid,expected_revision integer,vals jsonb,request_id uuid
 ) returns jsonb language plpgsql security definer set search_path=pg_catalog,mir_core as $$
 declare o mir_core.coordination_orders;payload jsonb;prior jsonb;result jsonb;rev integer;
- job text;address text;team text;priority text;notes text;begin
+ v_job text;v_address text;v_team text;v_priority text;v_notes text;begin
  if not mir_core.coordination_allowed(org) then raise exception 'Adjointe MIR requise' using errcode='42501';end if;
  if jsonb_typeof(vals) is distinct from 'object' or vals-array['job','address','team','priority','notes']<>'{}'::jsonb then
  raise exception 'Métadonnées non autorisées' using errcode='22023';end if;
@@ -38,17 +38,17 @@ declare o mir_core.coordination_orders;payload jsonb;prior jsonb;result jsonb;re
  select * into o from mir_core.coordination_orders where organization_id=org and id=coord_id for update;
  if not found or o.shipped_at is not null then raise exception 'Commande inconnue ou déjà expédiée' using errcode='40001';end if;
  if o.revision<>expected_revision then raise exception 'Commande modifiée : actualiser' using errcode='40001';end if;
- job:=btrim(coalesce(vals->>'job',o.job));address:=btrim(coalesce(vals->>'address',o.delivery_address));
- team:=btrim(coalesce(vals->>'team',o.team));priority:=coalesce(vals->>'priority',o.priority);
- notes:=btrim(coalesce(vals->>'notes',o.notes));
- if length(job)>200 or length(address)>360 or length(team)>200 or length(notes)>800 or priority not in ('normal','urgent')
+ v_job:=btrim(coalesce(vals->>'job',o.job));v_address:=btrim(coalesce(vals->>'address',o.delivery_address));
+ v_team:=btrim(coalesce(vals->>'team',o.team));v_priority:=coalesce(vals->>'priority',o.priority);
+ v_notes:=btrim(coalesce(vals->>'notes',o.notes));
+ if length(v_job)>200 or length(v_address)>360 or length(v_team)>200 or length(v_notes)>800 or v_priority not in ('normal','urgent')
  then raise exception 'Chantier, livraison ou priorité invalide' using errcode='22023';end if;
  rev:=o.revision+1;
- update mir_core.coordination_orders set job=job,delivery_address=address,team=team,
- priority=priority,notes=notes,revision=rev,updated_at=now()
+ update mir_core.coordination_orders set job=v_job,delivery_address=v_address,team=v_team,
+ priority=v_priority,notes=v_notes,revision=rev,updated_at=now()
  where organization_id=org and id=o.id;
  insert into mir_core.coordination_events(organization_id,coordination_id,revision,event_type,payload,actor_id)
- values(org,o.id,rev,'note_changed',jsonb_build_object('job',job,'address',address,'team',team,'priority',priority),auth.uid());
+ values(org,o.id,rev,'note_changed',jsonb_build_object('job',v_job,'address',v_address,'team',v_team,'priority',v_priority),auth.uid());
  result:=jsonb_build_object('id',o.id,'revision',rev);
  return mir_core.coordination_receipt(org,request_id,'metadata',payload,result);
 end$$;
