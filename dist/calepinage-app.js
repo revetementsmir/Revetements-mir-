@@ -20,7 +20,7 @@
   const svgText = (x,y,t,attrs='') => '<text x="'+x+'" y="'+y+'" '+attrs+'>'+esc(t)+'</text>';
   let workspace = {schema:'mir-panel-layout-workspace-1', zones:[], activeId:null}, layout, selected=null, history=[], view='zone', tool='select', zoom=1, drag=null, calibrationPoints=[], calibrationValue=null, transform=null;
   let pdfSession=null, pdfId=null, pdfSequence=0, dbPromise, saveTimer, saveChain=Promise.resolve(), saveSequence=0, toastTimer, exporting=false, ready=false;
-  let outlineDraft=[], outlineCursor=null, outlineOrthogonal=false, outlineRightAngle=false, wallYaw=-24, wallPitch=12;
+  let outlineDraft=[], outlineCursor=null, outlineOrthogonal=false, outlineRightAngle=false, wallYaw=-24, wallPitch=12, selectedWallEdge=null;
   const DB='mir-panel-layout-v1';
   function database() {
     if (!window.indexedDB) return Promise.reject(new Error('Le stockage local est indisponible. Sauvegardez votre dossier JSON.'));
@@ -152,6 +152,17 @@
     $('#wall-coordinate-list').innerHTML=waiting?
       '<p class="hint mir-wall-unmeasured">La forme est enregistrée sans mesure inventée. Entrez largeur et hauteur réelles avant de régler les sommets.</p>':
       points.map((p,i)=>'<div><strong>'+wallLetter(i)+'</strong><span>X '+inch(p[0])+' · H '+inch(d.height-p[1])+'</span></div>').join('');
+
+    const edgeDetails=$('#wall-edge-details'),edge=Number.isInteger(selectedWallEdge)&&selectedWallEdge>=0&&selectedWallEdge<points.length?selectedWallEdge:null;
+    const editable=type==='free'&&edge!==null&&points.length>=3&&d.width>0&&d.height>0;
+    edgeDetails.hidden=!editable;
+    if(editable){
+      const measure=polygonMeasures(points)[edge],next=(edge+1)%points.length;
+      $('#wall-edge-name').textContent='Côté '+wallLetter(edge)+'–'+wallLetter(next)+' · angle intérieur au sommet '+wallLetter(edge);
+      $('#wall-edge-length').value=val(measure.length);
+      $('#wall-edge-angle').value=number(measure.angle);
+      $('#wall-edge-error').hidden=true;$('#wall-edge-error').textContent='';
+    }
   }
   function renderSummary() {
     const z=zone(),valid=layout.ok,d=dimensions(z),errors=layout.errors||[];
@@ -359,17 +370,45 @@
     const sx=Math.hypot(m?.a||1,m?.b||0),sy=Math.hypot(m?.c||0,m?.d||1);
     return Math.hypot((a[0]-b[0])*sx,(a[1]-b[1])*sy)<=tolerance;
   }
+
   function selectWallEdge(index) {
     const pts=measuredPoints(),d=dimensions();
     if(!Number.isInteger(index)||index<0||index>=pts.length)return;
     if(!(d.width>0&&d.height>0))return toast('Entrez les cotes chantier avant de modifier les côtés.');
     const endpoint=(index+1)%pts.length;
-    const controls=$('#wall-coordinate-details');
-    if(controls)controls.open=true;
-    $('#wall-vertex').value=String(endpoint);
-    $('#wall-vertex').dispatchEvent(new Event('change'));
-    $('#vertex-x').focus({preventScroll:false});
-    toast('Côté '+wallLetter(index)+'–'+wallLetter(endpoint)+' : modifiez les cotes du sommet '+wallLetter(endpoint)+', puis cliquez Appliquer.');
+    selectedWallEdge=index;
+    const coords=$('#wall-coordinate-details');if(coords)coords.open=true;
+    $('#wall-vertex').value=String(endpoint);$('#wall-vertex').dispatchEvent(new Event('change'));
+    renderWallControls();
+    const editor=$('#wall-edge-details');editor.hidden=false;editor.open=true;
+    $('#wall-edge-length').focus({preventScroll:false});
+    toast('Côté '+wallLetter(index)+'–'+wallLetter(endpoint)+' : modifiez longueur et angle, puis Appliquer.');
+  }
+  function applyWallEdge(){
+    const points=clone(measuredPoints()),i=selectedWallEdge,d=dimensions();
+    if(!Number.isInteger(i)||i<0||i>=points.length||!(d.width>0&&d.height>0))return;
+    const length=parse($('#wall-edge-length').value),angle=Number(String($('#wall-edge-angle').value).trim().replace(',','.'));
+    const error=$('#wall-edge-error'),invalid=message=>{error.textContent=message;error.hidden=false;toast(message);return false;};
+    if(!(length>0)||!Number.isFinite(length)||length>100000)return invalid('Entrez une longueur positive en pouces, ex. 32 1/2.');
+    if(!Number.isFinite(angle)||angle<=0||angle>=360)return invalid('Entrez un angle intérieur supérieur à 0° et inférieur à 360°.');
+    const count=points.length,prev=points[(i+count-1)%count],start=points[i],
+      previous=[start[0]-prev[0],start[1]-prev[1]];
+    if(Math.hypot(...previous)<=1e-7)return invalid('Le côté précédent a une longueur nulle. Vérifiez les sommets.');
+    const signedArea=points.reduce((sum,p,j)=>{const q=points[(j+1)%count];return sum+p[0]*q[1]-q[0]*p[1];},0);
+    if(Math.abs(signedArea)<=1e-7)return invalid('La surface du mur doit être positive.');
+    const heading=Math.atan2(previous[1],previous[0])+Math.sign(signedArea)*(180-angle)*Math.PI/180;
+    const next=(i+1)%count,proposed=points.map(p=>p.slice());
+    proposed[next]=[Number((start[0]+Math.cos(heading)*length).toFixed(8)),Number((start[1]+Math.sin(heading)*length).toFixed(8))];
+    const wall=A?.prepare({widthIn:d.width,heightIn:d.height,clearances:d.g,shape:{type:'free',pointsIn:proposed}});
+    if(!wall?.ok)return invalid((wall?.errors||[]).map(e=>e.message).join(' ')||'La cote brise les dimensions fixes du mur.');
+    const checked=E.build({widthIn:wall.widthIn,heightIn:wall.heightIn,lipIn:0,columns:1,rows:1,contourIn:wall.contourIn});
+    if(!checked?.ok)return invalid((checked?.errors||[]).map(e=>e.message).join(' ')||'Les nouveaux côtés se croisent.');
+    const candidate=clone(zone());candidate.shape={type:'free',pointsIn:proposed};
+    if(layout.ok){const rebuilt=compute(candidate);if(!rebuilt.ok)return invalid((rebuilt.errors||[]).map(e=>e.message).join(' ')||'Les panneaux verrouillés ne permettent pas cette cote.');}
+    commit(z=>{z.shape={type:'free',pointsIn:proposed};});
+    error.hidden=true;error.textContent='';$('#wall-edge-details').open=true;
+    toast('Côté '+wallLetter(i)+'–'+wallLetter(next)+' mis à jour. Les autres sommets restent fixes.');
+    return true;
   }
   function onPointerDown(event) {
     if(event.button!==0)return;const p=svgPoint(event);if(!p)return;
@@ -574,6 +613,7 @@
     $('#wall-vertex').onchange=()=>{const p=measuredPoints()[Number($('#wall-vertex').value)],d=dimensions();if(p){$('#vertex-x').value=val(p[0]);$('#vertex-height').value=val(d.height-p[1]);}};
     $('#wall-edge-list').addEventListener('click',e=>{const b=e.target.closest('[data-wall-edge]');if(b)selectWallEdge(Number(b.dataset.wallEdge));});
     $('#apply-vertex').onclick=applyVertex;
+    $('#apply-wall-edge').onclick=applyWallEdge;
     $('#outline-right-angle').onclick=()=>{outlineRightAngle=!outlineRightAngle;draw();};
     $('#start-free-outline').onclick=beginOutline;$('#draw-outline').onclick=beginOutline;
     $('#outline-close').onclick=closeOutline;$('#outline-back').onclick=()=>{outlineDraft.pop();draw();};$('#outline-cancel').onclick=()=>{outlineDraft=[];tool='select';draw();};
