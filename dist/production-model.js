@@ -6,6 +6,7 @@
 })(function () {
   'use strict';
   const VERSION = '1.0.0', EPS = 1e-8, MAX_MM = 100000, MAX_SEGMENTS = 26;
+  const roof = typeof window==='object'?window.MIRPanelRoof:typeof require==='function'?require('./mir-panel-roof.js'):null;
   const own = (o, k) => Object.prototype.hasOwnProperty.call(o || {}, k);
   const finite = n => typeof n === 'number' && Number.isFinite(n);
   const copy = x => x === undefined ? undefined : JSON.parse(JSON.stringify(x));
@@ -221,7 +222,8 @@
     { id: 'rectangle', label: 'Rectangle' }, { id: 'square', label: 'Carré' },
     { id: 'right-triangle', label: 'Triangle rectangle' }, { id: 'triangle', label: 'Triangle à sommet réglable' },
     { id: 'trapezoid', label: 'Trapèze' }, { id: 'parallelogram', label: 'Parallélogramme' },
-    { id: 'pointed', label: 'Rectangle avec côté en pointe' }
+    { id: 'pointed', label: 'Rectangle avec côté en pointe' },
+    { id: 'roof-slope', label: 'Panneau à haut rampant (X/12)' }
   ]);
   const MIRRORED_RIGHT_ANGLES = Object.freeze({ 'bottom-left': 'bottom-right', 'bottom-right': 'bottom-left', 'top-left': 'top-right', 'top-right': 'top-left' });
   const PANEL_OUTER_DIMENSIONS = 'outer_including_lips';
@@ -402,8 +404,23 @@
     if (w !== null && h !== null && unit) {
       if (shape === 'rectangle' || shape === 'square') {
         pointsMM = [[0, 0], [w, 0], [w, h], [0, h]]; ids = ['bottom', 'right', 'top', 'left']; names = ['Bas', 'Droite', 'Haut', 'Gauche'];
+      } else if (shape === 'roof-slope') {
+        const pitch=roof?.pitchFactor(spec.roofPitch),direction=spec.roofDirection||'right';
+        parameters.roofPitch=spec.roofPitch;parameters.roofDirection=direction;
+        if(!finite(pitch)||pitch<=0)errors.push(issue('ROOF_PITCH_REQUIRED','roofPitch','Entrez une pente positive X/12, par exemple 6/12.'));
+        else {
+          const shapePoints=roof.slopePanel(w,h,spec.roofPitch,direction);
+          if(!shapePoints)errors.push(issue('ROOF_PANEL_IMPOSSIBLE','height','La hauteur maximale doit dépasser la montée de la pente : largeur × pente/12. Vérifiez le sens gauche/droite.'));
+          else {pointsMM=shapePoints;ids=['bottom','right','slope','left'];names=['Bas','Droite','Pente du toit','Gauche'];parameters.riseMM=w*pitch;interpretation='Hauteur B mesurée au côté haut. Montée='+decimal(w*pitch)+' mm. Pente du haut '+spec.roofPitch+' · '+direction+'.';}
+        }
       } else if (shape === 'triangle') {
         const x = measure(spec.apexX, unit, 'apexX', errors, { zero: true }); parameters.apexXMM = x;
+        if(spec.roofPitch!==undefined&&String(spec.roofPitch).trim()){
+          const factor=roof?.pitchFactor(spec.roofPitch);
+          if(!finite(factor)||factor<=0)errors.push(issue('ROOF_PITCH_INVALID','roofPitch','La pente du triangle doit être X/12, par exemple 6/12.'));
+          else if(x!==null&&Math.abs(h-x*factor)>Math.max(.01,h*.000001))errors.push(issue('ROOF_PITCH_DIMENSION','height','La hauteur B ne correspond pas à la montée calculée depuis la gauche (pente X/12 × distance S). Corrigez le champ pente ou la hauteur.'));
+          else parameters.roofPitch=spec.roofPitch;
+        }
         if (x !== null && x <= w) { pointsMM = [[0, 0], [w, 0], [x, h]]; ids = ['bottom', 'right-slope', 'left-slope']; names = ['Base', 'Pente droite', 'Pente gauche']; }
         else if (x !== null) errors.push(issue('APEX_OUTSIDE', 'apexX', 'Le sommet doit rester entre 0 et la largeur hors tout.'));
       } else if (shape === 'right-triangle') {
@@ -1097,6 +1114,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     if (topology.shape !== 'square') out.push(field('height', 'B · hauteur hors tout, lips compris'));
     out.push(field('relief', 'C · projection de la pièce finie'), field('lip', 'Largeur commune des lips', false));
     if (topology.shape === 'triangle') out.push(field('apexX', 'Position du sommet depuis la gauche'));
+    if (topology.shape === 'roof-slope') out.push(field('roofPitch', 'Pente du haut en X/12'));
     if (topology.shape === 'trapezoid') out.push(field('topWidth', 'Largeur du haut'), field('topOffset', 'Décalage du haut depuis la gauche'));
     if (topology.shape === 'parallelogram') out.push(field('offset', 'Décalage signé du haut'));
     if (topology.shape === 'pointed') out.push(field('tipDepth', 'Profondeur de la pointe'), field('apexOffset', 'Position du sommet sur le côté'));
@@ -1115,6 +1133,8 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       spec.shape = topology.shape;
       if (topology.rightAngle) spec.rightAngle = topology.rightAngle;
       if (topology.pointSide) spec.pointSide = topology.pointSide;
+      if (topology.shape === 'roof-slope') spec.roofDirection = topology.roofDirection || 'right';
+      if (own(m,'roofPitch'))spec.roofPitch=m.roofPitch;
       if (topology.shape === 'polygon') spec.contourRatios = copy(topology.contourRatios);
       for (const key of ['width', 'height', 'relief', 'lip', 'apexX', 'topWidth', 'topOffset', 'offset', 'tipDepth', 'apexOffset']) spec[key] = own(m, key) ? m[key] : null;
       if (spec.width === null && own(m, 'A')) spec.width = m.A;
@@ -1145,6 +1165,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       topology = { kind, shape };
       if (shape === 'right-triangle') topology.rightAngle = source.rightAngle || 'bottom-left';
       if (shape === 'pointed') topology.pointSide = source.pointSide || 'top';
+      if (shape === 'roof-slope') topology.roofDirection = source.roofDirection || 'right';
       const a = parseMeasurement(source.width ?? source.dimensions?.A, source.unit || 'in'), b = parseMeasurement(source.height ?? source.dimensions?.B, source.unit || 'in');
       if (shape === 'polygon') {
         const vertices = a.ok && b.ok ? panelPolygonPoints(source, a.mm, b.mm) : null;
@@ -1156,6 +1177,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       const width = a.ok && a.mm > 0 ? a.mm / scale : 1, height = shape === 'square' ? width : b.ok && b.mm > 0 ? b.mm / scale : .7;
       proportions = { illustrative: true, unitless: true, width, height, relief: .07, lip: .03, apexX: ratio(source.apexX, width / 2), topWidth: ratio(source.topWidth, width * .65), topOffset: ratio(source.topOffset, width * .15), offset: ratio(source.offset, width * .2), tipDepth: ratio(source.tipDepth, Math.min(width, height) * .25), apexOffset: ratio(source.apexOffset, (['right', 'left'].includes(topology.pointSide) ? height : width) / 2) };
       const probeValues = Object.fromEntries(Object.entries(proportions).filter(([k, v]) => typeof v === 'number').map(([k, v]) => [k, v * 100]));
+      if(shape==='roof-slope')probeValues.roofPitch=source.roofPitch||'6/12';
       const probe = buildPanel({ ...specFromTopology(topology, { measurements: probeValues }), unit: 'mm' });
       errors.push(...probe.validation.errors);
     }
@@ -1188,6 +1210,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       if (topology.shape !== 'polygon' && !SHAPES.some(s => s.id === topology.shape)) errors.push(issue('INVALID_TEMPLATE_SHAPE', 'topology.shape', 'Forme de panneau non définie.'));
       if (topology.shape === 'right-triangle' && !['bottom-left', 'bottom-right', 'top-left', 'top-right'].includes(topology.rightAngle)) errors.push(issue('INVALID_TEMPLATE_RIGHT_ANGLE', 'topology.rightAngle', 'Position de l’angle droit invalide.'));
       if (topology.shape === 'pointed' && !['top', 'right', 'bottom', 'left'].includes(topology.pointSide)) errors.push(issue('INVALID_TEMPLATE_POINT', 'topology.pointSide', 'Côté de la pointe invalide.'));
+      if(topology.shape==='roof-slope'&&!['left','right'].includes(topology.roofDirection))errors.push(issue('INVALID_ROOF_DIRECTION','topology.roofDirection','Choisissez la montée à gauche ou à droite.'));
       if (topology.shape === 'polygon') {
         const reason = simplePanelPolygon(topology.contourRatios, 1, 1);
         if (reason) errors.push(issue('INVALID_TEMPLATE_POLYGON', 'topology.contourRatios', reason));
@@ -1206,6 +1229,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     const p = template.previewProportions || {}, measurements = {};
     if (template.kind === 'profile') template.topology.segments.forEach((s, i) => { measurements[s.label] = (p.segmentRatios?.[i] || 1) * 100; });
     else for (const [key, value] of Object.entries(p)) if (typeof value === 'number') measurements[key] = value * 100;
+    if(template.kind==='panel'&&template.topology.shape==='roof-slope')measurements.roofPitch=p.roofPitch||'6/12';
     const spec = specFromTopology(template.topology, { unit: 'mm', measurements }); spec.name = template.name;
     const model = modelOf(spec); model.illustrative = true; model.productionReady = false; model.complete = false;
     return { ok: model.valid, model, errors: model.validation.errors, illustrative: true, unitless: true };
@@ -1227,7 +1251,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
   function reviseInstance(instance, changes = {}) {
     const current = instance?.snapshot || instance;
     if (!current || current.schema !== 'mir-production-instance-1') return { ok: false, spec: null, model: null, snapshot: null, errors: [issue('INSTANCE_REQUIRED', 'instance', 'Une version existante de la pièce est requise.')], pending: [] };
-    const topologyChanges = ['kind', 'template', 'shape', 'segments', 'bends', 'startAngle', 'rightAngle', 'pointSide', 'pointsIn', 'contourRatios'].filter(key => own(changes, key) && canonical(changes[key]) !== canonical(current.spec[key]));
+    const topologyChanges = ['kind', 'template', 'shape', 'segments', 'bends', 'startAngle', 'rightAngle', 'pointSide', 'roofDirection', 'pointsIn', 'contourRatios'].filter(key => own(changes, key) && canonical(changes[key]) !== canonical(current.spec[key]));
     if (topologyChanges.length) return { ok: false, spec: null, model: null, snapshot: null, errors: [issue('TOPOLOGY_REVISION_REQUIRED', topologyChanges.join(','), 'Un changement de forme ou de plis nécessite une nouvelle version du modèle, puis une nouvelle pièce. La commande originale reste conservée.')], pending: [] };
     const old = copy(current.values), updated = { ...old, ...copy(changes), instanceId: current.id };
     for (const key of ['measurements', 'dimensions', 'material', 'finish', 'coloredFace', 'perforation', 'lips', 'borders']) {
