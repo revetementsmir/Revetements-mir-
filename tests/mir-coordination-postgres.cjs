@@ -22,7 +22,7 @@ const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
   await db.exec("create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;");
   const dir=path.join(ROOT,'migrations');
   for(const file of fs.readdirSync(dir).filter(x=>x.endsWith('.sql')).sort())await db.exec(fs.readFileSync(path.join(dir,file),'utf8'));
-  for(const file of ['202611070006_warehouse_stock_qr.sql','202611070007_order_coordination.sql','202611070008_order_coordination_operations.sql'])
+  for(const file of ['202611070006_warehouse_stock_qr.sql','202611070007_order_coordination.sql','202611070008_order_coordination_operations.sql','202611070009_order_supplier_purchases.sql'])
     await db.exec(fs.readFileSync(path.join(ROOT,'proposals',file),'utf8'));
   ok('Installation des propositions 006+007+008 dans PostgreSQL jetable');
   await db.exec("insert into auth.users(id) values('"+[admin,employee,assistant,warehouse].join("'),('")+"');");
@@ -87,6 +87,28 @@ const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
   assert.equal((await db.query('select count(*)::int as n from mir_core.coordination_shipments where organization_id=$1 and coordination_id=$2',[org,co])).rows[0].n,1);
   await failAs(assistant,'select public.mir_coordination_add($1,$2,$3,3,5,$4)',[org,co,cLine,uuid(149)],/expédiée/i);
   ok('Expédition idempotente et modifications interdites après départ');
+  const detail2=(await actor(assistant,'select public.mir_coordination_detail($1,$2) as result',[org,co]))[0].result;
+  const supplierRoute=detail2.lines[0].routes.find(r=>r.lane==='supplier');
+  assert.ok(supplierRoute?.id);
+  const availableSuppliers=(await actor(assistant,'select public.mir_coordination_suppliers($1) as result',[org]))[0].result;
+  assert.ok(availableSuppliers.some(r=>r.id===supplier),'fournisseur MIR pré-intégré');
+  const poResult=(await actor(assistant,'select public.mir_coordination_supplier_po($1,$2,$3,null,5,$4) as result',
+   [org,co,supplierRoute.id,uuid(160)]))[0].result;
+  assert.equal(poResult.created,true);
+  const poOrder=(await db.query('select kind, status, supplier_id from mir_core.orders where organization_id=$1 and id=$2',[org,poResult.supplierOrderId])).rows[0];
+  assert.equal(poOrder.kind,'supplier');assert.equal(poOrder.status,'draft');
+  assert.equal(poOrder.supplier_id,supplier);
+  assert.equal((await db.query('select count(*)::int as n from mir_core.order_lines where organization_id=$1 and order_id=$2',[org,poResult.supplierOrderId])).rows[0].n,1);
+  const samePO=(await actor(assistant,'select public.mir_coordination_supplier_po($1,$2,$3,null,5,$4) as result',
+   [org,co,supplierRoute.id,uuid(160)]))[0].result;
+  assert.equal(samePO.supplierOrderId,poResult.supplierOrderId);
+  ok('Bon fournisseur réel réutilise les tables MIR, sans doublon ni envoi automatique');
+  const received=(await actor(assistant,'select public.mir_coordination_supplier_receive($1,$2,$3,3,6,$4) as result',
+   [org,co,supplierRoute.id,uuid(161)]))[0].result;
+  assert.equal(Number(received.remainingQty),2);
+  await failAs(assistant,'select public.mir_coordination_supplier_receive($1,$2,$3,3,7,$4)',
+   [org,co,supplierRoute.id,uuid(162)],/supérieure/);
+  ok('Réception externe partielle et reliquat, distincts de la sortie QR Entrepôt');
   await failAs(employee,'select * from mir_core.coordination_ops',[],/permission|denied/i);
   ok('Aucun accès direct aux opérations');
   console.log('MIR coordination PostgreSQL: '+checks+' tests réussis; simulation Auth, AUCUN service hébergé.');
