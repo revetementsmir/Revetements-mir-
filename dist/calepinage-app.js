@@ -639,7 +639,7 @@
     if(!workspace.zones.length){const z=blankZone(1);workspace.zones.push(z);workspace.activeId=z.id;}
     if(!workspace.zones.some(z=>z.id===workspace.activeId))workspace.activeId=workspace.zones[0].id;
     let requested='';try{requested=decodeURIComponent(location.hash.slice(1));}catch{}if(workspace.zones.some(z=>z.id===requested))workspace.activeId=requested;
-    ready=true;bind();render();restoreSession();
+    ready=true;bind();render();$('#new-traced-section').disabled=false;restoreSession();
   }
   boot().catch(error=>{const el=$('#calculation-errors');el.hidden=false;el.textContent=error.message||'Le calculateur n’a pas pu démarrer.';});
 })();
