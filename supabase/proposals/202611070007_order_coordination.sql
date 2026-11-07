@@ -279,12 +279,13 @@ declare out jsonb;co mir_core.coordination_orders;begin
     'id',l.id,'sourceLineId',l.employee_line_id,'name',l.item_name,'unit',l.unit,'requestedQty',l.requested_qty,
     'variantKey',l.variant_key,'routes',coalesce((select jsonb_agg(jsonb_build_object(
       'id',a.id,'lane',a.route,'quantity',a.quantity,'supplierId',a.supplier_id,
-      'supplierOrderId',a.supplier_order_id,'receivedQty',a.received_qty))
+      'supplierOrderId',a.supplier_order_id,'receivedQty',a.received_qty,
+       'pickedQty',case when a.route='warehouse' then coalesce((select f.delivered_qty from mir_core.warehouse_fulfillment f where f.organization_id=l.organization_id and f.order_line_id=l.employee_line_id),0) else null end))
       from mir_core.coordination_routes a where a.organization_id=org and a.coordination_line_id=l.id),'[]'::jsonb))
     order by l.created_at) from mir_core.coordination_lines l
     where l.organization_id=org and l.coordination_id=co.id),'[]'::jsonb),
   'events',coalesce((select jsonb_agg(jsonb_build_object(
-    'revision',e.revision,'type',e.event_type,'payload',e.payload,'at',e.created_at))
+    'revision',e.revision,'type',e.event_type,'payload',e.payload,'actorId',e.actor_id,'at',e.created_at))
     from mir_core.coordination_events e where e.organization_id=org and e.coordination_id=co.id),'[]'::jsonb)
  ) into out;
  return out;
