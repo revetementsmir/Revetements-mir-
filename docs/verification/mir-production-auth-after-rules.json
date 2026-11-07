@@ -11,7 +11,8 @@
       "signedOut": true,
       "publicationRules": true,
       "anonymousDenied": true,
-      "adminWriteDenied": true
+      "adminWriteDenied": null,
+      "note": "No Admin business write attempted by this read-only check"
     },
     {
       "role": "employee",
