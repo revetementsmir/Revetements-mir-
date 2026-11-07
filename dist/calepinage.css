@@ -12,3 +12,48 @@
 .wall-measures{padding:16px 18px;margin:0}.wall-measures summary{font-size:12px;font-weight:600}.wall-measures table{white-space:normal}.wall-measures td,.wall-measures th{padding:10px}
 
 #outline-right-angle{min-height:44px;touch-action:manipulation}#outline-right-angle[aria-pressed="true"]{background:#253c2a;color:#fff}
+
+
+/* MIR — tracé direct des sections de mur, gestes identiques aux moulures. */
+.project-bar #new-traced-section{font-weight:700;white-space:nowrap;background:#348511;border-color:#348511;color:white}
+.project-bar #new-traced-section:hover{background:#286b0d}
+.drawing-toolbar .draw-section-direct{font-weight:700;background:#e5f0de;color:#285b19;border:1px solid #b5cba9}
+.drawing-toolbar .draw-section-direct[aria-pressed="true"]{background:#348511;color:white}
+.mir-wall-edge-annotations .mir-wall-edge-label{fill:#243e2d;stroke:#fafcf6;stroke-width:3px;stroke-linejoin:round;paint-order:stroke;cursor:pointer}
+.mir-wall-edge-annotations .mir-wall-vertex-label{fill:#305b26;stroke:#fafcf6;stroke-width:3px;paint-order:stroke}
+.mir-wall-edge-annotations .mir-wall-angle-label{fill:#9a532a;stroke:#fafcf6;stroke-width:2.5px;paint-order:stroke}
+.mir-wall-edge-annotations [data-wall-edge]:focus{outline:2px solid #348511;outline-offset:2px}
+#wall-edge-list [data-wall-edge]{color:#285b19;text-decoration:underline;text-underline-offset:3px;font-weight:700;min-height:32px}
+.mir-wall-unmeasured{padding:10px 12px;border:1px solid #b5cba9;border-radius:6px;background:#edf6e6;color:#2b5126}
+.drawing-stage[data-tool="outline"]{cursor:crosshair;touch-action:none}
+@media(max-width:740px){
+ .project-bar #new-traced-section{flex:1 1 100%;min-height:45px}
+ .workspace{display:flex;flex-direction:column}
+ .workspace>.canvas-column{order:0}
+ .workspace>.settings{order:1}
+ .workspace>.inspector{order:2}
+ .drawing-toolbar .draw-section-direct{order:-2;min-height:42px}
+ .drawing-toolbar .toolbar-spacer{flex:0 0 0}
+ /* Le tracé en cours prend l'écran complet, sans défilement global ni mini tableau. */
+ body.mir-wall-tracing{overflow:hidden!important;height:100dvh;max-height:100dvh}
+ body.mir-wall-tracing .workspace>.canvas-column{
+  position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background:#fafaf7;overflow:hidden;max-width:100vw;
+ }
+ body.mir-wall-tracing .canvas-column>.canvas-card{
+  display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden;border-radius:0;
+ }
+ body.mir-wall-tracing .canvas-toolbar{flex:0 0 auto;padding:9px 11px}
+ body.mir-wall-tracing .canvas-toolbar h2{font-size:15px}
+ body.mir-wall-tracing .drawing-toolbar{flex:0 0 auto;padding:4px 7px;gap:4px}
+ body.mir-wall-tracing .drawing-toolbar button{min-height:35px;padding:5px;font-size:10px}
+ body.mir-wall-tracing .drawing-toolbar #zoom-reset{display:none}
+ body.mir-wall-tracing .drawing-stage{flex:1 1 auto;min-height:0!important;max-height:none!important;height:auto!important}
+ body.mir-wall-tracing .drawing-stage svg{height:100%!important;max-height:none;min-height:0}
+ body.mir-wall-tracing .outline-actions{flex:0 0 auto;padding:6px 9px;max-height:150px;overflow-y:auto}
+ body.mir-wall-tracing .drawing-footer{flex:0 0 auto;padding:5px 10px;font-size:9px}
+ body.mir-wall-tracing .drawing-footer>.legend-band,
+ body.mir-wall-tracing .drawing-footer>span:not(#drawing-hint){display:none!important}
+ body.mir-wall-tracing .drawing-footer #drawing-hint{width:100%;margin:0}
+}
