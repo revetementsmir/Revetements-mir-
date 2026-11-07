@@ -112,6 +112,11 @@ except Exception:print(json.dumps({'reachable':False,'reason':'Network/proxy con
    assert.equal(order.items.length,1);assert.equal(order.items[0].sourceSharedModel.modelId,fixture);assert.equal(order.items[0].sourceSharedModel.version,2);assert.equal(order.items[0].spec.finish.name,'Noir');
    assert.equal(await copy.p.evaluate(()=>localStorage.getItem('mir_production_templates_v1')),null,'Shared model reused without a second local model library');
    const svg=await copy.p.evaluate(()=>{const item=JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')).order.items[0];return MIRProduction.profileSVG(item.spec,{width:620,height:260});});assert.ok(svg.includes('<svg'));
+   await copy.p.locator('[data-mir-tab=boutique]').first().click();await copy.p.getByRole('link',{name:'Ouvrir la Boutique partagée'}).click();await copy.p.locator('[data-model-id="'+fixture+'"]').waitFor();assert.equal(await copy.p.locator('h1').textContent(),'Boutique partagée');
+   await pages.employee.goto(base+'/espace-partage.html?destination=store');await pages.employee.locator('[data-model-id="'+fixture+'"]').waitFor();
+   await pages.client.goto(base+'/espace-partage.html?destination=store');await pages.client.waitForFunction(()=>document.querySelector('#status').textContent.includes('compte autorisé pour cette destination'));assert.equal(await pages.client.locator('#catalogue article').count(),0);
+   await pages.client.goto(base+'/espace-partage.html?destination=boutique');await pages.client.locator('[data-model-id="'+fixture+'"]').waitFor();
+   for(const p of [pages.employee,pages.client])await p.evaluate(()=>{window.__missionSdk=window.MIRSupabase.createClient(window.MIRSharedConfig.supabaseUrl,window.MIRSharedConfig.publishableKey);});
   });
   await check('02-permissions-organizations',async()=>{
    const anon=await pages.client.evaluate(async org=>{const cfg=window.MIRSharedConfig;const sdk=window.MIRSupabase.createClient(cfg.supabaseUrl,cfg.publishableKey,{auth:{storageKey:'mir-mission4-anonymous',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});const r=await sdk.rpc('mir_shared_snapshot',{org});return {code:r.error?.code};},c.org);assert.equal(anon.code,'42501','Anonymous RPC must be denied, not simply unavailable');
@@ -135,7 +140,7 @@ except Exception:print(json.dumps({'reachable':False,'reason':'Network/proxy con
    const retry=()=>p.evaluate(async({org,model,configuration})=>{try{return {id:await window.__missionClient.submit(org,model,configuration)};}catch{return {failed:true};}},{org:c.org,model,configuration:config});
    assert.equal((await retry()).failed,true);await p.unroute('**/rest/v1/rpc/mir_submit_request');
    await p.locator('#logout').click();await p.locator('#login').waitFor({state:'visible'});await p.waitForFunction(async()=>!(await window.__missionSdk.auth.getSession()).data.session);await denied(p,'mir_shared_snapshot',{org:c.org});
-   await p.locator('[name=email]').fill(c.accounts.client.email);await p.locator('[name=password]').fill(c.accounts.client.password);await p.locator('#login button').click();await p.locator('#workspace').waitFor({state:'visible'});
+   await p.locator('[name=email]').fill(c.accounts.client.email);await p.locator('[name=password]').fill(c.accounts.client.password);await p.locator('#login').evaluate(f=>{f.noValidate=true;});await p.locator('#login button').click();await p.locator('#workspace').waitFor({state:'visible'});
    const confirmed=await retry();assert.ok(confirmed.id);assert.equal(await submit(p,request.requestId,config),confirmed.id);assert.equal((await snapshot(admin)).orders.filter(o=>o.id===confirmed.id).length,1);assert.equal(await p.evaluate(async org=>window.__missionClient.pending(org),c.org),null);
   });
   // Test fixture snapshots only. No access to the user's iPad localStorage.

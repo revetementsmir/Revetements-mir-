@@ -8,6 +8,8 @@
  const client=MIRSharedClient.create({sdk:window.MIRSupabase.createClient(config.supabaseUrl,config.publishableKey),storage:localStorage,onSessionInvalidated:clearWorkspace});
  const text=(tag,value,parent)=>{const node=document.createElement(tag);node.textContent=value;parent.append(node);return node;};
  const org=()=>$('#organization').value;
+ const requestedDestination=new URLSearchParams(location.search).get('destination'),destination=['boutique','store'].includes(requestedDestination)?requestedDestination:null;
+ if(destination)document.querySelector('h1').textContent=destination==='boutique'?'Boutique partagée':'Magasin employés partagé';
  function openLocalRequest(request){
   const key='mir_production_requests_v1',raw=localStorage.getItem(key),saved=raw?JSON.parse(raw):{version:1,requests:[]};
   if(saved.version!==1||!Array.isArray(saved.requests))throw Error('Anciennes données non reconnues : sauvegarde nécessaire');
@@ -19,7 +21,10 @@
  async function refresh(){
   const sequence=++readSequence,requestedOrg=org(),next=await client.snapshot(requestedOrg);if(sequence!==readSequence||requestedOrg!==org())return;snapshot=next;$('#import-label').hidden=snapshot.role!=='admin';$('#catalogue').replaceChildren();$('#orders').replaceChildren();$('#job-admin').replaceChildren();
   if(snapshot.role==='admin'){const f=document.createElement('form'),name=document.createElement('input'),employee=document.createElement('select');name.placeholder='Nom du chantier';name.required=true;for(const m of snapshot.members.filter(m=>m.role==='employee')){const o=document.createElement('option');o.value=m.id;o.textContent=m.email||('Employé '+m.id);employee.append(o);}f.append(name,employee);text('button','Créer / affecter le chantier',f);$('#job-admin').append(f);f.onsubmit=async e=>{e.preventDefault();try{await client.assignJob(org(),name.value,employee.value);await refresh();}catch(e){status(e.message);}};}
-  for(const model of snapshot.catalogue){
+  $('#all-models').hidden=snapshot.role!=='admin'||!destination;
+  const destinationAllowed=!destination||snapshot.role==='admin'||(destination==='boutique'&&snapshot.role==='client')||(destination==='store'&&snapshot.role==='employee');
+  const catalogue=destinationAllowed?snapshot.catalogue.filter(model=>!destination||(!model.archived&&(destination==='boutique'?model.boutique:model.store))):[];
+  for(const model of catalogue){
    const article=document.createElement('article');article.dataset.revision=model.revision;article.dataset.modelId=model.id;$('#catalogue').append(article);text('h2',model.name,article);
    text('p','Version '+model.version+' · '+model.conditions,article);
    const template=model.specification.template||model.specification,rules=model.configurationRules||{};
@@ -87,7 +92,7 @@
     }catch(e){status('Copie non préparée : '+e.message);}};
    }
   }
-  const focusId=new URLSearchParams(location.search).get('model');if(focusId)document.querySelector('[data-model-id="'+CSS.escape(focusId)+'"]')?.scrollIntoView({block:'start'});$('#retry').hidden=!(await client.pending(org()));status('Données relues depuis le serveur. Stock et fabrication restent à valider.');
+  const focusId=new URLSearchParams(location.search).get('model');if(focusId)document.querySelector('[data-model-id="'+CSS.escape(focusId)+'"]')?.scrollIntoView({block:'start'});$('#retry').hidden=!(await client.pending(org()));status(destinationAllowed?'Données relues depuis le serveur. Stock et fabrication restent à valider.':'Ce catalogue nécessite un compte autorisé pour cette destination.');
  }
  async function start(){const memberships=await client.memberships();$('#organization').replaceChildren();for(const m of memberships){const option=document.createElement('option');option.value=m.id;option.textContent=m.name+' — '+m.role;$('#organization').append(option);}if(!memberships.length)throw Error('Aucun accès MIR actif');$('#login').hidden=true;$('#workspace').hidden=false;await refresh();}
  $('#login').hidden=false;$('#login').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{await client.login(f.get('email'),f.get('password'));e.target.reset();await start();}catch(error){status(error.message);}};

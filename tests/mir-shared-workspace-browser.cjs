@@ -73,6 +73,12 @@ try{
  const supplierCopy=await otherAdmin.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')).order);
  assert.equal(supplierCopy.items.length,1);assert.equal(supplierCopy.items[0].sourceSharedModel.version,1);assert.equal(supplierCopy.items[0].spec.finish.name,'Noir');
  assert.equal(await otherAdmin.evaluate(()=>localStorage.getItem('mir_production_templates_v1')),null,'aucune deuxième bibliothèque créée pour le bon');
+ await otherAdmin.locator('[data-mir-tab=boutique]').first().click();await otherAdmin.getByRole('link',{name:'Ouvrir la Boutique partagée'}).click();
+ await otherAdmin.locator('#workspace').waitFor({state:'visible'});await otherAdmin.locator('#catalogue article').waitFor();
+ assert.equal(await otherAdmin.locator('h1').textContent(),'Boutique partagée');assert.equal(await otherAdmin.locator('#catalogue article').count(),1,'la Boutique exclut les brouillons et autres destinations');
+ await otherAdmin.locator('#all-models').click();await otherAdmin.waitForFunction(()=>document.querySelectorAll('#catalogue article').length===2);
+ await employee.goto(base+'/espace-partage.html?destination=store');await employee.locator('#catalogue article').waitFor();assert.equal(await employee.locator('h1').textContent(),'Magasin employés partagé');
+ await client.goto(base+'/espace-partage.html?destination=store');await client.locator('#workspace').waitFor({state:'visible'});await client.waitForFunction(()=>document.querySelector('#status').textContent.includes('compte autorisé pour cette destination'));assert.equal(await client.locator('#catalogue article').count(),0,'changer une URL ne donne pas accès au Magasin');
  console.log('PASS : import sans doublon, publication Admin, client indépendant mobile, demande employé tablette avec cote verrouillée, récupération Admin, sauvegarde directe du dessin en brouillon partagé');
  await drawingAdmin.locator('#logout').click();await drawingAdmin.locator('#login').waitFor({state:'visible'});
  assert.equal(await drawingAdmin.locator('#workspace').isVisible(),false);assert.equal(await drawingAdmin.locator('#catalogue article').count(),0);assert.equal(await drawingAdmin.locator('#organization option').count(),0);
