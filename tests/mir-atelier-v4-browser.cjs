@@ -39,8 +39,9 @@ function available() {
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'À préciser');
       assert.equal(await page.locator('#production-templates [data-template]').count(),0,'aucun profil imposé');
       await drawTwoSides(page);
-      await page.locator('[data-freeform-finish]').click();
       const phone=viewport.width<=650;
+      // Sur téléphone, Suivant termine le tracé via le vrai moteur : pas de second bouton caché.
+      if(!phone)await page.locator('[data-freeform-finish]').click();
       if(phone){
         assert.equal(await page.locator('body.mir-mobile-stepper').count(),1,viewport.name+': atelier téléphone à 4 étapes actif');
         assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'1');
