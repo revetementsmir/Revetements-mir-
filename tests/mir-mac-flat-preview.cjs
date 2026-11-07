@@ -55,9 +55,9 @@ async function ready(url){
    await page.locator('[data-freeform-add]').click();
    await page.locator('[data-freeform-add]').click();
    await page.locator('[data-freeform-finish]').click();
-   await page.locator('.mir-v4-materials > summary').click();
+    if(!(await page.locator('.mir-v4-materials').evaluate(node=>node.open)))await page.locator('.mir-v4-materials > summary').click();
    await page.locator('#material-type').selectOption('acier');
-   await page.locator('#mir-v4-colors > summary').click();
+    if(!(await page.locator('#mir-v4-colors').evaluate(node=>node.open)))await page.locator('#mir-v4-colors > summary').click();
    await page.locator('#production-material').selectOption('mac-acier-moulures');
    await page.locator('[data-production-color="mac-acier-304"]').click();
    const url='./assets/catalogue-swatches/mac-bouleau-fume-efcc24f8.jpeg';
