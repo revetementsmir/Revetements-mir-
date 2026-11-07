@@ -1,4 +1,5 @@
 'use strict';
+const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
 /* MAC Métal: une teinte de tôle n'est PAS une photo de clin répétée. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -52,8 +53,7 @@ async function ready(url){
    page.on('pageerror',e=>errors.push(String(e.message)));
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('[data-freeform-add]').click();
-   await page.locator('[data-freeform-add]').click();
+   await drawTwoSides(page);
    await page.locator('[data-freeform-finish]').click();
     if(!(await page.locator('.mir-v4-materials').evaluate(node=>node.open)))await page.locator('.mir-v4-materials > summary').click();
    await page.locator('#material-type').selectOption('acier');
