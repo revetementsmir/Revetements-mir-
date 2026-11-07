@@ -43,7 +43,7 @@ const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','T
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));return true;}catch{toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
 function persist(){store(KEYS.draft,{version:1,order});}
 function toast(text){$('#production-toast').textContent=text;$('#production-toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#production-toast').classList.remove('visible'),4400);}
-function closeDialog(){$('#production-dialog').close();}
+function closeDialog(){pendingPOAfterSave=null;$('#production-dialog').close();}
 function dialog(title,text,body){$('#production-dialog-content').innerHTML=`<p class="eyebrow">L’ATELIER MIR</p><h2 id="production-dialog-title" class="dialog-heading">${esc(title)}</h2>${text?`<p class="dialog-intro">${esc(text)}</p>`:''}${body}`;if(!$('#production-dialog').open)$('#production-dialog').showModal();}
 function messageError(message){let el=$('#production-dialog-error');if(!el){el=document.createElement('p');el.id='production-dialog-error';el.className='dialog-error';el.setAttribute('role','alert');$('#production-dialog-content').append(el);}el.textContent=message;}
 function sampleSpec(type,id){const spec={kind:type,unit:'in',quantity:1,material:{type:'aluminium',thickness:'',gauge:''},finish:{},coloredFace:{side:'left',segmentId:'A'},location:'',note:''};if(type==='profile')return {...spec,template:id,...copy(profiles[id]||profiles.custom),length:window.MIRBendingLengths.requiredLengthIn(id)};return {...spec,material:{type:'acier',name:'Unico U-P1 — Acier',productRef:'unico-up1-acier',thickness:'',thicknessUnit:'mm',gauge:''},mirrorX:false,dimensionBasis:'overall-including-lips',shape:id,name:shapes.find(s=>s[0]===id)?.[1]||'Panneau',width:48,height:id==='square'?48:36,relief:2,lip:1,apexX:24,topWidth:30,topOffset:9,offset:10,pointSide:'top',tipDepth:12,apexOffset:24,rightAngle:'bottom-left',bottomEdgeId:'bottom',perforation:{enabled:false,edgeId:'bottom',details:''},lips:{}};}
@@ -707,6 +707,7 @@ function choosePODialog(intent='',description=''){
   (rows.length?`<ul class="mir-po-list">${rows.map(row=>`<li><button type="button" class="secondary-button" data-open-po="${esc(row.id)}" data-po-intent="${intent}"${intent&&!row.poNumber?' disabled':''}>${esc(row.poNumber||'Brouillon sans numéro')} · ${row.items.length} ligne(s)${row.project?' · '+esc(row.project):''}</button></li>`).join('')}</ul>`:''));
 }
 
+let pendingPOAfterSave=null;
 /* Continuer ouvre trois destinations FINALES et ne crée jamais de côté.
  * Mesures, plis et couleurs restent disponibles sur une même page. */
 function openContinueMenu(){
@@ -720,11 +721,12 @@ function openContinueMenu(){
  const note=model.complete?'Moulure prête pour la préparation du bon.':'Certaines informations de fabrication restent à vérifier avant la validation du bon.';
  dialog('Que veux-tu faire avec cette moulure ?',note,
    '<div class="mir-continue-summary"><strong>'+esc(model.name||'Moulure dessinée')+'</strong><p>'+measures+'</p><p>'+bends+'</p><p>Longueur : '+esc(M.formatMeasurement(model.lengthMM,model.unit))+' · Qté : '+esc(model.quantity||1)+'</p></div>'+
+   '<label class="mir-continue-save-choice"><input id="mir-continue-save" type="checkbox" aria-label="Enregistrer aussi dans Mes pliages"> <span><strong>Enregistrer aussi dans Mes pliages</strong><small>Coche si tu veux réutiliser cette moulure. Les choix Boutique et Magasin sont conservés, sans publication automatique.</small></span></label>'+ 
    '<div class="mir-continue-actions" role="group" aria-label="Destination du pliage">'+
-   '<button type="button" data-mir-continue-action="save"><strong>Enregistrer dans Mes pliages</strong><small>Réutiliser la moulure et conserver les choix Boutique / Magasin.</small></button>'+
-   '<button type="button" data-mir-continue-action="existing"><strong>Ajouter à un bon existant</strong><small>Sélectionner un bon déjà créé, sans enregistrer un modèle.</small></button>'+
-   '<button type="button" data-mir-continue-action="new"><strong>Créer un nouveau bon</strong><small>Ajouter cette pièce et compléter fournisseur, chantier et livraison.</small></button>'+
-   '</div><p class="field-hint">Les deux choix Bon ne créent pas de fiche dans Mes pliages. Aucun envoi automatique.</p>'+
+   '<button type="button" data-mir-continue-action="save"><strong>Enregistrer seulement</strong><small>Enregistrer ce pliage, sans créer de bon.</small></button>'+
+   '<button type="button" data-mir-continue-action="existing"><strong>Ajouter à un bon existant</strong><small>Avec ou sans enregistrement dans Mes pliages.</small></button>'+
+   '<button type="button" data-mir-continue-action="new"><strong>Créer un nouveau bon</strong><small>Avec ou sans enregistrement. Fournisseur, chantier et livraison ensuite.</small></button>'+
+   '</div><p class="field-hint">Sans la case cochée, un bon ne crée jamais de fiche Mes pliages. Aucun bon n’est envoyé automatiquement.</p>'+
    '<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Retour au dessin</button></div>');
  return true;
 }
@@ -739,21 +741,32 @@ function existingPOChoice(){
   '<div class="mir-continue-existing">'+rows.map(row=>'<button type="button" class="secondary-button" data-open-po="'+esc(row.id)+'" data-po-intent="add"><strong>'+esc(row.poNumber)+'</strong><small>'+esc(row.project||'Chantier à nommer')+' · '+row.items.length+' référence(s)</small></button>').join('')+
   '</div><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button></div>');
 }
-function continueChoice(action){
- if(client||kind!=='profile'||authoring||editingItemId)return;
- if(action==='save'){closeDialog();saveTemplateDialog();return;}
- if(action==='existing'){existingPOChoice();return;}
- if(action!=='new')return;
- closeDialog();
+function createNewPOFromCurrent(){
  if(!switchWorkshopOrder(defaultOrder()))return;
  const count=order.items.length;
  addPiece();
- if(order.items.length>count)window.MIRProcurementUI?.openCreate?.();
- else toast('Le bon vide est conservé : vérifie les mesures et les paramètres de la pièce.');
+ if(order.items.length>count)window.MIRProcurementUI?.openCreate?.({newOrder:true});
+ else toast('Le bon reste brouillon : vérifie la quantité, les cotes et les paramètres avant de reprendre.');
+}
+function continueChoice(action){
+ if(client||kind!=='profile'||authoring||editingItemId)return;
+ if(!['save','existing','new'].includes(action))return;
+ if(action==='save'){pendingPOAfterSave=null;saveTemplateDialog();return;}
+ if($('#mir-continue-save')?.checked===true){
+  // La forme est enregistrée EXPLICITEMENT avant d'ajouter une ligne au bon.
+  // Annuler le dialogue de sauvegarde annule aussi l'ajout au bon.
+  pendingPOAfterSave=action;
+  saveTemplateDialog();
+  return;
+ }
+ pendingPOAfterSave=null;
+ if(action==='existing'){existingPOChoice();return;}
+ closeDialog();
+ createNewPOFromCurrent();
 }
 function finishPOChoice(intent){
  closeDialog();
- if(intent==='add'){const count=order.items.length;addPiece();if(order.items.length>count)window.MIRProcurementUI?.openCreate?.();}
+ if(intent==='add'){const count=order.items.length;addPiece();if(order.items.length>count)window.MIRProcurementUI?.openCreate?.({newOrder:false});}
  if(intent==='transfer')offerProfileImport(true);
 }
 function updateOrderReference(){
@@ -1881,7 +1894,18 @@ function handleSubmit(event){
  if(data.has('store')&&storeColor.policy.mode==='fixed'&&
     !window.MIRBendingFinishes.forMetal(materials,storeColor.policy.metalType).some(item=>item.id===storeColor.policy.materialId))
   return messageError('Ce nuancier fabricant ne correspond pas au métal choisi. Sélectionne le bon rouleau avant de conserver sa couleur.');
- const record={storeColor:storeColor.policy,measurementDefaults:checked.data,id:result.template.id,name:result.template.name,currentVersion:result.template.version,versions:old?[...old.versions,copy(result.template)]:[copy(result.template)],channels:{client:data.has('client'),store:data.has('store'),po:data.has('po')},allowed,archived:false,commercial:{...(old?.commercial||{}),status:'draft',lengthIn:120,currency:'CAD',priceCentsByMetal:old?.commercial?.priceCentsByMetal||{},wantsClient:data.has('client'),updatedAt:new Date().toISOString()},updatedAt:new Date().toISOString()};const nextRecords=old?templates.map(row=>row.id===old.id?record:row):[...templates,record];if(!store(KEYS.templates,{version:1,records:nextRecords}))return;templates=nextRecords;closeDialog();authoring=false;editingTemplateId=null;workflow='models';render();toast(data.has('client')?'Pliage enregistré. Boutique sélectionnée : tarifs et publication à valider.':data.has('store')?'Pliage enregistré pour le magasin employés.':'Pliage enregistré dans Mes pliages, sans publication en Boutique ni Magasin.');if(data.get('saveTarget')==='shared'&&window.MIRDirectModelSave)void window.MIRDirectModelSave.save(record);
+ const record={storeColor:storeColor.policy,measurementDefaults:checked.data,id:result.template.id,name:result.template.name,currentVersion:result.template.version,versions:old?[...old.versions,copy(result.template)]:[copy(result.template)],channels:{client:data.has('client'),store:data.has('store'),po:data.has('po')},allowed,archived:false,commercial:{...(old?.commercial||{}),status:'draft',lengthIn:120,currency:'CAD',priceCentsByMetal:old?.commercial?.priceCentsByMetal||{},wantsClient:data.has('client'),updatedAt:new Date().toISOString()},updatedAt:new Date().toISOString()};const nextRecords=old?templates.map(row=>row.id===old.id?record:row):[...templates,record];if(!store(KEYS.templates,{version:1,records:nextRecords}))return;
+ templates=nextRecords;
+ const nextPOAction=pendingPOAfterSave;
+ pendingPOAfterSave=null;
+ closeDialog();authoring=false;editingTemplateId=null;
+ workflow=nextPOAction?'configure':'models';
+ if(nextPOAction)selectedTemplate=result.template;
+ render();
+ toast(data.has('client')?'Pliage enregistré. Boutique sélectionnée : tarifs et publication à valider.':data.has('store')?'Pliage enregistré pour le magasin employés.':'Pliage enregistré dans Mes pliages, sans publication en Boutique ni Magasin.');
+ if(data.get('saveTarget')==='shared'&&window.MIRDirectModelSave)void window.MIRDirectModelSave.save(record);
+ if(nextPOAction==='existing')existingPOChoice();
+ if(nextPOAction==='new')createNewPOFromCurrent();
 }
 function handleKey(event){if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
 async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Error('Le moteur de modèles n’est pas disponible.');if(!window.MIRBendingLengths?.check)throw new Error('Les longueurs de vente MIR sont indisponibles.');const fetched=await Promise.allSettled([fetch('catalogue-fd6866b49d21.json').then(r=>{if(!r.ok)throw new Error('catalogue');return r.json();}),fetch('ral-classic.json').then(r=>{if(!r.ok)throw new Error('nuancier RAL');return r.json();})]);if(fetched[0].status==='fulfilled'){const raw=fetched[0].value;const catalogue=Array.isArray(raw)?raw:raw.materials||[];materials=window.MIRBendingFinishes.catalogue(catalogue);}if(fetched[1].status==='fulfilled'&&Array.isArray(fetched[1].value.colors))ral=fetched[1].value;
