@@ -474,7 +474,14 @@ body.mir-admin-v4 #production-dialog .mir-continue-existing{
  body.mir-mobile-stepper[data-mir-mobile-step="2"] #mir-v4-dimensions,
  body.mir-mobile-stepper[data-mir-mobile-step="3"] :is(.mir-v4-materials,#mir-v4-colors,#mir-v4-face){margin:0 0 8px!important}
  /* Confirmation: deux rendus existants, puis quantité et destinations. */
- body.mir-mobile-stepper[data-mir-mobile-step="4"] .production-workspace{overflow-y:auto!important;overscroll-behavior:contain}
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] .production-workspace{
+  overflow-y:auto!important;overscroll-behavior:contain;
+  scroll-padding-bottom:calc(105px + env(safe-area-inset-bottom));
+  padding-bottom:calc(105px + env(safe-area-inset-bottom))!important;
+ }
+ body.mir-mobile-stepper[data-mir-mobile-step="4"] :is(#mir-direct-po-add,#add-production-piece,#production-piece-name){
+  scroll-margin-bottom:calc(105px + env(safe-area-inset-bottom));
+ }
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card{display:flex!important;flex:0 0 auto;flex-direction:column}
  body.mir-mobile-stepper[data-mir-mobile-step="4"] .drawing-card>.drawing-tools,
  body.mir-mobile-stepper[data-mir-mobile-step="4"] #trace-readout{display:none!important}
