@@ -303,3 +303,8 @@ body.mir-admin-v4 #mir-procurement-panel .mir-proc-primary:hover{
  body.mir-admin-v4 #mir-procurement-panel .mir-po-editor-actions{flex-direction:column;align-items:stretch;}
  body.mir-admin-v4 #mir-procurement-panel .mir-po-suppliers{gap:7px}
 }
+
+body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field{display:flex;align-items:end;gap:7px;min-width:0}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field>.mir-proc-field{flex:1 1 auto;margin:0 0 13px;min-width:0}
+body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field>button{flex:0 0 auto;min-height:45px;margin-bottom:13px;font-size:11px!important;padding:6px 9px!important}
+@media(max-width:600px){body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field{flex-wrap:wrap}body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field>button{margin:0 0 13px}}
