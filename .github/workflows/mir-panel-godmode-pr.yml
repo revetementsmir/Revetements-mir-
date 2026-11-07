@@ -1,0 +1,37 @@
+name: MIR — Panneau seul pente lips 2D/3D
+on:
+  push:
+    branches: [moon/mir-panneaux-godmode-live-20261107]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'dist/production*'
+      - 'dist/mir-panel*'
+      - 'tests/mir-panel-godmode*.cjs'
+      - '.github/workflows/mir-panel-godmode-pr.yml'
+permissions:
+  contents: read
+jobs:
+  standalone:
+    name: Panneau seul / 6-12 / lips=0 / Chrome
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Geometry regression
+        run: |
+          node --check dist/production-model.js
+          node --check dist/production-app.js
+          node --check dist/mir-panel-roof.js
+          node --check dist/mir-panel-sketch.js
+          node --check tests/mir-panel-godmode-browser.cjs
+          node tests/mir-panel-godmode-model.cjs
+      - name: Browser PC iPad phone
+        run: |
+          npm install --no-save playwright@1.58.2
+          node tests/mir-panel-godmode-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-panel-godmode-chrome
+          path: artifacts/mir-panel-*.png
+          if-no-files-found: ignore
