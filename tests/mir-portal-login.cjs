@@ -27,13 +27,12 @@ test('Les codes d’authentification ne restent pas dans l’URL',()=>{
   assert.equal(r.authCallback.kind,'code');
   assert.ok(!r.cleanURL.includes('code='));
 });
-test('La connexion reste fermée sans configuration Supabase MIR',()=>{
-  const p=read('portal-config.js');
-  assert.match(p,/enabled: false/);
-  assert.match(p,/emailEnabled: false/);
-  assert.match(p,/googleEnabled: false/);
-  assert.match(p,/invitationsEnabled: false/);
-  assert.doesNotMatch(p,/service_role|sb_secret_[A-Za-z0-9]+/i);
+test('Activation réelle autorisée : clé publique et compte vérifié, jamais de rôle fourni par le navigateur',()=>{
+  const cfg=require('./mir-account-config-helper.cjs')();
+  assert.equal(cfg.enabled,true);assert.equal(cfg.accountEnabled,true);assert.equal(cfg.passwordEnabled,true);
+  assert.match(cfg.publishableKey,/^sb_publishable_/);
+  assert.equal(Auth.validateConfig(cfg,cfg.siteOrigin).redirectTo,'https://revetementsmirweb.github.io/MIR/chantier.html');
+  assert.deepEqual(Auth.validateConfig({enabled:false}),{enabled:false});
 });
 test('Une configuration activée sans clé publiable est refusée',()=>{
   assert.throws(()=>Auth.validateConfig({enabled:true,projectRef:'gccltmaulvrnthrbnrpd',

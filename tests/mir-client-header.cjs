@@ -67,11 +67,12 @@ test('Le second bouton va réellement à la boutique et les trois images sont ma
  assert.doesNotMatch(m,/<svg|class="icon"|lucide/i);
  for(const n of ['mir-01.jpg','mir-02.jpg','mir-03.jpg'])assert.ok(fs.existsSync(path.join(dir,'assets',n)));
 });
-test('Les clients peuvent explorer sans connexion et le portail demeure désactivé',()=>{
+test('Les clients explorent sans connexion et Mon compte exige une identité vérifiée',()=>{
  const home=read('index.html');
  const cfg=read('portal-config.js');
  assert.match(home,/href="boutique\.html">Découvrir nos revêtements/);
  assert.doesNotMatch(home,/Explorer sans connexion|Connexion Admin/i);
- assert.match(cfg,/enabled: false/);
+ assert.equal(require('./mir-account-config-helper.cjs')().enabled,true);
+ assert.match(read('portal-client.js'),/sdk.auth.getUser/);
 });
 console.log('MIR en-têtes client : '+count+'/'+count+' vérifications réussies');

@@ -24,6 +24,9 @@
   let model, state, materials=[], materialMap=new Map(), ui, mode='employee', view='projects', actorId='demo-employee-1', query='', category='all', favoritesOnly=false, orderFilter='pending', toastTimer, customModelController=null;
   let reviewingOrder=false, deliveryDraft={mode:'delivery',note:''};
   let connectionMode='connected', portalClient=null, clientStatus=null, authCallback=null, invitationToken=null, authMessage='', authError='', authBusy=false, invitations=[], uiStorageKey=UI_KEY;
+  let authScreen='signin',authEmail='',customerTab='orders';
+  const accountEnvironment=()=>window.MIRPortalConfig?.environment||'production';
+  function resumeCheckout(){try{const target=window.MIRAccountFlow?.consume(localStorage,accountEnvironment());if(target){location.assign(target+(accountEnvironment()==='test'?'&recette=1':''));return true;}}catch(_){}return false;}
   const isDemo=()=>connectionMode==='demo';
   const load = (key,fallback) => { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch { return fallback; } };
   function save() {
@@ -239,9 +242,10 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
   }
   function renderOrders(admin=false) {
     const all=model.listOrders(state,actorId,{view:'all'}),orders=model.listOrders(state,actorId,{view:orderFilter});
+    const shared=(state.sharedOrders||[]).map(order=>`<article class="order-card"><h2>Demande ${esc(order.id)}</h2><p>${esc(order.status||'Enregistrée')} · ${date(order.createdAt)}</p><a href="espace-partage.html">Voir le catalogue partagé et son suivi</a></article>`).join('');
     return heading(admin?'LA PRÉPARATION DES CHANTIERS':'VOS DEMANDES DE MATÉRIEL',admin?'Préparer. <em>Livrer. Suivre.</em>':'Mes commandes',admin?'Réservez le stock connu, saisissez les quantités réellement livrées et gardez le reliquat visible.':'Retrouvez les articles attendus et l’historique des articles reçus.')+
       (admin?`<div class="stats-row"><div class="stat-card"><span>À PRÉPARER</span><strong>${all.filter(o=>{const n=orderNumbers(o);return n.remaining&&!n.delivered;}).length}</strong><small>Demandes ouvertes</small></div><div class="stat-card"><span>LIVRAISONS PARTIELLES</span><strong>${all.filter(o=>{const n=orderNumbers(o);return n.remaining&&n.delivered;}).length}</strong><small>Reliquats conservés</small></div><div class="stat-card"><span>DEMANDES CLÔTURÉES</span><strong>${all.filter(o=>!orderNumbers(o).remaining).length}</strong><small>${isDemo()?'Dans cet aperçu':'Demandes terminées'}</small></div></div>`:'')+
-      `<div class="order-filters" aria-label="Filtrer les demandes">${[['pending','En cours'],['history','Historique'],['all','Tout voir']].map(([id,label])=>`<button type="button" data-order-filter="${id}" aria-pressed="${id===orderFilter}">${label}</button>`).join('')}</div><div class="orders-list">${orders.length?orders.map(order=>orderCard(order,admin)).join(''):empty('orders','Aucune demande dans cette vue',orderFilter==='history'?'Les articles entièrement reçus ou annulés apparaîtront ici.':'Ajoutez du matériel depuis le catalogue de chantier.')}</div>`+
+      `<div class="order-filters" aria-label="Filtrer les demandes">${[['pending','En cours'],['history','Historique'],['all','Tout voir']].map(([id,label])=>`<button type="button" data-order-filter="${id}" aria-pressed="${id===orderFilter}">${label}</button>`).join('')}</div><div class="orders-list">${shared}${orders.length?orders.map(order=>orderCard(order,admin)).join(''):empty('orders','Aucune demande dans cette vue',orderFilter==='history'?'Les articles entièrement reçus ou annulés apparaîtront ici.':'Ajoutez du matériel depuis le catalogue de chantier.')}</div>`+
       (admin?note('Le stock commence à « inconnu »',isDemo()?'Saisissez un stock de simulation dans Inventaire avant de réserver ou livrer. Le portail ne crée aucun stock réel.':'Enregistrez le comptage physique dans Inventaire avant de réserver ou livrer. Les réservations ne modifient pas le stock physique.'): '');
   }
   function stockHTML(stock,unit) {return stock.known?`<strong>${num(stock.available)} ${esc(unit)}</strong><small>Disponible · ${num(stock.reserved)} réservé${stock.reserved>1?'s':''}</small>`:`<strong>Stock inconnu</strong><small>${isDemo()?'Comptage de simulation requis':'Comptage physique requis'}</small>`;}
@@ -263,16 +267,23 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     const memberCards=members.length?members.map(member=>`<article class="member-card"><div class="member-avatar" aria-hidden="true">${esc((member.name||'MIR').split(' ').map(n=>n[0]).slice(0,2).join(''))}</div><div class="member-body"><h3>${esc(member.name||'Membre MIR')}</h3><p>${esc(member.email||(isDemo()?'Profil fictif · aucun compte connecté':''))}</p><span class="pill ${member.active?'muted':'danger'}">${member.active?(isDemo()?'Actif dans la démo':'Accès actif'):(isDemo()?'Désactivé dans la démo':'Accès suspendu')}</span><div class="member-jobs">${memberJobs(member).map(job=>`<span class="pill">${esc(job.name)}</span>`).join('')||'<span class="pill muted">Aucun chantier</span>'}</div><button type="button" class="button quiet" data-assign-member="${esc(member.id)}">Modifier les chantiers ${icon('arrow')}</button>${!isDemo()?`<button type="button" class="button quiet" data-member-active="${esc(member.id)}" data-active="${member.active?'false':'true'}">${member.active?'Suspendre l’accès':'Réactiver l’accès'}</button>`:''}</div></article>`).join(''):empty('people','Votre équipe commence ici','Invitez vos employés et attribuez leurs chantiers.');
     const invitationRows=rows.length?`<div class="invitation-drafts"><h3>${isDemo()?'Brouillons d’invitation':'Invitations'}</h3>${rows.map(row=>`<div class="invitation-row"><strong>${esc(row.email)}</strong><small>${isDemo()?'Brouillon local · aucun envoi.':esc(invitationLabel(row))}</small>${!isDemo()&&canInvite&&!['accepted','revoked','expired'].includes(row.status)?`<button type="button" class="button quiet" data-revoke-invitation="${esc(row.id||row.invitationId)}">Révoquer ce lien</button>`:''}</div>`).join('')}</div>`:'';
     return heading('L’ÉQUIPE & LES ACCÈS','Chacun a <em>son dossier.</em>',isDemo()?'Préparez les affectations de chantier et les invitations. Cet aperçu ne crée aucun compte réel.':'Attribuez les chantiers et gérez les accès de votre équipe.')+
-      `<div class="admin-grid"><section><div class="members-list">${memberCards}</div>${invitationRows}</section><aside class="admin-panel"><h2>Inviter un employé</h2><p>${isDemo()?'Préparez le courriel et les chantiers auxquels la personne pourra accéder.':canInvite?'Le lien d’accès est envoyé à cette adresse. La personne pourra consulter uniquement les chantiers attribués.':'L’envoi des liens sécurisés doit être activé avant la première invitation.'}</p><form id="invitation-form"><label class="form-wide">Adresse courriel<input name="email" type="email" maxlength="254" placeholder="nom@entreprise.ca" required${!isDemo()&&!canInvite?' disabled':''}></label><fieldset class="form-wide"${!isDemo()&&!canInvite?' disabled':''}><legend>Chantiers à attribuer</legend><div class="checklist">${state.jobs.map(job=>`<label class="checkline"><input name="jobIds" type="checkbox" value="${esc(job.id)}"><span>${esc(job.name)}</span></label>`).join('')||'<p>Créez un chantier pour l’attribuer à votre équipe.</p>'}</div></fieldset><p class="cart-local-note form-wide">${isDemo()?'Aucun courriel ni lien sécurisé n’est généré.':canInvite?'Invitation MIR valable 72 heures. Le lien de connexion reçu par courriel peut expirer plus tôt.':'Les comptes et les envois ne sont pas actifs sur cet aperçu.'}</p><button type="submit" class="button form-wide"${!isDemo()&&!canInvite?' disabled':''}>${isDemo()?'Enregistrer le brouillon':canInvite?'Envoyer l’invitation':'Invitations en cours d’activation'} ${icon('arrow')}</button></form></aside></div>`;
+      `<div class="admin-grid"><section><div class="members-list">${memberCards}</div>${invitationRows}</section><aside class="admin-panel"><h2>Inviter un employé</h2><p>${isDemo()?'Préparez le courriel et les chantiers auxquels la personne pourra accéder.':canInvite?(portalClient?.config.manualInvitations?'Créez un lien privé à transmettre à cette personne. Aucun courriel automatique.':'Le lien d’accès est envoyé à cette adresse. La personne pourra consulter uniquement les chantiers attribués.'):'L’envoi des liens sécurisés doit être activé avant la première invitation.'}</p><form id="invitation-form"><label class="form-wide">Adresse courriel<input name="email" type="email" maxlength="254" placeholder="nom@entreprise.ca" required${!isDemo()&&!canInvite?' disabled':''}></label><fieldset class="form-wide"${!isDemo()&&!canInvite?' disabled':''}><legend>Chantiers à attribuer</legend><div class="checklist">${state.jobs.map(job=>`<label class="checkline"><input name="jobIds" type="checkbox" value="${esc(job.id)}"><span>${esc(job.name)}</span></label>`).join('')||'<p>Créez un chantier pour l’attribuer à votre équipe.</p>'}</div></fieldset><p class="cart-local-note form-wide">${isDemo()?'Aucun courriel ni lien sécurisé n’est généré.':canInvite?'Invitation MIR valable 72 heures. Le lien de connexion reçu par courriel peut expirer plus tôt.':'Les comptes et les envois ne sont pas actifs sur cet aperçu.'}</p><button type="submit" class="button form-wide"${!isDemo()&&!canInvite?' disabled':''}>${isDemo()?'Enregistrer le brouillon':canInvite?(portalClient?.config.manualInvitations?'Créer le lien d’invitation':'Envoyer l’invitation'):'Invitations en cours d’activation'} ${icon('arrow')}</button></form></aside></div>`;
   }
   function invitationLabel(row) {
     if(row.status==='accepted')return 'Invitation acceptée';
     if(row.status==='revoked')return 'Lien révoqué';
     if(row.status==='expired')return 'Lien expiré';
+    if(portalClient?.config.manualInvitations)return 'Lien préparé · transmission manuelle · aucun courriel envoyé';
     if(row.deliveryStatus==='sent'||row.delivery_status==='sent')return `Courriel demandé · invitation valable jusqu’au ${date(row.expiresAt||row.expires_at)}`;
     if(['unknown','dispatching'].includes(row.deliveryStatus||row.delivery_status))return 'Envoi à vérifier avant de réémettre un lien';
     if(row.deliveryStatus==='failed'||row.delivery_status==='failed')return 'Envoi refusé';
     return 'Invitation préparée · envoi à vérifier';
+  }
+  function showInvitationLink(result){
+    if(!result.activationPath){toast('Ce lien a déjà été préparé. Révoquez-le avant d’en créer un autre si vous ne l’avez pas conservé.');return;}
+    const url=new URL(result.activationPath,location.href);if(url.origin!==location.origin||!/^[A-Za-z0-9_-]{43}$/.test(url.searchParams.get('invitation')||''))return toast('Le lien reçu ne peut pas être vérifié.');
+    if(accountEnvironment()==='test')url.searchParams.set('recette','1');
+    openDialog(dialogHeader('INVITATION MIR','Lien privé d’activation','Transmettez ce lien seulement à la personne invitée. Il expire dans 72 heures. Aucun courriel n’a été envoyé automatiquement.')+`<label>Lien d’activation<input id="account-invitation-link" readonly value="${esc(url.href)}"></label><div class="dialog-actions"><button type="button" id="account-copy-invitation" class="button">Copier le lien</button><button type="button" class="button secondary" data-close-dialog>Fermer</button></div>`);
   }
   async function refreshInvitations() {
     if(isDemo()||!portalClient?.config.invitationsEnabled)return;
@@ -334,6 +345,11 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
   async function handleClick(event) {
     const button=event.target.closest('button');if(!button)return;
     if(button.hasAttribute('data-close-dialog'))return closeDialog();
+    if(button.id==='account-copy-invitation'){const input=$('#account-invitation-link');input.select();try{await navigator.clipboard.writeText(input.value);toast('Lien copié. Transmettez-le à la personne invitée.');}catch(_){toast('Sélectionnez puis copiez le lien affiché.');}return;}
+    if(button.dataset.authScreen){authEmail=$('#auth-email')?.value||authEmail;authScreen=button.dataset.authScreen;authError='';authMessage='';renderAuth();$('#auth-email')?.focus();return;}
+    if(button.id==='auth-define-password'){authScreen='invite-password';renderAuth();return;}
+    if(button.dataset.accountView){customerTab=button.dataset.accountView;renderCustomer();return;}
+    if(button.dataset.accountRemoveAddress){if(!confirm('Supprimer cette adresse de votre compte ?'))return;return runAuth(async()=>{await portalClient.removeAddress(button.dataset.accountRemoveAddress);authMessage='Adresse supprimée.';});}
     if(button.id==='auth-confirm-link')return runAuth(async()=>{const callback=authCallback;authCallback=null;await portalClient.completeCallback(callback);});
     if(button.id==='auth-google')return runAuth(()=>portalClient.signInGoogle());
     if(button.id==='auth-retry'||button.id==='portal-refresh')return runAuth(()=>portalClient.refresh(),false);
@@ -399,6 +415,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(button.hasAttribute('data-confirm-demo-reset')&&isDemo()){state=model.createDemoState(materials,{seedExamples:true});ui={carts:{},jobs:{}};mode='employee';actorId='demo-employee-1';view='projects';orderFilter='pending';save();closeDialog();render();toast('Données de démonstration réinitialisées.');}
   }
   function handleChange(event) {
+    if(event.target.id==='auth-show-password'){const input=$('#auth-password');if(input)input.type=event.target.checked?'text':'password';return;}
     const element=event.target;
     if(element.id==='demo-profile'&&isDemo()){actorId=element.value;view=mode==='admin'?'admin-orders':'projects';orderFilter='pending';render();return;}
     if(element.id==='catalogue-category'){category=element.value;renderCatalogueGrid();return;}
@@ -430,6 +447,17 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
   const showFormError=error=>clientStatus?.pending?toast(errorMessage(error)):dialogError(errorMessage(error));
   async function handleSubmit(event) {
     const form=event.target;
+    if(['auth-signin-form','auth-signup-form','auth-reset-form','auth-resend-form','auth-password-form','account-address-form'].includes(form.id)){
+      event.preventDefault();if(!form.reportValidity())return;const data=new FormData(form);if(data.has('email'))authEmail=String(data.get('email')||'');
+      return runAuth(async()=>{
+        if(form.id==='auth-signin-form'){await portalClient.signInPassword(authEmail,String(data.get('password')||''));authScreen='signin';}
+        if(form.id==='auth-signup-form'){const out=await portalClient.signUpClient(authEmail,String(data.get('password')||''));authMessage=out.message;authScreen='confirmation';}
+        if(form.id==='auth-reset-form')authMessage=(await portalClient.resetPassword(authEmail)).message;
+        if(form.id==='auth-resend-form')authMessage=(await portalClient.resendConfirmation(authEmail)).message;
+        if(form.id==='auth-password-form'){await portalClient.setPassword(String(data.get('password')||''));authScreen='signin';authMessage='Votre mot de passe est enregistré.';}
+        if(form.id==='account-address-form'){await portalClient.saveAddress(Object.fromEntries(data));authMessage='Adresse enregistrée dans votre compte.';}
+      });
+    }
     if(form.id==='auth-email-form'){
       event.preventDefault();const email=String(new FormData(form).get('email')||'');
       return runAuth(async()=>{const result=await portalClient.sendEmail(email);authMessage=result.message;});
@@ -458,7 +486,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(form.id==='assignment-form'){if(!isDemo()){const out=await act('ASSIGN_MEMBER_JOBS',{memberId:form.dataset.member,jobIds:data.getAll('jobIds')});if(!out.ok)showFormError(out.error);else{closeDialog();render();toast('Accès aux chantiers enregistrés.');}return;}const member=state.members.find(m=>m.id===form.dataset.member),before=new Set(memberJobs(member).map(j=>j.id)),after=new Set(data.getAll('jobIds'));for(const job of state.jobs){if(before.has(job.id)===after.has(job.id))continue;const out=await act('ASSIGN_JOB',{memberId:member.id,jobId:job.id,assigned:after.has(job.id)});if(!out.ok){showFormError(out.error);return;}}closeDialog();render();toast('Affectations de démonstration enregistrées.');return;}
     if(form.id==='invitation-form'){
       const out=await act(isDemo()?'SAVE_INVITATION_DRAFT':'INVITE_EMPLOYEE',{email:String(data.get('email')||'').trim(),jobIds:data.getAll('jobIds'),expiresInHours:72});
-      if(out.ok){if(isDemo()){render();toast('Brouillon enregistré. Aucun courriel n’a été envoyé.');}else{toast(invitationLabel(out.result));form.reset();await refreshInvitations();}}return;
+      if(out.ok){if(isDemo()){render();toast('Brouillon enregistré. Aucun courriel n’a été envoyé.');}else{toast(invitationLabel(out.result));form.reset();await refreshInvitations();if(portalClient.config.manualInvitations)showInvitationLink(out.result);}}return;
     }
     if(form.hasAttribute('data-fabricated-stock')){const out=await act('SET_INVENTORY',{stockKey:form.dataset.fabricatedStock,quantity:Number(data.get('quantity')),unit:form.dataset.stockUnit,note:isDemo()?'Comptage de pièces fabriquées dans l’aperçu':'Comptage physique de pièces fabriquées'});if(out.ok){form.querySelector('.stock-value').innerHTML=stockHTML(stockFor(form.dataset.fabricatedStock),form.dataset.stockUnit);toast(isDemo()?'Stock de simulation enregistré.':'Comptage enregistré dans l’inventaire partagé.');}return;}
     if(form.dataset.inventoryForm){const item=itemById(form.dataset.inventoryForm),configured=model.configureLine(state,{itemId:item.id,quantity:item.quantityStep||1,colorId:String(data.get('colorId')||'')||undefined,formatId:String(data.get('formatId')||'')||undefined});if(!configured.ok){toast(errorMessage(configured.error));return;}const out=await act('SET_INVENTORY',{stockKey:configured.line.stockKey,quantity:Number(data.get('quantity')),unit:item.unit,note:isDemo()?'Comptage de simulation dans le portail':'Comptage physique dans le portail'});if(out.ok){form.querySelector('.stock-value').innerHTML=stockHTML(stockFor(configured.line.stockKey),item.unit);toast(isDemo()?'Stock de simulation enregistré.':'Comptage enregistré dans l’inventaire partagé.');}}
@@ -473,7 +501,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     document.querySelector('.portal-shell').classList.toggle('auth-shell',!showPortal);
     $('#account-bar').hidden=isDemo()||!showPortal;
     $('#demo-reset')?.setAttribute('hidden','');$('#demo-exit')?.setAttribute('hidden','');
-    $('#portal-footer-label').textContent=isDemo()?'Les Revêtements MIR · Aperçu avec données fictives':'Les Revêtements MIR · Le portail chantier';
+    $('#portal-footer-label').textContent=isDemo()?'Les Revêtements MIR · Aperçu avec données fictives':(showPortal?'Les Revêtements MIR · Le portail chantier':'Les Revêtements MIR · Mon compte');
     document.querySelectorAll('[data-management-link]').forEach(link=>link.hidden=!showPortal||mode!=='admin');
     // Le bandeau public reste accessible; seuls les droits serveur ouvrent les fonctions privées.
     if(!showPortal)$('#portal-operation').hidden=true;
@@ -488,35 +516,58 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     }catch(_){}
     return token||null;
   }
+  function authPasswordFields({newPassword=false}={}) {
+    return `<label for="auth-password">${newPassword?'Nouveau mot de passe':'Mot de passe'}<input id="auth-password" name="password" type="password" autocomplete="${newPassword?'new-password':'current-password'}" required${newPassword?' minlength="12"':''} maxlength="256"></label><label class="auth-show-password"><input type="checkbox" id="auth-show-password"> Afficher le mot de passe</label>${newPassword?'<p class="auth-footnote">Au moins 12 caractères. Utilisez une phrase facile à retenir.</p>':''}`;
+  }
   function renderAuth() {
     if(isDemo())return;
-    setChrome(false);if(customModelController){customModelController.destroy();customModelController=null;}
+    setChrome(false);$('#portal-navigation').replaceChildren();
+    if(customModelController){customModelController.destroy();customModelController=null;}
     const config=portalClient?.config||window.MIRPortalConfig||{},phase=clientStatus?.phase||'unavailable',user=clientStatus?.user;
-    let title='Espace équipe MIR',intro='Tes chantiers, tes commandes et tes plans au même endroit.',body='';
-    if(authCallback&&config.enabled){
-      title=invitationToken?'Bienvenue<br><em>dans l’équipe.</em>':'Votre lien<br><em>de connexion.</em>';
-      intro=invitationToken?'Validez votre lien, puis acceptez votre invitation pour rejoindre les chantiers qui vous sont attribués.':'Validez ce lien pour ouvrir votre espace MIR.';
-      body=`<button type="button" id="auth-confirm-link" class="button full"${authBusy?' disabled':''}>${authBusy?'Vérification…':'Valider mon lien'} ${icon('arrow')}</button>`;
+    let title=invitationToken?'Activer mon compte':'Mon compte MIR',intro='Vos commandes, leur suivi et vos adresses. Le catalogue et le panier restent accessibles sans compte.',body='';
+    if(phase==='password_required'||authScreen==='invite-password'&&user){
+      title=clientStatus?.passwordIntent==='invite'||authScreen==='invite-password'?'Activer mon compte':'Choisir mon nouveau mot de passe';
+      intro='Définissez votre mot de passe avant d’ouvrir votre compte. Votre panier est conservé.';
+      body=`<form id="auth-password-form">${authPasswordFields({newPassword:true})}<button type="submit" class="button full"${authBusy?' disabled':''}>Enregistrer mon mot de passe</button></form><button type="button" class="button quiet full" id="auth-signout">Annuler et me déconnecter</button>`;
+    }else if(authCallback&&config.enabled){
+      title='Vérification du lien';intro='Nous vérifions ce lien avant d’ouvrir votre compte.';
+      body=`<button type="button" id="auth-confirm-link" class="button full"${authBusy?' disabled':''}>${authBusy?'Vérification…':'Valider mon lien'}</button>`;
     }else if(invitationToken&&user&&config.enabled){
-      title='Votre invitation<br><em>vous attend.</em>';intro='Votre compte est identifié. Acceptez l’invitation pour ouvrir les chantiers que MIR vous a attribués.';
-      body=`<p class="auth-account">Connecté avec <strong>${esc(user.email)}</strong></p><button type="button" id="auth-accept-invitation" class="button full"${authBusy?' disabled':''}>${authBusy?'Activation…':'Accepter mon invitation'} ${icon('arrow')}</button><button type="button" id="auth-signout" class="button quiet full"${authBusy?' disabled':''}>Utiliser un autre compte</button>`;
+      title='Activer mon compte';intro='Cette invitation donne accès uniquement aux chantiers attribués par MIR.';
+      body=`<p class="auth-account">Connecté avec <strong>${esc(user.email)}</strong></p><button type="button" id="auth-accept-invitation" class="button full"${authBusy?' disabled':''}>Activer mon compte</button><button type="button" class="button secondary full" id="auth-define-password">Définir mon mot de passe</button><button type="button" id="auth-signout" class="button quiet full">Utiliser un autre compte</button>`;
     }else if(phase==='loading'){
-      body='<div class="auth-loading"><span class="loading-dot"></span><p>Vérification de votre accès…</p></div>';
+      body='<div class="auth-loading"><span class="loading-dot"></span><p>Vérification de votre compte…</p></div>';
     }else if(!config.enabled){
-      body='<div class="auth-activation"><h2>Connexion en attente</h2><p>L’espace équipe n’est pas encore ouvert. Si tu dois commander du matériel, communique avec ton responsable MIR.</p></div>';
+      body='<div class="auth-activation"><h2>Connexion en attente</h2><p>L’espace équipe n’est pas encore ouvert. Votre panier reste conservé.</p></div>';
     }else if(user&&['access_denied','error'].includes(phase)){
-      title=phase==='access_denied'?'Votre accès<br><em>reste à confirmer.</em>':'La connexion<br><em>a été interrompue.</em>';
-      intro=phase==='access_denied'?'Votre compte est reconnu. Le responsable MIR doit activer votre accès ou vous envoyer une invitation.':'Vos demandes sont conservées par le service. Vérifiez la connexion avant de poursuivre.';
-      body=`<p class="auth-account">${esc(user.email)}</p><button type="button" class="button full" id="auth-retry"${authBusy?' disabled':''}>Réessayer ${icon('arrow')}</button><button type="button" class="button quiet full" id="auth-signout"${authBusy?' disabled':''}>Déconnexion</button>`;
+      title='Votre accès reste à confirmer';intro='Votre identité est reconnue. MIR doit confirmer les accès internes ; l’inscription publique ne donne jamais de droit employé, admin ou entrepôt.';
+      body=`<p class="auth-account">${esc(user.email)}</p><button type="button" class="button full" id="auth-retry">Réessayer</button><button type="button" class="button quiet full" id="auth-signout">Déconnexion</button>`;
+    }else if(authScreen==='forgot'){
+      title='Mot de passe oublié';intro='Recevez un lien pour choisir un nouveau mot de passe.';
+      body=`<form id="auth-reset-form"><label for="auth-email">Courriel<input id="auth-email" name="email" type="email" autocomplete="email" maxlength="254" value="${esc(authEmail)}" required></label><button type="submit" class="button full"${authBusy?' disabled':''}>Envoyer le lien de récupération</button></form><button type="button" class="button quiet full" data-auth-screen="signin">Retour à la connexion</button>`;
+    }else if(authScreen==='signup'){
+      title='Créer un compte client';intro='Confirmez votre adresse courriel pour retrouver votre commande. Les accès de l’équipe sont attribués par MIR.';
+      body=`<form id="auth-signup-form"><label for="auth-email">Courriel<input id="auth-email" name="email" type="email" autocomplete="email" maxlength="254" required value="${esc(authEmail)}"></label>${authPasswordFields({newPassword:true})}<button type="submit" class="button full"${authBusy||!config.signupEnabled?' disabled':''}>Créer mon compte client</button></form>${!config.signupEnabled?'<p class="auth-footnote">Les nouveaux comptes sont en cours d’activation. Votre panier est conservé. Communiquez avec MIR pour obtenir de l’aide.</p>':''}<button type="button" class="button quiet full" data-auth-screen="signin">J’ai déjà un compte</button>`;
+    }else if(authScreen==='confirmation'){
+      title='Vérifiez votre courriel';intro='Ouvrez le lien de confirmation reçu. Revenez ensuite à votre commande, sans l’envoyer automatiquement.';
+      body=`<form id="auth-resend-form"><label for="auth-email">Courriel<input id="auth-email" name="email" type="email" autocomplete="email" maxlength="254" required value="${esc(authEmail)}"></label><button type="submit" class="button secondary full"${authBusy?' disabled':''}>Renvoyer la confirmation</button></form><button type="button" class="button quiet full" data-auth-screen="signin">Retour à la connexion</button>`;
     }else{
-      title=invitationToken?'Rejoignez<br><em>votre équipe.</em>':'Connexion à l’espace équipe';
-      intro=invitationToken?'Connectez-vous avec l’adresse qui a reçu l’invitation MIR.':'L’accès est réservé aux personnes invitées par MIR.';
-      body=(config.googleEnabled?`<button type="button" id="auth-google" class="button secondary full"${authBusy?' disabled':''}><span class="google-mark" aria-hidden="true">G</span>Continuer avec Google</button>${config.emailEnabled?'<div class="auth-divider"><span>ou par courriel</span></div>':''}`:'')+
-        (config.emailEnabled?`<form id="auth-email-form"><label for="auth-email">Votre adresse courriel<input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required placeholder="vous@entreprise.ca"${authBusy?' disabled':''}></label><button type="submit" class="button full"${authBusy?' disabled':''}>${authBusy?'Envoi…':'Recevoir mon lien de connexion'} ${icon('arrow')}</button></form><p class="auth-footnote">Ouvrez le lien reçu par courriel pour vous connecter. Aucun mot de passe à retenir.</p>`:'<p class="auth-footnote">Les méthodes de connexion sont en cours d’activation.</p>');
+      if(invitationToken){title='Activer mon compte';intro='Connectez-vous avec l’adresse qui a reçu l’invitation MIR. Vous pourrez ensuite activer votre accès.';}
+      body=`<button type="button" id="auth-google" class="button secondary full"${authBusy||!config.googleEnabled?' disabled':''}><span class="google-mark" aria-hidden="true">G</span>Continuer avec Google</button>${!config.googleEnabled?'<p class="auth-footnote">Google est en cours de configuration. Utilisez votre courriel et votre mot de passe.</p>':''}<div class="auth-divider"><span>ou avec votre courriel</span></div><form id="auth-signin-form"><label for="auth-email">Courriel<input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required value="${esc(authEmail)}"></label>${authPasswordFields()}<button type="submit" class="button full"${authBusy||config.passwordEnabled===false?' disabled':''}>${authBusy?'Connexion…':'Me connecter'}</button></form><button type="button" class="auth-text-button" data-auth-screen="forgot">Mot de passe oublié</button><button type="button" class="button secondary full" data-auth-screen="signup">Créer un compte client</button>`;
     }
-    const expectedInvitation=invitationToken&&user&&clientStatus?.error?.code==='MEMBERSHIP_REQUIRED';
-    const message=authError||(expectedInvitation?'':clientStatus?.error?.message);
-    $('#portal-content').innerHTML=`<section class="auth-grid"><div class="auth-intro"><p class="portal-eyebrow">LES REVÊTEMENTS MIR · PORTAIL CHANTIER</p><h1>${title}</h1><p>${esc(intro)}</p></div><div class="auth-card">${body}${authMessage?`<p class="auth-message" role="status">${esc(authMessage)}</p>`:''}${message?`<p class="auth-error" role="alert">${esc(message)}</p>`:''}</div></section>`;
+    const message=authError||clientStatus?.error?.message||'';
+    $('#portal-content').innerHTML=`<section class="auth-grid"><div class="auth-intro"><p class="portal-eyebrow">LES REVÊTEMENTS MIR</p><h1>${title}</h1><p>${esc(intro)}</p><a href="selection.html${accountEnvironment()==='test'?'?recette=1':''}" class="auth-cart-return">Retour à mon panier</a><p class="auth-team-note">Équipe MIR : utilisez votre invitation. Les droits internes sont vérifiés par le serveur.</p></div><div class="auth-card">${body}${authMessage?`<p class="auth-message" role="status">${esc(authMessage)}</p>`:''}${message?`<p class="auth-error" role="alert">${esc(message)}</p>`:''}</div></section>`;
+    const titleNode=$('.mir-harmony-title');if(titleNode)titleNode.textContent='Mon compte';
+  }
+  function renderCustomer() {
+    const account=clientStatus?.account;if(!account||clientStatus.phase!=='customer_ready')return renderAuth();
+    setChrome(false);document.body.dataset.portalMode='client';$('#portal-navigation').replaceChildren();$('#account-bar').hidden=false;$('#account-name').textContent=clientStatus.user?.email||'';$('#account-role').textContent='Client';
+    const titleNode=$('.mir-harmony-title');if(titleNode)titleNode.textContent='Mon compte';
+    const statusLabels={draft:'Brouillon',validated:'Validée',submitted:'À confirmer',sent:'Envoyée',shipped:'Expédiée',delivered:'Livrée',cancelled:'Annulée'};
+    const orders=(account.orders||[]).map(order=>`<article class="account-order"><div><h3>Commande ${esc(order.reference||order.id)}</h3><p>${esc(date(order.createdAt))} · ${esc(statusLabels[order.status]||order.status||'À confirmer')}</p></div><ul>${(order.events||[]).map(event=>`<li>${esc(date(event.createdAt))} · ${esc(event.label||'Statut mis à jour')}</li>`).join('')}</ul></article>`).join('')||'<div class="portal-empty"><h3>Aucune commande enregistrée</h3><p>Votre panier est conservé. Une sélection n’est pas encore une commande.</p><a href="selection.html">Revoir mon panier</a></div>';
+    const addresses=(account.addresses||[]).map(address=>`<article class="account-address"><h3>${esc(address.label||'Adresse de livraison')}</h3><p>${esc(address.recipient)}<br>${esc(address.line1)}${address.line2?'<br>'+esc(address.line2):''}<br>${esc(address.city)} · ${esc(address.province)} · ${esc(address.postalCode)}<br>${esc(address.country)}</p><button type="button" class="button quiet" data-account-remove-address="${esc(address.id)}">Supprimer cette adresse</button></article>`).join('')||'<p>Aucune adresse enregistrée.</p>';
+    const addressForm='<form id="account-address-form" class="account-address-form"><h3>Ajouter une adresse de livraison</h3><label>Nom de l’adresse<input name="label" maxlength="80" placeholder="Maison, chantier…"></label><label>Destinataire<input name="recipient" autocomplete="shipping name" maxlength="160" required></label><label>Adresse<input name="line1" autocomplete="shipping address-line1" maxlength="200" required></label><label>Appartement ou suite<input name="line2" autocomplete="shipping address-line2" maxlength="120"></label><div class="account-two-fields"><label>Ville<input name="city" autocomplete="shipping address-level2" maxlength="100" required></label><label>Province<input name="province" autocomplete="shipping address-level1" maxlength="100" required></label></div><div class="account-two-fields"><label>Code postal<input name="postalCode" autocomplete="shipping postal-code" maxlength="20" required></label><label>Pays<input name="country" autocomplete="shipping country-name" value="Canada" maxlength="80" required></label></div><button type="submit" class="button">Enregistrer l’adresse</button></form>';
+    $('#portal-content').innerHTML=`<section class="customer-account"><p class="portal-eyebrow">MON COMPTE MIR</p><h1>Bonjour, et bienvenue.</h1><p>Vos informations de livraison et vos commandes, au même endroit.</p><nav class="account-tabs" aria-label="Mon compte client"><button type="button" data-account-view="orders" aria-pressed="${customerTab==='orders'}">Mes commandes et suivi</button><button type="button" data-account-view="addresses" aria-pressed="${customerTab==='addresses'}">Mes adresses de livraison</button></nav><div${customerTab!=='orders'?' hidden':''}>${orders}<p class="account-dependency">Le paiement et la prise de commande de la sélection boutique ne sont pas encore raccordés. Aucun paiement ni envoi ne démarre depuis cette page.</p></div><div${customerTab!=='addresses'?' hidden':''}>${addresses}${addressForm}</div><a class="button secondary" href="selection.html?checkout=1${accountEnvironment()==='test'?'&recette=1':''}">Reprendre ma commande</a>${authMessage?`<p class="auth-message" role="status">${esc(authMessage)}</p>`:''}${authError?`<p class="auth-error" role="alert">${esc(authError)}</p>`:''}</section>`;
   }
   function connectedUI(snapshot) {
     uiStorageKey=`mir_employee_portal_ui_connected_${portalClient.config.projectRef}_${snapshot.actorId}`;
@@ -526,6 +577,12 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
   }
   function applyConnectedStatus(next) {
     clientStatus=next;
+    if(next.phase==='customer_ready'&&next.account){
+      state=null;actorId=null;ui={carts:{},jobs:{}};invitations=[];
+      if(authCallback||invitationToken){renderAuth();return;}
+      if(resumeCheckout())return;
+      renderCustomer();return;
+    }
     if(next.phase==='ready'&&next.snapshot){
       const changed=actorId!==next.snapshot.actorId||!state;
       state=next.snapshot;actorId=state.actorId;const role=actor()?.role||'employee';
@@ -556,7 +613,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(authBusy)return;authBusy=true;authError='';authMessage='';if(showGate)renderAuth();
     try {await operation();}
     catch(error){authError=invitationToken&&portalClient?.getStatus()?.user&&error?.code==='MEMBERSHIP_REQUIRED'?'':errorMessage(error);}
-    finally {authBusy=false;if(state&&clientStatus?.phase==='ready'&&!authCallback&&!invitationToken){setChrome(true);render();if(authError)toast(authError);}else renderAuth();}
+    finally {authBusy=false;if(clientStatus?.phase==='customer_ready'&&!authCallback&&!invitationToken)renderCustomer();else if(state&&clientStatus?.phase==='ready'&&!authCallback&&!invitationToken){setChrome(true);render();if(authError)toast(authError);}else renderAuth();}
   }
   async function retryOperation() {
     if(!portalClient||clientStatus?.busy)return;
@@ -583,6 +640,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     const entry=window.MIRPortalClient.captureEntry(location.href);
     if(entry.cleanURL!==location.href)history.replaceState(null,'',entry.cleanURL);
     connectionMode=entry.mode;authCallback=entry.authCallback;
+    if(new URLSearchParams(location.search).get('return')==='checkout')try{window.MIRAccountFlow?.remember(localStorage,accountEnvironment());}catch(_){}
     if(!isDemo())invitationToken=restoreInvitation(entry.invitationToken);
     if(entry.invalidInvitation)authError='Ce lien d’invitation ne peut pas être utilisé. Demandez un nouveau lien au responsable MIR.';
     if(entry.callbackError)authError='Ce lien de connexion est expiré ou ne peut plus être utilisé. Demandez un nouveau lien.';
@@ -597,7 +655,8 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     portalClient=window.MIRPortalClient.create({config:window.MIRPortalConfig,sdk:window.MIRSupabase,origin:location.origin,operationStorage});
     clientStatus=portalClient.getStatus();portalClient.subscribe(applyConnectedStatus);renderAuth();
     try {await portalClient.start();}catch(_){/* The client supplies an explicit error state, never demonstration data. */}
-    const refreshWhenIdle=()=>{if(document.visibilityState==='visible'&&clientStatus?.phase==='ready'&&!clientStatus.busy&&!clientStatus.pending&&!$('#portal-dialog').open&&!document.activeElement?.matches('input,select,textarea'))portalClient.refresh().catch(()=>{});};
+    if(authCallback&&portalClient.config.enabled)await runAuth(async()=>{const callback=authCallback;authCallback=null;await portalClient.completeCallback(callback);});
+    const refreshWhenIdle=()=>{if(document.visibilityState==='visible'&&['ready','customer_ready'].includes(clientStatus?.phase)&&!clientStatus.busy&&!clientStatus.pending&&!$('#portal-dialog').open&&!document.activeElement?.matches('input,select,textarea'))portalClient.refresh().catch(()=>{});};
     document.addEventListener('visibilitychange',refreshWhenIdle);
     setInterval(refreshWhenIdle,45000);
   }

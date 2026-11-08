@@ -1,6 +1,6 @@
 # MIR — ateliers fixes Harmony
 
-Branche : `feat/mir-unified-fixed-workspace`, basée sur `main` réel, incluant PR51 et les ajouts concurrents CanExel. **Revue visuelle propriétaire requise : ne pas fusionner ni publier cette refonte.**
+Branche : `feat/mir-unified-fixed-workspace`, basée sur `main` réel, incluant PR51 et les ajouts concurrents CanExel. **Autorisation mise à jour : le propriétaire a ensuite demandé « Autorise tout automatique ». PR55 fusionnée après CI verte et inspection Chromium ; la recette physique Safari reste à effectuer.**
 
 La PR51 a été publiée séparément : [Pages 42482117502](https://github.com/revetementsmirweb/MIR/actions/runs/42482117502), révision `cfd7858e08dbf8224f21e9d3e1801099e4751ab5`, déploiement et comparaison des fichiers servis réussis.
 
@@ -41,6 +41,6 @@ Logo MIR original ; moteurs `production-model.js`, `production-volume.js`, géom
 
 Ces preuves viennent de Chromium Linux et de formats émulés. Elles ne prouvent pas Safari/iPadOS ou Android physiques. La réduction de viewport vérifie la réaction de mise en page au clavier ; elle ne reproduit pas toutes les particularités d'un clavier iPad. Les espaces CSS équivalents au zoom ne sont pas une validation physique du raccourci de zoom navigateur.
 
-Avant approbation : sur un vrai iPad Safari en portrait/paysage, puis Android, ouvrir chaque atelier ; tracer au doigt et avec Shift sur clavier externe ; toucher A/B/C et une cote de pliage ; saisir `½`, `2¼`, `1270 mm` via l'unité choisie ; ouvrir/fermer le clavier et vérifier Appliquer ; pincer puis déplacer sans modifier les cotes ; ouvrir chaque rubrique longue de l'inspecteur ; tester texte agrandi et zoom navigateur 125/150/200 % ; enregistrer deux fois, revenir au dossier et recharger ; préparer dix pièces et contrôler le PDF sans l'envoyer. Vérifier le menu, le focus, Échap et les actions à chaque orientation. Toute anomalie bloque la publication de la refonte.
+Recette physique à compléter : sur un vrai iPad Safari en portrait/paysage, puis Android, ouvrir chaque atelier ; tracer au doigt et avec Shift sur clavier externe ; toucher A/B/C et une cote de pliage ; saisir `½`, `2¼`, `1270 mm` via l'unité choisie ; ouvrir/fermer le clavier et vérifier Appliquer ; pincer puis déplacer sans modifier les cotes ; ouvrir chaque rubrique longue de l'inspecteur ; tester texte agrandi et zoom navigateur 125/150/200 % ; enregistrer deux fois, revenir au dossier et recharger ; préparer dix pièces et contrôler le PDF sans l'envoyer. Vérifier le menu, le focus, Échap et les actions à chaque orientation. Toute anomalie réelle doit être consignée et corrigée ; ne pas assimiler ces instructions à une recette physique déjà exécutée.
 
 SEO/GEO : outils internes `noindex` conservés ; aucune ouverture d'indexation ni changement d'accès. Les en-têtes publics voisins sont comparés par les tests de signature ; cette recette ne constitue pas une validation de commerce, de paiement ou d'authentification serveur.

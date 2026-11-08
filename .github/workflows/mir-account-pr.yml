@@ -1,0 +1,31 @@
+name: MIR — Mon compte et Auth
+on:
+  pull_request:
+    paths: ['dist/chantier*','dist/portal-*','dist/mir-account*','dist/selection.html','tests/mir-account*','supabase/**','.github/workflows/mir-account-pr.yml','.github/workflows/pages.yml']
+permissions:
+  contents: read
+jobs:
+  account:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install --no-save playwright@1.58.2
+      - name: Account contract and callback checks
+        run: |
+          node tests/mir-account-public-config.cjs
+          node tests/mir-account-flow.cjs
+          node tests/mir-portal-login.cjs
+          node tests/mir-client-header.cjs
+          node tests/mir-client-signature.cjs
+          node tests/mir-homepage.cjs
+          node tests/mir-shared-client.cjs
+      - name: Browser UI, simulated Auth transport
+        run: MIR_CHROMIUM_BIN=$(command -v google-chrome || command -v chromium) node tests/mir-account-browser.cjs
+      - name: Employee regression
+        run: MIR_CHROMIUM_BIN=$(command -v google-chrome || command -v chromium) node tests/mir-employee-portal-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: MIR-account-browser-evidence
+          path: docs/verification/account/*.png

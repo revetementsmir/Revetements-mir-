@@ -92,8 +92,9 @@ test('Liens principaux locaux présents sans site de démonstration',()=>{
   }
   assert.doesNotMatch(header, /atelier-essai|candidate\.html/i);
 });
-test('Les accès réels restent fermés tant que Auth et RLS ne sont pas actifs',()=>{
-  assert.match(read('portal-config.js'),/enabled: false/);
+test('Mon compte actif utilise une clé publique et le contrôle de rôle serveur',()=>{
+  assert.equal(require('./mir-account-config-helper.cjs')().enabled,true);
+  assert.match(read('portal-client.js'),/sdk.auth.getUser/);
 });
 test('Le logo Illustrator original est utilisé sur les pages publiques principales',()=>{
   for(const name of ['boutique.html','pliage.html','chantier.html','plan.html','calepinage.html','production.html','materiaux.html','produit.html','selection.html']){

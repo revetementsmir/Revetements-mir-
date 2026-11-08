@@ -49,8 +49,9 @@ test('Les fonctionnalités client réelles sont toujours présentes',()=>{
   assert.match(text('boutique.html'),/id="collections"/);
 });
 test('La sécurité du portail ne change pas et aucun réglage Admin ne devient public',()=>{
-  assert.match(text('portal-config.js'),/enabled: false/);
-  assert.match(text('portal-config.js'),/googleEnabled: false/);
+  assert.equal(require('./mir-account-config-helper.cjs')().enabled,true);
+  assert.match(text('portal-client.js'),/sdk.auth.getUser/);
+  assert.match(text('portal-client.js'),/checkedSnapshot\(data, user.id\)/);
   const css=text('mir-client-signature.css');
   assert.doesNotMatch(css,/\.production-header|\.mir-admin-v4|data-admin-only/);
   assert.ok(!text('production.html').includes('mir-client-signature.css'));
