@@ -130,3 +130,16 @@ body.mir-admin-v4 #mir-procurement-panel .mir-wb-save #mir-create-po{display:blo
  .mir-wb-po-row{grid-template-columns:54px minmax(0,1fr) 51px;padding:9px 8px;font-size:11px;gap:6px}
  body.mir-admin-v4 #mir-procurement-panel .mir-wb-save #mir-create-po{position:sticky;bottom:0;z-index:12}
 }
+
+/* Le portail plein écran conserve plusieurs variantes de body ; l'onglet
+   Panneaux doit masquer l'ancien menu multiple sur téléphone dans tous les cas. */
+.mir-wb-heading-links{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+body #mir-procurement-panel .mir-wb-heading-links button{min-height:39px;padding:8px 10px;font-size:12px}
+@media(max-width:740px){
+ html body[data-mir-tab="panels"] #mir-procurement-tabs,
+ html body[data-mir-tab="orders"][data-mir-panel-order="true"] #mir-procurement-tabs{
+  display:none!important;visibility:hidden!important;height:0!important;margin:0!important;
+ }
+ .mir-wb-heading-links{gap:4px}
+ body #mir-procurement-panel .mir-wb-heading-links button{min-height:38px;padding:6px 8px;font-size:11px}
+}
