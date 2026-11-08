@@ -1,0 +1,12 @@
+PASS client pliage 360×780 landing/models/native trace/undo/measures/existing dossier
+PASS client pliage 390×844 landing/models/native trace/undo/measures/existing dossier
+PASS client pliage 428×926 landing/models/native trace/undo/measures/existing dossier
+PASS client pliage 600×900 landing/models/native trace/undo/measures/existing dossier
+PASS client pliage 601×900 landing/models/native trace/undo/measures/existing dossier
+PASS client pliage 834×1112 landing/models/native trace/undo/measures/existing dossier
+PASS client pliage 1024×768 landing/models/native trace/undo/measures/existing dossier
+PASS client pliage 1348×926 landing/models/native trace/undo/measures/existing dossier
+PASS client pliage 1440×900 landing/models/native trace/undo/measures/existing dossier
+PASS homepage before/after pixel-identical 390
+PASS homepage before/after pixel-identical 834
+PASS homepage before/after pixel-identical 1348

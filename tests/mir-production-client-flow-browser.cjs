@@ -77,7 +77,7 @@ async function verifyQuoteAndExports(browser,base,width){
  await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
  const next=page.locator('#client-step-next');
  // Le client choisit un dessin de l'atelier MIR préalablement sélectionné pour Boutique.
- // Aucun profil L/J/Z de départ n'est proposé.
+ // Les formes de départ vivent dans le sélecteur dédié ; ce test sélectionne un modèle enregistré.
  await page.evaluate(()=>{
    const geometry={kind:'profile',template:'custom',unit:'in',name:'Solin de fenêtre dessiné MIR',
      segments:[{label:'A',length:'3 1/2'},{label:'B',length:'2 1/4'}],
@@ -95,8 +95,8 @@ async function verifyQuoteAndExports(browser,base,width){
  await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
  assert.equal(await page.locator('#production-templates [data-template]').count(),0,'pas de profils prédéfinis');
+ await page.locator('#client-choose-model').click();
  await page.locator('[data-saved-template]').click();
- await next.click();
  assert.equal(await page.locator('body').getAttribute('data-client-stage'),'2');
  await page.locator('[data-segment-length="0"]').fill('3 1/2');
  await page.locator('[data-segment-length="1"]').fill('2 1/4');

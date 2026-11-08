@@ -22,7 +22,7 @@ let freeformRedo=[];
 const traceHeights=[6,8,10,12,14];
 let traceHeight=14,traceGridDivisor=4;
 let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,viewPan={x:0,y:0},pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
-let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces=[];
+let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces=[],clientEntry='choice';
 let panelSketchPoints=[],panelSketchHover=null,panelSketchBefore=null;
 const clientProfileWizard=()=>client&&catalogueChannel!=='store'&&kind==='profile';
 let activeStoreColorLock=false;
@@ -389,7 +389,7 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
  const grid=freehand?traceGridSVG(model.unit):'';
  const points=freehand?(drawPoints.length>=3&&model.pointsMM.length===drawPoints.length
-  ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">${grid}<text x="400" y="250" text-anchor="middle" font-family="Arial" font-size="19" fill="#7b8b6c">Glisse pour tracer le premier côté.</text></svg>`;
+  ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">${grid}<text x="400" y="250" text-anchor="middle" font-family="Arial" font-size="19" fill="#7b8b6c">${clientProfileWizard()?esc(clientTracePrompt()):'Glisse pour tracer le premier côté.'}</text></svg>`;
  const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});
  if(interactive&&!small&&view==='face'&&tool!=='draw'&&drag?.type!=='point'&&zoom!==1){tr.scale*=zoom;tr.ox=400+(tr.ox-400)*zoom;tr.oy=260+(tr.oy-260)*zoom;}
  if(interactive&&!small&&view==='face'&&tool==='select'&&kind==='profile'){tr.ox+=viewPan.x;tr.oy+=viewPan.y;}
@@ -570,7 +570,8 @@ function renderTools(){
  if(el.hidden){el.innerHTML='';return;}
  const drawing=tool==='draw';
  if(clientProfileWizard()){
-  el.innerHTML=`<p class="client-trace-help">Touchez ou cliquez pour placer les points. Vous pouvez aussi glisser pour tracer un côté.</p><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''}>Terminer le dessin</button><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le dernier point</button>`;
+  const instruction=!drawPoints.length?clientTracePrompt()+' Ajoutez ensuite les points suivants pour créer vos côtés.':drawPoints.length<3?'Ajoutez des points pour tracer au moins deux côtés.':build().valid?'Vous pouvez terminer le dessin pour ajuster vos mesures.':'Ce tracé doit être corrigé. Annulez le dernier point et réessayez.';
+  el.innerHTML=`<h2>Votre tracé</h2><p class="client-trace-help">${esc(instruction)} Vous pourrez corriger les mesures après le dessin.</p><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le point</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''}>Terminer le dessin</button>`;
   return;
  }
  const recentHem=draft.template==='custom'?(draft.bends||[]).findLastIndex(bend=>bend.mode==='hem'):-1;
@@ -670,6 +671,27 @@ const clientStages=[
  {title:'Choisissez la face colorée',hint:'Suivez le tracé de A vers le dernier côté. Choisissez de quel côté du trait se trouve la face à peindre.',action:'Confirmer la face'},
  {title:'Choisissez le métal et la couleur',hint:'Sélectionnez le métal, puis la teinte. Vous pourrez ensuite ajouter la pièce à votre dossier.'}
 ];
+function clientTracePrompt(){return matchMedia('(any-pointer:coarse)').matches?'Touchez la grille pour placer le premier point.':'Cliquez sur la grille pour placer le premier point.';}
+function renderClientEntry(active){
+ let entry=$('#client-entry');
+ if(!active){delete document.body.dataset.clientEntry;if(entry){entry.hidden=true;$('.drawing-head')?.after($('#drawing-tools'));}return;}
+ if(!entry){
+  entry=document.createElement('section');entry.id='client-entry';entry.setAttribute('aria-labelledby','client-entry-title');
+  entry.innerHTML='<a class="client-entry-return" href="pliage.html">← Retour au pliage</a><button type="button" class="client-entry-return" id="client-entry-back" hidden>← Retour aux choix</button><p class="eyebrow">ÉTAPE 1 SUR 5 · FORME</p><h1 id="client-entry-title" tabindex="-1">Comment voulez-vous commencer?</h1><p id="client-entry-intro">Vous pourrez ajuster les mesures dans les deux cas.</p><div class="client-entry-cards"><button type="button" id="client-choose-model"><span class="client-entry-icon" aria-hidden="true">▱</span><span><strong>Choisir un modèle</strong><small>Partez d’une forme connue et ajoutez vos mesures.</small></span><span aria-hidden="true">→</span></button><button type="button" id="client-draw-profile"><span class="client-entry-icon" aria-hidden="true">⌁</span><span><strong>Dessiner ma moulure</strong><small>Tracez les côtés de votre moulure sur une grille.</small></span><span aria-hidden="true">→</span></button></div><div id="client-model-options" hidden><h2>Formes de départ</h2><p>Ces profils utilisent les formes de l’atelier. Aucune cote de fabrication n’est préremplie.</p><div id="client-standard-options"></div><div id="client-saved-options"></div></div>';
+  $('.production-workspace').before(entry);
+  $('#client-standard-options').innerHTML=Object.entries(profiles).filter(([id])=>id!=='custom').map(([id,p])=>'<button type="button" class="template-button" data-client-profile="'+esc(id)+'">'+templateIcon('profile',id)+'<span>'+esc(p.name)+'</span></button>').join('');
+ }
+ const state=clientStep!==1?'measures':tool==='draw'?'draw':clientEntry;
+ document.body.dataset.clientEntry=state;entry.hidden=clientStep!==1;
+ $('#client-entry-title').textContent=state==='models'?'Choisissez votre modèle':state==='draw'?'Dessiner ma moulure':'Comment voulez-vous commencer?';
+ $('#client-entry-intro').hidden=state!=='choice';$('.client-entry-cards').hidden=state!=='choice';
+ entry.querySelector('a').hidden=state!=='choice';$('#client-entry-back').hidden=state==='choice';$('#client-model-options').hidden=state!=='models';
+ const templatesSection=$('.template-section');const destination=state==='models'?$('#client-saved-options'):$('#client-step-type');if(templatesSection.parentElement!==destination)destination.append(templatesSection);
+ const tools=$('#drawing-tools'),grid=$('.mir-panel-synced-views')||$('#production-drawing');if(state==='draw')grid.after(tools);else $('.drawing-head').after(tools);
+ if(state==='draw'){
+  const svg=$('#production-drawing svg');if(svg&&matchMedia('(max-width:600px)').matches){svg.setAttribute('viewBox','100 0 440 520');const prompt=svg.querySelector('text');if(!drawPoints.length&&prompt){prompt.setAttribute('x','320');prompt.setAttribute('font-size','13');}}
+ }
+}
 function mountClientWizard(active){
  const config=$('.config-card'),scroll=$('#client-step-scroll'),optional=$('#client-optional-metal');
  if(active===!scroll.hidden)return;
@@ -718,7 +740,7 @@ function clientStepIssues(model,blockJ){
 function renderClientWizard(model,blockJ){
  const active=clientProfileWizard();
  mountClientWizard(active);
- if(!active){delete document.body.dataset.clientStage;delete document.body.dataset.clientTrace;return;}
+ if(!active){delete document.body.dataset.clientStage;delete document.body.dataset.clientTrace;renderClientEntry(false);return;}
  const issues=clientStepIssues(model,blockJ);
  document.body.dataset.clientStage=clientStep;
  document.body.dataset.clientTrace=String(tool==='draw');
@@ -728,7 +750,6 @@ function renderClientWizard(model,blockJ){
   title.textContent=stage.title;
   $('#client-step-hint').textContent=stage.hint;
  }
- $('#client-draw-profile').textContent=tool==='draw'?'Recommencer le dessin':'＋ Dessiner ma moulure';
  $('.piece-finish').open=true;
  for(const button of $('#client-step-list').querySelectorAll('button')){
   const step=Number(button.dataset.clientStep);
@@ -743,6 +764,7 @@ function renderClientWizard(model,blockJ){
  if(status.textContent!==message)status.textContent=message;
  next.disabled=Boolean(message)||busy||clientStep===5&&$('#add-production-piece').disabled;
  next.innerHTML=clientStep===5?$('#add-production-piece').innerHTML:stage.action+' <span aria-hidden="true">→</span>';
+ renderClientEntry(true);
 }
 function goClientStep(step,{confirm=false}={}){
  if(!clientProfileWizard()||step<1||step>5||step===1&&editingItemId)return;
@@ -751,7 +773,7 @@ function goClientStep(step,{confirm=false}={}){
  const issues=clientStepIssues(build(),blockJ);
  if(step>clientUnlocked&&(!confirm||step!==clientStep+1))return;
  if(Array.from({length:step-1},(_,i)=>issues[i+1]).some(Boolean))return;
- clientStep=step;
+ clientStep=step;if(step===1)clientEntry='choice';
  clientUnlocked=Math.max(clientUnlocked,step);
  if(step===4){view='face';zoom=1;viewPan={x:0,y:0};}
  updateDrawing();
@@ -1287,7 +1309,7 @@ if(activeStoreColorLock){
 }else if(client&&catalogueChannel==='store'&&record.allowed?.colorSystems?.includes('manufacturer')){
  colorSystem='manufacturer';materialId='';colorId='';
 }
-render();applyTemplateOptions(record);}
+render();applyTemplateOptions(record);if(clientProfileWizard())goClientStep(2,{confirm:true});}
 function applyTemplateOptions(record){const allowed=record?.allowed;if(!allowed)return;for(const opt of $('#material-type').options)opt.disabled=allowed.materials?.length?!allowed.materials.includes(opt.value):false;for(const opt of $('#color-system').options)opt.disabled=allowed.colorSystems?.length?!allowed.colorSystems.includes(opt.value):false;}
 function saveTemplateDialog(){const old=templates.find(record=>record.id===editingTemplateId),current=old?latest(old):null;
  const detected=window.MIRProfileRecognition?.recognize(build());
@@ -2076,10 +2098,14 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
    $(`[data-client-face="${d.clientFace}"]`).focus();
    return;
   }
+  if(button.id==='client-choose-model'){clientEntry='models';updateDrawing();$('#client-entry-title').focus({preventScroll:true});return;}
+  if(button.id==='client-entry-back'){clientEntry='choice';tool='select';updateDrawing();$('#client-entry-title').focus({preventScroll:true});return;}
+  if(d.clientProfile){choose('profile',d.clientProfile,{profileChosen:true});return goClientStep(2,{confirm:true});}
   if(button.id==='client-draw-profile'&&clientStep===1){
+   if(drawPoints.length&&draft.template==='custom'&&!clientProfileSelected){tool='draw';updateDrawing();$('#production-drawing').focus();return;}
    choose('profile','custom');
    selectedTemplate=null;
-   startProfileDrawing();
+   startProfileDrawing({fullscreen:false});
    if(!$('.drawing-card').classList.contains('mobile-trace'))$('#production-drawing').focus();
    return;
   }
@@ -2135,7 +2161,6 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(d.savedTemplate||d.useSavedModel){
   if(clientProfileWizard()&&clientProfileSelected&&button.getAttribute('aria-pressed')==='true')return;
   useSavedTemplate(d.savedTemplate||d.useSavedModel);
-  if(clientProfileWizard())Array.from($('#production-templates').querySelectorAll('[data-saved-template]')).find(node=>node.dataset.savedTemplate===d.savedTemplate)?.focus();
   return;
  }
  if(d.preview){view=d.preview;tool='select';showProfilePaintedFace();updateDrawing();return;}
@@ -2417,7 +2442,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  modal.addEventListener('close',()=>{modalPressed=backdropPressed=false;});
  choose(kind,kind==='panel'?'rectangle':'l');const requestedMaterial=params.get('material');if(kind==='panel'&&['unico-up1-acier','unico-up1-aluminium'].includes(requestedMaterial)){const type=requestedMaterial.endsWith('aluminium')?'aluminium':'acier';draft.material={type,name:'Unico U-P1 — '+(type==='acier'?'Acier':'Aluminium plié'),productRef:requestedMaterial,thickness:'',thicknessUnit:'mm',gauge:''};materialId=availableMaterials()[0]?.id||'';colorSystem='manufacturer';const requestedColor=params.get('color'),palette=availableMaterials().find(m=>m.colors.some(c=>c.id===requestedColor));if(palette){materialId=palette.id;colorId=requestedColor;}render();}const linked=params.get('template');if(linked&&templates.some(record=>record.id===linked))useSavedTemplate(linked);if(!client&&params.get('view')==='models'){workflow='models';render();}if(!client&&params.get('view')==='requests'){workflow='requests';render();}if(client&&params.get('kind')==='profile'&&!linked)choose('profile','custom');
  const requestedProfile=params.get('profile');
- if(requestedProfile&&Object.prototype.hasOwnProperty.call(profiles,requestedProfile)) choose('profile',requestedProfile,{profileChosen:true});
+ if(requestedProfile&&Object.prototype.hasOwnProperty.call(profiles,requestedProfile)){choose('profile',requestedProfile,{profileChosen:true});if(clientProfileWizard())goClientStep(2,{confirm:true});}
  if(!client)window.addEventListener('storage',event=>{if([KEYS.draft,window.MIRPanelLayoutOutput?.STORAGE_KEY].includes(event.key))renderLayoutImport();});
  if(!client&&workflow==='configure'&&!linked&&!requestedProfile&&params.get('profil-mir')!=='1'&&location.hash!=='#production-order'){
   selectedTemplate=null;
@@ -2427,6 +2452,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  offerProfileImport();
  if(!client&&params.get('shared-request'))openRequest(params.get('shared-request'));
  window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,preview:view,zoom,pan:{...viewPan},drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:kind==='panel'?panelDirectUndo.length>0:freeformCanUndo(),canRedo:kind==='panel'?panelDirectRedo.length>0:freeformRedo.length>0};},saveCurrentPiece:saveWorkspacePiece,setOrderItemQuantity,openContinueMenu,openOrderPanelEditor(id,key,edge){if(client||!order.items.some(row=>row.id===id&&row.kind==='panel'))return false;editPiece(id);if(edge)openPanelEdge(edge);else openPanelMeasure(key);return true;},editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
+ matchMedia('(max-width:600px)').addEventListener('change',()=>{if(clientProfileWizard()&&tool==='draw'&&!drag)updateDrawing();});
  window.dispatchEvent(new Event('mir-production-ready'));
 }
 boot().catch(error=>{console.error('MIR production',error);$('#production-drawing').innerHTML=`<div class="drawing-hint"><strong>Le configurateur n’a pas pu démarrer.</strong><p>${esc(error.message)}</p><button type="button" class="secondary-button" onclick="location.reload()">Réessayer</button></div>`;$('#add-production-piece').disabled=true;});

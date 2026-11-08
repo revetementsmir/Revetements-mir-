@@ -1,0 +1,47 @@
+[
+  {
+    "file": "index.html",
+    "unchanged": true,
+    "sha256": "5aebc8854b46e420c059dd0743355b46d2d21d815d005aead234d8d3a87d95d5"
+  },
+  {
+    "file": "style.css",
+    "unchanged": true,
+    "sha256": "7a9b04b2bf17c4c82c0d5639d367fd08544fbbaed0f5070bb88e4c0848445065"
+  },
+  {
+    "file": "mir-home-premium.css",
+    "unchanged": true,
+    "sha256": "3c6424e79a3ff614049eaf6650af6f3ae2e7430addd25fac1abfc5118af3a00b"
+  },
+  {
+    "file": "mir-harmony.css",
+    "unchanged": true,
+    "sha256": "3d2b41ca6b6fe50b73cc278a0644396612841b2b899858b78828f4af8b6fb8c5"
+  },
+  {
+    "file": "mir-harmony.js",
+    "unchanged": true,
+    "sha256": "d28c28482deef91cb6224b7c17820908eafaaed26140dbba18d5c253f3e14bb6"
+  },
+  {
+    "file": "production-model.js",
+    "unchanged": true,
+    "sha256": "4f436e10891277830426f1492ee088491285914318507c4c62b724c20cd13cb3"
+  },
+  {
+    "file": "production-volume.js",
+    "unchanged": true,
+    "sha256": "c8e58d92c9513456025840e1b7d64db3b7a2fc00f04e79d527d0f8ff10453a40"
+  },
+  {
+    "file": "pliage.js",
+    "unchanged": true,
+    "sha256": "2e31b9d55f94c6b1df5151b39bff7b32267cfc5918a1b8a69e8867b6761cb0e4"
+  },
+  {
+    "file": "mir-panel-po-pdf.js",
+    "unchanged": true,
+    "sha256": "8ca7e4b8b5d4f18b275f458434f088a1d3c09ef4879df068f174762cbfb3b0b7"
+  }
+]
