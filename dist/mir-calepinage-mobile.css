@@ -100,3 +100,13 @@
  body[data-mir-cal-step="panels"] .canvas-column .drawing-footer{display:none!important}
  body[data-mir-cal-step="panels"] .canvas-card .drawing-stage svg{height:clamp(250px,63vw,380px)}
 }
+
+@media(max-width:740px){
+ body[data-mir-cal-step] .skip:not(:focus-visible){top:-100px!important}
+ body[data-mir-cal-step] .skip:focus-visible{top:9px!important}
+ body[data-mir-cal-step=order] .production-heading .eyebrow{font-size:9px}
+ body[data-mir-cal-step=order] .production-heading h2{font-size:26px;font-weight:700;line-height:1.2}
+ body[data-mir-cal-step=order] .production-heading p:last-child{font-size:12px;line-height:1.6}
+ body[data-mir-cal-step=order] #fabrication-details{margin:15px 0 0;padding:10px 0;border-top:1px solid #e3ebdf}
+ body[data-mir-cal-step=order] #fabrication-details summary{min-height:44px;font-size:13px;color:#38613b}
+}
