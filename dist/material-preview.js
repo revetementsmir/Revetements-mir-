@@ -56,16 +56,26 @@
   };
   // The base TEK 10 photo and its manufacturer colour variants share this layout.
   const tek10Frame = [2000,2000,52,816,1868,1147];
+  const canexelFrames = {
+    ced9: [750,750,23,251,701,251],
+    d5: [750,750,0,233,750,289],
+    vstyle: [750,750,25,250,668,200]
+  };
+  function sourceFrame(src) {
+    const path = new URL(src).pathname;
+    const canexel = path.match(/\/assets\/products\/employee-store\/deckmart-(ced9|d5|vstyle)-[a-z0-9-]+\.png$/)?.[1];
+    if (canexel) return canexelFrames[canexel];
+    const asset = path.match(/\/assets\/products\/(?:official-20261104\/)?([^/]+)$/)?.[1];
+    if (Object.hasOwn(photoFrames, asset)) return photoFrames[asset];
+    return /^lighttrim-vtsstek10-(?:jh[0-9]{4}-)?[0-9a-f]{10}\.jpg$/.test(asset) ? tek10Frame : null;
+  }
   function photoImage(image, alt, {loading='lazy', priority=false}={}) {
     const src = local(image?.src);
     if (!src) return '';
     const rawPosition = image.cardObjectPosition || '';
     const position = /^((left|right|top|bottom|center)|(-?\d+(\.\d+)?%))( ((left|right|top|bottom|center)|(-?\d+(\.\d+)?%)))?$/.test(rawPosition) ? rawPosition : '50% 50%';
     const markup = `<img src="${esc(src)}" alt="${esc(image.alt || alt)}" data-catalogue-image data-presentation="${photoType(image)}" style="object-position:${position}" loading="${loading}" ${priority?'fetchpriority="high" ':''}decoding="async">`;
-    const path = new URL(src).pathname;
-    const asset = path.match(/\/assets\/products\/(?:official-20261104\/)?([^/]+)$/)?.[1];
-    const frame = Object.hasOwn(photoFrames, asset) ? photoFrames[asset] :
-      /^lighttrim-vtsstek10-(?:jh[0-9]{4}-)?[0-9a-f]{10}\.jpg$/.test(asset) ? tek10Frame : null;
+    const frame = sourceFrame(src);
     if (!frame) return markup;
     const [sourceWidth, sourceHeight, left, top, width, height] = frame;
     const style = `--mir-trim-ratio:${width / height};--mir-source-width:${100 * sourceWidth / width}%;--mir-source-height:${100 * sourceHeight / height}%;--mir-source-left:${-100 * left / width}%;--mir-source-top:${-100 * top / height}%`;
