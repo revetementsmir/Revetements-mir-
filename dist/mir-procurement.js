@@ -171,34 +171,43 @@
     /* Le bon affiche une vue de chaque vraie pièce. Ni dessin ni prix ne sont
        recopiés dans un second configurateur ; le dossier reste la source. */
     function bonPieceCards(dossier){
-      const items=(dossier?.items||[]).filter(item=>item?.spec?.kind==='profile'||item?.kind==='profile');
-      if(!items.length)return '<div class="mir-po-empty"><strong>Aucune moulure dans ce bon.</strong><p>Depuis le dessin, choisis « Continuer », puis ajoute la pièce au bon existant ou au nouveau bon.</p><button type="button" data-mir-tab="draw">Retour au dessin</button></div>';
+      const items=(dossier?.items||[]).filter(item=>['profile','panel'].includes(item?.spec?.kind||item?.kind));
+      if(!items.length)return '<div class="mir-po-empty"><strong>Ce bon attend ses pièces.</strong><p>Trace une moulure, dessine un panneau ou prépare une section entière de mur.</p><button type="button" data-mir-tab="draw">Retour à mon dessin</button></div>';
       return '<div class="mir-po-piece-list">'+items.map((item,index)=>{
-        const spec=item.spec||{},api=win.MIRProduction;
-        let model=null,preview='',dimensions='',angles='',length='',color='',metal='';
+        const spec=item.spec||{},api=win.MIRProduction,isPanel=spec.kind==='panel';
+        let model=null,preview='',dimensions='',angles='',length='',color='',metal='',ready=false;
         try{
-          model=api?.buildProfile(spec);
-          if(!model?.valid)throw Error('Profil incomplet');
-          preview=api.profileSVG(spec,{width:580,height:250,legend:false,header:false,notes:false});
-          dimensions=model.segments.map(segment=>esc(segment.label)+' : '+esc(api.formatMeasurement(segment.lengthMM,model.unit))).join(' · ');
-          angles=(model.bends||[]).map((bend,i)=>esc(model.segments[i]?.label||'')+'→'+esc(model.segments[i+1]?.label||'')+' : '+(bend.mode==='hem'?'180°':esc(Math.round(Number(bend.angle)*10)/10)+'°')).join(' · ');
-          length=api.formatMeasurement(model.lengthMM,model.unit);
+          model=isPanel?api?.buildPanel(spec):api?.buildProfile(spec);
+          if(!model?.valid)throw Error('Géométrie incomplète');
+          ready=Boolean(model.complete);
+          preview=isPanel?api.panelSVG(spec,{width:580,height:250,legend:false,header:false,notes:false}):
+            api.profileSVG(spec,{width:580,height:250,legend:false,header:false,notes:false});
+          if(isPanel){
+            dimensions='Hors tout '+api.formatMeasurement(model.widthMM,model.unit)+' × '+api.formatMeasurement(model.heightMM,model.unit);
+            angles=(model.edges||[]).map((edge,i)=>(i+1)+' · '+esc(edge.name)+' : '+esc(api.formatMeasurement(edge.lengthMM,model.unit))+' · lip '+esc(api.formatMeasurement(edge.lipMM,model.unit))+' · '+esc(Math.round(edge.interiorAngleDeg*100)/100)+'°').join(' — ');
+            length='Projection C : '+api.formatMeasurement(model.reliefMM,model.unit);
+          }else{
+            dimensions=model.segments.map(segment=>esc(segment.label)+' : '+esc(api.formatMeasurement(segment.lengthMM,model.unit))).join(' · ');
+            angles=(model.bends||[]).map((bend,i)=>esc(model.segments[i]?.label||'')+'→'+esc(model.segments[i+1]?.label||'')+' : '+(bend.mode==='hem'?'180°':esc(Math.round(Number(bend.angle)*10)/10)+'°')).join(' · ');
+            length='Longueur : '+api.formatMeasurement(model.lengthMM,model.unit);
+          }
           metal=model.material?.type||spec.material?.type||'À confirmer';
           color=model.finish?.name||model.finish?.code||spec.finish?.name||spec.finish?.code||'À confirmer';
         }catch(error){preview='<p class="mir-po-piece-error">Géométrie à vérifier : retourne au dessin.</p>';}
         const quantity=Number.isInteger(Number(spec.quantity))&&Number(spec.quantity)>0?Number(spec.quantity):1;
-        const copyText=(dimensions||'Cotes à compléter')+' · '+(angles||'Angles à confirmer');
+        const summary=angles||'Côtés et angles à confirmer';
         return '<article class="mir-po-piece" data-mir-po-piece="'+esc(item.id)+'">'+
           '<div class="mir-po-piece-visual">'+preview+'</div>'+
-          '<div class="mir-po-piece-info"><span class="mir-po-piece-index">PIÈCE '+(index+1)+' · '+esc(item.id)+'</span>'+
-          '<h4>'+esc(spec.name||model?.name||'Moulure sur mesure')+'</h4>'+
+          '<div class="mir-po-piece-info"><span class="mir-po-piece-index">'+(isPanel?'PANNEAU':'MOULURE')+' '+(index+1)+' · '+esc(item.id)+'</span>'+
+          '<h4>'+esc(spec.name||model?.name||(isPanel?'Panneau architectural':'Moulure sur mesure'))+'</h4>'+
           '<p class="mir-po-piece-dimensions">'+(dimensions||'Cotes à vérifier')+'</p>'+
-          '<p class="mir-po-piece-angles">'+(angles||'Angles à vérifier')+'</p>'+
-          '<p><strong>Longueur :</strong> '+esc(length||spec.length||'À préciser')+
-          ' · <strong>Métal :</strong> '+esc(metal)+' · <strong>Couleur :</strong> '+esc(color)+'</p>'+
+          (isPanel?'<details class="mir-po-piece-details"><summary>Voir les côtés, lips et angles</summary><p class="mir-po-piece-angles">'+summary+'</p></details>':
+            '<p class="mir-po-piece-angles">'+summary+'</p>')+
+          '<p><strong>'+esc(length||'À préciser')+'</strong> · <strong>Métal :</strong> '+esc(metal)+' · <strong>Couleur :</strong> '+esc(color)+'</p>'+
+          (ready?'<p class="mir-po-piece-ready">Cotes et options renseignées · à valider en atelier</p>':'<p class="mir-po-piece-to-complete">Options à confirmer avant le PDF fournisseur</p>')+
           '<div class="mir-po-piece-actions"><label class="mir-proc-field"><span>Quantité</span>'+
           '<input type="number" min="1" step="1" inputmode="numeric" data-mir-po-qty="'+esc(item.id)+'" aria-label="Quantité pièce '+esc(item.id)+'" value="'+quantity+'"></label>'+
-          '<button type="button" data-mir-po-edit-line="'+esc(item.id)+'">Modifier les cotes / angles</button></div></div></article>';
+          '<button type="button" data-mir-po-edit-line="'+esc(item.id)+'">Modifier la pièce</button></div></div></article>';
       }).join('')+'</div>';
     }
     function supplierQuickPick(){
@@ -207,7 +216,7 @@
         '<button type="button" class="mir-po-supplier-choice" data-mir-po-supplier="'+esc(s.id)+'"'+(ui.supplierId===s.id?' aria-pressed="true"':' aria-pressed="false"')+'>'+
         '<strong>'+esc(s.name)+'</strong><small>'+esc(s.verified?'Contact confirmé':'Contact à confirmer')+'</small></button>'
       ).join('');
-      return '<div class="mir-po-suppliers" role="group" aria-label="Choisir un fournisseur de pliage">'+buttons+'</div>'+
+      return '<div class="mir-po-suppliers" role="group" aria-label="Choisir un fournisseur de fabrication">'+buttons+'</div>'+
         '<label class="mir-proc-field mir-po-supplier-select"><span>Fournisseur choisi</span><select data-mir-po="supplierId">'+supplierOptions()+'</select></label>'+
         '<p class="mir-po-contact">'+(selected?'<strong>'+esc(selected.name)+'</strong> · '+esc(selected.phone||'Téléphone à préciser')+
           ' · '+esc(selected.email||'Courriel à confirmer')+'<br>'+esc(selected.verified?'Courriel vérifié par MIR':'Vérifier les coordonnées du fournisseur avant tout envoi'):'Sélectionne un fournisseur')+'</p>'+
@@ -216,13 +225,13 @@
     function ordersHTML(){
       if(poView!=='create')return orderListsHTML();
       populateOrder();
-      const dossier=currentOrder(),items=(dossier?.items||[]).filter(i=>i?.spec?.kind==='profile'||i?.kind==='profile');
-      const quantity=items.reduce((sum,item)=>sum+Number(item.spec?.quantity||0),0);
+      const dossier=currentOrder(),items=(dossier?.items||[]).filter(i=>['profile','panel'].includes(i?.spec?.kind||i?.kind));
+      const quantity=items.reduce((sum,item)=>sum+Number(item.spec?.quantity||0),0),panelCount=items.filter(item=>item.spec?.kind==='panel').length;
       return poMenu()+
         '<section class="mir-po-editor" aria-label="Créer ou modifier un bon de pliage">'+
-        '<div class="mir-po-editor-heading"><div><h2>Bon de commande de pliage</h2><p>'+items.length+' moulure(s) · '+quantity+' pièce(s) · cotes et angles directement issus du tracé</p></div>'+
+        '<div class="mir-po-editor-heading"><div><h2>Bon de commande · Panneaux et pliages</h2><p>'+items.length+' référence(s) dont '+panelCount+' panneau(x) · '+quantity+' pièce(s) · mêmes cotes que le tracé</p></div>'+
         '<button type="button" id="mir-new-draft">＋ Nouveau bon</button></div>'+
-        '<section class="mir-proc-card mir-po-lines"><header class="mir-po-card-heading"><div><h3>1. Pièces à commander</h3><p>Les cotes A-B-C, angles, longueur et quantité sont visibles sur chaque pièce.</p></div><button type="button" id="mir-edit-lines">Retour au dessin</button></header>'+
+        '<section class="mir-proc-card mir-po-lines"><header class="mir-po-card-heading"><div><h3>1. Pièces à commander</h3><p>Chaque panneau ou moulure garde ses repères, ses cotes, ses lèvres et sa quantité.</p></div><button type="button" id="mir-edit-lines">Retour au dessin</button></header>'+
         bonPieceCards(dossier)+'</section>'+
         '<section class="mir-proc-card mir-po-supplier-card"><h3>2. Fournisseur</h3><p>Choisis directement un des fournisseurs enregistrés. Le contact reste modifiable.</p>'+
         supplierQuickPick()+'</section>'+
@@ -312,7 +321,7 @@
         const updates=Array.isArray(o.events)?o.events.length:0;
         return '<article class="mir-proc-card mir-po-tracked" data-mir-order-id="'+esc(o.id)+'">'
          +'<div class="mir-proc-model-head"><div><h3>'+esc(o.poNumber||'Bon sans numéro')+' · R'+esc(o.revision||1)+'</h3><p>'+esc(supplier)+' · '+esc(o.job||'Chantier à préciser')+'</p></div><span class="mir-proc-model-state">'+esc(status)+'</span></div>'
-         +'<p>'+esc(o.items?.length||0)+' moulure(s) · '+updates+' événement(s) dans le suivi local.</p>'
+         +'<p>'+esc(o.items?.length||0)+' référence(s) · '+updates+' événement(s) dans le suivi local.</p>'
          +'<label class="mir-proc-field"><span>Faire évoluer le suivi</span><select data-mir-order-status="'+esc(o.id)+'" aria-label="Statut du bon '+esc(o.poNumber)+'">'
          +PO_STATUS.filter(([value])=>value!=='envoye'||o.status==='envoye').map(([value,label])=>'<option value="'+value+'"'+((o.status||'brouillon')===value?' selected':'')+'>'+label+'</option>').join('')+'</select></label>'
          +'<div class="mir-proc-actions"><button type="button" data-mir-open="'+esc(o.id)+'">'+(W?.frozen(o)?'Créer une révision':'Modifier le bon')+'</button><button type="button" data-mir-review="'+esc(o.id)+'">Vérifier / envoyer</button><button type="button" data-mir-pdf="'+esc(o.id)+'">Télécharger le PDF</button></div>'
