@@ -146,3 +146,8 @@ Recette finale des contrôles verrouillés :
 PASS PDF réel 11 pages avec lip 2¼ et sans lip, données et quantités conservées
 PASS review click → metric edit → explicit revision → reload; nine unchanged panels; triangle independent lips; keyboard and invalid fraction
 PASS locked template width and lips remain unchanged through direct editor
+
+Dernière recette : verrous et séparation des dossiers employé/client
+PASS PDF réel 11 pages avec lip 2¼ et sans lip, données et quantités conservées
+PASS review click → metric edit → explicit revision → reload; nine unchanged panels; triangle independent lips; keyboard and invalid fraction
+PASS locked template width and lips remain unchanged through direct editor
