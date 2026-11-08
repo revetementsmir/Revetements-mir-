@@ -1,0 +1,25 @@
+name: MIR — Parcours employé responsive
+on:
+  pull_request:
+    paths:
+      - 'dist/chantier*'
+      - 'dist/portal-client.js'
+      - 'dist/employee-store-model.js'
+      - 'tests/mir-employee-portal-browser.cjs'
+      - '.github/workflows/mir-employee-portal-pr.yml'
+permissions:
+  contents: read
+jobs:
+  portal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install --no-save playwright@1.58.2
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/mir-employee-portal-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: MIR-portail-employe-390
+          path: artifacts/MIR-portail-employe-390.png
