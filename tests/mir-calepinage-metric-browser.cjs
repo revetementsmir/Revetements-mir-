@@ -35,12 +35,13 @@ async function saved(page){await page.waitForFunction(()=>document.querySelector
    const page=await browser.newPage({viewport:{width:device.width,height:device.height},hasTouch:device.width<1100});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'/calepinage.html',{waitUntil:'domcontentloaded'});
-   await page.locator('#load-example').waitFor({state:'visible',timeout:25000});
-   await page.locator('#load-example').click();
+   await page.locator(device.width<=740?'#mir-cal-mobile-example':'#load-example').waitFor({state:'visible',timeout:25000});
+   await page.locator(device.width<=740?'#mir-cal-mobile-example':'#load-example').click();
    await page.waitForFunction(()=>document.querySelector('#piece-count')?.textContent?.includes('8 panneaux'));
    assert.equal(await page.locator('#mir-wall-live-3d').getAttribute('data-synced-pieces'),'8','Auto 4 wide × 2 high generates 8 panels in 3D');
    assert.ok(await page.locator('#mir-wall-live-3d-stage [data-mir-wall-twin="3d"]').count()===1,'Real 3D preview follows 2D');
    // Adjust number across and high: compute immediately, never simulate pieces.
+   if(device.width<=740)await page.locator('[data-mir-cal-stage="panels"]').click();
    await page.locator('#columns').fill('3');await page.locator('#columns').press('Tab');
    assert.match(await page.locator('#piece-count').textContent(),/6 panneaux/);
    assert.equal(await page.locator('#mir-wall-live-3d').getAttribute('data-synced-pieces'),'6');
@@ -51,7 +52,12 @@ async function saved(page){await page.waitForFunction(()=>document.querySelector
    await page.locator('#rows').fill('2');await page.locator('#rows').press('Tab');
    assert.match(await page.locator('#piece-count').textContent(),/8 panneaux/);
    // Edit one selected panel using millimetres; lock its column and row atomically.
+   if(device.width<=740){
+    await page.locator('[data-mir-cal-stage="order"]').click();
+    await page.locator('.mir-cal-mobile-full-table summary').click();
+   }
    await page.locator('#piece-table [data-table-piece]').first().click();
+   if(device.width<=740)await page.locator('[data-mir-cal-stage="panels"]').click();
    await page.locator('#mir-panel-dimension-unit').selectOption('mm');
    const first=Number(await page.locator('#piece-width').inputValue()),second=Number(await page.locator('#piece-height').inputValue());
    assert.ok(first>300&&second>300,'Dimension inputs converted to mm');
@@ -81,6 +87,7 @@ async function saved(page){await page.waitForFunction(()=>document.querySelector
    assert.equal(await page.locator('#mir-wall-live-3d-stage [data-mir-wall-twin="3d"]').count(),1);
    await page.screenshot({path:path.join(artifacts,'mir-panel-grid-'+device.name+'.png'),fullPage:true});
    // A custom wall can be sketched before size; no fabricated panel count.
+   if(device.width<=740)await page.locator('[data-mir-cal-stage="wall"]').click();
    await page.locator('#new-traced-section').click();
    assert.equal(await page.locator('#drawing-stage').getAttribute('data-tool'),'outline');
    await tapSvg(page,240,165);await tapSvg(page,760,165);await tapSvg(page,760,515);await tapSvg(page,240,515);
@@ -93,6 +100,7 @@ async function saved(page){await page.waitForFunction(()=>document.querySelector
    assert.equal(await page.locator('#mir-wall-live-3d').getAttribute('data-geometry-status'),'unmeasured');
    await page.locator('#zone-width').fill('120');await page.locator('#zone-width').press('Tab');
    await page.locator('#zone-height').fill('96');await page.locator('#zone-height').press('Tab');
+   if(device.width<=740)await page.locator('[data-mir-cal-stage="panels"]').click();
    await page.locator('#lip').fill('1');await page.locator('#lip').press('Tab');
    await page.waitForFunction(()=>document.querySelector('#piece-count')?.textContent?.includes('8 panneaux'));
    assert.equal(await page.locator('#mir-wall-live-3d').getAttribute('data-geometry-status'),'measured');
