@@ -26,22 +26,25 @@ async function ready(){
    page.on('pageerror',e=>errors.push(e.message));
    page.on('dialog',d=>d.accept());
    await page.goto(base+'/calepinage.html',{waitUntil:'domcontentloaded'});
-   await page.locator('#load-example').click();
+   if(screen.width<=740){await page.locator('#mir-cal-mobile-example').waitFor({state:'visible'});await page.locator('#mir-cal-mobile-example').click();}
+   else await page.locator('#load-example').click();
    await page.waitForFunction(()=>document.querySelector('#piece-count')?.textContent?.includes('8 panneaux'));
+   if(screen.width<=740)await page.locator('[data-mir-cal-stage="panels"]').click();
    await page.locator('#columns').fill('5');await page.locator('#columns').press('Tab');
    assert.match(await page.locator('#piece-count').textContent(),/10 panneaux/);
    assert.equal(await page.locator('#mir-wall-live-3d').getAttribute('data-synced-pieces'),'10');
+   if(screen.width<=740)await page.locator('[data-mir-cal-stage="order"]').click();
    await page.locator('#project-name').fill('Chantier 10 panneaux');
    await page.locator('#project-name').press('Tab');
    await page.locator('#po-number').fill('MIR-BC-10');
    await page.locator('#po-number').press('Tab');
-   await page.locator('#dimensions-confirmed').check();
+   await page.locator(screen.width<=740?'#mir-cal-mobile-confirm':'#dimensions-confirmed').check();
    assert.equal(await page.locator('#send-production').isEnabled(),true);
    assert.match(await page.locator('#send-production').textContent(),/10 panneaux/);
    await page.screenshot({path:path.join(artifacts,'mir-mur-10-avant-bon-'+screen.name+'.png'),fullPage:true});
    await Promise.all([
     page.waitForURL(u=>u.pathname.endsWith('/production.html')&&u.searchParams.get('destination')==='bon',{timeout:25000}),
-    page.locator('#send-production').click()
+    page.locator(screen.width<=740?'#mir-cal-mobile-next':'#send-production').click()
    ]);
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace&&!!window.MIRProcurementUI);
    assert.equal(await page.locator('#create-panel-po').isVisible(),true,'Le mur entier propose un bon fournisseur');
@@ -56,8 +59,8 @@ async function ready(){
    assert.equal(proof.items.length,10);assert.equal(proof.receiptCount,1);
    assert.equal(new Set(proof.items.map(i=>i.source)).size,10);
    assert.ok(proof.items.every(i=>i.kind==='panel'),'Aucune pièce profil de pliage substituée');
-   assert.match(await page.locator('.mir-po-editor-heading').textContent(),/10 panneau/);
-   assert.ok(await page.locator('.mir-po-piece-visual svg').count()>=10,'Vrai SVG pour chaque pièce');
+   assert.match(await page.locator('.mir-wb-order-heading').textContent(),/bon de commande/i);
+   assert.equal(await page.locator('.mir-po-piece-visual svg').count(),0,'Le formulaire reste léger, les vrais SVG sont dans les fiches PDF');
    assert.equal(await page.locator('[data-mir-po="job"]').inputValue(),'Chantier 10 panneaux');
    assert.equal(await page.locator('[data-mir-po="poNumber"]').inputValue(),'MIR-BC-10');
    await page.locator('[data-mir-po="shipTo"]').fill('12 rue fictive, Québec');

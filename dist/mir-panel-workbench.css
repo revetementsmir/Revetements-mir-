@@ -1,0 +1,158 @@
+/* MIR / BOSS Responsive GOD MODE — parcours panneaux centré sur une seule tâche.
+ * Source des calculs : moteurs MIR existants, ce CSS n'influence aucune mesure. */
+body.mir-admin-v4[data-mir-tab="panels"] #mir-procurement-panel{width:100%;max-width:1390px;margin:auto;padding:0 0 90px}
+.mir-wb,.mir-wb-order{font-family:Arial,Helvetica,sans-serif;color:#2c4534;min-width:0}
+.mir-wb{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:15px;align-items:start}
+.mir-wb-heading,.mir-wb-progress,.mir-wb-start,.mir-wb-manage,.mir-wb-next-action{grid-column:1/-1}
+.mir-wb-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:22px 25px;border:1px solid #d7e1d5;border-radius:15px;background:#fff}
+.mir-wb-eyebrow{font-size:10px!important;letter-spacing:.13em;font-weight:750;color:#507e55!important;line-height:1.5!important;margin:0 0 6px!important}
+.mir-wb-heading h2{font-size:clamp(25px,3vw,36px)!important;line-height:1.16!important;letter-spacing:-.035em;margin:0 0 8px!important;font-weight:750}
+.mir-wb-heading p:not(.mir-wb-eyebrow){font-size:14px!important;color:#617464!important;line-height:1.5!important;max-width:650px}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-exit{background:#f1f5ee;border:1px solid #c9d7c8;color:#2a5239;padding:9px 13px;min-height:43px;font-size:12px;flex:none}
+.mir-wb-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:#ecf0e8;padding:5px;border:1px solid #d4dfd0;border-radius:12px}
+.mir-wb-step{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 6px;min-height:41px;border-radius:8px;color:#728070;font-weight:650;font-size:13px}
+.mir-wb-step strong{font-size:12px;display:grid;place-items:center;width:25px;height:25px;background:#dce4d6;border-radius:99px;color:#54715a}
+.mir-wb-step.is-current{background:#fff;color:#28533a;box-shadow:0 1px 6px #233b2d10}
+.mir-wb-step.is-current strong{background:#2e6242;color:white}
+.mir-wb-start{padding:22px;background:#fff;border:1px solid #d8e1d4;border-radius:15px}
+.mir-wb-start h3{font-size:22px!important;margin:0 0 17px!important}
+.mir-wb-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+body.mir-admin-v4 .mir-wb-choices :is(a,button){display:flex;align-items:flex-start;flex-direction:column;gap:9px;text-decoration:none;text-align:left;min-height:153px;padding:18px;background:#f5f8f2;color:#2d523b;border:1px solid #c9dac6;border-radius:12px}
+.mir-wb-choices strong{font-size:19px;font-weight:800}
+.mir-wb-choices span{font-size:13px;line-height:1.45;color:#556e59}
+.mir-wb-choices b{margin-top:auto;font-size:13px}
+body.mir-admin-v4 .mir-wb-choices .mir-wb-start-primary{background:#eaf3e5;border-color:#a7c7a5}
+.mir-wb-note,.mir-wb-scale,.mir-wb-instruction{font-size:12px!important;line-height:1.5!important;color:#6a796a!important;margin:10px 0 0!important}
+.mir-wb-overview,.mir-wb-focus{background:#fff;border:1px solid #d7e1d5;border-radius:15px;min-width:0;padding:20px}
+.mir-wb-summary{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.mir-wb-summary h3{font-size:23px!important;line-height:1.15!important;margin:0 0 8px!important;letter-spacing:-.025em}
+.mir-wb-summary p{font-size:14px!important;color:#4e694f}
+.mir-wb-summary strong{font-weight:800}
+body.mir-admin-v4 .mir-wb-secondary-link{font-size:12px;font-weight:750;color:#2e5e3b;border:1px solid #cadac8;border-radius:8px;padding:9px 11px;text-decoration:none}
+.mir-wb-wall-grid{display:grid;grid-template-columns:repeat(var(--mir-wb-cols,5),minmax(0,1fr));grid-auto-rows:minmax(58px,auto);gap:5px;padding:12px;background:#f3f6ef;border:1px solid #dae5d8;border-radius:11px;margin:13px 0 8px;overflow-x:auto}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-wall-tile{display:grid;place-items:center;min-width:0;min-height:58px;padding:6px 2px;background:#e4eddf;border:2px solid #9fb69e;border-radius:5px;color:#254a34;font-size:12px;font-weight:800}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-wall-tile.is-selected{background:#315e40;border-color:#234d33;color:white}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-wall-tile.is-out{background:#f2f1ec;color:#8a9987;border-style:dashed}
+.mir-wb-wall-tile span{overflow-wrap:anywhere}
+.mir-wb-focus-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:13px}
+.mir-wb-focus-head h3{font-size:23px!important;margin:0!important;line-height:1.15!important}
+.mir-wb-focus-head small{font-size:11px;font-weight:600;color:#6e856e;vertical-align:middle}
+.mir-wb-switch{display:flex;gap:5px}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-switch button{min-width:45px;min-height:43px;background:#f0f4ec;border:1px solid #c5d6c5;font-size:18px}
+.mir-wb-drawing{background:#fbfcfa;border:1px solid #e0e8da;border-radius:10px;padding:8px;display:grid;place-items:center;min-height:240px}
+.mir-wb-drawing svg{display:block;width:100%;max-width:630px;height:auto;max-height:295px}
+.mir-wb-drawing-empty{color:#955a34}
+.mir-wb-measures{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0}
+.mir-wb-measures>div{background:#f0f5ec;border:1px solid #d6e3d0;border-radius:10px;padding:12px}
+.mir-wb-measures span{display:block;font-size:11px;color:#607362;font-weight:700}
+.mir-wb-measures strong{display:block;font-size:18px;margin:4px 0;color:#244c33}
+.mir-wb-measures small{display:block;font-size:10px;color:#7b8b77}
+.mir-wb-measures>div:last-child{grid-column:1/-1}
+.mir-wb-drawing{background:#fff}
+.mir-wb-drawing svg{max-height:385px}
+.mir-wb-spec{font-size:13px!important;line-height:1.45!important;color:#526b56!important;margin:10px 0!important}
+.mir-wb-issue{padding:10px 12px;background:#fff7e9;border:1px solid #e9d6b3;border-radius:8px;color:#7f5b33;font-size:12px}
+.mir-wb-extra,.mir-wb-manage{border-top:1px solid #e0e8df;padding-top:11px;margin:11px 0 0;color:#4f644f}
+.mir-wb-extra summary,.mir-wb-manage summary{font-size:13px!important;min-height:32px;font-weight:750;cursor:pointer}
+.mir-wb-extra p,.mir-wb-manage p{font-size:12px!important;color:#637566}
+.mir-wb-three-d svg{max-width:100%;height:auto;display:block;max-height:290px}
+.mir-wb-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:15px 0}
+.mir-wb-controls label{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:750}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-controls input[type=number]{width:80px;min-width:80px;min-height:45px;font-size:16px;padding:8px;border:1px solid #c4d5c2;border-radius:8px}
+.mir-wb-check input{min-height:20px;width:21px;height:21px;accent-color:#285e3b}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-edit{width:100%;padding:12px;color:#28563b;border:1px solid #abc7ae;background:#edf5e9;font-size:14px;min-height:48px;font-weight:750}
+.mir-wb-options{margin-top:14px}
+.mir-wb-options a,.mir-wb-options button{font-size:12px;padding:7px;display:inline-flex;margin:7px}
+.mir-wb-manage{padding:15px 18px;background:#fff;border:1px solid #d5e1d5;border-radius:12px;margin:0}
+.mir-wb-manage>div{display:flex;flex-wrap:wrap;gap:9px;margin-top:10px}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-manage button{background:#f4f7f0;border:1px solid #cfdfcc;padding:11px;min-height:43px}
+.mir-wb-next-action{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:16px 19px;border-radius:13px;background:#e8f1e3;border:1px solid #b7d2b4}
+.mir-wb-next-action strong{font-size:17px}
+.mir-wb-next-action p{font-size:12px!important;color:#617962}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-next-action .mir-panel-primary{background:#2c6240;min-height:53px;font-size:14px;padding:12px 18px}
+.mir-wb-order{max-width:900px;margin:0 auto;padding:0 0 30px}
+.mir-wb-order-heading{padding:18px 20px;border:1px solid #d6e2d3;border-radius:13px;background:#fff;margin-bottom:14px}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-order-heading>button{font-size:12px;margin-bottom:14px}
+.mir-wb-order-heading h2{font-size:clamp(24px,3vw,32px)!important;margin:0 0 9px!important}
+.mir-wb-order-heading p:not(.mir-wb-eyebrow){font-size:13px!important;color:#5f7260!important;margin:0 0 12px}
+.mir-wb-order-section{border:1px solid #d7e2d6;border-radius:13px;background:#fff;margin-bottom:13px;padding:22px}
+.mir-wb-order-section h3{font-size:20px!important;margin:0 0 10px!important}
+.mir-wb-order-section>p{font-size:13px!important;color:#667567;margin:0 0 14px!important}
+.mir-wb-order-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mir-wb-order-fields label{min-width:0}
+.mir-wb-supplier-help{font-size:12px;color:#70816f}
+.mir-wb-order-section details summary{font-size:14px;font-weight:750;cursor:pointer}
+.mir-wb-po-summary{padding-top:13px}
+.mir-wb-po-summary h3{font-size:17px!important}
+.mir-wb-po-summary p{font-size:12px!important;color:#637363}
+.mir-wb-po-list{display:grid;gap:0;border:1px solid #dee7dd;border-radius:8px;margin-top:13px;overflow:hidden}
+.mir-wb-po-row{display:grid;grid-template-columns:90px minmax(0,1fr) 65px;gap:10px;align-items:center;padding:10px 12px;background:#fff;border-bottom:1px solid #e8eee6;font-size:12px}
+.mir-wb-po-row:last-child{border-bottom:0}
+.mir-wb-po-row span:last-child{text-align:right}
+.mir-wb-save{padding:18px 20px;background:#edf4e9;border:1px solid #c6dcc6;border-radius:13px}
+.mir-wb-save>p{font-size:12px!important;margin:0 0 12px!important}
+body.mir-admin-v4 #mir-procurement-panel .mir-wb-save #mir-create-po{display:block;width:100%;min-height:53px;color:#fff;background:#295a3c;border:1px solid #295a3c;font-size:15px}
+@media(max-width:800px){
+ .mir-wb{grid-template-columns:1fr}
+ .mir-wb-heading,.mir-wb-progress,.mir-wb-start,.mir-wb-manage,.mir-wb-next-action{grid-column:auto}
+ .mir-wb-order-fields{grid-template-columns:1fr}
+}
+@media(max-width:740px){
+ body.mir-admin-v4[data-mir-tab="panels"] #mir-procurement-tabs,
+ body.mir-admin-v4[data-mir-tab="orders"][data-mir-panel-order="true"] #mir-procurement-tabs{display:none!important}
+ body.mir-admin-v4[data-mir-tab="panels"] #mir-procurement-panel,
+ body.mir-admin-v4[data-mir-tab="orders"][data-mir-panel-order="true"] #mir-procurement-panel{padding:0 0 92px!important}
+ .mir-wb{display:flex;flex-direction:column;gap:11px}
+ .mir-wb>*{width:100%}
+ .mir-wb-heading{padding:14px 15px;border-radius:10px;gap:8px}
+ .mir-wb-heading h2{font-size:24px!important;margin:0 0 4px!important}
+ .mir-wb-heading p:not(.mir-wb-eyebrow){font-size:12px!important;line-height:1.5!important}
+ body.mir-admin-v4 #mir-procurement-panel .mir-wb-exit{font-size:11px;min-height:40px;padding:7px;max-width:96px}
+ .mir-wb-progress{padding:4px}
+ .mir-wb-step{font-size:11px;gap:5px;padding:7px 2px;min-height:38px}
+ .mir-wb-step strong{width:21px;height:21px;font-size:11px}
+ .mir-wb-start{padding:17px}
+ .mir-wb-choices{grid-template-columns:1fr}
+ body.mir-admin-v4 .mir-wb-choices :is(a,button){min-height:103px;padding:14px}
+ .mir-wb-overview,.mir-wb-focus{padding:15px;border-radius:11px}
+ .mir-wb-summary h3{font-size:20px!important}
+ .mir-wb-wall-grid{grid-auto-rows:minmax(51px,auto);gap:3px;padding:7px}
+ body.mir-admin-v4 #mir-procurement-panel .mir-wb-wall-tile{min-height:51px;font-size:11px}
+ .mir-wb-drawing{min-height:185px;padding:5px}
+ .mir-wb-drawing svg{max-height:265px}
+ .mir-wb-measures strong{font-size:16px}
+ .mir-wb-measures span{font-size:10px}
+ .mir-wb-next-action{position:sticky;bottom:0;z-index:20;box-shadow:0 -7px 20px #29443018;padding:10px 12px;border-radius:12px;gap:8px}
+ .mir-wb-next-action strong{font-size:12px}
+ .mir-wb-next-action p{font-size:10px!important}
+ body.mir-admin-v4 #mir-procurement-panel .mir-wb-next-action .mir-panel-primary{font-size:12px;min-height:48px;padding:7px 10px;flex:1}
+ .mir-wb-order-heading{padding:14px}
+ .mir-wb-order-section{padding:16px}
+ .mir-wb-order-section h3{font-size:18px!important}
+ .mir-wb-order-fields{gap:5px}
+ .mir-wb-po-row{grid-template-columns:54px minmax(0,1fr) 51px;padding:9px 8px;font-size:11px;gap:6px}
+ body.mir-admin-v4 #mir-procurement-panel .mir-wb-save #mir-create-po{position:sticky;bottom:0;z-index:12}
+}
+
+/* Le portail plein écran conserve plusieurs variantes de body ; l'onglet
+   Panneaux doit masquer l'ancien menu multiple sur téléphone dans tous les cas. */
+.mir-wb-heading-links{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+body #mir-procurement-panel .mir-wb-heading-links button{min-height:39px;padding:8px 10px;font-size:12px}
+@media(max-width:740px){
+ html body[data-mir-tab="panels"] #mir-procurement-tabs,
+ html body[data-mir-tab="orders"][data-mir-panel-order="true"] #mir-procurement-tabs{
+  display:none!important;visibility:hidden!important;height:0!important;margin:0!important;
+ }
+ .mir-wb-heading-links{gap:4px}
+ body #mir-procurement-panel .mir-wb-heading-links button{min-height:38px;padding:6px 8px;font-size:11px}
+}
+
+/* Keep the dimension arrows and lip labels unobstructed on phones.
+   The previous sticky call-to-action overlapped the drawing during scroll. */
+@media(max-width:740px){
+ body.mir-admin-v4 .mir-wb-next-action{
+   position:relative!important;bottom:auto!important;z-index:auto!important;
+   box-shadow:none!important;margin:10px 0 0!important
+ }
+ body.mir-admin-v4 .mir-wb-drawing svg{max-height:375px}
+}
