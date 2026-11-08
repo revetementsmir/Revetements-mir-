@@ -185,6 +185,11 @@
     $('#piece-count').textContent=valid?layout.pieces.length+' panneaux · mêmes repères en production':'Liste des panneaux';
     $('#piece-table').innerHTML=valid?layout.pieces.map(p=>'<tr class="'+(selected?.type==='piece'&&selected.id===p.id?'selected':'')+'"><td><button data-table-piece="'+p.id+'" aria-label="Modifier les dimensions de '+p.id+'">'+p.id+' ✎</button></td><td>Rangée '+(p.row+1)+' · colonne '+(p.col+1)+'</td><td>'+esc(panelBoth(p.widthIn))+'</td><td>'+esc(panelBoth(p.heightIn))+'</td><td>'+esc(panelBoth(p.faceWidthIn))+' × '+esc(panelBoth(p.faceHeightIn))+'</td><td>'+inch(layout.lipIn)+'</td><td>1</td></tr>').join(''):'<tr><td colspan="7">Tracez et mesurez le mur, puis entrez le nombre de panneaux et le lip pour calculer automatiquement.</td></tr>';
     $('#export-site').disabled=!valid||exporting;$('#send-production').disabled=!valid||exporting;$('#undo').disabled=!history.length;
+    const transferButton=$('#send-production'),status=$('#mir-panel-po-status');
+    transferButton.innerHTML=valid?'Préparer le bon · '+layout.pieces.length+' panneaux <span>→</span>':'Préparer le bon de commande <span>→</span>';
+    if(status)status.textContent=!valid?'Dessine ton mur et entre ses vraies cotes pour calculer les panneaux.':
+      !z.confirmed?'Les '+layout.pieces.length+' panneaux sont calculés. Vérifie les cotes et coche « Cotes et jeux de pose vérifiés » pour préparer le bon.':
+      'Les '+layout.pieces.length+' panneaux sont prêts pour un bon fournisseur. Tu pourras compléter le métal, la couleur et le côté du bas avant le PDF.
     const contour=valid?(layout.config.contourIn||[[0,0],[layout.widthIn,0],[layout.widthIn,layout.heightIn],[0,layout.heightIn]]):[];
     $('#wall-edge-list').innerHTML=valid?'<p class="hint">Contour utile après lousse · '+inch(layout.widthIn)+' × '+inch(layout.heightIn)+'. Angles mesurés dans le plan.</p><div class="table-wrap"><table><thead><tr><th>Côté du contour</th><th>Longueur réelle</th><th>Angle intérieur au départ</th></tr></thead><tbody>'+polygonMeasures(contour).map((e,i)=>'<tr><td><button type="button" data-wall-edge="'+i+'" aria-label="Modifier le sommet du côté '+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'">'+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'</button></td><td>'+inch(e.length)+'</td><td>'+number(e.angle)+'°</td></tr>').join('')+'</tbody></table></div>':'Entrez des mesures valides pour calculer le contour.';
   }
@@ -643,7 +648,7 @@
   async function sendProduction() {
     if(!layout.ok)return;
     if(!zone().confirmed){toast('Vérifiez les cotes et les jeux de pose, puis cochez leur confirmation dans Votre zone.');$('#dimensions-confirmed').focus();return;}
-    try{const payload=O.toTransfer(layout,outputMeta());clearTimeout(saveTimer);await saveChain.catch(()=>{});await dbRequest('drafts','readwrite','workspace',clone(workspace));localStorage.setItem(O.STORAGE_KEY||'mir_panel_layout_transfer_v1',JSON.stringify(payload));location.href='production.html?layout='+encodeURIComponent(payload.id);}
+    try{const payload=O.toTransfer(layout,outputMeta());clearTimeout(saveTimer);await saveChain.catch(()=>{});await dbRequest('drafts','readwrite','workspace',clone(workspace));localStorage.setItem(O.STORAGE_KEY||'mir_panel_layout_transfer_v1',JSON.stringify(payload));location.href='production.html?layout='+encodeURIComponent(payload.id)+'&destination=bon';}
     catch(error){toast(error.message||'Les pièces ne peuvent pas être préparées. Sauvegardez le dossier JSON.');}
   }
   function exportJSON() {
