@@ -17,6 +17,10 @@ try{for(const [w,h]of sizes)for(const mode of ['profile','panel','wall']){
  assert.equal(metrics.scroll,0,mode+' document scroll '+w);assert.equal(metrics.overflow,0);assert.ok(metrics.stage.height>=h*(h<520?.28:.45),mode+' useful drawing '+w+': '+metrics.stage.height);assert.ok(metrics.actions.bottom<=h+1);assert.equal(metrics.header,64);
  await settings(page);assert.ok(await page.locator('.mir-inspector-content').evaluate(e=>e.scrollHeight>=e.clientHeight));assert.ok(await page.locator('#production-drawing,#drawing-stage').isVisible());await close(page);
  if(mode==='panel'){
+  if(w>h&&h<=520){
+   const caption=await page.locator('[data-edit-panel-measure="width"] text').boundingBox();
+   assert.ok(caption.height>=12,'Cote A lisible en paysage court');
+  }
   for(const [key,value,expected]of [['width','50½',50.5],['height','38 1/4',38.25],['relief','2¼',2.25]]){await page.locator('#production-drawing [data-edit-panel-measure="'+key+'"]').click();await page.locator('#mir-panel-direct-value').fill(value);await page.locator('#mir-panel-direct-apply').click();assert.equal(await page.evaluate(k=>window.MIRProductionWorkspace.getLivePreviewState().model[{width:'widthMM',height:'heightMM',relief:'reliefMM'}[k]],key),expected*25.4);}
   await page.locator('#production-drawing g[data-edit-panel-edge="bottom"]').first().click();await page.locator('#mir-panel-direct-value').fill('2¼');await page.locator('#mir-panel-direct-apply').click();
   await page.locator('#production-drawing g[data-edit-panel-edge="top"]').first().click();await page.locator('#mir-panel-direct-no-lip').check();await page.locator('#mir-panel-direct-apply').click();

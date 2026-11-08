@@ -6,6 +6,8 @@ const $=s=>document.querySelector(s),esc=value=>String(value??'').replace(/[&<>"
 const copy=value=>JSON.parse(JSON.stringify(value));
 const finite=Number.isFinite;
 const params=new URLSearchParams(location.search),client=params.get('mode')==='client';
+const compactPanel=matchMedia('(max-width: 600px)');
+const shortPanel=matchMedia('(max-height: 520px) and (min-aspect-ratio: 3/2)');
 // This selects a local catalogue only; it is not authentication or authorization.
 const catalogueChannel=params.get('source')==='store'?'store':'client';
 const KEYS={templates:'mir_production_templates_v1',requests:'mir_production_requests_v1',draft:!client?'mir_production_admin_dossier_v1':catalogueChannel==='store'?'mir_production_employee_dossier_v1':'mir_production_client_dossier_v1'};
@@ -413,9 +415,9 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
 function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const mesh=window.MIRProductionVolume.buildMesh(model);
  if(!mesh.valid)return window.MIRProductionVolume.render(model,{yaw:0,pitch:0,zoom:1,illustrative,formatMeasurement:M.formatMeasurement});
- const compact=!small&&matchMedia('(max-width: 600px)').matches;
- const canvas=compact?400:760,height=compact?400:500;
- const face={left:compact?28:48,right:canvas-(compact?132:172),top:58,bottom:height-118};
+ const short=!small&&shortPanel.matches,compact=!small&&!short&&compactPanel.matches;
+ const canvas=compact?400:760,height=short?235:compact?400:500;
+ const face={left:compact?28:48,right:canvas-(short?340:compact?132:172),top:short?43:58,bottom:height-(short?62:118)};
  const {minX,maxX,minY,maxY}=mesh.bounds,z=small?1:zoom;
  const scale=Math.min((face.right-face.left)/Math.max(1,maxX-minX),(face.bottom-face.top)/Math.max(1,maxY-minY))*z;
  const tr={scale,ox:(face.left+face.right-(minX+maxX)*scale)/2,oy:(face.top+face.bottom+(minY+maxY)*scale)/2};
@@ -429,10 +431,10 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
  const xs=outer.map(p=>p[0]),ys=outer.map(p=>p[1]);
  const left=Math.max(18,Math.min(...xs)),right=Math.min(face.right+12,Math.max(...xs));
  const top=Math.max(face.top-18,Math.min(...ys)),bottom=Math.min(face.bottom+10,Math.max(...ys));
- const dimX=right+28,dimY=bottom+32,center=(left+right)/2,middle=(top+bottom)/2;
+ const dimX=right+28,dimY=bottom+(short?21:32),center=(left+right)/2,middle=(top+bottom)/2;
  const value=mm=>illustrative?'À saisir':M.formatMeasurement(mm,model.unit).replace(/(\d) (?=\d+\/\d+ po$)/,'$1\u00a0');
  const measure=(key,label,x,y,w,content)=>`<g class="mir-panel-plan-measure" ${editable?`data-edit-panel-measure="${key}" role="button" tabindex="0" aria-label="Modifier ${label}"`:''}><rect class="mir-panel-plan-hit" x="${x-w/2}" y="${y-26}" width="${w}" height="52" rx="7" fill="transparent"/>${content}</g>`;
- const text=(x,y,label,align='middle')=>`<text x="${x}" y="${y}" text-anchor="${align}" dominant-baseline="middle" font-size="${compact?16:19}" font-weight="700" fill="#294734" pointer-events="none">${esc(label)}</text>`;
+ const text=(x,y,label,align='middle')=>`<text x="${x}" y="${y}" text-anchor="${align}" dominant-baseline="middle" font-size="${short?22:compact?16:19}" font-weight="700" fill="#294734" pointer-events="none">${esc(label)}</text>`;
  let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas} ${height}" role="group" aria-label="${esc(model.name)} — vue cotée, lips compris" data-panel-face="true" data-zoom="${z}" font-family="Arial,sans-serif"><title>${esc(model.name)} — dimensions hors tout avec lèvres</title><defs><clipPath id="${clip}"><rect x="12" y="${face.top-20}" width="${face.right}" height="${face.bottom-face.top+30}"/></clipPath>${swatch?`<pattern id="${paint}" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${hex}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern>`:''}</defs><text x="${canvas/2}" y="25" text-anchor="middle" font-size="${compact?13:15}" fill="#49614a">${illustrative?'Aperçu · cotes à saisir':'Vue de face · lèvres incluses dans A et B'}</text><g clip-path="url(#${clip})"><polygon points="${coords(outer)}" fill="${fill}" stroke="#4b5b46" stroke-width="1.5"/><polygon points="${coords(mesh.front.map(p=>pointOnView(p,tr)))}" fill="${fill}" stroke="#4b5b46" stroke-width="2"/>`;
  for(const [i,edge] of (model.edges||[]).entries()){
   const [ax,ay]=outer[i],[bx,by]=outer[(i+1)%outer.length];
@@ -444,7 +446,7 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
  svg+=`</g><g fill="none" stroke="#658064" stroke-width="1.2" pointer-events="none"><path d="M${left},${bottom+8}V${dimY+6} M${right},${bottom+8}V${dimY+6} M${left},${dimY}H${center-Math.min(53,(right-left)/3)} M${center+Math.min(53,(right-left)/3)},${dimY}H${right} M${left},${dimY}l6,-3m-6,3l6,3 M${right},${dimY}l-6,-3m6,3l-6,3 M${right+8},${top}H${dimX+6} M${right+8},${bottom}H${dimX+6} M${dimX},${top}V${bottom} M${dimX},${top}l-3,6m3,-6l3,6 M${dimX},${bottom}l-3,-6m3,6l3,-6"/></g>`;
  svg+=measure('width','A — Largeur hors tout',center,dimY+10,142,text(center,dimY+12,'A · '+value(model.widthMM)));
  svg+=measure('height','B — Hauteur hors tout',dimX+47,middle,94,text(dimX+9,middle-10,'B','start')+text(dimX+9,middle+10,value(model.heightMM),'start'));
- const profileX=canvas/2,profileY=height-29;
+ const profileX=short?canvas-112:canvas/2,profileY=short?middle:height-29;
  svg+=measure('relief','C — Projection',profileX,profileY,196,`<path d="M${profileX-76},${profileY-10}h30v19h15 M${profileX-40},${profileY-10}v19" fill="none" stroke="#658064" stroke-width="1.5" pointer-events="none"/>${text(profileX-21,profileY,'C · '+value(model.reliefMM),'start')}`);
  return svg+'</svg>';
 }
@@ -1978,7 +1980,7 @@ function undoPanelDirect(redo=false){
  const source=redo?panelDirectRedo:panelDirectUndo,target=redo?panelDirectUndo:panelDirectRedo,next=source.at(-1);
  if(!next||!build(next).valid||!window.MIRProductionVolume.buildMesh(build(next)).valid)return;
  target.push(copy(draft));source.pop();draft=copy(next);renderDimensions();renderPanelOptions();updateDrawing();
- toast('Dessin mis à jour. Enregistrez pour réviser la pièce du dossier.');
+ toast('Dessin mis à jour. Enregistrez pour réviser la pièce du dossier.',{quiet:true});
 }
 let profileDirectEdit=null;
 function openProfileMeasure(index){
@@ -2420,6 +2422,9 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
   startProfileDrawing({fullscreen:false});
   renderTemplates();
  }
+ for(const media of [compactPanel,shortPanel])media.addEventListener('change',()=>{
+  if(kind==='panel'&&view==='face'&&workflow==='configure'&&tool!=='panel-trace')updateDrawing({keepForm:true});
+ });
  offerProfileImport();
  if(!client&&params.get('shared-request'))openRequest(params.get('shared-request'));
  window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,preview:view,zoom,pan:{...viewPan},drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:kind==='panel'?panelDirectUndo.length>0:freeformCanUndo(),canRedo:kind==='panel'?panelDirectRedo.length>0:freeformRedo.length>0};},saveCurrentPiece:saveWorkspacePiece,setOrderItemQuantity,openContinueMenu,openOrderPanelEditor(id,key,edge){if(client||!order.items.some(row=>row.id===id&&row.kind==='panel'))return false;editPiece(id);if(edge)openPanelEdge(edge);else openPanelMeasure(key);return true;},editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});

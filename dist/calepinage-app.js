@@ -69,7 +69,7 @@
     if(options.clearAxes){for(const axis of options.clearAxes===true?['x','y']:options.clearAxes)delete zone().rules[axis+'AxesIn'];}
     scheduleSave();render();
   }
-  function toast(message) { $('#toast').textContent=message;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),5000); }
+  function toast(message,{quiet=false}={}) { $('#toast').textContent=message;$('#toast').classList.toggle('visible',!quiet);clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),5000); }
   function gaps(z=zone()) { return {left:parse(z.values.clearLeft),right:parse(z.values.clearRight),top:parse(z.values.clearTop),bottom:parse(z.values.clearBottom)}; }
   function dimensions(z=zone()) { const g=gaps(z),width=parse(z.values.width),height=parse(z.values.height);return {width,height,g,usableWidth:finite(width)&&finite(g.left)&&finite(g.right)?width-g.left-g.right:null,usableHeight:finite(height)&&finite(g.top)&&finite(g.bottom)?height-g.top-g.bottom:null}; }
   function wallGeometry(z=zone()) {
@@ -740,7 +740,7 @@
       workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';
       scheduleSave();render();restoreSession();beginOutline();
     };
-    $('#load-example').onclick=()=>{if(workspace.zones.length>=30)return toast('Ce dossier contient déjà 30 zones. Sauvegardez-le avant de poursuivre.');snapshot();const z=blankZone(workspace.zones.length+1);z.name='Exemple · entre deux fenêtres';Object.assign(z.values,{width:'108 1/2',height:'83 3/4',lip:'1',columns:4,rows:2});z.dimensionSource='example';workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();toast('Exemple chargé. Le lip de 1 po reste modifiable.');};
+    $('#load-example').onclick=()=>{if(workspace.zones.length>=30)return toast('Ce dossier contient déjà 30 zones. Sauvegardez-le avant de poursuivre.');snapshot();const z=blankZone(workspace.zones.length+1);z.name='Exemple · entre deux fenêtres';Object.assign(z.values,{width:'108 1/2',height:'83 3/4',lip:'1',columns:4,rows:2});z.dimensionSource='example';workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();toast('Exemple chargé. Le lip de 1 po reste modifiable.',{quiet:true});};
     $('#undo').onclick=()=>{if(!history.length)return;const current=new Map(workspace.zones.map(z=>[z.id,z])),restored=history.pop();for(const z of restored.zones){const before=current.get(z.id);if(!before)continue;const oldContent={...before,revision:0},restoredContent={...z,revision:0};z.revision=JSON.stringify(oldContent)===JSON.stringify(restoredContent)?before.revision:Math.max(before.revision,z.revision)+1;}workspace=restored;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();};
     $('#redistribute').onclick=()=>commit(z=>{delete z.rules.xAxesIn;delete z.rules.yAxesIn;});
     $('#unlock-all').onclick=()=>commit(z=>{for(const k of ['widthLocks','heightLocks','xLocks','yLocks'])delete z.rules[k];},{invalidate:false});
