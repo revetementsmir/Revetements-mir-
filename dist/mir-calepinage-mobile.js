@@ -81,7 +81,8 @@
   const nav=document.createElement('section');
   nav.id='mir-cal-mobile-nav';nav.className='mir-cal-mobile-nav';
   nav.innerHTML='<div class="mir-cal-mobile-title"><p>ATELIER MIR · PANNEAUX</p>'+
-    '<h2>Créer mes panneaux</h2><span>Une étape à la fois, sans perdre les mesures.</span></div>'+
+    '<h2>Créer mes panneaux</h2><span>Une étape à la fois, sans perdre les mesures.</span>'+ 
+    '<button type="button" id="mir-cal-mobile-example">Essayer un mur exemple</button></div>'+
     '<div class="mir-cal-mobile-steps" role="navigation" aria-label="Étapes du calepinage">'+
     '<button type="button" data-mir-cal-stage="wall"><b>1</b>Mur</button>'+
     '<button type="button" data-mir-cal-stage="panels"><b>2</b>Panneaux</button>'+
@@ -119,6 +120,7 @@
   const count=document.createElement('p');count.className='mir-cal-mobile-count';
   count.id='mir-cal-mobile-panel-count';
   $('.production-heading')?.after(count);
+  $('#mir-cal-mobile-example')?.addEventListener('click',()=>$('#load-example')?.click());
   nav.addEventListener('click',e=>{
    const button=e.target.closest('[data-mir-cal-stage]');
    if(button)stepTo(button.dataset.mirCalStage);
