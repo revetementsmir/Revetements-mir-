@@ -44,11 +44,11 @@ for(const width of [320,360,390,820,1024,1440]){
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/catalogue-fd6866b49d21.json',r=>r.fulfill({json:[]}));
   await page.goto(base+'/chantier.html?demo=1');
-  await page.getByRole('heading',{name:'Connexion en attente'}).waitFor();
+  await page.getByRole('heading',{name:'Mon compte MIR'}).waitFor();
   assert.equal(new URL(page.url()).search,'');
   const noOverflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await noOverflow();
-  await page.route('**/portal-client.js',r=>r.fulfill({body:source+'\n'+stub,contentType:'application/javascript'}));
+  await page.route('**/portal-client.js*',r=>r.fulfill({body:source+'\n'+stub,contentType:'application/javascript'}));
   await page.reload();
   await page.getByRole('heading',{name:'Mes chantiers'}).waitFor();
   assert.equal(await page.locator('.employee-job').count(),1);

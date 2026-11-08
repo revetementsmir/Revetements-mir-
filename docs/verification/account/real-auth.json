@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-11-08T15:27:54.581Z",
+  "transport": "Real HTTPS; installed Chromium; read-only business data",
+  "rows": [
+    {
+      "role": "client",
+      "identityConfirmed": true,
+      "roleMatches": true,
+      "teamDenied": true,
+      "assignedOnly": true,
+      "signedOut": true
+    },
+    {
+      "role": "employee",
+      "identityConfirmed": true,
+      "roleMatches": true,
+      "teamDenied": true,
+      "assignedOnly": true,
+      "signedOut": true
+    },
+    {
+      "role": "admin",
+      "identityConfirmed": true,
+      "roleMatches": true,
+      "teamDenied": true,
+      "assignedOnly": true,
+      "signedOut": true
+    }
+  ]
+}

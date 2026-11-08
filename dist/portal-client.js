@@ -53,12 +53,16 @@
     const rawInvitation = query.get('invitation') || hash.get('invitation');
     const invitationToken = /^[A-Za-z0-9_-]{43}$/.test(rawInvitation || '') ? rawInvitation : null;
     const code = query.get('code');
+    const flow=query.get('flow')||hash.get('type')||query.get('type');
+    const intent=['recovery','invite','signup','google'].includes(flow)?flow:'signin';
     let authCallback = null;
-    if (code && code.length <= 2048) authCallback = { kind: 'code', code };
+    if (code && code.length <= 2048) authCallback = { kind: 'code', code, intent };
+    else if(/^[a-zA-Z0-9_-]{20,512}$/.test(query.get('token_hash')||'')&&['email','signup','invite','recovery'].includes(query.get('type')))
+      authCallback={kind:'otp',tokenHash:query.get('token_hash'),type:query.get('type'),intent};
     else if (hash.get('access_token') && hash.get('refresh_token')) {
       const accessToken = hash.get('access_token'), refreshToken = hash.get('refresh_token');
       if (accessToken.length < 16000 && refreshToken.length < 4096)
-        authCallback = { kind: 'implicit', accessToken, refreshToken };
+        authCallback = { kind: 'implicit', accessToken, refreshToken, intent };
     }
     const callbackError = query.has('error') || hash.has('error') || query.has('error_code') || hash.has('error_code') ||
       (!authCallback && ['code', 'token_hash', 'access_token', 'refresh_token'].some(key => query.has(key) || hash.has(key)));
@@ -67,7 +71,7 @@
     // Le site MIR principal n'expose jamais l'ancien mode démonstration.
     query.delete('demo');
     url.hash = hash.toString() ? `#${hash.toString()}` : '';
-    return { cleanURL: url.href, invitationToken, authCallback, callbackError,
+    return { cleanURL: url.href, invitationToken, authCallback, callbackError, intent,
       invalidInvitation: !!rawInvitation && !invitationToken,
       mode: 'connected' };
   }
@@ -112,6 +116,10 @@
     const storage = options.operationStorage;
     const logoutKey = `mir_portal_signed_out_${config.projectRef || 'disabled'}`;
     let logoutRequested = false;
+    const passwordGateKey=`mir_account_password_gate_${config.projectRef||'disabled'}`;
+    let passwordGate=null;
+    try{const value=storage?.getItem(passwordGateKey);if(['recovery','invite'].includes(value))passwordGate=value;}catch(_){}
+    function setPasswordGate(value){passwordGate=value;try{if(value)storage?.setItem(passwordGateKey,value);else storage?.removeItem(passwordGateKey);}catch(_){} }
     try { logoutRequested = config.enabled && storage?.getItem(logoutKey) === '1'; } catch (_) {}
     function setLogoutIntent(value) {
       logoutRequested = value;
@@ -157,7 +165,7 @@
     }
     function clearIdentity(phase = 'signed_out', error = null) {
       generation++; readSequence++;
-      emit({ phase, user: null, snapshot: null, pending: null, busy: false, error }, 'auth');
+      emit({ phase, user: null, snapshot: null, account:null, pending: null, busy: false, error }, 'auth');
     }
     function requireEnabled() { if (!sdk) fail('NOT_ENABLED', 'Les accès employés sont en cours d’activation.'); }
     async function verifiedUser() {
@@ -181,12 +189,20 @@
       try {
         const user = await verifiedUser();
         if (!user) return null;
+        if(passwordGate){emit({phase:'password_required',passwordIntent:passwordGate,user:{id:user.id,email:user.email||''},snapshot:null,account:null,error:null},'auth');return null;}
         if (currentGeneration !== generation || sequence !== readSequence || disposed) return null;
         if (status.user?.id && status.user.id !== user.id) {
-          generation++; currentGeneration = generation; emit({ snapshot: null, pending: null }, 'auth');
+          generation++; currentGeneration = generation; emit({ phase:'loading',user:null,account:null,snapshot:null,pending:null }, 'auth');
         }
         const epoch = generation;
         emit({ user: { id: user.id, email: user.email || '' }, pending: readPending(user.id) });
+        if(config.accountEnabled){
+          const {data:account,error:accountError}=await sdk.rpc('mir_account_snapshot');
+          if(epoch!==generation||sequence!==readSequence||disposed)return null;
+          if(accountError)throw errorOf(accountError);
+          if(!account||account.userId!==user.id||!['client','employee','admin'].includes(account.role))fail('ACCESS_DENIED','Votre accès MIR n’a pas pu être vérifié.');
+          if(account.role==='client'){emit({phase:'customer_ready',account:clone(account),snapshot:null,error:null},'refresh');return account;}
+        }
         const { data, error } = await sdk.rpc('mir_portal_snapshot');
         if (epoch !== generation || sequence !== readSequence || disposed) return null;
         if (error) throw errorOf(error);
@@ -196,7 +212,7 @@
       } catch (error) {
         if (currentGeneration !== generation || sequence !== readSequence || disposed) return null;
         const mapped = errorOf(error), denied = ['ACCESS_DENIED', 'ACTOR_INACTIVE', 'MEMBER_INACTIVE', 'MEMBERSHIP_REQUIRED', 'AUTH_REQUIRED', '42501'].includes(mapped.code);
-        emit({ phase: denied ? 'access_denied' : 'error', snapshot: null, error: mapped }, 'refresh');
+        emit({ phase: denied ? 'access_denied' : 'error', snapshot: null,account:null, error: mapped }, 'refresh');
         throw mapped;
       }
     }
@@ -205,6 +221,7 @@
       if (!authSubscription) {
         const subscription = sdk.auth.onAuthStateChange((event, session) => {
           if (event === 'SIGNED_OUT') { clearIdentity(); return; }
+          if(event==='PASSWORD_RECOVERY'){setPasswordGate('recovery');schedule(()=>{if(!disposed)refresh().catch(()=>{});});return;}
           if (logoutRequested) return;
           if (event === 'INITIAL_SESSION') return;
           if (['SIGNED_IN', 'TOKEN_REFRESHED', 'USER_UPDATED'].includes(event)) {
@@ -231,18 +248,66 @@
       }
       return { message: 'Si cette adresse possède un accès MIR, un lien de connexion lui a été envoyé.' };
     }
+    function redirectFor(flow){const u=new URL(config.redirectTo);u.searchParams.set('flow',flow);if(config.environment==='test')u.searchParams.set('recette','1');return u.href;}
+    function emailAddress(value){const email=String(value||'').trim();if(email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))fail('EMAIL_INVALID','Indiquez une adresse courriel valide.');return email;}
+    function newPassword(value){if(typeof value!=='string'||value.length<12||value.length>256)fail('PASSWORD_INVALID','Choisissez un mot de passe d’au moins 12 caractères.');return value;}
+    function authFailure(error){
+      const code=error?.code||'';
+      if(error?.status===429)return new PortalError('RATE_LIMIT','Trop de tentatives. Patientez quelques minutes avant de réessayer.');
+      if(code==='email_not_confirmed')return new PortalError('EMAIL_UNCONFIRMED','Confirmez votre adresse courriel avant de vous connecter.');
+      if(['invalid_credentials','invalid_grant','user_not_found'].includes(code))return new PortalError('LOGIN_INVALID','Courriel ou mot de passe incorrect.');
+      if(['otp_expired','flow_state_expired','flow_state_not_found'].includes(code))return new PortalError('LINK_EXPIRED','Ce lien est expiré ou déjà utilisé. Demandez un nouveau lien.');
+      if(code==='signup_disabled')return new PortalError('SIGNUP_DISABLED','La création de compte est en cours d’activation. Votre panier est conservé.');
+      return new PortalError('AUTH_FAILED','La connexion n’a pas pu être confirmée. Vérifiez vos informations et réessayez.');
+    }
+    async function signInPassword(email,password){
+      requireEnabled();if(config.passwordEnabled===false)fail('PASSWORD_DISABLED','La connexion par mot de passe est en cours d’activation.');
+      const {error}=await sdk.auth.signInWithPassword({email:emailAddress(email),password:String(password||'')});if(error)throw authFailure(error);
+      setLogoutIntent(false);return refresh();
+    }
+    async function signUpClient(email,password){
+      requireEnabled();if(!config.signupEnabled)fail('SIGNUP_DISABLED','La création de compte est en cours d’activation. Votre panier est conservé.');
+      const {error}=await sdk.auth.signUp({email:emailAddress(email),password:newPassword(password),options:{emailRedirectTo:redirectFor('signup')}});
+      if(error)throw authFailure(error);return {message:'Vérifiez votre boîte courriel pour confirmer votre adresse. Votre panier reste conservé.'};
+    }
+    async function resetPassword(email){
+      requireEnabled();const {error}=await sdk.auth.resetPasswordForEmail(emailAddress(email),{redirectTo:redirectFor('recovery')});
+      if(error)throw authFailure(error);return {message:'Si cette adresse possède un compte MIR, un courriel de récupération lui est envoyé. Vérifiez aussi les indésirables.'};
+    }
+    async function resendConfirmation(email){
+      requireEnabled();const {error}=await sdk.auth.resend({type:'signup',email:emailAddress(email),options:{emailRedirectTo:redirectFor('signup')}});
+      if(error&&(!error.status||error.status===429||error.status>=500))throw authFailure(error);
+      return {message:'Si une confirmation est attendue pour cette adresse, un nouveau courriel lui est envoyé.'};
+    }
+    async function setPassword(password){
+      requireEnabled();if(!await verifiedUser())fail('AUTH_REQUIRED','Ouvrez le lien de récupération ou d’invitation reçu par courriel.');
+      const {error}=await sdk.auth.updateUser({password:newPassword(password)});if(error)throw authFailure(error);
+      setPasswordGate(null);setLogoutIntent(false);return refresh();
+    }
+    async function saveAddress(address,id=null){
+      requireEnabled();if(status.phase!=='customer_ready')fail('ACCESS_DENIED','Connectez-vous à votre compte client.');
+      if(!await verifiedUser())fail('AUTH_REQUIRED','Reconnectez-vous pour enregistrer cette adresse.');
+      const {data,error}=await sdk.rpc('mir_account_save_address',{p_address:clone(address),p_id:id});if(error)throw errorOf(error);
+      await refresh();return data;
+    }
+    async function removeAddress(id){
+      requireEnabled();if(status.phase!=='customer_ready'||!UUID.test(id||''))fail('ACCESS_DENIED','Cette adresse ne peut pas être supprimée.');
+      if(!await verifiedUser())fail('AUTH_REQUIRED','Reconnectez-vous.');const {error}=await sdk.rpc('mir_account_remove_address',{p_id:id});if(error)throw errorOf(error);await refresh();
+    }
     async function signInGoogle() {
       requireEnabled(); if (!config.googleEnabled) fail('GOOGLE_DISABLED', 'La connexion Google est en cours d’activation.');
-      const { error } = await sdk.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: config.redirectTo } });
+      const { error } = await sdk.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: redirectFor('google') } });
       if (error) throw errorOf(error);
     }
     async function completeCallback(callback) {
       requireEnabled();
+      if(['recovery','invite'].includes(callback?.intent))setPasswordGate(callback.intent);
       let response;
       if (callback?.kind === 'code') response = await sdk.auth.exchangeCodeForSession(callback.code);
       else if (callback?.kind === 'implicit') response = await sdk.auth.setSession({ access_token: callback.accessToken, refresh_token: callback.refreshToken });
+      else if(callback?.kind==='otp')response=await sdk.auth.verifyOtp({token_hash:callback.tokenHash,type:callback.type});
       else fail('CALLBACK_INVALID', 'Ce lien de connexion ne peut pas être utilisé.');
-      if (response.error) throw new PortalError('CALLBACK_INVALID', 'Ce lien est expiré ou ne peut plus être utilisé. Demandez un nouveau lien.');
+      if (response.error){setPasswordGate(null);clearIdentity('signed_out');throw new PortalError('CALLBACK_INVALID', 'Ce lien est expiré ou ne peut plus être utilisé. Demandez un nouveau lien.');}
       // Only a successful, explicitly confirmed login can resume this browser tab.
       // A late token refresh cannot undo the person's choice to sign out.
       setLogoutIntent(false);
@@ -250,7 +315,7 @@
       return refresh();
     }
     async function signOut() {
-      requireEnabled(); setLogoutIntent(true); clearIdentity('signed_out');
+      requireEnabled(); setLogoutIntent(true);setPasswordGate(null); clearIdentity('signed_out');
       const { error } = await sdk.auth.signOut({ scope: 'local' });
       if (error) throw errorOf(error, 'Les données ont été masquées. La fermeture de session reste à confirmer.');
     }
@@ -263,7 +328,13 @@
       emit({ busy: true, error: null }, 'command'); readSequence++;
       try {
         let data, error;
-        if (['INVITE_EMPLOYEE', 'REVOKE_INVITATION'].includes(operation.command)) {
+        if(config.manualInvitations&&['INVITE_EMPLOYEE','REVOKE_INVITATION'].includes(operation.command)){
+          if(!config.invitationsEnabled)fail('INVITATIONS_DISABLED','Les invitations ne sont pas disponibles.');
+          const response=operation.command==='INVITE_EMPLOYEE'
+           ?await sdk.rpc('mir_account_create_invitation',{p_email:operation.payload.email,p_job_ids:operation.payload.jobIds||[],p_request_id:operation.requestId})
+           :await sdk.rpc('mir_account_revoke_invitation',{p_id:operation.payload.invitationId});
+          error=response.error;data={ok:!error,result:response.data};
+        }else if (['INVITE_EMPLOYEE', 'REVOKE_INVITATION'].includes(operation.command)) {
           if (!config.invitationsEnabled) fail('INVITATIONS_DISABLED', 'Les invitations sécurisées sont en cours d’activation.');
           const response = await sdk.functions.invoke('mir-invitations', { body: {
             action: operation.command === 'INVITE_EMPLOYEE' ? 'invite' : 'revoke', requestId: operation.requestId, ...operation.payload
@@ -362,7 +433,7 @@
       if (authTimer !== null && typeof clearTimeout === 'function') clearTimeout(authTimer);
       listeners.clear();
     }
-    return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, completeCallback, signOut, command, retry,
+    return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
       acceptInvitation, listInvitations, downloadPlan, dispose,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
     });

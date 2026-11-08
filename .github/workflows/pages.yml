@@ -254,7 +254,7 @@ jobs:
           fetch "$base/mir-public-menu.js" /tmp/mir-public-menu.js
           grep -F "aria-expanded" /tmp/mir-public-menu.js
           fetch "$base/pliage.html" /tmp/mir-menu-pliage.html
-          grep -F "mir-public-menu.js?v=1" /tmp/mir-menu-pliage.html
+          grep -F 'mir-public-menu.js?v=' /tmp/mir-menu-pliage.html
           fetch "$base/mir-client-header.css" /tmp/mir-client-header.css
           grep -F '.mir-client-header' /tmp/mir-client-header.css
           fetch "$base/realisations.html" /tmp/mir-realisations.html
@@ -274,11 +274,11 @@ jobs:
           grep -F '.mir-gallery-grid' /tmp/mir-realisations.css
           fetch "$base/boutique.html" /tmp/mir-boutique.html
           grep -F 'href="realisations.html"' /tmp/mir-boutique.html
-          grep -F 'mir-client-header.css?v=1' /tmp/mir-boutique.html
+          grep -F 'mir-client-header.css?v=' /tmp/mir-boutique.html
           grep -F 'mir-client-signature.css?v=1' /tmp/mir-boutique.html
           fetch "$base/plan.html?verification=$GITHUB_SHA" /tmp/mir-plan-public.html
           cmp /tmp/mir-plan-public.html _site_mir/plan.html
-          grep -F 'mir-client-header.css?v=1' /tmp/mir-plan-public.html
+          grep -F 'mir-client-header.css?v=' /tmp/mir-plan-public.html
           for asset in mir-bending-finishes.js plan-import.js plan-stair-vision.js mir-vertical-layout.js plan-scan-ocr.js plan-sheet-detection.js plan-spatial-dimensions.js plan-facade-visual.js plan-app.js plan-3d.js plan.css plan-annotations.js plan-annotations.css studio-wall-sections.js studio-features.js material-surface.js catalogue-fd6866b49d21.json; do
             fetch "$base/$asset?verification=$GITHUB_SHA" "/tmp/mir-$asset"
             cmp "/tmp/mir-$asset" "_site_mir/$asset"
@@ -305,11 +305,12 @@ jobs:
           fetch "$base/chantier.html?verification=$GITHUB_SHA" /tmp/mir-connexion.html
           grep -F 'Mon compte — Les Revêtements MIR' /tmp/mir-connexion.html
           fetch "$base/portal-config.js" /tmp/mir-portal-config.js
-          grep -F 'enabled: false' /tmp/mir-portal-config.js
+          cmp /tmp/mir-portal-config.js _site_mir/portal-config.js
+          node tests/mir-account-public-config.cjs
           grep -Fq 'chantier-employee.css?v=' /tmp/mir-connexion.html
           fetch "$base/chantier-app.js?verification=$GITHUB_SHA" /tmp/mir-chantier-app.js
           cmp /tmp/mir-chantier-app.js _site_mir/chantier-app.js
-          grep -Fq 'Connexion en attente' /tmp/mir-chantier-app.js
+          grep -Fq 'Mon compte MIR' /tmp/mir-chantier-app.js
           fetch "$base/chantier-employee.css?verification=$GITHUB_SHA" /tmp/mir-chantier-employee.css
           cmp /tmp/mir-chantier-employee.css _site_mir/chantier-employee.css
           fetch "$base/portal-client.js" /tmp/mir-portal-client.js
@@ -323,9 +324,9 @@ jobs:
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
           grep -F 'kaycan-flat-preview.js?v=mac-2' /tmp/production.html
-          grep -F 'production-app.js?v=atelier-ipad-libre-1' /tmp/production.html
-          grep -F 'mir-freeform-workshop.css?v=atelier-ipad-libre-1' /tmp/production.html
-          grep -F 'mir-freeform-workshop.js?v=atelier-ipad-libre-1' /tmp/production.html
+          grep -F 'production-app.js?v=' /tmp/production.html
+          grep -F 'mir-freeform-workshop.css?v=' /tmp/production.html
+          grep -F 'mir-freeform-workshop.js?v=' /tmp/production.html
           grep -F 'mir-bending-finishes.js?v=1' /tmp/production.html
           fetch "$base/kaycan-flat-preview.js" /tmp/kaycan-flat-preview.js
           grep -F 'function medianRgb' /tmp/kaycan-flat-preview.js
@@ -402,7 +403,7 @@ jobs:
           fetch "$base/mir-production-client-nav.css?verification=$GITHUB_SHA" /tmp/mir-production-client-nav.css
           cmp /tmp/mir-production-client-nav.css _site_mir/mir-production-client-nav.css
           grep -F "mir-production-client-nav.js?v=1" /tmp/production.html
-          grep -F "mir-public-menu.js?v=1" /tmp/production.html
+          grep -F 'mir-public-menu.js?v=' /tmp/production.html
           grep -F 'mir-bending-lengths.js' /tmp/production.html
           grep -F 'mir-bending-lengths.js' /tmp/pliage.html
           fetch "$base/mir-bending-lengths.js?verification=$GITHUB_SHA" /tmp/mir-bending-lengths.js
