@@ -117,6 +117,17 @@
    extra.innerHTML='<summary>Exports PDF de chantier et sauvegarde JSON</summary>';
    exports.before(extra);extra.append(exports);
   }
+  const inspector=$('.inspector');
+  if(inspector){
+    const details=document.createElement('details');
+    details.className='mir-cal-mobile-panel-inspector';
+    details.innerHTML='<summary>Modifier les mesures d’un panneau (facultatif)</summary>'+
+      '<p class="hint">Sélectionne un repère sur le mur, puis ouvre cette fiche seulement si tu veux ajuster ses cotes.</p>';
+    inspector.before(details);details.append(inspector);
+    $('#layout-svg')?.addEventListener('click',event=>{
+      if(event.target.closest('[data-piece]'))details.open=true;
+    });
+  }
   const count=document.createElement('p');count.className='mir-cal-mobile-count';
   count.id='mir-cal-mobile-panel-count';
   $('.production-heading')?.after(count);
