@@ -579,7 +579,7 @@ function renderTools(){
  const drawing=tool==='draw';
  if(clientProfileWizard()){
   const instruction=!drawPoints.length?clientTracePrompt():drawPoints.length<3?'Placez au moins trois points pour créer deux côtés.':build().valid?'Ajoutez un côté ou terminez le dessin.':'Annulez le dernier point et réessayez.';
-  el.innerHTML=`<p class="client-trace-help">${esc(instruction)}</p><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le point</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''}>Terminer le dessin</button>`;
+  el.innerHTML=`<p class="client-trace-help">${esc(instruction)}</p><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le point</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''} aria-label="Suivant — terminer le dessin">Suivant</button>`;
   return;
  }
  const recentHem=draft.template==='custom'?(draft.bends||[]).findLastIndex(bend=>bend.mode==='hem'):-1;
@@ -674,9 +674,9 @@ function syncPieceNameField(){
 }
 const clientStages=[
  {title:'Choisissez votre moulure',hint:'Sélectionnez un modèle ci-dessous ou dessinez votre propre profil.',action:'Passer aux mesures'},
- {title:'Indiquez vos mesures',hint:'Entrez ou vérifiez la mesure de chaque côté, de A jusqu’au dernier côté.',action:'Confirmer les mesures'},
- {title:'Longueur de vente MIR',hint:'Longueur fixe : 10 pi pour les moulures; 12 pi uniquement pour le J à soffite. Les cotes des côtés restent personnalisables.',action:'Confirmer la longueur'},
- {title:'Choisissez la face colorée',hint:'Suivez le tracé de A vers le dernier côté. Choisissez de quel côté du trait se trouve la face à peindre.',action:'Confirmer la face'},
+ {title:'Indiquez vos mesures',hint:'Entrez ou vérifiez la mesure de chaque côté, de A jusqu’au dernier côté.',action:'Suivant'},
+ {title:'Longueur de vente MIR',hint:'Longueur fixe : 10 pi pour les moulures; 12 pi uniquement pour le J à soffite. Les cotes des côtés restent personnalisables.',action:'Suivant'},
+ {title:'Choisissez la face colorée',hint:'Suivez le tracé de A vers le dernier côté. Choisissez de quel côté du trait se trouve la face à peindre.',action:'Suivant'},
  {title:'Choisissez le métal et la couleur',hint:'Sélectionnez le métal, puis la teinte. Vous pourrez ensuite ajouter la pièce à votre dossier.'}
 ];
 function clientTracePrompt(){return matchMedia('(any-pointer:coarse)').matches?'Touchez la grille pour placer le premier point.':'Cliquez sur la grille pour placer le premier point.';}
@@ -688,7 +688,7 @@ function renderClientEntry(active){
  if(!active){delete document.body.dataset.clientEntry;if(entry){entry.hidden=true;$('.drawing-head')?.after($('#drawing-tools'));}return;}
  if(!entry){
   entry=document.createElement('section');entry.id='client-entry';entry.setAttribute('aria-labelledby','client-entry-title');
-  entry.innerHTML='<a class="client-entry-return" href="pliage.html">← Retour au pliage</a><button type="button" class="client-entry-return" id="client-entry-back" hidden>← Retour aux choix</button><p class="eyebrow">ÉTAPE 1 SUR 4 · FORME</p><h1 id="client-entry-title" tabindex="-1">Comment voulez-vous commencer?</h1><p id="client-entry-intro">Vous pourrez ajuster les mesures dans les deux cas.</p><div class="client-entry-cards"><button type="button" id="client-choose-model"><span class="client-entry-icon" aria-hidden="true">▱</span><span><strong>Choisir un modèle</strong><small>Partez d’une forme connue et ajoutez vos mesures.</small></span><span aria-hidden="true">→</span></button><button type="button" id="client-draw-profile"><span class="client-entry-icon" aria-hidden="true">⌁</span><span><strong>Dessiner ma moulure</strong><small>Tracez les côtés de votre moulure sur une grille.</small></span><span aria-hidden="true">→</span></button></div><div id="client-model-options" hidden><p>Choisissez une forme, puis entrez vos mesures.</p><div id="client-standard-options"></div><div id="client-saved-options"></div></div>';
+  entry.innerHTML='<a class="client-entry-return" href="pliage.html">← Retour au pliage</a><button type="button" class="client-entry-return" id="client-entry-back" hidden>← Retour aux choix</button><p class="eyebrow">ÉTAPE 1 SUR 4 · FORME</p><h1 id="client-entry-title" tabindex="-1">Comment voulez-vous commencer?</h1><p id="client-entry-intro">Vous pourrez ajuster les mesures dans les deux cas.</p><div class="client-entry-cards"><button type="button" id="client-choose-model"><span class="client-entry-icon" aria-hidden="true">▱</span><span><strong>Consulter nos modèles</strong><small>Choisissez une forme et entrez vos mesures.</small></span><span aria-hidden="true">→</span></button><button type="button" id="client-draw-profile"><span class="client-entry-icon" aria-hidden="true">⌁</span><span><strong>Dessiner votre moulure personnalisée</strong><small>Tracez vos côtés sur la grille.</small></span><span aria-hidden="true">→</span></button></div><div id="client-model-options" hidden><p>Choisissez une forme, puis entrez vos mesures.</p><div id="client-standard-options"></div><div id="client-saved-options"></div></div>';
   $('.production-workspace').before(entry);
   $('#client-standard-options').innerHTML=Object.entries(profiles).filter(([id])=>id!=='custom').map(([id,p])=>'<button type="button" class="template-button" data-client-profile="'+esc(id)+'">'+templateIcon('profile',id)+'<span>'+esc(p.name)+'</span></button>').join('');
  }
@@ -739,7 +739,7 @@ function mountClientWizard(active){
 function clientStepIssues(model,blockJ){
  const pending=model.validation.pending||[];
  const issues={
-  1:!clientProfileSelected?(tool==='draw'?'Tracez au moins deux côtés, puis choisissez « Terminer le dessin ».':'Sélectionnez un modèle ou dessinez une moulure.'):'',
+  1:!clientProfileSelected?(tool==='draw'?'Tracez au moins deux côtés, puis cliquez sur « Suivant ».':'Sélectionnez un modèle ou dessinez une moulure.'):'',
   2:model.validation.errors[0]?.message||(blockJ?'Vérifiez le clouage du J dans les mesures.':''),
   3:(stockLengthCheck().ok?'':stockLengthCheck().message)||pending.find(issue=>issue.code==='LENGTH_REQUIRED')?.message||'',
   4:pending.find(issue=>issue.path.startsWith('coloredFace.'))?.message||'',

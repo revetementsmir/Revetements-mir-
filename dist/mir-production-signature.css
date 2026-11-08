@@ -200,3 +200,5 @@ body[data-client-entry] #mir-harmony-menu nav a[aria-current="page"]{background:
  body[data-client-entry="draw"] #drawing-tools{padding:10px}
 }
 body[data-client-entry="draw"] > .mir-signature-footer{display:none}
+
+.client-entry-cards{grid-auto-rows:1fr}
