@@ -16,3 +16,5 @@ body[data-client-pliage-landing] .page-main{padding-top:clamp(32px,5vw,72px);max
 .client-bend-quick[open]>summary span{transform:rotate(45deg)}
 .client-bend-quick-content{padding-block:12px}
 @media(max-width:600px){.client-bend-hero{grid-template-columns:1fr;gap:26px;padding-bottom:20px}.client-bend-copy h1{font-size:34px;margin:14px 0}.client-bend-copy .mir-button{width:100%;margin-top:18px}.client-bend-copy>p:not(.eyebrow){font-size:14px}.client-bend-example{padding:16px}.client-bend-example svg{max-height:215px}}
+body[data-client-pliage-landing] #mir-harmony-menu a[href="selection.html"]{display:none!important}
+body[data-client-pliage-landing] #mir-harmony-menu nav a[aria-current="page"]{background:#e5efdf;color:#205e21}

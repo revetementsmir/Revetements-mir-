@@ -364,11 +364,11 @@ function bendAngleLabel(bend){
  const angle=Number(bend?.angle);
  return Number.isFinite(angle)?fmt(angle)+'°':'À préciser';
 }
-function profileAnglesOverlay(model,points){
+function profileAnglesOverlay(model,points,compact=false){
  if(!model?.bends?.length||points.length<3)return '';
  return model.bends.map((bend,i)=>{
   const a=points[i],joint=points[i+1],b=points[i+2];
-  if(!a||!joint||!b)return '';
+  if(!a||!joint||!b||compact&&bend.mode==='hem')return '';
   const left=[a[0]-joint[0],a[1]-joint[1]],right=[b[0]-joint[0],b[1]-joint[1]];
   const d1=Math.hypot(...left),d2=Math.hypot(...right);if(d1<.5||d2<.5)return '';
   const u=left.map(v=>v/d1),w=right.map(v=>v/d2),sum=[u[0]+w[0],u[1]+w[1]];
@@ -376,6 +376,14 @@ function profileAnglesOverlay(model,points){
   const start=[joint[0]+u[0]*r,joint[1]+u[1]*r],end=[joint[0]+w[0]*r,joint[1]+w[1]*r];
   const sweep=u[0]*w[1]-u[1]*w[0]>=0?1:0;
   const x=Math.max(65,Math.min(735,joint[0]+bis[0]*60)),y=Math.max(26,Math.min(484,joint[1]+bis[1]*60));
+  if(compact){
+   const angle=Math.round(Number.parseFloat(bendAngleLabel(bend)));
+   if(!Number.isFinite(angle))return '';
+   const tx=joint[0]+bis[0]*36,ty=joint[1]+bis[1]*36;
+   return '<g class="mir-angle-annotation" pointer-events="none" aria-label="Angle '+angle+'°">'+
+    '<path d="M '+start.map(fmt).join(' ')+' A '+r+' '+r+' 0 0 '+sweep+' '+end.map(fmt).join(' ')+'" fill="none" stroke="#348511" stroke-width="2.5"/>'+
+    '<text x="'+fmt(tx)+'" y="'+fmt(ty)+'" dominant-baseline="middle" text-anchor="middle" font-size="15" font-weight="700" fill="#233b2a" stroke="#fcfcf8" stroke-width="3" paint-order="stroke">'+angle+'°</text></g>';
+  }
   const name=(model.segments[i]?.label||String.fromCharCode(65+i))+'–'+
    (model.segments[i+1]?.label||String.fromCharCode(66+i))+' · '+bendAngleLabel(bend);
   return '<g class="mir-angle-annotation" pointer-events="none" aria-label="Angle '+esc(name)+'">'+
@@ -389,7 +397,7 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
  const grid=freehand?traceGridSVG(model.unit):'';
  const points=freehand?(drawPoints.length>=3&&model.pointsMM.length===drawPoints.length
-  ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">${grid}<text x="400" y="250" text-anchor="middle" font-family="Arial" font-size="19" fill="#7b8b6c">${clientProfileWizard()?esc(clientTracePrompt()):'Glisse pour tracer le premier côté.'}</text></svg>`;
+  ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">${grid}<text x="400" y="250" text-anchor="middle" font-family="Arial" font-size="19" fill="#7b8b6c">${clientProfileWizard()?'':'Glisse pour tracer le premier côté.'}</text></svg>`;
  const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});
  if(interactive&&!small&&view==='face'&&tool!=='draw'&&drag?.type!=='point'&&zoom!==1){tr.scale*=zoom;tr.ox=400+(tr.ox-400)*zoom;tr.oy=260+(tr.oy-260)*zoom;}
  if(interactive&&!small&&view==='face'&&tool==='select'&&kind==='profile'){tr.ox+=viewPan.x;tr.oy+=viewPan.y;}
@@ -397,7 +405,7 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>${grid}`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
  output+=M.profileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand?{}:model,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative&&(!clientProfileWizard()||clientStep===4)});
-  if(!small&&!illustrative)output+=profileAnglesOverlay(model,mapped);
+  if(!small&&!illustrative)output+=profileAnglesOverlay(model,mapped,clientProfileWizard());
  }
  const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}
  }
@@ -570,8 +578,8 @@ function renderTools(){
  if(el.hidden){el.innerHTML='';return;}
  const drawing=tool==='draw';
  if(clientProfileWizard()){
-  const instruction=!drawPoints.length?clientTracePrompt()+' Ajoutez ensuite les points suivants pour créer vos côtés.':drawPoints.length<3?'Ajoutez des points pour tracer au moins deux côtés.':build().valid?'Vous pouvez terminer le dessin pour ajuster vos mesures.':'Ce tracé doit être corrigé. Annulez le dernier point et réessayez.';
-  el.innerHTML=`<h2>Votre tracé</h2><p class="client-trace-help">${esc(instruction)} Vous pourrez corriger les mesures après le dessin.</p><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le point</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''}>Terminer le dessin</button>`;
+  const instruction=!drawPoints.length?clientTracePrompt():drawPoints.length<3?'Placez au moins trois points pour créer deux côtés.':build().valid?'Ajoutez un côté ou terminez le dessin.':'Annulez le dernier point et réessayez.';
+  el.innerHTML=`<p class="client-trace-help">${esc(instruction)}</p><button type="button" data-drawing-undo${!drawPoints.length?' disabled':''}>Annuler le point</button><button type="button" class="draw-primary" data-draw-tool="draw"${drawPoints.length<3||!build().valid?' disabled':''}>Terminer le dessin</button>`;
   return;
  }
  const recentHem=draft.template==='custom'?(draft.bends||[]).findLastIndex(bend=>bend.mode==='hem'):-1;
@@ -680,7 +688,7 @@ function renderClientEntry(active){
  if(!active){delete document.body.dataset.clientEntry;if(entry){entry.hidden=true;$('.drawing-head')?.after($('#drawing-tools'));}return;}
  if(!entry){
   entry=document.createElement('section');entry.id='client-entry';entry.setAttribute('aria-labelledby','client-entry-title');
-  entry.innerHTML='<a class="client-entry-return" href="pliage.html">← Retour au pliage</a><button type="button" class="client-entry-return" id="client-entry-back" hidden>← Retour aux choix</button><p class="eyebrow">ÉTAPE 1 SUR 5 · FORME</p><h1 id="client-entry-title" tabindex="-1">Comment voulez-vous commencer?</h1><p id="client-entry-intro">Vous pourrez ajuster les mesures dans les deux cas.</p><div class="client-entry-cards"><button type="button" id="client-choose-model"><span class="client-entry-icon" aria-hidden="true">▱</span><span><strong>Choisir un modèle</strong><small>Partez d’une forme connue et ajoutez vos mesures.</small></span><span aria-hidden="true">→</span></button><button type="button" id="client-draw-profile"><span class="client-entry-icon" aria-hidden="true">⌁</span><span><strong>Dessiner ma moulure</strong><small>Tracez les côtés de votre moulure sur une grille.</small></span><span aria-hidden="true">→</span></button></div><div id="client-model-options" hidden><h2>Formes de départ</h2><p>Ces profils utilisent les formes de l’atelier. Aucune cote de fabrication n’est préremplie.</p><div id="client-standard-options"></div><div id="client-saved-options"></div></div>';
+  entry.innerHTML='<a class="client-entry-return" href="pliage.html">← Retour au pliage</a><button type="button" class="client-entry-return" id="client-entry-back" hidden>← Retour aux choix</button><p class="eyebrow">ÉTAPE 1 SUR 4 · FORME</p><h1 id="client-entry-title" tabindex="-1">Comment voulez-vous commencer?</h1><p id="client-entry-intro">Vous pourrez ajuster les mesures dans les deux cas.</p><div class="client-entry-cards"><button type="button" id="client-choose-model"><span class="client-entry-icon" aria-hidden="true">▱</span><span><strong>Choisir un modèle</strong><small>Partez d’une forme connue et ajoutez vos mesures.</small></span><span aria-hidden="true">→</span></button><button type="button" id="client-draw-profile"><span class="client-entry-icon" aria-hidden="true">⌁</span><span><strong>Dessiner ma moulure</strong><small>Tracez les côtés de votre moulure sur une grille.</small></span><span aria-hidden="true">→</span></button></div><div id="client-model-options" hidden><p>Choisissez une forme, puis entrez vos mesures.</p><div id="client-standard-options"></div><div id="client-saved-options"></div></div>';
   $('.production-workspace').before(entry);
   $('#client-standard-options').innerHTML=Object.entries(profiles).filter(([id])=>id!=='custom').map(([id,p])=>'<button type="button" class="template-button" data-client-profile="'+esc(id)+'">'+templateIcon('profile',id)+'<span>'+esc(p.name)+'</span></button>').join('');
  }
@@ -693,7 +701,7 @@ function renderClientEntry(active){
  const templatesSection=$('.template-section');const destination=state==='models'?$('#client-saved-options'):$('#client-step-type');if(templatesSection.parentElement!==destination)destination.append(templatesSection);
  const tools=$('#drawing-tools'),grid=$('.mir-panel-synced-views')||$('#production-drawing');if(state==='draw')grid.after(tools);else $('.drawing-head').after(tools);
  if(state==='draw'){
-  const svg=$('#production-drawing svg');if(svg&&matchMedia('(max-width:600px)').matches){svg.setAttribute('viewBox','100 0 440 520');const prompt=svg.querySelector('text');if(!drawPoints.length&&prompt){prompt.setAttribute('x','320');prompt.setAttribute('font-size','13');}}
+  const svg=$('#production-drawing svg');if(svg&&matchMedia('(max-width:600px)').matches)svg.setAttribute('viewBox','100 0 440 520');
  }
 }
 function mountClientWizard(active){
@@ -722,7 +730,7 @@ function mountClientWizard(active){
  optional.hidden=!active;
  optional.open=false;
  $('#production-title').innerHTML=active?'Configurez votre <em>moulure.</em>':'Votre pièce.<br>À vos <em>mesures.</em>';
- $('#production-description').textContent=active?'Cinq étapes pour préparer votre moulure sur mesure.':'Choisissez la forme. Entrez vos cotes, votre métal et votre couleur. Votre dessin suit vos choix.';
+ $('#production-description').textContent=active?'Préparez votre moulure sur mesure.':'Choisissez la forme. Entrez vos cotes, votre métal et votre couleur. Votre dessin suit vos choix.';
  config.setAttribute('aria-labelledby',active?'client-step-title':'configure-heading');
  scroll.hidden=!active;
  $('#client-step-actions').hidden=!active;
@@ -750,10 +758,10 @@ function renderClientWizard(model,blockJ){
  document.body.dataset.clientTrace=String(tool==='draw');
  const stage=clientStages[clientStep-1],count=$('#client-step-count'),title=$('#client-step-title');
  if(title.textContent!==stage.title){
-  count.textContent='ÉTAPE '+clientStep+' SUR 5';
+  count.textContent=clientStep===3?'LONGUEUR À VÉRIFIER':'ÉTAPE '+(clientStep>3?clientStep-1:clientStep)+' SUR 4';
   title.textContent=stage.title;
-  $('#client-step-hint').textContent=stage.hint;
  }
+ $('#client-step-hint').textContent=clientStep===2?stage.hint+' Longueur vendue : '+stockLengthIn(draft)/12+' pi.':stage.hint;
  $('.piece-finish').open=true;
  for(const button of $('#client-step-list').querySelectorAll('button')){
   const step=Number(button.dataset.clientStep);
@@ -776,6 +784,8 @@ function goClientStep(step,{confirm=false}={}){
  const blockJ=jRule&&!jRule.pending&&(!jRule.valid||(!jRule.ok&&!window.MIRBendingPresets.exceptionMatches(jRule,jException)));
  const issues=clientStepIssues(build(),blockJ);
  if(step>clientUnlocked&&(!confirm||step!==clientStep+1))return;
+ // A fixed, valid stock length does not need its own confirmation.
+ if(step===3&&!issues[3])step=clientStep===4?2:4;
  if(Array.from({length:step-1},(_,i)=>issues[i+1]).some(Boolean))return;
  clientStep=step;if(step===1)clientEntry='choice';
  clientUnlocked=Math.max(clientUnlocked,step);
