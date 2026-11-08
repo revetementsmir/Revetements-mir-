@@ -73,7 +73,7 @@
       return row&&row.version===1&&Array.isArray(row.order?.items)?row.order:null;
     }catch{return null;}
   }
-  function validatePo(draft,supplier,dossier,modelAPI) {
+  function validatePo(draft,supplier,dossier,modelAPI,{draftOnly=false}={}) {
     const errors=[];
     if(!supplier||supplier.archived) errors.push('Choisir un fournisseur actif.');
     if(!supplier?.verified) errors.push('Vérifier le courriel du fournisseur et confirmer sa fiche.');
@@ -81,16 +81,17 @@
     if(!safe(draft?.poNumber,100)) errors.push('Inscrire le numéro de bon de commande.');
     if(!safe(draft?.job,160)) errors.push('Inscrire le nom ou numéro du chantier.');
     if(!safe(draft?.shipTo,360)) errors.push("Inscrire l'adresse de livraison ou de cueillette.");
-    if(!dossier||!dossier.items?.length) errors.push('Ajouter une moulure dans le dossier avant de créer le bon.');
-    for(const item of dossier?.items||[]) {
-      if(item?.kind!=='profile'&&item?.spec?.kind!=='profile') {errors.push('Les bons de pliage acceptent seulement les moulures.');continue;}
-      if(!Number.isInteger(Number(item?.spec?.quantity))||Number(item.spec.quantity)<1) errors.push('Quantité invalide pour '+safe(item.id,80)+'.');
-      if(modelAPI?.buildProfile) {
-        try{
-          const m=modelAPI.buildProfile(item.spec);
-          if(!m.valid||!m.complete) errors.push('Cotes, métal ou couleur incomplets pour '+safe(item.id,80)+'.');
-        }catch {errors.push('Impossible de vérifier la géométrie de '+safe(item.id,80)+'.');}
-      } else errors.push('Moteur de pliage non chargé.');
+    if(!dossier||!dossier.items?.length) errors.push('Ajouter des panneaux ou moulures dans le dossier avant de créer le bon.');
+    for(const item of dossier?.items||[]){
+      const kind=item?.spec?.kind||item?.kind,label=safe(item?.id,80)||'sans repère';
+      if(!['panel','profile'].includes(kind)){errors.push('Type de pièce inconnu pour '+label+'.');continue;}
+      if(!Number.isInteger(Number(item?.spec?.quantity))||Number(item.spec.quantity)<1)errors.push('Quantité invalide pour '+label+'.');
+      if(!modelAPI?.buildPanel||!modelAPI?.buildProfile){errors.push('Moteur de fabrication non chargé.');continue;}
+      try{
+        const m=kind==='panel'?modelAPI.buildPanel(item.spec):modelAPI.buildProfile(item.spec);
+        if(!m.valid)errors.push('Géométrie ou cotes invalides pour '+label+'.');
+        else if(!draftOnly&&!m.complete)errors.push('Cotes, lèvres, projection, métal ou couleur incomplets pour '+label+'.');
+      }catch{errors.push('Impossible de vérifier la géométrie de '+label+'.');}
     }
     return errors;
   }
@@ -103,11 +104,11 @@
       notes:safe(draft.notes,800),supplier:copy(normalizeSupplier(supplier)),sourceDossierId:safe(dossier.id,140),
       items:copy(dossier.items),events:[{type:'création-brouillon',at:now}]};
   }
-  const moneyLabel=po=>po?.items?.length+' référence(s) de moulure';
+  const moneyLabel=po=>po?.items?.length+' référence(s) de fabrication';
   function mailtoDraft(po) {
-    const subject='MIR | Bon de pliage '+po.poNumber+' | '+po.job;
-    const items=po.items.map((i,n)=>'  '+(n+1)+'. '+safe(i?.spec?.name||i?.kind||'Moulure',100)+' — Qté '+safe(i?.spec?.quantity||1,20)+' — longueur '+safe(i?.spec?.length||120,30)+' po').join('\n');
-    const body='Bonjour,\n\nVeuillez trouver notre demande de pliage.\n'
+    const subject='MIR | Bon de commande '+po.poNumber+' | '+po.job;
+    const items=po.items.map((i,n)=>{const s=i.spec||{},panel=s.kind==='panel',size=panel?'dimensions '+safe(s.width,32)+' × '+safe(s.height,32)+' '+(s.unit==='mm'?'mm':'po'):'longueur '+safe(s.length||120,30)+' po';return '  '+(n+1)+'. '+safe(i.id,40)+' '+safe(s.name||(panel?'Panneau':'Moulure'),100)+' — Qté '+safe(s.quantity||1,20)+' — '+size;}).join('\n');
+    const body='Bonjour,\n\nVeuillez trouver notre bon de commande de pièces sur mesure.\n'
       +'Bon : '+po.poNumber+'\nChantier : '+po.job+'\nResponsable : '+(po.foreman||'À préciser')
       +'\nLivrer à : '+po.shipTo+'\nDate souhaitée : '+(po.requestedDate||'À confirmer')
       +'\nConditions : '+(po.terms||'À confirmer')+'\n\n'+items
@@ -393,7 +394,7 @@
       return prefix+String(n).padStart(3,'0');
     }
     function newPo() {
-      const supplier=state.suppliers.find(s=>s.id===ui.supplierId),dossier=currentOrder(),errs=validatePo(ui,supplier,dossier,win.MIRProduction).filter(text=>!/^(Vérifier le courriel|Adresse courriel du fournisseur)/.test(text));
+      const supplier=state.suppliers.find(s=>s.id===ui.supplierId),dossier=currentOrder(),errs=validatePo(ui,supplier,dossier,win.MIRProduction,{draftOnly:true}).filter(text=>!/^(Vérifier le courriel|Adresse courriel du fournisseur)/.test(text));
       if(errs.length){const e=doc.querySelector('#mir-proc-error');e.hidden=false;e.innerHTML='<strong>À compléter :</strong><ul>'+errs.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>';return;}
       if(state.orders.some(o=>o.id!==state.editingId&&o.poNumber.toLowerCase()===ui.poNumber.toLowerCase()&&(!state.editingId||(o.rootId||o.id)!==(state.orders.find(x=>x.id===state.editingId)?.rootId||state.editingId)))){const e=doc.querySelector('#mir-proc-error');e.hidden=false;e.textContent='Ce numéro existe déjà : ouvre ce bon depuis En attente ou Historique pour le modifier ou créer une révision.';return;}
       const previous=state.orders.find(o=>o.id===state.editingId);
