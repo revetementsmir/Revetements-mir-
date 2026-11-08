@@ -110,3 +110,11 @@
  body[data-mir-cal-step=order] #fabrication-details{margin:15px 0 0;padding:10px 0;border-top:1px solid #e3ebdf}
  body[data-mir-cal-step=order] #fabrication-details summary{min-height:44px;font-size:13px;color:#38613b}
 }
+
+@media(max-width:740px){
+ body[data-mir-cal-step="panels"] #mir-cal-panels-advanced{border:1px solid #dce7d7;border-radius:9px;background:#f7faf5;margin:14px 0 3px;padding:11px 13px}
+ body[data-mir-cal-step="panels"] #mir-cal-panels-advanced>summary{font-size:13px;font-weight:750;color:#395e40;min-height:43px;cursor:pointer}
+ body[data-mir-cal-step="panels"] #mir-cal-panels-advanced>p{margin:5px 0 9px;font-size:11px}
+ body[data-mir-cal-step="panels"] .canvas-card .drawing-toolbar{display:none!important}
+ body[data-mir-cal-step="panels"] .canvas-toolbar{padding:10px 13px}
+}
