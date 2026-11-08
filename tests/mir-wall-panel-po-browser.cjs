@@ -70,6 +70,27 @@ async function ready(){
     return {count:state.orders.length,items:state.orders[0]?.items.length,status:state.orders[0]?.status,ref:state.orders[0]?.poNumber};
    });
    assert.deepEqual(supplierOrder,{count:1,items:10,status:'brouillon',ref:'MIR-BC-10'});
+   if(screen.name==='pc'){
+    const receipt=await page.evaluate(async()=>{
+     const po=JSON.parse(localStorage.getItem('mir_admin_procurement_v1')).orders[0];
+     const finished={...po,items:po.items.map(item=>({...item,spec:{
+      ...item.spec,relief:'2',material:{type:'aluminium',thickness:'2',thicknessUnit:'mm'},
+      finish:{manufacturer:'Unico',name:'Noir fictif test',code:'NOIR-TEST',selectionType:'manufacturer'},
+      perforation:{enabled:false,edgeId:item.spec.bottomEdgeId||'bottom'}
+     }}))};
+     const model=window.MIRProduction;
+     const pending=finished.items.filter(item=>!model.buildPanel(item.spec).complete).map(item=>({id:item.id,pending:model.buildPanel(item.spec).validation.pending}));
+     if(pending.length)throw Error('PDF bloqué par les fiches de test : '+JSON.stringify(pending));
+     const faces=window.MIRPOWorkflow.pdfFaces(finished,model);
+     const pdf=await window.MIRPDF.makePlan({faces,title:'MIR · bon de 10 panneaux',subtitle:'Essai chantier fictif'});
+     const bytes=new Uint8Array(await pdf.blob.arrayBuffer());
+     return {pages:pdf.pages?.length||faces.length,size:bytes.length,header:String.fromCharCode(...bytes.slice(0,5)),faces:faces.length};
+    });
+    assert.equal(receipt.header,'%PDF-','PDF réel et pas une capture ou un dessin PNG');
+    assert.ok(receipt.size>25000,'Le PDF possède une taille crédible : '+JSON.stringify(receipt));
+    assert.ok(receipt.faces>=6,'Couverture et dessins individuels des 10 panneaux');
+    console.log('PASS PDF fournisseur réel : '+JSON.stringify(receipt));
+   }
    await page.screenshot({path:path.join(artifacts,'mir-mur-10-bon-'+screen.name+'.png'),fullPage:true});
    // Revoir la même révision ne doit pas insérer 10 panneaux une seconde fois.
    await page.goto(base+'/production.html?destination=bon',{waitUntil:'domcontentloaded'});
