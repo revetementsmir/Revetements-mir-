@@ -80,3 +80,23 @@
 }
 
 @media(max-width:740px){body[data-mir-cal-step] #mir-cal-mobile-example{margin-top:10px;padding:8px 10px;font-size:12px;min-height:40px;color:#2e593b;background:#f2f7ee;border:1px solid #c0d5bd;border-radius:8px;font-weight:700}}
+
+/* Après la revue des captures : faire réellement entrer les mesures AVANT
+   l'aperçu à l'étape 2, sans une deuxième grande fiche non demandée. */
+@media(max-width:740px){
+ body[data-mir-cal-step]:not([data-mir-cal-step="wall"]) #mir-cal-mobile-example{display:none!important}
+ body[data-mir-cal-step="panels"] .settings{order:1}
+ body[data-mir-cal-step="panels"] .canvas-column{order:2}
+ body[data-mir-cal-step="wall"] .canvas-column{order:1}
+ body[data-mir-cal-step="wall"] .settings{order:2}
+ body[data-mir-cal-step="wall"] .mir-cal-mobile-panel-inspector{display:none!important}
+ body[data-mir-cal-step="panels"] .mir-cal-mobile-panel-inspector{display:block!important;order:3;background:#fff;border:1px solid #d8e1d4;border-radius:12px;padding:13px 14px}
+ .mir-cal-mobile-panel-inspector summary{font-size:13px;font-weight:750;color:#31553b;min-height:42px;cursor:pointer}
+ .mir-cal-mobile-panel-inspector>.inspector{display:block!important;padding:12px 2px!important;box-shadow:none!important;border:0!important;width:100%}
+ .mir-cal-mobile-panel-inspector>.hint{font-size:11px}
+ body[data-mir-cal-step="panels"] .project-bar #new-traced-section,
+ body[data-mir-cal-step="order"] .project-bar{display:none!important}
+ body[data-mir-cal-step="panels"] .canvas-column .wall-measures,
+ body[data-mir-cal-step="panels"] .canvas-column .drawing-footer{display:none!important}
+ body[data-mir-cal-step="panels"] .canvas-card .drawing-stage svg{height:clamp(250px,63vw,380px)}
+}
