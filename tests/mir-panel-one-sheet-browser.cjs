@@ -104,6 +104,13 @@ async function serverReady(){
     console.log('PASS PDF réel one panel/one sheet '+fs.statSync(file).size+' bytes, '+pdf.pages+' pages');
    }
    await page.screenshot({path:path.join(artifacts,'MIR-GODMODE-Bon-'+screen.name+'.png'),fullPage:true});
+   if(screen.name==='pc'){
+    await page.locator('#mir-procurement-tabs [data-mir-tab="panels"]').click();
+    await page.locator('[data-mir-panel-duplicate]').first().click();
+    assert.equal(await page.locator('[data-mir-panel-card]').count(),11,'Dupliquer manuellement crée un nouveau repère unique');
+    const ids=await page.locator('[data-mir-panel-card]').evaluateAll(cards=>cards.map(c=>c.dataset.mirPanelCard));
+    assert.equal(new Set(ids).size,11,'La duplication manuelle ne réutilise jamais le même identifiant');
+   }
    assert.deepEqual(errors,[],screen.name+' JS runtime errors');
    await context.close();
    console.log('PASS '+screen.name+' : dix cartes, dix lignes, zéro doublon et source intacte');
