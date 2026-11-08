@@ -43,42 +43,40 @@ async function serverReady(){
    });
    await page.reload({waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace&&!!window.MIRProcurementUI);
-   await page.locator('#mir-procurement-tabs [data-mir-tab="panels"]').click();
-   const cards=page.locator('[data-mir-panel-card]');
-   await cards.first().waitFor({state:'visible'});
-   assert.equal(await cards.count(),10,'Un carré de dossier pour chacun des dix panneaux');
-   assert.equal(await page.locator('.mir-panel-card-drawing svg').count(),10,'Un seul croquis par carte');
-   assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),10);
-   assert.equal(new Set(await cards.evaluateAll(all=>all.map(a=>a.dataset.mirPanelCard))).size,10);
-   assert.match(await page.locator('.mir-panel-dossier-head').textContent(),/10 panneau/);
-   const measured=await page.evaluate(()=>({height:document.documentElement.scrollHeight,viewport:innerHeight,bodyOverflow:getComputedStyle(document.body).overflowY}));
-   if(screen.name==='pc'){
-    assert.ok(measured.height>measured.viewport+400,'Les 10 cartes doivent pouvoir défiler sur PC : '+JSON.stringify(measured));
-    assert.notEqual(measured.bodyOverflow,'hidden','Aucun verrou de défilement dans l’onglet Panneaux PC');
-   }
-   await cards.last().scrollIntoViewIfNeeded();
-   assert.ok(await cards.last().isVisible(),'Le dernier panneau doit être accessible au défilement');
+   await page.locator('[data-mir-wb-pick]').first().waitFor({state:'visible'});
+   const tiles=page.locator('[data-mir-wb-pick]');
+   await tiles.first().waitFor({state:'visible'});
+   assert.equal(await tiles.count(),10,'Dix repères réels du mur, pas dix longues cartes');
+   assert.equal(await page.locator('.mir-wb-drawing svg').count(),1,'Une seule pièce grande et cotée à la fois');
+   assert.equal(await page.locator('[data-mir-panel-include]').count(),1,'Une seule sélection active');
+   assert.equal(new Set(await tiles.evaluateAll(nodes=>nodes.map(el=>el.dataset.mirWbPick))).size,10);
+   assert.match(await page.locator('.mir-wb-summary').textContent(),/10 panneaux/);
+   const measured=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,width:innerWidth}));
+   assert.ok(measured.scroll<=measured.width+4,'Pas de débordement sur '+screen.name+': '+JSON.stringify(measured));
+   await tiles.nth(2).click();
+   assert.match(await page.locator('.mir-wb-focus-head').textContent(),/P03/i);
    await page.screenshot({path:path.join(artifacts,'MIR-GODMODE-Panneaux-'+screen.name+'.png'),fullPage:true});
-   // Removing a panel from the supplier order never deletes it from the source dossier.
-   await page.locator('[data-mir-panel-include]').nth(2).uncheck();
-   assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),9);
+   // L'exclusion est une décision du bon, le panneau original reste sauvegardé.
+   await page.locator('[data-mir-panel-include]').uncheck();
+   assert.match(await page.locator('.mir-wb-next-action').textContent(),/9 panneau/);
    const prior=await page.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')).order.items.length);
-   assert.equal(prior,10,'Le mur reste intact après exclusion');
+   assert.equal(prior,10,'Exclure une pièce du bon ne supprime rien');
    await page.reload({waitUntil:'domcontentloaded'});
-   await page.locator('#mir-procurement-tabs [data-mir-tab="panels"]').click();
-   assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),9,'Choix inclus au PO sauvegardé');
-   await page.locator('[data-mir-panel-include]').nth(2).check();
-   assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),10);
+   await page.locator('[data-mir-wb-pick]').nth(2).click();
+   assert.equal(await page.locator('[data-mir-panel-include]').isChecked(),false,'Choix enregistré après rechargement');
+   await page.locator('[data-mir-panel-include]').check();
+   await page.locator('.mir-wb-manage summary').click();
    await page.locator('[data-mir-panel-all="false"]').click();
-   assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),0,'Tout retirer du bon sans supprimer les pièces');
-   assert.equal(await page.locator('[data-mir-panel-to-po]').last().isDisabled(),true,'Bon indisponible sans pièce');
+   assert.match(await page.locator('.mir-wb-next-action').textContent(),/0 panneau/);
+   assert.equal(await page.locator('[data-mir-panel-to-po]').isDisabled(),true);
    await page.locator('[data-mir-panel-all="true"]').click();
-   assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),10,'Tout inclure remet les dix pièces');
-   assert.equal(await page.locator('[data-mir-panel-to-po]').last().isEnabled(),true,'Le bon peut de nouveau être préparé');
-   await page.locator('[data-mir-panel-to-po]').last().click();
+   assert.match(await page.locator('.mir-wb-next-action').textContent(),/10 panneau/);
+   assert.equal(await page.locator('[data-mir-panel-to-po]').isEnabled(),true);
+   await page.locator('[data-mir-panel-to-po]').click();
    await page.locator('#mir-procurement-panel [data-mir-po-piece]').first().waitFor({state:'visible'});
-   assert.equal(await page.locator('[data-mir-po-piece]').count(),10,'Dix lignes uniques dans le bon');
-   assert.equal(await page.locator('.mir-po-piece-visual svg').count(),10,'Le bon montre les dix vrais dessins');
+   assert.equal(await page.locator('[data-mir-po-piece]').count(),10,'Dix lignes uniques du bon');
+   assert.equal(await page.locator('.mir-po-piece-visual svg').count(),0,'Le récapitulatif ne répète pas dix immenses dessins');
+   assert.match(await page.locator('.mir-wb-order-heading').textContent(),/Préparer le bon de commande/);
    await page.locator('[data-mir-po="poNumber"]').fill('BC-MIR-GODMODE-10');
    await page.locator('[data-mir-po="job"]').fill('Chantier démonstration 10 panneaux');
    await page.locator('[data-mir-po="shipTo"]').fill('Lieu fictif de livraison, Québec');
@@ -87,8 +85,8 @@ async function serverReady(){
    if(await error.isVisible())throw Error('Bon invalide : '+await error.textContent());
    await page.locator('[data-mir-order-id]').first().waitFor({state:'visible'});
    const state=await page.evaluate(()=>JSON.parse(localStorage.getItem('mir_admin_procurement_v1')).orders[0]);
-   assert.equal(state.items.length,10,'Bon fournisseur sauvegardé avec dix lignes');
-   assert.equal(state.status,'brouillon','Ne jamais envoyer automatiquement');
+   assert.equal(state.items.length,10,'Bon sauvegardé avec dix lignes');
+   assert.equal(state.status,'brouillon','Aucun envoi fournisseur');
    if(screen.name==='pc'){
     const pdf=await page.evaluate(async()=>{
       const order=JSON.parse(localStorage.getItem('mir_admin_procurement_v1')).orders[0];
@@ -111,11 +109,13 @@ async function serverReady(){
    }
    await page.screenshot({path:path.join(artifacts,'MIR-GODMODE-Bon-'+screen.name+'.png'),fullPage:true});
    if(screen.name==='pc'){
-    await page.locator('#mir-procurement-tabs [data-mir-tab="panels"]').click();
-    await page.locator('[data-mir-panel-duplicate]').first().click();
-    assert.equal(await page.locator('[data-mir-panel-card]').count(),11,'Dupliquer manuellement crée un nouveau repère unique');
-    const ids=await page.locator('[data-mir-panel-card]').evaluateAll(cards=>cards.map(c=>c.dataset.mirPanelCard));
-    assert.equal(new Set(ids).size,11,'La duplication manuelle ne réutilise jamais le même identifiant');
+    await page.goto(base+'/production.html?view=panels',{waitUntil:'domcontentloaded'});
+    await page.locator('[data-mir-wb-pick]').first().waitFor({state:'visible'});
+    await page.locator('.mir-wb-options summary').click();
+    await page.locator('[data-mir-panel-duplicate]').click();
+    assert.equal(await page.locator('[data-mir-wb-pick]').count(),11,'Dupliquer volontairement ajoute un repère distinct');
+    const ids=await page.locator('[data-mir-wb-pick]').evaluateAll(cards=>cards.map(x=>x.dataset.mirWbPick));
+    assert.equal(new Set(ids).size,11,'Une nouvelle pièce garde un identifiant propre');
    }
    assert.deepEqual(errors,[],screen.name+' JS runtime errors');
    await context.close();
