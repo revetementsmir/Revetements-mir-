@@ -31,6 +31,17 @@ for(let i=1;i<faces.length;i++){
  const f=faces[i],main=(f.svg.match(/data-mir-panel-main=/g)||[]);
  assert.equal(main.length,1,'Un seul contour géométrique principal sur la fiche '+i);
  assert.equal(f.svg.includes('SUITE, ne pas compter'),false,'Aucune répétition du panneau');
+ assert.equal((f.svg.match(/data-mir-lip-label=/g)||[]).length,4,'Le dessin montre les quatre lèvres nommées, même sans lip');
+ assert.equal((f.svg.match(/data-mir-lip-inner=/g)||[]).length,1,'La face intérieure suit les retours réels du modèle');
+ assert.equal((f.svg.match(/data-mir-dimension-a=/g)||[]).length,1,'A est une vraie ligne de cote largeur hors tout');
+ assert.equal((f.svg.match(/data-mir-dimension-b=/g)||[]).length,1,'B est une vraie ligne de cote hauteur hors tout');
+ assert.equal((f.svg.match(/data-mir-ab-summary=/g)||[]).length,2,'A et B hors tout visibles en grand');
+ assert.match(f.svg,/Bas · Lip 1 po/);
+ assert.match(f.svg,/Droite · Lip 1 po/);
+ assert.match(f.svg,/Haut · Lip 1 po/);
+ assert.match(f.svg,/Gauche · Lip 1 po/);
+ assert.equal((f.svg.match(/<circle/g)||[]).length,0,'Plus de numéros 1-2-3-4 isolés sur le dessin');
+
  assert.match(f.svg,/CÔTÉS, LIPS ET ANGLES/,'Cotes + lèvres sur la même fiche');
  assert.match(f.svg,/QTÉ 1/,'Quantité visible sur la même fiche');
  refs.add(f.name);
@@ -48,4 +59,20 @@ assert.equal(mixedFaces.slice(1,11).reduce((n,f)=>n+(f.svg.match(/data-mir-panel
 assert.throws(()=>W.pdfFaces({...po,items:[po.items[0],po.items[0]]},M),/Repères répétés/,'Références dupliquées refusées');
 const unknown={...po.items[0],spec:{...po.items[0].spec,finish:{}}};
 assert.throws(()=>W.pdfFaces({...po,items:[unknown]},M),/Pièce incomplète/,'PDF non généré quand la couleur manque');
+
+const PDraw=require('../dist/mir-panel-po-pdf.js');
+const triangleSpec={...po.items[0].spec,shape:'right-triangle',rightAngle:'bottom-left',width:'48',height:'36',
+ lips:{bottom:'1',slope:0,left:'2'},bottomEdgeId:'bottom',perforation:{enabled:false,edgeId:'bottom'}};
+const triangleModel=M.buildPanel(triangleSpec);
+assert.equal(triangleModel.valid,true,JSON.stringify(triangleModel.validation.errors));
+assert.equal(triangleModel.edges.length,3,'Un triangle n’a pas de quatrième côté inventé');
+const triangleSvg=PDraw.previewSVG(triangleModel,M);
+assert.equal((triangleSvg.match(/data-mir-lip-label=/g)||[]).length,3,'Trois lèvres, chacune reliée à son véritable côté');
+assert.match(triangleSvg,/Base · Lip 1 po/);
+assert.match(triangleSvg,/Pente · Sans lip/);
+assert.match(triangleSvg,/Gauche · Lip 2 po/);
+assert.match(triangleSvg,/A · LARGEUR HORS TOUT : 48 po/);
+assert.match(triangleSvg,/B · HAUTEUR HORS TOUT : 36 po/);
+assert.equal((triangleSvg.match(/data-mir-panel-main=/g)||[]).length,1,'Un seul dessin géométrique pour le triangle');
+
 console.log('PASS MIR GOD MODE: un bon = 10 repères = 10 fiches uniques, aucun doublon, pas de SUITE, moulures préservées');
