@@ -26,8 +26,7 @@ function expandAluminumPalettes(catalogue){
  }
  const gentek=find('gentek-coil-3037');
  if(gentek){
-  const sourceUrl='https://www.gentek.ca/wp-content/uploads/sites/2/2023/08/Gentek-Product-Directory-ENG-March2026.pdf';
-  const documented={
+  const legacyCodes={
    'Blanc Pur 30':'431','Amande':'432','Noir':'425','Brownstone':'471',
    'Bleu littoral':'4P9','Espresso':'43P','Gris Hudson':'4C2',
    'Minerai de fer':'4P6','Rouge majestueux':'4C5','Bleu crépuscule':'4C6','Fougère des prés':'4C3',
@@ -35,9 +34,9 @@ function expandAluminumPalettes(catalogue){
   };
   const existing=new Set(gentek.colors.map(c=>c.id));
   const references=(find('gentek-fascia6-ribbed')?.colors||[]).filter(c=>!existing.has(c.id)).map(c=>{
-   const code=documented[c.name];
-   return {...c,code:code||c.code,sourceUrl:code?sourceUrl:c.sourceUrl,availabilityAtProfile:code?'documented':'unverified',
-    availabilityNote:code?'Teinte indiquée pour le 3037 dans la matrice Gentek. Stock et fini à confirmer.':'Référence aluminium Gentek. Disponibilité du rouleau 3037 à confirmer.'};
+   const code=legacyCodes[c.name]||c.code;
+   return {...c,code,availabilityAtProfile:'unverified',
+    availabilityNote:'Référence aluminium Gentek. Code et disponibilité pour le rouleau 3037 à confirmer.'};
   });
   gentek.colors=[...gentek.colors,...references];
  }
