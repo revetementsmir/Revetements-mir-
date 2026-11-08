@@ -714,7 +714,8 @@ function mountClientWizard(active){
    [config.querySelector('.section-heading'),scroll,2],[$('#measure-hint'),scroll,2],
    [$('#production-dimensions'),scroll,2],[$('#production-profile-options'),scroll,null],
    [$('.piece-finish'),scroll,5],[$('#add-production-piece').closest('.config-section'),scroll,5],
-   [$('#material-thickness').closest('.two-fields'),optional,null],[$('#thickness-hint'),optional,null]
+   [$('#material-thickness').closest('.two-fields'),optional,null],[$('#thickness-hint'),optional,null],
+   [$('#production-location').closest('label'),optional,null],[$('#production-note').closest('label'),optional,null]
   ];
   clientWizardPlaces=nodes.map(([node,destination,stage])=>{
    const marker=document.createComment('configurateur client');

@@ -57,15 +57,11 @@ async function verifyMouldingWizard(browser,base,artifacts){
  assert.equal(await next.isDisabled(),true);
  await desktop.locator('#production-color-grid button').first().click();
  assert.equal(await next.isEnabled(),true);
- const scroll=await desktop.evaluate(()=>{
-  const preview=document.querySelector('.drawing-card'),form=document.querySelector('#client-step-scroll');
-  const previewBefore=preview.scrollTop;
-  form.scrollTop=100;
-  return {preview:getComputedStyle(preview).overflowY,form:getComputedStyle(form).overflowY,previewBefore,previewAfter:preview.scrollTop,formTop:form.scrollTop};
- });
- assert.deepEqual([scroll.preview,scroll.form],['auto','auto']);
- assert.equal(scroll.previewAfter,scroll.previewBefore,'Le défilement du formulaire ne déplace pas le dessin');
- assert.ok(scroll.formTop>0,'The form scrolls independently of the drawing');
+ assert.equal(await desktop.locator('#production-preview').isVisible(),false);
+ await desktop.locator('#client-viewport-preview').click();
+ assert.equal(await desktop.locator('#production-preview').isVisible(),true);
+ await desktop.locator('#client-viewport-preview').click();
+ assert.equal(await desktop.locator('#production-preview').isVisible(),false);
  await desktop.locator('#client-step-back').click();
  await desktop.locator('#client-step-back').click();
  assert.equal(await stage(),'2');
@@ -93,7 +89,7 @@ async function verifyMouldingWizard(browser,base,artifacts){
  assert.equal(await stage(),'1');
  assert.deepEqual(errors,[]);
  await desktop.close();
- console.log('PASS Moulure client PC : étapes, validations, deux défilements et dossier');
+ console.log('PASS Moulure client PC : étapes, validations, aperçu sur demande et dossier');
  const soffit=await browser.newPage({viewport:{width:390,height:844}});
  await soffit.goto(base+'/production.html?mode=client&kind=profile&profile=j_soffite');
  await soffit.waitForFunction(()=>!!window.MIRProductionWorkspace);

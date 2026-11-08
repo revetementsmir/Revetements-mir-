@@ -126,6 +126,7 @@ async function verifyQuoteAndExports(browser,base,width){
  assert.equal(item.spec.coloredFace.side,'right');
  assert.equal(await page.locator('[data-production-item]').count(),1,'une seule pièce créée');
  // Modifier une vraie quantité et les données du chantier dans l’interface client.
+ await page.locator('#client-viewport-dossier').click();
  await page.locator('[data-item-quantity]').fill('2');
  const info=page.locator('#order-metadata');
  if(!(await info.evaluate(el=>el.open)))await info.locator('summary').click();

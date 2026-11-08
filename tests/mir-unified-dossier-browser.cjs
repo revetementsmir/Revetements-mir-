@@ -46,6 +46,7 @@ async function runAt(browser,base,width){
  await page.locator('#special-color-code').fill('QC-TEST-NOIR-2026');
  await page.locator('#special-color-name').fill('Noir personnalisé');
  await next.click();
+ await page.locator('#client-viewport-dossier').click();
  const metadata=page.locator('#order-metadata');
  if(!(await metadata.evaluate(el=>el.open)))await metadata.locator('summary').click();
  await page.locator('#order-project').fill('Chalet de Québec');

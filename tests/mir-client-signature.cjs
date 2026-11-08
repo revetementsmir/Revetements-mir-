@@ -76,7 +76,7 @@ test('Estimation reste accessible en mobile et le Studio revient aux réalisatio
 });
 test('Le configurateur client partage les codes MIR sans modifier la version Admin',()=>{
   const page=text('production.html'),css=text('mir-production-signature.css');
-  assert.match(page,/mir-production-signature\.css\?v=client-pliage-simple-2/);
+  assert.match(page,/mir-production-signature\.css\?v=client-pliage-viewport-1/);
   assert.match(page,/class="mir-production-steps"/);
   assert.match(css,/html\.mir-production-client/);
   assert.match(css,/--green:#348511/);
