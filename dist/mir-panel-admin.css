@@ -90,3 +90,21 @@ body.mir-admin-v4 .mir-panel-card-error{font-size:13px;color:#995b30;padding:19p
  body.mir-admin-v4 .mir-panel-card-drawing{min-height:160px}
  body.mir-admin-v4 .mir-panel-dossier-footer .mir-panel-primary{width:100%}
 }
+
+/* GOD MODE: The freeform workshop intentionally locks the desktop viewport.
+   Panel dossiers are long lists and MUST use normal page scrolling instead. */
+@media(min-width:768px) and (min-height:650px){
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="panels"]{
+  display:block!important;height:auto!important;max-height:none!important;
+  overflow:visible!important;min-height:100vh
+ }
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="panels"]>.production-wrap{
+  display:block!important;flex:none!important;height:auto!important;max-height:none!important;
+  overflow:visible!important;min-height:0!important;padding:14px max(18px,3vw) 55px!important
+ }
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="panels"] #mir-procurement-panel:not([hidden]){
+  display:block!important;flex:none!important;height:auto!important;max-height:none!important;
+  overflow:visible!important;min-height:0!important
+ }
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="panels"] .production-workspace:not([hidden]){display:none!important}
+}
