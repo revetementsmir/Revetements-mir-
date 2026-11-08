@@ -285,7 +285,8 @@
           '<details class="mir-panel-card-details"><summary>Voir lips, angles et options</summary><p>'+esc(notes.replace('<MIROPTIONS>',' • Options à préciser : '))+'</p></details>'+
           '<div class="mir-panel-card-controls"><label>Qté<input type="number" min="1" step="1" value="'+qty+'" data-mir-panel-qty="'+esc(id)+'" aria-label="Quantité panneau '+esc(label)+'"></label>'+
           '<label class="mir-panel-card-check"><input type="checkbox" data-mir-panel-include="'+esc(id)+'"'+(selected?' checked':'')+'><span>Inclure au bon</span></label></div>'+
-          '<div class="mir-panel-card-buttons"><button type="button" data-mir-panel-edit="'+esc(id)+'">Modifier</button>'+
+          '<div class="mir-panel-card-buttons"><button type="button" data-mir-panel-edit="'+esc(id)+'">Modifier</button>'+ 
+          '<button type="button" data-mir-panel-duplicate="'+esc(id)+'">Dupliquer</button>'+
           '<a href="calepinage.html'+(item.sourceLayout?.zoneId?'#'+encodeURIComponent(item.sourceLayout.zoneId):'')+'">Voir le mur</a></div></article>';
       }).join('');
     }
@@ -593,6 +594,15 @@
       }
       if(b.dataset.mirPanelEdit){
         if(win.MIRProductionWorkspace?.editOrderItem?.(b.dataset.mirPanelEdit))switchTab('draw');
+        return;
+      }
+      if(b.dataset.mirPanelDuplicate){
+        const previous=currentOrder()?.items?.length||0;
+        const source=[...doc.querySelectorAll('[data-duplicate-piece]')].find(el=>el.dataset.duplicatePiece===b.dataset.mirPanelDuplicate);
+        if(!source)return win.alert('Ouvre d’abord la fiche de cette pièce avant de la dupliquer.');
+        source.click();
+        if((currentOrder()?.items?.length||0)>previous)switchTab('panels');
+        else win.alert('La pièce n’a pas été dupliquée. Vérifie ses cotes dans le dessin.');
         return;
       }
       if(b.dataset.mirPanelHistory!==undefined){poView='history';switchTab('orders');return;}
