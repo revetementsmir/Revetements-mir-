@@ -239,6 +239,7 @@
       const count=chosen.items.filter(item=>item.spec?.kind==='panel').length;
       panel.querySelectorAll('[data-mir-panel-count]').forEach(node=>node.textContent=String(count));
       panel.querySelectorAll('[data-mir-po-count]').forEach(node=>node.textContent=String(chosen.items.length));
+      panel.querySelectorAll('[data-mir-panel-to-po]').forEach(button=>{button.disabled=chosen.items.length===0;});
     }
     function changeIncluded(id,checked){
       const dossier=currentOrder();
