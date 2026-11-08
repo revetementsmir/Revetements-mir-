@@ -6,16 +6,11 @@ const root=path.resolve(__dirname,'../dist');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const names=['realisations-mir-contemporain-brun','realisations-mir-contrastes','realisations-mir-classique'];
 let tests=0;function test(label,fn){fn();tests++;console.log('PASS '+label)}
-test('L’accueil approuvé est préservé avant sa section Réalisations',()=>{
+test('L’accueil vitrine ouvre la galerie dédiée et redirige les anciens liens',()=>{
  const html=read('index.html');
- const prefix=html.slice(0,html.indexOf('<section id="realisations"'))
-  .replace('mir-home-premium.css?v=centre-ville-1','mir-home-premium.css?v=images-ultrawide-20261105')
-  .replace('app.js?v=centre-ville-1','app.js');
- let h=0;for(const ch of prefix)h=(Math.imul(h,31)+ch.charCodeAt(0))>>>0;
- assert.equal(h,3906695709,'La maison, le logo, les cartes ou le header ont changé !');
- assert.match(prefix,/mir-home-hero-20261105\.avif/);
- assert.equal((prefix.match(/mir-home-card-[a-z]+-20261105\.webp/g)||[]).length,3);
- assert.match(prefix,/Voir notre boutique/);
+ assert.match(html,/href="realisations\.html">Réalisations/);
+ assert.match(html,/'#au-coeur-du-centre-ville':'realisations\.html#au-coeur-du-centre-ville'/);
+ assert.doesNotMatch(html,/id="realisations"/);
 });
 test('Les trois maisons de MIR sont présentes dans Réalisations sans changement d’architecture',()=>{
  const h=read('realisations.html');
@@ -24,15 +19,11 @@ test('Les trois maisons de MIR sont présentes dans Réalisations sans changemen
  assert.match(h,/Nos réalisations/);
  assert.doesNotMatch(h,/image générée pour la page d’accueil|palmier/i);
 });
-test('La section Réalisations existante conserve ses filtres et sélection',()=>{
- const h=read('index.html');
- assert.match(h,/data-filter="saved"/);
- assert.equal((h.match(/class="image-trigger"/g)||[]).length,4);
- const section=h.slice(h.indexOf('<section id="realisations"'),h.indexOf('</section>',h.indexOf('<section id="realisations"')));
- for(const id of names)assert.match(section,new RegExp(id+'-large\\.webp'));
- const app=read('app.js');
- for(const id of names)assert.match(app,new RegExp(id+'-large\\.webp'));
- assert.match(app,/dialog\.showModal\(\)/);
+test('La galerie conserve les filtres et la sélection de l’ancien accueil',()=>{
+ const html=read('realisations.html'), app=read('mir-realisations.js');
+ assert.match(html,/data-gallery-filter="saved"/);
+ assert.equal((html.match(/data-gallery-save=/g)||[]).length,4);
+ assert.match(app,/localStorage.getItem\('mir-inspirations'\)/);
 });
 test('Les trois fichiers originaux ne sont ni écrasés ni publiés comme modèles artificiels',()=>{
  const h=read('realisations.html');
@@ -78,7 +69,7 @@ test('Galerie en grand, clavier et retours accessibles',()=>{
 test('Quatrième réalisation publiée en AVIF, originale et variante mobile',()=>{
   const h=read('realisations.html'),js=read('mir-realisations.js'),css=read('mir-realisations.css');
   assert.match(h,/Au cœur du centre-ville de Québec/);
-  assert.match(read('index.html'),/data-category="urban" data-id="3"/);
+  assert.match(h,/id="au-coeur-du-centre-ville" data-gallery-category="urban"/);
   assert.match(h,/data-photo="3"/);
   assert.match(h,/aria-live="polite">1 \/ 4/);
   assert.match(js,/Au cœur du centre-ville de Québec/);

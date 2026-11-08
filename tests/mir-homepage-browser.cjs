@@ -14,7 +14,7 @@ const server=http.createServer((req,res)=>{
   res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream'});
   fs.createReadStream(file).pipe(res);
 });
-const sizes=[{name:'desktop',w:1440,h:900},{name:'large',w:1920,h:1080},{name:'tablette',w:820,h:1180},{name:'mobile',w:390,h:844},{name:'mobile-petit',w:360,h:780},{name:'ultrawide-2560',w:2560,h:1080},{name:'ultrawide-3440',w:3440,h:1440},{name:'ultrawide-3840',w:3840,h:1080},{name:'super-ultrawide-5120',w:5120,h:1440}];
+const sizes=[{name:'desktop',w:1440,h:900},{name:'large',w:1920,h:1080},{name:'tablette',w:820,h:1180},{name:'tablette-paysage',w:1024,h:768},{name:'pc-court',w:1366,h:768},{name:'mobile',w:390,h:844},{name:'mobile-petit',w:360,h:780},{name:'ultrawide-2560',w:2560,h:1080},{name:'ultrawide-3440',w:3440,h:1440},{name:'ultrawide-3840',w:3840,h:1080},{name:'super-ultrawide-5120',w:5120,h:1440}];
 async function main(){
   fs.mkdirSync(path.resolve(__dirname,'../artifacts'),{recursive:true});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -59,27 +59,25 @@ async function main(){
       assert.ok(metrics.account.right<=size.w+2,size.name+': compte hors viewport');
       assert.equal(failures.length,0,size.name+': erreurs JS '+failures.join('; '));
       await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-accueil-'+size.name+'.png')});
-      const featured=page.locator('#au-coeur-du-centre-ville');
-      await featured.scrollIntoViewIfNeeded();
-      const imageSource=await featured.locator('img').evaluate(async img=>{await img.decode();return img.currentSrc;});
-      assert.ok(imageSource.endsWith('-avec-voiture-'+(size.w<=760?'mobile':'large')+'.avif'),size.name+': bonne version de la photo');
-      if(['mobile','desktop'].includes(size.name)){
-        await featured.screenshot({path:path.resolve(__dirname,'../artifacts/mir-centre-ville-'+size.name+'.png')});
-        assert.equal(await page.locator('#result-count').textContent(),'4 réalisations');
-        await featured.locator('.image-trigger').click();
-        assert.equal(await page.locator('#dialog-title').textContent(),'Au cœur du centre-ville de Québec');
-        assert.equal(await page.locator('#dialog-number').textContent(),'1 / 4');
-        await page.locator('#next-project').click();
-        assert.equal(await page.locator('#dialog-title').textContent(),'Lignes contemporaines');
-        await page.keyboard.press('Escape');
-        await featured.locator('.save').click();
-        await page.locator('[data-filter="urban"]').click();
-        assert.equal(await page.locator('#result-count').textContent(),'1 réalisation');
-        await featured.locator('.image-trigger').click();
-        assert.equal(await page.locator('#next-project').isEnabled(),false);
-        await page.keyboard.press('Escape');
-        await page.locator('[data-filter="saved"]').click();
-        assert.equal(await featured.isVisible(),true);
+      const height=await page.evaluate(()=>document.documentElement.scrollHeight);
+      assert.ok(height<=size.h+2,size.name+': accueil dépasse un écran ('+height+' > '+size.h+')');
+      if(size.name==='mobile'){
+        const menu=page.locator('.mir-client-menu-toggle');
+        await menu.click();
+        await page.locator('nav').getByRole('link',{name:'Nous joindre'}).click();
+        await page.waitForURL('**/contact.html');
+        assert.ok(await page.locator('a[href="tel:+14188429859"]').isVisible());
+        assert.ok(await page.locator('main a[href="mailto:estimation@revetementsmir.com"]').isVisible());
+      }
+      if(size.name==='desktop'){
+        await page.goto('http://127.0.0.1:'+server.address().port+'/index.html#au-coeur-du-centre-ville');
+        await page.waitForURL('**/realisations.html#au-coeur-du-centre-ville');
+        await page.evaluate(()=>localStorage.setItem('mir-inspirations','[3]'));
+        await page.reload();
+        await page.locator('[data-gallery-filter="saved"]').click();
+        assert.equal(await page.locator('[data-gallery-category]:visible').count(),1);
+        await page.locator('#au-coeur-du-centre-ville [data-photo]').click();
+        assert.equal(await page.locator('#mir-gallery-dialog-title').textContent(),'Au cœur du centre-ville de Québec');
       }
       assert.deepEqual(failures,[]);
       checks++;

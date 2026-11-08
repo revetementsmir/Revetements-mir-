@@ -65,3 +65,11 @@ body.mir-gallery-page{background:#fafaf7;color:#18251d;min-width:0}
 
 /* Les modifications de décor sont clairement identifiées, sans nuire à la photo. */
 .mir-gallery-card-body>div>.mir-gallery-retouch-note{margin:13px 0 0;font-size:12px;line-height:1.5;color:#5d745d;font-weight:600}
+
+.mir-gallery-filters{display:flex;flex-wrap:wrap;gap:8px;margin-block:20px}
+.mir-gallery-filters button,.mir-gallery-save{min-height:44px;padding:8px 14px;border:1px solid #8aa487;border-radius:6px;background:#fff;color:#183c23;font:inherit;cursor:pointer}
+.mir-gallery-filters button[aria-pressed="true"],.mir-gallery-save[aria-pressed="true"]{background:#e5f2dc;border-color:#38861c}
+.mir-gallery-save{justify-self:start;align-self:start;margin:0 18px 18px}
+.mir-gallery-card-featured .mir-gallery-save{grid-column:2}
+.mir-gallery-page :is(.mir-gallery-card,.mir-gallery-filters,.mir-gallery-save)[hidden]{display:none}
+@media(max-width:1050px){.mir-gallery-card-featured .mir-gallery-save{grid-column:1}}

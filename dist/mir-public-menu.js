@@ -16,10 +16,10 @@
   function init(win){
     const doc=win.document;
     if(doc.documentElement.hasAttribute("data-mir-harmony"))return null;
-    const header=doc.querySelector('header.mir-client-header');
+    const header=doc.querySelector('header.mir-client-header, header.mir-home-header');
     const nav=header?.querySelector('nav.mir-client-links');
     if(!header||!nav||header.querySelector('.mir-client-menu-toggle'))return null;
-    const media=win.matchMedia(BREAKPOINT);
+    const media=win.matchMedia(header.classList.contains('mir-home-header')?'(max-width: 760px)':BREAKPOINT);
     const toggle=doc.createElement('button');
     toggle.type='button';
     toggle.className='mir-client-menu-toggle';

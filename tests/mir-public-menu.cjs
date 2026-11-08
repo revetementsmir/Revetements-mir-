@@ -20,11 +20,12 @@ test('Les sept pages clients utilisent les mêmes fichiers de menu, sans bibliot
    assert.match(html,/<header[^>]*mir-client-header/,route);
    assert.match(html,/assets\/MIR-logo-officiel-original\.svg/,route);
    assert.match(html,/name="robots" content="noindex,nofollow"/,route);
-   assert.match(html,/href="index.html#nous-joindre"[^>]*>Demander une estimation<\/a>/,route);
+   assert.match(html,/href="contact.html"[^>]*>Demander une estimation<\/a>/,route);
  }
 });
-test('L accueil et le portail ne sont pas injectés et le mode Admin reste isolé',()=>{
- for(const route of ['index','chantier']){
+test('Le menu accueil est compact et le mode Admin reste isolé',()=>{
+ assert.match(read('index.html'),/mir-public-menu\.js\?v=vitrine-1/);
+ for(const route of ['chantier']){
    assert.doesNotMatch(read(route+'.html'),/mir-public-menu\.(?:css|js)/,route);
  }
  const production=read('production.html'),bridge=read('mir-production-client-nav.js');
