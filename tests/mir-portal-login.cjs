@@ -69,7 +69,9 @@ test('Une seule page connexion est visible dans le site principal',()=>{
 });
 test('Le portail verrouillé ne propose aucun lien de démo',()=>{
   const portal=read('chantier-app.js');
-  assert.match(portal,/Activation sécurisée en attente/);
+  // PR #51 simplifie le message sans ouvrir le portail ni proposer de démo.
+  assert.match(portal,/Connexion en attente/);
+  assert.match(portal,/L’espace équipe n’est pas encore ouvert/);
   assert.doesNotMatch(portal,/href="chantier\.html\?demo=1"/);
   const source=read('portal-client.js');
   assert.match(source,/mode: 'connected'/);
