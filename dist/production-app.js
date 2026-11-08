@@ -681,6 +681,7 @@ function renderClientEntry(active){
   $('.production-workspace').before(entry);
   $('#client-standard-options').innerHTML=Object.entries(profiles).filter(([id])=>id!=='custom').map(([id,p])=>'<button type="button" class="template-button" data-client-profile="'+esc(id)+'">'+templateIcon('profile',id)+'<span>'+esc(p.name)+'</span></button>').join('');
  }
+ for(const button of $('#client-standard-options').querySelectorAll('[data-client-profile]'))button.setAttribute('aria-pressed',String(clientProfileSelected&&selectedTemplate?.id==='mir-standard-profile-'+button.dataset.clientProfile));
  const state=clientStep!==1?'measures':tool==='draw'?'draw':clientEntry;
  document.body.dataset.clientEntry=state;entry.hidden=clientStep!==1;
  $('#client-entry-title').textContent=state==='models'?'Choisissez votre modèle':state==='draw'?'Dessiner ma moulure':'Comment voulez-vous commencer?';
@@ -2100,7 +2101,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
   }
   if(button.id==='client-choose-model'){clientEntry='models';updateDrawing();$('#client-entry-title').focus({preventScroll:true});return;}
   if(button.id==='client-entry-back'){clientEntry='choice';tool='select';updateDrawing();$('#client-entry-title').focus({preventScroll:true});return;}
-  if(d.clientProfile){choose('profile',d.clientProfile,{profileChosen:true});return goClientStep(2,{confirm:true});}
+  if(d.clientProfile){if(!clientProfileSelected||button.getAttribute('aria-pressed')!=='true')choose('profile',d.clientProfile,{profileChosen:true});return goClientStep(2,{confirm:true});}
   if(button.id==='client-draw-profile'&&clientStep===1){
    if(drawPoints.length&&draft.template==='custom'&&!clientProfileSelected){tool='draw';updateDrawing();$('#production-drawing').focus();return;}
    choose('profile','custom');
@@ -2153,13 +2154,13 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(d.workflow){workflow=d.workflow;authoring=false;editingTemplateId=null;render();return;}
  if(d.kind){if(!clientProfileWizard()||d.kind!==kind){choose(d.kind,d.kind==='panel'?'rectangle':'custom');if(!client&&d.kind==='profile')startProfileDrawing({fullscreen:false});}return;}
  if(d.template){
-  if(clientProfileWizard()&&clientProfileSelected&&button.getAttribute('aria-pressed')==='true')return;
+  if(clientProfileWizard()&&clientProfileSelected&&button.getAttribute('aria-pressed')==='true')return goClientStep(2,{confirm:true});
   choose(kind,d.template,{empty:client&&!authoring,profileChosen:true});
   if(clientProfileWizard())$(`[data-template="${d.template}"]`)?.focus();
   return;
  }
  if(d.savedTemplate||d.useSavedModel){
-  if(clientProfileWizard()&&clientProfileSelected&&button.getAttribute('aria-pressed')==='true')return;
+  if(clientProfileWizard()&&clientProfileSelected&&button.getAttribute('aria-pressed')==='true')return goClientStep(2,{confirm:true});
   useSavedTemplate(d.savedTemplate||d.useSavedModel);
   return;
  }
