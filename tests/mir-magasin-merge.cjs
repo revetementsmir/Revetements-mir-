@@ -102,6 +102,32 @@ check('Invalid JSON est refusé sans toucher aux notes existantes',()=>{
  assert.throws(()=>Review.importAnnotations('{}',old),/incompatible/);
  assert.equal(old.annotations['mir-request-adfast'],'À conserver');
 });
+check('DeckMart : 45 choix avec référence au panier et 44 photos',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const deckmartCatalogue=Store.buildCatalogue([]);
+ const profiles=deckmartCatalogue.filter(item=>item.storeColors?.length);
+ assert.equal(profiles.length,3);
+ const missing=[];
+ const images=new Set();
+ for(const item of profiles){
+  assert.equal(item.storeColors.length,15);
+  assert.equal(new Set(item.storeColors.map(color=>color.id)).size,15);
+  for(const color of item.storeColors){
+   assert.match(color.sourceUrl,/^https:\/\/www\.deckmart\.com\/products\/maibec-canexel-aluminum-joint-mould\?variant=\d+$/);
+   const configured=Store.configureLine({catalogue:deckmartCatalogue},{itemId:item.id,colorId:color.id,quantity:1});
+   assert.equal(configured.ok,true,configured.error?.message);
+   assert.ok(color.supplierReference);
+   assert.equal(configured.line.snapshot.supplierReference,color.supplierReference);
+   assert.equal(configured.line.snapshot.supplierSource,color.sourceUrl);
+   if(color.variantImage){
+    assert.ok(fs.statSync(path.join(__dirname,'../dist',color.variantImage)).size>0);
+    images.add(color.variantImage);
+   }else missing.push([item.id,color.id]);
+  }
+ }
+ assert.equal(images.size,44);
+ assert.deepEqual(missing,[['canexel-joint-cedrvue-9','canexel-noir-2-0']]);
+});
 check('Aperçu de revue chargé sans accès aux données client',()=>{
  const fs=require('node:fs'),path=require('node:path');
  const html=fs.readFileSync(path.join(__dirname,'../dist/magasin-revue.html'),'utf8');

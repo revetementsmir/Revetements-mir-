@@ -264,6 +264,430 @@
         notes:['Cotes en pouces. Longueur maximale demandée : 10 pi selon la règle atelier MIR.',
           'Côté visible, retours, angles, épaisseur, rayons et largeur développée à valider avant fabrication. Aucune consommation automatique de bobine.']});
     }
+    const deckmartSource='https://www.deckmart.com/products/maibec-canexel-aluminum-joint-mould';
+    const deckmartVariants=[
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-acadia",
+    "name": "Acadia",
+    "supplierReference": "261-60311",
+    "supplierVariantId": "50345495658778",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-acadia.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-acadia",
+    "name": "Acadia",
+    "supplierReference": "261-60337",
+    "supplierVariantId": "50345504702746",
+    "variantImage": "assets/products/employee-store/deckmart-d5-acadia.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-acadia",
+    "name": "Acadia",
+    "supplierReference": "261-63200",
+    "supplierVariantId": "50351522087194",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-acadia.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-noir",
+    "name": "Noir",
+    "supplierReference": "261-60408",
+    "supplierVariantId": "50345495691546",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-noir.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-noir",
+    "name": "Noir",
+    "supplierReference": "261-60407",
+    "supplierVariantId": "50345504735514",
+    "variantImage": "assets/products/employee-store/deckmart-d5-noir.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-noir",
+    "name": "Noir",
+    "supplierReference": "261-63202",
+    "supplierVariantId": "50351522119962",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-noir.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-noir-2-0",
+    "name": "Noir 2.0",
+    "supplierReference": "261-61008",
+    "supplierVariantId": "50345495724314",
+    "variantImage": null,
+    "imageVerified": false
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-noir-2-0",
+    "name": "Noir 2.0",
+    "supplierReference": "261-61007",
+    "supplierVariantId": "50345504768282",
+    "variantImage": "assets/products/employee-store/deckmart-d5-noir-2-0.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-noir-2-0",
+    "name": "Noir 2.0",
+    "supplierReference": "261-61011",
+    "supplierVariantId": "50351522152730",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-noir-2-0.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-granit",
+    "name": "Granit",
+    "supplierReference": "261-60321",
+    "supplierVariantId": "50345495757082",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-granit.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-granit",
+    "name": "Granit",
+    "supplierReference": "261-60347",
+    "supplierVariantId": "50345504801050",
+    "variantImage": "assets/products/employee-store/deckmart-d5-granit.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-granit",
+    "name": "Granit",
+    "supplierReference": "261-63207",
+    "supplierVariantId": "50351522185498",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-granit.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-bleu-minuit",
+    "name": "Bleu minuit",
+    "supplierReference": "261-60322",
+    "supplierVariantId": "50345495789850",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-bleu-minuit.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-bleu-minuit",
+    "name": "Bleu minuit",
+    "supplierReference": "261-60348",
+    "supplierVariantId": "50345504833818",
+    "variantImage": "assets/products/employee-store/deckmart-d5-bleu-minuit.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-bleu-minuit",
+    "name": "Bleu minuit",
+    "supplierReference": "261-63209",
+    "supplierVariantId": "50351522218266",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-bleu-minuit.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-gris-brume",
+    "name": "Gris brume",
+    "supplierReference": "261-60313",
+    "supplierVariantId": "50345495822618",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-gris-brume.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-gris-brume",
+    "name": "Gris brume",
+    "supplierReference": "261-60339",
+    "supplierVariantId": "50345504866586",
+    "variantImage": "assets/products/employee-store/deckmart-d5-gris-brume.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-gris-brume",
+    "name": "Gris brume",
+    "supplierReference": "261-63210",
+    "supplierVariantId": "50351522251034",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-gris-brume.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-sable",
+    "name": "Sable",
+    "supplierReference": "261-60315",
+    "supplierVariantId": "50345495855386",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-sable.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-sable",
+    "name": "Sable",
+    "supplierReference": "261-60341",
+    "supplierVariantId": "50345504899354",
+    "variantImage": "assets/products/employee-store/deckmart-d5-sable.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-sable",
+    "name": "Sable",
+    "supplierReference": "261-63213",
+    "supplierVariantId": "50351522283802",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-sable.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-blanc",
+    "name": "Blanc",
+    "supplierReference": "261-60310",
+    "supplierVariantId": "50345495888154",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-blanc.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-blanc",
+    "name": "Blanc",
+    "supplierReference": "261-60336",
+    "supplierVariantId": "50345504932122",
+    "variantImage": "assets/products/employee-store/deckmart-d5-blanc.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-blanc",
+    "name": "Blanc",
+    "supplierReference": "261-63219",
+    "supplierVariantId": "50351522316570",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-blanc.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-bois-de-santal",
+    "name": "Bois de Santal",
+    "supplierReference": "261-60523",
+    "supplierVariantId": "50345495920922",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-bois-de-santal.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-bois-de-santal",
+    "name": "Bois de Santal",
+    "supplierReference": "261-60524",
+    "supplierVariantId": "50345504964890",
+    "variantImage": "assets/products/employee-store/deckmart-d5-bois-de-santal.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-bois-de-santal",
+    "name": "Bois de Santal",
+    "supplierReference": "261-63214",
+    "supplierVariantId": "50351522349338",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-bois-de-santal.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-falaise",
+    "name": "Falaise",
+    "supplierReference": "261-60537",
+    "supplierVariantId": "50345495953690",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-falaise.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-falaise",
+    "name": "Falaise",
+    "supplierReference": "261-60538",
+    "supplierVariantId": "50345504997658",
+    "variantImage": "assets/products/employee-store/deckmart-d5-falaise.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-falaise",
+    "name": "Falaise",
+    "supplierReference": "261-63204",
+    "supplierVariantId": "50351522382106",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-falaise.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-loup-gris",
+    "name": "Loup gris",
+    "supplierReference": "261-60874",
+    "supplierVariantId": "50345495986458",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-loup-gris.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-loup-gris",
+    "name": "Loup gris",
+    "supplierReference": "261-60873",
+    "supplierVariantId": "50345505030426",
+    "variantImage": "assets/products/employee-store/deckmart-d5-loup-gris.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-loup-gris",
+    "name": "Loup gris",
+    "supplierReference": "261-63217",
+    "supplierVariantId": "50351522414874",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-loup-gris.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-sierra",
+    "name": "Sierra",
+    "supplierReference": "261-60910",
+    "supplierVariantId": "50345496019226",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-sierra.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-sierra",
+    "name": "Sierra",
+    "supplierReference": "261-60911",
+    "supplierVariantId": "50345505063194",
+    "variantImage": "assets/products/employee-store/deckmart-d5-sierra.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-sierra",
+    "name": "Sierra",
+    "supplierReference": "261-63216",
+    "supplierVariantId": "50351522447642",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-sierra.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-barista",
+    "name": "Barista",
+    "supplierReference": "261-60924",
+    "supplierVariantId": "50345496051994",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-barista.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-barista",
+    "name": "Barista",
+    "supplierReference": "261-60925",
+    "supplierVariantId": "50345505095962",
+    "variantImage": "assets/products/employee-store/deckmart-d5-barista.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-barista",
+    "name": "Barista",
+    "supplierReference": "261-63221",
+    "supplierVariantId": "50351522480410",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-barista.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-scandinave",
+    "name": "Scandinave",
+    "supplierReference": "261-63004",
+    "supplierVariantId": "50345496084762",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-scandinave.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-scandinave",
+    "name": "Scandinave",
+    "supplierReference": "261-63003",
+    "supplierVariantId": "50345505128730",
+    "variantImage": "assets/products/employee-store/deckmart-d5-scandinave.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-scandinave",
+    "name": "Scandinave",
+    "supplierReference": "261-63011",
+    "supplierVariantId": "50351522513178",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-scandinave.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-cedrvue-9",
+    "colorId": "canexel-moka-fonce",
+    "name": "Moka foncé",
+    "supplierReference": "261-63104",
+    "supplierVariantId": "50345496117530",
+    "variantImage": "assets/products/employee-store/deckmart-ced9-moka-fonce.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-ridgewood-d5-12",
+    "colorId": "canexel-moka-fonce",
+    "name": "Moka foncé",
+    "supplierReference": "261-63103",
+    "supplierVariantId": "50345505161498",
+    "variantImage": "assets/products/employee-store/deckmart-d5-moka-fonce.png",
+    "imageVerified": true
+  },
+  {
+    "itemId": "canexel-joint-vstyle-12",
+    "colorId": "canexel-moka-fonce",
+    "name": "Moka foncé",
+    "supplierReference": "261-63111",
+    "supplierVariantId": "50351522545946",
+    "variantImage": "assets/products/employee-store/deckmart-vstyle-moka-fonce.png",
+    "imageVerified": true
+  }
+];
+    for(const itemId of [...new Set(deckmartVariants.map(variant=>variant.itemId))]){
+      const item=items.find(entry=>entry.id===itemId);
+      const colors=deckmartVariants.filter(variant=>variant.itemId===itemId).map(variant=>({
+        ...item.colors.find(color=>color.id===variant.colorId),id:variant.colorId,name:variant.name,
+        verified:true,scope:'supplier_product_variant',availabilityConfirmedForItem:true,
+        sourceUrl:deckmartSource+'?variant='+variant.supplierVariantId,
+        supplierReference:variant.supplierReference,variantImage:variant.variantImage
+      }));
+      item.colors=[...colors,...item.colors.filter(color=>!colors.some(variant=>variant.id===color.id))];
+      item.storeColors=colors;
+      item.colorPolicy='required';
+      item.sourceUrl=deckmartSource;
+      item.supplierSource=deckmartSource;
+      item.colorScope='supplier_product_variant';
+      item.colorNote='Combinaison documentée chez DeckMart; disponibilité MIR à confirmer.';
+    }
     return items.sort((a,b)=>CATEGORIES.findIndex(c=>c.id===a.category)-CATEGORIES.findIndex(c=>c.id===b.category)||Number(b.mirPreferred===true)-Number(a.mirPreferred===true)||a.name.localeCompare(b.name,'fr'));
   }
   function parseInches(value){
@@ -319,6 +743,7 @@
       }
       const expected=new Set((item.measureFields||[]).map(f=>f.key));
       if(Object.keys(provided).some(k=>!expected.has(k)))fail('MEASURE_UNKNOWN','Une cote ne correspond pas au profil sélectionné.');
+      const supplierColor=item.storeColors?.find(color=>color.id===colorId);
       const line={itemId:item.id,name:item.name,brand:item.brand||null,materialId:item.materialId||null,
         quantity,unit:item.unit,colorId,colorName,colorScope:item.colorScope||null,dimensionsIn,
         profile:item.profile||null,stockLengthIn:format?.lengthIn||item.stockLengthIn||null,sku:item.sku||null,
@@ -329,6 +754,7 @@
         reviewNotes:[...(item.referencePending?['Référence exacte à identifier avant réservation ou livraison.']:[]),
           ...(item.colorNote?[item.colorNote]:[]),...(format?['Format demandé; disponibilité de la combinaison format, finition et couleur à confirmer.']:[]),...(item.customBending?['Cotes et faisabilité à valider avant fabrication.']:[])],
         snapshot:{id:item.id,name:item.name,brand:item.brand||null,unit:item.unit,unitLabel:item.unitLabel||item.unit,
+          ...(supplierColor?{supplierReference:supplierColor.supplierReference,supplierSource:supplierColor.sourceUrl}:{}),
           category:item.category,sku:item.sku||null,manufacturerReference,formatId,format:copy(format),formatLabel:format?.label||null,
           packaging:copy(item.packaging||{}),sourceUrl:item.sourceUrl||null,documents:copy(item.documents||[]),
           dimensions,notes:copy(item.notes||[])}};

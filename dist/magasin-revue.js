@@ -20,7 +20,7 @@
    if(type==='variant')return (item.reviewVariants||[]).map((v,i)=>
      '<option value="'+i+'" data-item-id="'+safe(v.itemId)+'" data-color-id="'+safe(v.colorId||'')+'">'+safe(v.label)+'</option>').join('');
    if(type==='color')return '<option value="">Choisir la couleur</option>'+
-     (item.colors||[]).map(c=>'<option value="'+safe(c.id)+'"'+(item.baseColorId===c.id?' selected':'')+'>'+safe(c.name)+'</option>').join('');
+     (item.storeColors||item.colors||[]).map(c=>'<option value="'+safe(c.id)+'"'+(item.baseColorId===c.id?' selected':'')+'>'+safe(c.name)+'</option>').join('');
    return '<option value="">Choisir la longueur</option>'+
      (item.formats||[]).map(f=>'<option value="'+safe(f.id)+'">'+safe(f.label||f.lengthIn+' po')+'</option>').join('');
  }
@@ -42,7 +42,7 @@
      '<div class="review"><button type="button" data-note>'+ (annotated?'Modifier la note':'Annoter')+'</button>'+
      '<button type="button" data-hide>'+(hidden?'Remettre au magasin':'Retirer du magasin')+'</button>'+
      (annotated?'<p class="note">'+safe(annotated)+'</p>':'')+'</div>'+
-     (item.sourceUrl?'<small><a target="_blank" rel="noopener noreferrer" href="'+safe(item.sourceUrl)+'">Fiche fournisseur</a></small>':'')+
+     (item.sourceUrl?'<small><a data-supplier-link target="_blank" rel="noopener noreferrer" href="'+safe(item.sourceUrl)+'">Fiche fournisseur</a></small>':'')+
      '</div></article>';
  }
  function render(){
@@ -59,7 +59,7 @@
  function renderCart(){
    $('#cart').innerHTML='<h2>Panier d’essai · '+cart.length+' ligne'+(cart.length>1?'s':'')+'</h2>'+
     (cart.length?cart.map((line,i)=>'<div class="cart-line"><strong>'+safe(line.name)+'</strong>'+
-     '<small>'+safe([line.colorName,line.formatLabel,line.manufacturerReference].filter(Boolean).join(' · '))+'</small>'+
+     '<small>'+safe([line.colorName,line.formatLabel,line.snapshot?.supplierReference?'Réf. DeckMart '+line.snapshot.supplierReference:line.manufacturerReference].filter(Boolean).join(' · '))+'</small>'+
      '<small>'+n(line.quantity)+' '+safe(line.unit)+(line.reservable?'':' · À confirmer')+'</small>'+
      '<button type="button" data-cart-remove="'+i+'">Retirer du panier</button></div>').join(''):
      '<p>Ajoute des produits pour essayer les choix.</p>')+
@@ -67,7 +67,15 @@
  }
  function updateImage(card){
    const selection=Review.selection(card,byId);
-   if(selection.item)card.querySelector('[data-visual]').innerHTML=imageMarkup(selection.item);
+   const item=selection.item||byId(card.dataset.product);
+   if(!item)return;
+   const colorId=selection.colorId||card.querySelector('[data-product-color]')?.value;
+   const color=item.storeColors?.find(option=>option.id===colorId);
+   card.querySelector('[data-visual]').innerHTML=color?.variantImage
+     ?imageMarkup({...item,primaryImage:color.variantImage,name:item.name+' · '+color.name})
+     :color?'<div class="placeholder">Photo exacte à confirmer</div>':imageMarkup(item);
+   const supplierLink=card.querySelector('[data-supplier-link]');
+   if(supplierLink)supplierLink.href=color?.sourceUrl||item.sourceUrl;
  }
  function addCard(card){
    const choice=Review.selection(card,byId),item=choice.item||byId(card.dataset.product);
@@ -110,7 +118,7 @@
      }catch(err){alert('Import refusé : '+err.message);}finally{e.target.value='';}
    });
    $('#products').addEventListener('change',event=>{
-     if(event.target.matches('[data-product-variant]'))updateImage(event.target.closest('[data-product]'));
+     if(event.target.matches('[data-product-variant],[data-product-color]'))updateImage(event.target.closest('[data-product]'));
    });
    $('#products').addEventListener('click',event=>{
      const button=event.target.closest('button');if(!button)return;
