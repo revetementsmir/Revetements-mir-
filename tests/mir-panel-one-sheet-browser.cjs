@@ -51,6 +51,13 @@ async function serverReady(){
    assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),10);
    assert.equal(new Set(await cards.evaluateAll(all=>all.map(a=>a.dataset.mirPanelCard))).size,10);
    assert.match(await page.locator('.mir-panel-dossier-head').textContent(),/10 panneau/);
+   const measured=await page.evaluate(()=>({height:document.documentElement.scrollHeight,viewport:innerHeight,bodyOverflow:getComputedStyle(document.body).overflowY}));
+   if(screen.name==='pc'){
+    assert.ok(measured.height>measured.viewport+400,'Les 10 cartes doivent pouvoir défiler sur PC : '+JSON.stringify(measured));
+    assert.notEqual(measured.bodyOverflow,'hidden','Aucun verrou de défilement dans l’onglet Panneaux PC');
+   }
+   await cards.last().scrollIntoViewIfNeeded();
+   assert.ok(await cards.last().isVisible(),'Le dernier panneau doit être accessible au défilement');
    await page.screenshot({path:path.join(artifacts,'MIR-GODMODE-Panneaux-'+screen.name+'.png'),fullPage:true});
    // Removing a panel from the supplier order never deletes it from the source dossier.
    await page.locator('[data-mir-panel-include]').nth(2).uncheck();
