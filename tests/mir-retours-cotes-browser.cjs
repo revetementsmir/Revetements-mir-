@@ -136,6 +136,7 @@ async function ready(){
     assert.equal(await stage.locator('[data-draw-point]').count(),2);
     await trace(365,275);await choose('right');
     assert.match(await arc(),/ A5 5 0 0 1 /,'choix 2 : sens du retour conservé dans la géométrie');
+    assert.equal(await stage.locator('.mir-angle-annotation').count(),0,'Repli tracé sans étiquette à 180°');
     await page.locator('.mir-workspace-tools [data-freeform-undo]').click();
     await trace(365,275);await choose('left');
     assert.match(await arc(),/ A5 5 0 0 0 /,'choix 1 : sens opposé, sans modifier les cotes');

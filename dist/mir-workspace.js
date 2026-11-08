@@ -5,25 +5,9 @@ const $=(s,r=document)=>r.querySelector(s), wall=location.pathname.endsWith('/ca
 if(!wall&&new URLSearchParams(location.search).get('mode')==='client')return;
 let mounted=false,root,inspector,stage,context,actions,returnFocus,moves=[],sheets=[],adapted=[];
 let profileFrame=null,profileFrameKey='';
-function separateProfileLabels(svg){
- const boxes=[...svg.querySelectorAll('.profile-side-marker')].map(n=>n.getBBox());
- const overlap=(a,b)=>a.x<b.x+b.width+5&&a.x+a.width>b.x-5&&a.y<b.y+b.height+5&&a.y+a.height>b.y-5;
- for(const group of svg.querySelectorAll('.mir-angle-annotation')){
-  const rect=$('rect',group),text=$('text',group);if(!rect||!text)continue;
-  const b=rect.getBBox();let chosen={x:b.x,y:b.y,width:b.width,height:b.height};
-  if(boxes.some(other=>overlap(chosen,other))){
-   const candidates=[];for(const distance of [40,70,110,160])for(const [dx,dy]of [[0,-1],[0,1],[-1,0],[1,0]])candidates.push({...chosen,x:b.x+dx*distance,y:b.y+dy*distance});
-   chosen=candidates.find(c=>c.x>=8&&c.y>=8&&c.x+c.width<=792&&c.y+c.height<=512&&!boxes.some(other=>overlap(c,other)))||chosen;
-   const dx=chosen.x-b.x,dy=chosen.y-b.y;
-   rect.setAttribute('x',chosen.x);rect.setAttribute('y',chosen.y);text.setAttribute('x',Number(text.getAttribute('x'))+dx);text.setAttribute('y',Number(text.getAttribute('y'))+dy);
-  }
-  boxes.push(chosen);
- }
-}
 function fitProfileViewport(s){
  if(wall||s?.kind!=='profile'||s.tool!=='select'||s.preview!=='face')return;
  const svg=$('#production-drawing>svg');if(!svg)return;
- separateProfileLabels(svg);
  const key=JSON.stringify([s.model.pointsMM,s.model.bends]);
  if((key!==profileFrameKey||!profileFrame)&&s.zoom===1&&!s.pan.x&&!s.pan.y){
   const box=svg.getBBox(),pad=Math.max(box.width,box.height)*.12;

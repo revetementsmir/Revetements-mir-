@@ -364,40 +364,66 @@ function bendAngleLabel(bend){
  const angle=Number(bend?.angle);
  return Number.isFinite(angle)?fmt(angle)+'°':'À préciser';
 }
-function profileAnglesOverlay(model,points){
- if(!model?.bends?.length||points.length<3)return '';
- return model.bends.map((bend,i)=>{
-  const a=points[i],joint=points[i+1],b=points[i+2];
-  if(!a||!joint||!b)return '';
+function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,rightEdge]){
+ const pointBounds=[...folds,...handles].map(([x,y])=>[x,y,9,9]);
+ return (model.bends||[]).map((bend,i)=>{
+  if(!bend||bend.mode==='hem'||!segments[i]||!segments[i+1])return '';
+  const label=bendAngleLabel(bend);
+  if(label==='180°'||label==='À préciser')return '';
+  const [a,joint]=segments[i],b=segments[i+1][1];
   const left=[a[0]-joint[0],a[1]-joint[1]],right=[b[0]-joint[0],b[1]-joint[1]];
-  const d1=Math.hypot(...left),d2=Math.hypot(...right);if(d1<.5||d2<.5)return '';
-  const u=left.map(v=>v/d1),w=right.map(v=>v/d2),sum=[u[0]+w[0],u[1]+w[1]];
-  const len=Math.hypot(...sum),bis=len>.1?sum.map(v=>v/len):[-u[1],u[0]],r=23;
+  const d1=Math.hypot(...left),d2=Math.hypot(...right);
+  if(Math.min(d1,d2)<2)return '';
+  const u=left.map(v=>v/d1),w=right.map(v=>v/d2);
+  const bis=[u[0]+w[0],u[1]+w[1]],len=Math.hypot(...bis);
+  if(len<1e-6)return '';
+  const [nx,ny]=bis.map(v=>v/len),r=Math.min(23,d1*.45,d2*.45);
   const start=[joint[0]+u[0]*r,joint[1]+u[1]*r],end=[joint[0]+w[0]*r,joint[1]+w[1]*r];
   const sweep=u[0]*w[1]-u[1]*w[0]>=0?1:0;
-  const x=Math.max(65,Math.min(735,joint[0]+bis[0]*60)),y=Math.max(26,Math.min(484,joint[1]+bis[1]*60));
-  const name=(model.segments[i]?.label||String.fromCharCode(65+i))+'–'+
-   (model.segments[i+1]?.label||String.fromCharCode(66+i))+' · '+bendAngleLabel(bend);
-  return '<g class="mir-angle-annotation" pointer-events="none" aria-label="Angle '+esc(name)+'">'+
-   '<path d="M '+start.map(fmt).join(' ')+' A '+r+' '+r+' 0 0 '+sweep+' '+end.map(fmt).join(' ')+'" fill="none" stroke="#348511" stroke-width="2.5"/>'+
-   '<rect x="'+fmt(x-60)+'" y="'+fmt(y-13)+'" width="120" height="26" rx="5" fill="#fafaf7" stroke="#cad6c7"/>'+
-   '<text x="'+fmt(x)+'" y="'+fmt(y+4)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#18251d">'+esc(name)+'</text></g>';
+  const visualLabel=fmt(Math.round(Number.parseFloat(label)*100)/100)+'°';
+  const halfWidth=visualLabel.length*4.6+3,halfHeight=11;
+  const clear=([x,y])=>{
+   if(x<leftEdge+halfWidth+4||x>rightEdge-halfWidth-4||y<halfHeight+4||y>516-halfHeight)return false;
+   if(labels.some(([px,py,w,h])=>Math.abs(x-px)<halfWidth+w+4&&Math.abs(y-py)<halfHeight+h+4))return false;
+   if(pointBounds.some(([px,py,w,h])=>Math.abs(x-px)<halfWidth+w&&Math.abs(y-py)<halfHeight+h))return false;
+   // A scaled distance leaves clearance around the text and the thick profile stroke.
+   const scale=([px,py])=>[(px-x)/(halfWidth+6),(py-y)/(halfHeight+6)];
+   return segments.every(side=>{
+    const [[ax,ay],[bx,by]]=side.map(scale),dx=bx-ax,dy=by-ay;
+    const t=Math.max(0,Math.min(1,-(ax*dx+ay*dy)/(dx*dx+dy*dy||1)));
+    return Math.hypot(ax+t*dx,ay+t*dy)>1.25;
+   });
+  };
+  const position=visualLabel!=='180°'&&[16,28,43,60].flatMap(gap=>[0,16,-16].map(shift=>[
+   joint[0]+nx*(r+gap)-ny*shift,joint[1]+ny*(r+gap)+nx*shift
+  ])).find(clear);
+  let text='';
+  if(position){
+   const [x,y]=position;
+   labels.push([x,y,halfWidth,halfHeight]);
+   text=`<text x="${fmt(x)}" y="${fmt(y)}" text-anchor="middle" dominant-baseline="central" font-size="17" font-weight="700" fill="#243c2b" stroke="#fcfcf8" stroke-width="2.5" paint-order="stroke" aria-hidden="true">${esc(visualLabel)}</text>`;
+  }
+  const sides=[i,i+1].map(index=>model.segments?.[index]?.label||String.fromCharCode(65+index)).join('–');
+  return `<g class="mir-angle-annotation" pointer-events="none" role="img" aria-label="${esc('Angle '+sides+' : '+label)}"><path d="M ${start.map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep} ${end.map(fmt).join(' ')}" fill="none" stroke="#348511" stroke-width="2.5"/>${text}</g>`;
  }).join('');
 }
 function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
  const grid=freehand?traceGridSVG(model.unit):'';
+ const compactTrace=freehand&&clientProfileWizard()&&matchMedia('(max-width:600px)').matches;
+ const horizontalBounds=compactTrace?[100,540]:[0,800];
+ const [left,right]=horizontalBounds,viewBox=left+' 0 '+(right-left)+' 520';
  const points=freehand?(drawPoints.length>=3&&model.pointsMM.length===drawPoints.length
-  ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">${grid}<text x="400" y="250" text-anchor="middle" font-family="Arial" font-size="19" fill="#7b8b6c">${clientProfileWizard()?esc(clientTracePrompt()):'Glisse pour tracer le premier côté.'}</text></svg>`;
+  ?model.pointsMM.map(([x,y])=>[x+drawPoints[0][0],y+drawPoints[0][1]]):drawPoints):model.pointsMM||[];if(!points.length)return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${grid}<text x="${(left+right)/2}" y="250" text-anchor="middle" font-family="Arial" font-size="${compactTrace?13:19}" fill="#7b8b6c">${clientProfileWizard()?esc(clientTracePrompt()):'Glisse pour tracer le premier côté.'}</text></svg>`;
  const tr=(tool==='draw'||drag?.type==='point')&&drawTransform?drawTransform:fitModel({...model,pointsMM:points});
  if(interactive&&!small&&view==='face'&&tool!=='draw'&&drag?.type!=='point'&&zoom!==1){tr.scale*=zoom;tr.ox=400+(tr.ox-400)*zoom;tr.oy=260+(tr.oy-260)*zoom;}
  if(interactive&&!small&&view==='face'&&tool==='select'&&kind==='profile'){tr.ox+=viewPan.x;tr.oy+=viewPan.y;}
  if(interactive&&!drag)drawTransform=tr;
- const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>${grid}`;
+ const mapped=points.map(p=>pointOnView(p,tr)),polygon=model.kind==='panel',pointString=mapped.map(p=>p.map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#dce5d4';let output=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" role="group" aria-label="${esc(model.name)} — ${illustrative?'illustration du modèle':'cotes de la pièce finie'}" font-family="Arial,sans-serif"><title>${esc(model.name)} — ${illustrative?'proportions illustratives, sans cotes de fabrication':'dimensions de la pièce finie'}</title>${grid}`;
  if(polygon)output+=`<polygon points="${pointString}" fill="${hex}" fill-opacity=".65" stroke="#546b4a" stroke-width="2"/>`;else {
- output+=M.profileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand?{}:model,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative&&(!clientProfileWizard()||clientStep===4)});
-  if(!small&&!illustrative)output+=profileAnglesOverlay(model,mapped);
+ output+=M.profileDiagramContent(model,mapped,{bends:freehand&&drawPoints.length<3?[]:model.bends||[],markers:!small,markerModel:freehand?{}:model,handles:tool==='draw'||tool==='edit'?mapped:[],illustrative:illustrative||(interactive&&tool!=='select'),togglePaintedFace:interactive&&!small&&tool==='select'&&!illustrative&&(!clientProfileWizard()||clientStep===4),
+  horizontalBounds,angleOverlay:!small&&!illustrative?(section,labels,handles)=>profileAnglesOverlay(model,section,labels,handles,horizontalBounds):undefined});
  }
  const count=polygon?points.length:Math.max(0,points.length-1);for(let i=0;i<count;i++){const a=mapped[i],b=mapped[(i+1)%mapped.length],delta=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...delta)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-delta[1]/len,delta[0]/len];if(polygon){const edge=model.edges?.[i],bottom=edge?.id===model.bottomEdgeId;if(bottom&&!illustrative)output+=`<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="6"${model.perforation?.enabled?' stroke-dasharray="11 6"':''}/>`;output+=`<g${interactive&&edge&&!authoring?` data-select-bottom="${esc(edge.id)}" role="button" tabindex="0" aria-label="Choisir ${esc(edge.name)} comme bas"`:''}><circle cx="${fmt(mid[0])}" cy="${fmt(mid[1])}" r="13" fill="#fff" stroke="#b2c4a1"/><text x="${fmt(mid[0])}" y="${fmt(mid[1]+4.5)}" text-anchor="middle" font-size="13" fill="#4f6c3c">${i+1}</text></g>`;}
  }
@@ -692,9 +718,6 @@ function renderClientEntry(active){
  entry.querySelector('a').hidden=state!=='choice';$('#client-entry-back').hidden=state==='choice';$('#client-model-options').hidden=state!=='models';
  const templatesSection=$('.template-section');const destination=state==='models'?$('#client-saved-options'):$('#client-step-type');if(templatesSection.parentElement!==destination)destination.append(templatesSection);
  const tools=$('#drawing-tools'),grid=$('.mir-panel-synced-views')||$('#production-drawing');if(state==='draw')grid.after(tools);else $('.drawing-head').after(tools);
- if(state==='draw'){
-  const svg=$('#production-drawing svg');if(svg&&matchMedia('(max-width:600px)').matches){svg.setAttribute('viewBox','100 0 440 520');const prompt=svg.querySelector('text');if(!drawPoints.length&&prompt){prompt.setAttribute('x','320');prompt.setAttribute('font-size','13');}}
- }
 }
 function mountClientWizard(active){
  const config=$('.config-card'),scroll=$('#client-step-scroll'),optional=$('#client-optional-metal');
@@ -1544,16 +1567,16 @@ function drawDragPreview(segment, gesture){
  if(!segment)return;
  const [x,y]=pointOnView(gesture.start,drawTransform),[ex,ey]=pointOnView(segment.point,drawTransform);
  const scale=Math.max(1,Math.min(2.2,800/svg.clientWidth));
- const label=(x,y,value)=>`<text x="${fmt(x)}" y="${fmt(y)}" text-anchor="middle" dominant-baseline="central" font-size="${fmt(17*scale)}" font-weight="700" fill="#603b20" stroke="#fff5e3" stroke-width="${fmt(6*scale)}" stroke-linejoin="round" paint-order="stroke">${esc(value)}</text>`;
+ const label=(x,y,value,halo=6)=>`<text x="${fmt(x)}" y="${fmt(y)}" text-anchor="middle" dominant-baseline="central" font-size="${fmt(17*scale)}" font-weight="700" fill="#603b20" stroke="#fff5e3" stroke-width="${fmt(halo*scale)}" stroke-linejoin="round" paint-order="stroke">${esc(value)}</text>`;
  const size=Math.hypot(ex-x,ey-y), outgoing=Math.atan2(ey-y,ex-x);
  let angle='';
- if(segment.angle!==null){
+ if(segment.angle>0&&segment.angle<180){
   const incoming=Math.PI-gesture.heading;
   const sweep=Math.atan2(Math.sin(outgoing-incoming),Math.cos(outgoing-incoming));
   const r=Math.min(38*scale,size*.36), mid=incoming+sweep/2;
   const ray=(direction,distance)=>[x+Math.cos(direction)*distance,y+Math.sin(direction)*distance];
   const [ax,ay]=ray(mid,r+16*scale);
-  angle=`<path d="M ${ray(incoming,r).map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep>=0?1:0} ${ray(outgoing,r).map(fmt).join(' ')}" fill="none" stroke="#9c5a22" stroke-width="2"/>`+label(ax,ay,segment.angle+'°');
+  angle=`<path d="M ${ray(incoming,r).map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep>=0?1:0} ${ray(outgoing,r).map(fmt).join(' ')}" fill="none" stroke="#9c5a22" stroke-width="2"/>`+label(ax,ay,segment.angle+'°',2.5);
  }
  const line=`<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(ex)}" y2="${fmt(ey)}" stroke="#9c5a22" stroke-width="3" stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/>`;
  const guide=segment.guide?pointOnView(segment.guide,drawTransform):null;
