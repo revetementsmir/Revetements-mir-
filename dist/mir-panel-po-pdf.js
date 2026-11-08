@@ -2,10 +2,10 @@
  * Visual repérage is indicative, all production dimensions come from the exact model.
  * No network, no transmission and no invented developed sheet dimensions. */
 (function(root,factory){
-  const api=factory();
+  const api=factory(root);
   if(typeof module==='object'&&module.exports)module.exports=api;
   if(root)root.MIRPanelPOPDF=api;
-})(typeof window==='object'?window:null,function(){
+})(typeof window==='object'?window:null,function(root){
   'use strict';
   const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
   const num=value=>Number.isFinite(value)?Number(value.toFixed(2)).toLocaleString('fr-CA'):'?';
@@ -14,6 +14,8 @@
   const line=(x,y,x2,y2,color='#dbe3d9',sw=2)=>'<path d="M '+x+' '+y+' L '+x2+' '+y2+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'"/>';
   const svg=body=>'<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1000" viewBox="0 0 1400 1000"><rect width="1400" height="1000" fill="white"/>'+body+'</svg>';
   const fmt=(model,mm,api)=>api.formatMeasurement(mm,model.unit);
+  const volumeAPI=root?.MIRProductionVolume||
+    (typeof module==='object'&&module.exports?require('./production-volume.js'):null);
   const row=v=>String(v||'').trim();
   const max=(str,n)=>String(str??'').slice(0,n);
   function sectionHeading(title,kicker){
@@ -32,28 +34,89 @@
       txt(62,948,'COTES FINIES • CROQUIS NON À L’ÉCHELLE • VALIDATION ATELIER OBLIGATOIRE',15,'fill="#6a7b6b"')+
       txt(1338,948,'AUCUN ENVOI AUTOMATIQUE',15,'text-anchor="end" fill="#6a7b6b"');
   }
-  function geometry(model,box,attribute='data-mir-panel-main'){
+  // A = largeur hors tout, B = hauteur hors tout.
+  // Les anciens ronds 1-2-3-4 représentent les côtés du contour, pas des
+  // dimensions. Le bon fournisseur affiche à leur place le nom de chaque
+  // côté et sa vraie lèvre, sans créer une pièce ni un développé supplémentaire.
+  function geometry(model,box,attribute='data-mir-panel-main',api=null){
     const points=model.pointsMM||[];
     if(points.length<3)return '';
+    const full=attribute==='data-mir-panel-main';
     const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
     const bounds={left:Math.min(...xs),right:Math.max(...xs),bottom:Math.min(...ys),top:Math.max(...ys)};
     const w=Math.max(1,bounds.right-bounds.left),h=Math.max(1,bounds.top-bounds.bottom);
-    const scale=Math.min((box.w-40)/w,(box.h-40)/h);
-    const ox=box.x+(box.w-w*scale)/2,oy=box.y+(box.h-h*scale)/2;
+    // Dedicated space around the actual geometry for dimension arrows and
+    // readable lips; never shrink the true A/B measurements.
+    const margins=full?{left:113,right:168,top:68,bottom:145}:{left:5,right:5,top:5,bottom:5};
+    const maxW=Math.max(40,box.w-margins.left-margins.right);
+    const maxH=Math.max(40,box.h-margins.top-margins.bottom);
+    const scale=Math.min(maxW/w,maxH/h);
+    const ox=box.x+margins.left+(maxW-w*scale)/2;
+    const oy=box.y+margins.top+(maxH-h*scale)/2;
     const project=p=>[ox+(p[0]-bounds.left)*scale,oy+(bounds.top-p[1])*scale];
     const drawn=points.map(project);
-    const d=drawn.map((p,i)=>(i?'L ':'M ')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ')+' Z';
-    let out='<path '+attribute+'="'+esc(model.id||model.name)+'" d="'+d+'" fill="'+(model.finish?.hex||'#e7efe5')+'" stroke="#28553a" stroke-width="3"/>';
+    const shapePath=ps=>ps.map((p,i)=>(i?'L ':'M ')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ')+' Z';
+    const d=shapePath(drawn);
+    let out='<path '+attribute+'="'+esc(model.id||model.name)+'" d="'+d+'" fill="'+(model.finish?.hex||'#e7efe5')+'" fill-opacity="0.55" stroke="#28553a" stroke-width="'+(full?3.8:2.3)+'"/>';
+    if(!full)return out;
+    const lipTotal=model.edges.reduce((s,e)=>s+(e.lipMM||0),0);
+    const mesh=volumeAPI?.buildMesh?.(model);
+    if(lipTotal>0 && (!mesh?.valid||!mesh.front?.length)){
+      throw Error('Impossible de tracer les lèvres réelles du panneau. Corrigez les cotes et les lèvres avant le PDF.');
+    }
+    // Only the true inward face from MIR's existing 3D geometry kernel.
+    // No fictitious rectangle or approximate offset around sloped sides.
+    if(mesh?.valid && lipTotal>0){
+      const inner=mesh.front.map(project);
+      out+='<path data-mir-lip-inner="true" d="'+shapePath(inner)+'" fill="#fff" fill-opacity="0.73" stroke="#729c76" stroke-width="2.5"/>';
+    }
+    const sign=Math.sign(points.reduce((s,p,i)=>s+p[0]*points[(i+1)%points.length][1]-points[(i+1)%points.length][0]*p[1],0))||1;
+    const xL=Math.min(...drawn.map(p=>p[0])),xR=Math.max(...drawn.map(p=>p[0]));
+    const yT=Math.min(...drawn.map(p=>p[1])),yB=Math.max(...drawn.map(p=>p[1]));
+    const dimY=yB+66,dimX=xR+123;
+    // True outer-envelope dimensions, not the lip-free face.
+    out+=line(xL,yB+6,xL,dimY+8,'#607b65',1.5)+line(xR,yB+6,xR,dimY+8,'#607b65',1.5);
+    out+=line(xL,dimY,xR,dimY,'#28553a',2.1);
+    out+='<path d="M '+(xL+2)+' '+dimY+' l 12,-6 v 12 z M '+(xR-2)+' '+dimY+' l -12,-6 v 12 z" fill="#28553a"/>';
+    out+=txt((xL+xR)/2,dimY+27,'A · largeur hors tout',17,'text-anchor="middle" font-weight="700" data-mir-dimension-a="true"');
+    out+=line(xR+6,yT,dimX+8,yT,'#607b65',1.5)+line(xR+6,yB,dimX+8,yB,'#607b65',1.5);
+    out+=line(dimX,yT,dimX,yB,'#28553a',2.1);
+    out+='<path d="M '+dimX+' '+(yT+2)+' l -6,12 h 12 z M '+dimX+' '+(yB-2)+' l -6,-12 h 12 z" fill="#28553a"/>';
+    const B='B · hauteur hors tout';
+    out+=txt(dimX+33,(yT+yB)/2,B,17,'text-anchor="middle" font-weight="700" data-mir-dimension-b="true" transform="rotate(-90 '+(dimX+33)+' '+((yT+yB)/2)+')"');
+    // The labels are tied to real side IDs and real widths; they are not
+    // arbitrary drawing numbers. A 0 lip is explicitly shown as "Sans lip".
     for(let i=0;i<drawn.length;i++){
       const a=drawn[i],b=drawn[(i+1)%drawn.length],edge=model.edges?.[i];
+      if(!edge)continue;
+      const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1;
+      const nx=-sign*dy/len,ny=sign*dx/len; // outward normal in screen Y-down
       const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
-      if(edge?.id===model.bottomEdgeId)out+=line(a[0],a[1],b[0],b[1],model.perforation?.enabled?'#15798d':'#4e9854',6);
-      if(attribute==='data-mir-panel-main'){
-        out+='<circle cx="'+mx+'" cy="'+my+'" r="15" fill="white" stroke="#9fb4a1" stroke-width="1.5"/>'+
-          txt(mx,my+6,i+1,15,'font-weight="700" text-anchor="middle"');
+      const value=(edge.lipMM>1e-8)?('Lip '+fmt(model,edge.lipMM,api)):'Sans lip';
+      const label=String(edge.name||'Côté')+' · '+value;
+      const font=model.edges.length>6?12:14;
+      const labelW=Math.min(195,Math.max(92,label.length*(font*.52)+18));
+      const labelH=27;
+      let lx=mx+nx*35,ly=my+ny*30;
+      lx=Math.max(box.x+labelW/2+5,Math.min(box.x+box.w-labelW/2-5,lx));
+      ly=Math.max(box.y+labelH/2+6,Math.min(box.y+box.h-95-labelH/2,ly));
+      // Labels linked to the actual outer edge with a small leader.
+      out+=line(mx,my,lx,ly,'#8daa8f',1.25);
+      out+=rect(lx-labelW/2,ly-labelH/2,labelW,labelH,'#f4faf1','#b0c9ab',6);
+      out+=txt(lx,ly+5,label,font,'text-anchor="middle" font-weight="700" data-mir-lip-label="'+esc(edge.id)+'"');
+      if(edge?.id===model.bottomEdgeId){
+        out+=line(a[0],a[1],b[0],b[1],model.perforation?.enabled?'#167da2':'#477e4e',4);
       }
     }
     return out;
+  }
+  function previewSVG(model,api){
+    const body=rect(0,0,710,600,'#fff','#fff')+
+      geometry(model,{x:6,y:4,w:685,h:500},'data-mir-panel-main',api)+
+      rect(21,510,666,69,'#eaf3e7','#d7e6d5',9)+
+      txt(40,540,'A · LARGEUR HORS TOUT : '+fmt(model,model.widthMM,api),20,'font-weight="800"')+
+      txt(40,567,'B · HAUTEUR HORS TOUT : '+fmt(model,model.heightMM,api),20,'font-weight="800"');
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 710 600" role="img" aria-label="'+esc(model.name||'Panneau')+' · largeur et hauteur hors tout avec lèvres individuelles">'+body+'</svg>';
   }
   function panelGroups(items){
     const grouped=new Map();
@@ -122,10 +185,11 @@
       txt(1330,150,'QTÉ '+m.quantity,26,'font-weight="800" text-anchor="end" fill="#28553a"');
     body+=rect(62,177,720,708,'#f8faf6','#dce5d8',12);
     body+=txt(85,215,'VUE COTÉE · UNE PIÈCE',19,'font-weight="700"');
-    body+=geometry(m,{x:100,y:248,w:630,h:505});
-    body+=txt(110,788,'A · '+fmt(m,m.widthMM,api),22,'font-weight="700"')+
-      txt(110,824,'B · '+fmt(m,m.heightMM,api),22,'font-weight="700"');
-    body+=txt(110,859,'Hors tout, lips inclus. Le dessin n’est pas une échelle de coupe.',15,'fill="#607162"');
+    body+=geometry(m,{x:100,y:248,w:630,h:505},'data-mir-panel-main',api);
+    body+=rect(100,758,668,104,'#eaf3e6','#c4d9c0',9);
+    body+=txt(119,792,'A · LARGEUR HORS TOUT : '+fmt(m,m.widthMM,api),24,'font-weight="800" data-mir-ab-summary="A"')+
+      txt(119,832,'B · HAUTEUR HORS TOUT : '+fmt(m,m.heightMM,api),24,'font-weight="800" data-mir-ab-summary="B"');
+    body+=txt(110,878,'A et B incluent les lèvres. Ne pas confondre avec la face visible.',15,'fill="#607162"');
     body+=rect(806,177,531,708,'#fff','#dce5d8',12);
     body+=property(831,214,'PROJECTION C',fmt(m,m.reliefMM,api));
     body+=property(1090,214,'MATIÈRE',m.material?.name||m.material?.type||'À préciser');
@@ -143,7 +207,7 @@
     const limit=7;
     m.edges.slice(0,limit).forEach((edge,i)=>{
       const y=528+i*45;
-      body+=txt(832,y,(i+1)+'. '+max(edge.name,16),16)+
+      body+=txt(832,y,max(edge.name,20),16)+
         txt(1000,y,fmt(m,edge.lengthMM,api),15)+
         txt(1144,y,fmt(m,edge.lipMM,api),15)+
         txt(1260,y,num(edge.interiorAngleDeg)+'°',15);
@@ -165,7 +229,7 @@
       extra+=rect(68,245,1264,595,'#fff','#dbe4d8',11);
       group.forEach((e,i)=>{
         const y=293+i*39;
-        extra+=txt(90,y,(offset+i+1)+'. '+max(e.name,28),19)+
+        extra+=txt(90,y,max(e.name,28),19)+
           txt(510,y,'Côté '+fmt(m,e.lengthMM,api),19)+
           txt(815,y,'Lip '+fmt(m,e.lipMM,api),19)+
           txt(1142,y,num(e.interiorAngleDeg)+'°',19);
@@ -191,5 +255,5 @@
     },{layout:'bending-sheet'}));
     return faces;
   }
-  return Object.freeze({version:'1.0.0',makeFaces});
+  return Object.freeze({version:'1.1.0',makeFaces,previewSVG});
 });
