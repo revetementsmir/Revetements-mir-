@@ -1,0 +1,92 @@
+/* MIR - panneau architectural admin: clear, consistent and entirely local. */
+body.mir-admin-v4[data-mir-tab="panels"] :is(.kind-bar,.production-intro,.production-workspace,.mir-v4-technical,.production-order,.template-section,#production-library,#production-requests,#author-banner){display:none!important}
+body.mir-admin-v4[data-mir-tab="panels"] #mir-procurement-panel{display:block!important;max-width:1480px;width:100%;margin:auto}
+body.mir-admin-v4[data-mir-tab="panels"] #mir-procurement-panel[hidden]{display:none!important}
+body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px}
+body.mir-admin-v4 .mir-panel-admin{font-family:Arial,"Helvetica Neue",sans-serif;color:#294333}
+body.mir-admin-v4 .mir-panel-admin-hero{border-radius:17px;background:#fff;border:1px solid #d5e0d5;padding:26px 30px;margin-bottom:16px;box-shadow:0 5px 24px #1d3b2810}
+body.mir-admin-v4 .mir-panel-admin-hero h2{font-size:clamp(27px,3.1vw,42px)!important;line-height:1.12;font-weight:650;letter-spacing:-.035em;margin:5px 0 12px!important}
+body.mir-admin-v4 .mir-panel-admin-hero h2 em{font-family:Georgia,serif;font-style:italic;font-weight:400}
+body.mir-admin-v4 .mir-panel-admin-hero>p:last-child{max-width:860px;color:#5c7161;font-size:14px;line-height:1.7}
+body.mir-admin-v4 .mir-panel-kicker{font-size:11px;font-weight:800;letter-spacing:.12em;color:#438345}
+body.mir-admin-v4 .mir-panel-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:20px}
+body.mir-admin-v4 .mir-panel-steps :is(a,button){display:flex;align-items:center;gap:9px;min-width:0;padding:14px 10px;background:#fff;color:#284b35;border:1px solid #cfded1;border-radius:12px;min-height:67px;text-align:left;text-decoration:none;font-size:13px;font-weight:750;cursor:pointer}
+body.mir-admin-v4 .mir-panel-steps :is(a,button):hover{background:#eef5e9;border-color:#80a881}
+body.mir-admin-v4 .mir-panel-steps :is(a,button):focus-visible{outline:3px solid #7fae7b;outline-offset:2px}
+body.mir-admin-v4 .mir-panel-steps b{width:31px;height:31px;display:grid;place-items:center;flex:none;background:#e1eddd;color:#315c36;border-radius:50%;font-size:14px}
+body.mir-admin-v4 .mir-panel-steps span{display:grid;min-width:0;gap:2px}
+body.mir-admin-v4 .mir-panel-steps small{font-size:11px;font-weight:500;line-height:1.35;color:#607767}
+body.mir-admin-v4 .mir-panel-dossier{background:#fff;border:1px solid #d7e1d6;border-radius:18px;padding:24px;box-shadow:0 5px 20px #25432908}
+body.mir-admin-v4 .mir-panel-dossier-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;border-bottom:1px solid #dee7db;padding-bottom:20px;margin-bottom:16px}
+body.mir-admin-v4 .mir-panel-dossier-head h3{font-size:24px!important;line-height:1.25;letter-spacing:-.03em;margin:6px 0!important}
+body.mir-admin-v4 .mir-panel-dossier-head h3 small{font-size:13px;color:#6b7b6d;white-space:nowrap;letter-spacing:0}
+body.mir-admin-v4 .mir-panel-dossier-head>div>p:last-child{color:#637568;font-size:13px}
+body.mir-admin-v4 .mir-panel-dossier-actions{display:flex;gap:9px;flex-wrap:wrap}
+body.mir-admin-v4 .mir-panel-dossier-actions button{border:1px solid #b8cfb9;background:#f5f9f2;padding:11px 16px;border-radius:9px;font-weight:700;min-height:44px}
+body.mir-admin-v4 .mir-panel-search{display:block;font-size:13px;font-weight:700;margin:12px 0 21px;color:#405d44;max-width:420px}
+body.mir-admin-v4 .mir-panel-search input{border:1px solid #c6d8c8;border-radius:9px;padding:10px 13px;width:100%;margin-top:7px;background:#fff;font-size:16px;min-height:47px}
+body.mir-admin-v4 .mir-panel-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+body.mir-admin-v4 .mir-panel-card{min-width:0;border:1px solid #d4e1d5;background:#fcfdfa;padding:16px;border-radius:13px;display:flex;flex-direction:column;gap:7px;transition:border-color .15s,opacity .15s}
+body.mir-admin-v4 .mir-panel-card[hidden]{display:none!important}
+body.mir-admin-v4 .mir-panel-card.mir-panel-excluded{opacity:.67;border-style:dashed}
+body.mir-admin-v4 .mir-panel-card-head{display:flex;align-items:center;justify-content:space-between;gap:7px;flex-wrap:wrap}
+body.mir-admin-v4 .mir-panel-card-id{font-size:20px;font-weight:800;color:#235238}
+body.mir-admin-v4 .mir-panel-card-status{font-size:11px;padding:5px 9px;border-radius:999px;color:#784c2a;background:#fff2df;font-weight:700}
+body.mir-admin-v4 .mir-panel-card-status.mir-panel-card-complete{color:#286b36;background:#e7f5e4}
+body.mir-admin-v4 .mir-panel-card-drawing{min-height:190px;display:flex;justify-content:center;align-items:center;border:1px solid #e1e8db;border-radius:10px;background:#fff;overflow:hidden}
+body.mir-admin-v4 .mir-panel-card-drawing svg{width:min(100%,480px);height:auto;max-height:230px;display:block}
+body.mir-admin-v4 .mir-panel-card h3{margin:4px 0!important;font-size:16px!important;font-weight:750}
+body.mir-admin-v4 .mir-panel-card-size{font-size:16px!important;color:#2d4b32;font-weight:800}
+body.mir-admin-v4 .mir-panel-card-line{font-size:12px!important;color:#5a6e5f;overflow-wrap:anywhere}
+body.mir-admin-v4 .mir-panel-card-details{border-top:1px solid #e1e8df;padding:10px 0;margin:2px 0}
+body.mir-admin-v4 .mir-panel-card-details summary{font-size:12px;font-weight:700;cursor:pointer;min-height:34px}
+body.mir-admin-v4 .mir-panel-card-details p{font-size:12px;color:#4a604e;line-height:1.8;overflow-wrap:anywhere}
+body.mir-admin-v4 .mir-panel-card-controls{display:flex;justify-content:space-between;align-items:center;gap:13px;flex-wrap:wrap;margin-top:auto}
+body.mir-admin-v4 .mir-panel-card-controls>label{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700}
+body.mir-admin-v4 .mir-panel-card-controls input[type=number]{width:82px;min-height:45px;border:1px solid #c5d5c6;border-radius:8px;padding:8px;font-size:16px}
+body.mir-admin-v4 .mir-panel-card-check{min-height:44px;cursor:pointer}
+body.mir-admin-v4 .mir-panel-card-check input{width:21px;height:21px;min-height:21px;accent-color:#28553a}
+body.mir-admin-v4 .mir-panel-card-buttons{display:flex;gap:9px;margin-top:6px}
+body.mir-admin-v4 .mir-panel-card-buttons :is(a,button){display:inline-flex;align-items:center;justify-content:center;flex:1;min-height:45px;padding:9px;border:1px solid #b7cbb8;border-radius:8px;font-size:13px;font-weight:700;color:#26533a;text-decoration:none}
+body.mir-admin-v4 .mir-panel-card-buttons button{background:#edf5e9}
+body.mir-admin-v4 .mir-panel-empty{display:flex;flex-wrap:wrap;align-items:center;gap:15px;padding:22px;border:1px dashed #a8bba7;border-radius:10px;background:#f5f9f2}
+body.mir-admin-v4 .mir-panel-empty h3{width:100%}
+body.mir-admin-v4 .mir-panel-empty p{width:100%;font-size:13px;color:#5f705f}
+body.mir-admin-v4 .mir-panel-empty :is(a,button){padding:12px 20px;background:#e6f1df;border-radius:8px;color:#28553a;font-weight:700}
+body.mir-admin-v4 .mir-panel-dossier-footer{border-top:1px solid #e0e9df;margin-top:20px;padding-top:19px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+body.mir-admin-v4 .mir-panel-dossier-footer>p{font-size:12px;color:#68776b;max-width:600px}
+body.mir-admin-v4 #mir-procurement-panel .mir-panel-primary{background:#28553a;color:#fff;border:1px solid #28553a;border-radius:9px;font-size:15px;padding:13px 20px;min-height:51px;font-weight:800}
+body.mir-admin-v4 #mir-procurement-panel .mir-panel-primary:disabled{opacity:.5}
+body.mir-admin-v4 .mir-panel-card-error{font-size:13px;color:#995b30;padding:19px}
+@media(max-width:1150px){
+ body.mir-admin-v4 .mir-panel-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:800px){
+ body.mir-admin-v4 .mir-panel-cards{grid-template-columns:1fr}
+ body.mir-admin-v4 .mir-panel-dossier{padding:16px}
+ body.mir-admin-v4 .mir-panel-admin-hero{padding:20px}
+}
+@media(max-width:650px){
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="panels"] #mir-procurement-tabs,
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="orders"] #mir-procurement-tabs,
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="suppliers"] #mir-procurement-tabs{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  position:relative!important;top:auto!important;overflow:visible!important;gap:7px!important;padding:8px!important
+ }
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="panels"] #mir-procurement-tabs button,
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="orders"] #mir-procurement-tabs button,
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="suppliers"] #mir-procurement-tabs button{
+  flex:auto!important;min-width:0!important;min-height:48px!important;white-space:normal!important;
+  font-size:13px!important;padding:10px 8px!important;overflow-wrap:anywhere
+ }
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="panels"] #mir-procurement-tabs button[data-mir-tab="orders"],
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="orders"] #mir-procurement-tabs button[data-mir-tab="orders"]{grid-column:auto!important}
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="panels"].mir-mobile-stepper #mir-procurement-tabs{display:grid!important}
+ body.mir-admin-v4 .mir-panel-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ body.mir-admin-v4 .mir-panel-steps :is(a,button){padding:10px 7px;min-height:68px;font-size:12px}
+ body.mir-admin-v4 .mir-panel-steps small{font-size:10px}
+ body.mir-admin-v4 .mir-panel-admin-hero h2{font-size:29px!important}
+ body.mir-admin-v4 .mir-panel-dossier-head h3{font-size:20px!important}
+ body.mir-admin-v4 .mir-panel-card-drawing{min-height:160px}
+ body.mir-admin-v4 .mir-panel-dossier-footer .mir-panel-primary{width:100%}
+}
