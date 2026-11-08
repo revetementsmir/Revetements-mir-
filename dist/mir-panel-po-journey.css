@@ -42,3 +42,6 @@ body{font-size:14px}
  .settings,.inspector{padding:18px}
  .mir-panel-po-status{font-size:12px}
 }
+
+.mir-panel-table-swipe{display:none;font-weight:700;color:#315b3a;margin:5px 0 10px}
+@media(max-width:740px){.mir-panel-table-swipe{display:block}.table-wrap{overscroll-behavior-inline:contain}}
