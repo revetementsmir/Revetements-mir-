@@ -79,6 +79,7 @@ function available() {
       await page.locator('[data-preview="volume"]').click();
       assert.ok(await page.locator('#production-drawing svg').isVisible(),'Volume du même modèle');
       await page.locator('[data-preview="face"]').click();
+      await revealControl(page,'#panel-zoom-in');
       await page.locator('#panel-zoom-in').click();
       assert.match(await page.locator('#panel-zoom-value').textContent(),/120/);
       await revealControl(page,'.kind-bar [data-kind="panel"]');

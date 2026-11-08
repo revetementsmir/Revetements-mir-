@@ -88,7 +88,6 @@ async function saved(page){await page.waitForFunction(()=>document.querySelector
    // A custom wall can be sketched before size; no fabricated panel count.
    await revealControl(page,'#new-traced-section');
    await page.locator('#new-traced-section').click();
-   await page.locator('.mir-inspector-heading button').click();
    assert.equal(await page.locator('#drawing-stage').getAttribute('data-tool'),'outline');
    await tapSvg(page,240,165);await tapSvg(page,760,165);await tapSvg(page,760,515);await tapSvg(page,240,515);
    assert.equal(await page.locator('#mir-wall-live-3d-stage [data-mir-wall-twin="unmeasured"]').count(),1,'Illustrative 3D follows drawing points before real sizes');
