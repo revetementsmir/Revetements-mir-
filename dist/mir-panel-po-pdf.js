@@ -9,7 +9,7 @@
   'use strict';
   const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
   const num=value=>Number.isFinite(value)?Number(value.toFixed(2)).toLocaleString('fr-CA'):'?';
-  const txt=(x,y,value,size=21,extra='')=>'<text x="'+x+'" y="'+y+'" font-family="Arial,Helvetica,sans-serif" font-size="'+size+'" fill="#263f30" '+extra+'>'+esc(value)+'</text>';
+  const txt=(x,y,value,size=21,extra='')=>'<text x="'+x+'" y="'+y+'" font-family="Arial,Helvetica,sans-serif" font-size="'+size+'"'+(/(?:^|\s)fill\s*=/.test(extra)?'':' fill="#263f30"')+' '+extra+'>'+esc(value)+'</text>';
   const rect=(x,y,w,h,fill='#fff',stroke='#d8e3d8',radius=0)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+radius+'" fill="'+fill+'" stroke="'+stroke+'"/>';
   const line=(x,y,x2,y2,color='#dbe3d9',sw=2)=>'<path d="M '+x+' '+y+' L '+x2+' '+y2+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'"/>';
   const svg=body=>'<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1000" viewBox="0 0 1400 1000"><rect width="1400" height="1000" fill="white"/>'+body+'</svg>';
