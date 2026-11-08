@@ -1971,7 +1971,7 @@ function openPanelMeasure(key){
 function openPanelEdge(id){
  if(kind!=='panel'||authoring)return;
  const edge=build().edges.find(e=>e.id===id);if(!edge)return;
- if(activeDefaultLocks.lips)return toast('Les lèvres sont verrouillées par le modèle.');
+ if(activeDefaultLocks.lip||activeDefaultLocks.lips||activeDefaultLocks['lips.'+id])return toast('Les lèvres sont verrouillées par le modèle.');
  panelDirectEdit={edge:id,before:copy(draft)};
  dialog(edge.name,'Le lip de ce côté est indépendant des autres.',`<label>Largeur du lip<input id="mir-panel-direct-value" inputmode="text" value="${esc(fmt(unitValue(edge.lipMM,draft.unit)))}"></label>${panelDirectUnit()}<label><input id="mir-panel-direct-no-lip" type="checkbox" ${edge.lipMM===0?'checked':''}> Sans lip</label><p>Angle dans le plan : ${esc(fmt(edge.interiorAngleDeg))}° (défini par la forme)</p><label><input id="mir-panel-direct-bottom" type="checkbox" ${draft.bottomEdgeId===id?'checked':''}> Côté du bas après installation</label><label><input id="mir-panel-direct-perforation" type="checkbox" ${draft.perforation?.enabled&&draft.bottomEdgeId===id?'checked':''}> Perforation du bas</label><button type="button" class="primary-button" id="mir-panel-direct-apply">Appliquer</button>`);
  $('#mir-panel-direct-value').focus();
