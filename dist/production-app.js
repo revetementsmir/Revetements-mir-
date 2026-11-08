@@ -402,24 +402,40 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
 function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const V=window.MIRProductionVolume,mesh=V.buildMesh(model);
  if(!mesh.valid)return V.render(model,{yaw:0,pitch:0,zoom:1,illustrative,formatMeasurement:M.formatMeasurement});
- const z=small?1:zoom,tr=fitModel(model);tr.scale*=z;tr.ox=400-(mesh.bounds.minX+mesh.bounds.maxX)*tr.scale/2;tr.oy=231+(mesh.bounds.minY+mesh.bounds.maxY)*tr.scale/2;
+ const compact=!small&&matchMedia('(max-width: 600px)').matches,canvas=compact?400:800;
+ const z=small?1:zoom,tr=fitModel(model);tr.scale*=z*(compact?.34:.76);tr.ox=(compact?168:350)-(mesh.bounds.minX+mesh.bounds.maxX)*tr.scale/2;tr.oy=(compact?190:205)+(mesh.bounds.minY+mesh.bounds.maxY)*tr.scale/2;
  const map=pts=>pts.map(p=>pointOnView(p,tr).map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#b8c5ae',swatch=safeAsset(model.spec?.finish?.swatchUrl||model.finish?.swatchUrl),suffix=small?'thumb-'+esc(model.spec?.id||'panel'):'main',paint='panel-face-paint-'+suffix,clip='panel-face-clip-'+suffix;
- let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — vue cotée, lips compris" data-panel-face="true" data-zoom="${z}" font-family="Arial,sans-serif"><title>${esc(model.name)} — dimensions hors tout avec lèvres</title><defs><clipPath id="${clip}"><rect x="16" y="45" width="768" height="365"/></clipPath>${swatch?`<pattern id="${paint}" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${hex}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern>`:''}</defs><text x="400" y="30" text-anchor="middle" font-size="12" fill="#6f8064">${illustrative?'PROPORTIONS DU MODÈLE · COTES À SAISIR':'VUE DE FACE · LIPS INCLUS DANS LE HORS TOUT'}</text><g clip-path="url(#${clip})"><polygon points="${map(mesh.outer)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="1.5"/><polygon points="${map(mesh.front)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="2.2"/>`;
- (model.edges||[]).forEach((edge,i)=>{const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr);if(edge.id===model.bottomEdgeId&&!illustrative)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="5"${model.perforation?.enabled?' stroke-dasharray="10 5"':''}/>`;if(interactive&&!authoring)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="transparent" stroke-width="22" data-select-bottom="${esc(edge.id)}" tabindex="0" role="button" aria-label="Choisir ${esc(edge.name)} comme bas"/>`;});
+ let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas} 550" role="group" aria-label="${esc(model.name)} — vue cotée, lips compris" data-panel-face="true" data-zoom="${z}" font-family="Arial,sans-serif"><title>${esc(model.name)} — dimensions hors tout avec lèvres</title><defs><clipPath id="${clip}"><rect x="16" y="45" width="768" height="365"/></clipPath>${swatch?`<pattern id="${paint}" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${hex}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern>`:''}</defs><text x="${canvas/2}" y="30" text-anchor="middle" font-size="${compact?9:12}" fill="#6f8064">${illustrative?'PROPORTIONS DU MODÈLE · COTES À SAISIR':'VUE DE FACE · LIPS INCLUS DANS LE HORS TOUT'}</text><g clip-path="url(#${clip})"><polygon points="${map(mesh.outer)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="1.5"/><polygon points="${map(mesh.front)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="2.2"/>`;
+ (model.edges||[]).forEach((edge,i)=>{const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr);if(edge.id===model.bottomEdgeId&&!illustrative)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="5"${model.perforation?.enabled?' stroke-dasharray="10 5"':''}/>`;if(interactive&&!authoring)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="transparent" stroke-width="22" data-edit-panel-edge="${esc(edge.id)}" tabindex="0" role="button" aria-label="Modifier ${esc(edge.name)}"/>`;});
  svg+='</g>';
+ const labelBoxes=[];
  if(!small&&!illustrative)(model.edges||[]).forEach((edge,i)=>{
-  const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr),
-   len=Math.hypot(b[0]-a[0],b[1]-a[1]),cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2;
-  if(len<52)return;
-  const center=pointOnView([(mesh.bounds.minX+mesh.bounds.maxX)/2,(mesh.bounds.minY+mesh.bounds.maxY)/2],tr);
-  const vx=center[0]-cx,vy=center[1]-cy,dist=Math.hypot(vx,vy)||1;
-  const x=cx+vx/dist*22,y=cy+vy/dist*22;
-  const label=edge.lipMM===0?'Sans lip':'Lip '+M.formatMeasurement(edge.lipMM,model.unit);
-  svg+='<text data-panel-edge-lip="'+esc(edge.id)+'" x="'+fmt(x)+'" y="'+fmt(y)+'" font-size="12" font-weight="700" text-anchor="middle" fill="#284d30" stroke="#fafcf7" stroke-width="4" paint-order="stroke">'+esc((i+1)+' · '+label)+'</text>';
+  const points=mesh.outer.map(p=>pointOnView(p,tr)),a=points[i],b=points[(i+1)%points.length],
+   left=Math.min(...points.map(p=>p[0])),right=Math.max(...points.map(p=>p[0])),top=Math.min(...points.map(p=>p[1])),bottom=Math.max(...points.map(p=>p[1])),
+   cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2,center=[(left+right)/2,(top+bottom)/2],vx=cx-center[0],vy=cy-center[1];
+  const font=compact?16:15,w=Math.max(42,edge.name.length*font*.6+12),h=26;
+  const preferred=Math.abs(vx)>Math.abs(vy)?(vx<0?'left':'right'):(vy<0?'top':'bottom');
+  const overlap=(a,b)=>a.x<b.x+b.w+5&&a.x+a.w+5>b.x&&a.y<b.y+b.h+5&&a.y+a.h+5>b.y;
+  let box;
+  for(const side of [preferred,...['left','right','top','bottom'].filter(v=>v!==preferred)]){
+   for(let n=0;n<9;n++){
+    const shift=(n%2?1:-1)*Math.ceil(n/2)*30;
+    const q=side==='left'?{x:left-w-12,y:cy-h/2+shift,w,h}:side==='right'?{x:right+12,y:cy-h/2+shift,w,h}:side==='top'?{x:cx-w/2+shift,y:top-h-12,w,h}:{x:cx-w/2+shift,y:bottom+12,w,h};
+    const reserved={x:compact?251:558,y:compact?240:202,w:compact?144:224,h:compact?90:70};
+    if(q.x<4||q.y<45||q.x+w>canvas-4||q.y+h>(compact?315:370)||overlap(q,reserved)||labelBoxes.some(r=>overlap(q,r)))continue;
+    box=q;break;
+   }
+   if(box)break;
+  }
+  if(!box)return;
+  labelBoxes.push(box);
+  svg+=`<g data-edit-panel-edge="${esc(edge.id)}" role="button" tabindex="0" aria-label="Modifier ${esc(edge.name)}"><rect x="${box.x}" y="${box.y}" width="${w}" height="${h}" rx="5" fill="#fcfcf8"/><text data-panel-edge-lip="${esc(edge.id)}" x="${box.x+w/2}" y="${box.y+18}" font-size="${font}" font-weight="700" text-anchor="middle" fill="#284d30">${esc(edge.name)}</text></g>`;
  });
- svg+='<rect x="0" y="420" width="800" height="100" fill="#fcfcf8"/>';
- const dims=[['A','Largeur hors tout',model.widthMM],['B','Hauteur hors tout',model.heightMM],['C','Projection',model.reliefMM]];
- svg+=dims.map(([letter,label,value],i)=>`<text x="${135+i*265}" y="448" text-anchor="middle" font-size="13" fill="#6f8064">${letter} · ${label}</text><text x="${135+i*265}" y="478" text-anchor="middle" font-size="24" fill="#294734" font-weight="600">${esc(illustrative?'À saisir':M.formatMeasurement(value,model.unit))}</text>`).join('');return svg+'</svg>';
+ const corners=mesh.outer.map(p=>pointOnView(p,tr)),xs=corners.map(p=>p[0]),ys=corners.map(p=>p[1]);
+ const left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bottom=Math.max(...ys),dimY=compact?370:400,dimX=compact?323:670;
+ svg+=`<g fill="none" stroke="#6f8064" stroke-width="1.4"><path d="M${left},${bottom+8}V${dimY+10} M${right},${bottom+8}V${dimY+10} M${left},${dimY}H${right} M${right+8},${top}H${dimX+10} M${right+8},${bottom}H${dimX+10} M${dimX},${top}V${bottom}"/></g>`;
+ const dims=[['A','Largeur hors tout',model.widthMM,'width',compact?168:350,dimY+5],['B','Hauteur hors tout',model.heightMM,'height',dimX,compact?275:230],['C','Projection',model.reliefMM,'relief',compact?168:350,490]];
+ svg+=dims.map(([letter,label,value,key,x,y])=>`<g ${interactive&&!authoring?`data-edit-panel-measure="${key}" role="button" tabindex="0" aria-label="Modifier ${letter} — ${label}"`:''}><rect x="${x-(compact&&key==='height'?72:112)}" y="${y-35}" width="${compact&&key==='height'?144:224}" height="${compact?90:70}" rx="10" fill="#fcfcf8" stroke="#cad4bf"/><text x="${x}" y="${y-8}" text-anchor="middle" font-size="${compact?16:14}" fill="#52664a">${compact&&key==='height'?'B — Hauteur':letter+' — '+label}</text>${compact&&key==='height'?`<text x="${x}" y="${y+10}" text-anchor="middle" font-size="16" fill="#52664a">hors tout</text>`:''}<text x="${x}" y="${y+(compact&&key==='height'?36:21)}" text-anchor="middle" font-size="24" fill="#294734" font-weight="600">${esc(illustrative?'À saisir':M.formatMeasurement(value,model.unit))}</text></g>`).join('');return svg+'</svg>';
 }
 function profileVolumeStrips(model){
  const radius=Math.min(1.5,Math.max(.5,model.material?.thicknessMM||.65));
@@ -745,6 +761,10 @@ function updateDrawing({keepForm=false}={}){
   waiting?'<div class="drawing-hint">Choisissez une moulure pour voir son profil ici.</div>':
   view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
 
+ let directTools=$('#mir-panel-direct-tools');
+ if(!directTools){directTools=document.createElement('div');directTools.id='mir-panel-direct-tools';directTools.className='mir-panel-direct-tools';stage.after(directTools);}
+ directTools.hidden=kind!=='panel'||authoring||tool==='panel-trace';
+ directTools.innerHTML=directTools.hidden?'':['width','height','relief'].map(key=>'<button type="button" data-edit-panel-measure="'+key+'">'+({width:'A — Largeur hors tout',height:'B — Hauteur hors tout',relief:'C — Projection'}[key])+'</button>').join('');
  const twin=$('#mir-panel-live-alt');
  if(twin){
   twin.hidden=kind!=='panel';
@@ -1507,6 +1527,7 @@ function viewCursorPoint(event){
  return r.width&&r.height?[(event.clientX-r.left)*800/r.width,(event.clientY-r.top)*520/r.height]:null;
 }
 function beginPointDrag(event){
+ if(event.target.closest("[data-edit-panel-measure],[data-edit-panel-edge]"))return;
  const stage=$('#production-drawing');if(!stage.contains(event.target))return;
  if(tool==='panel-trace'&&kind==='panel'&&event.isPrimary&&(event.button===0||event.pointerType==='touch')){
   const pt=panelSketchHit(event);if(!pt)return;
@@ -1731,6 +1752,7 @@ function commitTrace(points,spec){
  updateDrawing({keepForm:true});
 }
 function drawingClick(event){
+ if(event.target.closest("[data-edit-panel-measure],[data-edit-panel-edge]"))return;
  if(suppressClick){suppressClick=false;return;}
  if(!canDrawProfile()||!drawingCanvasHit(event))return;
  const raw=localPoint(event);
@@ -1927,7 +1949,50 @@ function startProfileDrawing({fullscreen=true}={}){
  renderDimensions();
  updateDrawing();
 }
-function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom]');if(!button)return;const d=button.dataset;
+let panelDirectEdit=null;
+function panelDirectUnit(){return '<label>Unité<select id="mir-panel-direct-unit"><option value="in"'+(draft.unit==='in'?' selected':'')+'>Pouces</option><option value="mm"'+(draft.unit==='mm'?' selected':'')+'>Millimètres</option></select></label>';}
+function openPanelMeasure(key){
+ if(kind!=='panel'||authoring)return;
+ const input=$('#production-dimensions [data-measure="'+key+'"]');
+ if(input?.disabled||input?.readOnly||activeDefaultLocks[key]||draft.shape==='square'&&key!=='relief'&&(activeDefaultLocks.width||activeDefaultLocks.height))return toast('Cette cote est verrouillée par le modèle.');
+ if(key==='height'&&draft.roofPitch)return toast('La hauteur dépend de la pente X/12. Modifiez la pente ou la largeur dans le formulaire.');
+ panelDirectEdit={key,before:copy(draft)};
+ const label={width:'A — Largeur hors tout',height:'B — Hauteur hors tout',relief:'C — Projection'}[key];
+ dialog(label,draft.shape==='square'&&key!=='relief'?'Carré : cette cote ajuste ensemble A et B. Les lips sont inclus dans le hors tout.':'Les autres cotes restent conservées. Les lips sont inclus dans A et B.',`<label>Nouvelle cote<input id="mir-panel-direct-value" inputmode="text" value="${esc(draft[key]??'')}" aria-describedby="mir-panel-direct-hint"></label>${panelDirectUnit()}<p id="mir-panel-direct-hint">Exemples : 1/2, ½, 2 1/4, 2¼. C désigne la projection, pas l’épaisseur de tôle.</p><button type="button" class="primary-button" id="mir-panel-direct-apply">Appliquer</button>`);
+ $('#mir-panel-direct-value').focus();$('#mir-panel-direct-value').select();
+}
+function openPanelEdge(id){
+ if(kind!=='panel'||authoring)return;
+ const edge=build().edges.find(e=>e.id===id);if(!edge)return;
+ if(activeDefaultLocks.lips)return toast('Les lèvres sont verrouillées par le modèle.');
+ panelDirectEdit={edge:id,before:copy(draft)};
+ dialog(edge.name,'Le lip de ce côté est indépendant des autres.',`<label>Largeur du lip<input id="mir-panel-direct-value" inputmode="text" value="${esc(fmt(unitValue(edge.lipMM,draft.unit)))}"></label>${panelDirectUnit()}<label><input id="mir-panel-direct-no-lip" type="checkbox" ${edge.lipMM===0?'checked':''}> Sans lip</label><p>Angle dans le plan : ${esc(fmt(edge.interiorAngleDeg))}° (défini par la forme)</p><label><input id="mir-panel-direct-bottom" type="checkbox" ${draft.bottomEdgeId===id?'checked':''}> Côté du bas après installation</label><label><input id="mir-panel-direct-perforation" type="checkbox" ${draft.perforation?.enabled&&draft.bottomEdgeId===id?'checked':''}> Perforation du bas</label><button type="button" class="primary-button" id="mir-panel-direct-apply">Appliquer</button>`);
+ $('#mir-panel-direct-value').focus();
+}
+function applyPanelDirect(){
+ if(!panelDirectEdit)return;
+ const {key,edge,before}=panelDirectEdit,next=copy(before),raw=$('#mir-panel-direct-no-lip')?.checked?'0':$('#mir-panel-direct-value').value;
+ const parsed=M.parseMeasurement(raw,$('#mir-panel-direct-unit').value);
+ if(!parsed.ok||parsed.mm<0||key&&key!=='relief'&&parsed.mm===0)return messageError(parsed.error||'Entrez une cote positive. La mesure précédente est conservée.');
+ const value=String(parsed.unit===next.unit?parsed.value:Number(unitValue(parsed.mm,next.unit).toPrecision(15)));
+ if(key){next[key]=value;if(next.shape==='square'&&key!=='relief')next.width=next.height=value;
+ // Do not silently move the derived roof point when its width changes.
+ if(key==='width'&&next.roofPitch)return messageError('Cette largeur est liée à une pente X/12. Utilisez le formulaire de pente pour vérifier ensemble la largeur et la hauteur.');
+ }else{
+ next.lips={...next.lips,[edge]:value};
+ const bottom=$('#mir-panel-direct-bottom').checked,perforation=$('#mir-panel-direct-perforation').checked;
+ if(perforation&&!bottom)return messageError('La perforation concerne le côté du bas. Choisissez ce côté comme bas.');
+ if(bottom){next.bottomEdgeId=edge;next.perforation={...next.perforation,edgeId:edge,enabled:perforation};}
+ else if(next.bottomEdgeId===edge){next.bottomEdgeId='';next.perforation={...next.perforation,enabled:false,edgeId:''};}
+ }
+ const model=build(next),mesh=window.MIRProductionVolume.buildMesh(model);
+ if(!model.valid||!mesh.valid)return messageError(model.validation?.errors?.[0]?.message||mesh.errors?.[0]?.message||'Cette cote ne permet pas de construire les lèvres. La mesure précédente est conservée.');
+ draft=next;panelDirectEdit=null;closeDialog();renderDimensions();renderPanelOptions();updateDrawing();toast('Cote appliquée au dessin. Enregistrez la pièce pour mettre à jour le dossier.');
+}
+function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom],[data-edit-panel-measure],[data-edit-panel-edge]');if(!button)return;const d=button.dataset;
+ if(d.editPanelMeasure)return openPanelMeasure(d.editPanelMeasure);
+ if(d.editPanelEdge)return openPanelEdge(d.editPanelEdge);
+ if(button.id==='mir-panel-direct-apply')return applyPanelDirect();
  if(d.panelSketchStart!==undefined||button.id==='mir-draw-single-panel'){startPanelSketch();return;}
  if(d.panelSketchUndo!==undefined){panelSketchPoints.pop();panelSketchHover=null;updateDrawing();return;}
  if(d.panelSketchCancel!==undefined){cancelPanelSketch();return;}
@@ -2273,7 +2338,7 @@ function handleSubmit(event){
  if(nextPOAction==='existing')existingPOChoice();
  if(nextPOAction==='new')createNewPOFromCurrent();
 }
-function handleKey(event){if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
+function handleKey(event){const direct=event.target.closest('[data-edit-panel-measure],[data-edit-panel-edge]');if(direct&&['Enter',' '].includes(event.key)){event.preventDefault();direct.dispatchEvent(new MouseEvent('click',{bubbles:true}));return;}if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
 async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Error('Le moteur de modèles n’est pas disponible.');if(!window.MIRBendingLengths?.check)throw new Error('Les longueurs de vente MIR sont indisponibles.');const fetched=await Promise.allSettled([fetch('catalogue-fd6866b49d21.json').then(r=>{if(!r.ok)throw new Error('catalogue');return r.json();}),fetch('ral-classic.json').then(r=>{if(!r.ok)throw new Error('nuancier RAL');return r.json();})]);if(fetched[0].status==='fulfilled'){const raw=fetched[0].value;const catalogue=Array.isArray(raw)?raw:raw.materials||[];materials=window.MIRBendingFinishes.catalogue(catalogue);}if(fetched[1].status==='fulfilled'&&Array.isArray(fetched[1].value.colors))ral=fetched[1].value;
  const unico=window.MIRUnico;if(unico)for(const palette of unico.palettes){const usable=palette.colors.filter(c=>!c.publishedGauges||c.publishedGauges.some(g=>[18,20,22].includes(g)));if(!usable.length)continue;materials.push({id:'unico-palette-'+palette.id,brand:'Unico',name:'U-P1 · '+palette.label,architecturalPanel:true,metalType:palette.materialId,family:palette.materialId,allowedGauges:palette.id==='signature'?[22]:null,sourceUrl:palette.sourceUrl,colors:usable.map(c=>({...c,availabilityNote:c.uP1Compatibility.note+' Écran indicatif.'}))});}materialId=materials[0]?.id||'';
  reloadLocalTemplates();const savedRequests=read(KEYS.requests,{version:1,requests:[]});requests=Array.isArray(savedRequests.requests)?savedRequests.requests.filter(request=>request?.id&&Array.isArray(request.items)&&request.items.every(item=>item.spec&&item.snapshot?.schema==='mir-production-instance-1')):[];
@@ -2309,7 +2374,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  }
  offerProfileImport();
  if(!client&&params.get('shared-request'))openRequest(params.get('shared-request'));
- window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:freeformCanUndo(),canRedo:freeformRedo.length>0};},setOrderItemQuantity,openContinueMenu,editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
+ window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:freeformCanUndo(),canRedo:freeformRedo.length>0};},setOrderItemQuantity,openContinueMenu,openOrderPanelEditor(id,key,edge){if(client||!order.items.some(row=>row.id===id&&row.kind==='panel'))return false;editPiece(id);if(edge)openPanelEdge(edge);else openPanelMeasure(key);return true;},editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
  window.dispatchEvent(new Event('mir-production-ready'));
 }
 boot().catch(error=>{console.error('MIR production',error);$('#production-drawing').innerHTML=`<div class="drawing-hint"><strong>Le configurateur n’a pas pu démarrer.</strong><p>${esc(error.message)}</p><button type="button" class="secondary-button" onclick="location.reload()">Réessayer</button></div>`;$('#add-production-piece').disabled=true;});

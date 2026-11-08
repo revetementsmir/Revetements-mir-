@@ -1,0 +1,46 @@
+name: MIR Harmony — cotes directes et navigation
+on:
+  pull_request:
+    paths:
+      - 'dist/**'
+      - 'tests/mir-harmony-*.cjs'
+      - '.github/workflows/mir-harmony-direct-pr.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Moteurs et PDF conservés
+        run: |
+          node --check dist/production-app.js
+          node --check dist/mir-harmony.js
+          node --check dist/mir-panel-workbench.js
+          node --check dist/mir-procurement.js
+          node tests/mir-panel-workbench.cjs
+          node tests/mir-panel-one-sheet.cjs
+          node tests/mir-panel-roof-lips.cjs
+          node tests/mir-panel-dimensions.cjs
+          node tests/mir-procurement.cjs
+          node tests/mir-po-workflow.cjs
+          node tests/mir-retours-cotes.cjs
+      - name: Installer Playwright
+        run: npm install --no-save playwright@1.62.1
+      - name: Chrome — huit formats, révisions et triangle
+        run: |
+          export CHROMIUM_PATH=$(command -v google-chrome || command -v chromium)
+          python3 -m http.server 8870 --bind 127.0.0.1 --directory dist > /tmp/mir-harmony-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          node tests/mir-harmony-direct-browser.cjs
+          node tests/mir-harmony-revisions-browser.cjs
+      - name: Captures, séquence et résultats
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIR-Harmony-cotes-navigation
+          path: artifacts/harmony/
+          if-no-files-found: warn
