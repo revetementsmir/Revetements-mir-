@@ -1,3 +1,4 @@
+const {revealControl}=require('./mir-draw-freeform-helper.cjs');
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -16,17 +17,17 @@ async function set(page,sel,val){await page.locator(sel).fill(val);await page.lo
    const page=await browser.newPage({viewport:{width:w,height:h}});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'/calepinage.html',{waitUntil:'domcontentloaded'});
-   await page.locator('#new-traced-section').waitFor({state:'visible'});
+   await page.waitForFunction(()=>window.MirWorkspace?.active);
+   await revealControl(page,'#zone-width');
    await set(page,'#zone-width','120');await set(page,'#zone-height','96');
-   if(w<=740)await page.locator('[data-mir-cal-stage="panels"]').click();
    await set(page,'#lip','1');
    await set(page,'#columns','4');await set(page,'#rows','2');
    await page.waitForFunction(()=>document.querySelector('#mir-wall-live-3d')?.dataset.geometryStatus==='measured');
    assert.equal(await page.locator('#mir-wall-live-3d').getAttribute('data-synced-pieces'),'8');
    assert.equal(await page.locator('#mir-wall-live-3d-stage [data-mir-wall-twin="3d"]').count(),1);
-   if(w<=740){await page.locator('[data-mir-cal-stage="order"]').click();await page.locator('.mir-cal-mobile-full-table summary').click();}
+   await revealControl(page,'#piece-table');
    await page.locator('#piece-table [data-table-piece]').first().click();
-   if(w<=740){await page.locator('[data-mir-cal-stage="panels"]').click();await page.locator('.mir-cal-mobile-panel-inspector > summary').click();}
+   await revealControl(page,'#piece-width');
    await page.locator('#mir-panel-dimension-unit').selectOption('mm');
    const widthValue=Number(await page.locator('#piece-width').inputValue());
    const heightValue=Number(await page.locator('#piece-height').inputValue());
@@ -39,10 +40,12 @@ async function set(page,sel,val){await page.locator(sel).fill(val);await page.lo
    assert.equal(await page.locator('#piece-height-lock').isChecked(),true);
    assert.equal(await page.locator('#mir-wall-live-3d').getAttribute('data-synced-pieces'),'8');
    assert.ok((await page.locator('#piece-table').innerText()).includes('mm'));
+   await page.locator('.mir-inspector-heading button').click();
    await page.locator('#view-3d').click();
    assert.equal(await page.locator('#mir-wall-live-3d-stage [data-mir-wall-twin="2d"]').count(),1);
    await page.locator('#view-zone').click();
    const before=await page.locator('#piece-width').inputValue();
+   await revealControl(page,'#piece-width');
    await set(page,'#piece-width','900000');
    await page.locator('#apply-panel-dimensions').click();
    assert.equal(await page.locator('#mir-panel-dimension-error').isVisible(),true,'impossible width rejected');

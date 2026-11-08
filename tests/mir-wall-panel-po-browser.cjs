@@ -1,3 +1,4 @@
+const {revealControl}=require('./mir-draw-freeform-helper.cjs');
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -26,25 +27,27 @@ async function ready(){
    page.on('pageerror',e=>errors.push(e.message));
    page.on('dialog',d=>d.accept());
    await page.goto(base+'/calepinage.html',{waitUntil:'domcontentloaded'});
-   if(screen.width<=740){await page.locator('#mir-cal-mobile-example').waitFor({state:'visible'});await page.locator('#mir-cal-mobile-example').click();}
-   else await page.locator('#load-example').click();
+   await page.waitForFunction(()=>window.MirWorkspace?.active);
+   await revealControl(page,'#load-example');
+   await page.locator('#load-example').click();
    await page.waitForFunction(()=>document.querySelector('#piece-count')?.textContent?.includes('8 panneaux'));
-   if(screen.width<=740)await page.locator('[data-mir-cal-stage="panels"]').click();
+
    await page.locator('#columns').fill('5');await page.locator('#columns').press('Tab');
    assert.match(await page.locator('#piece-count').textContent(),/10 panneaux/);
    assert.equal(await page.locator('#mir-wall-live-3d').getAttribute('data-synced-pieces'),'10');
-   if(screen.width<=740)await page.locator('[data-mir-cal-stage="order"]').click();
+   await revealControl(page,'#project-name');
    await page.locator('#project-name').fill('Chantier 10 panneaux');
    await page.locator('#project-name').press('Tab');
    await page.locator('#po-number').fill('MIR-BC-10');
    await page.locator('#po-number').press('Tab');
-   await page.locator(screen.width<=740?'#mir-cal-mobile-confirm':'#dimensions-confirmed').check();
+   await revealControl(page,'#dimensions-confirmed');
+   await page.locator('#dimensions-confirmed').check();
    assert.equal(await page.locator('#send-production').isEnabled(),true);
    assert.match(await page.locator('#send-production').textContent(),/10 panneaux/);
    await page.screenshot({path:path.join(artifacts,'mir-mur-10-avant-bon-'+screen.name+'.png'),fullPage:true});
    await Promise.all([
     page.waitForURL(u=>u.pathname.endsWith('/production.html')&&u.searchParams.get('destination')==='bon',{timeout:25000}),
-    page.locator(screen.width<=740?'#mir-cal-mobile-next':'#send-production').click()
+    page.locator('#send-production').click()
    ]);
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace&&!!window.MIRProcurementUI);
    assert.equal(await page.locator('#create-panel-po').isVisible(),true,'Le mur entier propose un bon fournisseur');

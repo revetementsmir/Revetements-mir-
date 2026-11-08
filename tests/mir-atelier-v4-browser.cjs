@@ -1,5 +1,5 @@
 'use strict';
-const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
+const {drawTwoSides,revealControl}=require('./mir-draw-freeform-helper.cjs');
 /* Vérification réelle Chromium de l'atelier admin (captures PC/tablette/mobile). */
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
@@ -39,19 +39,11 @@ function available() {
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'À préciser');
       assert.equal(await page.locator('#production-templates [data-template]').count(),0,'aucun profil imposé');
       await drawTwoSides(page);
-      const phone=viewport.width<=650||viewport.width<=950&&viewport.height<=520;
-      // Sur téléphone, Suivant termine le tracé via le vrai moteur : pas de second bouton caché.
-      if(!phone)await page.locator('[data-freeform-finish]').click();
-      if(phone){
-        assert.equal(await page.locator('body.mir-mobile-stepper').count(),1,viewport.name+': atelier téléphone à 4 étapes actif');
-        assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'1');
-        const trace=await page.evaluate(()=>({scroll:document.documentElement.scrollHeight,window:innerHeight,stage:document.querySelector('#production-drawing').getBoundingClientRect().height}));
-        assert.ok(trace.scroll<=trace.window+4,viewport.name+': tracé sans défilement global '+JSON.stringify(trace));
-        assert.ok(trace.stage>120,viewport.name+': surface de tracé accessible '+JSON.stringify(trace));
-        await page.locator('#mir-freeform-toolbar [data-freeform-next]').click();
-        assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'2');
-      }
-      await page.locator('[data-segment-length="0"]').fill('3');
+      const phone=viewport.width<960;
+      await page.locator('.mir-workspace-tools [data-freeform-finish]').click();
+      await revealControl(page,'[data-segment-length="0"]');
+      await revealControl(page,'[data-segment-length="0"]');
+    await page.locator('[data-segment-length="0"]').fill('3');
       await page.locator('[data-segment-length="1"]').fill('2');
       assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'5 po');
       // Vrai angle intérieur aux sommets A–B : une rotation 30° signifie 150° entre côtés.
@@ -64,6 +56,7 @@ function available() {
         viewport.name+' : angle directement localisé au sommet du dessin');
       await angleInput.fill(originalAngle);
       // Les deux boutons doivent afficher des profils graphiquement différents, pas une même icône.
+      await revealControl(page,'[data-face-select="right"]');
       const variants=await page.locator('.mir-face-choice-image svg').evaluateAll(nodes=>nodes.map(node=>node.outerHTML));
       assert.equal(variants.length,2,'deux aperçus réels de la face peinte');
       assert.notEqual(variants[0],variants[1],'les deux faces affichent des résultats opposés');
@@ -77,44 +70,23 @@ function available() {
         return {scrollWidth:document.documentElement.scrollWidth,viewport:window.innerWidth,scrollHeight:document.documentElement.scrollHeight,screenHeight:window.innerHeight,drawing:box('.drawing-card'),config:box('.config-card')};
       });
       assert.ok(layout.scrollWidth<=layout.viewport+2,viewport.name+' horizontal overflow: '+JSON.stringify(layout));
-      if(!phone&&viewport.width>=768){
-        assert.ok(layout.config.left>=layout.drawing.right-5,'Tablet/PC two panes: '+JSON.stringify(layout));
-        assert.ok(layout.scrollHeight<=layout.screenHeight+4,'Tablet/PC no global vertical scroll: '+JSON.stringify(layout));
-      }else assert.ok(layout.config.top>=layout.drawing.bottom-10,'Phone stack: '+JSON.stringify(layout));
+      assert.ok(layout.scrollHeight<=layout.screenHeight+1,'Atelier sans défilement global');
+      if(!phone&&viewport.width>viewport.height)assert.ok(layout.config.left>=layout.drawing.right-5,'Inspecteur à droite');
       assert.ok(await page.locator('.config-card').isVisible());
-      // Contrats PC / iPad et parcours tactile en quatre étapes avec le même dessin.
-      if(phone){
-        assert.ok(await page.locator('#mir-angle-summary p').count()>=1,viewport.name+': angles entre les côtés');
-        assert.ok(await page.locator('.mir-angle-annotation').count()>=1,viewport.name+': angles aussi sur le dessin');
-        await page.locator('#mir-freeform-toolbar [data-freeform-next]').click();
-        assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'3');
-        assert.equal(await page.locator('.mir-face-choice').count(),2,viewport.name+': deux images de face peinte');
-        await page.locator('[data-face-select="right"]').click();
-        assert.equal(await page.locator('[data-face-select="right"]').getAttribute('aria-pressed'),'true');
-        assert.equal(await page.locator('#profile-painted-side').inputValue(),'right');
-        await page.locator('#mir-freeform-toolbar [data-freeform-next]').click();
-        assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'4');
-        assert.ok(await page.locator('#mir-freeform-3d-canvas').isVisible(),viewport.name+': vue 3D confirmée');
-        await page.locator('#mir-freeform-toolbar [data-freeform-undo]').click();
-        assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'3','Précédent ne détruit pas le dessin');
-        assert.equal(await page.locator('[data-face-select="right"]').getAttribute('aria-pressed'),'true','Face peinte conservée');
-      }else{
-        await page.locator('#mir-v4-dimensions').evaluate(node=>{node.open=false;});
-        const focusCotes=page.locator('#drawing-tools [data-focus-dimensions]');
-        assert.equal(await focusCotes.isVisible(),true,viewport.name+' : action Cotes et angles visible sans ouvrir Autres actions');
-        await focusCotes.click();
-        assert.equal(await page.locator('#mir-v4-dimensions').evaluate(node=>node.open),true,viewport.name+' : dimensions ouvertes');
-        assert.equal(await page.evaluate(()=>document.activeElement?.closest('#mir-v4-dimensions')?.id||''),'mir-v4-dimensions',viewport.name+' : focus sur une vraie cote');
-        assert.equal(await page.locator('#production-dimensions input').first().isVisible(),true,viewport.name+' : champ de mesure visible');
-        assert.equal(await page.locator('.mir-face-choice').count(),2,viewport.name+': deux aperçus de la face colorée');
-        await page.locator('#panel-zoom-in').click();
-        assert.ok((await page.locator('#panel-zoom-value').textContent()).includes('120'));
-        await page.locator('.kind-bar [data-kind="panel"]').click();
-        assert.equal(await page.locator('#production-title').textContent(),'Panneaux architecturaux');
-        assert.equal(await page.locator('#mir-v4-sheet-total').isVisible(),false);
-        await page.locator('.kind-bar [data-kind="profile"]').click();
-        assert.equal(await page.locator('#production-title').textContent(),'Créer une moulure');
-      }
+      await page.locator('[data-face-select="right"]').click();
+      assert.equal(await page.locator('#profile-painted-side').inputValue(),'right');
+      await page.locator('.mir-inspector-heading button').click();
+      await page.locator('[data-preview="volume"]').click();
+      assert.ok(await page.locator('#production-drawing svg').isVisible(),'Volume du même modèle');
+      await page.locator('[data-preview="face"]').click();
+      await page.locator('#panel-zoom-in').click();
+      assert.match(await page.locator('#panel-zoom-value').textContent(),/120/);
+      await revealControl(page,'.kind-bar [data-kind="panel"]');
+      await page.locator('.kind-bar [data-kind="panel"]').click();
+      assert.equal(await page.locator('#production-title').textContent(),'Panneaux architecturaux');
+      await page.locator('.kind-bar [data-kind="profile"]').click();
+      assert.equal(await page.locator('#production-title').textContent(),'Créer une moulure');
+      await page.locator('.mir-inspector-heading button').click();
       await page.screenshot({path:path.join(__dirname,'../artifacts/atelier-v4-'+viewport.name+'.png'),fullPage:true});
       assert.equal(await page.locator('[data-measure="length"]').inputValue(),'120');
       assert.equal(await page.locator('[data-measure="length"]').evaluate(input=>input.readOnly),true);
@@ -126,13 +98,15 @@ function available() {
     await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
     await drawTwoSides(page);
-    await page.locator('[data-freeform-finish]').click();
+    await page.locator('.mir-workspace-tools [data-freeform-finish]').click();
+    await revealControl(page,'[data-segment-length="0"]');
     await page.locator('[data-segment-length="0"]').fill('3');
     await page.locator('[data-segment-length="1"]').fill('2');
     await page.locator('#production-unit').selectOption('mm');
     assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'127 mm','Somme en mm');
     await page.locator('#production-unit').selectOption('in');
     assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'5 po','Retour en pouces');
+    await revealControl(page,'#add-production-piece');
     await page.locator('#add-production-piece').click();
     assert.equal((await page.locator('#order-head-count').textContent()).trim(),'01','Saving must not require PO');
     await page.locator('.mir-harmony-dossier').click();
@@ -173,6 +147,7 @@ function available() {
     assert.equal(await legacy.locator('[data-measure="length"]').inputValue(),'96','Longueur historique intacte');
     assert.equal(await legacy.locator('[data-measure="length"]').evaluate(node=>node.readOnly),true);
     assert.match(await legacy.locator('.mir-profile-stock-note').first().textContent(),/historique/i);
+    await revealControl(legacy,'#add-production-piece');
     await legacy.locator('#add-production-piece').click();
     const saved=await legacy.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')).order.items);
     assert.equal(saved.length,1,'La révision ne duplique pas la pièce');

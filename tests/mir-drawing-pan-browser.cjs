@@ -35,6 +35,7 @@ async function ready(){
    const beforeScroll=await page.evaluate(()=>scrollY);
    const count=await page.locator('#mir-v4-sheet-value').textContent();
    const dimensions=await page.locator('#production-dimensions input[data-segment-length]').evaluateAll(inputs=>inputs.map(e=>e.value));
+   if(await page.locator('#mir-workspace').count())await page.locator('.mir-inspector-heading button').click();
    const area=await page.locator('#production-drawing').boundingBox();
    const start={x:area.x+area.width*.23,y:area.y+area.height*.45};
    if(s.width<600){

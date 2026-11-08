@@ -21,7 +21,7 @@ async function saved(page){
   order:JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')||'{"order":{"items":[]}}').order
  }));
 }
-async function menu(page){await drawTwoSides(page);await page.locator('[data-freeform-next]').click();await page.locator('#mir-continue-save').waitFor();}
+async function menu(page){await drawTwoSides(page);await page.locator('.mir-action-bar .mir-workspace-primary').click();await page.locator('#mir-continue-save').waitFor();}
 async function storeModel(page,name){
  await page.locator('#save-production-template').waitFor({state:'visible'});
  await page.locator('#save-production-template input[name="name"]').fill(name);
