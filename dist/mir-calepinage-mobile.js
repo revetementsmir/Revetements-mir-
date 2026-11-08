@@ -50,6 +50,7 @@
   }
  }
  function build(){
+  if(!mobile())return;
   const main=$('#main'),settings=$('.settings'),bar=$('.project-bar');
   if(!main||!settings||!bar||$('#mir-cal-mobile-nav'))return;
   const boundary=$('#panneaux-setup');
@@ -138,4 +139,5 @@
   stepTo('wall');
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build,{once:true});else build();
+ window.matchMedia('(max-width:740px)').addEventListener('change',event=>{if(event.matches)build();});
 })();
