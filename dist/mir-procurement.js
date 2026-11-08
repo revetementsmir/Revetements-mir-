@@ -117,23 +117,32 @@
     return 'mailto:'+encodeURIComponent(po.supplier.email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
   }
   function printHTML(po,modelAPI) {
+    const hasPanels=po.items.some(i=>i?.spec?.kind==='panel'),title=hasPanels?'BON DE COMMANDE — PANNEAUX ET PLIAGES':'BON DE COMMANDE DE PLIAGE';
     const rows=po.items.map((i,n)=>{
-      let m,svg='',measure='',face='';
-      try {
-        m=modelAPI.buildProfile(i.spec);
-        svg=modelAPI.profileSVG(i.spec,{width:620,height:260,legend:false,notes:false,header:false});
-        measure=m.segments.map(s=>esc(s.label)+' = '+esc(modelAPI.formatMeasurement(s.lengthMM,m.unit))).join(' · ');
-        face=m.finishedSegmentSumMM!=null?modelAPI.formatMeasurement(m.finishedSegmentSumMM,'in'):'À confirmer';
+      const spec=i.spec||{},panel=spec.kind==='panel';
+      let m,svg='',measure='',face='',size='';
+      try{
+        m=panel?modelAPI.buildPanel(spec):modelAPI.buildProfile(spec);
+        if(!m.valid)throw Error('Géométrie à corriger');
+        svg=panel?modelAPI.panelSVG(spec,{width:620,height:260,legend:false,notes:false,header:false}):modelAPI.profileSVG(spec,{width:620,height:260,legend:false,notes:false,header:false});
+        if(panel){
+          size=modelAPI.formatMeasurement(m.widthMM,m.unit)+' × '+modelAPI.formatMeasurement(m.heightMM,m.unit);
+          measure=m.edges.map(e=>e.name+' '+modelAPI.formatMeasurement(e.lengthMM,m.unit)+' / lip '+modelAPI.formatMeasurement(e.lipMM,m.unit)+' / angle '+Math.round(e.interiorAngleDeg*100)/100+'°').join(' · ');
+        }else{
+          measure=m.segments.map(s=>s.label+' = '+modelAPI.formatMeasurement(s.lengthMM,m.unit)).join(' · ');
+          face=m.finishedSegmentSumMM!=null?modelAPI.formatMeasurement(m.finishedSegmentSumMM,'in'):'À confirmer';
+        }
       }catch{svg='<p>Géométrie indisponible — ne pas mettre en fabrication.</p>';}
-      const mat=safe(i.spec?.material?.type,40),color=safe(i.spec?.finish?.name||i.spec?.finish?.code,100);
-      return '<section class="piece"><h3>'+esc(i.id||'P'+(n+1))+' — '+esc(i.spec?.name||'Moulure')+'</h3><div class="draw">'+svg+'</div><p>'+measure+'</p>'
-       +'<p><b>Somme des côtés :</b> '+esc(face)+' (avant corrections de pliage, pas un développé de fabrication)</p>'
-       +'<p><b>Matériau :</b> '+esc(mat)+' · <b>Couleur :</b> '+esc(color)+' · <b>Calibre :</b> '+esc(i.spec?.material?.gauge||'À confirmer')+'</p>'
-       +'<p><b>Longueur finie :</b> '+esc(i.spec?.length||'À confirmer')+' po · <b>Quantité :</b> '+esc(i.spec?.quantity||1)+'</p></section>';
+      const mat=safe(spec.material?.type,40),color=safe(spec.finish?.name||spec.finish?.code,100);
+      return '<section class="piece"><h3>'+esc(i.id||'P'+(n+1))+' — '+esc(spec.name||(panel?'Panneau':'Moulure'))+'</h3><div class="draw">'+svg+'</div>'
+       +(panel?'<p><b>Dimensions hors tout :</b> '+esc(size)+' · <b>Projection C :</b> '+esc(spec.relief||'À confirmer')+'</p><p><b>Chaque côté, lip et angle :</b> '+esc(measure)+'</p>':'<p>'+esc(measure)+'</p><p><b>Somme des côtés :</b> '+esc(face)+' (avant corrections de pliage, pas un développé de fabrication)</p>')
+       +'<p><b>Matériau :</b> '+esc(mat)+' · <b>Couleur :</b> '+esc(color)+' · <b>Calibre :</b> '+esc(spec.material?.gauge||'À confirmer')+'</p>'
+       +(panel?'<p><b>Perforation :</b> '+esc(spec.perforation?.enabled===true?'Oui':spec.perforation?.enabled===false?'Non':'À confirmer')+'</p>':'<p><b>Longueur finie :</b> '+esc(spec.length||'À confirmer')+' po</p>')
+       +'<p><b>Quantité :</b> '+esc(spec.quantity||1)+'</p></section>';
     }).join('');
-    return '<!doctype html><html lang="fr-CA"><head><meta charset="utf-8"><title>Bon de pliage MIR '+esc(po.poNumber)+'</title>'
+    return '<!doctype html><html lang="fr-CA"><head><meta charset="utf-8"><title>Bon MIR '+esc(po.poNumber)+'</title>'
       +'<style>body{font:14px/1.5 Arial,sans-serif;color:#263a2b;margin:24px;max-width:1000px}header{border-bottom:3px solid #28553a;padding-bottom:16px;margin-bottom:16px}h1{font-size:27px}.meta{display:grid;grid-template-columns:1fr 1fr;gap:12px}.piece{page-break-inside:avoid;border-top:1px solid #d5ddce;margin-top:20px}.draw svg{max-width:100%;max-height:220px}p{margin:6px 0}small{color:#5d6a60}@media print{body{margin:12mm}.piece{break-inside:avoid}}</style></head><body>'
-      +'<header><strong>LES REVÊTEMENTS MIR</strong><h1>BON DE COMMANDE DE PLIAGE — '+esc(po.poNumber)+'</h1><p>Révision '+po.revision+' · Statut '+esc(po.status)+'</p></header>'
+      +'<header><strong>LES REVÊTEMENTS MIR</strong><h1>'+esc(title)+' — '+esc(po.poNumber)+'</h1><p>Révision '+po.revision+' · Statut '+esc(po.status)+'</p></header>'
       +'<div class="meta"><p><b>Fournisseur</b><br>'+esc(po.supplier.name)+'<br>'+esc(po.supplier.email)+'<br>'+esc(po.supplier.phone)+'</p>'
       +'<p><b>Chantier</b><br>'+esc(po.job)+'<br>Responsable : '+esc(po.foreman||'À préciser')+'</p>'
       +'<p><b>Livraison</b><br>'+esc(po.shipTo)+'<br>Souhaitée : '+esc(po.requestedDate||'À confirmer')+'</p>'
