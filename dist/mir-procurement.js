@@ -292,7 +292,7 @@
           '<details class="mir-panel-card-details"><summary>Voir lips, angles et options</summary><p>'+esc(notes.replace('<MIROPTIONS>',' • Options à préciser : '))+'</p></details>'+
           '<div class="mir-panel-card-controls"><label>Qté<input type="number" min="1" step="1" value="'+qty+'" data-mir-panel-qty="'+esc(id)+'" aria-label="Quantité panneau '+esc(label)+'"></label>'+
           '<label class="mir-panel-card-check"><input type="checkbox" data-mir-panel-include="'+esc(id)+'"'+(selected?' checked':'')+'><span>Inclure au bon</span></label></div>'+
-          '<div class="mir-panel-card-buttons"><button type="button" data-mir-panel-edit="'+esc(id)+'">Modifier</button>'+ 
+          '<div class="mir-panel-card-buttons"><button type="button" data-mir-panel-edit="'+esc(id)+'">Modifier</button>'+
           '<button type="button" data-mir-panel-duplicate="'+esc(id)+'">Dupliquer</button>'+
           '<a href="calepinage.html'+(item.sourceLayout?.zoneId?'#'+encodeURIComponent(item.sourceLayout.zoneId):'')+'">Voir le mur</a></div></article>';
       }).join('');
@@ -318,9 +318,10 @@
         '<h2>Préparer le bon de commande</h2>'+
         '<p>'+count+' panneau(x) à commander. Confirme les coordonnées, puis enregistre le brouillon.</p>'+
         '<nav class="mir-wb-progress" aria-label="Parcours de commande">'+
-        '<span class="mir-wb-step"><strong>1</strong>Dessiner</span>'+
-        '<span class="mir-wb-step"><strong>2</strong>Vérifier</span>'+
-        '<span class="mir-wb-step is-current" aria-current="step"><strong>3</strong>Commander</span></nav></div>'+
+        '<span class="mir-wb-step"><strong>1</strong>Choisir</span>'+
+        '<span class="mir-wb-step"><strong>2</strong>Dessiner et mesurer</span>'+
+        '<span class="mir-wb-step"><strong>3</strong>Vérifier</span>'+
+        '<span class="mir-wb-step is-current" aria-current="step"><strong>4</strong>Commander</span></nav></div>'+
         '<section class="mir-wb-order-section"><h3>1. Quel fournisseur ?</h3>'+
         '<p>Vérifie le nom du fournisseur avant de préparer le PDF.</p>'+
         '<label class="mir-proc-field"><span>Fournisseur</span><select data-mir-po="supplierId" required><option value="">Choisir un fournisseur…</option>'+
@@ -614,8 +615,10 @@
     }
     tabs.addEventListener('click',function(e){const b=e.target.closest('[data-mir-tab]');if(b)switchTab(b.dataset.mirTab);});
     shortcuts.addEventListener('click',function(e){const b=e.target.closest('[data-mir-tab]');if(b)switchTab(b.dataset.mirTab);});
+    panel.addEventListener('keydown',function(e){if(e.target.matches('[data-mir-wb-direct]')&&['Enter',' '].includes(e.key)){e.preventDefault();e.target.dispatchEvent(new win.MouseEvent('click',{bubbles:true}));}});
     panel.addEventListener('click',function(e){
-      const b=e.target.closest('button');if(!b)return;
+      const b=e.target.closest('button,[data-mir-wb-direct]');if(!b)return;
+      if(b.dataset.mirWbDirect){switchTab('draw');win.MIRProductionWorkspace?.openOrderPanelEditor?.(b.dataset.mirWbDirect,b.dataset.mirWbMeasure,b.dataset.mirWbEdge);return;}
       if(b.dataset.mirTab){switchTab(b.dataset.mirTab);return;}
       if(b.dataset.mirPoView){poView=b.dataset.mirPoView;switchTab('orders');return;}
       if(b.dataset.mirEdit){editSupplier(b.dataset.mirEdit);return;}

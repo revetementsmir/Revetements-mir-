@@ -1,0 +1,26 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const {chromium}=require('playwright');
+const base=process.env.MIR_TEST_BASE||'http://127.0.0.1:8870';
+(async()=>{const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox']});fs.mkdirSync('artifacts/harmony',{recursive:true});
+try{for(const [w,h] of [[360,800],[390,844],[428,926],[768,1024],[1024,768],[1440,900],[1920,1080],[844,390]]){
+console.log('START',w,h);const page=await browser.newPage({viewport:{width:w,height:h},hasTouch:w<1100});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto(base+'/production.html?mode=client');await page.locator('[data-template="rectangle"]').click();
+for(const [key,value]of Object.entries({width:'48',height:'36',relief:'2'})){await page.locator('[data-measure="'+key+'"]').fill(value);await page.locator('[data-measure="'+key+'"]').press('Tab');}
+await page.locator('#panel-lip').fill('1');await page.locator('#panel-lip').press('Tab');
+for(const [key,value,expected]of [['width','50½','50.5'],['height','38 1/4','38.25'],['relief','2¼','2.25']]){
+ console.log('EDIT',key);await page.locator('#production-drawing [data-edit-panel-measure="'+key+'"]').click();await page.locator('#mir-panel-direct-value').fill(value);await page.locator('#mir-panel-direct-apply').click();assert.equal(await page.locator('[data-measure="'+key+'"]').inputValue(),expected);
+}
+const volume=await page.locator('#mir-panel-live-alt').innerHTML();
+await page.locator('#production-drawing [data-edit-panel-measure="width"]').click();await page.locator('#mir-panel-direct-value').fill('0');await page.locator('#mir-panel-direct-apply').click();assert.equal(await page.locator('#production-dialog').evaluate(e=>e.open),true);assert.equal(await page.locator('[data-measure="width"]').inputValue(),'50.5');await page.keyboard.press('Escape');
+await page.locator('#production-drawing g[data-edit-panel-edge="bottom"]').first().click();await page.locator('#mir-panel-direct-value').fill('2¼');await page.locator('#mir-panel-direct-apply').click();assert.equal(await page.locator('[data-panel-lip="bottom"]').inputValue(),'2.25');assert.notEqual(await page.locator('#mir-panel-live-alt').innerHTML(),volume);
+await page.locator('#production-drawing g[data-edit-panel-edge="top"]').first().click();await page.locator('#mir-panel-direct-no-lip').check();await page.locator('#mir-panel-direct-apply').click();assert.equal(await page.locator('[data-panel-lip="top"]').inputValue(),'0');assert.equal(await page.locator('[data-panel-lip="bottom"]').inputValue(),'2.25');
+const layout=await page.locator('#production-drawing svg').evaluate(svg=>{const rect=e=>e.getBoundingClientRect().toJSON(),poly=rect(svg.querySelector('polygon')),labels=[...svg.querySelectorAll('g[data-edit-panel-edge]')].map(rect),dims=[...svg.querySelectorAll('[data-edit-panel-measure]')].map(rect),overlap=(a,b)=>a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y;return {count:labels.length,dimensionCollision:dims.some(d=>overlap(d,poly)),collision:labels.some((a,i)=>overlap(a,poly)||dims.some(d=>overlap(a,d))||labels.slice(i+1).some(b=>overlap(a,b)))};});assert.equal(layout.count,4);assert.equal(layout.dimensionCollision,false,'cotes outside geometry');assert.equal(layout.collision,false,'labels outside contours and cotes');
+await page.locator('#production-drawing').scrollIntoViewIfNeeded();await page.screenshot({path:'artifacts/harmony/after-panel-'+w+'x'+h+'.png'});
+assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no overflow '+w);
+await page.locator('.mir-harmony-toggle').click();assert.equal(await page.locator('#mir-harmony-menu [data-admin-only]:visible').count(),0);await page.keyboard.press('Escape');assert.equal(await page.locator('.mir-harmony-toggle').getAttribute('aria-expanded'),'false');assert.deepEqual(errors,[]);
+console.log('PASS direct A/B/C, fractions, rejection, independent lips, 2D/3D, client navigation '+w+'x'+h);await page.close();
+}
+for(const url of ['production.html','production.html?view=panels','production.html?view=orders','production.html?view=store','calepinage.html','boutique.html','pliage.html','entrepot.html','chantier.html','selection.html']){
+const page=await browser.newPage({viewport:{width:390,height:844}});await page.goto(base+'/'+url);await page.locator('.mir-harmony-header').waitFor();if(url.startsWith('production.html'))await page.waitForFunction(()=>!!window.MIRProductionWorkspace);const rect=await page.locator('.mir-harmony-header').boundingBox();assert.equal(rect.height,72,url);await page.locator('.mir-harmony-toggle').click();assert.equal(await page.locator('#mir-harmony-menu').isVisible(),true);assert.ok(await page.locator('#mir-harmony-menu a:visible,#mir-harmony-menu button:visible').count()>0,'menu links visible '+url);if(url.startsWith('production.html'))assert.equal(await page.locator('#mir-harmony-menu [data-mir-tab]:visible').count(),6);await page.keyboard.press('Escape');await page.screenshot({path:'artifacts/harmony/after-header-'+url.replace(/[^a-z0-9]/gi,'-')+'.png'});console.log('PASS shared header '+url);await page.close();}
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

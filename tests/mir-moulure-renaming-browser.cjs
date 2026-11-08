@@ -55,7 +55,7 @@ async function ready(){
    assert.equal(pre.spec.name,'Solin fenêtre avant');
    const quantity=pre.spec.quantity;
    const segments=JSON.stringify(pre.snapshot.geometry);
-   await page.locator('#mode-link').click();
+   await page.locator('.mir-harmony-dossier').click();
    assert.equal(await page.locator('#production-order').isVisible(),true);
    await first.locator('[data-rename-piece]').click();
    const form=first.locator('[data-rename-form]');
@@ -84,7 +84,7 @@ async function ready(){
    assert.ok(pageWidth<=layout.width+2,'Débordement horizontal '+layout.name+' '+pageWidth+'px');
    await page.reload({waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-   await page.locator('#mode-link').click();
+   await page.locator('.mir-harmony-dossier').click();
    assert.equal((await page.locator('[data-production-item="M001"] h3').textContent()).trim(),'L replié façade nord');
    // Un renommage ne change pas le dernier modèle choisi ni sa géométrie.
    const saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).order.items[0],storageKey);

@@ -43,6 +43,20 @@ const sizes=[
         const listener=error=>errors.push(error.message);
         page.on('pageerror',listener);
         await page.goto(base+route+'.html',{waitUntil:'domcontentloaded',timeout:25000});
+        if(await page.locator('html[data-mir-harmony]').count()){
+          await page.locator('.mir-harmony-toggle').waitFor();
+          const header=page.locator('#mir-harmony-header'),menu=header.locator('.mir-harmony-toggle'),nav=header.locator('#mir-harmony-menu');
+          assert.equal(await nav.isVisible(),false,'Harmony closed initially');
+          assert.equal(await menu.getAttribute('aria-controls'),'mir-harmony-menu');
+          assert.ok((await menu.boundingBox()).height>=44);
+          assert.ok(await header.locator('.mir-harmony-dossier').isVisible());
+          await menu.click();assert.equal(await nav.isVisible(),true);
+          assert.ok(await nav.locator('a:visible').count()>=5,'Existing public destinations retained');
+          assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
+          await page.keyboard.press('Escape');assert.equal(await nav.isVisible(),false);assert.equal(await menu.evaluate(e=>e===document.activeElement),true);
+          if(route==='boutique'&&['mobile','tablette'].includes(size.name)){await menu.click();await nav.locator('a[href="realisations.html"]').click();await page.waitForURL('**/realisations.html');assert.match(await page.title(),/réalisations/i);}
+          assert.deepEqual(errors,[]);page.off('pageerror',listener);count++;continue;
+        }
         await page.waitForFunction(()=>!!window.MIRPublicMenu?.version&&!!document.querySelector('.mir-client-menu-toggle'),{timeout:10000});
         const header=page.locator('header.mir-client-header'),menu=header.locator('.mir-client-menu-toggle'),nav=header.locator('nav.mir-client-links');
         const state=await page.evaluate(()=>{

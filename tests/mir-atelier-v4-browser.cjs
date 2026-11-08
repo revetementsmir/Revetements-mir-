@@ -135,7 +135,7 @@ function available() {
     assert.equal(await page.locator('#mir-v4-sheet-value').textContent(),'5 po','Retour en pouces');
     await page.locator('#add-production-piece').click();
     assert.equal((await page.locator('#order-head-count').textContent()).trim(),'01','Saving must not require PO');
-    await page.locator('#mode-link').click();
+    await page.locator('.mir-harmony-dossier').click();
     assert.equal(await page.locator('#production-order').isVisible(),true);
     console.log('PASS save draft without PO and open local dossier');
     await page.close();
@@ -167,7 +167,7 @@ function available() {
     assert.equal(built.ok,true,'Ancien bon préparable : '+JSON.stringify(built.errors));
     await legacy.reload({waitUntil:'domcontentloaded'});
     await legacy.waitForFunction(()=>!!window.MIRProductionWorkspace?.version);
-    await legacy.locator('#mode-link').click();
+    await legacy.locator('.mir-harmony-dossier').click();
     assert.equal(await legacy.locator('[data-production-item="M001"]').count(),1,'Le bon de 8 pi doit rester visible');
     await legacy.locator('[data-edit-piece="M001"]').click();
     assert.equal(await legacy.locator('[data-measure="length"]').inputValue(),'96','Longueur historique intacte');

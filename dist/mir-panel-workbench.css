@@ -9,7 +9,7 @@ body.mir-admin-v4[data-mir-tab="panels"] #mir-procurement-panel{width:100%;max-w
 .mir-wb-heading h2{font-size:clamp(25px,3vw,36px)!important;line-height:1.16!important;letter-spacing:-.035em;margin:0 0 8px!important;font-weight:750}
 .mir-wb-heading p:not(.mir-wb-eyebrow){font-size:14px!important;color:#617464!important;line-height:1.5!important;max-width:650px}
 body.mir-admin-v4 #mir-procurement-panel .mir-wb-exit{background:#f1f5ee;border:1px solid #c9d7c8;color:#2a5239;padding:9px 13px;min-height:43px;font-size:12px;flex:none}
-.mir-wb-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:#ecf0e8;padding:5px;border:1px solid #d4dfd0;border-radius:12px}
+.mir-wb-progress{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:#ecf0e8;padding:5px;border:1px solid #d4dfd0;border-radius:12px}
 .mir-wb-step{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 6px;min-height:41px;border-radius:8px;color:#728070;font-weight:650;font-size:13px}
 .mir-wb-step strong{font-size:12px;display:grid;place-items:center;width:25px;height:25px;background:#dce4d6;border-radius:99px;color:#54715a}
 .mir-wb-step.is-current{background:#fff;color:#28533a;box-shadow:0 1px 6px #233b2d10}

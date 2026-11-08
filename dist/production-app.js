@@ -26,6 +26,8 @@ let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces
 let panelSketchPoints=[],panelSketchHover=null,panelSketchBefore=null;
 const clientProfileWizard=()=>client&&catalogueChannel!=='store'&&kind==='profile';
 let activeStoreColorLock=false;
+// Imported panel metadata is authoritative until a user explicitly edits it.
+let preservedPanelMetadata=null;
 function applyStoreColorLock(){
  if(!client||catalogueChannel!=='store'||!activeStoreColorLock)return;
  const block=$('#production-color-fields');
@@ -102,7 +104,7 @@ function renderDossierPrice(pricing){
 }
 function exportOrder(){return {...copy(order),pricing:dossierPricing()};}
 function choose(type,id,{template=null,spec=null,empty=client,profileChosen=false}={}){
- jException=null;activeStoreColorLock=false;
+ jException=null;activeStoreColorLock=false;preservedPanelMetadata=null;
  kind=type;editingItemId=null;activeDefaultLocks={};selectedTemplate=template||templateForBuiltin(type,id);
  draft=spec?copy(spec):(empty?blankMeasurements(sampleSpec(type,id)):sampleSpec(type,id));draft.kind=type;if(type==='profile')draft.length=String(stockLengthIn(draft)*(draft.unit==='mm'?25.4:1));
  if(clientProfileWizard()){
@@ -254,6 +256,10 @@ function renderPanelOptions(){
     <span>Demander la perforation du bas<small>Le côté choisi est repéré en bleu sur le dessin.</small></span>
   </label>${draft.perforation?.enabled?`<label>Détail ou référence de perforation<textarea id="panel-perforation-details" rows="2" placeholder="À définir avec l’atelier" maxlength="300">${esc(draft.perforation.details||'')}</textarea></label><p class="field-hint">Le motif exact doit être confirmé par l’atelier.</p>`:''}
   </div>`;
+ if(client&&catalogueChannel==='store'&&(activeDefaultLocks.lip||activeDefaultLocks.lips)){
+  for(const input of $('#production-panel-options').querySelectorAll('#panel-lip,[data-panel-lip]')){input.readOnly=true;input.setAttribute('aria-readonly','true');input.title='Lip verrouillé par le modèle MIR';}
+  for(const button of $('#production-panel-options').querySelectorAll('[data-panel-no-lip]'))button.disabled=true;
+ }
 }
 function renderColors(){const block=$('#production-color-fields');$('#color-system').value=colorSystem;if(colorSystem==='manufacturer'){block.innerHTML=`<div class="color-source-field"><label>Fabricant / produit de référence<select id="production-material"><option value="">Choisir le fabricant et le produit</option>${availableMaterials().map(m=>`<option value="${esc(m.id)}"${m.id===materialId?' selected':''}>${esc(m.brand+' · '+m.name)}</option>`).join('')}</select></label>${(chosenMaterial()?.colors||[]).length>20?`<label>Rechercher une teinte du fabricant<input id="production-color-search" class="color-search" type="search" placeholder="Nom ou code, ex. 56068, noir…" value="${esc(colorQuery)}"></label><p id="color-count" class="color-count"></p>`:""}<div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Couleurs du fabricant"></div><p class="field-hint">${kind==='panel'?'Références Unico publiées. La disponibilité du fini sur le calibre choisi reste à confirmer.':'Chaque échantillon appartient au nuancier de ce produit. L’offre sur votre pièce doit être confirmée.'}</p></div>`;renderColorGrid();}else if(colorSystem==='ral'){block.innerHTML=`<div class="color-source-field"><label>Rechercher un code RAL Classic<input id="production-color-search" class="color-search" type="search" placeholder="Ex. 7016, black, vert…" value="${esc(colorQuery)}"></label><label>Code de la couleur<select id="production-ral"><option value="">Choisir un code RAL</option>${ral.colors.map(c=>`<option value="${esc(c.id)}"${c.id===colorId?' selected':''}>${esc(c.code+' · '+(c.nameEn||c.name))}</option>`).join('')}</select></label><p id="color-count" class="color-count"></p><div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Codes RAL Classic"></div><p class="field-hint">${esc(ral.displayNotice||'Aperçu écran indicatif. Valider la teinte demandée sur un nuancier physique avant fabrication.')}</p></div>`;renderColorGrid();}else{block.innerHTML=`<div class="color-source-field"><label>Nuancier ou fabricant<input id="special-color-system" value="${esc(draft.finish?.system||'')}" maxlength="60" placeholder="Ex. Nuancier à préciser"></label><div class="two-fields"><label>Code exact<input id="special-color-code" value="${esc(draft.finish?.code||'')}" maxlength="80" placeholder="Référence demandée"></label><label>Nom de la couleur<input id="special-color-name" value="${esc(draft.finish?.name||'')}" maxlength="100" placeholder="Si connu"></label></div><p class="field-hint">Cette référence est une demande spéciale à faire confirmer. Aucun équivalent fabricant ni teinte numérique n’est inventé.</p></div>`;}updateFinish();applyStoreColorLock();}
 function renderColorGrid(){
@@ -286,7 +292,7 @@ function renderColorGrid(){
   });
  }
 }
-function updateFinish(){if(authoring){$('#selected-finish').innerHTML='';return;}draft.finish=currentFinish();const c=chosenColor(),image=safeAsset(c?.swatchUrl||c?.swatchImage),finish=draft.finish,source=safeURL(c?.sourceUrl||chosenMaterial()?.sourceUrl||''),flat=kind==='profile'&&window.MIRKaycanFlatPreview?.isFlatPreview(finish)?window.MIRKaycanFlatPreview:null,flatHex=flat?.get(image)||'#e5e9e0';$('#selected-finish').innerHTML=(finish.code||finish.name)?`${flat?`<span class="kaycan-flat-chip" role="img" aria-label="Aperçu uni indicatif de ${esc(finish.name)}" style="background:${flatHex}"></span>`:image?`<img src="${esc(image)}" alt="Échantillon fabricant de ${esc(finish.name)}">`:''}<div><strong>${esc(finish.name||finish.code)}</strong><span>${esc(finish.code||'Code à confirmer')} · ${esc(finish.manufacturer||finish.system||'Référence spéciale')}</span><p>${esc(colorSystem==='ral'?ral.displayNotice:colorSystem==='special'?'Demande spéciale : faisabilité, teinte et disponibilité à confirmer.':flat?'Aperçu uni estimé du visuel fabricant, non certifié. Teinte, texture et disponibilité à confirmer sur un échantillon réel.':c?.availabilityNote||'Disponibilité sur ce profil à confirmer. Écran indicatif.')}</p>${colorSystem==='manufacturer'&&source?`<a href="${esc(source)}" target="_blank" rel="noopener">Source du fabricant ↗</a>`:''}</div>`:'<div><strong>La teinte reste à choisir.</strong><p>Choisissez une référence précise pour votre pièce.</p></div>';}
+function updateFinish(){if(authoring){$('#selected-finish').innerHTML='';return;}draft.finish=preservedPanelMetadata?.id===editingItemId?copy(preservedPanelMetadata.finish):currentFinish();const c=chosenColor(),image=safeAsset(c?.swatchUrl||c?.swatchImage),finish=draft.finish,source=safeURL(c?.sourceUrl||chosenMaterial()?.sourceUrl||''),flat=kind==='profile'&&window.MIRKaycanFlatPreview?.isFlatPreview(finish)?window.MIRKaycanFlatPreview:null,flatHex=flat?.get(image)||'#e5e9e0';$('#selected-finish').innerHTML=(finish.code||finish.name)?`${flat?`<span class="kaycan-flat-chip" role="img" aria-label="Aperçu uni indicatif de ${esc(finish.name)}" style="background:${flatHex}"></span>`:image?`<img src="${esc(image)}" alt="Échantillon fabricant de ${esc(finish.name)}">`:''}<div><strong>${esc(finish.name||finish.code)}</strong><span>${esc(finish.code||'Code à confirmer')} · ${esc(finish.manufacturer||finish.system||'Référence spéciale')}</span><p>${esc(colorSystem==='ral'?ral.displayNotice:colorSystem==='special'?'Demande spéciale : faisabilité, teinte et disponibilité à confirmer.':flat?'Aperçu uni estimé du visuel fabricant, non certifié. Teinte, texture et disponibilité à confirmer sur un échantillon réel.':c?.availabilityNote||'Disponibilité sur ce profil à confirmer. Écran indicatif.')}</p>${colorSystem==='manufacturer'&&source?`<a href="${esc(source)}" target="_blank" rel="noopener">Source du fabricant ↗</a>`:''}</div>`:'<div><strong>La teinte reste à choisir.</strong><p>Choisissez une référence précise pour votre pièce.</p></div>';}
 function fitModel(model){const p=model.pointsMM||[],xs=p.map(v=>v[0]),ys=p.map(v=>v[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const scale=Math.min(580/Math.max(1,maxX-minX),340/Math.max(1,maxY-minY));return {scale,ox:400-(minX+maxX)*scale/2,oy:255+(minY+maxY)*scale/2};}
 function pointOnView(point,tr){return [tr.ox+point[0]*tr.scale,tr.oy-point[1]*tr.scale];}
 
@@ -402,24 +408,44 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
 function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  const V=window.MIRProductionVolume,mesh=V.buildMesh(model);
  if(!mesh.valid)return V.render(model,{yaw:0,pitch:0,zoom:1,illustrative,formatMeasurement:M.formatMeasurement});
- const z=small?1:zoom,tr=fitModel(model);tr.scale*=z;tr.ox=400-(mesh.bounds.minX+mesh.bounds.maxX)*tr.scale/2;tr.oy=231+(mesh.bounds.minY+mesh.bounds.maxY)*tr.scale/2;
+ const compact=!small&&matchMedia('(max-width: 600px)').matches,canvas=compact?400:800;
+ const z=small?1:zoom,tr=fitModel(model);tr.scale*=z*(compact ? .34 : .76);tr.ox=(compact?168:350)-(mesh.bounds.minX+mesh.bounds.maxX)*tr.scale/2;tr.oy=(compact?190:205)+(mesh.bounds.minY+mesh.bounds.maxY)*tr.scale/2;
  const map=pts=>pts.map(p=>pointOnView(p,tr).map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#b8c5ae',swatch=safeAsset(model.spec?.finish?.swatchUrl||model.finish?.swatchUrl),suffix=small?'thumb-'+esc(model.spec?.id||'panel'):'main',paint='panel-face-paint-'+suffix,clip='panel-face-clip-'+suffix;
- let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="group" aria-label="${esc(model.name)} — vue cotée, lips compris" data-panel-face="true" data-zoom="${z}" font-family="Arial,sans-serif"><title>${esc(model.name)} — dimensions hors tout avec lèvres</title><defs><clipPath id="${clip}"><rect x="16" y="45" width="768" height="365"/></clipPath>${swatch?`<pattern id="${paint}" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${hex}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern>`:''}</defs><text x="400" y="30" text-anchor="middle" font-size="12" fill="#6f8064">${illustrative?'PROPORTIONS DU MODÈLE · COTES À SAISIR':'VUE DE FACE · LIPS INCLUS DANS LE HORS TOUT'}</text><g clip-path="url(#${clip})"><polygon points="${map(mesh.outer)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="1.5"/><polygon points="${map(mesh.front)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="2.2"/>`;
- (model.edges||[]).forEach((edge,i)=>{const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr);if(edge.id===model.bottomEdgeId&&!illustrative)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="5"${model.perforation?.enabled?' stroke-dasharray="10 5"':''}/>`;if(interactive&&!authoring)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="transparent" stroke-width="22" data-select-bottom="${esc(edge.id)}" tabindex="0" role="button" aria-label="Choisir ${esc(edge.name)} comme bas"/>`;});
+ let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas} 550" role="group" aria-label="${esc(model.name)} — vue cotée, lips compris" data-panel-face="true" data-zoom="${z}" font-family="Arial,sans-serif"><title>${esc(model.name)} — dimensions hors tout avec lèvres</title><defs><clipPath id="${clip}"><rect x="16" y="45" width="768" height="365"/></clipPath>${swatch?`<pattern id="${paint}" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${hex}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern>`:''}</defs><text x="${canvas/2}" y="30" text-anchor="middle" font-size="${compact?9:12}" fill="#6f8064">${illustrative?'PROPORTIONS DU MODÈLE · COTES À SAISIR':'VUE DE FACE · LIPS INCLUS DANS LE HORS TOUT'}</text><g clip-path="url(#${clip})"><polygon points="${map(mesh.outer)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="1.5"/><polygon points="${map(mesh.front)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="2.2"/>`;
+ (model.edges||[]).forEach((edge,i)=>{const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr);if(edge.id===model.bottomEdgeId&&!illustrative)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="5"${model.perforation?.enabled?' stroke-dasharray="10 5"':''}/>`;if(interactive&&!authoring)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="transparent" stroke-width="22" data-edit-panel-edge="${esc(edge.id)}" tabindex="0" role="button" aria-label="Modifier ${esc(edge.name)}"/>`;});
  svg+='</g>';
+ const labelBoxes=[];
  if(!small&&!illustrative)(model.edges||[]).forEach((edge,i)=>{
-  const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr),
-   len=Math.hypot(b[0]-a[0],b[1]-a[1]),cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2;
-  if(len<52)return;
-  const center=pointOnView([(mesh.bounds.minX+mesh.bounds.maxX)/2,(mesh.bounds.minY+mesh.bounds.maxY)/2],tr);
-  const vx=center[0]-cx,vy=center[1]-cy,dist=Math.hypot(vx,vy)||1;
-  const x=cx+vx/dist*22,y=cy+vy/dist*22;
-  const label=edge.lipMM===0?'Sans lip':'Lip '+M.formatMeasurement(edge.lipMM,model.unit);
-  svg+='<text data-panel-edge-lip="'+esc(edge.id)+'" x="'+fmt(x)+'" y="'+fmt(y)+'" font-size="12" font-weight="700" text-anchor="middle" fill="#284d30" stroke="#fafcf7" stroke-width="4" paint-order="stroke">'+esc((i+1)+' · '+label)+'</text>';
+  const points=mesh.outer.map(p=>pointOnView(p,tr)),a=points[i],b=points[(i+1)%points.length],
+   left=Math.min(...points.map(p=>p[0])),right=Math.max(...points.map(p=>p[0])),top=Math.min(...points.map(p=>p[1])),bottom=Math.max(...points.map(p=>p[1])),
+   cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2;
+  const font=compact?16:15,w=Math.max(42,edge.name.length*font*.6+12),h=compact?52:26;
+  const winding=Math.sign(points.reduce((sum,p,i)=>sum+p[0]*points[(i+1)%points.length][1]-points[(i+1)%points.length][0]*p[1],0))||1;
+  const nx=winding*(b[1]-a[1]),ny=-winding*(b[0]-a[0]);
+  const preferred=Math.abs(nx)>Math.abs(ny)?(nx<0?'left':'right'):(ny<0?'top':'bottom');
+  const overlap=(a,b)=>a.x<b.x+b.w+5&&a.x+a.w+5>b.x&&a.y<b.y+b.h+5&&a.y+a.h+5>b.y;
+  let box;
+  for(const side of [preferred,...['left','right','top','bottom'].filter(v=>v!==preferred)]){
+   for(let n=0;n<9;n++){
+    const shift=(n%2?1:-1)*Math.ceil(n/2)*30;
+    const q=side==='left'?{x:left-w-12,y:cy-h/2+shift,w,h}:side==='right'?{x:right+12,y:cy-h/2+shift,w,h}:side==='top'?{x:cx-w/2+shift,y:top-h-12,w,h}:{x:cx-w/2+shift,y:bottom+12,w,h};
+    const reserved={x:compact?251:558,y:compact?240:202,w:compact?144:224,h:compact?90:70};
+    if(q.x<4||q.y<45||q.x+w>canvas-4||q.y+h>(compact?315:370)||overlap(q,reserved)||labelBoxes.some(r=>overlap(q,r)))continue;
+    box=q;break;
+   }
+   if(box)break;
+  }
+  if(!box)return;
+  labelBoxes.push(box);
+  const lx=Math.max(box.x,Math.min(box.x+w,cx)),ly=Math.max(box.y,Math.min(box.y+h,cy));
+  svg+=`<path d="M${cx},${cy}L${lx},${ly}" fill="none" stroke="#8da389" stroke-width="1"/>`;
+  svg+=`<g data-edit-panel-edge="${esc(edge.id)}" role="button" tabindex="0" aria-label="Modifier ${esc(edge.name)}"><rect x="${box.x}" y="${box.y}" width="${w}" height="${h}" rx="5" fill="#fcfcf8"/><text data-panel-edge-lip="${esc(edge.id)}" x="${box.x+w/2}" y="${box.y+h/2+6}" font-size="${font}" font-weight="700" text-anchor="middle" fill="#284d30">${esc(edge.name)}</text></g>`;
  });
- svg+='<rect x="0" y="420" width="800" height="100" fill="#fcfcf8"/>';
- const dims=[['A','Largeur hors tout',model.widthMM],['B','Hauteur hors tout',model.heightMM],['C','Projection',model.reliefMM]];
- svg+=dims.map(([letter,label,value],i)=>`<text x="${135+i*265}" y="448" text-anchor="middle" font-size="13" fill="#6f8064">${letter} · ${label}</text><text x="${135+i*265}" y="478" text-anchor="middle" font-size="24" fill="#294734" font-weight="600">${esc(illustrative?'À saisir':M.formatMeasurement(value,model.unit))}</text>`).join('');return svg+'</svg>';
+ const corners=mesh.outer.map(p=>pointOnView(p,tr)),xs=corners.map(p=>p[0]),ys=corners.map(p=>p[1]);
+ const left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bottom=Math.max(...ys),dimY=compact?370:400,dimX=compact?323:670;
+ svg+=`<g fill="none" stroke="#6f8064" stroke-width="1.4"><path d="M${left},${bottom+8}V${dimY+10} M${right},${bottom+8}V${dimY+10} M${left},${dimY}H${right} M${right+8},${top}H${dimX+10} M${right+8},${bottom}H${dimX+10} M${dimX},${top}V${bottom}"/></g>`;
+ const dims=[['A','Largeur hors tout',model.widthMM,'width',compact?168:350,dimY+5],['B','Hauteur hors tout',model.heightMM,'height',dimX,compact?275:230],['C','Projection',model.reliefMM,'relief',compact?168:350,490]];
+ svg+=dims.map(([letter,label,value,key,x,y])=>`<g ${interactive&&!authoring?`data-edit-panel-measure="${key}" role="button" tabindex="0" aria-label="Modifier ${letter} — ${label}"`:''}><rect x="${x-(compact&&key==='height'?72:112)}" y="${y-35}" width="${compact&&key==='height'?144:224}" height="${compact?90:70}" rx="10" fill="#fcfcf8" stroke="#cad4bf"/><text x="${x}" y="${y-8}" text-anchor="middle" font-size="${compact?16:14}" fill="#52664a">${compact&&key==='height'?'B — Hauteur':letter+' — '+label}</text>${compact&&key==='height'?`<text x="${x}" y="${y+10}" text-anchor="middle" font-size="16" fill="#52664a">hors tout</text>`:''}<text x="${x}" y="${y+(compact&&key==='height'?36:21)}" text-anchor="middle" font-size="24" fill="#294734" font-weight="600">${esc(illustrative?'À saisir':M.formatMeasurement(value,model.unit))}</text></g>`).join('');return svg+'</svg>';
 }
 function profileVolumeStrips(model){
  const radius=Math.min(1.5,Math.max(.5,model.material?.thicknessMM||.65));
@@ -745,6 +771,11 @@ function updateDrawing({keepForm=false}={}){
   waiting?'<div class="drawing-hint">Choisissez une moulure pour voir son profil ici.</div>':
   view==='volume'?volumeSVG(shown.model,{illustrative:shown.illustrative}):diagramSVG(shown.model,{illustrative:shown.illustrative});
 
+ let directTools=$('#mir-panel-direct-tools');
+ if(!directTools){directTools=document.createElement('div');directTools.id='mir-panel-direct-tools';directTools.className='mir-panel-direct-tools';stage.after(directTools);}
+ directTools.hidden=kind!=='panel'||authoring||tool==='panel-trace';
+ directTools.innerHTML=directTools.hidden?'':'<details><summary>Autre méthode de saisie : cotes et côtés</summary><div>'+['width','height','relief'].map(key=>'<button type="button" data-edit-panel-measure="'+key+'">'+({width:'A — Largeur hors tout',height:'B — Hauteur hors tout',relief:'C — Projection'}[key])+'</button>').join('')+(actual.edges||[]).map(edge=>'<button type="button" data-edit-panel-edge="'+esc(edge.id)+'">'+esc(edge.name)+'</button>').join('')+'</div></details>';
+
  const twin=$('#mir-panel-live-alt');
  if(twin){
   twin.hidden=kind!=='panel';
@@ -875,7 +906,7 @@ function renderPanelMaterialControls(){
  }
  if(panel&&m.type==='aluminium-extrude'&&colorSystem==='manufacturer'){colorSystem='ral';colorId='';}
 }
-function formMetadata(){draft.material=draft.material||{};draft.material.type=$('#material-type').value;draft.material.thickness=$('#material-thickness').value;draft.material.thicknessUnit=kind==='panel'?'mm':draft.unit;draft.material.gauge=$('#material-gauge').value;draft.quantity=Number($('#production-quantity').value);draft.location=$('#production-location').value;draft.note=$('#production-note').value;if(colorSystem==='special')draft.finish={system:$('#special-color-system')?.value||'',code:$('#special-color-code')?.value||'',name:$('#special-color-name')?.value||'',selectionType:'custom',special:true};else draft.finish=currentFinish();}
+function formMetadata(){draft.material=draft.material||{};draft.material.type=$('#material-type').value;draft.material.thickness=$('#material-thickness').value;draft.material.thicknessUnit=kind==='panel'?'mm':draft.unit;draft.material.gauge=$('#material-gauge').value;draft.quantity=Number($('#production-quantity').value);draft.location=$('#production-location').value;draft.note=$('#production-note').value;if(colorSystem==='special')draft.finish={system:$('#special-color-system')?.value||'',code:$('#special-color-code')?.value||'',name:$('#special-color-name')?.value||'',selectionType:'custom',special:true};else draft.finish=currentFinish();if(preservedPanelMetadata?.id===editingItemId){draft.finish=copy(preservedPanelMetadata.finish);draft.material=copy(preservedPanelMetadata.material);}}
 function renderFormMetadata(){const m=draft.material||{};if(kind==='panel'&&m.thickness!==''&&m.thickness!==null&&m.thickness!==undefined&&(m.thicknessUnit||draft.unit)!=='mm'){const parsed=M.parseMeasurement(m.thickness,m.thicknessUnit||draft.unit);if(parsed.ok){m.thickness=fmt(parsed.mm);m.thicknessUnit='mm';}}renderPanelMaterialControls();$('#material-type').value=m.type||(kind==='panel'||clientProfileWizard()?'':'aluminium');$('#material-thickness').value=m.thickness??'';$('#material-gauge').value=m.gauge||'';$('#production-quantity').value=draft.quantity||1;$('#production-location').value=draft.location||'';$('#production-note').value=draft.note||'';$('#cancel-piece-edit').hidden=!editingItemId;for(const el of document.querySelectorAll('.config-card>.config-section'))el.hidden=authoring;$('#add-production-piece').closest('.config-section').hidden=false;if(authoring){for(const child of $('#add-production-piece').closest('.config-section').children)child.hidden=!child.classList.contains('piece-submit');}else for(const child of $('#add-production-piece').closest('.config-section').children)child.hidden=false;}
 function hasPanelGeometryIssue(item){const model=build(item.spec||item);if(model.kind!=='panel')return false;const mesh=window.MIRProductionVolume.buildMesh(model);if(item.sourceLayout&&model.valid&&mesh.errors?.length&&mesh.errors.every(error=>error.code==='PROJECTION_REQUIRED'))return !window.MIRProductionVolume.buildMesh(M.buildPanel({...model.spec,relief:0})).valid;return !mesh.valid;}
 function invalidPanelItems(){return (order.items||[]).filter(hasPanelGeometryIssue);}
@@ -1172,7 +1203,7 @@ function offerProfileImport(confirmedPO=false){
  }catch(error){toast(error.message);}
 }
 function restoreSelection(item){const selection=item.selection||{};colorSystem=selection.colorSystem||({manufacturer:'manufacturer',ral:'ral',custom:'special'}[item.spec.finish?.selectionType])||((item.spec.finish||{}).system==='RAL Classic'?'ral':item.spec.finish?.manufacturer||/^Nuancier /i.test(item.spec.finish?.system||'')?'manufacturer':item.spec.finish?.special?'special':'manufacturer');materialId=selection.materialId||materials.find(m=>m.brand===item.spec.finish?.manufacturer)?.id||'';colorId=selection.colorId||'';if(!colorId&&colorSystem==='ral')colorId=ral.colors.find(c=>c.code===item.spec.finish?.code)?.id||'';if(!colorId&&colorSystem==='manufacturer')colorId=(chosenMaterial()?.colors||[]).find(c=>(c.code||c.name)===item.spec.finish?.code)?.id||'';}
-function editPiece(id){const item=order.items.find(row=>row.id===id);if(!item)return;jException=null;activeStoreColorLock=!!(client&&catalogueChannel==='store'&&item.selection?.storeColorMode==='fixed');workflow='configure';authoring=false;editingTemplateId=null;editingItemId=id;activeDefaultLocks={};kind=item.kind;draft=copy(item.spec);if(item.stockProfileType)draft.mirProfileId=item.stockProfileType;selectedTemplate=item.snapshot?.templateSnapshot||null;restoreSelection(item);tool='select';view='face';if(clientProfileWizard()){
+function editPiece(id){const item=order.items.find(row=>row.id===id);if(!item)return;jException=null;activeStoreColorLock=!!(client&&catalogueChannel==='store'&&item.selection?.storeColorMode==='fixed');workflow='configure';authoring=false;editingTemplateId=null;editingItemId=id;activeDefaultLocks={};kind=item.kind;draft=copy(item.spec);preservedPanelMetadata=kind==='panel'?{id,finish:copy(draft.finish||{}),material:copy(draft.material||{})}:null;if(item.stockProfileType)draft.mirProfileId=item.stockProfileType;selectedTemplate=item.snapshot?.templateSnapshot||null;restoreSelection(item);tool='select';view='face';if(clientProfileWizard()){
  clientProfileSelected=true;
  clientStep=clientUnlocked=2;
  draft.length=draft.length||unitValue(120*25.4,draft.unit);
@@ -1507,6 +1538,7 @@ function viewCursorPoint(event){
  return r.width&&r.height?[(event.clientX-r.left)*800/r.width,(event.clientY-r.top)*520/r.height]:null;
 }
 function beginPointDrag(event){
+ if(event.target.closest("[data-edit-panel-measure],[data-edit-panel-edge]"))return;
  const stage=$('#production-drawing');if(!stage.contains(event.target))return;
  if(tool==='panel-trace'&&kind==='panel'&&event.isPrimary&&(event.button===0||event.pointerType==='touch')){
   const pt=panelSketchHit(event);if(!pt)return;
@@ -1731,6 +1763,7 @@ function commitTrace(points,spec){
  updateDrawing({keepForm:true});
 }
 function drawingClick(event){
+ if(event.target.closest("[data-edit-panel-measure],[data-edit-panel-edge]"))return;
  if(suppressClick){suppressClick=false;return;}
  if(!canDrawProfile()||!drawingCanvasHit(event))return;
  const raw=localPoint(event);
@@ -1927,7 +1960,50 @@ function startProfileDrawing({fullscreen=true}={}){
  renderDimensions();
  updateDrawing();
 }
-function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom]');if(!button)return;const d=button.dataset;
+let panelDirectEdit=null;
+function panelDirectUnit(){return '<label>Unité<select id="mir-panel-direct-unit"><option value="in"'+(draft.unit==='in'?' selected':'')+'>Pouces</option><option value="mm"'+(draft.unit==='mm'?' selected':'')+'>Millimètres</option></select></label>';}
+function openPanelMeasure(key){
+ if(kind!=='panel'||authoring)return;
+ const input=$('#production-dimensions [data-measure="'+key+'"]');
+ if(input?.disabled||input?.readOnly||activeDefaultLocks[key]||draft.shape==='square'&&key!=='relief'&&(activeDefaultLocks.width||activeDefaultLocks.height))return toast('Cette cote est verrouillée par le modèle.');
+ if(key==='height'&&draft.roofPitch)return toast('La hauteur dépend de la pente X/12. Modifiez la pente ou la largeur dans le formulaire.');
+ panelDirectEdit={key,before:copy(draft)};
+ const label={width:'A — Largeur hors tout',height:'B — Hauteur hors tout',relief:'C — Projection'}[key];
+ dialog(label,draft.shape==='square'&&key!=='relief'?'Carré : cette cote ajuste ensemble A et B. Les lips sont inclus dans le hors tout.':'Les autres cotes restent conservées. Les lips sont inclus dans A et B.',`<label>Nouvelle cote<input id="mir-panel-direct-value" inputmode="text" value="${esc(draft[key]??'')}" aria-describedby="mir-panel-direct-hint"></label>${panelDirectUnit()}<p id="mir-panel-direct-hint">Exemples : 1/2, ½, 2 1/4, 2¼. C désigne la projection, pas l’épaisseur de tôle.</p><button type="button" class="primary-button" id="mir-panel-direct-apply">Appliquer</button>`);
+ $('#mir-panel-direct-value').focus();$('#mir-panel-direct-value').select();
+}
+function openPanelEdge(id){
+ if(kind!=='panel'||authoring)return;
+ const edge=build().edges.find(e=>e.id===id);if(!edge)return;
+ if(activeDefaultLocks.lip||activeDefaultLocks.lips||activeDefaultLocks['lips.'+id])return toast('Les lèvres sont verrouillées par le modèle.');
+ panelDirectEdit={edge:id,before:copy(draft)};
+ dialog(edge.name,'Le lip de ce côté est indépendant des autres.',`<label>Largeur du lip<input id="mir-panel-direct-value" inputmode="text" value="${esc(fmt(unitValue(edge.lipMM,draft.unit)))}"></label>${panelDirectUnit()}<label><input id="mir-panel-direct-no-lip" type="checkbox" ${edge.lipMM===0?'checked':''}> Sans lip</label><p>Angle dans le plan : ${esc(fmt(edge.interiorAngleDeg))}° (défini par la forme)</p><label><input id="mir-panel-direct-bottom" type="checkbox" ${draft.bottomEdgeId===id?'checked':''}> Côté du bas après installation</label><label><input id="mir-panel-direct-perforation" type="checkbox" ${draft.perforation?.enabled&&draft.bottomEdgeId===id?'checked':''}> Perforation du bas</label><button type="button" class="primary-button" id="mir-panel-direct-apply">Appliquer</button>`);
+ $('#mir-panel-direct-value').focus();
+}
+function applyPanelDirect(){
+ if(!panelDirectEdit)return;
+ const {key,edge,before}=panelDirectEdit,next=copy(before),raw=$('#mir-panel-direct-no-lip')?.checked?'0':$('#mir-panel-direct-value').value;
+ const parsed=M.parseMeasurement(raw,$('#mir-panel-direct-unit').value);
+ if(!parsed.ok||parsed.mm<0||key&&key!=='relief'&&parsed.mm===0)return messageError(parsed.error||'Entrez une cote positive. La mesure précédente est conservée.');
+ const value=String(parsed.unit===next.unit?parsed.value:Number(unitValue(parsed.mm,next.unit).toPrecision(15)));
+ if(key){next[key]=value;if(next.shape==='square'&&key!=='relief')next.width=next.height=value;
+ // Do not silently move the derived roof point when its width changes.
+ if(key==='width'&&next.roofPitch)return messageError('Cette largeur est liée à une pente X/12. Utilisez le formulaire de pente pour vérifier ensemble la largeur et la hauteur.');
+ }else{
+ next.lips={...next.lips,[edge]:value};
+ const bottom=$('#mir-panel-direct-bottom').checked,perforation=$('#mir-panel-direct-perforation').checked;
+ if(perforation&&!bottom)return messageError('La perforation concerne le côté du bas. Choisissez ce côté comme bas.');
+ if(bottom){next.bottomEdgeId=edge;next.perforation={...next.perforation,edgeId:edge,enabled:perforation};}
+ else if(next.bottomEdgeId===edge){next.bottomEdgeId='';next.perforation={...next.perforation,enabled:false,edgeId:''};}
+ }
+ const model=build(next),mesh=window.MIRProductionVolume.buildMesh(model);
+ if(!model.valid||!mesh.valid)return messageError(model.validation?.errors?.[0]?.message||mesh.errors?.[0]?.message||'Cette cote ne permet pas de construire les lèvres. La mesure précédente est conservée.');
+ draft=next;panelDirectEdit=null;closeDialog();renderDimensions();renderPanelOptions();updateDrawing();toast('Cote appliquée au dessin. Enregistrez la pièce pour mettre à jour le dossier.');
+}
+function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom],[data-edit-panel-measure],[data-edit-panel-edge]');if(!button)return;const d=button.dataset;
+ if(d.editPanelMeasure)return openPanelMeasure(d.editPanelMeasure);
+ if(d.editPanelEdge)return openPanelEdge(d.editPanelEdge);
+ if(button.id==='mir-panel-direct-apply')return applyPanelDirect();
  if(d.panelSketchStart!==undefined||button.id==='mir-draw-single-panel'){startPanelSketch();return;}
  if(d.panelSketchUndo!==undefined){panelSketchPoints.pop();panelSketchHover=null;updateDrawing();return;}
  if(d.panelSketchCancel!==undefined){cancelPanelSketch();return;}
@@ -2032,7 +2108,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.id==='panel-zoom-in'){setZoom(zoom*1.2);return;}
  if(button.id==='panel-zoom-out'){setZoom(zoom/1.2);return;}
  if(button.id==='panel-view-reset'){zoom=1;viewPan={x:0,y:0};orbit=-35;pitch=23;updateDrawing();return;}
- if(d.productionColor){colorId=d.productionColor;renderColorGrid();if($('#production-ral'))$('#production-ral').value=colorId;updateFinish();showProfilePaintedFace();updateDrawing();return;}
+ if(d.productionColor){preservedPanelMetadata=null;colorId=d.productionColor;renderColorGrid();if($('#production-ral'))$('#production-ral').value=colorId;updateFinish();showProfilePaintedFace();updateDrawing();return;}
  if(d.selectBottom&&!authoring){draft.bottomEdgeId=d.selectBottom;draft.perforation={...draft.perforation,edgeId:d.selectBottom};renderPanelOptions();updateDrawing();return;}
  if(button.id==='mir-direct-po-add'&&!client){
   formMetadata();
@@ -2099,7 +2175,11 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.hasAttribute('data-new-drawing')){if(!client&&!editingItemId)startProfileDrawing();return;}
  if(button.hasAttribute('data-drawing-undo')){if(!drawPoints.length||!canDrawProfile())return;drawPoints.pop();const next=toCustom(drawPoints);if(next)draft=next;else{draft.segments=[];draft.bends=[];}renderDimensions();updateDrawing();return;}
 }
+function releasePanelMetadataOnEdit(target){
+ if(/^(material-(type|thickness|gauge)|color-system|production-(material|ral)|special-color-(system|code|name))$/.test(target.id||''))preservedPanelMetadata=null;
+}
 function handleInput(event){const e=event.target,d=e.dataset;
+ releasePanelMetadataOnEdit(e);
  if(d.segmentLength!==undefined||d.bendAngle!==undefined||d.measure!==undefined)freeformRedo=[];
  if(e.matches('[data-rename-form] input[name="name"]')){e.setCustomValidity('');return;}
  if(e.id==='production-piece-name'&&!client&&kind==='profile'&&!authoring){
@@ -2123,6 +2203,7 @@ function handleInput(event){const e=event.target,d=e.dataset;
 }
 function changeUnit(next){const previous=draft.unit||'in';if(next===previous)return;jException=null;const convert=value=>{if(value===''||value===null||value===undefined)return value;const p=M.parseMeasurement(value,previous);return p.ok?fmt(unitValue(p.mm,next)):value;};if(kind==='profile'){if(draft.template==='custom')draft.segments.forEach(s=>s.length=convert(s.length));else for(const k of Object.keys(draft.dimensions||{}))draft.dimensions[k]=convert(draft.dimensions[k]);draft.length=convert(draft.length);}else{for(const k of ['width','height','relief','lip','apexX','topWidth','topOffset','offset','tipDepth','apexOffset'])draft[k]=convert(draft[k]);for(const k of Object.keys(draft.lips||{}))draft.lips[k]=convert(draft.lips[k]);}if(draft.material?.thickness&&kind!=='panel'){draft.material.thickness=convert(draft.material.thickness);draft.material.thicknessUnit=next;}draft.unit=next;tool='select';renderDimensions();renderProfileOptions();renderPanelOptions();renderFormMetadata();updateDrawing();}
 function handleChange(event){const e=event.target,d=e.dataset;
+ releasePanelMetadataOnEdit(e);
  if(e.matches('#save-production-template input[name="store"]')){
   const section=$('[data-mir-store-color-choice]');
   if(section)section.hidden=!e.checked;
@@ -2273,7 +2354,7 @@ function handleSubmit(event){
  if(nextPOAction==='existing')existingPOChoice();
  if(nextPOAction==='new')createNewPOFromCurrent();
 }
-function handleKey(event){if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
+function handleKey(event){const direct=event.target.closest('[data-edit-panel-measure],[data-edit-panel-edge]');if(direct&&['Enter',' '].includes(event.key)){event.preventDefault();direct.dispatchEvent(new MouseEvent('click',{bubbles:true}));return;}if(event.target.matches('[data-toggle-painted-face]')&&['Enter',' '].includes(event.key)){event.preventDefault();toggleProfilePaintedFace();$('[data-toggle-painted-face]')?.focus();return;}if(event.target.id==='production-drawing'&&(kind==='panel'||(!client&&kind==='profile'&&tool!=='draw'))){if(['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();if(event.key==='+'||event.key==='=')setZoom(zoom*1.2);else if(event.key==='-')setZoom(zoom/1.2);else if(event.key==='0'){zoom=1;orbit=-35;pitch=23;updateDrawing();}else if(view==='volume'){if(event.key==='ArrowLeft')orbit-=10;if(event.key==='ArrowRight')orbit+=10;if(event.key==='ArrowUp')pitch=Math.min(85,pitch+10);if(event.key==='ArrowDown')pitch=Math.max(-85,pitch-10);updateDrawing();}return;}}const point=event.target.closest('[data-draw-point]');if(point&&tool==='edit'&&!client&&!editingItemId&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const model=build();if(!model.valid)return;const points=copy(model.pointsMM),i=Number(point.dataset.drawPoint),step=draft.unit==='mm'?(event.shiftKey?10:1):(event.shiftKey?25.4:25.4/16);if(event.key==='ArrowLeft')points[i][0]-=step;if(event.key==='ArrowRight')points[i][0]+=step;if(event.key==='ArrowUp')points[i][1]+=step;if(event.key==='ArrowDown')points[i][1]-=step;const spec=toCustom(points);if(spec){draft=spec;renderDimensions();updateDrawing();$(`[data-draw-point="${i}"]`)?.focus();}}const edge=event.target.closest('[data-select-bottom]');if(edge&&['Enter',' '].includes(event.key)){event.preventDefault();edge.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}
 async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Error('Le moteur de modèles n’est pas disponible.');if(!window.MIRBendingLengths?.check)throw new Error('Les longueurs de vente MIR sont indisponibles.');const fetched=await Promise.allSettled([fetch('catalogue-fd6866b49d21.json').then(r=>{if(!r.ok)throw new Error('catalogue');return r.json();}),fetch('ral-classic.json').then(r=>{if(!r.ok)throw new Error('nuancier RAL');return r.json();})]);if(fetched[0].status==='fulfilled'){const raw=fetched[0].value;const catalogue=Array.isArray(raw)?raw:raw.materials||[];materials=window.MIRBendingFinishes.catalogue(catalogue);}if(fetched[1].status==='fulfilled'&&Array.isArray(fetched[1].value.colors))ral=fetched[1].value;
  const unico=window.MIRUnico;if(unico)for(const palette of unico.palettes){const usable=palette.colors.filter(c=>!c.publishedGauges||c.publishedGauges.some(g=>[18,20,22].includes(g)));if(!usable.length)continue;materials.push({id:'unico-palette-'+palette.id,brand:'Unico',name:'U-P1 · '+palette.label,architecturalPanel:true,metalType:palette.materialId,family:palette.materialId,allowedGauges:palette.id==='signature'?[22]:null,sourceUrl:palette.sourceUrl,colors:usable.map(c=>({...c,availabilityNote:c.uP1Compatibility.note+' Écran indicatif.'}))});}materialId=materials[0]?.id||'';
  reloadLocalTemplates();const savedRequests=read(KEYS.requests,{version:1,requests:[]});requests=Array.isArray(savedRequests.requests)?savedRequests.requests.filter(request=>request?.id&&Array.isArray(request.items)&&request.items.every(item=>item.spec&&item.snapshot?.schema==='mir-production-instance-1')):[];
@@ -2309,7 +2390,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  }
  offerProfileImport();
  if(!client&&params.get('shared-request'))openRequest(params.get('shared-request'));
- window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:freeformCanUndo(),canRedo:freeformRedo.length>0};},setOrderItemQuantity,openContinueMenu,editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
+ window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:freeformCanUndo(),canRedo:freeformRedo.length>0};},setOrderItemQuantity,openContinueMenu,openOrderPanelEditor(id,key,edge){if(client||!order.items.some(row=>row.id===id&&row.kind==='panel'))return false;editPiece(id);if(edge)openPanelEdge(edge);else openPanelMeasure(key);return true;},editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
  window.dispatchEvent(new Event('mir-production-ready'));
 }
 boot().catch(error=>{console.error('MIR production',error);$('#production-drawing').innerHTML=`<div class="drawing-hint"><strong>Le configurateur n’a pas pu démarrer.</strong><p>${esc(error.message)}</p><button type="button" class="secondary-button" onclick="location.reload()">Réessayer</button></div>`;$('#add-production-piece').disabled=true;});

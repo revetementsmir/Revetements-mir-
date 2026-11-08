@@ -15,6 +15,7 @@
   const BREAKPOINT='(max-width: 1100px)';
   function init(win){
     const doc=win.document;
+    if(doc.documentElement.hasAttribute("data-mir-harmony"))return null;
     const header=doc.querySelector('header.mir-client-header');
     const nav=header?.querySelector('nav.mir-client-links');
     if(!header||!nav||header.querySelector('.mir-client-menu-toggle'))return null;

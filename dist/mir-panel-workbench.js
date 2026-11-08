@@ -46,14 +46,14 @@
   const count=included.length,all=panels.length;
   const models=panels.map(p=>summaryModel(p,api));
   const incomplete=models.filter(p=>!p.ready).length;
-  const stage=all?2:1;
+  const stage=all?3:1;
   let html='<section class="mir-wb" data-mir-wb-root>'+
    '<header class="mir-wb-heading"><div><p class="mir-wb-eyebrow">L’ATELIER MIR · PANNEAUX</p>'+
    '<h2>'+(!all?'Créer mes panneaux':'Vérifier mes panneaux')+'</h2><p>'+
    (!all?'Choisis ce que tu veux dessiner. MIR calculera les pièces ensuite.':'Ton mur et ses pièces sont déjà dans le dossier. Tu peux vérifier chaque panneau et préparer le bon.')+
    '</p></div><div class="mir-wb-heading-links"><button type="button" data-mir-panel-history>Bons enregistrés</button><button type="button" data-mir-tab="draw" class="mir-wb-exit">Retour à l’atelier</button></div></header>'+
-   '<nav class="mir-wb-progress" aria-label="Les trois étapes de la commande">'+
-   step(1,'Dessiner',stage)+step(2,'Vérifier',stage)+step(3,'Commander',stage)+'</nav>';
+   '<nav class="mir-wb-progress" aria-label="Les quatre étapes de la commande">'+
+   step(1,'Choisir',stage)+step(2,'Dessiner et mesurer',stage)+step(3,'Vérifier',stage)+step(4,'Commander',stage)+'</nav>';
   if(!all){
    html+='<section class="mir-wb-start"><h3>Qu’est-ce qu’on prépare ?</h3>'+
     '<div class="mir-wb-choices"><a href="calepinage.html" class="mir-wb-start-primary"><strong>Un mur complet</strong><span>Dessiner le mur, choisir combien de panneaux, calculer les pièces.</span><b>Commencer le mur →</b></a>'+
@@ -71,7 +71,9 @@
    const ready=result.ready,valid=!!m?.valid;
    let visual='',v3d='',size='À mesurer',project='À préciser',metal='À préciser',color='À préciser',edges='';
    if(valid){
-    try{visual=PDFVisual?.previewSVG(m,api)||'';}catch{}
+    try{visual=PDFVisual?.previewSVG(m,api)||'';
+     const edit=(attr,key)=>visual=visual.replace(new RegExp(attr+'=\"([^\"]*)\"','g'),(match,value)=>match+' data-mir-wb-direct="'+esc(active.id)+'" '+(key?'data-mir-wb-measure="'+key+'"':'data-mir-wb-edge="'+esc(value)+'"')+' role="button" tabindex="0" aria-label="Modifier '+(key==='width'?'A — Largeur hors tout':key==='height'?'B — Hauteur hors tout':esc(value))+'"');
+     edit('data-mir-dimension-a','width');edit('data-mir-dimension-b','height');edit('data-mir-lip-label',null);}catch{}
     try{v3d=volume?.render?.(m,{yaw:-24,pitch:12,zoom:1,width:620,height:410,formatMeasurement:api.formatMeasurement})||'';}catch{}
     size=api.formatMeasurement(m.widthMM,m.unit)+' × '+api.formatMeasurement(m.heightMM,m.unit);
     if(Number.isFinite(m.reliefMM))project=api.formatMeasurement(m.reliefMM,m.unit);
@@ -85,9 +87,9 @@
      '<div class="mir-wb-switch"><button type="button" data-mir-wb-prev'+(at===0?' disabled':'')+' aria-label="Panneau précédent">←</button>'+
      '<button type="button" data-mir-wb-next'+(at===all-1?' disabled':'')+' aria-label="Panneau suivant">→</button></div></header>'+
      (visual?'<div class="mir-wb-drawing">'+visual+'</div>':'<div class="mir-wb-drawing mir-wb-drawing-empty">Dessin à corriger avant la commande.</div>')+
-     '<div class="mir-wb-measures"><div><span>A · Largeur hors tout</span><strong>'+esc(valid?api.formatMeasurement(m.widthMM,m.unit):'À mesurer')+'</strong><small>Lips inclus</small></div>'+
-     '<div><span>B · Hauteur hors tout</span><strong>'+esc(valid?api.formatMeasurement(m.heightMM,m.unit):'À mesurer')+'</strong><small>Lips inclus</small></div>'+ 
-     '<div><span>C · Projection</span><strong>'+esc(project)+'</strong><small>Profondeur de la pièce</small></div></div>'+
+     '<div class="mir-wb-measures"><div><button type="button" data-mir-wb-direct="'+esc(active.id)+'" data-mir-wb-measure="width">A · Largeur hors tout</button><strong>'+esc(valid?api.formatMeasurement(m.widthMM,m.unit):'À mesurer')+'</strong><small>Lips inclus</small></div>'+
+     '<div><button type="button" data-mir-wb-direct="'+esc(active.id)+'" data-mir-wb-measure="height">B · Hauteur hors tout</button><strong>'+esc(valid?api.formatMeasurement(m.heightMM,m.unit):'À mesurer')+'</strong><small>Lips inclus</small></div>'+
+     '<div><button type="button" data-mir-wb-direct="'+esc(active.id)+'" data-mir-wb-measure="relief">C · Projection</button><strong>'+esc(project)+'</strong><small>Profondeur de la pièce</small></div></div>'+
      '<p class="mir-wb-spec">'+esc(metal)+' · '+esc(color)+'</p>'+
      (result.error?'<p class="mir-wb-issue" role="status">À vérifier : '+esc(result.error)+'</p>':'')+
      (v3d?'<details class="mir-wb-extra"><summary>Voir cette pièce en 3D</summary><div class="mir-wb-three-d">'+v3d+'</div></details>':'')+

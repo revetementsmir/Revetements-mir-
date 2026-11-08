@@ -35,7 +35,7 @@ async function online(){
    await openWorkshopStep(page,4);
    await page.locator('#production-piece-name').fill('Fascia de fenêtre');
    await page.locator('#add-production-piece').click();
-   await page.locator('#mode-link').click();
+   await page.locator('.mir-harmony-dossier').click();
    const row=page.locator('[data-production-item="M001"]');
    assert.equal((await row.locator('h3').textContent()).trim(),'Fascia de fenêtre');
    const thumb=row.locator('.production-item-thumb');

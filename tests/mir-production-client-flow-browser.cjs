@@ -38,34 +38,18 @@ async function verifyNavigation(browser,base){
   await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('mir-signature')),true,'charte client '+width);
   assert.equal(await page.locator('header.production-header').evaluate(el=>el.classList.contains('mir-client-header')),true,'menu commun '+width);
-  assert.equal(await page.locator('.mir-production-client-actions .mir-home-estimate').isVisible(),true,'estimation accessible '+width);
-  const toggle=page.locator('header.production-header .mir-client-menu-toggle');
-  const nav=page.locator('header.production-header nav.mir-production-client-nav');
-  if(mobile){
-   await toggle.waitFor({state:'visible'});
-   assert.equal(await toggle.getAttribute('aria-expanded'),'false');
-   assert.equal(await nav.isVisible(),false,'menu fermé au départ '+width);
-   await toggle.click();
-   assert.equal(await toggle.getAttribute('aria-expanded'),'true');
-   assert.equal(await nav.isVisible(),true,'menu ouvert '+width);
-   assert.ok(await nav.locator('a[href="selection.html"]').isVisible(),'Ma sélection disponible '+width);
-   const bounds=await page.evaluate(()=>({
-    width:innerWidth,scroll:document.documentElement.scrollWidth,
-    links:[...document.querySelectorAll('header.production-header .mir-production-client-nav a')].map(a=>a.getBoundingClientRect().right)
-   }));
-   assert.ok(bounds.scroll<=bounds.width+2,'sans défilement horizontal '+width+' : '+JSON.stringify(bounds));
-   assert.ok(bounds.links.every(right=>right<=bounds.width+2),'liens dans l’écran '+width);
-   await page.keyboard.press('Escape');
-   assert.equal(await toggle.getAttribute('aria-expanded'),'false','Échap ferme le menu '+width);
-   assert.equal(await toggle.evaluate(el=>document.activeElement===el),true,'focus rendu au bouton '+width);
-   await toggle.click();
-   await page.mouse.click(3,846);
-   assert.equal(await toggle.getAttribute('aria-expanded'),'false','clic extérieur ferme le menu '+width);
-  }else{
-   assert.equal(await toggle.isVisible(),false,'menu déroulant réservé au mobile '+width);
-   assert.equal(await nav.isVisible(),true,'navigation PC '+width);
-   assert.ok(await nav.locator('a[href="realisations.html"]').isVisible());
-  }
+  const toggle=page.locator('header.production-header .mir-harmony-toggle'),menu=page.locator('#mir-harmony-menu');
+  assert.equal(await toggle.isVisible(),true,'menu commun disponible '+width);
+  assert.equal(await toggle.getAttribute('aria-expanded'),'false');assert.equal(await menu.isVisible(),false);
+  assert.ok(await page.locator('.mir-harmony-dossier').isVisible());
+  await toggle.click();assert.equal(await toggle.getAttribute('aria-expanded'),'true');
+  assert.ok(await menu.locator('.mir-production-client-actions .mir-home-estimate').isVisible(),'estimation accessible '+width);
+  assert.ok(await menu.locator('a[href="selection.html"]').isVisible(),'dossier complet accessible '+width);
+  assert.ok(await menu.locator('a[href="realisations.html"]').isVisible());
+  assert.equal(await menu.locator('[data-admin-only]:visible').count(),0,'aucun accès Admin public');
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
+  await page.keyboard.press('Escape');assert.equal(await menu.isVisible(),false);assert.equal(await toggle.evaluate(e=>e===document.activeElement),true);
+  await toggle.click();await page.mouse.click(3,846);assert.equal(await toggle.getAttribute('aria-expanded'),'false','clic extérieur');
   if(width===390||width===1440||width===3440){
    await page.screenshot({path:path.join(artifacts,'mir-client-parcours-menu-'+width+'.png'),fullPage:false});
   }
@@ -79,7 +63,7 @@ async function verifyNavigation(browser,base){
  assert.equal(await admin.locator('header.production-header .mir-client-menu-toggle').count(),0,'Admin sans menu public');
  assert.equal(await admin.locator('header.production-header nav[aria-label="Navigation du site"] a[data-admin-only]').count(),4,'liens Admin originaux conservés');
  assert.equal(await admin.locator('header.production-header').evaluate(el=>el.classList.contains('mir-client-header')),false,'menu public non activé chez Admin');
- assert.equal(await admin.locator('#mir-procurement-tabs').isVisible(),true,'onglets Admin actifs');
+ await admin.locator('.mir-harmony-toggle').click();assert.equal(await admin.locator('#mir-procurement-tabs').isVisible(),true,'destinations Admin actives dans le menu commun');
  assert.equal(await admin.locator('body').evaluate(el=>el.classList.contains('mir-signature')),false,'Admin ne change pas de thème');
  await admin.close();
  console.log('PASS Admin isolé du menu public');
