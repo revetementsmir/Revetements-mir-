@@ -9,6 +9,50 @@
     {title:'Au cœur du centre-ville de Québec',file:'realisations-mir-quebec-avec-voiture-large.avif',alt:'Immeuble de brique et revêtement métallique au centre-ville de Québec, voiture sport noire à l’avant',caption:'Au cœur du centre-ville de Québec : brique traditionnelle et revêtement métallique, avec la voiture noire de la photographie fournie par MIR.'}
   ];
   let index=0;
+  const filters=document.querySelector('.mir-gallery-filters');
+  const cards=[...document.querySelectorAll('[data-gallery-category]')];
+  let filter='all';
+  let saved=new Set();
+  try {
+    saved=new Set(JSON.parse(localStorage.getItem('mir-inspirations')||'[]').filter(id=>Number.isInteger(id)&&names[id]));
+  } catch {}
+  function renderFilter(){
+    let visible=0;
+    for(const card of cards){
+      const save=card.querySelector('[data-gallery-save]');
+      const id=Number(save.dataset.gallerySave), selected=saved.has(id);
+      card.hidden=!(filter==='all'||(filter==='saved'?selected:card.dataset.galleryCategory===filter));
+      if(!card.hidden)visible++;
+      save.hidden=false;
+      save.setAttribute('aria-pressed',String(selected));
+      save.setAttribute('aria-label','Garder '+names[id].title+' dans ma sélection');
+      save.textContent=selected?'Dans ma sélection ✓':'Garder dans ma sélection';
+    }
+    for(const button of filters.querySelectorAll('button')){
+      button.setAttribute('aria-pressed',String(button.dataset.galleryFilter===filter));
+    }
+    document.getElementById('mir-gallery-empty').hidden=visible>0;
+  }
+  if(filters){
+    filters.hidden=false;
+    filters.addEventListener('click',event=>{
+      const button=event.target.closest('[data-gallery-filter]');
+      if(!button)return;
+      filter=button.dataset.galleryFilter;
+      renderFilter();
+    });
+    for(const card of cards){
+      const button=card.querySelector('[data-gallery-save]');
+      button.addEventListener('click',()=>{
+        const id=Number(button.dataset.gallerySave);
+        if(saved.has(id))saved.delete(id);else saved.add(id);
+        try {localStorage.setItem('mir-inspirations',JSON.stringify([...saved]));} catch {}
+        renderFilter();
+        if(card.hidden)filters.querySelector('[data-gallery-filter="saved"]').focus();
+      });
+    }
+    renderFilter();
+  }
   const img=dialog.querySelector('#mir-gallery-dialog-photo');
   const title=dialog.querySelector('#mir-gallery-dialog-title');
   const caption=dialog.querySelector('#mir-gallery-dialog-caption');

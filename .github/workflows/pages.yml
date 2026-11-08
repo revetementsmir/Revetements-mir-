@@ -235,10 +235,12 @@ jobs:
           fetch "$base/index.html?verification=$GITHUB_SHA" /tmp/mir-homepage.html
           cmp /tmp/mir-homepage.html _site_mir/index.html
           grep -F 'mir-home-premium.css?v=' /tmp/mir-homepage.html
-          grep -F 'id="au-coeur-du-centre-ville"' /tmp/mir-homepage.html
+          grep -F 'href="realisations.html"' /tmp/mir-homepage.html
+          fetch "$base/contact.html?verification=$GITHUB_SHA" /tmp/mir-contact.html
+          cmp /tmp/mir-contact.html _site_mir/contact.html
           grep -F 'assets/MIR-logo-officiel-original.svg' /tmp/mir-homepage.html
           grep -F 'Mon compte' /tmp/mir-homepage.html
-          grep -F 'Découvrir nos revêtements' /tmp/mir-homepage.html
+          grep -F 'Voir nos réalisations' /tmp/mir-homepage.html
           grep -F 'Voir notre boutique' /tmp/mir-homepage.html
           grep -F 'mir-home-card-revetement-20261105.webp' /tmp/mir-homepage.html
           grep -F 'mir-home-hero-20261105.avif' /tmp/mir-homepage.html
