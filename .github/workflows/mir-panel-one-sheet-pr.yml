@@ -36,10 +36,10 @@ jobs:
         run: npm install --no-save playwright@1.58.2
       - name: Onglet Panneaux et PDF fournisseur réel
         run: node tests/mir-panel-one-sheet-browser.cjs
-      - name: Calepinage → bon et anciens bons de pliage
-        run: |
-          node tests/mir-wall-panel-po-browser.cjs
-          MIR_CHROMIUM_BIN=$(command -v chromium || command -v google-chrome) node tests/mir-purchase-orders-browser.cjs
+      # Calepinage → 10 panneaux → PO est déjà contrôlé dans le workflow
+      # MIR — mur de 10 panneaux vers bon fournisseur sur le même SHA.
+      - name: Anciens bons de pliage et leurs PDF
+        run: MIR_CHROMIUM_BIN=$(command -v chromium || command -v google-chrome) node tests/mir-purchase-orders-browser.cjs
       - name: Aperçus et captures de navigateur
         if: always()
         uses: actions/upload-artifact@v4
