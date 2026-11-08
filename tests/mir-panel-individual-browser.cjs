@@ -26,7 +26,7 @@ async function set(page,sel,val){await page.locator(sel).fill(val);await page.lo
    assert.equal(await page.locator('#mir-wall-live-3d-stage [data-mir-wall-twin="3d"]').count(),1);
    if(w<=740){await page.locator('[data-mir-cal-stage="order"]').click();await page.locator('.mir-cal-mobile-full-table summary').click();}
    await page.locator('#piece-table [data-table-piece]').first().click();
-   if(w<=740){await page.locator('[data-mir-cal-stage="panels"]').click();await page.locator('.mir-cal-mobile-panel-inspector summary').click();}
+   if(w<=740){await page.locator('[data-mir-cal-stage="panels"]').click();await page.locator('.mir-cal-mobile-panel-inspector > summary').click();}
    await page.locator('#mir-panel-dimension-unit').selectOption('mm');
    const widthValue=Number(await page.locator('#piece-width').inputValue());
    const heightValue=Number(await page.locator('#piece-height').inputValue());
