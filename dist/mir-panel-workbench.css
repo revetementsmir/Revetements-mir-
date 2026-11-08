@@ -47,6 +47,9 @@ body.mir-admin-v4 #mir-procurement-panel .mir-wb-switch button{min-width:45px;mi
 .mir-wb-measures span{display:block;font-size:11px;color:#607362;font-weight:700}
 .mir-wb-measures strong{display:block;font-size:18px;margin:4px 0;color:#244c33}
 .mir-wb-measures small{display:block;font-size:10px;color:#7b8b77}
+.mir-wb-measures>div:last-child{grid-column:1/-1}
+.mir-wb-drawing{background:#fff}
+.mir-wb-drawing svg{max-height:385px}
 .mir-wb-spec{font-size:13px!important;line-height:1.45!important;color:#526b56!important;margin:10px 0!important}
 .mir-wb-issue{padding:10px 12px;background:#fff7e9;border:1px solid #e9d6b3;border-radius:8px;color:#7f5b33;font-size:12px}
 .mir-wb-extra,.mir-wb-manage{border-top:1px solid #e0e8df;padding-top:11px;margin:11px 0 0;color:#4f644f}
