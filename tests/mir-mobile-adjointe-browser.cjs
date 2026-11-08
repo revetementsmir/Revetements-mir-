@@ -42,6 +42,9 @@ const change=async(input,value)=>{await input.fill(value);await input.press('Tab
     const sequence=await page.evaluate(()=>({measure:document.querySelector('.settings').getBoundingClientRect().top,drawing:document.querySelector('.canvas-column').getBoundingClientRect().top}));
     assert.ok(sequence.measure<sequence.drawing,'Étape 2 : choisir la répartition AVANT de regarder le dessin : '+JSON.stringify(sequence));
     assert.equal(await page.locator('.mir-cal-mobile-panel-inspector').getAttribute('open'),null,'La fiche technique reste repliée au départ');
+    assert.equal(await page.locator('#mir-cal-panels-advanced').getAttribute('open'),null,'Les arrondis et réglages de joints restent dans les options avancées');
+    assert.equal(await page.locator('#precision').isVisible(),false,'La précision technique ne surcharge pas les mesures de base');
+    assert.equal(await page.locator('.canvas-card .drawing-toolbar').isVisible(),false,'Le dessin de mur n’impose pas une seconde barre d’outils en étape 2');
     await change(page.locator('#columns'),'5');
     await change(page.locator('#rows'),'2');
     await change(page.locator('#lip'),'1');
