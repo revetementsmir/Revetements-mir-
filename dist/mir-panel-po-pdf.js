@@ -118,7 +118,7 @@
     const m=api.buildPanel(item.spec);
     let body=sectionHeading('FICHE DE FABRICATION · PANNEAU '+(index+1)+'/'+total,'BON '+max(po.poNumber,45));
     const reference=item.sourceLayout?.sourcePieceId||item.id;
-    body+=txt(65,151,'PANNEAU '+max(reference,64),34,'font-weight="800"')+
+    body+=txt(65,151,'Panneau '+max(reference,64),34,'font-weight="800"')+
       txt(1330,150,'QTÉ '+m.quantity,26,'font-weight="800" text-anchor="end" fill="#28553a"');
     body+=rect(62,177,720,708,'#f8faf6','#dce5d8',12);
     body+=txt(85,215,'VUE COTÉE · UNE PIÈCE',19,'font-weight="700"');
