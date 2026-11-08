@@ -14,7 +14,9 @@
       "reject2": true,
       "legacyPreserved": true,
       "explicitFix5": true,
-      "pdfWarning": true
+      "pdfWarning": true,
+      "repeatedCoveragePrecision": true,
+      "legacyAggregationRefused": true
     },
     {
       "width": 834,
@@ -28,7 +30,9 @@
       "reject2": true,
       "legacyPreserved": true,
       "explicitFix5": true,
-      "pdfWarning": true
+      "pdfWarning": true,
+      "repeatedCoveragePrecision": true,
+      "legacyAggregationRefused": true
     },
     {
       "width": 1348,
@@ -42,7 +46,9 @@
       "reject2": true,
       "legacyPreserved": true,
       "explicitFix5": true,
-      "pdfWarning": true
+      "pdfWarning": true,
+      "repeatedCoveragePrecision": true,
+      "legacyAggregationRefused": true
     }
   ]
 }

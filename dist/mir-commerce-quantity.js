@@ -6,7 +6,7 @@
  if(root)root.MIRCommerceQuantity=api;
 })(typeof window==='object'?window:null,function(C){
  'use strict';
- const positive=n=>Number.isFinite(n)&&n>0,near=(a,b)=>Math.abs(a-b)<=1e-8*Math.max(1,Math.abs(a),Math.abs(b));
+ const positive=n=>Number.isFinite(n)&&n>0,near=(a,b)=>Math.abs(a-b)<=1e-8;
  const number=n=>new Intl.NumberFormat('fr-CA',{maximumFractionDigits:6}).format(n);
  function policy(m={},formatId=null){
   const d=m.dimensions||{},c=m.coverage||{},p=m.packaging||{},app=m.applications||[];
@@ -55,7 +55,7 @@
   if(p.missingFormat)return {ok:false,message:'Le format de cet article doit être choisi.',suggestion:null,policy:p};
   if(!rule)return {ok:false,message:'Unité incompatible avec le conditionnement. '+p.note,suggestion:null,policy:p};
   const count=q/rule.step;
-  if(!positive(q)||q>1000000||!near(count,Math.round(count))){
+  if(!positive(q)||q>1000000||(rule.step===1?!Number.isInteger(q):!near(count,Math.round(count)))){
    const next=Math.ceil(count-1e-9)*rule.step;
    return {ok:false,message:'Quantité attendue par multiples de '+number(rule.step)+' '+rule.unit+'. '+p.note,
     suggestion:positive(next)&&next<=1000000?next:null,policy:p};

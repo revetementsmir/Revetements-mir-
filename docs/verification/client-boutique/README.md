@@ -60,3 +60,5 @@ Chaque ligne de tout panier client est revérifiée à l’ouverture et après m
 - Captures `gabarit-*`, `quantite-2-refusee-*` et `ancien-panier-2-a-corriger-*`. Le visuel manquant est contenu dans sa case sur les trois formats.
 
 [PDF réel d’un ancien panier à corriger](ancien-panier-a-corriger-390.pdf) : quantité originale de 2 pi² conservée et avertissement imprimé. Les nouvelles captures incluent également une photo cassée dans l’article fictif de recette.
+
+Complément précision : les ajouts répétés conservent la couverture complète sans l’ancien arrondi à trois décimales. Test réel sur le soffite Rialux Timberland (5,677083333333333 pi² par pièce), deux ajouts successifs sans écart. Un ajout valide ne se fusionne pas avec une ancienne quantité incompatible : correction du panier requise d’abord. Les boîtes restent strictement entières, même pour de grandes quantités.
