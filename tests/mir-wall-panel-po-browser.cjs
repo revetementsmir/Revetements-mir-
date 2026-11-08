@@ -26,7 +26,7 @@ async function ready(){
    page.on('pageerror',e=>errors.push(e.message));
    page.on('dialog',d=>d.accept());
    await page.goto(base+'/calepinage.html',{waitUntil:'domcontentloaded'});
-   if(screen.width<=740)await page.locator('#mir-cal-mobile-example').click();
+   if(screen.width<=740){await page.locator('#mir-cal-mobile-example').waitFor({state:'visible'});await page.locator('#mir-cal-mobile-example').click();}
    else await page.locator('#load-example').click();
    await page.waitForFunction(()=>document.querySelector('#piece-count')?.textContent?.includes('8 panneaux'));
    if(screen.width<=740)await page.locator('[data-mir-cal-stage="panels"]').click();
