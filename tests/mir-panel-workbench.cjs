@@ -26,7 +26,7 @@ assert.equal((html.match(/data-mir-panel-include=/g)||[]).length,1,'Une commande
 assert.equal((html.match(/data-panel-volume=/g)||[]).length,1,'3D du même panneau');
 assert.match(html,/Panneau 3 SUR 10/i);
 const filtered=A.render({dossier:transfer.order,api:M,volume:V,excludedIds:[transfer.order.items[0].id,transfer.order.items[4].id]});
-assert.match(filtered,/8 panneau\(x\) sélectionné\(s\)/,'Dossier source intact, nombre ajusté');
+assert.match(filtered,/<strong data-mir-panel-count>8<\/strong> à commander/,'Dossier source intact, nombre ajusté et clairement affiché');
 const rows=A.orderRows(transfer.order.items,M);
 assert.equal((rows.match(/data-mir-po-piece=/g)||[]).length,10,'10 lignes de bon, aucune répétition');
 assert.equal((rows.match(/<svg/g)||[]).length,0,'Bon compact : dessins détaillés au PDF uniquement');
