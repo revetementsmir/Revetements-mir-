@@ -22,6 +22,7 @@ Travail sur le dépôt existant, branche `feat/mir-account-auth`, à partir du m
 - `supabase/verification/mir-account-acceptance.sql` : exécuté sur MIR TEST, transaction entièrement annulée. Deux clients, commandes/adresses privées, RLS, refus client/admin/anon, invitation de la bonne identité, refus de la mauvaise identité, affectation unique et répétition idempotente. Résultat PASS après la seconde migration.
 - `auth-settings.json` : réglages publics réels Google=true, disableSignup=false, confirmation du courriel conservée.
 - Captures `avant-*.png`, `connexion-*.png`, `adresses-*.png` : vrais navigateurs, inspection des formats téléphone, tablette et PC. Les données visibles sont fictives.
+- Correction de synchronisation du test de viewport : attendre la mise à jour de visualViewport avant de mesurer la barre, comme pour le scénario clavier. Les assertions de non-défilement et de visibilité restent identiques ; aucun test désactivé.
 - En-têtes publics : 30 contrôles navigateur réussis. Les preuves des ateliers et le véritable PDF de dix panneaux restent dans `../fixed-workspace/`.
 
 ## Limites et dépendances explicites
