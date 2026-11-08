@@ -56,7 +56,7 @@ for(const width of [320,360,390,820,1024,1440]){
   await page.getByRole('button',{name:'Voir le dossier'}).click();
   await page.locator('#portal-dialog[open]').waitFor();
   await page.keyboard.press('Escape');
-  await page.locator('[data-order-for]').click();
+  await page.getByRole('button',{name:'Commander',exact:true}).and(page.locator('.employee-job button')).click();
   await page.getByRole('heading',{name:'Commander du matériel'}).waitFor();
   await page.locator('#catalogue-category').selectOption('soffites-moulures');
   await page.getByRole('searchbox',{name:'Rechercher un article'}).fill('dépArt');
