@@ -631,7 +631,7 @@
         if(field.value.trim()&&!win.confirm('Remplacer ce numéro de bon par une proposition locale ?'))return;
         ui.poNumber=suggestedPONumber();field.value=ui.poNumber;autosave();field.focus();return;
       }
-      if(b.id==='mir-edit-lines'){switchTab('panels');return;}
+      if(b.id==='mir-edit-lines'){const hasPanels=currentOrder()?.items?.some(item=>item.spec?.kind==='panel');switchTab(hasPanels?'panels':'draw');if(!hasPanels)doc.querySelector('#production-drawing')?.focus({preventScroll:true});return;}
       if(b.dataset.mirPoEditLine){if(win.MIRProductionWorkspace?.editOrderItem?.(b.dataset.mirPoEditLine))switchTab('draw');return;}
       if(b.dataset.mirPoSupplier){const supplier=state.suppliers.find(row=>row.id===b.dataset.mirPoSupplier&&!row.archived);if(!supplier)return;ui.supplierId=supplier.id;autosave();switchTab('orders');return;}
       if(b.id==='mir-new-draft'){if(win.MIRProductionWorkspace?.newPurchaseOrder()){state.editingId=null;Object.assign(ui,{poNumber:'',job:'',foreman:'',shipTo:'',requestedDate:'',terms:'',notes:''});state.formDraft={...ui};save();poView='create';switchTab('orders');}return;}
