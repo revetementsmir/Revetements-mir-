@@ -1,0 +1,18 @@
+/* Approved client landing only. No selector affects the homepage, shop or admin. */
+body[data-client-pliage-landing] .page-main{padding-top:clamp(32px,5vw,72px);max-width:1200px}
+.client-bend-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,7vw,100px);align-items:center;padding:0 0 34px}
+.client-bend-copy h1{font:600 clamp(32px,4.3vw,56px)/1.07 Arial,sans-serif;letter-spacing:-.045em;margin:18px 0}
+.client-bend-copy h1 em{font-family:Georgia,serif;font-weight:400;color:#345d3d}
+.client-bend-copy>p:not(.eyebrow){font-size:16px;line-height:1.7;max-width:400px;color:#51624f}
+.client-bend-copy .mir-button{display:flex;align-items:center;justify-content:space-between;gap:24px;background:#348511;color:white;min-height:48px;margin-top:22px;width:max-content;font-size:14px;border-radius:6px;padding:12px 18px}
+.client-bend-copy small{display:block;color:#61705d;font-size:11px;margin-top:12px}
+.client-bend-example{margin:0;padding:20px;background:radial-gradient(at 65% 35%,#355d44,#152e24);color:#e3ebdb;border-radius:12px;overflow:hidden}
+.client-bend-example figcaption,.client-bend-example>p{display:flex;justify-content:space-between;gap:12px;font:9px Arial,sans-serif;letter-spacing:.12em}
+.client-bend-example svg{display:block;width:100%;height:auto;max-height:300px;margin:12px 0}
+.client-bend-example>p{font-size:9px;letter-spacing:0}
+.client-bend-quick{border-top:1px solid #dce2d4;margin:0 0 24px}
+.client-bend-quick>summary{list-style:none;display:flex;justify-content:space-between;gap:20px;cursor:pointer;padding:18px 0;font-size:13px;min-height:48px}
+.client-bend-quick>summary::-webkit-details-marker{display:none}
+.client-bend-quick[open]>summary span{transform:rotate(45deg)}
+.client-bend-quick-content{padding-block:12px}
+@media(max-width:600px){.client-bend-hero{grid-template-columns:1fr;gap:26px;padding-bottom:20px}.client-bend-copy h1{font-size:34px;margin:14px 0}.client-bend-copy .mir-button{width:100%;margin-top:18px}.client-bend-copy>p:not(.eyebrow){font-size:14px}.client-bend-example{padding:16px}.client-bend-example svg{max-height:215px}}

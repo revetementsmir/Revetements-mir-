@@ -1,0 +1,123 @@
+{
+  "browser": "Installed Chromium, emulation only; no physical Android/iPad/Safari claim",
+  "externalNetwork": "Blocked equally for deterministic local screenshots; no remote writes",
+  "results": [
+    {
+      "width": 360,
+      "height": 780,
+      "input": "touch",
+      "landing": true,
+      "models": true,
+      "freehand": true,
+      "undo": true,
+      "measurements": true,
+      "existingDossier": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "input": "touch",
+      "landing": true,
+      "models": true,
+      "freehand": true,
+      "undo": true,
+      "measurements": true,
+      "existingDossier": true
+    },
+    {
+      "width": 428,
+      "height": 926,
+      "input": "touch",
+      "landing": true,
+      "models": true,
+      "freehand": true,
+      "undo": true,
+      "measurements": true,
+      "existingDossier": true
+    },
+    {
+      "width": 600,
+      "height": 900,
+      "input": "touch",
+      "landing": true,
+      "models": true,
+      "freehand": true,
+      "undo": true,
+      "measurements": true,
+      "existingDossier": true
+    },
+    {
+      "width": 601,
+      "height": 900,
+      "input": "touch",
+      "landing": true,
+      "models": true,
+      "freehand": true,
+      "undo": true,
+      "measurements": true,
+      "existingDossier": true
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "input": "touch",
+      "landing": true,
+      "models": true,
+      "freehand": true,
+      "undo": true,
+      "measurements": true,
+      "existingDossier": true
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "input": "touch",
+      "landing": true,
+      "models": true,
+      "freehand": true,
+      "undo": true,
+      "measurements": true,
+      "existingDossier": true
+    },
+    {
+      "width": 1348,
+      "height": 926,
+      "input": "mouse",
+      "landing": true,
+      "models": true,
+      "freehand": true,
+      "undo": true,
+      "measurements": true,
+      "existingDossier": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "input": "mouse",
+      "landing": true,
+      "models": true,
+      "freehand": true,
+      "undo": true,
+      "measurements": true,
+      "existingDossier": true
+    },
+    {
+      "homepageWidth": 390,
+      "height": 844,
+      "pixelIdentical": true,
+      "sha256": "bc743092881785092751f5bee963e0d4b8e9a7b58a7c7d2f69cd727353399eb0"
+    },
+    {
+      "homepageWidth": 834,
+      "height": 1112,
+      "pixelIdentical": true,
+      "sha256": "48d6106901c2463d58c20a42f6f28334c903989c4b530199fae452e2410b31db"
+    },
+    {
+      "homepageWidth": 1348,
+      "height": 926,
+      "pixelIdentical": true,
+      "sha256": "71d4ebd4ab7950cffeff2fed479c0d86dfa356b4bc5d05b7ff6ec8b0dfd54992"
+    }
+  ]
+}

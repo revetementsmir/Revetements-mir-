@@ -59,6 +59,7 @@ async function ready(){
    await page.waitForSelector('.model-library-card');
    assert.match(await page.locator('.model-library-card').first().textContent(),/Solin test MIR/);
    await page.goto(base+'/pliage.html',{waitUntil:'domcontentloaded'});
+   await page.locator('#client-bend-quick summary').click();
    await page.waitForSelector('[data-custom-model-id="mir-modele-audit"]',{timeout:25000});
    assert.match(await page.locator('[data-custom-model-id="mir-modele-audit"]').textContent(),/7,99/);
    assert.match(await page.locator('[data-custom-model-id="mir-modele-audit"]').textContent(),/10,99/);

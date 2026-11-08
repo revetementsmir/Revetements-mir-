@@ -1,0 +1,100 @@
+PASS 6/12 : portée 108 po, montée 27 po et pointe 123 po
+PASS Pente 6 / 12 avec espaces
+PASS Pente numérique 6
+PASS Pentes gauche/droite indépendantes
+PASS Fractions chantier
+PASS Largeur verrouillée, fermeture exacte
+PASS Solin brique sans cotes inventées
+PASS Coin 86 degrés possible
+PASS Coin J : clouage minimum = retour + 1¼
+PASS Exception J requiert acceptation explicite
+PASS Snapshot J avec exception transférable en production
+PASS Tracé SHIFT orthogonal
+PASS Solin brique et coin avec J sont directement accessibles sur la vraie page de production
+PASS Les pages principales ne renvoient plus vers les écrans de démonstration
+PASS La page des coins charge les composants de production
+PASS Les onze profils MIR sont disponibles dans le configurateur
+PASS Fascia et L replié gardent le retour écrasé
+PASS Beam avec replis : sept segments, deux retours écrasés
+PASS Les solins brique ne préremplissent aucune cote inconnue
+PASS Le J intégré avertit pour le clouage inférieur au minimum
+PASS La correction automatique du J respecte le minimum
+PASS Une exception J exige une acceptation nominative
+PASS Le J ne peut pas contourner la règle après modification de la topologie
+PASS Les profils sont chargés directement sur la page de production
+PASS La page calepinage expose les contrôles préparés
+PASS Studio : clin 7 po sur 10 pi = 17 rangs complets + coupe de 1 po
+PASS Studio : panneaux 4×8 / 4×10 gardent leur format et leur orientation
+PASS Studio : la vue 2D ne repeint plus le soffite comme une bande sur le mur
+PASS Studio : le retrait central reste continu sur les deux étages
+PASS Studio : le grain du fibrociment reste indépendant de la couvrance
+PASS MIR : nouvelle version conservée en brouillon jusqu’au tarif, ancienne version intacte
+PASS Mesures standard MIR : fractions, verrouillage et longueur
+PASS Mesures standard MIR : cote verrouillée vide interdite
+PASS Mesures standard MIR : nouvelles fiches privées et usage magasin contrôlé
+PASS Pliage MIR : retour écrasé avec un raccord arrondi
+PASS Repères A-B-C : les côtés serrés gardent leurs étiquettes hors du dessin
+PASS Tracé MIR : un repli manuel reste écrasé après une petite retouche
+PASS Sauvegarde MIR : modèles et mesures seulement, pas de commandes
+PASS Sauvegarde MIR : ne jamais remplacer un modèle local par une vieille version
+PASS Sauvegarde MIR : rejeter fichiers erronés et doublons sans écriture
+PASS Sauvegarde MIR : interface réservée à l’atelier local
+Tests MIR : 41/41 réussis.
+PASS Une moulure standard est livrée en 120 po
+PASS Le J générique est de 10 pi
+PASS Un coin J intégré ne reçoit pas par erreur le 12 pi
+PASS Seul le J à soffite identifié est en 144 po
+PASS La longueur exacte 120 est admise sur une nouvelle commande
+PASS La longueur exacte 144 du J soffite est admise
+PASS La longueur 144 est refusée sur le J générique
+PASS Les longueurs 96, 100 et 0 sont refusées sur les nouvelles commandes
+PASS Les millimètres après conversion respectent les deux formats
+PASS L ancienne pièce 96 peut être révisée sans changer la longueur
+PASS Une longueur historique changée ne bénéficie pas de l exception
+PASS Un modèle préexistant reste valide pour lecture et PDF
+PASS Le configurateur principal charge le moteur avant son application
+PASS Le configurateur standalone réutilise la même règle
+PASS L identifiant J soffite est distinct dans le configurateur
+PASS Les modifications historiques restent séparées des snapshots
+PASS Le transfert de profil applique la même longueur fixe que le configurateur
+PASS Le transfert refuse une quantité invalide sans toucher à la géométrie
+PASS La dérogation J reste figée au transfert et ne permet pas le 12 pi
+MIR longueurs: 19 tests réussis.
+PASS La charte MIR Signature définit les mêmes couleurs que la page d’accueil
+PASS Toutes les pages client utilisent le thème, aucun nouveau site ni formulaire factice
+PASS Les liens internes d’admin ne sont plus proposés en pied de page client
+PASS Les fonctionnalités client réelles sont toujours présentes
+PASS La sécurité du portail ne change pas et aucun réglage Admin ne devient public
+PASS Le texte de l’en-tête boutique garde le contraste sur sa photo sombre
+PASS Direction photo Québec documentée sans changer les maisons
+PASS Estimation reste accessible en mobile et le Studio revient aux réalisations
+PASS Le configurateur client partage les codes MIR sans modifier la version Admin
+MIR Signature : 9/9 tests réussis
+PASS Accueil principal et logo original Illustrator inchangé dans la marque
+PASS Les couleurs des deux boutons reprennent la maquette validée
+PASS Le compte est neutre pour futurs clients et équipe
+PASS Le visiteur peut entrer sans compte ni action de connexion obligatoire
+PASS Maison du portfolio MIR utilisée, aucune image IA nouvelle ni palmiers
+PASS Pas de pictogrammes dans le nouveau bloc de services
+PASS Quatre images approuvées téléchargées sans reconversion du rendu en simple maquette
+PASS Adaptation ultrawide sans étirer la photo ni cacher la façade
+PASS 3D / plan PDF au troisième niveau et métier MIR au premier
+PASS Page responsive et logo non déformé
+PASS Liens principaux locaux présents sans site de démonstration
+PASS Mon compte actif utilise une clé publique et le contrôle de rôle serveur
+PASS Le logo Illustrator original est utilisé sur les pages publiques principales
+MIR accueil premium : 13/13 tests réussis.
+PASS Moulure L : addition exacte des segments A=3 et B=2 (5 po)
+PASS Moulure J : 3 + 2 + 3⅛ = 8⅛ po
+PASS La largeur est également disponible en millimètres
+PASS Chaque profil intégré utilise la somme de ses côtés
+PASS Ajout de deux plis : recalcul de la largeur sans compter les plis comme côtés
+PASS La page charge les ressources admin et garde les scripts métier
+PASS Les deux choix supérieurs sont Moulures et Panneaux architecturaux
+PASS Total des côtés affiché dans les réglages, jamais sous le dessin
+PASS Matériaux et Couleur sont des panneaux séparés, finition client conservée
+PASS Le magasin et la boutique ne polluent pas la page de traçage admin
+PASS Le parcours client ne charge pas la refonte admin
+PASS Responsive tablette et téléphone, tailles tactiles et champs sans débordement
+PASS Zoom 2D des moulures: boutons, pincement et molette
+MIR atelier v4: 13 scénarios réussis

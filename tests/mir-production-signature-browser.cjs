@@ -20,8 +20,8 @@ async function verifyMouldingWizard(browser,base,artifacts){
  assert.equal(await next.isDisabled(),true);
  assert.equal(await desktop.locator('[data-client-step]:disabled').count(),4);
  assert.equal(await desktop.locator('#production-dimensions').isVisible(),false);
- // Le parcours actuel n'affiche pas de profils L/J/Z imposés.
- // Tester le vrai tracé libre, sans modifier le configurateur pour un ancien test.
+ // L’entrée approuvée propose deux choix ; ce parcours teste le moteur de tracé réel.
+ // Les formes standard ne sont pas dupliquées dans la liste des modèles enregistrés.
  assert.equal(await desktop.locator('#production-templates [data-template]').count(),0);
  await desktop.locator('#client-draw-profile').click();
  const desktopTrace=desktop.locator('#production-drawing svg');
@@ -85,7 +85,7 @@ async function verifyMouldingWizard(browser,base,artifacts){
  assert.equal(stored[0].spec.material.type,'aluminium');
  assert.equal(stored[0].snapshot.geometry.segments[1].lengthMM,57.15);
  assert.equal(await stage(),'1');
- await desktop.locator('[data-kind="panel"]').click();
+ await desktop.goto(base+'/production.html?mode=client');await desktop.waitForFunction(()=>!!window.MIRProductionWorkspace);
  assert.equal(await stage(),null);
  assert.equal(await desktop.locator('.production-workspace').locator('.template-section').count(),0);
  await desktop.locator('[data-kind="profile"]').click();
@@ -114,9 +114,9 @@ async function verifyMouldingWizard(browser,base,artifacts){
  };
  const finish=mobile.locator('#drawing-tools [data-draw-tool="draw"]');
  await tap(220,330);
- await tap(465,330);
+ await tap(380,330);
  assert.equal(await finish.isDisabled(),true);
- await tap(465,195);
+ await tap(380,210);
  assert.equal(await finish.isEnabled(),true);
  await finish.tap();
  assert.equal(await mobile.locator('body').getAttribute('data-client-stage'),'2');

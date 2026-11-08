@@ -1,0 +1,10 @@
+Navigateur de recette : /usr/bin/chromium
+PASS bureau 1440x900, no overflow, profile and panel, zoom 2D
+PASS tablette-paysage 1024x768, no overflow, profile and panel, zoom 2D
+PASS tablette-portrait 820x1180, no overflow, profile and panel, zoom 2D
+PASS mobile 390x844, no overflow, profile and panel, zoom 2D
+PASS mobile-compact 360x780, no overflow, profile and panel, zoom 2D
+PASS mobile-landscape 844x390, no overflow, profile and panel, zoom 2D
+PASS save draft without PO and open local dossier
+PASS ancien dossier 8 pi : lecture, révision et historique préservés
+PASS client unaffected

@@ -33,9 +33,9 @@ async function runAt(browser,base,width){
  });
  await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
- assert.equal(await page.locator('#production-templates [data-template]').count(),0,'plus de profils prédéfinis');
+ assert.equal(await page.locator('#production-templates [data-template]').count(),0,'modèles enregistrés distincts des formes de départ');
+ await page.locator('#client-choose-model').click();
  await page.locator('[data-saved-template]').click();
- await next.click();
  await page.locator('[data-segment-length="0"]').fill('3 1/2');
  await page.locator('[data-segment-length="1"]').fill('2 1/4');
  await next.click();assert.equal(await page.locator('[data-measure="length"]').inputValue(),'120');

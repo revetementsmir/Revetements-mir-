@@ -1,0 +1,4 @@
+Navigateur de recette : /usr/bin/chromium
+PASS bureau : 4 onglets, prix, catalogue, retrait, fournisseurs, largeur
+PASS mobile : 4 onglets, prix, catalogue, retrait, fournisseurs, largeur
+PASS mobile-compact : 4 onglets, prix, catalogue, retrait, fournisseurs, largeur
