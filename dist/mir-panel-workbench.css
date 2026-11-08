@@ -146,3 +146,13 @@ body #mir-procurement-panel .mir-wb-heading-links button{min-height:39px;padding
  .mir-wb-heading-links{gap:4px}
  body #mir-procurement-panel .mir-wb-heading-links button{min-height:38px;padding:6px 8px;font-size:11px}
 }
+
+/* Keep the dimension arrows and lip labels unobstructed on phones.
+   The previous sticky call-to-action overlapped the drawing during scroll. */
+@media(max-width:740px){
+ body.mir-admin-v4 .mir-wb-next-action{
+   position:relative!important;bottom:auto!important;z-index:auto!important;
+   box-shadow:none!important;margin:10px 0 0!important
+ }
+ body.mir-admin-v4 .mir-wb-drawing svg{max-height:375px}
+}
