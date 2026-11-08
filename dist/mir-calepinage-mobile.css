@@ -70,7 +70,7 @@
  .mir-cal-mobile-full-table .table-wrap{overflow:auto}
  body[data-mir-cal-step] .production-section .export-bar{margin-top:5px}
  body[data-mir-cal-step] #send-production{display:none!important}
- body[data-mir-cal-step] #mir-cal-mobile-footer{position:sticky;bottom:0;display:flex;gap:8px;z-index:40;padding:11px 4%;margin:10px -4% -100px;background:#fafbf7;border-top:1px solid #d3e2d1;box-shadow:0 -5px 15px #1c32231c}
+ body[data-mir-cal-step] #mir-cal-mobile-footer{position:fixed;bottom:0;left:0;right:0;display:flex;gap:8px;z-index:80;padding:11px 4% calc(11px + env(safe-area-inset-bottom));margin:0;background:#fafbf7;border-top:1px solid #d3e2d1;box-shadow:0 -5px 15px #1c32231c}
  body[data-mir-cal-step] #mir-cal-mobile-footer button{min-height:51px;padding:12px;border-radius:9px;touch-action:manipulation;font-size:13px;font-weight:800}
  body[data-mir-cal-step] #mir-cal-mobile-back{background:#fff;border:1px solid #becfbd;color:#2d5a3b;flex:0 0 88px}
  body[data-mir-cal-step] #mir-cal-mobile-next{background:#285a3a;color:#fff;flex:1;border:1px solid #285a3a}
