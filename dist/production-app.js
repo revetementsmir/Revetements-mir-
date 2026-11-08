@@ -45,7 +45,7 @@ const profiles={l:{name:'Pliage en L',dimensions:{A:3,B:2}},j:{name:'Pliage en J
 const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','Triangle rectangle'],['triangle','Triangle à sommet'],['roof-slope','Panneau haut rampant X/12'],['trapezoid','Trapèze'],['parallelogram','Parallélogramme'],['pointed','Côté en pointe']];
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));return true;}catch{toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
 function persist(){store(KEYS.draft,{version:1,order});}
-function toast(text){$('#production-toast').textContent=text;$('#production-toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#production-toast').classList.remove('visible'),4400);}
+function toast(text,{quiet=false}={}){$('#production-toast').textContent=text;$('#production-toast').classList.toggle('visible',!quiet);clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#production-toast').classList.remove('visible'),4400);}
 function closeDialog(){pendingPOAfterSave=null;$('#production-dialog').close();}
 function dialog(title,text,body){$('#production-dialog-content').innerHTML=`<p class="eyebrow">L’ATELIER MIR</p><h2 id="production-dialog-title" class="dialog-heading">${esc(title)}</h2>${text?`<p class="dialog-intro">${esc(text)}</p>`:''}${body}`;if(!$('#production-dialog').open)$('#production-dialog').showModal();}
 function messageError(message){let el=$('#production-dialog-error');if(!el){el=document.createElement('p');el.id='production-dialog-error';el.className='dialog-error';el.setAttribute('role','alert');$('#production-dialog-content').append(el);}el.textContent=message;}
@@ -445,7 +445,7 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
  svg+=measure('width','A — Largeur hors tout',center,dimY+10,142,text(center,dimY+12,'A · '+value(model.widthMM)));
  svg+=measure('height','B — Hauteur hors tout',dimX+47,middle,94,text(dimX+9,middle-10,'B','start')+text(dimX+9,middle+10,value(model.heightMM),'start'));
  const profileX=canvas/2,profileY=height-29;
- svg+=measure('relief','C — Projection',profileX,profileY,196,`<path d="M${profileX-85},${profileY-10}h30v19h15 M${profileX-49},${profileY-10}v19" fill="none" stroke="#658064" stroke-width="1.5" pointer-events="none"/>${text(profileX-30,profileY,'C · '+value(model.reliefMM),'start')}<text x="${profileX+92}" y="${profileY+1}" text-anchor="end" dominant-baseline="middle" font-size="12" fill="#49614a" pointer-events="none">Profil</text>`);
+ svg+=measure('relief','C — Projection',profileX,profileY,196,`<path d="M${profileX-76},${profileY-10}h30v19h15 M${profileX-40},${profileY-10}v19" fill="none" stroke="#658064" stroke-width="1.5" pointer-events="none"/>${text(profileX-21,profileY,'C · '+value(model.reliefMM),'start')}`);
  return svg+'</svg>';
 }
 function profileVolumeStrips(model){
@@ -2036,7 +2036,7 @@ function applyPanelDirect(){
  }
  const model=build(next),mesh=window.MIRProductionVolume.buildMesh(model);
  if(!model.valid||!mesh.valid)return messageError(model.validation?.errors?.[0]?.message||mesh.errors?.[0]?.message||'Cette cote ne permet pas de construire les lèvres. La mesure précédente est conservée.');
- panelDirectUndo.push(copy(draft));panelDirectRedo=[];draft=next;panelDirectEdit=null;closeDialog();renderDimensions();renderPanelOptions();updateDrawing();toast('Cote appliquée au dessin. Enregistrez la pièce pour mettre à jour le dossier.');
+ panelDirectUndo.push(copy(draft));panelDirectRedo=[];draft=next;panelDirectEdit=null;closeDialog();renderDimensions();renderPanelOptions();updateDrawing();toast('Cote appliquée au dessin. Enregistrez la pièce pour mettre à jour le dossier.',{quiet:true});
 }
 function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom],[data-edit-panel-measure],[data-edit-panel-edge],[data-edit-profile-measure]');if(!button)return;const d=button.dataset;
  if(button.id==='mir-profile-direct-apply')return applyProfileDirect();
