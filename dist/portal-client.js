@@ -192,7 +192,7 @@
         if(passwordGate){emit({phase:'password_required',passwordIntent:passwordGate,user:{id:user.id,email:user.email||''},snapshot:null,account:null,error:null},'auth');return null;}
         if (currentGeneration !== generation || sequence !== readSequence || disposed) return null;
         if (status.user?.id && status.user.id !== user.id) {
-          generation++; currentGeneration = generation; emit({ snapshot: null, pending: null }, 'auth');
+          generation++; currentGeneration = generation; emit({ phase:'loading',user:null,account:null,snapshot:null,pending:null }, 'auth');
         }
         const epoch = generation;
         emit({ user: { id: user.id, email: user.email || '' }, pending: readPending(user.id) });
@@ -212,7 +212,7 @@
       } catch (error) {
         if (currentGeneration !== generation || sequence !== readSequence || disposed) return null;
         const mapped = errorOf(error), denied = ['ACCESS_DENIED', 'ACTOR_INACTIVE', 'MEMBER_INACTIVE', 'MEMBERSHIP_REQUIRED', 'AUTH_REQUIRED', '42501'].includes(mapped.code);
-        emit({ phase: denied ? 'access_denied' : 'error', snapshot: null, error: mapped }, 'refresh');
+        emit({ phase: denied ? 'access_denied' : 'error', snapshot: null,account:null, error: mapped }, 'refresh');
         throw mapped;
       }
     }
