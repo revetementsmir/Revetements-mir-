@@ -494,7 +494,7 @@
     function switchTab(next){
       if(pendingWorkflowObserver){pendingWorkflowObserver.disconnect();pendingWorkflowObserver=null;}
       tab=['draw','panels','models','boutique','store','orders','suppliers'].includes(next)?next:'draw';
-      doc.body.dataset.mirPanelOrder=tab==='orders'&&includedDossier(currentOrder())?.items.some(i=>i.spec?.kind==='panel')?'true':'false';
+      doc.body.dataset.mirPanelOrder=tab==='orders'&&poView==='create'&&includedDossier(currentOrder())?.items.some(i=>i.spec?.kind==='panel')?'true':'false';
       doc.body.dataset.mirTab=tab;shortcuts.hidden=tab!=='draw'&&tab!=='models';panel.hidden=!['panels','orders','suppliers','boutique','store'].includes(tab);
       tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===(tab==='suppliers'?'orders':tab)?'page':'false'));
       shortcuts.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===tab?'page':'false'));
