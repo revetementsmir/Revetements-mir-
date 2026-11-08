@@ -78,3 +78,5 @@
  body[data-mir-cal-step] #mir-cal-mobile-footer input:focus-visible,
  body[data-mir-cal-step] #mir-cal-mobile-footer button:focus-visible{outline:3px solid #7da873;outline-offset:2px}
 }
+
+@media(max-width:740px){body[data-mir-cal-step] #mir-cal-mobile-example{margin-top:10px;padding:8px 10px;font-size:12px;min-height:40px;color:#2e593b;background:#f2f7ee;border:1px solid #c0d5bd;border-radius:8px;font-weight:700}}
