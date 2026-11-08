@@ -54,7 +54,9 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    assert.equal(await page.locator('#send-production').isDisabled(),true);
    await page.locator('#zone-width').fill('120');await page.locator('#zone-width').press('Tab');
    await page.locator('#zone-height').fill('96');await page.locator('#zone-height').press('Tab');
+   if(v.w<=740)await page.locator('[data-mir-cal-stage="panels"]').click();
    await page.locator('#lip').fill('1');await page.locator('#lip').press('Tab');
+   if(v.w<=740){await page.locator('[data-mir-cal-stage="wall"]').click();await page.locator('#mir-cal-mobile-advanced summary').click();}
    assert.equal(await page.locator('#layout-svg [data-wall-sketch="pending"]').count(),0,'Sketch materialized once real measurements entered');
    assert.ok(await page.locator('#layout-svg .mir-wall-edge-label').count()>=3,'Actual side names persist');
    assert.equal(await page.locator('#layout-svg .mir-wall-angle-label').count(),4,'Angles shown at all four corners');
