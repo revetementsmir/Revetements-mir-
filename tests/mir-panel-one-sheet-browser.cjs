@@ -69,6 +69,12 @@ async function serverReady(){
    assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),9,'Choix inclus au PO sauvegardé');
    await page.locator('[data-mir-panel-include]').nth(2).check();
    assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),10);
+   await page.locator('[data-mir-panel-all="false"]').click();
+   assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),0,'Tout retirer du bon sans supprimer les pièces');
+   assert.equal(await page.locator('[data-mir-panel-to-po]').last().isDisabled(),true,'Bon indisponible sans pièce');
+   await page.locator('[data-mir-panel-all="true"]').click();
+   assert.equal(await page.locator('[data-mir-panel-include]:checked').count(),10,'Tout inclure remet les dix pièces');
+   assert.equal(await page.locator('[data-mir-panel-to-po]').last().isEnabled(),true,'Le bon peut de nouveau être préparé');
    await page.locator('[data-mir-panel-to-po]').last().click();
    await page.locator('#mir-procurement-panel [data-mir-po-piece]').first().waitFor({state:'visible'});
    assert.equal(await page.locator('[data-mir-po-piece]').count(),10,'Dix lignes uniques dans le bon');
