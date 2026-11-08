@@ -73,7 +73,13 @@ async function ready(){
    if(screen.name==='pc'){
     const receipt=await page.evaluate(async()=>{
      const po=JSON.parse(localStorage.getItem('mir_admin_procurement_v1')).orders[0];
-     const finished={...po,items:po.items.map(item=>({...item,spec:{
+     const finished={...po,
+      poNumber:'DEMO-MIR-10-PANNEAUX',
+      job:'CHANTIER FICTIF - EXEMPLE DE 10 PANNEAUX',
+      shipTo:'Adresse fictive - Québec',
+      notes:'DEMONSTRATION SEULEMENT - aucun bon envoyé ni commande réelle. Confirmer toutes les dimensions et les choix de fabrication.',
+      supplier:{...po.supplier,name:'Unico (EXEMPLE NON ENVOYÉ)',email:'non-envoye@example.invalid',phone:'Non applicable'},
+      items:po.items.map(item=>({...item,spec:{
       ...item.spec,relief:'2',material:{type:'aluminium',thickness:'2',thicknessUnit:'mm'},
       finish:{manufacturer:'Unico',name:'Noir fictif test',code:'NOIR-TEST',selectionType:'manufacturer'},
       perforation:{enabled:false,edgeId:item.spec.bottomEdgeId||'bottom'}
@@ -82,13 +88,23 @@ async function ready(){
      const pending=finished.items.filter(item=>!model.buildPanel(item.spec).complete).map(item=>({id:item.id,pending:model.buildPanel(item.spec).validation.pending}));
      if(pending.length)throw Error('PDF bloqué par les fiches de test : '+JSON.stringify(pending));
      const faces=window.MIRPOWorkflow.pdfFaces(finished,model);
-     const pdf=await window.MIRPDF.makePlan({faces,title:'MIR · bon de 10 panneaux',subtitle:'Essai chantier fictif'});
+     const pdf=await window.MIRPDF.makePlan({faces,title:'MIR · bon de 10 panneaux',subtitle:'DOCUMENT DE DÉMONSTRATION - ne pas envoyer'});
      const bytes=new Uint8Array(await pdf.blob.arrayBuffer());
-     return {pages:pdf.pages?.length||faces.length,size:bytes.length,header:String.fromCharCode(...bytes.slice(0,5)),faces:faces.length};
+     const reader=new FileReader();
+     const dataUrl=await new Promise((resolve,reject)=>{
+      reader.onload=()=>resolve(reader.result);
+      reader.onerror=()=>reject(reader.error||Error('Lecture du PDF impossible'));
+      reader.readAsDataURL(pdf.blob);
+     });
+     return {pages:pdf.pages?.length||faces.length,size:bytes.length,header:String.fromCharCode(...bytes.slice(0,5)),faces:faces.length,pdfBase64:dataUrl.split(',')[1]};
     });
     assert.equal(receipt.header,'%PDF-','PDF réel et pas une capture ou un dessin PNG');
     assert.ok(receipt.size>25000,'Le PDF possède une taille crédible : '+JSON.stringify(receipt));
     assert.ok(receipt.faces>=6,'Couverture et dessins individuels des 10 panneaux');
+    const demoFile=path.join(artifacts,'MIR-EXEMPLE-bon-commande-10-panneaux.pdf');
+    fs.writeFileSync(demoFile,Buffer.from(receipt.pdfBase64,'base64'));
+    delete receipt.pdfBase64;
+    assert.equal(fs.readFileSync(demoFile).subarray(0,5).toString(),'%PDF-');
     console.log('PASS PDF fournisseur réel : '+JSON.stringify(receipt));
    }
    await page.screenshot({path:path.join(artifacts,'mir-mur-10-bon-'+screen.name+'.png'),fullPage:true});
