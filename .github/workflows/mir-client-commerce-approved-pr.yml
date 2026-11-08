@@ -2,7 +2,7 @@ name: MIR — Boutique client approuvée
 on:
   pull_request:
     branches: [main]
-    paths: ['dist/boutique.html','dist/produit.html','dist/selection.html','dist/commerce.js','dist/mir-commerce-approved.css','dist/mir-harmony.js','tests/mir-client-commerce-approved-browser.cjs','tests/mir-selection-pdf*','tests/mir-unified-dossier-browser.cjs','tests/mir-client-header*','tests/mir-account-browser.cjs','.github/workflows/mir-client-commerce-approved-pr.yml']
+    paths: ['dist/boutique.html','dist/produit.html','dist/selection.html','dist/commerce.js','dist/mir-commerce-approved.css','dist/mir-harmony.js','dist/mir-commerce-quantity.js','dist/mir-selection-pdf.js','dist/material-coverage.js','tests/mir-commerce-quantity.cjs','tests/mir-commerce-templates-browser.cjs','tests/mir-client-commerce-approved-browser.cjs','tests/mir-selection-pdf*','tests/mir-unified-dossier-browser.cjs','tests/mir-client-header*','tests/mir-account-browser.cjs','.github/workflows/mir-client-commerce-approved-pr.yml']
 permissions:
   contents: read
 jobs:
@@ -26,6 +26,7 @@ jobs:
           node --check dist/mir-harmony.js
           node tests/mir-client-header.cjs
           node tests/mir-selection-pdf.cjs
+          node tests/mir-commerce-quantity.cjs
           node tests/mir-homepage.cjs
           node tests/mir-new-materials.cjs
       - name: Recette native et régressions
@@ -34,6 +35,7 @@ jobs:
         run: |
           export MIR_CHROMIUM_BIN=$(command -v google-chrome || command -v chromium)
           node tests/mir-client-commerce-approved-browser.cjs
+          node tests/mir-commerce-templates-browser.cjs
           node tests/mir-selection-pdf-browser.cjs
           node tests/mir-unified-dossier-browser.cjs
           node tests/mir-client-header-browser.cjs
