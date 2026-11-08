@@ -40,9 +40,33 @@ function dimension(key){
  const d=document.createElement('dialog');d.className='mir-workspace-choice';d.innerHTML='<h2></h2><label>Nouvelle cote<input id="mir-workspace-dimension-value" inputmode="text"></label><label>Unité<select><option value="in">Pouces et fractions</option><option value="mm">Millimètres</option></select></label><p>Les cotes et les joints verrouillés sont conservés. C désigne la projection, pas l’épaisseur.</p><p role="alert"></p>';
  $('h2',d).textContent=label;$('input',d).value=value||'';
  d.append(button('Appliquer',()=>{const result=api.applyDimension(key,$('input',d).value,$('select',d).value);if(!result.ok){$('[role=alert]',d).textContent=result.error;return;}d.close();}),button('Annuler',()=>d.close()));
- d.addEventListener('close',()=>{d.remove();$('.mir-workspace-dimensions [data-wall-dimension="'+key+'"]')?.focus();});document.body.append(d);d.showModal();$('input',d).focus();$('input',d).select();
+ d.addEventListener('close',()=>{d.remove();($('svg [data-wall-dimension="'+key+'"]')||$('.mir-workspace-dimensions [data-wall-dimension="'+key+'"]'))?.focus();});document.body.append(d);d.showModal();$('input',d).focus();$('input',d).select();
 }
-function wallDimensions(){const api=window.MIRCalepinageWorkspace;if(!api||!mounted)return;const s=api.getState();for(const key of ['width','height','projection']){const b=$('.mir-workspace-dimensions [data-wall-dimension="'+key+'"]');if(b)b.textContent=({width:'A — Largeur',height:'B — Hauteur',projection:'C — Projection'}[key])+' · '+((key==='projection'?s.zone.meta.projection:s.zone.values[key])||'À préciser')+' po';}}
+function wallDimensions(){
+ const api=window.MIRCalepinageWorkspace,strip=$('.mir-workspace-dimensions');
+ if(!api||!mounted||!strip)return;
+ const {zone}=api.getState();
+ for(const key of ['width','height','projection']){
+  const b=$('[data-wall-dimension="'+key+'"]',strip);
+  const value=key==='projection'?zone.meta.projection:zone.values[key];
+  b.textContent=({width:'A · Largeur',height:'B · Hauteur',projection:'C · Projection'}[key])+' '+(value?value+' po':'à préciser');
+ }
+ wallDrawing();
+}
+function wallDrawing(){
+ const strip=$('.mir-workspace-dimensions');
+ if(!strip)return;
+ for(const key of ['width','height']){
+  $('[data-wall-dimension="'+key+'"]',strip).hidden=Boolean($('#layout-svg [data-wall-dimension="'+key+'"]'));
+ }
+ const selection=$('#layout-svg [data-piece][aria-pressed="true"]');
+ const piece=$('.mir-wall-current-piece',strip);
+ piece.hidden=!selection;
+ if(selection){
+  const label=selection.getAttribute('aria-label').replace(', ',' · ');
+  if(piece.textContent!==label)piece.textContent=label;
+ }
+}
 function move(node,target){if(!node)return;const marker=document.createComment('MIR workspace return');node.before(marker);moves.push([node,marker]);target.append(node);}
 function fold(parent,label,nodes){const d=document.createElement('details');d.innerHTML='<summary></summary>';$('summary',d).textContent=label;parent.append(d);for(const n of nodes)move(n,d);return d;}
 function button(text,fn,cls=''){const b=document.createElement('button');b.type='button';b.textContent=text;b.className=cls;b.addEventListener('click',fn);return b;}
@@ -99,7 +123,7 @@ function mount(){if(mounted)return;mounted=true;const content=make();
   fold(content,'Dossier · zones et exemples',[$('.project-bar',content),$('.intro-side',content)]);
   fold(content,'Vérification du mur',[$('#layout-summary',content),$('.proof-card',content),$('.wall-measures',content)]);
   fold($('.settings',content),'Réglages avancés de répartition',[$('#distribution')?.closest('label'),$('#precision')?.closest('label'),$('#redistribute'),$('#unlock-all')]);
-  const dims=document.createElement('div');dims.className='mir-workspace-dimensions';for(const key of ['width','height','projection']){const b=button('',()=>dimension(key));b.dataset.wallDimension=key;dims.append(b);}stage.append(dims);wallDimensions();
+  const dims=document.createElement('div');dims.className='mir-workspace-dimensions';for(const key of ['width','height','projection']){const b=button('',()=>dimension(key));b.dataset.wallDimension=key;dims.append(b);}const piece=button('',()=>openInspector($('#selection-title')),'mir-wall-current-piece');piece.hidden=true;dims.prepend(piece);stage.append(dims);wallDimensions();
  }else{
   move($('#production-preview'),stage);move($('.config-card'),content);move($('.kind-bar'),content);move($('.mir-v4-technical'),content);
   const tools=document.createElement('div');tools.className='mir-workspace-tools';
@@ -128,7 +152,7 @@ function sync(){if(wall){mount();return;}
  if(active)mount();else unmount();syncTitle();
 }
 function init(){if(!wall&&!window.MIRProductionWorkspace)return;sync();new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class','data-mir-tab']});
- if(wall){addEventListener('mir-calepinage-ready',wallDimensions);addEventListener('mir-calepinage-rendered',wallDimensions);}
+ if(wall){addEventListener('mir-calepinage-ready',wallDimensions);addEventListener('mir-calepinage-rendered',wallDimensions);addEventListener('mir-calepinage-drawn',wallDrawing);}
  if(!wall)new MutationObserver(syncTitle).observe($('#production-drawing'),{childList:true});
  addEventListener('resize',()=>{viewport();adaptiveTools();if(mounted&&!compact())closeInspector();});visualViewport?.addEventListener('resize',viewport);visualViewport?.addEventListener('scroll',viewport);
  document.addEventListener('focusin',e=>{if(mounted&&inspector.contains(e.target)&&compact())root.dataset.inspector='open';});

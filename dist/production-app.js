@@ -21,7 +21,7 @@ let rightAngleSnap=true;
 let freeformRedo=[];
 const traceHeights=[6,8,10,12,14];
 let traceHeight=14,traceGridDivisor=4;
-let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,viewPan={x:0,y:0},pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
+let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client||params.get('kind')==='panel'?'panel':'profile',view='face',workflow='configure',authoring=false,editingTemplateId=null,editingItemId=null,selectedTemplate=null,templates=[],requests=[],order,tool='select',snap=true,drawPoints=[],drawTransform=null,drag=null,orbit=-35,pitch=23,zoom=1,viewPan={x:0,y:0},pointers=new Map(),busy=false,colorSystem='manufacturer',colorId='',materialId='',colorQuery='',toastTimer,suppressClick=false;
 let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces=[];
 let panelSketchPoints=[],panelSketchHover=null,panelSketchBefore=null;
 const clientProfileWizard=()=>client&&catalogueChannel!=='store'&&kind==='profile';
@@ -411,46 +411,42 @@ function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
  if(illustrative&&!small)output+=`<text x="400" y="35" text-anchor="middle" font-size="12" fill="#879677">MODÈLE ILLUSTRATIF · LES COTES RESTENT À SAISIR</text>`;return output+'</svg>';
 }
 function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
- const V=window.MIRProductionVolume,mesh=V.buildMesh(model);
- if(!mesh.valid)return V.render(model,{yaw:0,pitch:0,zoom:1,illustrative,formatMeasurement:M.formatMeasurement});
- const compact=!small&&matchMedia('(max-width: 600px)').matches,canvas=compact?400:800;
- const z=small?1:zoom,tr=fitModel(model);tr.scale*=z*(compact ? .34 : .76);tr.ox=(compact?168:350)-(mesh.bounds.minX+mesh.bounds.maxX)*tr.scale/2;tr.oy=(compact?190:205)+(mesh.bounds.minY+mesh.bounds.maxY)*tr.scale/2;
- const map=pts=>pts.map(p=>pointOnView(p,tr).map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#b8c5ae',swatch=safeAsset(model.spec?.finish?.swatchUrl||model.finish?.swatchUrl),suffix=small?'thumb-'+esc(model.spec?.id||'panel'):'main',paint='panel-face-paint-'+suffix,clip='panel-face-clip-'+suffix;
- let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas} 550" role="group" aria-label="${esc(model.name)} — vue cotée, lips compris" data-panel-face="true" data-zoom="${z}" font-family="Arial,sans-serif"><title>${esc(model.name)} — dimensions hors tout avec lèvres</title><defs><clipPath id="${clip}"><rect x="16" y="45" width="768" height="365"/></clipPath>${swatch?`<pattern id="${paint}" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${hex}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern>`:''}</defs><text x="${canvas/2}" y="30" text-anchor="middle" font-size="${compact?9:12}" fill="#6f8064">${illustrative?'PROPORTIONS DU MODÈLE · COTES À SAISIR':'VUE DE FACE · LIPS INCLUS DANS LE HORS TOUT'}</text><g clip-path="url(#${clip})"><polygon points="${map(mesh.outer)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="1.5"/><polygon points="${map(mesh.front)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="2.2"/>`;
- (model.edges||[]).forEach((edge,i)=>{const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr);if(edge.id===model.bottomEdgeId&&!illustrative)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="5"${model.perforation?.enabled?' stroke-dasharray="10 5"':''}/>`;if(interactive&&!authoring)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="transparent" stroke-width="22" data-edit-panel-edge="${esc(edge.id)}" tabindex="0" role="button" aria-label="Modifier ${esc(edge.name)}"/>`;});
- svg+='</g>';
- const labelBoxes=[];
- if(!small&&!illustrative)(model.edges||[]).forEach((edge,i)=>{
-  const points=mesh.outer.map(p=>pointOnView(p,tr)),a=points[i],b=points[(i+1)%points.length],
-   left=Math.min(...points.map(p=>p[0])),right=Math.max(...points.map(p=>p[0])),top=Math.min(...points.map(p=>p[1])),bottom=Math.max(...points.map(p=>p[1])),
-   cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2;
-  const font=compact?16:15,w=Math.max(42,edge.name.length*font*.6+12),h=compact?52:26;
-  const winding=Math.sign(points.reduce((sum,p,i)=>sum+p[0]*points[(i+1)%points.length][1]-points[(i+1)%points.length][0]*p[1],0))||1;
-  const nx=winding*(b[1]-a[1]),ny=-winding*(b[0]-a[0]);
-  const preferred=Math.abs(nx)>Math.abs(ny)?(nx<0?'left':'right'):(ny<0?'top':'bottom');
-  const overlap=(a,b)=>a.x<b.x+b.w+5&&a.x+a.w+5>b.x&&a.y<b.y+b.h+5&&a.y+a.h+5>b.y;
-  let box;
-  for(const side of [preferred,...['left','right','top','bottom'].filter(v=>v!==preferred)]){
-   for(let n=0;n<9;n++){
-    const shift=(n%2?1:-1)*Math.ceil(n/2)*30;
-    const q=side==='left'?{x:left-w-12,y:cy-h/2+shift,w,h}:side==='right'?{x:right+12,y:cy-h/2+shift,w,h}:side==='top'?{x:cx-w/2+shift,y:top-h-12,w,h}:{x:cx-w/2+shift,y:bottom+12,w,h};
-    const reserved={x:compact?251:558,y:compact?240:202,w:compact?144:224,h:compact?90:70};
-    if(q.x<4||q.y<45||q.x+w>canvas-4||q.y+h>(compact?315:370)||overlap(q,reserved)||labelBoxes.some(r=>overlap(q,r)))continue;
-    box=q;break;
-   }
-   if(box)break;
-  }
-  if(!box)return;
-  labelBoxes.push(box);
-  const lx=Math.max(box.x,Math.min(box.x+w,cx)),ly=Math.max(box.y,Math.min(box.y+h,cy));
-  svg+=`<path d="M${cx},${cy}L${lx},${ly}" fill="none" stroke="#8da389" stroke-width="1"/>`;
-  svg+=`<g data-edit-panel-edge="${esc(edge.id)}" role="button" tabindex="0" aria-label="Modifier ${esc(edge.name)}"><rect x="${box.x}" y="${box.y}" width="${w}" height="${h}" rx="5" fill="#fcfcf8"/><text data-panel-edge-lip="${esc(edge.id)}" x="${box.x+w/2}" y="${box.y+h/2+6}" font-size="${font}" font-weight="700" text-anchor="middle" fill="#284d30">${esc(edge.name)}</text></g>`;
- });
- const corners=mesh.outer.map(p=>pointOnView(p,tr)),xs=corners.map(p=>p[0]),ys=corners.map(p=>p[1]);
- const left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bottom=Math.max(...ys),dimY=compact?370:400,dimX=compact?323:670;
- svg+=`<g fill="none" stroke="#6f8064" stroke-width="1.4"><path d="M${left},${bottom+8}V${dimY+10} M${right},${bottom+8}V${dimY+10} M${left},${dimY}H${right} M${right+8},${top}H${dimX+10} M${right+8},${bottom}H${dimX+10} M${dimX},${top}V${bottom}"/></g>`;
- const dims=[['A','Largeur hors tout',model.widthMM,'width',compact?168:350,dimY+5],['B','Hauteur hors tout',model.heightMM,'height',dimX,compact?275:230],['C','Projection',model.reliefMM,'relief',compact?168:350,490]];
- svg+=dims.map(([letter,label,value,key,x,y])=>`<g ${interactive&&!authoring?`data-edit-panel-measure="${key}" role="button" tabindex="0" aria-label="Modifier ${letter} — ${label}"`:''}><rect x="${x-(compact&&key==='height'?72:112)}" y="${y-35}" width="${compact&&key==='height'?144:224}" height="${compact?90:70}" rx="10" fill="#fcfcf8" stroke="#cad4bf"/><text x="${x}" y="${y-8}" text-anchor="middle" font-size="${compact?16:14}" fill="#52664a">${compact&&key==='height'?'B — Hauteur':letter+' — '+label}</text>${compact&&key==='height'?`<text x="${x}" y="${y+10}" text-anchor="middle" font-size="16" fill="#52664a">hors tout</text>`:''}<text x="${x}" y="${y+(compact&&key==='height'?36:21)}" text-anchor="middle" font-size="24" fill="#294734" font-weight="600">${esc(illustrative?'À saisir':M.formatMeasurement(value,model.unit))}</text></g>`).join('');return svg+'</svg>';
+ const mesh=window.MIRProductionVolume.buildMesh(model);
+ if(!mesh.valid)return window.MIRProductionVolume.render(model,{yaw:0,pitch:0,zoom:1,illustrative,formatMeasurement:M.formatMeasurement});
+ const compact=!small&&matchMedia('(max-width: 600px)').matches;
+ const canvas=compact?400:760,height=compact?400:500;
+ const face={left:compact?28:48,right:canvas-(compact?132:172),top:58,bottom:height-118};
+ const {minX,maxX,minY,maxY}=mesh.bounds,z=small?1:zoom;
+ const scale=Math.min((face.right-face.left)/Math.max(1,maxX-minX),(face.bottom-face.top)/Math.max(1,maxY-minY))*z;
+ const tr={scale,ox:(face.left+face.right-(minX+maxX)*scale)/2,oy:(face.top+face.bottom+(minY+maxY)*scale)/2};
+ const outer=mesh.outer.map(p=>pointOnView(p,tr));
+ const coords=pts=>pts.map(p=>p.map(fmt).join(',')).join(' ');
+ const hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#b8c5ae';
+ const swatch=safeAsset(model.spec?.finish?.swatchUrl||model.finish?.swatchUrl);
+ const suffix=small?'thumb-'+esc(model.spec?.id||'panel'):'main',paint='panel-face-paint-'+suffix,clip='panel-face-clip-'+suffix;
+ const editable=interactive&&!authoring&&!small;
+ const fill=swatch?'url(#'+paint+')':hex;
+ const xs=outer.map(p=>p[0]),ys=outer.map(p=>p[1]);
+ const left=Math.max(18,Math.min(...xs)),right=Math.min(face.right+12,Math.max(...xs));
+ const top=Math.max(face.top-18,Math.min(...ys)),bottom=Math.min(face.bottom+10,Math.max(...ys));
+ const dimX=right+28,dimY=bottom+32,center=(left+right)/2,middle=(top+bottom)/2;
+ const value=mm=>illustrative?'À saisir':M.formatMeasurement(mm,model.unit).replace(/(\d) (?=\d+\/\d+ po$)/,'$1\u00a0');
+ const measure=(key,label,x,y,w,content)=>`<g class="mir-panel-plan-measure" ${editable?`data-edit-panel-measure="${key}" role="button" tabindex="0" aria-label="Modifier ${label}"`:''}><rect class="mir-panel-plan-hit" x="${x-w/2}" y="${y-26}" width="${w}" height="52" rx="7" fill="transparent"/>${content}</g>`;
+ const text=(x,y,label,align='middle')=>`<text x="${x}" y="${y}" text-anchor="${align}" dominant-baseline="middle" font-size="${compact?16:19}" font-weight="700" fill="#294734" pointer-events="none">${esc(label)}</text>`;
+ let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas} ${height}" role="group" aria-label="${esc(model.name)} — vue cotée, lips compris" data-panel-face="true" data-zoom="${z}" font-family="Arial,sans-serif"><title>${esc(model.name)} — dimensions hors tout avec lèvres</title><defs><clipPath id="${clip}"><rect x="12" y="${face.top-20}" width="${face.right}" height="${face.bottom-face.top+30}"/></clipPath>${swatch?`<pattern id="${paint}" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${hex}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern>`:''}</defs><text x="${canvas/2}" y="25" text-anchor="middle" font-size="${compact?13:15}" fill="#49614a">${illustrative?'Aperçu · cotes à saisir':'Vue de face · lèvres incluses dans A et B'}</text><g clip-path="url(#${clip})"><polygon points="${coords(outer)}" fill="${fill}" stroke="#4b5b46" stroke-width="1.5"/><polygon points="${coords(mesh.front.map(p=>pointOnView(p,tr)))}" fill="${fill}" stroke="#4b5b46" stroke-width="2"/>`;
+ for(const [i,edge] of (model.edges||[]).entries()){
+  const [ax,ay]=outer[i],[bx,by]=outer[(i+1)%outer.length];
+  const path=`M${ax},${ay}L${bx},${by}`;
+  const midX=(ax+bx)/2,midY=(ay+by)/2;
+  if(edge.id===model.bottomEdgeId&&!illustrative)svg+=`<path d="${path}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="4"${model.perforation?.enabled?' stroke-dasharray="10 5"':''}/>`;
+  if(editable)svg+=`<g class="mir-panel-plan-edge" data-edit-panel-edge="${esc(edge.id)}" tabindex="0" role="button" aria-label="Modifier ${esc(edge.name)}"><title data-panel-edge-lip="${esc(edge.id)}">${esc(edge.name)}</title><path class="mir-panel-plan-edge-line" d="${path}" fill="none" stroke="transparent" stroke-width="4" vector-effect="non-scaling-stroke"/><path d="${path}" fill="none" stroke="transparent" stroke-width="34" vector-effect="non-scaling-stroke" pointer-events="stroke"/><rect x="${midX-24}" y="${midY-24}" width="48" height="48" fill="transparent"/></g>`;
+ }
+ svg+=`</g><g fill="none" stroke="#658064" stroke-width="1.2" pointer-events="none"><path d="M${left},${bottom+8}V${dimY+6} M${right},${bottom+8}V${dimY+6} M${left},${dimY}H${center-Math.min(53,(right-left)/3)} M${center+Math.min(53,(right-left)/3)},${dimY}H${right} M${left},${dimY}l6,-3m-6,3l6,3 M${right},${dimY}l-6,-3m6,3l-6,3 M${right+8},${top}H${dimX+6} M${right+8},${bottom}H${dimX+6} M${dimX},${top}V${bottom} M${dimX},${top}l-3,6m3,-6l3,6 M${dimX},${bottom}l-3,-6m3,6l3,-6"/></g>`;
+ svg+=measure('width','A — Largeur hors tout',center,dimY+10,142,text(center,dimY+12,'A · '+value(model.widthMM)));
+ svg+=measure('height','B — Hauteur hors tout',dimX+47,middle,94,text(dimX+9,middle-10,'B','start')+text(dimX+9,middle+10,value(model.heightMM),'start'));
+ const profileX=canvas/2,profileY=height-29;
+ svg+=measure('relief','C — Projection',profileX,profileY,196,`<path d="M${profileX-85},${profileY-10}h30v19h15 M${profileX-49},${profileY-10}v19" fill="none" stroke="#658064" stroke-width="1.5" pointer-events="none"/>${text(profileX-30,profileY,'C · '+value(model.reliefMM),'start')}<text x="${profileX+92}" y="${profileY+1}" text-anchor="end" dominant-baseline="middle" font-size="12" fill="#49614a" pointer-events="none">Profil</text>`);
+ return svg+'</svg>';
 }
 function profileVolumeStrips(model){
  const radius=Math.min(1.5,Math.max(.5,model.material?.thicknessMM||.65));
@@ -779,7 +775,7 @@ function updateDrawing({keepForm=false}={}){
  let directTools=$('#mir-panel-direct-tools');
  if(!directTools){directTools=document.createElement('div');directTools.id='mir-panel-direct-tools';directTools.className='mir-panel-direct-tools';stage.after(directTools);}
  directTools.hidden=kind!=='panel'||authoring||tool==='panel-trace';
- directTools.innerHTML=directTools.hidden?'':'<details><summary>Autre méthode de saisie : cotes et côtés</summary><div>'+['width','height','relief'].map(key=>'<button type="button" data-edit-panel-measure="'+key+'">'+({width:'A — Largeur hors tout',height:'B — Hauteur hors tout',relief:'C — Projection'}[key])+'</button>').join('')+(actual.edges||[]).map(edge=>'<button type="button" data-edit-panel-edge="'+esc(edge.id)+'">'+esc(edge.name)+'</button>').join('')+'</div></details>';
+ directTools.innerHTML=directTools.hidden?'':'<details><summary>Modifier les cotes et les lèvres</summary><div>'+['width','height','relief'].map(key=>'<button type="button" data-edit-panel-measure="'+key+'">'+({width:'A — Largeur hors tout',height:'B — Hauteur hors tout',relief:'C — Projection'}[key])+'</button>').join('')+(actual.edges||[]).map(edge=>'<button type="button" data-edit-panel-edge="'+esc(edge.id)+'">'+esc(edge.name)+' · '+esc(edge.lipMM?M.formatMeasurement(edge.lipMM,actual.unit):'Sans lèvre')+'</button>').join('')+'</div></details>';
 
  const twin=$('#mir-panel-live-alt');
  if(twin){
@@ -2419,7 +2415,7 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  const requestedProfile=params.get('profile');
  if(requestedProfile&&Object.prototype.hasOwnProperty.call(profiles,requestedProfile)) choose('profile',requestedProfile,{profileChosen:true});
  if(!client)window.addEventListener('storage',event=>{if([KEYS.draft,window.MIRPanelLayoutOutput?.STORAGE_KEY].includes(event.key))renderLayoutImport();});
- if(!client&&workflow==='configure'&&!linked&&!requestedProfile&&params.get('profil-mir')!=='1'&&location.hash!=='#production-order'){
+ if(!client&&kind==='profile'&&workflow==='configure'&&!linked&&!requestedProfile&&params.get('profil-mir')!=='1'&&location.hash!=='#production-order'){
   selectedTemplate=null;
   startProfileDrawing({fullscreen:false});
   renderTemplates();

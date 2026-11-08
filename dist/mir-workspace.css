@@ -103,3 +103,13 @@ body[data-mir-workspace] dialog[open]{position:fixed;top:calc(var(--mir-viewport
  #mir-workspace .mir-action-bar{padding-block:4px}
  body[data-mir-workspace=wall].mir-wall-tracing .mir-workspace-dimensions{display:none}
 }
+
+/* The technical drawing keeps its controls on the measured geometry. */
+.mir-panel-plan-measure[role=button],.mir-panel-plan-edge{cursor:pointer}
+.mir-panel-plan-measure[role=button]:is(:hover,:focus-visible) .mir-panel-plan-hit{fill:#e3ebdd;stroke:#658064}
+.mir-panel-plan-edge:is(:hover,:focus-visible) .mir-panel-plan-edge-line{stroke:#36633d}
+#mir-workspace .mir-inspector-content .kind-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px}
+#mir-workspace .mir-inspector-content .kind-bar :where(button,a){white-space:normal;overflow-wrap:anywhere}
+#mir-workspace .mir-v4-technical p{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 8px}
+#mir-workspace .mir-wall-current-piece{background:#e1e9da;font-weight:700}
+#mir-workspace .mir-workspace-dimensions button{min-height:44px}
