@@ -130,9 +130,9 @@ create table mir_core.boutique_delivery_distances (
 alter table mir_core.boutique_delivery_distances enable row level security;
 revoke all on mir_core.boutique_delivery_distances from public,anon,authenticated;
 
+-- Use the HTTP extension's bounded defaults. Hosted postgres cannot set its cURL GUCs.
 create function mir_core.boutique_geocode_km(address jsonb) returns numeric
-language plpgsql security invoker set search_path=pg_catalog,mir_core
-set http.curlopt_connecttimeout_ms='1000' set http.curlopt_timeout_ms='2500' as $$
+language plpgsql security invoker set search_path=pg_catalog,mir_core as $$
 declare response jsonb; candidate jsonb; postal text; civic text; lat double precision; lng double precision;
 begin
   postal:=upper(regexp_replace(address->>'postalCode','[^[:alnum:]]','','g'));
