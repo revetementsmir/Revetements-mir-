@@ -38,7 +38,7 @@ test('Les liens internes d’admin ne sont plus proposés en pied de page client
 });
 test('Les fonctionnalités client réelles sont toujours présentes',()=>{
   assert.match(text('produit.html'),/id="product-detail"/);
-  assert.match(text('selection.html'),/id="selection-export-pdf"[^>]*>Préparer mon PDF/);
+  assert.match(text('selection.html'),/id="selection-export-pdf"[^>]*>Télécharger ma sélection en PDF/);
   assert.match(text('selection.html'),/id="selection-export"[^>]*>Sauvegarder JSON/);
   assert.match(text('selection.html'),/mir-selection-pdf\.js\?v=1/);
   assert.match(text('commerce.js'),/MIRPDF\.exportPlan/);

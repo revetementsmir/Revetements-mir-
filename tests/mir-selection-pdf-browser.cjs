@@ -38,6 +38,7 @@ async function run(){
       assert.equal(await page.locator('#selection-project-name').inputValue(),'Maison de test MIR');
       assert.ok((await page.locator('.selection-item').textContent()).includes(material.brand),'le fabricant doit être présent dans la fiche sélection');
       assert.equal(await page.locator('#selection-export').isEnabled(),true);
+      await page.locator('#mir-project-dossier > summary').click(); // JSON stays in the distinct project dossier.
       const jsonDownload=page.waitForEvent('download');
       await page.locator('#selection-export').click();
       const jsonFile=await jsonDownload;

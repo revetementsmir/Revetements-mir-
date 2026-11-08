@@ -30,7 +30,7 @@ test('Le site principal conserve aussi le même menu',()=>{
 test('Boutique, produit et sélection préservent les comptes du panier',()=>{
  for(const name of ['boutique.html','produit.html','selection.html']){
    assert.match(read(name),/data-list-count/,'Compteur absent '+name);
-   assert.match(read(name),/href="selection\.html"[^>]*>Ma sélection/);
+   assert.match(read(name),/href="selection\.html"[^>]*>Mon panier/);
  }
 });
 test('Le studio conserve son bouton de bibliothèque fonctionnel',()=>{

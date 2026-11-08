@@ -67,7 +67,7 @@ async function runAt(browser,base,width){
   localStorage.setItem('mir-shopping-list-v1',JSON.stringify({version:1,project:'Chalet de Québec',items:[item]}));
   return item;
  });
- await page.goto(base+'/selection.html',{waitUntil:'domcontentloaded'});
+ await page.goto(base+'/selection.html?view=dossier',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.querySelectorAll('#selection-items [data-selection-preview]').length===1&&
   document.querySelector('#mir-unified-pdf')?.disabled===false,{timeout:30000});
  assert.equal(await page.locator('#mir-unified-pieces li').count(),1);
