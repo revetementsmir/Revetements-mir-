@@ -5,8 +5,7 @@ body[data-portal-mode="employee"] .portal-header .mir-client-links,
 body[data-portal-mode="employee"] .portal-header .mir-client-actions,
 body[data-portal-mode="employee"] [data-portal-public-footer],
 body[data-portal-mode="login"] .portal-header .mir-client-links,
-body[data-portal-mode="login"] .portal-header .mir-client-actions,
-body[data-portal-mode="login"] [data-portal-public-footer] { display: none; }
+body[data-portal-mode="login"] .portal-header .mir-client-actions { display: none; }
 
 body[data-portal-mode="login"] .portal-header,
 body[data-portal-mode="employee"] .portal-header {
