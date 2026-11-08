@@ -210,6 +210,77 @@ test('Socle PostgreSQL : contraintes, RLS et sauvegardes',async t=>{
       assert.equal(old.modelVersion,1);assert.deepEqual(old.configurationRules,rules);assert.deepEqual(old.specification.template,template);
       assert.equal((await actor(id(2),submit,[id(10),id(144),model,config]))[0].id,oid,'reprise idempotente après retrait de publication');
     });
+    await db.exec(fs.readFileSync(path.join(__dirname,'../supabase/migrations/20261108134535_mir_account_customer_auth.sql'),'utf8'));
+    await db.exec(fs.readFileSync(path.join(__dirname,'../supabase/migrations/20261108220726_boutique_bend_tariff.sql'),'utf8'));
+    await t.test('Tarif Pliage et livraison : géométrie, majoration unique, seuils et droits',async()=>{
+      const M=require('../dist/production-model.js');
+      const template=M.createTemplate({kind:'profile',template:'l',unit:'in',dimensions:{A:3,B:2}},{id:'bend-price',name:'Pliage tarifé'}).template;
+      const model=(await actor(id(1),'select public.mir_import_master($1,$2) as id',[id(10),{id:template.id,name:template.name,currentVersion:1,versions:[template]}]))[0].id;
+      const publish='select public.mir_admin_publish_model($1,$2,$3,$4)';
+      await actor(id(1),publish,[id(10),model,1,{boutique:true,sale_length_in:120,standard_measures:{},locked_measures:{}}]);
+      const shared='select public.mir_shared_snapshot($1) as data';
+      assert.equal((await actor(id(3),shared,[id(10)]))[0].data.bendTariff.area_rate,0.014);
+      assert.equal((await actor(id(2),shared,[id(10)]))[0].data.bendTariff,null);
+      const snapshot=async request=>(await actor(id(3),'select snapshot from mir_core.order_revisions where order_id=$1',[request]))[0].snapshot;
+      const submit='select public.mir_submit_request($1,$2,$3,2,$4) as id';
+      const settings={area_rate:0.014,bend_cents:100,aluminum_basis_points:1000,delivery_cents:6000};
+      const config={metal:'aluminium',quantity:1,color:'Noir',measures:{A:'2½ po',B:'2 1/2',length:'120'},tariffRevision:0};
+      const first=(await actor(id(3),submit,[id(10),id(220),model,config]))[0].id;
+      assert.equal((await snapshot(first)).totalCents,940);
+      assert.equal((await snapshot(first)).billingLengthIn,120);
+      const save='select public.mir_admin_save_bend_tariff($1,$2,$3) as data';
+      await reject(id(3),save,[id(10),0,settings],'42501');
+      await actor(id(1),save,[id(10),0,settings]);
+      await reject(id(1),save,[id(10),0,settings],'40001');
+      await actor(id(1),save,[id(10),1,settings]);
+      await reject(id(3),submit,[id(10),id(221),model,config],'PT409');
+      assert.equal((await actor(id(3),submit,[id(10),id(220),model,config]))[0].id,first);
+      const latest={...config,tariffRevision:2};
+      const raised=(await actor(id(3),submit,[id(10),id(221),model,latest]))[0].id;
+      const steel=(await actor(id(3),submit,[id(10),id(222),model,{...latest,metal:'acier'}]))[0].id;
+      assert.equal((await snapshot(raised)).totalCents,1034);
+      assert.equal((await snapshot(steel)).totalCents,940);
+      assert.equal((await snapshot(first)).totalCents,940);
+      await reject(id(3),submit,[id(10),id(223),model,{...latest,measures:{A:'1/0',B:'2',length:'120'}}],'22023');
+
+      const quote='select mir_core.boutique_delivery_result($1,$2,$3) as data';
+      for(const [km,total,fee,state] of [[40,30000,6000,'confirmed'],[40,30001,0,'confirmed'],[40.001,40000,6000,'confirmed'],
+        [80,40000,6000,'confirmed'],[80.001,40000,null,'outside-zone'],[null,40000,null,'quote-required']]){
+        const row=(await db.query(quote,[km,total,6000])).rows[0].data;
+        assert.equal(row.feeCents,fee);assert.equal(row.status,state);
+      }
+      const savedAddress={line1:'1653 avenue des Affaires',city:'Québec',province:'Québec',postalCode:'G3J 1Y7',country:'Canada',recipient:'Recette'};
+      await db.exec(`create schema if not exists extensions;
+        create function extensions.http_get(varchar,jsonb) returns table(status integer,content text) language sql as $$
+          select 200,'{"candidates":[{"address":"1653 avenue des Affaires, Québec G3J1Y7","location":{"x":-71.420601906333,"y":46.865006094931},"score":99,"attributes":{"Addr_type":"Feature"}}]}'::text
+        $$`);
+      const geocode='select mir_core.boutique_geocode_km($1) as km';
+      assert.equal(Number((await db.query(geocode,[savedAddress])).rows[0].km),0);
+      assert.equal((await db.query(geocode,[{...savedAddress,line1:'16 avenue des Affaires'}])).rows[0].km,null);
+      await db.exec('alter table auth.users add email text,add email_confirmed_at timestamptz,add raw_user_meta_data jsonb');
+      await db.query("update auth.users set email='recette@example.invalid',email_confirmed_at=now(),raw_user_meta_data=jsonb_build_object('mir_delivery_address',$2::jsonb) where id=$1",[id(6),savedAddress]);
+      const imported=(await actor(id(6),'select public.mir_account_import_signup_address() as id'))[0].id;
+      assert.ok(imported,'adresse enregistrée après confirmation du compte');
+      assert.equal((await actor(id(6),'select public.mir_account_import_signup_address() as id'))[0].id,null);
+      assert.equal((await actor(id(6),count('customer_addresses')))[0].n,1);
+      assert.equal((await actor(id(3),count('customer_addresses')))[0].n,0);
+      await db.query('insert into mir_core.customer_addresses(id,user_id,address) values($1,$2,$3)',[id(224),id(3),savedAddress]);
+      await db.query("insert into mir_core.boutique_delivery_distances(address_id,address_key,distance_km) values($1,md5(jsonb_build_array($2::text,$3::text,$4::text,$5::text)::text),40)",[id(224),savedAddress.line1,savedAddress.city,savedAddress.province,savedAddress.postalCode]);
+      const address=(await actor(id(3),shared,[id(10)]))[0].data.deliveryAddresses[0];
+      const deliveryRpc='select public.mir_boutique_delivery_distance($1,$2,$3) as km';
+      await reject(id(6),deliveryRpc,[id(10),address.id,address.version],'PT409');
+      assert.equal(Number((await actor(id(3),deliveryRpc,[id(10),address.id,address.version]))[0].km),40);
+      const shipped={...latest,quantity:30,deliveryAddressId:address.id,deliveryAddressVersion:address.version,deliveryFeeCents:0};
+      await reject(id(3),submit,[id(10),id(225),model,{...shipped,deliveryFeeCents:1}],'PT409');
+      const delivered=(await actor(id(3),submit,[id(10),id(225),model,shipped]))[0].id;
+      assert.equal((await snapshot(delivered)).delivery.feeCents,0);
+      assert.equal((await snapshot(delivered)).totalCents,31020);
+      const fold={...template,topology:{...template.topology,bends:[{mode:'hem',direction:'left'}]}};
+      assert.equal(Number((await db.query('select mir_core.boutique_bend_price($1,$2,$3,$4,$5) as cents',
+        [fold,config.measures,'aluminium',null,settings])).rows[0].cents),1034);
+      assert.equal(Number((await db.query('select mir_core.boutique_bend_price($1,$2,$3,$4,$5) as cents',
+        [template,config.measures,'aluminium',799,settings])).rows[0].cents),879);
+    });
     await t.test('Toutes les tables du schéma sont sous RLS',async()=>{
       const r=await db.query("select relname from pg_class join pg_namespace n on n.oid=relnamespace where n.nspname='mir_core' and relkind='r' and not relrowsecurity");assert.equal(r.rows.length,0);
     });
