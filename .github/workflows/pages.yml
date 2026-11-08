@@ -187,6 +187,7 @@ jobs:
             artifacts/mir-signature-*.png
             artifacts/mir-production-signature-*.png
             artifacts/mir-realisations-*.png
+            artifacts/mir-boutique-fabricants-*.png
             artifacts/mir-miniatures-*.png
             artifacts/mir-direct-po-*.png
             artifacts/mir-reset-*.png

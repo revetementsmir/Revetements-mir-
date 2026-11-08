@@ -13,6 +13,61 @@ const server=http.createServer((req,res)=>{
 });
 const pages=['boutique','produit','selection','materiaux','pliage','plan','chantier','realisations'];
 const sizes=[{id:'mobile360',width:360,height:780},{id:'mobile',width:390,height:844},{id:'tablette',width:820,height:900},{id:'desktop',width:1440,height:900},{id:'ultrawide',width:2560,height:1080}];
+const brandSizes=[
+  [320,568],[360,780],[390,844],[430,932],[844,390],
+  [768,1024],[820,1180],[1024,768],[1180,820],
+  [1280,720],[1440,900],[1920,1080],[2560,1080],[3440,1440]
+];
+async function checkBrandCards(browser,base){
+  for(const [width,height] of brandSizes){
+    const mobile=width<=430||height<500;
+    const page=await browser.newPage({viewport:{width,height},isMobile:mobile,hasTouch:width<=1180,reducedMotion:'reduce'});
+    const errors=[];
+    page.on('pageerror',error=>errors.push(error.message));
+    try{
+      await page.goto(base+'/boutique.html#collections',{waitUntil:'domcontentloaded'});
+      const grid=page.locator('#shop-brand-directory');
+      const cards=grid.locator('.brand-collection-card');
+      await cards.first().waitFor({state:'visible'});
+      await grid.locator('img').evaluateAll(images=>Promise.all(images.map(img=>{img.loading='eager';return img.decode()})));
+      const layout=await grid.evaluate(el=>{
+        const box=node=>node.getBoundingClientRect();
+        const cards=[...el.querySelectorAll('.brand-collection-card')];
+        const tiles=cards.map(c=>box(c.querySelector('.brand-collection-image')));
+        const copy=cards.map(c=>box(c.querySelector('.brand-collection-copy')));
+        return {
+          count:cards.length, columns:getComputedStyle(el).gridTemplateColumns.split(' ').length,
+          fits:cards.every((c,i)=>box(c).right<=innerWidth+1&&tiles[i].right<=copy[i].left&&copy[i].right<=box(c).right),
+          sameTile:tiles.every(t=>Math.abs(t.width-tiles[0].width)<1&&Math.abs(t.height-t.width)<1),
+          height:Math.max(...cards.map(c=>box(c).height)), pageWidth:document.documentElement.scrollWidth,
+          columnsAligned:cards.every(c=>getComputedStyle(c).display==='grid')
+        };
+      });
+      assert.ok(layout.count>=20);
+      assert.equal(layout.columns,width<=700?1:width<=1100?2:3);
+      assert.ok(layout.fits&&layout.sameTile&&layout.columnsAligned);
+      assert.ok(layout.pageWidth<=width+2,'Pas de débordement horizontal à '+width);
+      if(width<=430)assert.ok(layout.height<=145,'Cartes compactes à '+width+' : '+layout.height);
+      const kaycan=cards.filter({has:page.getByRole('heading',{name:'Kaycan',exact:true})});
+      assert.match(await kaycan.locator('img').getAttribute('src'),/kaycan-soffit-installed/);
+      const jdp=cards.filter({has:page.getByRole('heading',{name:'JDP / Juste du Pin',exact:true})});
+      assert.equal(await jdp.locator('.brand-collection-image').getAttribute('data-framing'),'sample-crop');
+      if([390,1024,1440,2560].includes(width)){
+        await cards.first().scrollIntoViewIfNeeded();
+        await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-boutique-fabricants-'+width+'x'+height+'.png')});
+      }
+      if([390,1440].includes(width)){
+        await kaycan.click();
+        await page.waitForURL('**/boutique.html?brand=Kaycan#collections');
+        await page.locator('#shop-grid .manufacturer-group').first().waitFor({state:'visible'});
+        assert.equal(await grid.isVisible(),false);
+        assert.equal(await page.locator('#shop-brand').inputValue(),'Kaycan');
+      }
+      assert.deepEqual(errors,[]);
+      console.log('PASS fabricants '+width+'×'+height+' · '+layout.columns+' colonne(s) · '+layout.count+' fabricants');
+    }finally{await page.close();}
+  }
+}
 async function main(){
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  let browser;
@@ -20,6 +75,7 @@ async function main(){
   try{browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});}
   catch(err){const bin=[process.env.MIR_CHROMIUM_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(p=>p&&fs.existsSync(p));if(!bin)throw err;browser=await chromium.launch({executablePath:bin,headless:true,args:['--no-sandbox']});}
   fs.mkdirSync(path.resolve(__dirname,'../artifacts'),{recursive:true});
+  await checkBrandCards(browser,'http://127.0.0.1:'+server.address().port);
   let count=0;
   for(const size of sizes){
     const page=await browser.newPage({viewport:{width:size.width,height:size.height},reducedMotion:'reduce'});
