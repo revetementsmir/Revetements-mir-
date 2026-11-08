@@ -26,6 +26,8 @@ let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces
 let panelSketchPoints=[],panelSketchHover=null,panelSketchBefore=null;
 const clientProfileWizard=()=>client&&catalogueChannel!=='store'&&kind==='profile';
 let activeStoreColorLock=false;
+// Imported panel metadata is authoritative until a user explicitly edits it.
+let preservedPanelMetadata=null;
 function applyStoreColorLock(){
  if(!client||catalogueChannel!=='store'||!activeStoreColorLock)return;
  const block=$('#production-color-fields');
@@ -102,7 +104,7 @@ function renderDossierPrice(pricing){
 }
 function exportOrder(){return {...copy(order),pricing:dossierPricing()};}
 function choose(type,id,{template=null,spec=null,empty=client,profileChosen=false}={}){
- jException=null;activeStoreColorLock=false;
+ jException=null;activeStoreColorLock=false;preservedPanelMetadata=null;
  kind=type;editingItemId=null;activeDefaultLocks={};selectedTemplate=template||templateForBuiltin(type,id);
  draft=spec?copy(spec):(empty?blankMeasurements(sampleSpec(type,id)):sampleSpec(type,id));draft.kind=type;if(type==='profile')draft.length=String(stockLengthIn(draft)*(draft.unit==='mm'?25.4:1));
  if(clientProfileWizard()){
@@ -286,7 +288,7 @@ function renderColorGrid(){
   });
  }
 }
-function updateFinish(){if(authoring){$('#selected-finish').innerHTML='';return;}draft.finish=currentFinish();const c=chosenColor(),image=safeAsset(c?.swatchUrl||c?.swatchImage),finish=draft.finish,source=safeURL(c?.sourceUrl||chosenMaterial()?.sourceUrl||''),flat=kind==='profile'&&window.MIRKaycanFlatPreview?.isFlatPreview(finish)?window.MIRKaycanFlatPreview:null,flatHex=flat?.get(image)||'#e5e9e0';$('#selected-finish').innerHTML=(finish.code||finish.name)?`${flat?`<span class="kaycan-flat-chip" role="img" aria-label="Aperçu uni indicatif de ${esc(finish.name)}" style="background:${flatHex}"></span>`:image?`<img src="${esc(image)}" alt="Échantillon fabricant de ${esc(finish.name)}">`:''}<div><strong>${esc(finish.name||finish.code)}</strong><span>${esc(finish.code||'Code à confirmer')} · ${esc(finish.manufacturer||finish.system||'Référence spéciale')}</span><p>${esc(colorSystem==='ral'?ral.displayNotice:colorSystem==='special'?'Demande spéciale : faisabilité, teinte et disponibilité à confirmer.':flat?'Aperçu uni estimé du visuel fabricant, non certifié. Teinte, texture et disponibilité à confirmer sur un échantillon réel.':c?.availabilityNote||'Disponibilité sur ce profil à confirmer. Écran indicatif.')}</p>${colorSystem==='manufacturer'&&source?`<a href="${esc(source)}" target="_blank" rel="noopener">Source du fabricant ↗</a>`:''}</div>`:'<div><strong>La teinte reste à choisir.</strong><p>Choisissez une référence précise pour votre pièce.</p></div>';}
+function updateFinish(){if(authoring){$('#selected-finish').innerHTML='';return;}draft.finish=preservedPanelMetadata?.id===editingItemId?copy(preservedPanelMetadata.finish):currentFinish();const c=chosenColor(),image=safeAsset(c?.swatchUrl||c?.swatchImage),finish=draft.finish,source=safeURL(c?.sourceUrl||chosenMaterial()?.sourceUrl||''),flat=kind==='profile'&&window.MIRKaycanFlatPreview?.isFlatPreview(finish)?window.MIRKaycanFlatPreview:null,flatHex=flat?.get(image)||'#e5e9e0';$('#selected-finish').innerHTML=(finish.code||finish.name)?`${flat?`<span class="kaycan-flat-chip" role="img" aria-label="Aperçu uni indicatif de ${esc(finish.name)}" style="background:${flatHex}"></span>`:image?`<img src="${esc(image)}" alt="Échantillon fabricant de ${esc(finish.name)}">`:''}<div><strong>${esc(finish.name||finish.code)}</strong><span>${esc(finish.code||'Code à confirmer')} · ${esc(finish.manufacturer||finish.system||'Référence spéciale')}</span><p>${esc(colorSystem==='ral'?ral.displayNotice:colorSystem==='special'?'Demande spéciale : faisabilité, teinte et disponibilité à confirmer.':flat?'Aperçu uni estimé du visuel fabricant, non certifié. Teinte, texture et disponibilité à confirmer sur un échantillon réel.':c?.availabilityNote||'Disponibilité sur ce profil à confirmer. Écran indicatif.')}</p>${colorSystem==='manufacturer'&&source?`<a href="${esc(source)}" target="_blank" rel="noopener">Source du fabricant ↗</a>`:''}</div>`:'<div><strong>La teinte reste à choisir.</strong><p>Choisissez une référence précise pour votre pièce.</p></div>';}
 function fitModel(model){const p=model.pointsMM||[],xs=p.map(v=>v[0]),ys=p.map(v=>v[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);const scale=Math.min(580/Math.max(1,maxX-minX),340/Math.max(1,maxY-minY));return {scale,ox:400-(minX+maxX)*scale/2,oy:255+(minY+maxY)*scale/2};}
 function pointOnView(point,tr){return [tr.ox+point[0]*tr.scale,tr.oy-point[1]*tr.scale];}
 
@@ -900,7 +902,7 @@ function renderPanelMaterialControls(){
  }
  if(panel&&m.type==='aluminium-extrude'&&colorSystem==='manufacturer'){colorSystem='ral';colorId='';}
 }
-function formMetadata(){draft.material=draft.material||{};draft.material.type=$('#material-type').value;draft.material.thickness=$('#material-thickness').value;draft.material.thicknessUnit=kind==='panel'?'mm':draft.unit;draft.material.gauge=$('#material-gauge').value;draft.quantity=Number($('#production-quantity').value);draft.location=$('#production-location').value;draft.note=$('#production-note').value;if(colorSystem==='special')draft.finish={system:$('#special-color-system')?.value||'',code:$('#special-color-code')?.value||'',name:$('#special-color-name')?.value||'',selectionType:'custom',special:true};else draft.finish=currentFinish();}
+function formMetadata(){draft.material=draft.material||{};draft.material.type=$('#material-type').value;draft.material.thickness=$('#material-thickness').value;draft.material.thicknessUnit=kind==='panel'?'mm':draft.unit;draft.material.gauge=$('#material-gauge').value;draft.quantity=Number($('#production-quantity').value);draft.location=$('#production-location').value;draft.note=$('#production-note').value;if(colorSystem==='special')draft.finish={system:$('#special-color-system')?.value||'',code:$('#special-color-code')?.value||'',name:$('#special-color-name')?.value||'',selectionType:'custom',special:true};else draft.finish=currentFinish();if(preservedPanelMetadata?.id===editingItemId){draft.finish=copy(preservedPanelMetadata.finish);draft.material=copy(preservedPanelMetadata.material);}}
 function renderFormMetadata(){const m=draft.material||{};if(kind==='panel'&&m.thickness!==''&&m.thickness!==null&&m.thickness!==undefined&&(m.thicknessUnit||draft.unit)!=='mm'){const parsed=M.parseMeasurement(m.thickness,m.thicknessUnit||draft.unit);if(parsed.ok){m.thickness=fmt(parsed.mm);m.thicknessUnit='mm';}}renderPanelMaterialControls();$('#material-type').value=m.type||(kind==='panel'||clientProfileWizard()?'':'aluminium');$('#material-thickness').value=m.thickness??'';$('#material-gauge').value=m.gauge||'';$('#production-quantity').value=draft.quantity||1;$('#production-location').value=draft.location||'';$('#production-note').value=draft.note||'';$('#cancel-piece-edit').hidden=!editingItemId;for(const el of document.querySelectorAll('.config-card>.config-section'))el.hidden=authoring;$('#add-production-piece').closest('.config-section').hidden=false;if(authoring){for(const child of $('#add-production-piece').closest('.config-section').children)child.hidden=!child.classList.contains('piece-submit');}else for(const child of $('#add-production-piece').closest('.config-section').children)child.hidden=false;}
 function hasPanelGeometryIssue(item){const model=build(item.spec||item);if(model.kind!=='panel')return false;const mesh=window.MIRProductionVolume.buildMesh(model);if(item.sourceLayout&&model.valid&&mesh.errors?.length&&mesh.errors.every(error=>error.code==='PROJECTION_REQUIRED'))return !window.MIRProductionVolume.buildMesh(M.buildPanel({...model.spec,relief:0})).valid;return !mesh.valid;}
 function invalidPanelItems(){return (order.items||[]).filter(hasPanelGeometryIssue);}
@@ -1197,7 +1199,7 @@ function offerProfileImport(confirmedPO=false){
  }catch(error){toast(error.message);}
 }
 function restoreSelection(item){const selection=item.selection||{};colorSystem=selection.colorSystem||({manufacturer:'manufacturer',ral:'ral',custom:'special'}[item.spec.finish?.selectionType])||((item.spec.finish||{}).system==='RAL Classic'?'ral':item.spec.finish?.manufacturer||/^Nuancier /i.test(item.spec.finish?.system||'')?'manufacturer':item.spec.finish?.special?'special':'manufacturer');materialId=selection.materialId||materials.find(m=>m.brand===item.spec.finish?.manufacturer)?.id||'';colorId=selection.colorId||'';if(!colorId&&colorSystem==='ral')colorId=ral.colors.find(c=>c.code===item.spec.finish?.code)?.id||'';if(!colorId&&colorSystem==='manufacturer')colorId=(chosenMaterial()?.colors||[]).find(c=>(c.code||c.name)===item.spec.finish?.code)?.id||'';}
-function editPiece(id){const item=order.items.find(row=>row.id===id);if(!item)return;jException=null;activeStoreColorLock=!!(client&&catalogueChannel==='store'&&item.selection?.storeColorMode==='fixed');workflow='configure';authoring=false;editingTemplateId=null;editingItemId=id;activeDefaultLocks={};kind=item.kind;draft=copy(item.spec);if(item.stockProfileType)draft.mirProfileId=item.stockProfileType;selectedTemplate=item.snapshot?.templateSnapshot||null;restoreSelection(item);tool='select';view='face';if(clientProfileWizard()){
+function editPiece(id){const item=order.items.find(row=>row.id===id);if(!item)return;jException=null;activeStoreColorLock=!!(client&&catalogueChannel==='store'&&item.selection?.storeColorMode==='fixed');workflow='configure';authoring=false;editingTemplateId=null;editingItemId=id;activeDefaultLocks={};kind=item.kind;draft=copy(item.spec);preservedPanelMetadata=kind==='panel'?{id,finish:copy(draft.finish||{}),material:copy(draft.material||{})}:null;if(item.stockProfileType)draft.mirProfileId=item.stockProfileType;selectedTemplate=item.snapshot?.templateSnapshot||null;restoreSelection(item);tool='select';view='face';if(clientProfileWizard()){
  clientProfileSelected=true;
  clientStep=clientUnlocked=2;
  draft.length=draft.length||unitValue(120*25.4,draft.unit);
@@ -2102,7 +2104,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.id==='panel-zoom-in'){setZoom(zoom*1.2);return;}
  if(button.id==='panel-zoom-out'){setZoom(zoom/1.2);return;}
  if(button.id==='panel-view-reset'){zoom=1;viewPan={x:0,y:0};orbit=-35;pitch=23;updateDrawing();return;}
- if(d.productionColor){colorId=d.productionColor;renderColorGrid();if($('#production-ral'))$('#production-ral').value=colorId;updateFinish();showProfilePaintedFace();updateDrawing();return;}
+ if(d.productionColor){preservedPanelMetadata=null;colorId=d.productionColor;renderColorGrid();if($('#production-ral'))$('#production-ral').value=colorId;updateFinish();showProfilePaintedFace();updateDrawing();return;}
  if(d.selectBottom&&!authoring){draft.bottomEdgeId=d.selectBottom;draft.perforation={...draft.perforation,edgeId:d.selectBottom};renderPanelOptions();updateDrawing();return;}
  if(button.id==='mir-direct-po-add'&&!client){
   formMetadata();
@@ -2169,7 +2171,11 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(button.hasAttribute('data-new-drawing')){if(!client&&!editingItemId)startProfileDrawing();return;}
  if(button.hasAttribute('data-drawing-undo')){if(!drawPoints.length||!canDrawProfile())return;drawPoints.pop();const next=toCustom(drawPoints);if(next)draft=next;else{draft.segments=[];draft.bends=[];}renderDimensions();updateDrawing();return;}
 }
+function releasePanelMetadataOnEdit(target){
+ if(/^(material-(type|thickness|gauge)|color-system|production-(material|ral)|special-color-(system|code|name))$/.test(target.id||''))preservedPanelMetadata=null;
+}
 function handleInput(event){const e=event.target,d=e.dataset;
+ releasePanelMetadataOnEdit(e);
  if(d.segmentLength!==undefined||d.bendAngle!==undefined||d.measure!==undefined)freeformRedo=[];
  if(e.matches('[data-rename-form] input[name="name"]')){e.setCustomValidity('');return;}
  if(e.id==='production-piece-name'&&!client&&kind==='profile'&&!authoring){
@@ -2193,6 +2199,7 @@ function handleInput(event){const e=event.target,d=e.dataset;
 }
 function changeUnit(next){const previous=draft.unit||'in';if(next===previous)return;jException=null;const convert=value=>{if(value===''||value===null||value===undefined)return value;const p=M.parseMeasurement(value,previous);return p.ok?fmt(unitValue(p.mm,next)):value;};if(kind==='profile'){if(draft.template==='custom')draft.segments.forEach(s=>s.length=convert(s.length));else for(const k of Object.keys(draft.dimensions||{}))draft.dimensions[k]=convert(draft.dimensions[k]);draft.length=convert(draft.length);}else{for(const k of ['width','height','relief','lip','apexX','topWidth','topOffset','offset','tipDepth','apexOffset'])draft[k]=convert(draft[k]);for(const k of Object.keys(draft.lips||{}))draft.lips[k]=convert(draft.lips[k]);}if(draft.material?.thickness&&kind!=='panel'){draft.material.thickness=convert(draft.material.thickness);draft.material.thicknessUnit=next;}draft.unit=next;tool='select';renderDimensions();renderProfileOptions();renderPanelOptions();renderFormMetadata();updateDrawing();}
 function handleChange(event){const e=event.target,d=e.dataset;
+ releasePanelMetadataOnEdit(e);
  if(e.matches('#save-production-template input[name="store"]')){
   const section=$('[data-mir-store-color-choice]');
   if(section)section.hidden=!e.checked;
