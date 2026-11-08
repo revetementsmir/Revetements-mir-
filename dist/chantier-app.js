@@ -22,6 +22,7 @@
   const date = value => { const d=new Date(value); return Number.isFinite(d.getTime()) ? new Intl.DateTimeFormat('fr-CA',{day:'numeric',month:'short'}).format(d) : 'Date à préciser'; };
   const requestId = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   let model, state, materials=[], materialMap=new Map(), ui, mode='employee', view='projects', actorId='demo-employee-1', query='', category='all', favoritesOnly=false, orderFilter='pending', toastTimer, customModelController=null;
+  let reviewingOrder=false, deliveryDraft={mode:'delivery',note:''};
   let connectionMode='connected', portalClient=null, clientStatus=null, authCallback=null, invitationToken=null, authMessage='', authError='', authBusy=false, invitations=[], uiStorageKey=UI_KEY;
   const isDemo=()=>connectionMode==='demo';
   const load = (key,fallback) => { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch { return fallback; } };
@@ -58,6 +59,7 @@
   function setView(next,{focus=false}={}) {
     const allowed=mode==='admin'?['admin-orders','inventory','members','projects','catalogue','orders']:['projects','catalogue','orders'];
     if(!allowed.includes(next))return;
+    if(next!==view)reviewingOrder=false;
     view=next;query='';category='all';favoritesOnly=false;render();
     if(next==='members'&&!isDemo())refreshInvitations();
     if(focus){$('#portal-main').focus({preventScroll:true});$('#portal-main').scrollIntoView({behavior:'smooth',block:'start'});}
@@ -65,7 +67,7 @@
   function renderNavigation() {
     document.body.dataset.portalMode=mode;
     const pending=model.listOrders(state,actorId,{view:'pending'}).length;
-    const entries=mode==='admin'?[...(!isDemo()?[['projects','house','Chantiers']]:[]),['admin-orders','orders','Commandes'],['inventory','box','Inventaire'],['members','people','Équipe & accès']]:[['projects','house','Mes chantiers'],['catalogue','cart','Commander'],['orders','orders','Mes commandes']];
+    const entries=mode==='admin'?[...(!isDemo()?[['projects','house','Chantiers']]:[]),['admin-orders','orders','Commandes'],['inventory','box','Inventaire'],['members','people','Équipe & accès']]:[['projects','house','Mes chantiers'],['catalogue','cart','Commander'],['orders','orders','Suivi']];
     $('#portal-navigation').innerHTML=entries.map(([key,glyph,label])=>`<button type="button" data-view="${key}" aria-current="${key===view?'page':'false'}">${icon(glyph)}<span>${label}</span>${key.includes('orders')&&pending?`<span class="nav-count">${pending}</span>`:''}</button>`).join('');
     document.querySelectorAll('[data-demo-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.demoMode===mode)));
     if(isDemo())$('#demo-profile').innerHTML=state.members.filter(member=>member.active&&member.role===mode).map(member=>`<option value="${esc(member.id)}"${member.id===actorId?' selected':''}>${esc(member.name)} · exemple</option>`).join('');
@@ -79,6 +81,28 @@
   function renderProjects() {
     const jobs=jobsForActor(),orders=model.listOrders(state,actorId,{view:'pending'}),published=jobs.filter(job=>job.publishedVersionId).length;
     const admin=mode==='admin'&&!isDemo();
+    if(mode==='employee'){
+      const draftCount=currentCart().length;
+      const projects=jobs.map(job=>{
+        const version=state.planVersions.find(plan=>plan.id===job.publishedVersionId);
+        const pending=orders.filter(order=>order.jobId===job.id).length;
+        return `<article class="employee-job"><div class="employee-job-icon">${icon('house')}</div><div class="employee-job-copy">
+          <h3>${esc(job.name)}</h3><p>${esc(job.address||'Adresse à préciser')}</p>
+          <small>${version?'Plan disponible':'Plan à venir'}${pending?' · '+pending+' en cours':''}</small>
+        </div><div class="employee-job-actions">
+          <button type="button" class="button" data-order-for="${esc(job.id)}">Commander</button>
+          <button type="button" class="button secondary" data-job="${esc(job.id)}">Voir le dossier</button>
+        </div></article>`;
+      }).join('');
+      return `<section class="employee-welcome">
+        <div><p class="portal-eyebrow">ESPACE ÉQUIPE MIR</p><h1>Mes chantiers</h1>
+        <p>Commande du matériel ou consulte les plans de ton chantier.</p></div>
+        ${draftCount?`<button type="button" class="button" data-resume-order>Reprendre mon brouillon <span>${draftCount}</span></button>`:''}
+      </section><section class="employee-projects" aria-labelledby="employee-project-title">
+        <div class="employee-section-title"><h2 id="employee-project-title">Chantiers assignés</h2><span>${jobs.length}</span></div>
+        ${jobs.length?projects:empty('house','Aucun chantier assigné','Demande à ton responsable MIR de t’attribuer un chantier.')}
+      </section>`;
+    }
     return heading(admin?'LES DOSSIERS DE VOTRE ÉQUIPE':'LE QUOTIDIEN DE VOTRE ÉQUIPE',admin?'Des chantiers <em>bien organisés.</em>':'Prêt pour <em>le chantier.</em>',`Bonjour ${actor()?.name?.split(' ')[0]||''}. Retrouvez vos dossiers et demandez votre matériel en quelques gestes.`,admin?`<button type="button" class="button" data-create-job>${icon('plus')}Créer un chantier</button>`:`<button type="button" class="button" data-view="catalogue">${icon('plus')}Commander du matériel</button>`)+
       `<div class="stats-row"><div class="stat-card"><span>${admin?'LES CHANTIERS':'VOS CHANTIERS'}</span><strong>${jobs.length}</strong><small>${isDemo()?'Assignés dans cet aperçu':admin?'Dossiers de l’équipe':'Vos dossiers attribués'}</small></div><div class="stat-card"><span>VERSIONS DE PLAN</span><strong>${published}</strong><small>${isDemo()?'Publications de démonstration':'Plans publiés'}</small></div><div class="stat-card"><span>DEMANDES EN COURS</span><strong>${orders.length}</strong><small>Suivi du matériel</small></div></div><div class="section-label"><h2>${admin?'Les chantiers':'Mes chantiers'}</h2><p>${admin?'Retrouvez les dossiers de l’équipe.':'Les dossiers qui vous sont assignés.'}</p></div>`+
       (jobs.length?`<div class="project-grid">${jobs.map((job,index)=>{const version=state.planVersions.find(v=>v.id===job.publishedVersionId),jobOrders=orders.filter(order=>order.jobId===job.id);return `<article class="project-card">${isDemo()?`<div class="project-cover"><img src="assets/${index%2?'mir-03.jpg':'mir-01.jpg'}" alt="Réalisation MIR illustrant un chantier de démonstration" loading="lazy"><span>CHANTIER DE DÉMONSTRATION</span></div>`:`<div class="project-cover project-cover-neutral">${icon('house')}<span>DOSSIER MIR</span></div>`}<div class="project-body"><div class="project-meta"><span>ÉQUIPE MIR</span><span>${jobOrders.length} demande${jobOrders.length>1?'s':''} en cours</span></div><h3>${esc(job.name)}</h3><p>${esc(job.address||(isDemo()?'Dossier fictif pour essayer le portail':'Adresse à préciser'))}</p><div class="project-plan-row">${icon('plan')}<div><strong>${esc(version?.label||'Plan à publier')}</strong><small>${esc(version?.revision||'Aucune version publiée')}</small></div><span class="pill muted">${version?(isDemo()?'Publié · démo':'Publié'):'À venir'}</span></div><div class="project-actions"><button type="button" class="button secondary" data-job="${esc(job.id)}">Consulter le dossier</button><button type="button" class="button" data-order-for="${esc(job.id)}">Commander ${icon('arrow')}</button></div></div></article>`;}).join('')}</div>`:empty('house',admin?'Votre premier chantier':'Aucun chantier assigné',admin?'Créez un dossier, puis attribuez-le aux membres de votre équipe.':'Un gestionnaire pourra vous attribuer vos dossiers.'))+
@@ -154,8 +178,29 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
       reviewTools(item)+'</div></article>';
   }
   function renderCatalogue() {
-    return heading('LE MATÉRIEL DU CHANTIER','Tout pour <em>avancer.</em>',isDemo()?'Choisissez votre chantier, ajoutez vos articles et envoyez une demande de démonstration.':'Choisissez votre chantier, ajoutez vos articles et transmettez votre demande à l’équipe MIR.',`<div class="job-choice"><label for="order-job">Pour quel chantier ?<select id="order-job">${jobsForActor().map(job=>`<option value="${esc(job.id)}"${job.id===currentJobId()?' selected':''}>${esc(job.name)}</option>`).join('')||'<option value="">Aucun chantier assigné</option>'}</select></label></div>`)+
-      `<div class="order-workspace"><section aria-label="Catalogue du chantier"><div class="catalogue-tools"><label class="search-field"><span class="sr-only">Rechercher un article</span>${icon('search')}<input id="catalogue-search" type="search" placeholder="Clous, soffite, pliage…" value="${esc(query)}"></label><button type="button" class="favorites-filter" id="favorites-filter" aria-pressed="${favoritesOnly}">${icon('heart')}Mes favoris</button>${reviewToolbar()}</div><div class="category-tabs" aria-label="Catégories"><button type="button" data-category="all" aria-pressed="${category==='all'}">Tout le matériel</button>${Object.entries(categoryNames).map(([id,label])=>`<button type="button" data-category="${id}" aria-pressed="${category===id}">${label}</button>`).join('')}</div><p class="catalogue-results" id="catalogue-count"></p><div id="store-custom-models" hidden></div><div class="catalogue-grid" id="catalogue-grid"></div></section><aside class="order-cart" id="order-cart" tabindex="-1" aria-label="Votre demande"></aside></div><div id="mobile-cart"></div>`;
+    const jobs=jobsForActor(), selected=currentJobId();
+    const jobSelect=`<label for="order-job">Chantier<select id="order-job">${jobs.map(job=>`<option value="${esc(job.id)}"${job.id===selected?' selected':''}>${esc(job.name)}</option>`).join('')||'<option value="">Aucun chantier assigné</option>'}</select></label>`;
+    return `<section class="employee-order-heading">
+      <p class="portal-eyebrow">DEMANDE DE MATÉRIEL</p>
+      <h1>Commander du matériel</h1>
+      <ol class="employee-steps" aria-label="Étapes de la demande">
+        <li data-order-step="browse"><span>1</span> Choisir le matériel</li>
+        <li data-order-step="review"><span>2</span> Vérifier et envoyer</li>
+      </ol>
+    </section>
+    <div class="order-workspace employee-order-workspace">
+      <section id="employee-browse" tabindex="-1" aria-label="Choisir le matériel">
+        <div class="employee-order-tools"><div class="job-choice">${jobSelect}</div>
+          ${jobs.length?'':'<p class="employee-order-warning">Il te faut un chantier assigné pour envoyer une demande. Ton brouillon peut être préparé.</p>'}
+          <label class="search-field"><span class="sr-only">Rechercher un article</span>${icon('search')}<input id="catalogue-search" type="search" placeholder="Rechercher un article" value="${esc(query)}"></label>
+          <div class="employee-filter-row"><label>Catégorie<select id="catalogue-category"><option value="all">Tout le matériel</option>${Object.entries(categoryNames).map(([id,label])=>`<option value="${id}"${category===id?' selected':''}>${label}</option>`).join('')}</select></label>
+          <button type="button" class="favorites-filter" id="favorites-filter" aria-pressed="${favoritesOnly}">${icon('heart')} Favoris</button></div>
+          ${reviewToolbar()}
+        </div>
+        <p class="catalogue-results" id="catalogue-count"></p><div id="store-custom-models" hidden></div><div class="catalogue-grid" id="catalogue-grid"></div>
+      </section>
+      <aside class="order-cart employee-review" id="order-cart" tabindex="-1" aria-label="Vérifier la demande" hidden></aside>
+    </div><div id="mobile-cart"></div>`;
   }
   function renderCatalogueGrid() {
     const words=query.trim().toLocaleLowerCase('fr').split(/\s+/).filter(Boolean),favs=favoriteIds();
@@ -168,8 +213,24 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
   function lineDescription(line) {const reference=line.manufacturerReference||line.snapshot?.manufacturerReference,packaging=line.packaging||line.snapshot?.packaging;return [line.brand,reference?'Réf. '+reference:null,line.formatLabel||line.snapshot?.formatLabel,packageLabel({...line,packaging}),line.colorName,...Object.entries(line.dimensionsIn||{}).map(([key,value])=>`${key} ${num(value)} po`)].filter(Boolean).join(' · ');}
   function renderCart() {
     const cart=currentCart(),job=jobById(currentJobId());
-    $('#order-cart').innerHTML=`<div class="cart-heading"><h2>Votre demande</h2><span class="cart-count">${cart.length}</span></div>${cart.length?`<div class="cart-items">${cart.map(line=>`<div class="cart-item"><div><strong>${esc(line.name)}</strong><small>${esc(lineDescription(line))}</small><div class="cart-qty"><input type="number" data-cart-qty="${esc(line.cartKey)}" value="${line.quantity}" min="${itemById(line.itemId)?.quantityStep||1}" step="${itemById(line.itemId)?.quantityStep||1}" aria-label="Quantité de ${esc(line.name)}"><span>${esc(line.unit)}</span></div></div><button type="button" class="remove-item" data-cart-remove="${esc(line.cartKey)}" aria-label="Retirer ${esc(line.name)}">×</button></div>`).join('')}</div>`:`<div class="cart-empty">${icon('cart')}<p>Ajoutez le matériel dont vous avez besoin.</p></div>`}<form id="create-order-form"><div class="cart-fields"><label>Réception<select name="deliveryMode"><option value="delivery">Livraison au chantier</option><option value="pickup">Ramassage</option></select></label><label>Précision pour l’équipe<textarea name="note" rows="2" maxlength="500" placeholder="Accès, étage, détail utile…"></textarea></label></div><div class="cart-submit-row"><button type="submit" class="button full"${!cart.length||!job?' disabled':''}>${isDemo()?'Créer la demande démo':'Envoyer ma demande'} ${icon('arrow')}</button><p class="cart-local-note">${isDemo()?'Simulation locale. Aucun achat, envoi ni paiement n’est effectué.':'Votre demande sera transmise au responsable MIR. Les quantités reçues seront suivies ici.'}</p></div></form>`;
-    $('#mobile-cart').innerHTML=cart.length?`<div class="mobile-cart-bar"><div><p>${cart.length} article${cart.length>1?'s':''} dans la demande</p><small>${esc(job?.name||'Choisir un chantier')}</small></div><button type="button" data-scroll-cart>Voir la demande ↑</button></div>`:'';
+    $('#order-cart').innerHTML=`<button type="button" class="button secondary employee-back" data-order-back>Retour au matériel</button>
+      <div class="cart-heading"><h2>Vérifier la demande</h2><span class="cart-count">${cart.length}</span></div><p class="employee-review-job"><strong>Chantier</strong> ${esc(job?.name||'Aucun chantier assigné')}</p>${cart.length?`<div class="cart-items">${cart.map(line=>`<div class="cart-item"><div><strong>${esc(line.name)}</strong><small>${esc(lineDescription(line))}</small><div class="cart-qty"><input type="number" data-cart-qty="${esc(line.cartKey)}" value="${line.quantity}" min="${itemById(line.itemId)?.quantityStep||1}" step="${itemById(line.itemId)?.quantityStep||1}" aria-label="Quantité de ${esc(line.name)}"><span>${esc(line.unit)}</span></div></div><button type="button" class="remove-item" data-cart-remove="${esc(line.cartKey)}" aria-label="Retirer ${esc(line.name)}">×</button></div>`).join('')}</div>`:`<div class="cart-empty">${icon('cart')}<p>Ajoutez le matériel dont vous avez besoin.</p></div>`}<form id="create-order-form"><div class="cart-fields"><label>Réception<select name="deliveryMode"><option value="delivery">Livraison au chantier</option><option value="pickup"${deliveryDraft.mode==='pickup'?' selected':''}>Ramassage</option></select></label><label>Note pour l’équipe (facultatif)<textarea name="note" rows="2" maxlength="500" placeholder="Accès, étage, détail utile…">${esc(deliveryDraft.note)}</textarea></label></div><div class="cart-submit-row"><button type="submit" class="button full"${!cart.length||!job?' disabled':''}>${isDemo()?'Créer la demande démo':'Envoyer ma demande'} ${icon('arrow')}</button><p class="cart-local-note">${isDemo()?'Simulation locale. Aucun achat, envoi ni paiement n’est effectué.':'Votre demande sera transmise au responsable MIR. Les quantités reçues seront suivies ici.'}</p></div></form>`;
+    $('#mobile-cart').innerHTML=cart.length?`<div class="mobile-cart-bar employee-cart-bar"><div><p>${cart.length} article${cart.length>1?'s':''} dans la demande</p><small>${esc(job?.name||'Choisir un chantier')}</small></div><button type="button" data-scroll-cart>Vérifier</button></div>`:'';
+    showOrderStep();
+  }
+  function showOrderStep(focus=false) {
+    $('#employee-browse').hidden=reviewingOrder;
+    $('#order-cart').hidden=!reviewingOrder;
+    $('#mobile-cart').hidden=reviewingOrder;
+    document.querySelectorAll('[data-order-step]').forEach(step=>{
+      const current=step.dataset.orderStep===(reviewingOrder?'review':'browse');
+      if(current)step.setAttribute('aria-current','step');else step.removeAttribute('aria-current');
+    });
+    if(focus){
+      const target=reviewingOrder?$('#order-cart'):$('#employee-browse');
+      target.focus({preventScroll:true});
+      $('#portal-main').scrollIntoView({block:'start'});
+    }
   }
   function orderCard(order,admin) {
     const original=state.orders.find(o=>o.id===order.id)||order,n=orderNumbers(original),member=state.members.find(m=>m.id===order.requestedById),deliveries=state.deliveries.filter(d=>d.orderId===order.id);
@@ -178,7 +239,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
   }
   function renderOrders(admin=false) {
     const all=model.listOrders(state,actorId,{view:'all'}),orders=model.listOrders(state,actorId,{view:orderFilter});
-    return heading(admin?'LA PRÉPARATION DES CHANTIERS':'VOS DEMANDES DE MATÉRIEL',admin?'Préparer. <em>Livrer. Suivre.</em>':'Du matériel. <em>Du suivi.</em>',admin?'Réservez le stock connu, saisissez les quantités réellement livrées et gardez le reliquat visible.':'Retrouvez les articles attendus et l’historique des articles reçus.')+
+    return heading(admin?'LA PRÉPARATION DES CHANTIERS':'VOS DEMANDES DE MATÉRIEL',admin?'Préparer. <em>Livrer. Suivre.</em>':'Mes commandes',admin?'Réservez le stock connu, saisissez les quantités réellement livrées et gardez le reliquat visible.':'Retrouvez les articles attendus et l’historique des articles reçus.')+
       (admin?`<div class="stats-row"><div class="stat-card"><span>À PRÉPARER</span><strong>${all.filter(o=>{const n=orderNumbers(o);return n.remaining&&!n.delivered;}).length}</strong><small>Demandes ouvertes</small></div><div class="stat-card"><span>LIVRAISONS PARTIELLES</span><strong>${all.filter(o=>{const n=orderNumbers(o);return n.remaining&&n.delivered;}).length}</strong><small>Reliquats conservés</small></div><div class="stat-card"><span>DEMANDES CLÔTURÉES</span><strong>${all.filter(o=>!orderNumbers(o).remaining).length}</strong><small>${isDemo()?'Dans cet aperçu':'Demandes terminées'}</small></div></div>`:'')+
       `<div class="order-filters" aria-label="Filtrer les demandes">${[['pending','En cours'],['history','Historique'],['all','Tout voir']].map(([id,label])=>`<button type="button" data-order-filter="${id}" aria-pressed="${id===orderFilter}">${label}</button>`).join('')}</div><div class="orders-list">${orders.length?orders.map(order=>orderCard(order,admin)).join(''):empty('orders','Aucune demande dans cette vue',orderFilter==='history'?'Les articles entièrement reçus ou annulés apparaîtront ici.':'Ajoutez du matériel depuis le catalogue de chantier.')}</div>`+
       (admin?note('Le stock commence à « inconnu »',isDemo()?'Saisissez un stock de simulation dans Inventaire avant de réserver ou livrer. Le portail ne crée aucun stock réel.':'Enregistrez le comptage physique dans Inventaire avant de réserver ou livrer. Les réservations ne modifient pas le stock physique.'): '');
@@ -280,12 +341,14 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(button.id==='auth-accept-invitation')return runAuth(async()=>{await portalClient.acceptInvitation(invitationToken);clearInvitation();authMessage='Votre accès MIR est activé.';applyConnectedStatus(portalClient.getStatus());});
     if(button.id==='portal-retry-action')return retryOperation();
     if(!state)return;
-    if(!isDemo()&&clientStatus?.pending&&!button.dataset.view&&!button.dataset.job&&!button.dataset.orderFilter&&!button.hasAttribute('data-scroll-cart')){toast('Vérifiez d’abord l’action dont la confirmation manque.');return;}
+    if(!isDemo()&&clientStatus?.pending&&!button.hasAttribute('data-order-back')&&!button.dataset.view&&!button.dataset.job&&!button.dataset.orderFilter&&!button.hasAttribute('data-scroll-cart')){toast('Vérifiez d’abord l’action dont la confirmation manque.');return;}
     if(button.hasAttribute('data-create-job')){openDialog(dialogHeader('NOUVEAU DOSSIER','Créer un chantier','Donnez un nom clair au dossier. Vous pourrez ensuite l’attribuer à votre équipe.')+'<form id="create-job-form" class="dialog-form"><label>Nom du chantier<input name="name" maxlength="160" required placeholder="Adresse ou nom du projet"></label><label>Adresse<input name="address" maxlength="300" autocomplete="street-address"></label><p id="dialog-error" class="dialog-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" class="button secondary" data-close-dialog>Annuler</button><button type="submit" class="button">Créer le chantier</button></div></form>');return;}
     if(button.dataset.memberActive){const out=await act('SET_MEMBER_ACTIVE',{memberId:button.dataset.memberActive,active:button.dataset.active==='true'});if(out.ok){render();toast(button.dataset.active==='true'?'Accès réactivé.':'Accès suspendu.');}return;}
     if(button.dataset.revokeInvitation){const out=await act('REVOKE_INVITATION',{invitationId:button.dataset.revokeInvitation});if(out.ok){toast('Le lien a été révoqué.');await refreshInvitations();}return;}
     if(button.dataset.downloadPlan){button.disabled=true;try{const blob=await portalClient.downloadPlan(button.dataset.downloadPlan),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=(button.dataset.documentName||'Plan-chantier.pdf').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'-');link.rel='noopener';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}catch(error){dialogError(errorMessage(error));}finally{button.disabled=false;}return;}
     if(button.dataset.demoMode&&isDemo()){mode=button.dataset.demoMode;actorId=state.members.find(member=>member.active&&member.role===mode)?.id||actorId;view=mode==='admin'?'admin-orders':'projects';orderFilter='pending';query='';render();return;}
+    if(button.hasAttribute('data-resume-order')){setView('catalogue');reviewingOrder=true;showOrderStep(true);return;}
+    if(button.hasAttribute('data-order-back')){reviewingOrder=false;showOrderStep(true);return;}
     if(button.dataset.view){if($('#portal-dialog').open)closeDialog();return setView(button.dataset.view,{focus:true});}
     if(button.dataset.job)return showJob(button.dataset.job);
     if(button.dataset.orderFor){ui.jobs[actorId]=button.dataset.orderFor;save();if($('#portal-dialog').open)closeDialog();return setView('catalogue',{focus:true});}
@@ -324,7 +387,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
      if(button.dataset.configure)return showFold(button.dataset.configure);
     if(button.dataset.addItem){const card=button.closest('[data-product]'),chosen=reviewAPI?.selection(card,itemById),item=chosen?.item||itemById(button.dataset.addItem),out=addToCart({itemId:item?.id||button.dataset.addItem,quantity:Number(card.querySelector('[data-product-qty]').value),colorId:chosen?.colorId||card.querySelector('[data-product-color]')?.value||undefined,formatId:card.querySelector('[data-product-format]')?.value||(card.querySelector('[data-product-variant]')?item?.formats?.[0]?.id:undefined)});if(!out.ok)toast(errorMessage(out.error));else{renderCart();toast('Article ajouté à votre demande.');}return;}
     if(button.dataset.cartRemove){ui.carts[actorId]=currentCart().filter(line=>line.cartKey!==button.dataset.cartRemove);save();return renderCart();}
-    if(button.hasAttribute('data-scroll-cart')){$('#order-cart').scrollIntoView({behavior:'smooth',block:'start'});$('#order-cart').focus({preventScroll:true});return;}
+    if(button.hasAttribute('data-scroll-cart')){reviewingOrder=true;showOrderStep(true);return;}
     if(button.dataset.orderFilter){orderFilter=button.dataset.orderFilter;return render();}
     if(button.dataset.reserveOrder){const out=await act('RESERVE_ORDER',{orderId:button.dataset.reserveOrder});if(out.ok){render();const warnings=out.result?.warnings||[];if(warnings.length){const reserved=out.result?.reservedQty||0,units=out.result?.summary?.byUnit;let counts=[];if(Array.isArray(units))counts=units.filter(u=>u.reservedQty>0||u.reserved>0).map(u=>`${num(u.reservedQty??u.reserved)} ${u.unit}`);else if(units&&typeof units==='object')counts=Object.entries(units).filter(([,u])=>(u.reservedQty??u.reserved)>0).map(([unit,u])=>`${num(u.reservedQty??u.reserved)} ${u.unit||unit}`);openDialog(dialogHeader('VÉRIFICATION DU STOCK',reserved?'Réservation partielle':'Le stock reste à vérifier',reserved?`${counts.length?counts.join(' · '):'Une partie des articles'} réservée. Les autres quantités restent à préparer.`:'Aucune quantité réservée. Renseignez le stock avant la préparation.')+`<ul class="dialog-list">${warnings.map(w=>`<li>${esc(typeof w==='string'?w:w.message||w.code)}</li>`).join('')}</ul><div class="dialog-actions"><button type="button" class="button secondary" data-close-dialog>Fermer</button><button type="button" class="button" data-view="inventory">Vérifier l’inventaire ${icon('arrow')}</button></div>`);}else toast((out.result?.reservedQty||0)>0?'Stock réservé pour cette demande.':'Les quantités disponibles étaient déjà réservées.');}return;}
     if(button.dataset.deliverOrder)return showDelivery(button.dataset.deliverOrder);
@@ -338,8 +401,10 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
   function handleChange(event) {
     const element=event.target;
     if(element.id==='demo-profile'&&isDemo()){actorId=element.value;view=mode==='admin'?'admin-orders':'projects';orderFilter='pending';render();return;}
+    if(element.id==='catalogue-category'){category=element.value;renderCatalogueGrid();return;}
+    if(element.matches('#create-order-form select[name="deliveryMode"]')){deliveryDraft.mode=element.value;return;}
     if(element.id==='order-job'){ui.jobs[actorId]=element.value;save();renderCart();return;}
-    if(element.dataset.cartQty){const old=currentCart().find(line=>line.cartKey===element.dataset.cartQty);if(!old)return;const out=model.configureLine(state,{...old,quantity:Number(element.value)});if(!out.ok){toast(errorMessage(out.error));element.value=old.quantity;}else{Object.assign(old,out.line,{cartKey:old.cartKey});save();renderCart();}return;}
+    if(element.dataset.cartQty){const old=currentCart().find(line=>line.cartKey===element.dataset.cartQty);if(!old)return;const out=model.configureLine(state,{...old,quantity:Number(element.value)});if(!out.ok){toast(errorMessage(out.error));element.value=old.quantity;}else{Object.assign(old,out.line,{cartKey:old.cartKey});save();}return;}
     
      if(element.dataset.productVariant){
        const card=element.closest('[data-product]'),chosen=reviewAPI?.selection(card,itemById);
@@ -361,7 +426,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
      if(element.dataset.productColor||element.dataset.productFormat){const card=element.closest('[data-product]');updateProductPreview(card,itemById(card.dataset.product));return;}
     if(element.dataset.inventoryColor||element.dataset.inventoryFormat){const item=itemById(element.dataset.inventoryColor||element.dataset.inventoryFormat),form=element.closest('form'),out=model.configureLine(state,{itemId:item.id,quantity:item.quantityStep||1,colorId:form.elements.colorId?.value||undefined,formatId:form.elements.formatId?.value||undefined}),stock=out.ok?stockFor(out.line.stockKey):{known:false};form.querySelector('.stock-value').innerHTML=stockHTML(stock,item.unit);form.elements.quantity.value=stock.known?stock.onHand:'';}
   }
-  function handleInput(event) {const element=event.target;if(element.id==='catalogue-search'){query=element.value;renderCatalogueGrid();}else if(element.id==='inventory-search'){query=element.value;renderInventoryList();}else if(element.dataset.foldDimension){const form=element.closest('form'),values={};form.querySelectorAll('[data-fold-dimension]').forEach(input=>values[input.dataset.foldDimension]=input.value);$('#fold-diagram').innerHTML=foldSVG(itemById(form.dataset.item),values);}}
+  function handleInput(event) {const element=event.target;if(element.matches('#create-order-form textarea[name=note]')){deliveryDraft.note=element.value;}else if(element.id==='catalogue-search'){query=element.value;renderCatalogueGrid();}else if(element.id==='inventory-search'){query=element.value;renderInventoryList();}else if(element.dataset.foldDimension){const form=element.closest('form'),values={};form.querySelectorAll('[data-fold-dimension]').forEach(input=>values[input.dataset.foldDimension]=input.value);$('#fold-diagram').innerHTML=foldSVG(itemById(form.dataset.item),values);}}
   const showFormError=error=>clientStatus?.pending?toast(errorMessage(error)):dialogError(errorMessage(error));
   async function handleSubmit(event) {
     const form=event.target;
@@ -387,7 +452,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(!isDemo()&&(clientStatus?.busy||clientStatus?.pending)){event.preventDefault();toast('Vérifiez d’abord l’action en attente de confirmation.');return;}
     event.preventDefault();const data=new FormData(form);
     if(form.id==='create-job-form'){const out=await act('CREATE_JOB',{name:String(data.get('name')||'').trim(),address:String(data.get('address')||'').trim()});if(!out.ok)showFormError(out.error);else{closeDialog();setView('projects');toast('Chantier créé. Attribuez-le aux membres de votre équipe.');}return;}
-    if(form.id==='create-order-form'){const cart=currentCart();if(!cart.length||!currentJobId())return;const out=await act('CREATE_ORDER',{jobId:currentJobId(),lines:cart.map(({cartKey,...line})=>line),note:String(data.get('note')||''),deliveryMode:String(data.get('deliveryMode')||'delivery')});if(out.ok){ui.carts[actorId]=[];save();orderFilter='pending';setView(mode==='admin'?'admin-orders':'orders',{focus:true});toast(isDemo()?'Demande enregistrée dans l’aperçu.':'Votre demande a été transmise à MIR.');}return;}
+    if(form.id==='create-order-form'){const cart=currentCart();if(!cart.length||!currentJobId())return;const out=await act('CREATE_ORDER',{jobId:currentJobId(),lines:cart.map(({cartKey,...line})=>line),note:String(data.get('note')||''),deliveryMode:String(data.get('deliveryMode')||'delivery')});if(out.ok){ui.carts[actorId]=[];deliveryDraft={mode:'delivery',note:''};save();orderFilter='pending';setView(mode==='admin'?'admin-orders':'orders',{focus:true});toast(isDemo()?'Demande enregistrée dans l’aperçu.':'Votre demande a été transmise à MIR.');}return;}
     if(form.id==='fold-form'){const item=itemById(form.dataset.item),dimensionsIn={};for(const field of item.measureFields||[])dimensionsIn[field.key]=model.parseInches(String(data.get(`dim-${field.key}`)||''));const out=addToCart({itemId:item.id,quantity:Number(data.get('quantity')),colorId:String(data.get('colorId')||''),dimensionsIn});if(!out.ok)showFormError(out.error);else{closeDialog();renderCart();toast('Pliage ajouté avec vos mesures.');}return;}
     if(form.id==='delivery-form'){const order=state.orders.find(o=>o.id===form.dataset.order),quantities={};for(const line of order?.lines||[]){const amount=Number(data.get(`line-${line.id}`));if(amount>0)quantities[line.id]=amount;}const out=await act('RECORD_DELIVERY',{orderId:form.dataset.order,quantities,requestId:form.dataset.request});if(!out.ok)showFormError(out.error);else{closeDialog();render();toast('Livraison enregistrée. Le reliquat est conservé.');}return;}
     if(form.id==='assignment-form'){if(!isDemo()){const out=await act('ASSIGN_MEMBER_JOBS',{memberId:form.dataset.member,jobIds:data.getAll('jobIds')});if(!out.ok)showFormError(out.error);else{closeDialog();render();toast('Accès aux chantiers enregistrés.');}return;}const member=state.members.find(m=>m.id===form.dataset.member),before=new Set(memberJobs(member).map(j=>j.id)),after=new Set(data.getAll('jobIds'));for(const job of state.jobs){if(before.has(job.id)===after.has(job.id))continue;const out=await act('ASSIGN_JOB',{memberId:member.id,jobId:job.id,assigned:after.has(job.id)});if(!out.ok){showFormError(out.error);return;}}closeDialog();render();toast('Affectations de démonstration enregistrées.');return;}
@@ -427,7 +492,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(isDemo())return;
     setChrome(false);if(customModelController){customModelController.destroy();customModelController=null;}
     const config=portalClient?.config||window.MIRPortalConfig||{},phase=clientStatus?.phase||'unavailable',user=clientStatus?.user;
-    let title='Votre équipe.<br><em>Au même endroit.</em>',intro='Vos plans, votre matériel et le suivi des demandes, réunis dans le portail chantier MIR.',body='';
+    let title='Espace équipe MIR',intro='Tes chantiers, tes commandes et tes plans au même endroit.',body='';
     if(authCallback&&config.enabled){
       title=invitationToken?'Bienvenue<br><em>dans l’équipe.</em>':'Votre lien<br><em>de connexion.</em>';
       intro=invitationToken?'Validez votre lien, puis acceptez votre invitation pour rejoindre les chantiers qui vous sont attribués.':'Validez ce lien pour ouvrir votre espace MIR.';
@@ -438,20 +503,20 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     }else if(phase==='loading'){
       body='<div class="auth-loading"><span class="loading-dot"></span><p>Vérification de votre accès…</p></div>';
     }else if(!config.enabled){
-      body='<div class="auth-activation"><span class="pill">Activation sécurisée en attente</span><h2>L’espace MIR se prépare.</h2><p>Un espace commun permettra plus tard aux clients de retrouver leurs commandes, et à l’équipe d’accéder à ses chantiers et à l’administration selon ses droits.</p><p>Le service sécurisé MIR doit être raccordé et vérifié avant que les connexions Google, courriel et les invitations soient activées.</p></div><p class="auth-footnote">Aucun compte n’est créé ici et aucune donnée privée n’est accessible sans autorisation serveur.</p>';
+      body='<div class="auth-activation"><h2>Connexion en attente</h2><p>L’espace équipe n’est pas encore ouvert. Si tu dois commander du matériel, communique avec ton responsable MIR.</p></div>';
     }else if(user&&['access_denied','error'].includes(phase)){
       title=phase==='access_denied'?'Votre accès<br><em>reste à confirmer.</em>':'La connexion<br><em>a été interrompue.</em>';
       intro=phase==='access_denied'?'Votre compte est reconnu. Le responsable MIR doit activer votre accès ou vous envoyer une invitation.':'Vos demandes sont conservées par le service. Vérifiez la connexion avant de poursuivre.';
       body=`<p class="auth-account">${esc(user.email)}</p><button type="button" class="button full" id="auth-retry"${authBusy?' disabled':''}>Réessayer ${icon('arrow')}</button><button type="button" class="button quiet full" id="auth-signout"${authBusy?' disabled':''}>Déconnexion</button>`;
     }else{
-      title=invitationToken?'Rejoignez<br><em>votre équipe.</em>':'Bienvenue dans<br><em>votre espace.</em>';
+      title=invitationToken?'Rejoignez<br><em>votre équipe.</em>':'Connexion à l’espace équipe';
       intro=invitationToken?'Connectez-vous avec l’adresse qui a reçu l’invitation MIR.':'L’accès est réservé aux personnes invitées par MIR.';
       body=(config.googleEnabled?`<button type="button" id="auth-google" class="button secondary full"${authBusy?' disabled':''}><span class="google-mark" aria-hidden="true">G</span>Continuer avec Google</button>${config.emailEnabled?'<div class="auth-divider"><span>ou par courriel</span></div>':''}`:'')+
         (config.emailEnabled?`<form id="auth-email-form"><label for="auth-email">Votre adresse courriel<input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required placeholder="vous@entreprise.ca"${authBusy?' disabled':''}></label><button type="submit" class="button full"${authBusy?' disabled':''}>${authBusy?'Envoi…':'Recevoir mon lien de connexion'} ${icon('arrow')}</button></form><p class="auth-footnote">Ouvrez le lien reçu par courriel pour vous connecter. Aucun mot de passe à retenir.</p>`:'<p class="auth-footnote">Les méthodes de connexion sont en cours d’activation.</p>');
     }
     const expectedInvitation=invitationToken&&user&&clientStatus?.error?.code==='MEMBERSHIP_REQUIRED';
     const message=authError||(expectedInvitation?'':clientStatus?.error?.message);
-    $('#portal-content').innerHTML=`<section class="auth-grid"><div class="auth-intro"><p class="portal-eyebrow">LES REVÊTEMENTS MIR · PORTAIL CHANTIER</p><h1>${title}</h1><p>${esc(intro)}</p><ul class="auth-benefits"><li>${icon('plan')}Les plans de vos chantiers</li><li>${icon('cart')}Votre matériel en quelques gestes</li><li>${icon('orders')}Le suivi des quantités reçues</li></ul></div><div class="auth-card">${body}${authMessage?`<p class="auth-message" role="status">${esc(authMessage)}</p>`:''}${message?`<p class="auth-error" role="alert">${esc(message)}</p>`:''}</div></section>`;
+    $('#portal-content').innerHTML=`<section class="auth-grid"><div class="auth-intro"><p class="portal-eyebrow">LES REVÊTEMENTS MIR · PORTAIL CHANTIER</p><h1>${title}</h1><p>${esc(intro)}</p></div><div class="auth-card">${body}${authMessage?`<p class="auth-message" role="status">${esc(authMessage)}</p>`:''}${message?`<p class="auth-error" role="alert">${esc(message)}</p>`:''}</div></section>`;
   }
   function connectedUI(snapshot) {
     uiStorageKey=`mir_employee_portal_ui_connected_${portalClient.config.projectRef}_${snapshot.actorId}`;
@@ -464,7 +529,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(next.phase==='ready'&&next.snapshot){
       const changed=actorId!==next.snapshot.actorId||!state;
       state=next.snapshot;actorId=state.actorId;const role=actor()?.role||'employee';
-      if(changed){ui=connectedUI(state);mode=role;view=mode==='admin'?'admin-orders':'projects';invitations=[];}
+      if(changed){reviewingOrder=false;deliveryDraft={mode:'delivery',note:''};ui=connectedUI(state);mode=role;view=mode==='admin'?'admin-orders':'projects';invitations=[];}
       else if(mode!==role){mode=role;view=mode==='admin'?'admin-orders':'projects';}
       if(authCallback||invitationToken){renderAuth();return;}
       setChrome(true);
@@ -481,7 +546,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     banner.innerHTML=lock?`<div>${icon('info')}<p><strong>${busy?'Enregistrement en cours…':'Une confirmation reste à vérifier.'}</strong><span>${busy?'Votre demande garde la même référence jusqu’à sa confirmation.':'Réessayez cette action. Elle conserve sa référence pour éviter un doublon.'}</span></p></div>${!busy?'<button type="button" class="button secondary small" id="portal-retry-action">Vérifier cette action</button>':''}`:'';
     const controls=document.querySelectorAll('#portal-content input,#portal-content select,#portal-content textarea,#portal-content button,#portal-dialog-content input,#portal-dialog-content select,#portal-dialog-content textarea,#portal-dialog-content button');
     controls.forEach(control=>{
-      if(control.matches('[data-close-dialog],[data-job],[data-order-filter],[data-download-plan]'))return;
+      if(control.matches('[data-order-back],[data-close-dialog],[data-job],[data-order-filter],[data-download-plan]'))return;
       if(lock&&!control.disabled){control.disabled=true;control.dataset.operationLock='1';}
       else if(!lock&&control.dataset.operationLock){control.disabled=false;delete control.dataset.operationLock;}
     });
@@ -497,7 +562,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(!portalClient||clientStatus?.busy)return;
     try {
       const out=await portalClient.retry();state=out.snapshot;
-      if(out.command==='CREATE_ORDER'){ui.carts[actorId]=[];save();orderFilter='pending';view=mode==='admin'?'admin-orders':'orders';}
+      if(out.command==='CREATE_ORDER'){ui.carts[actorId]=[];reviewingOrder=false;deliveryDraft={mode:'delivery',note:''};save();orderFilter='pending';view=mode==='admin'?'admin-orders':'orders';}
       if(out.command==='INVITE_EMPLOYEE'||out.command==='REVOKE_INVITATION'){await refreshInvitations();toast(invitationLabel(out.result));}
       else toast('Action confirmée. Elle a été enregistrée une seule fois.');
       if($('#portal-dialog').open)closeDialog();render();
