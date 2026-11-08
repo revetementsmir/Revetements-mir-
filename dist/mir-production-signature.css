@@ -178,7 +178,7 @@ body[data-client-entry="draw"] .production-order{margin-top:48px}
 
 /* Parcours public des moulures. Le bandeau commun porte le dossier et le menu. */
 body[data-client-entry] :is(.production-intro,.mir-production-steps),
-body[data-client-entry] #mir-harmony-menu :is(#mode-link,a[href="selection.html"]) {
+body[data-client-entry] #mir-harmony-menu #mode-link {
  display:none!important;
 }
 body[data-client-entry] #client-entry .client-entry-return[hidden]{display:none!important}
@@ -191,7 +191,8 @@ body[data-client-entry="draw"] #drawing-tools .draw-primary{background:#2d681d;c
 body[data-client-entry="draw"] #drawing-tools .draw-primary:disabled{background:#e4efdd;color:#285f20}
 body[data-client-entry="draw"] .production-workspace{min-height:0}
 body[data-client-entry="measures"] .production-workspace{margin-top:18px}
-body:is([data-client-entry="choice"],[data-client-entry="models"],[data-client-entry="draw"]) :is(.production-order,.mir-unified-client-shortcut){display:none!important}
+body[data-client-entry="draw"] .production-order,
+body:is([data-client-entry="choice"],[data-client-entry="models"],[data-client-entry="draw"]) .mir-unified-client-shortcut{display:none!important}
 body[data-client-entry] #mir-harmony-menu nav a[aria-current="page"]{background:#e5efdf;color:#205e21}
 @media(max-width:600px){
  body[data-client-entry] .client-entry-cards{margin-top:16px}

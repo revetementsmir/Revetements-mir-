@@ -104,7 +104,7 @@ async function verifyQuoteAndExports(browser,base,width){
  await next.click();
  assert.equal(await page.locator('[data-measure="length"]').inputValue(),'120');
  assert.equal(await page.locator('[data-measure="length"]').evaluate(el=>el.readOnly),true);
- await next.click();
+ assert.equal(await page.locator('body').getAttribute('data-client-stage'),'4');
  await page.locator('[data-client-face="right"]').click();
  await next.click();
  await page.locator('#material-type').selectOption('aluminium');
