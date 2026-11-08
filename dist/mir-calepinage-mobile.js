@@ -121,6 +121,21 @@
    extra.innerHTML='<summary>Exports PDF de chantier et sauvegarde JSON</summary>';
    exports.before(extra);extra.append(exports);
   }
+  // Les trois mesures utiles précèdent le dessin; le mode d'allocation,
+  // la précision et les verrous restent accessibles aux techniciens.
+  const precision=$('#precision'),distribution=$('#distribution'),lip=$('#lip');
+  if(lip&&precision&&distribution){
+    const panelAdvanced=document.createElement('details');
+    panelAdvanced.id='mir-cal-panels-advanced';
+    panelAdvanced.dataset.mirCalGroup='panels';
+    panelAdvanced.innerHTML='<summary>Réglages avancés de fabrication</summary>'+
+      '<p class="hint">À ouvrir seulement pour modifier les joints, les arrondis au 1/16 ou les cotes verrouillées.</p>';
+    const lipLabel=lip.closest('label'),lipHint=lipLabel?.nextElementSibling;
+    if(lipHint)lipHint.after(panelAdvanced);else lipLabel?.after(panelAdvanced);
+    for(const node of [distribution.closest('label'),$('#distribution-note'),precision.closest('label'),$('#redistribute'),$('#unlock-all')]){
+      if(node)panelAdvanced.append(node);
+    }
+  }
   const inspector=$('.inspector');
   if(inspector){
     const details=document.createElement('details');
