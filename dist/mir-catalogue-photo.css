@@ -1,6 +1,6 @@
-/* Les visuels documentaires restent dans leur cadrage et leur couleur d’origine. */
+/* Cadre studio blanc pour conserver les teintes et fondus des fichiers fabricant. */
 .mir-catalogue-photo {
-  --mir-photo-canvas: #f5f5f2;
+  --mir-photo-canvas: #fff;
   --mir-photo-gutter: 8%;
   position: relative;
   box-sizing: border-box;
@@ -54,6 +54,41 @@ body .card.prime .mir-catalogue-photo img[data-catalogue-image] {
   filter: none;
   mix-blend-mode: normal;
   transform: none;
+}
+body .mir-catalogue-photo .mir-photo-trim {
+  grid-area: 1 / 1;
+}
+body .mir-catalogue-photo :is(.mir-photo-trim,.mir-photo-trim-viewport) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+@supports (width: 1cqh) {
+  body .mir-catalogue-photo .mir-photo-trim {
+    box-sizing: border-box;
+    display: grid;
+    grid-template: minmax(0,1fr) / minmax(0,1fr);
+    place-items: center;
+    container-type: size;
+    padding: var(--mir-photo-gutter);
+  }
+  body .mir-catalogue-photo .mir-photo-trim-viewport {
+    position: relative;
+    overflow: hidden;
+    width: min(100cqw, calc(100cqh * var(--mir-trim-ratio)));
+    height: auto;
+    aspect-ratio: var(--mir-trim-ratio);
+  }
+  body .mir-catalogue-photo .mir-photo-trim .mir-photo-trim-viewport > img[data-catalogue-image] {
+    position: absolute;
+    inset: var(--mir-source-top) auto auto var(--mir-source-left);
+    width: var(--mir-source-width);
+    height: var(--mir-source-height);
+    max-width: none;
+    max-height: none;
+    padding: 0;
+  }
 }
 body.commerce .mir-catalogue-photo .card-photo-label {
   position: static;
