@@ -5,7 +5,7 @@ Travail sur le dépôt existant, branche `feat/mir-account-auth`, à partir du m
 ## Réalisé
 
 - Une page `chantier.html` : Google, courriel/mot de passe, visibilité du mot de passe, inscription client avec confirmation, récupération, invitation et déconnexion. Même en-tête Harmony et logo original.
-- Retour Google, confirmation, invitation et récupération distingués. La récupération impose le nouveau mot de passe avant le compte, y compris après rechargement. Codes et jetons retirés de l'URL. Aucun rôle déduit des données du navigateur.
+- Retour Google, confirmation, invitation et récupération distingués. Un lien expiré masque le compte ; une invitation refusée permet de revenir à Mon compte sans rester bloqué. La récupération impose le nouveau mot de passe avant le compte, y compris après rechargement. Codes et jetons retirés de l'URL. Aucun rôle déduit des données du navigateur.
 - Catalogue et sélection accessibles sans compte. Le panier reste dans ses stockages existants ; seul un retour constant et expirant est mémorisé. Retour à la vérification, sans création automatique de commande.
 - Commandes du client et suivi filtrés côté serveur ; adresses privées protégées par RLS et RPC. L'inscription publique donne uniquement le rôle client dans l'organisation choisie par le serveur.
 - Invitation employé créée par un administrateur : lien privé à transmettre explicitement, 72 h, jeton aléatoire stocké seulement sous forme de hash, identité/courriel confirmés, attribution des seuls chantiers autorisés. Aucun envoi de courriel automatique. Connexion Entrepôt et son stockage Auth préservés.

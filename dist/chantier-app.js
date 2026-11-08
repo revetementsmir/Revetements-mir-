@@ -347,6 +347,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     if(button.hasAttribute('data-close-dialog'))return closeDialog();
     if(button.id==='account-copy-invitation'){const input=$('#account-invitation-link');input.select();try{await navigator.clipboard.writeText(input.value);toast('Lien copié. Transmettez-le à la personne invitée.');}catch(_){toast('Sélectionnez puis copiez le lien affiché.');}return;}
     if(button.dataset.authScreen){authEmail=$('#auth-email')?.value||authEmail;authScreen=button.dataset.authScreen;authError='';authMessage='';renderAuth();$('#auth-email')?.focus();return;}
+    if(button.id==='auth-dismiss-invitation'){clearInvitation();authError='';applyConnectedStatus(portalClient.getStatus());return;}
     if(button.id==='auth-define-password'){authScreen='invite-password';renderAuth();return;}
     if(button.dataset.accountView){customerTab=button.dataset.accountView;renderCustomer();return;}
     if(button.dataset.accountRemoveAddress){if(!confirm('Supprimer cette adresse de votre compte ?'))return;return runAuth(async()=>{await portalClient.removeAddress(button.dataset.accountRemoveAddress);authMessage='Adresse supprimée.';});}
@@ -534,7 +535,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
       body=`<button type="button" id="auth-confirm-link" class="button full"${authBusy?' disabled':''}>${authBusy?'Vérification…':'Valider mon lien'}</button>`;
     }else if(invitationToken&&user&&config.enabled){
       title='Activer mon compte';intro='Cette invitation donne accès uniquement aux chantiers attribués par MIR.';
-      body=`<p class="auth-account">Connecté avec <strong>${esc(user.email)}</strong></p><button type="button" id="auth-accept-invitation" class="button full"${authBusy?' disabled':''}>Activer mon compte</button><button type="button" class="button secondary full" id="auth-define-password">Définir mon mot de passe</button><button type="button" id="auth-signout" class="button quiet full">Utiliser un autre compte</button>`;
+      body=`<p class="auth-account">Connecté avec <strong>${esc(user.email)}</strong></p><button type="button" id="auth-accept-invitation" class="button full"${authBusy?' disabled':''}>Activer mon compte</button><button type="button" class="button secondary full" id="auth-define-password">Définir mon mot de passe</button><button type="button" id="auth-signout" class="button quiet full">Utiliser un autre compte</button><button type="button" id="auth-dismiss-invitation" class="button quiet full">Retour à Mon compte</button>`;
     }else if(phase==='loading'){
       body='<div class="auth-loading"><span class="loading-dot"></span><p>Vérification de votre compte…</p></div>';
     }else if(!config.enabled){

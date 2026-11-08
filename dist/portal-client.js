@@ -307,7 +307,7 @@
       else if (callback?.kind === 'implicit') response = await sdk.auth.setSession({ access_token: callback.accessToken, refresh_token: callback.refreshToken });
       else if(callback?.kind==='otp')response=await sdk.auth.verifyOtp({token_hash:callback.tokenHash,type:callback.type});
       else fail('CALLBACK_INVALID', 'Ce lien de connexion ne peut pas être utilisé.');
-      if (response.error){setPasswordGate(null);throw new PortalError('CALLBACK_INVALID', 'Ce lien est expiré ou ne peut plus être utilisé. Demandez un nouveau lien.');}
+      if (response.error){setPasswordGate(null);clearIdentity('signed_out');throw new PortalError('CALLBACK_INVALID', 'Ce lien est expiré ou ne peut plus être utilisé. Demandez un nouveau lien.');}
       // Only a successful, explicitly confirmed login can resume this browser tab.
       // A late token refresh cannot undo the person's choice to sign out.
       setLogoutIntent(false);
