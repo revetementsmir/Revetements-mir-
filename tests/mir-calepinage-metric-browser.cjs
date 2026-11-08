@@ -57,7 +57,10 @@ async function saved(page){await page.waitForFunction(()=>document.querySelector
     await page.locator('.mir-cal-mobile-full-table summary').click();
    }
    await page.locator('#piece-table [data-table-piece]').first().click();
-   if(device.width<=740)await page.locator('[data-mir-cal-stage="panels"]').click();
+   if(device.width<=740){
+    await page.locator('[data-mir-cal-stage="panels"]').click();
+    await page.locator('.mir-cal-mobile-panel-inspector summary').click();
+   }
    await page.locator('#mir-panel-dimension-unit').selectOption('mm');
    const first=Number(await page.locator('#piece-width').inputValue()),second=Number(await page.locator('#piece-height').inputValue());
    assert.ok(first>300&&second>300,'Dimension inputs converted to mm');
