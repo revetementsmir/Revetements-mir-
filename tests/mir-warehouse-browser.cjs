@@ -44,6 +44,8 @@ async function ready(){for(let i=0;i<80;i++){const ok=await new Promise(r=>http.
    await register.getByLabel('Nom',{exact:true}).fill('Vis MIR de recette');
    await register.getByRole('button',{name:'Créer la fiche et son QR permanent'}).click();
    await page.waitForFunction(()=>document.querySelector('#wh-label-name').textContent.includes('Vis MIR de recette'));
+   assert.equal(await page.locator('.wh-label-preview').isVisible(),true,'QR label visible after creation');
+   assert.equal(await page.locator('#wh-label-qr img').isVisible(),true,'generated QR visible');
    const registered=await page.evaluate(()=>window.__warehouseFixture.registered);
    assert.match(registered.sku_code,/^MIR-[A-F0-9]{16}$/);
    assert.equal(registered.source_ref,'mir-article-'+registered.sku_code.slice(4));

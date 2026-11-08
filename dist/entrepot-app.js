@@ -305,7 +305,7 @@ $('#wh-register-form').addEventListener('submit',async event=>{
   if(org()!==selectedOrg)throw Error('Organisation modifiée. Vérifie la fiche avant de réessayer.');
   const result=await client.register(selectedOrg,{kind,sourceRef,sku,name,unit,step:Number(values.get('step'))});
   status('Article enregistré avec son QR permanent : '+result.sku);
-  form.reset();await openRef(result.qrToken);
+  form.reset();await openRef(result.qrToken);$('#wh-print-label').scrollIntoView({block:'center',behavior:'instant'});
  }catch(error){fail(error);}
  finally{submit.disabled=false;}
 });
