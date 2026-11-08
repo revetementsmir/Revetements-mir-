@@ -35,8 +35,9 @@ async function serverReady(){
       finish:{manufacturer:'Unico',name:'Noir fictif',code:'NOIR-TEST',selectionType:'manufacturer'},
       perforation:{enabled:false,edgeId:'bottom',details:''}};
     const payload=O.toTransfer(layout,meta),key='mir_production_admin_dossier_v1';
-    const stored=JSON.parse(localStorage.getItem(key));
-    const result=O.prepareImport(stored.order,payload);
+    const stored=JSON.parse(localStorage.getItem(key)||'null');
+    const empty={id:'MIR-DEMO-PANELS-ORDER',poNumber:'',project:'',foreman:'',date:'',revision:'A',notes:'',items:[],layoutImports:[],nextNumber:1};
+    const result=O.prepareImport(stored?.order||empty,payload);
     if(!result.ok||result.added!==10)throw Error('Échec de transfert des dix panneaux '+JSON.stringify(result));
     localStorage.setItem(key,JSON.stringify({version:1,order:result.order}));
    });
