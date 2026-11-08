@@ -81,6 +81,8 @@ async function serverReady(){
       const order=JSON.parse(localStorage.getItem('mir_admin_procurement_v1')).orders[0];
       const faces=MIRPOWorkflow.pdfFaces(order,MIRProduction);
       const stats={faces:faces.length,duplicates:faces.slice(1).filter(f=>(f.svg.match(/data-mir-panel-main=/g)||[]).length!==1).length};
+      const errors=faces.map((face,i)=>{const parsed=new DOMParser().parseFromString(face.svg,'image/svg+xml');const error=parsed.querySelector('parsererror');return error?{page:i+1,error:error.textContent.slice(0,260),svg:face.svg.slice(0,250)}:null;}).filter(Boolean);
+      if(errors.length)throw Error('MIR SVG PDF diagnostic '+JSON.stringify(errors));
       const result=await MIRPDF.makePlan({faces,title:'Bon fournisseur MIR - 10 panneaux',subtitle:'DÉMONSTRATION - aucun envoi'});
       const data=await new Promise((resolve,reject)=>{const reader=new FileReader();
         reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(reader.error);reader.readAsDataURL(result.blob);});
