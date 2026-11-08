@@ -50,7 +50,9 @@ async function measure(page,key,value){
    await page.locator('[data-panel-no-lip="slope"]').click();
    assert.equal(await page.locator('[data-panel-lip="slope"]').inputValue(),'0','Slope has no lip while others retain 1');
    assert.equal(await page.locator('[data-panel-no-lip="slope"]').getAttribute('aria-pressed'),'true');
-   assert.match(await page.locator('[data-panel-edge-lip="slope"]').textContent(),/Sans lip/,'2D labels lip=0');
+   const slope=await page.evaluate(()=>MIRProductionWorkspace.getLivePreviewState().model.edges.find(e=>e.id==='slope'));
+   assert.equal(slope.lipMM,0,'Slope geometry has no lip');
+   assert.equal(await page.locator('[data-panel-edge-lip="slope"]').textContent(),slope.name,'Drawing uses the real side name only');
    assert.notEqual(await page.locator('#mir-panel-live-alt svg').evaluate(el=>el.outerHTML),before,'3D geometry updates when a lip is removed');
    assert.match(await page.locator('#mir-panel-net-summary').textContent(),/Face nette hors lèvres/);
    await page.locator('#mir-panel-roof-pitch').fill('8/12');await page.locator('#mir-panel-roof-pitch').press('Tab');
@@ -96,8 +98,10 @@ async function measure(page,key,value){
    assert.equal(await page.locator('#mir-panel-live-alt').getAttribute('data-geometry-status'),'measured');
    await page.locator('#panel-lip').fill('1');await page.locator('#panel-lip').press('Tab');
    await page.locator('[data-panel-lip="edge-1"]').fill('');await page.locator('[data-panel-lip="edge-1"]').press('Tab');
-   assert.match(await page.locator('[data-panel-edge-lip="edge-1"]').textContent(),/Lip/);
-   assert.match(await page.locator('[data-panel-edge-lip="edge-2"]').textContent(),/Sans lip/);
+   const edges=await page.evaluate(()=>MIRProductionWorkspace.getLivePreviewState().model.edges);
+   assert.equal(edges.find(e=>e.id==='edge-1').lipMM,25.4);
+   assert.equal(edges.find(e=>e.id==='edge-2').lipMM,0);
+   for(const id of ['edge-1','edge-2'])assert.equal(await page.locator('[data-panel-edge-lip="'+id+'"]').textContent(),edges.find(e=>e.id===id).name);
    await page.locator('[data-preview="volume"]').click();
    assert.equal(await page.locator('#mir-panel-live-alt').getAttribute('data-panel-twin'),'2d','2D remains visible while main 3D is rotated');
    assert.ok(await page.locator('#mir-panel-live-alt svg[data-panel-face]').count()===1);

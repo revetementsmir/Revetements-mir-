@@ -1,4 +1,5 @@
 'use strict';
+const {openMirTab}=require('./mir-navigation-helper.cjs');
 /* MIR — cinq combinaisons explicites entre Mes pliages et bon de commande.
  * Les créations directes au bon ne doivent jamais entrer dans la bibliothèque. */
 const assert=require('node:assert/strict');
@@ -41,7 +42,7 @@ async function storeModel(page,name){
    let value=await saved(page);
    assert.equal(value.templates.length,1);
    assert.equal(value.order.items.length,0);
-   await page.locator('#mir-procurement-tabs [data-mir-tab="models"]').click();
+   await openMirTab(page,'models');
    assert.equal(await page.locator('.model-library-card').count(),1);
    assert.deepEqual(errors,[]);
    await context.close();console.log('PASS enregistrer seulement');

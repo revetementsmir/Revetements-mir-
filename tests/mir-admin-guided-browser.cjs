@@ -1,4 +1,5 @@
 'use strict';
+const {openMirTab}=require('./mir-navigation-helper.cjs');
 /* Recette réelle Chrome MIR : SVG seul ajoute les côtés; Continuer ouvre
  * le menu final combinable, jamais une étape de configuration. */
 const assert=require('node:assert/strict');
@@ -177,7 +178,7 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
     assert.equal(records[0].channels.store,true);
     assert.equal(records[0].channels.client,false);
     assert.equal(records[0].commercial.status,'draft','Boutique sans publication implicite');
-    await page.locator('#mir-procurement-tabs [data-mir-tab="models"]').click();
+    await openMirTab(page,'models');
     assert.equal(await page.locator('#production-library .model-library-card').count(),1,'Mes pliages contient le pliage enregistré');
    }
    assert.deepEqual(errors,[],size.name+' erreurs de page');

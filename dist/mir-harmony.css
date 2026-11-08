@@ -31,3 +31,13 @@ html body header#mir-harmony-header #mir-harmony-menu #mir-procurement-tabs{disp
 html body header#mir-harmony-header #mir-harmony-menu #mir-procurement-tabs button{min-height:44px!important;font:600 15px/1.35 var(--mir-font)!important;padding:12px!important;white-space:normal!important}
 @media(max-width:600px){.mir-wb-progress{grid-template-columns:repeat(2,minmax(0,1fr))}.mir-wb-step{min-height:44px;font-size:12px}}
 html body header#mir-harmony-header #mir-harmony-menu #mir-procurement-tabs{visibility:visible!important;height:auto!important;max-height:none!important}
+@media(max-width:950px) and (max-height:520px) and (pointer:coarse){
+ html body>header#mir-harmony-header{min-height:72px!important;max-height:none!important;padding:10px 12px!important;grid-template-columns:76px minmax(0,1fr) auto 44px!important}
+ body.mir-mobile-stepper>.production-wrap{padding-bottom:64px!important}
+}
+@media(max-width:950px) and (max-height:520px) and (pointer:coarse){
+ html body.mir-mobile-stepper #drawing-tools{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:8px!important}
+ html body.mir-mobile-stepper #drawing-tools>details{flex:1 1 auto;width:auto!important;margin:0!important}
+ html body.mir-mobile-stepper #drawing-tools>details>summary{min-height:44px;display:flex;align-items:center}
+ html body.mir-mobile-stepper #drawing-tools>button{min-height:44px!important}
+}

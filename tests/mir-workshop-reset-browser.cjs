@@ -1,4 +1,5 @@
 'use strict';
+const {openMirTab}=require('./mir-navigation-helper.cjs');
 /* MIR — écran réel de remise à zéro, ordinateur et mobile Chrome. */
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright'),{spawn}=require('node:child_process');
@@ -11,15 +12,8 @@ async function ready(){
  }
  throw Error('Serveur local MIR indisponible');
 }
-async function openModels(page){
- const native=page.locator('#mir-procurement-tabs [data-mir-tab="models"]');
- if(await native.isVisible())return native.click();
- // Sur téléphone, la navigation est dans le menu compact plutôt que sur le tableau.
- const toggle=page.locator('#mir-mobile-section-toggle');
- await toggle.click();
- await page.locator('#mir-mobile-section-menu [data-mir-mobile-tab="models"]').click();
- assert.equal(await toggle.isVisible(),false,'menu compact masqué hors du tracé');
-}
+async function openModels(page){await openMirTab(page,'models');assert.equal(await page.locator('.mir-harmony-toggle').getAttribute('aria-expanded'),'false');}
+
 (async()=>{
  fs.mkdirSync(path.join(__dirname,'../artifacts'),{recursive:true});
  const server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1','--directory',path.join(__dirname,'../dist')],{stdio:'ignore'});

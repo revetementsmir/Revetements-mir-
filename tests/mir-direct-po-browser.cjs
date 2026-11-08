@@ -1,4 +1,5 @@
 'use strict';
+const {openMirTab}=require('./mir-navigation-helper.cjs');
 const {drawTwoSides,openWorkshopStep}=require('./mir-draw-freeform-helper.cjs');
 /* MIR — ajout d'une moulure au bon de commande sans étape de modèle enregistré. */
 const assert=require('node:assert/strict');
@@ -52,9 +53,9 @@ async function ready(){
    assert.equal(after.order.items[0].spec.name,'Solin porte entrée');
    assert.equal(after.order.items[0].snapshot.schema,'mir-production-instance-1');
    assert.deepEqual(after.templates,before.templates,'No reusable model should be saved');
-   await page.locator('#mir-procurement-tabs [data-mir-tab="models"]').click();
+   await openMirTab(page,'models');
    assert.equal(await page.locator('#production-library .model-library-card').count(),0,'Bon direct absent de Mes pliages');
-   await page.locator('#mir-procurement-tabs [data-mir-tab="draw"]').click();
+   await openMirTab(page,'draw');
    assert.equal(await page.locator('#order-head-count').textContent(),'01');
    assert.equal(await page.locator('#production-dialog').evaluate(node=>node.open),false);
    await page.locator('#production-drawing').screenshot({path:path.join(__dirname,'../artifacts/mir-direct-po-'+size.name+'.png')});

@@ -1,4 +1,5 @@
 'use strict';
+const {openMirTab}=require('./mir-navigation-helper.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {PGlite}=require('../tools/database/node_modules/@electric-sql/pglite'),{chromium}=require('playwright'),M=require('../dist/production-model.js');
 const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
@@ -77,7 +78,7 @@ try{
  const supplierCopy=await otherAdmin.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_admin_dossier_v1')).order);
  assert.equal(supplierCopy.items.length,1);assert.equal(supplierCopy.items[0].sourceSharedModel.version,1);assert.equal(supplierCopy.items[0].spec.finish.name,'Noir');
  assert.equal(await otherAdmin.evaluate(()=>localStorage.getItem('mir_production_templates_v1')),null,'aucune deuxième bibliothèque créée pour le bon');
- await otherAdmin.locator('[data-mir-tab=boutique]').first().click();await otherAdmin.getByRole('link',{name:'Ouvrir la Boutique partagée'}).click();
+ await openMirTab(otherAdmin,'boutique');await otherAdmin.getByRole('link',{name:'Ouvrir la Boutique partagée'}).click();
  await otherAdmin.locator('#workspace').waitFor({state:'visible'});await otherAdmin.locator('#catalogue article').waitFor();
  assert.equal(await otherAdmin.locator('h1').textContent(),'Boutique partagée');assert.equal(await otherAdmin.locator('#catalogue article').count(),1,'la Boutique exclut les brouillons et autres destinations');
  await otherAdmin.locator('#all-models').click();await otherAdmin.waitForFunction(()=>document.querySelectorAll('#catalogue article').length===2);

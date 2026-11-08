@@ -403,7 +403,7 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
  const V=window.MIRProductionVolume,mesh=V.buildMesh(model);
  if(!mesh.valid)return V.render(model,{yaw:0,pitch:0,zoom:1,illustrative,formatMeasurement:M.formatMeasurement});
  const compact=!small&&matchMedia('(max-width: 600px)').matches,canvas=compact?400:800;
- const z=small?1:zoom,tr=fitModel(model);tr.scale*=z*(compact?.34:.76);tr.ox=(compact?168:350)-(mesh.bounds.minX+mesh.bounds.maxX)*tr.scale/2;tr.oy=(compact?190:205)+(mesh.bounds.minY+mesh.bounds.maxY)*tr.scale/2;
+ const z=small?1:zoom,tr=fitModel(model);tr.scale*=z*(compact ? .34 : .76);tr.ox=(compact?168:350)-(mesh.bounds.minX+mesh.bounds.maxX)*tr.scale/2;tr.oy=(compact?190:205)+(mesh.bounds.minY+mesh.bounds.maxY)*tr.scale/2;
  const map=pts=>pts.map(p=>pointOnView(p,tr).map(fmt).join(',')).join(' '),hex=/^#[0-9a-f]{6}$/i.test(model.finish?.hex||'')?model.finish.hex:'#b8c5ae',swatch=safeAsset(model.spec?.finish?.swatchUrl||model.finish?.swatchUrl),suffix=small?'thumb-'+esc(model.spec?.id||'panel'):'main',paint='panel-face-paint-'+suffix,clip='panel-face-clip-'+suffix;
  let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas} 550" role="group" aria-label="${esc(model.name)} — vue cotée, lips compris" data-panel-face="true" data-zoom="${z}" font-family="Arial,sans-serif"><title>${esc(model.name)} — dimensions hors tout avec lèvres</title><defs><clipPath id="${clip}"><rect x="16" y="45" width="768" height="365"/></clipPath>${swatch?`<pattern id="${paint}" width="1" height="1" patternContentUnits="objectBoundingBox"><rect width="1" height="1" fill="${hex}"/><image href="${esc(swatch)}" width="1" height="1" preserveAspectRatio="xMidYMid slice"/></pattern>`:''}</defs><text x="${canvas/2}" y="30" text-anchor="middle" font-size="${compact?9:12}" fill="#6f8064">${illustrative?'PROPORTIONS DU MODÈLE · COTES À SAISIR':'VUE DE FACE · LIPS INCLUS DANS LE HORS TOUT'}</text><g clip-path="url(#${clip})"><polygon points="${map(mesh.outer)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="1.5"/><polygon points="${map(mesh.front)}" fill="${swatch?'url(#'+paint+')':hex}" stroke="#4b5b46" stroke-width="2.2"/>`;
  (model.edges||[]).forEach((edge,i)=>{const a=pointOnView(mesh.outer[i],tr),b=pointOnView(mesh.outer[(i+1)%mesh.outer.length],tr);if(edge.id===model.bottomEdgeId&&!illustrative)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="${model.perforation?.enabled?'#26758d':'#54863f'}" stroke-width="5"${model.perforation?.enabled?' stroke-dasharray="10 5"':''}/>`;if(interactive&&!authoring)svg+=`<path d="M${a.map(fmt).join(',')}L${b.map(fmt).join(',')}" stroke="transparent" stroke-width="22" data-edit-panel-edge="${esc(edge.id)}" tabindex="0" role="button" aria-label="Modifier ${esc(edge.name)}"/>`;});
@@ -412,9 +412,11 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
  if(!small&&!illustrative)(model.edges||[]).forEach((edge,i)=>{
   const points=mesh.outer.map(p=>pointOnView(p,tr)),a=points[i],b=points[(i+1)%points.length],
    left=Math.min(...points.map(p=>p[0])),right=Math.max(...points.map(p=>p[0])),top=Math.min(...points.map(p=>p[1])),bottom=Math.max(...points.map(p=>p[1])),
-   cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2,center=[(left+right)/2,(top+bottom)/2],vx=cx-center[0],vy=cy-center[1];
+   cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2;
   const font=compact?16:15,w=Math.max(42,edge.name.length*font*.6+12),h=26;
-  const preferred=Math.abs(vx)>Math.abs(vy)?(vx<0?'left':'right'):(vy<0?'top':'bottom');
+  const winding=Math.sign(points.reduce((sum,p,i)=>sum+p[0]*points[(i+1)%points.length][1]-points[(i+1)%points.length][0]*p[1],0))||1;
+  const nx=winding*(b[1]-a[1]),ny=-winding*(b[0]-a[0]);
+  const preferred=Math.abs(nx)>Math.abs(ny)?(nx<0?'left':'right'):(ny<0?'top':'bottom');
   const overlap=(a,b)=>a.x<b.x+b.w+5&&a.x+a.w+5>b.x&&a.y<b.y+b.h+5&&a.y+a.h+5>b.y;
   let box;
   for(const side of [preferred,...['left','right','top','bottom'].filter(v=>v!==preferred)]){
@@ -429,6 +431,8 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
   }
   if(!box)return;
   labelBoxes.push(box);
+  const lx=Math.max(box.x,Math.min(box.x+w,cx)),ly=Math.max(box.y,Math.min(box.y+h,cy));
+  svg+=`<path d="M${cx},${cy}L${lx},${ly}" fill="none" stroke="#8da389" stroke-width="1"/>`;
   svg+=`<g data-edit-panel-edge="${esc(edge.id)}" role="button" tabindex="0" aria-label="Modifier ${esc(edge.name)}"><rect x="${box.x}" y="${box.y}" width="${w}" height="${h}" rx="5" fill="#fcfcf8"/><text data-panel-edge-lip="${esc(edge.id)}" x="${box.x+w/2}" y="${box.y+18}" font-size="${font}" font-weight="700" text-anchor="middle" fill="#284d30">${esc(edge.name)}</text></g>`;
  });
  const corners=mesh.outer.map(p=>pointOnView(p,tr)),xs=corners.map(p=>p[0]),ys=corners.map(p=>p[1]);

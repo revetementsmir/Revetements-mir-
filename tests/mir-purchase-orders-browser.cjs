@@ -1,17 +1,12 @@
 'use strict';
+const {openMirTab}=require('./mir-navigation-helper.cjs');
 const {drawTwoSides,openWorkshopStep}=require('./mir-draw-freeform-helper.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium}=require('playwright'),{spawn}=require('node:child_process'),{createHash}=require('node:crypto');
 const port=8883,base='http://127.0.0.1:'+port;
 const hash=b=>createHash('sha256').update(b).digest('hex');
-async function openOrders(page){
- const tab=page.locator('#mir-procurement-tabs [data-mir-tab="orders"]');
- if(!(await tab.isVisible())){
-  // Sur téléphone, le dossier ouvre l'espace admin sans perdre le dessin.
-  await page.locator('#mode-link').click();
- }
- await tab.click();
-}
+async function openOrders(page){await openMirTab(page,'orders');}
+
 (async()=>{
   const server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1','--directory',path.join(__dirname,'../dist')],{stdio:'ignore'});let browser;
   try{
@@ -85,7 +80,7 @@ async function openOrders(page){
       await page.locator('#mir-edit-lines').click();
       // L'atelier admin masque volontairement le dossier tant que son onglet n'est pas ouvert.
       // Rendre l'action visible par le vrai bouton utilisateur sans contourner le test métier.
-      if(!(await page.locator('[data-duplicate-piece]').isVisible()))await page.locator('#mode-link').click();
+      if(!(await page.locator('[data-duplicate-piece]').isVisible()))await page.locator('.mir-harmony-dossier').click();
       await page.locator('[data-duplicate-piece]').click();assert.equal(await page.locator('[data-production-item]').count(),2);
       await page.locator('[data-remove-piece]').last().click();assert.equal(await page.locator('[data-production-item]').count(),1);
       await page.locator('[data-item-quantity]').fill('4');await page.locator('[data-item-quantity]').dispatchEvent('change');

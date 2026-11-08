@@ -26,6 +26,14 @@ async function main(){
    const page=await browser.newPage({viewport:{width:view.width,height:view.height}});
    for(const route of routes){
     await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:25000});
+    if(await page.locator('html[data-mir-harmony]').count()){
+      const header=page.locator('#mir-harmony-header'),toggle=header.locator('.mir-harmony-toggle'),nav=header.locator('#mir-harmony-menu');
+      assert.ok(await header.locator('img[src="assets/MIR-logo-officiel-original.svg"]').isVisible());
+      assert.ok(await header.locator('.mir-harmony-dossier').isVisible());
+      const box=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=view.width+2);
+      await toggle.click();assert.ok(await nav.locator('a[href="chantier.html"]').isVisible());
+      await page.keyboard.press('Escape');assert.equal(await nav.isVisible(),false);count++;continue;
+    }
     const result=await page.evaluate(()=>{
       const header=document.querySelector('header.mir-client-header') || document.querySelector('header.mir-home-header') || document.querySelector('html.mir-production-client header.production-header');
       const nav=header?.querySelector('nav.mir-client-links') || header?.querySelector('nav[aria-label="Navigation principale"]');

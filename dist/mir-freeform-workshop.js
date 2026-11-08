@@ -15,6 +15,7 @@ function closeMobileSections({restoreFocus=false}={}){
  if(toggle){toggle.setAttribute('aria-expanded','false');if(restoreFocus)toggle.focus({preventScroll:true});}
 }
 function initMobileSections(header){
+ if(document.documentElement.hasAttribute('data-mir-harmony'))return;
  if(!header||$('#mir-mobile-section-toggle'))return;
  const toggle=document.createElement('button');
  toggle.type='button';toggle.id='mir-mobile-section-toggle';
@@ -143,7 +144,7 @@ function init(){
   save.addEventListener('click',()=>{if(!window.MIRProductionWorkspace?.openModelFromCurrent?.()){
    const toast=$('#production-toast');if(toast){toast.textContent='Termine le dessin et les cotes avant de l’enregistrer.';toast.classList.add('visible');}
   }});
-  header.append(save);
+  if(document.documentElement.hasAttribute('data-mir-harmony'))$('.drawing-head')?.append(save);else header.append(save);
  }
  if(!$('#mir-freeform-detected')){
   const detected=document.createElement('p');detected.id='mir-freeform-detected';detected.className='mir-freeform-detected';
