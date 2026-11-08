@@ -52,5 +52,5 @@ jobs:
           name: MIR-Harmony-cotes-navigation
           path: |
             artifacts/harmony/
-            artifacts/mir-centre-ville-*.png
+            artifacts/mir-accueil-*.png
           if-no-files-found: warn

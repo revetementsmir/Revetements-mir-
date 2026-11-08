@@ -7,7 +7,7 @@ const read=p=>fs.readFileSync(path.join(dir,p),'utf8');
 let count=0;
 function test(name,fn){fn();console.log('PASS '+name);count++}
 const customerPages=['boutique.html','produit.html','selection.html','pliage.html','materiaux.html','plan.html','chantier.html'];
-const navTargets=['boutique.html','realisations.html','pliage.html','plan.html','index.html#nous-joindre'];
+const navTargets=['boutique.html','realisations.html','pliage.html','plan.html','contact.html'];
 test('Entête client commun sur toutes les pages publiques',()=>{
  for(const name of customerPages){
   const h=read(name);
@@ -24,7 +24,7 @@ test('Entête client commun sur toutes les pages publiques',()=>{
 test('Le site principal conserve aussi le même menu',()=>{
  const h=read('index.html');
  assert.match(h,/href="boutique\.html"[^>]*>Revêtements<\/a>/);
- assert.match(h,/href="#realisations"[^>]*>Réalisations<\/a>/);
+ assert.match(h,/href="realisations\.html"[^>]*>Réalisations<\/a>/);
  assert.match(h,/href="chantier\.html"[^>]*>Mon compte<\/a>/);
 });
 test('Boutique, produit et sélection préservent les comptes du panier',()=>{
@@ -70,7 +70,7 @@ test('Le second bouton va réellement à la boutique et les trois images sont ma
 test('Les clients explorent sans connexion et Mon compte exige une identité vérifiée',()=>{
  const home=read('index.html');
  const cfg=read('portal-config.js');
- assert.match(home,/href="boutique\.html">Découvrir nos revêtements/);
+ assert.match(home,/href="boutique\.html">Voir notre boutique/);
  assert.doesNotMatch(home,/Explorer sans connexion|Connexion Admin/i);
  assert.equal(require('./mir-account-config-helper.cjs')().enabled,true);
  assert.match(read('portal-client.js'),/sdk.auth.getUser/);

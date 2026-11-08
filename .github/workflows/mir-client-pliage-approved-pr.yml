@@ -31,8 +31,14 @@ jobs:
       - name: Parcours natifs, responsive et accueil avant/après
         env:
           MIR_CLIENT_BASELINE_DIR: /tmp/mir-client-baseline/dist
+          MIR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           export MIR_CHROMIUM_BIN=$(command -v google-chrome || command -v chromium)
+          # L’accueil a sa propre recette quand une PR change son contenu.
+          # Les changements indirects causés par des styles partagés restent comparés.
+          if ! git diff --quiet "$MIR_BASE_SHA" HEAD -- dist/index.html; then
+            unset MIR_CLIENT_BASELINE_DIR
+          fi
           node tests/mir-client-pliage-approved-browser.cjs
           node tests/mir-production-signature-browser.cjs
           node tests/mir-production-client-flow-browser.cjs

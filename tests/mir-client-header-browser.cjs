@@ -54,8 +54,8 @@ async function main(){
     assert.ok((result.navVisible||result.collapsed)&&result.accountVisible,route+' '+view.name+' : navigation ou compte inaccessible');
     assert.ok(result.left>=-2&&result.right<=view.width+2,route+' '+view.name+' : en-tête rogné');
     if(result.collapsed){
-      const menu=page.locator('header.mir-client-header .mir-client-menu-toggle');
-      const nav=page.locator('header.mir-client-header nav.mir-client-links');
+      const menu=page.locator('header .mir-client-menu-toggle');
+      const nav=page.locator('header nav.mir-client-links');
       await menu.click();
       assert.equal(await menu.getAttribute('aria-expanded'),'true');
       assert.equal(await nav.isVisible(),true,route+' '+view.name+' : menu ne s’ouvre pas');

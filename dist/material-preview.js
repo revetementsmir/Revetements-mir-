@@ -8,13 +8,103 @@
   const local = value => {
     try { const u = new URL(value, document.baseURI); return value && u.origin === location.origin && /^https?:$/.test(u.protocol) ? u.href : ''; } catch { return ''; }
   };
+  function photoType(image) {
+    if (!image) return 'empty';
+    const kind = String(image.assetKind || '').toLowerCase();
+    if (/drawing|diagram/.test(kind)) return 'profile';
+    if (['sample','profile','packshot','installed'].includes(image.cardPresentation)) return image.cardPresentation;
+    if (/texture|swatch|sphere/.test(kind)) return 'sample';
+    if (image.kind === 'installed') return 'installed';
+    return /render|profile/.test(kind) ? 'profile' : 'packshot';
+  }
+  function photoLabel(image) {
+    if (!image) return 'Visuel à compléter';
+    const kind = String(image.assetKind || '');
+    if (/drawing|diagram/.test(kind)) return 'Dessin fabricant';
+    const type = photoType(image);
+    if (type === 'installed') return 'Exemple de pose';
+    if (type === 'sample') return 'Détail de la matière';
+    if (type === 'profile') return 'Vue du profil';
+    if (image.matchScope === 'range') return 'Visuel de la gamme';
+    return /photo/.test(kind) ? 'Photo fabricant' : 'Visuel fabricant';
+  }
+  // Source dimensions and safe viewing rectangle in pixels (left, top, width, height).
+  // These frames remove empty manufacturer margins without changing the original files.
+  const photoFrames = {
+    'adseal-dws4580-original-alpha.png': [335,335,4,42,296,257],
+    'gentek-fascia-6.jpg': [2159,600,30,16,2129,564],
+    'lighttrim-0.jpg': [800,800,115,145,555,442],
+    'lt-j002-4.jpg': [800,800,112,143,457,460],
+    'lt-j201-4.jpg': [800,800,113,143,455,470],
+    'mac-5.png': [2048,649,44,56,1903,536],
+    'mac-harrywood-7.png': [2048,544,76,76,1887,434],
+    'prime-reliure-basse-brillant.png': [302,301,13,10,281,287],
+    'prime-reliure-basse-hdg.png': [318,280,5,5,303,266],
+    'prime-reliure-basse-inox.png': [345,305,6,6,329,288],
+    'prime-reliure-haute-hdg.png': [295,294,17,11,269,277],
+    'rialux-soffit-043e3baaf7.png': [173,168,18,0,148,168],
+    'lighttrim-vfcls8114-00f577aac7.jpg': [800,800,23,211,747,575],
+    'lighttrim-vfcsss-7a85a9b349.jpg': [800,800,55,270,692,517],
+    'lighttrim-vfcsstek-8d6b5a363e.jpg': [800,800,8,250,784,537],
+    'lighttrim-vfctek8-e176e16849.jpg': [800,800,29,256,746,532],
+    'lighttrim-vtsss10-1d1495877b.jpg': [2000,2000,72,704,1819,1248],
+    'lighttrim-vfcsss10-59f522550b.jpg': [800,800,25,301,747,487],
+    'lighttrim-vfcsstek10118t-0917ae4f14.jpg': [2000,2000,276,752,1455,1206],
+    'lighttrim-vfcltek8114-d7afce62b9.jpg': [800,800,25,211,760,577],
+    'lighttrim-vfctek834-362b619371.jpg': [800,800,140,282,530,505],
+    'lighttrim-t001-f88cf89671.jpg': [800,800,157,136,456,453]
+  };
+  // The base TEK 10 photo and its manufacturer colour variants share this layout.
+  const tek10Frame = [2000,2000,52,816,1868,1147];
+  const canexelFrames = {
+    ced9: [750,750,23,251,701,251],
+    d5: [750,750,0,233,750,289],
+    vstyle: [750,750,25,250,668,200]
+  };
+  function sourceFrame(src) {
+    const path = new URL(src).pathname;
+    const canexel = path.match(/\/assets\/products\/employee-store\/deckmart-(ced9|d5|vstyle)-[a-z0-9-]+\.png$/)?.[1];
+    if (canexel) return canexelFrames[canexel];
+    const asset = path.match(/\/assets\/products\/(?:official-20261104\/)?([^/]+)$/)?.[1];
+    if (Object.hasOwn(photoFrames, asset)) return photoFrames[asset];
+    return /^lighttrim-vtsstek10-(?:jh[0-9]{4}-)?[0-9a-f]{10}\.jpg$/.test(asset) ? tek10Frame : null;
+  }
+  function photoImage(image, alt, {loading='lazy', priority=false}={}) {
+    const src = local(image?.src);
+    if (!src) return '';
+    const rawPosition = image.cardObjectPosition || '';
+    const position = /^((left|right|top|bottom|center)|(-?\d+(\.\d+)?%))( ((left|right|top|bottom|center)|(-?\d+(\.\d+)?%)))?$/.test(rawPosition) ? rawPosition : '50% 50%';
+    const markup = `<img src="${esc(src)}" alt="${esc(image.alt || alt)}" data-catalogue-image data-presentation="${photoType(image)}" style="object-position:${position}" loading="${loading}" ${priority?'fetchpriority="high" ':''}decoding="async">`;
+    const frame = sourceFrame(src);
+    if (!frame) return markup;
+    const [sourceWidth, sourceHeight, left, top, width, height] = frame;
+    const style = `--mir-trim-ratio:${width / height};--mir-source-width:${100 * sourceWidth / width}%;--mir-source-height:${100 * sourceHeight / height}%;--mir-source-left:${-100 * left / width}%;--mir-source-top:${-100 * top / height}%`;
+    return `<span class="mir-photo-trim" style="${style}"><span class="mir-photo-trim-viewport">${markup}</span></span>`;
+  }
+  function photoUnavailable() {
+    return '<div class="mir-photo-unavailable">Visuel indisponible</div>';
+  }
+  if (typeof document !== 'undefined') document.addEventListener('error', event => {
+    const image = event.target;
+    if (!image.matches?.('img[data-catalogue-image]')) return;
+    const fallback = document.createElement('div');
+    fallback.className = 'mir-photo-unavailable';
+    fallback.textContent = 'Visuel indisponible';
+    const frame = image.closest('.mir-catalogue-photo');
+    (image.closest('.mir-photo-trim') || image).replaceWith(fallback);
+    if (!frame) return;
+    frame.dataset.photoType = 'empty';
+    const caption = frame.closest('article')?.querySelector('.card-photo-label,.mir-photo-caption');
+    if (caption) caption.textContent = fallback.textContent;
+  }, true);
   function smooth(m, c) {
     return /lisse|smooth/.test(norm(m.finish || m.name)) && c?.swatchUse === 'color_reference';
   }
   function colorReference(m,c) {return c?.swatchUse==='color_reference' && !(m.applications||[]).includes('siding');}
   function exactImage(m, c) {
     if(!c?.id)return null;
-    return (m.images || []).find(i => local(i.src) && (i.colorId === c?.id || (i.colorIds || []).includes(c?.id)));
+    const matches = (m.images || []).filter(i => local(i.src) && (i.colorId === c.id || (i.colorIds || []).includes(c.id)));
+    return matches.find(i => i.formatId && i.formatId === m.selectedFormatId) || matches.find(i => !i.formatId) || matches[0];
   }
   function sourceImage(m) {
     const list = (m.images || []).filter(i => local(i.src));
@@ -22,12 +112,12 @@
   }
   function recipe(m, c) {
     const exact = c && exactImage(m, c);
-    if (exact) return {kind:'exact_variant',src:local(exact.src),label:`${m.name} · ${c.name}`,source:exact.sourceUrl,formatMatch:!!exact.formatId&&m.selectedFormatId===exact.formatId,formatId:exact.formatId||null};
+    if (exact) return {kind:'exact_variant',image:exact,src:local(exact.src),label:`${m.name} · ${c.name}`,source:exact.sourceUrl,formatMatch:!!exact.formatId&&m.selectedFormatId===exact.formatId,formatId:exact.formatId||null};
     if (c && local(c.swatchUrl)) return {kind:smooth(m,c)?'smooth_preview':colorReference(m,c)?'color_reference_preview':'manufacturer_sample',src:local(c.swatchUrl),label:`${m.name} · ${c.name}`,source:c.sourceUrl};
     if (c && /^#[0-9a-f]{6}$/i.test(c.hex || '')) return {kind:'numeric_preview',hex:c.hex,label:`${m.name} · ${c.name}`,source:c.sourceUrl};
     if (c) return {kind:'missing_variant',label:`${m.name} · ${c.name}`,source:c.sourceUrl};
     const im = sourceImage(m);
-    return im ? {kind:'product',src:local(im.src),label:im.alt || m.name,source:im.sourceUrl} : {kind:'missing_product',label:m.name,source:m.sourceUrl};
+    return im ? {kind:'product',image:im,src:local(im.src),label:im.alt || m.name,source:im.sourceUrl} : {kind:'missing_product',label:m.name,source:m.sourceUrl};
   }
   async function displayColor(src) {
     const url = local(src); if (!url) return null;
@@ -66,12 +156,13 @@
     if(!element)return;
     const request=Symbol('material-preview');element._materialPreviewRequest=request;
     const r=recipe(m,c);element.dataset.previewKind=r.kind;element.dataset.colorId=c?.id || '';
+    if(element.classList.contains('mir-catalogue-photo'))element.dataset.photoType=r.image?photoType(r.image):r.kind.startsWith('missing_')?'empty':'sample';
     if(r.kind==='smooth_preview'||r.kind==='color_reference_preview'||r.kind==='numeric_preview'){
       element.innerHTML='<div class="sample-loading">Préparation de la teinte…</div>';
       const hex=r.hex || await displayColor(r.src);if(element._materialPreviewRequest!==request)return;
       element.innerHTML=hex?smoothSVG(m,c,hex):`<div class="sample-unavailable"><strong>${esc(c.name)}</strong><span>Échantillon indisponible</span></div>`;
       element.dataset.displayColor=hex||'';
-    } else if(r.src) element.innerHTML=`<img src="${esc(r.src)}" alt="${esc(r.label)}" loading="eager" decoding="async">`;
+    } else if(r.src) element.innerHTML=photoImage({...r.image,src:r.src,alt:r.label},r.label,{loading:'eager'});
     else element.innerHTML=`<div class="sample-unavailable"><strong>${esc(c?.name || 'Photo à compléter')}</strong><span>${c?'Cette teinte n’a pas encore de visuel associé.':'Référence fabricant en cours de vérification.'}</span></div>`;
     return r;
   }
@@ -81,5 +172,5 @@
     element.style.backgroundColor=hex;element.replaceChildren();element.dataset.displayColor=hex;
   }
   function cancel(element){if(element)element._materialPreviewRequest=Symbol('cancelled-preview');}
-  root.MIRMaterialPreview={recipe,render,svg,paintChip,displayColor,smooth,colorReference,cancel};
+  root.MIRMaterialPreview={recipe,render,svg,paintChip,displayColor,smooth,colorReference,cancel,photoType,photoLabel,photoImage,photoUnavailable};
 })(typeof window!=='undefined'?window:globalThis);

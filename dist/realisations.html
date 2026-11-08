@@ -12,8 +12,8 @@
   <link rel="stylesheet" href="mir-home-premium.css?v=images-ultrawide-20261105">
   <link rel="stylesheet" href="mir-client-header.css?v=1-harmony">
   <link rel="stylesheet" href="mir-client-signature.css?v=1-harmony"><link rel="stylesheet" href="mir-public-menu.css?v=1"><script defer src="mir-public-menu.js?v=1"></script>
-  <link rel="stylesheet" href="mir-realisations.css?v=1">
-  <script defer src="mir-realisations.js?v=1"></script>
+  <link rel="stylesheet" href="mir-realisations.css?v=vitrine-1">
+  <script defer src="mir-realisations.js?v=vitrine-1"></script>
 </head>
 <body class="mir-signature mir-gallery-page">
   <a class="skip" href="#contenu">Aller au contenu</a>
@@ -24,9 +24,9 @@
       <a href="realisations.html" aria-current="page">Réalisations</a>
       <a href="pliage.html">Pliage sur mesure</a>
       <a href="plan.html">Studio 3D</a>
-      <a href="index.html#nous-joindre">Nous joindre</a>
+      <a href="contact.html">Nous joindre</a>
     </nav>
-    <div class="mir-home-header-actions mir-client-actions"><a class="mir-home-account" href="chantier.html">Mon compte</a><a class="mir-home-estimate" href="index.html#nous-joindre">Demander une estimation</a></div>
+    <div class="mir-home-header-actions mir-client-actions"><a class="mir-home-account" href="chantier.html">Mon compte</a><a class="mir-home-estimate" href="contact.html">Demander une estimation</a></div>
   </header>
   <main id="contenu">
     <section class="mir-gallery-intro" aria-labelledby="realisations-title">
@@ -43,43 +43,55 @@
         <div><p class="mir-gallery-kicker">LE PORTFOLIO</p><h2 id="gallery-heading">Nos réalisations</h2></div>
         <p>Réalisations réelles présentées par MIR. Certaines photographies sont retouchées pour la présentation; les visuels du studio restent distincts.</p>
       </div>
+      <div class="mir-gallery-filters" role="group" aria-label="Filtrer les réalisations" hidden>
+        <button type="button" data-gallery-filter="all" aria-pressed="true">Toutes</button>
+        <button type="button" data-gallery-filter="contemporary" aria-pressed="false">Contemporaines</button>
+        <button type="button" data-gallery-filter="classic" aria-pressed="false">Classiques</button>
+        <button type="button" data-gallery-filter="urban" aria-pressed="false">Urbaines</button>
+        <button type="button" data-gallery-filter="saved" aria-pressed="false">Ma sélection</button>
+      </div>
+      <p id="mir-gallery-empty" role="status" hidden>Aucune réalisation dans cette sélection.</p>
       <div class="mir-gallery-grid">
-        <article class="mir-gallery-card mir-gallery-card-featured">
-          <button type="button" class="mir-gallery-photo-button" data-photo="0" aria-label="Voir la façade : Jeux de matières en grand">
-            <picture><source media="(max-width:760px)" srcset="assets/realisations/realisations-mir-contemporain-brun-mobile.webp" type="image/webp"><img src="assets/realisations/realisations-mir-contemporain-brun-large.webp" width="1536" height="1152" alt="Maison contemporaine à deux étages, parement brun horizontal, larges fenêtres noires, bande centrale de pierre claire et pelouse aménagée" fetchpriority="high" decoding="async"></picture>
-            <span class="mir-gallery-photo-action" aria-hidden="true">Voir en grand</span>
-          </button>
-          <div class="mir-gallery-card-body"><div><p class="mir-gallery-card-index">01 / MATIÈRES & CONTRASTES</p><h3>Jeux de matières</h3><p>Le parement foncé et la maçonnerie claire mettent en valeur les volumes et l’entrée de cette résidence contemporaine.</p></div><span class="mir-gallery-card-tag">Contemporain</span></div>
-        </article>
-        <article class="mir-gallery-card">
-          <button type="button" class="mir-gallery-photo-button" data-photo="1" aria-label="Voir la façade : Lignes contemporaines en grand">
-            <picture><source media="(max-width:760px)" srcset="assets/realisations/realisations-mir-contrastes-mobile.webp" type="image/webp"><img src="assets/realisations/realisations-mir-contrastes-large.webp" width="1536" height="1423" alt="Résidence contemporaine avec pignon asymétrique, clins horizontaux pâles, panneaux noirs, pierre grise et parement brun, devant une entrée paysagée" loading="lazy" decoding="async"></picture>
-            <span class="mir-gallery-photo-action" aria-hidden="true">Voir en grand</span>
-          </button>
-          <div class="mir-gallery-card-body"><div><p class="mir-gallery-card-index">02 / LIGNES & FINITIONS</p><h3>Lignes contemporaines</h3><p>Un assemblage de revêtements aux lignes franches, rehaussé par les profils foncés et la lumière sous les avant-toits.</p></div><span class="mir-gallery-card-tag">Contemporain</span></div>
-        </article>
-        <article class="mir-gallery-card">
-          <button type="button" class="mir-gallery-photo-button" data-photo="2" aria-label="Voir la façade : Un classique réinventé en grand">
-            <picture><source media="(max-width:760px)" srcset="assets/realisations/realisations-mir-classique-mobile.webp" type="image/webp"><img src="assets/realisations/realisations-mir-classique-large.webp" width="1536" height="1152" alt="Maison à deux grands pignons avec bardeaux de revêtement gris, fenêtres à encadrements blancs et galerie donnant sur une pelouse paysagée" loading="lazy" decoding="async"></picture>
-            <span class="mir-gallery-photo-action" aria-hidden="true">Voir en grand</span>
-          </button>
-          <div class="mir-gallery-card-body"><div><p class="mir-gallery-card-index">03 / ÉLÉGANCE & DÉTAILS</p><h3>Un classique réinventé</h3><p>Des pignons affirmés, des encadrements blancs et un revêtement gris qui mettent l’architecture en valeur.</p></div><span class="mir-gallery-card-tag">Intemporel</span></div>
-        </article>
-        <article class="mir-gallery-card mir-gallery-card-featured mir-gallery-card-twilight">
+        <article class="mir-gallery-card mir-gallery-card-featured mir-gallery-card-twilight" id="au-coeur-du-centre-ville" data-gallery-category="urban">
           <button type="button" class="mir-gallery-photo-button" data-photo="3" aria-label="Voir la réalisation : Au cœur du centre-ville de Québec en grand">
             <picture><source media="(max-width:760px)" srcset="assets/realisations/realisations-mir-quebec-avec-voiture-mobile.avif" type="image/avif"><img src="assets/realisations/realisations-mir-quebec-avec-voiture-large.avif" width="1448" height="1066" alt="Immeuble urbain en brique et revêtement métallique au centre-ville de Québec, balcon et escalier extérieur, voiture sport noire stationnée dans la rue au crépuscule" loading="lazy" decoding="async"></picture>
             <span class="mir-gallery-photo-action" aria-hidden="true">Voir en grand</span>
           </button>
           <div class="mir-gallery-card-body"><div><p class="mir-gallery-card-index">04 / PATRIMOINE & MODERNITÉ</p><h3>Au cœur du centre-ville de Québec</h3><p>Au cœur de Québec, la brique patrimoniale et le revêtement métallique contemporain se rencontrent sur une façade urbaine distinctive. Le crépuscule souligne ses volumes et ses détails architecturaux.</p></div><span class="mir-gallery-card-tag">Centre-ville de Québec</span></div>
+        <button type="button" class="mir-gallery-save" data-gallery-save="3" aria-pressed="false" hidden>Garder dans ma sélection</button>
+        </article>
+        <article class="mir-gallery-card mir-gallery-card-featured" data-gallery-category="contemporary">
+          <button type="button" class="mir-gallery-photo-button" data-photo="0" aria-label="Voir la façade : Jeux de matières en grand">
+            <picture><source media="(max-width:760px)" srcset="assets/realisations/realisations-mir-contemporain-brun-mobile.webp" type="image/webp"><img src="assets/realisations/realisations-mir-contemporain-brun-large.webp" width="1536" height="1152" alt="Maison contemporaine à deux étages, parement brun horizontal, larges fenêtres noires, bande centrale de pierre claire et pelouse aménagée" fetchpriority="high" decoding="async"></picture>
+            <span class="mir-gallery-photo-action" aria-hidden="true">Voir en grand</span>
+          </button>
+          <div class="mir-gallery-card-body"><div><p class="mir-gallery-card-index">01 / MATIÈRES & CONTRASTES</p><h3>Jeux de matières</h3><p>Le parement foncé et la maçonnerie claire mettent en valeur les volumes et l’entrée de cette résidence contemporaine.</p></div><span class="mir-gallery-card-tag">Contemporain</span></div>
+        <button type="button" class="mir-gallery-save" data-gallery-save="0" aria-pressed="false" hidden>Garder dans ma sélection</button>
+        </article>
+        <article class="mir-gallery-card" data-gallery-category="contemporary">
+          <button type="button" class="mir-gallery-photo-button" data-photo="1" aria-label="Voir la façade : Lignes contemporaines en grand">
+            <picture><source media="(max-width:760px)" srcset="assets/realisations/realisations-mir-contrastes-mobile.webp" type="image/webp"><img src="assets/realisations/realisations-mir-contrastes-large.webp" width="1536" height="1423" alt="Résidence contemporaine avec pignon asymétrique, clins horizontaux pâles, panneaux noirs, pierre grise et parement brun, devant une entrée paysagée" loading="lazy" decoding="async"></picture>
+            <span class="mir-gallery-photo-action" aria-hidden="true">Voir en grand</span>
+          </button>
+          <div class="mir-gallery-card-body"><div><p class="mir-gallery-card-index">02 / LIGNES & FINITIONS</p><h3>Lignes contemporaines</h3><p>Un assemblage de revêtements aux lignes franches, rehaussé par les profils foncés et la lumière sous les avant-toits.</p></div><span class="mir-gallery-card-tag">Contemporain</span></div>
+        <button type="button" class="mir-gallery-save" data-gallery-save="1" aria-pressed="false" hidden>Garder dans ma sélection</button>
+        </article>
+        <article class="mir-gallery-card" data-gallery-category="classic">
+          <button type="button" class="mir-gallery-photo-button" data-photo="2" aria-label="Voir la façade : Un classique réinventé en grand">
+            <picture><source media="(max-width:760px)" srcset="assets/realisations/realisations-mir-classique-mobile.webp" type="image/webp"><img src="assets/realisations/realisations-mir-classique-large.webp" width="1536" height="1152" alt="Maison à deux grands pignons avec bardeaux de revêtement gris, fenêtres à encadrements blancs et galerie donnant sur une pelouse paysagée" loading="lazy" decoding="async"></picture>
+            <span class="mir-gallery-photo-action" aria-hidden="true">Voir en grand</span>
+          </button>
+          <div class="mir-gallery-card-body"><div><p class="mir-gallery-card-index">03 / ÉLÉGANCE & DÉTAILS</p><h3>Un classique réinventé</h3><p>Des pignons affirmés, des encadrements blancs et un revêtement gris qui mettent l’architecture en valeur.</p></div><span class="mir-gallery-card-tag">Intemporel</span></div>
+        <button type="button" class="mir-gallery-save" data-gallery-save="2" aria-pressed="false" hidden>Garder dans ma sélection</button>
         </article>
       </div>
     </section>
     <section class="mir-gallery-next" aria-labelledby="gallery-next-title">
       <div><p class="mir-gallery-kicker">UN PROJET EN TÊTE ?</p><h2 id="gallery-next-title">Donnez du caractère<br>à votre façade.</h2><p>Découvrez les matières et les couleurs de MIR, puis contactez-nous pour préparer la suite.</p></div>
-      <div class="mir-gallery-cta"><a class="mir-gallery-primary" href="boutique.html">Découvrir nos revêtements</a><a class="mir-gallery-secondary" href="index.html#nous-joindre">Demander une estimation</a></div>
+      <div class="mir-gallery-cta"><a class="mir-gallery-primary" href="boutique.html">Découvrir nos revêtements</a><a class="mir-gallery-secondary" href="contact.html">Demander une estimation</a></div>
     </section>
   </main>
-  <footer class="mir-signature-footer"><a class="mir-signature-footer-logo" href="index.html" aria-label="Accueil MIR"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="364" height="91" loading="lazy"></a><p>Votre maison. Les bons matériaux. Les bons détails.</p><nav aria-label="Liens de pied de page"><a href="boutique.html">Revêtements</a><a href="realisations.html">Réalisations</a><a href="plan.html">Studio 3D</a><a href="pliage.html">Pliage sur mesure</a><a href="index.html#nous-joindre">Nous joindre</a></nav></footer>
+  <footer class="mir-signature-footer"><a class="mir-signature-footer-logo" href="index.html" aria-label="Accueil MIR"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="364" height="91" loading="lazy"></a><p>Votre maison. Les bons matériaux. Les bons détails.</p><nav aria-label="Liens de pied de page"><a href="boutique.html">Revêtements</a><a href="realisations.html">Réalisations</a><a href="plan.html">Studio 3D</a><a href="pliage.html">Pliage sur mesure</a><a href="contact.html">Nous joindre</a></nav></footer>
   <dialog id="mir-gallery-dialog" class="mir-gallery-dialog" aria-labelledby="mir-gallery-dialog-title">
     <div class="mir-gallery-dialog-shell"><div class="mir-gallery-dialog-top"><div><p class="mir-gallery-kicker">LES RÉALISATIONS MIR</p><h2 id="mir-gallery-dialog-title">Réalisation MIR</h2></div><button id="mir-gallery-close" class="mir-gallery-close" type="button" aria-label="Fermer la photographie">Fermer</button></div>
       <figure><img id="mir-gallery-dialog-photo" src="assets/realisations/realisations-mir-contemporain-brun-large.webp" alt="" width="1536" height="1152"><figcaption id="mir-gallery-dialog-caption"></figcaption></figure>

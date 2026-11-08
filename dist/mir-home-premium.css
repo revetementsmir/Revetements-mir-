@@ -90,3 +90,57 @@ body.mir-home-premium{background:#fafaf7;color:#18251d}
 @media(max-width:760px){
  .mir-home-premium .project-city .project-image{aspect-ratio:1448/1066}
 }
+
+/* Accueil vitrine : l’espace libre agrandit la photo, les cartes restent lisibles. */
+body.mir-home-premium{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
+.mir-home-premium #contenu{display:flex;flex:1 0 auto;flex-direction:column}
+.mir-home-premium .site-header{min-height:76px;padding-block:8px}
+.mir-home-premium .mir-home-brand{width:clamp(160px,16vw,275px)}
+.mir-home-premium .mir-home-showcase{flex:1 0 auto;height:auto;min-height:0}
+.mir-home-premium .mir-home-showcase-inner{padding-block:clamp(28px,6vh,80px)}
+.mir-home-premium .mir-home-showcase h1{font-size:clamp(48px,min(6.3vw,10vh),112px);margin-block:18px}
+.mir-home-premium .mir-home-showcase-actions{margin-top:22px}
+.mir-home-premium .mir-home-services{grid-template-columns:repeat(3,minmax(0,1fr));max-width:none;gap:14px;padding-block:16px}
+.mir-home-premium .mir-home-service{min-height:0;grid-template-columns:35% minmax(0,1fr)}
+.mir-home-premium .mir-home-service-studio{grid-template-columns:minmax(0,1fr) 35%}
+.mir-home-premium .mir-home-service-media{position:relative}
+.mir-home-premium .mir-home-service-media img{position:absolute;inset:0}
+.mir-home-premium .mir-home-service-copy{padding:14px;gap:6px}
+.mir-home-premium .mir-home-service-copy strong{font-size:clamp(16px,1.4vw,23px)}
+.mir-home-premium .mir-home-service-copy>b{padding-top:3px}
+.mir-home-premium .mir-client-menu-toggle,.mir-home-premium .mir-mobile-selection{display:none}
+.mir-contact-page .mir-contact h1{font-size:clamp(38px,5vw,66px);line-height:1.08;margin-block:14px}
+
+@media(max-height:850px){
+  .mir-home-premium .mir-home-service-copy>span{display:none}
+  .mir-home-premium .mir-home-service{min-height:104px}
+}
+@media(max-width:760px){
+  .mir-home-premium .site-header{position:relative;z-index:2;min-height:62px}
+  .mir-home-premium .mir-home-brand{width:clamp(106px,34vw,165px)}
+  .mir-home-premium .mir-home-account{min-height:44px;padding-inline:9px}
+  .mir-home-premium .mir-home-header-actions{margin-left:0}
+  .mir-home-premium .site-header nav{flex-wrap:wrap;overflow:visible;white-space:normal;gap:0 14px}
+  .mir-home-premium .site-header nav[hidden]{display:none}
+  .mir-home-premium .mir-client-menu-toggle:not([hidden]){
+    display:inline-flex;align-items:center;justify-content:center;min-height:44px;
+    margin-left:auto;padding:6px 10px;border:1px solid #8aa487;border-radius:5px;
+    background:#fff;color:#183c23;font:700 13px/1 Arial,Helvetica,sans-serif
+  }
+  .mir-home-premium .mir-client-menu-open nav{
+    position:absolute;inset:100% 0 auto;display:grid;grid-template-columns:1fr 1fr;
+    background:#fafaf7;padding:8px 14px;border:1px solid #d7dfd5;border-radius:0 0 8px 8px;
+    box-shadow:0 10px 25px #14201828
+  }
+  .mir-home-premium .mir-client-menu-open nav a{display:flex;align-items:center;min-height:44px;padding:8px 0}
+  .mir-home-premium .mir-home-showcase-inner{padding-block:clamp(42px,10svh,106px) 26px}
+  .mir-home-premium .mir-home-showcase h1{font-size:clamp(34px,8.9vw,52px);letter-spacing:-.045em;margin-block:14px}
+  .mir-home-premium .mir-home-showcase-actions{margin-top:18px;gap:8px}
+  .mir-home-premium .mir-home-main-cta,.mir-home-premium .mir-home-second-cta{min-height:44px;padding:10px 12px}
+  .mir-home-premium .mir-home-services{grid-template-columns:1fr;gap:7px;padding-block:10px}
+  .mir-home-premium .mir-home-service,.mir-home-premium .mir-home-service-studio{grid-template-columns:60px minmax(0,1fr);min-height:56px}
+  .mir-home-premium .mir-home-service-studio .mir-home-service-media{order:0}
+  .mir-home-premium .mir-home-service-copy{justify-content:center;gap:2px;padding:7px 12px}
+  .mir-home-premium .mir-home-service-copy>span{display:none}
+  .mir-home-premium .mir-home-service-copy>b{margin-top:0}
+}
