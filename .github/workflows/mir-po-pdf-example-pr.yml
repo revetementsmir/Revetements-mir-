@@ -1,0 +1,29 @@
+name: MIR — exemple réel de PDF fournisseur (10 panneaux)
+on:
+  pull_request:
+    paths:
+      - 'tests/mir-wall-panel-po-browser.cjs'
+      - '.github/workflows/mir-po-pdf-example-pr.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pdf:
+    name: Fabriquer le vrai bon PDF des 10 panneaux
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Vérifier la syntaxe du test
+        run: node --check tests/mir-wall-panel-po-browser.cjs
+      - name: Installer le navigateur Chrome
+        run: npm install --no-save playwright@1.58.2
+      - name: Générer le PDF avec le moteur MIR (aucun envoi)
+        run: node tests/mir-wall-panel-po-browser.cjs
+      - name: Récupérer le PDF de démonstration coté
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIR-exemple-PDF-10-panneaux
+          path: artifacts/MIR-EXEMPLE-bon-commande-10-panneaux.pdf
+          if-no-files-found: ignore
