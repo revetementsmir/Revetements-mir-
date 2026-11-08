@@ -302,12 +302,16 @@ jobs:
           grep -F 'href="production.html?view=orders"' /tmp/metres.html
           fetch "$base/pliage.html" /tmp/pliage.html
           grep -F 'href="production.html?mode=client&amp;kind=profile&amp;profile=coin_arch_j"' /tmp/pliage.html
-          fetch "$base/chantier.html" /tmp/mir-connexion.html
+          fetch "$base/chantier.html?verification=$GITHUB_SHA" /tmp/mir-connexion.html
           grep -F 'Mon compte — Les Revêtements MIR' /tmp/mir-connexion.html
           fetch "$base/portal-config.js" /tmp/mir-portal-config.js
           grep -F 'enabled: false' /tmp/mir-portal-config.js
-          fetch "$base/chantier-app.js" /tmp/mir-chantier-app.js
-          grep -F 'Activation sécurisée en attente' /tmp/mir-chantier-app.js
+          grep -Fq 'chantier-employee.css?v=' /tmp/mir-connexion.html
+          fetch "$base/chantier-app.js?verification=$GITHUB_SHA" /tmp/mir-chantier-app.js
+          cmp /tmp/mir-chantier-app.js _site_mir/chantier-app.js
+          grep -Fq 'Connexion en attente' /tmp/mir-chantier-app.js
+          fetch "$base/chantier-employee.css?verification=$GITHUB_SHA" /tmp/mir-chantier-employee.css
+          cmp /tmp/mir-chantier-employee.css _site_mir/chantier-employee.css
           fetch "$base/portal-client.js" /tmp/mir-portal-client.js
           grep -F "mode: 'connected'" /tmp/mir-portal-client.js
           # La page publiée doit être exactement celle de ce commit, et non une version CDN périmée.
