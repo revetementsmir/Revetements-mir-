@@ -373,3 +373,15 @@ body.mir-admin-v4 #mir-procurement-tabs{grid-template-columns:repeat(5,minmax(0,
  body.mir-admin-v4.mir-procurement-ready[data-mir-tab="orders"] #mir-procurement-tabs button[data-mir-tab="orders"],
  body.mir-admin-v4.mir-procurement-ready[data-mir-tab="suppliers"] #mir-procurement-tabs button[data-mir-tab="orders"]{grid-column:1/-1}
 }
+
+
+/* Trois chemins compréhensibles depuis l'atelier : pliage, panneau seul, mur. */
+body.mir-admin-v4 .kind-bar .mir-wall-shortcut{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ min-height:46px;padding:10px 15px;border:1px solid #aac3a2;border-radius:9px;
+ background:#edf5e6;color:#28553a;font-size:13px;font-weight:750;text-align:center;
+ text-decoration:none
+}
+body.mir-admin-v4 .kind-bar .mir-wall-shortcut:hover{background:#e1eed6;border-color:#63975e}
+body.mir-admin-v4 .kind-bar .mir-wall-shortcut:focus-visible{outline:3px solid #88b96e;outline-offset:3px}
+@media(max-width:740px){body.mir-admin-v4 .kind-bar .mir-wall-shortcut{width:100%;min-height:48px}}
