@@ -1,11 +1,12 @@
 /* MIR — module de présentation Panneaux, sans calcul parallèle ni mutation de pièce.
  * Une adjointe choisit une action, voit son mur, vérifie une pièce, prépare le bon. */
 (function(root,factory){
- const api=factory();
+ const api=factory(root);
  if(typeof module==='object'&&module.exports)module.exports=api;
  if(root)root.MIRPanelWorkbench=api;
-})(typeof window==='object'?window:null,function(){
+})(typeof window==='object'?window:null,function(root){
  'use strict';
+ const PDFVisual=root?.MIRPanelPOPDF||(typeof module==='object'&&module.exports?require('./mir-panel-po-pdf.js'):null);
  const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
  const step=(number,title,current)=>'<span class="mir-wb-step'+(number===current?' is-current':'')+'" '+(number===current?'aria-current="step"':'')+'><strong>'+number+'</strong>'+title+'</span>';
  const panelKind=i=>(i?.spec?.kind||i?.kind)==='panel';
@@ -70,13 +71,13 @@
    const ready=result.ready,valid=!!m?.valid;
    let visual='',v3d='',size='À mesurer',project='À préciser',metal='À préciser',color='À préciser',edges='';
    if(valid){
-    try{visual=api.panelSVG(active.spec,{width:620,height:400,legend:false,header:false,notes:false});}catch{}
+    try{visual=PDFVisual?.previewSVG(m,api)||'';}catch{}
     try{v3d=volume?.render?.(m,{yaw:-24,pitch:12,zoom:1,width:620,height:410,formatMeasurement:api.formatMeasurement})||'';}catch{}
     size=api.formatMeasurement(m.widthMM,m.unit)+' × '+api.formatMeasurement(m.heightMM,m.unit);
     if(Number.isFinite(m.reliefMM))project=api.formatMeasurement(m.reliefMM,m.unit);
     metal=m.material?.name||m.material?.type||'À préciser';
     color=m.finish?.name||m.finish?.code||'À préciser';
-    edges=(m.edges||[]).map((e,n)=>(n+1)+'. '+e.name+' : '+api.formatMeasurement(e.lengthMM,m.unit)+' · lip '+api.formatMeasurement(e.lipMM,m.unit)+' · '+(Math.round(e.interiorAngleDeg*100)/100)+'°').join(' / ');
+    edges=(m.edges||[]).map(e=>e.name+' : '+api.formatMeasurement(e.lengthMM,m.unit)+' · '+(e.lipMM>0?'Lip '+api.formatMeasurement(e.lipMM,m.unit):'Sans lip')+' · '+(Math.round(e.interiorAngleDeg*100)/100)+'°').join(' / ');
    }
    const selected=!excluded.has(active.id),qty=Number(active.spec?.quantity||1);
    html+='<section class="mir-wb-focus" data-mir-wb-focus><header class="mir-wb-focus-head"><div><p class="mir-wb-eyebrow">PANNEAU '+(at+1)+' SUR '+all+'</p>'+
@@ -84,8 +85,9 @@
      '<div class="mir-wb-switch"><button type="button" data-mir-wb-prev'+(at===0?' disabled':'')+' aria-label="Panneau précédent">←</button>'+
      '<button type="button" data-mir-wb-next'+(at===all-1?' disabled':'')+' aria-label="Panneau suivant">→</button></div></header>'+
      (visual?'<div class="mir-wb-drawing">'+visual+'</div>':'<div class="mir-wb-drawing mir-wb-drawing-empty">Dessin à corriger avant la commande.</div>')+
-     '<div class="mir-wb-measures"><div><span>Dimensions hors tout</span><strong>'+esc(size)+'</strong><small>Lips inclus</small></div>'+
-     '<div><span>Projection C</span><strong>'+esc(project)+'</strong><small>Profondeur de la pièce</small></div></div>'+
+     '<div class="mir-wb-measures"><div><span>A · Largeur hors tout</span><strong>'+esc(valid?api.formatMeasurement(m.widthMM,m.unit):'À mesurer')+'</strong><small>Lips inclus</small></div>'+
+     '<div><span>B · Hauteur hors tout</span><strong>'+esc(valid?api.formatMeasurement(m.heightMM,m.unit):'À mesurer')+'</strong><small>Lips inclus</small></div>'+ 
+     '<div><span>C · Projection</span><strong>'+esc(project)+'</strong><small>Profondeur de la pièce</small></div></div>'+
      '<p class="mir-wb-spec">'+esc(metal)+' · '+esc(color)+'</p>'+
      (result.error?'<p class="mir-wb-issue" role="status">À vérifier : '+esc(result.error)+'</p>':'')+
      (v3d?'<details class="mir-wb-extra"><summary>Voir cette pièce en 3D</summary><div class="mir-wb-three-d">'+v3d+'</div></details>':'')+
