@@ -35,8 +35,13 @@
   }
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function pdfFaces(po,model){
-    if(!po.items?.length)throw Error('Aucune moulure');
-    for(const i of po.items){const m=model.buildProfile(i.spec);if(!m.valid||!m.complete)throw Error('Pièce incomplète : '+i.id);}
+    if(!po.items?.length)throw Error('Aucune pièce');
+    for(const i of po.items){
+      const kind=i?.spec?.kind||i?.kind;
+      if(!['profile','panel'].includes(kind))throw Error('Type de pièce inconnu : '+(i?.id||'?'));
+      const m=kind==='panel'?model.buildPanel(i.spec):model.buildProfile(i.spec);
+      if(!m.valid||!m.complete)throw Error('Pièce incomplète : '+i.id+' — confirmez les cotes, le métal, les lèvres et la couleur avant le PDF.');
+    }
     const lines=['LES REVÊTEMENTS MIR','BON DE COMMANDE '+po.poNumber+' — R'+po.revision,
       'Fournisseur : '+po.supplier.name,'Courriel : '+po.supplier.email,'Chantier : '+po.job,
       'Livrer à : '+po.shipTo,'Date souhaitée : '+(po.requestedDate||'À confirmer'),

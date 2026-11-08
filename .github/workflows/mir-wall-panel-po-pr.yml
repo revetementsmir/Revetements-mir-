@@ -1,0 +1,53 @@
+name: MIR — mur de 10 panneaux vers bon fournisseur
+on:
+  pull_request:
+    paths:
+      - 'dist/calepinage*'
+      - 'dist/mir-panel-po-journey.css'
+      - 'dist/production-app.js'
+      - 'dist/mir-procurement*'
+      - 'dist/mir-po-workflow.js'
+      - 'tests/mir-wall-panel-po*.cjs'
+      - '.github/workflows/mir-wall-panel-po-pr.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration:
+    name: Moteurs et vrai parcours Chrome PC / iPad / téléphone
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Vérifier les sources et les tests
+        run: |
+          node --check dist/calepinage-app.js
+          node --check dist/production-app.js
+          node --check dist/mir-procurement.js
+          node --check dist/mir-po-workflow.js
+          node --check tests/mir-wall-panel-po.cjs
+          node --check tests/mir-wall-panel-po-browser.cjs
+      - name: Scénarios métier et protections du bon
+        run: |
+          node tests/mir-panel-dimensions.cjs
+          node tests/mir-wall-panel-po.cjs
+          node tests/mir-procurement.cjs
+          node tests/mir-po-workflow.cjs
+      - name: Installer le navigateur de recette
+        run: npm install --no-save playwright@1.58.2
+      - name: Mur réel de 10 panneaux vers le bon fournisseur
+        run: node tests/mir-wall-panel-po-browser.cjs
+      - name: Non-régression pliages et PDF fournisseurs
+        run: |
+          MIR_CHROMIUM_BIN=$(command -v chromium || command -v google-chrome) node tests/mir-purchase-orders-browser.cjs
+          node tests/mir-calepinage-metric-browser.cjs
+          node tests/mir-atelier-v4-browser.cjs
+      - name: Captures de recette
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-mur-bon-panneaux-pc-ipad-telephone
+          path: |
+            artifacts/mir-mur-10-*.png
+            artifacts/mir-panel-grid-*.png
+            artifacts/atelier-v4-*.png
+          if-no-files-found: ignore

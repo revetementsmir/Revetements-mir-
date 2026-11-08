@@ -1,0 +1,47 @@
+/* MIR — un seul parcours clair du mur au bon fournisseur.
+   Surcharge ciblée : géométrie, contrôles et sauvegardes existants inchangés. */
+:root{--green:#28553a;--paper:#f5f6f1;--line:#d8e1d6;--sage:#eaf0e6}
+html{scroll-behavior:smooth;scroll-padding-top:28px}
+body{font-size:14px}
+.mir-panel-journey{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 20px}
+.mir-panel-journey>a{display:flex;align-items:center;gap:13px;min-height:78px;padding:14px 16px;border:1px solid #d6e0d2;border-radius:12px;background:#fff;box-shadow:0 2px 15px #203b2808;transition:border-color .15s,transform .15s}
+.mir-panel-journey>a:hover{border-color:#348511;transform:translateY(-1px)}
+.mir-panel-journey>a:focus-visible{outline:3px solid #7ba96d;outline-offset:2px}
+.mir-panel-journey>a>strong{display:grid;place-items:center;flex:0 0 36px;height:36px;border-radius:50%;background:#e8f0df;color:#28553a;font-size:16px}
+.mir-panel-journey>a span{min-width:0;display:grid;gap:2px}
+.mir-panel-journey>a b{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.mir-panel-journey>a small{font-size:12px;color:#586b57}
+.workspace{grid-template-columns:300px minmax(0,1fr) 290px;gap:15px}
+.settings,.inspector{padding:22px}
+.settings label,.inspector label{font-size:12px;line-height:1.45}
+.settings .hint,.inspector .hint,.production-section .hint{font-size:12px;line-height:1.65}
+.settings summary{font-size:12px;font-weight:650}
+#panneaux-setup{scroll-margin-top:12px}
+.project-bar #new-traced-section{background:#348511;border-color:#348511;color:#fff}
+.project-bar #new-traced-section:not(:disabled):hover{background:#2d7112}
+#send-production{min-height:54px;font-size:14px;font-weight:700;box-shadow:0 7px 20px #295b2821;flex:0 0 auto}
+.mir-panel-po-status{padding:12px 16px;margin:15px 0 0;border:1px solid #bdd2b5;border-radius:9px;background:#f0f6ec;color:#325438;font-size:13px;line-height:1.65}
+#fabrication-title{scroll-margin-top:24px}
+#fabrication-details>summary{font-size:13px;font-weight:700}
+#piece-table button{min-height:38px;min-width:45px}
+#piece-table tr:hover td{background:#f6faf1}
+#new-traced-section,#draw-outline,#outline-close,#apply-panel-dimensions{min-height:44px}
+#calculation-errors:not([hidden]){font-size:13px}
+@media(min-width:1700px){.workspace{grid-template-columns:315px minmax(0,1fr) 300px}}
+@media(max-width:1160px){.workspace{grid-template-columns:295px minmax(0,1fr)}}
+@media(max-width:740px){
+ .mir-panel-journey{grid-template-columns:1fr;gap:8px}
+ .mir-panel-journey>a{min-height:57px;padding:9px 13px}
+ .mir-panel-journey>a>strong{flex-basis:30px;height:30px;font-size:14px}
+ .mir-panel-journey>a span{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+ .mir-panel-journey>a b{font-size:13px}
+ .mir-panel-journey>a small{font-size:11px}
+ .workspace{display:flex;flex-direction:column}
+ .project-bar #new-traced-section{flex:1 1 170px}
+ #send-production{width:100%;min-height:52px}
+ .settings,.inspector{padding:18px}
+ .mir-panel-po-status{font-size:12px}
+}
+
+.mir-panel-table-swipe{display:none;font-weight:700;color:#315b3a;margin:5px 0 10px}
+@media(max-width:740px){.mir-panel-table-swipe{display:block}.table-wrap{overscroll-behavior-inline:contain}}

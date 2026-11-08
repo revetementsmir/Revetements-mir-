@@ -308,3 +308,80 @@ body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field{display:flex;align
 body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field>.mir-proc-field{flex:1 1 auto;margin:0 0 13px;min-width:0}
 body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field>button{flex:0 0 auto;min-height:45px;margin-bottom:13px;font-size:11px!important;padding:6px 9px!important}
 @media(max-width:600px){body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field{flex-wrap:wrap}body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field>button{margin:0 0 13px}}
+
+
+/* MIR — un même bon de commande pour panneaux architecturaux et moulures */
+.mir-po-layout-journey{display:grid;gap:9px;max-width:1100px}
+.mir-po-layout-journey h2{font-size:clamp(22px,2.2vw,30px);font-weight:650;line-height:1.2;letter-spacing:-.03em;margin:0}
+.mir-po-layout-journey p{font-size:13px;line-height:1.55;margin:0;color:#455a47}
+.mir-po-layout-journey .eyebrow{font-size:10px;color:#3b653d;font-weight:750;letter-spacing:.12em}
+.mir-po-layout-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:7px}
+.mir-po-layout-actions button{font-size:13px;line-height:1.3;min-height:48px;padding:10px 16px}
+.mir-po-layout-actions a{margin-left:auto;min-height:44px;display:inline-flex;align-items:center}
+.mir-po-piece-details{border:1px solid #d8e3d2;background:#f5f8f0;padding:9px 12px;border-radius:7px;margin:10px 0}
+.mir-po-piece-details>summary{font-size:12px;line-height:1.5;font-weight:750;cursor:pointer;min-height:30px}
+.mir-po-piece-details .mir-po-piece-angles{font-size:12px;white-space:normal;line-height:1.85;overflow-wrap:anywhere}
+.mir-po-piece-ready{color:#315c33;font-size:12px;font-weight:650}
+.mir-po-piece-to-complete{color:#805426;font-size:12px;font-weight:650}
+#mir-procurement-panel .mir-po-piece-visual svg{max-width:100%;max-height:235px}
+@media(max-width:740px){
+ .mir-po-layout-actions{display:grid;grid-template-columns:1fr}
+ .mir-po-layout-actions button{width:100%;min-height:49px}
+ .mir-po-layout-actions a{margin-left:0}
+ .mir-po-layout-journey p{font-size:12px}
+}
+
+
+/* MOON — vrai contrôle visuel 390 px : menu complet, lisible, sans masquer le bon. */
+body.mir-admin-v4 #panel-layout-import{
+ position:relative;z-index:60;isolation:isolate;
+ min-height:0;height:auto;max-width:1150px;margin:12px auto 16px
+}
+body.mir-admin-v4 .mir-po-layout-journey{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+body.mir-admin-v4 .mir-po-layout-journey .mir-po-layout-actions{margin-top:8px}
+body.mir-admin-v4 #mir-procurement-tabs{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+@media(max-width:740px){
+ body.mir-admin-v4.mir-procurement-ready #mir-procurement-tabs{
+  position:relative;top:auto;z-index:2;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;padding:8px;margin:0 0 15px
+ }
+ body.mir-admin-v4 #mir-procurement-tabs button{
+  font-size:13px;min-height:48px;padding:9px 8px;white-space:normal;
+ }
+ body.mir-admin-v4 #mir-procurement-tabs button[data-mir-tab="orders"]{
+  grid-column:1/-1;
+ }
+ body.mir-admin-v4 #mir-procurement-panel{padding-bottom:20px}
+ body.mir-admin-v4 .mir-po-layout-actions{gap:8px}
+}
+
+
+/* Surcharge ciblée d'un ancien menu horizontal !important de mir-freeform-workshop.css.
+   Seul le mode commandes est modifié; le tracé plein écran reste intact. */
+@media(max-width:650px){
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="orders"] #mir-procurement-tabs,
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="suppliers"] #mir-procurement-tabs{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  overflow:visible!important;position:relative!important;top:auto!important;
+  gap:7px!important;padding:7px!important;margin:0 0 14px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="orders"] #mir-procurement-tabs button,
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="suppliers"] #mir-procurement-tabs button{
+  min-width:0!important;flex:auto!important;white-space:normal!important;
+  padding:10px 8px!important;font-size:13px!important;min-height:46px!important;
+ }
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="orders"] #mir-procurement-tabs button[data-mir-tab="orders"],
+ body.mir-admin-v4.mir-procurement-ready[data-mir-tab="suppliers"] #mir-procurement-tabs button[data-mir-tab="orders"]{grid-column:1/-1}
+}
+
+
+/* Trois chemins compréhensibles depuis l'atelier : pliage, panneau seul, mur. */
+body.mir-admin-v4 .kind-bar .mir-wall-shortcut{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ min-height:46px;padding:10px 15px;border:1px solid #aac3a2;border-radius:9px;
+ background:#edf5e6;color:#28553a;font-size:13px;font-weight:750;text-align:center;
+ text-decoration:none
+}
+body.mir-admin-v4 .kind-bar .mir-wall-shortcut:hover{background:#e1eed6;border-color:#63975e}
+body.mir-admin-v4 .kind-bar .mir-wall-shortcut:focus-visible{outline:3px solid #88b96e;outline-offset:3px}
+@media(max-width:740px){body.mir-admin-v4 .kind-bar .mir-wall-shortcut{width:100%;min-height:48px}}
