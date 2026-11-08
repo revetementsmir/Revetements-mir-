@@ -43,7 +43,11 @@
   if(confirmed&&proxy)proxy.checked=confirmed.checked;
   const n=$('#mir-cal-mobile-panel-count');
   if(n)n.textContent=$('#piece-count')?.textContent||'Les panneaux';
-  if(next==='order')$('#fabrication-details')?.setAttribute('open','');
+  if(next==='order'){
+    // L'adjointe vérifie le chantier avant les options de fabrication ;
+    // la fiche avancée reste accessible mais n'est pas imposée.
+    $('#fabrication-details')?.removeAttribute('open');
+  }
   if(mobile()){
    const nav=$('#mir-cal-mobile-nav');
    nav?.scrollIntoView({block:'start',behavior:'auto'});
@@ -128,6 +132,12 @@
       if(event.target.closest('[data-piece]'))details.open=true;
     });
   }
+  const productionTitle=$('#fabrication-title');
+  if(productionTitle)productionTitle.textContent='Préparer le bon fournisseur';
+  const productionIntro=$('.production-heading>p');
+  if(productionIntro)productionIntro.textContent='Renseigne le chantier, puis confirme les options seulement si elles sont connues. Les 10 panneaux gardent leurs mesures.';
+  const fabricationSummary=$('#fabrication-details>summary');
+  if(fabricationSummary)fabricationSummary.textContent='Matériau, épaisseur et couleur (à vérifier)';
   const count=document.createElement('p');count.className='mir-cal-mobile-count';
   count.id='mir-cal-mobile-panel-count';
   $('.production-heading')?.after(count);
