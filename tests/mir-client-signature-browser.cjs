@@ -25,6 +25,9 @@ async function main(){
     const page=await browser.newPage({viewport:{width:size.width,height:size.height},reducedMotion:'reduce'});
     for(const name of pages){
       await page.goto('http://127.0.0.1:'+server.address().port+'/'+name+'.html',{waitUntil:'domcontentloaded'});
+      const sharedMenu=page.locator('#mir-harmony-menu'),sharedToggle=page.locator('.mir-harmony-toggle');
+      const harmony=await sharedToggle.count()>0;
+      if(harmony){assert.equal(await sharedMenu.isVisible(),false);await sharedToggle.click();}
       const result=await page.evaluate(()=>{
         const css=Array.from(document.styleSheets).some(sheet=>String(sheet.href||'').includes('mir-client-signature.css'));
         const logo=document.querySelector('header img[src="assets/MIR-logo-officiel-original.svg"]');
@@ -49,6 +52,7 @@ async function main(){
       assert.ok(result.estimate,name+' '+size.id+': bouton Estimation masqué ou hors écran');
       assert.ok(result.footer,name+' '+size.id+': pied de page commun absent ou hors écran');
       assert.ok(result.heroFits,name+' '+size.id+': texte ou bouton du hero rogné');
+      if(harmony){assert.match(await sharedMenu.locator('.mir-home-estimate').getAttribute('href'),/index\.html#nous-joindre$/);await page.keyboard.press('Escape');assert.equal(await sharedMenu.isVisible(),false);}
       if(['boutique','produit','selection','pliage','plan'].includes(name)){
         await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-signature-'+name+'-'+size.id+'.png')});
       }

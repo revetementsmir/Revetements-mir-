@@ -4,6 +4,7 @@ on:
     paths:
       - 'dist/**'
       - 'tests/mir-harmony-*.cjs'
+      - 'tests/mir-client-signature-browser.cjs'
       - '.github/workflows/mir-harmony-direct-pr.yml'
   workflow_dispatch:
 permissions:
@@ -37,6 +38,7 @@ jobs:
           trap 'kill "$server_pid"' EXIT
           node tests/mir-harmony-direct-browser.cjs
           node tests/mir-harmony-revisions-browser.cjs
+          node tests/mir-client-signature-browser.cjs
       - name: Captures, séquence et résultats
         if: always()
         uses: actions/upload-artifact@v4
