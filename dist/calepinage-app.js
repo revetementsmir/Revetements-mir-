@@ -189,7 +189,7 @@
     transferButton.innerHTML=valid?'Préparer le bon · '+layout.pieces.length+' panneaux <span>→</span>':'Préparer le bon de commande <span>→</span>';
     if(status)status.textContent=!valid?'Dessine ton mur et entre ses vraies cotes pour calculer les panneaux.':
       !z.confirmed?'Les '+layout.pieces.length+' panneaux sont calculés. Vérifie les cotes et coche « Cotes et jeux de pose vérifiés » pour préparer le bon.':
-      'Les '+layout.pieces.length+' panneaux sont prêts pour un bon fournisseur. Tu pourras compléter le métal, la couleur et le côté du bas avant le PDF.
+      'Les '+layout.pieces.length+' panneaux sont prêts pour un bon fournisseur. Tu pourras compléter le métal, la couleur et le côté du bas avant le PDF.';
     const contour=valid?(layout.config.contourIn||[[0,0],[layout.widthIn,0],[layout.widthIn,layout.heightIn],[0,layout.heightIn]]):[];
     $('#wall-edge-list').innerHTML=valid?'<p class="hint">Contour utile après lousse · '+inch(layout.widthIn)+' × '+inch(layout.heightIn)+'. Angles mesurés dans le plan.</p><div class="table-wrap"><table><thead><tr><th>Côté du contour</th><th>Longueur réelle</th><th>Angle intérieur au départ</th></tr></thead><tbody>'+polygonMeasures(contour).map((e,i)=>'<tr><td><button type="button" data-wall-edge="'+i+'" aria-label="Modifier le sommet du côté '+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'">'+wallLetter(i)+'–'+wallLetter((i+1)%contour.length)+'</button></td><td>'+inch(e.length)+'</td><td>'+number(e.angle)+'°</td></tr>').join('')+'</tbody></table></div>':'Entrez des mesures valides pour calculer le contour.';
   }
