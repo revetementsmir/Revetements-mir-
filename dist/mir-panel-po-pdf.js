@@ -37,7 +37,7 @@
   // A = largeur hors tout, B = hauteur hors tout.
   // Les anciens ronds 1-2-3-4 représentent les côtés du contour, pas des
   // dimensions. Le bon fournisseur affiche à leur place le nom de chaque
-  // côté et sa vraie lèvre, sans créer une pièce ni un développé supplémentaire.
+  // côté, sans créer une pièce ni un développé supplémentaire.
   function geometry(model,box,attribute='data-mir-panel-main',api=null){
     const points=model.pointsMM||[];
     if(points.length<3)return '';
@@ -84,26 +84,80 @@
     out+='<path d="M '+dimX+' '+(yT+2)+' l -6,12 h 12 z M '+dimX+' '+(yB-2)+' l -6,-12 h 12 z" fill="#28553a"/>';
     const B='B · hauteur hors tout';
     out+=txt(dimX+33,(yT+yB)/2,B,17,'text-anchor="middle" font-weight="700" data-mir-dimension-b="true" transform="rotate(-90 '+(dimX+33)+' '+((yT+yB)/2)+')"');
-    // The labels are tied to real side IDs and real widths; they are not
-    // arbitrary drawing numbers. A 0 lip is explicitly shown as "Sans lip".
+    // Étiquettes courtes pour le chantier : uniquement le nom du côté.
+    // Les valeurs de lips restent dans le tableau détaillé du bon et la vraie
+    // géométrie du contour intérieur est visible sur le croquis.
+    const usedLabels=[];
+    const overlaps=(r,q,gap=5)=>
+      r.x<q.x+q.w+gap && r.x+r.w+gap>q.x &&
+      r.y<q.y+q.h+gap && r.y+r.h+gap>q.y;
+    const labelBounds={x:box.x+4,y:box.y+4,w:box.w-8,h:box.h-94};
+    const outsidePanel=r=>
+      r.x+r.w<xL-6 || r.x>xR+6 || r.y+r.h<yT-6 || r.y>yB+6;
+    const fits=r=>
+      r.x>=labelBounds.x && r.y>=labelBounds.y &&
+      r.x+r.w<=labelBounds.x+labelBounds.w &&
+      r.y+r.h<=labelBounds.y+labelBounds.h &&
+      outsidePanel(r) && usedLabels.every(q=>!overlaps(r,q));
+    // Les dimensions A/B occupent des couloirs réservés à droite et en bas.
+    // On n'y place jamais de texte de côté.
+    const corridors={right:xR+123,bottom:yB+66};
     for(let i=0;i<drawn.length;i++){
       const a=drawn[i],b=drawn[(i+1)%drawn.length],edge=model.edges?.[i];
       if(!edge)continue;
       const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1;
-      const nx=-sign*dy/len,ny=sign*dx/len; // outward normal in screen Y-down
+      const nx=-sign*dy/len,ny=sign*dx/len;
       const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
-      const value=(edge.lipMM>1e-8)?('Lip '+fmt(model,edge.lipMM,api)):'Sans lip';
-      const label=String(edge.name||'Côté')+' · '+value;
-      const font=model.edges.length>6?12:14;
-      const labelW=Math.min(195,Math.max(92,label.length*(font*.52)+18));
-      const labelH=27;
-      let lx=mx+nx*35,ly=my+ny*30;
-      lx=Math.max(box.x+labelW/2+5,Math.min(box.x+box.w-labelW/2-5,lx));
-      ly=Math.max(box.y+labelH/2+6,Math.min(box.y+box.h-95-labelH/2,ly));
-      // Labels linked to the actual outer edge with a small leader.
-      out+=line(mx,my,lx,ly,'#8daa8f',1.25);
-      out+=rect(lx-labelW/2,ly-labelH/2,labelW,labelH,'#f4faf1','#b0c9ab',6);
-      out+=txt(lx,ly+5,label,font,'text-anchor="middle" font-weight="700" data-mir-lip-label="'+esc(edge.id)+'"');
+      const label=String(edge.name||'Côté');
+      const font=label.length>13?11:label.length>8?12:14;
+      const labelW=Math.min(108,Math.max(57,label.length*font*.57+19));
+      const labelH=26;
+      const side=Math.abs(nx)>=Math.abs(ny)?(nx<0?'left':'right'):(ny<0?'top':'bottom');
+      const offset=15;
+      const pointAt=(direction,k)=>{
+        const shift=k%2===0?(k/2)*33:-(Math.ceil(k/2))*33;
+        let cx,cy;
+        if(direction==='left'||direction==='right'){
+          cx=direction==='left'?xL-labelW/2-offset:xR+labelW/2+offset;
+          cy=my+shift;
+        }else{
+          cy=direction==='top'?yT-labelH/2-offset:yB+labelH/2+offset;
+          cx=mx+shift*2;
+        }
+        return {x:cx-labelW/2,y:cy-labelH/2,w:labelW,h:labelH};
+      };
+      const directions=[side,...['left','right','top','bottom'].filter(d=>d!==side)];
+      let position=null;
+      for(const direction of directions){
+        for(let k=0;k<18;k++){
+          const candidate=pointAt(direction,k);
+          // Label blocks cannot cover the A/B dimension leaders.
+          if(candidate.x+candidate.w>=corridors.right-9 && candidate.x<=corridors.right+9 &&
+             candidate.y<yB+3 && candidate.y+candidate.h>yT-3)continue;
+          if(candidate.y+candidate.h>=corridors.bottom-8 && candidate.y<=corridors.bottom+8 &&
+             candidate.x<xR+3 && candidate.x+candidate.w>xL-3)continue;
+          if(fits(candidate)){position=candidate;break;}
+        }
+        if(position)break;
+      }
+      if(position){
+        usedLabels.push(position);
+        const lx=position.x+position.w/2,ly=position.y+position.h/2;
+        // La ligne guide s'arrête AU BORD de l'étiquette, jamais dans son texte.
+        const ux=lx-mx,uy=ly-my;
+        const tx=ux===0?Infinity:(position.w/2)/Math.abs(ux);
+        const ty=uy===0?Infinity:(position.h/2)/Math.abs(uy);
+        const factor=Math.min(tx,ty,1);
+        const endX=lx-ux*factor,endY=ly-uy*factor;
+        out+=line(mx,my,endX,endY,'#92ae98',1.25);
+        out+='<rect data-mir-side-label-box="'+esc(edge.id)+'" x="'+position.x.toFixed(2)+'" y="'+position.y.toFixed(2)+
+          '" width="'+position.w.toFixed(2)+'" height="'+position.h+'" rx="6" fill="#f4faf1" stroke="#b0c9ab"/>';
+        out+=txt(lx,ly+5,label,font,'text-anchor="middle" font-weight="700" data-mir-lip-label="'+esc(edge.id)+'"');
+      }else{
+        // Très nombreux côtés/pointes : la table contient toujours tous les
+        // noms et les lips exacts; une étiquette superposée est plus trompeuse.
+        out+='<g data-mir-side-label-omitted="'+esc(edge.id)+'"/>';
+      }
       if(edge?.id===model.bottomEdgeId){
         out+=line(a[0],a[1],b[0],b[1],model.perforation?.enabled?'#167da2':'#477e4e',4);
       }
