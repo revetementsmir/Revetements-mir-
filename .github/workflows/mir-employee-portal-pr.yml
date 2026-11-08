@@ -16,8 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm install --no-save playwright@1.58.2
-      - run: npx playwright install --with-deps chromium
-      - run: node tests/mir-employee-portal-browser.cjs
+      - run: MIR_CHROMIUM_BIN=$(command -v google-chrome || command -v chromium) node tests/mir-employee-portal-browser.cjs
       - uses: actions/upload-artifact@v4
         if: success()
         with:

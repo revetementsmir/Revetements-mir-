@@ -37,7 +37,7 @@ await once(server,'listening');
 const base='http://127.0.0.1:'+server.address().port;
 let browser;
 try {
-browser=await chromium.launch();
+browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN});
 for(const width of [320,360,390,820,1024,1440]){
   const page=await browser.newPage({viewport:{width,height:width<=390?760:900},isMobile:width<=390,hasTouch:width<=390});
   page.setDefaultTimeout(10000);
