@@ -239,6 +239,12 @@
       const count=chosen.items.filter(item=>item.spec?.kind==='panel').length;
       panel.querySelectorAll('[data-mir-panel-count]').forEach(node=>node.textContent=String(count));
       panel.querySelectorAll('[data-mir-po-count]').forEach(node=>node.textContent=String(chosen.items.length));
+      panel.querySelectorAll('[data-mir-wb-pick]').forEach(button=>{
+        const excluded=skippedFor(dossier).has(button.dataset.mirWbPick);
+        button.classList.toggle('is-out',excluded);
+        const original=button.getAttribute('aria-label')||'';
+        button.setAttribute('aria-label',original.replace(/, exclu du bon/g,'')+(excluded?', exclu du bon':''));
+      });
       panel.querySelectorAll('[data-mir-panel-to-po]').forEach(button=>{button.disabled=count===0;});
     }
     function changeIncluded(id,checked){
