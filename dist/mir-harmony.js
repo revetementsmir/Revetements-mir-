@@ -15,13 +15,14 @@
   const dossier=document.createElement(admin||portal?'button':'a');dossier.className='mir-harmony-dossier';
   if(admin){dossier.type='button';dossier.addEventListener('click',()=>{document.querySelector('[data-mir-tab="draw"]')?.click();const original=document.querySelector('#mode-link');if(!document.body.classList.contains('mir-v4-dossier-open'))original?.click();document.querySelector('#production-order')?.scrollIntoView({block:'start'});});}
   else if(portal){dossier.type='button';dossier.addEventListener('click',()=>{document.querySelector('#portal-navigation [data-view="projects"]')?.click();document.querySelector('#portal-main')?.focus();});}
-  else dossier.href=page==='production.html'?'#production-order':'selection.html';
+  else dossier.href='selection.html#mir-unified-dossier';
   const toggle=document.createElement('button');toggle.type='button';toggle.className='mir-harmony-toggle';toggle.textContent='☰';toggle.setAttribute('aria-label','Ouvrir le menu MIR');toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-controls','mir-harmony-menu');
   const menu=document.createElement('div');menu.id='mir-harmony-menu';menu.className='mir-harmony-menu';menu.hidden=true;
   // Retain originals, including account controls and permitted links.
   for(const child of [...header.children])if(child!==logo)menu.append(child);
   if(page==='production.html'&&!admin){for(const nav of menu.querySelectorAll('nav'))if(!nav.classList.contains('mir-production-client-nav'))nav.hidden=true;}
   if(admin){const tabs=document.querySelector('#mir-procurement-tabs');if(tabs){for(const nav of menu.querySelectorAll('nav'))nav.hidden=true;menu.prepend(tabs);}}
+  if(!admin&&!portal&&!menu.querySelector('a[href="selection.html"]')){const complete=document.createElement('a');complete.href='selection.html';complete.textContent='Mon dossier complet';menu.append(complete);}
   header.append(title,dossier,toggle,menu);
   const owned=new Set([logo,title,dossier,toggle,menu]);new MutationObserver(()=>{for(const node of [...header.children])if(!owned.has(node))menu.append(node);}).observe(header,{childList:true});
   if(portal){const nativeNav=document.querySelector('#portal-navigation');if(nativeNav){const placeholder=document.createComment('MIR navigation métier');nativeNav.before(placeholder);const media=matchMedia('(max-width:1100px)');const sync=()=>{if(media.matches)menu.prepend(nativeNav);else placeholder.after(nativeNav);};sync();media.addEventListener('change',sync);}}

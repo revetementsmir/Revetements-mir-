@@ -413,7 +413,7 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
   const points=mesh.outer.map(p=>pointOnView(p,tr)),a=points[i],b=points[(i+1)%points.length],
    left=Math.min(...points.map(p=>p[0])),right=Math.max(...points.map(p=>p[0])),top=Math.min(...points.map(p=>p[1])),bottom=Math.max(...points.map(p=>p[1])),
    cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2;
-  const font=compact?16:15,w=Math.max(42,edge.name.length*font*.6+12),h=26;
+  const font=compact?16:15,w=Math.max(42,edge.name.length*font*.6+12),h=compact?52:26;
   const winding=Math.sign(points.reduce((sum,p,i)=>sum+p[0]*points[(i+1)%points.length][1]-points[(i+1)%points.length][0]*p[1],0))||1;
   const nx=winding*(b[1]-a[1]),ny=-winding*(b[0]-a[0]);
   const preferred=Math.abs(nx)>Math.abs(ny)?(nx<0?'left':'right'):(ny<0?'top':'bottom');
@@ -433,7 +433,7 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
   labelBoxes.push(box);
   const lx=Math.max(box.x,Math.min(box.x+w,cx)),ly=Math.max(box.y,Math.min(box.y+h,cy));
   svg+=`<path d="M${cx},${cy}L${lx},${ly}" fill="none" stroke="#8da389" stroke-width="1"/>`;
-  svg+=`<g data-edit-panel-edge="${esc(edge.id)}" role="button" tabindex="0" aria-label="Modifier ${esc(edge.name)}"><rect x="${box.x}" y="${box.y}" width="${w}" height="${h}" rx="5" fill="#fcfcf8"/><text data-panel-edge-lip="${esc(edge.id)}" x="${box.x+w/2}" y="${box.y+18}" font-size="${font}" font-weight="700" text-anchor="middle" fill="#284d30">${esc(edge.name)}</text></g>`;
+  svg+=`<g data-edit-panel-edge="${esc(edge.id)}" role="button" tabindex="0" aria-label="Modifier ${esc(edge.name)}"><rect x="${box.x}" y="${box.y}" width="${w}" height="${h}" rx="5" fill="#fcfcf8"/><text data-panel-edge-lip="${esc(edge.id)}" x="${box.x+w/2}" y="${box.y+h/2+6}" font-size="${font}" font-weight="700" text-anchor="middle" fill="#284d30">${esc(edge.name)}</text></g>`;
  });
  const corners=mesh.outer.map(p=>pointOnView(p,tr)),xs=corners.map(p=>p[0]),ys=corners.map(p=>p[1]);
  const left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bottom=Math.max(...ys),dimY=compact?370:400,dimX=compact?323:670;
@@ -768,7 +768,8 @@ function updateDrawing({keepForm=false}={}){
  let directTools=$('#mir-panel-direct-tools');
  if(!directTools){directTools=document.createElement('div');directTools.id='mir-panel-direct-tools';directTools.className='mir-panel-direct-tools';stage.after(directTools);}
  directTools.hidden=kind!=='panel'||authoring||tool==='panel-trace';
- directTools.innerHTML=directTools.hidden?'':['width','height','relief'].map(key=>'<button type="button" data-edit-panel-measure="'+key+'">'+({width:'A — Largeur hors tout',height:'B — Hauteur hors tout',relief:'C — Projection'}[key])+'</button>').join('');
+ directTools.innerHTML=directTools.hidden?'':'<details><summary>Autre méthode de saisie : cotes et côtés</summary><div>'+['width','height','relief'].map(key=>'<button type="button" data-edit-panel-measure="'+key+'">'+({width:'A — Largeur hors tout',height:'B — Hauteur hors tout',relief:'C — Projection'}[key])+'</button>').join('')+(actual.edges||[]).map(edge=>'<button type="button" data-edit-panel-edge="'+esc(edge.id)+'">'+esc(edge.name)+'</button>').join('')+'</div></details>';
+
  const twin=$('#mir-panel-live-alt');
  if(twin){
   twin.hidden=kind!=='panel';

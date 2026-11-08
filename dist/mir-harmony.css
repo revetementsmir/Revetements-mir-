@@ -41,3 +41,4 @@ html body header#mir-harmony-header #mir-harmony-menu #mir-procurement-tabs{visi
  html body.mir-mobile-stepper #drawing-tools>details>summary{min-height:44px;display:flex;align-items:center}
  html body.mir-mobile-stepper #drawing-tools>button{min-height:44px!important}
 }
+.mir-panel-direct-tools>details{width:100%}.mir-panel-direct-tools summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font:600 14px/1.35 var(--mir-font)}.mir-panel-direct-tools details>div{display:flex;flex-wrap:wrap;gap:8px}
