@@ -136,7 +136,7 @@ async function ready(){
     assert.equal(await stage.locator('[data-draw-point]').count(),2);
     await trace(365,275);await choose('right');
     assert.match(await arc(),/ A5 5 0 0 1 /,'choix 2 : sens du retour conservé dans la géométrie');
-    await page.locator('[data-freeform-undo]').click();
+    await page.locator('.mir-workspace-tools [data-freeform-undo]').click();
     await trace(365,275);await choose('left');
     assert.match(await arc(),/ A5 5 0 0 0 /,'choix 1 : sens opposé, sans modifier les cotes');
     await openWorkshopStep(page,2);

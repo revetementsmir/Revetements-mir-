@@ -2,7 +2,7 @@
 const {openMirTab}=require('./mir-navigation-helper.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {PGlite}=require('../tools/database/node_modules/@electric-sql/pglite'),{chromium}=require('playwright'),M=require('../dist/production-model.js');
-const {drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
+const {drawTwoSides,revealControl}=require('./mir-draw-freeform-helper.cjs');
 const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 (async()=>{const db=new PGlite();let browser,server;let chain=Promise.resolve();
 try{
@@ -51,10 +51,12 @@ try{
  // Le nouvel atelier garde les cotes et couleurs sur la même page.
  // Tester la vraie création SVG, la face colorée, puis Continuer → Enregistrer.
  await drawTwoSides(drawingAdmin);
- await drawingAdmin.locator('[data-freeform-finish]').click();
+ await drawingAdmin.locator('.mir-workspace-tools [data-freeform-finish]').click();
+ await revealControl(drawingAdmin,'#profile-painted-side');
  await drawingAdmin.locator('#profile-painted-side').selectOption('right');
  assert.equal(await drawingAdmin.locator('#profile-painted-side').inputValue(),'right','face colorée préservée');
- await drawingAdmin.locator('[data-freeform-next]').click();
+ await drawingAdmin.locator('.mir-inspector-heading button').click();
+ await drawingAdmin.locator('.mir-action-bar .mir-workspace-primary').click();
  await drawingAdmin.locator('[data-mir-continue-action="save"]').click();
  await drawingAdmin.locator('#save-production-template [name=name]').fill('Moulure dessinée sans fichier');
  assert.equal(await drawingAdmin.locator('[name=saveTarget][value=shared]').isChecked(),true);await drawingAdmin.locator('#save-production-template button[type=submit]').click();

@@ -1,3 +1,4 @@
+const {revealControl}=require('./mir-draw-freeform-helper.cjs');
 'use strict';
 /* MIR : real Chromium trace-first architectural wall sections; not a mock. */
 const assert=require('node:assert/strict');
@@ -36,7 +37,9 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    const page=await browser.newPage({viewport:{width:v.w,height:v.h},hasTouch:v.w<1100});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'/calepinage.html',{waitUntil:'domcontentloaded'});
-   await page.locator('#new-traced-section').waitFor({state:'visible',timeout:25000});
+   await page.waitForFunction(()=>window.MirWorkspace?.active);
+   await revealControl(page,'#new-traced-section');
+   await revealControl(page,'#new-traced-section');
    await page.locator('#new-traced-section').click();
    assert.equal(await page.locator('#drawing-stage').getAttribute('data-tool'),'outline','New section starts drawing tool');
    assert.equal(await page.locator('#zone-width').inputValue(),'');
@@ -52,11 +55,10 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    assert.equal(await page.locator('#drawing-stage').getAttribute('data-tool'),'select');
    assert.equal(await page.locator('#layout-svg [data-wall-sketch="pending"]').count(),1,'Shape stays visible without pretending to know dimensions');
    assert.equal(await page.locator('#send-production').isDisabled(),true);
+   await revealControl(page,'#zone-width');
    await page.locator('#zone-width').fill('120');await page.locator('#zone-width').press('Tab');
    await page.locator('#zone-height').fill('96');await page.locator('#zone-height').press('Tab');
-   if(v.w<=740)await page.locator('[data-mir-cal-stage="panels"]').click();
    await page.locator('#lip').fill('1');await page.locator('#lip').press('Tab');
-   if(v.w<=740){await page.locator('[data-mir-cal-stage="wall"]').click();await page.locator('#mir-cal-mobile-advanced > summary').click();}
    assert.equal(await page.locator('#layout-svg [data-wall-sketch="pending"]').count(),0,'Sketch materialized once real measurements entered');
    assert.ok(await page.locator('#layout-svg .mir-wall-edge-label').count()>=3,'Actual side names persist');
    assert.equal(await page.locator('#layout-svg .mir-wall-angle-label').count(),4,'Angles shown at all four corners');
@@ -65,6 +67,7 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    assert.ok((await page.locator('#wall-edge-list').textContent()).includes('A–B'),'Side labels agree with the worksheet');
    // Clicking a real side opens the exact endpoint controls, never edits dimensions silently.
    const before=await page.locator('#zone-width').inputValue();
+   await page.locator('.mir-inspector-heading button').click();
    await page.locator('#layout-svg [data-wall-edge="0"]').first().click();
    assert.equal(await page.locator('#wall-coordinate-details').evaluate(n=>n.open),true);
    assert.equal(await page.locator('#wall-vertex').inputValue(),'1');
@@ -93,8 +96,10 @@ async function idb(page){return page.evaluate(()=>new Promise((resolve,reject)=>
    await page.screenshot({path:path.join(artifact,'mir-wall-edge-editor-'+v.name+'.png'),fullPage:false});
    await page.locator('#zone-width').fill('120 1/2');await page.locator('#zone-width').press('Tab');
    assert.equal(await page.locator('#send-production').isDisabled(),true,'Changing outer width cannot silently stretch confirmed wall corners');
+   await revealControl(page,'#zone-width');
    await page.locator('#zone-width').fill('120');await page.locator('#zone-width').press('Tab');
    assert.equal(await page.locator('#send-production').isDisabled(),false,'Valid measured contour restored unchanged');
+   await revealControl(page,'#new-traced-section');
    await page.locator('#new-traced-section').click();
    await drag(page,200,190,690,215,true);
    await drag(page,690,190,720,460,true);

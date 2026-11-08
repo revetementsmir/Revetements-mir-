@@ -19,6 +19,12 @@ async function drawTwoSides(page){
  for(const [x,y] of [[190,260],[440,260],[440,140]])await tapDrawing(page,x,y);
 }
 async function openWorkshopStep(page,targetStep=4){
+ if(await page.locator('#mir-workspace').count()){
+  const finish=page.locator('.mir-workspace-tools [data-freeform-finish]');
+  if(await finish.isVisible()&&await finish.isEnabled())await finish.click();
+  await revealControl(page,'#production-dimensions');
+  return false;
+ }
  const isMobile=await page.locator('body.mir-mobile-stepper').count()>0;
  if(isMobile){
   const target=Math.max(2,Math.min(4,targetStep));
@@ -35,4 +41,13 @@ async function openWorkshopStep(page,targetStep=4){
  if(await finish.isVisible()&&await finish.isEnabled())await finish.click();
  return false;
 }
-module.exports={pointOnDrawing,tapDrawing,drawTwoSides,openWorkshopStep};
+async function revealControl(page,selector){
+ const node=page.locator(selector).first();
+ if(await page.locator('#mir-workspace').count()&&await node.evaluate(e=>!!e.closest('#mir-inspector'))){
+  if(!await page.locator('#mir-inspector').isVisible())await page.locator('#mir-workspace-settings').click();
+ }
+ const ancestors=node.locator('xpath=ancestor::details');
+ for(let i=0;i<await ancestors.count();i++){const d=ancestors.nth(i);if(!await d.evaluate(e=>e.open))await d.locator(':scope > summary').click();}
+ return node;
+}
+module.exports={pointOnDrawing,tapDrawing,drawTwoSides,openWorkshopStep,revealControl};

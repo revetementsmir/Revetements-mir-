@@ -375,9 +375,9 @@
       const fs=Math.max(d.width,d.height)*.026,dim=margin*.52;
       out+=svgLine(0,-dim,d.width,-dim,'stroke="#677d5b" vector-effect="non-scaling-stroke"');
       out+=svgLine(0,-dim-fs*.45,0,-dim+fs*.45,'stroke="#677d5b" vector-effect="non-scaling-stroke"')+svgLine(d.width,-dim-fs*.45,d.width,-dim+fs*.45,'stroke="#677d5b" vector-effect="non-scaling-stroke"');
-      out+=svgText(d.width/2,-dim-fs*.4,inch(d.width),'font-size="'+fs+'" text-anchor="middle" fill="#395335"');
+      out+=svgText(d.width/2,-dim-fs*.4,inch(d.width),'data-wall-dimension="width" role="button" tabindex="0" aria-label="A — Largeur hors tout du mur" font-size="'+fs+'" text-anchor="middle" fill="#395335"');
       out+=svgLine(-dim,0,-dim,d.height,'stroke="#677d5b" vector-effect="non-scaling-stroke"');
-      out+='<text transform="translate('+(-dim-fs*.35)+' '+d.height/2+') rotate(-90)" font-size="'+fs+'" text-anchor="middle" fill="#395335">'+esc(inch(d.height))+'</text>';
+      out+='<text data-wall-dimension="height" role="button" tabindex="0" aria-label="B — Hauteur hors tout du mur" transform="translate('+(-dim-fs*.35)+' '+d.height/2+') rotate(-90)" font-size="'+fs+'" text-anchor="middle" fill="#395335">'+esc(inch(d.height))+'</text>';
       if(valid)out+=svgText(d.width/2,d.height+dim+fs*.3,inch(layout.widthIn)+' × '+inch(layout.heightIn)+' utiles après lousse','font-size="'+fs*.75+'" text-anchor="middle" fill="#395335"');
       if(!valid)out+=svgText(d.width/2,d.height/2,'Renseignez le lip et la répartition','font-size="'+fs+'" text-anchor="middle" fill="#687d5e"');
     } else {
@@ -423,6 +423,7 @@
   function render() {
     layout=compute();if(layout.ok){zone().rules=clone(layout.config);if((!selected||selected.type==='piece'&&!layout.pieces.some(p=>p.id===selected.id))&&layout.pieces.length)selected={type:'piece',id:layout.pieces[0].id};}
     renderControls();renderSummary();renderInspector();draw();
+    window.dispatchEvent(new Event('mir-calepinage-rendered'));
   }
   function svgPoint(event) { const s=$('#layout-svg'),p=s.createSVGPoint();p.x=event.clientX;p.y=event.clientY;const m=s.getScreenCTM();if(!m)return null;const q=p.matrixTransform(m.inverse());return [q.x,q.y]; }
   function jointPosition(point,axis) { const d=dimensions();return axis==='x'?(point[0]-transform.x)/transform.sx-d.g.left:(point[1]-transform.y)/transform.sy-d.g.top; }
@@ -461,6 +462,7 @@
     $('#wall-vertex').value=String(endpoint);$('#wall-vertex').dispatchEvent(new Event('change'));
     renderWallControls();
     const editor=$('#wall-edge-details');editor.hidden=false;editor.open=true;
+    window.MirWorkspace?.openInspector($('#wall-edge-length'));
     $('#wall-edge-length').focus({preventScroll:false});
     toast('Côté '+wallLetter(index)+'–'+wallLetter(endpoint)+' : modifiez longueur et angle, puis Appliquer.');
   }
@@ -574,6 +576,7 @@
   function beginOutline() {
     // Same trace-first workflow as a folded profile; do not fabricate site dimensions.
     outlineDraft=[];outlineCursor=null;if(view==='3d')view='zone';tool='outline';zoom=1;selected=null;renderInspector();draw();
+    window.MirWorkspace?.closeInspector();
   }
   function closeOutline() {
     if(outlineDraft.length<3||!A)return;
@@ -781,6 +784,22 @@
     if(!workspace.zones.some(z=>z.id===workspace.activeId))workspace.activeId=workspace.zones[0].id;
     let requested='';try{requested=decodeURIComponent(location.hash.slice(1));}catch{}if(workspace.zones.some(z=>z.id===requested))workspace.activeId=requested;
     ready=true;bind();render();$('#new-traced-section').disabled=false;restoreSession();
+    window.MIRCalepinageWorkspace=Object.freeze({
+      getState(){return {zone:clone(zone()),layout:clone(layout),selected:selected?clone(selected):null};},
+      applyDimension(key,raw,unit='in'){
+        const parsed=M.parseMeasurement(raw,unit);if(!parsed.ok||parsed.mm<0||key!=='projection'&&parsed.mm===0)return {ok:false,error:'Entrez une cote positive. La valeur précédente est conservée.'};
+        const next=clone(zone()),value=String(Number((parsed.mm/25.4).toPrecision(15)));
+        if(key==='projection'){commit(z=>{z.meta.projection=value;},{invalidate:false});return {ok:true};}
+        if(!['width','height'].includes(key))return {ok:false,error:'Cote inconnue.'};
+        if(next.shape?.type&&next.shape.type!=='rectangle')return {ok:false,error:'Cette cote dépend du contour ou de la pente. Utilisez les réglages des sommets pour conserver la forme.'};
+        next.values[key]=value;
+        // Existing absolute axes and locks are kept; the existing engine decides
+        // whether they can close the wall. Never clear them to force success.
+        const result=compute(next);if(!result.ok)return {ok:false,error:(result.errors||[]).map(e=>e.message).join(' ')||'Cette cote ne respecte pas les verrouillages du mur.'};
+        commit(z=>{z.values[key]=value;z.dimensionSource='manual';z.rules=clone(result.config);});return {ok:true};
+      }
+    });
+    window.dispatchEvent(new Event('mir-calepinage-ready'));
   }
   boot().catch(error=>{const el=$('#calculation-errors');el.hidden=false;el.textContent=error.message||'Le calculateur n’a pas pu démarrer.';});
 })();

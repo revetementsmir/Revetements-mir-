@@ -5,7 +5,7 @@ const {openMirTab}=require('./mir-navigation-helper.cjs');
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright'),{spawn}=require('node:child_process');
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
-const {pointOnDrawing,tapDrawing,drawTwoSides}=require('./mir-draw-freeform-helper.cjs');
+const {pointOnDrawing,tapDrawing,drawTwoSides,revealControl}=require('./mir-draw-freeform-helper.cjs');
 const port=8851,base='http://127.0.0.1:'+port;
 async function ready(){
  for(let i=0;i<80;i++){
@@ -33,32 +33,19 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    const nav=await page.locator('#mir-procurement-tabs button').allTextContents();
    assert.deepEqual(nav,['Créer','Panneaux','Mes pliages','Boutique','Magasin employés','Bons de commande']);
    assert.equal(await page.locator('#mir-guide-steps').count(),0,'ancien assistant retiré');
-   const phone=size.width<=650||size.width<=950&&size.height<=520;
-   assert.equal(await page.locator('#mir-mobile-steps').isVisible(),phone,'4 étapes réservées au téléphone');
+   const phone=size.width<960;
+   assert.ok(await page.locator('#mir-workspace').isVisible(),'Shell commune active');
+   assert.equal(await page.locator('#mir-mobile-steps').isVisible(),false,'Ancienne barre remplacée');
    assert.equal(await page.locator('#production-templates [data-template]').count(),0,'aucun profil prédéfini');
-   assert.equal(await page.locator('.mir-v4-picker').isVisible(),false,'ancien sélecteur masqué');
-   assert.equal(await page.locator('#mir-freeform-toolbar').isVisible(),true,'barre de tracé présente');
-   assert.equal(await page.locator('[data-freeform-redo]').count(),0,'Rétablir supprimé');
-   assert.equal(await page.locator('[data-freeform-add]').count(),0,'Ajouter un côté supprimé');
-   assert.match(await page.locator('[data-freeform-next]').innerText(),phone?/Suivant/:/Continuer/);
-   assert.equal(await page.locator('[data-freeform-next]').isDisabled(),true,'Continuer attend une forme dessinée');
-   assert.equal(await page.locator('#mir-freeform-client-toggle').isChecked(),false,'Boutique décochée');
-   assert.equal(await page.locator('#mir-freeform-store-toggle').isChecked(),false,'Magasin décoché');
-   assert.equal(await page.locator('#mir-freeform-3d').isVisible(),!phone,'3D visible au traçage sur PC/iPad et en confirmation sur téléphone');
-   assert.equal(await page.locator('[data-freeform-undo]').isDisabled(),true,'aucun côté à effacer au départ');
-
-   // Aucune interaction en dehors du vrai SVG ne doit créer de segment.
-   const outsideDrawing=phone&&!(await page.locator('.drawing-head').isVisible())?'#mir-mobile-steps':'.drawing-head';
+   assert.ok(await page.locator('.mir-action-bar').isVisible(),'actions communes');
+   assert.equal(await page.locator('#mir-freeform-client-toggle').isChecked(),false);
+   assert.equal(await page.locator('#mir-freeform-store-toggle').isChecked(),false);
+   assert.equal(await page.locator('.mir-workspace-tools [data-freeform-undo]').isDisabled(),true);
+   assert.equal(await page.locator('.mir-workspace-tools [data-freeform-redo]').isDisabled(),true);
+   const outsideDrawing='.drawing-head';
    await page.locator(outsideDrawing).click({position:{x:8,y:8}});
-   if(!phone){
-    await page.locator('#mir-freeform-3d-canvas').click({position:{x:18,y:18}});
-    await page.locator('#mir-freeform-destination').click({position:{x:7,y:7}});
-   }else{
-    const dimensions=await page.evaluate(()=>({scroll:document.documentElement.scrollHeight,
-      viewport:innerHeight,stage:document.querySelector('#production-drawing').getBoundingClientRect().height}));
-    assert.ok(dimensions.scroll<=dimensions.viewport+4,'tracé téléphone fixe '+JSON.stringify(dimensions));
-    assert.ok(dimensions.stage>120,'surface de dessin tactile exploitable '+JSON.stringify(dimensions));
-   }
+   const dimensions=await page.evaluate(()=>({scroll:document.documentElement.scrollHeight,viewport:innerHeight,stage:document.querySelector('#production-drawing').getBoundingClientRect().height}));
+   assert.ok(dimensions.scroll<=dimensions.viewport+1,'atelier fixe');assert.ok(dimensions.stage>100,'dessin accessible');
    await page.locator('#production-drawing').evaluate(node=>{
     node.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:0,clientY:0}));
    });
@@ -70,7 +57,7 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    assert.equal(await page.locator('#mir-freeform-3d-canvas [data-mir-live-3d="ready"]').count(),1);
 
    const drawingBefore=JSON.stringify((await state(page)).drawPointsMM);
-   for(const selector of (phone?[outsideDrawing]:['.drawing-head','#mir-freeform-3d-canvas','#mir-freeform-destination'])){
+   for(const selector of [outsideDrawing,'.mir-action-bar']){
     await page.locator(selector).click({position:{x:7,y:7}});
     assert.equal(JSON.stringify((await state(page)).drawPointsMM),drawingBefore,'clic hors SVG ne crée pas de côté : '+selector);
    }
@@ -96,7 +83,7 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
      assert.equal(JSON.stringify((await state(page)).drawPointsMM),drawingBefore,'le doigt relâché hors tableau n’ajoute jamais de côté');
    }
 
-   await page.locator('[data-freeform-undo]').click();
+   await page.locator('.mir-workspace-tools [data-freeform-undo]').click();
    assert.equal((await state(page)).drawPointsMM.length,2,'Précédent efface le dernier côté');
    await tapDrawing(page,440,140);
    assert.equal((await state(page)).model.segments.length,2,'nouveau trait créé uniquement sur le tableau');
@@ -105,60 +92,25 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    const geometry=JSON.stringify((await state(page)).model.pointsMM);
    const first=page.locator('#production-dimensions input[data-segment-length="0"]');
    const fraction=page.locator('#production-dimensions input[data-segment-length="0"] + select[data-pick-fraction]');
-   if(phone){
-    await page.locator('[data-freeform-next]').click();
-    assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'2','Étape Mesures');
-    assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'aucun point modifié en passant aux mesures');
-    assert.equal((await state(page)).tool,'select');
-    assert.equal(await page.locator('#mir-v4-dimensions').isVisible(),true,'mesures visibles à l’étape 2');
-    assert.ok(await page.locator('.mir-angle-summary p').count()>0,'angles entre A-B et suivants');
-    await first.fill('');
-    await fraction.selectOption('8');
-    assert.equal(await first.inputValue(),'0.5','la fraction 1/2 devient 0.5');
-    await first.fill('6');
-    await page.locator('[data-freeform-next]').click();
-    assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'3','Étape Finition');
-    assert.equal(await page.locator('.mir-face-choice').count(),2,'deux images des faces');
-    await page.locator('[data-face-select="right"]').click();
-    assert.equal(await page.locator('[data-face-select="right"]').getAttribute('aria-pressed'),'true');
-    await page.locator('[data-freeform-next]').click();
-    assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'4','Étape Confirmation');
-    assert.equal(await page.locator('#mir-freeform-3d').isVisible(),true,'3D visible à la confirmation');
-    await page.locator('[data-freeform-undo]').click();
-    assert.equal(await page.locator('body').getAttribute('data-mir-mobile-step'),'3','Précédent ne détruit pas le dessin');
-    assert.equal(await page.locator('[data-face-select="right"]').getAttribute('aria-pressed'),'true','couleur préservée');
-    await page.locator('[data-freeform-next]').click();
-   }else{
-    await page.locator('[data-freeform-next]').click();
-   }
-   if(phone)assert.equal(await page.locator('#production-dialog').evaluate(node=>node.open),false,'confirmation avant dialogue final');
-   if(phone)await page.locator('[data-freeform-next]').click();
-   assert.equal(await page.locator('#production-dialog').evaluate(node=>node.open),true,'dialogue final après Continuer');
-   assert.match(await page.locator('#production-dialog-title').textContent(),/moulure/i);
-   assert.equal(await page.locator('[data-mir-continue-action]').count(),3,'enregistrer, bon existant, nouveau bon');
+   await page.locator('.mir-workspace-tools [data-freeform-finish]').click();
+   assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'terminer ne modifie aucun point');
+   await page.locator('.mir-action-bar .mir-workspace-primary').click();
+   assert.equal(await page.locator('#production-dialog').evaluate(node=>node.open),true,'choix explicite avant commande');
+   assert.equal(await page.locator('[data-mir-continue-action]').count(),3,'modèle, bon existant, nouveau bon');
    assert.equal(await page.locator('#mir-continue-save').isChecked(),false,'pas de sauvegarde implicite');
-   if(!phone)assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'Continuer ne modifie aucun côté');
-   assert.equal((await state(page)).tool,'select','les cotes restent modifiables');
    await page.getByRole('button',{name:'Retour au dessin',exact:true}).click();
-   if(!phone){
-    assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'fermer sans toucher au dessin');
-    assert.equal(await page.locator('#mir-v4-dimensions').evaluate(node=>node.open),true,'mesures accessibles');
-    await first.fill('');
-    await fraction.selectOption('8');
-    assert.equal(await first.inputValue(),'0.5','fraction 1/2 = 0.5');
-    await first.fill('6');
-   }
-
+   assert.equal(JSON.stringify((await state(page)).model.pointsMM),geometry,'retour sans modification');
+   await revealControl(page,'[data-segment-length="0"]');
+   await first.fill('');await fraction.selectOption('8');assert.equal(await first.inputValue(),'0.5','fraction 1/2');await first.fill('6');
    const positions=await page.evaluate(()=>{
     const box=selector=>{const b=document.querySelector(selector).getBoundingClientRect();return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,width:b.width,height:b.height};};
     const root=document.documentElement;
     return {scrollWidth:root.scrollWidth,viewport:innerWidth,draw:box('.drawing-card'),settings:box('.config-card')};
    });
    assert.ok(positions.scrollWidth<=positions.viewport+2,'pas de débordement horizontal '+size.name+' '+JSON.stringify(positions));
-   if(!phone)assert.ok(positions.settings.left>=positions.draw.right-5,'deux colonnes PC/tablette');
-   else assert.ok(positions.settings.top>=positions.draw.bottom-10,'panneau sous le dessin à la confirmation mobile');
+   if(size.width>=960)assert.ok(positions.settings.left>=positions.draw.right-5,'deux colonnes PC/tablette');
    if(size.width===1440){
-    const scroll=await page.evaluate(()=>({body:getComputedStyle(document.body).overflowY,config:getComputedStyle(document.querySelector('.config-card')).overflowY,
+    const scroll=await page.evaluate(()=>({body:getComputedStyle(document.body).overflowY,config:getComputedStyle(document.querySelector('.mir-inspector-content')).overflowY,
       mainBottom:document.querySelector('#production-main').getBoundingClientRect().bottom,viewport:innerHeight}));
     assert.equal(scroll.body,'hidden','PC fixe sans défilement de page');
     assert.equal(scroll.config,'auto','réglages défilables dans leur panneau');
@@ -166,8 +118,11 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    }
    await page.screenshot({path:path.join(__dirname,'../artifacts/mir-admin-guide-'+size.name+'.png'),fullPage:true});
    if(size.name==='bureau'){
+    await revealControl(page,'#mir-freeform-store-toggle');
     await page.locator('#mir-freeform-store-toggle').check();
-    await page.locator('#mir-freeform-save').click();
+    await page.locator('.mir-inspector-heading button').click();
+    await page.locator('.mir-action-bar .mir-workspace-primary').click();
+    await page.locator('[data-mir-continue-action="save"]').click();
     await page.locator('#save-production-template').waitFor({state:'visible'});
     assert.equal(await page.locator('#save-production-template input[name="store"]').isChecked(),true,'Magasin repris de son interrupteur');
     assert.equal(await page.locator('#save-production-template input[name="client"]').isChecked(),false,'Boutique reste indépendante');

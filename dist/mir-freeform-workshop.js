@@ -5,7 +5,7 @@ if(new URLSearchParams(location.search).get('mode')==='client')return;
 const $=(selector,root=document)=>root.querySelector(selector);
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let yaw=-42,pitch=24,drag=null,current=null,wasActive=false,lastFaceView='',mobileStep=1;
-const phoneLayout=()=>matchMedia('(max-width:650px), (max-width:950px) and (max-height:520px) and (pointer:coarse)').matches;
+const phoneLayout=()=>!document.documentElement.hasAttribute('data-mir-workspace-shell')&&matchMedia('(max-width:650px), (max-width:950px) and (max-height:520px) and (pointer:coarse)').matches;
 const mobileStepNames=['Tracé libre','Mesures et angles','Matériau et couleur','Confirmation 2D/3D'];
 function closeMobileSections({restoreFocus=false}={}){
  const menu=$('#mir-mobile-section-menu'),toggle=$('#mir-mobile-section-toggle');
