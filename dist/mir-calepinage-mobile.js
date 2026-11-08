@@ -131,7 +131,18 @@
   const count=document.createElement('p');count.className='mir-cal-mobile-count';
   count.id='mir-cal-mobile-panel-count';
   $('.production-heading')?.after(count);
-  $('#mir-cal-mobile-example')?.addEventListener('click',()=>$('#load-example')?.click());
+  // Ne jamais proposer l'exemple avant la fin du chargement du calculateur.
+  // Le moteur met `disabled=false` sur le bouton nouveau mur une fois l'état IndexedDB restauré.
+  const example=$('#mir-cal-mobile-example'),starter=$('#new-traced-section');
+  if(example&&starter){
+    const syncReady=()=>{example.disabled=starter.disabled;};
+    syncReady();
+    new MutationObserver(syncReady).observe(starter,{attributes:true,attributeFilter:['disabled']});
+    example.addEventListener('click',()=>{
+      if(starter.disabled){advice('Le calculateur charge le dossier. Réessaie une fois le bouton disponible.');return;}
+      $('#load-example')?.click();
+    });
+  }
   nav.addEventListener('click',e=>{
    const button=e.target.closest('[data-mir-cal-stage]');
    if(button)stepTo(button.dataset.mirCalStage);
