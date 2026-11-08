@@ -30,7 +30,7 @@ async function state(page){return page.evaluate(()=>window.MIRProductionWorkspac
    await page.goto(base+'/production.html',{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace?.version&&window.MIRAdminWizard?.active,{timeout:30000});
    const nav=await page.locator('#mir-procurement-tabs button').allTextContents();
-   assert.deepEqual(nav,['Créer','Mes pliages','Boutique','Magasin employés','Bons de commande']);
+   assert.deepEqual(nav,['Créer','Panneaux','Mes pliages','Boutique','Magasin employés','Bons de commande']);
    assert.equal(await page.locator('#mir-guide-steps').count(),0,'ancien assistant retiré');
    const phone=size.width<=650||size.width<=950&&size.height<=520;
    assert.equal(await page.locator('#mir-mobile-steps').isVisible(),phone,'4 étapes réservées au téléphone');

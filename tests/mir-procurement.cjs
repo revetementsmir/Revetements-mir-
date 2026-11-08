@@ -79,7 +79,7 @@ test('Page admin charge les scripts et styles du module',()=>{
 test('Accès direct aux bons et fournisseurs sur la page principale',()=>{
  const script=fs.readFileSync(path.join(__dirname,'../dist/mir-procurement.js'),'utf8');
  assert.ok(script.includes("const requestedView=new URLSearchParams(win.location.search).get('view')"));
- assert.ok(script.includes("['orders','suppliers','models'].includes(requestedView)"));
+ assert.ok(script.includes("['orders','suppliers','models','panels'].includes(requestedView)"),'Accès direct aux bons, fournisseurs, modèles et nouvel onglet Panneaux');
  assert.ok(!script.includes("win.location.href='production.html?view=models'"));
 });
 console.log('MIR procurement: '+n+' tests OK');

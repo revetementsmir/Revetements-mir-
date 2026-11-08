@@ -42,6 +42,15 @@
       const m=kind==='panel'?model.buildPanel(i.spec):model.buildProfile(i.spec);
       if(!m.valid||!m.complete)throw Error('Pièce incomplète : '+i.id+' — confirmez les cotes, le métal, les lèvres et la couleur avant le PDF.');
     }
+    // Panel supplier sheets are one exact drawing per item, not fragmented
+    // productionPages rows that repeat the panel with 'SUITE'. Pure-profile
+    // supplier orders intentionally keep their existing bending-sheet output.
+    if(po.items.some(item=>(item?.spec?.kind||item?.kind)==='panel')){
+      const supplierPanels=(typeof globalThis!=='undefined'?globalThis.MIRPanelPOPDF:null)||
+        (typeof module==='object'&&module.exports?require('./mir-panel-po-pdf.js'):null);
+      if(!supplierPanels?.makeFaces)throw Error('Le modèle du bon de panneaux est indisponible. Rechargez la page.');
+      return supplierPanels.makeFaces(po,model);
+    }
     const lines=['LES REVÊTEMENTS MIR','BON DE COMMANDE '+po.poNumber+' — R'+po.revision,
       'Fournisseur : '+po.supplier.name,'Courriel : '+po.supplier.email,'Chantier : '+po.job,
       'Livrer à : '+po.shipTo,'Date souhaitée : '+(po.requestedDate||'À confirmer'),
