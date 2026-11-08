@@ -4,12 +4,65 @@
  if(!config?.enabled||!/^sb_publishable_[A-Za-z0-9_-]+$/.test(config.publishableKey||'')){status('Espace partagé non activé. Le raccordement Supabase reste à valider.');return;}
  if(!window.MIRSupabase?.createClient){status('Le module de connexion n’a pas pu être chargé. Rechargez cette page.');return;}
  let snapshot,readSequence=0;
- function clearWorkspace(){readSequence++;snapshot=null;$('#workspace').hidden=true;for(const id of ['#catalogue','#orders','#job-admin','#organization'])$(id).replaceChildren();$('#import').value='';$('#retry').hidden=true;$('#login').hidden=false;}
+ function clearWorkspace(){readSequence++;snapshot=null;$('#workspace').hidden=true;for(const id of ['#catalogue','#orders','#job-admin','#bend-tariff-admin','#organization'])$(id).replaceChildren();$('#import').value='';$('#retry').hidden=true;$('#login').hidden=false;}
  const client=MIRSharedClient.create({sdk:window.MIRSupabase.createClient(config.supabaseUrl,config.publishableKey),storage:localStorage,onSessionInvalidated:clearWorkspace});
  const text=(tag,value,parent)=>{const node=document.createElement(tag);node.textContent=value;parent.append(node);return node;};
  const org=()=>$('#organization').value;
  const requestedDestination=new URLSearchParams(location.search).get('destination'),destination=['boutique','store'].includes(requestedDestination)?requestedDestination:null;
  if(destination)document.querySelector('h1').textContent=destination==='boutique'?'Boutique partagée':'Magasin employés partagé';
+ const cad=cents=>(cents/100).toFixed(2)+' $ CA';
+ function bendPrice(tariff,metal,fixedCents,area,folds){
+  const base=fixedCents??(area*tariff.area_rate*100+folds*tariff.bend_cents);
+  const amount=base*(1+(metal==='aluminium'?tariff.aluminum_basis_points/10000:0));
+  const cents=Math.round(amount+Number.EPSILON*amount*4);
+  return cents>=1&&cents<=10000000?cents:null;
+ }
+ function numberInput(parent,label,value,{step='1',min='0',max}={}){
+  const input=document.createElement('input');
+  input.type='number';input.inputMode='decimal';input.required=true;
+  input.min=min;input.step=step;if(max)input.max=max;input.value=value??'';
+  text('label',label,parent).append(input);return input;
+ }
+ function renderBendTariff(tariff,organization){
+  const target=$('#bend-tariff-admin');target.replaceChildren();
+  if(!tariff||snapshot.role!=='admin'||destination==='store')return;
+  const article=text('article','',target);text('h2','Tarifs de la Boutique de pliages',article);
+  text('p','Une pièce est facturée sur 10 pi, même si elle est coupée plus courte.',article);
+  const form=text('form','',article);
+  const rate=numberInput(form,'Surface ($ CA / po²)',tariff.area_rate,{step:'0.000001',min:'0.000001',max:'1000'});
+  const bend=numberInput(form,'Prix par pli ($ CA)',tariff.bend_cents/100,{step:'0.01',max:'10000'});
+  const markup=numberInput(form,'Majoration aluminium (%)',tariff.aluminum_basis_points/100,{step:'0.01',max:'1000'});
+  const quick=text('button','+10 % aluminium',form);quick.type='button';
+  const delivery=numberInput(form,'Frais de livraison par commande ($ CA)',tariff.delivery_cents/100,{step:'0.01',max:'10000'});
+  text('p','Livraison gratuite au-delà de 300 $ avant taxes dans les 40 premiers km du 1653, avenue des Affaires, Québec. Au-delà de 80 km, sur soumission.',form);
+  const preview=text('p','',form);preview.setAttribute('role','status');
+  const feedback=text('p','',form);feedback.setAttribute('role','status');
+  const save=text('button','Appliquer les tarifs',form);save.type='submit';save.className='shared-save';
+  const values=()=>({area_rate:rate.valueAsNumber,bend_cents:Math.round(bend.valueAsNumber*100),
+   aluminum_basis_points:Math.round(markup.valueAsNumber*100),delivery_cents:Math.round(delivery.valueAsNumber*100)});
+  function update(){
+   if(!form.checkValidity()){preview.textContent='Vérifiez les montants saisis.';return;}
+   const before=bendPrice(tariff,'aluminium',null,600,1),after=bendPrice(values(),'aluminium',null,600,1);
+   preview.textContent=after===null?'Exemple de prix hors limite.':'Exemple aluminium (600 po² et 1 pli) · '+(before===null?'Sur demande':cad(before))+' → '+cad(after);
+  }
+  quick.onclick=()=>{markup.value='10';update();};form.addEventListener('input',update);update();
+  form.onsubmit=async event=>{
+   event.preventDefault();if(save.disabled)return;save.disabled=true;
+   try{
+    await client.saveBendTariff(organization,tariff.revision,values());
+    if(org()===organization){await refresh();status('Tarifs appliqués à la Boutique de pliages.');}
+   }catch(error){feedback.textContent=error.message;}
+   finally{save.disabled=false;}
+  };
+ }
+ function renderDelivery(article,order){
+  const saved=order.snapshot.delivery;if(!saved)return;
+  text('p','Livraison · '+[saved.address.line1,saved.address.line2,saved.address.city,saved.address.postalCode].filter(Boolean).join(', '),article);
+  if(saved.status==='confirmed'){
+   text('p',saved.feeCents===0?'Livraison gratuite':cad(saved.feeCents)+' de livraison',article);
+   text('p','Total avant taxes · '+cad(order.snapshot.totalCents+saved.feeCents),article);
+  }else text('p',saved.status==='outside-zone'?'Livraison au-delà de 80 km · Sur soumission':'Livraison sur soumission · Adresse ou tarif à vérifier',article);
+ }
  function openLocalRequest(request){
   const key='mir_production_requests_v1',raw=localStorage.getItem(key),saved=raw?JSON.parse(raw):{version:1,requests:[]};
   if(saved.version!==1||!Array.isArray(saved.requests))throw Error('Anciennes données non reconnues : sauvegarde nécessaire');
@@ -19,11 +72,12 @@
   location.href='production.html?shared-request='+encodeURIComponent(request.id);
  }
  async function refresh(){
-  const sequence=++readSequence,requestedOrg=org(),next=await client.snapshot(requestedOrg);if(sequence!==readSequence||requestedOrg!==org())return;snapshot=next;$('#import-label').hidden=snapshot.role!=='admin';$('#catalogue').replaceChildren();$('#orders').replaceChildren();$('#job-admin').replaceChildren();
+  const sequence=++readSequence,requestedOrg=org(),next=await client.snapshot(requestedOrg);if(sequence!==readSequence||requestedOrg!==org())return;snapshot=next;$('#import-label').hidden=snapshot.role!=='admin';$('#catalogue').replaceChildren();$('#orders').replaceChildren();$('#job-admin').replaceChildren();renderBendTariff(snapshot.bendTariff,requestedOrg);
   if(snapshot.role==='admin'){const f=document.createElement('form'),name=document.createElement('input'),employee=document.createElement('select');name.placeholder='Nom du chantier';name.required=true;for(const m of snapshot.members.filter(m=>m.role==='employee')){const o=document.createElement('option');o.value=m.id;o.textContent=m.email||('Employé '+m.id);employee.append(o);}f.append(name,employee);text('button','Créer / affecter le chantier',f);$('#job-admin').append(f);f.onsubmit=async e=>{e.preventDefault();try{await client.assignJob(org(),name.value,employee.value);await refresh();}catch(e){status(e.message);}};}
   $('#all-models').hidden=snapshot.role!=='admin'||!destination;
   const destinationAllowed=!destination||snapshot.role==='admin'||(destination==='boutique'&&snapshot.role==='client')||(destination==='store'&&snapshot.role==='employee');
   const catalogue=destinationAllowed?snapshot.catalogue.filter(model=>!destination||(!model.archived&&(destination==='boutique'?model.boutique:model.store))):[];
+  const distanceRequests=new Map();
   for(const model of catalogue){
    const article=document.createElement('article');article.dataset.revision=model.revision;article.dataset.modelId=model.id;$('#catalogue').append(article);text('h2',model.name,article);
    text('p','Version '+model.version+' · '+model.conditions,article);
@@ -44,9 +98,10 @@
      text('p','Le bon de travail et son PDF seront préparés sur cet appareil. Aucun envoi automatique.',article);
     }
     const form=document.createElement('form');article.append(form);const controls={};
-    for(const [key,label,value,type] of [['boutique','Boutique',model.boutique,'checkbox'],['store','Magasin employés',model.store,'checkbox'],['supplier_po','Bons fournisseurs',model.supplierPo,'checkbox'],['archived','Archivé',model.archived,'checkbox'],['aluminum_cents','Prix aluminium en cents / 10 pi',model.aluminumCents,'number'],['steel_cents','Prix acier en cents / 10 pi',model.steelCents,'number'],['sale_length_in','Longueur de vente (120 po; 144 uniquement J à soffite)',model.saleLengthIn,'number'],['conditions','Conditions',model.conditions,'text']]){
+    for(const [key,label,value,type] of [['boutique','Boutique',model.boutique,'checkbox'],['store','Magasin employés',model.store,'checkbox'],['supplier_po','Bons fournisseurs',model.supplierPo,'checkbox'],['archived','Archivé',model.archived,'checkbox'],['aluminum_cents',snapshot.bendTariff?'Prix fixe aluminium en cents / 10 pi (facultatif)':'Prix aluminium en cents / 10 pi',model.aluminumCents,'number'],['steel_cents',snapshot.bendTariff?'Prix fixe acier en cents / 10 pi (facultatif)':'Prix acier en cents / 10 pi',model.steelCents,'number'],['sale_length_in','Longueur de vente (120 po; 144 uniquement J à soffite)',model.saleLengthIn,'number'],['conditions','Conditions',model.conditions,'text']]){
      const input=document.createElement('input');input.type=type;input.value=value??'';input.checked=value===true;if(type==='number'){input.min='1';input.step='1';}text('label',label,form).append(input);controls[key]=input;
     }
+    if(snapshot.bendTariff)text('p','Laissez le prix fixe vide pour utiliser le tarif général. La majoration aluminium s’applique aussi au prix fixe.',form);
     const measureControls={};for(const field of template.fields||[]){if(field.key==='length')continue;const row=text('label',field.label||field.key,form),value=document.createElement('input'),lock=document.createElement('input');value.value=model.standards[field.key]??model.locks[field.key]??'';value.placeholder='Mesure standard, ex. 3 1/2';lock.type='checkbox';lock.checked=Object.hasOwn(model.locks,field.key);row.append(value);text('span','Verrouiller cette cote',row).append(lock);measureControls[field.key]={value,lock};}
     let readRules=null;
     if(snapshot.capabilities?.publicationRules){
@@ -69,20 +124,88 @@
    text('p','Cotes en pouces — fractions acceptées, par exemple 3 1/2.',form);const measures={...model.standards,...model.locks},fields={};
    for(const field of template.fields||[]){const label=text('label',field.label||field.key,form);const input=document.createElement('input');input.value=field.key==='length'?String(model.saleLengthIn):measures[field.key]??'';input.required=field.required!==false;input.disabled=field.key==='length'||Object.hasOwn(model.locks,field.key)||(Array.isArray(rules.measure_edit_roles)&&!rules.measure_edit_roles.includes(snapshot.role));label.append(input);fields[field.key]=input;}
    const chantier=document.createElement('select');if(snapshot.role==='employee'){chantier.required=true;const empty=document.createElement('option');empty.value='';empty.textContent='Choisir un chantier affecté';chantier.append(empty);for(const job of snapshot.jobs){const o=document.createElement('option');o.value=job.id;o.textContent=job.name;chantier.append(o);}text('label','Chantier affecté',form).append(chantier);}
+   const tariff=snapshot.role==='client'?snapshot.bendTariff:null;
+   const addresses=snapshot.deliveryAddresses||[];
+   let deliveryChoice,deliveryPrice,deliveryFee=null,deliveryLoading=false,distance=null,distanceSequence=0;
+   const selectedAddress=()=>addresses.find(a=>a.id===deliveryChoice?.value);
+   if(tariff){
+    text('p','Prix par pièce facturé sur 10 pi, même après coupe.',form);
+    deliveryChoice=document.createElement('select');
+    text('option','Ramassage au bureau',deliveryChoice).value='pickup';
+    for(const address of addresses)text('option','Livrer au '+address.label,deliveryChoice).value=address.id;
+    if(addresses.length)deliveryChoice.value=addresses[0].id;
+    text('label','Réception',form).append(deliveryChoice);
+    text('a',addresses.length?'Gérer mes adresses':'Ajouter une adresse de livraison dans Mon compte',form).href='chantier.html';
+    deliveryPrice=text('p','',form);deliveryPrice.setAttribute('aria-live','polite');
+    text('p','Livraison jusqu’à 80 km du 1653, avenue des Affaires, Québec · '+cad(tariff.delivery_cents)+
+      ' par commande. Gratuite au-delà de 300 $ avant taxes dans les 40 premiers km.',form);
+    const source=text('a','Localisation des adresses : Adresses Québec (MRNF)',form);
+    source.href='https://www.donneesquebec.ca/recherche/dataset/adresses-quebec/resource/64cbcdfc-4dd6-42e7-9a5d-489e775da83b';
+   }
    const price=text('p','',form),drawing=document.createElement('div'),volume=document.createElement('div');let volumeOpen=false;form.append(drawing,volume);const toggle=text('button','Afficher la 3D',form);toggle.type='button';toggle.onclick=()=>{volumeOpen=!volumeOpen;toggle.textContent=volumeOpen?'Masquer la 3D':'Afficher la 3D';preview();};
    function preview(){const values=Object.fromEntries(Object.entries(fields).map(([k,v])=>[k,v.value]));
     const result=MIRProduction.instantiateTemplate(template,{measurements:values,unit:'in',length:model.saleLengthIn,quantity:Number(quantity.value),material:{type:metal.value},finish:{name:color.value||'À valider'}});
     drawing.innerHTML=result.ok?MIRProduction.profileSVG(result.spec,{width:620,height:260}):'';volume.innerHTML=volumeOpen&&result.ok?MIRProductionVolume.render(MIRProduction.buildProfile(result.spec),{width:620,height:320}):'';
-    const cents=metal.value==='aluminium'?model.aluminumCents:model.steelCents;price.textContent=snapshot.role==='employee'?'Demande interne — disponibilité à confirmer':cents==null||model.saleLengthIn!==120?'Soumission requise':(cents/100).toFixed(2)+' $ CA / 10 pi · total de référence '+((cents*Number(quantity.value))/100).toFixed(2)+' $ CA · prix revérifié au serveur';
+    const fixedCents=metal.value==='aluminium'?model.aluminumCents:model.steelCents;
+    const count=Number(quantity.value);
+    let cents=model.saleLengthIn===120?fixedCents:null;
+    if(tariff){
+     if(!result.ok||!Number.isInteger(count)||count<1||count>10000){
+      price.textContent='Renseignez les cotes et la quantité pour voir le prix.';
+      deliveryPrice.textContent=deliveryLoading?'Calcul de la distance…':'';return false;
+     }
+     const profile=result.model.kind==='profile';
+     const area=profile?result.model.finishedSegmentSumMM/25.4*120:0;
+     const folds=profile?result.model.bends.filter(b=>b.turnDeg!==0).length:0;
+     cents=profile||fixedCents!=null?bendPrice(tariff,metal.value,fixedCents,area,folds):null;
+    }
+    price.textContent=snapshot.role==='employee'?'Demande interne — disponibilité à confirmer':
+     cents==null?'Soumission requise':cad(cents)+' / pièce · '+cad(cents*count)+' avant taxes et livraison · prix revérifié au serveur';
+    if(deliveryPrice){
+     const subtotal=cents==null?null:cents*count;
+     deliveryFee=null;
+     if(!selectedAddress())deliveryPrice.textContent='';
+     else if(deliveryLoading)deliveryPrice.textContent='Calcul de la distance…';
+     else if(distance===null||distance>80||subtotal===null)deliveryPrice.textContent='Livraison sur soumission';
+     else{
+      deliveryFee=distance<=40&&subtotal>30000?0:tariff.delivery_cents;
+      deliveryPrice.textContent=(deliveryFee===0?'Livraison gratuite':cad(deliveryFee)+' de livraison')+
+        ' · '+cad(subtotal+deliveryFee)+' avant taxes';
+     }
+    }
+    return true;
    }
-   form.addEventListener('input',preview);preview();const submit=text('button','Transmettre pour validation',form);submit.type='submit';
-   form.onsubmit=async e=>{e.preventDefault();const button=form.querySelector('button[type=submit]');button.disabled=true;try{
+   async function updateDistance(){
+    const sequence=++distanceSequence,address=selectedAddress();
+    distance=null;deliveryLoading=!!address;preview();
+    if(!address)return;
+    try{
+     if(!distanceRequests.has(address.id))distanceRequests.set(address.id,client.deliveryDistance(requestedOrg,address));
+     const km=await distanceRequests.get(address.id);
+     if(sequence===distanceSequence&&article.isConnected&&requestedOrg===org())distance=km===null?null:Number(km);
+    }catch(error){
+     if(sequence===distanceSequence&&article.isConnected&&error.code==='PT409')status(error.message);
+    }finally{
+     if(sequence===distanceSequence&&article.isConnected){deliveryLoading=false;preview();}
+    }
+   }
+   form.addEventListener('input',preview);
+   if(deliveryChoice){deliveryChoice.addEventListener('change',updateDistance);void updateDistance();}else preview();
+   const submit=text('button','Transmettre pour validation',form);submit.type='submit';
+   form.onsubmit=async e=>{e.preventDefault();if(tariff&&(!preview()||deliveryLoading))return;const button=form.querySelector('button[type=submit]');button.disabled=true;try{
     const configuration={metal:metal.value,color:color.value,quantity:Number(quantity.value),measures:Object.fromEntries(Object.entries(fields).map(([k,v])=>[k,Object.hasOwn(model.locks,k)?model.locks[k]:v.value]))};
     if(snapshot.role==='employee')configuration.chantier=chantier.value;
+    if(tariff)configuration.tariffRevision=tariff.revision;
+    const address=selectedAddress();
+    if(address)Object.assign(configuration,{deliveryAddressId:address.id,deliveryAddressVersion:address.version,deliveryFeeCents:deliveryFee});
     const id=await client.submit(org(),model,configuration);status('Demande enregistrée : '+id);await refresh();
-   }catch(error){status('Non confirmé : '+error.message+' Votre demande reste conservée pour reprise.');$('#retry').hidden=false;}finally{button.disabled=false;}};
+   }catch(error){
+    if(error.code==='PT409'){await refresh();status(error.message+' Vérifiez le total avant de renvoyer la demande.');}
+    else{status('Non confirmé : '+error.message+' Votre demande reste conservée pour reprise.');$('#retry').hidden=false;}
+   }finally{button.disabled=false;}};
   }
   for(const order of snapshot.orders){const article=document.createElement('article');$('#orders').append(article);text('h3',order.id+' · '+(order.status==='draft'?'À valider par MIR':order.status),article);const request=order.snapshot,configuration=request.configuration||{};text('p','Quantité : '+(configuration.quantity??'À confirmer')+' · Métal : '+(configuration.metal||'À confirmer')+' · Couleur : '+(configuration.color||'À confirmer'),article);text('p','Cotes : '+Object.entries(configuration.measures||{}).map(([key,value])=>key+' = '+value).join(' · '),article);text('p',request.totalCents==null?'Demande de validation — tarif et disponibilité à confirmer':'Montant de référence : '+(request.totalCents/100).toFixed(2)+' $ CA · conditions de la demande conservées',article);
+   renderDelivery(article,order);
    if(snapshot.role==='admin'){
     const button=text('button','Préparer une copie dans les bons de pliage',article);button.onclick=()=>{try{
      const s=order.snapshot,c=s.configuration,t=s.specification.template||s.specification;
@@ -98,7 +221,7 @@
  $('#login').hidden=false;$('#login').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{await client.login(f.get('email'),f.get('password'));e.target.reset();await start();}catch(error){status(error.message);}};
  $('#import').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>3*1024*1024)throw Error('Sauvegarde trop volumineuse (maximum 3 Mo)');const original=await file.text(),records=MIRSharedClient.readModelBackup(original,window.MIRTemplateBackup);let n=0;for(const record of records){await client.importMaster(org(),record);n++;status(n+' modèle(s) importé(s). La sauvegarde originale reste intacte.');}await refresh();}catch(error){status('Import interrompu, reprise possible sans doublon : '+error.message);}};
  $('#refresh').onclick=()=>refresh().catch(e=>status('Actualisation impossible : '+e.message));$('#organization').onchange=$('#refresh').onclick;
- $('#retry').onclick=async()=>{try{const p=await client.pending(org());if(p){await client.submit(org(),p.model,p.configuration);await refresh();}}catch(e){status(e.message);}};
+ $('#retry').onclick=async()=>{try{const p=await client.pending(org());if(p){await client.submit(org(),p.model,p.configuration);await refresh();}}catch(e){if(e.code==='PT409')await refresh();status(e.message);}};
  $('#logout').onclick=async()=>{clearWorkspace();try{await client.logout();status('Déconnexion effectuée sur cet appareil.');}catch(e){status('Données masquées. Déconnexion non confirmée : '+e.message);}};
  try{await start();}catch(e){status(e.message);}
 })().catch(()=>{document.querySelector('#status').textContent='Impossible de démarrer la connexion. Rechargez cette page.';});

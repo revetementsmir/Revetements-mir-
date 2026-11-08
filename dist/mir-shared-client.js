@@ -20,14 +20,21 @@ function create({sdk,storage,onSessionInvalidated=()=>{}}){
   let pending=JSON.parse(storage.getItem(key)||'null');
   if(pending&&pending.signature!==signature)throw Error('Une demande attend confirmation. Reprenez-la avant de changer son contenu.');
   if(!pending){pending={signature,requestId:globalThis.crypto.randomUUID(),model,configuration};storage.setItem(key,JSON.stringify(pending));}
-  const id=await rpc('mir_submit_request',{org,request_id:pending.requestId,model:model.id,publication_revision:model.revision,configuration});
-  storage.removeItem(key);return id;
+  try{
+   const id=await rpc('mir_submit_request',{org,request_id:pending.requestId,model:model.id,publication_revision:model.revision,configuration});
+   storage.removeItem(key);return id;
+  }catch(error){
+   if(error.code==='PT409'&&JSON.parse(storage.getItem(key)||'null')?.requestId===pending.requestId)storage.removeItem(key);
+   throw error;
+  }
  },
  async pending(org){await verify();return JSON.parse(storage.getItem('mir_shared_pending_'+identity+'_'+org)||'null');},
  async assignJob(org,job_name,employee){await verify();return rpc('mir_assign_job',{org,job_name,employee});},
  async importMaster(org,record){await verify();return rpc('mir_import_master',{org,record});},
  async addVersion(org,model,template){await verify();return rpc('mir_add_master_version',{org,model:model.id,expected_revision:model.revision,template});},
  async publish(org,model,settings){await verify();return rpc('mir_admin_publish_model',{org,model:model.id,expected_revision:model.revision,settings});},
+ async saveBendTariff(org,revision,settings){await verify();return rpc('mir_admin_save_bend_tariff',{org,expected_revision:revision,settings});},
+ async deliveryDistance(org,address){await verify();return rpc('mir_boutique_delivery_distance',{org,address_id:address.id,address_version:address.version});},
  async logout(){generation++;identity=null;onSessionInvalidated();const {error}=await sdk.auth.signOut({scope:'local'});if(error)throw error;},
  dispose(){generation++;identity=null;subscription?.data?.subscription?.unsubscribe();}
  };

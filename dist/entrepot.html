@@ -6,14 +6,14 @@
  <link rel="stylesheet" href="mir-home-premium.css?v=20261105">
  <link rel="stylesheet" href="mir-client-header.css?v=1-harmony">
  <link rel="stylesheet" href="mir-client-signature.css?v=1-harmony">
- <link rel="stylesheet" href="entrepot.css?v=1">
+ <link rel="stylesheet" href="entrepot.css?v=pr64-label-1">
  <script src="shared-config.js" defer></script>
  <script src="vendor/supabase-client.js" defer></script>
  <script src="vendor/qrcode.min.js" defer></script>
  <script src="employee-store-model.js" defer></script>
  <script src="mir-warehouse-core.js?v=1" defer></script>
  <script src="mir-warehouse-client.js?v=1" defer></script>
- <script src="entrepot-app.js?v=1" defer></script>
+ <script src="entrepot-app.js?v=pr64-label-article-template-1" defer></script>
  <script src="mir-warehouse-coordination-ui.js?v=1" defer></script>
 <link rel="stylesheet" href="mir-harmony.css?v=2-workspace-20261108"><script defer src="mir-harmony.js?v=2-workspace-20261108"></script></head>
 <body class="mir-signature mir-warehouse">
@@ -85,7 +85,7 @@
      <div id="wh-results"></div>
     </section>
     <section class="wh-card" id="wh-register-section" hidden>
-     <h2>Ajouter une référence à l’inventaire</h2>
+     <h2>Ajouter un article</h2>
      <p class="wh-hint">Réservé à l’Admin MIR. Réutiliser la référence exacte de l’article ou de la variante, sans remplacer son QR historique.</p>
      <div class="wh-catalogue-helper" id="wh-catalogue-helper">
       <h3>Reprendre une référence du catalogue MIR</h3>
@@ -99,9 +99,11 @@
       <p class="wh-hint">Utilise la même identité de variante que les commandes employés. Aucun stock n’est inventé ni importé automatiquement.</p>
      </div>
      <form id="wh-register-form">
+      <h3>Fiche article et étiquette</h3>
+      <p class="wh-hint">Le numéro d’item est généré à l’enregistrement si le champ est vide. Le QR permanent est prêt à imprimer sur la fiche.</p>
       <label>Famille<select name="kind"><option value="hardware">Quincaillerie et accessoires</option><option value="bending">Pliage enregistré</option></select></label>
-      <label>Référence de catalogue exacte<input name="sourceRef" required maxlength="300"></label>
-      <label>SKU entrepôt<input name="sku" required maxlength="80"></label>
+      <label>Référence existante ou variante<input name="sourceRef" maxlength="300" placeholder="Facultative pour un nouvel article de quincaillerie"></label>
+      <label>Numéro d’item (SKU)<input name="sku" maxlength="80" placeholder="Généré automatiquement"></label>
       <label>Nom<input name="name" required maxlength="180"></label>
       <label>Unité<input name="unit" value="pièce" required maxlength="40"></label>
       <label>Pas de quantité<input name="step" type="number" min="0.001" max="1000" step="0.001" value="1" required></label>

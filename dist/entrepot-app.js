@@ -291,14 +291,23 @@ $('#wh-move-form').addEventListener('submit',async event=>{
 });
 $('#wh-register-form').addEventListener('submit',async event=>{
  event.preventDefault();if(!activeOrg()?.isAdmin)return fail(Error('Admin MIR requis pour créer une fiche.'));
- const values=new FormData(event.currentTarget);
+ const form=event.currentTarget,submit=form.querySelector('[type=submit]'),values=new FormData(form),selectedOrg=org();
+ if(submit.disabled)return;
+ submit.disabled=true;
  try{
-  const result=await client.register(org(),{kind:values.get('kind'),sourceRef:String(values.get('sourceRef')||'').trim(),
-   sku:String(values.get('sku')||'').trim(),name:String(values.get('name')||'').trim(),
-   unit:String(values.get('unit')||'').trim(),step:Number(values.get('step'))});
-  status('Référence enregistrée avec son QR permanent : '+result.sku);
-  event.currentTarget.reset();await openRef(result.qrToken);
+  const kind=values.get('kind'),name=String(values.get('name')||'').trim(),unit=String(values.get('unit')||'').trim();
+  let sourceRef=String(values.get('sourceRef')||'').trim(),sku=String(values.get('sku')||'').trim();
+  if(!sourceRef&&kind==='bending')throw Error('Indique la référence exacte du modèle de pliage et de sa version.');
+  const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([kind,sourceRef||[name.normalize('NFC').toLowerCase(),unit.toLowerCase()]])));
+  const code=Array.from(new Uint8Array(digest).slice(0,8),byte=>byte.toString(16).padStart(2,'0')).join('').toUpperCase();
+  if(!sourceRef)sourceRef='mir-article-'+code;
+  if(!sku)sku='MIR-'+code;
+  if(org()!==selectedOrg)throw Error('Organisation modifiée. Vérifie la fiche avant de réessayer.');
+  const result=await client.register(selectedOrg,{kind,sourceRef,sku,name,unit,step:Number(values.get('step'))});
+  status('Article enregistré avec son QR permanent : '+result.sku);
+  form.reset();await openRef(result.qrToken);$('#wh-print-label').scrollIntoView({block:'center',behavior:'instant'});
  }catch(error){fail(error);}
+ finally{submit.disabled=false;}
 });
 window.addEventListener('pagehide',stopCamera);
 bootstrap();

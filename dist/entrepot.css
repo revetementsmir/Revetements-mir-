@@ -49,8 +49,8 @@
 .mir-warehouse #wh-scan-form label{flex:1}
 .mir-warehouse #wh-scan-form button{margin-bottom:10px;min-width:140px}
 .mir-warehouse #wh-camera video{max-height:270px;max-width:100%;background:#14251c;border-radius:8px}
-.mir-warehouse .wh-label-preview{display:none}
-.mir-warehouse .wh-label{border:2px solid #223524;padding:8mm;max-width:100mm;width:100mm;min-height:55mm;background:#fff;color:#18251d;text-align:center;margin:auto}
+.mir-warehouse .wh-label-preview{display:block;margin-top:16px}
+.mir-warehouse .wh-label{border:2px solid #223524;padding:8mm;max-width:100mm;width:100%;min-height:55mm;background:#fff;color:#18251d;text-align:center;margin:auto}
 .mir-warehouse .wh-label>strong{display:block;font-size:12px;letter-spacing:.07em}
 .mir-warehouse .wh-label #wh-label-qr{width:160px;height:160px;margin:7px auto}
 .mir-warehouse .wh-label #wh-label-qr img,.mir-warehouse .wh-label #wh-label-qr canvas{width:160px!important;height:160px!important}

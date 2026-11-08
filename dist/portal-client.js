@@ -197,11 +197,22 @@
         const epoch = generation;
         emit({ user: { id: user.id, email: user.email || '' }, pending: readPending(user.id) });
         if(config.accountEnabled){
-          const {data:account,error:accountError}=await sdk.rpc('mir_account_snapshot');
+          let {data:account,error:accountError}=await sdk.rpc('mir_account_snapshot');
           if(epoch!==generation||sequence!==readSequence||disposed)return null;
           if(accountError)throw errorOf(accountError);
           if(!account||account.userId!==user.id||!['client','employee','admin'].includes(account.role))fail('ACCESS_DENIED','Votre accès MIR n’a pas pu être vérifié.');
-          if(account.role==='client'){emit({phase:'customer_ready',account:clone(account),snapshot:null,error:null},'refresh');return account;}
+          if(account.role==='client'){
+            if(user.user_metadata?.mir_delivery_address){
+              const imported=await sdk.rpc('mir_account_import_signup_address');
+              if(epoch!==generation||sequence!==readSequence||disposed)return null;
+              if(!imported.error&&imported.data){
+                const updated=await sdk.rpc('mir_account_snapshot');
+                if(epoch!==generation||sequence!==readSequence||disposed)return null;
+                if(!updated.error&&updated.data?.userId===user.id)account=updated.data;
+              }else if(imported.error)account={...account,addressImportPending:true};
+            }
+            emit({phase:'customer_ready',account:clone(account),snapshot:null,error:null},'refresh');return account;
+          }
         }
         const { data, error } = await sdk.rpc('mir_portal_snapshot');
         if (epoch !== generation || sequence !== readSequence || disposed) return null;
@@ -265,9 +276,17 @@
       const {error}=await sdk.auth.signInWithPassword({email:emailAddress(email),password:String(password||'')});if(error)throw authFailure(error);
       setLogoutIntent(false);return refresh();
     }
-    async function signUpClient(email,password){
+    async function signUpClient(email,password,address=null){
       requireEnabled();if(!config.signupEnabled)fail('SIGNUP_DISABLED','La création de compte est en cours d’activation. Votre panier est conservé.');
-      const {error}=await sdk.auth.signUp({email:emailAddress(email),password:newPassword(password),options:{emailRedirectTo:redirectFor('signup')}});
+      const options={emailRedirectTo:redirectFor('signup')};
+      if(address){
+        const fields=['recipient','line1','line2','city','province','postalCode','country'];
+        const delivery=Object.fromEntries(fields.map(key=>[key,String(address[key]||'').trim()]));
+        if(fields.some(key=>delivery[key].length>200||(key!=='line2'&&!delivery[key])))
+          fail('ADDRESS_INVALID','Complétez l’adresse de livraison ou laissez les champs vides.');
+        options.data={mir_delivery_address:delivery};
+      }
+      const {error}=await sdk.auth.signUp({email:emailAddress(email),password:newPassword(password),options});
       if(error)throw authFailure(error);return {message:'Vérifiez votre boîte courriel pour confirmer votre adresse. Votre panier reste conservé.'};
     }
     async function resetPassword(email){

@@ -12,7 +12,7 @@ try{
  const users={'admin@example.invalid':{id:id(1),role:'admin'},'client@example.invalid':{id:id(2),role:'client'},'employee@example.invalid':{id:id(3),role:'employee'}};
  for(const u of Object.values(users)){await db.query('insert into auth.users values($1)',[u.id]);await db.query('insert into mir_core.memberships values($1,$2,$3,true)',[id(10),u.id,u.role]);}
  const sdk=`window.MIRSupabase={createClient(){return {auth:{async signInWithPassword({email,password}){if(password!=='test-only')return {error:{message:'Refus test'}};sessionStorage.setItem('fixture-user',email);return {};},async getUser(){const email=sessionStorage.getItem('fixture-user');return {data:{user:email?{id:email}:null}};},async signOut(){sessionStorage.removeItem('fixture-user');return {};}},async rpc(name,args){const r=await fetch('/test-rpc',{method:'POST',headers:{'content-type':'application/json','x-test-user':sessionStorage.getItem('fixture-user')||''},body:JSON.stringify({name,args})});return r.json();}}}};`;
- const functions={mir_my_memberships:[],mir_shared_snapshot:['org'],mir_submit_request:['org','request_id','model','publication_revision','configuration'],mir_import_master:['org','record'],mir_admin_publish_model:['org','model','expected_revision','settings'],mir_add_master_version:['org','model','expected_revision','template'],mir_assign_job:['org','job_name','employee']};
+ const functions={mir_my_memberships:[],mir_shared_snapshot:['org'],mir_submit_request:['org','request_id','model','publication_revision','configuration'],mir_import_master:['org','record'],mir_admin_publish_model:['org','model','expected_revision','settings'],mir_add_master_version:['org','model','expected_revision','template'],mir_assign_job:['org','job_name','employee'],mir_admin_save_bend_tariff:['org','expected_revision','settings'],mir_boutique_delivery_distance:['org','address_id','address_version']};
  server=http.createServer(async(req,res)=>{
   if(req.url==='/test-rpc'){
    let raw='';for await(const c of req)raw+=c;const {name,args}=JSON.parse(raw),u=users[req.headers['x-test-user']];
@@ -34,9 +34,9 @@ try{
  await admin.locator('#import').setInputFiles({name:'backup-again.json',mimeType:'application/json',buffer:Buffer.from(require('../dist/template-library-backup.js').create([record]).content)});
  await admin.waitForTimeout(150);assert.equal(await admin.locator('#catalogue article').count(),1);
  const inputs=admin.locator('#catalogue form input');await inputs.nth(0).check();await inputs.nth(1).check();await inputs.nth(2).check();await inputs.nth(4).fill('2500');await inputs.nth(5).fill('3000');await inputs.nth(8).fill('3');await inputs.nth(9).check();await inputs.nth(10).fill('2');await admin.route('**/test-rpc',route=>{const body=route.request().postDataJSON();return body.name==='mir_admin_publish_model'?route.abort():route.continue();});
- await admin.locator('#catalogue form button').click();await admin.waitForFunction(()=>document.querySelector('.shared-save-feedback')?.textContent.includes('Enregistrement non confirmé'));assert.equal(await inputs.nth(4).inputValue(),'2500');assert.equal(await admin.locator('.shared-save').isEnabled(),true);
+ await admin.locator('#catalogue form button').click();await admin.waitForFunction(()=>document.querySelector('.shared-save-feedback')?.textContent.includes('Enregistrement non confirmé'));assert.equal(await inputs.nth(4).inputValue(),'2500');assert.equal(await admin.locator('#catalogue .shared-save').isEnabled(),true);
  await admin.unroute('**/test-rpc');await admin.locator('#catalogue form button').click();
- await admin.waitForFunction(()=>document.querySelector('#catalogue article')?.dataset.revision==='2');assert.match(await admin.locator('.shared-save-feedback').textContent(),/enregistrée sur le serveur/);const appearance=await admin.locator('.shared-save').evaluate(n=>({background:getComputedStyle(n).backgroundColor,height:n.getBoundingClientRect().height}));assert.notEqual(appearance.background,'rgba(0, 0, 0, 0)');assert.ok(appearance.height>=44);
+ await admin.waitForFunction(()=>document.querySelector('#catalogue article')?.dataset.revision==='2');assert.match(await admin.locator('.shared-save-feedback').textContent(),/enregistrée sur le serveur/);const appearance=await admin.locator('#catalogue .shared-save').evaluate(n=>({background:getComputedStyle(n).backgroundColor,height:n.getBoundingClientRect().height}));assert.notEqual(appearance.background,'rgba(0, 0, 0, 0)');assert.ok(appearance.height>=44);
  await admin.locator('#job-admin input').fill('Chantier test');await admin.locator('#job-admin button').click();
  const client=await login('client@example.invalid',390);await client.locator('#catalogue article').waitFor();assert.equal(await client.locator('#catalogue h2').textContent(),'Solin partagé');
  await client.locator('#catalogue form input').nth(0).fill('Noir');await client.locator('#catalogue form button[type=submit]').click();await client.locator('#orders article').waitFor();assert.match(await client.locator('#orders').textContent(),/25\.00/);
@@ -84,6 +84,30 @@ try{
  await otherAdmin.locator('#workspace').waitFor({state:'visible'});await otherAdmin.locator('#catalogue article').waitFor();
  assert.equal(await otherAdmin.locator('h1').textContent(),'Boutique partagée');assert.equal(await otherAdmin.locator('#catalogue article').count(),1,'la Boutique exclut les brouillons et autres destinations');
  await otherAdmin.locator('#all-models').click();await otherAdmin.waitForFunction(()=>document.querySelectorAll('#catalogue article').length===2);
+ const tariff=otherAdmin.locator('#bend-tariff-admin');
+ assert.equal(await tariff.getByLabel('Surface').inputValue(),'0.014');
+ await tariff.getByRole('button',{name:'+10 % aluminium'}).click();
+ await tariff.getByRole('button',{name:'+10 % aluminium'}).click();
+ assert.equal(await tariff.getByLabel('Majoration aluminium').inputValue(),'10');
+ assert.match(await tariff.getByRole('status').first().textContent(),/9\.40.*10\.34/);
+ await tariff.getByRole('button',{name:'Appliquer les tarifs'}).click();
+ await otherAdmin.waitForFunction(()=>document.querySelector('#status').textContent.includes('Tarifs appliqués'));
+ await db.exec(`insert into mir_core.customer_addresses(id,user_id,address) values('${id(90)}','${id(2)}','{"line1":"1653 avenue des Affaires","city":"Québec","province":"Québec","postalCode":"G3J 1Y7"}');
+   insert into mir_core.boutique_delivery_distances(address_id,address_key,distance_km) values('${id(90)}',md5(jsonb_build_array('1653 avenue des Affaires','Québec','Québec','G3J 1Y7')::text),40)`);
+ await client.goto(base+'/espace-partage.html?destination=boutique');
+ const priced=client.locator('#catalogue article').first();
+ await priced.getByText(/49.50.*par|49.50.*pièce/).waitFor();
+ await priced.getByText(/60.00.*livraison/).waitFor();
+ await priced.getByLabel('Quantité').fill('7');
+ await priced.getByText(/Livraison gratuite/).waitFor();
+ await priced.getByLabel('Couleur demandée').selectOption('Blanc');
+ await priced.getByRole('button',{name:'Transmettre pour validation'}).click();
+ await client.locator('#orders').getByText('Livraison gratuite',{exact:true}).waitFor();
+ assert.match(await client.locator('#orders').textContent(),/346.50/);
+ for(const page of [client,otherAdmin]){
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'tarifs sans débordement');
+ }
+
  await employee.goto(base+'/espace-partage.html?destination=store');await employee.locator('#catalogue article').waitFor();assert.equal(await employee.locator('h1').textContent(),'Magasin employés partagé');
  await client.goto(base+'/espace-partage.html?destination=store');await client.locator('#workspace').waitFor({state:'visible'});await client.waitForFunction(()=>document.querySelector('#status').textContent.includes('compte autorisé pour cette destination'));assert.equal(await client.locator('#catalogue article').count(),0,'changer une URL ne donne pas accès au Magasin');
  console.log('PASS : import sans doublon, publication Admin, client indépendant mobile, demande employé tablette avec cote verrouillée, récupération Admin, sauvegarde directe du dessin en brouillon partagé');
