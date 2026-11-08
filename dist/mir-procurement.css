@@ -334,6 +334,7 @@ body.mir-admin-v4 #mir-procurement-panel .mir-po-number-field>button{flex:0 0 au
 
 /* MOON — vrai contrôle visuel 390 px : menu complet, lisible, sans masquer le bon. */
 body.mir-admin-v4 #panel-layout-import{
+ position:relative;z-index:60;isolation:isolate;
  min-height:0;height:auto;max-width:1150px;margin:12px auto 16px
 }
 body.mir-admin-v4 .mir-po-layout-journey{display:flex;flex-direction:column;align-items:stretch;gap:8px}
