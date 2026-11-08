@@ -672,6 +672,9 @@ const clientStages=[
  {title:'Choisissez le métal et la couleur',hint:'Sélectionnez le métal, puis la teinte. Vous pourrez ensuite ajouter la pièce à votre dossier.'}
 ];
 function clientTracePrompt(){return matchMedia('(any-pointer:coarse)').matches?'Touchez la grille pour placer le premier point.':'Cliquez sur la grille pour placer le premier point.';}
+function focusClientEntry(selector='#client-entry-title'){
+ window.scrollTo({top:0,left:0,behavior:'auto'});$(selector)?.focus({preventScroll:true});
+}
 function renderClientEntry(active){
  let entry=$('#client-entry');
  if(!active){delete document.body.dataset.clientEntry;if(entry){entry.hidden=true;$('.drawing-head')?.after($('#drawing-tools'));}return;}
@@ -779,6 +782,7 @@ function goClientStep(step,{confirm=false}={}){
  if(step===4){view='face';zoom=1;viewPan={x:0,y:0};}
  updateDrawing();
  $('#client-step-scroll').scrollTop=0;
+ if(step===1){focusClientEntry();return;}
  $('#client-step-title').focus({preventScroll:true});
  $('#client-step-title').scrollIntoView({block:'nearest'});
 }
@@ -2099,15 +2103,15 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
    $(`[data-client-face="${d.clientFace}"]`).focus();
    return;
   }
-  if(button.id==='client-choose-model'){clientEntry='models';updateDrawing();$('#client-entry-title').focus({preventScroll:true});return;}
-  if(button.id==='client-entry-back'){clientEntry='choice';tool='select';updateDrawing();$('#client-entry-title').focus({preventScroll:true});return;}
+  if(button.id==='client-choose-model'){clientEntry='models';updateDrawing();focusClientEntry();return;}
+  if(button.id==='client-entry-back'){clientEntry='choice';tool='select';updateDrawing();focusClientEntry();return;}
   if(d.clientProfile){if(!clientProfileSelected||button.getAttribute('aria-pressed')!=='true')choose('profile',d.clientProfile,{profileChosen:true});return goClientStep(2,{confirm:true});}
   if(button.id==='client-draw-profile'&&clientStep===1){
-   if(drawPoints.length&&draft.template==='custom'&&!clientProfileSelected){tool='draw';updateDrawing();$('#production-drawing').focus();return;}
+   if(drawPoints.length&&draft.template==='custom'&&!clientProfileSelected){tool='draw';updateDrawing();focusClientEntry('#production-drawing');return;}
    choose('profile','custom');
    selectedTemplate=null;
    startProfileDrawing({fullscreen:false});
-   if(!$('.drawing-card').classList.contains('mobile-trace'))$('#production-drawing').focus();
+   focusClientEntry('#production-drawing');
    return;
   }
   if(d.drawTool==='draw'&&canDrawProfile()&&drawPoints.length>=3&&build().valid){

@@ -144,6 +144,7 @@ body[data-client-stage] .production-intro h1{font-size:clamp(29px,4vw,49px);marg
 }
 
 /* Approved entry for client mouldings; admin and employee store never opt in. */
+html.mir-production-client:has(body[data-client-entry]){scroll-behavior:auto}
 body[data-client-entry] .workshop-banner,body[data-client-entry] .kind-bar{display:none}
 #client-entry{padding:32px 0;min-height:calc(100dvh - 64px);max-width:1080px;margin:auto}
 #client-entry .client-entry-return{display:inline-flex;min-height:44px;align-items:center;font-size:12px;color:#334c3a;padding:0;margin-bottom:22px}
