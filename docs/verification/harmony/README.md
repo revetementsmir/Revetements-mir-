@@ -1,6 +1,6 @@
 # MIR — Harmony et édition directe
 
-Développement dans le dépôt existant `revetementsmirweb/MIR`, PR [#52](https://github.com/revetementsmirweb/MIR/pull/52). Base vérifiée : `f1389767f3d5a0ae9f6f935dc6da7968a57d6a70`. Code de cette recette : `56f4d8d03a7d82d0781bfc6affb5a9ca3d9d010a`.
+Développement dans le dépôt existant `revetementsmirweb/MIR`, PR [#52](https://github.com/revetementsmirweb/MIR/pull/52). Base vérifiée : `f1389767f3d5a0ae9f6f935dc6da7968a57d6a70`. Code de cette recette : `a11ed66446757292c055fd9ca452544316b89b9e`.
 
 ## Réalisé
 
@@ -11,6 +11,7 @@ Développement dans le dépôt existant `revetementsmirweb/MIR`, PR [#52](https:
 - Chaque côté réel ouvre sa fiche : lip indépendant, sans lip, angle géométrique défini par la forme, bas après pose et perforation du bas. Les étiquettes n'affichent que les noms des côtés. Les contours intérieur/extérieur proviennent de `MIRProductionVolume.buildMesh`.
 - Les finitions et métaux importés restent conservés lors de la correction de cotes, même lorsque la couleur n’existe pas dans le nuancier local. Seule une modification explicite du métal ou de la couleur libère cette conservation. Le défaut a été reproduit par un test en échec, puis corrigé. Les valeurs originales sont contrôlées après révision.
 - Validation sur une copie avant application. Les géométries impossibles conservent la valeur précédente. Le changement d'un carré annonce explicitement qu'A et B évoluent ensemble. Une cote liée à une pente X/12 renvoie au formulaire de pente plutôt que de déplacer silencieusement le point dérivé.
+- Les verrous des modèles du magasin sont aussi vérifiés sur la largeur et les lèvres, dans le dessin comme dans le formulaire accessible. Les URL des scripts modifiés changent de version pour éviter de mélanger l’ancien menu en cache et le nouvel en-tête après publication.
 - Accès clavier sur les cotes et côtés; méthode de saisie alternative repliable avec boutons de 44 px. Les champs originaux restent disponibles. Les zones de cote mobiles sont agrandies.
 - L'aperçu d'une pièce du dossier permet aussi d'ouvrir directement la bonne cote ou le bon côté. Une application actualise le dessin; l'enregistrement d'une nouvelle révision dans le dossier reste explicite. Neuf autres pièces et le mur source restent intacts.
 - Parcours Panneaux : Choisir → Dessiner et mesurer → Vérifier → Commander. Les dix repères et l'exclusion d'une pièce du bon sans suppression sont conservés.

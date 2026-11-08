@@ -1,5 +1,5 @@
 MIR Harmony — résultats navigateur
-Code final : 56f4d8d03a7d82d0781bfc6affb5a9ca3d9d010a
+Code final : a11ed66446757292c055fd9ca452544316b89b9e
 La CI de la PR #52 consolide les suites sur le HEAD de livraison. Les résultats locaux ci-dessous proviennent des itérations détaillées dans le rapport.
 
 --- direct-browser ---
@@ -136,3 +136,13 @@ PASS bureau: reset, export JSON, historique préservé, retour à une liste vide
 PASS mobile: reset, export JSON, historique préservé, retour à une liste vide
 PASS compact: reset, export JSON, historique préservé, retour à une liste vide
 
+
+Dernière recette des verrous et métadonnées :
+PASS PDF réel 11 pages avec lip 2¼ et sans lip, données et quantités conservées
+PASS review click → metric edit → explicit revision → reload; nine unchanged panels; triangle independent lips; keyboard and invalid fraction
+PASS locked template width and lips remain unchanged through direct editor
+
+Recette finale des contrôles verrouillés :
+PASS PDF réel 11 pages avec lip 2¼ et sans lip, données et quantités conservées
+PASS review click → metric edit → explicit revision → reload; nine unchanged panels; triangle independent lips; keyboard and invalid fraction
+PASS locked template width and lips remain unchanged through direct editor
