@@ -33,7 +33,7 @@
    const id=getId(item),label=sourceId(item),no=excluded.has(id),selected=id===activeId;
    return '<button type="button" class="mir-wb-wall-tile'+(no?' is-out':'')+(selected?' is-selected':'')+
     '" data-mir-wb-pick="'+esc(id)+'" aria-pressed="'+selected+'" aria-label="Voir le panneau '+esc(label)+(no?', exclu du bon':'')+
-    '" style="grid-column:'+(col+1)+';grid-row:'+(row+1)+'">'+
+    '" style="grid-column:'+((col%cols)+1)+';grid-row:'+(row+Math.floor(col/cols)+1)+'">'+
     '<span>'+esc(label)+'</span></button>';
   }).join('')+'</div>';
  }
@@ -50,7 +50,7 @@
    '<header class="mir-wb-heading"><div><p class="mir-wb-eyebrow">L’ATELIER MIR · PANNEAUX</p>'+
    '<h2>'+(!all?'Créer mes panneaux':'Vérifier mes panneaux')+'</h2><p>'+
    (!all?'Choisis ce que tu veux dessiner. MIR calculera les pièces ensuite.':'Ton mur et ses pièces sont déjà dans le dossier. Tu peux vérifier chaque panneau et préparer le bon.')+
-   '</p></div><button type="button" data-mir-tab="draw" class="mir-wb-exit">Retour à l’atelier</button></header>'+
+   '</p></div><div class="mir-wb-heading-links"><button type="button" data-mir-panel-history>Bons enregistrés</button><button type="button" data-mir-tab="draw" class="mir-wb-exit">Retour à l’atelier</button></div></header>'+
    '<nav class="mir-wb-progress" aria-label="Les trois étapes de la commande">'+
    step(1,'Dessiner',stage)+step(2,'Vérifier',stage)+step(3,'Commander',stage)+'</nav>';
   if(!all){
