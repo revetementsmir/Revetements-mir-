@@ -157,7 +157,7 @@
     if(!main||!win.localStorage||doc.querySelector('#mir-procurement-tabs'))return;
     const W=win.MIRPOWorkflow;
     let stored=win.localStorage.getItem(KEY);
-    let state=readState(win.localStorage),tab='draw',supplierEditing=null,pendingWorkflowObserver=null,poView='pending',panelFilter='';
+    let state=readState(win.localStorage),tab='draw',supplierEditing=null,pendingWorkflowObserver=null,poView='pending',panelFilter='',activePanelId=null;
     const ui={supplierId:'unico',poNumber:'',job:'',foreman:'',shipTo:'',requestedDate:'',terms:'',notes:'',...state.formDraft};
     let query='',filterDate='';
     function save(){try{if(win.localStorage.getItem(KEY)!==stored)throw Error('Le suivi a changé dans un autre onglet. Rechargez la page.');const raw=JSON.stringify(state);win.localStorage.setItem(KEY,raw);stored=raw;return true;}catch{win.alert('Sauvegarde impossible ou données modifiées dans un autre onglet. Rechargez avant de continuer.');return false;}}
@@ -292,31 +292,53 @@
       }).join('');
     }
     function panelsHTML(){
-      const dossier=currentOrder(),panels=(dossier?.items||[]).filter(item=>item.spec?.kind==='panel');
-      const selected=includedDossier(dossier);
-      const included=selected?.items.filter(item=>item.spec?.kind==='panel').length||0;
-      return '<section class="mir-panel-admin" aria-label="Gestion des panneaux architecturaux">'+
-        '<header class="mir-panel-admin-hero"><p class="mir-panel-kicker">L’ATELIER MIR / PANNEAUX ARCHITECTURAUX</p>'+
-        '<h2>Du mur au bon. <em>Sans tout recommencer.</em></h2>'+
-        '<p>Dessine ton mur ou un seul panneau, vérifie les cotes, puis prépare un bon fournisseur. Un panneau = une carte = une ligne = un dessin au PDF.</p></header>'+
-        '<nav class="mir-panel-steps" aria-label="Parcours panneaux">'+
-        '<a href="calepinage.html"><b>1</b><span>Mur / Calepinage<small>Dessiner et répartir</small></span></a>'+
-        '<button type="button" data-mir-panel-new><b>2</b><span>Panneau seul<small>Tracer une pièce</small></span></button>'+
-        '<a href="#mir-panel-dossier"><b>3</b><span>Dossier panneaux<small>Chaque pièce cotée</small></span></a>'+
-        '<button type="button" data-mir-panel-to-po><b>4</b><span>Bon de commande<small>Fournisseur et livraison</small></span></button>'+
-        '<button type="button" data-mir-panel-history><b>5</b><span>Historique / PDF<small>Retrouver les bons</small></span></button></nav>'+
-        '<section class="mir-panel-dossier" id="mir-panel-dossier">'+
-        '<div class="mir-panel-dossier-head"><div><p class="mir-panel-kicker">TON DOSSIER LOCAL</p>'+
-        '<h3><span data-mir-panel-count>'+included+'</span> panneau(x) dans le bon <small>sur '+panels.length+' pièces du dossier</small></h3>'+
-        '<p>Chaque dessin est une seule pièce, avec son repère, ses dimensions et ses lèvres.</p></div>'+
-        '<div class="mir-panel-dossier-actions"><button type="button" data-mir-panel-all="true">Tout inclure</button>'+
-        '<button type="button" data-mir-panel-all="false">Tout retirer</button></div></div>'+
-        (panels.length?'<label class="mir-panel-search">Rechercher un panneau<input type="search" data-mir-panel-search placeholder="P01, mur arrière, dimensions…"></label>'+
-        '<div class="mir-panel-cards">'+panelCards(dossier)+'</div>':
-        '<div class="mir-panel-empty"><h3>Aucun panneau dans ce dossier</h3><p>Commence par dessiner un mur complet ou un panneau seul. Les pièces apparaîtront ici avec leurs vraies cotes.</p>'+
-        '<a href="calepinage.html">Dessiner un mur</a><button type="button" data-mir-panel-new>Créer un panneau seul</button></div>')+
-        '<footer class="mir-panel-dossier-footer"><p>Les pièces décochées restent enregistrées dans le dossier. Elles ne seront pas incluses dans ce bon.</p>'+
-        '<button type="button" class="mir-panel-primary" data-mir-panel-to-po'+(!included?' disabled':'')+'>Préparer le bon avec <span data-mir-panel-count>'+included+'</span> panneau(x)</button></footer></section></section>';
+      const dossier=currentOrder(),render=win.MIRPanelWorkbench?.render;
+      if(!render)return '<section class="mir-proc-card"><h2>Panneaux indisponibles</h2><p>Le module de l’atelier n’a pas chargé. Recharge la page sans effacer tes données.</p></section>';
+      return render({dossier,activeId:activePanelId,excludedIds:[...skippedFor(dossier)],
+        api:win.MIRProduction,volume:win.MIRProductionVolume});
+    }
+    function showPanel(id){
+      const choices=(currentOrder()?.items||[]).filter(i=>i.spec?.kind==='panel');
+      if(!choices.some(x=>x.id===id))return;
+      activePanelId=id;
+      panel.innerHTML=panelsHTML();
+      panel.querySelector('.mir-wb-focus')?.scrollIntoView({block:'start',behavior:'smooth'});
+    }
+    function panelOrderHTML(dossier,items){
+      const count=items.filter(x=>x.spec?.kind==='panel').length;
+      return '<section class="mir-wb-order" data-mir-wb-order>'+
+        '<div class="mir-wb-order-heading"><button type="button" data-mir-tab="panels">← Retour aux panneaux</button>'+
+        '<p class="mir-wb-eyebrow">L’ATELIER MIR · BON FOURNISSEUR</p>'+
+        '<h2>Préparer le bon de commande</h2>'+
+        '<p>'+count+' panneau(x) à commander. Confirme les coordonnées, puis enregistre le brouillon.</p>'+
+        '<nav class="mir-wb-progress" aria-label="Parcours de commande">'+
+        '<span class="mir-wb-step"><strong>1</strong>Dessiner</span>'+
+        '<span class="mir-wb-step"><strong>2</strong>Vérifier</span>'+
+        '<span class="mir-wb-step is-current" aria-current="step"><strong>3</strong>Commander</span></nav></div>'+
+        '<section class="mir-wb-order-section"><h3>1. Quel fournisseur ?</h3>'+
+        '<p>Vérifie le nom du fournisseur avant de préparer le PDF.</p>'+
+        '<label class="mir-proc-field"><span>Fournisseur</span><select data-mir-po="supplierId" required><option value="">Choisir un fournisseur…</option>'+
+        supplierOptions()+'</select></label>'+
+        '<p class="mir-wb-supplier-help">Le fournisseur et ses coordonnées doivent être confirmés avant tout envoi.</p>'+
+        '<button type="button" data-mir-tab="suppliers">Gérer les fournisseurs</button></section>'+
+        '<section class="mir-wb-order-section"><h3>2. Quel chantier et où livrer ?</h3><div class="mir-wb-order-fields">'+
+        '<div class="mir-po-number-field">'+field('poNumber','Numéro du bon','text','required maxlength="100"')+
+        '<button type="button" id="mir-po-suggest-number">Proposer un numéro</button></div>'+
+        field('job','Nom ou numéro du chantier','text','required maxlength="160"')+
+        field('shipTo','Adresse de livraison ou de cueillette','text','required maxlength="360"')+
+        field('requestedDate','Date demandée','date')+'</div>'+
+        '<details class="mir-wb-extra"><summary>Informations supplémentaires (facultatives)</summary>'+
+        field('foreman','Responsable / contremaître','text','maxlength="150"')+
+        field('terms','Transport / conditions','text','maxlength="300"')+
+        '<label class="mir-proc-field"><span>Notes fournisseur</span><textarea data-mir-po="notes" rows="3" maxlength="800">'+esc(ui.notes)+'</textarea></label></details></section>'+
+        '<section class="mir-wb-order-section"><details class="mir-wb-order-items" open>'+
+        '<summary>3. Vérifier les '+items.length+' pièces du bon</summary>'+
+        win.MIRPanelWorkbench.orderRows(items,win.MIRProduction)+
+        '</details></section>'+
+        '<section class="mir-wb-save"><p id="mir-proc-error" role="alert" class="mir-proc-error" hidden></p>'+
+        '<p id="mir-draft-feedback" role="status" aria-live="polite"></p>'+
+        '<p>Ce bouton enregistre un brouillon sur cet appareil. Il n’envoie rien au fournisseur.</p>'+
+        '<button type="button" class="mir-panel-primary" id="mir-create-po">Enregistrer le bon brouillon →</button></section></section>';
     }
     function supplierQuickPick(){
       const active=state.suppliers.filter(s=>!s.archived),selected=active.find(row=>row.id===ui.supplierId);
@@ -335,6 +357,7 @@
       populateOrder();
       const dossier=includedDossier(currentOrder()),items=(dossier?.items||[]).filter(i=>['profile','panel'].includes(i?.spec?.kind||i?.kind));
       const quantity=items.reduce((sum,item)=>sum+Number(item.spec?.quantity||0),0),panelCount=items.filter(item=>item.spec?.kind==='panel').length;
+      if(panelCount>0)return panelOrderHTML(dossier,items);
       return poMenu()+
         '<section class="mir-po-editor" aria-label="Créer ou modifier un bon de pliage">'+
         '<div class="mir-po-editor-heading"><div><h2>Bon de commande · Panneaux et pliages</h2><p>'+items.length+' référence(s) dont '+panelCount+' panneau(x) · '+quantity+' pièce(s) · mêmes cotes que le tracé</p></div>'+
@@ -471,6 +494,7 @@
     function switchTab(next){
       if(pendingWorkflowObserver){pendingWorkflowObserver.disconnect();pendingWorkflowObserver=null;}
       tab=['draw','panels','models','boutique','store','orders','suppliers'].includes(next)?next:'draw';
+      doc.body.dataset.mirPanelOrder=tab==='orders'&&includedDossier(currentOrder())?.items.some(i=>i.spec?.kind==='panel')?'true':'false';
       doc.body.dataset.mirTab=tab;shortcuts.hidden=tab!=='draw'&&tab!=='models';panel.hidden=!['panels','orders','suppliers','boutique','store'].includes(tab);
       tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===(tab==='suppliers'?'orders':tab)?'page':'false'));
       shortcuts.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===tab?'page':'false'));
@@ -590,6 +614,16 @@
       if(b.dataset.mirPoView){poView=b.dataset.mirPoView;switchTab('orders');return;}
       if(b.dataset.mirEdit){editSupplier(b.dataset.mirEdit);return;}
       if(b.id==='mir-new-supplier'){supplierEditing=null;switchTab('suppliers');return;}
+      if(b.dataset.mirWbPick){
+        showPanel(b.dataset.mirWbPick);return;
+      }
+      if(b.dataset.mirWbPrev!==undefined||b.dataset.mirWbNext!==undefined){
+        const items=(currentOrder()?.items||[]).filter(i=>i.spec?.kind==='panel');
+        const index=items.findIndex(i=>i.id===activePanelId);
+        const next=Math.max(0,Math.min(items.length-1,(index<0?0:index)+(b.dataset.mirWbNext!==undefined?1:-1)));
+        if(items[next])showPanel(items[next].id);
+        return;
+      }
       if(b.dataset.mirPanelNew!==undefined){
         switchTab('draw');doc.querySelector('[data-kind="panel"]')?.click();return;
       }
@@ -609,7 +643,7 @@
       if(b.dataset.mirPanelHistory!==undefined){poView='history';switchTab('orders');return;}
       if(b.dataset.mirPanelToPo!==undefined){
         const dossier=includedDossier(currentOrder());
-        if(!dossier?.items.length)return win.alert('Coche au moins un panneau avant de préparer le bon.');
+        if(!dossier?.items.some(item=>item.spec?.kind==='panel'))return win.alert('Coche au moins un panneau avant de préparer le bon.');
         if(!win.MIRProcurementUI?.openCreate?.({newOrder:false})){poView='create';switchTab('orders');}
         return;
       }
