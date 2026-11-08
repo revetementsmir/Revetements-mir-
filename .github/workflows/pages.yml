@@ -232,8 +232,10 @@ jobs:
             curl --fail --silent --show-error --location \
               --retry 20 --retry-delay 3 --retry-all-errors "$1" -o "$2"
           }
-          fetch "$base/index.html" /tmp/mir-homepage.html
-          grep -F 'mir-home-premium.css?v=images-ultrawide-20261105' /tmp/mir-homepage.html
+          fetch "$base/index.html?verification=$GITHUB_SHA" /tmp/mir-homepage.html
+          cmp /tmp/mir-homepage.html _site_mir/index.html
+          grep -F 'mir-home-premium.css?v=' /tmp/mir-homepage.html
+          grep -F 'id="au-coeur-du-centre-ville"' /tmp/mir-homepage.html
           grep -F 'assets/MIR-logo-officiel-original.svg' /tmp/mir-homepage.html
           grep -F 'Mon compte' /tmp/mir-homepage.html
           grep -F 'Découvrir nos revêtements' /tmp/mir-homepage.html
@@ -257,7 +259,8 @@ jobs:
           grep -F 'mir-public-menu.js?v=' /tmp/mir-menu-pliage.html
           fetch "$base/mir-client-header.css" /tmp/mir-client-header.css
           grep -F '.mir-client-header' /tmp/mir-client-header.css
-          fetch "$base/realisations.html" /tmp/mir-realisations.html
+          fetch "$base/realisations.html?verification=$GITHUB_SHA" /tmp/mir-realisations.html
+          cmp /tmp/mir-realisations.html _site_mir/realisations.html
           grep -F 'Nos réalisations' /tmp/mir-realisations.html
           grep -F 'realisations-mir-contemporain-brun-large.webp' /tmp/mir-realisations.html
           grep -F 'realisations-mir-contrastes-large.webp' /tmp/mir-realisations.html
@@ -265,7 +268,7 @@ jobs:
           fetch "$base/assets/realisations/realisations-mir-contemporain-brun-large.webp" /tmp/mir-realisations-1.webp
           test "$(wc -c </tmp/mir-realisations-1.webp)" -gt 100000
           grep -F 'realisations-mir-quebec-avec-voiture-large.avif' /tmp/mir-realisations.html
-          grep -F 'Photo originale fournie par MIR · voiture conservée' /tmp/mir-realisations.html
+          grep -F 'Au cœur du centre-ville de Québec' /tmp/mir-realisations.html
           fetch "$base/assets/realisations/realisations-mir-quebec-avec-voiture-large.avif" /tmp/mir-realisations-4.avif
           fetch "$base/assets/realisations/realisations-mir-quebec-avec-voiture-mobile.avif" /tmp/mir-realisations-4-mobile.avif
           test "$(wc -c </tmp/mir-realisations-4.avif)" -gt 50000
