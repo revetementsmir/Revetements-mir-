@@ -8,13 +8,57 @@
   const local = value => {
     try { const u = new URL(value, document.baseURI); return value && u.origin === location.origin && /^https?:$/.test(u.protocol) ? u.href : ''; } catch { return ''; }
   };
+  function photoType(image) {
+    if (!image) return 'empty';
+    const kind = String(image.assetKind || '').toLowerCase();
+    if (/drawing|diagram/.test(kind)) return 'profile';
+    if (['sample','profile','packshot','installed'].includes(image.cardPresentation)) return image.cardPresentation;
+    if (/texture|swatch|sphere/.test(kind)) return 'sample';
+    if (image.kind === 'installed') return 'installed';
+    return /render|profile/.test(kind) ? 'profile' : 'packshot';
+  }
+  function photoLabel(image) {
+    if (!image) return 'Visuel à compléter';
+    const kind = String(image.assetKind || '');
+    if (/drawing|diagram/.test(kind)) return 'Dessin fabricant';
+    const type = photoType(image);
+    if (type === 'installed') return 'Exemple de pose';
+    if (type === 'sample') return 'Détail de la matière';
+    if (type === 'profile') return 'Vue du profil';
+    if (image.matchScope === 'range') return 'Visuel de la gamme';
+    return /photo/.test(kind) ? 'Photo fabricant' : 'Visuel fabricant';
+  }
+  function photoImage(image, alt, {loading='lazy', priority=false}={}) {
+    const src = local(image?.src);
+    if (!src) return '';
+    const rawPosition = image.cardObjectPosition || '';
+    const position = /^((left|right|top|bottom|center)|(-?\d+(\.\d+)?%))( ((left|right|top|bottom|center)|(-?\d+(\.\d+)?%)))?$/.test(rawPosition) ? rawPosition : '50% 50%';
+    return `<img src="${esc(src)}" alt="${esc(image.alt || alt)}" data-catalogue-image data-presentation="${photoType(image)}" style="object-position:${position}" loading="${loading}" ${priority?'fetchpriority="high" ':''}decoding="async">`;
+  }
+  function photoUnavailable() {
+    return '<div class="mir-photo-unavailable">Visuel indisponible</div>';
+  }
+  if (typeof document !== 'undefined') document.addEventListener('error', event => {
+    const image = event.target;
+    if (!image.matches?.('img[data-catalogue-image]')) return;
+    const fallback = document.createElement('div');
+    fallback.className = 'mir-photo-unavailable';
+    fallback.textContent = 'Visuel indisponible';
+    const frame = image.closest('.mir-catalogue-photo');
+    image.replaceWith(fallback);
+    if (!frame) return;
+    frame.dataset.photoType = 'empty';
+    const caption = frame.closest('article')?.querySelector('.card-photo-label,.mir-photo-caption');
+    if (caption) caption.textContent = fallback.textContent;
+  }, true);
   function smooth(m, c) {
     return /lisse|smooth/.test(norm(m.finish || m.name)) && c?.swatchUse === 'color_reference';
   }
   function colorReference(m,c) {return c?.swatchUse==='color_reference' && !(m.applications||[]).includes('siding');}
   function exactImage(m, c) {
     if(!c?.id)return null;
-    return (m.images || []).find(i => local(i.src) && (i.colorId === c?.id || (i.colorIds || []).includes(c?.id)));
+    const matches = (m.images || []).filter(i => local(i.src) && (i.colorId === c.id || (i.colorIds || []).includes(c.id)));
+    return matches.find(i => i.formatId && i.formatId === m.selectedFormatId) || matches.find(i => !i.formatId) || matches[0];
   }
   function sourceImage(m) {
     const list = (m.images || []).filter(i => local(i.src));
@@ -22,12 +66,12 @@
   }
   function recipe(m, c) {
     const exact = c && exactImage(m, c);
-    if (exact) return {kind:'exact_variant',src:local(exact.src),label:`${m.name} · ${c.name}`,source:exact.sourceUrl,formatMatch:!!exact.formatId&&m.selectedFormatId===exact.formatId,formatId:exact.formatId||null};
+    if (exact) return {kind:'exact_variant',image:exact,src:local(exact.src),label:`${m.name} · ${c.name}`,source:exact.sourceUrl,formatMatch:!!exact.formatId&&m.selectedFormatId===exact.formatId,formatId:exact.formatId||null};
     if (c && local(c.swatchUrl)) return {kind:smooth(m,c)?'smooth_preview':colorReference(m,c)?'color_reference_preview':'manufacturer_sample',src:local(c.swatchUrl),label:`${m.name} · ${c.name}`,source:c.sourceUrl};
     if (c && /^#[0-9a-f]{6}$/i.test(c.hex || '')) return {kind:'numeric_preview',hex:c.hex,label:`${m.name} · ${c.name}`,source:c.sourceUrl};
     if (c) return {kind:'missing_variant',label:`${m.name} · ${c.name}`,source:c.sourceUrl};
     const im = sourceImage(m);
-    return im ? {kind:'product',src:local(im.src),label:im.alt || m.name,source:im.sourceUrl} : {kind:'missing_product',label:m.name,source:m.sourceUrl};
+    return im ? {kind:'product',image:im,src:local(im.src),label:im.alt || m.name,source:im.sourceUrl} : {kind:'missing_product',label:m.name,source:m.sourceUrl};
   }
   async function displayColor(src) {
     const url = local(src); if (!url) return null;
@@ -66,12 +110,13 @@
     if(!element)return;
     const request=Symbol('material-preview');element._materialPreviewRequest=request;
     const r=recipe(m,c);element.dataset.previewKind=r.kind;element.dataset.colorId=c?.id || '';
+    if(element.classList.contains('mir-catalogue-photo'))element.dataset.photoType=r.image?photoType(r.image):r.kind.startsWith('missing_')?'empty':'sample';
     if(r.kind==='smooth_preview'||r.kind==='color_reference_preview'||r.kind==='numeric_preview'){
       element.innerHTML='<div class="sample-loading">Préparation de la teinte…</div>';
       const hex=r.hex || await displayColor(r.src);if(element._materialPreviewRequest!==request)return;
       element.innerHTML=hex?smoothSVG(m,c,hex):`<div class="sample-unavailable"><strong>${esc(c.name)}</strong><span>Échantillon indisponible</span></div>`;
       element.dataset.displayColor=hex||'';
-    } else if(r.src) element.innerHTML=`<img src="${esc(r.src)}" alt="${esc(r.label)}" loading="eager" decoding="async">`;
+    } else if(r.src) element.innerHTML=photoImage({...r.image,src:r.src,alt:r.label},r.label,{loading:'eager'});
     else element.innerHTML=`<div class="sample-unavailable"><strong>${esc(c?.name || 'Photo à compléter')}</strong><span>${c?'Cette teinte n’a pas encore de visuel associé.':'Référence fabricant en cours de vérification.'}</span></div>`;
     return r;
   }
@@ -81,5 +126,5 @@
     element.style.backgroundColor=hex;element.replaceChildren();element.dataset.displayColor=hex;
   }
   function cancel(element){if(element)element._materialPreviewRequest=Symbol('cancelled-preview');}
-  root.MIRMaterialPreview={recipe,render,svg,paintChip,displayColor,smooth,colorReference,cancel};
+  root.MIRMaterialPreview={recipe,render,svg,paintChip,displayColor,smooth,colorReference,cancel,photoType,photoLabel,photoImage,photoUnavailable};
 })(typeof window!=='undefined'?window:globalThis);

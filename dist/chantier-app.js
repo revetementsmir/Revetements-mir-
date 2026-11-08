@@ -135,18 +135,45 @@
       (reviewState.hidden.length?'<button type="button" id="review-hidden-toggle">'+
       (reviewState.showHidden?'Masquer les retirés':'Voir les retirés ('+reviewState.hidden.length+')')+'</button>':'')+'</div>';
   }
-function imageFor(item) {const path=item.primaryImage||item.image||materialMap.get(item.materialId)?.primaryImage;return typeof path==='string'&&/^(\.\/)?assets\//.test(path)?path:null;}
-  function productVisual(item) {const path=imageFor(item);return path?`<img src="${esc(path)}" alt="${esc(item.name)} — illustration du profil ou de la gamme" loading="lazy">`:isFold(item)?foldSVG(item):icon(item.category==='lames-consommables'?'tool':'box');}
+  function cataloguePhoto(item){
+    const material=materialMap.get(item.materialId),path=item.primaryImage||item.image||material?.primaryImage;
+    if(typeof path!=='string'||!/^(?:\.\/)?assets\//.test(path))return null;
+    return material?.images?.find(image=>image.src===path)||{src:path};
+  }
+  function productVisual(item) {
+    const photo=cataloguePhoto(item),V=window.MIRMaterialPreview;
+    return V.photoImage(photo,item.name)||(isFold(item)?foldSVG(item):V.photoUnavailable());
+  }
+  function productVisualLabel(item){
+    const photo=cataloguePhoto(item);
+    return photo?window.MIRMaterialPreview.photoLabel(photo):isFold(item)?'Dessin du pliage':'Visuel à compléter';
+  }
   const favoriteIds=()=>state.favorites[actorId]||[];
   function colorOptions(item,value='') {const selected=value||item.baseColorId||'';return `<option value=""${selected?'':' selected'}>${item.colors?.length?'Choisir la couleur':'Teinte à confirmer'}</option>`+(item.colors||[]).map(color=>`<option value="${esc(color.id)}"${selected===color.id?' selected':''}>${esc(color.name)}</option>`).join('');}
   function formatLabel(format){return format?.label||(format?.widthIn?`${num(format.widthIn)} × ${num(format.lengthIn)} po`:format?.lengthIn?`${num(format.lengthIn)} po`:'');}
   function formatOptions(item,value=''){return '<option value="">Choisir le format</option>'+(item.formats||[]).map(format=>`<option value="${esc(format.id)}"${value===format.id?' selected':''}>${esc(formatLabel(format))}</option>`).join('');}
-  async function updateProductPreview(card,item){
-    const element=card?.querySelector('[data-product-sample]'),caption=card?.querySelector('.product-preview-caption'),M=window.MIRMaterialPreview,material=materialMap.get(item?.materialId);if(!element||!M||!material)return;
-    const color=(item.colors||[]).find(c=>c.id===card.querySelector('[data-product-color]')?.value),formatId=card.querySelector('[data-product-format]')?.value||item.formats?.[0]?.id||'';
-    const rendering=M.render(element,{...material,selectedFormatId:formatId},color);
-    if(caption){const recipe=M.recipe({...material,selectedFormatId:formatId},color);caption.textContent=color?(recipe.kind==='exact_variant'?`${color.name} · photo couleur${recipe.formatMatch?'':' · format à confirmer'}`:`${color.name} · échantillon à l’écran`):'';}
-    await rendering;
+  async function updateProductPreview(card,item,colorId){
+    const element=card?.querySelector('[data-product-sample]'),caption=card?.querySelector('.product-preview-caption'),V=window.MIRMaterialPreview;
+    if(!element||!V||!item)return;
+    colorId ||= card.querySelector('[data-product-color]')?.value;
+    const color=item.storeColors?.find(c=>c.id===colorId)||item.colors?.find(c=>c.id===colorId);
+    const formatId=card.querySelector('[data-product-format]')?.value||item.formats?.[0]?.id||'';
+    if(color?.variantImage){
+      V.cancel(element);
+      element.innerHTML=V.photoImage({src:color.variantImage,assetKind:'supplier_product_photo'},item.name+' · '+color.name)||V.photoUnavailable();
+      caption.textContent='Photo de la variante · '+color.name;return;
+    }
+    const material=materialMap.get(item.materialId);
+    if(!color||!material){
+      V.cancel(element);element.innerHTML=productVisual(item);
+      caption.textContent=productVisualLabel(item)+(color?' · Teinte à confirmer':'');return;
+    }
+    const previewColor={...color,swatchUrl:color.swatchUrl||color.swatchImage};
+    const selection={...material,selectedFormatId:formatId};
+    const recipe=V.recipe(selection,previewColor);
+    caption.textContent=recipe.kind==='exact_variant'?'Photo de la couleur · '+color.name+(recipe.formatMatch?'':' · Format à confirmer'):
+      recipe.kind==='missing_variant'?'Visuel couleur à compléter · '+color.name:'Échantillon de couleur · '+color.name;
+    await V.render(element,selection,previewColor);
   }
   function packageLabel(item) {const quantity=item.packaging?.piecesPerBox;if(item.unit!=='boîte'||!Number.isSafeInteger(quantity)||quantity<=0)return '';const noun=/clou/i.test(item.name||'')?'clous':/vis\b/i.test(item.name||'')?'vis':'pièces';return `${num(quantity)} ${noun} / boîte`;}
   function renderCustomModels() {
@@ -164,10 +191,10 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     const variant=group?'<label>Couleur / type<select data-product-variant="'+esc(item.id)+'" aria-label="Couleur ou type de '+esc(item.name)+'">'+
       item.reviewVariants.map((v,i)=>'<option value="'+i+'" data-item-id="'+esc(v.itemId)+'" data-color-id="'+esc(v.colorId||'')+'">'+esc(v.label)+'</option>').join('')+'</select></label>':'';
     return '<article class="product-card mir-simple-card'+(item.id==='mir-request-soffit-staples-1in'?' mir-prime-card':'')+
-      '" data-product="'+esc(item.id)+'"><div class="product-visual"><div class="product-sample" data-product-sample>'+productVisual(item)+
+      '" data-product="'+esc(item.id)+'"><div class="product-visual mir-catalogue-photo"><div class="product-sample" data-product-sample>'+productVisual(item)+
       '</div><button type="button" class="favorite-button" data-favorite="'+esc(item.id)+'" aria-pressed="'+favorite+'" aria-label="'+
       (favorite?'Retirer des favoris':'Ajouter aux favoris')+' : '+esc(item.name)+'">'+icon('heart')+'</button></div>'+
-      '<p class="product-preview-caption"></p><div class="product-body"><h3>'+esc(item.name)+'</h3>'+
+      '<p class="product-preview-caption mir-photo-caption">'+esc(productVisualLabel(item))+'</p><div class="product-body"><h3>'+esc(item.name)+'</h3>'+
       variant+
       (!custom&&!group&&(item.formats||[]).length>1?'<label>Longueur / format<select data-product-format="'+esc(item.id)+'">'+formatOptions(item)+'</select></label>':'')+
       (!custom&&!group&&item.formats?.length===1?'<p class="product-format">'+esc(formatLabel(item.formats[0]))+'</p>':'')+
@@ -426,9 +453,7 @@ function imageFor(item) {const path=item.primaryImage||item.image||materialMap.g
     
      if(element.dataset.productVariant){
        const card=element.closest('[data-product]'),chosen=reviewAPI?.selection(card,itemById);
-       if(chosen?.item){const sample=card.querySelector('[data-product-sample]');
-         if(sample)sample.innerHTML=productVisual(chosen.item);
-         updateProductPreview(card,chosen.item);}
+       if(chosen?.item)updateProductPreview(card,chosen.item,chosen.colorId);
        return;
      }
      if(element.id==='review-import-file'&&isDemo()&&reviewAPI){
