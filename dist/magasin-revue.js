@@ -6,15 +6,14 @@
  const n=v=>new Intl.NumberFormat('fr-CA',{maximumFractionDigits:2}).format(v);
  let materials=[],catalogue=[],display=[],notes=Review.empty(),cart=[],noteId='';
  const byId=id=>catalogue.find(i=>i.id===id);
- function imagePath(item){
-   const material=materials.find(m=>m.id===item.materialId);
-   const path=item.primaryImage||material?.primaryImage||null;
-   return typeof path==='string'&&/^(?:\.\/)?assets\/[\w./-]+\.(?:png|webp|jpe?g|avif)$/i.test(path)?path:null;
+ function photoFor(item){
+   const material=materials.find(m=>m.id===item.materialId),src=item.primaryImage||material?.primaryImage;
+   if(typeof src!=='string'||!/^(?:\.\/)?assets\/[\w./-]+\.(?:png|webp|jpe?g|avif)$/i.test(src))return null;
+   return material?.images?.find(image=>image.src===src)||{src};
  }
- function imageMarkup(item){
-   const path=imagePath(item);
-   return path?'<img src="'+safe(path)+'" loading="lazy" alt="'+safe(item.name)+'">':
-     '<div class="placeholder">Photo exacte à confirmer</div>';
+ function imageMarkup(item,photo=photoFor(item)){
+   const V=window.MIRMaterialPreview;
+   return V.photoImage(photo,item.name)||V.photoUnavailable();
  }
  function options(item,type){
    if(type==='variant')return (item.reviewVariants||[]).map((v,i)=>
@@ -29,7 +28,8 @@
    const format=!grouped&&item.formats?.length>1;
    const annotated=notes.annotations[item.id]||'',hidden=notes.hidden.includes(item.id);
    return '<article class="card'+(item.id==='mir-request-soffit-staples-1in'?' prime':'')+'" data-product="'+safe(item.id)+'">'+
-     '<div class="visual" data-visual>'+imageMarkup(item)+'</div><div class="card-body"><h2>'+safe(item.name)+'</h2>'+
+     '<div class="visual mir-catalogue-photo" data-visual>'+imageMarkup(item)+'</div><p class="mir-photo-caption" data-visual-label>'+
+     safe(window.MIRMaterialPreview.photoLabel(photoFor(item)))+'</p><div class="card-body"><h2>'+safe(item.name)+'</h2>'+
      (grouped?'<label>Couleur / type<select data-product-variant>'+options(item,'variant')+'</select></label>':'')+
      (format?'<label>Longueur / format<select data-product-format>'+options(item,'format')+'</select></label>':'')+
      (!format&&!grouped&&item.formats?.length===1?'<small>'+safe(item.formats[0].label||'')+'</small>':'')+
@@ -71,9 +71,11 @@
    if(!item)return;
    const colorId=selection.colorId||card.querySelector('[data-product-color]')?.value;
    const color=item.storeColors?.find(option=>option.id===colorId);
-   card.querySelector('[data-visual]').innerHTML=color?.variantImage
-     ?imageMarkup({...item,primaryImage:color.variantImage,name:item.name+' · '+color.name})
-     :color?'<div class="placeholder">Photo exacte à confirmer</div>':imageMarkup(item);
+   const V=window.MIRMaterialPreview;
+   const photo=color?.variantImage?{src:color.variantImage,assetKind:'supplier_product_photo',alt:item.name+' · '+color.name}:color?null:photoFor(item);
+   card.querySelector('[data-visual]').innerHTML=imageMarkup(item,photo);
+   card.querySelector('[data-visual-label]').textContent=color?.variantImage?'Photo de la variante · '+color.name:
+     color?'Visuel couleur à compléter · '+color.name:V.photoLabel(photo);
    const supplierLink=card.querySelector('[data-supplier-link]');
    if(supplierLink)supplierLink.href=color?.sourceUrl||item.sourceUrl;
  }
