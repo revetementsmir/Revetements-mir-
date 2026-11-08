@@ -15,7 +15,7 @@ const services=html.match(/<section class="mir-home-services\b[^"]*"[\s\S]*?<\/s
 
 test('Accueil principal et logo original Illustrator inchangé dans la marque',()=>{
   assert.ok(header&&hero&&services);
-  assert.ok(html.includes('mir-home-premium.css?v=images-ultrawide-20261105'));
+  assert.ok(html.includes('mir-home-premium.css?v=centre-ville-1'));
   assert.equal((html.match(/MIR-logo-officiel-original\.svg/g)||[]).length,2);
   const logo=read('assets/MIR-logo-officiel-original.svg');
   assert.match(logo,/^<svg[^>]*viewBox="0 0 363\.68 91\.133"/);

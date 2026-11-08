@@ -8,7 +8,9 @@ const names=['realisations-mir-contemporain-brun','realisations-mir-contrastes',
 let tests=0;function test(label,fn){fn();tests++;console.log('PASS '+label)}
 test('L’accueil approuvé est préservé avant sa section Réalisations',()=>{
  const html=read('index.html');
- const prefix=html.slice(0,html.indexOf('<section id="realisations"'));
+ const prefix=html.slice(0,html.indexOf('<section id="realisations"'))
+  .replace('mir-home-premium.css?v=centre-ville-1','mir-home-premium.css?v=images-ultrawide-20261105')
+  .replace('app.js?v=centre-ville-1','app.js');
  let h=0;for(const ch of prefix)h=(Math.imul(h,31)+ch.charCodeAt(0))>>>0;
  assert.equal(h,3906695709,'La maison, le logo, les cartes ou le header ont changé !');
  assert.match(prefix,/mir-home-hero-20261105\.avif/);
@@ -25,7 +27,7 @@ test('Les trois maisons de MIR sont présentes dans Réalisations sans changemen
 test('La section Réalisations existante conserve ses filtres et sélection',()=>{
  const h=read('index.html');
  assert.match(h,/data-filter="saved"/);
- assert.equal((h.match(/class="image-trigger"/g)||[]).length,3);
+ assert.equal((h.match(/class="image-trigger"/g)||[]).length,4);
  const section=h.slice(h.indexOf('<section id="realisations"'),h.indexOf('</section>',h.indexOf('<section id="realisations"')));
  for(const id of names)assert.match(section,new RegExp(id+'-large\\.webp'));
  const app=read('app.js');
@@ -76,7 +78,7 @@ test('Galerie en grand, clavier et retours accessibles',()=>{
 test('Quatrième réalisation publiée en AVIF, originale et variante mobile',()=>{
   const h=read('realisations.html'),js=read('mir-realisations.js'),css=read('mir-realisations.css');
   assert.match(h,/Au cœur du centre-ville de Québec/);
-  assert.match(h,/Photo originale fournie par MIR · voiture conservée/);
+  assert.match(read('index.html'),/data-category="urban" data-id="3"/);
   assert.match(h,/data-photo="3"/);
   assert.match(h,/aria-live="polite">1 \/ 4/);
   assert.match(js,/Au cœur du centre-ville de Québec/);

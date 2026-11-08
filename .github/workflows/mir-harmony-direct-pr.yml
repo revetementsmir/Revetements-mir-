@@ -39,10 +39,18 @@ jobs:
           node tests/mir-harmony-direct-browser.cjs
           node tests/mir-harmony-revisions-browser.cjs
           node tests/mir-client-signature-browser.cjs
+      - name: Accueil et réalisations sur téléphone, tablette et PC
+        run: |
+          node tests/mir-homepage.cjs
+          node tests/mir-realisations.cjs
+          node tests/mir-homepage-browser.cjs
+          node tests/mir-realisations-browser.cjs
       - name: Captures, séquence et résultats
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: MIR-Harmony-cotes-navigation
-          path: artifacts/harmony/
+          path: |
+            artifacts/harmony/
+            artifacts/mir-centre-ville-*.png
           if-no-files-found: warn

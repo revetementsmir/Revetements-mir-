@@ -59,6 +59,29 @@ async function main(){
       assert.ok(metrics.account.right<=size.w+2,size.name+': compte hors viewport');
       assert.equal(failures.length,0,size.name+': erreurs JS '+failures.join('; '));
       await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-accueil-'+size.name+'.png')});
+      const featured=page.locator('#au-coeur-du-centre-ville');
+      await featured.scrollIntoViewIfNeeded();
+      const imageSource=await featured.locator('img').evaluate(async img=>{await img.decode();return img.currentSrc;});
+      assert.ok(imageSource.endsWith('-avec-voiture-'+(size.w<=760?'mobile':'large')+'.avif'),size.name+': bonne version de la photo');
+      if(['mobile','desktop'].includes(size.name)){
+        await featured.screenshot({path:path.resolve(__dirname,'../artifacts/mir-centre-ville-'+size.name+'.png')});
+        assert.equal(await page.locator('#result-count').textContent(),'4 réalisations');
+        await featured.locator('.image-trigger').click();
+        assert.equal(await page.locator('#dialog-title').textContent(),'Au cœur du centre-ville de Québec');
+        assert.equal(await page.locator('#dialog-number').textContent(),'1 / 4');
+        await page.locator('#next-project').click();
+        assert.equal(await page.locator('#dialog-title').textContent(),'Lignes contemporaines');
+        await page.keyboard.press('Escape');
+        await featured.locator('.save').click();
+        await page.locator('[data-filter="urban"]').click();
+        assert.equal(await page.locator('#result-count').textContent(),'1 réalisation');
+        await featured.locator('.image-trigger').click();
+        assert.equal(await page.locator('#next-project').isEnabled(),false);
+        await page.keyboard.press('Escape');
+        await page.locator('[data-filter="saved"]').click();
+        assert.equal(await featured.isVisible(),true);
+      }
+      assert.deepEqual(failures,[]);
       checks++;
       console.log('PASS '+size.name+' '+size.w+'×'+size.h+' · sans débordement · photo et logo chargés');
       await page.close();
