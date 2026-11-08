@@ -1052,23 +1052,50 @@ function renderLayoutImport(){
  banner.hidden=false;
  try{
   const payload=JSON.parse(raw),preview=output.inspectImport(order,payload),transfer=preview.transfer;
-  const sourceHref='calepinage.html#'+encodeURIComponent(transfer.zoneId),otherRevision=(order.layoutImports||[]).some(row=>row.zoneId===transfer.zoneId&&row.id!==transfer.id);
-  banner.innerHTML=`<strong>${esc(transfer.name)} · ${transfer.items.length} panneaux · révision ${esc(transfer.revision)}</strong><p>${preview.alreadyImported?'Cette révision a déjà été ajoutée au dossier. Aucun doublon ne sera créé.':'Vos panneaux gardent les cotes hors tout et les repères du calepinage. La matière, la projection et la perforation restent à préciser si elles ne sont pas renseignées.'}</p>${otherRevision?'<p>Une autre révision de cette zone existe dans le dossier. Cet ajout crée de nouvelles lignes; il ne remplace pas les pièces existantes.</p>':''}<p>Données locales sur ce navigateur · dossier à valider par l’atelier. Aucun bon n’est envoyé à Zoho Books.</p><div class="piece-submit"><button type="button" id="import-panel-layout" class="primary-button" ${preview.alreadyImported||layoutImportBusy||busy?'disabled':''}>${preview.alreadyImported?'Panneaux déjà ajoutés':layoutImportBusy?'Enregistrement…':'Ajouter ces '+transfer.items.length+' panneaux au dossier'}</button><a class="text-link" href="${esc(sourceHref)}">Retour au calepinage ↗</a></div>`;
- }catch(error){banner.innerHTML=`<strong>Calepinage à vérifier</strong><p>${esc(error.message)}</p><a class="text-link" href="calepinage.html">Ouvrir le calepinage ↗</a>`;}
+  const sourceHref='calepinage.html#'+encodeURIComponent(transfer.zoneId),count=transfer.items.length;
+  const otherRevision=(order.layoutImports||[]).some(row=>row.zoneId===transfer.zoneId&&row.id!==transfer.id);
+  const status=preview.alreadyImported?'Les '+count+' panneaux sont déjà dans ce dossier. Aucun doublon créé.':'Les '+count+' panneaux sont prêts à importer ensemble, avec leurs repères et leurs vraies cotes.';
+  const actions=preview.alreadyImported
+   ?'<button type="button" id="open-panel-po" class="primary-button">Ouvrir le bon de commande de ces pièces →</button>'
+   :'<button type="button" id="create-panel-po" class="primary-button"'+(layoutImportBusy||busy?' disabled':'')+'>Créer un bon avec les '+count+' panneaux →</button>'+
+    '<button type="button" id="import-panel-layout" class="secondary-button"'+(layoutImportBusy||busy?' disabled':'')+'>Ajouter les '+count+' au dossier courant</button>';
+  banner.innerHTML='<div class="mir-po-layout-journey">'+
+   '<p class="eyebrow">VOTRE MUR → BON DE COMMANDE</p>'+
+   '<h2>'+esc(transfer.name)+' · '+count+' panneaux</h2>'+
+   '<p>'+esc(status)+'</p>'+
+   '<p class="field-hint">1. Vérifier les pièces · 2. Choisir le fournisseur · 3. Enregistrer le bon PDF. Rien n’est envoyé automatiquement.</p>'+
+   (otherRevision?'<p class="field-hint">Attention : une autre révision de cette zone figure au dossier. Elle sera conservée.</p>':'')+
+   '<div class="piece-submit mir-po-layout-actions">'+actions+
+   '<a class="text-link" href="'+esc(sourceHref)+'">Retour au mur et aux dimensions ↗</a></div></div>';
+ }catch(error){banner.innerHTML='<strong>Mur à vérifier</strong><p>'+esc(error.message)+'</p><a class="text-link" href="calepinage.html">Revenir au tracé ↗</a>';}
 }
-async function importPanelLayout(){
+async function importPanelLayout({startNew=false,openBon=false}={}){
  if(client||busy||layoutImportBusy)return;
  const output=window.MIRPanelLayoutOutput;if(!output)return;
  layoutImportBusy=true;renderLayoutImport();
  try{
+  if(startNew){
+   const raw=localStorage.getItem(output.STORAGE_KEY);
+   if(!raw)throw Error('Le mur ne se trouve plus dans ce navigateur. Ouvre le calepinage.');
+   const fresh=defaultOrder(),payload=JSON.parse(raw);
+   output.inspectImport(fresh,payload);
+   if((order.items.length||order.poNumber||order.project)&&!window.confirm('Créer un nouveau bon uniquement avec les panneaux de ce mur ? Le dossier en cours sera conservé séparément.'))return;
+   if(!switchWorkshopOrder(fresh))return;
+  }
   const perform=()=>output.importStored(localStorage,KEYS.draft,{fallbackOrder:order,expectedOrder:order});
   const result=globalThis.navigator?.locks?.request?await navigator.locks.request('mir-production-admin-dossier',perform):perform();
   if(!result.ok){toast(result.error||'Le calepinage n’a pas été ajouté.');return;}
-  // The stored dossier is adopted only after the complete batch was saved.
   order=result.order;workflow='configure';authoring=false;editingItemId=null;
-  render();toast(result.alreadyImported?'Cette révision est déjà présente : aucun doublon ajouté.':result.added+' panneaux ajoutés et enregistrés dans le dossier.');
-  if(!result.alreadyImported)$('#production-order').scrollIntoView({behavior:'smooth',block:'start'});
- }catch(error){toast('Le calepinage n’a pas été ajouté : '+error.message);}
+  render();
+  const count=result.transfer?.items?.length||result.added;
+  toast(result.alreadyImported?'Cette révision est déjà présente : aucun doublon ajouté.':count+' panneaux ajoutés ensemble au dossier.');
+  if(openBon){
+   if(!window.MIRProcurementUI?.openCreate?.({newOrder:false})){
+    toast('Les panneaux sont enregistrés; ouvre Bons de commande pour choisir le fournisseur.');
+    $('#production-order')?.scrollIntoView({behavior:'smooth',block:'start'});
+   }
+  }else if(!result.alreadyImported)$('#production-order')?.scrollIntoView({behavior:'smooth',block:'start'});
+ }catch(error){toast('Les panneaux n’ont pas été ajoutés : '+error.message);}
  finally{layoutImportBusy=false;renderLayoutImport();}
 }
 function valuesFromDraft(spec,id){const measurements={};if(spec.kind==='profile'){if(spec.template==='custom')for(const s of spec.segments||[])measurements[s.label]=s.length;else Object.assign(measurements,spec.dimensions||{});measurements.length=spec.length;}else{for(const key of ['width','height','relief','lip','apexX','topWidth','topOffset','offset','tipDepth','apexOffset','roofPitch'])measurements[key]=spec[key];measurements.lips=copy(spec.lips||{});}return {id,instanceId:id,name:spec.name,unit:spec.unit,measurements,quantity:spec.quantity,material:copy(spec.material||{}),finish:{manufacturer:'',selectionType:null,hex:null,swatchUrl:null,swatchImage:null,source:null,availabilityNote:'',displayOnly:false,...copy(spec.finish||{})},length:spec.length,coloredFace:copy(spec.coloredFace||{}),mirrorX:spec.mirrorX===true,dimensionBasis:spec.dimensionBasis,bottomEdgeId:spec.bottomEdgeId,perforation:copy(spec.perforation||{}),lips:copy(spec.lips||{}),location:spec.location,note:spec.note};}
@@ -1982,6 +2009,8 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(d.importMirModels&&!client){$('#mir-template-backup-file')?.click();return;}
   if(d.mirFixJ){try{draft=window.MIRBendingPresets.autoCorrectJ(draft);jException=null;renderDimensions();renderProfileOptions();updateDrawing();toast('Clouage ajusté au minimum requis.');}catch(error){toast(error.message);}return;}
   if(d.mirAcceptJ){const check=window.MIRBendingPresets?.checkJ(draft);if(!check?.valid||check.ok)return;dialog('Garder le clouage hors règle','Le minimum est '+window.MIRCalepinageExtension.formatInches(check.minimumIn)+'. La dérogation sera enregistrée sur la pièce et dans la production.',`<form id="mir-j-exception-form" class="dialog-form"><label class="check-field"><input type="checkbox" name="accepted" required> J’accepte explicitement ce clouage hors règle.</label><label>Acceptée par (nom ou identifiant)<input name="acceptedBy" maxlength="100" required></label><label>Note chantier facultative<input name="note" maxlength="220" placeholder="Contexte de fabrication"></label><p id="production-dialog-error" class="dialog-error" role="alert"></p><div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button><button type="submit" class="primary-button">Confirmer la dérogation</button></div></form>`);return;}
+ if(button.id==='create-panel-po')return importPanelLayout({startNew:true,openBon:true});
+ if(button.id==='open-panel-po')return window.MIRProcurementUI?.openCreate?.({newOrder:false});
  if(button.id==='import-panel-layout')return importPanelLayout();
  if(button.hasAttribute('data-close-production-dialog'))return closeDialog();
  if(d.workflow){workflow=d.workflow;authoring=false;editingTemplateId=null;render();return;}
