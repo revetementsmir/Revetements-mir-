@@ -157,13 +157,13 @@
     if(!main||!win.localStorage||doc.querySelector('#mir-procurement-tabs'))return;
     const W=win.MIRPOWorkflow;
     let stored=win.localStorage.getItem(KEY);
-    let state=readState(win.localStorage),tab='draw',supplierEditing=null,pendingWorkflowObserver=null,poView='pending';
+    let state=readState(win.localStorage),tab='draw',supplierEditing=null,pendingWorkflowObserver=null,poView='pending',panelFilter='';
     const ui={supplierId:'unico',poNumber:'',job:'',foreman:'',shipTo:'',requestedDate:'',terms:'',notes:'',...state.formDraft};
     let query='',filterDate='';
     function save(){try{if(win.localStorage.getItem(KEY)!==stored)throw Error('Le suivi a changé dans un autre onglet. Rechargez la page.');const raw=JSON.stringify(state);win.localStorage.setItem(KEY,raw);stored=raw;return true;}catch{win.alert('Sauvegarde impossible ou données modifiées dans un autre onglet. Rechargez avant de continuer.');return false;}}
     save();
     const tabs=doc.createElement('nav');tabs.id='mir-procurement-tabs';tabs.setAttribute('aria-label','Atelier MIR : dessins, modèles et bons fournisseur');
-    tabs.innerHTML='<button type="button" data-mir-tab="draw">Créer</button><button type="button" data-mir-tab="models">Mes pliages</button><button type="button" data-mir-tab="boutique">Boutique</button><button type="button" data-mir-tab="store">Magasin employés</button><button type="button" data-mir-tab="orders">Bons de commande</button>';
+    tabs.innerHTML='<button type="button" data-mir-tab="draw">Créer</button><button type="button" data-mir-tab="panels">Panneaux</button><button type="button" data-mir-tab="models">Mes pliages</button><button type="button" data-mir-tab="boutique">Boutique</button><button type="button" data-mir-tab="store">Magasin employés</button><button type="button" data-mir-tab="orders">Bons de commande</button>';
     const panel=doc.createElement('section');panel.id='mir-procurement-panel';panel.hidden=true;
     main.insertBefore(tabs,main.firstChild);main.append(panel);doc.body.classList.add('mir-procurement-ready');
     const shortcuts=doc.createElement('div');shortcuts.id='mir-proc-shortcuts';shortcuts.innerHTML='<button type="button" data-mir-tab="draw">＋ Nouveau dessin</button>';
@@ -219,6 +219,103 @@
           '<button type="button" data-mir-po-edit-line="'+esc(item.id)+'">Modifier la pièce</button></div></div></article>';
       }).join('')+'</div>';
     }
+
+    /* One shared workshop dossier; selection is a reversible PO choice only.
+       Never remove or re-number fabrication pieces when a checkbox changes. */
+    const skippedFor=dossier=>new Set(state.excludedItemIdsByDossier?.[dossier?.id]||[]);
+    function includedDossier(dossier){
+      if(!dossier)return null;
+      const skipped=skippedFor(dossier);
+      return {...dossier,items:dossier.items.filter(item=>!skipped.has(item.id))};
+    }
+    function refreshPanelSelections(){
+      const dossier=currentOrder(),chosen=includedDossier(dossier);
+      if(!dossier)return;
+      for(const control of panel.querySelectorAll('[data-mir-panel-include],[data-mir-po-include]')){
+        const selected=!skippedFor(dossier).has(control.dataset.mirPanelInclude||control.dataset.mirPoInclude);
+        control.checked=selected;
+        control.closest('[data-mir-panel-card],[data-mir-po-piece]')?.classList.toggle('mir-panel-excluded',!selected);
+      }
+      const count=chosen.items.filter(item=>item.spec?.kind==='panel').length;
+      panel.querySelectorAll('[data-mir-panel-count]').forEach(node=>node.textContent=String(count));
+      panel.querySelectorAll('[data-mir-po-count]').forEach(node=>node.textContent=String(chosen.items.length));
+    }
+    function changeIncluded(id,checked){
+      const dossier=currentOrder();
+      if(!dossier||!dossier.items.some(item=>item.id===id))return false;
+      const oldState=JSON.stringify(state.excludedItemIdsByDossier||{});
+      const exclude=skippedFor(dossier);
+      if(checked)exclude.delete(id);else exclude.add(id);
+      state.excludedItemIdsByDossier={...(state.excludedItemIdsByDossier||{}),[dossier.id]:[...exclude]};
+      if(!save()){
+        state.excludedItemIdsByDossier=JSON.parse(oldState);
+        return false;
+      }
+      refreshPanelSelections();
+      return true;
+    }
+    function panelCards(dossier){
+      const api=win.MIRProduction,parts=(dossier?.items||[]).filter(item=>item.spec?.kind==='panel');
+      const excluded=skippedFor(dossier);
+      return parts.map((item,index)=>{
+        const spec=item.spec||{},id=String(item.id),label=item.sourceLayout?.sourcePieceId||id;
+        let preview='',measure='',notes='',complete=false,metal='',color='';
+        try{
+          const m=api.buildPanel(spec);
+          if(!m.valid)throw Error('Cotes invalides');
+          preview=api.panelSVG(spec,{width:510,height:290,legend:false,header:false,notes:false});
+          measure=api.formatMeasurement(m.widthMM,m.unit)+' × '+api.formatMeasurement(m.heightMM,m.unit);
+          complete=m.complete;
+          metal=m.material?.name||m.material?.type||'Métal à choisir';
+          color=m.finish?.name||m.finish?.code||'Couleur à choisir';
+          notes=(m.edges||[]).map((e,i)=>(i+1)+'. '+e.name+' : '+api.formatMeasurement(e.lengthMM,m.unit)+
+            ' • lip '+api.formatMeasurement(e.lipMM,m.unit)+' • '+Math.round(e.interiorAngleDeg*100)/100+'°').join(' · ');
+          if(!m.complete)notes+='<MIROPTIONS>'+((m.validation.pending||[]).slice(0,3).map(p=>p.message).join(' · '));
+        }catch{preview='<div class="mir-panel-card-error">Dessin à corriger dans Panneau seul.</div>';}
+        const qty=Number.isSafeInteger(Number(spec.quantity))&&Number(spec.quantity)>0?Number(spec.quantity):1;
+        const source=item.sourceLayout?.zoneName||'Panneau seul';
+        const selected=!excluded.has(id);
+        return '<article class="mir-panel-card'+(selected?'':' mir-panel-excluded')+'" data-mir-panel-card="'+esc(id)+'" data-panel-search-text="'+esc(label+' '+source+' '+measure)+'">'+
+          '<div class="mir-panel-card-head"><span class="mir-panel-card-id">'+esc(label)+'</span>'+
+          '<span class="mir-panel-card-status'+(complete?' mir-panel-card-complete':'')+'">'+(complete?'Cotes complètes':'À vérifier avant PDF')+'</span></div>'+
+          '<div class="mir-panel-card-drawing">'+preview+'</div>'+
+          '<h3>'+esc(spec.name||'Panneau sur mesure')+'</h3>'+
+          '<p class="mir-panel-card-size">'+esc(measure||'Dimensions à préciser')+'</p>'+
+          '<p class="mir-panel-card-line">'+esc(source)+' · '+esc(metal)+' · '+esc(color)+'</p>'+
+          '<details class="mir-panel-card-details"><summary>Voir lips, angles et options</summary><p>'+esc(notes.replace('<MIROPTIONS>',' • Options à préciser : '))+'</p></details>'+
+          '<div class="mir-panel-card-controls"><label>Qté<input type="number" min="1" step="1" value="'+qty+'" data-mir-panel-qty="'+esc(id)+'" aria-label="Quantité panneau '+esc(label)+'"></label>'+
+          '<label class="mir-panel-card-check"><input type="checkbox" data-mir-panel-include="'+esc(id)+'"'+(selected?' checked':'')+'><span>Inclure au bon</span></label></div>'+
+          '<div class="mir-panel-card-buttons"><button type="button" data-mir-panel-edit="'+esc(id)+'">Modifier</button>'+
+          '<a href="calepinage.html'+(item.sourceLayout?.zoneId?'#'+encodeURIComponent(item.sourceLayout.zoneId):'')+'">Voir le mur</a></div></article>';
+      }).join('');
+    }
+    function panelsHTML(){
+      const dossier=currentOrder(),panels=(dossier?.items||[]).filter(item=>item.spec?.kind==='panel');
+      const selected=includedDossier(dossier);
+      const included=selected?.items.filter(item=>item.spec?.kind==='panel').length||0;
+      return '<section class="mir-panel-admin" aria-label="Gestion des panneaux architecturaux">'+
+        '<header class="mir-panel-admin-hero"><p class="mir-panel-kicker">L’ATELIER MIR / PANNEAUX ARCHITECTURAUX</p>'+
+        '<h2>Du mur au bon. <em>Sans tout recommencer.</em></h2>'+
+        '<p>Dessine ton mur ou un seul panneau, vérifie les cotes, puis prépare un bon fournisseur. Un panneau = une carte = une ligne = un dessin au PDF.</p></header>'+
+        '<nav class="mir-panel-steps" aria-label="Parcours panneaux">'+
+        '<a href="calepinage.html"><b>1</b><span>Mur / Calepinage<small>Dessiner et répartir</small></span></a>'+
+        '<button type="button" data-mir-panel-new><b>2</b><span>Panneau seul<small>Tracer une pièce</small></span></button>'+
+        '<a href="#mir-panel-dossier"><b>3</b><span>Dossier panneaux<small>Chaque pièce cotée</small></span></a>'+
+        '<button type="button" data-mir-panel-to-po><b>4</b><span>Bon de commande<small>Fournisseur et livraison</small></span></button>'+
+        '<button type="button" data-mir-panel-history><b>5</b><span>Historique / PDF<small>Retrouver les bons</small></span></button></nav>'+
+        '<section class="mir-panel-dossier" id="mir-panel-dossier">'+
+        '<div class="mir-panel-dossier-head"><div><p class="mir-panel-kicker">TON DOSSIER LOCAL</p>'+
+        '<h3><span data-mir-panel-count>'+included+'</span> panneau(x) dans le bon <small>sur '+panels.length+' pièces du dossier</small></h3>'+
+        '<p>Chaque dessin est une seule pièce, avec son repère, ses dimensions et ses lèvres.</p></div>'+
+        '<div class="mir-panel-dossier-actions"><button type="button" data-mir-panel-all="true">Tout inclure</button>'+
+        '<button type="button" data-mir-panel-all="false">Tout retirer</button></div></div>'+
+        (panels.length?'<label class="mir-panel-search">Rechercher un panneau<input type="search" data-mir-panel-search placeholder="P01, mur arrière, dimensions…"></label>'+
+        '<div class="mir-panel-cards">'+panelCards(dossier)+'</div>':
+        '<div class="mir-panel-empty"><h3>Aucun panneau dans ce dossier</h3><p>Commence par dessiner un mur complet ou un panneau seul. Les pièces apparaîtront ici avec leurs vraies cotes.</p>'+
+        '<a href="calepinage.html">Dessiner un mur</a><button type="button" data-mir-panel-new>Créer un panneau seul</button></div>')+
+        '<footer class="mir-panel-dossier-footer"><p>Les pièces décochées restent enregistrées dans le dossier. Elles ne seront pas incluses dans ce bon.</p>'+
+        '<button type="button" class="mir-panel-primary" data-mir-panel-to-po'+(!included?' disabled':'')+'>Préparer le bon avec <span data-mir-panel-count>'+included+'</span> panneau(x)</button></footer></section></section>';
+    }
     function supplierQuickPick(){
       const active=state.suppliers.filter(s=>!s.archived),selected=active.find(row=>row.id===ui.supplierId);
       const buttons=active.map(s=>
@@ -234,7 +331,7 @@
     function ordersHTML(){
       if(poView!=='create')return orderListsHTML();
       populateOrder();
-      const dossier=currentOrder(),items=(dossier?.items||[]).filter(i=>['profile','panel'].includes(i?.spec?.kind||i?.kind));
+      const dossier=includedDossier(currentOrder()),items=(dossier?.items||[]).filter(i=>['profile','panel'].includes(i?.spec?.kind||i?.kind));
       const quantity=items.reduce((sum,item)=>sum+Number(item.spec?.quantity||0),0),panelCount=items.filter(item=>item.spec?.kind==='panel').length;
       return poMenu()+
         '<section class="mir-po-editor" aria-label="Créer ou modifier un bon de pliage">'+
@@ -371,8 +468,8 @@
     }
     function switchTab(next){
       if(pendingWorkflowObserver){pendingWorkflowObserver.disconnect();pendingWorkflowObserver=null;}
-      tab=['draw','models','boutique','store','orders','suppliers'].includes(next)?next:'draw';
-      doc.body.dataset.mirTab=tab;shortcuts.hidden=tab!=='draw'&&tab!=='models';panel.hidden=!['orders','suppliers','boutique','store'].includes(tab);
+      tab=['draw','panels','models','boutique','store','orders','suppliers'].includes(next)?next:'draw';
+      doc.body.dataset.mirTab=tab;shortcuts.hidden=tab!=='draw'&&tab!=='models';panel.hidden=!['panels','orders','suppliers','boutique','store'].includes(tab);
       tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===(tab==='suppliers'?'orders':tab)?'page':'false'));
       shortcuts.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.mirTab===tab?'page':'false'));
       if(tab==='draw'||tab==='models'){
@@ -387,7 +484,7 @@
         }
         return;
       }
-      panel.innerHTML=tab==='orders'?ordersHTML():tab==='boutique'?boutiqueHTML():tab==='store'?storeHTML():supplierHTML();
+      panel.innerHTML=tab==='panels'?panelsHTML():tab==='orders'?ordersHTML():tab==='boutique'?boutiqueHTML():tab==='store'?storeHTML():supplierHTML();
       panel.scrollIntoView({block:'start',behavior:'smooth'});
     }
     function editSupplier(id){supplierEditing=id;switchTab('suppliers');}
@@ -412,7 +509,7 @@
       return prefix+String(n).padStart(3,'0');
     }
     function newPo() {
-      const supplier=state.suppliers.find(s=>s.id===ui.supplierId),dossier=currentOrder(),errs=validatePo(ui,supplier,dossier,win.MIRProduction,{draftOnly:true}).filter(text=>!/^(Vérifier le courriel|Adresse courriel du fournisseur)/.test(text));
+      const supplier=state.suppliers.find(s=>s.id===ui.supplierId),dossier=includedDossier(currentOrder()),errs=validatePo(ui,supplier,dossier,win.MIRProduction,{draftOnly:true}).filter(text=>!/^(Vérifier le courriel|Adresse courriel du fournisseur)/.test(text));
       if(errs.length){const e=doc.querySelector('#mir-proc-error');e.hidden=false;e.innerHTML='<strong>À compléter :</strong><ul>'+errs.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>';return;}
       if(state.orders.some(o=>o.id!==state.editingId&&o.poNumber.toLowerCase()===ui.poNumber.toLowerCase()&&(!state.editingId||(o.rootId||o.id)!==(state.orders.find(x=>x.id===state.editingId)?.rootId||state.editingId)))){const e=doc.querySelector('#mir-proc-error');e.hidden=false;e.textContent='Ce numéro existe déjà : ouvre ce bon depuis En attente ou Historique pour le modifier ou créer une révision.';return;}
       const previous=state.orders.find(o=>o.id===state.editingId);
@@ -427,7 +524,7 @@
       if(index>=0&&W&&!W.frozen(state.orders[index])){
         const old=state.orders[index],supplier=state.suppliers.find(s=>s.id===ui.supplierId)||old.supplier;
         const patch={...ui,supplier:{...supplier}};
-        if(source?.id===old.sourceDossierId)patch.items=JSON.parse(JSON.stringify(source.items));
+        if(source?.id===old.sourceDossierId)patch.items=JSON.parse(JSON.stringify(includedDossier(source).items));
         state.orders[index]=W.saveDraft(old,patch);
       }
       const saved=save(),feedback=doc.querySelector('#mir-draft-feedback');if(feedback)feedback.textContent=saved?'Brouillon enregistré sur cet appareil.':'Sauvegarde non confirmée.';return saved;
@@ -491,12 +588,39 @@
       if(b.dataset.mirPoView){poView=b.dataset.mirPoView;switchTab('orders');return;}
       if(b.dataset.mirEdit){editSupplier(b.dataset.mirEdit);return;}
       if(b.id==='mir-new-supplier'){supplierEditing=null;switchTab('suppliers');return;}
+      if(b.dataset.mirPanelNew!==undefined){
+        switchTab('draw');doc.querySelector('[data-kind="panel"]')?.click();return;
+      }
+      if(b.dataset.mirPanelEdit){
+        if(win.MIRProductionWorkspace?.editOrderItem?.(b.dataset.mirPanelEdit))switchTab('draw');
+        return;
+      }
+      if(b.dataset.mirPanelHistory!==undefined){poView='history';switchTab('orders');return;}
+      if(b.dataset.mirPanelToPo!==undefined){
+        const dossier=includedDossier(currentOrder());
+        if(!dossier?.items.length)return win.alert('Coche au moins un panneau avant de préparer le bon.');
+        if(!win.MIRProcurementUI?.openCreate?.({newOrder:false})){poView='create';switchTab('orders');}
+        return;
+      }
+      if(b.dataset.mirPanelAll!==undefined){
+        const dossier=currentOrder();if(!dossier)return;
+        const checked=b.dataset.mirPanelAll==='true';
+        const excluded=skippedFor(dossier);
+        for(const item of dossier.items.filter(item=>item.spec?.kind==='panel')){
+          if(checked)excluded.delete(item.id);else excluded.add(item.id);
+        }
+        const previous=JSON.stringify(state.excludedItemIdsByDossier||{});
+        state.excludedItemIdsByDossier={...(state.excludedItemIdsByDossier||{}),[dossier.id]:[...excluded]};
+        if(!save())state.excludedItemIdsByDossier=JSON.parse(previous);
+        refreshPanelSelections();
+        return;
+      }
       if(b.id==='mir-po-suggest-number'){
         const field=panel.querySelector('[data-mir-po="poNumber"]');if(!field)return;
         if(field.value.trim()&&!win.confirm('Remplacer ce numéro de bon par une proposition locale ?'))return;
         ui.poNumber=suggestedPONumber();field.value=ui.poNumber;autosave();field.focus();return;
       }
-      if(b.id==='mir-edit-lines'){switchTab('draw');doc.querySelector('#production-drawing')?.focus({preventScroll:true});return;}
+      if(b.id==='mir-edit-lines'){switchTab('panels');return;}
       if(b.dataset.mirPoEditLine){if(win.MIRProductionWorkspace?.editOrderItem?.(b.dataset.mirPoEditLine))switchTab('draw');return;}
       if(b.dataset.mirPoSupplier){const supplier=state.suppliers.find(row=>row.id===b.dataset.mirPoSupplier&&!row.archived);if(!supplier)return;ui.supplierId=supplier.id;autosave();switchTab('orders');return;}
       if(b.id==='mir-new-draft'){if(win.MIRProductionWorkspace?.newPurchaseOrder()){state.editingId=null;Object.assign(ui,{poNumber:'',job:'',foreman:'',shipTo:'',requestedDate:'',terms:'',notes:''});state.formDraft={...ui};save();poView='create';switchTab('orders');}return;}
@@ -509,8 +633,28 @@
       if(b.dataset.mirPrint){printPo(b.dataset.mirPrint);return;}
       if(b.dataset.mirMail){mailPo(b.dataset.mirMail);}
     });
-    panel.addEventListener('input',function(e){if(e.target.id==='mir-po-search'){query=e.target.value;const start=e.target.selectionStart;switchTab('orders');const field=doc.querySelector('#mir-po-search');field.focus();field.setSelectionRange(start,start);return;}if(e.target.dataset.mirPo){ui[e.target.dataset.mirPo]=e.target.value;autosave();}});
+    panel.addEventListener('input',function(e){
+      if(e.target.matches('[data-mir-panel-search]')){
+        panelFilter=e.target.value.trim().toLocaleLowerCase('fr-CA');
+        for(const item of panel.querySelectorAll('[data-mir-panel-card]')){
+          item.hidden=!item.getAttribute('data-panel-search-text').toLocaleLowerCase('fr-CA').includes(panelFilter);
+        }
+        return;
+      }
+      if(e.target.id==='mir-po-search'){query=e.target.value;const start=e.target.selectionStart;switchTab('orders');const field=doc.querySelector('#mir-po-search');field.focus();field.setSelectionRange(start,start);return;}if(e.target.dataset.mirPo){ui[e.target.dataset.mirPo]=e.target.value;autosave();}});
     panel.addEventListener('change',function(e){
+      if(e.target.dataset.mirPanelInclude!==undefined || e.target.dataset.mirPoInclude!==undefined){
+        const id=e.target.dataset.mirPanelInclude||e.target.dataset.mirPoInclude;
+        if(!changeIncluded(id,e.target.checked))e.target.checked=!e.target.checked;
+        return;
+      }
+      if(e.target.dataset.mirPanelQty!==undefined){
+        const result=win.MIRProductionWorkspace?.setOrderItemQuantity?.(e.target.dataset.mirPanelQty,e.target.value);
+        if(!result?.ok){win.alert(result?.error||'Quantité invalide : aucune modification enregistrée.');return;}
+        const countNode=panel.querySelector('[data-mir-panel-count]');
+        if(countNode)countNode.textContent=String(includedDossier(currentOrder()).items.filter(i=>i.spec.kind==='panel').length);
+        return;
+      }
       if(e.target.dataset.mirPoQty){
         const id=e.target.dataset.mirPoQty,result=win.MIRProductionWorkspace?.setOrderItemQuantity?.(id,e.target.value);
         if(!result?.ok){
@@ -569,7 +713,7 @@
       }
     });
     const requestedView=new URLSearchParams(win.location.search).get('view');
-    switchTab(['orders','suppliers','models'].includes(requestedView)||['boutique','store'].includes(requestedView)?requestedView:'draw');
+    switchTab(['orders','suppliers','models','panels'].includes(requestedView)||['boutique','store'].includes(requestedView)?requestedView:'draw');
   }
   return {VERSION,SOURCES,seed,normalizeSupplier,mergeSuppliers,readState,getDossier,validatePo,createPo,mailtoDraft,printHTML,parsePrice,priceLabel,commercialUpdate,init};
 });
