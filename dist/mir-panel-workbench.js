@@ -91,7 +91,7 @@
      '<p class="mir-wb-spec">'+esc(metal)+' · '+esc(color)+'</p>'+
      (result.error?'<p class="mir-wb-issue" role="status">À vérifier : '+esc(result.error)+'</p>':'')+
      (v3d?'<details class="mir-wb-extra"><summary>Voir cette pièce en 3D</summary><div class="mir-wb-three-d">'+v3d+'</div></details>':'')+
-     '<details class="mir-wb-extra"><summary>Voir les lèvres et angles</summary><p>'+esc(edges||'Cotes à compléter dans le dessin')+'</p></details>'+
+     '<details class="mir-wb-extra"><summary>Voir le détail des angles et des côtés</summary><p>'+esc(edges||'Cotes à compléter dans le dessin')+'</p></details>'+
      '<div class="mir-wb-controls"><label>Quantité<input data-mir-panel-qty="'+esc(active.id)+'" type="number" inputmode="numeric" step="1" min="1" max="100000" value="'+(Number.isInteger(qty)&&qty>0?qty:1)+'"></label>'+
      '<label class="mir-wb-check"><input data-mir-panel-include="'+esc(active.id)+'" type="checkbox" '+(selected?'checked':'')+'><span>Inclure au bon</span></label></div>'+
      '<button type="button" class="mir-wb-edit" data-mir-panel-edit="'+esc(active.id)+'">Modifier les mesures de '+esc(sourceId(active))+'</button>'+
