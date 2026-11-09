@@ -95,6 +95,9 @@
   function commandSpec(command, raw = {}) {
     const fields = {
       CREATE_ORDER: ['jobId', 'lines', 'note', 'deliveryMode'], SET_FAVORITE: ['itemId', 'favorite'],
+      EXTRA_SUBMIT: ['jobId','description','photoPath','dueAt'], DELIVERY_ISSUE: ['jobId','orderId','lineId','supplierOrderId','comment','photoPath'],
+      DELIVERY_RECEIVE: ['jobId','orderId','lineId','quantity','place','photoPath'], HR_SUBMIT: ['kind','start','end','note'],
+      MESSAGE_SEND: ['conversationId','body','jobId','planDocumentId','attachmentPath'], MESSAGE_ACK: ['messageId','state'],NOTIFICATION_READ:['notificationId'],
       SET_INVENTORY: ['stockKey', 'variant', 'quantity', 'unit', 'note'], RESERVE_ORDER: ['orderId'],
       RECORD_DELIVERY: ['orderId', 'quantities', 'note'], CANCEL_REMAINDER: ['orderId', 'quantities', 'note'],
       ASSIGN_JOB: ['jobId', 'memberIds', 'memberId', 'assigned'], ASSIGN_MEMBER_JOBS: ['memberId', 'jobIds'], SET_MEMBER_ACTIVE: ['memberId', 'active'],

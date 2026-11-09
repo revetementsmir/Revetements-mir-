@@ -29,7 +29,8 @@
   if(!admin&&!portal&&!wall&&params.get('source')!=='store'&&!menu.querySelector('a[href="selection.html"]')){const complete=document.createElement('a');complete.href='selection.html';complete.textContent='Mon dossier complet';menu.append(complete);}
   header.append(title,dossier,toggle,menu);
   const owned=new Set([logo,title,dossier,toggle,menu]);new MutationObserver(()=>{for(const node of [...header.children])if(!owned.has(node))menu.append(node);}).observe(header,{childList:true});
-  if(portal){const nativeNav=document.querySelector('#portal-navigation');if(nativeNav){const placeholder=document.createComment('MIR navigation métier');nativeNav.before(placeholder);const media=matchMedia('(max-width:1100px)');const sync=()=>{if(media.matches)menu.prepend(nativeNav);else placeholder.after(nativeNav);};sync();media.addEventListener('change',sync);}}
+  // Le menu métier du portail reste dans son conteneur : latéral au bureau et
+  // fixé en bas sur téléphone. Le déplacer dans le menu d'en-tête le masquait.
 
   function close(focus=false){menu.hidden=true;toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ouvrir le menu MIR');if(focus)toggle.focus();}
   toggle.addEventListener('click',()=>{const open=menu.hidden;menu.hidden=!open;toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Fermer le menu MIR':'Ouvrir le menu MIR');if(open)menu.querySelector('a,button')?.focus();});
