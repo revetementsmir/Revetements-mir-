@@ -21,7 +21,7 @@ window.MIRPortalClient={...window.MIRPortalClient,create({config}){
   const model=window.MIREmployeeStore;
   const actorId='demo-employee-1';
   let state={...model.createDemoState([]),actorId};
-  state.jobs[0].address='141, rue du Chantier, Québec';
+  state.jobs[0].address='141, rue du Chantier, Québec';state.jobs[0].documentCount=1;
   let publish=()=>{};
   const ready=()=>({phase:'ready',snapshot:state});
   return {config,getStatus:()=>({phase:'loading'}),subscribe(fn){publish=fn;},async start(){publish(ready());},
@@ -53,9 +53,11 @@ for(const width of [320,360,390,820,1024,1440]){
   await page.getByRole('heading',{name:'Mes chantiers'}).waitFor();
   assert.equal(await page.locator('.employee-job').count(),1);
   await noOverflow();
-  await page.getByRole('button',{name:'Voir le dossier'}).click();
-  await page.locator('#portal-dialog[open]').waitFor();
-  await page.keyboard.press('Escape');
+  await page.route('**/vendor/supabase-client.js',r=>r.fulfill({contentType:'application/javascript',body:`window.MIRSupabase={createClient(){return {auth:{async getUser(){return {data:{user:{id:'demo-employee-1'}}};}},async rpc(name,args){if(name==='mir_administration')return {error:{code:'42501',message:'Administration non autorisée'}};if(name==='mir_job_detail')return {data:{id:args.p_job_id,job_number:'QA-353',name:'Chantier de recette',delivery_address:'141, rue du Chantier, Québec',canManage:false,documents:[{id:'plan-fixture',family_id:'family-fixture',version:1,name:'Plan de recette.pdf',created_at:'2026-11-09',author:'Fixture',object_path:'private-fixture.pdf'}],orders:[],purchases:[]}};return {data:name==='mir_job_blockers'?[]:null};}};}};`}));
+  await page.getByRole('link',{name:'Voir le dossier',exact:true}).click();
+  assert.equal(new URL(page.url()).pathname,'/administration.html');assert.ok(new URL(page.url()).searchParams.get('job'));
+  await page.locator('[data-download]').waitFor();assert.match(await page.locator('#admin-content').textContent(),/Plan de recette.pdf/);assert.equal(await page.locator('#admin-document-form').count(),0,'employee cannot publish a plan');await noOverflow();
+  await page.locator('#admin-account').click();await page.getByRole('heading',{name:'Mes chantiers'}).waitFor();
   await page.getByRole('button',{name:'Commander',exact:true}).and(page.locator('.employee-job button')).click();
   await page.getByRole('heading',{name:'Commander du matériel'}).waitFor();
   await page.locator('#catalogue-category').selectOption('soffites-moulures');

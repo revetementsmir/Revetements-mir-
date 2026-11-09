@@ -44,7 +44,7 @@ Les parcours réels ont utilisé les fichiers du dépôt servis au navigateur so
 
 **Chromium, tailles émulées.** Aucun téléphone, tablette ou PC physique n’a servi aux parcours du site par l’agent. Le client a confirmé le courriel R1 et l’ouverture de son PDF sur son téléphone ; ce constat ne vaut pas recette du site sur appareil physique. R2 a été inspectée à partir du PDF réellement archivé, puis acceptée par Resend ; sa réception humaine reste non confirmée.
 
-Les **18 états supplémentaires** d’interface, avec Auth/API simulées, vérifient les mêmes largeurs, droits affichés, libellés longs, dialogue clavier et aperçu PDF avant approbation. La matrice est produite dans `artifacts/administration/matrix.json` et dans l’artefact GitHub de recette. Ces essais ne sont pas présentés comme des accès Supabase réels.
+Les **19 états supplémentaires** d’interface, avec Auth/API simulées, vérifient les mêmes largeurs, droits affichés, libellés longs, dialogue clavier et aperçu PDF avant approbation. La matrice est produite dans `artifacts/administration/matrix.json` et dans l’artefact GitHub de recette. Ces essais ne sont pas présentés comme des accès Supabase réels.
 
 ## Accès refusés vérifiés
 

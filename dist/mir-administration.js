@@ -74,7 +74,7 @@
       await refresh();
       return r.result;
     } catch (e) {
-      if (e.code && /^(22|23|42|0A)/.test(e.code)) localStorage.removeItem(key);
+      if (e.code && /^(22|23|40|42|0A)/.test(e.code)) localStorage.removeItem(key);
       throw e;
     }
   }
