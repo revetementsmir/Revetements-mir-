@@ -1,4 +1,4 @@
-/* Client moulding wizard only. Keep every form node and value while paging. */
+/* Client moulding wizard only. Keep model navigation and the local dossier within the client wizard. */
 (() => {
  const $ = (selector) => document.querySelector(selector);
  const body = document.body;
@@ -8,20 +8,6 @@
 
  const controls = new Map();
  let frame = 0;
- let lastState = '';
- const preview = document.createElement('button');
- preview.type = 'button';
- preview.hidden = true;
- preview.className = 'secondary-button';
- preview.id = 'client-viewport-preview';
- preview.textContent = 'Voir le dessin';
- preview.addEventListener('click', () => {
-  const showing = body.toggleAttribute('data-client-preview');
-  preview.textContent = showing ? 'Retour aux réglages' : 'Voir le dessin';
-  if (showing) $('#production-preview').focus({preventScroll:true});
- });
- $('#production-preview').tabIndex = -1;
- main.prepend(preview);
  const localDossier = document.createElement('a');
  localDossier.id = 'client-viewport-dossier';
  localDossier.href = '#production-order';
@@ -59,12 +45,7 @@
    controls.set(key, view);
   }
   if (!view.nav.isConnected) host.after(view.nav);
-  const first = items[0].dataset.productionColor;
-  if (items.length !== view.items.length || first !== view.first) view.index = 0;
-  const selected = items.findIndex(item => item.dataset.productionColor && item.getAttribute('aria-pressed') === 'true');
-  if (selected >= 0 && items[selected].dataset.productionColor !== view.selected) view.index = Math.floor(selected / size);
-  view.selected = items[selected]?.dataset.productionColor;
-  view.first = first;
+  if (items.length !== view.items.length) view.index = 0;
   view.items = items;
   view.size = size;
   paint(view);
@@ -88,27 +69,14 @@
   frame = 0;
   const state = body.dataset.clientEntry;
   if (!state) return;
-  const stage = body.dataset.clientStage;
-  const current = state + stage;
-  if (current !== lastState) {
-   body.removeAttribute('data-client-preview');
-   preview.textContent = 'Voir le dessin';
-   lastState = current;
-  }
   const wide = innerWidth >= 780;
   const short = innerHeight < 760;
-  preview.hidden = state !== 'measures';
   if (!localDossier.isConnected) $('#client-entry')?.append(localDossier);
   localDossier.hidden = state !== 'choice' || !$('#production-items [data-item-quantity]');
   if (state === 'models') {
    paginate('Pages de modèles', '#client-saved-options [data-saved-template], #client-standard-options [data-client-profile]',
     $('#client-model-options'), wide ? 8 : short ? 4 : 6);
-  } else if (state === 'measures' && stage === '2') {
-   paginate('Pages de mesures', '#production-dimensions .segment-editor > .segment-row, #production-dimensions .dimension-fields > label',
-    $('#production-dimensions'), wide && !short ? 4 : 2);
-  } else if (state === 'measures' && stage === '5') {
-   paginate('Pages de couleurs', '#production-color-grid [data-production-color]',
-    $('#production-color-grid'), wide ? 8 : 4);
+
   }
  }
 
