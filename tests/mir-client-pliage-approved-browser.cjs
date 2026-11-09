@@ -11,9 +11,54 @@ const dossier={version:1,order:{id:'qa-existing-dossier',project:'Dossier exista
 const quick={version:1,project:'Liste rapide QA',items:[{id:'quick-existing',profile:'l',dimensions:{A:3.5,B:2.25},lengthIn:120,quantity:2}]};
 const modelRecord={id:t.template.id,name:t.template.name,currentVersion:1,versions:[t.template],channels:{client:true,store:false,po:true},archived:false,allowed:{materials:['aluminium','acier'],colorSystems:['manufacturer','special']}};
 async function contextFor(browser,base,viewport){const context=await browser.newContext({viewport,isMobile:viewport.width<=428,hasTouch:viewport.width<=1024});await context.route('**/*',route=>{if(!route.request().url().startsWith(base))return route.abort();return route.continue();});return context;}
+async function verifyFirstPaint(browser,base,{width,height,touch}){
+ const context=await browser.newContext({viewport:{width,height},isMobile:touch,hasTouch:touch});
+ await context.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
+ try{
+  const page=await context.newPage();
+  await page.goto(base+'/pliage.html');
+  let sawCatalogue,releaseCatalogue;
+  const started=new Promise(resolve=>{sawCatalogue=resolve;});
+  const gate=new Promise(resolve=>{releaseCatalogue=resolve;});
+  await page.route('**/catalogue-fd6866b49d21.json',async route=>{
+   sawCatalogue();await gate;await route.continue();
+  });
+  const opening=page.waitForURL(/production\.html.*kind=profile/,{waitUntil:'commit'});
+  await page.getByRole('link',{name:/Pliage personnalisé/})[touch?'tap':'click']();
+  await opening;
+  try{
+   await started;
+   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   assert.equal(await page.locator('#production-title').isVisible(),false,'aucune intro atelier pendant le chargement');
+   assert.equal(await page.locator('.workshop-banner').isVisible(),false,'aucun bandeau atelier');
+   assert.equal(await page.locator('.mir-production-steps').isVisible(),false);
+   assert.equal(await page.locator('.mir-destinations').isVisible(),false);
+   assert.equal(await page.locator('#production-preview').isVisible(),false);
+   assert.equal(await page.locator('#client-choose-model').isVisible(),true);
+   assert.equal(await page.locator('#client-draw-profile').isVisible(),true);
+   assert.equal(await page.locator('#client-draw-profile').isEnabled(),false,'attendre la disponibilité du configurateur');
+   const choices=await page.locator('.client-entry-cards').boundingBox();
+   assert.ok(choices.x>=0&&choices.x+choices.width<=width+1,'choix complets dans la largeur visible');
+   const heading=await page.locator('#client-entry-title').boundingBox();
+   releaseCatalogue();
+   await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
+   const readyHeading=await page.locator('#client-entry-title').boundingBox();
+   assert.deepEqual(readyHeading,heading,'les choix restent au même endroit une fois actifs');
+   assert.equal(await page.locator('#client-choice-loading').isVisible(),false);
+   await page.locator('#client-draw-profile')[touch?'tap':'click']();
+   assert.equal(await page.locator('#production-drawing').isVisible(),true,'le dessin libre démarre normalement');
+   console.log('PASS démarrage sans écran atelier '+width+'×'+height+(touch?' tactile':' souris'));
+  }finally{releaseCatalogue();}
+ }finally{await context.close();}
+}
 (async()=>{const server=serve(root);server.listen(0,'127.0.0.1');await once(server,'listening');const base='http://127.0.0.1:'+server.address().port;
 const beforeDir=process.env.MIR_CLIENT_BASELINE_DIR,before=beforeDir?serve(path.resolve(beforeDir)):null;if(before){before.listen(0,'127.0.0.1');await once(before,'listening');}
 const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium'}),results=[];try{
+ for(const [width,height,touch] of [
+  [360,780,true],[390,844,true],[428,926,true],[844,390,true],
+  [768,1024,true],[834,1112,true],[1112,834,true],
+  [1024,768,false],[1280,720,false],[1440,900,false],[1920,1080,false],[3440,1440,false]
+ ])await verifyFirstPaint(browser,base,{width,height,touch});
  for(const [width,height]of [[360,780],[390,844],[428,926],[600,900],[601,900],[834,1112],[1024,768],[1348,926],[1440,900]]){
  const c=await contextFor(browser,base,{width,height}),page=await c.newPage(),errors=[];page.setDefaultTimeout(15000);page.on('pageerror',e=>{errors.push(e.stack);console.log('PAGEERROR '+page.url()+' '+e.stack);});
  await page.addInitScript(({dossier,quick,modelRecord})=>{if(!sessionStorage.getItem('qa-seeded')){localStorage.setItem('mir_production_client_dossier_v1',JSON.stringify(dossier));localStorage.setItem('mir-bending-v1',JSON.stringify(quick));localStorage.setItem('mir_production_templates_v1',JSON.stringify({version:1,records:[modelRecord]}));sessionStorage.setItem('qa-seeded','1');}},{dossier,quick,modelRecord});

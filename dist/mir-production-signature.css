@@ -349,3 +349,19 @@ body[data-client-stage="5"] #panel-price{margin-top:8px;padding:10px 14px}
 body[data-client-stage="5"] #panel-price .price-eyebrow{margin-bottom:4px}
 body[data-client-stage="5"] #panel-price .price-main strong{font-size:22px}
 body[data-client-stage="5"] #panel-price small{margin-top:4px}
+
+
+/* Le profil client a sa propre entrée dès le premier rendu, avant le catalogue. */
+html[data-mir-profile-startup] .workshop-banner,
+html[data-mir-profile-startup] [data-configurator-public-footer],
+html[data-mir-profile-startup] #production-main > :not(#client-entry,#client-startup),
+html[data-mir-profile-startup]:not([data-mir-profile-startup="choice"]) #client-entry{display:none!important}
+html[data-mir-profile-startup] .production-wrap{padding-block:0 8px;max-width:1120px}
+html[data-mir-profile-startup="choice"] #client-entry{display:block!important;padding-top:14px;min-height:0}
+html[data-mir-profile-startup="choice"] #client-entry .client-entry-return{margin-bottom:6px}
+html[data-mir-profile-startup="choice"] #client-choice-loading{display:block!important;margin-top:12px}
+html[data-mir-profile-startup]:not([data-mir-profile-startup="choice"]) #client-startup{display:block!important;padding:24px 0}
+@media(max-width:600px){
+ html[data-mir-profile-startup="choice"] .client-entry-cards{margin-top:16px}
+ html[data-mir-profile-startup="choice"] .client-entry-cards>button{min-height:86px}
+}
