@@ -137,6 +137,9 @@ async function verifyQuoteAndExports(browser,base,width){
  await page.locator('[data-item-quantity]').fill('2');
  const info=page.locator('#order-metadata');
  if(!(await info.evaluate(el=>el.open)))await info.locator('summary').click();
+ assert.match(await page.locator('#order-title').innerText(),/Ma demande sur mesure/);
+ assert.doesNotMatch(await page.locator('#production-order').innerText(),/bon de commande|mise en production|Zoho/i);
+ assert.equal(await page.locator('#order-revision').isVisible(),false);
  await page.locator('#order-project').fill('Maison de test MIR — façade avant, Québec');
  await page.locator('#order-po').fill('ESSAI-CLIENT-2026-11');
  await page.locator('#order-foreman').fill('Responsable chantier test');
@@ -168,7 +171,7 @@ async function verifyQuoteAndExports(browser,base,width){
  const jsonEvent=page.waitForEvent('download');
  await page.locator('#production-json').click();
  const jsonDownload=await jsonEvent;
- assert.equal(jsonDownload.suggestedFilename(),'MIR-dossier-fabrication.json');
+ assert.equal(jsonDownload.suggestedFilename(),'MIR-demande-sur-mesure.json');
  const backup=JSON.parse(fs.readFileSync(await jsonDownload.path(),'utf8'));
  assert.equal(backup.schema,'mir-production-dossier-1');
  assert.equal(backup.localOnly,true);
@@ -177,7 +180,15 @@ async function verifyQuoteAndExports(browser,base,width){
  assert.equal(backup.order.items[0].spec.finish.code,'QC-CHANTIER-TEST-04');
  assert.equal(backup.order.items[0].spec.quantity,2);
  assert.equal(backup.order.project,persisted.project);
- // Générer un VRAI PDF. Le module place ensuite un lien de téléchargement explicite.
+ // Vérifier le document métier et générer un vrai PDF depuis le même dessin.
+ const requestPages=await page.evaluate(()=>window.MIRProduction.productionPages({
+  ...JSON.parse(localStorage.getItem('mir_production_client_dossier_v1')).order,
+  items:JSON.parse(localStorage.getItem('mir_production_client_dossier_v1')).order.items.map(item=>item.snapshot)
+ },{document:'client-request'}));
+ assert.match(requestPages[0].svg,/DEMANDE DE SOUMISSION/);
+ assert.match(requestPages[0].svg,/profile-painted-star/);
+ assert.doesNotMatch(requestPages.map(p=>p.svg+' '+p.footerNote).join(' '),/bon de commande|mise en production|Zoho/i);
+ assert.match(await page.locator('#production-pdf').innerText(),/PDF de ma demande/);
  await page.locator('#production-pdf').click();
  const link=page.locator('#mir-pdf-ready a[download]');
  await link.waitFor({state:'visible',timeout:90000});

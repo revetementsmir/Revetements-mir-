@@ -870,15 +870,26 @@ function profileSideMarkers({segments,folds},model,handles,annotationBounds,[lef
 
 }
 
-function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, angleOverlay}={}){
+function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, angleOverlay, paintedMarker='stripe', highContrast=false}={}){
  const section=profileDrawingSection(mapped,bends);
- let output=`<path d="${section.path}" fill="none" stroke="#97a68b" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="#dbe3d4" stroke-width="4" stroke-linejoin="miter"/>`;
+ let output=`<path d="${section.path}" fill="none" stroke="${highContrast?'#304b3d':'#97a68b'}" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="${highContrast?'#dfe8e3':'#dbe3d4'}" stroke-width="4" stroke-linejoin="miter"/>`;
  const reserved=[...handles];
  section.segments.forEach(([a,b],i)=>{
  const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-dy/len,dx/len];
  const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
  if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;
  const at=gap=>[mid[0]+normal[0]*gap*side,mid[1]+normal[1]*gap*side];
+ if(paintedMarker==='star'){
+  const center=at(32);
+  const points=Array.from({length:10},(_,index)=>{
+   const angle=index*Math.PI/5-Math.PI/2,radius=index%2===0?23:10;
+   return [decimal(center[0]+Math.cos(angle)*radius),decimal(center[1]+Math.sin(angle)*radius)].join(',');
+  }).join(' ');
+  reserved.push(center,[center[0]-14,center[1]],[center[0]+14,center[1]]);
+  const action=togglePaintedFace?' data-toggle-painted-face role="button" tabindex="0" aria-label="Inverser la face peinte" style="cursor:pointer"':'';
+  output+=`<g${action}><polygon class="profile-painted-star" points="${points}" fill="#ffcf4d" stroke="#202e29" stroke-width="4" stroke-linejoin="round"/></g>`;
+  return;
+ }
  const stripeCenter=at(9),half=Math.min(24,len*.34);
  const point=sign=>[stripeCenter[0]+dx/len*half*sign,stripeCenter[1]+dy/len*half*sign];
  const ends=[point(-1),point(1)];
@@ -893,10 +904,10 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  return output;
 }
 
-  function bendingSheetSketch(item, scale=.25) {
+  function bendingSheetSketch(item, scale=.25, options) {
     if (!item.valid || item.pointsMM.length < 2) return svgText(16,65,'Croquis à compléter','font-size="12" fill="#8b5526"');
     const project=projection(item.pointsMM,{x:110,y:85,w:580,h:340});
-    return '<g font-family="Arial,sans-serif" transform="scale('+scale+')">'+profileDiagramContent(item,item.pointsMM.map(project))+'</g>';
+    return '<g font-family="Arial,sans-serif" transform="scale('+scale+')">'+profileDiagramContent(item,item.pointsMM.map(project),options)+'</g>';
   }
 
   const PROFILE_GROUPS = ['L','L replié','J','Z','Fascia','Oméga','Beam','Colonne','Solin brique','Coin architectural','Éloignement des eaux','Profils personnalisés'];
@@ -1032,10 +1043,12 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       return {name:'Mise en production · '+(index+1)+'/'+pages.length,svg:svg+svgClose,layout:'bending-sheet'};
     });
   }
-  function productionPages(input = {}, {layout, profileGroups} = {}) {
+  function productionPages(input = {}, {layout, profileGroups, document} = {}) {
     const order = buildOrder(input), fragments = [];
-    if (layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return bendingSheetPages(order,profileGroups);
-    const documentTitle = order.requiresQuote ? 'Demande de soumission' : 'Mise en production';
+    if (document !== 'client-request' && layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return bendingSheetPages(order,profileGroups);
+    const clientRequest = document === 'client-request';
+    const documentTitle = order.requiresQuote ? 'Demande de soumission' :
+      clientRequest ? (order.items.every(item => item.kind === 'profile') ? 'Demande de pliage' : 'Demande de pièces sur mesure') : 'Mise en production';
     for (const item of order.items) {
       const details = productionDetailLines(item).flatMap(line => wrapLines(line, 37));
       if (item.location) details.push(...wrapLines('Emplacement : ' + item.location, 37));
@@ -1047,15 +1060,15 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     for (let page = 0; page < count; page++) {
       const rows = fragments.slice(page * 2, page * 2 + 2), width = 1400, height = 1000, tableX = 32, tableY = 172, tableW = 1336, headerH = 42, rowH = 326, columns = [32, 812, 972, 1148, 1244, 1368];
       let svg = svgOpen(width, height, 'MIR · ' + documentTitle + ' · ' + (page + 1));
-      svg += svgText(32, 45, order.requiresQuote ? 'DEMANDE DE SOUMISSION' : 'MISE EN PRODUCTION', 'font-size="29" font-weight="700"');
+      svg += svgText(32, 45, documentTitle.toLocaleUpperCase('fr-CA'), 'font-size="29" font-weight="700"');
       svg += svgText(1368, 45, 'MIR', 'font-size="34" font-weight="700" text-anchor="end" fill="#527539"');
-      svg += svgText(32, 82, 'PO / bon de commande Zoho Books : ' + (order.poNumber || 'À préciser'), 'font-size="17"');
+      svg += svgText(32, 82, (clientRequest ? 'Référence du projet : ' : 'PO / bon de commande Zoho Books : ') + (order.poNumber || 'À préciser'), 'font-size="17"');
       svg += svgText(32, 110, 'Chantier : ' + (order.project || 'À préciser'), 'font-size="17"');
-      svg += svgText(32, 138, 'Contremaître : ' + (order.foreman || 'À préciser'), 'font-size="17"');
+      svg += svgText(32, 138, (clientRequest ? 'Personne responsable : ' : 'Contremaître : ') + (order.foreman || 'À préciser'), 'font-size="17"');
       svg += svgText(1368, 82, 'Date souhaitée : ' + (order.date || 'À préciser'), 'font-size="16" text-anchor="end"');
-      svg += svgText(1368, 110, 'Révision : ' + (order.revision || 'À préciser'), 'font-size="16" text-anchor="end"');
+      if (!clientRequest) svg += svgText(1368, 110, 'Révision : ' + (order.revision || 'À préciser'), 'font-size="16" text-anchor="end"');
       const hasPricedLines = order.pricing.items.some(item => item.status === 'priced');
-      svg += svgText(1368, 138, order.requiresQuote ? hasPricedLines ? 'Couleurs personnalisées sur soumission' : 'Soumission obligatoire · aucun prix automatique' : 'Préparation locale · validation atelier requise', 'font-size="14" text-anchor="end" fill="#8a572c"');
+      svg += svgText(1368, 138, order.requiresQuote ? hasPricedLines ? 'Couleurs personnalisées sur soumission' : 'Soumission obligatoire · aucun prix automatique' : clientRequest ? 'Demande à faire valider par MIR' : 'Préparation locale · validation atelier requise', 'font-size="14" text-anchor="end" fill="#8a572c"');
       svg += '<rect x="32" y="' + tableY + '" width="' + tableW + '" height="' + headerH + '" fill="#eef2e9" stroke="#697568"/>';
       const headers = ['CROQUIS ET COTES FINIES', 'MATIÈRE / GAGE', 'COULEUR / CODE', 'QUANTITÉ', 'LONGUEUR / FORMAT'];
       headers.forEach((label, i) => { svg += svgText(columns[i] + 10, tableY + 27, label, 'font-size="' + (i === 4 ? 9 : 12) + '" font-weight="700"'); });
@@ -1066,7 +1079,9 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         if (fragment.empty) { svg += svgText(60, y + 70, 'Aucune pièce dans ce dossier.', 'font-size="22"'); return; }
         const item = fragment.item, header = item.id + ' · ' + item.name + (fragment.continuation ? ' · SUITE, ne pas recompter' : '');
         svg += svgText(48, y + 27, header, 'font-size="16" font-weight="700"');
-        const drawing = item.kind === 'profile' ? bendingSheetSketch(item,.5) : panelSVG(item, { width: 408, height: 270, legend: false, header: false, notes: false });
+        const drawing = item.kind === 'profile' ? bendingSheetSketch(item,.5,clientRequest?{
+          paintedMarker:'star',highContrast:true,markerModel:{segments:item.segments.map(({label})=>({label}))}
+        }:undefined) : panelSVG(item, { width: 408, height: 270, legend: false, header: false, notes: false });
         svg += placeSVG(drawing, 42, y + 44);
         svg += multiline(466, y + 53, fragment.details, { width: 37, lineHeight: 20, attrs: 'font-size="14"' }).svg;
         svg += multiline(822, y + 42, materialLines(item), { width: 16, lineHeight: 24, attrs: 'font-size="15"' }).svg;
@@ -1077,8 +1092,10 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg += multiline(1254, y + 42, lengthLines, { width: 12, lineHeight: 23, attrs: 'font-size="14"' }).svg;
       });
       const footY = 904;
-      svg += svgText(32, footY, 'Liseré bleu : face colorée. Les cotes sont celles de la pièce finie; les rayons, le développé et les réglages de pliage restent à valider.', 'font-size="14"');
-      svg += svgText(32, footY + 25, 'La référence Zoho Books est saisie localement. Aucun bon de commande n’a été envoyé ni synchronisé.', 'font-size="13" fill="#5b685e"');
+      const faceNote = !clientRequest ? 'Liseré bleu : face colorée. ' :
+        rows.some(row => row.item?.kind === 'profile' && row.item.coloredFace?.side) ? 'Étoile : face peinte. ' : '';
+      svg += svgText(32, footY, faceNote + 'Cotes de la pièce finie. Les rayons, le développé et les réglages de pliage restent à valider.', 'font-size="14"');
+      svg += svgText(32, footY + 25, clientRequest ? 'Demande préparée sur cet appareil. Transmission à MIR à faire séparément.' : 'La référence Zoho Books est saisie localement. Aucun bon de commande n’a été envoyé ni synchronisé.', 'font-size="13" fill="#5b685e"');
       if (hasPricedLines) {
         const totalLine = order.pricing.totalCents !== null ? 'Total de base : ' + priceText(order.pricing.totalCents) : order.pricing.pricedSubtotalCents !== null ? 'Sous-total des lignes tarifées : ' + priceText(order.pricing.pricedSubtotalCents) + '; autres pièces à chiffrer.' : 'Montant du dossier à vérifier; aucun total automatique.';
         svg += svgText(32, footY + 49, totalLine + ' Taxes et livraison non calculées.', 'font-size="12" fill="#5b685e"');
@@ -1094,7 +1111,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       }
       if (order.notes) summary.push('Notes du dossier : ' + order.notes);
       if (!summary.length) summary.push('Cotes et options renseignées. Validation de l’atelier requise avant fabrication.');
-      pages.push({ name: documentTitle + ' · ' + (page + 1) + '/' + count, svg: svg + svgClose, summary: [...new Set(summary)], layout: 'wide', sidebarTitle: 'POINTS À VALIDER', scaleNote: 'Croquis coté de pièce finie. Ne pas relever de mesures sur la taille imprimée.', footerNote: 'Document local — aucune transmission Zoho Books. Développé et compensations de pliage à valider par l’atelier.' });
+      pages.push({ ...(clientRequest?{documentTitle}:{}), name: documentTitle + ' · ' + (page + 1) + '/' + count, svg: svg + svgClose, summary: [...new Set(summary)], layout: 'wide', sidebarTitle: 'POINTS À VALIDER', scaleNote: 'Croquis coté de pièce finie. Ne pas relever de mesures sur la taille imprimée.', footerNote: clientRequest ? 'Demande client à faire valider par MIR.' : 'Document local — aucune transmission Zoho Books. Développé et compensations de pliage à valider par l’atelier.' });
     }
     return pages;
   }

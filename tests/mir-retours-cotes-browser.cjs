@@ -115,9 +115,14 @@ async function ready(){
      assert.equal(await prompt.locator('h2').textContent(),'De quel côté replier le bord ?');
      const options=prompt.locator('[data-trace-hem-direction]');
      assert.equal(await options.count(),2,'Deux sens illustrés sont proposés');
-     const sketches=await options.locator('svg').evaluateAll(nodes=>nodes.map(e=>e.outerHTML));
+     const sketches=await options.locator(':scope > svg').evaluateAll(nodes=>nodes.map(svg=>({
+      markup:svg.outerHTML,
+      faces:[...svg.querySelectorAll('polygon[fill^=rgb]')].map(p=>p.getAttribute('points'))
+     })));
      assert.equal(sketches.length,2);
-     assert.notEqual(sketches[0],sketches[1],'Le retour orange doit différencier les deux sens');
+     assert.ok(sketches.every(s=>s.faces.length>4&&s.faces.every(f=>!f.includes('NaN'))),'Deux volumes métalliques complets');
+     assert.ok(sketches.every(s=>!/#d27b25|#ad5010|orange/i.test(s.markup)),'Le métal est rendu sans trait orange');
+     assert.notDeepEqual(sketches[0].faces,sketches[1].faces,'Le sens est visible dans la géométrie 3D');
      if(label==='Annuler')await prompt.getByRole('button',{name:'Annuler',exact:true}).click();
      else await prompt.locator('[data-trace-hem-direction="'+label+'"]').click();
      await prompt.waitFor({state:'hidden'});

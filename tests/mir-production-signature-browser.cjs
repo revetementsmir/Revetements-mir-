@@ -58,13 +58,12 @@ async function verifyMouldingWizard(browser,base,artifacts){
  await desktop.locator('#production-color-grid button').first().click();
  assert.equal(await next.isEnabled(),true);
  assert.equal(await desktop.locator('#production-preview').isVisible(),false);
- await desktop.locator('#client-viewport-preview').click();
- assert.equal(await desktop.locator('#production-preview').isVisible(),true);
- await desktop.locator('#client-viewport-preview').click();
- assert.equal(await desktop.locator('#production-preview').isVisible(),false);
+ assert.equal(await desktop.locator('#production-quantity').isVisible(),false);
  await desktop.locator('#client-step-back').click();
  await desktop.locator('#client-step-back').click();
  assert.equal(await stage(),'2');
+ assert.ok(await desktop.locator('#production-preview').isVisible());
+ assert.ok(await desktop.locator('#mir-angle-summary').isVisible());
  await desktop.locator('[data-segment-length="1"]').fill('');
  assert.equal(await next.isDisabled(),true);
  await desktop.locator('[data-segment-length="1"]').fill('2 1/4');
@@ -89,7 +88,7 @@ async function verifyMouldingWizard(browser,base,artifacts){
  assert.equal(await stage(),'1');
  assert.deepEqual(errors,[]);
  await desktop.close();
- console.log('PASS Moulure client PC : étapes, validations, aperçu sur demande et dossier');
+ console.log('PASS Moulure client PC : étapes, validations, aperçu avec les cotes et dossier');
  const soffit=await browser.newPage({viewport:{width:390,height:844}});
  await soffit.goto(base+'/production.html?mode=client&kind=profile&profile=j_soffite');
  await soffit.waitForFunction(()=>!!window.MIRProductionWorkspace);
