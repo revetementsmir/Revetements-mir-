@@ -1,0 +1,10 @@
+{
+  "observedAt": "2026-11-09T20:39:39.792Z",
+  "project": "MIR TEST",
+  "kind": "real authorized API replay after UI creation",
+  "passed": true,
+  "existingJobId": "a283988b-a001-4acd-8382-a36b7cd865ab",
+  "firstAlreadyCreated": true,
+  "secondAlreadyCreated": true,
+  "extraJobsCreated": 0
+}

@@ -45,7 +45,8 @@ async function ready(){for(let i=0;i<80;i++){const ok=await new Promise(r=>http.
    await register.getByRole('button',{name:'Créer la fiche et son QR permanent'}).click();
    await page.waitForFunction(()=>document.querySelector('#wh-label-name').textContent.includes('Vis MIR de recette'));
    assert.equal(await page.locator('.wh-label-preview').isVisible(),true,'QR label visible after creation');
-   assert.equal(await page.locator('#wh-label-qr img').isVisible(),true,'generated QR visible');
+   const qrImage=page.locator('#wh-label-qr img');await qrImage.waitFor({state:'visible'});await qrImage.evaluate(image=>image.decode());
+   assert.equal(await qrImage.isVisible(),true,'generated QR visible');assert.ok(await qrImage.evaluate(image=>image.naturalWidth>=120),'QR image decoded at printable size');
    const registered=await page.evaluate(()=>window.__warehouseFixture.registered);
    assert.match(registered.sku_code,/^MIR-[A-F0-9]{16}$/);
    assert.equal(registered.source_ref,'mir-article-'+registered.sku_code.slice(4));
