@@ -43,7 +43,10 @@ async function checkBrandCards(browser,base){
           columnsAligned:cards.every(c=>getComputedStyle(c).display==='grid')
         };
       });
-      assert.ok(layout.count>=20);
+      const brandOptions=await page.locator('#shop-brand option').evaluateAll(options=>options.filter(option=>option.value!=='all').map(option=>option.value));
+      const collectionNames=await cards.locator('h3').allTextContents();
+      assert.equal(layout.count,brandOptions.length);
+      assert.deepEqual(collectionNames,brandOptions);
       assert.equal(layout.columns,width<=700?1:width<=1100?2:3);
       assert.ok(layout.fits&&layout.sameTile&&layout.columnsAligned);
       assert.ok(layout.pageWidth<=width+2,'Pas de débordement horizontal à '+width);
