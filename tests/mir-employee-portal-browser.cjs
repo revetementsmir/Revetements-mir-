@@ -21,7 +21,10 @@ window.MIRPortalClient={...window.MIRPortalClient,create({config}){
   const model=window.MIREmployeeStore;
   const actorId='demo-employee-1';
   let state={...model.createDemoState([]),actorId};
+  state.jobs[0].number='353';state.jobs[1].number='454';
   state.jobs[0].address='141, rue du Chantier, Québec';
+  state.jobs[1].assignedMemberIds=[...(state.jobs[1].assignedMemberIds||[]),actorId];
+  const employee=state.members.find(member=>member.id===actorId);employee.jobIds=[...new Set([...(employee.jobIds||[]),state.jobs[1].id])];
   let publish=()=>{};
   const ready=()=>({phase:'ready',snapshot:state});
   return {config,getStatus:()=>({phase:'loading'}),subscribe(fn){publish=fn;},async start(){publish(ready());},
@@ -50,18 +53,28 @@ for(const width of [320,360,390,820,1024,1440]){
   await noOverflow();
   await page.route('**/portal-client.js*',r=>r.fulfill({body:source+'\n'+stub,contentType:'application/javascript'}));
   await page.reload();
-  await page.getByRole('heading',{name:'Mes chantiers'}).waitFor();
-  assert.equal(await page.locator('.employee-job').count(),1);
+  await page.locator('.employee-current-job h1').waitFor();
+  assert.equal(await page.locator('.employee-quick-grid > button').count(),4);
+  assert.equal(await page.locator('#portal-navigation > button').count(),4);
+  assert.equal(await page.locator('#portal-navigation').isVisible(),true);
+  assert.equal(await page.getByRole('button',{name:/Messages/}).count(),1);
+  assert.equal(await page.locator('#employee-job-switch option').count(),2);
   await noOverflow();
-  await page.getByRole('button',{name:'Voir le dossier'}).click();
+  if(width===390){fs.mkdirSync('artifacts',{recursive:true});await page.screenshot({path:'artifacts/MIR-ma-journee-390.png'});}
+  await page.getByRole('button',{name:/Historique, notes et photos/}).click();
   await page.locator('#portal-dialog[open]').waitFor();
   await page.keyboard.press('Escape');
-  await page.getByRole('button',{name:'Commander',exact:true}).and(page.locator('.employee-job button')).click();
+  await page.getByRole('button',{name:/Commander/}).and(page.locator('.employee-quick-grid button')).click();
   await page.getByRole('heading',{name:'Commander du matériel'}).waitFor();
   await page.locator('#catalogue-category').selectOption('soffites-moulures');
   await page.getByRole('searchbox',{name:'Rechercher un article'}).fill('dépArt');
   const starter=page.locator('[data-product="mir-starter-10ft"]');
   await starter.getByRole('button',{name:'Ajouter',exact:true}).click();
+  const firstJob=await page.locator('#order-job').inputValue(),secondJob=await page.locator('#order-job option').nth(1).getAttribute('value');
+  await page.locator('#order-job').selectOption(secondJob);
+  assert.equal(await page.locator('[data-scroll-cart]').count(),0,'le deuxième job ne reprend pas le panier du premier');
+  await page.locator('#order-job').selectOption(firstJob);
+  assert.equal(await page.locator('[data-scroll-cart]').count(),1,'le brouillon du premier job est conservé');
   await page.getByRole('button',{name:'Vérifier',exact:true}).click();
   await page.getByRole('heading',{name:'Vérifier la demande'}).waitFor();
   assert.equal(await page.locator('#employee-browse').isVisible(),false);
@@ -75,7 +88,7 @@ for(const width of [320,360,390,820,1024,1440]){
   assert.equal(await qty.inputValue(),'3');
   assert.equal(await page.getByLabel('Réception').inputValue(),'pickup');
   assert.equal(await page.getByLabel('Note pour l’équipe').inputValue(),'Fixture seulement');
-  if(width===390){fs.mkdirSync('artifacts',{recursive:true});await page.screenshot({path:'artifacts/MIR-portail-employe-390.png'});}
+  if(width===390){fs.mkdirSync('artifacts',{recursive:true});await page.screenshot({path:'artifacts/MIR-panier-job-390.png',fullPage:true});}
   await page.getByRole('button',{name:'Envoyer ma demande'}).click();
   await page.getByRole('heading',{name:'Mes commandes'}).waitFor();
   assert.equal(await page.locator('.order-info').filter({hasText:'Fixture seulement'}).count(),1);

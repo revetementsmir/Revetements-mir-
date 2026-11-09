@@ -21,7 +21,7 @@
   const num = value => Number.isFinite(value) ? new Intl.NumberFormat('fr-CA',{maximumFractionDigits:2}).format(value) : 'À confirmer';
   const date = value => { const d=new Date(value); return Number.isFinite(d.getTime()) ? new Intl.DateTimeFormat('fr-CA',{day:'numeric',month:'short'}).format(d) : 'Date à préciser'; };
   const requestId = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  let model, state, materials=[], materialMap=new Map(), ui, mode='employee', view='projects', actorId='demo-employee-1', query='', category='all', favoritesOnly=false, orderFilter='pending', toastTimer, customModelController=null;
+  let model, state, materials=[], materialMap=new Map(), ui, mode='employee', view='day', actorId='demo-employee-1', query='', category='all', favoritesOnly=false, orderFilter='pending', toastTimer, customModelController=null;
   let reviewingOrder=false, deliveryDraft={mode:'delivery',note:''};
   let connectionMode='connected', portalClient=null, clientStatus=null, authCallback=null, invitationToken=null, authMessage='', authError='', authBusy=false, invitations=[], uiStorageKey=UI_KEY;
   let authScreen='signin',authEmail='',customerTab='orders',signupAddress=null;
@@ -33,15 +33,16 @@
     try {
       if(isDemo()){localStorage.setItem(STORE_KEY,JSON.stringify(state));localStorage.setItem(UI_KEY,JSON.stringify(ui));}
       else if(actorId&&ui){
-        const cart=currentCart().map(line=>Object.fromEntries(['itemId','quantity','colorId','formatId','dimensionsIn','cartKey'].filter(key=>line[key]!==undefined).map(key=>[key,line[key]])));
-        localStorage.setItem(uiStorageKey,JSON.stringify({cart,jobId:ui.jobs[actorId]||''}));
+        const carts=Object.fromEntries(Object.entries(ui.carts||{}).filter(([key])=>key.startsWith(actorId+':')).map(([key,lines])=>[key,lines.map(line=>Object.fromEntries(['itemId','quantity','colorId','formatId','dimensionsIn','cartKey'].filter(name=>line[name]!==undefined).map(name=>[name,line[name]])))]));
+        localStorage.setItem(uiStorageKey,JSON.stringify({carts,jobId:ui.jobs[actorId]||''}));
       }
     } catch { toast('Votre brouillon reste en mémoire. Le stockage local est indisponible.'); }
   }
   const actor = () => state.members.find(member=>member.id===actorId);
   const jobById = id => state.jobs.find(job=>job.id===id);
   const itemById = id => state.catalogue.find(item=>item.id===id);
-  const currentCart = () => ui.carts[actorId] || (ui.carts[actorId]=[]);
+  const cartKeyFor=(jobId=currentJobId())=>`${actorId}:${jobId||'unassigned'}`;
+  const currentCart = () => ui.carts[cartKeyFor()] || (ui.carts[cartKeyFor()]=[]);
   const jobsForActor = () => model.listJobs(state,actorId);
   function currentJobId() { const jobs=jobsForActor(); if (!jobs.some(job=>job.id===ui.jobs[actorId])) ui.jobs[actorId]=jobs[0]?.id || ''; return ui.jobs[actorId]; }
   const isFold = item => !!item && (item.customBending===true || (Array.isArray(item.measureFields) && item.measureFields.length>0));
@@ -60,7 +61,7 @@
     }catch(error){toast(errorMessage(error));if(error?.needsRetry&&$('#portal-dialog').open)closeDialog();syncOperation();return {ok:false,error};}
   }
   function setView(next,{focus=false}={}) {
-    const allowed=mode==='admin'?['admin-orders','inventory','members','projects','catalogue','orders']:['projects','catalogue','orders'];
+    const allowed=mode==='admin'?['admin-orders','inventory','members','projects','catalogue','orders']:['day','catalogue','material','messages','account','orders'];
     if(!allowed.includes(next))return;
     if(next!==view)reviewingOrder=false;
     view=next;query='';category='all';favoritesOnly=false;render();
@@ -70,7 +71,7 @@
   function renderNavigation() {
     document.body.dataset.portalMode=mode;
     const pending=model.listOrders(state,actorId,{view:'pending'}).length;
-    const entries=mode==='admin'?[...(!isDemo()?[['projects','house','Chantiers']]:[]),['admin-orders','orders','Commandes'],['inventory','box','Inventaire'],['members','people','Équipe & accès']]:[['projects','house','Mes chantiers'],['catalogue','cart','Commander'],['orders','orders','Suivi']];
+    const entries=mode==='admin'?[...(!isDemo()?[['projects','house','Chantiers']]:[]),['admin-orders','orders','Commandes'],['inventory','box','Inventaire'],['members','people','Équipe & accès']]:[['day','house','Ma journée'],['catalogue','cart','Magasin'],['material','box','Matériel'],['account','people','Mon compte']];
     $('#portal-navigation').innerHTML=entries.map(([key,glyph,label])=>`<button type="button" data-view="${key}" aria-current="${key===view?'page':'false'}">${icon(glyph)}<span>${label}</span>${key.includes('orders')&&pending?`<span class="nav-count">${pending}</span>`:''}</button>`).join('');
     document.querySelectorAll('[data-demo-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.demoMode===mode)));
     if(isDemo())$('#demo-profile').innerHTML=state.members.filter(member=>member.active&&member.role===mode).map(member=>`<option value="${esc(member.id)}"${member.id===actorId?' selected':''}>${esc(member.name)} · exemple</option>`).join('');
@@ -111,6 +112,30 @@
       (jobs.length?`<div class="project-grid">${jobs.map((job,index)=>{const version=state.planVersions.find(v=>v.id===job.publishedVersionId),jobOrders=orders.filter(order=>order.jobId===job.id);return `<article class="project-card">${isDemo()?`<div class="project-cover"><img src="assets/${index%2?'mir-03.jpg':'mir-01.jpg'}" alt="Réalisation MIR illustrant un chantier de démonstration" loading="lazy"><span>CHANTIER DE DÉMONSTRATION</span></div>`:`<div class="project-cover project-cover-neutral">${icon('house')}<span>DOSSIER MIR</span></div>`}<div class="project-body"><div class="project-meta"><span>ÉQUIPE MIR</span><span>${jobOrders.length} demande${jobOrders.length>1?'s':''} en cours</span></div><h3>${esc(job.name)}</h3><p>${esc(job.address||(isDemo()?'Dossier fictif pour essayer le portail':'Adresse à préciser'))}</p><div class="project-plan-row">${icon('plan')}<div><strong>${esc(version?.label||'Plan à publier')}</strong><small>${esc(version?.revision||'Aucune version publiée')}</small></div><span class="pill muted">${version?(isDemo()?'Publié · démo':'Publié'):'À venir'}</span></div><div class="project-actions"><button type="button" class="button secondary" data-job="${esc(job.id)}">Consulter le dossier</button><button type="button" class="button" data-order-for="${esc(job.id)}">Commander ${icon('arrow')}</button></div></div></article>`;}).join('')}</div>`:empty('house',admin?'Votre premier chantier':'Aucun chantier assigné',admin?'Créez un dossier, puis attribuez-le aux membres de votre équipe.':'Un gestionnaire pourra vous attribuer vos dossiers.'))+
       (isDemo()?note('Une version claire pour chaque chantier','Les affectations et les publications de cet aperçu sont simulées. Les vrais plans et les accès seront reliés au service de publication.'):note('Les documents utiles sur le chantier','Retrouvez ici les versions de plan publiées par MIR et les demandes de matériel associées.'));
   }
+
+  function selectedJob(){return jobById(currentJobId());}
+  function jobNumber(job){const explicit=String(job?.number||job?.jobNumber||'').trim();if(explicit)return explicit;const name=String(job?.name||''),match=name.match(/(?:^\s*|\b(?:job|chantier)\s*#?\s*-?)(\d{2,})\b/i);return match?.[1]||'—';}
+  function weatherLine(job){const weather=job?.weather||state.weatherByJob?.[job?.id];return weather?.summary?`${weather.emoji||'🌤️'} ${weather.summary}`:'Météo indisponible';}
+  function renderDay(){
+    const jobs=jobsForActor(),job=selectedJob(),version=state.planVersions.find(plan=>plan.id===job?.publishedVersionId),unread=Number(state.messaging?.unreadCount||0);
+    if(!job)return `<section class="employee-day">${heading('MA JOURNÉE','Aucun chantier assigné','Demandez à votre responsable de vous attribuer un chantier.')}</section>`;
+    return `<section class="employee-day"><div class="employee-day-top"><p class="employee-weather">${esc(weatherLine(job))}</p><button type="button" class="employee-messages-bubble" data-view="messages" aria-label="Messages, ${unread} non lus">${icon('people')}<span>Messages</span>${unread?`<b>${unread}</b>`:''}</button></div>
+      <div class="employee-current-job"><div><span>JOB</span><strong>${esc(jobNumber(job))}</strong><h1>${esc(job.name)}</h1><p>${esc(job.address||'Adresse à préciser')}</p></div><label>Changer de job<select id="employee-job-switch">${jobs.map(item=>`<option value="${esc(item.id)}"${item.id===job.id?' selected':''}>${esc(jobNumber(item))} · ${esc(item.name)}</option>`).join('')}</select></label></div>
+      <div class="employee-quick-grid" aria-label="Actions principales">
+        <button type="button" data-latest-plan="${esc(job.id)}">${icon('plan')}<strong>Plan à jour</strong><small>${esc(version?.revision||'À venir')}</small></button>
+        <button type="button" data-order-for="${esc(job.id)}">${icon('cart')}<strong>Commander</strong><small>Job ${esc(jobNumber(job))}</small></button>
+        <button type="button" data-view="material">${icon('box')}<strong>Matériel</strong><small>À recevoir</small></button>
+        <button type="button" data-extra-job="${esc(job.id)}">${icon('plus')}<strong>Ajouter un extra</strong><small>Description + photo</small></button>
+      </div><button type="button" class="employee-job-file" data-job="${esc(job.id)}">Historique, notes et photos du chantier ${icon('arrow')}</button></section>`;
+  }
+  function materialRows(tab){
+    const job=selectedJob(),orders=model.listOrders(state,actorId,{view:'all'}).filter(order=>order.jobId===job?.id),rows=[];
+    for(const order of orders)for(const line of order.lines||[]){const total=Number(line.requestedQty??line.quantity)||0,received=Number(line.deliveredQty)||0,remaining=Math.max(0,total-received-Number(line.cancelledQty||0));if(tab==='received'&&received)rows.push({line,qty:received,order});if(tab==='pending'&&remaining)rows.push({line,qty:remaining,order});}
+    return rows;
+  }
+  function renderMaterial(){const tab=ui.materialTab||'pending',rows=materialRows(tab),job=selectedJob();return `<section class="employee-material">${heading('MATÉRIEL',`Job ${esc(jobNumber(job))}`,'Livraisons du chantier sélectionné.')}<div class="employee-tabs" role="tablist"><button data-material-tab="pending" aria-selected="${tab==='pending'}">À recevoir</button><button data-material-tab="received" aria-selected="${tab==='received'}">Reçu</button><button data-material-tab="issues" aria-selected="${tab==='issues'}">Problèmes</button></div>${tab==='issues'?`<button type="button" class="button" data-delivery-issue>Signaler un problème de livraison</button><p class="portal-note">Les signalements partagés seront disponibles lorsque le service Matériel sera activé dans MIR TEST.</p>`:rows.length?`<div class="material-list">${rows.map(({line,qty,order})=>`<article><div><strong>${esc(line.name)}</strong><small>Commande ${esc(order.id)} · Job ${esc(jobNumber(job))}</small></div><b>${num(qty)} ${esc(line.unit)}</b></article>`).join('')}</div>`:empty('box',tab==='pending'?'Rien à recevoir':'Aucune réception enregistrée','Le suivi se met à jour article par article.')}</section>`;}
+  function renderMessages(){return `<section class="employee-simple">${heading('MESSAGES','Messages de travail','Les conversations sont limitées à leurs participants et à leur équipe.')}<div class="portal-note"><strong>Messagerie en attente d’activation serveur</strong> Aucun message fictif n’est affiché. Les états Envoyé, Distribué et Lu dépendront des confirmations réelles.</div></section>`;}
+  function renderAccount(){return `<section class="employee-simple">${heading('MON COMPTE','Congés et absences','Vos renseignements RH restent séparés des chantiers et des messages.')}<div class="account-action-list"><button type="button" data-hr="absence">Signaler une absence aujourd’hui ${icon('arrow')}</button><button type="button" data-hr="leave">Demander un congé ou des vacances ${icon('arrow')}</button><button type="button" data-hr="requests">Mes demandes ${icon('arrow')}</button></div></section>`;}
   
   const reviewAPI=window.MIRStoreReview;
   let reviewState=reviewAPI?.empty()||{annotations:{},hidden:[],showHidden:false};
@@ -318,7 +343,7 @@
     try {const rows=await portalClient.listInvitations();if(forActor!==actorId||view!=='members')return;invitations=rows;render();}
     catch(error){toast(errorMessage(error));}
   }
-  function render() {if(!state)return renderAuth();if(customModelController){customModelController.destroy();customModelController=null;}renderNavigation();$('#portal-content').innerHTML=view==='projects'?renderProjects():view==='catalogue'?renderCatalogue():view==='orders'?renderOrders(false):view==='admin-orders'?renderOrders(true):view==='inventory'?renderInventory():renderMembers();if(view==='catalogue'){renderCatalogueGrid();renderCart();}if(view==='inventory')renderInventoryList();syncOperation();}
+  function render() {if(!state)return renderAuth();if(customModelController){customModelController.destroy();customModelController=null;}renderNavigation();$('#portal-content').innerHTML=view==='day'?renderDay():view==='projects'?renderProjects():view==='catalogue'?renderCatalogue():view==='material'?renderMaterial():view==='messages'?renderMessages():view==='account'?renderAccount():view==='orders'?renderOrders(false):view==='admin-orders'?renderOrders(true):view==='inventory'?renderInventory():renderMembers();if(view==='catalogue'){renderCatalogueGrid();renderCart();}if(view==='inventory')renderInventoryList();syncOperation();}
   function openDialog(html) {$('#portal-dialog-content').innerHTML=html;if(!$('#portal-dialog').open)$('#portal-dialog').showModal();}
   function closeDialog() {$('#portal-dialog').close();}
   function dialogError(message) {let element=$('#dialog-error');if(!element){element=document.createElement('p');element.id='dialog-error';element.className='dialog-error';element.setAttribute('role','alert');$('#portal-dialog-content').append(element);}element.hidden=false;element.textContent=message;element.scrollIntoView({block:'nearest'});}
@@ -390,10 +415,15 @@
     if(button.dataset.memberActive){const out=await act('SET_MEMBER_ACTIVE',{memberId:button.dataset.memberActive,active:button.dataset.active==='true'});if(out.ok){render();toast(button.dataset.active==='true'?'Accès réactivé.':'Accès suspendu.');}return;}
     if(button.dataset.revokeInvitation){const out=await act('REVOKE_INVITATION',{invitationId:button.dataset.revokeInvitation});if(out.ok){toast('Le lien a été révoqué.');await refreshInvitations();}return;}
     if(button.dataset.downloadPlan){button.disabled=true;try{const blob=await portalClient.downloadPlan(button.dataset.downloadPlan),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=(button.dataset.documentName||'Plan-chantier.pdf').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'-');link.rel='noopener';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}catch(error){dialogError(errorMessage(error));}finally{button.disabled=false;}return;}
-    if(button.dataset.demoMode&&isDemo()){mode=button.dataset.demoMode;actorId=state.members.find(member=>member.active&&member.role===mode)?.id||actorId;view=mode==='admin'?'admin-orders':'projects';orderFilter='pending';query='';render();return;}
+    if(button.dataset.demoMode&&isDemo()){mode=button.dataset.demoMode;actorId=state.members.find(member=>member.active&&member.role===mode)?.id||actorId;view=mode==='admin'?'admin-orders':'day';orderFilter='pending';query='';render();return;}
     if(button.hasAttribute('data-resume-order')){setView('catalogue');reviewingOrder=true;showOrderStep(true);return;}
     if(button.hasAttribute('data-order-back')){reviewingOrder=false;showOrderStep(true);return;}
     if(button.dataset.view){if($('#portal-dialog').open)closeDialog();return setView(button.dataset.view,{focus:true});}
+    if(button.dataset.materialTab){ui.materialTab=button.dataset.materialTab;save();return render();}
+    if(button.dataset.latestPlan){const job=jobsForActor().find(item=>item.id===button.dataset.latestPlan),version=state.planVersions.find(item=>item.id===job?.publishedVersionId),document=(version?.documents||[])[0];if(!document)return showJob(button.dataset.latestPlan);if(!isDemo()&&document.id&&portalClient?.config.documentsEnabled){button.dataset.downloadPlan=document.id;button.dataset.documentName=document.name||'Plan-chantier.pdf';return handleClick({target:button});}const url=isDemo()?safeDocumentURL(document.url):null;if(url){window.open(url,'_blank','noopener');return;}return showJob(button.dataset.latestPlan);}
+    if(button.dataset.extraJob){const job=jobById(button.dataset.extraJob);openDialog(dialogHeader('EXTRA CHANTIER',`Job ${jobNumber(job)}`,'Décrivez le travail supplémentaire demandé.')+`<form id="extra-form" class="dialog-form" data-job="${esc(job.id)}"><label>Description<textarea name="description" maxlength="1200" required></textarea></label><label>Photo facultative<input name="photo" type="file" accept="image/*" capture="environment"></label><p id="dialog-error" class="dialog-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" class="button secondary" data-close-dialog>Annuler</button><button type="submit" class="button">Envoyer l’extra</button></div></form>`);return;}
+    if(button.hasAttribute('data-delivery-issue')){openDialog(dialogHeader('MATÉRIEL',`Job ${jobNumber(selectedJob())}`,'Signaler un problème de livraison.')+`<form id="delivery-issue-form" class="dialog-form"><label>Commentaire<textarea name="comment" maxlength="1200" required></textarea></label><label>Photo facultative<input name="photo" type="file" accept="image/*" capture="environment"></label><p id="dialog-error" class="dialog-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" class="button secondary" data-close-dialog>Annuler</button><button type="submit" class="button">Envoyer le signalement</button></div></form>`);return;}
+    if(button.dataset.hr){if(button.dataset.hr==='requests'){openDialog(dialogHeader('RESSOURCES HUMAINES','Mes demandes','Le service RH attend son activation dans MIR TEST.')+'<div class="dialog-actions"><button class="button" data-close-dialog>Fermer</button></div>');return;}const absence=button.dataset.hr==='absence';openDialog(dialogHeader('RESSOURCES HUMAINES',absence?'Absence aujourd’hui':'Demande de congé',absence?'Aucun diagnostic ne sera demandé.':'Choisissez la période demandée.')+`<form id="hr-form" class="dialog-form" data-kind="${absence?'absence':'leave'}">${absence?`<label>Date<input name="start" type="date" value="${new Date().toISOString().slice(0,10)}" readonly></label>`:`<label>Du<input name="start" type="date" required></label><label>Au<input name="end" type="date" required></label>`}<label>Note facultative<textarea name="note" maxlength="500"></textarea></label><p id="dialog-error" class="dialog-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" class="button secondary" data-close-dialog>Annuler</button><button type="submit" class="button">Confirmer</button></div></form>`);return;}
     if(button.dataset.job)return showJob(button.dataset.job);
     if(button.dataset.orderFor){ui.jobs[actorId]=button.dataset.orderFor;save();if($('#portal-dialog').open)closeDialog();return setView('catalogue',{focus:true});}
     if(button.dataset.category){category=button.dataset.category;document.querySelectorAll('[data-category]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.category===category)));return renderCatalogueGrid();}
@@ -430,7 +460,7 @@
      }
      if(button.dataset.configure)return showFold(button.dataset.configure);
     if(button.dataset.addItem){const card=button.closest('[data-product]'),chosen=reviewAPI?.selection(card,itemById),item=chosen?.item||itemById(button.dataset.addItem),out=addToCart({itemId:item?.id||button.dataset.addItem,quantity:Number(card.querySelector('[data-product-qty]').value),colorId:chosen?.colorId||card.querySelector('[data-product-color]')?.value||undefined,formatId:card.querySelector('[data-product-format]')?.value||(card.querySelector('[data-product-variant]')?item?.formats?.[0]?.id:undefined)});if(!out.ok)toast(errorMessage(out.error));else{renderCart();toast('Article ajouté à votre demande.');}return;}
-    if(button.dataset.cartRemove){ui.carts[actorId]=currentCart().filter(line=>line.cartKey!==button.dataset.cartRemove);save();return renderCart();}
+    if(button.dataset.cartRemove){ui.carts[cartKeyFor()]=currentCart().filter(line=>line.cartKey!==button.dataset.cartRemove);save();return renderCart();}
     if(button.hasAttribute('data-scroll-cart')){reviewingOrder=true;showOrderStep(true);return;}
     if(button.dataset.orderFilter){orderFilter=button.dataset.orderFilter;return render();}
     if(button.dataset.reserveOrder){const out=await act('RESERVE_ORDER',{orderId:button.dataset.reserveOrder});if(out.ok){render();const warnings=out.result?.warnings||[];if(warnings.length){const reserved=out.result?.reservedQty||0,units=out.result?.summary?.byUnit;let counts=[];if(Array.isArray(units))counts=units.filter(u=>u.reservedQty>0||u.reserved>0).map(u=>`${num(u.reservedQty??u.reserved)} ${u.unit}`);else if(units&&typeof units==='object')counts=Object.entries(units).filter(([,u])=>(u.reservedQty??u.reserved)>0).map(([unit,u])=>`${num(u.reservedQty??u.reserved)} ${u.unit||unit}`);openDialog(dialogHeader('VÉRIFICATION DU STOCK',reserved?'Réservation partielle':'Le stock reste à vérifier',reserved?`${counts.length?counts.join(' · '):'Une partie des articles'} réservée. Les autres quantités restent à préparer.`:'Aucune quantité réservée. Renseignez le stock avant la préparation.')+`<ul class="dialog-list">${warnings.map(w=>`<li>${esc(typeof w==='string'?w:w.message||w.code)}</li>`).join('')}</ul><div class="dialog-actions"><button type="button" class="button secondary" data-close-dialog>Fermer</button><button type="button" class="button" data-view="inventory">Vérifier l’inventaire ${icon('arrow')}</button></div>`);}else toast((out.result?.reservedQty||0)>0?'Stock réservé pour cette demande.':'Les quantités disponibles étaient déjà réservées.');}return;}
@@ -440,12 +470,13 @@
     if(button.dataset.assignMember)return showAssignment(button.dataset.assignMember);
     if(button.id==='demo-about'&&isDemo())return showAbout();
     if(button.id==='demo-reset'&&isDemo()){openDialog(dialogHeader('RÉINITIALISATION LOCALE','Recommencer la démonstration ?','Les demandes, stocks et affectations de cet aperçu seront remplacés par les exemples de départ. Les données du studio ne sont pas touchées.')+'<div class="dialog-actions"><button type="button" class="button secondary" data-close-dialog>Annuler</button><button type="button" class="button danger" data-confirm-demo-reset>Réinitialiser cet aperçu</button></div>');return;}
-    if(button.hasAttribute('data-confirm-demo-reset')&&isDemo()){state=model.createDemoState(materials,{seedExamples:true});ui={carts:{},jobs:{}};mode='employee';actorId='demo-employee-1';view='projects';orderFilter='pending';save();closeDialog();render();toast('Données de démonstration réinitialisées.');}
+    if(button.hasAttribute('data-confirm-demo-reset')&&isDemo()){state=model.createDemoState(materials,{seedExamples:true});ui={carts:{},jobs:{}};mode='employee';actorId='demo-employee-1';view='day';orderFilter='pending';save();closeDialog();render();toast('Données de démonstration réinitialisées.');}
   }
   function handleChange(event) {
     if(event.target.id==='auth-show-password'){const input=$('#auth-password');if(input)input.type=event.target.checked?'text':'password';return;}
     const element=event.target;
-    if(element.id==='demo-profile'&&isDemo()){actorId=element.value;view=mode==='admin'?'admin-orders':'projects';orderFilter='pending';render();return;}
+    if(element.id==='demo-profile'&&isDemo()){actorId=element.value;view=mode==='admin'?'admin-orders':'day';orderFilter='pending';render();return;}
+    if(element.id==='employee-job-switch'){ui.jobs[actorId]=element.value;save();render();return;}
     if(element.id==='catalogue-category'){category=element.value;renderCatalogueGrid();return;}
     if(element.matches('#create-order-form select[name="deliveryMode"]')){deliveryDraft.mode=element.value;return;}
     if(element.id==='order-job'){ui.jobs[actorId]=element.value;save();renderCart();return;}
@@ -505,12 +536,13 @@
          if(note){const p=document.createElement('p');p.className='mir-review-note';p.textContent=note;tools.append(p);}}
        toast('Note enregistrée sans déplacer la liste.');return;
      }
-     if(!form.matches('#create-order-form,#fold-form,#delivery-form,#assignment-form,#invitation-form,#create-job-form,[data-inventory-form],[data-fabricated-stock]'))return;
+     if(!form.matches('#create-order-form,#fold-form,#delivery-form,#assignment-form,#invitation-form,#create-job-form,#extra-form,#delivery-issue-form,#hr-form,[data-inventory-form],[data-fabricated-stock]'))return;
     if(!state)return;
     if(!isDemo()&&(clientStatus?.busy||clientStatus?.pending)){event.preventDefault();toast('Vérifiez d’abord l’action en attente de confirmation.');return;}
     event.preventDefault();const data=new FormData(form);
     if(form.id==='create-job-form'){const out=await act('CREATE_JOB',{name:String(data.get('name')||'').trim(),address:String(data.get('address')||'').trim()});if(!out.ok)showFormError(out.error);else{closeDialog();setView('projects');toast('Chantier créé. Attribuez-le aux membres de votre équipe.');}return;}
-    if(form.id==='create-order-form'){const cart=currentCart();if(!cart.length||!currentJobId())return;const out=await act('CREATE_ORDER',{jobId:currentJobId(),lines:cart.map(({cartKey,...line})=>line),note:String(data.get('note')||''),deliveryMode:String(data.get('deliveryMode')||'delivery')});if(out.ok){ui.carts[actorId]=[];deliveryDraft={mode:'delivery',note:''};save();orderFilter='pending';setView(mode==='admin'?'admin-orders':'orders',{focus:true});toast(isDemo()?'Demande enregistrée dans l’aperçu.':'Votre demande a été transmise à MIR.');}return;}
+    if(form.id==='create-order-form'){const cart=currentCart();if(!cart.length||!currentJobId())return;const out=await act('CREATE_ORDER',{jobId:currentJobId(),lines:cart.map(({cartKey,...line})=>line),note:String(data.get('note')||''),deliveryMode:String(data.get('deliveryMode')||'delivery')});if(out.ok){ui.carts[cartKeyFor()]=[];deliveryDraft={mode:'delivery',note:''};save();orderFilter='pending';setView(mode==='admin'?'admin-orders':'orders',{focus:true});toast(isDemo()?'Demande enregistrée dans l’aperçu.':'Votre demande a été transmise à MIR.');}return;}
+    if(['extra-form','delivery-issue-form','hr-form'].includes(form.id)){if(!isDemo()){showFormError({message:'Ce service attend son activation serveur dans MIR TEST. Aucune donnée n’a été envoyée.'});return;}ui.demoSubmissions=ui.demoSubmissions||[];ui.demoSubmissions.push({type:form.id,jobId:form.dataset.job||currentJobId(),kind:form.dataset.kind||'',at:new Date().toISOString()});save();closeDialog();toast('Demande enregistrée dans l’aperçu local.');return;}
     if(form.id==='fold-form'){const item=itemById(form.dataset.item),dimensionsIn={};for(const field of item.measureFields||[])dimensionsIn[field.key]=model.parseInches(String(data.get(`dim-${field.key}`)||''));const out=addToCart({itemId:item.id,quantity:Number(data.get('quantity')),colorId:String(data.get('colorId')||''),dimensionsIn});if(!out.ok)showFormError(out.error);else{closeDialog();renderCart();toast('Pliage ajouté avec vos mesures.');}return;}
     if(form.id==='delivery-form'){const order=state.orders.find(o=>o.id===form.dataset.order),quantities={};for(const line of order?.lines||[]){const amount=Number(data.get(`line-${line.id}`));if(amount>0)quantities[line.id]=amount;}const out=await act('RECORD_DELIVERY',{orderId:form.dataset.order,quantities,requestId:form.dataset.request});if(!out.ok)showFormError(out.error);else{closeDialog();render();toast('Livraison enregistrée. Le reliquat est conservé.');}return;}
     if(form.id==='assignment-form'){if(!isDemo()){const out=await act('ASSIGN_MEMBER_JOBS',{memberId:form.dataset.member,jobIds:data.getAll('jobIds')});if(!out.ok)showFormError(out.error);else{closeDialog();render();toast('Accès aux chantiers enregistrés.');}return;}const member=state.members.find(m=>m.id===form.dataset.member),before=new Set(memberJobs(member).map(j=>j.id)),after=new Set(data.getAll('jobIds'));for(const job of state.jobs){if(before.has(job.id)===after.has(job.id))continue;const out=await act('ASSIGN_JOB',{memberId:member.id,jobId:job.id,assigned:after.has(job.id)});if(!out.ok){showFormError(out.error);return;}}closeDialog();render();toast('Affectations de démonstration enregistrées.');return;}
@@ -601,9 +633,10 @@
   }
   function connectedUI(snapshot) {
     uiStorageKey=`mir_employee_portal_ui_connected_${portalClient.config.projectRef}_${snapshot.actorId}`;
-    const saved=load(uiStorageKey,{cart:[],jobId:''}),cart=[];
-    for(const spec of Array.isArray(saved.cart)?saved.cart:[]){const line=model.configureLine(snapshot,spec);if(line.ok)cart.push({...line.line,cartKey:typeof spec.cartKey==='string'?spec.cartKey:requestId()});}
-    return {carts:{[snapshot.actorId]:cart},jobs:{[snapshot.actorId]:typeof saved.jobId==='string'?saved.jobId:''}};
+    const saved=load(uiStorageKey,{carts:{},jobId:''}),carts={};
+    const source=saved.carts&&typeof saved.carts==='object'?saved.carts:(Array.isArray(saved.cart)?{[`${snapshot.actorId}:${saved.jobId||snapshot.jobs?.[0]?.id||'unassigned'}`]:saved.cart}:{});
+    for(const [key,specs] of Object.entries(source)){if(!key.startsWith(snapshot.actorId+':')||!Array.isArray(specs))continue;carts[key]=[];for(const spec of specs){const line=model.configureLine(snapshot,spec);if(line.ok)carts[key].push({...line.line,cartKey:typeof spec.cartKey==='string'?spec.cartKey:requestId()});}}
+    return {carts,jobs:{[snapshot.actorId]:typeof saved.jobId==='string'?saved.jobId:''}};
   }
   function applyConnectedStatus(next) {
     clientStatus=next;
@@ -616,8 +649,8 @@
     if(next.phase==='ready'&&next.snapshot){
       const changed=actorId!==next.snapshot.actorId||!state;
       state=next.snapshot;actorId=state.actorId;const role=actor()?.role||'employee';
-      if(changed){reviewingOrder=false;deliveryDraft={mode:'delivery',note:''};ui=connectedUI(state);mode=role;view=mode==='admin'?'admin-orders':'projects';invitations=[];}
-      else if(mode!==role){mode=role;view=mode==='admin'?'admin-orders':'projects';}
+      if(changed){reviewingOrder=false;deliveryDraft={mode:'delivery',note:''};ui=connectedUI(state);mode=role;view=mode==='admin'?'admin-orders':'day';invitations=[];}
+      else if(mode!==role){mode=role;view=mode==='admin'?'admin-orders':'day';}
       if(authCallback||invitationToken){renderAuth();return;}
       setChrome(true);
       if(next.reason==='command')syncOperation();else render();
@@ -649,7 +682,7 @@
     if(!portalClient||clientStatus?.busy)return;
     try {
       const out=await portalClient.retry();state=out.snapshot;
-      if(out.command==='CREATE_ORDER'){ui.carts[actorId]=[];reviewingOrder=false;deliveryDraft={mode:'delivery',note:''};save();orderFilter='pending';view=mode==='admin'?'admin-orders':'orders';}
+      if(out.command==='CREATE_ORDER'){ui.carts[cartKeyFor()]=[];reviewingOrder=false;deliveryDraft={mode:'delivery',note:''};save();orderFilter='pending';view=mode==='admin'?'admin-orders':'orders';}
       if(out.command==='INVITE_EMPLOYEE'||out.command==='REVOKE_INVITATION'){await refreshInvitations();toast(invitationLabel(out.result));}
       else toast('Action confirmée. Elle a été enregistrée une seule fois.');
       if($('#portal-dialog').open)closeDialog();render();
@@ -662,7 +695,7 @@
     try{reviewState=reviewAPI?.load(localStorage)||reviewState;}catch(_){}
     ui=load(UI_KEY,{carts:{},jobs:{}});if(!ui||typeof ui!=='object')ui={carts:{},jobs:{}};if(!ui.carts||typeof ui.carts!=='object')ui.carts={};if(!ui.jobs||typeof ui.jobs!=='object')ui.jobs={};
     actorId=state.members.find(member=>member.id==='demo-employee-1'&&member.active)?.id||state.members.find(member=>member.role==='employee'&&member.active)?.id||state.members[0]?.id;
-    mode=actor()?.role||'employee';view=mode==='admin'?'admin-orders':'projects';setChrome(true);render();
+    mode=actor()?.role||'employee';view=mode==='admin'?'admin-orders':'day';setChrome(true);render();
     if(saved&&!restored?.ok)toast('Les données de démonstration invalides ont été réinitialisées. Le studio est inchangé.');
   }
   async function boot() {

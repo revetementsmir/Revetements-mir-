@@ -1,0 +1,18 @@
+'use strict';
+/* MIR TEST read-only: real Auth/RPC, local branch frontend, no business write. */
+const {chromium}=require('playwright'),{spawnSync}=require('child_process'),fs=require('fs'),path=require('path'),assert=require('node:assert/strict');
+const root=path.resolve(__dirname,'../dist'),relay=path.resolve(__dirname,'../tools/validation/https-relay.py');
+const credentials={email:process.env.MIR_SANDBOX_EMPLOYEE_EMAIL,password:process.env.MIR_SANDBOX_EMPLOYEE_PASSWORD};
+if(!credentials.email||!credentials.password){console.log('SKIP MIR TEST employee credentials unavailable');process.exit(0);}
+(async()=>{const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium'});try{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}),page=await context.newPage();
+ await context.route('https://*.supabase.co/**',async route=>{const request=route.request(),run=spawnSync('python3',[relay],{input:JSON.stringify({url:request.url(),method:request.method(),headers:await request.allHeaders(),body:request.postDataBuffer()?.toString('base64')}),encoding:'utf8',timeout:35000,maxBuffer:30*1024*1024});if(run.status)throw Error('HTTPS relay failed');const response=JSON.parse(run.stdout),headers={};for(const [key,value]of Object.entries(response.headers||{}))if(!['content-length','transfer-encoding','connection'].includes(key.toLowerCase()))headers[key]=value;await route.fulfill({status:response.status,headers,body:Buffer.from(response.body,'base64')});});
+ await context.route('https://revetementsmirweb.github.io/MIR/**',route=>{const url=new URL(route.request().url()),file=path.resolve(root,url.pathname.slice('/MIR/'.length));return route.fulfill(fs.existsSync(file)?{path:file}:{status:404,body:''});});
+ await page.goto('https://revetementsmirweb.github.io/MIR/chantier.html?recette=1');
+ const login=await page.evaluate(async value=>{const config=MIRPortalConfig,sdk=MIRSupabase.createClient(config.supabaseUrl,config.publishableKey,{auth:{storageKey:'mir_portal_auth_'+config.projectRef,flowType:'pkce',detectSessionInUrl:false}});const {error}=await sdk.auth.signInWithPassword(value);return error?error.code:'ok';},credentials);assert.equal(login,'ok');
+ await page.reload();await page.locator('.employee-day').waitFor({timeout:45000});
+ const result=await page.evaluate(async()=>{const config=MIRPortalConfig,sdk=MIRSupabase.createClient(config.supabaseUrl,config.publishableKey,{auth:{storageKey:'mir_portal_auth_'+config.projectRef,flowType:'pkce',detectSessionInUrl:false}}),user=(await sdk.auth.getUser()).data.user,snapshot=(await sdk.rpc('mir_portal_snapshot')).data;return {identity:snapshot.actorId===user.id,assignedOnly:snapshot.jobs.every(job=>job.assignedMemberIds.includes(user.id)),jobs:snapshot.jobs.length,actions:document.querySelectorAll('.employee-quick-grid>button').length,overflow:document.documentElement.scrollWidth<=innerWidth};});
+ assert.deepEqual({...result, jobs:undefined},{identity:true,assignedOnly:true,jobs:undefined,actions:4,overflow:true});assert.ok(result.jobs>0,'MIR TEST employee needs an assigned job');
+ fs.mkdirSync(path.resolve(__dirname,'../artifacts'),{recursive:true});await page.screenshot({path:path.resolve(__dirname,'../artifacts/MIR-TEST-ma-journee-390.png')});
+ console.log('PASS MIR TEST réel lecture seule: identité, chantiers assignés, quatre actions, 390 px');
+}finally{await browser.close();}})().catch(error=>{console.error(error.message);process.exitCode=1;});

@@ -123,10 +123,43 @@ body[data-portal-mode="employee"] .order-filters button,
 body[data-portal-mode="employee"] .account-bar button { min-height: 44px; }
 body[data-portal-mode="employee"] .order-line strong { font-size: 14px; }
 body[data-portal-mode="employee"] .order-line small { font-size: 12px; }
+body[data-portal-mode="employee"] #mir-harmony-header .mir-harmony-toggle { width:56px!important; font-size:13px!important; }
+
+.employee-day-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.employee-weather { margin:0; font-weight:800; color:#2d4032; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.employee-messages-bubble { min-height:44px; display:flex; align-items:center; gap:7px; border:1px solid #bdc9b9; border-radius:999px; background:#fff; color:#284630; padding:7px 12px; font-weight:800; }
+.employee-messages-bubble svg { width:20px; }
+.employee-messages-bubble b { display:grid; place-items:center; min-width:22px; height:22px; border-radius:50%; background:#2d5036; color:#fff; }
+.employee-current-job { display:flex; justify-content:space-between; align-items:end; gap:18px; padding:18px; border-radius:16px; background:#2d4032; color:#fff; }
+.employee-current-job > div { min-width:0; overflow-wrap:anywhere; }
+.employee-current-job span { font-size:12px; font-weight:900; letter-spacing:.12em; color:#dbe6d7; }
+.employee-current-job strong { display:block; font-size:clamp(40px,12vw,72px); line-height:.95; }
+.employee-current-job h1 { margin:5px 0 2px; font-size:clamp(20px,5vw,30px); }
+.employee-current-job p { margin:0; color:#e1e9df; }
+.employee-current-job label { min-width:min(230px,45%); font-size:13px; font-weight:800; }
+.employee-current-job select { display:block; width:100%; min-height:48px; margin-top:6px; font-size:16px; border-radius:9px; }
+.employee-quick-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0; }
+.employee-quick-grid button { min-height:132px; display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end; gap:5px; padding:16px; border:1px solid #cbd4c7; border-radius:15px; background:#fff; color:#213b29; text-align:left; }
+.employee-quick-grid button:active { background:#e8efe5; }
+.employee-quick-grid svg { width:30px; height:30px; margin-bottom:auto; }
+.employee-quick-grid strong { font-size:18px; }
+.employee-quick-grid small { color:#526653; }
+.employee-job-file { width:100%; min-height:48px; display:flex; align-items:center; justify-content:space-between; border:0; background:transparent; color:#2d5036; font-weight:800; }
+.employee-job-file svg { width:22px; }
+.employee-tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-bottom:16px; padding:4px; border-radius:12px; background:#e7ece4; }
+.employee-tabs button { min-height:44px; border:0; border-radius:9px; background:transparent; font-weight:800; }
+.employee-tabs button[aria-selected="true"] { background:#fff; color:#294b33; box-shadow:0 1px 5px #1f36251f; }
+.material-list article { display:flex; justify-content:space-between; gap:12px; padding:15px 2px; border-bottom:1px solid #dce3d9; }
+.material-list small { display:block; margin-top:4px; color:#617061; }
+.account-action-list { display:grid; gap:10px; }
+.account-action-list button { min-height:62px; display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid #ccd5c8; border-radius:12px; background:#fff; color:#284630; font-size:16px; font-weight:800; text-align:left; }
+.account-action-list svg { width:22px; }
 
 @media (max-width: 1050px) {
   .employee-order-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .employee-filter-row { grid-column: 1 / -1; }
+  .employee-current-job { align-items:stretch; flex-direction:column; }
+  .employee-current-job label { min-width:0; width:100%; }
 }
 @media (max-width: 700px) {
   body[data-portal-mode="login"] { padding-bottom: 0; }
@@ -142,4 +175,13 @@ body[data-portal-mode="employee"] .order-line small { font-size: 12px; }
     bottom: calc(82px + env(safe-area-inset-bottom));
   }
   body[data-portal-mode="employee"] .portal-shell:has(#mobile-cart:not([hidden]) .employee-cart-bar) { padding-bottom: 116px; }
+  body[data-portal-mode="employee"] .portal-sidebar nav { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; }
+  body[data-portal-mode="employee"] .portal-sidebar nav button { min-height:58px; display:flex; flex-direction:column; justify-content:center; gap:2px; padding:4px 2px; border-radius:8px; }
+  body[data-portal-mode="employee"] .portal-sidebar nav button svg { width:22px; height:22px; }
+  body[data-portal-mode="employee"] .portal-sidebar .sidebar-caption,
+  body[data-portal-mode="employee"] .portal-sidebar .sidebar-help { display:none; }
+  body[data-portal-mode="employee"] .portal-shell { padding-bottom:calc(88px + env(safe-area-inset-bottom)); }
+  .employee-current-job { align-items:stretch; flex-direction:column; }
+  .employee-current-job label { min-width:0; width:100%; }
+  .employee-quick-grid button { min-height:124px; }
 }
