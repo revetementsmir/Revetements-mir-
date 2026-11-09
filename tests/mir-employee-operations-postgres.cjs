@@ -3,22 +3,40 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {PGlite}=require('../tools/database/node_modules/@electric-sql/pglite');
 const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0'),migrations=path.resolve(__dirname,'../supabase/migrations');
-(async()=>{const db=new PGlite(),org=uuid(10),admin=uuid(1),leader=uuid(2),employee=uuid(3),colleague=uuid(4),assistant=uuid(5),outsider=uuid(6),job=uuid(20),otherJob=uuid(21),order=uuid(30);let checks=0;
+(async()=>{const db=new PGlite(),org=uuid(10),admin=uuid(1),leader=uuid(2),employee=uuid(3),colleague=uuid(4),assistant=uuid(5),outsider=uuid(6),boss=uuid(7),job=uuid(20),otherJob=uuid(21),order=uuid(30);let checks=0;
  const ok=name=>{checks++;console.log('PASS '+name);};
  async function actor(user,sql,params=[]){await db.exec('begin;set local role authenticated;');try{await db.query("select set_config('request.jwt.claim.sub',$1,true)",[user]);const result=await db.query(sql,params);await db.exec('commit');return result.rows;}catch(error){await db.exec('rollback');throw error;}}
  async function denied(user,sql,params=[],pattern=/permission|autorisé|requis|invalide/i){await assert.rejects(()=>actor(user,sql,params),error=>pattern.test(error.message));}
  try{
   await db.exec("create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}');create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text);alter table storage.objects enable row level security;create function storage.foldername(text) returns text[] language sql immutable as $$select (string_to_array($1,'/'))[1:array_length(string_to_array($1,'/'),1)-1]$$;grant usage on schema storage to authenticated;grant select,insert,delete on storage.objects to authenticated;");
   for(const file of fs.readdirSync(migrations).filter(name=>name.endsWith('.sql')&&!name.includes('mir_estimates')).sort())await db.exec(fs.readFileSync(path.join(migrations,file),'utf8'));
-  await db.exec("insert into auth.users(id) values('"+[admin,leader,employee,colleague,assistant,outsider].join("'),('")+"');");
+  await db.exec("insert into auth.users(id) values('"+[admin,leader,employee,colleague,assistant,outsider,boss].join("'),('")+"');");
   await db.query('insert into mir_core.organizations(id,name) values($1,$2)',[org,'MIR TEST']);
-  for(const [id,role]of [[admin,'admin'],[leader,'employee'],[employee,'employee'],[colleague,'employee'],[assistant,'employee'],[outsider,'employee']])await db.query('insert into mir_core.memberships values($1,$2,$3,true)',[org,id,role]);
+  for(const [id,role]of [[admin,'admin'],[leader,'employee'],[employee,'employee'],[colleague,'employee'],[assistant,'employee'],[outsider,'employee'],[boss,'employee']])await db.query('insert into mir_core.memberships values($1,$2,$3,true)',[org,id,role]);
   await db.query('insert into mir_core.jobs(organization_id,id,name) values($1,$2,$3),($1,$4,$5)',[org,job,'JOB 353',otherJob,'JOB 454']);
   for(const id of [leader,employee,colleague])await db.query('insert into mir_core.job_memberships values($1,$2,$3)',[org,job,id]);
   await db.query('insert into mir_core.job_memberships values($1,$2,$3)',[org,otherJob,outsider]);
-  for(const [id,role,name]of [[leader,'leader','Julie'],[employee,'employee','Mathieu'],[colleague,'employee','Alex'],[assistant,'assistant','Sophie'],[outsider,'employee','Hors équipe']])await actor(admin,'select public.mir_staff_configure($1,$2,$3,$4)',[org,id,role,name]);
+  for(const [id,role,name]of [[leader,'chef_equipe','Julie'],[employee,'employe','Mathieu'],[colleague,'employe','Alex'],[assistant,'assistant','Sophie'],[outsider,'employe','Hors équipe'],[boss,'boss','Patron']])await actor(admin,'select public.mir_staff_configure($1,$2,$3,$4)',[org,id,role,name]);
   const team=(await actor(admin,'select public.mir_team_save($1,null,$2,$3,$4) id',[org,'Équipe Julie',leader,[employee,colleague]]))[0].id;
   ok('Admin configure chef, adjointe et équipe sans auto-escalade');
+  await db.query('insert into mir_core.team_day_assignments(organization_id,team_id,job_id,leader_id,created_by) values($1,$2,$3,$4,$5)',[org,team,job,leader,boss]);
+  const leadStart=(await actor(leader,'select public.mir_lead_today_snapshot($1) result',[org]))[0].result;
+  assert.equal(leadStart.role,'chef_equipe');assert.equal(leadStart.assignment.jobId,job);assert.equal(leadStart.team.length,3);
+  await denied(leader,'select public.mir_boss_operations_snapshot($1)',[org]);
+  await denied(employee,'select public.mir_lead_today_snapshot($1)',[org]);
+  ok('Chef voit seulement sa journée; employé et chef refusés sur les pages interdites');
+  await actor(leader,'select public.mir_lead_action($1,$2,$3,$4)',[org,uuid(150),'attendance',{userId:employee,status:'present'}]);
+  const task=(await actor(leader,'select public.mir_lead_action($1,$2,$3,$4) result',[org,uuid(151),'task_add',{title:'Poser les moulures'}]))[0].result.id;
+  await actor(leader,'select public.mir_lead_action($1,$2,$3,$4)',[org,uuid(152),'task_complete',{id:task}]);
+  const material=(await actor(leader,'select public.mir_lead_action($1,$2,$3,$4) result',[org,uuid(153),'material_request',{item:'Mono',quantity:3,note:'',urgency:'normal'}]))[0].result.id;
+  await actor(leader,'select public.mir_lead_action($1,$2,$3,$4)',[org,uuid(154),'field_issue',{note:'Mur hors niveau',urgency:'urgent'}]);
+  await actor(leader,'select public.mir_lead_action($1,$2,$3,$4)',[org,uuid(155),'daily_report',{workDone:'Façade nord terminée',hadProblem:true,missingMaterial:false,photoPaths:[],comment:''}]);
+  const bossView=(await actor(boss,'select public.mir_boss_operations_snapshot($1) result',[org]))[0].result;assert.equal(bossView.pendingMaterials.length,1);assert.equal(bossView.reports.length,1);
+  await actor(boss,'select public.mir_boss_action($1,$2,$3,$4)',[org,'material_decision',material,'approved']);
+  assert.equal((await db.query('select status from mir_core.material_requests where organization_id=$1 and id=$2',[org,material])).rows[0].status,'approved');
+  await denied(boss,'select public.mir_staff_configure($1,$2,$3,$4)',[org,outsider,'boss','Intrus']);
+  await denied(leader,'select * from mir_core.material_requests');
+  ok('Présence, tâches, matériel, problème, rapport et approbation Boss protégés côté serveur');
   const privateConversation=(await actor(employee,'select public.mir_conversation_private($1,$2) id',[org,colleague]))[0].id;
   await denied(employee,'select public.mir_conversation_private($1,$2)',[org,outsider]);
   const teamConversation=(await actor(leader,'select public.mir_conversation_team($1,$2) id',[org,team]))[0].id;

@@ -225,7 +225,13 @@
           sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg})
         ]);
         if(operationsResponse.error)throw errorOf(operationsResponse.error);if(messagingResponse.error)throw errorOf(messagingResponse.error);
-        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data}, user.id);
+        let lead=null,boss=null;
+        if(operationsResponse.data?.role==='chef_equipe'){
+          const response=await sdk.rpc('mir_lead_today_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
+        }else if(operationsResponse.data?.role==='boss'){
+          const response=await sdk.rpc('mir_boss_operations_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);boss=response.data;
+        }
+        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {
@@ -460,7 +466,7 @@
       const {data,error}=await sdk.rpc('mir_conversation_open',{org:internalOrg,kind,target:targetId});if(error)throw errorOf(error);return data;
     }
     async function uploadInternal(file,scope,entityId){
-      requireReady();if(!internalOrg||!['message','extra','issue','receipt'].includes(scope)||!UUID.test(entityId||''))fail('UPLOAD_INVALID','La destination de cette photo est invalide.');
+      requireReady();if(!internalOrg||!['message','extra','issue','receipt','material','problem','report'].includes(scope)||!UUID.test(entityId||''))fail('UPLOAD_INVALID','La destination de cette photo est invalide.');
       const mime=String(file?.type||'').toLowerCase(),extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif'};
       if(!extensions[mime]||!file.size||file.size>10*1024*1024)fail('UPLOAD_INVALID','Utilisez une photo JPG, PNG, WebP ou HEIC de 10 Mo maximum.');
       const id=uuid();if(!UUID.test(id||''))fail('UUID_REQUIRED','Le navigateur ne peut pas préparer cette photo.');
@@ -468,13 +474,15 @@
       const {error}=await sdk.storage.from('mir-internal').upload(path,file,{contentType:mime,upsert:false,cacheControl:'3600'});if(error)throw errorOf(error,'La photo n’a pas pu être téléversée.');return path;
     }
     async function internalPhotoURL(path){requireReady();const {data,error}=await sdk.storage.from('mir-internal').createSignedUrl(path,300);if(error||!data?.signedUrl)throw errorOf(error||{},'Cette photo ne peut pas être ouverte.');return data.signedUrl;}
+    async function leadAction(action,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='chef_equipe')fail('ACCESS_DENIED','Chef équipe requis.');const {data,error}=await sdk.rpc('mir_lead_action',{org:internalOrg,request_id:uuid(),action,payload});if(error)throw errorOf(error);await refresh();return data;}
+    async function bossAction(action,entity,decision,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='boss')fail('ACCESS_DENIED','Boss requis.');const {data,error}=await sdk.rpc('mir_boss_action',{org:internalOrg,action,entity,decision,payload});if(error)throw errorOf(error);await refresh();return data;}
     function dispose() {
       disposed = true; generation++; authSubscription?.unsubscribe?.();
       if (authTimer !== null && typeof clearTimeout === 'function') clearTimeout(authTimer);
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, leadAction, bossAction, dispose,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
     });
   }
