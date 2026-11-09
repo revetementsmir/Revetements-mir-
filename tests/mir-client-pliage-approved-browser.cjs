@@ -96,13 +96,14 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
  await page.locator('#client-step-next').click();
  await page.locator('#material-type').selectOption('aluminium');
  await noOverflow();
- await page.locator('#color-system').selectOption('ral');
- await noOverflow();
+ assert.equal(await page.locator('#client-step-title').textContent(),'Choisissez le matériau et la couleur');
+ assert.deepEqual(await page.locator('#material-type option').evaluateAll(nodes=>nodes.map(option=>option.value)),['','aluminium','acier']);
+ assert.deepEqual(await page.locator('#color-system option').evaluateAll(nodes=>nodes.map(option=>option.value)),['manufacturer','special']);
  assert.equal(await page.locator('#production-quantity').isVisible(),false);
  assert.equal(await page.getByRole('navigation',{name:'Pages de couleurs'}).count(),0);
- const palette=page.locator('#production-color-grid');
- assert.ok(await palette.evaluate(grid=>grid.scrollHeight>grid.clientHeight));
  await page.locator('#color-system').selectOption('special');
+ assert.equal(await page.locator('#custom-color-quote').isVisible(),true,'couleur spéciale sur soumission');
+ assert.equal(await page.locator('#client-step-next').isDisabled(),true,'référence spéciale obligatoire');
  await noOverflow();
 
  assert.equal(await page.evaluate(()=>localStorage.getItem('mir_production_client_dossier_v1')),JSON.stringify(dossier),'existing dossier unchanged');assert.equal(await page.evaluate(()=>localStorage.getItem('mir-bending-v1')),quickSaved,'quick list unchanged');await page.goto(base+'/production.html?mode=client&kind=profile#production-order');await page.getByRole('link',{name:'Voir mon dossier complet'}).click();await page.waitForURL('**/selection.html#mir-unified-dossier');await page.locator('#mir-unified-pieces li').waitFor();assert.equal(await page.locator('#mir-unified-pieces li').count(),1);assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_client_dossier_v1')).order.items[0].snapshot.revision),1);assert.deepEqual(errors,[]);results.push({width,height,input:width<=1024?'touch':'mouse',landing:true,models:true,freehand:true,undo:true,measurements:true,existingDossier:true});await c.close();console.log('PASS client pliage '+width+'×'+height+' landing/models/native trace/undo/measures/existing dossier');

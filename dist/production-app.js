@@ -27,6 +27,12 @@ let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client||para
 let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces=[],clientEntry='choice';
 let panelSketchPoints=[],panelSketchHover=null,panelSketchBefore=null;
 const clientProfileWizard=()=>client&&catalogueChannel!=='store'&&kind==='profile';
+const publicProfileMaterials=['aluminium','acier'];
+const publicProfileColors=['manufacturer','special'];
+const ralOption=$('#color-system option[value="ral"]');
+const supportsPublicChoices=record=>[['materials',publicProfileMaterials],['colorSystems',publicProfileColors]]
+ .every(([key,options])=>!record.allowed?.[key]?.length||record.allowed[key].some(value=>options.includes(value)));
+
 let activeStoreColorLock=false;
 // Imported panel metadata is authoritative until a user explicitly edits it.
 let preservedPanelMetadata=null;
@@ -73,7 +79,7 @@ function reloadLocalTemplates(){
  if(workflow==='models')renderModels();else if(workflow==='configure')renderTemplates();
 }
 function availableForPO(){return client||authoring||editingItemId||templates.find(record=>record.id===selectedTemplate?.id)?.channels?.po!==false;}
-function visibleTemplate(record){return !!record&&!record.archived&&(!client||record.archived===false&&record.channels?.[catalogueChannel]===true);}
+function visibleTemplate(record){return !!record&&!record.archived&&(!client||record.archived===false&&record.channels?.[catalogueChannel]===true&&(catalogueChannel==='store'||latest(record)?.kind!=='profile'||supportsPublicChoices(record)));}
 function availableMaterials(){
  if(clientProfileWizard()){
   return window.MIRBendingFinishes.forMetal(materials,draft?.material?.type);
@@ -724,7 +730,7 @@ const clientStages=[
  {title:'Vérifiez les mesures et les angles',hint:'Vérifiez chaque côté et son angle sur le dessin.',action:'Suivant'},
  {title:'Longueur de vente MIR',hint:'Longueur fixe : 10 pi pour les moulures; 12 pi uniquement pour le J à soffite. Les cotes des côtés restent personnalisables.',action:'Suivant'},
  {title:'Choisissez la face colorée',hint:'Suivez le tracé de A vers le dernier côté. Choisissez de quel côté du trait se trouve la face à peindre.',action:'Suivant'},
- {title:'Choisissez le métal et la couleur',hint:'Sélectionnez le métal, puis la teinte. Vous pourrez ensuite ajouter la pièce à votre dossier.'}
+ {title:'Choisissez le matériau et la couleur',hint:'Sélectionnez le matériau, puis la teinte. Vous pourrez ensuite ajouter la pièce à votre dossier.'}
 ];
 function clientTracePrompt(){return matchMedia('(any-pointer:coarse)').matches?'Touchez la grille pour placer le premier point.':'Cliquez sur la grille pour placer le premier point.';}
 function focusClientEntry(selector='#client-entry-title'){
@@ -795,7 +801,7 @@ function clientStepIssues(model,blockJ){
   4:pending.find(issue=>issue.path.startsWith('coloredFace.'))?.message||'',
   5:pending.find(issue=>['MATERIAL_REQUIRED','COLOR_SOURCE_REQUIRED','COLOR_CODE_REQUIRED','THICKNESS_INVALID','QUANTITY_REQUIRED','GAUGE_UNCONFIRMED'].includes(issue.code))?.message||''
  };
- if(!model.material.type)issues[5]='Choisissez un type de métal.';
+ if(!publicProfileMaterials.includes(model.material.type))issues[5]='Choisissez un matériau.';
  else if(!model.finish.code)issues[5]=colorSystem==='special'?'Entrez le code exact de votre couleur spéciale.':'Choisissez une couleur.';
  return issues;
 }
@@ -983,8 +989,17 @@ function setZoom(value){zoom=Math.max(.5,Math.min(4,value));updateDrawing({keepF
 function renderValidation(model){const box=$('#production-validation');const errors=model.validation.errors||[],pending=authoring?[]:model.validation.pending||[],warnings=(model.validation.warnings||[]).filter(w=>w.code!=='GAUGE_NOT_CONVERTED');if(authoring&&model.valid){box.innerHTML='<div class="validation-group good"><strong>Modèle paramétrique sans cotes de commande.</strong><p>Les proportions de ce croquis servent à reconnaître la pièce. Les dimensions seront obligatoires à la commande.</p></div>';return;}let html='';if(errors.length)html+=`<div class="validation-group error"><strong>${client?'Renseignez vos cotes pour voir la pièce.':'Le dessin demande une correction.'}</strong><details><summary>${errors.length} cote${errors.length>1?'s':''} ou détail${errors.length>1?'s':''} à renseigner</summary><ul>${errors.map(e=>`<li>${esc(e.message)}</li>`).join('')}</ul></details></div>`;if(pending.length&&!errors.length)html+=`<div class="validation-group"><strong>Le dessin est prêt, la fiche reste à compléter.<span class="validation-count">${pending.length}</span></strong><details><summary>Voir les précisions à confirmer</summary><ul>${pending.map(e=>`<li>${esc(e.message)}</li>`).join('')}</ul></details></div>`;if(warnings.length)html+=`<div class="validation-group"><strong>À vérifier avec l’atelier</strong><ul>${warnings.map(e=>`<li>${esc(e.message)}</li>`).join('')}</ul></div>`;if(!errors.length&&!pending.length)html+='<div class="validation-group good"><strong>Les cotes et les options sont renseignées.</strong><p>La validation de fabrication reste à faire par l’atelier.</p></div>';box.innerHTML=html;}
 function renderPanelMaterialControls(){
  const panel=kind==='panel',m=draft.material||{},options=panel?[['aluminium-extrude','Aluminium extrudé · sur mesure'],['aluminium',editingItemId&&!m.productRef&&m.type==='aluminium'?'Aluminium · référence du dossier':'Aluminium plié · Unico U-P1'],['acier',editingItemId&&!m.productRef&&m.type==='acier'?'Acier · référence du dossier':'Acier · Unico U-P1']]:[['aluminium','Aluminium'],['acier','Acier'],['acier-inoxydable','Acier inoxydable'],['autre','Autre métal à préciser']];
- if(panel&&!m.type||clientProfileWizard())options.unshift(['','Choisir le métal']);
- if(m.type&&!options.some(x=>x[0]===m.type))options.push([m.type,'Matière du dossier · '+m.type]);
+ const publicProfile=clientProfileWizard();
+ $('#production-material-label').textContent=publicProfile?'Matériau':'Type de métal';
+ if(publicProfile){
+  const publicOptions=options.filter(([id])=>publicProfileMaterials.includes(id));
+  options.splice(0,options.length,['','Choisir le matériau'],...publicOptions);
+  ralOption.remove();
+ }else{
+  if(panel&&!m.type)options.unshift(['','Choisir le métal']);
+  if(m.type&&!options.some(x=>x[0]===m.type))options.push([m.type,'Matière du dossier · '+m.type]);
+  if(!ralOption.isConnected)$('#color-system option[value="special"]').before(ralOption);
+ }
  $('#material-type').innerHTML=options.map(([id,label])=>`<option value="${esc(id)}">${esc(label)}</option>`).join('');
  const thickness=$('#material-thickness'),needSelect=panel&&m.type!=='acier',isSelect=thickness.tagName==='SELECT';
  if(needSelect!==isSelect){const field=document.createElement(needSelect?'select':'input');field.id='material-thickness';field.setAttribute('aria-describedby','thickness-hint');if(!needSelect){field.inputMode='decimal';field.placeholder='À confirmer';}thickness.replaceWith(field);}
@@ -1330,6 +1345,15 @@ function offerProfileImport(confirmedPO=false){
 }
 function restoreSelection(item){const selection=item.selection||{};colorSystem=selection.colorSystem||({manufacturer:'manufacturer',ral:'ral',custom:'special'}[item.spec.finish?.selectionType])||((item.spec.finish||{}).system==='RAL Classic'?'ral':item.spec.finish?.manufacturer||/^Nuancier /i.test(item.spec.finish?.system||'')?'manufacturer':item.spec.finish?.special?'special':'manufacturer');materialId=selection.materialId||materials.find(m=>m.brand===item.spec.finish?.manufacturer)?.id||'';colorId=selection.colorId||'';if(!colorId&&colorSystem==='ral')colorId=ral.colors.find(c=>c.code===item.spec.finish?.code)?.id||'';if(!colorId&&colorSystem==='manufacturer')colorId=(chosenMaterial()?.colors||[]).find(c=>(c.code||c.name)===item.spec.finish?.code)?.id||'';}
 function editPiece(id){panelDirectUndo=[];panelDirectRedo=[];const item=order.items.find(row=>row.id===id);if(!item)return;jException=null;activeStoreColorLock=!!(client&&catalogueChannel==='store'&&item.selection?.storeColorMode==='fixed');workflow='configure';authoring=false;editingTemplateId=null;editingItemId=id;activeDefaultLocks={};kind=item.kind;draft=copy(item.spec);preservedPanelMetadata=kind==='panel'?{id,finish:copy(draft.finish||{}),material:copy(draft.material||{})}:null;if(item.stockProfileType)draft.mirProfileId=item.stockProfileType;selectedTemplate=item.snapshot?.templateSnapshot||null;restoreSelection(item);tool='select';view='face';if(clientProfileWizard()){
+ if(!publicProfileMaterials.includes(draft.material?.type)){
+  draft.material={type:'',thickness:'',gauge:''};
+  materialId='';
+  colorId='';
+  if(colorSystem==='manufacturer')draft.finish={};
+ }
+ if(!publicProfileColors.includes(colorSystem)){
+  colorSystem='manufacturer';colorId='';draft.finish={};
+ }
  clientProfileSelected=true;
  clientStep=clientUnlocked=2;
  draft.length=draft.length||unitValue(120*25.4,draft.unit);
@@ -1384,6 +1408,8 @@ if(defaults&&!defaults.ok){toast(defaults.errors.join(' '));return;}
 const blank=M.instantiateTemplate(t,{unit:'in',measurements:defaults?.measurements||{},length:defaults?.length||'',quantity:1,material:{type:record.allowed?.materials?.[0]||'aluminium'},finish:{},bottomEdgeId:'bottom',perforation:{enabled:false},coloredFace:{side:'',segmentId:'A'}});
 activeDefaultLocks=client&&catalogueChannel==='store'?(defaults?.locks||{}):{};
 workflow='configure';authoring=false;editingTemplateId=null;editingItemId=null;selectedTemplate=t;draft=copy(blank.spec||blank.model?.spec||{});draft.kind=t.kind;kind=t.kind;if(kind==='profile')draft.length=String(stockLengthIn(draft)*(draft.unit==='mm'?25.4:1));draft.name=t.name;draft.perforation=draft.perforation||{enabled:false,details:''};draft.lips=draft.lips||{};colorSystem=record.allowed?.colorSystems?.[0]||'manufacturer';colorId='';view='face';tool='select';if(clientProfileWizard()){
+ colorSystem=publicProfileColors.find(value=>!record.allowed?.colorSystems?.length||record.allowed.colorSystems.includes(value))||'manufacturer';
+
  clientProfileSelected=true;
  clientStep=clientUnlocked=1;
  draft.length=draft.length||String(stockLengthIn(draft)*(draft.unit==='mm'?25.4:1));
@@ -1400,7 +1426,7 @@ if(activeStoreColorLock){
  colorSystem='manufacturer';materialId='';colorId='';
 }
 render();applyTemplateOptions(record);if(clientProfileWizard())goClientStep(2,{confirm:true});}
-function applyTemplateOptions(record){const allowed=record?.allowed;if(!allowed)return;for(const opt of $('#material-type').options)opt.disabled=allowed.materials?.length?!allowed.materials.includes(opt.value):false;for(const opt of $('#color-system').options)opt.disabled=allowed.colorSystems?.length?!allowed.colorSystems.includes(opt.value):false;}
+function applyTemplateOptions(record){const allowed=record?.allowed;if(!allowed)return;for(const opt of $('#material-type').options)opt.disabled=!!opt.value&&!!allowed.materials?.length&&!allowed.materials.includes(opt.value);for(const opt of $('#color-system').options)opt.disabled=allowed.colorSystems?.length?!allowed.colorSystems.includes(opt.value):false;}
 function saveTemplateDialog(){const old=templates.find(record=>record.id===editingTemplateId),current=old?latest(old):null;
  const detected=window.MIRProfileRecognition?.recognize(build());
  const suggestedName=draft.name&&!['Profil dessiné','Profil personnalisé','Mon modèle MIR'].includes(draft.name)?draft.name:detected?.suggestedName||'Moulure dessinée';
