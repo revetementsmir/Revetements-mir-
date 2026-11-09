@@ -89,7 +89,7 @@
   const faces=[];
   if(state.materials.length){
    if(!selectionPDF?.buildOptions)throw Error('Moteur de PDF des matériaux indisponible.');
-   faces.push(...selectionPDF.buildOptions({project:state.project,items:state.materials,excludedCount:state.excludedMaterials}).faces);
+   faces.push(...selectionPDF.buildOptions({project:state.project,reference:state.order?.poNumber||state.order?.id||state.project,items:state.materials,excludedCount:state.excludedMaterials}).faces);
   }
   if(state.pieces.length){
    if(!production?.productionPages)throw Error('Moteur de fiches cotées indisponible.');

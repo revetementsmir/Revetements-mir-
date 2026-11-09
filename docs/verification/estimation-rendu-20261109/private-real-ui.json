@@ -1,0 +1,62 @@
+[
+  {
+    "source": "bending",
+    "width": 390,
+    "height": 844,
+    "api": "real MIR TEST",
+    "shell": "local dist at official origin",
+    "pdfDownloadedIdentical": true,
+    "physicalDevice": false,
+    "auth": "real QA Auth token restored in browser; login screen not replayed"
+  },
+  {
+    "source": "cart",
+    "width": 390,
+    "height": 844,
+    "api": "real MIR TEST",
+    "shell": "local dist at official origin",
+    "pdfDownloadedIdentical": true,
+    "physicalDevice": false,
+    "auth": "real QA Auth token restored in browser; login screen not replayed"
+  },
+  {
+    "source": "bending",
+    "width": 834,
+    "height": 1112,
+    "api": "real MIR TEST",
+    "shell": "local dist at official origin",
+    "pdfDownloadedIdentical": true,
+    "physicalDevice": false,
+    "auth": "real QA Auth token restored in browser; login screen not replayed"
+  },
+  {
+    "source": "cart",
+    "width": 834,
+    "height": 1112,
+    "api": "real MIR TEST",
+    "shell": "local dist at official origin",
+    "pdfDownloadedIdentical": true,
+    "physicalDevice": false,
+    "auth": "real QA Auth token restored in browser; login screen not replayed"
+  },
+  {
+    "source": "bending",
+    "width": 1440,
+    "height": 900,
+    "api": "real MIR TEST",
+    "shell": "local dist at official origin",
+    "pdfDownloadedIdentical": true,
+    "physicalDevice": false,
+    "auth": "real QA Auth token restored in browser; login screen not replayed"
+  },
+  {
+    "source": "cart",
+    "width": 1440,
+    "height": 900,
+    "api": "real MIR TEST",
+    "shell": "local dist at official origin",
+    "pdfDownloadedIdentical": true,
+    "physicalDevice": false,
+    "auth": "real QA Auth token restored in browser; login screen not replayed"
+  }
+]

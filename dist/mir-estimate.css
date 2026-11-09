@@ -6,3 +6,5 @@
 @media(max-width:600px){.estimate-fields,.estimate-facades{grid-template-columns:minmax(0,1fr)}#mir-estimate-dialog fieldset{padding:12px}.estimate-dialog-head{gap:10px}#mir-estimate-dialog{padding:16px}.estimate-review{padding:12px}.estimate-review ul{padding-left:20px}.estimate-submit{padding:10px 0}.estimate-submit #estimate-send{width:100%}.estimate-intro{padding-block:22px 16px}.estimate-record-section{padding:14px}.mir-estimate-page #mir-estimate-dialog{padding:14px}.estimate-dialog-head .eyebrow{font-size:11px}}
 
 .estimate-honeypot{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden}
+
+.mir-estimate-private .estimate-record-section p{white-space:pre-line;overflow-wrap:anywhere}.mir-estimate-private .estimate-record-section li{margin:0 0 14px;line-height:1.6;overflow-wrap:anywhere}

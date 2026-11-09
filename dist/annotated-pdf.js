@@ -63,6 +63,10 @@
   }
   async function makePlan({faces,title='MIR — Plan annoté',subtitle='Étude de revêtement',filename='MIR-plan-annote.pdf',onProgress=()=>{}}={}){
     if(!Array.isArray(faces)||!faces.length)throw new Error('Aucune élévation disponible pour l’export.');
+    if(faces.every(f=>f.layout==='mir-dossier')){
+      if(!global.MIRDossierPDF)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='mir-dossier-pdf.js?v=rendu-1';script.onload=resolve;script.onerror=()=>reject(Error('Le moteur de dossier PDF ne charge pas.'));document.head.append(script);});
+      return global.MIRDossierPDF.make({faces,title,subtitle,filename,onProgress});
+    }
     const pages=[];let pageNumber=0;
     for(const face of faces){
       onProgress(`Préparation du dessin : ${face.name||'élévation'}…`);

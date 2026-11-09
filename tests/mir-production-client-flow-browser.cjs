@@ -185,7 +185,7 @@ async function verifyQuoteAndExports(browser,base,width){
   ...JSON.parse(localStorage.getItem('mir_production_client_dossier_v1')).order,
   items:JSON.parse(localStorage.getItem('mir_production_client_dossier_v1')).order.items.map(item=>item.snapshot)
  },{document:'client-request'}));
- assert.match(requestPages[0].svg,/DEMANDE DE SOUMISSION/);
+ assert.equal(requestPages[0].documentTitle,'Demande de soumission');
  assert.match(requestPages[0].svg,/profile-painted-star/);
  assert.doesNotMatch(requestPages.map(p=>p.svg+' '+p.footerNote).join(' '),/bon de commande|mise en production|Zoho/i);
  assert.match(await page.locator('#production-pdf').innerText(),/PDF de ma demande/);
