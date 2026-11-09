@@ -255,3 +255,33 @@ body.commerce .shop-filterbar :is(input,select){
 .mir-shop-review-dialog form>div{display:flex;justify-content:flex-end;gap:8px}
 .mir-shop-review-dialog [type=submit],.mir-shop-review-toolbar [data-review-export]{background:#347326;color:#fff;border-color:#347326}
 .mir-shop-review-dialog [data-review-error]{color:#873323}
+
+body.commerce .mir-screw-preview {
+  display:block;
+  position:relative;
+  width:100%;
+  height:100%;
+}
+body.commerce .mir-screw-preview > :is(img,canvas) {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  padding:0;
+  object-fit:contain;
+  object-position:center;
+}
+body.commerce .mir-screw-preview > canvas[hidden] { display:none; }
+body.commerce :is(.shop-card-swatches,.product-color-picker,.product-extra-colors) > button.mir-named-swatch {
+  width:auto;
+  min-height:44px;
+  height:auto;
+  max-width:100%;
+  padding:6px 9px;
+  color:#263529;
+  font-size:12px;
+  line-height:1.2;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+body.commerce .shop-card:hover .mir-screw-preview > img { transform:none; }

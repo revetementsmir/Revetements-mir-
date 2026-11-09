@@ -1,27 +1,31 @@
 /* Shared product and colour references for bending and Studio trim. */
 (function(root){
 'use strict';
-function expandAluminumPalettes(catalogue){
+function kaycanAluminumPalette(catalogue){
  const find=id=>catalogue.find(product=>product.id===id);
  const normalize=name=>name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+ const kaycanSource='https://www.kaycan.com/product/aluminum/aluminum-siding/acm/';
+ const samples=[...(find('kaycan-fascia-6-0480')?.colors||[]),...(find('kaycan-urbanix-coil-0747')?.colors||[])];
+ const names=[
+  'Noir','Noir LG','Noir SG','Étain Bruni','Cactus','Noir Charbon','Charbon','Brun Chocolat',
+  'Brun Chocolat LG','Brun Chocolat SG','Chocolat SG','Rouge Colonial','Brun Commercial','Vert Forêt',
+  'Gris Gothique','Gris Grafton','Récolte de Cèdre','Ivoire','Ivoire LG','Ivoire SG','Vert Lierre',
+  'Kaki','Lin','Beige MC','Santal MC','Mocha','Gris Perle','Blanc Polaire','Beige Prestige','Rockwood',
+  'Granite Rustique','Sable','Santal','Gris Argenté','Gris Ardoise','Gris Soho','Blanc','Blanc LG','Blanc SG','Osier','Blanc Loup'
+ ];
+ return names.map((name,index)=>{
+  const sample=samples.find(c=>normalize(c.name)===normalize(name));
+  return {...sample,id:sample?.id||'kaycan-reference-'+(index+1),name,sourceUrl:kaycanSource,
+   availabilityAtProfile:'unverified',availabilityNote:'Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.'};
+ });
+}
+function expandAluminumPalettes(catalogue){
+ const find=id=>catalogue.find(product=>product.id===id);
  const kaycan=find('kaycan-coil-0721-30m');
  if(kaycan){
-  const kaycanSource='https://www.kaycan.com/product/aluminum/aluminum-siding/acm/';
-  const samples=[...(find('kaycan-fascia-6-0480')?.colors||[]),...(find('kaycan-urbanix-coil-0747')?.colors||[])];
-  const names=[
-   'Noir','Noir LG','Noir SG','Étain Bruni','Cactus','Noir Charbon','Charbon','Brun Chocolat',
-   'Brun Chocolat LG','Brun Chocolat SG','Chocolat SG','Rouge Colonial','Brun Commercial','Vert Forêt',
-   'Gris Gothique','Gris Grafton','Récolte de Cèdre','Ivoire','Ivoire LG','Ivoire SG','Vert Lierre',
-   'Kaki','Lin','Beige MC','Santal MC','Mocha','Gris Perle','Blanc Polaire','Beige Prestige','Rockwood',
-   'Granite Rustique','Sable','Santal','Gris Argenté','Gris Ardoise','Gris Soho','Blanc','Blanc LG','Blanc SG','Osier','Blanc Loup'
-  ];
-  const references=names.map((name,index)=>{
-   const sample=samples.find(c=>normalize(c.name)===normalize(name));
-   return {...sample,id:sample?.id||'kaycan-reference-'+(index+1),name,sourceUrl:kaycanSource,
-    availabilityAtProfile:'unverified',availabilityNote:'Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.'};
-  });
+  const normalize=name=>name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
   const existing=new Set(kaycan.colors.map(c=>normalize(c.name)));
-  kaycan.colors=[...kaycan.colors,...references.filter(c=>!existing.has(normalize(c.name)))];
+  kaycan.colors=[...kaycan.colors,...kaycanAluminumPalette(catalogue).filter(c=>!existing.has(normalize(c.name)))];
   kaycan.name='Rouleau aluminium 0721 · références de couleur à confirmer';
  }
  const gentek=find('gentek-coil-3037');
@@ -60,5 +64,5 @@ function forMetal(products,metal){
  const type=metal==='steel'||metal==='acier'?'steel':metal==='aluminum'||metal==='aluminium'?'aluminum':null;
  return products.filter(p=>!p.architecturalPanel&&type===(p.steelProfileOnly||/acier/i.test(p.family||p.name)?'steel':'aluminum'));
 }
-root.MIRBendingFinishes=Object.freeze({catalogue,forMetal});
+root.MIRBendingFinishes=Object.freeze({catalogue,forMetal,kaycanAluminumPalette});
 })(typeof window==='object'?window:globalThis);
