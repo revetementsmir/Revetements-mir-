@@ -1,0 +1,79 @@
+{
+  "browser": "Chromium 155.0.8059.79",
+  "physicalDevices": false,
+  "network": "External requests blocked; no Supabase writes, no orders or payment",
+  "results": [
+    {
+      "width": 390,
+      "height": 844,
+      "search": true,
+      "category": true,
+      "filters": true,
+      "returnContext": true,
+      "color": "Pierre des champs",
+      "quantity": 5,
+      "unit": "pi²",
+      "editReload": true,
+      "accountVisit": true,
+      "guest": true,
+      "estimate": true,
+      "realPdfBytes": 261396,
+      "projectDossierPreserved": true,
+      "removal": true,
+      "empty": true
+    },
+    {
+      "homepageWidth": 390,
+      "pixelIdentical": true,
+      "sha256": "bc743092881785092751f5bee963e0d4b8e9a7b58a7c7d2f69cd727353399eb0"
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "search": true,
+      "category": true,
+      "filters": true,
+      "returnContext": true,
+      "color": "Pierre des champs",
+      "quantity": 5,
+      "unit": "pi²",
+      "editReload": true,
+      "accountVisit": true,
+      "guest": true,
+      "estimate": true,
+      "realPdfBytes": 261396,
+      "projectDossierPreserved": true,
+      "removal": true,
+      "empty": true
+    },
+    {
+      "homepageWidth": 834,
+      "pixelIdentical": true,
+      "sha256": "48d6106901c2463d58c20a42f6f28334c903989c4b530199fae452e2410b31db"
+    },
+    {
+      "width": 1348,
+      "height": 926,
+      "search": true,
+      "category": true,
+      "filters": true,
+      "returnContext": true,
+      "color": "Pierre des champs",
+      "quantity": 5,
+      "unit": "pi²",
+      "editReload": true,
+      "accountVisit": true,
+      "guest": true,
+      "estimate": true,
+      "realPdfBytes": 261396,
+      "projectDossierPreserved": true,
+      "removal": true,
+      "empty": true
+    },
+    {
+      "homepageWidth": 1348,
+      "pixelIdentical": true,
+      "sha256": "71d4ebd4ab7950cffeff2fed479c0d86dfa356b4bc5d05b7ff6ec8b0dfd54992"
+    }
+  ]
+}

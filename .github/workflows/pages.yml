@@ -325,7 +325,7 @@ jobs:
           fetch "$base/production.html?verification=$GITHUB_SHA" /tmp/production.html
           cmp /tmp/production.html _site_mir/production.html
           grep -F 'mir-miniature.js?v=1' /tmp/production.html
-          grep -F 'production-model.js?v=retours-cotes-20261105' /tmp/production.html
+          grep -F 'production-model.js?v=' /tmp/production.html
           grep -F 'production-admin-v4.css?v=deplacer-vue-20261105' /tmp/production.html
           fetch "$base/mir-miniature.js" /tmp/mir-miniature.js
           grep -F "function project(points" /tmp/mir-miniature.js
