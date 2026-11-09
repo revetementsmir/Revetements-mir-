@@ -1,0 +1,44 @@
+[
+  {
+    "page": "compte",
+    "state": "signup-long-address",
+    "width": 360,
+    "overflow": false,
+    "submitted": false
+  },
+  {
+    "page": "compte",
+    "state": "signup-long-address",
+    "width": 390,
+    "overflow": false,
+    "submitted": false
+  },
+  {
+    "page": "compte",
+    "state": "signup-long-address",
+    "width": 760,
+    "overflow": false,
+    "submitted": false
+  },
+  {
+    "page": "compte",
+    "state": "signup-long-address",
+    "width": 761,
+    "overflow": false,
+    "submitted": false
+  },
+  {
+    "page": "compte",
+    "state": "signup-long-address",
+    "width": 834,
+    "overflow": false,
+    "submitted": false
+  },
+  {
+    "page": "compte",
+    "state": "signup-long-address",
+    "width": 1440,
+    "overflow": false,
+    "submitted": false
+  }
+]

@@ -111,7 +111,7 @@ async function main(){
       assert.ok(result.compact||result.estimate,name+' '+size.id+': bouton Estimation masqué ou hors écran');
       assert.ok(result.footer,name+' '+size.id+': pied de page commun absent ou hors écran');
       assert.ok(result.heroFits,name+' '+size.id+': texte ou bouton du hero rogné');
-      if(harmony){assert.match(await sharedMenu.locator('.mir-home-estimate').getAttribute('href'),/contact\.html$/);await page.keyboard.press('Escape');assert.equal(await sharedMenu.isVisible(),false);}
+      if(harmony){assert.match(await sharedMenu.locator('.mir-home-estimate').getAttribute('href'),/estimation\.html$/);await page.keyboard.press('Escape');assert.equal(await sharedMenu.isVisible(),false);}
       if(['boutique','produit','selection','pliage','plan'].includes(name)){
         await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-signature-'+name+'-'+size.id+'.png')});
       }

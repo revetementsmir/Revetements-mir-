@@ -37,7 +37,7 @@ test('Le visiteur peut entrer sans compte ni action de connexion obligatoire',()
   assert.match(header,/href="boutique\.html"[^>]*>Revêtements<\/a>/);
   assert.match(hero,/href="realisations\.html"[^>]*>Voir nos réalisations<\/a>/);
   assert.match(hero,/href="boutique\.html"[^>]*>Voir notre boutique<\/a>/);
-  assert.match(header,/href="contact\.html"[^>]*>Demander une estimation<\/a>/);
+  assert.match(header,/href="estimation\.html"[^>]*>Demander une estimation<\/a>/);
 });
 test('Maison du portfolio MIR utilisée, aucune image IA nouvelle ni palmiers',()=>{
   assert.match(hero,/src="assets\/mir-home-hero-20261105\.webp"/);
@@ -79,7 +79,7 @@ test('3D / plan PDF au troisième niveau et métier MIR au premier',()=>{
   assert.doesNotMatch(html,/id="(?:realisations|nous-joindre|matieres)"/);
   assert.equal((html.match(/<section\b/g)||[]).length,2);
   assert.match(read('contact.html'),/href="tel:\+14188429859"/);
-  assert.match(read('contact.html'),/href="mailto:estimation@revetementsmir\.com"/);
+  assert.match(read('contact.html'),/href="estimation\.html"/);
 });
 test('Page responsive et logo non déformé',()=>{
   assert.match(css,/@media\(max-width:1100px\)/);

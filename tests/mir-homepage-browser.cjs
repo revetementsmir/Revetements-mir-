@@ -67,7 +67,7 @@ async function main(){
         await page.locator('nav').getByRole('link',{name:'Nous joindre'}).click();
         await page.waitForURL('**/contact.html');
         assert.ok(await page.locator('a[href="tel:+14188429859"]').isVisible());
-        assert.ok(await page.locator('main a[href="mailto:estimation@revetementsmir.com"]').isVisible());
+        assert.ok(await page.locator('main a[href="estimation.html"]').isVisible());
       }
       if(size.name==='desktop'){
         await page.goto('http://127.0.0.1:'+server.address().port+'/index.html#au-coeur-du-centre-ville');

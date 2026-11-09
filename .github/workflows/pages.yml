@@ -107,6 +107,7 @@ jobs:
           node tests/mir-finishing-editor.cjs
           node --check tests/mir-finishing-editor-browser.cjs
           node tests/mir-pages-regressions.cjs
+          node --test tests/mir-estimate-service.cjs
           node tests/mir-atelier-v4.cjs
           node tests/mir-miniatures.cjs
           node tests/mir-retours-cotes.cjs
@@ -173,6 +174,7 @@ jobs:
           node tests/mir-studio-terrain-browser.cjs
           node tests/mir-finishing-editor-browser.cjs
           node tests/mir-shared-startup-browser.cjs
+          node tests/mir-estimate-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
         uses: actions/upload-artifact@v4
@@ -238,6 +240,10 @@ jobs:
           cmp /tmp/mir-homepage.html _site_mir/index.html
           grep -F 'mir-home-premium.css?v=' /tmp/mir-homepage.html
           grep -F 'href="realisations.html"' /tmp/mir-homepage.html
+          for file in estimation.html estimation-dossier.html mir-estimate.js mir-estimate-config.js mir-estimate-private.js; do
+            fetch "$base/$file?verification=$GITHUB_SHA" "/tmp/mir-$file"
+            cmp "/tmp/mir-$file" "_site_mir/$file"
+          done
           fetch "$base/contact.html?verification=$GITHUB_SHA" /tmp/mir-contact.html
           cmp /tmp/mir-contact.html _site_mir/contact.html
           grep -F 'assets/MIR-logo-officiel-original.svg' /tmp/mir-homepage.html
@@ -522,3 +528,15 @@ jobs:
           done
           echo "MIR public and workspace headers match deployed revision $GITHUB_SHA"
           echo "MIR Pages verified at $base/"
+
+      - name: Vérifier les parcours estimation sur GitHub Pages
+        env:
+          MIR_PUBLISHED_BASE: ${{ steps.deployment.outputs.page_url }}
+        run: node tests/mir-estimate-published-browser.cjs
+      - name: Preuves de recette estimation publiée
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-estimation-publiee
+          path: artifacts/estimation-published
+          if-no-files-found: ignore

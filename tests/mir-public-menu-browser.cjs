@@ -67,7 +67,7 @@ const sizes=[
           assert.deepEqual(await header.boundingBox(),closed,label+' le menu ne pousse pas la page');
           assert.equal(await nav.evaluate(el=>getComputedStyle(el).position),'absolute',label);
         }
-        const links=await nav.locator('a:visible').evaluateAll(anchors=>anchors.map(a=>[a.textContent.trim(),a.getAttribute('href')]));
+        const links=await nav.locator('a:visible').evaluateAll(anchors=>anchors.map(a=>[a.getAttribute('href')==='selection.html'?'Mon panier':a.textContent.trim(),a.getAttribute('href')]));
         if(!reference)reference=links;
         else assert.deepEqual(links,reference,label+' mêmes liens que l’accueil');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),label+' débordement');

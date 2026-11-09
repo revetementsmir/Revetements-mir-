@@ -1,0 +1,10 @@
+{
+  "standalone": true,
+  "bytes": 313757,
+  "documentTransport": "local HTML fulfilled by browser route; file URL blocked by browser policy",
+  "httpSubresourceRequests": [],
+  "imagesLoaded": true,
+  "scripts": 0,
+  "forms": 0,
+  "errors": []
+}

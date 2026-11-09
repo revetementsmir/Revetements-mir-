@@ -1,0 +1,26 @@
+{
+  "viewports": [
+    [
+      390,
+      844
+    ],
+    [
+      834,
+      1112
+    ],
+    [
+      1440,
+      900
+    ]
+  ],
+  "entries": [
+    "general",
+    "bending",
+    "cart",
+    "studio"
+  ],
+  "received": 12,
+  "provider": "HTTP local capturé, pas Resend externe",
+  "destination": "capture@example.invalid",
+  "physicalDevices": false
+}

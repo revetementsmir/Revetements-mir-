@@ -31,14 +31,14 @@ async function main(){
       assert.ok(await header.locator('img[src="assets/MIR-logo-officiel-original.svg"]').isVisible());
       assert.ok(await header.locator('.mir-harmony-dossier').isVisible());
       const box=await header.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=view.width+2);
-      await toggle.click();assert.ok(await nav.locator('a[href="chantier.html"]').isVisible());
+      await toggle.click();assert.ok(await nav.locator('a[href^="chantier.html"]').isVisible());
       await page.keyboard.press('Escape');assert.equal(await nav.isVisible(),false);count++;continue;
     }
     const result=await page.evaluate(()=>{
       const header=document.querySelector('header.mir-client-header') || document.querySelector('header.mir-home-header') || document.querySelector('html.mir-production-client header.production-header');
       const nav=header?.querySelector('nav.mir-client-links') || header?.querySelector('nav[aria-label="Navigation principale"]');
       const logo=header?.querySelector('img[src="assets/MIR-logo-officiel-original.svg"]');
-      const account=header?.querySelector('a[href="chantier.html"]');
+      const account=header?.querySelector('a[href^="chantier.html"]');
       const box=header?.getBoundingClientRect();
       const bar=nav?.getBoundingClientRect();
       const menu=header?.querySelector('.mir-client-menu-toggle');
