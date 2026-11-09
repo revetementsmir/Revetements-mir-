@@ -21,6 +21,16 @@
   doc.body.classList.add('mir-signature');
   header.classList.add('mir-client-header');
   logo.classList.add('mir-client-brand');
+  const params=new URLSearchParams(win.location.search);
+  if(params.get('kind')==='profile'&&params.get('source')!=='store'){
+   doc.documentElement.removeAttribute('data-mir-harmony');
+   header.setAttribute('data-mir-public-shell','');
+   header.classList.add('mir-home-header');
+   links.classList.remove('mir-production-client-nav');
+   links.setAttribute('aria-label','Navigation principale');
+   actions.classList.remove('mir-client-actions','mir-production-client-actions');
+   actions.querySelector('.mir-home-account')?.classList.remove('mir-production-client-account');
+  }
   // Le même contrôleur public (Escape, clic extérieur, focus, ARIA) sera chargé
   // ensuite par mir-public-menu.js, sans le recopier.
   return true;

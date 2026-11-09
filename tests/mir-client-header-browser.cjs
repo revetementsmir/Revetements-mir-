@@ -26,7 +26,7 @@ async function main(){
    const page=await browser.newPage({viewport:{width:view.width,height:view.height}});
    for(const route of routes){
     await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:25000});
-    if(await page.locator('html[data-mir-harmony]').count()){
+    if(await page.locator('#mir-harmony-header').count()){
       const header=page.locator('#mir-harmony-header'),toggle=header.locator('.mir-harmony-toggle'),nav=header.locator('#mir-harmony-menu');
       assert.ok(await header.locator('img[src="assets/MIR-logo-officiel-original.svg"]').isVisible());
       assert.ok(await header.locator('.mir-harmony-dossier').isVisible());

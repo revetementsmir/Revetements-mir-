@@ -3,7 +3,7 @@
 (function(){
  'use strict';
  function init(){
-  const header=document.querySelector('body > header');if(!header)return;
+  const header=document.querySelector('body > header');if(!header||header.hasAttribute('data-mir-public-shell'))return;
   const page=location.pathname.split('/').pop(),params=new URLSearchParams(location.search);
   const admin=page==='production.html'&&params.get('mode')!=='client';
   const wall=page==='calepinage.html';

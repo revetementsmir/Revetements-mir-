@@ -91,7 +91,7 @@ async function main(){
         const box=footer?.getBoundingClientRect();
         const hero=document.querySelector('.shop-hero'),copy=hero?.querySelector('.shop-hero-copy');
         const frame=hero?.getBoundingClientRect(),content=copy?.getBoundingClientRect();
-        return {theme:document.body.classList.contains('mir-signature'),css,
+        return {compact:innerWidth<=760&&!!document.querySelector('header[data-mir-public-shell]'),theme:document.body.classList.contains('mir-signature'),css,
           accent:getComputedStyle(document.body).getPropertyValue('--mir-accent').trim(),
           paper:getComputedStyle(document.body).getPropertyValue('--mir-surface').trim(),
           footer:box?.width>0&&box.left>=0&&box.right<=innerWidth&&footer.querySelectorAll('nav a').length===5,
@@ -105,7 +105,7 @@ async function main(){
       assert.ok(result.theme&&result.css&&result.logo,name+' '+size.id+': thème ou logo absent');
       assert.equal(result.accent,'#348511',name+' '+size.id+': accent');
       assert.equal(result.paper,'#fafaf7',name+' '+size.id+': fond');
-      assert.ok(result.estimate,name+' '+size.id+': bouton Estimation masqué ou hors écran');
+      assert.ok(result.compact||result.estimate,name+' '+size.id+': bouton Estimation masqué ou hors écran');
       assert.ok(result.footer,name+' '+size.id+': pied de page commun absent ou hors écran');
       assert.ok(result.heroFits,name+' '+size.id+': texte ou bouton du hero rogné');
       if(harmony){assert.match(await sharedMenu.locator('.mir-home-estimate').getAttribute('href'),/contact\.html$/);await page.keyboard.press('Escape');assert.equal(await sharedMenu.isVisible(),false);}

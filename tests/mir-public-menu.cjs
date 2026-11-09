@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../dist'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const menu=require('../dist/mir-public-menu.js');
-const routes=['realisations','materiaux','boutique','produit','selection','pliage','plan'];
+const routes=['realisations','contact','materiaux','boutique','produit','selection','pliage','plan'];
 let checks=0;
 function test(name,fn){fn();checks++;console.log('PASS '+name);}
 test('Le menu a une API stable et son activation reste explicitement mobile/tablette',()=>{
@@ -12,15 +12,16 @@ test('Le menu a une API stable et son activation reste explicitement mobile/tabl
  assert.equal(menu.breakpoint,'(max-width: 1100px)');
  assert.equal(typeof menu.init,'function');
 });
-test('Les sept pages clients utilisent les mêmes fichiers de menu, sans bibliothèques ajoutées',()=>{
+test('Les pages clients utilisent les mêmes fichiers de menu, sans bibliothèques ajoutées',()=>{
  for(const route of routes){
    const html=read(route+'.html');
    assert.match(html,/mir-public-menu\.css\?v=1/,route);
-   assert.match(html,/mir-public-menu\.js\?v=1/,route);
+   assert.match(html,/mir-public-menu\.js\?v=public-shell-1/,route);
+   assert.match(html,/<header[^>]*data-mir-public-shell/,route);
    assert.match(html,/<header[^>]*mir-client-header/,route);
    assert.match(html,/assets\/MIR-logo-officiel-original\.svg/,route);
    assert.match(html,/name="robots" content="noindex,nofollow"/,route);
-   assert.match(html,/href="contact.html"[^>]*>Demander une estimation<\/a>/,route);
+   assert.match(html,/>Demander une estimation<\/a>/,route);
  }
 });
 test('Le menu accueil est compact et le mode Admin reste isolé',()=>{

@@ -16,3 +16,25 @@ body[data-client-pliage-landing] .page-main{padding-top:clamp(32px,5vw,72px);max
 .client-bend-quick[open]>summary span{transform:rotate(45deg)}
 .client-bend-quick-content{padding-block:12px}
 @media(max-width:600px){.client-bend-hero{grid-template-columns:1fr;gap:26px;padding-bottom:20px}.client-bend-copy h1{font-size:34px;margin:14px 0}.client-bend-copy .mir-button{width:100%;margin-top:18px}.client-bend-copy>p:not(.eyebrow){font-size:14px}.client-bend-example{padding:16px}.client-bend-example svg{max-height:215px}}
+body[data-client-pliage-landing] #mir-harmony-menu nav a[aria-current="page"]{background:#e5efdf;color:#205e21}
+
+/* The entry fits one screen. The legacy form remains an explicit advanced path. */
+body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) .subnav{display:none}
+body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) footer.mir-signature-footer{
+ display:block;margin:0 auto;padding:4px 0 8px;
+}
+body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) footer.mir-signature-footer>:not(nav){display:none}
+body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) .mir-signature-footer nav{justify-content:center;gap:0 12px}
+body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) .mir-signature-footer nav a{
+ display:inline-flex;align-items:center;min-height:44px;
+}
+@media(max-width:600px){
+ body[data-client-pliage-landing] .page-main{padding-top:18px}
+ .client-bend-hero{gap:12px;padding-bottom:10px}
+ .client-bend-copy h1{margin:8px 0}
+ .client-bend-copy .mir-button{margin-top:12px}
+ .client-bend-example svg{max-height:clamp(105px,24dvh,200px)}
+}
+@media(max-height:670px){
+ .client-bend-example svg{max-height:26dvh}
+}
