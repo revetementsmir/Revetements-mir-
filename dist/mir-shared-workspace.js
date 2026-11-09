@@ -11,12 +11,7 @@
  const requestedDestination=new URLSearchParams(location.search).get('destination'),destination=['boutique','store'].includes(requestedDestination)?requestedDestination:null;
  if(destination)document.querySelector('h1').textContent=destination==='boutique'?'Boutique partagée':'Magasin employés partagé';
  const cad=cents=>(cents/100).toFixed(2)+' $ CA';
- function bendPrice(tariff,metal,fixedCents,area,folds){
-  const base=fixedCents??(area*tariff.area_rate*100+folds*tariff.bend_cents);
-  const amount=base*(1+(metal==='aluminium'?tariff.aluminum_basis_points/10000:0));
-  const cents=Math.round(amount+Number.EPSILON*amount*4);
-  return cents>=1&&cents<=10000000?cents:null;
- }
+ const bendPrice=window.MIRBendPricing.unitCents;
  function numberInput(parent,label,value,{step='1',min='0',max}={}){
   const input=document.createElement('input');
   input.type='number';input.inputMode='decimal';input.required=true;

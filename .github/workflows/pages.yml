@@ -153,6 +153,7 @@ jobs:
           node tests/mir-client-header-browser.cjs
           node tests/mir-public-menu-browser.cjs
           node tests/mir-production-client-flow-browser.cjs
+          node tests/mir-client-bend-tariff-browser.cjs
           node tests/mir-unified-dossier-browser.cjs
           node tests/mir-unified-dossier-browser.cjs
           node tests/mir-selection-pdf-browser.cjs
