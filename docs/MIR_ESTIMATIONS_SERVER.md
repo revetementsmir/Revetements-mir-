@@ -6,7 +6,7 @@
 - **MIR TEST** (`hxtztkmbfpmzrieccwsg`) possède les migrations `mir_estimates_*`, le bucket privé `mir-estimates` et la fonction `mir-estimates`. Les fichiers de cette fonction sont dans `supabase/functions/`.
 - **MIR** (`gccltmaulvrnthrbnrpd`) n’a pas été migré ni activé : l’utilisateur conditionne la production à la recette de courriel réellement reçue.
 - L’organisation existante **Les Revêtements MIR est sur Free**. Aucun projet, branche facturée, abonnement ou hôte Node payant créé.
-- Les clés/permissions Resend et la boîte de recette ne sont pas disponibles. Aucun domaine Resend ni enregistrement DNS inventé. **Aucun courriel externe envoyé ou reçu dans cette recette**.
+- Les clés/permissions Resend ne sont pas disponibles. MIR a confirmé une boîte de recette dans la conversation ; elle reste à renseigner dans les secrets serveur, sans publier cette adresse personnelle dans le dépôt. Aucun domaine Resend ni enregistrement DNS inventé. **Aucun courriel externe envoyé ou reçu dans cette recette**.
 
 Le [rapport de recette](verification/estimation-edge-20261109/README.md) distingue API/Storage/Auth réels, transport Resend simulé, navigateur émulé et scénarios bloqués.
 
@@ -77,7 +77,7 @@ Quand un plafond est atteint, le service refuse proprement et conserve le brouil
 |---|---|
 | `RESEND_API_KEY` | Clé Resend d’envoi ; gestionnaire de secrets uniquement, jamais chat/GitHub. |
 | `MIR_ESTIMATE_FROM` | Exemple de forme : `Les Revêtements MIR <estimation@envoi.revetementsmir.com>`, après vérification réelle du sous-domaine. |
-| `MIR_ESTIMATE_TO` | Boîte de test contrôlée par MIR, à confirmer. |
+| `MIR_ESTIMATE_TO` | Boîte de test fournie et autorisée par MIR dans la conversation, à enregistrer ici uniquement. |
 | `MIR_ESTIMATE_MODE` | `test` sur MIR TEST. |
 | `MIR_ESTIMATE_ENABLED` | `true` après les réglages ci-dessus. |
 
@@ -98,7 +98,7 @@ Le script `tools/validation/mir-resend-domain.mjs` peut lire/créer ce seul doma
 
 ## Recette réelle puis production
 
-Restent obligatoires : boîte de test contrôlée, expéditeur vérifié, quatre courriels effectivement reçus, PDF joints panier/pliage, accès du compte d’adjointe et refus des autres comptes, reprise après interruption/échec, version Studio immuable, trois tailles navigateur. Les simulations de courriel ne valident pas cette étape.
+La boîte de test est confirmée. Restent obligatoires : configuration de cette boîte dans les secrets, expéditeur vérifié, quatre courriels effectivement reçus, PDF joints panier/pliage, accès du compte d’adjointe et refus des autres comptes, reprise après interruption/échec, version Studio immuable, trois tailles navigateur. Les simulations de courriel ne valident pas cette étape.
 
 Après réussite seulement : appliquer les migrations dans **MIR**, déployer la même fonction, configurer [les secrets MIR](https://supabase.com/dashboard/project/gccltmaulvrnthrbnrpd/functions/secrets) avec `MIR_ESTIMATE_MODE=production`, `MIR_ESTIMATE_TO=estimation@revetementsmir.com`, les vrais UUID d’adjointe et le budget 400 Mio ; activer les deux garde-fous (`settings.enabled` + secret ENABLED). Enfin renseigner uniquement l’URL publique `https://gccltmaulvrnthrbnrpd.supabase.co/functions/v1/mir-estimates` pour la production dans `dist/mir-estimate-config.js`, sans clé/expéditeur/destinataire.
 

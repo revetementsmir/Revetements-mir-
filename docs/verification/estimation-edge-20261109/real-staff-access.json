@@ -1,0 +1,65 @@
+{
+  "project": "MIR TEST",
+  "account": "QA employee explicitly authorized temporarily; not the actual adjointe",
+  "emailSent": false,
+  "checks": [
+    {
+      "source": "general",
+      "phase": "temporarily allowlisted",
+      "recordStatus": 200,
+      "pdfHashesVerified": false,
+      "passed": true
+    },
+    {
+      "source": "studio",
+      "phase": "temporarily allowlisted",
+      "recordStatus": 200,
+      "pdfHashesVerified": true,
+      "passed": true
+    },
+    {
+      "source": "cart",
+      "phase": "temporarily allowlisted",
+      "recordStatus": 200,
+      "pdfHashesVerified": true,
+      "passed": true
+    },
+    {
+      "source": "bending",
+      "phase": "temporarily allowlisted",
+      "recordStatus": 200,
+      "pdfHashesVerified": true,
+      "passed": true
+    },
+    {
+      "source": "general",
+      "phase": "access removed",
+      "recordStatus": 403,
+      "pdfHashesVerified": false,
+      "passed": true
+    },
+    {
+      "source": "studio",
+      "phase": "access removed",
+      "recordStatus": 403,
+      "pdfHashesVerified": false,
+      "passed": true
+    },
+    {
+      "source": "cart",
+      "phase": "access removed",
+      "recordStatus": 403,
+      "pdfHashesVerified": false,
+      "passed": true
+    },
+    {
+      "source": "bending",
+      "phase": "access removed",
+      "recordStatus": 403,
+      "pdfHashesVerified": false,
+      "passed": true
+    }
+  ],
+  "allowedAt": "2026-11-09T16:20:59.294Z",
+  "revokedAt": "2026-11-09T16:21:27.873Z"
+}
