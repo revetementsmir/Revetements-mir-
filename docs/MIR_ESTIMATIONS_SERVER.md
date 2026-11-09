@@ -6,7 +6,7 @@
 - **MIR TEST** (`hxtztkmbfpmzrieccwsg`) possède les migrations `mir_estimates_*`, le bucket privé `mir-estimates` et la fonction `mir-estimates`. Les fichiers de cette fonction sont dans `supabase/functions/`.
 - **MIR** (`gccltmaulvrnthrbnrpd`) n’a pas été migré ni activé : l’utilisateur conditionne la production à la recette de courriel réellement reçue.
 - L’organisation existante **Les Revêtements MIR est sur Free**. Aucun projet, branche facturée, abonnement ou hôte Node payant créé.
-- Les quatre secrets Resend de MIR TEST sont maintenant configurés. **Un courriel fictif réel avec PDF a été accepté par Resend**, et le reçu durable est vérifié ; confirmation de réception dans la boîte encore attendue. La boîte personnelle de recette reste exclusivement dans les secrets serveur.
+- Les quatre secrets Resend de MIR TEST sont maintenant configurés. **Cinq courriels fictifs réels ont été acceptés par Resend et reçus dans la boîte autorisée**, avec ouverture des PDF confirmée par MIR : premier essai API puis quatre entrées par l’interface. La boîte personnelle de recette reste exclusivement dans les secrets serveur.
 - La lecture des domaines Resend est refusée **HTTP 401** avec cette clé. Aucun domaine ni DNS modifié, aucune valeur DNS inventée. La vérification de l’expéditeur MIR et du compte Free Resend reste à faire dans le Dashboard Resend.
 
 Le [rapport de recette](verification/estimation-edge-20261109/README.md) distingue API/Storage/Auth réels, transport Resend simulé, navigateur émulé et scénarios bloqués.
@@ -55,7 +55,7 @@ La clé Resend est stable : `mir-estimate-PROJECTREF-UUID`. Notification, expéd
 
 ## Quotas et objectif 0 $/mois
 
-État mesuré au 9 novembre 2026 : organisation Free ; MIR environ **14,8 Mo de base / 0 Storage**, MIR TEST environ **13,5 Mo de base / 47,2 Mo de PDF de recette**. Valeurs détaillées dans le rapport. Les deux projets étaient existants ; aucune création facturée.
+État mesuré au 9 novembre 2026 : organisation Free ; MIR environ **14,8 Mo de base / 0 Storage**, MIR TEST environ **13,9 Mo de base / 48,0 Mo de PDF de recette**. Valeurs détaillées dans le rapport. Les deux projets étaient existants ; aucune création facturée.
 
 Garde-fous applicatifs conservateurs, sans achat de dépassement :
 
@@ -69,6 +69,10 @@ Limites Supabase documentées : [Edge](https://supabase.com/docs/guides/function
 Quand un plafond est atteint, le service refuse proprement et conserve le brouillon. Aucun plan payant automatique n’est demandé. « 0 $ visé » ne signifie pas conservation illimitée : surveiller les compteurs et archiver avec décision MIR.
 
 `POST .../maintenance`, réservé à un admin vérifié, nettoie une demande de staging expirée sans première tentative d’envoi. Il attend l’expiration des droits d’upload (125 min), ne supprime ni reçu ni envoi incertain, et garde l’identité du brouillon. Les PDF d’une demande reçue ne sont jamais purgés automatiquement par ce module.
+
+## Dernière demande d’activation TEST
+
+Après la recette privée, MIR a demandé l’activation uniquement de MIR TEST. Le réglage SQL `settings.enabled` a été passé à `true`. Au dernier contrôle, l’API signale encore `MIR_ESTIMATE_ENABLED` comme seul réglage bloquant, même après redéploiement du runtime. La production conserve son URL API vide. Aucun nouvel essai public n’est déclaré envoyé à ce stade.
 
 ## Configuration — exclusivement côté serveur
 
@@ -92,7 +96,9 @@ Pour générer une migration : CLI Supabase. Pour déployer : entrée `supabase/
 
 `POST .../test/submit` existe **uniquement dans MIR TEST**, pour un admin actif de la bonne organisation et pendant `settings.diagnostics=true`. Les quatre secrets d’envoi doivent être complets, avec mode `test`. Le corps contient la clé de reprise et `expectedRecipient`, qui doit correspondre au destinataire serveur : il ne permet jamais de le remplacer. Cette voie réutilise exactement la même transaction et le même appel Resend idempotent. Elle n’exige ni `settings.enabled=true` ni le secret ENABLED. Toutes les voies de recette sont refusées dans MIR production, même à un admin.
 
-Le script `tools/validation/mir-estimate-approved-mail.cjs --send-approved` exige `MIR_TEST_APPROVED_TO` dans le processus sécurisé, les identifiants QA existants et l’autorisation explicite de l’essai. Son PDF est `tests/fixtures/mir-estimation-fictive.pdf`. Son contexte de reprise reste dans `/tmp`, mode 0600, jamais dans Git. Aucun envoi automatique au chargement ou dans CI. **Un seul courriel a été accepté**, source panier, avec dossier PDF fictif joint ; une répétition a retrouvé le même reçu sans deuxième appel d’envoi. Voir `real-mail.json`.
+Le script `tools/validation/mir-estimate-approved-mail.cjs --send-approved` exige `MIR_TEST_APPROVED_TO` dans le processus sécurisé, les identifiants QA existants et l’autorisation explicite de l’essai. Son PDF est `tests/fixtures/mir-estimation-fictive.pdf`. Son contexte de reprise reste dans `/tmp`, mode 0600, jamais dans Git. Aucun envoi automatique au chargement ou dans CI. Le premier essai source panier a été reçu avec son PDF ouvert ; une répétition a retrouvé le même reçu sans deuxième appel d’envoi. La recette UI a ensuite produit quatre courriels distincts, un par entrée, tous reçus et les PDF natifs ouverts. Voir `real-mail.json`, `live-ui/results.json` et `mailbox-confirmation.json`.
+
+`tests/mir-estimate-real-ui.cjs --send-approved` réalise cette recette par un relais admin local : fichiers `dist` réels sous l’origine officielle, JWT admin vérifié et vrai Supabase/Storage/Resend. Seule la configuration UI du navigateur de recette est activée par le relais ; les garde-fous publics serveur restent fermés. `--resume-only` interdit toute nouvelle soumission et vérifie les boutons et reçus existants à 390/834/1440 px, avec contextes tactile puis souris et redémarrage du navigateur. Le navigateur de cette recette est local ; les contrôles réseau du vrai GitHub Pages restent distincts dans CI.
 
 `GET/POST .../test/provider-domain` a les mêmes restrictions admin TEST et diagnostic. GET lit les domaines MIR ; POST prépare seulement `envoi.revetementsmir.com` si aucun domaine MIR vérifié n’existe déjà. La route ne touche ni DNS ni abonnement. La clé actuelle refuse la lecture HTTP 401 ; la route ne peut donc pas générer les valeurs exactes pour l’instant. Les deux garde-fous publics et le diagnostic sont refermés après chaque opération.
 
@@ -107,7 +113,7 @@ Le script `tools/validation/mir-resend-domain.mjs` peut lire/créer ce seul doma
 
 ## Recette réelle puis production
 
-La boîte et les secrets d’envoi TEST sont configurés. Un courriel fictif avec PDF a été accepté par Resend, réception humaine encore à confirmer. Restent obligatoires : expéditeur MIR vérifié, recette complète des quatre entrées avec courriels effectivement reçus, PDF joints panier/pliage, accès du compte d’adjointe et refus des autres comptes, reprise après interruption/échec, version Studio immuable, trois tailles navigateur. Les simulations de courriel ne valident pas cette étape.
+La boîte et les secrets d’envoi TEST sont configurés. Les quatre entrées ont produit des courriels réels reçus et les PDF panier/pliage ont été ouverts, après un premier essai API confirmé. Les erreurs réseau injectées, reprises et instantanés immuables sont vérifiés ; les trois tailles utilisent Chromium émulé. Restent obligatoires avant production : expéditeur MIR et forfait Free Resend vérifiés dans le Dashboard, puis accès du véritable compte d’adjointe. Le test employé QA autorisé/retiré ne remplace pas cette dernière validation.
 
 Après réussite seulement : appliquer les migrations dans **MIR**, déployer la même fonction, configurer [les secrets MIR](https://supabase.com/dashboard/project/gccltmaulvrnthrbnrpd/functions/secrets) avec `MIR_ESTIMATE_MODE=production`, `MIR_ESTIMATE_TO=estimation@revetementsmir.com`, les vrais UUID d’adjointe et le budget 400 Mio ; activer les deux garde-fous (`settings.enabled` + secret ENABLED). Enfin renseigner uniquement l’URL publique `https://gccltmaulvrnthrbnrpd.supabase.co/functions/v1/mir-estimates` pour la production dans `dist/mir-estimate-config.js`, sans clé/expéditeur/destinataire.
 

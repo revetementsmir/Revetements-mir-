@@ -567,4 +567,5 @@ jobs:
           path: |
             artifacts/estimation-edge-published/
             docs/verification/estimation-edge-20261109/simulated-ui/
+            docs/verification/estimation-edge-20261109/live-ui/
           if-no-files-found: ignore
