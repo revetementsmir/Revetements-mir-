@@ -501,16 +501,21 @@ jobs:
           cmp /tmp/mir-qrcode-sdk.js _site_mir/vendor/qrcode.min.js
           grep -Fq 'https://gccltmaulvrnthrbnrpd.supabase.co' /tmp/mir-shared-config.js
           echo "MIR Warehouse + Coordination pages validated"
-          # Confirm the Harmony assets and all shared headers are the exact
+          # Confirm the public menu and workspace headers use the exact
           # bytes of this deployment, including cache-busting during rollout.
-          for asset in mir-harmony.js mir-harmony.css mir-panel-workbench.js mir-panel-workbench.css mir-procurement.js mir-freeform-workshop.js production-app.js; do
+          for asset in mir-harmony.js mir-harmony.css mir-panel-workbench.js mir-panel-workbench.css mir-procurement.js mir-freeform-workshop.js production-app.js mir-public-menu.js mir-public-shell.css mir-production-client-nav.js mir-client-pliage-viewport.js; do
             fetch "$base/$asset?verification=$GITHUB_SHA" "/tmp/harmony-$asset"
             cmp "/tmp/harmony-$asset" "_site_mir/$asset"
           done
-          for page in production calepinage boutique pliage selection chantier entrepot; do
+          for page in production calepinage chantier entrepot; do
             fetch "$base/$page.html?verification=$GITHUB_SHA" "/tmp/harmony-$page.html"
             cmp "/tmp/harmony-$page.html" "_site_mir/$page.html"
             grep -Fq 'data-mir-harmony' "/tmp/harmony-$page.html"
           done
-          echo "MIR Harmony served files match deployed revision $GITHUB_SHA"
+          for page in boutique pliage selection realisations contact materiaux produit plan; do
+            fetch "$base/$page.html?verification=$GITHUB_SHA" "/tmp/menu-$page.html"
+            cmp "/tmp/menu-$page.html" "_site_mir/$page.html"
+            grep -Fq 'data-mir-public-shell' "/tmp/menu-$page.html"
+          done
+          echo "MIR public and workspace headers match deployed revision $GITHUB_SHA"
           echo "MIR Pages verified at $base/"
