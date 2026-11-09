@@ -55,7 +55,7 @@ Les écrans nécessitant un jeton d’invitation, de validation de courriel ou d
 
 ## Mesures de chargement
 
-[Avant modification](reproductions-before.json) : photos Boutique **2 812 655 + 1 417 463 = 4 230 118 octets**. [Après](performance-after-before.json) : **231 390 + 128 656 = 360 046 octets**, réduction **91,5 %**. Même photo, proportions conservées, originales intactes ; aucun changement d’image sur l’accueil. Mesures locales de ressources, pas un score Lighthouse ni une mesure réseau mobile réelle. Les durées nulles du second passage viennent du cache et ne sont pas des gains de latence.
+[Avant modification](reproductions-before.json) : photos Boutique **2 812 655 + 1 417 463 = 4 230 118 octets**. [Après](performance-after-before.json) : **231 320 + 128 656 = 359 976 octets**, réduction **91,5 %**. Même photo, proportions conservées, originales intactes ; aucun changement d’image sur l’accueil. Mesures locales de ressources, pas un score Lighthouse ni une mesure réseau mobile réelle. Le relevé final désactive le cache navigateur ; les durées locales ne constituent pas des gains de latence mobile. La conversion applique l’orientation EXIF de l’original ([contrôle](image-orientation.json)) pour conserver la photo à l’endroit.
 
 Scripts mesurés avant : Pliage d’entrée **6 / 168 040 octets** ; configurateur Pliage/Panneaux **44 / 1 076 475 octets** ; Mur complet **16 / 475 020 octets**. Déjà différés ; moteurs partagés conservés. Leur suppression ou chargement conditionnel n’est pas entrepris sans mesure CPU et preuve de non-régression des exports/anciens dossiers.
 
