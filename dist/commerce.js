@@ -64,6 +64,42 @@
   function hydrateChips(container=document){container.querySelectorAll('[data-card-color]').forEach(b=>{const m=materials.find(m=>m.id===b.dataset.material),c=m?.colors?.find(c=>c.id===b.dataset.cardColor);if(m&&c)V.paintChip(b,m,c);});}
   function facts(m,c){const d=m.dimensions||{},a=[];a.push(['Matière',m.family]);if(m.manufacturerCode)a.push(['Code fabricant',m.manufacturerCode]);if(formats(m).length>1)a.push(['Formats proposés',formats(m).map(formatLabel).join(' / ')]);if(m.finish)a.push(['Fini',m.finish]);for(const [key,label,unit] of [['actualWidthIn','Largeur réelle','po'],['nominalWidthIn','Largeur nominale','po'],['nominalHeightIn','Hauteur nominale','po'],['nominalLengthIn','Longueur nominale','po'],['exposedWidthIn','Largeur exposée','po'],['coveredWidthIn','Largeur couverte','po'],['coveredHeightIn','Hauteur couverte','po'],['profileDepthIn','Profondeur du profil','po'],['lengthFt','Longueur','pi'],['lengthMinFt','Longueur minimale','pi'],['lengthMaxFt','Longueur maximale','pi'],['nominalThicknessIn','Épaisseur nominale','po'],['metalThicknessIn','Épaisseur du métal','po'],['metalThicknessMils','Épaisseur du métal','mils'],['lengthM','Longueur publiée','m'],['lengthMPublished','Longueur publiée','m'],['lengthFtPublished','Longueur publiée','pi']])if(d[key])a.push([label,`${fraction(d[key])} ${unit}`]);if(d.nominalSection)a.push(['Section nominale',d.nominalSection]);if(d.availableGauges?.length)a.push(['Calibres publiés',d.availableGauges.join(' / ')]);a.push(['Applications',(m.applications||[]).map(x=>applications[x]||x).join(', ')]);if(m.allowedOrientations?.length)a.push(['Pose documentée',m.allowedOrientations.map(x=>orientation[x]||x).join(' ou ')]);if(d.widthIn)a.push(['Largeur physique',`${fraction(d.widthIn)} po`]);if(d.lengthIn)a.push(['Longueur physique',`${fraction(d.lengthIn)} po`]);if(d.thicknessIn)a.push(['Épaisseur',`${fraction(d.thicknessIn)} po`]);if(d.metalThicknessMm)a.push(['Épaisseur du métal',`${number(d.metalThicknessMm)} mm`]);if(d.availableLengthsIn?.length)a.push(['Longueurs référencées',d.availableLengthsIn.map(n=>`${fraction(n)} po`).join(' / ')]);if(m.coverage?.exposureIn)a.push(['Exposition utile',`${fraction(m.coverage.exposureIn)} po`]);if(m.soffitType)a.push(['Type de soffite',m.soffitType==='vented'?'Ventilé':m.soffitType==='solid'?'Non ventilé':m.soffitType]);if(d.representativeCartridgeMl)a.push(['Format de référence',`${number(d.representativeCartridgeMl)} ml`]);if(d.volumeMl)a.push(['Volume',`${number(d.volumeMl)} ml`]);if(m.packaging?.piecesPerBox||m.packaging?.piecesPerCarton)a.push(['Pièces par boîte',number(m.packaging.piecesPerBox||m.packaging.piecesPerCarton)]);if(m.packaging?.containersPerCarton)a.push(['Contenants par boîte',number(m.packaging.containersPerCarton)]);if(m.packaging?.contents?.length)a.push(['Contenu du kit',m.packaging.contents.join(' · ')]);if(m.unit)a.push(['Unité documentée',m.unit]);for(const item of m.specifications||[])if(item&&item.label&&item.value)a.push([item.label,item.value]);const tariff=surfaceTariff(m,c);if(tariff){a.push(['Tarif MIR',`${number(tariff.amount)} $ CA/po²`],['Base du tarif','Surface en projection de la forme hors tout, lips compris; projection C non ajoutée.'],['Couleur personnalisée ou RAL','Soumission obligatoire, sans prix automatique.'],['Taxes et livraison','Non calculées.']);}else if(customColor(c))a.push(['Prix','Soumission obligatoire pour la couleur personnalisée, sans prix automatique.']);return a.filter(x=>x[1]);}
   function defaultUnit(m){if(m.renderPattern==='panel')return 'pièces';if((m.applications||[]).includes('siding'))return 'pi²';if((m.applications||[]).includes('sealant'))return 'cartouches';if(m.packaging?.piecesPerBox||m.packaging?.piecesPerCarton)return 'boîtes';if(m.packaging?.unit==='rouleau'||(m.applications||[]).includes('bending'))return 'rouleaux';if(m.packaging?.unit==='kit')return 'kits';return 'pièces';}
+  // Use the manufacturer's material swatch when the catalogue cover is a profile rendering.
+  const brandSwatches={
+    'mac-norwood':'mac-bouleau-fume',
+    'vicwest-bellara-plank135':'vicwest-amber-birch'
+  };
+  function brandCover(products){
+    for(const product of products){
+      const swatch=product.colors?.find(color=>color.id===brandSwatches[product.id]&&color.verified);
+      const src=localAsset(swatch?.swatchUrl);
+      if(src)return {src, framing:'material'};
+    }
+    const candidates=products.flatMap(product=>images(product)).filter(image=>!/drawing|diagram/i.test(image.assetKind));
+    const installed=candidates.find(image=>presentation(image)==='installed'&&!/family/i.test(image.assetKind));
+    const sample=candidates.find(image=>presentation(image)==='sample'&&!/sphere/i.test(image.assetKind));
+    const image=installed||sample||candidates.find(image=>!/family/i.test(image.assetKind))||candidates[0];
+    if(!image)return null;
+    const sphere=/sphere|jdp-akta-portobello|jdp-bluhouss/i.test((image.assetKind||'')+' '+image.src);
+    const framing=sphere?'sample-crop':installed||sample?'material':'packshot';
+    return {src:localAsset(image.src),framing};
+  }
+  function brandCollectionCard(brand,products){
+    const cover=brandCover(products);
+    const types=[...new Set(products.map(O.section))].map(id=>O.sections.find(section=>section[0]===id)?.[1]).filter(Boolean);
+    const count=products.length;
+    return `<a class="brand-collection-card" href="?brand=${encodeURIComponent(brand)}#collections">
+      <div class="brand-collection-image" data-framing="${cover?.framing||'empty'}">
+        ${cover?`<img src="${esc(cover.src)}" alt="" loading="lazy" decoding="async">`:'<span>Photo à venir</span>'}
+      </div>
+      <div class="brand-collection-copy">
+        <span class="brand-collection-count">${count} référence${count===1?'':'s'}</span>
+        <h3>${esc(brand)}</h3>
+        <p>${esc(types.slice(0,3).join(' · '))}</p>
+        <b>Voir la collection <span aria-hidden="true">→</span></b>
+      </div>
+    </a>`;
+  }
   function showShop(){
     const qs=new URLSearchParams(location.search),brand=$('#shop-brand'),family=$('#shop-family'),profile=$('#shop-profile'),search=$('#shop-search');
     let all=qs.get('view')==='all';
@@ -85,7 +121,7 @@
       const framing=id==='fix'?'packshot':'sample';
       return `<a href="?family=${id}#collections" class="category-card" data-category="${id}" aria-label="${esc(label)} : voir les matériaux"><div class="category-photo" data-presentation="${framing}">${m?imageMarkup(m):placeholder()}</div><h3>${esc(label)}</h3><span class="category-action">Explorer <span aria-hidden="true">↗</span></span></a>`;
     }).join('');
-    $('#shop-brand-directory').innerHTML=brands.map(b=>{const list=materials.filter(m=>sold(m)&&m.brand===b),m=list.find(m=>heroImage(m)&&m.applications?.includes('siding'))||list.find(heroImage);const types=[...new Set(list.map(O.section))].map(id=>O.sections.find(x=>x[0]===id)?.[1]).filter(Boolean);return `<a class="brand-collection-card" href="?brand=${encodeURIComponent(b)}#collections"><div class="brand-collection-image">${m?imageMarkup(m):placeholder()}</div><div><span>${String(list.length).padStart(2,'0')} références</span><h3>${esc(b)}</h3><p>${esc(types.slice(0,3).join(' · '))}</p><b>Voir la collection ↗</b></div></a>`;}).join('');
+    $('#shop-brand-directory').innerHTML=brands.map(b=>brandCollectionCard(b,materials.filter(m=>sold(m)&&m.brand===b))).join('');
     function render(){const q=norm(search.value),directory=!all&&brand.value==='all'&&family.value==='all'&&profile.value==='all'&&!q;const result=materials.filter(m=>sold(m)&&(brand.value==='all'||m.brand===brand.value)&&(family.value==='all'||O.matchesCategory(m,family.value))&&(profile.value==='all'||O.section(m)===profile.value)&&(!q||norm([m.name,m.brand,m.family,m.finish,m.description,dimensions(m),...colors(m).map(c=>c.name)].join(' ')).includes(q))).sort(O.compare);
       $('#shop-brand-directory').hidden=!directory;$('#shop-all-button').hidden=!directory;$('#shop-grid').hidden=directory;
       $('#shop-grid').innerHTML=directory?'':O.group(result).map(g=>`<section class="manufacturer-group"><header><div><p class="eyebrow">LA COLLECTION</p><h3>${esc(g.brand)}</h3></div><span>${g.sections.reduce((n,s)=>n+s.items.length,0)} références</span></header>${g.sections.map(s=>`<section class="profile-group"><h4>${esc(s.label)} <span>${s.items.length}</span></h4><div class="shop-grid">${s.items.map(card).join('')}</div></section>`).join('')}</section>`).join('');
