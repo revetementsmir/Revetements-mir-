@@ -822,7 +822,7 @@
   function listOrders(state,actorId,{view='all',jobId}={}){
     const actor=memberFor(state,actorId);if(!actor)return [];
     return (state.orders||[]).filter(o=>{
-      const job=state.jobs.find(j=>j.id===o.jobId);if(!canSeeJob(state,actor,job)||actor.role!=='admin'&&o.requestedById!==actor.id)return false;
+      const job=[...state.jobs,...(state.historyJobs||[])].find(j=>j.id===o.jobId);if(!canSeeJob(state,actor,job)||actor.role!=='admin'&&o.requestedById!==actor.id)return false;
       if(jobId&&o.jobId!==jobId)return false;
       if(view==='pending')return o.lines.some(l=>l.remainingQty>0);
       if(view==='history')return o.lines.some(l=>l.remainingQty===0);

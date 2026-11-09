@@ -1,2 +1,2 @@
-/* Public key only. Activation prepared for the approved release; hosted password login still requires acceptance testing. */
-window.MIRSharedConfig=Object.freeze({enabled:true,supabaseUrl:'https://gccltmaulvrnthrbnrpd.supabase.co',publishableKey:'sb_publishable_fH9gUWK6pYI0G0_oVKieCw_56UqhNWK'});
+/* Public configuration. The recipe never falls back to production. */
+(function(){const test=new URLSearchParams(location.search).get('recette')==='1';window.MIRSharedConfig=Object.freeze({enabled:true,environment:test?'test':'production',supabaseUrl:test?'https://hxtztkmbfpmzrieccwsg.supabase.co':'https://gccltmaulvrnthrbnrpd.supabase.co',publishableKey:test?'sb_publishable_jk8zsTWqQi6Borv44aaDJw_k7JSbzZh':'sb_publishable_fH9gUWK6pYI0G0_oVKieCw_56UqhNWK'});})();

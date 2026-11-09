@@ -9,7 +9,7 @@ function create({sdk,config,storage,uuid=()=>globalThis.crypto?.randomUUID?.()}=
  if(config?.enabled!==true||!/^https:\/\/[a-z0-9]{20}\.supabase\.co$/.test(config.supabaseUrl||'')||
   !/^sb_publishable_[A-Za-z0-9_-]+$/.test(config.publishableKey||''))throw Error('Connexion Coordination MIR non activée ou à vérifier.');
  if(!sdk?.createClient||!storage)throw Error('Module de connexion ou reprise manquant.');
- const db=sdk.createClient(config.supabaseUrl,config.publishableKey,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true}});
+ const db=sdk.createClient(config.supabaseUrl,config.publishableKey,{auth:{storageKey:'mir_portal_auth_'+new URL(config.supabaseUrl).hostname.split('.')[0],flowType:'pkce',persistSession:true,autoRefreshToken:true}});
  let actor=null,generation=0;
  const changed=()=>{generation++;actor=null;};
  const subscription=db.auth.onAuthStateChange?.((event,session)=>{
@@ -63,6 +63,8 @@ function create({sdk,config,storage,uuid=()=>globalThis.crypto?.randomUUID?.()}=
  const inbox=org=>rpc('mir_coordination_inbox',{org});
  const open=(org,sourceOrderId)=>rpc('mir_coordination_open',{org,source_order:sourceOrderId});
  const detail=(org,coordId)=>rpc('mir_coordination_detail',{org,coord_id:coordId});
+ const people=org=>rpc('mir_coordination_people',{org});
+ const expectation=(org,routeId,date,responsible,destination,revision)=>operation('mir_coordination_expectation',{org,route_id:routeId,expected_date:date,responsible,destination,expected_revision:revision});
  const suppliers=org=>rpc('mir_coordination_suppliers',{org});
  const supplierOrders=(org,supplier)=>rpc('mir_coordination_supplier_orders',{org,supplier});
  const route=(org,coordId,lineId,warehouseQty,ext,revision)=>operation('mir_coordination_route',{
@@ -82,7 +84,7 @@ function create({sdk,config,storage,uuid=()=>globalThis.crypto?.randomUUID?.()}=
  const ship=(org,coordId,revision)=>operation('mir_coordination_ship',{org,coord_id:coordId,expected_revision:revision});
  const grant=(org,member,allowed)=>rpc('mir_coordination_grant',{org,member,allowed});
  function close(){changed();subscription?.data?.subscription?.unsubscribe?.();}
- return Object.freeze({login,logout,memberships,inbox,open,detail,suppliers,route,add,metadata,linkPO,
+ return Object.freeze({login,logout,memberships,inbox,open,detail,suppliers,people,expectation,route,add,metadata,linkPO,
   supplierReceive,supplierStatus,warehouseQueue,acknowledge,ship,grant,checkPending:async()=>getPending((await verified()).id),
   supplierOrders,close,version:'1.1.0'});
 }

@@ -1,0 +1,96 @@
+{
+  "observedAt": "2026-11-09T18:03:05.382Z",
+  "project": "MIR TEST",
+  "revision": "466f3f1",
+  "frontend": "local main files under official origin; real Supabase",
+  "productionWrites": 0,
+  "commands": [
+    {
+      "command": "CREATE_JOB",
+      "status": 400,
+      "serverOk": false,
+      "hasResult": false,
+      "hasSnapshot": false,
+      "errorCode": "0A000",
+      "message": "Cette action n’est pas encore raccordée au portail. Aucune commande ni quantité n’a été enregistrée."
+    },
+    {
+      "command": "SET_MEMBER_ACTIVE",
+      "status": 400,
+      "serverOk": false,
+      "hasResult": false,
+      "hasSnapshot": false,
+      "errorCode": "0A000",
+      "message": "Cette action n’est pas encore raccordée au portail. Aucune commande ni quantité n’a été enregistrée."
+    },
+    {
+      "command": "SET_MEMBER_ACTIVE",
+      "status": 400,
+      "serverOk": false,
+      "hasResult": false,
+      "hasSnapshot": false,
+      "errorCode": "0A000",
+      "message": "Cette action n’est pas encore raccordée au portail. Aucune commande ni quantité n’a été enregistrée."
+    },
+    {
+      "command": "ASSIGN_MEMBER_JOBS",
+      "status": 200,
+      "serverOk": true,
+      "hasResult": false,
+      "hasSnapshot": false
+    },
+    {
+      "command": "CREATE_ORDER",
+      "status": 403,
+      "serverOk": false,
+      "hasResult": false,
+      "hasSnapshot": false,
+      "errorCode": "42501",
+      "message": "Action réservée à l’administration MIR"
+    }
+  ],
+  "checks": [
+    {
+      "kind": "snapshot",
+      "catalogueCount": 0,
+      "jobCount": 10,
+      "role": "admin"
+    },
+    {
+      "kind": "create-job-ui",
+      "observed": "definitive unsupported action; no job created"
+    },
+    {
+      "kind": "reactivate-api",
+      "ok": false,
+      "errorCode": "0A000",
+      "message": "Cette action n’est pas encore raccordée au portail. Aucune commande ni quantité n’a été enregistrée.",
+      "hasSnapshot": false
+    },
+    {
+      "kind": "snapshot",
+      "catalogueCount": 0,
+      "jobCount": 10,
+      "role": "admin"
+    },
+    {
+      "kind": "assignment-ui",
+      "observed": "server returns ok without result/snapshot; client retains uncertain pending action"
+    },
+    {
+      "kind": "snapshot",
+      "catalogueCount": 0,
+      "jobCount": 10,
+      "role": "employee"
+    },
+    {
+      "kind": "employee-create-order-api",
+      "ok": false,
+      "errorCode": "42501",
+      "message": "Action réservée à l’administration MIR",
+      "hasSnapshot": false
+    }
+  ],
+  "physicalDevice": false,
+  "completedAt": "2026-11-09T18:03:13.551Z"
+}

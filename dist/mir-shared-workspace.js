@@ -5,7 +5,7 @@
  if(!window.MIRSupabase?.createClient){status('Le module de connexion n’a pas pu être chargé. Rechargez cette page.');return;}
  let snapshot,readSequence=0;
  function clearWorkspace(){readSequence++;snapshot=null;$('#workspace').hidden=true;for(const id of ['#catalogue','#orders','#job-admin','#bend-tariff-admin','#organization'])$(id).replaceChildren();$('#import').value='';$('#retry').hidden=true;$('#login').hidden=false;}
- const client=MIRSharedClient.create({sdk:window.MIRSupabase.createClient(config.supabaseUrl,config.publishableKey),storage:localStorage,onSessionInvalidated:clearWorkspace});
+ const client=MIRSharedClient.create({sdk:window.MIRSupabase.createClient(config.supabaseUrl,config.publishableKey,{auth:{storageKey:"mir_portal_auth_"+new URL(config.supabaseUrl).hostname.split(".")[0],flowType:"pkce",persistSession:true,autoRefreshToken:true}}),storage:localStorage,onSessionInvalidated:clearWorkspace});
  const text=(tag,value,parent)=>{const node=document.createElement(tag);node.textContent=value;parent.append(node);return node;};
  const org=()=>$('#organization').value;
  const requestedDestination=new URLSearchParams(location.search).get('destination'),destination=['boutique','store'].includes(requestedDestination)?requestedDestination:null;
@@ -68,7 +68,7 @@
  }
  async function refresh(){
   const sequence=++readSequence,requestedOrg=org(),next=await client.snapshot(requestedOrg);if(sequence!==readSequence||requestedOrg!==org())return;snapshot=next;$('#import-label').hidden=snapshot.role!=='admin';$('#catalogue').replaceChildren();$('#orders').replaceChildren();$('#job-admin').replaceChildren();renderBendTariff(snapshot.bendTariff,requestedOrg);
-  if(snapshot.role==='admin'){const f=document.createElement('form'),name=document.createElement('input'),employee=document.createElement('select');name.placeholder='Nom du chantier';name.required=true;for(const m of snapshot.members.filter(m=>m.role==='employee')){const o=document.createElement('option');o.value=m.id;o.textContent=m.email||('Employé '+m.id);employee.append(o);}f.append(name,employee);text('button','Créer / affecter le chantier',f);$('#job-admin').append(f);f.onsubmit=async e=>{e.preventDefault();try{await client.assignJob(org(),name.value,employee.value);await refresh();}catch(e){status(e.message);}};}
+  if(snapshot.role==='admin'){text('p','Chantiers, fiches employés et affectations sont réunis dans Administration.',$('#job-admin'));text('a','Ouvrir les chantiers et les affectations',$('#job-admin')).href='administration.html?section=jobs'+(config.environment==='test'?'&recette=1':'');}
   $('#all-models').hidden=snapshot.role!=='admin'||!destination;
   const destinationAllowed=!destination||snapshot.role==='admin'||(destination==='boutique'&&snapshot.role==='client')||(destination==='store'&&snapshot.role==='employee');
   const catalogue=destinationAllowed?snapshot.catalogue.filter(model=>!destination||(!model.archived&&(destination==='boutique'?model.boutique:model.store))):[];

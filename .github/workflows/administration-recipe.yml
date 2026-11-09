@@ -1,0 +1,51 @@
+name: MIR Administration — recette sans déploiement
+on:
+  push:
+    branches: [codex/administration-mir-20261109]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  administration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Dépendances de recette
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund --prefix tools/database
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
+      - name: Droits et transactions dans PostgreSQL jetable
+        run: |
+          node tests/mir-administration-postgres.cjs
+          node tests/mir-coordination-postgres.cjs
+          node tests/mir-admin-delivery.cjs
+          node tests/mir-supplier-pdf.cjs
+          node tests/mir-estimate-service.cjs
+          node tests/mir-estimate-edge.cjs
+          node tests/mir-portal-login.cjs
+          node tests/mir-direct-model-save.cjs
+          node tests/mir-pages-regressions.cjs
+      - name: Chromium — interfaces et régressions simulées, aucun courriel
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: |
+          node tools/run-chromium-test.cjs tests/mir-administration-browser.cjs
+          node tools/run-chromium-test.cjs tests/mir-coordination-browser.cjs
+          node tools/run-chromium-test.cjs tests/mir-warehouse-browser.cjs
+          node tools/run-chromium-test.cjs tests/mir-employee-portal-browser.cjs
+          node tools/run-chromium-test.cjs tests/mir-shared-workspace-browser.cjs
+          node tools/run-chromium-test.cjs tests/mir-shared-startup-browser.cjs
+      - name: Matrice, captures et recette MIR TEST déjà effectuée
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-administration-recette
+          path: |
+            artifacts/administration/
+            artifacts/mir-coordination-*.png
+            artifacts/mir-warehouse-*.png
+            docs/verification/administration-20261109/
+          if-no-files-found: error

@@ -1,0 +1,56 @@
+{
+  "observedAt": "2026-11-09T19:09:59.861Z",
+  "project": "MIR TEST",
+  "revision": "working-tree",
+  "frontend": "local main files under official origin; real Supabase",
+  "productionWrites": 0,
+  "commands": [
+    {
+      "command": "SET_PERMISSIONS",
+      "status": 200,
+      "serverOk": true,
+      "hasResult": true,
+      "hasSnapshot": true
+    },
+    {
+      "command": "SET_PERMISSIONS",
+      "status": 200,
+      "serverOk": true,
+      "hasResult": true,
+      "hasSnapshot": true
+    }
+  ],
+  "checks": [
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 11,
+      "role": "admin"
+    },
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 11,
+      "role": "employee"
+    },
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 11,
+      "role": "employee"
+    },
+    {
+      "name": "separate real QA accounts granted Adjointe+jobs+estimates and Warehouse through admin screens",
+      "passed": true
+    },
+    {
+      "name": "plan revision uploaded on admin desktop; current and historical versions visible and downloadable in independent assistant tablet session",
+      "passed": true
+    },
+    {
+      "name": "authorized assistant added 3 through UI without rewriting original 25, routed addition to warehouse",
+      "passed": true
+    }
+  ],
+  "physicalDevice": false
+}

@@ -7,20 +7,20 @@
  <link rel="stylesheet" href="mir-client-header.css?v=1-harmony">
  <link rel="stylesheet" href="mir-client-signature.css?v=1-harmony">
  <link rel="stylesheet" href="entrepot.css?v=pr64-label-1">
- <script src="shared-config.js" defer></script>
+ <script src="shared-config.js?v=admin-20261109-1" defer></script>
  <script src="vendor/supabase-client.js" defer></script>
  <script src="vendor/qrcode.min.js" defer></script>
  <script src="employee-store-model.js" defer></script>
  <script src="mir-warehouse-core.js?v=1" defer></script>
- <script src="mir-warehouse-client.js?v=1" defer></script>
- <script src="entrepot-app.js?v=pr64-label-article-template-1" defer></script>
- <script src="mir-warehouse-coordination-ui.js?v=1" defer></script>
-<link rel="stylesheet" href="mir-harmony.css?v=2-workspace-20261108"><script defer src="mir-harmony.js?v=2-workspace-20261108"></script></head>
+ <script src="mir-warehouse-client.js?v=admin-20261109-1" defer></script>
+ <script src="entrepot-app.js?v=admin-20261109-1" defer></script>
+ <script src="mir-warehouse-coordination-ui.js?v=1" defer></script><script src="mir-supplier-stock-ui.js?v=1" defer></script>
+<link rel="stylesheet" href="mir-harmony.css?v=2-workspace-20261108"><script defer src="mir-harmony.js?v=2-workspace-20261108"></script><script src="mir-admin-navigation.js?v=1" defer></script></head>
 <body class="mir-signature mir-warehouse">
 <header class="mir-warehouse-header">
  <a href="index.html" aria-label="Retour à l’accueil MIR"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="220" height="55"></a>
  <div><span>ESPACE ÉQUIPE</span><h1>Entrepôt et inventaire</h1></div>
- <nav aria-label="Autres espaces MIR"><a href="production.html?view=models">Mes pliages</a><a href="chantier.html">Commandes employés</a><a href="index.html">Accueil</a></nav>
+ <nav aria-label="Autres espaces MIR"><a href="administration.html">Administration</a><a href="production.html?view=models">Mes pliages</a><a href="chantier.html">Commandes employés</a><a href="index.html">Accueil</a></nav>
 </header>
 <main class="mir-warehouse-main">
  <p id="wh-status" role="status" aria-live="polite">Vérification de la connexion…</p>
@@ -30,7 +30,7 @@
    <label>Mot de passe<input type="password" name="password" autocomplete="current-password" required></label>
    <button type="submit" class="wh-primary">Se connecter</button></form>
  </section>
- <section id="wh-workspace" hidden>
+ <section id="wh-workspace" hidden><p><a class="wh-primary" href="administration.html" aria-label="Administration">← Administration</a></p>
   <div class="wh-topbar"><label>Organisation MIR <select id="wh-org"></select></label><div class="wh-top-actions"><button id="wh-refresh" type="button">Actualiser</button><button id="wh-signout" type="button">Déconnexion</button></div></div>
   <div class="wh-grid">
    <div class="wh-main-panel">

@@ -1,0 +1,26 @@
+{
+  "observedAt": "2026-11-09T19:21:33.004Z",
+  "project": "MIR TEST",
+  "revision": "working-tree",
+  "frontend": "local main files under official origin; real Supabase",
+  "productionWrites": 0,
+  "commands": [],
+  "checks": [
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 11,
+      "role": "employee"
+    },
+    {
+      "name": "real Resend accepted supplier TEST email with approved PDF; human receipt unconfirmed",
+      "passed": true,
+      "subject": "Envoyé · accepté par le service. [RECETTE MIR TEST] Bon fournisseur MIR — MIR-20261109-00EC54 — R1"
+    },
+    {
+      "name": "supplier direct delivery partial 3 then remaining 2; warehouse stays separately shipped",
+      "passed": true
+    }
+  ],
+  "physicalDevice": false
+}

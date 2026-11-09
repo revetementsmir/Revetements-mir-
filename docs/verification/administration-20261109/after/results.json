@@ -1,0 +1,34 @@
+{
+  "observedAt": "2026-11-09T18:52:19.567Z",
+  "project": "MIR TEST",
+  "revision": "working-tree",
+  "frontend": "local main files under official origin; real Supabase",
+  "productionWrites": 0,
+  "commands": [
+    {
+      "command": "PUBLISH_CATALOGUE",
+      "status": 200,
+      "serverOk": true,
+      "hasResult": true,
+      "hasSnapshot": true
+    }
+  ],
+  "checks": [
+    {
+      "kind": "snapshot",
+      "catalogueCount": 0,
+      "jobCount": 11,
+      "role": "admin"
+    },
+    {
+      "name": "job 353 created through Mon compte UI",
+      "passed": true
+    },
+    {
+      "name": "real ADSEAL 4584 304 ml reference published by administrator UI",
+      "passed": true
+    }
+  ],
+  "physicalDevice": false,
+  "completedAt": "2026-11-09T18:52:25.092Z"
+}

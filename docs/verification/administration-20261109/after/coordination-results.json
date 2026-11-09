@@ -1,0 +1,39 @@
+{
+  "observedAt": "2026-11-09T19:04:46.523Z",
+  "project": "MIR TEST",
+  "revision": "working-tree",
+  "frontend": "local main files under official origin; real Supabase",
+  "productionWrites": 0,
+  "commands": [
+    {
+      "command": "SAVE_SUPPLIER",
+      "status": 200,
+      "serverOk": true,
+      "hasResult": true,
+      "hasSnapshot": true
+    }
+  ],
+  "checks": [
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 11,
+      "role": "admin"
+    },
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 11,
+      "role": "admin"
+    },
+    {
+      "name": "stock counted through warehouse interface using exact employee variant",
+      "passed": true
+    },
+    {
+      "name": "UI allocation 20 warehouse + 5 supplier",
+      "passed": true
+    }
+  ],
+  "physicalDevice": false
+}

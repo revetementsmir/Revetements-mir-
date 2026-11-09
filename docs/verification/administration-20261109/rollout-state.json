@@ -1,0 +1,96 @@
+{
+  "checkedAt": "2026-11-09T20:34:31.749877+00:00",
+  "baselineMain": "466f3f170ed995ed9bdbd1124700b170195bc303",
+  "publicPagesDeployment": "https://github.com/revetementsmirweb/MIR/actions/runs/42665429046",
+  "administrationProductionApplied": false,
+  "productionPublicEstimateSendingEnabled": false,
+  "productionJobs": 0,
+  "productionOrders": 0,
+  "productionEstimateRecords": 0,
+  "automaticReview": "rejected production migration mir_administration_portal; explicit production authorization required for permissions/invitations/jobs/orders",
+  "testFunctions": {
+    "mir-estimates": 19,
+    "mir-admin-delivery": 5
+  },
+  "physicalSiteDevicesTested": false,
+  "mailR1HumanReceived": true,
+  "mailR2HumanReceived": "not confirmed",
+  "mailR2ResendAccepted": true,
+  "protectedFiles": [
+    {
+      "path": "dist/assets/MIR-logo-officiel-original.svg",
+      "sha256": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/assets/mir-home-card-pliage-20261105.webp",
+      "sha256": "ae035ed042ea87b56db7bc8425fcd6b9a670ac59d258b3b769963b68bbf84ee2",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/assets/mir-home-card-revetement-20261105.webp",
+      "sha256": "864478f53ca3857743bde67a9bf4678347c6e5e71d2b3e35ce7ec390fb3843c9",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/assets/mir-home-card-studio-20261105.webp",
+      "sha256": "3accaf7f62cb00b025592b98996e1a1f001dbcc04d41e9894bd64c27da8f9fca",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/assets/mir-home-hero-20261105.webp",
+      "sha256": "53ee16ea323d72363a867e8218e66e569ff4603835612fee253041028cf40e1a",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/catalogue-fd6866b49d21.json",
+      "sha256": "8da50cf21d8080c6714dfbab4cad2d9f55bfd140981e219f8cb6978a42ded4e6",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/index.html",
+      "sha256": "b7b755e5e6db8f804c052599633528198272925fc710b82903cd5962fefc1b6f",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/mir-client-header.css",
+      "sha256": "05f381a887e743d277eee4936f2f3edf3526ec4cff266dc706aeec0d3f8b410d",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/mir-client-signature.css",
+      "sha256": "d347ff921a059a371a3763f93910dd801c85a1c0c5e07c083bcab0449abb05e2",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/mir-home-premium.css",
+      "sha256": "abf242b04f7175b32a0cc365adaf7480c8dd0886fad36ce5eface3d82d7e7851",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/mir-miniature.js",
+      "sha256": "afcf61c8ae9b2cc76023607b2b45351039b8766dd175ce429f77fd9c826bc524",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/mir-public-menu.js",
+      "sha256": "5a5b7da704a3719e7ad74efa7f6bc102151f8b28083e19276446c2a8c287b613",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/mir-v4.css",
+      "sha256": "547e0a3708072650aff08c83f859750560a15f4220c9b590263bd567b0ee3da0",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/production-model.js",
+      "sha256": "3639e2ba9d651c6b983ecc0251e6332f47afbd4a5e024dd795e2df98a6d2b085",
+      "matchesPublishedBaseline": true
+    },
+    {
+      "path": "dist/style.css",
+      "sha256": "7a9b04b2bf17c4c82c0d5639d367fd08544fbbaed0f5070bb88e4c0848445065",
+      "matchesPublishedBaseline": true
+    }
+  ]
+}

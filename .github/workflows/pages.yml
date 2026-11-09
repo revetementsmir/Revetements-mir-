@@ -2,7 +2,7 @@ name: Publier le site principal MIR
 on:
   push:
     branches: [main]
-    paths: ['dist/**', 'tests/**', 'server/**', 'supabase/functions/**', '.github/workflows/pages.yml']
+    paths: ['dist/**', 'tests/**', 'server/**', 'supabase/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,6 +22,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Test administration and coordination SQL (isolated PostgreSQL)
+        run: |
+          npm ci --prefix tools/database
+          node tests/mir-administration-postgres.cjs
+          node tests/mir-coordination-postgres.cjs
+          node tests/mir-admin-delivery.cjs
+          node tests/mir-supplier-pdf.cjs
+          node --check dist/mir-administration.js
       - name: Test MIR architectural profiles
         run: |
           node --check dist/model-measure-defaults.js
@@ -179,9 +187,20 @@ jobs:
           node tests/mir-studio-terrain-browser.cjs
           node tests/mir-finishing-editor-browser.cjs
           node tests/mir-shared-startup-browser.cjs
+          node tests/mir-shared-workspace-browser.cjs
           node tests/mir-estimate-browser.cjs
           node tests/mir-estimate-edge-browser.cjs
+          node tests/mir-administration-browser.cjs
           node tests/mir-client-followup-browser.cjs
+      - name: Preuves de recette administration
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-administration
+          path: |
+            artifacts/administration/
+            docs/verification/administration-20261109/
+          if-no-files-found: ignore
       - name: Captures accueil PC, tablette et mobile
         if: always()
         uses: actions/upload-artifact@v4

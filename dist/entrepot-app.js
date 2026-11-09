@@ -26,6 +26,7 @@ async function loadCatalogue(){
   if(!response.ok)throw Error('Le catalogue MIR ne répond pas.');
   const raw=await response.json();
   catalogueItems=window.MIREmployeeStore.buildCatalogue(raw.materials||[]);
+  const sdk=window.MIRSupabase.createClient(window.MIRSharedConfig.supabaseUrl,window.MIRSharedConfig.publishableKey,{auth:{storageKey:'mir_portal_auth_'+new URL(window.MIRSharedConfig.supabaseUrl).hostname.split('.')[0]}});const published=await sdk.rpc('mir_portal_snapshot');if(!published.error)catalogueItems=[...published.data.catalogue,...catalogueItems.filter(i=>!published.data.catalogue.some(p=>p.id===i.id))];
   catalogueResults();
  }catch(error){status('Catalogue non chargé : '+error.message);}
 }

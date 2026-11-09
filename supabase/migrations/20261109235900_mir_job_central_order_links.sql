@@ -1,0 +1,13 @@
+begin;
+-- Link legacy shared requests only when their recorded UUID matches an existing job.
+update mir_core.orders o set job_id=j.id from mir_core.order_revisions r join mir_core.jobs j on j.organization_id=r.organization_id and j.id::text=r.snapshot->'configuration'->>'chantier' where o.organization_id=r.organization_id and o.id=r.order_id and o.revision=r.revision and o.kind='employee' and o.job_id is null;
+update mir_core.orders po set job_id=src.job_id from mir_core.coordination_orders c join mir_core.orders src on(src.organization_id,src.id)=(c.organization_id,c.employee_order_id) join mir_core.coordination_lines l on(l.organization_id,l.coordination_id)=(c.organization_id,c.id) join mir_core.coordination_routes r on(r.organization_id,r.coordination_line_id)=(l.organization_id,l.id) where po.organization_id=r.organization_id and po.id=r.supplier_order_id and po.job_id is null and src.job_id is not null;
+create or replace function public.mir_job_detail(p_job_id uuid) returns jsonb language plpgsql stable security definer set search_path=pg_catalog,mir_core as $$
+declare a jsonb;org uuid;out jsonb;begin
+ a:=public.mir_account_snapshot();org:=(a->>'organizationId')::uuid;
+ if not mir_core.job_allowed(org,p_job_id) then raise exception 'Chantier inaccessible' using errcode='42501';end if;
+ select to_jsonb(j)||jsonb_build_object('documents',(select coalesce(jsonb_agg(to_jsonb(d)||jsonb_build_object('author',coalesce(p.name,u.raw_user_meta_data->>'full_name','Équipe MIR')) order by d.created_at desc),'[]') from mir_core.job_documents d join auth.users u on u.id=d.created_by left join mir_core.staff_profiles p on p.organization_id=org and p.user_id=d.created_by where d.organization_id=org and d.job_id=j.id),'orders',(select coalesce(jsonb_agg(jsonb_build_object('id',o.id,'number',o.order_number,'createdAt',o.created_at,'coordinationId',c.id,'warehouseShippedAt',c.shipped_at)),'[]') from mir_core.orders o left join mir_core.coordination_orders c on(c.organization_id,c.employee_order_id)=(o.organization_id,o.id) where o.organization_id=org and o.job_id=j.id and o.kind='employee' and (mir_core.job_manager(org) or o.owner_id=auth.uid())),'purchases',case when mir_core.coordination_allowed(org) then (select coalesce(jsonb_agg(jsonb_build_object('id',po.id,'number',po.order_number)),'[]') from mir_core.orders po where po.organization_id=org and po.kind='supplier' and po.job_id=j.id) else '[]'::jsonb end,'canManage',mir_core.job_manager(org)) into out from mir_core.jobs j where j.organization_id=org and j.id=p_job_id;
+ if out is null then raise exception 'Chantier introuvable' using errcode='42501';end if;return out;
+end$$;
+
+commit;

@@ -1,0 +1,46 @@
+{
+  "observedAt": "2026-11-09T18:57:33.671Z",
+  "project": "MIR TEST",
+  "revision": "working-tree",
+  "frontend": "local main files under official origin; real Supabase",
+  "productionWrites": 0,
+  "commands": [
+    {
+      "command": "CREATE_ORDER",
+      "status": 200,
+      "serverOk": true,
+      "hasResult": true,
+      "hasSnapshot": true
+    }
+  ],
+  "checks": [
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 11,
+      "role": "admin"
+    },
+    {
+      "name": "prepared named employee profile and private 72h invitation through administration UI",
+      "passed": true
+    },
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 1,
+      "role": "employee"
+    },
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 1,
+      "role": "employee"
+    },
+    {
+      "name": "employee connected with invited email and attached to prepared profile",
+      "passed": true
+    }
+  ],
+  "physicalDevice": false,
+  "failure": "locator.waitFor: Error: strict mode violation: locator('.order-card').filter({ hasText: 'e76e0932-1d9d-4940-a1b2-a6e11dd33ea3' }) resolved to 2 elements:\n    1) <article class=\"order-card\">…</article> aka getByText('Demande e76e0932-1d9d-4940-a1b2-a6e11dd33ea3approved · 9 nov.Voir le catalogue')\n    2) <article class=\"order-card\" data-order=\"e76e0932-1d9d-4940-a1b2-a6e11dd33ea3\">…</article> aka getByRole('article').filter({ hasText: 'e76e0932-1d9d-4940-a1b2-a6e11dd33ea3RECETTE — Chantier fictif 3539 nov. · mir-' })\n\nCall log:\n\u001b[2m  - waiting for locator('.order-card').filter({ hasText: 'e76e0932-1d9d-4940-a1b2-a6e11dd33ea3' }) to be visible\u001b[22m\n"
+}

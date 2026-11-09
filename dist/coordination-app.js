@@ -6,7 +6,7 @@
 const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>new Intl.NumberFormat('fr-CA',{maximumFractionDigits:3}).format(Number(n)||0);
 const CLIENT=window.MIRCoordinationClient;
-let api=null,orgs=[],inbox=[],detail=null,suppliers=[],busy=false,filter='all',poller=null,sessionReady=false;
+let api=null,orgs=[],inbox=[],detail=null,suppliers=[],people=[],busy=false,filter=new URLSearchParams(location.search).get('filter')==='new'?'new':'all',poller=null,sessionReady=false;
 const status=v=>{$('#co-status').textContent=String(v||'');};
 const toast=v=>{$('#co-toast').textContent=String(v||'');};
 const org=()=>$('#co-organization')?.value;
@@ -30,7 +30,7 @@ async function session(){
   for(const row of orgs){const option=document.createElement('option');option.value=row.id;option.textContent=row.name;$('#co-organization').append(option);}
   sessionReady=true;$('#co-login').hidden=true;$('#co-workspace').hidden=false;
   status('Coordination MIR connectée · toutes les écritures passent par le serveur.');
-  await refresh({initial:true});
+  await refresh({initial:true});const source=new URLSearchParams(location.search).get('order');if(source)await openOrder(source);
  }catch(error){signedOut();err(error);}
 }
 function sum(line,lane){
@@ -40,7 +40,7 @@ function summary(row){
  const lines=row.lines||[],total=lines.reduce((n,l)=>n+Number(l.requestedQty||0),0);
  const warehouse=lines.reduce((n,l)=>n+sum(l,'warehouse'),0);
  const external=lines.reduce((n,l)=>n+sum(l,'supplier'),0);
- const received=lines.reduce((n,l)=>n+(l.routes||[]).filter(r=>r.lane==='supplier').reduce((m,r)=>m+Number(r.receivedQty||0),0),0);
+ const received=lines.reduce((n,l)=>n+(l.routes||[]).filter(r=>r.lane==='supplier').reduce((m,r)=>m+Number(r.deliveredQty??r.receivedQty??0),0),0);
  const picked=lines.reduce((n,l)=>n+(l.routes||[]).filter(r=>r.lane==='warehouse').reduce((m,r)=>m+Number(r.pickedQty||0),0),0);
  const unassigned=total-warehouse-external;
  const supplierHasPO=lines.every(l=>(l.routes||[]).filter(r=>r.lane==='supplier').every(r=>!!r.supplierOrderId));
@@ -52,11 +52,11 @@ function summary(row){
 function renderInbox(){
  const needle=$('#co-search').value.trim().toLowerCase(),rows=inbox.filter(x=>
   (!needle||[x.sourceOrderId,x.id,x.job,x.address,x.team].some(v=>String(v||'').toLowerCase().includes(needle)))&&
-  (filter==='all'||filter==='new'&&!x.id||filter==='shipped'&&x.status==='warehouse_shipped'));
+  (filter==='all'||filter==='new'&&(!x.id||Number(x.unassignedQty)>0)||filter==='shipped'&&x.status==='warehouse_shipped'));
  $('#co-count').textContent=rows.length;
  $('#co-orders').innerHTML=rows.length?rows.map(row=>
   '<button type="button" class="co-order" data-co-open="'+esc(row.sourceOrderId)+'" aria-current="'+String(detail?.sourceOrderId===row.sourceOrderId)+'">'+
-  '<strong>Commande '+esc(String(row.sourceOrderId||'').slice(0,13))+'</strong>'+
+  '<strong>Commande '+esc(row.number||String(row.sourceOrderId||'').slice(0,13))+'</strong>'+
   '<small>'+esc(row.job||'Chantier à préciser')+' · '+esc(row.team||'Équipe à préciser')+'</small>'+
   '<small>'+esc(row.address||'Adresse à compléter')+'</small>'+
   '<em>'+esc(row.status==='new'?'À répartir':row.status==='warehouse_shipped'?'Entrepôt expédié':'En traitement')+
@@ -67,7 +67,7 @@ async function refresh({initial=false}={}){
  if(!sessionReady||!org())return;
  try{
   const next=await api.inbox(org());inbox=Array.isArray(next)?next:[];
-  renderInbox();
+  document.querySelectorAll('[data-co-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.coFilter===filter)));renderInbox();
   if(initial||!detail)await suppliersForOrg();
   if(!initial&&detail&&!busy&&!document.querySelector('#co-detail :focus:is(input,select,textarea)')){
    const row=inbox.find(x=>x.id===detail.id);
@@ -76,7 +76,7 @@ async function refresh({initial=false}={}){
  }catch(error){err(error);}
 }
 async function suppliersForOrg(){
- try{const out=await api.suppliers(org());suppliers=Array.isArray(out)?out:[];}
+ try{const out=await api.suppliers(org());suppliers=Array.isArray(out)?out:[];people=await api.people(org());}
  catch(error){suppliers=[];status('Les fournisseurs ne sont pas encore disponibles : '+error.message);}
 }
 function supplierOptions(value=''){
@@ -104,7 +104,7 @@ function linkedPo(route){
    '<button type="button" data-co-action="po" data-route="'+esc(id)+'">Créer un bon</button>'+
    '<label>Ou bon existant<select data-co-existing-po="'+esc(id)+'"><option value="">Choisir après recherche</option></select></label>'+
    '<button type="button" data-co-action="existing-po" data-route="'+esc(id)+'">Ajouter à ce bon</button>'
-  )+'</div>';
+  )+'<form data-co-expectation="'+esc(id)+'"><label>Date attendue<input name="date" type="date" value="'+esc(route.expectedDate||'')+'"></label><label>Suivi par<select name="responsible"><option value="">Adjointe à attribuer</option>'+people.map(p=>'<option value="'+p.id+'"'+(p.id===route.responsibleId?' selected':'')+'>'+esc(p.name)+'</option>').join('')+'</select></label><label>Destination de la réception<select name="destination"><option value="job"'+(route.destination!=='stock'?' selected':'')+'>Livraison directe au chantier</option><option value="stock"'+(route.destination==='stock'?' selected':'')+'>Réception en stock, chantier à livrer ensuite</option></select></label><button>Enregistrer le suivi</button></form></div>';
 }
 function supplierRow(lineId,{supplierId='',quantity=0}={}){
  return '<div class="co-external-row"><label>Fournisseur<select data-co-supplier>'+supplierOptions(supplierId)+'</select></label>'+
@@ -185,7 +185,7 @@ function renderDetail(){
  '<p>'+esc(e.payload?.name||'Commande')+(e.type==='quantity_added'?' +'+fmt(e.payload?.delta)+' '+esc(e.payload?.unit):'')+'</p></div>').join('')||'<p>Aucun changement à communiquer.</p>';
  $('#co-meta').querySelector('button').disabled=!!detail.shippedAt;
  $('#co-overall-status').className='co-badge';
- void fillExistingPOs();
+ void fillExistingPOs();if(window.MIRAdminPurchases)void MIRAdminPurchases.render($('#co-pos'),detail.lines.flatMap(l=>(l.routes||[]).map(r=>r.supplierOrderId).filter(Boolean))).catch(err);
 }
 async function openOrder(sourceOrderId){
  if(!sessionReady||busy)return;locked(true);status('Lecture de la commande et de ses références…');
@@ -269,7 +269,7 @@ function bind(){
   if(b.dataset.coAction==='remove-supplier'){b.closest('.co-external-row')?.remove();return;}
   void actionRun(b);
  });
- $('#co-line-list').addEventListener('submit',e=>{const form=e.target.closest('[data-co-route-form]');if(!form)return;e.preventDefault();routeForm(form);});
+ $('#co-line-list').addEventListener('submit',e=>{const expected=e.target.closest('[data-co-expectation]');if(expected){e.preventDefault();if(busy)return;const d=new FormData(expected);locked(true);api.expectation(org(),expected.dataset.coExpectation,d.get('date')||null,d.get('responsible')||null,d.get('destination'),detail.revision).then(()=>detailReload()).then(()=>status('Suivi enregistré.')).catch(err).finally(()=>locked(false));return;}const form=e.target.closest('[data-co-route-form]');if(!form)return;e.preventDefault();routeForm(form);});
  $('#co-meta').addEventListener('submit',e=>{e.preventDefault();metaForm(e.currentTarget);});
 }
 async function bootstrap(){

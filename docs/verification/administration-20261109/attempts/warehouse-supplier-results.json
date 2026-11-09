@@ -1,0 +1,37 @@
+{
+  "observedAt": "2026-11-09T19:19:31.038Z",
+  "project": "MIR TEST",
+  "revision": "working-tree",
+  "frontend": "local main files under official origin; real Supabase",
+  "productionWrites": 0,
+  "commands": [],
+  "checks": [
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 10,
+      "role": "employee"
+    },
+    {
+      "name": "QR interface limits original 25 to warehouse allocation 20; supplier 5 excluded",
+      "passed": true
+    },
+    {
+      "name": "warehouse 23 shipped; repeated server request returns same movement; stock exactly 77 without second deduction",
+      "passed": true
+    },
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 11,
+      "role": "employee"
+    },
+    {
+      "name": "supplier PO linked to employee order/job; PDF archived and approved by assistant UI",
+      "passed": true,
+      "poId": "00ec5470-6fd0-4804-9dad-7b81cdd5d576"
+    }
+  ],
+  "physicalDevice": false,
+  "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#purchase-status').filter({ hasText: 'Envoyé · accepté' }) to be visible\u001b[22m\n"
+}

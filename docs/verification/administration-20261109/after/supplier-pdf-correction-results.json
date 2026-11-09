@@ -1,0 +1,21 @@
+{
+  "observedAt": "2026-11-09T19:30:17.113Z",
+  "project": "MIR TEST",
+  "revision": "working-tree",
+  "frontend": "local main files under official origin; real Supabase",
+  "productionWrites": 0,
+  "commands": [],
+  "checks": [
+    {
+      "kind": "snapshot",
+      "catalogueCount": 1,
+      "jobCount": 11,
+      "role": "employee"
+    },
+    {
+      "name": "R2 preview verified, approved and original private PDF downloaded; one portrait page, R1 archived unchanged, no new email at this stage",
+      "passed": true
+    }
+  ],
+  "physicalDevice": false
+}

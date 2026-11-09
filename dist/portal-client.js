@@ -98,7 +98,7 @@
       SET_INVENTORY: ['stockKey', 'variant', 'quantity', 'unit', 'note'], RESERVE_ORDER: ['orderId'],
       RECORD_DELIVERY: ['orderId', 'quantities', 'note'], CANCEL_REMAINDER: ['orderId', 'quantities', 'note'],
       ASSIGN_JOB: ['jobId', 'memberIds', 'memberId', 'assigned'], ASSIGN_MEMBER_JOBS: ['memberId', 'jobIds'], SET_MEMBER_ACTIVE: ['memberId', 'active'],
-      CREATE_JOB: ['name', 'address'], INVITE_EMPLOYEE: ['email', 'jobIds'], REVOKE_INVITATION: ['invitationId']
+      CREATE_JOB: ['number','name','address','team','foreman','requiredDate'], UPDATE_JOB:['jobId','revision','number','name','address','team','foreman','requiredDate','archived'], SAVE_STAFF:['profileId','revision','name','email','team'], SET_PERMISSIONS:['memberId','coordination','warehouse','jobs','estimates'], PUBLISH_CATALOGUE:['item'], INVITE_EMPLOYEE: ['email', 'jobIds'], REVOKE_INVITATION: ['invitationId']
     }[command];
     if (!fields) fail('COMMAND_UNKNOWN', 'Cette action n’est pas proposée dans le portail connecté.');
     const payload = Object.fromEntries(fields.filter(key => raw[key] !== undefined).map(key => [key, clone(raw[key])]));
@@ -222,7 +222,7 @@
         return snapshot;
       } catch (error) {
         if (currentGeneration !== generation || sequence !== readSequence || disposed) return null;
-        const mapped = errorOf(error), denied = ['ACCESS_DENIED', 'ACTOR_INACTIVE', 'MEMBER_INACTIVE', 'MEMBERSHIP_REQUIRED', 'AUTH_REQUIRED', '42501'].includes(mapped.code);
+        const mapped = errorOf(error), denied = ['ACCESS_DENIED', 'ACCESS_SUSPENDED', 'ACTOR_INACTIVE', 'MEMBER_INACTIVE', 'MEMBERSHIP_REQUIRED', 'AUTH_REQUIRED', '42501'].includes(mapped.code);
         emit({ phase: denied ? 'access_denied' : 'error', snapshot: null,account:null, error: mapped }, 'refresh');
         throw mapped;
       }
@@ -384,7 +384,7 @@
         const mapped = errorOf(error);
         if (mapped.definitive) clearPending(operation.userId);
         if (epoch === generation) {
-          if (['AUTH_REQUIRED', 'MEMBERSHIP_REQUIRED', 'MEMBER_INACTIVE', 'ACTOR_INACTIVE', 'ACCESS_DENIED', '42501'].includes(mapped.code))
+          if (['AUTH_REQUIRED', 'MEMBERSHIP_REQUIRED', 'MEMBER_INACTIVE', 'ACTOR_INACTIVE', 'ACCESS_DENIED', 'ACCESS_SUSPENDED', '42501'].includes(mapped.code))
             emit({ phase: 'access_denied', snapshot: null, error: mapped }, 'auth');
           else if (['ADMIN_REQUIRED', 'JOB_NOT_ASSIGNED'].includes(mapped.code)) {
             emit({ phase: 'error', snapshot: null, error: mapped }, 'auth');

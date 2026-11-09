@@ -7,7 +7,7 @@
      !/^sb_publishable_[A-Za-z0-9_-]+$/.test(config.publishableKey||''))
     throw Error('La connexion Entrepôt MIR n’est pas activée ou vérifiée.');
   if(!sdk?.createClient||!storage)throw Error('Module de connexion ou stockage sûr indisponible.');
-  const db=sdk.createClient(config.supabaseUrl,config.publishableKey,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true}});
+  const db=sdk.createClient(config.supabaseUrl,config.publishableKey,{auth:{storageKey:'mir_portal_auth_'+new URL(config.supabaseUrl).hostname.split('.')[0],flowType:'pkce',persistSession:true,autoRefreshToken:true}});
   let userId=null,epoch=0;
   const pendingKey=id=>'mir_entrepot_pending_v1_'+id;
   function changed(){epoch++;userId=null;}

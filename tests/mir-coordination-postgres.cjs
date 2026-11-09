@@ -6,7 +6,7 @@ const {PGlite}=require('../tools/database/node_modules/@electric-sql/pglite');
 const ROOT=path.join(__dirname,'../supabase');
 const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 (async()=>{
- const db=new PGlite(), org=uuid(10),admin=uuid(1),employee=uuid(2),assistant=uuid(3),warehouse=uuid(4),
+ const db=await require('./helpers/mir-postgres-fixture.cjs')(), org=uuid(10),admin=uuid(1),employee=uuid(2),assistant=uuid(3),warehouse=uuid(4),
  source=uuid(61), supplier=uuid(50), skuId=uuid(80), qr=uuid(81);
  let checks=0;const ok=(name,fn)=>{checks++;console.log('PASS '+name);};
  async function actor(user,sql,params=[]){
@@ -19,11 +19,6 @@ const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
   await assert.rejects(()=>actor(user,sql,params),e=>!pattern||pattern.test(e.message));
  }
  try{
-  await db.exec("create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;");
-  const dir=path.join(ROOT,'migrations');
-  for(const file of fs.readdirSync(dir).filter(x=>x.endsWith('.sql')).sort())await db.exec(fs.readFileSync(path.join(dir,file),'utf8'));
-  for(const file of ['202611070006_warehouse_stock_qr.sql','202611070007_order_coordination.sql','202611070008_order_coordination_operations.sql','202611070009_order_supplier_purchases.sql'])
-    await db.exec(fs.readFileSync(path.join(ROOT,'proposals',file),'utf8'));
   ok('Installation des propositions 006+007+008 dans PostgreSQL jetable');
   await db.exec("insert into auth.users(id) values('"+[admin,employee,assistant,warehouse].join("'),('")+"');");
   await db.exec("insert into mir_core.organizations(id,name) values('"+org+"','MIR TEST');");
@@ -147,6 +142,41 @@ const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
   ok('Adjointe modifie le job, l’adresse, la priorité et l’équipe via SQL');
   await failAs(employee,'select * from mir_core.coordination_ops',[],/permission|denied/i);
   ok('Aucun accès direct aux opérations');
+  await db.query('insert into mir_core.account_settings(singleton,organization_id) values(true,$1)',[org]);
+  const secondLine=detailMeta.lines[0].id;
+  await actor(assistant,'select public.mir_coordination_route($1,$2,$3,0,$4,2,$5)',[org,fresh.id,secondLine,[{supplierId:supplier,quantity:4}],uuid(171)]);
+  const secondDetail=(await actor(assistant,'select public.mir_coordination_detail($1,$2) result',[org,fresh.id]))[0].result;
+  const secondRoute=secondDetail.lines[0].routes[0].id;
+  await failAs(assistant,'select public.mir_coordination_supplier_po($1,$2,$3,$4,3,$5)',[org,fresh.id,secondRoute,poResult.supplierOrderId,uuid(172)],/même job|même adresse/);
+  const stockPO=(await actor(assistant,'select public.mir_coordination_supplier_po($1,$2,$3,null,3,$4) result',[org,fresh.id,secondRoute,uuid(173)]))[0].result.supplierOrderId;
+  await actor(assistant,'select public.mir_coordination_expectation($1,$2,$3,$4,$5,4,$6)',[org,secondRoute,'2026-11-12',assistant,'stock',uuid(174)]);
+  await actor(assistant,'select public.mir_coordination_supplier_receive($1,$2,$3,3,5,$4)',[org,fresh.id,secondRoute,uuid(175)]);
+  const partial=(await db.query('select received_qty,delivered_qty from mir_core.coordination_routes where id=$1',[secondRoute])).rows[0];assert.equal(Number(partial.received_qty),3);assert.equal(Number(partial.delivered_qty),0);
+  assert.equal(Number((await db.query('select on_hand from mir_core.warehouse_stock where sku_id=$1',[skuId])).rows[0].on_hand),80);
+  await actor(assistant,'select public.mir_coordination_supplier_receive($1,$2,$3,1,6,$4)',[org,fresh.id,secondRoute,uuid(176)]);
+  await failAs(warehouse,'select public.mir_supplier_stock_dispatch($1,$2,5,$3)',[org,secondRoute,uuid(177)],/supérieure/);
+  const sent=(await actor(warehouse,'select public.mir_supplier_stock_dispatch($1,$2,2,$3) result',[org,secondRoute,uuid(178)]))[0].result;
+  assert.equal(Number(sent.deliveredQty),2);await actor(warehouse,'select public.mir_supplier_stock_dispatch($1,$2,2,$3)',[org,secondRoute,uuid(178)]);
+  await actor(warehouse,'select public.mir_supplier_stock_dispatch($1,$2,2,$3)',[org,secondRoute,uuid(179)]);
+  assert.equal(Number((await db.query('select on_hand from mir_core.warehouse_stock where sku_id=$1',[skuId])).rows[0].on_hand),77);
+  ok('Réception en stock distincte du chantier, sorties bornées au reçu et reprise sans double déduction');
+  const path=org+'/'+stockPO+'/1/'+uuid(180)+'.pdf';await db.query("insert into storage.objects(bucket_id,name,owner_id,metadata) values('mir-supplier-documents',$1,$2,$3)",[path,assistant,{size:100,mimetype:'application/pdf'}]);
+  await db.query('update mir_core.suppliers set verified_at=now() where id=$1',[supplier]);
+  const archived=(await actor(assistant,'select public.mir_supplier_approve($1,1,$2,$3) result',[stockPO,path,'a'.repeat(64)]))[0].result;
+  const sendJob=(await actor(assistant,'select public.mir_supplier_queue($1,1,$2,$3) result',[stockPO,archived.id,uuid(181)]))[0].result;
+  const sameJob=(await actor(assistant,'select public.mir_supplier_queue($1,1,$2,$3) result',[stockPO,archived.id,uuid(182)]))[0].result;assert.equal(sameJob,sendJob);
+  await failAs(assistant,'select public.mir_supplier_dispatch_rpc($1,$2)',['claim',{id:sendJob}],/permission/);
+  async function service(action,body){await db.exec('begin;set local role service_role;');try{const r=await db.query('select public.mir_supplier_dispatch_rpc($1,$2) result',[action,body]);await db.exec('commit');return r.rows[0].result;}catch(e){await db.exec('rollback');throw e;}}
+  const claimed=await service('claim',{id:sendJob});await assert.rejects(()=>service('claim',{id:sendJob}),/BUSY/);
+  await service('complete',{id:sendJob,attempt:claimed.job.attempts,status:'accepted',messageId:'provider-simulation'});
+  assert.equal((await service('claim',{id:sendJob})).job.status,'accepted');
+  ok('PDF approuvé, un seul job d’envoi par révision, service privé et verrou de transmission');
+  const corrected=(await actor(assistant,'select public.mir_supplier_document_revision($1,1,$2) result',[stockPO,uuid(183)]))[0].result;
+  assert.equal(corrected.revision,2);const repeated=(await actor(assistant,'select public.mir_supplier_document_revision($1,1,$2) result',[stockPO,uuid(183)]))[0].result;assert.equal(repeated.revision,2);
+  assert.equal(Number((await db.query('select sum(quantity) q from mir_core.order_lines where order_id=$1 and revision=2',[stockPO])).rows[0].q),4);
+  assert.equal(Number((await db.query('select delivered_qty from mir_core.coordination_routes where id=$1',[secondRoute])).rows[0].delivered_qty),4);
+  assert.equal(Number((await db.query('select on_hand from mir_core.warehouse_stock where sku_id=$1',[skuId])).rows[0].on_hand),77);
+  ok('Révision documentaire conserve PDF précédent, quantités, réceptions et stock sans commande supplémentaire');
   console.log('MIR coordination PostgreSQL: '+checks+' tests réussis; simulation Auth, AUCUN service hébergé.');
  }finally{await db.close();}
-})().catch(error=>{console.error(error.stack||error);process.exitCode=1});
+})().catch(error=>{console.error(error.stack||error);if(error.where)console.error(error.where);process.exitCode=1});
