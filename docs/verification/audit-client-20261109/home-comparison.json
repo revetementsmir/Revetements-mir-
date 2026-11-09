@@ -1,0 +1,20 @@
+[
+  {
+    "width": 390,
+    "height": 844,
+    "identical": true,
+    "sha256": "e4207a4fb3bfc1747b52c66476abdbdf3238ddebfeb6e7d0c8e69fc7c5b24d22"
+  },
+  {
+    "width": 834,
+    "height": 1112,
+    "identical": true,
+    "sha256": "831c25750796104ae184a78f7eb43ba96c3cf035ab72e10233cbfddc92e07e72"
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "identical": true,
+    "sha256": "ba0d7fe9cfe33faf431e90e71907ff1c899798b45c06904415b21472b86f7e21"
+  }
+]

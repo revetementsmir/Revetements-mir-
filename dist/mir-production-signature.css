@@ -369,3 +369,19 @@ html[data-mir-profile-startup]:not([data-mir-profile-startup="choice"]) #client-
  html[data-mir-profile-startup="choice"] .client-entry-cards{margin-top:16px}
  html[data-mir-profile-startup="choice"] .client-entry-cards>button{min-height:86px}
 }
+
+/* Audit client: scoped to this wizard; the approved home does not opt in. */
+body[data-client-entry="draw"] .client-keyboard-trace{grid-column:1/-1;min-width:0}
+body[data-client-entry] .client-keyboard-trace summary{min-height:44px;cursor:pointer}
+body[data-client-entry] .client-keyboard-trace input{width:100%;min-height:44px}
+body[data-client-entry] .angle-details{font-size:13px}
+body[data-client-entry] .angle-details summary{min-height:44px;padding:10px;cursor:pointer}
+body[data-client-entry] #production-drawing [data-edit-profile-measure]:focus{outline:2px solid #348511;outline-offset:3px}
+@media(max-width:650px){
+ body[data-client-entry][data-client-stage="5"] :is(.finish-fields,.color-source-field,.two-fields){grid-template-columns:minmax(0,1fr)!important}
+ body[data-client-entry][data-client-stage="5"] label{white-space:normal;overflow:visible;line-height:1.5}
+ body[data-client-entry="draw"] .production-workspace{padding-bottom:24px}
+}
+
+body[data-client-entry]:not([data-client-stage="5"]) #panel-price{display:none!important}
+@media(max-width:650px){body[data-client-entry][data-client-stage="5"] #client-step-actions{position:sticky;bottom:0;z-index:3;box-shadow:0 -4px 14px #203b2010}}

@@ -1311,6 +1311,15 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     const history = [...(Array.isArray(instance.history) ? instance.history : []), copy(current)];
     return makeInstance(current.templateSnapshot, updated, current.revision + 1, current.revisionId, history);
   }
+  // Explicitly revise a free profile's topology while preserving its instance history.
+  function reviseProfileTrace(instance, spec, values = {}) {
+    const current=instance?.snapshot;
+    if(current?.schema!=='mir-production-instance-1'||current.spec?.kind!=='profile'||current.spec.template!=='custom'||spec?.kind!=='profile'||spec.template!=='custom')
+      return {ok:false,errors:[issue('FREE_PROFILE_REQUIRED','template','Un tracé libre existant est requis.')]};
+    const revised=createTemplateRevision(current.templateSnapshot,spec);
+    if(!revised.ok)return revised;
+    return makeInstance(revised.template,{...copy(values),instanceId:current.id},current.revision+1,current.revisionId,[...(instance.history||[]),copy(current)]);
+  }
   function createTemplateRevision(template, spec, options = {}) {
     const errors = templateCheck(template);
     if (errors.length) return { ok: false, template: null, errors, warnings: [] };
@@ -1324,5 +1333,5 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
   }
 
   function validate(spec) { return modelOf(spec).validation; }
-  return Object.freeze({ version: VERSION, TEMPLATES, SHAPES, PROFILE_GROUPS:Object.freeze(PROFILE_GROUPS), groupProfiles, parseMeasurement, formatMeasurement, quotePolicy, pricePiece, priceDossier, buildProfile, buildPanel, mirrorPanelSpec, insertDoubleFold, validate, profileSVG, profileSectionPath, profileDiagramContent, panelSVG, buildOrder, productionPages, createTemplate, templatePreview, instantiateTemplate, configureTemplate: instantiateTemplate, createOrderSnapshot: instantiateTemplate, reviseInstance, revision: reviseInstance, createTemplateRevision });
+  return Object.freeze({ version: VERSION, TEMPLATES, SHAPES, PROFILE_GROUPS:Object.freeze(PROFILE_GROUPS), groupProfiles, parseMeasurement, formatMeasurement, quotePolicy, pricePiece, priceDossier, buildProfile, buildPanel, mirrorPanelSpec, insertDoubleFold, validate, profileSVG, profileSectionPath, profileDiagramContent, panelSVG, buildOrder, productionPages, createTemplate, templatePreview, instantiateTemplate, configureTemplate: instantiateTemplate, createOrderSnapshot: instantiateTemplate, reviseInstance, reviseProfileTrace, revision: reviseInstance, createTemplateRevision });
 });

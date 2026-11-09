@@ -73,6 +73,7 @@
   const short = innerHeight < 760;
   if (!localDossier.isConnected) $('#client-entry')?.append(localDossier);
   localDossier.hidden = state !== 'choice' || !$('#production-items [data-item-quantity]');
+  for(const view of controls.values())view.nav.hidden=state!=='models'||view.count<=1;
   if (state === 'models') {
    paginate('Pages de modèles', '#client-saved-options [data-saved-template], #client-standard-options [data-client-profile]',
     $('#client-model-options'), wide ? 8 : short ? 4 : 6);
