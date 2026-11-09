@@ -23,7 +23,7 @@ Le guide [MIR_ESTIMATIONS_SERVER.md](../../MIR_ESTIMATIONS_SERVER.md) donne l’
 | Envoi sans configuration | Réel : 503, aucun faux reçu, aucune demande `received`, aucun courriel externe envoyé. |
 | Doubles clics / réponse perdue Resend / panne après acceptation | Tests du vrai code Edge avec frontières RPC/Storage/Resend simulées : fiche et corps d’envoi stables, reprise sans deuxième courriel, verrou transactionnel testé via fixture. À refaire avec Resend réel. |
 | Contrat et service Node existant | 8 tests réussis, validations réutilisées. |
-| Code Edge | 5 tests réussis, quatre sources, droits, empreintes, limites, idempotence, expiration et configuration fermée. |
+| Code Edge | 6 tests réussis, quatre sources, droits, empreintes, limites, idempotence, expiration et configuration fermée. La reprise après expiration de session TUS est couverte avec le stockage simulé. |
 | Parcours navigateur | 12 parcours réussis, quatre entrées × trois tailles ; vrais formulaires, imports/exports PDF et brouillons. Supabase et Resend simulés dans cette série. |
 | Régression parcours client | Chromium 390 et 1440 : Pliage/dossier et autres parcours existants réussis. |
 
