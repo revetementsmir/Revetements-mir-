@@ -69,7 +69,7 @@
     if(options.clearAxes){for(const axis of options.clearAxes===true?['x','y']:options.clearAxes)delete zone().rules[axis+'AxesIn'];}
     scheduleSave();render();
   }
-  function toast(message) { $('#toast').textContent=message;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),5000); }
+  function toast(message,{quiet=false}={}) { $('#toast').textContent=message;$('#toast').classList.toggle('visible',!quiet);clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),5000); }
   function gaps(z=zone()) { return {left:parse(z.values.clearLeft),right:parse(z.values.clearRight),top:parse(z.values.clearTop),bottom:parse(z.values.clearBottom)}; }
   function dimensions(z=zone()) { const g=gaps(z),width=parse(z.values.width),height=parse(z.values.height);return {width,height,g,usableWidth:finite(width)&&finite(g.left)&&finite(g.right)?width-g.left-g.right:null,usableHeight:finite(height)&&finite(g.top)&&finite(g.bottom)?height-g.top-g.bottom:null}; }
   function wallGeometry(z=zone()) {
@@ -267,7 +267,7 @@
     for(const p of layout.pieces){
       const active=selected?.type==='piece'&&selected.id===p.id,locked=layout.config.widthLocks?.[p.col]!=null||layout.config.heightLocks?.[p.row]!=null;
       const x=p.xIn+l,y=p.yIn+l,pw=p.widthIn-2*l,ph=p.heightIn-2*l;
-      out+='<g data-piece="'+p.id+'" tabindex="0" role="button" aria-label="'+p.id+', '+esc(inch(p.widthIn)+' par '+inch(p.heightIn))+'">';
+      out+='<g data-piece="'+p.id+'" tabindex="0" role="button" aria-pressed="'+active+'" aria-label="'+p.id+', '+esc(inch(p.widthIn)+' par '+inch(p.heightIn))+'">';
       if(shaped){
         const poly=piecePolygon(p),mesh=window.MIRProductionVolume?.buildMesh({kind:'panel',shape:'polygon',pointsMM:poly.map(q=>[(q[0]-p.xIn)*25.4,-(q[1]-p.yIn)*25.4]),reliefMM:0,edges:poly.map((_,i)=>({id:String(i+1),lipMM:l*25.4}))});
         const front=p.facePolygonIn||(mesh?.valid?mesh.front.map(q=>[p.xIn+q[0]/25.4,p.yIn-q[1]/25.4]):poly);
@@ -275,7 +275,7 @@
       }else out+='<rect x="'+x+'" y="'+y+'" width="'+pw+'" height="'+ph+'" rx=".15" fill="'+(active?'#4e6c46':'#f1f4ea')+'" stroke="'+(active?'#365131':'#95a584')+'" stroke-width="1" vector-effect="non-scaling-stroke"/>';
       const center=shaped&&V?.labelPoint?V.labelPoint(piecePolygon(p)):[p.xIn+p.widthIn/2,p.yIn+p.heightIn/2];
       out+=svgText(center[0],center[1]-fs*.25,p.id,'text-anchor="middle" font-size="'+fs+'" font-weight="700" fill="'+(active?'white':'#2e4934')+'"');
-      if(fs>1.8&&pw>7){const label=inch(p.widthIn).replace(' po','')+' × '+inch(p.heightIn),size=Math.min(fs*.65,Math.max(1,pw*.82/(label.length*.56)));out+=svgText(center[0],center[1]+fs*1.02,label,'text-anchor="middle" font-size="'+size+'" fill="'+(active?'#e4edda':'#52694a')+'"');}
+      if(active&&fs>1.8&&pw>7){const label=inch(p.widthIn).replace(' po','')+' × '+inch(p.heightIn),size=Math.min(fs*.65,Math.max(1,pw*.82/(label.length*.56)));out+=svgText(center[0],center[1]+fs*1.02,label,'text-anchor="middle" font-size="'+size+'" fill="'+(active?'#e4edda':'#52694a')+'"');}
       if(locked)out+=svgText(center[0],center[1]+fs*2,'COTE FIXÉE','text-anchor="middle" font-size="'+fs*.37+'" fill="'+(active?'#e4edda':'#6b7f61')+'"');
       out+='</g>';
     }
@@ -372,13 +372,13 @@
       if(valid)out+=panelDrawing();
       if(z.shape?.type==='free'&&tool!=='outline'&&Array.isArray(wall.measuredPointsIn))
         out+=wallEdgeAnnotations(wall.measuredPointsIn,{closed:true,measured:true,span:baseWidth});
-      const fs=Math.max(d.width,d.height)*.026,dim=margin*.52;
+      const fs=Math.max(d.width,d.height)*.033,dim=margin*.50;
       out+=svgLine(0,-dim,d.width,-dim,'stroke="#677d5b" vector-effect="non-scaling-stroke"');
       out+=svgLine(0,-dim-fs*.45,0,-dim+fs*.45,'stroke="#677d5b" vector-effect="non-scaling-stroke"')+svgLine(d.width,-dim-fs*.45,d.width,-dim+fs*.45,'stroke="#677d5b" vector-effect="non-scaling-stroke"');
-      out+=svgText(d.width/2,-dim-fs*.4,inch(d.width),'data-wall-dimension="width" role="button" tabindex="0" aria-label="A — Largeur hors tout du mur" font-size="'+fs+'" text-anchor="middle" fill="#395335"');
+      out+=svgText(d.width/2,-dim-fs*.4,'A · '+inch(d.width),'data-wall-dimension="width" role="button" tabindex="0" aria-label="A — Largeur hors tout du mur" font-size="'+fs+'" text-anchor="middle" fill="#395335"');
       out+=svgLine(-dim,0,-dim,d.height,'stroke="#677d5b" vector-effect="non-scaling-stroke"');
-      out+='<text data-wall-dimension="height" role="button" tabindex="0" aria-label="B — Hauteur hors tout du mur" transform="translate('+(-dim-fs*.35)+' '+d.height/2+') rotate(-90)" font-size="'+fs+'" text-anchor="middle" fill="#395335">'+esc(inch(d.height))+'</text>';
-      if(valid)out+=svgText(d.width/2,d.height+dim+fs*.3,inch(layout.widthIn)+' × '+inch(layout.heightIn)+' utiles après lousse','font-size="'+fs*.75+'" text-anchor="middle" fill="#395335"');
+      out+='<text data-wall-dimension="height" role="button" tabindex="0" aria-label="B — Hauteur hors tout du mur" transform="translate('+(-dim-fs*.35)+' '+d.height/2+') rotate(-90)" font-size="'+fs+'" text-anchor="middle" fill="#395335">'+esc('B · '+inch(d.height))+'</text>';
+      if(valid)out+=svgText(d.width/2,d.height+dim+fs*.3,inch(layout.widthIn)+' × '+inch(layout.heightIn)+' utiles après lousse','font-size="'+fs*.82+'" text-anchor="middle" fill="#395335"');
       if(!valid)out+=svgText(d.width/2,d.height/2,'Renseignez le lip et la répartition','font-size="'+fs+'" text-anchor="middle" fill="#687d5e"');
     } else {
       // Enlarged trace viewport; still no fabricated chantier dimensions.
@@ -419,6 +419,7 @@
     $('#draw-outline').setAttribute('aria-pressed',String(tool==='outline'));$('#outline-actions').hidden=tool!=='outline';$('#outline-close').disabled=outlineDraft.length<3;$('#outline-back').disabled=!outlineDraft.length;$('#outline-progress').textContent=outlineDraft.length+' sommet(s) · '+(outlineDraft.length<3?'cliquez ou glissez pour tracer.':'tapez le premier point ou Fermer le contour.');
     $('#outline-right-angle').setAttribute('aria-pressed',String(outlineRightAngle));
     $('#drawing-hint').textContent=tool==='outline'?'Cliquez ou glissez comme une moulure. Maj = 90°. Fermez puis cotez.':view==='3d'?'Glissez pour tourner. Cliquez une pièce pour lire ses cotes.':tool==='draw'?'Glissez entre deux coins de la zone.':tool==='calibrate'?'Cliquez les deux extrémités de votre cote.':'Cliquez une pièce ou déplacez un joint.';
+    window.dispatchEvent(new Event('mir-calepinage-drawn'));
   }
   function render() {
     layout=compute();if(layout.ok){zone().rules=clone(layout.config);if((!selected||selected.type==='piece'&&!layout.pieces.some(p=>p.id===selected.id))&&layout.pieces.length)selected={type:'piece',id:layout.pieces[0].id};}
@@ -739,7 +740,7 @@
       workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';
       scheduleSave();render();restoreSession();beginOutline();
     };
-    $('#load-example').onclick=()=>{if(workspace.zones.length>=30)return toast('Ce dossier contient déjà 30 zones. Sauvegardez-le avant de poursuivre.');snapshot();const z=blankZone(workspace.zones.length+1);z.name='Exemple · entre deux fenêtres';Object.assign(z.values,{width:'108 1/2',height:'83 3/4',lip:'1',columns:4,rows:2});z.dimensionSource='example';workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();toast('Exemple chargé. Le lip de 1 po reste modifiable.');};
+    $('#load-example').onclick=()=>{if(workspace.zones.length>=30)return toast('Ce dossier contient déjà 30 zones. Sauvegardez-le avant de poursuivre.');snapshot();const z=blankZone(workspace.zones.length+1);z.name='Exemple · entre deux fenêtres';Object.assign(z.values,{width:'108 1/2',height:'83 3/4',lip:'1',columns:4,rows:2});z.dimensionSource='example';workspace.zones.push(z);workspace.activeId=z.id;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();toast('Exemple chargé. Le lip de 1 po reste modifiable.',{quiet:true});};
     $('#undo').onclick=()=>{if(!history.length)return;const current=new Map(workspace.zones.map(z=>[z.id,z])),restored=history.pop();for(const z of restored.zones){const before=current.get(z.id);if(!before)continue;const oldContent={...before,revision:0},restoredContent={...z,revision:0};z.revision=JSON.stringify(oldContent)===JSON.stringify(restoredContent)?before.revision:Math.max(before.revision,z.revision)+1;}workspace=restored;selected=null;view='zone';zoom=1;tool='select';scheduleSave();render();restoreSession();};
     $('#redistribute').onclick=()=>commit(z=>{delete z.rules.xAxesIn;delete z.rules.yAxesIn;});
     $('#unlock-all').onclick=()=>commit(z=>{for(const k of ['widthLocks','heightLocks','xLocks','yLocks'])delete z.rules[k];},{invalidate:false});

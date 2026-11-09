@@ -770,7 +770,7 @@ function profileDrawingSection(points,bends){
  return section;
 }
 
-function profileSideMarkers({segments,folds},model,handles){
+function profileSideMarkers({segments,folds},model,handles,annotationBounds,[left,right]=[0,800]){
  const placed=[];
  const distance=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
  function distanceToSide(p,[a,b]){
@@ -793,7 +793,7 @@ function profileSideMarkers({segments,folds},model,handles){
   const clear=([x,y])=>{
    const near=(q,margin)=>Math.abs(x-q[0])<halfWidth+margin&&Math.abs(y-q[1])<12+margin;
    const relative=([px,py])=>[(px-x)/(halfWidth+7),(py-y)/19];
-   return x>=halfWidth+2&&x<=798-halfWidth&&y>=14&&y<=462&&
+   return x>=left+halfWidth+2&&x<=right-halfWidth-2&&y>=14&&y<=462&&
     !placed.some(q=>near(q.point,q.halfWidth+4)&&Math.abs(y-q.point[1])<28)&&
     !folds.some(q=>near(q,10))&&!handles.some(q=>near(q,12))&&
     !segments.some(line=>distanceToSide([0,0],line.map(relative))<1.42);
@@ -821,9 +821,9 @@ function profileSideMarkers({segments,folds},model,handles){
     }
    }
   }
-  if(!position&&caption!==label){
+  if(!position&&(caption!==label||right-left<800)){
    let nearest=Infinity;
-   for(let y=16;y<=452;y+=20)for(let x=halfWidth+2;x<=798-halfWidth;x+=24){
+   for(let y=16;y<=452;y+=20)for(let x=left+halfWidth+2;x<=right-halfWidth-2;x+=24){
     const candidate=[x,y],gap=distance(candidate,anchor);
     if(gap<nearest&&clear(candidate)){position=candidate;nearest=gap;}
    }
@@ -833,6 +833,7 @@ function profileSideMarkers({segments,folds},model,handles){
    return '';
   }
   placed.push({point:position,halfWidth,anchor:caption===label||adjacent?null:anchor});
+  annotationBounds?.push([position[0],position[1],halfWidth,12]);
   return badge(position,caption,halfWidth,caption===label);
  }).join('');
  function badge([x,y],caption,halfWidth,letterOnly){
@@ -854,10 +855,13 @@ function profileSideMarkers({segments,folds},model,handles){
  if(!missing.length)return leaders.join('')+markers;
  const fallback=missing.map(({caption,label,anchor,halfWidth},index)=>{
   const letterOnly=caption===label;
-  const columns=letterOnly?26:7;
-  const x=letterOnly?400+(index-(missing.length-1)/2)*30:61+(index%columns)*113;
-  const y=letterOnly?495:466+Math.floor(index/columns)*14;
+  const columns=letterOnly?Math.floor((right-left)/30):7;
+  const row=Math.floor(index/columns);
+  const inRow=Math.min(columns,missing.length-row*columns);
+  const x=letterOnly?(left+right)/2+(index%columns-(inRow-1)/2)*30:61+(index%columns)*113;
+  const y=letterOnly?495-row*24:466+row*14;
   const point=[x,y];
+  annotationBounds?.push([x,y,letterOnly?11:halfWidth*.55,letterOnly?11:6.6]);
   if(!letterOnly)leaders.push(leader(point,anchor));
   return letterOnly?badge(point,caption,halfWidth,true):
    `<g transform="translate(${x} ${y}) scale(.55)">${badge([0,0],caption,halfWidth,false)}</g>`;
@@ -866,7 +870,7 @@ function profileSideMarkers({segments,folds},model,handles){
 
 }
 
-function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false}={}){
+function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, angleOverlay}={}){
  const section=profileDrawingSection(mapped,bends);
  let output=`<path d="${section.path}" fill="none" stroke="#97a68b" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="#dbe3d4" stroke-width="4" stroke-linejoin="miter"/>`;
  const reserved=[...handles];
@@ -883,7 +887,9 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  const stripe=`M${ends[0].map(decimal).join(',')}L${ends[1].map(decimal).join(',')}`;
  output+=`<g${action}>${togglePaintedFace?`<path d="${stripe}" fill="none" stroke="transparent" stroke-width="38" stroke-linecap="round"/>`:''}<path class="profile-painted-stripe" d="${stripe}" fill="none" stroke="#175b94" stroke-width="5" stroke-linecap="round"/></g>`;}
  });
- if(markers)output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved);
+ const annotationBounds=angleOverlay?[]:null;
+ if(markers)output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds);
+ if(angleOverlay)output+=angleOverlay(section,annotationBounds,reserved);
  return output;
 }
 
