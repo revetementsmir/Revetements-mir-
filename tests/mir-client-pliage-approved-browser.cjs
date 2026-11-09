@@ -17,17 +17,14 @@ async function verifyFirstPaint(browser,base,{width,height,touch}){
  try{
   const page=await context.newPage();
   await page.goto(base+'/pliage.html');
-  let sawCatalogue,releaseCatalogue;
-  const started=new Promise(resolve=>{sawCatalogue=resolve;});
-  const gate=new Promise(resolve=>{releaseCatalogue=resolve;});
-  await page.route('**/catalogue-fd6866b49d21.json',async route=>{
-   sawCatalogue();await gate;await route.continue();
-  });
-  const opening=page.waitForURL(/production\.html.*kind=profile/,{waitUntil:'commit'});
-  await page.getByRole('link',{name:/Pliage personnalisé/})[touch?'tap':'click']();
-  await opening;
-  try{
-   await started;
+  async function hold(pattern){
+   let release;
+   const gate=new Promise(resolve=>{release=resolve;});
+   await page.route(pattern,async route=>{await gate;await route.continue();});
+   return {release,started:page.waitForRequest(pattern,{timeout:20000})};
+  }
+  async function assertWaiting(){
+   await page.locator('#client-entry-title').waitFor();
    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    assert.equal(await page.locator('#production-title').isVisible(),false,'aucune intro atelier pendant le chargement');
    assert.equal(await page.locator('.workshop-banner').isVisible(),false,'aucun bandeau atelier');
@@ -39,8 +36,20 @@ async function verifyFirstPaint(browser,base,{width,height,touch}){
    assert.equal(await page.locator('#client-draw-profile').isEnabled(),false,'attendre la disponibilité du configurateur');
    const choices=await page.locator('.client-entry-cards').boundingBox();
    assert.ok(choices.x>=0&&choices.x+choices.width<=width+1,'choix complets dans la largeur visible');
-   const heading=await page.locator('#client-entry-title').boundingBox();
-   releaseCatalogue();
+   return page.locator('#client-entry-title').boundingBox();
+  }
+  const app=await hold('**/production-app.js?*');
+  const catalogue=await hold('**/catalogue-fd6866b49d21.json');
+  try{
+   const opening=page.waitForURL(/production\.html.*kind=profile/,{waitUntil:'commit'});
+   await page.getByRole('link',{name:/Pliage personnalisé/})[touch?'tap':'click']();
+   await opening;
+   await app.started;
+   const heading=await assertWaiting();
+   app.release();
+   await catalogue.started;
+   assert.deepEqual(await assertWaiting(),heading,'l’en-tête ne déplace pas les choix');
+   catalogue.release();
    await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
    const readyHeading=await page.locator('#client-entry-title').boundingBox();
    assert.deepEqual(readyHeading,heading,'les choix restent au même endroit une fois actifs');
@@ -48,7 +57,7 @@ async function verifyFirstPaint(browser,base,{width,height,touch}){
    await page.locator('#client-draw-profile')[touch?'tap':'click']();
    assert.equal(await page.locator('#production-drawing').isVisible(),true,'le dessin libre démarre normalement');
    console.log('PASS démarrage sans écran atelier '+width+'×'+height+(touch?' tactile':' souris'));
-  }finally{releaseCatalogue();}
+  }finally{app.release();catalogue.release();}
  }finally{await context.close();}
 }
 (async()=>{const server=serve(root);server.listen(0,'127.0.0.1');await once(server,'listening');const base='http://127.0.0.1:'+server.address().port;
