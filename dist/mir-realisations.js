@@ -25,8 +25,8 @@
       if(!card.hidden)visible++;
       save.hidden=false;
       save.setAttribute('aria-pressed',String(selected));
-      save.setAttribute('aria-label','Garder '+names[id].title+' dans ma sélection');
-      save.textContent=selected?'Dans ma sélection ✓':'Garder dans ma sélection';
+      save.setAttribute('aria-label','Garder '+names[id].title+' dans mes inspirations');
+      save.textContent=selected?'Dans mes inspirations ✓':'Garder dans mes inspirations';
     }
     for(const button of filters.querySelectorAll('button')){
       button.setAttribute('aria-pressed',String(button.dataset.galleryFilter===filter));
@@ -59,14 +59,16 @@
   const position=dialog.querySelector('#mir-gallery-position');
   const close=dialog.querySelector('#mir-gallery-close');
   let opener=null;
+  function visibleIds(){return cards.filter(c=>!c.hidden).map(c=>Number(c.querySelector('[data-gallery-save]').dataset.gallerySave));}
+  function move(delta){const ids=visibleIds();if(ids.length)show(ids[(ids.indexOf(index)+delta+ids.length)%ids.length]);}
   function show(i){
-    index=(i+names.length)%names.length;
+    index=i;
     const data=names[index];
     title.textContent=data.title;
     img.src='assets/realisations/'+data.file;
     img.alt=data.alt;
     caption.textContent=data.caption;
-    position.textContent=(index+1)+' / '+names.length;
+    position.textContent=(visibleIds().indexOf(index)+1)+' / '+visibleIds().length;
   }
   document.querySelectorAll('[data-photo]').forEach(button=>{
     button.addEventListener('click',()=>{
@@ -75,13 +77,13 @@
       if(typeof dialog.showModal==='function')dialog.showModal();
     });
   });
-  dialog.querySelector('#mir-gallery-prev')?.addEventListener('click',()=>show(index-1));
-  dialog.querySelector('#mir-gallery-next')?.addEventListener('click',()=>show(index+1));
+  dialog.querySelector('#mir-gallery-prev')?.addEventListener('click',()=>move(-1));
+  dialog.querySelector('#mir-gallery-next')?.addEventListener('click',()=>move(1));
   close.addEventListener('click',()=>dialog.close());
   dialog.addEventListener('close',()=>opener?.focus());
   dialog.addEventListener('keydown',event=>{
-    if(event.key==='ArrowLeft'){event.preventDefault();show(index-1)}
-    else if(event.key==='ArrowRight'){event.preventDefault();show(index+1)}
+    if(event.key==='ArrowLeft'){event.preventDefault();move(-1)}
+    else if(event.key==='ArrowRight'){event.preventDefault();move(1)}
   });
   dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close()});
 })();

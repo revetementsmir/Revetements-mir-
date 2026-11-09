@@ -35,7 +35,7 @@
       const select=doc.createElement('a');
       select.href='selection.html';
       select.className='mir-mobile-selection';
-      select.textContent='Ma sélection';
+      select.textContent=/\/(?:index\.html)?$/.test(win.location.pathname)?'Ma sélection':'Mon panier';
       nav.append(select);
     }
     let mobile=false;

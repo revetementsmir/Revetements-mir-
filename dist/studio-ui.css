@@ -29,3 +29,6 @@
 .mir-corner-panel input[type=color]{min-height:48px;width:100%;border:1px solid #ccd8ca;border-radius:6px;padding:4px}
 .mir-corner-panel select,.mir-corner-panel input[type=number]{min-height:44px;width:100%}
 .mir-corner-toggle{display:flex;align-items:center;gap:8px;min-height:44px}
+
+@media(max-width:600px){body.mir-signature .studio-start{display:flex!important;align-items:stretch!important;margin-top:12px;gap:8px}body.mir-signature .studio-start button{min-height:44px}body.mir-signature .studio-intro{padding-block:14px!important}body.mir-signature .studio-start small{font-size:12px;line-height:1.4}}
+@media(max-width:800px){body.mir-signature:not(.embed-studio) .project-notes{display:grid}}
