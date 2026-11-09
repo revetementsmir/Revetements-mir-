@@ -76,9 +76,9 @@
       if(src)return {src, framing:'material'};
     }
     const candidates=products.flatMap(product=>images(product)).filter(image=>!/drawing|diagram/i.test(image.assetKind));
-    const installed=candidates.find(image=>presentation(image)==='installed');
+    const installed=candidates.find(image=>presentation(image)==='installed'&&!/family/i.test(image.assetKind));
     const sample=candidates.find(image=>presentation(image)==='sample'&&!/sphere/i.test(image.assetKind));
-    const image=installed||sample||candidates[0];
+    const image=installed||sample||candidates.find(image=>!/family/i.test(image.assetKind))||candidates[0];
     if(!image)return null;
     const sphere=/sphere|jdp-akta-portobello|jdp-bluhouss/i.test((image.assetKind||'')+' '+image.src);
     const framing=sphere?'sample-crop':installed||sample?'material':'packshot';
