@@ -1,0 +1,9 @@
+{
+  "project": "MIR TEST",
+  "observedAt": "2026-11-09T16:41:37.123Z",
+  "status": 503,
+  "ok": false,
+  "error": "RESEND_DOMAINS",
+  "message": "Resend refuse la gestion des domaines (HTTP 401). Vérifiez les droits dans Resend → Domains ; aucun DNS ni forfait n’a été modifié.",
+  "retryable": true
+}

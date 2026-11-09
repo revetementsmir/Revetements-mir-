@@ -6,7 +6,8 @@
 - **MIR TEST** (`hxtztkmbfpmzrieccwsg`) possède les migrations `mir_estimates_*`, le bucket privé `mir-estimates` et la fonction `mir-estimates`. Les fichiers de cette fonction sont dans `supabase/functions/`.
 - **MIR** (`gccltmaulvrnthrbnrpd`) n’a pas été migré ni activé : l’utilisateur conditionne la production à la recette de courriel réellement reçue.
 - L’organisation existante **Les Revêtements MIR est sur Free**. Aucun projet, branche facturée, abonnement ou hôte Node payant créé.
-- Les clés/permissions Resend ne sont pas disponibles. MIR a confirmé une boîte de recette dans la conversation ; elle reste à renseigner dans les secrets serveur, sans publier cette adresse personnelle dans le dépôt. Aucun domaine Resend ni enregistrement DNS inventé. **Aucun courriel externe envoyé ou reçu dans cette recette**.
+- Les quatre secrets Resend de MIR TEST sont maintenant configurés. **Un courriel fictif réel avec PDF a été accepté par Resend**, et le reçu durable est vérifié ; confirmation de réception dans la boîte encore attendue. La boîte personnelle de recette reste exclusivement dans les secrets serveur.
+- La lecture des domaines Resend est refusée **HTTP 401** avec cette clé. Aucun domaine ni DNS modifié, aucune valeur DNS inventée. La vérification de l’expéditeur MIR et du compte Free Resend reste à faire dans le Dashboard Resend.
 
 Le [rapport de recette](verification/estimation-edge-20261109/README.md) distingue API/Storage/Auth réels, transport Resend simulé, navigateur émulé et scénarios bloqués.
 
@@ -79,13 +80,21 @@ Quand un plafond est atteint, le service refuse proprement et conserve le brouil
 | `MIR_ESTIMATE_FROM` | Exemple de forme : `Les Revêtements MIR <estimation@envoi.revetementsmir.com>`, après vérification réelle du sous-domaine. |
 | `MIR_ESTIMATE_TO` | Boîte de test fournie et autorisée par MIR dans la conversation, à enregistrer ici uniquement. |
 | `MIR_ESTIMATE_MODE` | `test` sur MIR TEST. |
-| `MIR_ESTIMATE_ENABLED` | `true` après les réglages ci-dessus. |
+| `MIR_ESTIMATE_ENABLED` | Reste absent ou `false` pendant la recette privée ; `true` uniquement pour l’ouverture publique après validation. |
 
 `SUPABASE_URL`, les clés publiques/privées automatiques et les variantes modernes sont lus dans le runtime Supabase. Aucun service-role dans le navigateur. L’organisation vient du compte MIR existant, pas d’une revendication client.
 
-Dans le SQL Editor **MIR TEST**, après identification des vrais comptes : vérifier `mir_estimates.settings.organization_id`, ajouter uniquement le ou les UUID d’adjointe autorisés à `staff_user_ids` **sans remplacer les accès existants**, puis `enabled=true`. Le mode de diagnostic admin TEST a été refermé après les essais. Il ne sert qu’à vérifier le stockage sans fournisseur ; les scripts `mir-estimate-edge-real.cjs` et `mir-estimate-edge-boundaries.cjs` exigent son activation temporaire par un admin pour créer leurs données fictives, puis sa fermeture. Ils ne sont pas une recette de courriel réel.
+Dans le SQL Editor **MIR TEST**, après identification des vrais comptes : vérifier `mir_estimates.settings.organization_id`, ajouter uniquement le ou les UUID d’adjointe autorisés à `staff_user_ids` **sans remplacer les accès existants**, garder `enabled=false` jusqu’à validation. Le mode `diagnostics=true` permet à un admin TEST de préparer les données fictives, sans courriel par le POST normal. Les scripts `mir-estimate-edge-real.cjs` et `mir-estimate-edge-boundaries.cjs` utilisent ce diagnostic de stockage. Refermer `diagnostics=false` après les essais.
 
 Pour générer une migration : CLI Supabase. Pour déployer : entrée `supabase/functions/mir-estimates/index.ts` et ses deux dépendances `_shared/`, `verify_jwt=false` car l’entrée est publique ; les routes privées authentifient elles-mêmes chaque Bearer. Le déploiement ne rend pas le bucket public.
+
+## Recette privée Resend sans ouverture publique
+
+`POST .../test/submit` existe **uniquement dans MIR TEST**, pour un admin actif de la bonne organisation et pendant `settings.diagnostics=true`. Les quatre secrets d’envoi doivent être complets, avec mode `test`. Le corps contient la clé de reprise et `expectedRecipient`, qui doit correspondre au destinataire serveur : il ne permet jamais de le remplacer. Cette voie réutilise exactement la même transaction et le même appel Resend idempotent. Elle n’exige ni `settings.enabled=true` ni le secret ENABLED. Toutes les voies de recette sont refusées dans MIR production, même à un admin.
+
+Le script `tools/validation/mir-estimate-approved-mail.cjs --send-approved` exige `MIR_TEST_APPROVED_TO` dans le processus sécurisé, les identifiants QA existants et l’autorisation explicite de l’essai. Son PDF est `tests/fixtures/mir-estimation-fictive.pdf`. Son contexte de reprise reste dans `/tmp`, mode 0600, jamais dans Git. Aucun envoi automatique au chargement ou dans CI. **Un seul courriel a été accepté**, source panier, avec dossier PDF fictif joint ; une répétition a retrouvé le même reçu sans deuxième appel d’envoi. Voir `real-mail.json`.
+
+`GET/POST .../test/provider-domain` a les mêmes restrictions admin TEST et diagnostic. GET lit les domaines MIR ; POST prépare seulement `envoi.revetementsmir.com` si aucun domaine MIR vérifié n’existe déjà. La route ne touche ni DNS ni abonnement. La clé actuelle refuse la lecture HTTP 401 ; la route ne peut donc pas générer les valeurs exactes pour l’instant. Les deux garde-fous publics et le diagnostic sont refermés après chaque opération.
 
 ## Resend et DNS : reste à faire
 
@@ -94,11 +103,11 @@ Pour générer une migration : CLI Supabase. Pour déployer : entrée `supabase/
 3. Ne remplacer aucun MX, SPF ou DKIM de la boîte existante à la racine. Seules les entrées du sous-domaine d’envoi et ses sous-noms générées par Resend sont concernées.
 4. Vérifier le domaine dans Resend, créer une clé d’envoi et l’enregistrer dans les secrets Supabase ci-dessus.
 
-Le script `tools/validation/mir-resend-domain.mjs` peut lire/créer ce seul domaine et exporter ses vraies entrées publiques (`--create`, `--out=/tmp/mir-resend-dns.json`) si une clé de gestion des domaines est déjà disponible dans le processus sécurisé. Il ne touche ni DNS ni abonnement, n’envoie aucun courriel et n’imprime jamais la clé. **Il n’a pas été exécuté, faute d’accès Resend**. Il n’existe donc pas encore de valeurs DKIM/SPF/MX générées à livrer ; ne pas copier des exemples comme s’ils étaient réels.
+Le script `tools/validation/mir-resend-domain.mjs` peut lire/créer ce seul domaine et exporter ses vraies entrées publiques (`--create`, `--out=/tmp/mir-resend-dns.json`) si une clé de gestion des domaines est déjà disponible dans le processus sécurisé. Il ne touche ni DNS ni abonnement, n’envoie aucun courriel et n’imprime jamais la clé. **Ce script local n’a pas été exécuté**. La sonde serveur privée a réellement été appelée et reçoit HTTP 401 de Resend pour la gestion des domaines (`resend-domain.json`). Il n’existe donc pas encore de valeurs DKIM/SPF/MX générées à livrer ; ne pas copier des exemples comme s’ils étaient réels.
 
 ## Recette réelle puis production
 
-La boîte de test est confirmée. Restent obligatoires : configuration de cette boîte dans les secrets, expéditeur vérifié, quatre courriels effectivement reçus, PDF joints panier/pliage, accès du compte d’adjointe et refus des autres comptes, reprise après interruption/échec, version Studio immuable, trois tailles navigateur. Les simulations de courriel ne valident pas cette étape.
+La boîte et les secrets d’envoi TEST sont configurés. Un courriel fictif avec PDF a été accepté par Resend, réception humaine encore à confirmer. Restent obligatoires : expéditeur MIR vérifié, recette complète des quatre entrées avec courriels effectivement reçus, PDF joints panier/pliage, accès du compte d’adjointe et refus des autres comptes, reprise après interruption/échec, version Studio immuable, trois tailles navigateur. Les simulations de courriel ne valident pas cette étape.
 
 Après réussite seulement : appliquer les migrations dans **MIR**, déployer la même fonction, configurer [les secrets MIR](https://supabase.com/dashboard/project/gccltmaulvrnthrbnrpd/functions/secrets) avec `MIR_ESTIMATE_MODE=production`, `MIR_ESTIMATE_TO=estimation@revetementsmir.com`, les vrais UUID d’adjointe et le budget 400 Mio ; activer les deux garde-fous (`settings.enabled` + secret ENABLED). Enfin renseigner uniquement l’URL publique `https://gccltmaulvrnthrbnrpd.supabase.co/functions/v1/mir-estimates` pour la production dans `dist/mir-estimate-config.js`, sans clé/expéditeur/destinataire.
 
