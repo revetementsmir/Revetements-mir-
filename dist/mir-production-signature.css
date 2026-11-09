@@ -344,3 +344,8 @@ body[data-client-entry] .color-source-field>label{min-width:0;line-height:1.25}
 @media(max-width:600px) and (min-height:650px){
  body[data-client-entry="draw"] #production-drawing{height:clamp(280px,42dvh,440px)}
 }
+
+body[data-client-stage="5"] #panel-price{margin-top:8px;padding:10px 14px}
+body[data-client-stage="5"] #panel-price .price-eyebrow{margin-bottom:4px}
+body[data-client-stage="5"] #panel-price .price-main strong{font-size:22px}
+body[data-client-stage="5"] #panel-price small{margin-top:4px}

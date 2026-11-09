@@ -62,6 +62,8 @@ assert.doesNotMatch(sheet.svg,/Zoho|MISE EN PRODUCTION/i);
    await page.locator('#production-color-grid [data-production-color]:visible').first().click();
    await page.waitForFunction(()=>document.querySelector('#panel-price').textContent.includes('9,40'));
    assert.equal(await page.locator('#production-quantity').isVisible(),false);
+   assert.ok(await next.evaluate(button=>button.getBoundingClientRect().bottom<=innerHeight+1),
+    'le prix et le bouton restent ensemble au premier écran à '+width+' px');
    await next.click();
    const dossier=page.locator('#client-viewport-dossier');
    if(await dossier.isVisible())await dossier.click();
