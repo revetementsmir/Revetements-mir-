@@ -38,18 +38,25 @@ async function verifyNavigation(browser,base){
   await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('mir-signature')),true,'charte client '+width);
   assert.equal(await page.locator('header.production-header').evaluate(el=>el.classList.contains('mir-client-header')),true,'menu commun '+width);
-  const toggle=page.locator('header.production-header .mir-harmony-toggle'),menu=page.locator('#mir-harmony-menu');
-  assert.equal(await toggle.isVisible(),true,'menu commun disponible '+width);
-  assert.equal(await toggle.getAttribute('aria-expanded'),'false');assert.equal(await menu.isVisible(),false);
-  assert.ok(await page.locator('.mir-harmony-dossier').isVisible());
-  await toggle.click();assert.equal(await toggle.getAttribute('aria-expanded'),'true');
-  assert.ok(await menu.locator('.mir-production-client-actions .mir-home-estimate').isVisible(),'estimation accessible '+width);
-  assert.ok(await menu.locator('a[href="selection.html"]').isVisible(),'dossier complet accessible '+width);
+  const header=page.locator('header[data-mir-public-shell]');
+  const toggle=header.locator('.mir-client-menu-toggle'),menu=header.locator('nav.mir-client-links');
+  assert.equal(await toggle.isVisible(),width<=760,'menu compact disponible '+width);
+  if(width<=760){
+   assert.equal(await toggle.getAttribute('aria-expanded'),'false');
+   assert.equal(await menu.isVisible(),false);
+   await toggle.click();
+   assert.equal(await toggle.getAttribute('aria-expanded'),'true');
+   assert.ok(await menu.locator('a[href="selection.html"]').isVisible(),'dossier accessible '+width);
+  }else{
+   assert.ok(await header.locator('.mir-home-estimate').isVisible(),'estimation accessible '+width);
+  }
   assert.ok(await menu.locator('a[href="realisations.html"]').isVisible());
-  assert.equal(await menu.locator('[data-admin-only]:visible').count(),0,'aucun accès Admin public');
+  assert.equal(await header.locator('[data-admin-only]:visible').count(),0,'aucun accès Admin public');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
-  await page.keyboard.press('Escape');assert.equal(await menu.isVisible(),false);assert.equal(await toggle.evaluate(e=>e===document.activeElement),true);
-  await toggle.click();await page.mouse.click(3,846);assert.equal(await toggle.getAttribute('aria-expanded'),'false','clic extérieur');
+  if(width<=760){
+   await page.keyboard.press('Escape');assert.equal(await menu.isVisible(),false);assert.equal(await toggle.evaluate(e=>e===document.activeElement),true);
+   await toggle.click();await page.mouse.click(3,846);assert.equal(await toggle.getAttribute('aria-expanded'),'false','clic extérieur');
+  }
   if(width===390||width===1440||width===3440){
    await page.screenshot({path:path.join(artifacts,'mir-client-parcours-menu-'+width+'.png'),fullPage:false});
   }
@@ -104,7 +111,7 @@ async function verifyQuoteAndExports(browser,base,width){
  await next.click();
  assert.equal(await page.locator('[data-measure="length"]').inputValue(),'120');
  assert.equal(await page.locator('[data-measure="length"]').evaluate(el=>el.readOnly),true);
- await next.click();
+ assert.equal(await page.locator('body').getAttribute('data-client-stage'),'4');
  await page.locator('[data-client-face="right"]').click();
  await next.click();
  await page.locator('#material-type').selectOption('aluminium');
@@ -126,6 +133,7 @@ async function verifyQuoteAndExports(browser,base,width){
  assert.equal(item.spec.coloredFace.side,'right');
  assert.equal(await page.locator('[data-production-item]').count(),1,'une seule pièce créée');
  // Modifier une vraie quantité et les données du chantier dans l’interface client.
+ await page.locator('#client-viewport-dossier').click();
  await page.locator('[data-item-quantity]').fill('2');
  const info=page.locator('#order-metadata');
  if(!(await info.evaluate(el=>el.open)))await info.locator('summary').click();

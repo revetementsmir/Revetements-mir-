@@ -39,13 +39,14 @@ async function runAt(browser,base,width){
  await page.locator('[data-segment-length="0"]').fill('3 1/2');
  await page.locator('[data-segment-length="1"]').fill('2 1/4');
  await next.click();assert.equal(await page.locator('[data-measure="length"]').inputValue(),'120');
- await next.click();await page.locator('[data-client-face="left"]').click();await next.click();
+ assert.equal(await page.locator('body').getAttribute('data-client-stage'),'4');await page.locator('[data-client-face="left"]').click();await next.click();
  await page.locator('#material-type').selectOption('aluminium');
  await page.locator('#color-system').selectOption('special');
  await page.locator('#special-color-system').fill('Nuancier spécial Québec test');
  await page.locator('#special-color-code').fill('QC-TEST-NOIR-2026');
  await page.locator('#special-color-name').fill('Noir personnalisé');
  await next.click();
+ await page.locator('#client-viewport-dossier').click();
  const metadata=page.locator('#order-metadata');
  if(!(await metadata.evaluate(el=>el.open)))await metadata.locator('summary').click();
  await page.locator('#order-project').fill('Chalet de Québec');
