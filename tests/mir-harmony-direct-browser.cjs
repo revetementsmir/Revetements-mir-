@@ -15,7 +15,17 @@ const volume=await page.locator('#mir-panel-live-alt').innerHTML();
 await page.locator('#production-drawing [data-edit-panel-measure="width"]').click();await page.locator('#mir-panel-direct-value').fill('0');await page.locator('#mir-panel-direct-apply').click();assert.equal(await page.locator('#production-dialog').evaluate(e=>e.open),true);assert.equal(await page.locator('[data-measure="width"]').inputValue(),'50.5');await page.keyboard.press('Escape');
 await page.locator('#production-drawing g[data-edit-panel-edge="bottom"]').first().click();await page.locator('#mir-panel-direct-value').fill('2¼');await page.locator('#mir-panel-direct-apply').click();assert.equal(await page.locator('[data-panel-lip="bottom"]').inputValue(),'2.25');assert.notEqual(await page.locator('#mir-panel-live-alt').innerHTML(),volume);
 await page.locator('#production-drawing g[data-edit-panel-edge="top"]').first().click();await page.locator('#mir-panel-direct-no-lip').check();await page.locator('#mir-panel-direct-apply').click();assert.equal(await page.locator('[data-panel-lip="top"]').inputValue(),'0');assert.equal(await page.locator('[data-panel-lip="bottom"]').inputValue(),'2.25');
-const layout=await page.locator('#production-drawing svg').evaluate(svg=>{const rect=e=>e.getBoundingClientRect().toJSON(),poly=rect(svg.querySelector('polygon')),labels=[...svg.querySelectorAll('g[data-edit-panel-edge]')].map(rect),dims=[...svg.querySelectorAll('[data-edit-panel-measure]')].map(rect),overlap=(a,b)=>a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y;return {count:labels.length,dimensionCollision:dims.some(d=>overlap(d,poly)),collision:labels.some((a,i)=>overlap(a,poly)||dims.some(d=>overlap(a,d))||labels.slice(i+1).some(b=>overlap(a,b)))};});assert.equal(layout.count,4);assert.equal(layout.dimensionCollision,false,'cotes outside geometry');assert.equal(layout.collision,false,'labels outside contours and cotes');
+const layout=await page.locator('#production-drawing svg').evaluate(svg=>{
+ const rect=e=>e.getBoundingClientRect(),poly=rect(svg.querySelector('polygon'));
+ const labels=[...svg.querySelectorAll('.mir-panel-plan-measure text')].map(rect);
+ const frame=rect(svg);
+ const overlap=(a,b)=>a.x<b.right&&a.right>b.x&&a.y<b.bottom&&a.bottom>b.y;
+ return {edgeCount:svg.querySelectorAll('g[data-edit-panel-edge]').length,dimensionCollision:labels.some(d=>overlap(d,poly)),
+  clipped:labels.some(d=>d.left<frame.left||d.right>frame.right||d.top<frame.top||d.bottom>frame.bottom)};
+});
+assert.equal(layout.edgeCount,4,'One editor for each edge');
+assert.equal(layout.dimensionCollision,false,'Dimension labels stay outside the panel');
+assert.equal(layout.clipped,false,'Dimension labels fit in the drawing');
 await page.locator('#production-drawing').scrollIntoViewIfNeeded();await page.screenshot({path:'artifacts/harmony/after-panel-'+w+'x'+h+'.png'});
 assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no overflow '+w);
 await page.locator('.mir-harmony-toggle').click();assert.equal(await page.locator('#mir-harmony-menu [data-admin-only]:visible').count(),0);await page.keyboard.press('Escape');assert.equal(await page.locator('.mir-harmony-toggle').getAttribute('aria-expanded'),'false');assert.deepEqual(errors,[]);
