@@ -81,6 +81,7 @@
   function setPicking(active) {
     picking = active;
     point.setAttribute('aria-pressed', String(active));
+    point.textContent = active ? 'Annuler le pointage' : 'Pointer un élément';
     document.body.classList.toggle('mir-annotation-picking', active);
     reticle.hidden = lens.hidden = true;
     if (active) status.textContent = 'Vise avec la croix, puis clique. Échap annule la sélection.';

@@ -18,3 +18,8 @@
 .mir-annotations-compact{width:auto;padding:.4rem}
 .mir-annotations-compact > :not([data-collapse]){display:none}
 .mir-annotations-compact [data-collapse]{margin:0}
+
+/* Keep the target visible while the pointer is active. */
+.mir-annotation-picking .mir-annotations{top:auto;bottom:.75rem;width:auto;padding:.4rem}
+.mir-annotation-picking .mir-annotations > :not(button[aria-pressed="true"]){display:none}
+.mir-annotation-picking .mir-annotations > button[aria-pressed="true"]{margin:0}
