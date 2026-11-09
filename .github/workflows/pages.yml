@@ -527,6 +527,10 @@ jobs:
             cmp "/tmp/menu-$page.html" "_site_mir/$page.html"
             grep -Fq 'data-mir-public-shell' "/tmp/menu-$page.html"
           done
+          for photo in mir-shop-01.webp mir-shop-03.webp; do
+            fetch "$base/assets/$photo?verification=$GITHUB_SHA" "/tmp/$photo"
+            cmp "/tmp/$photo" "_site_mir/assets/$photo"
+          done
           echo "MIR public and workspace headers match deployed revision $GITHUB_SHA"
           echo "MIR Pages verified at $base/"
 
