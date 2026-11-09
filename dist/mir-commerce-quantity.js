@@ -8,10 +8,14 @@
  'use strict';
  const positive=n=>Number.isFinite(n)&&n>0,near=(a,b)=>Math.abs(a-b)<=1e-8;
  const number=n=>new Intl.NumberFormat('fr-CA',{maximumFractionDigits:6}).format(n);
- function policy(m={},formatId=null){
+ function formats(m,colorId=null){
+  const allowed=m.colors?.find(color=>color.id===colorId)?.formatIds;
+  return (m.formats||[]).filter(f=>f.id&&(positive(f.lengthIn)||positive(f.volumeMl))&&(!allowed||allowed.includes(f.id)));
+ }
+ function policy(m={},formatId=null,colorId=null){
   const d=m.dimensions||{},c=m.coverage||{},p=m.packaging||{},app=m.applications||[];
-  const declared=(m.formats||[]).filter(f=>f.id&&positive(f.lengthIn));
-  const format=declared.find(f=>f.id===formatId);
+  const declared=formats(m);
+  const format=formats(m,colorId).find(f=>f.id===formatId);
   const missingFormat=declared.length>0&&!format;
   let area=null;
   const covering=app.includes('siding')||app.includes('soffit')||app.includes('roofing');
@@ -39,6 +43,7 @@
   else if(/^rouleau/.test(unitText)||p.unit==='rouleau')unit='rouleaux';
   else if(/^kit/.test(unitText)||p.unit==='kit')unit='kits';
   else if(app.includes('sealant'))unit='cartouches';
+  if(format?.unit)unit=format.unit;
   const rules=[{unit,step:1}];
   if(unit==='pièces'&&positive(area))rules.unshift({unit:'pi²',step:area});
   // Variable-length products explicitly documented as sold by area have no fixed sheet increment.
@@ -47,11 +52,12 @@
   const packageLabel=(p.piecesPerPack||c.piecesPerPack)?'paquet':p.piecesPerCarton?'carton':'boîte';
   const explanation=packagingCount?number(packagingCount)+' éléments par '+packageLabel+'. '+(area?number(area)+' pi² utiles par pièce. ':'')+(m.unit||'Conditionnement MIR à confirmer.'):
    area?number(area)+' pi² par pièce complète (surface utile).':
-   'Quantités entières. '+(m.unit||'Conditionnement MIR à confirmer.')+'.';
+   'Quantités entières. '+(format?.label||m.unit||'Conditionnement MIR à confirmer.')+'.';
   return {rules,area,missingFormat,defaultUnit:rules[0].unit,note:missingFormat?'Choisissez le format avant de saisir la quantité.':explanation};
  }
  function validate(m,item){
-  const p=policy(m,item.formatId),q=Number(item.quantity),rule=p.rules.find(r=>r.unit===item.unit);
+  const p=policy(m,item.formatId,item.colorId),q=Number(item.quantity),rule=p.rules.find(r=>r.unit===item.unit);
+  if(m.requireColor&&!m.colors?.some(color=>color.id===item.colorId))return {ok:false,message:'Choisissez une couleur pour cet article.',suggestion:null,policy:p};
   if(p.missingFormat)return {ok:false,message:'Le format de cet article doit être choisi.',suggestion:null,policy:p};
   if(!rule)return {ok:false,message:'Unité incompatible avec le conditionnement. '+p.note,suggestion:null,policy:p};
   const count=q/rule.step;
@@ -62,5 +68,5 @@
   }
   return {ok:true,message:p.note,suggestion:null,policy:p};
  }
- return Object.freeze({policy,validate});
+ return Object.freeze({formats,policy,validate});
 });
