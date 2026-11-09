@@ -68,8 +68,16 @@ const sizes=[
           assert.equal(await nav.evaluate(el=>getComputedStyle(el).position),'absolute',label);
         }
         const links=await nav.locator('a:visible').evaluateAll(anchors=>anchors.map(a=>[a.getAttribute('href')==='selection.html'?'Mon panier':a.textContent.trim(),a.getAttribute('href')]));
-        if(!reference)reference=links;
-        else assert.deepEqual(links,reference,label+' mêmes liens que l’accueil');
+        const mobileEstimate = nav.locator('a.mir-mobile-estimate');
+        if (route === 'index') {
+          assert.equal(await mobileEstimate.isVisible(), small, label + ' accès mobile à Estimation');
+          assert.equal(await mobileEstimate.getAttribute('href'), 'estimation.html');
+        }
+        const commonLinks = route === 'index' && small
+          ? links.filter(([, href]) => href !== 'estimation.html')
+          : links;
+        if(!reference)reference=commonLinks;
+        else assert.deepEqual(commonLinks,reference,label+' mêmes liens communs que l’accueil');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),label+' débordement');
         if(small){
           await page.keyboard.press('Escape');

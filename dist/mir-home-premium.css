@@ -108,7 +108,7 @@ body.mir-home-premium{display:flex;flex-direction:column;min-height:100vh;min-he
 .mir-home-premium .mir-home-service-copy{padding:14px;gap:6px}
 .mir-home-premium .mir-home-service-copy strong{font-size:clamp(16px,1.4vw,23px)}
 .mir-home-premium .mir-home-service-copy>b{padding-top:3px}
-.mir-home-premium .mir-client-menu-toggle,.mir-home-premium .mir-mobile-selection{display:none}
+.mir-home-premium .mir-client-menu-toggle,.mir-home-premium .mir-mobile-selection,.mir-home-premium .mir-mobile-estimate{display:none}
 .mir-contact-page .mir-contact h1{font-size:clamp(38px,5vw,66px);line-height:1.08;margin-block:14px}
 
 @media(max-height:850px){
