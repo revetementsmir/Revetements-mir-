@@ -44,7 +44,7 @@ test('Le configurateur client dispose du menu commun, Admin garde le sien',()=>{
  assert.match(html,/mir-production-client-nav/);
  assert.match(html,/mir-production-client-account/);
  assert.match(html,/id="mode-link"/);
- assert.match(html,/new URLSearchParams\(location.search\)\.get\("mode"\)==="client"/);
+ assert.match(html.split('<body',1)[0],/if \(params\.get\('mode'\) !== 'client'\) return;/);
  assert.match(html,/data-admin-only>Atelier/);
  const css=read('mir-client-header.css');
  assert.match(css,/html\.mir-production-client \.production-header nav\[aria-label="Navigation du site"\]\{display:none!important\}/);
