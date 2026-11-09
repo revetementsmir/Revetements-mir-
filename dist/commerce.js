@@ -366,6 +366,40 @@
   }
   document.addEventListener('click',event=>{const b=event.target.closest('[data-card-color]');if(!b)return;const m=materials.find(m=>m.id===b.dataset.material),c=m?.colors?.find(c=>c.id===b.dataset.cardColor),card=b.closest('[data-shop-card]');if(!m||!c||!card)return;card.querySelectorAll('[data-card-color]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderVisual(card.querySelector('.card-preview'),m,c);card.querySelector('.card-photo-label').textContent='Couleur choisie';card.querySelector('.card-color-name').textContent=c.name;card.querySelectorAll('[data-card-link]').forEach(a=>a.href=productHref(m.id,c.id));});
   document.addEventListener('error',event=>{const img=event.target;if(img.tagName!=='IMG'||img.hasAttribute('data-catalogue-image')||!img.closest('.shop-card-photo,.category-photo,.product-main-photo,.selection-item-photo'))return;const holder=img.closest('.card-preview,.category-photo,.product-main-photo,.selection-item-photo');if(holder)holder.innerHTML=placeholder();},true);
+  function applyBoutiqueReview(){
+    const nails=materials.find(m=>m.id==='prime-siding-2-30724');
+    if(nails){
+      nails.name='Clous à revêtement 2 po, galvanisé à chaud (hdg)';
+      nails.brand='Fixations';
+    }
+    for(const id of ['lighttrim-vfcltek8114','lighttrim-vfcls8114','lighttrim-vfctek834']){
+      const screw=materials.find(m=>m.id===id);
+      if(!screw)continue;
+      screw.finish ||= screw.colors?.[0]?.name;
+      screw.colors=[];
+      screw.colorStatus='not_applicable';
+    }
+    const hardieKit=materials.find(m=>m.id==='hardie-colorplus-touch-up-kit');
+    const hardieColor=colors(materials.find(m=>m.id==='hardieplank-select-825')||{}).find(c=>c.id==='hardie-etain-vieilli');
+    if(hardieKit&&hardieColor){
+      const source='https://www.jameshardie.com/product-catalog/accessories-siding-products/hardie-colorplus-touch-up-kits/touch-up-kit/';
+      hardieKit.documents=[...hardieKit.documents,{kind:'technical',title:'James Hardie — kit de retouche ColorPlus',url:source,verified:true}];
+      hardieKit.colors=[{...hardieColor,name:'Étain vieilli (Aged Pewter)',
+        availabilityNote:'Teinte de référence. Disponibilité du kit dans cette teinte à confirmer avec MIR.'}];
+    }
+    const canexelPaint=materials.find(m=>m.id==='canexel-touch-up-284ml');
+    if(canexelPaint){
+      const source='https://boutique.aluminiumbbouchard.ca/produit/peinture-de-retouche-pour-le-canexel-284ml/';
+      const guide=colors(materials.find(m=>m.id==='canexel-vstyle')||{});
+      const names=['Acadia','Barista','Blanc','Bleu minuit','Bois de grange','Bois de Santal','Falaise','Granit','Gris brume','Loup gris','Moka foncé','Noir','Renard roux','Rouge campagne','Sable','Scandinave','Sierra','Yellowstone'];
+      canexelPaint.documents=[...canexelPaint.documents,{kind:'technical',title:'Aluminium B. Bouchard — couleurs et format 284 ml',url:source,verified:true}];
+      canexelPaint.colors=names.map(name=>{
+        const reference=guide.find(c=>norm(c.name)===norm(name));
+        return {...reference,id:reference?.id||'canexel-'+norm(name).replaceAll(' ','-'),name,
+          sourceUrl:source,availabilityNote:'Teinte répertoriée par le détaillant. Disponibilité MIR à confirmer.'};
+      });
+    }
+  }
   async function init(){updateCount();const [response,visibility,adseal]=await Promise.all([fetch('./catalogue-fd6866b49d21.json'),fetch('./boutique-visibilite.json',{cache:'no-cache'}),fetch('./catalogue-adseal-4580.json').then(r=>r.ok?r.json():null).catch(()=>null)]);if(!visibility.ok)throw new Error('La disponibilité des articles ne peut pas être vérifiée. Réessayez dans un instant.');const {hidden}=await visibility.json();if(!Array.isArray(hidden))throw new Error('La disponibilité des articles est invalide.');hiddenProducts=new Set(hidden);if(!response.ok)throw new Error('Le catalogue ne peut pas être chargé. Réessayez dans un instant.');materials=(await response.json()).materials||[];
   const sealant=materials.find(m=>m.id===adseal?.id);
   if(sealant){
@@ -374,7 +408,7 @@
       color.availabilityNote=color.formatIds?'Format répertorié par Adfast. Stock et minimums à confirmer avec MIR.':'Teinte du nuancier sur demande. Le format reste à confirmer.';
     }
     Object.assign(sealant,adseal);
-  }const view=document.body.dataset.commerceView;if(view==='shop')showShop();if(view==='product')showProduct();if(view==='selection')showSelection();}
+  }applyBoutiqueReview();const view=document.body.dataset.commerceView;if(view==='shop')showShop();if(view==='product')showProduct();if(view==='selection')showSelection();}
   window.addEventListener('storage',e=>{if(e.key===KEY){try{const s=JSON.parse(e.newValue);if(s&&Array.isArray(s.items)){list=s;updateCount();if(document.body.dataset.commerceView==='selection')showSelection();}}catch{}}});
   init().catch(e=>{const target=$('#shop-grid')||$('#product-detail')||$('#selection-items');if(target)target.innerHTML=`<p class="shop-empty">${esc(e.message)}</p>`;});
 })();
