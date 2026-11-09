@@ -1,0 +1,32 @@
+[
+  {
+    "stage": "before",
+    "images": [
+      {
+        "name": "mir-01.jpg",
+        "bytes": 2812655,
+        "duration": 0
+      },
+      {
+        "name": "mir-03.jpg",
+        "bytes": 1417463,
+        "duration": 0
+      }
+    ]
+  },
+  {
+    "stage": "after",
+    "images": [
+      {
+        "name": "mir-shop-01.webp",
+        "bytes": 231390,
+        "duration": 0
+      },
+      {
+        "name": "mir-shop-03.webp",
+        "bytes": 128656,
+        "duration": 0
+      }
+    ]
+  }
+]

@@ -12,7 +12,7 @@ return Object.freeze({remember,pending,consume,cartCount,TARGET});
 'use strict';if(typeof document==='undefined'||document.body?.dataset.commerceView!=='selection')return;
 const Flow=window.MIRAccountFlow,config=window.MIRPortalConfig||{},environment=config.environment||'production';
 const section=document.createElement('section');section.className='mir-account-checkout';section.setAttribute('aria-labelledby','mir-checkout-title');
-section.innerHTML='<h2 id="mir-checkout-title">Préparer ma commande</h2><p>Vous pouvez remplir votre panier sans compte. Connectez-vous au moment de préparer la suite.</p><button type="button" id="mir-checkout-start">Passer à ma commande</button><p id="mir-checkout-status" role="status"></p><div id="mir-checkout-review" hidden></div>';
+section.innerHTML='<h2 id="mir-checkout-title">Vérifier mon panier</h2><p>Vous pouvez remplir votre panier sans compte. Connectez-vous au moment de préparer la suite.</p><button type="button" id="mir-checkout-start">Vérifier mon panier</button><p id="mir-checkout-status" role="status"></p><div id="mir-checkout-review" hidden></div>';
 document.querySelector('.selection-page')?.append(section);
 function sync(){document.querySelector('#mir-checkout-start').disabled=!Flow.cartCount(localStorage);}
 sync();const count=document.querySelector('[data-list-count]');if(count)new MutationObserver(sync).observe(count,{subtree:true,childList:true,characterData:true});addEventListener('storage',sync);

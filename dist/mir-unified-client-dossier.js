@@ -47,7 +47,7 @@
   const materials=allMaterials.filter((item,i)=>{
    if(allowed&&!allowed.has(i))return false;
    if(!item||typeof item.materialId!=='string'||!item.materialId||!Number.isFinite(item.quantity)||item.quantity<=0||item.quantity>1000000){
-    errors.push('Une ligne de matériaux est invalide. Corrigez-la dans Ma sélection.');return false;
+    errors.push('Une ligne de matériaux est invalide. Corrigez-la dans Mon panier.');return false;
    }
    return true;
   });

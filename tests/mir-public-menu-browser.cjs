@@ -73,9 +73,9 @@ const sizes=[
           assert.equal(await mobileEstimate.isVisible(), small, label + ' accès mobile à Estimation');
           assert.equal(await mobileEstimate.getAttribute('href'), 'estimation.html');
         }
-        const commonLinks = route === 'index' && small
-          ? links.filter(([, href]) => href !== 'estimation.html')
-          : links;
+        const commonLinks = links.filter(([, href]) => !['estimation.html','selection.html'].includes(href));
+        if(route!=='index')assert.ok(await nav.locator('a[href="selection.html"]:visible').count(),label+' Mon panier accessible');
+        if(small)assert.ok(await nav.locator('a[href="estimation.html"]:visible').count(),label+' estimation mobile accessible');
         if(!reference)reference=commonLinks;
         else assert.deepEqual(commonLinks,reference,label+' mêmes liens communs que l’accueil');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),label+' débordement');

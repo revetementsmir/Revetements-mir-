@@ -175,6 +175,7 @@ jobs:
           node tests/mir-finishing-editor-browser.cjs
           node tests/mir-shared-startup-browser.cjs
           node tests/mir-estimate-browser.cjs
+          node tests/mir-client-followup-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
         uses: actions/upload-artifact@v4
@@ -532,11 +533,16 @@ jobs:
       - name: Vérifier les parcours estimation sur GitHub Pages
         env:
           MIR_PUBLISHED_BASE: ${{ steps.deployment.outputs.page_url }}
-        run: node tests/mir-estimate-published-browser.cjs
+          MIR_FOLLOWUP_BASE: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          node tests/mir-estimate-published-browser.cjs
+          node tests/mir-client-followup-browser.cjs
       - name: Preuves de recette estimation publiée
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: mir-estimation-publiee
-          path: artifacts/estimation-published
+          path: |
+            artifacts/estimation-published
+            artifacts/client-followup/functional
           if-no-files-found: ignore

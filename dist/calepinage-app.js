@@ -779,7 +779,7 @@
   }
   async function boot() {
     if(!M||!E||!O)throw new Error('Un outil de calcul n’a pas chargé. Rechargez la page.');
-    try{const saved=await dbRequest('drafts','readonly','workspace');if(saved?.schema==='mir-panel-layout-workspace-1'&&Array.isArray(saved.zones)&&saved.zones.length&&saved.zones.length<=30&&saved.zones.every(z=>z&&z.id&&z.values&&z.rules&&z.meta))workspace=saved;}
+    try{const saved=await dbRequest('drafts','readonly','workspace');if(saved?.schema==='mir-panel-layout-workspace-1'&&Array.isArray(saved.zones)&&saved.zones.length&&saved.zones.length<=30&&saved.zones.every(z=>z&&z.id&&z.values&&z.rules&&z.meta)){workspace=saved;$('#save-state').textContent='Projet repris · enregistré sur cet appareil';}}
     catch{$('#save-state').textContent='Sauvegarde indisponible · exportez le JSON';}
     if(!workspace.zones.length){const z=blankZone(1);workspace.zones.push(z);workspace.activeId=z.id;}
     if(!workspace.zones.some(z=>z.id===workspace.activeId))workspace.activeId=workspace.zones[0].id;

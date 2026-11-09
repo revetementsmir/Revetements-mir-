@@ -35,9 +35,10 @@
       const select=doc.createElement('a');
       select.href='selection.html';
       select.className='mir-mobile-selection';
-      select.textContent=/\/(?:index\.html)?$/.test(win.location.pathname)?'Ma sélection':'Mon panier';
+      select.textContent='Mon panier';
       nav.append(select);
     }
+    if(!nav.querySelector('a[href="estimation.html"]')){const estimate=doc.createElement('a');estimate.href='estimation.html';estimate.className='mir-menu-estimate';estimate.textContent='Demander une estimation';nav.append(estimate);}
     let mobile=false;
     function close(restoreFocus=false){
       nav.hidden=true;

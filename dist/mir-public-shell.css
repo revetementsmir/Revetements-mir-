@@ -61,3 +61,8 @@ body header.mir-home-header.mir-client-header[data-mir-public-shell] .mir-mobile
 }
 
 html.mir-production-client header.mir-home-header.mir-client-header[data-mir-public-shell]>#mode-link{display:none!important}
+
+/* Keep both client actions in the navigation around the tablet breakpoint. */
+body header[data-mir-public-shell] nav .mir-mobile-selection{display:inline-flex!important}
+body header[data-mir-public-shell] nav .mir-menu-estimate{display:none!important}
+@media(max-width:760px){body header[data-mir-public-shell] nav .mir-menu-estimate{display:flex!important}}

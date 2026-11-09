@@ -53,7 +53,7 @@ function applyStoreColorLock(){
 }
 const profiles={l:{name:'Pliage en L',dimensions:{A:3,B:2}},j:{name:'Pliage en J',dimensions:{A:1,B:3,C:1}},z:{name:'Pliage en Z',dimensions:{A:2,B:4,C:2}},beam5:{name:'Cache-poutre · 5 côtés',dimensions:{A:1,B:6,C:8,D:6,E:1}},omega:{name:'Oméga',dimensions:{A:1,B:2,C:4,D:2,E:1}},custom:{name:'Profil personnalisé',segments:[{label:'A',length:4},{label:'B',length:3},{label:'C',length:2}],bends:[{mode:'interior',angle:90,direction:'left'},{mode:'interior',angle:90,direction:'right'}],startAngle:0},...window.MIRBendingPresets?.catalog(),j_soffite:{name:'J à soffite · 12 pi',template:'j',mirProfileId:'j_soffite',dimensions:{A:1,B:3,C:1}}};
 const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','Triangle rectangle'],['triangle','Triangle à sommet'],['roof-slope','Panneau haut rampant X/12'],['trapezoid','Trapèze'],['parallelogram','Parallélogramme'],['pointed','Côté en pointe']];
-function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));return true;}catch{toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
+function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));if(client&&catalogueChannel!=='store'&&[KEYS.draft,'mir_client_active_profile_v1'].includes(key)){const label=document.querySelector('.workshop-banner span:last-child');if(label)label.textContent=(key===KEYS.draft?'Dossier':'Tracé')+' enregistré sur cet appareil';}return true;}catch{toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
 function persist(){store(KEYS.draft,{version:1,order});}
 function toast(text,{quiet=false}={}){$('#production-toast').textContent=text;$('#production-toast').classList.toggle('visible',!quiet);clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#production-toast').classList.remove('visible'),4400);}
 function closeDialog(){pendingPOAfterSave=null;$('#production-dialog').close();}
@@ -185,6 +185,7 @@ function renderDimensions(){
   }if(draft.shape==='right-triangle')body+=`<label class="shape-field">Angle droit<select data-spec-select="rightAngle"${editingItemId||client&&selectedTemplate&&!selectedTemplate.id.startsWith('mir-standard-')?' disabled':''}>${[['bottom-left','En bas à gauche'],['bottom-right','En bas à droite'],['top-left','En haut à gauche'],['top-right','En haut à droite']].map(([id,name])=>`<option value="${id}"${(draft.mirrorX?({'bottom-left':'bottom-right','bottom-right':'bottom-left','top-left':'top-right','top-right':'top-left'}[draft.rightAngle]):draft.rightAngle)===id?' selected':''}>${name}</option>`).join('')}</select></label><div class="panel-mirror-row"><button type="button" class="secondary-button" id="mirror-panel" aria-pressed="${draft.mirrorX===true}">↔ Miroir gauche / droite</button><span>${draft.mirrorX?'Vue inversée':'Vue d’origine'}</span></div>`;if(draft.shape==='trapezoid')body+=`<div class="dimension-fields">${measureField('topWidth','Largeur du haut',draft.topWidth,'D')}${measureField('topOffset','Décalage du haut à gauche',draft.topOffset,'E')}</div>`;if(draft.shape==='parallelogram')body+=`<div class="dimension-fields">${measureField('offset','Décalage du haut (+ droite / − gauche)',draft.offset,'D','full-field')}</div><p class="field-hint">A est la largeur hors tout. Le décalage reste distinct de la longueur de base.</p>`;if(draft.shape==='pointed')body+=`<label class="shape-field">Côté terminé en pointe<select data-spec-select="pointSide"${editingItemId||client&&selectedTemplate&&!selectedTemplate.id.startsWith('mir-standard-')?' disabled':''}>${[['top','Haut'],['right','Droite'],['bottom','Bas'],['left','Gauche']].map(([id,name])=>`<option value="${id}"${draft.pointSide===id?' selected':''}>${name}</option>`).join('')}</select></label><div class="dimension-fields">${measureField('tipDepth','Profondeur de la pointe',draft.tipDepth,'D')}${measureField('apexOffset','Position du sommet sur ce côté',draft.apexOffset,'E')}</div>`;
  }
  if(clientProfileWizard()&&draft.template==='custom')body+='<button type="button" data-end-hem>Ajouter un double pli (retour écrasé)</button><button type="button" data-add-double>Ajouter deux angles consécutifs</button>';
+ if(kind==='panel'&&!authoring)body+='<button type="button" class="secondary-button" id="panel-flat">Pièce plate · projection C = 0</button>';
  if(kind==='profile'&&(draft.template==='custom'||clientProfileWizard()))body+='<section id="mir-angle-summary" class="mir-angle-summary" aria-label="Angles des jonctions A-B, B-C et suivantes"></section>';
  $('#production-dimensions').innerHTML=body;
  $('#client-step-length').innerHTML=clientProfileWizard()
@@ -283,7 +284,7 @@ function renderPanelOptions(){
  $('#production-panel-options').innerHTML=`<div class="config-section mir-panel-lips"><div class="section-heading compact"><div>
   <span class="step-dot">↳</span><h2>Lips et face visible</h2></div></div>
   <p class="field-hint">Les cotes A/B sont HORS TOUT de fabrication. Les lèvres restent à l'intérieur du hors tout; elles ne sont jamais ajoutées deux fois.</p>
-  <label>Lip commun à tous les côtés<input id="panel-lip" inputmode="decimal" value="${esc(draft.lip??'')}" placeholder="0 = sans lip"></label>
+  <button type="button" class="secondary-button" id="panel-no-folds">Sans repli · tous les lips à 0</button><label>Lip commun à tous les côtés<input id="panel-lip" inputmode="decimal" value="${esc(draft.lip??'')}" placeholder="0 = sans lip"></label>
   <details class="options-details mir-panel-edge-options" open><summary>Lip de chaque côté, y compris sans lip (0)</summary>
   <div class="mir-lip-sides">${perEdge||'<p class="field-hint">Fermez d’abord le dessin pour identifier les côtés.</p>'}</div></details>
   <div id="mir-panel-net-summary" class="mir-panel-net-summary" role="status" aria-live="polite">Entrez vos cotes pour voir la face nette, sans les lips.</div>
@@ -969,6 +970,21 @@ function updateDrawing({keepForm=false}={}){
 }
 function renderPieceGuidance(model,blockJ){
  const box=$('#piece-guidance');
+ if(kind==='panel'&&!authoring){
+  box.hidden=false;
+  const mesh=window.MIRProductionVolume?.buildMesh(model);
+  const issue=model.validation.errors?.[0]||mesh?.errors?.[0]||model.validation.pending?.[0];
+  const field=issue?.path||issue?.field||'';
+  const key=field.replace(/^dimensions\./,'');
+  let target=['width','height','relief','apexX','topWidth','topOffset','offset','tipDepth','apexOffset'].includes(key)?'[data-measure="'+key+'"]':field==='lip'?'#panel-lip':field.startsWith('lips.')?'[data-panel-lip="'+field.slice(5)+'"]':({'quantity':'#production-quantity','material.type':'#material-type','material.thickness':'#material-thickness','finish':'#color-system','finish.code':'#color-system','finish.system':'#color-system'}[field]);
+  if(issue?.code==='LIP_REQUIRED'&&issue.edgeId)target='[data-panel-lip="'+issue.edgeId+'"]';
+  if(issue?.code==='PROJECTION_REQUIRED')target='[data-measure="relief"]';
+  const message=issue?.message||'Les cotes permettent l’ajout. Les précisions de fabrication seront validées par MIR.';
+  const html='<strong>'+(issue?'À compléter : ':'Prêt à ajouter : ')+'</strong>'+esc(message)+(target&&$(target)?' <button type="button" data-piece-focus="'+esc(target)+'">Aller au champ</button>':'');
+  if(box.dataset.guidance!==html){box.innerHTML=html;box.dataset.guidance=html;}
+  return;
+ }
+
  box.hidden=client||kind!=='profile'||authoring;
  if(box.hidden)return;
  const blocking=model.validation.errors||[];
@@ -1294,7 +1310,7 @@ function addPiece(){
  }
  const model=build();
  if(!model.valid||kind==='panel'&&!window.MIRProductionVolume.buildMesh(model).valid)
-   return toast('Complétez les cotes et les lips avant d’ajouter la pièce.');
+   return toast(model.validation.errors?.[0]?.message||window.MIRProductionVolume.buildMesh(model).errors?.[0]?.message||'Vérifiez les dimensions de la pièce.');
  const jRule=window.MIRBendingPresets?.checkJ(draft);
  if(jRule&&!jRule.valid)return toast(jRule.message||'Complétez le coin J.');
  if(jRule&&!jRule.ok&&!window.MIRBendingPresets.exceptionMatches(jRule,jException))
@@ -2281,6 +2297,11 @@ function applyPanelDirect(){
  panelDirectUndo.push(copy(draft));panelDirectRedo=[];draft=next;panelDirectEdit=null;closeDialog();renderDimensions();renderPanelOptions();updateDrawing();toast('Cote appliquée au dessin. Enregistrez la pièce pour mettre à jour le dossier.',{quiet:true});
 }
 function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'))return toggleProfilePaintedFace();const button=event.target.closest('button,[data-select-bottom],[data-edit-panel-measure],[data-edit-panel-edge],[data-edit-profile-measure]');if(!button)return;const d=button.dataset;
+ if(kind==='panel'&&(button.id==='panel-flat'||button.id==='panel-no-folds')){
+  if(button.id==='panel-flat'){const input=$('[data-measure="relief"]');if(input?.readOnly)return;draft.relief='0';}
+  else{if($('#panel-lip')?.readOnly)return;draft.lip='0';draft.lips=Object.fromEntries(Object.keys(draft.lips||{}).map(id=>[id,'0']));}
+  renderDimensions();renderPanelOptions();updateDrawing();return;
+ }
  if(button.id==='mir-profile-direct-apply')return applyProfileDirect();
  if(d.editPanelMeasure)return openPanelMeasure(d.editPanelMeasure);
  if(d.editPanelEdge)return openPanelEdge(d.editPanelEdge);

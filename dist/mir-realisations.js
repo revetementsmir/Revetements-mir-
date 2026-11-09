@@ -68,7 +68,7 @@
     img.src='assets/realisations/'+data.file;
     img.alt=data.alt;
     caption.textContent=data.caption;
-    position.textContent=(visibleIds().indexOf(index)+1)+' / '+visibleIds().length;
+    const ids=visibleIds();position.textContent=(ids.indexOf(index)+1)+' sur '+ids.length;for(const arrow of dialog.querySelectorAll('#mir-gallery-prev,#mir-gallery-next')){arrow.hidden=ids.length<2;arrow.disabled=ids.length<2;}
   }
   document.querySelectorAll('[data-photo]').forEach(button=>{
     button.addEventListener('click',()=>{

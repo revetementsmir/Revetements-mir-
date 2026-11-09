@@ -27,7 +27,7 @@
   <a class="skip" href="#main">Aller au calculateur</a>
   <header class="site-header"><a class="brand" href="index.html" aria-label="Les Revêtements MIR, accueil"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="364" height="91"></a><nav aria-label="Navigation atelier"><a href="metres.html">Métrés</a><a href="production.html">Pliage & production ↗</a><a href="plan.html">Studio</a></nav><span class="local-label"><i></i> Atelier · sur cet appareil</span></header>
   <main id="main">
-    <section class="intro"><div><p class="eyebrow">L’ATELIER MIR / PANNEAUX ARCHITECTURAUX</p><h1>Dessine ton mur.<br><em>MIR calcule tes panneaux.</em></h1></div><div class="intro-side"><p>Dessine la forme du mur, écris ses vraies dimensions, puis indique combien de panneaux tu veux. MIR calcule les 10 pièces et te guide jusqu’au bon de commande.</p><button id="load-gable-example" class="text-button">Essayer un mur en pointe <span>↗</span></button><button id="load-example" class="text-button">Exemple rectangulaire 108½ × 83¾ po <span>↗</span></button></div></section>
+    <section class="intro"><div><p class="eyebrow">L’ATELIER MIR / PANNEAUX ARCHITECTURAUX</p><h1>Dessine ton mur.<br><em>MIR calcule tes panneaux.</em></h1></div><div class="intro-side"><p>Dessine la forme du mur, écris ses vraies dimensions, puis indique combien de panneaux tu veux. MIR calcule les pièces et te guide jusqu’au bon de commande.</p><button id="load-gable-example" class="text-button">Essayer un mur en pointe <span>↗</span></button><button id="load-example" class="text-button">Exemple rectangulaire 108½ × 83¾ po <span>↗</span></button></div></section>
     <nav class="mir-panel-journey" aria-label="Parcours facile du mur au bon de commande">
       <a href="#mur-setup"><strong>1</strong><span><b>Dessiner le mur</b><small>Forme, largeur, hauteur</small></span></a>
       <a href="#panneaux-setup"><strong>2</strong><span><b>Répartir les panneaux</b><small>Par exemple 5 × 2 = 10</small></span></a>
@@ -79,7 +79,7 @@
         <label class="check"><input type="checkbox" id="dimensions-confirmed"><span>Cotes et jeux de pose vérifiés</span></label>
         <div id="panneaux-setup" class="card-title section-title"><span class="step">02</span><h2>Combien de panneaux?</h2></div>
         <div class="fields two"><label>Panneaux de large<input id="columns" type="number" min="1" max="16" value="4"></label><label>Panneaux de haut<input id="rows" type="number" min="1" max="16" value="2"></label></div>
-        <p class="hint mir-panel-count-hint">MIR répartit automatiquement les panneaux selon la largeur, la hauteur, la forme du mur et le recouvrement. Clique un panneau pour régler ses cotes exactes.</p><label>Lip · recouvrement entre panneaux (po)<input id="lip" inputmode="decimal" placeholder="À renseigner"></label><p class="hint">Inclus dans le hors tout. Un recouvrement par joint.</p>
+        <p class="hint mir-panel-count-hint">MIR répartit automatiquement les panneaux selon la largeur, la hauteur, la forme du mur et le recouvrement. Clique un panneau pour régler ses cotes exactes.</p><label>Recouvrement entre panneaux (po)<input id="lip" inputmode="decimal" placeholder="À renseigner"></label><p class="hint">Saisissez la largeur recouverte à chaque joint, en pouces. Entrez 0 pour une pose bord à bord, sans recouvrement. Le calcul du mur utilise ses dimensions seules, sans plan PDF obligatoire.</p>
         <label>Répartition<select id="distribution"><option value="equal">Panneaux hors tout égaux</option><option value="axes">Axes de joints espacés également</option></select></label><p id="distribution-note" class="hint"></p>
         <label>Précision de fabrication<select id="precision"><option value="0">Conserver les valeurs exactes</option><option value="0.0625">Répartir au 1/16 po</option></select></label>
         <button id="redistribute" class="primary full">Calculer mes panneaux <span>→</span></button>
@@ -115,7 +115,7 @@
       <div class="export-bar"><div><button id="export-site" class="secondary" disabled>PDF chantier ↓</button><button id="export-json" class="quiet">Sauvegarder le dossier JSON ↓</button></div><button id="send-production" class="primary" disabled>Créer mon bon de commande <span>↗</span></button></div><p id="mir-panel-po-status" class="mir-panel-po-status" role="status" aria-live="polite">Définis le mur, puis MIR prépare la liste des pièces.</p><p id="export-status" class="hint" role="status"></p><p class="local-footnote">Plans et calculs conservés dans ce navigateur. La préparation ne transmet aucune commande à Zoho Books. Les détails de jonction et de pliage restent à valider pour la fabrication.</p>
     </section>
   </main>
-  <footer><a href="metres.html">← Métrés & matériaux</a><span>MIR · L’ATELIER DU DÉTAIL</span><a href="production.html">Dossier de production ↗</a></footer>
+  <footer><a href="selection.html#mir-unified-dossier">← Mon dossier</a><a href="production.html?mode=client">Panneaux</a><a href="plan.html">Studio 3D ↗</a></footer>
   <div id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
