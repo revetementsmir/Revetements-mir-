@@ -1,4 +1,5 @@
 'use strict';
+const presentation=require('../dist/mir-estimate-presentation.js');
 /* Resend is an optional configured transport, never a browser dependency.
  * Its idempotency retention is 24 hours; the service stops automatic retries
  * at 23 hours instead of assuming an unbounded guarantee. */
@@ -7,7 +8,7 @@ function createResendProvider({apiKey,endpoint='https://api.resend.com/emails',f
  if(url.protocol!=='https:'&&!(allowTestEndpoint&&url.protocol==='http:'&&['127.0.0.1','localhost','[::1]'].includes(url.hostname)))throw Error('HTTPS requis pour le prestataire courriel');
  if(!apiKey)throw Error('RESEND_API_KEY requis');
  return {supportsIdempotency:true,async send(message){
-  const response=await fetchImpl(url,{method:'POST',headers:{authorization:'Bearer '+apiKey,'content-type':'application/json','idempotency-key':message.idempotencyKey},body:JSON.stringify({from:message.from,to:[message.to],subject:message.subject,text:message.text,attachments:message.attachments.map(a=>({filename:a.filename,content:Buffer.from(a.content).toString('base64'),content_type:a.contentType}))}),signal:AbortSignal.timeout(20000)});
+  const response=await fetchImpl(url,{method:'POST',headers:{authorization:'Bearer '+apiKey,'content-type':'application/json','idempotency-key':message.idempotencyKey},body:JSON.stringify({from:message.from,to:[message.to],subject:message.subject,text:message.text,html:message.html,attachments:[...message.attachments.map(a=>({filename:a.filename,content:Buffer.from(a.content).toString('base64'),content_type:a.contentType})),...(message.html?.includes('cid:mir-logo')?[{filename:'MIR-logo.png',content:presentation.logoBase64,content_type:'image/png',content_id:'mir-logo'}]:[])]}),signal:AbortSignal.timeout(20000)});
   if(!response.ok)throw Error('EMAIL_PROVIDER_REJECTED');
   const data=await response.json();if(typeof data.id!=='string'||!data.id.trim())throw Error('EMAIL_PROVIDER_RECEIPT_MISSING');
   return {accepted:true,messageId:data.id};

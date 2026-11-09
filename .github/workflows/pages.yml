@@ -112,6 +112,7 @@ jobs:
           node tests/mir-pages-regressions.cjs
           node tests/mir-estimate-service.cjs
           node tests/mir-estimate-edge.cjs
+          node --test tests/mir-estimate-presentation.cjs
           node --check dist/mir-estimate-upload.js
           node tests/mir-atelier-v4.cjs
           node tests/mir-miniatures.cjs

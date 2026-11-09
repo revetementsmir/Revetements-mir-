@@ -1,0 +1,331 @@
+{
+  "physicalDevices": false,
+  "browser": "Chromium",
+  "method": "PDF.js, mêmes tailles avant/après; format du papier adapté au contenu",
+  "checks": [
+    {
+      "width": 390,
+      "height": 844,
+      "state": "before",
+      "key": "bending",
+      "page": 1,
+      "textItems": 0,
+      "vectorText": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "after",
+      "key": "bending",
+      "page": 1,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "before",
+      "key": "cart",
+      "page": 1,
+      "textItems": 0,
+      "vectorText": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "before",
+      "key": "cart",
+      "page": 2,
+      "textItems": 0,
+      "vectorText": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "after",
+      "key": "cart",
+      "page": 1,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "after",
+      "key": "cart",
+      "page": 2,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "after",
+      "key": "multiple",
+      "page": 1,
+      "textItems": 113,
+      "vectorText": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "after",
+      "key": "multiple",
+      "page": 2,
+      "textItems": 113,
+      "vectorText": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "after",
+      "key": "multiple",
+      "page": 3,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "after",
+      "key": "multiple",
+      "page": 4,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "after",
+      "key": "multiple",
+      "page": 5,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "state": "after",
+      "key": "multiple",
+      "page": 6,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "before",
+      "key": "bending",
+      "page": 1,
+      "textItems": 0,
+      "vectorText": false
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "after",
+      "key": "bending",
+      "page": 1,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "before",
+      "key": "cart",
+      "page": 1,
+      "textItems": 0,
+      "vectorText": false
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "before",
+      "key": "cart",
+      "page": 2,
+      "textItems": 0,
+      "vectorText": false
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "after",
+      "key": "cart",
+      "page": 1,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "after",
+      "key": "cart",
+      "page": 2,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "after",
+      "key": "multiple",
+      "page": 1,
+      "textItems": 113,
+      "vectorText": true
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "after",
+      "key": "multiple",
+      "page": 2,
+      "textItems": 113,
+      "vectorText": true
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "after",
+      "key": "multiple",
+      "page": 3,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "after",
+      "key": "multiple",
+      "page": 4,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "after",
+      "key": "multiple",
+      "page": 5,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "state": "after",
+      "key": "multiple",
+      "page": 6,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "before",
+      "key": "bending",
+      "page": 1,
+      "textItems": 0,
+      "vectorText": false
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "after",
+      "key": "bending",
+      "page": 1,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "before",
+      "key": "cart",
+      "page": 1,
+      "textItems": 0,
+      "vectorText": false
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "before",
+      "key": "cart",
+      "page": 2,
+      "textItems": 0,
+      "vectorText": false
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "after",
+      "key": "cart",
+      "page": 1,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "after",
+      "key": "cart",
+      "page": 2,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "after",
+      "key": "multiple",
+      "page": 1,
+      "textItems": 113,
+      "vectorText": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "after",
+      "key": "multiple",
+      "page": 2,
+      "textItems": 113,
+      "vectorText": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "after",
+      "key": "multiple",
+      "page": 3,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "after",
+      "key": "multiple",
+      "page": 4,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "after",
+      "key": "multiple",
+      "page": 5,
+      "textItems": 41,
+      "vectorText": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "state": "after",
+      "key": "multiple",
+      "page": 6,
+      "textItems": 41,
+      "vectorText": true
+    }
+  ]
+}

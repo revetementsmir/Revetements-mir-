@@ -1,0 +1,43 @@
+name: MIR — courriels et dossiers PDF
+on:
+  push:
+    branches: [main, codex/estimation-rendu-mir-20261109]
+    paths: ['dist/**', 'server/**', 'supabase/functions/**', 'tests/**', 'docs/verification/estimation-rendu-20261109/**', '.github/workflows/estimation-rendu.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Outils de recette
+        run: |
+          npm install --no-save playwright@1.58.2
+          sudo apt-get update -qq
+          sudo apt-get install -y poppler-utils
+      - name: Courriels et protections existantes — aucun envoi externe
+        run: |
+          node --test --test-concurrency=1 tests/mir-estimate-presentation.cjs tests/mir-estimate-edge.cjs tests/mir-estimate-service.cjs
+          node tests/mir-selection-pdf.cjs
+          node tests/mir-unified-dossier.cjs
+      - name: PDF vectoriels et comparaisons visuelles
+        run: |
+          node tests/mir-estimate-render-browser.cjs
+          node tests/mir-estimate-pdf-viewer-browser.cjs
+          node tests/mir-estimate-private-render-browser.cjs
+          node tests/mir-estimate-email-capture-browser.cjs
+          node tools/run-chromium-test.cjs tests/mir-client-bend-tariff-browser.cjs
+          node tools/run-chromium-test.cjs tests/mir-production-client-flow-browser.cjs
+          node tools/run-chromium-test.cjs tests/mir-unified-dossier-browser.cjs
+      - name: Preuves de recette
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-estimation-rendu
+          path: docs/verification/estimation-rendu-20261109/

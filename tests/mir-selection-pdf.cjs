@@ -24,7 +24,7 @@ test('Plusieurs pages sans tronquer les produits de la sélection',()=>{
   const opts=PDF.buildOptions({project:'Projet A',items:Array.from({length:22},(_,i)=>fixture(i+1))});
   assert.ok(opts.faces.length>=2);
   assert.equal(opts.faces.map(x=>(x.svg.match(/font-weight="700">(\d{2})<\/text>/g)||[]).length).reduce((a,n)=>a+n,0),22);
-  assert.ok(opts.faces.every(f=>/SÉLECTION DE MATÉRIAUX/.test(f.svg)));
+  assert.ok(opts.faces.every(f=>f.documentTitle==='SÉLECTION DE MATÉRIAUX'));
 });
 test('Articles exclus annoncés sans ajouter des prix fictifs',()=>{
   const opts=PDF.buildOptions({project:'Un projet',items:[fixture()],excludedCount:2});

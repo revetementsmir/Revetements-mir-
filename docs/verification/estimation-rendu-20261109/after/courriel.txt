@@ -1,0 +1,14 @@
+RECETTE MIR TEST — demande fictive, ne pas traiter.
+MIR-RECETTE-RENDU-20261109
+Provenance : Mon panier
+Client : RECETTE UI MIR TEST - cart
+Courriel : recette@example.invalid
+Téléphone : Non fourni
+Chantier : 123 rue Fictive, Québec, G0A 0A0
+
+Matériaux à estimer — Vis de fascia 2 po — tête hexagonale ¼ po, teintes aluminium Kaycan · Référence : À confirmer · Fabricant : Kaycan · Fini : Noir · Format : À confirmer · Quantité : 2 pièces
+Pièces de pliage à estimer — Profil dessiné · Quantité : 1 pièce(s) · Matériau : Aluminium · Fini : QA · QA-REEL · Longueur : 120 po · A = 4 · B = 3
+Note : RECETTE FICTIVE UI cart. Aucun projet réel, aucune commande.
+
+Ouvrir le dossier privé : https://revetementsmirweb.github.io/MIR/estimation-dossier.html?id=128ce443-c66c-44a4-b717-00a8fab55699&recette=1
+Connexion MIR autorisée requise. Les documents restent privés.

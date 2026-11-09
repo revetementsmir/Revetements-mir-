@@ -41,66 +41,26 @@
       if(!item||!clean(item.name)||!Number.isFinite(quantity)||quantity<=0||quantity>1000000)
         throw Error('Quantité ou référence invalide à la ligne '+(index+1)+'.');
       return {
-        name:clean(item.name),brand:clean(item.brand)||'Fabricant à confirmer',
+        reference:clean(item.manufacturerReference||item.reference)||'À confirmer',name:clean(item.name),brand:clean(item.brand)||'Fabricant à confirmer',
         color:clean(item.colorName)||'À confirmer',format:clean([item.formatName, browser?.MIRCommerceValidateQuantity&&!browser.MIRCommerceValidateQuantity(item).ok?'QUANTITÉ À CORRIGER : '+browser.MIRCommerceValidateQuantity(item).message:''].filter(Boolean).join(' · ')),
         quantity,unit:clean(item.unit)||'pièces'
       };
     });
   }
-  function itemRows(items){
-    return items.map((item,i)=>{
-      const heading=wrap(item.name,43),details=wrap(item.color+(item.format?' · '+item.format:''),37);
-      const height=Math.max(105,58+32*Math.max(heading.length,details.length));
-      return {item,index:i+1,heading,details,height};
-    });
-  }
-  function groups(rows){
-    const pages=[];let rowsOnPage=[],height=0;
-    for(const row of rows){
-      if(rowsOnPage.length&&height+row.height>780){pages.push(rowsOnPage);rowsOnPage=[];height=0;}
-      rowsOnPage.push(row);height+=row.height;
-    }
-    if(rowsOnPage.length)pages.push(rowsOnPage);
-    return pages;
-  }
+  function itemRows(items){return items.map((item,i)=>{const cells=[String(i+1).padStart(2,'0'),[item.name,item.reference].join(' · '),item.brand,[item.color,item.format].filter(Boolean).join(' · '),String(item.quantity.toLocaleString('fr-CA',{maximumFractionDigits:6})),item.unit],limits=[3,31,17,22,9,9],lines=cells.map((v,j)=>wrap(v,limits[j]));return {item,index:i+1,lines,height:Math.max(85,24+20*Math.max(...lines.map(x=>x.length)))};});}
+  function groups(rows){const pages=[];let current=[],height=0;for(const row of rows){if(height+row.height>650&&current.length){pages.push(current);current=[];height=0;}current.push(row);height+=row.height;}if(current.length)pages.push(current);return pages;}
   function drawing(rows,project,page,total,excluded){
-    const drawingHeight=347+rows.reduce((a,x)=>a+x.height,0)+175;
-    const h=Math.max(1150,drawingHeight),parts=[];
-    parts.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 '+h+'">');
-    parts.push('<rect width="1600" height="'+h+'" fill="#ffffff"/>');
-    parts.push('<rect x="50" y="42" width="9" height="95" fill="#348511"/>');
-    parts.push(text(86,90,'LES REVÊTEMENTS MIR',{size:42,weight:'700'}));
-    parts.push(text(86,138,'SÉLECTION DE MATÉRIAUX — À CONFIRMER',{size:25,color:'#36643a',weight:'700'}));
-    const projectLines=wrap(project||'Projet sans nom',78);
-    parts.push(text(50,199,'Projet : '+projectLines[0],{size:26,weight:'700'}));
-    projectLines.slice(1).forEach((line,i)=>parts.push(text(50,230+i*30,line,{size:23})));
-    parts.push(text(50,258,'Références souhaitées · quantités non validées · page '+page+' / '+total,{size:22,color:'#607264'}));
-    parts.push('<rect x="50" y="285" width="1500" height="47" fill="#ebf2e7"/>');
-    parts.push(text(70,317,'N°',{size:22,weight:'700'}));
-    parts.push(text(155,317,'MATÉRIAU / FABRICANT',{size:22,weight:'700'}));
-    parts.push(text(825,317,'COULEUR / FORMAT',{size:22,weight:'700'}));
-    parts.push(text(1370,317,'BESOIN',{size:22,weight:'700'}));
-    let y=347;
-    for(const row of rows){
-      const {item,heading,details,index,height}=row;
-      if(index%2===0)parts.push('<rect x="50" y="'+y+'" width="1500" height="'+height+'" fill="#f6f8f4"/>');
-      parts.push(text(70,y+34,String(index).padStart(2,'0'),{size:24,weight:'700'}));
-      heading.forEach((line,i)=>parts.push(text(155,y+34+i*32,line,{size:25,weight:i===0?'700':'400'})));
-      parts.push(text(155,y+34+heading.length*32,item.brand,{size:22,color:'#657567'}));
-      details.forEach((line,i)=>parts.push(text(825,y+34+i*32,line,{size:23,color:'#344837'})));
-      parts.push(text(1370,y+34,String(item.quantity.toLocaleString('fr-CA',{maximumFractionDigits:3})),{size:24,weight:'700'}));
-      parts.push(text(1370,y+63,item.unit,{size:20,color:'#657567'}));
-      y+=height;
-    }
-    const notesY=h-120;
-    parts.push('<path d="M50 '+(notesY-24)+' H1550" stroke="#cbd8c8" stroke-width="2"/>');
-    parts.push(text(50,notesY+9,'Document de préparation : ceci ne constitue PAS une commande.',{size:24,weight:'700'}));
-    parts.push(text(50,notesY+44,'Prix, stocks, unités de vente et compatibilités à confirmer par MIR.',{size:22}));
-    if(excluded>0)parts.push(text(50,notesY+78,excluded+' référence(s) masquée(s) ou indisponible(s), exclue(s) de ce PDF.',{size:21,color:'#9a5b22'}));
-    parts.push('</svg>');
-    return parts.join('');
+   const x=[40,74,320,455,638,720],parts=['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 1100">'];
+   parts.push(text(40,190,'Projet : '+(project||'À confirmer'),{size:16,weight:'700'}));
+   parts.push('<rect x="40" y="210" width="770" height="38" fill="#edf2e8"/>');
+   ['N°','ARTICLE / RÉFÉRENCE','FABRICANT','FINI / FORMAT','QUANTITÉ','UNITÉ'].forEach((v,j)=>parts.push(text(x[j]+4,234,v,{size:12,weight:'700'})));
+   let y=248;for(const row of rows){if(row.index%2===0)parts.push('<rect x="40" y="'+y+'" width="770" height="'+row.height+'" fill="#f7f8f5"/>');row.lines.forEach((lines,j)=>lines.forEach((v,k)=>parts.push(text(x[j]+4,y+25+k*20,v,{size:14,weight:j===0?'700':'400'}))));y+=row.height;parts.push('<path d="M40 '+y+'H810" stroke="#d7ded2"/>');}
+   parts.push(text(40,950,'Document de préparation : ceci ne constitue PAS une commande.',{size:14,weight:'700'}));
+   parts.push(text(40,973,'Prix, stocks, unités de vente et compatibilités à confirmer par MIR.',{size:13}));
+   if(excluded>0)parts.push(text(40,995,excluded+' référence(s) masquée(s) ou indisponible(s), exclue(s) de ce PDF.',{size:12,color:'#9a5b22'}));
+   parts.push('</svg>');return parts.join('');
   }
-  function buildOptions({project='',items=[],excludedCount=0}={}){
+  function buildOptions({project='',reference='',items=[],excludedCount=0}={}){
     const normalized=normalize(items);
     if(!normalized.length)throw Error('Aucun matériau disponible dans votre sélection.');
     const rows=itemRows(normalized),pages=groups(rows);
@@ -110,7 +70,7 @@
       filename:'MIR-selection-materiaux.pdf',
       faces:pages.map((page,i)=>({
         name:'Sélection · page '+(i+1)+' / '+pages.length,
-        layout:'wide',
+        layout:'mir-dossier',documentTitle:'SÉLECTION DE MATÉRIAUX',reference:clean(reference)||clean(project)||'Projet à confirmer',
         svg:drawing(page,clean(project),i+1,pages.length,Number(excludedCount)||0),
         summary:['Cette liste est conservée localement et ne constitue pas une commande.','Quantités et unités à valider · Aucun prix ou paiement confirmé.'],
         scaleNote:'Liste de besoins estimés, sans échelle ni quantités de fabrication garanties.',

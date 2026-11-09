@@ -1069,10 +1069,36 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       return {name:'Mise en production · '+(index+1)+'/'+pages.length,svg:svg+svgClose,layout:'bending-sheet'};
     });
   }
+  function clientDossierPages(order){
+    const pages=[];
+    for(const item of order.items){
+      const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(item.quotePolicy.required?['Soumission obligatoire : '+item.quotePolicy.reason]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>wrapLines(line,87));
+      const chunks=[];for(let i=0;i<Math.max(1,details.length);i+=12)chunks.push(details.slice(i,i+12));
+      for(let i=0;i<chunks.length;i++){
+        let svg=svgOpen(850,1100,'Pièce cotée '+item.id);
+        svg+=multiline(40,193,[item.id+' · '+item.name+(i?' · Suite — ne pas recompter':'')],{width:75,lineHeight:23,attrs:'font-size="18" font-weight="700"'}).svg;
+        svg+='<rect x="40" y="230" width="770" height="345" fill="#fafbf8" stroke="#d7ded2"/>';
+        if(item.kind==='profile'&&item.valid){const map=projection(item.pointsMM,{x:110,y:85,w:580,h:245});svg+='<g transform="translate(65 235) scale(.9)">'+profileDiagramContent(item,item.pointsMM.map(map),{paintedMarker:'star',highContrast:true,markerModel:item})+'</g>';}
+        else if(item.kind==='panel')svg+=placeSVG(panelSVG(item,{width:710,height:325,legend:false,header:false,notes:false}),70,240);
+        else svg+=svgText(65,380,'Croquis à compléter','font-size="20"');
+        svg+=svgText(40,603,'MATÉRIAU / FINI','font-size="12" font-weight="700" fill="#52634f"');
+        svg+=multiline(40,628,[...materialLines(item),...finishLines(item)],{width:48,lineHeight:21,attrs:'font-size="15"'}).svg;
+        svg+=svgText(500,603,'QUANTITÉ / LONGUEUR','font-size="12" font-weight="700" fill="#52634f"');
+        svg+=svgText(500,633,(i?'Suite, quantité inchangée':(item.quantity??'À préciser')+' pièce(s)'),'font-size="22" font-weight="700"');
+        svg+=multiline(500,662,item.kind==='profile'?[formatMeasurement(item.lengthMM,item.unit)]:[formatMeasurement(item.widthMM,item.unit)+' × '+formatMeasurement(item.heightMM,item.unit)],{width:32,lineHeight:23,attrs:'font-size="18"'}).svg;
+        svg+=svgText(40,764,'COTES FINIES ET POINTS À VALIDER','font-size="12" font-weight="700" fill="#52634f"');
+        svg+=multiline(40,790,chunks[i],{width:87,lineHeight:18,attrs:'font-size="14"'}).svg;
+        svg+=svgText(40,1003,'Étoile : face peinte. Rayons, développé et réglages à valider par l’atelier.','font-size="12"');
+        pages.push({name:item.id+' · '+item.name+(i?' · Suite':''),layout:'mir-dossier',documentTitle:order.requiresQuote?'Demande de soumission':order.automaticPricingAllowed?'Récapitulatif de pliage':'DOSSIER DE PLIAGE',reference:[order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:chunks[i]});
+      }
+    }
+    return pages;
+  }
   function productionPages(input = {}, {layout, profileGroups, document, bendTariff} = {}) {
     const order = buildOrder(input, { bendTariff: document === 'client-request' ? bendTariff : undefined }), fragments = [];
     if (document !== 'client-request' && layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return bendingSheetPages(order,profileGroups);
     const clientRequest = document === 'client-request';
+    if(clientRequest)return clientDossierPages({...order,dossierReference:input.poNumber||input.id});
     const pricedProfiles = clientRequest && order.automaticPricingAllowed && order.items.every(item => item.kind === 'profile');
     const documentTitle = order.requiresQuote ? 'Demande de soumission' :
       pricedProfiles ? 'Récapitulatif de pliage' :
