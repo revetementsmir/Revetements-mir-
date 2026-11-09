@@ -154,6 +154,25 @@ body[data-portal-mode="employee"] #mir-harmony-header .mir-harmony-toggle { widt
 .account-action-list { display:grid; gap:10px; }
 .account-action-list button { min-height:62px; display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid #ccd5c8; border-radius:12px; background:#fff; color:#284630; font-size:16px; font-weight:800; text-align:left; }
 .account-action-list svg { width:22px; }
+.message-start { display:grid; gap:8px; margin:18px 0 28px; }
+.message-start h2 { font-size:17px; margin-bottom:4px; }
+.message-start > button { display:flex; justify-content:space-between; align-items:center; min-height:58px; padding:10px 13px; border:1px solid #ccd5c8; border-radius:11px; background:#fff; text-align:left; }
+.message-start > button span,.message-start > button small { display:block; }
+.message-start > button small { color:#667466; margin-top:2px; }
+.message-start svg { width:20px; }
+.message-thread > h1 { margin:8px 0 15px; font-size:26px; }
+.message-list { display:flex; flex-direction:column; gap:9px; min-height:180px; margin-bottom:14px; }
+.message-list article { max-width:86%; padding:11px 13px; border-radius:14px 14px 14px 4px; background:#edf1ea; }
+.message-list article.mine { align-self:flex-end; border-radius:14px 14px 4px 14px; background:#dce9d7; }
+.message-list article p { white-space:pre-wrap; overflow-wrap:anywhere; }
+.message-list article button { min-height:34px; margin-top:5px; color:#31583d; text-decoration:underline; }
+.message-list article small { display:block; margin-top:5px; color:#657165; }
+.message-thread form { display:grid; gap:10px; padding:12px; border:1px solid #ccd5c8; border-radius:12px; background:#fff; }
+.hr-request-list { margin-top:28px; }
+.hr-request-list h2 { font-size:18px; margin-bottom:8px; }
+.hr-request-list article { display:grid; grid-template-columns:1fr auto; gap:4px 12px; padding:12px 0; border-bottom:1px solid #dce3d9; }
+.hr-request-list article span { grid-column:1; color:#657165; }
+.hr-request-list article b { grid-column:2; grid-row:1/3; align-self:center; color:#31583d; }
 
 @media (max-width: 1050px) {
   .employee-order-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }

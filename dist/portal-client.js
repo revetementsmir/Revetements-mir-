@@ -115,7 +115,7 @@
     const config = validateConfig(options.config, options.origin);
     const listeners = new Set();
     let status = { phase: config.enabled ? 'signed_out' : 'unavailable', user: null, snapshot: null, error: null, pending: null, busy: false };
-    let generation = 0, readSequence = 0, authSubscription = null, activePromise = null, authTimer = null, disposed = false;
+    let generation = 0, readSequence = 0, authSubscription = null, activePromise = null, authTimer = null, disposed = false, internalOrg = null;
     const storage = options.operationStorage;
     const logoutKey = `mir_portal_signed_out_${config.projectRef || 'disabled'}`;
     let logoutRequested = false;
@@ -204,6 +204,7 @@
           if(epoch!==generation||sequence!==readSequence||disposed)return null;
           if(accountError)throw errorOf(accountError);
           if(!account||account.userId!==user.id||!['client','employee','admin'].includes(account.role))fail('ACCESS_DENIED','Votre accès MIR n’a pas pu être vérifié.');
+          internalOrg=account.organizationId||null;
           if(account.role==='client'){
             if(user.user_metadata?.mir_delivery_address){
               const imported=await sdk.rpc('mir_account_import_signup_address');
@@ -220,7 +221,11 @@
         const { data, error } = await sdk.rpc('mir_portal_snapshot');
         if (epoch !== generation || sequence !== readSequence || disposed) return null;
         if (error) throw errorOf(error);
-        const snapshot = checkedSnapshot(data, user.id);
+        const [operationsResponse,messagingResponse]=await Promise.all([
+          sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg})
+        ]);
+        if(operationsResponse.error)throw errorOf(operationsResponse.error);if(messagingResponse.error)throw errorOf(messagingResponse.error);
+        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {
@@ -450,13 +455,26 @@
       if (blob.size > 25 * 1024 * 1024 || !blob.size) fail('DOCUMENT_INVALID', 'Ce document ne peut pas être téléchargé.');
       return blob;
     }
+    async function openConversation(kind,targetId){
+      requireReady();if(!internalOrg||!['private','team'].includes(kind)||!UUID.test(targetId||''))fail('CONVERSATION_INVALID','Cette conversation ne peut pas être ouverte.');
+      const {data,error}=await sdk.rpc('mir_conversation_open',{org:internalOrg,kind,target:targetId});if(error)throw errorOf(error);return data;
+    }
+    async function uploadInternal(file,scope,entityId){
+      requireReady();if(!internalOrg||!['message','extra','issue','receipt'].includes(scope)||!UUID.test(entityId||''))fail('UPLOAD_INVALID','La destination de cette photo est invalide.');
+      const mime=String(file?.type||'').toLowerCase(),extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif'};
+      if(!extensions[mime]||!file.size||file.size>10*1024*1024)fail('UPLOAD_INVALID','Utilisez une photo JPG, PNG, WebP ou HEIC de 10 Mo maximum.');
+      const id=uuid();if(!UUID.test(id||''))fail('UUID_REQUIRED','Le navigateur ne peut pas préparer cette photo.');
+      const path=`${internalOrg}/${scope}/${entityId}/${status.user.id}/${id}.${extensions[mime]}`;
+      const {error}=await sdk.storage.from('mir-internal').upload(path,file,{contentType:mime,upsert:false,cacheControl:'3600'});if(error)throw errorOf(error,'La photo n’a pas pu être téléversée.');return path;
+    }
+    async function internalPhotoURL(path){requireReady();const {data,error}=await sdk.storage.from('mir-internal').createSignedUrl(path,300);if(error||!data?.signedUrl)throw errorOf(error||{},'Cette photo ne peut pas être ouverte.');return data.signedUrl;}
     function dispose() {
       disposed = true; generation++; authSubscription?.unsubscribe?.();
       if (authTimer !== null && typeof clearTimeout === 'function') clearTimeout(authTimer);
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, dispose,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
     });
   }
