@@ -4,10 +4,10 @@
  */
 (function(root,factory){
   'use strict';
-  const api=factory();
+  const api=factory(root);
   if(typeof module==='object'&&module.exports)module.exports=api;
   if(root)root.MIRSelectionPDF=api;
-})(typeof window==='object'?window:null,function(){
+})(typeof window==='object'?window:null,function(browser){
   'use strict';
   const xml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
   function clean(value){
@@ -42,7 +42,7 @@
         throw Error('Quantité ou référence invalide à la ligne '+(index+1)+'.');
       return {
         name:clean(item.name),brand:clean(item.brand)||'Fabricant à confirmer',
-        color:clean(item.colorName)||'À confirmer',format:clean(item.formatName),
+        color:clean(item.colorName)||'À confirmer',format:clean([item.formatName, browser?.MIRCommerceValidateQuantity&&!browser.MIRCommerceValidateQuantity(item).ok?'QUANTITÉ À CORRIGER : '+browser.MIRCommerceValidateQuantity(item).message:''].filter(Boolean).join(' · ')),
         quantity,unit:clean(item.unit)||'pièces'
       };
     });
