@@ -1,2 +1,2 @@
-/* Public endpoint only. Secrets and recipient overrides belong to the server. */
-window.MIREstimateConfig=Object.freeze({apiBase:'',environment:'production'});
+/* Public API URLs only. No secret, sender, recipient or privileged key. */
+(()=>{const test=new URLSearchParams(location.search).get('recette')==='1';window.MIREstimateConfig=Object.freeze({apiBase:test?'https://hxtztkmbfpmzrieccwsg.supabase.co/functions/v1/mir-estimates':'',environment:test?'test':'production'});})();

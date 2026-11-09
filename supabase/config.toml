@@ -1,0 +1,3 @@
+# Public estimation entry; private routes verify Auth and MIR roles server-side.
+[functions.mir-estimates]
+verify_jwt = false

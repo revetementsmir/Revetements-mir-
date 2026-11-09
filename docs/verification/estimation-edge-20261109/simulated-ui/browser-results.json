@@ -1,0 +1,26 @@
+{
+  "viewports": [
+    [
+      390,
+      844
+    ],
+    [
+      834,
+      1112
+    ],
+    [
+      1440,
+      900
+    ]
+  ],
+  "entries": [
+    "general",
+    "bending",
+    "cart",
+    "studio"
+  ],
+  "received": 12,
+  "provider": "Supabase RPC/Storage et Resend simulés, vrai code Edge et vraie UI",
+  "destination": "capture@example.invalid",
+  "physicalDevices": false
+}

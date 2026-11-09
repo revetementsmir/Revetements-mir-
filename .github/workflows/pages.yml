@@ -2,7 +2,7 @@ name: Publier le site principal MIR
 on:
   push:
     branches: [main]
-    paths: ['dist/**', 'tests/**', '.github/workflows/pages.yml']
+    paths: ['dist/**', 'tests/**', 'server/**', 'supabase/functions/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
       - name: Test MIR architectural profiles
         run: |
           node --check dist/model-measure-defaults.js
@@ -107,7 +110,9 @@ jobs:
           node tests/mir-finishing-editor.cjs
           node --check tests/mir-finishing-editor-browser.cjs
           node tests/mir-pages-regressions.cjs
-          node --test tests/mir-estimate-service.cjs
+          node tests/mir-estimate-service.cjs
+          node tests/mir-estimate-edge.cjs
+          node --check dist/mir-estimate-upload.js
           node tests/mir-atelier-v4.cjs
           node tests/mir-miniatures.cjs
           node tests/mir-retours-cotes.cjs
@@ -175,6 +180,7 @@ jobs:
           node tests/mir-finishing-editor-browser.cjs
           node tests/mir-shared-startup-browser.cjs
           node tests/mir-estimate-browser.cjs
+          node tests/mir-estimate-edge-browser.cjs
           node tests/mir-client-followup-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
@@ -241,7 +247,7 @@ jobs:
           cmp /tmp/mir-homepage.html _site_mir/index.html
           grep -F 'mir-home-premium.css?v=' /tmp/mir-homepage.html
           grep -F 'href="realisations.html"' /tmp/mir-homepage.html
-          for file in estimation.html estimation-dossier.html mir-estimate.js mir-estimate-config.js mir-estimate-private.js; do
+          for file in estimation.html estimation-dossier.html mir-estimate.js mir-estimate-config.js mir-estimate-private.js mir-estimate-upload.js; do
             fetch "$base/$file?verification=$GITHUB_SHA" "/tmp/mir-$file"
             cmp "/tmp/mir-$file" "_site_mir/$file"
           done
@@ -549,4 +555,16 @@ jobs:
           path: |
             artifacts/estimation-published
             artifacts/client-followup/functional
+          if-no-files-found: ignore
+
+      - name: Vérifier le raccordement MIR TEST depuis les pages publiées sans envoi
+        run: node tests/mir-estimate-edge-published.cjs
+      - name: Preuves du raccordement Supabase
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-estimation-supabase
+          path: |
+            artifacts/estimation-edge-published/
+            docs/verification/estimation-edge-20261109/simulated-ui/
           if-no-files-found: ignore

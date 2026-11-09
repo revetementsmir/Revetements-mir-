@@ -4,28 +4,8 @@
  * A queued/stored record is never reported as received before email acceptance. */
 const fs=require('node:fs/promises'),path=require('node:path');
 const {createHash,createHmac,randomUUID}=require('node:crypto');
-const LIMITS=Object.freeze({maxFiles:5,maxFileBytes:20*1024*1024,maxTotalFileBytes:25*1024*1024,maxPayloadBytes:8*1024*1024});
-const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const {LIMITS,UUID,canonical,EstimateError,error,payloadOf,text}=require('../supabase/functions/_shared/estimate-contract.mjs');
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-const canonical=value=>JSON.stringify(value&&typeof value==='object'&&!Array.isArray(value)?Object.fromEntries(Object.keys(value).sort().map(k=>[k,JSON.parse(canonical(value[k]))])):Array.isArray(value)?value.map(x=>JSON.parse(canonical(x))):value);
-const clone=value=>JSON.parse(JSON.stringify(value));
-class EstimateError extends Error{constructor(code,message,status=400,retryable=false){super(message);Object.assign(this,{code,status,retryable});}}
-const error=(code,message,status,retryable)=>new EstimateError(code,message,status,retryable);
-function text(value,max,required=false){if(typeof value!=='string'||value.length>max||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value))throw error('INPUT','Un champ est invalide ou trop long.');const out=value.trim();if(required&&!out)throw error('INPUT','Complétez les coordonnées et l’adresse du chantier.');return out;}
-function payloadOf(raw,limit){
- if(typeof raw!=='string'||Buffer.byteLength(raw)>limit)throw error('PAYLOAD_SIZE','Les choix du projet dépassent la taille permise.',413);
- let p;try{p=JSON.parse(raw);}catch{throw error('INPUT','Le résumé de la demande est illisible.');}
- if(p?.version!==1||!['general','studio','cart','bending'].includes(p.source))throw error('INPUT','La provenance de la demande est invalide.');
- const c=p.contact||{},a=p.address||{};
- const contact={name:text(c.name,160,true),email:text(c.email,254,true),phone:text(c.phone||'',60)};
- if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email)||/[\r\n]/.test(contact.email))throw error('EMAIL','Entrez une adresse courriel valide.');
- const address={street:text(a.street,300,true),city:text(a.city,160,true),postalCode:text(a.postalCode,30,true)};
- if(p.source==='studio'&&(!p.studio||typeof p.studio!=='object'||Array.isArray(p.studio)))throw error('STUDIO_REQUIRED','Le résumé du Studio est manquant.');
- if(['cart','bending'].includes(p.source)&&(!p.selection||typeof p.selection!=='object'))throw error('SELECTION_REQUIRED','La sélection du dossier est manquante.');
- // The server never injects client HTML into an email or a private page. The
- // snapshot is JSON only; originals are delivered as attachments, never inline.
- return {version:1,source:p.source,contact,address,note:text(p.note||'',5000),...(p.selection?{selection:clone(p.selection)}:{}),...(p.studio?{studio:clone(p.studio)}:{})};
-}
 async function boundedBody(request,max){
  const declared=request.headers.get('content-length');if(declared&&Number(declared)>max)throw error('REQUEST_SIZE','La demande et ses fichiers dépassent la taille permise.',413);
  const reader=request.body?.getReader();if(!reader)return Buffer.alloc(0);let total=0;const parts=[];
