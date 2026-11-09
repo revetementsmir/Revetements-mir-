@@ -156,7 +156,7 @@ function renderHistory(){
 }
 function label(sku){
  const token=sku.qrToken;
- const url=Core.qrUrl(token,{origin:'https://revetementsmirweb.github.io',prefix:'/MIR/'});
+ const url=Core.qrUrl(token,{origin:'https://revetementsmirweb.github.io',prefix:'/MIR/'})+(window.MIRSharedConfig?.environment==='test'?'&recette=1':'');
  $('#wh-label-sku').textContent=sku.sku;$('#wh-label-name').textContent=sku.name+' · '+sku.unit;
  $('#wh-label-url').textContent=url;
  const qr=clearChildren('#wh-label-qr');
