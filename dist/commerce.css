@@ -262,7 +262,8 @@ body.commerce .mir-screw-preview {
   width:100%;
   height:100%;
 }
-body.commerce .mir-screw-preview > :is(img,canvas) {
+body.commerce .mir-screw-preview > :is(img,canvas),
+body.commerce .shop-card .mir-screw-preview > :is(img,canvas) {
   position:absolute;
   inset:0;
   width:100%;
@@ -272,6 +273,26 @@ body.commerce .mir-screw-preview > :is(img,canvas) {
   object-position:center;
 }
 body.commerce .mir-screw-preview > canvas[hidden] { display:none; }
+body.commerce .shop-card .mir-screw-preview > :is(img,canvas) { padding:4px; }
+body.commerce :is(.product-color-picker,.product-extra-colors) > button[aria-pressed="true"] {
+  position:relative;
+  outline:2px solid #294d28;
+  outline-offset:2px;
+}
+body.commerce :is(.product-color-picker,.product-extra-colors) > button[aria-pressed="true"]::after {
+  content:"✓";
+  position:absolute;
+  right:3px;
+  bottom:3px;
+  display:grid;
+  place-items:center;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  color:#fff;
+  background:#294d28;
+  font:700 11px/1 Arial,sans-serif;
+}
 body.commerce :is(.shop-card-swatches,.product-color-picker,.product-extra-colors) > button.mir-named-swatch {
   width:auto;
   min-height:44px;

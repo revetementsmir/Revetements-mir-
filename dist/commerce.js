@@ -105,11 +105,14 @@
     const midtone={'lighttrim-vfcs':99,'lighttrim-vfctek8':163,'fascia-2po':203}[m.screwPreview];
     for(let i=0;i<pixels.data.length;i+=4){
       if(!alpha[i+3]){pixels.data[i+3]=0;continue;}
-      const level=(pixels.data[i]+pixels.data[i+1]+pixels.data[i+2])/3;
+      const r=pixels.data[i],g=pixels.data[i+1],b=pixels.data[i+2];
+      const level=(r+g+b)/3;
+      // Fade tint into the white background where the head edge is antialiased.
+      const edgeOpacity=Math.min(1,(255-Math.min(r,g,b))/18);
       const shade=Math.min(1.14,Math.max(.35,1+(level-midtone)/150));
       const reflection=Math.max(0,level-210)*.36;
       for(let channel=0;channel<3;channel++)pixels.data[i+channel]=rgb[channel]*shade+reflection;
-      pixels.data[i+3]=alpha[i+3];
+      pixels.data[i+3]=alpha[i+3]*edgeOpacity;
     }
     ctx.putImageData(pixels,0,0);
     canvas.dataset.colorId=c.id;
