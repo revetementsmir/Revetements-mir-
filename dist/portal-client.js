@@ -225,7 +225,7 @@
           sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg})
         ]);
         if(operationsResponse.error)throw errorOf(operationsResponse.error);if(messagingResponse.error)throw errorOf(messagingResponse.error);
-        let lead=null,boss=null,logistics=null;
+        let lead=null,boss=null,logistics=null,management=null;
         if(operationsResponse.data?.role==='chef_equipe'){
           const response=await sdk.rpc('mir_lead_today_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
         }else if(operationsResponse.data?.role==='boss'){
@@ -234,7 +234,10 @@
         if(['warehouse','chef_equipe','boss','admin'].includes(operationsResponse.data?.role)){
           const response=await sdk.rpc('mir_logistics_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);logistics=response.data;
         }
-        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics}, user.id);
+        if(['assistant','boss','admin'].includes(operationsResponse.data?.role)){
+          const response=await sdk.rpc('mir_management_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);management=response.data;
+        }
+        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {
@@ -481,13 +484,14 @@
     async function bossAction(action,entity,decision,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='boss')fail('ACCESS_DENIED','Boss requis.');const {data,error}=await sdk.rpc('mir_boss_action',{org:internalOrg,action,entity,decision,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function logisticsAction(action,entity=null,payload={}){requireReady();if(!internalOrg||!['warehouse','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès entrepôt requis.');const {data,error}=await sdk.rpc('mir_logistics_action',{org:internalOrg,request_id:uuid(),action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function adminLogisticsAction(action,entity=null,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='admin')fail('ACCESS_DENIED','Admin requis.');const {data,error}=await sdk.rpc('mir_admin_logistics_action',{org:internalOrg,action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
+    async function managementAction(action,entity=null,payload={}){requireReady();if(!internalOrg||!['assistant','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès gestion requis.');const {data,error}=await sdk.rpc('mir_management_action',{org:internalOrg,action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     function dispose() {
       disposed = true; generation++; authSubscription?.unsubscribe?.();
       if (authTimer !== null && typeof clearTimeout === 'function') clearTimeout(authTimer);
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, dispose,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
     });
   }

@@ -67,6 +67,8 @@ jobs:
           node --check dist/portal-client.js
           node --check dist/chantier-app.js
           node --check tests/mir-portal-login.cjs
+          node --check tests/mir-management-browser.cjs
+          node --check tests/mir-management-postgres.cjs
           node --check dist/employee-store-model.js
           node --check dist/mir-store-review.js
           node --check dist/magasin-revue.js
@@ -183,6 +185,7 @@ jobs:
           node tests/mir-estimate-browser.cjs
           node tests/mir-estimate-edge-browser.cjs
           node tests/mir-client-followup-browser.cjs
+          MIR_CHROMIUM_BIN=$(command -v google-chrome || command -v chromium) node tests/mir-management-browser.cjs
       - name: Captures accueil PC, tablette et mobile
         if: always()
         uses: actions/upload-artifact@v4
@@ -209,6 +212,8 @@ jobs:
             artifacts/mir-balcon-3d-*.png
             artifacts/mir-terrain-fullscreen-*.png
             artifacts/mir-finitions-*.png
+            artifacts/MIR-assistant-dashboard-*.png
+            artifacts/MIR-boss-dashboard-*.png
           if-no-files-found: ignore
       - uses: actions/configure-pages@v5
       - name: Préparer uniquement le site MIR principal
