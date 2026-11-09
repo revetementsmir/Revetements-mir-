@@ -84,7 +84,7 @@
    notes:['Dossier de préparation uniquement. Aucun paiement, commande ou envoi.',
     'Prix, stock, couleurs, dimensions et règles de fabrication à confirmer par MIR.']};
  }
- function pdfOptions(state,{selectionPDF,production}={}){
+ function pdfOptions(state,{selectionPDF,production,bendTariff}={}){
   if(!state.ready)throw Error('Vérifiez les noms de projet et les éléments enregistrés avant export.');
   const faces=[];
   if(state.materials.length){
@@ -95,7 +95,7 @@
    if(!production?.productionPages)throw Error('Moteur de fiches cotées indisponible.');
    faces.push(...production.productionPages({
     ...state.order,items:state.pieces.map(item=>item.snapshot||item.spec)
-   }));
+   },{document:'client-request',bendTariff}));
   }
   if(!faces.length)throw Error('Aucune pièce ou aucun matériau à exporter.');
   return {title:'MIR — Dossier matériaux et pièces sur mesure',
@@ -118,7 +118,15 @@
   const $=sel=>section.querySelector(sel);
   const message=$('#mir-unified-message'),list=$('#mir-unified-pieces'),count=$('#mir-unified-count');
   const join=$('#mir-unified-associate'),pdf=$('#mir-unified-pdf'),json=$('#mir-unified-json'),status=$('#mir-unified-export-status');
-  let busy=false,current=null;
+  let busy=false,current=null,bendTariff,loadingTariff=false;
+  const currency=new Intl.NumberFormat('fr-CA',{style:'currency',currency:'CAD'});
+  async function refreshTariff(){
+   if(loadingTariff||!current?.pieces.some(item=>item.spec.kind==='profile'))return;
+   loadingTariff=true;
+   try{bendTariff=await win.MIRBendPricing.load(win.MIRPortalConfig);}
+   catch{bendTariff=undefined;}
+   finally{loadingTariff=false;render();}
+  }
   const render=()=>{
    const available=[...doc.querySelectorAll('#selection-items [data-selection-preview]')]
     .map(el=>Number(el.dataset.selectionPreview));
@@ -133,6 +141,8 @@
      const detail=doc.createElement('span'),quantity=Number(item.spec?.quantity)||1;
      const code=clean(item.spec?.finish?.code||item.spec?.finish?.name||'Couleur à confirmer');
      detail.textContent=' · '+quantity+' pièce'+(quantity===1?'':'s')+' · '+code+' · repère '+clean(item.id);
+     const price=item.spec.kind==='profile'?win.MIRProduction?.pricePiece(item,{bendTariff}):null;
+     if(price?.status==='priced')detail.textContent+=' · '+currency.format(price.lineCents/100)+' avant taxes et livraison';
      row.append(strong,detail);list.append(row);
     }
    }else{
@@ -190,7 +200,7 @@
    busy=true;pdf.disabled=true;json.disabled=true;
    status.textContent='Préparation des pages matériaux et des croquis cotés…';
    try{
-    const state=render(),options=pdfOptions(state,{selectionPDF:win.MIRSelectionPDF,production:win.MIRProduction});
+    const state=render(),options=pdfOptions(state,{selectionPDF:win.MIRSelectionPDF,production:win.MIRProduction,bendTariff});
     if(!win.MIRPDF?.exportPlan)throw Error('Moteur PDF indisponible.');
     const result=await win.MIRPDF.exportPlan(options);
     status.textContent='Dossier complet prêt · '+result.pages+' page'+(result.pages===1?'':'s')+'. Utilisez Télécharger dans le panneau.';
@@ -205,8 +215,9 @@
   doc.addEventListener('input',event=>{if(event.target?.id==='selection-project-name')queueMicrotask(render);});
   doc.addEventListener('change',event=>{if(event.target?.closest?.('#selection-items'))queueMicrotask(render);});
   win.addEventListener('storage',event=>{if([KEYS.materials,KEYS.pieces].includes(event.key))render();});
-  win.addEventListener('pageshow',render);
+  win.addEventListener('pageshow',event=>{render();if(event.persisted)void refreshTariff();});
   render();
+  void refreshTariff();
   return Object.freeze({render});
  }
  return Object.freeze({version:'1.0.0',KEYS,read,associate,payload,pdfOptions,mount});

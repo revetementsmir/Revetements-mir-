@@ -89,15 +89,38 @@ function currentFinish(){
 }
 const money=cents=>Number.isSafeInteger(cents)?new Intl.NumberFormat('fr-CA',{style:'currency',currency:'CAD'}).format(cents/100)+' CA':'À préciser';
 const surface=value=>new Intl.NumberFormat('fr-CA',{maximumFractionDigits:4}).format(value);
-function dossierPricing(items=order.items){return M.priceDossier(items);}
+let bendTariff, bendTariffLoading=false;
+function dossierPricing(items=order.items){return M.priceDossier(items,{bendTariff});}
+async function refreshBendTariff(){
+ if(bendTariffLoading)return;
+ bendTariffLoading=true;
+ try{bendTariff=await window.MIRBendPricing.load(window.MIRSharedConfig);}
+ catch{bendTariff=undefined;}
+ finally{
+  bendTariffLoading=false;
+  if(workflow==='configure'){
+   if(clientProfileWizard())renderPiecePrice(build());
+   renderOrder();
+  }
+ }
+}
 function renderPiecePrice(model,geometryErrors=[]){
- const box=$('#panel-price'),price=M.pricePiece(model),tariff=window.MIRUnico?.pricing,eligible=model.kind==='panel'&&model.spec?.material?.type==='aluminium'&&model.spec?.material?.productRef==='unico-up1-aluminium';
+ const box=$('#panel-price');
+ if(model.kind==='profile'){
+  const price=M.pricePiece(model,{bendTariff});
+  box.hidden=!clientProfileWizard()||!model.valid||!model.material.type||!model.finish.code||price.requiresQuote;
+  box.innerHTML=box.hidden?'':price.status==='priced'
+   ? `<span class="price-eyebrow">PRIX CALCULÉ SUR 10 PI</span><div class="price-main"><strong>${esc(money(price.unitCents))}</strong><span>par moulure</span></div><small>Avant taxes et livraison. Ajustez la quantité dans votre dossier.</small>`
+   : `<p>${bendTariffLoading?'Chargement du tarif MIR…':bendTariff?'Prix à confirmer par MIR.':'Tarif MIR temporairement indisponible.'}</p>`;
+  return;
+ }
+ const price=M.pricePiece(model),tariff=window.MIRUnico?.pricing,eligible=model.kind==='panel'&&model.spec?.material?.type==='aluminium'&&model.spec?.material?.productRef==='unico-up1-aluminium';
  box.hidden=authoring||!eligible||price.requiresQuote||tariff?.calculationEnabled!==true;
  if(box.hidden){box.innerHTML='';return;}
  const ready=price.status==='priced'&&geometryErrors.length===0;
  box.innerHTML=`<span class="price-eyebrow">TARIF MIR · ${esc(surface(tariff.amount))} $ CA / po²</span>${ready?`<div class="price-main"><strong>${esc(money(price.unitCents))}</strong><span>par panneau</span></div><p>${esc(surface(price.areaSqIn))} po² × ${esc(surface(price.rate))} $ CA / po²</p><div class="price-quantity"><span>${esc(price.quantity)} pièce${price.quantity>1?'s':''}</span><strong>${esc(money(price.lineCents))}</strong></div>`:`<strong>${geometryErrors.length?'Corrigez les dimensions des lips.':esc(price.label||'Complétez votre panneau pour voir son prix.')}</strong><p>${geometryErrors.length?'Le prix sera calculé lorsque la géométrie sera valide.':esc(price.note||'Choisissez les dimensions et une couleur du fabricant.')}</p>`}<small>Surface de la forme hors tout, lips inclus. Projection C non ajoutée. Taxes et livraison non calculées; fini et fabrication à confirmer.</small>`;
 }
-function linePriceMarkup(spec){const price=M.pricePiece(spec);return price.status==='priced'?`<p class="production-line-price"><strong>${esc(money(price.lineCents))}</strong><span>${esc(surface(price.areaSqIn))} po² · ${esc(money(price.unitCents))} / pièce × ${esc(price.quantity)}</span></p>`:'';}
+function linePriceMarkup(spec){const price=M.pricePiece(spec,{bendTariff});return price.status==='priced'?`<p class="production-line-price"><strong>${esc(money(price.lineCents))}</strong><span>${esc(surface(price.areaSqIn))} po²${price.folds===undefined?'':' · '+esc(price.folds)+' pli'+(price.folds===1?'':'s')} · ${esc(money(price.unitCents))} / pièce × ${esc(price.quantity)}</span></p>`:'';}
 function renderDossierPrice(pricing){
  const box=$('#production-pricing-summary'),hasPriced=pricing.items.some(item=>item.status==='priced');box.hidden=!hasPriced;
  if(!hasPriced){box.innerHTML='';return;}
@@ -1154,11 +1177,13 @@ $('#order-head-count').textContent=String(validItems.length).padStart(2,'0');$('
    `<section class="production-family"><h3>${esc(family)} <small>· ${models.length}</small></h3>${models.map(model=>renderItem(byId.get(model.id))).join('')}</section>`).join('');
  }
  const qty=validItems.reduce((n,item)=>n+(item.spec.quantity||0),0),pending=validItems.filter(item=>!build(item.spec).complete||hasPanelGeometryIssue(item)).length;$('#production-total').textContent=validItems.length?`${validItems.length} référence${validItems.length>1?'s':''} · ${qty} pièce${qty>1?'s':''}${pending?' · '+pending+' fiche'+(pending>1?'s':'')+' à compléter':''}`:'Votre dossier attend sa première pièce.';$('#production-json').disabled=!validItems.length;$('#production-pdf').disabled=!validItems.length||busy||invalidPanelItems().length>0;$('#prepare-local-request').hidden=!client;$('#prepare-local-request').disabled=!validItems.length||busy||invalidPanelItems().length>0;const pricing=dossierPricing();renderDossierPrice(pricing);const publicDossier=publicClientDossier();
+ const pricedProfiles=publicDossier&&pricing.automaticPricingAllowed&&validItems.every(item=>item.kind==='profile');
+ if(pricedProfiles)$('#prepare-local-request').hidden=true;
  $('#prepare-local-request').textContent=publicDossier
   ? (pricing.requiresQuote?'Préparer ma demande de soumission ici':'Préparer ma demande ici')
   : (pricing.requiresQuote?'Préparer ma demande de soumission ↗':'Préparer ma demande ↗');
- $('#production-pdf').textContent=publicDossier?'PDF de ma demande ↓':pricing.requiresQuote?'Dossier de soumission PDF ↓':usesBendingSheet(pricing.requiresQuote)?'Bon de commande · Fiche PDF ↓':'Bon de commande PDF ↓';
- $('.document-status').textContent=pricing.requiresQuote?'Soumission obligatoire pour les pièces personnalisées':publicDossier?'Demande à faire valider par MIR':!client&&kind==='profile'?'Brouillon sur cet appareil':'Brouillon à valider';
+ $('#production-pdf').textContent=publicDossier?(pricedProfiles?'Récapitulatif PDF ↓':'PDF de ma demande ↓'):pricing.requiresQuote?'Dossier de soumission PDF ↓':usesBendingSheet(pricing.requiresQuote)?'Bon de commande · Fiche PDF ↓':'Bon de commande PDF ↓';
+ $('.document-status').textContent=pricing.requiresQuote?'Soumission obligatoire pour les pièces personnalisées':publicDossier?(pricedProfiles?'Prix calculé · fabrication à confirmer':'Demande à faire valider par MIR'):!client&&kind==='profile'?'Brouillon sur cet appareil':'Brouillon à valider';
  renderLayoutImport();
 }
 function renderLayoutImport(){
@@ -1427,14 +1452,14 @@ function usesBendingSheet(requiresQuote){
 async function exportPDF(){
  if(!order.items.length||busy)return;
  if(invalidPanelItems().length)return toast('Corrigez les lips des panneaux signalés avant de produire le PDF. Le dossier JSON reste disponible.');
- const quote=dossierPricing().requiresQuote,bending=usesBendingSheet(quote),publicDossier=publicClientDossier();
+ const pricing=dossierPricing(),quote=pricing.requiresQuote,bending=usesBendingSheet(quote),publicDossier=publicClientDossier();
  busy=true;renderOrder();
  const status=$('#production-export-status');
  status.textContent=quote?'Préparation du dossier de soumission…':'Préparation du PDF…';
  try{
-  const pages=M.productionPages({...order,items:order.items.map(item=>item.snapshot||item.spec)},publicDossier?{document:'client-request'}:bending?{layout:'bending-sheet',profileGroups:profileGroupOverrides()}:undefined);
+  const pages=M.productionPages({...order,items:order.items.map(item=>item.snapshot||item.spec)},publicDossier?{document:'client-request',bendTariff}:bending?{layout:'bending-sheet',profileGroups:profileGroupOverrides()}:undefined);
   const profilesOnly=publicDossier&&order.items.every(item=>item.kind==='profile');
-  const prefix=quote?'MIR-demande-soumission-':publicDossier?(profilesOnly?'MIR-demande-pliage-':'MIR-demande-sur-mesure-'):bending?'MIR-mise-en-production-':'MIR-bon-production-';
+  const prefix=quote?'MIR-demande-soumission-':publicDossier?(profilesOnly?(pricing.automaticPricingAllowed?'MIR-recapitulatif-pliage-':'MIR-demande-pliage-'):'MIR-demande-sur-mesure-'):bending?'MIR-mise-en-production-':'MIR-bon-production-';
   const result=await window.MIRPDF.exportPlan({
    faces:pages,title:publicDossier?'MIR — '+pages[0].documentTitle:quote?'MIR — Demande de soumission':bending?'Mise en production':'MIR — Dossier de fabrication',
    subtitle:order.project||(publicDossier?'Pièces sur mesure · validation par MIR':'Pièces sur mesure · dossier à valider'),
@@ -2563,6 +2588,10 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  if(!client&&params.get('shared-request'))openRequest(params.get('shared-request'));
  window.MIRProductionWorkspace=Object.freeze({version:'1.1.0',storageKeys:{...KEYS},localOnly:true,newPurchaseOrder(){if(client||!switchWorkshopOrder(defaultOrder()))return false;workflow='configure';render();return true;},openPurchaseOrder(po){if(client)return false;if(!po.items?.every(i=>i.spec&&i.snapshot?.schema==='mir-production-instance-1'&&build(i.spec).valid)){toast('Ancien format ou géométrie à vérifier : dessin conservé; exportez le dossier avant une conversion.');return false;}const next={...defaultOrder(),id:'procurement-'+po.id,poNumber:po.poNumber,project:po.job,foreman:po.foreman,date:po.requestedDate,revision:po.revision,notes:po.notes,items:copy(po.items)};if(!switchWorkshopOrder(next))return false;workflow='configure';authoring=false;render();return true;},getLivePreviewState(){return {model:build(),tool,kind,authoring,editingItemId,preview:view,zoom,pan:{...viewPan},drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:kind==='panel'?panelDirectUndo.length>0:freeformCanUndo(),canRedo:kind==='panel'?panelDirectRedo.length>0:freeformRedo.length>0};},saveCurrentPiece:saveWorkspacePiece,setOrderItemQuantity,openContinueMenu,openOrderPanelEditor(id,key,edge){if(client||!order.items.some(row=>row.id===id&&row.kind==='panel'))return false;editPiece(id);if(edge)openPanelEdge(edge);else openPanelMeasure(key);return true;},editOrderItem(id){if(client||!order.items.some(row=>row.id===id))return false;editPiece(id);return true;},finishFreeformTrace(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid||(draft.segments||[]).length<2)return false;if(tool==='draw')freeformFinish();return true;},openModelFromCurrent(){if(client||kind!=='profile'||authoring||editingItemId)return false;if(!build().valid){toast('Termine les cotes avant d’enregistrer ce modèle.');return false;}saveTemplateDialog();return true;}});
  matchMedia('(max-width:600px)').addEventListener('change',()=>{if(clientProfileWizard()&&tool==='draw'&&!drag)updateDrawing();});
+ if(publicClientDossier()){
+  void refreshBendTariff();
+  window.addEventListener('pageshow',event=>{if(event.persisted)void refreshBendTariff();});
+ }
  window.dispatchEvent(new Event('mir-production-ready'));
 }
 boot().catch(error=>{console.error('MIR production',error);$('#production-drawing').innerHTML=`<div class="drawing-hint"><strong>Le configurateur n’a pas pu démarrer.</strong><p>${esc(error.message)}</p><button type="button" class="secondary-button" onclick="location.reload()">Réessayer</button></div>`;$('#add-production-piece').disabled=true;});

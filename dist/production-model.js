@@ -143,14 +143,37 @@
     model.pricing = { ...pricing, quotePolicy: copy(model.quotePolicy) };
     return model;
   }
-  function pricePiece(value = {}) { return copy(modelOf(value).pricing); }
+  function profilePricing(model, tariff) {
+    const result = model.pricing;
+    if (!tariff || !model.valid || result.requiresQuote || model.quotePolicy.selectionType !== 'manufacturer' ||
+      !model.finish.code || !['aluminium', 'acier'].includes(model.material.type) || model.quantity === null ||
+      model.lengthMM === null || model.lengthMM > 120 * 25.4 + 0.001) return result;
+    const calculator = typeof module === 'object' && module.exports
+      ? require('./mir-bend-pricing.js') : window.MIRBendPricing;
+    const areaSqIn = model.finishedSegmentSumMM / 25.4 * 120;
+    const folds = model.bends.filter(bend => bend.turnDeg !== 0).length;
+    const unitCents = calculator.unitCents(tariff, model.material.type, null, areaSqIn, folds);
+    if (unitCents === null) return result;
+    const lineCents = unitCents * model.quantity;
+    return { ...result, status: 'priced', automaticPricingAllowed: true, basis: 'profile_120in_and_bends',
+      tariffRevision: tariff.revision, billingLengthIn: 120, areaSqIn, folds,
+      rate: tariff.area_rate, bendCents: tariff.bend_cents,
+      aluminumBasisPoints: model.material.type === 'aluminium' ? tariff.aluminum_basis_points : 0,
+      unitCents, unitAmount: unitCents / 100, lineCents, lineAmount: lineCents / 100,
+      label: 'Prix de base calculé', note: 'Prix calculé sur 10 pi, avant taxes et livraison. Disponibilité et fabrication à confirmer.',
+      availabilityConfirmationRequired: true };
+  }
+  function currentPricing(model, bendTariff) {
+    return model.kind === 'profile' ? profilePricing(model, bendTariff) : model.pricing;
+  }
+  function pricePiece(value = {}, { bendTariff } = {}) { return copy(currentPricing(modelOf(value), bendTariff)); }
   function quotePolicy(value = {}) { return copy(modelOf(value).quotePolicy); }
-  function priceDossier(values = []) {
+  function priceDossier(values = [], { bendTariff } = {}) {
     if (!Array.isArray(values)) throw new TypeError('Le dossier doit contenir un tableau de pièces.');
     if (values.length > 1000) throw new RangeError('Un dossier est limité à 1 000 lignes; créez plusieurs lots.');
     const items = values.map((value, index) => {
       const model = modelOf(value), itemId = text(value?.id || value?.snapshot?.id || model.id, 100) || 'M' + String(index + 1).padStart(3, '0');
-      return { itemId, ...copy(model.pricing) };
+      return { itemId, ...copy(currentPricing(model, bendTariff)) };
     });
     const quoteItemIds = items.filter(item => item.requiresQuote).map(item => item.itemId), unpricedItemIds = items.filter(item => item.status !== 'priced').map(item => item.itemId);
     const seen = new Set(), duplicateItemIds = [];
@@ -645,15 +668,15 @@
     return out + svgClose;
   }
 
-  function buildOrder(input = {}) {
+  function buildOrder(input = {}, { bendTariff } = {}) {
     if (!Array.isArray(input.items)) throw new TypeError('La commande doit contenir un tableau items.');
     if (input.items.length > 1000) throw new RangeError('Un dossier est limité à 1 000 lignes; créez plusieurs lots.');
-    const items = input.items.map((item, i) => { const model = modelOf(item); if (!model.id) model.id = 'M' + String(i + 1).padStart(3, '0'); return model; });
+    const items = input.items.map((item, i) => { const model = modelOf(item); if (!model.id) model.id = 'M' + String(i + 1).padStart(3, '0'); model.pricing = currentPricing(model, bendTariff); return model; });
     const ids = new Set(), errors = [];
     for (const item of items) { if (ids.has(item.id)) errors.push(issue('DUPLICATE_ITEM_ID', 'items', 'Identifiant de pièce répété : ' + item.id)); ids.add(item.id); }
     if (!items.length) errors.push(issue('EMPTY_ORDER', 'items', 'Ajoutez une pièce au dossier.'));
     const complete = errors.length === 0 && items.every(item => item.complete), knownQuantity = items.reduce((sum, item) => sum + (item.quantity ?? 0), 0);
-    const pricing = priceDossier(items), quoteRequiredItemIds = pricing.quoteItemIds;
+    const pricing = priceDossier(items, { bendTariff }), quoteRequiredItemIds = pricing.quoteItemIds;
     return { version: VERSION, poNumber: text(input.poNumber ?? input.po, 100), project: text(input.project, 160), foreman: text(input.foreman, 120), date: text(input.date, 40), revision: text(input.revision, 60), notes: text(input.notes, 1000), items, complete, errors, knownQuantity, quantity: complete ? knownQuantity : null, requiresQuote: quoteRequiredItemIds.length > 0, quoteRequiredItemIds, automaticPricingAllowed: pricing.automaticPricingAllowed, pricing, localReferenceOnly: true, transmitted: false, workshopValidationRequired: true };
   }
   function materialLines(item) {
@@ -667,6 +690,8 @@
     return price?.status === 'priced' ? [
       'Surface tarifée = ' + decimal(price.areaSqIn) + ' po²',
       'Tarif MIR = ' + decimal(price.rate) + ' CAD/po²',
+      ...(price.folds === undefined ? [] : [price.folds + ' pli(s) × ' + priceText(price.bendCents),
+        ...(price.aluminumBasisPoints ? ['Majoration aluminium : ' + decimal(price.aluminumBasisPoints / 100) + ' %'] : [])]),
       'Prix par pièce = ' + priceText(price.unitCents),
       'Ligne × ' + price.quantity + ' = ' + priceText(price.lineCents)
     ] : [];
@@ -676,6 +701,7 @@
       const lines = item.segments.map(s => s.label + ' = ' + formatMeasurement(s.lengthMM, item.unit));
       for (const b of item.bends) if (b) lines.push('Pli ' + b.from + '–' + b.to + ' : ' + b.label);
       lines.push('Face colorée : ' + (item.coloredFace.side ? (item.coloredFace.side === 'left' ? 'gauche' : 'droite') + ' de A → ' + item.segments.at(-1).label : 'à préciser'));
+      lines.push(...pricingDetailLines(item));
       return lines;
     }
     const lines = ['A hors tout, lips compris = ' + formatMeasurement(item.widthMM, item.unit), 'B hors tout, lips compris = ' + formatMeasurement(item.heightMM, item.unit), 'C projection = ' + formatMeasurement(item.reliefMM, item.unit)];
@@ -1043,11 +1069,13 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       return {name:'Mise en production · '+(index+1)+'/'+pages.length,svg:svg+svgClose,layout:'bending-sheet'};
     });
   }
-  function productionPages(input = {}, {layout, profileGroups, document} = {}) {
-    const order = buildOrder(input), fragments = [];
+  function productionPages(input = {}, {layout, profileGroups, document, bendTariff} = {}) {
+    const order = buildOrder(input, { bendTariff: document === 'client-request' ? bendTariff : undefined }), fragments = [];
     if (document !== 'client-request' && layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return bendingSheetPages(order,profileGroups);
     const clientRequest = document === 'client-request';
+    const pricedProfiles = clientRequest && order.automaticPricingAllowed && order.items.every(item => item.kind === 'profile');
     const documentTitle = order.requiresQuote ? 'Demande de soumission' :
+      pricedProfiles ? 'Récapitulatif de pliage' :
       clientRequest ? (order.items.every(item => item.kind === 'profile') ? 'Demande de pliage' : 'Demande de pièces sur mesure') : 'Mise en production';
     for (const item of order.items) {
       const details = productionDetailLines(item).flatMap(line => wrapLines(line, 37));
@@ -1068,7 +1096,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       svg += svgText(1368, 82, 'Date souhaitée : ' + (order.date || 'À préciser'), 'font-size="16" text-anchor="end"');
       if (!clientRequest) svg += svgText(1368, 110, 'Révision : ' + (order.revision || 'À préciser'), 'font-size="16" text-anchor="end"');
       const hasPricedLines = order.pricing.items.some(item => item.status === 'priced');
-      svg += svgText(1368, 138, order.requiresQuote ? hasPricedLines ? 'Couleurs personnalisées sur soumission' : 'Soumission obligatoire · aucun prix automatique' : clientRequest ? 'Demande à faire valider par MIR' : 'Préparation locale · validation atelier requise', 'font-size="14" text-anchor="end" fill="#8a572c"');
+      svg += svgText(1368, 138, order.requiresQuote ? hasPricedLines ? 'Couleurs personnalisées sur soumission' : 'Soumission obligatoire · aucun prix automatique' : pricedProfiles ? 'Prix de base calculé sur 10 pi' : clientRequest ? 'Demande à faire valider par MIR' : 'Préparation locale · validation atelier requise', 'font-size="14" text-anchor="end" fill="#8a572c"');
       svg += '<rect x="32" y="' + tableY + '" width="' + tableW + '" height="' + headerH + '" fill="#eef2e9" stroke="#697568"/>';
       const headers = ['CROQUIS ET COTES FINIES', 'MATIÈRE / GAGE', 'COULEUR / CODE', 'QUANTITÉ', 'LONGUEUR / FORMAT'];
       headers.forEach((label, i) => { svg += svgText(columns[i] + 10, tableY + 27, label, 'font-size="' + (i === 4 ? 9 : 12) + '" font-weight="700"'); });
@@ -1095,7 +1123,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       const faceNote = !clientRequest ? 'Liseré bleu : face colorée. ' :
         rows.some(row => row.item?.kind === 'profile' && row.item.coloredFace?.side) ? 'Étoile : face peinte. ' : '';
       svg += svgText(32, footY, faceNote + 'Cotes de la pièce finie. Les rayons, le développé et les réglages de pliage restent à valider.', 'font-size="14"');
-      svg += svgText(32, footY + 25, clientRequest ? 'Demande préparée sur cet appareil. Transmission à MIR à faire séparément.' : 'La référence Zoho Books est saisie localement. Aucun bon de commande n’a été envoyé ni synchronisé.', 'font-size="13" fill="#5b685e"');
+      svg += svgText(32, footY + 25, pricedProfiles ? 'Récapitulatif sur cet appareil. Disponibilité et fabrication à confirmer par MIR.' : clientRequest ? 'Demande préparée sur cet appareil. Transmission à MIR à faire séparément.' : 'La référence Zoho Books est saisie localement. Aucun bon de commande n’a été envoyé ni synchronisé.', 'font-size="13" fill="#5b685e"');
       if (hasPricedLines) {
         const totalLine = order.pricing.totalCents !== null ? 'Total de base : ' + priceText(order.pricing.totalCents) : order.pricing.pricedSubtotalCents !== null ? 'Sous-total des lignes tarifées : ' + priceText(order.pricing.pricedSubtotalCents) + '; autres pièces à chiffrer.' : 'Montant du dossier à vérifier; aucun total automatique.';
         svg += svgText(32, footY + 49, totalLine + ' Taxes et livraison non calculées.', 'font-size="12" fill="#5b685e"');
