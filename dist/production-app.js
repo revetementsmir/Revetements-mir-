@@ -730,13 +730,18 @@ function focusClientEntry(selector='#client-entry-title'){
  window.scrollTo({top:0,left:0,behavior:'auto'});$(selector)?.focus({preventScroll:true});
 }
 function renderClientEntry(active){
- let entry=$('#client-entry');
- if(!active){delete document.body.dataset.clientEntry;if(entry){entry.hidden=true;$('.drawing-head')?.after($('#drawing-tools'));}return;}
- if(!entry){
-  entry=document.createElement('section');entry.id='client-entry';entry.setAttribute('aria-labelledby','client-entry-title');
-  entry.innerHTML='<a class="client-entry-return" href="pliage.html">← Retour au pliage</a><button type="button" class="client-entry-return" id="client-entry-back" hidden>← Retour aux choix</button><p class="eyebrow">ÉTAPE 1 SUR 4 · FORME</p><h1 id="client-entry-title" tabindex="-1">Comment voulez-vous commencer?</h1><p id="client-entry-intro">Vous pourrez ajuster les mesures dans les deux cas.</p><div class="client-entry-cards"><button type="button" id="client-choose-model"><span class="client-entry-icon" aria-hidden="true">▱</span><span><strong>Consulter nos modèles</strong><small>Choisissez une forme et entrez vos mesures.</small></span><span aria-hidden="true">→</span></button><button type="button" id="client-draw-profile"><span class="client-entry-icon" aria-hidden="true">⌁</span><span><strong>Dessiner votre moulure personnalisée</strong><small>Tracez vos côtés sur la grille.</small></span><span aria-hidden="true">→</span></button></div><div id="client-model-options" hidden><p>Choisissez une forme, puis entrez vos mesures.</p><div id="client-standard-options"></div><div id="client-saved-options"></div></div>';
-  $('.production-workspace').before(entry);
-  $('#client-standard-options').innerHTML=Object.entries(profiles).filter(([id])=>id!=='custom').map(([id,p])=>'<button type="button" class="template-button" data-client-profile="'+esc(id)+'">'+templateIcon('profile',id)+'<span>'+esc(p.name)+'</span></button>').join('');
+ const entry=$('#client-entry');
+ if(!active){
+  if(document.body.dataset.clientEntry)$('.drawing-head')?.after($('#drawing-tools'));
+  delete document.body.dataset.clientEntry;
+  entry.hidden=true;
+  return;
+ }
+ const options=$('#client-standard-options');
+ if(!options.hasChildNodes()){
+  options.innerHTML=Object.entries(profiles).filter(([id])=>id!=='custom').map(([id,p])=>'<button type="button" class="template-button" data-client-profile="'+esc(id)+'">'+templateIcon('profile',id)+'<span>'+esc(p.name)+'</span></button>').join('');
+  $('#client-choose-model').disabled=false;
+  $('#client-draw-profile').disabled=false;
  }
  for(const button of $('#client-standard-options').querySelectorAll('[data-client-profile]'))button.setAttribute('aria-pressed',String(clientProfileSelected&&selectedTemplate?.id==='mir-standard-profile-'+button.dataset.clientProfile));
  const state=clientStep!==1?'measures':tool==='draw'?'draw':clientEntry;
@@ -2592,7 +2597,16 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
   void refreshBendTariff();
   window.addEventListener('pageshow',event=>{if(event.persisted)void refreshBendTariff();});
  }
+ delete document.documentElement.dataset.mirProfileStartup;
  window.dispatchEvent(new Event('mir-production-ready'));
 }
-boot().catch(error=>{console.error('MIR production',error);$('#production-drawing').innerHTML=`<div class="drawing-hint"><strong>Le configurateur n’a pas pu démarrer.</strong><p>${esc(error.message)}</p><button type="button" class="secondary-button" onclick="location.reload()">Réessayer</button></div>`;$('#add-production-piece').disabled=true;});
+boot().catch(error=>{
+ console.error('MIR production',error);
+ if(document.documentElement.dataset.mirProfileStartup){
+  document.documentElement.dataset.mirProfileStartup='error';
+  $('#client-startup-message').textContent='Le configurateur n’a pas pu démarrer.';
+  $('#client-startup a').hidden=false;
+  return;
+ }
+$('#production-drawing').innerHTML=`<div class="drawing-hint"><strong>Le configurateur n’a pas pu démarrer.</strong><p>${esc(error.message)}</p><button type="button" class="secondary-button" onclick="location.reload()">Réessayer</button></div>`;$('#add-production-piece').disabled=true;});
 })();
