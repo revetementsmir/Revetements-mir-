@@ -392,11 +392,13 @@ jobs:
           fetch "$base/mir-unified-client-dossier.js?verification=$GITHUB_SHA" /tmp/mir-unified-dossier.js
           cmp /tmp/mir-unified-dossier.js _site_mir/mir-unified-client-dossier.js
           grep -F "mir-unified-client-dossier-1" /tmp/mir-unified-dossier.js
+          fetch "$base/mir-bend-pricing.js?verification=$GITHUB_SHA" /tmp/mir-bend-pricing.js
+          cmp /tmp/mir-bend-pricing.js _site_mir/mir-bend-pricing.js
           fetch "$base/mir-unified-dossier.css?verification=$GITHUB_SHA" /tmp/mir-unified-dossier.css
           cmp /tmp/mir-unified-dossier.css _site_mir/mir-unified-dossier.css
           fetch "$base/selection.html?verification=$GITHUB_SHA" /tmp/mir-selection-dossier.html
           cmp /tmp/mir-selection-dossier.html _site_mir/selection.html
-          grep -F "mir-unified-client-dossier.js?v=1" /tmp/mir-selection-dossier.html
+          grep -F "mir-unified-client-dossier.js?v=" /tmp/mir-selection-dossier.html
           grep -F "mir-unified-dossier" /tmp/mir-selection-dossier.html
           fetch "$base/mir-production-client-nav.js?verification=$GITHUB_SHA" /tmp/mir-production-client-nav.js
           cmp /tmp/mir-production-client-nav.js _site_mir/mir-production-client-nav.js
@@ -406,7 +408,7 @@ jobs:
           fetch "$base/mir-unified-dossier.css?verification=$GITHUB_SHA" /tmp/mir-unified-dossier.css
           cmp /tmp/mir-unified-dossier.css _site_mir/mir-unified-dossier.css
           fetch "$base/selection.html?verification=$GITHUB_SHA" /tmp/mir-dossier-selection.html
-          grep -F "mir-unified-client-dossier.js?v=1" /tmp/mir-dossier-selection.html
+          grep -F "mir-unified-client-dossier.js?v=" /tmp/mir-dossier-selection.html
           fetch "$base/mir-production-client-nav.css?verification=$GITHUB_SHA" /tmp/mir-production-client-nav.css
           cmp /tmp/mir-production-client-nav.css _site_mir/mir-production-client-nav.css
           grep -F "mir-production-client-nav.js?v=1" /tmp/production.html
