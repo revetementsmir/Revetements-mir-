@@ -138,5 +138,25 @@
     "path": "after/reference-390.png",
     "bytes": 77766,
     "sha256": "ef5f0edd355681ee9dbb0fcf55f50391b262c4b9e354a6c6d896a0862ff2e09b"
+  },
+  {
+    "path": "before/trace-enregistre-390.png",
+    "bytes": 45582,
+    "sha256": "e0005190d2fe00697b47b57edd94c9baa480bbb6c0c172760d9c13bd18d43f11"
+  },
+  {
+    "path": "before/trace-enregistre-1440.png",
+    "bytes": 69072,
+    "sha256": "08976a101113709fbe09d868bdc709b8b5315522cbf546efe8366d95ea04227f"
+  },
+  {
+    "path": "after/trace-enregistre-390.png",
+    "bytes": 45973,
+    "sha256": "f099e15b68ffeefb4c32f35b2fad30be9c2a9e064bcc81e451e63554252e83eb"
+  },
+  {
+    "path": "after/trace-enregistre-1440.png",
+    "bytes": 71697,
+    "sha256": "54c19794b64075d8eccfc04cea2240f8aff22ae8688e932f2ed0944920ff9b60"
   }
 ]
