@@ -16,7 +16,7 @@ async function ready(){for(let i=0;i<80;i++){const ok=await new Promise(r=>http.
    const context=await browser.newContext({viewport:{width:size.width,height:size.height},hasTouch:size.width<1100});
    const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.route('**/vendor/supabase-client.js',route=>route.fulfill({status:200,contentType:'application/javascript',body:mock}));
-   await page.goto(base+'/entrepot.html?qr='+token,{waitUntil:'domcontentloaded'});
+   await page.goto(base+'/entrepot.html?qr='+token+(size.name==='mobile'?'&recette=1':''),{waitUntil:'domcontentloaded'});
    await page.locator('#wh-detail').waitFor({state:'visible',timeout:25000});
    assert.equal(await page.locator('#wh-stock-qty').textContent(),'85');
    assert.match(await page.locator('#wh-current-order').textContent(),/Reste 25/);
