@@ -164,8 +164,10 @@ body:is([data-client-entry="choice"],[data-client-entry="models"]) .production-w
 body[data-client-entry="draw"] #client-entry{min-height:0;padding-bottom:16px}
 body[data-client-entry="draw"] .production-workspace{display:block;height:auto;min-height:calc(100dvh - 270px);max-width:1080px;margin:auto}
 body[data-client-entry="draw"] .production-workspace .config-card{display:none}
-body[data-client-entry="draw"] .drawing-card{position:static;display:grid;grid-template-columns:minmax(0,1fr) 210px;align-items:start;gap:16px;background:none;border:0;border-radius:0;box-shadow:none;overflow:visible}
+body[data-client-entry="draw"] .drawing-card{position:static;display:grid;grid-template-columns:minmax(0,1fr) 210px;grid-template-areas:"canvas actions";align-items:start;gap:16px;background:none;border:0;border-radius:0;box-shadow:none;overflow:visible}
 body[data-client-entry="draw"] .drawing-card>:not(.mir-panel-synced-views):not(#production-drawing):not(#drawing-tools){display:none}
+body[data-client-entry="draw"] .drawing-card > :is(.mir-panel-synced-views,#production-drawing){grid-area:canvas}
+body[data-client-entry="draw"] .drawing-card > #drawing-tools{grid-area:actions}
 body[data-client-entry="draw"] :is(.mir-panel-synced-views,#production-drawing){min-width:0;background:#f2f5ee;border:1px solid #dce3d5;border-radius:8px;overflow:hidden}
 body[data-client-entry="draw"] #production-drawing{min-width:0;width:100%;min-height:280px;height:auto;aspect-ratio:800/520;max-height:55dvh;border:0;background:none}
 body[data-client-entry="draw"] #production-drawing>svg{width:100%;height:100%;min-height:0;max-height:none}
@@ -174,7 +176,7 @@ body[data-client-entry="draw"] #drawing-tools h2{font-size:16px}body[data-client
 body[data-client-entry="draw"] #drawing-tools .draw-primary{background:#e4efdd;color:#285f20;font-weight:700}
 body[data-client-entry="draw"] #drawing-tools button:disabled{opacity:.45}
 body[data-client-entry="draw"] .production-order{margin-top:48px}
-@media(max-width:600px){#client-entry{padding-top:20px}.client-entry-cards{grid-template-columns:1fr;gap:12px;margin-top:25px}.client-entry-cards>button{padding:18px;min-height:106px}.client-entry-cards strong{font-size:16px}.client-entry-cards small{font-size:13px}#client-entry h1{font-size:31px}#client-entry .client-entry-return{margin-bottom:18px}body[data-client-entry="draw"] .drawing-card{grid-template-columns:1fr;gap:12px}body[data-client-entry="draw"] #production-drawing{height:clamp(280px,47dvh,440px);aspect-ratio:auto;max-height:none}body[data-client-entry="draw"] #drawing-tools{display:grid;grid-template-columns:1fr 1fr;padding:14px;gap:10px}body[data-client-entry="draw"] #drawing-tools h2{display:none}body[data-client-entry="draw"] #drawing-tools .client-trace-help{grid-column:1/-1;font-size:12px}#client-standard-options{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){#client-entry{padding-top:20px}.client-entry-cards{grid-template-columns:1fr;gap:12px;margin-top:25px}.client-entry-cards>button{padding:18px;min-height:106px}.client-entry-cards strong{font-size:16px}.client-entry-cards small{font-size:13px}#client-entry h1{font-size:31px}#client-entry .client-entry-return{margin-bottom:18px}body[data-client-entry="draw"] .drawing-card{grid-template-columns:1fr;grid-template-areas:"canvas" "actions";gap:12px}body[data-client-entry="draw"] #production-drawing{height:clamp(280px,47dvh,440px);aspect-ratio:auto;max-height:none}body[data-client-entry="draw"] #drawing-tools{display:grid;grid-template-columns:1fr 1fr;padding:14px;gap:10px}body[data-client-entry="draw"] #drawing-tools h2{display:none}body[data-client-entry="draw"] #drawing-tools .client-trace-help{grid-column:1/-1;font-size:12px}#client-standard-options{grid-template-columns:1fr 1fr}}
 
 /* Parcours public des moulures. Le bandeau commun porte le dossier et le menu. */
 body[data-client-entry] :is(.production-intro,.mir-production-steps),

@@ -19,7 +19,15 @@ body[data-client-pliage-landing] .page-main{padding-top:clamp(32px,5vw,72px);max
 body[data-client-pliage-landing] #mir-harmony-menu nav a[aria-current="page"]{background:#e5efdf;color:#205e21}
 
 /* The entry fits one screen. The legacy form remains an explicit advanced path. */
-body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) :is(.subnav,.mir-signature-footer){display:none}
+body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) .subnav{display:none}
+body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) footer.mir-signature-footer{
+ display:block;margin:0 auto;padding:4px 0 8px;
+}
+body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) footer.mir-signature-footer>:not(nav){display:none}
+body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) .mir-signature-footer nav{justify-content:center;gap:0 12px}
+body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) .mir-signature-footer nav a{
+ display:inline-flex;align-items:center;min-height:44px;
+}
 @media(max-width:600px){
  body[data-client-pliage-landing] .page-main{padding-top:18px}
  .client-bend-hero{gap:12px;padding-bottom:10px}

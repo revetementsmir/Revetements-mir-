@@ -11,6 +11,33 @@ const dossier={version:1,order:{id:'qa-existing-dossier',project:'Dossier exista
 const quick={version:1,project:'Liste rapide QA',items:[{id:'quick-existing',profile:'l',dimensions:{A:3.5,B:2.25},lengthIn:120,quantity:2}]};
 const modelRecord={id:t.template.id,name:t.template.name,currentVersion:1,versions:[t.template],channels:{client:true,store:false,po:true},archived:false,allowed:{materials:['aluminium','acier'],colorSystems:['manufacturer','special']}};
 async function contextFor(browser,base,viewport){const context=await browser.newContext({viewport,isMobile:viewport.width<=428,hasTouch:viewport.width<=1024});await context.route('**/*',route=>{if(!route.request().url().startsWith(base))return route.abort();return route.continue();});return context;}
+async function compareHomepagePixels(page,images){
+ if(images[0].equals(images[1]))return 0;
+ return page.evaluate(async([before,after])=>{
+  const decoded=await Promise.all([before,after].map(async value=>{
+   const img=new Image();img.src='data:image/png;base64,'+value;await img.decode();return img;
+  }));
+  const [a,b]=decoded;
+  if(a.width!==b.width||a.height!==b.height)throw Error('Les dimensions de la capture d’accueil ont changé');
+  const canvas=document.createElement('canvas');canvas.width=a.width;canvas.height=a.height;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  const pixels=decoded.map(image=>{
+   ctx.drawImage(image,0,0);return ctx.getImageData(0,0,a.width,a.height).data;
+  });
+  let count=0;
+  for(let i=0;i<pixels[0].length;i+=4){
+   let changed=false;
+   for(let channel=0;channel<4;channel++){
+    const delta=Math.abs(pixels[0][i+channel]-pixels[1][i+channel]);
+    if(delta>1)throw Error('Le rendu de l’accueil a changé au-delà de l’anticrénelage');
+    changed ||= delta>0;
+   }
+   if(changed)count++;
+  }
+  if(count>a.width*a.height/10000)throw Error('Trop de pixels différents dans l’accueil');
+  return count;
+ },images.map(image=>image.toString('base64')));
+}
 (async()=>{const server=serve(root);server.listen(0,'127.0.0.1');await once(server,'listening');const base='http://127.0.0.1:'+server.address().port;
 const beforeDir=process.env.MIR_CLIENT_BASELINE_DIR,before=beforeDir?serve(path.resolve(beforeDir)):null;if(before){before.listen(0,'127.0.0.1');await once(before,'listening');}
 const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium'}),results=[];try{
@@ -24,11 +51,15 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
  }),true,'wizard fits one screen '+width);
  await page.goto(base+'/pliage.html');await page.locator('#bend-items [data-qty]').waitFor({state:'attached'});assert.equal(await page.locator('#client-bend-quick').getAttribute('open'),null);assert.equal(await page.getByRole('link',{name:'Pliage personnalisé'}).count(),1);
  const action=await page.getByRole('link',{name:'Pliage personnalisé'}).boundingBox();assert.ok(action.y+action.height<=height,'CTA above fold '+width);const illustration=await page.locator('.client-bend-example').boundingBox();assert.ok(width<=600?illustration.y>=action.y+action.height:illustration.x>action.x+action.width,'responsive landing '+width);await noOverflow();
- await page.screenshot({path:path.join(proof,'01-introduction-'+width+'.png')});await page.locator('#client-bend-quick summary').click();await page.locator('#bend-project').fill('Liste rapide conservée');await page.locator('#bend-items [data-qty]').fill('3');await page.locator('#bend-items [data-qty]').press('Tab');const quickSaved=await page.evaluate(()=>localStorage.getItem('mir-bending-v1'));assert.equal(JSON.parse(quickSaved).items[0].quantity,3);await page.reload();await page.locator('#bend-items [data-qty]').waitFor({state:'attached'});assert.equal(await page.locator('#client-bend-quick').getAttribute('open'),null);assert.equal(await page.locator('#bend-project').inputValue(),'Liste rapide conservée');
+ await page.screenshot({path:path.join(proof,'01-introduction-'+width+'.png')});assert.equal(await page.locator('footer.mir-signature-footer nav a:visible').count(),5);await page.locator('#client-bend-quick summary').click();await page.locator('#bend-project').fill('Liste rapide conservée');await page.locator('#bend-items [data-qty]').fill('3');await page.locator('#bend-items [data-qty]').press('Tab');const quickSaved=await page.evaluate(()=>localStorage.getItem('mir-bending-v1'));assert.equal(JSON.parse(quickSaved).items[0].quantity,3);await page.reload();await page.locator('#bend-items [data-qty]').waitFor({state:'attached'});assert.equal(await page.locator('#client-bend-quick').getAttribute('open'),null);assert.equal(await page.locator('#bend-project').inputValue(),'Liste rapide conservée');
  const headerSize=()=>page.locator('#mir-harmony-header').evaluate(el=>[el.offsetWidth,el.offsetHeight]);const beforeHeader=await headerSize();await page.getByRole('link',{name:'Pliage personnalisé'}).click();await page.locator('#client-entry').waitFor();assert.deepEqual(await headerSize(),beforeHeader,'same header dimensions');await page.locator('.mir-harmony-toggle').click();assert.equal(await page.locator('#mir-harmony-menu a[aria-current=page]').isVisible(),true);assert.equal(await page.locator('#mode-link').isVisible(),false);await page.keyboard.press('Escape');assert.equal(await page.locator('#mir-harmony-menu').isVisible(),false);await page.waitForFunction(()=>!!window.MIRProductionWorkspace);assert.equal(await page.locator('.drawing-card').isVisible(),false,'no empty preview');const a=await page.locator('#client-choose-model').boundingBox(),b=await page.locator('#client-draw-profile').boundingBox();assert.ok(Math.abs(a.height-b.height)<2,'equal card importance');assert.ok(width<=600?b.y>=a.y+a.height:Math.abs(a.y-b.y)<2,'responsive choices');await noOverflow();await page.screenshot({path:path.join(proof,'02-choix-'+width+'.png')});
  await page.locator('#client-choose-model').click();await noOverflow();assert.ok(await page.locator('#client-standard-options button').count()>0);assert.equal(await page.locator('[data-saved-template="qa-client-model"]').isVisible(),true);await page.locator('[data-client-profile="l"]').click();await page.waitForFunction(()=>document.body.dataset.clientStage==='2');assert.equal(await page.locator('[data-measure="A"]').inputValue(),'');await page.locator('[data-measure="A"]').fill('3½');await page.locator('[data-measure="B"]').fill('2¼');assert.equal(await page.locator('#client-step-next').isEnabled(),true);assert.ok(Math.abs(await page.evaluate(()=>window.MIRProductionWorkspace.getLivePreviewState().model.segments[0].lengthMM)-88.9)<1e-9);
  await page.locator('#client-step-back').click();await page.locator('#client-choose-model').click();await page.locator('[data-client-profile="l"]').click();await page.waitForFunction(()=>document.body.dataset.clientStage==='2');assert.equal(await page.locator('[data-measure="A"]').inputValue(),'3½','same standard model retains typed measurements');await page.locator('#client-step-back').click();await page.locator('#client-choose-model').click();await page.locator('[data-saved-template="qa-client-model"]').click();await page.waitForFunction(()=>document.body.dataset.clientStage==='2');assert.equal(await page.locator('#production-dimensions').isVisible(),true);const firstModelField=page.locator('#production-dimensions input').first();await firstModelField.fill('4');await page.locator('#client-step-back').click();await page.locator('#client-choose-model').click();await page.locator('[data-saved-template="qa-client-model"]').click();await page.waitForFunction(()=>document.body.dataset.clientStage==='2');assert.equal(await firstModelField.inputValue(),'4','same saved model retains typed measurements');await page.locator('#client-step-back').click();
- await page.locator('#client-draw-profile').click();await page.waitForFunction(()=>scrollY===0);assert.equal(await page.locator('.mobile-trace').count(),0,'portrait without forced fullscreen');const draw=page.locator('#production-drawing'),tools=page.locator('#drawing-tools');let box=await draw.boundingBox(),controls=await tools.boundingBox();assert.ok(box.width>=250&&box.height>=280,'useful drawing surface');assert.ok(width<=600?controls.y>=box.y+box.height-1:controls.x>=box.x+box.width-1,'drawing actions position');assert.ok((await tools.locator('button').first().boundingBox()).height>=44);await noOverflow();await page.screenshot({path:path.join(proof,'03-dessin-'+width+'.png')});
+ await page.locator('#client-draw-profile').click();await page.waitForFunction(()=>scrollY===0);assert.equal(await page.locator('.mobile-trace').count(),0,'portrait without forced fullscreen');const draw=page.locator('#production-drawing'),tools=page.locator('#drawing-tools');const {box,controls}=await page.evaluate(async()=>{
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  return {box:document.querySelector('#production-drawing').getBoundingClientRect().toJSON(),
+   controls:document.querySelector('#drawing-tools').getBoundingClientRect().toJSON()};
+ });assert.ok(box.width>=250&&box.height>=280,'useful drawing surface');assert.ok(width<=600?controls.top>=box.bottom-1:controls.left>=box.right-1,'drawing actions position '+width+' '+JSON.stringify({box,controls}));assert.ok(controls.bottom<=height+1,'drawing actions visible '+width);assert.ok((await tools.locator('button').first().boundingBox()).height>=44);await noOverflow();await page.screenshot({path:path.join(proof,'03-dessin-'+width+'.png')});
  const tap=async(x,y)=>{const screen=await page.locator('#production-drawing svg').evaluate((s,[x,y])=>{const p=new DOMPoint(x,y).matrixTransform(s.getScreenCTM());return {x:p.x,y:p.y};},[x,y]);assert.equal(await page.evaluate(({x,y})=>!!document.elementFromPoint(x,y)?.closest('#production-drawing'),screen),true,'trace coordinate hits actual canvas');if(width<=1024)await page.touchscreen.tap(screen.x,screen.y);else await page.mouse.click(screen.x,screen.y);};
  const finish=tools.getByRole('button',{name:'Suivant — terminer le dessin',exact:true});assert.equal(await finish.isDisabled(),true);await tap(220,330);assert.equal(await page.evaluate(()=>window.MIRProductionWorkspace.getLivePreviewState().drawPointsMM.length),1);await tap(380,330);assert.equal(await finish.isDisabled(),true);await tap(380,210);assert.equal(await finish.isEnabled(),true);await tools.getByRole('button',{name:'Annuler le point',exact:true}).click();assert.equal(await page.evaluate(()=>window.MIRProductionWorkspace.getLivePreviewState().drawPointsMM.length),2);assert.equal(await finish.isDisabled(),true);await tap(380,210);assert.equal(await finish.isEnabled(),true);assert.deepEqual(await page.locator('#production-drawing .mir-angle-annotation text').allTextContents(),['90°']);const geometry=await page.evaluate(()=>JSON.stringify(window.MIRProductionWorkspace.getLivePreviewState().model.pointsMM));await finish.click();await page.waitForFunction(()=>document.body.dataset.clientStage==='2');assert.equal(await page.evaluate(()=>JSON.stringify(window.MIRProductionWorkspace.getLivePreviewState().model.pointsMM)),geometry);assert.equal(await page.locator('[data-segment-length]').count(),2);await noOverflow();assert.match(await page.locator('#client-step-hint').textContent(),/10 pi/);await page.locator('#client-step-next').click();assert.equal(await page.locator('body').getAttribute('data-client-stage'),'4');assert.match(await page.locator('#client-step-count').textContent(),/3 SUR 4/);await page.locator('#client-step-back').click();assert.equal(await page.locator('body').getAttribute('data-client-stage'),'2');await page.screenshot({path:path.join(proof,'04-mesures-'+width+'.png')});
  await page.locator('#client-step-next').click();
@@ -47,13 +78,34 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
 
  assert.equal(await page.evaluate(()=>localStorage.getItem('mir_production_client_dossier_v1')),JSON.stringify(dossier),'existing dossier unchanged');assert.equal(await page.evaluate(()=>localStorage.getItem('mir-bending-v1')),quickSaved,'quick list unchanged');await page.locator('.mir-harmony-dossier').click();await page.waitForURL('**/selection.html#mir-unified-dossier');await page.locator('#mir-unified-pieces li').waitFor();assert.equal(await page.locator('#mir-unified-pieces li').count(),1);assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_client_dossier_v1')).order.items[0].snapshot.revision),1);assert.deepEqual(errors,[]);results.push({width,height,input:width<=1024?'touch':'mouse',landing:true,models:true,freehand:true,undo:true,measurements:true,existingDossier:true});await c.close();console.log('PASS client pliage '+width+'×'+height+' landing/models/native trace/undo/measures/existing dossier');
  }
- if(before){const beforeBase='http://127.0.0.1:'+before.address().port;for(const [width,height]of [[390,844],[834,1112],[1348,926]]){const images=[];for(const [label,url]of [['avant',beforeBase],['apres',base]]){const c=await contextFor(browser,url,{width,height}),page=await c.newPage();await page.goto(url+'/index.html');await page.evaluate(()=>{for(const image of document.images)image.loading='eager';});
-  await page.waitForFunction(()=>[...document.images].every(image=>image.complete&&image.naturalWidth>0));
-  await page.evaluate(async()=>{
-   await Promise.all([...document.images].map(image=>image.decode()));
-   await document.fonts.ready;
-   scrollTo({top:0,left:0,behavior:'instant'});
-   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-  });await page.screenshot({path:path.join(proof,'accueil-'+label+'-'+width+'.png'),fullPage:true,animations:'disabled'});images.push(fs.readFileSync(path.join(proof,'accueil-'+label+'-'+width+'.png')));await c.close();}assert.equal(images[0].equals(images[1]),true,'homepage pixel-identical '+width);results.push({homepageWidth:width,height,pixelIdentical:true,sha256:crypto.createHash('sha256').update(images[0]).digest('hex')});console.log('PASS homepage before/after pixel-identical '+width);}}
+ if(before){
+  const beforeBase='http://127.0.0.1:'+before.address().port;
+  for(const [width,height]of [[390,844],[834,1112],[1348,926]]){
+   const images=[],sources=[],contexts=[];
+   for(const [label,url]of [['avant',beforeBase],['apres',base]]){
+    const c=await contextFor(browser,url,{width,height}),page=await c.newPage(),responses=[];
+    contexts.push(c);
+    page.on('response',res=>{if(res.ok())responses.push(res);});
+    await page.goto(url+'/index.html');
+    await page.evaluate(()=>{for(const image of document.images)image.loading='eager';});
+    await page.waitForFunction(()=>[...document.images].every(image=>image.complete&&image.naturalWidth>0));
+    await page.evaluate(async()=>{
+     await Promise.all([...document.images].map(image=>image.decode()));
+     await document.fonts.ready;
+     scrollTo({top:0,left:0,behavior:'instant'});
+     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    });
+    images.push(await page.screenshot({path:path.join(proof,'accueil-'+label+'-'+width+'.png'),fullPage:true,animations:'disabled'}));
+    sources.push(Object.fromEntries(await Promise.all(responses.map(async res=>[
+     new URL(res.url()).pathname,crypto.createHash('sha256').update(await res.body()).digest('hex')
+    ]))));
+   }
+   assert.deepEqual(sources[0],sources[1],'identical homepage resources '+width);
+   const changedPixels=await compareHomepagePixels(contexts[1].pages()[0],images);
+   for(const c of contexts)await c.close();
+   results.push({homepageWidth:width,height,identicalResources:true,changedPixels});
+   console.log('PASS homepage '+width+' identical resources · '+changedPixels+' subpixel differences');
+  }
+ }
  fs.writeFileSync(path.join(proof,'results.json'),JSON.stringify({browser:'Installed Chromium, emulation only; no physical Android/iPad/Safari claim',externalNetwork:'Blocked equally for deterministic local screenshots; no remote writes',results},null,2));
 }finally{await browser.close();server.close();before?.close();}})().catch(e=>{console.error(e);process.exitCode=1});
