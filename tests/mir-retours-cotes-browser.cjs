@@ -113,18 +113,27 @@ async function ready(){
       throw new Error(error.message+' ; points : '+JSON.stringify(drawing)+' ; dernière fenêtre : '+await prompt.locator('#production-dialog-content').textContent()+' ; erreurs : '+errors.join(', '));
      });
      assert.equal(await prompt.locator('h2').textContent(),'De quel côté replier le bord ?');
-     const options=prompt.locator('[data-trace-hem-direction]');
+     const options=prompt.locator('.mir-hem-option');
      assert.equal(await options.count(),2,'Deux sens illustrés sont proposés');
-     const sketches=await options.locator(':scope > svg').evaluateAll(nodes=>nodes.map(svg=>({
+     const sketches=await options.locator('svg').evaluateAll(nodes=>nodes.map(svg=>({
       markup:svg.outerHTML,
+      marked:!!svg.querySelector('[data-hem-edge]'),
       faces:[...svg.querySelectorAll('polygon[fill^=rgb]')].map(p=>p.getAttribute('points'))
      })));
      assert.equal(sketches.length,2);
+     assert.ok(sketches.every(s=>s.marked),'Le repli est marqué sur le profil lui-même');
+     assert.deepEqual(await options.evaluateAll(nodes=>nodes.map(node=>getComputedStyle(node).display)),['grid','grid']);
+     const [first,second]=await options.evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect().toJSON()));
+     assert.ok(Math.abs(first.x-second.x)<1&&first.bottom<=second.top&&Math.abs(first.width-second.width)<1,'Deux cartes pleine largeur empilées');
      assert.ok(sketches.every(s=>s.faces.length>4&&s.faces.every(f=>!f.includes('NaN'))),'Deux volumes métalliques complets');
      assert.ok(sketches.every(s=>!/#d27b25|#ad5010|orange/i.test(s.markup)),'Le métal est rendu sans trait orange');
      assert.notDeepEqual(sketches[0].faces,sketches[1].faces,'Le sens est visible dans la géométrie 3D');
      if(label==='Annuler')await prompt.getByRole('button',{name:'Annuler',exact:true}).click();
-     else await prompt.locator('[data-trace-hem-direction="'+label+'"]').click();
+     else{
+      await options.filter({has:page.locator('input[value="'+label+'"]')}).click();
+      assert.equal(await prompt.isVisible(),true,'Choisir ne confirme pas encore');
+      await prompt.getByRole('button',{name:'Confirmer le repli'}).click();
+     }
      await prompt.waitFor({state:'hidden'});
     };
     const arc=()=>stage.locator('svg > path[d*=" A5 5 "]').first().getAttribute('d');

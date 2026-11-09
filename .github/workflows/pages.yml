@@ -386,7 +386,7 @@ jobs:
           grep -F 'template-library-backup.js?v=backup-1' /tmp/mir-backup-page.html
           fetch "$base/production-app.js?verification=$GITHUB_SHA" /tmp/production-app.js
           cmp /tmp/production-app.js _site_mir/production-app.js
-          grep -F "function hemChoicePreviews(specs,atStart=false)" /tmp/production-app.js
+          grep -F "function hemChoicePreviews(" /tmp/production-app.js
           grep -Fq "function faceChoiceCards(" /tmp/production-app.js
           grep -Fq "function profileAnglesOverlay(" /tmp/production-app.js
           fetch "$base/mir-unified-client-dossier.js?verification=$GITHUB_SHA" /tmp/mir-unified-dossier.js

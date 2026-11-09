@@ -202,9 +202,11 @@ function bendFields(bend,index,expanded){
  const b=bend||{mode:'interior',angle:90,direction:'left'};
  if(clientProfileWizard())return '';
  if(client||editingItemId)return `<p class="field-hint">Pli ${index+1} : ${b.mode==='hem'?'retour écrasé 180°':esc(b.angle)+'° '+(b.mode==='interior'?'intérieur':'de rotation')}${b.direction?' · '+(b.direction==='left'?'gauche':'droite'):''} · défini par le modèle</p>`;
+ const legend='Sens du pli '+(index+1);
  const sense=b.mode==='signed'?
   '<p class="field-hint">Le signe de l’angle indique le sens de la rotation.</p>':
-  bendChoiceMarkup('bend-direction-'+index,b.direction||'left',b.mode==='hem'?180:b.angle,{index,legend:'Sens du pli '+(index+1)});
+  b.mode==='hem'?hemChoiceCards('bend-direction-'+index,{selected:b.direction||'left',index,legend}):
+  bendChoiceMarkup('bend-direction-'+index,b.direction||'left',b.angle,{index,legend});
  return `<details class="angle-details" data-angle-details="${index}"${expanded||draft.bends.length===1?' open':''}><summary>Pli ${esc(draft.segments[index].label)} → ${esc(draft.segments[index+1].label)}</summary>
  <div class="bend-fields mir-bend-controls">
  <label>Type du pli<select data-bend-mode="${index}"><option value="interior"${b.mode==='interior'?' selected':''}>Angle intérieur</option><option value="signed"${b.mode==='signed'?' selected':''}>Rotation signée</option><option value="hem"${b.mode==='hem'?' selected':''}>Retour écrasé 180°</option></select></label>
@@ -506,8 +508,7 @@ function panelDiagramSVG(model,{illustrative=false,small=false,interactive=true}
  return svg+'</svg>';
 }
 function profileHemRadius(model){return Math.min(1.5,Math.max(.5,model.material?.thicknessMM||.65));}
-function profileVolumeStrips(model){
- const radius=profileHemRadius(model);
+function profileVolumeStrips(model,radius=profileHemRadius(model)){
  const section=M.profileSectionPath(model.pointsMM.map(([x,y])=>[x,-y]),model.bends,radius);
  const runs=section.segments.map(pair=>pair.map(([x,y])=>[x,-y]));
  return runs.flatMap(([a,b],index)=>{
@@ -849,6 +850,7 @@ function updateDrawing({keepForm=false}={}){
  document.body.dataset.panelSketch=String(kind==='panel'&&tool==='panel-trace');
  syncPieceNameField();
  renderFractionPickers();
+ refreshInlineHemCards();
  const actual=build(),shown=drawingModel(),mesh=kind==='panel'&&actual.valid&&!authoring?window.MIRProductionVolume?.buildMesh(actual):null;
  const angleList=$('#mir-angle-summary');
  if(angleList){
@@ -1814,8 +1816,9 @@ function hemChoiceCaption(direction,atStart=false){
  // At the start, it is the supporting flange that moves through the bend.
  return (direction==='left')!==atStart?'Repli au-dessus':'Repli au-dessous';
 }
-function hemChoicePreviews(specs,atStart=false){
- const width=290, fullHeight=104, detailHeight=68;
+const hemDirections=['left','right'];
+function hemChoicePreviews(specs,atStart=false,index=null){
+ const width=218,height=128;
  const project=([x,y],z)=>[x+z*.48,-y-z*.28];
  const eye=[.48,.28];
  const corners=({a,b},length)=>[project(a,0),project(b,0),project(b,length),project(a,length)];
@@ -1823,62 +1826,85 @@ function hemChoicePreviews(specs,atStart=false){
   if(!spec)return null;
   const model=build(spec);
   if(!model.valid)return null;
-  const strips=profileVolumeStrips(model);
-  const bendIndex=atStart?0:model.bends.length-1;
+  const {minX,maxX,minY,maxY}=model.bbox;
+  const span=Math.max(maxX-minX,maxY-minY,32);
+  // Visually open the hem in this small illustration; the part's measurements stay intact.
+  const radius=Math.max(profileHemRadius(model),Math.min(5,span*.035));
+  const strips=profileVolumeStrips(model,radius);
+  const bendIndex=index??(atStart?0:model.bends.length-1);
   const support=strips.find(s=>s.segmentIndex===bendIndex+(atStart?1:0)&&!s.rounded);
   if(!support)return null;
   const joint=atStart?support.a:support.b;
   const axis=support.b.map((b,i)=>(b-support.a[i])*(atStart?-1:1));
   const length=Math.hypot(...axis)||1;
   const [ux,uy]=axis.map(v=>v/length);
-  const relative=p=>p.map((v,i)=>v-joint[i]);
-  const detailPoint=p=>{const [x,y]=relative(p);return [x*ux+y*uy,y*ux-x*uy];};
-  const transformed=(parts,fn)=>parts.map(s=>({...s,a:fn(s.a),b:fn(s.b)}));
-  return {
-   whole:transformed(strips,relative),
-   detail:transformed(strips.filter(s=>s.segmentIndex===bendIndex||s.segmentIndex===bendIndex+1),detailPoint),
-   radius:profileHemRadius(model),
-   dimensions:model.bbox,
-   length:model.lengthMM||254
+  const align=([x,y])=>{
+   x-=joint[0];y-=joint[1];
+   return [x*ux+y*uy,y*ux-x*uy];
   };
+  const whole=strips.map(s=>({...s,a:align(s.a),b:align(s.b)}));
+  const edge=whole.filter(s=>s.segmentIndex===bendIndex&&s.rounded||
+   s.segmentIndex===bendIndex+(atStart?0:1)&&!s.rounded);
+  return {whole,edge,sample:Math.min(model.lengthMM||254,span*.62)};
  });
  const valid=candidates.filter(Boolean);
- if(!valid.length)return specs.map(()=>'<span class="mir-hem-invalid">Longueur incompatible avec ce retour.</span>');
- const first=valid[0];
- const {minX,maxX,minY,maxY}=first.dimensions;
- const sample=Math.min(first.length,Math.max(maxX-minX,maxY-minY,32)*.62);
+ const unavailable='<span class="mir-hem-invalid">Aperçu indisponible. Vérifiez les cotes.</span>';
+ if(!valid.length)return specs.map(()=>unavailable);
+ const sample=valid[0].sample;
  const all=valid.flatMap(c=>c.whole.flatMap(s=>corners(s,sample)));
- const wholeBounds=[0,1].map(i=>[Math.min(...all.map(p=>p[i])),Math.max(...all.map(p=>p[i]))]);
- const r=first.radius;
- const detailSample=Math.min(first.length,r*9);
- const detailBounds=[[-r*12,r*8],[-r*5,r*3]];
- function view(strips,length,bounds,height,gradient){
-  const [[minX,maxX],[minY,maxY]]=bounds;
-  const scale=Math.min((width-24)/Math.max(1,maxX-minX),(height-14)/Math.max(1,maxY-minY));
-  const pixel=([x,y])=>[fmt(width/2+(x-(maxX+minX)/2)*scale),fmt(height/2+(y-(maxY+minY)/2)*scale)].join(',');
-  return orderProfileStrips(strips,eye).map(s=>{
+ const [[minX,maxX],[minY,maxY]]=[0,1].map(i=>[Math.min(...all.map(p=>p[i])),Math.max(...all.map(p=>p[i]))]);
+ const scale=Math.min((width-28)/Math.max(1,maxX-minX),(height-22)/Math.max(1,maxY-minY));
+ const pixel=([x,y])=>[fmt(width/2+(x-(maxX+minX)/2)*scale),fmt(height/2+(y-(maxY+minY)/2)*scale)].join(',');
+ return candidates.map((candidate,i)=>{
+  if(!candidate)return unavailable;
+  const gradient='mir-hem-metal-'+uid();
+  const volume=orderProfileStrips(candidate.whole,eye).map(s=>{
    const dx=s.b[0]-s.a[0],dy=s.b[1]-s.a[1];
    const litSide=dx*eye[1]-dy*eye[0]>0;
    const tone=Math.round((litSide?166:136)+56*Math.abs(dx+dy*.55)/(Math.hypot(dx,dy)*1.15||1));
-   const [a,b,c,d]=corners(s,length).map(pixel);
-   return `<polygon points="${a} ${b} ${c} ${d}" fill="rgb(${tone},${tone+4},${tone+8})"/><polygon points="${a} ${b} ${c} ${d}" fill="url(#${gradient})"/><path d="M${a} L${b} M${c} L${d}" fill="none" stroke="#42505a" stroke-width=".75"/>`;
+   const [a,b,c,d]=corners(s,sample).map(pixel);
+   return `<polygon points="${a} ${b} ${c} ${d}" fill="rgb(${tone},${tone+4},${tone+8})"/><polygon points="${a} ${b} ${c} ${d}" fill="url(#${gradient})"/><path d="M${a} L${b} M${c} L${d}" fill="none" stroke="#42505a" stroke-width=".85"/>`;
   }).join('');
- }
- return candidates.map((candidate,i)=>{
-  if(!candidate)return '<span class="mir-hem-invalid">Longueur incompatible avec ce retour.</span>';
-  const gradient='mir-hem-metal-'+i;
-  return `<svg viewBox="0 0 ${width} ${fullHeight+detailHeight}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Aperçu 3D du double pli, choix ${i+1}">
+  const edge=candidate.edge.map(s=>`M${pixel(project(s.a,0))} L${pixel(project(s.b,0))}`).join(' ');
+  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Aperçu 3D · ${hemChoiceCaption(hemDirections[i],atStart)}">
    <defs><linearGradient id="${gradient}" x2=".75" y2="1">
     <stop offset="0" stop-color="#fff" stop-opacity=".64"/><stop offset=".43" stop-color="#fff" stop-opacity=".06"/>
     <stop offset=".58" stop-color="#fff" stop-opacity=".26"/><stop offset="1" stop-color="#273744" stop-opacity=".36"/>
    </linearGradient></defs>
-   <rect width="${width}" height="${fullHeight}" rx="7" fill="#edf1f3"/>
-   ${view(candidate.whole,sample,wholeBounds,fullHeight,gradient)}
-   <svg x="0" y="${fullHeight}" width="${width}" height="${detailHeight}" viewBox="0 0 ${width} ${detailHeight}" overflow="hidden">
-    <rect width="${width}" height="${detailHeight}" fill="#e3e9ec"/>
-    ${view(candidate.detail,detailSample,detailBounds,detailHeight,gradient)}
-   </svg></svg>`;
+   ${volume}
+   <path data-hem-edge d="${edge}" fill="none" stroke="#317133" stroke-width="3.4" stroke-linecap="round"/>
+   </svg>`;
  });
+}
+function hemChoiceCards(name,{selected=null,index=null,hideLegend=false,legend='Sens du retour',previews=[],atStart=false}={}){
+ const cards=hemDirections.map((direction,i)=>{
+  const label=hemChoiceCaption(direction,atStart);
+  const control=index===null?'':' data-bend-direction="'+index+'"';
+  return `<label class="mir-hem-option">
+   <span class="mir-hem-image" data-hem-preview="${direction}">${previews[i]||''}</span>
+   <input type="radio" name="${name}" value="${direction}"${control}${selected===direction?' checked':''} required aria-label="${label}">
+   <span class="mir-hem-copy"><strong>${label}</strong><small>Le métal revient ${label.endsWith('dessus')?'sur':'sous'} le bord.</small></span>
+   </label>`;
+ }).join('');
+ return `<fieldset class="mir-hem-choice-fieldset"><legend${hideLegend?' class="sr-only"':''}>${legend}</legend>
+  <div class="mir-hem-choice-grid" data-hem-cards${index===null?'':' data-hem-index="'+index+'"'}>${cards}</div></fieldset>`;
+}
+function refreshInlineHemCards(){
+ const grids=document.querySelectorAll('#production-dimensions [data-hem-index]');
+ if(!grids.length)return;
+ const key=JSON.stringify([draft.segments,draft.bends,draft.unit,draft.startAngle,draft.material?.thickness,draft.material?.thicknessUnit]);
+ for(const grid of grids){
+  if(grid.dataset.hemGeometry===key)continue;
+  grid.dataset.hemGeometry=key;
+  const index=Number(grid.dataset.hemIndex);
+  const candidates=hemDirections.map(direction=>{
+   const next=copy(draft);
+   next.bends[index].direction=direction;
+   return next;
+  });
+  const previews=hemChoicePreviews(candidates,false,index);
+  grid.querySelectorAll('[data-hem-preview]').forEach((span,i)=>{span.innerHTML=previews[i];});
+ }
 }
 /* Même composant de direction sur PC, téléphone et tablette. */
 function bendTurnSketch(direction,angle=90){
@@ -1912,21 +1938,22 @@ function appendTracePoint(point, start){
  const spec=toCustom(points);
  const bend=spec?.bends.at(-1);
  if(bend?.mode==='hem'){
-  const directions=['left','right'];
-  const candidates=directions.map(direction=>{
+  const candidates=hemDirections.map(direction=>{
    const candidate=copy(spec);
    candidate.bends.at(-1).direction=direction;
    return candidate;
   });
-  const previews=hemChoicePreviews(candidates);
-  const buttons=directions.map((direction,i)=>'<button type="button" class="mir-hem-option" data-trace-hem-direction="'+direction+'">'+
-   previews[i]+'<strong>'+hemChoiceCaption(direction)+'</strong></button>').join('');
   dialog('De quel côté replier le bord ?',
-   'Chaque aperçu montre la moulure en haut et le bord agrandi en bas. Choisissez de quel côté le métal revient.',
-   '<div class="mir-hem-choice-grid" role="group" aria-label="Choix du sens du retour">'+buttons+'</div>'+
-   '<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button></div>');
-  $('#production-dialog-content').querySelectorAll('[data-trace-hem-direction]').forEach((choice,i)=>{
-   choice.onclick=()=>{closeDialog();commitTrace(points,candidates[i]);};
+   'Le trait vert indique le retour sur la moulure.',
+   '<form id="trace-hem-form" class="dialog-form">'+
+   hemChoiceCards('direction',{hideLegend:true,previews:hemChoicePreviews(candidates)})+
+   '<div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button>'+
+   '<button type="submit" class="primary-button">Confirmer le repli</button></div></form>');
+  $('#trace-hem-form').addEventListener('submit',event=>{
+   event.preventDefault();
+   const index=hemDirections.indexOf(new FormData(event.currentTarget).get('direction'));
+   if(index<0)return;
+   closeDialog();commitTrace(points,candidates[index]);
   });
   return;
  }
@@ -1988,14 +2015,7 @@ function endHemDialog(){
   `<form id="end-hem-form" class="dialog-form">
     <label>Extrémité<select name="end"><option value="start">Début · ${esc(first.label+side(start,end))}</option><option value="end">Fin · ${esc(last.label+side(end,start))}</option></select></label>
     <label>Longueur du retour (${draft.unit==='mm'?'mm':'po'})<input name="length" value="${draft.unit==='mm'?'13':'1/2'}" inputmode="decimal" required></label>
-    <fieldset class="mir-hem-choice-fieldset"><legend>Quel résultat veux-tu ?</legend>
-    <div class="mir-hem-choice-grid" role="radiogroup" aria-label="Sens du retour">
-      <label class="mir-hem-option"><input type="radio" name="direction" value="left" required>
-        <span data-hem-preview="left"></span><strong>Choix 1</strong></label>
-      <label class="mir-hem-option"><input type="radio" name="direction" value="right" required>
-        <span data-hem-preview="right"></span><strong>Choix 2</strong></label>
-    </div></fieldset>
-    <p class="mir-hem-note">L’aperçu du bas agrandit le détail du bord.</p>
+    ${hemChoiceCards('direction')}
     <p id="production-dialog-error" class="dialog-error" role="alert"></p>
     <div class="dialog-actions"><button type="button" class="secondary-button" data-close-production-dialog>Annuler</button><button class="primary-button" type="submit">Ajouter ce retour</button></div>
    </form>`);
@@ -2013,13 +2033,20 @@ function endHemDialog(){
    const preview=form.querySelector('[data-hem-preview="'+direction+'"]');
    const radio=form.querySelector('input[name="direction"][value="'+direction+'"]');
    preview.innerHTML=previews[i];
-   radio.closest('label').querySelector('strong').textContent=hemChoiceCaption(direction,atStart);
+   const label=hemChoiceCaption(direction,atStart);
+   radio.setAttribute('aria-label',label);
+   const copy=radio.closest('label').querySelector('.mir-hem-copy');
+   copy.querySelector('strong').textContent=label;
+   copy.querySelector('small').textContent='Le métal revient '+(label.endsWith('dessus')?'sur':'sous')+' le bord.';
    radio.disabled=!specs[i]||!build(specs[i]).valid;
    if(radio.disabled)radio.checked=false;
   });
  };
- form.addEventListener('input',showChoices);
- form.addEventListener('change',showChoices);
+ form.elements.namedItem('length').addEventListener('input',showChoices);
+ form.elements.namedItem('end').addEventListener('change',()=>{
+  form.querySelectorAll('input[name="direction"]').forEach(radio=>{radio.checked=false;});
+  showChoices();
+ });
  showChoices();
 }
 function profileWithEndHem(spec,model,atStart,length,direction){
