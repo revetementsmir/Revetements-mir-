@@ -230,3 +230,28 @@ body.commerce .shop-filterbar :is(input,select){
   body.commerce .category-card,
   body.commerce .shop-card { border-radius:11px; }
 }
+
+
+.mir-shop-review-active{overflow-anchor:none;padding-bottom:calc(124px + env(safe-area-inset-bottom))}
+.mir-shop-review-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.mir-shop-review-actions button,.mir-shop-review-toolbar button,.mir-shop-review-toolbar a,.mir-shop-review-dialog button{
+ min-height:44px;padding:6px 10px;border:1px solid #a6b7a5;border-radius:6px;
+ background:#fff;color:#25432c;font:600 13px/1.2 Arial,sans-serif;cursor:pointer
+}
+.mir-shop-review-actions [data-review-remove]{color:#873323;border-color:#d6ada5}
+.mir-shop-review-toolbar{
+ position:fixed;z-index:25;inset:auto 0 0;display:flex;align-items:center;justify-content:center;
+ flex-wrap:wrap;gap:6px 9px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+ background:#edf4eb;border-top:1px solid #b7c8b5;box-shadow:0 -3px 14px #20372a1f
+}
+.mir-shop-review-toolbar span{font-size:13px;color:#25432c}
+.mir-shop-review-toolbar a{display:inline-flex;align-items:center}
+.mir-shop-review-toolbar button:disabled{opacity:.55;cursor:default}
+.mir-shop-review-dialog{width:min(480px,calc(100% - 24px));padding:20px;border:1px solid #a6b7a5;border-radius:12px;color:#25432c;background:#f8fbf6}
+.mir-shop-review-dialog::backdrop{background:#21362b88}
+.mir-shop-review-dialog h2{margin:0}
+.mir-shop-review-dialog label{display:grid;gap:6px}
+.mir-shop-review-dialog textarea{width:100%;resize:vertical;font-size:16px;padding:8px;border:1px solid #a6b7a5;border-radius:6px}
+.mir-shop-review-dialog form>div{display:flex;justify-content:flex-end;gap:8px}
+.mir-shop-review-dialog [type=submit],.mir-shop-review-toolbar [data-review-export]{background:#347326;color:#fff;border-color:#347326}
+.mir-shop-review-dialog [data-review-error]{color:#873323}

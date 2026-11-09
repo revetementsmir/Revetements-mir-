@@ -36,7 +36,7 @@
   try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved&&Array.isArray(saved.items)){list={version:1,project:String(saved.project||'').slice(0,100),items:saved.items.filter(x=>x&&typeof x.materialId==='string'&&Number.isFinite(x.quantity)&&x.quantity>0&&x.quantity<=1000000).map(x=>({...x,unit:units.includes(x.unit)?x.unit:'pièces'}))};}}catch{}
   // Return context is filter data, never a caller-supplied URL.
   let shopContext='';
-  function cleanShopContext(raw){const source=new URLSearchParams(String(raw||'').slice(0,2048)),out=new URLSearchParams();for(const key of ['brand','family','type','q','view']){const value=source.get(key);if(value&&value.length<=(key==='q'?128:100)&&!/[\u0000-\u001f]/.test(value))out.set(key,value);}return out.toString();}
+  function cleanShopContext(raw){const source=new URLSearchParams(String(raw||'').slice(0,2048)),out=new URLSearchParams();for(const key of ['brand','family','type','q','view','revision']){const value=source.get(key);if(value&&value.length<=(key==='q'?128:100)&&!/[\u0000-\u001f]/.test(value))out.set(key,value);}return out.toString();}
   function rememberShopContext(value){shopContext=cleanShopContext(value);try{sessionStorage.setItem('mir_shop_context_v1',shopContext);}catch{}}
   function returnToShop(){return 'boutique.html'+(shopContext?'?'+shopContext:'')+'#collections';}
   function productHref(id,color,format){const q=new URLSearchParams({id});if(color)q.set('color',color);if(format)q.set('format',format);if(shopContext)q.set('from',shopContext);return 'produit.html?'+q;}
@@ -115,6 +115,9 @@
   function showShop(){
     const qs=new URLSearchParams(location.search),brand=$('#shop-brand'),family=$('#shop-family'),profile=$('#shop-profile'),search=$('#shop-search');
     let all=qs.get('view')==='all';
+    const review=qs.get('revision')==='1'?shopReview(render):null;
+    if(review)all=true;
+
     const brands=[...new Set(materials.filter(sold).map(m=>m.brand))].sort(O.brandCompare);
     brand.innerHTML='<option value="all">Tous les fabricants</option>'+brands.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
     family.innerHTML='<option value="all">Toutes les matières</option>'+categories.map(([id,label])=>`<option value="${id}">${label}</option>`).join('');
@@ -134,15 +137,131 @@
       return `<a href="?family=${id}#collections" class="category-card" data-category="${id}" aria-label="${esc(label)} : voir les matériaux"><div class="category-photo" data-presentation="${framing}">${m?imageMarkup(m):placeholder()}</div><h3>${esc(label)}</h3><span class="category-action">Explorer <span aria-hidden="true">→</span></span></a>`;
     }).join('');
     $('#shop-brand-directory').innerHTML=brands.map(b=>brandCollectionCard(b,materials.filter(m=>sold(m)&&m.brand===b))).join('');
-    function render(){const p=new URLSearchParams();if(brand.value!=='all')p.set('brand',brand.value);if(family.value!=='all')p.set('family',family.value);if(profile.value!=='all')p.set('type',profile.value);if(search.value.trim())p.set('q',search.value.trim());if(all)p.set('view','all');rememberShopContext(p.toString());const q=norm(search.value),directory=!all&&brand.value==='all'&&family.value==='all'&&profile.value==='all'&&!q;const result=materials.filter(m=>sold(m)&&(brand.value==='all'||m.brand===brand.value)&&(family.value==='all'||O.matchesCategory(m,family.value))&&(profile.value==='all'||O.section(m)===profile.value)&&(!q||norm([m.name,m.brand,m.family,m.finish,m.description,dimensions(m),...colors(m).map(c=>c.name)].join(' ')).includes(q))).sort(O.compare);
+    if(review)for(const link of document.querySelectorAll('.category-card[href],.brand-collection-card[href]')){
+      const url=new URL(link.href);url.searchParams.set('revision','1');link.href=url.href;
+    }
+
+    function render(){const p=new URLSearchParams();if(brand.value!=='all')p.set('brand',brand.value);if(family.value!=='all')p.set('family',family.value);if(profile.value!=='all')p.set('type',profile.value);if(search.value.trim())p.set('q',search.value.trim());if(all)p.set('view','all');if(review)p.set('revision','1');rememberShopContext(p.toString());const q=norm(search.value),directory=!review&&!all&&brand.value==='all'&&family.value==='all'&&profile.value==='all'&&!q;const result=materials.filter(m=>sold(m)&&!review?.isRemoved(m.id)&&(brand.value==='all'||m.brand===brand.value)&&(family.value==='all'||O.matchesCategory(m,family.value))&&(profile.value==='all'||O.section(m)===profile.value)&&(!q||norm([m.name,m.brand,m.family,m.finish,m.description,dimensions(m),...colors(m).map(c=>c.name)].join(' ')).includes(q))).sort(O.compare);
       $('#collection-title').textContent=directory?'Collections par fabricant':'Résultats';$('#shop-brand-directory').hidden=!directory;$('#shop-all-button').hidden=!directory;$('#shop-grid').hidden=directory;
       $('#shop-grid').innerHTML=directory?'':O.group(result).map(g=>`<section class="manufacturer-group"><header><div><p class="eyebrow">LA COLLECTION</p><h3>${esc(g.brand)}</h3></div><span>${g.sections.reduce((n,s)=>n+s.items.length,0)} références</span></header>${g.sections.map(s=>`<section class="profile-group"><h4>${esc(s.label)} <span>${s.items.length}</span></h4><div class="shop-grid">${s.items.map(card).join('')}</div></section>`).join('')}</section>`).join('');
       $('#shop-empty').hidden=!!result.length||directory;$('#shop-results-count').textContent=directory?`${brands.length} fabricants · choisissez votre collection`:`${result.length} référence${result.length>1?'s':''}${brand.value==='all'?'':` · ${brand.value}`}`;
       $('#shop-active-filters').textContent=directory?'Commencez par un fabricant. Ses gammes, formats et couleurs restent ensemble.':[brand.value==='all'?'Tous les fabricants':brand.value,family.value==='all'?'':categories.find(x=>x[0]===family.value)?.[1],profile.value==='all'?'':O.sections.find(x=>x[0]===profile.value)?.[1]].filter(Boolean).join(' / ');
-      history.replaceState(null,'',location.pathname+(p.size?'?'+p:'')+location.hash);hydrateChips($('#shop-grid'));
+      history.replaceState(null,'',location.pathname+(p.size?'?'+p:'')+location.hash);hydrateChips($('#shop-grid'));review?.decorate();
     }
     $('#shop-filter-toggle').onclick=()=>{const panel=$('#shop-filter-panel'),open=panel.hidden;panel.hidden=!open;$('#shop-filter-toggle').setAttribute('aria-expanded',String(open));if(open)brand.focus();};
     [brand,family,profile].forEach(el=>el.addEventListener('change',render));search.addEventListener('input',render);$('#shop-reset').onclick=()=>{brand.value=family.value=profile.value='all';search.value='';all=false;render();};$('#shop-all-button').onclick=()=>{all=true;render();};render();
+  }
+  function shopReview(render){
+    const key='mir-catalogue-review-v1',grid=$('#shop-grid');
+    const read=()=>{
+      const raw=localStorage.getItem(key);
+      if(raw===null)return [];
+      const saved=JSON.parse(raw);
+      if(saved.version!==1||!Array.isArray(saved.fiches))throw new Error('Format de révision inconnu');
+      return saved.fiches;
+    };
+    let records;
+    try{records=read();}
+    catch{notify('Le navigateur ne peut pas ouvrir les données de révision.');return null;}
+    const toolbar=document.createElement('aside');
+    toolbar.className='mir-shop-review-toolbar';
+    toolbar.setAttribute('aria-label','Révision temporaire du catalogue');
+    toolbar.innerHTML='<span data-review-count></span><button type="button" data-review-undo>Rétablir la dernière</button><button type="button" data-review-export>Exporter JSON</button><a data-review-exit>Quitter</a>';
+    const dialog=document.createElement('dialog');
+    dialog.className='mir-shop-review-dialog';
+    dialog.setAttribute('aria-labelledby','mir-review-title');
+    dialog.innerHTML='<form><h2 id="mir-review-title">Annotation</h2><p data-review-product></p><label>Note<textarea rows="5" maxlength="3000"></textarea></label><p data-review-error role="alert"></p><div><button type="button" data-review-cancel>Annuler</button><button type="submit">Enregistrer</button></div></form>';
+    document.body.append(toolbar,dialog);
+    document.body.classList.add('mir-shop-review-active');
+    const field=dialog.querySelector('textarea'),status=dialog.querySelector('[data-review-error]');
+    const find=id=>records.find(row=>row.id===id);
+    const controls='<div class="mir-shop-review-actions"><button type="button" data-review-note>Annotation</button><button type="button" data-review-remove>Supprimer</button></div>';
+    let editing=null;
+    function update(product,values){
+      try{
+        const latest=read(),previous=latest.find(row=>row.id===product.id);
+        const row={id:product.id,nom:product.nom,fabricant:product.fabricant,...previous,...values};
+        const next=latest.filter(entry=>entry.id!==row.id);
+        if(row.annotation||row.supprimeLe)next.push(row);
+        localStorage.setItem(key,JSON.stringify({version:1,fiches:next}));
+        records=next;
+        return true;
+      }catch{return false;}
+    }
+    function refreshAt(anchor,top=anchor?.getBoundingClientRect().top){
+      const id=anchor?.dataset.shopCard;
+      render();
+      const retained=id&&[...grid.querySelectorAll('[data-shop-card]')].find(card=>card.dataset.shopCard===id);
+      if(retained)window.scrollBy({top:retained.getBoundingClientRect().top-top,behavior:'instant'});
+      return retained;
+    }
+    grid.addEventListener('click',event=>{
+      const action=event.target.closest('[data-review-note],[data-review-remove]');
+      const card=action?.closest('[data-shop-card]');
+      if(!card)return;
+      const material=materials.find(m=>m.id===card.dataset.shopCard);
+      if(!material)return;
+      const product={id:material.id,nom:material.name,fabricant:material.brand};
+      if(action.hasAttribute('data-review-note')){
+        editing=product;field.value=find(product.id)?.annotation||'';
+        dialog.querySelector('[data-review-product]').textContent=material.name;
+        status.textContent='';dialog.showModal();
+        return;
+      }
+      const cards=[...grid.querySelectorAll('[data-shop-card]')],index=cards.indexOf(card);
+      const anchor=cards[index+1]||cards[index-1];
+      if(!update(product,{supprimeLe:new Date().toISOString()}))return notify('La suppression locale n’a pas pu être enregistrée.');
+      // Bring the next card into the removed card’s slot, even across groups.
+      const top=cards[index+1]?Math.max(8,card.getBoundingClientRect().top):undefined;
+      const retained=refreshAt(anchor,top);
+      if(retained)retained.querySelector('[data-review-remove]').focus({preventScroll:true});
+      else toolbar.querySelector('[data-review-undo]').focus({preventScroll:true});
+    });
+    dialog.querySelector('[data-review-cancel]').onclick=()=>dialog.close();
+    dialog.querySelector('form').onsubmit=event=>{
+      event.preventDefault();
+      const annotation=field.value.trim();
+      if(!update(editing,{annotation,annoteLe:annotation?new Date().toISOString():null})){
+        status.textContent='La note n’a pas pu être sauvegardée.';return;
+      }
+      const card=[...grid.querySelectorAll('[data-shop-card]')].find(el=>el.dataset.shopCard===editing.id);
+      if(card)card.querySelector('[data-review-note]').textContent=annotation?'Annotation enregistrée':'Annotation';
+      updateToolbar();dialog.close();
+    };
+    const lastRemoved=()=>records.reduce((last,row)=>row.supprimeLe&&(!last||row.supprimeLe>=last.supprimeLe)?row:last,null);
+    toolbar.querySelector('[data-review-undo]').onclick=()=>{
+      const product=lastRemoved();
+      if(!product)return;
+      const visible=[...grid.querySelectorAll('[data-shop-card]')].find(card=>card.getBoundingClientRect().bottom>0);
+      if(!update(product,{supprimeLe:null}))return notify('La restauration locale n’a pas pu être enregistrée.');
+      refreshAt(visible);
+    };
+    toolbar.querySelector('[data-review-export]').onclick=()=>{
+      let fiches;
+      try{fiches=read();}catch{return notify('Impossible de lire les données de révision.');}
+      const url=URL.createObjectURL(new Blob([JSON.stringify({version:1,exporteLe:new Date().toISOString(),fiches},null,2)],{type:'application/json'}));
+      const link=document.createElement('a');
+      link.href=url;link.download='MIR-revision-boutique.json';link.click();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    };
+    function updateToolbar(){
+      const removed=records.filter(row=>row.supprimeLe).length;
+      const noted=records.filter(row=>row.annotation).length;
+      toolbar.querySelector('[data-review-count]').textContent=`Révision · ${noted} notes · ${removed} retirées`;
+      toolbar.querySelector('[data-review-undo]').disabled=!removed;
+      const url=new URL(location.href);url.searchParams.delete('revision');
+      toolbar.querySelector('[data-review-exit]').href=url.href;
+    }
+    return {
+      isRemoved:id=>!!find(id)?.supprimeLe,
+      decorate(){
+        for(const card of grid.querySelectorAll('[data-shop-card]')){
+          card.querySelector('.shop-card-copy').insertAdjacentHTML('beforeend',controls);
+          if(find(card.dataset.shopCard)?.annotation)card.querySelector('[data-review-note]').textContent='Annotation enregistrée';
+        }
+        updateToolbar();
+      }
+    };
   }
   function productActions(m){
     const href=configurationURL(m,activeColor);
