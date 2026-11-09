@@ -15,8 +15,8 @@
   const BREAKPOINT='(max-width: 1100px)';
   function init(win){
     const doc=win.document;
-    if(doc.documentElement.hasAttribute("data-mir-harmony"))return null;
     const header=doc.querySelector('header.mir-client-header, header.mir-home-header');
+    if(doc.documentElement.hasAttribute("data-mir-harmony")&&!header?.hasAttribute("data-mir-public-shell"))return null;
     const nav=header?.querySelector('nav.mir-client-links');
     if(!header||!nav||header.querySelector('.mir-client-menu-toggle'))return null;
     const media=win.matchMedia(header.classList.contains('mir-home-header')?'(max-width: 760px)':BREAKPOINT);

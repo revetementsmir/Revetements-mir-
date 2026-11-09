@@ -13,10 +13,12 @@ const server=http.createServer((req,res)=>{
   res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream'});
   fs.createReadStream(file).pipe(res);
 });
-const routes=['realisations','materiaux','boutique','produit','selection','pliage','plan'];
+const routes=['index','realisations','contact','materiaux','boutique','produit','selection','pliage','plan'];
 const sizes=[
   {name:'mobile-compact',width:360,height:780},
   {name:'mobile',width:390,height:844},
+  {name:'seuil-mobile',width:760,height:900},
+  {name:'seuil-bureau',width:761,height:900},
   {name:'tablette',width:820,height:1100},
   {name:'petit-pc',width:1024,height:768},
   {name:'bureau',width:1440,height:900},
@@ -38,86 +40,48 @@ const sizes=[
     for(const size of sizes){
       const context=await browser.newContext({viewport:{width:size.width,height:size.height},hasTouch:size.width<1100,reducedMotion:'reduce'});
       const page=await context.newPage();
+      let reference;
       for(const route of routes){
         const errors=[];
         const listener=error=>errors.push(error.message);
         page.on('pageerror',listener);
         await page.goto(base+route+'.html',{waitUntil:'domcontentloaded',timeout:25000});
-        if(await page.locator('html[data-mir-harmony]').count()){
-          await page.locator('.mir-harmony-toggle').waitFor();
-          const header=page.locator('#mir-harmony-header'),menu=header.locator('.mir-harmony-toggle'),nav=header.locator('#mir-harmony-menu');
-          assert.equal(await nav.isVisible(),false,'Harmony closed initially');
-          assert.equal(await menu.getAttribute('aria-controls'),'mir-harmony-menu');
-          assert.ok((await menu.boundingBox()).height>=44);
-          assert.ok(await header.locator('.mir-harmony-dossier').isVisible());
-          await menu.click();assert.equal(await nav.isVisible(),true);
-          assert.ok(await nav.locator('a:visible').count()>=5,'Existing public destinations retained');
-          assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
-          await page.keyboard.press('Escape');assert.equal(await nav.isVisible(),false);assert.equal(await menu.evaluate(e=>e===document.activeElement),true);
-          if(route==='boutique'&&['mobile','tablette'].includes(size.name)){await menu.click();await nav.locator('a[href="realisations.html"]').click();await page.waitForURL('**/realisations.html');assert.match(await page.title(),/réalisations/i);}
-          assert.deepEqual(errors,[]);page.off('pageerror',listener);count++;continue;
-        }
-        await page.waitForFunction(()=>!!window.MIRPublicMenu?.version&&!!document.querySelector('.mir-client-menu-toggle'),{timeout:10000});
-        const header=page.locator('header.mir-client-header'),menu=header.locator('.mir-client-menu-toggle'),nav=header.locator('nav.mir-client-links');
-        const state=await page.evaluate(()=>{
-          const h=document.querySelector('header.mir-client-header'),n=h.querySelector('nav.mir-client-links'),b=h.querySelector('.mir-client-menu-toggle'),estimate=h.querySelector('.mir-home-estimate');
-          const est=estimate?.getBoundingClientRect();
-          return {
-            view:innerWidth,scroll:document.documentElement.scrollWidth,
-            collapsed:n.hidden,
-            expanded:b.getAttribute('aria-expanded'),
-            menuVisible:getComputedStyle(b).display!=='none',
-            navVisible:getComputedStyle(n).display!=='none',
-            selection:n.querySelectorAll('a[href="selection.html"]').length,
-            estimateVisible:!!est&&est.width>0&&getComputedStyle(estimate).display!=='none'&&est.left>=-2&&est.right<=innerWidth+2,
-            linkCount:n.querySelectorAll('a').length,
-            ariaControls:b.getAttribute('aria-controls')===n.id
-          };
-        });
-        if(state.scroll>state.view+2){
-          const violations=await page.evaluate(()=>[...document.querySelectorAll('body *')].map(el=>{
-            const r=el.getBoundingClientRect();return {node:el.tagName.toLowerCase(),id:el.id,cls:String(el.className||'').slice(0,90),left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),scrollWidth:el.scrollWidth};
-          }).filter(x=>x.right>innerWidth+3).sort((a,b)=>b.right-a.right).slice(0,12));
-          console.log('MIR OVERFLOW '+size.name+' '+route+' '+JSON.stringify(violations));
-        }
-        assert.ok(state.scroll<=state.view+2,size.name+' '+route+' : débordement horizontal '+JSON.stringify(state));
-        assert.ok(state.estimateVisible,size.name+' '+route+' : estimation invisible');
-        assert.equal(state.selection,1,size.name+' '+route+' : lien de sélection absent ou doublé');
-        assert.ok(state.ariaControls,size.name+' '+route+' : aria-controls incorrect');
-        assert.ok(state.linkCount>=6,size.name+' '+route+' : menu incomplet');
-        if(size.width<=1100){
-          assert.equal(state.collapsed,true,size.name+' '+route+' : menu non réduit au chargement');
-          assert.equal(state.menuVisible,true);
-          assert.equal(state.navVisible,false);
-          assert.equal(state.expanded,'false');
+        const header=page.locator('header.mir-home-header');
+        const menu=header.locator('.mir-client-menu-toggle');
+        const nav=header.locator('nav.mir-client-links');
+        const account=header.getByRole('link',{name:'Mon compte'});
+        const label=route+' '+size.name;
+        const small=size.width<=760;
+        await menu.waitFor({state:'attached'});
+        assert.equal(await menu.isVisible(),small,label);
+        assert.equal(await nav.isVisible(),!small,label);
+        assert.ok(await account.isVisible(),label+' compte');
+        assert.equal(await menu.getAttribute('aria-controls'),await nav.getAttribute('id'),label);
+        const closed=await header.boundingBox();
+        if(small){
+          const logo=await header.locator('img').boundingBox();
+          const button=await menu.boundingBox(),link=await account.boundingBox();
+          assert.ok(button.height>=44&&logo.x+logo.width<=button.x&&button.x+button.width<=link.x,label+' logo, menu, compte sur une ligne');
           await menu.click();
-          assert.equal(await menu.getAttribute('aria-expanded'),'true');
-          assert.equal(await nav.isVisible(),true);
-          const expanded=await page.evaluate(()=>{
-            const n=document.querySelector('header.mir-client-header nav.mir-client-links');
-            return {scroll:document.documentElement.scrollWidth,view:innerWidth,links:[...n.querySelectorAll('a')].map(x=>x.getBoundingClientRect()).every(r=>r.width>0&&r.left>=-2&&r.right<=innerWidth+2)};
-          });
-          assert.ok(expanded.links&&expanded.scroll<=expanded.view+2,size.name+' '+route+' : menu ouvert déborde');
+          assert.equal(await menu.getAttribute('aria-expanded'),'true',label);
+          assert.deepEqual(await header.boundingBox(),closed,label+' le menu ne pousse pas la page');
+          assert.equal(await nav.evaluate(el=>getComputedStyle(el).position),'absolute',label);
+        }
+        const links=await nav.locator('a:visible').evaluateAll(anchors=>anchors.map(a=>[a.textContent.trim(),a.getAttribute('href')]));
+        if(!reference)reference=links;
+        else assert.deepEqual(links,reference,label+' mêmes liens que l’accueil');
+        assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),label+' débordement');
+        if(small){
           await page.keyboard.press('Escape');
-          assert.equal(await menu.getAttribute('aria-expanded'),'false');
-          assert.equal(await nav.isVisible(),false);
-          assert.equal(await menu.evaluate(el=>document.activeElement===el),true,'Échap doit rendre le focus au bouton');
-          if(route==='boutique'&&['mobile','tablette'].includes(size.name)){
+          assert.equal(await nav.isVisible(),false,label+' ferme avec Échap');
+          assert.equal(await menu.evaluate(el=>document.activeElement===el),true,label+' retour du focus');
+          if(route==='boutique'&&size.name==='mobile'){
             await menu.click();
-            await header.locator('a[href="realisations.html"]').click();
-            await page.waitForURL('**/realisations.html',{timeout:10000});
-            assert.match(await page.title(),/réalisations/i);
-            await page.goto(base+route+'.html',{waitUntil:'domcontentloaded'});
+            await nav.getByRole('link',{name:'Réalisations'}).click();
+            await page.waitForURL('**/realisations.html');
           }
-        }else{
-          assert.equal(state.collapsed,false,size.name+' '+route+' : navigation PC cachée');
-          assert.equal(state.menuVisible,false);
-          assert.equal(state.navVisible,true);
         }
-        if(['boutique','realisations'].includes(route)&&['mobile','bureau'].includes(size.name)){
-          await header.screenshot({path:path.join(artifacts,'mir-menu-'+route+'-'+size.name+'.png')});
-        }
-        assert.deepEqual(errors,[],size.name+' '+route+' : erreurs JS');
+        assert.deepEqual(errors,[],label+' erreurs JS');
         page.off('pageerror',listener);
         count++;
       }
