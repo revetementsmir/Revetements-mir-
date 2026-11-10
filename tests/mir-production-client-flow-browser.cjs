@@ -33,7 +33,7 @@ async function verifyNavigation(browser,base){
   const mobile=width<=1100;
   const context=await browser.newContext({viewport:{width,height:850},isMobile:mobile,hasTouch:mobile,acceptDownloads:true});
   const page=await context.newPage(),errors=[];
-  page.on('pageerror',error=>errors.push(error.message));
+  page.on('pageerror',error=>errors.push(error.stack||error.message));
   await page.goto(base+'/production.html?mode=client&kind=profile',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('mir-signature')),true,'charte client '+width);
@@ -79,7 +79,7 @@ async function verifyQuoteAndExports(browser,base,width){
  const mobile=width<600;
  const context=await browser.newContext({viewport:{width,height:mobile?844:900},isMobile:mobile,hasTouch:mobile,acceptDownloads:true});
  const page=await context.newPage(),errors=[];
- page.on('pageerror',error=>errors.push(error.message));
+ page.on('pageerror',error=>errors.push(error.stack||error.message));
  await page.goto(base+'/production.html?mode=client&kind=profile',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
  const next=page.locator('#client-step-next');
@@ -217,7 +217,7 @@ async function run(){
  fs.mkdirSync(artifacts,{recursive:true});
  let browser;
  try{
-  browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+  browser=await chromium.launch({...(process.env.MIR_CHROMIUM_BIN?{executablePath:process.env.MIR_CHROMIUM_BIN}:{channel:'chrome'}),headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
   await verifyNavigation(browser,base);
   await verifyQuoteAndExports(browser,base,1440);
   await verifyQuoteAndExports(browser,base,390);

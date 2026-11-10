@@ -1,0 +1,41 @@
+name: MIR real role certification
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  certify-six-real-roles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MIR_SUPABASE_URL: https://hxtztkmbfpmzrieccwsg.supabase.co
+      MIR_SANDBOX_PUBLISHABLE_KEY: ${{ secrets.MIR_SANDBOX_PUBLISHABLE_KEY }}
+      MIR_SANDBOX_ORG_ID: ${{ secrets.MIR_SANDBOX_ORG_ID }}
+      MIR_SANDBOX_ADMIN_EMAIL: ${{ secrets.MIR_SANDBOX_ADMIN_EMAIL }}
+      MIR_SANDBOX_ADMIN_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
+      MIR_SANDBOX_BOSS_EMAIL: ${{ secrets.MIR_SANDBOX_BOSS_EMAIL }}
+      MIR_SANDBOX_BOSS_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
+      MIR_SANDBOX_CHEF_EQUIPE_EMAIL: ${{ secrets.MIR_SANDBOX_CHEF_EQUIPE_EMAIL }}
+      MIR_SANDBOX_CHEF_EQUIPE_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
+      MIR_SANDBOX_EMPLOYEE_EMAIL: ${{ secrets.MIR_SANDBOX_EMPLOYEE_EMAIL }}
+      MIR_SANDBOX_EMPLOYEE_PASSWORD: ${{ secrets.MIR_SANDBOX_EMPLOYEE_PASSWORD }}
+      MIR_SANDBOX_ADJOINTE_EMAIL: ${{ secrets.MIR_SANDBOX_ADJOINTE_EMAIL }}
+      MIR_SANDBOX_ADJOINTE_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
+      MIR_SANDBOX_ENTREPOT_EMAIL: ${{ secrets.MIR_SANDBOX_ENTREPOT_EMAIL }}
+      MIR_SANDBOX_ENTREPOT_PASSWORD: ${{ secrets.MIR_SANDBOX_ENTREPOT_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Certifier Auth et rôles réels MIR TEST
+        run: node tools/validation/certify-six-roles.cjs
+      - name: Publier le rapport même en cas d'échec
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-real-role-certification
+          path: artifacts/real-role-certification.json
+          if-no-files-found: error
+          retention-days: 14

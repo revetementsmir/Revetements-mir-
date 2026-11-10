@@ -28,7 +28,11 @@ let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces
 let clientDraftReady=false,legacyQuickId=null;
 let panelSketchPoints=[],panelSketchHover=null,panelSketchBefore=null;
 const clientProfileWizard=()=>client&&catalogueChannel!=='store'&&kind==='profile';
-const clientEditableTrace=()=>clientProfileWizard()&&draft?.template==='custom'&&(!editingItemId||existingItem()?.editableTrace===true||existingItem()?.snapshot?.templateId?.startsWith('modele-piece-'));
+const clientEditableTrace=()=>clientProfileWizard()&&draft?.template==='custom'&&(
+ editingItemId
+  ?existingItem()?.editableTrace===true||existingItem()?.snapshot?.templateId?.startsWith('modele-piece-')
+  :!selectedTemplate||selectedTemplate.id?.startsWith('mir-standard-')
+);
 const publicProfileMaterials=['aluminium','acier'];
 const publicProfileColors=['manufacturer','special'];
 const ralOption=$('#color-system option[value="ral"]');
@@ -842,7 +846,7 @@ function renderClientWizard(model,blockJ){
  }
  const next=$('#client-step-next');
  $('#client-step-back').hidden=clientStep===1||clientStep===2&&!!editingItemId&&!clientEditableTrace();
- $('#client-step-back').textContent=clientStep===2&&draft.template==='custom'?'Modifier le tracé':'Retour';
+ $('#client-step-back').textContent=clientStep===2&&clientEditableTrace()?'Modifier le tracé':'Retour';
  const status=$('#client-step-status'),message=issues[clientStep]||'';
  if(status.textContent!==message)status.textContent=message;
  next.disabled=Boolean(message)||busy||clientStep===5&&$('#add-production-piece').disabled;
@@ -866,6 +870,14 @@ function goClientStep(step,{confirm=false}={}){
  if(step===1){focusClientEntry();return;}
  $('#client-step-title').focus({preventScroll:true});
  $('#client-step-title').scrollIntoView({block:'nearest'});
+}
+function returnToClientChoice(){
+ if(!clientProfileWizard()||clientStep!==2||editingItemId&&!clientEditableTrace())return;
+ clientStep=1;
+ clientEntry='choice';
+ tool='select';
+ updateDrawing();
+ focusClientEntry('#client-choose-model');
 }
 function updateDrawing({keepForm=false}={}){
  if(clientProfileWizard()&&draft&&order&&clientDraftReady)store('mir_client_active_profile_v1',{version:1,draft,drawPoints,clientStep,clientUnlocked,clientProfileSelected,clientEntry,tool,colorSystem,colorId,materialId,selectedTemplate,legacyQuickId,editingItemId});
@@ -2326,7 +2338,11 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(d.mirContinueAction!==undefined)return continueChoice(d.mirContinueAction);
  if(clientProfileWizard()){
   if(d.clientStep)return goClientStep(Number(d.clientStep));
-  if(button.id==='client-step-back'){if(clientStep===2&&draft.template==='custom')return resumeClientTrace();return goClientStep(clientStep-1);}
+  if(button.id==='client-step-back'){
+   if(clientStep===2&&clientEditableTrace())return resumeClientTrace();
+   if(clientStep===2)return returnToClientChoice();
+   return goClientStep(clientStep-1);
+  }
   if(button.id==='client-new-trace'){choose('profile','custom');startProfileDrawing({fullscreen:false});return;}
   if(button.id==='client-example-l'){appendTracePoint([50.8,50.8]);appendTracePoint([152.4,50.8]);appendTracePoint([152.4,127]);return;}
   if(button.id==='client-keyboard-point'){const x=M.parseMeasurement($('#client-point-x').value,draft.unit),y=M.parseMeasurement($('#client-point-y').value,draft.unit);if(!x.ok||!y.ok)return toast('Entrez deux coordonnées valides.');appendTracePoint([x.mm,y.mm]);const editor=$('.client-keyboard-trace');if(editor){editor.open=true;$('#client-point-x').value=String(x.value);$('#client-point-y').value=String(y.value);$('#client-point-x').focus();$('#client-point-x').select();}return;}
