@@ -105,7 +105,8 @@ async function runAt(browser,base,width){
  assert.match(await page.locator('#mir-unified-export-status').innerText(),/Dossier complet prêt/);
  assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage).sort()),before,'PDF sans sauvegarde supplémentaire');
  await page.reload({waitUntil:'domcontentloaded'});
- await page.waitForFunction(()=>document.querySelector('#mir-unified-json')?.disabled===false);
+ await page.waitForFunction(()=>document.querySelector('#mir-unified-json')?.disabled===false&&
+  document.querySelectorAll('#selection-items .selection-item').length===1,{timeout:30000});
  assert.equal(await page.locator('#mir-unified-pieces li').count(),1,'reprise sans doublon');
  assert.equal(await page.locator('#selection-items .selection-item').count(),1,'matériau conservé');
  assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_client_dossier_v1')).order.items[0].snapshot),original.items[0].snapshot);
