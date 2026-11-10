@@ -28,7 +28,11 @@ let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces
 let clientDraftReady=false,legacyQuickId=null;
 let panelSketchPoints=[],panelSketchHover=null,panelSketchBefore=null;
 const clientProfileWizard=()=>client&&catalogueChannel!=='store'&&kind==='profile';
-const clientEditableTrace=()=>clientProfileWizard()&&draft?.template==='custom'&&(!editingItemId||existingItem()?.editableTrace===true||existingItem()?.snapshot?.templateId?.startsWith('modele-piece-'));
+const clientEditableTrace=()=>clientProfileWizard()&&draft?.template==='custom'&&(
+ editingItemId
+  ?existingItem()?.editableTrace===true||existingItem()?.snapshot?.templateId?.startsWith('modele-piece-')
+  :!selectedTemplate||selectedTemplate.id?.startsWith('mir-standard-')
+);
 const publicProfileMaterials=['aluminium','acier'];
 const publicProfileColors=['manufacturer','special'];
 const ralOption=$('#color-system option[value="ral"]');
@@ -842,7 +846,7 @@ function renderClientWizard(model,blockJ){
  }
  const next=$('#client-step-next');
  $('#client-step-back').hidden=clientStep===1||clientStep===2&&!!editingItemId&&!clientEditableTrace();
- $('#client-step-back').textContent=clientStep===2&&draft.template==='custom'?'Modifier le tracé':'Retour';
+ $('#client-step-back').textContent=clientStep===2&&clientEditableTrace()?'Modifier le tracé':'Retour';
  const status=$('#client-step-status'),message=issues[clientStep]||'';
  if(status.textContent!==message)status.textContent=message;
  next.disabled=Boolean(message)||busy||clientStep===5&&$('#add-production-piece').disabled;
@@ -2335,7 +2339,7 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(clientProfileWizard()){
   if(d.clientStep)return goClientStep(Number(d.clientStep));
   if(button.id==='client-step-back'){
-   if(clientStep===2&&draft.template==='custom')return resumeClientTrace();
+   if(clientStep===2&&clientEditableTrace())return resumeClientTrace();
    if(clientStep===2)return returnToClientChoice();
    return goClientStep(clientStep-1);
   }
