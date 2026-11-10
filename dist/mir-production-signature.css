@@ -344,7 +344,7 @@ body[data-client-entry] .color-source-field>label{min-width:0;line-height:1.25}
 @media(max-width:600px) and (min-height:650px){
  body[data-client-entry="draw"] #production-drawing{height:clamp(280px,42dvh,440px)}
 }
-@media(max-width:600px) and (max-height:800px){
+@media(max-width:600px) and (max-height:900px){
  body[data-client-entry="draw"] #client-entry{
   display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px;padding:4px 0
  }
