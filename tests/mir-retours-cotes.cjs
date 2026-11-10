@@ -71,6 +71,17 @@ test('Toutes les étiquettes A-D sont présentes une seule fois avec un identifi
  }
  assert.ok(svg.includes('A5 5 0 0'),'retour visible dans le dessin');
 });
+test('Sur mobile, les repères des deux feuilles restent nettement séparés',()=>{
+ const markerModel={...model,segments:model.segments.map(({label})=>({label}))};
+ const svg=M.profileDiagramContent(model,points,{bends,markers:true,markerModel,horizontalBounds:[100,540]});
+ const point=label=>{
+  const match=svg.match(new RegExp('data-marker-label="'+label+'"[^>]*>\\s*<circle[^>]*cx="([^"]+)"[^>]*cy="([^"]+)"'));
+  return match&&match.slice(1).map(Number);
+ };
+ const b=point('B'),c=point('C');
+ assert.ok(b&&c&&b.every(Number.isFinite)&&c.every(Number.isFinite));
+ assert.ok(Math.hypot(b[0]-c[0],b[1]-c[1])>=49,'B et C doivent être séparés sur téléphone');
+});
 test('Le retour symétrique fonctionne aussi en miroir',()=>{
  const mirrored=points.map(([x,y])=>[x,520-y]);
  const opposite=bends.map(b=>b.mode==='hem'?{...b,direction:'left'}:b);
