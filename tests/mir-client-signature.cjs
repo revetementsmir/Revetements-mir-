@@ -51,7 +51,7 @@ test('Les fonctionnalités client réelles sont toujours présentes',()=>{
 test('La sécurité du portail ne change pas et aucun réglage Admin ne devient public',()=>{
   assert.equal(require('./mir-account-config-helper.cjs')().enabled,true);
   assert.match(text('portal-client.js'),/sdk.auth.getUser/);
-  assert.match(text('portal-client.js'),/checkedSnapshot\(\{\.\.\.data,operations:operationsResponse\.data,messaging:messagingResponse\.data,lead,boss,logistics,management\}, user\.id\)/);
+  assert.match(text('portal-client.js'),/checkedSnapshot\(\{\.\.\.data,operations:operationsResponse\.data,messaging:messagingResponse\.data,lead,boss,logistics,management,punch:punchResponse\.data\}, user\.id\)/);
   const css=text('mir-client-signature.css');
   assert.doesNotMatch(css,/\.production-header|\.mir-admin-v4|data-admin-only/);
   assert.ok(!text('production.html').includes('mir-client-signature.css'));
