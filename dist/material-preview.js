@@ -144,6 +144,25 @@
     const shape = panel ? '<path d="M164 130h450v430H164z"/>' : '<path d="M105 182h570v100H105zM105 288h570v100H105zM105 394h570v100H105z"/>';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 680" role="img" aria-label="${esc(m.name+' · '+c.name+' · aperçu du fini lisse')}"><rect width="800" height="680" fill="#fff"/><g fill="#24352c" opacity=".10" transform="translate(8,9)">${shape}</g><g fill="${esc(hex)}" stroke="#26352b" stroke-opacity=".18" stroke-width="1.2">${shape}</g><text x="400" y="620" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" fill="#354735">${esc(c.name)}</text><text x="400" y="648" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#697567">Fini lisse · aperçu de teinte à l’écran</text></svg>`;
   }
+  function canexelOfficialTexture(c) {
+    const key=norm(c?.name || c?.id);
+    const files=[
+      ['gris brume','maibec-canexel-board-and-batten-gris-brume-mist-grey'],
+      ['mist grey','maibec-canexel-board-and-batten-gris-brume-mist-grey'],
+      ['sable','maibec-canexel-board-and-batten-sable-sand'],
+      ['sand','maibec-canexel-board-and-batten-sable-sand'],
+      ['noir','maibec-canexel-board-and-batten-noir-black'],
+      ['black','maibec-canexel-board-and-batten-noir-black'],
+      ['granit','maibec-canexel-board-and-batten-granit-granite'],
+      ['granite','maibec-canexel-board-and-batten-granit-granite'],
+      ['bleu minuit','maibec-canexel-board-and-batten-bleu-minuit-midnight-blue'],
+      ['midnight blue','maibec-canexel-board-and-batten-bleu-minuit-midnight-blue'],
+      ['blanc','maibec-canexel-board-and-batten-blanc-white'],
+      ['white','maibec-canexel-board-and-batten-blanc-white']
+    ];
+    const slug=files.find(([label])=>key.includes(label))?.[1];
+    return slug ? `https://cdn.lightbeans.com/organizations/maibec/products/${slug}/images/diffuse/rectified/0.jpg?width=1200` : '';
+  }
   function canexelSampleSVG(m,c,hex,src) {
     const name=norm(m.name),lines=[];
     if(/planche|couvre-joint|board|batten/.test(name)){
@@ -153,7 +172,7 @@
     }else{
       for(const y of [105,230,355,480])lines.push(`<path d="M0 ${y}h900" stroke="#132018" stroke-opacity=".26"/><path d="M0 ${y+3}h900" stroke="#fff" stroke-opacity=".16"/>`);
     }
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" role="img" aria-label="${esc(m.name+' · '+c.name+' · aperçu CanExel')}"><defs><linearGradient id="light" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".10"/><stop offset=".46" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#0b160f" stop-opacity=".08"/></linearGradient><filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".32 .045" numOctaves="2" seed="17"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .08"/></feComponentTransfer></filter></defs><rect width="900" height="500" fill="${esc(hex)}"/><rect width="900" height="500" fill="#fff" filter="url(#grain)" opacity=".48"/><rect width="900" height="500" fill="url(#light)"/><g>${lines.join('')}</g><rect x=".75" y=".75" width="898.5" height="498.5" fill="none" stroke="#132018" stroke-opacity=".15" stroke-width="1.5"/></svg>`;
+    const texture=canexelOfficialTexture(c); return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" role="img" aria-label="${esc(m.name+' · '+c.name+' · aperçu CanExel')}"><defs><linearGradient id="light" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".08"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#0b160f" stop-opacity=".08"/></linearGradient><filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".32 .045" numOctaves="2" seed="17"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .08"/></feComponentTransfer></filter></defs><rect width="900" height="500" fill="${esc(hex)}"/>${texture?`<image href="${esc(texture)}" width="900" height="500" preserveAspectRatio="xMidYMid slice"/>`:`<rect width="900" height="500" fill="#fff" filter="url(#grain)" opacity=".48"/>`}<rect width="900" height="500" fill="url(#light)"/><g>${lines.join('')}</g><rect x=".75" y=".75" width="898.5" height="498.5" fill="none" stroke="#132018" stroke-opacity=".15" stroke-width="1.5"/></svg>`;
   }
   async function svg(m,c) {
     const r=recipe(m,c);
