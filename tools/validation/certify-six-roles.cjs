@@ -2,8 +2,9 @@
 const fs=require('node:fs'),path=require('node:path');
 const output=path.resolve(__dirname,'../../artifacts/real-role-certification.json');
 const roles=[
- ['ADMIN','admin'],['BOSS','boss'],['CHEF_EQUIPE','chef_equipe'],
- ['EMPLOYEE','employe'],['ADJOINTE','assistant'],['ENTREPOT','warehouse']
+ ['ADMIN','admin','mir-recette-admin@example.com'],['BOSS','boss','mir-recette-boss@example.com'],
+ ['CHEF_EQUIPE','chef_equipe','mir-recette-chef@example.com'],['EMPLOYEE','employe','mir-recette-employe@example.com'],
+ ['ADJOINTE','assistant','mir-recette-adjointe@example.com'],['ENTREPOT','warehouse','mir-recette-entrepot@example.com']
 ];
 const report={project:'MIR TEST',physicalDevice:false,startedAt:new Date().toISOString(),checks:[]};
 function save(status,error){fs.mkdirSync(path.dirname(output),{recursive:true});fs.writeFileSync(output,JSON.stringify({...report,status,error:error||null,finishedAt:new Date().toISOString()},null,2),{mode:0o600});}
@@ -14,6 +15,11 @@ async function json(url,options={}){const response=await fetch(url,options),text
  const missing=required.filter(name=>!process.env[name]);
  if(missing.length)throw Error('Secrets GitHub manquants: '+missing.join(', '));
  if(!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(base)||!/^[0-9a-f-]{36}$/i.test(org))throw Error('Configuration MIR TEST invalide');
+ const mismatched=roles.flatMap(([name,,expectedEmail])=>[
+  process.env[`MIR_SANDBOX_${name}_EMAIL`]===expectedEmail?null:`MIR_SANDBOX_${name}_EMAIL`,
+  process.env[`MIR_SANDBOX_${name}_PASSWORD`]==='MIR-Recette-2026!'?null:`MIR_SANDBOX_${name}_PASSWORD`
+ ]).filter(Boolean);
+ if(mismatched.length)throw Error('Valeurs GitHub incorrectes: '+mismatched.join(', '));
  for(const [name,expected] of roles){
   const email=process.env[`MIR_SANDBOX_${name}_EMAIL`],password=process.env[`MIR_SANDBOX_${name}_PASSWORD`];
   const auth=await json(base+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:key,'content-type':'application/json'},body:JSON.stringify({email,password})});
