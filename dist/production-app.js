@@ -1695,19 +1695,29 @@ function drawDragPreview(segment, gesture){
  const scale=Math.max(1,Math.min(2.2,800/svg.clientWidth));
  const label=(x,y,value,halo=6)=>`<text x="${fmt(x)}" y="${fmt(y)}" text-anchor="middle" dominant-baseline="central" font-size="${fmt(17*scale)}" font-weight="700" fill="#603b20" stroke="#fff5e3" stroke-width="${fmt(halo*scale)}" stroke-linejoin="round" paint-order="stroke">${esc(value)}</text>`;
  const size=Math.hypot(ex-x,ey-y), outgoing=Math.atan2(ey-y,ex-x);
+ const normal=[-Math.sin(outgoing),Math.cos(outgoing)];
+ // La cote suit le côté sans recouvrir le trait, les badges B/C ou l'angle.
+ // Sur les petits écrans, un décalage normal est indispensable puisque le
+ // texte de fraction est souvent plus large que le segment affiché.
+ const measureGap=30*scale;
+ const measureT=size<150*scale?.68:.56;
+ const measurePoint=[
+  x+(ex-x)*measureT+normal[0]*measureGap,
+  y+(ey-y)*measureT+normal[1]*measureGap
+ ];
  let angle='';
  if(segment.angle>0&&segment.angle<180){
   const incoming=Math.PI-gesture.heading;
   const sweep=Math.atan2(Math.sin(outgoing-incoming),Math.cos(outgoing-incoming));
   const r=Math.min(38*scale,size*.36), mid=incoming+sweep/2;
   const ray=(direction,distance)=>[x+Math.cos(direction)*distance,y+Math.sin(direction)*distance];
-  const [ax,ay]=ray(mid,r+16*scale);
+  const [ax,ay]=ray(mid,r+9*scale);
   angle=`<path d="M ${ray(incoming,r).map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep>=0?1:0} ${ray(outgoing,r).map(fmt).join(' ')}" fill="none" stroke="#9c5a22" stroke-width="2"/>`+label(ax,ay,segment.angle+'°',2.5);
  }
  const line=`<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(ex)}" y2="${fmt(ey)}" stroke="#9c5a22" stroke-width="3" stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/>`;
  const guide=segment.guide?pointOnView(segment.guide,drawTransform):null;
  const alignment=guide?`<line x1="${fmt(guide[0])}" y1="${fmt(guide[1])}" x2="${fmt(ex)}" y2="${fmt(ey)}" stroke="#517e48" stroke-width="2" stroke-dasharray="4 5" vector-effect="non-scaling-stroke"/>`:'';
- const content=`<g data-trace-preview pointer-events="none">${alignment}${line}${angle}${label((x+ex)/2,(y+ey)/2,segment.lengthLabel)}</g>`;
+ const content=`<g data-trace-preview pointer-events="none">${alignment}${line}${angle}${label(measurePoint[0],measurePoint[1],segment.lengthLabel)}</g>`;
  const marker=svg.querySelector('.profile-side-marker');
  if(marker)marker.insertAdjacentHTML('beforebegin',content);
  else svg.insertAdjacentHTML('beforeend',content);
