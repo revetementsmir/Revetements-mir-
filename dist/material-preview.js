@@ -144,11 +144,25 @@
     const shape = panel ? '<path d="M164 130h450v430H164z"/>' : '<path d="M105 182h570v100H105zM105 288h570v100H105zM105 394h570v100H105z"/>';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 680" role="img" aria-label="${esc(m.name+' · '+c.name+' · aperçu du fini lisse')}"><rect width="800" height="680" fill="#fff"/><g fill="#24352c" opacity=".10" transform="translate(8,9)">${shape}</g><g fill="${esc(hex)}" stroke="#26352b" stroke-opacity=".18" stroke-width="1.2">${shape}</g><text x="400" y="620" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" fill="#354735">${esc(c.name)}</text><text x="400" y="648" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#697567">Fini lisse · aperçu de teinte à l’écran</text></svg>`;
   }
+  function canexelSampleSVG(m,c,hex,src) {
+    const name=norm(m.name),lines=[];
+    if(/planche|couvre-joint|board|batten/.test(name)){
+      for(const x of [118,338,558,778])lines.push(`<rect x="${x}" y="0" width="18" height="500" fill="#142018" opacity=".14"/><path d="M${x+3} 0v500M${x+15} 0v500" stroke="#fff" stroke-opacity=".16"/>`);
+    }else if(/vstyle|vertical/.test(name)){
+      for(let x=70;x<900;x+=95)lines.push(`<path d="M${x} 0v500" stroke="#132018" stroke-opacity=".28"/><path d="M${x+3} 0v500" stroke="#fff" stroke-opacity=".14"/>`);
+    }else{
+      for(const y of [105,230,355,480])lines.push(`<path d="M0 ${y}h900" stroke="#132018" stroke-opacity=".26"/><path d="M0 ${y+3}h900" stroke="#fff" stroke-opacity=".16"/>`);
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" role="img" aria-label="${esc(m.name+' · '+c.name+' · aperçu CanExel')}"><rect width="900" height="500" fill="${esc(hex)}"/><image href="${esc(src)}" width="900" height="500" preserveAspectRatio="xMidYMid slice" opacity=".20"/><rect width="900" height="500" fill="${esc(hex)}" opacity=".48"/><path d="M0 0h900v42H0z" fill="#fff" opacity=".06"/><g>${lines.join('')}</g><rect x=".75" y=".75" width="898.5" height="498.5" fill="none" stroke="#132018" stroke-opacity=".15" stroke-width="1.5"/></svg>`;
+  }
   async function svg(m,c) {
     const r=recipe(m,c);
     if(r.kind==='smooth_preview'||r.kind==='color_reference_preview'||r.kind==='numeric_preview'){
       const hex=r.hex || await displayColor(r.src);
       if(hex)return smoothSVG(m,c,hex);
+    }
+    if(r.kind==='manufacturer_sample'&&norm(m.brand)==='canexel'){
+      const hex=await displayColor(r.src);if(hex)return canexelSampleSVG(m,c,hex,r.src);
     }
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 680"><rect width="800" height="680" fill="#fff"/>${r.src?`<image href="${esc(r.src)}" x="75" y="50" width="650" height="530" preserveAspectRatio="xMidYMid meet"/>`:''}<text x="400" y="620" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#354735">${esc(c?.name || m.name)}</text>${!r.src?'<text x="400" y="330" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#667260">Échantillon à associer</text>':''}</svg>`;
   }
@@ -161,6 +175,11 @@
       element.innerHTML='<div class="sample-loading">Préparation de la teinte…</div>';
       const hex=r.hex || await displayColor(r.src);if(element._materialPreviewRequest!==request)return;
       element.innerHTML=hex?smoothSVG(m,c,hex):`<div class="sample-unavailable"><strong>${esc(c.name)}</strong><span>Échantillon indisponible</span></div>`;
+      element.dataset.displayColor=hex||'';
+    } else if(r.kind==='manufacturer_sample'&&norm(m.brand)==='canexel'){
+      element.innerHTML='<div class="sample-loading">Préparation de la matière…</div>';
+      const hex=await displayColor(r.src);if(element._materialPreviewRequest!==request)return;
+      element.innerHTML=hex?canexelSampleSVG(m,c,hex,r.src):photoImage({...r.image,src:r.src,alt:r.label},r.label,{loading:'eager'});
       element.dataset.displayColor=hex||'';
     } else if(r.src) element.innerHTML=photoImage({...r.image,src:r.src,alt:r.label},r.label,{loading:'eager'});
     else element.innerHTML=`<div class="sample-unavailable"><strong>${esc(c?.name || 'Photo à compléter')}</strong><span>${c?'Cette teinte n’a pas encore de visuel associé.':'Référence fabricant en cours de vérification.'}</span></div>`;
