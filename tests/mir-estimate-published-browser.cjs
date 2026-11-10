@@ -1,7 +1,7 @@
 'use strict';
 // Read-only published smoke test. Fictional drafts only; never submits email.
 const{chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const base=String(process.env.MIR_PUBLISHED_BASE||'').replace(/\/$/,'');if(!/^https:\/\/revetementsmirweb\.github\.io\/MIR$/i.test(base))throw Error('URL GitHub Pages MIR requise');
+const base=String(process.env.MIR_PUBLISHED_BASE||'').replace(/\/$/,'');if(!/^https:\/\/(?:revetementsmirweb\.github\.io\/MIR|revetementsmir\.github\.io\/Revetements-mir-)$/i.test(base))throw Error('URL GitHub Pages MIR requise');
 (async()=>{const proof=path.resolve(__dirname,'../artifacts/estimation-published');fs.mkdirSync(proof,{recursive:true});let b;try{b=await chromium.launch({channel:'chrome',args:['--no-sandbox']});}catch{b=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});}const results=[];try{for(const[width,height]of [[390,844],[834,1112],[1440,900]]){const c=await b.newContext({viewport:{width,height}}),p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.setDefaultTimeout(30000);await p.goto(base+'/index.html');
       if (width <= 760) {
         await p.getByRole('button', { name: 'Ouvrir le menu principal' }).click();
