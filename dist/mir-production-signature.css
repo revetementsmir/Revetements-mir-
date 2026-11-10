@@ -354,6 +354,15 @@ body[data-client-entry] .color-source-field>label{min-width:0;line-height:1.25}
  body[data-client-entry="draw"] #production-drawing{height:280px;min-height:280px}
  body[data-client-entry="draw"] #drawing-tools{gap:6px;padding:8px}
  body[data-client-entry="draw"] #drawing-tools .client-trace-help{margin:0;line-height:1.25}
+ body[data-client-entry="measures"][data-client-stage="2"] .production-workspace{margin-top:4px;gap:4px}
+ body[data-client-entry="measures"][data-client-stage="2"] #production-drawing svg{height:110px}
+ body[data-client-entry][data-client-stage="2"] #client-step-scroll{padding:6px 10px}
+ body[data-client-entry][data-client-stage="2"] #client-step-count{margin-bottom:2px}
+ body[data-client-entry][data-client-stage="2"] #client-step-title{font-size:19px;line-height:1.1}
+ body[data-client-entry][data-client-stage="2"] #client-step-hint{font-size:12px;line-height:1.3;margin:3px 0 5px}
+ body[data-client-entry][data-client-stage="2"] :is(.segment-editor,.dimension-fields){margin-top:5px;gap:4px}
+ body[data-client-entry][data-client-stage="2"] #mir-angle-summary{margin-top:4px}
+ body[data-client-entry][data-client-stage="2"] #client-step-actions{padding:5px 10px}
 }
 
 body[data-client-stage="5"] #panel-price{margin-top:8px;padding:10px 14px}
