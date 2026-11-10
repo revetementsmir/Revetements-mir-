@@ -72,12 +72,12 @@ async function main(){
       if(size.name==='desktop'){
         await page.goto('http://127.0.0.1:'+server.address().port+'/index.html#au-coeur-du-centre-ville');
         await page.waitForURL('**/realisations.html#au-coeur-du-centre-ville');
-        await page.evaluate(()=>localStorage.setItem('mir-inspirations','[3]'));
+        await page.evaluate(()=>localStorage.setItem('mir-inspirations','[10]'));
         await page.reload();
         await page.locator('[data-gallery-filter="saved"]').click();
         assert.equal(await page.locator('[data-gallery-category]:visible').count(),1);
         await page.locator('#au-coeur-du-centre-ville [data-photo]').click();
-        assert.equal(await page.locator('#mir-gallery-dialog-title').textContent(),'Au cœur du centre-ville de Québec');
+        assert.equal(await page.locator('#mir-gallery-dialog-title').textContent(),'Au cœur de Québec');
       }
       assert.deepEqual(failures,[]);
       checks++;
