@@ -1,5 +1,7 @@
 /* MIR team portal */
 .portal-shell [hidden], .sidebar-help[hidden] { display: none !important; }
+.portal-skip { transform: translateY(-200%); }
+.portal-skip:focus-visible { top: 12px; transform: none; }
 
 body[data-portal-mode="employee"] .portal-header .mir-client-links,
 body[data-portal-mode="employee"] .portal-header .mir-client-actions,
