@@ -33,7 +33,7 @@ body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) .subnav{dis
 }
 
 /* Keep the complete landing visible on compact phones without removing navigation. */
-@media(max-width:600px) and (max-height:800px){
+@media(max-width:600px) and (max-height:900px){
  body[data-client-pliage-landing] .page-main{padding-top:8px}
  body[data-client-pliage-landing] .client-bend-hero{gap:6px;padding-bottom:5px}
  body[data-client-pliage-landing] .client-bend-copy h1{font-size:30px;line-height:1.04;margin:4px 0}
