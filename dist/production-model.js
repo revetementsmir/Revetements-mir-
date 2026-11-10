@@ -816,11 +816,13 @@ function profileSideMarkers({segments,folds},model,handles,annotationBounds,[lef
   const caption=Number.isFinite(mm)?label+' · '+formatMeasurement(mm,model.unit):label;
   const length=distance(a,b),halfWidth=caption===label?11:Math.ceil(caption.length*4.1+8);
   const anchor=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+  const compact=right-left<800;
   const clear=([x,y])=>{
    const near=(q,margin)=>Math.abs(x-q[0])<halfWidth+margin&&Math.abs(y-q[1])<12+margin;
    const relative=([px,py])=>[(px-x)/(halfWidth+7),(py-y)/19];
    return x>=left+halfWidth+2&&x<=right-halfWidth-2&&y>=14&&y<=462&&
-    !placed.some(q=>near(q.point,q.halfWidth+4)&&Math.abs(y-q.point[1])<28)&&
+    !placed.some(q=>compact?distance([x,y],q.point)<50:
+      near(q.point,q.halfWidth+4)&&Math.abs(y-q.point[1])<28)&&
     !folds.some(q=>near(q,10))&&!handles.some(q=>near(q,12))&&
     !segments.some(line=>distanceToSide([0,0],line.map(relative))<1.42);
   };
@@ -831,7 +833,7 @@ function profileSideMarkers({segments,folds},model,handles,annotationBounds,[lef
    // C à gauche, D sous le retour. Les plis voisins ne partagent plus
    // la même rangée de badges ni des flèches traversant le profil.
    const preferred=-1;
-   const gap=Math.max(38,Math.ceil(1.48/Math.hypot(nx/(halfWidth+7),ny/19))+2);
+   const gap=Math.max(compact?52:38,Math.ceil(1.48/Math.hypot(nx/(halfWidth+7),ny/19))+2);
    const candidate=(side,extra,slide=0)=>[
     anchor[0]+side*(gap+extra)*nx+slide*(b[0]-a[0])/length,
     anchor[1]+side*(gap+extra)*ny+slide*(b[1]-a[1])/length
