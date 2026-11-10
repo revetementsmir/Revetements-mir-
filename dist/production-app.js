@@ -867,6 +867,14 @@ function goClientStep(step,{confirm=false}={}){
  $('#client-step-title').focus({preventScroll:true});
  $('#client-step-title').scrollIntoView({block:'nearest'});
 }
+function returnToClientChoice(){
+ if(!clientProfileWizard()||clientStep!==2||editingItemId&&!clientEditableTrace())return;
+ clientStep=1;
+ clientEntry='choice';
+ tool='select';
+ updateDrawing();
+ focusClientEntry('#client-choose-model');
+}
 function updateDrawing({keepForm=false}={}){
  if(clientProfileWizard()&&draft&&order&&clientDraftReady)store('mir_client_active_profile_v1',{version:1,draft,drawPoints,clientStep,clientUnlocked,clientProfileSelected,clientEntry,tool,colorSystem,colorId,materialId,selectedTemplate,legacyQuickId,editingItemId});
  document.body.dataset.panelSketch=String(kind==='panel'&&tool==='panel-trace');
@@ -2326,7 +2334,11 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(d.mirContinueAction!==undefined)return continueChoice(d.mirContinueAction);
  if(clientProfileWizard()){
   if(d.clientStep)return goClientStep(Number(d.clientStep));
-  if(button.id==='client-step-back'){if(clientStep===2&&draft.template==='custom')return resumeClientTrace();return goClientStep(clientStep-1);}
+  if(button.id==='client-step-back'){
+   if(clientStep===2&&draft.template==='custom')return resumeClientTrace();
+   if(clientStep===2)return returnToClientChoice();
+   return goClientStep(clientStep-1);
+  }
   if(button.id==='client-new-trace'){choose('profile','custom');startProfileDrawing({fullscreen:false});return;}
   if(button.id==='client-example-l'){appendTracePoint([50.8,50.8]);appendTracePoint([152.4,50.8]);appendTracePoint([152.4,127]);return;}
   if(button.id==='client-keyboard-point'){const x=M.parseMeasurement($('#client-point-x').value,draft.unit),y=M.parseMeasurement($('#client-point-y').value,draft.unit);if(!x.ok||!y.ok)return toast('Entrez deux coordonnées valides.');appendTracePoint([x.mm,y.mm]);const editor=$('.client-keyboard-trace');if(editor){editor.open=true;$('#client-point-x').value=String(x.value);$('#client-point-y').value=String(y.value);$('#client-point-x').focus();$('#client-point-x').select();}return;}
