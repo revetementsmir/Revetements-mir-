@@ -437,9 +437,17 @@ function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,ri
     return Math.hypot(ax+t*dx,ay+t*dy)>1.25;
    });
   };
-  const position=visualLabel!=='180°'&&[16,28,43,60].flatMap(gap=>[0,16,-16].map(shift=>[
+  const compact=rightEdge-leftEdge<800;
+  const mobileCandidates=compact?[
+   [joint[0]-42,joint[1]-30],
+   [joint[0]-45,joint[1]+30],
+   [joint[0]+42,joint[1]-30],
+   [joint[0]+45,joint[1]+30]
+  ]:[];
+  const regularCandidates=[16,28,43,60].flatMap(gap=>[0,16,-16].map(shift=>[
    joint[0]+nx*(r+gap)-ny*shift,joint[1]+ny*(r+gap)+nx*shift
-  ])).find(clear);
+  ]));
+  const position=visualLabel!=='180°'&&[...mobileCandidates,...regularCandidates].find(clear);
   let text='';
   if(position){
    const [x,y]=position;
