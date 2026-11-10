@@ -32,6 +32,7 @@
     return new PortalError(code || 'NETWORK_UNCERTAIN', definitive && error?.message ? error.message : fallback,
       { definitive, needsRetry: !definitive });
   }
+  const missingRoutine = response => response?.error?.code === 'PGRST202';
   function validateConfig(config = {}, origin) {
     if (config.enabled !== true) return { enabled: false };
     if (!/^[a-z0-9]{20}$/.test(config.projectRef || '')) fail('CONFIGURATION', 'Le portail attend sa configuration MIR.');
@@ -224,7 +225,9 @@
         const [operationsResponse,messagingResponse,punchResponse]=await Promise.all([
           sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg}),sdk.rpc('mir_punch_snapshot',{org:internalOrg,employee:null})
         ]);
-        if(operationsResponse.error)throw errorOf(operationsResponse.error);if(messagingResponse.error)throw errorOf(messagingResponse.error);if(punchResponse.error)throw errorOf(punchResponse.error);
+        if(operationsResponse.error)throw errorOf(operationsResponse.error);if(messagingResponse.error)throw errorOf(messagingResponse.error);
+        if(punchResponse.error&&!missingRoutine(punchResponse))throw errorOf(punchResponse.error);
+        const punch=punchResponse.error?{enabled:false,settings:{},activeShift:null,week:[],corrections:[],bankBalance:0,unavailable:true}:punchResponse.data;
         let lead=null,boss=null,logistics=null,management=null,boutiquePricing=null;
         if(operationsResponse.data?.role==='chef_equipe'){
           const response=await sdk.rpc('mir_lead_today_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
@@ -238,7 +241,7 @@
           const response=await sdk.rpc('mir_management_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);management=response.data;
           const prices=await sdk.rpc('mir_boutique_price_management',{org:internalOrg});if(prices.error)throw errorOf(prices.error);boutiquePricing=prices.data;
         }
-        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch:punchResponse.data}, user.id);
+        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {
