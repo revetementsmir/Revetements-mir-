@@ -27,10 +27,10 @@ test('Le site principal conserve aussi le même menu',()=>{
  assert.match(h,/href="realisations\.html"[^>]*>Réalisations<\/a>/);
  assert.match(h,/href="chantier\.html"[^>]*>Mon compte<\/a>/);
 });
-test('Boutique, produit et sélection préservent les comptes du panier',()=>{
+test('Boutique, produit et sélection préservent les comptes de la demande',()=>{
  for(const name of ['boutique.html','produit.html','selection.html']){
    assert.match(read(name),/data-list-count/,'Compteur absent '+name);
-   if(name!=='selection.html')assert.match(read(name),/href="selection\.html"[^>]*>Mon panier/);
+   if(name!=='selection.html')assert.match(read(name),/href="selection\.html"[^>]*>Ma demande/);
  }
 });
 test('Le studio conserve son bouton de bibliothèque fonctionnel',()=>{

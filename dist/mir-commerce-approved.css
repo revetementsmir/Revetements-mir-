@@ -73,6 +73,10 @@ body[data-mir-cart-header] .product-save-note{font-size:11px;line-height:1.5;mar
 body[data-mir-cart-header] .mir-product-added{padding:14px;background:#edf4e7;border:1px solid #b8d1aa;border-radius:8px;margin-top:12px;font-size:13px}
 body[data-mir-cart-header] .mir-product-added p{margin:6px 0 12px}
 body[data-mir-cart-header] .mir-product-added a{display:flex;min-height:44px;align-items:center}
+body[data-commerce-view="shop"].mir-shop-filtered .shop-categories,
+body[data-commerce-view="shop"].mir-shop-filtered .mir-shop-intro figure,
+body[data-commerce-view="shop"].mir-shop-filtered .mir-shop-intro>div>:not(.mir-shop-search){display:none}
+body[data-commerce-view="shop"].mir-shop-filtered .mir-shop-intro{display:block;padding-block:16px}
 body[data-mir-cart-header] .mir-product-technical{margin:20px 0;border-block:1px solid #dce4d5}
 body[data-mir-cart-header] .mir-product-technical>summary{padding:14px 0;cursor:pointer;font-size:13px}
 body[data-mir-cart-header] .product-related{margin-top:48px}

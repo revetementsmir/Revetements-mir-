@@ -372,6 +372,62 @@
     "note": "Quantités entières. unité MIR à confirmer."
   },
   {
+    "id": "royal-alumipro-coil-132419",
+    "formatId": null,
+    "rules": [
+      {
+        "unit": "rouleaux",
+        "step": 1
+      }
+    ],
+    "area": null,
+    "missingFormat": false,
+    "defaultUnit": "rouleaux",
+    "note": "Quantités entières. rouleau."
+  },
+  {
+    "id": "royal-alumipro-coil-132423",
+    "formatId": null,
+    "rules": [
+      {
+        "unit": "rouleaux",
+        "step": 1
+      }
+    ],
+    "area": null,
+    "missingFormat": false,
+    "defaultUnit": "rouleaux",
+    "note": "Quantités entières. rouleau."
+  },
+  {
+    "id": "royal-alumipro-coil-132423-gaufre",
+    "formatId": null,
+    "rules": [
+      {
+        "unit": "rouleaux",
+        "step": 1
+      }
+    ],
+    "area": null,
+    "missingFormat": false,
+    "defaultUnit": "rouleaux",
+    "note": "Quantités entières. rouleau."
+  },
+  {
+    "id": "royal-cedar-renditions-coil-132423",
+    "formatId": null,
+    "rules": [
+      {
+        "unit": "rouleaux",
+        "step": 1
+      }
+    ],
+    "area": null,
+    "missingFormat": false,
+    "defaultUnit": "rouleaux",
+    "note": "Quantités entières. rouleau."
+  },
+  {
     "id": "adseal-4580",
     "formatId": null,
     "rules": [
@@ -967,7 +1023,7 @@
     "area": null,
     "missingFormat": false,
     "defaultUnit": "pièces",
-    "note": "Quantités entières. pièce — unité de vente MIR à confirmer."
+    "note": "Quantités entières. 4 × 8 pi — nominal."
   },
   {
     "id": "allura-panel-smooth-4x10",
@@ -981,7 +1037,7 @@
     "area": null,
     "missingFormat": false,
     "defaultUnit": "pièces",
-    "note": "Quantités entières. pièce — unité de vente MIR à confirmer."
+    "note": "Quantités entières. 4 × 10 pi — nominal."
   },
   {
     "id": "allura-panel-traditional-4x10",
@@ -1009,7 +1065,7 @@
     "area": null,
     "missingFormat": false,
     "defaultUnit": "pièces",
-    "note": "Quantités entières. pièce — unité de vente MIR à confirmer."
+    "note": "Quantités entières. 4 × 8 pi — nominal."
   },
   {
     "id": "allura-panel-traditional-4x10",
@@ -1023,7 +1079,7 @@
     "area": null,
     "missingFormat": false,
     "defaultUnit": "pièces",
-    "note": "Quantités entières. pièce — unité de vente MIR à confirmer."
+    "note": "Quantités entières. 4 × 10 pi — nominal."
   },
   {
     "id": "allura-trim-54x4",
@@ -2013,7 +2069,7 @@
     "area": null,
     "missingFormat": false,
     "defaultUnit": "boîtes",
-    "note": "Quantités entières. conditionnement à confirmer — sources fabricant divergentes."
+    "note": "Quantités entières. ¾ po — VFCTEK834."
   },
   {
     "id": "lighttrim-t001",
