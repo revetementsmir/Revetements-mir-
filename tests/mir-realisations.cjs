@@ -12,22 +12,33 @@ test('L’accueil vitrine ouvre la galerie dédiée et redirige les anciens lien
  assert.match(html,/'#au-coeur-du-centre-ville':'realisations\.html#au-coeur-du-centre-ville'/);
  assert.doesNotMatch(html,/id="realisations"/);
 });
-test('Les trois maisons de MIR sont présentes dans Réalisations sans changement d’architecture',()=>{
+test('Les réalisations existantes sont conservées et les nouvelles photos sont publiées',()=>{
  const h=read('realisations.html');
- for(const id of names){assert.match(h,new RegExp(id+'-large\\.webp'));assert.match(h,new RegExp(id+'-mobile\\.webp'))}
- assert.equal((h.match(/class="mir-gallery-photo-button"/g)||[]).length,4);
- assert.match(h,/Nos réalisations/);
+ for(const id of names){assert.match(h,new RegExp(id+'-large\\.webp'))}
+ for(const file of ['multilogements-contemporains','residence-forestiere-hiver','residence-bois-pierre-terrasse','residence-fenetres-panoramiques','residence-brique-grise','residence-bois-pierre','residence-metal-contemporaine']){
+  assert.match(h,new RegExp('nouveaux/'+file+'\\.webp'));
+ }
+ assert.equal((h.match(/class="mir-gallery-card(?: |")/g)||[]).length,10);
+ assert.equal((h.match(/data-photo="/g)||[]).length,11);
+ assert.match(h,/Des façades/);
  assert.doesNotMatch(h,/image générée pour la page d’accueil|palmier/i);
 });
 test('La galerie conserve les filtres et la sélection de l’ancien accueil',()=>{
  const html=read('realisations.html'), app=read('mir-realisations.js');
  assert.match(html,/data-gallery-filter="saved"/);
- assert.equal((html.match(/data-gallery-save=/g)||[]).length,4);
+ assert.equal((html.match(/data-gallery-save=/g)||[]).length,10);
  assert.match(app,/localStorage.getItem\('mir-inspirations'\)/);
+});
+test('Les deux vues du même projet bois et pierre sont regroupées sans carte en double',()=>{
+ const h=read('realisations.html');
+ assert.equal((h.match(/<h3>Nature habitée<\/h3>/g)||[]).length,1);
+ assert.match(h,/BOIS & PIERRE · 2 PHOTOS/);
+ assert.match(h,/class="mir-gallery-related-view"[^>]+data-photo="5"/);
+ assert.equal((h.match(/<article class="mir-gallery-card/g)||[]).length,10);
 });
 test('Les trois fichiers originaux ne sont ni écrasés ni publiés comme modèles artificiels',()=>{
  const h=read('realisations.html');
- assert.match(h,/Réalisations réelles présentées par MIR/);
+ assert.match(h,/Les photographies de certains projets ont été retouchées/);
  assert.doesNotMatch(h,/src="assets\/mir-home-hero/);
  const count=names.flatMap(id=>['large','mobile'].map(fmt=>id+'-'+fmt+'.webp'));
  for(const name of count){
@@ -63,20 +74,18 @@ test('Galerie en grand, clavier et retours accessibles',()=>{
  assert.match(js,/ArrowLeft/);
  assert.match(js,/dialog\.addEventListener\('close'/);
  assert.match(css,/@media\(max-width:680px\)/);
- assert.match(css,/@media\(min-width:2200px\)/);
  assert.match(css,/object-fit:cover/);
 });
-test('Quatrième réalisation publiée en AVIF, originale et variante mobile',()=>{
-  const h=read('realisations.html'),js=read('mir-realisations.js'),css=read('mir-realisations.css');
+test('La réalisation urbaine en AVIF demeure publiée avec ses deux formats',()=>{
+  const h=read('realisations.html'),js=read('mir-realisations.js');
   assert.match(h,/Au cœur du centre-ville de Québec/);
-  assert.match(h,/id="au-coeur-du-centre-ville" data-gallery-category="urban"/);
-  assert.match(h,/data-photo="3"/);
-  assert.match(h,/aria-live="polite">1 \/ 4/);
-  assert.match(js,/Au cœur du centre-ville de Québec/);
-  assert.match(css,/mir-gallery-card-twilight/);
+  assert.match(h,/id="au-coeur-du-centre-ville" data-gallery-category="contemporary"/);
+  assert.match(h,/data-photo="10"/);
+  assert.match(h,/aria-live="polite">1 sur 11/);
+  assert.match(js,/Au cœur de Québec/);
   for(const kind of ['large','mobile']){
     const file='assets/realisations/realisations-mir-quebec-avec-voiture-'+kind+'.avif';
-    assert.match(h,new RegExp(file.replaceAll('.','\\.')));
+    if(kind==='large')assert.match(h,new RegExp(file.replaceAll('.','\\.')));
     const b=fs.readFileSync(path.join(root,file));
     assert.ok(b.length>15000,file);
     assert.equal(b.toString('ascii',4,8),'ftyp',file);

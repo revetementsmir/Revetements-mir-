@@ -22,7 +22,7 @@ async function main(){await new Promise(r=>server.listen(0,'127.0.0.1',r));let b
    await page.locator('.mir-gallery-photo-button img').evaluateAll(imgs=>Promise.all(imgs.map(img=>{img.loading='eager';return img.decode()})));
    const data=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,images:[...document.querySelectorAll('.mir-gallery-photo-button img')].map(x=>x.naturalWidth>0),links:document.querySelectorAll('header.mir-client-header nav a').length}));
    assert.ok(data.scroll<=vp.width+2,vp.name+': débordement '+data.scroll+' > '+vp.width);
-   assert.equal(data.images.length,4);
+   assert.equal(data.images.length,10);
    assert.ok(data.images.every(Boolean),vp.name+': image manquante');
    assert.ok(data.links>=5,vp.name+': menu incomplet');
    assert.equal(errors.length,0,vp.name+': '+errors.join('; '));
@@ -31,13 +31,13 @@ async function main(){await new Promise(r=>server.listen(0,'127.0.0.1',r));let b
     await page.locator('[data-photo="1"]').click();
     assert.equal(await page.locator('#mir-gallery-dialog').evaluate(el=>el.open),true);
     await page.locator('#mir-gallery-next').click();
-    assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Un classique réinventé');
+    assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Nature habitée');
     await page.locator('#mir-gallery-close').click();
     assert.equal(await page.locator('#mir-gallery-dialog').evaluate(el=>el.open),false);
     await page.locator('[data-photo="3"]').click();
-    assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Au cœur du centre-ville de Québec');
+    assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Ouverte sur le paysage');
     await page.locator('#mir-gallery-next').click();
-    assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Jeux de matières');
+    assert.equal(await page.locator('#mir-gallery-dialog-title').innerText(),'Contrastes maîtrisés');
     await page.locator('#mir-gallery-close').click();
    }
    await page.close();console.log('PASS Réalisations '+vp.name+' px');
