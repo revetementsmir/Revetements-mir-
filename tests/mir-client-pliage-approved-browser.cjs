@@ -71,11 +71,11 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
  for(const [width,height]of [[360,780],[390,844],[428,926],[600,900],[601,900],[834,1112],[1024,768],[1348,926],[1440,900]]){
  const c=await contextFor(browser,base,{width,height}),page=await c.newPage(),errors=[];page.setDefaultTimeout(15000);page.on('pageerror',e=>{errors.push(e.stack);console.log('PAGEERROR '+page.url()+' '+e.stack);});
  await page.addInitScript(({dossier,quick,modelRecord})=>{if(!sessionStorage.getItem('qa-seeded')){localStorage.setItem('mir_production_client_dossier_v1',JSON.stringify(dossier));localStorage.setItem('mir-bending-v1',JSON.stringify(quick));localStorage.setItem('mir_production_templates_v1',JSON.stringify({version:1,records:[modelRecord]}));sessionStorage.setItem('qa-seeded','1');}},{dossier,quick,modelRecord});
- const noOverflow=async()=>assert.equal(await page.evaluate(async()=>{
+ const noOverflow=async()=>{const dimensions=await page.evaluate(async()=>{
   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   const root=document.scrollingElement;
-  return root.scrollWidth<=innerWidth+1&&root.scrollHeight<=root.clientHeight+1;
- }),true,'wizard fits one screen '+width);
+  return {scrollWidth:root.scrollWidth,clientWidth:root.clientWidth,scrollHeight:root.scrollHeight,clientHeight:root.clientHeight,viewportWidth:innerWidth,viewportHeight:innerHeight};
+ });assert.ok(dimensions.scrollWidth<=dimensions.viewportWidth+1&&dimensions.scrollHeight<=dimensions.clientHeight+1,'wizard fits one screen '+width+' '+JSON.stringify(dimensions));};
  const backToChoice=async()=>{
   await page.locator('#client-step-back').click();
   await page.waitForFunction(()=>document.body.dataset.clientStage==='1'&&document.body.dataset.clientEntry==='choice');
