@@ -14,6 +14,7 @@
     return url.href;
   }
   const number = n => new Intl.NumberFormat('fr-CA',{maximumFractionDigits:3}).format(n);
+  const money = n => new Intl.NumberFormat('fr-CA',{style:'currency',currency:'CAD'}).format(n);
   // A tariff per area is not a price for one unmeasured panel. The configurator
   // owns the quantity calculation; this page only presents MIR's approved rate.
   function customColor(c){return ['ral','custom'].includes(c?.selectionType)||/^ral(?:\b|\s)/.test(norm(c?.system))||/^ral\s*\d/.test(norm(c?.code));}
@@ -24,11 +25,17 @@
   function productPriceNote(m,c){
     if(m.status==='pending_identity')return 'Référence exacte à confirmer avant sélection';
     if(customColor(c))return 'Couleur personnalisée · soumission obligatoire';
-    const p=surfaceTariff(m,c);return p?`Tarif MIR : ${number(p.amount)} $ CA/po²`:'Prix et disponibilité sur demande';
+    const p=surfaceTariff(m,c);if(p)return `Tarif MIR : ${number(p.amount)} $ CA/po²`;
+    const regional=m.regionalPricing;if(!regional)return 'Prix sur demande';
+    const formatPrice=activeFormat&&regional.formatPrices?.[activeFormat.id];
+    const selected=formatPrice||regional;
+    return Number.isFinite(selected.amount)?`${money(selected.amount)} / ${regional.unit}`:'Prix sur demande';
   }
   function productPriceDetails(m,c){
     if(customColor(c))return 'Aucun prix automatique pour une couleur personnalisée ou RAL. Le dessin et les mesures accompagnent la demande de soumission.';
-    return surfaceTariff(m,c)?'Surface de la forme hors tout, lips compris. Couleur personnalisée ou RAL : soumission obligatoire. Taxes et livraison non calculées. Disponibilité du fini à confirmer.':'';
+    if(surfaceTariff(m,c))return 'Surface de la forme hors tout, lips compris. Couleur personnalisée ou RAL : soumission obligatoire. Taxes et livraison non calculées. Disponibilité du fini à confirmer.';
+    const regional=m.regionalPricing,selected=activeFormat&&regional?.formatPrices?.[activeFormat.id]||regional;
+    return Number.isFinite(selected?.amount)?`Prix MIR calculé sur une moyenne régionale avant taxes de ${money(selected.marketAverage)}, majorée de 15 %. Relevé du ${regional.researchedOn||'9 novembre 2026'}; prix et disponibilité à reconfirmer.`:'';
   }
   const units=['pi²','pi lin.','pièces','cartouches','saucisses','boîtes','rouleaux','kits','paquets','cartons'];
   const KEY='mir-shopping-list-v1';
@@ -128,7 +135,7 @@
   function persist(){try{localStorage.setItem(KEY,JSON.stringify(list));updateCount();return true;}catch{notify('Le navigateur ne peut pas enregistrer cette sélection. Téléchargez votre liste.');return false;}}
   function updateCount(){document.querySelectorAll('[data-list-count]').forEach(el=>el.textContent=list.items.length);}
   function unitOptions(value,m,formatId){return (m?Q.policy(m,formatId).rules.map(r=>r.unit).concat(value&&!Q.policy(m,formatId).rules.some(r=>r.unit===value)?[value]:[]):units).map(u=>`<option${u===value?' selected':''}>${esc(u)}</option>`).join('');}
-  function card(m){const im=heroImage(m),cs=colors(m),shown=cs.slice(0,3),f=formats(m);return `<article class="shop-card" data-shop-card="${esc(m.id)}"><a data-card-link href="${esc(productHref(m.id))}"><div class="shop-card-photo" data-photo-type="${presentation(im)}"><div class="card-preview">${imageMarkup(m)}</div><span class="card-photo-label">${esc(photoLabel(im))}</span></div></a><div class="shop-card-copy"><span class="shop-card-brand">${esc(m.brand)}</span><h3><a data-card-link href="${esc(productHref(m.id))}">${esc(m.name)}</a></h3><p class="shop-card-size">${esc(f.length>1?f.map(formatLabel).join(' · '):dimensions(m))}</p><details class="mir-card-colors"${cs.length?'':' hidden'}><summary>${cs.length} nuance${cs.length>1?'s':''}</summary><div class="shop-card-swatches" aria-label="Nuances de ${esc(m.name)}">${shown.map(c=>`<button type="button" class="shop-swatch-small${swatchClass(c)}" data-card-color="${esc(c.id)}" data-material="${esc(m.id)}" title="${esc(c.name)}" aria-label="Voir ${esc(c.name)} sur ${esc(m.name)}" aria-pressed="false">${swatch(c)}</button>`).join('')}${cs.length>3?`<a href="${esc(productHref(m.id))}" class="more-colors">+${cs.length-3}</a>`:''}</div><p class="card-color-name">${m.status==='pending_identity'?'Référence à identifier':cs.length?`${cs.length} nuances référencées`:m.colorStatus==='not_applicable'?esc(m.finish||'Fini de la référence'):esc(m.finish||'Finition à préciser')}</p></details><a class="product-card-link" data-card-link href="${esc(productHref(m.id))}">Choisir ce matériau <span>→</span></a></div></article>`;}
+  function card(m){const im=heroImage(m),cs=colors(m),shown=cs.slice(0,3),f=formats(m),price=m.regionalPricing&&!m.regionalPricing.formatPrices?productPriceNote(m,cs[0]):m.regionalPricing?.formatPrices?'Prix selon le format':'Prix sur demande';return `<article class="shop-card" data-shop-card="${esc(m.id)}"><a data-card-link href="${esc(productHref(m.id))}"><div class="shop-card-photo" data-photo-type="${presentation(im)}"><div class="card-preview">${imageMarkup(m)}</div><span class="card-photo-label">${esc(photoLabel(im))}</span></div></a><div class="shop-card-copy"><span class="shop-card-brand">${esc(m.brand)}</span><h3><a data-card-link href="${esc(productHref(m.id))}">${esc(m.name)}</a></h3><p class="shop-card-size">${esc(f.length>1?f.map(formatLabel).join(' · '):dimensions(m))}</p><p class="product-price-note shop-card-price">${esc(price)}</p><details class="mir-card-colors"${cs.length?'':' hidden'}><summary>${cs.length} nuance${cs.length>1?'s':''}</summary><div class="shop-card-swatches" aria-label="Nuances de ${esc(m.name)}">${shown.map(c=>`<button type="button" class="shop-swatch-small${swatchClass(c)}" data-card-color="${esc(c.id)}" data-material="${esc(m.id)}" title="${esc(c.name)}" aria-label="Voir ${esc(c.name)} sur ${esc(m.name)}" aria-pressed="false">${swatch(c)}</button>`).join('')}${cs.length>3?`<a href="${esc(productHref(m.id))}" class="more-colors">+${cs.length-3}</a>`:''}</div><p class="card-color-name">${m.status==='pending_identity'?'Référence à identifier':cs.length?`${cs.length} nuances référencées`:m.colorStatus==='not_applicable'?esc(m.finish||'Fini de la référence'):esc(m.finish||'Finition à préciser')}</p></details><a class="product-card-link" data-card-link href="${esc(productHref(m.id))}">Choisir ce matériau <span>→</span></a></div></article>`;}
   function hydrateChips(container=document){
     for(const card of container.querySelectorAll('[data-shop-card]')){
       const material=materials.find(m=>m.id===card.dataset.shopCard);
@@ -535,7 +542,7 @@
       });
     }
   }
-  async function init(){updateCount();const [response,visibility,adseal,kaycanSwatches]=await Promise.all([fetch('./catalogue-fd6866b49d21.json'),fetch('./boutique-visibilite.json',{cache:'no-cache'}),fetch('./catalogue-adseal-4580.json').then(r=>r.ok?r.json():null).catch(()=>null),fetch(screwAssetRoot+'kaycan-fascia-colours.json').then(r=>r.ok?r.json():{}).catch(()=>({}))]);if(!visibility.ok)throw new Error('La disponibilité des articles ne peut pas être vérifiée. Réessayez dans un instant.');const {hidden}=await visibility.json();if(!Array.isArray(hidden))throw new Error('La disponibilité des articles est invalide.');hiddenProducts=new Set(hidden);if(!response.ok)throw new Error('Le catalogue ne peut pas être chargé. Réessayez dans un instant.');materials=(await response.json()).materials||[];
+  async function init(){updateCount();const [response,visibility,adseal,kaycanSwatches,regionalPricing]=await Promise.all([fetch('./catalogue-fd6866b49d21.json'),fetch('./boutique-visibilite.json',{cache:'no-cache'}),fetch('./catalogue-adseal-4580.json').then(r=>r.ok?r.json():null).catch(()=>null),fetch(screwAssetRoot+'kaycan-fascia-colours.json').then(r=>r.ok?r.json():{}).catch(()=>({})),fetch('./mir-regional-pricing-20261110.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null)]);if(!visibility.ok)throw new Error('La disponibilité des articles ne peut pas être vérifiée. Réessayez dans un instant.');const {hidden}=await visibility.json();if(!Array.isArray(hidden))throw new Error('La disponibilité des articles est invalide.');hiddenProducts=new Set(hidden);if(!response.ok)throw new Error('Le catalogue ne peut pas être chargé. Réessayez dans un instant.');materials=(await response.json()).materials||[];for(const material of materials){const price=regionalPricing?.priced?.[material.id];if(price)material.regionalPricing={...price,researchedOn:regionalPricing.researchedOn,markupPercent:regionalPricing.markupPercent};}
   const sealant=materials.find(m=>m.id===adseal?.id);
   if(sealant){
     for(const color of adseal.colors){
