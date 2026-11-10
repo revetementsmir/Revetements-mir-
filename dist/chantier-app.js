@@ -62,7 +62,7 @@
     }catch(error){toast(errorMessage(error));if(error?.needsRetry&&$('#portal-dialog').open)closeDialog();syncOperation();return {ok:false,error};}
   }
   function setView(next,{focus=false}={}) {
-    const allowed=['admin','assistant','boss'].includes(mode)?['management-home','management-today','management-files','messages','management-more','boutique-prices','management-estimates','management-invoices','management-jobs','management-settings','punch-admin','punch-reports','admin-vehicles','admin-logistics','members']:mode==='warehouse'?['warehouse-prepare','warehouse-scan','warehouse-deliveries','warehouse-inventory']:mode==='chef_equipe'?['lead-day','lead-job','lead-team','lead-more','punch-hours']:['day','plans','photos','account','catalogue','material','messages','orders','punch-hours'];
+    const allowed=['admin','assistant','boss'].includes(mode)?['management-home','management-today','management-files','messages','management-more','boutique-prices','management-estimates','management-invoices','management-jobs','management-settings','punch-admin','punch-journal','punch-reports','admin-vehicles','admin-logistics','members']:mode==='warehouse'?['warehouse-prepare','warehouse-scan','warehouse-deliveries','warehouse-inventory']:mode==='chef_equipe'?['lead-day','lead-job','lead-team','lead-more','punch-hours']:['day','plans','photos','account','catalogue','material','messages','orders','punch-hours'];
     if(!allowed.includes(next))return;
     if(next!==view)reviewingOrder=false;
     view=next;query='';category='all';favoritesOnly=false;render();
