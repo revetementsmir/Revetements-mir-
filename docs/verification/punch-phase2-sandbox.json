@@ -1,11 +1,12 @@
 {
-  "observedAt": "2026-11-10T13:43:00Z",
+  "observedAt": "2026-11-10T16:50:00Z",
   "target": "MIR TEST",
   "productionChanged": false,
   "migrations": [
     "operational_roles_phase1",
     "punch_phase2_integrity",
-    "punch_phase2_workflow"
+    "punch_phase2_workflow",
+    "punch_phase2_corrections"
   ],
   "activeTestRoles": {
     "boss": 2,
@@ -21,10 +22,18 @@
     "terrainRolesDeniedBossActions": "PASS",
     "directPunchAuditReadDenied": "PASS",
     "anonymousRpcExecutionDenied": "PASS",
-    "authenticatedChefBrowserAndPunchRpc": "PASS"
+    "authenticatedChefBrowserAndPunchRpc": "PASS",
+    "phase2CompletionLocalPostgresScenarios": "20/20 PASS",
+    "decisionConflictLock": "PASS",
+    "bossAssistantNotifications": "PASS",
+    "employeeDecisionNotification": "PASS",
+    "paginatedJournalRpcAndDirectAuditDenied": "PASS",
+    "timeBankRequestWorkflow": "PASS",
+    "phase2CompletionMigrationRemote": "NOT_APPLIED"
   },
   "limitations": [
     "Distinct Adjointe and Entrepot passwords were not injected into this execution session; their server permissions were verified inside MIR TEST without exposing account identifiers.",
-    "No production migration or business-data write was performed."
+    "Migration 20261110160000 remains local until the MIR TEST project identity is explicitly confirmed.",
+    "No publication was performed from the prompt1-final branch."
   ]
 }

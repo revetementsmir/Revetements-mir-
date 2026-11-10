@@ -116,7 +116,7 @@
     const config = validateConfig(options.config, options.origin);
     const listeners = new Set();
     let status = { phase: config.enabled ? 'signed_out' : 'unavailable', user: null, snapshot: null, error: null, pending: null, busy: false };
-    let generation = 0, readSequence = 0, authSubscription = null, activePromise = null, authTimer = null, disposed = false, internalOrg = null;
+    let generation = 0, readSequence = 0, authSubscription = null, activePromise = null, authTimer = null, liveTimer = null, disposed = false, internalOrg = null;
     const storage = options.operationStorage;
     const logoutKey = `mir_portal_signed_out_${config.projectRef || 'disabled'}`;
     let logoutRequested = false;
@@ -251,7 +251,7 @@
         throw mapped;
       }
     }
-    const onlinePunchSync=()=>{if(!disposed)syncPunchQueue().catch(()=>{});};
+    const onlinePunchSync=()=>{if(!disposed)syncPunchQueue().catch(()=>0).then(()=>refresh().catch(()=>{}));};
     async function start() {
       if (!sdk) { emit({}, 'start'); return null; }
       if (!authSubscription) {
@@ -272,6 +272,7 @@
       emit({ phase: 'loading', error: null }, 'start');
       const result=await refresh();
       globalThis.addEventListener?.('online',onlinePunchSync);
+      if(liveTimer===null&&typeof setInterval==='function')liveTimer=setInterval(()=>{if(!disposed&&globalThis.navigator?.onLine!==false&&globalThis.document?.visibilityState!=='hidden'&&status.phase==='ready')refresh().catch(()=>{});},15000);
       if(globalThis.navigator?.onLine!==false)syncPunchQueue().catch(()=>{});
       return result;
     }
@@ -498,14 +499,17 @@
     async function syncPunchQueue(){if(!internalOrg||!navigator.onLine)return 0;const queue=JSON.parse(localStorage.getItem('mir_punch_queue_v1')||'[]'),remaining=[];for(const item of queue){const {error}=await sdk.rpc('mir_punch_action',{org:internalOrg,request_id:item.id,action:item.action,job:item.job,payload:item.payload});if(error)remaining.push(item);}localStorage.setItem('mir_punch_queue_v1',JSON.stringify(remaining));if(queue.length!==remaining.length)await refresh();return queue.length-remaining.length;}
     async function punchCorrection(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_correction',{org:internalOrg,correction:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function punchAdmin(action,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_admin',{org:internalOrg,action,payload});if(error)throw errorOf(error);await refresh();return data;}
+    async function punchJournal(filters={},pageAfter=null,pageSize=25){requireReady();const {data,error}=await sdk.rpc('mir_punch_journal',{org:internalOrg,filters,page_size:pageSize,page_after:pageAfter});if(error)throw errorOf(error);return data;}
+    async function timeBankRequest(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_time_bank_request',{org:internalOrg,request:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     function dispose() {
       disposed = true; generation++; authSubscription?.unsubscribe?.();
       globalThis.removeEventListener?.('online',onlinePunchSync);
       if (authTimer !== null && typeof clearTimeout === 'function') clearTimeout(authTimer);
+      if (liveTimer !== null && typeof clearInterval === 'function') clearInterval(liveTimer);
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, dispose,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
     });
   }

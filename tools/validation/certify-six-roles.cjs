@@ -20,7 +20,7 @@ const ROLE_DEFINITIONS = [
 ];
 
 function credentialNames(key, suffix) {
-  const aliases = key === 'CHEF' ? ['CHEF', 'CHEF_EQUIPE'] : [key];
+  const aliases = key === 'CHEF' ? ['CHEF', 'CHEF_EQUIPE'] : key === 'ADJOINTE' ? ['ASSISTANT','ADJOINTE'] : key === 'ENTREPOT' ? ['WAREHOUSE','ENTREPOT'] : [key];
   return [
     ...aliases.map(alias => `MIR_TEST_${alias}_${suffix}`),
     ...aliases.slice().reverse().map(alias => `MIR_SANDBOX_${alias}_${suffix}`)
