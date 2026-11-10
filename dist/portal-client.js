@@ -225,7 +225,7 @@
           sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg}),sdk.rpc('mir_punch_snapshot',{org:internalOrg,employee:null})
         ]);
         if(operationsResponse.error)throw errorOf(operationsResponse.error);if(messagingResponse.error)throw errorOf(messagingResponse.error);if(punchResponse.error)throw errorOf(punchResponse.error);
-        let lead=null,boss=null,logistics=null,management=null;
+        let lead=null,boss=null,logistics=null,management=null,boutiquePricing=null;
         if(operationsResponse.data?.role==='chef_equipe'){
           const response=await sdk.rpc('mir_lead_today_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
         }else if(operationsResponse.data?.role==='boss'){
@@ -236,8 +236,9 @@
         }
         if(['assistant','boss','admin'].includes(operationsResponse.data?.role)){
           const response=await sdk.rpc('mir_management_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);management=response.data;
+          const prices=await sdk.rpc('mir_boutique_price_management',{org:internalOrg});if(prices.error)throw errorOf(prices.error);boutiquePricing=prices.data;
         }
-        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,punch:punchResponse.data}, user.id);
+        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch:punchResponse.data}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {
@@ -489,6 +490,7 @@
     async function logisticsAction(action,entity=null,payload={}){requireReady();if(!internalOrg||!['warehouse','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès entrepôt requis.');const {data,error}=await sdk.rpc('mir_logistics_action',{org:internalOrg,request_id:uuid(),action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function adminLogisticsAction(action,entity=null,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='admin')fail('ACCESS_DENIED','Admin requis.');const {data,error}=await sdk.rpc('mir_admin_logistics_action',{org:internalOrg,action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function managementAction(action,entity=null,payload={}){requireReady();if(!internalOrg||!['assistant','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès gestion requis.');const {data,error}=await sdk.rpc('mir_management_action',{org:internalOrg,action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
+    async function boutiquePriceAction(item,format,action,newPriceCents=null,reason=null){requireReady();if(!internalOrg||!['assistant','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès Prix boutique requis.');const {data,error}=await sdk.rpc('mir_boutique_price_action',{org:internalOrg,item,format:format||'',action,new_price_cents:newPriceCents,reason});if(error)throw errorOf(error);await refresh();return data;}
     async function punchAction(action,job=null,payload={}){requireReady();if(!internalOrg)fail('ACCESS_DENIED','Accès punch requis.');const id=uuid(),body={...payload,deviceId:payload.deviceId||'web'};try{const {data,error}=await sdk.rpc('mir_punch_action',{org:internalOrg,request_id:id,action,job,payload:body});if(error)throw errorOf(error);await refresh();return data;}catch(error){const settings=status.snapshot?.punch?.settings||{};if(!(settings.offlineEnabled??settings.offline_enabled)||!['in','out','switch','travel_start','travel_arrive'].includes(action))throw error;const queue=JSON.parse(localStorage.getItem('mir_punch_queue_v1')||'[]');queue.push({id,action,job,payload:{...body,source:'offline',originalAt:new Date().toISOString()}});localStorage.setItem('mir_punch_queue_v1',JSON.stringify(queue));return{ok:true,pending:true,serverAt:new Date().toISOString()};}}
     async function syncPunchQueue(){if(!internalOrg||!navigator.onLine)return 0;const queue=JSON.parse(localStorage.getItem('mir_punch_queue_v1')||'[]'),remaining=[];for(const item of queue){const {error}=await sdk.rpc('mir_punch_action',{org:internalOrg,request_id:item.id,action:item.action,job:item.job,payload:item.payload});if(error)remaining.push(item);}localStorage.setItem('mir_punch_queue_v1',JSON.stringify(remaining));if(queue.length!==remaining.length)await refresh();return queue.length-remaining.length;}
     async function punchCorrection(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_correction',{org:internalOrg,correction:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
@@ -500,7 +502,7 @@
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, dispose,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
     });
   }
