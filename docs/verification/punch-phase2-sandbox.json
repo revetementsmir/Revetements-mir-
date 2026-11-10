@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-11-10T13:43:00Z",
+  "target": "MIR TEST",
+  "productionChanged": false,
+  "migrations": [
+    "operational_roles_phase1",
+    "punch_phase2_integrity",
+    "punch_phase2_workflow"
+  ],
+  "activeTestRoles": {
+    "boss": 2,
+    "adjointe": 1,
+    "chef_equipe": 2,
+    "employe_chantier": 2,
+    "entrepot_livraison": 1
+  },
+  "checks": {
+    "canonicalRoleAndFourItemNavigation": "PASS",
+    "selfPunchSnapshotForEveryOperationalRole": "PASS",
+    "adjointeAndBossCanReviewEmployeePunch": "PASS",
+    "terrainRolesDeniedBossActions": "PASS",
+    "directPunchAuditReadDenied": "PASS",
+    "anonymousRpcExecutionDenied": "PASS",
+    "authenticatedChefBrowserAndPunchRpc": "PASS"
+  },
+  "limitations": [
+    "Distinct Adjointe and Entrepot passwords were not injected into this execution session; their server permissions were verified inside MIR TEST without exposing account identifiers.",
+    "No production migration or business-data write was performed."
+  ]
+}
