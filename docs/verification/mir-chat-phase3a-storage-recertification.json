@@ -1428,7 +1428,7 @@
     "url": "https://github.com/revetementsmir/Revetements-mir-/actions/runs/43026678386",
     "separateFromNewChatChecks": true
   },
-  "currentCi": {
+  "ciAtB7c235d": {
     "sourceSha": "b7c235dc299c38ea20e93a367f8c8f9d1c411a9f",
     "runs": [
       {
@@ -1619,5 +1619,973 @@
   "frontendChangedThisFollowup": false,
   "lotBStarted": false,
   "published": false,
-  "mainChanged": false
+  "mainChanged": false,
+  "latestFollowup": {
+    "sourceSha": "c7c3cdc95642b78935db851d107cb89fb25324e0",
+    "realCi": {
+      "runId": 43029401142,
+      "artifactId": 13860161713,
+      "artifactZipSha256": "75bf7f9c12490e79b087918987205a39ecdcb8c638cbf2b7e89e20edf139581e",
+      "kind": "real-MIR-TEST-HTTPS",
+      "projectId": "hxtztkmbfpmzrieccwsg",
+      "production": "not-accessed",
+      "startedAt": "2026-11-11T13:28:21Z",
+      "workSha": "c7c3cdc95642b78935db851d107cb89fb25324e0",
+      "checks": [
+        {
+          "name": "QA assignment additive 57d2600c8a88",
+          "status": "passed",
+          "at": "2026-11-11T13:28:31Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "QA assignment additive 57d2600c8a88",
+          "status": "passed",
+          "at": "2026-11-11T13:28:32Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "additive assignment keeps same job",
+          "status": "passed",
+          "at": "2026-11-11T13:28:32Z",
+          "evidence": null
+        },
+        {
+          "name": "8 concurrent official conversation requests: one id",
+          "status": "passed",
+          "at": "2026-11-11T13:28:32Z",
+          "evidence": {
+            "statuses": [
+              200,
+              200,
+              200,
+              200,
+              200,
+              200,
+              200,
+              200
+            ],
+            "conversationId": "fec3d5d8-5072-4a2b-98ba-0e0bb029ed41"
+          }
+        },
+        {
+          "name": "real role job permission admin",
+          "status": "passed",
+          "at": "2026-11-11T13:28:32Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "existing other organization refused admin",
+          "status": "passed",
+          "at": "2026-11-11T13:28:32Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "real role job permission boss",
+          "status": "passed",
+          "at": "2026-11-11T13:28:33Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "existing other organization refused boss",
+          "status": "passed",
+          "at": "2026-11-11T13:28:33Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "real role job permission chef_equipe",
+          "status": "passed",
+          "at": "2026-11-11T13:28:33Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "existing other organization refused chef_equipe",
+          "status": "passed",
+          "at": "2026-11-11T13:28:34Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "real role job permission employe",
+          "status": "passed",
+          "at": "2026-11-11T13:28:34Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "existing other organization refused employe",
+          "status": "passed",
+          "at": "2026-11-11T13:28:34Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "real role job permission assistant",
+          "status": "passed",
+          "at": "2026-11-11T13:28:34Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "existing other organization refused assistant",
+          "status": "passed",
+          "at": "2026-11-11T13:28:35Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "real role job permission warehouse",
+          "status": "passed",
+          "at": "2026-11-11T13:28:35Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "existing other organization refused warehouse",
+          "status": "passed",
+          "at": "2026-11-11T13:28:35Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "valid PNG Storage upload",
+          "status": "passed",
+          "at": "2026-11-11T13:28:36Z",
+          "evidence": {
+            "status": 200,
+            "bytes": 68
+          }
+        },
+        {
+          "name": "valid PNG final server metadata and owner",
+          "status": "passed",
+          "at": "2026-11-11T13:28:36Z",
+          "evidence": {
+            "status": 200,
+            "metadata": {
+              "mime": "image/png",
+              "path": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9/message/fec3d5d8-5072-4a2b-98ba-0e0bb029ed41/f7a01b60-db95-475c-abb8-0dbd65daa054/4cc4cf8a-b9c9-479e-844b-f7c917446288.png",
+              "size": 68
+            }
+          }
+        },
+        {
+          "name": "valid PNG attached to message",
+          "status": "passed",
+          "at": "2026-11-11T13:28:37Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "nonexistent object refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:37Z",
+          "evidence": {
+            "status": 400
+          }
+        },
+        {
+          "name": "attachment owned by another user refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:38Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "existing private conversation API preserved",
+          "status": "passed",
+          "at": "2026-11-11T13:28:38Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "file from another conversation refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:38Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "forged tenant upload refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:39Z",
+          "evidence": {
+            "status": 400
+          }
+        },
+        {
+          "name": "forged conversation upload refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:39Z",
+          "evidence": {
+            "status": 400
+          }
+        },
+        {
+          "name": "forged owner upload refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:39Z",
+          "evidence": {
+            "status": 400
+          }
+        },
+        {
+          "name": "forged extension upload refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:40Z",
+          "evidence": {
+            "status": 400
+          }
+        },
+        {
+          "name": "disallowed declared MIME refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:40Z",
+          "evidence": {
+            "status": 400
+          }
+        },
+        {
+          "name": "over 10 MiB refused by Storage",
+          "status": "passed",
+          "at": "2026-11-11T13:28:40Z",
+          "evidence": {
+            "status": 400,
+            "bytes": 10485761
+          }
+        },
+        {
+          "name": "extension/MIME mismatch never attachable",
+          "status": "passed",
+          "at": "2026-11-11T13:28:41Z",
+          "evidence": {
+            "uploadStatus": 400,
+            "validationStatus": 400
+          }
+        },
+        {
+          "name": "private file HTTP public refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:42Z",
+          "evidence": {
+            "status": 400
+          }
+        },
+        {
+          "name": "private file HTTP anonymous refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:42Z",
+          "evidence": {
+            "status": 400
+          }
+        },
+        {
+          "name": "private file current conversation member accepted",
+          "status": "passed",
+          "at": "2026-11-11T13:28:42Z",
+          "evidence": {
+            "status": 200,
+            "sha256": "ff528c234a73d0c88dd42991651012d8b0fec7bdc2f4fb6583de613fe111ecad"
+          }
+        },
+        {
+          "name": "short signed URL issued",
+          "status": "passed",
+          "at": "2026-11-11T13:28:42Z",
+          "evidence": {
+            "ttl": 5
+          }
+        },
+        {
+          "name": "300 second client signed URL issued",
+          "status": "passed",
+          "at": "2026-11-11T13:28:43Z",
+          "evidence": {
+            "ttl": 300
+          }
+        },
+        {
+          "name": "signed URL works before expiration",
+          "status": "passed",
+          "at": "2026-11-11T13:28:43Z",
+          "evidence": {
+            "status": 200,
+            "bytes": 68,
+            "sha256": "ff528c234a73d0c88dd42991651012d8b0fec7bdc2f4fb6583de613fe111ecad",
+            "ageSeconds": 0.4,
+            "ttl": 5
+          }
+        },
+        {
+          "name": "8 concurrent sends idempotent",
+          "status": "passed",
+          "at": "2026-11-11T13:28:43Z",
+          "evidence": {
+            "messageId": "bf3b3315-0e86-456a-b8fd-ccb8b756fa66",
+            "statuses": [
+              200,
+              200,
+              200,
+              200,
+              200,
+              200,
+              200,
+              200
+            ]
+          }
+        },
+        {
+          "name": "sender cannot ack another recipient",
+          "status": "passed",
+          "at": "2026-11-11T13:28:43Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "forged ack user parameter refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:44Z",
+          "evidence": {
+            "status": 404
+          }
+        },
+        {
+          "name": "self read receipt accepted",
+          "status": "passed",
+          "at": "2026-11-11T13:28:44Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "57 tagged pagination messages sent",
+          "status": "passed",
+          "at": "2026-11-11T13:28:46Z",
+          "evidence": {
+            "count": 57
+          }
+        },
+        {
+          "name": "real message cursor: no gaps or duplicates",
+          "status": "passed",
+          "at": "2026-11-11T13:28:49Z",
+          "evidence": {
+            "count": 59
+          }
+        },
+        {
+          "name": "real server maximum 50",
+          "status": "passed",
+          "at": "2026-11-11T13:28:50Z",
+          "evidence": {
+            "count": 50
+          }
+        },
+        {
+          "name": "real bounded search: no gaps or duplicates",
+          "status": "passed",
+          "at": "2026-11-11T13:28:52Z",
+          "evidence": {
+            "count": 57
+          }
+        },
+        {
+          "name": "QA assignment additive 8 restricted",
+          "status": "passed",
+          "at": "2026-11-11T13:28:52Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "restricted conversation fixture",
+          "status": "passed",
+          "at": "2026-11-11T13:28:53Z",
+          "evidence": {
+            "status": 200
+          }
+        },
+        {
+          "name": "unauthorized conversation text not searchable",
+          "status": "passed",
+          "at": "2026-11-11T13:28:53Z",
+          "evidence": {
+            "status": 200,
+            "count": 0
+          }
+        },
+        {
+          "name": "unassigned job conversation refused",
+          "status": "passed",
+          "at": "2026-11-11T13:28:53Z",
+          "evidence": {
+            "status": 403
+          }
+        },
+        {
+          "name": "signed URL expired at actual HTTP endpoint",
+          "status": "passed",
+          "at": "2026-11-11T13:28:54Z",
+          "evidence": {
+            "status": 400,
+            "bytes": 110,
+            "sha256": "9544a0840325a26cb1010271a2b8771f5aa7c3c4a7db50b94b50cca9267e0f60",
+            "ageSeconds": 11.1,
+            "ttl": 5
+          }
+        }
+      ],
+      "observations": [
+        {
+          "name": "MIME metadata is not binary analysis",
+          "uploadStatus": 200,
+          "attachmentValidationStatus": 200,
+          "binaryAnalysisPerformed": false,
+          "risk": "A declared PNG containing non-image bytes may pass metadata validation. No sniffing, image decoding or antivirus."
+        }
+      ],
+      "fixtures": {
+        "jobId": "d131b571-6b15-4809-85a0-e58089b5e06c",
+        "conversationId": "fec3d5d8-5072-4a2b-98ba-0e0bb029ed41",
+        "tag": "QA3A-84cee3d3-a431-421d-8fea-57d2600c8a88",
+        "validObjectPath": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9/message/fec3d5d8-5072-4a2b-98ba-0e0bb029ed41/f7a01b60-db95-475c-abb8-0dbd65daa054/4cc4cf8a-b9c9-479e-844b-f7c917446288.png",
+        "concurrentMessageId": "bf3b3315-0e86-456a-b8fd-ccb8b756fa66",
+        "attachmentMessageId": "12143db9-5329-4bb0-a08a-8d78ef673b60",
+        "restrictedConversationId": "65f7498f-5b43-4116-b5c4-9f09bdd2e384"
+      },
+      "missing": [],
+      "actors": [
+        {
+          "role": "admin",
+          "userId": "f2e22452-d6a3-4966-b78b-b72afff35112"
+        },
+        {
+          "role": "boss",
+          "userId": "1d846ad2-e771-4fa1-ac6d-0001dbe943cc"
+        },
+        {
+          "role": "chef_equipe",
+          "userId": "f7a01b60-db95-475c-abb8-0dbd65daa054"
+        },
+        {
+          "role": "employe",
+          "userId": "95a35456-767e-432d-ab68-0c0d63a74101"
+        },
+        {
+          "role": "assistant",
+          "userId": "53e90c6e-75c6-4129-9a9a-02ee0aea6ab2"
+        },
+        {
+          "role": "warehouse",
+          "userId": "829ef020-8e2f-459a-b153-642a6077a7b9"
+        }
+      ],
+      "passed": 49,
+      "failed": 0,
+      "finishedAt": "2026-11-11T13:28:54Z"
+    },
+    "earlyExpiryFailure": {
+      "sourceSha": "5ed3df42fe56640ccd401ae73f2c98335fcb2b06",
+      "runId": 43028905356,
+      "passed": 48,
+      "failed": 1,
+      "evidence": [
+        {
+          "name": "signed URL expired at actual HTTP endpoint",
+          "status": "failed",
+          "at": "2026-11-11T13:25:19Z",
+          "evidence": {
+            "status": 200,
+            "bytes": 68,
+            "sha256": "ff528c234a73d0c88dd42991651012d8b0fec7bdc2f4fb6583de613fe111ecad",
+            "ageSeconds": 3.4,
+            "ttl": 5
+          }
+        }
+      ],
+      "fix": "Explicit wait until actual issue time + TTL + 2 seconds, no weakened HTTP denial assertion."
+    },
+    "localFullRerun": {
+      "workSha": "c7c3cdc95642b78935db851d107cb89fb25324e0",
+      "startedAt": "2026-11-11T13:29:00.324Z",
+      "finishedAt": "2026-11-11T13:32:17.895Z",
+      "total": 40,
+      "passed": 39,
+      "failed": 1,
+      "suites": [
+        {
+          "file": "tests/mir-chat-phase3a.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 622
+        },
+        {
+          "file": "tests/mir-today.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 345
+        },
+        {
+          "file": "tests/mir-pages-regressions.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 590
+        },
+        {
+          "file": "tests/mir-homepage.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 371
+        },
+        {
+          "file": "tests/mir-boutique-audit-20261110.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 446
+        },
+        {
+          "file": "tests/mir-pliage-audit-commercial.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 508
+        },
+        {
+          "file": "tests/mir-magasin-merge.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 364
+        },
+        {
+          "file": "tests/mir-warehouse-core.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 482
+        },
+        {
+          "file": "tests/mir-warehouse-sql.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 347
+        },
+        {
+          "file": "tests/mir-realisations.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 404
+        },
+        {
+          "file": "tests/mir-studio-wall-sections.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 318
+        },
+        {
+          "file": "tests/mir-role-navigation.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 308
+        },
+        {
+          "file": "tests/mir-account-session.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 339
+        },
+        {
+          "file": "tests/mir-six-role-certification.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 337
+        },
+        {
+          "file": "tests/mir-portal-login.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 364
+        },
+        {
+          "file": "tests/mir-portal-optional-modules.cjs",
+          "kind": "static-or-unit-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 337
+        },
+        {
+          "file": "tests/mir-chat-phase3a-postgres.cjs",
+          "kind": "disposable-postgres",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 5275
+        },
+        {
+          "file": "tests/mir-chat-phase3a-guards.cjs",
+          "kind": "disposable-postgres",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 10270
+        },
+        {
+          "file": "tests/mir-chat-support-postgres.cjs",
+          "kind": "disposable-postgres",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 2826
+        },
+        {
+          "file": "tests/mir-chat-storage-probe-postgres.cjs",
+          "kind": "disposable-postgres",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 2942
+        },
+        {
+          "file": "tests/mir-employee-operations-postgres.cjs",
+          "kind": "disposable-postgres",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 2928
+        },
+        {
+          "file": "tests/mir-job-dossier-postgres.cjs",
+          "kind": "disposable-postgres",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 2817
+        },
+        {
+          "file": "tests/mir-punch-postgres.cjs",
+          "kind": "disposable-postgres",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 2763
+        },
+        {
+          "file": "tests/mir-operational-roles-postgres.cjs",
+          "kind": "disposable-postgres",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 2201
+        },
+        {
+          "file": "tests/mir-chat-phase3a-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 6213
+        },
+        {
+          "file": "tests/mir-today-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 11873
+        },
+        {
+          "file": "tests/mir-punch-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 11077
+        },
+        {
+          "file": "tests/mir-employee-portal-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 8943
+        },
+        {
+          "file": "tests/mir-chef-boss-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 4242
+        },
+        {
+          "file": "tests/mir-homepage-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 15847
+        },
+        {
+          "file": "tests/mir-boutique-audit-20261110-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 6195
+        },
+        {
+          "file": "tests/mir-client-pliage-approved-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 39596
+        },
+        {
+          "file": "tests/mir-warehouse-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "failed",
+          "exitCode": 1,
+          "durationMs": 913,
+          "stderr": "page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:8921/entrepot.html?qr=02c8070d-d549-4298-833e-b1a8e6310981\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:8921/entrepot.html?qr=02c8070d-d549-4298-833e-b1a8e6310981\", waiting until \"domcontentloaded\"\u001b[22m\n\n    at /workspace/Revetements-mir/tests/mir-warehouse-browser.cjs:19:15\n"
+        },
+        {
+          "file": "tests/mir-realisations-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 7927
+        },
+        {
+          "file": "tests/mir-studio-wall-sections-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 7503
+        },
+        {
+          "file": "tests/mir-job-dossier-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 2295
+        },
+        {
+          "file": "tests/mir-production-signature-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 7664
+        },
+        {
+          "file": "tests/mir-production-client-flow-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 8544
+        },
+        {
+          "file": "tests/mir-unified-dossier-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 7208
+        },
+        {
+          "file": "tests/mir-atelier-v4-browser.cjs",
+          "kind": "ui-simulated",
+          "status": "passed",
+          "exitCode": 0,
+          "durationMs": 13006
+        }
+      ]
+    },
+    "localWarehouseIsolatedRerun": {
+      "status": "passed",
+      "exitCode": 0,
+      "sourceSha": "c7c3cdc95642b78935db851d107cb89fb25324e0",
+      "note": "Full rerun39/40 due to test operator starting baseline test concurrently on same hardcoded port8921. All original40 had passed before. Isolated rerun after both servers stopped passes unchanged. Raw failure retained."
+    },
+    "warehouseBaseline": {
+      "baseSha": "39de53260a134bae48143c1bdb1aa235335d6187",
+      "test": "tests/mir-warehouse-browser.cjs",
+      "status": "passed",
+      "warehouseAppAndQrVendorAndTestUnchanged": true,
+      "ciRun43029401096": {
+        "realSixRoles": "success",
+        "ui": "failed generated QR visible line48, repeated in second attempt",
+        "classification": "Existing unchanged UI assertion races asynchronous QR image rendering; not fixed out of scope. Main CI reproduction of this specific failure not established. Local base and work tests both pass."
+      }
+    },
+    "ciAtSource": [
+      {
+        "id": 43029401165,
+        "name": "MIR — Mon compte et Auth",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 24,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401165/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401165/logs",
+        "workflow_id": 413808664
+      },
+      {
+        "id": 43029401142,
+        "name": "MIR chat Phase 3A real TEST",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 5,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401142/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401142/logs",
+        "workflow_id": 414685407
+      },
+      {
+        "id": 43029401268,
+        "name": "MIR — Parcours employé responsive",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 21,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401268/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401268/logs",
+        "workflow_id": 413808675
+      },
+      {
+        "id": 43029400992,
+        "name": "MIR — Aujourd’hui mobile Phase 2",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 15,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029400992/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029400992/logs",
+        "workflow_id": 414143075
+      },
+      {
+        "id": 43029401067,
+        "name": "MIR atelier v4 — validation PR",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 23,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401067/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401067/logs",
+        "workflow_id": 413808659
+      },
+      {
+        "id": 43029401072,
+        "name": "MIR purchase orders and send safety",
+        "status": "completed",
+        "conclusion": "failure",
+        "run_number": 16,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401072/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401072/logs",
+        "workflow_id": 413808692
+      },
+      {
+        "id": 43029401314,
+        "name": "MIR dossier chantier central",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 18,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401314/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401314/logs",
+        "workflow_id": 414064344
+      },
+      {
+        "id": 43029400830,
+        "name": "MIR shared database foundation",
+        "status": "completed",
+        "conclusion": "failure",
+        "run_number": 16,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029400830/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029400830/logs",
+        "workflow_id": 413808694
+      },
+      {
+        "id": 43029401144,
+        "name": "MIR — Clavardage Phase 3A sécurité locale",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 7,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401144/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401144/logs",
+        "workflow_id": 414639438
+      },
+      {
+        "id": 43029400943,
+        "name": "MIR Harmony — cotes directes et navigation",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 23,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029400943/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029400943/logs",
+        "workflow_id": 413808679
+      },
+      {
+        "id": 43029401096,
+        "name": "MIR real role certification",
+        "status": "completed",
+        "conclusion": "failure",
+        "run_number": 39,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401096/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401096/logs",
+        "workflow_id": 413902662
+      },
+      {
+        "id": 43029401478,
+        "name": "MIR — ateliers fixes téléphone tablette PC",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 26,
+        "jobs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401478/jobs",
+        "logs_url": "https://api.github.com/repos/revetementsmir/Revetements-mir-/actions/runs/43029401478/logs",
+        "workflow_id": 413808677
+      }
+    ],
+    "extraPathChecks": [
+      {
+        "name": "extra folder with valid PNG",
+        "status": 400,
+        "storageCode": "403",
+        "error": "new row violates row-level security policy",
+        "result": "refused"
+      },
+      {
+        "name": "percent-encoded dot traversal upload",
+        "status": 500,
+        "bodyLength": 17,
+        "result": "not-certified: 5xx through proxy does not prove RLS handling; not counted as passed"
+      }
+    ],
+    "remoteMainObserved": {
+      "sha": "215259c957a1d939e9fbdc52524623153cc3b910",
+      "message": "Boutique — ajouter les clous BECK PANELFAST AGS-100",
+      "createdAt": "2026-11-11T13:06:35Z",
+      "ours": false,
+      "integrated": false
+    },
+    "atelierSync": {
+      "status": "denied",
+      "reason": "Explicit external evidence-sharing authorization missing; no workaround attempted."
+    }
+  }
 }
