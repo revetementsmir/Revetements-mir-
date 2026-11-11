@@ -1,5 +1,5 @@
 {
-  "observedAt": "2026-11-11T22:31:10.823Z",
+  "observedAt": "2026-11-11T22:46:50.126Z",
   "target": "MIR TEST hxtztkmbfpmzrieccwsg",
   "productionRequests": [],
   "checks": [
@@ -34,17 +34,27 @@
       "kind": "navigateur réel / frontend privé"
     },
     {
-      "name": "Compte connecté ouvre le portail protégé correspondant au rôle serveur",
+      "name": "Compte client connecté ouvre son aperçu et ses données propres",
       "passed": true,
       "kind": "navigateur réel / frontend privé"
     },
     {
-      "name": "Commandes connectées conserve le portail protégé du rôle interne",
+      "name": "Panier conservé après connexion client",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Commandes client connectées ouvre un onglet distinct avec son état serveur",
       "passed": true,
       "kind": "navigateur réel / frontend privé"
     },
     {
       "name": "Centre d’aide réellement ouvert en session connectée",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Déconnexion client revient à l’authentification sans perdre le panier",
       "passed": true,
       "kind": "navigateur réel / frontend privé"
     },
@@ -73,7 +83,5 @@
   ],
   "physicalDevices": false,
   "estimateSubmitted": false,
-  "limits": [
-    "Aucun secret configuré ne correspondait à un client TEST; les onglets Aperçu/Commandes client connectés restent non rejoués dans cette recette."
-  ]
+  "limits": []
 }
