@@ -2,6 +2,47 @@
 
 Date : 11 novembre 2026. Périmètre : UI Aujourd’hui Employé/Chef uniquement.
 
+## Correctifs de recette — état courant après le rapport initial
+
+La demande utilisateur a été clarifiée : les deux échecs visés sont `mir-punch-postgres.cjs` et `mir-client-pliage-approved-browser.cjs`. Aucun fichier `tests/mir-today-js` n'existe. Les tests Aujourd’hui `mir-today.cjs` passent à 7/7, également sous `node --test`; ils n'ont pas nécessité de changement.
+
+Base des correctifs : `74ed614a7039b128728a7d09286fce204c1ff592`, même branche locale `codex/phase-2-aujourdhui-mobile`. Aucun push. Aucune autre phase. Aucun appel Supabase, aucune écriture production ni modification de réglage dans cette reprise.
+
+### Causes exactes et corrections
+
+1. **Punch SQL : dates de fixture incohérentes.** Le test fabriquait une période limitée à la date UTC de Node (`toISOString()`), tandis que les corrections changent `punch_shifts.work_date` selon `America/Toronto`; le refus d'un nouveau Punch verrouillé utilise `current_date` PostgreSQL. Entre minuit UTC et minuit Toronto, ces deux dates diffèrent. La période du test couvre désormais les bornes `least(current_date,work_date)` et `greatest(current_date,work_date)` lues dans PostgreSQL. Les assertions de verrouillage de la journée et de refus d'un nouveau Punch sont conservées. Aucune fonction SQL métier ni migration n'est modifiée. Résultat : les 20 scénarios complets passent, aussi avec TZ=UTC et TZ=America/Toronto.
+
+2. **Pliage mobile : contrat de mise en page et recette désynchronisés.** L'assertion « wizard fits one screen » s'appliquait aussi à la page publique d'introduction et à son pied de page : à 360×780, le document mesure 875 px, sans débordement horizontal; le simple écran de choix mesure bien 780 px. Elle s'appliquait également aux formulaires détaillés de mesures/matériaux, qui peuvent défiler. Le contrôle horizontal reste strict partout. La hauteur d'un écran reste exigée pour choix/modèles/dessin; l'introduction doit permettre d'atteindre son pied de page et les formulaires doivent permettre d'atteindre réellement le bouton Suivant, avec vérification de la position et du hit-test.
+
+   Le déroulement complet, jusque-là bloqué par cette première assertion, a aussi exposé deux points du même parcours : le retour depuis un modèle enregistré de type custom passe volontairement par « Modifier le tracé » avant « Retour aux choix »; le test saute désormais correctement ces étapes visibles, puis utilise « Nouveau tracé » pour séparer son scénario de dessin neuf. Enfin, les commandes clavier ajoutées avaient agrandi le panneau mobile du dessin : à 360×780, son bas atteignait 864 px. Le CSS réduit uniquement ce bloc `body[data-client-entry="draw"]` à ≤600 px, regroupe ses commandes sans les masquer, laisse le clavier déplié sur une ligne complète et réserve une surface de dessin de 280 px minimum et des cibles de 44 px minimum. La hauteur de canvas est ajustée au viewport à partir de 780 px de hauteur. Aucun moteur, tracé, prix ou modèle n'est réécrit.
+
+Le chemin de preuves du test Pliage est maintenant configurable par `MIR_CLIENT_PLIAGE_PROOF_DIR`, pour conserver les captures historiques. Les preuves de cette reprise sont dans `/tmp/mir-phase2-correction-pliage`, avec les neuf parcours complets dans `results.json`.
+
+### Résultats de la relance complète
+
+**29 suites locales distinctes réussies, 0 échec final** : les 25 suites du rapport initial ci-dessous, plus `mir-production-signature-browser`, `mir-production-client-flow-browser`, `mir-unified-dossier-browser` et `mir-atelier-v4-browser`.
+
+- Aujourd’hui : 7 tests unitaires/statiques; UI six formats × deux rôles réussie.
+- Punch SQL : 20/20; même résultat avec les deux fuseaux UTC et Toronto. Punch navigateur : réussi.
+- Pliage navigateur : 12 formats de démarrage puis 9 parcours complets réussis (360, 390, 428, 600, 601, 834, 1024, 1348 et 1440 px); clavier déplié, tous boutons/selects/summaries ≥44 px, dessin ≥280 px, modèles, mesures, retour, dessin, annulation, couleurs et données locales conservées.
+- Régressions Pliage supplémentaires : présentation client/Admin, navigation, dessin, dossier, JSON/PDF réels, reprise et ancien dossier 8 pi réussis.
+- Accueil, Boutique, Magasin, Entrepôt, Réalisations, Studio, dossier chantier, navigation et sessions : toutes les suites initiales relancées réussissent.
+- Studio : première exécution parallèle en échec sur un délai de chargement de 30 secondes; relance isolée réussie sur bureau et mobile. Aucun timeout ni assertion n'a été augmenté ou supprimé.
+
+Les commandes, résultats complets et empreintes SHA-256 des trois fichiers corrigés sont dans [mir-today-phase2-corrections-tests.json](mir-today-phase2-corrections-tests.json). Les deux échecs conservés dans le rapport initial ci-dessous sont désormais **résolus par cette reprise**. Ils restent décrits pour l'historique, pas comme des échecs finaux actuels. La CI GitHub n'a pas été relancée puisqu'aucun push n'est effectué.
+
+### Fichiers de cette correction et risques
+
+- `tests/mir-punch-postgres.cjs`
+- `tests/mir-client-pliage-approved-browser.cjs`
+- `dist/mir-production-signature.css`
+- `docs/verification/mir-today-phase2.md`
+- `docs/verification/mir-today-phase2-corrections-tests.json`
+
+Le principal risque visuel concerne seulement le panneau de dessin Pliage mobile ≤600 px, notamment le clavier déplié et les petits écrans. Les neuf parcours, les cibles tactiles et le clavier sont vérifiés; aucun essai sur appareil physique n'est revendiqué. Les formulaires détaillés conservent le défilement autorisé; un contenu coupé ou un bouton inaccessible fait échouer la recette. Le test SQL change ses données de période, pas les permissions ou la logique de verrouillage. Les fichiers applicatifs Aujourd’hui, le client RPC, les réglages et les migrations sont identiques au SHA de base de cette correction. Les captures historiques régénérées par les tests ont été remises à leur version initiale et ne sont pas incluses dans le correctif.
+
+---
+
 ## Référence et reprise
 
 - Dépôt : `revetementsmir/Revetements-mir-`, clone `/workspace/Revetements-mir`.

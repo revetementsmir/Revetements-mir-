@@ -385,3 +385,17 @@ body[data-client-entry] #production-drawing [data-edit-profile-measure]:focus{ou
 
 body[data-client-entry]:not([data-client-stage="5"]) #panel-price{display:none!important}
 @media(max-width:650px){body[data-client-entry][data-client-stage="5"] #client-step-actions{position:sticky;bottom:0;z-index:3;box-shadow:0 -4px 14px #203b2010}}
+
+/* Keep all existing drawing controls reachable on a phone, including keyboard
+   entry. Preserve the 280px canvas and 44px touch targets; never clip content. */
+@media(max-width:600px){
+ body[data-client-entry="draw"] #drawing-tools #client-example-l{grid-column:1/-1}
+ body[data-client-entry="draw"] #drawing-tools .client-keyboard-trace{grid-column:auto}
+ body[data-client-entry="draw"] #drawing-tools .client-keyboard-trace[open]{grid-column:1/-1}
+ body[data-client-entry="draw"] #drawing-tools .client-keyboard-trace summary{font-size:12px;line-height:1.4;min-height:44px}
+ body[data-client-entry="draw"] #drawing-tools .client-trace-scale{flex-wrap:nowrap}
+ body[data-client-entry="draw"] #drawing-tools .client-trace-scale select{width:auto;flex:1;min-width:0}
+}
+@media(max-width:600px) and (min-height:780px){
+ body[data-client-entry="draw"] #production-drawing{height:clamp(280px,calc(100dvh - 500px),440px)}
+}
