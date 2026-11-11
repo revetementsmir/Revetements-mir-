@@ -17,8 +17,8 @@ begin
  insert into mir_core.memberships(organization_id,user_id,role,active) values(b,actor,'employee',true)
  on conflict(organization_id,user_id) do update set role='employee',active=true;
  insert into mir_core.staff_capabilities(organization_id,user_id,staff_role,display_name,active,configured_by)
- values(b,actor,'employee','Recette Phase 3A tenant B',true,actor)
- on conflict(organization_id,user_id) do update set staff_role='employee',display_name=excluded.display_name,active=true,configured_by=actor,configured_at=now();
+ values(b,actor,'employe','Recette Phase 3A tenant B',true,actor)
+ on conflict(organization_id,user_id) do update set staff_role='employe',display_name=excluded.display_name,active=true,configured_by=actor,configured_at=now();
  select j.id into job_id from mir_core.jobs j where j.organization_id=b and j.name='[QA PHASE3A TENANT B] Isolation';
  if job_id is null then
   insert into mir_core.jobs(organization_id,name,job_number,delivery_address,team,foreman,address,phone,city,client_name)
