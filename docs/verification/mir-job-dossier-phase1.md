@@ -60,3 +60,21 @@ Ils existaient dans les modules protégés et la Phase 1 ne les corrige pas.
 - La CLI Supabase officielle ne peut pas créer son dossier interne `/home/agent/.supabase`, monté en lecture seule. Le nom de migration respecte donc manuellement le format chronologique du dépôt.
 - La migration est appliquée sur MIR TEST seulement. Les captures utilisent un jeu de données représentatif; la recette visuelle intercomptes reste à reprendre lorsque les quatre comptes manquants seront disponibles.
 - Aucune mutation, migration ou publication n’a été faite sur MIR production.
+- Le test API direct Admin/Employé ne peut pas établir la connexion depuis l’exécuteur (`fetch failed`), même via l’exécution autorisée. La présence et les privilèges des objets hébergés ont été vérifiés par le connecteur Supabase.
+- L’absence d’accès GitHub en écriture n’empêche pas la livraison locale. Aucun nouveau push ne sera tenté.
+
+## Récupération des commits
+
+Depuis un clone autorisé du même dépôt :
+
+```bash
+git format-patch ab2952610560350d40a90d05039c1be96ccab51f..80f2ba1 --stdout > phase-1-dossier-chantier.patch
+git apply --check phase-1-dossier-chantier.patch
+git am phase-1-dossier-chantier.patch
+```
+
+Si le dossier de travail local est accessible directement, les deux commits peuvent aussi être récupérés avec :
+
+```bash
+git cherry-pick 1c4d023 80f2ba1
+```
