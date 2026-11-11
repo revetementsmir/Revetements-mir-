@@ -2,7 +2,7 @@
 Fails BLOCKED before QA writes if the explicitly authorized gateway is absent.
 This is not deployed automatically by any workflow.
 """
-import importlib.util, pathlib, sys, os, json, base64, hashlib, uuid, concurrent.futures
+import importlib.util, pathlib, sys, os, json, base64, hashlib, uuid, concurrent.futures, time
 source=pathlib.Path(__file__).with_name('mir-chat-phase3a-real.py')
 spec=importlib.util.spec_from_file_location('mir_chat_existing_certification',source)
 existing=importlib.util.module_from_spec(spec);spec.loader.exec_module(existing)
@@ -27,6 +27,17 @@ class GatewayCertification(existing.Certification):
         r=self.request('POST','/auth/v1/token?grant_type=password',{'email':email,'password':password})
         if not self.ok(r) or r['data']['user']['id']!=self.sessions[actor]['id']:raise RuntimeError('Session renewal failed')
         self.sessions[actor]['token']=r['data']['access_token'];return r
+    def wait_natural_expiry(self,actor):
+        token=self.sessions[actor]['token'];payload=token.split('.')[1]
+        claims=json.loads(base64.urlsafe_b64decode(payload+'='*(-len(payload)%4)))
+        expires=int(claims['exp']);remaining=expires-int(time.time())
+        if remaining<1 or remaining>3900:raise RuntimeError('Unexpected JWT lifetime for bounded natural-expiry recipe')
+        self.report['naturalJwtExpiry']={'status':'waiting','initialRemainingSeconds':remaining};self.save()
+        time.sleep(max(0,expires+3-time.time()))
+        r=self.gateway(actor,'download',path=self.path)
+        self.check('naturally expired JWT cannot start a gateway read',r['status']==401,{'status':r['status'],'waitedSeconds':remaining+3})
+        self.renew_actor(actor)
+        self.report['naturalJwtExpiry']={'status':'passed','waitedSeconds':remaining+3,'expiredBearerStatus':r['status'],'globalLifetimeChanged':False};self.save()
     def certify(self):
         self.report['kind']='real-MIR-TEST-gateway';self.report['operatorRevocation']='pending';self.authenticate()
         actor=self.roles.get('employe')
@@ -67,6 +78,8 @@ class GatewayCertification(existing.Certification):
             self.check('gateway foreign tenant refused',r['status']==403,{'status':r['status']})
             with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:reads=list(pool.map(lambda _:self.gateway(emp,'download',path=self.path),range(8)))
             self.check('eight concurrent reauthorized binary reads',all(self.ok(r) and r['sha256']==hashlib.sha256(existing.PNG).hexdigest() for r in reads))
+            if os.environ.get('MIR_CHAT_WAIT_NATURAL_EXPIRY')=='true':self.wait_natural_expiry(self.roles['admin'])
+            else:self.report['naturalJwtExpiry']={'status':'not-run','reason':'manual long-running recipe not selected'};self.save()
             # Real Auth session transition: logout the test login, require the
             # old bearer to stop opening the gateway, then create a fresh login.
             old=self.sessions[emp]['token'];logout=self.request('POST','/auth/v1/logout?scope=local',{},emp)
@@ -77,8 +90,9 @@ class GatewayCertification(existing.Certification):
             self.check('fresh session can read after session change',self.ok(fresh),{'status':fresh['status'],'oldTokenReused':False})
             self.report['sessionTransition']={'logoutStatus':logout['status'],'oldBearerStatus':stale['status'],'freshBearerStatus':fresh['status'],'clientLateResponseGuard':'covered by tests/mir-chat-phase3a.cjs'}
             self.tenant_b()
-            self.report['status']='PARTIALLY_VALIDATED' if self.report['tenantB']['status']!='passed' else 'CERTIFIED'
-            self.save();return 2 if self.report['tenantB']['status']!='passed' else 0
+            complete=self.report['tenantB']['status']=='passed' and self.report['naturalJwtExpiry']['status']=='passed'
+            self.report['status']='CERTIFIED' if complete else 'PARTIALLY_VALIDATED'
+            self.save();return 0 if complete else 2
         finally:
             # Remove only this run's tagged job; preserve any concurrent new assignment.
             for member in (emp_id,chef_id):

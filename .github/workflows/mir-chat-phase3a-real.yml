@@ -15,6 +15,10 @@ on:
         description: 'Seulement après autorisation et activation TEST de la passerelle (aucun déploiement par ce workflow)'
         type: boolean
         default: false
+      wait_natural_expiry:
+        description: 'Attendre réellement l’expiration JWT courante sans modifier sa durée globale'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -24,10 +28,11 @@ jobs:
   real-test:
     if: github.head_ref == 'codex/phase-3a-clavardage-securite' || github.ref_name == 'codex/phase-3a-clavardage-securite'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 90
     env:
       MIR_CHAT_WORK_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       MIR_CHAT_REAL_REPORT: artifacts/mir-chat-phase3a-real.json
+      MIR_CHAT_WAIT_NATURAL_EXPIRY: ${{ inputs.wait_natural_expiry || 'false' }}
       MIR_SANDBOX_PUBLISHABLE_KEY: ${{ secrets.MIR_SANDBOX_PUBLISHABLE_KEY }}
       MIR_SANDBOX_ADMIN_EMAIL: ${{ secrets.MIR_SANDBOX_ADMIN_EMAIL }}
       MIR_SANDBOX_ADMIN_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
