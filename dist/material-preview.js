@@ -11,6 +11,7 @@
   function photoType(image) {
     if (!image) return 'empty';
     const kind = String(image.assetKind || '').toLowerCase();
+    if (kind === 'mir_siding_color_demo') return 'sample';
     if (/drawing|diagram/.test(kind)) return 'profile';
     if (['sample','profile','packshot','installed'].includes(image.cardPresentation)) return image.cardPresentation;
     if (/texture|swatch|sphere/.test(kind)) return 'sample';
@@ -20,6 +21,7 @@
   function photoLabel(image) {
     if (!image) return 'Visuel à compléter';
     const kind = String(image.assetKind || '');
+    if (kind === 'mir_siding_color_demo') return 'Échantillon MIR';
     if (/drawing|diagram/.test(kind)) return 'Dessin fabricant';
     const type = photoType(image);
     if (type === 'installed') return 'Exemple de pose';
@@ -110,7 +112,44 @@
     const list = (m.images || []).filter(i => local(i.src));
     return list.find(i => i.src === m.primaryImage) || list[0];
   }
+  function stableSidingRecipe(m, c) {
+    const base = m.stableSidingPreview, color = c || m.colors?.[0];
+    if (!base || !color) return null;
+    const image = exactImage(m, color), src = local(base.baseImage), lut = image?.colorLut;
+    const width = Number(base.width), height = Number(base.height);
+    if (!src || !Number.isFinite(width) || width <= 0 || !Number.isFinite(height) || height <= 0 ||
+        typeof base.maskPath !== 'string' || !base.maskPath.trim() ||
+        !['r','g','b'].every(channel => Array.isArray(lut?.[channel]) && lut[channel].length >= 2 &&
+          lut[channel].every(value => Number.isFinite(value) && value >= 0 && value <= 1))) return null;
+    return {kind:'stable_siding_preview', image, src, width, height, maskPath:base.maskPath,
+      colorLut:lut, label:`${m.name} · ${color.name} · échantillon MIR`, source:color.sourceUrl,
+      geometryKey:JSON.stringify([src,width,height,base.maskPath])};
+  }
+  let stableSidingSerial = 0;
+  function stableSidingMarkup(r) {
+    const id = `mir-siding-${++stableSidingSerial}`;
+    const image = `<image href="${esc(r.src)}" width="${r.width}" height="${r.height}" preserveAspectRatio="xMidYMid meet"/>`;
+    // The original layer retains its background and shadow. Only the fixed board
+    // perimeter receives the colour table; the source grain never changes.
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${r.width} ${r.height}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${esc(r.label)}" data-mir-stable-siding="${esc(r.geometryKey)}" style="display:block;width:100%;height:100%"><defs><clipPath id="${id}-mask" clipPathUnits="userSpaceOnUse"><path d="${esc(r.maskPath)}"/></clipPath><filter id="${id}-tone" filterUnits="userSpaceOnUse" x="0" y="0" width="${r.width}" height="${r.height}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".2126 .7152 .0722 0 0 .2126 .7152 .0722 0 0 .2126 .7152 .0722 0 0 0 0 0 1 0"/><feComponentTransfer>${['r','g','b'].map(channel => `<feFunc${channel.toUpperCase()} data-mir-siding-channel="${channel}" type="table" tableValues="${r.colorLut[channel].join(' ')}"/>`).join('')}</feComponentTransfer></filter></defs><rect width="${r.width}" height="${r.height}" fill="#fff"/>${image}<g clip-path="url(#${id}-mask)"><g filter="url(#${id}-tone)">${image}</g></g></svg>`;
+  }
+  function stableSidingSVG(m, c) {
+    const r = stableSidingRecipe(m, c);
+    return r ? stableSidingMarkup(r) : '';
+  }
+  function renderStableSiding(element, r) {
+    const svg = element.firstElementChild;
+    const channels = svg?.querySelectorAll('[data-mir-siding-channel]');
+    if (svg?.getAttribute('data-mir-stable-siding') !== r.geometryKey || channels?.length !== 3) {
+      element.innerHTML = stableSidingMarkup(r);
+      return;
+    }
+    // Preserve the SVG, both image elements, filter and mask between colours.
+    for (const channel of channels) channel.setAttribute('tableValues', r.colorLut[channel.getAttribute('data-mir-siding-channel')].join(' '));
+    svg.setAttribute('aria-label', r.label);
+  }
   function recipe(m, c) {
+    if (m.stableSidingPreview) return stableSidingRecipe(m,c) || {kind:c?'missing_variant':'missing_product',label:m.name,source:m.sourceUrl};
     const exact = c && exactImage(m, c);
     if (exact) return {kind:'exact_variant',image:exact,src:local(exact.src),label:`${m.name} · ${c.name}`,source:exact.sourceUrl,formatMatch:!!exact.formatId&&m.selectedFormatId===exact.formatId,formatId:exact.formatId||null};
     if (c && local(c.swatchUrl)) return {kind:smooth(m,c)?'smooth_preview':colorReference(m,c)?'color_reference_preview':'manufacturer_sample',src:local(c.swatchUrl),label:`${m.name} · ${c.name}`,source:c.sourceUrl};
@@ -176,6 +215,7 @@
   }
   async function svg(m,c) {
     const r=recipe(m,c);
+    if(r.kind==='stable_siding_preview')return stableSidingMarkup(r);
     if(r.kind==='smooth_preview'||r.kind==='color_reference_preview'||r.kind==='numeric_preview'){
       const hex=r.hex || await displayColor(r.src);
       if(hex)return smoothSVG(m,c,hex);
@@ -190,7 +230,9 @@
     const request=Symbol('material-preview');element._materialPreviewRequest=request;
     const r=recipe(m,c);element.dataset.previewKind=r.kind;element.dataset.colorId=c?.id || '';
     if(element.classList.contains('mir-catalogue-photo'))element.dataset.photoType=r.image?photoType(r.image):r.kind.startsWith('missing_')?'empty':'sample';
-    if(r.kind==='smooth_preview'||r.kind==='color_reference_preview'||r.kind==='numeric_preview'){
+    if(r.kind==='stable_siding_preview'){
+      renderStableSiding(element,r);
+    } else if(r.kind==='smooth_preview'||r.kind==='color_reference_preview'||r.kind==='numeric_preview'){
       element.innerHTML='<div class="sample-loading">Préparation de la teinte…</div>';
       const hex=r.hex || await displayColor(r.src);if(element._materialPreviewRequest!==request)return;
       element.innerHTML=hex?smoothSVG(m,c,hex):`<div class="sample-unavailable"><strong>${esc(c.name)}</strong><span>Échantillon indisponible</span></div>`;
@@ -210,5 +252,5 @@
     element.style.backgroundColor=hex;element.replaceChildren();element.dataset.displayColor=hex;
   }
   function cancel(element){if(element)element._materialPreviewRequest=Symbol('cancelled-preview');}
-  root.MIRMaterialPreview={recipe,render,svg,paintChip,displayColor,smooth,colorReference,cancel,photoType,photoLabel,photoImage,photoUnavailable};
+  root.MIRMaterialPreview={recipe,render,svg,stableSidingSVG,paintChip,displayColor,smooth,colorReference,cancel,photoType,photoLabel,photoImage,photoUnavailable};
 })(typeof window!=='undefined'?window:globalThis);
