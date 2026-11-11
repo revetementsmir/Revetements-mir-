@@ -51,7 +51,7 @@ jobs:
       - name: Recette HTTPS réelle — comptes existants, TEST épinglé
         run: python3 tools/validation/mir-chat-phase3a-real.py
       - name: Nouvelle passerelle — certification explicite, refus si prérequis manquants
-        if: github.event_name == 'pull_request' || inputs.certify_gateway
+        if: always() && (github.event_name == 'pull_request' || inputs.certify_gateway)
         env:
           MIR_CHAT_REAL_REPORT: artifacts/mir-chat-files-real.json
         run: python3 tools/validation/mir-chat-files-real.py
