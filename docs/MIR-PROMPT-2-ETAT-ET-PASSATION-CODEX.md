@@ -638,3 +638,15 @@ Arrête-toi à la fin de la Phase 1 et demande la validation avant toute autre p
 - aucune application Android;
 - aucune publication.
 
+## 9. Passation courante — refonte publique, 11 novembre 2026
+
+Les consignes de Phase 1 ci-dessus sont historiques. La phase active est la refonte publique, après les clôtures distinctes de 3A, 3B et 3C.
+
+Branche : `codex/refonte-site-public`. Dépendance : Phase 3C `c0b12ffbcbb5c00f493d1459e1e2de7b5a8d039a`; le main `482c17541066ff1d92a02aade6ed71b24f77fb5e` a été intégré pour préserver le catalogue récent. PR #10 demeure en brouillon.
+
+Décision validée par Frederick : navigation mobile à cinq destinations — Accueil, Boutique, Pliage, Commandes, Compte — avec Panier visible et compté dans l’en-tête. Réalisations, Aide et Contact restent accessibles dans les liens utiles; sur ordinateur ils demeurent visibles dans l’en-tête.
+
+La navigation publique commune est appliquée à Accueil, Boutique, Produit, Panier, Matériaux, Pliage, configurateur client, Studio, Réalisations, Contact et Estimation. Les modules Harmony/Admin restent exclus. Le vocabulaire de sélection est maintenant « Panier »; « Demander une estimation » désigne uniquement l’étape suivante. Le format unique BECK 1½ po est présélectionné et la fiche reste à 515,99 $ CA par boîte avant taxes.
+
+Preuves : `docs/verification/refonte-site-public/README.md` et `final/browser-results.json`. Recette Chromium : 33 rendus, 168 contrôles réussis aux formats 390×844, 768×1024 et 1440×900, plus Produit → Panier réel local. Limite : émulation Chromium, aucun appareil physique ni Safari. Aucune publication, fusion ou écriture Supabase production.
+

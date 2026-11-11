@@ -1,5 +1,5 @@
-/* Les Revêtements MIR — menu public progressif (aucun effet sur l'Admin).
-   Sans JavaScript, les liens HTML originaux restent visibles. */
+/* Les Revêtements MIR — navigation publique commune.
+   Les espaces Harmony/Admin restent exclus. Sans JavaScript, les liens HTML restent visibles. */
 (function(root,factory){
   'use strict';
   const api=factory();
@@ -13,77 +13,61 @@
 })(typeof window==='object'?window:null,function(){
   'use strict';
   const BREAKPOINT='(max-width: 1100px)';
+  const PRIMARY=[
+    ['boutique.html','Boutique','boutique'],['pliage.html','Pliage','pliage'],
+    ['plan.html','Studio','plan'],['realisations.html','Réalisations','realisations'],
+    ['chantier.html#aide','Aide','aide'],['contact.html','Contact','contact']
+  ];
+  const MOBILE=[
+    ['index.html','Accueil','⌂','index'],['boutique.html','Boutique','▦','boutique'],
+    ['pliage.html','Pliage','⌁','pliage'],['chantier.html?view=orders','Commandes','▤','commandes'],
+    ['chantier.html','Compte','○','compte']
+  ];
+  function route(path){const file=String(path||'').split('/').pop().split(/[?#]/)[0]||'index.html';return file.replace(/\.html$/,'');}
+  function currentFor(key,current){if(key==='boutique')return ['boutique','produit','selection','materiaux'].includes(current);return key===current;}
+  function link(doc,href,label,key,current){const a=doc.createElement('a');a.href=href;a.textContent=label;if(currentFor(key,current))a.setAttribute('aria-current','page');return a;}
+  function normalize(doc,header,nav,current){
+    nav.replaceChildren(...PRIMARY.map(([href,label,key])=>link(doc,href,label,key,current)));
+    let actions=header.querySelector('.mir-home-header-actions, .mir-client-actions');
+    if(!actions){actions=doc.createElement('div');header.append(actions);}
+    actions.classList.add('mir-home-header-actions','mir-client-actions');
+    let account=actions.querySelector('.mir-home-account');
+    if(!account){account=link(doc,'chantier.html','Compte','compte',current);account.className='mir-home-account';actions.prepend(account);}
+    account.textContent='Compte';
+    let estimate=actions.querySelector('.mir-home-estimate');
+    if(!estimate){estimate=link(doc,'estimation.html','Estimation','estimation',current);estimate.className='mir-home-estimate';actions.append(estimate);}
+    estimate.textContent='Estimation';
+    let cart=actions.querySelector('.mir-public-cart');
+    if(!cart){const initial=doc.querySelector('[data-list-count]')?.textContent||'0';cart=link(doc,'selection.html','Panier','boutique',current);cart.className='mir-public-cart';cart.innerHTML=`Panier <b data-list-count>${initial}</b>`;actions.insertBefore(cart,account);}
+    if(!doc.querySelector('.mir-mobile-tabs')){
+      const tabs=doc.createElement('nav');tabs.className='mir-mobile-tabs';tabs.setAttribute('aria-label','Navigation mobile principale');
+      for(const [href,label,icon,key] of MOBILE){const a=link(doc,href,label,key,current);a.innerHTML=`<span aria-hidden="true">${icon}</span><small>${label}</small>`;tabs.append(a);}
+      doc.body.append(tabs);
+    }
+  }
   function init(win){
     const doc=win.document;
-    if(doc.documentElement.hasAttribute("data-mir-harmony"))return null;
+    if(doc.documentElement.hasAttribute('data-mir-harmony'))return null;
     const header=doc.querySelector('header.mir-client-header, header.mir-home-header');
     const nav=header?.querySelector('nav.mir-client-links');
     if(!header||!nav||header.querySelector('.mir-client-menu-toggle'))return null;
-    const media=win.matchMedia(header.classList.contains('mir-home-header')?'(max-width: 760px)':BREAKPOINT);
-    const toggle=doc.createElement('button');
-    toggle.type='button';
-    toggle.className='mir-client-menu-toggle';
-    toggle.textContent='Menu';
+    const current=route(win.location?.pathname);
+    normalize(doc,header,nav,current);
+    header.setAttribute('data-mir-public-shell','');doc.body.classList.add('mir-public-navigation');
+    const media=win.matchMedia(BREAKPOINT);
+    const toggle=doc.createElement('button');toggle.type='button';toggle.className='mir-client-menu-toggle';toggle.textContent='Plus';
     if(!nav.id)nav.id='mir-client-links-menu';
-    toggle.setAttribute('aria-controls',nav.id);
-    toggle.setAttribute('aria-expanded','false');
-    toggle.setAttribute('aria-label','Ouvrir le menu principal');
-    header.insertBefore(toggle,nav);
-
-    // La sélection est utile dans le menu mobile, sans élargir l'en-tête PC.
-    if(!nav.querySelector('a[href="selection.html"]')){
-      const select=doc.createElement('a');
-      select.href='selection.html';
-      select.className='mir-mobile-selection';
-      select.textContent='Mon panier';
-      nav.append(select);
-    }
-    if(!nav.querySelector('a[href="estimation.html"]')){const estimate=doc.createElement('a');estimate.href='estimation.html';estimate.className='mir-menu-estimate';estimate.textContent='Demander une estimation';nav.append(estimate);}
+    toggle.setAttribute('aria-controls',nav.id);toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ouvrir les liens utiles');header.insertBefore(toggle,nav);
     let mobile=false;
-    function close(restoreFocus=false){
-      nav.hidden=true;
-      header.classList.remove('mir-client-menu-open');
-      toggle.setAttribute('aria-expanded','false');
-      toggle.setAttribute('aria-label','Ouvrir le menu principal');
-      if(restoreFocus)toggle.focus();
-    }
-    function open(){
-      nav.hidden=false;
-      header.classList.add('mir-client-menu-open');
-      toggle.setAttribute('aria-expanded','true');
-      toggle.setAttribute('aria-label','Fermer le menu principal');
-    }
-    function sync(){
-      const now=media.matches;
-      header.classList.toggle('mir-client-menu-ready',now);
-      toggle.hidden=!now;
-      if(!now){
-        nav.hidden=false;
-        header.classList.remove('mir-client-menu-open');
-        toggle.setAttribute('aria-expanded','false');
-        toggle.setAttribute('aria-label','Ouvrir le menu principal');
-      }else if(!mobile)close(false);
-      mobile=now;
-    }
-    toggle.addEventListener('click',()=>{
-      if(!media.matches)return;
-      if(toggle.getAttribute('aria-expanded')==='true')close(true);else open();
-    });
-    nav.addEventListener('click',event=>{
-      if(media.matches&&event.target.closest?.('a'))close(false);
-    });
-    doc.addEventListener('keydown',event=>{
-      if(event.key==='Escape'&&media.matches&&toggle.getAttribute('aria-expanded')==='true'){
-        event.preventDefault();close(true);
-      }
-    });
-    doc.addEventListener('pointerdown',event=>{
-      if(media.matches&&!header.contains(event.target)&&toggle.getAttribute('aria-expanded')==='true')close(false);
-    });
-    if(media.addEventListener)media.addEventListener('change',sync);
-    else media.addListener?.(sync);
-    sync();
+    function close(restoreFocus=false){nav.hidden=true;header.classList.remove('mir-client-menu-open');toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ouvrir les liens utiles');if(restoreFocus)toggle.focus();}
+    function open(){nav.hidden=false;header.classList.add('mir-client-menu-open');toggle.setAttribute('aria-expanded','true');toggle.setAttribute('aria-label','Fermer les liens utiles');}
+    function sync(){const now=media.matches;header.classList.toggle('mir-client-menu-ready',now);toggle.hidden=!now;if(!now){nav.hidden=false;header.classList.remove('mir-client-menu-open');toggle.setAttribute('aria-expanded','false');}else if(!mobile)close(false);mobile=now;}
+    toggle.addEventListener('click',()=>{if(media.matches)(toggle.getAttribute('aria-expanded')==='true'?close:open)(true);});
+    nav.addEventListener('click',event=>{if(media.matches&&event.target.closest?.('a'))close(false);});
+    doc.addEventListener('keydown',event=>{if(event.key==='Escape'&&media.matches&&toggle.getAttribute('aria-expanded')==='true'){event.preventDefault();close(true);}});
+    doc.addEventListener('pointerdown',event=>{if(media.matches&&!header.contains(event.target)&&toggle.getAttribute('aria-expanded')==='true')close(false);});
+    if(media.addEventListener)media.addEventListener('change',sync);else media.addListener?.(sync);sync();
     return Object.freeze({toggle,nav,close,open,sync});
   }
-  return Object.freeze({version:'1.0.0',breakpoint:BREAKPOINT,init});
+  return Object.freeze({version:'2.0.0',breakpoint:BREAKPOINT,primary:PRIMARY,mobile:MOBILE,route,init});
 });

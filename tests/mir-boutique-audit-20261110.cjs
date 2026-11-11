@@ -32,14 +32,14 @@ for(const id of [
   'profilec-la-muralys','profilec-la-petite-renommee','profilec-la-renommee','profilec-muralys-soffite'
 ])assert.ok(hidden.has(id),`${id} doit rester retiré tant que son visuel exact manque`);
 
-assert.match(commerce,/Ajouter à ma demande/);
-assert.match(commerce,/Voir ma demande/);
+assert.match(commerce,/Ajouter au panier/);
+assert.match(commerce,/Voir le panier/);
 assert.match(commerce,/slice\(0,3\)\.map\(card\)/);
 assert.match(commerce,/const requestable=/);
 assert.match(commerce,/if\(!requestable\(m\)\)return/);
-assert.doesNotMatch(boutique+produit+selection,/Mon panier/);
-assert.match(boutique,/Ma demande/);
-assert.match(selection,/Ma demande/);
+assert.doesNotMatch(boutique+produit,/Ma demande/);
+assert.match(boutique,/Panier/);
+assert.match(selection,/Mon <em>panier/);
 assert.doesNotMatch(boutique,/shop-studio-banner|shop-bottom-links/);
 
 console.log(`MIR audit boutique: ${catalogue.length} références; ${missing.length} sans image retirées; P0/P1 contrôlés.`);

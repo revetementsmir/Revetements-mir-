@@ -28,6 +28,16 @@ L’aperçu réutilise uniquement la fiche approuvée `beck-panelfast-ags100` : 
 
 Les captures `avant/` documentent l’interface existante; les captures `apres/` documentent la proposition. L’émulation Chromium ne remplace pas une vérification sur appareils physiques.
 
+## Validation de la navigation et généralisation
+
+Frederick a validé les cinq destinations mobiles le 11 novembre 2026 : **Accueil, Boutique, Pliage, Commandes, Compte**. Le panier reste visible avec compteur dans l’en-tête. Les liens secondaires **Réalisations, Aide et Contact** sont regroupés dans « Plus » sur téléphone/tablette et restent visibles dans l’en-tête sur ordinateur.
+
+La navigation commune est appliquée à Accueil, Boutique, Produit, Panier, Matériaux, Pliage, Studio, Réalisations, Contact et Estimation. Le configurateur de pliage client réutilise le même contrôleur sans modifier son moteur. Les modules Harmony/Admin et les fonctions 3A/3B/3C restent exclus de la transformation visuelle.
+
+Terminologie retenue : **Panier** pour la sélection de produits et **Demander une estimation** pour l’action d’envoi. Les anciens raccourcis « Ma demande » de Boutique, Produit et Panier ont été harmonisés.
+
+Preuve navigateur finale : `final/browser-results.json`, 33 rendus Chromium et 168 contrôles réussis sur 390×844, 768×1024 et 1440×900. Les contrôles couvrent les cinq destinations, le panier d’en-tête, Réalisations/Aide/Contact, l’absence de débordement horizontal, les cibles d’au moins 44 px, l’absence d’erreur JavaScript observée, la présélection du format BECK unique et l’ajout au panier avec compteur.
+
 ## Limites
 
 - maquette fonctionnelle privée, pas une publication;

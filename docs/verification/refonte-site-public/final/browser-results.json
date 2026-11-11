@@ -1,0 +1,35 @@
+{
+  "status": "passed",
+  "routes": 11,
+  "renderings": 33,
+  "checks": 168,
+  "viewports": [
+    {
+      "name": "telephone",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "name": "tablette",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "name": "ordinateur",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "validated": [
+    "five-mobile-destinations",
+    "cart-header",
+    "secondary-links",
+    "no-horizontal-overflow",
+    "touch-targets-min-44",
+    "no-page-errors",
+    "single-format-preselected",
+    "product-add-to-cart",
+    "cart-count"
+  ],
+  "deviceLimit": "Chromium emulation; no physical device or Safari"
+}

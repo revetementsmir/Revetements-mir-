@@ -8,15 +8,16 @@ const routes=['realisations','contact','materiaux','boutique','produit','selecti
 let checks=0;
 function test(name,fn){fn();checks++;console.log('PASS '+name);}
 test('Le menu a une API stable et son activation reste explicitement mobile/tablette',()=>{
- assert.equal(menu.version,'1.0.0');
+ assert.equal(menu.version,'2.0.0');
  assert.equal(menu.breakpoint,'(max-width: 1100px)');
  assert.equal(typeof menu.init,'function');
+ assert.deepEqual(menu.mobile.map(item=>item[1]),['Accueil','Boutique','Pliage','Commandes','Compte']);
 });
 test('Les pages clients utilisent les mêmes fichiers de menu, sans bibliothèques ajoutées',()=>{
  for(const route of routes){
    const html=read(route+'.html');
-   assert.match(html,/mir-public-menu\.css\?v=1/,route);
-   assert.match(html,/mir-public-menu\.js\?v=public-shell-1/,route);
+   assert.match(html,/mir-public-menu\.css\?v=2/,route);
+   assert.match(html,/mir-public-menu\.js\?v=public-shell-2/,route);
    assert.match(html,/<header[^>]*data-mir-public-shell/,route);
    assert.match(html,/<header[^>]*mir-client-header/,route);
    assert.match(html,/assets\/MIR-logo-officiel-original\.svg/,route);
@@ -25,13 +26,14 @@ test('Les pages clients utilisent les mêmes fichiers de menu, sans bibliothèqu
  }
 });
 test('Le menu accueil est compact et le mode Admin reste isolé',()=>{
- assert.match(read('index.html'),/mir-public-menu\.js\?v=vitrine-1/);
+ assert.match(read('index.html'),/mir-public-menu\.css\?v=2/);
+ assert.match(read('index.html'),/mir-public-menu\.js\?v=public-shell-2/);
  for(const route of ['chantier']){
    assert.doesNotMatch(read(route+'.html'),/mir-public-menu\.(?:css|js)/,route);
  }
  const production=read('production.html'),bridge=read('mir-production-client-nav.js');
- assert.match(production,/mir-public-menu\.css\?v=1/);
- assert.match(production,/mir-public-menu\.js\?v=1/);
+ assert.match(production,/mir-public-menu\.css\?v=2/);
+ assert.match(production,/mir-public-menu\.js\?v=public-shell-2/);
  assert.match(production,/mir-production-client-nav\.js\?v=1/);
  assert.match(bridge,/classList\.contains\('mir-production-client'\)/,
    'seul le mode client doit être activé');
@@ -54,5 +56,14 @@ test('Les actions estimation et sélection restent accessibles, sans masquer les
  assert.match(css,/nav\.mir-client-links\[hidden\]\{[\s\S]*?display:none!important/);
  assert.doesNotMatch(css,/body\.mir-signature\s+header\.mir-client-header\s*>\s*nav\[hidden\]/);
  assert.match(css,/\.mir-client-actions a\{/);
+});
+test('La navigation commune garde le panier visible et les liens secondaires faciles à trouver',()=>{
+ const code=read('mir-public-menu.js'),css=read('mir-public-menu.css');
+ for(const label of ['Réalisations','Aide','Contact'])assert.match(code,new RegExp(`'${label}'`));
+ assert.match(code,/mir-public-cart/);
+ assert.match(code,/data-list-count/);
+ assert.match(css,/\.mir-mobile-tabs/);
+ assert.match(css,/min-height:44px/);
+ assert.match(read('mir-help-center.js'),/location\.hash==='\#aide'/);
 });
 console.log('MIR menu client : '+checks+'/'+checks+' contrats réussis');

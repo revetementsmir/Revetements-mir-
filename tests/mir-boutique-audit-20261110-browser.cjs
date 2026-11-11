@@ -28,7 +28,7 @@ function serve(){return http.createServer((req,res)=>{const file=path.resolve(ro
    for(const id of ['kaycan-coil-0721-30m','canexel-joint-ridgewood-d5-12','profilec-la-capitale'])assert.equal(await page.locator(`[data-shop-card="${id}"]`).count(),0,id);
    await page.locator('[data-shop-card="hardieplank-smooth-625"] h3 a').click();await page.locator('#product-add').waitFor();
    assert.equal(await page.locator('#product-add').isEnabled(),true);
-   assert.match(await page.locator('#product-add').innerText(),/Ajouter à ma demande/);
+   assert.match(await page.locator('#product-add').innerText(),/Ajouter au panier/);
    const source=await page.locator('.product-color-heading a').getAttribute('href');assert.match(source,/jameshardie\.ca/);assert.doesNotMatch(source,/gentek\.ca/);
    const color=page.locator('[data-color]').first();await color.click();assert.equal(await color.getAttribute('aria-pressed'),'true');
    assert.ok(await page.locator('#related-grid [data-shop-card]').count()<=3);
