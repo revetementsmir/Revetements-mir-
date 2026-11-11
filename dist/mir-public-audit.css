@@ -14,7 +14,7 @@ body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-hea
 body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-menu{right:0}
 @media(max-width:1100px){html body:is([data-portal-mode='login'],[data-portal-mode='client'])>header#mir-harmony-header{width:calc(100% - 56px)!important;gap:18px!important}}
 @media(max-width:760px){
- html body:is([data-portal-mode='login'],[data-portal-mode='client'])>header#mir-harmony-header{width:calc(100% - 32px)!important;gap:8px!important;min-height:62px!important;padding:8px 0!important}
+ html body:is([data-portal-mode='login'],[data-portal-mode='client'])>header#mir-harmony-header{width:calc(100% - 32px)!important;gap:8px!important;min-height:64px!important;padding:8px 0!important}
  body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-logo{width:clamp(106px,34vw,165px)!important}
  body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-dossier{margin-left:0!important;padding-inline:9px!important;min-width:0}
  body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-toggle{margin-left:auto!important}
