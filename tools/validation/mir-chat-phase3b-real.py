@@ -25,12 +25,13 @@ class Phase3B(gateway3a.GatewayCertification):
         self.setup();emp=self.employee;chef=self.chef;pdf=make_pdf();emp_id=self.sessions[emp]['id'];chef_id=self.sessions[chef]['id']
         try:
             uploaded={}
-            for label,mime,raw in [('photo','image/png',gateway3a.existing.PNG),('pdf','application/pdf',pdf)]:
-                r=self.gateway(chef,'upload',mime=mime,base64=base64.b64encode(raw).decode())
-                self.check('real '+label+' gateway upload',self.ok(r) and r['data']['mime']==mime,{'status':r['status'],'size':len(raw),'inspector':r['data'].get('inspector') if self.ok(r) else None})
-                uploaded[label]=r['data']['path']
-                read=self.gateway(emp,'download',path=uploaded[label])
-                self.check('real '+label+' gateway read',self.ok(read) and read['sha256']==hashlib.sha256(raw).hexdigest(),{'status':read['status']})
+            r=self.gateway(chef,'upload',mime='image/png',base64=base64.b64encode(gateway3a.existing.PNG).decode())
+            self.check('real photo gateway upload',self.ok(r) and r['data']['mime']=='image/png',{'status':r['status'],'size':len(gateway3a.existing.PNG),'inspector':r['data'].get('inspector') if self.ok(r) else None});uploaded['photo']=r['data']['path']
+            read=self.gateway(emp,'download',path=uploaded['photo']);self.check('real photo gateway read',self.ok(read) and read['sha256']==hashlib.sha256(gateway3a.existing.PNG).hexdigest(),{'status':read['status']})
+            photo=self.send(chef,self.tag+' PHOTO',uploaded['photo']);self.check('photo message regression',self.ok(photo),{'status':photo['status']})
+            r=self.gateway(chef,'upload',mime='application/pdf',base64=base64.b64encode(pdf).decode())
+            self.check('real pdf gateway upload',self.ok(r) and r['data']['mime']=='application/pdf',{'status':r['status'],'size':len(pdf),'inspector':r['data'].get('inspector') if self.ok(r) else None});uploaded['pdf']=r['data']['path']
+            read=self.gateway(emp,'download',path=uploaded['pdf']);self.check('real pdf gateway read',self.ok(read) and read['sha256']==hashlib.sha256(pdf).hexdigest(),{'status':read['status']})
             invalid=[b'not a PDF',pdf[:-8],pdf.replace(b'/Type /Catalog',b'/Type /Catalog /JavaScript')]
             for index,raw in enumerate(invalid):
                 r=self.gateway(chef,'upload',mime='application/pdf',base64=base64.b64encode(raw).decode())
@@ -38,7 +39,6 @@ class Phase3B(gateway3a.GatewayCertification):
             request_id=str(uuid.uuid4())
             first=self.send(chef,self.tag+' PDF',uploaded['pdf'],request_id=request_id);second=self.send(chef,self.tag+' PDF',uploaded['pdf'],request_id=request_id)
             self.check('PDF message send idempotent',self.ok(first) and self.ok(second) and first['data']['id']==second['data']['id'],{'statuses':[first['status'],second['status']]})
-            photo=self.send(chef,self.tag+' PHOTO',uploaded['photo']);self.check('photo message regression',self.ok(photo),{'status':photo['status']})
             page=self.rpc(emp,'mir_chat_messages',{'org':gateway3a.existing.ORG,'conversation':self.con,'page_size':1,'page_before':None})
             self.check('real pagination still bounded',self.ok(page) and len(page['data']['items'])==1 and page['data'].get('nextCursor') is not None,{'status':page['status']})
             search=self.rpc(emp,'mir_chat_search',{'org':gateway3a.existing.ORG,'query_text':self.tag,'page_size':20,'page_before':None})
