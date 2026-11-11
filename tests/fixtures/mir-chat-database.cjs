@@ -15,7 +15,7 @@ async function baseline({hosted=true}={}){
  alter table storage.objects enable row level security;
  create function storage.foldername(text) returns text[] language sql immutable as $$select (string_to_array($1,'/'))[1:array_length(string_to_array($1,'/'),1)-1]$$;
  grant usage on schema storage to authenticated;grant select,insert,delete on storage.objects to authenticated;`);
- for(const f of fs.readdirSync(dir).filter(f=>f.endsWith('.sql')&&!f.includes('mir_estimates')&&!f.includes('chat_phase3a')).sort())await db.exec(fs.readFileSync(path.join(dir,f),'utf8'));
+ for(const f of fs.readdirSync(dir).filter(f=>f.endsWith('.sql')&&!f.includes('mir_estimates')&&!f.includes('chat_phase3a')&&!f.includes('chat_phase3b')).sort())await db.exec(fs.readFileSync(path.join(dir,f),'utf8'));
  if(hosted){
   // Remove default on local 3-arg job_allowed before restoring hosted overloads.
   const fixture=require('./mir-chat-hosted-functions.json');

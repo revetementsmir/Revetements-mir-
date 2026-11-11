@@ -3,6 +3,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 const TEST='https://hxtztkmbfpmzrieccwsg.supabase.co';
 const A='8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9',B='3005c762-de14-4ab0-8bc8-16c4be92d0a4';
 const PNG='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGD4DwABBAEAX+XDSwAAAABJRU5ErkJggg==';
+const PDF='JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA3MiA3Ml0gPj4KZW5kb2JqCnhyZWYKMCA0CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAwOSAwMDAwMCBuIAowMDAwMDAwMDU4IDAwMDAwIG4gCjAwMDAwMDAxMTUgMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA0IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgoxODQKJSVFT0YK';
 const reply=(status:number,data:unknown)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json','cache-control':'no-store'}});
 
 Deno.serve(async req=>{
@@ -17,11 +18,18 @@ Deno.serve(async req=>{
   const actor=await account.json();if(!account.ok||actor.role!=='admin'||actor.organizationId!==A)return reply(403,{status:'admin-a-required'});
   const users=await api('/auth/v1/admin/users?per_page=1000');const listed=await users.json();
   if(!users.ok)return reply(503,{status:'auth-admin-unavailable'});
-  if((listed.users||[]).some((u:any)=>u.app_metadata?.mir_test_fixture==='phase3a_tenant_b'))return reply(409,{status:'already-provisioned'});
+  const fixtures=(listed.users||[]).filter((u:any)=>u.app_metadata?.mir_test_fixture==='phase3a_tenant_b');
+  if(fixtures.length>1)return reply(409,{status:'duplicate-fixture'});
   const random=crypto.getRandomValues(new Uint8Array(36));password=btoa(String.fromCharCode(...random)).replace(/[+/=]/g,'x')+'Aa9!';
   const email='mir-phase3a-tenant-b@qa.invalid';
-  const made=await api('/auth/v1/admin/users',{method:'POST',body:JSON.stringify({email,password,email_confirm:true,app_metadata:{mir_test_fixture:'phase3a_tenant_b'}})});
-  const newUser=await made.json();if(!made.ok||!newUser.id)throw Error('AUTH_CREATE');created=true;userId=newUser.id;
+  if(fixtures.length){
+   userId=fixtures[0].id;
+   const reset=await api('/auth/v1/admin/users/'+userId,{method:'PUT',body:JSON.stringify({password})});
+   if(!reset.ok)throw Error('AUTH_RESET');
+  }else{
+   const made=await api('/auth/v1/admin/users',{method:'POST',body:JSON.stringify({email,password,email_confirm:true,app_metadata:{mir_test_fixture:'phase3a_tenant_b'}})});
+   const newUser=await made.json();if(!made.ok||!newUser.id)throw Error('AUTH_CREATE');created=true;userId=newUser.id;
+  }
   const provision=await api('/rest/v1/rpc/mir_chat_tenant_b_recipe_provision',{method:'POST',body:JSON.stringify({actor:userId})});
   const fixture=await provision.json();if(!provision.ok||!fixture.jobId)throw Error('PROVISION_'+provision.status+'_'+String(fixture?.code||'NO_CODE'));provisioned=true;
   const login=await api('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email,password})});
@@ -40,8 +48,12 @@ Deno.serve(async req=>{
   const bf=await file(bToken,B,bConversation,{action:'upload',mime:'image/png',base64:PNG});check('B positive gateway upload',bf.status===200,bf.status);
   const bReadsA=await file(bToken,A,aConversation,{action:'download',path:af.data?.path});check('B gateway to A refused',bReadsA.status===403,bReadsA.status);
   const aReadsB=await file(caller.slice(7),B,bConversation,{action:'download',path:bf.data?.path});check('A gateway to B refused',aReadsB.status===403,aReadsB.status);
+  const apdf=await file(caller.slice(7),A,aConversation,{action:'upload',mime:'application/pdf',base64:PDF});check('A positive PDF gateway upload',apdf.status===200,apdf.status);
+  const bpdf=await file(bToken,B,bConversation,{action:'upload',mime:'application/pdf',base64:PDF});check('B positive PDF gateway upload',bpdf.status===200,bpdf.status);
+  const bReadsAPdf=await file(bToken,A,aConversation,{action:'download',path:apdf.data?.path});check('B PDF gateway to A refused',bReadsAPdf.status===403,bReadsAPdf.status);
+  const aReadsBPdf=await file(caller.slice(7),B,bConversation,{action:'download',path:bpdf.data?.path});check('A PDF gateway to B refused',aReadsBPdf.status===403,aReadsBPdf.status);
   const failed=checks.filter(c=>c.status==='failed').length;
-  return reply(failed?409:200,{status:failed?'FAILED':'CERTIFIED_TENANT_B',passed:checks.length-failed,failed,provisioned:true,clientBUntouched:true,production:'not-accessed',checks});
+  return reply(failed?409:200,{status:failed?'FAILED':'CERTIFIED_TENANT_B',passed:checks.length-failed,failed,provisioned:true,reusedFixture:fixtures.length===1,clientBUntouched:true,production:'not-accessed',checks});
  }catch(error){
   password='';
   if(created&&!provisioned&&userId){try{const service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'';await fetch(TEST+'/auth/v1/admin/users/'+userId,{method:'DELETE',headers:{apikey:service,authorization:'Bearer '+service}});}catch{}}

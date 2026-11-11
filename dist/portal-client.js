@@ -44,8 +44,8 @@
     if (site.protocol !== 'https:' || site.origin !== config.siteOrigin || site.username || site.password || site.search || site.hash || site.pathname !== '/')
       fail('CONFIGURATION', 'L’adresse du portail doit être vérifiée.');
     if (origin && origin !== site.origin) fail('ORIGIN_MISMATCH', 'Ouvrez le portail depuis son adresse MIR officielle.');
-    const expectedCallback = site.origin === 'https://revetementsmirweb.github.io'
-      ? '/MIR/chantier.html' : '/chantier.html';
+    const expectedCallback = site.origin === 'https://revetementsmir.github.io'
+      ? '/Revetements-mir-/chantier.html' : '/chantier.html';
     if (config.callbackPath !== expectedCallback) fail('CONFIGURATION', 'Le retour de connexion doit être vérifié.');
     return { ...config, enabled: true, redirectTo: `${site.origin}${expectedCallback}` };
   }
@@ -495,7 +495,7 @@
     async function chatSearch(query,cursor=null,limit=20){return chatRPC('mir_chat_search',{query_text:String(query||''),page_size:Math.min(50,Math.max(1,Number(limit)||20)),page_before:cursor});}
     function chatPath(path){
       const p=String(path||'').split('/'),file=p[4]?.split('.');
-      if(p.length!==5||p[0]!==internalOrg||p[1]!=='message'||!UUID.test(p[2])||!UUID.test(p[3])||file?.length!==2||!UUID.test(file[0])||!['jpg','png','webp','heic','heif'].includes(file[1])||/[%\\\s?#]/.test(path))fail('DOCUMENT_INVALID','Pièce jointe invalide.');return p;
+      if(p.length!==5||p[0]!==internalOrg||p[1]!=='message'||!UUID.test(p[2])||!UUID.test(p[3])||file?.length!==2||!UUID.test(file[0])||!['jpg','png','webp','heic','heif','pdf'].includes(file[1])||/[%\\\s?#]/.test(path))fail('DOCUMENT_INVALID','Pièce jointe invalide.');return p;
     }
     async function chatFile(action,conversation,extra){
       requireReady();if(!internalOrg||!UUID.test(conversation||''))fail('CONVERSATION_INVALID','Conversation invalide.');
@@ -513,11 +513,12 @@
     }
     async function validateMessageAttachment(conversation,path){chatPath(path);await chatFile('validate',conversation,{path});return chatRPC('mir_message_attachment_validate',{conversation,object_path:path});}
     async function ackChatMessage(message,state='read'){return chatRPC('mir_message_ack',{message,state});}
-    async function chatPhotoURL(path){
+    async function chatFileURL(path){
       requireReady();const parts=chatPath(path),blob=await chatFile('download',parts[2],{path});
-      if(!blob.size||blob.size>10*1024*1024||!['image/jpeg','image/png','image/webp','image/heic','image/heif'].includes(blob.type))fail('DOCUMENT_INVALID','Pièce jointe invalide.');
+      if(!blob.size||blob.size>10*1024*1024||!['image/jpeg','image/png','image/webp','image/heic','image/heif','application/pdf'].includes(blob.type))fail('DOCUMENT_INVALID','Pièce jointe invalide.');
       const url=blobURLs.createObjectURL(blob);chatURLs.add(url);return url;
     }
+    const chatPhotoURL=chatFileURL;
     // Phase3A chat API end.
     async function openConversation(kind,targetId){
       requireReady();if(!internalOrg||!['private','team','job'].includes(kind)||!UUID.test(targetId||''))fail('CONVERSATION_INVALID','Cette conversation ne peut pas être ouverte.');
@@ -525,8 +526,8 @@
     }
     async function uploadInternal(file,scope,entityId){
       requireReady();if(!internalOrg||!['message','extra','issue','receipt','material','problem','report','vehicle','delivery','inspection','signature'].includes(scope)||!UUID.test(entityId||''))fail('UPLOAD_INVALID','La destination de cette photo est invalide.');
-      const mime=String(file?.type||'').toLowerCase(),extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif'};
-      if(!extensions[mime]||!file.size||file.size>10*1024*1024)fail('UPLOAD_INVALID','Utilisez une photo JPG, PNG, WebP ou HEIC de 10 Mo maximum.');
+      const mime=String(file?.type||'').toLowerCase(),extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif',...(scope==='message'?{'application/pdf':'pdf'}:{})};
+      if(!extensions[mime]||!file.size||file.size>10*1024*1024)fail('UPLOAD_INVALID',scope==='message'?'Utilisez une photo ou un PDF de 10 Mo maximum.':'Utilisez une photo JPG, PNG, WebP ou HEIC de 10 Mo maximum.');
       // Phase3A chat upload begin.
       if(scope==='message'){
         const bytes=new Uint8Array(await file.arrayBuffer());let binary='';for(let at=0;at<bytes.length;at+=32768)binary+=String.fromCharCode(...bytes.subarray(at,at+32768));
@@ -538,7 +539,7 @@
       const path=`${internalOrg}/${scope}/${entityId}/${status.user.id}/${id}.${extensions[mime]}`;
       const {error}=await sdk.storage.from('mir-internal').upload(path,file,{contentType:mime,upsert:false,cacheControl:'3600'});if(error)throw errorOf(error,'La photo n’a pas pu être téléversée.');return path;
     }
-    async function internalPhotoURL(path){requireReady();if(String(path).split('/')[1]==='message')return chatPhotoURL(path);const {data,error}=await sdk.storage.from('mir-internal').createSignedUrl(path,300);if(error||!data?.signedUrl)throw errorOf(error||{},'Cette photo ne peut pas être ouverte.');return data.signedUrl;}
+    async function internalPhotoURL(path){requireReady();if(String(path).split('/')[1]==='message')return chatFileURL(path);const {data,error}=await sdk.storage.from('mir-internal').createSignedUrl(path,300);if(error||!data?.signedUrl)throw errorOf(error||{},'Cette photo ne peut pas être ouverte.');return data.signedUrl;}
     async function jobDossier(jobId,pageBefore=null,pageSize=20){
       requireReady();if(!internalOrg||!UUID.test(jobId||''))fail('JOB_INVALID','Ce chantier ne peut pas être ouvert.');
       const {data,error}=await sdk.rpc('mir_job_dossier_snapshot',{org:internalOrg,job:jobId,page_size:Math.min(50,Math.max(1,Number(pageSize)||20)),page_before:pageBefore||null});
@@ -567,7 +568,7 @@
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
       acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, dispose,
-      chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatPhotoURL,
+      chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatFileURL, chatPhotoURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
     });
   }

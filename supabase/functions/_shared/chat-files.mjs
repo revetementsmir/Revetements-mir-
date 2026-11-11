@@ -1,7 +1,7 @@
-import { FileError,inspectImage,MAX_FILE_BYTES } from './chat-file-content.mjs';
+import { FileError,inspectFile,MAX_FILE_BYTES } from './chat-file-content.mjs';
 const TEST_URL='https://hxtztkmbfpmzrieccwsg.supabase.co';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
-const EXT={'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/heic':'heic','image/heif':'heif'};
+const EXT={'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/heic':'heic','image/heif':'heif','application/pdf':'pdf'};
 export const PRIVATE_HEADERS={'Cache-Control':'private, no-store, max-age=0, must-revalidate','CDN-Cache-Control':'no-store','Cloudflare-CDN-Cache-Control':'no-store','Surrogate-Control':'no-store','Pragma':'no-cache','Expires':'0','Vary':'Authorization, Origin','X-Content-Type-Options':'nosniff'};
 export function canonicalPath(path,org,conversation){
  if(typeof path!=='string'||path.length>250||/[%\\\s?#\u0000-\u001f]/.test(path))throw new FileError('FILE_PATH',400);
@@ -53,7 +53,7 @@ export function createChatFileService({env,fetch:network=globalThis.fetch,random
    if(action==='upload'){
     if(!EXT[mime]||typeof base64!=='string'||base64.length%4||base64.length>Math.ceil(MAX_FILE_BYTES*4/3)+4||!/^[A-Za-z0-9+/]*={0,2}$/.test(base64))throw new FileError('FILE_ENCODING',400);
     const identity=await uploadAuth();if(identity.userId!==user.id)throw new FileError('FILE_ACCESS_DENIED',403);
-    try{bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));}catch{throw new FileError('FILE_ENCODING',400);}inspectImage(bytes,mime);
+    try{bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));}catch{throw new FileError('FILE_ENCODING',400);}inspectFile(bytes,mime);
     objectPath=canonicalPath(`${org}/message/${conversation}/${user.id}/${randomUUID()}.${EXT[mime]}`,org,conversation);
     const r=await backend('/storage/v1/object/mir-internal/'+objectPath,{method:'POST',headers:{apikey:service,Authorization:'Bearer '+service,'Content-Type':mime,'cache-control':'no-store','x-upsert':'false'},body:bytes});
     if(!r.ok)throw new FileError('UPLOAD_UNAVAILABLE',503);
@@ -69,7 +69,7 @@ export function createChatFileService({env,fetch:network=globalThis.fetch,random
     bytes=await bounded(r,MAX_FILE_BYTES);
    }
    if(bytes.length!==facts.size)throw new FileError('FILE_SIZE_MISMATCH',422);
-   const inspected=inspectImage(bytes,facts.mime);
+   const inspected=inspectFile(bytes,facts.mime);
    const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
    const proof=await rpc('mir_chat_file_record',{object_id:facts.objectId,object_version:facts.version,content_sha256:sha256,inspector:inspected.inspector,actor:user.id,expected_path:objectPath,expected_size:bytes.length,expected_mime:facts.mime},true);
    if(proof.objectId!==facts.objectId||proof.path!==objectPath||proof.size!==bytes.length||proof.mime!==facts.mime||facts.version!==null&&proof.version!==facts.version)throw new FileError('FILE_CHANGED',409);

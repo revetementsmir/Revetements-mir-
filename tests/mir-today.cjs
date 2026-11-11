@@ -49,9 +49,11 @@ test('Punch, client RPC et modules validés préservés depuis main',()=>{
    .replace(/    \/\/ Phase3A chat API begin\.[\s\S]*?    \/\/ Phase3A chat API end\.\n/,'')
    .replace(/      \/\/ Phase3A chat upload begin\.[\s\S]*?      \/\/ Phase3A chat upload end\.\n/,'')
    .replaceAll('      revokeChatURLs();\n','')
-   .replace("if(String(path).split('/')[1]==='message')return chatPhotoURL(path);",'')
+   .replace(/if\(String\(path\)\.split\('\/'\)\[1\]==='message'\)return chat(?:Photo|File)URL\(path\);/,'')
+   .replace("const mime=String(file?.type||'').toLowerCase(),extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif',...(scope==='message'?{'application/pdf':'pdf'}:{})};","const mime=String(file?.type||'').toLowerCase(),extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif'};")
+   .replace("if(!extensions[mime]||!file.size||file.size>10*1024*1024)fail('UPLOAD_INVALID',scope==='message'?'Utilisez une photo ou un PDF de 10 Mo maximum.':'Utilisez une photo JPG, PNG, WebP ou HEIC de 10 Mo maximum.');","if(!extensions[mime]||!file.size||file.size>10*1024*1024)fail('UPLOAD_INVALID','Utilisez une photo JPG, PNG, WebP ou HEIC de 10 Mo maximum.');")
    .replace("['private','team','job']","['private','team']")
-   .replace('      chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatPhotoURL,\n','');
+   .replace(/      chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, (?:chatFileURL, )?chatPhotoURL,\n/,'');
   }
   assert.equal(hash(source),expected,file);
  }

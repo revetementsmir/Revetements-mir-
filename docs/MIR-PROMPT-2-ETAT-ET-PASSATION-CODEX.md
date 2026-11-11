@@ -1,5 +1,15 @@
 # MIR — État exhaustif et passation d’exécution du Prompt 2 pour Codex
 
+## Addendum courant — Phase 3B, 11 novembre 2026
+
+La Phase 3A reste certifiée sur MIR TEST et n’a pas été rejouée. La branche 3B `codex/phase-3b-clavardage-mobile` dépend explicitement de sa tête `f5c2aa04450d708a8f86da51bc3c778d0ebf75e7`, car la PR #4 n’était pas fusionnée au démarrage.
+
+Le parcours mobile Harmony liste → conversation → pièce jointe est consolidé localement : privé/équipe/chantier, recherche, pagination, non-lus, photos et PDF par `mir-chat-files`, brouillons, hors ligne, protection d’envoi, chargement/vide/erreur/refus et dispositions téléphone/tablette/ordinateur. La recette Playwright passe sur six formats; les contrats 3A, Aujourd’hui et six rôles restent verts. Voir `docs/verification/mir-chat-phase3b-mobile.md`.
+
+Extension PDF installée uniquement sur MIR TEST : migrations `chat_phase3b_pdf_attachments`, `chat_phase3b_pdf_gateway_acl` et `chat_phase3b_pdf_attestation_constraint`, `mir-chat-files` v2 et `mir-chat-tenant-b-recipe` v3. Le bucket privé reste borné à 10 MiB; les PDF sont inspectés comme documents passifs et passent par les mêmes contrôles Auth/organisation/conversation que les images, sans accès Storage direct. Aucun objet production n’a été modifié.
+
+Verdict courant 3B : **CERTIFIÉ sur MIR TEST en recette intégrée privée**. Au SHA fonctionnel `b6296c0fa9ac86e11fa08e9d2c94f553892adc2f`, 22/22 contrôles navigateur avec deux sessions Auth réelles réussissent : conversations, recherche, pagination, PNG/PDF par `mir-chat-files`, non-lus/reçus, brouillon hors ligne, envoi unique, refus 403 après retrait et navigation téléphone/tablette/ordinateur. Les affectations temporaires ont été restaurées. Cette preuve complète la recette backend 25/25 et l’isolation A↔B du run `43084321137`; elle ne les rejoue pas. Le frontend n’est pas publié et les autres documents restent refusés. Production intacte; aucune Phase 3C ni refonte publique commencée.
+
 ## Addendum courant — Phase 3A, 11 novembre 2026
 
 La consigne historique de commencer la Phase 1 est remplacée par la reprise courante : seule la Phase 3A est active. Sur MIR TEST `hxtztkmbfpmzrieccwsg`, la préparation `chat_phase3a_private_file_gateway`, la fonction Edge `mir-chat-files` v1 (`verify_jwt=false` avec vérification Auth explicite) et l'activation `chat_phase3a_private_file_activate` sont réellement installées. MIR production n'a reçu aucune mutation.
@@ -233,6 +243,7 @@ Légende test : **Réel** = vérifié sur MIR TEST ou service réel par une preu
 | Exigence | État | Test | Associés |
 |---|---|---|---|
 | FAQ/demandes/chat client, transfert, statuts, non lus, pièces, notes internes | Partielle sur MIR TEST seulement | Réel schéma/RPC TEST; UI non testée | `help_faq`, `support_*`, `mir_client_center_snapshot`, `mir_support_*`; migration absente du dépôt |
+| Clavardage interne mobile : photo/PDF privés, recherche, pagination, non-lus, brouillon, envoi unique, hors ligne | Partiel | Réel MIR TEST 25/25 + isolation A↔B; UI testée en simulation sur six formats | `mir-chat-files` v2; run `43084321137`; migrations `chat_phase3b_pdf_attachments`, `chat_phase3b_pdf_gateway_acl`, `chat_phase3b_pdf_attestation_constraint`; aucun repli Storage; frontend non publié |
 | Navigation PC exacte et intégrations Matériaux/Nous joindre | Partielle | Simulation | `mir-public-menu.*`; tests menu |
 | Navigation mobile fixe exacte | Partielle | Simulation | menu public/mobile; audit requis |
 | Estimation envoyée directement à estimation@, jamais mailto, succès réel | Terminée | Réel | Edge `mir-estimates` TEST, service/recettes estimation |

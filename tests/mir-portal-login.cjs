@@ -31,7 +31,7 @@ test('Activation réelle autorisée : clé publique et compte vérifié, jamais 
   const cfg=require('./mir-account-config-helper.cjs')();
   assert.equal(cfg.enabled,true);assert.equal(cfg.accountEnabled,true);assert.equal(cfg.passwordEnabled,true);
   assert.match(cfg.publishableKey,/^sb_publishable_/);
-  assert.equal(Auth.validateConfig(cfg,cfg.siteOrigin).redirectTo,'https://revetementsmirweb.github.io/MIR/chantier.html');
+  assert.equal(Auth.validateConfig(cfg,cfg.siteOrigin).redirectTo,'https://revetementsmir.github.io/Revetements-mir-/chantier.html');
   assert.deepEqual(Auth.validateConfig({enabled:false}),{enabled:false});
 });
 test('Une configuration activée sans clé publiable est refusée',()=>{
@@ -40,15 +40,15 @@ test('Une configuration activée sans clé publiable est refusée',()=>{
     siteOrigin:'https://revetementsmirweb.github.io',callbackPath:'/chantier.html'},
     'https://revetementsmirweb.github.io'));
 });
-test('Le retour Auth reste strictement limité au vrai chemin MIR',()=>{
+test('Le retour Auth reste strictement limité au dépôt MIR courant',()=>{
   const config={enabled:true,projectRef:'gccltmaulvrnthrbnrpd',
     supabaseUrl:'https://gccltmaulvrnthrbnrpd.supabase.co',
     publishableKey:'sb_publishable_'+'a'.repeat(48),
-    siteOrigin:'https://revetementsmirweb.github.io',
-    callbackPath:'/MIR/chantier.html'};
-  const validated=Auth.validateConfig(config,'https://revetementsmirweb.github.io');
-  assert.equal(validated.redirectTo,'https://revetementsmirweb.github.io/MIR/chantier.html');
-  assert.throws(()=>Auth.validateConfig({...config,callbackPath:'/autre.html'},'https://revetementsmirweb.github.io'));
+    siteOrigin:'https://revetementsmir.github.io',
+    callbackPath:'/Revetements-mir-/chantier.html'};
+  const validated=Auth.validateConfig(config,'https://revetementsmir.github.io');
+  assert.equal(validated.redirectTo,'https://revetementsmir.github.io/Revetements-mir-/chantier.html');
+  assert.throws(()=>Auth.validateConfig({...config,callbackPath:'/autre.html'},'https://revetementsmir.github.io'));
 });
 test('Aucun rôle admin n’est attribué sans preuve serveur',()=>{
   assert.throws(()=>Auth.checkedSnapshot({
