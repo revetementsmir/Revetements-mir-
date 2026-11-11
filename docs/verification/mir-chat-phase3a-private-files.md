@@ -2,7 +2,7 @@
 
 ## État exact
 
-**Passerelle déployée et activation restrictive appliquée sur MIR TEST; 38/38 contrôles hébergés du nouveau circuit réussis. Certification intégrale encore bloquée uniquement par l'absence d'un interne dans un second tenant TEST et l’indisponibilité d’une écriture GitHub Secrets via les connexions actuelles.** Aucune écriture ni lecture métier de MIR production, aucune fusion de PR, publication du site ou intervention Lot B.
+**Phase 3A certifiée sur MIR TEST : 38/38 contrôles hébergés de la passerelle et 10/10 contrôles réels d’isolation bidirectionnelle tenant B réussis.** Aucune écriture ni lecture métier de MIR production, aucune fusion de PR, publication du site ou intervention Lot B.
 
 ## Reprise du 11 novembre 2026 — installation TEST réelle
 
@@ -14,9 +14,9 @@
 - Preuve d’expiration naturelle [43052372399](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43052372399), SHA `74d805179270a2aec86bebf7168b8444a6e4ff02` : **38 réussites, 0 échec fonctionnel**. Le runner a attendu le `exp` réel du JWT pendant environ une heure, sans changer la configuration Auth; la nouvelle lecture a été refusée 401. La session Admin a ensuite été renouvelée et les restaurations QA ont réussi.
 - Le header non standard `Cloudflare-CDN-Cache-Control` est retiré par la plateforme. Les réponses réelles conservent `Cache-Control`, `CDN-Cache-Control` et `Surrogate-Control` en `no-store`, `cf-cache-status: DYNAMIC`, `Vary: Authorization, Origin` et `nosniff`.
 - L'ancien runner échoue désormais sur son upload Storage direct, attendu après activation; il ne faut pas rouvrir cet ancien accès. Le nouveau runner est exécuté avec `always()` afin de garder les deux résultats visibles.
-- Reste non certifiée : isolation bidirectionnelle positive avec un interne d’un second tenant TEST. Le compte est maintenant autorisé, mais aucune opération de dépôt GitHub Secrets n’est exposée par les connexions disponibles; aucun mot de passe n’a été généré.
+- Recette ponctuelle tenant B [43067261753](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43067261753), SHA `be90c35bb41def96a91cf90503b5c0b430d5369f` : **10 réussites, 0 échec**. Accès positifs A et B; conversations et fichiers refusés dans les deux sens croisés. Auth Supabase réelle, aucun JWT fabriqué. Le client B existant est intact.
 
-La règle « ne publie rien » est respectée : déployer une nouvelle fonction serveur est une mise en service distincte. Aucun `deploy_edge_function`, `apply_migration`, `db push` ou changement de réglage hébergé n’a été exécuté dans cette reprise. Les seuls tests mutateurs hébergés concernent des fixtures clairement balisées dans le tenant A; les retraits d’accès A ont été restaurés. Aucun compte créé; aucune modification de membership dans B.
+La règle « ne publie rien » est respectée : déployer une fonction serveur TEST est une mise en service distincte du site public. Un seul compte Employé B de recette, son membership, son chantier et sa conversation ont été créés selon l’autorisation complémentaire. Le mot de passe aléatoire n’a existé qu’en mémoire, aucune réponse Auth ni jeton n’a été journalisé, puis les variables sensibles ont été libérées. La recette ponctuelle est désactivée par défaut dans le workflow et ne constitue pas une certification CI récurrente sans secrets. Les retraits d’accès A ont été restaurés.
 
 ## Git et modules protégés
 
@@ -106,7 +106,7 @@ Premier passage intermédiaire `c830097` : **42/43**. Le contrat Aujourd’hui d
 - Lien signé actuel 300 secondes réellement refusé en HTTP après **419,5 secondes**; le contrôle court 5 secondes est aussi relancé. Cela ne prouve pas un plafond universel ni l’invalidation de toutes les réponses CDN.
 - Ancienne traversée `%2e%2e` : **HTTP 500 toujours reproduit**, non compté comme un succès RLS. Pas de réparation du routage amont réalisée.
 
-Le nouveau test `tools/validation/mir-chat-files-real.py` est prêt. Il s’arrête avant mutation si la passerelle manque; il exige la fermeture des accès natifs après activation et ne peut être qualifié de complet sans les preuves opérateur de retrait/cache et le tenant B. Un lancement optionnel manuel est prévu dans Actions, **sans étape de déploiement**.
+Le test `tools/validation/mir-chat-files-real.py` certifie le circuit installé : fermeture des accès natifs, accès positif par passerelle, retraits/réintégrations et sessions. La recette tenant B séparée certifie les accès positifs de chaque organisation et les refus croisés. Les lancements restent explicites dans Actions, sans redéploiement automatique.
 
 ### CI et avis existants
 
@@ -114,33 +114,22 @@ Au SHA `f4a69a0` : **10 workflows réussis, 2 échoués**. Les rouges sont les e
 
 Pendant la recette, main a avancé indépendamment vers `ebf54f676a84fc01717543f0cec224a173f90171`, fusion de la PR #7 « Test MIR — aligner BECK sur le seul format 1½ po ». La CI teste une fusion synthétique avec ce nouveau main : notre premier garde de hash intégral de catalogue a donc échoué, alors que notre branche n’avait pas modifié BECK. Le correctif `f4a69a0` compare le delta de **notre tête de PR** à son ancêtre commun avec main pour les sept fichiers protégés, sans figer ni masquer les modifications approuvées ailleurs. Historique Git complet récupéré en CI; contrôle des SHA et absence de modifications Phase 3A vérifiés. La base demandée `215259c` reste intégrée; aucune autre PR fusionnée par cette mission, aucun catalogue réécrit. Les nouveaux formats de main restent sous l’autorité des tests Boutique de main.
 
-Les avis Security Advisors TEST ont été relus : types INFO/WARN existants sur policies absentes, search_path, EXECUTE SECURITY DEFINER et protection des mots de passe. Ils ne sont pas présentés comme tous résolus. La nouvelle passerelle étant absente du projet, ces avis ne peuvent pas la certifier; sa revue hébergée reste requise après autorisation.
+Les avis Security Advisors TEST ont été relus : types INFO/WARN existants sur policies absentes, search_path, EXECUTE SECURITY DEFINER et protection des mots de passe. Ils ne sont pas présentés comme tous résolus. La passerelle et sa recette dédiée ont été contrôlées par les preuves hébergées ci-dessus; ces avis généraux demeurent distincts.
 
-## Compte tenant B : exigence exacte, sans invention
+## Compte tenant B : provisionnement ponctuel certifié
 
-Audit réel : projet **MIR TEST `hxtztkmbfpmzrieccwsg`**, tenant B **`3005c762-de14-4ab0-8bc8-16c4be92d0a4`** : **un membership, aucun interne actif**. Le compte présent est client, pas un compte de certification interne. **Il n’existe donc aucun identifiant interne B que je puisse précisément nommer dans cet état.** Le client présent ne doit ni être réutilisé comme interne ni recevoir de nouveau rôle pour faire passer les tests.
-
-Recontrôle après autorisation complémentaire : **zéro compte de recette équivalent**, un client actif, zéro interne actif. Le provisionnement n’a pas commencé car le stockage obligatoire des identifiants dans GitHub Secrets est inaccessible avec les outils actuellement autorisés. Cette décision évite de créer un compte dont le mot de passe ne pourrait être transmis ou conservé conformément au mandat.
+Audit préalable réel : projet **MIR TEST `hxtztkmbfpmzrieccwsg`**, tenant B **`3005c762-de14-4ab0-8bc8-16c4be92d0a4`** : zéro compte de recette équivalent, un client actif et zéro interne actif. Après autorisation, un seul compte Employé de recette a été créé avec son membership minimal, un chantier et une conversation balisés. Contrôle final : un utilisateur de fixture, un interne de fixture, un chantier de fixture, une conversation de fixture et toujours un client original actif. Le client existant et ses droits n’ont pas été modifiés.
 
 Le compte local derrière l’alias historique `MIR_SANDBOX_OTHER_CLIENT` est en réalité un Employé de **A**, pas de B; il ne doit pas être copié dans les secrets B sur la foi du nom de variable. Organisation et rôle sont toujours contrôlés côté serveur.
 
-Pour compléter la recette sans aucune création ni modification de membership, il faut fournir un compte **déjà existant** du projet TEST, déjà membre interne actif de cette organisation, idéalement Employé (rôle technique employee, rôle opérationnel employe), et une conversation B dans laquelle il peut déjà lire et écrire. Un chantier fermé ne convient pas pour le canari d’envoi.
+La fonction TEST `mir-chat-tenant-b-recipe` v2 et la RPC `mir_chat_tenant_b_recipe_provision` sont réservées à cette preuve. La RPC est révoquée de `public`, `anon` et `authenticated`, accordée uniquement à `service_role`; la fonction exige une session Admin A vérifiée avant provisionnement. Les migrations officielles installées sont `chat_phase3a_tenant_b_recipe`, `chat_phase3a_tenant_b_recipe_acl` et `chat_phase3a_tenant_b_operational_role`.
 
-Secrets GitHub à configurer uniquement par le propriétaire, jamais dans le clavardage :
-
-| Secret | Valeur requise |
-|---|---|
-| `MIR_CHAT_TENANT_B_INTERNAL_EMAIL` | Adresse du compte interne TEST existant et autorisé décrit ci-dessus |
-| `MIR_CHAT_TENANT_B_INTERNAL_PASSWORD` | Son secret existant, sans réinitialisation par cette mission |
-| `MIR_CHAT_TENANT_B_CONVERSATION_ID` | UUID d’une conversation B **déjà autorisée**, sans nouvelle affectation |
-
-Le runner vérifie organisation/rôle par Auth et RPC, puis la conversation autorisée, les refus A→B/B→A et l’exclusion de deux canaris non vides dans les recherches. Aucun compte ni membership créé. Secrets absents = **blocked**, pas succès d’isolation bidirectionnelle. Dans l’état actuel, il faut soit un accès interne B réellement préexistant non encore identifié, soit une décision sur un autre second tenant TEST déjà pourvu d’accès internes; rien n’est provisionné automatiquement.
+Le runner vérifie organisation/rôle par Auth et RPC, puis les accès positifs et les refus A→B/B→A. Sa voie ponctuelle est désactivée par défaut après certification. Une exécution récurrente future exigerait des secrets dédiés; la présente exception en mémoire ne les remplace pas.
 
 ## Décisions réellement nécessaires avant la suite
 
-1. **Autorisation distincte de mise en service sur MIR TEST seulement** : valider le contrat technique service-only d’attestation décrit plus haut, puis fonction serveur, préparation SQL et activation gardée avec le client de recette compatible. Rien en production, aucune publication du site, aucune fusion de PR.
-2. **Traitement des anciennes capacités de téléchargement** : accès fournisseur/purge CDN ou plan de retrait des anciens liens en préservant les fichiers et l’historique. Une suppression de fichier ou rotation globale de clés n’est pas autorisée implicitement. Les copies déjà reçues ne sont pas révocables à distance.
-3. **Route Storage native 500** : correction amont/fournisseur nécessaire pour garantir son 4xx. La nouvelle route applicative prévoit son propre refus contrôlé, mais ne réécrit pas le service Storage Supabase.
-4. **Accès interne du second tenant** : fournir les secrets d’un accès existant conforme, ou décider d’un autre second tenant déjà utilisable, sans création/modification par cette mission.
+1. **Traitement éventuel des anciennes capacités de téléchargement** : accès fournisseur/purge CDN ou plan de retrait des anciens liens en préservant les fichiers et l’historique. Les copies déjà reçues ne sont pas révocables à distance.
+2. **Route Storage native 500** : correction amont/fournisseur nécessaire pour garantir son 4xx. La passerelle refuse ses propres chemins encodés de manière contrôlée, mais ne réécrit pas le service Storage Supabase.
+3. **Recette B récurrente** : si elle devient nécessaire, configurer séparément les secrets CI prévus. La certification ponctuelle actuelle ne les crée pas et ne les requiert pas.
 
 Le détail des fichiers, hashes, scénarios et résultats est dans [le JSON](mir-chat-phase3a-private-files-results.json). Le patch Phase 1 non suivi préexistant reste intact et exclu des commits. Méthode Tests appliquée sans synchronisation Atelier : aucun partage externe autorisé ni tenté dans cette reprise.

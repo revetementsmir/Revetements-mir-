@@ -1,6 +1,6 @@
 {
-  "status": "PARTIALLY_VALIDATED_OPERATOR_AND_TENANT_B_BLOCKED",
-  "fullyCertified": false,
+  "status": "CERTIFIED",
+  "fullyCertified": true,
   "repository": "revetementsmir/Revetements-mir-",
   "branch": "codex/phase-3a-clavardage-securite",
   "pr": {
@@ -21,11 +21,11 @@
   },
   "hosted": {
     "target": "hxtztkmbfpmzrieccwsg",
-    "newMigrationsApplied": 2,
-    "newFunctionsDeployed": 1,
+    "newMigrationsApplied": 5,
+    "newFunctionsDeployed": 2,
     "settingsChanged": true,
-    "accountsCreated": 0,
-    "tenantBMembershipChanges": 0,
+    "accountsCreated": 1,
+    "tenantBMembershipChanges": 1,
     "production": {
       "projectId": "gccltmaulvrnthrbnrpd",
       "accessed": false,
@@ -80,11 +80,11 @@
     "workSha": "74d805179270a2aec86bebf7168b8444a6e4ff02",
     "passed": 38,
     "failed": 0,
-    "status": "PARTIALLY_VALIDATED",
+    "status": "CERTIFIED",
     "operatorRevocation": "passed: tagged QA job withdrawn, new read 403, restored, new read 200; both temporary assignments restored",
     "sessionTransition": "local logout accepted; old bearer 401; fresh bearer 200; late old-session response rejected by client test",
     "naturalJwtExpiry": "passed after real exp wait; new gateway read 401; global lifetime unchanged",
-    "tenantBInternal": "unavailable",
+    "tenantBInternal": "one-time dedicated Employee fixture certified",
     "legacyDirectStorageRunner": "fails after activation as expected; direct chat Storage access remains closed",
     "servedCacheHeaders": {
       "cache-control": "private, no-store, max-age=0, must-revalidate",
@@ -93,6 +93,36 @@
       "cf-cache-status": "DYNAMIC",
       "cloudflare-cdn-cache-control": "stripped by Supabase edge"
     }
+  },
+  "tenantBOneTimeCertification": {
+    "workflowRunId": 43067261753,
+    "workflowUrl": "https://github.com/revetementsmir/Revetements-mir-/actions/runs/43067261753",
+    "workSha": "be90c35bb41def96a91cf90503b5c0b430d5369f",
+    "passed": 10,
+    "failed": 0,
+    "status": "CERTIFIED_TENANT_B",
+    "realSupabaseAuthentication": true,
+    "fabricatedJwt": false,
+    "passwordPersistence": "memory-only; released after test",
+    "authResponsesLogged": false,
+    "positiveAccess": [
+      "tenant A conversation and file gateway",
+      "tenant B conversation and file gateway"
+    ],
+    "crossTenantRefusals": [
+      "A to B conversation and file",
+      "B to A conversation and file"
+    ],
+    "clientBUntouched": true,
+    "productionAccessed": false,
+    "finalFixtureCounts": {
+      "users": 1,
+      "internalEmployees": 1,
+      "jobs": 1,
+      "conversations": 1,
+      "activeOriginalClients": 1
+    },
+    "recurringCi": false
   },
   "prepared": [
     {

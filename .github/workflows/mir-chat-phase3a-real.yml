@@ -19,6 +19,10 @@ on:
         description: 'Attendre réellement l’expiration JWT courante sans modifier sa durée globale'
         type: boolean
         default: false
+      tenant_b_once:
+        description: 'Recette ponctuelle seulement; ne pas activer après certification initiale'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -34,7 +38,7 @@ jobs:
       MIR_CHAT_REAL_REPORT: artifacts/mir-chat-phase3a-real.json
       # Long-running expiry evidence is explicit; ordinary PR pushes stay fast.
       MIR_CHAT_WAIT_NATURAL_EXPIRY: ${{ inputs.wait_natural_expiry || 'false' }}
-      MIR_CHAT_TENANT_B_ONCE: 'true'
+      MIR_CHAT_TENANT_B_ONCE: ${{ inputs.tenant_b_once || 'false' }}
       MIR_SANDBOX_PUBLISHABLE_KEY: ${{ secrets.MIR_SANDBOX_PUBLISHABLE_KEY }}
       MIR_SANDBOX_ADMIN_EMAIL: ${{ secrets.MIR_SANDBOX_ADMIN_EMAIL }}
       MIR_SANDBOX_ADMIN_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
