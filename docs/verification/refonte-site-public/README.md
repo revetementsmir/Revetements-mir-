@@ -12,7 +12,7 @@ Navigation mobile validée : **Accueil, Boutique, Pliage, Commandes et Compte**,
 - Boutique : recherche, catégories et fabricants conservés; catalogue, photos et prix existants inchangés.
 - Produit : photo, prix, options, quantité et ajout; BECK reste offert uniquement en 1½ po à 515,99 $.
 - Panier : sélection, format et quantité conservés; action principale « Demander une estimation ».
-- Estimation : le vrai formulaire s’ouvre depuis le panier et reçoit la sélection courante. Aucun envoi n’a été effectué pendant cette recette.
+- Estimation : le vrai formulaire s’ouvre depuis le panier, reçoit la sélection courante et a confirmé une demande fictive balisée sur MIR TEST vers la seule boîte de recette autorisée.
 - Compte et Commandes : deux destinations distinctes. Déconnecté, Compte ouvre l’authentification en conservant le panier. Une vraie session client TEST ouvre l’aperçu et l’état Commandes propres au client; le panier survit à la connexion et à la déconnexion.
 - Centre d’aide : ouverture réelle dans le dialogue 3C, vérifiée déconnectée et connectée; il ne s’agit pas d’un simple lien présent.
 - Pliage et Studio : navigation commune appliquée côté client sans modification de leurs moteurs.
@@ -43,12 +43,14 @@ Les modules internes Harmony/Admin et les fonctions privées 3A/3B/3C ne sont pa
 
 ### Estimation réelle bornée
 
-`final-v2/estimate-partial-results.json` documente une demande fictive balisée : sélection quantité 2 conservée, vrai formulaire complété, configuration/challenge et **une seule préparation serveur MIR TEST** réussis. Le double clic n’a produit qu’un `/prepare` et qu’un appel final. Cet appel final a été bloqué avant transfert : aucune destination `MIR_TEST_APPROVED_TO` n’était disponible et la destination serveur n’est volontairement pas exposée par `/config`. Aucun courriel n’a été tenté. La plateforme a ensuite refusé un second lancement susceptible de créer un doublon; aucun contournement n’a été tenté.
+`final-v2/estimate-partial-results.json` conserve l’étape historique où l’appel final était volontairement bloqué faute de destination autorisée. Elle n’est plus l’état courant.
+
+`final-v2/estimate-approved-results.json` documente l’unique reprise autorisée : sélection quantité 2 conservée dans le formulaire, un `/prepare`, un seul appel final malgré le double clic, confirmation « Demande reçue » affichée, puis un seul dossier serveur retrouvé à l’état `received`. Le fournisseur courriel a accepté l’envoi et l’horodatage d’acceptation est enregistré. L’arrivée effective dans la boîte Gmail n’est pas observable avec les connexions disponibles et n’est donc pas déclarée. Une assertion locale fondée sur l’ancien chemin `selection.items` a échoué après la confirmation; elle est corrigée pour accepter le schéma courant `selection.materials`. Le jeton éphémère n’ayant pas été conservé, le rejeu exact post-réception n’a pas été relancé; l’absence de doublon est prouvée par l’unique appel final et l’unique dossier balisé.
 
 ## Limites et intervention backend
 
 - Les comptes Phase 3C balisés ont été retrouvés, mais leur fonction de recette réinitialise leurs mots de passe; elle n’a pas été appelée. L’accès client TEST déjà autorisé sous l’alias historique `OUTSIDER` a été réutilisé, avec rôle `client` recalculé côté serveur. Aucun compte, membership ou mot de passe n’a été modifié.
-- La réception finale de l’estimation et sa confirmation restent bloquées uniquement par l’absence d’une destination de courriel de recette explicitement disponible. La préparation serveur réelle est prouvée; elle ne vaut pas réception finale.
+- La réception serveur et la confirmation client sont validées sur MIR TEST. L’acceptation du message par le fournisseur courriel est prouvée; la livraison effective dans la boîte demeure à confirmer par son propriétaire.
 - Aucun appareil physique, Safari, fusion, publication ou écriture Supabase production.
 
-Verdict : **PARTIELLEMENT VALIDÉ**. Compte/Commandes client sont validés; seule la réception finale de l’estimation demeure bloquée par la destination de courriel de recette manquante.
+Verdict : **VALIDÉ SUR MIR TEST pour le périmètre frontend demandé**. Compte/Commandes, conservation du panier, réception serveur et confirmation client sont validés. La livraison effective du courriel dans la boîte et les appareils physiques/Safari restent hors preuve.

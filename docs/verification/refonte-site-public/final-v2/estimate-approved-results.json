@@ -1,0 +1,40 @@
+{
+  "observedAt": "2026-11-11T23:25:43.649Z",
+  "project": "MIR TEST hxtztkmbfpmzrieccwsg",
+  "source": "cart",
+  "recipient": "user-approved TEST mailbox",
+  "requestId": "f31f70eb-0d4c-45fe-8733-272afa7b741d",
+  "requestNumber": "MIR-20261111-F31F70EB0D4C45FE8733272AFA7B741D",
+  "serverState": "received",
+  "providerAccepted": true,
+  "providerAcceptedAtRecorded": true,
+  "mailboxReceiptConfirmed": false,
+  "productionRequests": [],
+  "network": {
+    "prepare": 1,
+    "final": 1
+  },
+  "checks": [
+    {
+      "name": "panier fictif quantité 2 conservé",
+      "passed": true
+    },
+    {
+      "name": "formulaire réel prêt avec sélection intacte",
+      "passed": true
+    },
+    {
+      "name": "confirmation Demande reçue affichée au client",
+      "passed": true
+    },
+    {
+      "name": "un seul appel final et un seul dossier serveur",
+      "passed": true
+    }
+  ],
+  "doubleClickDuplicateObserved": false,
+  "exactReplayAfterReceiptTested": false,
+  "exactReplayLimitation": "Le contrôle local a échoué après la confirmation sur un ancien chemin de schéma. Le jeton de reprise n'a pas été conservé; aucun second envoi n'a été tenté.",
+  "mailboxReceiptLimitation": "L'acceptation par le fournisseur est prouvée côté serveur; l'arrivée effective dans la boîte n'est pas observable avec les accès disponibles.",
+  "productionTouched": false
+}
