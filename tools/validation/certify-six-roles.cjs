@@ -188,4 +188,15 @@ if (require.main === module) {
   });
 }
 
-module.exports = { ROLE_DEFINITIONS, credentialNames, configuration, run };
+module.exports = {
+  ROLE_DEFINITIONS,
+  credentialNames,
+  configuration,
+  request,
+  authenticate,
+  refreshSession,
+  rpc,
+  assertOk,
+  assertDenied,
+  run
+};

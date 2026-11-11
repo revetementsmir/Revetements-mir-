@@ -1,7 +1,7 @@
 -- MIR Phase 2 completion: decisions, notifications, journal and time-bank requests.
 begin;
 
-create table mir_core.time_bank_requests(
+create table if not exists mir_core.time_bank_requests(
   organization_id uuid not null,
   id uuid not null default gen_random_uuid(),
   employee_id uuid not null,
@@ -16,12 +16,20 @@ create table mir_core.time_bank_requests(
   primary key(organization_id,id),
   foreign key(organization_id,employee_id) references mir_core.memberships(organization_id,user_id)
 );
-create index time_bank_requests_employee on mir_core.time_bank_requests(organization_id,employee_id,created_at desc);
+create index if not exists time_bank_requests_employee on mir_core.time_bank_requests(organization_id,employee_id,created_at desc);
 alter table mir_core.time_bank_requests enable row level security;
 revoke all on mir_core.time_bank_requests from public,anon,authenticated;
 
-alter function public.mir_punch_snapshot(uuid,uuid) rename to mir_punch_snapshot_phase2_workflow;
-create function public.mir_punch_snapshot(org uuid,employee uuid default null) returns jsonb
+do $$
+begin
+  if to_regprocedure('public.mir_punch_snapshot_phase2_workflow(uuid,uuid)') is null then
+    if to_regprocedure('public.mir_punch_snapshot(uuid,uuid)') is null then
+      raise exception 'Dépendance absente: public.mir_punch_snapshot(uuid,uuid)';
+    end if;
+    alter function public.mir_punch_snapshot(uuid,uuid) rename to mir_punch_snapshot_phase2_workflow;
+  end if;
+end$$;
+create or replace function public.mir_punch_snapshot(org uuid,employee uuid default null) returns jsonb
 language plpgsql security definer set search_path=pg_catalog,mir_core,public as $$
 declare target uuid:=coalesce(employee,auth.uid()); result jsonb; manager boolean:=mir_core.punch_manager(org);
 begin
@@ -47,8 +55,16 @@ revoke all on function public.mir_punch_snapshot_phase2_workflow(uuid,uuid) from
 revoke all on function public.mir_punch_snapshot(uuid,uuid) from public,anon;
 grant execute on function public.mir_punch_snapshot(uuid,uuid) to authenticated;
 
-alter function public.mir_punch_correction(uuid,uuid,jsonb) rename to mir_punch_correction_phase2_apply;
-create function public.mir_punch_correction(org uuid,correction uuid default null,payload jsonb default '{}') returns uuid
+do $$
+begin
+  if to_regprocedure('public.mir_punch_correction_phase2_apply(uuid,uuid,jsonb)') is null then
+    if to_regprocedure('public.mir_punch_correction(uuid,uuid,jsonb)') is null then
+      raise exception 'Dépendance absente: public.mir_punch_correction(uuid,uuid,jsonb)';
+    end if;
+    alter function public.mir_punch_correction(uuid,uuid,jsonb) rename to mir_punch_correction_phase2_apply;
+  end if;
+end$$;
+create or replace function public.mir_punch_correction(org uuid,correction uuid default null,payload jsonb default '{}') returns uuid
 language plpgsql security definer set search_path=pg_catalog,mir_core,public as $$
 declare result uuid; c mir_core.punch_corrections; target uuid; paid_minutes integer; decision text:=payload->>'decision';
 begin
@@ -88,7 +104,7 @@ revoke all on function public.mir_punch_correction_phase2_apply(uuid,uuid,jsonb)
 revoke all on function public.mir_punch_correction(uuid,uuid,jsonb) from public,anon;
 grant execute on function public.mir_punch_correction(uuid,uuid,jsonb) to authenticated;
 
-create function public.mir_punch_journal(org uuid,filters jsonb default '{}',page_size integer default 25,page_after bigint default null) returns jsonb
+create or replace function public.mir_punch_journal(org uuid,filters jsonb default '{}',page_size integer default 25,page_after bigint default null) returns jsonb
 language plpgsql security definer set search_path=pg_catalog,mir_core,public as $$
 declare size integer:=least(greatest(coalesce(page_size,25),1),100); rows jsonb; next_id bigint;
 begin
@@ -110,7 +126,7 @@ end$$;
 revoke all on function public.mir_punch_journal(uuid,jsonb,integer,bigint) from public,anon;
 grant execute on function public.mir_punch_journal(uuid,jsonb,integer,bigint) to authenticated;
 
-create function public.mir_time_bank_request(org uuid,request uuid default null,payload jsonb default '{}') returns uuid
+create or replace function public.mir_time_bank_request(org uuid,request uuid default null,payload jsonb default '{}') returns uuid
 language plpgsql security definer set search_path=pg_catalog,mir_core,public as $$
 declare result uuid:=coalesce(request,gen_random_uuid()); row_request mir_core.time_bank_requests; decision text:=payload->>'decision'; target uuid; movement jsonb; balance numeric; movement_id uuid;
 begin
