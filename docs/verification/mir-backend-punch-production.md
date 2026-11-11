@@ -147,7 +147,7 @@ Backups : obtenir liste/statut/date de sauvegarde et PITR du projet MIR avant to
 | mir-pliage-audit-commercial.cjs | Métier : 11 PASS (inclut Magasin et prix) |
 | mir-boutique-audit-20261110.cjs | Statique : PASS, contrôle de 118 références |
 | mir-job-dossier-browser.cjs | 6/6 PASS après relance Chromium autorisée; rendu fictif isolé, 360/390/430/768/1024/1440 px, pas de RPC réelle; captures versionnées préservées |
-| Certification six sessions MIR TEST | Non exécutée localement : quatre comptes et clé publishable absents; aucun identifiant demandé au clavardage. Relance attendue du workflow existant lors de la PR |
+| Certification six sessions MIR TEST | **PASS dans GitHub Actions**, run 42941500212, job certify-six-real-roles, étape réelle et upload du rapport réussis; aucun identifiant demandé au clavardage. Non exécutée localement faute de configuration complète |
 | Répétition sur copie fidèle production | Non exécutée |
 | Double application gardée sur copie fidèle | Non exécutée |
 | Permissions métier / RPC / Storage en production | Non exécutées : backend absent et étape migration non atteinte |
@@ -158,11 +158,21 @@ Backups : obtenir liste/statut/date de sauvegarde et PITR du projet MIR avant to
 Erreur d'invocation : tentative de tests/mir-pages.cjs (fichier inexistant), remplacée par le fichier réel mir-pages-regressions.cjs; aucune réussite comptée pour cette invocation.
 Les tests et sources exécutés sont inchangés au SHA main indiqué; `git diff` ne contient que les livrables de cet audit.
 
+## Certification réelle et échec CI isolé
+
+La PR en brouillon est https://github.com/revetementsmir/Revetements-mir-/pull/2 .
+Le run https://github.com/revetementsmir/Revetements-mir-/actions/runs/42941500212 a exécuté le SHA `f5c50ae2b82f08fdffdfbabf3cbfc4b4cb40cbcd`.
+- Job `certify-six-real-roles` : completed/success, six authentifications et contrôles RPC réalisés avec les secrets GitHub Actions; rapport artefact `mir-real-role-certification`, ID 13820777607, empreinte ZIP sha256:93144109163b7c90ca5fd2279897130f9ba8703431bef9b6a780eb68c731426d.
+- Job `UI simulated and disposable SQL` : completed/failure. Le log reproduit exactement `'review' !== 'locked'`, tests/mir-punch-postgres.cjs:30:765, à 2026-11-11T01:47:57Z. L'étape navigateur de ce job est skipped; ne pas la compter comme réussie.
+- Les seuls changements du SHA testé sont les trois livrables d'audit; le test et les migrations correspondent au main inspecté. C'est une preuve supplémentaire du caractère préexistant de l'échec SQL.
+- La certification réelle couvre sessions/rafraîchissement, rôles, snapshots autorisés/refusés et organisation étrangère. Elle ne teste ni les RPC completion absentes, ni le dossier, ni les fichiers privés, ni un chantier fermé. Son succès ne lève pas ces blocages.
+- Ce complément de rapport est un changement documentaire ultérieur; il ne modifie aucun code testé.
+
 ## Matrice des permissions attendues — à vérifier avant production
 
 | Rôle | Punch | Dossier chantier | Heures/punchs dans le dossier | Documents | Limite de preuve |
 |---|---|---|---|---|---|
-| Admin | Configuration et opérations selon RPC existantes | Technique autorisé, libellé opérationnel Boss | Oui | Privés, gestion selon helper | Catalogue TEST + simulations; pas session réelle relancée |
+| Admin | Configuration et opérations selon RPC existantes | Technique autorisé, libellé opérationnel Boss | Oui | Privés, gestion selon helper | Session réelle et RPC du script certifiées; dossier/Storage non certifiés en réel |
 | Boss | Gestion, décisions et périodes selon contrat | Chantiers de son organisation | Oui | Privés | Idem |
 | Adjointe | Lecture/validation selon Punch, banque; pas décisions Boss réservées | Organisation selon helper | Oui | Privés | Idem |
 | Chef | Personnel et équipe autorisée selon snapshot Punch existant | Affectations autorisées | Non dans dossier | Lecture autorisée | Idem |
@@ -193,7 +203,7 @@ Reprise :
 - `mir-backend-punch-production-audit.json` : métadonnées des deux projets, historique officiel avec empreintes SQL; aucun compte ni donnée métier exporté.
 - `mir-backend-punch-production-audit.sql` : requêtes de catalogue en transactions READ ONLY.
 - Captures antérieures conservées dans `captures/job-dossier-phase1/`; la relance a vérifié les six formats avec données fictives. Elles ne sont pas des captures production.
-- Branche et PR : liens consignés dans la réponse de livraison; état CI à vérifier au SHA de la branche.
+- Branche : https://github.com/revetementsmir/Revetements-mir-/tree/codex/backend-punch-production ; PR #2 en brouillon, non fusionnée. CI réelle réussie et SQL échoué séparément au SHA ci-dessus.
 
 ### TEST — historique officiel
 
