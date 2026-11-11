@@ -27,6 +27,7 @@ begin
  alter policy mir_chat_phase3a_insert on storage.objects with check(not(bucket_id='mir-internal' and split_part(name,'/',2)='message'));
  alter policy mir_chat_phase3a_select on storage.objects using(not(bucket_id='mir-internal' and split_part(name,'/',2)='message'));
  select pg_get_functiondef('public.mir_message_attachment_validate(uuid,uuid,text)'::regprocedure) into source;
+ source:=replace(source,'mir_core.chat_storage_object(obj.name,obj.owner,obj.owner_id,obj.metadata)','mir_core.chat_file_object_valid(obj)');
  source:=replace(source,' return jsonb_build_object(''path'',obj.name,',
  $guard$ if not exists(select 1 from mir_core.chat_file_validations v where v.object_id=obj.id
   and v.object_version=coalesce(to_jsonb(obj)->>'version','') and v.object_path=obj.name
@@ -34,7 +35,7 @@ begin
   and v.mime=obj.metadata->>'mimetype' and v.bytes=(obj.metadata->>'size')::integer) then
   raise exception 'Analyse serveur requise' using errcode='22023';end if;
  return jsonb_build_object('path',obj.name,$guard$);
- if source not like '%Analyse serveur requise%' then raise exception 'Validateur incompatible' using errcode='55000';end if;execute source;
+ if source not like '%Analyse serveur requise%' or source not like '%mir_core.chat_file_object_valid(obj)%' then raise exception 'Validateur incompatible' using errcode='55000';end if;execute source;
  select md5(prosrc||coalesce(proacl::text,'')||
   (select with_check from pg_policies where schemaname='storage' and policyname='mir_chat_phase3a_insert')||
   (select qual from pg_policies where schemaname='storage' and policyname='mir_chat_phase3a_select'))

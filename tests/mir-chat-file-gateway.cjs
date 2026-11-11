@@ -9,14 +9,14 @@ async function fixture(){
   calls.push({url,init});if(url.endsWith('/auth/v1/user'))return Response.json(validAuth?{id:user}:{},{status:validAuth?200:401});
   if(url.includes('/rest/v1/rpc/')){
    const name=url.split('/').at(-1),args=JSON.parse(init.body);if(!active||args.org&&args.org!==org||args.conversation&&args.conversation!==conversation)return Response.json({},{status:403});
-   if(name==='mir_chat_file_record')return Response.json(null);
+   if(name==='mir_chat_file_record')return Response.json({objectId:args.object_id,version:'1',path:args.expected_path,mime:args.expected_mime,size:args.expected_size,userId:args.actor});
    if(name==='mir_chat_file_upload_authorize')return Response.json({userId:user});
    const object=files.get(args.object_path);if(!object)return Response.json({},{status:400});
    return Response.json({userId:user,objectId:id(50),path:args.object_path,version:'1',mime:'image/png',size:object.length});
   }
   if(url.includes('/storage/v1/object/')){
    const key=url.slice(url.indexOf(org)).split('?')[0];
-   if(init.method==='POST'){files.set(key,init.body);return Response.json({Key:key});}
+   if(init.method==='POST'){files.set(key,init.body);return Response.json({Key:key,Id:id(50),version:'1'});}
    if(revokeWhileDownloading)active=false;return new Response(files.get(key),{headers:{'Content-Type':'image/png'}});
   }
   throw Error('Unexpected upstream');

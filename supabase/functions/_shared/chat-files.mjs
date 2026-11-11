@@ -49,7 +49,7 @@ export function createChatFileService({env,fetch:network=globalThis.fetch,random
     if(!r.ok)throw new FileError('FILE_ACCESS_DENIED',r.status>=500?503:403);return r.json();
    };
    const uploadAuth=()=>rpc('mir_chat_file_upload_authorize',{org,conversation});
-   let bytes,objectPath=path,facts;
+   let bytes,objectPath=path,facts,uploaded;
    if(action==='upload'){
     if(!EXT[mime]||typeof base64!=='string'||base64.length%4||base64.length>Math.ceil(MAX_FILE_BYTES*4/3)+4||!/^[A-Za-z0-9+/]*={0,2}$/.test(base64))throw new FileError('FILE_ENCODING',400);
     const identity=await uploadAuth();if(identity.userId!==user.id)throw new FileError('FILE_ACCESS_DENIED',403);
@@ -57,10 +57,12 @@ export function createChatFileService({env,fetch:network=globalThis.fetch,random
     objectPath=canonicalPath(`${org}/message/${conversation}/${user.id}/${randomUUID()}.${EXT[mime]}`,org,conversation);
     const r=await backend('/storage/v1/object/mir-internal/'+objectPath,{method:'POST',headers:{apikey:service,Authorization:'Bearer '+service,'Content-Type':mime,'cache-control':'no-store','x-upsert':'false'},body:bytes});
     if(!r.ok)throw new FileError('UPLOAD_UNAVAILABLE',503);
+    uploaded=await r.json();if(!UUID.test(uploaded?.Id||''))throw new FileError('UPLOAD_UNAVAILABLE',503);
     await uploadAuth(); // Revocation during upload must not result in a successful attachment.
    }
    const authorize=()=>rpc('mir_chat_file_authorize',{org,conversation,object_path:objectPath});
-   facts=await authorize();if(facts.userId!==user.id||facts.path!==objectPath||!EXT[facts.mime])throw new FileError('FILE_ACCESS_DENIED',403);
+   facts=action==='upload'?{userId:user.id,path:objectPath,objectId:uploaded.Id,version:uploaded.version??null,mime,size:bytes.length}:await authorize();
+   if(facts.userId!==user.id||facts.path!==objectPath||!EXT[facts.mime])throw new FileError('FILE_ACCESS_DENIED',403);
    if(action!=='upload'){
     const r=await backend('/storage/v1/object/authenticated/mir-internal/'+objectPath+'?cacheNonce='+randomUUID(),{headers:{apikey:service,Authorization:'Bearer '+service,'Cache-Control':'no-store'}});
     if(!r.ok)throw new FileError('FILE_UNAVAILABLE',r.status>=500?503:404);
@@ -69,7 +71,9 @@ export function createChatFileService({env,fetch:network=globalThis.fetch,random
    if(bytes.length!==facts.size)throw new FileError('FILE_SIZE_MISMATCH',422);
    const inspected=inspectImage(bytes,facts.mime);
    const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
-   await rpc('mir_chat_file_record',{object_id:facts.objectId,object_version:facts.version,content_sha256:sha256,inspector:inspected.inspector,actor:user.id},true);
+   const proof=await rpc('mir_chat_file_record',{object_id:facts.objectId,object_version:facts.version,content_sha256:sha256,inspector:inspected.inspector,actor:user.id,expected_path:objectPath,expected_size:bytes.length,expected_mime:facts.mime},true);
+   if(proof.objectId!==facts.objectId||proof.path!==objectPath||proof.size!==bytes.length||proof.mime!==facts.mime||facts.version!==null&&proof.version!==facts.version)throw new FileError('FILE_CHANGED',409);
+   facts.version=proof.version;
    const latest=await authorize();
    if(latest.objectId!==facts.objectId||latest.version!==facts.version||latest.size!==facts.size||latest.mime!==facts.mime)throw new FileError('FILE_CHANGED',409);
    if(action!=='download')return json(200,{path:objectPath,mime:facts.mime,size:bytes.length,sha256,inspector:inspected.inspector});
