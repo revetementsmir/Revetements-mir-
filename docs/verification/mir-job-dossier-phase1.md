@@ -1,0 +1,60 @@
+# Phase 1 — Dossier chantier central
+
+Date : 11 novembre 2026  
+Branche : `codex/phase-1-dossier-chantier`  
+Base de départ : `ab2952610560350d40a90d05039c1be96ccab51f`
+
+## Portée livrée
+
+Un RPC de lecture central `mir_job_dossier_snapshot(org, job, page_size, page_before)` compose les données canoniques autour du `job_id` existant. Il ne crée aucune seconde table de chantiers et ne déplace aucune donnée. Le dossier expose équipe, employés, adresse, plans/documents, tâches, rapports, heures, punchs, extras, demandes, commandes, fournisseurs et messages liés au chantier. Les résultats volumineux sont bornés à 50 éléments et l’activité possède un curseur `nextBefore`.
+
+Les documents utilisent le bucket privé `mir-job-documents`; lecture et ajout sont contrôlés par Storage/RLS. Un chantier archivé reste lisible et est présenté en lecture seule. Aucune action métier nouvelle n’a été ajoutée : les actions sensibles continuent d’utiliser les RPC et audits existants.
+
+## Matrice de permissions
+
+| Rôle | Dossier | Heures/punchs | Fournisseurs | Portée |
+|---|---|---|---|---|
+| Admin technique | Lecture/gestion selon accès Admin existant | Oui | Oui | Organisation; libellé opérationnel « Boss » uniquement |
+| Boss | Lecture/gestion | Oui | Oui | Tous les chantiers de son organisation |
+| Adjointe | Lecture/coordination | Oui | Oui | Tous les chantiers de son organisation |
+| Chef d’équipe | Lecture | Non dans le snapshot central | Non | Chantiers affectés uniquement |
+| Employé | Lecture | Non dans le snapshot central | Non | Chantiers affectés uniquement |
+| Entrepôt | Lecture | Non | Oui | Chantiers liés à une tournée/commande uniquement |
+
+Dans tous les cas, une organisation étrangère, un chantier non affecté, un RPC direct non autorisé et un fichier hors périmètre sont refusés côté serveur.
+
+## Résultats
+
+| Vérification | Résultat |
+|---|---|
+| PostgreSQL jetable : isolation, fermeture, Storage, RPC direct, absence de duplication | 6/6 réussi |
+| Contrats UI/Storage/Admin | 5/5 réussi |
+| Captures responsive | 6/6 réussi |
+| Backend opérations employé existant | 12/12 réussi |
+| Suites statiques de non-régression ciblées | 8/10 réussies |
+| Certification réelle des six rôles MIR TEST | Bloquée par secrets incomplets |
+| Migration MIR TEST | Non exécutée — autorisation requise |
+| Production | Lecture seule; aucune modification |
+
+Les deux échecs de non-régression sont hors fichiers modifiés :
+
+- `mir-punch-postgres.cjs` : une période attendue `locked` reste `review`;
+- `mir-commerce-templates-browser.cjs` : la carte `prime-siding-2-30644` n’apparaît pas avant le délai de 30 s.
+
+Ils existaient dans les modules protégés et la Phase 1 ne les corrige pas.
+
+## Captures
+
+- `captures/job-dossier-phase1/phone-360.png`
+- `captures/job-dossier-phase1/phone-390.png`
+- `captures/job-dossier-phase1/phone-430.png`
+- `captures/job-dossier-phase1/tablet-portrait.png`
+- `captures/job-dossier-phase1/tablet-landscape.png`
+- `captures/job-dossier-phase1/desktop.png`
+
+## Limites et blocages
+
+- L’environnement fournit seulement les identifiants MIR TEST Admin, Employé et Client. Les comptes Boss, Chef, Adjointe et Entrepôt ainsi que la clé publishable de certification ne sont pas disponibles; aucune création de compte hébergé n’a été tentée.
+- La CLI Supabase officielle ne peut pas créer son dossier interne `/home/agent/.supabase`, monté en lecture seule. Le nom de migration respecte donc manuellement le format chronologique du dépôt.
+- La migration reste locale. Les captures utilisent un jeu de données représentatif et ne prouvent pas l’état hébergé tant que la migration n’a pas été autorisée sur MIR TEST.
+- Aucune mutation, migration ou publication n’a été faite sur MIR production.
