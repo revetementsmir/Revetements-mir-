@@ -2,7 +2,7 @@
 
 ## État exact
 
-**Passerelle déployée et activation restrictive appliquée sur MIR TEST; 37/37 contrôles hébergés du nouveau circuit réussis. Certification intégrale encore bloquée par l’expiration naturelle du JWT non attendue et l'absence d'un interne dans un second tenant TEST.** Aucune écriture ni lecture métier de MIR production, aucune fusion de PR, publication du site ou intervention Lot B.
+**Passerelle déployée et activation restrictive appliquée sur MIR TEST; 38/38 contrôles hébergés du nouveau circuit réussis. Certification intégrale encore bloquée uniquement par l'absence d'un interne dans un second tenant TEST et l’indisponibilité d’une écriture GitHub Secrets via les connexions actuelles.** Aucune écriture ni lecture métier de MIR production, aucune fusion de PR, publication du site ou intervention Lot B.
 
 ## Reprise du 11 novembre 2026 — installation TEST réelle
 
@@ -11,9 +11,10 @@
 - Activation restrictive `chat_phase3a_private_file_activate` appliquée avec succès après contrôle anonyme 401 et prévol CORS 204 pour `https://revetementsmir.github.io`.
 - Run hébergé [43045549628](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43045549628), SHA `55c599774f743331b5160abbee29c05492cad427` : **27 réussites, 0 échec fonctionnel** sur le nouveau circuit; statut volontaire `BLOCKED_TENANT_B_ACCESS`.
 - Reprise hébergée [43050426108](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43050426108), SHA `6314817d1672a68c931de31cb1cdb822d6c42692` : **37 réussites, 0 échec fonctionnel**. Retrait du seul chantier QA puis nouvelle lecture 403; réintégration puis lecture 200; déconnexion locale acceptée, ancienne session 401, nouvelle session 200; restauration confirmée des affectations Employé et Chef. Le statut demeure volontairement `PARTIALLY_VALIDATED` et le job rouge (code 2) afin de ne pas masquer le blocage tenant B.
+- Preuve d’expiration naturelle [43052372399](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43052372399), SHA `74d805179270a2aec86bebf7168b8444a6e4ff02` : **38 réussites, 0 échec fonctionnel**. Le runner a attendu le `exp` réel du JWT pendant environ une heure, sans changer la configuration Auth; la nouvelle lecture a été refusée 401. La session Admin a ensuite été renouvelée et les restaurations QA ont réussi.
 - Le header non standard `Cloudflare-CDN-Cache-Control` est retiré par la plateforme. Les réponses réelles conservent `Cache-Control`, `CDN-Cache-Control` et `Surrogate-Control` en `no-store`, `cf-cache-status: DYNAMIC`, `Vary: Authorization, Origin` et `nosniff`.
 - L'ancien runner échoue désormais sur son upload Storage direct, attendu après activation; il ne faut pas rouvrir cet ancien accès. Le nouveau runner est exécuté avec `always()` afin de garder les deux résultats visibles.
-- Restent non certifiés : expiration naturelle du JWT réellement attendue sur le nouveau circuit, et isolation bidirectionnelle positive avec un interne d’un second tenant TEST préexistant.
+- Reste non certifiée : isolation bidirectionnelle positive avec un interne d’un second tenant TEST. Le compte est maintenant autorisé, mais aucune opération de dépôt GitHub Secrets n’est exposée par les connexions disponibles; aucun mot de passe n’a été généré.
 
 La règle « ne publie rien » est respectée : déployer une nouvelle fonction serveur est une mise en service distincte. Aucun `deploy_edge_function`, `apply_migration`, `db push` ou changement de réglage hébergé n’a été exécuté dans cette reprise. Les seuls tests mutateurs hébergés concernent des fixtures clairement balisées dans le tenant A; les retraits d’accès A ont été restaurés. Aucun compte créé; aucune modification de membership dans B.
 
@@ -118,6 +119,8 @@ Les avis Security Advisors TEST ont été relus : types INFO/WARN existants sur 
 ## Compte tenant B : exigence exacte, sans invention
 
 Audit réel : projet **MIR TEST `hxtztkmbfpmzrieccwsg`**, tenant B **`3005c762-de14-4ab0-8bc8-16c4be92d0a4`** : **un membership, aucun interne actif**. Le compte présent est client, pas un compte de certification interne. **Il n’existe donc aucun identifiant interne B que je puisse précisément nommer dans cet état.** Le client présent ne doit ni être réutilisé comme interne ni recevoir de nouveau rôle pour faire passer les tests.
+
+Recontrôle après autorisation complémentaire : **zéro compte de recette équivalent**, un client actif, zéro interne actif. Le provisionnement n’a pas commencé car le stockage obligatoire des identifiants dans GitHub Secrets est inaccessible avec les outils actuellement autorisés. Cette décision évite de créer un compte dont le mot de passe ne pourrait être transmis ou conservé conformément au mandat.
 
 Le compte local derrière l’alias historique `MIR_SANDBOX_OTHER_CLIENT` est en réalité un Employé de **A**, pas de B; il ne doit pas être copié dans les secrets B sur la foi du nom de variable. Organisation et rôle sont toujours contrôlés côté serveur.
 

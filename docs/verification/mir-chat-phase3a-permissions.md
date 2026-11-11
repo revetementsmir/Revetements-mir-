@@ -2,7 +2,7 @@
 
 Base : `39de53260a134bae48143c1bdb1aa235335d6187`. Rôles et autorisations chantier existants réutilisés, aucun nouveau rôle.
 
-Mise à niveau courante : main `ebf54f676a84fc01717543f0cec224a173f90171` vérifié. Les règles métier ci-dessous sont conservées. La nouvelle passerelle de fichiers est **hébergée et activée sur MIR TEST seulement**. La recette courante compte 37/37 contrôles réussis : retrait, nouvelle lecture refusée, réintégration, nouvelle lecture autorisée, déconnexion/renouvellement et restauration QA. La certification globale reste partielle faute d’interne actif dans un second tenant TEST et faute d’attente réelle de l’expiration naturelle du JWT. Voir [le rapport courant](mir-chat-phase3a-private-files.md).
+Mise à niveau courante : main `ebf54f676a84fc01717543f0cec224a173f90171` vérifié. Les règles métier ci-dessous sont conservées. La nouvelle passerelle de fichiers est **hébergée et activée sur MIR TEST seulement**. La recette courante compte 38/38 contrôles réussis : retrait, nouvelle lecture refusée, réintégration, nouvelle lecture autorisée, expiration naturelle, déconnexion/renouvellement et restauration QA. La certification globale reste bloquée faute d’un second interne TEST; le stockage des identifiants dans GitHub Secrets n’est pas disponible via les connexions actuelles. Voir [le rapport courant](mir-chat-phase3a-private-files.md).
 
 | Contrôle fichiers chat | MIR TEST actuellement installé | Après activation préparée, non appliquée |
 |---|---|---|
@@ -46,7 +46,7 @@ Ces restrictions parfois asymétriques sont intentionnellement conservées : Pha
 
 Les participants historiques ne déterminent l’accès que pour les conversations privées. Les équipes et chantiers sont recalculés à chaque appel. Retrait = refus immédiat des nouvelles requêtes SQL et Storage non cachées; réintégration = accès rétabli. **Une réponse HTTP authentifiée déjà mise en cache peut encore être délivrée : échec de révocation immédiate constaté, non résolu.** Une URL déjà signée peut survivre jusqu’à son expiration (300 secondes par défaut client, pas un plafond SQL universel); ce délai n’est pas une révocation instantanée d’URL.
 
-Certification : les 37 contrôles de la passerelle sont hébergés et réels au SHA `6314817d1672a68c931de31cb1cdb822d6c42692`; les contrôles locaux/simulés restent distincts. Le tenant B et l’expiration naturelle du JWT empêchent encore un verdict CERTIFIÉ.
+Certification : les 38 contrôles de la passerelle sont hébergés et réels au SHA `74d805179270a2aec86bebf7168b8444a6e4ff02`; les contrôles locaux/simulés restent distincts. Seul le provisionnement sécurisé du tenant B et sa recette bidirectionnelle empêchent encore un verdict CERTIFIÉ.
 
 ## Reprise réelle autorisée — état courant
 
