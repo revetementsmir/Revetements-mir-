@@ -1,0 +1,38 @@
+name: MIR — Aujourd’hui mobile Phase 2
+on:
+  pull_request:
+    paths:
+      - 'dist/chantier.html'
+      - 'dist/chantier-app.js'
+      - 'dist/mir-today.*'
+      - 'tests/mir-today*.cjs'
+      - 'tests/fixtures/mir-today*'
+      - '.github/workflows/mir-today-pr.yml'
+permissions:
+  contents: read
+jobs:
+  today:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
+      - run: node --check dist/chantier-app.js && node --check dist/mir-today.js
+      - run: node tests/mir-today.cjs
+      - name: UI fictive — six formats
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: |
+          node tests/mir-today-browser.cjs
+          node tests/mir-punch-browser.cjs
+          node tests/mir-employee-portal-browser.cjs
+          node tests/mir-chef-boss-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-today-phase2
+          path: docs/verification/captures/today-phase2/after-*.png
+          retention-days: 14
