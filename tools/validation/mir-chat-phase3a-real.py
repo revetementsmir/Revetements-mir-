@@ -120,7 +120,10 @@ class Certification:
         missing=self.path.rsplit('/',1)[0]+'/'+str(uuid.uuid4())+'.png'
         r=self.validate(chef,missing);self.check('nonexistent object refused',self.denied(r),{'status':r['status']})
         r=self.validate(emp,self.path);self.check('attachment owned by another user refused',self.denied(r),{'status':r['status']})
-        private=self.rpc(emp,'mir_conversation_private',{'org':ORG,'other':self.sessions[chef]['id']})
+        # Preserve the existing business matrix: Employee -> Assistant/Boss;
+        # Employee -> Chef only when both are current members of the same team.
+        private_target=self.roles.get('assistant') or self.roles.get('boss') or chef
+        private=self.rpc(emp,'mir_conversation_private',{'org':ORG,'other':self.sessions[private_target]['id']})
         self.check('existing private conversation API preserved',self.ok(private),{'status':private['status']})
         r=self.validate(chef,self.path,private['data']);self.check('file from another conversation refused',self.denied(r),{'status':r['status']})
         for label,bad in [('tenant',self.path.replace(ORG,FOREIGN)),('conversation',self.path.replace(self.con,str(uuid.uuid4()))),('owner',self.path.replace(self.sessions[chef]['id'],self.sessions[emp]['id'])),('extension',self.path[:-4]+'.exe')]:
