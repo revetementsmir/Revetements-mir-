@@ -65,7 +65,16 @@ test('upload chat via serveur, autres photos inchangées et blobs invalidés au 
 test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch conservées',()=>{
  const baseline=require('./fixtures/mir-chat-baseline.json'),hash=x=>createHash('sha256').update(x).digest('hex');
  for(const [file,value]of Object.entries(baseline.files))assert.equal(hash(fs.readFileSync(file)),value,file);
- for(const [file,value]of Object.entries(require('./fixtures/mir-chat-main-215259.json').files))assert.equal(hash(fs.readFileSync(file)),value,'BECK/main '+file);
+ const beck=require('./fixtures/mir-chat-main-215259.json');
+ if(process.env.GITHUB_EVENT_NAME==='pull_request'&&process.env.GITHUB_EVENT_PATH){
+  // Actions checks a synthetic merge with today's main, which other approved
+  // PRs may change. Guard OUR head's diff, not freeze their catalogue globally.
+  const pr=JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8')).pull_request;
+  assert.match(pr.base.sha,/^[0-9a-f]{40}$/);assert.match(pr.head.sha,/^[0-9a-f]{40}$/);
+  const git=(...args)=>require('node:child_process').execFileSync('git',args,{encoding:'utf8'}).trim();
+  const ancestor=git('merge-base',pr.base.sha,pr.head.sha);
+  assert.equal(git('diff','--name-only',ancestor,pr.head.sha,'--',...Object.keys(beck.files)),'','Phase3A must not edit BECK/main files');
+ }else for(const [file,value]of Object.entries(beck.files))assert.equal(hash(fs.readFileSync(file)),value,'BECK/main '+file);
  const source=fs.readFileSync('dist/chantier-app.js','utf8');
  for(const [name,value]of Object.entries(baseline.functions)){const start=source.indexOf('  function '+name+'('),end=source.indexOf('\n  function ',start+1);assert.ok(start>=0,name);assert.equal(hash(source.slice(start,end<0?undefined:end)),value,name);}
  const client=fs.readFileSync('dist/portal-client.js','utf8');assert.match(client,/createSignedUrl\(path,300\)/);assert.doesNotMatch(client,/getPublicUrl/);
