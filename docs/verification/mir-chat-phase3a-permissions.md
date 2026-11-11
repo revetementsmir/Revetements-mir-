@@ -2,6 +2,19 @@
 
 Base : `39de53260a134bae48143c1bdb1aa235335d6187`. Rôles et autorisations chantier existants réutilisés, aucun nouveau rôle.
 
+Mise à niveau courante : main `215259c957a1d939e9fbdc52524623153cc3b910` intégré à la branche seulement. Les règles métier ci-dessous sont conservées. La nouvelle passerelle de fichiers est **préparée, pas hébergée ni activée** : voir [le rapport courant](mir-chat-phase3a-private-files.md).
+
+| Contrôle fichiers chat | MIR TEST actuellement installé | Après activation préparée, non appliquée |
+|---|---|---|
+| Employé/Chef/Adjointe/Boss/Admin lisent | Seulement leurs conversations; cache résiduel constaté | Même accès métier, revérifié au POST avant et après lecture des octets |
+| Entrepôt | Périmètre logistique existant | Identique, aucun nouveau droit |
+| Lire/uploader/signer directement dans Storage | Autorisé selon les anciennes policies | Fermé uniquement pour le scope message; passerelle privée obligatoire |
+| Valider un PNG | Métadonnées serveur | Structure/CRC/décompression bornée des octets; attestation serveur avant rattachement |
+| Fabriquer une attestation | Table/RPC encore absentes | Aucun utilisateur ne le peut; seul service_role inspecteur, accès courant vérifié |
+| Autres modules/buckets | Inchangés | Inchangés, aucune nouvelle policy permissive |
+
+Ne pas lire cette matrice future comme une preuve de mise en service. La passerelle retourne actuellement 404. Le compte client de B n’est pas un compte interne : aucun membership/compte B n’a été modifié, accès bidirectionnel toujours bloqué. Les liens déjà émis/copies déjà délivrées demandent un traitement séparé; aucun contrôle SQL ne peut effacer un fichier déjà reçu.
+
 | Opération | Employé | Chef | Adjointe | Boss | Admin technique |
 |---|---|---|---|---|---|
 | Lire/écrire une conversation privée existante | Participant actif | Participant actif | Participant actif | Participant actif | Participant actif |

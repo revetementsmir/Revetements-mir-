@@ -1,6 +1,18 @@
 # MIR — Phase 3A : fondations et sécurité du clavardage
 
-État courant au 11 novembre 2026 : **blocage Support corrigé sur MIR TEST, PNG accepté, recette reprise; validation globale À VÉRIFIER, pas entièrement certifiée**. Un téléchargement authentifié déjà mis en cache survit au retrait; ce résultat reste un échec, pas un succès RLS. Production intacte. L’historique ci-dessous est conservé.
+État courant au 11 novembre 2026 : **branche mise à niveau avec main 215259c; corrections cache/chemins/PNG préparées et testées localement, NON déployées/activées. Certification réelle incomplète.** Le backend actuel garde son défaut de cache; le second tenant n’a pas de membre interne actif. Production intacte. [Rapport courant](mir-chat-phase3a-private-files.md) · [JSON courant](mir-chat-phase3a-private-files-results.json).
+
+## Reprise courante — mise à niveau main et fichiers privés
+
+Main `215259c957a1d939e9fbdc52524623153cc3b910` intégré uniquement à la branche dédiée; Boutique BECK préservée par empreintes/tests. Dernière suite complète sur `c385ad93eb20205769dc29024bf73a981bcbb98b` : **43/43 suites locales**; **49/49 contrôles réels du backend actuellement installé** et six rôles réels réussis, pas une validation de la nouvelle passerelle absente. La relance CI sur `2f0d043` avait 10 verts/2 erreurs SQL héritées inchangées; le garde BECK a ensuite été adapté au nouveau main approuvé indépendamment (PR #7), sans changement catalogue par cette mission. QR Entrepôt non modifié.
+
+Une passerelle privée et une activation SQL gardée sont préparées : contrôle courant à chaque POST de lecture, aucun nouveau lien Storage chat, analyse structure/CRC/décompression bornée des PNG, attestation privée réservée au serveur. L’ancienne fixture 68 octets a un CRC invalide; une fixture correcte de 70 octets est maintenant utilisée. Analyse binaire prouvée **localement seulement**, aucun antivirus.
+
+MIR TEST hébergé : ancienne URL cachée toujours 200 après retrait (échec conservé), chemin encodé natif toujours 500, nouvelle passerelle 404. Aucune nouvelle migration ou fonction déployée dans cette reprise, conformément à l’interdiction de publication. Les retraits/réintégrations de recette concernent A seulement et sont restaurés; **aucun compte ni membership B modifié**.
+
+Tenant B `3005c762-de14-4ab0-8bc8-16c4be92d0a4` : un compte client, zéro interne actif; aucun compte interne existant à nommer. Les trois secrets précis et les conditions d’accès sont documentés dans le rapport courant. Aucune certification bidirectionnelle inventée. Attendre autorisation de mise en service TEST, décision de traitement des anciens liens/cache et accès B conforme. **PR #4 brouillon, aucune production, aucune fusion de PR, aucun Lot B.**
+
+## Historique — correctifs Support et recette antérieure
 
 ## Reprise autorisée — correctifs Storage et certification réelle
 
