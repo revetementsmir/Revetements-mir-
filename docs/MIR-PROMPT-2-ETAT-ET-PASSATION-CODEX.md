@@ -4,9 +4,9 @@
 
 La Phase 3C est développée sur `codex/phase-3c-centre-aide-soutien`, depuis la tête 3B `62bb65d8d01f521ee9feec63db9a2820070fb735`, elle-même dépendante de 3A `f5c2aa04450d708a8f86da51bc3c778d0ebf75e7`. Les certifications 3A/3B n’ont pas été rejouées.
 
-Sur MIR TEST uniquement, les migrations `phase3c_help_support_hardening`, `phase3c_support_create_fix` et `phase3c_support_account_category` sont installées. Le Centre d’aide Harmony s’ouvre partout sans navigation, filtre FAQ/procédures côté serveur, expose recherche/catégories et états chargement/vide/erreur/hors ligne. Le soutien fournit demandes structurées idempotentes, suivi, routage Adjointe, notifications, pièces privées existantes et notes internes exclues du snapshot client.
+Sur MIR TEST uniquement, les migrations `phase3c_help_support_hardening`, `phase3c_support_create_fix`, `phase3c_support_account_category`, `phase3c_client_organization_scope` et `phase3c_explicit_client_scope` sont installées. Les appels client courants exigent désormais l’organisation explicite et la revalident contre le membership actif. Le Centre d’aide Harmony fournit recherche/catégories, états explicites, demandes idempotentes, suivi, routage Adjointe, photo/PDF privés et notes internes exclues du snapshot client.
 
-Preuves : recette hébergée **7/7** avec trois sessions Auth réelles; recette Chromium privée MIR TEST **9/9** à 390×844, 768×1024 et 1440×900; tests locaux ciblés **20/20**. Verdict : **PARTIELLEMENT VALIDÉ**, car l’isolation bidirectionnelle propre aux tables de soutien entre deux organisations et l’envoi navigateur complet photo/PDF restent à exécuter. Voir `docs/verification/mir-phase3c-help-support.md`. Production et publication publique intactes.
+Preuves : recette hébergée **7/7**; recette Chromium privée MIR TEST **16/16** avec demande réelle, double clic sans doublon, photo/PDF ouverts et réponse Adjointe; tests locaux ciblés **22/22**. Le garde-fou refuse toute configuration autre que MIR TEST avant Auth, test négatif sans réseau **2/2**. Verdict : **PARTIELLEMENT VALIDÉ** uniquement parce qu’il n’existe pas deux clients distincts utilisables : le seul identifiant client est membre actif de A et B. Aucun compte ou membership n’a été modifié. Production et publication publique intactes.
 
 ## Addendum courant — Phase 3B, 11 novembre 2026
 
