@@ -608,6 +608,17 @@
     }
   }
   async function init(){updateCount();const [response,visibility,adseal,kaycanSwatches,regionalPricing]=await Promise.all([fetch('./catalogue-fd6866b49d21.json'),fetch('./boutique-visibilite.json',{cache:'no-cache'}),fetch('./catalogue-adseal-4580.json').then(r=>r.ok?r.json():null).catch(()=>null),fetch(screwAssetRoot+'kaycan-fascia-colours.json').then(r=>r.ok?r.json():{}).catch(()=>({})),fetch('./mir-regional-pricing-20261110.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null)]);if(!visibility.ok)throw new Error('La disponibilité des articles ne peut pas être vérifiée. Réessayez dans un instant.');const {hidden}=await visibility.json();if(!Array.isArray(hidden))throw new Error('La disponibilité des articles est invalide.');hiddenProducts=new Set(hidden);if(!response.ok)throw new Error('Le catalogue ne peut pas être chargé. Réessayez dans un instant.');materials=(await response.json()).materials||[];for(const material of materials){const price=regionalPricing?.priced?.[material.id];if(price)material.regionalPricing={...price,researchedOn:regionalPricing.researchedOn,markupPercent:regionalPricing.markupPercent};}
+  const ridgewood=materials.find(material=>material.id==='canexel-ridgewood-d5');
+  if(ridgewood?.stableSidingPreview){
+    const variants=await Promise.all(ridgewood.colors.map(async color=>({
+      src:ridgewood.stableSidingPreview.baseImage,colorId:color.id,colorLut:await V.colorLut(color.swatchUrl),
+      kind:'product',assetKind:'mir_siding_color_demo',matchScope:'illustration',exactProductMatch:false,
+      alt:`Échantillon CanExel Ridgewood D-5 — ${color.name}`,credit:'Les Revêtements MIR — illustration de couleur',
+      sourceUrl:color.sourceUrl,note:'Même échantillon Ridgewood D-5; teinte écran indicative.',rightsStatus:'user_authorized_generated_illustration',
+      cardPresentation:'sample',cardObjectPosition:'50% 50%',widthPx:1254,heightPx:1254
+    })));
+    ridgewood.images=[...(ridgewood.images||[]),...variants.filter(image=>image.colorLut)];
+  }
   await window.MIRBoutiquePricing?.load();
   for(const material of materials){const rows=window.MIRBoutiquePricing?.rows().filter(x=>x.itemId===material.id)||[];if(rows.length)material.regionalPricing=rows.some(x=>x.formatId)?{formatPrices:Object.fromEntries(rows.map(x=>[x.formatId,{amount:Number.isInteger(x.amountCents)?x.amountCents/100:null}]))}:{amount:Number.isInteger(rows[0].amountCents)?rows[0].amountCents/100:null};}
   const sealant=materials.find(m=>m.id===adseal?.id);

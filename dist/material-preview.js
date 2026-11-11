@@ -177,6 +177,26 @@
     }));
     return samples.get(url);
   }
+  async function colorLut(src) {
+    const url = local(src); if (!url) return null;
+    return new Promise(resolve => {
+      const image = new Image();
+      image.onload = () => {
+        try {
+          const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 32;
+          const ctx = canvas.getContext('2d', {willReadFrequently:true});
+          ctx.drawImage(image, image.naturalWidth*.03, image.naturalHeight*.08, image.naturalWidth*.94, image.naturalHeight*.84, 0, 0, canvas.width, canvas.height);
+          const data=ctx.getImageData(0,0,canvas.width,canvas.height).data,channels=[[],[],[]];
+          for(let i=0;i<data.length;i+=4)if(data[i+3]>230){channels[0].push(data[i]);channels[1].push(data[i+1]);channels[2].push(data[i+2]);}
+          resolve(Object.fromEntries(['r','g','b'].map((key,index)=>{
+            const values=channels[index].sort((a,b)=>a-b);
+            return [key,Array.from({length:33},(_,i)=>Number((values[Math.round(i*(values.length-1)/32)]/255).toFixed(5)))];
+          })));
+        } catch { resolve(null); }
+      };
+      image.onerror=()=>resolve(null);image.src=url;
+    });
+  }
   function smoothSVG(m,c,hex) {
     if(!(m.applications||[]).includes('siding'))return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 680" role="img" aria-label="${esc(m.name+' · '+c.name+' · référence de couleur')}"><rect width="800" height="680" fill="#fff"/><rect x="184" y="144" width="432" height="372" rx="3" fill="${esc(hex)}" stroke="#26352b" stroke-opacity=".18"/><text x="400" y="590" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#354735">${esc(c.name)}</text><text x="400" y="622" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#697567">Référence de couleur · aperçu à l’écran</text><text x="400" y="648" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#697567">Photo du produit accessible séparément</text></svg>`;
     const panel = m.renderPattern === 'panel' || /panel|panneau/.test(norm(m.name));
@@ -252,5 +272,5 @@
     element.style.backgroundColor=hex;element.replaceChildren();element.dataset.displayColor=hex;
   }
   function cancel(element){if(element)element._materialPreviewRequest=Symbol('cancelled-preview');}
-  root.MIRMaterialPreview={recipe,render,svg,stableSidingSVG,paintChip,displayColor,smooth,colorReference,cancel,photoType,photoLabel,photoImage,photoUnavailable};
+  root.MIRMaterialPreview={recipe,render,svg,stableSidingSVG,paintChip,displayColor,colorLut,smooth,colorReference,cancel,photoType,photoLabel,photoImage,photoUnavailable};
 })(typeof window!=='undefined'?window:globalThis);
