@@ -1,0 +1,45 @@
+name: MIR chat Phase 3A real TEST
+on:
+  pull_request:
+    paths:
+      - 'tools/validation/mir-chat-phase3a-real.py'
+      - '.github/workflows/mir-chat-phase3a-real.yml'
+      - 'supabase/migrations/*chat_phase3a*'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mir-chat-phase3a-real-test
+  cancel-in-progress: false
+jobs:
+  real-test:
+    if: github.head_ref == 'codex/phase-3a-clavardage-securite' || github.ref_name == 'codex/phase-3a-clavardage-securite'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MIR_CHAT_WORK_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      MIR_CHAT_REAL_REPORT: artifacts/mir-chat-phase3a-real.json
+      MIR_SANDBOX_PUBLISHABLE_KEY: ${{ secrets.MIR_SANDBOX_PUBLISHABLE_KEY }}
+      MIR_SANDBOX_ADMIN_EMAIL: ${{ secrets.MIR_SANDBOX_ADMIN_EMAIL }}
+      MIR_SANDBOX_ADMIN_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
+      MIR_SANDBOX_BOSS_EMAIL: ${{ secrets.MIR_SANDBOX_BOSS_EMAIL }}
+      MIR_SANDBOX_BOSS_PASSWORD: ${{ secrets.MIR_SANDBOX_BOSS_PASSWORD }}
+      MIR_SANDBOX_CHEF_EMAIL: ${{ secrets.MIR_SANDBOX_CHEF_EMAIL }}
+      MIR_SANDBOX_CHEF_PASSWORD: ${{ secrets.MIR_SANDBOX_CHEF_PASSWORD }}
+      MIR_SANDBOX_EMPLOYEE_EMAIL: ${{ secrets.MIR_SANDBOX_EMPLOYEE_EMAIL }}
+      MIR_SANDBOX_EMPLOYEE_PASSWORD: ${{ secrets.MIR_SANDBOX_EMPLOYEE_PASSWORD }}
+      MIR_SANDBOX_ASSISTANT_EMAIL: ${{ secrets.MIR_SANDBOX_ASSISTANT_EMAIL }}
+      MIR_SANDBOX_ASSISTANT_PASSWORD: ${{ secrets.MIR_SANDBOX_ASSISTANT_PASSWORD }}
+      MIR_SANDBOX_WAREHOUSE_EMAIL: ${{ secrets.MIR_SANDBOX_WAREHOUSE_EMAIL }}
+      MIR_SANDBOX_WAREHOUSE_PASSWORD: ${{ secrets.MIR_SANDBOX_WAREHOUSE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recette HTTPS réelle — comptes existants, TEST épinglé
+        run: python3 tools/validation/mir-chat-phase3a-real.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-chat-phase3a-real
+          path: artifacts/mir-chat-phase3a-real.json
+          if-no-files-found: error
+          retention-days: 14
