@@ -1,5 +1,13 @@
 # MIR — État exhaustif et passation d’exécution du Prompt 2 pour Codex
 
+## Addendum courant — Phase 3C, 11 novembre 2026
+
+La Phase 3C est développée sur `codex/phase-3c-centre-aide-soutien`, depuis la tête 3B `62bb65d8d01f521ee9feec63db9a2820070fb735`, elle-même dépendante de 3A `f5c2aa04450d708a8f86da51bc3c778d0ebf75e7`. Les certifications 3A/3B n’ont pas été rejouées.
+
+Sur MIR TEST uniquement, les migrations `phase3c_help_support_hardening`, `phase3c_support_create_fix`, `phase3c_support_account_category`, `phase3c_client_organization_scope`, `phase3c_explicit_client_scope` et `phase3c_two_client_recipe` sont installées, ainsi que `mir-support-tenant-recipe` v1. Les appels client exigent l’organisation explicite et revalident le membership actif. Le Centre d’aide Harmony fournit recherche/catégories, états explicites, demandes idempotentes, suivi, routage Adjointe, photo/PDF privés et notes internes exclues du snapshot client.
+
+Preuves : recette hébergée **7/7**; navigateur privé **16/16** avec demande réelle, double clic sans doublon, photo/PDF ouverts et réponse Adjointe; isolation A↔B **18/18** avec deux clients Auth distincts et memberships exclusifs; tests locaux ciblés **23/23**. Le garde-fou TEST passe **2/2** sans réseau. Verdict : **CERTIFIÉ sur MIR TEST**. Limites : pas d’appareil physique/Safari, frontend non publié et dépendance 3B non fusionnée. Production intacte.
+
 ## Addendum courant — Phase 3B, 11 novembre 2026
 
 La Phase 3A reste certifiée sur MIR TEST et n’a pas été rejouée. La branche 3B `codex/phase-3b-clavardage-mobile` dépend explicitement de sa tête `f5c2aa04450d708a8f86da51bc3c778d0ebf75e7`, car la PR #4 n’était pas fusionnée au démarrage.
@@ -242,7 +250,7 @@ Légende test : **Réel** = vérifié sur MIR TEST ou service réel par une preu
 
 | Exigence | État | Test | Associés |
 |---|---|---|---|
-| FAQ/demandes/chat client, transfert, statuts, non lus, pièces, notes internes | Partielle sur MIR TEST seulement | Réel schéma/RPC TEST; UI non testée | `help_faq`, `support_*`, `mir_client_center_snapshot`, `mir_support_*`; migration absente du dépôt |
+| FAQ/demandes/chat client, transfert, statuts, non lus, pièces, notes internes | Partiellement validée sur MIR TEST | Réel API 7/7 + navigateur privé 9/9; isolation bidirectionnelle soutien et envoi navigateur PDF à compléter | `help_faq`, `support_*`, `mir_client_center_snapshot`, `mir_support_*`; migrations Phase 3C versionnées; rapport `mir-phase3c-help-support.md` |
 | Clavardage interne mobile : photo/PDF privés, recherche, pagination, non-lus, brouillon, envoi unique, hors ligne | Partiel | Réel MIR TEST 25/25 + isolation A↔B; UI testée en simulation sur six formats | `mir-chat-files` v2; run `43084321137`; migrations `chat_phase3b_pdf_attachments`, `chat_phase3b_pdf_gateway_acl`, `chat_phase3b_pdf_attestation_constraint`; aucun repli Storage; frontend non publié |
 | Navigation PC exacte et intégrations Matériaux/Nous joindre | Partielle | Simulation | `mir-public-menu.*`; tests menu |
 | Navigation mobile fixe exacte | Partielle | Simulation | menu public/mobile; audit requis |

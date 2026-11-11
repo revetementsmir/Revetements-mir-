@@ -991,7 +991,7 @@
     catch(_){if(isDemo())throw new Error('Le catalogue de démonstration n’a pas pu être chargé.');}
     if(isDemo()){startDemo();return;}
     let operationStorage;try{operationStorage=sessionStorage;}catch(_){}
-    portalClient=window.MIRPortalClient.create({config:window.MIRPortalConfig,sdk:window.MIRSupabase,origin:location.origin,operationStorage});
+    portalClient=window.MIRPortalClient.create({config:window.MIRPortalConfig,sdk:window.MIRSupabase,origin:location.origin,operationStorage});window.MIRPortalActiveClient=portalClient;
     clientStatus=portalClient.getStatus();portalClient.subscribe(applyConnectedStatus);renderAuth();
     try {await portalClient.start();}catch(_){/* The client supplies an explicit error state, never demonstration data. */}
     if(authCallback&&portalClient.config.enabled)await runAuth(async()=>{const callback=authCallback;authCallback=null;await portalClient.completeCallback(callback);});

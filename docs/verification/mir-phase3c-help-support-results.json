@@ -1,0 +1,21 @@
+{
+  "project": "hxtztkmbfpmzrieccwsg",
+  "environment": "MIR TEST",
+  "productionMutation": false,
+  "hostedApi": { "passed": 7, "failed": 0, "authSessions": 3 },
+  "tenantIsolation": { "passed": 18, "failed": 0, "distinctClients": 2, "exclusiveMemberships": true, "directions": ["A-to-B", "B-to-A"] },
+  "privateBrowser": { "passed": 16, "failed": 0, "viewports": ["390x844", "768x1024", "1440x900"], "photo": true, "pdf": true, "assistantReply": true, "duplicateCount": 1 },
+  "local": { "testGuard": "2/2", "phase3c": "6/6", "phase3aRegression": "8/8", "todayPunchRegression": "7/7" },
+  "migrationsInstalled": [
+    "phase3c_help_support_hardening",
+    "phase3c_support_create_fix",
+    "phase3c_support_account_category",
+    "phase3c_client_organization_scope",
+    "phase3c_explicit_client_scope",
+    "phase3c_two_client_recipe"
+  ],
+  "limitations": [
+    "No physical-device or Safari proof"
+  ],
+  "verdict": "CERTIFIE SUR MIR TEST"
+}
