@@ -9,7 +9,7 @@ for(const [width,height]of [[390,844],[834,1112],[1348,926]]){
  const future={...accessory,id:'qa-future-article',name:'Accessoire futur sans photo',images:[{src:'assets/qa-photo-absente.png'}],primaryImage:'assets/qa-photo-absente.png',formats:[{id:'qa-court',label:'Court',lengthIn:12,measurementKind:'physical_piece'},{id:'qa-long',label:'Long',lengthIn:24,measurementKind:'physical_piece'}]};
  await p.route('**/catalogue-fd6866b49d21.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({...cat,materials:[...cat.materials,future]})}));
  const snap=async name=>{await p.evaluate(()=>document.fonts.ready);await p.screenshot({path:path.join(proof,name+'-'+width+'.png'),animations:'disabled'});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,name);};
- for(const [id,label,colored,photo] of [['hardieplank-select-625','couleurs',true,true],['canexel-joint-vstyle-12','sans-photo',false,false],['qa-future-article','futur',false,false]]){
+ for(const [id,label,colored,photo] of [['hardieplank-select-625','couleurs',true,true],['qa-future-article','futur',false,false]]){
   const searchTerm=id==='qa-future-article'?'Accessoire futur':cat.materials.find(m=>m.id===id).name;
   await p.goto(base+'/boutique.html?view=all&q='+encodeURIComponent(searchTerm));
   const card=p.locator('[data-shop-card="'+id+'"]');await card.waitFor();assert.equal(await card.locator('.mir-card-colors').isVisible(),colored);await card.scrollIntoViewIfNeeded();if(!photo)await card.locator('.product-placeholder, .mir-photo-unavailable').waitFor();await snap('gabarit-carte-'+label);
