@@ -33,8 +33,10 @@ Dans tous les cas, une organisation étrangère, un chantier non affecté, un RP
 | Backend opérations employé existant | 12/12 réussi |
 | Suites statiques de non-régression ciblées | 8/10 réussies |
 | Certification réelle des six rôles MIR TEST | Bloquée par secrets incomplets |
-| Migration MIR TEST | Non exécutée — autorisation requise |
+| Migration MIR TEST | Réussie le 11 novembre 2026 après autorisation |
 | Production | Lecture seule; aucune modification |
+
+Vérification hébergée après migration : RPC et table présents, bucket privé, deux policies Storage, `anon` sans droit d’exécution et `authenticated` autorisé. Le conseiller Health ne retourne aucun avertissement. Les avis Security/Performance restants sont des constats globaux déjà présents (tables privées sans policies de lecture directe, fonctions historiques et index encore inutilisés); aucun droit direct n’a été ajouté sur `mir_core.job_documents`.
 
 Les deux échecs de non-régression sont hors fichiers modifiés :
 
@@ -56,5 +58,5 @@ Ils existaient dans les modules protégés et la Phase 1 ne les corrige pas.
 
 - L’environnement fournit seulement les identifiants MIR TEST Admin, Employé et Client. Les comptes Boss, Chef, Adjointe et Entrepôt ainsi que la clé publishable de certification ne sont pas disponibles; aucune création de compte hébergé n’a été tentée.
 - La CLI Supabase officielle ne peut pas créer son dossier interne `/home/agent/.supabase`, monté en lecture seule. Le nom de migration respecte donc manuellement le format chronologique du dépôt.
-- La migration reste locale. Les captures utilisent un jeu de données représentatif et ne prouvent pas l’état hébergé tant que la migration n’a pas été autorisée sur MIR TEST.
+- La migration est appliquée sur MIR TEST seulement. Les captures utilisent un jeu de données représentatif; la recette visuelle intercomptes reste à reprendre lorsque les quatre comptes manquants seront disponibles.
 - Aucune mutation, migration ou publication n’a été faite sur MIR production.
