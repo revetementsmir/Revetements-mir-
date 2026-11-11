@@ -26,7 +26,13 @@ class GatewayCertification(existing.Certification):
             r=self.gateway(key,'download',path=self.path)
             self.check('gateway real read '+role,r['status']==403 if role=='warehouse' else r['status']==200,{'status':r['status']})
             if r['status']==200:
-                self.check('real noncacheable headers '+role,all('no-store' in (r['headers'].get(k) or '') for k in ['cache-control','cdn-cache-control','cloudflare-cdn-cache-control','surrogate-control']),{'headers':r['headers']})
+                # Supabase's edge strips Cloudflare-CDN-Cache-Control from the
+                # served response. Require the three surviving no-store
+                # directives and proof that Cloudflare did not cache it.
+                required=['cache-control','cdn-cache-control','surrogate-control']
+                uncached=all('no-store' in (r['headers'].get(k) or '') for k in required)
+                uncached=uncached and r['headers'].get('cf-cache-status') in ('DYNAMIC','BYPASS')
+                self.check('real noncacheable headers '+role,uncached,{'headers':r['headers'],'edgeStrippedHeader':'cloudflare-cdn-cache-control'})
         # Native Storage/signing must be closed only after the separately authorized activation.
         r=self.request('GET','/storage/v1/object/authenticated/mir-internal/'+self.path,actor=emp)
         self.check('native Storage read closed',self.denied(r),{'status':r['status']})
