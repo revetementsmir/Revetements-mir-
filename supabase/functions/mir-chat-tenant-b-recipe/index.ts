@@ -23,7 +23,7 @@ Deno.serve(async req=>{
   const made=await api('/auth/v1/admin/users',{method:'POST',body:JSON.stringify({email,password,email_confirm:true,app_metadata:{mir_test_fixture:'phase3a_tenant_b'}})});
   const newUser=await made.json();if(!made.ok||!newUser.id)throw Error('AUTH_CREATE');created=true;userId=newUser.id;
   const provision=await api('/rest/v1/rpc/mir_chat_tenant_b_recipe_provision',{method:'POST',body:JSON.stringify({actor:userId})});
-  const fixture=await provision.json();if(!provision.ok||!fixture.jobId)throw Error('PROVISION');provisioned=true;
+  const fixture=await provision.json();if(!provision.ok||!fixture.jobId)throw Error('PROVISION_'+provision.status+'_'+String(fixture?.code||'NO_CODE'));provisioned=true;
   const login=await api('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email,password})});
   const session=await login.json();password='';if(!login.ok||!session.access_token)throw Error('LOGIN');const bToken=session.access_token;session.access_token='';session.refresh_token='';
   const rpc=async(token:string,name:string,args:unknown)=>{const r=await api('/rest/v1/rpc/'+name,{method:'POST',body:JSON.stringify(args)},token);let data:any=null;try{data=await r.json();}catch{}return{status:r.status,data};};
