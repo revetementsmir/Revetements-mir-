@@ -33,6 +33,18 @@ function serve(){return http.createServer((req,res)=>{const file=path.resolve(ro
    const color=page.locator('[data-color]').first();await color.click();assert.equal(await color.getAttribute('aria-pressed'),'true');
    assert.ok(await page.locator('#related-grid [data-shop-card]').count()<=3);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`débordement fiche ${width}`);
+   await page.goto(base+'/boutique.html?view=all&q=PANELFAST');
+   const beck=page.locator('[data-shop-card="beck-panelfast-ags100"]');await beck.waitFor();
+   assert.match(await beck.innerText(),/BECK PANELFAST AGS-100/);
+   assert.match(await beck.innerText(),/1 1\/2 po/);
+   await beck.locator('h3 a').click();await page.locator('#product-add').waitFor();
+   assert.match(await page.locator('#product-price-note').innerText(),/Prix sur demande/);
+   assert.equal(await page.locator('[data-photo]').count(),2);
+   assert.equal(await page.locator('#product-format option').count(),4);
+   await page.locator('#product-format').selectOption('ags1000200-na');
+   assert.equal(await page.locator('#product-format').inputValue(),'ags1000200-na');
+   assert.equal(await page.locator('#product-unit').inputValue(),'boîtes');
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`débordement fiche BECK ${width}`);
    assert.deepEqual(errors,[]);
    results.push({width,passed:true});await context.close();
   }

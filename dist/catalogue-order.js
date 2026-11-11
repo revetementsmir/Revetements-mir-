@@ -3,7 +3,7 @@
  const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
  const categories=[['fibre','Fibrociment'],['wood','Bois & ingénierie'],['metal','Revêtements métalliques'],['vinyl','Vinyle'],['finish','Soffites & finitions'],['fix','Accessoires & fixations']];
  const sections=[['lap','Clins & profils de revêtement'],['panel','Panneaux'],['shake','Bardeaux décoratifs'],['soffit','Soffites'],['fascia','Fascias'],['opening','Contours & bandeaux'],['trim','Moulures & joints'],['coil','Rouleaux & feuilles à plier'],['fastener','Vis, clous & attaches'],['sealant','Scellants'],['touchup','Retouches'],['other','Autres accessoires']];
- const brandOrder=['James Hardie','Maibec','CanExel','JDP / Juste du Pin','Kaycan','Gentek Canada','Allura','LP SmartSide','Rialux','Westlake Royal','MAC Métal architectural','Light Trim','Vicwest','ADSEAL / Adfast','St-Laurent','Quality Edge','PRIME / Premier Outils Pro','3M'];
+ const brandOrder=['James Hardie','Maibec','CanExel','JDP / Juste du Pin','Kaycan','Gentek Canada','Allura','LP SmartSide','Rialux','Westlake Royal','MAC Métal architectural','Light Trim','Vicwest','ADSEAL / Adfast','St-Laurent','Quality Edge','BECK Fastener Group','PRIME / Premier Outils Pro','3M'];
  function section(m){const a=m.applications||[],s=norm(m.id+' '+m.name),p=m.renderPattern;
   if(a.includes('architectural-panel'))return 'panel';
   if(a.includes('siding')){if(p==='panel'||/hardiepanel|allura-panel|smartside-panel/.test(s))return 'panel';if(p==='shingle'||/shingle|shake/.test(s))return 'shake';return 'lap';}
