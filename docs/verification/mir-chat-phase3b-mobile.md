@@ -6,7 +6,7 @@ Verdict : **PARTIELLEMENT VALIDÉ** sur la branche `codex/phase-3b-clavardage-mo
 
 Les preuves 3A sont réutilisées sans rejouer leur certification complète : 38/38 contrôles passerelle au SHA `74d805179270a2aec86bebf7168b8444a6e4ff02`, puis 10/10 contrôles d’isolation A↔B au SHA `be90c35bb41def96a91cf90503b5c0b430d5369f`.
 
-Extension PDF installée uniquement sur MIR TEST le 11 novembre 2026 : migration `chat_phase3b_pdf_attachments`, `mir-chat-files` v2 et recette isolée `mir-chat-tenant-b-recipe` v3. Le bucket `mir-internal` demeure privé et limité à 10 MiB; seul `application/pdf` a été ajouté aux cinq MIME image. La fonction conserve `verify_jwt=false` uniquement avec la vérification Auth explicite et les RPC d’autorisation 3A inchangés.
+Extension PDF installée uniquement sur MIR TEST le 11 novembre 2026 : migrations `chat_phase3b_pdf_attachments`, `chat_phase3b_pdf_gateway_acl` et `chat_phase3b_pdf_attestation_constraint`, `mir-chat-files` v2 et recette isolée `mir-chat-tenant-b-recipe` v3. Le bucket `mir-internal` demeure privé et limité à 10 MiB; seul `application/pdf` a été ajouté aux cinq MIME image. La fonction conserve `verify_jwt=false` uniquement avec la vérification Auth explicite. Les migrations étendent au PDF l’attestation binaire service-only, la contrainte d’inspecteur et la validation objet existantes, sans élargir les ACL utilisateur ni les autorisations de conversation.
 
 ## Parcours réalisé
 
@@ -38,7 +38,8 @@ Captures fonctionnelles simulées :
 
 - 3A passerelle : 38/38, run GitHub `43052372399`.
 - 3A isolation tenant : 10/10, run GitHub `43067261753`.
-- Extension installée sur MIR TEST : `mir-chat-files` v2, `mir-chat-tenant-b-recipe` v3 et migration `chat_phase3b_pdf_attachments`.
+- Extension installée sur MIR TEST : `mir-chat-files` v2, `mir-chat-tenant-b-recipe` v3 et migrations `chat_phase3b_pdf_attachments`, `chat_phase3b_pdf_gateway_acl`, `chat_phase3b_pdf_attestation_constraint`.
+- La recette locale a détecté avant validation hébergée que la contrainte d’inspecteur 3A restait limitée aux images; la troisième migration l’étend exactement à `pdf-structure-v1`, sans modifier les ACL.
 - Recette ciblée 3B hébergée : **en attente du run associé au prochain SHA poussé**. Aucun résultat n’est anticipé dans ce rapport.
 - Aucune publication du frontend : la branche reste une proposition en PR brouillon.
 
