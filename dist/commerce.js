@@ -68,7 +68,40 @@
   function heroImage(m){const im=images(m);return im.find(x=>x.src===m.primaryImage)||im[0];}
   const presentation=V.photoType, photoLabel=V.photoLabel;
   function placeholder(){return '<div class="product-placeholder" role="img" aria-label="Photo fabricant non disponible"><svg viewBox="0 0 160 110" fill="none" stroke="currentColor" stroke-width="1"><path d="M18 85V30l65-15 60 31v50L78 70 18 85Zm0-55 60 26 65-10M78 56v40M38 25l61 27M58 20l61 28"/></svg><span>Visuel fabricant à compléter</span></div>';}
-  function imageMarkup(m,large=false,c=null){if(m.stableSidingPreview)return V.stableSidingSVG(m,c)||placeholder();const im=heroImage(m);return im?V.photoImage(im,m.name,{loading:large?'eager':'lazy',priority:large}):placeholder();}
+  function imageMarkup(m,large=false,c=null){if(m.stableSidingPreview)return V.stableSidingSVG(m,c)||placeholder();if(m.paintPotIndices)return paintPotSVG(m,c);const im=heroImage(m);return im?V.photoImage(im,m.name,{loading:large?'eager':'lazy',priority:large}):placeholder();}
+
+  // Sixteen studio packshots supplied by MIR: fixed 600x600 tiles in one 2400x2400 WebP.
+  // Keep the same SVG, viewport, framing and background; change only the selected cell.
+  const paintPotAtlas='./assets/products/mir-canexel-touchup/canexel-pots-16.webp';
+  const paintPotCell=600,paintPotColumns=4;
+  function paintPotIndex(m,c){
+    const choice=c||m.colors?.[0];
+    const index=m.paintPotIndices?.[norm(choice?.name)];
+    return Number.isInteger(index)&&index>=0&&index<16?index:null;
+  }
+  function paintPotSVG(m,c){
+    const choice=c||m.colors?.[0],index=paintPotIndex(m,choice);
+    if(index===null)return '<div class="sample-unavailable"><strong>'+esc(choice?.name||'Couleur à confirmer')+'</strong><span>Photo MIR de cette couleur à venir · consulter le nuancier.</span></div>';
+    const label=m.name+' — '+choice.name+' — visuel MIR indicatif';
+    const x=-paintPotCell*(index%paintPotColumns),y=-paintPotCell*Math.floor(index/paintPotColumns);
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="'+esc(label)+'" data-mir-canexel-pot="'+index+'" style="display:block;width:100%;height:100%;max-width:100%;object-fit:contain"><image href="'+paintPotAtlas+'" x="'+x+'" y="'+y+'" width="2400" height="2400" preserveAspectRatio="xMidYMid meet"/></svg>';
+  }
+  function renderPaintPot(el,m,c){
+    if(!el)return;
+    V.cancel(el);
+    const choice=c||m.colors?.[0],index=paintPotIndex(m,choice),svg=el.querySelector('svg[data-mir-canexel-pot]');
+    el.dataset.previewKind='mir-canexel-touchup';
+    el.dataset.colorId=choice?.id||'';
+    if(el.classList.contains('mir-catalogue-photo'))el.dataset.photoType=index===null?'empty':'packshot';
+    if(index===null||!svg){el.innerHTML=paintPotSVG(m,choice);return;}
+    const picture=svg.querySelector('image');
+    if(!picture){el.innerHTML=paintPotSVG(m,choice);return;}
+    picture.setAttribute('x',String(-paintPotCell*(index%paintPotColumns)));
+    picture.setAttribute('y',String(-paintPotCell*Math.floor(index/paintPotColumns)));
+    svg.setAttribute('data-mir-canexel-pot',String(index));
+    svg.setAttribute('aria-label',m.name+' — '+choice.name+' — visuel MIR indicatif');
+  }
+
   const screwAssetRoot='./assets/products/mir-screws/';
   const screwImages=new Map();
   function screwImage(path){
@@ -124,7 +157,7 @@
     canvas.dataset.colorId=c.id;
     canvas.hidden=false;
   }
-  function renderVisual(element,m,c){if(m.screwPreview)return renderScrew(element,m,c);if(m.keepProductPhoto)c=null;const recipe=V.recipe(m,c);if(recipe.kind==='missing_product'||recipe.kind==='missing_variant'){V.cancel(element);element.innerHTML=placeholder();return;}const rendered=V.render(element,m,c),request=element._materialPreviewRequest;return Promise.resolve(rendered).then(r=>{if(element._materialPreviewRequest===request&&element.querySelector('.sample-unavailable'))element.innerHTML=placeholder();return r;});}
+  function renderVisual(element,m,c){if(m.paintPotIndices)return renderPaintPot(element,m,c);if(m.screwPreview)return renderScrew(element,m,c);if(m.keepProductPhoto)c=null;const recipe=V.recipe(m,c);if(recipe.kind==='missing_product'||recipe.kind==='missing_variant'){V.cancel(element);element.innerHTML=placeholder();return;}const rendered=V.render(element,m,c),request=element._materialPreviewRequest;return Promise.resolve(rendered).then(r=>{if(element._materialPreviewRequest===request&&element.querySelector('.sample-unavailable'))element.innerHTML=placeholder();return r;});}
   function colors(m){return Array.isArray(m.colors)?m.colors:[];}
   function swatchClass(c){return !localAsset(c.swatchUrl)&&!/^#[0-9a-f]{6}$/i.test(c.hex||'')?' mir-named-swatch':'';}
   function swatch(c){return localAsset(c.swatchUrl)?`<img src="${esc(localAsset(c.swatchUrl))}" alt="" loading="lazy">`:/^#[0-9a-f]{6}$/i.test(c.hex||'')?`<span aria-hidden="true" style="display:block;width:100%;height:100%;background-color:${c.hex}"></span>`:`<span>${esc(c.name)}</span>`;}
@@ -136,7 +169,7 @@
   function hydrateChips(container=document){
     for(const card of container.querySelectorAll('[data-shop-card]')){
       const material=materials.find(m=>m.id===card.dataset.shopCard);
-      if(!material||material.keepProductPhoto)continue;
+      if(!material||(material.keepProductPhoto&&!material.paintPotIndices))continue;
       if(material.screwPreview)renderScrew(card.querySelector('.card-preview'),material,null);
       for(const button of card.querySelectorAll('[data-card-color]')){
         const color=colors(material).find(c=>c.id===button.dataset.cardColor);
@@ -351,6 +384,10 @@
         $('#product-photo-note').textContent='Illustration de la couleur choisie. Rendu écran indicatif.';
         return;
       }
+      if(m.paintPotIndices){
+        $('#product-photo-note').textContent=paintPotIndex(m,activeColor)===null?'Photo MIR non encore disponible pour cette teinte. Référence de couleur disponible dans le nuancier.':'Photo de retouche MIR · '+(activeColor?.name||'teinte à confirmer')+' · touche de peinture sèche sur le couvercle. Rendu écran indicatif.';
+        return;
+      }
       if(m.keepProductPhoto||m.screwPreview){
         const note=$('#product-photo-note');
         note.textContent=m.keepProductPhoto?'Photo du produit. L’échantillon de teinte est dans le nuancier.':
@@ -470,7 +507,7 @@
     };
     $('#selection-export').onclick=()=>{const payload={...list,createdAt:new Date().toISOString(),status:'selection_non_commandee',note:'Quantités souhaitées; prix, stock, unités livrables et compatibilités à confirmer.',items:list.items.filter(x=>sold(materials.find(m=>m.id===x.materialId))).map(x=>({...x,sourceUrl:materials.find(m=>m.id===x.materialId)?.sourceUrl||null}))};const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));a.href=url;a.download='MIR-selection-materiaux.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);};render();
   }
-  document.addEventListener('click',event=>{const b=event.target.closest('[data-card-color]');if(!b)return;const m=materials.find(m=>m.id===b.dataset.material),c=m?.colors?.find(c=>c.id===b.dataset.cardColor),card=b.closest('[data-shop-card]');if(!m||!c||!card)return;card.querySelectorAll('[data-card-color]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));if(!m.keepProductPhoto){renderVisual(card.querySelector('.card-preview'),m,c);card.querySelector('.card-photo-label').textContent=m.stableSidingPreview?'Échantillon MIR':m.screwPreview?'Aperçu de teinte':'Couleur choisie';}card.querySelector('.card-color-name').textContent=c.name;card.querySelectorAll('[data-card-link]').forEach(a=>a.href=productHref(m.id,c.id));});
+  document.addEventListener('click',event=>{const b=event.target.closest('[data-card-color]');if(!b)return;const m=materials.find(m=>m.id===b.dataset.material),c=m?.colors?.find(c=>c.id===b.dataset.cardColor),card=b.closest('[data-shop-card]');if(!m||!c||!card)return;card.querySelectorAll('[data-card-color]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));if(!m.keepProductPhoto||m.paintPotIndices){renderVisual(card.querySelector('.card-preview'),m,c);card.querySelector('.card-photo-label').textContent=m.paintPotIndices?'Pot de retouche MIR · teinte indicative':m.stableSidingPreview?'Échantillon MIR':m.screwPreview?'Aperçu de teinte':'Couleur choisie';}card.querySelector('.card-color-name').textContent=c.name;card.querySelectorAll('[data-card-link]').forEach(a=>a.href=productHref(m.id,c.id));});
   document.addEventListener('error',event=>{const img=event.target;if(img.tagName!=='IMG'||img.hasAttribute('data-catalogue-image')||!img.closest('.shop-card-photo,.category-photo,.product-main-photo,.selection-item-photo'))return;const holder=img.closest('.card-preview,.category-photo,.product-main-photo,.selection-item-photo');if(holder)holder.innerHTML=placeholder();},true);
   function attachScrewPreview(material,key){
     material.screwPreview=key;
@@ -537,8 +574,9 @@
     if(canexelPaint){
       const source='https://boutique.aluminiumbbouchard.ca/produit/peinture-de-retouche-pour-le-canexel-284ml/';
       const guide=colors(materials.find(m=>m.id==='canexel-vstyle')||{});
-      const names=['Acadia','Barista','Blanc','Bleu minuit','Bois de grange','Bois de Santal','Falaise','Granit','Gris brume','Loup gris','Moka foncé','Noir','Renard roux','Rouge campagne','Sable','Scandinave','Sierra','Yellowstone'];
+      const names=['Acadia','Barista','Blanc','Bleu minuit','Bois de grange','Bois de Santal','Charbon','Falaise','Granit','Gris brume','Loup gris','Moka foncé','Noir','Renard roux','Rouge campagne','Sable','Scandinave','Sierra','Toundra','Yellowstone'];
       canexelPaint.keepProductPhoto=true;
+      canexelPaint.paintPotIndices={'blanc':0,'noir':1,'gris brume':2,'sable':3,'bleu minuit':4,'granit':5,'toundra':6,'charbon':7,'moka fonce':8,'scandinave':9,'bois de santal':10,'acadia':11,'sierra':12,'barista':13,'falaise':14,'loup gris':15};
       canexelPaint.documents=[...canexelPaint.documents,{kind:'technical',title:'Aluminium B. Bouchard — couleurs et format 284 ml',url:source,verified:true}];
       canexelPaint.colors=names.map(name=>{
         const reference=guide.find(c=>norm(c.name)===norm(name));
