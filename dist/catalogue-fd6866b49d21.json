@@ -21654,7 +21654,7 @@
     {
       "id": "prime-siding-2-30724",
       "brand": "PRIME / Premier Outils Pro",
-      "name": "PRIME 30724 — Clous à revêtement 2 po, galvanisé à chaud (hdg)",
+      "name": "PRIME 30724 — Clous annelés en bobine 2 po · galvanisés à chaud",
       "manufacturerCode": "30724",
       "family": "Fixation",
       "applications": [
@@ -21708,7 +21708,7 @@
         "piecesPerBox": 4500,
         "boxesPerPallet": 60
       },
-      "unit": "boîte de 4500 clous — prix et offre MIR à confirmer",
+      "unit": "boîte de 4 500 clous",
       "colors": [],
       "colorStatus": "not_applicable",
       "paletteComplete": true,
@@ -21718,7 +21718,7 @@
       "maxPiece": {},
       "coverage": null,
       "status": "documented_reference",
-      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "commercialStatus": "MIR_product",
       "notes": [
         "Le catalogue regroupe revêtement, clôture et lattage. Ce classement ne valide pas la compatibilité avec tous les parements ni toutes les expositions.",
         "Aucun nombre de clous par pi² ni liaison automatique à James Hardie ou CanExel sans la prescription du système."
@@ -21729,27 +21729,31 @@
       "researchedOn": "2026-11-03",
       "images": [
         {
-          "src": "./assets/products/prime-reliure-basse-hdg.png",
-          "alt": "Illustration officielle PRIME : clous en bobine, basse, galvanisé à chaud (hdg)",
-          "sourceUrl": "https://www.premieroutilspro.com/wp-content/uploads/2025/07/PRIME_Catalogue_Clous_Attaches.pdf#page=7",
-          "assetSourceUrl": "https://www.premieroutilspro.com/wp-content/uploads/2025/07/PRIME_Catalogue_Clous_Attaches.pdf",
+          "src": "./assets/products/mir-provided-20261111/prime-30724-coil.webp",
+          "alt": "Bobine de clous annelés PRIME 30724 galvanisés à chaud",
           "kind": "product",
-          "exactProductMatch": false,
-          "matchScope": "range",
-          "credit": "PRIME / Premier Outils Pro — catalogue 2025",
-          "assetKind": "original_embedded_pdf_image",
-          "note": "Illustration de la famille de clous; la longueur exacte de la référence est donnée dans le tableau fabricant.",
-          "rightsStatus": "manufacturer_copyright_publication_permission_not_established",
+          "credit": "Les Revêtements MIR",
+          "assetKind": "MIR_user_provided_product_visual",
+          "exactProductMatch": true,
           "cardPresentation": "packshot",
-          "cardObjectPosition": "50% 50%",
-          "widthPx": 318,
-          "heightPx": 280
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        },
+        {
+          "src": "./assets/products/mir-provided-20261111/prime-30724-box.webp",
+          "alt": "Boîte PRIME 30724, 2 po et calibre 0,092",
+          "kind": "packaging",
+          "credit": "Les Revêtements MIR",
+          "assetKind": "MIR_user_provided_product_visual",
+          "exactProductMatch": true,
+          "cardPresentation": "packshot",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
         }
       ],
-      "primaryImage": "./assets/products/prime-reliure-basse-hdg.png",
-      "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
-      "imageStatus": "official_range_reference",
-      "exposureMm": null
+      "primaryImage": "./assets/products/mir-provided-20261111/prime-30724-coil.webp",
+      "catalogueScope": "MIR_supplied_exact_item",
+      "imageStatus": "MIR_provided_product_visual",
+      "exposureMm": null,
+      "orderable": true
     },
     {
       "id": "prime-siding-2-34733",
@@ -33854,14 +33858,14 @@
     {
       "id": "beck-panelfast-ags100",
       "brand": "BECK Fastener Group",
-      "name": "BECK PANELFAST AGS-100 — clous en bobine pour panneaux sur acier",
-      "manufacturerCode": "AGS-100",
-      "manufacturerCodeScope": "family",
+      "name": "BECK PANELFAST AGS-100 — Clous 1½ po pour panneaux sur acier",
+      "manufacturerCode": "AGS1000150-NA",
+      "manufacturerCodeScope": "sellable_variant",
       "family": "Fixation",
       "applications": [
         "fastener"
       ],
-      "description": "Clous PANELFAST à tête plate de 5/16 po, tige moletée et pointe balistique, assemblés en bobine plastique. Conçus pour fixer le fibrociment, le contreplaqué, l’OSB et les panneaux de gypse extérieur sur une ossature d’acier de 68 mil (14 ga) ou plus légère.",
+      "description": "Clous BECK PANELFAST AGS-100 de 1½ po (38 mm), tige moletée de 0,100 po et tête plate de 5/16 po, en bobines pour fixation de panneaux compatibles sur ossature d’acier. MIR offre uniquement ce format, en boîte de 12 bobines (3 000 clous).",
       "sourceUrl": "https://www.beck-fastening.com/en/plastic-coil-panelfast-pins-ags-100-xxxxna~p2554",
       "documents": [
         {
@@ -33879,13 +33883,20 @@
         "headDiameterIn": 0.3125,
         "collationAngleDeg": 21,
         "availableLengthsIn": [
-          1.5,
-          2,
-          2.5
-        ]
+          1.5
+        ],
+        "lengthIn": 1.5
       },
       "finish": "Aericote 1000",
       "specifications": [
+        {
+          "label": "Longueur vendue par MIR",
+          "value": "1½ po (38 mm)"
+        },
+        {
+          "label": "Prix MIR",
+          "value": "515,99 $ CA / boîte avant taxes"
+        },
         {
           "label": "Tête",
           "value": "Plate · diamètre nominal 5/16 po"
@@ -33926,7 +33937,7 @@
         "unit": "boîte",
         "status": "MIR_user_provided_box_visual_and_manufacturer_coil_capacity"
       },
-      "unit": "boîte de 12 bobines (3 000 clous) — prix MIR à confirmer",
+      "unit": "boîte de 12 bobines (3 000 clous)",
       "colors": [],
       "colorStatus": "not_applicable",
       "paletteComplete": true,
@@ -33937,18 +33948,18 @@
       "maxPiece": {},
       "coverage": null,
       "status": "documented_reference",
-      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
-      "catalogueScope": "manufacturer_reference_requested_for_MIR_shop",
+      "commercialStatus": "MIR_product",
+      "catalogueScope": "MIR_supplied_exact_item",
       "compatibilityStatus": "manufacturer_applications_subject_to_panel_system_project_and_tool_requirements",
       "mirPreferred": true,
       "sourceRefs": [],
       "notes": [
         "BECK publie l’usage pour contreplaqué, OSB, gypse extérieur et panneaux de fibrociment sur ossature d’acier de 68 mil (14 ga) ou plus légère.",
-        "Les visuels ont été fournis par MIR pour cette fiche. La longueur exacte n’est pas identifiable sur la photo et doit être choisie dans le format.",
-        "La prescription du fabricant du panneau, l’épaisseur réelle du support et la compatibilité de la cloueuse gouvernent la sélection finale."
+        "La prescription du fabricant du panneau, l’épaisseur réelle du support et la compatibilité de la cloueuse gouvernent la sélection finale.",
+        "MIR vend seulement le format 1½ po (38 mm) dans cette fiche."
       ],
       "gaps": [
-        "Prix, stock, délai et disponibilité des trois longueurs chez MIR à confirmer."
+        "Stock et disponibilité à confirmer avec MIR."
       ],
       "researchedOn": "2026-11-11",
       "formats": [
@@ -33957,22 +33968,6 @@
           "label": "1 1/2 po (38 mm) — AGS1000150-NA",
           "lengthIn": 1.5,
           "manufacturerCode": "AGS1000150-NA",
-          "measurementKind": "physical_piece",
-          "sourceUrl": "https://www.beck-fastening.com/en/plastic-coil-panelfast-pins-ags-100-xxxxna~p2554"
-        },
-        {
-          "id": "ags1000200-na",
-          "label": "2 po (50 mm) — AGS1000200-NA",
-          "lengthIn": 2,
-          "manufacturerCode": "AGS1000200-NA",
-          "measurementKind": "physical_piece",
-          "sourceUrl": "https://www.beck-fastening.com/en/plastic-coil-panelfast-pins-ags-100-xxxxna~p2554"
-        },
-        {
-          "id": "ags1000250-na",
-          "label": "2 1/2 po (63 mm) — AGS1000250-NA",
-          "lengthIn": 2.5,
-          "manufacturerCode": "AGS1000250-NA",
           "measurementKind": "physical_piece",
           "sourceUrl": "https://www.beck-fastening.com/en/plastic-coil-panelfast-pins-ags-100-xxxxna~p2554"
         }
@@ -33994,7 +33989,7 @@
           "variantMatch": false,
           "cardPresentation": "packshot",
           "cardObjectPosition": "50% 50%",
-          "note": "Bobine du produit fournie par MIR. La longueur exacte doit être sélectionnée dans la fiche.",
+          "note": "Visuel fourni par MIR du modèle PANELFAST AGS-100.",
           "alt": "Bobine de clous BECK PANELFAST AGS-100 sur fond clair",
           "rightsStatus": "provided_by_MIR_for_MIR_site"
         },
@@ -34014,13 +34009,427 @@
           "variantMatch": false,
           "cardPresentation": "packshot",
           "cardObjectPosition": "50% 50%",
-          "note": "Présentation MIR d’une boîte de 12 bobines; le prix et la disponibilité restent à confirmer.",
+          "note": "Présentation MIR d’une boîte de 12 bobines.",
           "alt": "Boîte ouverte contenant douze bobines de clous BECK PANELFAST AGS-100",
           "rightsStatus": "provided_by_MIR_for_MIR_site"
         }
       ],
       "primaryImage": "./assets/products/mir-provided-20261111/beck-panelfast-ags100-coil.webp",
-      "imageStatus": "MIR_provided_product_visual"
+      "imageStatus": "MIR_provided_product_visual",
+      "mirFixedPriceCents": 51599,
+      "priceCurrency": "CAD",
+      "orderable": true
+    },
+    {
+      "family": "Fixation",
+      "applications": [
+        "fastener",
+        "accessory"
+      ],
+      "colors": [],
+      "colorStatus": "not_applicable",
+      "paletteComplete": true,
+      "allowedPatterns": [],
+      "allowedOrientations": [],
+      "renderPattern": "plain",
+      "maxPiece": {},
+      "coverage": null,
+      "status": "mir_reference",
+      "commercialStatus": "MIR_product",
+      "catalogueScope": "MIR_supplied_exact_item",
+      "orderable": true,
+      "imageStatus": "MIR_provided_product_visual",
+      "researchedOn": "2026-11-11",
+      "sourceRefs": [],
+      "documents": [],
+      "notes": [
+        "Référence et caractéristiques relevées sur les photos d’emballage fournies par MIR. Vérifier le type de cloueuse ou d'agrafeuse et le support avant l’installation."
+      ],
+      "gaps": [
+        "Stock et prix de vente MIR à confirmer."
+      ],
+      "colorSelectionIndependent": true,
+      "id": "prime-staples-inox-40869",
+      "brand": "PRIME / Premier Outils Pro",
+      "name": "PRIME 40869 — Agrafes inox 2 po · calibre 16",
+      "manufacturerCode": "40869",
+      "description": "Agrafes en acier inoxydable, fil fort (Heavy Wire), longueur 2 po, couronne de 7/16 po et calibre 16. Boîte de 5 000 agrafes. Les dimensions sont indiquées sur l’emballage Prime.",
+      "dimensions": {
+        "lengthIn": 2,
+        "widthIn": 0.4375,
+        "gauge": 16
+      },
+      "finish": "Acier inoxydable",
+      "packaging": {
+        "piecesPerBox": 5000,
+        "unit": "boîte"
+      },
+      "unit": "boîte de 5 000 agrafes",
+      "specifications": [
+        {
+          "label": "Longueur",
+          "value": "2 po"
+        },
+        {
+          "label": "Couronne",
+          "value": "7/16 po"
+        },
+        {
+          "label": "Calibre",
+          "value": "16"
+        },
+        {
+          "label": "Matériau",
+          "value": "Acier inoxydable"
+        },
+        {
+          "label": "Conditionnement",
+          "value": "5 000 agrafes par boîte"
+        }
+      ],
+      "images": [
+        {
+          "src": "./assets/products/mir-provided-20261111/prime-40869-staples.webp",
+          "alt": "Agrafes PRIME 40869 en barrettes",
+          "kind": "product",
+          "credit": "Les Revêtements MIR",
+          "assetKind": "MIR_user_provided_product_visual",
+          "exactProductMatch": true,
+          "cardPresentation": "packshot",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        },
+        {
+          "src": "./assets/products/mir-provided-20261111/prime-40869-box.webp",
+          "alt": "Emballage PRIME 40869 avec calibre et longueur",
+          "kind": "packaging",
+          "credit": "Les Revêtements MIR",
+          "assetKind": "MIR_user_provided_product_visual",
+          "exactProductMatch": true,
+          "cardPresentation": "packshot",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        }
+      ],
+      "primaryImage": "./assets/products/mir-provided-20261111/prime-40869-staples.webp"
+    },
+    {
+      "family": "Fixation",
+      "applications": [
+        "fastener",
+        "accessory"
+      ],
+      "colors": [],
+      "colorStatus": "not_applicable",
+      "paletteComplete": true,
+      "allowedPatterns": [],
+      "allowedOrientations": [],
+      "renderPattern": "plain",
+      "maxPiece": {},
+      "coverage": null,
+      "status": "mir_reference",
+      "commercialStatus": "MIR_product",
+      "catalogueScope": "MIR_supplied_exact_item",
+      "orderable": true,
+      "imageStatus": "MIR_provided_product_visual",
+      "researchedOn": "2026-11-11",
+      "sourceRefs": [],
+      "documents": [],
+      "notes": [
+        "Référence et caractéristiques relevées sur les photos d’emballage fournies par MIR. Vérifier le type de cloueuse ou d'agrafeuse et le support avant l’installation."
+      ],
+      "gaps": [
+        "Stock et prix de vente MIR à confirmer."
+      ],
+      "colorSelectionIndependent": true,
+      "id": "prime-paper-strip-20031",
+      "brand": "PRIME / Premier Outils Pro",
+      "name": "PRIME 20031 — Clous communs en bandes 3¼ po · 34°",
+      "manufacturerCode": "20031",
+      "description": "Clous communs lisses en bandes de papier, fini brillant. Longueur 3¼ po, diamètre 0,120 po, assemblage à 34°. Boîte de 2 000 clous, selon l’étiquette Prime.",
+      "dimensions": {
+        "lengthIn": 3.25,
+        "diameterIn": 0.12,
+        "collationAngleDeg": 34
+      },
+      "finish": "Brillant",
+      "packaging": {
+        "piecesPerBox": 2000,
+        "unit": "boîte"
+      },
+      "unit": "boîte de 2 000 clous",
+      "specifications": [
+        {
+          "label": "Longueur",
+          "value": "3¼ po"
+        },
+        {
+          "label": "Diamètre",
+          "value": "0,120 po"
+        },
+        {
+          "label": "Angle",
+          "value": "34°"
+        },
+        {
+          "label": "Tige",
+          "value": "Lisse / commune"
+        },
+        {
+          "label": "Assemblage",
+          "value": "Bandes de papier"
+        },
+        {
+          "label": "Conditionnement",
+          "value": "2 000 clous par boîte"
+        }
+      ],
+      "images": [
+        {
+          "src": "./assets/products/mir-provided-20261111/prime-20031-strips.webp",
+          "alt": "Clous en bandes de papier PRIME 20031",
+          "kind": "product",
+          "credit": "Les Revêtements MIR",
+          "assetKind": "MIR_user_provided_product_visual",
+          "exactProductMatch": true,
+          "cardPresentation": "packshot",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        },
+        {
+          "src": "./assets/products/mir-provided-20261111/prime-20031-box.webp",
+          "alt": "Emballage de clous PRIME 20031, 3¼ po",
+          "kind": "packaging",
+          "credit": "Les Revêtements MIR",
+          "assetKind": "MIR_user_provided_product_visual",
+          "exactProductMatch": true,
+          "cardPresentation": "packshot",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        }
+      ],
+      "primaryImage": "./assets/products/mir-provided-20261111/prime-20031-strips.webp"
+    },
+    {
+      "family": "Fixation",
+      "applications": [
+        "fastener",
+        "accessory"
+      ],
+      "colors": [],
+      "colorStatus": "not_applicable",
+      "paletteComplete": true,
+      "allowedPatterns": [],
+      "allowedOrientations": [],
+      "renderPattern": "plain",
+      "maxPiece": {},
+      "coverage": null,
+      "status": "mir_reference",
+      "commercialStatus": "MIR_product",
+      "catalogueScope": "MIR_supplied_exact_item",
+      "orderable": true,
+      "imageStatus": "MIR_provided_product_visual",
+      "researchedOn": "2026-11-11",
+      "sourceRefs": [],
+      "documents": [],
+      "notes": [
+        "Référence et caractéristiques relevées sur les photos d’emballage fournies par MIR. Vérifier le type de cloueuse ou d'agrafeuse et le support avant l’installation."
+      ],
+      "gaps": [
+        "Stock et prix de vente MIR à confirmer."
+      ],
+      "colorSelectionIndependent": true,
+      "id": "prime-gsi-staples-40713",
+      "brand": "PRIME / Premier Outils Pro",
+      "name": "PRIME GSI 40713 — Agrafes électrogalvanisées 1 po · calibre 18",
+      "manufacturerCode": "40713",
+      "description": "Agrafes Prime série GSI à fil moyen, électrogalvanisées, longueur 1 po, couronne 3/8 po et calibre 18. Boîte de 5 000 agrafes selon l’emballage.",
+      "dimensions": {
+        "lengthIn": 1,
+        "widthIn": 0.375,
+        "gauge": 18
+      },
+      "finish": "Électrogalvanisé",
+      "packaging": {
+        "piecesPerBox": 5000,
+        "unit": "boîte"
+      },
+      "unit": "boîte de 5 000 agrafes",
+      "specifications": [
+        {
+          "label": "Longueur",
+          "value": "1 po"
+        },
+        {
+          "label": "Couronne",
+          "value": "3/8 po"
+        },
+        {
+          "label": "Calibre",
+          "value": "18"
+        },
+        {
+          "label": "Finition",
+          "value": "Électrogalvanisée"
+        },
+        {
+          "label": "Série",
+          "value": "GSI"
+        },
+        {
+          "label": "Conditionnement",
+          "value": "5 000 agrafes par boîte"
+        }
+      ],
+      "images": [
+        {
+          "src": "./assets/products/mir-provided-20261111/prime-40713-staples.webp",
+          "alt": "Agrafes PRIME GSI 40713 en barrettes",
+          "kind": "product",
+          "credit": "Les Revêtements MIR",
+          "assetKind": "MIR_user_provided_product_visual",
+          "exactProductMatch": true,
+          "cardPresentation": "packshot",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        },
+        {
+          "src": "./assets/products/mir-provided-20261111/prime-40713-box.webp",
+          "alt": "Boîte PRIME GSI 40713, largeur 3/8 po",
+          "kind": "packaging",
+          "credit": "Les Revêtements MIR",
+          "assetKind": "MIR_user_provided_product_visual",
+          "exactProductMatch": true,
+          "cardPresentation": "packshot",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        }
+      ],
+      "primaryImage": "./assets/products/mir-provided-20261111/prime-40713-staples.webp"
+    },
+    {
+      "id": "mir-joint-fibro-6",
+      "brand": "Les Revêtements MIR",
+      "name": "Joint fibro MIR — 6 po",
+      "family": "Accessoire de fibrociment",
+      "applications": [
+        "siding-joint",
+        "accessory"
+      ],
+      "description": "Joint fibro de 6 po proposé par Les Revêtements MIR, destiné à la finition de joints de revêtement en fibrociment. Le format représente la longueur annoncée par MIR; vérifier la compatibilité avec le profil et le système de pose avant de commander.",
+      "dimensions": {
+        "lengthIn": 6
+      },
+      "finish": "Gris",
+      "specifications": [
+        {
+          "label": "Format",
+          "value": "6 po"
+        },
+        {
+          "label": "Matériau",
+          "value": "Joint fibro"
+        },
+        {
+          "label": "Coloris",
+          "value": "Gris"
+        }
+      ],
+      "notes": [
+        "Photo de la pièce fournie par MIR; la version 8 po est un visuel adapté du modèle 6 po. La forme, l'épaisseur et le conditionnement définitifs sont à confirmer avant commande."
+      ],
+      "gaps": [
+        "Conditionnement, prix, compatibilité fabricant et stock à confirmer."
+      ],
+      "colors": [],
+      "colorStatus": "not_applicable",
+      "paletteComplete": true,
+      "allowedPatterns": [],
+      "allowedOrientations": [],
+      "renderPattern": "plain",
+      "maxPiece": {},
+      "coverage": null,
+      "unit": "pièce — conditionnement à confirmer avec MIR",
+      "status": "mir_reference",
+      "commercialStatus": "MIR_product",
+      "catalogueScope": "MIR_supplied_exact_item",
+      "orderable": true,
+      "imageStatus": "MIR_provided_product_visual",
+      "researchedOn": "2026-11-11",
+      "sourceUrl": null,
+      "documents": [],
+      "images": [
+        {
+          "src": "./assets/products/mir-provided-20261111/mir-joint-fibro-6.webp",
+          "alt": "Joints fibro MIR 6 po sur fond neutre",
+          "kind": "product",
+          "credit": "Les Revêtements MIR",
+          "assetKind": "MIR_user_provided_product_visual",
+          "exactProductMatch": true,
+          "cardPresentation": "packshot",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        }
+      ],
+      "primaryImage": "./assets/products/mir-provided-20261111/mir-joint-fibro-6.webp"
+    },
+    {
+      "id": "mir-joint-fibro-8",
+      "brand": "Les Revêtements MIR",
+      "name": "Joint fibro MIR — 8 po",
+      "family": "Accessoire de fibrociment",
+      "applications": [
+        "siding-joint",
+        "accessory"
+      ],
+      "description": "Joint fibro de 8 po proposé par Les Revêtements MIR, destiné à la finition de joints de revêtement en fibrociment. Le format représente la longueur annoncée par MIR; vérifier la compatibilité avec le profil et le système de pose avant de commander.",
+      "dimensions": {
+        "lengthIn": 8
+      },
+      "finish": "Gris",
+      "specifications": [
+        {
+          "label": "Format",
+          "value": "8 po"
+        },
+        {
+          "label": "Matériau",
+          "value": "Joint fibro"
+        },
+        {
+          "label": "Coloris",
+          "value": "Gris"
+        }
+      ],
+      "notes": [
+        "Photo de la pièce fournie par MIR; la version 8 po est un visuel adapté du modèle 6 po. La forme, l'épaisseur et le conditionnement définitifs sont à confirmer avant commande."
+      ],
+      "gaps": [
+        "Conditionnement, prix, compatibilité fabricant et stock à confirmer."
+      ],
+      "colors": [],
+      "colorStatus": "not_applicable",
+      "paletteComplete": true,
+      "allowedPatterns": [],
+      "allowedOrientations": [],
+      "renderPattern": "plain",
+      "maxPiece": {},
+      "coverage": null,
+      "unit": "pièce — conditionnement à confirmer avec MIR",
+      "status": "mir_reference",
+      "commercialStatus": "MIR_product",
+      "catalogueScope": "MIR_supplied_exact_item",
+      "orderable": true,
+      "imageStatus": "MIR_provided_product_visual",
+      "researchedOn": "2026-11-11",
+      "sourceUrl": null,
+      "documents": [],
+      "images": [
+        {
+          "src": "./assets/products/mir-provided-20261111/mir-joint-fibro-8.webp",
+          "alt": "Joints fibro MIR 8 po sur fond neutre",
+          "kind": "product",
+          "credit": "Les Revêtements MIR",
+          "assetKind": "MIR_user_provided_product_visual",
+          "exactProductMatch": true,
+          "cardPresentation": "packshot",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        }
+      ],
+      "primaryImage": "./assets/products/mir-provided-20261111/mir-joint-fibro-8.webp"
     }
   ],
   "schemaVersion": "5.2",
