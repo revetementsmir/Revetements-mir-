@@ -31,6 +31,9 @@ jobs:
         run: |
           node tests/mir-live-validation.cjs
           node tests/mir-punch-postgres.cjs
+          node tests/mir-backend-production-rehearsal.cjs
+          MIR_REHEARSAL_SCHEMA=production node tests/mir-punch-postgres.cjs
+          MIR_REHEARSAL_SCHEMA=production node tests/mir-job-dossier-postgres.cjs
           node tests/mir-management-postgres.cjs
           node tests/mir-operational-roles-postgres.cjs
           node tests/mir-warehouse-sql.cjs

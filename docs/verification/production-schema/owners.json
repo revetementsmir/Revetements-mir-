@@ -1,0 +1,1259 @@
+{
+  "tables": [
+    {
+      "name": "request_keys",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "job_memberships",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "model_sources",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "users",
+      "owner": "supabase_auth_admin",
+      "schema": "auth"
+    },
+    {
+      "name": "warehouse_access",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "warehouse_skus",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "warehouse_stock",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "warehouse_fulfillment",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "warehouse_movements",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "objects",
+      "owner": "supabase_storage_admin",
+      "schema": "storage"
+    },
+    {
+      "name": "buckets",
+      "owner": "supabase_storage_admin",
+      "schema": "storage"
+    },
+    {
+      "name": "coordination_access",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "coordination_orders",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "coordination_lines",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "coordination_routes",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "coordination_events",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "coordination_acks",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "coordination_shipments",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "coordination_ops",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "jobs",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "account_settings",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "customer_addresses",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "account_invitations",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "organizations",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "memberships",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "boutique_bend_tariffs",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "boutique_delivery_distances",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "models",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "model_versions",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "suppliers",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "order_revisions",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "order_lines",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "order_events",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "documents",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "send_attempts",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "import_batches",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "model_publications",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "message_receipts",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "staff_capabilities",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "catalogue_items",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "orders",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "send_jobs",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "teams",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "team_members",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "conversations",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "conversation_participants",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "messages",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "extras",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "delivery_receipts",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "delivery_issues",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "hr_requests",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "notifications",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "reminders",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "job_activity",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "team_day_assignments",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "team_attendance",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "team_tasks",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "material_requests",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "field_issues",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "daily_reports",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "vehicles",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "vehicle_authorizations",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "vehicle_qr_tokens",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "vehicle_qr_scans",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "inventory_locations",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "delivery_runs",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "delivery_run_orders",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "delivery_load_items",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "inventory_transfers",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "inspection_rules",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "run_inspections",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "inspection_results",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "delivery_approvals",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "delivery_proofs",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "vehicle_maintenance",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "logistics_audit",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "management_permissions",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "dashboard_preferences",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "clients",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "estimates",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "estimate_versions",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "change_orders",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "employee_cost_rates",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "time_entries",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "job_finances",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "invoices",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "invoice_payments",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "management_audit",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "boutique_price_suggestions",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "boutique_prices",
+      "owner": "postgres",
+      "schema": "mir_core"
+    },
+    {
+      "name": "boutique_price_history",
+      "owner": "postgres",
+      "schema": "mir_core"
+    }
+  ],
+  "schemas": [
+    {
+      "name": "public",
+      "owner": "pg_database_owner"
+    },
+    {
+      "name": "auth",
+      "owner": "supabase_admin"
+    },
+    {
+      "name": "storage",
+      "owner": "supabase_admin"
+    },
+    {
+      "name": "mir_core",
+      "owner": "postgres"
+    }
+  ],
+  "functions": [
+    {
+      "name": "uid",
+      "owner": "supabase_auth_admin",
+      "schema": "auth",
+      "identity": ""
+    },
+    {
+      "name": "role",
+      "owner": "supabase_auth_admin",
+      "schema": "auth",
+      "identity": ""
+    },
+    {
+      "name": "email",
+      "owner": "supabase_auth_admin",
+      "schema": "auth",
+      "identity": ""
+    },
+    {
+      "name": "boutique_price_history_immutable",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": ""
+    },
+    {
+      "name": "mir_public_boutique_prices",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": ""
+    },
+    {
+      "name": "mir_boutique_price_management",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_boutique_price_action",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, item text, format text, action text, new_price_cents integer, reason text"
+    },
+    {
+      "name": "extension",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "name text"
+    },
+    {
+      "name": "filename",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "name text"
+    },
+    {
+      "name": "jwt",
+      "owner": "supabase_auth_admin",
+      "schema": "auth",
+      "identity": ""
+    },
+    {
+      "name": "foldername",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "name text"
+    },
+    {
+      "name": "update_updated_at_column",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": ""
+    },
+    {
+      "name": "can_insert_object",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "bucketid text, name text, owner uuid, metadata jsonb"
+    },
+    {
+      "name": "protect_active_lifecycle_states",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": ""
+    },
+    {
+      "name": "operation",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": ""
+    },
+    {
+      "name": "enforce_bucket_name_length",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": ""
+    },
+    {
+      "name": "get_common_prefix",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "p_key text, p_prefix text, p_delimiter text"
+    },
+    {
+      "name": "rls_auto_enable",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": ""
+    },
+    {
+      "name": "protect_delete",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": ""
+    },
+    {
+      "name": "allow_only_operation",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "expected_operation text"
+    },
+    {
+      "name": "allow_any_operation",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "expected_operations text[]"
+    },
+    {
+      "name": "publish_model",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, model uuid, model_version integer, expected_revision integer, settings jsonb"
+    },
+    {
+      "name": "mir_my_memberships",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": ""
+    },
+    {
+      "name": "protect_bucket_control_columns",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": ""
+    },
+    {
+      "name": "list_multipart_uploads_with_delimiter",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "bucket_id text, prefix_param text, delimiter_param text, max_keys integer, next_key_token text, next_upload_token text, raw_prefix_param text"
+    },
+    {
+      "name": "list_objects_with_delimiter",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "_bucket_id text, prefix_param text, delimiter_param text, max_keys integer, start_after text, next_token text, sort_order text, noncurrent_versions text, delete_markers text, next_token_archived_at timestamp with time zone, next_token_version text"
+    },
+    {
+      "name": "enforce_bucket_lifecycle_service_role",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": ""
+    },
+    {
+      "name": "search",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text, noncurrent_versions text, delete_markers text"
+    },
+    {
+      "name": "search_by_timestamp",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "p_prefix text, p_bucket_id text, p_limit integer, p_level integer, p_start_after text, p_sort_order text, p_sort_column text, p_sort_column_after text, noncurrent_versions text, delete_markers text, p_start_after_version text"
+    },
+    {
+      "name": "search_v2",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "prefix text, bucket_name text, limits integer, levels integer, start_after text, sort_order text, sort_column text, sort_column_after text, noncurrent_versions text, delete_markers text, start_after_archived_at timestamp with time zone, start_after_version text, start_after_is_continuation boolean"
+    },
+    {
+      "name": "get_size_by_bucket",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "noncurrent_versions text, delete_markers text"
+    },
+    {
+      "name": "enforce_versioning_status_transition",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": ""
+    },
+    {
+      "name": "reconcile_lifecycle_state",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "target_bucket_id text, policy_changed boolean"
+    },
+    {
+      "name": "wake_lifecycle_state",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": ""
+    },
+    {
+      "name": "delete_lifecycle_objects",
+      "owner": "supabase_storage_admin",
+      "schema": "storage",
+      "identity": "object_ids uuid[]"
+    },
+    {
+      "name": "has_role",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, roles text[]"
+    },
+    {
+      "name": "can_read_order",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, order_id uuid"
+    },
+    {
+      "name": "stage_local_backup",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, payload jsonb"
+    },
+    {
+      "name": "revert_staged_backup",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, batch uuid"
+    },
+    {
+      "name": "reset_supplier_verification",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": ""
+    },
+    {
+      "name": "queue_supplier_pdf",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, po uuid, expected_revision integer, document uuid, request_id uuid, confirmed_recipient text"
+    },
+    {
+      "name": "mir_shared_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_submit_request",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, request_id uuid, model uuid, publication_revision integer, configuration jsonb"
+    },
+    {
+      "name": "mir_import_master",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, record jsonb"
+    },
+    {
+      "name": "mir_assign_job",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, job_name text, employee uuid"
+    },
+    {
+      "name": "validate_configuration_rules",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "rules jsonb"
+    },
+    {
+      "name": "mir_add_master_version",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, model uuid, expected_revision integer, template jsonb"
+    },
+    {
+      "name": "mir_admin_publish_model",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, model uuid, expected_revision integer, settings jsonb"
+    },
+    {
+      "name": "warehouse_auto_link_line",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": ""
+    },
+    {
+      "name": "mir_warehouse_grant_access",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, member uuid, allow_access boolean"
+    },
+    {
+      "name": "mir_account_remove_address",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "p_id uuid"
+    },
+    {
+      "name": "warehouse_allowed",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_warehouse_memberships",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": ""
+    },
+    {
+      "name": "mir_conversation_team",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, team uuid"
+    },
+    {
+      "name": "boutique_delivery_km",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "address_id uuid, address jsonb"
+    },
+    {
+      "name": "mir_message_send",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, conversation uuid, body text, job uuid, plan uuid, attachment text, request_id uuid"
+    },
+    {
+      "name": "mir_warehouse_register",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, kind text, source_ref text, sku_code text, display_name text, unit_name text, step numeric"
+    },
+    {
+      "name": "mir_warehouse_link_order_line",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, line_id uuid, sku_id uuid"
+    },
+    {
+      "name": "mir_warehouse_search",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, term text"
+    },
+    {
+      "name": "mir_warehouse_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, qr uuid"
+    },
+    {
+      "name": "mir_warehouse_queue",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_warehouse_move",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, qr uuid, line_id uuid, delta numeric, request_id uuid, reason text"
+    },
+    {
+      "name": "coordination_allowed",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid"
+    },
+    {
+      "name": "coordination_guard_picking",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": ""
+    },
+    {
+      "name": "mir_coordination_memberships",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": ""
+    },
+    {
+      "name": "mir_coordination_grant",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, member uuid, allowed boolean"
+    },
+    {
+      "name": "mir_coordination_inbox",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_coordination_open",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, source_order uuid"
+    },
+    {
+      "name": "mir_coordination_detail",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, coord_id uuid"
+    },
+    {
+      "name": "coordination_replay",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, request_id uuid, operation text, payload jsonb"
+    },
+    {
+      "name": "coordination_receipt",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, request_id uuid, operation text, payload jsonb, result jsonb"
+    },
+    {
+      "name": "mir_coordination_route",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, coord_id uuid, coord_line uuid, warehouse_qty numeric, suppliers jsonb, expected_revision integer, request_id uuid"
+    },
+    {
+      "name": "mir_coordination_add",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, coord_id uuid, existing_coord_line uuid, additional_qty numeric, expected_revision integer, request_id uuid"
+    },
+    {
+      "name": "mir_account_revoke_invitation",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "p_id uuid"
+    },
+    {
+      "name": "mir_coordination_ack",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, coord_id uuid"
+    },
+    {
+      "name": "mir_coordination_ship",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, coord_id uuid, expected_revision integer, request_id uuid"
+    },
+    {
+      "name": "mir_coordination_warehouse_queue",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_coordination_supplier_orders",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, supplier uuid"
+    },
+    {
+      "name": "mir_coordination_suppliers",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_coordination_metadata",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, coord_id uuid, expected_revision integer, vals jsonb, request_id uuid"
+    },
+    {
+      "name": "mir_coordination_supplier_po",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, coord_id uuid, route_id uuid, po_id uuid, expected_revision integer, request_id uuid"
+    },
+    {
+      "name": "mir_coordination_supplier_receive",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, coord_id uuid, route_id uuid, quantity numeric, expected_revision integer, request_id uuid"
+    },
+    {
+      "name": "conversation_allowed",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, conversation uuid, member uuid"
+    },
+    {
+      "name": "mir_coordination_supplier_status",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, coord_id uuid, route_id uuid, next_status text, expected_revision integer, request_id uuid"
+    },
+    {
+      "name": "account_identity",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": ""
+    },
+    {
+      "name": "boutique_bend_tariff",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_account_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": ""
+    },
+    {
+      "name": "mir_account_save_address",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "p_address jsonb, p_id uuid"
+    },
+    {
+      "name": "mir_account_create_invitation",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "p_email text, p_job_ids uuid[], p_request_id uuid"
+    },
+    {
+      "name": "mir_portal_accept_invitation",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "p_token text"
+    },
+    {
+      "name": "mir_portal_list_invitations",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": ""
+    },
+    {
+      "name": "mir_portal_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": ""
+    },
+    {
+      "name": "boutique_geocode_km",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "address jsonb"
+    },
+    {
+      "name": "boutique_delivery_result",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "distance numeric, subtotal bigint, fee bigint"
+    },
+    {
+      "name": "mir_boutique_delivery_distance",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, address_id uuid, address_version text"
+    },
+    {
+      "name": "mir_account_import_signup_address",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": ""
+    },
+    {
+      "name": "boutique_inches",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "value text"
+    },
+    {
+      "name": "boutique_bend_price",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "spec jsonb, measures jsonb, metal text, fixed_cents bigint, tariff jsonb"
+    },
+    {
+      "name": "mir_message_ack",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, message uuid, state text"
+    },
+    {
+      "name": "mir_admin_save_bend_tariff",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, expected_revision integer, settings jsonb"
+    },
+    {
+      "name": "mir_public_bend_tariff",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": ""
+    },
+    {
+      "name": "mir_estimate_rpc",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "action text, body jsonb"
+    },
+    {
+      "name": "staff_role",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, member uuid"
+    },
+    {
+      "name": "mir_staff_configure",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, member uuid, role_name text, display_name text"
+    },
+    {
+      "name": "mir_portal_command",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "p_request_id uuid, p_command text, p_payload jsonb"
+    },
+    {
+      "name": "mir_team_save",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, team uuid, name text, leader uuid, members uuid[]"
+    },
+    {
+      "name": "mir_conversation_private",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, other uuid"
+    },
+    {
+      "name": "mir_extra_submit",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, job uuid, description text, photo text, due_at timestamp with time zone, request_id uuid"
+    },
+    {
+      "name": "mir_delivery_receive",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, job uuid, p_order uuid, line uuid, quantity numeric, place text, photo text, request_id uuid"
+    },
+    {
+      "name": "mir_hr_decide",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, request uuid, decision text, note text"
+    },
+    {
+      "name": "mir_delivery_issue",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, job uuid, p_order uuid, line uuid, supplier_order uuid, comment text, photo text, request_id uuid"
+    },
+    {
+      "name": "mir_hr_submit",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, kind text, start_on date, end_on date, note text, request_id uuid"
+    },
+    {
+      "name": "mir_notification_read",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, notification uuid"
+    },
+    {
+      "name": "mir_employee_operations_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, job uuid"
+    },
+    {
+      "name": "mir_logistics_action",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, request_id uuid, action text, entity uuid, payload jsonb"
+    },
+    {
+      "name": "internal_object_allowed",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "object_name text, writing boolean"
+    },
+    {
+      "name": "mir_messaging_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_lead_today_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_conversation_open",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, kind text, target uuid"
+    },
+    {
+      "name": "job_allowed",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, job uuid, member uuid"
+    },
+    {
+      "name": "job_allowed",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, jid uuid"
+    },
+    {
+      "name": "mir_logistics_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_admin_logistics_action",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, action text, entity uuid, payload jsonb"
+    },
+    {
+      "name": "mir_boss_operations_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_lead_action",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, request_id uuid, action text, payload jsonb"
+    },
+    {
+      "name": "mir_boss_action",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, action text, entity uuid, decision text, payload jsonb"
+    },
+    {
+      "name": "vehicle_authorized",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, vehicle uuid, member uuid"
+    },
+    {
+      "name": "management_allowed",
+      "owner": "postgres",
+      "schema": "mir_core",
+      "identity": "org uuid, capability text, member uuid"
+    },
+    {
+      "name": "mir_management_snapshot",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid"
+    },
+    {
+      "name": "mir_management_action",
+      "owner": "postgres",
+      "schema": "public",
+      "identity": "org uuid, action text, entity uuid, payload jsonb"
+    }
+  ]
+}

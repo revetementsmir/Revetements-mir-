@@ -1,0 +1,18 @@
+begin read only;
+select jsonb_build_object(
+'captured_at',now(),'project_id','gccltmaulvrnthrbnrpd',
+'tables',(select jsonb_agg(jsonb_build_object('schema',n.nspname,'name',c.relname,'rls',c.relrowsecurity,'force_rls',c.relforcerowsecurity,'acl',c.relacl::text,
+'columns',(select jsonb_agg(jsonb_build_object('name',a.attname,'type',format_type(a.atttypid,a.atttypmod),'notnull',a.attnotnull,'identity',a.attidentity,'generated',a.attgenerated,'default',pg_get_expr(d.adbin,d.adrelid)) order by a.attnum) from pg_attribute a left join pg_attrdef d on d.adrelid=a.attrelid and d.adnum=a.attnum where a.attrelid=c.oid and a.attnum>0 and not a.attisdropped),
+'constraints',(select coalesce(jsonb_agg(jsonb_build_object('name',k.conname,'type',k.contype,'definition',pg_get_constraintdef(k.oid)) order by k.conname),'[]') from pg_constraint k where k.conrelid=c.oid),
+'indexes',(select coalesce(jsonb_agg(jsonb_build_object('name',ic.relname,'definition',pg_get_indexdef(i.indexrelid)) order by ic.relname),'[]') from pg_index i join pg_class ic on ic.oid=i.indexrelid where i.indrelid=c.oid and not exists(select 1 from pg_constraint k where k.conindid=i.indexrelid)),
+'triggers',(select coalesce(jsonb_agg(pg_get_triggerdef(t.oid) order by t.tgname),'[]') from pg_trigger t where t.tgrelid=c.oid and not t.tgisinternal)
+) order by n.nspname,c.relname) from pg_class c join pg_namespace n on n.oid=c.relnamespace where c.relkind='r' and (n.nspname in('mir_core','public') or n.nspname='auth' and c.relname='users' or n.nspname='storage' and c.relname in('objects','buckets'))),
+'functions',(select jsonb_agg(jsonb_build_object('schema',n.nspname,'name',p.proname,'identity',pg_get_function_identity_arguments(p.oid),'definition',pg_get_functiondef(p.oid),'acl',p.proacl::text) order by n.nspname,p.proname,p.oid) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where p.prokind='f' and (n.nspname='mir_core' or n.nspname='public' and p.proname like 'mir_%' or n.nspname='auth' and p.proname in('uid','jwt','role','email') or n.nspname='storage' and p.proname in('foldername','filename','extension'))),
+'policies',(select jsonb_agg(to_jsonb(x) order by schemaname,tablename,policyname) from pg_policies x where schemaname in('mir_core','public') or schemaname='storage' and tablename in('objects','buckets')),
+'enums',(select jsonb_agg(jsonb_build_object('schema',n.nspname,'name',t.typname,'labels',(select jsonb_agg(e.enumlabel order by e.enumsortorder) from pg_enum e where e.enumtypid=t.oid))) from pg_type t join pg_namespace n on n.oid=t.typnamespace where t.typtype='e' and n.nspname in('mir_core','public','auth','storage')),
+'sequences',(select jsonb_agg(to_jsonb(s)-'last_value') from pg_sequences s where schemaname in('mir_core','public')),
+'grants',(select jsonb_agg(to_jsonb(g)) from information_schema.table_privileges g where table_schema in('mir_core','public','auth','storage') and grantee in('anon','authenticated','service_role','PUBLIC') and (table_schema in('mir_core','public') or table_name in('users','objects','buckets'))),
+'defaults',(select jsonb_agg(jsonb_build_object('schema',n.nspname,'type',d.defaclobjtype,'acl',d.defaclacl::text)) from pg_default_acl d left join pg_namespace n on n.oid=d.defaclnamespace where n.nspname in('mir_core','public')),
+'schema_acl',(select jsonb_agg(jsonb_build_object('name',n.nspname,'acl',n.nspacl::text)) from pg_namespace n where n.nspname in('mir_core','public','auth','storage')),
+'migrations',(select jsonb_agg(jsonb_build_object('version',version,'name',name) order by version) from supabase_migrations.schema_migrations)
+) snapshot; commit;

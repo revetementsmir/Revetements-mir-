@@ -61,13 +61,34 @@ grant execute on function mir_core.job_storage_read(text),mir_core.job_storage_w
 
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
 values('mir-job-documents','mir-job-documents',false,26214400,array['application/pdf','image/jpeg','image/png','image/webp'])
-on conflict(id) do update set public=false,file_size_limit=excluded.file_size_limit,allowed_mime_types=excluded.allowed_mime_types;
-drop policy if exists mir_job_document_read on storage.objects;
-drop policy if exists mir_job_document_insert on storage.objects;
-create policy mir_job_document_read on storage.objects for select to authenticated
- using(bucket_id='mir-job-documents' and mir_core.job_storage_read(name));
-create policy mir_job_document_insert on storage.objects for insert to authenticated
- with check(bucket_id='mir-job-documents' and mir_core.job_storage_write(name));
+on conflict(id) do nothing;
+do $guard$
+declare p record;
+begin
+ if not exists(select 1 from storage.buckets where id='mir-job-documents' and not public
+   and file_size_limit=26214400
+   and allowed_mime_types=array['application/pdf','image/jpeg','image/png','image/webp']) then
+  raise exception 'Bucket mir-job-documents incompatible; arrêt sans modification';
+ end if;
+ select * into p from pg_policies where schemaname='storage' and tablename='objects' and policyname='mir_job_document_read';
+ if not found then
+  create policy mir_job_document_read on storage.objects for select to authenticated
+   using(bucket_id='mir-job-documents' and mir_core.job_storage_read(name));
+ elsif p.cmd<>'SELECT' or p.permissive<>'PERMISSIVE' or p.roles<>array['authenticated']::name[]
+   or p.with_check is not null
+   or regexp_replace(p.qual,'[[:space:]()]','','g')<>$expr$bucket_id='mir-job-documents'::textANDmir_core.job_storage_readname$expr$ then
+  raise exception 'Policy mir_job_document_read incompatible; arrêt sans remplacement';
+ end if;
+ select * into p from pg_policies where schemaname='storage' and tablename='objects' and policyname='mir_job_document_insert';
+ if not found then
+  create policy mir_job_document_insert on storage.objects for insert to authenticated
+   with check(bucket_id='mir-job-documents' and mir_core.job_storage_write(name));
+ elsif p.cmd<>'INSERT' or p.permissive<>'PERMISSIVE' or p.roles<>array['authenticated']::name[]
+   or p.qual is not null
+   or regexp_replace(p.with_check,'[[:space:]()]','','g')<>$expr$bucket_id='mir-job-documents'::textANDmir_core.job_storage_writename$expr$ then
+  raise exception 'Policy mir_job_document_insert incompatible; arrêt sans remplacement';
+ end if;
+end$guard$;
 
 create or replace function public.mir_job_dossier_snapshot(
  org uuid,

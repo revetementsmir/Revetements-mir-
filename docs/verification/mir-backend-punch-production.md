@@ -15,6 +15,52 @@ Ce rapport conserve l'audit initial et ses échecs historiques; la section « Va
 - SEO/GEO : non applicable, audit de backend privé sans modification des pages publiques.
 - Documents Prompt 2 et passation relus; aucune autre phase commencée.
 
+## Préparation sécurisée et répétition locale — 11 novembre 2026
+
+Cette section complète l'audit historique. Aucune migration ni donnée de MIR production n'a été modifiée. PR #2 reste en brouillon. La référence main inspectée reste `39ca1033ae1b70ced19cc5c756d4957f84cb2d41`.
+
+Les versions gardées des migrations 1 à 5, de completion et du dossier sont disponibles dans `supabase/production-transport/`. Les sources historiques Punch restent conservées; **le lot gardé remplace leur réexécution pour cette opération**. Il ne faut pas appliquer les deux jeux. Chaque transaction utilise un verrou commun, des limites de temps, un SHA-256 de source et une empreinte de catalogue dans un registre privé RLS. Un second passage compatible ne recrée aucune fonction. Une collision, un ordre incorrect ou une dérive arrête l'opération. Un état partiellement installé sans checkpoint exige une comparaison manuelle explicite; aucune adoption silencieuse n'est prévue.
+
+La source dossier n'utilise plus `DROP POLICY`. Une policy existante est vérifiée sur le nom, la commande, les rôles, le caractère permissif et les expressions; une différence bloque la transaction. Le bucket existant n'est plus modifié par upsert : ses caractéristiques privées, taille et MIME doivent correspondre exactement.
+
+| Ordre | Fichier du lot gardé | Objets | Dépendances | Répétition locale | Risque / reprise |
+|---|---|---|---|---|---|
+| 1 | `20261110020000_punch_gps.sql` | 4 colonnes jobs, 8 tables Punch, helpers, RPC | memberships, jobs, staff_role, job_allowed, auth | Deux passages PASS | Collision refusée; transaction annulée, aucune suppression |
+| 2 | `20261110120000_operational_roles_phase1.sql` | operational_role, mir_my_operational_access | memberships, staff_capabilities | Deux passages PASS | Fonctions existantes non remplacées silencieusement |
+| 3 | `20261110130000_punch_phase2_integrity.sql` | unicité dîner, wrappers action/correction/admin | Étape 1, ordre du lot | Deux passages PASS | Renommages exécutés une seule fois |
+| 4 | `20261110140000_punch_phase2_workflow.sql` | snapshots, périodes, corrections et historique | Étape 3 | Deux passages PASS | Empreinte catalogue vérifiée avant reprise |
+| 5 | `20261110150000_punch_phase2_corrections.sql` | corrections arrivée/départ/chantier/déplacement | Étapes 3 et 4 | Deux passages PASS | Aucun remplacement d'une fonction préexistante incompatible |
+| 6 | `20261110160000_punch_phase2_completion.sql` | journal, demandes banque, notifications | Étape 5, notifications et banque | Deux passages PASS | Validation réelle MIR TEST conservée |
+| 7 | `20261111120000_job_dossier_central.sql` | documents, helpers, RPC, bucket et policies | Punch + tables canoniques du dossier | Deux passages PASS | Policy/bucket incompatibles refusés sans remplacement |
+
+Après ces doubles applications, le lot complet est rejoué une troisième fois : empreinte finale identique. La configuration Punch reste désactivée par défaut. Une organisation et six identités **synthétiques locales** servent de sentinelles; elles sont conservées sans modification. Toutes les fonctions et ACL existant dans le schéma production copié restent identiques après migration.
+
+Copie structurelle : extraction READ ONLY à `2026-11-11T02:08:31.671094+00:00`, fichiers `production-schema/production-schema.json`, `storage-trigger-functions.json` et `owners.json`. Le fixture contient 91 tables de mir_core/public et les tables dépendantes auth.users, storage.objects/storage.buckets; 10 enums, fonctions MIR, helpers Auth/Storage, triggers, index, contraintes, policies, propriétaires et ACL. Aucune ligne utilisateur ou métier, aucun fichier Storage, aucune valeur de séquence de production n'est exporté. Les types, défauts, nullabilités, identités, contraintes, RLS et ACL des 91 tables restaurées sont comparés au catalogue exporté. Les fonctions et droits des modules protégés ne sont pas modifiés par le lot.
+
+| Vérification | Nature | Résultat |
+|---|---|---|
+| `mir-backend-production-rehearsal.cjs` | Copie du schéma applicatif réel, PostgreSQL jetable | 20 contrôles PASS; rapport JSON versionné |
+| Sept migrations chacune deux fois | Copie locale | PASS |
+| Lot complet rejoué après installation | Copie locale | PASS, aucune dérive |
+| Ordre incorrect | Test négatif local | Refus et transaction annulée; aucun checkpoint partiel |
+| Policies compatibles | Test local | OID conservés; aucune suppression/recréation |
+| Policy incompatible | Test négatif local | Refus explicite; transaction annulée |
+| Dérive de schéma | Test négatif local | Refus avant réapplication |
+| Punch sur copie production | SQL métier local, mêmes tests existants | 20 scénarios PASS |
+| Dossier sur copie production | SQL/RLS/Storage local | 6 scénarios PASS |
+| Punch depuis migrations historiques | SQL local | 21 scénarios PASS |
+| Dossier depuis migrations historiques corrigées | SQL local | 6 scénarios PASS |
+| Régressions pages protégées | Statique/métier | 41/41 PASS |
+| `mir-job-dossier-real.cjs` | Contrat statique | 1 PASS; aucune session réelle dans ce fichier |
+
+Inventaire final local : 10 tables Punch/documents sous RLS, 57 contraintes hors contraintes NOT NULL représentées séparément sur PG18, 21 index valides. Aucune contrainte non validée. Les 16 signatures publiques et alias concernés sont vérifiés avec SECURITY DEFINER, search_path fixé et ACL : anon refusé partout, authenticated seulement sur les entrées publiques, service_role conservé. Aucun accès direct anon/authenticated aux dix tables. Deux policies Storage et un bucket privé sont présents.
+
+**Limites restantes :** le moteur jetable est PostgreSQL 18.6 / PGlite 0.5.15, tandis que production est PostgreSQL 17.11. La copie est fidèle au schéma applicatif exporté, pas une réplique de tous les services Supabase : extensions HTTP/vault, Auth, API REST et Storage hébergé ne sont pas exécutés comme services. Les sauvegardes/PITR production restent à vérifier avant toute écriture. La certification réelle six rôles MIR TEST précédente reste acquise; les nouveaux tests de cette préparation sont locaux. Aucun succès local n'est présenté comme une validation production.
+
+Migrations appliquées en production pendant cette préparation : **aucune**. Historique officiel Supabase production : inchangé. Le registre de répétabilité proposé est distinct de l'historique officiel; après autorisation, chaque fichier devra passer séparément par `apply_migration` et sa version officielle devra être consignée.
+
+Prochaine étape : autorisation distincte de l'utilisateur avant toute écriture dans `gccltmaulvrnthrbnrpd`, puis levée des limites de sauvegarde et de moteur avant exécution. Aucun push sur main, aucune fusion, aucune publication.
+
 ## Validation completion sur MIR TEST — état faisant foi
 
 La cible complète inclut `20261110160000_punch_phase2_completion.sql`. Le frontend appelle réellement `mir_punch_journal` et `mir_time_bank_request` depuis `dist/portal-client.js`; l'écran Punch consomme aussi `bankRequests` et l'historique de décision dans `dist/chantier-app.js`. L'extension dépend des wrappers Punch Phase 1/2, de `memberships`, `staff_capabilities`, `notifications`, `punch_audit`, `time_bank_movements` et des fonctions de rôles existantes.

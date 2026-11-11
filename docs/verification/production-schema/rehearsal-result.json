@@ -1,0 +1,244 @@
+{
+  "status": "PASS",
+  "project": "local disposable PostgreSQL",
+  "engine": "PostgreSQL 18.6 (PGlite 0.5.15) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.13 (e13ee988ce3d87a738dd8f3661d02223308c412a), 32-bit",
+  "sourceProject": "gccltmaulvrnthrbnrpd",
+  "sourceCapturedAt": "2026-11-11T02:08:31.671094+00:00",
+  "finishedAt": "2026-11-11T02:16:47.979Z",
+  "checks": [
+    "Copie structurelle issue du catalogue production: 91 tables, sans lignes privées",
+    "Colonnes/types/défauts/NOT NULL/identités, contraintes, RLS et ACL des 91 tables vérifiés",
+    "Ordre de dépendance incorrect refusé; aucun checkpoint partiel",
+    "20261110020000_punch_gps.sql: première puis deuxième exécution identiques",
+    "20261110120000_operational_roles_phase1.sql: première puis deuxième exécution identiques",
+    "20261110130000_punch_phase2_integrity.sql: première puis deuxième exécution identiques",
+    "20261110140000_punch_phase2_workflow.sql: première puis deuxième exécution identiques",
+    "20261110150000_punch_phase2_corrections.sql: première puis deuxième exécution identiques",
+    "20261110160000_punch_phase2_completion.sql: première puis deuxième exécution identiques",
+    "20261111120000_job_dossier_central.sql: première puis deuxième exécution identiques",
+    "Lot complet rejoué après toutes les migrations: aucune dérive",
+    "Sentinelles de données conservées et configuration Punch désactivée par défaut",
+    "Toutes les fonctions et ACL préexistantes production conservées exactement",
+    "Dix tables protégées par RLS et sans accès direct anon/authenticated",
+    "Signatures, SECURITY DEFINER, search_path et EXECUTE des RPC/alias vérifiés",
+    "Bucket privé et deux policies conditionnelles présents",
+    "Policies compatibles conservées avec leurs OID lors du rejeu dossier",
+    "Policy incompatible refusée sans suppression ni remplacement",
+    "Dérive de schéma refusée avant réapplication; transaction annulée",
+    "Toutes les contraintes validées et tous les index valides"
+  ],
+  "inventory": [
+    {
+      "relname": "job_documents",
+      "constraints": 9,
+      "indexes": 5
+    },
+    {
+      "relname": "punch_audit",
+      "constraints": 2,
+      "indexes": 1
+    },
+    {
+      "relname": "punch_corrections",
+      "constraints": 6,
+      "indexes": 2
+    },
+    {
+      "relname": "punch_events",
+      "constraints": 7,
+      "indexes": 2
+    },
+    {
+      "relname": "punch_segments",
+      "constraints": 7,
+      "indexes": 2
+    },
+    {
+      "relname": "punch_settings",
+      "constraints": 5,
+      "indexes": 1
+    },
+    {
+      "relname": "punch_shifts",
+      "constraints": 5,
+      "indexes": 3
+    },
+    {
+      "relname": "time_bank_movements",
+      "constraints": 5,
+      "indexes": 1
+    },
+    {
+      "relname": "time_bank_requests",
+      "constraints": 6,
+      "indexes": 2
+    },
+    {
+      "relname": "time_periods",
+      "constraints": 5,
+      "indexes": 2
+    }
+  ],
+  "functions": [
+    {
+      "signature": "mir_job_dossier_snapshot(uuid,uuid,integer,timestamp with time zone)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core"
+      ],
+      "anon": false,
+      "authenticated": true,
+      "service_role": true
+    },
+    {
+      "signature": "mir_my_operational_access(uuid)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core"
+      ],
+      "anon": false,
+      "authenticated": true,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_action(uuid,uuid,text,uuid,jsonb)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core, public"
+      ],
+      "anon": false,
+      "authenticated": true,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_action_phase1(uuid,uuid,text,uuid,jsonb)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core"
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_admin(uuid,text,jsonb)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core, public"
+      ],
+      "anon": false,
+      "authenticated": true,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_admin_phase1(uuid,text,jsonb)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core"
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_admin_phase2(uuid,text,jsonb)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core, public"
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_correction(uuid,uuid,jsonb)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core, public"
+      ],
+      "anon": false,
+      "authenticated": true,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_correction_phase1(uuid,uuid,jsonb)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core"
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_correction_phase2(uuid,uuid,jsonb)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core, public"
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_correction_phase2_apply(uuid,uuid,jsonb)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core, public"
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_journal(uuid,jsonb,integer,bigint)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core, public"
+      ],
+      "anon": false,
+      "authenticated": true,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_snapshot(uuid,uuid)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core, public"
+      ],
+      "anon": false,
+      "authenticated": true,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_snapshot_phase1(uuid,uuid)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core"
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service_role": true
+    },
+    {
+      "signature": "mir_punch_snapshot_phase2_workflow(uuid,uuid)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core, public"
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service_role": true
+    },
+    {
+      "signature": "mir_time_bank_request(uuid,uuid,jsonb)",
+      "prosecdef": true,
+      "proconfig": [
+        "search_path=pg_catalog, mir_core, public"
+      ],
+      "anon": false,
+      "authenticated": true,
+      "service_role": true
+    }
+  ]
+}
