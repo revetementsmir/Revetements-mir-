@@ -2,7 +2,7 @@
   "sha": "39ca1033ae1b70ced19cc5c756d4957f84cb2d41",
   "files": {
     "dist/portal-client.js": "a42cad18d6087b00a5e9559d7520548f519733908f008557b3f8bb7be40a8293",
-    "dist/chantier-employee.css": "6a0b97921ae69e355e4b6e5a7a8d2607deadfab4f152609d7569f03ce3d53bcb",
+    "dist/chantier-employee.css": "273a6e69b76e223d0e7860132eb1b7bb578cb491170ad475aafd03031fa3350a",
     "dist/employee-store-model.js": "0d33d1c944d55764dd60d9fd330bff231dac3b975e0027f04c02444a4a2c0c7b",
     "dist/portal-config.js": "cf4a4bc34ad1210e2461a578680da96466a1e6878b05814bb45a7c101cb4b991"
   },

@@ -1,5 +1,13 @@
 # MIR — État exhaustif et passation d’exécution du Prompt 2 pour Codex
 
+## Addendum courant — Phase 3B, 11 novembre 2026
+
+La Phase 3A reste certifiée sur MIR TEST et n’a pas été rejouée. La branche 3B `codex/phase-3b-clavardage-mobile` dépend explicitement de sa tête `f5c2aa04450d708a8f86da51bc3c778d0ebf75e7`, car la PR #4 n’était pas fusionnée au démarrage.
+
+Le parcours mobile Harmony liste → conversation → pièce jointe est consolidé localement : privé/équipe/chantier, recherche, pagination, non-lus, photos par `mir-chat-files`, brouillons, hors ligne, protection d’envoi, chargement/vide/erreur/refus et dispositions téléphone/tablette/ordinateur. La recette Playwright passe sur six formats; les contrats 3A, Aujourd’hui et six rôles restent verts. Voir `docs/verification/mir-chat-phase3b-mobile.md`.
+
+Verdict courant 3B : **PARTIELLEMENT VALIDÉ**. Les contrôles UI sont locaux/simulés et le frontend n’est pas publié. Le backend certifié ne prend actuellement en charge que les images; les documents/PDF restent une extension serveur à concevoir et recertifier, sans repli Storage. Production intacte; aucune Phase 3C ni refonte publique commencée.
+
 ## Addendum courant — Phase 3A, 11 novembre 2026
 
 La consigne historique de commencer la Phase 1 est remplacée par la reprise courante : seule la Phase 3A est active. Sur MIR TEST `hxtztkmbfpmzrieccwsg`, la préparation `chat_phase3a_private_file_gateway`, la fonction Edge `mir-chat-files` v1 (`verify_jwt=false` avec vérification Auth explicite) et l'activation `chat_phase3a_private_file_activate` sont réellement installées. MIR production n'a reçu aucune mutation.
