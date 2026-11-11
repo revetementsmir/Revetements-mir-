@@ -31,6 +31,7 @@ jobs:
         run: |
           node tests/mir-chat-phase3a-postgres.cjs
           node tests/mir-chat-phase3a-guards.cjs
+          node tests/mir-chat-support-postgres.cjs
           node tests/mir-employee-operations-postgres.cjs
           node tests/mir-job-dossier-postgres.cjs
           node tests/mir-punch-postgres.cjs

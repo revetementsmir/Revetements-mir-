@@ -1,0 +1,63 @@
+{
+  "project": "hxtztkmbfpmzrieccwsg",
+  "readOnly": true,
+  "policies": [
+    {
+      "cmd": "INSERT",
+      "qual": null,
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "objects",
+      "permissive": "PERMISSIVE",
+      "policyname": "mir_support_insert",
+      "schemaname": "storage",
+      "with_check": "((bucket_id = 'mir-support'::text) AND mir_core.support_object_allowed(name, true))"
+    },
+    {
+      "cmd": "SELECT",
+      "qual": "((bucket_id = 'mir-support'::text) AND mir_core.support_object_allowed(name, false))",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "objects",
+      "permissive": "PERMISSIVE",
+      "policyname": "mir_support_select",
+      "schemaname": "storage",
+      "with_check": null
+    },
+    {
+      "cmd": "DELETE",
+      "qual": "((bucket_id = 'mir-support'::text) AND mir_core.support_object_allowed(name, true))",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "objects",
+      "permissive": "PERMISSIVE",
+      "policyname": "mir_support_delete",
+      "schemaname": "storage",
+      "with_check": null
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{postgres=X/postgres}",
+      "md5": "0fb4c73abeb186aa051db3b1bf905e3f",
+      "signature": "mir_core.support_staff(uuid,uuid)",
+      "definition": "CREATE OR REPLACE FUNCTION mir_core.support_staff(org uuid, member uuid DEFAULT auth.uid())\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'mir_core'\nAS $function$\n select mir_core.staff_role(org,member) in('assistant','boss','admin','warehouse');\n$function$\n"
+    },
+    {
+      "acl": "{postgres=X/postgres}",
+      "md5": "b17b6b390cbeaaa5e050a4f842c638af",
+      "signature": "mir_core.support_allowed(uuid,uuid,uuid)",
+      "definition": "CREATE OR REPLACE FUNCTION mir_core.support_allowed(org uuid, conversation uuid, member uuid DEFAULT auth.uid())\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'mir_core'\nAS $function$\n select exists(select 1 from mir_core.support_conversations c where c.organization_id=org and c.id=conversation and (c.customer_id=member or mir_core.support_staff(org,member)));\n$function$\n"
+    },
+    {
+      "acl": "{postgres=X/postgres}",
+      "md5": "31d75e84af8bd7bb5f5c2e4f0b25c3fa",
+      "signature": "mir_core.support_object_allowed(text,boolean)",
+      "definition": "CREATE OR REPLACE FUNCTION mir_core.support_object_allowed(object_name text, writing boolean DEFAULT false)\n RETURNS boolean\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'mir_core', 'storage'\nAS $function$declare parts text[];org uuid;conversation uuid;owner uuid;begin parts:=storage.foldername(object_name);if cardinality(parts)<>4 then return false;end if;begin org:=parts[1]::uuid;conversation:=parts[2]::uuid;owner:=parts[3]::uuid;exception when others then return false;end;if writing and owner<>auth.uid() then return false;end if;return mir_core.support_allowed(org,conversation);end$function$\n"
+    }
+  ],
+  "existingPaths": null
+}
