@@ -1,5 +1,13 @@
 # MIR — État exhaustif et passation d’exécution du Prompt 2 pour Codex
 
+## Addendum courant — Phase 3A, 11 novembre 2026
+
+La consigne historique de commencer la Phase 1 est remplacée par la reprise courante : seule la Phase 3A est active. Sur MIR TEST `hxtztkmbfpmzrieccwsg`, la préparation `chat_phase3a_private_file_gateway`, la fonction Edge `mir-chat-files` v1 (`verify_jwt=false` avec vérification Auth explicite) et l'activation `chat_phase3a_private_file_activate` sont réellement installées. MIR production n'a reçu aucune mutation.
+
+Preuve hébergée : run GitHub `43045549628`, SHA `55c599774f743331b5160abbee29c05492cad427`, 27/27 contrôles du nouveau circuit réussis. Les accès Storage directs du chat et la création de nouveaux liens signés sont refusés; vrai PNG accepté; texte/CRC invalide refusés; cinq rôles lisent et Entrepôt est refusé; chemins encodés 400; organisation étrangère 403; huit lectures concurrentes cohérentes; réponses non cachables. L'ancien runner échoue comme attendu sur son upload direct après activation.
+
+Verdict courant : **PARTIELLEMENT VALIDÉ**. Restent bloqués : retrait/réintégration et changement/expiration de session exercés sur le nouveau circuit, puis certification bidirectionnelle avec un interne tenant B déjà provisionné. Le tenant B connu a toujours zéro interne actif; aucun compte ni membership ne doit être créé pour contourner ce blocage.
+
 Date de l’audit : 10 novembre 2026  
 Dépôt vérifié : `revetementsmir/Revetements-mir-`  
 Branche vérifiée : `main`  
