@@ -1,6 +1,6 @@
 'use strict';
 // Service integration simulated with native Request/Response. No Supabase writes.
-const {test}=require('node:test'),assert=require('node:assert/strict'),{png,chunk}=require('./fixtures/mir-chat-png.cjs');
+const {test}=require('node:test'),assert=require('node:assert/strict'),{png,chunk}=require('./fixtures/mir-chat-png.cjs'),{pdf}=require('./fixtures/mir-chat-pdf.cjs');
 const id=n=>'60000000-0000-4000-8000-'+String(n).padStart(12,'0'),org=id(10),conversation=id(20),user=id(1),filename=id(30),path=`${org}/message/${conversation}/${user}/${filename}.png`;
 const loaded=Promise.all([import('../supabase/functions/_shared/chat-files.mjs'),import('../supabase/functions/_shared/chat-file-content.mjs')]);
 async function fixture(){
@@ -12,7 +12,7 @@ async function fixture(){
    if(name==='mir_chat_file_record')return Response.json({objectId:args.object_id,version:'1',path:args.expected_path,mime:args.expected_mime,size:args.expected_size,userId:args.actor});
    if(name==='mir_chat_file_upload_authorize')return Response.json({userId:user});
    const object=files.get(args.object_path);if(!object)return Response.json({},{status:400});
-   return Response.json({userId:user,objectId:id(50),path:args.object_path,version:'1',mime:'image/png',size:object.length});
+   return Response.json({userId:user,objectId:id(50),path:args.object_path,version:'1',mime:args.object_path.endsWith('.pdf')?'application/pdf':'image/png',size:object.length});
   }
   if(url.includes('/storage/v1/object/')){
    const key=url.slice(url.indexOf(org)).split('?')[0];
@@ -31,6 +31,17 @@ test('PNG réel structure CRC et décompression, et limites annoncées',async()=
  for(const bytes of invalid)assert.throws(()=>content.inspectImage(bytes,'image/png'),e=>e.status===422);
  assert.throws(()=>content.inspectImage(png({width:8192,height:8192}),'image/png'),e=>e.code==='PNG_DIMENSIONS_OR_HEADER'||e.code==='PNG_DECODE_LIMIT');
  assert.throws(()=>content.inspectImage(png(),'image/jpeg'),/FILE_CONTENT_TYPE/);
+});
+test('PDF passif structurellement valide; faux, tronqué et actif refusés',async()=>{
+ const {content}=await fixture(),valid=pdf();assert.equal(content.inspectPdf(valid).inspector,'pdf-structure-v1');
+ for(const bad of [Buffer.from('not a PDF'),valid.subarray(0,-8),Buffer.from(valid.toString('latin1').replace('/Type /Catalog','/Type /Catalog /JavaScript'),'latin1'),Buffer.from(valid.toString('latin1').replace(/startxref\n\d+/,'startxref\n12'),'latin1')])
+  assert.throws(()=>content.inspectPdf(bad),e=>e.status===422);
+ assert.throws(()=>content.inspectFile(Buffer.alloc(10*1024*1024+1),'application/pdf'),e=>e.status===413);
+});
+test('upload PDF valide passe par la même autorisation et les invalides restent avant Storage',async()=>{
+ const s=await fixture(),bytes=pdf(),r=await s.request({action:'upload',mime:'application/pdf',base64:bytes.toString('base64')});assert.equal(r.status,200);const data=await r.json();
+ assert.equal(data.path,path.slice(0,-3)+'pdf');assert.equal(data.mime,'application/pdf');assert.equal(data.inspector,'pdf-structure-v1');
+ for(const bad of [Buffer.from('not a PDF'),bytes.subarray(0,-8)]){const x=await fixture(),response=await x.request({action:'upload',mime:'application/pdf',base64:bad.toString('base64')});assert.equal(response.status,422);assert.equal(x.calls.some(c=>c.url.includes('/storage/')),false);}
 });
 test('upload valide contrôlé avant Storage, chemin généré côté serveur, attestation privée',async()=>{
  const s=await fixture(),r=await s.request({action:'upload',mime:'image/png',base64:s.bytes.toString('base64')});assert.equal(r.status,200);const data=await r.json();assert.equal(data.path,path);assert.equal(data.inspector,'png-crc-inflate-v1');

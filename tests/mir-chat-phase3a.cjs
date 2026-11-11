@@ -17,8 +17,8 @@ async function setup(){
  },storage:{from:bucket=>({async createSignedUrl(path,ttl){calls.push({bucket,path,ttl});if(hold==='storage')await new Promise(r=>resolve=r);return {data:{signedUrl:'https://example.invalid/signed-fixture'}};}})}};
  const revoked=[];let serial=0;
  const client=Portal.create({config,sdk:{createClient:()=>sdk},operationStorage:{getItem:()=>null,setItem(){},removeItem(){}},objectURL:{createObjectURL(){return'blob:fixture-'+(++serial);},revokeObjectURL(url){revoked.push(url);}},fetch:async(url,options)=>{
-  calls.push({url,options});if(hold==='file')await new Promise(r=>resolve=r);const b=JSON.parse(options.body);
-  return {ok:true,blob:async()=>new Blob(['fixture'],{type:'image/png'}),json:async()=>b.action==='upload'?{path:`${org}/message/${b.conversation}/${id}/${conversation}.png`,mime:b.mime,size:Buffer.from(b.base64,'base64').length}:{path:b.path}};
+  calls.push({url,options});if(hold==='file')await new Promise(r=>resolve=r);const b=JSON.parse(options.body),ext=b.mime==='application/pdf'?'pdf':'png';
+  return {ok:true,blob:async()=>new Blob(['fixture'],{type:String(b.path||'').endsWith('.pdf')?'application/pdf':'image/png'}),json:async()=>b.action==='upload'?{path:`${org}/message/${b.conversation}/${id}/${conversation}.${ext}`,mime:b.mime,size:Buffer.from(b.base64,'base64').length}:{path:b.path}};
  }});
  await client.start();assert.equal(client.getStatus().phase,'ready');
  return {client,calls,revoked,hold(name){hold=name;},resolve(){resolve({});},waiting(){return !!resolve;}};
@@ -66,6 +66,12 @@ test('upload chat via serveur, autres photos inchangées et blobs invalidés au 
  assert.equal(JSON.parse(s.calls.at(-1).options.body).action,'upload');assert.equal(s.calls.some(c=>c.bucket),false);
  await s.client.chatPhotoURL(p);await s.client.refresh();assert.deepEqual(s.revoked,['blob:fixture-1']);
  assert.equal(await s.client.internalPhotoURL(`${org}/report/${conversation}/${id}/${conversation}.jpg`),'https://example.invalid/signed-fixture');assert.equal(s.calls.at(-1).ttl,300);
+});
+test('PDF chat utilise la passerelle et reste interdit aux autres scopes',async t=>{
+ const s=await setup();t.after(()=>s.client.dispose());const bytes=require('./fixtures/mir-chat-pdf.cjs').pdf(),file=new Blob([bytes],{type:'application/pdf'});
+ const p=await s.client.uploadInternal(file,'message',conversation);assert.match(p,/\.pdf$/);assert.equal(JSON.parse(s.calls.at(-1).options.body).mime,'application/pdf');
+ assert.equal(await s.client.chatFileURL(p),'blob:fixture-1');assert.equal(s.calls.some(c=>c.bucket),false);
+ await assert.rejects(()=>s.client.uploadInternal(file,'report',conversation),/photo/i);
 });
 test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch conservées',()=>{
  const baseline=require('./fixtures/mir-chat-baseline.json'),hash=x=>createHash('sha256').update(x).digest('hex');

@@ -62,3 +62,22 @@ export function inspectImage(bytes,mime){
  }
  fail('FILE_CONTENT_TYPE');
 }
+
+export function inspectPdf(bytes){
+ if(!(bytes instanceof Uint8Array)||!bytes.length||bytes.length>MAX_FILE_BYTES)throw new FileError('FILE_SIZE',413);
+ const source=new TextDecoder('latin1').decode(bytes);
+ if(!/^%PDF-(?:1\.[0-7]|2\.0)(?:\r\n|\r|\n)/.test(source))fail('PDF_SIGNATURE');
+ const eof=source.match(/%%EOF[\t \r\n]*$/);if(!eof)fail('PDF_EOF');
+ const beforeEof=source.slice(0,eof.index),start=beforeEof.match(/startxref[\t \r\n]+([0-9]{1,10})[\t \r\n]*$/);
+ if(!start)fail('PDF_STARTXREF');
+ const offset=Number(start[1]);if(!Number.isSafeInteger(offset)||offset<9||offset>=start.index)fail('PDF_XREF');
+ const target=source.slice(offset,Math.min(offset+80,source.length));
+ if(!/^xref(?:\r\n|\r|\n)/.test(target)&&!/^\d+[\t ]+\d+[\t ]+obj(?:\r\n|\r|\n|[\t ])/.test(target))fail('PDF_XREF');
+ if(!/\/Type\s*\/Catalog\b/.test(beforeEof)||!/\/Type\s*\/Pages\b/.test(beforeEof))fail('PDF_STRUCTURE');
+ if(/\/(?:Encrypt|JavaScript|JS|Launch|EmbeddedFile|Filespec|RichMedia)\b/.test(beforeEof))fail('PDF_ACTIVE_CONTENT');
+ const objects=source.match(/(?:^|[\r\n])\d+[\t ]+\d+[\t ]+obj\b/g)?.length||0;
+ if(!objects||objects>10000)fail('PDF_OBJECT_LIMIT');
+ return{inspector:'pdf-structure-v1',version:source.slice(5,8),objects};
+}
+
+export function inspectFile(bytes,mime){return mime==='application/pdf'?inspectPdf(bytes):inspectImage(bytes,mime);}

@@ -4,9 +4,11 @@
 
 La Phase 3A reste certifiée sur MIR TEST et n’a pas été rejouée. La branche 3B `codex/phase-3b-clavardage-mobile` dépend explicitement de sa tête `f5c2aa04450d708a8f86da51bc3c778d0ebf75e7`, car la PR #4 n’était pas fusionnée au démarrage.
 
-Le parcours mobile Harmony liste → conversation → pièce jointe est consolidé localement : privé/équipe/chantier, recherche, pagination, non-lus, photos par `mir-chat-files`, brouillons, hors ligne, protection d’envoi, chargement/vide/erreur/refus et dispositions téléphone/tablette/ordinateur. La recette Playwright passe sur six formats; les contrats 3A, Aujourd’hui et six rôles restent verts. Voir `docs/verification/mir-chat-phase3b-mobile.md`.
+Le parcours mobile Harmony liste → conversation → pièce jointe est consolidé localement : privé/équipe/chantier, recherche, pagination, non-lus, photos et PDF par `mir-chat-files`, brouillons, hors ligne, protection d’envoi, chargement/vide/erreur/refus et dispositions téléphone/tablette/ordinateur. La recette Playwright passe sur six formats; les contrats 3A, Aujourd’hui et six rôles restent verts. Voir `docs/verification/mir-chat-phase3b-mobile.md`.
 
-Verdict courant 3B : **PARTIELLEMENT VALIDÉ**. Les contrôles UI sont locaux/simulés et le frontend n’est pas publié. Le backend certifié ne prend actuellement en charge que les images; les documents/PDF restent une extension serveur à concevoir et recertifier, sans repli Storage. Production intacte; aucune Phase 3C ni refonte publique commencée.
+Extension PDF installée uniquement sur MIR TEST : migration `chat_phase3b_pdf_attachments`, `mir-chat-files` v2 et `mir-chat-tenant-b-recipe` v3. Le bucket privé reste borné à 10 MiB; les PDF sont inspectés comme documents passifs et passent par les mêmes contrôles Auth/organisation/conversation que les images, sans accès Storage direct. Aucun objet production n’a été modifié.
+
+Verdict courant 3B : **PARTIELLEMENT VALIDÉ**. Les contrôles UI photo/PDF sont locaux et simulés; la recette hébergée ciblée du SHA poussé reste à obtenir et le frontend n’est pas publié. Les documents autres que PDF restent refusés. Production intacte; aucune Phase 3C ni refonte publique commencée.
 
 ## Addendum courant — Phase 3A, 11 novembre 2026
 
@@ -241,6 +243,7 @@ Légende test : **Réel** = vérifié sur MIR TEST ou service réel par une preu
 | Exigence | État | Test | Associés |
 |---|---|---|---|
 | FAQ/demandes/chat client, transfert, statuts, non lus, pièces, notes internes | Partielle sur MIR TEST seulement | Réel schéma/RPC TEST; UI non testée | `help_faq`, `support_*`, `mir_client_center_snapshot`, `mir_support_*`; migration absente du dépôt |
+| Clavardage interne mobile : photo/PDF privés, recherche, pagination, non-lus, brouillon, envoi unique, hors ligne | Partiel | PDF installé sur MIR TEST; UI testée en simulation sur six formats; recette hébergée 3B en attente | `mir-chat-files` v2; `chat_phase3b_pdf_attachments`; aucun repli Storage; frontend non publié |
 | Navigation PC exacte et intégrations Matériaux/Nous joindre | Partielle | Simulation | `mir-public-menu.*`; tests menu |
 | Navigation mobile fixe exacte | Partielle | Simulation | menu public/mobile; audit requis |
 | Estimation envoyée directement à estimation@, jamais mailto, succès réel | Terminée | Réel | Edge `mir-estimates` TEST, service/recettes estimation |
