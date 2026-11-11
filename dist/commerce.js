@@ -84,7 +84,7 @@
     if(index===null)return '<div class="sample-unavailable"><strong>'+esc(choice?.name||'Couleur à confirmer')+'</strong><span>Photo MIR de cette couleur à venir · consulter le nuancier.</span></div>';
     const label=m.name+' — '+choice.name+' — visuel MIR indicatif';
     const x=-paintPotCell*(index%paintPotColumns),y=-paintPotCell*Math.floor(index/paintPotColumns);
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="'+esc(label)+'" data-mir-canexel-pot="'+index+'" style="display:block;width:100%;height:100%;max-width:100%;object-fit:contain"><image href="'+paintPotAtlas+'" x="'+x+'" y="'+y+'" width="2400" height="2400" preserveAspectRatio="xMidYMid meet"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" overflow="hidden" role="img" aria-label="'+esc(label)+'" data-mir-canexel-pot="'+index+'" style="display:block;width:100%;height:100%;max-width:100%;object-fit:contain;overflow:hidden"><svg x="0" y="0" width="600" height="600" viewBox="0 0 600 600" overflow="hidden" style="overflow:hidden"><image href="'+paintPotAtlas+'" x="'+x+'" y="'+y+'" width="2400" height="2400" preserveAspectRatio="xMidYMid meet"/></svg></svg>';
   }
   function renderPaintPot(el,m,c){
     if(!el)return;
@@ -390,7 +390,7 @@
       }
       if(m.keepProductPhoto||m.screwPreview){
         const note=$('#product-photo-note');
-        note.textContent=m.keepProductPhoto?'Photo du produit. L’échantillon de teinte est dans le nuancier.':
+        note.textContent=m.paintPotIndices?(paintPotIndex(m,activeColor)===null?'Photo de ce coloris à venir · voir le nuancier fabricant.':'Pot CanExel · '+(activeColor?.name||'couleur sélectionnée')+' · couleur du couvercle indicative.') : m.keepProductPhoto?'Photo du produit. L’échantillon de teinte est dans le nuancier.':
           m.screwPreview==='fascia-2po'?'Illustration de la vis · aperçu de la teinte sur la tête.':
           activeColor?.swatchUrl||activeColor?.hex?'Aperçu de la teinte sur la tête de la vis.':'Photo de référence de la vis. Teinte à préciser.';
         return;
@@ -450,7 +450,7 @@
         for(const option of options)option.hidden=!norm(option.getAttribute('aria-label')).includes(query);
       });
     }
-    const technical=$('#product-technical');technical.append(photos,$('#color-note'));const sampleNote=document.createElement('p');sampleNote.className='mir-sample-note';sampleNote.textContent=m.stableSidingPreview?'Échantillon MIR · rendu écran indicatif':m.keepProductPhoto?'Photo du produit · teinte au nuancier':
+    const technical=$('#product-technical');technical.append(photos,$('#color-note'));const sampleNote=document.createElement('p');sampleNote.className='mir-sample-note';sampleNote.textContent=m.stableSidingPreview?'Échantillon MIR · rendu écran indicatif':m.paintPotIndices?'Pot CanExel · tache de peinture sèche, teinte indicative':m.keepProductPhoto?'Photo du produit · teinte au nuancier':
       m.screwPreview?(m.screwPreview==='fascia-2po'?'Illustration · teinte indicative':'Aperçu de la teinte sur la tête'):
       im?.assetKind?.startsWith('MIR_user_provided_')?'Visuel fourni par MIR · longueur à sélectionner':
       im||cs.some(c=>c.swatchUrl)?'Visuel indicatif · référence fabricant':'Photo non disponible · visuel de remplacement';gallery.append(sampleNote);for(const a of [...$('.product-actions-main').querySelectorAll('a.quiet-button')])technical.append(a);
