@@ -11,8 +11,8 @@
   "invitationsEnabled": true,
   "manualInvitations": true,
   "documentsEnabled": false,
-  "siteOrigin": "https://revetementsmirweb.github.io",
-  "callbackPath": "/MIR/chantier.html"
+  "siteOrigin": "https://revetementsmir.github.io",
+  "callbackPath": "/Revetements-mir-/chantier.html"
 };
  const test=typeof location==='object'&&new URLSearchParams(location.search).get('recette')==='1';
  window.MIRPortalConfig=Object.freeze({...common,...(test?{
