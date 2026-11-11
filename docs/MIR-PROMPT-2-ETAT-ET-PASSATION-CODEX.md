@@ -8,7 +8,7 @@ Le parcours mobile Harmony liste → conversation → pièce jointe est consolid
 
 Extension PDF installée uniquement sur MIR TEST : migrations `chat_phase3b_pdf_attachments`, `chat_phase3b_pdf_gateway_acl` et `chat_phase3b_pdf_attestation_constraint`, `mir-chat-files` v2 et `mir-chat-tenant-b-recipe` v3. Le bucket privé reste borné à 10 MiB; les PDF sont inspectés comme documents passifs et passent par les mêmes contrôles Auth/organisation/conversation que les images, sans accès Storage direct. Aucun objet production n’a été modifié.
 
-Verdict courant 3B : **PARTIELLEMENT VALIDÉ**. Au SHA `9eed4435681ee1a44223d42665ccd8fb742ae081`, la recette hébergée ciblée réussit 25/25 contrôles et l’étape d’isolation A↔B photo/PDF est verte dans le run `43084321137`. Les contrôles UI photo/PDF restent locaux et simulés et le frontend n’est pas publié. Les documents autres que PDF restent refusés. Production intacte; aucune Phase 3C ni refonte publique commencée.
+Verdict courant 3B : **CERTIFIÉ sur MIR TEST en recette intégrée privée**. Au SHA fonctionnel `b6296c0fa9ac86e11fa08e9d2c94f553892adc2f`, 22/22 contrôles navigateur avec deux sessions Auth réelles réussissent : conversations, recherche, pagination, PNG/PDF par `mir-chat-files`, non-lus/reçus, brouillon hors ligne, envoi unique, refus 403 après retrait et navigation téléphone/tablette/ordinateur. Les affectations temporaires ont été restaurées. Cette preuve complète la recette backend 25/25 et l’isolation A↔B du run `43084321137`; elle ne les rejoue pas. Le frontend n’est pas publié et les autres documents restent refusés. Production intacte; aucune Phase 3C ni refonte publique commencée.
 
 ## Addendum courant — Phase 3A, 11 novembre 2026
 

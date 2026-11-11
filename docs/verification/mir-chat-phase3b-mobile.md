@@ -2,7 +2,7 @@
 
 ## État courant
 
-Verdict : **PARTIELLEMENT VALIDÉ** sur la branche `codex/phase-3b-clavardage-mobile`, dépendante de la tête 3A certifiée `f5c2aa04450d708a8f86da51bc3c778d0ebf75e7`. La PR 3A n’étant pas fusionnée au démarrage, 3B ne repart pas d’un `main` incomplet.
+Verdict : **CERTIFIÉ sur MIR TEST en recette intégrée privée** au SHA fonctionnel `b6296c0fa9ac86e11fa08e9d2c94f553892adc2f`, sur la branche `codex/phase-3b-clavardage-mobile`, dépendante de la tête 3A certifiée `f5c2aa04450d708a8f86da51bc3c778d0ebf75e7`. La PR 3A n’étant pas fusionnée au démarrage, 3B ne repart pas d’un `main` incomplet.
 
 Les preuves 3A sont réutilisées sans rejouer leur certification complète : 38/38 contrôles passerelle au SHA `74d805179270a2aec86bebf7168b8444a6e4ff02`, puis 10/10 contrôles d’isolation A↔B au SHA `be90c35bb41def96a91cf90503b5c0b430d5369f`.
 
@@ -42,6 +42,9 @@ Captures fonctionnelles simulées :
 - La recette locale a détecté avant validation hébergée que la contrainte d’inspecteur 3A restait limitée aux images; la troisième migration l’étend exactement à `pdf-structure-v1`, sans modifier les ACL.
 - Recette ciblée 3B hébergée au SHA `9eed4435681ee1a44223d42665ccd8fb742ae081` : **25/25 réussis**, run GitHub `43084321137`, artefact `mir-chat-phase3b-real` (digest `sha256:bdf7a5fb3b8c1baa5972ed43e95c33f518a25a30598c9dbe453dbd99948ea170`). Photo et PDF réels, trois PDF invalides refusés, idempotence, pagination, recherche, non-lus, retrait/réintégration et refus Storage direct sont prouvés.
 - Le même job a réussi l’étape réelle d’isolation A→B et B→A pour photo et PDF avec la recette tenant B existante. Les affectations temporaires A ont été restaurées; aucun secret n’est présent dans l’artefact.
+- Recette frontend intégrée privée sur le SHA exact `b6296c0fa9ac86e11fa08e9d2c94f553892adc2f` : **22/22 contrôles réussis** avec deux sessions Auth réelles, fichiers de la branche servis sous l’origine HTTPS MIR courante et appels métier dirigés uniquement vers MIR TEST. Conversations, recherche, pagination 20→40, PNG/PDF envoyés et ouverts par `mir-chat-files`, non-lu, reçu de lecture, brouillon hors ligne et envoi unique sont prouvés.
+- Après retrait réel du chantier, une nouvelle lecture du fichier par la session navigateur reçoit **403**; les affectations temporaires sont ensuite restaurées. Les formats 390×844, 768×1024 et 1440×900 ne présentent aucun débordement horizontal.
+- Preuve expurgée : `docs/verification/mir-chat-phase3b-browser-real-results.json`. Aucun secret, jeton ou donnée Auth n’y est consigné.
 - Aucune publication du frontend : la branche reste une proposition en PR brouillon.
 
 ### Local et simulé
@@ -56,9 +59,9 @@ Captures fonctionnelles simulées :
 
 Ces résultats navigateur utilisent des comptes, RPC et réponses simulés. Ils prouvent le comportement UI, pas une installation hébergée du frontend.
 
-## Limites et décision nécessaire
+## Limites conservées
 
-Le PDF est installé sur MIR TEST, mais le verdict demeure **PARTIELLEMENT VALIDÉ** tant que la recette hébergée du SHA exact n’a pas confirmé photo/PDF, refus A↔B, retrait/réintégration et les régressions de messagerie ciblées. Les autres documents génériques restent refusés. Le frontend n’est pas publié.
+La recette intégrée demandée est certifiée sur MIR TEST. Elle utilise Chromium privé et des dimensions de viewport; elle ne constitue pas une recette sur appareils physiques. Le frontend n’est pas publié, conformément au périmètre, et les documents autres que les images autorisées et le PDF restent refusés.
 
 Les copies déjà téléchargées ne sont pas révocables à distance. Le HTTP 500 historique de la route Storage native demeure distinct et n’est pas présenté comme corrigé par 3B.
 
