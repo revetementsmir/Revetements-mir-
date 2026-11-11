@@ -8,10 +8,17 @@ const routes=['realisations','contact','materiaux','boutique','produit','selecti
 let checks=0;
 function test(name,fn){fn();checks++;console.log('PASS '+name);}
 test('Le menu a une API stable et son activation reste explicitement mobile/tablette',()=>{
- assert.equal(menu.version,'2.0.0');
+ assert.equal(menu.version,'2.1.0');
  assert.equal(menu.breakpoint,'(max-width: 1100px)');
  assert.equal(typeof menu.init,'function');
  assert.deepEqual(menu.mobile.map(item=>item[1]),['Accueil','Boutique','Pliage','Commandes','Compte']);
+});
+test('Le mode recette reste lié à MIR TEST dans les destinations publiques',()=>{
+ assert.equal(menu.recipeHref('chantier.html?view=orders',true),'chantier.html?view=orders&recette=1');
+ assert.equal(menu.recipeHref('chantier.html?view=account',true),'chantier.html?view=account&recette=1');
+ assert.equal(menu.recipeHref('selection.html',true),'selection.html?recette=1');
+ assert.equal(menu.recipeHref('chantier.html#aide',true),'chantier.html?recette=1#aide');
+ assert.equal(menu.recipeHref('https://example.invalid/',true),'https://example.invalid/');
 });
 test('Les pages clients utilisent les mêmes fichiers de menu, sans bibliothèques ajoutées',()=>{
  for(const route of routes){

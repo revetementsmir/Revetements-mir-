@@ -1,5 +1,13 @@
 # MIR — État exhaustif et passation d’exécution du Prompt 2 pour Codex
 
+## Addendum courant — Refonte publique, 11 novembre 2026
+
+La branche `codex/refonte-site-public` conserve les têtes non fusionnées 3A/3B/3C et les ajouts récents du catalogue. La navigation validée est généralisée : Accueil, Boutique, Pliage, Commandes et Compte sur mobile, Panier permanent dans l’en-tête, et Réalisations/Aide/Contact dans les liens utiles. Compte et Commandes ont désormais des routes distinctes; le mode recette reste explicitement lié à MIR TEST pendant les navigations Produit, Panier, Compte, Commandes, Aide et Estimation.
+
+Recette finale privée : **11/11 contrôles navigateur réussis** dans `docs/verification/refonte-site-public/final-v2/integrated-results.json`. Le parcours Boutique → Produit BECK → Panier conserve format et quantité; Panier → Demander une estimation ouvre le vrai formulaire avec la sélection; le Centre d’aide 3C s’ouvre réellement en état déconnecté et connecté; Boutique, Pliage et Studio passent sur tablette et ordinateur sans erreur JavaScript observée ni débordement horizontal. L’hôte Supabase production était bloqué et aucune requête production n’a été transmise. Aucune estimation n’a été envoyée.
+
+Limite : aucun secret disponible n’a été confirmé comme rôle client par `mir_account_snapshot`; la session Auth réelle disponible est interne. Les onglets client connectés Aperçu/Commandes existent dans le frontend mais leur recette réelle reste bloquée par l’absence d’un accès client TEST autorisé. Aucun compte ou membership n’a été créé ou modifié. Verdict refonte : **PARTIELLEMENT VALIDÉ**, non fusionné et non publié.
+
 ## Addendum courant — Phase 3C, 11 novembre 2026
 
 La Phase 3C est développée sur `codex/phase-3c-centre-aide-soutien`, depuis la tête 3B `62bb65d8d01f521ee9feec63db9a2820070fb735`, elle-même dépendante de 3A `f5c2aa04450d708a8f86da51bc3c778d0ebf75e7`. Les certifications 3A/3B n’ont pas été rejouées.

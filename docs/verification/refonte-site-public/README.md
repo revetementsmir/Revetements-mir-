@@ -1,46 +1,50 @@
-# Refonte publique MIR — aperçu à valider
+# Refonte publique MIR — état réellement livré
 
-## Périmètre
+## État courant
 
-Aperçu privé et navigable du parcours **Boutique → Fiche produit → Panier**. Il ne remplace pas encore les pages publiques et ne contacte aucun service externe.
+La refonte est généralisée dans la branche `codex/refonte-site-public`; elle n’est ni fusionnée ni publiée. Elle conserve les dépendances 3A/3B/3C et le catalogue récent. La proposition initiale limitée à BECK est un jalon historique, pas l’état courant.
 
-Révision de départ : Phase 3C `c0b12ffbcbb5c00f493d1459e1e2de7b5a8d039a`, avec `main` `482c17541066ff1d92a02aade6ed71b24f77fb5e` intégré pour préserver les ajouts récents du catalogue.
+Navigation mobile validée : **Accueil, Boutique, Pliage, Commandes et Compte**, avec **Panier** visible dans l’en-tête. Réalisations, Aide et Contact restent dans les liens utiles. Les routes Compte et Commandes sont distinctes (`view=account` et `view=orders`). En recette privée, tous les liens locaux conservent `recette=1`; un rechargement Produit ou Panier ne peut plus basculer silencieusement vers la configuration production.
 
-## Décision proposée pour la navigation mobile
+## Pages et parcours terminés
 
-Conserver les cinq destinations prévues par la section 11 du consolidé : **Accueil, Boutique, Pliage, Commandes, Compte**. Le **Panier** reste une action permanente et comptée dans l’en-tête compact.
+- Accueil : en-tête compact et navigation commune.
+- Boutique : recherche, catégories et fabricants conservés; catalogue, photos et prix existants inchangés.
+- Produit : photo, prix, options, quantité et ajout; BECK reste offert uniquement en 1½ po à 515,99 $.
+- Panier : sélection, format et quantité conservés; action principale « Demander une estimation ».
+- Estimation : le vrai formulaire s’ouvre depuis le panier et reçoit la sélection courante. Aucun envoi n’a été effectué pendant cette recette.
+- Compte et Commandes : deux destinations distinctes. Déconnecté, Compte ouvre l’authentification en conservant le panier. Connecté, le portail protégé correspondant au rôle serveur est conservé.
+- Centre d’aide : ouverture réelle dans le dialogue 3C, vérifiée déconnectée et connectée; il ne s’agit pas d’un simple lien présent.
+- Pliage et Studio : navigation commune appliquée côté client sans modification de leurs moteurs.
+- Matériaux, Réalisations et Contact : présentation et navigation communes.
 
-Cette solution évite de cacher Accueil, Commandes et Compte sous « Plus », tout en laissant le panier visible pendant tout le parcours. Elle attend la validation de Frederick avant généralisation.
+Les modules internes Harmony/Admin et les fonctions privées 3A/3B/3C ne sont pas refondus par ce lot.
 
-## Données affichées
+## Preuves
 
-L’aperçu réutilise uniquement la fiche approuvée `beck-panelfast-ags100` : format 1½ po, prix MIR de 515,99 $ CA par boîte avant taxes, boîte de 12 bobines (3 000 clous) et photo fournie par MIR.
+### Réel — navigateur privé connecté à MIR TEST
 
-## Vérifications exécutées
+`final-v2/integrated-results.json` : **11/11 contrôles réussis** avec Chromium émulé, frontend de la branche servi en privé et données sur MIR TEST seulement.
 
-- navigation Boutique → Produit → Panier;
-- recherche dans l’aperçu;
-- format unique présélectionné;
-- quantité et personnalisation conservées après l’ajout;
-- compteur du panier et sous-total mis à jour;
-- rendus Chromium à 390 × 844, 768 × 1024 et 1440 × 900;
-- aperçu autonome : styles, scripts et photo intégrés, aucune API, stockage, connexion de compte ou dépendance réseau.
+- cinq destinations mobiles et panier permanent;
+- Boutique, Produit et Panier sur téléphone;
+- article BECK, format et quantité 2 conservés jusqu’au panier;
+- vrai dialogue d’estimation ouvert avec « Quantité 2 »; aucune soumission;
+- Compte déconnecté et session Auth réelle connectée;
+- Centre d’aide réellement ouvert dans les deux états;
+- Boutique, Pliage et Studio sans erreur JavaScript ni débordement horizontal sur tablette et ordinateur;
+- **zéro requête vers `gccltmaulvrnthrbnrpd.supabase.co`** : l’hôte production était bloqué avant transfert.
 
-Les captures `avant/` documentent l’interface existante; les captures `apres/` documentent la proposition. L’émulation Chromium ne remplace pas une vérification sur appareils physiques.
+### Local / simulation navigateur
 
-## Validation de la navigation et généralisation
+- `tests/mir-public-menu.cjs` : **7/7** contrats, y compris la conservation de `recette=1`.
+- preuve précédente `final/browser-results.json` : 168 contrôles et 33 rendus à 390×844, 768×1024 et 1440×900; réutilisée pour les pages non modifiées depuis cette preuve.
+- les formats sont des émulations Chromium, pas des appareils physiques ni Safari.
 
-Frederick a validé les cinq destinations mobiles le 11 novembre 2026 : **Accueil, Boutique, Pliage, Commandes, Compte**. Le panier reste visible avec compteur dans l’en-tête. Les liens secondaires **Réalisations, Aide et Contact** sont regroupés dans « Plus » sur téléphone/tablette et restent visibles dans l’en-tête sur ordinateur.
+## Limites et intervention backend
 
-La navigation commune est appliquée à Accueil, Boutique, Produit, Panier, Matériaux, Pliage, Studio, Réalisations, Contact et Estimation. Le configurateur de pliage client réutilise le même contrôleur sans modifier son moteur. Les modules Harmony/Admin et les fonctions 3A/3B/3C restent exclus de la transformation visuelle.
+- Aucun identifiant configuré dans l’environnement n’a été confirmé par `mir_account_snapshot` comme rôle `client`. La session réellement disponible est interne; les nouveaux onglets client connectés **Aperçu/Commandes** ne sont donc pas rejoués ici. Le frontend est présent, mais une recette client exige un secret TEST client autorisé; aucun compte ni membership n’a été modifié.
+- « Demander une estimation » prépare correctement la sélection et le brouillon. L’envoi, la réception serveur et le courriel n’ont pas été déclenchés : ce sont des preuves backend séparées et une écriture métier, hors de cette recette de finalisation.
+- Aucun appareil physique, Safari, fusion, publication ou écriture Supabase production.
 
-Terminologie retenue : **Panier** pour la sélection de produits et **Demander une estimation** pour l’action d’envoi. Les anciens raccourcis « Ma demande » de Boutique, Produit et Panier ont été harmonisés.
-
-Preuve navigateur finale : `final/browser-results.json`, 33 rendus Chromium et 168 contrôles réussis sur 390×844, 768×1024 et 1440×900. Les contrôles couvrent les cinq destinations, le panier d’en-tête, Réalisations/Aide/Contact, l’absence de débordement horizontal, les cibles d’au moins 44 px, l’absence d’erreur JavaScript observée, la présélection du format BECK unique et l’ajout au panier avec compteur.
-
-## Limites
-
-- maquette fonctionnelle privée, pas une publication;
-- une seule fiche réelle est incluse pour valider la hiérarchie et le parcours;
-- les autres pages, le compte, l’aide et l’envoi d’estimation ne sont volontairement pas généralisés avant validation;
-- aucun classement, indexation ou visibilité IA n’est revendiqué; l’aperçu reste `noindex`.
+Verdict : **PARTIELLEMENT VALIDÉ**. Le frontend public et les parcours déconnectés demandés sont fonctionnels; la preuve d’un vrai client connecté sur Compte/Commandes reste à fournir.

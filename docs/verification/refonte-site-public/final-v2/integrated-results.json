@@ -1,0 +1,79 @@
+{
+  "observedAt": "2026-11-11T22:31:10.823Z",
+  "target": "MIR TEST hxtztkmbfpmzrieccwsg",
+  "productionRequests": [],
+  "checks": [
+    {
+      "name": "cinq destinations mobiles, panier en en-tête et Accueil téléphone",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Boutique téléphone chargée depuis MIR TEST",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Produit → Panier conserve article, format et quantité",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Panier → Demander une estimation ouvre le vrai formulaire avec sélection conservée",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Compte déconnecté affiche la connexion sans quitter MIR TEST",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Centre d’aide réellement ouvert en session déconnectée",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Compte connecté ouvre le portail protégé correspondant au rôle serveur",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Commandes connectées conserve le portail protégé du rôle interne",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Centre d’aide réellement ouvert en session connectée",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Boutique, moteur Pliage et moteur Studio sans régression — tablette",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    },
+    {
+      "name": "Boutique, moteur Pliage et moteur Studio sans régression — ordinateur",
+      "passed": true,
+      "kind": "navigateur réel / frontend privé"
+    }
+  ],
+  "screenshots": [
+    "accueil-telephone.png",
+    "boutique-telephone.png",
+    "produit-telephone.png",
+    "panier-telephone.png",
+    "compte-deconnecte-telephone.png",
+    "compte-connecte-telephone.png",
+    "boutique-tablette.png",
+    "pliage-tablette.png",
+    "boutique-ordinateur.png",
+    "pliage-ordinateur.png"
+  ],
+  "physicalDevices": false,
+  "estimateSubmitted": false,
+  "limits": [
+    "Aucun secret configuré ne correspondait à un client TEST; les onglets Aperçu/Commandes client connectés restent non rejoués dans cette recette."
+  ]
+}
