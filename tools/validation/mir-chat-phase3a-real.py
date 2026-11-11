@@ -43,7 +43,8 @@ class Certification:
         data=r.read()
         try:parsed=json.loads(data)
         except (ValueError,UnicodeDecodeError):parsed=None
-        return {'status':r.status,'data':parsed,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+        return {'status':r.status,'data':parsed,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),
+            'headers':{k:r.headers.get(k) for k in ['cache-control','cdn-cache-control','cloudflare-cdn-cache-control','surrogate-control','x-content-type-options','cf-cache-status','sb-request-id']}}
     def rpc(self,actor,name,args):return self.request('POST','/rest/v1/rpc/'+name,args,actor)
     def check(self,name,condition,evidence=None):
         self.report['checks'].append({'name':name,'status':'passed' if condition else 'failed',
@@ -239,6 +240,8 @@ if __name__=='__main__':
                 except Exception as e:print(json.dumps({'ok':False,'errorClass':type(e).__name__,'error':str(e) if isinstance(e,AssertionError) else 'Check failed; no credentials logged'}),flush=True)
         else:
             cert.core();cert.tenant_b()
+            cert.report['scope']='installed legacy Phase3A backend only; prepared gateway not deployed by this runner'
+            cert.report['status']='LEGACY_CONTRACTS_PASSED' if cert.report['tenantB']['status']=='passed' else 'PARTIAL_TENANT_B_BLOCKED'
             required=['admin','boss','assistant','chef_equipe','employe']
             if any(r not in cert.roles for r in required):raise RuntimeError('Required role credentials missing')
             cert.report['finishedAt']=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime());cert.save()

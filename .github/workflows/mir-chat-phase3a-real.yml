@@ -6,6 +6,11 @@ on:
       - '.github/workflows/mir-chat-phase3a-real.yml'
       - 'supabase/migrations/*chat_phase3a*'
   workflow_dispatch:
+    inputs:
+      certify_gateway:
+        description: 'Seulement après autorisation et activation TEST de la passerelle (aucun déploiement par ce workflow)'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -41,10 +46,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: Recette HTTPS réelle — comptes existants, TEST épinglé
         run: python3 tools/validation/mir-chat-phase3a-real.py
+      - name: Nouvelle passerelle — certification explicite, refus si prérequis manquants
+        if: github.event_name == 'workflow_dispatch' && inputs.certify_gateway
+        env:
+          MIR_CHAT_REAL_REPORT: artifacts/mir-chat-files-real.json
+        run: python3 tools/validation/mir-chat-files-real.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: mir-chat-phase3a-real
-          path: artifacts/mir-chat-phase3a-real.json
+          path: |
+            artifacts/mir-chat-phase3a-real.json
+            artifacts/mir-chat-files-real.json
           if-no-files-found: error
           retention-days: 14
