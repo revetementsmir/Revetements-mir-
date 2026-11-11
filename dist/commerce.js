@@ -613,7 +613,7 @@
     ridgewood.primaryImage='./assets/products/mir-ridgewood-d5/base-ridgewood-d5.webp';
     ridgewood.imageStatus='mir_approved_color_demo';
     ridgewood.imageNote='Échantillon MIR Ridgewood D-5 à cadrage fixe. Seule la teinte change; rendu écran indicatif.';
-    ridgewood.stableSidingPreview={baseImage:ridgewood.primaryImage,width:1254,height:1254,
+    ridgewood.stableSidingPreview={baseImage:ridgewood.primaryImage,width:1254,height:1254,viewBox:[0,188,1254,879],
       maskPath:'M0 188H1254V1067H0Z',method:'fixed_geometry_color_lut',
       note:'Le même échantillon, le même profil, les mêmes ombres et le même grain sont conservés pour chaque couleur.'};
     const variants=await Promise.all(ridgewood.colors.map(async color=>({

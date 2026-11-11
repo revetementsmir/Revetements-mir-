@@ -121,9 +121,11 @@
         typeof base.maskPath !== 'string' || !base.maskPath.trim() ||
         !['r','g','b'].every(channel => Array.isArray(lut?.[channel]) && lut[channel].length >= 2 &&
           lut[channel].every(value => Number.isFinite(value) && value >= 0 && value <= 1))) return null;
-    return {kind:'stable_siding_preview', image, src, width, height, maskPath:base.maskPath,
+    const viewBox = Array.isArray(base.viewBox) && base.viewBox.length === 4 && base.viewBox.every(Number.isFinite)
+      ? base.viewBox : [0,0,width,height];
+    return {kind:'stable_siding_preview', image, src, width, height, viewBox, maskPath:base.maskPath,
       colorLut:lut, label:`${m.name} · ${color.name} · échantillon MIR`, source:color.sourceUrl,
-      geometryKey:JSON.stringify([src,width,height,base.maskPath])};
+      geometryKey:JSON.stringify([src,width,height,viewBox,base.maskPath])};
   }
   let stableSidingSerial = 0;
   function stableSidingMarkup(r) {
@@ -131,7 +133,7 @@
     const image = `<image href="${esc(r.src)}" width="${r.width}" height="${r.height}" preserveAspectRatio="xMidYMid meet"/>`;
     // The original layer retains its background and shadow. Only the fixed board
     // perimeter receives the colour table; the source grain never changes.
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${r.width} ${r.height}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${esc(r.label)}" data-mir-stable-siding="${esc(r.geometryKey)}" style="display:block;width:100%;height:100%"><defs><clipPath id="${id}-mask" clipPathUnits="userSpaceOnUse"><path d="${esc(r.maskPath)}"/></clipPath><filter id="${id}-tone" filterUnits="userSpaceOnUse" x="0" y="0" width="${r.width}" height="${r.height}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".2126 .7152 .0722 0 0 .2126 .7152 .0722 0 0 .2126 .7152 .0722 0 0 0 0 0 1 0"/><feComponentTransfer>${['r','g','b'].map(channel => `<feFunc${channel.toUpperCase()} data-mir-siding-channel="${channel}" type="table" tableValues="${r.colorLut[channel].join(' ')}"/>`).join('')}</feComponentTransfer></filter></defs><rect width="${r.width}" height="${r.height}" fill="#fff"/>${image}<g clip-path="url(#${id}-mask)"><g filter="url(#${id}-tone)">${image}</g></g></svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${r.viewBox.join(' ')}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${esc(r.label)}" data-mir-stable-siding="${esc(r.geometryKey)}" style="display:block;width:100%;height:100%"><defs><clipPath id="${id}-mask" clipPathUnits="userSpaceOnUse"><path d="${esc(r.maskPath)}"/></clipPath><filter id="${id}-tone" filterUnits="userSpaceOnUse" x="0" y="0" width="${r.width}" height="${r.height}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".2126 .7152 .0722 0 0 .2126 .7152 .0722 0 0 .2126 .7152 .0722 0 0 0 0 0 1 0"/><feComponentTransfer>${['r','g','b'].map(channel => `<feFunc${channel.toUpperCase()} data-mir-siding-channel="${channel}" type="table" tableValues="${r.colorLut[channel].join(' ')}"/>`).join('')}</feComponentTransfer></filter></defs><rect width="${r.width}" height="${r.height}" fill="#fff"/>${image}<g clip-path="url(#${id}-mask)"><g filter="url(#${id}-tone)">${image}</g></g></svg>`;
   }
   function stableSidingSVG(m, c) {
     const r = stableSidingRecipe(m, c);
