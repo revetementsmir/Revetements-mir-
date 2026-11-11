@@ -1,0 +1,14 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'../..'),m=require(path.join(root,'ops/mir-promotion/manifest.json'));let checks=0;const ok=(v,n)=>{assert.ok(v,n);checks++;console.log('PASS '+n);};
+ok(m.globalDbPushAllowed===false,'db push global interdit');
+for(const rel of m.orderedSql)ok(fs.existsSync(path.join(root,rel)),'fichier ordonné présent '+path.basename(rel));
+for(const rel of m.excludedSql)ok(!m.orderedSql.includes(rel),'fixture ou correctif TEST exclu '+path.basename(rel));
+ok(m.excludedFunctions.includes('mir-chat-tenant-b-recipe')&&m.excludedFunctions.includes('mir-support-tenant-recipe'),'fonctions de recette exclues');
+const pages=fs.readFileSync(path.join(root,'.github/workflows/pages.yml'),'utf8');
+ok(/push:\s*\n\s*branches: \[main\]/.test(pages),'Pages déclenché par push main');
+ok(/uses: actions\/deploy-pages@v4/.test(pages),'workflow réalise un vrai déploiement Pages');
+ok(!m.secretNames.some(x=>/=|@/.test(x)),'manifest ne contient que des noms de secrets');
+for(const fn of m.functions)for(const rel of fn.files)ok(fs.existsSync(path.join(root,rel)),`bundle ${fn.name}: ${path.basename(rel)}`);
+ok(m.blockedSql.length===1&&/client_center/.test(m.blockedSql[0].reason),'socle 3C manquant reste bloquant');
+console.log(`Lot de promotion : ${checks}/${checks} contrôles réussis`);

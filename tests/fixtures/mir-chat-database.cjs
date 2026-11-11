@@ -15,7 +15,10 @@ async function baseline({hosted=true}={}){
  alter table storage.objects enable row level security;
  create function storage.foldername(text) returns text[] language sql immutable as $$select (string_to_array($1,'/'))[1:array_length(string_to_array($1,'/'),1)-1]$$;
  grant usage on schema storage to authenticated;grant select,insert,delete on storage.objects to authenticated;`);
- for(const f of fs.readdirSync(dir).filter(f=>f.endsWith('.sql')&&!f.includes('mir_estimates')&&!f.includes('chat_phase3a')&&!f.includes('chat_phase3b')).sort())await db.exec(fs.readFileSync(path.join(dir,f),'utf8'));
+ // Phase-specific migrations are applied explicitly by their suites. Keeping
+ // them out of the baseline also proves that a missing hosted-only prerequisite
+ // fails closed instead of being silently manufactured by the fixture.
+ for(const f of fs.readdirSync(dir).filter(f=>f.endsWith('.sql')&&!f.includes('mir_estimates')&&!f.includes('mir_estimate_recipe')&&!f.includes('chat_phase3a')&&!f.includes('chat_phase3b')&&!f.includes('phase3c')).sort())await db.exec(fs.readFileSync(path.join(dir,f),'utf8'));
  if(hosted){
   // Remove default on local 3-arg job_allowed before restoring hosted overloads.
   const fixture=require('./mir-chat-hosted-functions.json');

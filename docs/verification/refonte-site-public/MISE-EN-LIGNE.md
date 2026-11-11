@@ -76,3 +76,31 @@ Un retour arrière applicatif ne doit jamais supprimer des messages, demandes, p
 - inventaire et configuration des secrets production pour les seules fonctions promues;
 - plan de recette production avec comptes et destinataires autorisés;
 - décision séparée de fusion et de publication publique.
+
+## Lot concret préparé
+
+Le lot inerte est versionné dans `ops/mir-promotion/` et ses outils dans
+`tools/promotion/`. Il contient le manifeste ordonné, les requêtes de prévol
+et vérification en lecture seule, la compensation qui désactive les nouveaux
+RPC sans supprimer de données, les scripts de sauvegarde/restauration et le
+générateur des deux bundles Edge.
+
+Vérification locale isolée :
+
+- prévol catalogue production en transaction read-only : 11/11;
+- manifeste et exclusions : 27/27;
+- Phase 3A PGlite avec données fictives : 36/36;
+- passerelle 3A + PDF 3B PGlite : 15/15;
+- Storage soutien isolé : 10/10;
+- régression Edge fichiers : 10/10;
+- bundles : `mir-chat-files` 14 413 octets, SHA-256
+  `d83428a90d3308453d62738a3b0da1b0cbbdfbfd950a4058d3fe8be522c5dc84`;
+  `mir-estimates` 62 889 octets, SHA-256
+  `895d61748f06ac4209d95c94aa381eaf16513e5c886d6f719ac0256302ee626a`.
+
+Le test de la chaîne 3C sur un socle représentatif de production s’arrête
+volontairement avec SQLSTATE `55000`, « Phase 3C audited backend is absent or
+incomplete ». Cela confirme que la migration hébergée non versionnée
+`client_center_20261110` est le seul préalable SQL 3C à reconstruire; aucune
+garde n’a masqué l’écart. Résultats :
+`ops/mir-promotion/verification-results.json`.

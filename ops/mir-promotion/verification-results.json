@@ -1,0 +1,56 @@
+{
+  "observedAt": "2026-11-11T23:55:00Z",
+  "productionWrites": false,
+  "githubSettingsChanged": false,
+  "publicationTriggered": false,
+  "productionPreflight": {
+    "mode": "read only",
+    "passed": 11,
+    "failed": 0
+  },
+  "packageChecks": {
+    "passed": 27,
+    "failed": 0
+  },
+  "isolatedPglite": {
+    "phase3a": {
+      "passed": 36,
+      "failed": 0
+    },
+    "gateway3a3b": {
+      "passed": 15,
+      "failed": 0
+    },
+    "supportStorage": {
+      "passed": 10,
+      "failed": 0
+    }
+  },
+  "edgeRegression": {
+    "passed": 10,
+    "failed": 0
+  },
+  "functionBundles": [
+    {
+      "name": "mir-chat-files",
+      "bytes": 14413,
+      "sha256": "d83428a90d3308453d62738a3b0da1b0cbbdfbfd950a4058d3fe8be522c5dc84"
+    },
+    {
+      "name": "mir-estimates",
+      "bytes": 62889,
+      "sha256": "895d61748f06ac4209d95c94aa381eaf16513e5c886d6f719ac0256302ee626a"
+    }
+  ],
+  "expectedFailClosed": {
+    "scope": "Phase 3C migration chain against a production-like baseline without client_center_20261110",
+    "result": "blocked",
+    "sqlstate": "55000",
+    "message": "Phase 3C audited backend is absent or incomplete"
+  },
+  "limits": [
+    "No pg_dump, pg_dumpall, psql or production database service credentials are available in this session.",
+    "GitHub Pages and github-pages environment settings are not readable with the current GitHub API access.",
+    "The unversioned client_center_20261110 schema migration must be reconstructed before Phase 3C promotion."
+  ]
+}
