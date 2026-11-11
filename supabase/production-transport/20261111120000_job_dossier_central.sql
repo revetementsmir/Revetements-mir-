@@ -1,0 +1,186 @@
+-- Transport sécurisé généré depuis 20261111120000_job_dossier_central.sql
+-- Ne pas rejouer le fichier historique en parallèle de ce transport.
+begin;
+set local lock_timeout='5s';
+set local statement_timeout='120s';
+select pg_advisory_xact_lock(hashtextextended('mir-backend-punch-transport',0));
+create table if not exists mir_core.backend_migration_checkpoints(
+ source_file text primary key, source_sha256 text not null, schema_fingerprint text not null, applied_at timestamptz not null default now()
+);
+alter table mir_core.backend_migration_checkpoints enable row level security;
+revoke all on mir_core.backend_migration_checkpoints from public,anon,authenticated,service_role;
+do $transport$
+declare existing record; current_fingerprint text;
+begin
+ select md5(string_agg(item,E'\n' order by item)) from (
+ select 'table:'||n.nspname||'.'||c.relname||':'||c.relrowsecurity||':'||c.relforcerowsecurity||':'||coalesce(c.relacl::text,'') item from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='mir_core' and c.relkind in('r','p') and c.relname<>'backend_migration_checkpoints'
+ union all select 'column:'||n.nspname||'.'||c.relname||'.'||a.attname||':'||format_type(a.atttypid,a.atttypmod)||':'||a.attnotnull||':'||coalesce(pg_get_expr(d.adbin,d.adrelid),'') from pg_attribute a join pg_class c on c.oid=a.attrelid join pg_namespace n on n.oid=c.relnamespace left join pg_attrdef d on d.adrelid=a.attrelid and d.adnum=a.attnum where n.nspname='mir_core' and a.attnum>0 and not a.attisdropped and c.relname<>'backend_migration_checkpoints'
+ union all select 'constraint:'||n.nspname||'.'||c.relname||'.'||k.conname||':'||pg_get_constraintdef(k.oid) from pg_constraint k join pg_class c on c.oid=k.conrelid join pg_namespace n on n.oid=c.relnamespace where n.nspname='mir_core' and c.relname<>'backend_migration_checkpoints'
+ union all select 'index:'||indexdef from pg_indexes where schemaname='mir_core' and tablename<>'backend_migration_checkpoints'
+ union all select 'function:'||pg_get_functiondef(p.oid)||coalesce(p.proacl::text,'') from pg_proc p join pg_namespace n on n.oid=p.pronamespace where p.prokind='f' and (n.nspname='mir_core' or n.nspname='public' and p.proname like 'mir_%')
+ union all select 'policy:'||to_jsonb(p)::text from pg_policies p where schemaname='mir_core' or schemaname='storage' and policyname like 'mir_job_document_%'
+ union all select 'trigger:'||pg_get_triggerdef(t.oid) from pg_trigger t join pg_class c on c.oid=t.tgrelid join pg_namespace n on n.oid=c.relnamespace where n.nspname='mir_core' and not t.tgisinternal
+ union all select 'bucket:'||id||':'||public||':'||file_size_limit||':'||allowed_mime_types::text from storage.buckets where id='mir-job-documents'
+) state into current_fingerprint;
+ select * into existing from mir_core.backend_migration_checkpoints where source_file='20261111120000_job_dossier_central.sql';
+ if found then
+  if existing.source_sha256<>'9e6cd8fd67157020d10d48465007fc621be60dc90c8c816b9ea8acdbb8e3b2c8' or existing.schema_fingerprint<>current_fingerprint then
+   raise exception 'Checkpoint incompatible ou dérive de schéma: 20261111120000_job_dossier_central.sql';
+  end if;
+  return;
+ end if;
+ if exists(select 1 from mir_core.backend_migration_checkpoints where schema_fingerprint<>current_fingerprint) then
+  raise exception 'Dérive de schéma avant 20261111120000_job_dossier_central.sql';
+ end if;
+if (select count(*) from mir_core.backend_migration_checkpoints where source_file in('20261110020000_punch_gps.sql','20261110120000_operational_roles_phase1.sql','20261110130000_punch_phase2_integrity.sql','20261110140000_punch_phase2_workflow.sql','20261110150000_punch_phase2_corrections.sql','20261110160000_punch_phase2_completion.sql'))<>6 then raise exception 'Dépendance de transport absente avant 20261111120000_job_dossier_central.sql'; end if;
+
+ if to_regclass('mir_core.job_documents') is not null then raise exception 'Table préexistante incompatible avec une première application: mir_core.job_documents'; end if;
+ if exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='mir_core' and p.proname='job_dossier_allowed') then raise exception 'Fonction préexistante à comparer avant installation: mir_core.job_dossier_allowed'; end if;
+ if exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='mir_core' and p.proname='job_storage_read') then raise exception 'Fonction préexistante à comparer avant installation: mir_core.job_storage_read'; end if;
+ if exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='mir_core' and p.proname='job_storage_write') then raise exception 'Fonction préexistante à comparer avant installation: mir_core.job_storage_write'; end if;
+ if exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname='mir_job_dossier_snapshot') then raise exception 'Fonction préexistante à comparer avant installation: public.mir_job_dossier_snapshot'; end if;
+ execute '-- Phase 1: dossier chantier central. Additive only; canonical domain tables remain unchanged.
+
+create table if not exists mir_core.job_documents(
+ organization_id uuid not null,
+ id uuid not null default gen_random_uuid(),
+ job_id uuid not null,
+ family_id uuid not null,
+ version integer not null check(version>0),
+ name text not null check(length(btrim(name)) between 1 and 240),
+ object_path text not null,
+ mime text not null check(mime in (''application/pdf'',''image/jpeg'',''image/png'',''image/webp'')),
+ size_bytes bigint not null check(size_bytes between 1 and 26214400),
+ created_by uuid not null default auth.uid() references auth.users(id),
+ created_at timestamptz not null default now(),
+ primary key(organization_id,id),
+ unique(organization_id,job_id,family_id,version),
+ unique(object_path),
+ foreign key(organization_id,job_id) references mir_core.jobs(organization_id,id)
+);
+create index if not exists mir_job_documents_job on mir_core.job_documents(organization_id,job_id,created_at desc,id);
+create index if not exists mir_job_documents_author on mir_core.job_documents(organization_id,created_by,created_at desc);
+alter table mir_core.job_documents enable row level security;
+revoke all on mir_core.job_documents from public,anon,authenticated;
+
+create or replace function mir_core.job_dossier_allowed(org uuid,jid uuid,member uuid default auth.uid()) returns boolean
+language sql stable security definer set search_path=pg_catalog,mir_core as $$
+ select member is not null
+ and exists(select 1 from mir_core.memberships m where m.organization_id=org and m.user_id=member and m.active)
+ and (
+   mir_core.has_role(org,array[''admin''])
+   or mir_core.staff_role(org,member) in (''boss'',''assistant'')
+   or mir_core.job_allowed(org,jid,member)
+   or (mir_core.staff_role(org,member)=''warehouse'' and exists(
+     select 1 from mir_core.delivery_run_orders dro
+     join mir_core.delivery_runs dr on (dr.organization_id,dr.id)=(dro.organization_id,dro.run_id)
+     where dro.organization_id=org and dro.job_id=jid
+       and (dr.driver_id=member or mir_core.staff_role(org,member)=''warehouse'')
+   ))
+ );
+$$;
+revoke all on function mir_core.job_dossier_allowed(uuid,uuid,uuid) from public,anon;
+grant execute on function mir_core.job_dossier_allowed(uuid,uuid,uuid) to authenticated;
+
+create or replace function mir_core.job_storage_read(path text) returns boolean
+language plpgsql stable security definer set search_path=pg_catalog,mir_core as $$begin
+ return exists(select 1 from mir_core.job_documents d where d.object_path=path and mir_core.job_dossier_allowed(d.organization_id,d.job_id));
+end$$;
+create or replace function mir_core.job_storage_write(path text) returns boolean
+language plpgsql stable security definer set search_path=pg_catalog,mir_core as $$declare org uuid;jid uuid;begin
+ if array_length(string_to_array(path,''/''),1)<>4 then return false;end if;
+ org:=split_part(path,''/'',1)::uuid;jid:=split_part(path,''/'',2)::uuid;
+ return (mir_core.has_role(org,array[''admin'']) or mir_core.staff_role(org) in (''boss'',''assistant''))
+  and exists(select 1 from mir_core.jobs j where j.organization_id=org and j.id=jid and not j.archived)
+  and split_part(path,''/'',3)~''^[0-9a-f-]{36}$''
+  and split_part(path,''/'',4)~''^[0-9a-f-]{36}\.(pdf|jpg|png|webp)$'';
+ exception when invalid_text_representation then return false;
+end$$;
+revoke all on function mir_core.job_storage_read(text),mir_core.job_storage_write(text) from public,anon;
+grant execute on function mir_core.job_storage_read(text),mir_core.job_storage_write(text) to authenticated;
+
+insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
+values(''mir-job-documents'',''mir-job-documents'',false,26214400,array[''application/pdf'',''image/jpeg'',''image/png'',''image/webp''])
+on conflict(id) do nothing;
+do $guard$
+declare p record;
+begin
+ if not exists(select 1 from storage.buckets where id=''mir-job-documents'' and not public
+   and file_size_limit=26214400
+   and allowed_mime_types=array[''application/pdf'',''image/jpeg'',''image/png'',''image/webp'']) then
+  raise exception ''Bucket mir-job-documents incompatible; arrêt sans modification'';
+ end if;
+ select * into p from pg_policies where schemaname=''storage'' and tablename=''objects'' and policyname=''mir_job_document_read'';
+ if not found then
+  create policy mir_job_document_read on storage.objects for select to authenticated
+   using(bucket_id=''mir-job-documents'' and mir_core.job_storage_read(name));
+ elsif p.cmd<>''SELECT'' or p.permissive<>''PERMISSIVE'' or p.roles<>array[''authenticated'']::name[]
+   or p.with_check is not null
+   or regexp_replace(p.qual,''[[:space:]()]'','''',''g'')<>$expr$bucket_id=''mir-job-documents''::textANDmir_core.job_storage_readname$expr$ then
+  raise exception ''Policy mir_job_document_read incompatible; arrêt sans remplacement'';
+ end if;
+ select * into p from pg_policies where schemaname=''storage'' and tablename=''objects'' and policyname=''mir_job_document_insert'';
+ if not found then
+  create policy mir_job_document_insert on storage.objects for insert to authenticated
+   with check(bucket_id=''mir-job-documents'' and mir_core.job_storage_write(name));
+ elsif p.cmd<>''INSERT'' or p.permissive<>''PERMISSIVE'' or p.roles<>array[''authenticated'']::name[]
+   or p.qual is not null
+   or regexp_replace(p.with_check,''[[:space:]()]'','''',''g'')<>$expr$bucket_id=''mir-job-documents''::textANDmir_core.job_storage_writename$expr$ then
+  raise exception ''Policy mir_job_document_insert incompatible; arrêt sans remplacement'';
+ end if;
+end$guard$;
+
+create or replace function public.mir_job_dossier_snapshot(
+ org uuid,
+ job uuid,
+ page_size integer default 20,
+ page_before timestamptz default null
+) returns jsonb
+language plpgsql stable security definer set search_path=pg_catalog,mir_core as $$
+declare
+ size integer:=least(greatest(coalesce(page_size,20),1),50);
+ role_name text:=mir_core.staff_role(org);
+ dossier jsonb;
+begin
+ if auth.uid() is null or not mir_core.job_dossier_allowed(org,job) then
+  raise exception ''Chantier inaccessible'' using errcode=''42501'';
+ end if;
+ select jsonb_build_object(
+  ''job'',jsonb_build_object(''id'',j.id,''name'',j.name,''address'',j.address,''city'',j.city,''phone'',j.phone,''closed'',j.archived),
+  ''access'',jsonb_build_object(''technicalRole'',case when mir_core.has_role(org,array[''admin'']) then ''admin'' else role_name end,''operationalLabel'',case when mir_core.has_role(org,array[''admin'']) then ''boss'' else role_name end,''canManage'',(mir_core.has_role(org,array[''admin'']) or role_name in (''boss'',''assistant'')),''readOnly'',j.archived),
+  ''teams'',coalesce((select jsonb_agg(x.data order by x.name) from (select distinct t.id,t.name,jsonb_build_object(''id'',t.id,''name'',t.name,''leaderId'',t.leader_id) data from mir_core.teams t join mir_core.team_day_assignments a on(a.organization_id,a.team_id)=(t.organization_id,t.id) where t.organization_id=org and a.job_id=j.id) x),''[]''::jsonb),
+  ''employees'',coalesce((select jsonb_agg(jsonb_build_object(''id'',m.user_id,''name'',coalesce(nullif(p.display_name,''''),m.user_id::text),''role'',coalesce(p.staff_role,''employee'')) order by coalesce(nullif(p.display_name,''''),m.user_id::text)) from mir_core.job_memberships m left join mir_core.staff_capabilities p on(p.organization_id,p.user_id)=(m.organization_id,m.user_id) where m.organization_id=org and m.job_id=j.id),''[]''::jsonb),
+  ''documents'',coalesce((select jsonb_agg(to_jsonb(d) order by d.created_at desc,d.id) from (select d.id,d.family_id,d.version,d.name,d.object_path,d.mime,d.size_bytes,d.created_by,d.created_at from mir_core.job_documents d where d.organization_id=org and d.job_id=j.id order by d.created_at desc,d.id limit size) d),''[]''::jsonb),
+  ''tasks'',coalesce((select jsonb_agg(to_jsonb(t) order by t.created_at desc,t.id) from (select t.id,t.team_id,t.work_date,t.title,t.completed_at,t.completed_by,t.created_at from mir_core.team_tasks t where t.organization_id=org and t.job_id=j.id order by t.created_at desc,t.id limit size) t),''[]''::jsonb),
+  ''reports'',coalesce((select jsonb_agg(to_jsonb(r) order by r.submitted_at desc,r.id) from (select r.id,r.team_id,r.leader_id,r.work_date,r.work_done,r.had_problem,r.missing_material,r.photo_paths,r.comment,r.submitted_at from mir_core.daily_reports r where r.organization_id=org and r.job_id=j.id order by r.submitted_at desc,r.id limit size) r),''[]''::jsonb),
+  ''hours'',case when role_name in (''assistant'',''boss'') or mir_core.has_role(org,array[''admin'']) then coalesce((select jsonb_agg(jsonb_build_object(''id'',e.id,''employeeId'',e.employee_id,''workDate'',e.work_date,''regularHours'',e.regular_hours,''overtimeHours'',e.overtime_hours,''status'',e.status) order by e.work_date desc,e.id) from (select * from mir_core.time_entries e where e.organization_id=org and e.job_id=j.id order by e.work_date desc,e.id limit size) e),''[]''::jsonb) else ''[]''::jsonb end,
+  ''punches'',case when role_name in (''assistant'',''boss'') or mir_core.has_role(org,array[''admin'']) then coalesce((select jsonb_agg(jsonb_build_object(''id'',s.id,''employeeId'',sh.employee_id,''startedAt'',s.started_at,''endedAt'',s.ended_at,''type'',s.segment_type) order by s.started_at desc,s.id) from (select * from mir_core.punch_segments s where s.organization_id=org and s.job_id=j.id order by s.started_at desc,s.id limit size) s join mir_core.punch_shifts sh on(sh.organization_id,sh.id)=(s.organization_id,s.shift_id)),''[]''::jsonb) else ''[]''::jsonb end,
+  ''extras'',coalesce((select jsonb_agg(to_jsonb(e)-''client_request_id'' order by e.created_at desc,e.id) from (select * from mir_core.extras e where e.organization_id=org and e.job_id=j.id order by e.created_at desc,e.id limit size) e),''[]''::jsonb),
+  ''requests'',coalesce((select jsonb_agg(to_jsonb(r)-''client_request_id'' order by r.created_at desc,r.id) from (select * from mir_core.material_requests r where r.organization_id=org and r.job_id=j.id order by r.created_at desc,r.id limit size) r),''[]''::jsonb),
+  ''orders'',coalesce((select jsonb_agg(jsonb_build_object(''id'',o.id,''kind'',o.kind,''ownerId'',o.owner_id,''createdAt'',o.created_at) order by o.created_at desc,o.id) from (select o.* from mir_core.orders o where o.organization_id=org and exists(select 1 from mir_core.order_revisions rev where rev.organization_id=org and rev.order_id=o.id and rev.snapshot#>>''{configuration,chantier}''=j.id::text) order by o.created_at desc,o.id limit size) o),''[]''::jsonb),
+  ''suppliers'',case when role_name in (''assistant'',''boss'',''warehouse'') or mir_core.has_role(org,array[''admin'']) then coalesce((select jsonb_agg(jsonb_build_object(''id'',s.id,''name'',s.name) order by s.name) from mir_core.suppliers s where s.organization_id=org and exists(select 1 from mir_core.orders o join mir_core.order_revisions rev on(rev.organization_id,rev.order_id)=(o.organization_id,o.id) where o.organization_id=org and o.kind=''supplier'' and rev.snapshot#>>''{configuration,chantier}''=j.id::text and rev.snapshot::text like ''%''||s.id::text||''%'')),''[]''::jsonb) else ''[]''::jsonb end,
+  ''conversation'',coalesce((select jsonb_agg(jsonb_build_object(''id'',m.id,''conversationId'',m.conversation_id,''senderId'',m.sender_id,''body'',m.body,''sentAt'',m.sent_at,''attachmentPath'',m.attachment_path) order by m.sent_at desc,m.id) from (select m.* from mir_core.messages m where m.organization_id=org and m.job_id=j.id and mir_core.conversation_allowed(org,m.conversation_id) order by m.sent_at desc,m.id limit size) m),''[]''::jsonb),
+  ''activity'',coalesce((select jsonb_agg(to_jsonb(a) order by a.created_at desc,a.id) from (select a.* from mir_core.job_activity a where a.organization_id=org and a.job_id=j.id and(page_before is null or a.created_at<page_before) order by a.created_at desc,a.id limit size) a),''[]''::jsonb),
+  ''nextBefore'',(select min(a.created_at) from (select a.created_at from mir_core.job_activity a where a.organization_id=org and a.job_id=j.id and(page_before is null or a.created_at<page_before) order by a.created_at desc,a.id limit size) a)
+ ) into dossier from mir_core.jobs j where j.organization_id=org and j.id=job;
+ if dossier is null then raise exception ''Chantier introuvable'' using errcode=''42501'';end if;
+ return dossier;
+end$$;
+revoke all on function public.mir_job_dossier_snapshot(uuid,uuid,integer,timestamptz) from public,anon;
+grant execute on function public.mir_job_dossier_snapshot(uuid,uuid,integer,timestamptz) to authenticated;
+
+';
+ select md5(string_agg(item,E'\n' order by item)) from (
+ select 'table:'||n.nspname||'.'||c.relname||':'||c.relrowsecurity||':'||c.relforcerowsecurity||':'||coalesce(c.relacl::text,'') item from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='mir_core' and c.relkind in('r','p') and c.relname<>'backend_migration_checkpoints'
+ union all select 'column:'||n.nspname||'.'||c.relname||'.'||a.attname||':'||format_type(a.atttypid,a.atttypmod)||':'||a.attnotnull||':'||coalesce(pg_get_expr(d.adbin,d.adrelid),'') from pg_attribute a join pg_class c on c.oid=a.attrelid join pg_namespace n on n.oid=c.relnamespace left join pg_attrdef d on d.adrelid=a.attrelid and d.adnum=a.attnum where n.nspname='mir_core' and a.attnum>0 and not a.attisdropped and c.relname<>'backend_migration_checkpoints'
+ union all select 'constraint:'||n.nspname||'.'||c.relname||'.'||k.conname||':'||pg_get_constraintdef(k.oid) from pg_constraint k join pg_class c on c.oid=k.conrelid join pg_namespace n on n.oid=c.relnamespace where n.nspname='mir_core' and c.relname<>'backend_migration_checkpoints'
+ union all select 'index:'||indexdef from pg_indexes where schemaname='mir_core' and tablename<>'backend_migration_checkpoints'
+ union all select 'function:'||pg_get_functiondef(p.oid)||coalesce(p.proacl::text,'') from pg_proc p join pg_namespace n on n.oid=p.pronamespace where p.prokind='f' and (n.nspname='mir_core' or n.nspname='public' and p.proname like 'mir_%')
+ union all select 'policy:'||to_jsonb(p)::text from pg_policies p where schemaname='mir_core' or schemaname='storage' and policyname like 'mir_job_document_%'
+ union all select 'trigger:'||pg_get_triggerdef(t.oid) from pg_trigger t join pg_class c on c.oid=t.tgrelid join pg_namespace n on n.oid=c.relnamespace where n.nspname='mir_core' and not t.tgisinternal
+ union all select 'bucket:'||id||':'||public||':'||file_size_limit||':'||allowed_mime_types::text from storage.buckets where id='mir-job-documents'
+) state into current_fingerprint;
+ update mir_core.backend_migration_checkpoints set schema_fingerprint=current_fingerprint;
+ insert into mir_core.backend_migration_checkpoints(source_file,source_sha256,schema_fingerprint) values('20261111120000_job_dossier_central.sql','9e6cd8fd67157020d10d48465007fc621be60dc90c8c816b9ea8acdbb8e3b2c8',current_fingerprint);
+end$transport$;
+commit;

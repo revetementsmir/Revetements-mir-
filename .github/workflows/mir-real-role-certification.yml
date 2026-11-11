@@ -31,6 +31,9 @@ jobs:
         run: |
           node tests/mir-live-validation.cjs
           node tests/mir-punch-postgres.cjs
+          node tests/mir-backend-production-rehearsal.cjs
+          MIR_REHEARSAL_SCHEMA=production node tests/mir-punch-postgres.cjs
+          MIR_REHEARSAL_SCHEMA=production node tests/mir-job-dossier-postgres.cjs
           node tests/mir-management-postgres.cjs
           node tests/mir-operational-roles-postgres.cjs
           node tests/mir-warehouse-sql.cjs
@@ -88,11 +91,15 @@ jobs:
         run: node --test tests/mir-six-role-certification.cjs
       - name: Certifier les six comptes MIR TEST
         run: node tools/validation/certify-six-roles.cjs
+      - name: Certifier le journal et la banque d’heures Punch
+        run: node tools/validation/certify-punch-completion.cjs
       - name: Publier le rapport même en cas d’échec
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: mir-real-role-certification
-          path: artifacts/real-role-certification.json
+          path: |
+            artifacts/real-role-certification.json
+            artifacts/punch-completion-certification.json
           if-no-files-found: error
           retention-days: 14
