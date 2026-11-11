@@ -42,5 +42,9 @@ begin
  return jsonb_build_object('organizationId',b,'userId',actor,'jobId',job_id,'role','employee');
 end$fn$;
 revoke all on function public.mir_chat_tenant_b_recipe_provision(uuid) from public,anon,authenticated;
-grant execute on function public.mir_chat_tenant_b_recipe_provision(uuid) to service_role;
+do $grant$ begin
+ if exists(select 1 from pg_roles where rolname='service_role') then
+  grant execute on function public.mir_chat_tenant_b_recipe_provision(uuid) to service_role;
+ end if;
+end$grant$;
 commit;

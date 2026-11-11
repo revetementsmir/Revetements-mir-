@@ -16,6 +16,6 @@ if status!=200 or not auth.get('access_token'):raise SystemExit('Tenant-B recipe
 token=auth['access_token'];auth.clear()
 status,result=call('/functions/v1/mir-chat-tenant-b-recipe',{},token)
 token=None
-safe={k:result.get(k) for k in ('status','passed','failed','provisioned','clientBUntouched','production')}
+safe={k:result.get(k) for k in ('status','passed','failed','provisioned','clientBUntouched','production','failureClass')}
 print(json.dumps(safe,sort_keys=True))
 if status!=200 or result.get('failed')!=0 or result.get('passed',0)<8:raise SystemExit('Tenant-B recipe incomplete')
