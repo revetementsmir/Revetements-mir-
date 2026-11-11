@@ -41,12 +41,18 @@ test('Punch, client RPC et modules validés préservés depuis main',()=>{
  const base=require('./fixtures/mir-today-baseline.json'),hash=s=>createHash('sha256').update(s).digest('hex');
  for(const [file,expected]of Object.entries(base.files)){
   let source=fs.readFileSync(file,'utf8');
-  // Phase 3A may add only the scoped chat API here. Every other client byte,
-  // including Punch and session handling, remains pinned to the Phase 2 base.
-  if(file==='dist/portal-client.js')source=source
+  // Phase3A's explicitly bounded chat API/upload and three blob-revocation hooks
+  // are tested separately. All non-chat client bytes remain pinned to Phase2.
+  if(file==='dist/portal-client.js'){
+   assert.equal((source.match(/^      revokeChatURLs\(\);$/gm)||[]).length,3);
+   source=source
    .replace(/    \/\/ Phase3A chat API begin\.[\s\S]*?    \/\/ Phase3A chat API end\.\n/,'')
+   .replace(/      \/\/ Phase3A chat upload begin\.[\s\S]*?      \/\/ Phase3A chat upload end\.\n/,'')
+   .replaceAll('      revokeChatURLs();\n','')
+   .replace("if(String(path).split('/')[1]==='message')return chatPhotoURL(path);",'')
    .replace("['private','team','job']","['private','team']")
    .replace('      chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatPhotoURL,\n','');
+  }
   assert.equal(hash(source),expected,file);
  }
  const after=fs.readFileSync('dist/chantier-app.js','utf8');

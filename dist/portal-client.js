@@ -117,8 +117,6 @@
     const listeners = new Set();
     let status = { phase: config.enabled ? 'signed_out' : 'unavailable', user: null, snapshot: null, error: null, pending: null, busy: false };
     let generation = 0, readSequence = 0, authSubscription = null, activePromise = null, authTimer = null, liveTimer = null, disposed = false, internalOrg = null;
-    const chatURLs=new Set(),blobURLs=options.objectURL||globalThis.URL;let chatFileEpoch=0;
-    function revokeChatURLs(){chatFileEpoch++;for(const url of chatURLs)blobURLs.revokeObjectURL(url);chatURLs.clear();}
     const storage = options.operationStorage;
     const logoutKey = `mir_portal_signed_out_${config.projectRef || 'disabled'}`;
     let logoutRequested = false;
@@ -481,6 +479,8 @@
       return blob;
     }
     // Phase3A chat API begin. Server authorization remains authoritative.
+    const chatURLs=new Set(),blobURLs=options.objectURL||globalThis.URL;let chatFileEpoch=0;
+    function revokeChatURLs(){chatFileEpoch++;for(const url of chatURLs)blobURLs.revokeObjectURL(url);chatURLs.clear();}
     async function chatRPC(name,args){
       requireReady();if(!internalOrg)fail('ACCESS_DENIED','Accès interne requis.');
       const epoch=generation,user=status.user.id,{data,error}=await sdk.rpc(name,{org:internalOrg,...args});
@@ -527,11 +527,13 @@
       requireReady();if(!internalOrg||!['message','extra','issue','receipt','material','problem','report','vehicle','delivery','inspection','signature'].includes(scope)||!UUID.test(entityId||''))fail('UPLOAD_INVALID','La destination de cette photo est invalide.');
       const mime=String(file?.type||'').toLowerCase(),extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif'};
       if(!extensions[mime]||!file.size||file.size>10*1024*1024)fail('UPLOAD_INVALID','Utilisez une photo JPG, PNG, WebP ou HEIC de 10 Mo maximum.');
+      // Phase3A chat upload begin.
       if(scope==='message'){
         const bytes=new Uint8Array(await file.arrayBuffer());let binary='';for(let at=0;at<bytes.length;at+=32768)binary+=String.fromCharCode(...bytes.subarray(at,at+32768));
         const result=await chatFile('upload',entityId,{mime,base64:globalThis.btoa(binary)});const parts=chatPath(result?.path);
         if(parts[2]!==entityId||parts[3]!==status.user.id||result.mime!==mime||result.size!==file.size)fail('DOCUMENT_INVALID','La pièce jointe reçue est invalide.');return result.path;
       }
+      // Phase3A chat upload end.
       const id=uuid();if(!UUID.test(id||''))fail('UUID_REQUIRED','Le navigateur ne peut pas préparer cette photo.');
       const path=`${internalOrg}/${scope}/${entityId}/${status.user.id}/${id}.${extensions[mime]}`;
       const {error}=await sdk.storage.from('mir-internal').upload(path,file,{contentType:mime,upsert:false,cacheControl:'3600'});if(error)throw errorOf(error,'La photo n’a pas pu être téléversée.');return path;
