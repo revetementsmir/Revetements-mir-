@@ -7,7 +7,7 @@ const groups={
   'mir-chat-phase3a','mir-today','mir-pages-regressions','mir-homepage','mir-boutique-audit-20261110','mir-pliage-audit-commercial','mir-magasin-merge','mir-warehouse-core','mir-warehouse-sql','mir-realisations','mir-studio-wall-sections','mir-role-navigation','mir-account-session','mir-six-role-certification','mir-portal-login','mir-portal-optional-modules'
  ],
  'disposable-postgres':[
-  'mir-chat-phase3a-postgres','mir-chat-phase3a-guards','mir-employee-operations-postgres','mir-job-dossier-postgres','mir-punch-postgres','mir-operational-roles-postgres'
+  'mir-chat-phase3a-postgres','mir-chat-phase3a-guards','mir-chat-support-postgres','mir-chat-storage-probe-postgres','mir-employee-operations-postgres','mir-job-dossier-postgres','mir-punch-postgres','mir-operational-roles-postgres'
  ],
  'ui-simulated':[
   'mir-chat-phase3a-browser','mir-today-browser','mir-punch-browser','mir-employee-portal-browser','mir-chef-boss-browser','mir-homepage-browser','mir-boutique-audit-20261110-browser','mir-client-pliage-approved-browser','mir-warehouse-browser','mir-realisations-browser','mir-studio-wall-sections-browser','mir-job-dossier-browser','mir-production-signature-browser','mir-production-client-flow-browser','mir-unified-dossier-browser','mir-atelier-v4-browser'
