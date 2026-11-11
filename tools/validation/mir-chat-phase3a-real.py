@@ -184,6 +184,10 @@ class Certification:
         self.check('unauthorized conversation text not searchable',self.ok(r) and not r['data']['items'],{'status':r['status'],'count':len(r['data']['items'])})
         r=self.rpc(emp,'mir_chat_messages',{'org':ORG,'conversation':cid,'page_size':20,'page_before':None})
         self.check('unassigned job conversation refused',self.denied(r),{'status':r['status']})
+        # Fast CI can finish the other checks BEFORE five seconds elapse. Wait
+        # until actual expiry + a small clock margin; never count an early 200
+        # as an expiry failure or infer expiry just from work performed above.
+        time.sleep(max(0,self.links['short']['issued']+7-time.time()))
         r=self.signed_check('short');self.check('signed URL expired at actual HTTP endpoint',r['ageSeconds']>5 and self.denied(r),r)
         self.report['fixtures'].update(concurrentMessageId=mid,attachmentMessageId=self.attachmentMessage,restrictedConversationId=cid)
         self.save()
