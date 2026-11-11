@@ -610,7 +610,7 @@
   async function init(){updateCount();const [response,visibility,adseal,kaycanSwatches,regionalPricing]=await Promise.all([fetch('./catalogue-fd6866b49d21.json'),fetch('./boutique-visibilite.json',{cache:'no-cache'}),fetch('./catalogue-adseal-4580.json').then(r=>r.ok?r.json():null).catch(()=>null),fetch(screwAssetRoot+'kaycan-fascia-colours.json').then(r=>r.ok?r.json():{}).catch(()=>({})),fetch('./mir-regional-pricing-20261110.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null)]);if(!visibility.ok)throw new Error('La disponibilité des articles ne peut pas être vérifiée. Réessayez dans un instant.');const {hidden}=await visibility.json();if(!Array.isArray(hidden))throw new Error('La disponibilité des articles est invalide.');hiddenProducts=new Set(hidden);if(!response.ok)throw new Error('Le catalogue ne peut pas être chargé. Réessayez dans un instant.');materials=(await response.json()).materials||[];for(const material of materials){const price=regionalPricing?.priced?.[material.id];if(price)material.regionalPricing={...price,researchedOn:regionalPricing.researchedOn,markupPercent:regionalPricing.markupPercent};}
   const ridgewood=materials.find(material=>material.id==='canexel-ridgewood-d5');
   if(ridgewood){
-    ridgewood.primaryImage='./assets/products/mir-ridgewood-d5/base-ridgewood-d5.webp';
+    ridgewood.primaryImage='./assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp';
     ridgewood.imageStatus='mir_approved_color_demo';
     ridgewood.imageNote='Échantillon MIR Ridgewood D-5 à cadrage fixe. Seule la teinte change; rendu écran indicatif.';
     ridgewood.stableSidingPreview={baseImage:ridgewood.primaryImage,width:1254,height:1254,viewBox:[0,188,1254,879],
