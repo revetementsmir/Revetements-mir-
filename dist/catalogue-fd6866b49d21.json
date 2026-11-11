@@ -33850,10 +33850,181 @@
       "images": [],
       "primaryImage": null,
       "imageStatus": "manufacturer_image_not_integrated"
+    },
+    {
+      "id": "beck-panelfast-ags100",
+      "brand": "BECK Fastener Group",
+      "name": "BECK PANELFAST AGS-100 — clous en bobine pour panneaux sur acier",
+      "manufacturerCode": "AGS-100",
+      "manufacturerCodeScope": "family",
+      "family": "Fixation",
+      "applications": [
+        "fastener"
+      ],
+      "description": "Clous PANELFAST à tête plate de 5/16 po, tige moletée et pointe balistique, assemblés en bobine plastique. Conçus pour fixer le fibrociment, le contreplaqué, l’OSB et les panneaux de gypse extérieur sur une ossature d’acier de 68 mil (14 ga) ou plus légère.",
+      "sourceUrl": "https://www.beck-fastening.com/en/plastic-coil-panelfast-pins-ags-100-xxxxna~p2554",
+      "documents": [
+        {
+          "kind": "technical",
+          "title": "BECK — AGS-100 PLASTIC ROPE COIL PANELFAST PINS",
+          "url": "https://www.beck-fastening.com/en/plastic-coil-panelfast-pins-ags-100-xxxxna~p2554",
+          "scope": "product",
+          "verified": true,
+          "verificationStatus": "opened_official_source",
+          "note": "Page officielle du produit. Confirmer la longueur, le support, l’épaisseur de l’acier et la cloueuse avant la commande."
+        }
+      ],
+      "dimensions": {
+        "diameterIn": 0.1,
+        "headDiameterIn": 0.3125,
+        "collationAngleDeg": 21,
+        "availableLengthsIn": [
+          1.5,
+          2,
+          2.5
+        ]
+      },
+      "finish": "Aericote 1000",
+      "specifications": [
+        {
+          "label": "Tête",
+          "value": "Plate · diamètre nominal 5/16 po"
+        },
+        {
+          "label": "Tige",
+          "value": "Moletée · diamètre 0,100 po (2,54 mm)"
+        },
+        {
+          "label": "Pointe",
+          "value": "Balistique / pointue"
+        },
+        {
+          "label": "Assemblage",
+          "value": "Bobine plastique conique RBC · 21°"
+        },
+        {
+          "label": "Matière",
+          "value": "Acier à haute teneur en carbone"
+        },
+        {
+          "label": "Protection anticorrosion",
+          "value": "Aericote 1000 · essai au brouillard salin de 1 000 h annoncé par BECK"
+        },
+        {
+          "label": "Cloueuse compatible publiée",
+          "value": "BECK PANELFAST Model 510 / 510A"
+        },
+        {
+          "label": "Conditionnement",
+          "value": "250 clous par bobine · 12 bobines par boîte · 3 000 clous"
+        }
+      ],
+      "packaging": {
+        "piecesPerCoil": 250,
+        "coilsPerBox": 12,
+        "piecesPerBox": 3000,
+        "unit": "boîte",
+        "status": "MIR_user_provided_box_visual_and_manufacturer_coil_capacity"
+      },
+      "unit": "boîte de 12 bobines (3 000 clous) — prix MIR à confirmer",
+      "colors": [],
+      "colorStatus": "not_applicable",
+      "paletteComplete": true,
+      "colorSelectionIndependent": false,
+      "allowedPatterns": [],
+      "allowedOrientations": [],
+      "renderPattern": "plain",
+      "maxPiece": {},
+      "coverage": null,
+      "status": "documented_reference",
+      "commercialStatus": "availability_price_stock_and_sale_unit_at_MIR_unverified",
+      "catalogueScope": "manufacturer_reference_requested_for_MIR_shop",
+      "compatibilityStatus": "manufacturer_applications_subject_to_panel_system_project_and_tool_requirements",
+      "mirPreferred": true,
+      "sourceRefs": [],
+      "notes": [
+        "BECK publie l’usage pour contreplaqué, OSB, gypse extérieur et panneaux de fibrociment sur ossature d’acier de 68 mil (14 ga) ou plus légère.",
+        "Les visuels ont été fournis par MIR pour cette fiche. La longueur exacte n’est pas identifiable sur la photo et doit être choisie dans le format.",
+        "La prescription du fabricant du panneau, l’épaisseur réelle du support et la compatibilité de la cloueuse gouvernent la sélection finale."
+      ],
+      "gaps": [
+        "Prix, stock, délai et disponibilité des trois longueurs chez MIR à confirmer."
+      ],
+      "researchedOn": "2026-11-11",
+      "formats": [
+        {
+          "id": "ags1000150-na",
+          "label": "1 1/2 po (38 mm) — AGS1000150-NA",
+          "lengthIn": 1.5,
+          "manufacturerCode": "AGS1000150-NA",
+          "measurementKind": "physical_piece",
+          "sourceUrl": "https://www.beck-fastening.com/en/plastic-coil-panelfast-pins-ags-100-xxxxna~p2554"
+        },
+        {
+          "id": "ags1000200-na",
+          "label": "2 po (50 mm) — AGS1000200-NA",
+          "lengthIn": 2,
+          "manufacturerCode": "AGS1000200-NA",
+          "measurementKind": "physical_piece",
+          "sourceUrl": "https://www.beck-fastening.com/en/plastic-coil-panelfast-pins-ags-100-xxxxna~p2554"
+        },
+        {
+          "id": "ags1000250-na",
+          "label": "2 1/2 po (63 mm) — AGS1000250-NA",
+          "lengthIn": 2.5,
+          "manufacturerCode": "AGS1000250-NA",
+          "measurementKind": "physical_piece",
+          "sourceUrl": "https://www.beck-fastening.com/en/plastic-coil-panelfast-pins-ags-100-xxxxna~p2554"
+        }
+      ],
+      "images": [
+        {
+          "src": "./assets/products/mir-provided-20261111/beck-panelfast-ags100-coil.webp",
+          "widthPx": 1536,
+          "heightPx": 1536,
+          "bytes": 228474,
+          "sha256": "c423f065e4cce8d5e51d196ed1e01d0840719a16302b5f1e29d61af8f15c6773",
+          "format": "WEBP",
+          "contentType": "image/webp",
+          "credit": "Les Revêtements MIR",
+          "kind": "product",
+          "assetKind": "MIR_user_provided_product_visual",
+          "matchScope": "product_family",
+          "exactProductMatch": true,
+          "variantMatch": false,
+          "cardPresentation": "packshot",
+          "cardObjectPosition": "50% 50%",
+          "note": "Bobine du produit fournie par MIR. La longueur exacte doit être sélectionnée dans la fiche.",
+          "alt": "Bobine de clous BECK PANELFAST AGS-100 sur fond clair",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        },
+        {
+          "src": "./assets/products/mir-provided-20261111/beck-panelfast-ags100-box-12.webp",
+          "widthPx": 1316,
+          "heightPx": 1536,
+          "bytes": 380880,
+          "sha256": "378748f9a7e125e46134be8fd28d6510829608e4d9f56c23a0d860749ec2427d",
+          "format": "WEBP",
+          "contentType": "image/webp",
+          "credit": "Les Revêtements MIR",
+          "kind": "packaging",
+          "assetKind": "MIR_user_provided_box_visual",
+          "matchScope": "box_of_12_coils",
+          "exactProductMatch": true,
+          "variantMatch": false,
+          "cardPresentation": "packshot",
+          "cardObjectPosition": "50% 50%",
+          "note": "Présentation MIR d’une boîte de 12 bobines; le prix et la disponibilité restent à confirmer.",
+          "alt": "Boîte ouverte contenant douze bobines de clous BECK PANELFAST AGS-100",
+          "rightsStatus": "provided_by_MIR_for_MIR_site"
+        }
+      ],
+      "primaryImage": "./assets/products/mir-provided-20261111/beck-panelfast-ags100-coil.webp",
+      "imageStatus": "MIR_provided_product_visual"
     }
   ],
   "schemaVersion": "5.2",
-  "researchedOn": "2026-11-05",
+  "researchedOn": "2026-11-11",
   "purpose": "Références fabricant pour le configurateur MIR; choix de demande, sans inventaire, prix ni disponibilité MIR confirmés.",
   "method": {
     "sources": "Sources primaires officielles; recherches system1 ciblées et ouverture des pages et PDF accessibles.",

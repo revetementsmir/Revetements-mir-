@@ -409,6 +409,7 @@
     }
     const technical=$('#product-technical');technical.append(photos,$('#color-note'));const sampleNote=document.createElement('p');sampleNote.className='mir-sample-note';sampleNote.textContent=m.keepProductPhoto?'Photo du produit · teinte au nuancier':
       m.screwPreview?(m.screwPreview==='fascia-2po'?'Illustration · teinte indicative':'Aperçu de la teinte sur la tête'):
+      im?.assetKind?.startsWith('MIR_user_provided_')?'Visuel fourni par MIR · longueur à sélectionner':
       im||cs.some(c=>c.swatchUrl)?'Visuel indicatif · référence fabricant':'Photo non disponible · visuel de remplacement';gallery.append(sampleNote);for(const a of [...$('.product-actions-main').querySelectorAll('a.quiet-button')])technical.append(a);
     const notice=document.createElement('div');notice.id='product-added';notice.className='mir-product-added';notice.hidden=true;notice.setAttribute('role','status');notice.innerHTML='<strong>Ajouté à votre demande</strong><p></p><a class="mir-button" href="selection.html">Voir ma demande →</a>';$('.product-actions-main').after(notice);
     const accessory=x=>(x.applications||[]).some(a=>['accessory','fastener','fasteners','sealant','membrane','touchup','touch-up','trim','opening-trim','siding-joint'].includes(a));
