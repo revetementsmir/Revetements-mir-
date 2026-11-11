@@ -2,18 +2,18 @@
 
 Base : `39de53260a134bae48143c1bdb1aa235335d6187`. Rôles et autorisations chantier existants réutilisés, aucun nouveau rôle.
 
-Mise à niveau courante : main `215259c957a1d939e9fbdc52524623153cc3b910` intégré à la branche seulement. Les règles métier ci-dessous sont conservées. La nouvelle passerelle de fichiers est **préparée, pas hébergée ni activée** : voir [le rapport courant](mir-chat-phase3a-private-files.md).
+Mise à niveau courante : main `ebf54f676a84fc01717543f0cec224a173f90171` vérifié. Les règles métier ci-dessous sont conservées. La nouvelle passerelle de fichiers est **hébergée et activée sur MIR TEST seulement**. La recette courante compte 37/37 contrôles réussis : retrait, nouvelle lecture refusée, réintégration, nouvelle lecture autorisée, déconnexion/renouvellement et restauration QA. La certification globale reste partielle faute d’interne actif dans un second tenant TEST et faute d’attente réelle de l’expiration naturelle du JWT. Voir [le rapport courant](mir-chat-phase3a-private-files.md).
 
 | Contrôle fichiers chat | MIR TEST actuellement installé | Après activation préparée, non appliquée |
 |---|---|---|
 | Employé/Chef/Adjointe/Boss/Admin lisent | Seulement leurs conversations; cache résiduel constaté | Même accès métier, revérifié au POST avant et après lecture des octets |
 | Entrepôt | Périmètre logistique existant | Identique, aucun nouveau droit |
-| Lire/uploader/signer directement dans Storage | Autorisé selon les anciennes policies | Fermé uniquement pour le scope message; passerelle privée obligatoire |
+| Lire/uploader/signer directement dans Storage | Ancien état historique | Fermé en TEST uniquement pour le scope message; passerelle privée obligatoire |
 | Valider un PNG | Métadonnées serveur | Structure/CRC/décompression bornée des octets; attestation serveur avant rattachement |
 | Fabriquer une attestation | Table/RPC encore absentes | Aucun utilisateur ne le peut; seul service_role inspecteur, accès courant vérifié |
 | Autres modules/buckets | Inchangés | Inchangés, aucune nouvelle policy permissive |
 
-Ne pas lire cette matrice future comme une preuve de mise en service. La passerelle retourne actuellement 404. Le compte client de B n’est pas un compte interne : aucun membership/compte B n’a été modifié, accès bidirectionnel toujours bloqué. Les liens déjà émis/copies déjà délivrées demandent un traitement séparé; aucun contrôle SQL ne peut effacer un fichier déjà reçu.
+La colonne historique « après activation préparée » décrit la conception avant installation; l’état courant est bien activé sur TEST. Le compte client de B n’est pas un compte interne : aucun membership/compte B n’a été modifié, accès bidirectionnel positif toujours bloqué. Les liens déjà émis/copies déjà délivrées demandent un traitement séparé; aucun contrôle SQL ne peut effacer un fichier déjà reçu.
 
 | Opération | Employé | Chef | Adjointe | Boss | Admin technique |
 |---|---|---|---|---|---|
@@ -46,7 +46,7 @@ Ces restrictions parfois asymétriques sont intentionnellement conservées : Pha
 
 Les participants historiques ne déterminent l’accès que pour les conversations privées. Les équipes et chantiers sont recalculés à chaque appel. Retrait = refus immédiat des nouvelles requêtes SQL et Storage non cachées; réintégration = accès rétabli. **Une réponse HTTP authentifiée déjà mise en cache peut encore être délivrée : échec de révocation immédiate constaté, non résolu.** Une URL déjà signée peut survivre jusqu’à son expiration (300 secondes par défaut client, pas un plafond SQL universel); ce délai n’est pas une révocation instantanée d’URL.
 
-Certification : aucun test local n’équivaut à une certification hébergée.
+Certification : les 37 contrôles de la passerelle sont hébergés et réels au SHA `6314817d1672a68c931de31cb1cdb822d6c42692`; les contrôles locaux/simulés restent distincts. Le tenant B et l’expiration naturelle du JWT empêchent encore un verdict CERTIFIÉ.
 
 ## Reprise réelle autorisée — état courant
 

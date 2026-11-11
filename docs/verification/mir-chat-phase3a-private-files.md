@@ -2,7 +2,18 @@
 
 ## État exact
 
-**Préparé et validé localement; nouvelle passerelle NON déployée, NON activée sur MIR TEST. Certification intégrale bloquée, pas terminée.** Aucune écriture ni lecture de MIR production, aucune fusion de PR, publication du site ou intervention Lot B.
+**Passerelle déployée et activation restrictive appliquée sur MIR TEST; 37/37 contrôles hébergés du nouveau circuit réussis. Certification intégrale encore bloquée par l’expiration naturelle du JWT non attendue et l'absence d'un interne dans un second tenant TEST.** Aucune écriture ni lecture métier de MIR production, aucune fusion de PR, publication du site ou intervention Lot B.
+
+## Reprise du 11 novembre 2026 — installation TEST réelle
+
+- Préparation additive `chat_phase3a_private_file_gateway` appliquée avec succès sur `hxtztkmbfpmzrieccwsg`.
+- Fonction `mir-chat-files` version 1 déployée ACTIVE, `verify_jwt=false` uniquement pour cette passerelle; Auth est vérifiée explicitement dans le code avant les contrôles SQL.
+- Activation restrictive `chat_phase3a_private_file_activate` appliquée avec succès après contrôle anonyme 401 et prévol CORS 204 pour `https://revetementsmir.github.io`.
+- Run hébergé [43045549628](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43045549628), SHA `55c599774f743331b5160abbee29c05492cad427` : **27 réussites, 0 échec fonctionnel** sur le nouveau circuit; statut volontaire `BLOCKED_TENANT_B_ACCESS`.
+- Reprise hébergée [43050426108](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43050426108), SHA `6314817d1672a68c931de31cb1cdb822d6c42692` : **37 réussites, 0 échec fonctionnel**. Retrait du seul chantier QA puis nouvelle lecture 403; réintégration puis lecture 200; déconnexion locale acceptée, ancienne session 401, nouvelle session 200; restauration confirmée des affectations Employé et Chef. Le statut demeure volontairement `PARTIALLY_VALIDATED` et le job rouge (code 2) afin de ne pas masquer le blocage tenant B.
+- Le header non standard `Cloudflare-CDN-Cache-Control` est retiré par la plateforme. Les réponses réelles conservent `Cache-Control`, `CDN-Cache-Control` et `Surrogate-Control` en `no-store`, `cf-cache-status: DYNAMIC`, `Vary: Authorization, Origin` et `nosniff`.
+- L'ancien runner échoue désormais sur son upload Storage direct, attendu après activation; il ne faut pas rouvrir cet ancien accès. Le nouveau runner est exécuté avec `always()` afin de garder les deux résultats visibles.
+- Restent non certifiés : expiration naturelle du JWT réellement attendue sur le nouveau circuit, et isolation bidirectionnelle positive avec un interne d’un second tenant TEST préexistant.
 
 La règle « ne publie rien » est respectée : déployer une nouvelle fonction serveur est une mise en service distincte. Aucun `deploy_edge_function`, `apply_migration`, `db push` ou changement de réglage hébergé n’a été exécuté dans cette reprise. Les seuls tests mutateurs hébergés concernent des fixtures clairement balisées dans le tenant A; les retraits d’accès A ont été restaurés. Aucun compte créé; aucune modification de membership dans B.
 
@@ -20,9 +31,9 @@ La règle « ne publie rien » est respectée : déployer une nouvelle fonction 
 
 | Sujet | Backend hébergé actuel | Correction préparée | Limite actuelle |
 |---|---|---|---|
-| Cache après retrait | RPC 403, nouvelle signature 400, téléchargement non caché 400; URL authentifiée déjà cachée **200** | Chaque ouverture chat passe par POST authentifié et contrôle SQL courant; octets retournés avec no-store navigateur/CDN; plus de lien Storage chat au client | Pas encore déployé. Anciennes copies/liens restent à traiter; aucune promesse d’effacement à distance |
-| Chemin encodé | Ancienne route Storage : **500**, 17 octets, server envoy, CF-ray présent, pas de sb-request-id observé | Canonicalisation stricte avant tout appel Storage; pourcentage, double encodage, traversée, slash/backslash et champs inconnus refusés en 400 | 400 prouvé dans les tests de service locaux, pas en MIR TEST; le 500 de la route native amont n’est pas modifiable par RLS |
-| Faux PNG | Métadonnées seules : un texte déclaré PNG est accepté par l’ancien backend | Inspection réelle des octets avant upload et à la lecture; attestation serveur privée requise avant rattachement après activation | Inspection locale prouvée; hébergée non exécutée tant que la passerelle est absente |
+| Cache après retrait | Historique : l’ancienne URL authentifiée déjà cachée restait **200** | Chaque ouverture chat passe par POST authentifié et contrôle SQL courant; octets retournés avec no-store navigateur/CDN; plus de lien Storage chat au client | Déployé sur TEST : nouvelle lecture 403 après retrait, 200 après réintégration. Anciennes copies/liens restent à traiter; aucune promesse d’effacement à distance |
+| Chemin encodé | Ancienne route Storage : **500**, non présentée comme corrigée | Canonicalisation stricte avant tout appel Storage | 400 prouvé en MIR TEST sur la passerelle; le 500 de la route native amont demeure distinct |
+| Faux PNG | Historique : métadonnées seules acceptaient un texte déclaré PNG | Inspection réelle des octets avant upload et à la lecture; attestation serveur privée requise | Hébergé TEST : texte déclaré PNG et CRC invalide refusés 422; pas d’antivirus |
 
 Source officielle consultée : [Supabase Smart CDN](https://supabase.com/docs/guides/storage/cdn/smart-cdn). Elle précise que l’expiration/révocation d’un token ne purge pas nécessairement sa réponse CDN, que les TTL du token et du cache sont indépendants et que l’invalidation d’un objet peut prendre jusqu’à 60 secondes. **Raccourcir le TTL ou ajouter un nonce au seul navigateur n’est donc pas une garantie de révocation.**
 
