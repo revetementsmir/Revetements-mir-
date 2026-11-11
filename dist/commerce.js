@@ -68,38 +68,59 @@
   function heroImage(m){const im=images(m);return im.find(x=>x.src===m.primaryImage)||im[0];}
   const presentation=V.photoType, photoLabel=V.photoLabel;
   function placeholder(){return '<div class="product-placeholder" role="img" aria-label="Photo fabricant non disponible"><svg viewBox="0 0 160 110" fill="none" stroke="currentColor" stroke-width="1"><path d="M18 85V30l65-15 60 31v50L78 70 18 85Zm0-55 60 26 65-10M78 56v40M38 25l61 27M58 20l61 28"/></svg><span>Visuel fabricant à compléter</span></div>';}
-  function imageMarkup(m,large=false,c=null){if(m.stableSidingPreview)return V.stableSidingSVG(m,c)||placeholder();if(m.paintPotIndices)return paintPotSVG(m,c);const im=heroImage(m);return im?V.photoImage(im,m.name,{loading:large?'eager':'lazy',priority:large}):placeholder();}
+  function imageMarkup(m,large=false,c=null){if(m.stableSidingPreview)return V.stableSidingSVG(m,c)||placeholder();if(m.paintPotIndices)return paintPotMarkup(m,c);const im=heroImage(m);return im?V.photoImage(im,m.name,{loading:large?'eager':'lazy',priority:large}):placeholder();}
 
-  // Sixteen studio packshots supplied by MIR: fixed 600x600 tiles in one 2400x2400 WebP.
-  // Keep the same SVG, viewport, framing and background; change only the selected cell.
+  // CanExel touch-up: each can is independently cropped onto a 600x600
+  // bitmap. Never show the surrounding cells from the 4x4 studio atlas.
   const paintPotAtlas='./assets/products/mir-canexel-touchup/canexel-pots-16.webp';
   const paintPotCell=600,paintPotColumns=4;
+  let paintPotAtlasPromise=null;
+  function loadPaintPotAtlas(){
+    if(!paintPotAtlasPromise)paintPotAtlasPromise=new Promise(resolve=>{
+      const image=new Image();
+      image.onload=()=>resolve(image.naturalWidth===2400&&image.naturalHeight===2400?image:null);
+      image.onerror=()=>resolve(null);
+      image.src=paintPotAtlas;
+    });
+    return paintPotAtlasPromise;
+  }
   function paintPotIndex(m,c){
     const choice=c||m.colors?.[0];
     const index=m.paintPotIndices?.[norm(choice?.name)];
     return Number.isInteger(index)&&index>=0&&index<16?index:null;
   }
-  function paintPotSVG(m,c){
+  function paintPotMarkup(m,c){
     const choice=c||m.colors?.[0],index=paintPotIndex(m,choice);
     if(index===null)return '<div class="sample-unavailable"><strong>'+esc(choice?.name||'Couleur à confirmer')+'</strong><span>Photo MIR de cette couleur à venir · consulter le nuancier.</span></div>';
-    const label=m.name+' — '+choice.name+' — visuel MIR indicatif';
-    const x=-paintPotCell*(index%paintPotColumns),y=-paintPotCell*Math.floor(index/paintPotColumns);
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" overflow="hidden" role="img" aria-label="'+esc(label)+'" data-mir-canexel-pot="'+index+'" style="display:block;width:100%;height:100%;max-width:100%;object-fit:contain;overflow:hidden"><svg x="0" y="0" width="600" height="600" viewBox="0 0 600 600" overflow="hidden" style="overflow:hidden"><image href="'+paintPotAtlas+'" x="'+x+'" y="'+y+'" width="2400" height="2400" preserveAspectRatio="xMidYMid meet"/></svg></svg>';
+    const label=m.name+' — '+choice.name+' — pot de peinture de retouche MIR';
+    // The square canvas is a replaced element, not an SVG image referring to
+    // the 2400px atlas; no neighboring pot can overflow its own 600px bitmap.
+    return '<canvas width="600" height="600" role="img" aria-label="'+esc(label)+'" data-mir-canexel-pot="'+index+'" style="display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain"></canvas>';
   }
   function renderPaintPot(el,m,c){
     if(!el)return;
     V.cancel(el);
-    const choice=c||m.colors?.[0],index=paintPotIndex(m,choice),svg=el.querySelector('svg[data-mir-canexel-pot]');
+    const choice=c||m.colors?.[0],index=paintPotIndex(m,choice);
     el.dataset.previewKind='mir-canexel-touchup';
     el.dataset.colorId=choice?.id||'';
     if(el.classList.contains('mir-catalogue-photo'))el.dataset.photoType=index===null?'empty':'packshot';
-    if(index===null||!svg){el.innerHTML=paintPotSVG(m,choice);return;}
-    const picture=svg.querySelector('image');
-    if(!picture){el.innerHTML=paintPotSVG(m,choice);return;}
-    picture.setAttribute('x',String(-paintPotCell*(index%paintPotColumns)));
-    picture.setAttribute('y',String(-paintPotCell*Math.floor(index/paintPotColumns)));
-    svg.setAttribute('data-mir-canexel-pot',String(index));
-    svg.setAttribute('aria-label',m.name+' — '+choice.name+' — visuel MIR indicatif');
+    if(index===null){el.innerHTML=paintPotMarkup(m,choice);return;}
+    let canvas=el.querySelector('canvas[data-mir-canexel-pot]');
+    if(!canvas){el.innerHTML=paintPotMarkup(m,choice);canvas=el.querySelector('canvas[data-mir-canexel-pot]');}
+    if(!canvas)return;
+    const label=m.name+' — '+choice.name+' — pot de peinture de retouche MIR';
+    canvas.setAttribute('aria-label',label);
+    canvas.setAttribute('data-mir-canexel-pot',String(index));
+    const request=Symbol('canexel-selected-tile');
+    el._materialPreviewRequest=request;
+    return loadPaintPotAtlas().then(image=>{
+      if(el._materialPreviewRequest!==request||!canvas.isConnected)return;
+      if(!image){el.innerHTML='<div class="sample-unavailable"><strong>'+esc(choice.name)+'</strong><span>Image temporairement indisponible.</span></div>';return;}
+      const ctx=canvas.getContext('2d');
+      if(!ctx){el.innerHTML='<div class="sample-unavailable">Aperçu indisponible</div>';return;}
+      ctx.clearRect(0,0,paintPotCell,paintPotCell);
+      ctx.drawImage(image,(index%paintPotColumns)*paintPotCell,Math.floor(index/paintPotColumns)*paintPotCell,paintPotCell,paintPotCell,0,0,paintPotCell,paintPotCell);
+    });
   }
 
   const screwAssetRoot='./assets/products/mir-screws/';
@@ -171,6 +192,7 @@
       const material=materials.find(m=>m.id===card.dataset.shopCard);
       if(!material||(material.keepProductPhoto&&!material.paintPotIndices))continue;
       if(material.screwPreview)renderScrew(card.querySelector('.card-preview'),material,null);
+      if(material.paintPotIndices)renderPaintPot(card.querySelector('.card-preview'),material,null);
       for(const button of card.querySelectorAll('[data-card-color]')){
         const color=colors(material).find(c=>c.id===button.dataset.cardColor);
         if(color)V.paintChip(button,material,color);
