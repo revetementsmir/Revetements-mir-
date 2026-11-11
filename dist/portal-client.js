@@ -489,6 +489,12 @@
       const {error}=await sdk.storage.from('mir-internal').upload(path,file,{contentType:mime,upsert:false,cacheControl:'3600'});if(error)throw errorOf(error,'La photo n’a pas pu être téléversée.');return path;
     }
     async function internalPhotoURL(path){requireReady();const {data,error}=await sdk.storage.from('mir-internal').createSignedUrl(path,300);if(error||!data?.signedUrl)throw errorOf(error||{},'Cette photo ne peut pas être ouverte.');return data.signedUrl;}
+    async function jobDossier(jobId,pageBefore=null,pageSize=20){
+      requireReady();if(!internalOrg||!UUID.test(jobId||''))fail('JOB_INVALID','Ce chantier ne peut pas être ouvert.');
+      const {data,error}=await sdk.rpc('mir_job_dossier_snapshot',{org:internalOrg,job:jobId,page_size:Math.min(50,Math.max(1,Number(pageSize)||20)),page_before:pageBefore||null});
+      if(error)throw errorOf(error);if(!data?.job||data.job.id!==jobId)fail('RESPONSE_UNCERTAIN','Le dossier chantier reçu ne peut pas être vérifié.');return data;
+    }
+    async function jobDocumentURL(path){requireReady();if(typeof path!=='string'||path.length>600||path.includes('..'))fail('DOCUMENT_INVALID','Ce document ne peut pas être ouvert.');const {data,error}=await sdk.storage.from('mir-job-documents').createSignedUrl(path,300);if(error||!data?.signedUrl)throw errorOf(error||{},'Ce document privé ne peut pas être ouvert.');return data.signedUrl;}
     async function leadAction(action,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='chef_equipe')fail('ACCESS_DENIED','Chef équipe requis.');const {data,error}=await sdk.rpc('mir_lead_action',{org:internalOrg,request_id:uuid(),action,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function bossAction(action,entity,decision,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='boss')fail('ACCESS_DENIED','Boss requis.');const {data,error}=await sdk.rpc('mir_boss_action',{org:internalOrg,action,entity,decision,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function logisticsAction(action,entity=null,payload={}){requireReady();if(!internalOrg||!['warehouse','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès entrepôt requis.');const {data,error}=await sdk.rpc('mir_logistics_action',{org:internalOrg,request_id:uuid(),action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
@@ -509,7 +515,7 @@
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, dispose,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
     });
   }
