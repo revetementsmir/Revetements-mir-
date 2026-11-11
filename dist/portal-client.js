@@ -476,8 +476,31 @@
       if (blob.size > 25 * 1024 * 1024 || !blob.size) fail('DOCUMENT_INVALID', 'Ce document ne peut pas être téléchargé.');
       return blob;
     }
+    // Phase3A chat API begin. Server authorization remains authoritative.
+    async function chatRPC(name,args){
+      requireReady();if(!internalOrg)fail('ACCESS_DENIED','Accès interne requis.');
+      const epoch=generation,user=status.user.id,{data,error}=await sdk.rpc(name,{org:internalOrg,...args});
+      if(epoch!==generation||status.user?.id!==user||status.phase!=='ready')fail('SESSION_CHANGED','La session a changé; rouvrez la conversation.');
+      if(error)throw errorOf(error);return data;
+    }
+    async function chatConversations(cursor=null,limit=20){return chatRPC('mir_chat_conversations',{page_size:Math.min(50,Math.max(1,Number(limit)||20)),page_before:cursor});}
+    async function chatMessages(conversation,cursor=null,limit=20){
+      if(!UUID.test(conversation||''))fail('CONVERSATION_INVALID','Conversation invalide.');
+      return chatRPC('mir_chat_messages',{conversation,page_size:Math.min(50,Math.max(1,Number(limit)||20)),page_before:cursor});
+    }
+    async function chatSearch(query,cursor=null,limit=20){return chatRPC('mir_chat_search',{query_text:String(query||''),page_size:Math.min(50,Math.max(1,Number(limit)||20)),page_before:cursor});}
+    async function validateMessageAttachment(conversation,path){return chatRPC('mir_message_attachment_validate',{conversation,object_path:path});}
+    async function ackChatMessage(message,state='read'){return chatRPC('mir_message_ack',{message,state});}
+    async function chatPhotoURL(path){
+      requireReady();const parts=String(path||'').split('/');
+      if(parts.length!==5||parts[0]!==internalOrg||parts[1]!=='message'||!UUID.test(parts[2]))fail('DOCUMENT_INVALID','Pièce jointe invalide.');
+      const epoch=generation,user=status.user.id,{data,error}=await sdk.storage.from('mir-internal').createSignedUrl(path,300);
+      if(epoch!==generation||status.user?.id!==user||status.phase!=='ready')fail('SESSION_CHANGED','La session a changé; rouvrez la pièce jointe.');
+      if(error||!data?.signedUrl)throw errorOf(error||{},'Cette photo ne peut pas être ouverte.');return data.signedUrl;
+    }
+    // Phase3A chat API end.
     async function openConversation(kind,targetId){
-      requireReady();if(!internalOrg||!['private','team'].includes(kind)||!UUID.test(targetId||''))fail('CONVERSATION_INVALID','Cette conversation ne peut pas être ouverte.');
+      requireReady();if(!internalOrg||!['private','team','job'].includes(kind)||!UUID.test(targetId||''))fail('CONVERSATION_INVALID','Cette conversation ne peut pas être ouverte.');
       const {data,error}=await sdk.rpc('mir_conversation_open',{org:internalOrg,kind,target:targetId});if(error)throw errorOf(error);return data;
     }
     async function uploadInternal(file,scope,entityId){
@@ -516,6 +539,7 @@
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
       acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, dispose,
+      chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatPhotoURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
     });
   }

@@ -39,7 +39,16 @@ test('ville canonique seulement pour la météo sans coordonnées du snapshot pr
 });
 test('Punch, client RPC et modules validés préservés depuis main',()=>{
  const base=require('./fixtures/mir-today-baseline.json'),hash=s=>createHash('sha256').update(s).digest('hex');
- for(const [file,expected]of Object.entries(base.files))assert.equal(hash(fs.readFileSync(file,'utf8')),expected,file);
+ for(const [file,expected]of Object.entries(base.files)){
+  let source=fs.readFileSync(file,'utf8');
+  // Phase 3A may add only the scoped chat API here. Every other client byte,
+  // including Punch and session handling, remains pinned to the Phase 2 base.
+  if(file==='dist/portal-client.js')source=source
+   .replace(/    \/\/ Phase3A chat API begin\.[\s\S]*?    \/\/ Phase3A chat API end\.\n/,'')
+   .replace("['private','team','job']","['private','team']")
+   .replace('      chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatPhotoURL,\n','');
+  assert.equal(hash(source),expected,file);
+ }
  const after=fs.readFileSync('dist/chantier-app.js','utf8');
  for(const name of ['punchCard','renderPunchHours','punchCorrectionDialog','punchDecisionDialog','renderWarehouse','renderManagement']){
   const extract=s=>{const start=s.indexOf('  function '+name+'(');assert.ok(start>=0,name);const end=s.indexOf('\n  function ',start+1);return s.slice(start,end<0?undefined:end);};

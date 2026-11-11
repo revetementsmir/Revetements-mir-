@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {once}=require('node:events'),{chromium}=require('playwright');
 const fixture=require('./fixtures/mir-today.cjs');
-const root=path.resolve(__dirname,'../dist'),out=path.resolve(__dirname,'../docs/verification/captures/today-phase2');
+const root=path.resolve(__dirname,'../dist'),out=process.env.MIR_TODAY_PROOF_DIR||path.resolve(__dirname,'../docs/verification/captures/today-phase2');
 const before=process.env.MIR_TODAY_BEFORE==='1';
 const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new URL(req.url,'http://local').pathname);if(!file.startsWith(root+path.sep)){res.writeHead(404).end();return;}fs.readFile(file,(e,data)=>e?res.writeHead(404).end():res.writeHead(200,{'content-type':({'.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.html':'text/html','.json':'application/json'})[path.extname(file)]||'application/octet-stream'}).end(data));});
 (async()=>{server.listen(0,'127.0.0.1');await once(server,'listening');let browser;try{

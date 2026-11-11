@@ -37,7 +37,7 @@ begin
   'public.mir_chat_messages(uuid,uuid,integer,jsonb)','public.mir_chat_conversations(uuid,integer,jsonb)',
   'public.mir_chat_search(uuid,text,integer,jsonb)','public.mir_message_attachment_validate(uuid,uuid,text)',
   'mir_core.chat_phase3a_catalog()','mir_core.chat_storage_object(text,uuid,text,jsonb)',
-  'mir_core.chat_legacy_projection(uuid)','mir_core.chat_message_json(uuid,uuid)'] loop
+  'mir_core.chat_legacy_projection(uuid)','mir_core.chat_message_json(uuid,uuid)','mir_core.chat_attachment_unlinked(text)','mir_core.chat_attachment_writable(text)'] loop
   if to_regprocedure(signature) is not null then raise exception 'État clavardage partiel: %',signature using errcode='55000';end if;
  end loop;
  if to_regprocedure('mir_core.job_dossier_allowed(uuid,uuid,uuid)') is null then raise exception 'Dépendance dossier chantier absente' using errcode='55000';end if;
@@ -66,6 +66,24 @@ begin
   raise exception 'Policies Storage existantes absentes ou incompatibles' using errcode='55000';end if;
  if (select count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='mir_core' and c.relname in('conversations','conversation_participants','messages','message_receipts'))<>4 then
   raise exception 'Tables clavardage partielles' using errcode='55000';end if;
+ if not (select relrowsecurity from pg_class where oid='storage.objects'::regclass) then
+  raise exception 'RLS Storage inactive' using errcode='55000';end if;
+ if (select array_agg(attname::text order by attnum) from pg_attribute where attrelid='mir_core.conversations'::regclass and attnum>0 and not attisdropped)
+  <>array['organization_id','id','kind','team_id','created_by','created_at'] then
+  raise exception 'Colonnes conversations incompatibles' using errcode='55000';end if;
+ -- PG18 catalogs NOT NULL constraints separately (contype=n); hosted PG17 does not.
+ if (select count(*) from pg_constraint where conrelid='mir_core.conversations'::regclass and contype<>'n')<>5
+  or not exists(select 1 from pg_constraint where conrelid='mir_core.conversations'::regclass
+   and pg_get_constraintdef(oid)='CHECK (((kind = ''team''::text) = (team_id IS NOT NULL)))')
+  or not exists(select 1 from pg_constraint where conrelid='mir_core.messages'::regclass
+   and pg_get_constraintdef(oid)='UNIQUE (organization_id, sender_id, client_request_id)')
+  or not exists(select 1 from pg_constraint where conrelid='mir_core.messages'::regclass
+   and pg_get_constraintdef(oid)='FOREIGN KEY (organization_id, conversation_id) REFERENCES mir_core.conversations(organization_id, id)')
+  or not exists(select 1 from pg_index where indexrelid=to_regclass('mir_core.conversations_one_team') and indisunique and indisvalid
+   and pg_get_indexdef(indexrelid)='CREATE UNIQUE INDEX conversations_one_team ON mir_core.conversations USING btree (organization_id, team_id) WHERE (kind = ''team''::text)') then
+  raise exception 'Contraintes/index clavardage incompatibles' using errcode='55000';end if;
+ if exists(select 1 from pg_proc where proname in('mir_chat_messages','mir_chat_conversations','mir_chat_search','mir_message_attachment_validate','mir_conversation_job')
+  and pronamespace='public'::regnamespace) then raise exception 'RPC Phase3A déjà partielle ou signature incompatible' using errcode='55000';end if;
 
  -- Evolution of the precisely verified CHECK, transactionally. No rows removed.
  alter table mir_core.conversations add column job_id uuid;
@@ -77,6 +95,7 @@ begin
  create index conversations_created_cursor on mir_core.conversations(organization_id,created_at desc,id desc);
  create index messages_chat_cursor on mir_core.messages(organization_id,conversation_id,sent_at desc,id desc);
  create index messages_chat_search_cursor on mir_core.messages(organization_id,sent_at desc,id desc);
+ create index messages_chat_attachment on mir_core.messages(attachment_path) where attachment_path is not null;
  create index message_receipts_chat_unread on mir_core.message_receipts(organization_id,user_id,message_id) where read_at is null;
 
  execute $install$
@@ -292,9 +311,19 @@ begin
  'teams',coalesce((select jsonb_agg(jsonb_build_object('id',t.id,'name',t.name,'leaderId',t.leader_id)) from mir_core.teams t join mir_core.team_members tm on(tm.organization_id,tm.team_id)=(t.organization_id,t.id) where t.organization_id=org and t.active and tm.active and tm.user_id=auth.uid()),'[]'));
 end$fn$;
 -- Additional restrictive policies: original permissive policies remain byte-for-byte intact.
+create function mir_core.chat_attachment_writable(path text) returns boolean
+language plpgsql stable security definer set search_path=pg_catalog,mir_core as $fn$
+declare org uuid;conversation uuid;
+begin
+ if auth.uid() is null or not mir_core.internal_object_allowed(path,true) then return false;end if;
+ org:=split_part(path,'/',1)::uuid;conversation:=split_part(path,'/',3)::uuid;
+ return exists(select 1 from mir_core.conversations c left join mir_core.jobs j on(j.organization_id,j.id)=(c.organization_id,c.job_id)
+  where c.organization_id=org and c.id=conversation and (c.kind<>'job' or not j.archived));
+exception when invalid_text_representation then return false;
+end$fn$;
 create policy mir_chat_phase3a_insert on storage.objects as restrictive for insert to authenticated with check(
  case when bucket_id='mir-internal' and split_part(name,'/',2)='message' then
-  mir_core.internal_object_allowed(name,true) and mir_core.chat_storage_object(name,owner,owner_id,metadata)
+  mir_core.chat_attachment_writable(name) and mir_core.chat_storage_object(name,owner,owner_id,metadata)
  else true end);
 create policy mir_chat_phase3a_update on storage.objects as restrictive for update to authenticated
  using(not(bucket_id='mir-internal' and split_part(name,'/',2)='message'))
@@ -329,7 +358,7 @@ $install$;
  -- New APIs get explicit minimal EXECUTE. No table privilege is added.
  foreach signature in array array['public.mir_conversation_job(uuid,uuid)','public.mir_chat_messages(uuid,uuid,integer,jsonb)',
   'public.mir_chat_conversations(uuid,integer,jsonb)','public.mir_chat_search(uuid,text,integer,jsonb)',
-  'public.mir_message_attachment_validate(uuid,uuid,text)','mir_core.chat_storage_object(text,uuid,text,jsonb)','mir_core.chat_attachment_unlinked(text)'] loop
+  'public.mir_message_attachment_validate(uuid,uuid,text)','mir_core.chat_storage_object(text,uuid,text,jsonb)','mir_core.chat_attachment_unlinked(text)','mir_core.chat_attachment_writable(text)'] loop
   execute 'revoke all on function '||signature||' from public,anon';execute 'grant execute on function '||signature||' to authenticated';
   if exists(select 1 from pg_roles where rolname='service_role') then execute 'grant execute on function '||signature||' to service_role';end if;
  end loop;

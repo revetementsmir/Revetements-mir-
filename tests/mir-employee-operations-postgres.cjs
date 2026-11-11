@@ -9,6 +9,7 @@ const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0'),migrations=p
  async function denied(user,sql,params=[],pattern=/permission|autorisé|requis|invalide/i){await assert.rejects(()=>actor(user,sql,params),error=>pattern.test(error.message));}
  try{
   await db.exec("create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}');create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text);alter table storage.objects enable row level security;create function storage.foldername(text) returns text[] language sql immutable as $$select (string_to_array($1,'/'))[1:array_length(string_to_array($1,'/'),1)-1]$$;grant usage on schema storage to authenticated;grant select,insert,delete on storage.objects to authenticated;");
+  await db.exec('alter table storage.objects add column owner uuid,add column owner_id text,add column metadata jsonb');
   for(const file of fs.readdirSync(migrations).filter(name=>name.endsWith('.sql')&&!name.includes('mir_estimates')).sort())await db.exec(fs.readFileSync(path.join(migrations,file),'utf8'));
   await db.exec("insert into auth.users(id) values('"+[admin,leader,employee,colleague,assistant,outsider,boss].join("'),('")+"');");
   await db.query('insert into mir_core.organizations(id,name) values($1,$2)',[org,'MIR TEST']);
@@ -49,7 +50,7 @@ const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0'),migrations=p
   assert.equal(snapshot.messages[0].readCount,1);assert.equal(snapshot.messages[0].recipientCount,2);
   ok('États Envoyé, Distribué et Lu proviennent des reçus réels');
   const messagePath=`${org}/message/${teamConversation}/${employee}/${uuid(101)}.jpg`,jobPath=`${org}/extra/${job}/${employee}/${uuid(102)}.jpg`;
-  await actor(employee,'insert into storage.objects(bucket_id,name) values($1,$2),($1,$3)',['mir-internal',messagePath,jobPath]);
+  await actor(employee,'insert into storage.objects(bucket_id,name,owner,owner_id,metadata) values($1,$2,$4::uuid,$4::text,$5),($1,$3,$4::uuid,$4::text,$5)',['mir-internal',messagePath,jobPath,employee,{mimetype:'image/jpeg',size:10}]);
   assert.equal((await actor(colleague,'select count(*)::int n from storage.objects where bucket_id=$1',['mir-internal']))[0].n,2);
   assert.equal((await actor(outsider,'select count(*)::int n from storage.objects where bucket_id=$1',['mir-internal']))[0].n,0);
   await denied(outsider,'insert into storage.objects(bucket_id,name) values($1,$2)',['mir-internal',`${org}/extra/${job}/${outsider}/${uuid(103)}.jpg`],/row-level|policy/i);

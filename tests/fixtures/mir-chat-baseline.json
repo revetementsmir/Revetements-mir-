@@ -1,0 +1,30 @@
+{
+  "sha": "39de53260a134bae48143c1bdb1aa235335d6187",
+  "files": {
+    "dist/mir-harmony.css": "3d2b41ca6b6fe50b73cc278a0644396612841b2b899858b78828f4af8b6fb8c5",
+    "dist/mir-harmony.js": "6efc250fb7499dc2ba11849d078ed68fefc9eee4ac69748bd47903f25dcfeff7",
+    "dist/mir-today.js": "6574167d661ed965cf0cde1f5de1082331a96d6ff7e6e110090bae5ea742d490",
+    "dist/mir-today.css": "a25b18b2dfa065be10e7f942d4532afbfff24f170d5a7c53322a0001c9850c0a",
+    "dist/portal-config.js": "cf4a4bc34ad1210e2461a578680da96466a1e6878b05814bb45a7c101cb4b991",
+    "dist/employee-store-model.js": "0d33d1c944d55764dd60d9fd330bff231dac3b975e0027f04c02444a4a2c0c7b",
+    "dist/mir-production-signature.css": "d5c72cce4c78990a3f50fa4b45e9a122fd9abc24bcb9ba8d8507ddb83870cbc7",
+    "supabase/migrations/20261111120000_job_dossier_central.sql": "55227f04eecdcaaabdb70d9350a5aad6a26d382b9823dff148cf3938b03f25e0",
+    "supabase/migrations/20261110020000_punch_gps.sql": "15a1aa2b343a4bfa247ac24634325f44b28d95ee1ebb7abd2160e0bb30afb8f8",
+    "supabase/migrations/20261110130000_punch_phase2_integrity.sql": "ef7141911e8649adae1185b47f9538af9726489567ce073ac78a214f23e6bb23",
+    "supabase/migrations/20261110140000_punch_phase2_workflow.sql": "68a1ce96fbb63e4fc28095f2d4f3825a5dd4620ca7f78f90d1cf6bd45d9dbb9d",
+    "supabase/migrations/20261110150000_punch_phase2_corrections.sql": "d5d02ac31e360a2794fb6ef60e50dda9d5fed1a37466e7b22b0b99870051ec22",
+    "supabase/migrations/20261110160000_punch_phase2_completion.sql": "ec3436bdf865ed29224ccc0b90763f5ed482841cc113a5b08e6e294a96ad18df"
+  },
+  "functions": {
+    "todayTasksMarkup": "8aafba5c63533a33f6e3251b94a756ec233dfc9e9ed1d48d73087331e9edd08a",
+    "todayTasks": "ab8e6e584c80d83650f515b4e2b6e25f394443324f8959fb5707eaf568f1dc61",
+    "todayNotices": "13bd7bd0b637bc7b6830ae0d3ddaa17387dccf348a666450e4f904a85ac94f9b",
+    "todayFrame": "d00ba7d8baf8cd101c14a819d8e552b174da9830dd02d28aec819e7508e21242",
+    "punchCard": "c003f21b62cdc4dd810fa29ebd731ae5cb09895606a8e03d488f7b0806266b69",
+    "renderPunchHours": "1793d78a6bedc76971928ddfa2dd7bb1e09dd10703d64bb348e328827dc3fb6a",
+    "punchCorrectionDialog": "f1e94c0ea7e51072ffa6226470a5cd53e884f67a8bd5258eadf20a4946c35e13",
+    "punchDecisionDialog": "23af02a23da29fdd230980f23583ca5e4e8528775617d5a4911744f8d8024e63",
+    "renderWarehouse": "e36b12bb7ac3a106e7059ad92e652437cf8319b12ecc95c9693b72455d42dd51",
+    "renderManagement": "6786f7dabb39018625b31dcbeedd3988515ce879f6b30750d582cd297ba81ae3"
+  }
+}
