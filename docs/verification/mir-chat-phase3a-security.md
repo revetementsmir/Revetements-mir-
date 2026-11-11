@@ -1,6 +1,119 @@
 # MIR — Phase 3A : fondations et sécurité du clavardage
 
-État courant au 11 novembre 2026 : **migration appliquée sur MIR TEST; recette réelle BLOQUÉE / NON CERTIFIÉE**. Production intacte. L’historique de préparation locale est conservé plus bas et ne constitue pas une certification hébergée.
+État courant au 11 novembre 2026 : **blocage Support corrigé sur MIR TEST, PNG accepté, recette reprise; validation globale À VÉRIFIER, pas entièrement certifiée**. Un téléchargement authentifié déjà mis en cache survit au retrait; ce résultat reste un échec, pas un succès RLS. Production intacte. L’historique ci-dessous est conservé.
+
+## Reprise autorisée — correctifs Storage et certification réelle
+
+### Résultat et décisions restantes
+
+Les correctifs sont appliqués uniquement à **MIR TEST `hxtztkmbfpmzrieccwsg`**. Aucun accès ni aucune écriture à **MIR production `gccltmaulvrnthrbnrpd`**, aucun nouveau compte, aucune modification de mot de passe, aucune fusion, publication ou intervention Lot B. Aucun changement frontend dans cette reprise.
+
+- **40/40 suites locales réussies** : 16 statiques/unitaires, 8 PostgreSQL jetables, 16 UI simulées. Les quatre suites SQL ciblées chat/gardes/Support/sonde couvrent **62 scénarios**. Chaque correctif est exécuté deux fois; la migration initiale est aussi rejouée après le correctif sonde.
+- **49/49 contrôles HTTPS réels réussis en Actions**, six comptes existants : [run 43026678667](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43026678667), source **`b7c235dc299c38ea20e93a367f8c8f9d1c411a9f`**. Employé/Chef/Adjointe/Boss/Admin autorisés sur leur chantier; Entrepôt refusé sur le chantier sans opération logistique. Ce run ne contient pas le test opérateur de retrait du cache.
+- Recette opérateur HTTPS complémentaire : **51 contrôles réussis, 1 échoué**. Retraits/réintégrations, SQL de cohérence et durée réelle 300 secondes testés en supplément. Les comptes Boss/Adjointe absents localement ont été validés par les secrets Actions, sans demander leurs identifiants ici.
+- Certification générale des six rôles également réussie **après** les correctifs : [run 43026678386](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43026678386).
+
+**La somme des runs n’est pas un nombre de scénarios distincts** : plusieurs vérifications sont rejouées. Le vert des 49 contrôles CI ne remplace pas le résultat rouge de la recette complémentaire.
+
+Deux prérequis restent ouverts avant de déclarer la sécurité entièrement certifiée :
+
+1. Définir et vérifier la révocation des téléchargements déjà mis en cache. Une URL authentifiée antérieure renvoie encore 200 après retrait, alors qu’un appel non caché et les RPC refusent. L’attribution précise au proxy/CDN/origine et la durée du cache restent à établir avec les accès/réglages appropriés. Aucun changement silencieux de bucket partagé ou de plateforme n’a été effectué.
+2. La deuxième organisation TEST existe mais ne possède **aucun membre interne actif**. Les refus réels A → B sont vérifiés pour les six rôles; une session interne autorisée B et un texte interne B non vide ne peuvent pas être certifiés dans l’autre sens sans décision d’accès. Aucun compte ni membership n’a été créé pour contourner ce manque. Ne pas demander de mot de passe dans le clavardage; utiliser un accès approuvé et les secrets Actions.
+
+La méthode Tests a imposé la conservation des échecs intermédiaires et la séparation des tests hébergés, jetables et simulés. Le [JSON de cette reprise](mir-chat-phase3a-storage-recertification.json) contient les contrôles détaillés et les 12 fichiers touchés. Le [premier JSON bloqué](mir-chat-phase3a-mir-test-results.json) demeure une preuve historique, pas l’état courant.
+
+### Audit complet du helper Support
+
+Signature constatée : `mir_core.support_object_allowed(object_name text, writing boolean DEFAULT false) RETURNS boolean`, PL/pgSQL STABLE SECURITY DEFINER, `search_path=pg_catalog, mir_core, storage`, propriétaire postgres. Avant correction : ACL propriétaire uniquement; authenticated/anon sans EXECUTE.
+
+Les **trois seules policies** qui appellent directement ce helper sont `mir_support_insert` (WITH CHECK, writing=true), `mir_support_select` (USING, false) et `mir_support_delete` (USING, true). Elles sont permissives, pour authenticated, et bornées au bucket `mir-support`. Elles sont **inchangées** après correction. L’audit des autres helpers directement appelés par les policies Storage n’a trouvé aucun autre EXECUTE authenticated manquant.
+
+Le helper déléguait à `support_allowed(org,conversation,member DEFAULT auth.uid())`, puis `support_staff(org,member DEFAULT auth.uid())`. Ces deux fonctions SECURITY DEFINER fixent `search_path=pg_catalog,mir_core`. `support_allowed` relie effectivement organisation/conversation et autorise le client propriétaire ou les rôles Support historiques; `support_staff` conserve assistant/boss/admin/warehouse. Aucun de ces deux helpers internes n’a reçu d’EXECUTE utilisateur et leurs corps sont inchangés.
+
+Le corps initial de `support_object_allowed` : extraction de `storage.foldername`, exigence de quatre dossiers, conversion des trois premiers en UUID, propriétaire égal à auth.uid() en écriture, puis délégation métier. Défauts : absence d’EXECUTE requis pour RLS, absence de garde explicite de membership active et cardinalité incompatible avec le chemin publié par la RPC Support (**4 segments au total**, soit 3 dossiers). Un simple GRANT n’était donc pas suffisant.
+
+Correctif minimal gardé : authentification non nulle, membership active dans l’organisation du chemin, absence de segment vide/`.`/`..`, longueur bornée, UUID valides, propriétaire égal à l’utilisateur pour toute écriture, puis vérification serveur de la conversation dans cette organisation avec le même prédicat métier. Le contrat canonique 4 segments et l’ancien format 5 segments sont acceptés. Aucun fichier existant déplacé, aucun second stockage ou Centre d’aide créé.
+
+### Deuxième défaut réel découvert au PNG
+
+Après correction Support, l’erreur EXECUTE a disparu, mais le PNG a rencontré `new row violates row-level security policy`. La nouvelle policy chat INSERT exigeait déjà `metadata.size` lors de la **sonde de préautorisation Storage**, avant la création des métadonnées finales.
+
+Contrat officiel contrôlé : [Storage v1.29.3, uploader.ts](https://github.com/supabase/storage/blob/v1.29.3/src/storage/uploader.ts), `canUpload` crée une ligne provisoire sans metadata; le [code courant](https://github.com/supabase/storage/blob/master/src/storage/uploader.ts) peut transmettre `contentLength`, pas encore `size`. Ce sont deux formats de préautorisation, pas deux preuves de contenu.
+
+Le deuxième correctif ajoute un helper **invoker**, `chat_storage_upload(text,uuid,text,jsonb)`, et effectue un **ALTER POLICY gardé** de la seule policy restrictive INSERT chat. Le chemin canonique, le propriétaire, l’accès courant et le chantier non archivé restent obligatoires. Metadata absente ou provisoire sert seulement à autoriser la sonde. **SELECT et `mir_message_attachment_validate` conservent le validateur final strict**, existence de l’objet comprise : une ligne provisoire n’est ni lisible ni rattachable. Les autres policies et autorisations hors chat ne sont pas modifiées.
+
+### Migrations réellement enregistrées
+
+Préconditions SQL exécutées en READ ONLY avant chaque application. Application unitaire par le mécanisme officiel **Supabase apply_migration**, jamais db push global.
+
+| Source | Version enregistrée TEST | Préconditions UTC | SHA-256 source = historique enregistré |
+|---|---|---|---|
+| `20261113125310_chat_phase3a_storage_support_acl.sql` | `20261111125722` | 12:57:03 | `0cbf5ed6e01ac436c5840eb3310525605ad16a20c306c3ae152b2307a83ff191` |
+| `20261114131000_chat_phase3a_storage_upload_probe.sql` | `20261111130350` | 13:03:34 | `83ea676e27644f8d4917e788a156dbdfcf90d9d6abba314abeb5fd95198dc99a` |
+
+La migration initiale conserve sa version `20261111122840`, son source et son hash. Les préfixes locaux suivent les dépendances versionnées; les versions hébergées sont générées par Supabase. **Ne pas les réappliquer sous prétexte d’un numéro différent.**
+
+Les gardes refusent un état partiel, une définition/ACL/policy différente ou une dérive de catalogue. La seconde exécution identique est un no-op. Aucun DROP POLICY/FUNCTION, aucune suppression de données. Le catalogue Phase3A est remis en concordance uniquement après l’évolution explicitement vérifiée; la migration initiale reste répétable et refuse les autres dérives. Retour arrière opérationnel : arrêter les mutations et inspecter; ne pas supprimer des objets ou improviser une réparation hébergée.
+
+Contrôle hébergé du **13:19:55 UTC** : trois migrations enregistrées une seule fois, hash SQL concordants, marqueur de catalogue valide, affectation chantier et équipe restaurées. Quatre tables chat toujours RLS sans droits directs anon/authenticated; bucket privé; anon sans EXECUTE sur les helpers/RPC concernés. Le JSON conserve les signatures, sources de fixture et preuves d’ACL.
+
+### Preuves réelles de la reprise
+
+| Vérification | Résultat réel |
+|---|---|
+| PNG valide 68 octets | Upload 200, métadonnées finales validées 200, envoi avec fichier 200, lecture autorisée SHA-256 identique |
+| Objet inexistant, mauvais propriétaire ou conversation | Rattachement refusé |
+| Chemins tenant/conversation/propriétaire/extension forgés | Storage refuse |
+| MIME déclaré non permis, >10 Mio | Storage refuse |
+| Extension/MIME discordants | Non rattachable; le statut d’upload est consigné séparément |
+| Bucket public, lecture anonyme, client extérieur | Refus HTTP réel |
+| Conversation officielle concurrente | 8 requêtes, même UUID; SQL confirme une ligne |
+| Envoi concurrent idempotent | 8 requêtes, même message; SQL : 1 message, 9 reçus, 9 notifications, aucun doublon par destinataire |
+| Accusé pour autrui ou accusé par l’expéditeur | Refus; lecture pour soi acceptée; SQL montre seulement son reçu et sa notification lus |
+| Non-lus | 58 non-lus, concordance RPC/reçus SQL après 59 messages et une lecture |
+| Pagination/recherche | 57 messages balisés retrouvés sans trou ni doublon, limite serveur 50 malgré 99999 demandé; canari d’une autre conversation autorisée au Chef seul introuvable pour Employé |
+| Retrait chantier | RPC 403, nouvelle signature 400, HTTP authentifié non caché 400; accès restauré après réintégration, 59 messages conservés |
+| Retrait équipe | HTTP RPC 403 immédiatement, privé existant et chantier restent 200; réintégration 200 sans copie de participant historique |
+| URL signée 5 secondes | 200 avant expiration, 400 après 10,4 secondes |
+| URL signée client 300 secondes | 200 durant la fenêtre, 400 à 311,7 secondes |
+
+Retrait chantier de recette : **13:11:08 → restauration 13:11:36 UTC**, puis contrôle cache distinct **13:13:27 → 13:13:46 UTC**. Retrait équipe existante limité à la ligne auditée : **13:15:29 → restauration 13:15:49 UTC**. Les blocs finally restaurent les accès même si le test échoue; le contrôle final confirme les deux états. Aucun autre chantier affecté, aucun historique effacé.
+
+**Échec restant — cache HTTP** : après retrait, la même URL authentifiée déjà lue renvoie **200**; une URL équivalente avec nonce inédit renvoie **400**, tandis que RPC et nouvelle signature refusent. En-têtes observés : `cache-control: private, no-cache`, `cf-cache-status: HIT`; métadonnée Storage `cacheControl=no-cache`. Ce n’est donc pas une preuve qu’un simple changement frontend de cacheControl résoudrait le problème. Le parcours réel passe par le proxy de l’environnement; l’attribution indépendante et l’expiration du cache ne sont pas établies. Aucune promesse de révocation instantanée des copies déjà délivrées. Ce contrôle reste rouge dans le JSON.
+
+Une URL **signée déjà émise** est par ailleurs une capacité porteuse : elle est restée 200 à 153,5 secondes lors du retrait, puis a réellement expiré. La valeur 300 secondes est le défaut du client, **pas un plafond universel imposé à tous les appels Storage par SQL**.
+
+### MIME et binaire — résultats séparés
+
+1. **Validé réellement** : type déclaré autorisé par le bucket, taille, extension, `metadata.mimetype/size` finaux, propriétaire, tenant, conversation et accès courant. Ces métadonnées sont lues côté serveur dans Storage, jamais acceptées du navigateur comme attestation suffisante de rattachement.
+2. **Analyse binaire non réalisée / non implémentée** : ni magic bytes, décodage d’image, antivirus ni quarantaine avec analyse de contenu. La recette a envoyé un texte inoffensif non PNG déclaré `image/png` : **upload 200 et validation 200**. C’est une preuve concrète de la limite, pas une validation de sûreté du contenu. Renforcer ce contrôle requiert un choix produit/sécurité distinct.
+
+### Régressions, erreurs de recette et fichiers
+
+Les 40 suites locales couvrent Punch, dossier chantier, Aujourd’hui, portail, accueil, Boutique, Pliage, Magasin, Entrepôt, Réalisations et Studio, plus les parcours existants. Formats simulés : **360, 390, 430, 768, 1024, 1440 px**; aucun appareil physique ou UI hébergée n’est présenté comme testé par ces simulations. Les captures UI existantes restent des preuves simulées, pas des captures des sessions réelles. Aucune refonte visuelle.
+
+Deux erreurs du **nouveau test**, pas des permissions métier, ont été corrigées et restent consignées : paramètre privé `target` au lieu de `other` (PGRST202); hypothèse Employé → Chef sans équipe commune dans la CI (42501). La recette utilise désormais la cible Adjointe/Boss prévue par la matrice, et ne change pas cette matrice. [Run intermédiaire échoué](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43026450553), puis run réel vert cité plus haut.
+
+Au SHA CI `b7c235d` : **10 workflows verts, 2 rouges préexistants**. Les rouges restent `mir-supplier-send.cjs` et `mir-shared-workspace-browser.cjs`, erreur **42704 — role service_role does not exist**, confirmée dans les nouveaux logs ([fournisseurs](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43026678693), [fondations](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43026678511)) et déjà reproduite sur main `39de53260a134bae48143c1bdb1aa235335d6187`. Aucun module protégé corrigé hors périmètre.
+
+Fichiers touchés **dans cette reprise**, par rapport à `9438879adf94d937df675fd56a76fe3795b8ccd8` :
+
+- `.github/workflows/mir-chat-phase3a-pr.yml`
+- `.github/workflows/mir-chat-phase3a-real.yml`
+- `supabase/migrations/20261113125310_chat_phase3a_storage_support_acl.sql`
+- `supabase/migrations/20261114131000_chat_phase3a_storage_upload_probe.sql`
+- `tests/fixtures/mir-chat-support-audit.json`
+- `tests/mir-chat-support-postgres.cjs`
+- `tests/mir-chat-storage-probe-postgres.cjs`
+- `tools/validation/mir-chat-phase3a-local.cjs`
+- `tools/validation/mir-chat-phase3a-real.py`
+- `docs/verification/mir-chat-phase3a-security.md`
+- `docs/verification/mir-chat-phase3a-permissions.md`
+- `docs/verification/mir-chat-phase3a-storage-recertification.json`
+
+Le patch Phase 1 non suivi préexistant est conservé et exclu des commits. Branche dédiée uniquement; [PR #4](https://github.com/revetementsmir/Revetements-mir-/pull/4) reste en brouillon. Attendre les décisions de cache et d’accès du second tenant, sans compte neuf implicite, avant de qualifier toute la certification de complète. **Production intacte, aucune fusion, aucun déploiement, aucun Lot B.**
+
+## Historique — première application et blocage initial, avant autorisation corrective
 
 ## Mise à jour — application autorisée et recette MIR TEST
 

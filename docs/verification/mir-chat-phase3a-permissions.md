@@ -31,11 +31,21 @@ Ces restrictions parfois asymétriques sont intentionnellement conservées : Pha
 
 `job_dossier_allowed` conserve les droits Boss/Adjointe/Admin existants et les affectations chantier Employé/Chef. Entrepôt conserve le périmètre logistique déjà accordé par cette fonction; aucun nouveau droit hors clavardage. Le libellé opérationnel Boss pour Admin ne modifie pas le rôle technique.
 
-Les participants historiques ne déterminent l’accès que pour les conversations privées. Les équipes et chantiers sont recalculés à chaque appel. Retrait = refus immédiat des nouvelles requêtes SQL/Storage, réintégration = accès rétabli. Une URL déjà signée peut survivre jusqu’à son expiration (300 secondes); ce délai n’est pas une révocation instantanée d’URL.
+Les participants historiques ne déterminent l’accès que pour les conversations privées. Les équipes et chantiers sont recalculés à chaque appel. Retrait = refus immédiat des nouvelles requêtes SQL et Storage non cachées; réintégration = accès rétabli. **Une réponse HTTP authentifiée déjà mise en cache peut encore être délivrée : échec de révocation immédiate constaté, non résolu.** Une URL déjà signée peut survivre jusqu’à son expiration (300 secondes par défaut client, pas un plafond SQL universel); ce délai n’est pas une révocation instantanée d’URL.
 
 Certification : aucun test local n’équivaut à une certification hébergée.
 
-## Recette réelle du 11 novembre 2026 — partielle et bloquée
+## Reprise réelle autorisée — état courant
+
+Correctifs TEST enregistrés : `20261111125722` (helper Support durci avant grant minimal) et `20261111130350` (sonde Storage séparée des métadonnées finales). Les trois policies Support et les fonctions métier sous-jacentes sont conservées, sans grant utilisateur aux helpers internes. Aucun droit de table chat ajouté.
+
+Les six comptes existants ont réellement passé [49 contrôles chat en Actions](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43026678667). Employé, Chef, Adjointe, Boss et Admin : lecture chantier 200; Entrepôt non relié à une opération : 403. Chaque rôle est refusé dans la deuxième organisation existante. La certification générale des six rôles est également verte après application.
+
+Retraits et réintégrations équipe/chantier vérifiés avec les comptes locaux existants : RPC refusée immédiatement, réintégration autorisée, conversations privées et historique préservés. PNG et refus de fichiers, pagination/recherche, concurrence d’envoi, reçus/non-lus et expiration réelle à 5 et 300 secondes vérifiés. Voir le [rapport](mir-chat-phase3a-security.md) et le [JSON détaillé](mir-chat-phase3a-storage-recertification.json).
+
+**Certification intégrale non acquise** : réponse authentifiée déjà cachée encore 200 après retrait (non cachée 400); seconde organisation sans membre interne actif pour une validation positive B → A; validation MIME limitée aux métadonnées, texte non PNG déclaré PNG accepté. Aucun réglage partagé, compte ou membership ajouté pour masquer ces limites. La matrice reste normative, pas une garantie des copies déjà délivrées.
+
+## Historique — première recette réelle, avant les correctifs
 
 Migration `chat_phase3a_security` enregistrée sur MIR TEST en version `20261111122840`. Chef, Employé et Admin technique : lectures HTTP du chantier de recette autorisées; refus HTTP sur une seconde organisation existante. Client exclu. **Boss et Adjointe : nouvelles RPC non certifiées par session réelle après migration.** Les secrets existants ne sont pas demandés dans le clavardage.
 
