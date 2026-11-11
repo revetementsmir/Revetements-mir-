@@ -117,6 +117,8 @@
     const listeners = new Set();
     let status = { phase: config.enabled ? 'signed_out' : 'unavailable', user: null, snapshot: null, error: null, pending: null, busy: false };
     let generation = 0, readSequence = 0, authSubscription = null, activePromise = null, authTimer = null, liveTimer = null, disposed = false, internalOrg = null;
+    const chatURLs=new Set(),blobURLs=options.objectURL||globalThis.URL;let chatFileEpoch=0;
+    function revokeChatURLs(){chatFileEpoch++;for(const url of chatURLs)blobURLs.revokeObjectURL(url);chatURLs.clear();}
     const storage = options.operationStorage;
     const logoutKey = `mir_portal_signed_out_${config.projectRef || 'disabled'}`;
     let logoutRequested = false;
@@ -168,6 +170,7 @@
       if (status.user?.id === userId) emit({ pending: null }, 'command');
     }
     function clearIdentity(phase = 'signed_out', error = null) {
+      revokeChatURLs();
       generation++; readSequence++;
       emit({ phase, user: null, snapshot: null, account:null, pending: null, busy: false, error }, 'auth');
     }
@@ -185,6 +188,7 @@
       return data.user;
     }
     async function refresh() {
+      revokeChatURLs();
       requireEnabled();
       if (logoutRequested) { clearIdentity(); return null; }
       if (activePromise) await activePromise.catch(() => {});
@@ -489,14 +493,30 @@
       return chatRPC('mir_chat_messages',{conversation,page_size:Math.min(50,Math.max(1,Number(limit)||20)),page_before:cursor});
     }
     async function chatSearch(query,cursor=null,limit=20){return chatRPC('mir_chat_search',{query_text:String(query||''),page_size:Math.min(50,Math.max(1,Number(limit)||20)),page_before:cursor});}
-    async function validateMessageAttachment(conversation,path){return chatRPC('mir_message_attachment_validate',{conversation,object_path:path});}
+    function chatPath(path){
+      const p=String(path||'').split('/'),file=p[4]?.split('.');
+      if(p.length!==5||p[0]!==internalOrg||p[1]!=='message'||!UUID.test(p[2])||!UUID.test(p[3])||file?.length!==2||!UUID.test(file[0])||!['jpg','png','webp','heic','heif'].includes(file[1])||/[%\\\s?#]/.test(path))fail('DOCUMENT_INVALID','Pièce jointe invalide.');return p;
+    }
+    async function chatFile(action,conversation,extra){
+      requireReady();if(!internalOrg||!UUID.test(conversation||''))fail('CONVERSATION_INVALID','Conversation invalide.');
+      const epoch=generation,fileEpoch=chatFileEpoch,user=status.user.id,{data,error}=await sdk.auth.getSession();
+      if(error||!data?.session?.access_token)fail('AUTH_REQUIRED','Reconnectez-vous pour ouvrir cette pièce jointe.');
+      if(epoch!==generation||fileEpoch!==chatFileEpoch||status.user?.id!==user||status.phase!=='ready')fail('SESSION_CHANGED','La session a changé; rouvrez la pièce jointe.');
+      const response=await(options.fetch||globalThis.fetch)(`${config.supabaseUrl}/functions/v1/mir-chat-files`,{
+        method:'POST',cache:'no-store',credentials:'omit',redirect:'error',headers:{'Content-Type':'application/json',apikey:config.publishableKey,Authorization:`Bearer ${data.session.access_token}`},
+        body:JSON.stringify({action,org:internalOrg,conversation,...extra})});
+      if(epoch!==generation||fileEpoch!==chatFileEpoch||status.user?.id!==user||status.phase!=='ready')fail('SESSION_CHANGED','La session a changé; rouvrez la pièce jointe.');
+      if(!response.ok)fail('DOCUMENT_DENIED','Pièce jointe refusée ou service sécurisé indisponible.');
+      const result=action==='download'?await response.blob():await response.json();
+      if(epoch!==generation||fileEpoch!==chatFileEpoch||status.user?.id!==user||status.phase!=='ready')fail('SESSION_CHANGED','La session a changé; rouvrez la pièce jointe.');
+      return result;
+    }
+    async function validateMessageAttachment(conversation,path){chatPath(path);await chatFile('validate',conversation,{path});return chatRPC('mir_message_attachment_validate',{conversation,object_path:path});}
     async function ackChatMessage(message,state='read'){return chatRPC('mir_message_ack',{message,state});}
     async function chatPhotoURL(path){
-      requireReady();const parts=String(path||'').split('/');
-      if(parts.length!==5||parts[0]!==internalOrg||parts[1]!=='message'||!UUID.test(parts[2]))fail('DOCUMENT_INVALID','Pièce jointe invalide.');
-      const epoch=generation,user=status.user.id,{data,error}=await sdk.storage.from('mir-internal').createSignedUrl(path,300);
-      if(epoch!==generation||status.user?.id!==user||status.phase!=='ready')fail('SESSION_CHANGED','La session a changé; rouvrez la pièce jointe.');
-      if(error||!data?.signedUrl)throw errorOf(error||{},'Cette photo ne peut pas être ouverte.');return data.signedUrl;
+      requireReady();const parts=chatPath(path),blob=await chatFile('download',parts[2],{path});
+      if(!blob.size||blob.size>10*1024*1024||!['image/jpeg','image/png','image/webp','image/heic','image/heif'].includes(blob.type))fail('DOCUMENT_INVALID','Pièce jointe invalide.');
+      const url=blobURLs.createObjectURL(blob);chatURLs.add(url);return url;
     }
     // Phase3A chat API end.
     async function openConversation(kind,targetId){
@@ -507,11 +527,16 @@
       requireReady();if(!internalOrg||!['message','extra','issue','receipt','material','problem','report','vehicle','delivery','inspection','signature'].includes(scope)||!UUID.test(entityId||''))fail('UPLOAD_INVALID','La destination de cette photo est invalide.');
       const mime=String(file?.type||'').toLowerCase(),extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif'};
       if(!extensions[mime]||!file.size||file.size>10*1024*1024)fail('UPLOAD_INVALID','Utilisez une photo JPG, PNG, WebP ou HEIC de 10 Mo maximum.');
+      if(scope==='message'){
+        const bytes=new Uint8Array(await file.arrayBuffer());let binary='';for(let at=0;at<bytes.length;at+=32768)binary+=String.fromCharCode(...bytes.subarray(at,at+32768));
+        const result=await chatFile('upload',entityId,{mime,base64:globalThis.btoa(binary)});const parts=chatPath(result?.path);
+        if(parts[2]!==entityId||parts[3]!==status.user.id||result.mime!==mime||result.size!==file.size)fail('DOCUMENT_INVALID','La pièce jointe reçue est invalide.');return result.path;
+      }
       const id=uuid();if(!UUID.test(id||''))fail('UUID_REQUIRED','Le navigateur ne peut pas préparer cette photo.');
       const path=`${internalOrg}/${scope}/${entityId}/${status.user.id}/${id}.${extensions[mime]}`;
       const {error}=await sdk.storage.from('mir-internal').upload(path,file,{contentType:mime,upsert:false,cacheControl:'3600'});if(error)throw errorOf(error,'La photo n’a pas pu être téléversée.');return path;
     }
-    async function internalPhotoURL(path){requireReady();const {data,error}=await sdk.storage.from('mir-internal').createSignedUrl(path,300);if(error||!data?.signedUrl)throw errorOf(error||{},'Cette photo ne peut pas être ouverte.');return data.signedUrl;}
+    async function internalPhotoURL(path){requireReady();if(String(path).split('/')[1]==='message')return chatPhotoURL(path);const {data,error}=await sdk.storage.from('mir-internal').createSignedUrl(path,300);if(error||!data?.signedUrl)throw errorOf(error||{},'Cette photo ne peut pas être ouverte.');return data.signedUrl;}
     async function jobDossier(jobId,pageBefore=null,pageSize=20){
       requireReady();if(!internalOrg||!UUID.test(jobId||''))fail('JOB_INVALID','Ce chantier ne peut pas être ouvert.');
       const {data,error}=await sdk.rpc('mir_job_dossier_snapshot',{org:internalOrg,job:jobId,page_size:Math.min(50,Math.max(1,Number(pageSize)||20)),page_before:pageBefore||null});
@@ -531,6 +556,7 @@
     async function punchJournal(filters={},pageAfter=null,pageSize=25){requireReady();const {data,error}=await sdk.rpc('mir_punch_journal',{org:internalOrg,filters,page_size:pageSize,page_after:pageAfter});if(error)throw errorOf(error);return data;}
     async function timeBankRequest(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_time_bank_request',{org:internalOrg,request:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     function dispose() {
+      revokeChatURLs();
       disposed = true; generation++; authSubscription?.unsubscribe?.();
       globalThis.removeEventListener?.('online',onlinePunchSync);
       if (authTimer !== null && typeof clearTimeout === 'function') clearTimeout(authTimer);

@@ -25,6 +25,7 @@ jobs:
       - name: Contrats statiques et client fictif
         run: |
           node tests/mir-chat-phase3a.cjs
+          node tests/mir-chat-file-gateway.cjs
           node tests/mir-today.cjs
           node tests/mir-six-role-certification.cjs
       - name: PostgreSQL jetable uniquement
@@ -33,6 +34,7 @@ jobs:
           node tests/mir-chat-phase3a-guards.cjs
           node tests/mir-chat-support-postgres.cjs
           node tests/mir-chat-storage-probe-postgres.cjs
+          node tests/mir-chat-file-gateway-postgres.cjs
           node tests/mir-employee-operations-postgres.cjs
           node tests/mir-job-dossier-postgres.cjs
           node tests/mir-punch-postgres.cjs

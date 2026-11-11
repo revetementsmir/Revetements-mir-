@@ -12,7 +12,8 @@ PROJECT = 'hxtztkmbfpmzrieccwsg'
 HOST = 'https://' + PROJECT + '.supabase.co'
 ORG = '8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9'
 FOREIGN = '3005c762-de14-4ab0-8bc8-16c4be92d0a4'
-PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a8K0AAAAASUVORK5CYII=')
+# CRC/IDAT validated by the local binary-inspector suite, not just an image header.
+PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGD4DwABBAEAX+XDSwAAAABJRU5ErkJggg==')
 
 class Certification:
     def __init__(self):
@@ -114,8 +115,8 @@ class Certification:
             self.check('real role job permission '+role,expected,{'status':r['status']})
             r=self.rpc(key,'mir_chat_messages',{**args,'org':FOREIGN})
             self.check('existing other organization refused '+role,self.denied(r),{'status':r['status']})
-        r=self.upload(chef,self.path);self.check('valid PNG Storage upload',self.ok(r),{'status':r['status'],'bytes':68})
-        r=self.validate(chef,self.path);self.check('valid PNG final server metadata and owner',self.ok(r) and r['data'].get('size')==68,{'status':r['status'],'metadata':r['data'] if self.ok(r) else None})
+        r=self.upload(chef,self.path);self.check('valid PNG Storage upload',self.ok(r),{'status':r['status'],'bytes':len(PNG)})
+        r=self.validate(chef,self.path);self.check('valid PNG final server metadata and owner',self.ok(r) and r['data'].get('size')==len(PNG),{'status':r['status'],'metadata':r['data'] if self.ok(r) else None})
         r=self.send(chef,self.tag+' PNG',self.path);self.check('valid PNG attached to message',self.ok(r),{'status':r['status']});self.attachmentMessage=r['data']['id']
         missing=self.path.rsplit('/',1)[0]+'/'+str(uuid.uuid4())+'.png'
         r=self.validate(chef,missing);self.check('nonexistent object refused',self.denied(r),{'status':r['status']})
@@ -192,6 +193,29 @@ class Certification:
         self.report['fixtures'].update(concurrentMessageId=mid,attachmentMessageId=self.attachmentMessage,restrictedConversationId=cid)
         self.save()
         return {'passed':self.report['passed'],'failed':self.report['failed'],'missing':self.report['missing'],'fixture':self.report['fixtures']}
+    def tenant_b(self):
+        names=['MIR_CHAT_TENANT_B_INTERNAL_EMAIL','MIR_CHAT_TENANT_B_INTERNAL_PASSWORD','MIR_CHAT_TENANT_B_CONVERSATION_ID']
+        missing=[name for name in names if not os.environ.get(name)]
+        self.report['tenantB']={'organizationId':FOREIGN,'status':'blocked','missingSecretNames':missing,'accountsCreated':0,'membershipsChanged':0}
+        if missing:self.save();return
+        r=self.request('POST','/auth/v1/token?grant_type=password',{'email':os.environ[names[0]],'password':os.environ[names[1]]})
+        if not self.ok(r) or not r['data'].get('access_token'):raise RuntimeError('Tenant B existing account authentication unavailable')
+        self.sessions['TENANT_B']={'token':r['data']['access_token'],'id':r['data']['user']['id']}
+        account=self.rpc('TENANT_B','mir_account_snapshot',{})
+        self.check('tenant B actual internal identity',self.ok(account) and account['data'].get('organizationId')==FOREIGN and account['data'].get('role') in ['admin','employee'],{'status':account['status']})
+        cid=os.environ[names[2]]
+        r=self.rpc('TENANT_B','mir_chat_messages',{'org':FOREIGN,'conversation':cid,'page_size':1,'page_before':None})
+        self.check('tenant B authorized existing conversation',self.ok(r),{'status':r['status']})
+        marker=self.tag+' B_CANARY'
+        r=self.rpc('TENANT_B','mir_message_send',{'org':FOREIGN,'conversation':cid,'body':marker,'job':None,'plan':None,'attachment':None,'request_id':str(uuid.uuid4())})
+        self.check('tenant B scoped canary without new membership',self.ok(r),{'status':r['status']})
+        for actor,org,c in [('TENANT_B',ORG,self.con),(self.employee,FOREIGN,cid),(self.roles['admin'],FOREIGN,cid)]:
+            r=self.rpc(actor,'mir_chat_messages',{'org':org,'conversation':c,'page_size':1,'page_before':None})
+            self.check('bidirectional tenant refusal '+actor+' '+org,self.denied(r),{'status':r['status']})
+        for actor,org,query in [('TENANT_B',FOREIGN,self.tag+' PAGE'),(self.employee,ORG,marker)]:
+            r=self.rpc(actor,'mir_chat_search',{'org':org,'query_text':query,'page_size':50,'page_before':None})
+            self.check('other tenant nonempty canary not searchable '+actor,self.ok(r) and not r['data']['items'],{'status':r['status']})
+        self.report['tenantB']['status']='passed';self.save()
 
 if __name__=='__main__':
     cert=Certification()
@@ -214,7 +238,7 @@ if __name__=='__main__':
                     print(json.dumps({'ok':True,'result':result}),flush=True)
                 except Exception as e:print(json.dumps({'ok':False,'errorClass':type(e).__name__,'error':str(e) if isinstance(e,AssertionError) else 'Check failed; no credentials logged'}),flush=True)
         else:
-            cert.core()
+            cert.core();cert.tenant_b()
             required=['admin','boss','assistant','chef_equipe','employe']
             if any(r not in cert.roles for r in required):raise RuntimeError('Required role credentials missing')
             cert.report['finishedAt']=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime());cert.save()

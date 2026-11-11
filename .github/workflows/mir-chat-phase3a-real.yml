@@ -32,6 +32,11 @@ jobs:
       MIR_SANDBOX_ASSISTANT_PASSWORD: ${{ secrets.MIR_SANDBOX_ASSISTANT_PASSWORD }}
       MIR_SANDBOX_WAREHOUSE_EMAIL: ${{ secrets.MIR_SANDBOX_WAREHOUSE_EMAIL }}
       MIR_SANDBOX_WAREHOUSE_PASSWORD: ${{ secrets.MIR_SANDBOX_WAREHOUSE_PASSWORD }}
+      # Existing tenant-B internal account and an ALREADY authorized conversation.
+      # Missing secrets are reported as blocked, never as tenant-B certification.
+      MIR_CHAT_TENANT_B_INTERNAL_EMAIL: ${{ secrets.MIR_CHAT_TENANT_B_INTERNAL_EMAIL }}
+      MIR_CHAT_TENANT_B_INTERNAL_PASSWORD: ${{ secrets.MIR_CHAT_TENANT_B_INTERNAL_PASSWORD }}
+      MIR_CHAT_TENANT_B_CONVERSATION_ID: ${{ secrets.MIR_CHAT_TENANT_B_CONVERSATION_ID }}
     steps:
       - uses: actions/checkout@v4
       - name: Recette HTTPS réelle — comptes existants, TEST épinglé
