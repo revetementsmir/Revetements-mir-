@@ -1,7 +1,7 @@
 # Phase 1 — Dossier chantier central
 
-Date : 11 novembre 2026  
-Branche : `codex/phase-1-dossier-chantier`  
+Date : 11 novembre 2026
+Branche : `codex/phase-1-dossier-chantier`
 Base de départ : `ab2952610560350d40a90d05039c1be96ccab51f`
 
 ## Portée livrée
@@ -68,7 +68,7 @@ Ils existaient dans les modules protégés et la Phase 1 ne les corrige pas.
 Depuis un clone autorisé du même dépôt :
 
 ```bash
-git format-patch ab2952610560350d40a90d05039c1be96ccab51f..80f2ba1 --stdout > phase-1-dossier-chantier.patch
+git format-patch ab2952610560350d40a90d05039c1be96ccab51f..e3cf536 --stdout > phase-1-dossier-chantier.patch
 git apply --check phase-1-dossier-chantier.patch
 git am phase-1-dossier-chantier.patch
 ```
@@ -76,5 +76,5 @@ git am phase-1-dossier-chantier.patch
 Si le dossier de travail local est accessible directement, les deux commits peuvent aussi être récupérés avec :
 
 ```bash
-git cherry-pick 1c4d023 80f2ba1
+git cherry-pick 1c4d023 80f2ba1 e3cf536
 ```
