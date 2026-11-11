@@ -1,7 +1,7 @@
 # MIR — Audit du backend Punch production
 
-Audit du 11 novembre 2026, relevés de catalogue entre 01:39 et 01:44 UTC. **Migration production bloquée avant toute écriture.**
-Ce rapport conserve les limites et les échecs; il ne constitue pas une certification production.
+Audit du 11 novembre 2026, relevés de catalogue entre 01:39 et 01:44 UTC, puis validation MIR TEST entre 01:57 et 02:02 UTC. **Migration production toujours bloquée avant toute écriture.**
+Ce rapport conserve l'audit initial et ses échecs historiques; la section « Validation completion » ci-dessous fait foi pour l'état MIR TEST actuel. Il ne constitue pas une certification production.
 
 ## Révision et périmètre
 
@@ -10,12 +10,73 @@ Ce rapport conserve les limites et les échecs; il ne constitue pas une certific
 - Branche : `codex/backend-punch-production`, créée depuis ce main.
 - MIR TEST : `hxtztkmbfpmzrieccwsg`, nom MIR TEST, ACTIVE_HEALTHY, PostgreSQL 17.11.0.018.
 - MIR production : `gccltmaulvrnthrbnrpd`, nom MIR, ACTIVE_HEALTHY, PostgreSQL 17.11.0.011.
-- Aucune écriture SQL hébergée, aucun compte créé, aucun changement de mot de passe, aucune publication.
+- Une seule écriture SQL hébergée, autorisée et ciblée sur MIR TEST : `20261111015750_punch_phase2_completion`. Aucun compte créé, aucun changement de mot de passe, aucune publication et aucune écriture production.
 - Méthodes MOON 1.3.5, architecture, sécurité et tests chargées sur Atelier; elles ne sont pas des validations indépendantes exécutées par des agents.
 - SEO/GEO : non applicable, audit de backend privé sans modification des pages publiques.
 - Documents Prompt 2 et passation relus; aucune autre phase commencée.
 
-## Décision de sécurité et blocages
+## Validation completion sur MIR TEST — état faisant foi
+
+La cible complète inclut `20261110160000_punch_phase2_completion.sql`. Le frontend appelle réellement `mir_punch_journal` et `mir_time_bank_request` depuis `dist/portal-client.js`; l'écran Punch consomme aussi `bankRequests` et l'historique de décision dans `dist/chantier-app.js`. L'extension dépend des wrappers Punch Phase 1/2, de `memberships`, `staff_capabilities`, `notifications`, `punch_audit`, `time_bank_movements` et des fonctions de rôles existantes.
+
+Le fichier a été rendu reproductible sans changer les permissions métier : table et index gardés, renommages exécutés seulement quand les alias historiques sont absents, préconditions explicites si une fonction source manque, et RPC en `CREATE OR REPLACE`. Une double exécution intégrale sur PostgreSQL jetable est réussie sans perte ni doublon.
+
+Migration officielle appliquée uniquement à MIR TEST :
+
+| Heure UTC | Projet | Version enregistrée | Nom | Résultat |
+|---|---|---|---|---|
+| 2026-11-11 01:57:50 | MIR TEST `hxtztkmbfpmzrieccwsg` | `20261111015750` | `punch_phase2_completion` | Succès transactionnel |
+
+Contrôles catalogue après migration :
+
+| Objet / droit | MIR TEST | MIR production | Preuve / action |
+|---|---|---|---|
+| `mir_core.time_bank_requests` | Présente, RLS activée | Absente | Créée seulement dans TEST; production inchangée |
+| Contraintes banque | PK, 2 FK, quantité, explication et statut : 6 présentes | Absentes | Définitions PostgreSQL vérifiées |
+| Index banque | PK + `time_bank_requests_employee` | Absents | Deux index vérifiés |
+| Accès direct table | `postgres` seulement; aucun grant `anon`, `authenticated` ou `service_role` | Sans objet | Accès applicatif exclusivement par RPC |
+| `mir_punch_snapshot_phase2_workflow` | Présente; exécutable seulement par postgres/service_role | Absente | Alias interne protégé |
+| `mir_punch_correction_phase2_apply` | Présente; exécutable seulement par postgres/service_role | Absente | Alias interne protégé |
+| `mir_punch_snapshot`, `mir_punch_correction` | Présentes; authenticated + service_role | Absentes | Wrappers publics conservés |
+| `mir_punch_journal` | Présente; authenticated + service_role | Absente | Autorisation métier contrôlée dans la fonction |
+| `mir_time_bank_request` | Présente; authenticated + service_role | Absente | Création/décision contrôlées dans la fonction |
+| Policies directes banque | Aucune | Sans objet | RLS + révocation directe; pas de policy permissive |
+| Production Punch/dossier | Sans objet | Toujours absent à 02:02:11 UTC | Lecture seule : shifts, segments, banque, journal, dossier, documents et bucket tous absents |
+
+La certification GitHub Actions du SHA `1a6239ad105c6e737e8f46ddbeac9923d72af9d2`, run `42942875970`, est entièrement verte : les jobs « UI simulated and disposable SQL » et « certify-six-real-roles » ont réussi. L'artefact réel `mir-real-role-certification` (ID `13821187266`, SHA-256 ZIP `ef3879a11f18c0b354d966d2bed5c7b132223df4932eb43476e88ebe7aef98bc`) ne contient aucun secret.
+
+Résultats réels des six rôles :
+
+| Rôle | Rôle opérationnel | Journal Punch | Snapshot/permissions générales | Banque d'heures |
+|---|---|---|---|---|
+| Admin | Boss (libellé opérationnel seulement) | Autorisé | Auth, refresh, organisation et RPC autorisées/refusées : PASS | Trace finale vérifiée dans le journal |
+| Boss | Boss | Autorisé | PASS | Accès de décideur confirmé |
+| Adjointe | assistant | Autorisé | PASS | Refus réel d'une demande : PASS |
+| Chef | chef_equipe | Refusé | PASS | Snapshot personnel seulement |
+| Employé | employe | Refusé | PASS | Création réelle, pending puis refused visible : PASS |
+| Entrepôt | warehouse | Refusé | PASS | Snapshot personnel seulement |
+
+Le test fonctionnel a créé dans MIR TEST une demande de `0,25 h`, puis l'Adjointe l'a refusée avec motif. L'Employé a vu les états pending puis refused; l'Admin a retrouvé l'action `bank_request_refused` dans le journal. Aucun débit de banque n'a été effectué (`balanceChanged: false`) et l'historique a été conservé.
+
+Tests completion :
+
+| Test | Nature | Résultat |
+|---|---|---|
+| `mir-punch-postgres.cjs` | PostgreSQL jetable, migration exécutée deux fois | 21 scénarios PASS |
+| `mir-punch-browser.cjs` | UI simulée Chromium | PASS, 6 formats téléphone/tablette/ordinateur, décisions, journal, banque, dîner et PDF réel |
+| `mir-job-dossier-postgres.cjs` | PostgreSQL jetable | 6 scénarios PASS |
+| `mir-job-dossier-browser.cjs` | Chromium local | 6/6 PASS |
+| Certification API réelle | Six comptes MIR TEST | PASS |
+| Journal réel par six rôles | MIR TEST | Admin/Boss/Adjointe autorisés; Chef/Employé/Entrepôt refusés : PASS |
+| Banque réelle | MIR TEST | création Employé, décision Adjointe, snapshot et journal Admin : PASS |
+
+Le précédent échec `review != locked` provenait du test mélangeant la date UTC de CI et la date métier Toronto. Le test utilise maintenant la plage couvrant explicitement les dates métier/UTC concernées; le comportement SQL n'a pas été assoupli. Le scénario de verrouillage passe.
+
+**Arrêt obligatoire atteint :** MIR TEST est validé. Aucune migration ne sera appliquée à MIR production sans autorisation explicite distincte.
+
+## Audit initial — décisions et blocages historiques
+
+Les points 1 et 2 ci-dessous décrivent l'état constaté avant l'autorisation d'installer completion dans TEST; ils sont résolus par la validation faisant foi ci-dessus. Les points 3 à 6 restent des limites avant production.
 
 1. La version locale `20261110160000_punch_phase2_completion.sql` n'est pas installée dans MIR TEST, même sous un autre numéro : absence réelle de `time_bank_requests`, `mir_punch_journal`, `mir_time_bank_request`, `mir_punch_snapshot_phase2_workflow` et `mir_punch_correction_phase2_apply`. Le frontend main appelle déjà journal et banque (`dist/portal-client.js:508`). La certification antérieure des six comptes ne certifie donc pas cette extension absente. L'installer d'abord en production contredirait le transfert du backend validé.
 2. `tests/mir-punch-postgres.cjs:30` échoue sur le main inchangé : `'review' !== 'locked'`, après 14 scénarios réussis. À l'heure du test, date UTC = 2026-11-11 et Toronto = 2026-11-10. Le test définit la période en UTC, alors que la correction précédente recalcule la journée en America/Toronto. Cause du décalage étayée par le code; aucun changement du test ou des fonctions n'a été fait.
@@ -62,14 +123,14 @@ Le JSON associé contient colonnes, contraintes, index, triggers, policies, gran
 | mir_core.punch_corrections | Présent, RLS | Absent | 20261110020000_punch_gps.sql | punch_shifts, jobs, memberships | Installation conditionnelle, bloquée |
 | mir_core.time_periods | Présent, RLS | Absent | 20261110020000_punch_gps.sql | auth.users | Installation conditionnelle, bloquée |
 | mir_core.time_bank_movements | Présent, RLS | Absent | 20261110020000_punch_gps.sql | time_periods, memberships | Installation conditionnelle, bloquée |
-| mir_core.time_bank_requests | Absent | Absent | 20261110160000_punch_phase2_completion.sql | memberships, auth.users | Absent des deux; décision requise |
+| mir_core.time_bank_requests | Présent, RLS, aucun droit direct applicatif | Absent | 20261110160000_punch_phase2_completion.sql | memberships, auth.users | Validé TEST; attendre autorisation production |
 | mir_core.punch_audit | Présent, RLS | Absent | 20261110020000_punch_gps.sql | auth.users | Installation conditionnelle, bloquée |
 | mir_core.staff_capabilities | Présent, RLS | Présent, RLS | 20261109170000_employee_operations_backend.sql | memberships | Réutiliser; ne pas rejouer |
 | mir_core.memberships | Présent, RLS | Présent, RLS | 202611060001_shared_foundation.sql | organizations, auth.users | Réutiliser; ne pas rejouer |
 | public.mir_punch_snapshot / action / correction / admin | Présents | Absents | punch_gps + integrity + workflow + corrections | Tables Punch, staff_role, job_allowed | Transfert conditionnel |
 | mir_core.punch_manager / punch_distance_m | Présents | Absents | punch_gps | staff_role; mathématiques PG | Ajouter avec Punch |
 | mir_core.operational_role / public.mir_my_operational_access | Présents | Absents | 20261110120000_operational_roles_phase1.sql | memberships, staff_capabilities | Ajouter sans changer les droits |
-| public.mir_punch_journal / mir_time_bank_request | Absents | Absents | 20261110160000_punch_phase2_completion.sql | Punch + notifications | Bloqué, version non validée sur TEST |
+| public.mir_punch_journal / mir_time_bank_request | Présents et certifiés six rôles | Absents | 20261110160000_punch_phase2_completion.sql | Punch + notifications | Validés TEST; attendre autorisation production |
 | public.mir_job_dossier_snapshot | Présent | Absent | 20261111120000_job_dossier_central.sql | Tous les domaines du dossier + Punch | Après Punch, version sans DROP POLICY |
 | mir_core.job_dossier_allowed / job_storage_read / job_storage_write | Présents | Absents | job_dossier_central | job_allowed, staff_role, memberships, livraisons, jobs, job_documents | Après contrôle de compatibilité |
 | storage.objects / storage.buckets | Présents, objects RLS | Présents, objects RLS | Socle Supabase existant | helpers de policy | Réutiliser |
@@ -115,7 +176,7 @@ Les fondations, opérations employés, messagerie, chef/équipes, logistique et 
 | 3 | 20261110130000_punch_phase2_integrity.sql | index dîner, wrappers action/correction/admin, anciens noms phase1 | Non, RENAME | Préconditions exactes sur signatures et absence des alias; dépend ordre 1 | Dîner, périodes fermées, banque, wrapper interne interdit authenticated | Transaction; pas de renommage inverse improvisé |
 | 4 | 20261110140000_punch_phase2_workflow.sql | wrappers snapshot/admin, alias phase1/phase2 | Non | Dépend 3; les noms historiques doivent être ceux attendus | Historique banque, approbation/verrouillage et correction auditée | Transaction puis correctif additif si nécessaire |
 | 5 | 20261110150000_punch_phase2_corrections.sql | correction + alias phase2 | Non | Dépend 3/4, FK et colonnes Punch présentes | Avant/après, arrivée/départ/job/trajet, interdits | Idem |
-| 6, décision requise | 20261110160000_punch_phase2_completion.sql | time_bank_requests, wrappers, journal, banque, notifications | Non | Absente de TEST; ne pas considérer certifiée; dépend 5 + notifications/staff_capabilities | Tests extension et six rôles avant production | Idem |
+| 6, validé TEST | 20261110160000_punch_phase2_completion.sql | time_bank_requests, wrappers, journal, banque, notifications | Oui après correctif gardé; double exécution testée | Dépend 5 + notifications/staff_capabilities; installée TEST sous 20261111015750 | 21 SQL, UI et six rôles réels verts | Transaction; après commit, correctif additif seulement |
 | 7 | 20261111120000_job_dossier_central.sql | job_documents, bucket/policies/helpers et snapshot | Partiel seulement | Dépend 1 à 5, tables du dossier; remplacer DROP POLICY par création conditionnelle vérifiée; comparer tout objet préexistant | Privé, isolation, historique, pagination, aucun droit direct | Transaction; objets conservés après commit, éventuel correctif additif |
 
 L'ordre 2 est indépendant des tables Punch mais dépend des rôles déjà présents. Completion n'est pas une dépendance SQL du dossier; c'est une dépendance des fonctions Punch déjà appelées par le frontend.
@@ -129,7 +190,7 @@ Backups : obtenir liste/statut/date de sauvegarde et PITR du projet MIR avant to
 
 | Test | Nature / résultat |
 |---|---|
-| mir-punch-postgres.cjs | PostgreSQL jetable issu du dépôt : ÉCHEC après 14 PASS, review != locked, ligne 30; aucun test ultérieur déclaré réussi |
+| mir-punch-postgres.cjs | Échec historique du main après 14 PASS; corrigé sur la branche puis **21 scénarios PASS**, double migration incluse |
 | mir-job-dossier-postgres.cjs | PostgreSQL jetable issu du dépôt : 6 scénarios PASS; socle local, pas copie production |
 | mir-job-dossier-real.cjs | Contrat statique : 1 PASS; ce fichier **n'ouvre aucune session réelle** |
 | mir-six-role-certification.cjs | Contrats et API simulée : 7 PASS; pas six comptes réels |
@@ -147,11 +208,11 @@ Backups : obtenir liste/statut/date de sauvegarde et PITR du projet MIR avant to
 | mir-pliage-audit-commercial.cjs | Métier : 11 PASS (inclut Magasin et prix) |
 | mir-boutique-audit-20261110.cjs | Statique : PASS, contrôle de 118 références |
 | mir-job-dossier-browser.cjs | 6/6 PASS après relance Chromium autorisée; rendu fictif isolé, 360/390/430/768/1024/1440 px, pas de RPC réelle; captures versionnées préservées |
-| Certification six sessions MIR TEST | **PASS dans GitHub Actions**, run 42941500212, job certify-six-real-roles, étape réelle et upload du rapport réussis; aucun identifiant demandé au clavardage. Non exécutée localement faute de configuration complète |
+| Certification six sessions MIR TEST | **PASS**, run 42942875970, SHA 1a6239a; journal réel six rôles et banque réelle également PASS; aucun identifiant demandé au clavardage |
 | Répétition sur copie fidèle production | Non exécutée |
 | Double application gardée sur copie fidèle | Non exécutée |
 | Permissions métier / RPC / Storage en production | Non exécutées : backend absent et étape migration non atteinte |
-| Punch/gestion/portail/Entrepôt en navigateur complet | Non exécutés dans cet audit; tests SQL/statique seulement |
+| Punch en navigateur complet | PASS sur six formats; gestion/portail/Entrepôt couverts par le job CI simulé vert |
 | Appareils physiques, expiration UI réelle | Non exécutés |
 
 Échec environnemental initial du navigateur : Chromium setsockopt Operation not permitted, SIGTRAP. Relance hors sandbox autorisée : réussie. Ce n'est pas une régression applicative.
@@ -185,18 +246,17 @@ L'isolation organisation/chantier réelle, les URL directes, l'expiration et les
 
 ## État production et reprise
 
-Migrations appliquées pendant cette mission : **aucune**. Heure d'application : sans objet.
+Migration appliquée pendant cette mission : **uniquement MIR TEST**, `20261111015750_punch_phase2_completion`, à 01:57:50 UTC. Migration production : **aucune**.
 Production reste sans Punch, sans job_documents, sans mir_job_dossier_snapshot et sans bucket mir-job-documents.
-Aucun grant, policy, fonction, bucket, compte ni donnée hébergée modifié par cette mission.
+Aucun grant, policy, fonction, bucket, compte ni donnée modifié en production. MIR TEST contient une demande de banque de certification refusée, conservée comme trace; aucun solde n'a changé.
 
 Reprise :
-1. Décider la référence Punch exacte (completion incluse ou version TEST existante).
-2. Vérifier backups/PITR et obtenir une copie de schéma production fidèle, sans données privées inutiles.
-3. Préparer les gardes idempotentes et le dossier sans suppression de policy, sans changer les droits existants.
-4. Exécuter le plan deux fois sur cette copie, tests SQL et refus par rôle; corriger/qualifier le test date avec preuve.
-5. Certification réelle six comptes via les secrets GitHub Actions, avec résultat du SHA exact.
-6. Seulement quand toutes les conditions sont satisfaites : reconfirmer MIR/gccltmaulvrnthrbnrpd, appliquer une migration officielle à la fois, vérifier et consigner chaque version/heure, arrêter au premier échec.
-7. PR à relire, aucune fusion ni publication automatique.
+1. Attendre l'autorisation explicite de migration production demandée à la fin de cette étape.
+2. Avant toute écriture future, vérifier backups/PITR et obtenir une copie de schéma production fidèle, sans données privées inutiles.
+3. Finaliser les gardes idempotentes des migrations Punch antérieures et le dossier sans suppression de policy, sans changer les droits existants.
+4. Exécuter le plan complet deux fois sur cette copie fidèle; l'extension completion est déjà verte en double exécution jetable et en réel TEST.
+5. Reconfirmer le projet MIR `gccltmaulvrnthrbnrpd`, puis appliquer une migration officielle à la fois seulement après autorisation, vérifier et consigner chaque version/heure, arrêter au premier échec.
+6. PR à relire, aucune fusion ni publication automatique.
 
 ## Pièces de preuve
 
@@ -261,6 +321,7 @@ Reprise :
 | 20261110142928 | client_center_20261110 | 1 |
 | 20261110233343 | operational_admin_role_label | 1 |
 | 20261111005324 | job_dossier_central | 1 |
+| 20261111015750 | punch_phase2_completion | 1 |
 
 ### PROD — historique officiel
 
