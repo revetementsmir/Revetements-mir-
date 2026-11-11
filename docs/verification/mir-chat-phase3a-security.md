@@ -1,6 +1,91 @@
 # MIR — Phase 3A : fondations et sécurité du clavardage
 
-État : **préparation locale validée; aucune migration hébergée autorisée ni appliquée**.
+État courant au 11 novembre 2026 : **migration appliquée sur MIR TEST; recette réelle BLOQUÉE / NON CERTIFIÉE**. Production intacte. L’historique de préparation locale est conservé plus bas et ne constitue pas une certification hébergée.
+
+## Mise à jour — application autorisée et recette MIR TEST
+
+### Migration réellement enregistrée
+
+Autorisation explicite de l’utilisateur reçue pour MIR TEST uniquement. Projet confirmé par Management API : `hxtztkmbfpmzrieccwsg`, nom **MIR TEST**, PostgreSQL **17.11**, état ACTIVE_HEALTHY. Aucune requête production.
+
+- SHA distant de la PR #4 avant application : `f589382409796a8a681021cd87b20c65ea534e16`; brouillon, non fusionnée.
+- Préconditions intégrales de la migration exécutées en **READ ONLY** le **2026-11-11 à 12:24:32.452027 UTC** : toutes compatibles. Aucune garde contournée.
+- Une seule application, par **Supabase apply_migration officiel**, résultat success.
+- Nom enregistré : **chat_phase3a_security**; version enregistrée : **20261111122840**.
+- Fichier source inchangé : `supabase/migrations/20261112114958_chat_phase3a_security.sql`.
+- SHA-256 du SQL local **et du SQL enregistré dans l’historique hébergé**, identiques : `d787d6d5d9f2313e17858c4d1554bf7f59fc6536a842644547d2a854ac41b512`.
+- Première vérification après application : **12:29:07.114991 UTC**. Empreinte de catalogue concordante, sept entrées RPC contrôlées SECURITY DEFINER/search_path, anon sans EXECUTE, authenticated/service_role avec EXECUTE attendu, quatre tables chat RLS sans droits directs anon/authenticated, trois anciennes policies Storage et quatre nouvelles restrictives présentes, bucket toujours privé.
+- Contrôle de l’historique à **12:41:14.710685 UTC** : une entrée correspondant à cette application, SQL exact conservé. La version hébergée générée par Supabase diffère du préfixe du fichier; ne pas en déduire une migration manquante et ne pas la rejouer.
+
+Preuves détaillées : [JSON réel MIR TEST](mir-chat-phase3a-mir-test-results.json). Le [JSON local antérieur](mir-chat-phase3a-results.json) reste inchangé et décrit uniquement les simulations précédentes.
+
+### CI inspectée avant application
+
+Le workflow [Clavardage Phase 3A](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43019443497) est réussi. Les workflows Auth, Aujourd’hui, dossier chantier, portail et certification de base des six rôles sont réussis également. La certification des six rôles du run 43019443553 précède l’application : elle ne prouve pas les nouvelles RPC.
+
+Deux workflows sont rouges : [fournisseurs](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43019443500), étape `tests/mir-supplier-send.cjs`, et [fondations partagées](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43019443508), étape `tests/mir-shared-workspace-browser.cjs`. Les deux échecs ont été reproduits dans un worktree détaché de **main 39de53260a134bae48143c1bdb1aa235335d6187**, avant Phase 3A : **42704 — role service_role does not exist** dans les fixtures PostgreSQL jetables. Ils ne sont ni masqués ni corrigés dans cette mission.
+
+### Résultats HTTP réellement exécutés
+
+Sessions obtenues par mot de passe avec des comptes MIR TEST existants, HTTPS réel via le proxy autorisé. Les jetons restent en mémoire, jamais dans les livrables. Les rôles sont vérifiés côté serveur; les noms historiques de variables ne sont pas considérés comme une preuve du rôle.
+
+**13 contrôles HTTP consignés : 12 réussis, 1 échoué; certification globale NON acquise.**
+
+| Vérification réelle | Résultat |
+|---|---|
+| Création simultanée de la conversation officielle du chantier de recette | 8 appels HTTP 200, même identifiant; SQL confirme une seule ligne |
+| Lecture chantier par Chef et Employé affectés | HTTP 200 chacun |
+| Lecture par Admin technique autorisé | HTTP 200 |
+| Client exclu du chat interne | HTTP 403 / 42501 |
+| Chef, Employé et Admin vers une seconde organisation existante | HTTP 403 / 42501 chacun |
+| Chemin de pièce jointe forgé | HTTP 403 / 42501 |
+| Fichier inexistant | HTTP 400 / 22023 |
+| Appel RPC de recherche autorisé | HTTP 200, historique de recette vide; ne prouve pas le filtrage d’un texte inter-tenant |
+| Appel anonyme d’une nouvelle RPC | HTTP 401 / 42501 |
+| Téléversement d’un PNG valide de 68 octets | **ÉCHEC** : HTTP 400 externe, statusCode 403, AccessDenied |
+
+### Blocage Storage constaté — arrêt des mutations de recette
+
+Erreur exacte du téléversement : **permission denied for function support_object_allowed**.
+
+Diagnostic en lecture seule à **12:36:53.305834 UTC** :
+
+- `mir_core.support_object_allowed(text,boolean)` a l’ACL **{postgres=X/postgres}** : authenticated ne peut pas l’exécuter.
+- Les policies déjà présentes `mir_support_insert`, `mir_support_select`, `mir_support_delete` de `storage.objects` référencent cette fonction.
+- Ces policies étaient présentes avant Phase 3A. La migration appliquée ne modifie ni cette fonction, ni son ACL, ni ces policies.
+- Le vrai appel Storage vers `mir-internal` échoue néanmoins sur cette dépendance du système Support. Aucun objet du PNG n’est enregistré dans `storage.objects`.
+- Aucune nouvelle migration, aucun GRANT de réparation, aucune suppression de policy et aucun retour arrière improvisé n’ont été exécutés. L’échec n’est pas présenté comme un succès d’isolation ou de MIME.
+
+Un GRANT ajouté sans examen élargirait potentiellement le périmètre Support/Centre d’aide, hors du correctif autorisé. **Une décision distincte est nécessaire pour auditer puis préparer un correctif gardé de cette dépendance sur MIR TEST.** La méthode Tests a servi à séparer défaut de fixture CI et défaut réel de service; elle n’a pas autorisé de modification supplémentaire.
+
+### MIME : protections effectives et limites exactes
+
+La configuration du bucket borne les types déclarés à JPEG/PNG/WebP/HEIC/HEIF et la taille à 10 Mio. Le SQL installé vérifie l’existence dans Storage, l’organisation, le propriétaire, la conversation, le chemin, l’extension, `metadata.mimetype`, `metadata.size` et l’accès courant. Ce sont des **contrôles de métadonnées serveur**, pas une identification du type à partir des octets.
+
+**Aucun reniflage binaire, décodage d’image ni antivirus n’a été ajouté.** Le blocage ACL empêche pour l’instant de vérifier réellement si un contenu non-image déclaré image serait accepté, ou si une limite MIME/taille serait la cause précise d’un refus. Un PNG légitime refusé sur une permission ne prouve aucune protection MIME du contenu.
+
+**Aucune URL signée n’a été émise dans cette recette; expiration NON TESTÉE.** Le défaut client de 300 secondes et la fenêtre résiduelle de liens déjà émis restent des faits de code/architecture, pas une preuve HTTP d’expiration ni un plafond universel imposé par SQL.
+
+### Vérifications non terminées
+
+- Sessions HTTP Boss et Adjointe pour les nouvelles RPC : non exécutées après migration; leurs secrets restent dans GitHub Actions, sans demande de comptes dans le clavardage.
+- Retrait/réintégration d’accès équipe et chantier : non exécutés en hébergé; aucune affectation existante n’a été retirée.
+- Pagination stable avec historique réel et recherche de textes inter-tenants : non exécutées. L’appel sur historique vide n’est qu’un smoke test.
+- Transfert/téléchargement de fichiers privés valides, autres conversations/tenants via HTTP Storage, MIME/tailles réels : bloqués.
+- Accusés, non-lus et concurrence d’envoi de messages : non exécutés. La concurrence de création de conversation seule est vérifiée.
+- Expiration des URL signées : non exécutée.
+
+### État laissé et reprise
+
+La migration complète reste installée sur MIR TEST; aucune erreur DDL ni transaction partielle. Nouveau chantier fictif **[QA PHASE3A] 20261111 f589382 validation**, identifiant `859143d9-4f98-47d8-8c97-588007941a40`, deux affectations ajoutées sur ce seul chantier; conversation officielle `0e2c6b49-b1af-4c27-acc5-77a9d43c81fc`. Ces données de recette sont conservées pour la reprise, sans créer d’autres doublons. Un fil d’équipe existant a été ouvert par la RPC normale; aucun message métier existant n’a été modifié.
+
+Aucun message de recette envoyé, aucun fichier téléversé avec succès, aucun compte créé, aucun mot de passe changé. Aucun retrait d’affectation existante et aucune suppression de données. Production non consultée/non modifiée. PR #4 reste en brouillon, non fusionnée; aucun Lot B, aucune publication.
+
+Prochaine action proposée : **autoriser un audit ciblé du contrat Storage/ACL Support puis un correctif minimal gardé sur MIR TEST**, en conservant les policies et les autorisations métier; relancer ensuite toute la recette réelle interrompue. Ne pas élargir les permissions maintenant pour faire passer le test.
+
+## Historique — préparation locale avant autorisation MIR TEST
+
+Les sections suivantes décrivent l’état antérieur à l’application du 11 novembre. Leurs mentions « non appliquée » et « autorisation requise » sont historiques; la mise à jour ci-dessus constitue l’état courant.
 
 ## Références et périmètre
 

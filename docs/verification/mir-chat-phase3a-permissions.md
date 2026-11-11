@@ -33,4 +33,10 @@ Ces restrictions parfois asymétriques sont intentionnellement conservées : Pha
 
 Les participants historiques ne déterminent l’accès que pour les conversations privées. Les équipes et chantiers sont recalculés à chaque appel. Retrait = refus immédiat des nouvelles requêtes SQL/Storage, réintégration = accès rétabli. Une URL déjà signée peut survivre jusqu’à son expiration (300 secondes); ce délai n’est pas une révocation instantanée d’URL.
 
-Certification : la matrice doit être vérifiée sur PostgreSQL jetable avec deux tenants, puis sur MIR TEST seulement après autorisation distincte d’appliquer la migration. Aucun test local n’équivaut à une certification hébergée.
+Certification : aucun test local n’équivaut à une certification hébergée.
+
+## Recette réelle du 11 novembre 2026 — partielle et bloquée
+
+Migration `chat_phase3a_security` enregistrée sur MIR TEST en version `20261111122840`. Chef, Employé et Admin technique : lectures HTTP du chantier de recette autorisées; refus HTTP sur une seconde organisation existante. Client exclu. **Boss et Adjointe : nouvelles RPC non certifiées par session réelle après migration.** Les secrets existants ne sont pas demandés dans le clavardage.
+
+Le PNG légitime est refusé par HTTP Storage avec `permission denied for function support_object_allowed`. Les retraits/réintégrations, non-lus, messages concurrents, téléchargements et expiration des URL restent non exécutés en hébergé. La matrice attendue ci-dessus n’est donc pas intégralement certifiée. Voir le [rapport courant](mir-chat-phase3a-security.md) et le [JSON réel](mir-chat-phase3a-mir-test-results.json).
