@@ -477,8 +477,9 @@
   function applyBoutiqueReview(kaycanSwatches){
     const nails=materials.find(m=>m.id==='prime-siding-2-30724');
     if(nails){
-      nails.name='Clous à revêtement 2 po, galvanisé à chaud (hdg)';
-      nails.brand='Fixations';
+      // Conserver la marque et la référence exactes fournies par MIR.
+      nails.name='PRIME 30724 — Clous annelés en bobine 2 po · galvanisés à chaud';
+      nails.brand='PRIME / Premier Outils Pro';
     }
     for(const id of ['lighttrim-vfcltek8114','lighttrim-vfcls8114','lighttrim-vfctek834']){
       const screw=materials.find(m=>m.id===id);
