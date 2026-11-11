@@ -2,7 +2,7 @@
 
 ## Verdict
 
-**PARTIELLEMENT VALIDÉ sur MIR TEST.** Le backend et le parcours navigateur privé complet photo/PDF sont prouvés. L’isolation bidirectionnelle avec deux clients distincts reste bloquée : MIR TEST contient un seul identifiant client actif, membre à la fois des organisations A et B; aucun second accès client conforme n’est disponible. Aucun compte ni membership n’a été modifié. Les preuves 3A/3B restent réutilisées.
+**CERTIFIÉ sur MIR TEST.** Le backend, le parcours navigateur privé complet photo/PDF et l’isolation bidirectionnelle A↔B sont prouvés. Deux comptes clients de recette balisés et distincts ont été créés, chacun avec exactement un membership client actif dans son organisation. Le client historique et ses memberships n’ont pas été modifiés. Les preuves 3A/3B restent réutilisées.
 
 ## Base et dépendances
 
@@ -20,6 +20,9 @@ Projet exclusif : `hxtztkmbfpmzrieccwsg`.
 3. `phase3c_support_account_category` : alignement explicite de la contrainte de catégorie avec « Mon compte ».
 4. `phase3c_client_organization_scope` : refus sécurisé des RPC implicites lorsqu’un client appartient à plusieurs organisations.
 5. `phase3c_explicit_client_scope` : nouveaux RPC exigeant l’organisation explicite et la revalidant contre le membership actif; le frontend 3C utilise exclusivement ces RPC.
+6. `phase3c_two_client_recipe` : provisionnement service-only des deux fixtures, recherche de soutien isolée et insertion de notes internes de recette.
+
+Fonction privée installée : `mir-support-tenant-recipe` v1, `verify_jwt=false` avec Auth Admin A explicitement vérifiée côté serveur. Les clés serveur restent dans l’environnement Edge. Elle ne retourne ni secret, jeton, identifiant utilisateur, conversation ou chemin.
 
 Aucune fonction Edge n’a été redéployée. Le bucket privé existant `mir-support` et ses politiques RLS ont été réutilisés.
 
@@ -52,9 +55,19 @@ Captures : `captures/help-phase3c/`. Le lanceur exécute maintenant un prévol m
 
 La tentative de restaurer le singleton après découverte de l’ambiguïté a été refusée automatiquement par la plateforme comme risque d’affaiblissement de l’isolation. Ce refus n’a pas été contourné. Les nouveaux RPC explicites constituent l’alternative plus sûre.
 
+Recette d’isolation avec deux Auth clients réelles et distinctes : **18/18**.
+
+- A et B créent et consultent leur propre demande;
+- snapshots et recherche ne contiennent aucun marqueur de l’autre organisation;
+- snapshots, messages et identifiants étrangers refusés HTTP 403 dans les deux sens;
+- photo privée positive dans chaque organisation et lecture croisée refusée dans les deux sens;
+- notes internes injectées pour chaque fixture et absentes des snapshots clients;
+- contrôle SQL après recette : une organisation, un membership, rôle client actif pour chaque fixture;
+- mots de passe aléatoires conservés seulement en mémoire du processus Edge puis vidés; aucune valeur dans les sorties ou artefacts.
+
 ## Preuves locales
 
-- Phase 3C statique/sécurité : **5/5**;
+- Phase 3C statique/sécurité : **6/6**;
 - garde-fou TEST sans réseau : **2/2**;
 - contrats 3A ciblés : **8/8**;
 - non-régression Aujourd’hui/Punch : **7/7**;
@@ -69,10 +82,9 @@ La tentative de restaurer le singleton après découverte de l’ambiguïté a �
 | Pièce privée | autorisée | refusée | selon politique existante | réelle propriétaire/refus |
 | Note interne | invisible | invisible | autorisée | réelle |
 | Réponse client | visible | isolée par requête métier | autorisée | réelle |
-| Isolation organisation B→A et A→B propre au soutien | contrat explicite par organisation | contrat explicite par organisation | contrat explicite par organisation | **non certifiée avec deux clients distincts**; un seul identifiant client appartient aux deux tenants |
+| Isolation organisation B→A et A→B propre au soutien | accès propre autorisé | refus croisés 403 | contrat explicite par organisation | réelle 18/18, deux Auth distinctes et memberships exclusifs |
 
 ## Limites restantes
 
-- aucun deuxième client réel distinct : le client de recette connu est actif simultanément dans A et B; cette situation ne prouve pas l’isolation interclient;
 - aucune validation sur appareil physique ou moteur Safari;
 - la branche dépend de 3B non fusionnée et ne doit pas être fusionnée isolément.
