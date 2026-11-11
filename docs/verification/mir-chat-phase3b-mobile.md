@@ -40,7 +40,8 @@ Captures fonctionnelles simulées :
 - 3A isolation tenant : 10/10, run GitHub `43067261753`.
 - Extension installée sur MIR TEST : `mir-chat-files` v2, `mir-chat-tenant-b-recipe` v3 et migrations `chat_phase3b_pdf_attachments`, `chat_phase3b_pdf_gateway_acl`, `chat_phase3b_pdf_attestation_constraint`.
 - La recette locale a détecté avant validation hébergée que la contrainte d’inspecteur 3A restait limitée aux images; la troisième migration l’étend exactement à `pdf-structure-v1`, sans modifier les ACL.
-- Recette ciblée 3B hébergée : **en attente du run associé au prochain SHA poussé**. Aucun résultat n’est anticipé dans ce rapport.
+- Recette ciblée 3B hébergée au SHA `9eed4435681ee1a44223d42665ccd8fb742ae081` : **25/25 réussis**, run GitHub `43084321137`, artefact `mir-chat-phase3b-real` (digest `sha256:bdf7a5fb3b8c1baa5972ed43e95c33f518a25a30598c9dbe453dbd99948ea170`). Photo et PDF réels, trois PDF invalides refusés, idempotence, pagination, recherche, non-lus, retrait/réintégration et refus Storage direct sont prouvés.
+- Le même job a réussi l’étape réelle d’isolation A→B et B→A pour photo et PDF avec la recette tenant B existante. Les affectations temporaires A ont été restaurées; aucun secret n’est présent dans l’artefact.
 - Aucune publication du frontend : la branche reste une proposition en PR brouillon.
 
 ### Local et simulé
