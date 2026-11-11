@@ -45,6 +45,11 @@ test('fichiers chat: POST privé, pas de lien Storage, blob révoqué et répons
  await assert.rejects(()=>s.client.chatPhotoURL('foreign/message/file'),/invalide/i);
  s.hold('file');const reading=s.client.internalPhotoURL(path);while(!s.waiting())await new Promise(r=>setImmediate(r));await s.client.signOut();s.resolve();await assert.rejects(reading,/session a changé/i);assert.deepEqual(s.revoked,['blob:fixture-1']);
 });
+test('fichier de l’ancienne session jamais livré après changement de compte',async t=>{
+ const s=await setup();t.after(()=>s.client.dispose());const path=`${org}/message/${conversation}/${id}/${conversation}.jpg`;
+ s.hold('file');const reading=s.client.chatPhotoURL(path);while(!s.waiting())await new Promise(r=>setImmediate(r));
+ await s.client.signOut();s.resolve();await assert.rejects(reading,/session a changé/i);assert.deepEqual(s.revoked,[]);
+});
 test('migration sans DROP POLICY/FUNCTION, bornes serveur et ACL explicites',()=>{
  const migration=fs.readFileSync('supabase/migrations/20261112114958_chat_phase3a_security.sql','utf8');
  assert.doesNotMatch(migration,/drop\s+(policy|function|table)|truncate|disable row level security/i);
