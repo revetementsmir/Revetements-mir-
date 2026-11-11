@@ -24,6 +24,17 @@ for(const m of profilec){
 assert.ok(byId('profilec-la-muralys').applications.includes('siding'));
 assert.ok(byId('profilec-la-capitale').applications.includes('roofing'));
 assert.ok(byId('profilec-lancestra').applications.includes('roofing'));
+const beck=byId('beck-panelfast-ags100');
+assert.equal(beck.brand,'BECK Fastener Group');
+assert.deepEqual(beck.formats.map(format=>format.manufacturerCode),['AGS1000150-NA','AGS1000200-NA','AGS1000250-NA']);
+assert.deepEqual(beck.formats.map(format=>format.lengthIn),[1.5,2,2.5]);
+assert.equal(beck.packaging.piecesPerCoil,250);
+assert.equal(beck.packaging.coilsPerBox,12);
+assert.equal(beck.packaging.piecesPerBox,3000);
+assert.equal(beck.images.length,2);
+assert.ok(beck.images.every(image=>fs.existsSync(path.resolve(base,image.src.replace(/^\.\//,'')))));
+assert.ok(beck.documents.some(document=>document.verified&&document.url.includes('beck-fastening.com')));
+assert.match(beck.unit,/prix MIR à confirmer/);
 const masonry=c.filter(m=>m.applications.includes('masonry'));
 const surface=require('../dist/material-surface.js'),coverage=require('../dist/material-coverage.js');
 assert.equal(masonry.filter(m=>m.name.startsWith('Brique')).length,3);
