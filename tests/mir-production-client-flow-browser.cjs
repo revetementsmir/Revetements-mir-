@@ -40,20 +40,20 @@ async function verifyNavigation(browser,base){
   assert.equal(await page.locator('header.production-header').evaluate(el=>el.classList.contains('mir-client-header')),true,'menu commun '+width);
   const header=page.locator('header[data-mir-public-shell]');
   const toggle=header.locator('.mir-client-menu-toggle'),menu=header.locator('nav.mir-client-links');
-  assert.equal(await toggle.isVisible(),width<=760,'menu compact disponible '+width);
-  if(width<=760){
+  assert.equal(await toggle.isVisible(),mobile,'menu compact disponible '+width);
+  if(mobile){
    assert.equal(await toggle.getAttribute('aria-expanded'),'false');
    assert.equal(await menu.isVisible(),false);
    await toggle.click();
    assert.equal(await toggle.getAttribute('aria-expanded'),'true');
-   assert.ok(await menu.locator('a[href="selection.html"]').isVisible(),'dossier accessible '+width);
   }else{
    assert.ok(await header.locator('.mir-home-estimate').isVisible(),'estimation accessible '+width);
   }
+  assert.ok(await header.locator('a.mir-public-cart[href="selection.html"]:visible').count(),'panier permanent '+width);
   assert.ok(await menu.locator('a[href="realisations.html"]').isVisible());
   assert.equal(await header.locator('[data-admin-only]:visible').count(),0,'aucun accès Admin public');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
-  if(width<=760){
+  if(mobile){
    await page.keyboard.press('Escape');assert.equal(await menu.isVisible(),false);assert.equal(await toggle.evaluate(e=>e===document.activeElement),true);
    await toggle.click();await page.mouse.click(3,846);assert.equal(await toggle.getAttribute('aria-expanded'),'false','clic extérieur');
   }
