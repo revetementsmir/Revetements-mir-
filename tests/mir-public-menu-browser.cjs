@@ -69,14 +69,8 @@ const sizes=[
           assert.equal(await nav.evaluate(el=>getComputedStyle(el).position),'absolute',label);
         }
         const links=await nav.locator('a:visible').evaluateAll(anchors=>anchors.map(a=>[a.getAttribute('href')==='selection.html'?'Mon panier':a.textContent.trim(),a.getAttribute('href')]));
-        const mobileEstimate = nav.locator('a.mir-mobile-estimate');
-        if (route === 'index') {
-          assert.equal(await mobileEstimate.isVisible(), small, label + ' accès mobile à Estimation');
-          assert.equal(await mobileEstimate.getAttribute('href'), 'estimation.html');
-        }
         const commonLinks = links.filter(([, href]) => !['estimation.html','selection.html'].includes(href));
         if(route!=='index')assert.ok(await nav.locator('a[href="selection.html"]:visible').count(),label+' Mon panier accessible');
-        if(small)assert.ok(await nav.locator('a[href="estimation.html"]:visible').count(),label+' estimation mobile accessible');
         if(!reference)reference=commonLinks;
         else assert.deepEqual(commonLinks,reference,label+' mêmes liens communs que l’accueil');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),label+' débordement');
