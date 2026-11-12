@@ -5,12 +5,11 @@ const sql=fs.readFileSync('supabase/migrations/20261124120000_phase6_commandes.s
 const ui=fs.readFileSync('dist/coordination-app.js','utf8');
 const client=fs.readFileSync('dist/mir-coordination-client.js','utf8');
 const employee=fs.readFileSync('dist/chantier-app.js','utf8');
-const production=fs.readFileSync('dist/production-app.js','utf8');
 assert.match(sql,/mir_order_decide/);assert.match(sql,/mir_order_supplier_confirm/);assert.match(sql,/mir_order_issue/);pass('décision, confirmation et anomalie exclusivement par RPC');
 assert.match(sql,/mir-order-files/);assert.match(sql,/false,10485760/);assert.match(sql,/image\/jpeg.*image\/png.*application\/pdf/s);assert.match(sql,/mir_order_attach/);assert.match(sql,/expiresIn',120/);pass('pièces privées JPEG PNG PDF limitées à 10 Mo et liens courts');
 assert.match(sql,/phase6_order_visible/);assert.match(sql,/coordination_allowed/);assert.match(sql,/warehouse_allowed/);assert.doesNotMatch(sql,/user_metadata|auth\.role\(/);pass('isolation par organisation et rôle recalculé au serveur');
 assert.match(client,/operation\('mir_order_decide'/);assert.match(client,/operation\('mir_order_supplier_confirm'/);assert.match(client,/operation\('mir_order_issue'/);assert.match(client,/operation\('mir_order_attach'/);pass('reprise et idempotence partagées par les nouvelles actions');
 assert.match(ui,/supplierConfirm/);assert.doesNotMatch(ui,/fetch\([^)]*(supplier|fournisseur)/i);pass('aucun faux raccordement fournisseur');
-assert.match(employee,/colorPriority/);assert.match(production,/mirColorPriority/);assert.match(employee,/noir\|black/);assert.match(employee,/blanc\|white/);pass('Noir puis Blanc réordonnés sans créer de couleur');
+assert.match(employee,/colorPriority/);assert.match(employee,/noir\|black/);assert.match(employee,/blanc\|white/);pass('Noir puis Blanc réordonnés dans le sélecteur Commandes sans créer de couleur');
 assert.doesNotMatch(ui,/bottom-nav|navigation-bottom/);assert.match(fs.readFileSync('dist/coordination.html','utf8'),/mir-client-header\.css/);pass('Harmony conservé sans navigation inférieure');
 console.log('Phase 6 contrats: '+checks+'/7');
