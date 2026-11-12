@@ -27,6 +27,7 @@ window.MIRPortalClient={...window.MIRPortalClient,create({config}){
   const employee=state.members.find(member=>member.id===actorId);employee.jobIds=[...new Set([...(employee.jobIds||[]),state.jobs[1].id])];
   const colleague=state.members.find(member=>member.id!==actorId&&member.role==='employee')||{id:'demo-employee-2',name:'Alex'};
   state.messaging={contacts:[{id:colleague.id,name:'Alex',role:'employee'}],teams:[],conversations:[{id:'00000000-0000-4000-8000-000000000501',kind:'private',participants:[actorId,colleague.id],unread:0}],messages:[{id:'00000000-0000-4000-8000-000000000502',conversationId:'00000000-0000-4000-8000-000000000501',senderId:actorId,body:'Plan mis à jour',sentAt:new Date().toISOString(),deliveredCount:1,readCount:1,recipientCount:1}]};
+  state.expenses={role:'employe_chantier',categories:[{code:'materials',label:'Matériaux'}],expenses:[]};
   let publish=()=>{};
   const ready=()=>({phase:'ready',snapshot:state});
   return {config,getStatus:()=>({phase:'loading'}),subscribe(fn){publish=fn;},async start(){publish(ready());},
@@ -43,7 +44,7 @@ const base='http://127.0.0.1:'+server.address().port;
 let browser;
 try {
 browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN});
-for(const width of [320,360,390,820,1024,1440]){
+for(const width of [320,360,390,768,820,1024,1440]){
   const page=await browser.newPage({viewport:{width,height:width<=390?760:900},isMobile:width<=390,hasTouch:width<=390});
   page.setDefaultTimeout(10000);
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -62,7 +63,13 @@ for(const width of [320,360,390,820,1024,1440]){
   assert.equal(await page.getByRole('button',{name:/Messages/}).count(),1);
   assert.equal(await page.locator('#employee-job-switch option').count(),2);
   await noOverflow();
-  if(width===390){fs.mkdirSync('artifacts',{recursive:true});await page.screenshot({path:'artifacts/MIR-ma-journee-390.png'});}
+  await page.locator('#portal-navigation [data-view="account"]').click();
+  await page.getByRole('button',{name:/Mes dépenses et reçus/}).click();
+  await page.getByRole('heading',{name:'Dépenses et reçus'}).waitFor();
+  await page.locator('#expense-draft-form').waitFor();
+  await noOverflow();
+  if([390,768,1440].includes(width)){fs.mkdirSync('artifacts/phase4-expenses',{recursive:true});await page.screenshot({path:`artifacts/phase4-expenses/MIR-expenses-navigation-${width}.png`});}
+  await page.locator('#portal-navigation [data-view="day"]').click();
   await page.getByRole('button',{name:/Messages/}).click();
   await page.locator('[data-conversation]').click();
   await page.getByText('Plan mis à jour',{exact:true}).waitFor();
