@@ -13,7 +13,9 @@ const check=name=>report.ux.checks.push(name);
 (async()=>{assert(key&&org,'Secrets publics MIR TEST absents');const tokens={};for(const [label,keyName] of Object.entries(roles)){const token=tokens[label]=await login(keyName),r=await rpc(token,'mir_coordination_memberships');assert.equal(r.status,200,'Périmètre '+label);const memberships=await r.json(),row=memberships.find(x=>x.id===org);report.roles[label]={authenticated:true,coordination:!!(row?.assistant||row?.admin),warehouse:!!row?.warehouse};if(['admin','boss','adjointe'].includes(label))assert(report.roles[label].coordination,label+' doit traiter les commandes');if(label==='entrepot')assert(report.roles[label].warehouse,'Entrepôt doit voir sa file');if(['chef','employee'].includes(label))assert(!report.roles[label].coordination&&!report.roles[label].warehouse,label+' ne doit pas être élevé');if(label==='employee'){const denied=await rpc(token,'mir_order_decide',{org,coord_id:crypto.randomUUID(),next_status:'approved',reason:'',request_id:crypto.randomUUID()});assert.equal(denied.status,403,'Employé doit être refusé');report.roles[label].decisionDenied=true;}}
  const initial=await rpcJson(tokens.employee,'mir_portal_snapshot'),catalogue=initial.catalogue||[],jobs=initial.jobs||[];
  const folds=catalogue.filter(item=>item.customBending===true||(Array.isArray(item.measureFields)&&item.measureFields.length>0)),materials=catalogue.filter(item=>!folds.some(fold=>fold.id===item.id));
- assert(materials.length>=2&&folds.length>=1&&jobs.length>=1,'Fixture MIR TEST insuffisant: 2 articles, 1 pliage et 1 chantier Employé requis');
+ assert(materials.length>=2,'Fixture MIR TEST insuffisant: '+materials.length+' article(s) matériel visible(s), 2 requis');
+ assert(folds.length>=1,'Fixture MIR TEST insuffisant: '+folds.length+' pliage mesurable visible, 1 requis');
+ assert(jobs.length>=1,'Fixture MIR TEST insuffisant: '+jobs.length+' chantier visible pour le compte Employé, 1 requis');
  const material=materials[0],fold=folds[0],job=jobs[0],tag='RECETTE-UX-P23-'+Date.now();
  const lines=[
   {itemId:material.id,quantity:2,colorId:material.colors?.[0]?.id||undefined},
