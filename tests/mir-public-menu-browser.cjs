@@ -51,17 +51,18 @@ const sizes=[
         const nav=header.locator('nav.mir-client-links');
         const account=header.getByRole('link',{name:'Compte'});
         const label=route+' '+size.name;
-        const small=size.width<=760;
+        const small=size.width<=1100;
         await menu.waitFor({state:'attached'});
         assert.equal(await menu.isVisible(),small,label);
         assert.equal(await nav.isVisible(),!small,label);
-        assert.ok(await account.isVisible(),label+' compte');
+        assert.equal(await account.isVisible(),!small,label+' compte dans l’en-tête bureau seulement');
+        if(small)assert.ok(await page.locator('.mir-mobile-tabs a[href^="chantier.html?view=account"]:visible').count(),label+' compte dans la navigation mobile');
         assert.equal(await menu.getAttribute('aria-controls'),await nav.getAttribute('id'),label);
         const closed=await header.boundingBox();
         if(small){
           const logo=await header.locator('img').boundingBox();
-          const button=await menu.boundingBox(),link=await account.boundingBox();
-          assert.ok(button.height>=44&&logo.x+logo.width<=button.x&&button.x+button.width<=link.x,label+' logo, menu, compte sur une ligne');
+          const button=await menu.boundingBox(),link=await header.locator('.mir-public-cart').boundingBox();
+          assert.ok(button.height>=44&&logo.x+logo.width<=link.x&&link.x+link.width<=button.x,label+' logo, panier, menu sur une ligne');
           await menu.click();
           assert.equal(await menu.getAttribute('aria-expanded'),'true',label);
           assert.deepEqual(await header.boundingBox(),closed,label+' le menu ne pousse pas la page');
