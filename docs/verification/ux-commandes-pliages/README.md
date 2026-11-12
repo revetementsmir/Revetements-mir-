@@ -31,3 +31,14 @@ Preuves locales ajoutées :
 - reçu serveur, état relu, instantanés de pliage, référence originale, isolation utilisateur/organisation et absence d'envoi fournisseur/courriel vérifiés.
 
 La migration distante et la recette hébergée restent consignées séparément après validation complète de la CI. Aucun secret n'est conservé dans ces preuves.
+
+## MIR TEST
+
+- cible vérifiée : projet `hxtztkmbfpmzrieccwsg` (`MIR TEST`, PostgreSQL 17.11);
+- migrations `phase6_commandes_ux_pliages` et `phase6_commandes_ux_server_contract` appliquées, puis rejouées sans erreur;
+- fixture strictement TEST : deux articles publiés balisés `RECETTE-UX-P23` ajoutés à l'organisation de recette, car elle contenait 1 matériel et 0 pliage mesurable;
+- aucune création de compte, aucun changement de rôle, membership, mot de passe ou secret;
+- aucune commande fournisseur ni aucun courriel déclenché;
+- Supabase production `gccltmaulvrnthrbnrpd` n'a reçu aucune requête.
+
+La recette réelle à six rôles est exécutée par le workflow `MIR Phase 6 Commandes — rôles réels TEST`; son résultat chiffré final est consigné après exécution sur le SHA final.
