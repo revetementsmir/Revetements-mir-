@@ -8,6 +8,7 @@ const sdk={auth:{getUser:async()=>({data:{user}}),onAuthStateChange:()=>({data:{
  if(name==='mir_employee_operations_snapshot')return{data:{role:'employe'}};
  if(name==='mir_messaging_snapshot')return{data:{contacts:[],teams:[],conversations:[],messages:[]}};
  if(name==='mir_punch_snapshot')return{error:{code:'PGRST202',message:'routine missing'}};
+ if(name==='mir_expense_snapshot')return{error:{code:'PGRST202',message:'routine missing'}};
  throw Error('unexpected rpc '+name);
 }};
-(async()=>{const client=Portal.create({config,origin:config.siteOrigin,sdk:{createClient:()=>sdk}});await client.start();const status=client.getStatus();assert.equal(status.phase,'ready');assert.equal(status.snapshot.punch.enabled,false);assert.equal(status.snapshot.punch.unavailable,true);assert.equal(status.error,null);client.dispose();console.log('Portail: module Punch absent traité comme désactivé sans masquer les autres erreurs OK');})().catch(error=>{console.error(error);process.exitCode=1});
+(async()=>{const client=Portal.create({config,origin:config.siteOrigin,sdk:{createClient:()=>sdk}});await client.start();const status=client.getStatus();assert.equal(status.phase,'ready');assert.equal(status.snapshot.punch.enabled,false);assert.equal(status.snapshot.punch.unavailable,true);assert.equal(status.snapshot.expenses.unavailable,true);assert.equal(status.error,null);client.dispose();console.log('Portail: modules optionnels absents traités comme indisponibles sans masquer les autres erreurs OK');})().catch(error=>{console.error(error);process.exitCode=1});
