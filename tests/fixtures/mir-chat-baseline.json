@@ -1,13 +1,13 @@
 {
   "sha": "39de53260a134bae48143c1bdb1aa235335d6187",
   "files": {
-    "dist/mir-harmony.css": "8e39cfd38f49575d5b26304b1bd1e81eced6678aa3111e93ade93666a1467dd6",
+    "dist/mir-harmony.css": "1798aed84b7436aca078a962d8fcaab8ad5229e47be9afd0e1c8d9a70d41a2da",
     "dist/mir-harmony.js": "320025bb12ecbb764c79eb6f70d528b8b24fb78c6980dee381c484358b18621a",
     "dist/mir-today.js": "6574167d661ed965cf0cde1f5de1082331a96d6ff7e6e110090bae5ea742d490",
     "dist/mir-today.css": "a25b18b2dfa065be10e7f942d4532afbfff24f170d5a7c53322a0001c9850c0a",
     "dist/portal-config.js": "f25cb94c5966a98b6a06dc3c7a2aa8b0ab3e07e0b0edc5d1b80739d17f870ee9",
     "dist/employee-store-model.js": "0d33d1c944d55764dd60d9fd330bff231dac3b975e0027f04c02444a4a2c0c7b",
-    "dist/mir-production-signature.css": "d5c72cce4c78990a3f50fa4b45e9a122fd9abc24bcb9ba8d8507ddb83870cbc7",
+    "dist/mir-production-signature.css": "25c7fbf13815b2aa4e0744062ab62106318476d34f7227b7038c8a346bb3c409",
     "supabase/migrations/20261111120000_job_dossier_central.sql": "55227f04eecdcaaabdb70d9350a5aad6a26d382b9823dff148cf3938b03f25e0",
     "supabase/migrations/20261110020000_punch_gps.sql": "15a1aa2b343a4bfa247ac24634325f44b28d95ee1ebb7abd2160e0bb30afb8f8",
     "supabase/migrations/20261110130000_punch_phase2_integrity.sql": "ef7141911e8649adae1185b47f9538af9726489567ce073ac78a214f23e6bb23",

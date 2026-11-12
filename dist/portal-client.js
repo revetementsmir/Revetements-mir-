@@ -95,7 +95,7 @@
   }
   function commandSpec(command, raw = {}) {
     const fields = {
-      CREATE_ORDER: ['jobId', 'lines', 'note', 'deliveryMode'], SET_FAVORITE: ['itemId', 'favorite'],
+      CREATE_ORDER: ['jobId', 'jobReference', 'lines', 'note', 'deliveryMode'],
       EXTRA_SUBMIT: ['jobId','description','photoPath','dueAt'], DELIVERY_ISSUE: ['jobId','orderId','lineId','supplierOrderId','comment','photoPath'],
       DELIVERY_RECEIVE: ['jobId','orderId','lineId','quantity','place','photoPath'], HR_SUBMIT: ['kind','start','end','note'],
       MESSAGE_SEND: ['conversationId','body','jobId','planDocumentId','attachmentPath'], MESSAGE_ACK: ['messageId','state'],NOTIFICATION_READ:['notificationId'],
@@ -107,9 +107,8 @@
     if (!fields) fail('COMMAND_UNKNOWN', 'Cette action n’est pas proposée dans le portail connecté.');
     const payload = Object.fromEntries(fields.filter(key => raw[key] !== undefined).map(key => [key, clone(raw[key])]));
     if (command === 'CREATE_ORDER' && Array.isArray(payload.lines))
-      payload.lines = payload.lines.map(line => Object.fromEntries(['itemId', 'quantity', 'colorId', 'formatId', 'dimensionsIn']
+      payload.lines = payload.lines.map(line => Object.fromEntries(['itemId', 'quantity', 'colorId', 'formatId', 'dimensionsIn', 'specification']
         .filter(key => line[key] !== undefined && line[key] !== null).map(key => [key, line[key]])));
-    if (command === 'SET_FAVORITE' && typeof payload.favorite !== 'boolean') fail('FAVORITE_REQUIRED', 'Précisez le choix du favori.');
     return payload;
   }
   function create(options = {}) {
@@ -257,7 +256,7 @@
         throw mapped;
       }
     }
-    const onlinePunchSync=()=>{if(!disposed)Promise.all([syncPunchQueue().catch(()=>0),syncExpenseDrafts().catch(()=>0),syncAbsenceDrafts().catch(()=>0)]).then(()=>refresh().catch(()=>{}));};
+    const onlinePunchSync=()=>{if(!disposed)Promise.all([syncPunchQueue().catch(()=>0),syncExpenseDrafts().catch(()=>0),syncAbsenceDrafts().catch(()=>0),syncOrderShortcutQueue().catch(()=>0),syncOrderDraftQueue().catch(()=>0)]).then(()=>refresh().catch(()=>{}));};
     async function start() {
       if (!sdk) { emit({}, 'start'); return null; }
       if (!authSubscription) {
@@ -279,7 +278,7 @@
       const result=await refresh();
       globalThis.addEventListener?.('online',onlinePunchSync);
       if(liveTimer===null&&typeof setInterval==='function')liveTimer=setInterval(()=>{if(!disposed&&globalThis.navigator?.onLine!==false&&globalThis.document?.visibilityState!=='hidden'&&status.phase==='ready')refresh().catch(()=>{});},15000);
-      if(globalThis.navigator?.onLine!==false)syncPunchQueue().catch(()=>{});
+      if(globalThis.navigator?.onLine!==false){syncPunchQueue().catch(()=>{});syncOrderShortcutQueue().catch(()=>{});syncOrderDraftQueue().catch(()=>{});}
       return result;
     }
     async function sendEmail(email) {
@@ -401,6 +400,13 @@
             } catch (_) {}
           }
           if (!error && data?.ok !== true) error = new PortalError(data?.error?.code || 'INVITATION_FAILED', data?.error?.message || 'L’invitation n’a pas pu être préparée.');
+        } else if(operation.command==='CREATE_ORDER') {
+          const response=await sdk.rpc('mir_order_create_submit',{org:internalOrg,request_id:operation.requestId,data:operation.payload});
+          error=response.error;
+          if(!error){
+            const refreshed=await sdk.rpc('mir_portal_snapshot');error=refreshed.error;
+            data={result:response.data,snapshot:refreshed.data};
+          }
         } else {
           ({ data, error } = await sdk.rpc('mir_portal_command', {
             p_request_id: operation.requestId, p_command: operation.command, p_payload: operation.payload
@@ -562,6 +568,35 @@
     async function punchAdmin(action,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_admin',{org:internalOrg,action,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function punchJournal(filters={},pageAfter=null,pageSize=25){requireReady();const {data,error}=await sdk.rpc('mir_punch_journal',{org:internalOrg,filters,page_size:pageSize,page_after:pageAfter});if(error)throw errorOf(error);return data;}
     async function timeBankRequest(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_time_bank_request',{org:internalOrg,request:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
+    function orderShortcutQueueKey(){return `mir_order_shortcuts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
+    function readOrderShortcutQueue(){try{const rows=JSON.parse(storage?.getItem(orderShortcutQueueKey())||'[]');return Array.isArray(rows)?rows.filter(x=>x&&UUID.test(x.requestId||'')&&UUID.test(x.itemId||'')&&['material','fold'].includes(x.kind)&&typeof x.favorite==='boolean'):[];}catch(_){return [];}}
+    function writeOrderShortcutQueue(rows){try{storage?.setItem(orderShortcutQueueKey(),JSON.stringify(rows.slice(-20)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre ce favori.');}}
+    async function setOrderShortcut(kind,itemId,favorite,position=null,requestId=uuid()){
+      requireReady();if(!internalOrg||!UUID.test(requestId||'')||!UUID.test(itemId||'')||!['material','fold'].includes(kind)||typeof favorite!=='boolean')fail('FAVORITE_INVALID','Ce raccourci ne peut pas être enregistré.');
+      const intent={requestId,kind,itemId,favorite,position:Number.isInteger(position)?position:null};
+      if(!navigator.onLine){writeOrderShortcutQueue([...readOrderShortcutQueue(),intent]);return{...intent,offline:true};}
+      try{const {data,error}=await sdk.rpc('mir_order_shortcut_update',{org:internalOrg,request_id:requestId,kind,item_id:itemId,favorite,requested_position:intent.position});if(error)throw errorOf(error);await refresh();return data;}
+      catch(error){if(error?.definitive===false||error?.code==='NETWORK_UNCERTAIN'){writeOrderShortcutQueue([...readOrderShortcutQueue(),intent]);return{...intent,offline:true};}throw error;}
+    }
+    async function syncOrderShortcutQueue(){if(!internalOrg||!navigator.onLine||!status.user?.id)return 0;const queue=readOrderShortcutQueue(),remaining=[];let synced=0;for(const intent of queue){try{const {error}=await sdk.rpc('mir_order_shortcut_update',{org:internalOrg,request_id:intent.requestId,kind:intent.kind,item_id:intent.itemId,favorite:intent.favorite,requested_position:intent.position});if(error)throw error;synced++;}catch(_){remaining.push(intent);}}writeOrderShortcutQueue(remaining);if(synced)await refresh();return synced;}
+    function orderDraftQueueKey(){return `mir_order_drafts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
+    function readOrderDraftQueue(){try{const rows=JSON.parse(storage?.getItem(orderDraftQueueKey())||'[]');return Array.isArray(rows)?rows.filter(x=>x&&UUID.test(x.saveRequestId||'')&&UUID.test(x.submitRequestId||'')&&x.data&&typeof x.data==='object'):[];}catch(_){return [];}}
+    function writeOrderDraftQueue(rows){try{storage?.setItem(orderDraftQueueKey(),JSON.stringify(rows.slice(-10)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre cette commande.');}}
+    async function transmitOrderDraft(intent){
+      const saved=await sdk.rpc('mir_order_draft_save',{org:internalOrg,request_id:intent.saveRequestId,order_id:intent.orderId||null,data:intent.data});if(saved.error)throw errorOf(saved.error);
+      const orderId=saved.data?.orderId;if(!UUID.test(orderId||''))fail('RESPONSE_UNCERTAIN','Le reçu du brouillon est incomplet.',{definitive:false,needsRetry:true});
+      const submitted=await sdk.rpc('mir_order_submit',{org:internalOrg,request_id:intent.submitRequestId,order_id:orderId});if(submitted.error)throw errorOf(submitted.error);
+      if(submitted.data?.orderId!==orderId||submitted.data?.status!=='submitted'||!UUID.test(submitted.data?.receiptId||''))fail('RESPONSE_UNCERTAIN','Le reçu de soumission est incomplet.',{definitive:false,needsRetry:true});
+      return submitted.data;
+    }
+    function submitOrder(data,orderId=null){
+      requireReady();if(activePromise)return Promise.reject(new PortalError('BUSY','Une commande est déjà en cours.'));if(!internalOrg||!data||typeof data!=='object')fail('ORDER_INVALID','Cette commande ne peut pas être préparée.');
+      const intent={saveRequestId:uuid(),submitRequestId:uuid(),orderId:UUID.test(orderId||'')?orderId:null,data:clone(data)};
+      if(!UUID.test(intent.saveRequestId||'')||!UUID.test(intent.submitRequestId||''))fail('UUID_REQUIRED','Le navigateur ne peut pas préparer les reçus de commande.');
+      activePromise=(async()=>{if(!navigator.onLine){writeOrderDraftQueue([...readOrderDraftQueue(),intent]);return{status:'draft',offline:true};}try{return await transmitOrderDraft(intent);}catch(error){if(error?.definitive===false||error?.code==='NETWORK_UNCERTAIN'){writeOrderDraftQueue([...readOrderDraftQueue(),intent]);return{status:'draft',offline:true};}throw error;}})().finally(()=>{activePromise=null;});
+      return activePromise;
+    }
+    async function syncOrderDraftQueue(){if(!internalOrg||!navigator.onLine||!status.user?.id)return 0;const queue=readOrderDraftQueue(),remaining=[];let synced=0;for(const intent of queue){try{await transmitOrderDraft(intent);synced++;}catch(_){remaining.push(intent);}}writeOrderDraftQueue(remaining);if(synced)await refresh();return synced;}
     function expenseQueueKey(){return `mir_expense_drafts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
     function readExpenseQueue(){try{const raw=JSON.parse(storage?.getItem(expenseQueueKey())||'[]');return Array.isArray(raw)?raw.filter(x=>x&&UUID.test(x.requestId||'')&&x.data&&typeof x.data==='object'):[];}catch(_){return [];}}
     function writeExpenseQueue(rows){try{storage?.setItem(expenseQueueKey(),JSON.stringify(rows.slice(-20)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre ce brouillon.');}}
@@ -619,7 +654,7 @@
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, dispose,
       chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatFileURL, chatPhotoURL,
       helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }

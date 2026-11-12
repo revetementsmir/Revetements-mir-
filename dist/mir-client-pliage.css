@@ -31,3 +31,7 @@ body[data-client-pliage-landing]:not(:has(#client-bend-quick[open])) .subnav{dis
 @media(max-height:670px){
  .client-bend-example svg{max-height:26dvh}
 }
+@media(max-width:1100px){
+ body[data-client-pliage-landing].mir-public-navigation{padding-bottom:0}
+ body[data-client-pliage-landing] .mir-mobile-tabs{position:static}
+}

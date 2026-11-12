@@ -194,6 +194,16 @@ body[data-client-entry="draw"] #drawing-tools .draw-primary:disabled{background:
 body[data-client-entry="draw"] .production-workspace{min-height:0}
 body[data-client-entry="measures"] .production-workspace{margin-top:18px}
 body[data-client-entry] #mir-harmony-menu nav a[aria-current="page"]{background:#e5efdf;color:#205e21}
+@media(min-width:761px) and (max-width:1100px){
+ html.mir-production-client header.mir-home-header.mir-client-header[data-mir-public-shell]{height:76px;min-height:76px;padding-block:8px;border:0}
+}
+/* Le parcours Pliage public conserve l’en-tête GOD MODE et n’empile pas
+   l’ancienne barre mobile permanente sur les actions du configurateur. */
+body[data-client-entry].mir-public-navigation{padding-bottom:0}
+body[data-client-entry="measures"] .mir-mobile-tabs{display:none!important}
+@media(max-width:1100px){
+ body[data-client-entry="measures"] #client-step-actions{position:sticky;bottom:72px;z-index:51;background:#fff}
+}
 @media(max-width:600px){
  body[data-client-entry] .client-entry-cards{margin-top:16px}
  body[data-client-entry] .client-entry-cards>button{min-height:86px}
@@ -219,6 +229,12 @@ body[data-client-entry="models"] #client-saved-options .template-strip{
 body[data-client-entry="models"] .template-button{min-height:68px;padding:8px}
 body[data-client-entry="models"] .template-button svg{max-height:40px}
 body[data-client-entry="models"] #client-saved-options .template-section{padding:8px 0 0}
+@media(max-width:600px) and (max-height:820px){
+ body[data-client-entry="models"] #client-entry{padding-top:6px}
+ body[data-client-entry="models"] #client-entry h1{font-size:26px;margin-bottom:4px}
+ body[data-client-entry="models"] #client-entry-intro{margin:0;line-height:1.35}
+ body[data-client-entry="models"] #client-model-options{margin-top:6px}
+}
 .client-viewport-pages{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
 .client-viewport-pages[hidden]{display:none!important}
 .client-viewport-pages button{min-width:44px;min-height:44px;border:1px solid #c9d5c5;border-radius:7px;background:white;color:#244329;font-weight:700}
@@ -398,4 +414,11 @@ body[data-client-entry]:not([data-client-stage="5"]) #panel-price{display:none!i
 }
 @media(max-width:600px) and (min-height:780px){
  body[data-client-entry="draw"] #production-drawing{height:clamp(280px,calc(100dvh - 500px),440px)}
+}
+@media(max-width:600px) and (max-height:820px){
+ body[data-client-entry="draw"] #client-entry{padding-top:4px}
+ body[data-client-entry="draw"] #client-entry h1{font-size:24px;margin-bottom:2px}
+ body[data-client-entry="draw"] #client-entry-intro{display:none}
+ body[data-client-entry="draw"] .production-workspace{padding-bottom:8px}
+ body[data-client-entry="draw"] .drawing-card{gap:2px}
 }
