@@ -224,12 +224,14 @@
         const { data, error } = await sdk.rpc('mir_portal_snapshot');
         if (epoch !== generation || sequence !== readSequence || disposed) return null;
         if (error) throw errorOf(error);
-        const [operationsResponse,messagingResponse,punchResponse]=await Promise.all([
-          sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg}),sdk.rpc('mir_punch_snapshot',{org:internalOrg,employee:null})
+        const [operationsResponse,messagingResponse,punchResponse,expensesResponse]=await Promise.all([
+          sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg}),sdk.rpc('mir_punch_snapshot',{org:internalOrg,employee:null}),sdk.rpc('mir_expense_snapshot',{org:internalOrg})
         ]);
         if(operationsResponse.error)throw errorOf(operationsResponse.error);if(messagingResponse.error)throw errorOf(messagingResponse.error);
         if(punchResponse.error&&!missingRoutine(punchResponse))throw errorOf(punchResponse.error);
+        if(expensesResponse.error&&!missingRoutine(expensesResponse))throw errorOf(expensesResponse.error);
         const punch=punchResponse.error?{enabled:false,settings:{},activeShift:null,week:[],corrections:[],bankBalance:0,unavailable:true}:punchResponse.data;
+        const expenses=expensesResponse.error?{unavailable:true,role:null,categories:[],expenses:[]}:expensesResponse.data;
         let lead=null,boss=null,logistics=null,management=null,boutiquePricing=null;
         if(operationsResponse.data?.role==='chef_equipe'){
           const response=await sdk.rpc('mir_lead_today_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
@@ -243,7 +245,7 @@
           const response=await sdk.rpc('mir_management_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);management=response.data;
           const prices=await sdk.rpc('mir_boutique_price_management',{org:internalOrg});if(prices.error)throw errorOf(prices.error);boutiquePricing=prices.data;
         }
-        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch}, user.id);
+        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {
@@ -253,7 +255,7 @@
         throw mapped;
       }
     }
-    const onlinePunchSync=()=>{if(!disposed)syncPunchQueue().catch(()=>0).then(()=>refresh().catch(()=>{}));};
+    const onlinePunchSync=()=>{if(!disposed)Promise.all([syncPunchQueue().catch(()=>0),syncExpenseDrafts().catch(()=>0)]).then(()=>refresh().catch(()=>{}));};
     async function start() {
       if (!sdk) { emit({}, 'start'); return null; }
       if (!authSubscription) {
@@ -558,6 +560,32 @@
     async function punchAdmin(action,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_admin',{org:internalOrg,action,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function punchJournal(filters={},pageAfter=null,pageSize=25){requireReady();const {data,error}=await sdk.rpc('mir_punch_journal',{org:internalOrg,filters,page_size:pageSize,page_after:pageAfter});if(error)throw errorOf(error);return data;}
     async function timeBankRequest(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_time_bank_request',{org:internalOrg,request:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
+    function expenseQueueKey(){return `mir_expense_drafts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
+    function readExpenseQueue(){try{const raw=JSON.parse(storage?.getItem(expenseQueueKey())||'[]');return Array.isArray(raw)?raw.filter(x=>x&&UUID.test(x.requestId||'')&&x.data&&typeof x.data==='object'):[];}catch(_){return [];}}
+    function writeExpenseQueue(rows){try{storage?.setItem(expenseQueueKey(),JSON.stringify(rows.slice(-20)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre ce brouillon.');}}
+    async function expenseSaveDraft(expenseId,data,requestId=uuid()){
+      requireReady();if(!internalOrg||!UUID.test(requestId||''))fail('EXPENSE_INVALID','Le brouillon ne peut pas être préparé.');
+      const draft={requestId,expenseId:UUID.test(expenseId||'')?expenseId:null,data:clone(data),savedAt:new Date().toISOString()};
+      if(!navigator.onLine){writeExpenseQueue([...readExpenseQueue(),draft]);return {...draft,offline:true};}
+      try{const {data:out,error}=await sdk.rpc('mir_expense_save_draft',{org:internalOrg,request_id:requestId,expense_id:draft.expenseId,data:draft.data});if(error)throw errorOf(error);await refresh();return out;}
+      catch(error){if(error?.definitive===false||error?.code==='NETWORK_UNCERTAIN'){writeExpenseQueue([...readExpenseQueue(),draft]);return {...draft,offline:true};}throw error;}
+    }
+    async function syncExpenseDrafts(){if(!internalOrg||!navigator.onLine||!status.user?.id)return 0;const queued=readExpenseQueue(),remaining=[];let synced=0;for(const draft of queued){try{const {error}=await sdk.rpc('mir_expense_save_draft',{org:internalOrg,request_id:draft.requestId,expense_id:draft.expenseId,data:draft.data});if(error)throw error;synced++;}catch(_){remaining.push(draft);}}writeExpenseQueue(remaining);if(synced)await refresh();return synced;}
+    async function expenseUploadReceipt(expenseId,file,requestId=uuid()){
+      requireReady();if(!internalOrg||!UUID.test(expenseId||'')||!UUID.test(requestId||''))fail('EXPENSE_INVALID','Le reçu ne peut pas être préparé.');
+      if(!navigator.onLine)fail('OFFLINE','Le reçu sera ajouté lors de la reconnexion. Le brouillon reste conservé.');
+      const mime=String(file?.type||'').toLowerCase(),ext={'image/jpeg':'jpg','image/png':'png','application/pdf':'pdf'}[mime];
+      if(!ext||!file?.size||file.size>10*1024*1024)fail('UPLOAD_INVALID','Utilisez un JPEG, PNG ou PDF de 10 Mo maximum.');
+      if(!globalThis.crypto?.subtle)fail('HASH_UNAVAILABLE','Ce navigateur ne peut pas vérifier le reçu.');
+      const bytes=await file.arrayBuffer(),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(x=>x.toString(16).padStart(2,'0')).join('');
+      const path=`${internalOrg}/expense/${expenseId}/${status.user.id}/${uuid()}.${ext}`;
+      const uploaded=await sdk.storage.from('mir-expense-receipts').upload(path,file,{contentType:mime,upsert:false,cacheControl:'3600'});if(uploaded.error)throw errorOf(uploaded.error,'Le reçu n’a pas pu être téléversé.');
+      const {data,error}=await sdk.rpc('mir_expense_attach_receipt',{org:internalOrg,request_id:requestId,expense_id:expenseId,object_path:path,file_name:String(file.name||`recu.${ext}`).slice(0,240),mime_type:mime,size_bytes:file.size,sha256:hash});
+      if(error){await sdk.storage.from('mir-expense-receipts').remove([path]).catch(()=>{});throw errorOf(error);}await refresh();return data;
+    }
+    async function expenseSubmit(expenseId,requestId=uuid()){requireReady();if(!internalOrg||!UUID.test(expenseId||'')||!UUID.test(requestId||''))fail('EXPENSE_INVALID','Soumission invalide.');const {data,error}=await sdk.rpc('mir_expense_submit',{org:internalOrg,request_id:requestId,expense_id:expenseId});if(error)throw errorOf(error);await refresh();return data;}
+    async function expenseDecide(expenseId,decision,reason='',requestId=uuid()){requireReady();if(!internalOrg||!UUID.test(expenseId||'')||!UUID.test(requestId||''))fail('EXPENSE_INVALID','Décision invalide.');const {data,error}=await sdk.rpc('mir_expense_decide',{org:internalOrg,request_id:requestId,expense_id:expenseId,decision,reason});if(error)throw errorOf(error);await refresh();return data;}
+    async function expenseReceiptURL(receiptId){requireReady();if(!internalOrg||!UUID.test(receiptId||''))fail('DOCUMENT_INVALID','Reçu invalide.');const {data:access,error:accessError}=await sdk.rpc('mir_expense_receipt_access',{org:internalOrg,receipt_id:receiptId});if(accessError||!access?.path||access.bucket!=='mir-expense-receipts'||access.expiresIn!==120)throw errorOf(accessError||{},'Ce reçu ne peut pas être ouvert.');const {data,error}=await sdk.storage.from(access.bucket).createSignedUrl(access.path,access.expiresIn);if(error||!data?.signedUrl)throw errorOf(error||{},'Ce reçu ne peut pas être ouvert.');return data.signedUrl;}
     // Phase3C help/support API begin.
     async function helpFAQ(){requireEnabled();const epoch=generation,{data,error}=await sdk.rpc(internalOrg?'mir_help_faq_scoped':'mir_help_faq',internalOrg?{org:internalOrg}:undefined);if(epoch!==generation)fail('SESSION_CHANGED','La session a changé.');if(error)throw errorOf(error);return Array.isArray(data)?data:[];}
     function requireSupport(){if(!status.user||!['ready','customer_ready'].includes(status.phase)||!internalOrg)fail('AUTH_REQUIRED','Connectez-vous pour ouvrir vos demandes.');return {epoch:generation,user:status.user.id};}
@@ -575,7 +603,7 @@
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, dispose,
       chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatFileURL, chatPhotoURL,
       helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
