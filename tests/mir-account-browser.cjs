@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('fs'),path=require('path'),assert=require('node:assert/strict');
 const {chromium}=require('playwright');
-const root=path.resolve(__dirname,'../dist'),base='https://revetementsmirweb.github.io/MIR/';
+const root=path.resolve(__dirname,'../dist'),base='https://revetementsmir.github.io/Revetements-mir-/',basePath='/Revetements-mir-/';
 const out=path.resolve(__dirname,'../docs/verification/account');fs.mkdirSync(out,{recursive:true});
 // Only the external SDK transport is simulated. Real HTML, Auth adapter, app,
 // cart storage, callback parser, error mapping and responsive CSS run unchanged.
@@ -12,7 +12,7 @@ window.MIRSupabase={createClient(url,key,options){window.qaOptions=options;retur
 async function setup(browser,viewport={width:390,height:844},initial={}){
  const context=await browser.newContext({viewport,recordVideo:process.env.MIR_RECORD_ACCOUNT?{dir:out}:undefined});
  await context.addInitScript(initial=>{if(!sessionStorage.getItem('qa-seeded')){for(const [k,v]of Object.entries(initial))localStorage.setItem(k,JSON.stringify(v));sessionStorage.setItem('qa-seeded','1');}},initial);
- await context.route(base+'**',async route=>{const u=new URL(route.request().url()),file=path.join(root,decodeURIComponent(u.pathname.slice('/MIR/'.length)));if(u.pathname.endsWith('/vendor/supabase-client.js'))return route.fulfill({body:mock,contentType:'application/javascript'});if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});return route.fulfill({path:file});});
+ await context.route(base+'**',async route=>{const u=new URL(route.request().url()),file=path.join(root,decodeURIComponent(u.pathname.slice(basePath.length)));if(u.pathname.endsWith('/vendor/supabase-client.js'))return route.fulfill({body:mock,contentType:'application/javascript'});if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});return route.fulfill({path:file});});
  const page=await context.newPage();page.setDefaultTimeout(12000);const errors=[];page.on('pageerror',e=>errors.push(e.message));return {context,page,errors};
 }
 const signin=async(page,email='a@example.invalid')=>{await page.locator('#auth-email').fill(email);await page.locator('#auth-password').fill('valid-password-123');await page.getByRole('button',{name:'Me connecter',exact:true}).click();};
@@ -23,9 +23,9 @@ const signin=async(page,email='a@example.invalid')=>{await page.locator('#auth-e
  assert.equal(await page.locator('#auth-email').evaluate(e=>e.getBoundingClientRect().height>=44),true);
  await page.screenshot({path:path.join(out,'connexion-'+width+'.png'),fullPage:true});
  await page.getByLabel('Afficher le mot de passe').check();assert.equal(await page.locator('#auth-password').getAttribute('type'),'text');
- await page.locator('#auth-email').fill('a@example.invalid');await page.locator('#auth-password').fill('wrong');await page.getByRole('button',{name:'Me connecter',exact:true}).click();await page.getByRole('alert').filter({hasText:'incorrect'}).waitFor();
- await signin(page);await page.getByRole('heading',{name:'Bonjour, et bienvenue.'}).waitFor();assert.equal(await page.getByText('ORDER-client-b').count(),0);
- await page.getByRole('button',{name:'Mes adresses de livraison'}).click();await page.locator('[name=recipient]').fill('Recette MIR');await page.locator('[name=line1]').fill('123 rue de recette');await page.locator('[name=city]').fill('Québec');await page.locator('[name=province]').fill('QC');await page.locator('[name=postalCode]').fill('G1A 1A1');await page.getByRole('button',{name:'Enregistrer l’adresse',exact:true}).click();await page.locator('.account-address').waitFor();
+ await page.locator('#auth-email').fill('a@example.invalid');await page.locator('#auth-password').fill('wrong-password');await page.getByRole('button',{name:'Me connecter',exact:true}).click();await page.getByRole('alert').filter({hasText:'incorrect'}).waitFor();
+ await signin(page);await page.getByRole('heading',{name:'Mon compte',exact:true}).waitFor();assert.equal(await page.getByText('ORDER-client-b').count(),0);assert.equal(await page.locator('.account-tabs button').count(),2);
+ await page.getByText('Ajouter une adresse',{exact:true}).click();await page.locator('[name=recipient]').fill('Recette MIR');await page.locator('[name=line1]').fill('123 rue de recette');await page.locator('[name=city]').fill('Québec');await page.locator('[name=province]').fill('QC');await page.locator('[name=postalCode]').fill('G1A 1A1');await page.getByRole('button',{name:'Enregistrer l’adresse',exact:true}).click();await page.locator('.account-address').waitFor();
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);});await page.screenshot({path:path.join(out,'adresses-'+width+'.png'),fullPage:true});
  await page.locator('#portal-signout').click();await page.getByRole('heading',{name:'Mon compte MIR',exact:true}).waitFor();assert.equal(await page.locator('.customer-account').count(),0);assert.deepEqual(errors,[]);await context.close();console.log('PASS account UI '+width+'px: password/error/private addresses/logout');
  }
