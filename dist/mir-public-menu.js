@@ -19,7 +19,9 @@
     const header=doc.querySelector('header.mir-client-header, header.mir-home-header');
     const nav=header?.querySelector('nav.mir-client-links');
     if(!header||!nav||header.querySelector('.mir-client-menu-toggle'))return null;
-    const media=win.matchMedia(header.classList.contains('mir-home-header')?'(max-width: 760px)':BREAKPOINT);
+    const breakpoint=header.classList.contains('mir-home-header')?760:1100;
+    const browserMedia=win.matchMedia(`(max-width: ${breakpoint}px)`);
+    const media={get matches(){const surface=header.closest('.mir-responsive-page');return surface?surface.clientWidth<=breakpoint:browserMedia.matches;}};
     const toggle=doc.createElement('button');
     toggle.type='button';
     toggle.className='mir-client-menu-toggle';
@@ -80,8 +82,9 @@
     doc.addEventListener('pointerdown',event=>{
       if(media.matches&&!header.contains(event.target)&&toggle.getAttribute('aria-expanded')==='true')close(false);
     });
-    if(media.addEventListener)media.addEventListener('change',sync);
-    else media.addListener?.(sync);
+    if(browserMedia.addEventListener)browserMedia.addEventListener('change',sync);
+    else browserMedia.addListener?.(sync);
+    win.addEventListener('mir-responsive-resize',sync);
     sync();
     return Object.freeze({toggle,nav,close,open,sync});
   }
