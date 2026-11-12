@@ -24,7 +24,7 @@
     ['chantier.html?view=account','Compte','○','compte']
   ];
   function route(path){const file=String(path||'').split('/').pop().split(/[?#]/)[0]||'index.html';return file.replace(/\.html$/,'');}
-  function currentFor(key,current){if(key==='boutique')return ['boutique','produit','selection','materiaux'].includes(current);if(key==='pliage')return ['pliage','production'].includes(current);return key===current;}
+  function currentFor(key,current){if(key==='boutique')return ['boutique','produit','selection','materiaux'].includes(current);return key===current;}
   function recipeHref(href,test){if(!test||!/^[-\w]+\.html(?:[?#]|$)/.test(href))return href;const [base,hash='']=href.split('#'),join=base.includes('?')?'&':'?';return base+join+'recette=1'+(hash?'#'+hash:'');}
   function link(doc,href,label,key,current,test){const a=doc.createElement('a');a.href=recipeHref(href,test);a.textContent=label;if(currentFor(key,current))a.setAttribute('aria-current','page');return a;}
   function normalize(doc,header,nav,current,test){

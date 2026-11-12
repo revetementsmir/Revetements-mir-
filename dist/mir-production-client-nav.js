@@ -30,6 +30,12 @@
    links.setAttribute('aria-label','Navigation principale');
    actions.classList.remove('mir-client-actions','mir-production-client-actions');
    actions.querySelector('.mir-home-account')?.classList.remove('mir-production-client-account');
+   const markPliage=()=>{
+    const current=links.querySelector('a[href^="pliage.html"]');
+    if(current)current.setAttribute('aria-current','page');
+   };
+   new MutationObserver(markPliage).observe(links,{childList:true});
+   markPliage();
   }
   // Le même contrôleur public (Escape, clic extérieur, focus, ARIA) sera chargé
   // ensuite par mir-public-menu.js, sans le recopier.
