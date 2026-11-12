@@ -59,6 +59,7 @@ end $$;
 
 create unique index if not exists notification_recipient_event_unique on mir_core.notifications(organization_id,event_id,user_id) where event_id is not null;
 create index if not exists notification_events_entity on mir_core.notification_events(organization_id,module,entity_id,occurred_at desc);
+create index if not exists notification_events_actor on mir_core.notification_events(actor_id) where actor_id is not null;
 create index if not exists notification_recipient_feed on mir_core.notifications(organization_id,user_id,created_at desc,id desc);
 create index if not exists notification_recipient_actions on mir_core.notifications(organization_id,user_id,created_at desc) where action_required and treated_at is null;
 
@@ -69,13 +70,13 @@ revoke all on mir_core.notification_events,mir_core.notification_preferences,mir
 
 drop policy if exists notification_events_recipient_read on mir_core.notification_events;
 create policy notification_events_recipient_read on mir_core.notification_events for select to authenticated
- using(auth.uid() is not null and exists(select 1 from mir_core.notifications n where(n.organization_id,n.event_id,n.user_id)=(notification_events.organization_id,notification_events.id,auth.uid())));
+ using((select auth.uid()) is not null and exists(select 1 from mir_core.notifications n where(n.organization_id,n.event_id,n.user_id)=(notification_events.organization_id,notification_events.id,(select auth.uid()))));
 drop policy if exists notification_recipients_own_read on mir_core.notifications;
 create policy notification_recipients_own_read on mir_core.notifications for select to authenticated
- using(auth.uid() is not null and user_id=auth.uid() and exists(select 1 from mir_core.memberships m where(m.organization_id,m.user_id)=(notifications.organization_id,auth.uid()) and m.active));
+ using((select auth.uid()) is not null and user_id=(select auth.uid()) and exists(select 1 from mir_core.memberships m where(m.organization_id,m.user_id)=(notifications.organization_id,(select auth.uid())) and m.active));
 drop policy if exists notification_preferences_own_read on mir_core.notification_preferences;
 create policy notification_preferences_own_read on mir_core.notification_preferences for select to authenticated
- using(auth.uid() is not null and user_id=auth.uid() and exists(select 1 from mir_core.memberships m where(m.organization_id,m.user_id)=(notification_preferences.organization_id,auth.uid()) and m.active));
+ using((select auth.uid()) is not null and user_id=(select auth.uid()) and exists(select 1 from mir_core.memberships m where(m.organization_id,m.user_id)=(notification_preferences.organization_id,(select auth.uid())) and m.active));
 
 create or replace function mir_core.notification_module(kind text,route jsonb) returns text
 language sql immutable set search_path=pg_catalog as $$
