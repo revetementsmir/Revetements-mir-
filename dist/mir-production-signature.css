@@ -274,7 +274,6 @@ body[data-client-entry="draw"] .client-trace-scale{display:flex;gap:6px;align-it
 body[data-client-entry="draw"] .client-trace-scale select{min-height:44px;max-width:100%;font:inherit}
 body[data-client-entry] .mir-face-choice-image{background:#f1f5f2}
 body[data-client-entry] .mir-face-choice-image svg{min-height:100px}
-body[data-client-entry][data-client-stage="5"] label:has(>#production-quantity){display:none!important}
 body[data-client-entry][data-client-stage="5"] #production-color-grid{
  max-height:144px;overflow:auto;overscroll-behavior:contain;padding:2px;scrollbar-gutter:stable
 }

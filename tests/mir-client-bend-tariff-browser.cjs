@@ -39,9 +39,9 @@ assert.doesNotMatch(sheet.svg,/Zoho|MISE EN PRODUCTION/i);
  const base='http://127.0.0.1:'+server.address().port;
  const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
  try{
-  for(const width of [390,834,1440]){
+  for(const [width,height] of [[390,844],[834,1112],[1366,768],[1440,900]]){
    const touch=width<1100;
-   const context=await browser.newContext({viewport:{width,height:width===390?844:950},isMobile:width===390,hasTouch:touch,acceptDownloads:true});
+   const context=await browser.newContext({viewport:{width,height},isMobile:width===390,hasTouch:touch,acceptDownloads:true});
    let currentTariff=tariff;
    await context.route('**/rest/v1/rpc/mir_public_bend_tariff',route=>{
     assert.equal(route.request().method(),'GET');
@@ -60,8 +60,18 @@ assert.doesNotMatch(sheet.svg,/Zoho|MISE EN PRODUCTION/i);
    await next.click();
    await page.locator('#material-type').selectOption('aluminium');
    await page.locator('#production-color-grid [data-production-color]:visible').first().click();
+   const pieceQuantity=page.locator('#production-quantity');
+   assert.equal(await pieceQuantity.isVisible(),true,'la quantité obligatoire est visible au dernier écran');
+   assert.equal(await pieceQuantity.inputValue(),'','aucune quantité 1 n’est ajoutée implicitement');
+   assert.match(await page.locator('#client-step-status').textContent(),/Quantité entière à préciser/);
+   assert.equal(await next.isDisabled(),true,'la pièce ne peut pas être ajoutée sans quantité');
+   assert.match(await page.locator('#panel-price').textContent(),/Prix à confirmer par MIR/);
+   assert.doesNotMatch(await page.locator('#panel-price').textContent(),/9,40|NaN|0,00/);
+   await pieceQuantity.fill('12');
+   await pieceQuantity.press('Tab');
    await page.waitForFunction(()=>document.querySelector('#panel-price').textContent.includes('9,40'));
-   assert.equal(await page.locator('#production-quantity').isVisible(),false);
+   assert.doesNotMatch(await page.locator('#panel-price').textContent(),/NaN|0,00/);
+   assert.equal(await next.isEnabled(),true,'la quantité valide autorise l’ajout');
    assert.ok(await next.evaluate(button=>button.getBoundingClientRect().bottom<=innerHeight+1),
     'le prix et le bouton restent ensemble au premier écran à '+width+' px');
    await next.click();
@@ -69,7 +79,7 @@ assert.doesNotMatch(sheet.svg,/Zoho|MISE EN PRODUCTION/i);
    if(await dossier.isVisible())await dossier.click();
    else await page.goto(base+'/production.html?mode=client&kind=profile#production-order');
    const qty=page.locator('[data-item-quantity]');
-   await qty.fill('12');await qty.press('Tab');
+   assert.equal(await qty.inputValue(),'12','la quantité explicite est conservée dans le dossier');
    await page.waitForFunction(()=>document.querySelector('#production-pricing-summary').textContent.includes('112,80'));
    await page.locator('#production-pdf').click();
    const link=page.locator('#mir-pdf-ready a[download]');

@@ -123,7 +123,8 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
  assert.equal(await page.locator('#client-step-title').textContent(),'Choisissez le matériau et la couleur');
  assert.deepEqual(await page.locator('#material-type option').evaluateAll(nodes=>nodes.map(option=>option.value)),['','aluminium','acier']);
  assert.deepEqual(await page.locator('#color-system option').evaluateAll(nodes=>nodes.map(option=>option.value)),['manufacturer','special']);
- assert.equal(await page.locator('#production-quantity').isVisible(),false);
+  assert.equal(await page.locator('#production-quantity').isVisible(),true);
+  assert.equal(await page.locator('#production-quantity').inputValue(),'');
  assert.equal(await page.getByRole('navigation',{name:'Pages de couleurs'}).count(),0);
  await page.locator('#color-system').selectOption('special');
  assert.equal(await page.locator('#custom-color-quote').isVisible(),true,'couleur spéciale sur soumission');

@@ -7,7 +7,7 @@
     "dist/mir-today.css": "a25b18b2dfa065be10e7f942d4532afbfff24f170d5a7c53322a0001c9850c0a",
     "dist/portal-config.js": "f25cb94c5966a98b6a06dc3c7a2aa8b0ab3e07e0b0edc5d1b80739d17f870ee9",
     "dist/employee-store-model.js": "0d33d1c944d55764dd60d9fd330bff231dac3b975e0027f04c02444a4a2c0c7b",
-    "dist/mir-production-signature.css": "25c7fbf13815b2aa4e0744062ab62106318476d34f7227b7038c8a346bb3c409",
+    "dist/mir-production-signature.css": "b6625d3627ef871e25378213c1efe659db342626eae43fbaa0acfcfbbf632e1d",
     "supabase/migrations/20261111120000_job_dossier_central.sql": "55227f04eecdcaaabdb70d9350a5aad6a26d382b9823dff148cf3938b03f25e0",
     "supabase/migrations/20261110020000_punch_gps.sql": "15a1aa2b343a4bfa247ac24634325f44b28d95ee1ebb7abd2160e0bb30afb8f8",
     "supabase/migrations/20261110130000_punch_phase2_integrity.sql": "ef7141911e8649adae1185b47f9538af9726489567ce073ac78a214f23e6bb23",
