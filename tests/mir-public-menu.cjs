@@ -24,7 +24,7 @@ test('Les pages clients utilisent les mêmes fichiers de menu, sans bibliothèqu
  for(const route of routes){
    const html=read(route+'.html');
    assert.match(html,/mir-public-menu\.css\?v=2/,route);
-   assert.match(html,/mir-public-menu\.js\?v=public-shell-2/,route);
+   assert.match(html,/mir-public-menu\.js\?v=public-shell-3/,route);
    assert.match(html,/<header[^>]*data-mir-public-shell/,route);
    assert.match(html,/<header[^>]*mir-client-header/,route);
    assert.match(html,/assets\/MIR-logo-officiel-original\.svg/,route);
@@ -34,13 +34,13 @@ test('Les pages clients utilisent les mêmes fichiers de menu, sans bibliothèqu
 });
 test('Le menu accueil est compact et le mode Admin reste isolé',()=>{
  assert.match(read('index.html'),/mir-public-menu\.css\?v=2/);
- assert.match(read('index.html'),/mir-public-menu\.js\?v=public-shell-2/);
+ assert.match(read('index.html'),/mir-public-menu\.js\?v=public-shell-3/);
  for(const route of ['chantier']){
    assert.doesNotMatch(read(route+'.html'),/mir-public-menu\.(?:css|js)/,route);
  }
  const production=read('production.html'),bridge=read('mir-production-client-nav.js');
  assert.match(production,/mir-public-menu\.css\?v=2/);
- assert.match(production,/mir-public-menu\.js\?v=public-shell-2/);
+ assert.match(production,/mir-public-menu\.js\?v=public-shell-3/);
  assert.match(production,/mir-production-client-nav\.js\?v=1/);
  assert.match(bridge,/classList\.contains\('mir-production-client'\)/,
    'seul le mode client doit être activé');
