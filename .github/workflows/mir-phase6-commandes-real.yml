@@ -3,6 +3,12 @@ name: MIR Phase 6 Commandes — rôles réels TEST
 on:
   pull_request:
   workflow_dispatch:
+    inputs:
+      ux_recipe:
+        description: Exécuter la recette UX après promotion des migrations sur MIR TEST
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -26,6 +32,7 @@ jobs:
       MIR_SANDBOX_ASSISTANT_PASSWORD: ${{ secrets.MIR_SANDBOX_ASSISTANT_PASSWORD }}
       MIR_SANDBOX_WAREHOUSE_EMAIL: ${{ secrets.MIR_SANDBOX_WAREHOUSE_EMAIL }}
       MIR_SANDBOX_WAREHOUSE_PASSWORD: ${{ secrets.MIR_SANDBOX_WAREHOUSE_PASSWORD }}
+      MIR_UX_RECIPE: ${{ github.event_name == 'workflow_dispatch' && inputs.ux_recipe && '1' || '0' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
