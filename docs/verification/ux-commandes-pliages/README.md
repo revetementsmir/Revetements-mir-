@@ -42,4 +42,12 @@ La migration distante et la recette hébergée restent consignées séparément 
 - aucune commande fournisseur ni aucun courriel déclenché;
 - Supabase production `gccltmaulvrnthrbnrpd` n'a reçu aucune requête.
 
-La recette réelle à six rôles est exécutée par le workflow `MIR Phase 6 Commandes — rôles réels TEST`; son résultat chiffré final est consigné après exécution sur le SHA final.
+Recette réelle à six rôles : **12/12 contrôles UX réussis** dans le workflow `MIR Phase 6 Commandes — rôles réels TEST`, run `43307037201`.
+
+- Employé : brouillon de 4 lignes (2 matériels + pliage de banque + pliage sur mesure), rejeu idempotent, soumission et reçu serveur;
+- favoris matériel et pliage : ajout, retrait, restauration de l'état initial et isolation face au compte Chef;
+- chantier assigné et référence `Je ne connais pas le numéro` persistée, puis rattachement Adjointe historisé sans création de chantier;
+- Chef, Adjointe, Boss, Admin et Entrepôt : matrice existante vérifiée et mutations Employé refusées hors périmètre;
+- isolation d'une organisation arbitraire refusée pour les six rôles;
+- deux commandes `RECETTE-UX-P23` conservées comme preuve d'audit TEST; aucun fournisseur et aucun courriel contactés;
+- artefact `phase6-real-roles`, identifiant `13983768688`, empreinte `sha256:64c3c7bd2b2209eea5d2fd53f609666e43d124cdbcafb7bbdecc5e686dc668e2`.
