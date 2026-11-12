@@ -300,7 +300,8 @@
     return photo?window.MIRMaterialPreview.photoLabel(photo):isFold(item)?'Dessin du pliage':'Visuel à compléter';
   }
   const favoriteIds=()=>state.favorites[actorId]||[];
-  function colorOptions(item,value='') {const selected=value||item.baseColorId||'';return `<option value=""${selected?'':' selected'}>${item.colors?.length?'Choisir la couleur':'Teinte à confirmer'}</option>`+(item.colors||[]).map(color=>`<option value="${esc(color.id)}"${selected===color.id?' selected':''}>${esc(color.name)}</option>`).join('');}
+  function colorPriority(color){const name=String(color?.name||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();return /(^|\b)(noir|black)(\b|$)/.test(name)?0:/(^|\b)(blanc|white)(\b|$)/.test(name)?1:2;}
+  function colorOptions(item,value='') {const selected=value||item.baseColorId||'',colors=[...(item.colors||[])].sort((a,b)=>colorPriority(a)-colorPriority(b));return `<option value=""${selected?'':' selected'}>${colors.length?'Choisir la couleur':'Teinte à confirmer'}</option>`+colors.map(color=>`<option value="${esc(color.id)}"${selected===color.id?' selected':''}>${esc(color.name)}</option>`).join('');}
   function formatLabel(format){return format?.label||(format?.widthIn?`${num(format.widthIn)} × ${num(format.lengthIn)} po`:format?.lengthIn?`${num(format.lengthIn)} po`:'');}
   function formatOptions(item,value=''){return '<option value="">Choisir le format</option>'+(item.formats||[]).map(format=>`<option value="${esc(format.id)}"${value===format.id?' selected':''}>${esc(formatLabel(format))}</option>`).join('');}
   async function updateProductPreview(card,item,colorId){

@@ -93,6 +93,19 @@ function linkedPo(route){
   [['ordered','Commandé'],['in_production','En production'],['ready','Prêt à recevoir']].map(([v,label])=>
   '<option value="'+v+'"'+(production===v?' selected':'')+'>'+label+'</option>').join('')+
   '</select></label><button type="button" data-co-action="supplier-state" data-route="'+esc(id)+'">Mettre à jour</button>';
+ const confirmation=saved?'<details class="co-supplier-confirm"><summary>Confirmation, prix et date prévue</summary>'+
+  '<label>No fournisseur<input data-co-supplier-reference="'+esc(id)+'" maxlength="120" value="'+esc(route.supplierReference||'')+'"></label>'+
+  '<label>Date prévue<input type="date" data-co-supplier-date="'+esc(id)+'" value="'+esc(route.expectedOn||'')+'"></label>'+
+  '<label>Prix avant taxes (¢)<input type="number" min="0" step="1" data-co-supplier-price="'+esc(id)+'" value="'+esc(route.unitPriceCents||0)+'"></label>'+
+  '<label>Taxes (¢)<input type="number" min="0" step="1" data-co-supplier-tax="'+esc(id)+'" value="'+esc(route.taxCents||0)+'"></label>'+
+  '<label>Frais (¢)<input type="number" min="0" step="1" data-co-supplier-fee="'+esc(id)+'" value="'+esc(route.feeCents||0)+'"></label>'+
+  '<button type="button" data-co-action="supplier-confirm" data-route="'+esc(id)+'">Conserver la confirmation</button></details>':'';
+ const issue='<details class="co-route-issue"><summary>Rupture, dommage ou substitution</summary>'+
+  '<label>Manquant<input type="number" min="0" step="1" data-co-shortage="'+esc(id)+'" value="'+esc(route.shortageQty||0)+'"></label>'+
+  '<label>Endommagé<input type="number" min="0" step="1" data-co-damaged="'+esc(id)+'" value="'+esc(route.damagedQty||0)+'"></label>'+
+  '<label>Substitution autorisée<input data-co-substitution="'+esc(id)+'" maxlength="220" placeholder="Produit de remplacement approuvé"></label>'+
+  '<label>Motif<input data-co-issue-reason="'+esc(id)+'" maxlength="500" placeholder="Pourquoi cette modification?"></label>'+
+  '<button type="button" data-co-action="issue" data-route="'+esc(id)+'">Enregistrer l’anomalie</button></details>';
  return '<div class="co-route-po" data-co-po-route="'+esc(id)+'"><strong>'+esc(supplier?.name||route.supplierId||'Fournisseur')+
   ' · '+fmt(route.quantity)+' · reçu '+fmt(route.receivedQty||0)+'</strong>'+
   '<span class="co-badge">'+esc(labels[production]||'À confirmer')+'</span>'+
@@ -104,7 +117,7 @@ function linkedPo(route){
    '<button type="button" data-co-action="po" data-route="'+esc(id)+'">Créer un bon</button>'+
    '<label>Ou bon existant<select data-co-existing-po="'+esc(id)+'"><option value="">Choisir après recherche</option></select></label>'+
    '<button type="button" data-co-action="existing-po" data-route="'+esc(id)+'">Ajouter à ce bon</button>'
-  )+'</div>';
+  )+confirmation+issue+'</div>';
 }
 function supplierRow(lineId,{supplierId='',quantity=0}={}){
  return '<div class="co-external-row"><label>Fournisseur<select data-co-supplier>'+supplierOptions(supplierId)+'</select></label>'+
@@ -163,6 +176,7 @@ function renderDetail(){
  $('#co-overall-status').textContent=sum.complete?'Commande complétée':
   detail.shippedAt?'Entrepôt expédié · fournisseur(s) en cours':
    sum.unassigned>0?'En attente de répartition':'Préparation et bons en cours';
+ $('#co-overall-status').textContent+=' · '+({submitted:'À traiter',needs_clarification:'Précision demandée',approved:'Approuvée',refused:'Refusée',cancelled:'Annulée'}[detail.decisionStatus]||'À traiter');
  $('#co-metrics').innerHTML=[
  ['Commandés',sum.total],['Entrepôt',sum.warehouse],['À commander',sum.external],['Non répartis',sum.unassigned]
  ].map(([label,num])=>'<div><span>'+label+'</span><strong>'+fmt(num)+'</strong></div>').join('');
@@ -183,6 +197,7 @@ function renderDetail(){
  $('#co-notifications').innerHTML=events.filter(e=>e.type==='quantity_added'||e.type==='routed').slice(0,9)
  .map(e=>'<div class="co-event"><strong>'+esc(e.type==='quantity_added'?'Ajout de matériel':'Répartition modifiée')+'</strong>'+
  '<p>'+esc(e.payload?.name||'Commande')+(e.type==='quantity_added'?' +'+fmt(e.payload?.delta)+' '+esc(e.payload?.unit):'')+'</p></div>').join('')||'<p>Aucun changement à communiquer.</p>';
+ $('#co-attachments').innerHTML=(detail.attachments||[]).map(a=>'<button type="button" data-co-attachment="'+esc(a.id)+'">'+esc(a.fileName)+' · '+fmt(Number(a.sizeBytes||0)/1048576)+' Mo</button>').join('')||'<p class="co-small">Aucun document joint.</p>';
  $('#co-meta').querySelector('button').disabled=!!detail.shippedAt;
  $('#co-overall-status').className='co-badge';
  void fillExistingPOs();
@@ -218,6 +233,14 @@ async function actionRun(action){
    const value=action.closest('.co-route-po')?.querySelector('[data-co-production-status]')?.value;
    if(!['ordered','in_production','ready'].includes(value))throw Error('Choisis un état fournisseur valide.');
    response=await api.supplierStatus(org(),id,routeId,value,rev);
+  }else if(action.dataset.coAction==='supplier-confirm'){
+   const box=action.closest('.co-route-po'),value=k=>box.querySelector(k)?.value;
+   response=await api.supplierConfirm(org(),detail.id,routeId,{reference:value('[data-co-supplier-reference]'),expectedDate:value('[data-co-supplier-date]')||null,
+    priceCents:Number(value('[data-co-supplier-price]')||0),taxCents:Number(value('[data-co-supplier-tax]')||0),feeCents:Number(value('[data-co-supplier-fee]')||0)});
+  }else if(action.dataset.coAction==='issue'){
+   const box=action.closest('.co-route-po'),value=k=>box.querySelector(k)?.value,sub=value('[data-co-substitution]');
+   response=await api.issue(org(),detail.id,routeId,{shortage:Number(value('[data-co-shortage]')||0),damaged:Number(value('[data-co-damaged]')||0),
+    substitution:sub?{label:sub}:null,reason:value('[data-co-issue-reason]')});
   }else return;
   status('Modification conservée côté serveur. Révision '+fmt(response.revision||rev)+'.');
   await detailReload();
@@ -271,6 +294,21 @@ function bind(){
  });
  $('#co-line-list').addEventListener('submit',e=>{const form=e.target.closest('[data-co-route-form]');if(!form)return;e.preventDefault();routeForm(form);});
  $('#co-meta').addEventListener('submit',e=>{e.preventDefault();metaForm(e.currentTarget);});
+ $('#co-attachment-form').addEventListener('submit',async e=>{
+  e.preventDefault();if(!detail||busy)return;const input=$('#co-attachment'),file=input.files?.[0];
+  locked(true);try{await api.attach(org(),detail.sourceOrderId,file);input.value='';await detailReload();status('Document privé joint à la commande.');}
+  catch(error){err(error);}finally{locked(false);}
+ });
+ $('#co-attachments').addEventListener('click',async e=>{
+  const button=e.target.closest('[data-co-attachment]');if(!button||busy)return;
+  locked(true);try{const url=await api.attachmentUrl(org(),button.dataset.coAttachment);window.open(url,'_blank','noopener,noreferrer');status('Lien privé ouvert pour 120 secondes.');}
+  catch(error){err(error);}finally{locked(false);}
+ });
+ document.querySelector('.co-decision').addEventListener('click',async e=>{
+  const button=e.target.closest('[data-co-decision]');if(!button||!detail||busy)return;
+  locked(true);try{await api.decide(org(),detail.id,button.dataset.coDecision,$('#co-decision-reason').value);$('#co-decision-reason').value='';await detailReload();status('Décision conservée dans l’historique.');}
+  catch(error){err(error);}finally{locked(false);}
+ });
 }
 async function bootstrap(){
  bind();
