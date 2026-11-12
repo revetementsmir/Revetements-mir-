@@ -72,7 +72,8 @@ Un retour arrière applicatif ne doit jamais supprimer des messages, demandes, p
 
 - autorisation explicite d’écriture MIR production;
 - validation de la sauvegarde et du mécanisme de restauration réel;
-- réconciliation détaillée des 38 migrations d’écart, sans assimiler les noms différents à des objets différents;
+- relecture finale du prévol production juste avant exécution; la chaîne métier
+  3A/3B/3C est désormais réconciliée et testée localement, sans fixtures;
 - inventaire et configuration des secrets production pour les seules fonctions promues;
 - plan de recette production avec comptes et destinataires autorisés;
 - décision séparée de fusion et de publication publique.
@@ -98,9 +99,37 @@ Vérification locale isolée :
   `mir-estimates` 62 889 octets, SHA-256
   `895d61748f06ac4209d95c94aa381eaf16513e5c886d6f719ac0256302ee626a`.
 
-Le test de la chaîne 3C sur un socle représentatif de production s’arrête
-volontairement avec SQLSTATE `55000`, « Phase 3C audited backend is absent or
-incomplete ». Cela confirme que la migration hébergée non versionnée
-`client_center_20261110` est le seul préalable SQL 3C à reconstruire; aucune
-garde n’a masqué l’écart. Résultats :
+## Actualisation promotion — 12 novembre 2026
+
+Le blocage SQLSTATE `55000` ci-dessus est historique et résolu dans le lot
+préparé. La migration hébergée `client_center_20261110` (version
+`20261110142928`) a été relue sur MIR TEST en lecture seule et reconstruite
+sans compte, membership, donnée client, secret ni fixture. Son contenu FAQ
+initial est séparé et non automatique.
+
+La chaîne réelle contient 16 migrations ordonnées. Deux dépendances ont été
+identifiées après le premier blocage : le RPC métier de recherche client,
+extrait d'une migration de recette, et l'alignement explicite des ACL finales.
+Les droits ne sont pas assouplis : `anon` est refusé sur tous les RPC
+authentifiés; seule la FAQ publique conserve son accès prévu.
+
+Preuve locale représentative :
+
+- 16/16 migrations appliquées dans l'ordre sur PGlite avec données fictives;
+- 7/7 assertions de chaîne;
+- deuxième exécution : 16 migrations reconnues par historique et empreinte,
+  aucune réapplication;
+- aucune perte, aucun doublon, aucun contenu initial injecté;
+- catalogue final identique aux définitions MIR TEST pour le périmètre;
+- vérificateur du paquet et des empreintes : 54/54.
+
+Les empreintes sont dans
+`ops/mir-promotion/migration-sha256.json` et les résultats dans
 `ops/mir-promotion/verification-results.json`.
+
+État sauvegarde : **scripts prêts**, mais **aucune sauvegarde/restauration
+production réellement vérifiée**. Il manque `pg_dump`, `pg_dumpall`,
+`psql`, un service libpq production autorisé et les accès nécessaires aux
+objets Storage/fonctions. Ces accès, l'autorisation d'écriture production et
+la décision distincte de fusion/publication restent les blocages d'exécution.
+MIR TEST n'a pas été remigré; production est intacte.

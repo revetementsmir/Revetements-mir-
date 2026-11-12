@@ -660,3 +660,31 @@ Preuves : `docs/verification/refonte-site-public/README.md` et `final/browser-re
 
 Preuve finale estimation MIR TEST : une demande fictive balisée a été soumise depuis le vrai formulaire avec la sélection quantité 2 conservée. Le double clic a produit un seul appel final, la confirmation « Demande reçue » a été affichée et un seul dossier serveur existe à l’état `received`. Le fournisseur courriel a accepté le message. Frederick Messely a confirmé la réception dans Gmail, l’ouverture du PDF joint et la présence des deux boîtes BECK; cette preuve utilisateur est distinguée de la recette automatisée. La route de recette accepte uniquement la destination dont l’empreinte est approuvée, sans modifier `MIR_ESTIMATE_TO`; le contrôle Admin, le mode diagnostics et le refus production demeurent obligatoires. Migrations TEST installées : `mir_estimate_recipe_enable` et `mir_estimate_recipe_result`; fonction TEST `mir-estimates` version 22. Recette d’estimation clôturée sur MIR TEST, production intacte.
 
+## 10. Lot de promotion préparé — 12 novembre 2026
+
+Le socle hébergé `client_center_20261110`, version
+`20261110142928`, est désormais versionné depuis l'historique SQL et les
+définitions MIR TEST relus en lecture seule. Le schéma ne contient aucune
+donnée, aucun compte, membership, secret ou fixture. Les FAQ initiales sont
+séparées dans `supabase/seed/client_center_initial_content.sql` et exclues de
+la promotion automatique.
+
+Le manifeste ordonne 16 migrations métier. Il inclut deux dépendances
+supplémentaires découvertes par la chaîne complète : le RPC de recherche client
+extrait de la recette 3C et une migration finale qui vérifie les empreintes des
+fonctions avant de fixer les ACL strictes. Aucun droit n'a été élargi pour les
+tests.
+
+Preuve locale : 7/7 contrôles, 16 migrations appliquées sur une base PGlite
+représentative avec données fictives; deuxième passage entièrement reconnu par
+historique et SHA-256; aucune perte, aucun doublon; catalogue conforme à MIR
+TEST; contenu initial non injecté. Le paquet et ses empreintes passent 54/54.
+
+État exact des sauvegardes : les scripts base/Storage et les bundles de
+fonctions sont prêts, mais aucune sauvegarde/restauration production n'a été
+exécutée ni vérifiée. Il manque dans cette session `pg_dump`,
+`pg_dumpall`, `psql`, un service libpq production autorisé et les accès
+nécessaires aux objets Storage/fonctions. La promotion reste non exécutée :
+aucune écriture production ou TEST, aucune fusion, aucun changement GitHub
+Pages et aucune publication.
+

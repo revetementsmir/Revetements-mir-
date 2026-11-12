@@ -4,7 +4,7 @@
 const fs=require('node:fs'),path=require('node:path');
 const {PGlite}=require('../../tools/database/node_modules/@electric-sql/pglite');
 const dir=path.resolve(__dirname,'../../supabase/migrations');
-async function baseline({hosted=true}={}){
+async function baseline({hosted=true,clientCenter=false}={}){
  const db=new PGlite();
  await db.exec(`create role anon;create role authenticated;create role service_role;
  create schema auth;create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}');
@@ -18,7 +18,7 @@ async function baseline({hosted=true}={}){
  // Phase-specific migrations are applied explicitly by their suites. Keeping
  // them out of the baseline also proves that a missing hosted-only prerequisite
  // fails closed instead of being silently manufactured by the fixture.
- for(const f of fs.readdirSync(dir).filter(f=>f.endsWith('.sql')&&!f.includes('mir_estimates')&&!f.includes('mir_estimate_recipe')&&!f.includes('chat_phase3a')&&!f.includes('chat_phase3b')&&!f.includes('phase3c')).sort())await db.exec(fs.readFileSync(path.join(dir,f),'utf8'));
+ for(const f of fs.readdirSync(dir).filter(f=>f.endsWith('.sql')&&!f.includes('mir_estimates')&&!f.includes('mir_estimate_recipe')&&!f.includes('chat_phase3a')&&!f.includes('chat_phase3b')&&!f.includes('phase3c')&&(clientCenter||!f.includes('client_center_20261110'))).sort())await db.exec(fs.readFileSync(path.join(dir,f),'utf8'));
  if(hosted){
   // Remove default on local 3-arg job_allowed before restoring hosted overloads.
   const fixture=require('./mir-chat-hosted-functions.json');
