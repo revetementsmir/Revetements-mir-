@@ -41,7 +41,7 @@ const server=http.createServer((req,res)=>{
     console.log('ANNOTATION',await page.locator('textarea').evaluateAll(es=>es.map(e=>({placeholder:e.placeholder,aria:e.getAttribute('aria-label')}))));
     console.log('ANNOTATION UI',(await page.locator('body').innerText()).slice(-9000));
     await page.getByPlaceholder('Qu’aimerais-tu changer ?').fill('Recette locale MIR : vérifier ce lien.');
-    await page.getByRole('button',{name:'Ajouter',exact:true}).click();
+    console.log('AFTER FILL',await page.locator('body').innerText()); await page.screenshot({path:path.resolve(__dirname,'../artifacts/annotation-debug.png')}); await page.locator('button').filter({hasText:/^Ajouter$/}).click({timeout:4000});
     assert(await page.getByText('Recette locale MIR : vérifier ce lien.',{exact:false}).count()>0);
     const plain=await context.newPage();
     await plain.setViewportSize({width:837,height:1180});await plain.goto(base+'index.html');
@@ -52,6 +52,22 @@ const server=http.createServer((req,res)=>{
     await page.evaluate(()=>window.MIRResponsive.workspace.setLayout('tablet'));await page.waitForTimeout(250);
     console.log('PREVIEW STYLES',await page.evaluate(measure));
     console.log('ERRORS',errors);
+    for (const route of ['realisations','contact','materiaux','boutique','produit','selection','pliage']) {
+      await page.goto(base+route+'.html?responsive=atelier');
+      await page.waitForSelector('html[data-mir-responsive="ready"]');
+      for(const layout of ['phone','tablet','web']) {
+        await page.evaluate(value=>window.MIRResponsive.workspace.setLayout(value),layout);
+        await page.waitForTimeout(150);
+        assert.equal(await page.locator('.mir-responsive-page').count(),1);
+        assert.equal(await page.locator('iframe').count(),0);
+        console.log('PAGE',route,layout,await page.locator('.mir-responsive-page').evaluate(e=>({width:e.clientWidth,scroll:e.scrollWidth})));
+        assert(await page.locator('.mir-responsive-page').evaluate(e=>e.scrollWidth<=e.clientWidth+2));
+      }
+    }
+    await page.goto(base+'production.html?responsive=atelier');
+    assert.equal(await page.locator('.preview-workspace').count(),0);
+    assert.equal(await page.locator('.mir-responsive-page').count(),0);
+    console.log('PASS: private production screen not mounted by public adapter');
     fs.mkdirSync(path.resolve(__dirname,'../artifacts'),{recursive:true});
     await page.screenshot({path:path.resolve(__dirname,'../artifacts/mir-responsive-phone.png')});
   }finally{await browser.close();server.close();}
