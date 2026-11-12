@@ -223,16 +223,18 @@
         const { data, error } = await sdk.rpc('mir_portal_snapshot');
         if (epoch !== generation || sequence !== readSequence || disposed) return null;
         if (error) throw errorOf(error);
-        const [operationsResponse,messagingResponse,punchResponse,expensesResponse,absencesResponse]=await Promise.all([
-          sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg}),sdk.rpc('mir_punch_snapshot',{org:internalOrg,employee:null}),sdk.rpc('mir_expense_snapshot',{org:internalOrg}),sdk.rpc('mir_absence_snapshot',{org:internalOrg})
+        const [operationsResponse,messagingResponse,punchResponse,expensesResponse,absencesResponse,notificationsResponse]=await Promise.all([
+          sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg}),sdk.rpc('mir_punch_snapshot',{org:internalOrg,employee:null}),sdk.rpc('mir_expense_snapshot',{org:internalOrg}),sdk.rpc('mir_absence_snapshot',{org:internalOrg}),sdk.rpc('mir_notification_center',{org:internalOrg,filter_name:'all',page_size:30,page_before:null})
         ]);
         if(operationsResponse.error)throw errorOf(operationsResponse.error);if(messagingResponse.error)throw errorOf(messagingResponse.error);
         if(punchResponse.error&&!missingRoutine(punchResponse))throw errorOf(punchResponse.error);
         if(expensesResponse.error&&!missingRoutine(expensesResponse))throw errorOf(expensesResponse.error);
         if(absencesResponse.error&&!missingRoutine(absencesResponse))throw errorOf(absencesResponse.error);
+        if(notificationsResponse.error&&!missingRoutine(notificationsResponse))throw errorOf(notificationsResponse.error);
         const punch=punchResponse.error?{enabled:false,settings:{},activeShift:null,week:[],corrections:[],bankBalance:0,unavailable:true}:punchResponse.data;
         const expenses=expensesResponse.error?{unavailable:true,role:null,categories:[],expenses:[]}:expensesResponse.data;
         const absences=absencesResponse.error?{unavailable:true,role:null,requests:[]}:absencesResponse.data;
+        const notifications=notificationsResponse.error?{unavailable:true,items:[],unreadCount:0,actionCount:0}:notificationsResponse.data;
         let lead=null,boss=null,logistics=null,management=null,boutiquePricing=null;
         if(operationsResponse.data?.role==='chef_equipe'){
           const response=await sdk.rpc('mir_lead_today_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
@@ -246,7 +248,7 @@
           const response=await sdk.rpc('mir_management_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);management=response.data;
           const prices=await sdk.rpc('mir_boutique_price_management',{org:internalOrg});if(prices.error)throw errorOf(prices.error);boutiquePricing=prices.data;
         }
-        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses,absences}, user.id);
+        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses,absences,notifications}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {
@@ -637,6 +639,9 @@
     async function absenceDecide(id,decision,reason='',requestId=uuid()){requireReady();const {data,error}=await sdk.rpc('mir_absence_decide',{org:internalOrg,request_key:requestId,absence_id:id,decision,reason});if(error)throw errorOf(error);await refresh();return data;}
     async function absenceCancel(id,requestId=uuid()){requireReady();const {data,error}=await sdk.rpc('mir_absence_cancel',{org:internalOrg,request_key:requestId,absence_id:id});if(error)throw errorOf(error);await refresh();return data;}
     async function absenceAttachmentURL(id){requireReady();const {data:access,error:accessError}=await sdk.rpc('mir_absence_attachment_access',{org:internalOrg,attachment_id:id});if(accessError||access?.bucket!=='mir-absence-files'||access?.expiresIn!==120)throw errorOf(accessError||{},'Cette pièce jointe ne peut pas être ouverte.');const {data,error}=await sdk.storage.from(access.bucket).createSignedUrl(access.path,access.expiresIn);if(error||!data?.signedUrl)throw errorOf(error||{},'Cette pièce jointe ne peut pas être ouverte.');return data.signedUrl;}
+    async function notificationCenter(filter='all',before=null,pageSize=30){requireReady();if(!['all','today','unread','actions'].includes(filter))fail('NOTIFICATION_FILTER','Filtre de notifications invalide.');const {data,error}=await sdk.rpc('mir_notification_center',{org:internalOrg,filter_name:filter,page_size:Math.min(50,Math.max(1,Number(pageSize)||30)),page_before:before});if(error)throw errorOf(error);return data;}
+    async function notificationState(ids,action,requestId=uuid()){requireReady();const list=[...new Set((ids||[]).filter(id=>UUID.test(id)))];if(!list.length||!['read','unread'].includes(action)||!UUID.test(requestId||''))fail('NOTIFICATION_ACTION','Action de notification invalide.');const {data,error}=await sdk.rpc('mir_notification_state',{org:internalOrg,request_id:requestId,notification_ids:list,action});if(error)throw errorOf(error);await refresh();return data;}
+    async function notificationPreferences(changes=null){requireReady();const {data,error}=await sdk.rpc('mir_notification_preferences',{org:internalOrg,changes});if(error)throw errorOf(error);return data;}
     // Phase3C help/support API begin.
     async function helpFAQ(){requireEnabled();const epoch=generation,{data,error}=await sdk.rpc(internalOrg?'mir_help_faq_scoped':'mir_help_faq',internalOrg?{org:internalOrg}:undefined);if(epoch!==generation)fail('SESSION_CHANGED','La session a changé.');if(error)throw errorOf(error);return Array.isArray(data)?data:[];}
     function requireSupport(){if(!status.user||!['ready','customer_ready'].includes(status.phase)||!internalOrg)fail('AUTH_REQUIRED','Connectez-vous pour ouvrir vos demandes.');return {epoch:generation,user:status.user.id};}
@@ -654,7 +659,7 @@
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, dispose,
       chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatFileURL, chatPhotoURL,
       helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }
