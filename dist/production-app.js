@@ -1351,7 +1351,7 @@ function addPiece(){
   legacyQuickId=null;
  }
  editingItemId=null;
- if(clientProfileWizard()){choose('profile','l');goClientStep(1);dialog('Pliage ajouté','Il reste dans votre commande pendant la suite du parcours.',`<div class="dialog-actions stacked"><button type="button" class="secondary-button" data-close-production-dialog>Choisir dans la banque de pliages</button><button type="button" class="secondary-button" data-new-client-custom>Ajouter un pliage sur mesure</button><a class="primary-button" href="chantier.html?view=orders">Vérifier ma commande</a></div>`);}
+ if(clientProfileWizard()){choose('profile','l');goClientStep(1);dialog('Pliage ajouté','Il reste dans votre commande pendant la suite du parcours.',`<div class="dialog-actions stacked"><button type="button" class="secondary-button" data-close-production-dialog>Choisir dans la banque de pliages</button><button type="button" class="secondary-button" data-new-client-custom>Ajouter un pliage sur mesure</button><a class="primary-button" href="chantier.html?view=orders">Vérifier ma commande</a></div>`);const choices=$('#production-dialog');choices.close();choices.show();}
  else {renderOrder();renderFormMetadata();updateDrawing();}
  toast(old?'Nouvelle révision enregistrée. La version précédente reste conservée.':id+(client?' ajouté au dossier.':order.poNumber?' ajouté au bon.':' enregistré dans le dossier local.'));
 }
