@@ -133,3 +133,21 @@ production réellement vérifiée**. Il manque `pg_dump`, `pg_dumpall`,
 objets Storage/fonctions. Ces accès, l'autorisation d'écriture production et
 la décision distincte de fusion/publication restent les blocages d'exécution.
 MIR TEST n'a pas été remigré; production est intacte.
+
+
+## Sauvegarde production vérifiée — 12 novembre 2026
+
+Résultats rapportés et vérifiés localement, sans révélation de secrets :
+
+- PostgreSQL production 17.11 accessible via le Session pooler ;
+- dumps complets, schéma, données, historique des migrations et rôles créés hors GitHub ;
+- cinq empreintes SHA-256 calculées ; archive complète lisible (1 340 entrées) ;
+- restauration complète réussie dans l’image officielle `supabase/postgres:17.11.0.018` ;
+- schémas restaurés : `auth` 27 tables, `mir_core` 99, `mir_estimates` 3, `storage` 10, `supabase_migrations` 1 ;
+- 34 migrations restaurées et 0 index invalide ;
+- Storage : `mir-internal` présent, privé et vide ; `mir-support` absent de production avant la promotion 3C ; aucun objet à télécharger ;
+- aucune écriture ou migration production exécutée.
+
+### Blocage de sécurité maintenu
+
+Le mot de passe PostgreSQL a été exposé pendant la manipulation. La promotion reste bloquée jusqu’à sa rotation et à la mise à jour de `MIR_PROD_DATABASE_URL`. Aucune fusion, publication, migration, écriture production ni déploiement Edge n’est autorisé par ce bilan.
