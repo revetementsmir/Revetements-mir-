@@ -120,6 +120,9 @@ async function verifyQuoteAndExports(browser,base,width){
  assert.equal(await next.isDisabled(),true,'référence spéciale incomplète bloquée');
  await page.locator('#special-color-system').fill('Nuancier client — à confirmer');
  await page.locator('#special-color-name').fill('Anthracite chantier test');
+ assert.equal(await page.locator('#production-quantity').inputValue(),'','aucune quantité implicite');
+ assert.equal(await next.isDisabled(),true,'la référence complète reste bloquée sans quantité');
+ await page.locator('#production-quantity').fill('1');
  assert.equal(await next.isEnabled(),true,'référence complète débloquée');
  await next.click();
  const item=await page.evaluate(()=>{
@@ -129,6 +132,7 @@ async function verifyQuoteAndExports(browser,base,width){
  assert.ok(item&&item.snapshot?.schema==='mir-production-instance-1','instantané de pièce et dessin conservé');
  assert.equal(item.spec.material.type,'aluminium');
  assert.equal(item.spec.finish.code,'QC-CHANTIER-TEST-04');
+ assert.equal(item.spec.quantity,1);
  assert.equal(Number(item.spec.length),120);
  assert.equal(item.spec.coloredFace.side,'right');
  assert.equal(await page.locator('[data-production-item]').count(),1,'une seule pièce créée');
