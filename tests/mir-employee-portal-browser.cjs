@@ -44,8 +44,8 @@ const base='http://127.0.0.1:'+server.address().port;
 let browser;
 try {
 browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN});
-for(const width of [320,360,390,768,820,1024,1440]){
-  const page=await browser.newPage({viewport:{width,height:width<=390?760:900},isMobile:width<=390,hasTouch:width<=390});
+for(const [width,height] of [[320,760],[360,800],[390,844],[768,1024],[820,900],[1024,900],[1366,768],[1440,900]]){
+  const page=await browser.newPage({viewport:{width,height},isMobile:width<=390,hasTouch:width<=390});
   page.setDefaultTimeout(10000);
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/catalogue-fd6866b49d21.json',r=>r.fulfill({json:[]}));
@@ -59,22 +59,32 @@ for(const width of [320,360,390,768,820,1024,1440]){
   await page.locator('.employee-current-job h1').waitFor();
   assert.equal(await page.locator('.employee-quick-grid > button').count(),4);
   assert.equal(await page.locator('#portal-navigation > button').count(),4);
-  assert.equal(await page.locator('#portal-navigation').isVisible(),true);
+  assert.equal(await page.locator('#portal-navigation').isVisible(),false);
+  assert.equal(await page.locator('.portal-sidebar').isVisible(),false);
+  const openPortalView=async view=>{await page.locator('.mir-harmony-toggle').click();await page.locator(`#portal-navigation [data-view="${view}"]`).click();};
   assert.equal(await page.getByRole('button',{name:/Messages/}).count(),1);
   assert.equal(await page.locator('#employee-job-switch option').count(),2);
   await noOverflow();
-  await page.locator('#portal-navigation [data-view="account"]').click();
+  if([390,768,1366,1440].includes(width)){fs.mkdirSync('docs/verification/god-mode-client',{recursive:true});await page.screenshot({path:`docs/verification/god-mode-client/portail-entete-${width}x${height}.png`,fullPage:true});}
+  if(width===390){
+    await page.getByRole('button',{name:'Aide et soutien'}).click();
+    await page.locator('.mir-help-faq details').first().waitFor();
+    assert.ok(await page.locator('.mir-help-faq details').count()>=4,'la FAQ essentielle reste disponible');
+    await page.context().setOffline(true);await page.getByText(/Hors ligne/).first().waitFor();
+    await page.context().setOffline(false);await page.locator('.mir-help-close').click();
+  }
+  await openPortalView('account');
   await page.getByRole('button',{name:/Mes dépenses et reçus/}).click();
   await page.getByRole('heading',{name:'Dépenses et reçus'}).waitFor();
   await page.locator('#expense-draft-form').waitFor();
   await noOverflow();
-  if([390,768,1440].includes(width)){fs.mkdirSync('artifacts/phase4-expenses',{recursive:true});await page.screenshot({path:`artifacts/phase4-expenses/MIR-expenses-navigation-${width}.png`});}
-  await page.locator('#portal-navigation [data-view="day"]').click();
+  if([390,768,1366,1440].includes(width))await page.screenshot({path:`docs/verification/god-mode-client/phase4-depenses-${width}x${height}.png`,fullPage:true});
+  await openPortalView('day');
   await page.getByRole('button',{name:/Messages/}).click();
   await page.locator('[data-conversation]').click();
   await page.getByText('Plan mis à jour',{exact:true}).waitFor();
   assert.match(await page.locator('.message-list article small').innerText(),/Lu par 1 sur 1/);
-  await page.locator('#portal-navigation [data-view="day"]').click();
+  await openPortalView('day');
   await page.getByRole('button',{name:/Historique, notes et photos/}).click();
   await page.locator('#portal-dialog[open]').waitFor();
   await page.keyboard.press('Escape');

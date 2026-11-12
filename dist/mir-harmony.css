@@ -23,6 +23,10 @@ html body>header#mir-harmony-header{box-sizing:border-box;position:relative;z-in
 #mir-harmony-header #portal-navigation{position:static!important;display:flex!important;flex-direction:column!important;gap:6px!important;width:100%!important;padding:0!important;border:0!important}
 #mir-harmony-header #portal-navigation button{gap:10px;text-align:left}
 #mir-harmony-header #portal-navigation svg{width:20px;height:20px;flex-shrink:0}
+body:has(#mir-harmony-header #portal-navigation) .portal-shell{grid-template-columns:minmax(0,1fr)!important;max-width:1280px}
+body:has(#mir-harmony-header #portal-navigation){padding-bottom:0!important}
+body:has(#mir-harmony-header #portal-navigation) .mobile-cart-bar{bottom:12px!important}
+body:has(#mir-harmony-header #portal-navigation) #portal-toast{bottom:22px!important}
 body[data-portal-mode=employee] #mir-harmony-header .mir-client-links,body[data-portal-mode=employee] #mir-harmony-header .mir-client-actions{display:none!important}
 @media(max-width:600px){body:not([data-mir-workspace]) #production-drawing:has(svg[data-panel-face]){height:auto;min-height:0;max-height:none}body:not([data-mir-workspace]) #production-drawing svg[data-panel-face]{display:block;width:100%;height:auto!important;max-height:none!important;aspect-ratio:400/550}}
 /* These legacy workshop selectors hid navigation during touch drawing. Their
