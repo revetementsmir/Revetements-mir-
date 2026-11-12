@@ -95,7 +95,7 @@
   }
   function commandSpec(command, raw = {}) {
     const fields = {
-      CREATE_ORDER: ['jobId', 'lines', 'note', 'deliveryMode'], SET_FAVORITE: ['itemId', 'favorite'],
+      CREATE_ORDER: ['jobId', 'jobReference', 'lines', 'note', 'deliveryMode'], SET_FAVORITE: ['itemId', 'favorite'],
       EXTRA_SUBMIT: ['jobId','description','photoPath','dueAt'], DELIVERY_ISSUE: ['jobId','orderId','lineId','supplierOrderId','comment','photoPath'],
       DELIVERY_RECEIVE: ['jobId','orderId','lineId','quantity','place','photoPath'], HR_SUBMIT: ['kind','start','end','note'],
       MESSAGE_SEND: ['conversationId','body','jobId','planDocumentId','attachmentPath'], MESSAGE_ACK: ['messageId','state'],NOTIFICATION_READ:['notificationId'],
@@ -107,7 +107,7 @@
     if (!fields) fail('COMMAND_UNKNOWN', 'Cette action n’est pas proposée dans le portail connecté.');
     const payload = Object.fromEntries(fields.filter(key => raw[key] !== undefined).map(key => [key, clone(raw[key])]));
     if (command === 'CREATE_ORDER' && Array.isArray(payload.lines))
-      payload.lines = payload.lines.map(line => Object.fromEntries(['itemId', 'quantity', 'colorId', 'formatId', 'dimensionsIn']
+      payload.lines = payload.lines.map(line => Object.fromEntries(['itemId', 'quantity', 'colorId', 'formatId', 'dimensionsIn', 'specification']
         .filter(key => line[key] !== undefined && line[key] !== null).map(key => [key, line[key]])));
     if (command === 'SET_FAVORITE' && typeof payload.favorite !== 'boolean') fail('FAVORITE_REQUIRED', 'Précisez le choix du favori.');
     return payload;

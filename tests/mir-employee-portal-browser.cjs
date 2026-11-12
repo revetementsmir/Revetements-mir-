@@ -93,14 +93,18 @@ for(const [width,height] of [[320,760],[360,800],[390,844],[768,1024],[820,900],
   await page.locator('#catalogue-category').selectOption('soffites-moulures');
   await page.getByRole('searchbox',{name:'Rechercher un article'}).fill('dépArt');
   const starter=page.locator('[data-product="mir-starter-10ft"]');
+  assert.equal(await starter.locator('[data-product-qty]').inputValue(),'','aucune quantité implicite');
   await starter.getByRole('button',{name:'Ajouter',exact:true}).click();
-  const firstJob=await page.locator('#order-job').inputValue(),secondJob=await page.locator('#order-job option').nth(1).getAttribute('value');
+  assert.equal(await page.locator('[data-scroll-cart]').count(),0,'une quantité vide ne peut pas être ajoutée');
+  await starter.locator('[data-product-qty]').fill('2');
+  await starter.getByRole('button',{name:'Ajouter',exact:true}).click();
+  const firstJob=await page.locator('#order-job').inputValue(),secondJob=await page.locator('#order-job option').nth(2).getAttribute('value');
   await page.locator('#order-job').selectOption(secondJob);
   assert.equal(await page.locator('[data-scroll-cart]').count(),0,'le deuxième job ne reprend pas le panier du premier');
   await page.locator('#order-job').selectOption(firstJob);
   assert.equal(await page.locator('[data-scroll-cart]').count(),1,'le brouillon du premier job est conservé');
   await page.getByRole('button',{name:'Vérifier',exact:true}).click();
-  await page.getByRole('heading',{name:'Vérifier la demande'}).waitFor();
+  await page.getByRole('heading',{name:'Vérifier ma commande'}).waitFor();
   assert.equal(await page.locator('#employee-browse').isVisible(),false);
   await noOverflow();
   const qty=page.locator('[data-cart-qty]');
@@ -112,8 +116,8 @@ for(const [width,height] of [[320,760],[360,800],[390,844],[768,1024],[820,900],
   assert.equal(await qty.inputValue(),'3');
   assert.equal(await page.getByLabel('Réception').inputValue(),'pickup');
   assert.equal(await page.getByLabel('Note pour l’équipe').inputValue(),'Fixture seulement');
-  if(width===390){fs.mkdirSync('artifacts',{recursive:true});await page.screenshot({path:'artifacts/MIR-panier-job-390.png',fullPage:true});}
-  await page.getByRole('button',{name:'Envoyer ma demande'}).click();
+  if([390,768,1440].includes(width)){fs.mkdirSync('docs/verification/ux-commandes-pliages',{recursive:true});await page.screenshot({path:`docs/verification/ux-commandes-pliages/panier-${width}x${height}.png`,fullPage:true});}
+  await page.getByRole('button',{name:'Envoyer ma commande'}).click();
   await page.getByRole('heading',{name:'Mes commandes'}).waitFor();
   assert.equal(await page.locator('.order-info').filter({hasText:'Fixture seulement'}).count(),1);
   await noOverflow();
