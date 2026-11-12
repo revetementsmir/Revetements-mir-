@@ -1,7 +1,6 @@
 name: MIR Phase 7 Notifications — recette réelle TEST
 
 on:
-  pull_request:
   workflow_dispatch:
 
 permissions:

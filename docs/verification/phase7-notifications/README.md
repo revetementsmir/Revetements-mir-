@@ -1,6 +1,6 @@
 # Phase 7 — Notifications
 
-Branche de preuve: `codex/phase-7-notifications`. Le SHA exact est celui de la tête de PR citée dans Atelier et dans le rapport de promotion. Cible distante autorisée pour la recette: MIR TEST `hxtztkmbfpmzrieccwsg` seulement.
+Branche de preuve: `codex/phase-7-notifications`. Cible distante autorisée pour la recette: MIR TEST `hxtztkmbfpmzrieccwsg` seulement.
 
 ## Architecture
 
@@ -47,8 +47,13 @@ Une ancienne notification dont la cible est archivée ou devenue interdite reste
 - Non-régressions ciblées: Phase 6 7/7, UX Commandes/Pliages, client→serveur, Aujourd’hui 7/7, Signature 9/9, Pages 41/41, navigation, session Auth et modules optionnels.
 - `git diff --check`: réussi avant commit.
 
-## Limites avant certification distante
+## Certification MIR TEST
 
-- La migration n’est pas appliquée à MIR TEST tant que la CI de la PR n’est pas entièrement verte, conformément au mandat.
-- La recette six rôles réelle et Realtime ne sont donc pas encore revendiqués. Le centre se replie honnêtement sur actualisation/rechargement; aucun faux temps réel.
-- Aucun courriel ou push envoyé. Aucune requête ou écriture Supabase production.
+- Projet vérifié explicitement: `hxtztkmbfpmzrieccwsg`; le ref production interdit n’a jamais été ciblé.
+- Migration appliquée après CI verte, puis rejouée intégralement avec succès.
+- Structure relue: trois RPC, RLS active, neuf index Phase 7/notifications, zéro droit RPC `anon`.
+- Recette réelle: 11 contrôles, six rôles authentifiés, isolation des six rôles sur une organisation étrangère, destinataires de gestion calculés au serveur, lecture/non-lecture, préférences, idempotence et refus `anon` réussis.
+- Une commande balisée `RECETTE-PHASE7` a été créée uniquement dans MIR TEST afin de provoquer un événement canonique. Le rejeu a retourné la même commande et aucun fournisseur n’a été contacté.
+- Audit Supabase final: aucune alerte sécurité liée aux tables Phase 7; le seul avis propre au lot est l’index `notification_events_actor` encore inutilisé immédiatement après sa création.
+- Le centre utilise rechargement/actualisation comme repli; aucun faux temps réel n’est revendiqué.
+- Aucun courriel ou push envoyé. Zéro requête et zéro écriture Supabase production.
