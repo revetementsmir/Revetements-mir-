@@ -121,7 +121,7 @@ create or replace function mir_core.notification_emit(
 ) returns uuid language plpgsql security definer set search_path=pg_catalog,mir_core as $$
 declare eid uuid;target uuid;essential boolean:=priority in('action_required','urgent');
 begin
- if auth.uid() is null or actor is distinct from auth.uid() or not exists(select 1 from mir_core.memberships where organization_id=org and user_id=actor and active) then raise exception 'Émetteur MIR refusé' using errcode='42501';end if;
+ if actor is null or not exists(select 1 from mir_core.memberships where organization_id=org and user_id=actor and active) or(auth.uid() is not null and actor is distinct from auth.uid()) then raise exception 'Émetteur MIR refusé' using errcode='42501';end if;
  if module not in('orders','folds','absences','expenses','punch','jobs','chat','support','inventory') or priority not in('information','action_required','urgent') or length(p_event_key) not between 8 and 240 then raise exception 'Événement invalide' using errcode='22023';end if;
  insert into mir_core.notification_events(organization_id,event_key,module,event_type,entity_id,actor_id,title,summary,priority,route,metadata)
  values(org,p_event_key,module,event_type,entity,actor,left(title,160),left(coalesce(summary,''),400),priority,coalesce(route,'{}'),coalesce(metadata,'{}'))

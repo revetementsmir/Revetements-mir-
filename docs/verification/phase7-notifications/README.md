@@ -8,6 +8,7 @@ Branche de preuve: `codex/phase-7-notifications`. Le SHA exact est celui de la t
 - `mir_core.notifications` reste la table canonique existante des destinataires et porte désormais l’état individuel (lu, action requise, traité).
 - `mir_core.notification_preferences` conserve uniquement les catégories non essentielles par utilisateur et organisation.
 - `mir_core.notification_emit` calcule les destinataires depuis les memberships, rôles opérationnels et affectations serveur. Le navigateur ne fournit jamais de destinataire ou de rôle.
+- Les événements du worker fournisseur acceptent uniquement l’auteur canonique membre actif déjà inscrit dans `order_events`; une session utilisateur présente doit toujours correspondre à cet auteur. Le worker n’obtient aucun droit client supplémentaire.
 - Les insertions historiques sont normalisées dans la transaction par un adaptateur de compatibilité. Les événements `order_events` de Phase 6 sont raccordés explicitement dans leur transaction.
 - Trois RPC publiques minimales: liste/compteurs paginés, état lu/non lu, préférences. Les tables restent privées et RLS est fail-closed.
 - Aucun transport courriel, push, SMTP, webhook fournisseur ou permission navigateur n’est installé.
