@@ -64,7 +64,7 @@ async function main(){
       if(size.name==='mobile'){
         const menu=page.locator('.mir-client-menu-toggle');
         await menu.click();
-        await page.locator('nav').getByRole('link',{name:'Nous joindre'}).click();
+        await page.locator('nav').getByRole('link',{name:'Contact'}).click();
         await page.waitForURL('**/contact.html');
         assert.ok(await page.locator('a[href="tel:+14188429859"]').isVisible());
         assert.ok(await page.locator('main a[href="estimation.html"]').isVisible());
