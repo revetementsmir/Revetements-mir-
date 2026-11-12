@@ -45,6 +45,8 @@ async function runAt(browser,base,width){
  await page.locator('#special-color-system').fill('Nuancier spécial Québec test');
  await page.locator('#special-color-code').fill('QC-TEST-NOIR-2026');
  await page.locator('#special-color-name').fill('Noir personnalisé');
+ assert.equal(await page.locator('#production-quantity').inputValue(),'');
+ await page.locator('#production-quantity').fill('2');
  await next.click();
  if(await page.locator('#production-dialog[open]').count())await page.getByRole('button',{name:'Fermer la fenêtre'}).click();
  await page.locator('#client-viewport-dossier').click();
@@ -56,6 +58,7 @@ async function runAt(browser,base,width){
  const original=await page.evaluate(()=>JSON.parse(localStorage.getItem('mir_production_client_dossier_v1')).order);
  assert.equal(original.items.length,1);
  assert.equal(original.items[0].spec.finish.code,'QC-TEST-NOIR-2026');
+ assert.equal(original.items[0].spec.quantity,2);
  assert.equal(original.items[0].snapshot.schema,'mir-production-instance-1');
  const material=await page.evaluate(async()=>{
   const response=await fetch('catalogue-fd6866b49d21.json');
