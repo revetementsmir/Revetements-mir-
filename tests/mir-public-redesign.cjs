@@ -9,7 +9,7 @@ const menu=read('mir-public-menu.js'),commerce=read('commerce.js');
 
 for(const page of pages){
   const html=read(page+'.html');
-  assert.match(html,/mir-public-menu\.js\?v=public-shell-2/,page);
+  assert.match(html,/mir-public-menu\.js\?v=public-shell-3/,page);
   assert.match(html,/mir-public-menu\.css\?v=2/,page);
 }
 assert.match(menu,/\['index\.html','Accueil'/);
