@@ -94,7 +94,7 @@ async function main(){
         const box=footer?.getBoundingClientRect();
         const hero=document.querySelector('.shop-hero'),copy=hero?.querySelector('.shop-hero-copy');
         const frame=hero?.getBoundingClientRect(),content=copy?.getBoundingClientRect();
-        return {compact:innerWidth<=760&&!!document.querySelector('header[data-mir-public-shell]'),theme:document.body.classList.contains('mir-signature'),css,
+        return {compact:innerWidth<=1100&&!!document.querySelector('header[data-mir-public-shell]'),theme:document.body.classList.contains('mir-signature'),css,
           accent:getComputedStyle(document.body).getPropertyValue('--mir-accent').trim(),
           paper:getComputedStyle(document.body).getPropertyValue('--mir-surface').trim(),
           footer:box?.width>0&&box.left>=0&&box.right<=innerWidth&&footer.querySelectorAll('nav a').length===5,
