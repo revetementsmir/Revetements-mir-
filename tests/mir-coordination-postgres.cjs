@@ -25,6 +25,8 @@ const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
   for(const file of ['202611070006_warehouse_stock_qr.sql','202611070007_order_coordination.sql','202611070008_order_coordination_operations.sql','202611070009_order_supplier_purchases.sql'])
    await db.exec(fs.readFileSync(path.join(ROOT,'proposals',file),'utf8'));
   await db.exec(fs.readFileSync(path.join(dir,'20261124120000_phase6_commandes.sql'),'utf8'));
+  await db.exec(fs.readFileSync(path.join(dir,'20261124123000_phase6_commandes_roles.sql'),'utf8'));
+  await db.exec(fs.readFileSync(path.join(dir,'20261124124500_phase6_commandes_roles_fail_closed.sql'),'utf8'));
   ok('Migration Phase 6 rejouée sans perte ni doublon');
   ok('Installation des migrations Commandes/Entrepôt dans PostgreSQL jetable');
   await db.exec("insert into auth.users(id) values('"+[admin,employee,assistant,warehouse].join("'),('")+"');");
