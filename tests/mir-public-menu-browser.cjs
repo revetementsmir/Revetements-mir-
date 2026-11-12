@@ -49,7 +49,7 @@ const sizes=[
         const header=page.locator('header.mir-home-header');
         const menu=header.locator('.mir-client-menu-toggle');
         const nav=header.locator('nav.mir-client-links');
-        const account=header.getByRole('link',{name:'Mon compte'});
+        const account=header.getByRole('link',{name:'Compte'});
         const label=route+' '+size.name;
         const small=size.width<=760;
         await menu.waitFor({state:'attached'});
