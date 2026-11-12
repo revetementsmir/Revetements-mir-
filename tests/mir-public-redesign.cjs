@@ -16,7 +16,7 @@ assert.match(menu,/\['index\.html','Accueil'/);
 assert.match(menu,/\['boutique\.html','Boutique'/);
 assert.match(menu,/\['pliage\.html','Pliage'/);
 assert.match(menu,/\['chantier\.html\?view=orders','Commandes'/);
-assert.match(menu,/\['chantier\.html','Compte'/);
+assert.match(menu,/\['chantier\.html\?view=account','Compte'/);
 for(const label of ['Réalisations','Aide','Contact'])assert.match(menu,new RegExp(`'${label}'`));
 assert.match(menu,/mir-public-cart/);
 assert.match(commerce,/Ajouter au panier/);
