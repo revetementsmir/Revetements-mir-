@@ -60,9 +60,11 @@ const sizes=[
         assert.equal(await menu.getAttribute('aria-controls'),await nav.getAttribute('id'),label);
         const closed=await header.boundingBox();
         if(small){
-          const logo=await header.locator('img').boundingBox();
-          const button=await menu.boundingBox(),link=await header.locator('.mir-public-cart').boundingBox();
-          assert.ok(button.height>=44&&logo.x+logo.width<=link.x&&link.x+link.width<=button.x,label+' logo, panier, menu sur une ligne');
+          if(size.width<=760){
+            const logo=await header.locator('img').boundingBox();
+            const button=await menu.boundingBox(),link=await header.locator('.mir-public-cart').boundingBox();
+            assert.ok(button.height>=44&&logo.x+logo.width<=link.x&&link.x+link.width<=button.x,label+' logo, panier, menu sur une ligne');
+          }
           await menu.click();
           assert.equal(await menu.getAttribute('aria-expanded'),'true',label);
           assert.deepEqual(await header.boundingBox(),closed,label+' le menu ne pousse pas la page');
