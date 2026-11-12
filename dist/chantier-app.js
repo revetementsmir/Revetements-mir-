@@ -61,9 +61,14 @@
   async function act(type,payload={}) {
     try {
       if(!isDemo()){
-        const command=type==='TOGGLE_FAVORITE'?'SET_FAVORITE':type;
-        const data=type==='TOGGLE_FAVORITE'?{itemId:payload.itemId,favorite:!favoriteIds().includes(payload.itemId)}:payload;
-        const out=await portalClient.command(command,data);state=out.snapshot;syncOperation();return {...out,state};
+        if(type==='TOGGLE_FAVORITE'){
+          const item=itemById(payload.itemId),favorite=!favoriteIds().includes(payload.itemId),kind=isFold(item)?'fold':'material';
+          const result=await portalClient.setOrderShortcut(kind,payload.itemId,favorite);
+          if(result.offline){const ids=state.favorites[actorId]||(state.favorites[actorId]=[]),index=ids.indexOf(payload.itemId);if(favorite&&index<0)ids.push(payload.itemId);if(!favorite&&index>=0)ids.splice(index,1);save();}
+          else state=portalClient.getStatus().snapshot;
+          syncOperation();return {ok:true,result,state};
+        }
+        const out=await portalClient.command(type,payload);state=out.snapshot;syncOperation();return {...out,state};
       }
       const out=model.reduce(state,{type,actorId,at:new Date().toISOString(),requestId:requestId(),...payload});
       if(!out.ok){toast(errorMessage(out.error));return out;}state=out.state;save();return out;
@@ -847,7 +852,7 @@
     if(form.id==='lead-problem-form'){const photo=data.get('photo'),job=leadJob(),photoPath=photo?.size?await portalClient.uploadInternal(photo,'problem',job.id):'';await portalClient.leadAction('field_issue',{note:String(data.get('note')||''),urgency:String(data.get('urgency')||'normal'),photoPath});closeDialog();toast('Problème signalé.');return;}
     if(form.id==='lead-report-form'){await portalClient.leadAction('daily_report',{workDone:String(data.get('workDone')||''),hadProblem:data.get('hadProblem')==='true',missingMaterial:data.get('missingMaterial')==='true',photoPaths:[],comment:String(data.get('comment')||'')});closeDialog();toast('Rapport envoyé. Bonne fin de journée.');return;}
     if(form.id==='create-job-form'){const out=await act('CREATE_JOB',{name:String(data.get('name')||'').trim(),address:String(data.get('address')||'').trim()});if(!out.ok)showFormError(out.error);else{closeDialog();setView('projects');toast('Chantier créé. Attribuez-le aux membres de votre équipe.');}return;}
-    if(form.id==='create-order-form'){const cart=currentCart();if(!cart.length)return;const jobId=currentJobId(),jobReference=jobId?'':String(data.get('jobReference')||'Je ne connais pas le numéro').trim();const out=await act('CREATE_ORDER',{jobId:jobId||undefined,jobReference,lines:cart.map(({cartKey,unifiedKind,snapshot,...line})=>line),note:String(data.get('note')||''),deliveryMode:String(data.get('deliveryMode')||'delivery')});if(out.ok){ui.carts[cartKeyFor()]=[];window.MIRUnifiedOrderCart?.clear?.();deliveryDraft={mode:'delivery',note:''};jobReferenceDraft='';save();orderFilter='pending';setView(mode==='admin'?'admin-orders':'orders',{focus:true});toast(isDemo()?'Demande enregistrée dans l’aperçu.':'Votre commande a été transmise à MIR.');}return;}
+    if(form.id==='create-order-form'){const cart=currentCart();if(!cart.length)return;const jobId=currentJobId(),jobReference=jobId?'':String(data.get('jobReference')||'Je ne connais pas le numéro').trim(),payload={jobId:jobId||undefined,jobReference,lines:cart.map(({cartKey,unifiedKind,snapshot,...line})=>line),note:String(data.get('note')||''),deliveryMode:String(data.get('deliveryMode')||'delivery')};if(!isDemo()){try{const receipt=await portalClient.submitOrder(payload);if(receipt.offline){toast('Hors ligne : le brouillon est conservé et sera soumis une seule fois à la reconnexion.');return;}await portalClient.refresh();state=portalClient.getStatus().snapshot;ui.carts[cartKeyFor()]=[];window.MIRUnifiedOrderCart?.clear?.();deliveryDraft={mode:'delivery',note:''};jobReferenceDraft='';save();orderFilter='pending';setView('orders',{focus:true});toast('Votre commande a été transmise à MIR.');}catch(error){showFormError(errorMessage(error));}return;}const out=await act('CREATE_ORDER',payload);if(out.ok){ui.carts[cartKeyFor()]=[];window.MIRUnifiedOrderCart?.clear?.();deliveryDraft={mode:'delivery',note:''};jobReferenceDraft='';save();orderFilter='pending';setView(mode==='admin'?'admin-orders':'orders',{focus:true});toast('Demande enregistrée dans l’aperçu.');}return;}
     if(['extra-form','delivery-issue-form','hr-form'].includes(form.id)){
       if(isDemo()){ui.demoSubmissions=ui.demoSubmissions||[];ui.demoSubmissions.push({type:form.id,jobId:form.dataset.job||currentJobId(),kind:form.dataset.kind||'',at:new Date().toISOString()});save();closeDialog();toast('Demande enregistrée dans l’aperçu local.');return;}
       const photo=data.get('photo'),scope=form.id==='extra-form'?'extra':'issue',photoPath=photo?.size?await portalClient.uploadInternal(photo,scope,currentJobId()):'';

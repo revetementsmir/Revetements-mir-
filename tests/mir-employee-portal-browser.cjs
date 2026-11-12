@@ -30,11 +30,20 @@ window.MIRPortalClient={...window.MIRPortalClient,create({config}){
   state.expenses={role:'employe_chantier',categories:[{code:'materials',label:'Matériaux'}],expenses:[]};
   let publish=()=>{};
   const ready=()=>({phase:'ready',snapshot:state});
-  return {config,getStatus:()=>({phase:'loading'}),subscribe(fn){publish=fn;},async start(){publish(ready());},
+  return {config,getStatus:()=>ready(),subscribe(fn){publish=fn;},async start(){publish(ready());},
     async refresh(){publish(ready());},async command(command,payload){
       const out=model.reduce(state,{...payload,type:command,actorId,at:new Date().toISOString(),requestId:crypto.randomUUID()});
       if(!out.ok)throw new Error(out.error?.message);
       state={...out.state,actorId};publish({...ready(),reason:'command'});return {...out,snapshot:state};
+    },async submitOrder(payload){
+      const out=model.reduce(state,{...payload,type:'CREATE_ORDER',actorId,at:new Date().toISOString(),requestId:crypto.randomUUID()});
+      if(!out.ok)throw new Error(out.error?.message);
+      state={...out.state,actorId};publish({...ready(),reason:'order-submit'});
+      return {orderId:state.orders.at(-1)?.id,receiptId:crypto.randomUUID(),status:'submitted'};
+    },async setOrderShortcut(kind,itemId,favorite){
+      const out=model.reduce(state,{type:'SET_FAVORITE',actorId,itemId,favorite,at:new Date().toISOString(),requestId:crypto.randomUUID()});
+      if(!out.ok)throw new Error(out.error?.message);
+      state={...out.state,actorId};publish({...ready(),reason:'shortcut'});return {kind,itemId,favorite};
     }};
 }};`;
 (async()=>{

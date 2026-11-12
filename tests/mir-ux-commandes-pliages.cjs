@@ -17,7 +17,7 @@ assert.ok(cart.duplicate(fold.id));assert.equal(cart.counts().folds,2);
 cart.remove('material-1');assert.deepEqual({...cart.counts()},{materials:0,folds:2});
 cart.clear();assert.equal(cart.list().length,0);assert.ok(events.length>=6);
 
-const app=fs.readFileSync('dist/chantier-app.js','utf8'),production=fs.readFileSync('dist/production-app.js','utf8'),sql=fs.readFileSync('supabase/migrations/20261125120000_phase6_commandes_ux_pliages.sql','utf8');
+const app=fs.readFileSync('dist/chantier-app.js','utf8'),portal=fs.readFileSync('dist/portal-client.js','utf8'),production=fs.readFileSync('dist/production-app.js','utf8'),sql=fs.readFileSync('supabase/migrations/20261125120000_phase6_commandes_ux_pliages.sql','utf8'),serverSql=fs.readFileSync('supabase/migrations/20261125130000_phase6_commandes_ux_server_contract.sql','utf8');
 assert.match(app,/production\.html\?mode=client&source=store&kind=profile/);
 assert.match(app,/value="" placeholder="Quantité" required/);
 assert.match(app,/Chantier à confirmer/);
@@ -25,5 +25,9 @@ assert.match(app,/maximum 6/);
 assert.match(production,/MIRUnifiedOrderCart\?\.upsert/);
 assert.match(production,/Indiquez une quantité entière supérieure à zéro/);
 for(const required of ['enable row level security','user_id=auth.uid()','Maximum de six favoris atteint','pending_job_match_status','grant execute'])assert.match(sql,new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i'));
+for(const required of ['mir_order_create_submit','mir_order_shortcut_update','mir_order_draft_save','originalReference','receiptId','supplierSent'])assert.match(serverSql,new RegExp(required,'i'));
+assert.match(portal,/operation\.command==='CREATE_ORDER'[\s\S]*mir_order_create_submit/);
+assert.match(portal,/mir_order_shortcut_update/);assert.doesNotMatch(portal,/p_command:\s*['"]SET_FAVORITE/);
 assert.doesNotMatch(sql,/service_role|supabase\.co|gccltmaulvrnthrbnrpd|hxtztkmbfpmzrieccwsg/);
+assert.doesNotMatch(serverSql,/service_role|supabase\.co|gccltmaulvrnthrbnrpd|hxtztkmbfpmzrieccwsg/);
 console.log('UX Commandes + Pliages: panier, quantité, favoris, chantier et sécurité OK');

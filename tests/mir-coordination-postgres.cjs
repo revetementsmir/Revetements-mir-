@@ -30,6 +30,8 @@ const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
   await db.exec(fs.readFileSync(path.join(dir,'20261124130000_phase6_commandes_warehouse_role.sql'),'utf8'));
   const uxSql=fs.readFileSync(path.join(dir,'20261125120000_phase6_commandes_ux_pliages.sql'),'utf8');
   await db.exec(uxSql);await db.exec(uxSql);
+  const uxServerSql=fs.readFileSync(path.join(dir,'20261125130000_phase6_commandes_ux_server_contract.sql'),'utf8');
+  await db.exec(uxServerSql);await db.exec(uxServerSql);
   ok('Migration Phase 6 rejouée sans perte ni doublon');
   ok('Installation des migrations Commandes/Entrepôt dans PostgreSQL jetable');
   await db.exec("insert into auth.users(id) values('"+[admin,employee,assistant,warehouse].join("'),('")+"');");
