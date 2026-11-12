@@ -1,8 +1,8 @@
 {
   "sha": "39de53260a134bae48143c1bdb1aa235335d6187",
   "files": {
-    "dist/mir-harmony.css": "3d2b41ca6b6fe50b73cc278a0644396612841b2b899858b78828f4af8b6fb8c5",
-    "dist/mir-harmony.js": "6efc250fb7499dc2ba11849d078ed68fefc9eee4ac69748bd47903f25dcfeff7",
+    "dist/mir-harmony.css": "8e39cfd38f49575d5b26304b1bd1e81eced6678aa3111e93ade93666a1467dd6",
+    "dist/mir-harmony.js": "320025bb12ecbb764c79eb6f70d528b8b24fb78c6980dee381c484358b18621a",
     "dist/mir-today.js": "6574167d661ed965cf0cde1f5de1082331a96d6ff7e6e110090bae5ea742d490",
     "dist/mir-today.css": "a25b18b2dfa065be10e7f942d4532afbfff24f170d5a7c53322a0001c9850c0a",
     "dist/portal-config.js": "f25cb94c5966a98b6a06dc3c7a2aa8b0ab3e07e0b0edc5d1b80739d17f870ee9",

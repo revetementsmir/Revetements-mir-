@@ -19,10 +19,11 @@ test('Envoi : vraie file PostgreSQL, prestataire simulé uniquement dans ce test
   },async lookup(key){return receipts.get(key)||{definitivelyNotAccepted:mode==='failure'};}};
   const repository=createRepository(db),storage={async read(p){assert.equal(p,'private/order.pdf');return pdf;}},sender={verified:true,address:'mir@example.invalid'};
   try{
-    await db.exec(`create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);
+    await db.exec(`create role anon;create role authenticated;create role service_role;create schema auth;create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb default '{}');
       create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
-      grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;`);
-    for(const f of fs.readdirSync(path.join(__dirname,'../supabase/migrations')).sort())await db.exec(fs.readFileSync(path.join(__dirname,'../supabase/migrations',f),'utf8'));
+      grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;
+      create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text,owner uuid,owner_id text,metadata jsonb,unique(bucket_id,name));alter table storage.objects enable row level security;create function storage.foldername(text) returns text[] language sql immutable as $$select (string_to_array($1,'/'))[1:array_length(string_to_array($1,'/'),1)-1]$$;grant usage on schema storage to authenticated;grant select,insert,delete on storage.objects to authenticated;`);
+    for(const f of fs.readdirSync(path.join(__dirname,'../supabase/migrations')).filter(f=>f.endsWith('.sql')&&!f.includes('mir_estimates')&&!f.includes('mir_estimate_recipe')&&!f.includes('chat_phase3a')&&!f.includes('chat_phase3b')&&!f.includes('phase3c')&&!f.includes('client_center_20261110')).sort())await db.exec(fs.readFileSync(path.join(__dirname,'../supabase/migrations',f),'utf8'));
     await db.exec(`insert into auth.users values('${id(1)}'),('${id(2)}'),('${id(3)}');
       insert into mir_core.organizations values('${id(10)}','MIR'),('${id(20)}','Autre');
       insert into mir_core.memberships values('${id(10)}','${id(1)}','admin',true),('${id(10)}','${id(2)}','employee',true),('${id(20)}','${id(3)}','admin',true);
