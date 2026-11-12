@@ -1452,7 +1452,7 @@ if(storeColorResult.locked&&!window.MIRBendingFinishes.forMetal(materials,storeC
  return toast('La couleur fixée ne correspond pas au métal du fabricant. Demande une correction du modèle à l’admin.');
 const t=latest(record),defaults=window.MIRModelDefaults?.prepare(t,record.measurementDefaults);
 if(defaults&&!defaults.ok){toast(defaults.errors.join(' '));return;}
-const blank=M.instantiateTemplate(t,{unit:'in',measurements:defaults?.measurements||{},length:defaults?.length||'',quantity:1,material:{type:record.allowed?.materials?.[0]||'aluminium'},finish:{},bottomEdgeId:'bottom',perforation:{enabled:false},coloredFace:{side:'',segmentId:'A'}});
+const blank=M.instantiateTemplate(t,{unit:'in',measurements:defaults?.measurements||{},length:defaults?.length||'',quantity:client?'':1,material:{type:record.allowed?.materials?.[0]||'aluminium'},finish:{},bottomEdgeId:'bottom',perforation:{enabled:false},coloredFace:{side:'',segmentId:'A'}});
 activeDefaultLocks=client&&catalogueChannel==='store'?(defaults?.locks||{}):{};
 workflow='configure';authoring=false;editingTemplateId=null;editingItemId=null;selectedTemplate=t;draft=copy(blank.spec||blank.model?.spec||{});draft.kind=t.kind;kind=t.kind;if(kind==='profile')draft.length=String(stockLengthIn(draft)*(draft.unit==='mm'?25.4:1));draft.name=t.name;draft.perforation=draft.perforation||{enabled:false,details:''};draft.lips=draft.lips||{};colorSystem=record.allowed?.colorSystems?.[0]||'manufacturer';colorId='';view='face';tool='select';if(clientProfileWizard()){
  colorSystem=publicProfileColors.find(value=>!record.allowed?.colorSystems?.length||record.allowed.colorSystems.includes(value))||'manufacturer';
@@ -2241,7 +2241,7 @@ function resumeClientTrace(){
 function startProfileDrawing({fullscreen=true}={}){
  freeformRedo=[];selectedTemplate=null;
  kind='profile';
- draft={...draft,kind:'profile',template:'custom',segments:[],bends:[],startAngle:0,name:'Profil dessiné',length:120,...(clientProfileWizard()?{quantity:1}:{})};delete draft.mirProfileId;
+ draft={...draft,kind:'profile',template:'custom',segments:[],bends:[],startAngle:0,name:'Profil dessiné',length:120,...(clientProfileWizard()?{quantity:''}:{})};delete draft.mirProfileId;
  delete draft.dimensions;
  tool='draw';view='face';drawPoints=[];viewPan={x:0,y:0};
  drawTransform={scale:520/(traceHeight*25.4),ox:140,oy:395};
