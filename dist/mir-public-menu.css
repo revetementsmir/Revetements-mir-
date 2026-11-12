@@ -140,3 +140,7 @@ body.mir-public-navigation .mir-public-cart b{
   body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand,
   body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand{width:clamp(96px,30vw,145px)}
 }
+@media(max-width:1100px){
+ body[data-client-pliage-landing].mir-public-navigation{padding-bottom:0}
+ body[data-client-pliage-landing] .mir-mobile-tabs{position:static}
+}
