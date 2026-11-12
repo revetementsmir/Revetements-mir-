@@ -129,7 +129,8 @@ begin
   begin item:=(line->>'itemId')::uuid;exception when invalid_text_representation then item:=null;end;
   if item is not null then select * into catalogue_row from mir_core.catalogue_items c where c.organization_id=org and c.id=item;end if;
   if catalogue_row.id is not null then
-   line_spec:=jsonb_build_object('kind',case when coalesce((catalogue_row.specification->>'customBending')::boolean,false) then 'fold' else 'material' end,
+   line_spec:=jsonb_build_object('kind',case when coalesce((catalogue_row.specification->>'customBending')::boolean,false)
+      or coalesce(jsonb_typeof(catalogue_row.specification->'measureFields')='array' and jsonb_array_length(catalogue_row.specification->'measureFields')>0,false) then 'fold' else 'material' end,
     'catalogueItemId',catalogue_row.id,'catalogueSnapshot',catalogue_row.specification||jsonb_build_object('id',catalogue_row.id,'name',catalogue_row.name),
     'configuration',line-'quantity');
    unit_name:=coalesce(nullif(catalogue_row.specification->>'unit',''),'unité');
@@ -221,8 +222,10 @@ begin
  payload:=jsonb_build_object('kind',kind,'itemId',item_id,'favorite',favorite,'position',requested_position);
  prior:=mir_core.order_ux_replay(org,request_id,'favorite',payload);if prior is not null then return prior;end if;
  if not exists(select 1 from mir_core.catalogue_items c where c.organization_id=org and c.id=item_id and c.channel='store' and c.published and not c.archived
-   and case when kind='fold' then coalesce((c.specification->>'customBending')::boolean,false) or jsonb_typeof(c.specification->'measureFields')='array'
-            else not coalesce((c.specification->>'customBending')::boolean,false) and jsonb_typeof(c.specification->'measureFields') is distinct from 'array' end)
+   and case when kind='fold' then coalesce((c.specification->>'customBending')::boolean,false)
+      or coalesce(jsonb_typeof(c.specification->'measureFields')='array' and jsonb_array_length(c.specification->'measureFields')>0,false)
+            else not (coalesce((c.specification->>'customBending')::boolean,false)
+      or coalesce(jsonb_typeof(c.specification->'measureFields')='array' and jsonb_array_length(c.specification->'measureFields')>0,false)) end)
  then raise exception 'Article indisponible pour ce type de raccourci' using errcode='42501';end if;
  perform pg_advisory_xact_lock(hashtextextended(org::text||auth.uid()::text||kind,0));
  prior:=mir_core.order_ux_replay(org,request_id,'favorite',payload);if prior is not null then return prior;end if;
