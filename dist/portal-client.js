@@ -224,14 +224,16 @@
         const { data, error } = await sdk.rpc('mir_portal_snapshot');
         if (epoch !== generation || sequence !== readSequence || disposed) return null;
         if (error) throw errorOf(error);
-        const [operationsResponse,messagingResponse,punchResponse,expensesResponse]=await Promise.all([
-          sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg}),sdk.rpc('mir_punch_snapshot',{org:internalOrg,employee:null}),sdk.rpc('mir_expense_snapshot',{org:internalOrg})
+        const [operationsResponse,messagingResponse,punchResponse,expensesResponse,absencesResponse]=await Promise.all([
+          sdk.rpc('mir_employee_operations_snapshot',{org:internalOrg,job:null}),sdk.rpc('mir_messaging_snapshot',{org:internalOrg}),sdk.rpc('mir_punch_snapshot',{org:internalOrg,employee:null}),sdk.rpc('mir_expense_snapshot',{org:internalOrg}),sdk.rpc('mir_absence_snapshot',{org:internalOrg})
         ]);
         if(operationsResponse.error)throw errorOf(operationsResponse.error);if(messagingResponse.error)throw errorOf(messagingResponse.error);
         if(punchResponse.error&&!missingRoutine(punchResponse))throw errorOf(punchResponse.error);
         if(expensesResponse.error&&!missingRoutine(expensesResponse))throw errorOf(expensesResponse.error);
+        if(absencesResponse.error&&!missingRoutine(absencesResponse))throw errorOf(absencesResponse.error);
         const punch=punchResponse.error?{enabled:false,settings:{},activeShift:null,week:[],corrections:[],bankBalance:0,unavailable:true}:punchResponse.data;
         const expenses=expensesResponse.error?{unavailable:true,role:null,categories:[],expenses:[]}:expensesResponse.data;
+        const absences=absencesResponse.error?{unavailable:true,role:null,requests:[]}:absencesResponse.data;
         let lead=null,boss=null,logistics=null,management=null,boutiquePricing=null;
         if(operationsResponse.data?.role==='chef_equipe'){
           const response=await sdk.rpc('mir_lead_today_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
@@ -245,7 +247,7 @@
           const response=await sdk.rpc('mir_management_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);management=response.data;
           const prices=await sdk.rpc('mir_boutique_price_management',{org:internalOrg});if(prices.error)throw errorOf(prices.error);boutiquePricing=prices.data;
         }
-        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses}, user.id);
+        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses,absences}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {
@@ -255,7 +257,7 @@
         throw mapped;
       }
     }
-    const onlinePunchSync=()=>{if(!disposed)Promise.all([syncPunchQueue().catch(()=>0),syncExpenseDrafts().catch(()=>0)]).then(()=>refresh().catch(()=>{}));};
+    const onlinePunchSync=()=>{if(!disposed)Promise.all([syncPunchQueue().catch(()=>0),syncExpenseDrafts().catch(()=>0),syncAbsenceDrafts().catch(()=>0)]).then(()=>refresh().catch(()=>{}));};
     async function start() {
       if (!sdk) { emit({}, 'start'); return null; }
       if (!authSubscription) {
@@ -586,6 +588,20 @@
     async function expenseSubmit(expenseId,requestId=uuid()){requireReady();if(!internalOrg||!UUID.test(expenseId||'')||!UUID.test(requestId||''))fail('EXPENSE_INVALID','Soumission invalide.');const {data,error}=await sdk.rpc('mir_expense_submit',{org:internalOrg,request_id:requestId,expense_id:expenseId});if(error)throw errorOf(error);await refresh();return data;}
     async function expenseDecide(expenseId,decision,reason='',requestId=uuid()){requireReady();if(!internalOrg||!UUID.test(expenseId||'')||!UUID.test(requestId||''))fail('EXPENSE_INVALID','Décision invalide.');const {data,error}=await sdk.rpc('mir_expense_decide',{org:internalOrg,request_id:requestId,expense_id:expenseId,decision,reason});if(error)throw errorOf(error);await refresh();return data;}
     async function expenseReceiptURL(receiptId){requireReady();if(!internalOrg||!UUID.test(receiptId||''))fail('DOCUMENT_INVALID','Reçu invalide.');const {data:access,error:accessError}=await sdk.rpc('mir_expense_receipt_access',{org:internalOrg,receipt_id:receiptId});if(accessError||!access?.path||access.bucket!=='mir-expense-receipts'||access.expiresIn!==120)throw errorOf(accessError||{},'Ce reçu ne peut pas être ouvert.');const {data,error}=await sdk.storage.from(access.bucket).createSignedUrl(access.path,access.expiresIn);if(error||!data?.signedUrl)throw errorOf(error||{},'Ce reçu ne peut pas être ouvert.');return data.signedUrl;}
+    function absenceQueueKey(){return `mir_absence_drafts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
+    function readAbsenceQueue(){try{const raw=JSON.parse(storage?.getItem(absenceQueueKey())||'[]');return Array.isArray(raw)?raw.filter(x=>x&&UUID.test(x.requestId||'')&&x.data&&typeof x.data==='object'):[];}catch(_){return [];}}
+    function writeAbsenceQueue(rows){try{storage?.setItem(absenceQueueKey(),JSON.stringify(rows.slice(-20)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre ce brouillon.');}}
+    async function absenceSaveDraft(absenceId,data,requestId=uuid()){
+      requireReady();if(!internalOrg||!UUID.test(requestId||''))fail('ABSENCE_INVALID','Le brouillon ne peut pas être préparé.');const draft={requestId,absenceId:UUID.test(absenceId||'')?absenceId:null,data:clone(data),savedAt:new Date().toISOString()};
+      if(!navigator.onLine){writeAbsenceQueue([...readAbsenceQueue(),draft]);return{...draft,offline:true};}
+      try{const {data:out,error}=await sdk.rpc('mir_absence_save_draft',{org:internalOrg,request_key:requestId,absence_id:draft.absenceId,data:draft.data});if(error)throw errorOf(error);await refresh();return out;}catch(error){if(error?.definitive===false||error?.code==='NETWORK_UNCERTAIN'){writeAbsenceQueue([...readAbsenceQueue(),draft]);return{...draft,offline:true};}throw error;}
+    }
+    async function syncAbsenceDrafts(){if(!internalOrg||!navigator.onLine||!status.user?.id)return 0;const queued=readAbsenceQueue(),remaining=[];let synced=0;for(const draft of queued){try{const {error}=await sdk.rpc('mir_absence_save_draft',{org:internalOrg,request_key:draft.requestId,absence_id:draft.absenceId,data:draft.data});if(error)throw error;synced++;}catch(_){remaining.push(draft);}}writeAbsenceQueue(remaining);if(synced)await refresh();return synced;}
+    async function absenceUploadAttachment(absenceId,file,requestId=uuid()){requireReady();if(!internalOrg||!UUID.test(absenceId||'')||!UUID.test(requestId||''))fail('ABSENCE_INVALID','La pièce jointe ne peut pas être préparée.');if(!navigator.onLine)fail('OFFLINE','La pièce jointe pourra être ajoutée après la reconnexion.');const mime=String(file?.type||'').toLowerCase(),ext={'image/jpeg':'jpg','image/png':'png','application/pdf':'pdf'}[mime];if(!ext||!file?.size||file.size>10*1024*1024)fail('UPLOAD_INVALID','Utilisez un JPEG, PNG ou PDF de 10 Mo maximum.');if(!globalThis.crypto?.subtle)fail('HASH_UNAVAILABLE','Ce navigateur ne peut pas vérifier le fichier.');const bytes=await file.arrayBuffer(),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(x=>x.toString(16).padStart(2,'0')).join(''),path=`${internalOrg}/absence/${absenceId}/${status.user.id}/${uuid()}.${ext}`;const uploaded=await sdk.storage.from('mir-absence-files').upload(path,file,{contentType:mime,upsert:false,cacheControl:'3600'});if(uploaded.error)throw errorOf(uploaded.error,'La pièce jointe n’a pas pu être téléversée.');const {data,error}=await sdk.rpc('mir_absence_attach',{org:internalOrg,request_key:requestId,absence_id:absenceId,object_path:path,file_name:String(file.name||`absence.${ext}`).slice(0,240),mime_type:mime,size_bytes:file.size,sha256:hash});if(error){await sdk.storage.from('mir-absence-files').remove([path]).catch(()=>{});throw errorOf(error);}await refresh();return data;}
+    async function absenceSubmit(id,requestId=uuid()){requireReady();const {data,error}=await sdk.rpc('mir_absence_submit',{org:internalOrg,request_key:requestId,absence_id:id});if(error)throw errorOf(error);await refresh();return data;}
+    async function absenceDecide(id,decision,reason='',requestId=uuid()){requireReady();const {data,error}=await sdk.rpc('mir_absence_decide',{org:internalOrg,request_key:requestId,absence_id:id,decision,reason});if(error)throw errorOf(error);await refresh();return data;}
+    async function absenceCancel(id,requestId=uuid()){requireReady();const {data,error}=await sdk.rpc('mir_absence_cancel',{org:internalOrg,request_key:requestId,absence_id:id});if(error)throw errorOf(error);await refresh();return data;}
+    async function absenceAttachmentURL(id){requireReady();const {data:access,error:accessError}=await sdk.rpc('mir_absence_attachment_access',{org:internalOrg,attachment_id:id});if(accessError||access?.bucket!=='mir-absence-files'||access?.expiresIn!==120)throw errorOf(accessError||{},'Cette pièce jointe ne peut pas être ouverte.');const {data,error}=await sdk.storage.from(access.bucket).createSignedUrl(access.path,access.expiresIn);if(error||!data?.signedUrl)throw errorOf(error||{},'Cette pièce jointe ne peut pas être ouverte.');return data.signedUrl;}
     // Phase3C help/support API begin.
     async function helpFAQ(){requireEnabled();const epoch=generation,{data,error}=await sdk.rpc(internalOrg?'mir_help_faq_scoped':'mir_help_faq',internalOrg?{org:internalOrg}:undefined);if(epoch!==generation)fail('SESSION_CHANGED','La session a changé.');if(error)throw errorOf(error);return Array.isArray(data)?data:[];}
     function requireSupport(){if(!status.user||!['ready','customer_ready'].includes(status.phase)||!internalOrg)fail('AUTH_REQUIRED','Connectez-vous pour ouvrir vos demandes.');return {epoch:generation,user:status.user.id};}
@@ -603,7 +619,7 @@
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, dispose,
       chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatFileURL, chatPhotoURL,
       helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }

@@ -55,7 +55,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   if([390,1440].includes(width))await page.screenshot({path:path.join(out,`chat-${width}.png`),fullPage:true});
   await page.getByRole('button',{name:'← Conversations'}).click();await page.evaluate(()=>window.__chatDenied=true);await page.getByRole('button',{name:/Chantier · Chantier fictif A/}).click();
   await page.locator('#portal-toast').filter({hasText:'Conversation non autorisée'}).waitFor();assert.equal(await page.getByText('Message chantier',{exact:true}).count(),0);assert.equal(await page.locator('[data-conversation="30000000-0000-4000-8000-000000000101"]').count(),0);
-  await page.getByRole('button',{name:'Aujourd’hui',exact:true}).click();assert.equal(await page.locator('[data-today-block]').count(),3);
+  await page.locator('.mir-harmony-toggle').click();await page.locator('#portal-navigation [data-view="day"]').click();assert.equal(await page.locator('[data-today-block]').count(),3);
   console.log(`PASS UI simulée ${width}x${height}: recherche, pagination, brouillon, hors ligne, envoi unique, lecture propre, archive, refus, Aujourd’hui intact`);await page.close();
  }
 }finally{await browser?.close();server.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

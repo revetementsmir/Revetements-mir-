@@ -1,0 +1,25 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {baseline,actor,dir}=require('./fixtures/mir-chat-database.cjs');
+const id=n=>'75000000-0000-4000-8000-'+String(n).padStart(12,'0');
+(async()=>{const db=await baseline(),org=id(10),other=id(11),employee=id(1),chef=id(2),assistant=id(3),boss=id(4),outsider=id(5),team=id(30);let checks=0;
+ const rpc=async(u,name,args)=>(await actor(db,u,`select public.${name}(${args.map((_,i)=>'$'+(i+1)).join(',')}) r`,args))[0].r;
+ const deny=fn=>assert.rejects(fn,e=>['42501','22023','23P01'].includes(e.code));const pass=n=>{checks++;console.log('PASS '+n)};
+ try{
+  for(const [o,n]of[[org,'A'],[other,'B']])await db.query('insert into mir_core.organizations(id,name) values($1,$2)',[o,n]);
+  for(const u of[employee,chef,assistant,boss,outsider])await db.query('insert into auth.users(id) values($1)',[u]);
+  for(const [u,o,role]of[[employee,org,'employee'],[chef,org,'employee'],[assistant,org,'employee'],[boss,org,'admin'],[outsider,other,'employee']])await db.query('insert into mir_core.memberships values($1,$2,$3,true)',[o,u,role]);
+  for(const [u,r]of[[employee,'employe'],[chef,'chef_equipe'],[assistant,'assistant'],[outsider,'employe']])await db.query('insert into mir_core.staff_capabilities(organization_id,user_id,staff_role,active,configured_by) values($1,$2,$3,true,$4)',[u===outsider?other:org,u,r,boss]);
+  await db.query('insert into mir_core.teams(organization_id,id,name,leader_id,active) values($1,$2,$3,$4,true)',[org,team,'Équipe',chef]);await db.query('insert into mir_core.team_members(organization_id,team_id,user_id,active) values($1,$2,$3,true)',[org,team,employee]);
+  const sql=fs.readFileSync(path.join(dir,'20261123120000_phase5_absences.sql'),'utf8');await db.exec(sql);await db.exec(sql);pass('migration rejouable sans doublon');
+  const payload={type:'vacation',startDate:'2026-12-01',endDate:'2026-12-03',dayPart:'full_day',note:'Vacances'};
+  const draft=await rpc(employee,'mir_absence_save_draft',[org,id(100),null,payload]);const request=draft.id;assert.equal((await rpc(employee,'mir_absence_save_draft',[org,id(100),null,payload])).idempotent,true);assert.equal((await db.query('select count(*)::int n from mir_core.hr_requests where organization_id=$1',[org])).rows[0].n,1);pass('brouillon et idempotence');
+  await deny(()=>rpc(outsider,'mir_absence_save_draft',[org,id(101),null,payload]));assert.equal((await rpc(chef,'mir_absence_snapshot',[org])).requests.length,1);await deny(()=>rpc(outsider,'mir_absence_snapshot',[org]));pass('isolation organisation et périmètre Chef');
+  const objectPath=`${org}/absence/${request}/${employee}/${id(300)}.png`;await actor(db,employee,'insert into storage.objects(bucket_id,name,owner,owner_id,metadata) values($1,$2,$3::uuid,$3::text,$4)',['mir-absence-files',objectPath,employee,{mimetype:'image/png',size:400}]);await deny(()=>actor(db,outsider,'select * from storage.objects where bucket_id=$1 and name=$2',['mir-absence-files',objectPath]).then(r=>{if(!r.length)throw Object.assign(new Error('denied'),{code:'42501'})}));const attachment=await rpc(employee,'mir_absence_attach',[org,id(102),request,objectPath,'preuve.png','image/png',400,'a'.repeat(64)]);assert.ok(attachment.id);pass('pièce privée PNG validée');
+  assert.equal((await rpc(employee,'mir_absence_submit',[org,id(103),request])).status,'submitted');await deny(()=>rpc(chef,'mir_absence_decide',[org,id(104),request,'approved','']));assert.equal((await rpc(assistant,'mir_absence_decide',[org,id(105),request,'refused','Dates à confirmer'])).status,'refused');pass('soumission et décision autorisée seulement');
+  const partial=await rpc(employee,'mir_absence_save_draft',[org,id(106),null,{type:'appointment',startDate:'2026-12-10',endDate:'2026-12-10',dayPart:'partial',startTime:'09:00',endTime:'11:30',note:'Rendez-vous'}]);assert.ok(partial.id);await deny(()=>rpc(employee,'mir_absence_save_draft',[org,id(107),null,{...payload,startDate:'2026-12-12',endDate:'2026-12-13',dayPart:'partial',startTime:'09:00',endTime:'10:00'}]));pass('journée complète et portion validées');
+  const duplicate=await rpc(employee,'mir_absence_save_draft',[org,id(108),null,{...payload,startDate:'2026-12-02',endDate:'2026-12-02'}]);await rpc(employee,'mir_absence_submit',[org,id(109),duplicate.id]);const overlap=await rpc(employee,'mir_absence_save_draft',[org,id(110),null,{...payload,startDate:'2026-12-02',endDate:'2026-12-02'}]);await deny(()=>rpc(employee,'mir_absence_submit',[org,id(111),overlap.id]));pass('conflit de dates refusé');
+  assert.equal((await rpc(employee,'mir_absence_attachment_access',[org,attachment.id])).expiresIn,120);await deny(()=>rpc(outsider,'mir_absence_attachment_access',[org,attachment.id]));await deny(()=>actor(db,employee,'delete from mir_core.hr_request_events where organization_id=$1',[org]));pass('URL courte et historique immuable');
+  console.log(`Absences PostgreSQL: ${checks} scénarios réussis.`);
+ }finally{await db.close()}
+})().catch(e=>{console.error(e);process.exitCode=1});
