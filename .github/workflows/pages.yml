@@ -510,8 +510,8 @@ jobs:
           fetch "$base/coordination.html?verification=$GITHUB_SHA" /tmp/mir-coordination-live.html
           cmp /tmp/mir-coordination-live.html _site_mir/coordination.html
           grep -Fq 'noindex,nofollow' /tmp/mir-coordination-live.html
-          grep -Fq 'mir-coordination-client.js?v=1' /tmp/mir-coordination-live.html
-          grep -Fq 'coordination-app.js?v=1' /tmp/mir-coordination-live.html
+          grep -Fq 'mir-coordination-client.js?v=phase6-orders-1' /tmp/mir-coordination-live.html
+          grep -Fq 'coordination-app.js?v=phase6-orders-1' /tmp/mir-coordination-live.html
           fetch "$base/entrepot-app.js?verification=$GITHUB_SHA" /tmp/mir-entrepot-app.js
           cmp /tmp/mir-entrepot-app.js _site_mir/entrepot-app.js
           fetch "$base/mir-warehouse-client.js?verification=$GITHUB_SHA" /tmp/mir-warehouse-client.js
