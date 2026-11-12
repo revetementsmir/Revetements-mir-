@@ -61,7 +61,12 @@ const server=http.createServer((req,res)=>{
         assert.equal(await page.locator('.mir-responsive-page').count(),1);
         assert.equal(await page.locator('iframe').count(),0);
         console.log('PAGE',route,layout,await page.locator('.mir-responsive-page').evaluate(e=>({width:e.clientWidth,scroll:e.scrollWidth})));
-        assert(await page.locator('.mir-responsive-page').evaluate(e=>e.scrollWidth<=e.clientWidth+2));
+        const overflow=await page.locator('.mir-responsive-page').evaluate(root=>{
+          const edge=root.getBoundingClientRect().right;
+          return [...root.querySelectorAll('*')].filter(e=>e.getBoundingClientRect().right>edge+2).slice(0,12).map(e=>({tag:e.tagName,cls:e.className,width:Math.round(e.getBoundingClientRect().width),right:Math.round(e.getBoundingClientRect().right-edge)}));
+        });
+        if(overflow.length) console.log('OVERFLOW',route,layout,overflow);
+        assert.equal(await page.locator('.mir-responsive-page').evaluate(e=>e.scrollWidth<=e.clientWidth+2),true,'Débordement global '+route+' '+layout);
       }
     }
     await page.goto(base+'production.html?responsive=atelier');

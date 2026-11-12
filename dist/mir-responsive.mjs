@@ -44,6 +44,7 @@ export async function startResponsive() {
     body { margin:0; }
     .mir-responsive-viewport { container:mir-viewport / size; height:100%; width:100%; overflow:auto; position:relative; }
     .mir-responsive-page { display:flow-root; min-height:100%; position:relative; isolation:isolate; font:16px Arial,sans-serif; color:#18251d; background:#fafaf7; }
+    .mir-responsive-page [hidden] { display:none!important; }
     .preview-workspace [data-layout*="-"] { display:none!important; }
     @scope (.mir-responsive-page) { ${css} }
   `;
