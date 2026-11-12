@@ -11,7 +11,7 @@ create table if not exists mir_core.expense_categories(
 
 create table if not exists mir_core.expenses(
  organization_id uuid not null references mir_core.organizations(id), id uuid not null default gen_random_uuid(),
- employee_id uuid not null references auth.users(id), job_id uuid references mir_core.jobs(organization_id,id),
+ employee_id uuid not null references auth.users(id), job_id uuid,
  expense_date date not null default current_date, supplier text not null default '' check(length(supplier)<=180), category_code text not null,
  amount_before_tax numeric(12,2) not null default 0 check(amount_before_tax>=0), tps_amount numeric(12,2) not null default 0 check(tps_amount>=0),
  tvq_amount numeric(12,2) not null default 0 check(tvq_amount>=0), total_amount numeric(12,2) not null default 0 check(total_amount>=0),
@@ -20,6 +20,7 @@ create table if not exists mir_core.expenses(
  created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
  primary key(organization_id,id), unique(organization_id,employee_id,client_request_id),
  foreign key(organization_id,category_code) references mir_core.expense_categories(organization_id,code),
+ foreign key(organization_id,job_id) references mir_core.jobs(organization_id,id),
  check(round(amount_before_tax+tps_amount+tvq_amount,2)=total_amount),
  check((status in('approved','refused')) = (decided_at is not null))
 );
