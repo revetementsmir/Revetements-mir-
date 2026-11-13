@@ -132,14 +132,15 @@ class Capture:
             raise CaptureError('Non-allowlisted UI action refused')
         if label == 'Menu':
             # Chrome exposes the button's aria-label rather than its visible text.
-            selector = self.device(descriptionMatches='(?:Ouvrir|Fermer) le menu MIR')
+            selector = self.device(descriptionContains='menu MIR')
             if selector.count == 0:
                 selector = self.device(text=label)
         else:
             selector = (self.device(textStartsWith=label) if label == 'Mes absences'
                         else self.device(text=label))
+        self.wait(lambda: selector.count == 1, 'navigation control ' + label, seconds=10)
         if selector.count != 1:
-            raise CaptureError('Navigation action is missing or ambiguous')
+            raise CaptureError('Navigation action is missing or ambiguous: '+label+' matches='+str(selector.count))
         selector.click(timeout=10)
         time.sleep(.4)
 
@@ -208,11 +209,13 @@ class Capture:
         self.wait(lambda: self.device(text='Nouvelle demande').exists, 'absence form')
         self.shot('employee-absence-form', 'Employé chantier', 'Unsaved absence form; no submit')
         # The last field is the note textarea (source audited); no draft/save button is clicked.
-        self.device.swipe_ext('up', scale=.6)
-        fields = self.device(className='android.widget.EditText')
-        if fields.count < 1:
-            raise CaptureError('Local note field not visible')
-        note = fields[fields.count - 1]
+        note = self.device(className='android.widget.EditText', descriptionContains='Motif ou commentaire')
+        for _ in range(4):
+            if note.count == 1:
+                break
+            self.device.swipe_ext('up', scale=.5)
+        if note.count != 1:
+            raise CaptureError('Uniquely labelled local note field not found')
         if note.info.get('password'):
             raise CaptureError('Password field refused for local form probe')
         note.click()
@@ -298,6 +301,7 @@ def main():
                 except Exception:
                     capture.manifest['safe_ui_probe'] = {'unavailable': True}
             capture.save_manifest('failed')
+            print('Safe UI state: '+json.dumps(capture.manifest.get('safe_ui_probe',{})),file=sys.stderr)
         if type(error) is CaptureError:
             print('Diagnostic: '+str(error), file=sys.stderr)
         print('FAIL native capture generation at ' + (capture.stage if capture else 'APK verification')
