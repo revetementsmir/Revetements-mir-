@@ -75,7 +75,7 @@ public class MirRealRolesTest extends MirDeviceSetup {
      waitFor(s,"window.realProof==='42501'");
      assertNotEquals("ready",js(s,"MIRPortalActiveClient.getStatus().phase"));assertEquals(Boolean.TRUE,js(s,"document.querySelector('#account-bar').hidden"));
     }else{
-     js(s,"window.realProof='pending';MIRPortalActiveClient.signInPassword("+email+","+password+").then(()=>window.realProof='ready').catch(()=>window.realProof='error');true");waitFor(s,"window.realProof==='ready'");
+     js(s,"window.realProof='pending';MIRPortalActiveClient.signInPassword("+email+","+password+").then(()=>window.realProof='ready').catch(()=>window.realProof='error');true");waitFor(s,"window.realProof==='ready' && MIRPortalActiveClient.getStatus().phase==='ready'");
      assertEquals("ready",js(s,"MIRPortalActiveClient.getStatus().phase"));assertEquals(role.getString("role"),js(s,"MIRPortalActiveClient.getStatus().snapshot.operations.role"));
      String label=role.getString("role").equals("employe")?"Employé chantier":role.getString("role").equals("chef_equipe")?"Chef d’équipe":role.getString("role").equals("warehouse")?"Entrepôt et livraison":role.getString("role").equals("assistant")?"Adjointe":"Boss";
      waitFor(s,"document.body.dataset.portalConnection==='connected'");assertEquals(label,js(s,"document.querySelector('#account-role').textContent"));assertEquals(Boolean.TRUE,js(s,"document.querySelector('#portal-content').children.length>0"));
