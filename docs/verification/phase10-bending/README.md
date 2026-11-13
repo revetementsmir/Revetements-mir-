@@ -16,9 +16,9 @@ Branche : `codex/phase-10-ten-bend-models`
 | ID stable | Nom | Source | Segments | Plis | Cotes demandées ou fixes | Contraintes | Boutique | Magasin | Production |
 |---|---|---|---:|---:|---|---|---|---|---|
 | `fascia` | Fascia | §14.1 + décision Frederick | 3 | 2 | face personnalisable; bas 1 1/4 et retour 3/4 po fixes | retour écrasé | oui | oui | oui |
-| `ailes_fenetre` | Ailes de fenêtre | §14.2 + croquis 97902 | 3 | 2 | trois cotes obligatoires, vides | vertical, bas à droite, retour terminal | oui | oui | oui |
+| `ailes_fenetre` | Ailes de fenêtre | §14.2 + croquis 97904 | 3 | 2 | trois cotes obligatoires, vides | vertical, bas à droite, retour terminal | oui | oui | oui |
 | `eloignement_eaux` | Écoulement des eaux | §14.3 + croquis 97906 | 3 | 2 | trois cotes obligatoires, vides | vertical, bas à gauche, retour descendant | oui | oui | oui |
-| `goutte_eau_8` | Goutte d’eau — développé total 8 po | §14.4 + croquis 97904 | 4 | 3 | quatre cotes obligatoires, vides | somme exactement 8 po | oui | oui | oui |
+| `goutte_eau_8` | Goutte d’eau — développé total 8 po | §14.4 + croquis 97902 | 3 | 2 | trois cotes obligatoires, vides | vertical, portée à gauche, retour descendant; somme exactement 8 po | oui | oui | oui |
 | `sill_trim` | Sill Trim | §14.5 | 3 | 2 | 2 1/2, 1 1/2, 3/4 po | zone de clouage minimale 1 po | oui | oui | oui |
 | `beam` | Habillage de poutre — Beam | §14.6 | 5 | 4 | 1 1/4, 7 1/2, 6 1/8, 7 1/2, 1 1/4 po | replis 5/8 facultatifs, non nominaux | oui | oui | oui |
 | `colonne` | Habillage de colonne | §14.7 | 5 | 4 | 7/8, 7 1/8, 7 1/8, 1, 1 po | 7/8 et deux plis 1 po fixes; faces centrales personnalisables | oui | oui | oui |

@@ -191,7 +191,7 @@
     },
     ailes_fenetre: {
       id:'ailes_fenetre', name:'Ailes de fenêtre', version:1,
-      geometryStatus:'décision Frederick Phase 10 et croquis 97902 : grand segment vertical, bas vers la droite, retour terminal', startHeadingDeg:-90,
+      geometryStatus:'décision Frederick Phase 10 et croquis 97904 : grand segment vertical, bas vers la droite, retour terminal', startHeadingDeg:-90,
       fields:[
         {id:'vertical',label:'Grande aile verticale',defaultValue:'',required:true},
         {id:'bottom',label:'Aile inférieure vers la droite',defaultValue:'',required:true},
@@ -270,20 +270,18 @@
       ]
     },
     goutte_eau_8: {
-      id:'goutte_eau_8', name:'Goutte d’eau — développé total 8 po', version:1,
-      geometryStatus:'décision Frederick Phase 10 et croquis 97904 : développé total exactement 8 po; aucune cote partielle inventée', startHeadingDeg:-90,
+      id:'goutte_eau_8', name:'Goutte d’eau — développé total 8 po', version:2,
+      geometryStatus:'décision Frederick Phase 10 et croquis 97902 : grande remontée verticale, portée vers la gauche et retour descendant; développé total exactement 8 po', startHeadingDeg:-90,
       developedTotalIn:8,
       fields:[
         {id:'back',label:'Grande remontée verticale',defaultValue:'',required:true},
-        {id:'seat',label:'Portée vers la droite',defaultValue:'',required:true},
-        {id:'drop',label:'Descente terminale',defaultValue:'',required:true},
-        {id:'return',label:'Petit retour terminal',defaultValue:'',required:true}
+        {id:'seat',label:'Portée vers la gauche',defaultValue:'',required:true},
+        {id:'return',label:'Petit retour descendant',defaultValue:'',required:true}
       ],
       segments:[
         {id:'back',fieldId:'back',turnDeg:0},
-        {id:'seat',fieldId:'seat',turnDeg:90},
-        {id:'drop',fieldId:'drop',turnDeg:-90},
-        {id:'return',fieldId:'return',turnDeg:-90}
+        {id:'seat',fieldId:'seat',turnDeg:-90},
+        {id:'return',fieldId:'return',turnDeg:90}
       ]
     },
     sill_trim: {

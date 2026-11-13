@@ -115,11 +115,12 @@ test('Les trois topologies décidées par Frederick n’inventent aucune cote', 
   }
   assert.deepEqual(Presets.create('ailes_fenetre').bends.map(b=>b.angle),[90,-90]);
   assert.deepEqual(Presets.create('eloignement_eaux').bends.map(b=>b.angle),[-90,90]);
+  assert.deepEqual(Presets.create('goutte_eau_8').bends.map(b=>b.angle),[-90,90]);
 });
 test('Goutte d’eau exige un développé total exactement égal à 8 po', () => {
   const s=Presets.create('goutte_eau_8');
   s.kind='profile';s.unit='in';s.length=120;
-  s.segments.forEach((segment,index)=>segment.length=[3.25,2,.75,2][index]);
+  s.segments.forEach((segment,index)=>segment.length=[5.5,2,.5][index]);
   assert.equal(Presets.checkCanonical(s).ok,true);
   s.segments.at(-1).length=1.5;
   const invalid=Presets.checkCanonical(s);

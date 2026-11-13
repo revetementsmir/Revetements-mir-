@@ -13,7 +13,7 @@ function complete(id,{face='left',quantity=2}={}){
     material:{type:'aluminium',thickness:'0.019',gauge:'24'},
     finish:{selectionType:'manufacturer',manufacturer:'MIR',system:'Nuancier MIR',code:'NOIR',name:'Noir'},
     ...B.create(id)};
-  const fallback=id==='goutte_eau_8'?[3.25,2,.75,2]:spec.segments.map((segment,index)=>segment.length||[6,2,.75,1,3,4,1.25][index]||1);
+  const fallback=id==='goutte_eau_8'?[5.5,2,.5]:spec.segments.map((segment,index)=>segment.length||[6,2,.75,1,3,4,1.25][index]||1);
   spec.segments.forEach((segment,index)=>{segment.length=fallback[index];});
   spec.coloredFace={side:face,segmentId:B.preferredFaceSegment(spec)};
   return spec;

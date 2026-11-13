@@ -15,7 +15,7 @@
     {id:'fascia',source:'fascia',version:2},
     {id:'ailes_fenetre',source:'ailes_fenetre',version:1},
     {id:'eloignement_eaux',source:'eloignement_eaux',version:2},
-    {id:'goutte_eau_8',source:'goutte_eau_8',version:1,developedTotalIn:8},
+    {id:'goutte_eau_8',source:'goutte_eau_8',version:2,developedTotalIn:8},
     {id:'sill_trim',source:'sill_trim',version:1},
     {id:'beam',source:'beam',version:2,optionalBeamHems:true},
     {id:'colonne',source:'colonne',version:2},
