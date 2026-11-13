@@ -23,6 +23,7 @@ const server = http.createServer((req,res) => {
     const base = 'http://127.0.0.1:'+server.address().port;
     await page.goto(base+'/annoter.html');
     await page.locator('[data-mir-annotation-ready="true"]').waitFor();
+    assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'),'noindex,nofollow');
     assert.equal(await page.locator('iframe').count(),0,'real screen must be in the main DOM');
     await page.getByRole('button',{name:'Annoter',exact:true}).click();
     await page.getByRole('link',{name:'Voir notre boutique',exact:true}).click();

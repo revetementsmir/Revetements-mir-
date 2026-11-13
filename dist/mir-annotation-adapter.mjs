@@ -3,6 +3,10 @@ const PROJECT = '7afd893e-adcb-494b-a82b-c4cf8b28f94e';
 const pages = new Set(['index.html','boutique.html','produit.html','selection.html','pliage.html','production.html','chantier.html','entrepot.html','coordination.html','calepinage.html','plan.html','realisations.html','contact.html','materiaux.html']);
 if (document.readyState === 'loading') await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, {once:true}));
 const current = new URL(location.href).searchParams.get('page') || 'index.html';
+const sourceUrl = new URL(current, location.href);
+sourceUrl.search = location.search;
+sourceUrl.searchParams.delete('page');
+sourceUrl.hash = location.hash;
 document.documentElement.dataset.previewWorkspace = 'true';
 const workspace = document.createElement('div');
 workspace.className = 'mir-annotation-workspace';
@@ -53,12 +57,12 @@ try {
     projectId:PROJECT,
     title:'Les Revêtements MIR',
     service:createAnnotationService({projectId:PROJECT}),
-    getContext:() => ({device:`Vue réelle · ${innerWidth} × ${innerHeight}`,interface:current,sourceUrl:new URL(current,document.baseURI).href}),
+    getContext:() => ({device:`Vue réelle · ${innerWidth} × ${innerHeight}`,interface:current,sourceUrl:sourceUrl.href}),
   });
   // Keep the central service in control of notes, privacy and native handoff.
   workspace.dataset.mirAnnotationReady = 'true';
   window.addEventListener('beforeunload', event => {
-    if (workspace.querySelector('.annotation-list')?.children.length || workspace.querySelector('textarea')?.value.trim()) {
+    if (board.getAnnotations().length || workspace.querySelector('textarea')?.value.trim()) {
       event.preventDefault();
       event.returnValue = '';
     }

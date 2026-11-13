@@ -18,6 +18,11 @@
       if (!response.ok) throw new Error('Écran MIR indisponible : HTTP ' + response.status);
       const html = await response.text();
       const parsed = new DOMParser().parseFromString(html, 'text/html');
+      parsed.querySelectorAll('meta[name="robots"]').forEach(node => node.remove());
+      const robots = parsed.createElement('meta');
+      robots.name = 'robots';
+      robots.content = 'noindex,nofollow';
+      parsed.head.append(robots);
       parsed.querySelectorAll('base').forEach(node => node.remove());
       const base = parsed.createElement('base');
       base.href = new URL('./', location.href).href;
