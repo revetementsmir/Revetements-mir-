@@ -59,7 +59,7 @@ const Policy={...OriginalPolicy,allowedRequest(value,origin){try{const u=new URL
  adapter=adapter.replace("notice.textContent='Vrais écrans MIR · une vue active à la fois. Les vues simultanées nécessitent encore des contrôleurs indépendants. Annotations en mémoire : copier avant de changer de page.';","notice.textContent='Sources APK Android TEST '+source.versionCode+' · annotations → sources APK · une vue active à la fois';");
  adapter=adapter.replace("title:'Les Revêtements MIR',service:","title:'MIR — CORRIGER LES SOURCES APK ANDROID (PR31), PUIS RECOMPILER — PAS LE SITE SEUL',service:");
  adapter=adapter.replace("const syncClasses=", "window.MIRAPKPreview.getAnnotations=()=>board.getAnnotations();\n  const syncClasses=");
- adapter=adapter.replace("interface:current,device:","interface:'Application Android TEST · '+current+' · sources '+source.sourceBranch,revision:'APK '+source.sourceRef+' | dist/'+current+' | mobile/web/team.css | PR31: corriger sources puis recompiler APK',device:");
+ adapter=adapter.replace("interface:current,device:","interface:'Application Android TEST · '+current+' · APK PR31',revision:'APK '+source.sourceRef+' | dist/'+current+' | mobile/web/team.css | PR31: corriger sources puis recompiler APK',device:");
  adapter=adapter.replace("if(!allowed.has(name))return;event.preventDefault();","if(!allowed.has(name))return;event.preventDefault();");
  adapter=adapter.replace("target.searchParams.set('page',name);","target.searchParams.set('page',name);target.searchParams.set('app-preview','1');target.searchParams.set('app-platform','android');");
  write('mir-responsive-adapter.mjs',adapter);write('mir-apk-preview-source.mjs','export default '+JSON.stringify(config)+';\n');
