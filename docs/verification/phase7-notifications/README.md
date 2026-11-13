@@ -17,13 +17,17 @@ Branche de preuve: `codex/phase-7-notifications`. Cible distante autorisée pour
 
 | Module | Événements raccordés | Destinataires calculés | Destination |
 |---|---|---|---|
-| Commandes/Pliages | soumission, rattachement chantier, événements historiques Phase 6 | Adjointe, Boss, Admin ou propriétaire selon l’action | Commandes / demandes |
+| Commandes | soumission et rattachement chantier Phase 6 | Adjointe, Boss/Admin ou propriétaire selon l’action | Commandes / demandes |
+| Pliages | raccord indirect seulement lorsqu’un pliage est une ligne d’une commande | mêmes destinataires que la commande | Commandes / demandes |
 | Absences | soumission, décision, absence du jour | propriétaire, Chef ou gestion selon le RPC métier existant | Absences |
-| Dépenses | soumission et décisions existantes | propriétaire ou gestion autorisée | Dépenses |
+| Dépenses | soumission; précision demandée; approbation; refus | Adjointe et Boss/Admin à la soumission; propriétaire à la décision | Dépenses |
 | Punch | correction et décision existantes | propriétaire ou gestion autorisée | Punch / heures |
 | Chantiers | matériel, problème, rapport, extra | équipe/gestion déjà choisie par le serveur | écran chantier autorisé |
 | Clavardage | nouveau message | participants calculés par la conversation | conversation |
 | Soutien | demande ou réponse | client/Adjointe autorisés | Centre d’aide |
+| Entrepôt | mouvement canonique de réception, livraison ou ajustement, si le module Entrepôt est installé | Entrepôt et Boss/Admin de l’organisation | Inventaire Entrepôt |
+
+Les pliages sont notifiés dans le cycle de la commande; aucun événement Pliage autonome n’est livré en Phase 7. Mise en production, prêt et révision Pliage ne sont pas annoncés comme raccordés. Le module Dépenses ne possède aucun état canonique « remboursement traité »; aucun événement de ce nom n’est inventé.
 
 Une ancienne notification dont la cible est archivée ou devenue interdite reste dans l’historique. L’interface affiche alors « Cet élément n’est plus accessible » sans élargir les droits.
 
@@ -40,10 +44,10 @@ Une ancienne notification dont la cible est archivée ou devenue interdite reste
 
 ## Vérifications locales
 
-- Contrats Phase 7: 13/13.
-- PostgreSQL jetable: 30/30 avec migration Phase 7 exécutée deux fois, idempotence, compteur, lu/non lu, préférences et isolation entre deux employés.
-- Navigateur Chromium: 9/9 formats (360×780, 390×844, 430×932, 768×1024, 834×1112, iPad paysage 1112×834, 1366×768, 1440×900 et 1920×1080), sans débordement ni erreur JavaScript.
-- Captures: `centre-390x844.png`, `centre-768x1024.png`, `centre-1440x900.png`.
+- Contrats Phase 7: 15/15.
+- PostgreSQL jetable: 30/30 historiques conservés, plus 10/10 Dépenses correctives; migrations Phase 7 et corrective rejouées deux fois, idempotence, refus, état traité, métadonnées minimales et isolation.
+- Navigateur Chromium: 4/4 formats (390×844, 834×1112, 1366×768 et 1440×900) sur le parcours complet Dépenses → décision → Traitée → rechargement, filtre Actions, compteur, autre utilisateur et cible inaccessible, sans débordement ni erreur JavaScript.
+- Captures correctives: `centre-390x844.png`, `centre-834x1112.png`, `centre-1440x900.png`; contrôle sans capture également réussi en 1366×768.
 - Non-régressions ciblées: Phase 6 7/7, UX Commandes/Pliages, client→serveur, Aujourd’hui 7/7, Signature 9/9, Pages 41/41, navigation, session Auth et modules optionnels.
 - `git diff --check`: réussi avant commit.
 
@@ -57,3 +61,8 @@ Une ancienne notification dont la cible est archivée ou devenue interdite reste
 - Audit Supabase final: aucune alerte sécurité liée aux tables Phase 7; le seul avis propre au lot est l’index `notification_events_actor` encore inutilisé immédiatement après sa création.
 - Le centre utilise rechargement/actualisation comme repli; aucun faux temps réel n’est revendiqué.
 - Aucun courriel ou push envoyé. Zéro requête et zéro écriture Supabase production.
+
+## Ordre correctif
+
+1. `20261126120000_phase7_notifications.sql` — socle Phase 7 déjà appliqué.
+2. `20261126130000_phase7_expense_notifications.sql` — raccord transactionnel additif des événements Dépenses et des mouvements canoniques Entrepôt; migration rejouable, sans réécriture de l’historique Phase 4 ou Phase 7.
