@@ -1,0 +1,42 @@
+name: MIR — aperçu des sources APK
+on:
+  pull_request:
+    paths:
+      - 'scripts/apk-preview/**'
+      - 'scripts/build-mir-apk-preview.cjs'
+      - 'dist/mir-responsive-adapter.mjs'
+      - 'tests/mir-apk-preview-browser.cjs'
+      - '.github/workflows/mir-apk-preview.yml'
+permissions:
+  contents: write
+jobs:
+  apk-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/checkout@v4
+        with:
+          repository: revetementsmir/Revetements-mir-
+          ref: d1876c75b8ec97e52e56a6e535f0cfa00c7e362c
+          path: .apk-source
+          persist-credentials: false
+      - run: npm ci --prefix .apk-source/mobile --ignore-scripts --no-audit --no-fund
+      - run: node .apk-source/mobile/tools/build-web.cjs
+      - run: node scripts/build-mir-apk-preview.cjs .apk-source artifacts/apk-preview-site/test/application
+      - run: .apk-source/mobile/node_modules/.bin/playwright install --with-deps chromium
+      - run: node tests/mir-apk-preview-browser.cjs
+        env:
+          NODE_PATH: .apk-source/mobile/node_modules
+      - name: Conserver les captures et le manifeste
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "proofs/apk-preview-${{ github.run_id }}"
+          git add -f artifacts/apk-preview-proofs artifacts/apk-preview-site/test/application/mir-apk-preview.json
+          git commit -m "Preuves aperçu sources APK — run ${{ github.run_id }}"
+          git push origin "HEAD:refs/heads/proofs/apk-preview-${{ github.run_id }}"

@@ -1,0 +1,10 @@
+{
+  "repository": "revetementsmir/Revetements-mir-",
+  "sourceRef": "d1876c75b8ec97e52e56a6e535f0cfa00c7e362c",
+  "sourceBranch": "codex/phase-11-android-private",
+  "sourcePR": 31,
+  "apkSHA256": "e5b025382a29e05cab0b1640a8523c2fec296d2e245e6d5a7cb85cd9e015cdbb",
+  "versionCode": 110002,
+  "environment": "test",
+  "platform": "android"
+}
