@@ -41,13 +41,14 @@ public class MirRealRolesTest extends MirDeviceSetup {
   js(s,"document.querySelector('.mir-harmony-toggle').click();scrollTo(0,0);true");
   screenshot(s,"v110002-"+role+"-home");
   js(s,"document.querySelector('[data-view=settings]').click();true");
-  waitFor(s,"!!document.querySelector('#harmony-settings-form')");
+  waitFor(s,"!!document.querySelector('#harmony-settings-form') && document.querySelector('.settings-status')?.textContent==='Enregistré dans votre compte MIR'");
   js(s,"scrollTo(0,0);true");screenshot(s,"v110002-"+role+"-settings");
   if(role.equals("employe")){
    js(s,"document.querySelector('.mir-harmony-toggle').click();document.querySelector('#portal-navigation [data-view=account]').click();document.querySelector('[data-view=absences]').click();true");
    waitFor(s,"!!document.querySelector('#absence-draft-form textarea[name=note]')");
    js(s,"scrollTo(0,0);true");screenshot(s,"v110002-employee-absence-form");
    js(s,"(()=>{const n=document.querySelector('#absence-draft-form textarea[name=note]');n.value='RECETTE-PHASE11-VISUEL-LOCAL';n.dispatchEvent(new Event('input',{bubbles:true}));n.scrollIntoView({block:'center'});})()");
+   assertEquals("RECETTE-PHASE11-VISUEL-LOCAL",js(s,"document.querySelector('#absence-draft-form textarea[name=note]').value"));
    screenshot(s,"v110002-employee-local-note");
    androidx.test.uiautomator.UiDevice device=androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());device.pressBack();
    androidx.test.uiautomator.UiObject2 cancel=device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.res("android:id/button2")),5000);
