@@ -616,7 +616,7 @@
     $(productId).disabled=!filtered.length;if(selected)$(productId).value=selected.id;
     return selected;
   }
-  function colorOptions(selector,m,colorId){const cs=colorsFor(m),valid=cs.some(c=>c.id===colorId);$(selector).innerHTML=cs.length?`${valid?'':'<option value="" disabled>Choisissez un fini</option>'}${cs.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}`:'<option value="">Finition à confirmer</option>';$(selector).disabled=!cs.length;$(selector).value=valid?colorId:'';}
+  function colorOptions(selector,m,colorId){const cs=window.MIRCataloguePolicy?.sortColors(colorsFor(m))||colorsFor(m),valid=cs.some(c=>c.id===colorId);$(selector).innerHTML=cs.length?`${valid?'':'<option value="" disabled>Choisissez un fini</option>'}${cs.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}`:'<option value="">Finition à confirmer</option>';$(selector).disabled=!cs.length;$(selector).value=valid?colorId:'';}
   const bandMaterials=()=>materials.filter(m=>m.applications.includes('band'));
   const trimMaterials=mode=>materials.filter(m=>m.applications.includes(mode==='capping'?'capping':'opening-trim'));
   function bandConfig(f,z){const saved=state.bands[key(f.key,z.id)]||{},m=bandMaterials().find(m=>m.id===saved.materialId)||bandMaterials()[0];return {enabled:false,heightIn:6,...saved,materialId:m?.id||null,...officialColor(m,saved)};}

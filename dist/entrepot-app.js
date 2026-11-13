@@ -41,7 +41,7 @@ function catalogueOptions(){
  const item=catalogueItems.find(row=>row.id===$('#wh-catalogue-select').value);
  const colors=clearChildren('#wh-catalogue-color'),formats=clearChildren('#wh-catalogue-format');
  const c=node('option',item?.colorPolicy==='required'?'Choisir une couleur exacte':'Aucune couleur requise',colors);c.value='';
- for(const row of item?.colors||[]){const o=node('option',row.name,colors);o.value=row.id;}
+ for(const row of window.MIRCataloguePolicy?.sortColors(item?.colors)||(item?.colors||[])){const o=node('option',row.name,colors);o.value=row.id;}
  const base=node('option',item?.formats?.length>1?'Choisir un format exact':'Format standard',formats);base.value='';
  for(const row of item?.formats||[]){const o=node('option',row.label||row.id,formats);o.value=row.id;}
  colors.disabled=!item||item.colorPolicy==='none';

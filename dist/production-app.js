@@ -306,7 +306,7 @@ function renderColorGrid(){
  if(clientProfileWizard()&&(!draft.material?.type||colorSystem==='manufacturer'&&!chosenMaterial())){grid.innerHTML='<p class="field-hint">'+(!draft.material?.type?'Choisissez d’abord le matériau pour consulter son nuancier.':'Choisissez le fabricant et le produit pour consulter ses teintes.')+'</p>';if($('#color-count'))$('#color-count').textContent='';return;}
  const colors=colorSystem==='ral'
   ?ral.colors.filter(c=>`${c.code} ${c.nameEn||''} ${c.family||c.familyFR||''}`.toLocaleLowerCase('fr').includes(colorQuery.toLocaleLowerCase('fr')))
-  :(chosenMaterial()?.colors||[]).filter(c=>`${c.name||''} ${c.code||''} ${c.collection||''}`.toLocaleLowerCase('fr').includes(colorQuery.toLocaleLowerCase('fr')));
+  :(window.MIRCataloguePolicy?.sortColors(chosenMaterial()?.colors)||(chosenMaterial()?.colors||[])).filter(c=>`${c.name||''} ${c.code||''} ${c.collection||''}`.toLocaleLowerCase('fr').includes(colorQuery.toLocaleLowerCase('fr')));
  if($('#color-count'))$('#color-count').textContent=`${colors.length} codes · aperçus indicatifs`;
  const flat=kind==='profile'&&colorSystem==='manufacturer'&&
   (chosenMaterial()?.brand==='Kaycan'||chosenMaterial()?.brand==='MAC Métal architectural')
