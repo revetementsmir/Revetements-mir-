@@ -2,6 +2,7 @@
 const rootSelector = selector => selector
   .replace(/:root\b/g, ':scope')
   .replace(/(^|[\s>+~,(])(?:html|body)(?=[.#:[\s>+~),]|$)/g, '$1:scope')
+  .replace(/(:scope(?:\[[^\]]*\])*)\s+(?:>\s*)?:scope/g, '$1')
   .replace(/:scope\s+(?:>\s*)?:scope/g, ':scope');
 const units = text => text.replace(/(\d*\.?\d+)(?:d|s|l)?vw\b/g, '$1cqw').replace(/(\d*\.?\d+)(?:d|s|l)?vh\b/g, '$1cqh');
 function rulesText(rules, base) {
