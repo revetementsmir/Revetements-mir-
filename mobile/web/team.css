@@ -5,6 +5,16 @@ body, html body:has(#mir-harmony-header #portal-navigation) { padding-bottom: ca
   color: var(--mir-text, #223128) !important;
   border-color: var(--mir-border, #ccd6ce) !important;
 }
+:root[data-mir-harmony] .auth-card .auth-error {
+  background: var(--mir-surface-soft, #f7f9f5) !important;
+  color: var(--mir-danger, #b53b2e) !important;
+  border-color: var(--mir-danger, #b53b2e) !important;
+}
+:root[data-mir-harmony] .auth-card .auth-message {
+  background: var(--mir-surface-soft, #f7f9f5) !important;
+  color: var(--mir-text, #223128) !important;
+  border-color: var(--mir-accent, #348511) !important;
+}
 :root[data-mir-harmony] .auth-card :is(label, h2, .auth-show-password) {
   color: var(--mir-text, #223128) !important;
 }

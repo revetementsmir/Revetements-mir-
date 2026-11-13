@@ -7,10 +7,14 @@ async function assertTeamScreen(page){
   const rgb=v=>v.match(/[\d.]+/g).slice(0,3).map(Number);
   const luminance=c=>c.map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;}).reduce((n,v,i)=>n+v*[.2126,.7152,.0722][i],0);
   const card=document.querySelector('.auth-card');
-  return ['.auth-card label','.auth-card input[type=email]','.auth-card input[type=password]','.auth-card button[type=submit]'].map(selector=>{
+  const ratios=['.auth-card label','.auth-card input[type=email]','.auth-card input[type=password]','.auth-card button[type=submit]'].map(selector=>{
    const el=document.querySelector(selector),style=getComputedStyle(el),background=selector.endsWith('label')?getComputedStyle(card).backgroundColor:style.backgroundColor;
    const a=luminance(rgb(style.color)),b=luminance(rgb(background));return {selector,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)};
   });
+  for(const kind of ['auth-error','auth-message']){
+   const p=document.createElement('p');p.className=kind;p.textContent='Message de contrôle du contraste';card.append(p);const style=getComputedStyle(p),a=luminance(rgb(style.color)),b=luminance(rgb(style.backgroundColor));ratios.push({selector:'.'+kind,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)});p.remove();
+  }
+  return ratios;
  });
  for(const {selector,ratio}of ratios)assert.ok(ratio>=4.5,selector+' contrast '+ratio);
  for(const selector of ['.mir-harmony-toggle','.mir-harmony-dossier','.mir-client-links','.mir-home-header-actions','.mir-signature-footer','.mir-help-launch'])assert.equal(await page.locator(selector).first().isVisible(),false,selector+' must not expose public chrome at login');

@@ -45,7 +45,9 @@ Les tests utilisent seulement des lectures métier MIR TEST; aucune commande, no
 
 ### Correction après capture sur téléphone
 
-Le formulaire réutilisé gardait un fond blanc alors que les libellés passaient en clair en mode sombre. `mobile/web/team.css` applique désormais les surfaces et couleurs Harmony ensemble; les tests mesurent un contraste minimal de 4,5:1 pour les libellés, champs et bouton, en clair/sombre/contraste renforcé sur les sept formats. Assertion de contraste également ajoutée dans la vraie WebView Android.
+Le test des alertes ajoutées a d’abord échoué sur le défaut réel : auth-error à 1,6057:1 en thème sombre. Les surfaces et couleurs des deux types de message sont maintenant accordées au thème; ce contrôle reste bloquant à 4,5:1.
+
+Le formulaire réutilisé gardait un fond blanc alors que les libellés passaient en clair en mode sombre. `mobile/web/team.css` applique désormais les surfaces et couleurs Harmony ensemble; les tests mesurent un contraste minimal de 4,5:1 pour les libellés, champs, bouton et messages d’erreur/information, en clair/sombre/contraste renforcé sur les sept formats. Assertion de contraste également ajoutée dans la vraie WebView Android.
 
 Application réservée aux cinq rôles métier de l’équipe : aucun compte client accepté. La connexion ne présente plus les liens, menu, panier ou pied de page du site public. Le pied de page commercial est retiré du HTML embarqué, et le bouton flottant public « Aide et soutien » est masqué; le Centre d’aide métier reste dans la navigation équipe. Les pages Boutique, Produit, Sélection, Pliage client et Studio client sont exclues de l’artefact Android et refusées par les politiques Java et JavaScript, même par URL directe. Le Magasin et le panier commun de l’employé demeurent dans le portail métier après connexion. Le site web public est inchangé.
 
