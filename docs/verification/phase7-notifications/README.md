@@ -56,8 +56,8 @@ Une ancienne notification dont la cible est archivée ou devenue interdite reste
 - Projet vérifié explicitement: `hxtztkmbfpmzrieccwsg`; le ref production interdit n’a jamais été ciblé.
 - Migration appliquée après CI verte, puis rejouée intégralement avec succès.
 - Structure relue: trois RPC, RLS active, neuf index Phase 7/notifications, zéro droit RPC `anon`.
-- Recette réelle: 11 contrôles, six rôles authentifiés, isolation des six rôles sur une organisation étrangère, destinataires de gestion calculés au serveur, lecture/non-lecture, préférences, idempotence et refus `anon` réussis.
-- Une commande balisée `RECETTE-PHASE7` a été créée uniquement dans MIR TEST afin de provoquer un événement canonique. Le rejeu a retourné la même commande et aucun fournisseur n’a été contacté.
+- Recette corrective réelle: run GitHub `43335678845`, SHA fonctionnel `9c5b458150fcc99a19736bb1a3db65a9049da367`, 16/16 contrôles et six rôles authentifiés. Elle prouve la portée Commandes/Dépenses de l’Adjointe, la décision Dépenses propre à l’Employé, l’absence d’équipe du Chef sans Dépenses, le mouvement d’inventaire de l’Entrepôt sans RH/Dépenses, la portée opérationnelle du Boss/Admin, l’isolation interorganisationnelle, l’état traité, lecture/non-lecture, préférences et refus `anon`.
+- Les données créées sont documentées dans l’artefact `phase7-notifications-real` du run: commande `RECETTE-PHASE7`, dépense, reçu privé, SKU et réception `RECETTE-PHASE7-CORRECTIF`. Elles restent identifiables dans MIR TEST; aucun nettoyage destructif n’a été effectué. Le rejeu de commande a retourné le même identifiant sans doublon et aucun fournisseur n’a été contacté.
 - Audit Supabase final: aucune alerte sécurité liée aux tables Phase 7; le seul avis propre au lot est l’index `notification_events_actor` encore inutilisé immédiatement après sa création.
 - Le centre utilise rechargement/actualisation comme repli; aucun faux temps réel n’est revendiqué.
 - Aucun courriel ou push envoyé. Zéro requête et zéro écriture Supabase production.
