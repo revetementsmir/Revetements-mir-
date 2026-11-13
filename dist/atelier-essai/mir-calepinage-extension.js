@@ -176,17 +176,31 @@
 
   const PROFILE_TEMPLATES = deepFreeze({
     fascia: {
-      id:'fascia', name:'Fascia', version:1,
-      geometryStatus:'confirmé par croquis 95821 et cotes fournies', startHeadingDeg:90,
+      id:'fascia', name:'Fascia', version:2,
+      geometryStatus:'décision Frederick Phase 10 : retour verrouillé à 3/4 po', startHeadingDeg:-90,
       fields:[
         {id:'height',label:'Face',defaultValue:6,required:true},
-        {id:'bottom',label:'Bas',defaultValue:1.25,required:true},
-        {id:'hem',label:'Repli',defaultValue:0.625,required:true}
+        {id:'bottom',label:'Bas',defaultValue:1.25,required:true,locked:true},
+        {id:'hem',label:'Retour écrasé',defaultValue:0.75,required:true,locked:true}
       ],
       segments:[
         {id:'height',fieldId:'height',turnDeg:0},
-        {id:'bottom',fieldId:'bottom',turnDeg:-90},
-        {id:'hem',fieldId:'hem',turnDeg:-180,foldKind:'hem'}
+        {id:'bottom',fieldId:'bottom',turnDeg:90},
+        {id:'hem',fieldId:'hem',turnDeg:180,foldKind:'hem'}
+      ]
+    },
+    ailes_fenetre: {
+      id:'ailes_fenetre', name:'Ailes de fenêtre', version:1,
+      geometryStatus:'décision Frederick Phase 10 et croquis 97904 : grand segment vertical, bas vers la droite, retour terminal', startHeadingDeg:-90,
+      fields:[
+        {id:'vertical',label:'Grande aile verticale',defaultValue:'',required:true},
+        {id:'bottom',label:'Aile inférieure vers la droite',defaultValue:'',required:true},
+        {id:'return',label:'Retour terminal',defaultValue:'',required:true}
+      ],
+      segments:[
+        {id:'vertical',fieldId:'vertical',turnDeg:0},
+        {id:'bottom',fieldId:'bottom',turnDeg:90},
+        {id:'return',fieldId:'return',turnDeg:-90}
       ]
     },
     l_replie: {
@@ -207,11 +221,11 @@
       id:'colonne', name:'Colonne', version:1,
       geometryStatus:'suite ⅞–7–7–1–1 confirmée; orientation conservée du prototype 95821', startHeadingDeg:90,
       fields:[
-        {id:'s1',label:'Segment 1',defaultValue:0.875,required:true},
-        {id:'s2',label:'Segment 2',defaultValue:7,required:true},
-        {id:'s3',label:'Segment 3',defaultValue:7,required:true},
-        {id:'s4',label:'Segment 4',defaultValue:1,required:true},
-        {id:'s5',label:'Segment 5',defaultValue:1,required:true}
+        {id:'s1',label:'Segment 1',defaultValue:0.875,required:true,locked:true},
+        {id:'s2',label:'Segment 2',defaultValue:7.125,required:true},
+        {id:'s3',label:'Segment 3',defaultValue:7.125,required:true},
+        {id:'s4',label:'Segment 4',defaultValue:1,required:true,locked:true},
+        {id:'s5',label:'Segment 5',defaultValue:1,required:true,locked:true}
       ],
       segments:[
         {id:'s1',fieldId:'s1',turnDeg:0},
@@ -223,15 +237,15 @@
     },
     beam: {
       id:'beam', name:'Beam / cache-poutre', version:1,
-      geometryStatus:'cotes 1¼–8–6–8–1¼ confirmées; replis facultatifs sans cote inventée', startHeadingDeg:0,
+      geometryStatus:'cotes Phase 10 confirmées 1¼–7½–6⅛–7½–1¼; replis facultatifs de 5/8 po', startHeadingDeg:0,
       fields:[
         {id:'leftFlange',label:'Retour gauche',defaultValue:1.25,required:true},
-        {id:'leftSide',label:'Côté gauche',defaultValue:8,required:true},
-        {id:'bottom',label:'Dessous',defaultValue:6,required:true},
-        {id:'rightSide',label:'Côté droit',defaultValue:8,required:true},
+        {id:'leftSide',label:'Côté gauche',defaultValue:7.5,required:true},
+        {id:'bottom',label:'Dessous',defaultValue:6.125,required:true},
+        {id:'rightSide',label:'Côté droit',defaultValue:7.5,required:true},
         {id:'rightFlange',label:'Retour droit',defaultValue:1.25,required:true},
-        {id:'leftHem',label:'Repli gauche',defaultValue:'',required:false,visibleWhen:'beamHems'},
-        {id:'rightHem',label:'Repli droit',defaultValue:'',required:false,visibleWhen:'beamHems'}
+        {id:'leftHem',label:'Repli gauche',defaultValue:0.625,required:false,locked:true,visibleWhen:'beamHems'},
+        {id:'rightHem',label:'Repli droit',defaultValue:0.625,required:false,locked:true,visibleWhen:'beamHems'}
       ],
       segments:[
         {id:'leftFlange',fieldId:'leftFlange',turnDeg:0},
@@ -242,17 +256,98 @@
       ]
     },
     eloignement_eaux: {
-      id:'eloignement_eaux', name:'Éloignement des eaux', version:1,
-      geometryStatus:'cotes 6–2–½ reprises de la passation maître; développé non calculé', startHeadingDeg:90,
+      id:'eloignement_eaux', name:'Écoulement des eaux', version:2,
+      geometryStatus:'décision Frederick Phase 10 et croquis 97906 : grand segment vertical, bas vers la gauche, petit retour descendant', startHeadingDeg:-90,
       fields:[
-        {id:'drop',label:'Grande face',defaultValue:6,required:true},
-        {id:'out',label:'Éloignement horizontal',defaultValue:2,required:true},
-        {id:'drip',label:'Petit retour / goutte',defaultValue:0.5,required:true}
+        {id:'drop',label:'Grand segment vertical',defaultValue:'',required:true},
+        {id:'out',label:'Segment inférieur vers la gauche',defaultValue:'',required:true},
+        {id:'drip',label:'Petit retour descendant',defaultValue:'',required:true}
       ],
       segments:[
         {id:'drop',fieldId:'drop',turnDeg:0},
         {id:'out',fieldId:'out',turnDeg:-90},
-        {id:'drip',fieldId:'drip',turnDeg:45}
+        {id:'drip',fieldId:'drip',turnDeg:90}
+      ]
+    },
+    goutte_eau_8: {
+      id:'goutte_eau_8', name:'Goutte d’eau — développé total 8 po', version:2,
+      geometryStatus:'décision Frederick Phase 10 et croquis 97902 : grande remontée verticale, portée vers la gauche et retour descendant; développé total exactement 8 po', startHeadingDeg:-90,
+      developedTotalIn:8,
+      fields:[
+        {id:'back',label:'Grande remontée verticale',defaultValue:'',required:true},
+        {id:'seat',label:'Portée vers la gauche',defaultValue:'',required:true},
+        {id:'return',label:'Petit retour descendant',defaultValue:'',required:true}
+      ],
+      segments:[
+        {id:'back',fieldId:'back',turnDeg:0},
+        {id:'seat',fieldId:'seat',turnDeg:-90},
+        {id:'return',fieldId:'return',turnDeg:90}
+      ]
+    },
+    sill_trim: {
+      id:'sill_trim', name:'Sill Trim', version:1,
+      geometryStatus:'cotes confirmées Phase 10 : 2½–1½–¾; zone de clouage minimale 1 po', startHeadingDeg:-90,
+      fields:[
+        {id:'face',label:'Face descendante',defaultValue:2.5,required:true},
+        {id:'rightFold',label:'Retour vers la droite',defaultValue:1.5,required:true},
+        {id:'leftFold',label:'Retour vers la gauche',defaultValue:0.75,required:true}
+      ],
+      segments:[
+        {id:'face',fieldId:'face',turnDeg:0},
+        {id:'rightFold',fieldId:'rightFold',turnDeg:90},
+        {id:'leftFold',fieldId:'leftFold',turnDeg:180,foldKind:'hem'}
+      ]
+    },
+    l_transition: {
+      id:'l_transition', name:'L de transition verticale pour panneau', version:1,
+      geometryStatus:'cotes confirmées Phase 10 : 2⅜–⅞–¾, toutes visibles et verrouillées', startHeadingDeg:-90,
+      fields:[
+        {id:'vertical',label:'Face verticale',defaultValue:2.375,required:true,locked:true},
+        {id:'right',label:'Aile vers la droite',defaultValue:0.875,required:true,locked:true},
+        {id:'hem',label:'Retour écrasé',defaultValue:0.75,required:true,locked:true}
+      ],
+      segments:[
+        {id:'vertical',fieldId:'vertical',turnDeg:0},
+        {id:'right',fieldId:'right',turnDeg:90},
+        {id:'hem',fieldId:'hem',turnDeg:180,foldKind:'hem'}
+      ]
+    },
+    capage_climatiseur: {
+      id:'capage_climatiseur', name:'Capage d’air climatisé', version:1,
+      geometryStatus:'topologie et cotes ½–1–3–4–3–1–½ confirmées Phase 10', startHeadingDeg:180,
+      fields:[
+        {id:'returnLeft',label:'Retour gauche',defaultValue:0.5,required:true,locked:true},
+        {id:'foldLeft',label:'Double pli gauche',defaultValue:1,required:true,locked:true},
+        {id:'sideLeft',label:'Côté gauche',defaultValue:3,required:true},
+        {id:'top',label:'Dessus',defaultValue:4,required:true},
+        {id:'sideRight',label:'Côté droit',defaultValue:3,required:true},
+        {id:'foldRight',label:'Double pli droit',defaultValue:1,required:true,locked:true},
+        {id:'returnRight',label:'Retour droit',defaultValue:0.5,required:true,locked:true}
+      ],
+      segments:[
+        {id:'returnLeft',fieldId:'returnLeft',turnDeg:0},
+        {id:'foldLeft',fieldId:'foldLeft',turnDeg:180,foldKind:'hem'},
+        {id:'sideLeft',fieldId:'sideLeft',turnDeg:-90},
+        {id:'top',fieldId:'top',turnDeg:90},
+        {id:'sideRight',fieldId:'sideRight',turnDeg:90},
+        {id:'foldRight',fieldId:'foldRight',turnDeg:180,foldKind:'hem'},
+        {id:'returnRight',fieldId:'returnRight',turnDeg:180,foldKind:'hem'}
+      ]
+    },
+    ventilation_mur_fenetre: {
+      id:'ventilation_mur_fenetre', name:'Ventilation — haut de mur et bas de fenêtre', version:1,
+      geometryStatus:'cotes confirmées Phase 10 : 2–1½–1½–1¼; jumelage anti-rongeur requis', startHeadingDeg:0,
+      fields:[
+        {id:'right',label:'Aile vers la droite',defaultValue:2,required:true,locked:true},
+        {id:'down',label:'Descente',defaultValue:1.5,required:true,locked:true},
+        {id:'fold',label:'Double pli remontant',defaultValue:1.5,required:true,locked:true},
+        {id:'left',label:'Retour vers la gauche',defaultValue:1.25,required:true,locked:true}
+      ],
+      segments:[
+        {id:'right',fieldId:'right',turnDeg:0},
+        {id:'down',fieldId:'down',turnDeg:-90},
+        {id:'fold',fieldId:'fold',turnDeg:180,foldKind:'hem'},
+        {id:'left',fieldId:'left',turnDeg:-90}
       ]
     },
     solin_brique: {

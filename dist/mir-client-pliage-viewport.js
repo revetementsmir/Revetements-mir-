@@ -57,6 +57,13 @@
   view.items.forEach((item, index) => {
    item.classList.toggle('client-viewport-off-page', Math.floor(index / view.size) !== view.index);
   });
+  document.querySelectorAll('#client-standard-options .client-model-group').forEach(group => {
+   const visible = Array.from(group.querySelectorAll('[data-client-profile]'))
+    .some(item => !item.classList.contains('client-viewport-off-page'));
+   group.hidden = !visible;
+   const title = group.previousElementSibling;
+   if (title?.classList.contains('client-model-group-title')) title.hidden = !visible;
+  });
   view.nav.hidden = view.count <= 1;
   view.back.disabled = view.index === 0;
   view.next.disabled = view.index + 1 >= view.count;
@@ -76,7 +83,7 @@
   for(const view of controls.values())view.nav.hidden=state!=='models'||view.count<=1;
   if (state === 'models') {
    paginate('Pages de modèles', '#client-saved-options [data-saved-template], #client-standard-options [data-client-profile]',
-    $('#client-model-options'), wide ? 8 : short ? 4 : 6);
+    $('#client-model-options'), wide ? (innerHeight < 900 ? 4 : 8) : short ? 4 : 6);
 
   }
  }

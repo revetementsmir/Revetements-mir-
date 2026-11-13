@@ -153,7 +153,7 @@ async function verifyMouldingWizard(browser,base,artifacts){
 async function main(){
  await new Promise(done=>server.listen(0,'127.0.0.1',done));let browser;
  try{
-  browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
+  browser=await chromium.launch({...(fs.existsSync('/opt/google/chrome/chrome')?{channel:'chrome'}:{executablePath:'/usr/bin/chromium'}),headless:true,args:['--no-sandbox']});
   fs.mkdirSync(path.resolve(__dirname,'../artifacts'),{recursive:true});
   for(const width of [360,390,820,1440,3440]){
    const page=await browser.newPage({viewport:{width,height:900}});

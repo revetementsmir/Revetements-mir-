@@ -77,8 +77,13 @@ test('La page des coins charge les composants de production', () => {
   assert.ok(html.includes('MIR — Solin brique et coins architecturaux'));
 });
 const Presets = require('../dist/mir-bending-presets.js');
-test('Les onze profils MIR sont disponibles dans le configurateur', () => {
-  assert.equal(Presets.VARIANTS.length,11);
+test('Les dix modèles canoniques Phase 10 sont disponibles dans le configurateur', () => {
+  assert.equal(Presets.VARIANTS.length,10);
+  assert.deepEqual(Presets.VARIANTS.map(({id})=>id),[
+    'fascia','ailes_fenetre','eloignement_eaux','goutte_eau_8','sill_trim',
+    'beam','colonne','l_transition','capage_climatiseur','ventilation_mur_fenetre'
+  ]);
+  assert.ok(!Presets.VARIANTS.some(({id})=>['omega','beam_replis','solin_brique_goutte'].includes(id)));
   for(const preset of Presets.VARIANTS){
     const s=Presets.create(preset.id);
     assert.equal(s.template,'custom');
@@ -98,12 +103,42 @@ test('Fascia et L replié gardent le retour écrasé', () => {
     assert.equal(P.buildProfile({kind:'profile',unit:'in',...s,length:120}).valid,true);
   }
 });
+test('Fascia Phase 10 verrouille le retour à 3/4 po', () => {
+  const s=Presets.create('fascia');
+  assert.equal(s.segments.at(-1).length,.75);
+  assert.ok(s.mirLockedFields.includes('hem'));
+});
+test('Les trois topologies décidées par Frederick n’inventent aucune cote', () => {
+  for(const id of ['ailes_fenetre','eloignement_eaux','goutte_eau_8']){
+    const s=Presets.create(id);
+    assert.ok(s.segments.every(segment=>segment.length===''),id);
+  }
+  assert.deepEqual(Presets.create('ailes_fenetre').bends.map(b=>b.angle),[90,-90]);
+  assert.deepEqual(Presets.create('eloignement_eaux').bends.map(b=>b.angle),[-90,90]);
+  assert.deepEqual(Presets.create('goutte_eau_8').bends.map(b=>b.angle),[-90,90]);
+});
+test('Goutte d’eau exige un développé total exactement égal à 8 po', () => {
+  const s=Presets.create('goutte_eau_8');
+  s.kind='profile';s.unit='in';s.length=120;
+  s.segments.forEach((segment,index)=>segment.length=[5.5,2,.5][index]);
+  assert.equal(Presets.checkCanonical(s).ok,true);
+  s.segments.at(-1).length=1.5;
+  const invalid=Presets.checkCanonical(s);
+  assert.equal(invalid.ok,false);
+  assert.equal(invalid.errors[0].code,'DEVELOPED_TOTAL_8_REQUIRED');
+});
+test('Les variantes dérivées et profils historiques restent accessibles hors décompte', () => {
+  assert.equal(Presets.create('beam_replis').mirCanonicalPhase10,false);
+  assert.equal(Presets.create('solin_brique_goutte').mirCanonicalPhase10,false);
+  assert.equal(Presets.create('coin_arch_j').mirCanonicalPhase10,false);
+  assert.ok(Presets.catalog().omega===undefined);
+});
 test('Beam avec replis : sept segments, deux retours écrasés', () => {
   const s=Presets.create('beam_replis');
   assert.equal(s.segments.length,7);
   assert.equal(s.bends.filter(b=>b.mode==='hem').length,2);
-  assert.equal(s.segments[0].length,'');
-  assert.equal(s.segments.at(-1).length,'');
+  assert.equal(s.segments[0].length,.625);
+  assert.equal(s.segments.at(-1).length,.625);
 });
 test('Les solins brique ne préremplissent aucune cote inconnue', () => {
   for(const id of ['solin_brique','solin_brique_goutte']){
@@ -146,7 +181,7 @@ test('Le J ne peut pas contourner la règle après modification de la topologie'
 test('Les profils sont chargés directement sur la page de production', () => {
   const html=fs.readFileSync(path.join(__dirname,'../dist/production.html'),'utf8');
   const app=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
-  assert.ok(html.includes('mir-bending-presets.js?v=profils-1'));
+  assert.ok(html.includes('mir-bending-presets.js?v=phase10-1'));
   assert.ok(app.includes('...window.MIRBendingPresets?.catalog()'));
   assert.ok(app.includes('mir-j-exception-form'));
 });
@@ -301,7 +336,7 @@ test('Pliage MIR : retour écrasé avec un raccord arrondi', () => {
 });
 
 
-test('Repères A-B-C : les côtés serrés gardent leurs étiquettes hors du dessin', () => {
+test('Repères A-B-C : le solveur garde tous les badges dans le cadre et cible le milieu exact', () => {
  const code=fs.readFileSync(path.join(__dirname,'../dist/production-model.js'),'utf8');
  const begin=code.indexOf('function profileSideMarkers(');
  const end=code.indexOf('\nfunction profileDiagramContent(',begin);
@@ -312,12 +347,13 @@ test('Repères A-B-C : les côtés serrés gardent leurs étiquettes hors du des
  const labels={segments:[{label:'A'},{label:'B'},{label:'C'}]};
  const normal=place({segments,folds:[]},labels,[]);
  assert.ok(normal.includes('>A</text>')&&normal.includes('>B</text>')&&normal.includes('>C</text>'));
- const tiny=place({segments:[[[1,1],[2,1]]],folds:[]},{segments:[{label:'A'}]},[]);
- assert.ok(tiny.includes('profile-marker-overflow'));
- assert.ok(tiny.includes('cy="495"'));
+ const tiny=place({segments:[[[80,80],[81,80]]],folds:[]},{segments:[{label:'A'}]},[],null,[0,160],[0,160]);
  assert.ok(tiny.includes('>A</text>'));
- const count=(tiny.match(/>A<\/text>/g)||[]).length;
- assert.equal(count,1,'un seul badge par segment');
+ assert.equal((tiny.match(/>A<\/text>/g)||[]).length,1,'un seul badge par segment');
+ assert.match(tiny,/data-anchor-x="80\.5" data-anchor-y="80"/,'le rappel vise le milieu du segment');
+ const center=tiny.match(/transform="translate\(([\d.]+),([\d.]+)\)/);
+ assert.ok(center,'badge rendu');
+ assert.ok(Number(center[1])>=12&&Number(center[1])<=148&&Number(center[2])>=12&&Number(center[2])<=148,'badge et ses marges dans le cadre');
 });
 
 

@@ -15,6 +15,7 @@ function create({sdk,storage,onSessionInvalidated=()=>{}}){
  async login(email,password){generation++;const {error}=await sdk.auth.signInWithPassword({email,password});if(error)throw error;await verify();return rpc('mir_my_memberships',{});},
  async memberships(){await verify();return rpc('mir_my_memberships',{});},
  async snapshot(org){await verify();return rpc('mir_shared_snapshot',{org});},
+ async managementSnapshot(org){await verify();return rpc('mir_bending_management_snapshot',{org});},
  async submit(org,model,configuration){
   const user=await verify();const key='mir_shared_pending_'+user+'_'+org,signature=JSON.stringify({model:model.id,revision:model.revision,configuration});
   let pending=JSON.parse(storage.getItem(key)||'null');
@@ -33,7 +34,10 @@ function create({sdk,storage,onSessionInvalidated=()=>{}}){
  async importMaster(org,record){await verify();return rpc('mir_import_master',{org,record});},
  async addVersion(org,model,template){await verify();return rpc('mir_add_master_version',{org,model:model.id,expected_revision:model.revision,template});},
  async publish(org,model,settings){await verify();return rpc('mir_admin_publish_model',{org,model:model.id,expected_revision:model.revision,settings});},
- async saveBendTariff(org,revision,settings){await verify();return rpc('mir_admin_save_bend_tariff',{org,expected_revision:revision,settings});},
+ async manageModel(org,{requestId=globalThis.crypto.randomUUID(),action,modelId,expectedVersion,expectedRevision,name,description,specification,settings,reason}){await verify();if(window.MIRSharedConfig?.legacyTechnicalAdminTestOnly)return rpc('mir_admin_publish_model',{org,model:modelId,expected_revision:expectedRevision,settings:{...settings,supplier_po:settings.production}});return rpc('mir_bending_model_manage',{org,request_id:requestId,action,model_id:modelId,expected_version:expectedVersion,expected_revision:expectedRevision,name,description,specification,settings,reason});},
+ async reviseReceivedOrder(org,{requestId=globalThis.crypto.randomUUID(),orderId,expectedRevision,reason,snapshot}){await verify();return rpc('mir_received_order_revise',{org,request_id:requestId,order_id:orderId,expected_revision:expectedRevision,reason,revised_snapshot:snapshot});},
+ async saveRevisedOrderPdf(org,{orderId,revision,blob,supersedesDocumentId=null}){const user=await verify();if(!(blob instanceof Blob)||blob.type!=='application/pdf'||blob.size<1||blob.size>20*1024*1024)throw Error('PDF révisé invalide');const bytes=await blob.arrayBuffer(),sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(x=>x.toString(16).padStart(2,'0')).join(''),path=`${org}/${orderId}/revision-${revision}/${user}-${globalThis.crypto.randomUUID()}.pdf`,uploaded=await sdk.storage.from('mir-order-files').upload(path,blob,{contentType:'application/pdf',upsert:false});if(uploaded.error)throw uploaded.error;try{return await rpc('mir_revised_order_document_register',{org,order_id:orderId,revision,object_path:path,sha256,supersedes_document_id:supersedesDocumentId});}catch(error){await sdk.storage.from('mir-order-files').remove([path]).catch(()=>{});throw error;}},
+ async saveBendTariff(org,revision,settings,reason){await verify();return window.MIRSharedConfig?.legacyTechnicalAdminTestOnly?rpc('mir_admin_save_bend_tariff',{org,expected_revision:revision,settings}):rpc('mir_bending_tariff_manage',{org,expected_revision:revision,settings,reason});},
  async deliveryDistance(org,address){await verify();return rpc('mir_boutique_delivery_distance',{org,address_id:address.id,address_version:address.version});},
  async logout(){generation++;identity=null;onSessionInvalidated();const {error}=await sdk.auth.signOut({scope:'local'});if(error)throw error;},
  dispose(){generation++;identity=null;subscription?.data?.subscription?.unsubscribe();}

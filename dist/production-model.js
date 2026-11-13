@@ -301,7 +301,7 @@
     if (extruded) {
       if (material.thicknessMM === null) pending.push(issue('EXTRUDED_THICKNESS_REQUIRED', 'material.thickness', 'Choisissez l’épaisseur de l’aluminium extrudé : 2 mm ou 3 mm.'));
       else if (![2, 3].some(t => Math.abs(material.thicknessMM - t) < EPS)) pending.push(issue('EXTRUDED_THICKNESS_CHOICE', 'material.thickness', 'Ce modèle d’aluminium extrudé propose seulement 2 mm ou 3 mm.'));
-    } else if (!material.gauge && material.thicknessMM === null) pending.push(issue('GAUGE_OR_THICKNESS_REQUIRED', 'material', 'Gage ou épaisseur de tôle à préciser.'));
+    } else if (kind === 'panel' && !material.gauge && material.thicknessMM === null) pending.push(issue('GAUGE_OR_THICKNESS_REQUIRED', 'material', 'Gage ou épaisseur de tôle à préciser.'));
     if (material.gauge && !unknownGauge) warnings.push(issue('GAUGE_NOT_CONVERTED', 'material.gauge', 'Le gage est conservé tel que saisi; aucune conversion en épaisseur n’est supposée.'));
     const finish = { manufacturer: text(rawFinish.manufacturer, 100), name: text(rawFinish.name, 100), code: text(rawFinish.code, 80), system: text(rawFinish.system, 60), selectionType: ['manufacturer', 'ral', 'custom'].includes(rawFinish.selectionType) ? rawFinish.selectionType : null, special: rawFinish.special === true, hex: /^#[0-9a-f]{6}$/i.test(rawFinish.hex || '') ? rawFinish.hex : null };
     const pricing = colorQuotePolicy({ finish });
@@ -356,6 +356,10 @@
     if (!coloredFace.side) meta.pending.push(issue('COLORED_FACE_REQUIRED', 'coloredFace.side', 'Indiquez le côté coloré, gauche ou droit en suivant A vers les segments suivants.'));
     if (!used.has(coloredFace.segmentId)) meta.pending.push(issue('COLORED_FACE_SEGMENT', 'coloredFace.segmentId', 'Choisissez un segment existant pour le repère de face colorée.'));
     if (warnings.some(w => w.code === 'PROFILE_CROSSING')) meta.pending.push(issue('CROSSING_REVIEW', 'segments', 'Le croisement doit être résolu avant validation atelier.'));
+    if (!errors.length && Number.isFinite(Number(spec.mirDevelopedTotalIn))) {
+      const actualIn = segments.reduce((sum, segment) => sum + segment.lengthMM, 0) / 25.4;
+      if (Math.abs(actualIn - Number(spec.mirDevelopedTotalIn)) > EPS) errors.push(issue(Number(spec.mirDevelopedTotalIn) === 8 ? 'DEVELOPED_TOTAL_8_REQUIRED' : 'DEVELOPED_TOTAL_REQUIRED', 'segments', 'La somme des cotes doit être exactement ' + decimal(Number(spec.mirDevelopedTotalIn)) + ' po.'));
+    }
     const check = validation(errors, meta.pending, [...warnings, ...meta.warnings]);
     return withPricing({ version: VERSION, kind: 'profile', id: text(spec.id, 80), name: text(spec.name || spec.label || template?.label || 'Profil libre', 140), template: templateId, unit, spec, segments, bends, pointsMM, bbox: pointsMM.length ? bounds(pointsMM) : null, coloredFace, quantity: meta.quantity, material: meta.material, finish: meta.finish, quotePolicy: meta.quotePolicy, lengthMM: meta.lengthMM, location: meta.location, note: meta.note, finishedSegmentSumMM: errors.length ? null : segments.reduce((sum, s) => sum + s.lengthMM, 0), developedWidthMM: null, developedWidth: null, developmentStatus: 'requires_workshop_bend_parameters', validation: check, valid: check.valid, complete: check.specificationComplete, productionReady: check.productionReady });
   }
@@ -558,26 +562,21 @@
     out += multiline(28, 116, model.validation.errors.map(e => e.message), { width: Math.max(25, Math.floor(width / 10)), lineHeight: 24, attrs: 'font-size="16"' }).svg;
     return out + svgClose;
   }
-  function segmentLabelMap(points, labels, width, height) {
-    const used = [], result = [];
-    for (let i = 0; i < labels.length; i++) {
-      const a = points[i], b = points[i + 1], mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], length = Math.max(dist(a, b), EPS), normal = [-(b[1] - a[1]) / length, (b[0] - a[0]) / length];
-      let p;
-      for (const radius of [22, -22, 42, -42, 62, -62, 84]) {
-        const candidate = [Math.max(18, Math.min(width - 18, mid[0] + normal[0] * radius)), Math.max(48, Math.min(height - 44, mid[1] + normal[1] * radius))];
-        p = candidate;
-        if (!used.some(q => dist(q, candidate) < 30)) break;
-      }
-      used.push(p); result.push({ label: labels[i], mid, point: p });
-    }
-    return result;
+  function paintedFaceLabel(side) {
+    return side==='left'?'Face 1 — côté indiqué par l’étoile':side==='right'?'Face 2 — côté indiqué par l’étoile':'à préciser';
   }
   function profileDetailLines(model) {
-    const lines = model.segments.map(s => s.label + ' = ' + formatMeasurement(s.lengthMM, model.unit) + (s.name ? ' · ' + s.name : ''));
-    for (const b of model.bends) if (b) lines.push('Pli ' + b.from + '–' + b.to + ' : ' + b.label);
-    lines.push('* Face colorée : ' + (model.coloredFace.side ? (model.coloredFace.side === 'left' ? 'gauche' : 'droite') + ' en suivant A → dernier segment' : 'à préciser'));
+    const lines=[];
+    model.segments.forEach((s,index)=>{lines.push(s.label + ' = ' + formatMeasurement(s.lengthMM, model.unit) + (s.name ? ' · ' + s.name : ''));const b=model.bends[index];if(b)lines.push('Pli ' + b.from + '–' + b.to + ' = ' + fabricationBendLabel(b));});
+    if(Number.isFinite(model.finishedSegmentSumMM))lines.push('Développé total = '+formatMeasurement(model.finishedSegmentSumMM,model.unit)+' (nominal)');
+    lines.push('Face colorée : ' + paintedFaceLabel(model.coloredFace.side));
     lines.push('Développé de tôle : à valider par l’atelier.');
     return lines;
+  }
+  function fabricationBendLabel(bend) {
+    if (bend?.mode === 'hem') return '180° — retour écrasé';
+    if (Number.isFinite(bend?.angle)) return decimal(Math.abs(bend.angle)) + '°';
+    return bend?.label || 'à préciser';
   }
   function profileSVG(value, options = {}) {
     const model = modelOf(value), width = safeSize(options.width, 900), legend = options.legend !== false, details = profileDetailLines(model), height = safeSize(options.height, Math.max(480, legend ? 96 + details.length * 24 : 480));
@@ -586,24 +585,7 @@
     const diagramWidth = legend ? width * .62 : width, topSpace = options.header === false ? 35 : 83, bottomSpace = options.notes === false ? 36 : 92, box = { x: 50, y: topSpace, w: Math.max(80, diagramWidth - 100), h: height - topSpace - bottomSpace }, project = projection(model.pointsMM, box), points = model.pointsMM.map(project);
     let out = svgOpen(width, height, model.name + ' · coupe et cotes finies');
     if (options.header !== false) out += svgText(24, 34, (model.id ? model.id + ' · ' : '') + model.name, 'font-size="23" font-weight="700"');
-    out += '<polyline points="' + pointsAttr(points) + '" fill="none" stroke="#25352d" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"/>';
-    for (const item of segmentLabelMap(points, model.segments.map(s => s.label), diagramWidth, height)) {
-      out += '<line x1="' + decimal(item.mid[0]) + '" y1="' + decimal(item.mid[1]) + '" x2="' + decimal(item.point[0]) + '" y2="' + decimal(item.point[1]) + '" stroke="#94a08f" stroke-width="1"/>';
-      out += '<circle cx="' + decimal(item.point[0]) + '" cy="' + decimal(item.point[1]) + '" r="14" fill="#f4f7f0" stroke="#dce4d4"/>';
-      out += svgText(item.point[0], item.point[1] + 5, item.label, 'font-size="17" font-weight="700" text-anchor="middle" fill="#527539"');
-    }
-    const coloredIndex = model.segments.findIndex(s => s.id === model.coloredFace.segmentId);
-    if (model.coloredFace.side && coloredIndex >= 0) {
-      const a = points[coloredIndex], b = points[coloredIndex + 1], len = Math.max(dist(a, b), EPS), sign = model.coloredFace.side === 'left' ? -1 : 1, normal = [-(b[1] - a[1]) / len * sign, (b[0] - a[0]) / len * sign], mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-      const tangent = [(b[0] - a[0]) / len, (b[1] - a[1]) / len], half = Math.min(24, len * .3), center = [mid[0] + normal[0] * 8, mid[1] + normal[1] * 8];
-      out += '<line x1="' + decimal(center[0] - tangent[0] * half) + '" y1="' + decimal(center[1] - tangent[1] * half) + '" x2="' + decimal(center[0] + tangent[0] * half) + '" y2="' + decimal(center[1] + tangent[1] * half) + '" stroke="#568443" stroke-width="3"/>';
-      out += svgText(mid[0] + normal[0] * 26, mid[1] + normal[1] * 26 + 6, '*', 'font-size="28" font-weight="700" fill="#568443" text-anchor="middle"');
-    }
-    for (const b of model.bends.filter(b => b?.mode === 'hem')) {
-      const p = project(b.at);
-      out += '<circle cx="' + decimal(p[0]) + '" cy="' + decimal(p[1]) + '" r="7" fill="#fff" stroke="#a56624" stroke-width="2"/>';
-      out += svgText(p[0] + 12, p[1] - 12, '180°', 'font-size="14" fill="#a56624"');
-    }
+    out += profileDiagramContent(model, points, { paintedMarker: 'star', highContrast: true, horizontalBounds: [0, diagramWidth], verticalBounds: [0, height] });
     if (legend) {
       out += '<line x1="' + decimal(diagramWidth) + '" y1="62" x2="' + decimal(diagramWidth) + '" y2="' + decimal(height - 56) + '" stroke="#dde4d7"/>';
       out += multiline(diagramWidth + 20, 86, details, { width: Math.max(24, Math.floor((width - diagramWidth - 35) / 8)), lineHeight: 21, attrs: 'font-size="15"' }).svg;
@@ -698,9 +680,14 @@
   }
   function productionDetailLines(item) {
     if (item.kind === 'profile') {
-      const lines = item.segments.map(s => s.label + ' = ' + formatMeasurement(s.lengthMM, item.unit));
-      for (const b of item.bends) if (b) lines.push('Pli ' + b.from + '–' + b.to + ' : ' + b.label);
-      lines.push('Face colorée : ' + (item.coloredFace.side ? (item.coloredFace.side === 'left' ? 'gauche' : 'droite') + ' de A → ' + item.segments.at(-1).label : 'à préciser'));
+      const lines = [];
+      item.segments.forEach((segment, index) => {
+        lines.push(segment.label + ' = ' + formatMeasurement(segment.lengthMM, item.unit));
+        const bend = item.bends[index];
+        if (bend) lines.push('Pli ' + bend.from + '–' + bend.to + ' = ' + fabricationBendLabel(bend));
+      });
+      if (Number.isFinite(item.finishedSegmentSumMM)) lines.push('Développé total = ' + formatMeasurement(item.finishedSegmentSumMM, item.unit) + ' (nominal)');
+      lines.push('Face colorée : ' + paintedFaceLabel(item.coloredFace.side));
       lines.push(...pricingDetailLines(item));
       return lines;
     }
@@ -796,126 +783,102 @@ function profileDrawingSection(points,bends){
  return section;
 }
 
-function profileSideMarkers({segments,folds},model,handles,annotationBounds,[left,right]=[0,800]){
- const placed=[];
- const distance=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
- function distanceToSide(p,[a,b]){
-  const dx=b[0]-a[0],dy=b[1]-a[1],lengthSquared=dx*dx+dy*dy;
-  const t=lengthSquared?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/lengthSquared)):0;
-  return distance(p,[a[0]+t*dx,a[1]+t*dy]);
- }
- const points=segments.flat();
- const center=[0,1].map(axis=>{
-  const coordinates=points.map(point=>point[axis]);
-  return (Math.min(...coordinates)+Math.max(...coordinates))/2;
- });
- const missing=[],leaders=[];
- const markers=segments.map(([a,b],index)=>{
-  const label=model.segments?.[index]?.label||String.fromCharCode(65+index);
-  const mm=model.segments?.[index]?.lengthMM;
-  const caption=Number.isFinite(mm)?label+' · '+formatMeasurement(mm,model.unit):label;
-  const length=distance(a,b),halfWidth=caption===label?11:Math.ceil(caption.length*4.1+8);
-  const anchor=[(a[0]+b[0])/2,(a[1]+b[1])/2];
-  const compact=right-left<800;
-  const clear=([x,y])=>{
-   const near=(q,margin)=>Math.abs(x-q[0])<halfWidth+margin&&Math.abs(y-q[1])<12+margin;
-   const relative=([px,py])=>[(px-x)/(halfWidth+7),(py-y)/19];
-   return x>=left+halfWidth+2&&x<=right-halfWidth-2&&y>=14&&y<=462&&
-    !placed.some(q=>compact?distance([x,y],q.point)<50:
-      near(q.point,q.halfWidth+4)&&Math.abs(y-q.point[1])<28)&&
-    !folds.some(q=>near(q,10))&&!handles.some(q=>near(q,12))&&
-    !segments.some(line=>distanceToSide([0,0],line.map(relative))<1.42);
-  };
-  let position=null, adjacent=false;
-  if(length){
-   const nx=(a[1]-b[1])/length,ny=(b[0]-a[0])/length;
-   // Repères du côté droit du tracé : A au-dessus, B à droite,
-   // C à gauche, D sous le retour. Les plis voisins ne partagent plus
-   // la même rangée de badges ni des flèches traversant le profil.
-   const preferred=-1;
-   const gap=Math.max(compact?52:38,Math.ceil(1.48/Math.hypot(nx/(halfWidth+7),ny/19))+2);
-   const candidate=(side,extra,slide=0)=>[
-    anchor[0]+side*(gap+extra)*nx+slide*(b[0]-a[0])/length,
-    anchor[1]+side*(gap+extra)*ny+slide*(b[1]-a[1])/length
-   ];
-   position=[candidate(preferred,0),candidate(preferred,10),
-    candidate(preferred,24),candidate(preferred,8,22),candidate(preferred,8,-22)].find(clear);
-   adjacent=!!position;
-   if(!position){
-    for(const extra of [18,35,55,85,120,160]){
-     position=[candidate(preferred,extra),candidate(-preferred,extra),
-       candidate(preferred,extra,26),candidate(-preferred,extra,-26)].find(clear);
-     if(position)break;
-    }
-   }
+function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=[0,800],[top,bottom]=[0,520],lineObstacles=[]){
+ const {segments}=section,center=segments.flat().reduce((s,p)=>[s[0]+p[0]/(segments.length*2),s[1]+p[1]/(segments.length*2)],[0,0]);
+ const used=[],ink=[],rendered=new Map(),candidateCache=new Map();
+ const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+ const intersects=(first,second)=>{
+  const [a,b]=first.map(p=>p.map(v=>Number(decimal(v)))),[c,d]=second.map(p=>p.map(v=>Number(decimal(v))));
+  return cross(a,b,c)*cross(a,b,d)<-1e-5&&cross(c,d,a)*cross(c,d,b)<-1e-5;
+ };
+ const hitsBox=([a,b],box)=>{
+  let low=0,high=1;
+  for(let axis=0;axis<2;axis++){
+   const min=(axis?box.y:box.x)-3,max=min+(axis?box.h:box.w)+6,delta=b[axis]-a[axis];
+   if(Math.abs(delta)<1e-9){if(a[axis]<min||a[axis]>max)return false;continue;}
+   let enter=(min-a[axis])/delta,leave=(max-a[axis])/delta;if(enter>leave)[enter,leave]=[leave,enter];
+   low=Math.max(low,enter);high=Math.min(high,leave);if(low>high)return false;
   }
-  if(!position&&(caption!==label||right-left<800)){
-   let nearest=Infinity;
-   for(let y=16;y<=452;y+=20)for(let x=left+halfWidth+2;x<=right-halfWidth-2;x+=24){
-    const candidate=[x,y],gap=distance(candidate,anchor);
-    if(gap<nearest&&clear(candidate)){position=candidate;nearest=gap;}
-   }
+  return true;
+ };
+ const order=[...segments.entries()].sort((a,b)=>Math.hypot(a[1][1][0]-a[1][0][0],a[1][1][1]-a[1][0][1])-Math.hypot(b[1][1][0]-b[1][0][0],b[1][1][1]-b[1][0][1])||a[0]-b[0]);
+ let visits=0;
+ function place(depth){
+  if(depth===order.length)return true;
+  if(++visits>20000)return false;
+  const [index,[a,b]]=order[depth];
+  let output='';
+  const length=Math.hypot(b[0]-a[0],b[1]-a[1])||1,t=[(b[0]-a[0])/length,(b[1]-a[1])/length],n=[-t[1],t[0]],mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+  const label=model.segments?.[index]?.label||String.fromCharCode(65+index),mm=model.segments?.[index]?.lengthMM,caption=Number.isFinite(mm)?label+' · '+formatMeasurement(mm,model.unit):label;
+  let angle=Math.atan2(t[1],t[0])*180/Math.PI;if(angle>90)angle-=180;if(angle<=-90)angle+=180;
+  const width=Math.max(24,caption.length*7.5+12),rad=angle*Math.PI/180,bw=Math.abs(Math.cos(rad))*width+Math.abs(Math.sin(rad))*24,bh=Math.abs(Math.sin(rad))*width+Math.abs(Math.cos(rad))*24;
+  const neighbour=segments.find(([s,e],j)=>j!==index&&Math.abs((e[0]-s[0])*t[0]+(e[1]-s[1])*t[1])>Math.hypot(e[0]-s[0],e[1]-s[1])*.98&&Math.abs(((s[0]+e[0])/2-mid[0])*n[0]+((s[1]+e[1])/2-mid[1])*n[1])>2&&Math.hypot((s[0]+e[0])/2-mid[0],(s[1]+e[1])/2-mid[1])<40);
+  const reference=neighbour?[(neighbour[0][0]+neighbour[1][0])/2,(neighbour[0][1]+neighbour[1][1])/2]:center;
+  const outward=(mid[0]-reference[0])*n[0]+(mid[1]-reference[1])*n[1]>=0?1:-1;
+  let chosen;const candidates=candidateCache.get(index)||[];
+  const longitudinal=(mid[0]-center[0])*t[0]+(mid[1]-center[1])*t[1]>=0?1:-1;
+  if(!candidateCache.has(index))for(const side of [outward,-outward])for(const gap of [32,48,64,80,96,112])for(const slide of length<width+20?[24*longitudinal,0,-24*longitudinal,48*longitudinal,-48*longitudinal,72,-72]:[0,24,-24,48,-48]){
+   const p=[mid[0]+n[0]*gap*side+t[0]*slide,mid[1]+n[1]*gap*side+t[1]*slide],box={x:p[0]-bw/2,y:p[1]-bh/2,w:bw,h:bh,cx:p[0],cy:p[1]};
+   const hit=q=>q[0]>=box.x-6&&q[0]<=box.x+box.w+6&&q[1]>=box.y-6&&q[1]<=box.y+box.h+6;
+   if(box.x<left+8||box.x+box.w>right-8||box.y<top+8||box.y+box.h>bottom-8||handles.some(p=>box.x<p[0]+25&&box.x+box.w>p[0]-25&&box.y<p[1]+25&&box.y+box.h>p[1]-25))continue;
+   if(segments.some(([s,e])=>Array.from({length:41},(_,i)=>[s[0]+(e[0]-s[0])*i/40,s[1]+(e[1]-s[1])*i/40]).some(hit)))continue;
+   const classic=length>=width+20&&slide===0;
+   const offset=q=>[q[0]+n[0]*gap*side,q[1]+n[1]*gap*side],lines=classic?[[a,offset(a)],[b,offset(b)],[offset(a),offset(b)]]:[[p,mid]];
+   if(lines.some(line=>lineObstacles.some(p=>hitsBox(line,{x:p[0]-25,y:p[1]-25,w:50,h:50}))))continue;
+   candidates.push({p,box,side,gap,lines,classic});
   }
-  if(!position){
-   missing.push({label,caption,anchor,halfWidth});
-   return '';
+  candidateCache.set(index,candidates);
+  for(const candidate of candidates){
+   const {box,p,lines}=candidate;
+   if(used.some(q=>Math.hypot(p[0]-q.cx,p[1]-q.cy)<50||box.x<q.x+q.w+6&&box.x+box.w+6>q.x&&box.y<q.y+q.h+6&&box.y+box.h+6>q.y))continue;
+   if(ink.some(line=>hitsBox(line,box))||lines.some(line=>used.some(box=>hitsBox(line,box))||ink.some(other=>intersects(line,other))))continue;
+   used.push(box);ink.push(...lines);if(place(depth+1)){chosen=candidate;break;}used.pop();ink.splice(ink.length-lines.length);
   }
-  placed.push({point:position,halfWidth,anchor:caption===label||adjacent?null:anchor});
-  annotationBounds?.push([position[0],position[1],halfWidth,12]);
-  return badge(position,caption,halfWidth,caption===label);
- }).join('');
- function badge([x,y],caption,halfWidth,letterOnly){
-  const shape=letterOnly?`<circle cx="${decimal(x)}" cy="${decimal(y)}" r="11"`:
-   `<rect x="${decimal(x-halfWidth)}" y="${decimal(y-12)}" width="${halfWidth*2}" height="24" rx="9"`;
-  return `<g class="profile-side-marker" data-marker-label="${esc(caption.split(" · ")[0])}" pointer-events="none" aria-hidden="true">${shape} fill="#fff" stroke="#779068"/><text x="${decimal(x)}" y="${decimal(y+4)}" text-anchor="middle" font-size="${letterOnly?12:14}" font-weight="700" fill="#345d3d">${esc(caption)}</text></g>`;
+  if(!chosen)return false;
+  const {p,box,side,gap,lines}=chosen;annotationBounds?.push([p[0],p[1],bw/2,bh/2]);
+  const xy=p=>p.map(decimal).join(','),offset=q=>[q[0]+n[0]*gap*side,q[1]+n[1]*gap*side];
+  if(chosen.classic){
+   output+=`<path class="profile-dimension-line" data-segment-index="${index}" d="M${xy(a)}L${xy(offset(a))} M${xy(b)}L${xy(offset(b))} M${xy(offset(a))}L${xy(offset(b))}" fill="none" stroke="#667e60" stroke-width="1.3"/>`;
+  }else output+=`<path class="profile-measure-leader" data-segment-index="${index}" d="M${xy(p)}L${xy(mid)}" fill="none" stroke="#667e60" stroke-width="1.3"/>`;
+  output+=`<g class="profile-side-marker" data-marker-label="${esc(label)}" data-segment-index="${index}" data-anchor-x="${decimal(mid[0])}" data-anchor-y="${decimal(mid[1])}" data-segment-start-x="${decimal(a[0])}" data-segment-start-y="${decimal(a[1])}" data-segment-end-x="${decimal(b[0])}" data-segment-end-y="${decimal(b[1])}" pointer-events="none" aria-hidden="true"><g transform="translate(${xy(p)}) rotate(${decimal(angle)})"><rect x="${-width/2}" y="-12" width="${width}" height="24" rx="3" fill="white"/><text x="0" y="5" text-anchor="middle" font-size="15" fill="#263d30">${esc(caption)}</text></g></g>`;
+  rendered.set(index,output);
+  return true;
  }
- function leader(from,to){
-  const gap=distance(from,to);
-  if(gap<12)return '';
-  const dx=(to[0]-from[0])/gap,dy=(to[1]-from[1])/gap;
-  const tip=[to[0]-dx*5,to[1]-dy*5];
-  const wing=sign=>[tip[0]-dx*7-dy*4*sign,tip[1]-dy*7+dx*4*sign].map(decimal).join(',');
-  return `<path class="profile-measure-leader" d="M${from.map(decimal).join(',')}L${tip.map(decimal).join(',')} M${wing(-1)}L${tip.map(decimal).join(',')}L${wing(1)}" fill="none" stroke="#667e60" stroke-width="1.7" pointer-events="none"/>`;
- }
- for(const position of placed){
-  if(position.anchor)leaders.push(leader(position.point,position.anchor));
- }
- if(!missing.length)return leaders.join('')+markers;
- const fallback=missing.map(({caption,label,anchor,halfWidth},index)=>{
-  const letterOnly=caption===label;
-  const columns=letterOnly?Math.floor((right-left)/30):7;
-  const row=Math.floor(index/columns);
-  const inRow=Math.min(columns,missing.length-row*columns);
-  const x=letterOnly?(left+right)/2+(index%columns-(inRow-1)/2)*30:61+(index%columns)*113;
-  const y=letterOnly?495-row*24:466+row*14;
-  const point=[x,y];
-  annotationBounds?.push([x,y,letterOnly?11:halfWidth*.55,letterOnly?11:6.6]);
-  if(!letterOnly)leaders.push(leader(point,anchor));
-  return letterOnly?badge(point,caption,halfWidth,true):
-   `<g transform="translate(${x} ${y}) scale(.55)">${badge([0,0],caption,halfWidth,false)}</g>`;
- }).join('');
- return leaders.join('')+markers+`<g class="profile-marker-overflow" aria-label="Repères déportés">${fallback}</g>`;
-
+ if(!place(0))throw new Error('Cotation technique sans espace : '+model.name);
+ return segments.map((_,index)=>rendered.get(index)).join('');
 }
 
-function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, angleOverlay, paintedMarker='stripe', highContrast=false}={}){
+function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, verticalBounds, angleOverlay, paintedMarker='stripe', highContrast=false,starPosition=0}={}){
  const section=profileDrawingSection(mapped,bends);
  let output=`<path d="${section.path}" fill="none" stroke="${highContrast?'#304b3d':'#97a68b'}" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="${highContrast?'#dfe8e3':'#dbe3d4'}" stroke-width="4" stroke-linejoin="miter"/>`;
  const reserved=[...handles];
  section.segments.forEach(([a,b],i)=>{
  const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-dy/len,dx/len];
  const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
- if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;
+ if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){
+ // Face identity is stored in physical (Y-up) coordinates. Determine the
+ // projection handedness independently of annotation placement, including mirrors.
+ let handedness=-1;
+ for(let j=1;j<mapped.length-1;j++){
+  const source=model.pointsMM;if(!source?.[j+1])break;
+  const cross=(p,q,r)=>(q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]);
+  const physical=cross(source[0],source[j],source[j+1]),screen=cross(mapped[0],mapped[j],mapped[j+1]);
+  if(Math.abs(physical)>1e-6&&Math.abs(screen)>1e-6){handedness=Math.sign(physical*screen);break;}
+ }
+ const side=(model.coloredFace.side==='left'?1:-1)*handedness;
  const at=gap=>[mid[0]+normal[0]*gap*side,mid[1]+normal[1]*gap*side];
  if(paintedMarker==='star'){
-  const center=at(32);
+  // Keep the physical side fixed; leave the near lane for technical dimensions.
+  const [minX,maxX]=horizontalBounds||[0,800],[minY,maxY]=verticalBounds||[0,520];
+  const center=[76,60,44,32].flatMap(gap=>(gap<60?[len*.3,-len*.3,0]:[0,len*.3,-len*.3]).map(slide=>{const p=at(gap);return[p[0]+dx/len*slide,p[1]+dy/len*slide];})).filter(p=>p[0]>=minX+25&&p[0]<=maxX-25&&p[1]>=minY+25&&p[1]<=maxY-25).filter(p=>section.segments.every(([a,b])=>{const vx=b[0]-a[0],vy=b[1]-a[1],den=vx*vx+vy*vy,t=den?Math.max(0,Math.min(1,((p[0]-a[0])*vx+(p[1]-a[1])*vy)/den)):0;return Math.hypot(p[0]-a[0]-t*vx,p[1]-a[1]-t*vy)>28;}))[starPosition];
+  if(!center)throw new Error('Aucun emplacement pour l’étoile sur la face choisie : '+model.name);
   const points=Array.from({length:10},(_,index)=>{
    const angle=index*Math.PI/5-Math.PI/2,radius=index%2===0?23:10;
    return [decimal(center[0]+Math.cos(angle)*radius),decimal(center[1]+Math.sin(angle)*radius)].join(',');
   }).join(' ');
-  reserved.push(center,[center[0]-14,center[1]],[center[0]+14,center[1]]);
+  reserved.push(center);
   const action=togglePaintedFace?' data-toggle-painted-face role="button" tabindex="0" aria-label="Inverser la face peinte" style="cursor:pointer"':'';
-  output+=`<g${action}><polygon class="profile-painted-star" points="${points}" fill="#ffcf4d" stroke="#202e29" stroke-width="4" stroke-linejoin="round"/></g>`;
+  output+=`<g${action} data-painted-side="${model.coloredFace.side}" data-painted-segment="${model.coloredFace.segmentId}"><polygon class="profile-painted-star" points="${points}" fill="#ffcf4d" stroke="#202e29" stroke-width="4" stroke-linejoin="round"/></g>`;
   return;
  }
  const stripeCenter=at(9),half=Math.min(24,len*.34);
@@ -927,7 +890,10 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  output+=`<g${action}>${togglePaintedFace?`<path d="${stripe}" fill="none" stroke="transparent" stroke-width="38" stroke-linecap="round"/>`:''}<path class="profile-painted-stripe" d="${stripe}" fill="none" stroke="#175b94" stroke-width="5" stroke-linecap="round"/></g>`;}
  });
  const annotationBounds=angleOverlay?[]:null;
- if(markers)output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds);
+ if(markers)try{output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds,verticalBounds,paintedMarker==='star'?reserved.slice(handles.length):[]);}catch(error){
+  if(paintedMarker!=='star'||!model.coloredFace?.side||starPosition>=11)throw error;
+  return profileDiagramContent(model,mapped,{bends,markers,markerModel,handles,illustrative,togglePaintedFace,horizontalBounds,verticalBounds,angleOverlay,paintedMarker,highContrast,starPosition:starPosition+1});
+ }
  if(angleOverlay)output+=angleOverlay(section,annotationBounds,reserved);
  return output;
 }
@@ -989,12 +955,13 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     const bodyText='font-size="11.5"';
     const compactLengths=item=>item.segments.flatMap((segment,index)=>{
       const bend=item.bends[index];
-      return [segment.label+' = '+formatMeasurement(segment.lengthMM,item.unit),...(bend?['Pli '+bend.from+'–'+bend.to+' : '+bend.label]:[])];
+      return [segment.label+' = '+formatMeasurement(segment.lengthMM,item.unit),...(bend?['Pli '+bend.from+'–'+bend.to+' = '+fabricationBendLabel(bend)]:[])];
     });
     for(const [family,items] of groupProfiles(order.items,profileGroups))for(const item of items){
       const title=lines([item.id+' · '+item.name],55);
-      const face=item.coloredFace?.side?['Face colorée : '+(item.coloredFace.side==='left'?'gauche':'droite')+' · côté '+item.coloredFace.segmentId]:[];
-      const details=lines([...compactLengths(item),...face,...(item.location?['Repère : '+item.location]:[]),...(item.note?[item.note]:[])],33);
+      const face=item.coloredFace?.side?['Face colorée : '+paintedFaceLabel(item.coloredFace.side)]:[];
+      const total=Number.isFinite(item.finishedSegmentSumMM)?['Développé total = '+formatMeasurement(item.finishedSegmentSumMM,item.unit)+' (nominal)']:[];
+      const details=lines([...compactLengths(item),...total,...face,...(item.location?['Repère : '+item.location]:[]),...(item.note?[item.note]:[])],33);
       const material=lines(materialLines(item),13),finish=lines(finishLines(item),16);
       const checks=lines([...item.validation.errors,...item.validation.pending].map(issue=>issue.message),90).filter(Boolean);
       for(let start=0;start<Math.max(details.length,material.length,finish.length,1);start+=23){
@@ -1071,34 +1038,45 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       return {name:'Mise en production · '+(index+1)+'/'+pages.length,svg:svg+svgClose,layout:'bending-sheet'};
     });
   }
-  function clientDossierPages(order){
+  function clientDossierPages(order,{production=false}={}){
     const pages=[];
     for(const item of order.items){
       const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(item.quotePolicy.required?['Soumission obligatoire : '+item.quotePolicy.reason]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>wrapLines(line,87));
-      const chunks=[];for(let i=0;i<Math.max(1,details.length);i+=12)chunks.push(details.slice(i,i+12));
-      for(let i=0;i<chunks.length;i++){
+      const primary=details.slice(0,24),columns=[primary.slice(0,12),primary.slice(12,24)];
+      {
         let svg=svgOpen(850,1100,'Pièce cotée '+item.id);
-        svg+=multiline(40,193,[item.id+' · '+item.name+(i?' · Suite — ne pas recompter':'')],{width:75,lineHeight:23,attrs:'font-size="18" font-weight="700"'}).svg;
+        svg+=multiline(40,91,[production?'MISE EN PRODUCTION · PROFIL UNIQUE':'DOSSIER DE PLIAGE'],{width:75,lineHeight:18,attrs:'font-size="12" font-weight="700" fill="#52634f"'}).svg;
+        svg+=multiline(40,121,[item.id+' · '+item.name],{width:75,lineHeight:23,attrs:'font-size="18" font-weight="700"'}).svg;
+        svg+=multiline(40,154,[['Commande : '+(order.poNumber||'À préciser'),'Chantier : '+(order.project||'À préciser'),'Chef : '+(order.foreman||'À préciser'),'Date : '+(order.date||'À préciser'),'Révision : '+(order.revision||'À préciser')].join(' · ')],{width:95,lineHeight:18,attrs:'font-size="12"'}).svg;
         svg+='<rect x="40" y="230" width="770" height="345" fill="#fafbf8" stroke="#d7ded2"/>';
-        if(item.kind==='profile'&&item.valid){const map=projection(item.pointsMM,{x:110,y:85,w:580,h:245});svg+='<g transform="translate(65 235) scale(.9)">'+profileDiagramContent(item,item.pointsMM.map(map),{paintedMarker:'star',highContrast:true,markerModel:item})+'</g>';}
+        if(item.kind==='profile'&&item.valid){const map=projection(item.pointsMM,{x:110,y:85,w:580,h:210});svg+='<g transform="translate(65 235) scale(.9)">'+profileDiagramContent(item,item.pointsMM.map(map),{paintedMarker:'star',highContrast:true,markerModel:item,verticalBounds:[20,365]})+'</g>';}
         else if(item.kind==='panel')svg+=placeSVG(panelSVG(item,{width:710,height:325,legend:false,header:false,notes:false}),70,240);
         else svg+=svgText(65,380,'Croquis à compléter','font-size="20"');
         svg+=svgText(40,603,'MATÉRIAU / FINI','font-size="12" font-weight="700" fill="#52634f"');
         svg+=multiline(40,628,[...materialLines(item),...finishLines(item)],{width:48,lineHeight:21,attrs:'font-size="15"'}).svg;
         svg+=svgText(500,603,'QUANTITÉ / LONGUEUR','font-size="12" font-weight="700" fill="#52634f"');
-        svg+=svgText(500,633,(i?'Suite, quantité inchangée':(item.quantity??'À préciser')+' pièce(s)'),'font-size="22" font-weight="700"');
+        svg+=svgText(500,633,(item.quantity??'À préciser')+' pièce(s)','font-size="22" font-weight="700"');
         svg+=multiline(500,662,item.kind==='profile'?[formatMeasurement(item.lengthMM,item.unit)]:[formatMeasurement(item.widthMM,item.unit)+' × '+formatMeasurement(item.heightMM,item.unit)],{width:32,lineHeight:23,attrs:'font-size="18"'}).svg;
         svg+=svgText(40,764,'COTES FINIES ET POINTS À VALIDER','font-size="12" font-weight="700" fill="#52634f"');
-        svg+=multiline(40,790,chunks[i],{width:87,lineHeight:18,attrs:'font-size="14"'}).svg;
-        svg+=svgText(40,1003,'Étoile : face peinte. Rayons, développé et réglages à valider par l’atelier.','font-size="12"');
-        pages.push({name:item.id+' · '+item.name+(i?' · Suite':''),layout:'mir-dossier',documentTitle:order.requiresQuote?'Demande de soumission':order.automaticPricingAllowed?'Récapitulatif de pliage':'DOSSIER DE PLIAGE',reference:[order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:chunks[i]});
+        svg+=multiline(40,790,columns[0],{width:42,lineHeight:18,attrs:'font-size="13"'}).svg;
+        svg+=multiline(430,790,columns[1],{width:42,lineHeight:18,attrs:'font-size="13"'}).svg;
+        pages.push({name:item.id+' · '+item.name,layout:production?'bending-sheet':'mir-dossier',documentTitle:production?'Mise en production':order.requiresQuote?'Demande de soumission':order.automaticPricingAllowed?'Récapitulatif de pliage':'DOSSIER DE PLIAGE',reference:[order.poNumber||order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:primary});
+      }
+      for(let start=24;start<details.length;start+=40){
+        const extra=details.slice(start,start+40),left=extra.slice(0,20),right=extra.slice(20,40);
+        let svg=svgOpen(850,1100,'Continuation '+item.id);
+        svg+=multiline(40,120,['Continuation — quantité déjà comptée',item.id+' · '+item.name],{width:75,lineHeight:27,attrs:'font-size="20" font-weight="700"'}).svg;
+        svg+=svgText(40,205,'Bloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.','font-size="13" fill="#52634f"');
+        svg+=multiline(40,260,left,{width:43,lineHeight:22,attrs:'font-size="14"'}).svg;
+        svg+=multiline(430,260,right,{width:43,lineHeight:22,attrs:'font-size="14"'}).svg;
+        pages.push({name:item.id+' · Continuation',layout:production?'bending-sheet':'mir-dossier',documentTitle:production?'Mise en production':'DOSSIER DE PLIAGE',reference:[order.poNumber||order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:extra});
       }
     }
     return pages;
   }
   function productionPages(input = {}, {layout, profileGroups, document, bendTariff} = {}) {
     const order = buildOrder(input, { bendTariff: document === 'client-request' ? bendTariff : undefined }), fragments = [];
-    if (document !== 'client-request' && layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return bendingSheetPages(order,profileGroups);
+    if (document !== 'client-request' && layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return clientDossierPages(order,{production:true});
     const clientRequest = document === 'client-request';
     if(clientRequest)return clientDossierPages({...order,dossierReference:input.poNumber||input.id});
     const pricedProfiles = clientRequest && order.automaticPricingAllowed && order.items.every(item => item.kind === 'profile');
@@ -1148,8 +1126,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg += multiline(1254, y + 42, lengthLines, { width: 12, lineHeight: 23, attrs: 'font-size="14"' }).svg;
       });
       const footY = 904;
-      const faceNote = !clientRequest ? 'Liseré bleu : face colorée. ' :
-        rows.some(row => row.item?.kind === 'profile' && row.item.coloredFace?.side) ? 'Étoile : face peinte. ' : '';
+      const faceNote = !clientRequest ? 'Liseré bleu : face colorée. ' : '';
       svg += svgText(32, footY, faceNote + 'Cotes de la pièce finie. Les rayons, le développé et les réglages de pliage restent à valider.', 'font-size="14"');
       svg += svgText(32, footY + 25, pricedProfiles ? 'Récapitulatif sur cet appareil. Disponibilité et fabrication à confirmer par MIR.' : clientRequest ? 'Demande préparée sur cet appareil. Transmission à MIR à faire séparément.' : 'La référence Zoho Books est saisie localement. Aucun bon de commande n’a été envoyé ni synchronisé.', 'font-size="13" fill="#5b685e"');
       if (hasPricedLines) {
@@ -1205,6 +1182,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     for (const key of allowedMeta) if (own(values, key)) spec[key] = copy(values[key]);
     if (topology.kind === 'profile') {
       spec.template = 'custom'; spec.startAngle = topology.startAngle; spec.bends = copy(topology.bends);
+      if (Number.isFinite(topology.mirDevelopedTotalIn)) spec.mirDevelopedTotalIn = topology.mirDevelopedTotalIn;
       spec.segments = topology.segments.map(s => ({ label: s.label, name: s.name, length: own(m, s.label) ? m[s.label] : values.segments?.find(v => v.label === s.label)?.length ?? null }));
       if (own(m, 'length')) spec.length = m.length;
       spec.coloredFace = copy(values.coloredFace || topology.coloredFace || {});
@@ -1234,7 +1212,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       const initial = segments.map((s, i) => parseMeasurement(preset ? source.dimensions?.[s.label] : source.segments?.[i]?.length, source.unit || 'in'));
       const largest = Math.max(1, ...initial.filter(p => p.ok && p.mm > 0).map(p => p.mm));
       const ratios = initial.map(p => p.ok && p.mm > 0 ? Math.max(.02, p.mm / largest) : 1);
-      topology = { kind, segments, bends, startAngle, coloredFace: { side: ['left', 'right'].includes(source.coloredFace?.side) ? source.coloredFace.side : null, segmentId: text(source.coloredFace?.segmentId || segments[0]?.label, 5) } };
+      topology = { kind, segments, bends, startAngle, coloredFace: { side: ['left', 'right'].includes(source.coloredFace?.side) ? source.coloredFace.side : null, segmentId: text(source.coloredFace?.segmentId || segments[0]?.label, 5) }, ...(Number.isFinite(Number(source.mirDevelopedTotalIn))?{mirDevelopedTotalIn:Number(source.mirDevelopedTotalIn)}:{}) };
       proportions = { illustrative: true, unitless: true, segmentRatios: ratios };
       const probe = buildProfile({ template: 'custom', unit: 'mm', segments: segments.map((s, i) => ({ ...s, length: ratios[i] * 100 })), bends, startAngle });
       errors.push(...probe.validation.errors); warnings.push(...probe.validation.warnings);
@@ -1285,6 +1263,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       }
       const angle = angleValue(topology.startAngle);
       if (angle === null || Math.abs(angle) > 360) errors.push(issue('INVALID_TEMPLATE_ANGLE', 'topology.startAngle', 'Orientation du modèle invalide.'));
+      if (own(topology, 'mirDevelopedTotalIn') && (!Number.isFinite(topology.mirDevelopedTotalIn) || topology.mirDevelopedTotalIn <= 0)) errors.push(issue('INVALID_DEVELOPED_TOTAL', 'topology.mirDevelopedTotalIn', 'Le développé total imposé doit être positif.'));
     } else {
       if (topology.shape !== 'polygon' && !SHAPES.some(s => s.id === topology.shape)) errors.push(issue('INVALID_TEMPLATE_SHAPE', 'topology.shape', 'Forme de panneau non définie.'));
       if (topology.shape === 'right-triangle' && !['bottom-left', 'bottom-right', 'top-left', 'top-right'].includes(topology.rightAngle)) errors.push(issue('INVALID_TEMPLATE_RIGHT_ANGLE', 'topology.rightAngle', 'Position de l’angle droit invalide.'));
@@ -1306,7 +1285,11 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     const errors = templateCheck(template);
     if (errors.length) return { ok: false, model: null, errors, illustrative: true };
     const p = template.previewProportions || {}, measurements = {};
-    if (template.kind === 'profile') template.topology.segments.forEach((s, i) => { measurements[s.label] = (p.segmentRatios?.[i] || 1) * 100; });
+    if (template.kind === 'profile') {
+      const ratios=template.topology.segments.map((s,i)=>p.segmentRatios?.[i]||1);
+      const scale=Number.isFinite(template.topology.mirDevelopedTotalIn)?template.topology.mirDevelopedTotalIn*25.4/ratios.reduce((sum,value)=>sum+value,0):100;
+      template.topology.segments.forEach((s, i) => { measurements[s.label] = ratios[i] * scale; });
+    }
     else for (const [key, value] of Object.entries(p)) if (typeof value === 'number') measurements[key] = value * 100;
     if(template.kind==='panel'&&template.topology.shape==='roof-slope')measurements.roofPitch=p.roofPitch||'6/12';
     const spec = specFromTopology(template.topology, { unit: 'mm', measurements }); spec.name = template.name;

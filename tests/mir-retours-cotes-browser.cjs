@@ -20,7 +20,7 @@ async function ready(){
  let browser;
  try{
   await ready();
-  browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+  browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
   for(const viewport of [
    {name:'bureau',width:1440,height:900},
    {name:'mobile',width:390,height:844},
@@ -45,6 +45,9 @@ async function ready(){
     const all=markers.map(marker=>{
       const box=marker.getBBox(),text=marker.querySelector('text');
       return {label:marker.dataset.markerLabel,x:Number(text.getAttribute('x')),y:Number(text.getAttribute('y')),
+        anchor:[Number(marker.dataset.anchorX),Number(marker.dataset.anchorY)],
+        start:[Number(marker.dataset.segmentStartX),Number(marker.dataset.segmentStartY)],
+        end:[Number(marker.dataset.segmentEndX),Number(marker.dataset.segmentEndY)],
         box:{x:box.x,y:box.y,w:box.width,h:box.height}};
     });
     const stroke=svg.querySelector('path[d^="M"]')?.getAttribute('d')||'';
@@ -54,10 +57,11 @@ async function ready(){
    const dict=Object.fromEntries(facts.markers.map(x=>[x.label,x]));
    assert.equal(facts.markers.length,4,'4 labels '+JSON.stringify(facts));
    for(const k of ['A','B','C','D'])assert.ok(dict[k],'Missing '+k+' '+JSON.stringify(facts));
-   assert.ok(dict.A.y<110,'A above top '+JSON.stringify(dict));
-   assert.ok(dict.D.y>110,'D below top '+JSON.stringify(dict));
-   assert.ok(dict.B.x>520,'B right of vertical '+JSON.stringify(dict));
-   assert.ok(dict.C.x<520,'C left of vertical '+JSON.stringify(dict));
+   for(const marker of facts.markers){
+    assert.ok(Math.abs(marker.anchor[0]-(marker.start[0]+marker.end[0])/2)<.02,'rappel au milieu X '+JSON.stringify(marker));
+    assert.ok(Math.abs(marker.anchor[1]-(marker.start[1]+marker.end[1])/2)<.02,'rappel au milieu Y '+JSON.stringify(marker));
+    assert.ok(marker.box.x>=-1&&marker.box.y>=-1&&marker.box.x+marker.box.w<=801&&marker.box.y+marker.box.h<=521,'repère dans le cadre '+JSON.stringify(marker));
+   }
    assert.equal(facts.arcs,2,'rounded return at B-C and D-A');
    assert.ok(facts.overflow<=2,'overflow: '+facts.overflow);
    for(let i=0;i<facts.markers.length;i++)for(let j=i+1;j<facts.markers.length;j++){

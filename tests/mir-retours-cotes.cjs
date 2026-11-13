@@ -75,7 +75,7 @@ test('Sur mobile, les repères des deux feuilles restent nettement séparés',()
  const markerModel={...model,segments:model.segments.map(({label})=>({label}))};
  const svg=M.profileDiagramContent(model,points,{bends,markers:true,markerModel,horizontalBounds:[100,540]});
  const point=label=>{
-  const match=svg.match(new RegExp('data-marker-label="'+label+'"[^>]*>\\s*<circle[^>]*cx="([^"]+)"[^>]*cy="([^"]+)"'));
+  const match=svg.match(new RegExp('data-marker-label="'+label+'"[^>]*>\\s*<g transform="translate\\(([^,]+),([^\\)]+)\\)'));
   return match&&match.slice(1).map(Number);
  };
  const b=point('B'),c=point('C');

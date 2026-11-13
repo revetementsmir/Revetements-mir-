@@ -8,20 +8,32 @@
 })(typeof window==='object'?window:null,function(X,M){
   'use strict';
   if(!X?.PROFILE_TEMPLATES||!M?.parseMeasurement)throw new Error('Les moteurs de pliages MIR sont requis.');
+  /* Les dix modèles nominaux suivent exactement MIR-PROMPT-2, sections
+     14.1 à 14.10. Les profils historiques restent accessibles, mais ne sont
+     jamais comptés dans cette banque canonique. */
   const VARIANTS=Object.freeze([
-    {id:'fascia',source:'fascia'},
+    {id:'fascia',source:'fascia',version:3,developedTotalIn:8},
+    {id:'ailes_fenetre',source:'ailes_fenetre',version:1},
+    {id:'eloignement_eaux',source:'eloignement_eaux',version:2},
+    {id:'goutte_eau_8',source:'goutte_eau_8',version:2,developedTotalIn:8},
+    {id:'sill_trim',source:'sill_trim',version:1},
+    {id:'beam',source:'beam',version:2,optionalBeamHems:true},
+    {id:'colonne',source:'colonne',version:2},
+    {id:'l_transition',source:'l_transition',version:1},
+    {id:'capage_climatiseur',source:'capage_climatiseur',version:1},
+    {id:'ventilation_mur_fenetre',source:'ventilation_mur_fenetre',version:1}
+  ]);
+  const LEGACY_VARIANTS=Object.freeze([
     {id:'l_replie',source:'l_replie'},
-    {id:'colonne',source:'colonne'},
-    {id:'beam',source:'beam'},
-    {id:'beam_replis',source:'beam',name:'Beam avec replis',beamHems:true},
-    {id:'eloignement_eaux',source:'eloignement_eaux'},
+    {id:'beam_replis',source:'beam',name:'Beam avec replis',beamHems:true,parentId:'beam'},
     {id:'solin_brique',source:'solin_brique'},
-    {id:'solin_brique_goutte',source:'solin_brique',name:'Solin brique avec goutte',drip:true},
+    {id:'solin_brique_goutte',source:'solin_brique',name:'Solin brique avec goutte',drip:true,parentId:'solin_brique'},
     {id:'coin_arch_90',source:'coin_arch_90'},
     {id:'coin_arch_retours',source:'coin_arch_retours'},
     {id:'coin_arch_j',source:'coin_arch_j'}
   ]);
-  const BY_ID=Object.fromEntries(VARIANTS.map(v=>[v.id,v]));
+  const ALL_VARIANTS=Object.freeze([...VARIANTS,...LEGACY_VARIANTS]);
+  const BY_ID=Object.fromEntries(ALL_VARIANTS.map(v=>[v.id,v]));
   function topology(id){
     const variant=BY_ID[id];if(!variant)return null;
     const source=X.PROFILE_TEMPLATES[variant.source];
@@ -48,9 +60,14 @@
       ?{mode:'hem',angle:180,direction:s.turnDeg>0?'left':'right'}
       :{mode:'signed',angle:s.turnDeg});
     return {name:d.variant.name||d.source.name,template:'custom',mirProfileId:id,
+      mirTemplateVersion:d.variant.version||d.source.version||1,
+      mirCanonicalPhase10:VARIANTS.includes(d.variant),
+      mirLockedFields:d.source.fields.filter(field=>field.locked).map(field=>field.id),
+      ...(d.variant.developedTotalIn?{mirDevelopedTotalIn:d.variant.developedTotalIn}:{}),
       startAngle:d.startAngle,segments,bends};
   }
-  function catalog(){return Object.fromEntries(VARIANTS.map(v=>[v.id,create(v.id)]));}
+  function catalog(){return Object.fromEntries(ALL_VARIANTS.map(v=>[v.id,create(v.id)]));}
+  function canonicalCatalog(){return Object.fromEntries(VARIANTS.map(v=>[v.id,create(v.id)]));}
   function icon(id){
     const d=topology(id);if(!d)return null;
     const fields=Object.fromEntries(d.source.fields.map(f=>[f.id,f]));
@@ -93,6 +110,35 @@
     return {...result,valid:true,pending:false,jReturnIn:values.jReturn,
       nailingIn:values.nailing,values};
   }
+  function checkCanonical(spec){
+    const id=spec?.mirProfileId,variant=BY_ID[id];
+    if(!variant||!VARIANTS.includes(variant))return {ok:true,pending:false,errors:[]};
+    const model=M.buildProfile(spec),errors=[];
+    if(!model.valid)return {ok:false,pending:true,errors:model.validation.errors};
+    if(variant.developedTotalIn){
+      const total=model.finishedSegmentSumMM/25.4;
+      if(Math.abs(total-variant.developedTotalIn)>1e-7)errors.push({code:variant.developedTotalIn===8?'DEVELOPED_TOTAL_8_REQUIRED':'DEVELOPED_TOTAL_REQUIRED',path:'segments',message:'La somme des cotes doit être exactement '+variant.developedTotalIn+' po.'});
+    }
+    if(id==='sill_trim'){
+      const face=model.segments.find(s=>s.label==='A')?.lengthMM/25.4;
+      const right=model.segments.find(s=>s.label==='B')?.lengthMM/25.4;
+      if(Number.isFinite(face)&&Number.isFinite(right)&&right<1)
+        errors.push({code:'SILL_NAILING_MINIMUM',path:'segments.1.length',message:'La zone de clouage du Sill Trim doit mesurer au moins 1 po.'});
+    }
+    return {ok:errors.length===0,pending:false,errors,developedTotalIn:model.finishedSegmentSumMM/25.4};
+  }
+  function preferredFaceSegment(spec){
+    const model=M.buildProfile(spec);
+    if(!model.valid||!model.segments.length)return spec?.coloredFace?.segmentId||'A';
+    return model.segments.reduce((best,segment,index)=>{
+      const length=segment.lengthMM||0;
+      /* Le dégagement départage seulement les longueurs égales : un segment
+         intérieur a deux plis voisins, une extrémité en a un seul. */
+      const clearance=(index===0||index===model.segments.length-1?2:1);
+      return !best||length>best.length+1e-7||Math.abs(length-best.length)<=1e-7&&clearance>best.clearance
+        ?{id:segment.id,length,clearance}:best;
+    },null).id;
+  }
   function exceptionMatches(check,exception){
     return !!(check?.valid&&!check.ok&&exception?.accepted===true&&
       Math.abs(exception.currentIn-check.nailingIn)<1e-7&&
@@ -120,6 +166,6 @@
       {angleOverrides,exception:check.ok?undefined:exception,
        metadata:{source:'MIR configurateur de production',manufacturingValidationRequired:true}});
   }
-  return Object.freeze({VARIANTS,create,catalog,icon,checkJ,exceptionMatches,
-    autoCorrectJ,finalizeJ});
+  return Object.freeze({VARIANTS,LEGACY_VARIANTS,ALL_VARIANTS,create,catalog,canonicalCatalog,icon,
+    checkCanonical,preferredFaceSegment,checkJ,exceptionMatches,autoCorrectJ,finalizeJ});
 });

@@ -20,6 +20,8 @@ jobs:
       - run: node tests/mir-database.cjs
       - run: node tests/mir-local-backup.cjs
       - run: node tests/mir-live-validation.cjs
+      - run: node tests/mir-phase10-management-postgres.cjs
+      - run: node tests/mir-phase10-management.cjs
       - run: node --check tools/validation/real-supabase.cjs
       - run: node tests/mir-shared-client.cjs
       - run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
