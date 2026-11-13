@@ -43,6 +43,7 @@ const Policy={...OriginalPolicy,allowedRequest(value,origin){try{const u=new URL
  adapter=adapter.replace(/\/\* APK_APPLICATION_LAUNCH_START \*\/[\s\S]*?\/\* APK_APPLICATION_LAUNCH_END \*\//,'');
  adapter=adapter.replace("import {mountEnvironmentSwitch} from './mir-responsive-environments.mjs';","import source from './mir-apk-preview-source.mjs';\nconst mountEnvironmentSwitch=()=>()=>{};");
  adapter=adapter.replace("||'index.html'","||'chantier.html'");
+ adapter=adapter.replace("font:16px/1.5 Arial,sans-serif", "");
  adapter=adapter.replace("const syncClasses=()=>{page.className=", "const syncClasses=()=>{for(const root of [document.documentElement,document.body])for(const attr of root.attributes)if(/^data-(mir-(?:harmony|theme|text|contrast|motion)|portal-)/.test(attr.name))page.setAttribute(attr.name,attr.value);page.className=");
  adapter=adapter.replaceAll("{attributes:true,attributeFilter:['class']}","{attributes:true}");
  adapter=adapter.replace("const query=new URLSearchParams(location.search);","const query=new URLSearchParams(location.search);query.set('app-preview','1');query.set('app-platform','android');if(!query.has('phone'))query.set('phone','galaxy-s26-ultra');");
@@ -53,7 +54,7 @@ const Policy={...OriginalPolicy,allowedRequest(value,origin){try{const u=new URL
  adapter=adapter.replace("notice.textContent='Vrais écrans MIR · une vue active à la fois. Les vues simultanées nécessitent encore des contrôleurs indépendants. Annotations en mémoire : copier avant de changer de page.';","notice.textContent='Sources APK Android TEST '+source.versionCode+' · annotations → sources APK · une vue active à la fois';");
  adapter=adapter.replace("title:'Les Revêtements MIR',service:","title:'MIR — CORRIGER LES SOURCES APK ANDROID (PR31), PUIS RECOMPILER — PAS LE SITE SEUL',service:");
  adapter=adapter.replace("const syncClasses=", "window.MIRAPKPreview.getAnnotations=()=>board.getAnnotations();\n  const syncClasses=");
- adapter=adapter.replace("interface:current,device:","interface:'Application Android TEST · '+current+' · sources '+source.sourceBranch,revision:'APK '+source.sourceRef+' · HTML dist/'+current+' · styles mobile/web/team.css + dist/*.css · corriger les sources de PR31 puis reconstruire l’APK; ne pas modifier les fichiers générés test/application',device:");
+ adapter=adapter.replace("interface:current,device:","interface:'Application Android TEST · '+current+' · sources '+source.sourceBranch,revision:'APK '+source.sourceRef+' | dist/'+current+' | mobile/web/team.css | PR31: corriger sources puis recompiler APK',device:");
  adapter=adapter.replace("if(!allowed.has(name))return;event.preventDefault();","if(!allowed.has(name))return;event.preventDefault();");
  adapter=adapter.replace("target.searchParams.set('page',name);","target.searchParams.set('page',name);target.searchParams.set('app-preview','1');target.searchParams.set('app-platform','android');");
  write('mir-responsive-adapter.mjs',adapter);write('mir-apk-preview-source.mjs','export default '+JSON.stringify(config)+';\n');

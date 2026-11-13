@@ -20,6 +20,10 @@ const server=http.createServer((req,res)=>{const name=path.resolve(root,'.'+new 
   await page.screenshot({animations:'disabled',path:proof+'/'+layout+'.png'});
  }
  await page.locator('button[data-layout=phone]').click();
+ const appearance=await app.locator('.auth-card').evaluate(card=>({font:getComputedStyle(card).fontFamily,label:getComputedStyle(card.querySelector('label')).fontSize,input:getComputedStyle(card.querySelector('input')).fontSize,background:getComputedStyle(card).backgroundColor}));
+ const baseline=await browser.newPage({viewport:{width:412,height:836}});await baseline.route('**/*.supabase.co/**',route=>route.abort());await baseline.goto(url.replace(/responsive.html.*$/,'chantier.html'));await baseline.locator('#auth-signin-form').waitFor();
+ const reference=await baseline.locator('.auth-card').evaluate(card=>({font:getComputedStyle(card).fontFamily,label:getComputedStyle(card.querySelector('label')).fontSize,input:getComputedStyle(card.querySelector('input')).fontSize,background:getComputedStyle(card).backgroundColor}));
+ assert.deepEqual(appearance,reference,'app typography and card surface match the unwrapped APK web source');await baseline.screenshot({animations:'disabled',path:proof+'/source-without-responsive.png'});await baseline.close();
  await page.getByRole('button',{name:'Annoter',exact:true}).click();
  await app.locator('#auth-signin-form input[type=email]').click();
  await page.getByPlaceholder('Qu’aimerais-tu changer ?').fill('Corriger ce champ dans l’APK, pas seulement le site.');
