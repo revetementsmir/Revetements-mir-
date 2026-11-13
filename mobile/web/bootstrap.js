@@ -10,7 +10,8 @@ window.fetch=(input,options)=>{const url=input instanceof Request?input.url:inpu
 const rawOpen=XMLHttpRequest.prototype.open;
 XMLHttpRequest.prototype.open=function(method,url,...args){if(!Policy.allowedRequest(url,origin))throw Error('Service refusé : MIR TEST uniquement.');return rawOpen.call(this,method,url,...args);};
 // Browser navigation cannot hand an untrusted document the native bridge.
-window.open=url=>{if(Policy.external(url))Native.openExternal({url}).catch(showError);else if(Policy.allowedRoute(url,origin))location.assign(url);return null;};
+function privateAsset(url){try{const u=new URL(url,location.href);return u.protocol==='blob:'||u.hostname===Policy.TEST&&u.pathname.startsWith('/storage/v1/')&&Policy.allowedRequest(u.href,origin);}catch{return false;}}
+window.open=url=>{if(privateAsset(url))download({href:url,download:''}).catch(showError);else if(Policy.external(url))Native.openExternal({url}).catch(showError);else if(Policy.allowedRoute(url,origin))location.assign(url);else showError(new Error('Lien refusé dans MIR TEST.'));return null;};
 let dirty=false;
 function showError(error){const node=document.getElementById('mir-native-state');if(node){node.textContent=error?.message||'Action indisponible. Rien n’a été envoyé.';node.setAttribute('role','alert');}}
 function networkState(){const node=document.getElementById('mir-native-state');if(node)node.textContent=navigator.onLine?'MIR TEST · Notifications par actualisation':'MIR TEST · Hors ligne — les enregistrements serveur restent à confirmer';}
@@ -30,10 +31,16 @@ document.addEventListener('input',event=>{if(event.target.closest('form')&&!even
 async function download(link){
  const url=new URL(link.href,location.href);if(url.protocol!=='blob:'&&!Policy.allowedRequest(url.href,origin))throw Error('Fichier non autorisé');
  const blob=await rawFetch(url.href).then(r=>{if(!r.ok)throw Error('Fichier indisponible');return r.blob();});
- const bytes=new Uint8Array(await blob.arrayBuffer());if(bytes.length>20*1024*1024||String.fromCharCode(...bytes.slice(0,5))!=='%PDF-')throw Error('Seuls les PDF vérifiés peuvent être ouverts ici.');
+ const bytes=new Uint8Array(await blob.arrayBuffer());if(bytes.length>20*1024*1024)throw Error('Fichier trop volumineux : maximum 20 Mo.');
+ const pdf=String.fromCharCode(...bytes.slice(0,5))==='%PDF-';
+ if(!pdf){
+  const png=bytes[0]===137&&String.fromCharCode(...bytes.slice(1,4))==='PNG',jpeg=bytes[0]===255&&bytes[1]===216&&bytes[2]===255,webp=String.fromCharCode(...bytes.slice(0,4))==='RIFF'&&String.fromCharCode(...bytes.slice(8,12))==='WEBP';
+  if(!png&&!jpeg&&!webp)throw Error('Fichier refusé : PDF, JPEG, PNG ou WebP vérifié seulement.');
+  const source=URL.createObjectURL(new Blob([bytes],{type:png?'image/png':jpeg?'image/jpeg':'image/webp'})),dialog=document.createElement('dialog'),image=document.createElement('img'),close=document.createElement('button');image.src=source;image.alt='Pièce jointe privée MIR';image.style.cssText='display:block;max-width:100%;max-height:70vh;object-fit:contain';close.type='button';close.textContent='Fermer';close.style.minHeight='44px';dialog.append(image,close);dialog.setAttribute('aria-label','Pièce jointe privée');document.body.append(dialog);close.onclick=()=>dialog.close();dialog.addEventListener('close',()=>{URL.revokeObjectURL(source);dialog.remove();},{once:true});dialog.showModal();return;
+ }
  let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
  const action=await new Promise(resolve=>{const dialog=document.createElement('dialog');dialog.innerHTML='<h2>PDF prêt</h2><p>Choisissez une action. Aucun fichier n’est envoyé automatiquement.</p><button data-action="open">Ouvrir le PDF</button> <button data-action="share">Partager…</button> <button data-action="cancel">Annuler</button>';document.body.append(dialog);dialog.addEventListener('click',event=>{const value=event.target.dataset.action;if(value){dialog.close();dialog.remove();resolve(value);}});dialog.addEventListener('cancel',()=>{dialog.remove();resolve('cancel');},{once:true});dialog.showModal();});
- if(action!=='cancel')await Native.pdf({data:btoa(binary),name:link.download||'MIR.pdf',action});
+ if(action!=='cancel'){if(action==='open'&&dirty&&!confirm('Ouvrir le PDF et quitter cette saisie ? Les données non enregistrées restent à vérifier.'))return;let name=link.download||'MIR.pdf';if(!name.toLowerCase().endsWith('.pdf'))name+='.pdf';await Native.pdf({data:btoa(binary),name,action});}
 }
 document.addEventListener('click',async event=>{
  const qr=event.target.closest?.('#wh-camera-start');
@@ -41,12 +48,12 @@ document.addEventListener('click',async event=>{
  const input=event.target.closest?.('input[type="file"]');
  if(input){event.preventDefault();event.stopImmediatePropagation();try{const result=input.hasAttribute('capture')?await Native.capturePhoto():await Native.pickFile();if(!result.cancelled){const bytes=Uint8Array.from(atob(result.data),c=>c.charCodeAt(0)),transfer=new DataTransfer();transfer.items.add(new File([bytes],result.name,{type:result.mime}));input.files=transfer.files;input.dispatchEvent(new Event('change',{bubbles:true}));}}catch(error){showError(error);}return;}
  const link=event.target.closest?.('a[href]');if(!link)return;
- if(link.download||link.href.startsWith('blob:')){event.preventDefault();event.stopImmediatePropagation();download(link).catch(showError);return;}
+ if(link.hasAttribute('download')||privateAsset(link.href)){event.preventDefault();event.stopImmediatePropagation();download(link).catch(showError);return;}
  if(Policy.external(link.href)){event.preventDefault();event.stopImmediatePropagation();Native.openExternal({url:link.href}).catch(showError);return;}
  if(!Policy.allowedRoute(link.href,origin)){event.preventDefault();event.stopImmediatePropagation();showError(new Error('Ce parcours n’est pas disponible dans MIR TEST.'));return;}
  if(dirty&&!confirm('Quitter cette saisie ? Les données non enregistrées sur le serveur restent à vérifier.')){event.preventDefault();event.stopImmediatePropagation();}
 },true);
-App.addListener('backButton',()=>{if(dirty&&!confirm('Revenir en arrière et quitter cette saisie ?'))return;const close=document.querySelector('dialog[open] [data-close-dialog],dialog[open] [data-close-production-dialog]');if(close){close.click();return;}if(history.length>1)history.back();else App.minimizeApp();}).catch(()=>{});
+App.addListener('backButton',()=>{const dialog=document.querySelector('dialog[open]');if(dialog){const close=dialog.querySelector('[data-close-dialog],[data-close-production-dialog]');if(close)close.click();else{const event=new Event('cancel',{cancelable:true});if(dialog.dispatchEvent(event))dialog.close();}return;}if(dirty&&!confirm('Revenir en arrière et quitter cette saisie ?'))return;if(history.length>1)history.back();else App.minimizeApp();}).catch(()=>{});
 App.addListener('appStateChange',({isActive})=>{if(isActive){Native.clearTemporary().catch(()=>{});window.MIRAndroidSession?.resume();}else window.MIRAndroidSession?.pause();}).catch(()=>{});
 // One position per explicit business action; no background/watch tracking.
 if(navigator.geolocation)navigator.geolocation.getCurrentPosition=(success,error,options={})=>{

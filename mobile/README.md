@@ -6,7 +6,7 @@ Application TEST `ca.revetementsmir.equipe.test`, version `0.11.0-test`, code in
 
 ## Compiler
 
-Prérequis : Node 24, JDK 21 complet, SDK Android 36 et build tools 36.0.0, licences Android acceptées. Capacitor 8.6.2, App 8.1.2, Geolocation 8.2.4, esbuild 0.28.2 et leurs dépendances npm sont verrouillés. Gradle 8.14.3 et son SHA-256 sont fixés. AGP 8.13.0, ZXing embarqué 4.3.0; aucun modèle QR téléchargé, Firebase ou service payant.
+Prérequis : Node 24, JDK 21 complet, SDK Android 36 et build tools 36.0.0, licences Android acceptées. Capacitor 8.6.2, App 8.1.2, Geolocation 8.2.4, esbuild 0.28.2, Playwright 1.62.1 et leurs dépendances npm sont verrouillés. Gradle 8.14.3 et son SHA-256 sont fixés. AGP 8.13.0, ZXing embarqué 4.3.0; aucun modèle QR téléchargé, Firebase ou service payant.
 
 ```sh
 cd mobile

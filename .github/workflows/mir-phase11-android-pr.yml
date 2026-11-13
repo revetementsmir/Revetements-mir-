@@ -20,6 +20,7 @@ jobs:
           cd mobile && npm ci && npm run sync && cd ..
           node mobile/tools/test-contracts.cjs
           node mobile/tools/test-web.cjs
+          node mobile/tools/test-pdf-web.cjs
           node tests/mir-phase10-bending.cjs
           node tests/mir-phase10-management.cjs
           node tests/mir-technical-dimensions.cjs
@@ -44,6 +45,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+          cache: gradle
+          cache-dependency-path: |
+            mobile/android/**/*.gradle
+            mobile/android/gradle/wrapper/gradle-wrapper.properties
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
@@ -56,7 +61,16 @@ jobs:
           node tools/test-contracts.cjs
       - name: Compiler APK, tests et analyse Android stricte
         working-directory: mobile/android
-        run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon
+        run: |
+          ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/mir-version-110001.apk"
+          MIR_ANDROID_VERSION_CODE=110002 ./gradlew :app:assembleDebug --no-daemon
+          mkdir -p ../../artifacts/phase11
+          cp app/build/outputs/apk/debug/app-debug.apk ../../artifacts/phase11/MIR-TEST-debug.apk
+          cd ../..
+          sha256sum artifacts/phase11/MIR-TEST-debug.apk > artifacts/phase11/SHA256SUMS
+          git rev-parse HEAD > artifacts/phase11/source-sha.txt
+          echo '${{ github.event.pull_request.head.sha }}' > artifacts/phase11/pr-head-sha.txt
       - name: Permettre KVM au runner éphémère
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -84,13 +98,12 @@ jobs:
           profile: pixel_7
           disable-animations: true
           script: |
-            adb install mobile/android/app/build/outputs/apk/debug/app-debug.apk
+            adb install "$RUNNER_TEMP/mir-version-110001.apk"
             adb install mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             mobile/tools/run-instrumentation.sh
             cp artifacts/phase11/instrumentation.txt artifacts/phase11/webview-tests.txt
             mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#prepareUpdate'
-            cd mobile/android && MIR_ANDROID_VERSION_CODE=110002 ./gradlew :app:assembleDebug --no-daemon && cd ../..
-            adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
+            adb install -r artifacts/phase11/MIR-TEST-debug.apk
             mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#verifyUpdate'
             node mobile/tools/prepare-real-roles.cjs
             mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirRealRolesTest'
@@ -98,10 +111,7 @@ jobs:
             adb pull /sdcard/Android/data/ca.revetementsmir.equipe.test/files/phase11-proof artifacts/phase11/
       - name: Empreinte de l’APK de recette — signature debug uniquement
         run: |
-          mkdir -p artifacts/phase11
-          cp mobile/android/app/build/outputs/apk/debug/app-debug.apk artifacts/phase11/MIR-TEST-debug.apk
-          sha256sum artifacts/phase11/MIR-TEST-debug.apk > artifacts/phase11/SHA256SUMS
-          git rev-parse HEAD > artifacts/phase11/source-sha.txt
+          sha256sum -c artifacts/phase11/SHA256SUMS
           git diff --exit-code -- dist supabase
           git diff --check
       - uses: actions/upload-artifact@v4
@@ -111,5 +121,4 @@ jobs:
           path: |
             artifacts/phase11/
             mobile/android/app/build/reports/
-            mobile/android/app/build/outputs/apk/debug/*.apk
           retention-days: 14

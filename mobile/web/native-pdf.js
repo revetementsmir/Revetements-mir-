@@ -1,5 +1,6 @@
 import * as pdfjs from './vendor/pdfjs/pdf.min.mjs';
-pdfjs.GlobalWorkerOptions.workerSrc='./vendor/pdfjs/pdf.worker.min.mjs';
+// PDF.js resolves its fallback import relative to its own module, not this page.
+pdfjs.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdfjs/pdf.worker.min.mjs',location.href).href;
 const id=new URLSearchParams(location.search).get('id');let encoded;
 document.querySelector('#back').onclick=()=>history.back();
 document.querySelector('#share').onclick=async()=>{if(!encoded)return;try{await MIRAndroid.Native.pdf({data:encoded,name:id.slice(37),action:'share'});}catch(error){document.querySelector('#status').textContent=error.message;}};
