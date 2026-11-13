@@ -1,4 +1,7 @@
 /* Native team shell only; public website sources remain untouched. */
+html body [data-mir-native-public], html body [data-estimate-source],
+html body #cart-estimate, html body .mir-unified-client-shortcut,
+html body [data-configurator-public-footer] { display: none !important; }
 body, html body:has(#mir-harmony-header #portal-navigation) { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px) !important; }
 :root[data-mir-harmony] .auth-card {
   background: var(--mir-surface, #fff) !important;

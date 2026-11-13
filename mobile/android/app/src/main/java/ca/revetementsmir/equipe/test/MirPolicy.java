@@ -13,7 +13,20 @@ public final class MirPolicy {
         catch (Exception e) { return false; }
     }
     public static boolean navigation(String value) {
-        try { URI u = URI.create(value); return local(value) && ROUTES.contains(u.getPath()); }
+        try {
+            URI u = URI.create(value);
+            if (!local(value) || !ROUTES.contains(u.getPath())) return false;
+            java.util.Map<String,String> params = new java.util.HashMap<>();
+            for (String part : (u.getRawQuery() == null ? "" : u.getRawQuery()).split("&")) {
+                String[] pair = part.split("=", 2);
+                String key = java.net.URLDecoder.decode(pair[0], "UTF-8");
+                String val = java.net.URLDecoder.decode(pair.length == 2 ? pair[1] : "", "UTF-8");
+                if ("estimate".equals(key)) return false;
+                if (java.util.Arrays.asList("mode", "source", "kind").contains(key) && params.containsKey(key)) return false;
+                params.put(key, val);
+            }
+            return !"client".equals(params.get("mode")) || ("/production.html".equals(u.getPath()) && "store".equals(params.get("source")) && "profile".equals(params.get("kind")));
+        }
         catch (Exception e) { return false; }
     }
     public static boolean request(String value) {
@@ -22,13 +35,14 @@ public final class MirPolicy {
             if (local(value)) return !u.getPath().contains("..") && !u.getPath().contains("\\");
             if (!"https".equals(u.getScheme()) || !TEST_HOST.equals(u.getHost()) || u.getUserInfo() != null || (u.getPort() != -1 && u.getPort() != 443)) return false;
             String path = u.normalize().getPath();
+            if (path.startsWith("/rest/v1/rpc/mir_client_") || path.startsWith("/rest/v1/rpc/mir_estimate_")) return false;
             if (path.startsWith("/functions/") || path.contains("..") || path.contains("\\")) return false;
             if (path.startsWith("/auth/")) return java.util.Arrays.asList("/auth/v1/token", "/auth/v1/user", "/auth/v1/logout").contains(path);
             return path.startsWith("/rest/v1/") || path.startsWith("/storage/v1/") || path.startsWith("/realtime/v1/");
         } catch (Exception e) { return false; }
     }
     public static boolean external(String value) {
-        try { URI u=URI.create(value); return "https".equals(u.getScheme()) && u.getHost()!=null && u.getUserInfo()==null && !u.getHost().endsWith("supabase.co") && !local(value); }
+        try { URI u=URI.create(value); return "https".equals(u.getScheme()) && u.getHost()!=null && u.getUserInfo()==null && !u.getHost().endsWith("supabase.co") && !local(value) && !java.util.Arrays.asList("revetementsmir.com","www.revetementsmir.com","revetementsmir.github.io").contains(u.getHost()); }
         catch(Exception e){return false;}
     }
 }

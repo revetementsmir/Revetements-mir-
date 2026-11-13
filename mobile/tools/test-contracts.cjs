@@ -19,6 +19,22 @@ test('Only enumerated local routes enter the WebView; signed URLs stay out of ex
  for(const url of ['https://localhost/plan.html','https://localhost/boutique.html','https://localhost/produit.html','https://localhost/selection.html','https://localhost/pliage.html','https://localhost/estimation.html','https://evil.example/chantier.html','https://localhost/untrusted/chantier.html','javascript:alert(1)','file:///chantier.html'])assert.equal(Policy.allowedRoute(url),false);
  assert.equal(Policy.allowedRoute('https://localhost/chantier.html'),true);assert.equal(Policy.external('https://'+Policy.TEST+'/storage/v1/object/sign/private'),false);
 });
+test('Public configurator and estimate URL variants fail closed; employee folding stays available',()=>{
+ for(const name of ['mir_client_center_snapshot_scoped','mir_client_support_action_scoped','mir_estimate_submit'])assert.equal(Policy.allowedRequest('https://'+Policy.TEST+'/rest/v1/rpc/'+name),false);
+ assert.equal(Policy.allowedRequest('https://'+Policy.TEST+'/rest/v1/rpc/mir_%63lient_support_action_scoped'),false);
+ assert.equal(Policy.allowedRequest('https://'+Policy.TEST+'/rest/v1/rpc/mir_management_action'),true);
+ for(const url of ['https://www.revetementsmir.com/estimation.html','https://revetementsmir.com/','https://revetementsmir.github.io/Revetements-mir-/'])assert.equal(Policy.external(url),false);
+ assert.equal(Policy.external('https://www.google.com/maps/dir/?destination=Quebec'),true);
+ for(const suffix of ['?mode=client','?mode=client&kind=panel','?mode=client&source=store','?mode=client&source=store&kind=panel','?mode=client&source=store&kind=profile&mode=admin','?mode=client&source=store&source=client&kind=profile','?mode=client&source=store&kind=profile&kind=panel','?%6dode=client','?estimate=1','?estimate=0'])assert.equal(Policy.allowedRoute('https://localhost/production.html'+suffix),false,suffix);
+ assert.equal(Policy.allowedRoute('https://localhost/production.html?mode=client&source=store&kind=profile'),true);
+ assert.equal(Policy.allowedRoute('https://localhost/production.html?view=models'),true);
+ assert.equal(Policy.allowedRoute('https://localhost/chantier.html?estimate=1'),false);
+});
+test('Public estimate implementation is absent from the embedded package',()=>{
+ for(const file of ['mir-estimate.js','mir-estimate-drafts.js','mir-estimate-upload.js'])assert.equal(fs.existsSync(path.join(root,'www',file)),false,file);
+ for(const file of fs.readdirSync(path.join(root,'www')).filter(name=>name.endsWith('.html')))assert.doesNotMatch(fs.readFileSync(path.join(root,'www',file),'utf8'),/src="mir-estimate(?:-drafts|-upload)?\.js/);
+ const help=fs.readFileSync(path.join(root,'www/mir-help-center.js'),'utf8');assert.doesNotMatch(help,/Comment demander une estimation\?|depuis la page Nous joindre|Comment retrouver mon panier\?/);assert.match(help,/compte équipe/);
+});
 for(const role of ['employee','chef','warehouse','assistant','boss'])test(role+' is revalidated by the server before every business RPC',async()=>{
  const h=harness(role);assert.equal((await h.client.rpc('mir_business',{role:'admin'})).error,null);assert.deepEqual(h.calls,['mir_account_snapshot','mir_business']);await h.client.rpc('mir_business');assert.deepEqual(h.calls.slice(-2),['mir_account_snapshot','mir_business']);
 });

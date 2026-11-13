@@ -43,8 +43,9 @@ function mount(){
   for(const el of document.querySelectorAll('[data-auth-screen="signup"],[data-auth-screen="forgot"],#auth-google,.auth-divider,.auth-cart-return,.auth-card>.auth-footnote'))el.hidden=true;
   const intro=document.querySelector('.auth-intro');if(intro){const title=intro.querySelector('h1');if(title&&title.textContent!=='Connexion équipe MIR')title.textContent='Connexion équipe MIR';const text=intro.querySelector('p:not(.portal-eyebrow)');if(text&&text.textContent!=='Connectez-vous avec votre compte équipe. Environnement TEST.')text.textContent='Connectez-vous avec votre compte équipe. Environnement TEST.';}
   // Harmony moves/inserts links after login. Keep permitted internal links.
-  for(const link of document.querySelectorAll('#mir-harmony-header a[href]')){
-   if(!Policy.allowedRoute(link.href,origin)&&!link.hasAttribute('data-mir-native-public'))link.setAttribute('data-mir-native-public','');
+  for(const link of document.querySelectorAll('a[href]')){
+   const url=new URL(link.href,location.href);
+   if(!link.hasAttribute('download')&&!privateAsset(link.href)&&!Policy.external(link.href)&&!Policy.allowedRoute(link.href,origin)&&!link.hasAttribute('data-mir-native-public'))link.setAttribute('data-mir-native-public','');
   }
   const menu=document.querySelector('#mir-harmony-menu'),help=document.querySelector('.mir-help-launch');
   let businessHelp=document.querySelector('#mir-native-business-help');

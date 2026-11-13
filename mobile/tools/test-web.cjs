@@ -41,8 +41,9 @@ async function assertTeamScreen(page){
     const nav=document.createElement('nav');nav.className='mir-client-links';
     nav.innerHTML='<a href="realisations.html">Réalisations</a><a href="plan.html">Studio 3D</a><a href="contact.html">Nous joindre</a>';
     const shortcuts=document.createElement('nav');shortcuts.dataset.clientShortcuts='';shortcuts.innerHTML='<a href="selection.html">Mon panier client</a><a href="estimation.html">Demander une estimation</a>';
-    const tools=document.createElement('nav');tools.id='native-business-probe';tools.innerHTML='<a href="production.html?source=store">Pliage interne</a>';
+    const tools=document.createElement('nav');tools.id='native-business-probe';tools.innerHTML='<a href="production.html?mode=client&source=store&kind=profile">Pliage interne</a><a href="production.html?mode=client">Panneaux client</a>';
     menu.append(nav,shortcuts,tools);menu.hidden=false;
+    const outside=document.createElement('div');outside.id='native-public-probe';outside.innerHTML='<a href="production.html?mode=client&kind=panel">Configurer mes panneaux</a><button data-estimate-source="bending">Estimation publique</button>';document.body.append(outside);
    },role);
    await page.waitForTimeout(50);
    assert.equal(await page.getByRole('link',{name:'Réalisations',exact:true}).isVisible(),false,role+' public menu');
@@ -50,9 +51,24 @@ async function assertTeamScreen(page){
    assert.equal(await page.getByRole('link',{name:'Demander une estimation',exact:true}).first().isVisible(),false,role+' client shortcuts');
    assert.equal(await page.getByRole('button',{name:'Centre d’aide métier',exact:true}).isVisible(),true);
    assert.equal(await page.getByRole('link',{name:'Pliage interne',exact:true}).isVisible(),true);
-   await page.evaluate(()=>{document.querySelector('#native-business-probe').remove();document.querySelector('#mir-harmony-menu').hidden=true;});
+   assert.equal(await page.getByRole('link',{name:'Panneaux client',exact:true}).isVisible(),false);
+   assert.equal(await page.getByRole('link',{name:'Configurer mes panneaux',exact:true}).isVisible(),false);
+   assert.equal(await page.getByRole('button',{name:'Estimation publique',exact:true}).isVisible(),false);
+   assert.equal(await page.evaluate(()=>typeof window.MIREstimate),'undefined');
+   await page.evaluate(()=>{document.querySelector('#native-business-probe').remove();document.querySelector('#native-public-probe').remove();document.querySelector('#mir-harmony-menu').hidden=true;});
   }
   await page.reload();await page.locator('#auth-signin-form').waitFor({state:'visible'});
+  if(width===390){
+   await page.evaluate(()=>{
+    window.MIRPortalActiveClient={getStatus:()=>({phase:'ready'}),helpFAQ:async()=>[],supportSnapshot:async()=>({conversations:[]})};
+    document.querySelector('.mir-help-launch').click();
+   });
+   await page.getByText('Comment accéder à mon compte équipe?',{exact:true}).waitFor();
+   assert.equal(await page.getByText('Comment demander une estimation?',{exact:true}).count(),0);
+   assert.equal(await page.locator('#mir-help-create').count(),0,'No customer support request form for staff');
+   await page.screenshot({path:path.join(proof,'business-help-390x844.png')});
+   await page.locator('.mir-help-close').click();await page.reload();await page.locator('#auth-signin-form').waitFor({state:'visible'});
+  }
   // Background snapshot rendering must not erase a local, unsaved absence.
   await page.evaluate(()=>{
    window.MIRAndroidSession.currentUserId=()=> 'actor-a';
@@ -74,6 +90,15 @@ async function assertTeamScreen(page){
   await page.evaluate(()=>MIRHarmonySettings.store({theme:'dark',textSize:'large',reducedMotion:'on',highContrast:true}));await page.reload();await page.locator('#auth-signin-form').waitFor({state:'visible'});assert.equal(await page.locator('html').getAttribute('data-mir-theme'),'dark');assert.equal(await page.locator('html').getAttribute('data-mir-text'),'large');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true);
   await assertTeamScreen(page);await page.screenshot({path:path.join(proof,`signin-dark-${width}x${height}.png`),fullPage:true});
   await page.evaluate(()=>MIRHarmonySettings.store({theme:'dark',highContrast:false}));await assertTeamScreen(page);await page.screenshot({path:path.join(proof,`signin-dark-standard-${width}x${height}.png`),fullPage:true});
-  await page.evaluate(()=>MIRHarmonySettings.store({theme:'system'}));await page.emulateMedia({colorScheme:'light'});await page.waitForFunction(()=>document.documentElement.dataset.mirTheme==='light');await page.emulateMedia({colorScheme:'dark'});await page.waitForFunction(()=>document.documentElement.dataset.mirTheme==='dark');await assertTeamScreen(page);assert.deepEqual(errors,[]);await context.close();console.log(`PASS Chromium adapter ${width}×${height}, TEST, auth, offline, no overflow/errors`);
+  await page.evaluate(()=>MIRHarmonySettings.store({theme:'system'}));await page.emulateMedia({colorScheme:'light'});await page.waitForFunction(()=>document.documentElement.dataset.mirTheme==='light');await page.emulateMedia({colorScheme:'dark'});await page.waitForFunction(()=>document.documentElement.dataset.mirTheme==='dark');await assertTeamScreen(page);
+  if(width===390){
+   await page.goto('https://localhost/production.html?mode=client&source=store&kind=profile');
+   await page.waitForFunction(()=>!!window.MIRProductionWorkspace);
+   assert.equal(await page.evaluate(()=>typeof window.MIREstimate),'undefined');
+   assert.equal(await page.locator('#mir-estimate-dialog').count(),0);
+   assert.equal(await page.getByRole('link',{name:/Demander une estimation/}).count(),0);
+   await page.screenshot({path:path.join(proof,'employee-folding-390x844.png')});
+  }
+  assert.deepEqual(errors,[]);await context.close();console.log(`PASS Chromium adapter ${width}×${height}, TEST, auth, offline, no overflow/errors`);
  }
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exitCode=1;});

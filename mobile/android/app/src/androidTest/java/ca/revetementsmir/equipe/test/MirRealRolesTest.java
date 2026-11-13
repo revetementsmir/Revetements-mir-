@@ -36,6 +36,10 @@ public class MirRealRolesTest extends MirDeviceSetup {
  private void inspectMenu(ActivityScenario<MainActivity>s,String role)throws Exception{
   js(s,"scrollTo(0,0);document.querySelector('.mir-harmony-toggle').click();true");
   waitFor(s,"document.querySelector('#mir-harmony-menu')?.hidden===false");
+  assertEquals(Boolean.FALSE,js(s,"MIRAndroid.Policy.allowedRoute('https://localhost/production.html?mode=client')"));
+  assertEquals(Boolean.FALSE,js(s,"MIRAndroid.Policy.allowedRoute('https://localhost/chantier.html?estimate=1')"));
+  assertEquals(Boolean.TRUE,js(s,"MIRAndroid.Policy.allowedRoute('https://localhost/production.html?mode=client&source=store&kind=profile')"));
+  assertEquals("undefined",js(s,"typeof window.MIREstimate"));
   // The exact regression observed in the original native PNGs: a public link
   // survives relocation or late insertion into the shared header.
   waitFor(s,"[...document.querySelectorAll('#mir-harmony-menu a[href]')].every(a=>MIRAndroid.Policy.allowedRoute(a.href,location.origin)||!a.getClientRects().length)");
