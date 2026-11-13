@@ -1097,7 +1097,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg+=multiline(40,790,columns[0],{width:42,lineHeight:18,attrs:'font-size="13"'}).svg;
         svg+=multiline(430,790,columns[1],{width:42,lineHeight:18,attrs:'font-size="13"'}).svg;
         svg+=svgText(40,1003,'Étoile : face peinte. Rayons, développé et réglages à valider par l’atelier.','font-size="12"');
-        pages.push({name:item.id+' · '+item.name,layout:'mir-dossier',documentTitle:production?'Mise en production':order.requiresQuote?'Demande de soumission':order.automaticPricingAllowed?'Récapitulatif de pliage':'DOSSIER DE PLIAGE',reference:[order.poNumber||order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:primary});
+        pages.push({name:item.id+' · '+item.name,layout:production?'bending-sheet':'mir-dossier',documentTitle:production?'Mise en production':order.requiresQuote?'Demande de soumission':order.automaticPricingAllowed?'Récapitulatif de pliage':'DOSSIER DE PLIAGE',reference:[order.poNumber||order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:primary});
       }
       for(let start=24;start<details.length;start+=40){
         const extra=details.slice(start,start+40),left=extra.slice(0,20),right=extra.slice(20,40);
@@ -1106,7 +1106,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg+=svgText(40,205,'Bloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.','font-size="13" fill="#52634f"');
         svg+=multiline(40,260,left,{width:43,lineHeight:22,attrs:'font-size="14"'}).svg;
         svg+=multiline(430,260,right,{width:43,lineHeight:22,attrs:'font-size="14"'}).svg;
-        pages.push({name:item.id+' · Continuation',layout:'mir-dossier',documentTitle:production?'Mise en production':'DOSSIER DE PLIAGE',reference:[order.poNumber||order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:extra});
+        pages.push({name:item.id+' · Continuation',layout:production?'bending-sheet':'mir-dossier',documentTitle:production?'Mise en production':'DOSSIER DE PLIAGE',reference:[order.poNumber||order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:extra});
       }
     }
     return pages;

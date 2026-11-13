@@ -2,6 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const sql=read('supabase/migrations/20261128120000_phase10_boss_adjointe_management.sql');
+const hardening=read('supabase/migrations/20261128123000_phase10_management_idempotence_hardening.sql');
 const ui=read('dist/mir-shared-workspace.js'),client=read('dist/mir-shared-client.js');
 let n=0;const test=(name,fn)=>{fn();n++;console.log('PASS '+name);};
 test('permissions serveur limitées à Boss et Adjointe',()=>{assert.match(sql,/staff_role\(org\) in \('boss','assistant'\)/);assert.doesNotMatch(sql,/phase10_management_allowed[\s\S]{0,300}'admin'/);});
@@ -14,4 +15,6 @@ test('PDF précédent conservé',()=>{assert.match(sql,/supersedes_document_id/)
 test('aucun transport externe',()=>{assert.match(sql,/supplierOrderCreated',false/);assert.match(sql,/emailSent',false/);assert.doesNotMatch(sql,/http_post|net\.http|smtp|resend/i);});
 test('interface exige motif confirmation et avertissement',()=>{assert.match(ui,/Raison obligatoire/);assert.match(ui,/confirm\(/);assert.match(ui,/la production a commencé/i);assert.match(ui,/nouvelle mise en production/i);});
 test('client utilise les nouvelles RPC métier',()=>{for(const name of ['mir_bending_model_manage','mir_received_order_revise','mir_bending_management_snapshot','mir_bending_tariff_manage'])assert.match(client,new RegExp(name));});
+test('rejeu divergent et concurrence sont fail-closed',()=>{assert.match(hardening,/pg_advisory_xact_lock[\s\S]+select \* into receipt/);assert.match(hardening,/request_id déjà utilisé avec un contenu différent/);assert.match(hardening,/payload_hash<>payload_hash/);assert.match(hardening,/phase10_management_requests enable row level security/);});
+test('commande Phase 6 réelle et statut opérationnel sont pris en charge',()=>{assert.match(ui,/instanceSnapshot\?\.spec/);assert.match(hardening,/'status',o\.status,'uxStatus',o\.ux_status/);assert.match(hardening,/set snapshot=revised_snapshot/);});
 console.log('Phase 10 gestion Boss/Adjointe : '+n+'/'+n+' contrats réussis.');

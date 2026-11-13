@@ -109,6 +109,7 @@ test('un profil unique produit une page complète, quatre profils quatre pages',
   const items=['fascia','ailes_fenetre','beam','capage_climatiseur'].map((id,index)=>({id:'M00'+(index+1),spec:complete(id)}));
   const pages=P.productionPages({id:'RECETTE-PHASE10',poNumber:'RECETTE-PHASE10',project:'Chantier fictif',foreman:'MIR',date:'2026-11-13',revision:'A',items},{layout:'bending-sheet'});
   assert.equal(pages.length,4);
+  assert.ok(pages.every(page=>page.layout==='bending-sheet'),'aucun second en-tête de dossier autour de la fiche de production');
   assert.ok(pages.every(page=>!page.svg.includes('Suite')&&!page.svg.includes('SUITE')));
   for(const [index,page] of pages.entries()){
     assert.equal((page.svg.match(/QUANTITÉ \/ LONGUEUR/g)||[]).length,1);
