@@ -197,6 +197,7 @@ class Capture:
         self.stage = key.lower() + '-settings'
         self.tap('Réglages')
         self.wait(lambda: self.device(textContains='Apparence').exists, 'settings form')
+        self.wait(lambda: self.device(text='Enregistré dans votre compte MIR').exists, 'settings response complete')
         self.shot(key.lower() + '-settings', label, 'Settings form, read only; no preference changed')
 
     def employee_form_and_back(self):
@@ -209,16 +210,29 @@ class Capture:
         self.wait(lambda: self.device(text='Nouvelle demande').exists, 'absence form')
         self.shot('employee-absence-form', 'Employé chantier', 'Unsaved absence form; no submit')
         # The last field is the note textarea (source audited); no draft/save button is clicked.
-        candidates = [self.device(className='android.widget.EditText', descriptionContains='Motif ou commentaire'),
-                      self.device(className='android.widget.EditText', textContains='Motif ou commentaire')]
-        for _ in range(4):
-            if any(item.count == 1 for item in candidates):
+        # WebView exposes the label separately from an empty textarea. Do not
+        # require the label to be repeated in the field's text/content-desc.
+        # Source-audited note is the only editable field between its label and
+        # the save button; never click that button.
+        def note_field():
+            labels = self.device(text='Motif ou commentaire')
+            save = self.device(text='Enregistrer le brouillon')
+            if labels.count != 1 or save.count != 1:
+                return None
+            lower = labels.info['bounds']['top']
+            upper = save.info['bounds']['top']
+            fields = [item for item in self.device(className='android.widget.EditText').all()
+                      if item.info['bounds']['top'] >= lower
+                      and item.info['bounds']['bottom'] <= upper]
+            return fields[0] if len(fields) == 1 else None
+        note = note_field()
+        for _ in range(6):
+            if note is not None:
                 break
             self.device.swipe_ext('up', scale=.5)
-        matches = [item for item in candidates if item.count == 1]
-        if not matches:
+            note = note_field()
+        if note is None:
             raise CaptureError('Uniquely labelled local note field not found')
-        note = matches[0]
         if note.info.get('password'):
             raise CaptureError('Password field refused for local form probe')
         note.click()
