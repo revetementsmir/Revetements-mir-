@@ -8,6 +8,8 @@ on:
       - 'tests/mir-test-*'
       - '.github/workflows/mir-environments-pr.yml'
       - '.github/workflows/pages.yml'
+      - '.github/workflows/mir-publish-test.yml'
+      - 'tools/validation/verify-pages-local.py'
 permissions:
   contents: read
 jobs:

@@ -240,7 +240,9 @@ jobs:
             exit 1
           fi
       - name: Préparer le site MIR TEST isolé
-        run: node scripts/build-mir-test.cjs _site_mir _site_mir/test "$GITHUB_SHA"
+        run: |
+          node scripts/build-mir-test.cjs --production-manifest _site_mir "$GITHUB_SHA" > /tmp/mir-production-release-build.json
+          node scripts/build-mir-test.cjs _site_mir _site_mir/test "$GITHUB_SHA"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site_mir
@@ -256,7 +258,7 @@ jobs:
             curl --fail --silent --show-error --location \
               --retry 20 --retry-delay 3 --retry-all-errors "$1" -o "$2"
           }
-          for file in responsive.html mir-responsive-adapter.mjs mir-responsive-styles.mjs mir-responsive-history.js mir-responsive-environments.mjs; do
+          for file in mir-production-release.json responsive.html mir-responsive-adapter.mjs mir-responsive-styles.mjs mir-responsive-history.js mir-responsive-environments.mjs; do
             fetch "$base/$file?verification=$GITHUB_SHA" "/tmp/published-$file"
             cmp "/tmp/published-$file" "_site_mir/$file"
           done

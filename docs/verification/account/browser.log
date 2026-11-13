@@ -1,9 +1,0 @@
-PASS account UI 360px: password/error/private addresses/logout
-PASS account UI 390px: password/error/private addresses/logout
-PASS account UI 428px: password/error/private addresses/logout
-PASS account UI 820px: password/error/private addresses/logout
-PASS account UI 1024px: password/error/private addresses/logout
-PASS account UI 1440px: password/error/private addresses/logout
-PASS account UI 2560px: password/error/private addresses/logout
-PASS simulated SDK: signup confirmation/cart return, recovery before account/reload, expired link, Google redirect, reset
-PASS simulated invitation identity and assigned job UI

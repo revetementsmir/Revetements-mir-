@@ -1,7 +1,0 @@
-# Public estimation entry; private routes verify Auth and MIR roles server-side.
-[functions.mir-estimates]
-verify_jwt = false
-
-# PREPARED, NOT DEPLOYED. The handler verifies Auth /user AND current SQL access.
-[functions.mir-chat-files]
-verify_jwt = false

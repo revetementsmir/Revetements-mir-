@@ -1,6 +1,0 @@
-{
-  "name": "mir-database-tests",
-  "private": true,
-  "scripts": { "test": "node ../../tests/mir-database.cjs" },
-  "devDependencies": { "@electric-sql/pglite": "0.5.15" }
-}

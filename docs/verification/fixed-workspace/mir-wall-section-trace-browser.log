@@ -1,6 +1,0 @@
-PASS MIR wall trace pc: points/drag, A-B labels, measurement-first optional, multi-zone persistence
-PASS MIR wall trace ipad-landscape: points/drag, A-B labels, measurement-first optional, multi-zone persistence
-PASS MIR wall trace ipad-portrait: points/drag, A-B labels, measurement-first optional, multi-zone persistence
-PASS MIR wall trace phone: points/drag, A-B labels, measurement-first optional, multi-zone persistence
-PASS MIR wall trace phone-compact: points/drag, A-B labels, measurement-first optional, multi-zone persistence
-PASS MIR wall trace phone-landscape: points/drag, A-B labels, measurement-first optional, multi-zone persistence

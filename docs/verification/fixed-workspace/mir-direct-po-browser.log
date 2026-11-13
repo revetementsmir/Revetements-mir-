@@ -1,4 +1,0 @@
-PASS mobile: drawing -> PO draft, cancel/no duplicate, saved snapshot and restored after reload
-PASS tablet: drawing -> PO draft, cancel/no duplicate, saved snapshot and restored after reload
-PASS desktop: drawing -> PO draft, cancel/no duplicate, saved snapshot and restored after reload
-PASS client unchanged: direct PO is admin-only
