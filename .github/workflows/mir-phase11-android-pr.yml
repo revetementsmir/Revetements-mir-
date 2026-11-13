@@ -1,7 +1,7 @@
 name: MIR Phase 11 — Android privé TEST
 on:
   pull_request:
-    paths: ['mobile/**', 'dist/**', 'tests/**', '.github/workflows/mir-phase11-android-pr.yml']
+    paths: ['mobile/**', 'dist/**', 'tests/**', 'docs/verification/phase11-android/**', '.github/workflows/mir-phase11-android-pr.yml']
 permissions:
   contents: read
 jobs:
@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -37,6 +39,8 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -104,8 +108,10 @@ jobs:
             mobile/tools/run-instrumentation.sh
             cp artifacts/phase11/instrumentation.txt artifacts/phase11/webview-tests.txt
             mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#prepareUpdate'
+            cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-prepare.txt
             adb install -r artifacts/phase11/MIR-TEST-debug.apk
             mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#verifyUpdate'
+            cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-verify.txt
             node mobile/tools/prepare-real-roles.cjs
             mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirRealRolesTest'
             cp artifacts/phase11/instrumentation.txt artifacts/phase11/real-roles.txt
@@ -113,6 +119,8 @@ jobs:
       - name: Empreinte de l’APK de recette — signature debug uniquement
         run: |
           sha256sum -c artifacts/phase11/SHA256SUMS
+          cat artifacts/phase11/SHA256SUMS
+          node mobile/tools/result-summary.cjs
           git diff --exit-code -- dist supabase
           git diff --check
       - uses: actions/upload-artifact@v4

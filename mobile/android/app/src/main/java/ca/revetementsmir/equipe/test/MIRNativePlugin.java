@@ -69,6 +69,9 @@ public class MIRNativePlugin extends Plugin {
         File dir=new File(getContext().getCacheDir(),"mir-pdf");dir.mkdirs();clean(dir,false);
         String safe=name.replaceAll("[^\\p{L}\\p{N}._ -]","-");if(safe.length()>120)safe="MIR.pdf";
         File file=new File(dir,UUID.randomUUID()+"-"+safe);try(FileOutputStream out=new FileOutputStream(file)){out.write(bytes);}
+        // Capacitor persists activity-result options in Android's small Binder Bundle.
+        // Keep PDF bytes only in the private file, never in saved activity state.
+        call.getData().remove("data");
         if(action.equals("save")){call.getData().put("pdfSaveName",file.getName());Intent save=new Intent(Intent.ACTION_CREATE_DOCUMENT);save.addCategory(Intent.CATEGORY_OPENABLE);save.setType("application/pdf");save.putExtra(Intent.EXTRA_TITLE,safe);startActivityForResult(call,save,"pdfSaved");return;}
         Uri uri=FileProvider.getUriForFile(getContext(),getContext().getPackageName()+".fileprovider",file);
         Intent intent=new Intent(action.equals("share")?Intent.ACTION_SEND:Intent.ACTION_VIEW);intent.setType("application/pdf");
