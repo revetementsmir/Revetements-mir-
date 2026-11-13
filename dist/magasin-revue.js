@@ -19,7 +19,7 @@
    if(type==='variant')return (item.reviewVariants||[]).map((v,i)=>
      '<option value="'+i+'" data-item-id="'+safe(v.itemId)+'" data-color-id="'+safe(v.colorId||'')+'">'+safe(v.label)+'</option>').join('');
    if(type==='color')return '<option value="">Choisir la couleur</option>'+
-     (item.storeColors||item.colors||[]).map(c=>'<option value="'+safe(c.id)+'"'+(item.baseColorId===c.id?' selected':'')+'>'+safe(c.name)+'</option>').join('');
+     (window.MIRCataloguePolicy?.sortColors(item.storeColors||item.colors)||(item.storeColors||item.colors||[])).map(c=>'<option value="'+safe(c.id)+'"'+(item.baseColorId===c.id?' selected':'')+'>'+safe(c.name)+'</option>').join('');
    return '<option value="">Choisir la longueur</option>'+
      (item.formats||[]).map(f=>'<option value="'+safe(f.id)+'">'+safe(f.label||f.lengthIn+' po')+'</option>').join('');
  }

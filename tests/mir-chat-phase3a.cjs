@@ -77,7 +77,10 @@ test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch con
  const baseline=require('./fixtures/mir-chat-baseline.json'),hash=x=>createHash('sha256').update(x).digest('hex');
  for(const [file,value]of Object.entries(baseline.files))assert.equal(hash(fs.readFileSync(file)),value,file);
  const beck=require('./fixtures/mir-chat-main-215259.json');
- const approvedProtectedChanges={'dist/commerce.js':'cf1cf6510948bd72c71deb41abb198b32311d1c7a7d2ce51a69e37cade77e9f1'};
+ const approvedProtectedChanges={
+  'dist/catalogue-fd6866b49d21.json':'a08b9bf28abba1f286d0854690ae4979eaaa723a3fe04eb86a75dffc82efdc63',
+  'dist/commerce.js':'4f52389a1a771c72b4900ac0d7c93a38e58c6d269e2a83e15452701327897815'
+ };
  if(process.env.GITHUB_EVENT_NAME==='pull_request'&&process.env.GITHUB_EVENT_PATH){
   // Actions checks a synthetic merge with today's main, which other approved
   // PRs may change. Guard OUR head's diff, not freeze their catalogue globally.

@@ -3,7 +3,7 @@
   "files": {
     "dist/portal-client.js": "25684264a9f8e6c5027992ed8c72e04a35ef1a0a5a85659a01f158c7e7c313b9",
     "dist/chantier-employee.css": "273a6e69b76e223d0e7860132eb1b7bb578cb491170ad475aafd03031fa3350a",
-    "dist/employee-store-model.js": "0d33d1c944d55764dd60d9fd330bff231dac3b975e0027f04c02444a4a2c0c7b",
+    "dist/employee-store-model.js": "f2f470453c0a0cdc0317136f4c04978704850c35004e5ee7c15293aa5426def3",
     "dist/portal-config.js": "f25cb94c5966a98b6a06dc3c7a2aa8b0ab3e07e0b0edc5d1b80739d17f870ee9"
   },
   "functions": {

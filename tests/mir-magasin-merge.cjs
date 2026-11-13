@@ -4,9 +4,10 @@
 const assert=require('node:assert/strict');
 const Store=require('../dist/employee-store-model.js');
 const Review=require('../dist/mir-store-review.js');
+const Canonical=require('../dist/catalogue-fd6866b49d21.json');
 let tests=0;
 function check(label,fn){fn();tests++;console.log('PASS '+label);}
-const catalogue=Store.buildCatalogue([]);
+const catalogue=Store.buildCatalogue(Canonical);
 const get=id=>catalogue.find(x=>x.id===id);
 check('Ids de la passation conservés sans doublons',()=>{
  const ids=['mir-request-soffit-staples-1in','pending-kaycan-fascia-hex-quarter-inch',
@@ -28,7 +29,7 @@ check('ADSEAL remplace uniquement la fiche générique',()=>{
 check('Quatre demandes d’accessoires distinctes',()=>{
  ['mir-caulk-nozzle-45-5','mir-adfast-yellow-nozzles-5',
  'mir-caulk-sausage-nozzle','mir-bates-caulk-gun'].forEach(id=>assert.ok(get(id),id));
- assert.equal(get('mir-adfast-yellow-nozzles-5').packaging.piecesPerBox,5);
+ assert.equal(get('mir-adfast-yellow-nozzles-5').packaging.piecesPerPack,5);
  assert.equal(get('mir-bates-caulk-gun').manufacturerReference,'FPMS001B351');
 });
 check('Joints Ced’R 6 et 9, D-5 et VStyle ne fusionnent pas',()=>{
@@ -62,13 +63,12 @@ check('Formats des rouleaux : 10/20/50/100 pi réellement distincts',()=>{
  const state={catalogue};
  assert.ok(!Store.configureLine(state,{itemId:item.id,quantity:1}).ok);
 });
-check('Boîte de 5 et pistolet à l’unité dans la demande',()=>{
+check('Accessoires incomplets bloqués avant la commande',()=>{
  const state={catalogue};
  const five=Store.configureLine(state,{itemId:'mir-adfast-yellow-nozzles-5',quantity:2});
  const one=Store.configureLine(state,{itemId:'mir-bates-caulk-gun',quantity:1});
- assert.ok(five.ok);assert.ok(one.ok);
- assert.equal(five.line.unit,'paquet');assert.equal(one.line.unit,'pièce');
- assert.equal(five.line.packaging.piecesPerBox,5);assert.equal(one.line.quantity,1);
+ assert.equal(five.ok,false);assert.equal(one.ok,false);
+ assert.equal(five.error.code,'ITEM_NOT_ORDERABLE');assert.equal(one.error.code,'ITEM_NOT_ORDERABLE');
 });
 check('La présentation sans démo ne touche pas aux objets sources',()=>{
  const shown=Review.present(catalogue);

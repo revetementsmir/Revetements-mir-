@@ -8,7 +8,7 @@
   let materials=[],hiddenProducts=new Set();
   try{const r=await fetch('boutique-visibilite.json');if(r.ok)hiddenProducts=new Set((await r.json()).hidden||[]);}catch{}
   const sold=m=>!hiddenProducts.has(m.id)&&m.status!=='visualization_only'&&m.commercialStatus!=='not_for_sale';
-  try{const r=await fetch('catalogue-fd6866b49d21.json');if(!r.ok)throw Error();materials=(await r.json()).materials;}catch{$('#brand-title').textContent='Catalogue indisponible';$('#brand-note').textContent='Rechargez la page pour réessayer.';return;}
+  try{const r=await fetch('catalogue-fd6866b49d21.json');if(!r.ok)throw Error();materials=(await r.json()).materials.map(m=>({...m,colors:window.MIRCataloguePolicy?.sortColors(m.colors)||m.colors}));}catch{$('#brand-title').textContent='Catalogue indisponible';$('#brand-note').textContent='Rechargez la page pour réessayer.';return;}
   const brands=[...new Set(materials.filter(m=>m.brand&&!m.id.startsWith('generic-')).map(m=>m.brand))];
   const preferred=['James Hardie','Maibec','CanExel','St-Laurent','Kaycan','Gentek','Allura','LP','Rialux','MAC','Royal','Juste du Pin','Light Trim','Vicwest','Adfast'];
   brands.sort((a,b)=>{const rank=x=>{const n=preferred.findIndex(y=>norm(x).includes(norm(y)));return n<0?99:n;};return rank(a)-rank(b)||a.localeCompare(b,'fr');});

@@ -41,6 +41,10 @@
   }
   function requestUnit(m){
     const u=String(m.unit||'').toLowerCase(),a=m.applications||[];
+    if(/^paquet(?:\s|$)/.test(u))return 'paquet';
+    if(/^pièce(?:\s|$)/.test(u))return 'pièce';
+    if(/^boîte(?:\s|$)/.test(u))return 'boîte';
+    if(/^à confirmer$/.test(u))return 'à confirmer';
     if(a.includes('fastener')||/Fixation/i.test(m.family||''))return 'boîte';
     if(/rouleau|bobine/i.test(m.name||'')||/rouleau/.test(u))return 'rouleau';
     if(a.includes('sealant'))return 'cartouche';
@@ -62,7 +66,7 @@
     for(const m of source){
       if(m.excludeFromCommerce===true||m.commercialStatus==='not_for_sale'||m.status==='visualization_only'||
         (m.applications||[]).some(a=>a==='roofing'||a==='masonry'))continue;
-      const category=categoryFor(m),pending=m.configurationRequired===true||/pending_identity|supplier_identity_to_confirm/.test(m.status||'');
+      const category=categoryFor(m),pending=m.orderable===false||m.configurationRequired===true||/pending_identity|supplier_identity_to_confirm|procurement_pending/.test(m.status||'');
       let colors=(m.colors||[]).filter(c=>c.id&&c.name&&c.verified!==false).map(c=>({...copy(c),scope:'product_reference',
         swatchImage:c.swatchImage||c.swatchUrl||null,sourceUrl:c.sourceUrl||m.sourceUrl||null}));
       let colorScope=m.colorStatus==='collection_only'?'manufacturer_request_only':'product_reference';
@@ -85,7 +89,7 @@
         stockLengthIn:finite(m.dimensions?.lengthIn)?m.dimensions.lengthIn:null,measureFields:[],profile:null,
         status:pending?'to_identify':'reference',statusLabel:m.configurationRequired===true?'Configuration à confirmer':pending?'Référence à confirmer':'Référence catalogue',
         ...(m.configurationRequired===true?{configurationRequired:true,configurationUrl:m.configurationUrl||null}:{}),
-        referencePending:pending,primaryImage:m.primaryImage||m.images?.[0]?.src||null,
+        referencePending:pending,orderable:m.orderable!==false,orderableReason:m.orderableReason||null,primaryImage:m.primaryImage||m.images?.[0]?.src||null,
         sourceUrl:m.sourceUrl||null,documents:copy(m.documents||[]),notes:copy(m.notes||[]),
         commercialNote:'Demande interne de démonstration; prix, stock réel et unité de vente MIR non connectés.',active:true});
     }
@@ -193,20 +197,6 @@
       notes:[documented?'Moulure de joint aluminium documentée dans le guide Maibec 2026; photo exacte et couleur à confirmer.':'Profil Ced’R-Vue 6 po documenté, mais moulure de joint aluminium 6 po non confirmée; ne pas substituer une moulure 9 po.'],
       status:'to_identify',statusLabel:'Moulure à vérifier',referencePending:true
     }));
-    [
-      {id:'mir-caulk-nozzle-45-5',name:'Embouts 45° pour pistolet à calfeutrer · 5/pqt',brand:'Canac',unit:'paquet',packaging:{piecesPerBox:5},
-        sourceUrl:'https://www.canac.ca/canac/fr/2/p/embouts-45-pour-pistolet-a-calfeutrer-pqt-5/55001518',notes:['Article Canac 55001518; compatibilité à confirmer.']},
-      {id:'mir-adfast-yellow-nozzles-5',name:'ADFAST — Embouts jaunes pour saucisse · 5/pqt',brand:'Adfast',unit:'paquet',packaging:{piecesPerBox:5},manufacturerReference:'YELLOW NOZZLE/5',
-        sourceUrl:'https://www.rona.ca/fr/produit/embout-en-plastique-de-rechange-pour-scellant-de-adfast-jaune-5-pqt-13485024',
-        notes:['Article RONA 13485024; modèle YELLOW NOZZLE/5; compatibilité Adseal600MG indiquée par le détaillant.']},
-      {id:'mir-caulk-sausage-nozzle',name:'Embout pour fusil à calfeutrer type saucisse',brand:'Canac',unit:'pièce',
-        sourceUrl:'https://www.canac.ca/canac/fr/2/p/embout-pour-fusil-a-calfeutrer-type-saucisse/5081112',
-        notes:['Article Canac 5081112; marque, emballage et compatibilité à confirmer.']},
-      {id:'mir-bates-caulk-gun',name:'Bates Choice — Pistolet à calfeutrer 18:1',brand:'Bates Choice',unit:'pièce',manufacturerReference:'FPMS001B351',
-        sourceUrl:'https://www.amazon.com/Bates-Choice-FPMS001B351-Bates-Caulking/dp/B0CQZ3HWY7',
-        notes:['Modèle FPMS001B351, ASIN B0CQZ3HWY7, rapport 18:1; 1 pistolet.']}
-    ].forEach(row=>add({...row,category:'lames-consommables',status:'to_identify',
-      statusLabel:'Commande à confirmer',referencePending:true}));
     // Demandé sur ChatGPT Sites : conserver noir/blanc à 100 pi et
     // permettre les demandes couleur en 10, 20, 50 ou 100 pi sans inventer de SKU.
     for(const [id,name,color,base] of [
@@ -715,6 +705,7 @@
     try{
       const item=(state?.catalogue||[]).find(i=>i.id===spec.itemId&&i.active!==false);
       if(!item)fail('ITEM_UNKNOWN','Cet article est absent ou désactivé.');
+      if(item.orderable===false)fail('ITEM_NOT_ORDERABLE',item.orderableReason||'Cette référence doit être confirmée avant de pouvoir être ajoutée à une commande.');
       const quantity=typeof spec.quantity==='string'&&spec.quantity.trim()?Number(spec.quantity):spec.quantity;
       if(!Number.isSafeInteger(quantity)||quantity<=0||!Number.isInteger(quantity/(item.quantityStep||1)))fail('INVALID_QUANTITY','Indiquer une quantité positive dans l’unité de cet article.');
       if(spec.unit&&spec.unit!==item.unit)fail('UNIT_MISMATCH','L’unité doit rester celle de l’article; aucune conversion boîte/pièce n’est automatique.');

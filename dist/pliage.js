@@ -17,7 +17,7 @@
   function number(n){return n.toLocaleString('fr-CA',{maximumFractionDigits:2});}
   let profile='l',unit='in',view='volume',items=[],project='',materials=[],selectedMaterial='',selectedColor='',busy=false;
   try{const old=JSON.parse(localStorage.getItem(STORAGE));if(old?.version===1){items=(old.items||[]).filter(i=>profiles[i.profile]&&i.dimensions&&Number.isFinite(i.lengthIn)&&i.lengthIn>0&&Number.isInteger(i.quantity)&&i.quantity>0);project=String(old.project||'');}}catch{}
-  try{const r=await fetch('catalogue-fd6866b49d21.json');if(r.ok)materials=(await r.json()).materials.filter(m=>(m.applications||[]).includes('bending'));}catch{}
+  try{const r=await fetch('catalogue-fd6866b49d21.json');if(r.ok)materials=(await r.json()).materials.filter(m=>(m.applications||[]).includes('bending')).map(m=>({...m,colors:window.MIRCataloguePolicy?.sortColors(m.colors)||m.colors}));}catch{}
   function material(){return materials.find(m=>m.id===selectedMaterial);}
   function color(){return (material()?.colors||[]).find(c=>c.id===selectedColor)||null;}
   function finishLabel(item){return item.colorCode ? item.colorName+' · '+item.colorCode : item.colorName;}
