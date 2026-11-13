@@ -52,21 +52,24 @@
     const header=doc.querySelector('header.mir-client-header, header.mir-home-header');
     const nav=header?.querySelector('nav.mir-client-links');
     if(!header||!nav||header.querySelector('.mir-client-menu-toggle'))return null;
-    const current=route(win.location?.pathname),test=new URLSearchParams(win.location?.search||'').get('recette')==='1';
+    const query=new URLSearchParams(win.location?.search||'');
+    const current=route(doc.documentElement.dataset.mirResponsiveEntry==='true'?(query.get('page')||'index.html'):win.location?.pathname),test=query.get('recette')==='1';
     normalize(doc,header,nav,current,test);
     header.setAttribute('data-mir-public-shell','');doc.body.classList.add('mir-public-navigation');
     const media=win.matchMedia(BREAKPOINT);
+    const isMobile=()=>{const viewport=header.closest('[data-mir-responsive-viewport]');return viewport?viewport.clientWidth<=1100:media.matches;};
     const toggle=doc.createElement('button');toggle.type='button';toggle.className='mir-client-menu-toggle';toggle.textContent='Plus';
     if(!nav.id)nav.id='mir-client-links-menu';
     toggle.setAttribute('aria-controls',nav.id);toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ouvrir les liens utiles');header.insertBefore(toggle,nav);
     let mobile=false;
     function close(restoreFocus=false){nav.hidden=true;header.classList.remove('mir-client-menu-open');toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ouvrir les liens utiles');if(restoreFocus)toggle.focus();}
     function open(){nav.hidden=false;header.classList.add('mir-client-menu-open');toggle.setAttribute('aria-expanded','true');toggle.setAttribute('aria-label','Fermer les liens utiles');}
-    function sync(){const now=media.matches;header.classList.toggle('mir-client-menu-ready',now);toggle.hidden=!now;if(!now){nav.hidden=false;header.classList.remove('mir-client-menu-open');toggle.setAttribute('aria-expanded','false');}else if(!mobile)close(false);mobile=now;}
-    toggle.addEventListener('click',()=>{if(media.matches)(toggle.getAttribute('aria-expanded')==='true'?close:open)(true);});
-    nav.addEventListener('click',event=>{if(media.matches&&event.target.closest?.('a'))close(false);});
-    doc.addEventListener('keydown',event=>{if(event.key==='Escape'&&media.matches&&toggle.getAttribute('aria-expanded')==='true'){event.preventDefault();close(true);}});
-    doc.addEventListener('pointerdown',event=>{if(media.matches&&!header.contains(event.target)&&toggle.getAttribute('aria-expanded')==='true')close(false);});
+    function sync(){const now=isMobile();header.classList.toggle('mir-client-menu-ready',now);toggle.hidden=!now;if(!now){nav.hidden=false;header.classList.remove('mir-client-menu-open');toggle.setAttribute('aria-expanded','false');}else if(!mobile)close(false);mobile=now;}
+    toggle.addEventListener('click',()=>{if(isMobile())(toggle.getAttribute('aria-expanded')==='true'?close:open)(true);});
+    nav.addEventListener('click',event=>{if(isMobile()&&event.target.closest?.('a'))close(false);});
+    doc.addEventListener('keydown',event=>{if(event.key==='Escape'&&isMobile()&&toggle.getAttribute('aria-expanded')==='true'){event.preventDefault();close(true);}});
+    doc.addEventListener('pointerdown',event=>{if(isMobile()&&!header.contains(event.target)&&toggle.getAttribute('aria-expanded')==='true')close(false);});
+    doc.addEventListener('mir:responsive-viewport',sync);
     if(media.addEventListener)media.addEventListener('change',sync);else media.addListener?.(sync);sync();
     return Object.freeze({toggle,nav,close,open,sync});
   }
