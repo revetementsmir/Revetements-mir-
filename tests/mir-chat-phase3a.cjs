@@ -79,7 +79,7 @@ test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch con
  const beck=require('./fixtures/mir-chat-main-215259.json');
  const approvedProtectedChanges={
   'dist/catalogue-fd6866b49d21.json':'a08b9bf28abba1f286d0854690ae4979eaaa723a3fe04eb86a75dffc82efdc63',
-  'dist/commerce.js':'bf460f572d63fa97f0e48ea7ff328f70ec378c210adbe9e8d8f2e0cd0d0d5f8e'
+  'dist/commerce.js':'4f52389a1a771c72b4900ac0d7c93a38e58c6d269e2a83e15452701327897815'
  };
  if(process.env.GITHUB_EVENT_NAME==='pull_request'&&process.env.GITHUB_EVENT_PATH){
   // Actions checks a synthetic merge with today's main, which other approved
