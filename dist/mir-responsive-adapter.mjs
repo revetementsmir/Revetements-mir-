@@ -11,6 +11,9 @@ for(const attribute of document.body.attributes)page.setAttribute(attribute.name
 page.classList.add(...document.documentElement.classList);
 for(const attribute of document.documentElement.attributes)if(attribute.name.startsWith('data-'))page.setAttribute(attribute.name,attribute.value);
 page.append(...[...document.body.childNodes].filter(node=>node.nodeName!=='SCRIPT'));
+// Async MIR controllers query the document while the shared toolkit imports.
+// Keep their real nodes connected throughout mounting, not in a detached tree.
+document.body.append(page);
 let restoreStyles;
 try{restoreStyles=isolatePageStyles();}catch(error){document.body.append(page);const alert=document.createElement('p');alert.setAttribute('role','alert');alert.textContent='Styles de prévisualisation indisponibles : '+error.message;document.body.prepend(alert);throw error;}
 document.body.removeAttribute('style');
