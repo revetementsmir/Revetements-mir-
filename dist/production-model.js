@@ -1083,7 +1083,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         let svg=svgOpen(850,1100,'Pièce cotée '+item.id);
         svg+=multiline(40,91,[production?'MISE EN PRODUCTION · PROFIL UNIQUE':'DOSSIER DE PLIAGE'],{width:75,lineHeight:18,attrs:'font-size="12" font-weight="700" fill="#52634f"'}).svg;
         svg+=multiline(40,121,[item.id+' · '+item.name],{width:75,lineHeight:23,attrs:'font-size="18" font-weight="700"'}).svg;
-        svg+=multiline(40,154,[['Commande : '+(order.poNumber||'À préciser'),'Chantier : '+(order.project||'À préciser'),'Révision : '+(order.revision||'À préciser')].join(' · ')],{width:95,lineHeight:18,attrs:'font-size="12"'}).svg;
+        svg+=multiline(40,154,[['Commande : '+(order.poNumber||'À préciser'),'Chantier : '+(order.project||'À préciser'),'Chef : '+(order.foreman||'À préciser'),'Date : '+(order.date||'À préciser'),'Révision : '+(order.revision||'À préciser')].join(' · ')],{width:95,lineHeight:18,attrs:'font-size="12"'}).svg;
         svg+='<rect x="40" y="230" width="770" height="345" fill="#fafbf8" stroke="#d7ded2"/>';
         if(item.kind==='profile'&&item.valid){const map=projection(item.pointsMM,{x:110,y:85,w:580,h:245});svg+='<g transform="translate(65 235) scale(.9)">'+profileDiagramContent(item,item.pointsMM.map(map),{paintedMarker:'star',highContrast:true,markerModel:item})+'</g>';}
         else if(item.kind==='panel')svg+=placeSVG(panelSVG(item,{width:710,height:325,legend:false,header:false,notes:false}),70,240);
