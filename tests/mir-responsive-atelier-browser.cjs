@@ -57,11 +57,12 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   tab.on('dialog',dialog=>dialog.accept());await tab.close();
   const shop=await browser.newPage({viewport:{width:1440,height:1080}});
   shop.on('pageerror',error=>console.log('SHOP ERROR',error.message));
+  shop.on('requestfailed',request=>console.log('SHOP REQUEST FAILED',request.url(),request.failure()?.errorText));
   await shop.route('**/*.supabase.co/**',route=>route.abort());
   await shop.goto(base+'/responsive.html?page=boutique.html&layout=phone');
   await Promise.race([shop.locator('[data-mir-responsive-ready=true]').waitFor(),shop.locator('[role=alert]').waitFor().then(async()=>{throw Error(await shop.locator('[role=alert]').innerText());})]);
   await shop.locator('.mir-client-menu-ready').waitFor();
-  await shop.locator('.brand-collection-card').first().waitFor();
+  await shop.locator('.brand-collection-card').first().waitFor().catch(async error=>{console.log('SHOP DIAGNOSTIC',await shop.evaluate(()=>({grid:document.querySelector('#shop-grid')?.textContent,view:document.body.dataset.commerceView,categories:document.querySelector('#category-cards')?.innerHTML,brands:document.querySelector('#shop-brand-directory')?.innerHTML})));await shop.screenshot({path:'artifacts/mir-responsive-atelier/boutique-failure.png'});throw error;});
   const search=shop.locator('#shop-search');await search.fill('BECK');
   await shop.locator('[data-shop-card]').first().waitFor();
   assert.equal(new URL(shop.url()).searchParams.get('page'),'boutique.html','business filters must retain the viewer page');
