@@ -16,7 +16,7 @@ test('Request boundary refuses production, lookalikes, cleartext and mail endpoi
  assert.equal(Policy.allowedRequest('https://'+Policy.TEST+'/rest/v1/rpc/mir_account_snapshot'),true);
 });
 test('Only enumerated local routes enter the WebView; signed URLs stay out of external browser',()=>{
- for(const url of ['https://evil.example/chantier.html','https://localhost/untrusted/chantier.html','javascript:alert(1)','file:///chantier.html'])assert.equal(Policy.allowedRoute(url),false);
+ for(const url of ['https://localhost/boutique.html','https://localhost/produit.html','https://localhost/selection.html','https://localhost/pliage.html','https://localhost/estimation.html','https://evil.example/chantier.html','https://localhost/untrusted/chantier.html','javascript:alert(1)','file:///chantier.html'])assert.equal(Policy.allowedRoute(url),false);
  assert.equal(Policy.allowedRoute('https://localhost/chantier.html'),true);assert.equal(Policy.external('https://'+Policy.TEST+'/storage/v1/object/sign/private'),false);
 });
 for(const role of ['employee','chef','warehouse','assistant','boss'])test(role+' is revalidated by the server before every business RPC',async()=>{

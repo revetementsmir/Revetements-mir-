@@ -1,0 +1,29 @@
+/* Native team shell only; public website sources remain untouched. */
+:root[data-mir-harmony] .auth-card {
+  background: var(--mir-surface, #fff) !important;
+  color: var(--mir-text, #223128) !important;
+  border-color: var(--mir-border, #ccd6ce) !important;
+}
+:root[data-mir-harmony] .auth-card :is(label, h2, .auth-show-password) {
+  color: var(--mir-text, #223128) !important;
+}
+:root[data-mir-harmony] .auth-card input:not([type=checkbox]) {
+  background: var(--mir-surface-soft, #f7f9f5) !important;
+  color: var(--mir-text, #223128) !important;
+  border-color: var(--mir-border, #ccd6ce) !important;
+}
+:root[data-mir-harmony] .auth-card .button:not(.quiet):not(.secondary) {
+  background: #31573b !important;
+  color: #fff !important;
+}
+:root[data-mir-harmony] .auth-card :is(.quiet, .secondary, .auth-text-button),
+:root[data-mir-harmony] #mir-harmony-header :is(button, .mir-harmony-dossier) {
+  background: var(--mir-surface-soft, #f7f9f5) !important;
+  color: var(--mir-text, #223128) !important;
+  border-color: var(--mir-border, #ccd6ce) !important;
+}
+/* Business navigation and the employee's common cart remain after login. */
+:root[data-mir-harmony] body.mir-native-signin #mir-harmony-header :is(.mir-harmony-toggle, .mir-harmony-dossier),
+:root[data-mir-harmony] body :is(.mir-client-links, .mir-home-header-actions, .mir-client-actions,
+.mir-mobile-tabs, .mir-signature-footer, [data-portal-public-footer],
+.mir-client-return, .auth-cart-return) { display: none !important; }

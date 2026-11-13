@@ -2,6 +2,20 @@
 // Chromium simulation of the native adapter; this is not an Android proof.
 const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'../www'),proof=path.resolve(__dirname,'../../artifacts/phase11/web');
+async function assertTeamScreen(page){
+ const ratios=await page.evaluate(()=>{
+  const rgb=v=>v.match(/[\d.]+/g).slice(0,3).map(Number);
+  const luminance=c=>c.map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;}).reduce((n,v,i)=>n+v*[.2126,.7152,.0722][i],0);
+  const card=document.querySelector('.auth-card');
+  return ['.auth-card label','.auth-card input[type=email]','.auth-card input[type=password]','.auth-card button[type=submit]'].map(selector=>{
+   const el=document.querySelector(selector),style=getComputedStyle(el),background=selector.endsWith('label')?getComputedStyle(card).backgroundColor:style.backgroundColor;
+   const a=luminance(rgb(style.color)),b=luminance(rgb(background));return {selector,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)};
+  });
+ });
+ for(const {selector,ratio}of ratios)assert.ok(ratio>=4.5,selector+' contrast '+ratio);
+ for(const selector of ['.mir-harmony-toggle','.mir-harmony-dossier','.mir-client-links','.mir-home-header-actions','.mir-signature-footer'])assert.equal(await page.locator(selector).first().isVisible(),false,selector+' must not expose public chrome at login');
+ for(const name of ['boutique.html','produit.html','selection.html','pliage.html','estimation.html']){assert.equal(fs.existsSync(path.join(root,name)),false);assert.equal(await page.evaluate(name=>MIRAndroid.Policy.allowedRoute('https://localhost/'+name),name),false);}
+}
 (async()=>{fs.mkdirSync(proof,{recursive:true});const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium',args:['--no-sandbox']});try{
  for(const [width,height] of [[360,780],[390,844],[768,1024],[834,1112],[1366,768],[1440,900],[1920,1080]]){
   const context=await browser.newContext({viewport:{width,height}});const errors=[],requests=[];
@@ -10,10 +24,13 @@ const root=path.resolve(__dirname,'../www'),proof=path.resolve(__dirname,'../../
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto('https://localhost/chantier.html');await page.locator('#auth-signin-form').waitFor({state:'visible'});
   assert.equal(await page.evaluate(()=>MIRPortalConfig.projectRef),'hxtztkmbfpmzrieccwsg');assert.equal(await page.locator('#auth-google').evaluate(e=>e.hidden),true);assert.equal(await page.locator('[data-auth-screen=signup]').evaluate(e=>e.hidden),true);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true);
+  await assertTeamScreen(page);
   const blocked=await page.evaluate(async()=>{try{await fetch('https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/');return false;}catch{return true;}});assert.equal(blocked,true);assert.deepEqual(requests,[]);assert.deepEqual(errors,[]);
   await context.setOffline(true);await page.waitForFunction(()=>document.querySelector('#mir-native-state').textContent.includes('Hors ligne'));await context.setOffline(false);await page.waitForFunction(()=>document.querySelector('#mir-native-state').textContent.includes('actualisation'));
   await page.screenshot({path:path.join(proof,`signin-${width}x${height}.png`),fullPage:true});
   await page.evaluate(()=>MIRHarmonySettings.store({theme:'dark',textSize:'large',reducedMotion:'on',highContrast:true}));await page.reload();await page.locator('#auth-signin-form').waitFor({state:'visible'});assert.equal(await page.locator('html').getAttribute('data-mir-theme'),'dark');assert.equal(await page.locator('html').getAttribute('data-mir-text'),'large');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true);
-  await page.evaluate(()=>MIRHarmonySettings.store({theme:'system'}));await page.emulateMedia({colorScheme:'light'});await page.waitForFunction(()=>document.documentElement.dataset.mirTheme==='light');await page.emulateMedia({colorScheme:'dark'});await page.waitForFunction(()=>document.documentElement.dataset.mirTheme==='dark');assert.deepEqual(errors,[]);await context.close();console.log(`PASS Chromium adapter ${width}×${height}, TEST, auth, offline, no overflow/errors`);
+  await assertTeamScreen(page);await page.screenshot({path:path.join(proof,`signin-dark-${width}x${height}.png`),fullPage:true});
+  await page.evaluate(()=>MIRHarmonySettings.store({theme:'dark',highContrast:false}));await assertTeamScreen(page);await page.screenshot({path:path.join(proof,`signin-dark-standard-${width}x${height}.png`),fullPage:true});
+  await page.evaluate(()=>MIRHarmonySettings.store({theme:'system'}));await page.emulateMedia({colorScheme:'light'});await page.waitForFunction(()=>document.documentElement.dataset.mirTheme==='light');await page.emulateMedia({colorScheme:'dark'});await page.waitForFunction(()=>document.documentElement.dataset.mirTheme==='dark');await assertTeamScreen(page);assert.deepEqual(errors,[]);await context.close();console.log(`PASS Chromium adapter ${width}×${height}, TEST, auth, offline, no overflow/errors`);
  }
 }finally{await browser.close();}})().catch(error=>{console.error(error);process.exitCode=1;});

@@ -38,6 +38,13 @@ Les tests utilisent seulement des lectures métier MIR TEST; aucune commande, no
 
 ## Défauts trouvés et protections
 
+### Correction après capture sur téléphone
+
+Le formulaire réutilisé gardait un fond blanc alors que les libellés passaient en clair en mode sombre. `mobile/web/team.css` applique désormais les surfaces et couleurs Harmony ensemble; les tests mesurent un contraste minimal de 4,5:1 pour les libellés, champs et bouton, en clair/sombre/contraste renforcé sur les sept formats. Assertion de contraste également ajoutée dans la vraie WebView Android.
+
+Application réservée aux cinq rôles métier de l’équipe : aucun compte client accepté. La connexion ne présente plus les liens, menu, panier ou pied de page du site public. Les pages Boutique, Produit, Sélection et Pliage client sont exclues de l’artefact Android et refusées par les politiques Java et JavaScript, même par URL directe. Le Magasin et le panier commun de l’employé demeurent dans le portail métier après connexion. Le site web public est inchangé.
+
+
 - Paquet SDK historique `tools` indisponible : paquets SDK actuels explicités.
 - Worker PDF résolu avec `vendor/pdfjs` en double : URL locale absolue et worker avec compatibilité WebView.
 - API PDF.js `Promise.try` absente de la WebView AOSP : compatibilité standard épinglée, sans remplacer le moteur ni affaiblir ses tests.
