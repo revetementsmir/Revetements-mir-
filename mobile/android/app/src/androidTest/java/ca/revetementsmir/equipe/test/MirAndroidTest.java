@@ -18,6 +18,9 @@ import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class MirAndroidTest {
+ @org.junit.Rule public org.junit.rules.TestWatcher failureProof=new org.junit.rules.TestWatcher(){
+  @Override protected void failed(Throwable error,org.junit.runner.Description description){try{screenshot("failed-"+description.getMethodName());Context c=InstrumentationRegistry.getInstrumentation().getTargetContext();UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).dumpWindowHierarchy(new File(c.getExternalFilesDir(null),"phase11-proof/failed-ui.xml"));}catch(Exception ignored){}}
+ };
  private Object js(ActivityScenario<MainActivity> scenario,String expression)throws Exception{
   CountDownLatch done=new CountDownLatch(1);String[] result={null};
   scenario.onActivity(activity->activity.getBridge().getWebView().evaluateJavascript(expression,value->{result[0]=value;done.countDown();}));
@@ -26,7 +29,7 @@ public class MirAndroidTest {
  private void waitFor(ActivityScenario<MainActivity> scenario,String expression)throws Exception{
   long end=SystemClock.uptimeMillis()+30000;
   while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(scenario,expression)))return;SystemClock.sleep(150);}
-  fail("Condition Android WebView non satisfaite : "+expression);
+  screenshot("failed-wait");fail("Condition Android WebView non satisfaite : "+expression+"; état PDF="+js(scenario,"JSON.stringify({status:document.querySelector('#status')?.textContent,error:window.mirNativeDiagnostic})"));
  }
  private void screenshot(String name)throws Exception{
   Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();File dir=new File(context.getExternalFilesDir(null),"phase11-proof");dir.mkdirs();
@@ -41,6 +44,8 @@ public class MirAndroidTest {
    assertEquals(Boolean.TRUE,js(s,"document.querySelector('#auth-google').hidden"));
    js(s,"document.querySelector('#auth-email').value='recette-phase11@example.invalid';localStorage.setItem('mir_phase11_probe','retained');true");
    screenshot("android-signin-portrait");
+   js(s,"MIRHarmonySettings.store({theme:'dark',textSize:'large',reducedMotion:'on',highContrast:true});true");
+   assertEquals("dark",js(s,"document.documentElement.dataset.mirTheme"));assertEquals("large",js(s,"document.documentElement.dataset.mirText"));assertEquals("reduced",js(s,"document.documentElement.dataset.mirMotion"));assertEquals("high",js(s,"document.documentElement.dataset.mirContrast"));assertEquals(Boolean.TRUE,js(s,"document.documentElement.scrollWidth<=innerWidth+2"));screenshot("android-dark-large-contrast");
    s.onActivity(a->a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
    waitFor(s,"innerWidth>innerHeight");assertEquals("recette-phase11@example.invalid",js(s,"document.querySelector('#auth-email').value"));screenshot("android-signin-landscape");
    s.recreate();waitFor(s,"!!document.querySelector('#auth-signin-form')");assertEquals("retained",js(s,"localStorage.getItem('mir_phase11_probe')"));
@@ -64,8 +69,8 @@ public class MirAndroidTest {
   try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
    waitFor(s,"!!document.querySelector('#auth-signin-form')");
    automation.revokeRuntimePermission(c.getPackageName(),android.Manifest.permission.CAMERA);
-   js(s,"window.permissionProof='pending';MIRAndroid.Native.scanQr().then(()=>window.permissionProof='unexpected').catch(()=>window.permissionProof='denied');true");
-   androidx.test.uiautomator.UiObject2 deny=device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.res("com.android.permissioncontroller:id/permission_deny_button")),5000);assertNotNull("Permission demandée à l’usage",deny);deny.click();waitFor(s,"window.permissionProof==='denied'");screenshot("android-camera-denied");
+   js(s,"window.permissionProof='pending';MIRAndroid.Native.scanQr().then(()=>window.permissionProof='unexpected').catch(e=>{window.permissionError=e.message;window.permissionProof='denied';});true");
+   androidx.test.uiautomator.UiObject2 deny=device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.res("com.android.permissioncontroller:id/permission_deny_button")),5000);screenshot("permission-before-check");assertNotNull("Permission demandée à l’usage; état="+js(s,"window.permissionProof+' '+window.permissionError"),deny);deny.click();waitFor(s,"window.permissionProof==='denied'");screenshot("android-camera-denied");
    automation.grantRuntimePermission(c.getPackageName(),android.Manifest.permission.CAMERA);
    js(s,"window.permissionProof='pending';MIRAndroid.Native.scanQr().then(r=>window.permissionProof=r.cancelled?'cancelled':'scanned').catch(()=>window.permissionProof='failed');true");
    assertTrue(device.wait(androidx.test.uiautomator.Until.hasObject(androidx.test.uiautomator.By.text("Scanner le code MIR")),5000));screenshot("android-qr-scanner");device.pressBack();waitFor(s,"window.permissionProof==='cancelled'");
