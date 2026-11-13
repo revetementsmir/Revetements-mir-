@@ -286,11 +286,20 @@ const check = (name) => report.checks.push(name);
   report.roles.chef.teamAbsence = true;
   check("chef_evenement_equipe_sans_depense");
 
-  const queue = await rpc(tokens.entrepot, "mir_warehouse_queue", { org });
-  assert(queue[0]?.qrToken, "Fixture Entrepôt MIR TEST insuffisante");
+  const warehouseSku = await rpc(tokens.admin, "mir_warehouse_register", {
+    org,
+    kind: "hardware",
+    source_ref: expenseTag,
+    sku_code: `P7-${crypto.randomUUID().slice(0, 8)}`,
+    display_name: expenseTag,
+    unit_name: "unité",
+    step: 1,
+  });
+  assert(warehouseSku?.qrToken, "Création du SKU de recette Entrepôt refusée");
+  report.writes.push({ kind: "warehouse_sku", id: warehouseSku.id, tag: expenseTag });
   const movement = await rpc(tokens.entrepot, "mir_warehouse_move", {
     org,
-    qr: queue[0].qrToken,
+    qr: warehouseSku.qrToken,
     line_id: null,
     delta: 1,
     request_id: crypto.randomUUID(),
