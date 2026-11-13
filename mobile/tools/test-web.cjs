@@ -53,6 +53,17 @@ async function assertTeamScreen(page){
    await page.evaluate(()=>{document.querySelector('#native-business-probe').remove();document.querySelector('#mir-harmony-menu').hidden=true;});
   }
   await page.reload();await page.locator('#auth-signin-form').waitFor({state:'visible'});
+  // Background snapshot rendering must not erase a local, unsaved absence.
+  await page.evaluate(()=>{
+   window.MIRAndroidSession.currentUserId=()=> 'actor-a';
+   const form=document.createElement('form');form.id='absence-draft-form';form.innerHTML='<textarea name="note"></textarea>';document.body.append(form);
+   const field=form.elements.note;field.value='NOTE LOCALE';field.dispatchEvent(new Event('input',{bubbles:true}));
+   form.outerHTML='<form id="absence-draft-form"><textarea name="note"></textarea></form>';
+  });
+  await page.waitForFunction(()=>document.querySelector('#absence-draft-form textarea').value==='NOTE LOCALE');
+  await page.evaluate(()=>{window.MIRAndroidSession.currentUserId=()=> 'actor-b';document.querySelector('#absence-draft-form').outerHTML='<form id="absence-draft-form"><textarea name="note"></textarea></form>';});
+  await page.waitForTimeout(50);assert.equal(await page.locator('#absence-draft-form textarea').inputValue(),'');
+  await page.evaluate(()=>document.querySelector('#absence-draft-form').remove());
   // A field at the very end must remain reachable after the keyboard shrinks the viewport.
   await page.evaluate(()=>{const form=document.createElement('form');form.id='keyboard-end-probe';form.innerHTML='<label>Note locale<textarea id="keyboard-end-field"></textarea></label>';document.body.append(form);form.querySelector('textarea').focus();});
   await page.setViewportSize({width,height:360});

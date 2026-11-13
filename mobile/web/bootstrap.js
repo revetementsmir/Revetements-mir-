@@ -13,12 +13,32 @@ XMLHttpRequest.prototype.open=function(method,url,...args){if(!Policy.allowedReq
 function privateAsset(url){try{const u=new URL(url,location.href);return u.protocol==='blob:'||u.hostname===Policy.TEST&&u.pathname.startsWith('/storage/v1/')&&Policy.allowedRequest(u.href,origin);}catch{return false;}}
 window.open=url=>{if(privateAsset(url))download({href:url,download:''}).catch(showError);else if(Policy.external(url))Native.openExternal({url}).catch(showError);else if(Policy.allowedRoute(url,origin)){if(!dirty||confirm('Quitter cette saisie ? Les données non enregistrées restent à vérifier.'))location.assign(url);}else showError(new Error('Lien refusé dans MIR TEST.'));return null;};
 let dirty=false;
+// The portal refreshes its snapshot every 15 seconds and replaces forms.
+// Keep only unsaved absence input in memory, within the same actor and view.
+// No storage, save, RPC or server preference is involved.
+let absenceDraft=null;
+function rememberAbsence(event){
+ const form=event.target.closest?.('#absence-draft-form');if(!form)return;
+ const actor=window.MIRAndroidSession?.currentUserId?.();if(!actor)return;
+ absenceDraft={actor,form,fields:[...form.elements].filter(e=>e.name&&e.type!=='file').map(e=>({name:e.name,value:e.value,checked:e.checked,type:e.type}))};
+}
+function restoreAbsence(){
+ if(!absenceDraft)return;
+ const form=document.querySelector('#absence-draft-form');
+ if(!form||absenceDraft.actor!==window.MIRAndroidSession?.currentUserId?.()){absenceDraft=null;return;}
+ if(form===absenceDraft.form)return;
+ for(const field of absenceDraft.fields){const el=form.elements.namedItem(field.name);if(!el||el.type!==field.type)continue;el.value=field.value;if(['checkbox','radio'].includes(field.type))el.checked=field.checked;}
+ absenceDraft.form=form;
+}
+document.addEventListener('input',rememberAbsence,true);document.addEventListener('change',rememberAbsence,true);
+for(const name of ['submit','reset'])document.addEventListener(name,event=>{if(event.target.id==='absence-draft-form')absenceDraft=null;},true);
 function showError(error){const node=document.getElementById('mir-native-state');if(node){node.textContent=error?.message||'Action indisponible. Rien n’a été envoyé.';node.setAttribute('role','alert');}}
 function networkState(){const node=document.getElementById('mir-native-state');if(node)node.textContent=navigator.onLine?'MIR TEST · Notifications par actualisation':'MIR TEST · Hors ligne — les enregistrements serveur restent à confirmer';}
 function mount(){
  const style=document.createElement('style');style.textContent='body{padding-top:calc(env(safe-area-inset-top) + 30px)!important;padding-bottom:env(safe-area-inset-bottom)}#mir-native-state{position:fixed;top:0;left:0;right:0;z-index:10000;background:var(--mir-surface-soft,#e9eee7);color:var(--mir-text,#24422e);padding:5px 10px;font:13px system-ui;min-height:20px}button,input,select{scroll-margin-bottom:100px}.mir-native-signin .mir-help-launch{position:static!important;transform:none!important;pointer-events:auto!important;display:block;margin:16px}';document.head.append(style);
  const banner=document.createElement('div');banner.id='mir-native-state';banner.setAttribute('role','status');document.body.prepend(banner);networkState();
  const observer=new MutationObserver(()=>{
+  restoreAbsence();
   document.body.classList.toggle('mir-native-signin',!!document.querySelector('#auth-signin-form'));
   for(const el of document.querySelectorAll('[data-auth-screen="signup"],[data-auth-screen="forgot"],#auth-google,.auth-divider,.auth-cart-return,.auth-card>.auth-footnote'))el.hidden=true;
   const intro=document.querySelector('.auth-intro');if(intro){const title=intro.querySelector('h1');if(title&&title.textContent!=='Connexion équipe MIR')title.textContent='Connexion équipe MIR';const text=intro.querySelector('p:not(.portal-eyebrow)');if(text&&text.textContent!=='Connectez-vous avec votre compte équipe. Environnement TEST.')text.textContent='Connectez-vous avec votre compte équipe. Environnement TEST.';}
