@@ -168,7 +168,7 @@ class Capture:
             'role': role, 'scenario': scenario, **png_info(path)})
         self.save_manifest('in-progress')
 
-    def login(self, key, label):
+    def login(self, key, label, home_name=None):
         self.stage = key.lower() + '-login'
         email, password = (os.environ.get('MIR_SANDBOX_' + key + '_' + suffix)
                            for suffix in ('EMAIL', 'PASSWORD'))
@@ -185,7 +185,7 @@ class Capture:
         self.wait(lambda: self.device(textContains=label).exists
                   and self.device(text='Déconnexion').exists, 'server role label')
         self.top()
-        self.shot(key.lower() + '-home', label, 'Authenticated landing and system bars')
+        self.shot(home_name or key.lower() + '-home', label, 'Authenticated landing and system bars')
 
     def menu(self, key, label):
         self.stage = key.lower() + '-menu'
@@ -261,7 +261,7 @@ class Capture:
             # Closing/reopening is non-destructive; no pm clear/uninstall or business cleanup.
             self.device.app_stop(APP)
             self.device.app_start(APP)
-        self.login('EMPLOYEE', 'Employé chantier')
+        self.login('EMPLOYEE', 'Employé chantier', home_name='employee-before-local-form')
         self.employee_form_and_back()
         self.top()
         self.tap('Déconnexion')
