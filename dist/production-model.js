@@ -907,6 +907,9 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
  if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;
  const at=gap=>[mid[0]+normal[0]*gap*side,mid[1]+normal[1]*gap*side];
+ const haloCenter=at(12),haloHalf=Math.min(34,len*.4),haloEnd=sign=>[haloCenter[0]+dx/len*haloHalf*sign,haloCenter[1]+dy/len*haloHalf*sign];
+ const haloEnds=[haloEnd(-1),haloEnd(1)];
+ output+=`<path class="profile-painted-face-highlight" d="M${haloEnds[0].map(decimal).join(',')}L${haloEnds[1].map(decimal).join(',')}" fill="none" stroke="${highContrast?'#8fd36f':'#b8ddb0'}" stroke-opacity=".58" stroke-width="18" stroke-linecap="round"/>`;
  if(paintedMarker==='star'){
   const center=at(32);
   const points=Array.from({length:10},(_,index)=>{
@@ -1071,14 +1074,16 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       return {name:'Mise en production · '+(index+1)+'/'+pages.length,svg:svg+svgClose,layout:'bending-sheet'};
     });
   }
-  function clientDossierPages(order){
+  function clientDossierPages(order,{production=false}={}){
     const pages=[];
     for(const item of order.items){
       const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(item.quotePolicy.required?['Soumission obligatoire : '+item.quotePolicy.reason]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>wrapLines(line,87));
-      const chunks=[];for(let i=0;i<Math.max(1,details.length);i+=12)chunks.push(details.slice(i,i+12));
-      for(let i=0;i<chunks.length;i++){
+      const primary=details.slice(0,24),columns=[primary.slice(0,12),primary.slice(12,24)];
+      {
         let svg=svgOpen(850,1100,'Pièce cotée '+item.id);
-        svg+=multiline(40,193,[item.id+' · '+item.name+(i?' · Suite — ne pas recompter':'')],{width:75,lineHeight:23,attrs:'font-size="18" font-weight="700"'}).svg;
+        svg+=multiline(40,91,[production?'MISE EN PRODUCTION · PROFIL UNIQUE':'DOSSIER DE PLIAGE'],{width:75,lineHeight:18,attrs:'font-size="12" font-weight="700" fill="#52634f"'}).svg;
+        svg+=multiline(40,121,[item.id+' · '+item.name],{width:75,lineHeight:23,attrs:'font-size="18" font-weight="700"'}).svg;
+        svg+=multiline(40,154,[['Commande : '+(order.poNumber||'À préciser'),'Chantier : '+(order.project||'À préciser'),'Révision : '+(order.revision||'À préciser')].join(' · ')],{width:95,lineHeight:18,attrs:'font-size="12"'}).svg;
         svg+='<rect x="40" y="230" width="770" height="345" fill="#fafbf8" stroke="#d7ded2"/>';
         if(item.kind==='profile'&&item.valid){const map=projection(item.pointsMM,{x:110,y:85,w:580,h:245});svg+='<g transform="translate(65 235) scale(.9)">'+profileDiagramContent(item,item.pointsMM.map(map),{paintedMarker:'star',highContrast:true,markerModel:item})+'</g>';}
         else if(item.kind==='panel')svg+=placeSVG(panelSVG(item,{width:710,height:325,legend:false,header:false,notes:false}),70,240);
@@ -1086,19 +1091,29 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg+=svgText(40,603,'MATÉRIAU / FINI','font-size="12" font-weight="700" fill="#52634f"');
         svg+=multiline(40,628,[...materialLines(item),...finishLines(item)],{width:48,lineHeight:21,attrs:'font-size="15"'}).svg;
         svg+=svgText(500,603,'QUANTITÉ / LONGUEUR','font-size="12" font-weight="700" fill="#52634f"');
-        svg+=svgText(500,633,(i?'Suite, quantité inchangée':(item.quantity??'À préciser')+' pièce(s)'),'font-size="22" font-weight="700"');
+        svg+=svgText(500,633,(item.quantity??'À préciser')+' pièce(s)','font-size="22" font-weight="700"');
         svg+=multiline(500,662,item.kind==='profile'?[formatMeasurement(item.lengthMM,item.unit)]:[formatMeasurement(item.widthMM,item.unit)+' × '+formatMeasurement(item.heightMM,item.unit)],{width:32,lineHeight:23,attrs:'font-size="18"'}).svg;
         svg+=svgText(40,764,'COTES FINIES ET POINTS À VALIDER','font-size="12" font-weight="700" fill="#52634f"');
-        svg+=multiline(40,790,chunks[i],{width:87,lineHeight:18,attrs:'font-size="14"'}).svg;
+        svg+=multiline(40,790,columns[0],{width:42,lineHeight:18,attrs:'font-size="13"'}).svg;
+        svg+=multiline(430,790,columns[1],{width:42,lineHeight:18,attrs:'font-size="13"'}).svg;
         svg+=svgText(40,1003,'Étoile : face peinte. Rayons, développé et réglages à valider par l’atelier.','font-size="12"');
-        pages.push({name:item.id+' · '+item.name+(i?' · Suite':''),layout:'mir-dossier',documentTitle:order.requiresQuote?'Demande de soumission':order.automaticPricingAllowed?'Récapitulatif de pliage':'DOSSIER DE PLIAGE',reference:[order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:chunks[i]});
+        pages.push({name:item.id+' · '+item.name,layout:'mir-dossier',documentTitle:production?'Mise en production':order.requiresQuote?'Demande de soumission':order.automaticPricingAllowed?'Récapitulatif de pliage':'DOSSIER DE PLIAGE',reference:[order.poNumber||order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:primary});
+      }
+      for(let start=24;start<details.length;start+=40){
+        const extra=details.slice(start,start+40),left=extra.slice(0,20),right=extra.slice(20,40);
+        let svg=svgOpen(850,1100,'Continuation '+item.id);
+        svg+=multiline(40,120,['Continuation — quantité déjà comptée',item.id+' · '+item.name],{width:75,lineHeight:27,attrs:'font-size="20" font-weight="700"'}).svg;
+        svg+=svgText(40,205,'Bloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.','font-size="13" fill="#52634f"');
+        svg+=multiline(40,260,left,{width:43,lineHeight:22,attrs:'font-size="14"'}).svg;
+        svg+=multiline(430,260,right,{width:43,lineHeight:22,attrs:'font-size="14"'}).svg;
+        pages.push({name:item.id+' · Continuation',layout:'mir-dossier',documentTitle:production?'Mise en production':'DOSSIER DE PLIAGE',reference:[order.poNumber||order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:extra});
       }
     }
     return pages;
   }
   function productionPages(input = {}, {layout, profileGroups, document, bendTariff} = {}) {
     const order = buildOrder(input, { bendTariff: document === 'client-request' ? bendTariff : undefined }), fragments = [];
-    if (document !== 'client-request' && layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return bendingSheetPages(order,profileGroups);
+    if (document !== 'client-request' && layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return clientDossierPages(order,{production:true});
     const clientRequest = document === 'client-request';
     if(clientRequest)return clientDossierPages({...order,dossierReference:input.poNumber||input.id});
     const pricedProfiles = clientRequest && order.automaticPricingAllowed && order.items.every(item => item.kind === 'profile');

@@ -222,7 +222,7 @@ async function run(){
  fs.mkdirSync(artifacts,{recursive:true});
  let browser;
  try{
-  browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+  browser=await chromium.launch({...(fs.existsSync('/opt/google/chrome/chrome')?{channel:'chrome'}:{executablePath:'/usr/bin/chromium'}),headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
   await verifyNavigation(browser,base);
   await verifyQuoteAndExports(browser,base,1440);
   await verifyQuoteAndExports(browser,base,390);

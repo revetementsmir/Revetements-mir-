@@ -158,6 +158,7 @@ body[data-client-entry] .workshop-banner,body[data-client-entry] .kind-bar{displ
 .client-entry-icon{font-size:28px;width:38px;flex-shrink:0;color:#6b8e57}
 #client-model-options{margin-top:24px}#client-model-options h2{font-size:19px;margin-bottom:8px}#client-model-options>p{font-size:14px;color:#53664d;margin-bottom:20px}
 #client-standard-options,#client-saved-options .template-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
+.client-model-group{display:contents}.client-model-group[hidden],.client-model-group-title[hidden]{display:none!important}.client-model-group-title{grid-column:1/-1;margin:0 0 2px;font-size:15px;color:var(--mir-muted,#52634f)}
 #client-saved-options .template-section{padding:24px 0}.client-entry-cards[hidden],#client-model-options[hidden]{display:none}
 body[data-client-entry][data-client-stage="1"] .production-intro,body[data-client-entry][data-client-stage="1"] .mir-production-steps{display:none}
 body:is([data-client-entry="choice"],[data-client-entry="models"]) .production-workspace{display:none}
@@ -221,6 +222,7 @@ body[data-client-entry]:has(#production-order:target) :is(#client-entry,.product
 }
 body[data-client-entry] .production-wrap{padding-block:0 8px;max-width:1120px}
 body[data-client-entry] .client-viewport-off-page{display:none!important}
+body[data-client-entry="choice"] .client-entry-cards>.client-viewport-off-page{display:flex!important}
 body[data-client-entry="models"] #client-model-options{margin-top:12px}
 body[data-client-entry="models"] #client-standard-options,
 body[data-client-entry="models"] #client-saved-options .template-strip{
@@ -234,6 +236,7 @@ body[data-client-entry="models"] #client-saved-options .template-section{padding
  body[data-client-entry="models"] #client-entry h1{font-size:26px;margin-bottom:4px}
  body[data-client-entry="models"] #client-entry-intro{margin:0;line-height:1.35}
  body[data-client-entry="models"] #client-model-options{margin-top:6px}
+ body[data-client-entry="models"] .client-model-group-title{display:none}
 }
 .client-viewport-pages{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
 .client-viewport-pages[hidden]{display:none!important}
