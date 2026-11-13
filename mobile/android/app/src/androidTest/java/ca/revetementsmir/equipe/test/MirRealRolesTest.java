@@ -26,12 +26,15 @@ public class MirRealRolesTest {
     if(role.getString("role").equals("admin")){
      js(s,"window.realProof='pending';MIRSupabase.createClient(MIRPortalConfig.supabaseUrl,MIRPortalConfig.publishableKey).auth.signInWithPassword({email:"+email+",password:"+password+"}).then(r=>window.realProof=r.error?.code||'unexpected').catch(()=>window.realProof='error');true");
      waitFor(s,"window.realProof==='42501'");
+     assertNotEquals("ready",js(s,"MIRPortalActiveClient.getStatus().phase"));assertEquals(Boolean.TRUE,js(s,"document.querySelector('#account-bar').hidden"));
     }else{
      js(s,"window.realProof='pending';MIRPortalActiveClient.signInPassword("+email+","+password+").then(()=>window.realProof='ready').catch(()=>window.realProof='error');true");waitFor(s,"window.realProof==='ready'");
      assertEquals("ready",js(s,"MIRPortalActiveClient.getStatus().phase"));assertEquals(role.getString("role"),js(s,"MIRPortalActiveClient.getStatus().snapshot.operations.role"));
-     s.recreate();waitFor(s,"window.MIRPortalActiveClient?.getStatus().phase===\"ready\"");assertEquals(role.getString("role"),js(s,"MIRPortalActiveClient.getStatus().snapshot.operations.role"));
+     String label=role.getString("role").equals("employe")?"Employé chantier":role.getString("role").equals("chef_equipe")?"Chef d’équipe":role.getString("role").equals("warehouse")?"Entrepôt et livraison":role.getString("role").equals("assistant")?"Adjointe":"Boss";
+     waitFor(s,"document.body.dataset.portalConnection==='connected'");assertEquals(label,js(s,"document.querySelector('#account-role').textContent"));assertEquals(Boolean.TRUE,js(s,"document.querySelector('#portal-content').children.length>0"));
+     s.recreate();waitFor(s,"window.MIRPortalActiveClient?.getStatus().phase===\"ready\"");assertEquals(role.getString("role"),js(s,"MIRPortalActiveClient.getStatus().snapshot.operations.role"));waitFor(s,"document.body.dataset.portalConnection==='connected'");assertEquals(label,js(s,"document.querySelector('#account-role').textContent"));
      // Foreign organisation is rejected by the existing server contract.
-     js(s,"window.realProof='pending';MIRSupabase.createClient(MIRPortalConfig.supabaseUrl,MIRPortalConfig.publishableKey).rpc('mir_employee_operations_snapshot',{org:'00000000-0000-4000-8000-000000000011',job:null}).then(r=>window.realProof=r.error?'denied':'unexpected');true");waitFor(s,"window.realProof==='denied'");
+     js(s,"window.realProof='pending';MIRSupabase.createClient(MIRPortalConfig.supabaseUrl,MIRPortalConfig.publishableKey).rpc('mir_employee_operations_snapshot',{org:'00000000-0000-4000-8000-000000000011',job:null}).then(r=>window.realProof=r.error?.code==='42501'?'denied':'unexpected');true");waitFor(s,"window.realProof==='denied'");
     }
     js(s,"window.realProof='pending';MIRPortalActiveClient.signOut().then(()=>window.realProof='out');true");waitFor(s,"window.realProof==='out'");assertEquals(null,js(s,"MIRPortalActiveClient.getStatus().snapshot"));
    }
