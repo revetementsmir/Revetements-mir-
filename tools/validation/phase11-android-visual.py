@@ -17,9 +17,9 @@ import sys
 import time
 
 APP = 'ca.revetementsmir.equipe.test'
-SOURCE = '58c13ab96be63601d314ba94d92ab7dd20976407'
-APK_SHA = '141eae844d4e938c6270dcf243536e7f72b1b45b68206922d7584cc61a5e2127'
-RUN = 43505093162
+SOURCE = '04a5b43504b012072bfeaf5aa1d67072f1de640b'
+APK_SHA = 'b2f31d321e94f523c978e48ebd945a8cf64a1f6b64978e2f08697155e150db6d'
+RUN = 43518155720
 TEST = 'hxtztkmbfpmzrieccwsg'
 ROLES = [('EMPLOYEE', 'Employé chantier'), ('CHEF', 'Chef d’équipe'),
          ('WAREHOUSE', 'Entrepôt et livraison'), ('ASSISTANT', 'Adjointe'), ('BOSS', 'Boss')]
