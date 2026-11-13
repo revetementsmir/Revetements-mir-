@@ -1,0 +1,32 @@
+name: MIR Pages — contrat de publication sur artefact local
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/pages.yml'
+      - '.github/workflows/mir-pages-artifact-pr.yml'
+      - 'tools/validation/verify-pages-local.py'
+      - 'tests/mir-technical-dimensions.cjs'
+      - 'tests/mir-phase10-label-layout-browser.cjs'
+permissions:
+  contents: read
+jobs:
+  local-artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install --no-save --package-lock=false playwright@1.62.1
+      - name: Contrat complet sur HTTP local — aucune publication
+        run: |
+          python3 tools/validation/verify-pages-local.py --output /tmp/mir-pages-local-ci
+          node tests/mir-pages-regressions.cjs
+          node tests/mir-phase10-bending.cjs
+          git diff --check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-pages-local-artifact
+          path: /tmp/mir-pages-local-ci/
+          if-no-files-found: error

@@ -452,9 +452,13 @@ jobs:
           grep -F 'data-rename-piece=' /tmp/production-app.js
           grep -F 'M.reviseInstance({snapshot:old.snapshot' /tmp/production-app.js
           grep -F "const requestedProfile=params.get('profile')" /tmp/production-app.js
-          fetch "$base/production-model.js" /tmp/production-model.js
+          fetch "$base/production-model.js?verification=$GITHUB_SHA" /tmp/production-model.js
+          cmp /tmp/production-model.js _site_mir/production-model.js
           grep -F 'const radius=5, side=bends[i-1].direction' /tmp/production-model.js
-          grep -F 'class="profile-marker-overflow"' /tmp/production-model.js
+          # Validate segment association, dimension orientation, leaders, collisions
+          # and fail-closed placement against the exact artifact compared above.
+          MIR_PHASE10_ARTIFACT_ROOT=_site_mir node tests/mir-technical-dimensions.cjs
+          MIR_PHASE10_ARTIFACT_ROOT=_site_mir MIR_PHASE10_PROOF_DIR=artifacts/pages-profile-annotations MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-phase10-label-layout-browser.cjs
           grep -F 'function profileDrawingSection(' /tmp/production-model.js
           grep -F "const oldHem=base?.bends?.[i]?.mode==='hem'" /tmp/production-app.js
           fetch "$base/atelier-essai/mir-calepinage-extension.js" /tmp/extension.js
