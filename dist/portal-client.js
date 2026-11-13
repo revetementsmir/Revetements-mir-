@@ -258,7 +258,7 @@
         throw mapped;
       }
     }
-    const onlinePunchSync=()=>{if(!disposed)Promise.all([syncPunchQueue().catch(()=>0),syncExpenseDrafts().catch(()=>0),syncAbsenceDrafts().catch(()=>0),syncOrderShortcutQueue().catch(()=>0),syncOrderDraftQueue().catch(()=>0)]).then(()=>refresh().catch(()=>{}));};
+    const onlinePunchSync=()=>{if(!disposed)Promise.all([syncPunchQueue().catch(()=>0),syncExpenseDrafts().catch(()=>0),syncAbsenceDrafts().catch(()=>0),syncOrderShortcutQueue().catch(()=>0),syncOrderDraftQueue().catch(()=>0),syncHarmonySettings().catch(()=>0)]).then(()=>refresh().catch(()=>{}));};
     async function start() {
       if (!sdk) { emit({}, 'start'); return null; }
       if (!authSubscription) {
@@ -280,7 +280,7 @@
       const result=await refresh();
       globalThis.addEventListener?.('online',onlinePunchSync);
       if(liveTimer===null&&typeof setInterval==='function')liveTimer=setInterval(()=>{if(!disposed&&globalThis.navigator?.onLine!==false&&globalThis.document?.visibilityState!=='hidden'&&status.phase==='ready')refresh().catch(()=>{});},15000);
-      if(globalThis.navigator?.onLine!==false){syncPunchQueue().catch(()=>{});syncOrderShortcutQueue().catch(()=>{});syncOrderDraftQueue().catch(()=>{});}
+      if(globalThis.navigator?.onLine!==false){syncPunchQueue().catch(()=>{});syncOrderShortcutQueue().catch(()=>{});syncOrderDraftQueue().catch(()=>{});syncHarmonySettings().catch(()=>{});}
       return result;
     }
     async function sendEmail(email) {
@@ -642,6 +642,21 @@
     async function notificationCenter(filter='all',before=null,pageSize=30){requireReady();if(!['all','today','unread','actions'].includes(filter))fail('NOTIFICATION_FILTER','Filtre de notifications invalide.');const {data,error}=await sdk.rpc('mir_notification_center',{org:internalOrg,filter_name:filter,page_size:Math.min(50,Math.max(1,Number(pageSize)||30)),page_before:before});if(error)throw errorOf(error);return data;}
     async function notificationState(ids,action,requestId=uuid()){requireReady();const list=[...new Set((ids||[]).filter(id=>UUID.test(id)))];if(!list.length||!['read','unread'].includes(action)||!UUID.test(requestId||''))fail('NOTIFICATION_ACTION','Action de notification invalide.');const {data,error}=await sdk.rpc('mir_notification_state',{org:internalOrg,request_id:requestId,notification_ids:list,action});if(error)throw errorOf(error);await refresh();return data;}
     async function notificationPreferences(changes=null){requireReady();const {data,error}=await sdk.rpc('mir_notification_preferences',{org:internalOrg,changes});if(error)throw errorOf(error);return data;}
+    // Phase8 Harmony settings API begin.
+    function harmonyQueueKey(){return `mir_harmony_settings_queue_${config.projectRef}_${status.user?.id||'anonymous'}`;}
+    function readHarmonyQueue(){try{const item=JSON.parse(storage?.getItem(harmonyQueueKey())||'null');return item&&UUID.test(item.requestId||'')&&item.changes&&typeof item.changes==='object'?item:null;}catch(_){return null;}}
+    function writeHarmonyQueue(item){try{if(item)storage?.setItem(harmonyQueueKey(),JSON.stringify(item));else storage?.removeItem(harmonyQueueKey());}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour conserver ces réglages.');}}
+    async function harmonySettings(changes=null,requestId=uuid()){
+      requireReady();if(!internalOrg)fail('ACCESS_DENIED','Organisation MIR requise.');
+      if(changes===null){const {data,error}=await sdk.rpc('mir_harmony_settings',{org:internalOrg,request_id:null,changes:null});if(error)throw errorOf(error);globalThis.MIRHarmonySettings?.store(data);return data;}
+      if(!UUID.test(requestId||'')||!changes||typeof changes!=='object'||Array.isArray(changes))fail('SETTINGS_INVALID','Ces réglages ne peuvent pas être enregistrés.');
+      const pending={requestId,changes:clone(changes),savedAt:new Date().toISOString()};globalThis.MIRHarmonySettings?.store(changes);
+      if(globalThis.navigator?.onLine===false){writeHarmonyQueue(pending);return{...changes,offline:true,pending:true};}
+      try{const {data,error}=await sdk.rpc('mir_harmony_settings',{org:internalOrg,request_id:requestId,changes});if(error)throw errorOf(error);writeHarmonyQueue(null);globalThis.MIRHarmonySettings?.store(data);return data;}
+      catch(error){if(error?.definitive===false||error?.code==='NETWORK_UNCERTAIN'){writeHarmonyQueue(pending);return{...changes,offline:true,pending:true};}throw error;}
+    }
+    async function syncHarmonySettings(){if(!internalOrg||globalThis.navigator?.onLine===false||!status.user?.id)return 0;const item=readHarmonyQueue();if(!item)return 0;const {data,error}=await sdk.rpc('mir_harmony_settings',{org:internalOrg,request_id:item.requestId,changes:item.changes});if(error)throw errorOf(error);writeHarmonyQueue(null);globalThis.MIRHarmonySettings?.store(data);globalThis.dispatchEvent?.(new CustomEvent('mir:harmony-synced',{detail:data}));return 1;}
+    // Phase8 Harmony settings API end.
     // Phase3C help/support API begin.
     async function helpFAQ(){requireEnabled();const epoch=generation,{data,error}=await sdk.rpc(internalOrg?'mir_help_faq_scoped':'mir_help_faq',internalOrg?{org:internalOrg}:undefined);if(epoch!==generation)fail('SESSION_CHANGED','La session a changé.');if(error)throw errorOf(error);return Array.isArray(data)?data:[];}
     function requireSupport(){if(!status.user||!['ready','customer_ready'].includes(status.phase)||!internalOrg)fail('AUTH_REQUIRED','Connectez-vous pour ouvrir vos demandes.');return {epoch:generation,user:status.user.id};}
@@ -659,7 +674,7 @@
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, dispose,
+      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, harmonySettings, syncHarmonySettings, dispose,
       chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatFileURL, chatPhotoURL,
       helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }

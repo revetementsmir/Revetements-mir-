@@ -1,0 +1,40 @@
+name: MIR Phase 8 Réglages — recette réelle TEST
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase8-real:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MIR_SANDBOX_PUBLISHABLE_KEY: ${{ secrets.MIR_SANDBOX_PUBLISHABLE_KEY }}
+      MIR_SANDBOX_ORG_ID: ${{ secrets.MIR_SANDBOX_ORG_ID }}
+      MIR_SANDBOX_ADMIN_EMAIL: ${{ secrets.MIR_SANDBOX_ADMIN_EMAIL }}
+      MIR_SANDBOX_ADMIN_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
+      MIR_SANDBOX_BOSS_EMAIL: ${{ secrets.MIR_SANDBOX_BOSS_EMAIL }}
+      MIR_SANDBOX_BOSS_PASSWORD: ${{ secrets.MIR_SANDBOX_BOSS_PASSWORD }}
+      MIR_SANDBOX_CHEF_EMAIL: ${{ secrets.MIR_SANDBOX_CHEF_EMAIL }}
+      MIR_SANDBOX_CHEF_PASSWORD: ${{ secrets.MIR_SANDBOX_CHEF_PASSWORD }}
+      MIR_SANDBOX_EMPLOYEE_EMAIL: ${{ secrets.MIR_SANDBOX_EMPLOYEE_EMAIL }}
+      MIR_SANDBOX_EMPLOYEE_PASSWORD: ${{ secrets.MIR_SANDBOX_EMPLOYEE_PASSWORD }}
+      MIR_SANDBOX_ASSISTANT_EMAIL: ${{ secrets.MIR_SANDBOX_ASSISTANT_EMAIL }}
+      MIR_SANDBOX_ASSISTANT_PASSWORD: ${{ secrets.MIR_SANDBOX_ASSISTANT_PASSWORD }}
+      MIR_SANDBOX_WAREHOUSE_EMAIL: ${{ secrets.MIR_SANDBOX_WAREHOUSE_EMAIL }}
+      MIR_SANDBOX_WAREHOUSE_PASSWORD: ${{ secrets.MIR_SANDBOX_WAREHOUSE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/validation/mir-phase8-settings-real.cjs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase8-settings-real
+          path: artifacts/phase8-settings-real.json
+          if-no-files-found: error
+          retention-days: 14

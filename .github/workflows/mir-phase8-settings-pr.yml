@@ -1,0 +1,56 @@
+name: MIR Phase 8 — Thèmes et réglages
+
+on:
+  pull_request:
+    paths:
+      - 'dist/mir-settings.*'
+      - 'dist/chantier*'
+      - 'dist/portal-client.js'
+      - 'dist/production.html'
+      - 'dist/calepinage.html'
+      - 'dist/entrepot.html'
+      - 'supabase/migrations/*phase8_harmony_settings*'
+      - 'tests/mir-phase8-settings-*'
+      - '.github/workflows/mir-phase8-settings-pr.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  phase8-settings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --prefix tools/database --ignore-scripts --no-audit --no-fund
+      - run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
+      - name: PostgreSQL jetable et client hors ligne
+        run: |
+          node tests/mir-phase8-settings-postgres.cjs
+          node tests/mir-phase8-settings-client.cjs
+      - name: Thèmes, accessibilité et six rôles simulés
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-phase8-settings-browser.cjs
+      - name: Non-régressions Phase 7 et Harmony
+        run: |
+          node tests/mir-phase7-notifications.cjs
+          node tests/mir-phase7-expenses-postgres.cjs
+          node tests/mir-today.cjs
+          node tests/mir-ux-commandes-client-server-contract.cjs
+      - name: Contrôles de livraison
+        run: |
+          git diff --check
+          ! rg -n '\.(skip|only|todo)\s*\(' tests/mir-phase8-settings-*.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase8-settings-browser
+          path: docs/verification/phase8-settings/*.png
+          if-no-files-found: error
+          retention-days: 14

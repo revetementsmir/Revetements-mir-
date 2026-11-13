@@ -48,6 +48,7 @@ test('Punch, client RPC et modules validés préservés depuis main',()=>{
    source=source
    .replace(/    \/\/ Phase3A chat API begin\.[\s\S]*?    \/\/ Phase3A chat API end\.\n/,'')
    .replace(/    \/\/ Phase3C help\/support API begin\.[\s\S]*?    \/\/ Phase3C help\/support API end\.\n/,'')
+   .replace(/    \/\/ Phase8 Harmony settings API begin\.[\s\S]*?    \/\/ Phase8 Harmony settings API end\.\n/,'')
    .replace(/      \/\/ Phase3A chat upload begin\.[\s\S]*?      \/\/ Phase3A chat upload end\.\n/,'')
    .replaceAll('      revokeChatURLs();\n','')
    .replace(/if\(String\(path\)\.split\('\/'\)\[1\]==='message'\)return chat(?:Photo|File)URL\(path\);/,'')
@@ -56,6 +57,7 @@ test('Punch, client RPC et modules validés préservés depuis main',()=>{
    .replace("['private','team','job']","['private','team']")
    .replace(/      chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, (?:chatFileURL, )?chatPhotoURL,\n/,'')
    .replace(/      helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,\n/,'');
+   source=source.replace(',syncHarmonySettings().catch(()=>0)','').replace(';syncHarmonySettings().catch(()=>{})','').replace(', harmonySettings, syncHarmonySettings','');
   }
   assert.equal(hash(source),expected,file);
  }
