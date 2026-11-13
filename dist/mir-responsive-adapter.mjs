@@ -77,3 +77,20 @@ document.addEventListener('click',event=>{
   if(!allowed.has(name))return;event.preventDefault();const target=new URL('responsive.html',document.baseURI);target.search=url.search;target.searchParams.set('page',name);
   for(const key of ['layout','phone','tablet','desktop'])if(new URL(location.href).searchParams.has(key))target.searchParams.set(key,new URL(location.href).searchParams.get(key));target.hash=url.hash;location.assign(target.href);
 });
+
+/* APK_APPLICATION_LAUNCH_START */
+// App preview is an explicitly verified TEST build, never the public website.
+document.addEventListener('click',async event=>{
+ const button=event.target.closest?.('.preview-application-toggle');
+ if(!button)return;
+ event.preventDefault();event.stopImmediatePropagation();
+ const root=new URL('./',import.meta.url),site=root.pathname.endsWith('/test/')?new URL('../',root):root;
+ const target=new URL('test/application/responsive.html',site);
+ const query=new URL(location.href).searchParams;
+ for(const key of ['layout','phone','tablet','app-orientation'])if(query.has(key))target.searchParams.set(key,query.get(key));
+ target.searchParams.set('app-preview','1');target.searchParams.set('app-platform','android');
+ button.disabled=true;button.textContent='Application TEST…';
+ try{const response=await fetch(new URL('mir-apk-preview.json',target),{cache:'no-store',credentials:'omit'});if(!response.ok)throw Error('L’aperçu de l’application TEST n’est pas encore publié.');const source=await response.json();if(source.environment!=='test'||source.platform!=='android'||source.versionCode!==110002||! /^[a-f0-9]{40}$/.test(source.sourceRef))throw Error('Version de l’application non vérifiée.');location.assign(target.href);}
+ catch(error){button.disabled=false;button.textContent='Application';button.title=error.message;const status=document.querySelector('.mir-responsive-notice');if(status){status.setAttribute('role','alert');status.textContent=error.message;}}
+},true);
+/* APK_APPLICATION_LAUNCH_END */
