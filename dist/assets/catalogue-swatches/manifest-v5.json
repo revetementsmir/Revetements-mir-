@@ -1,0 +1,297 @@
+{
+  "createdAt": "2026-11-03",
+  "kaycan": [
+    {
+      "name": "Cabot Brown",
+      "id": "kaycan-davinci-cabot-brown",
+      "swatchUrl": "./assets/catalogue-swatches/kaycan-davinci-cabot-brown.webp",
+      "officialSwatchUrl": "https://www.kaycan.com/wp-content/uploads/2023/02/cabot_brown.webp",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 3318,
+      "sha256": "3f2cb49baccedcf38e678b183d245b50f2e66244e75780f04157494a43ce9626"
+    },
+    {
+      "name": "Castlemore",
+      "id": "kaycan-davinci-castlemore",
+      "swatchUrl": "./assets/catalogue-swatches/kaycan-davinci-castlemore.webp",
+      "officialSwatchUrl": "https://www.kaycan.com/wp-content/uploads/2023/02/davinci_castlemore.webp",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 2456,
+      "sha256": "96a6f4c7d626e0e0e9a7ca985935bfa60426074fd0a63ec5f0e87990e1034c8d"
+    },
+    {
+      "name": "Mahognany",
+      "id": "kaycan-davinci-mahognany",
+      "swatchUrl": "./assets/catalogue-swatches/kaycan-davinci-mahognany.webp",
+      "officialSwatchUrl": "https://www.kaycan.com/wp-content/uploads/2023/02/davinci_mahognany.webp",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 5060,
+      "sha256": "3504a4bb0d360e5e33725756c9c0db638c30208852e4a7af5c81f1511738d205"
+    },
+    {
+      "name": "Manor",
+      "id": "kaycan-davinci-manor",
+      "swatchUrl": "./assets/catalogue-swatches/kaycan-davinci-manor.webp",
+      "officialSwatchUrl": "https://www.kaycan.com/wp-content/uploads/2023/02/Kaycan_davinci_manor-3.webp",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 2280,
+      "sha256": "dda0b048b8bfb1bf5425e8b4da319f2f0cb8fef867c78e4e890c2e2e03c6ebe9"
+    },
+    {
+      "name": "Pecan",
+      "id": "kaycan-davinci-pecan",
+      "swatchUrl": "./assets/catalogue-swatches/kaycan-davinci-pecan.webp",
+      "officialSwatchUrl": "https://www.kaycan.com/wp-content/uploads/2023/02/davinci_pecan.webp",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 4154,
+      "sha256": "434079ba2d5b1e6ba306cbaf29f8db8086f5364669e88cf93a4a78ce5a6046ba"
+    },
+    {
+      "name": "Cabot Red",
+      "id": "kaycan-davinci-cabot-red",
+      "swatchUrl": "./assets/catalogue-swatches/kaycan-davinci-cabot-red.webp",
+      "officialSwatchUrl": "https://www.kaycan.com/wp-content/uploads/2024/01/Davinci-Cabot-Red.webp",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 2430,
+      "sha256": "61c46dcce857a6cdd7a7bfd9a6e35f8e76b08937ff0fce407d6fbe8b38a2bded"
+    },
+    {
+      "name": "Evergreen",
+      "id": "kaycan-davinci-evergreen",
+      "swatchUrl": "./assets/catalogue-swatches/kaycan-davinci-evergreen.jpg",
+      "officialSwatchUrl": "https://www.kaycan.com/wp-content/uploads/2018/07/evergreen.jpg",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 1223,
+      "sha256": "69de63dee64eeb33279641649ffc37b14d50b4c0cd170e210e4bde4a02b25bd5"
+    },
+    {
+      "name": "Cobalt",
+      "id": "kaycan-davinci-cobalt",
+      "swatchUrl": "./assets/catalogue-swatches/kaycan-davinci-cobalt.jpg",
+      "officialSwatchUrl": "https://www.kaycan.com/wp-content/uploads/2024/01/Davinci-Cobalt-1.jpg",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 13182,
+      "sha256": "ff3d6b5ca1815d240060e1913f49675d9eba5edc9bc10b917dba098135a43c53"
+    },
+    {
+      "name": "Cabot Blue",
+      "id": "kaycan-davinci-cabot-blue",
+      "swatchUrl": "./assets/catalogue-swatches/kaycan-davinci-cabot-blue.webp",
+      "officialSwatchUrl": "https://www.kaycan.com/wp-content/uploads/2024/01/Davinci-Cabot-Blue.webp",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 3382,
+      "sha256": "5257ce39ad49c22e9cffb32f67a690fd9b405abbdc7499990f0caaa8593154d4"
+    },
+    {
+      "name": "Nordic Blue",
+      "id": "kaycan-davinci-nordic-blue",
+      "swatchUrl": "./assets/catalogue-swatches/kaycan-davinci-nordic-blue.jpg",
+      "officialSwatchUrl": "https://www.kaycan.com/wp-content/uploads/2024/01/Davinci-Nordic-Blue-en.jpg",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 13192,
+      "sha256": "a48af044d9decac52274e71813fee1ff4ae9e9a67fdfc3a911dd34b6fb81362b"
+    }
+  ],
+  "rialux": [
+    {
+      "name": "Écorce",
+      "id": "rialux-tiago-ecorce",
+      "filename": "rialux-tiago-ecorce.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/72909/TIAGO_ECORCE_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-tiago/",
+      "target": "swatch",
+      "bytes": 680,
+      "sha256": "b36e6e660d334d4f00a5c71bdce7883d887b61607bb27f3d430858dda6e3a06c"
+    },
+    {
+      "name": "Bouleau",
+      "id": "rialux-tiago-bouleau",
+      "filename": "rialux-tiago-bouleau.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/107907/TIAGO_BOULEAU_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-tiago/",
+      "target": "swatch",
+      "bytes": 472,
+      "sha256": "6d59b7523628083ec580f63a2ea3760b68e64934992829f81157636a6aa148eb"
+    },
+    {
+      "name": "Ébène",
+      "id": "rialux-tiago-ebene",
+      "filename": "rialux-tiago-ebene.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/107906/TIAGO_EBENE_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-tiago/",
+      "target": "swatch",
+      "bytes": 432,
+      "sha256": "d8d9d039139d54369d7e82309eb42a2455af59428866b9c23937529c56c90354"
+    },
+    {
+      "name": "Sienna",
+      "id": "rialux-tiago-sienna",
+      "filename": "rialux-tiago-sienna.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/107896/TIAGO_SIENNA_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-tiago/",
+      "target": "swatch",
+      "bytes": 1474,
+      "sha256": "8ae91146583ae379fff577d3b9064d59d8989a32c8b1243b2a0c9a5ea3d5c3d8"
+    },
+    {
+      "name": "Gris chêne",
+      "id": "rialux-tiago-gris-chene",
+      "filename": "rialux-tiago-gris-chene.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/107908/TIAGO_GRISCHENE_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-tiago/",
+      "target": "swatch",
+      "bytes": 860,
+      "sha256": "439b7004d0bfcddf6e576cccbd55d91f75ab284bbf96fcdb313594546e7f066b"
+    },
+    {
+      "name": "Driftwood",
+      "id": "rialux-tiago-driftwood",
+      "filename": "rialux-tiago-driftwood.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/72395/TIAGO_DRIFTWOOD_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-tiago/",
+      "target": "swatch",
+      "bytes": 848,
+      "sha256": "62add0c16bde22ed0b12aac51744e81cfe559ab520e491c97698b4509da09c58"
+    },
+    {
+      "name": "Noyer foncé",
+      "id": "rialux-tiago-noyer-fonce",
+      "filename": "rialux-tiago-noyer-fonce.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/170637/TIAGO_NOYERFONCE_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-tiago/",
+      "target": "swatch",
+      "bytes": 1054,
+      "sha256": "d7325c63b4815afd186ac22b457a0165d89483a0211fc4072cd0c2ff564c6644"
+    },
+    {
+      "name": "Cèdre nordique",
+      "id": "rialux-tiago-cedre-nordique",
+      "filename": "rialux-tiago-cedre-nordique.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/90303/TIAGO_CEDRENORDIQUE_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-tiago/",
+      "target": "swatch",
+      "bytes": 872,
+      "sha256": "64f06bd8ce3fb73f64fb0fc982f14b4db20bb8a0a946d138b652cf5c36975195"
+    },
+    {
+      "name": "Noir mat",
+      "id": "rialux-tiago-noir-mat",
+      "filename": "rialux-tiago-noir-mat.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/107931/TIAGO_NOIRMAT_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-tiago/",
+      "target": "swatch",
+      "bytes": 270,
+      "sha256": "f8f31ff47bf5ef0065bf2a4ca1db82419b40b1f849fabe8212dc34860076d634"
+    },
+    {
+      "name": "Balsa",
+      "id": "rialux-tiago-balsa",
+      "filename": "rialux-tiago-balsa.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/107917/TIAGO_BALSA_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-tiago/",
+      "target": "swatch",
+      "bytes": 632,
+      "sha256": "88f03a4e266e69e5fe0083ae8adc13d3e289789e72922b3887365a46e6cb64f4"
+    },
+    {
+      "name": "Écorce",
+      "id": "rialux-bolton-ecorce",
+      "filename": "rialux-bolton-ecorce.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/171124/BOLTON_ECORCE_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-bolton/",
+      "target": "swatch",
+      "bytes": 876,
+      "sha256": "081923bdb64d8fd8987151ca9006a6c464ee6b6562574760dc147f4697cf9a19"
+    },
+    {
+      "name": "Bouleau",
+      "id": "rialux-bolton-bouleau",
+      "filename": "rialux-bolton-bouleau.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/171127/BOLTON_BOULEAU_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-bolton/",
+      "target": "swatch",
+      "bytes": 590,
+      "sha256": "5ac8f715b45feaf9c96871e9424eb9d2ee6af550c56f9c3d2fd4ceacde6de5c7"
+    },
+    {
+      "name": "Ébène",
+      "id": "rialux-bolton-ebene",
+      "filename": "rialux-bolton-ebene.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/171126/BOLTON_EBENE_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-bolton/",
+      "target": "swatch",
+      "bytes": 480,
+      "sha256": "22b7c9f20d49db81a9f2b176225694d7404093a25c1057688e05c646d0894c96"
+    },
+    {
+      "name": "Sienna",
+      "id": "rialux-bolton-sienna",
+      "filename": "rialux-bolton-sienna.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/171125/BOLTON_SIENNA_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-bolton/",
+      "target": "swatch",
+      "bytes": 1634,
+      "sha256": "1f587f3d96448aaa00a63b793ade4f6a4763689daad47d3ccbb089cccc94c1c2"
+    },
+    {
+      "name": "Gris chêne",
+      "id": "rialux-bolton-gris-chene",
+      "filename": "rialux-bolton-gris-chene.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/171128/BOLTON_GRISCHENE_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-bolton/",
+      "target": "swatch",
+      "bytes": 1010,
+      "sha256": "c0b1db229b74052c44783fd80f2fdf86d452d9356ddd725fafc4a855e64dcfd9"
+    },
+    {
+      "name": "Driftwood",
+      "id": "rialux-bolton-driftwood",
+      "filename": "rialux-bolton-driftwood.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/171130/BOLTON_DRIFTWOOD_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-bolton/",
+      "target": "swatch",
+      "bytes": 1148,
+      "sha256": "f68f788e6a94409fd688369520ebed179472fe733cd6e3806cb7ea06e150d09a"
+    },
+    {
+      "name": "Noyer foncé",
+      "id": "rialux-bolton-noyer-fonce",
+      "filename": "rialux-bolton-noyer-fonce.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/171133/BOLTON_NOYERFONCE_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-bolton/",
+      "target": "swatch",
+      "bytes": 1236,
+      "sha256": "892db3ad0ab357478cc25229b3f946484f8eb34ce0881e6e35674b8c854ee622"
+    },
+    {
+      "name": "Cèdre nordique",
+      "id": "rialux-bolton-cedre-nordique",
+      "filename": "rialux-bolton-cedre-nordique.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/171131/BOLTON_CEDRENORDIQUE_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-bolton/",
+      "target": "swatch",
+      "bytes": 1152,
+      "sha256": "518874e99f8712ec131604ed39b8e6db1e55c24570a21b15e4b6f35c2066682b"
+    },
+    {
+      "name": "Noir mat",
+      "id": "rialux-bolton-noir-mat",
+      "filename": "rialux-bolton-noir-mat.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/171132/BOLTON_NOIRMAT_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-bolton/",
+      "target": "swatch",
+      "bytes": 242,
+      "sha256": "5aa1867b06fd60b15b0ddc705f1348c49e20e0d0fdab0cff0d867b25b114a418"
+    },
+    {
+      "name": "Balsa",
+      "id": "rialux-bolton-balsa",
+      "filename": "rialux-bolton-balsa.webp",
+      "url": "https://www.rialux.com/craft-assets/products/rialux_swatch/_xSmall/171129/BOLTON_BALSA_low.webp",
+      "sourceUrl": "https://www.rialux.com/produits/collection-bolton/",
+      "target": "swatch",
+      "bytes": 952,
+      "sha256": "44ba9c6f1fa38781da1c24746137b94d4e89097d52026fa739b97489e9acd5fe"
+    }
+  ]
+}

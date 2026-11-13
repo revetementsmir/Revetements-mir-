@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const dist=path.resolve(__dirname,'../dist'),source=fs.readFileSync(path.join(dist,'plan-3d.js'),'utf8');
+const sandbox={window:{}};vm.runInNewContext(source,sandbox);
+const MIR3D=sandbox.window.MIR3D,study=MIR3D.studyDefaults();
+assert.equal(study.porch.enabled,true);assert.equal(study.porch.balconyEnabled,true);
+assert.equal(study.structures.filter(s=>s.type==='column').length,2);
+assert.equal(study.structures.filter(s=>s.type==='beam').length,1);
+assert.equal(study.structures.find(s=>s.type==='beam').material,'unknown');
+const model=MIR3D.mesh({...study,dimensions:MIR3D.defaults});
+assert.ok(model.faces.some(f=>f.role==='balcony-platform'&&f.type==='balcony'));
+assert.ok(model.faces.some(f=>f.structureId==='porch-front-beam'&&f.type==='beam'));
+const absent=MIR3D.mesh({dimensions:MIR3D.defaults,porch:{enabled:false,balconyEnabled:true},structures:[]});
+assert.ok(!absent.faces.some(f=>f.role==='balcony-platform'));
+assert.ok(fs.readFileSync(path.join(dist,'studio-features.js'),'utf8').includes('porch-balcony-enabled'));
+console.log('MIR 3D balcon et poutre : 9 contrôles réussis');

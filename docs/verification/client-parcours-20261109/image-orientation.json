@@ -1,0 +1,15 @@
+{
+  "sourceExifOrientation": 3,
+  "orientationApplied": true,
+  "sourceUnmodified": true,
+  "correctMeanAbsoluteChannelError": [
+    2.177547582304527,
+    1.9300167181069958,
+    2.54407728909465
+  ],
+  "wrongOrientationMeanAbsoluteChannelError": [
+    75.25546296296297,
+    74.10012474279836,
+    98.81282214506173
+  ]
+}

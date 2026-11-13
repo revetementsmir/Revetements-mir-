@@ -1,0 +1,46 @@
+{
+  "observedAt": "2026-11-12T00:30:00Z",
+  "productionWrites": false,
+  "testWrites": false,
+  "githubSettingsChanged": false,
+  "publicationTriggered": false,
+  "hostedReadOnlyEvidence": {
+    "migration": "client_center_20261110",
+    "version": "20261110142928",
+    "schemaReconstructed": true,
+    "initialContentSeparated": true,
+    "catalogReference": "ops/mir-promotion/mir-test-catalog-reference.json"
+  },
+  "promotionChain": {
+    "engine": "PGlite, production-like baseline with fictitious data",
+    "migrationsApplied": 16,
+    "checksPassed": 7,
+    "checksFailed": 0,
+    "secondRun": "16 skipped after history and SHA-256 verification",
+    "dataLoss": false,
+    "duplicates": false,
+    "initialContentAppliedAutomatically": false,
+    "catalogMatchesMirTest": true,
+    "acl": "authenticated/service_role explicit; anon denied except public FAQ"
+  },
+  "packageChecks": {
+    "passed": 54,
+    "failed": 0
+  },
+  "resolvedDependencies": [
+    "The client_center_20261110 business schema is now versioned without records or fixtures.",
+    "The scoped client support search RPC was extracted from the TEST recipe migration.",
+    "Final function ACLs are pinned and fail closed on incompatible bodies."
+  ],
+  "backupRestore": {
+    "scriptsReady": true,
+    "realBackupExecuted": false,
+    "realRestoreExecuted": false,
+    "reason": "pg_dump, pg_dumpall, psql and an authorized production libpq service are unavailable in this session"
+  },
+  "limits": [
+    "GitHub Pages and github-pages environment settings are not readable with the current GitHub API access.",
+    "No production promotion, backup or restore has been executed.",
+    "The optional initial FAQ content requires a separate business decision and is excluded from automatic promotion."
+  ]
+}

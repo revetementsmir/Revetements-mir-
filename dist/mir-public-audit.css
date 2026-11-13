@@ -1,0 +1,22 @@
+/* Public audit 2026-11-09. Home and staff/admin workspaces are deliberately outside these selectors. */
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:100 1000;font-display:swap;src:url('assets/fonts/dm-sans-variable.ttf') format('truetype')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:200 800;font-display:swap;src:url('assets/fonts/manrope-variable.ttf') format('truetype')}
+body:not(.mir-home-premium) header[data-mir-public-shell] nav.mir-client-links a{min-height:44px;display:inline-flex;align-items:center}
+body:not(.mir-home-premium) header[data-mir-public-shell] :is(a,button):focus-visible{outline:3px solid #348511;outline-offset:3px}
+html body:is([data-portal-mode='login'],[data-portal-mode='client'])>header#mir-harmony-header{display:flex!important;align-items:center!important;gap:clamp(18px,2vw,36px)!important;width:calc(100% - 92px)!important;max-width:1600px!important;min-height:76px!important;margin:0 auto!important;padding:8px 0!important;border:0!important;background:transparent!important}
+body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-logo{width:clamp(160px,16vw,275px)!important;flex:none}
+body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-logo img{max-height:none}
+body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-title{display:none}
+body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header :is(.mir-harmony-dossier,.mir-harmony-toggle){border-radius:5px!important;min-height:44px!important;font:700 13px/1.25 Arial,Helvetica,sans-serif!important;white-space:normal!important}
+body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-dossier{order:2;margin-left:auto!important;min-width:90px}
+body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-toggle{order:1;width:auto;min-width:54px;margin-left:auto!important;padding:6px 10px!important}
+body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-dossier+.mir-harmony-toggle{margin-left:0!important}
+body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-menu{right:0}
+@media(max-width:1100px){html body:is([data-portal-mode='login'],[data-portal-mode='client'])>header#mir-harmony-header{width:calc(100% - 56px)!important;gap:18px!important}}
+@media(max-width:760px){
+ html body:is([data-portal-mode='login'],[data-portal-mode='client'])>header#mir-harmony-header{width:calc(100% - 32px)!important;gap:8px!important;min-height:64px!important;padding:8px 0!important}
+ body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-logo{width:clamp(106px,34vw,165px)!important}
+ body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-dossier{margin-left:0!important;padding-inline:9px!important;min-width:0}
+ body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-toggle{margin-left:auto!important}
+ body:is([data-portal-mode='login'],[data-portal-mode='client']) #mir-harmony-header .mir-harmony-dossier+.mir-harmony-toggle{margin-left:auto!important}
+}

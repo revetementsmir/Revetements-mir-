@@ -1,0 +1,94 @@
+{
+  "method": "RVB approximatifs échantillonnés sur les visuels de référence Kaycan. La finition et les reflets peuvent varier.",
+  "sampled": {
+    "kaycan-reference-9": {
+      "hex": "#4a2e2d",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=61"
+    },
+    "kaycan-reference-11": {
+      "hex": "#481919",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=70"
+    },
+    "kaycan-reference-12": {
+      "hex": "#905f5b",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2016/12/Colonial-Red.jpg"
+    },
+    "kaycan-reference-19": {
+      "hex": "#efecd9",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=61"
+    },
+    "kaycan-reference-21": {
+      "hex": "#557b7c",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2016/12/ivy-green.png"
+    },
+    "kaycan-reference-23": {
+      "hex": "#f7f5f0",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=61"
+    },
+    "kaycan-reference-25": {
+      "hex": "#edebdc",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=61"
+    },
+    "kaycan-reference-28": {
+      "hex": "#ffffff",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2018/07/Polar_white.jpg"
+    },
+    "kaycan-reference-33": {
+      "hex": "#c9bbb0",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=61"
+    },
+    "kaycan-reference-35": {
+      "hex": "#cec6c3",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2016/06/alum_soffit_SlateGrey.jpg"
+    },
+    "kaycan-reference-37": {
+      "hex": "#ffffff",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2025/03/WHITE.webp"
+    },
+    "kaycan-reference-38": {
+      "hex": "#f6f2f3",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=61"
+    }
+  },
+  "extra": [
+    {
+      "id": "kaycan-bleu-brume",
+      "name": "Bleu Brume",
+      "hex": "#527686",
+      "sourceUrl": "https://www.kaycan.com/product/aluminum/aluminum-soffit/",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2016/06/alum_soffit_MistBlue.jpg"
+    },
+    {
+      "id": "kaycan-gris-georgien",
+      "name": "Gris Georgien",
+      "code": "56",
+      "hex": "#bcbbbb",
+      "sourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=61",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=61"
+    },
+    {
+      "id": "kaycan-bronze-38",
+      "name": "Bronze",
+      "code": "38",
+      "hex": "#34311e",
+      "sourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=70",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=70"
+    },
+    {
+      "id": "kaycan-cachemire",
+      "name": "Cachemire",
+      "code": "18",
+      "hex": "#ede3d4",
+      "sourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=70",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=70"
+    },
+    {
+      "id": "kaycan-blanc-maritime",
+      "name": "Blanc Maritime",
+      "code": "22",
+      "hex": "#f0eeee",
+      "sourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=96",
+      "swatchSourceUrl": "https://www.kaycan.com/wp-content/uploads/2026/09/LOW_MAY_26_2026_Cartable_Kaycan_EN_20250429.pdf#page=96"
+    }
+  ]
+}

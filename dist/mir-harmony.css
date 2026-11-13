@@ -1,0 +1,51 @@
+:root{--mir-ink:#294734;--mir-paper:#fcfcf8;--mir-line:#cad4bf;--mir-radius:12px;--mir-touch:44px;--mir-font:Arial,Helvetica,sans-serif}
+html body>header#mir-harmony-header{box-sizing:border-box;position:relative;z-index:80;display:grid!important;grid-template-columns:150px minmax(0,1fr) auto 44px!important;align-items:center!important;gap:16px!important;min-height:64px!important;height:auto!important;padding:9px 16px!important;margin:0!important;width:100%!important;max-width:none!important;background:var(--mir-paper)!important;border-bottom:1px solid var(--mir-line)!important;color:var(--mir-ink);font-family:var(--mir-font)}
+#mir-harmony-header .mir-harmony-logo{display:block!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important}
+#mir-harmony-header .mir-harmony-logo img{display:block!important;width:100%!important;height:auto!important;max-height:42px;object-fit:contain}
+#mir-harmony-header .mir-harmony-title{font:600 16px/1.2 var(--mir-font);overflow-wrap:anywhere}
+#mir-harmony-header .mir-harmony-dossier,#mir-harmony-header .mir-harmony-toggle{box-sizing:border-box;display:flex!important;align-items:center;justify-content:center;min-height:44px!important;border:1px solid var(--mir-line)!important;background:white!important;border-radius:var(--mir-radius)!important;color:var(--mir-ink)!important;padding:10px!important;font:600 14px/1.2 var(--mir-font)!important;text-decoration:none;cursor:pointer;margin:0!important}
+#mir-harmony-header .mir-harmony-toggle{width:44px;height:44px;max-height:44px;font-size:22px!important;line-height:1!important}
+#mir-harmony-header .mir-harmony-menu{position:absolute;right:16px;top:calc(100% + 6px);width:min(380px,calc(100vw - 32px));max-height:calc(100dvh - 110px);overflow:auto;background:var(--mir-paper);padding:16px;border:1px solid var(--mir-line);border-radius:16px;box-shadow:0 12px 36px #15291d22}
+#mir-harmony-header .mir-harmony-menu[hidden],#mir-harmony-header .mir-harmony-menu [hidden]{display:none!important}
+#mir-harmony-header .mir-harmony-menu nav,#mir-harmony-header .mir-harmony-menu #mir-procurement-tabs,#mir-harmony-header .mir-harmony-menu .mir-client-actions{position:static!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;flex-wrap:nowrap!important;width:100%!important;max-height:none!important;overflow:visible!important;gap:6px!important;padding:0!important;margin:0!important;grid-column:auto!important;border:0!important}
+#mir-harmony-header .mir-harmony-menu a,#mir-harmony-header .mir-harmony-menu button{box-sizing:border-box;display:flex;align-items:center;min-height:44px!important;white-space:normal!important;padding:12px!important;border-radius:10px;color:var(--mir-ink);font:500 15px/1.35 var(--mir-font);text-decoration:none}
+#mir-harmony-header :focus-visible,[data-edit-panel-measure]:focus-visible,[data-edit-panel-edge]:focus-visible{outline:3px solid #b58a42;outline-offset:3px}
+[data-edit-panel-measure],[data-edit-panel-edge]{cursor:pointer}
+#production-dialog input:not([type=checkbox]),#production-dialog select{box-sizing:border-box;min-height:44px;width:100%;font-size:16px}
+#production-dialog label{display:block;margin-block:12px}#production-dialog input[type=checkbox]{width:24px;height:24px;vertical-align:middle;margin-right:8px}
+@media(max-width:600px){html body>header#mir-harmony-header{grid-template-columns:76px minmax(0,1fr) auto 44px!important;gap:8px!important;padding:9px 12px!important;min-height:64px!important}#mir-harmony-header .mir-harmony-title{font-size:13px}#mir-harmony-header .mir-harmony-dossier{font-size:12px!important;padding:8px!important}#production-dialog{box-sizing:border-box;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto}}
+@media print{#mir-harmony-header{display:none!important}}
+.mir-wb-measures button{min-height:44px;border:1px solid var(--mir-line);border-radius:10px;background:var(--mir-paper);color:var(--mir-ink);font:600 14px/1.3 var(--mir-font);padding:8px;cursor:pointer}
+[data-mir-wb-direct]{cursor:pointer}
+.mir-panel-direct-tools{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:var(--mir-paper)}
+.mir-panel-direct-tools[hidden]{display:none}
+.mir-panel-direct-tools button{flex:1 1 140px;min-height:44px;border:1px solid var(--mir-line);border-radius:10px;padding:10px;color:var(--mir-ink);background:white;font:600 14px/1.35 var(--mir-font);cursor:pointer}
+#mir-harmony-header #portal-navigation{position:static!important;display:flex!important;flex-direction:column!important;gap:6px!important;width:100%!important;padding:0!important;border:0!important}
+#mir-harmony-header #portal-navigation button,#mir-harmony-header #portal-navigation .portal-nav-link{gap:10px;text-align:left}
+#mir-harmony-header #portal-navigation svg{width:20px;height:20px;flex-shrink:0}
+.portal-nav-link{display:flex;align-items:center;min-height:44px;padding:10px 12px;border-radius:10px;color:inherit;text-decoration:none;font-weight:700}.portal-nav-link:hover,.portal-nav-link:focus-visible{background:#eef3ec}
+.cart-kind-counts{margin:.25rem 0 1rem;color:#425746}.dialog-actions.stacked{display:grid;gap:10px}.dialog-actions.stacked .button,.dialog-actions.stacked a{min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none}
+.order-shortcuts{margin:0 0 16px;padding:14px;border:1px solid #d8e1d5;border-radius:14px;background:#f8faf7}.order-shortcuts>div:first-child{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.order-shortcuts h2{font-size:1rem;margin:0}.shortcut-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.shortcut-tile{min-height:58px;padding:8px;border:1px solid #cdd9ca;border-radius:10px;background:#fff;text-align:left}.shortcut-tile strong,.shortcut-tile span{display:block}.shortcut-tile span{font-size:.75rem;color:#60705e}@media(min-width:700px){.shortcut-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}@media(max-width:389px){.shortcut-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+body:has(#mir-harmony-header #portal-navigation) .portal-shell{grid-template-columns:minmax(0,1fr)!important;max-width:1280px}
+body:has(#mir-harmony-header #portal-navigation){padding-bottom:0!important}
+body:has(#mir-harmony-header #portal-navigation) .mobile-cart-bar{bottom:12px!important}
+body:has(#mir-harmony-header #portal-navigation) #portal-toast{bottom:22px!important}
+body[data-portal-mode=employee] #mir-harmony-header .mir-client-links,body[data-portal-mode=employee] #mir-harmony-header .mir-client-actions{display:none!important}
+@media(max-width:600px){body:not([data-mir-workspace]) #production-drawing:has(svg[data-panel-face]){height:auto;min-height:0;max-height:none}body:not([data-mir-workspace]) #production-drawing svg[data-panel-face]{display:block;width:100%;height:auto!important;max-height:none!important;aspect-ratio:400/550}}
+/* These legacy workshop selectors hid navigation during touch drawing. Their
+   scope ends at the canvas; destinations remain available inside the menu. */
+html body header#mir-harmony-header #mir-harmony-menu #mir-procurement-tabs{display:flex!important;position:static!important;flex-direction:column!important;margin:0!important;padding:0!important}
+html body header#mir-harmony-header #mir-harmony-menu #mir-procurement-tabs button{min-height:44px!important;font:600 15px/1.35 var(--mir-font)!important;padding:12px!important;white-space:normal!important}
+@media(max-width:600px){.mir-wb-progress{grid-template-columns:repeat(2,minmax(0,1fr))}.mir-wb-step{min-height:44px;font-size:12px}}
+html body header#mir-harmony-header #mir-harmony-menu #mir-procurement-tabs{visibility:visible!important;height:auto!important;max-height:none!important}
+@media(max-width:950px) and (max-height:520px) and (pointer:coarse){
+ html body>header#mir-harmony-header{min-height:64px!important;max-height:none!important;padding:9px 12px!important;grid-template-columns:76px minmax(0,1fr) auto 44px!important}
+ body.mir-mobile-stepper>.production-wrap{padding-bottom:64px!important}
+}
+@media(max-width:950px) and (max-height:520px) and (pointer:coarse){
+ html body.mir-mobile-stepper #drawing-tools{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:8px!important}
+ html body.mir-mobile-stepper #drawing-tools>details{flex:1 1 auto;width:auto!important;margin:0!important}
+ html body.mir-mobile-stepper #drawing-tools>details>summary{min-height:44px;display:flex;align-items:center}
+ html body.mir-mobile-stepper #drawing-tools>button{min-height:44px!important}
+}
+.mir-panel-direct-tools>details{width:100%}.mir-panel-direct-tools summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font:600 14px/1.35 var(--mir-font)}.mir-panel-direct-tools details>div{display:flex;flex-wrap:wrap;gap:8px}

@@ -1,0 +1,55 @@
+name: MIR — audit BOSS GOD MODE parcours mobile adjointe
+on:
+  pull_request:
+    paths:
+      - 'dist/mir-panel-workbench*'
+      - 'dist/mir-calepinage-mobile*'
+      - 'dist/mir-procurement.js'
+      - 'dist/production.html'
+      - 'dist/calepinage.html'
+      - 'tests/mir-panel-workbench.cjs'
+      - 'tests/mir-mobile-adjointe-browser.cjs'
+      - 'tests/mir-panel-one-sheet-browser.cjs'
+      - 'tests/mir-calepinage-metric-browser.cjs'
+      - '.github/workflows/mir-mobile-adjointe-pr.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mobile-first:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    name: Bureau, iPad et téléphone — parcours de commande simple
+    steps:
+      - uses: actions/checkout@v4
+      - name: Contrôles de syntaxe
+        run: |
+          node --check dist/mir-panel-workbench.js
+          node --check dist/mir-calepinage-mobile.js
+          node --check dist/mir-procurement.js
+          node --check tests/mir-panel-workbench.cjs
+          node --check tests/mir-mobile-adjointe-browser.cjs
+      - name: Contrats de fabrication, PDF et présentation
+        run: |
+          node tests/mir-panel-workbench.cjs
+          node tests/mir-wall-panel-po.cjs
+          node tests/mir-panel-one-sheet.cjs
+          node tests/mir-procurement.cjs
+      - name: Installer le moteur de recette Chrome
+        run: npm install --no-save playwright@1.58.2
+      - name: Test novice mur, panneaux, bon — PC, iPad, téléphone
+        run: node tests/mir-mobile-adjointe-browser.cjs
+      - name: Intégration 10 panneaux → bon + PDF
+        run: node tests/mir-panel-one-sheet-browser.cjs
+      - name: Essais de cotes et 2D/3D sur les trois formats
+        run: node tests/mir-calepinage-metric-browser.cjs
+      - name: Captures véritables de recette
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIR-BOSS-mobile-adjointe-parcours
+          path: |
+            artifacts/mir-adjointe-*.png
+            artifacts/MIR-GODMODE-Panneaux-*.png
+            artifacts/MIR-GODMODE-Bon-*.png
+          if-no-files-found: ignore

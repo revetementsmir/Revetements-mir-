@@ -1,0 +1,37 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {baseline,actor,dir}=require('./fixtures/mir-chat-database.cjs');
+const audit=require('./fixtures/mir-chat-support-audit.json');
+const id=n=>'40000000-0000-4000-8000-'+String(n).padStart(12,'0');
+(async()=>{const db=await baseline(),org=id(10),foreign=id(11),customer=id(1),other=id(2),employee=id(3),assistant=id(4),foreignUser=id(5),con=id(20),otherCon=id(21);let checks=0;
+ const sql=fs.readFileSync(path.join(dir,'20261113125310_chat_phase3a_storage_support_acl.sql'),'utf8');
+ const as=(u,q,a=[])=>actor(db,u,q,a);
+ const allowed=async(u,p,write=false)=>(await as(u,'select mir_core.support_object_allowed($1,$2) ok',[p,write]))[0].ok;
+ const pass=n=>{checks++;console.log('PASS '+n);};
+ try{
+  await db.exec(sql);assert.equal((await db.query("select to_regprocedure('mir_core.support_object_allowed(text,boolean)') is null ok")).rows[0].ok,true);pass('module Support totalement absent: aucune création');
+  await db.exec('create table mir_core.support_conversations(organization_id uuid,id uuid,customer_id uuid,primary key(organization_id,id));alter table mir_core.support_conversations enable row level security');
+  for(const f of audit.functions)await db.exec(f.definition);
+  for(const f of audit.functions)await db.exec('revoke all on function '+f.signature+' from public,anon,authenticated');
+  for(const p of audit.policies)await db.exec(`create policy ${p.policyname} on storage.objects for ${p.cmd} to authenticated ${p.qual?'using('+p.qual+')':''} ${p.with_check?'with check('+p.with_check+')':''}`);
+  await db.query('insert into mir_core.organizations(id,name) values($1,$2),($3,$4)',[org,'Fictif A',foreign,'Fictif B']);
+  for(const u of [customer,other,employee,assistant,foreignUser])await db.query('insert into auth.users(id) values($1)',[u]);
+  for(const [u,role]of [[customer,'client'],[other,'client'],[employee,'employee'],[assistant,'employee']])await db.query('insert into mir_core.memberships values($1,$2,$3,true)',[org,u,role]);
+  await db.query("insert into mir_core.memberships values($1,$2,'client',true)",[foreign,foreignUser]);
+  for(const [u,role]of [[employee,'employe'],[assistant,'assistant']])await db.query('insert into mir_core.staff_capabilities(organization_id,user_id,staff_role,configured_by) values($1,$2,$3,$2)',[org,u,role]);
+  await db.query('insert into mir_core.support_conversations values($1,$2,$3),($4,$5,$6)',[org,con,customer,foreign,otherCon,foreignUser]);
+  const canonical=`${org}/${con}/${customer}/${id(30)}.png`,legacy=`${org}/${con}/${customer}/message/${id(30)}.png`;
+  await assert.rejects(()=>allowed(customer,canonical),e=>e.code==='42501');pass('défaut EXECUTE reproduit avant correctif');
+  const policies=JSON.stringify((await db.query("select * from pg_policies where policyname like 'mir_support_%' order by policyname")).rows);
+  await db.exec(sql);const def=(await db.query("select prosrc,proacl::text from pg_proc where oid='mir_core.support_object_allowed(text,boolean)'::regprocedure")).rows;await db.exec(sql);
+  assert.deepEqual((await db.query("select prosrc,proacl::text from pg_proc where oid='mir_core.support_object_allowed(text,boolean)'::regprocedure")).rows,def);pass('double exécution sans changement de définition ni ACL');
+  assert.equal(JSON.stringify((await db.query("select * from pg_policies where policyname like 'mir_support_%' order by policyname")).rows),policies);pass('trois policies et autorisations métier Support conservées');
+  for(const p of [canonical,legacy]){assert.equal(await allowed(customer,p,true),true);assert.equal(await allowed(customer,p),true);assert.equal(await allowed(assistant,p),true);}pass('chemins client canonique et historique, lecture propriétaire/Adjointe');
+  assert.equal(await allowed(other,canonical),false);assert.equal(await allowed(employee,canonical),false);assert.equal(await allowed(foreignUser,canonical),false);pass('autre client, employé non Support et autre tenant refusés');
+  assert.equal(await allowed(customer,`${org}/${otherCon}/${customer}/${id(30)}.png`),false);assert.equal(await allowed(assistant,canonical,true),false);pass('conversation étrangère et propriétaire forgé refusés');
+  for(const p of [canonical.replace('/'+con+'/', '/../'),canonical+'/../x','https://x/file','',canonical.replace('/'+con+'/', '//')])assert.equal(await allowed(customer,p,true),false);pass('traversée, segments vides et chemins invalides refusés');
+  await db.query('update mir_core.memberships set active=false where organization_id=$1 and user_id=$2',[org,customer]);assert.equal(await allowed(customer,canonical),false);pass('client désactivé immédiatement refusé');
+  const grants=(await db.query("select has_function_privilege('anon','mir_core.support_object_allowed(text,boolean)','EXECUTE') anon,has_function_privilege('authenticated','mir_core.support_object_allowed(text,boolean)','EXECUTE') auth,has_function_privilege('authenticated','mir_core.support_allowed(uuid,uuid,uuid)','EXECUTE') internal")).rows[0];assert.deepEqual(grants,{anon:false,auth:true,internal:false});pass('un seul grant minimal; anon et helper interne non exposés');
+  console.log(`Support Storage PostgreSQL: ${checks} scénarios réussis.`);
+ }finally{await db.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;});

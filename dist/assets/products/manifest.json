@@ -1,0 +1,533 @@
+{
+  "createdAt": "2026-11-03",
+  "images": [
+    {
+      "file": "hardieplank-cedarmill.png",
+      "assetSourceUrl": "https://images.ctfassets.net/dzi2asncd44t/ag5a70QVjxrNY7WWcG7zG/98d7bc4de314574975b0b0d5c58ae998/hardie-plank-lap-select-cedarmill.png",
+      "sourceUrl": "https://www.jameshardie.com/product-catalog/exterior-siding-products/hardie-plank-lap-siding/",
+      "bytes": 517895,
+      "sha256": "09097a6f2f8bf2c8dce9247597b8a5a82d2deaf1339410feb6bbb0396187f19e",
+      "credit": "James Hardie",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "hardieplank-smooth.png",
+      "assetSourceUrl": "https://images.ctfassets.net/dzi2asncd44t/3DhWzU1S91F1fDpLIMwXpB/c19cabe3ee394163617a0913ddc74f42/hardie-plank-lap-smooth.png",
+      "sourceUrl": "https://www.jameshardie.com/product-catalog/exterior-siding-products/hardie-plank-lap-siding/",
+      "bytes": 158415,
+      "sha256": "96a8d4450e1016836afca0e3fb7827723bba31d70f9d90c793ed0f5168f89bdb",
+      "credit": "James Hardie",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "hardiepanel-smooth.png",
+      "assetSourceUrl": "https://images.ctfassets.net/dzi2asncd44t/1dccWyBQsDoS1G6Raj1H7D/7f9f6d7e84767ab7e8fe9670462a8ebc/hardie-panel-smooth.png",
+      "sourceUrl": "https://www.jameshardie.com/product-catalog/exterior-siding-products/hardie-panel-siding/",
+      "bytes": 114250,
+      "sha256": "72d0d3a99b343619042ef7e294d25badf17dd380a9f3a68f5f94d82d9c2b6c33",
+      "credit": "James Hardie",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "hardiepanel-cedarmill.png",
+      "assetSourceUrl": "https://images.ctfassets.net/dzi2asncd44t/FloeDZi7xpGXk6dRMtpDK/b80e91320d08a12fd3c31342dc7f7bd2/hardie-panel-select-cedarmill.png",
+      "sourceUrl": "https://www.jameshardie.com/product-catalog/exterior-siding-products/hardie-panel-siding/",
+      "bytes": 304174,
+      "sha256": "fe963b68510538ce519e8adfe64b4259cd45727fada1fc1b22629ff47431d786",
+      "credit": "James Hardie",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "hardieshingle-straight.png",
+      "assetSourceUrl": "https://images.ctfassets.net/dzi2asncd44t/5iOiwTJqjugrwwoI4C5ArD/eeb56c38abf30ef9bde5dd7260c8fffd/hardie-shingle-straight-edge.png",
+      "sourceUrl": "https://www.jameshardie.com/product-catalog/exterior-siding-products/hardie-shingle-siding/",
+      "bytes": 371632,
+      "sha256": "04878ef07c2ba722f7b5941068b7822a99e28b9a5afbf2bbdb8dec987794067b",
+      "credit": "James Hardie",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "hardieshingle-staggered.png",
+      "assetSourceUrl": "https://images.ctfassets.net/dzi2asncd44t/3byem5PDWueTqFfhQ49iFo/973ae7ea94d8b1baa3fd85bfd08ade14/hardie-shingle-staggered-edge.png",
+      "sourceUrl": "https://www.jameshardie.com/product-catalog/exterior-siding-products/hardie-shingle-siding/",
+      "bytes": 330812,
+      "sha256": "61a330235d4fa10f071b9f29c8768696bc88ac9a773f446bdbc12e788c0106cc",
+      "credit": "James Hardie",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "hardietrim-smooth.jpeg",
+      "assetSourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=5",
+      "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf#page=5",
+      "bytes": 1935,
+      "sha256": "7c2655aac8bae8dba52c20abf61681ab3f6f92235f9a27c67a55a0cc6e8bf947",
+      "credit": "James Hardie",
+      "assetKind": "original_pdf_product_image",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "canexel-3.webp",
+      "assetSourceUrl": "https://maibec.com/wp-content/uploads/2022/03/MAIBEC_CanExel-RidgewoodD5_Barista.jpg.webp",
+      "sourceUrl": "https://maibec.com/fr/produits/canexel/",
+      "bytes": 16448,
+      "sha256": "efeaa96790553816e802ecf05ed8ce11992c6de4169abee32a5d3f549867f7f8",
+      "credit": "CanExel",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "canexel-2.webp",
+      "assetSourceUrl": "https://maibec.com/wp-content/uploads/2022/02/CanExel_VStyle.jpg.webp",
+      "sourceUrl": "https://maibec.com/fr/produits/canexel/",
+      "bytes": 42684,
+      "sha256": "6005c12f9f9d6b9e4e5edce068482790fb8fe3ab720fd8191f346477fa92a2b4",
+      "credit": "CanExel",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "canexel-4.webp",
+      "assetSourceUrl": "https://maibec.com/wp-content/uploads/2022/02/CanExel_CedRVue.jpg.webp",
+      "sourceUrl": "https://maibec.com/fr/produits/canexel/",
+      "bytes": 34430,
+      "sha256": "8116ef52f997fd0ddeebe1a960a691734b42206435952601e4b342bc65edc78f",
+      "credit": "CanExel",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "canexel-1.webp",
+      "assetSourceUrl": "https://maibec.com/wp-content/uploads/2022/02/Planche-et-couvre-joint.jpg.webp",
+      "sourceUrl": "https://maibec.com/fr/produits/canexel/",
+      "bytes": 27052,
+      "sha256": "8cb28d052af23e8b39e3ea3e09fb4e5df37c592d64f4f29ad8e1655244eed877",
+      "credit": "CanExel",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "maibec-2.jpg",
+      "assetSourceUrl": "https://maibec.com/wp-content/uploads/2022/04/Motif-Lambris-Moderne-1x6-Texture.jpg",
+      "sourceUrl": "https://maibec.com/fr/produits/lambris/",
+      "bytes": 159748,
+      "sha256": "abb0d8325ba5b28dce811c373b0e03c02ee03e03c9109da7fe579b5f2099c4eb",
+      "credit": "Maibec",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "maibec-1.jpg",
+      "assetSourceUrl": "https://maibec.com/wp-content/uploads/2022/04/Motif-Lambris-Clin-1x6-Texture.jpg",
+      "sourceUrl": "https://maibec.com/fr/produits/lambris/",
+      "bytes": 147643,
+      "sha256": "14c42fa2736db3d65a035dcdb1a18937615e0ada03eddb1f7344bf4b5b936acb",
+      "credit": "Maibec",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "maibec-3.jpg",
+      "assetSourceUrl": "https://maibec.com/wp-content/uploads/2022/04/Motif-Lambris-Contemporain-1x6-Texturé.jpg",
+      "sourceUrl": "https://maibec.com/fr/produits/lambris/",
+      "bytes": 160044,
+      "sha256": "2684f5e88ddf06673272f364483d1b20d178b1b65b48d1341017f88d21604c9c",
+      "credit": "Maibec",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "maibec-4.jpg",
+      "assetSourceUrl": "https://maibec.com/wp-content/uploads/2022/04/Motif-Lambris-PlancheCouvreJoint-1x10-Texture.jpg",
+      "sourceUrl": "https://maibec.com/fr/produits/lambris/",
+      "bytes": 149220,
+      "sha256": "677d12a7f59595e06af8e6e5964b86285340188e1e79fffd6bf325899fdc9396",
+      "credit": "Maibec",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "allura-lap-installed.jpg",
+      "assetSourceUrl": "https://assets.allurausa.com/web/gallery/_880x992_crop_center-center_none/1_Lap_Trad_Cedar_Snow_0515.jpg",
+      "sourceUrl": "https://allurausa.com/products/lap-siding",
+      "bytes": 117059,
+      "sha256": "1dba8036646c3ec3880be23204911d2f3b8b7c7b6eb0fead2f136dc36a73d393",
+      "credit": "Allura",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "allura-panel-installed.jpg",
+      "assetSourceUrl": "https://assets.allurausa.com/web/gallery/_880x992_crop_center-center_none/Allura-0288.jpg",
+      "sourceUrl": "https://allurausa.com/products/panels",
+      "bytes": 185268,
+      "sha256": "ddfc082a19d238ee11b7fa902997a26d9f44e64b42f080e8a5f3a52ed846fab8",
+      "credit": "Allura",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "allura-trim-installed.jpg",
+      "assetSourceUrl": "https://assets.allurausa.com/web/gallery/_880x992_crop_center-center_none/Allura-0545.jpg",
+      "sourceUrl": "https://allurausa.com/products/trim/5-4-reversible-trim",
+      "bytes": 181444,
+      "sha256": "eb2c941ce71bde4fac1da36386b9eec928ee3b876a06a0438c77b9c9824f1b70",
+      "credit": "Allura",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "lp-lap-installed.webp",
+      "assetSourceUrl": "https://images.ctfassets.net/89s5b832f23c/FkZACvau8y3ZN9Y3eTNJG/5172d55cece5d2bb798415d65c6bbe59/db75b46756f2700f1adc3643d31b8cf61a2930dc.jpg?fm=webp&q=75&w=2560&h=1440",
+      "sourceUrl": "https://www.lpcorp.com/products/siding-trim/lap-siding",
+      "bytes": 538792,
+      "sha256": "6afb0c294c9825d7b32e56f66627cd0b6a50b2f411cc7a28e77869a496234da8",
+      "credit": "LP SmartSide",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "lp-panel-1.webp",
+      "assetSourceUrl": "https://images.ctfassets.net/89s5b832f23c/7juWLZs1YfUDG9IKrD5El9/67115e3da750ab430cca0ce89a6c6f96/HO_-_Product_-_Panel___Vertical_Siding_-_Hero_-_Panel___Vertical_1.png?fm=webp&q=75&w=2560&h=1440",
+      "sourceUrl": "https://www.lpcorp.com/products/siding-trim/panel-vertical-siding",
+      "bytes": 473482,
+      "sha256": "ff6c46ac1fe4b59bbe10b7039265b6e8b0b3440a47a59e6ce147879120a61c37",
+      "credit": "LP SmartSide",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "lp-shake-0.webp",
+      "assetSourceUrl": "https://images.ctfassets.net/89s5b832f23c/7d6iXBsp0KHYAHtkTZHX9S/c3a74d695bb9a945e6ca9e396897e182/HO_-_Product_-_Shakes_-_Hero_-_Shakes_1.jpg?fm=webp&q=75&w=2560&h=1440",
+      "sourceUrl": "https://www.lpcorp.com/products/siding-trim/shakes",
+      "bytes": 1104070,
+      "sha256": "e91b28b8fd592f03251c6d2d27956a1567bfa1b33745a0f0d8fbde91280037d0",
+      "credit": "LP SmartSide",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "lp-trim-0.webp",
+      "assetSourceUrl": "https://images.ctfassets.net/89s5b832f23c/HUmA5BnCNaE5nKhNnqzyk/e7765d9772ad7b6815720f2a4e045e73/0G5A3667_RT1sk.jpg?fm=webp&q=75&w=2560&h=1440",
+      "sourceUrl": "https://www.lpcorp.com/products/siding-trim/trim-fascia",
+      "bytes": 536756,
+      "sha256": "2313fefad9b14d7c4ccc8dbed7f0364480b88d5d06c3ba40212703b533334d0c",
+      "credit": "LP SmartSide",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "kaycan-6.jpg",
+      "assetSourceUrl": "https://www.kaycan.com/wp-content/uploads/2016/06/0606.jpg",
+      "sourceUrl": "https://www.kaycan.com/product/aluminium/soffite-en-aluminium/soffite-aluminium-n/?lang=fr",
+      "bytes": 15448,
+      "sha256": "05d588c6f3073e6cbfc3ff22c9a96480ef229544dfd6e2fd226b2a5c05257042",
+      "credit": "Kaycan",
+      "assetKind": "manufacturer_profile_drawing",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "kaycan-fascia-0480.jpg",
+      "assetSourceUrl": "https://www.kaycan.com/wp-content/uploads/2016/06/0480.jpg",
+      "sourceUrl": "https://www.kaycan.com/product/aluminium/accessoires-aluminum/?lang=fr",
+      "bytes": 11876,
+      "sha256": "171150c93d202b5cfd9dc8f50f3223ffa92e1674a1617d78d6f2d69e038a15c0",
+      "credit": "Kaycan",
+      "assetKind": "manufacturer_profile_drawing",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "kaycan-urbanix-5.png",
+      "assetSourceUrl": "https://www.kaycan.com/wp-content/uploads/2018/05/9020.png",
+      "sourceUrl": "https://www.kaycan.com/product/aluminium/revetement-daluminium/urbanix-revetements-exterieur-et-soffites-en-aluminium/?lang=fr",
+      "bytes": 4431,
+      "sha256": "dd7b3e02e4b56e0028baeb6ca252a1e198ab06e15669ee7ccc7d3ab3ad018dca",
+      "credit": "Kaycan",
+      "assetKind": "manufacturer_profile_drawing",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "kaycan-vinyl-12.png",
+      "assetSourceUrl": "https://www.kaycan.com/wp-content/uploads/2016/05/D4-DaVinci-Panel.png",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 244625,
+      "sha256": "8acfdae7bfe1fc2103c70e6661b62cdbfbe384e185a9f9dea150dfcf66a38e3c",
+      "credit": "Kaycan",
+      "assetKind": "manufacturer_profile_drawing",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "kaycan-vinyl-11.png",
+      "assetSourceUrl": "https://www.kaycan.com/wp-content/uploads/2016/05/D4D-DaVinci-Dutch-Lap-B.png",
+      "sourceUrl": "https://www.kaycan.com/product/vinyl-siding/lap-siding/davinci/",
+      "bytes": 319423,
+      "sha256": "f65e8387c28f4c3c0cf7b0e21eb3c4015787477f5e43c84fe51f401019c2a026",
+      "credit": "Kaycan",
+      "assetKind": "manufacturer_profile_drawing",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "kaycan-soffit-installed.jpg",
+      "assetSourceUrl": "https://www.kaycan.com/wp-content/uploads/2016/06/alluminun-soffit-milieu.jpg",
+      "sourceUrl": "https://www.kaycan.com/product/aluminium/soffite-en-aluminium/soffite-aluminium-n/?lang=fr",
+      "bytes": 29046,
+      "sha256": "ed06cda5e08d88cf0e1996599558c0fd9fd5c426fc6ebde534a9309577b1bb40",
+      "credit": "Kaycan",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "gentek-1.jpg",
+      "assetSourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2020/08/Gentek_AlumSoffit_16in_2panel_solid.jpg",
+      "sourceUrl": "https://www.gentek.ca/aluminum-soffit/?lang=fr",
+      "bytes": 29167,
+      "sha256": "5623cd501e7ee7e0dd0121bba85ca2fb31377d3e301c378ee994658eb40b1e94",
+      "credit": "Gentek Canada",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "gentek-2.jpg",
+      "assetSourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2020/08/Gentek_AlumSoffit_16in_2panel_vent.jpg",
+      "sourceUrl": "https://www.gentek.ca/aluminum-soffit/?lang=fr",
+      "bytes": 82548,
+      "sha256": "a8c11e936aee83f086c92fac858817a6eef4616cdf990ac59421e02d52da67e9",
+      "credit": "Gentek Canada",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "gentek-fascia-6.jpg",
+      "assetSourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2021/09/fascia_6inchRibed_white.jpg",
+      "sourceUrl": "https://www.gentek.ca/aluminum-fascia/",
+      "bytes": 44921,
+      "sha256": "52653c0a0f3524e9fdf84173aad21938f567c9289e086253bf0246bed5309cf0",
+      "credit": "Gentek Canada",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "gentek-woodgrain-8.jpg",
+      "assetSourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2020/08/Gentek_WG2000_profile_8in-horizontal-300x156.jpg",
+      "sourceUrl": "https://www.gentek.ca/product-catalog/siding/woodgrain-series-2000-aluminum-siding/",
+      "bytes": 8667,
+      "sha256": "4eb57f34456d8d13c104f6a9c0586ee92d19e7fcf82de8c7bafab8012d1feaf7",
+      "credit": "Gentek Canada",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "gentek-vinyl-9.jpg",
+      "assetSourceUrl": "https://gentekinc.com/wp-content/uploads/2020/08/Gentek_Sequoia-Select_profile_D4-300x168.jpg",
+      "sourceUrl": "https://www.gentek.ca/product-catalog/siding/sequoia-select-vinyl-siding/",
+      "bytes": 9668,
+      "sha256": "b19198217e672e0006953330beac0a58ef3c5f5a0d296ba4296ed415b6ecdce9",
+      "credit": "Gentek Canada",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "mac-5.png",
+      "assetSourceUrl": "https://macmetalarchitectural.com/wp-content/uploads/2022/05/NORWOOD_sm2-scaled.png",
+      "sourceUrl": "https://macmetalarchitectural.com/produit/norwood/",
+      "bytes": 65908,
+      "sha256": "4a2d04ebac9a1f1648f67aa622f38c07e353272e2caf2092f9e794a7e7d8751e",
+      "credit": "MAC Métal architectural",
+      "assetKind": "manufacturer_product_render",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "mac-harrywood-7.png",
+      "assetSourceUrl": "https://macmetalarchitectural.com/wp-content/uploads/2022/03/Harrywood.png",
+      "sourceUrl": "https://macmetalarchitectural.com/produit/harrywood/",
+      "bytes": 51675,
+      "sha256": "15c3058166423f2e3a60e2d3b34537d95e2896d0f7814e6afa708f47619d5253",
+      "credit": "MAC Métal architectural",
+      "assetKind": "manufacturer_product_render",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "mac-harrywood-8.png",
+      "assetSourceUrl": "https://macmetalarchitectural.com/wp-content/uploads/2022/05/Harrywood-ventilated.png",
+      "sourceUrl": "https://macmetalarchitectural.com/produit/harrywood/",
+      "bytes": 40031,
+      "sha256": "ce76b7dad83fc5d337ec0468a6a1e0c18dc599fc81832bac67938e4f22b0f7b1",
+      "credit": "MAC Métal architectural",
+      "assetKind": "manufacturer_product_render",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "lighttrim-0.jpg",
+      "assetSourceUrl": "https://lighttrim.com/wp-content/uploads/2022/03/v299_lt0103_brightsilver_grisbrillant.jpg",
+      "sourceUrl": "https://lighttrim.com/product/trim-james-hardie-v299-light-trim-siding-fiber-cement-5-16-1-2/",
+      "bytes": 21880,
+      "sha256": "3a8080fb7da87d0836fb94fb3782bb2a4748f3964166c866eccc8690e717dead",
+      "credit": "Light Trim",
+      "assetKind": "manufacturer_product_render",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "lt-screw-4.jpg",
+      "assetSourceUrl": "https://lighttrim.com/wp-content/uploads/2022/09/VFCLS8114-1.jpg",
+      "sourceUrl": "https://lighttrim.com/fr/produit/vis-de-declin-en-fibrociment-lighttrim-pour-latte-de-bois/",
+      "bytes": 29769,
+      "sha256": "00f577aac7592627f8fb5957624675d20be792e52a1f8ad6f862483d986dc6ba",
+      "credit": "Light Trim",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "lt-j002-4.jpg",
+      "assetSourceUrl": "https://lighttrim.com/wp-content/uploads/2022/03/j002_lt0103_brightsilver_grisbrillant.jpg",
+      "sourceUrl": "https://lighttrim.com/product/trim-james-hardie-j002-shadow-light-trim-siding-fiber-cement/",
+      "bytes": 21027,
+      "sha256": "4b0ac5673293d2a2c5000563334e8690256d5e1ab8ab11599171e8eb7f48954d",
+      "credit": "Light Trim",
+      "assetKind": "manufacturer_product_render",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "lt-j201-4.jpg",
+      "assetSourceUrl": "https://lighttrim.com/wp-content/uploads/2022/03/j201_lt0103_brightsilver_grisbrillant.jpg",
+      "sourceUrl": "https://lighttrim.com/product/trim-james-hardie-j201-light-trim-siding-fiber-cement/",
+      "bytes": 16664,
+      "sha256": "ab63dec0b31ef6780cde66789a4ca2010a2e91b1f4f8ff4af3ea96bcb4277c45",
+      "credit": "Light Trim",
+      "assetKind": "manufacturer_product_render",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "vicwest-1.jpeg",
+      "assetSourceUrl": "https://www.vicwest.com/wp-content/uploads/2026/09/cq5dam.web_.1280.1280-26.jpeg",
+      "sourceUrl": "https://www.vicwest.com/ca/products-systems/bellara-plank/",
+      "bytes": 118349,
+      "sha256": "bf10b71b07105ebd11a4f2b45e5244eed82dc923697ff38bd9381750ff101d08",
+      "credit": "Vicwest",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "rialux-bosco.webp",
+      "assetSourceUrl": "https://www.rialux.com/craft-assets/general/IMGS_RIALUX/_xLarge/347764/RIALUX_profiles_website_2023_bosco.webp",
+      "sourceUrl": "https://www.rialux.com/collections/",
+      "bytes": 75904,
+      "sha256": "be4785d0144ea11420831f4e8346dc387a40d48bef58bfb0601da87138788063",
+      "credit": "Rialux",
+      "assetKind": "manufacturer_installed_profile_diagram",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "rialux-tiago.webp",
+      "assetSourceUrl": "https://www.rialux.com/craft-assets/general/IMGS_RIALUX/_xLarge/90307/RIALUX_profiles_website_2023_tiago.webp",
+      "sourceUrl": "https://www.rialux.com/collections/",
+      "bytes": 29702,
+      "sha256": "7f58c4f3c1a1f1e8ae4c5bc003609b27f9cdaf1623e42dcff33213dac7b2ce0c",
+      "credit": "Rialux",
+      "assetKind": "manufacturer_installed_profile_diagram",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "rialux-bolton.webp",
+      "assetSourceUrl": "https://www.rialux.com/craft-assets/general/IMGS_RIALUX/_xLarge/90308/RIALUX_profiles_website_2023_bolton.webp",
+      "sourceUrl": "https://www.rialux.com/collections/",
+      "bytes": 41714,
+      "sha256": "f609db45f899d2bdb4801b0634f60ff9ec6559e07cf7fa22b21263cde7daa218",
+      "credit": "Rialux",
+      "assetKind": "manufacturer_installed_profile_diagram",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "st-laurent-4.jpg",
+      "assetSourceUrl": "https://www.fabstlaurent.com/wp-content/uploads/2026/01/ph_Fibro_Bardage.jpg",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/bardage-a-clin/",
+      "bytes": 507159,
+      "sha256": "3b3afefd9545521664f3e29ed623a5bdd0a6643a3caea87bf9eda00f272ce28d",
+      "credit": "St-Laurent",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "st-vgroove-9.jpg",
+      "assetSourceUrl": "https://www.fabstlaurent.com/wp-content/uploads/2026/01/ph_Fibro_V-Groove.jpg",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/v-groove-architectural/",
+      "bytes": 449894,
+      "sha256": "b6398481a985e98cd670c6afbbbd078495d54719d57ac6f4141068b0d134f11c",
+      "credit": "St-Laurent",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "st-trim-9.jpg",
+      "assetSourceUrl": "https://www.fabstlaurent.com/wp-content/uploads/2026/03/ph_Fibro_moulure.jpg",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/moulures/",
+      "bytes": 618210,
+      "sha256": "91d9c05199e840b8b69e7b1d453cd7907c58d53debde7ed23450a63e8c1f1437",
+      "credit": "St-Laurent",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "st-board-9.jpg",
+      "assetSourceUrl": "https://www.fabstlaurent.com/wp-content/uploads/2026/01/ph_Fibro_Board-batten.jpg",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/board-batten/",
+      "bytes": 940715,
+      "sha256": "57aaa24ff880860ab0a3802170b1a3ec1220207eb48a7b9368375ac196491101",
+      "credit": "St-Laurent",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "jdp-akta-portobello.webp",
+      "assetSourceUrl": "https://jdprevetement.com/wp-content/uploads/2021/01/portobello-antique-profil-306_preview-2000x2000.webp",
+      "sourceUrl": "https://jdprevetement.com/collections/akta/",
+      "bytes": 242564,
+      "sha256": "6b1506d457bb8ea39f71d509f451bff637bc68144be99020352d374f0a4c4bae",
+      "credit": "JDP / Juste du Pin",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "jdp-bluhouss-307.webp",
+      "assetSourceUrl": "https://jdprevetement.com/wp-content/uploads/2021/01/cedre-blanc-ecobleach-antique-profil-307_preview-2000x2000.webp",
+      "sourceUrl": "https://jdprevetement.com/collections/bluhouss/",
+      "bytes": 119190,
+      "sha256": "5d0b5795fb9d20d6fcc198b4447503b60773487e9103187b8316be79c848689c",
+      "credit": "JDP / Juste du Pin",
+      "assetKind": "manufacturer_profile_texture",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "adseal-dws4580.jpeg",
+      "assetSourceUrl": "https://adfastcorpcdnak.azureedge.net/b2b/technical_document_en/catalogue_construction_EN_screen.pdf#page=3",
+      "sourceUrl": "https://adfastcorpcdnak.azureedge.net/b2b/technical_document_en/catalogue_construction_EN_screen.pdf#page=3",
+      "bytes": 13827,
+      "sha256": "049c9a26ab82059a031821a18cf490bad4d31224c2a8c8237d1f2be7dc12382c",
+      "credit": "ADSEAL / Adfast",
+      "assetKind": "manufacturer_product_photo",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "royal-soffit6-timberline.jpeg",
+      "assetSourceUrl": "https://www.royalbuildingsolutions.com/sites/rbs/files/2023-05/RS_CedarRenditions_Brochure_CDN_2023_LR.pdf#page=13",
+      "sourceUrl": "https://www.royalbuildingsolutions.com/sites/rbs/files/2023-05/RS_CedarRenditions_Brochure_CDN_2023_LR.pdf#page=13",
+      "bytes": 2809,
+      "sha256": "1e287e3e6b91fcd4604766a589cf837015d8c355a2d42dd0c2ba22d4f16d03a6",
+      "credit": "Westlake Royal",
+      "assetKind": "original_pdf_product_image",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    }
+  ],
+  "policy": {
+    "sources": "Original manufacturer pages or original embedded PDF images",
+    "recoloring": false,
+    "generatedProductPhotos": false,
+    "colorHexInvented": false,
+    "rights": "Copyright belongs to credited manufacturers; public reuse permission not established. Prototype review only.",
+    "exactProductMatchDefinition": "Matches named profile or SKU according to matchScope. A profile match does not certify photographed color, exact physical length or regional stock. Installed range references remain exactProductMatch:false."
+  }
+}

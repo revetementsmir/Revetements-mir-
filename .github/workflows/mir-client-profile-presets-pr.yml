@@ -1,0 +1,40 @@
+name: MIR — profils client et panneaux sans régression
+on:
+  pull_request:
+    paths:
+      - 'dist/production-app.js'
+      - 'dist/production.html'
+      - 'tests/mir-production-signature-browser.cjs'
+      - '.github/workflows/mir-client-profile-presets-pr.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qa:
+    name: Chrome — parcours Pliage client, atelier libre et panneau seul
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Vérifier le JavaScript et installer Playwright
+        run: |
+          node --check dist/production-app.js
+          node --check tests/mir-production-signature-browser.cjs
+          node --check tests/mir-atelier-v4-browser.cjs
+          node --check tests/mir-single-panel-live-browser.cjs
+          npm install --no-save playwright@1.58.2
+      - name: Parcours client et sauvegarde du dossier
+        run: node tests/mir-production-signature-browser.cjs
+      - name: Tracé libre admin PC, tablette et mobile
+        run: node tests/mir-atelier-v4-browser.cjs
+      - name: Panneau seul, pente, lèvres indépendantes et 2D/3D
+        run: node tests/mir-single-panel-live-browser.cjs
+      - name: Conserver les captures de recette
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-parcours-pliage-et-panneau
+          path: |
+            artifacts/mir-production-signature-*.png
+            artifacts/mir-single-*.png
+            artifacts/mir-atelier-*.png
+          if-no-files-found: ignore

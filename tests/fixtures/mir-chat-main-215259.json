@@ -1,0 +1,12 @@
+{
+  "sha": "215259c957a1d939e9fbdc52524623153cc3b910",
+  "files": {
+    "dist/assets/products/mir-provided-20261111/beck-panelfast-ags100-box-12.webp": "378748f9a7e125e46134be8fd28d6510829608e4d9f56c23a0d860749ec2427d",
+    "dist/assets/products/mir-provided-20261111/beck-panelfast-ags100-coil.webp": "c423f065e4cce8d5e51d196ed1e01d0840719a16302b5f1e29d61af8f15c6773",
+    "dist/catalogue-fd6866b49d21.json": "be5f94d7a4c9864010ee2530b6bc16e310bf33957bd54b14adeaa0afc06cb773",
+    "dist/catalogue-order.js": "dfe24ba46da0ca282820d2cf9c37dc81d5ec7a38fdf4b78c18ec48e6a233a5ac",
+    "dist/commerce.js": "2365f598d08bbc7818a7e5f6e212366c649a01f30fdc413b7f1a7ed619bccaec",
+    "tests/mir-boutique-audit-20261110-browser.cjs": "56cff78a7713a4d2c90cdf03f6a43a11abc9b8658e7f58bea1843d05ae6a8869",
+    "tests/mir-new-materials.cjs": "62a380ce6c56cfd8d4dc5f5503783a03dca6ca1a7ba66d602ee0d5303cbc67ad"
+  }
+}

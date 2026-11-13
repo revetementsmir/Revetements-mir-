@@ -1,0 +1,56 @@
+name: MIR — Clavardage Phase 3A sécurité locale
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/*chat_phase3a*'
+      - 'dist/chantier.html'
+      - 'dist/chantier-app.js'
+      - 'dist/portal-client.js'
+      - 'tests/*chat-phase3a*'
+      - 'tests/fixtures/mir-chat*'
+      - '.github/workflows/mir-chat-phase3a-pr.yml'
+permissions:
+  contents: read
+jobs:
+  chat-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --prefix tools/database --ignore-scripts --no-audit --no-fund
+      - run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
+      - name: Contrats statiques et client fictif
+        run: |
+          node tests/mir-chat-phase3a.cjs
+          node tests/mir-chat-file-gateway.cjs
+          node tests/mir-today.cjs
+          node tests/mir-six-role-certification.cjs
+      - name: PostgreSQL jetable uniquement
+        run: |
+          node tests/mir-chat-phase3a-postgres.cjs
+          node tests/mir-chat-phase3a-guards.cjs
+          node tests/mir-chat-support-postgres.cjs
+          node tests/mir-chat-storage-probe-postgres.cjs
+          node tests/mir-chat-file-gateway-postgres.cjs
+          node tests/mir-employee-operations-postgres.cjs
+          node tests/mir-job-dossier-postgres.cjs
+          node tests/mir-punch-postgres.cjs
+      - name: UI simulée, aucune certification hébergée
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: |
+          node tests/mir-chat-phase3a-browser.cjs
+          node tests/mir-today-browser.cjs
+          node tests/mir-employee-portal-browser.cjs
+          node tests/mir-punch-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-chat-phase3a-ui-simulee
+          path: docs/verification/captures/chat-phase3a/*.png
+          retention-days: 14

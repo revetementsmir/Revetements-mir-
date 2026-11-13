@@ -1,0 +1,25 @@
+.mir-annotations{position:fixed;right:.75rem;top:.75rem;z-index:1000;width:min(20rem,calc(100vw - 1.5rem));max-height:48vh;overflow:auto;padding:.8rem;background:#fff;color:#17251e;border:1px solid #31583c;border-radius:.6rem;box-shadow:0 3px 18px #13241d35;font:14px/1.35 system-ui,sans-serif}
+.mir-annotations strong,.mir-annotations label,.mir-annotations textarea{display:block}
+.mir-annotations p{margin:.4rem 0}
+.mir-annotations button{margin:.3rem .3rem 0 0;padding:.3rem .55rem}
+.mir-annotations textarea{width:100%;box-sizing:border-box}
+.mir-annotations textarea[hidden]{display:none}
+.mir-annotations ol{margin:.4rem 0;overflow-wrap:anywhere}
+.mir-annotation-selected{outline:3px solid #16844e!important;outline-offset:2px}
+@media(max-width:650px){.mir-annotations{top:auto;bottom:.75rem;max-height:37vh}}
+.mir-annotation-reticle,.mir-annotation-pin,.mir-annotation-lens{position:fixed;pointer-events:none;z-index:1001}
+.mir-annotation-reticle,.mir-annotation-pin{transform:translate(-50%,-50%);width:27px;height:27px}
+.mir-annotation-reticle:before,.mir-annotation-reticle:after,.mir-annotation-pin:before,.mir-annotation-pin:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#0079e8;box-shadow:0 0 0 1px white}
+.mir-annotation-reticle:before,.mir-annotation-pin:before{width:25px;height:1px}
+.mir-annotation-reticle:after,.mir-annotation-pin:after{width:1px;height:25px}
+.mir-annotation-pin{border:2px solid #0079e8;border-radius:50%;box-shadow:0 0 0 1px white}
+.mir-annotation-lens{width:144px;height:144px;border:2px solid #0079e8;border-radius:6px;background:#fff;box-shadow:0 2px 8px #0005}
+.mir-annotation-picking :not(.mir-annotations,.mir-annotations *){cursor:none!important}
+.mir-annotations-compact{width:auto;padding:.4rem}
+.mir-annotations-compact > :not([data-collapse]){display:none}
+.mir-annotations-compact [data-collapse]{margin:0}
+
+/* Keep the target visible while the pointer is active. */
+.mir-annotation-picking .mir-annotations{top:auto;bottom:.75rem;width:auto;padding:.4rem}
+.mir-annotation-picking .mir-annotations > :not(button[aria-pressed="true"]){display:none}
+.mir-annotation-picking .mir-annotations > button[aria-pressed="true"]{margin:0}

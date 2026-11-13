@@ -1,0 +1,5000 @@
+{
+  "id": "adseal-4580",
+  "sourceUrl": "https://adfast.store/adstore/overview/4580/Adseal/?lng=fr-ca",
+  "unit": "cartouches ou saucisses, par unité",
+  "requireColor": true,
+  "colorStatus": "manufacturer_palette",
+  "paletteComplete": true,
+  "formats": [
+    {
+      "id": "tube-304",
+      "label": "Tube (cartouche) · 304 ml",
+      "volumeMl": 304,
+      "unit": "cartouches"
+    },
+    {
+      "id": "saucisse-600",
+      "label": "Saucisse · 600 ml",
+      "volumeMl": 600,
+      "unit": "saucisses"
+    }
+  ],
+  "colors": [
+    {
+      "id": "adseal-4584",
+      "code": "4584",
+      "name": "Ivoire · 4584",
+      "hex": "#DCD3BE",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-42",
+      "code": "458-42",
+      "name": "Ardoise · 458-42",
+      "hex": "#6D7E80",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-43",
+      "code": "458-43",
+      "name": "Noyer foncé · 458-43",
+      "hex": "#605A51",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-44",
+      "code": "458-44",
+      "name": "Gris orageux xl · 458-44",
+      "hex": "#9B948D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-45",
+      "code": "458-45",
+      "name": "Blanc os · 458-45",
+      "hex": "#C7C5BD",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-46",
+      "code": "458-46",
+      "name": "Pierre · 458-46",
+      "hex": "#B2A895",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-79",
+      "code": "458-79",
+      "name": "Or prestige · 458-79",
+      "hex": "#C19E73",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-47",
+      "code": "458-47",
+      "name": "Bronze · 458-47",
+      "hex": "#494540",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-48",
+      "code": "458-48",
+      "name": "Gris Ciment · 458-48",
+      "hex": "#9C9488",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-49",
+      "code": "458-49",
+      "name": "Vert foret · 458-49",
+      "hex": "#466158",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-475",
+      "code": "458-475",
+      "name": "Jaune Monarque · 458-475",
+      "hex": "#E0A533",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-477",
+      "code": "458-477",
+      "name": "Pourpre d'Izmir · 458-477",
+      "hex": "#585179",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-481",
+      "code": "458-481",
+      "name": "Endive · 458-481",
+      "hex": "#B6BBAC",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-50",
+      "code": "458-50",
+      "name": "Rouge tuile · 458-50",
+      "hex": "#904639",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-51",
+      "code": "458-51",
+      "name": "Bleu héron · 458-51",
+      "hex": "#3A5260",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-52",
+      "code": "458-52",
+      "name": "Bourgogne · 458-52",
+      "hex": "#684240",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-53",
+      "code": "458-53",
+      "name": "Crème xl · 458-53",
+      "hex": "#EACDA7",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-54",
+      "code": "458-54",
+      "name": "Rouge campagne · 458-54",
+      "hex": "#795047",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-512",
+      "code": "458-512",
+      "name": "Écorce JH · 458-512",
+      "hex": "#796E62",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-55",
+      "code": "458-55",
+      "name": "Bleu minuit · 458-55",
+      "hex": "#39434F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-56",
+      "code": "458-56",
+      "name": "Pacanier · 458-56",
+      "hex": "#958E7E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-57",
+      "code": "458-57",
+      "name": "Cèdre · 458-57",
+      "hex": "#885F4B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-58",
+      "code": "458-58",
+      "name": "Rouge brique · 458-58",
+      "hex": "#6E3F3A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-59",
+      "code": "458-59",
+      "name": "Vert cactus · 458-59",
+      "hex": "#4B564E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-148",
+      "code": "458-148",
+      "name": "Orange volcanique · 458-148",
+      "hex": "#965846",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-476",
+      "code": "458-476",
+      "name": "Blanc Special Cg · 458-476",
+      "hex": "#DCE4EA",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-513",
+      "code": "458-513",
+      "name": "Gris Perle JH · 458-513",
+      "hex": "#B3AEAB",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-396",
+      "code": "458-396",
+      "name": "Bleu HNB · 458-396",
+      "hex": "#0082BA",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-538",
+      "code": "458-538",
+      "name": "Autobus jaune · 458-538",
+      "hex": "#E59A33",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-332",
+      "code": "458-332",
+      "name": "Gris 756 · 458-332",
+      "hex": "#A7A8A1",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-152",
+      "code": "458-152",
+      "name": "Limestone dc · 458-152",
+      "hex": "#BDAE99",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-264",
+      "code": "458-264",
+      "name": "Pourpre · 458-264",
+      "hex": "#4B494B",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-4586",
+      "code": "4586",
+      "name": "Rouge foncé · 4586",
+      "hex": "#874945",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-60",
+      "code": "458-60",
+      "name": "Limestone · 458-60",
+      "hex": "#B7BAB0",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-601",
+      "code": "458-601",
+      "name": "Verre Clair II · 458-601",
+      "hex": "#B3B1A9",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-474",
+      "code": "458-474",
+      "name": "Oiseau Jaune · 458-474",
+      "hex": "#F1CE81",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-451",
+      "code": "458-451",
+      "name": "Gris Ciel 883 · 458-451",
+      "hex": "#A3A49F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-543",
+      "code": "458-543",
+      "name": "Olive AD · 458-543",
+      "hex": "#998F72",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-11",
+      "code": "458-11",
+      "name": "Amande · 458-11",
+      "hex": "#D7CDBB",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-174",
+      "code": "458-174",
+      "name": "Deep blue · 458-174",
+      "hex": "#2A4F65",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-557",
+      "code": "458-557",
+      "name": "Teinte bronzé · 458-557",
+      "hex": "#D68D50",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-555",
+      "code": "458-555",
+      "name": "Vert printemps · 458-555",
+      "hex": "#636E65",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-473",
+      "code": "458-473",
+      "name": "Doré Coquin · 458-473",
+      "hex": "#BA7B47",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-560",
+      "code": "458-560",
+      "name": "Érable heritage · 458-560",
+      "hex": "#816F60",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-13",
+      "code": "458-13",
+      "name": "Sable · 458-13",
+      "hex": "#B7AB9E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-190",
+      "code": "458-190",
+      "name": "Gris calme · 458-190",
+      "hex": "#B5ADA8",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-394",
+      "code": "458-394",
+      "name": "Vert fonce edon · 458-394",
+      "hex": "#575F54",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-430",
+      "code": "458-430",
+      "name": "Mirage de minuit · 458-430",
+      "hex": "#49525B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-20",
+      "code": "458-20",
+      "name": "Gris granite · 458-20",
+      "hex": "#6A6C6A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-83",
+      "code": "458-83",
+      "name": "Beige pâle · 458-83",
+      "hex": "#BFB8A8",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-563",
+      "code": "458-563",
+      "name": "Aneth · 458-563",
+      "hex": "#ACAD8C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-556",
+      "code": "458-556",
+      "name": "Crème douce · 458-556",
+      "hex": "#F4EBD2",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-14",
+      "code": "458-14",
+      "name": "Yellowstone · 458-14",
+      "hex": "#A37A5A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-308",
+      "code": "458-308",
+      "name": "Bleu 5P9 · 458-308",
+      "hex": "#48697A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-558",
+      "code": "458-558",
+      "name": "Aléoute · 458-558",
+      "hex": "#99AAB7",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-525",
+      "code": "458-525",
+      "name": "Noyer antique · 458-525",
+      "hex": "#765944",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-266",
+      "code": "458-266",
+      "name": "Orange flash · 458-266",
+      "hex": "#D07F2F",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-193",
+      "code": "458-193",
+      "name": "Carrelage de Sable · 458-193",
+      "hex": "#B69F86",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-205",
+      "code": "458-205",
+      "name": "Creme de bois · 458-205",
+      "hex": "#E7D1AB",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-267",
+      "code": "458-267",
+      "name": "Brun roux · 458-267",
+      "hex": "#726151",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-363",
+      "code": "458-363",
+      "name": "Vert de Gris · 458-363",
+      "hex": "#86A79A",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-483",
+      "code": "458-483",
+      "name": "Gris Scout · 458-483",
+      "hex": "#A39F9B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-4588",
+      "code": "4588",
+      "name": "Aluminium anodisé · 4588",
+      "hex": "#BEBEBC",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-80",
+      "code": "458-80",
+      "name": "Dune · 458-80",
+      "hex": "#C5B498",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-81",
+      "code": "458-81",
+      "name": "Espresso · 458-81",
+      "hex": "#554845",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-369",
+      "code": "458-369",
+      "name": "Bleu Majeur · 458-369",
+      "hex": "#2BA0C6",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-355",
+      "code": "458-355",
+      "name": "Gris Moyen · 458-355",
+      "hex": "#8E8D89",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-357",
+      "code": "458-357",
+      "name": "Ble lisse · 458-357",
+      "hex": "#CAB598",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-82",
+      "code": "458-82",
+      "name": "Torrifié · 458-82",
+      "hex": "#85614B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-90",
+      "code": "458-90",
+      "name": "Vert moyen · 458-90",
+      "hex": "#4A6B5C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-194",
+      "code": "458-194",
+      "name": "Passive · 458-194",
+      "hex": "#C4C6C4",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-210",
+      "code": "458-210",
+      "name": "Rouge Mission · 458-210",
+      "hex": "#9A4C38",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-319",
+      "code": "458-319",
+      "name": "Bleu nuit · 458-319",
+      "hex": "#535A61",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-434",
+      "code": "458-434",
+      "name": "Gris pierre · 458-434",
+      "hex": "#A9A398",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-436",
+      "code": "458-436",
+      "name": "Huitre · 458-436",
+      "hex": "#E7D9C9",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-902",
+      "code": "458-902",
+      "name": "Nichiha Noir Brillant · 458-902",
+      "hex": "#333333",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-265",
+      "code": "458-265",
+      "name": "Orange dinastique · 458-265",
+      "hex": "#D16A3E",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-223",
+      "code": "458-223",
+      "name": "Force du vent · 458-223",
+      "hex": "#414E57",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-533",
+      "code": "458-533",
+      "name": "Vert Ad · 458-533",
+      "hex": "#7E816A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-381",
+      "code": "458-381",
+      "name": "Bleu Tempête · 458-381",
+      "hex": "#3C6277",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-280",
+      "code": "458-280",
+      "name": "Lobelie · 458-280",
+      "hex": "#718FAD",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-230",
+      "code": "458-230",
+      "name": "Brume de castleton · 458-230",
+      "hex": "#D0C394",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-123",
+      "code": "458-123",
+      "name": "Argile · 458-123",
+      "hex": "#7F776E",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-279",
+      "code": "458-279",
+      "name": "Paysage urbain · 458-279",
+      "hex": "#818482",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-115",
+      "code": "458-115",
+      "name": "Gris éclipse · 458-115",
+      "hex": "#666A6D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-118",
+      "code": "458-118",
+      "name": "Bois de grange · 458-118",
+      "hex": "#8C8B8B",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-124",
+      "code": "458-124",
+      "name": "Gris filet · 458-124",
+      "hex": "#84817B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-119",
+      "code": "458-119",
+      "name": "Loup gris · 458-119",
+      "hex": "#82817F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-12",
+      "code": "458-12",
+      "name": "Beige lambeth · 458-12",
+      "hex": "#C1B9A5",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-120",
+      "code": "458-120",
+      "name": "Erable · 458-120",
+      "hex": "#AB9C86",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-35",
+      "code": "458-35",
+      "name": "Mais · 458-35",
+      "hex": "#EDDEC1",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-243",
+      "code": "458-243",
+      "name": "Expresso riche · 458-243",
+      "hex": "#5D544F",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-903",
+      "code": "458-903",
+      "name": "Rouge Honco · 458-903",
+      "hex": "#712115",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-910",
+      "code": "458-910",
+      "name": "Brun écorce · 458-910",
+      "hex": "#2F2622",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-915",
+      "code": "458-915",
+      "name": "Marguerite anglaise · 458-915",
+      "hex": "#EBCB40",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-4585",
+      "code": "4585",
+      "name": "Blanc glacier · 4585",
+      "hex": "#EAEEEE",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-531",
+      "code": "458-531",
+      "name": "Ropppe tan · 458-531",
+      "hex": "#8B7B6D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-84",
+      "code": "458-84",
+      "name": "Bronze vieux château · 458-84",
+      "hex": "#454240",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-85",
+      "code": "458-85",
+      "name": "Cuivre vieilli · 458-85",
+      "hex": "#92A993",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-86",
+      "code": "458-86",
+      "name": "Peuplier · 458-86",
+      "hex": "#816756",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-87",
+      "code": "458-87",
+      "name": "Noire prune · 458-87",
+      "hex": "#3E3E3F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-88",
+      "code": "458-88",
+      "name": "Muskoka · 458-88",
+      "hex": "#875F49",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-4581",
+      "code": "4581",
+      "name": "Translucide · 4581",
+      "hex": "#FFFFFE",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-247",
+      "code": "458-247",
+      "name": "Grillé · 458-247",
+      "hex": "#97755E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-99",
+      "code": "458-99",
+      "name": "Renard roux xl · 458-99",
+      "hex": "#644F45",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-89",
+      "code": "458-89",
+      "name": "Vert foncé · 458-89",
+      "hex": "#43645C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-4589",
+      "code": "4589",
+      "name": "Aluminium · 4589",
+      "hex": "#AAABAA",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-91",
+      "code": "458-91",
+      "name": "Rouge vif · 458-91",
+      "hex": "#A23B3A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-92",
+      "code": "458-92",
+      "name": "Blanc pur · 458-92",
+      "hex": "#D4D6D6",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-905",
+      "code": "458-905",
+      "name": "Nichiha glacier · 458-905",
+      "hex": "#BAC0B4",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-906",
+      "code": "458-906",
+      "name": "Nichiha snow · 458-906",
+      "hex": "#D4D0CA",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-515",
+      "code": "458-515",
+      "name": "Port Grisâtre · 458-515",
+      "hex": "#626A70",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-330",
+      "code": "458-330",
+      "name": "Vert parc · 458-330",
+      "hex": "#706853",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-908",
+      "code": "458-908",
+      "name": "Chardonneret · 458-908",
+      "hex": "#EDB523",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-27",
+      "code": "458-27",
+      "name": "Marron Terre · 458-27",
+      "hex": "#77695F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-909",
+      "code": "458-909",
+      "name": "Lime Électrique · 458-909",
+      "hex": "#889922",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-911",
+      "code": "458-911",
+      "name": "Jaune sécurité · 458-911",
+      "hex": "#DC9D23",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-912",
+      "code": "458-912",
+      "name": "Tarte a la lime · 458-912",
+      "hex": "#ABA701",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-340",
+      "code": "458-340",
+      "name": "Cafe DK · 458-340",
+      "hex": "#55514E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-272",
+      "code": "458-272",
+      "name": "Bleu baie illumination · 458-272",
+      "hex": "#3B708B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-285",
+      "code": "458-285",
+      "name": "Bleu PPG · 458-285",
+      "hex": "#006EA3",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-913",
+      "code": "458-913",
+      "name": "Orange international · 458-913",
+      "hex": "#D05733",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-914",
+      "code": "458-914",
+      "name": "Orange citronné · 458-914",
+      "hex": "#D8741B",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-916",
+      "code": "458-916",
+      "name": "Rouge burlington 916 · 458-916",
+      "hex": "#A82930",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-94",
+      "code": "458-94",
+      "name": "Kaki foncé · 458-94",
+      "hex": "#6A6962",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-95",
+      "code": "458-95",
+      "name": "Sahara G · 458-95",
+      "hex": "#AFA391",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-96",
+      "code": "458-96",
+      "name": "Désert G · 458-96",
+      "hex": "#AA8F75",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-97",
+      "code": "458-97",
+      "name": "Gris kynar · 458-97",
+      "hex": "#817E7A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-283",
+      "code": "458-283",
+      "name": "Gris serieux · 458-283",
+      "hex": "#798186",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-382",
+      "code": "458-382",
+      "name": "Voile Transparent · 458-382",
+      "hex": "#D4CEC5",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-252",
+      "code": "458-252",
+      "name": "Albatre · 458-252",
+      "hex": "#F1F1E8",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-270",
+      "code": "458-270",
+      "name": "Blanc chaud · 458-270",
+      "hex": "#E0DFD9",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-291",
+      "code": "458-291",
+      "name": "Chataigne 400 · 458-291",
+      "hex": "#523F3B",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-271",
+      "code": "458-271",
+      "name": "Scarlett · 458-271",
+      "hex": "#944242",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-274",
+      "code": "458-274",
+      "name": "Ardoise brunie · 458-274",
+      "hex": "#534D44",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-372",
+      "code": "458-372",
+      "name": "Blanc Regal · 458-372",
+      "hex": "#DEE0E0",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-359",
+      "code": "458-359",
+      "name": "Miel · 458-359",
+      "hex": "#916D51",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-275",
+      "code": "458-275",
+      "name": "Cocktail a la lime · 458-275",
+      "hex": "#6E984F",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-28",
+      "code": "458-28",
+      "name": "Chamois · 458-28",
+      "hex": "#DACDB9",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-281",
+      "code": "458-281",
+      "name": "Lupine · 458-281",
+      "hex": "#536E92",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-282",
+      "code": "458-282",
+      "name": "Nuage d'orage · 458-282",
+      "hex": "#7F8990",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-374",
+      "code": "458-374",
+      "name": "Orange robuste · 458-374",
+      "hex": "#C96E47",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-358",
+      "code": "458-358",
+      "name": "Marron Doré · 458-358",
+      "hex": "#846953",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-484",
+      "code": "458-484",
+      "name": "Terre Cuite · 458-484",
+      "hex": "#936357",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-486",
+      "code": "458-486",
+      "name": "Cantaloup · 458-486",
+      "hex": "#D49A73",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-485",
+      "code": "458-485",
+      "name": "Tremble · 458-485",
+      "hex": "#859A9C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-487",
+      "code": "458-487",
+      "name": "Chemin De Cedre · 458-487",
+      "hex": "#7B8971",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-354",
+      "code": "458-354",
+      "name": "Olive Foncé · 458-354",
+      "hex": "#65625C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-559",
+      "code": "458-559",
+      "name": "Sanctuaire · 458-559",
+      "hex": "#A3B48E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-488",
+      "code": "458-488",
+      "name": "Eau Profonde · 458-488",
+      "hex": "#B5CBC6",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-378",
+      "code": "458-378",
+      "name": "Tempête · 458-378",
+      "hex": "#5B5953",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-220",
+      "code": "458-220",
+      "name": "Jute · 458-220",
+      "hex": "#8C7258",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-503",
+      "code": "458-503",
+      "name": "Vert Sauge · 458-503",
+      "hex": "#A0AEA4",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-309",
+      "code": "458-309",
+      "name": "Herisson 992 · 458-309",
+      "hex": "#9B8774",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-343",
+      "code": "458-343",
+      "name": "Olive DK · 458-343",
+      "hex": "#81816C",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-373",
+      "code": "458-373",
+      "name": "Chute d'eau · 458-373",
+      "hex": "#BEDCD2",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-371",
+      "code": "458-371",
+      "name": "Vision Grandiose · 458-371",
+      "hex": "#6D9383",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-383",
+      "code": "458-383",
+      "name": "Topiaire · 458-383",
+      "hex": "#878E53",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-384",
+      "code": "458-384",
+      "name": "Sauge JH · 458-384",
+      "hex": "#6D6C56",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-337",
+      "code": "458-337",
+      "name": "Gris Sombre · 458-337",
+      "hex": "#70706E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-304",
+      "code": "458-304",
+      "name": "Modern Gray · 458-304",
+      "hex": "#D2CABE",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-390",
+      "code": "458-390",
+      "name": "Bleu Cape Cod · 458-390",
+      "hex": "#86AEC1",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-329",
+      "code": "458-329",
+      "name": "Ble Pale · 458-329",
+      "hex": "#AA8C72",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-376",
+      "code": "458-376",
+      "name": "Romarin · 458-376",
+      "hex": "#65675D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-284",
+      "code": "458-284",
+      "name": "Bleu brillant · 458-284",
+      "hex": "#1F4C80",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-286",
+      "code": "458-286",
+      "name": "Vert xtreme · 458-286",
+      "hex": "#317A5C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-287",
+      "code": "458-287",
+      "name": "Bleu sonic · 458-287",
+      "hex": "#198EC2",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-29",
+      "code": "458-29",
+      "name": "Vanille · 458-29",
+      "hex": "#E8E2D4",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-290",
+      "code": "458-290",
+      "name": "Beige 310 · 458-290",
+      "hex": "#AF9987",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-292",
+      "code": "458-292",
+      "name": "Charbon 530 · 458-292",
+      "hex": "#6A6966",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-293",
+      "code": "458-293",
+      "name": "Dalle 540 · 458-293",
+      "hex": "#8E8983",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-295",
+      "code": "458-295",
+      "name": "Amazon prime blue · 458-295",
+      "hex": "#1F9BC4",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-296",
+      "code": "458-296",
+      "name": "Corne d'abondance · 458-296",
+      "hex": "#DD9136",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-299",
+      "code": "458-299",
+      "name": "Bronze Antique · 458-299",
+      "hex": "#BE9642",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-4583",
+      "code": "4583",
+      "name": "Noir · 4583",
+      "hex": "#383839",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-30",
+      "code": "458-30",
+      "name": "Bleu wedgewood · 458-30",
+      "hex": "#6E7F87",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-300",
+      "code": "458-300",
+      "name": "Bleu incroyable · 458-300",
+      "hex": "#008AB3",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-301",
+      "code": "458-301",
+      "name": "Assiette bleu · 458-301",
+      "hex": "#0076A5",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-302",
+      "code": "458-302",
+      "name": "Voie de migration · 458-302",
+      "hex": "#58B0CF",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-303",
+      "code": "458-303",
+      "name": "Bleu des frères hollandais · 458-303",
+      "hex": "#1C5372",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-393",
+      "code": "458-393",
+      "name": "Houx · 458-393",
+      "hex": "#42514E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-34",
+      "code": "458-34",
+      "name": "Cashemere · 458-34",
+      "hex": "#CDC6BD",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-305",
+      "code": "458-305",
+      "name": "Herisson · 458-305",
+      "hex": "#9B8879",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-306",
+      "code": "458-306",
+      "name": "Rouge burlington · 458-306",
+      "hex": "#A73943",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-170",
+      "code": "458-170",
+      "name": "Autumn Wheat · 458-170",
+      "hex": "#946C4E",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-307",
+      "code": "458-307",
+      "name": "Sequoia geant · 458-307",
+      "hex": "#96594B",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-31",
+      "code": "458-31",
+      "name": "Vert Épave · 458-31",
+      "hex": "#626B64",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-312",
+      "code": "458-312",
+      "name": "Celeri · 458-312",
+      "hex": "#D1CEA8",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-314",
+      "code": "458-314",
+      "name": "Vert 8307 · 458-314",
+      "hex": "#345247",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-315",
+      "code": "458-315",
+      "name": "Bassin profond · 458-315",
+      "hex": "#4F4B3D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-234",
+      "code": "458-234",
+      "name": "Fumee premium · 458-234",
+      "hex": "#797873",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-370",
+      "code": "458-370",
+      "name": "Aneth · 458-370",
+      "hex": "#728C60",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-362",
+      "code": "458-362",
+      "name": "Bleu Gentiane · 458-362",
+      "hex": "#4B7B8C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-325",
+      "code": "458-325",
+      "name": "Gris chaud · 458-325",
+      "hex": "#756C68",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-347",
+      "code": "458-347",
+      "name": "Argile de prairie · 458-347",
+      "hex": "#A59C8A",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-350",
+      "code": "458-350",
+      "name": "Vert Atrium · 458-350",
+      "hex": "#8D9382",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-352",
+      "code": "458-352",
+      "name": "Feuilles d'or · 458-352",
+      "hex": "#BD8344",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-140",
+      "code": "458-140",
+      "name": "Terre Cuite Rockwood · 458-140",
+      "hex": "#A26350",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-125",
+      "code": "458-125",
+      "name": "Taupe · 458-125",
+      "hex": "#817A6C",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-143",
+      "code": "458-143",
+      "name": "Neige allura · 458-143",
+      "hex": "#E6E5DF",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-144",
+      "code": "458-144",
+      "name": "Marron · 458-144",
+      "hex": "#6B4D46",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-145",
+      "code": "458-145",
+      "name": "Patina tropical *DISCONTINUÉ* · 458-145",
+      "hex": "#6C8E7E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-126",
+      "code": "458-126",
+      "name": "Grès · 458-126",
+      "hex": "#96836C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-146",
+      "code": "458-146",
+      "name": "Orange brulé · 458-146",
+      "hex": "#A46E51",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-129",
+      "code": "458-129",
+      "name": "Caraméline · 458-129",
+      "hex": "#957861",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-336",
+      "code": "458-336",
+      "name": "Bourgogne Ceraclad · 458-336",
+      "hex": "#684E4B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-130",
+      "code": "458-130",
+      "name": "Bleu littoral · 458-130",
+      "hex": "#4E6B78",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-132",
+      "code": "458-132",
+      "name": "Bleu ardoise · 458-132",
+      "hex": "#62818B",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-133",
+      "code": "458-133",
+      "name": "Bleu océan · 458-133",
+      "hex": "#35596C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-134",
+      "code": "458-134",
+      "name": "Jade sombre · 458-134",
+      "hex": "#5F816D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-136",
+      "code": "458-136",
+      "name": "Gris honco · 458-136",
+      "hex": "#A1A19E",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-137",
+      "code": "458-137",
+      "name": "Gris antharacite · 458-137",
+      "hex": "#464C4F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-138",
+      "code": "458-138",
+      "name": "Bleu crevier · 458-138",
+      "hex": "#2D4563",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-147",
+      "code": "458-147",
+      "name": "Prockow · 458-147",
+      "hex": "#52504B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-149",
+      "code": "458-149",
+      "name": "Mahogany · 458-149",
+      "hex": "#493C3B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-15",
+      "code": "458-15",
+      "name": "Sable royal · 458-15",
+      "hex": "#C6B7A8",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-356",
+      "code": "458-356",
+      "name": "Gris Argent Lisse · 458-356",
+      "hex": "#B6B7B2",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-445",
+      "code": "458-445",
+      "name": "Olive Foncé Bm · 458-445",
+      "hex": "#6C685F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-395",
+      "code": "458-395",
+      "name": "Bleu 286C · 458-395",
+      "hex": "#35568F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-564",
+      "code": "458-564",
+      "name": "Bohème · 458-564",
+      "hex": "#CDC434",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-399",
+      "code": "458-399",
+      "name": "Mer des célèbes · 458-399",
+      "hex": "#90A193",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-422",
+      "code": "458-422",
+      "name": "Bronze AC · 458-422",
+      "hex": "#565451",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-402",
+      "code": "458-402",
+      "name": "Vert centennial · 458-402",
+      "hex": "#627775",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-377",
+      "code": "458-377",
+      "name": "Rouge Vif Alpolic · 458-377",
+      "hex": "#B73838",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-917",
+      "code": "458-917",
+      "name": "Rouge vrai pella · 458-917",
+      "hex": "#8F2F33",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-442",
+      "code": "458-442",
+      "name": "Ile de Sable · 458-442",
+      "hex": "#6B5240",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-440",
+      "code": "458-440",
+      "name": "Bleu Provence · 458-440",
+      "hex": "#8A9C97",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-410",
+      "code": "458-410",
+      "name": "Gris marbre · 458-410",
+      "hex": "#B7B2B0",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-36",
+      "code": "458-36",
+      "name": "Sequoia · 458-36",
+      "hex": "#9B6F61",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-361",
+      "code": "458-361",
+      "name": "Trefles a quatre feuilles · 458-361",
+      "hex": "#5B5F4B",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-37",
+      "code": "458-37",
+      "name": "Noyer · 458-37",
+      "hex": "#6E6357",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-413",
+      "code": "458-413",
+      "name": "Ardoise 522 · 458-413",
+      "hex": "#5E7370",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-419",
+      "code": "458-419",
+      "name": "Gris etain · 458-419",
+      "hex": "#A8A19A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-420",
+      "code": "458-420",
+      "name": "Vert billard · 458-420",
+      "hex": "#505F56",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-425",
+      "code": "458-425",
+      "name": "Vert Chasseur · 458-425",
+      "hex": "#686D61",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-424",
+      "code": "458-424",
+      "name": "Port de mer · 458-424",
+      "hex": "#525F69",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-427",
+      "code": "458-427",
+      "name": "Jaune Van Gogh · 458-427",
+      "hex": "#E8B955",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-534",
+      "code": "458-534",
+      "name": "Vert hemlock · 458-534",
+      "hex": "#728076",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-535",
+      "code": "458-535",
+      "name": "Lin 032 · 458-535",
+      "hex": "#EAE5D9",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-536",
+      "code": "458-536",
+      "name": "Beige WC · 458-536",
+      "hex": "#C5BAA5",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-387",
+      "code": "458-387",
+      "name": "Lueur des lucioles · 458-387",
+      "hex": "#F1DA92",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-401",
+      "code": "458-401",
+      "name": "Gris oxford · 458-401",
+      "hex": "#7F92A4",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-415",
+      "code": "458-415",
+      "name": "Avocat · 458-415",
+      "hex": "#898166",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-418",
+      "code": "458-418",
+      "name": "Touche de citrouille · 458-418",
+      "hex": "#CE8C6C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-417",
+      "code": "458-417",
+      "name": "Herbe sechee · 458-417",
+      "hex": "#ACAA84",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-423",
+      "code": "458-423",
+      "name": "Corsaire · 458-423",
+      "hex": "#364764",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-428",
+      "code": "458-428",
+      "name": "Canari JL · 458-428",
+      "hex": "#F1BE3B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-150",
+      "code": "458-150",
+      "name": "Orange Husky · 458-150",
+      "hex": "#BF6547",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-151",
+      "code": "458-151",
+      "name": "Bleu manoir · 458-151",
+      "hex": "#B0B7BA",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-156",
+      "code": "458-156",
+      "name": "Ancient copper · 458-156",
+      "hex": "#8E4E3E",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-406",
+      "code": "458-406",
+      "name": "Vert Panera 2 · 458-406",
+      "hex": "#717247",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-433",
+      "code": "458-433",
+      "name": "Vert moyen 8329 · 458-433",
+      "hex": "#517565",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-542",
+      "code": "458-542",
+      "name": "Chardonneret N · 458-542",
+      "hex": "#EDB523",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-208",
+      "code": "458-208",
+      "name": "Gris perle · 458-208",
+      "hex": "#B8B1AB",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-429",
+      "code": "458-429",
+      "name": "Vert Mousse · 458-429",
+      "hex": "#395045",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-209",
+      "code": "458-209",
+      "name": "Brume légère · 458-209",
+      "hex": "#B7B9B6",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-21",
+      "code": "458-21",
+      "name": "Fusain · 458-21",
+      "hex": "#605D5A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-158",
+      "code": "458-158",
+      "name": "Night shade · 458-158",
+      "hex": "#4C413E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-408",
+      "code": "458-408",
+      "name": "Vert sur le lac · 458-408",
+      "hex": "#818D82",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-127",
+      "code": "458-127",
+      "name": "Sundried · 458-127",
+      "hex": "#A65947",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-414",
+      "code": "458-414",
+      "name": "Bleu nostalgie · 458-414",
+      "hex": "#B9DDE3",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-416",
+      "code": "458-416",
+      "name": "Vert pale 6021 · 458-416",
+      "hex": "#8C9F80",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-16",
+      "code": "458-16",
+      "name": "Kaki · 458-16",
+      "hex": "#8F8E85",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-195",
+      "code": "458-195",
+      "name": "Ruisseau de chene · 458-195",
+      "hex": "#B28460",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-196",
+      "code": "458-196",
+      "name": "Cidre épicé · 458-196",
+      "hex": "#AB7459",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-197",
+      "code": "458-197",
+      "name": "Café turc · 458-197",
+      "hex": "#584740",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-198",
+      "code": "458-198",
+      "name": "Lazy Gray · 458-198",
+      "hex": "#C2C5C7",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-199",
+      "code": "458-199",
+      "name": "Morning Fog · 458-199",
+      "hex": "#A8AFB2",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-4582",
+      "code": "4582",
+      "name": "Blanc · 4582",
+      "hex": "#EFEEEA",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-200",
+      "code": "458-200",
+      "name": "Dusty blue · 458-200",
+      "hex": "#949AA0",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-201",
+      "code": "458-201",
+      "name": "Bleu de soirée · 458-201",
+      "hex": "#5A6263",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-202",
+      "code": "458-202",
+      "name": "Sage de montagne · 458-202",
+      "hex": "#666652",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-203",
+      "code": "458-203",
+      "name": "Zone grise · 458-203",
+      "hex": "#878A8A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-204",
+      "code": "458-204",
+      "name": "Tan d'automne · 458-204",
+      "hex": "#BDA78B",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-206",
+      "code": "458-206",
+      "name": "Mousse de bruyère · 458-206",
+      "hex": "#A49E7F",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-207",
+      "code": "458-207",
+      "name": "Peau de cuir · 458-207",
+      "hex": "#755E4F",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-211",
+      "code": "458-211",
+      "name": "Vert valfon · 458-211",
+      "hex": "#006568",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-212",
+      "code": "458-212",
+      "name": "Noir de la nuit · 458-212",
+      "hex": "#32363A",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-213",
+      "code": "458-213",
+      "name": "Ombre pale · 458-213",
+      "hex": "#DDD7D6",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-218",
+      "code": "458-218",
+      "name": "Rouge pinot · 458-218",
+      "hex": "#644959",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-22",
+      "code": "458-22",
+      "name": "Gris ardoise · 458-22",
+      "hex": "#4C4D4C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-540",
+      "code": "458-540",
+      "name": "Poussiere de Feuilles · 458-540",
+      "hex": "#B9C0B6",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-426",
+      "code": "458-426",
+      "name": "Yeux bleu de bébé · 458-426",
+      "hex": "#829FB1",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-548",
+      "code": "458-548",
+      "name": "Pieds Légers · 458-548",
+      "hex": "#E6CD9B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-539",
+      "code": "458-539",
+      "name": "Vert chasseur JH · 458-539",
+      "hex": "#434B48",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-553",
+      "code": "458-553",
+      "name": "Corail · 458-553",
+      "hex": "#B17A6C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-398",
+      "code": "458-398",
+      "name": "BLEU KONIG · 458-398",
+      "hex": "#315367",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-397",
+      "code": "458-397",
+      "name": "Genevrier · 458-397",
+      "hex": "#9B9982",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-400",
+      "code": "458-400",
+      "name": "Soirée étoilée · 458-400",
+      "hex": "#4D5864",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-403",
+      "code": "458-403",
+      "name": "Bleu brillant Reynobond · 458-403",
+      "hex": "#00649D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-405",
+      "code": "458-405",
+      "name": "Bleu 7692C · 458-405",
+      "hex": "#196790",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-407",
+      "code": "458-407",
+      "name": "Gris avalanche · 458-407",
+      "hex": "#CDD0CC",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-375",
+      "code": "458-375",
+      "name": "Sauge des Plateux · 458-375",
+      "hex": "#A9AC96",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-444",
+      "code": "458-444",
+      "name": "Mille Raies Gris · 458-444",
+      "hex": "#7D8382",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-221",
+      "code": "458-221",
+      "name": "Gris de colombe · 458-221",
+      "hex": "#979895",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-224",
+      "code": "458-224",
+      "name": "Gris gantelet · 458-224",
+      "hex": "#797269",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-225",
+      "code": "458-225",
+      "name": "Gris dorian · 458-225",
+      "hex": "#AEA99F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-432",
+      "code": "458-432",
+      "name": "Beige 8315 · 458-432",
+      "hex": "#A3927B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-226",
+      "code": "458-226",
+      "name": "Rouge raptors · 458-226",
+      "hex": "#813F41",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-227",
+      "code": "458-227",
+      "name": "Rouge traffique · 458-227",
+      "hex": "#C21F29",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-228",
+      "code": "458-228",
+      "name": "Point vert de Kittery · 458-228",
+      "hex": "#C0CFA4",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-229",
+      "code": "458-229",
+      "name": "Bleu catalina · 458-229",
+      "hex": "#A0B3A5",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-23",
+      "code": "458-23",
+      "name": "Bronze renaissance · 458-23",
+      "hex": "#786B5F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-231",
+      "code": "458-231",
+      "name": "Vert Kensington · 458-231",
+      "hex": "#88B4A9",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-431",
+      "code": "458-431",
+      "name": "Mauve Taco Bell · 458-431",
+      "hex": "#67486D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-232",
+      "code": "458-232",
+      "name": "Bleu commodore · 458-232",
+      "hex": "#003351",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-233",
+      "code": "458-233",
+      "name": "Acajou premium · 458-233",
+      "hex": "#835444",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-235",
+      "code": "458-235",
+      "name": "Fusain premium · 458-235",
+      "hex": "#4E4F4F",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-155",
+      "code": "458-155",
+      "name": "Pot de Gingembre · 458-155",
+      "hex": "#BE785D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-404",
+      "code": "458-404",
+      "name": "Vendange Nichiha · 458-404",
+      "hex": "#7A7494",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-409",
+      "code": "458-409",
+      "name": "Bleu langoureux · 458-409",
+      "hex": "#A5B8BE",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-447",
+      "code": "458-447",
+      "name": "Beige 7502 · 458-447",
+      "hex": "#CFB48C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-541",
+      "code": "458-541",
+      "name": "Blanc nautique · 458-541",
+      "hex": "#D6D9CB",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-493",
+      "code": "458-493",
+      "name": "Rose Thé · 458-493",
+      "hex": "#BD9591",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-448",
+      "code": "458-448",
+      "name": "Vert Brumeux · 458-448",
+      "hex": "#9AA287",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-388",
+      "code": "458-388",
+      "name": "Hummos Aux H. Blancs · 458-388",
+      "hex": "#E6D4BD",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-459",
+      "code": "458-459",
+      "name": "Vert Tec · 458-459",
+      "hex": "#256C52",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-470",
+      "code": "458-470",
+      "name": "Vert biologique · 458-470",
+      "hex": "#83B070",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-461",
+      "code": "458-461",
+      "name": "Érable Naturel · 458-461",
+      "hex": "#DFC09D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-478",
+      "code": "458-478",
+      "name": "Trèfles de Minuit · 458-478",
+      "hex": "#38534B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-479",
+      "code": "458-479",
+      "name": "Gris Regent 8730 · 458-479",
+      "hex": "#9DA3A1",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-489",
+      "code": "458-489",
+      "name": "Soleil Doré · 458-489",
+      "hex": "#E1AA62",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-502",
+      "code": "458-502",
+      "name": "Pierre Poncée · 458-502",
+      "hex": "#615F5D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-491",
+      "code": "458-491",
+      "name": "Poudre Rosé · 458-491",
+      "hex": "#ECE0E1",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-492",
+      "code": "458-492",
+      "name": "Bleu Fumée · 458-492",
+      "hex": "#4D5F71",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-490",
+      "code": "458-490",
+      "name": "Glace Italienne · 458-490",
+      "hex": "#385E6A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-463",
+      "code": "458-463",
+      "name": "Gris Dune · 458-463",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-496",
+      "code": "458-496",
+      "name": "Vin de porto · 458-496",
+      "hex": "#905E4D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-467",
+      "code": "458-467",
+      "name": "Étan Foncé · 458-467",
+      "hex": "#485353",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-471",
+      "code": "458-471",
+      "name": "Vert de la Garde · 458-471",
+      "hex": "#616558",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-494",
+      "code": "458-494",
+      "name": "Sépia Pâle · 458-494",
+      "hex": "#DABB9A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-457",
+      "code": "458-457",
+      "name": "Rouge Acajou · 458-457",
+      "hex": "#7B4E41",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-458",
+      "code": "458-458",
+      "name": "Bleu 27743 · 458-458",
+      "hex": "#035B85",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-437",
+      "code": "458-437",
+      "name": "Toundra · 458-437",
+      "hex": "#7A7764",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-468",
+      "code": "458-468",
+      "name": "Turquoise Pacifique · 458-468",
+      "hex": "#698C7D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-482",
+      "code": "458-482",
+      "name": "Vert Héritage · 458-482",
+      "hex": "#414D46",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-460",
+      "code": "458-460",
+      "name": "Vert Anglais · 458-460",
+      "hex": "#597C7A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-100",
+      "code": "458-100",
+      "name": "Graphite G · 458-100",
+      "hex": "#555857",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-504",
+      "code": "458-504",
+      "name": "Étain Vieilli JH · 458-504",
+      "hex": "#7C7873",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-104",
+      "code": "458-104",
+      "name": "Egwnut · 458-104",
+      "hex": "#5E5145",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-341",
+      "code": "458-341",
+      "name": "Elkhorn DK · 458-341",
+      "hex": "#574B42",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-101",
+      "code": "458-101",
+      "name": "Brun antique G · 458-101",
+      "hex": "#4B4441",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-108",
+      "code": "458-108",
+      "name": "Bleu tonnerre · 458-108",
+      "hex": "#65808E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-102",
+      "code": "458-102",
+      "name": "Brun muscade G · 458-102",
+      "hex": "#584945",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-505",
+      "code": "458-505",
+      "name": "Noisette JH · 458-505",
+      "hex": "#705C4C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-103",
+      "code": "458-103",
+      "name": "Brun fauve G · 458-103",
+      "hex": "#766051",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-106",
+      "code": "458-106",
+      "name": "Hickory · 458-106",
+      "hex": "#A49989",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-109",
+      "code": "458-109",
+      "name": "Midnight surf · 458-109",
+      "hex": "#5E6468",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-121",
+      "code": "458-121",
+      "name": "Santiago · 458-121",
+      "hex": "#968983",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-160",
+      "code": "458-160",
+      "name": "Gris argent · 458-160",
+      "hex": "#939799",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-162",
+      "code": "458-162",
+      "name": "Piano · 458-162",
+      "hex": "#4C4141",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-167",
+      "code": "458-167",
+      "name": "NYPD-Bleu · 458-167",
+      "hex": "#004E75",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-173",
+      "code": "458-173",
+      "name": "Jonquille · 458-173",
+      "hex": "#F9D97E",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-176",
+      "code": "458-176",
+      "name": "Gris escarpement · 458-176",
+      "hex": "#A49F99",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-18",
+      "code": "458-18",
+      "name": "Bleu marine · 458-18",
+      "hex": "#37414D",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-183",
+      "code": "458-183",
+      "name": "Suède d'été · 458-183",
+      "hex": "#605850",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-184",
+      "code": "458-184",
+      "name": "Cabine Bleu · 458-184",
+      "hex": "#748082",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-186",
+      "code": "458-186",
+      "name": "Ardoise Downing · 458-186",
+      "hex": "#768188",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-191",
+      "code": "458-191",
+      "name": "Orange Ocre · 458-191",
+      "hex": "#D89B65",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-161",
+      "code": "458-161",
+      "name": "Web gray · 458-161",
+      "hex": "#676C6F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-163",
+      "code": "458-163",
+      "name": "Arôme de tabac · 458-163",
+      "hex": "#986458",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-172",
+      "code": "458-172",
+      "name": "Bleu minéral · 458-172",
+      "hex": "#325360",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-181",
+      "code": "458-181",
+      "name": "Morning Rose · 458-181",
+      "hex": "#B09F98",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-506",
+      "code": "458-506",
+      "name": "Rouge Campagnard JH · 458-506",
+      "hex": "#704C44",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-187",
+      "code": "458-187",
+      "name": "Vision · 458-187",
+      "hex": "#837A77",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-19",
+      "code": "458-19",
+      "name": "Brun chocolat · 458-19",
+      "hex": "#544441",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-168",
+      "code": "458-168",
+      "name": "Brun Rugueux · 458-168",
+      "hex": "#63554D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-188",
+      "code": "458-188",
+      "name": "Roche · 458-188",
+      "hex": "#63605C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-17",
+      "code": "458-17",
+      "name": "Pebble kaki · 458-17",
+      "hex": "#9B8E80",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-178",
+      "code": "458-178",
+      "name": "Bleu Concord · 458-178",
+      "hex": "#536978",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-180",
+      "code": "458-180",
+      "name": "Powder Blue · 458-180",
+      "hex": "#A8B4BA",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-189",
+      "code": "458-189",
+      "name": "Bleu Indigo · 458-189",
+      "hex": "#3E454A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-507",
+      "code": "458-507",
+      "name": "Gris Ardoise JH · 458-507",
+      "hex": "#858783",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-165",
+      "code": "458-165",
+      "name": "Bleu Royal · 458-165",
+      "hex": "#006C95",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-166",
+      "code": "458-166",
+      "name": "Or · 458-166",
+      "hex": "#C2A470",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-171",
+      "code": "458-171",
+      "name": "Abricot · 458-171",
+      "hex": "#DD965E",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-175",
+      "code": "458-175",
+      "name": "Bleu curacao · 458-175",
+      "hex": "#446780",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-177",
+      "code": "458-177",
+      "name": "Grecian Green · 458-177",
+      "hex": "#4D594D",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-179",
+      "code": "458-179",
+      "name": "Bleu outremer · 458-179",
+      "hex": "#1E5580",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-182",
+      "code": "458-182",
+      "name": "Brun Royal · 458-182",
+      "hex": "#62504C",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-192",
+      "code": "458-192",
+      "name": "Glaise · 458-192",
+      "hex": "#A1745A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-254",
+      "code": "458-254",
+      "name": "Gris BCG · 458-254",
+      "hex": "#545758",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-26",
+      "code": "458-26",
+      "name": "Bronze pâle · 458-26",
+      "hex": "#807869",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-263",
+      "code": "458-263",
+      "name": "Bleu amalon · 458-263",
+      "hex": "#003D59",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-236",
+      "code": "458-236",
+      "name": "Erable premium · 458-236",
+      "hex": "#925E45",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-268",
+      "code": "458-268",
+      "name": "Graphite illumination · 458-268",
+      "hex": "#575859",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-269",
+      "code": "458-269",
+      "name": "Grain poivré · 458-269",
+      "hex": "#5D5B5B",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-273",
+      "code": "458-273",
+      "name": "Ombre grise · 458-273",
+      "hex": "#413F37",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-239",
+      "code": "458-239",
+      "name": "DALE BLEU · 458-239",
+      "hex": "#5A7D8E",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-24",
+      "code": "458-24",
+      "name": "Sablon · 458-24",
+      "hex": "#6E675E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-249",
+      "code": "458-249",
+      "name": "Fer forgé · 458-249",
+      "hex": "#4A4B4D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-250",
+      "code": "458-250",
+      "name": "Rouge securite · 458-250",
+      "hex": "#B54040",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-277",
+      "code": "458-277",
+      "name": "Vers le haut · 458-277",
+      "hex": "#BFC8CE",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-237",
+      "code": "458-237",
+      "name": "Rouge brulé · 458-237",
+      "hex": "#874D42",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-245",
+      "code": "458-245",
+      "name": "Gris requis · 458-245",
+      "hex": "#AFAAA4",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-248",
+      "code": "458-248",
+      "name": "Bronzage Total · 458-248",
+      "hex": "#CDA57F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-25",
+      "code": "458-25",
+      "name": "Bleu cobalt · 458-25",
+      "hex": "#407290",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-278",
+      "code": "458-278",
+      "name": "Matiere grise · 458-278",
+      "hex": "#ADABA7",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-259",
+      "code": "458-259",
+      "name": "Turquoise · 458-259",
+      "hex": "#576A71",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-260",
+      "code": "458-260",
+      "name": "Poussiere de champagne · 458-260",
+      "hex": "#8E8371",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-508",
+      "code": "458-508",
+      "name": "Taupe Monterey JH · 458-508",
+      "hex": "#A49B8B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-238",
+      "code": "458-238",
+      "name": "Érable irlandais · 458-238",
+      "hex": "#897766",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-251",
+      "code": "458-251",
+      "name": "Minuit · 458-251",
+      "hex": "#4A4B4C",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-253",
+      "code": "458-253",
+      "name": "Ceinture verte · 458-253",
+      "hex": "#00623F",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-246",
+      "code": "458-246",
+      "name": "bleu CVB · 458-246",
+      "hex": "#3A749C",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-261",
+      "code": "458-261",
+      "name": "Supernova · 458-261",
+      "hex": "#D1DBDA",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-244",
+      "code": "458-244",
+      "name": "Étain vieilli · 458-244",
+      "hex": "#746E67",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-318",
+      "code": "458-318",
+      "name": "Dark night · 458-318",
+      "hex": "#2F4044",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-326",
+      "code": "458-326",
+      "name": "Noir glace · 458-326",
+      "hex": "#474540",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-32",
+      "code": "458-32",
+      "name": "Champagne · 458-32",
+      "hex": "#A99F91",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-328",
+      "code": "458-328",
+      "name": "Acier caverne · 458-328",
+      "hex": "#656668",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-40",
+      "code": "458-40",
+      "name": "Vert bonneville · 458-40",
+      "hex": "#4C5550",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-41",
+      "code": "458-41",
+      "name": "Tan · 458-41",
+      "hex": "#BEA68E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-346",
+      "code": "458-346",
+      "name": "Mondain · 458-346",
+      "hex": "#917C7D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-353",
+      "code": "458-353",
+      "name": "Blanc Arctique · 458-353",
+      "hex": "#E2E3E2",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-39",
+      "code": "458-39",
+      "name": "Aluminium foncé · 458-39",
+      "hex": "#95999B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-509",
+      "code": "458-509",
+      "name": "Espresso JH · 458-509",
+      "hex": "#5D5753",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-327",
+      "code": "458-327",
+      "name": "Gris Toundra · 458-327",
+      "hex": "#78736D",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-33",
+      "code": "458-33",
+      "name": "Beige antique · 458-33",
+      "hex": "#A59480",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-351",
+      "code": "458-351",
+      "name": "Traitement Naturel · 458-351",
+      "hex": "#948D8B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-38",
+      "code": "458-38",
+      "name": "Aluminium galvanisé · 458-38",
+      "hex": "#8B8F91",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-324",
+      "code": "458-324",
+      "name": "Bleu de processus · 458-324",
+      "hex": "#008CB1",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-510",
+      "code": "458-510",
+      "name": "Brun Rustique JH · 458-510",
+      "hex": "#8E6449",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-331",
+      "code": "458-331",
+      "name": "Gris Attitude · 458-331",
+      "hex": "#7D7E78",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-69",
+      "code": "458-69",
+      "name": "Foret de pin xl · 458-69",
+      "hex": "#837F5E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-4587",
+      "code": "4587",
+      "name": "Window bronze · 4587",
+      "hex": "#524B46",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-71",
+      "code": "458-71",
+      "name": "Caramel · 458-71",
+      "hex": "#A87756",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-72",
+      "code": "458-72",
+      "name": "Desert · 458-72",
+      "hex": "#A18471",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-74",
+      "code": "458-74",
+      "name": "Parchemin · 458-74",
+      "hex": "#D6C3B0",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-78",
+      "code": "458-78",
+      "name": "Bleu ultra · 458-78",
+      "hex": "#216289",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-602",
+      "code": "458-602",
+      "name": "Étain · 458-602",
+      "hex": "#858482",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-610",
+      "code": "458-610",
+      "name": "Or leger · 458-610",
+      "hex": "#B39662",
+      "formatIds": [
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-63",
+      "code": "458-63",
+      "name": "Bois sierra xl · 458-63",
+      "hex": "#7A6252",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-632",
+      "code": "458-632",
+      "name": "Champagne · 458-632",
+      "hex": "#9C8F7A",
+      "formatIds": [
+        "tube-304"
+      ]
+    },
+    {
+      "id": "adseal-458-65",
+      "code": "458-65",
+      "name": "Coutil · 458-65",
+      "hex": "#9D8875",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-657",
+      "code": "458-657",
+      "name": "Cuivre · 458-657",
+      "hex": "#AB7B57",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-68",
+      "code": "458-68",
+      "name": "Ambre d'automne xl · 458-68",
+      "hex": "#DAA66A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-75",
+      "code": "458-75",
+      "name": "Minerai de fer · 458-75",
+      "hex": "#47494B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-604",
+      "code": "458-604",
+      "name": "Argent brillant · 458-604",
+      "hex": "#999C9D",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-605",
+      "code": "458-605",
+      "name": "Charbon de bois perlé · 458-605",
+      "hex": "#50575B",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-64",
+      "code": "458-64",
+      "name": "Pierre grise · 458-64",
+      "hex": "#AFB7AE",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-70",
+      "code": "458-70",
+      "name": "Brun contemporain · 458-70",
+      "hex": "#75574A",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-73",
+      "code": "458-73",
+      "name": "Ipé · 458-73",
+      "hex": "#8D6049",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-511",
+      "code": "458-511",
+      "name": "Beige Sable JH · 458-511",
+      "hex": "#C2B69F",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-61",
+      "code": "458-61",
+      "name": "Orange · 458-61",
+      "hex": "#B0724E",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-77",
+      "code": "458-77",
+      "name": "Bois d'épave · 458-77",
+      "hex": "#827464",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-67",
+      "code": "458-67",
+      "name": "Gris régent · 458-67",
+      "hex": "#A8AAA6",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-62",
+      "code": "458-62",
+      "name": "Café · 458-62",
+      "hex": "#CBBDAD",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-66",
+      "code": "458-66",
+      "name": "Acadia xl · 458-66",
+      "hex": "#9D9785",
+      "formatIds": [
+        "tube-304",
+        "saucisse-600"
+      ]
+    },
+    {
+      "id": "adseal-458-421",
+      "code": "458-421",
+      "name": "Lin naturel · 458-421",
+      "hex": "#C0B7AD"
+    },
+    {
+      "id": "adseal-458-310",
+      "code": "458-310",
+      "name": "Aiguille rocheuse · 458-310",
+      "hex": "#94795D"
+    },
+    {
+      "id": "adseal-458-530",
+      "code": "458-530",
+      "name": "Chene de froment · 458-530",
+      "hex": "#D6D4CB"
+    },
+    {
+      "id": "adseal-458-552",
+      "code": "458-552",
+      "name": "Vert tilleul 8256 · 458-552",
+      "hex": "#97AC8F"
+    },
+    {
+      "id": "adseal-458-313",
+      "code": "458-313",
+      "name": "Winchester brun · 458-313",
+      "hex": "#6A5447"
+    },
+    {
+      "id": "adseal-458-608",
+      "code": "458-608",
+      "name": "Aluminium anodise metal · 458-608",
+      "hex": "#BBBEBD"
+    },
+    {
+      "id": "adseal-458-367",
+      "code": "458-367",
+      "name": "Sage pella · 458-367",
+      "hex": "#B6B39C"
+    },
+    {
+      "id": "adseal-458-627",
+      "code": "458-627",
+      "name": "Bronze moyen · 458-627",
+      "hex": "#4C4740"
+    },
+    {
+      "id": "adseal-458-537",
+      "code": "458-537",
+      "name": "Gris blackhawk · 458-537",
+      "hex": "#535458"
+    },
+    {
+      "id": "adseal-458-519",
+      "code": "458-519",
+      "name": "Orange whataburger · 458-519",
+      "hex": "#D8732D"
+    },
+    {
+      "id": "adseal-458-569",
+      "code": "458-569",
+      "name": "Lune jaune · 458-569",
+      "hex": "#F3DDA9"
+    },
+    {
+      "id": "adseal-458-262",
+      "code": "458-262",
+      "name": "Paysage zuni · 458-262",
+      "hex": "#E1D0C8"
+    },
+    {
+      "id": "adseal-458-364",
+      "code": "458-364",
+      "name": "Blanc pella · 458-364",
+      "hex": "#DCDFDB"
+    },
+    {
+      "id": "adseal-458-529",
+      "code": "458-529",
+      "name": "Surtaco sphera · 458-529",
+      "hex": "#7B8278"
+    },
+    {
+      "id": "adseal-458-517",
+      "code": "458-517",
+      "name": "Shitake · 458-517",
+      "hex": "#CABEAE"
+    },
+    {
+      "id": "adseal-458-561",
+      "code": "458-561",
+      "name": "Vert privilegie · 458-561",
+      "hex": "#7D8F7B"
+    },
+    {
+      "id": "adseal-458-392",
+      "code": "458-392",
+      "name": "Introspectif · 458-392",
+      "hex": "#6E5F54"
+    },
+    {
+      "id": "adseal-458-567",
+      "code": "458-567",
+      "name": "Gris saule · 458-567",
+      "hex": "#727267"
+    },
+    {
+      "id": "adseal-458-411",
+      "code": "458-411",
+      "name": "Vert altec · 458-411",
+      "hex": "#6C7974"
+    },
+    {
+      "id": "adseal-458-335",
+      "code": "458-335",
+      "name": "Cedre allura · 458-335",
+      "hex": "#855841"
+    },
+    {
+      "id": "adseal-458-449",
+      "code": "458-449",
+      "name": "Argile 527 · 458-449",
+      "hex": "#918273"
+    },
+    {
+      "id": "adseal-458-524",
+      "code": "458-524",
+      "name": "Baha turquoise · 458-524",
+      "hex": "#0A7680"
+    },
+    {
+      "id": "adseal-458-298",
+      "code": "458-298",
+      "name": "Cerise · 458-298",
+      "hex": "#685353"
+    },
+    {
+      "id": "adseal-458-142",
+      "code": "458-142",
+      "name": "Vent de tempete · 458-142",
+      "hex": "#414345"
+    },
+    {
+      "id": "adseal-458-549",
+      "code": "458-549",
+      "name": "Blanc arctique vr · 458-549",
+      "hex": "#DDD8CD"
+    },
+    {
+      "id": "adseal-458-528",
+      "code": "458-528",
+      "name": "Gris minuit · 458-528",
+      "hex": "#585755"
+    },
+    {
+      "id": "adseal-458-153",
+      "code": "458-153",
+      "name": "Donnegal · 458-153",
+      "hex": "#70978C"
+    },
+    {
+      "id": "adseal-458-338",
+      "code": "458-338",
+      "name": "Canyon · 458-338",
+      "hex": "#6C4D3E"
+    },
+    {
+      "id": "adseal-458-568",
+      "code": "458-568",
+      "name": "Bleu noeud papillon · 458-568",
+      "hex": "#007CB3"
+    },
+    {
+      "id": "adseal-458-499",
+      "code": "458-499",
+      "name": "Ecume de mer · 458-499",
+      "hex": "#E0EBE7"
+    },
+    {
+      "id": "adseal-458-520",
+      "code": "458-520",
+      "name": "Brun de securite · 458-520",
+      "hex": "#795546"
+    },
+    {
+      "id": "adseal-458-554",
+      "code": "458-554",
+      "name": "Port de bateau · 458-554",
+      "hex": "#658293"
+    },
+    {
+      "id": "adseal-458-320",
+      "code": "458-320",
+      "name": "Wasabi · 458-320",
+      "hex": "#8C8164"
+    },
+    {
+      "id": "adseal-458-334",
+      "code": "458-334",
+      "name": "Osier savane · 458-334",
+      "hex": "#C1B29B"
+    },
+    {
+      "id": "adseal-458-349",
+      "code": "458-349",
+      "name": "Bouquet vert · 458-349",
+      "hex": "#C8C9B6"
+    },
+    {
+      "id": "adseal-458-365",
+      "code": "458-365",
+      "name": "Amande pella · 458-365",
+      "hex": "#CCBDA8"
+    },
+    {
+      "id": "adseal-458-532",
+      "code": "458-532",
+      "name": "Artisanat d'automne · 458-532",
+      "hex": "#D9D1C4"
+    },
+    {
+      "id": "adseal-458-469",
+      "code": "458-469",
+      "name": "Vert foret 678 · 458-469",
+      "hex": "#4C5E59"
+    },
+    {
+      "id": "adseal-458-257",
+      "code": "458-257",
+      "name": "Gres dc · 458-257",
+      "hex": "#C5AD88"
+    },
+    {
+      "id": "adseal-458-380",
+      "code": "458-380",
+      "name": "Acier sarcelle · 458-380",
+      "hex": "#3F5960"
+    },
+    {
+      "id": "adseal-458-547",
+      "code": "458-547",
+      "name": "Chroma patriote · 458-547",
+      "hex": "#4B5056"
+    },
+    {
+      "id": "adseal-458-550",
+      "code": "458-550",
+      "name": "Bleu specifique · 458-550",
+      "hex": "#66747A"
+    },
+    {
+      "id": "adseal-458-497",
+      "code": "458-497",
+      "name": "Oleander · 458-497",
+      "hex": "#82848A"
+    },
+    {
+      "id": "adseal-458-333",
+      "code": "458-333",
+      "name": "Gris heron · 458-333",
+      "hex": "#88928A"
+    },
+    {
+      "id": "adseal-458-521",
+      "code": "458-521",
+      "name": "Beige balance · 458-521",
+      "hex": "#C0B5A4"
+    },
+    {
+      "id": "adseal-458-647",
+      "code": "458-647",
+      "name": "Bronze metallique · 458-647",
+      "hex": "#463D35"
+    },
+    {
+      "id": "adseal-458-322",
+      "code": "458-322",
+      "name": "Lit de fougeres · 458-322",
+      "hex": "#988E75"
+    },
+    {
+      "id": "adseal-458-317",
+      "code": "458-317",
+      "name": "Argent d'erable · 458-317",
+      "hex": "#645D5B"
+    },
+    {
+      "id": "adseal-458-438",
+      "code": "458-438",
+      "name": "Flint · 458-438",
+      "hex": "#789DB7"
+    },
+    {
+      "id": "adseal-458-516",
+      "code": "458-516",
+      "name": "Aiguilles a tricoter · 458-516",
+      "hex": "#C1C0BB"
+    },
+    {
+      "id": "adseal-458-570",
+      "code": "458-570",
+      "name": "Alchimie · 458-570",
+      "hex": "#C99F5C"
+    },
+    {
+      "id": "adseal-458-452",
+      "code": "458-452",
+      "name": "Sable de plage 030 · 458-452",
+      "hex": "#C0B7AA"
+    },
+    {
+      "id": "adseal-458-348",
+      "code": "458-348",
+      "name": "Prefabrique blanc · 458-348",
+      "hex": "#D8CEBE"
+    },
+    {
+      "id": "adseal-458-443",
+      "code": "458-443",
+      "name": "Mur de pierres · 458-443",
+      "hex": "#84857D"
+    },
+    {
+      "id": "adseal-458-566",
+      "code": "458-566",
+      "name": "Concombre · 458-566",
+      "hex": "#8E9672"
+    },
+    {
+      "id": "adseal-458-379",
+      "code": "458-379",
+      "name": "Chene dore · 458-379",
+      "hex": "#997656"
+    },
+    {
+      "id": "adseal-458-435",
+      "code": "458-435",
+      "name": "Rose electrisant · 458-435",
+      "hex": "#AC476A"
+    },
+    {
+      "id": "adseal-458-276",
+      "code": "458-276",
+      "name": "Nuit etoilee · 458-276",
+      "hex": "#5C6368"
+    },
+    {
+      "id": "adseal-458-633",
+      "code": "458-633",
+      "name": "Champagne or · 458-633",
+      "hex": "#8C8880"
+    },
+    {
+      "id": "adseal-458-501",
+      "code": "458-501",
+      "name": "Bleu loisir · 458-501",
+      "hex": "#6F8E9E"
+    },
+    {
+      "id": "adseal-458-441",
+      "code": "458-441",
+      "name": "Tan qx · 458-441",
+      "hex": "#B9B0A3"
+    },
+    {
+      "id": "adseal-458-495",
+      "code": "458-495",
+      "name": "Limestone ds · 458-495",
+      "hex": "#B9B1A5"
+    },
+    {
+      "id": "adseal-458-366",
+      "code": "458-366",
+      "name": "Gris perle pella · 458-366",
+      "hex": "#D7D4CB"
+    },
+    {
+      "id": "adseal-458-500",
+      "code": "458-500",
+      "name": "Tissage d ete · 458-500",
+      "hex": "#9EA9AF"
+    },
+    {
+      "id": "adseal-458-600",
+      "code": "458-600",
+      "name": "Verre clair #1 · 458-600",
+      "hex": "#C4C5C3"
+    },
+    {
+      "id": "adseal-458-164",
+      "code": "458-164",
+      "name": "Vert espalier · 458-164",
+      "hex": "#41674A"
+    },
+    {
+      "id": "adseal-458-386",
+      "code": "458-386",
+      "name": "Beige d'epoque · 458-386",
+      "hex": "#DDC6A5"
+    },
+    {
+      "id": "adseal-458-565",
+      "code": "458-565",
+      "name": "Soie bleue · 458-565",
+      "hex": "#919FA7"
+    },
+    {
+      "id": "adseal-458-360",
+      "code": "458-360",
+      "name": "Sable du desert · 458-360",
+      "hex": "#C3B8A6"
+    },
+    {
+      "id": "adseal-458-311",
+      "code": "458-311",
+      "name": "Toile bise · 458-311",
+      "hex": "#908063"
+    },
+    {
+      "id": "adseal-458-157",
+      "code": "458-157",
+      "name": "Pumpkin bar · 458-157",
+      "hex": "#A55534"
+    },
+    {
+      "id": "adseal-458-455",
+      "code": "458-455",
+      "name": "Vert lime pc · 458-455",
+      "hex": "#95B24F"
+    },
+    {
+      "id": "adseal-458-154",
+      "code": "458-154",
+      "name": "Catnip · 458-154",
+      "hex": "#678F81"
+    },
+    {
+      "id": "adseal-458-117",
+      "code": "458-117",
+      "name": "Rawhide · 458-117",
+      "hex": "#BC9B7D"
+    },
+    {
+      "id": "adseal-458-626",
+      "code": "458-626",
+      "name": "Bronze leger · 458-626",
+      "hex": "#63503A"
+    },
+    {
+      "id": "adseal-458-514",
+      "code": "458-514",
+      "name": "Brouillard persistant · 458-514",
+      "hex": "#969C8E"
+    },
+    {
+      "id": "adseal-458-344",
+      "code": "458-344",
+      "name": "Onyx dk · 458-344",
+      "hex": "#3D3F41"
+    },
+    {
+      "id": "adseal-458-439",
+      "code": "458-439",
+      "name": "Skyline · 458-439",
+      "hex": "#7F908B"
+    },
+    {
+      "id": "adseal-458-169",
+      "code": "458-169",
+      "name": "Dalle grise · 458-169",
+      "hex": "#777C7F"
+    },
+    {
+      "id": "adseal-458-185",
+      "code": "458-185",
+      "name": "Bleu mer · 458-185",
+      "hex": "#70A0B2"
+    },
+    {
+      "id": "adseal-458-412",
+      "code": "458-412",
+      "name": "Lueur bleu · 458-412",
+      "hex": "#006771"
+    },
+    {
+      "id": "adseal-458-323",
+      "code": "458-323",
+      "name": "Bourgogne id 8011 · 458-323",
+      "hex": "#5A4244"
+    },
+    {
+      "id": "adseal-458-551",
+      "code": "458-551",
+      "name": "Cedre blanc · 458-551",
+      "hex": "#DED8CE"
+    },
+    {
+      "id": "adseal-458-518",
+      "code": "458-518",
+      "name": "Gris whataburger · 458-518",
+      "hex": "#7E7D7A"
+    },
+    {
+      "id": "adseal-458-472",
+      "code": "458-472",
+      "name": "Bleu signalisation · 458-472",
+      "hex": "#29607E"
+    },
+    {
+      "id": "adseal-458-316",
+      "code": "458-316",
+      "name": "Brouillard de montagne · 458-316",
+      "hex": "#B7B3AB"
+    },
+    {
+      "id": "adseal-458-904",
+      "code": "458-904",
+      "name": "Rouge ecarlate · 458-904",
+      "hex": "#881A13"
+    },
+    {
+      "id": "adseal-458-385",
+      "code": "458-385",
+      "name": "Espace profond · 458-385",
+      "hex": "#595D60"
+    },
+    {
+      "id": "adseal-458-522",
+      "code": "458-522",
+      "name": "Grain de bois chaud · 458-522",
+      "hex": "#B5967A"
+    },
+    {
+      "id": "adseal-458-562",
+      "code": "458-562",
+      "name": "Lagune / laguna · 458-562",
+      "hex": "#323F53"
+    },
+    {
+      "id": "adseal-458-446",
+      "code": "458-446",
+      "name": "Quattro · 458-446",
+      "hex": "#4F6888"
+    },
+    {
+      "id": "adseal-458-240",
+      "code": "458-240",
+      "name": "Patine parisienne · 458-240",
+      "hex": "#7C866C"
+    },
+    {
+      "id": "adseal-458-321",
+      "code": "458-321",
+      "name": "Naval · 458-321",
+      "hex": "#3B4855"
+    },
+    {
+      "id": "adseal-458-339",
+      "code": "458-339",
+      "name": "Chataigne dk · 458-339",
+      "hex": "#755240"
+    },
+    {
+      "id": "adseal-458-368",
+      "code": "458-368",
+      "name": "Acier satine pella · 458-368",
+      "hex": "#4F5457"
+    },
+    {
+      "id": "adseal-458-342",
+      "code": "458-342",
+      "name": "Minuit dk · 458-342",
+      "hex": "#3B4955"
+    },
+    {
+      "id": "adseal-458-450",
+      "code": "458-450",
+      "name": "Gris 204 · 458-450",
+      "hex": "#87817A"
+    },
+    {
+      "id": "adseal-458-297",
+      "code": "458-297",
+      "name": "Acajou · 458-297",
+      "hex": "#6A5958"
+    },
+    {
+      "id": "adseal-458-527",
+      "code": "458-527",
+      "name": "Bleu ardoise 8260 · 458-527",
+      "hex": "#5B797F"
+    },
+    {
+      "id": "adseal-458-391",
+      "code": "458-391",
+      "name": "Rouge fallingwater · 458-391",
+      "hex": "#824F4B"
+    },
+    {
+      "id": "adseal-458-498",
+      "code": "458-498",
+      "name": "Promenade · 458-498",
+      "hex": "#809A8E"
+    },
+    {
+      "id": "adseal-458-480",
+      "code": "458-480",
+      "name": "Chene noueu · 458-480",
+      "hex": "#B38E65"
+    }
+  ],
+  "gaps": [
+    "Le nuancier numérique est indicatif. Faites valider la teinte sur un échantillon.",
+    "Les teintes sans format publié sont sur demande. Prix, disponibilité et minimums à confirmer avec MIR."
+  ]
+}

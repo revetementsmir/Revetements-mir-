@@ -1,0 +1,50 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const base='https://hxtztkmbfpmzrieccwsg.supabase.co',production='gccltmaulvrnthrbnrpd.supabase.co';
+if(new URL(base).hostname===production||!base.includes('hxtztkmbfpmzrieccwsg'))throw Error('Cible MIR TEST invalide');
+const key=process.env.MIR_SANDBOX_PUBLISHABLE_KEY,org=process.env.MIR_SANDBOX_ORG_ID;
+const roles={admin:'ADMIN',boss:'BOSS',chef:'CHEF',employee:'EMPLOYEE',adjointe:'ASSISTANT',entrepot:'WAREHOUSE'};
+const report={target:'hxtztkmbfpmzrieccwsg',roles:{},ux:{checks:[],supplierSent:false,emailSent:false},productionRequests:0,at:new Date().toISOString()};
+async function call(url,options={}){if(new URL(url).hostname===production){report.productionRequests++;throw Error('Production interdite');}return fetch(url,options);}
+async function login(keyName){const prefix='MIR_SANDBOX_'+keyName,email=process.env[prefix+'_EMAIL'],password=process.env[prefix+'_PASSWORD'];if(!email||!password)throw Error('Secret manquant: '+prefix+'_EMAIL ou '+prefix+'_PASSWORD');const r=await call(base+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:key,'content-type':'application/json'},body:JSON.stringify({email,password})});assert.equal(r.status,200,'Auth '+keyName);return (await r.json()).access_token;}
+async function rpc(token,name,body={}){return call(base+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:key,authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify(body)});}
+async function rpcJson(token,name,body={},status=200){const r=await rpc(token,name,body);assert.equal(r.status,status,name+' HTTP '+r.status);return status===204?null:r.json();}
+const check=name=>report.ux.checks.push(name);
+(async()=>{assert(key&&org,'Secrets publics MIR TEST absents');const tokens={};for(const [label,keyName] of Object.entries(roles)){const token=tokens[label]=await login(keyName),r=await rpc(token,'mir_coordination_memberships');assert.equal(r.status,200,'Périmètre '+label);const memberships=await r.json(),row=memberships.find(x=>x.id===org);report.roles[label]={authenticated:true,coordination:!!(row?.assistant||row?.admin),warehouse:!!row?.warehouse};if(['admin','boss','adjointe'].includes(label))assert(report.roles[label].coordination,label+' doit traiter les commandes');if(label==='entrepot')assert(report.roles[label].warehouse,'Entrepôt doit voir sa file');if(['chef','employee'].includes(label))assert(!report.roles[label].coordination&&!report.roles[label].warehouse,label+' ne doit pas être élevé');if(label==='employee'){const denied=await rpc(token,'mir_order_decide',{org,coord_id:crypto.randomUUID(),next_status:'approved',reason:'',request_id:crypto.randomUUID()});assert.equal(denied.status,403,'Employé doit être refusé');report.roles[label].decisionDenied=true;}}
+ const initial=await rpcJson(tokens.employee,'mir_portal_snapshot'),catalogue=initial.catalogue||[],jobs=initial.jobs||[];
+ const folds=catalogue.filter(item=>item.customBending===true||(Array.isArray(item.measureFields)&&item.measureFields.length>0)),materials=catalogue.filter(item=>!folds.some(fold=>fold.id===item.id));
+ assert(materials.length>=2,'Fixture MIR TEST insuffisant: '+materials.length+' article(s) matériel visible(s), 2 requis');
+ assert(folds.length>=1,'Fixture MIR TEST insuffisant: '+folds.length+' pliage mesurable visible, 1 requis');
+ assert(jobs.length>=1,'Fixture MIR TEST insuffisant: '+jobs.length+' chantier visible pour le compte Employé, 1 requis');
+ const material=materials[0],fold=folds[0],job=jobs[0],tag='RECETTE-UX-P23-'+Date.now();
+ const lines=[
+  {itemId:material.id,quantity:2,colorId:material.colors?.[0]?.id||undefined},
+  {itemId:materials[1].id,quantity:3,formatId:materials[1].formats?.[0]?.id||undefined},
+  {itemId:fold.id,quantity:4,colorId:fold.colors?.[0]?.id||undefined,dimensionsIn:{A:6},specification:{}},
+  {itemId:'sur-mesure-'+tag,quantity:5,dimensionsIn:{A:4,B:8},specification:{kind:'fold',templateSnapshot:{schema:'mir-production-template-1',version:1},instanceSnapshot:{schema:'mir-production-instance-1',templateId:'sur-mesure-'+tag,values:{measurements:{A:4,B:8},length:120,repere:tag}}}}
+ ];
+ const payload={jobId:job.id,lines,note:tag,deliveryMode:'delivery'},saveId=crypto.randomUUID(),submitId=crypto.randomUUID();
+ const draft=await rpcJson(tokens.employee,'mir_order_draft_save',{org,request_id:saveId,order_id:null,data:payload});assert.equal(draft.status,'draft');assert.equal(draft.lineCount,4);check('brouillon_4_lignes');
+ const draftReplay=await rpcJson(tokens.employee,'mir_order_draft_save',{org,request_id:saveId,order_id:null,data:payload});assert.equal(draftReplay.orderId,draft.orderId);assert.equal(draftReplay.idempotent,true);check('brouillon_idempotent');
+ const submitted=await rpcJson(tokens.employee,'mir_order_submit',{org,request_id:submitId,order_id:draft.orderId});assert.equal(submitted.status,'submitted');assert(submitted.receiptId);assert.equal(submitted.supplierSent,false);assert.equal(submitted.emailSent,false);check('soumission_recue_sans_envoi');
+ const replay=await rpcJson(tokens.employee,'mir_order_submit',{org,request_id:submitId,order_id:draft.orderId});assert.equal(replay.orderId,draft.orderId);assert.equal(replay.idempotent,true);check('soumission_unique');
+ const employeeFavoritesBefore=await rpcJson(tokens.employee,'mir_order_shortcut_snapshot',{org}),chefFavoritesBefore=await rpcJson(tokens.chef,'mir_order_shortcut_snapshot',{org});
+ await rpcJson(tokens.employee,'mir_order_shortcut_update',{org,request_id:crypto.randomUUID(),kind:'material',item_id:material.id,favorite:false,requested_position:null});
+ const materialAdd=await rpcJson(tokens.employee,'mir_order_shortcut_update',{org,request_id:crypto.randomUUID(),kind:'material',item_id:material.id,favorite:true,requested_position:null});assert(materialAdd.items.includes(material.id));
+ const chefFavoritesAfter=await rpcJson(tokens.chef,'mir_order_shortcut_snapshot',{org});assert.deepEqual(chefFavoritesAfter,chefFavoritesBefore);check('favori_materiel_isole');
+ const materialRemove=await rpcJson(tokens.employee,'mir_order_shortcut_update',{org,request_id:crypto.randomUUID(),kind:'material',item_id:material.id,favorite:false,requested_position:null});assert(!materialRemove.items.includes(material.id));check('favori_materiel_retire');
+ if(employeeFavoritesBefore.material.includes(material.id))await rpcJson(tokens.employee,'mir_order_shortcut_update',{org,request_id:crypto.randomUUID(),kind:'material',item_id:material.id,favorite:true,requested_position:null});
+ await rpcJson(tokens.employee,'mir_order_shortcut_update',{org,request_id:crypto.randomUUID(),kind:'fold',item_id:fold.id,favorite:false,requested_position:null});
+ const foldAdd=await rpcJson(tokens.employee,'mir_order_shortcut_update',{org,request_id:crypto.randomUUID(),kind:'fold',item_id:fold.id,favorite:true,requested_position:null});assert(foldAdd.items.includes(fold.id));
+ const foldRemove=await rpcJson(tokens.employee,'mir_order_shortcut_update',{org,request_id:crypto.randomUUID(),kind:'fold',item_id:fold.id,favorite:false,requested_position:null});assert(!foldRemove.items.includes(fold.id));check('favori_pliage_ajoute_retire');
+ if(employeeFavoritesBefore.fold.includes(fold.id))await rpcJson(tokens.employee,'mir_order_shortcut_update',{org,request_id:crypto.randomUUID(),kind:'fold',item_id:fold.id,favorite:true,requested_position:null});
+ const pendingRef='Je ne connais pas le numéro · '+tag,pendingPayload={...payload,jobId:undefined,jobReference:pendingRef,note:tag+' PENDING'},pendingId=crypto.randomUUID();
+ const pending=await rpcJson(tokens.employee,'mir_order_create_submit',{org,request_id:pendingId,data:pendingPayload});assert.equal(pending.jobMatchStatus,'to_confirm');assert.equal(pending.originalJobReference,pendingRef);check('chantier_a_confirmer_persiste');
+ const pendingRows=await rpcJson(tokens.adjointe,'mir_order_pending_jobs',{org});assert(pendingRows.some(row=>row.orderId===pending.orderId&&row.originalReference===pendingRef));
+ const linked=await rpcJson(tokens.adjointe,'mir_order_link_job',{org,request_id:crypto.randomUUID(),order_id:pending.orderId,job_id:job.id,reason:'Rattachement recette vérifié'});assert.equal(linked.originalJobReference,pendingRef);check('rattachement_adjointe_historise');
+ const finalSnapshot=await rpcJson(tokens.employee,'mir_portal_snapshot');assert.equal((finalSnapshot.jobs||[]).length,jobs.length,'Aucun chantier officiel ne doit être créé');const saved=finalSnapshot.orders.find(order=>order.id===draft.orderId);assert(saved&&saved.lines.length===4);check('etat_serveur_relu');
+ const foreignOrg=crypto.randomUUID();for(const label of ['employee','chef','adjointe','boss','admin','entrepot']){const denied=await rpc(tokens[label],'mir_order_shortcut_snapshot',{org:foreignOrg});assert.equal(denied.status,403,label+' doit être isolé d’une autre organisation');}check('isolation_organisationnelle_6_roles');
+ for(const label of ['adjointe','boss','admin','entrepot']){const denied=await rpc(tokens[label],'mir_order_create_submit',{org,request_id:crypto.randomUUID(),data:payload});assert.equal(denied.status,403,label+' ne peut pas créer une commande Employé');}check('mutations_roles_fail_closed');
+ assert(employeeFavoritesBefore&&report.ux.checks.length===12);report.ux.orderId=draft.orderId;report.ux.pendingOrderId=pending.orderId;report.ux.receiptId=submitted.receiptId;
+ assert.equal(report.productionRequests,0);fs.mkdirSync(path.resolve('artifacts'),{recursive:true});fs.writeFileSync(path.resolve('artifacts/phase6-real-roles.json'),JSON.stringify(report,null,2),{mode:0o600});console.log('PASS MIR TEST Phase 6: six rôles authentifiés, matrice Coordination/Entrepôt conforme, production 0 requête.');
+})().catch(error=>{report.error=error.message;fs.mkdirSync(path.resolve('artifacts'),{recursive:true});fs.writeFileSync(path.resolve('artifacts/phase6-real-roles.json'),JSON.stringify(report,null,2),{mode:0o600});console.error(error.message);process.exitCode=1;});

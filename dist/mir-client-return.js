@@ -1,0 +1,5 @@
+/* Safe return links only; guest project stores are never cleared here. */
+(()=>{'use strict';const targets={studio:['plan.html','Retour à mon Studio 3D'],panier:['selection.html','Retour à mon panier']};const here=location.pathname.split('/').pop();
+if(here==='plan.html'||here==='selection.html')for(const a of document.querySelectorAll('a[href="chantier.html"]'))a.href='chantier.html?return='+(here==='plan.html'?'studio':'panier');
+if(here==='chantier.html'){const params=new URLSearchParams(location.search),request=params.get('request');const target=params.get('return')==='estimate'&&/^[a-f0-9-]{36}$/i.test(request||'')?['estimation-dossier.html?id='+encodeURIComponent(request)+(params.get('recette')==='1'?'&recette=1':''),'Retour à la demande privée']:targets[params.get('return')];if(target){const a=document.createElement('a');a.className='mir-client-return';a.href=target[0];a.textContent='← '+target[1]+' · données conservées sur cet appareil';a.style.cssText='display:block;padding:16px 5%;background:#edf3e9;color:#203b28;min-height:44px';document.querySelector('header')?.after(a);}}
+})();

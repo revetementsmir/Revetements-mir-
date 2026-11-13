@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "researchedOn": "2026-11-09",
+  "region": "Québec et Charlesbourg, Québec",
+  "currency": "CAD",
+  "taxesIncluded": false,
+  "markupPercent": 15,
+  "method": "Moyenne de prix publics comparables, normalisés au même format et à la même unité, puis majorée de 15 %. Les prix promotionnels, installés, de grade B et les formats non équivalents sont exclus. En l'absence d'au moins deux repères crédibles, le prix demeure sur demande.",
+  "priced": {
+    "hardieplank-select-625": {
+      "unit": "pièce de 12 pi",
+      "marketAverage": 15.715,
+      "amount": 18.07,
+      "sampleCount": 2,
+      "basis": "HardiePlank 6,25 po apprêté ou fini public comparable",
+      "sources": [
+        {"seller": "Patrick Morin", "price": 18.44, "url": "https://patrickmorin.com/fr/revetement-en-fibrociment-6-1-4-po-x-12-pi-jh614gf"},
+        {"seller": "Building Supplies Canada", "price": 12.99, "url": "https://shop.buildingsupplies.ca/departments/hardie-siding-panels-amp-trims-%7C18%7C18F%7C18FF01.html"}
+      ]
+    },
+    "hardieplank-select-825": {
+      "unit": "pièce de 12 pi",
+      "marketAverage": 15.76,
+      "amount": 18.12,
+      "sampleCount": 3,
+      "basis": "HardiePlank 8,25 po public comparable; couleurs spéciales à confirmer",
+      "sources": [
+        {"seller": "Home Depot Canada", "price": 13.35, "url": "https://www.homedepot.ca/product/james-hardie-hardie-plank-8-25-inch-x-12-ft-fibre-cement-siding-panel/1000160059"},
+        {"seller": "RONA", "price": 14.99, "url": "https://www.rona.ca/fr/produit/weyerhaeuser-revetement-en-fibro-ciment-5-16-x-8-1-4-x-12-apprete-824261-64196142"},
+        {"seller": "Matériaux Audet", "price": 18.94, "url": "https://materiauxaudet.ca/categorie/revetement/"}
+      ]
+    },
+    "hardiepanel": {
+      "unit": "panneau",
+      "formatPrices": {
+        "48x96": {"marketAverage": 105.51, "amount": 121.34},
+        "48x120": {"marketAverage": 118.40, "amount": 136.16}
+      },
+      "sampleCount": 3,
+      "basis": "HardiePanel lisse, format identique; moyenne d'annonces publiques et du repère québécois au pi²",
+      "sources": [
+        {"seller": "Matériaux Audet", "url": "https://materiauxaudet.ca/categorie/revetement/"},
+        {"seller": "Building Supplies Canada", "url": "https://shop.buildingsupplies.ca/departments/hardie-siding-panels-amp-trims-%7C18%7C18F%7C18FF01.html"},
+        {"seller": "Bâtir à Rabais", "url": "https://www.batirarabais.ca/prix/revetement-exterieur-quebec"}
+      ]
+    },
+    "hardiepanel-cedarmill": {
+      "unit": "panneau",
+      "formatPrices": {
+        "48x96": {"marketAverage": 90.575, "amount": 104.16},
+        "48x120": {"marketAverage": 115.60, "amount": 132.94}
+      },
+      "sampleCount": 2,
+      "basis": "HardiePanel Cedarmill apprêté et repère québécois fibrociment normalisé au format",
+      "sources": [
+        {"seller": "Building Supplies Canada", "url": "https://shop.buildingsupplies.ca/departments/hardie-siding-panels-amp-trims-%7C18%7C18F%7C18FF01.html"},
+        {"seller": "Bâtir à Rabais", "url": "https://www.batirarabais.ca/prix/revetement-exterieur-quebec"}
+      ]
+    },
+    "hardieshingle-straight": {
+      "unit": "pièce",
+      "marketAverage": 25.54,
+      "amount": 29.37,
+      "sampleCount": 1,
+      "basis": "Prix public exact; repère unique, à revérifier avant commande importante",
+      "sources": [{"seller": "DeckMart", "price": 25.54, "url": "https://www.deckmart.com/collections/vendors?q=jameshardie"}]
+    },
+    "hardieshingle-staggered": {
+      "unit": "pièce",
+      "marketAverage": 21.96,
+      "amount": 25.25,
+      "sampleCount": 1,
+      "basis": "Prix public exact; repère unique, à revérifier avant commande importante",
+      "sources": [{"seller": "DeckMart", "price": 21.96, "url": "https://www.deckmart.com/collections/vendors?q=jameshardie"}]
+    },
+    "canexel-ridgewood-d5": {
+      "unit": "paquet de 4 planches",
+      "marketAverage": 141.48,
+      "amount": 162.70,
+      "sampleCount": 3,
+      "basis": "Ridgewood D-5 grade A; couleurs publiques comparables normalisées au paquet de quatre",
+      "sources": [
+        {"seller": "Matériaux Audet", "url": "https://materiauxaudet.ca/categorie/revetement/"},
+        {"seller": "Gagnon", "url": "https://gagnonlgq.com/collections/revetements-de-fibre-de-bois-1/special_order-false?page=2"},
+        {"seller": "Matério", "url": "https://www.materio.ca/canexel"}
+      ]
+    },
+    "canexel-vstyle": {
+      "unit": "paquet de 4 planches",
+      "marketAverage": 153.975,
+      "amount": 177.07,
+      "sampleCount": 2,
+      "basis": "VStyle grade A; couleurs publiques comparables normalisées au paquet de quatre",
+      "sources": [
+        {"seller": "Gagnon", "url": "https://gagnonlgq.com/collections/revetements-de-fibre-de-bois-1/special_order-false?page=2"},
+        {"seller": "Matério", "url": "https://www.materio.ca/canexel"}
+      ]
+    },
+    "rialux-bosco": {
+      "unit": "pi²",
+      "marketAverage": 4.40,
+      "amount": 5.06,
+      "sampleCount": 2,
+      "basis": "Bosco public et médiane québécoise de revêtement d'aluminium",
+      "sources": [
+        {"seller": "Revêtement Canada", "price": 5.16, "url": "https://revetementcanada.com/"},
+        {"seller": "Bâtir à Rabais", "price": 3.64, "url": "https://www.batirarabais.ca/produit/revetement-en-aluminium"}
+      ]
+    },
+    "rialux-timberland-soffit": {
+      "unit": "pi²",
+      "marketAverage": 7.20,
+      "amount": 8.28,
+      "sampleCount": 2,
+      "basis": "Timberland public et comparaison québécoise du même profil",
+      "sources": [
+        {"seller": "Revêtement Canada", "price": 7.76, "url": "https://revetementcanada.com/"},
+        {"seller": "Soumissions Revêtement", "price": 6.64, "url": "https://www.soumissionsrevetement.ca/revetement-exterieur-aluminium-modeles-prix/"}
+      ]
+    },
+    "rialux-tiago": {
+      "unit": "pi²",
+      "marketAverage": 7.22,
+      "amount": 8.30,
+      "sampleCount": 2,
+      "basis": "Tiago public et comparaison québécoise du même profil",
+      "sources": [
+        {"seller": "Revêtement Canada", "price": 7.76, "url": "https://revetementcanada.com/"},
+        {"seller": "Soumissions Revêtement", "price": 6.67, "url": "https://www.soumissionsrevetement.ca/revetement-exterieur-aluminium-modeles-prix/"}
+      ]
+    },
+    "jdp-akta-306-antique": {
+      "unit": "pi²",
+      "marketAverage": 7.21,
+      "amount": 8.29,
+      "sampleCount": 2,
+      "basis": "Äkta public et repère québécois bois naturel comparable",
+      "sources": [
+        {"seller": "Revêtement Canada", "price": 7.41, "url": "https://revetementcanada.com/"},
+        {"seller": "Entreprises EJA", "price": 7.00, "url": "https://www.constructioneja.com/blog/prix-revetement-exterieur-montreal-2026"}
+      ]
+    },
+    "jdp-bluhouss-307": {
+      "unit": "pi²",
+      "marketAverage": 7.74,
+      "amount": 8.90,
+      "sampleCount": 2,
+      "basis": "Bluhouss public et repère québécois bois naturel comparable",
+      "sources": [
+        {"seller": "Revêtement Canada", "price": 8.47, "url": "https://revetementcanada.com/"},
+        {"seller": "Entreprises EJA", "price": 7.00, "url": "https://www.constructioneja.com/blog/prix-revetement-exterieur-montreal-2026"}
+      ]
+    },
+    "adseal-4580": {
+      "unit": "cartouche de 304 ml",
+      "marketAverage": 9.73,
+      "amount": 11.19,
+      "sampleCount": 4,
+      "basis": "ADSEAL DWS 4580, cartouche 304 ml",
+      "sources": [
+        {"seller": "Matério", "price": 10.99, "url": "https://www.materio.ca/peinture/scellant-et-fusil"},
+        {"seller": "Les idées d'Époxy", "price": 10.99, "url": "https://lesideesdepoxy.com/products/adseal-dws-serie-4580"},
+        {"seller": "Rénovation Vitrerie RF", "price": 7.95, "url": "https://renovationvitrerierf.ca/panier/"},
+        {"seller": "Juneau", "price": 8.99, "url": "https://juneau.ca/products/adseal-dws-4580"}
+      ]
+    },
+    "canexel-touch-up-284ml": {
+      "unit": "contenant de 284 ml",
+      "marketAverage": 32.42,
+      "amount": 37.28,
+      "sampleCount": 3,
+      "basis": "Peinture de retouche CanExel 284 ml",
+      "sources": [
+        {"seller": "Aluminium B. Bouchard", "price": 34.00, "url": "https://boutique.aluminiumbbouchard.ca/produit/peinture-de-retouche-pour-le-canexel-284ml/"},
+        {"seller": "Gagnon", "price": 29.49, "url": "https://gagnonlgq.com/collections/revetements-exterieurs-1/products/peinture-de-retouche-pour-revetements-exterieurs-284-ml-blanc-89900417"},
+        {"seller": "BMR", "price": 33.78, "url": "https://www.bmr.ca/fr/canexel-peinture-de-retouche-pour-le-canexel-acadia-058-8377.html"}
+      ]
+    }
+  },
+  "nonSellable": [
+    "bp-mystique-est-preview",
+    "iko-cambridge-qc-preview",
+    "iko-dynasty-qc-preview",
+    "iko-nordic-qc-preview",
+    "certainteed-landmark-qc-preview",
+    "certainteed-landmark-pro-qc-preview"
+  ],
+  "quoteReason": "Aucun prix public suffisamment comparable ou unité de vente MIR non confirmée. Prix sur demande; aucune moyenne inventée."
+}

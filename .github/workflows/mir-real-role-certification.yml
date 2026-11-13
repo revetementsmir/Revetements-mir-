@@ -1,0 +1,98 @@
+name: MIR real role certification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: mir-real-role-certification-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ui-and-sql-simulated:
+    name: UI simulated and disposable SQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Installer les moteurs de test
+        run: |
+          npm install --prefix tools/database
+          npm install --no-save playwright@1.58.2
+      - name: Contrats SQL jetables et sécurité locale
+        run: |
+          node tests/mir-live-validation.cjs
+          node tests/mir-punch-postgres.cjs
+          node tests/mir-management-postgres.cjs
+          node tests/mir-operational-roles-postgres.cjs
+          node tests/mir-warehouse-sql.cjs
+          node tests/mir-warehouse-vehicles-postgres.cjs
+          node tests/mir-account-session.cjs
+          node tests/mir-role-navigation.cjs
+      - name: UI simulated — rôles et parcours responsive
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: |
+          node tests/mir-punch-browser.cjs
+          node tests/mir-management-browser.cjs
+          node tests/mir-chef-boss-browser.cjs
+          node tests/mir-employee-portal-browser.cjs
+          node tests/mir-warehouse-browser.cjs
+          node tests/mir-warehouse-vehicles-browser.cjs
+      - name: Publier les preuves UI simulées
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-ui-simulated
+          path: |
+            artifacts/MIR-*-dashboard-*.png
+            artifacts/punch/*.png
+            artifacts/punch/*.pdf
+            artifacts/warehouse-*.png
+          if-no-files-found: ignore
+          retention-days: 14
+
+  certify-six-real-roles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MIR_TEST_TARGET: sandbox
+      MIR_SANDBOX_PUBLISHABLE_KEY: ${{ secrets.MIR_SANDBOX_PUBLISHABLE_KEY }}
+      MIR_SANDBOX_ORG_ID: ${{ secrets.MIR_SANDBOX_ORG_ID }}
+      MIR_SANDBOX_ADMIN_EMAIL: ${{ secrets.MIR_SANDBOX_ADMIN_EMAIL }}
+      MIR_SANDBOX_ADMIN_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
+      MIR_SANDBOX_BOSS_EMAIL: ${{ secrets.MIR_SANDBOX_BOSS_EMAIL }}
+      MIR_SANDBOX_BOSS_PASSWORD: ${{ secrets.MIR_SANDBOX_BOSS_PASSWORD }}
+      MIR_SANDBOX_CHEF_EMAIL: ${{ secrets.MIR_SANDBOX_CHEF_EMAIL }}
+      MIR_SANDBOX_CHEF_PASSWORD: ${{ secrets.MIR_SANDBOX_CHEF_PASSWORD }}
+      MIR_SANDBOX_EMPLOYEE_EMAIL: ${{ secrets.MIR_SANDBOX_EMPLOYEE_EMAIL }}
+      MIR_SANDBOX_EMPLOYEE_PASSWORD: ${{ secrets.MIR_SANDBOX_EMPLOYEE_PASSWORD }}
+      MIR_SANDBOX_ASSISTANT_EMAIL: ${{ secrets.MIR_SANDBOX_ASSISTANT_EMAIL }}
+      MIR_SANDBOX_ASSISTANT_PASSWORD: ${{ secrets.MIR_SANDBOX_ASSISTANT_PASSWORD }}
+      MIR_SANDBOX_WAREHOUSE_EMAIL: ${{ secrets.MIR_SANDBOX_WAREHOUSE_EMAIL }}
+      MIR_SANDBOX_WAREHOUSE_PASSWORD: ${{ secrets.MIR_SANDBOX_WAREHOUSE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Valider le contrat de certification
+        run: node --test tests/mir-six-role-certification.cjs
+      - name: Certifier les six comptes MIR TEST
+        run: node tools/validation/certify-six-roles.cjs
+      - name: Publier le rapport même en cas d’échec
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-real-role-certification
+          path: artifacts/real-role-certification.json
+          if-no-files-found: error
+          retention-days: 14

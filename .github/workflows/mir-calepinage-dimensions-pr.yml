@@ -1,0 +1,40 @@
+name: MIR — dimensions architecturales et 2D/3D en direct
+on:
+  push:
+    branches:
+      - moon/mir-calepinage-cotes-panneau-20261107
+  pull_request:
+    branches: [main]
+    paths:
+      - 'dist/calepinage*'
+      - 'dist/mir-panel-dimensions.js'
+      - 'dist/panel-layout-engine.js'
+      - 'dist/architectural-wall-view.js'
+      - 'tests/mir-panel-dimensions.cjs'
+      - 'tests/mir-calepinage-metric-browser.cjs'
+      - '.github/workflows/mir-calepinage-dimensions-pr.yml'
+permissions:
+  contents: read
+jobs:
+  architect-dimensions:
+    name: Mur automatique + tailles po/mm + jumelage 2D/3D
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Geometry, storage and syntax
+        run: |
+          node --check dist/calepinage-app.js
+          node --check dist/mir-panel-dimensions.js
+          node --check tests/mir-panel-dimensions.cjs
+          node --check tests/mir-calepinage-metric-browser.cjs
+          node tests/mir-panel-dimensions.cjs
+      - name: Browser QA on desktop, iPad and phone
+        run: |
+          npm install --no-save playwright@1.58.2
+          node tests/mir-calepinage-metric-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-panel-architect-metric-views
+          path: artifacts/mir-panel-*.png
+          if-no-files-found: ignore

@@ -1,0 +1,140 @@
+{
+  "mode": "real-admin-auth-and-live-rpc",
+  "project": "gccltmaulvrnthrbnrpd",
+  "stockMovements": 0,
+  "physicalCamera": false,
+  "network": "Real HTTPS Python relay with system CA; local PR frontend",
+  "checks": [
+    "real-admin-identity-and-server-warehouse-role",
+    "generated-item-number",
+    "printable-label",
+    "actual-qr-pixel-decoding",
+    "decoded-scan-reopens-same-server-record",
+    "duplicate-registration-keeps-sku-and-qr",
+    "authenticated-reload-qr-link"
+  ],
+  "organizationId": "d5bf3995-d67a-4bdb-938b-b8a1c9b28592",
+  "sku": "MIR-0529CF019C1542DA",
+  "qrUrl": "https://revetementsmirweb.github.io/MIR/entrepot.html?qr=b5b6d5fe-0e7e-4ebf-8281-d0beb673c7f6",
+  "skuId": "8257bcc8-c90f-4d03-88ba-5035a0e7d64e",
+  "status": "PASS",
+  "calls": [
+    {
+      "path": "/auth/v1/token",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_memberships",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_queue",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_memberships",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_register",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_snapshot",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_snapshot",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_snapshot",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_snapshot",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_register",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_snapshot",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_snapshot",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_memberships",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_queue",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/user",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_snapshot",
+      "status": 200
+    },
+    {
+      "path": "/rest/v1/rpc/mir_warehouse_snapshot",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/logout",
+      "status": 204
+    }
+  ],
+  "finishedAt": "2026-11-08T22:33:29.080Z"
+}

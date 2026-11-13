@@ -1,0 +1,46 @@
+{
+  "createdAt": "2026-11-03",
+  "images": [
+    {
+      "file": "prime-reliure-basse-hdg.png",
+      "assetSourceUrl": "https://www.premieroutilspro.com/wp-content/uploads/2025/07/PRIME_Catalogue_Clous_Attaches.pdf",
+      "sourceUrl": "https://www.premieroutilspro.com/wp-content/uploads/2025/07/PRIME_Catalogue_Clous_Attaches.pdf#page=7",
+      "bytes": 162842,
+      "sha256": "39ed58e97affa3832e1d6e159512314a8140ec724f7c91a5940e8e8e8bf30b7c",
+      "credit": "PRIME / Premier Outils Pro — catalogue 2025",
+      "assetKind": "original_embedded_pdf_image",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "prime-reliure-basse-inox.png",
+      "assetSourceUrl": "https://www.premieroutilspro.com/wp-content/uploads/2025/07/PRIME_Catalogue_Clous_Attaches.pdf",
+      "sourceUrl": "https://www.premieroutilspro.com/wp-content/uploads/2025/07/PRIME_Catalogue_Clous_Attaches.pdf#page=8",
+      "bytes": 163149,
+      "sha256": "b28005729e57ec053645ce20c44324bfe916fe8a8e3a2ee6b99260060d67d8f2",
+      "credit": "PRIME / Premier Outils Pro — catalogue 2025",
+      "assetKind": "original_embedded_pdf_image",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "prime-reliure-haute-hdg.png",
+      "assetSourceUrl": "https://www.premieroutilspro.com/wp-content/uploads/2025/07/PRIME_Catalogue_Clous_Attaches.pdf",
+      "sourceUrl": "https://www.premieroutilspro.com/wp-content/uploads/2025/07/PRIME_Catalogue_Clous_Attaches.pdf#page=8",
+      "bytes": 158382,
+      "sha256": "9505bfddcf677a58326d0c2c314b9fec8c9619bd61ae46121d6d61e3bdb17c78",
+      "credit": "PRIME / Premier Outils Pro — catalogue 2025",
+      "assetKind": "original_embedded_pdf_image",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    },
+    {
+      "file": "prime-reliure-basse-brillant.png",
+      "assetSourceUrl": "https://www.premieroutilspro.com/wp-content/uploads/2025/07/PRIME_Catalogue_Clous_Attaches.pdf",
+      "sourceUrl": "https://www.premieroutilspro.com/wp-content/uploads/2025/07/PRIME_Catalogue_Clous_Attaches.pdf#page=7",
+      "bytes": 165333,
+      "sha256": "0f846e38548e9d1e001572f69ca4d2954edcef02fbf485dbd7fda5f4b10e7a45",
+      "credit": "PRIME / Premier Outils Pro — catalogue 2025",
+      "assetKind": "original_embedded_pdf_image",
+      "rightsStatus": "manufacturer_copyright_publication_permission_not_established"
+    }
+  ],
+  "policy": "Images originales du catalogue fabricant; représentation de gamme, pas mesure photographique du SKU."
+}

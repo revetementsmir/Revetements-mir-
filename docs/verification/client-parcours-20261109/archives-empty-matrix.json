@@ -1,0 +1,290 @@
+[
+  {
+    "stage": "before",
+    "page": "studio.html",
+    "width": 360,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "dossier.html",
+    "width": 360,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "boutique.html",
+    "width": 360,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour cette sélection. Essayez un autre fabricant ou retirez un filtre."
+  },
+  {
+    "stage": "before",
+    "page": "studio.html",
+    "width": 390,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "dossier.html",
+    "width": 390,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "boutique.html",
+    "width": 390,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour cette sélection. Essayez un autre fabricant ou retirez un filtre."
+  },
+  {
+    "stage": "before",
+    "page": "studio.html",
+    "width": 760,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "dossier.html",
+    "width": 760,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "boutique.html",
+    "width": 760,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour cette sélection. Essayez un autre fabricant ou retirez un filtre."
+  },
+  {
+    "stage": "before",
+    "page": "studio.html",
+    "width": 761,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "dossier.html",
+    "width": 761,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "boutique.html",
+    "width": 761,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour cette sélection. Essayez un autre fabricant ou retirez un filtre."
+  },
+  {
+    "stage": "before",
+    "page": "studio.html",
+    "width": 834,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "dossier.html",
+    "width": 834,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "boutique.html",
+    "width": 834,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour cette sélection. Essayez un autre fabricant ou retirez un filtre."
+  },
+  {
+    "stage": "before",
+    "page": "studio.html",
+    "width": 1440,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "dossier.html",
+    "width": 1440,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "before",
+    "page": "boutique.html",
+    "width": 1440,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour cette sélection. Essayez un autre fabricant ou retirez un filtre."
+  },
+  {
+    "stage": "after",
+    "page": "studio.html",
+    "width": 360,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "dossier.html",
+    "width": 360,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "boutique.html",
+    "width": 360,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour « zz-aucun-produit ». Aucun filtre actif. Essayez un nom de produit, un fabricant ou un code couleur, par exemple « panneau Hardie » ou « 458-264 »."
+  },
+  {
+    "stage": "after",
+    "page": "studio.html",
+    "width": 390,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "dossier.html",
+    "width": 390,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "boutique.html",
+    "width": 390,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour « zz-aucun-produit ». Aucun filtre actif. Essayez un nom de produit, un fabricant ou un code couleur, par exemple « panneau Hardie » ou « 458-264 »."
+  },
+  {
+    "stage": "after",
+    "page": "studio.html",
+    "width": 760,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "dossier.html",
+    "width": 760,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "boutique.html",
+    "width": 760,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour « zz-aucun-produit ». Aucun filtre actif. Essayez un nom de produit, un fabricant ou un code couleur, par exemple « panneau Hardie » ou « 458-264 »."
+  },
+  {
+    "stage": "after",
+    "page": "studio.html",
+    "width": 761,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "dossier.html",
+    "width": 761,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "boutique.html",
+    "width": 761,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour « zz-aucun-produit ». Aucun filtre actif. Essayez un nom de produit, un fabricant ou un code couleur, par exemple « panneau Hardie » ou « 458-264 »."
+  },
+  {
+    "stage": "after",
+    "page": "studio.html",
+    "width": 834,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "dossier.html",
+    "width": 834,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "boutique.html",
+    "width": 834,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour « zz-aucun-produit ». Aucun filtre actif. Essayez un nom de produit, un fabricant ou un code couleur, par exemple « panneau Hardie » ou « 458-264 »."
+  },
+  {
+    "stage": "after",
+    "page": "studio.html",
+    "width": 1440,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "dossier.html",
+    "width": 1440,
+    "state": "archive",
+    "overflow": false,
+    "empty": null
+  },
+  {
+    "stage": "after",
+    "page": "boutique.html",
+    "width": 1440,
+    "state": "recherche-sans-filtre",
+    "overflow": false,
+    "empty": "Aucun résultat pour « zz-aucun-produit ». Aucun filtre actif. Essayez un nom de produit, un fabricant ou un code couleur, par exemple « panneau Hardie » ou « 458-264 »."
+  }
+]

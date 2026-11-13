@@ -1,0 +1,54 @@
+[
+  {
+    "slug": "realisations-mir-contemporain-brun",
+    "originalFilename": "96084.jpg",
+    "sha256": "951ec75cd712e68e983bcca5b93b08d17d0d9f544d4f2db322c1f76aa9e6db04",
+    "originalBytes": 461597,
+    "resolution": [
+      1536,
+      1152
+    ],
+    "webpLarge": "realisations-mir-contemporain-brun-large.webp",
+    "webpMobile": "realisations-mir-contemporain-brun-mobile.webp"
+  },
+  {
+    "slug": "realisations-mir-contrastes",
+    "originalFilename": "96083.jpg",
+    "sha256": "84e8b991dbf79abd57e94a4ddbcbea1c54b0d0e5f8eccdbda0982f76c8394746",
+    "originalBytes": 480930,
+    "resolution": [
+      1536,
+      1423
+    ],
+    "webpLarge": "realisations-mir-contrastes-large.webp",
+    "webpMobile": "realisations-mir-contrastes-mobile.webp"
+  },
+  {
+    "slug": "realisations-mir-classique",
+    "originalFilename": "96085.jpg",
+    "sha256": "ac67b0a79029260f4a14a71f6bcdf7d4a85db01354eb579c530f86a130a1c708",
+    "originalBytes": 489136,
+    "resolution": [
+      1536,
+      1152
+    ],
+    "webpLarge": "realisations-mir-classique-large.webp",
+    "webpMobile": "realisations-mir-classique-mobile.webp"
+  },
+  {
+    "slug": "realisations-mir-quebec-avec-voiture",
+    "originalFilename": "1f93591b-c239-4f62-85b9-a7c7446d6c21.jpg",
+    "sha256": "3d0dd55d28501aa7f9c3a6eaa37873b3c6603f9fa41e9f3d25c81c6cf16a02d0",
+    "originalBytes": 255895,
+    "resolution": [
+      1461,
+      1076
+    ],
+    "retouched": false,
+    "retouchSummary": "Photographie originale fournie par MIR, voiture noire volontairement conservée. Conversions AVIF sans suppression d'objets.",
+    "avifLarge": "realisations-mir-quebec-avec-voiture-large.avif",
+    "avifMobile": "realisations-mir-quebec-avec-voiture-mobile.avif",
+    "sha256Large": "d644817624956b90bc28e162247e84aa7714c353da29812b351084055c129c8a",
+    "sha256Mobile": "629b11d9299d4f74f6b9a005e844b09bf6df6e07fdadb117e2949fd0236142b3"
+  }
+]

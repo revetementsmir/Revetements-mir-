@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-11-09T16:38:32.220Z",
+  "project": "MIR TEST",
+  "source": "cart",
+  "destination": "MIR-controlled mailbox explicitly approved in conversation",
+  "publicSendEnabled": false,
+  "providerAccepted": true,
+  "mailboxReceiptConfirmed": true,
+  "status": 200,
+  "id": "4cdf3ea9-474a-4f4e-a911-093a1946c036",
+  "requestNumber": "MIR-20261109-4CDF3EA9474A4F4EA911093A1946C036",
+  "pdfBytes": 1039,
+  "pdfSHA256": "843a4ee0f9432f9284389f183495bb0396af42e339ee6423d214c1040bf1e94b",
+  "attachmentCount": 1,
+  "repeatReturnedSameReceipt": true,
+  "originalPrivateDownloadVerified": true,
+  "attachmentOpenedByRecipient": true,
+  "confirmationSource": "MIR user confirmed receipt and opened PDF in conversation"
+}

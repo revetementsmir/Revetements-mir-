@@ -1,0 +1,17 @@
+{
+  "sha": "39ca1033ae1b70ced19cc5c756d4957f84cb2d41",
+  "files": {
+    "dist/portal-client.js": "25684264a9f8e6c5027992ed8c72e04a35ef1a0a5a85659a01f158c7e7c313b9",
+    "dist/chantier-employee.css": "273a6e69b76e223d0e7860132eb1b7bb578cb491170ad475aafd03031fa3350a",
+    "dist/employee-store-model.js": "f2f470453c0a0cdc0317136f4c04978704850c35004e5ee7c15293aa5426def3",
+    "dist/portal-config.js": "f25cb94c5966a98b6a06dc3c7a2aa8b0ab3e07e0b0edc5d1b80739d17f870ee9"
+  },
+  "functions": {
+    "punchCard": "c003f21b62cdc4dd810fa29ebd731ae5cb09895606a8e03d488f7b0806266b69",
+    "renderPunchHours": "1793d78a6bedc76971928ddfa2dd7bb1e09dd10703d64bb348e328827dc3fb6a",
+    "punchCorrectionDialog": "f1e94c0ea7e51072ffa6226470a5cd53e884f67a8bd5258eadf20a4946c35e13",
+    "punchDecisionDialog": "23af02a23da29fdd230980f23583ca5e4e8528775617d5a4911744f8d8024e63",
+    "renderWarehouse": "e36b12bb7ac3a106e7059ad92e652437cf8319b12ecc95c9693b72455d42dd51",
+    "renderManagement": "c7638951b2118bcc910a5e8d32cd840d3b4874116981c9313152b863ed79d987"
+  }
+}

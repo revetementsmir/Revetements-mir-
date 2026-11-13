@@ -1,0 +1,153 @@
+MIR Harmony — résultats navigateur
+Code final : a11ed66446757292c055fd9ca452544316b89b9e
+La CI de la PR #52 consolide les suites sur le HEAD de livraison. Les résultats locaux ci-dessous proviennent des itérations détaillées dans le rapport.
+
+--- direct-browser ---
+START 360 800
+EDIT width
+EDIT height
+EDIT relief
+PASS direct A/B/C, fractions, rejection, independent lips, 2D/3D, client navigation 360x800
+START 390 844
+EDIT width
+EDIT height
+EDIT relief
+PASS direct A/B/C, fractions, rejection, independent lips, 2D/3D, client navigation 390x844
+START 428 926
+EDIT width
+EDIT height
+EDIT relief
+PASS direct A/B/C, fractions, rejection, independent lips, 2D/3D, client navigation 428x926
+START 768 1024
+EDIT width
+EDIT height
+EDIT relief
+PASS direct A/B/C, fractions, rejection, independent lips, 2D/3D, client navigation 768x1024
+START 1024 768
+EDIT width
+EDIT height
+EDIT relief
+PASS direct A/B/C, fractions, rejection, independent lips, 2D/3D, client navigation 1024x768
+START 1440 900
+EDIT width
+EDIT height
+EDIT relief
+PASS direct A/B/C, fractions, rejection, independent lips, 2D/3D, client navigation 1440x900
+START 1920 1080
+EDIT width
+EDIT height
+EDIT relief
+PASS direct A/B/C, fractions, rejection, independent lips, 2D/3D, client navigation 1920x1080
+START 844 390
+EDIT width
+EDIT height
+EDIT relief
+PASS direct A/B/C, fractions, rejection, independent lips, 2D/3D, client navigation 844x390
+PASS shared header production.html
+PASS shared header production.html?view=panels
+PASS shared header production.html?view=orders
+PASS shared header production.html?view=store
+PASS shared header calepinage.html
+PASS shared header boutique.html
+PASS shared header pliage.html
+PASS shared header entrepot.html
+PASS shared header chantier.html
+PASS shared header selection.html
+
+
+--- revisions-browser ---
+PASS PDF réel 11 pages avec lip 2¼ et sans lip, données et quantités conservées
+PASS review click → metric edit → explicit revision → reload; nine unchanged panels; triangle independent lips; keyboard and invalid fraction
+
+
+--- employee-pr51 ---
+320 px: portail fermé, chantier, dossier, recherche, panier, retour, envoi simulé et suivi OK
+360 px: portail fermé, chantier, dossier, recherche, panier, retour, envoi simulé et suivi OK
+390 px: portail fermé, chantier, dossier, recherche, panier, retour, envoi simulé et suivi OK
+820 px: portail fermé, chantier, dossier, recherche, panier, retour, envoi simulé et suivi OK
+1024 px: portail fermé, chantier, dossier, recherche, panier, retour, envoi simulé et suivi OK
+1440 px: portail fermé, chantier, dossier, recherche, panier, retour, envoi simulé et suivi OK
+
+
+--- atelier-v4 ---
+PASS bureau 1440x900, no overflow, profile and panel, zoom 2D
+PASS tablette-paysage 1024x768, no overflow, profile and panel, zoom 2D
+PASS tablette-portrait 820x1180, no overflow, profile and panel, zoom 2D
+PASS mobile 390x844, no overflow, profile and panel, zoom 2D
+PASS mobile-compact 360x780, no overflow, profile and panel, zoom 2D
+PASS mobile-landscape 844x390, no overflow, profile and panel, zoom 2D
+PASS save draft without PO and open local dossier
+PASS ancien dossier 8 pi : lecture, révision et historique préservés
+PASS client unaffected
+
+
+--- admin-guided ---
+PASS bureau : SVG seul, Continuer sans trait, deux interrupteurs, PC/iPad et commandes protégés
+PASS tablette : SVG seul, Continuer sans trait, deux interrupteurs, PC/iPad et commandes protégés
+PASS tablette-portrait : SVG seul, Continuer sans trait, deux interrupteurs, PC/iPad et commandes protégés
+PASS mobile : SVG seul, Continuer sans trait, deux interrupteurs, PC/iPad et commandes protégés
+PASS mobile-paysage : SVG seul, Continuer sans trait, deux interrupteurs, PC/iPad et commandes protégés
+
+
+--- pliage-audit ---
+PASS bureau : 4 onglets, prix, catalogue, retrait, fournisseurs, largeur
+PASS mobile : 4 onglets, prix, catalogue, retrait, fournisseurs, largeur
+PASS mobile-compact : 4 onglets, prix, catalogue, retrait, fournisseurs, largeur
+
+
+--- purchase-orders ---
+PASS 1440: ajout direct, autosauvegarde, PDF réel et original, révision, recherche, envoi désactivé
+PASS 1024: ajout direct, autosauvegarde, PDF réel et original, révision, recherche, envoi désactivé
+PASS 390: ajout direct, autosauvegarde, PDF réel et original, révision, recherche, envoi désactivé
+
+
+--- public-menu ---
+PASS menu responsive après changement de largeur
+MIR navigation publique : 42/42 parcours Chrome réussis
+
+
+--- client-flow ---
+PASS Menu MIR client 360 px
+PASS Menu MIR client 390 px
+PASS Menu MIR client 820 px
+PASS Menu MIR client 1440 px
+PASS Menu MIR client 2560 px
+PASS Menu MIR client 3440 px
+PASS Admin isolé du menu public
+PASS Dessin → dossier → soumission → JSON réel → PDF réel → reprise 1440 px (335146 octets)
+PASS Dessin → dossier → soumission → JSON réel → PDF réel → reprise 390 px (335146 octets)
+
+
+--- one-sheet ---
+PASS PDF réel one panel/one sheet 4003550 bytes, 11 pages
+PASS pc : dix cartes, dix lignes, zéro doublon et source intacte
+PASS ipad : dix cartes, dix lignes, zéro doublon et source intacte
+PASS telephone : dix cartes, dix lignes, zéro doublon et source intacte
+
+
+--- single-panel ---
+PASS MIR standalone panel desktop : 6/12 slope, no-lip side, freehand, dual synced 2D/3D
+PASS MIR standalone panel ipad : 6/12 slope, no-lip side, freehand, dual synced 2D/3D
+PASS MIR standalone panel phone : 6/12 slope, no-lip side, freehand, dual synced 2D/3D
+
+
+--- reset ---
+PASS bureau: reset, export JSON, historique préservé, retour à une liste vide
+PASS mobile: reset, export JSON, historique préservé, retour à une liste vide
+PASS compact: reset, export JSON, historique préservé, retour à une liste vide
+
+
+Dernière recette des verrous et métadonnées :
+PASS PDF réel 11 pages avec lip 2¼ et sans lip, données et quantités conservées
+PASS review click → metric edit → explicit revision → reload; nine unchanged panels; triangle independent lips; keyboard and invalid fraction
+PASS locked template width and lips remain unchanged through direct editor
+
+Recette finale des contrôles verrouillés :
+PASS PDF réel 11 pages avec lip 2¼ et sans lip, données et quantités conservées
+PASS review click → metric edit → explicit revision → reload; nine unchanged panels; triangle independent lips; keyboard and invalid fraction
+PASS locked template width and lips remain unchanged through direct editor
+
+Dernière recette : verrous et séparation des dossiers employé/client
+PASS PDF réel 11 pages avec lip 2¼ et sans lip, données et quantités conservées
+PASS review click → metric edit → explicit revision → reload; nine unchanged panels; triangle independent lips; keyboard and invalid fraction
+PASS locked template width and lips remain unchanged through direct editor

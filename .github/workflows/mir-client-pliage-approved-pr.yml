@@ -1,0 +1,50 @@
+name: MIR — Pliage client approuvé
+on:
+  pull_request:
+    branches: [main]
+    paths: ['dist/pliage*','dist/production*','dist/mir-production-signature.css','dist/mir-client-pliage.css','tests/mir-client-pliage-approved-browser.cjs','tests/mir-production-client-flow-browser.cjs','tests/mir-production-signature-browser.cjs','tests/mir-unified-dossier-browser.cjs','.github/workflows/mir-client-pliage-approved-pr.yml']
+permissions:
+  contents: read
+jobs:
+  client-pliage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: npm install --no-save playwright@1.58.2
+      - name: Conserver le main de référence pour les captures
+        env:
+          MIR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          mkdir -p /tmp/mir-client-baseline
+          git archive "$MIR_BASE_SHA" dist | tar -x -C /tmp/mir-client-baseline
+      - name: Contrats et moteur préservés
+        run: |
+          node --check dist/production-app.js
+          node tests/mir-pages-regressions.cjs
+          node tests/mir-bending-lengths.cjs
+          node tests/mir-client-signature.cjs
+          node tests/mir-homepage.cjs
+          node tests/mir-atelier-v4.cjs
+      - name: Parcours natifs, responsive et accueil avant/après
+        env:
+          MIR_CLIENT_BASELINE_DIR: /tmp/mir-client-baseline/dist
+          MIR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          export MIR_CHROMIUM_BIN=$(command -v google-chrome || command -v chromium)
+          # L’accueil a sa propre recette quand une PR change son contenu.
+          # Les changements indirects causés par des styles partagés restent comparés.
+          if ! git diff --quiet "$MIR_BASE_SHA" HEAD -- dist/index.html; then
+            unset MIR_CLIENT_BASELINE_DIR
+          fi
+          node tests/mir-client-pliage-approved-browser.cjs
+          node tests/mir-production-signature-browser.cjs
+          node tests/mir-production-client-flow-browser.cjs
+          node tests/mir-unified-dossier-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: MIR-pliage-client-approved
+          path: docs/verification/client-pliage/

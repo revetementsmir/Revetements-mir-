@@ -1,0 +1,15 @@
+{
+  "baseline": "e11108a980cefe8dff7e8509b79b4b414afe580b",
+  "studio": {
+    "open": false,
+    "errors": [
+      "Cannot read properties of undefined (reading 'length')"
+    ]
+  },
+  "search": {
+    "vis Kaycan": 0,
+    "vis HardiePanel": 2,
+    "HardiePanel vis": 0,
+    "458-264": 1
+  }
+}

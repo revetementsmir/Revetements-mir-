@@ -1,0 +1,123 @@
+<!doctype html>
+<html data-mir-workspace-shell data-mir-harmony lang="fr-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#2f4937">
+  <title>Calepinage des panneaux — L’atelier MIR</title>
+  <script src="mir-settings.js?v=phase8-1"></script>
+  <link rel="stylesheet" href="mir-settings.css?v=phase8-1">
+  <link rel="stylesheet" href="calepinage.css">
+  <link rel="stylesheet" href="mir-panel-po-journey.css?v=1">
+  <script src="production-model.js?v=1-rendu-20261109" defer></script>
+  <script src="production-volume.js" defer></script>
+  <script src="unico-data.js" defer></script>
+  <script src="plan-import-core.js" defer></script>
+  <script src="vendor/polygon-clipping/polygon-clipping.umd.min.js" defer></script>
+  <script src="architectural-wall-geometry.js" defer></script>
+  <script src="architectural-wall-input.js" defer></script>
+  <script src="panel-layout-engine.js" defer></script>
+  <script src="mir-panel-dimensions.js?v=1" defer></script>
+  <script src="architectural-wall-view.js" defer></script>
+  <script src="panel-layout-pdf.js" defer></script>
+  <script src="panel-layout-output.js" defer></script>
+  <script src="annotated-pdf.js?v=1-rendu-20261109" defer></script>
+  <script src="calepinage-app.js?v=cotes-plan-1" defer></script>
+<link rel="stylesheet" href="mir-harmony.css?v=2-workspace-20261108"><script defer src="mir-harmony.js?v=2-workspace-20261108"></script><link rel="stylesheet" href="mir-workspace.css?v=cotes-plan-1"><script defer src="mir-workspace.js?v=cotes-plan-1"></script></head>
+<body>
+  <a class="skip" href="#main">Aller au calculateur</a>
+  <header class="site-header"><a class="brand" href="index.html" aria-label="Les Revêtements MIR, accueil"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="364" height="91"></a><nav aria-label="Navigation atelier"><a href="metres.html">Métrés</a><a href="production.html">Pliage & production ↗</a><a href="plan.html">Studio</a></nav><span class="local-label"><i></i> Atelier · sur cet appareil</span></header>
+  <main id="main">
+    <section class="intro"><div><p class="eyebrow">L’ATELIER MIR / PANNEAUX ARCHITECTURAUX</p><h1>Dessine ton mur.<br><em>MIR calcule tes panneaux.</em></h1></div><div class="intro-side"><p>Dessine la forme du mur, écris ses vraies dimensions, puis indique combien de panneaux tu veux. MIR calcule les pièces et te guide jusqu’au bon de commande.</p><button id="load-gable-example" class="text-button">Essayer un mur en pointe <span>↗</span></button><button id="load-example" class="text-button">Exemple rectangulaire 108½ × 83¾ po <span>↗</span></button></div></section>
+    <nav class="mir-panel-journey" aria-label="Parcours facile du mur au bon de commande">
+      <a href="#mur-setup"><strong>1</strong><span><b>Dessiner le mur</b><small>Forme, largeur, hauteur</small></span></a>
+      <a href="#panneaux-setup"><strong>2</strong><span><b>Répartir les panneaux</b><small>Par exemple 5 × 2 = 10</small></span></a>
+      <a href="#fabrication-title"><strong>3</strong><span><b>Créer le bon</b><small>Toutes les pièces ensemble</small></span></a>
+    </nav>
+    <div class="project-bar"><label class="zone-choice">ZONE DE TRAVAIL<select id="zone-select" aria-label="Zone de travail"></select></label><button id="new-zone" class="secondary">＋ Mur vide</button><button id="new-traced-section" class="primary" type="button" disabled title="Créer une section de mur et dessiner son contour directement">＋ Dessiner un mur</button><button id="undo" class="quiet" disabled>↶ Annuler</button><span id="save-state" role="status">Dossier local</span></div>
+    <div class="workspace">
+      <aside id="mur-setup" class="settings card" aria-label="Dimensions et répartition">
+        <div class="card-title"><span class="step">01</span><h2>Votre zone</h2></div>
+        <label>Nom de la zone<input id="zone-name" maxlength="100" placeholder="Ex. Entre fenêtres F1 et F2"></label>
+        <div class="source-buttons"><button id="import-pdf" class="secondary">Importer un PDF ↗</button><button id="blank-source" class="quiet" hidden>Retirer le fond PDF</button></div>
+        <input type="file" id="pdf-file" accept="application/pdf,.pdf" hidden>
+        <p id="source-name" class="hint">Dessinez une zone ou entrez ses dimensions.</p>
+        <div id="pdf-options" hidden>
+          <label>Page du plan<select id="pdf-page"></select></label>
+          <label>Cote repérée au plan<select id="pdf-cote"><option value="">Aucune cote repérée</option></select></label>
+          <p id="scale-status" class="hint"></p>
+          <details><summary>Indiquer une cote entre deux points</summary><label>Distance exacte (po)<input id="reference-value" placeholder="Ex. 108 1/2" inputmode="decimal"></label><button id="calibrate" class="secondary">Placer les 2 points</button><p class="hint">Sélectionnez les extrémités de cette cote sur le PDF.</p></details>
+          <button id="measure-scale" class="text-button" disabled>Relever la zone à cette échelle ↗</button>
+        </div>
+        <div class="label-line"><h3>Mesures fixes du chantier</h3><span>Pouces · fractions acceptées, ex. ⅜ ou 3/8</span></div>
+        <div class="fields two"><label>Largeur totale chantier<input id="zone-width" inputmode="decimal" placeholder="120"></label><label>Hauteur totale chantier<input id="zone-height" inputmode="decimal" placeholder="96"></label></div>
+        <p id="dimension-source" class="hint">Les cotes exactes saisies commandent les calculs.</p>
+        <div class="allowance-box"><h3>Lousse total à déduire</h3><div class="fields two"><label>Sur la largeur (po)<input id="total-gap-width" list="gap-presets" inputmode="decimal" value="0" placeholder="3/8"></label><label>Sur la hauteur (po)<input id="total-gap-height" list="gap-presets" inputmode="decimal" value="0" placeholder="1/4"></label></div><p class="hint">Déduit une seule fois du total. Par défaut : une moitié à chaque extrémité.</p><div id="net-dimensions" class="net-dimensions" role="status">Entrez vos mesures chantier.</div></div>
+        <datalist id="gap-presets"><option value="0">Aucun lousse</option><option value="1/8">⅛ po</option><option value="1/4">¼ po</option><option value="3/8">⅜ po</option><option value="1/2">½ po</option><option value="3/4">¾ po</option><option value="1">1 po</option></datalist><details class="clearances"><summary>Répartir le lousse autrement</summary><p class="hint">Ces valeurs composent le total; elles ne s’y ajoutent pas.</p><div class="fields two"><label>Gauche (po)<input id="clear-left" inputmode="decimal" value="0"></label><label>Droite (po)<input id="clear-right" inputmode="decimal" value="0"></label><label>Haut (po)<input id="clear-top" inputmode="decimal" value="0"></label><label>Bas (po)<input id="clear-bottom" inputmode="decimal" value="0"></label></div></details>
+        <label>Forme du mur<select id="wall-shape"><option value="rectangle">Rectangle</option><option value="gable">Mur avec pointe</option><option value="slope">Haut en pente</option><option value="free">Forme libre — point par point</option></select></label>
+        <div id="wall-preset-fields" hidden><div class="fields two"><label>Hauteur à gauche (po)<input id="wall-left-height" inputmode="decimal"></label><label>Hauteur à droite (po)<input id="wall-right-height" inputmode="decimal"></label></div><label id="wall-peak-field">Pointe depuis la gauche (po)<input id="wall-peak-x" inputmode="decimal"></label><button id="center-peak" class="text-button">Centrer la pointe</button></div>
+        <details id="roof-pitch-fields">
+          <summary>Calculer un pignon à partir d’une pente X/12</summary>
+          <p class="hint">Entrez la largeur totale du mur ci-dessus. Le calcul utilise la même hauteur d’égout des deux côtés. Entrez une seule pente pour une pointe centrée, ou deux pentes pour une pointe décentrée.</p>
+          <div class="fields two">
+            <label>Hauteur d’égout (po)<input id="roof-eave-height" inputmode="decimal" placeholder="Ex. 96"></label>
+            <label>Pente gauche (X/12)<input id="roof-pitch" inputmode="decimal" placeholder="Ex. 6 ou 6/12"></label>
+          </div>
+          <label>Pente droite (X/12, facultative)<input id="roof-right-pitch" inputmode="decimal" placeholder="Même pente à droite"></label>
+          <button id="apply-roof-pitch" class="secondary full">Calculer la hauteur de pointe</button>
+          <p id="roof-pitch-result" class="hint" role="status"></p>
+        </details>
+        <div id="wall-free-fields" hidden><button id="start-free-outline" class="secondary full">Tracer le contour directement</button><p class="hint">Cliquez pour placer les points, ou glissez depuis le dernier point comme une moulure. Maj (Shift) = angle droit. Fermez la section, puis saisissez les mesures exactes; aucune cote n’est inventée. Le tracé s’adapte aux dimensions chantier.</p></div>
+        <details id="wall-coordinate-details"><summary>Cotes exactes des sommets</summary><p class="hint">X depuis la gauche. Hauteur depuis le bas. Appliquer une cote passe en forme libre et conserve les sommets saisis.</p><label>Sommet<select id="wall-vertex"></select></label><div class="fields two"><label>X depuis la gauche<input id="vertex-x" inputmode="decimal"></label><label>Hauteur depuis le bas<input id="vertex-height" inputmode="decimal"></label></div><button id="apply-vertex" class="secondary full">Fixer ces cotes</button><div id="wall-coordinate-list" class="coordinate-list"></div></details><details id="wall-edge-details" hidden><summary>Modifier une longueur et un angle</summary>
+          <p id="wall-edge-name" class="hint" role="status">Sélectionnez un côté sur le dessin.</p>
+          <div class="fields two"><label>Longueur du côté (po)<input id="wall-edge-length" inputmode="decimal" placeholder="Ex. 32 1/2"></label>
+          <label>Angle intérieur au départ (°)<input id="wall-edge-angle" inputmode="decimal" placeholder="Ex. 90"></label></div>
+          <button id="apply-wall-edge" class="secondary full" type="button">Appliquer longueur et angle</button>
+          <p class="hint">Le point de départ reste fixe. Le sommet d’arrivée peut bouger et le côté suivant change en conséquence. Les autres sommets, la largeur et la hauteur du mur restent fixes. Une forme impossible est refusée.</p>
+          <p id="wall-edge-error" class="notice error" role="alert" hidden></p>
+          </details>
+        <p id="wall-gap-method" class="hint" hidden>Le lousse réduit les dimensions hors tout suivant les axes largeur et hauteur. Les angles de coupe sont calculés sur ce contour net; ce n’est pas un retrait perpendiculaire constant aux pentes.</p>
+        <label class="check"><input type="checkbox" id="dimensions-confirmed"><span>Cotes et jeux de pose vérifiés</span></label>
+        <div id="panneaux-setup" class="card-title section-title"><span class="step">02</span><h2>Combien de panneaux?</h2></div>
+        <div class="fields two"><label>Panneaux de large<input id="columns" type="number" min="1" max="16" value="4"></label><label>Panneaux de haut<input id="rows" type="number" min="1" max="16" value="2"></label></div>
+        <p class="hint mir-panel-count-hint">MIR répartit automatiquement les panneaux selon la largeur, la hauteur, la forme du mur et le recouvrement. Clique un panneau pour régler ses cotes exactes.</p><label>Recouvrement entre panneaux (po)<input id="lip" inputmode="decimal" placeholder="À renseigner"></label><p class="hint">Saisissez la largeur recouverte à chaque joint, en pouces. Entrez 0 pour une pose bord à bord, sans recouvrement. Le calcul du mur utilise ses dimensions seules, sans plan PDF obligatoire.</p>
+        <label>Répartition<select id="distribution"><option value="equal">Panneaux hors tout égaux</option><option value="axes">Axes de joints espacés également</option></select></label><p id="distribution-note" class="hint"></p>
+        <label>Précision de fabrication<select id="precision"><option value="0">Conserver les valeurs exactes</option><option value="0.0625">Répartir au 1/16 po</option></select></label>
+        <button id="redistribute" class="primary full">Calculer mes panneaux <span>→</span></button>
+        <button id="unlock-all" class="text-button">Libérer les cotes verrouillées</button>
+      </aside>
+      <section class="canvas-column" aria-label="Plan de calepinage">
+        <div class="canvas-card card"><div class="canvas-toolbar"><div><span class="eyebrow">PANNEAUX ARCHITECTURAUX</span><h2 id="canvas-title">Votre calepinage</h2></div><div class="view-controls"><button id="view-zone" aria-pressed="true">2D</button><button id="view-3d" aria-pressed="false">3D</button><button id="view-plan" aria-pressed="false" disabled>Plan PDF</button></div></div>
+          <div class="drawing-toolbar"><button id="select-tool" aria-pressed="true">Sélectionner</button><button id="draw-zone" aria-pressed="false">Zone rectangulaire</button><button id="draw-outline" class="draw-section-direct" aria-pressed="false" title="Tracer les sommets du mur comme une moulure, avant ou après les mesures">Tracer une section libre</button><span class="toolbar-spacer"></span><button id="zoom-out" aria-label="Réduire le plan">−</button><output id="zoom-value">100 %</output><button id="zoom-in" aria-label="Agrandir le plan">＋</button><button id="zoom-reset">Cadrer</button></div>
+          <div id="outline-actions" class="outline-actions" hidden><button id="outline-right-angle" type="button" class="quiet" aria-pressed="false">Angle droit à 90°</button><span id="outline-progress" role="status" aria-live="polite">Cliquez ou glissez pour créer un côté · 3 sommets minimum.</span><button id="outline-back" class="quiet">↶ Dernier point</button><button id="outline-close" class="primary" disabled>Fermer le contour</button><button id="outline-cancel" class="quiet">Annuler le tracé</button></div>
+          <div id="wall-orbit-controls" class="orbit-controls" hidden><button id="orbit-left" aria-label="Tourner le mur vers la gauche">↶</button><button id="orbit-right" aria-label="Tourner le mur vers la droite">↷</button><button id="orbit-up" aria-label="Voir le mur de plus haut">↑</button><button id="orbit-down" aria-label="Voir le mur de plus bas">↓</button><button id="orbit-front">Vue de face</button><span id="wall-3d-status"></span></div>
+          <div class="mir-wall-dual-preview"><div id="drawing-stage" class="drawing-stage" tabindex="0" aria-label="Dessin interactif des panneaux"><svg id="layout-svg" viewBox="0 0 1000 680" role="img" aria-label="Zone à définir"></svg></div><section id="mir-wall-live-3d" class="mir-wall-live-3d" aria-label="Aperçu 3D simultané des panneaux" aria-live="off"><strong>3D · même calepinage</strong><div id="mir-wall-live-3d-stage"></div><small>Aperçu synchronisé au dessin · aucune cote inventée</small></section></div>
+          <div class="drawing-footer"><span><i class="legend-band"></i> Recouvrement commun</span><span><i class="legend-selected"></i> Pièce sélectionnée</span><span id="drawing-hint">Cliquez une pièce ou déplacez un joint.</span></div>
+        </div>
+        <div id="calculation-errors" class="notice error" role="alert" hidden></div>
+        <div id="calculation-warnings" class="notice" role="status" hidden></div>
+        <div id="layout-summary" class="summary-grid"></div>
+        <div class="card proof-card"><div><p class="eyebrow">LES COTES SE REJOIGNENT</p><h3>Une seule largeur au joint.</h3></div><p id="closure-proof">Les dimensions assemblées seront vérifiées ici.</p></div>
+        <details class="card wall-measures"><summary>Longueurs et angles du mur</summary><div id="wall-edge-list"></div></details>
+      </section>
+      <aside class="inspector card" aria-label="Pièce ou joint sélectionné">
+        <p class="eyebrow">SÉLECTION</p><h2 id="selection-title" tabindex="-1">Votre panneau</h2><p id="selection-help" class="hint">Cliquez sur une pièce pour régler ses dimensions.</p>
+        <div id="piece-inspector" hidden><label class="mir-panel-unit-label">Unité des cotes du panneau<select id="mir-panel-dimension-unit" aria-label="Unité des cotes du panneau"><option value="in">Pouces / fractions</option><option value="mm">Millimètres</option></select></label><label><span id="piece-width-label">Largeur hors tout (po)</span><input id="piece-width" inputmode="decimal"></label><label class="check"><input id="piece-width-lock" type="checkbox"><span>Verrouiller cette largeur</span></label><button id="apply-width" class="secondary full">Appliquer la largeur</button><label><span id="piece-height-label">Hauteur hors tout (po)</span><input id="piece-height" inputmode="decimal"></label><label class="check"><input id="piece-height-lock" type="checkbox"><span>Verrouiller cette hauteur</span></label><button id="apply-height" class="secondary full">Appliquer la hauteur</button><button id="apply-panel-dimensions" class="primary full" type="button">Appliquer les 2 cotes et verrouiller</button><p id="mir-panel-dimension-error" class="notice error" role="alert" hidden></p><p class="hint">La largeur fixe la colonne entière; la hauteur fixe la rangée entière pour garder les joints alignés. Les autres panneaux non verrouillés s’ajustent. Aucun changement n’est enregistré si les deux cotes ne ferment pas le mur.</p></div>
+        <div id="joint-inspector" hidden><label id="joint-position-label">Position de l’axe (po)<input id="joint-position" inputmode="decimal"></label><button id="apply-joint" class="secondary full">Placer à cette cote</button><button id="center-joint" class="secondary full">Centrer dans la zone</button><label class="check"><input id="joint-lock" type="checkbox"><span>Verrouiller la position</span></label><p class="hint">L’axe passe au milieu de la bande de recouvrement.</p></div>
+        <div id="piece-measurements" class="piece-measurements" hidden><h3>Forme et cotes de coupe</h3><svg id="piece-detail-svg" viewBox="0 0 300 240" role="img" aria-label="Forme du panneau sélectionné"></svg><div id="piece-dimensions"></div><div class="table-wrap"><table><thead><tr><th>Côté</th><th>Longueur</th><th>Angle intérieur</th></tr></thead><tbody id="piece-edge-table"></tbody></table></div><p class="hint">Angles dans le plan du panneau, mesurés au sommet de départ. Les réglages de scie et développés de pli ne sont pas déduits de ces angles.</p></div>
+        <div class="inspector-note"><span>↳</span><p>Les dimensions affichées comprennent les lips. La projection est réglée séparément pour la fabrication.</p></div>
+        <label>Note importante sur la zone<textarea id="zone-notes" rows="3" maxlength="1000" placeholder="Ex. !! Panneaux entre fenêtres — vérifier l’alignement"></textarea></label>
+      </aside>
+    </div>
+    <section class="production-section card" aria-labelledby="fabrication-title"><div class="production-heading"><div><p class="eyebrow">03 / POUR L’ATELIER</p><h2 id="fabrication-title">Les mêmes repères.<br><em>Du plan aux pièces.</em></h2></div><p>Préparez la liste de fabrication et son PDF. Les précisions manquantes restent identifiées dans le dossier.</p></div>
+      <div class="fabrication-fields"><label>Projet<input id="project-name" maxlength="160" placeholder="Nom du chantier"></label><label>Référence du bon de commande<input id="po-number" maxlength="100" placeholder="Référence Zoho Books, si connue"></label><label>Projection C (po)<input id="projection" inputmode="decimal" placeholder="À préciser"></label><label>Perforation du bas<select id="perforation"><option value="">À préciser</option><option value="no">Non</option><option value="yes">Oui</option></select></label></div>
+      <details id="fabrication-details"><summary>Métal, épaisseur et finition</summary><div class="fabrication-fields"><label>Matériau<select id="panel-material"><option value="">À préciser dans le dossier</option><option value="aluminium">Aluminium plié · Unico U-P1</option><option value="acier">Acier · Unico U-P1</option><option value="aluminium-extrude">Aluminium extrudé · sur mesure</option></select></label><label id="thickness-label">Épaisseur / calibre<select id="panel-thickness"><option value="">À préciser</option></select></label><label>Finition<select id="panel-color"><option value="">À préciser</option><option value="custom">Couleur personnalisée · soumission</option></select></label><label id="custom-color-field" hidden>Référence personnalisée<input id="custom-color" maxlength="100" placeholder="Code et nuancier exacts"></label></div><p id="finish-note" class="hint">La couleur et sa disponibilité seront conservées dans les pièces.</p></details>
+      <div class="table-heading"><h3 id="piece-count">Liste des panneaux</h3><span id="revision-label">Révision 1</span></div><p class="hint mir-panel-arch-hint">Panneau par panneau : clique P1, P2… puis inscris ses cotes exactes en po ou mm dans la fiche. Les cotes du tableau restent hors tout, lèvres comprises.</p><p class="hint mir-panel-table-swipe">↔ Glisse le tableau sur le côté pour voir les hauteurs, la face nette et les lips.</p><div class="table-wrap"><table><thead><tr><th>Repère</th><th>Position</th><th>Largeur hors tout · po/mm</th><th>Hauteur hors tout · po/mm</th><th>Face nette · sans lips</th><th>Lip</th><th>Qté</th></tr></thead><tbody id="piece-table"><tr><td colspan="6">Entrez les cotes de votre zone pour commencer.</td></tr></tbody></table></div>
+      <div class="export-bar"><div><button id="export-site" class="secondary" disabled>PDF chantier ↓</button><button id="export-json" class="quiet">Sauvegarder le dossier JSON ↓</button></div><button id="send-production" class="primary" disabled>Créer mon bon de commande <span>↗</span></button></div><p id="mir-panel-po-status" class="mir-panel-po-status" role="status" aria-live="polite">Définis le mur, puis MIR prépare la liste des pièces.</p><p id="export-status" class="hint" role="status"></p><p class="local-footnote">Plans et calculs conservés dans ce navigateur. La préparation ne transmet aucune commande à Zoho Books. Les détails de jonction et de pliage restent à valider pour la fabrication.</p>
+    </section>
+  </main>
+  <footer><a href="selection.html#mir-unified-dossier">← Mon dossier</a><a href="production.html?mode=client">Panneaux</a><a href="plan.html">Studio 3D ↗</a></footer>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+/* Negotiated Supabase transport; original Node multipart transport remains supported. */
+(()=>{'use strict';const hex=buffer=>[...new Uint8Array(buffer)].map(b=>b.toString(16).padStart(2,'0')).join('');
+let challenge=null,challengeAt=0;
+async function response(r){let d;try{d=await r.json();}catch{throw Error('La réponse du serveur a été interrompue. Reprenez ce même brouillon.');}if(!r.ok){const e=Error(d.message||'Le service ne confirme pas la réception. Votre brouillon est conservé.');e.result=d;e.status=r.status;throw e;}return d;}
+async function prepareChallenge(base){challenge=await response(await fetch(base+'/challenge',{credentials:'omit',cache:'no-store',signal:AbortSignal.timeout(15000)}));challengeAt=performance.now();}
+async function send({base,draft,save,progress,website=''}){
+ if(!draft.uploadToken){draft.uploadToken=hex(crypto.getRandomValues(new Uint8Array(32)));await save();}
+ const attached=[...(draft.plans||[]).map(file=>({field:'plans',file})),...(draft.context.dossier?[{field:'dossier',file:draft.context.dossier}]:[])];
+ progress('Vérification des PDF avant téléversement privé…');
+ const files=[];for(const [i,{field,file}]of attached.entries())files.push({id:String(i+1),field,filename:file.name,bytes:file.size,contentType:'application/pdf',sha256:hex(await crypto.subtle.digest('SHA-256',await file.arrayBuffer()))});
+ if(!challenge||performance.now()-challengeAt>19*60000)await prepareChallenge(base);
+ const pause=2100-(performance.now()-challengeAt);if(pause>0)await new Promise(r=>setTimeout(r,pause));
+ const prepared=await response(await fetch(base+'/prepare',{method:'POST',credentials:'omit',headers:{'content-type':'application/json'},body:JSON.stringify({requestId:draft.requestId,resumeToken:draft.uploadToken,payload:draft.submission,files,challenge,website}),signal:AbortSignal.timeout(120000)}));
+ if(prepared.state==='received')return prepared;
+ for(const upload of prepared.files){if(upload.uploaded)continue;const index=Number(upload.id)-1,file=attached[index]?.file;if(!file)throw Error('La liste des PDF ne correspond plus au brouillon.');if(upload.chunkedUrl){const endpoint=new URL(upload.chunkedUrl),api=new URL(base);if(endpoint.origin!==api.origin||!endpoint.pathname.startsWith(api.pathname+'/uploads/'))throw Error('La session de téléversement privé est invalide.');let offset=0;while(offset<file.size){progress('Téléversement privé du PDF '+(index+1)+' sur '+files.length+' · '+Math.round(offset/file.size*100)+' %');const chunk=file.slice(offset,Math.min(file.size,offset+upload.chunkBytes)),r=await response(await fetch(endpoint,{method:'POST',headers:{'content-type':'application/octet-stream','x-mir-estimate-token':draft.uploadToken,'upload-offset':String(offset)},body:chunk,credentials:'omit',signal:AbortSignal.timeout(120000)}));if(!Number.isSafeInteger(r.offset)||r.offset<=offset||r.offset>file.size)throw Error('La reprise du PDF ne peut pas être confirmée. Réessayez le même brouillon.');offset=r.offset;}continue;}
+ const url=new URL(upload.url),api=new URL(base);if(url.protocol!=='https:'||url.origin!==api.origin||!url.pathname.startsWith('/storage/v1/object/upload/sign/mir-estimates/'))throw Error('L’adresse du téléversement privé est invalide.');progress('Téléversement privé du PDF '+(index+1)+' sur '+files.length+'…');const r=await fetch(url,{method:'PUT',headers:upload.headers,body:file,credentials:'omit',signal:AbortSignal.timeout(180000)});if(!r.ok){let d;try{d=await r.json();}catch{}throw Error('Le PDF « '+file.name+' » n’a pas pu être téléversé'+(r.status===413?' : taille refusée par le stockage':'')+'. Votre brouillon est conservé ; réessayez.');}}
+ progress('PDF enregistrés. Vérification et envoi de la demande…');
+ return response(await fetch(base,{method:'POST',credentials:'omit',headers:{'content-type':'application/json'},body:JSON.stringify({requestId:draft.requestId,resumeToken:draft.uploadToken}),signal:AbortSignal.timeout(120000)}));
+}
+window.MIREstimateUpload=Object.freeze({send,prepareChallenge});})();

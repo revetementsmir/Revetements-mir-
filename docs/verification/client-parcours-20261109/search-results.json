@@ -1,0 +1,42 @@
+[
+  {
+    "stage": "before",
+    "q": "panneau hardie",
+    "count": 7
+  },
+  {
+    "stage": "before",
+    "q": "hardie panneaux",
+    "count": 3
+  },
+  {
+    "stage": "before",
+    "q": "panneaux hardie",
+    "count": 3
+  },
+  {
+    "stage": "before",
+    "q": "hardie panneau",
+    "count": 7
+  },
+  {
+    "stage": "after",
+    "q": "panneau hardie",
+    "count": 7
+  },
+  {
+    "stage": "after",
+    "q": "hardie panneaux",
+    "count": 7
+  },
+  {
+    "stage": "after",
+    "q": "panneaux hardie",
+    "count": 7
+  },
+  {
+    "stage": "after",
+    "q": "hardie panneau",
+    "count": 7
+  }
+]

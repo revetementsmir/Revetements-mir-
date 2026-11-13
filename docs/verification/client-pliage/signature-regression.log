@@ -1,0 +1,9 @@
+Navigateur de recette : /usr/bin/chromium
+PASS Production client 360 px
+PASS Production client 390 px
+PASS Production client 820 px
+PASS Production client 1440 px
+PASS Production client 3440 px
+PASS Moulure client PC : étapes, validations, deux défilements et dossier
+PASS Moulure client tactile : dessin, mesures modifiables et soumission
+PASS Interface Admin non modifiée

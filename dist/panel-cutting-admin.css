@@ -1,0 +1,205 @@
+/* Scoped workshop controls. Mobile switches drawings; desktop keeps both visible. */
+#panel-cutting {
+  --cut-gold: #ad762b;
+  --cut-gold-soft: #fbf2dc;
+  --cut-border: #d7dece;
+  --cut-muted: #657160;
+  min-width: 0;
+}
+#panel-cutting .cut-settings,
+#panel-cutting .cut-admin-controls {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.7fr) minmax(175px, 1fr) minmax(190px, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid var(--cut-border);
+  border-radius: 5px;
+  background: #fff;
+  margin: 18px 0;
+}
+#panel-cutting .cut-settings .check,
+#panel-cutting .cut-admin-controls .check { font-size: 12px; color: var(--ink, #202a24); align-items: flex-start; }
+#panel-cutting .cut-settings input[type=checkbox] { margin-top: 1px; }
+#panel-cutting .cut-actions,
+#panel-cutting .cut-admin-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+#panel-cutting .cut-actions button,
+#panel-cutting .cut-admin-actions button { min-height: 44px; }
+#panel-cutting button:disabled { opacity: .48; cursor: default; }
+#cut-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+#panel-cutting .cut-admin-stat { display: flex; flex-direction: column; gap: 9px; padding: 20px; border: 1px solid var(--cut-border); border-radius: 5px; background: #fff; min-width: 0; }
+#panel-cutting .cut-admin-stat > span { font-size: 10px; color: var(--cut-muted); letter-spacing: .65px; text-transform: uppercase; }
+#panel-cutting .cut-admin-stat > strong { font: 500 clamp(19px, 2vw, 27px)/1.25 Manrope, Arial, sans-serif; letter-spacing: -.5px; overflow-wrap: anywhere; }
+#panel-cutting .cut-admin-stat > small { font-size: 10px; color: var(--cut-muted); line-height: 1.65; }
+#panel-cutting .cut-status-line { display: flex; gap: 14px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; margin: 14px 0; }
+#cut-status { font-size: 12px; line-height: 1.6; font-weight: 600; }
+#cut-status[data-state=partial] { color: #80591e; }
+#cut-status[data-state=invalid] { color: #a13d2a; }
+#cut-revision { font-size: 10px; color: var(--cut-muted); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#cut-alerts { background: #fff8ea; border: 1px solid #e7d9ba; border-radius: 5px; padding: 14px 18px; margin: 15px 0; font-size: 11px; line-height: 1.65; }
+#cut-alerts summary { cursor: pointer; font-weight: 600; }
+#cut-alert-list { padding-left: 20px; margin: 12px 0 0; }
+#cut-alert-list li + li { margin-top: 7px; }
+#panel-cutting .cut-view-switch,
+#panel-cutting .cut-admin-tabs { display: none; gap: 5px; padding: 4px; background: #e9eddf; border-radius: 5px; margin: 17px 0 12px; }
+#panel-cutting [data-cut-view-button] { flex: 1; min-height: 44px; padding: 10px; font-size: 12px; border-radius: 3px; }
+#panel-cutting [data-cut-view-button][aria-pressed=true] { background: #202a24; color: #fff; }
+#panel-cutting .cut-drawings,
+#panel-cutting .cut-admin-grid,
+#panel-cutting .cut-visuals { display: grid; grid-template-columns: minmax(0, 1.16fr) minmax(0, 1fr); gap: 16px; align-items: stretch; margin: 18px 0; }
+#panel-cutting .cut-drawing-card,
+#panel-cutting .cut-admin-card,
+#panel-cutting .cut-visual-card { min-width: 0; overflow: hidden; background: #fff; border: 1px solid var(--cut-border); border-radius: 5px; }
+#panel-cutting .cut-drawing-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 13px 16px; border-bottom: 1px solid var(--cut-border); }
+#panel-cutting .cut-drawing-toolbar label { flex: 1; min-width: 0; }
+#panel-cutting .cut-drawing-toolbar select { max-width: 100%; min-width: 0; text-overflow: ellipsis; }
+#panel-cutting [data-cut-zoom] { min-height: 44px; padding: 9px 10px; white-space: nowrap; color: #48603a; font-size: 11px; }
+#cut-face-drawing,
+#cut-sheet-drawing { height: 420px; min-width: 0; padding: 18px; background: #f7f8f3; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+#cut-face-drawing > svg,
+#cut-sheet-drawing > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+#cut-sheet-material { padding: 13px 16px; color: var(--cut-muted); font-size: 10px; line-height: 1.65; overflow-wrap: anywhere; border-top: 1px solid var(--cut-border); }
+#panel-cutting .cut-admin-empty,
+#cut-zoom .cut-admin-empty { color: #687263; padding: 16px; font-size: 12px; line-height: 1.7; max-width: 54ch; }
+#cut-selection { margin: 18px 0; padding: 18px 20px; background: #fff; border: 1px solid var(--cut-border); border-left: 4px solid var(--cut-gold); border-radius: 5px; }
+#cut-selection > .cut-admin-empty { padding: 0; max-width: none; }
+#panel-cutting .cut-admin-selected-heading { display: flex; align-items: center; gap: 14px; min-width: 0; }
+#panel-cutting .cut-admin-selected-heading > b { background: var(--cut-gold-soft); color: #744e1a; padding: 10px 12px; border-radius: 4px; font-size: 14px; letter-spacing: .4px; flex-shrink: 0; }
+#panel-cutting .cut-admin-selected-heading > div { min-width: 0; }
+#panel-cutting .cut-admin-selected-heading strong { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+#panel-cutting .cut-admin-selected-heading p { font-size: 11px; color: var(--cut-muted); margin-top: 5px; line-height: 1.55; overflow-wrap: anywhere; }
+#panel-cutting .cut-admin-selection-details { display: flex; flex-wrap: wrap; gap: 13px 30px; margin: 18px 0 0; padding-top: 14px; border-top: 1px solid #e4e8dd; }
+#panel-cutting .cut-admin-selection-details div { display: grid; gap: 6px; }
+#panel-cutting .cut-admin-selection-details dt { font-size: 10px; color: var(--cut-muted); }
+#panel-cutting .cut-admin-selection-details dd { font-size: 12px; margin: 0; }
+#cut-materials { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr)); gap: 12px; margin: 18px 0; }
+#panel-cutting .cut-admin-material { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 11px 16px; padding: 17px 18px; background: #ecf1e5; border: 1px solid var(--cut-border); border-radius: 5px; }
+#panel-cutting .cut-admin-material h4 { margin: 0; font-size: 12px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+#panel-cutting .cut-admin-material p { margin-top: 5px; color: var(--cut-muted); font-size: 11px; }
+#panel-cutting .cut-admin-material > strong { font-size: 12px; text-align: right; line-height: 1.6; font-weight: 600; max-width: 14ch; }
+#panel-cutting .cut-admin-material small,
+#panel-cutting .cut-admin-material ul { grid-column: 1 / -1; font-size: 10px; line-height: 1.6; color: var(--cut-muted); }
+#panel-cutting .cut-admin-material ul { margin: 0; padding-left: 17px; color: #80591e; }
+#panel-cutting .cut-admin-piece-link { min-height: 40px; min-width: 48px; padding: 8px; border: 1px solid #d4deca; border-radius: 4px; background: #f3f6ed; color: #39502e; font-size: 11px; font-weight: 700; text-align: center; }
+#panel-cutting .cut-admin-piece-link[aria-pressed=true] { color: #6c4818; border-color: #c39a5c; background: var(--cut-gold-soft); }
+#panel-cutting .cut-admin-piece-link:focus-visible { outline: 2px solid var(--cut-gold); outline-offset: 3px; }
+#cut-piece-rows [data-cut-row-piece] { cursor: pointer; }
+#cut-piece-rows [data-cut-row-piece]:hover { background: #f6f8f1; }
+#cut-piece-rows .cut-admin-row-selected,
+#cut-piece-rows .cut-admin-row-selected:hover { background: #fff7e6; }
+#cut-piece-rows th[scope=row] { background: transparent; }
+#cut-piece-rows td { font-size: 11px; }
+#cut-piece-rows td:nth-child(2),
+#cut-piece-rows td:nth-child(3) { min-width: 170px; }
+#cut-piece-rows .cut-admin-dimensions { min-width: 145px; font-variant-numeric: tabular-nums; }
+#panel-cutting .cut-admin-to-define,
+#panel-cutting .cut-admin-pending-reason { color: #985031; }
+#panel-cutting .cut-admin-pending-reason { font-size: 11px; line-height: 1.6; margin-top: 15px; }
+#cut-pending { margin: 17px 0; padding: 16px 18px; border: 1px solid #e2cfc0; border-radius: 5px; background: #fff6ef; }
+#cut-pending h4 { margin: 0; font-size: 12px; }
+#cut-pending ul { padding-left: 20px; margin: 12px 0 0; font-size: 11px; line-height: 1.7; }
+#cut-pending li + li { margin-top: 10px; }
+#cut-pending .cut-admin-piece-link { min-height: 32px; padding: 4px 7px; margin-right: 4px; }
+#panel-cutting > .small-note { margin: 18px 0; max-width: 112ch; }
+#panel-cutting .cut-admin-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--cut-border); border-radius: 5px; }
+#cut-zoom { width: min(1440px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); height: min(1000px, calc(100dvh - 32px)); padding: 20px; border: 1px solid #d7dece; border-radius: 7px; background: #f4f2ed; color: #202a24; }
+#cut-zoom[open] { display: flex; flex-direction: column; gap: 12px; }
+#cut-zoom::backdrop { background: #17231dcc; backdrop-filter: blur(4px); }
+#cut-zoom .dialog-heading { flex-shrink: 0; margin: 0; }
+#cut-zoom .dialog-heading h2 { font-size: 20px; line-height: 1.4; overflow-wrap: anywhere; }
+#cut-zoom [data-cut-zoom-close] { min-height: 44px; padding: 10px 14px; border: 1px solid #c7d1bb; border-radius: 4px; background: #fff; }
+#cut-zoom-drawing { flex: 1; min-height: 0; padding: 20px; background: #fff; border: 1px solid #d7dece; border-radius: 4px; overflow: auto; display: flex; align-items: center; justify-content: center; }
+#cut-zoom-drawing > svg { display: block; width: 100%; height: 100%; max-width: 100%; overflow: visible; }
+#cut-zoom-caption { flex-shrink: 0; font-size: 11px; line-height: 1.6; color: #657160; }
+#panel-cutting svg [data-panel-piece],
+#cut-zoom svg [data-panel-piece] { cursor: pointer; outline: none; }
+#panel-cutting svg [data-panel-piece]:focus,
+#cut-zoom svg [data-panel-piece]:focus { outline: none; }
+#panel-cutting svg [data-panel-piece]:focus-visible > path,
+#cut-zoom svg [data-panel-piece]:focus-visible > path { stroke: #ad762b; stroke-width: 2.5px; vector-effect: non-scaling-stroke; }
+.plan-notes-editor { border-top: 1px solid var(--line, #d9dfd2); padding: 16px 18px; background: #fffaf1; font-size: 11px; line-height: 1.65; }
+.plan-notes-editor summary { cursor: pointer; font-weight: 600; }
+.plan-notes-editor > p { margin: 10px 0; color: var(--muted, #687263); }
+.plan-notes-editor textarea { width: 100%; min-height: 65px; resize: vertical; border: 1px solid #cbd4bf; border-radius: 3px; padding: 10px; font: inherit; background: #fff; color: inherit; margin: 5px 0 10px; }
+.plan-notes-editor textarea:focus-visible { outline: 3px solid #547341; outline-offset: 3px; }
+.plan-notes-editor ul { margin: 14px 0 0; padding-left: 19px; }
+.plan-notes-editor li + li { margin-top: 8px; }
+.window-finish { max-width: 310px; min-width: 150px; font-size: 10px; line-height: 1.6; }
+.window-finish summary { cursor: pointer; color: #48603a; }
+.window-finish label { margin-top: 10px; }
+.window-finish select { max-width: 310px; width: 100%; }
+.corners-section { margin: 30px 0; padding: 18px; border: 1px solid var(--line, #d9dfd2); border-radius: 5px; background: #f8faf4; }
+.corners-section .table-heading { margin-top: 0; }
+.corners-section .rule-controls { grid-template-columns: minmax(160px, 1fr) minmax(210px, 1.2fr) minmax(200px, 1.5fr); align-items: center; padding: 15px; }
+#corners-total { font-size: 12px; font-weight: 500; line-height: 1.6; }
+#corner-warnings { padding-left: 19px; font-size: 11px; color: #80591e; line-height: 1.7; }
+@media (max-width: 1050px) {
+  #panel-cutting .cut-settings,
+  #panel-cutting .cut-admin-controls { grid-template-columns: 1fr 1fr; }
+  #panel-cutting .cut-settings > .check,
+  #panel-cutting .cut-admin-controls > .check { grid-column: 1 / -1; }
+  #cut-face-drawing, #cut-sheet-drawing { height: 360px; padding: 12px; }
+  #panel-cutting .cut-admin-material { grid-template-columns: minmax(0, 1fr); }
+  #panel-cutting .cut-admin-material > strong { text-align: left; max-width: none; }
+}
+@media (max-width: 760px) {
+  #panel-cutting .cut-view-switch,
+  #panel-cutting .cut-admin-tabs { display: flex; }
+  #panel-cutting .cut-drawings,
+  #panel-cutting .cut-admin-grid,
+  #panel-cutting .cut-visuals { grid-template-columns: minmax(0, 1fr); margin-top: 12px; }
+  #panel-cutting[data-cut-view=sheets] .cut-face-card,
+  #panel-cutting[data-cut-view=sheets] [data-cut-panel=elevations],
+  #panel-cutting[data-cut-view=elevations] .cut-sheet-card,
+  #panel-cutting[data-cut-view=elevations] [data-cut-panel=sheets] { display: none; }
+  #cut-summary { gap: 8px; }
+  #panel-cutting .cut-admin-stat { padding: 14px 12px; gap: 8px; }
+  #panel-cutting .cut-admin-stat > strong { font-size: 20px; }
+  #panel-cutting .cut-admin-stat > small { font-size: 9px; }
+  #cut-face-drawing, #cut-sheet-drawing { height: 400px; }
+  .corners-section .rule-controls { grid-template-columns: 1fr 1fr; }
+  #corners-total { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  #panel-cutting .cut-actions,
+  #panel-cutting .cut-admin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #panel-cutting [data-cut-edit-layout] { grid-column: 1 / -1; }
+  #panel-cutting .cut-actions button,
+  #panel-cutting .cut-admin-actions button { font-size: 11px; padding: 10px; }
+  #panel-cutting .cut-settings,
+  #panel-cutting .cut-admin-controls { padding: 15px; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+  #panel-cutting .cut-settings label,
+  #panel-cutting .cut-admin-controls label { font-size: 11px; }
+  #panel-cutting input[type=number],
+  #panel-cutting select { font-size: 16px; min-height: 44px; }
+  #cut-summary { grid-template-columns: minmax(0, 1fr); }
+  #panel-cutting .cut-admin-stat { display: grid; grid-template-columns: minmax(90px, 1fr) minmax(0, 1.8fr); align-items: baseline; gap: 5px 12px; }
+  #panel-cutting .cut-admin-stat > strong { font-size: 20px; text-align: right; }
+  #panel-cutting .cut-admin-stat > small { grid-column: 1 / -1; font-size: 10px; }
+  #panel-cutting .cut-status-line { gap: 6px; }
+  #panel-cutting .cut-drawing-toolbar { gap: 7px; padding: 11px; }
+  #panel-cutting [data-cut-zoom] { font-size: 10px; padding: 8px; }
+  #cut-face-drawing, #cut-sheet-drawing { height: 360px; padding: 10px; }
+  #cut-selection { padding: 15px; }
+  #panel-cutting .cut-admin-selected-heading { align-items: flex-start; gap: 10px; }
+  #panel-cutting .cut-admin-selected-heading strong { font-size: 12px; }
+  #panel-cutting .cut-admin-selection-details { gap: 12px 22px; }
+  #cut-zoom { width: calc(100vw - 12px); height: calc(100dvh - 12px); max-height: calc(100dvh - 12px); padding: 12px; border-radius: 5px; }
+  #cut-zoom .dialog-heading { gap: 8px; align-items: flex-start; }
+  #cut-zoom .dialog-heading h2 { font-size: 16px; }
+  #cut-zoom [data-cut-zoom-close] { padding: 8px 10px; font-size: 11px; }
+  #cut-zoom-drawing { padding: 9px; }
+  #cut-zoom-caption { font-size: 10px; }
+  .corners-section { padding: 13px; }
+  .corners-section .rule-controls { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .plan-notes-editor textarea { font-size: 16px; }
+}
+@media print {
+  #panel-cutting .cut-settings, #panel-cutting .cut-admin-controls,
+  #panel-cutting .cut-actions, #panel-cutting .cut-admin-actions,
+  #panel-cutting .cut-view-switch, #panel-cutting .cut-admin-tabs,
+  #panel-cutting .cut-drawing-toolbar, #cut-zoom { display: none !important; }
+  #panel-cutting .cut-drawings, #panel-cutting .cut-admin-grid { display: block; }
+  #panel-cutting .cut-drawing-card, #panel-cutting .cut-admin-card { display: block !important; break-inside: avoid; margin-bottom: 12px; }
+  #panel-cutting .cut-admin-stat, #cut-selection, #cut-materials article { break-inside: avoid; }
+}

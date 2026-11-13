@@ -1,0 +1,432 @@
+{
+  "status": "BLOCKED_NOT_CERTIFIED",
+  "kind": "real-MIR-TEST-partial-validation",
+  "projectId": "hxtztkmbfpmzrieccwsg",
+  "projectName": "MIR TEST",
+  "inspectedPr": 4,
+  "inspectedRemoteSha": "f589382409796a8a681021cd87b20c65ea534e16",
+  "baseSha": "39de53260a134bae48143c1bdb1aa235335d6187",
+  "prDraft": true,
+  "prMerged": false,
+  "migration": {
+    "checked_at": "2026-11-11 12:41:14.710685+00",
+    "version": "20261111122840",
+    "name": "chat_phase3a_security",
+    "statement_count": 1,
+    "stored_sql_sha256": "d787d6d5d9f2313e17858c4d1554bf7f59fc6536a842644547d2a854ac41b512",
+    "sourceFile": "supabase/migrations/20261112114958_chat_phase3a_security.sql",
+    "sourceSqlSha256": "d787d6d5d9f2313e17858c4d1554bf7f59fc6536a842644547d2a854ac41b512",
+    "method": "Supabase official apply_migration",
+    "applicationResult": "success",
+    "applicationsThisMission": 1
+  },
+  "preflight": {
+    "at": "2026-11-11T12:24:32.452027Z",
+    "mode": "READ ONLY",
+    "serverVersion": "17.11",
+    "result": "all_preconditions_compatible"
+  },
+  "catalog": {
+    "tables": [
+      {
+        "rls": true,
+        "name": "conversation_participants",
+        "anon_direct": false,
+        "authenticated_direct": false
+      },
+      {
+        "rls": true,
+        "name": "conversations",
+        "anon_direct": false,
+        "authenticated_direct": false
+      },
+      {
+        "rls": true,
+        "name": "message_receipts",
+        "anon_direct": false,
+        "authenticated_direct": false
+      },
+      {
+        "rls": true,
+        "name": "messages",
+        "anon_direct": false,
+        "authenticated_direct": false
+      }
+    ],
+    "policies": [
+      {
+        "kind": "PERMISSIVE",
+        "name": "mir_internal_insert",
+        "command": "INSERT"
+      },
+      {
+        "kind": "PERMISSIVE",
+        "name": "mir_internal_select",
+        "command": "SELECT"
+      },
+      {
+        "kind": "PERMISSIVE",
+        "name": "mir_internal_delete",
+        "command": "DELETE"
+      },
+      {
+        "kind": "RESTRICTIVE",
+        "name": "mir_chat_phase3a_insert",
+        "command": "INSERT"
+      },
+      {
+        "kind": "RESTRICTIVE",
+        "name": "mir_chat_phase3a_update",
+        "command": "UPDATE"
+      },
+      {
+        "kind": "RESTRICTIVE",
+        "name": "mir_chat_phase3a_select",
+        "command": "SELECT"
+      },
+      {
+        "kind": "RESTRICTIVE",
+        "name": "mir_chat_phase3a_delete",
+        "command": "DELETE"
+      }
+    ],
+    "functions": [
+      {
+        "signature": "mir_chat_conversations(uuid,integer,jsonb)",
+        "search_path": [
+          "search_path=pg_catalog, mir_core"
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "signature": "mir_chat_messages(uuid,uuid,integer,jsonb)",
+        "search_path": [
+          "search_path=pg_catalog, mir_core"
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "signature": "mir_chat_search(uuid,text,integer,jsonb)",
+        "search_path": [
+          "search_path=pg_catalog, mir_core"
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "signature": "mir_conversation_job(uuid,uuid)",
+        "search_path": [
+          "search_path=pg_catalog, mir_core"
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "signature": "mir_message_ack(uuid,uuid,text)",
+        "search_path": [
+          "search_path=pg_catalog, mir_core"
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "signature": "mir_message_attachment_validate(uuid,uuid,text)",
+        "search_path": [
+          "search_path=pg_catalog, mir_core, storage"
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      },
+      {
+        "signature": "mir_message_send(uuid,uuid,text,uuid,uuid,text,uuid)",
+        "search_path": [
+          "search_path=pg_catalog, mir_core"
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": true
+      }
+    ],
+    "checked_at": "2026-11-11T12:29:07.114991+00:00",
+    "migrations": [
+      {
+        "name": "chat_phase3a_security",
+        "version": "20261111122840"
+      }
+    ],
+    "bucket_private": true,
+    "marker_matches": true
+  },
+  "storageBlocker": {
+    "checked_at": "2026-11-11T12:36:53.305834+00:00",
+    "support_helper": [
+      {
+        "acl": "{postgres=X/postgres}",
+        "signature": "mir_core.support_object_allowed(text,boolean)",
+        "definition": "CREATE OR REPLACE FUNCTION mir_core.support_object_allowed(object_name text, writing boolean DEFAULT false)\n RETURNS boolean\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'mir_core', 'storage'\nAS $function$declare parts text[];org uuid;conversation uuid;owner uuid;begin parts:=storage.foldername(object_name);if cardinality(parts)<>4 then return false;end if;begin org:=parts[1]::uuid;conversation:=parts[2]::uuid;owner:=parts[3]::uuid;exception when others then return false;end;if writing and owner<>auth.uid() then return false;end if;return mir_core.support_allowed(org,conversation);end$function$\n",
+        "search_path": [
+          "search_path=pg_catalog, mir_core, storage"
+        ],
+        "anon_execute": false,
+        "security_definer": true,
+        "authenticated_execute": false
+      }
+    ],
+    "support_policies": [
+      {
+        "name": "mir_support_insert",
+        "check": "((bucket_id = 'mir-support'::text) AND mir_core.support_object_allowed(name, true))",
+        "using": null,
+        "command": "INSERT"
+      },
+      {
+        "name": "mir_support_select",
+        "check": null,
+        "using": "((bucket_id = 'mir-support'::text) AND mir_core.support_object_allowed(name, false))",
+        "command": "SELECT"
+      },
+      {
+        "name": "mir_support_delete",
+        "check": null,
+        "using": "((bucket_id = 'mir-support'::text) AND mir_core.support_object_allowed(name, true))",
+        "command": "DELETE"
+      }
+    ],
+    "valid_png_object_count": 0,
+    "official_job_conversations": 1
+  },
+  "http": {
+    "transport": "Real HTTPS via environment proxy, existing accounts/password login, tokens in memory only",
+    "checks": [
+      {
+        "name": "official_job_conversation_concurrent_create",
+        "kind": "real-auth-http",
+        "status": "passed",
+        "parallelRequests": 8,
+        "httpStatuses": [
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "observedDistinctIds": 1,
+        "at": "2026-11-11T12:35:23.951Z"
+      },
+      {
+        "name": "valid_png_storage_upload",
+        "kind": "real-auth-http-storage",
+        "status": "failed",
+        "httpStatus": 400,
+        "error": {
+          "statusCode": "403",
+          "error": "Unauthorized",
+          "message": "permission denied for function support_object_allowed",
+          "code": "AccessDenied"
+        },
+        "bytes": 68,
+        "at": "2026-11-11T12:35:29.020Z"
+      },
+      {
+        "name": "Chef lit le chantier de recette",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 200,
+        "expectedStatus": 200,
+        "sqlCode": null,
+        "at": "2026-11-11T12:37:44.696Z"
+      },
+      {
+        "name": "Employé lit le chantier de recette",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 200,
+        "expectedStatus": 200,
+        "sqlCode": null,
+        "at": "2026-11-11T12:37:50.494Z"
+      },
+      {
+        "name": "Admin technique lit le chantier autorisé",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 200,
+        "expectedStatus": 200,
+        "sqlCode": null,
+        "at": "2026-11-11T12:37:54.725Z"
+      },
+      {
+        "name": "Client exclu du clavardage interne",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 403,
+        "expectedStatus": 403,
+        "sqlCode": "42501",
+        "at": "2026-11-11T12:37:59.148Z"
+      },
+      {
+        "name": "Chef refusé sur organisation réelle B",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 403,
+        "expectedStatus": 403,
+        "sqlCode": "42501",
+        "at": "2026-11-11T12:38:03.622Z"
+      },
+      {
+        "name": "Employé refusé sur organisation réelle B",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 403,
+        "expectedStatus": 403,
+        "sqlCode": "42501",
+        "at": "2026-11-11T12:38:07.910Z"
+      },
+      {
+        "name": "Admin refusé sur organisation réelle B",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 403,
+        "expectedStatus": 403,
+        "sqlCode": "42501",
+        "at": "2026-11-11T12:38:12.862Z"
+      },
+      {
+        "name": "Chemin pièce jointe forgé refusé",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 403,
+        "expectedStatus": 403,
+        "sqlCode": "42501",
+        "at": "2026-11-11T12:38:23.055Z"
+      },
+      {
+        "name": "Fichier inexistant refusé",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 400,
+        "expectedStatus": 400,
+        "sqlCode": "22023",
+        "at": "2026-11-11T12:38:27.546Z"
+      },
+      {
+        "name": "RPC de recherche répond sur périmètre autorisé sans contenu de recette",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 200,
+        "expectedStatus": 200,
+        "sqlCode": null,
+        "at": "2026-11-11T12:38:34.484Z"
+      },
+      {
+        "name": "Anon ne peut pas appeler les nouvelles RPC",
+        "kind": "real-auth-http-read-only",
+        "status": "passed",
+        "httpStatus": 401,
+        "expectedStatus": 401,
+        "sqlCode": "42501",
+        "at": "2026-11-11T12:38:39.000Z"
+      }
+    ],
+    "passed": 12,
+    "failed": 1,
+    "fullCertification": false
+  },
+  "ciBeforeApplication": {
+    "chat": {
+      "run": 43019443497,
+      "status": "success"
+    },
+    "rolesBaseline": {
+      "run": 43019443553,
+      "status": "success",
+      "caution": "Before chat migration; not a chat Phase3A certification"
+    },
+    "legacyFailures": [
+      {
+        "run": 43019443500,
+        "job": 130518658736,
+        "suite": "tests/mir-supplier-send.cjs",
+        "error": "42704 role \"service_role\" does not exist"
+      },
+      {
+        "run": 43019443508,
+        "job": 130518657209,
+        "suite": "tests/mir-shared-workspace-browser.cjs",
+        "error": "42704 role \"service_role\" does not exist"
+      }
+    ],
+    "baselineReproduction": {
+      "sha": "39de53260a134bae48143c1bdb1aa235335d6187",
+      "bothFailuresReproduced": true,
+      "productCodeChanged": false
+    }
+  },
+  "mime": {
+    "configuredAllowlist": [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/heic",
+      "image/heif"
+    ],
+    "configuredMaxBytes": 10485760,
+    "attachmentRpcChecks": "Storage metadata mimetype/size/owner/path plus current conversation access",
+    "binaryContentInspection": false,
+    "antivirus": false,
+    "realFileInput": {
+      "declaredType": "image/png",
+      "knownSignature": "PNG",
+      "bytes": 68
+    },
+    "realFileResult": "Rejected before successful upload; MIME/binary spoof acceptance not established",
+    "signedUrlsIssued": 0,
+    "signedUrlExpirationTest": "not-run"
+  },
+  "remaining": [
+    "Complete Boss/Adjointe authenticated HTTP checks after migration",
+    "Current team/job access withdrawal and reintegration via real sessions",
+    "Stable pagination and authorized search with actual message history and foreign-tenant text",
+    "Valid private attachment transfer/download, cross-tenant and other-conversation HTTP Storage checks",
+    "MIME/content mismatch and maximum-size real upload controls",
+    "Message receipt/unread consistency",
+    "Concurrent message idempotency (conversation uniqueness only passed)",
+    "Actual signed URL expiration"
+  ],
+  "fixture": {
+    "jobId": "859143d9-4f98-47d8-8c97-588007941a40",
+    "jobName": "[QA PHASE3A] 20261111 f589382 validation",
+    "officialConversationId": "0e2c6b49-b1af-4c27-acc5-77a9d43c81fc",
+    "jobMembershipsAdded": 2,
+    "messageCountCreated": 0,
+    "validUploadedStorageObjects": 0,
+    "existingMembershipsWithdrawn": 0,
+    "preservedForResume": true
+  },
+  "production": {
+    "accessed": false,
+    "modified": false
+  },
+  "newAccounts": 0,
+  "passwordChanges": 0,
+  "hostedRepairAttempted": false,
+  "otherHostedMigrationApplied": false,
+  "decisionRequired": "Authorize a focused audit/corrective migration for Storage support helper ACL dependencies on MIR TEST only; no permission broadened without review"
+}

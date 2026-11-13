@@ -1,0 +1,241 @@
+{
+  "purpose": "Selected delivery evidence; full inventory screenshots remain local",
+  "totalBytes": 3921830,
+  "files": [
+    {
+      "path": "docs/verification/estimation-visual-20261109/README.md",
+      "bytes": 8837,
+      "sha256": "02786bf88beb50c442c6ee363ed45f638ef7f9eabab7beb8d93efc73428c16a5"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/account-authenticated.json",
+      "bytes": 6424,
+      "sha256": "797a2c739c36a0b966a70edc856e3e477df1a31cf398160afab8bed1850c9b0b"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after-account-screens.json",
+      "bytes": 789,
+      "sha256": "6c3f118659162ab65a884c66abdad32dd9b098124f90fe69e968d5b3456496df"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after-extra-states.json",
+      "bytes": 3567,
+      "sha256": "dbe2f2c13dd2fab91bbe9e60dd3085437e6c4cc1a64daad4b07e4b7416a800f4"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after-inventory.json",
+      "bytes": 283428,
+      "sha256": "5022da24fa5598a07b3e01ef69b4902c171af2b5eb9a87c9d227ec69ff5dfe95"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/boutique-761-closed.png",
+      "bytes": 184441,
+      "sha256": "f6ae77a7e7ad4ca219a05c4518af75adf28433517d3286ad0986f087b71c34e7"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/boutique-834-closed.png",
+      "bytes": 193679,
+      "sha256": "b1ca9aee250493c4a75e4b476c6d7cb3f97b593edb1b60617bc447c5efb898b6"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/compte-1440-closed.png",
+      "bytes": 60823,
+      "sha256": "5c956a1c7c4ee9faed6846c9bd39d059aa16df3c714761d7887088182fa2a117"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/compte-360-addresses-long.png",
+      "bytes": 65855,
+      "sha256": "a81cdda946a0751212cdd782d0f59a292aa545228007a3a4f1a310208e62b012"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/compte-360-closed.png",
+      "bytes": 45741,
+      "sha256": "49f46b19eadbb27aba79e62ca3cb260b76dd4ac186d04387ed640d37ec349720"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/compte-390-keyboard-focus.png",
+      "bytes": 47161,
+      "sha256": "572b81950641cb3fbe27fb6a35136a9981e3f918bd5498a2e6cd57cb6ecf07a0"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/compte-390-menu.png",
+      "bytes": 34985,
+      "sha256": "9d1d1f79157d524b764dc7b57ce2558e103d915f59edb8844e020e1cc3e20591"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/compte-390-orders.png",
+      "bytes": 267236,
+      "sha256": "edefd5ea49b6c6366ff0543175cccdfb4d25c64474f6dc54cc1dc943cdf2cc39"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/dossier-prive-1440-closed.png",
+      "bytes": 52797,
+      "sha256": "7459c0ca8d6bed5a9ee7c7928b57fb5145b028bf611f241fb7a12d6bf4dca4c6"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/dossier-prive-360-closed.png",
+      "bytes": 36577,
+      "sha256": "d0b0eca22b9b16f8e9daaf7272c131ac3439e40a6d41d54c70c673feb0734784"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/dossier-prive-390-closed.png",
+      "bytes": 36314,
+      "sha256": "7196dc48de2775b259a77f343fabb7963ad7660d69fd0b54195c2d0df439f7dc"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/dossier-prive-760-closed.png",
+      "bytes": 38215,
+      "sha256": "73801d446bb2f73c5214c613c6a51ce44ab4d74a30a6020f4670c346b7b88592"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/dossier-prive-761-closed.png",
+      "bytes": 44546,
+      "sha256": "40768774e597d78e3ef5db07a8d1846923fd68934a74c88670041fa8f0952718"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/dossier-prive-834-closed.png",
+      "bytes": 44815,
+      "sha256": "4003136f7f49ae5355e3b18b198babde77ff5bbed97c2683d8f49d2bad099b93"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/estimation-1440-closed.png",
+      "bytes": 73799,
+      "sha256": "ccf04c6c2dddffb25986681cabce471768ea18aa1f61ce4e2a4be2c40171a042"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/estimation-360-closed.png",
+      "bytes": 47924,
+      "sha256": "7ee158dc6d097dfb3493c2e9aa234eebc2adcb3e1406dac27d8fb86f5fb72d76"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/estimation-390-closed.png",
+      "bytes": 48119,
+      "sha256": "4f92459c58909aba1bb0a326f7e7847be4ee411cf17bfb14a5cbf486240fca7d"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/estimation-760-closed.png",
+      "bytes": 53609,
+      "sha256": "0211f584afaff880b35e0164b524721e208979c0bf7bd4afaea771152a2cd0be"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/estimation-761-closed.png",
+      "bytes": 60402,
+      "sha256": "fa05a367ca111dddf2d215327a931ffcda02c84b5fda17f465fa1f77c3aff811"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/estimation-834-closed.png",
+      "bytes": 61000,
+      "sha256": "b451d2bd6711873f28f0a3088a51c736fca2709a09cbcffaa54e619d4b868533"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/plan-1440-closed.png",
+      "bytes": 212513,
+      "sha256": "3c255cc89e3599582d035bc37b3001a80461f298954cfe19dfb7b2bbe6e2d18a"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/after/plan-360-closed.png",
+      "bytes": 54980,
+      "sha256": "cd465e30e5486c1dd903684d08be8e2ab8469ad6a9b3ff4a4bce289d923c156c"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/apercu-autonome.html",
+      "bytes": 313757,
+      "sha256": "d3ec3c9e456c43216f63df4699756978ad210c5fa510e8180679d25b62dd41c6"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before-account-screens.json",
+      "bytes": 789,
+      "sha256": "6c3f118659162ab65a884c66abdad32dd9b098124f90fe69e968d5b3456496df"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before-extra-states.json",
+      "bytes": 3567,
+      "sha256": "dbe2f2c13dd2fab91bbe9e60dd3085437e6c4cc1a64daad4b07e4b7416a800f4"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before-inventory.json",
+      "bytes": 252283,
+      "sha256": "7c0751fa1e8cd289d41a74800fa1eec7fc83e8adffffe42449c11e2822d8b011"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/boutique-761-closed.png",
+      "bytes": 185333,
+      "sha256": "4c37b8618954036fc669fa8ab56296d72216a11e0caa476412ddda0f38c4f24f"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/boutique-834-closed.png",
+      "bytes": 194472,
+      "sha256": "ac1c2b5f64a81b57f00297b52d3bfbce6f3d159ad4dec835570a8d07d0466678"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/compte-1440-closed.png",
+      "bytes": 61048,
+      "sha256": "0a6b45501fff4753f089385a4df43d3c2aecdd56f8037f43f4aa53331e03d7c1"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/compte-360-addresses-long.png",
+      "bytes": 66462,
+      "sha256": "b71691b5dce516e28c49c880998de716159e6611de50747470a4ac29d640e6d5"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/compte-360-closed.png",
+      "bytes": 46404,
+      "sha256": "744a65bb8453e71127579362fff7dfb270cc70aae6f8bba97b5c7da54e7673ca"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/compte-390-keyboard-focus.png",
+      "bytes": 47924,
+      "sha256": "3a166460fae8d22e238506bc6ca56e07991fc22771437d01547114d98330a2e8"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/compte-390-menu.png",
+      "bytes": 35418,
+      "sha256": "43450e5a33551ebb7044e6b329bbf4debbb354454db3cab9e1ebac00b68349d5"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/compte-390-orders.png",
+      "bytes": 267677,
+      "sha256": "4ddf93a5e872dd6a26565714428acf18edc3ae7c2ed5dc4ba3f7fd804961d775"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/estimation-360-unconfigured-status.png",
+      "bytes": 45852,
+      "sha256": "aa49ca019a9375462d5d34632897f7fdad0d197d080cbaef999a361567a6d027"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/plan-1440-closed.png",
+      "bytes": 258256,
+      "sha256": "6a97d5073aa9b13663a82e48988419bf61e052f7dd76ef830b3a9429e0d09886"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/before/plan-360-closed.png",
+      "bytes": 62669,
+      "sha256": "35c610a4db2ddfce3ab37e51d37f9fa0e8150437d827a83c41075dc823cfedcb"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/fonts.md",
+      "bytes": 892,
+      "sha256": "e22da7d850f4eb76220a60530dc6b864325bf268e8bf9db5c773a6f1534c5501"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/home-layout-comparison.json",
+      "bytes": 783,
+      "sha256": "66ce1dae7ac49a8a85164d68fa26a4e32eb7a827cc95412b338843f70a8d548b"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/home-unchanged.json",
+      "bytes": 4403,
+      "sha256": "400af91431f7fb964ced7e798dabd0fd75cfe2d244f810f4dada5b767664b4e7"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/keyboard-focus.json",
+      "bytes": 5019,
+      "sha256": "831e2a2bd2ef5676c1fb176f8967d8c643a8674be0a834fb64c96479b9043f90"
+    },
+    {
+      "path": "docs/verification/estimation-visual-20261109/preview-validation.json",
+      "bytes": 246,
+      "sha256": "3e8c8f595735bdd8533fd744b3bbe7397abfffe8f8a3fce0eea28d79fa9871a2"
+    }
+  ]
+}
