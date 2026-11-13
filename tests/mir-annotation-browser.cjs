@@ -29,11 +29,13 @@ const server = http.createServer((req,res) => {
     assert.equal(new URL(page.url()).pathname,'/annoter.html','annotation click must not navigate');
     await page.getByPlaceholder('Qu’aimerais-tu changer ?').fill('PREUVE LOCALE — modifier le bouton Boutique');
     await page.getByRole('button',{name:'Ajouter l’annotation au tableau',exact:true}).click();
+    await page.getByRole('button',{name:'Annotations · 1',exact:true}).click();
     await page.getByText('PREUVE LOCALE — modifier le bouton Boutique',{exact:true}).first().waitFor();
     const target = await page.locator('.annotation-list').innerText();
     assert(target.includes('PREUVE LOCALE'));
     fs.mkdirSync('artifacts/mir-annotations',{recursive:true});
     await page.screenshot({path:'artifacts/mir-annotations/note.png'});
+    page.on('dialog',dialog=>dialog.accept());
     await page.close();
     const mobile = await browser.newPage({viewport:{width:390,height:844}});
     await mobile.route('**/*.supabase.co/**',route=>route.abort());
