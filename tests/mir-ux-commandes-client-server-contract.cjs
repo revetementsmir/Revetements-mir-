@@ -10,7 +10,7 @@ const sdk={auth:{getUser:async()=>({data:{user}}),onAuthStateChange:()=>({data:{
  if(name==='mir_portal_snapshot')return{data:snapshot()};
  if(name==='mir_employee_operations_snapshot')return{data:{role:'employe'}};
  if(name==='mir_messaging_snapshot')return{data:{contacts:[],teams:[],conversations:[],messages:[]}};
- if(['mir_punch_snapshot','mir_expense_snapshot','mir_absence_snapshot'].includes(name))return{error:{code:'PGRST202',message:'routine missing'}};
+ if(['mir_punch_snapshot','mir_expense_snapshot','mir_absence_snapshot','mir_notification_center'].includes(name))return{error:{code:'PGRST202',message:'routine missing'}};
  if(name==='mir_order_create_submit')return{data:{orderId:'00000000-0000-4000-8000-000000000700',receiptId:args.request_id,status:'submitted',lineCount:1,supplierSent:false,emailSent:false}};
  if(name==='mir_order_draft_save')return{data:{orderId:'00000000-0000-4000-8000-000000000701',receiptId:args.request_id,status:'draft',lineCount:1}};
  if(name==='mir_order_submit')return{data:{orderId:args.order_id,receiptId:args.request_id,status:'submitted',supplierSent:false,emailSent:false}};
