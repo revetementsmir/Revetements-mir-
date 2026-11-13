@@ -107,12 +107,12 @@ jobs:
             adb install mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             mobile/tools/run-instrumentation.sh
             cp artifacts/phase11/instrumentation.txt artifacts/phase11/webview-tests.txt
+            node mobile/tools/prepare-real-roles.cjs
             mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#prepareUpdate'
             cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-prepare.txt
             adb install -r artifacts/phase11/MIR-TEST-debug.apk
             mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#verifyUpdate'
             cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-verify.txt
-            node mobile/tools/prepare-real-roles.cjs
             mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirRealRolesTest'
             cp artifacts/phase11/instrumentation.txt artifacts/phase11/real-roles.txt
             adb pull /sdcard/Android/data/ca.revetementsmir.equipe.test/files/phase11-proof artifacts/phase11/

@@ -6,7 +6,7 @@ Base : `a7d2d6fd10d6909d25f262aa06e921342c03d889`. Branche : `codex/phase-11-and
 
 Le workflow Android compile **la tête exacte de la PR**, vérifie l’APK et archive `source-sha.txt`, `pr-head-sha.txt`, `SHA256SUMS`, `result.json`, les journaux et les captures. `result.json` n’est produit qu’après réussite de tous les tests natifs, des deux étapes de mise à jour et de la matrice des rôles. Les numéros de runs et le verdict courant sont actualisés dans la description de la PR et dans Atelier; un ancien run vert ne certifie pas une nouvelle tête.
 
-Aucune signature de livraison durable n’est disponible. L’APK est debug/TEST, identifiant `ca.revetementsmir.equipe.test`, version `0.11.0-test`. La CI installe `110001`, prépare un témoin local, installe `110002` sans désinstaller, puis vérifie la conservation. Les comptes QA sont injectés après compilation dans un fichier privé de l’émulateur, supprimé après la matrice; jamais dans les APK ni leurs ressources.
+Aucune signature de livraison durable n’est disponible. L’APK est debug/TEST, identifiant `ca.revetementsmir.equipe.test`, version `0.11.0-test`. La CI installe `110001`, confirme une session Employé MIR TEST et prépare un témoin local, installe `110002` sans désinstaller, puis vérifie la conservation. Les comptes QA sont injectés après compilation dans un fichier privé de l’émulateur, supprimé après la matrice; jamais dans les APK ni leurs ressources.
 
 ## Audit et reprise
 
@@ -17,7 +17,7 @@ Ressources du portail suivies dans `dist` embarquées : 997 fichiers avant exclu
 ## Contrôles locaux rejoués
 
 - APK, instrumentation, tests Java et Android Lint : réussis; avertissements de versions et ressources générées conservés, aucun contrôle neutralisé.
-- Adaptateur : 15 contrats, permissions simulées, Admin/client/inconnu refusés, purge intercomptes et transports bloqués.
+- Adaptateur : 16 contrats, permissions simulées, Admin/client/inconnu refusés, purge intercomptes et transports bloqués.
 - Compatibilité WebView : API standard `Promise.try`, Map et URL absentes recréées et testées dans un contexte isolé, sans transport ajouté. Le moteur PDF.js existant et ses octets restent inchangés; la compatibilité s’applique aussi au worker.
 - Chromium : sept formats 360×780, 390×844, 768×1024, 834×1112, 1366×768, 1440×900, 1920×1080. Auth équipe, garde TEST, clair/sombre/système dynamique, texte Grand, contraste, hors ligne/retour, aucun débordement ni erreur JS.
 - Lecteur : quatre vraies pages PDF avec contenu non vide, ouverture PDF et image privées, annulation d’enregistrement sans faux succès. Pont natif simulé ici; distinct des tests Android.
@@ -31,7 +31,7 @@ Ressources du portail suivies dans `dist` embarquées : 997 fichiers avant exclu
 3. Clavier réel, champ visible après redimensionnement, confirmation Retour et conservation de la saisie; arrière-plan/reprise, hors ligne et reconnexion.
 4. Permission caméra refusée, puis accordée dans Android; scanner QR réellement ouvert puis annulé. Sélecteur de fichiers réellement ouvert puis annulé.
 5. PDF Phase 10 de quatre pages rendu dans la WebView, contrôle des pixels de chaque page, sélecteur d’enregistrement ouvert puis annulé, original inchangé par SHA-256, faux PDF refusé.
-6. Mise à jour `110001 → 110002` conservant les données autorisées.
+6. Mise à jour `110001 → 110002` conservant le témoin local et la vraie session Employé confirmée côté serveur.
 7. Connexion réelle Employé, Chef, Entrepôt, Adjointe et Boss; rôle opérationnel relu, recréation de l’Activity et session persistée, autre organisation refusée, déconnexion et données masquées. Admin technique refusé comme rôle métier.
 
 Les tests utilisent seulement des lectures métier MIR TEST; aucune commande, notification, estimation, transmission fournisseur, dépense ou absence de recette demandée. Les tests locaux de coffre et de fichier utilisent des témoins **sur l’émulateur uniquement**. Les workflows existants de rôles réels et Phase 6 restent actifs et leurs résultats sont rapportés séparément.

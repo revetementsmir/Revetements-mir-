@@ -3,6 +3,7 @@ if(!Native||!window.MIRSupabase)throw Error('Initialisation Android manquante');
 const raw=window.MIRSupabase,allowedRoles=new Set(['employee','employe','chef','chef_equipe','warehouse','assistant','boss']);
 let client=null,identity=null;
 async function purgeBrowser(){
+ for(const dialog of window.document?.querySelectorAll('dialog[data-mir-native-file]')||[]){dialog.close();dialog.remove();}
  localStorage.clear();sessionStorage.clear();
  if(indexedDB.databases)for(const db of await indexedDB.databases())await new Promise((resolve,reject)=>{const request=indexedDB.deleteDatabase(db.name);request.onsuccess=resolve;request.onerror=request.onblocked=()=>reject(Error('Fermez MIR avant de changer de compte : des données privées sont encore ouvertes.'));});
 }
@@ -29,6 +30,6 @@ window.MIRSupabase=Object.freeze({createClient(url,key,options={}){
   if(event==='SIGNED_OUT'||identity&&next&&identity!==next)setTimeout(()=>purgeBrowser().catch(()=>{}),0);
   identity=next;
  });
- window.MIRAndroidSession={pause:()=>client.auth.stopAutoRefresh(),resume:()=>{client.auth.startAutoRefresh();client.auth.getUser().then(({error})=>{if(error&&[401,403].includes(error.status))client.auth.signOut();}).catch(()=>{});}};
+ window.MIRAndroidSession={currentUserId:()=>identity,pause:()=>client.auth.stopAutoRefresh(),resume:()=>{client.auth.startAutoRefresh();client.auth.getUser().then(({error})=>{if(error&&[401,403].includes(error.status))client.auth.signOut();}).catch(()=>{});}};
  return client;
 }});

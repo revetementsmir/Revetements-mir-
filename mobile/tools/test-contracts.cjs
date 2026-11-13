@@ -2,14 +2,14 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const Policy=require('../web/policy.cjs'),root=path.resolve(__dirname,'..'),source=fs.readFileSync(path.join(root,'web/sdk.js'),'utf8');
 function harness(role='employee'){
- const calls=[],local=new Map([['old-private','value']]);let vault='old-session',options;
- const auth={signInWithPassword:async()=>({data:{user:{id:'test-user'}}}),signOut:async()=>({error:null}),onAuthStateChange:()=>({}),stopAutoRefresh(){},startAutoRefresh(){},getUser:async()=>({data:{user:{id:'test-user'}}})};
+ let authListener;const calls=[],local=new Map([['old-private','value']]);let vault='old-session',options;
+ const auth={signInWithPassword:async()=>({data:{user:{id:'test-user'}}}),signOut:async()=>({error:null}),onAuthStateChange:fn=>(authListener=fn,{}),stopAutoRefresh(){},startAutoRefresh(){},getUser:async()=>({data:{user:{id:'test-user'}}})};
  const raw={auth,rpc:async name=>{calls.push(name);return {data:name==='mir_account_snapshot'?{role}: {confirmed:true},error:null};}};
  const Native={readAuth:async()=>({value:vault}),writeAuth:async({value})=>{vault=value;},clearAuth:async()=>{vault=null;}};
  const window={MIRAndroid:{Native,Policy},MIRSupabase:{createClient:(url,key,opts)=>{options=opts;return raw;}}};
  vm.runInNewContext(source,{window,localStorage:{clear:()=>local.clear()},sessionStorage:{clear(){}},indexedDB:{databases:async()=>[]},setTimeout});
  const client=window.MIRSupabase.createClient('https://'+Policy.TEST,'sb_publishable_test',{});
- return{window,client,calls,local,vault:()=>vault,options:()=>options};
+ return{window,client,calls,local,emit:(event,session)=>authListener(event,session),vault:()=>vault,options:()=>options};
 }
 test('Request boundary refuses production, lookalikes, cleartext and mail endpoints',()=>{
  for(const url of ['https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/','http://'+Policy.TEST+'/rest/v1/','https://'+Policy.TEST+'.evil.example/rest/v1/','https://user@'+Policy.TEST+'/rest/v1/','https://'+Policy.TEST+'/auth/v1/recover','https://'+Policy.TEST+'/functions/v1/send','https://smtp.example/'])assert.equal(Policy.allowedRequest(url),false,url);
@@ -28,6 +28,7 @@ for(const role of ['admin','client','unknown',null])test(String(role)+' cannot s
 test('Account switch purges local data and SDK uses asynchronous native storage only',async()=>{
  const h=harness();await h.client.auth.signInWithPassword({});assert.equal(h.local.size,0);assert.equal(h.vault(),null);assert.equal(h.options().auth.detectSessionInUrl,false);await h.options().auth.storage.setItem(h.options().auth.storageKey,'session');assert.equal(h.vault(),'session');await h.client.auth.signOut();assert.equal(h.vault(),null);
 });
+test('Native identity follows Auth on every page, including outside chantier',()=>{const h=harness();h.emit('SIGNED_IN',{user:{id:'account-a'}});assert.equal(h.window.MIRAndroidSession.currentUserId(),'account-a');h.emit('SIGNED_OUT',null);assert.equal(h.window.MIRAndroidSession.currentUserId(),null);});
 test('SDK secondary-key cleanup never erases the authenticated vault',async()=>{const h=harness(),storage=h.options().auth.storage,key=h.options().auth.storageKey;await storage.setItem(key,'session');await storage.removeItem(key+'-user');await storage.removeItem(key+'-flows-code-verifier');assert.equal(await storage.getItem(key),'session');assert.equal(await storage.getItem(key+'-user'),null);await assert.rejects(()=>storage.setItem(key+'-user','unexpected'));assert.equal(h.vault(),'session');});
 test('All invitation/email/OAuth methods fail without invoking a transport',async()=>{
  const h=harness();for(const method of ['signUp','signInWithOAuth','signInWithOtp','resetPasswordForEmail','resend','inviteUserByEmail'])assert.equal((await h.client.auth[method]()).error.code,'ANDROID_TRANSPORT_DISABLED');assert.deepEqual(h.calls,[]);

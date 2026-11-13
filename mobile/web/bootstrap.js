@@ -31,7 +31,7 @@ function keepInputVisible(){requestAnimationFrame(()=>requestAnimationFrame(()=>
 window.visualViewport?.addEventListener('resize',keepInputVisible);addEventListener('resize',keepInputVisible);document.addEventListener('focusin',keepInputVisible);
 document.addEventListener('input',event=>{if(event.target.closest('form')&&!event.target.closest('#auth-signin-form,#wh-login-form'))dirty=true;},true);
 async function download(link){
- const actor=()=>window.MIRPortalActiveClient?.getStatus()?.user?.id||null,startedBy=actor(),assertSession=()=>{if(actor()!==startedBy)throw Error('La session a changé. Ouvrez à nouveau le fichier depuis votre compte.');};
+ const actor=()=>window.MIRAndroidSession?.currentUserId?window.MIRAndroidSession.currentUserId():window.MIRPortalActiveClient?.getStatus()?.user?.id||null,startedBy=actor(),assertSession=()=>{if(actor()!==startedBy)throw Error('La session a changé. Ouvrez à nouveau le fichier depuis votre compte.');};
  const url=new URL(link.href,location.href);if(url.protocol!=='blob:'&&!Policy.allowedRequest(url.href,origin))throw Error('Fichier non autorisé');
  const blob=await rawFetch(url.href).then(r=>{if(!r.ok)throw Error('Fichier indisponible');return r.blob();});
  const bytes=new Uint8Array(await blob.arrayBuffer());if(bytes.length>20*1024*1024)throw Error('Fichier trop volumineux : maximum 20 Mo.');
