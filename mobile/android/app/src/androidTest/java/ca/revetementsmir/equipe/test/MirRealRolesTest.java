@@ -19,6 +19,9 @@ public class MirRealRolesTest extends MirDeviceSetup {
   CountDownLatch drawn=new CountDownLatch(1);
   s.onActivity(a->a.getBridge().getWebView().postVisualStateCallback(1,new android.webkit.WebView.VisualStateCallback(){@Override public void onComplete(long id){drawn.countDown();}}));
   assertTrue("WebView frame ready",drawn.await(10,TimeUnit.SECONDS));
+  CountDownLatch presented=new CountDownLatch(1);
+  s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();web.invalidate();web.postOnAnimation(()->web.postOnAnimation(()->web.postOnAnimation(presented::countDown)));});
+  assertTrue("WebView frame presented",presented.await(10,TimeUnit.SECONDS));
   InstrumentationRegistry.getInstrumentation().waitForIdleSync();
   androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).waitForIdle();
   screenshotSystem(name);
