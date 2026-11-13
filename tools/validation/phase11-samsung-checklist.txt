@@ -1,0 +1,20 @@
+MIR TEST — Samsung S25 Ultra de Frederick, recette à réaliser
+
+APK certifié : 0.11.0-test, versionCode 110002, ca.revetementsmir.equipe.test
+Source APK : 58c13ab96be63601d314ba94d92ab7dd20976407
+SHA-256 APK : 141eae844d4e938c6270dcf243536e7f72b1b45b68206922d7584cc61a5e2127
+APK et preuves certifiées : https://github.com/revetementsmir/Revetements-mir-/actions/runs/43505093162/artifacts/14076960142
+Procédure : https://github.com/revetementsmir/Revetements-mir-/blob/58c13ab96be63601d314ba94d92ab7dd20976407/docs/verification/phase11-android/SAMSUNG-S25-ULTRA.md
+
+[ ] Installer MIR-TEST-debug.apk depuis le ZIP, avec Mes fichiers. Aucun mode développeur nécessaire. Si Android refuse la signature, arrêter : ne pas désinstaller ni effacer les données d’une ancienne version.
+[ ] Se connecter avec un compte MIR TEST existant; vérifier la bannière TEST et son rôle. Aucun compte client dans l’application.
+[ ] Fermer et rouvrir sans se déconnecter : vérifier la session et le bon rôle.
+[ ] Mise à jour : uniquement entre deux versions signées avec la même clé, sans désinstallation. Le CI a vérifié 110001 → 110002; aucun résultat S25 n’est acquis. Le binaire 110001 n’a pas été archivé : une paire compatible sera nécessaire pour une vraie mise à jour de version sur le téléphone. Réinstaller le même APK ne prouve pas une montée de version.
+[ ] Appui long sur l’icône → Tester ce téléphone : GPS refusé puis accordé, position ponctuelle et précision annoncée, aucun pointage créé ni coordonnées conservées.
+[ ] Photo d’une feuille neutre : annuler, puis prendre une photo, vérifier et retirer l’aperçu. Aucun téléversement.
+[ ] QR fourni : reconnaître exactement RECETTE-PHASE11-QR; annuler une lecture; aucun lien ni recherche serveur.
+[ ] Pièce jointe neutre PDF/JPG/PNG/WebP : choisir puis annuler; type et taille exacts, aucun téléversement. Le stockage d’une pièce jointe dans un module métier nécessite une recette TEST séparée autorisée.
+[ ] Clair/sombre/système, texte Grand, clavier, retour et zones système : vérifier lisibilité et absence de débordement.
+
+Noter pour chaque point : attendu/observé, Android/One UI/WebView, version APK et capture sans mot de passe, coordonnées ou document privé. Aucune case n’est marquée réussie automatiquement ici.
+Aucune production, commande réelle, courriel, push, fournisseur, distribution aux employés ou signature de distribution.
