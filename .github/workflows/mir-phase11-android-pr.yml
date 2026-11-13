@@ -5,6 +5,31 @@ on:
 permissions:
   contents: read
 jobs:
+  chromium-and-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Adapter web embarqué et non-régressions sans serveur
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ./mobile/node_modules
+        run: |
+          cd mobile && npm ci && npm run sync && cd ..
+          node mobile/tools/test-contracts.cjs
+          node mobile/tools/test-web.cjs
+          node tests/mir-phase10-bending.cjs
+          node tests/mir-phase10-management.cjs
+          node tests/mir-technical-dimensions.cjs
+          node tests/mir-account-session.cjs
+          git diff --check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase11-chromium-simulation
+          path: artifacts/phase11/web/
   android-test:
     runs-on: ubuntu-latest
     timeout-minutes: 35
@@ -20,6 +45,8 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
       - name: Ressources embarquées et contrats sans réseau métier
         working-directory: mobile
         run: |
