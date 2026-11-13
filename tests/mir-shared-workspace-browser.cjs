@@ -69,7 +69,7 @@ try{
  await publication.locator('[data-rule=materials][value=acier]').uncheck();
  await publication.locator('[data-rule=colors]').fill('Noir\nBlanc');await publication.locator('[data-rule=fixed_color]').fill('Noir');
  await publication.locator('[data-rule=color_edit_roles][value=employee]').uncheck();await publication.locator('[data-rule=measure_edit_roles][value=employee]').uncheck();
- await publication.locator('.shared-save').click();await drawingAdmin.waitForFunction(()=>document.querySelector('.shared-save-feedback')?.textContent.includes('Publication enregistrée'));
+ await publication.locator('.shared-save').click();await drawingAdmin.waitForFunction(()=>document.querySelector('.shared-save-feedback')?.textContent.includes('Nouvelle version enregistrée sur le serveur'));
  await employee.locator('#refresh').click();await employee.waitForFunction(()=>document.querySelector('#catalogue label select[disabled]'));
  assert.equal(await employee.locator('#catalogue form select').first().locator('option').count(),1,'métal autorisé unique');
  assert.equal(await employee.locator('#catalogue form select[disabled]').inputValue(),'Noir','couleur fixée par Admin');
