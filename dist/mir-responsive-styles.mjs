@@ -9,11 +9,14 @@ function rulesText(rules, base) {
     if (rule.type === 3) return rulesText(rule.styleSheet.cssRules, rule.href);
     if (rule.type === 1) return `${rootSelector(rule.selectorText)}{${units(rule.style.cssText)}}`;
     if (rule.type === 4) {
-      const condition = rule.conditionText.replace(/^(?:only\s+)?(?:screen|all)\s+and\s+/i, '');
-      const isSize = /\b(?:width|height|orientation|aspect-ratio)\s*:/.test(condition);
-      // Mixed device/environment queries must not silently become size queries.
-      if (isSize && /\b(?:hover|pointer|prefers-|resolution|print)\b/.test(condition)) throw Error('Requête CSS mixte non prise en charge : '+condition);
-      return `@${isSize?'container mir-page':'media'} ${condition}{${rulesText(rule.cssRules, base)}}`;
+      const body=rulesText(rule.cssRules,base);
+      return rule.conditionText.split(',').map(branch=>{
+        const terms=branch.trim().split(/\s+and\s+/i),size=[],environment=[];
+        for(const term of terms)(/^\((?:(?:min|max)-)?(?:width|height|orientation|aspect-ratio)\s*[:<=>]/i.test(term)?size:environment).push(term);
+        let content=size.length?`@container mir-page ${size.join(' and ')}{${body}}`:body;
+        if(environment.length)content=`@media ${environment.join(' and ')}{${content}}`;
+        return content;
+      }).join('\n');
     }
     if (rule.cssRules && rule.type !== 7 && rule.type !== 8) {
       return rule.cssText.slice(0,rule.cssText.indexOf('{')+1)+rulesText(rule.cssRules,base)+'}';

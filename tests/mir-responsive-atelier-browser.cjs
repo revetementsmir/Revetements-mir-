@@ -23,6 +23,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   const page=tab.locator('[data-mir-responsive-page]');
   const phoneFont=await page.locator('h1').evaluate(node=>parseFloat(getComputedStyle(node).fontSize));
   await page.locator('.mir-client-menu-toggle').click();assert.equal(await page.locator('.mir-client-menu-toggle').getAttribute('aria-expanded'),'true');
+  assert(await page.locator('.mir-mobile-tabs').evaluate(node=>{const rect=node.getBoundingClientRect(),frame=node.closest('[data-mir-responsive-viewport]').getBoundingClientRect();return rect.top>=frame.top&&rect.bottom<=frame.bottom+2;}),'mobile navigation must stay inside its device viewport');
   await tab.keyboard.press('Escape');
   fs.mkdirSync('artifacts/mir-responsive-atelier',{recursive:true});
   for(const layout of ['phone','tablet','web']){
@@ -45,9 +46,10 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   assert.equal(errors.length,0,errors.join('\n'));
   tab.on('dialog',dialog=>dialog.accept());await tab.close();
   const shop=await browser.newPage({viewport:{width:1440,height:1080}});
+  shop.on('pageerror',error=>console.log('SHOP ERROR',error.message));
   await shop.route('**/*.supabase.co/**',route=>route.abort());
   await shop.goto(base+'/responsive.html?page=boutique.html&layout=phone');
-  await shop.locator('[data-mir-responsive-ready=true]').waitFor();
+  await Promise.race([shop.locator('[data-mir-responsive-ready=true]').waitFor(),shop.locator('[role=alert]').waitFor().then(async()=>{throw Error(await shop.locator('[role=alert]').innerText());})]);
   await shop.locator('.mir-client-menu-ready').waitFor();
   assert.equal(await shop.locator('[data-mir-responsive-page] a[aria-current=page]').first().innerText(),'Boutique');
   await shop.screenshot({path:'artifacts/mir-responsive-atelier/boutique-phone.png'});
