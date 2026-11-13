@@ -26,6 +26,11 @@ function mount(){
   for(const link of document.querySelectorAll('#mir-harmony-header a[href]')){
    if(!Policy.allowedRoute(link.href,origin)&&!link.hasAttribute('data-mir-native-public'))link.setAttribute('data-mir-native-public','');
   }
+  const menu=document.querySelector('#mir-harmony-menu'),help=document.querySelector('.mir-help-launch');
+  let businessHelp=document.querySelector('#mir-native-business-help');
+  if(menu&&help&&document.body.dataset.portalConnection==='connected'){
+   if(!businessHelp){businessHelp=document.createElement('button');businessHelp.type='button';businessHelp.id='mir-native-business-help';businessHelp.textContent='Centre d’aide métier';businessHelp.onclick=()=>{document.querySelector('.mir-harmony-toggle')?.click();help.click();};menu.append(businessHelp);}
+  }else businessHelp?.remove();
   const qr=document.querySelector('#wh-camera-start');if(qr)qr.hidden=false;
  });observer.observe(document.body,{childList:true,subtree:true});
 }

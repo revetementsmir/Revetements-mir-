@@ -35,13 +35,13 @@ async function assertTeamScreen(page){
   // after authentication. Exercise late insertion and its stronger CSS selectors.
   for(const role of ['employee','chef','warehouse','assistant','boss']){
    await page.evaluate(role=>{
-    document.body.dataset.portalMode=role;
+    document.body.dataset.portalMode=role;document.body.dataset.portalConnection='connected';
     document.querySelector('#auth-signin-form')?.remove();
     const menu=document.querySelector('#mir-harmony-menu');
     const nav=document.createElement('nav');nav.className='mir-client-links';
     nav.innerHTML='<a href="realisations.html">Réalisations</a><a href="plan.html">Studio 3D</a><a href="contact.html">Nous joindre</a>';
     const shortcuts=document.createElement('nav');shortcuts.dataset.clientShortcuts='';shortcuts.innerHTML='<a href="selection.html">Mon panier client</a><a href="estimation.html">Demander une estimation</a>';
-    const tools=document.createElement('nav');tools.id='native-business-probe';tools.innerHTML='<button>Centre d’aide métier</button><a href="production.html?source=store">Pliage interne</a>';
+    const tools=document.createElement('nav');tools.id='native-business-probe';tools.innerHTML='<a href="production.html?source=store">Pliage interne</a>';
     menu.append(nav,shortcuts,tools);menu.hidden=false;
    },role);
    await page.waitForTimeout(50);
