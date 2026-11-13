@@ -44,6 +44,8 @@ Pour une mise à jour, conserver l’identifiant **et la même clé de signature
 - PDF : octets `%PDF-` vérifiés, ouverture dans le lecteur PDF.js embarqué enregistrement par le sélecteur Android ou partage par choix explicite. FileProvider limité aux deux sous-dossiers temporaires, purge à la déconnexion, expiration après 24 h au retour dans l’application. Les PDF restent clairs indépendamment du thème.
 - INTERNET, état réseau, GPS et caméra uniquement; aucune permission notification, suivi GPS en arrière-plan ou stockage partagé. Aucun push/courriel/fournisseur ajouté.
 
+Le Studio client et son import OCR restent sur le site web; leur page `plan.html` est exclue de l’APK équipe et son accès direct est refusé. Les plans de chantier et PDF du portail utilisent leurs parcours métier existants.
+
 ## Validation et limites
 
 `tools/test-web.cjs` : Chromium avec pont simulé, sept formats, connexion équipe, réseau TEST, refus production, hors ligne et absence de débordement/erreur. Ce résultat n’est pas une preuve Android.

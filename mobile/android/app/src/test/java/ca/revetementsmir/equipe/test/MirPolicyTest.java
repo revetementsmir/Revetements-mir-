@@ -11,7 +11,7 @@ public class MirPolicyTest {
   assertFalse(MirPolicy.request("https://hxtztkmbfpmzrieccwsg.supabase.co/functions/v1/send"));
   assertFalse(MirPolicy.request("https://hxtztkmbfpmzrieccwsg.supabase.co/auth/v1/recover"));
   assertTrue(MirPolicy.navigation("https://localhost/chantier.html"));
-  for(String page:new String[]{"boutique.html","produit.html","selection.html","pliage.html","estimation.html"})assertFalse(MirPolicy.navigation("https://localhost/"+page));
+  for(String page:new String[]{"plan.html","boutique.html","produit.html","selection.html","pliage.html","estimation.html"})assertFalse(MirPolicy.navigation("https://localhost/"+page));
   assertFalse(MirPolicy.navigation("https://localhost/untrusted/chantier.html"));
   assertFalse(MirPolicy.navigation("https://evil.example/chantier.html"));
   assertFalse(MirPolicy.navigation("javascript:alert(1)"));

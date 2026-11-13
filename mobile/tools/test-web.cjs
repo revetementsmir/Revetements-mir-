@@ -15,7 +15,7 @@ async function assertTeamScreen(page){
  for(const {selector,ratio}of ratios)assert.ok(ratio>=4.5,selector+' contrast '+ratio);
  for(const selector of ['.mir-harmony-toggle','.mir-harmony-dossier','.mir-client-links','.mir-home-header-actions','.mir-signature-footer','.mir-help-launch'])assert.equal(await page.locator(selector).first().isVisible(),false,selector+' must not expose public chrome at login');
  assert.equal(await page.locator('[data-portal-public-footer]').count(),0);
- for(const name of ['boutique.html','produit.html','selection.html','pliage.html','estimation.html']){assert.equal(fs.existsSync(path.join(root,name)),false);assert.equal(await page.evaluate(name=>MIRAndroid.Policy.allowedRoute('https://localhost/'+name),name),false);}
+ for(const name of ['plan.html','boutique.html','produit.html','selection.html','pliage.html','estimation.html']){assert.equal(fs.existsSync(path.join(root,name)),false);assert.equal(await page.evaluate(name=>MIRAndroid.Policy.allowedRoute('https://localhost/'+name),name),false);}
 }
 (async()=>{fs.mkdirSync(proof,{recursive:true});const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium',args:['--no-sandbox']});try{
  for(const [width,height] of [[360,780],[390,844],[768,1024],[834,1112],[1366,768],[1440,900],[1920,1080]]){

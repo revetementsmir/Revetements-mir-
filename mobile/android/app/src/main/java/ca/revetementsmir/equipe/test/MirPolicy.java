@@ -6,7 +6,7 @@ import java.util.Set;
 /** Native boundary, independent of DOM, role labels and JavaScript fetch wrappers. */
 public final class MirPolicy {
     public static final String TEST_HOST = "hxtztkmbfpmzrieccwsg.supabase.co";
-    private static final Set<String> ROUTES = new java.util.HashSet<>(java.util.Arrays.asList("/", "/index.html", "/native-checks.html", "/native-pdf.html", "/chantier.html", "/entrepot.html", "/coordination.html", "/production.html", "/calepinage.html", "/plan.html", "/espace-partage.html"));
+    private static final Set<String> ROUTES = new java.util.HashSet<>(java.util.Arrays.asList("/", "/index.html", "/native-checks.html", "/native-pdf.html", "/chantier.html", "/entrepot.html", "/coordination.html", "/production.html", "/calepinage.html", "/espace-partage.html"));
     private MirPolicy() {}
     public static boolean local(String value) {
         try { URI u = URI.create(value); return "https".equals(u.getScheme()) && "localhost".equals(u.getHost()) && u.getUserInfo() == null && (u.getPort() == -1 || u.getPort() == 443); }

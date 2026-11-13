@@ -14,7 +14,7 @@ Cet APK **MIR TEST** est réservé à la recette personnelle autorisée. Aucun c
 ## Vérifier l’interface sans créer de données
 
 - Connexion lisible en clair/sombre/système et texte Grand, avec clavier; tous les champs et le bouton doivent rester visibles par défilement.
-- Aucun bloc commercial, lien Boutique/panier client ou bouton flottant « Aide et soutien » sur la connexion. Le Centre d’aide métier reste accessible après connexion.
+- Aucun bloc commercial, accès au Studio client, lien Boutique/panier client ou bouton flottant « Aide et soutien » sur la connexion. Le Centre d’aide métier reste accessible après connexion.
 - Avec chaque compte autorisé : contrôler le rôle affiché, quitter/revenir, fermer/rouvrir puis se déconnecter; ne soumettre aucun formulaire métier. Vérifier l’absence des données du compte précédent.
 - Tester hors ligne puis retour en ligne sans saisir de mutation métier. La bannière ne doit annoncer aucun enregistrement serveur pendant la coupure.
 
