@@ -26,8 +26,9 @@ for(const role of ['admin','client','unknown',null])test(String(role)+' cannot s
  const h=harness(role);assert.equal((await h.client.auth.signInWithPassword({})).error.code,'42501');assert.equal(h.vault(),null);assert.equal((await h.client.rpc('mir_business')).error.code,'42501');assert.equal(h.calls.includes('mir_business'),false);
 });
 test('Account switch purges local data and SDK uses asynchronous native storage only',async()=>{
- const h=harness();await h.client.auth.signInWithPassword({});assert.equal(h.local.size,0);assert.equal(h.vault(),null);assert.equal(h.options().auth.detectSessionInUrl,false);await h.options().auth.storage.setItem('ignored','session');assert.equal(h.vault(),'session');await h.client.auth.signOut();assert.equal(h.vault(),null);
+ const h=harness();await h.client.auth.signInWithPassword({});assert.equal(h.local.size,0);assert.equal(h.vault(),null);assert.equal(h.options().auth.detectSessionInUrl,false);await h.options().auth.storage.setItem(h.options().auth.storageKey,'session');assert.equal(h.vault(),'session');await h.client.auth.signOut();assert.equal(h.vault(),null);
 });
+test('SDK secondary-key cleanup never erases the authenticated vault',async()=>{const h=harness(),storage=h.options().auth.storage,key=h.options().auth.storageKey;await storage.setItem(key,'session');await storage.removeItem(key+'-user');await storage.removeItem(key+'-flows-code-verifier');assert.equal(await storage.getItem(key),'session');assert.equal(await storage.getItem(key+'-user'),null);await assert.rejects(()=>storage.setItem(key+'-user','unexpected'));assert.equal(h.vault(),'session');});
 test('All invitation/email/OAuth methods fail without invoking a transport',async()=>{
  const h=harness();for(const method of ['signUp','signInWithOAuth','signInWithOtp','resetPasswordForEmail','resend','inviteUserByEmail'])assert.equal((await h.client.auth[method]()).error.code,'ANDROID_TRANSPORT_DISABLED');assert.deepEqual(h.calls,[]);
 });

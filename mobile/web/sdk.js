@@ -6,11 +6,12 @@ async function purgeBrowser(){
  localStorage.clear();sessionStorage.clear();
  if(indexedDB.databases)for(const db of await indexedDB.databases())await new Promise((resolve,reject)=>{const request=indexedDB.deleteDatabase(db.name);request.onsuccess=resolve;request.onerror=request.onblocked=()=>reject(Error('Fermez MIR avant de changer de compte : des données privées sont encore ouvertes.'));});
 }
-const storage={getItem:async()=>{const result=await Native.readAuth();return result.value||null;},setItem:async(_,value)=>Native.writeAuth({value}),removeItem:async()=>Native.clearAuth()};
+const storageKey='mir_android_test_auth';
+const storage={getItem:async key=>{if(key!==storageKey)return null;const result=await Native.readAuth();return result.value||null;},setItem:async(key,value)=>{if(key!==storageKey)throw Error('Cette méthode de connexion n’est pas disponible dans MIR TEST.');return Native.writeAuth({value});},removeItem:async key=>{if(key===storageKey)await Native.clearAuth();}};
 window.MIRSupabase=Object.freeze({createClient(url,key,options={}){
  if(url!=='https://'+Policy.TEST||!/^sb_publishable_[A-Za-z0-9_-]+$/.test(key))throw Error('Projet MIR TEST obligatoire');
  if(client)return client;
- client=raw.createClient(url,key,{...options,auth:{...options.auth,storage,storageKey:'mir_android_test_auth',detectSessionInUrl:false,persistSession:true}});
+ client=raw.createClient(url,key,{...options,auth:{...options.auth,storage,storageKey,detectSessionInUrl:false,persistSession:true}});
  const rpc=client.rpc.bind(client);
  const forbidden=()=>({data:null,error:{code:'42501',message:'Accès réservé aux comptes équipe MIR autorisés. Aucun rôle Admin ou client dans cette application.'}});
  client.rpc=async(name,args,...rest)=>{

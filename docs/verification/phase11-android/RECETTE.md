@@ -17,7 +17,7 @@ Ressources du portail suivies dans `dist` embarquées : 997 fichiers avant exclu
 ## Contrôles locaux rejoués
 
 - APK, instrumentation, tests Java et Android Lint : réussis; avertissements de versions et ressources générées conservés, aucun contrôle neutralisé.
-- Adaptateur : 14 contrats, permissions simulées, Admin/client/inconnu refusés, purge intercomptes et transports bloqués.
+- Adaptateur : 15 contrats, permissions simulées, Admin/client/inconnu refusés, purge intercomptes et transports bloqués.
 - Compatibilité WebView : API standard `Promise.try`, Map et URL absentes recréées et testées dans un contexte isolé, sans transport ajouté. Le moteur PDF.js existant et ses octets restent inchangés; la compatibilité s’applique aussi au worker.
 - Chromium : sept formats 360×780, 390×844, 768×1024, 834×1112, 1366×768, 1440×900, 1920×1080. Auth équipe, garde TEST, clair/sombre/système dynamique, texte Grand, contraste, hors ligne/retour, aucun débordement ni erreur JS.
 - Lecteur : quatre vraies pages PDF avec contenu non vide, ouverture PDF et image privées, annulation d’enregistrement sans faux succès. Pont natif simulé ici; distinct des tests Android.
@@ -44,6 +44,7 @@ Les tests utilisent seulement des lectures métier MIR TEST; aucune commande, no
 - Champ sous le clavier : recalcul du défilement après changement du viewport, assertion géométrique conservée après stabilisation du layout.
 - PDF volumineux dans l’état Capacitor : `TransactionTooLargeException`, Bundle de 4 497 732 octets. Octets retirés des options d’activité; seul le nom du fichier privé est conservé pour le retour du sélecteur. Le test conserve le vrai PDF de quatre pages.
 - Pièces jointes ouvertes par `window.open` : raccordées au lecteur privé PDF/image; origine et session contrôlées. Ni URL signée ni document distant dans une WebView disposant du pont natif.
+- Stockage Auth limité à sa clé fixe : le nettoyage des clés auxiliaires du SDK ne peut pas effacer le coffre, ni les PDF privés. Contrat dédié ajouté.
 - Déconnexion : coffre, fichiers temporaires, stockage web, IndexedDB, historique et cache WebView purgés. Un IndexedDB bloqué interdit le changement de compte.
 
 ## Limites honnêtes

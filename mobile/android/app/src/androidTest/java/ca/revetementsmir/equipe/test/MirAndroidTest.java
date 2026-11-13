@@ -30,7 +30,7 @@ public class MirAndroidTest {
  private void waitFor(ActivityScenario<MainActivity> scenario,String expression)throws Exception{
   long end=SystemClock.uptimeMillis()+30000;
   while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(scenario,expression)))return;SystemClock.sleep(150);}
-  screenshot("failed-wait");fail("Condition Android WebView non satisfaite : "+expression+"; état PDF="+js(scenario,"JSON.stringify({status:document.querySelector('#status')?.textContent,error:window.mirNativeDiagnostic})"));
+  screenshot("failed-wait");fail("Condition Android WebView non satisfaite : "+expression+"; état PDF="+js(scenario,"JSON.stringify({status:document.querySelector('#status')?.textContent,error:window.mirNativeDiagnostic,save:window.saveProof,visibility:document.visibilityState})"));
  }
  private void screenshot(String name)throws Exception{
   Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();File dir=new File(context.getExternalFilesDir(null),"phase11-proof");dir.mkdirs();
@@ -113,7 +113,10 @@ public class MirAndroidTest {
    screenshot("android-pdf-four-pages");
    byte[] original=java.security.MessageDigest.getInstance("SHA-256").digest(java.nio.file.Files.readAllBytes(file.toPath()));
    js(s,"window.saveProof='pending';MIRAndroid.Native.readPdf({id:'"+name+"'}).then(r=>MIRAndroid.Native.pdf({data:r.data,name:'RECETTE-PHASE11.pdf',action:'save'})).then(r=>window.saveProof=r.cancelled?'cancelled':'unexpected').catch(()=>window.saveProof='failed');true");
-   UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());assertTrue(device.wait(androidx.test.uiautomator.Until.hasObject(androidx.test.uiautomator.By.pkg("com.android.documentsui")),5000));screenshot("android-pdf-save-chooser");device.pressBack();waitFor(s,"window.saveProof==='cancelled'");
+   UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());assertTrue(device.wait(androidx.test.uiautomator.Until.hasObject(androidx.test.uiautomator.By.pkg("com.android.documentsui")),5000));screenshot("android-pdf-save-chooser");device.pressBack();
+   // The first Back can dismiss the filename keyboard; cancel the still-open picker.
+   if(!device.wait(androidx.test.uiautomator.Until.gone(androidx.test.uiautomator.By.pkg("com.android.documentsui")),1000))device.pressBack();
+   waitFor(s,"window.saveProof==='cancelled'");
    assertArrayEquals(original,java.security.MessageDigest.getInstance("SHA-256").digest(java.nio.file.Files.readAllBytes(file.toPath())));
    js(s,"window.pdfProof='pending';MIRAndroid.Native.pdf({data:btoa('not a PDF'),name:'bad.pdf',action:'open'}).then(()=>window.pdfProof='incorrectly accepted').catch(()=>window.pdfProof='refused');true");
    waitFor(s,"window.pdfProof==='refused'");
