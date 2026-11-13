@@ -46,10 +46,20 @@ Les urgences et actions requises restent obligatoires. Les Pliages restent un ra
 
 Captures locales : `reglages-390x844.png`, `reglages-sombre-390x844.png`, `reglages-834x1112.png` et `reglages-1440x900.png`.
 
+## MIR TEST
+
+- Projet vérifié : `hxtztkmbfpmzrieccwsg` (`MIR TEST`, état sain).
+- Migration `phase8_harmony_settings` appliquée seule puis rejouée sans erreur.
+- Schéma relu : RLS active, `SECURITY DEFINER`, `search_path` fixe, `anon` refusé, `authenticated` seulement.
+- Recette réelle : run GitHub `43344719746`, 8 contrôles réussis, six rôles authentifiés.
+- Persistance prouvée après reconnexion pour les six rôles, puis réglages initiaux restaurés.
+- Isolation interorganisationnelle et refus anonyme confirmés.
+- Zéro commande, estimation, transmission fournisseur, courriel ou push; zéro requête production.
+
 ## Limites honnêtes
 
 - Les notifications internes utilisent l’actualisation/rechargement; aucun temps réel n’est annoncé.
 - Hors ligne, le choix visuel est temporairement appliqué à l’appareil et mis en attente. L’état `Enregistré` ne revient qu’après la confirmation serveur.
 - Aucun courriel, SMS, push, SMTP, Gmail ou Resend n’est activé.
 - Les PDF et impressions sont forcés en rendu clair par la feuille d’impression, indépendamment du thème utilisateur.
-- La certification MIR TEST et les exécutions GitHub sont consignées séparément après validation locale et CI.
+- La recette réelle modifie temporairement seulement les préférences des six comptes et restaure leurs valeurs initiales; aucun historique métier n’est touché.

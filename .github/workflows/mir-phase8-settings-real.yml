@@ -2,8 +2,6 @@ name: MIR Phase 8 Réglages — recette réelle TEST
 
 on:
   workflow_dispatch:
-  push:
-    branches: [codex/phase-8-themes-settings]
 
 permissions:
   contents: read
