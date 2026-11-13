@@ -73,13 +73,30 @@ test('Face 1 et Face 2 ciblent automatiquement le segment le plus long',()=>{
   }
 });
 
-test('rendu commun : toutes les lettres, surbrillance et étoile PDF',()=>{
+test('rendu commun : toutes les lettres, aucune surbrillance verte et étoile PDF',()=>{
   for(const {id} of B.VARIANTS){
     const spec=complete(id),model=P.buildProfile(spec);
     const svg=P.profileDiagramContent(model,model.pointsMM.map(([x,y])=>[x+300,y+300]),{paintedMarker:'star',highContrast:true});
     for(const segment of model.segments)assert.match(svg,new RegExp('data-marker-label="'+segment.label+'"'),id+' '+segment.label);
-    assert.match(svg,/profile-painted-face-highlight/,id);
+    assert.doesNotMatch(svg,/profile-painted-face-highlight|#348511|#568443/i,id+' sans highlight vert');
     assert.match(svg,/profile-painted-star/,id);
+  }
+});
+
+test('Fascia certifié : A 6, pli 90, B 1 1/4, retour écrasé, C 3/4, développé 8',()=>{
+  for(const face of ['left','right']){
+    const spec=complete('fascia',{face,quantity:1});
+    spec.segments[0].length=6;
+    spec.material={type:'aluminium'};
+    spec.finish={selectionType:'manufacturer',manufacturer:'Kaycan',system:'Nuancier Kaycan',code:'NOIR',name:'Noir'};
+    const model=P.buildProfile(spec);
+    assert.equal(model.finishedSegmentSumMM/25.4,8);
+    assert.equal(model.material.gauge,'');
+    const page=P.productionPages({poNumber:'RECETTE-PHASE10-FASCIA',project:'Preuve locale',foreman:'Employé MIR',date:'2026-11-13',revision:'A',items:[{id:'FASCIA-'+face.toUpperCase(),spec}]},{layout:'bending-sheet'})[0].svg;
+    const ordered=['A = 6 po','Pli A–B = 90°','B = 1 1/4 po','Pli B–C = 180° — retour écrasé','C = 3/4 po','Développé total = 8 po'];
+    let cursor=-1;for(const text of ordered){const index=page.indexOf(text);assert.ok(index>cursor,face+' ordre de fabrication : '+text);cursor=index;}
+    assert.doesNotMatch(page,/profile-painted-face-highlight|#348511|#568443/i);
+    assert.match(page,/Kaycan/);assert.match(page,/Noir/);
   }
 });
 
@@ -105,6 +122,14 @@ test('instantané immuable et révision sans écrasement',()=>{
   assert.equal(revised.snapshot.revision,2);
 });
 
+test('développé Fascia conservé dans commande et révision',()=>{
+  const spec=complete('fascia');spec.segments[0].length=6;
+  const template=P.createTemplate(spec,{id:'phase10-fascia',name:'Fascia',version:3}).template;
+  const first=P.instantiateTemplate(template,{measurements:{A:6,B:1.25,C:.75},length:120,quantity:1,material:{type:'aluminium'},finish:{selectionType:'manufacturer',manufacturer:'Kaycan',system:'Nuancier Kaycan',code:'NOIR',name:'Noir'},coloredFace:spec.coloredFace});
+  assert.equal(first.ok,true);assert.equal(first.snapshot.spec.mirDevelopedTotalIn,8);
+  const revised=P.reviseInstance(first,{quantity:2});assert.equal(revised.ok,true);assert.equal(revised.snapshot.spec.mirDevelopedTotalIn,8);assert.equal(first.snapshot.spec.quantity,1);
+});
+
 test('un profil unique produit une page complète, quatre profils quatre pages',()=>{
   const items=['fascia','ailes_fenetre','beam','capage_climatiseur'].map((id,index)=>({id:'M00'+(index+1),spec:complete(id)}));
   const pages=P.productionPages({id:'RECETTE-PHASE10',poNumber:'RECETTE-PHASE10',project:'Chantier fictif',foreman:'MIR',date:'2026-11-13',revision:'A',items},{layout:'bending-sheet'});
@@ -120,6 +145,12 @@ test('un profil unique produit une page complète, quatre profils quatre pages',
 test('aucun test Phase 10 neutralisé',()=>{
   const app=fs.readFileSync(path.join(__dirname,'../dist/production-app.js'),'utf8');
   assert.ok(app.includes('phase10ProfileIds'));
+});
+
+test('Boss et Adjointe conservent la gestion technique interne',()=>{
+  const workspace=fs.readFileSync(path.join(__dirname,'../dist/mir-shared-workspace.js'),'utf8');
+  assert.match(workspace,/role==='boss'\|\|value\?\.role==='assistant'/);
+  assert.match(workspace,/text\('label','Gage',group\)/);
 });
 
 console.log('Phase 10 : '+total+'/'+total+' contrôles réussis.');

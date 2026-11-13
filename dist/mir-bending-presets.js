@@ -12,7 +12,7 @@
      14.1 à 14.10. Les profils historiques restent accessibles, mais ne sont
      jamais comptés dans cette banque canonique. */
   const VARIANTS=Object.freeze([
-    {id:'fascia',source:'fascia',version:2},
+    {id:'fascia',source:'fascia',version:3,developedTotalIn:8},
     {id:'ailes_fenetre',source:'ailes_fenetre',version:1},
     {id:'eloignement_eaux',source:'eloignement_eaux',version:2},
     {id:'goutte_eau_8',source:'goutte_eau_8',version:2,developedTotalIn:8},
@@ -115,9 +115,9 @@
     if(!variant||!VARIANTS.includes(variant))return {ok:true,pending:false,errors:[]};
     const model=M.buildProfile(spec),errors=[];
     if(!model.valid)return {ok:false,pending:true,errors:model.validation.errors};
-    if(id==='goutte_eau_8'){
+    if(variant.developedTotalIn){
       const total=model.finishedSegmentSumMM/25.4;
-      if(Math.abs(total-8)>1e-7)errors.push({code:'DEVELOPED_TOTAL_8_REQUIRED',path:'segments',message:'La somme des quatre cotes doit être exactement 8 po.'});
+      if(Math.abs(total-variant.developedTotalIn)>1e-7)errors.push({code:'DEVELOPED_TOTAL_REQUIRED',path:'segments',message:'La somme des cotes doit être exactement '+variant.developedTotalIn+' po.'});
     }
     if(id==='sill_trim'){
       const face=model.segments.find(s=>s.label==='A')?.lengthMM/25.4;

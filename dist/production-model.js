@@ -301,7 +301,7 @@
     if (extruded) {
       if (material.thicknessMM === null) pending.push(issue('EXTRUDED_THICKNESS_REQUIRED', 'material.thickness', 'Choisissez l’épaisseur de l’aluminium extrudé : 2 mm ou 3 mm.'));
       else if (![2, 3].some(t => Math.abs(material.thicknessMM - t) < EPS)) pending.push(issue('EXTRUDED_THICKNESS_CHOICE', 'material.thickness', 'Ce modèle d’aluminium extrudé propose seulement 2 mm ou 3 mm.'));
-    } else if (!material.gauge && material.thicknessMM === null) pending.push(issue('GAUGE_OR_THICKNESS_REQUIRED', 'material', 'Gage ou épaisseur de tôle à préciser.'));
+    } else if (kind === 'panel' && !material.gauge && material.thicknessMM === null) pending.push(issue('GAUGE_OR_THICKNESS_REQUIRED', 'material', 'Gage ou épaisseur de tôle à préciser.'));
     if (material.gauge && !unknownGauge) warnings.push(issue('GAUGE_NOT_CONVERTED', 'material.gauge', 'Le gage est conservé tel que saisi; aucune conversion en épaisseur n’est supposée.'));
     const finish = { manufacturer: text(rawFinish.manufacturer, 100), name: text(rawFinish.name, 100), code: text(rawFinish.code, 80), system: text(rawFinish.system, 60), selectionType: ['manufacturer', 'ral', 'custom'].includes(rawFinish.selectionType) ? rawFinish.selectionType : null, special: rawFinish.special === true, hex: /^#[0-9a-f]{6}$/i.test(rawFinish.hex || '') ? rawFinish.hex : null };
     const pricing = colorQuotePolicy({ finish });
@@ -356,6 +356,10 @@
     if (!coloredFace.side) meta.pending.push(issue('COLORED_FACE_REQUIRED', 'coloredFace.side', 'Indiquez le côté coloré, gauche ou droit en suivant A vers les segments suivants.'));
     if (!used.has(coloredFace.segmentId)) meta.pending.push(issue('COLORED_FACE_SEGMENT', 'coloredFace.segmentId', 'Choisissez un segment existant pour le repère de face colorée.'));
     if (warnings.some(w => w.code === 'PROFILE_CROSSING')) meta.pending.push(issue('CROSSING_REVIEW', 'segments', 'Le croisement doit être résolu avant validation atelier.'));
+    if (!errors.length && Number.isFinite(Number(spec.mirDevelopedTotalIn))) {
+      const actualIn = segments.reduce((sum, segment) => sum + segment.lengthMM, 0) / 25.4;
+      if (Math.abs(actualIn - Number(spec.mirDevelopedTotalIn)) > EPS) errors.push(issue('DEVELOPED_TOTAL_REQUIRED', 'segments', 'La somme des cotes doit être exactement ' + decimal(Number(spec.mirDevelopedTotalIn)) + ' po.'));
+    }
     const check = validation(errors, meta.pending, [...warnings, ...meta.warnings]);
     return withPricing({ version: VERSION, kind: 'profile', id: text(spec.id, 80), name: text(spec.name || spec.label || template?.label || 'Profil libre', 140), template: templateId, unit, spec, segments, bends, pointsMM, bbox: pointsMM.length ? bounds(pointsMM) : null, coloredFace, quantity: meta.quantity, material: meta.material, finish: meta.finish, quotePolicy: meta.quotePolicy, lengthMM: meta.lengthMM, location: meta.location, note: meta.note, finishedSegmentSumMM: errors.length ? null : segments.reduce((sum, s) => sum + s.lengthMM, 0), developedWidthMM: null, developedWidth: null, developmentStatus: 'requires_workshop_bend_parameters', validation: check, valid: check.valid, complete: check.specificationComplete, productionReady: check.productionReady });
   }
@@ -573,11 +577,17 @@
     return result;
   }
   function profileDetailLines(model) {
-    const lines = model.segments.map(s => s.label + ' = ' + formatMeasurement(s.lengthMM, model.unit) + (s.name ? ' · ' + s.name : ''));
-    for (const b of model.bends) if (b) lines.push('Pli ' + b.from + '–' + b.to + ' : ' + b.label);
+    const lines=[];
+    model.segments.forEach((s,index)=>{lines.push(s.label + ' = ' + formatMeasurement(s.lengthMM, model.unit) + (s.name ? ' · ' + s.name : ''));const b=model.bends[index];if(b)lines.push('Pli ' + b.from + '–' + b.to + ' = ' + fabricationBendLabel(b));});
+    if(model.spec?.mirDevelopedTotalIn)lines.push('Développé total = '+formatMeasurement(model.finishedSegmentSumMM,model.unit));
     lines.push('* Face colorée : ' + (model.coloredFace.side ? (model.coloredFace.side === 'left' ? 'gauche' : 'droite') + ' en suivant A → dernier segment' : 'à préciser'));
     lines.push('Développé de tôle : à valider par l’atelier.');
     return lines;
+  }
+  function fabricationBendLabel(bend) {
+    if (bend?.mode === 'hem') return '180° — retour écrasé';
+    if (Number.isFinite(bend?.angle)) return decimal(Math.abs(bend.angle)) + '°';
+    return bend?.label || 'à préciser';
   }
   function profileSVG(value, options = {}) {
     const model = modelOf(value), width = safeSize(options.width, 900), legend = options.legend !== false, details = profileDetailLines(model), height = safeSize(options.height, Math.max(480, legend ? 96 + details.length * 24 : 480));
@@ -595,9 +605,7 @@
     const coloredIndex = model.segments.findIndex(s => s.id === model.coloredFace.segmentId);
     if (model.coloredFace.side && coloredIndex >= 0) {
       const a = points[coloredIndex], b = points[coloredIndex + 1], len = Math.max(dist(a, b), EPS), sign = model.coloredFace.side === 'left' ? -1 : 1, normal = [-(b[1] - a[1]) / len * sign, (b[0] - a[0]) / len * sign], mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-      const tangent = [(b[0] - a[0]) / len, (b[1] - a[1]) / len], half = Math.min(24, len * .3), center = [mid[0] + normal[0] * 8, mid[1] + normal[1] * 8];
-      out += '<line x1="' + decimal(center[0] - tangent[0] * half) + '" y1="' + decimal(center[1] - tangent[1] * half) + '" x2="' + decimal(center[0] + tangent[0] * half) + '" y2="' + decimal(center[1] + tangent[1] * half) + '" stroke="#568443" stroke-width="3"/>';
-      out += svgText(mid[0] + normal[0] * 26, mid[1] + normal[1] * 26 + 6, '*', 'font-size="28" font-weight="700" fill="#568443" text-anchor="middle"');
+      out += svgText(mid[0] + normal[0] * 26, mid[1] + normal[1] * 26 + 6, '★', 'font-size="24" font-weight="700" fill="#9a6500" text-anchor="middle"');
     }
     for (const b of model.bends.filter(b => b?.mode === 'hem')) {
       const p = project(b.at);
@@ -698,8 +706,13 @@
   }
   function productionDetailLines(item) {
     if (item.kind === 'profile') {
-      const lines = item.segments.map(s => s.label + ' = ' + formatMeasurement(s.lengthMM, item.unit));
-      for (const b of item.bends) if (b) lines.push('Pli ' + b.from + '–' + b.to + ' : ' + b.label);
+      const lines = [];
+      item.segments.forEach((segment, index) => {
+        lines.push(segment.label + ' = ' + formatMeasurement(segment.lengthMM, item.unit));
+        const bend = item.bends[index];
+        if (bend) lines.push('Pli ' + bend.from + '–' + bend.to + ' = ' + fabricationBendLabel(bend));
+      });
+      if (item.spec?.mirDevelopedTotalIn) lines.push('Développé total = ' + formatMeasurement(item.finishedSegmentSumMM, item.unit));
       lines.push('Face colorée : ' + (item.coloredFace.side ? (item.coloredFace.side === 'left' ? 'gauche' : 'droite') + ' de A → ' + item.segments.at(-1).label : 'à préciser'));
       lines.push(...pricingDetailLines(item));
       return lines;
@@ -887,7 +900,7 @@ function profileSideMarkers({segments,folds},model,handles,annotationBounds,[lef
   const row=Math.floor(index/columns);
   const inRow=Math.min(columns,missing.length-row*columns);
   const x=letterOnly?(left+right)/2+(index%columns-(inRow-1)/2)*30:61+(index%columns)*113;
-  const y=letterOnly?495-row*24:466+row*14;
+  const y=letterOnly?495-row*24:452+row*32;
   const point=[x,y];
   annotationBounds?.push([x,y,letterOnly?11:halfWidth*.55,letterOnly?11:6.6]);
   if(!letterOnly)leaders.push(leader(point,anchor));
@@ -907,9 +920,6 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
  if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;
  const at=gap=>[mid[0]+normal[0]*gap*side,mid[1]+normal[1]*gap*side];
- const haloCenter=at(12),haloHalf=Math.min(34,len*.4),haloEnd=sign=>[haloCenter[0]+dx/len*haloHalf*sign,haloCenter[1]+dy/len*haloHalf*sign];
- const haloEnds=[haloEnd(-1),haloEnd(1)];
- output+=`<path class="profile-painted-face-highlight" d="M${haloEnds[0].map(decimal).join(',')}L${haloEnds[1].map(decimal).join(',')}" fill="none" stroke="${highContrast?'#8fd36f':'#b8ddb0'}" stroke-opacity=".58" stroke-width="18" stroke-linecap="round"/>`;
  if(paintedMarker==='star'){
   const center=at(32);
   const points=Array.from({length:10},(_,index)=>{
@@ -918,7 +928,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
   }).join(' ');
   reserved.push(center,[center[0]-14,center[1]],[center[0]+14,center[1]]);
   const action=togglePaintedFace?' data-toggle-painted-face role="button" tabindex="0" aria-label="Inverser la face peinte" style="cursor:pointer"':'';
-  output+=`<g${action}><polygon class="profile-painted-star" points="${points}" fill="#ffcf4d" stroke="#202e29" stroke-width="4" stroke-linejoin="round"/></g>`;
+  output+=`<g${action} data-painted-side="${model.coloredFace.side}" data-painted-segment="${model.coloredFace.segmentId}"><polygon class="profile-painted-star" points="${points}" fill="#ffcf4d" stroke="#202e29" stroke-width="4" stroke-linejoin="round"/></g>`;
   return;
  }
  const stripeCenter=at(9),half=Math.min(24,len*.34);
@@ -992,12 +1002,13 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     const bodyText='font-size="11.5"';
     const compactLengths=item=>item.segments.flatMap((segment,index)=>{
       const bend=item.bends[index];
-      return [segment.label+' = '+formatMeasurement(segment.lengthMM,item.unit),...(bend?['Pli '+bend.from+'–'+bend.to+' : '+bend.label]:[])];
+      return [segment.label+' = '+formatMeasurement(segment.lengthMM,item.unit),...(bend?['Pli '+bend.from+'–'+bend.to+' = '+fabricationBendLabel(bend)]:[])];
     });
     for(const [family,items] of groupProfiles(order.items,profileGroups))for(const item of items){
       const title=lines([item.id+' · '+item.name],55);
       const face=item.coloredFace?.side?['Face colorée : '+(item.coloredFace.side==='left'?'gauche':'droite')+' · côté '+item.coloredFace.segmentId]:[];
-      const details=lines([...compactLengths(item),...face,...(item.location?['Repère : '+item.location]:[]),...(item.note?[item.note]:[])],33);
+      const total=item.spec?.mirDevelopedTotalIn?['Développé total = '+formatMeasurement(item.finishedSegmentSumMM,item.unit)]:[];
+      const details=lines([...compactLengths(item),...total,...face,...(item.location?['Repère : '+item.location]:[]),...(item.note?[item.note]:[])],33);
       const material=lines(materialLines(item),13),finish=lines(finishLines(item),16);
       const checks=lines([...item.validation.errors,...item.validation.pending].map(issue=>issue.message),90).filter(Boolean);
       for(let start=0;start<Math.max(details.length,material.length,finish.length,1);start+=23){
@@ -1220,6 +1231,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     for (const key of allowedMeta) if (own(values, key)) spec[key] = copy(values[key]);
     if (topology.kind === 'profile') {
       spec.template = 'custom'; spec.startAngle = topology.startAngle; spec.bends = copy(topology.bends);
+      if (Number.isFinite(topology.mirDevelopedTotalIn)) spec.mirDevelopedTotalIn = topology.mirDevelopedTotalIn;
       spec.segments = topology.segments.map(s => ({ label: s.label, name: s.name, length: own(m, s.label) ? m[s.label] : values.segments?.find(v => v.label === s.label)?.length ?? null }));
       if (own(m, 'length')) spec.length = m.length;
       spec.coloredFace = copy(values.coloredFace || topology.coloredFace || {});
@@ -1249,7 +1261,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       const initial = segments.map((s, i) => parseMeasurement(preset ? source.dimensions?.[s.label] : source.segments?.[i]?.length, source.unit || 'in'));
       const largest = Math.max(1, ...initial.filter(p => p.ok && p.mm > 0).map(p => p.mm));
       const ratios = initial.map(p => p.ok && p.mm > 0 ? Math.max(.02, p.mm / largest) : 1);
-      topology = { kind, segments, bends, startAngle, coloredFace: { side: ['left', 'right'].includes(source.coloredFace?.side) ? source.coloredFace.side : null, segmentId: text(source.coloredFace?.segmentId || segments[0]?.label, 5) } };
+      topology = { kind, segments, bends, startAngle, coloredFace: { side: ['left', 'right'].includes(source.coloredFace?.side) ? source.coloredFace.side : null, segmentId: text(source.coloredFace?.segmentId || segments[0]?.label, 5) }, ...(Number.isFinite(Number(source.mirDevelopedTotalIn))?{mirDevelopedTotalIn:Number(source.mirDevelopedTotalIn)}:{}) };
       proportions = { illustrative: true, unitless: true, segmentRatios: ratios };
       const probe = buildProfile({ template: 'custom', unit: 'mm', segments: segments.map((s, i) => ({ ...s, length: ratios[i] * 100 })), bends, startAngle });
       errors.push(...probe.validation.errors); warnings.push(...probe.validation.warnings);
@@ -1300,6 +1312,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       }
       const angle = angleValue(topology.startAngle);
       if (angle === null || Math.abs(angle) > 360) errors.push(issue('INVALID_TEMPLATE_ANGLE', 'topology.startAngle', 'Orientation du modèle invalide.'));
+      if (own(topology, 'mirDevelopedTotalIn') && (!Number.isFinite(topology.mirDevelopedTotalIn) || topology.mirDevelopedTotalIn <= 0)) errors.push(issue('INVALID_DEVELOPED_TOTAL', 'topology.mirDevelopedTotalIn', 'Le développé total imposé doit être positif.'));
     } else {
       if (topology.shape !== 'polygon' && !SHAPES.some(s => s.id === topology.shape)) errors.push(issue('INVALID_TEMPLATE_SHAPE', 'topology.shape', 'Forme de panneau non définie.'));
       if (topology.shape === 'right-triangle' && !['bottom-left', 'bottom-right', 'top-left', 'top-right'].includes(topology.rightAngle)) errors.push(issue('INVALID_TEMPLATE_RIGHT_ANGLE', 'topology.rightAngle', 'Position de l’angle droit invalide.'));
