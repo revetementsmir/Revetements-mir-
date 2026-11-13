@@ -113,10 +113,13 @@ class Capture:
             if path.exists():
                 raise CaptureError('Duplicate original screenshot name')
             shutil.copyfile(source, path)
+            updated = source.name.startswith('v110002-')
             self.manifest['screens'].append({'file': str(path.relative_to(self.output)),
                 'origin': 'certified-instrumentation', 'source_run': RUN, 'source_sha': SOURCE,
-                'apk_versionCode': 110001, 'binary_sha256': None,
-                'note': 'Original tests ran before the certified 110001 to 110002 update; 110001 binary was not archived.',
+                'apk_versionCode': 110002 if updated else 110001,
+                'binary_sha256': APK_SHA if updated else None,
+                'note': ('Real-role matrix ran after the certified update on the archived 110002 APK.'
+                         if updated else 'Original tests ran before the certified 110001 to 110002 update; 110001 binary was not archived.'),
                 'scaled': source.stem.endswith('-scaled'), **png_info(path)})
 
     def wait(self, predicate, label, seconds=30):
