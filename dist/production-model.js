@@ -358,7 +358,7 @@
     if (warnings.some(w => w.code === 'PROFILE_CROSSING')) meta.pending.push(issue('CROSSING_REVIEW', 'segments', 'Le croisement doit être résolu avant validation atelier.'));
     if (!errors.length && Number.isFinite(Number(spec.mirDevelopedTotalIn))) {
       const actualIn = segments.reduce((sum, segment) => sum + segment.lengthMM, 0) / 25.4;
-      if (Math.abs(actualIn - Number(spec.mirDevelopedTotalIn)) > EPS) errors.push(issue('DEVELOPED_TOTAL_REQUIRED', 'segments', 'La somme des cotes doit être exactement ' + decimal(Number(spec.mirDevelopedTotalIn)) + ' po.'));
+      if (Math.abs(actualIn - Number(spec.mirDevelopedTotalIn)) > EPS) errors.push(issue(Number(spec.mirDevelopedTotalIn) === 8 ? 'DEVELOPED_TOTAL_8_REQUIRED' : 'DEVELOPED_TOTAL_REQUIRED', 'segments', 'La somme des cotes doit être exactement ' + decimal(Number(spec.mirDevelopedTotalIn)) + ' po.'));
     }
     const check = validation(errors, meta.pending, [...warnings, ...meta.warnings]);
     return withPricing({ version: VERSION, kind: 'profile', id: text(spec.id, 80), name: text(spec.name || spec.label || template?.label || 'Profil libre', 140), template: templateId, unit, spec, segments, bends, pointsMM, bbox: pointsMM.length ? bounds(pointsMM) : null, coloredFace, quantity: meta.quantity, material: meta.material, finish: meta.finish, quotePolicy: meta.quotePolicy, lengthMM: meta.lengthMM, location: meta.location, note: meta.note, finishedSegmentSumMM: errors.length ? null : segments.reduce((sum, s) => sum + s.lengthMM, 0), developedWidthMM: null, developedWidth: null, developmentStatus: 'requires_workshop_bend_parameters', validation: check, valid: check.valid, complete: check.specificationComplete, productionReady: check.productionReady });
@@ -1334,7 +1334,11 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     const errors = templateCheck(template);
     if (errors.length) return { ok: false, model: null, errors, illustrative: true };
     const p = template.previewProportions || {}, measurements = {};
-    if (template.kind === 'profile') template.topology.segments.forEach((s, i) => { measurements[s.label] = (p.segmentRatios?.[i] || 1) * 100; });
+    if (template.kind === 'profile') {
+      const ratios=template.topology.segments.map((s,i)=>p.segmentRatios?.[i]||1);
+      const scale=Number.isFinite(template.topology.mirDevelopedTotalIn)?template.topology.mirDevelopedTotalIn*25.4/ratios.reduce((sum,value)=>sum+value,0):100;
+      template.topology.segments.forEach((s, i) => { measurements[s.label] = ratios[i] * scale; });
+    }
     else for (const [key, value] of Object.entries(p)) if (typeof value === 'number') measurements[key] = value * 100;
     if(template.kind==='panel'&&template.topology.shape==='roof-slope')measurements.roofPitch=p.roofPitch||'6/12';
     const spec = specFromTopology(template.topology, { unit: 'mm', measurements }); spec.name = template.name;

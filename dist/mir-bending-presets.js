@@ -117,7 +117,7 @@
     if(!model.valid)return {ok:false,pending:true,errors:model.validation.errors};
     if(variant.developedTotalIn){
       const total=model.finishedSegmentSumMM/25.4;
-      if(Math.abs(total-variant.developedTotalIn)>1e-7)errors.push({code:'DEVELOPED_TOTAL_REQUIRED',path:'segments',message:'La somme des cotes doit être exactement '+variant.developedTotalIn+' po.'});
+      if(Math.abs(total-variant.developedTotalIn)>1e-7)errors.push({code:variant.developedTotalIn===8?'DEVELOPED_TOTAL_8_REQUIRED':'DEVELOPED_TOTAL_REQUIRED',path:'segments',message:'La somme des cotes doit être exactement '+variant.developedTotalIn+' po.'});
     }
     if(id==='sill_trim'){
       const face=model.segments.find(s=>s.label==='A')?.lengthMM/25.4;
