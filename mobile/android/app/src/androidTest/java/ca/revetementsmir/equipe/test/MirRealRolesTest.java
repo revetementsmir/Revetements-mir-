@@ -14,6 +14,32 @@ import static org.junit.Assert.*;
 public class MirRealRolesTest extends MirDeviceSetup {
  private Object js(ActivityScenario<MainActivity>s,String expression)throws Exception{CountDownLatch done=new CountDownLatch(1);String[] value={null};s.onActivity(a->a.getBridge().getWebView().evaluateJavascript(expression,r->{value[0]=r;done.countDown();}));assertTrue(done.await(10,TimeUnit.SECONDS));return value[0]==null||value[0].equals("null")?null:new JSONTokener(value[0]).nextValue();}
  private void waitFor(ActivityScenario<MainActivity>s,String expression)throws Exception{long end=SystemClock.uptimeMillis()+30000;while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(s,expression)))return;SystemClock.sleep(150);}fail("MIR TEST Android : résultat serveur non confirmé");}
+ private void screenshot(ActivityScenario<MainActivity>s,String name)throws Exception{
+  // Wait for the rendered WebView frame, not only a changed DOM attribute.
+  CountDownLatch drawn=new CountDownLatch(1);
+  s.onActivity(a->a.getBridge().getWebView().postVisualStateCallback(1,new android.webkit.WebView.VisualStateCallback(){@Override public void onComplete(long id){drawn.countDown();}}));
+  assertTrue("WebView frame ready",drawn.await(10,TimeUnit.SECONDS));
+  InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+  androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).waitForIdle();
+  File dir=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null),"phase11-proof");assertTrue(dir.isDirectory()||dir.mkdirs());
+  File file=new File(dir,name+".png");assertFalse("Never overwrite native proof",file.exists());
+  android.graphics.Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bitmap);
+  try(FileOutputStream out=new FileOutputStream(file)){assertTrue(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,out));}finally{bitmap.recycle();}
+ }
+ private void inspectMenu(ActivityScenario<MainActivity>s,String role)throws Exception{
+  js(s,"scrollTo(0,0);document.querySelector('.mir-harmony-toggle').click();true");
+  waitFor(s,"document.querySelector('#mir-harmony-menu')?.hidden===false");
+  // The exact regression observed in the original native PNGs: a public link
+  // survives relocation or late insertion into the shared header.
+  waitFor(s,"[...document.querySelectorAll('#mir-harmony-menu a[href]')].every(a=>MIRAndroid.Policy.allowedRoute(a.href,location.origin)||!a.getClientRects().length)");
+  assertEquals(Boolean.TRUE,js(s,"[...document.querySelectorAll('#portal-navigation button')].some(b=>b.getClientRects().length)"));
+  screenshot(s,"v110002-"+role+"-menu");
+  js(s,"document.querySelector('.mir-harmony-toggle').click();scrollTo(0,0);true");
+  screenshot(s,"v110002-"+role+"-home");
+  js(s,"document.querySelector('[data-view=settings]').click();true");
+  waitFor(s,"!!document.querySelector('#harmony-settings-form')");
+  js(s,"scrollTo(0,0);true");screenshot(s,"v110002-"+role+"-settings");
+ }
  @Test public void fiveBusinessRolesAndTechnicalAdmin()throws Exception{
   File credentials=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir(),"phase11-roles.json");
   JSONObject config=new JSONObject(new String(java.nio.file.Files.readAllBytes(credentials.toPath()),java.nio.charset.StandardCharsets.UTF_8));
@@ -33,6 +59,7 @@ public class MirRealRolesTest extends MirDeviceSetup {
      String label=role.getString("role").equals("employe")?"Employé chantier":role.getString("role").equals("chef_equipe")?"Chef d’équipe":role.getString("role").equals("warehouse")?"Entrepôt et livraison":role.getString("role").equals("assistant")?"Adjointe":"Boss";
      waitFor(s,"document.body.dataset.portalConnection==='connected'");assertEquals(label,js(s,"document.querySelector('#account-role').textContent"));assertEquals(Boolean.TRUE,js(s,"document.querySelector('#portal-content').children.length>0"));
      s.recreate();waitFor(s,"window.MIRPortalActiveClient?.getStatus().phase===\"ready\"");assertEquals(role.getString("role"),js(s,"MIRPortalActiveClient.getStatus().snapshot.operations.role"));waitFor(s,"document.body.dataset.portalConnection==='connected'");assertEquals(label,js(s,"document.querySelector('#account-role').textContent"));
+     inspectMenu(s,role.getString("role"));
      // Foreign organisation is rejected by the existing server contract.
      js(s,"window.realProof='pending';MIRSupabase.createClient(MIRPortalConfig.supabaseUrl,MIRPortalConfig.publishableKey).rpc('mir_employee_operations_snapshot',{org:'00000000-0000-4000-8000-000000000011',job:null}).then(r=>window.realProof=r.error?.code==='42501'?'denied':'unexpected');true");waitFor(s,"window.realProof==='denied'");
     }
