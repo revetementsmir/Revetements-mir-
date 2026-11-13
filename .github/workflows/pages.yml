@@ -2,7 +2,7 @@ name: Publier le site principal MIR
 on:
   push:
     branches: [main]
-    paths: ['dist/**', 'tests/**', 'server/**', 'supabase/functions/**', '.github/workflows/pages.yml']
+    paths: ['dist/**', 'tests/**', 'server/**', 'supabase/functions/**', 'scripts/build-mir-test.cjs', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -239,6 +239,8 @@ jobs:
             echo "Les écrans de démonstration ne doivent pas être publiés." >&2
             exit 1
           fi
+      - name: Préparer le site MIR TEST isolé
+        run: node scripts/build-mir-test.cjs _site_mir _site_mir/test "$GITHUB_SHA"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site_mir
@@ -254,6 +256,15 @@ jobs:
             curl --fail --silent --show-error --location \
               --retry 20 --retry-delay 3 --retry-all-errors "$1" -o "$2"
           }
+          for file in responsive.html mir-responsive-adapter.mjs mir-responsive-styles.mjs mir-responsive-history.js mir-responsive-environments.mjs; do
+            fetch "$base/$file?verification=$GITHUB_SHA" "/tmp/published-$file"
+            cmp "/tmp/published-$file" "_site_mir/$file"
+          done
+          for file in index.html responsive.html portal-config.js shared-config.js mir-estimate-config.js mir-test-guard.js mir-test-environment.json mir-responsive-environments.mjs; do
+            fetch "$base/test/$file?verification=$GITHUB_SHA" "/tmp/test-$file"
+            cmp "/tmp/test-$file" "_site_mir/test/$file"
+          done
+          node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("/tmp/test-mir-test-environment.json"));if(m.environment!=="test"||m.projectRef!=="hxtztkmbfpmzrieccwsg"||m.revision!==process.env.GITHUB_SHA)throw Error("Published TEST revision mismatch");'
           fetch "$base/index.html?verification=$GITHUB_SHA" /tmp/mir-homepage.html
           cmp /tmp/mir-homepage.html _site_mir/index.html
           grep -F 'mir-home-premium.css?v=' /tmp/mir-homepage.html
@@ -583,4 +594,15 @@ jobs:
             artifacts/estimation-edge-published/
             docs/verification/estimation-edge-20261109/simulated-ui/
             docs/verification/estimation-edge-20261109/live-ui/
+          if-no-files-found: ignore
+      - name: Vérifier le choix TEST / PRODUCTION publié sans appel Supabase
+        env:
+          MIR_ENV_PUBLISHED_BASE: ${{ steps.deployment.outputs.page_url }}
+        run: MIR_CHROMIUM_BIN=$(command -v google-chrome || command -v chromium) node tests/mir-test-production-browser.cjs
+      - name: Preuves TEST / PRODUCTION publiées
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-environments-publies
+          path: artifacts/mir-environments/
           if-no-files-found: ignore

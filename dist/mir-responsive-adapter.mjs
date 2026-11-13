@@ -1,4 +1,5 @@
 import {isolatePageStyles} from './mir-responsive-styles.mjs';
+import {mountEnvironmentSwitch} from './mir-responsive-environments.mjs';
 if(document.readyState==='loading') await new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
 const PROJECT='7afd893e-adcb-494b-a82b-c4cf8b28f94e';
 const params=new URL(location.href).searchParams;
@@ -48,6 +49,7 @@ try {
     annotations:false,
     afterMount(value){
       context=value;
+      const disposeEnvironment=mountEnvironmentSwitch(value.workspace);
       for(const button of value.workspace.querySelectorAll('[data-layout="phone-tablet"],[data-layout="phone-web"]'))button.remove();
       const notice=document.createElement('div');notice.className='mir-responsive-notice';
       notice.textContent='Vrais écrans MIR · une vue active à la fois. Les vues simultanées nécessitent encore des contrôleurs indépendants. Annotations en mémoire : copier avant de changer de page.';
@@ -56,7 +58,7 @@ try {
       for(const pane of value.workspace.querySelectorAll('.preview-pane'))observer.observe(pane,{attributes:true,attributeFilter:['hidden']});
       const resize=new ResizeObserver(notify);resize.observe(primary.viewport);resize.observe(webViewport);
       relocate();
-      return ()=>{observer.disconnect();resize.disconnect();};
+      return ()=>{disposeEnvironment();observer.disconnect();resize.disconnect();};
     }
   });
   const board=mountAnnotationBoard(context.workspace,{projectId:PROJECT,title:'Les Revêtements MIR',service:createAnnotationService({projectId:PROJECT}),getContext:()=>({sourceUrl:sourceUrl.href,interface:current,device:context.state.layout+' · '+(context.state.layout==='web'?context.state.desktop:context.state.layout==='tablet'?context.state.tablet:context.state.phone)})});
