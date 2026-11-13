@@ -1,0 +1,19 @@
+{
+  "repository": "revetementsmir/Revetements-mir-",
+  "sourceRef": "d1876c75b8ec97e52e56a6e535f0cfa00c7e362c",
+  "sourceBranch": "codex/phase-11-android-private",
+  "sourcePR": 31,
+  "apkSHA256": "e5b025382a29e05cab0b1640a8523c2fec296d2e245e6d5a7cb85cd9e015cdbb",
+  "versionCode": 110002,
+  "environment": "test",
+  "platform": "android",
+  "preview": "same-source-browser",
+  "nativeCapabilities": false,
+  "uiSHA256": {
+    "team.css": "1836350bcf7f3d3346c9c212feef7dfb8bf45ce9d9b7bd1bbeaf1246ffe0dc5b",
+    "mir-native-sdk.js": "674e3f992a56fb2da66efbbf476fa971835c88a7c616a2252754ab18d039cdbe",
+    "chantier-app.js": "dbc8fcccf8abd6ed4c563104b38c921e78b936e36f133903c990a185dfc6b51f",
+    "portal-client.js": "b84da61a0f981be8e269ad1a8a72238ccf616a003ca6fa77a073cde3fccca52a",
+    "mir-harmony.css": "1798aed84b7436aca078a962d8fcaab8ad5229e47be9afd0e1c8d9a70d41a2da"
+  }
+}
