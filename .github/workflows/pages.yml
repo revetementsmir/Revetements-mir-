@@ -397,7 +397,7 @@ jobs:
           grep -F 'href="production.html?view=orders" data-admin-only' /tmp/production.html
           grep -F 'href="production.html?profile=solin_brique"' /tmp/production.html
           grep -F 'href="production.html?profile=coin_arch_j"' /tmp/production.html
-          grep -F 'mir-bending-presets.js?v=profils-1' /tmp/production.html
+          grep -F 'mir-bending-presets.js?v=phase10-1' /tmp/production.html
           fetch "$base/mir-bending-presets.js" /tmp/mir-profiles.js
           grep -F "id:'coin_arch_j'" /tmp/mir-profiles.js
           fetch "$base/model-measure-defaults.js" /tmp/model-measure-defaults.js
