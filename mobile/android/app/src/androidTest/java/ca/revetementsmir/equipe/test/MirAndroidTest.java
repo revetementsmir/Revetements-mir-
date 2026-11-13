@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class MirAndroidTest {
+public class MirAndroidTest extends MirDeviceSetup {
  @org.junit.Rule public org.junit.rules.TestWatcher failureProof=new org.junit.rules.TestWatcher(){
   @Override protected void failed(Throwable error,org.junit.runner.Description description){try{screenshot("failed-"+description.getMethodName());Context c=InstrumentationRegistry.getInstrumentation().getTargetContext();UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).dumpWindowHierarchy(new File(c.getExternalFilesDir(null),"phase11-proof/failed-ui.xml"));}catch(Exception ignored){}}
  };
@@ -39,7 +39,7 @@ public class MirAndroidTest {
  }
  @Test public void launchRotationAndRestartUseBundledPortal()throws Exception{
   try(ActivityScenario<MainActivity> s=ActivityScenario.launch(MainActivity.class)){
-   waitFor(s,"!!document.querySelector('#auth-signin-form')");
+   waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");
    assertEquals("https://localhost",js(s,"location.origin"));
    assertEquals("hxtztkmbfpmzrieccwsg",js(s,"MIRPortalConfig.projectRef"));
    assertEquals(Boolean.TRUE,js(s,"document.querySelector('[data-auth-screen=signup]').hidden"));
@@ -50,14 +50,14 @@ public class MirAndroidTest {
    assertEquals("dark",js(s,"document.documentElement.dataset.mirTheme"));assertEquals("large",js(s,"document.documentElement.dataset.mirText"));assertEquals("reduced",js(s,"document.documentElement.dataset.mirMotion"));assertEquals("high",js(s,"document.documentElement.dataset.mirContrast"));assertEquals(Boolean.TRUE,js(s,"document.documentElement.scrollWidth<=innerWidth+2"));screenshot("android-dark-large-contrast");
    s.onActivity(a->a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
    waitFor(s,"innerWidth>innerHeight");assertEquals("recette-phase11@example.invalid",js(s,"document.querySelector('#auth-email').value"));screenshot("android-signin-landscape");
-   s.recreate();waitFor(s,"!!document.querySelector('#auth-signin-form')");assertEquals("retained",js(s,"localStorage.getItem('mir_phase11_probe')"));
+   s.recreate();waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");assertEquals("retained",js(s,"localStorage.getItem('mir_phase11_probe')"));
    assertEquals(Boolean.TRUE,js(s,"document.documentElement.scrollWidth<=innerWidth+2"));
    s.onActivity(a->a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));waitFor(s,"innerHeight>innerWidth");
   }
  }
  @Test public void nativeVaultEncryptsAndLogoutPurges()throws Exception{
   try(ActivityScenario<MainActivity> s=ActivityScenario.launch(MainActivity.class)){
-   waitFor(s,"!!document.querySelector('#auth-signin-form')");
+   waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");
    js(s,"window.vaultProof='pending';MIRAndroid.Native.writeAuth({value:'RECETTE-PHASE11-VAULT'}).then(()=>MIRAndroid.Native.readAuth()).then(r=>window.vaultProof=r.value).catch(()=>window.vaultProof='failed');true");
    waitFor(s,"window.vaultProof==='RECETTE-PHASE11-VAULT'");
    Context c=InstrumentationRegistry.getInstrumentation().getTargetContext();File file=new File(c.getNoBackupFilesDir(),"mir-auth.enc");assertTrue(file.exists());byte[] encrypted=java.nio.file.Files.readAllBytes(file.toPath());assertFalse(new String(encrypted,java.nio.charset.StandardCharsets.UTF_8).contains("RECETTE-PHASE11-VAULT"));
@@ -68,7 +68,7 @@ public class MirAndroidTest {
  @Test public void backKeyboardOfflineAndResumePreserveLocalInput()throws Exception{
   UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
   try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
-   waitFor(s,"!!document.querySelector('#auth-signin-form')");
+   waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");
    js(s,"document.body.insertAdjacentHTML('beforeend','<form id=android-recipe-form><label>Brouillon local de recette<textarea id=android-recipe-input></textarea></label></form>');let field=document.querySelector('#android-recipe-input');field.value='RECETTE-PHASE11-LOCAL';field.focus();field.scrollIntoView({block:'center'});field.dispatchEvent(new Event('input',{bubbles:true}));true");
    s.onActivity(a->{a.getBridge().getWebView().requestFocus();((android.view.inputmethod.InputMethodManager)a.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(a.getBridge().getWebView(),android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);});
    long end=SystemClock.uptimeMillis()+5000;java.util.concurrent.atomic.AtomicBoolean keyboard=new java.util.concurrent.atomic.AtomicBoolean(false);
@@ -88,7 +88,7 @@ public class MirAndroidTest {
   android.app.UiAutomation automation=InstrumentationRegistry.getInstrumentation().getUiAutomation();
   UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
   try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
-   waitFor(s,"!!document.querySelector('#auth-signin-form')");
+   waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");
    automation.revokeRuntimePermission(c.getPackageName(),android.Manifest.permission.CAMERA);
    js(s,"window.permissionProof='pending';MIRAndroid.Native.scanQr().then(()=>window.permissionProof='unexpected').catch(e=>{window.permissionError=e.message;window.permissionProof='denied';});true");
    // The resource name is fixed; AOSP and Google images use different system packages.
@@ -106,7 +106,7 @@ public class MirAndroidTest {
   try(InputStream input=InstrumentationRegistry.getInstrumentation().getContext().getAssets().open("phase10-four.pdf");FileOutputStream output=new FileOutputStream(file)){input.transferTo(output);}
   assertTrue(file.length()>1000);
   try(ActivityScenario<MainActivity> s=ActivityScenario.launch(MainActivity.class)){
-   waitFor(s,"!!document.querySelector('#auth-signin-form')");
+   waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");
    s.onActivity(a->a.getBridge().getWebView().loadUrl("https://localhost/native-pdf.html?id="+name));
    waitFor(s,"document.querySelectorAll('canvas').length===4 && document.querySelector('#status').textContent.startsWith('4 page')");
    assertEquals(Boolean.TRUE,js(s,"[...document.querySelectorAll('canvas')].every(canvas=>{const data=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;let ink=0;for(let i=0;i<data.length;i+=4)if(data[i+3]&&data[i]<200&&data[i+1]<200&&data[i+2]<200)ink++;return ink>100;})"));

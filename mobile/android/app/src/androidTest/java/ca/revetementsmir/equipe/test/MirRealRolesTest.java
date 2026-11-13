@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 import static org.junit.Assert.*;
 /** Required CI integration test, secrets supplied privately at runtime, never in the APK. */
 @RunWith(AndroidJUnit4.class)
-public class MirRealRolesTest {
+public class MirRealRolesTest extends MirDeviceSetup {
  private Object js(ActivityScenario<MainActivity>s,String expression)throws Exception{CountDownLatch done=new CountDownLatch(1);String[] value={null};s.onActivity(a->a.getBridge().getWebView().evaluateJavascript(expression,r->{value[0]=r;done.countDown();}));assertTrue(done.await(10,TimeUnit.SECONDS));return value[0]==null||value[0].equals("null")?null:new JSONTokener(value[0]).nextValue();}
  private void waitFor(ActivityScenario<MainActivity>s,String expression)throws Exception{long end=SystemClock.uptimeMillis()+30000;while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(s,expression)))return;SystemClock.sleep(150);}fail("MIR TEST Android : résultat serveur non confirmé");}
  @Test public void fiveBusinessRolesAndTechnicalAdmin()throws Exception{
