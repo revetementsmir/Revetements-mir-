@@ -50,6 +50,17 @@ Branche : `codex/phase-10-ten-bend-models`
 - captures : les dix fichiers PNG du présent dossier;
 - PDF réel : `MIR-phase10-4-profils.pdf`, quatre profils uniques et quatre pages.
 
+## Correctif permissions Boss et Adjointe
+
+- Aucun rôle Admin métier n’est requis : les opérations sont autorisées uniquement à `boss` et `assistant` (Adjointe), dans leur organisation.
+- Toute modification publiée crée une nouvelle ligne `model_versions`; les versions déjà utilisées restent inchangées.
+- Toute correction d’une commande reçue crée une nouvelle `order_revisions` et un audit avec auteur, date, raison et valeurs avant/après.
+- Une production commencée produit un avertissement et marque la nécessité d’une nouvelle mise en production; aucune commande fournisseur n’est recréée.
+- Une quantité ne peut jamais passer sous la quantité déjà reçue.
+- Un PDF révisé référence le document précédent sans le remplacer.
+- `tests/mir-phase10-management-postgres.cjs` : 17/17 sur PostgreSQL jetable, migration rejouée deux fois.
+- `tests/mir-phase10-management.cjs` : 10/10 contrats de permissions, historique et interface.
+
 ## Persistance et serveur
 
 Aucune migration Phase 10 n’est nécessaire : les modèles, versions, instantanés, révisions et commandes réutilisent les structures Phase 6. Aucun second configurateur, panier ou système serveur n’a été créé.
