@@ -1,5 +1,7 @@
 'use strict';
-const assert=require('node:assert/strict'),P=require('../dist/production-model.js'),B=require('../dist/mir-bending-presets.js');
+const assert=require('node:assert/strict'),path=require('node:path');
+const artifact=path.resolve(process.env.MIR_PHASE10_ARTIFACT_ROOT||path.join(__dirname,'../dist'));
+const P=require(path.join(artifact,'production-model.js')),B=require(path.join(artifact,'mir-bending-presets.js'));
 for(const id of ['beam','ventilation_mur_fenetre'])for(const side of ['left','right']){
  const spec={...B.create(id),unit:'in',length:120,quantity:1};spec.segments.forEach((s,i)=>s.length=(id==='beam'?[1.25,7.5,6.125,7.5,1.25]:[2,1.5,1.5,1.25])[i]);spec.coloredFace={side,segmentId:id==='beam'?'B':'A'};
  const m=P.buildProfile(spec),svg=P.profileSVG(m,{width:800,height:650,legend:false});

@@ -1,7 +1,8 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {once}=require('node:events'),{chromium}=require('playwright');
-const root=path.resolve(__dirname,'../dist'),proof=path.resolve(__dirname,'../docs/verification/phase10-bending');
+const root=path.resolve(process.env.MIR_PHASE10_ARTIFACT_ROOT||path.join(__dirname,'../dist'));
+const proof=path.resolve(process.env.MIR_PHASE10_PROOF_DIR||path.join(__dirname,'../docs/verification/phase10-bending'));
 const mime={'.js':'application/javascript','.html':'text/html','.css':'text/css','.mjs':'application/javascript','.json':'application/json','.png':'image/png'};
 const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://local').pathname));if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile())return res.writeHead(404).end();res.writeHead(200,{'content-type':mime[path.extname(file)]||'application/octet-stream'});fs.createReadStream(file).pipe(res);});
 const ids=['fascia','ailes_fenetre','eloignement_eaux','goutte_eau_8','sill_trim','beam','colonne','l_transition','capage_climatiseur','ventilation_mur_fenetre'];
@@ -9,7 +10,9 @@ const values={fascia:[6,1.25,.75],ailes_fenetre:[6,2,.75],eloignement_eaux:[6,1.
 const viewports=[[360,780],[390,844],[768,1024],[834,1112],[1366,768],[1440,900],[1920,1080]];
 
 (async()=>{server.listen(0,'127.0.0.1');await once(server,'listening');const base='http://127.0.0.1:'+server.address().port;fs.mkdirSync(proof,{recursive:true});const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium',args:['--no-sandbox']});try{
- const page=await browser.newPage({viewport:{width:1920,height:1080}});await page.goto(base+'/production.html?mode=client&kind=profile');
+ const page=await browser.newPage({viewport:{width:1920,height:1080}});
+ await page.route('**/*',route=>new URL(route.request().url()).hostname.endsWith('.supabase.co')?route.abort():route.continue());
+ await page.goto(base+'/production.html?mode=client&kind=profile');
  const result=await page.evaluate(({ids,values})=>{
   const faults=[],renders=[];
   const near=(a,b,t=.8)=>Math.abs(a-b)<=t,overlap=(a,b,gap=0)=>a.x<a.x+a.width&&a.x<b.x+b.width+gap&&a.x+a.width+gap>b.x&&a.y<b.y+b.height+gap&&a.y+a.height+gap>b.y;
@@ -21,6 +24,20 @@ const viewports=[[360,780],[390,844],[768,1024],[834,1112],[1366,768],[1440,900]
    const model=modelFor(id,side),mapped=fit(transformed(model.pointsMM,angle,mirror));
    const host=document.createElement('div');host.style.cssText='position:absolute;left:-10000px;top:0';host.innerHTML=`<svg viewBox="0 0 800 520" width="800" height="520">${MIRProduction.profileDiagramContent(model,mapped,{paintedMarker:'star',highContrast:true,horizontalBounds:[0,800],verticalBounds:[0,520]})}</svg>`;document.body.append(host);const svg=host.firstElementChild,labels=[...svg.querySelectorAll('.profile-side-marker')],leaders=[...svg.querySelectorAll('.profile-measure-leader')],profiles=[...svg.querySelectorAll(':scope > path')].slice(0,2),stars=[...svg.querySelectorAll('.profile-painted-star')];
    const boxes=labels.map(node=>({node,box:node.getBBox(),index:Number(node.dataset.segmentIndex)}));
+   if(labels.length!==model.segments.length)faults.push(`${id}/${side}: label manquant ou supplémentaire`);
+   if(new Set(boxes.map(b=>b.index)).size!==model.segments.length)faults.push(`${id}/${side}: indices non uniques`);
+   for(const {node,index} of boxes){
+    const segment=model.segments[index];
+    if(!segment||node.dataset.markerLabel!==segment.label||node.textContent!==segment.label+' · '+MIRProduction.formatMeasurement(segment.lengthMM,model.unit))faults.push(`${id}/${side}: label ou mesure du mauvais segment ${index}`);
+    const paths=[...svg.querySelectorAll('.profile-measure-leader,.profile-dimension-line')].filter(p=>Number(p.dataset.segmentIndex)===index);
+    if(paths.length!==1){faults.push(`${id}/${side}: cote absente ou dupliquée ${index}`);continue;}
+    const parts=[...paths[0].getAttribute('d').matchAll(/M([\d.-]+),([\d.-]+)L([\d.-]+),([\d.-]+)/g)].map(m=>m.slice(1).map(Number));
+    const sx=+node.dataset.segmentStartX,sy=+node.dataset.segmentStartY,ex=+node.dataset.segmentEndX,ey=+node.dataset.segmentEndY;
+    if(paths[0].classList.contains('profile-measure-leader')){
+     if(parts.length!==1||!near(parts[0][2],(sx+ex)/2)||!near(parts[0][3],(sy+ey)/2))faults.push(`${id}/${side}: rappel vers le mauvais segment ${index}`);
+    }else if(parts.length!==3||!near(parts[0][0],sx)||!near(parts[0][1],sy)||!near(parts[1][0],ex)||!near(parts[1][1],ey))faults.push(`${id}/${side}: attaches incorrectes ${index}`);
+    else{const [x1,y1,x2,y2]=parts[2],den=Math.hypot(ex-sx,ey-sy)*Math.hypot(x2-x1,y2-y1);if(!den||Math.abs((ex-sx)*(y2-y1)-(ey-sy)*(x2-x1))/den>.002)faults.push(`${id}/${side}: cote non parallèle ${index}`);}
+   }
    for(let i=0;i<boxes.length;i++)for(let j=i+1;j<boxes.length;j++)if(overlap(boxes[i].box,boxes[j].box,1))faults.push(`${id}/${side}/${angle}/${mirror}: labels ${i}-${j}`);
    for(const {node,box,index} of boxes){if(box.x<0||box.y<0||box.x+box.width>800||box.y+box.height>520)faults.push(`${id}/${side}/${angle}/${mirror}: label ${index} hors cadre`);const ax=+node.dataset.anchorX,ay=+node.dataset.anchorY,sx=+node.dataset.segmentStartX,sy=+node.dataset.segmentStartY,ex=+node.dataset.segmentEndX,ey=+node.dataset.segmentEndY;if(!near(ax,(sx+ex)/2)||!near(ay,(sy+ey)/2))faults.push(`${id}/${side}/${angle}/${mirror}: cible ${index} hors milieu`);for(const profile of profiles){const length=profile.getTotalLength();for(let at=0;at<=length;at+=2){const p=profile.getPointAtLength(at);if(p.x>box.x-1&&p.x<box.x+box.width+1&&p.y>box.y-1&&p.y<box.y+box.height+1){faults.push(`${id}/${side}/${angle}/${mirror}: profil-label ${index}`);at=length+1;}}}}
    const lines=[...svg.querySelectorAll('.profile-measure-leader,.profile-dimension-line')].flatMap(node=>[...node.getAttribute('d').matchAll(/M([\d.-]+),([\d.-]+)L([\d.-]+),([\d.-]+)/g)].map(m=>({index:Number(node.dataset.segmentIndex),a:{x:+m[1],y:+m[2]},b:{x:+m[3],y:+m[4]}})));
@@ -39,6 +56,9 @@ const viewports=[[360,780],[390,844],[768,1024],[834,1112],[1366,768],[1440,900]
   };
   for(const id of [...Object.keys(MIRBendingPresets.catalog()),'engine_l','engine_j','engine_z','engine_omega','generic_tight','generic_inclined'])for(const side of ['left','right'])for(const angle of [0,45,90,135,180,225,270,315])inspect(id,side,angle,angle%90!==0,false);
   for(const id of ids)for(const side of ['left','right'])inspect(id,side,0,false,true);
+  const crowded=modelFor('fascia','left');crowded.coloredFace={};
+  let refused=false;try{MIRProduction.profileDiagramContent(crowded,fit(crowded.pointsMM),{horizontalBounds:[0,1],verticalBounds:[0,1]});}catch(error){refused=/Cotation technique sans espace/.test(error.message);}
+  if(!refused)faults.push('cadre impossible : rendu doit être refusé sans label caché ou déporté hors cadre');
   return{faults,renders};
  },{ids,values});
  assert.deepEqual(result.faults,[],'intersections géométriques :\n'+result.faults.slice(0,30).join('\n'));assert.equal(result.renders.length,20);
