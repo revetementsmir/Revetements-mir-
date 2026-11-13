@@ -32,7 +32,14 @@ public class MirAndroidTest extends MirDeviceSetup {
   while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(scenario,expression)))return;SystemClock.sleep(150);}
   screenshot("failed-wait");fail("Condition Android WebView non satisfaite : "+expression+"; état PDF="+js(scenario,"JSON.stringify({status:document.querySelector('#status')?.textContent,error:window.mirNativeDiagnostic,save:window.saveProof,visibility:document.visibilityState,field:document.querySelector('#android-recipe-input')?.getBoundingClientRect().toJSON(),height:innerHeight,viewport:window.visualViewport?{height:visualViewport.height,top:visualViewport.offsetTop}:null})"));
  }
+ private void screenshot(ActivityScenario<MainActivity>s,String name)throws Exception{
+  CountDownLatch drawn=new CountDownLatch(1);
+  s.onActivity(a->a.getBridge().getWebView().postVisualStateCallback(1,new android.webkit.WebView.VisualStateCallback(){@Override public void onComplete(long id){drawn.countDown();}}));
+  assertTrue("WebView frame ready",drawn.await(10,TimeUnit.SECONDS));
+  InstrumentationRegistry.getInstrumentation().waitForIdleSync();screenshot(name);
+ }
  private void screenshot(String name)throws Exception{
+  UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).waitForIdle();
   Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();File dir=new File(context.getExternalFilesDir(null),"phase11-proof");dir.mkdirs();
   Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bitmap);try(FileOutputStream out=new FileOutputStream(new File(dir,name+".png"))){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,out));}
   int width=bitmap.getWidth()>bitmap.getHeight()?960:540;Bitmap small=Bitmap.createScaledBitmap(bitmap,width,Math.round(bitmap.getHeight()*(width/(float)bitmap.getWidth())),true);try(FileOutputStream out=new FileOutputStream(new File(dir,name+"-scaled.png"))){assertTrue(small.compress(Bitmap.CompressFormat.PNG,100,out));}small.recycle();bitmap.recycle();
@@ -45,13 +52,13 @@ public class MirAndroidTest extends MirDeviceSetup {
    assertEquals(Boolean.TRUE,js(s,"document.querySelector('[data-auth-screen=signup]').hidden"));
    assertEquals(Boolean.TRUE,js(s,"document.querySelector('#auth-google').hidden"));
    js(s,"document.querySelector('#auth-email').value='recette-phase11@example.invalid';localStorage.setItem('mir_phase11_probe','retained');true");
-   screenshot("android-signin-portrait");
+   screenshot(s,"android-signin-portrait");
    js(s,"MIRHarmonySettings.store({theme:'dark',textSize:'large',reducedMotion:'on',highContrast:true});true");
    assertEquals(Boolean.TRUE,js(s,"(()=>{const lum=v=>v.match(/[0-9.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;}).reduce((n,v,i)=>n+v*[.2126,.7152,.0722][i],0);const label=getComputedStyle(document.querySelector('.auth-card label')),card=getComputedStyle(document.querySelector('.auth-card'));const a=lum(label.color),b=lum(card.backgroundColor);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5;})()"));
    assertEquals(Boolean.FALSE,js(s,"MIRAndroid.Policy.allowedRoute('https://localhost/boutique.html')"));
-   assertEquals("dark",js(s,"document.documentElement.dataset.mirTheme"));assertEquals("large",js(s,"document.documentElement.dataset.mirText"));assertEquals("reduced",js(s,"document.documentElement.dataset.mirMotion"));assertEquals("high",js(s,"document.documentElement.dataset.mirContrast"));assertEquals(Boolean.TRUE,js(s,"document.documentElement.scrollWidth<=innerWidth+2"));screenshot("android-dark-large-contrast");
+   assertEquals("dark",js(s,"document.documentElement.dataset.mirTheme"));assertEquals("large",js(s,"document.documentElement.dataset.mirText"));assertEquals("reduced",js(s,"document.documentElement.dataset.mirMotion"));assertEquals("high",js(s,"document.documentElement.dataset.mirContrast"));assertEquals(Boolean.TRUE,js(s,"document.documentElement.scrollWidth<=innerWidth+2"));screenshot(s,"android-dark-large-contrast");
    s.onActivity(a->a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
-   waitFor(s,"innerWidth>innerHeight");assertEquals("recette-phase11@example.invalid",js(s,"document.querySelector('#auth-email').value"));screenshot("android-signin-landscape");
+   waitFor(s,"innerWidth>innerHeight");assertEquals("recette-phase11@example.invalid",js(s,"document.querySelector('#auth-email').value"));screenshot(s,"android-signin-landscape");
    s.recreate();waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");assertEquals("retained",js(s,"localStorage.getItem('mir_phase11_probe')"));
    assertEquals(Boolean.TRUE,js(s,"document.documentElement.scrollWidth<=innerWidth+2"));
    s.onActivity(a->a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));waitFor(s,"innerHeight>innerWidth");
@@ -75,7 +82,7 @@ public class MirAndroidTest extends MirDeviceSetup {
    waitFor(s,"location.pathname==='/native-checks.html' && !!document.querySelector('#check-gps')");
    assertEquals("https://localhost",js(s,"location.origin"));assertEquals(Boolean.TRUE,js(s,"['#check-gps','#check-photo','#check-qr','#check-file'].every(id=>!!document.querySelector(id))"));
    assertEquals("undefined",js(s,"typeof window.MIRSupabase"));assertEquals(0,((Number)js(s,"document.querySelectorAll('form').length")).intValue());
-   screenshot("android-device-recipe");
+   screenshot(s,"android-device-recipe");
   }
  }
  @Test public void backKeyboardOfflineAndResumePreserveLocalInput()throws Exception{
@@ -86,12 +93,12 @@ public class MirAndroidTest extends MirDeviceSetup {
    s.onActivity(a->{a.getBridge().getWebView().requestFocus();((android.view.inputmethod.InputMethodManager)a.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(a.getBridge().getWebView(),android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);});
    long end=SystemClock.uptimeMillis()+5000;java.util.concurrent.atomic.AtomicBoolean keyboard=new java.util.concurrent.atomic.AtomicBoolean(false);
    while(SystemClock.uptimeMillis()<end){s.onActivity(a->{androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(a.getBridge().getWebView());keyboard.set(insets!=null&&insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime()));});if(keyboard.get())break;SystemClock.sleep(100);}
-   assertTrue("Clavier Android visible",keyboard.get());screenshot("android-keyboard");
+   assertTrue("Clavier Android visible",keyboard.get());screenshot(s,"android-keyboard");
    waitFor(s,"document.querySelector('#android-recipe-input').getBoundingClientRect().bottom<=innerHeight");
    device.pressBack();device.pressBack();
    androidx.test.uiautomator.UiObject2 cancel=device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.res("android:id/button2")),5000);assertNotNull("Confirmation avant abandon",cancel);cancel.click();assertEquals("RECETTE-PHASE11-LOCAL",js(s,"document.querySelector('#android-recipe-input').value"));
    device.pressHome();Context target=InstrumentationRegistry.getInstrumentation().getTargetContext();Intent intent=target.getPackageManager().getLaunchIntentForPackage(target.getPackageName());intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);target.startActivity(intent);waitFor(s,"document.visibilityState==='visible'");assertEquals("RECETTE-PHASE11-LOCAL",js(s,"document.querySelector('#android-recipe-input').value"));
-   try{device.executeShellCommand("svc wifi disable");device.executeShellCommand("svc data disable");waitFor(s,"document.querySelector('#mir-native-state').textContent.includes('Hors ligne')");screenshot("android-offline");}
+   try{device.executeShellCommand("svc wifi disable");device.executeShellCommand("svc data disable");waitFor(s,"document.querySelector('#mir-native-state').textContent.includes('Hors ligne')");screenshot(s,"android-offline");}
    finally{device.executeShellCommand("svc wifi enable");device.executeShellCommand("svc data enable");}
    waitFor(s,"document.querySelector('#mir-native-state').textContent.includes('actualisation')");assertEquals("RECETTE-PHASE11-LOCAL",js(s,"document.querySelector('#android-recipe-input').value"));
   }
@@ -123,7 +130,7 @@ public class MirAndroidTest extends MirDeviceSetup {
    s.onActivity(a->a.getBridge().getWebView().loadUrl("https://localhost/native-pdf.html?id="+name));
    waitFor(s,"document.querySelectorAll('canvas').length===4 && document.querySelector('#status').textContent.startsWith('4 page')");
    assertEquals(Boolean.TRUE,js(s,"[...document.querySelectorAll('canvas')].every(canvas=>{const data=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;let ink=0;for(let i=0;i<data.length;i+=4)if(data[i+3]&&data[i]<200&&data[i+1]<200&&data[i+2]<200)ink++;return ink>100;})"));
-   screenshot("android-pdf-four-pages");
+   screenshot(s,"android-pdf-four-pages");
    byte[] original=java.security.MessageDigest.getInstance("SHA-256").digest(java.nio.file.Files.readAllBytes(file.toPath()));
    js(s,"window.saveProof='pending';MIRAndroid.Native.readPdf({id:'"+name+"'}).then(r=>MIRAndroid.Native.pdf({data:r.data,name:'RECETTE-PHASE11.pdf',action:'save'})).then(r=>window.saveProof=r.cancelled?'cancelled':'unexpected').catch(()=>window.saveProof='failed');true");
    UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());assertTrue(device.wait(androidx.test.uiautomator.Until.hasObject(androidx.test.uiautomator.By.pkg("com.android.documentsui")),5000));screenshot("android-pdf-save-chooser");device.pressBack();

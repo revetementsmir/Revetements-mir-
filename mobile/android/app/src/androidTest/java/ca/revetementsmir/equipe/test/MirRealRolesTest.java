@@ -21,6 +21,10 @@ public class MirRealRolesTest extends MirDeviceSetup {
   assertTrue("WebView frame ready",drawn.await(10,TimeUnit.SECONDS));
   InstrumentationRegistry.getInstrumentation().waitForIdleSync();
   androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).waitForIdle();
+  screenshotSystem(name);
+ }
+ private void screenshotSystem(String name)throws Exception{
+  androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).waitForIdle();
   File dir=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null),"phase11-proof");assertTrue(dir.isDirectory()||dir.mkdirs());
   File file=new File(dir,name+".png");assertFalse("Never overwrite native proof",file.exists());
   android.graphics.Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bitmap);
@@ -39,6 +43,19 @@ public class MirRealRolesTest extends MirDeviceSetup {
   js(s,"document.querySelector('[data-view=settings]').click();true");
   waitFor(s,"!!document.querySelector('#harmony-settings-form')");
   js(s,"scrollTo(0,0);true");screenshot(s,"v110002-"+role+"-settings");
+  if(role.equals("employe")){
+   js(s,"document.querySelector('.mir-harmony-toggle').click();document.querySelector('#portal-navigation [data-view=account]').click();document.querySelector('[data-view=absences]').click();true");
+   waitFor(s,"!!document.querySelector('#absence-draft-form textarea[name=note]')");
+   js(s,"scrollTo(0,0);true");screenshot(s,"v110002-employee-absence-form");
+   js(s,"(()=>{const n=document.querySelector('#absence-draft-form textarea[name=note]');n.value='RECETTE-PHASE11-VISUEL-LOCAL';n.dispatchEvent(new Event('input',{bubbles:true}));n.scrollIntoView({block:'center'});})()");
+   screenshot(s,"v110002-employee-local-note");
+   androidx.test.uiautomator.UiDevice device=androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());device.pressBack();
+   androidx.test.uiautomator.UiObject2 cancel=device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.res("android:id/button2")),5000);
+   assertNotNull("Android back requires confirmation for local input",cancel);screenshotSystem("v110002-employee-back-confirmation");cancel.click();
+   assertEquals("RECETTE-PHASE11-VISUEL-LOCAL",js(s,"document.querySelector('#absence-draft-form textarea[name=note]').value"));
+   // No submit, save, upload or preference change; the ordinary sign-out follows.
+  }
+
  }
  @Test public void fiveBusinessRolesAndTechnicalAdmin()throws Exception{
   File credentials=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir(),"phase11-roles.json");
