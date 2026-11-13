@@ -1,0 +1,53 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
+const {once}=require('node:events'),{chromium}=require('playwright');
+const root=path.resolve(__dirname,'../dist');
+const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new URL(req.url,'http://local').pathname);if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile())return res.writeHead(404).end();res.writeHead(200,{'content-type':({'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream'});fs.createReadStream(file).pipe(res);});
+(async()=>{
+ server.listen(0,'127.0.0.1');await once(server,'listening');let browser;
+ try{
+  browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium',args:['--no-sandbox']});
+  const tab=await browser.newPage({viewport:{width:1440,height:1080}}),errors=[];
+  tab.on('pageerror',error=>errors.push(error.message));tab.on('console',msg=>{if(msg.type()==='error')console.log('BROWSER',msg.text());});
+  await tab.route('**/*.supabase.co/**',route=>route.abort());
+  const base='http://127.0.0.1:'+server.address().port;
+  await tab.goto(base+'/responsive.html?page=index.html&layout=phone');
+  await tab.locator('[data-mir-responsive-ready=true]').waitFor();
+  assert.equal(await tab.locator('iframe').count(),0);
+  assert.equal(await tab.locator('[data-mir-responsive-page]').count(),1);
+  assert((await tab.locator('[data-runtime-source]').getAttribute('data-runtime-source')).startsWith('https://atelier.atelier-app-001.workers.dev/responsive/v1/'));
+  await tab.locator('.mir-client-menu-ready').waitFor();
+  const page=tab.locator('[data-mir-responsive-page]');
+  const phoneFont=await page.locator('h1').evaluate(node=>parseFloat(getComputedStyle(node).fontSize));
+  await page.locator('.mir-client-menu-toggle').click();assert.equal(await page.locator('.mir-client-menu-toggle').getAttribute('aria-expanded'),'true');
+  await tab.keyboard.press('Escape');
+  fs.mkdirSync('artifacts/mir-responsive-atelier',{recursive:true});
+  for(const layout of ['phone','tablet','web']){
+   await tab.locator('[data-layout="'+layout+'"]').click();
+   await tab.waitForFunction(expected=>document.querySelector('[data-mir-responsive-page]').closest('.preview-pane')?.hidden===false,layout);
+   assert.equal(await tab.locator('[data-mir-responsive-page]').count(),1,'single live document, no duplicated business controllers');
+   await tab.getByRole('button',{name:'Annoter',exact:true}).click();
+   await page.getByRole('link',{name:'Voir notre boutique',exact:true}).click();
+   await tab.getByPlaceholder('Qu’aimerais-tu changer ?').fill('Preuve '+layout+' : bouton Boutique');
+   await tab.getByRole('button',{name:'Ajouter l’annotation au tableau',exact:true}).click();
+   await tab.locator('.preview-annotation-toggle').click();
+   await tab.getByText('Preuve '+layout+' : bouton Boutique',{exact:true}).first().waitFor();
+   await tab.screenshot({path:'artifacts/mir-responsive-atelier/'+layout+'.png'});
+   await tab.locator('.preview-annotation-toggle').click();
+   if(await tab.locator('.preview-annotation-start').getAttribute('aria-pressed')==='true')await tab.locator('.preview-annotation-start').click();
+  }
+  const desktopFont=await page.locator('h1').evaluate(node=>parseFloat(getComputedStyle(node).fontSize));
+  assert(desktopFont>phoneFont,'real page must reflow according to its frame, not the host window');
+  assert.equal(await tab.locator('.annotation-list article').count(),3,'notes survive device changes');
+  assert.equal(errors.length,0,errors.join('\n'));
+  tab.on('dialog',dialog=>dialog.accept());await tab.close();
+  const shop=await browser.newPage({viewport:{width:1440,height:1080}});
+  await shop.route('**/*.supabase.co/**',route=>route.abort());
+  await shop.goto(base+'/responsive.html?page=boutique.html&layout=phone');
+  await shop.locator('[data-mir-responsive-ready=true]').waitFor();
+  await shop.locator('.mir-client-menu-ready').waitFor();
+  assert.equal(await shop.locator('[data-mir-responsive-page] a[aria-current=page]').first().innerText(),'Boutique');
+  await shop.screenshot({path:'artifacts/mir-responsive-atelier/boutique-phone.png'});
+  console.log('PASS shared Atelier workspace, real mobile/tablet/web reflow, live menu, precise annotations, state preservation and Boutique');
+ }finally{await browser?.close();server.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

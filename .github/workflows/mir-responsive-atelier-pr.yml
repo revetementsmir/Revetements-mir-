@@ -1,0 +1,28 @@
+name: MIR — Responsive Atelier intégré
+on:
+  pull_request:
+    paths:
+      - 'dist/responsive.html'
+      - 'dist/mir-responsive-*.mjs'
+      - 'dist/mir-public-menu.js'
+      - 'tests/mir-responsive-atelier-browser.cjs'
+      - '.github/workflows/mir-responsive-atelier-pr.yml'
+permissions:
+  contents: read
+jobs:
+  responsive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install --no-save --package-lock=false playwright@1.62.1
+      - run: npx playwright install --with-deps chromium
+      - run: MIR_CHROMIUM_BIN="$(find "$HOME/.cache/ms-playwright" -path '*/chrome-linux*/chrome' -type f | head -1)" node tests/mir-responsive-atelier-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-responsive-atelier-preuves
+          path: artifacts/mir-responsive-atelier/
