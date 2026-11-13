@@ -26,4 +26,4 @@
 :root[data-mir-harmony] body.mir-native-signin #mir-harmony-header :is(.mir-harmony-toggle, .mir-harmony-dossier),
 :root[data-mir-harmony] body :is(.mir-client-links, .mir-home-header-actions, .mir-client-actions,
 .mir-mobile-tabs, .mir-signature-footer, [data-portal-public-footer],
-.mir-client-return, .auth-cart-return) { display: none !important; }
+.mir-client-return, .auth-cart-return, .mir-help-launch) { display: none !important; }

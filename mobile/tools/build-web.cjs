@@ -24,6 +24,7 @@ for(const file of fs.readdirSync(out).filter(p=>p.endsWith('.html'))){
  const p=path.join(out,file);let html=fs.readFileSync(p,'utf8');
  html=html.replace(/<head([^>]*)>/i,'<head$1><meta http-equiv="Content-Security-Policy" content="'+csp+'"><script src="mir-native-compat.js"></script>'+(html.includes('src="mir-native-bootstrap.js"')?'':'<script src="mir-native-bootstrap.js"></script>'));
  html=html.replace(/(<script[^>]*src="vendor\/supabase-client\.js[^>]*><\/script>)/g,'$1<script src="mir-native-sdk.js" defer></script>');
+ html=html.replace(/<footer\b[^>]*(?:data-portal-public-footer|class="mir-signature-footer")[^>]*>[\s\S]*?<\/footer>/gi,'');
  html=html.replace(/<\/head>/i,'<link rel="stylesheet" href="team.css"></head>');
  fs.writeFileSync(p,html);
 }
