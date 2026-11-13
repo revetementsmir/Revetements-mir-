@@ -3,6 +3,7 @@ const PROJECT = '7afd893e-adcb-494b-a82b-c4cf8b28f94e';
 const pages = new Set(['index.html','boutique.html','produit.html','selection.html','pliage.html','production.html','chantier.html','entrepot.html','coordination.html','calepinage.html','plan.html','realisations.html','contact.html','materiaux.html']);
 if (document.readyState === 'loading') await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, {once:true}));
 const current = new URL(location.href).searchParams.get('page') || 'index.html';
+document.documentElement.dataset.previewWorkspace = 'true';
 const workspace = document.createElement('div');
 workspace.className = 'mir-annotation-workspace';
 const toolbar = document.createElement('header');
@@ -23,7 +24,18 @@ surface.dataset.responsiveAnnotationRoot = 'true';
 surface.setAttribute('aria-label', 'Véritable page MIR à annoter');
 const content = [...document.body.childNodes].filter(node => node.nodeName !== 'SCRIPT');
 surface.append(...content);
-workspace.append(toolbar, surface);
+const stage = document.createElement('div');
+stage.className = 'preview-stage';
+const pane = document.createElement('section');
+pane.id = 'mir-real-page-pane';
+pane.className = 'preview-pane';
+pane.dataset.kind = 'web';
+const fitbox = document.createElement('div');
+fitbox.className = 'preview-fitbox';
+fitbox.append(surface);
+pane.append(fitbox);
+stage.append(pane);
+workspace.append(toolbar, stage);
 document.body.prepend(workspace);
 const css = document.createElement('style');
 css.textContent = `
@@ -41,7 +53,7 @@ try {
     projectId:PROJECT,
     title:'Les Revêtements MIR',
     service:createAnnotationService({projectId:PROJECT}),
-    getContext:() => ({device:`Vue réelle · ${innerWidth} × ${innerHeight}`,interface:current}),
+    getContext:() => ({device:`Vue réelle · ${innerWidth} × ${innerHeight}`,interface:current,sourceUrl:new URL(current,document.baseURI).href}),
   });
   // Keep the central service in control of notes, privacy and native handoff.
   workspace.dataset.mirAnnotationReady = 'true';
