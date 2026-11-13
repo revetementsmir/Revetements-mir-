@@ -15,13 +15,13 @@ const config={enabled:true,accountEnabled:true,passwordEnabled:true,emailEnabled
 fs.writeFileSync(path.join(out,'portal-config.js'),'window.MIRPortalConfig=Object.freeze('+JSON.stringify(config)+');');
 fs.writeFileSync(path.join(out,'shared-config.js'),'window.MIRSharedConfig=Object.freeze('+JSON.stringify({enabled:true,supabaseUrl:config.supabaseUrl,publishableKey:key})+');');
 fs.writeFileSync(path.join(out,'mir-estimate-config.js'),'window.MIREstimateConfig=Object.freeze({enabled:false,environment:"test",apiBase:null});');
-for(const name of ['native-pdf.html','native-pdf.js'])fs.copyFileSync(path.join(root,'mobile/web',name),path.join(out,name));
+for(const name of ['native-pdf.html','native-pdf.js','native-pdf-worker.mjs'])fs.copyFileSync(path.join(root,'mobile/web',name),path.join(out,name));
 const esbuild=require('esbuild');
-for(const name of ['bootstrap','sdk'])esbuild.buildSync({entryPoints:[path.join(root,'mobile/web/'+name+'.js')],outfile:path.join(out,'mir-native-'+name+'.js'),bundle:true,format:'iife',target:'es2022'});
+for(const name of ['compat','bootstrap','sdk'])esbuild.buildSync({entryPoints:[path.join(root,'mobile/web/'+name+'.js')],outfile:path.join(out,'mir-native-'+name+'.js'),bundle:true,format:'iife',target:'es2022'});
 const csp="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' blob: https://"+project+".supabase.co wss://"+project+".supabase.co; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'none'; form-action 'none'; base-uri 'self'";
 for(const file of fs.readdirSync(out).filter(p=>p.endsWith('.html'))){
  const p=path.join(out,file);let html=fs.readFileSync(p,'utf8');
- html=html.replace(/<head([^>]*)>/i,'<head$1><meta http-equiv="Content-Security-Policy" content="'+csp+'">'+(html.includes('src="mir-native-bootstrap.js"')?'':'<script src="mir-native-bootstrap.js"></script>'));
+ html=html.replace(/<head([^>]*)>/i,'<head$1><meta http-equiv="Content-Security-Policy" content="'+csp+'"><script src="mir-native-compat.js"></script>'+(html.includes('src="mir-native-bootstrap.js"')?'':'<script src="mir-native-bootstrap.js"></script>'));
  html=html.replace(/(<script[^>]*src="vendor\/supabase-client\.js[^>]*><\/script>)/g,'$1<script src="mir-native-sdk.js" defer></script>');
  fs.writeFileSync(p,html);
 }

@@ -1,0 +1,6 @@
+'use strict';
+const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict'),path=require('node:path');
+(async()=>{const context=vm.createContext({setTimeout,clearTimeout});vm.runInContext('Promise.try=undefined; Map.prototype.getOrInsertComputed=undefined;',context);vm.runInContext(fs.readFileSync(path.resolve(__dirname,'../www/mir-native-compat.js'),'utf8'),context);
+ assert.equal(await vm.runInContext('Promise.try(()=>42)',context),42);assert.equal(await vm.runInContext('Promise.try(()=>{throw Error("expected")}).catch(e=>e.message)',context),'expected');
+ assert.equal(vm.runInContext('(()=>{let calls=0;const map=new Map();map.getOrInsertComputed("key",()=>++calls);map.getOrInsertComputed("key",()=>++calls);return calls;})()',context),1);
+ assert.equal(vm.runInContext('URL.parse("https://localhost/native-pdf.html").hostname',context),'localhost');assert.equal(vm.runInContext('URL.parse("::invalid")',context),null);assert.equal(vm.runInContext('typeof fetch',context),'undefined');console.log('PASS compatibilité WebView/main et worker : Promise.try, erreurs, Map sans doublon, URL.parse, aucun transport ajouté');})().catch(e=>{console.error(e);process.exitCode=1;});

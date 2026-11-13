@@ -59,22 +59,29 @@ public class MIRNativePlugin extends Plugin {
         output=file.startWrite();output.write(cipher.getIV());output.write(ciphertext);file.finishWrite(output);call.resolve();
     }catch(Exception e){if(output!=null)file.failWrite(output);call.reject("Session non conservée sur cet appareil");}}
     private void clean(File dir,boolean all){File[] files=dir.listFiles();if(files!=null)for(File f:files)if(all||System.currentTimeMillis()-f.lastModified()>86400000L)f.delete();}
-    @PluginMethod public void clearAuth(PluginCall call){if(!trusted(call))return;new AtomicFile(authFile()).delete();clean(new File(getContext().getCacheDir(),"mir-pdf"),true);clean(new File(getContext().getCacheDir(),"mir-capture"),true);call.resolve();}
+    @PluginMethod public void clearAuth(PluginCall call){if(!trusted(call))return;new AtomicFile(authFile()).delete();clean(new File(getContext().getCacheDir(),"mir-pdf"),true);clean(new File(getContext().getCacheDir(),"mir-capture"),true);getActivity().runOnUiThread(()->{getBridge().getWebView().clearHistory();getBridge().getWebView().clearCache(true);android.webkit.CookieManager.getInstance().removeAllCookies(removed->{android.webkit.CookieManager.getInstance().flush();call.resolve();});});}
     @PluginMethod public void clearTemporary(PluginCall call){if(!trusted(call))return;clean(new File(getContext().getCacheDir(),"mir-pdf"),false);clean(new File(getContext().getCacheDir(),"mir-capture"),false);call.resolve();}
     @PluginMethod public void openExternal(PluginCall call){if(!trusted(call))return;String url=call.getString("url");if(!MirPolicy.external(url)){call.reject("Lien externe refusé");return;}try{getActivity().startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));call.resolve();}catch(Exception e){call.reject("Aucun navigateur disponible");}}
     @PluginMethod public void pdf(PluginCall call){if(!trusted(call))return;try{
         String encoded=call.getString("data"),name=call.getString("name","MIR.pdf"),action=call.getString("action","open");
         if(encoded==null||encoded.length()>MAX*4/3+8)throw new IOException();byte[] bytes=Base64.decode(encoded,Base64.DEFAULT);
-        if(bytes.length<5||bytes.length>MAX||!new String(bytes,0,5,StandardCharsets.US_ASCII).equals("%PDF-")||!name.toLowerCase(java.util.Locale.ROOT).endsWith(".pdf")||!(action.equals("open")||action.equals("share")))throw new IOException();
+        if(bytes.length<5||bytes.length>MAX||!new String(bytes,0,5,StandardCharsets.US_ASCII).equals("%PDF-")||!name.toLowerCase(java.util.Locale.ROOT).endsWith(".pdf")||!(action.equals("open")||action.equals("share")||action.equals("save")))throw new IOException();
         File dir=new File(getContext().getCacheDir(),"mir-pdf");dir.mkdirs();clean(dir,false);
         String safe=name.replaceAll("[^\\p{L}\\p{N}._ -]","-");if(safe.length()>120)safe="MIR.pdf";
         File file=new File(dir,UUID.randomUUID()+"-"+safe);try(FileOutputStream out=new FileOutputStream(file)){out.write(bytes);}
+        if(action.equals("save")){call.getData().put("pdfSaveName",file.getName());Intent save=new Intent(Intent.ACTION_CREATE_DOCUMENT);save.addCategory(Intent.CATEGORY_OPENABLE);save.setType("application/pdf");save.putExtra(Intent.EXTRA_TITLE,safe);startActivityForResult(call,save,"pdfSaved");return;}
         Uri uri=FileProvider.getUriForFile(getContext(),getContext().getPackageName()+".fileprovider",file);
         Intent intent=new Intent(action.equals("share")?Intent.ACTION_SEND:Intent.ACTION_VIEW);intent.setType("application/pdf");
         if(action.equals("share")){intent.putExtra(Intent.EXTRA_STREAM,uri);intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);getActivity().startActivity(Intent.createChooser(intent,"Partager le PDF"));}
         else getActivity().runOnUiThread(()->getBridge().getWebView().loadUrl("https://localhost/native-pdf.html?id="+Uri.encode(file.getName())));
         call.resolve();
     }catch(Exception e){call.reject("PDF indisponible ou aucun lecteur installé. Aucun fichier envoyé.");}}
+    @ActivityCallback private void pdfSaved(PluginCall call,ActivityResult activity){if(call!=null)getBridge().execute(()->finishPdfSave(call,activity));}
+    private void finishPdfSave(PluginCall call,ActivityResult activity){String name=call.getString("pdfSaveName","");if(!name.matches("[a-f0-9-]{36}-[^/\\\\]{1,120}\\.pdf")){call.reject("Document refusé");return;}File file=new File(new File(getContext().getCacheDir(),"mir-pdf"),name);try{
+        if(activity.getResultCode()!=Activity.RESULT_OK||activity.getData()==null){call.resolve(new JSObject().put("cancelled",true));return;}
+        Uri uri=activity.getData().getData();if(uri==null||!"content".equals(uri.getScheme()))throw new IOException();byte[] bytes=readFile(file);if(bytes.length<5||!new String(bytes,0,5,StandardCharsets.US_ASCII).equals("%PDF-"))throw new IOException();
+        try(OutputStream output=getContext().getContentResolver().openOutputStream(uri,"wt")){if(output==null)throw new IOException();output.write(bytes);output.flush();}call.resolve(new JSObject().put("saved",true));
+    }catch(Exception e){call.reject("Enregistrement non confirmé. Vérifiez le fichier choisi.");}finally{file.delete();}}
     @PluginMethod public void scanQr(PluginCall call){if(!trusted(call))return;if(getPermissionState("camera")!=PermissionState.GRANTED){requestPermissionForAlias("camera",call,"cameraReady");return;}launchScanner(call);}
     @PermissionCallback private void cameraReady(PluginCall call){if(getPermissionState("camera")!=PermissionState.GRANTED){call.reject("Caméra refusée. Utilisez le sélecteur ou le code saisi.");return;}if(call.getMethodName().equals("capturePhoto"))launchPhoto(call);else launchScanner(call);}
     @PluginMethod public void readPdf(PluginCall call){if(!trusted(call))return;try{

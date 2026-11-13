@@ -74,7 +74,7 @@ public class MirAndroidTest {
    long end=SystemClock.uptimeMillis()+5000;java.util.concurrent.atomic.AtomicBoolean keyboard=new java.util.concurrent.atomic.AtomicBoolean(false);
    while(SystemClock.uptimeMillis()<end){s.onActivity(a->{androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(a.getBridge().getWebView());keyboard.set(insets!=null&&insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime()));});if(keyboard.get())break;SystemClock.sleep(100);}
    assertTrue("Clavier Android visible",keyboard.get());screenshot("android-keyboard");
-   assertEquals(Boolean.TRUE,js(s,"document.querySelector('#android-recipe-input').getBoundingClientRect().bottom<=innerHeight"));
+   waitFor(s,"document.querySelector('#android-recipe-input').getBoundingClientRect().bottom<=innerHeight");
    device.pressBack();device.pressBack();
    androidx.test.uiautomator.UiObject2 cancel=device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.res("android:id/button2")),5000);assertNotNull("Confirmation avant abandon",cancel);cancel.click();assertEquals("RECETTE-PHASE11-LOCAL",js(s,"document.querySelector('#android-recipe-input').value"));
    device.pressHome();Context target=InstrumentationRegistry.getInstrumentation().getTargetContext();Intent intent=target.getPackageManager().getLaunchIntentForPackage(target.getPackageName());intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);target.startActivity(intent);waitFor(s,"document.visibilityState==='visible'");assertEquals("RECETTE-PHASE11-LOCAL",js(s,"document.querySelector('#android-recipe-input').value"));
@@ -111,6 +111,10 @@ public class MirAndroidTest {
    waitFor(s,"document.querySelectorAll('canvas').length===4 && document.querySelector('#status').textContent.startsWith('4 page')");
    assertEquals(Boolean.TRUE,js(s,"[...document.querySelectorAll('canvas')].every(canvas=>{const data=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;let ink=0;for(let i=0;i<data.length;i+=4)if(data[i+3]&&data[i]<200&&data[i+1]<200&&data[i+2]<200)ink++;return ink>100;})"));
    screenshot("android-pdf-four-pages");
+   byte[] original=java.security.MessageDigest.getInstance("SHA-256").digest(java.nio.file.Files.readAllBytes(file.toPath()));
+   js(s,"window.saveProof='pending';MIRAndroid.Native.readPdf({id:'"+name+"'}).then(r=>MIRAndroid.Native.pdf({data:r.data,name:'RECETTE-PHASE11.pdf',action:'save'})).then(r=>window.saveProof=r.cancelled?'cancelled':'unexpected').catch(()=>window.saveProof='failed');true");
+   UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());assertTrue(device.wait(androidx.test.uiautomator.Until.hasObject(androidx.test.uiautomator.By.pkg("com.android.documentsui")),5000));screenshot("android-pdf-save-chooser");device.pressBack();waitFor(s,"window.saveProof==='cancelled'");
+   assertArrayEquals(original,java.security.MessageDigest.getInstance("SHA-256").digest(java.nio.file.Files.readAllBytes(file.toPath())));
    js(s,"window.pdfProof='pending';MIRAndroid.Native.pdf({data:btoa('not a PDF'),name:'bad.pdf',action:'open'}).then(()=>window.pdfProof='incorrectly accepted').catch(()=>window.pdfProof='refused');true");
    waitFor(s,"window.pdfProof==='refused'");
   }finally{assertTrue(file.delete());}

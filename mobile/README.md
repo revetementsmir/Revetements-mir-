@@ -6,7 +6,7 @@ Application TEST `ca.revetementsmir.equipe.test`, version `0.11.0-test`, code in
 
 ## Compiler
 
-Prérequis : Node 24, JDK 21 complet, SDK Android 36 et build tools 36.0.0, licences Android acceptées. Capacitor 8.6.2, App 8.1.2, Geolocation 8.2.4, esbuild 0.28.2, Playwright 1.62.1 et leurs dépendances npm sont verrouillés. Gradle 8.14.3 et son SHA-256 sont fixés. AGP 8.13.0, ZXing embarqué 4.3.0; aucun modèle QR téléchargé, Firebase ou service payant.
+Prérequis : Node 24, JDK 21 complet, SDK Android 36 et build tools 36.0.0, licences Android acceptées. Capacitor 8.6.2, App 8.1.2, Geolocation 8.2.4, esbuild 0.28.2, core-js 3.51.0, Playwright 1.62.1 et leurs dépendances npm sont verrouillés. Gradle 8.14.3 et son SHA-256 sont fixés. AGP 8.13.0, ZXing embarqué 4.3.0; aucun modèle QR téléchargé, Firebase ou service payant.
 
 ```sh
 cd mobile
@@ -37,9 +37,9 @@ Pour une mise à jour, conserver l’identifiant **et la même clé de signature
 - Réseau métier limité à `hxtztkmbfpmzrieccwsg.supabase.co`, HTTPS, chemins Auth token/user/logout, REST et Storage existants. Aucune Edge Function de transport, inscription, récupération par courriel ou OAuth. La garde native, la CSP et les gardes JS refusent tout repli production.
 - Clé publique publishable TEST seulement. Aucun mot de passe, service_role ou jeton de gestion embarqué. Le serveur conserve l’autorité sur les rôles et organisations; l’adaptateur relit `mir_account_snapshot` avant les RPC et refuse compte client/Admin technique.
 - Sessions Auth chiffrées AES-GCM avec clé Android Keystore et fichier privé `noBackupFilesDir`. Sauvegarde cloud/transfert désactivés. Aucune copie des jetons dans localStorage ou les journaux.
-- Déconnexion/changement de compte purgent stockage web, IndexedDB et fichiers privés temporaires; un IndexedDB bloqué interdit le changement. Hors ligne : aucun succès serveur simulé; les mécanismes de brouillons/queues existants restent ceux du portail.
+- Déconnexion/changement de compte purgent stockage web, IndexedDB, historique/cache WebView et fichiers privés temporaires; un IndexedDB bloqué interdit le changement. Hors ligne : aucun succès serveur simulé; les mécanismes de brouillons/queues existants restent ceux du portail.
 - GPS ponctuel à la demande, watch désactivé. Caméra et QR à l’utilisation, refus/annulation explicites. Fichiers PDF/JPEG/PNG/WebP ≤20 Mo, puis validations métier et bucket privé existants. Aucune photo téléversée par le plugin lui-même.
-- PDF : octets `%PDF-` vérifiés, ouverture dans le lecteur PDF.js embarqué ou partage par choix explicite. FileProvider limité aux deux sous-dossiers temporaires, purge à la déconnexion, expiration après 24 h au retour dans l’application. Les PDF restent clairs indépendamment du thème.
+- PDF : octets `%PDF-` vérifiés, ouverture dans le lecteur PDF.js embarqué enregistrement par le sélecteur Android ou partage par choix explicite. FileProvider limité aux deux sous-dossiers temporaires, purge à la déconnexion, expiration après 24 h au retour dans l’application. Les PDF restent clairs indépendamment du thème.
 - INTERNET, état réseau, GPS et caméra uniquement; aucune permission notification, suivi GPS en arrière-plan ou stockage partagé. Aucun push/courriel/fournisseur ajouté.
 
 ## Validation et limites

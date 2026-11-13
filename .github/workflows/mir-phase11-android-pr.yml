@@ -19,6 +19,7 @@ jobs:
         run: |
           cd mobile && npm ci && npm run sync && cd ..
           node mobile/tools/test-contracts.cjs
+          node mobile/tools/test-compat.cjs
           node mobile/tools/test-web.cjs
           node mobile/tools/test-pdf-web.cjs
           node tests/mir-phase10-bending.cjs
