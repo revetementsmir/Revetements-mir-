@@ -15,6 +15,7 @@ const restoreStyles=isolatePageStyles();
 document.body.removeAttribute('style');
 const css=document.createElement('style');css.textContent=`
   .mir-live-viewport{width:100%;height:100%;container:mir-page/size;overflow:auto;overscroll-behavior:contain;background:white;color:#26332b}
+  .ap-device-content.mir-live-viewport{height:auto;container-name:mir-page}
   [data-mir-responsive-page]{position:relative;isolation:isolate;transform:translateZ(0);min-height:100%;width:100%;font:16px/1.5 Arial,sans-serif}
   html[data-preview-workspace] .web-document{padding:0!important;overflow:hidden!important}
   .mir-responsive-notice{padding:8px 16px;font:12px/1.5 system-ui;color:#52664c;background:#f5f7f0}
