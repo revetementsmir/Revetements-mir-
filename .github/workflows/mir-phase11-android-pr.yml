@@ -1,0 +1,143 @@
+name: MIR Phase 11 — Android privé TEST
+on:
+  pull_request:
+    paths: ['mobile/**', 'dist/**', 'tests/**', 'docs/verification/phase11-android/**', '.github/workflows/mir-phase11-android-pr.yml']
+permissions:
+  contents: read
+jobs:
+  chromium-and-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Adapter web embarqué et non-régressions sans serveur
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ./mobile/node_modules
+        run: |
+          cd mobile && npm ci && npm run sync && cd ..
+          node mobile/tools/test-contracts.cjs
+          node mobile/tools/test-compat.cjs
+          node mobile/tools/test-web.cjs
+          node mobile/tools/test-pdf-web.cjs
+          node mobile/tools/test-device-checks.cjs
+          node tests/mir-phase10-bending.cjs
+          node tests/mir-phase10-management.cjs
+          node tests/mir-technical-dimensions.cjs
+          node tests/mir-account-session.cjs
+          node tests/mir-test-environment.cjs
+          node tests/mir-test-production-browser.cjs
+          node tests/mir-responsive-atelier-browser.cjs
+          node tests/mir-annotation-browser.cjs
+          git diff --check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase11-chromium-simulation
+          path: |
+            artifacts/phase11/web/
+            artifacts/mir-environments/
+            artifacts/mir-responsive-atelier/
+            artifacts/mir-annotations/
+  android-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+          cache-dependency-path: |
+            mobile/android/**/*.gradle
+            mobile/android/gradle/wrapper/gradle-wrapper.properties
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+      - name: Ressources embarquées et contrats sans réseau métier
+        working-directory: mobile
+        run: |
+          npm ci
+          npm run sync
+          node tools/prepare-android-tests.cjs
+          node tools/test-contracts.cjs
+      - name: Compiler APK, tests et analyse Android stricte
+        working-directory: mobile/android
+        run: |
+          ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/mir-version-110001.apk"
+          MIR_ANDROID_VERSION_CODE=110002 ./gradlew :app:assembleDebug --no-daemon
+          mkdir -p ../../artifacts/phase11
+          cp app/build/outputs/apk/debug/app-debug.apk ../../artifacts/phase11/MIR-TEST-debug.apk
+          cd ../..
+          sha256sum artifacts/phase11/MIR-TEST-debug.apk > artifacts/phase11/SHA256SUMS
+          git rev-parse HEAD > artifacts/phase11/source-sha.txt
+          echo '${{ github.event.pull_request.head.sha }}' > artifacts/phase11/pr-head-sha.txt
+      - name: Permettre KVM au runner éphémère
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Installation, WebView Android, PDF et mise à jour sans effacement
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          MIR_SANDBOX_EMPLOYEE_EMAIL: ${{ secrets.MIR_SANDBOX_EMPLOYEE_EMAIL }}
+          MIR_SANDBOX_EMPLOYEE_PASSWORD: ${{ secrets.MIR_SANDBOX_EMPLOYEE_PASSWORD }}
+          MIR_SANDBOX_CHEF_EMAIL: ${{ secrets.MIR_SANDBOX_CHEF_EMAIL }}
+          MIR_SANDBOX_CHEF_PASSWORD: ${{ secrets.MIR_SANDBOX_CHEF_PASSWORD }}
+          MIR_SANDBOX_WAREHOUSE_EMAIL: ${{ secrets.MIR_SANDBOX_WAREHOUSE_EMAIL }}
+          MIR_SANDBOX_WAREHOUSE_PASSWORD: ${{ secrets.MIR_SANDBOX_WAREHOUSE_PASSWORD }}
+          MIR_SANDBOX_ASSISTANT_EMAIL: ${{ secrets.MIR_SANDBOX_ASSISTANT_EMAIL }}
+          MIR_SANDBOX_ASSISTANT_PASSWORD: ${{ secrets.MIR_SANDBOX_ASSISTANT_PASSWORD }}
+          MIR_SANDBOX_BOSS_EMAIL: ${{ secrets.MIR_SANDBOX_BOSS_EMAIL }}
+          MIR_SANDBOX_BOSS_PASSWORD: ${{ secrets.MIR_SANDBOX_BOSS_PASSWORD }}
+          MIR_SANDBOX_ADMIN_EMAIL: ${{ secrets.MIR_SANDBOX_ADMIN_EMAIL }}
+          MIR_SANDBOX_ADMIN_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
+        with:
+          api-level: 35
+          target: default
+          arch: x86_64
+          profile: pixel_7
+          disable-animations: true
+          script: |
+            adb install "$RUNNER_TEMP/mir-version-110001.apk"
+            adb install mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            mobile/tools/run-instrumentation.sh
+            cp artifacts/phase11/instrumentation.txt artifacts/phase11/webview-tests.txt
+            node mobile/tools/prepare-real-roles.cjs
+            mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#prepareUpdate'
+            cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-prepare.txt
+            adb install -r artifacts/phase11/MIR-TEST-debug.apk
+            mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#verifyUpdate'
+            cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-verify.txt
+            mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirRealRolesTest'
+            cp artifacts/phase11/instrumentation.txt artifacts/phase11/real-roles.txt
+            adb pull /sdcard/Android/data/ca.revetementsmir.equipe.test/files/phase11-proof artifacts/phase11/
+      - name: Empreinte de l’APK de recette — signature debug uniquement
+        run: |
+          sha256sum -c artifacts/phase11/SHA256SUMS
+          cat artifacts/phase11/SHA256SUMS
+          node mobile/tools/result-summary.cjs
+          cp docs/verification/phase11-android/SAMSUNG-S25-ULTRA.md docs/verification/phase11-android/RECETTE-PHASE11-QR.png artifacts/phase11/
+          git diff --exit-code -- dist supabase
+          git diff --check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase11-android-test
+          path: |
+            artifacts/phase11/
+            mobile/android/app/build/reports/
+          retention-days: 14

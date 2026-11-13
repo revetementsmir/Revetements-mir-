@@ -1,0 +1,9 @@
+{
+  "appId": "ca.revetementsmir.equipe.test",
+  "appName": "MIR TEST",
+  "webDir": "www",
+  "loggingBehavior": "none",
+  "server": {"hostname": "localhost", "androidScheme": "https", "cleartext": false},
+  "android": {"allowMixedContent": false, "captureInput": true, "webContentsDebuggingEnabled": false},
+  "plugins": {"CapacitorHttp": {"enabled": false}, "CapacitorCookies": {"enabled": false}}
+}

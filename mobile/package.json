@@ -1,0 +1,21 @@
+{
+  "name": "mir-android-test",
+  "version": "0.11.0",
+  "private": true,
+  "scripts": {
+    "web": "node tools/build-web.cjs",
+    "sync": "npm run web && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.2",
+    "@capacitor/geolocation": "8.2.4",
+    "core-js": "3.51.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.2",
+    "esbuild": "0.28.2",
+    "playwright": "1.62.1"
+  }
+}

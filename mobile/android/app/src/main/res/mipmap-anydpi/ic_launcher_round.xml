@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- First four paths of assets/MIR-logo-officiel-original.svg; symbol only. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+ <group android:translateX="29" android:translateY="32.6" android:scaleX="0.47" android:scaleY="0.47">
+  <path android:fillColor="#a3a5a8" android:pathData="M84.33,43.03 L22.6182,21.9839 L63.4665,0.0045 Z"/>
+  <path android:fillColor="#57c03f" android:pathData="M44.7,70.08 L106.4131,91.1288 L85.5496,48.1019 Z"/>
+  <path android:fillColor="#57c03f" android:pathData="M22.11,24.97 L83.8258,46.0241 L42.9774,67.996 Z"/>
+  <path android:fillColor="#57c03f" android:pathData="M19.98,26.11 L0.0005,91.122 L40.852,69.1426 Z"/>
+ </group>
+</vector>

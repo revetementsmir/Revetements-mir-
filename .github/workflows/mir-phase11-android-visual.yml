@@ -1,0 +1,71 @@
+name: MIR Phase 11 — captures Android APK certifié
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/mir-phase11-android-visual.yml'
+      - 'tools/validation/phase11-android-visual.py'
+      - 'tools/validation/phase11-visual-requirements.txt'
+      - 'tools/validation/phase11-samsung-checklist.txt'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native-captures:
+    if: github.event.number == 31 && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'codex/phase-11-android-private'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: phase11-android-test
+          path: certified-artifact
+          github-token: ${{ github.token }}
+          repository: revetementsmir/Revetements-mir-
+          run-id: 43522576473
+      - name: Vérifier les octets de l’APK certifié, sans compilation ou signature
+        run: |
+          python tools/validation/phase11-android-visual.py verify --artifact-root certified-artifact
+          python -m pip install --disable-pip-version-check -r tools/validation/phase11-visual-requirements.txt
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+      - name: Permettre KVM sur le runner éphémère
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Capturer uniquement les preuves manquantes sur l’APK original
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          CAPTURE_GENERATOR_SHA: ${{ github.event.pull_request.head.sha }}
+          MIR_SANDBOX_EMPLOYEE_EMAIL: ${{ secrets.MIR_SANDBOX_EMPLOYEE_EMAIL }}
+          MIR_SANDBOX_EMPLOYEE_PASSWORD: ${{ secrets.MIR_SANDBOX_EMPLOYEE_PASSWORD }}
+          MIR_SANDBOX_CHEF_EMAIL: ${{ secrets.MIR_SANDBOX_CHEF_EMAIL }}
+          MIR_SANDBOX_CHEF_PASSWORD: ${{ secrets.MIR_SANDBOX_CHEF_PASSWORD }}
+          MIR_SANDBOX_WAREHOUSE_EMAIL: ${{ secrets.MIR_SANDBOX_WAREHOUSE_EMAIL }}
+          MIR_SANDBOX_WAREHOUSE_PASSWORD: ${{ secrets.MIR_SANDBOX_WAREHOUSE_PASSWORD }}
+          MIR_SANDBOX_ASSISTANT_EMAIL: ${{ secrets.MIR_SANDBOX_ASSISTANT_EMAIL }}
+          MIR_SANDBOX_ASSISTANT_PASSWORD: ${{ secrets.MIR_SANDBOX_ASSISTANT_PASSWORD }}
+          MIR_SANDBOX_BOSS_EMAIL: ${{ secrets.MIR_SANDBOX_BOSS_EMAIL }}
+          MIR_SANDBOX_BOSS_PASSWORD: ${{ secrets.MIR_SANDBOX_BOSS_PASSWORD }}
+        with:
+          api-level: 35
+          target: default
+          arch: x86_64
+          profile: pixel_7
+          disable-animations: true
+          script: python tools/validation/phase11-android-visual.py capture --artifact-root certified-artifact --output artifacts/phase11-native-visual
+      - name: Conserver les PNG et leur provenance, sans image dans les journaux
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase11-native-visual
+          path: artifacts/phase11-native-visual/
+          retention-days: 14
+          if-no-files-found: error
