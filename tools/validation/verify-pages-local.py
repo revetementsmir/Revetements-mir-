@@ -46,6 +46,10 @@ def main():
     subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', block('Préparer uniquement le site MIR principal')],
                    cwd=work, check=True)
     (work / 'tests').symlink_to(ROOT / 'tests', target_is_directory=True)
+    (work / 'scripts').symlink_to(ROOT / 'scripts', target_is_directory=True)
+    sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', block('Préparer le site MIR TEST isolé')],
+                   cwd=work, env=dict(os.environ, GITHUB_SHA=sha), check=True)
     artifact = work / '_site_mir'
     requests = []
 
@@ -68,7 +72,6 @@ def main():
 
     server = http.server.ThreadingHTTPServer(('127.0.0.1', 0), Handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
-    sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     script = block('Verify published MIR pages')
     (output / 'verify.sh').write_text(script)
     env = dict(os.environ, PAGE_URL=f'http://127.0.0.1:{server.server_port}', GITHUB_SHA=sha)

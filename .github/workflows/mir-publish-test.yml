@@ -1,0 +1,89 @@
+name: MIR — publier uniquement TEST
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_ref:
+        description: Branche ou SHA candidat à publier uniquement dans TEST
+        required: true
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: mir-pages
+  cancel-in-progress: false
+jobs:
+  publish-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Lire la révision de production actuellement publiée
+        id: live
+        run: |
+          curl -fsSL --retry 3 'https://revetementsmir.github.io/Revetements-mir-/mir-production-release.json' -o /tmp/mir-live-production.json
+          node -e 'const fs=require("fs"),m=JSON.parse(fs.readFileSync("/tmp/mir-live-production.json"));if(m.environment!=="production"||! /^[a-f0-9]{40}$/.test(m.revision)||!m.files)throw Error("Verified production release required");fs.appendFileSync(process.env.GITHUB_OUTPUT,"sha="+m.revision+"\n");'
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.live.outputs.sha }}
+          path: production-source
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_ref }}
+          path: candidate-source
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Garder les octets production et préparer le candidat TEST
+        run: |
+          candidate_sha=$(git -C candidate-source rev-parse HEAD)
+          node production-source/scripts/build-mir-test.cjs --candidate production-source/dist candidate-source/dist _site_mir /tmp/mir-live-production.json "$candidate_sha"
+          echo "MIR_TEST_REVISION=$candidate_sha" >> "$GITHUB_ENV"
+      - name: Recette des deux environnements avant publication, sans appel Supabase
+        run: |
+          cd production-source
+          npm install --no-save --package-lock=false playwright@1.62.1
+          npx playwright install --with-deps chromium
+          cd ..
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory _site_mir > /tmp/mir-test-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in 1 2 3 4 5; do if curl -fsS http://127.0.0.1:8765/mir-production-release.json > /dev/null; then break; fi; sleep 1; done
+          MIR_ENV_PUBLISHED_BASE=http://127.0.0.1:8765 MIR_CHROMIUM_BIN="$(find "$HOME/.cache/ms-playwright" -path '*/chrome-linux*/chrome' -type f | head -1)" node production-source/tests/mir-test-production-browser.cjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site_mir
+      - name: Refuser une production qui a changé entre-temps
+        env:
+          EXPECTED_PRODUCTION_SHA: ${{ steps.live.outputs.sha }}
+        run: |
+          current_main=$(git -C production-source ls-remote origin refs/heads/main | cut -f1)
+          test "$current_main" = "$EXPECTED_PRODUCTION_SHA"
+          curl -fsSL 'https://revetementsmir.github.io/Revetements-mir-/mir-production-release.json' -o /tmp/mir-production-before-deploy.json
+          cmp /tmp/mir-live-production.json /tmp/mir-production-before-deploy.json
+      - uses: actions/deploy-pages@v4
+        id: deploy
+      - name: Vérifier production inchangée et candidat TEST publié
+        env:
+          PAGE_URL: ${{ steps.deploy.outputs.page_url }}
+        run: |
+          base="${PAGE_URL%/}"
+          curl -fsSL --retry 10 --retry-delay 3 --retry-all-errors "$base/mir-production-release.json?verification=$MIR_TEST_REVISION" -o /tmp/mir-production-after-deploy.json
+          cmp /tmp/mir-live-production.json /tmp/mir-production-after-deploy.json
+          curl -fsSL --retry 10 --retry-delay 3 --retry-all-errors "$base/test/mir-test-environment.json?verification=$MIR_TEST_REVISION" -o /tmp/mir-test-after-deploy.json
+          node -e 'const fs=require("fs"),m=JSON.parse(fs.readFileSync("/tmp/mir-test-after-deploy.json"));if(m.environment!=="test"||m.projectRef!=="hxtztkmbfpmzrieccwsg"||m.revision!==process.env.MIR_TEST_REVISION)throw Error("Wrong TEST candidate published");'
+      - name: Parcours publiés sans appel Supabase
+        env:
+          MIR_ENV_PUBLISHED_BASE: ${{ steps.deploy.outputs.page_url }}
+        run: MIR_CHROMIUM_BIN="$(find "$HOME/.cache/ms-playwright" -path '*/chrome-linux*/chrome' -type f | head -1)" node production-source/tests/mir-test-production-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-test-only-preuves
+          path: artifacts/mir-environments/
+          if-no-files-found: ignore
