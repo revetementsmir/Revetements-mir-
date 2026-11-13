@@ -27,9 +27,9 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   await tab.keyboard.press('Escape');
   await tab.locator('#preview-phone-model').selectOption('galaxy-s26-ultra');
   assert.equal(await tab.locator('#mir-responsive-device').getAttribute('data-preview-frame'),'android');
-  await tab.locator('[data-orientation=landscape]').click();
+  await tab.locator('button[data-orientation=landscape]').click();
   assert(await tab.locator('#mir-responsive-device').evaluate(node=>parseFloat(node.style.width)>parseFloat(node.style.height)));
-  await tab.locator('[data-orientation=portrait]').click();
+  await tab.locator('button[data-orientation=portrait]').click();
   await tab.locator('#preview-zoom').selectOption('.5');
   await tab.waitForFunction(()=>document.querySelector('#mir-responsive-device').style.getPropertyValue('--preview-scale')==='0.5',null,{timeout:5000});
   assert.equal(await tab.locator('#mir-responsive-device').evaluate(node=>node.style.getPropertyValue('--preview-scale')),'0.5');
