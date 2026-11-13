@@ -1,10 +1,10 @@
 MIR TEST — Samsung S25 Ultra de Frederick, recette à réaliser
 
 APK certifié : 0.11.0-test, versionCode 110002, ca.revetementsmir.equipe.test
-Source APK : 04a5b43504b012072bfeaf5aa1d67072f1de640b
-SHA-256 APK : b2f31d321e94f523c978e48ebd945a8cf64a1f6b64978e2f08697155e150db6d
-APK et preuves certifiées : https://github.com/revetementsmir/Revetements-mir-/actions/runs/43518155720/artifacts/14081054456
-Procédure : https://github.com/revetementsmir/Revetements-mir-/blob/04a5b43504b012072bfeaf5aa1d67072f1de640b/docs/verification/phase11-android/SAMSUNG-S25-ULTRA.md
+Source APK : d1876c75b8ec97e52e56a6e535f0cfa00c7e362c
+SHA-256 APK : e5b025382a29e05cab0b1640a8523c2fec296d2e245e6d5a7cb85cd9e015cdbb
+APK et preuves certifiées : https://github.com/revetementsmir/Revetements-mir-/actions/runs/43522576473/artifacts/14084546059
+Procédure : https://github.com/revetementsmir/Revetements-mir-/blob/d1876c75b8ec97e52e56a6e535f0cfa00c7e362c/docs/verification/phase11-android/SAMSUNG-S25-ULTRA.md
 
 [ ] Installer MIR-TEST-debug.apk depuis le ZIP, avec Mes fichiers. Aucun mode développeur nécessaire. Si Android refuse la signature, arrêter : ne pas désinstaller ni effacer les données d’une ancienne version.
 [ ] Se connecter avec un compte MIR TEST existant; vérifier la bannière TEST et son rôle. Aucun compte client dans l’application.

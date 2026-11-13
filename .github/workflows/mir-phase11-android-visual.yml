@@ -27,7 +27,7 @@ jobs:
           path: certified-artifact
           github-token: ${{ github.token }}
           repository: revetementsmir/Revetements-mir-
-          run-id: 43518155720
+          run-id: 43522576473
       - name: Vérifier les octets de l’APK certifié, sans compilation ou signature
         run: |
           python tools/validation/phase11-android-visual.py verify --artifact-root certified-artifact
