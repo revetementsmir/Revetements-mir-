@@ -1,0 +1,29 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
+const root=path.resolve(__dirname,'../..'),out=path.join(root,'mobile/www');
+if(process.env.MIR_ANDROID_ENV&&process.env.MIR_ANDROID_ENV!=='test')throw Error('Seule la recette MIR TEST est autorisée');
+const project='hxtztkmbfpmzrieccwsg',key='sb_publishable_jk8zsTWqQi6Borv44aaDJw_k7JSbzZh';
+const files=cp.execFileSync('git',['ls-files','-z','dist'],{cwd:root,encoding:'utf8'}).split('\0').filter(Boolean);
+fs.mkdirSync(out,{recursive:true});
+// Generated build directory only; no source, server or historical data is edited.
+for(const entry of fs.readdirSync(out))fs.rmSync(path.join(out,entry),{recursive:true,force:true});
+for(const file of files){
+ if(/atelier-essai\/.*(?:-candidate|index)\.html$/.test(file))continue;
+ const dest=path.join(out,file.slice(5));fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,file),dest);
+}
+const config={enabled:true,accountEnabled:true,passwordEnabled:true,emailEnabled:false,googleEnabled:false,signupEnabled:false,invitationsEnabled:false,manualInvitations:false,documentsEnabled:false,environment:'test',projectRef:project,supabaseUrl:`https://${project}.supabase.co`,publishableKey:key,siteOrigin:'https://localhost',callbackPath:'/chantier.html'};
+fs.writeFileSync(path.join(out,'portal-config.js'),'window.MIRPortalConfig=Object.freeze('+JSON.stringify(config)+');');
+fs.writeFileSync(path.join(out,'shared-config.js'),'window.MIRSharedConfig=Object.freeze('+JSON.stringify({enabled:true,supabaseUrl:config.supabaseUrl,publishableKey:key})+');');
+fs.writeFileSync(path.join(out,'mir-estimate-config.js'),'window.MIREstimateConfig=Object.freeze({enabled:false,environment:"test",apiBase:null});');
+for(const name of ['native-pdf.html','native-pdf.js'])fs.copyFileSync(path.join(root,'mobile/web',name),path.join(out,name));
+const esbuild=require('esbuild');
+for(const name of ['bootstrap','sdk'])esbuild.buildSync({entryPoints:[path.join(root,'mobile/web/'+name+'.js')],outfile:path.join(out,'mir-native-'+name+'.js'),bundle:true,format:'iife',target:'es2022'});
+const csp="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://"+project+".supabase.co wss://"+project+".supabase.co; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'none'; form-action 'none'; base-uri 'self'";
+for(const file of fs.readdirSync(out).filter(p=>p.endsWith('.html'))){
+ const p=path.join(out,file);let html=fs.readFileSync(p,'utf8');
+ html=html.replace(/<head([^>]*)>/i,'<head$1><meta http-equiv="Content-Security-Policy" content="'+csp+'">'+(html.includes('src="mir-native-bootstrap.js"')?'':'<script src="mir-native-bootstrap.js"></script>'));
+ html=html.replace(/(<script[^>]*src="vendor\/supabase-client\.js[^>]*><\/script>)/g,'$1<script src="mir-native-sdk.js" defer></script>');
+ fs.writeFileSync(p,html);
+}
+fs.writeFileSync(path.join(out,'index.html'),'<!doctype html><html lang="fr-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=chantier.html"></head><body><a href="chantier.html">Connexion équipe MIR — TEST</a></body></html>');
+console.log('Ressources MIR embarquées; projet TEST '+project+'; aucun server.url distant.');
