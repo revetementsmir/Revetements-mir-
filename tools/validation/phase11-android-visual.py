@@ -221,9 +221,10 @@ class Capture:
                 return None
             lower = labels.info['bounds']['top']
             upper = save.info['bounds']['top']
-            fields = [item for item in self.device(className='android.widget.EditText').all()
-                      if item.info['bounds']['top'] >= lower
-                      and item.info['bounds']['bottom'] <= upper]
+            edits = self.device(className='android.widget.EditText')
+            fields = [edits[index] for index in range(edits.count)
+                      if edits[index].info['bounds']['top'] >= lower
+                      and edits[index].info['bounds']['bottom'] <= upper]
             return fields[0] if len(fields) == 1 else None
         note = note_field()
         for _ in range(6):
