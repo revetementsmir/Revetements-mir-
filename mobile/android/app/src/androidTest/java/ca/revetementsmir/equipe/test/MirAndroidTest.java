@@ -30,7 +30,7 @@ public class MirAndroidTest extends MirDeviceSetup {
  private void waitFor(ActivityScenario<MainActivity> scenario,String expression)throws Exception{
   long end=SystemClock.uptimeMillis()+30000;
   while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(scenario,expression)))return;SystemClock.sleep(150);}
-  screenshot("failed-wait");fail("Condition Android WebView non satisfaite : "+expression+"; état PDF="+js(scenario,"JSON.stringify({status:document.querySelector('#status')?.textContent,error:window.mirNativeDiagnostic,save:window.saveProof,visibility:document.visibilityState})"));
+  screenshot("failed-wait");fail("Condition Android WebView non satisfaite : "+expression+"; état PDF="+js(scenario,"JSON.stringify({status:document.querySelector('#status')?.textContent,error:window.mirNativeDiagnostic,save:window.saveProof,visibility:document.visibilityState,field:document.querySelector('#android-recipe-input')?.getBoundingClientRect().toJSON(),height:innerHeight,viewport:window.visualViewport?{height:visualViewport.height,top:visualViewport.offsetTop}:null})"));
  }
  private void screenshot(String name)throws Exception{
   Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();File dir=new File(context.getExternalFilesDir(null),"phase11-proof");dir.mkdirs();
@@ -65,6 +65,17 @@ public class MirAndroidTest extends MirDeviceSetup {
    Context c=InstrumentationRegistry.getInstrumentation().getTargetContext();File file=new File(c.getNoBackupFilesDir(),"mir-auth.enc");assertTrue(file.exists());byte[] encrypted=java.nio.file.Files.readAllBytes(file.toPath());assertFalse(new String(encrypted,java.nio.charset.StandardCharsets.UTF_8).contains("RECETTE-PHASE11-VAULT"));
    js(s,"window.vaultProof='pending';MIRAndroid.Native.clearAuth().then(()=>MIRPortalActiveClient.signOut()).then(()=>window.vaultProof='cleared').catch(()=>window.vaultProof='failed');true");
    waitFor(s,"window.vaultProof==='cleared'");assertFalse(file.exists());assertEquals(null,js(s,"localStorage.getItem('mir_phase11_probe')"));
+  }
+ }
+ @Test public void deviceRecipeShortcutIsDebugAndLocalOnly()throws Exception{
+  Context context=InstrumentationRegistry.getInstrumentation().getTargetContext();
+  assertTrue(context.getSystemService(android.content.pm.ShortcutManager.class).getManifestShortcuts().stream().anyMatch(shortcut->shortcut.getId().equals("mir_device_recipe")));
+  Intent intent=new Intent(context,MainActivity.class).setAction("ca.revetementsmir.equipe.test.CHECK_DEVICE");
+  try(ActivityScenario<MainActivity>s=ActivityScenario.launch(intent)){
+   waitFor(s,"location.pathname==='/native-checks.html' && !!document.querySelector('#check-gps')");
+   assertEquals("https://localhost",js(s,"location.origin"));assertEquals(Boolean.TRUE,js(s,"['#check-gps','#check-photo','#check-qr','#check-file'].every(id=>!!document.querySelector(id))"));
+   assertEquals("undefined",js(s,"typeof window.MIRSupabase"));assertEquals(0,((Number)js(s,"document.querySelectorAll('form').length")).intValue());
+   screenshot("android-device-recipe");
   }
  }
  @Test public void backKeyboardOfflineAndResumePreserveLocalInput()throws Exception{

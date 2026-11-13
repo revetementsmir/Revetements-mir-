@@ -28,7 +28,7 @@ function mount(){
 document.addEventListener('DOMContentLoaded',mount,{once:true});
 addEventListener('offline',networkState);addEventListener('online',networkState);
 function keepInputVisible(){requestAnimationFrame(()=>requestAnimationFrame(()=>{const field=document.activeElement;if(!field?.matches?.('input,textarea,select,[contenteditable="true"]'))return;const rect=field.getBoundingClientRect(),view=window.visualViewport,bottom=(view?.offsetTop||0)+(view?.height||innerHeight)-16;if(rect.bottom>bottom||rect.top<(view?.offsetTop||0)+40)field.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});}));}
-window.visualViewport?.addEventListener('resize',keepInputVisible);addEventListener('resize',keepInputVisible);document.addEventListener('focusin',keepInputVisible);
+window.visualViewport?.addEventListener('resize',keepInputVisible);window.visualViewport?.addEventListener('scroll',keepInputVisible);addEventListener('resize',keepInputVisible);document.addEventListener('focusin',keepInputVisible);
 document.addEventListener('input',event=>{if(event.target.closest('form')&&!event.target.closest('#auth-signin-form,#wh-login-form'))dirty=true;},true);
 async function download(link){
  const actor=()=>window.MIRAndroidSession?.currentUserId?window.MIRAndroidSession.currentUserId():window.MIRPortalActiveClient?.getStatus()?.user?.id||null,startedBy=actor(),assertSession=()=>{if(actor()!==startedBy)throw Error('La session a changé. Ouvrez à nouveau le fichier depuis votre compte.');};

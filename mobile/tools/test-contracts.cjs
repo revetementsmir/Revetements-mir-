@@ -38,3 +38,12 @@ test('Built configuration is TEST only and the web engines are unchanged',()=>{
  const staged=fs.readFileSync(path.join(root,'www/portal-config.js'),'utf8');assert.ok(staged.includes('hxtztkmbfpmzrieccwsg'));assert.ok(!staged.includes('gccltmaulvrnthrbnrpd'));
  for(const file of ['production-model.js','mir-bending-presets.js','mir-catalogue.js','portal-client.js','chantier-app.js'])if(fs.existsSync(path.join(root,'../dist',file)))assert.deepEqual(fs.readFileSync(path.join(root,'www',file)),fs.readFileSync(path.join(root,'../dist',file)),file);
 });
+
+test('Every embedded service configuration stays TEST even when a production build is requested',()=>{
+ const cp=require('node:child_process');
+ for(const file of ['portal-config.js','shared-config.js','mir-estimate-config.js']){const content=fs.readFileSync(path.join(root,'www',file),'utf8');assert.doesNotMatch(content,/gccltmaulvrnthrbnrpd/);}
+ assert.match(fs.readFileSync(path.join(root,'www/shared-config.js'),'utf8'),/hxtztkmbfpmzrieccwsg/);
+ assert.match(fs.readFileSync(path.join(root,'www/mir-estimate-config.js'),'utf8'),/enabled:false/);
+ const result=cp.spawnSync(process.execPath,[path.join(root,'tools/build-web.cjs')],{env:{...process.env,MIR_ANDROID_ENV:'production'},encoding:'utf8'});assert.equal(result.error,undefined);assert.notEqual(result.status,0);assert.match(result.stderr,/Seule la recette MIR TEST est autorisée/);
+ assert.equal(fs.existsSync(path.join(root,'www/responsive.html')),false);assert.equal(fs.existsSync(path.join(root,'www/boutique.html')),false);
+});

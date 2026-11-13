@@ -22,6 +22,8 @@ cd android
 
 APK : `mobile/android/app/build/outputs/apk/debug/app-debug.apk`. **Debug/TEST seulement, jamais une livraison de production.** Ne pas envoyer cet APK aux employés sans autorisation distincte.
 
+Procédure simple pour Frederick : [Samsung S25 Ultra et recette physique locale](../docs/verification/phase11-android/SAMSUNG-S25-ULTRA.md). Le raccourci debug « Tester ce téléphone » ouvre des contrôles locaux explicites sans formulaire métier ou transport.
+
 ## Installation et mise à jour de recette
 
 ```sh

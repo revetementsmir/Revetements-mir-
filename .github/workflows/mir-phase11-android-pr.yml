@@ -24,16 +24,25 @@ jobs:
           node mobile/tools/test-compat.cjs
           node mobile/tools/test-web.cjs
           node mobile/tools/test-pdf-web.cjs
+          node mobile/tools/test-device-checks.cjs
           node tests/mir-phase10-bending.cjs
           node tests/mir-phase10-management.cjs
           node tests/mir-technical-dimensions.cjs
           node tests/mir-account-session.cjs
+          node tests/mir-test-environment.cjs
+          node tests/mir-test-production-browser.cjs
+          node tests/mir-responsive-atelier-browser.cjs
+          node tests/mir-annotation-browser.cjs
           git diff --check
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: phase11-chromium-simulation
-          path: artifacts/phase11/web/
+          path: |
+            artifacts/phase11/web/
+            artifacts/mir-environments/
+            artifacts/mir-responsive-atelier/
+            artifacts/mir-annotations/
   android-test:
     runs-on: ubuntu-latest
     timeout-minutes: 35
@@ -121,6 +130,7 @@ jobs:
           sha256sum -c artifacts/phase11/SHA256SUMS
           cat artifacts/phase11/SHA256SUMS
           node mobile/tools/result-summary.cjs
+          cp docs/verification/phase11-android/SAMSUNG-S25-ULTRA.md docs/verification/phase11-android/RECETTE-PHASE11-QR.png artifacts/phase11/
           git diff --exit-code -- dist supabase
           git diff --check
       - uses: actions/upload-artifact@v4

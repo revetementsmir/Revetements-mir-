@@ -1,6 +1,6 @@
 'use strict';
 const TEST='hxtztkmbfpmzrieccwsg.supabase.co';
-const routes=new Set(['index.html','native-pdf.html','chantier.html','entrepot.html','coordination.html','production.html','calepinage.html','plan.html','espace-partage.html']);
+const routes=new Set(['index.html','native-checks.html','native-pdf.html','chantier.html','entrepot.html','coordination.html','production.html','calepinage.html','plan.html','espace-partage.html']);
 function allowedRequest(value,origin='https://localhost'){
  try{const u=new URL(value,origin);if(u.username||u.password||u.port&&u.port!=='443')return false;
   if(u.origin===origin)return true;

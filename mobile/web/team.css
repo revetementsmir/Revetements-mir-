@@ -1,4 +1,5 @@
 /* Native team shell only; public website sources remain untouched. */
+body, html body:has(#mir-harmony-header #portal-navigation) { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px) !important; }
 :root[data-mir-harmony] .auth-card {
   background: var(--mir-surface, #fff) !important;
   color: var(--mir-text, #223128) !important;
