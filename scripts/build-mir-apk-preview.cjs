@@ -18,7 +18,7 @@ function build(source,output){
  // The packaged localhost origin becomes the hosted preview origin. Auth
  // options, TEST endpoint and the original role-checking SDK stay unchanged.
  let portal=fs.readFileSync(path.join(www,'portal-config.js'),'utf8');
- portal=portal.replace(/"siteOrigin":"[^"]*"/, '"siteOrigin":location.origin').replace(/"callbackPath":"[^"]*"/, '\"callbackPath\":new URL(\"chantier.html\",document.currentScript.src).pathname');
+ portal=portal.replace(/"siteOrigin":"[^"]*"/, '"siteOrigin":location.origin').replace(/"callbackPath":"[^"]*"/, '\"callbackPath\":(location.origin===\"https://revetementsmir.github.io\"?\"/Revetements-mir-/chantier.html\":\"/chantier.html\")');
  write('portal-config.js',portal);
  const policy=require(path.join(source,'mobile/web/policy.cjs'));
  // Only the shell's browser capabilities differ; its UI controllers and styles
@@ -38,6 +38,8 @@ const Policy={...OriginalPolicy,allowedRequest(value,origin){try{const u=new URL
  for(const name of fs.readdirSync(output).filter(n=>n.endsWith('.html'))){let html=fs.readFileSync(path.join(output,name),'utf8');html=html.replace(/<meta http-equiv="Content-Security-Policy"[^>]*>/gi,'').replace(/<head([^>]*)>/i,`<head$1><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="${csp}"><script src="mir-apk-preview-guard.js"></script><script src="mir-apk-browser-bridge.js"></script>`);write(name,html);}
  for(const name of ['mir-responsive-styles.mjs','mir-responsive-history.js'])fs.copyFileSync(path.join(repo,'dist',name),path.join(output,name));
  let loader=fs.readFileSync(path.join(repo,'dist/responsive.html'),'utf8');
+ const policyCode=fs.readFileSync(path.join(source,'mobile/web/policy.cjs'),'utf8');
+ loader=loader.replace("if (!pages.has(page))",`const nativePolicy=(()=>{const module={exports:{}};${policyCode};return module.exports;})();const nativeURL=new URL(page,'https://localhost/');nativeURL.search=location.search;if(!nativePolicy.allowedRoute(nativeURL.href))throw Error('Ce parcours est refusé par la politique de l’APK.');\n      if (!pages.has(page))`);
  loader=loader.replace(/const pages = new Set\(\[[^;]+;/,"const pages = new Set(['chantier.html','entrepot.html','coordination.html','production.html','calepinage.html','espace-partage.html']);").replace("|| 'index.html'","|| 'chantier.html'");
  loader=loader.replace("const page = new URL(location.href).searchParams.get('page') || 'chantier.html';","const page = new URL(location.href).searchParams.get('page') || 'chantier.html';");
  // Entry redirection is for the website launcher, never for this app renderer.

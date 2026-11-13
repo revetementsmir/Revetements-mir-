@@ -2,13 +2,14 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const root=path.resolve(process.env.MIR_APK_PREVIEW_ROOT||'artifacts/apk-preview-site'),proof='artifacts/apk-preview-proofs';
+async function routeSource(page){await page.route('https://apk-preview.example.test/**',async route=>{const name=path.resolve(root,'.'+new URL(route.request().url()).pathname);if(!name.startsWith(root+path.sep)||!fs.existsSync(name)||!fs.statSync(name).isFile())return route.fulfill({status:404,body:'missing'});return route.fulfill({path:name,contentType:({'.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.html':'text/html','.json':'application/json','.svg':'image/svg+xml'})[path.extname(name)]||'application/octet-stream'});});}
 const server=http.createServer((req,res)=>{const name=path.resolve(root,'.'+new URL(req.url,'http://localhost').pathname);if(!name.startsWith(root+path.sep)||!fs.existsSync(name)||!fs.statSync(name).isFile())return res.writeHead(404).end();res.setHeader('Content-Type',({'.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.html':'text/html','.json':'application/json','.svg':'image/svg+xml'})[path.extname(name)]||'application/octet-stream');fs.createReadStream(name).pipe(res);});
 (async()=>{await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const browser=await chromium.launch({headless:true,...(process.env.MIR_CHROMIUM_BIN?{executablePath:process.env.MIR_CHROMIUM_BIN}:{})});try{
  fs.mkdirSync(proof,{recursive:true});const page=await browser.newPage({viewport:{width:1440,height:1080}}),errors=[],network=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')console.log('BROWSER',m.text());});
  await page.addInitScript(()=>{window.originalStorage=localStorage;localStorage.setItem('production-sentinel','untouched');});
  await page.route('**/*.supabase.co/**',route=>{network.push(route.request().url());return route.abort();});
- const url='http://127.0.0.1:'+server.address().port+'/test/application/responsive.html?app-preview=1&app-platform=android&phone=galaxy-s26-ultra';
+ await routeSource(page);const url='https://apk-preview.example.test/test/application/responsive.html?app-preview=1&app-platform=android&phone=galaxy-s26-ultra';
  await page.goto(url);await page.locator('[data-mir-responsive-ready=true]').waitFor({timeout:30000});
  const app=page.locator('[data-mir-responsive-page]');await app.locator('#auth-signin-form').waitFor();
  assert.equal(await page.locator('iframe').count(),0);assert.equal(await app.locator('#auth-google').isVisible(),false);
@@ -21,7 +22,7 @@ const server=http.createServer((req,res)=>{const name=path.resolve(root,'.'+new 
  }
  await page.locator('button[data-layout=phone]').click();
  const appearance=await app.locator('.auth-card').evaluate(card=>({font:getComputedStyle(card).fontFamily,label:getComputedStyle(card.querySelector('label')).fontSize,input:getComputedStyle(card.querySelector('input')).fontSize,background:getComputedStyle(card).backgroundColor}));
- const baseline=await browser.newPage({viewport:{width:412,height:836}});await baseline.route('**/*.supabase.co/**',route=>route.abort());await baseline.goto(url.replace(/responsive.html.*$/,'chantier.html'));await baseline.locator('#auth-signin-form').waitFor();
+ const baseline=await browser.newPage({viewport:{width:412,height:836}});await routeSource(baseline);await baseline.route('**/*.supabase.co/**',route=>route.abort());await baseline.goto(url.replace(/responsive.html.*$/,'chantier.html'));await baseline.locator('#auth-signin-form').waitFor();
  const reference=await baseline.locator('.auth-card').evaluate(card=>({font:getComputedStyle(card).fontFamily,label:getComputedStyle(card.querySelector('label')).fontSize,input:getComputedStyle(card.querySelector('input')).fontSize,background:getComputedStyle(card).backgroundColor}));
  assert.deepEqual(appearance,reference,'app typography and card surface match the unwrapped APK web source');await baseline.screenshot({animations:'disabled',path:proof+'/source-without-responsive.png'});await baseline.close();
  await page.getByRole('button',{name:'Annoter',exact:true}).click();
