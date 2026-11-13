@@ -90,6 +90,13 @@ test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch con
   const ancestor=git('merge-base',pr.base.sha,pr.head.sha);
   const changed=git('diff','--name-only',ancestor,pr.head.sha,'--',...Object.keys(beck.files)).split('\n').filter(Boolean);
   for(const file of changed)assert.equal(hash(fs.readFileSync(file)),approvedProtectedChanges[file],`Phase3A protected file not explicitly approved: ${file}`);
+ }else if(process.env.GITHUB_BASE_REF){
+  // A PR checkout may omit the event payload in a restricted runner. Compare
+  // the current head with the certified base instead of treating today's main
+  // as the historical BECK snapshot.
+  const git=(...args)=>require('node:child_process').execFileSync('git',args,{encoding:'utf8'}).trim(),baseRef=`origin/${process.env.GITHUB_BASE_REF}`;
+  const ancestor=git('merge-base',baseRef,'HEAD'),changed=git('diff','--name-only',ancestor,'HEAD','--',...Object.keys(beck.files)).split('\n').filter(Boolean);
+  for(const file of changed)assert.equal(hash(fs.readFileSync(file)),approvedProtectedChanges[file],`Phase3A protected file not explicitly approved: ${file}`);
  }else for(const [file,value]of Object.entries(beck.files))assert.equal(hash(fs.readFileSync(file)),approvedProtectedChanges[file]||value,'BECK/main '+file);
  const source=fs.readFileSync('dist/chantier-app.js','utf8');
  for(const [name,value]of Object.entries(baseline.functions)){const start=source.indexOf('  function '+name+'('),end=source.indexOf('\n  function ',start+1);assert.ok(start>=0,name);assert.equal(hash(source.slice(start,end<0?undefined:end)),value,name);}
