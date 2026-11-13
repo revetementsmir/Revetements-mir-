@@ -24,6 +24,10 @@ TEST = 'hxtztkmbfpmzrieccwsg'
 ROLES = [('EMPLOYEE', 'Employé chantier'), ('CHEF', 'Chef d’équipe'),
          ('WAREHOUSE', 'Entrepôt et livraison'), ('ASSISTANT', 'Adjointe'), ('BOSS', 'Boss')]
 SAFE_NAV = {'Me connecter', 'Menu', 'Réglages', 'Déconnexion', 'Plus', 'Mes absences'}
+class CaptureError(RuntimeError):
+    """Only static, non-sensitive diagnostic messages may be logged."""
+
+
 REQUIRED_OLD = {'android-signin-portrait.png', 'android-dark-large-contrast.png',
                 'android-signin-landscape.png', 'android-keyboard.png',
                 'android-offline.png', 'android-pdf-four-pages.png', 'android-device-recipe.png'}
@@ -36,37 +40,37 @@ def sha(path):
 def certified_apk(root):
     matches = list(root.rglob('MIR-TEST-debug.apk'))
     if len(matches) != 1:
-        raise RuntimeError('Exactly one certified APK is required')
+        raise CaptureError('Exactly one certified APK is required')
     apk = matches[0]
     if sha(apk) != APK_SHA:
-        raise RuntimeError('Certified APK SHA-256 mismatch')
+        raise CaptureError('Certified APK SHA-256 mismatch')
     folder = apk.parent
     if (folder / 'pr-head-sha.txt').read_text().strip() != SOURCE:
-        raise RuntimeError('Certified source mismatch')
+        raise CaptureError('Certified source mismatch')
     result = json.loads((folder / 'result.json').read_text())
     if (result['source'] != SOURCE or result['project'] != TEST
             or result['versionCode'] != 110002 or result['nativeTests'] != 6):
-        raise RuntimeError('Certified result metadata mismatch')
+        raise CaptureError('Certified result metadata mismatch')
     import zipfile
     with zipfile.ZipFile(apk) as package:
         for filename in ['portal-config.js', 'shared-config.js', 'mir-estimate-config.js']:
             content = package.read('assets/public/' + filename).decode()
             if 'gccltmaulvrnthrbnrpd' in content:
-                raise RuntimeError('Production configuration refused')
+                raise CaptureError('Production configuration refused')
             if filename == 'mir-estimate-config.js' and 'enabled:false' not in content:
-                raise RuntimeError('Estimate transport must remain disabled')
+                raise CaptureError('Estimate transport must remain disabled')
             if filename != 'mir-estimate-config.js' and TEST not in content:
-                raise RuntimeError('Fixed TEST configuration missing')
+                raise CaptureError('Fixed TEST configuration missing')
         config = json.loads(package.read('assets/capacitor.config.json'))
         if config.get('server', {}).get('url'):
-            raise RuntimeError('Remote server.url refused')
+            raise CaptureError('Remote server.url refused')
     return apk
 
 
 def png_info(path):
     data = path.read_bytes()
     if data[:8] != b'\x89PNG\r\n\x1a\n':
-        raise RuntimeError('Native screenshot is not PNG')
+        raise CaptureError('Native screenshot is not PNG')
     width, height = struct.unpack('>II', data[16:24])
     return {'sha256': hashlib.sha256(data).hexdigest(), 'width': width,
             'height': height, 'bytes': len(data)}
@@ -89,7 +93,7 @@ class Capture:
         # No shell interpolation and no credential value ever passed to this helper.
         result = subprocess.run(['adb', '-s', self.serial, *args], capture_output=True, timeout=40)
         if result.returncode:
-            raise RuntimeError('ADB operation failed')
+            raise CaptureError('ADB operation failed')
         return result.stdout
 
     def save_manifest(self, status):
@@ -101,13 +105,13 @@ class Capture:
         import shutil
         originals = [p for p in self.root.rglob('*.png') if 'phase11-proof' in p.parts and not p.stem.endswith('-scaled')]
         if not REQUIRED_OLD.issubset({p.name for p in originals}):
-            raise RuntimeError('Certified screenshots missing from original artifact')
+            raise CaptureError('Certified screenshots missing from original artifact')
         target = self.output / 'certified-original'
         target.mkdir(exist_ok=True)
         for source in sorted(originals):
             path = target / source.name
             if path.exists():
-                raise RuntimeError('Duplicate original screenshot name')
+                raise CaptureError('Duplicate original screenshot name')
             shutil.copyfile(source, path)
             self.manifest['screens'].append({'file': str(path.relative_to(self.output)),
                 'origin': 'certified-instrumentation', 'source_run': RUN, 'source_sha': SOURCE,
@@ -121,15 +125,21 @@ class Capture:
             if predicate():
                 return
             time.sleep(.25)
-        raise RuntimeError('UI state not reached: ' + label)
+        raise CaptureError('UI state not reached: ' + label)
 
     def tap(self, label):
         if label not in SAFE_NAV:
-            raise RuntimeError('Non-allowlisted UI action refused')
-        selector = (self.device(textStartsWith=label) if label == 'Mes absences'
-                    else self.device(text=label))
+            raise CaptureError('Non-allowlisted UI action refused')
+        if label == 'Menu':
+            # Chrome exposes the button's aria-label rather than its visible text.
+            selector = self.device(descriptionMatches='(?:Ouvrir|Fermer) le menu MIR')
+            if selector.count == 0:
+                selector = self.device(text=label)
+        else:
+            selector = (self.device(textStartsWith=label) if label == 'Mes absences'
+                        else self.device(text=label))
         if selector.count != 1:
-            raise RuntimeError('Navigation action is missing or ambiguous')
+            raise CaptureError('Navigation action is missing or ambiguous')
         selector.click(timeout=10)
         time.sleep(.4)
 
@@ -140,18 +150,18 @@ class Capture:
 
     def shot(self, name, role, scenario):
         if not re.fullmatch('[a-z0-9-]+', name):
-            raise RuntimeError('Invalid screenshot name')
+            raise CaptureError('Invalid screenshot name')
         if self.device.app_current().get('package') != APP:
-            raise RuntimeError('MIR is not foreground for screenshot')
+            raise CaptureError('MIR is not foreground for screenshot')
         path = self.output / (name + '.png')
         if path.exists():
-            raise RuntimeError('Existing screenshot must not be overwritten')
+            raise CaptureError('Existing screenshot must not be overwritten')
         # Lossless native capture including Android status/navigation bars; never stdout/logs.
         with path.open('wb') as stream:
             result = subprocess.run(['adb', '-s', self.serial, 'exec-out', 'screencap', '-p'],
                                     stdout=stream, stderr=subprocess.PIPE, timeout=30)
         if result.returncode:
-            raise RuntimeError('Native screenshot failed')
+            raise CaptureError('Native screenshot failed')
         self.manifest['screens'].append({'file': path.name, 'origin': 'uiautomator-certified-apk',
             'apk_versionCode': 110002, 'binary_sha256': APK_SHA, 'source_sha': SOURCE,
             'role': role, 'scenario': scenario, **png_info(path)})
@@ -162,11 +172,11 @@ class Capture:
         email, password = (os.environ.get('MIR_SANDBOX_' + key + '_' + suffix)
                            for suffix in ('EMAIL', 'PASSWORD'))
         if not email or not password:
-            raise RuntimeError('Required TEST account missing')
+            raise CaptureError('Required TEST account missing')
         self.wait(lambda: self.device(text='Me connecter').exists, 'team sign-in')
         fields = self.device(className='android.widget.EditText')
         if fields.count != 2:
-            raise RuntimeError('Unexpected sign-in fields')
+            raise CaptureError('Unexpected sign-in fields')
         fields[0].set_text(email)
         fields[1].set_text(password)
         # Accessibility actions do not require IME injection or a signature bypass.
@@ -201,10 +211,10 @@ class Capture:
         self.device.swipe_ext('up', scale=.6)
         fields = self.device(className='android.widget.EditText')
         if fields.count < 1:
-            raise RuntimeError('Local note field not visible')
+            raise CaptureError('Local note field not visible')
         note = fields[fields.count - 1]
         if note.info.get('password'):
-            raise RuntimeError('Password field refused for local form probe')
+            raise CaptureError('Password field refused for local form probe')
         note.click()
         note.set_text('RECETTE-PHASE11-VISUEL-LOCAL')
         self.shot('employee-local-note', 'Employé chantier', 'Local note only, no server save')
@@ -281,13 +291,15 @@ def main():
                     import xml.etree.ElementTree as ET
                     tree = ET.fromstring(capture.device.dump_hierarchy())
                     labels = SAFE_NAV | {label for _, label in ROLES} | {'Nouvelle demande', 'Apparence et réglages'}
-                    texts = [node.get('text', '') for node in tree.iter('node')]
+                    texts = [value for node in tree.iter('node') for value in (node.get('text', ''),node.get('content-desc',''))]
                     capture.manifest['safe_ui_probe'] = {'known_labels': sorted(label for label in labels if any(label in text for text in texts)),
                         'edit_field_count': sum(node.get('class') == 'android.widget.EditText' for node in tree.iter('node')),
                         'foreground_package': capture.device.app_current().get('package')}
                 except Exception:
                     capture.manifest['safe_ui_probe'] = {'unavailable': True}
             capture.save_manifest('failed')
+        if type(error) is CaptureError:
+            print('Diagnostic: '+str(error), file=sys.stderr)
         print('FAIL native capture generation at ' + (capture.stage if capture else 'APK verification')
               + ' (' + type(error).__name__ + '); no credential or image payload logged.', file=sys.stderr)
         return 1
