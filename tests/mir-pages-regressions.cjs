@@ -351,9 +351,9 @@ test('Repères A-B-C : le solveur garde tous les badges dans le cadre et cible l
  assert.ok(tiny.includes('>A</text>'));
  assert.equal((tiny.match(/>A<\/text>/g)||[]).length,1,'un seul badge par segment');
  assert.match(tiny,/data-anchor-x="80\.5" data-anchor-y="80"/,'le rappel vise le milieu du segment');
- const center=[...tiny.matchAll(/<(?:circle|rect) [^>]*(?:cx|x)="([\d.]+)"[^>]*(?:cy|y)="([\d.]+)"/g)][0];
+ const center=tiny.match(/transform="translate\(([\d.]+),([\d.]+)\)/);
  assert.ok(center,'badge rendu');
- assert.ok(Number(center[1])>=0&&Number(center[1])<=160&&Number(center[2])>=0&&Number(center[2])<=160,'badge dans le cadre');
+ assert.ok(Number(center[1])>=12&&Number(center[1])<=148&&Number(center[2])>=12&&Number(center[2])<=148,'badge et ses marges dans le cadre');
 });
 
 

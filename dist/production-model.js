@@ -562,11 +562,14 @@
     out += multiline(28, 116, model.validation.errors.map(e => e.message), { width: Math.max(25, Math.floor(width / 10)), lineHeight: 24, attrs: 'font-size="16"' }).svg;
     return out + svgClose;
   }
+  function paintedFaceLabel(side) {
+    return side==='left'?'Face 1 — côté indiqué par l’étoile':side==='right'?'Face 2 — côté indiqué par l’étoile':'à préciser';
+  }
   function profileDetailLines(model) {
     const lines=[];
     model.segments.forEach((s,index)=>{lines.push(s.label + ' = ' + formatMeasurement(s.lengthMM, model.unit) + (s.name ? ' · ' + s.name : ''));const b=model.bends[index];if(b)lines.push('Pli ' + b.from + '–' + b.to + ' = ' + fabricationBendLabel(b));});
-    if(model.spec?.mirDevelopedTotalIn)lines.push('Développé total = '+formatMeasurement(model.finishedSegmentSumMM,model.unit));
-    lines.push('* Face colorée : ' + (model.coloredFace.side ? (model.coloredFace.side === 'left' ? 'gauche' : 'droite') + ' en suivant A → dernier segment' : 'à préciser'));
+    if(Number.isFinite(model.finishedSegmentSumMM))lines.push('Développé total = '+formatMeasurement(model.finishedSegmentSumMM,model.unit)+' (nominal)');
+    lines.push('Face colorée : ' + paintedFaceLabel(model.coloredFace.side));
     lines.push('Développé de tôle : à valider par l’atelier.');
     return lines;
   }
@@ -683,8 +686,8 @@
         const bend = item.bends[index];
         if (bend) lines.push('Pli ' + bend.from + '–' + bend.to + ' = ' + fabricationBendLabel(bend));
       });
-      if (item.spec?.mirDevelopedTotalIn) lines.push('Développé total = ' + formatMeasurement(item.finishedSegmentSumMM, item.unit));
-      lines.push('Face colorée : ' + (item.coloredFace.side ? (item.coloredFace.side === 'left' ? 'gauche' : 'droite') + ' de A → ' + item.segments.at(-1).label : 'à préciser'));
+      if (Number.isFinite(item.finishedSegmentSumMM)) lines.push('Développé total = ' + formatMeasurement(item.finishedSegmentSumMM, item.unit) + ' (nominal)');
+      lines.push('Face colorée : ' + paintedFaceLabel(item.coloredFace.side));
       lines.push(...pricingDetailLines(item));
       return lines;
     }
@@ -780,88 +783,55 @@ function profileDrawingSection(points,bends){
  return section;
 }
 
-function profileSideMarkers({segments,folds},model,handles,annotationBounds,[left,right]=[0,800],[top,bottom]=[0,520]){
- const distance=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
- top+=14;bottom-=14;
- const orientation=(a,b,c)=>Math.sign((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]));
- const onSegment=(a,b,p)=>p[0]>=Math.min(a[0],b[0])-1e-6&&p[0]<=Math.max(a[0],b[0])+1e-6&&p[1]>=Math.min(a[1],b[1])-1e-6&&p[1]<=Math.max(a[1],b[1])+1e-6;
- function intersects([a,b],[c,d]){
-  const o1=orientation(a,b,c),o2=orientation(a,b,d),o3=orientation(c,d,a),o4=orientation(c,d,b);
-  if(o1!==o2&&o3!==o4)return true;
-  return (!o1&&onSegment(a,b,c))||(!o2&&onSegment(a,b,d))||(!o3&&onSegment(c,d,a))||(!o4&&onSegment(c,d,b));
- }
- const rect=(point,halfWidth)=>({x:point[0]-halfWidth,y:point[1]-12,w:halfWidth*2,h:24});
- const expanded=(r,gap)=>({x:r.x-gap,y:r.y-gap,w:r.w+gap*2,h:r.h+gap*2});
- const rectOverlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
- const pointInRect=(p,r)=>p[0]>=r.x&&p[0]<=r.x+r.w&&p[1]>=r.y&&p[1]<=r.y+r.h;
- const rectEdges=r=>[[[r.x,r.y],[r.x+r.w,r.y]],[[r.x+r.w,r.y],[r.x+r.w,r.y+r.h]],[[r.x+r.w,r.y+r.h],[r.x,r.y+r.h]],[[r.x,r.y+r.h],[r.x,r.y]]];
- const lineHitsRect=(line,r)=>pointInRect(line[0],r)||pointInRect(line[1],r)||rectEdges(r).some(edge=>intersects(line,edge));
- const rectHitsLine=(r,line)=>lineHitsRect(line,expanded(r,3));
- const leaderStart=(point,halfWidth,anchor)=>{
-  const dx=anchor[0]-point[0],dy=anchor[1]-point[1],sx=Math.abs(dx)/(halfWidth||1),sy=Math.abs(dy)/12,scale=1/Math.max(sx,sy,1e-6);
-  return [point[0]+dx*scale,point[1]+dy*scale];
+function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=[0,800],[top,bottom]=[0,520]){
+ const {segments}=section,center=segments.flat().reduce((s,p)=>[s[0]+p[0]/(segments.length*2),s[1]+p[1]/(segments.length*2)],[0,0]);
+ const used=[],ink=[],rendered=new Map();let output='';
+ const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+ const intersects=(first,second)=>{
+  const [a,b]=first.map(p=>p.map(v=>Number(decimal(v)))),[c,d]=second.map(p=>p.map(v=>Number(decimal(v))));
+  return cross(a,b,c)*cross(a,b,d)<-1e-5&&cross(c,d,a)*cross(c,d,b)<-1e-5;
  };
- const obstacles=[...folds,...handles].map(point=>({x:point[0]-17,y:point[1]-17,w:34,h:34}));
- const placed=[],byIndex=new Map(),leaderLines=[];
- const descriptors=segments.map(([a,b],index)=>{
-  const label=model.segments?.[index]?.label||String.fromCharCode(65+index),mm=model.segments?.[index]?.lengthMM;
-  const caption=Number.isFinite(mm)?label+' · '+formatMeasurement(mm,model.unit):label,length=distance(a,b);
-  return {index,a,b,label,caption,length,halfWidth:caption===label?11:Math.ceil(caption.length*4.1+8),anchor:[(a[0]+b[0])/2,(a[1]+b[1])/2]};
- });
- function validCandidate(item,point,side){
-  const box=rect(point,item.halfWidth);
-  if(box.x<left+2||box.x+box.w>right-2||box.y<top||box.y+box.h>bottom)return null;
-  if(obstacles.some(obstacle=>rectOverlap(expanded(box,3),obstacle)))return null;
-  if(placed.some(other=>rectOverlap(expanded(box,5),expanded(other.box,2))))return null;
-  if(segments.some(line=>rectHitsLine(box,line)))return null;
-  if(leaderLines.some(line=>lineHitsRect(line,expanded(box,3))))return null;
-  const start=leaderStart(point,item.halfWidth,item.anchor),leader=[start,item.anchor];
-  if(placed.some(other=>lineHitsRect(leader,expanded(other.box,3))))return null;
-  if(leaderLines.some(line=>intersects(leader,line)))return null;
-  const frameSpace=Math.min(box.x-left,right-(box.x+box.w),box.y-top,bottom-(box.y+box.h));
-  const objectSpace=Math.min(180,...placed.map(other=>distance(point,other.point)),...obstacles.map(o=>distance(point,[o.x+o.w/2,o.y+o.h/2])));
-  const leaderLength=distance(start,item.anchor);
-  return {point,box,leader,start,side,score:frameSpace*.7+objectSpace*.25-leaderLength*.08};
- }
- const order=[...descriptors].sort((a,b)=>a.length-b.length||a.index-b.index);
- for(const item of order){
-  const dx=(item.b[0]-item.a[0])/(item.length||1),dy=(item.b[1]-item.a[1])/(item.length||1),normal=[-dy,dx];
-  const neighbour=placed.filter(other=>Math.abs(other.index-item.index)===1).sort((a,b)=>a.length-b.length)[0];
-  const needsOppositeSide=!!(neighbour&&item.length<95&&neighbour.length<95);
-  const isOpposite=point=>!needsOppositeSide||((point[0]-item.anchor[0])*(neighbour.point[0]-neighbour.anchor[0])+(point[1]-item.anchor[1])*(neighbour.point[1]-neighbour.anchor[1])<0);
-  const candidates=[];
-  for(const gap of [34,46,60,78,102,132,166])for(const slide of [0,18,-18,34,-34,56,-56])for(const side of [-1,1]){
-   const point=[item.anchor[0]+normal[0]*gap*side+dx*slide,item.anchor[1]+normal[1]*gap*side+dy*slide];
-   const candidate=validCandidate(item,point,side);if(candidate)candidates.push(candidate);
+ const hitsBox=([a,b],box)=>Array.from({length:61},(_,i)=>[a[0]+(b[0]-a[0])*i/60,a[1]+(b[1]-a[1])*i/60]).some(p=>p[0]>=box.x-3&&p[0]<=box.x+box.w+3&&p[1]>=box.y-3&&p[1]<=box.y+box.h+3);
+ const order=[...segments.entries()].sort((a,b)=>Math.hypot(a[1][1][0]-a[1][0][0],a[1][1][1]-a[1][0][1])-Math.hypot(b[1][1][0]-b[1][0][0],b[1][1][1]-b[1][0][1])||a[0]-b[0]);
+ let visits=0;
+ function place(depth){
+  if(depth===order.length)return true;
+  if(++visits>20000)return false;
+  const [index,[a,b]]=order[depth];
+  let output='';
+  const length=Math.hypot(b[0]-a[0],b[1]-a[1])||1,t=[(b[0]-a[0])/length,(b[1]-a[1])/length],n=[-t[1],t[0]],mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+  const label=model.segments?.[index]?.label||String.fromCharCode(65+index),mm=model.segments?.[index]?.lengthMM,caption=Number.isFinite(mm)?label+' · '+formatMeasurement(mm,model.unit):label;
+  let angle=Math.atan2(t[1],t[0])*180/Math.PI;if(angle>90)angle-=180;if(angle<=-90)angle+=180;
+  const width=Math.max(24,caption.length*7.5+12),rad=angle*Math.PI/180,bw=Math.abs(Math.cos(rad))*width+Math.abs(Math.sin(rad))*24,bh=Math.abs(Math.sin(rad))*width+Math.abs(Math.cos(rad))*24;
+  const neighbour=segments.find(([s,e],j)=>j!==index&&Math.abs((e[0]-s[0])*t[0]+(e[1]-s[1])*t[1])>Math.hypot(e[0]-s[0],e[1]-s[1])*.98&&Math.abs(((s[0]+e[0])/2-mid[0])*n[0]+((s[1]+e[1])/2-mid[1])*n[1])>2&&Math.hypot((s[0]+e[0])/2-mid[0],(s[1]+e[1])/2-mid[1])<40);
+  const reference=neighbour?[(neighbour[0][0]+neighbour[1][0])/2,(neighbour[0][1]+neighbour[1][1])/2]:center;
+  const outward=(mid[0]-reference[0])*n[0]+(mid[1]-reference[1])*n[1]>=0?1:-1;
+  let chosen;const candidates=[];
+  const longitudinal=(mid[0]-center[0])*t[0]+(mid[1]-center[1])*t[1]>=0?1:-1;
+  for(const side of [outward,-outward])for(const gap of [32,48,64,80,96,112])for(const slide of length<width+20?[24*longitudinal,0,-24*longitudinal,48*longitudinal,-48*longitudinal,72,-72]:[0,24,-24,48,-48]){
+   const p=[mid[0]+n[0]*gap*side+t[0]*slide,mid[1]+n[1]*gap*side+t[1]*slide],box={x:p[0]-bw/2,y:p[1]-bh/2,w:bw,h:bh,cx:p[0],cy:p[1]};
+   if(used.some(q=>Math.hypot(p[0]-q.cx,p[1]-q.cy)<50))continue;
+   const hit=q=>q[0]>=box.x-6&&q[0]<=box.x+box.w+6&&q[1]>=box.y-6&&q[1]<=box.y+box.h+6;
+   if(box.x<left+8||box.x+box.w>right-8||box.y<top+8||box.y+box.h>bottom-8||handles.some(p=>box.x<p[0]+25&&box.x+box.w>p[0]-25&&box.y<p[1]+25&&box.y+box.h>p[1]-25)||used.some(q=>box.x<q.x+q.w+6&&box.x+box.w+6>q.x&&box.y<q.y+q.h+6&&box.y+box.h+6>q.y))continue;
+   if(segments.some(([s,e])=>Array.from({length:41},(_,i)=>[s[0]+(e[0]-s[0])*i/40,s[1]+(e[1]-s[1])*i/40]).some(hit)))continue;
+   const classic=length>=width+20&&slide===0;
+   const offset=q=>[q[0]+n[0]*gap*side,q[1]+n[1]*gap*side],lines=classic?[[a,offset(a)],[b,offset(b)],[offset(a),offset(b)]]:[[p,mid]];
+   if(ink.some(line=>hitsBox(line,box))||lines.some(line=>used.some(box=>hitsBox(line,box))||ink.some(other=>intersects(line,other))))continue;
+   candidates.push({p,box,side,gap,lines,classic});
   }
-  if(!candidates.length)for(let y=top+14;y<=bottom-14;y+=18)for(let x=left+item.halfWidth+3;x<=right-item.halfWidth-3;x+=18){
-   const cross=(item.b[0]-item.a[0])*(y-item.anchor[1])-(item.b[1]-item.a[1])*(x-item.anchor[0]);
-   const candidate=validCandidate(item,[x,y],cross>=0?1:-1);if(candidate)candidates.push(candidate);
-  }
-  candidates.sort((a,b)=>Number(isOpposite(b.point))-Number(isOpposite(a.point))||b.score-a.score||distance(a.point,item.anchor)-distance(b.point,item.anchor));
-  const chosen=candidates[0];
-  if(!chosen)throw new Error('Aucune zone libre pour le repère '+item.label+'.');
-  if(leaderLines.some(line=>intersects(chosen.leader,line)))throw new Error('Croisement de rappels pour le repère '+item.label+'.');
-  const record={...item,...chosen};placed.push(record);byIndex.set(item.index,record);leaderLines.push(chosen.leader);
-  annotationBounds?.push([chosen.point[0],chosen.point[1],item.halfWidth,12]);
+  for(const candidate of candidates){used.push(candidate.box);ink.push(...candidate.lines);if(place(depth+1)){chosen=candidate;break;}used.pop();ink.splice(ink.length-candidate.lines.length);}
+  if(!chosen)return false;
+  const {p,box,side,gap,lines}=chosen;annotationBounds?.push([p[0],p[1],bw/2,bh/2]);
+  const xy=p=>p.map(decimal).join(','),offset=q=>[q[0]+n[0]*gap*side,q[1]+n[1]*gap*side];
+  if(chosen.classic){
+   output+=`<path class="profile-dimension-line" data-segment-index="${index}" d="M${xy(a)}L${xy(offset(a))} M${xy(b)}L${xy(offset(b))} M${xy(offset(a))}L${xy(offset(b))}" fill="none" stroke="#667e60" stroke-width="1.3"/>`;
+  }else output+=`<path class="profile-measure-leader" data-segment-index="${index}" d="M${xy(p)}L${xy(mid)}" fill="none" stroke="#667e60" stroke-width="1.3"/>`;
+  output+=`<g class="profile-side-marker" data-marker-label="${esc(label)}" data-segment-index="${index}" data-anchor-x="${decimal(mid[0])}" data-anchor-y="${decimal(mid[1])}" data-segment-start-x="${decimal(a[0])}" data-segment-start-y="${decimal(a[1])}" data-segment-end-x="${decimal(b[0])}" data-segment-end-y="${decimal(b[1])}" pointer-events="none" aria-hidden="true"><g transform="translate(${xy(p)}) rotate(${decimal(angle)})"><rect x="${-width/2}" y="-12" width="${width}" height="24" rx="3" fill="white"/><text x="0" y="5" text-anchor="middle" font-size="15" fill="#263d30">${esc(caption)}</text></g></g>`;
+  rendered.set(index,output);
+  return true;
  }
- const markers=descriptors.map(item=>{const chosen=byIndex.get(item.index);return badge(chosen.point,item.caption,item.halfWidth,item.caption===item.label,item.index,chosen.anchor,item.a,item.b);}).join('');
- function badge([x,y],caption,halfWidth,letterOnly,index,anchor,a,b){
-  const shape=letterOnly?`<circle cx="${decimal(x)}" cy="${decimal(y)}" r="11"`:
-   `<rect x="${decimal(x-halfWidth)}" y="${decimal(y-12)}" width="${halfWidth*2}" height="24" rx="9"`;
-  return `<g class="profile-side-marker" data-marker-label="${esc(caption.split(" · ")[0])}" data-segment-index="${index}" data-anchor-x="${decimal(anchor[0])}" data-anchor-y="${decimal(anchor[1])}" data-segment-start-x="${decimal(a[0])}" data-segment-start-y="${decimal(a[1])}" data-segment-end-x="${decimal(b[0])}" data-segment-end-y="${decimal(b[1])}" pointer-events="none" aria-hidden="true">${shape} fill="#fff" stroke="#779068"/><text x="${decimal(x)}" y="${decimal(y+4)}" text-anchor="middle" font-size="${letterOnly?12:14}" font-weight="700" fill="#345d3d">${esc(caption)}</text></g>`;
- }
- function leader(from,to,index){
-  const gap=distance(from,to);
-  if(gap<12)return '';
-  const dx=(to[0]-from[0])/gap,dy=(to[1]-from[1])/gap;
-  const tip=[to[0]-dx*5,to[1]-dy*5];
-  const wing=sign=>[tip[0]-dx*7-dy*4*sign,tip[1]-dy*7+dx*4*sign].map(decimal).join(',');
-  return `<path class="profile-measure-leader" data-segment-index="${index}" data-start-x="${decimal(from[0])}" data-start-y="${decimal(from[1])}" data-tip-x="${decimal(tip[0])}" data-tip-y="${decimal(tip[1])}" data-target-x="${decimal(to[0])}" data-target-y="${decimal(to[1])}" d="M${from.map(decimal).join(',')}L${tip.map(decimal).join(',')} M${wing(-1)}L${tip.map(decimal).join(',')}L${wing(1)}" fill="none" stroke="#667e60" stroke-width="1.7" pointer-events="none"/>`;
- }
- const leaders=placed.map(position=>leader(position.start,position.anchor,position.index));
- return leaders.join('')+markers;
-
+ if(!place(0))throw new Error('Cotation technique sans espace : '+model.name);
+ return segments.map((_,index)=>rendered.get(index)).join('');
 }
 
 function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, verticalBounds, angleOverlay, paintedMarker='stripe', highContrast=false}={}){
@@ -871,15 +841,28 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  section.segments.forEach(([a,b],i)=>{
  const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1,mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-dy/len,dx/len];
  const segment=model.segments?.[i],label=segment?.label||String.fromCharCode(65+i);
- if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){const side=model.coloredFace.side==='left'?-1:1;
+ if(!illustrative&&model.coloredFace?.side&&model.coloredFace.segmentId===label){
+ // Face identity is stored in physical (Y-up) coordinates. Determine the
+ // projection handedness independently of annotation placement, including mirrors.
+ let handedness=-1;
+ for(let j=1;j<mapped.length-1;j++){
+  const source=model.pointsMM;if(!source?.[j+1])break;
+  const cross=(p,q,r)=>(q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]);
+  const physical=cross(source[0],source[j],source[j+1]),screen=cross(mapped[0],mapped[j],mapped[j+1]);
+  if(Math.abs(physical)>1e-6&&Math.abs(screen)>1e-6){handedness=Math.sign(physical*screen);break;}
+ }
+ const side=(model.coloredFace.side==='left'?1:-1)*handedness;
  const at=gap=>[mid[0]+normal[0]*gap*side,mid[1]+normal[1]*gap*side];
  if(paintedMarker==='star'){
-  const center=at(32);
+  // Keep the physical side fixed; leave the near lane for technical dimensions.
+  const [minX,maxX]=horizontalBounds||[0,800],[minY,maxY]=verticalBounds||[0,520];
+  const center=[76,60,44,32].flatMap(gap=>(gap<60?[len*.3,-len*.3,0]:[0]).map(slide=>{const p=at(gap);return[p[0]+dx/len*slide,p[1]+dy/len*slide];})).find(p=>p[0]>=minX+25&&p[0]<=maxX-25&&p[1]>=minY+25&&p[1]<=maxY-25);
+  if(!center)throw new Error('Aucun emplacement pour l’étoile sur la face choisie : '+model.name);
   const points=Array.from({length:10},(_,index)=>{
    const angle=index*Math.PI/5-Math.PI/2,radius=index%2===0?23:10;
    return [decimal(center[0]+Math.cos(angle)*radius),decimal(center[1]+Math.sin(angle)*radius)].join(',');
   }).join(' ');
-  reserved.push(center,[center[0]-18,center[1]],[center[0]+18,center[1]],[center[0],center[1]-18],[center[0],center[1]+18]);
+  reserved.push(center);
   const action=togglePaintedFace?' data-toggle-painted-face role="button" tabindex="0" aria-label="Inverser la face peinte" style="cursor:pointer"':'';
   output+=`<g${action} data-painted-side="${model.coloredFace.side}" data-painted-segment="${model.coloredFace.segmentId}"><polygon class="profile-painted-star" points="${points}" fill="#ffcf4d" stroke="#202e29" stroke-width="4" stroke-linejoin="round"/></g>`;
   return;
@@ -959,8 +942,8 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     });
     for(const [family,items] of groupProfiles(order.items,profileGroups))for(const item of items){
       const title=lines([item.id+' · '+item.name],55);
-      const face=item.coloredFace?.side?['Face colorée : '+(item.coloredFace.side==='left'?'gauche':'droite')+' · côté '+item.coloredFace.segmentId]:[];
-      const total=item.spec?.mirDevelopedTotalIn?['Développé total = '+formatMeasurement(item.finishedSegmentSumMM,item.unit)]:[];
+      const face=item.coloredFace?.side?['Face colorée : '+paintedFaceLabel(item.coloredFace.side)]:[];
+      const total=Number.isFinite(item.finishedSegmentSumMM)?['Développé total = '+formatMeasurement(item.finishedSegmentSumMM,item.unit)+' (nominal)']:[];
       const details=lines([...compactLengths(item),...total,...face,...(item.location?['Repère : '+item.location]:[]),...(item.note?[item.note]:[])],33);
       const material=lines(materialLines(item),13),finish=lines(finishLines(item),16);
       const checks=lines([...item.validation.errors,...item.validation.pending].map(issue=>issue.message),90).filter(Boolean);
@@ -1049,7 +1032,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg+=multiline(40,121,[item.id+' · '+item.name],{width:75,lineHeight:23,attrs:'font-size="18" font-weight="700"'}).svg;
         svg+=multiline(40,154,[['Commande : '+(order.poNumber||'À préciser'),'Chantier : '+(order.project||'À préciser'),'Chef : '+(order.foreman||'À préciser'),'Date : '+(order.date||'À préciser'),'Révision : '+(order.revision||'À préciser')].join(' · ')],{width:95,lineHeight:18,attrs:'font-size="12"'}).svg;
         svg+='<rect x="40" y="230" width="770" height="345" fill="#fafbf8" stroke="#d7ded2"/>';
-        if(item.kind==='profile'&&item.valid){const map=projection(item.pointsMM,{x:110,y:85,w:580,h:245});svg+='<g transform="translate(65 235) scale(.9)">'+profileDiagramContent(item,item.pointsMM.map(map),{paintedMarker:'star',highContrast:true,markerModel:item})+'</g>';}
+        if(item.kind==='profile'&&item.valid){const map=projection(item.pointsMM,{x:110,y:85,w:580,h:210});svg+='<g transform="translate(65 235) scale(.9)">'+profileDiagramContent(item,item.pointsMM.map(map),{paintedMarker:'star',highContrast:true,markerModel:item,verticalBounds:[20,365]})+'</g>';}
         else if(item.kind==='panel')svg+=placeSVG(panelSVG(item,{width:710,height:325,legend:false,header:false,notes:false}),70,240);
         else svg+=svgText(65,380,'Croquis à compléter','font-size="20"');
         svg+=svgText(40,603,'MATÉRIAU / FINI','font-size="12" font-weight="700" fill="#52634f"');
@@ -1060,7 +1043,6 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg+=svgText(40,764,'COTES FINIES ET POINTS À VALIDER','font-size="12" font-weight="700" fill="#52634f"');
         svg+=multiline(40,790,columns[0],{width:42,lineHeight:18,attrs:'font-size="13"'}).svg;
         svg+=multiline(430,790,columns[1],{width:42,lineHeight:18,attrs:'font-size="13"'}).svg;
-        svg+=svgText(40,1003,'Étoile : face peinte. Rayons, développé et réglages à valider par l’atelier.','font-size="12"');
         pages.push({name:item.id+' · '+item.name,layout:production?'bending-sheet':'mir-dossier',documentTitle:production?'Mise en production':order.requiresQuote?'Demande de soumission':order.automaticPricingAllowed?'Récapitulatif de pliage':'DOSSIER DE PLIAGE',reference:[order.poNumber||order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:primary});
       }
       for(let start=24;start<details.length;start+=40){
@@ -1127,8 +1109,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg += multiline(1254, y + 42, lengthLines, { width: 12, lineHeight: 23, attrs: 'font-size="14"' }).svg;
       });
       const footY = 904;
-      const faceNote = !clientRequest ? 'Liseré bleu : face colorée. ' :
-        rows.some(row => row.item?.kind === 'profile' && row.item.coloredFace?.side) ? 'Étoile : face peinte. ' : '';
+      const faceNote = !clientRequest ? 'Liseré bleu : face colorée. ' : '';
       svg += svgText(32, footY, faceNote + 'Cotes de la pièce finie. Les rayons, le développé et les réglages de pliage restent à valider.', 'font-size="14"');
       svg += svgText(32, footY + 25, pricedProfiles ? 'Récapitulatif sur cet appareil. Disponibilité et fabrication à confirmer par MIR.' : clientRequest ? 'Demande préparée sur cet appareil. Transmission à MIR à faire séparément.' : 'La référence Zoho Books est saisie localement. Aucun bon de commande n’a été envoyé ni synchronisé.', 'font-size="13" fill="#5b685e"');
       if (hasPricedLines) {

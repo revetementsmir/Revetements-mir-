@@ -69,7 +69,8 @@ test('Face 1 et Face 2 ciblent automatiquement le segment le plus long',()=>{
     spec.coloredFace={side,segmentId:B.preferredFaceSegment(spec)};
     assert.equal(spec.coloredFace.segmentId,'A');
     const svg=P.profileSVG(P.buildProfile(spec));
-    assert.match(svg,/\*/);
+    assert.match(svg,/class="profile-painted-star"/);
+    assert.match(svg,new RegExp('data-painted-side="'+side+'" data-painted-segment="A"'));
   }
 });
 
