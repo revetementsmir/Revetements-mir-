@@ -38,3 +38,10 @@ body, html body:has(#mir-harmony-header #portal-navigation) { padding-bottom: ca
 :root[data-mir-harmony] body :is(.mir-client-links, .mir-home-header-actions, .mir-client-actions,
 .mir-mobile-tabs, .mir-signature-footer, [data-portal-public-footer],
 .mir-client-return, .auth-cart-return, .mir-help-launch) { display: none !important; }
+
+/* Harmony relocates public nodes and gives menu navs an !important display.
+   Match that structure so these remain absent after role rendering. */
+:root[data-mir-harmony] #mir-harmony-header #mir-harmony-menu :is(
+  .mir-client-links, .mir-client-actions, .mir-home-header-actions,
+  [data-client-shortcuts], [aria-label="Navigation client du projet"],
+  [data-mir-native-public]) { display: none !important; }

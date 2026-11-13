@@ -31,6 +31,28 @@ async function assertTeamScreen(page){
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true);
   await assertTeamScreen(page);
   const blocked=await page.evaluate(async()=>{try{await fetch('https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/');return false;}catch{return true;}});assert.equal(blocked,true);assert.deepEqual(requests,[]);assert.deepEqual(errors,[]);
+  // Reproduce the native screenshots: Harmony moves public links into its menu
+  // after authentication. Exercise late insertion and its stronger CSS selectors.
+  for(const role of ['employee','chef','warehouse','assistant','boss']){
+   await page.evaluate(role=>{
+    document.body.dataset.portalMode=role;
+    document.querySelector('#auth-signin-form')?.remove();
+    const menu=document.querySelector('#mir-harmony-menu');
+    const nav=document.createElement('nav');nav.className='mir-client-links';
+    nav.innerHTML='<a href="realisations.html">Réalisations</a><a href="plan.html">Studio 3D</a><a href="contact.html">Nous joindre</a>';
+    const shortcuts=document.createElement('nav');shortcuts.dataset.clientShortcuts='';shortcuts.innerHTML='<a href="selection.html">Mon panier client</a><a href="estimation.html">Demander une estimation</a>';
+    const tools=document.createElement('nav');tools.id='native-business-probe';tools.innerHTML='<button>Centre d’aide métier</button><a href="production.html?source=store">Pliage interne</a>';
+    menu.append(nav,shortcuts,tools);menu.hidden=false;
+   },role);
+   await page.waitForTimeout(50);
+   assert.equal(await page.getByRole('link',{name:'Réalisations',exact:true}).isVisible(),false,role+' public menu');
+   assert.equal(await page.getByRole('link',{name:'Studio 3D',exact:true}).first().isVisible(),false,role+' studio menu');
+   assert.equal(await page.getByRole('link',{name:'Demander une estimation',exact:true}).first().isVisible(),false,role+' client shortcuts');
+   assert.equal(await page.getByRole('button',{name:'Centre d’aide métier',exact:true}).isVisible(),true);
+   assert.equal(await page.getByRole('link',{name:'Pliage interne',exact:true}).isVisible(),true);
+   await page.evaluate(()=>{document.querySelector('#native-business-probe').remove();document.querySelector('#mir-harmony-menu').hidden=true;});
+  }
+  await page.reload();await page.locator('#auth-signin-form').waitFor({state:'visible'});
   // A field at the very end must remain reachable after the keyboard shrinks the viewport.
   await page.evaluate(()=>{const form=document.createElement('form');form.id='keyboard-end-probe';form.innerHTML='<label>Note locale<textarea id="keyboard-end-field"></textarea></label>';document.body.append(form);form.querySelector('textarea').focus();});
   await page.setViewportSize({width,height:360});

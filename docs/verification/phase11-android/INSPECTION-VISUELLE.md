@@ -1,0 +1,37 @@
+# Phase 11 — inspection réelle du 13 novembre 2026
+
+Phase non terminée. PR #31 reste en brouillon. Aucun appareil physique certifié.
+
+## Provenance
+ZIP téléchargé avec succès après autorisation du domaine, extrait dans /tmp/mir-visual-inspect.
+SHA-256 : a88a00359e593de27e88089ea849d2c9f4025b3c05041e201716bd6f39536063.
+Les 27 PNG ont chacun été ouverts avec view_image; leurs empreintes correspondent au manifeste.
+Captures : https://github.com/revetementsmir/Revetements-mir-/actions/runs/43513719511/artifacts/14080296300
+Générateur b0e243c37fa75ebdfb55856da6874cab953301ce; génération échouée à employee-login (collision de nom), pas une génération complète.
+16 vues UIAutomator : APK exact 110002, source 58c13ab96be63601d314ba94d92ab7dd20976407.
+11 vues certified-original : instrumentation 110001, binaire non archivé; jamais présentées comme captures 110002.
+
+## Constats observés (avant correctif)
+- certified-apk-team-signin.png : logo, titre, champs courriel/mot de passe, case et bouton lisibles; aucun footer commercial ni bouton public flottant visible.
+- employee/chef/warehouse/assistant/boss-home.png : rôle et bannière TEST visibles; contenu lisible, retours à la ligne des longs identifiants; aucun débordement horizontal évident. La vue Employé coupe le bouton Punch au bord inférieur de la capture : la capture seule ne prouve pas son accessibilité après défilement.
+- Les cinq *-menu.png : ÉCHEC du périmètre privé. Studio 3D et estimation visibles; Chef, Entrepôt, Adjointe et Boss montrent aussi Réalisations/Nous joindre et autres liens publics. Menu Entrepôt long et tronqué en bas. Ce défaut invalide la certification visuelle des menus de l’APK original.
+- Les cinq *-settings.png : formulaires lisibles en clair, options sans chevauchement; portions inférieures hors capture. Chef affiche Chargement… : fin du chargement non prouvée.
+- android-signin-portrait.png : état Vérification de votre compte…, pas formulaire stable.
+- android-signin-landscape.png : sombre lisible dans la partie visible, formulaire coupé sous Mot de passe; défilement non prouvé visuellement.
+- android-dark-large-contrast.png : rendu clair, pas preuve de thème sombre ni de texte Grand/contraste effectifs.
+- android-keyboard.png : champs visibles et clavier ouvert; bouton Me connecter partiellement recouvert. Le défilement/dernier champ métier reste à observer.
+- android-offline.png : bandeau hors ligne et note locale visibles, sans chevauchement dans cette vue.
+- android-pdf-four-pages.png : lecteur sombre, contrôles visibles, première page rendue avec schéma et cotes; seulement une page visible, zoom/lecture des quatre pages non prouvés par cette image.
+- android-pdf-save-chooser.png : écran blanc, sélecteur non observé.
+- android-device-recipe.png : écran blanc, diagnostic local non observé.
+- android-qr-scanner.png : connexion, scanner non observé.
+- android-camera-denied.png : connexion; aucune erreur de refus visible. permission-before-check.png : dialogue Android caméra visible et lisible (langue système anglaise).
+
+## Correctif en cours de recertification
+La CSS native ne l’emportait pas sur la règle !important du menu Harmony; les raccourcis data-client-shortcuts n’étaient pas couverts. Règle native ciblée sur le menu déplacé et filtrage des liens hors routes privées après insertion. Aucun fichier dist/supabase modifié, aucun moteur Responsive commun recopié.
+Test de régression : échec reproduit avant correction (employee studio menu), puis réussite sur sept formats et cinq états de rôle simulés, avec Centre d’aide métier et pliage interne conservés. Cette simulation ne remplace pas une capture Android.
+
+## CI connue et limites
+Tête 65be2e65e3ae919689d71f13cb1cd2c50234da85 : Android 43514512242, Rôles 43514511234, Phase6 43514511341 et fondation 43514511319 réussis. Captures 43514511239 échouées avant connexion initiale (aucun champ exposé); pas de formulaire Employé ni confirmation retour.
+Toute tête après le correctif doit être recertifiée séparément, avec nouvel APK/empreinte et inspection des menus corrigés. L’APK original 0.11.0-test/110002/SHA256 141eae844d4e938c6270dcf243536e7f72b1b45b68206922d7584cc61a5e2127 reste une preuve historique, pas la livraison du correctif.
+Restent : capture formulaire Employé sans sauvegarde, retour Android, thèmes réels, paysage/clavier, diagnostic local, scanner et sélecteur PDF; recette Samsung physique complète. Aucune soumission métier ni préférence serveur changée.
