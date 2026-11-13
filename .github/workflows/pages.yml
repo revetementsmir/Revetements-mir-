@@ -243,6 +243,18 @@ jobs:
         run: |
           node scripts/build-mir-test.cjs --production-manifest _site_mir "$GITHUB_SHA" > /tmp/mir-production-release-build.json
           node scripts/build-mir-test.cjs _site_mir _site_mir/test "$GITHUB_SHA"
+      - name: Charger les sources certifiées de l’application TEST
+        uses: actions/checkout@v4
+        with:
+          repository: revetementsmir/Revetements-mir-
+          ref: d1876c75b8ec97e52e56a6e535f0cfa00c7e362c
+          path: .apk-source
+          persist-credentials: false
+      - name: Générer l’aperçu depuis les mêmes sources que l’APK
+        run: |
+          npm ci --prefix .apk-source/mobile --ignore-scripts --no-audit --no-fund
+          node .apk-source/mobile/tools/build-web.cjs
+          node scripts/build-mir-apk-preview.cjs .apk-source _site_mir/test/application
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site_mir
