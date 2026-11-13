@@ -131,16 +131,16 @@ class Capture:
         if label not in SAFE_NAV:
             raise CaptureError('Non-allowlisted UI action refused')
         if label == 'Menu':
-            # Chrome exposes the button's aria-label rather than its visible text.
-            selector = self.device(descriptionContains='menu MIR')
-            if selector.count == 0:
-                selector = self.device(text=label)
+            # WebView may expose aria-label in text OR content-desc.
+            candidates = [self.device(descriptionContains='menu MIR'),
+                          self.device(textMatches='(?:Ouvrir|Fermer) le menu MIR'),
+                          self.device(text='Menu')]
         else:
-            selector = (self.device(textStartsWith=label) if label == 'Mes absences'
-                        else self.device(text=label))
-        self.wait(lambda: selector.count == 1, 'navigation control ' + label, seconds=10)
-        if selector.count != 1:
-            raise CaptureError('Navigation action is missing or ambiguous: '+label+' matches='+str(selector.count))
+            candidates = [(self.device(textStartsWith=label) if label == 'Mes absences'
+                           else self.device(text=label))]
+        self.wait(lambda: any(item.count == 1 for item in candidates),
+                  'navigation control ' + label, seconds=10)
+        selector = next(item for item in candidates if item.count == 1)
         selector.click(timeout=10)
         time.sleep(.4)
 
@@ -209,13 +209,16 @@ class Capture:
         self.wait(lambda: self.device(text='Nouvelle demande').exists, 'absence form')
         self.shot('employee-absence-form', 'Employé chantier', 'Unsaved absence form; no submit')
         # The last field is the note textarea (source audited); no draft/save button is clicked.
-        note = self.device(className='android.widget.EditText', descriptionContains='Motif ou commentaire')
+        candidates = [self.device(className='android.widget.EditText', descriptionContains='Motif ou commentaire'),
+                      self.device(className='android.widget.EditText', textContains='Motif ou commentaire')]
         for _ in range(4):
-            if note.count == 1:
+            if any(item.count == 1 for item in candidates):
                 break
             self.device.swipe_ext('up', scale=.5)
-        if note.count != 1:
+        matches = [item for item in candidates if item.count == 1]
+        if not matches:
             raise CaptureError('Uniquely labelled local note field not found')
+        note = matches[0]
         if note.info.get('password'):
             raise CaptureError('Password field refused for local form probe')
         note.click()
@@ -251,8 +254,6 @@ class Capture:
             self.login(key, label)
             self.menu(key, label)
             self.settings(key, label)
-            if key == 'EMPLOYEE':
-                self.employee_form_and_back()
             self.stage = key.lower() + '-logout'
             self.top()
             self.tap('Déconnexion')
@@ -260,9 +261,15 @@ class Capture:
             # Closing/reopening is non-destructive; no pm clear/uninstall or business cleanup.
             self.device.app_stop(APP)
             self.device.app_start(APP)
+        self.login('EMPLOYEE', 'Employé chantier')
+        self.employee_form_and_back()
+        self.top()
+        self.tap('Déconnexion')
+        self.wait(lambda: self.device(text='Me connecter').exists, 'final sign out')
         import shutil
         shutil.copyfile(Path(__file__).with_name('phase11-samsung-checklist.txt'), self.output / 'SAMSUNG-CHECKLIST.txt')
         self.save_manifest('complete')
+        print('Native PNG count: '+str(len(self.manifest['screens'])))
         print('PASS native screenshot generation: five role menus, forms and Android back; visual inspection still required.')
 
 
@@ -293,7 +300,7 @@ def main():
                 try:
                     import xml.etree.ElementTree as ET
                     tree = ET.fromstring(capture.device.dump_hierarchy())
-                    labels = SAFE_NAV | {label for _, label in ROLES} | {'Nouvelle demande', 'Apparence et réglages'}
+                    labels = SAFE_NAV | {label for _, label in ROLES} | {'Nouvelle demande', 'Apparence et réglages', 'Ouvrir le menu MIR', 'Fermer le menu MIR', 'Motif ou commentaire'}
                     texts = [value for node in tree.iter('node') for value in (node.get('text', ''),node.get('content-desc',''))]
                     capture.manifest['safe_ui_probe'] = {'known_labels': sorted(label for label in labels if any(label in text for text in texts)),
                         'edit_field_count': sum(node.get('class') == 'android.widget.EditText' for node in tree.iter('node')),
