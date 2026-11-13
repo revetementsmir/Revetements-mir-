@@ -28,6 +28,9 @@
       base.href = new URL('./', location.href).href;
       parsed.head.prepend(base);
       parsed.documentElement.dataset.mirResponsiveEntry = 'true';
+      const historyAdapter = parsed.createElement('script');
+      historyAdapter.src = new URL('mir-responsive-history.js', base.href).href;
+      parsed.head.insertBefore(historyAdapter, base.nextSibling);
       const adapter = parsed.createElement('script');
       adapter.type = 'module';
       adapter.src = new URL('mir-responsive-adapter.mjs', base.href).href;

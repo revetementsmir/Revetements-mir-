@@ -4,6 +4,7 @@ on:
     paths:
       - 'dist/responsive.html'
       - 'dist/mir-responsive-*.mjs'
+      - 'dist/mir-responsive-history.js'
       - 'dist/mir-public-menu.js'
       - 'tests/mir-responsive-atelier-browser.cjs'
       - '.github/workflows/mir-responsive-atelier-pr.yml'

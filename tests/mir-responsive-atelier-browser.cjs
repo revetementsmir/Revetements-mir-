@@ -25,6 +25,16 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   await page.locator('.mir-client-menu-toggle').click();assert.equal(await page.locator('.mir-client-menu-toggle').getAttribute('aria-expanded'),'true');
   assert(await page.locator('.mir-mobile-tabs').evaluate(node=>{const rect=node.getBoundingClientRect(),frame=node.closest('[data-mir-responsive-viewport]').getBoundingClientRect();return rect.top>=frame.top&&rect.bottom<=frame.bottom+2;}),'mobile navigation must stay inside its device viewport');
   await tab.keyboard.press('Escape');
+  await tab.locator('#preview-phone-model').selectOption('galaxy-s26-ultra');
+  assert.equal(await tab.locator('#mir-responsive-device').getAttribute('data-preview-frame'),'android');
+  await tab.locator('[data-orientation=landscape]').click();
+  assert(await tab.locator('#mir-responsive-device').evaluate(node=>parseFloat(node.style.width)>parseFloat(node.style.height)));
+  await tab.locator('[data-orientation=portrait]').click();
+  await tab.locator('#preview-zoom').selectOption('.5');
+  await tab.waitForFunction(()=>document.querySelector('#mir-responsive-device').style.getPropertyValue('--preview-scale')==='0.5',null,{timeout:5000});
+  assert.equal(await tab.locator('#mir-responsive-device').evaluate(node=>node.style.getPropertyValue('--preview-scale')),'0.5');
+  await tab.locator('#preview-zoom').selectOption('fit');
+  await tab.locator('#preview-phone-model').selectOption('iphone-18-pro');
   fs.mkdirSync('artifacts/mir-responsive-atelier',{recursive:true});
   for(const layout of ['phone','tablet','web']){
    await tab.locator('[data-layout="'+layout+'"]').click();
@@ -51,6 +61,14 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   await shop.goto(base+'/responsive.html?page=boutique.html&layout=phone');
   await Promise.race([shop.locator('[data-mir-responsive-ready=true]').waitFor(),shop.locator('[role=alert]').waitFor().then(async()=>{throw Error(await shop.locator('[role=alert]').innerText());})]);
   await shop.locator('.mir-client-menu-ready').waitFor();
+  await shop.locator('.brand-collection-card').first().waitFor();
+  const search=shop.locator('#shop-search');await search.fill('BECK');
+  await shop.locator('[data-shop-card]').first().waitFor();
+  assert.equal(new URL(shop.url()).searchParams.get('page'),'boutique.html','business filters must retain the viewer page');
+  await shop.locator('[data-layout=tablet]').click();
+  assert.equal(await search.inputValue(),'BECK','real filter state survives a format change');
+  assert(await shop.locator('[data-mir-responsive-page]').evaluate(node=>node.classList.contains('mir-shop-searching')));
+  await shop.locator('[data-layout=phone]').click();
   assert.equal(await shop.locator('[data-mir-responsive-page] a[aria-current=page]').first().innerText(),'Boutique');
   await shop.screenshot({path:'artifacts/mir-responsive-atelier/boutique-phone.png'});
   console.log('PASS shared Atelier workspace, real mobile/tablet/web reflow, live menu, precise annotations, state preservation and Boutique');

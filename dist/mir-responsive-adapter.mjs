@@ -57,15 +57,17 @@ try {
     }
   });
   const board=mountAnnotationBoard(context.workspace,{projectId:PROJECT,title:'Les Revêtements MIR',service:createAnnotationService({projectId:PROJECT}),getContext:()=>({sourceUrl:sourceUrl.href,interface:current,device:context.state.layout+' · '+(context.state.layout==='web'?context.state.desktop:context.state.layout==='tablet'?context.state.tablet:context.state.phone)})});
+  const syncClasses=()=>{page.className=[...new Set([...document.body.classList,...document.documentElement.classList])].join(' ');};
+  const classes=new MutationObserver(syncClasses);classes.observe(document.body,{attributes:true,attributeFilter:['class']});classes.observe(document.documentElement,{attributes:true,attributeFilter:['class']});syncClasses();
   context.workspace.dataset.mirResponsiveReady='true';
   window.addEventListener('beforeunload',event=>{if(board.getAnnotations().length||document.querySelector('.annotation-editor textarea')?.value.trim()){event.preventDefault();event.returnValue='';}});
-  window.addEventListener('pagehide',()=>{board.dispose();api.dispose();},{once:true});
+  window.addEventListener('pagehide',()=>{classes.disconnect();board.dispose();api.dispose();},{once:true});
 }catch(error){restoreStyles();document.body.append(page);const alert=document.createElement('p');alert.setAttribute('role','alert');alert.textContent='Responsive Atelier indisponible : '+error.message;document.body.prepend(alert);}
 document.addEventListener('click',event=>{
   if(event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
   const link=event.target.closest?.('a[href]');if(!link||!page.contains(link)||link.target==='_blank'||link.hasAttribute('download')||link.getAttribute('href').startsWith('#'))return;
   const url=new URL(link.href,document.baseURI);if(url.origin!==location.origin)return;
-  const name=url.pathname.split('/').pop();
+  const name=link.getAttribute('href').startsWith('?')?current:url.pathname.split('/').pop();
   const allowed=new Set(['index.html','boutique.html','produit.html','selection.html','pliage.html','production.html','chantier.html','entrepot.html','coordination.html','calepinage.html','plan.html','realisations.html','contact.html','materiaux.html']);
   if(!allowed.has(name))return;event.preventDefault();const target=new URL('responsive.html',document.baseURI);target.search=url.search;target.searchParams.set('page',name);
   for(const key of ['layout','phone','tablet','desktop'])if(new URL(location.href).searchParams.has(key))target.searchParams.set(key,new URL(location.href).searchParams.get(key));target.hash=url.hash;location.assign(target.href);
