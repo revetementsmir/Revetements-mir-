@@ -12,7 +12,7 @@ const server=http.createServer((req,res)=>{const name=path.resolve(root,'.'+new 
  await page.goto(url);await page.locator('[data-mir-responsive-ready=true]').waitFor({timeout:30000});
  const app=page.locator('[data-mir-responsive-page]');await app.locator('#auth-signin-form').waitFor();
  assert.equal(await page.locator('iframe').count(),0);assert.equal(await app.locator('#auth-google').isVisible(),false);
- assert.equal(await page.evaluate(()=>MIRPortalConfig.projectRef),'hxtztkmbfpmzrieccwsg');
+ assert.equal(await page.evaluate(()=>MIRPortalConfig.projectRef),'hxtztkmbfpmzrieccwsg');assert.equal(await page.evaluate(()=>MIRPortalConfig.siteOrigin===location.origin),true);assert.equal(await app.locator('.auth-error').isVisible(),false);
  assert.equal(await page.evaluate(()=>document.querySelector('#mir-native-state').closest('[data-mir-responsive-page]')!==null),true);
  for(const layout of ['phone','tablet']){
   await page.locator('button[data-layout='+layout+']').click();

@@ -15,6 +15,11 @@ function build(source,output){
  guard=guard.replace("prefix='mir-test:","prefix='mir-apk-preview:").replace("root.pathname.endsWith('/test/')","root.pathname.endsWith('/test/application/')");
  guard=guard.replace(/function banner\(\)\{[\s\S]*?\n if\(window.MIRTestEnvironment\)/,'function banner(){}\n if(window.MIRTestEnvironment)');
  write('mir-apk-preview-guard.js',guard);write('mir-apk-browser-bridge.js',fs.readFileSync(path.join(__dirname,'apk-preview/browser-bridge.js')));
+ // The packaged localhost origin becomes the hosted preview origin. Auth
+ // options, TEST endpoint and the original role-checking SDK stay unchanged.
+ let portal=fs.readFileSync(path.join(www,'portal-config.js'),'utf8');
+ portal=portal.replace(/"siteOrigin":"[^"]*"/, '"siteOrigin":location.origin').replace(/"callbackPath":"[^"]*"/, '\"callbackPath\":new URL(\"chantier.html\",document.currentScript.src).pathname');
+ write('portal-config.js',portal);
  const policy=require(path.join(source,'mobile/web/policy.cjs'));
  // Only the shell's browser capabilities differ; its UI controllers and styles
  // still come from the same revision used to build the certified APK.
