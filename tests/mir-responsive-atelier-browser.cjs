@@ -17,6 +17,9 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   assert.equal(await tab.locator('[data-mir-responsive-page]').count(),1);
   assert((await tab.locator('[data-runtime-source]').getAttribute('data-runtime-source')).startsWith('https://atelier.atelier-app-001.workers.dev/responsive/v1/'));
   await tab.locator('.mir-client-menu-ready').waitFor();
+  fs.mkdirSync('artifacts/mir-responsive-atelier',{recursive:true});
+  await tab.screenshot({path:'artifacts/mir-responsive-atelier/initial.png'});
+  console.log('FRAME',await tab.locator('[data-mir-responsive-page]').evaluate(node=>({classes:node.className,width:node.clientWidth,parentWidth:node.parentElement.clientWidth,parentContainer:getComputedStyle(node.parentElement).container,buttonStyle:getComputedStyle(node.querySelector('.mir-client-menu-toggle')).display,styles:document.querySelector('[data-mir-responsive-styles]').textContent.includes('@container mir-page')})));
   const page=tab.locator('[data-mir-responsive-page]');
   const phoneFont=await page.locator('h1').evaluate(node=>parseFloat(getComputedStyle(node).fontSize));
   await page.locator('.mir-client-menu-toggle').click();assert.equal(await page.locator('.mir-client-menu-toggle').getAttribute('aria-expanded'),'true');
