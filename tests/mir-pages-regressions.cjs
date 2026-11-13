@@ -336,7 +336,7 @@ test('Pliage MIR : retour écrasé avec un raccord arrondi', () => {
 });
 
 
-test('Repères A-B-C : les côtés serrés gardent leurs étiquettes hors du dessin', () => {
+test('Repères A-B-C : le solveur garde tous les badges dans le cadre et cible le milieu exact', () => {
  const code=fs.readFileSync(path.join(__dirname,'../dist/production-model.js'),'utf8');
  const begin=code.indexOf('function profileSideMarkers(');
  const end=code.indexOf('\nfunction profileDiagramContent(',begin);
@@ -347,12 +347,13 @@ test('Repères A-B-C : les côtés serrés gardent leurs étiquettes hors du des
  const labels={segments:[{label:'A'},{label:'B'},{label:'C'}]};
  const normal=place({segments,folds:[]},labels,[]);
  assert.ok(normal.includes('>A</text>')&&normal.includes('>B</text>')&&normal.includes('>C</text>'));
- const tiny=place({segments:[[[1,1],[2,1]]],folds:[]},{segments:[{label:'A'}]},[]);
- assert.ok(tiny.includes('profile-marker-overflow'));
- assert.ok(tiny.includes('cy="495"'));
+ const tiny=place({segments:[[[80,80],[81,80]]],folds:[]},{segments:[{label:'A'}]},[],null,[0,160],[0,160]);
  assert.ok(tiny.includes('>A</text>'));
- const count=(tiny.match(/>A<\/text>/g)||[]).length;
- assert.equal(count,1,'un seul badge par segment');
+ assert.equal((tiny.match(/>A<\/text>/g)||[]).length,1,'un seul badge par segment');
+ assert.match(tiny,/data-anchor-x="80\.5" data-anchor-y="80"/,'le rappel vise le milieu du segment');
+ const center=[...tiny.matchAll(/<(?:circle|rect) [^>]*(?:cx|x)="([\d.]+)"[^>]*(?:cy|y)="([\d.]+)"/g)][0];
+ assert.ok(center,'badge rendu');
+ assert.ok(Number(center[1])>=0&&Number(center[1])<=160&&Number(center[2])>=0&&Number(center[2])<=160,'badge dans le cadre');
 });
 
 

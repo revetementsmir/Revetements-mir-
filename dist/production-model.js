@@ -562,20 +562,6 @@
     out += multiline(28, 116, model.validation.errors.map(e => e.message), { width: Math.max(25, Math.floor(width / 10)), lineHeight: 24, attrs: 'font-size="16"' }).svg;
     return out + svgClose;
   }
-  function segmentLabelMap(points, labels, width, height) {
-    const used = [], result = [];
-    for (let i = 0; i < labels.length; i++) {
-      const a = points[i], b = points[i + 1], mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], length = Math.max(dist(a, b), EPS), normal = [-(b[1] - a[1]) / length, (b[0] - a[0]) / length];
-      let p;
-      for (const radius of [22, -22, 42, -42, 62, -62, 84]) {
-        const candidate = [Math.max(18, Math.min(width - 18, mid[0] + normal[0] * radius)), Math.max(48, Math.min(height - 44, mid[1] + normal[1] * radius))];
-        p = candidate;
-        if (!used.some(q => dist(q, candidate) < 30)) break;
-      }
-      used.push(p); result.push({ label: labels[i], mid, point: p });
-    }
-    return result;
-  }
   function profileDetailLines(model) {
     const lines=[];
     model.segments.forEach((s,index)=>{lines.push(s.label + ' = ' + formatMeasurement(s.lengthMM, model.unit) + (s.name ? ' · ' + s.name : ''));const b=model.bends[index];if(b)lines.push('Pli ' + b.from + '–' + b.to + ' = ' + fabricationBendLabel(b));});
@@ -596,22 +582,7 @@
     const diagramWidth = legend ? width * .62 : width, topSpace = options.header === false ? 35 : 83, bottomSpace = options.notes === false ? 36 : 92, box = { x: 50, y: topSpace, w: Math.max(80, diagramWidth - 100), h: height - topSpace - bottomSpace }, project = projection(model.pointsMM, box), points = model.pointsMM.map(project);
     let out = svgOpen(width, height, model.name + ' · coupe et cotes finies');
     if (options.header !== false) out += svgText(24, 34, (model.id ? model.id + ' · ' : '') + model.name, 'font-size="23" font-weight="700"');
-    out += '<polyline points="' + pointsAttr(points) + '" fill="none" stroke="#25352d" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"/>';
-    for (const item of segmentLabelMap(points, model.segments.map(s => s.label), diagramWidth, height)) {
-      out += '<line x1="' + decimal(item.mid[0]) + '" y1="' + decimal(item.mid[1]) + '" x2="' + decimal(item.point[0]) + '" y2="' + decimal(item.point[1]) + '" stroke="#94a08f" stroke-width="1"/>';
-      out += '<circle cx="' + decimal(item.point[0]) + '" cy="' + decimal(item.point[1]) + '" r="14" fill="#f4f7f0" stroke="#dce4d4"/>';
-      out += svgText(item.point[0], item.point[1] + 5, item.label, 'font-size="17" font-weight="700" text-anchor="middle" fill="#527539"');
-    }
-    const coloredIndex = model.segments.findIndex(s => s.id === model.coloredFace.segmentId);
-    if (model.coloredFace.side && coloredIndex >= 0) {
-      const a = points[coloredIndex], b = points[coloredIndex + 1], len = Math.max(dist(a, b), EPS), sign = model.coloredFace.side === 'left' ? -1 : 1, normal = [-(b[1] - a[1]) / len * sign, (b[0] - a[0]) / len * sign], mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-      out += svgText(mid[0] + normal[0] * 26, mid[1] + normal[1] * 26 + 6, '★', 'font-size="24" font-weight="700" fill="#9a6500" text-anchor="middle"');
-    }
-    for (const b of model.bends.filter(b => b?.mode === 'hem')) {
-      const p = project(b.at);
-      out += '<circle cx="' + decimal(p[0]) + '" cy="' + decimal(p[1]) + '" r="7" fill="#fff" stroke="#a56624" stroke-width="2"/>';
-      out += svgText(p[0] + 12, p[1] - 12, '180°', 'font-size="14" fill="#a56624"');
-    }
+    out += profileDiagramContent(model, points, { paintedMarker: 'star', highContrast: true, horizontalBounds: [0, diagramWidth], verticalBounds: [0, height] });
     if (legend) {
       out += '<line x1="' + decimal(diagramWidth) + '" y1="62" x2="' + decimal(diagramWidth) + '" y2="' + decimal(height - 56) + '" stroke="#dde4d7"/>';
       out += multiline(diagramWidth + 20, 86, details, { width: Math.max(24, Math.floor((width - diagramWidth - 35) / 8)), lineHeight: 21, attrs: 'font-size="15"' }).svg;
@@ -809,109 +780,91 @@ function profileDrawingSection(points,bends){
  return section;
 }
 
-function profileSideMarkers({segments,folds},model,handles,annotationBounds,[left,right]=[0,800]){
- const placed=[];
+function profileSideMarkers({segments,folds},model,handles,annotationBounds,[left,right]=[0,800],[top,bottom]=[0,520]){
  const distance=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
- function distanceToSide(p,[a,b]){
-  const dx=b[0]-a[0],dy=b[1]-a[1],lengthSquared=dx*dx+dy*dy;
-  const t=lengthSquared?Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/lengthSquared)):0;
-  return distance(p,[a[0]+t*dx,a[1]+t*dy]);
+ top+=14;bottom-=14;
+ const orientation=(a,b,c)=>Math.sign((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]));
+ const onSegment=(a,b,p)=>p[0]>=Math.min(a[0],b[0])-1e-6&&p[0]<=Math.max(a[0],b[0])+1e-6&&p[1]>=Math.min(a[1],b[1])-1e-6&&p[1]<=Math.max(a[1],b[1])+1e-6;
+ function intersects([a,b],[c,d]){
+  const o1=orientation(a,b,c),o2=orientation(a,b,d),o3=orientation(c,d,a),o4=orientation(c,d,b);
+  if(o1!==o2&&o3!==o4)return true;
+  return (!o1&&onSegment(a,b,c))||(!o2&&onSegment(a,b,d))||(!o3&&onSegment(c,d,a))||(!o4&&onSegment(c,d,b));
  }
- const points=segments.flat();
- const center=[0,1].map(axis=>{
-  const coordinates=points.map(point=>point[axis]);
-  return (Math.min(...coordinates)+Math.max(...coordinates))/2;
+ const rect=(point,halfWidth)=>({x:point[0]-halfWidth,y:point[1]-12,w:halfWidth*2,h:24});
+ const expanded=(r,gap)=>({x:r.x-gap,y:r.y-gap,w:r.w+gap*2,h:r.h+gap*2});
+ const rectOverlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+ const pointInRect=(p,r)=>p[0]>=r.x&&p[0]<=r.x+r.w&&p[1]>=r.y&&p[1]<=r.y+r.h;
+ const rectEdges=r=>[[[r.x,r.y],[r.x+r.w,r.y]],[[r.x+r.w,r.y],[r.x+r.w,r.y+r.h]],[[r.x+r.w,r.y+r.h],[r.x,r.y+r.h]],[[r.x,r.y+r.h],[r.x,r.y]]];
+ const lineHitsRect=(line,r)=>pointInRect(line[0],r)||pointInRect(line[1],r)||rectEdges(r).some(edge=>intersects(line,edge));
+ const rectHitsLine=(r,line)=>lineHitsRect(line,expanded(r,3));
+ const leaderStart=(point,halfWidth,anchor)=>{
+  const dx=anchor[0]-point[0],dy=anchor[1]-point[1],sx=Math.abs(dx)/(halfWidth||1),sy=Math.abs(dy)/12,scale=1/Math.max(sx,sy,1e-6);
+  return [point[0]+dx*scale,point[1]+dy*scale];
+ };
+ const obstacles=[...folds,...handles].map(point=>({x:point[0]-17,y:point[1]-17,w:34,h:34}));
+ const placed=[],byIndex=new Map(),leaderLines=[];
+ const descriptors=segments.map(([a,b],index)=>{
+  const label=model.segments?.[index]?.label||String.fromCharCode(65+index),mm=model.segments?.[index]?.lengthMM;
+  const caption=Number.isFinite(mm)?label+' · '+formatMeasurement(mm,model.unit):label,length=distance(a,b);
+  return {index,a,b,label,caption,length,halfWidth:caption===label?11:Math.ceil(caption.length*4.1+8),anchor:[(a[0]+b[0])/2,(a[1]+b[1])/2]};
  });
- const missing=[],leaders=[];
- const markers=segments.map(([a,b],index)=>{
-  const label=model.segments?.[index]?.label||String.fromCharCode(65+index);
-  const mm=model.segments?.[index]?.lengthMM;
-  const caption=Number.isFinite(mm)?label+' · '+formatMeasurement(mm,model.unit):label;
-  const length=distance(a,b),halfWidth=caption===label?11:Math.ceil(caption.length*4.1+8);
-  const anchor=[(a[0]+b[0])/2,(a[1]+b[1])/2];
-  const compact=right-left<800;
-  const clear=([x,y])=>{
-   const near=(q,margin)=>Math.abs(x-q[0])<halfWidth+margin&&Math.abs(y-q[1])<12+margin;
-   const relative=([px,py])=>[(px-x)/(halfWidth+7),(py-y)/19];
-   return x>=left+halfWidth+2&&x<=right-halfWidth-2&&y>=14&&y<=462&&
-    !placed.some(q=>compact?distance([x,y],q.point)<50:
-      near(q.point,q.halfWidth+4)&&Math.abs(y-q.point[1])<28)&&
-    !folds.some(q=>near(q,10))&&!handles.some(q=>near(q,12))&&
-    !segments.some(line=>distanceToSide([0,0],line.map(relative))<1.42);
-  };
-  let position=null, adjacent=false;
-  if(length){
-   const nx=(a[1]-b[1])/length,ny=(b[0]-a[0])/length;
-   // Repères du côté droit du tracé : A au-dessus, B à droite,
-   // C à gauche, D sous le retour. Les plis voisins ne partagent plus
-   // la même rangée de badges ni des flèches traversant le profil.
-   const preferred=-1;
-   const gap=Math.max(compact?52:38,Math.ceil(1.48/Math.hypot(nx/(halfWidth+7),ny/19))+2);
-   const candidate=(side,extra,slide=0)=>[
-    anchor[0]+side*(gap+extra)*nx+slide*(b[0]-a[0])/length,
-    anchor[1]+side*(gap+extra)*ny+slide*(b[1]-a[1])/length
-   ];
-   position=[candidate(preferred,0),candidate(preferred,10),
-    candidate(preferred,24),candidate(preferred,8,22),candidate(preferred,8,-22)].find(clear);
-   adjacent=!!position;
-   if(!position){
-    for(const extra of [18,35,55,85,120,160]){
-     position=[candidate(preferred,extra),candidate(-preferred,extra),
-       candidate(preferred,extra,26),candidate(-preferred,extra,-26)].find(clear);
-     if(position)break;
-    }
-   }
+ function validCandidate(item,point,side){
+  const box=rect(point,item.halfWidth);
+  if(box.x<left+2||box.x+box.w>right-2||box.y<top||box.y+box.h>bottom)return null;
+  if(obstacles.some(obstacle=>rectOverlap(expanded(box,3),obstacle)))return null;
+  if(placed.some(other=>rectOverlap(expanded(box,5),expanded(other.box,2))))return null;
+  if(segments.some(line=>rectHitsLine(box,line)))return null;
+  if(leaderLines.some(line=>lineHitsRect(line,expanded(box,3))))return null;
+  const start=leaderStart(point,item.halfWidth,item.anchor),leader=[start,item.anchor];
+  if(placed.some(other=>lineHitsRect(leader,expanded(other.box,3))))return null;
+  if(leaderLines.some(line=>intersects(leader,line)))return null;
+  const frameSpace=Math.min(box.x-left,right-(box.x+box.w),box.y-top,bottom-(box.y+box.h));
+  const objectSpace=Math.min(180,...placed.map(other=>distance(point,other.point)),...obstacles.map(o=>distance(point,[o.x+o.w/2,o.y+o.h/2])));
+  const leaderLength=distance(start,item.anchor);
+  return {point,box,leader,start,side,score:frameSpace*.7+objectSpace*.25-leaderLength*.08};
+ }
+ const order=[...descriptors].sort((a,b)=>a.length-b.length||a.index-b.index);
+ for(const item of order){
+  const dx=(item.b[0]-item.a[0])/(item.length||1),dy=(item.b[1]-item.a[1])/(item.length||1),normal=[-dy,dx];
+  const neighbour=placed.filter(other=>Math.abs(other.index-item.index)===1).sort((a,b)=>a.length-b.length)[0];
+  const needsOppositeSide=!!(neighbour&&item.length<95&&neighbour.length<95);
+  const isOpposite=point=>!needsOppositeSide||((point[0]-item.anchor[0])*(neighbour.point[0]-neighbour.anchor[0])+(point[1]-item.anchor[1])*(neighbour.point[1]-neighbour.anchor[1])<0);
+  const candidates=[];
+  for(const gap of [34,46,60,78,102,132,166])for(const slide of [0,18,-18,34,-34,56,-56])for(const side of [-1,1]){
+   const point=[item.anchor[0]+normal[0]*gap*side+dx*slide,item.anchor[1]+normal[1]*gap*side+dy*slide];
+   const candidate=validCandidate(item,point,side);if(candidate)candidates.push(candidate);
   }
-  if(!position&&(caption!==label||right-left<800)){
-   let nearest=Infinity;
-   for(let y=16;y<=452;y+=20)for(let x=left+halfWidth+2;x<=right-halfWidth-2;x+=24){
-    const candidate=[x,y],gap=distance(candidate,anchor);
-    if(gap<nearest&&clear(candidate)){position=candidate;nearest=gap;}
-   }
+  if(!candidates.length)for(let y=top+14;y<=bottom-14;y+=18)for(let x=left+item.halfWidth+3;x<=right-item.halfWidth-3;x+=18){
+   const cross=(item.b[0]-item.a[0])*(y-item.anchor[1])-(item.b[1]-item.a[1])*(x-item.anchor[0]);
+   const candidate=validCandidate(item,[x,y],cross>=0?1:-1);if(candidate)candidates.push(candidate);
   }
-  if(!position){
-   missing.push({label,caption,anchor,halfWidth});
-   return '';
-  }
-  placed.push({point:position,halfWidth,anchor:caption===label||adjacent?null:anchor});
-  annotationBounds?.push([position[0],position[1],halfWidth,12]);
-  return badge(position,caption,halfWidth,caption===label);
- }).join('');
- function badge([x,y],caption,halfWidth,letterOnly){
+  candidates.sort((a,b)=>Number(isOpposite(b.point))-Number(isOpposite(a.point))||b.score-a.score||distance(a.point,item.anchor)-distance(b.point,item.anchor));
+  const chosen=candidates[0];
+  if(!chosen)throw new Error('Aucune zone libre pour le repère '+item.label+'.');
+  if(leaderLines.some(line=>intersects(chosen.leader,line)))throw new Error('Croisement de rappels pour le repère '+item.label+'.');
+  const record={...item,...chosen};placed.push(record);byIndex.set(item.index,record);leaderLines.push(chosen.leader);
+  annotationBounds?.push([chosen.point[0],chosen.point[1],item.halfWidth,12]);
+ }
+ const markers=descriptors.map(item=>{const chosen=byIndex.get(item.index);return badge(chosen.point,item.caption,item.halfWidth,item.caption===item.label,item.index,chosen.anchor,item.a,item.b);}).join('');
+ function badge([x,y],caption,halfWidth,letterOnly,index,anchor,a,b){
   const shape=letterOnly?`<circle cx="${decimal(x)}" cy="${decimal(y)}" r="11"`:
    `<rect x="${decimal(x-halfWidth)}" y="${decimal(y-12)}" width="${halfWidth*2}" height="24" rx="9"`;
-  return `<g class="profile-side-marker" data-marker-label="${esc(caption.split(" · ")[0])}" pointer-events="none" aria-hidden="true">${shape} fill="#fff" stroke="#779068"/><text x="${decimal(x)}" y="${decimal(y+4)}" text-anchor="middle" font-size="${letterOnly?12:14}" font-weight="700" fill="#345d3d">${esc(caption)}</text></g>`;
+  return `<g class="profile-side-marker" data-marker-label="${esc(caption.split(" · ")[0])}" data-segment-index="${index}" data-anchor-x="${decimal(anchor[0])}" data-anchor-y="${decimal(anchor[1])}" data-segment-start-x="${decimal(a[0])}" data-segment-start-y="${decimal(a[1])}" data-segment-end-x="${decimal(b[0])}" data-segment-end-y="${decimal(b[1])}" pointer-events="none" aria-hidden="true">${shape} fill="#fff" stroke="#779068"/><text x="${decimal(x)}" y="${decimal(y+4)}" text-anchor="middle" font-size="${letterOnly?12:14}" font-weight="700" fill="#345d3d">${esc(caption)}</text></g>`;
  }
- function leader(from,to){
+ function leader(from,to,index){
   const gap=distance(from,to);
   if(gap<12)return '';
   const dx=(to[0]-from[0])/gap,dy=(to[1]-from[1])/gap;
   const tip=[to[0]-dx*5,to[1]-dy*5];
   const wing=sign=>[tip[0]-dx*7-dy*4*sign,tip[1]-dy*7+dx*4*sign].map(decimal).join(',');
-  return `<path class="profile-measure-leader" d="M${from.map(decimal).join(',')}L${tip.map(decimal).join(',')} M${wing(-1)}L${tip.map(decimal).join(',')}L${wing(1)}" fill="none" stroke="#667e60" stroke-width="1.7" pointer-events="none"/>`;
+  return `<path class="profile-measure-leader" data-segment-index="${index}" data-start-x="${decimal(from[0])}" data-start-y="${decimal(from[1])}" data-tip-x="${decimal(tip[0])}" data-tip-y="${decimal(tip[1])}" data-target-x="${decimal(to[0])}" data-target-y="${decimal(to[1])}" d="M${from.map(decimal).join(',')}L${tip.map(decimal).join(',')} M${wing(-1)}L${tip.map(decimal).join(',')}L${wing(1)}" fill="none" stroke="#667e60" stroke-width="1.7" pointer-events="none"/>`;
  }
- for(const position of placed){
-  if(position.anchor)leaders.push(leader(position.point,position.anchor));
- }
- if(!missing.length)return leaders.join('')+markers;
- const fallback=missing.map(({caption,label,anchor,halfWidth},index)=>{
-  const letterOnly=caption===label;
-  const columns=letterOnly?Math.floor((right-left)/30):7;
-  const row=Math.floor(index/columns);
-  const inRow=Math.min(columns,missing.length-row*columns);
-  const x=letterOnly?(left+right)/2+(index%columns-(inRow-1)/2)*30:61+(index%columns)*113;
-  const y=letterOnly?495-row*24:452+row*32;
-  const point=[x,y];
-  annotationBounds?.push([x,y,letterOnly?11:halfWidth*.55,letterOnly?11:6.6]);
-  if(!letterOnly)leaders.push(leader(point,anchor));
-  return letterOnly?badge(point,caption,halfWidth,true):
-   `<g transform="translate(${x} ${y}) scale(.55)">${badge([0,0],caption,halfWidth,false)}</g>`;
- }).join('');
- return leaders.join('')+markers+`<g class="profile-marker-overflow" aria-label="Repères déportés">${fallback}</g>`;
+ const leaders=placed.map(position=>leader(position.start,position.anchor,position.index));
+ return leaders.join('')+markers;
 
 }
 
-function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, angleOverlay, paintedMarker='stripe', highContrast=false}={}){
+function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, verticalBounds, angleOverlay, paintedMarker='stripe', highContrast=false}={}){
  const section=profileDrawingSection(mapped,bends);
  let output=`<path d="${section.path}" fill="none" stroke="${highContrast?'#304b3d':'#97a68b'}" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="${highContrast?'#dfe8e3':'#dbe3d4'}" stroke-width="4" stroke-linejoin="miter"/>`;
  const reserved=[...handles];
@@ -926,7 +879,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
    const angle=index*Math.PI/5-Math.PI/2,radius=index%2===0?23:10;
    return [decimal(center[0]+Math.cos(angle)*radius),decimal(center[1]+Math.sin(angle)*radius)].join(',');
   }).join(' ');
-  reserved.push(center,[center[0]-14,center[1]],[center[0]+14,center[1]]);
+  reserved.push(center,[center[0]-18,center[1]],[center[0]+18,center[1]],[center[0],center[1]-18],[center[0],center[1]+18]);
   const action=togglePaintedFace?' data-toggle-painted-face role="button" tabindex="0" aria-label="Inverser la face peinte" style="cursor:pointer"':'';
   output+=`<g${action} data-painted-side="${model.coloredFace.side}" data-painted-segment="${model.coloredFace.segmentId}"><polygon class="profile-painted-star" points="${points}" fill="#ffcf4d" stroke="#202e29" stroke-width="4" stroke-linejoin="round"/></g>`;
   return;
@@ -940,7 +893,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  output+=`<g${action}>${togglePaintedFace?`<path d="${stripe}" fill="none" stroke="transparent" stroke-width="38" stroke-linecap="round"/>`:''}<path class="profile-painted-stripe" d="${stripe}" fill="none" stroke="#175b94" stroke-width="5" stroke-linecap="round"/></g>`;}
  });
  const annotationBounds=angleOverlay?[]:null;
- if(markers)output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds);
+ if(markers)output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds,verticalBounds);
  if(angleOverlay)output+=angleOverlay(section,annotationBounds,reserved);
  return output;
 }
