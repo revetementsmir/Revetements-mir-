@@ -53,6 +53,13 @@ assertion de séparation, de permission ou d’immutabilité n’a été retiré
 Un workflow PR dédié exécute désormais les contrats, les intersections,
 les 70 parcours et la génération PDF réelle.
 
+La première exécution CI de cette recertification a révélé une course dans
+le test de pagination de la banque (carte Colonne encore masquée). Le test
+attend maintenant l’état initial explicite de la pagination, sans augmenter
+son délai. Le dernier passage local couvre les 70 parcours. Le contrôle
+des lignes contre l’étoile et les limites réelles du cadre PDF est également
+obligatoire; le solveur essaie un autre emplacement sur la même face si nécessaire.
+
 ## Limites et garde-fous
 
 Les essais sont automatisés sur Chromium, sans appareil physique. Une matrice

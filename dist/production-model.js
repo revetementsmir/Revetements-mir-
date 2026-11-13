@@ -785,13 +785,22 @@ function profileDrawingSection(points,bends){
 
 function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=[0,800],[top,bottom]=[0,520]){
  const {segments}=section,center=segments.flat().reduce((s,p)=>[s[0]+p[0]/(segments.length*2),s[1]+p[1]/(segments.length*2)],[0,0]);
- const used=[],ink=[],rendered=new Map();let output='';
+ const used=[],ink=[],rendered=new Map(),candidateCache=new Map();
  const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
  const intersects=(first,second)=>{
   const [a,b]=first.map(p=>p.map(v=>Number(decimal(v)))),[c,d]=second.map(p=>p.map(v=>Number(decimal(v))));
   return cross(a,b,c)*cross(a,b,d)<-1e-5&&cross(c,d,a)*cross(c,d,b)<-1e-5;
  };
- const hitsBox=([a,b],box)=>Array.from({length:61},(_,i)=>[a[0]+(b[0]-a[0])*i/60,a[1]+(b[1]-a[1])*i/60]).some(p=>p[0]>=box.x-3&&p[0]<=box.x+box.w+3&&p[1]>=box.y-3&&p[1]<=box.y+box.h+3);
+ const hitsBox=([a,b],box)=>{
+  let low=0,high=1;
+  for(let axis=0;axis<2;axis++){
+   const min=(axis?box.y:box.x)-3,max=min+(axis?box.h:box.w)+6,delta=b[axis]-a[axis];
+   if(Math.abs(delta)<1e-9){if(a[axis]<min||a[axis]>max)return false;continue;}
+   let enter=(min-a[axis])/delta,leave=(max-a[axis])/delta;if(enter>leave)[enter,leave]=[leave,enter];
+   low=Math.max(low,enter);high=Math.min(high,leave);if(low>high)return false;
+  }
+  return true;
+ };
  const order=[...segments.entries()].sort((a,b)=>Math.hypot(a[1][1][0]-a[1][0][0],a[1][1][1]-a[1][0][1])-Math.hypot(b[1][1][0]-b[1][0][0],b[1][1][1]-b[1][0][1])||a[0]-b[0]);
  let visits=0;
  function place(depth){
@@ -806,20 +815,25 @@ function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=
   const neighbour=segments.find(([s,e],j)=>j!==index&&Math.abs((e[0]-s[0])*t[0]+(e[1]-s[1])*t[1])>Math.hypot(e[0]-s[0],e[1]-s[1])*.98&&Math.abs(((s[0]+e[0])/2-mid[0])*n[0]+((s[1]+e[1])/2-mid[1])*n[1])>2&&Math.hypot((s[0]+e[0])/2-mid[0],(s[1]+e[1])/2-mid[1])<40);
   const reference=neighbour?[(neighbour[0][0]+neighbour[1][0])/2,(neighbour[0][1]+neighbour[1][1])/2]:center;
   const outward=(mid[0]-reference[0])*n[0]+(mid[1]-reference[1])*n[1]>=0?1:-1;
-  let chosen;const candidates=[];
+  let chosen;const candidates=candidateCache.get(index)||[];
   const longitudinal=(mid[0]-center[0])*t[0]+(mid[1]-center[1])*t[1]>=0?1:-1;
-  for(const side of [outward,-outward])for(const gap of [32,48,64,80,96,112])for(const slide of length<width+20?[24*longitudinal,0,-24*longitudinal,48*longitudinal,-48*longitudinal,72,-72]:[0,24,-24,48,-48]){
+  if(!candidateCache.has(index))for(const side of [outward,-outward])for(const gap of [32,48,64,80,96,112])for(const slide of length<width+20?[24*longitudinal,0,-24*longitudinal,48*longitudinal,-48*longitudinal,72,-72]:[0,24,-24,48,-48]){
    const p=[mid[0]+n[0]*gap*side+t[0]*slide,mid[1]+n[1]*gap*side+t[1]*slide],box={x:p[0]-bw/2,y:p[1]-bh/2,w:bw,h:bh,cx:p[0],cy:p[1]};
-   if(used.some(q=>Math.hypot(p[0]-q.cx,p[1]-q.cy)<50))continue;
    const hit=q=>q[0]>=box.x-6&&q[0]<=box.x+box.w+6&&q[1]>=box.y-6&&q[1]<=box.y+box.h+6;
-   if(box.x<left+8||box.x+box.w>right-8||box.y<top+8||box.y+box.h>bottom-8||handles.some(p=>box.x<p[0]+25&&box.x+box.w>p[0]-25&&box.y<p[1]+25&&box.y+box.h>p[1]-25)||used.some(q=>box.x<q.x+q.w+6&&box.x+box.w+6>q.x&&box.y<q.y+q.h+6&&box.y+box.h+6>q.y))continue;
+   if(box.x<left+8||box.x+box.w>right-8||box.y<top+8||box.y+box.h>bottom-8||handles.some(p=>box.x<p[0]+25&&box.x+box.w>p[0]-25&&box.y<p[1]+25&&box.y+box.h>p[1]-25))continue;
    if(segments.some(([s,e])=>Array.from({length:41},(_,i)=>[s[0]+(e[0]-s[0])*i/40,s[1]+(e[1]-s[1])*i/40]).some(hit)))continue;
    const classic=length>=width+20&&slide===0;
    const offset=q=>[q[0]+n[0]*gap*side,q[1]+n[1]*gap*side],lines=classic?[[a,offset(a)],[b,offset(b)],[offset(a),offset(b)]]:[[p,mid]];
-   if(ink.some(line=>hitsBox(line,box))||lines.some(line=>used.some(box=>hitsBox(line,box))||ink.some(other=>intersects(line,other))))continue;
+   if(lines.some(line=>handles.some(p=>hitsBox(line,{x:p[0]-25,y:p[1]-25,w:50,h:50}))))continue;
    candidates.push({p,box,side,gap,lines,classic});
   }
-  for(const candidate of candidates){used.push(candidate.box);ink.push(...candidate.lines);if(place(depth+1)){chosen=candidate;break;}used.pop();ink.splice(ink.length-candidate.lines.length);}
+  candidateCache.set(index,candidates);
+  for(const candidate of candidates){
+   const {box,p,lines}=candidate;
+   if(used.some(q=>Math.hypot(p[0]-q.cx,p[1]-q.cy)<50||box.x<q.x+q.w+6&&box.x+box.w+6>q.x&&box.y<q.y+q.h+6&&box.y+box.h+6>q.y))continue;
+   if(ink.some(line=>hitsBox(line,box))||lines.some(line=>used.some(box=>hitsBox(line,box))||ink.some(other=>intersects(line,other))))continue;
+   used.push(box);ink.push(...lines);if(place(depth+1)){chosen=candidate;break;}used.pop();ink.splice(ink.length-lines.length);
+  }
   if(!chosen)return false;
   const {p,box,side,gap,lines}=chosen;annotationBounds?.push([p[0],p[1],bw/2,bh/2]);
   const xy=p=>p.map(decimal).join(','),offset=q=>[q[0]+n[0]*gap*side,q[1]+n[1]*gap*side];
@@ -834,7 +848,7 @@ function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=
  return segments.map((_,index)=>rendered.get(index)).join('');
 }
 
-function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, verticalBounds, angleOverlay, paintedMarker='stripe', highContrast=false}={}){
+function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, verticalBounds, angleOverlay, paintedMarker='stripe', highContrast=false,starPosition=0}={}){
  const section=profileDrawingSection(mapped,bends);
  let output=`<path d="${section.path}" fill="none" stroke="${highContrast?'#304b3d':'#97a68b'}" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="${highContrast?'#dfe8e3':'#dbe3d4'}" stroke-width="4" stroke-linejoin="miter"/>`;
  const reserved=[...handles];
@@ -856,7 +870,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  if(paintedMarker==='star'){
   // Keep the physical side fixed; leave the near lane for technical dimensions.
   const [minX,maxX]=horizontalBounds||[0,800],[minY,maxY]=verticalBounds||[0,520];
-  const center=[76,60,44,32].flatMap(gap=>(gap<60?[len*.3,-len*.3,0]:[0]).map(slide=>{const p=at(gap);return[p[0]+dx/len*slide,p[1]+dy/len*slide];})).find(p=>p[0]>=minX+25&&p[0]<=maxX-25&&p[1]>=minY+25&&p[1]<=maxY-25);
+  const center=[76,60,44,32].flatMap(gap=>(gap<60?[len*.3,-len*.3,0]:[0,len*.3,-len*.3]).map(slide=>{const p=at(gap);return[p[0]+dx/len*slide,p[1]+dy/len*slide];})).filter(p=>p[0]>=minX+25&&p[0]<=maxX-25&&p[1]>=minY+25&&p[1]<=maxY-25).filter(p=>section.segments.every(([a,b])=>{const vx=b[0]-a[0],vy=b[1]-a[1],den=vx*vx+vy*vy,t=den?Math.max(0,Math.min(1,((p[0]-a[0])*vx+(p[1]-a[1])*vy)/den)):0;return Math.hypot(p[0]-a[0]-t*vx,p[1]-a[1]-t*vy)>28;}))[starPosition];
   if(!center)throw new Error('Aucun emplacement pour l’étoile sur la face choisie : '+model.name);
   const points=Array.from({length:10},(_,index)=>{
    const angle=index*Math.PI/5-Math.PI/2,radius=index%2===0?23:10;
@@ -876,7 +890,10 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  output+=`<g${action}>${togglePaintedFace?`<path d="${stripe}" fill="none" stroke="transparent" stroke-width="38" stroke-linecap="round"/>`:''}<path class="profile-painted-stripe" d="${stripe}" fill="none" stroke="#175b94" stroke-width="5" stroke-linecap="round"/></g>`;}
  });
  const annotationBounds=angleOverlay?[]:null;
- if(markers)output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds,verticalBounds);
+ if(markers)try{output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds,verticalBounds);}catch(error){
+  if(paintedMarker!=='star'||!model.coloredFace?.side||starPosition>=11)throw error;
+  return profileDiagramContent(model,mapped,{bends,markers,markerModel,handles,illustrative,togglePaintedFace,horizontalBounds,verticalBounds,angleOverlay,paintedMarker,highContrast,starPosition:starPosition+1});
+ }
  if(angleOverlay)output+=angleOverlay(section,annotationBounds,reserved);
  return output;
 }
