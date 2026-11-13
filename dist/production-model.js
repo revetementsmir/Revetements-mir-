@@ -783,7 +783,7 @@ function profileDrawingSection(points,bends){
  return section;
 }
 
-function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=[0,800],[top,bottom]=[0,520]){
+function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=[0,800],[top,bottom]=[0,520],lineObstacles=[]){
  const {segments}=section,center=segments.flat().reduce((s,p)=>[s[0]+p[0]/(segments.length*2),s[1]+p[1]/(segments.length*2)],[0,0]);
  const used=[],ink=[],rendered=new Map(),candidateCache=new Map();
  const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
@@ -824,7 +824,7 @@ function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=
    if(segments.some(([s,e])=>Array.from({length:41},(_,i)=>[s[0]+(e[0]-s[0])*i/40,s[1]+(e[1]-s[1])*i/40]).some(hit)))continue;
    const classic=length>=width+20&&slide===0;
    const offset=q=>[q[0]+n[0]*gap*side,q[1]+n[1]*gap*side],lines=classic?[[a,offset(a)],[b,offset(b)],[offset(a),offset(b)]]:[[p,mid]];
-   if(lines.some(line=>handles.some(p=>hitsBox(line,{x:p[0]-25,y:p[1]-25,w:50,h:50}))))continue;
+   if(lines.some(line=>lineObstacles.some(p=>hitsBox(line,{x:p[0]-25,y:p[1]-25,w:50,h:50}))))continue;
    candidates.push({p,box,side,gap,lines,classic});
   }
   candidateCache.set(index,candidates);
@@ -890,7 +890,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  output+=`<g${action}>${togglePaintedFace?`<path d="${stripe}" fill="none" stroke="transparent" stroke-width="38" stroke-linecap="round"/>`:''}<path class="profile-painted-stripe" d="${stripe}" fill="none" stroke="#175b94" stroke-width="5" stroke-linecap="round"/></g>`;}
  });
  const annotationBounds=angleOverlay?[]:null;
- if(markers)try{output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds,verticalBounds);}catch(error){
+ if(markers)try{output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds,verticalBounds,paintedMarker==='star'?reserved.slice(handles.length):[]);}catch(error){
   if(paintedMarker!=='star'||!model.coloredFace?.side||starPosition>=11)throw error;
   return profileDiagramContent(model,mapped,{bends,markers,markerModel,handles,illustrative,togglePaintedFace,horizontalBounds,verticalBounds,angleOverlay,paintedMarker,highContrast,starPosition:starPosition+1});
  }

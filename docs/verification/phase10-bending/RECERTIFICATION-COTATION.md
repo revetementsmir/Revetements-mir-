@@ -60,6 +60,13 @@ son délai. Le dernier passage local couvre les 70 parcours. Le contrôle
 des lignes contre l’étoile et les limites réelles du cadre PDF est également
 obligatoire; le solveur essaie un autre emplacement sur la même face si nécessaire.
 
+Les non-régressions de dessin guidé ont ensuite détecté que la zone réservée
+aux poignées d’édition était aussi appliquée aux lignes d’attache. Le moteur
+distingue maintenant ces poignées de l’étoile : les labels évitent les poignées,
+les attaches peuvent rejoindre leurs extrémités, et les lignes évitent toujours
+l’étoile. Le parcours générique guidé est rejoué sur ses cinq formats sans
+supprimer son assertion d’absence d’erreur JavaScript.
+
 ## Limites et garde-fous
 
 Les essais sont automatisés sur Chromium, sans appareil physique. Une matrice
