@@ -221,7 +221,13 @@ public class MirRealRolesTest extends MirDeviceSetup {
        js(s,"(()=>{const n=document.querySelector('[data-pm-search]');n.value="+JSONObject.quote(target[1])+";n.dispatchEvent(new Event('input',{bubbles:true}));return true;})()");
        waitFor(s,"unique QA employee search includes its ID/name and excludes every other employee", "(()=>{const id="+JSONObject.quote(target[0])+",name="+JSONObject.quote(target[1])+",rows=[...document.querySelectorAll('.pm-person')],n=rows[0]?.querySelector('.pm-name');return rows.length===1&&n?.dataset.pmDetail===id&&n.textContent.trim()===name&&window.nativeManagementPeople?.includes(id)&&window.nativeManagementPeople.filter(other=>other!==id).every(other=>![...document.querySelectorAll('.pm-person .pm-name')].some(n=>n.dataset.pmDetail===other));})()");
       }
-      js(s,"scrollTo({top:0,behavior:'instant'});true");
+      js(s,"document.activeElement?.blur();true");
+      s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();android.view.inputmethod.InputMethodManager ime=(android.view.inputmethod.InputMethodManager)a.getSystemService(android.content.Context.INPUT_METHOD_SERVICE);ime.hideSoftInputFromWindow(web.getWindowToken(),0);});
+      long keyboardDeadline=SystemClock.uptimeMillis()+10000;boolean[] keyboardHidden={false};
+      while(SystemClock.uptimeMillis()<keyboardDeadline){s.onActivity(a->{androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(a.getBridge().getWebView());keyboardHidden[0]=insets!=null&&!insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime());});if(keyboardHidden[0])break;SystemClock.sleep(100);}
+      assertTrue("Android keyboard is hidden before management capture",keyboardHidden[0]);
+      js(s,"document.querySelector('.pm-person').scrollIntoView({block:'center',behavior:'instant'});true");
+      waitFor(s,"complete QA management card is visible without clipping", "(()=>{const r=document.querySelector('.pm-person')?.getBoundingClientRect(),v=visualViewport;return !!r&&r.top>=0&&r.left>=0&&r.bottom<=(v?.height||innerHeight)&&r.right<=(v?.width||innerWidth)&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName);})()");
       presentFrame(s);screenshot(s,"teams-hours-"+role.getString("role")+"-http-snapshot");
      }
 

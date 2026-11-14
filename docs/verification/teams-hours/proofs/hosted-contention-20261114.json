@@ -1,0 +1,1215 @@
+{
+  "target": "hxtztkmbfpmzrieccwsg",
+  "kind": "Hosted PostgreSQL; controlled authenticated claims, not an HTTP login or physical device",
+  "source": "a22a87c7301383894b21c2f4a49fd0891332f90f",
+  "setup": [
+    {
+      "proof": {
+        "a": {
+          "ok": true,
+          "status": "pending",
+          "incomplete": null,
+          "correctionId": "227f82a9-4567-4383-98c4-7689565aa3ab"
+        },
+        "b": {
+          "ok": true,
+          "status": "pending",
+          "incomplete": null,
+          "correctionId": "034c2c14-8c6f-4fc6-9063-feea20377b73"
+        },
+        "fixture": "7da20261-1114-4000-8550-000000000001",
+        "initialRevision": "0f9bcf18afc8c85a978e4cc92c03e942"
+      }
+    }
+  ],
+  "sessionA": [
+    {
+      "proof": {
+        "pid": 932177,
+        "result": {
+          "ok": true,
+          "status": "approved",
+          "shiftId": "7da20261-1114-4000-8550-000000000001",
+          "correctionId": "227f82a9-4567-4383-98c4-7689565aa3ab"
+        },
+        "message": "",
+        "session": "mir-pr38-race-a",
+        "sqlstate": "00000",
+        "startedAt": "2026-11-14T21:14:34.472311+00:00",
+        "finishedAt": "2026-11-14T21:14:54.513154+00:00",
+        "elapsedSeconds": 20.040843,
+        "blockedSessions": [
+          {
+            "pid": 932179,
+            "blockers": [
+              932177
+            ],
+            "startedAt": null,
+            "waitEvent": null
+          }
+        ]
+      }
+    }
+  ],
+  "sessionB": [
+    {
+      "proof": {
+        "pid": 932179,
+        "result": null,
+        "message": "Le quart a changé ; rechargez son détail",
+        "session": "mir-pr38-race-b",
+        "sqlstate": "40001",
+        "startedAt": "2026-11-14T21:14:45.733565+00:00",
+        "finishedAt": "2026-11-14T21:14:54.529978+00:00",
+        "elapsedSeconds": 8.796413
+      }
+    }
+  ],
+  "canonicalBeforeReplay": [
+    {
+      "proof": {
+        "audit": [
+          {
+            "id": 24,
+            "action": "management_proposed",
+            "reason": "QA PR38 contention dedicated fixture",
+            "payload": {
+              "after": {
+                "body": {
+                  "at": "2026-11-10T10:30:00-05:00",
+                  "kind": "transfer",
+                  "jobId": "7da20261-1114-4000-8000-000000000002",
+                  "reason": "QA PR38 contention dedicated fixture",
+                  "shiftId": "7da20261-1114-4000-8550-000000000001",
+                  "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                  "workDate": "2026-11-10"
+                },
+                "kind": "transfer",
+                "totals": {
+                  "jobs": [
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "paidSeconds": 12229.411765,
+                      "actualSeconds": 12600,
+                      "accountingBreakSeconds": 370.588235
+                    },
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "paidSeconds": 17470.588235,
+                      "actualSeconds": 18000,
+                      "accountingBreakSeconds": 529.411765
+                    }
+                  ],
+                  "rule": "strictly-over-threshold-v1",
+                  "segments": [
+                    {
+                      "id": "7da20261-1114-4000-8551-000000000001",
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "endedAt": "2026-11-10T15:30:00+00:00",
+                      "jobName": "QA UX 20261114 Façade A",
+                      "seconds": 12600,
+                      "jobNumber": "QA-UX-1",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T12:00:00+00:00"
+                    },
+                    {
+                      "id": null,
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "endedAt": "2026-11-10T20:30:00+00:00",
+                      "jobName": "QA UX 20261114 Façade A",
+                      "seconds": 18000,
+                      "jobNumber": "QA-UX-1",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T15:30:00+00:00"
+                    }
+                  ],
+                  "allocation": "accounting-pro-rata-job",
+                  "jobSeconds": 30600,
+                  "paidSeconds": 29700,
+                  "grossSeconds": 30600,
+                  "travelSeconds": 0,
+                  "warehouseSeconds": 0,
+                  "totalBreakSeconds": 900,
+                  "policyBreakSeconds": 900,
+                  "explicitBreakSeconds": 0,
+                  "automaticRemainderSeconds": 900,
+                  "unallocatedAccountingBreakSeconds": 0
+                },
+                "endedAt": "2026-11-10T20:30:00+00:00",
+                "shiftId": "7da20261-1114-4000-8550-000000000001",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T15:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  },
+                  {
+                    "id": null,
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000002",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T15:30:00+00:00"
+                  }
+                ],
+                "workDate": "2026-11-10",
+                "startedAt": "2026-11-10T12:00:00+00:00",
+                "employeeId": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                "provisional": false,
+                "policyRevision": "df5e3e3e84e7b6ec8d140a97c38fdebe"
+              },
+              "before": {
+                "shift": {
+                  "id": "7da20261-1114-4000-8550-000000000001",
+                  "source": "online",
+                  "status": "review",
+                  "ended_at": "2026-11-10T20:30:00+00:00",
+                  "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+                  "work_date": "2026-11-10",
+                  "created_at": "2026-11-14T21:13:55.933579+00:00",
+                  "started_at": "2026-11-10T12:00:00+00:00",
+                  "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                  "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9",
+                  "auto_break_minutes": 15
+                },
+                "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  }
+                ],
+                "calculationPolicy": {
+                  "enabled": true,
+                  "minutes": 15,
+                  "threshold": 300,
+                  "travelRule": "separate",
+                  "breakOverride": null,
+                  "lunchException": false
+                }
+              }
+            },
+            "actor_id": "27fdec90-d357-4490-8ed6-7ab005bf20ed",
+            "entity_id": "227f82a9-4567-4383-98c4-7689565aa3ab",
+            "created_at": "2026-11-14T21:13:55.933579+00:00",
+            "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "entity_type": "correction",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          },
+          {
+            "id": 25,
+            "action": "management_proposed",
+            "reason": "QA PR38 contention dedicated fixture",
+            "payload": {
+              "after": {
+                "body": {
+                  "at": "2026-11-10T11:00:00-05:00",
+                  "kind": "transfer",
+                  "jobId": "7da20261-1114-4000-8000-000000000002",
+                  "reason": "QA PR38 contention dedicated fixture",
+                  "shiftId": "7da20261-1114-4000-8550-000000000001",
+                  "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                  "workDate": "2026-11-10"
+                },
+                "kind": "transfer",
+                "totals": {
+                  "jobs": [
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "paidSeconds": 13976.470588,
+                      "actualSeconds": 14400,
+                      "accountingBreakSeconds": 423.529412
+                    },
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "paidSeconds": 15723.529412,
+                      "actualSeconds": 16200,
+                      "accountingBreakSeconds": 476.470588
+                    }
+                  ],
+                  "rule": "strictly-over-threshold-v1",
+                  "segments": [
+                    {
+                      "id": "7da20261-1114-4000-8551-000000000001",
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "endedAt": "2026-11-10T16:00:00+00:00",
+                      "jobName": "QA UX 20261114 Façade A",
+                      "seconds": 14400,
+                      "jobNumber": "QA-UX-1",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T12:00:00+00:00"
+                    },
+                    {
+                      "id": null,
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "endedAt": "2026-11-10T20:30:00+00:00",
+                      "jobName": "QA UX 20261114 Façade A",
+                      "seconds": 16200,
+                      "jobNumber": "QA-UX-1",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T16:00:00+00:00"
+                    }
+                  ],
+                  "allocation": "accounting-pro-rata-job",
+                  "jobSeconds": 30600,
+                  "paidSeconds": 29700,
+                  "grossSeconds": 30600,
+                  "travelSeconds": 0,
+                  "warehouseSeconds": 0,
+                  "totalBreakSeconds": 900,
+                  "policyBreakSeconds": 900,
+                  "explicitBreakSeconds": 0,
+                  "automaticRemainderSeconds": 900,
+                  "unallocatedAccountingBreakSeconds": 0
+                },
+                "endedAt": "2026-11-10T20:30:00+00:00",
+                "shiftId": "7da20261-1114-4000-8550-000000000001",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T16:00:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  },
+                  {
+                    "id": null,
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000002",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T16:00:00+00:00"
+                  }
+                ],
+                "workDate": "2026-11-10",
+                "startedAt": "2026-11-10T12:00:00+00:00",
+                "employeeId": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                "provisional": false,
+                "policyRevision": "df5e3e3e84e7b6ec8d140a97c38fdebe"
+              },
+              "before": {
+                "shift": {
+                  "id": "7da20261-1114-4000-8550-000000000001",
+                  "source": "online",
+                  "status": "review",
+                  "ended_at": "2026-11-10T20:30:00+00:00",
+                  "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+                  "work_date": "2026-11-10",
+                  "created_at": "2026-11-14T21:13:55.933579+00:00",
+                  "started_at": "2026-11-10T12:00:00+00:00",
+                  "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                  "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9",
+                  "auto_break_minutes": 15
+                },
+                "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  }
+                ],
+                "calculationPolicy": {
+                  "enabled": true,
+                  "minutes": 15,
+                  "threshold": 300,
+                  "travelRule": "separate",
+                  "breakOverride": null,
+                  "lunchException": false
+                }
+              }
+            },
+            "actor_id": "27fdec90-d357-4490-8ed6-7ab005bf20ed",
+            "entity_id": "034c2c14-8c6f-4fc6-9063-feea20377b73",
+            "created_at": "2026-11-14T21:13:55.933579+00:00",
+            "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "entity_type": "correction",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          },
+          {
+            "id": 26,
+            "action": "management_approved",
+            "reason": "QA PR38 concurrent session mir-pr38-race-a",
+            "payload": {
+              "after": {
+                "shift": {
+                  "id": "7da20261-1114-4000-8550-000000000001",
+                  "source": "online",
+                  "status": "review",
+                  "ended_at": "2026-11-10T20:30:00+00:00",
+                  "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+                  "work_date": "2026-11-10",
+                  "created_at": "2026-11-14T21:13:55.933579+00:00",
+                  "started_at": "2026-11-10T12:00:00+00:00",
+                  "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                  "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9",
+                  "auto_break_minutes": 15
+                },
+                "totals": {
+                  "jobs": [
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "paidSeconds": 12229.411765,
+                      "actualSeconds": 12600,
+                      "accountingBreakSeconds": 370.588235
+                    },
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "paidSeconds": 17470.588235,
+                      "actualSeconds": 18000,
+                      "accountingBreakSeconds": 529.411765
+                    }
+                  ],
+                  "rule": "strictly-over-threshold-v1",
+                  "segments": [
+                    {
+                      "id": "7da20261-1114-4000-8551-000000000001",
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "endedAt": "2026-11-10T15:30:00+00:00",
+                      "jobName": "QA UX 20261114 Façade A",
+                      "seconds": 12600,
+                      "jobNumber": "QA-UX-1",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T12:00:00+00:00"
+                    },
+                    {
+                      "id": "c90f060c-e23c-46e0-b748-c195ae3d5908",
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "endedAt": "2026-11-10T20:30:00+00:00",
+                      "jobName": "QA UX 20261114 Garage B",
+                      "seconds": 18000,
+                      "jobNumber": "QA-UX-2",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T15:30:00+00:00"
+                    }
+                  ],
+                  "allocation": "accounting-pro-rata-job",
+                  "jobSeconds": 30600,
+                  "paidSeconds": 29700,
+                  "grossSeconds": 30600,
+                  "travelSeconds": 0,
+                  "warehouseSeconds": 0,
+                  "totalBreakSeconds": 900,
+                  "policyBreakSeconds": 900,
+                  "explicitBreakSeconds": 0,
+                  "automaticRemainderSeconds": 900,
+                  "unallocatedAccountingBreakSeconds": 0
+                },
+                "revision": "08dfcfd839b823a5d289eaf3f5a94648",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T15:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  },
+                  {
+                    "id": "c90f060c-e23c-46e0-b748-c195ae3d5908",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000002",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Garage B",
+                    "jobNumber": "QA-UX-2",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T15:30:00+00:00"
+                  }
+                ],
+                "provisional": false,
+                "calculationPolicy": {
+                  "enabled": true,
+                  "minutes": 15,
+                  "threshold": 300,
+                  "travelRule": "separate",
+                  "breakOverride": null,
+                  "lunchException": false
+                }
+              },
+              "before": {
+                "shift": {
+                  "id": "7da20261-1114-4000-8550-000000000001",
+                  "source": "online",
+                  "status": "review",
+                  "ended_at": "2026-11-10T20:30:00+00:00",
+                  "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+                  "work_date": "2026-11-10",
+                  "created_at": "2026-11-14T21:13:55.933579+00:00",
+                  "started_at": "2026-11-10T12:00:00+00:00",
+                  "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                  "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9",
+                  "auto_break_minutes": 15
+                },
+                "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  }
+                ],
+                "calculationPolicy": {
+                  "enabled": true,
+                  "minutes": 15,
+                  "threshold": 300,
+                  "travelRule": "separate",
+                  "breakOverride": null,
+                  "lunchException": false
+                }
+              },
+              "proposed": {
+                "at": "2026-11-10T10:30:00-05:00",
+                "kind": "transfer",
+                "jobId": "7da20261-1114-4000-8000-000000000002",
+                "reason": "QA PR38 contention dedicated fixture",
+                "shiftId": "7da20261-1114-4000-8550-000000000001",
+                "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                "policyRevision": "df5e3e3e84e7b6ec8d140a97c38fdebe"
+              }
+            },
+            "actor_id": "9de59777-5df3-454c-9570-249bcda9b8c8",
+            "entity_id": "227f82a9-4567-4383-98c4-7689565aa3ab",
+            "created_at": "2026-11-14T21:14:34.466222+00:00",
+            "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "entity_type": "correction",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          }
+        ],
+        "receipts": [
+          {
+            "intent": {
+              "action": "decide",
+              "payload": {
+                "reason": "QA PR38 concurrent session mir-pr38-race-a",
+                "decision": "approved",
+                "correctionId": "227f82a9-4567-4383-98c4-7689565aa3ab"
+              },
+              "employee": "3980647a-d83a-48ad-9d90-8fc2b314807f"
+            },
+            "result": {
+              "ok": true,
+              "status": "approved",
+              "shiftId": "7da20261-1114-4000-8550-000000000001",
+              "correctionId": "227f82a9-4567-4383-98c4-7689565aa3ab"
+            },
+            "actor_id": "9de59777-5df3-454c-9570-249bcda9b8c8",
+            "created_at": "2026-11-14T21:14:34.466222+00:00",
+            "request_id": "7da20261-1114-4000-8555-000000000001",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          }
+        ],
+        "segments": [
+          {
+            "id": "7da20261-1114-4000-8551-000000000001",
+            "job_id": "7da20261-1114-4000-8000-000000000001",
+            "ended_at": "2026-11-10T15:30:00+00:00",
+            "shift_id": "7da20261-1114-4000-8550-000000000001",
+            "created_by": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "started_at": "2026-11-10T12:00:00+00:00",
+            "next_job_id": null,
+            "segment_type": "job",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          },
+          {
+            "id": "c90f060c-e23c-46e0-b748-c195ae3d5908",
+            "job_id": "7da20261-1114-4000-8000-000000000002",
+            "ended_at": "2026-11-10T20:30:00+00:00",
+            "shift_id": "7da20261-1114-4000-8550-000000000001",
+            "created_by": "9de59777-5df3-454c-9570-249bcda9b8c8",
+            "started_at": "2026-11-10T15:30:00+00:00",
+            "next_job_id": null,
+            "segment_type": "job",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          }
+        ],
+        "corrections": [
+          {
+            "id": "034c2c14-8c6f-4fc6-9063-feea20377b73",
+            "status": "pending",
+            "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+            "decidedAt": null,
+            "decidedBy": null
+          },
+          {
+            "id": "227f82a9-4567-4383-98c4-7689565aa3ab",
+            "status": "approved",
+            "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+            "decidedAt": "2026-11-14T21:14:34.466222+00:00",
+            "decidedBy": "9de59777-5df3-454c-9570-249bcda9b8c8"
+          }
+        ],
+        "otherShifts": "cf5af5690b1ee1f4dd5f81122b5f9552",
+        "otherSegments": "52db57461dcd3f7f4c411e7b075721bb",
+        "originalEvents": [
+          {
+            "id": "7da20261-1114-4000-8552-000000000001",
+            "job_id": "7da20261-1114-4000-8000-000000000001",
+            "source": "online",
+            "payload": {
+              "physical": false,
+              "synthetic": true
+            },
+            "latitude": null,
+            "shift_id": "7da20261-1114-4000-8550-000000000001",
+            "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+            "longitude": null,
+            "server_at": "2026-11-14T21:13:55.933579+00:00",
+            "accuracy_m": null,
+            "distance_m": null,
+            "event_type": "in",
+            "request_id": "7da20261-1114-4000-8553-000000000001",
+            "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "original_at": "2026-11-10T12:00:00+00:00",
+            "zone_status": "unknown",
+            "outside_reason": "",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          },
+          {
+            "id": "7da20261-1114-4000-8552-000000000002",
+            "job_id": "7da20261-1114-4000-8000-000000000001",
+            "source": "online",
+            "payload": {
+              "physical": false,
+              "synthetic": true
+            },
+            "latitude": null,
+            "shift_id": "7da20261-1114-4000-8550-000000000001",
+            "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+            "longitude": null,
+            "server_at": "2026-11-14T21:13:55.933579+00:00",
+            "accuracy_m": null,
+            "distance_m": null,
+            "event_type": "out",
+            "request_id": "7da20261-1114-4000-8553-000000000002",
+            "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "original_at": "2026-11-10T20:30:00+00:00",
+            "zone_status": "unknown",
+            "outside_reason": "",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          }
+        ]
+      }
+    }
+  ],
+  "canonicalAfterReplay": [
+    {
+      "proof": {
+        "audit": [
+          {
+            "id": 24,
+            "action": "management_proposed",
+            "reason": "QA PR38 contention dedicated fixture",
+            "payload": {
+              "after": {
+                "body": {
+                  "at": "2026-11-10T10:30:00-05:00",
+                  "kind": "transfer",
+                  "jobId": "7da20261-1114-4000-8000-000000000002",
+                  "reason": "QA PR38 contention dedicated fixture",
+                  "shiftId": "7da20261-1114-4000-8550-000000000001",
+                  "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                  "workDate": "2026-11-10"
+                },
+                "kind": "transfer",
+                "totals": {
+                  "jobs": [
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "paidSeconds": 12229.411765,
+                      "actualSeconds": 12600,
+                      "accountingBreakSeconds": 370.588235
+                    },
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "paidSeconds": 17470.588235,
+                      "actualSeconds": 18000,
+                      "accountingBreakSeconds": 529.411765
+                    }
+                  ],
+                  "rule": "strictly-over-threshold-v1",
+                  "segments": [
+                    {
+                      "id": "7da20261-1114-4000-8551-000000000001",
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "endedAt": "2026-11-10T15:30:00+00:00",
+                      "jobName": "QA UX 20261114 Façade A",
+                      "seconds": 12600,
+                      "jobNumber": "QA-UX-1",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T12:00:00+00:00"
+                    },
+                    {
+                      "id": null,
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "endedAt": "2026-11-10T20:30:00+00:00",
+                      "jobName": "QA UX 20261114 Façade A",
+                      "seconds": 18000,
+                      "jobNumber": "QA-UX-1",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T15:30:00+00:00"
+                    }
+                  ],
+                  "allocation": "accounting-pro-rata-job",
+                  "jobSeconds": 30600,
+                  "paidSeconds": 29700,
+                  "grossSeconds": 30600,
+                  "travelSeconds": 0,
+                  "warehouseSeconds": 0,
+                  "totalBreakSeconds": 900,
+                  "policyBreakSeconds": 900,
+                  "explicitBreakSeconds": 0,
+                  "automaticRemainderSeconds": 900,
+                  "unallocatedAccountingBreakSeconds": 0
+                },
+                "endedAt": "2026-11-10T20:30:00+00:00",
+                "shiftId": "7da20261-1114-4000-8550-000000000001",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T15:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  },
+                  {
+                    "id": null,
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000002",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T15:30:00+00:00"
+                  }
+                ],
+                "workDate": "2026-11-10",
+                "startedAt": "2026-11-10T12:00:00+00:00",
+                "employeeId": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                "provisional": false,
+                "policyRevision": "df5e3e3e84e7b6ec8d140a97c38fdebe"
+              },
+              "before": {
+                "shift": {
+                  "id": "7da20261-1114-4000-8550-000000000001",
+                  "source": "online",
+                  "status": "review",
+                  "ended_at": "2026-11-10T20:30:00+00:00",
+                  "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+                  "work_date": "2026-11-10",
+                  "created_at": "2026-11-14T21:13:55.933579+00:00",
+                  "started_at": "2026-11-10T12:00:00+00:00",
+                  "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                  "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9",
+                  "auto_break_minutes": 15
+                },
+                "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  }
+                ],
+                "calculationPolicy": {
+                  "enabled": true,
+                  "minutes": 15,
+                  "threshold": 300,
+                  "travelRule": "separate",
+                  "breakOverride": null,
+                  "lunchException": false
+                }
+              }
+            },
+            "actor_id": "27fdec90-d357-4490-8ed6-7ab005bf20ed",
+            "entity_id": "227f82a9-4567-4383-98c4-7689565aa3ab",
+            "created_at": "2026-11-14T21:13:55.933579+00:00",
+            "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "entity_type": "correction",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          },
+          {
+            "id": 25,
+            "action": "management_proposed",
+            "reason": "QA PR38 contention dedicated fixture",
+            "payload": {
+              "after": {
+                "body": {
+                  "at": "2026-11-10T11:00:00-05:00",
+                  "kind": "transfer",
+                  "jobId": "7da20261-1114-4000-8000-000000000002",
+                  "reason": "QA PR38 contention dedicated fixture",
+                  "shiftId": "7da20261-1114-4000-8550-000000000001",
+                  "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                  "workDate": "2026-11-10"
+                },
+                "kind": "transfer",
+                "totals": {
+                  "jobs": [
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "paidSeconds": 13976.470588,
+                      "actualSeconds": 14400,
+                      "accountingBreakSeconds": 423.529412
+                    },
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "paidSeconds": 15723.529412,
+                      "actualSeconds": 16200,
+                      "accountingBreakSeconds": 476.470588
+                    }
+                  ],
+                  "rule": "strictly-over-threshold-v1",
+                  "segments": [
+                    {
+                      "id": "7da20261-1114-4000-8551-000000000001",
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "endedAt": "2026-11-10T16:00:00+00:00",
+                      "jobName": "QA UX 20261114 Façade A",
+                      "seconds": 14400,
+                      "jobNumber": "QA-UX-1",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T12:00:00+00:00"
+                    },
+                    {
+                      "id": null,
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "endedAt": "2026-11-10T20:30:00+00:00",
+                      "jobName": "QA UX 20261114 Façade A",
+                      "seconds": 16200,
+                      "jobNumber": "QA-UX-1",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T16:00:00+00:00"
+                    }
+                  ],
+                  "allocation": "accounting-pro-rata-job",
+                  "jobSeconds": 30600,
+                  "paidSeconds": 29700,
+                  "grossSeconds": 30600,
+                  "travelSeconds": 0,
+                  "warehouseSeconds": 0,
+                  "totalBreakSeconds": 900,
+                  "policyBreakSeconds": 900,
+                  "explicitBreakSeconds": 0,
+                  "automaticRemainderSeconds": 900,
+                  "unallocatedAccountingBreakSeconds": 0
+                },
+                "endedAt": "2026-11-10T20:30:00+00:00",
+                "shiftId": "7da20261-1114-4000-8550-000000000001",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T16:00:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  },
+                  {
+                    "id": null,
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000002",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T16:00:00+00:00"
+                  }
+                ],
+                "workDate": "2026-11-10",
+                "startedAt": "2026-11-10T12:00:00+00:00",
+                "employeeId": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                "provisional": false,
+                "policyRevision": "df5e3e3e84e7b6ec8d140a97c38fdebe"
+              },
+              "before": {
+                "shift": {
+                  "id": "7da20261-1114-4000-8550-000000000001",
+                  "source": "online",
+                  "status": "review",
+                  "ended_at": "2026-11-10T20:30:00+00:00",
+                  "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+                  "work_date": "2026-11-10",
+                  "created_at": "2026-11-14T21:13:55.933579+00:00",
+                  "started_at": "2026-11-10T12:00:00+00:00",
+                  "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                  "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9",
+                  "auto_break_minutes": 15
+                },
+                "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  }
+                ],
+                "calculationPolicy": {
+                  "enabled": true,
+                  "minutes": 15,
+                  "threshold": 300,
+                  "travelRule": "separate",
+                  "breakOverride": null,
+                  "lunchException": false
+                }
+              }
+            },
+            "actor_id": "27fdec90-d357-4490-8ed6-7ab005bf20ed",
+            "entity_id": "034c2c14-8c6f-4fc6-9063-feea20377b73",
+            "created_at": "2026-11-14T21:13:55.933579+00:00",
+            "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "entity_type": "correction",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          },
+          {
+            "id": 26,
+            "action": "management_approved",
+            "reason": "QA PR38 concurrent session mir-pr38-race-a",
+            "payload": {
+              "after": {
+                "shift": {
+                  "id": "7da20261-1114-4000-8550-000000000001",
+                  "source": "online",
+                  "status": "review",
+                  "ended_at": "2026-11-10T20:30:00+00:00",
+                  "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+                  "work_date": "2026-11-10",
+                  "created_at": "2026-11-14T21:13:55.933579+00:00",
+                  "started_at": "2026-11-10T12:00:00+00:00",
+                  "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                  "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9",
+                  "auto_break_minutes": 15
+                },
+                "totals": {
+                  "jobs": [
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "paidSeconds": 12229.411765,
+                      "actualSeconds": 12600,
+                      "accountingBreakSeconds": 370.588235
+                    },
+                    {
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "paidSeconds": 17470.588235,
+                      "actualSeconds": 18000,
+                      "accountingBreakSeconds": 529.411765
+                    }
+                  ],
+                  "rule": "strictly-over-threshold-v1",
+                  "segments": [
+                    {
+                      "id": "7da20261-1114-4000-8551-000000000001",
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000001",
+                      "endedAt": "2026-11-10T15:30:00+00:00",
+                      "jobName": "QA UX 20261114 Façade A",
+                      "seconds": 12600,
+                      "jobNumber": "QA-UX-1",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T12:00:00+00:00"
+                    },
+                    {
+                      "id": "c90f060c-e23c-46e0-b748-c195ae3d5908",
+                      "type": "job",
+                      "jobId": "7da20261-1114-4000-8000-000000000002",
+                      "endedAt": "2026-11-10T20:30:00+00:00",
+                      "jobName": "QA UX 20261114 Garage B",
+                      "seconds": 18000,
+                      "jobNumber": "QA-UX-2",
+                      "nextJobId": null,
+                      "startedAt": "2026-11-10T15:30:00+00:00"
+                    }
+                  ],
+                  "allocation": "accounting-pro-rata-job",
+                  "jobSeconds": 30600,
+                  "paidSeconds": 29700,
+                  "grossSeconds": 30600,
+                  "travelSeconds": 0,
+                  "warehouseSeconds": 0,
+                  "totalBreakSeconds": 900,
+                  "policyBreakSeconds": 900,
+                  "explicitBreakSeconds": 0,
+                  "automaticRemainderSeconds": 900,
+                  "unallocatedAccountingBreakSeconds": 0
+                },
+                "revision": "08dfcfd839b823a5d289eaf3f5a94648",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T15:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  },
+                  {
+                    "id": "c90f060c-e23c-46e0-b748-c195ae3d5908",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000002",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Garage B",
+                    "jobNumber": "QA-UX-2",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T15:30:00+00:00"
+                  }
+                ],
+                "provisional": false,
+                "calculationPolicy": {
+                  "enabled": true,
+                  "minutes": 15,
+                  "threshold": 300,
+                  "travelRule": "separate",
+                  "breakOverride": null,
+                  "lunchException": false
+                }
+              },
+              "before": {
+                "shift": {
+                  "id": "7da20261-1114-4000-8550-000000000001",
+                  "source": "online",
+                  "status": "review",
+                  "ended_at": "2026-11-10T20:30:00+00:00",
+                  "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+                  "work_date": "2026-11-10",
+                  "created_at": "2026-11-14T21:13:55.933579+00:00",
+                  "started_at": "2026-11-10T12:00:00+00:00",
+                  "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+                  "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9",
+                  "auto_break_minutes": 15
+                },
+                "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                "segments": [
+                  {
+                    "id": "7da20261-1114-4000-8551-000000000001",
+                    "type": "job",
+                    "jobId": "7da20261-1114-4000-8000-000000000001",
+                    "endedAt": "2026-11-10T20:30:00+00:00",
+                    "jobName": "QA UX 20261114 Façade A",
+                    "jobNumber": "QA-UX-1",
+                    "nextJobId": null,
+                    "startedAt": "2026-11-10T12:00:00+00:00"
+                  }
+                ],
+                "calculationPolicy": {
+                  "enabled": true,
+                  "minutes": 15,
+                  "threshold": 300,
+                  "travelRule": "separate",
+                  "breakOverride": null,
+                  "lunchException": false
+                }
+              },
+              "proposed": {
+                "at": "2026-11-10T10:30:00-05:00",
+                "kind": "transfer",
+                "jobId": "7da20261-1114-4000-8000-000000000002",
+                "reason": "QA PR38 contention dedicated fixture",
+                "shiftId": "7da20261-1114-4000-8550-000000000001",
+                "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+                "policyRevision": "df5e3e3e84e7b6ec8d140a97c38fdebe"
+              }
+            },
+            "actor_id": "9de59777-5df3-454c-9570-249bcda9b8c8",
+            "entity_id": "227f82a9-4567-4383-98c4-7689565aa3ab",
+            "created_at": "2026-11-14T21:14:34.466222+00:00",
+            "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "entity_type": "correction",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          }
+        ],
+        "receipts": [
+          {
+            "intent": {
+              "action": "decide",
+              "payload": {
+                "reason": "QA PR38 concurrent session mir-pr38-race-a",
+                "decision": "approved",
+                "correctionId": "227f82a9-4567-4383-98c4-7689565aa3ab"
+              },
+              "employee": "3980647a-d83a-48ad-9d90-8fc2b314807f"
+            },
+            "result": {
+              "ok": true,
+              "status": "approved",
+              "shiftId": "7da20261-1114-4000-8550-000000000001",
+              "correctionId": "227f82a9-4567-4383-98c4-7689565aa3ab"
+            },
+            "actor_id": "9de59777-5df3-454c-9570-249bcda9b8c8",
+            "created_at": "2026-11-14T21:14:34.466222+00:00",
+            "request_id": "7da20261-1114-4000-8555-000000000001",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          }
+        ],
+        "segments": [
+          {
+            "id": "7da20261-1114-4000-8551-000000000001",
+            "job_id": "7da20261-1114-4000-8000-000000000001",
+            "ended_at": "2026-11-10T15:30:00+00:00",
+            "shift_id": "7da20261-1114-4000-8550-000000000001",
+            "created_by": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "started_at": "2026-11-10T12:00:00+00:00",
+            "next_job_id": null,
+            "segment_type": "job",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          },
+          {
+            "id": "c90f060c-e23c-46e0-b748-c195ae3d5908",
+            "job_id": "7da20261-1114-4000-8000-000000000002",
+            "ended_at": "2026-11-10T20:30:00+00:00",
+            "shift_id": "7da20261-1114-4000-8550-000000000001",
+            "created_by": "9de59777-5df3-454c-9570-249bcda9b8c8",
+            "started_at": "2026-11-10T15:30:00+00:00",
+            "next_job_id": null,
+            "segment_type": "job",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          }
+        ],
+        "corrections": [
+          {
+            "id": "034c2c14-8c6f-4fc6-9063-feea20377b73",
+            "status": "pending",
+            "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+            "decidedAt": null,
+            "decidedBy": null
+          },
+          {
+            "id": "227f82a9-4567-4383-98c4-7689565aa3ab",
+            "status": "approved",
+            "revision": "0f9bcf18afc8c85a978e4cc92c03e942",
+            "decidedAt": "2026-11-14T21:14:34.466222+00:00",
+            "decidedBy": "9de59777-5df3-454c-9570-249bcda9b8c8"
+          }
+        ],
+        "otherShifts": "cf5af5690b1ee1f4dd5f81122b5f9552",
+        "otherSegments": "52db57461dcd3f7f4c411e7b075721bb",
+        "originalEvents": [
+          {
+            "id": "7da20261-1114-4000-8552-000000000001",
+            "job_id": "7da20261-1114-4000-8000-000000000001",
+            "source": "online",
+            "payload": {
+              "physical": false,
+              "synthetic": true
+            },
+            "latitude": null,
+            "shift_id": "7da20261-1114-4000-8550-000000000001",
+            "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+            "longitude": null,
+            "server_at": "2026-11-14T21:13:55.933579+00:00",
+            "accuracy_m": null,
+            "distance_m": null,
+            "event_type": "in",
+            "request_id": "7da20261-1114-4000-8553-000000000001",
+            "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "original_at": "2026-11-10T12:00:00+00:00",
+            "zone_status": "unknown",
+            "outside_reason": "",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          },
+          {
+            "id": "7da20261-1114-4000-8552-000000000002",
+            "job_id": "7da20261-1114-4000-8000-000000000001",
+            "source": "online",
+            "payload": {
+              "physical": false,
+              "synthetic": true
+            },
+            "latitude": null,
+            "shift_id": "7da20261-1114-4000-8550-000000000001",
+            "device_id": "QA-PR38-CONTENTION-SYNTHETIC",
+            "longitude": null,
+            "server_at": "2026-11-14T21:13:55.933579+00:00",
+            "accuracy_m": null,
+            "distance_m": null,
+            "event_type": "out",
+            "request_id": "7da20261-1114-4000-8553-000000000002",
+            "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "original_at": "2026-11-10T20:30:00+00:00",
+            "zone_status": "unknown",
+            "outside_reason": "",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          }
+        ]
+      }
+    }
+  ],
+  "replay": [
+    {
+      "proof": {
+        "pid": 932213,
+        "result": {
+          "ok": true,
+          "status": "approved",
+          "shiftId": "7da20261-1114-4000-8550-000000000001",
+          "correctionId": "227f82a9-4567-4383-98c4-7689565aa3ab"
+        },
+        "message": "",
+        "session": "mir-pr38-race-a",
+        "sqlstate": "00000",
+        "startedAt": "2026-11-14T21:15:57.891464+00:00",
+        "finishedAt": "2026-11-14T21:15:57.901368+00:00",
+        "elapsedSeconds": 0.009904,
+        "blockedSessions": null
+      }
+    }
+  ],
+  "replayUnchanged": true,
+  "preliminarySerialAttemptExcluded": true,
+  "cleanup": "Both dedicated shifts already closed; pending stale proposals refused through canonical Boss contract; immutable QA events/history retained. No other shifts/segments changed; hashes match preliminary baseline."
+}
