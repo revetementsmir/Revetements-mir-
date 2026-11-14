@@ -23,6 +23,7 @@ jobs:
           node mobile/tools/test-contracts.cjs
           node mobile/tools/test-native-screen-proofs.cjs
           node mobile/tools/test-native-readiness.cjs
+          node mobile/tools/test-native-drawing-target.cjs
           node mobile/tools/test-android-ci-environment.cjs
           node --test mobile/tools/test-auth-flow.cjs tests/mir-team-enrollment-service.cjs tests/mir-team-session-queue.cjs
           npm ci --prefix tools/database
