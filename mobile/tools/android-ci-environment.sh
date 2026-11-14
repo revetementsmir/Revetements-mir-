@@ -29,6 +29,23 @@ PY
 verify_kvm_report() {
  grep -Eiq 'KVM.* is installed and usable' "$1" && ! grep -Eiq '(^|[^[:alnum:]_])(not|unusable)([^[:alnum:]_]|$)' "$1"
 }
+await_home() {
+ local phase=$1 stable=0 window activity
+ record "$phase: awaiting stable HOME focus and resumed Activity"
+ for ((i=0;i<30;i++));do
+  window=$(adb shell dumpsys window)
+  if grep -Eiq 'Application (Not Responding|Error)|AppNotResponding' <<< "$window";then capture home-anr;echo 'System ANR before MIR tests; not dismissed' >&2;return 1;fi
+  activity=$(adb shell dumpsys activity activities)
+  if grep -Eq 'mCurrentFocus=.*com.android.launcher3' <<< "$window" && grep -Eq '(mResumedActivity|topResumedActivity|ResumedActivity:).*com.android.launcher3' <<< "$activity";then
+   ((stable+=1))
+   if ((stable>=2));then record "$phase: HOME focus and resumed Activity stable";return 0;fi
+  else stable=0;fi
+  sleep 1
+ done
+ capture home-not-ready
+ echo "Android HOME is not interactive ($phase)" >&2
+ return 1
+}
 # Sourcing exposes only the report parser to its unit test; CI executes mode host.
 if [[ "${BASH_SOURCE[0]}" != "$0" ]];then return;fi
 case "$mode" in
@@ -80,27 +97,32 @@ case "$mode" in
   record 'boot_completed=1 bootanim=stopped; no input sent'
   adb shell wm dismiss-keyguard
   adb shell am start -W -a android.intent.action.MAIN -c android.intent.category.HOME > "$out/home-launch.txt"
-  focused=false
-  for ((i=0;i<30;i++)); do
-   window=$(adb shell dumpsys window)
-   if grep -Eiq 'Application (Not Responding|Error)|AppNotResponding' <<< "$window";then capture home-anr;echo 'System ANR before MIR tests; not dismissed' >&2;exit 1;fi
-   activity=$(adb shell dumpsys activity activities)
-   if grep -Eq 'mCurrentFocus=.*com.android.launcher3' <<< "$window" && grep -Eq '(mResumedActivity|topResumedActivity|ResumedActivity:).*com.android.launcher3' <<< "$activity";then focused=true;break;fi
-   sleep 1
-  done
-  "$focused" || { capture home-not-ready;echo 'Android HOME is not interactive' >&2;exit 1; }
+  await_home before-input
   record 'HOME focused and resumed; first input permitted'
   adb shell input keyevent KEYCODE_HOME
   record 'HOME key dispatched after focus'
+  await_home after-input
   adb shell settings put global window_animation_scale 0.0
   adb shell settings put global transition_animation_scale 0.0
   adb shell settings put global animator_duration_scale 0.0
-  capture before-tests
-  grep -Eq 'mCurrentFocus=.*com.android.launcher3' "$out/before-tests-window.txt"
-  grep -Eq '(mResumedActivity|topResumedActivity|ResumedActivity:).*com.android.launcher3' "$out/before-tests-activity.txt"
-  test -s "$out/before-tests-ui.xml"
-  grep -q 'package="com.android.launcher3"' "$out/before-tests-ui.xml"
-  if grep -Eiq "isn.t responding|not responding|ne répond pas|AppNotRespondingDialog" "$out/before-tests-ui.xml";then echo 'System ANR before tests; no automatic dismissal' >&2;exit 1;fi
+  presentation_deadline=$((SECONDS+30))
+  presented=false
+  frame=0
+  while ((SECONDS<presentation_deadline));do
+   ((frame+=1))
+   label="home-frame-$frame"
+   capture "$label"
+   if node "$(dirname "$0")/android-ci-home.cjs" "$out" "$label" > "$out/home-presentation.json";then
+    for suffix in .png -window.txt -activity.txt -anr.txt -launcher-memory.txt -ui.xml;do cp "$out/$label$suffix" "$out/before-tests$suffix";done
+    presented=true;break
+   else
+    result=$?
+    if ((result==2));then echo 'System ANR observed in HOME presentation; not dismissed' >&2;exit 1;fi
+   fi
+   record 'HOME frame still transitional; no new input sent'
+   await_home presentation
+  done
+  "$presented" || { echo 'Android HOME did not present a coherent rendered frame' >&2;exit 1; }
   printf 'boot_completed=%s\nbootanim=%s\nHOME=interactive\nANR=not observed\n' "$boot" "$animation" > "$out/ready.txt"
   record 'HOME screenshot/XML verified; MIR installation permitted'
   ;;
