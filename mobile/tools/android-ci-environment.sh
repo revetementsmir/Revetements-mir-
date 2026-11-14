@@ -4,6 +4,7 @@ set -euo pipefail
 out=artifacts/phase11/system
 mkdir -p "$out"
 mode=${1:-capture}
+record() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >> "$out/boot-order.txt"; }
 capture() {
  local label=$1
  local ui_path="/sdcard/mir-ci-system-$label.xml"
@@ -31,6 +32,21 @@ verify_kvm_report() {
 # Sourcing exposes only the report parser to its unit test; CI executes mode host.
 if [[ "${BASH_SOURCE[0]}" != "$0" ]];then return;fi
 case "$mode" in
+ start)
+  # Own the boot sequence: the upstream runner injected MENU immediately after
+  # sys.boot_completed without awaiting Launcher focus (CI 2154 focus ANR).
+  "$0" host
+  : "${ANDROID_AVD_HOME:?A job-private AVD directory is required}"
+  mkdir -p "$ANDROID_AVD_HOME"
+  avdmanager create avd --force --name test --package 'system-images;android-35;default;x86_64' --device pixel_7 <<< no
+  avd_config="$ANDROID_AVD_HOME/test.avd/config.ini"
+  printf '\nhw.cpu.ncore=2\nhw.ramSize=3072\nvm.heapSize=512\nhw.keyboard=no\n' >> "$avd_config"
+  grep -E '^(hw.cpu.ncore|hw.ramSize|vm.heapSize|hw.lcd.(height|width|density)|hw.device.name)=' "$avd_config" > "$out/avd-config.txt"
+  record 'emulator start API35/default/x86_64 Pixel7 cores=2 RAM=3072 heap=512 KVM=on GPU=swiftshader Vulkan=off'
+  "$ANDROID_HOME/emulator/emulator" -port 5554 -avd test -no-window -accel on -gpu swiftshader -feature -Vulkan -no-snapshot -noaudio -no-boot-anim > "$out/emulator-boot.log" 2>&1 &
+  printf '%s\n' "$!" > "$out/emulator.pid"
+  exec "$0" ready
+  ;;
  host)
   rm -f "$out/host-ok.txt"
   emulator_bin="${ANDROID_HOME:?Android SDK required}/emulator/emulator"
@@ -53,14 +69,15 @@ case "$mode" in
  ready)
   if ! test -s "$out/host-ok.txt" || ! grep -qx 'KVM=verified' "$out/host-ok.txt" || ! verify_kvm_report "$out/kvm.txt";then echo 'Host preflight missing or failed; MIR tests refused' >&2;exit 1;fi
   ready=false
-  for ((i=0;i<30;i++)); do
-   boot=$(adb shell getprop sys.boot_completed | tr -d '\r')
-   animation=$(adb shell getprop init.svc.bootanim | tr -d '\r')
+  deadline=$((SECONDS+150))
+  while ((SECONDS<deadline)); do
+   boot=$(timeout 5s adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r') || boot=''
+   animation=$(timeout 5s adb shell getprop init.svc.bootanim 2>/dev/null | tr -d '\r') || animation=''
    if [[ "$boot" == 1 && "$animation" == stopped ]]; then ready=true;break;fi
-   sleep 1
+   sleep 2
   done
   "$ready" || { capture boot-not-ready; echo 'Android boot/animation not complete' >&2;exit 1; }
-  adb shell input keyevent KEYCODE_WAKEUP
+  record 'boot_completed=1 bootanim=stopped; no input sent'
   adb shell wm dismiss-keyguard
   adb shell am start -W -a android.intent.action.MAIN -c android.intent.category.HOME > "$out/home-launch.txt"
   focused=false
@@ -72,12 +89,34 @@ case "$mode" in
    sleep 1
   done
   "$focused" || { capture home-not-ready;echo 'Android HOME is not interactive' >&2;exit 1; }
+  record 'HOME focused and resumed; first input permitted'
+  adb shell input keyevent KEYCODE_HOME
+  record 'HOME key dispatched after focus'
+  adb shell settings put global window_animation_scale 0.0
+  adb shell settings put global transition_animation_scale 0.0
+  adb shell settings put global animator_duration_scale 0.0
   capture before-tests
+  grep -Eq 'mCurrentFocus=.*com.android.launcher3' "$out/before-tests-window.txt"
+  grep -Eq '(mResumedActivity|topResumedActivity|ResumedActivity:).*com.android.launcher3' "$out/before-tests-activity.txt"
   test -s "$out/before-tests-ui.xml"
   grep -q 'package="com.android.launcher3"' "$out/before-tests-ui.xml"
   if grep -Eiq "isn.t responding|not responding|ne répond pas|AppNotRespondingDialog" "$out/before-tests-ui.xml";then echo 'System ANR before tests; no automatic dismissal' >&2;exit 1;fi
   printf 'boot_completed=%s\nbootanim=%s\nHOME=interactive\nANR=not observed\n' "$boot" "$animation" > "$out/ready.txt"
+  record 'HOME screenshot/XML verified; MIR installation permitted'
+  ;;
+ stop)
+  # Only terminate the emulator process started by this job. Never kill by name
+  # or clear app data; the caller preserves the instrumentation exit status.
+  if test -f "$out/emulator.pid";then
+   emulator_pid=$(cat "$out/emulator.pid")
+   if [[ "$emulator_pid" =~ ^[0-9]+$ ]] && test -r "/proc/$emulator_pid/cmdline" && tr '\0' ' ' < "/proc/$emulator_pid/cmdline" | grep -Eq '/emulator/.*-avd test( |$)';then
+    kill "$emulator_pid" 2>/dev/null || true
+    for ((i=0;i<20;i++));do kill -0 "$emulator_pid" 2>/dev/null || break;sleep 1;done
+    kill -KILL "$emulator_pid" 2>/dev/null || true
+    record 'job emulator PID stopped'
+   fi
+  fi
   ;;
  capture) capture failure ;;
- *) echo 'Expected host, ready or capture' >&2;exit 2 ;;
+ *) echo 'Expected start, host, ready, stop or capture' >&2;exit 2 ;;
 esac

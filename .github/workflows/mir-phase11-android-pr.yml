@@ -89,7 +89,7 @@ jobs:
             mobile/android/gradle/wrapper/gradle-wrapper.properties
       - uses: android-actions/setup-android@v3
         with:
-          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0 emulator system-images;android-35;default;x86_64'
       - name: Ressources embarquées et contrats sans réseau métier
         working-directory: mobile
         run: |
@@ -116,8 +116,9 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
       - name: Installation, WebView Android, PDF et mise à jour sans effacement
-        uses: reactivecircus/android-emulator-runner@v2
         env:
+          ANDROID_AVD_HOME: ${{ runner.temp }}/mir-android-avd
+          ANDROID_SERIAL: emulator-5554
           MIR_SANDBOX_EMPLOYEE_EMAIL: ${{ secrets.MIR_SANDBOX_EMPLOYEE_EMAIL }}
           MIR_SANDBOX_EMPLOYEE_PASSWORD: ${{ secrets.MIR_SANDBOX_EMPLOYEE_PASSWORD }}
           MIR_SANDBOX_CHEF_EMAIL: ${{ secrets.MIR_SANDBOX_CHEF_EMAIL }}
@@ -130,35 +131,29 @@ jobs:
           MIR_SANDBOX_BOSS_PASSWORD: ${{ secrets.MIR_SANDBOX_BOSS_PASSWORD }}
           MIR_SANDBOX_ADMIN_EMAIL: ${{ secrets.MIR_SANDBOX_ADMIN_EMAIL }}
           MIR_SANDBOX_ADMIN_PASSWORD: ${{ secrets.MIR_SANDBOX_ADMIN_PASSWORD }}
-        with:
-          api-level: 35
-          target: default
-          arch: x86_64
-          profile: pixel_7
-          cores: 2
-          ram-size: 3072M
-          heap-size: 512M
-          force-avd-creation: true
-          disable-linux-hw-accel: false
-          emulator-options: -no-window -accel on -gpu swiftshader -feature -Vulkan -no-snapshot -noaudio -no-boot-anim
-          pre-emulator-launch-script: mobile/tools/android-ci-environment.sh host
-          disable-animations: true
-          script: |
-            mobile/tools/android-ci-environment.sh host
-            mobile/tools/android-ci-environment.sh ready
-            adb install "$RUNNER_TEMP/mir-version-130001.apk"
-            adb install mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-            mobile/tools/run-instrumentation.sh
-            cp artifacts/phase11/instrumentation.txt artifacts/phase11/webview-tests.txt
-            node mobile/tools/prepare-real-roles.cjs
-            mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#prepareUpdate'
-            cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-prepare.txt
-            adb install -r artifacts/phase11/MIR-TEST-debug.apk
-            mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#verifyUpdate'
-            cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-verify.txt
-            mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirRealRolesTest'
-            cp artifacts/phase11/instrumentation.txt artifacts/phase11/real-roles.txt
-            adb pull /sdcard/Android/data/ca.revetementsmir.equipe.test/files/phase11-proof artifacts/phase11/
+        run: |
+          finish() {
+            status=$?
+            trap - EXIT
+            if [ "$status" -ne 0 ]; then mobile/tools/android-ci-environment.sh capture || true; fi
+            mobile/tools/android-ci-environment.sh stop || true
+            exit "$status"
+          }
+          trap finish EXIT
+          timeout --foreground 180s mobile/tools/android-ci-environment.sh start
+          adb install "$RUNNER_TEMP/mir-version-130001.apk"
+          adb install mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          mobile/tools/run-instrumentation.sh
+          cp artifacts/phase11/instrumentation.txt artifacts/phase11/webview-tests.txt
+          node mobile/tools/prepare-real-roles.cjs
+          mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#prepareUpdate'
+          cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-prepare.txt
+          adb install -r artifacts/phase11/MIR-TEST-debug.apk
+          mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#verifyUpdate'
+          cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-verify.txt
+          mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirRealRolesTest'
+          cp artifacts/phase11/instrumentation.txt artifacts/phase11/real-roles.txt
+          adb pull /sdcard/Android/data/ca.revetementsmir.equipe.test/files/phase11-proof artifacts/phase11/
       - name: Empreinte de l’APK de recette — signature debug uniquement
         run: |
           sha256sum -c artifacts/phase11/SHA256SUMS
