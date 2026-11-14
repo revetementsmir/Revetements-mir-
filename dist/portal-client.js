@@ -45,7 +45,7 @@
       fail('CONFIGURATION', 'L’adresse du portail doit être vérifiée.');
     if (origin && origin !== site.origin) fail('ORIGIN_MISMATCH', 'Ouvrez le portail depuis son adresse MIR officielle.');
     const expectedCallback = site.origin === 'https://revetementsmir.github.io'
-      ? '/Revetements-mir-/chantier.html' : '/chantier.html';
+      ? (config.environment==='test'&&config.callbackPath==='/Revetements-mir-/test/chantier.html'?'/Revetements-mir-/test/chantier.html':'/Revetements-mir-/chantier.html') : '/chantier.html';
     if (config.callbackPath !== expectedCallback) fail('CONFIGURATION', 'Le retour de connexion doit être vérifié.');
     return { ...config, enabled: true, redirectTo: `${site.origin}${expectedCallback}` };
   }
@@ -102,7 +102,7 @@
       SET_INVENTORY: ['stockKey', 'variant', 'quantity', 'unit', 'note'], RESERVE_ORDER: ['orderId'],
       RECORD_DELIVERY: ['orderId', 'quantities', 'note'], CANCEL_REMAINDER: ['orderId', 'quantities', 'note'],
       ASSIGN_JOB: ['jobId', 'memberIds', 'memberId', 'assigned'], ASSIGN_MEMBER_JOBS: ['memberId', 'jobIds'], SET_MEMBER_ACTIVE: ['memberId', 'active'],
-      CREATE_JOB: ['name', 'address'], INVITE_EMPLOYEE: ['email', 'jobIds'], REVOKE_INVITATION: ['invitationId']
+      CREATE_JOB: ['name', 'address'], INVITE_EMPLOYEE: ['email', 'jobIds','name','role'], REVOKE_INVITATION: ['invitationId'], RESEND_INVITATION:['invitationId']
     }[command];
     if (!fields) fail('COMMAND_UNKNOWN', 'Cette action n’est pas proposée dans le portail connecté.');
     const payload = Object.fromEntries(fields.filter(key => raw[key] !== undefined).map(key => [key, clone(raw[key])]));
@@ -167,7 +167,7 @@
       if (status.user?.id === userId) emit({ pending: null }, 'command');
     }
     function clearIdentity(phase = 'signed_out', error = null) {
-      revokeChatURLs();
+      revokeChatURLs();internalOrg=null;
       generation++; readSequence++;
       emit({ phase, user: null, snapshot: null, account:null, pending: null, busy: false, error }, 'auth');
     }
@@ -197,7 +197,7 @@
         if(passwordGate){emit({phase:'password_required',passwordIntent:passwordGate,user:{id:user.id,email:user.email||''},snapshot:null,account:null,error:null},'auth');return null;}
         if (currentGeneration !== generation || sequence !== readSequence || disposed) return null;
         if (status.user?.id && status.user.id !== user.id) {
-          generation++; currentGeneration = generation; emit({ phase:'loading',user:null,account:null,snapshot:null,pending:null }, 'auth');
+          generation++;internalOrg=null; currentGeneration = generation; emit({ phase:'loading',user:null,account:null,snapshot:null,pending:null }, 'auth');
         }
         const epoch = generation;
         emit({ user: { id: user.id, email: user.email || '' }, pending: readPending(user.id) });
@@ -307,10 +307,22 @@
       if(code==='signup_disabled')return new PortalError('SIGNUP_DISABLED','La création de compte est en cours d’activation. Votre panier est conservé.');
       return new PortalError('AUTH_FAILED','La connexion n’a pas pu être confirmée. Vérifiez vos informations et réessayez.');
     }
-    async function signInPassword(email,password){
+    async function signInPassword(email,password,invitation=null){
       requireEnabled();if(config.passwordEnabled===false)fail('PASSWORD_DISABLED','La connexion par mot de passe est en cours d’activation.');
-      const {error}=await sdk.auth.signInWithPassword({email:emailAddress(email),password:String(password||'')});if(error)throw authFailure(error);
+      const {error}=await sdk.auth.signInWithPassword({email:emailAddress(email),password:String(password||''),...(config.teamInvitationsEnabled&&invitation?{options:{mirInvitation:invitation}}:{})});if(error)throw authFailure(error);
       setLogoutIntent(false);return refresh();
+    }
+    async function activateInvitation(token,email,password,requestId=uuid()){
+      requireEnabled();
+      if(config.environment!=='test'||!config.teamEnrollmentEnabled||!config.teamInvitationsEnabled)fail('ENROLLMENT_DISABLED','L’activation des nouveaux accès attend sa configuration TEST.');
+      if(!/^[A-Za-z0-9_-]{43}$/.test(token||'')||!UUID.test(requestId||''))fail('INVITATION_INVALID','Ouvrez votre lien personnel d’invitation.');
+      const epoch=generation;
+      const {data,error}=await sdk.functions.invoke('mir-team-invitations',{body:{action:'activate',token,email:emailAddress(email),password:newPassword(password),requestId}});
+      if(error){let reason;try{reason=await error.context?.json();}catch(_){}throw new PortalError(reason?.error?.code||'AUTH_UNCERTAIN',reason?.error?.message||'L’activation reste à confirmer. Essayez votre connexion avant de recommencer.');}
+      if(!data?.ok||!data.session?.access_token||!data.session?.refresh_token)throw new PortalError(data?.error?.code||'AUTH_UNCERTAIN',data?.error?.message||'L’activation reste à confirmer.');
+      if(epoch!==generation||disposed)fail('SESSION_CHANGED','Cette activation a été annulée dans cet écran. Reconnectez-vous à votre accès.');
+      const result=await sdk.auth.setSession(data.session);if(result.error)throw authFailure(result.error);
+      setLogoutIntent(false);setPasswordGate(null);return refresh();
     }
     async function signUpClient(email,password,address=null){
       requireEnabled();if(!config.signupEnabled)fail('SIGNUP_DISABLED','La création de compte est en cours d’activation. Votre panier est conservé.');
@@ -349,9 +361,9 @@
       requireEnabled();if(status.phase!=='customer_ready'||!UUID.test(id||''))fail('ACCESS_DENIED','Cette adresse ne peut pas être supprimée.');
       if(!await verifiedUser())fail('AUTH_REQUIRED','Reconnectez-vous.');const {error}=await sdk.rpc('mir_account_remove_address',{p_id:id});if(error)throw errorOf(error);await refresh();
     }
-    async function signInGoogle() {
+    async function signInGoogle(invitation=null) {
       requireEnabled(); if (!config.googleEnabled) fail('GOOGLE_DISABLED', 'La connexion Google est en cours d’activation.');
-      const { error } = await sdk.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: redirectFor('google') } });
+      const { error } = await sdk.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: redirectFor('google'),...(config.teamInvitationsEnabled&&invitation?{mirInvitation:invitation}:{}) } });
       if (error) throw errorOf(error);
     }
     async function completeCallback(callback) {
@@ -383,7 +395,10 @@
       emit({ busy: true, error: null }, 'command'); readSequence++;
       try {
         let data, error;
-        if(config.manualInvitations&&['INVITE_EMPLOYEE','REVOKE_INVITATION'].includes(operation.command)){
+        if(config.environment==='test'&&config.teamInvitationsEnabled&&['INVITE_EMPLOYEE','REVOKE_INVITATION','RESEND_INVITATION'].includes(operation.command)){
+          const response=await sdk.rpc('mir_team_invitation',{p_action:operation.command==='INVITE_EMPLOYEE'?'prepare':operation.command==='RESEND_INVITATION'?'resend':'revoke',p_request_id:operation.requestId,p_data:operation.payload});
+          error=response.error;data={ok:!error,result:response.data};
+        }else if(config.manualInvitations&&['INVITE_EMPLOYEE','REVOKE_INVITATION'].includes(operation.command)){
           if(!config.invitationsEnabled)fail('INVITATIONS_DISABLED','Les invitations ne sont pas disponibles.');
           const response=operation.command==='INVITE_EMPLOYEE'
            ?await sdk.rpc('mir_account_create_invitation',{p_email:operation.payload.email,p_job_ids:operation.payload.jobIds||[],p_request_id:operation.requestId})
@@ -417,7 +432,7 @@
         if (error) throw errorOf(error);
         if (epoch !== generation || status.user?.id !== operation.userId) fail('SESSION_CHANGED', 'La session a changé. Retrouvez cette action avec le même compte.', { definitive: false, needsRetry: true });
         if (!data?.result || typeof data.result !== 'object' || Array.isArray(data.result) ||
-          (!['INVITE_EMPLOYEE', 'REVOKE_INVITATION'].includes(operation.command) && !data.snapshot))
+          (!['INVITE_EMPLOYEE', 'REVOKE_INVITATION','RESEND_INVITATION'].includes(operation.command) && !data.snapshot))
           fail('RESPONSE_UNCERTAIN', 'La confirmation de cette action manque. Réessayez la même action.', { definitive: false, needsRetry: true });
         const snapshot = data.snapshot ? checkedSnapshot(data.snapshot, operation.userId) : status.snapshot;
         clearPending(operation.userId);
@@ -461,14 +476,22 @@
       if (!/^[A-Za-z0-9_-]{43}$/.test(token || '')) fail('INVITATION_INVALID', 'Le lien d’invitation n’est pas valide.');
       const user = await verifiedUser();
       if (!user) fail('AUTH_REQUIRED', 'Connectez-vous pour accepter votre invitation.');
-      const { data, error } = await sdk.rpc('mir_portal_accept_invitation', { p_token: token });
+      const { data, error } = await sdk.rpc(config.environment==='test'&&config.teamInvitationsEnabled?'mir_team_accept_invitation':'mir_portal_accept_invitation', { p_token: token });
       if (error) throw errorOf(error, 'L’invitation n’a pas pu être confirmée. Réessayez sans recréer votre accès.');
       await refresh(); return data;
     }
+    async function previewInvitation(token){
+      requireReady();if(config.environment!=='test'||!config.teamEnrollmentEnabled||!/^[A-Za-z0-9_-]{43}$/.test(token||''))fail('INVITATIONS_DISABLED','L’aperçu des courriels attend sa configuration TEST.');
+      const {data,error}=await sdk.functions.invoke('mir-team-invitations',{body:{action:'preview',token}});
+      if(error)throw errorOf(error,'L’aperçu du courriel n’a pas pu être confirmé.');
+      if(!data?.ok||data.emailSent!==false||typeof data.envelope?.text!=='string')fail('RESPONSE_UNCERTAIN','Aucun envoi n’est confirmé.');
+      return data.envelope;
+    }
     async function listInvitations() {
       requireReady();
-      if (status.snapshot.members.find(member => member.id === status.user.id)?.role !== 'admin' || !config.invitationsEnabled) return [];
-      const epoch = generation, { data, error } = await sdk.rpc('mir_portal_list_invitations');
+      if(!config.invitationsEnabled)return [];
+      if(!(config.environment==='test'&&config.teamInvitationsEnabled)&&status.snapshot.members.find(member=>member.id===status.user.id)?.role!=='admin')return [];
+      const epoch = generation, { data, error } = await sdk.rpc(config.environment==='test'&&config.teamInvitationsEnabled?'mir_team_invitations':'mir_portal_list_invitations');
       if (error) throw errorOf(error);
       if (epoch !== generation) return [];
       return Array.isArray(data) ? data : [];
@@ -564,8 +587,30 @@
     async function adminLogisticsAction(action,entity=null,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='admin')fail('ACCESS_DENIED','Admin requis.');const {data,error}=await sdk.rpc('mir_admin_logistics_action',{org:internalOrg,action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function managementAction(action,entity=null,payload={}){requireReady();if(!internalOrg||!['assistant','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès gestion requis.');const {data,error}=await sdk.rpc('mir_management_action',{org:internalOrg,action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function boutiquePriceAction(item,format,action,newPriceCents=null,reason=null){requireReady();if(!internalOrg||!['assistant','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès Prix boutique requis.');const {data,error}=await sdk.rpc('mir_boutique_price_action',{org:internalOrg,item,format:format||'',action,new_price_cents:newPriceCents,reason});if(error)throw errorOf(error);await refresh();return data;}
-    async function punchAction(action,job=null,payload={}){requireReady();if(!internalOrg)fail('ACCESS_DENIED','Accès punch requis.');const id=uuid(),body={...payload,deviceId:payload.deviceId||'web'};try{const {data,error}=await sdk.rpc('mir_punch_action',{org:internalOrg,request_id:id,action,job,payload:body});if(error)throw errorOf(error);await refresh();return data;}catch(error){const settings=status.snapshot?.punch?.settings||{};if(!(settings.offlineEnabled??settings.offline_enabled)||!['in','out','switch','travel_start','travel_arrive'].includes(action))throw error;const queue=JSON.parse(localStorage.getItem('mir_punch_queue_v1')||'[]');queue.push({id,action,job,payload:{...body,source:'offline',originalAt:new Date().toISOString()}});localStorage.setItem('mir_punch_queue_v1',JSON.stringify(queue));return{ok:true,pending:true,serverAt:new Date().toISOString()};}}
-    async function syncPunchQueue(){if(!internalOrg||!navigator.onLine)return 0;const queue=JSON.parse(localStorage.getItem('mir_punch_queue_v1')||'[]'),remaining=[];for(const item of queue){const {error}=await sdk.rpc('mir_punch_action',{org:internalOrg,request_id:item.id,action:item.action,job:item.job,payload:item.payload});if(error)remaining.push(item);}localStorage.setItem('mir_punch_queue_v1',JSON.stringify(remaining));if(queue.length!==remaining.length)await refresh();return queue.length-remaining.length;}
+    const punchQueueKey=(actor,org)=>`mir_punch_queue_v2_${config.projectRef}_${org}_${actor}`;
+    async function punchAction(action,job=null,payload={}){
+      requireReady();if(!internalOrg)fail('ACCESS_DENIED','Accès punch requis.');
+      const actor=status.user.id,org=internalOrg,epoch=generation,id=uuid(),body={...payload,deviceId:payload.deviceId||'web'},key=punchQueueKey(actor,org);
+      try{const {data,error}=await sdk.rpc('mir_punch_action',{org,request_id:id,action,job,payload:body});if(error)throw errorOf(error);if(epoch!==generation||status.user?.id!==actor)fail('SESSION_CHANGED','La session a changé. Vérifiez le pointage avec le compte d’origine.');await refresh();return data;}
+      catch(error){
+        if(epoch!==generation||status.user?.id!==actor||internalOrg!==org)fail('SESSION_CHANGED','La session a changé. Aucun pointage n’est réattribué.');
+        const settings=status.snapshot?.punch?.settings||{};
+        if(!(settings.offlineEnabled??settings.offline_enabled)||!['in','out','switch','travel_start','travel_arrive'].includes(action)||navigator.onLine!==false&&error?.definitive!==false&&error?.code!=='NETWORK_UNCERTAIN')throw error;
+        const queue=JSON.parse(localStorage.getItem(key)||'[]');queue.push({id,actor,org,action,job,payload:{...body,source:'offline',originalAt:new Date().toISOString()}});localStorage.setItem(key,JSON.stringify(queue));return{ok:true,pending:true,serverAt:new Date().toISOString()};
+      }
+    }
+    async function syncPunchQueue(){
+      if(!internalOrg||!navigator.onLine||status.phase!=='ready'||!status.user?.id)return 0;
+      const actor=status.user.id,org=internalOrg,epoch=generation,key=punchQueueKey(actor,org),queue=JSON.parse(localStorage.getItem(key)||'[]'),remaining=[];let sent=0;
+      // v1 had no owner. Retain it for explicit review, never adopt it for a login.
+      for(const item of queue){
+        if(epoch!==generation||status.user?.id!==actor||internalOrg!==org)return sent;
+        if(item.actor!==actor||item.org!==org){remaining.push(item);continue;}
+        const {error}=await sdk.rpc('mir_punch_action',{org,request_id:item.id,action:item.action,job:item.job,payload:item.payload});if(error)remaining.push(item);else sent++;
+      }
+      if(epoch!==generation||status.user?.id!==actor||internalOrg!==org)return sent;
+      localStorage.setItem(key,JSON.stringify(remaining));if(sent)await refresh();return sent;
+    }
     async function punchCorrection(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_correction',{org:internalOrg,correction:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function punchAdmin(action,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_admin',{org:internalOrg,action,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function punchJournal(filters={},pageAfter=null,pageSize=25){requireReady();const {data,error}=await sdk.rpc('mir_punch_journal',{org:internalOrg,filters,page_size:pageSize,page_after:pageAfter});if(error)throw errorOf(error);return data;}
@@ -673,8 +718,8 @@
       if (liveTimer !== null && typeof clearInterval === 'function') clearInterval(liveTimer);
       listeners.clear();
     }
-    return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, harmonySettings, syncHarmonySettings, dispose,
+    return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,activateInvitation,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
+      acceptInvitation, previewInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, harmonySettings, syncHarmonySettings, dispose,
       chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatFileURL, chatPhotoURL,
       helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }

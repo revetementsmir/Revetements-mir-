@@ -48,3 +48,8 @@ body, html body:has(#mir-harmony-header #portal-navigation) { padding-bottom: ca
   .mir-client-links, .mir-client-actions, .mir-home-header-actions,
   [data-client-shortcuts], [aria-label="Navigation client du projet"],
   [data-mir-native-public]) { display: none !important; }
+
+#mir-device-lock{position:fixed;inset:0;z-index:2147483647;display:grid;place-content:center;background:var(--mir-surface,#fff)}
+html[data-mir-device-locked] body>*:not(#mir-device-lock){visibility:hidden!important;pointer-events:none!important}
+#mir-email-toggle{margin-block:12px}#auth-signin-form[hidden]{display:none!important}
+.google-official{width:20px;height:20px;vertical-align:middle;margin-inline-end:10px}
