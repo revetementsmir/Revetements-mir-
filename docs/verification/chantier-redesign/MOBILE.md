@@ -117,3 +117,33 @@ Résultats mesurés à390px :
 Preuves conservées : `artifacts/chantier-redesign/mobile-after-v6/`, notamment `employee-390-message-keyboard.png`, `employee-390-tool-keyboard.png` et `measurements.json`; journal `/tmp/mir-mobile-review-v6.log`. Les passagesv2/v3/v4 restent disponibles. La validation porte sur l’arbre de travail courant avant commit; la CI et l’empaquetage finaux doivent rattacher leurs résultats au SHA final.
 
 Les défauts clavier reproduits sont corrigés dans le rendu Chromium examiné. Il reste à vérifier dans la WebView accélérée : vrais clavier/retour système, refus/annulation caméra et fichiers, rotation, verrou facultatif et session. Samsung physique reste ouvert. Aucun défaut graphique critique empêchant les cinq onglets n’a été observé dans ce dernier contrôle.
+
+## Contrôle natif CI de la tête2bed90f
+
+Source examinée : `2bed90f64f0353c1540efa661b34dba92b22a909`. [Run Android43562227718](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43562227718), job Android132348222102; logs relus par l’expertise Mobile. Il s’agit de l’émulateur API35 accéléré du workflow CI, distinct de l’hôte local sans KVM. Aucun émulateur logiciel local n’a été lancé.
+
+| Vérification CI exécutée | Résultat constaté |
+|---|---|
+| Compilation APK et APK de tests | Réussie |
+| Tests Java et Lint | Réussis dans l’étape de compilation |
+| `MirAndroidTest` | **7 tests réussis** (`OK (7 tests)` à05:39:49UTC) |
+| Préparation de mise à jour | **1 test réussi** à05:39:59UTC |
+| Vérification après mise à jour | **1 test réussi** à05:40:08UTC |
+| `MirRealRolesTest` | Échec dans `inspectMenu`, ancienne ligne71, attente du formulaire d’absence |
+| Travail de chaque rôle natif | Cinq onglets Employé parcourus avant l’échec; le scénario s’arrête au premier rôle, donc Chef et rôles suivants ne sont pas certifiés par cette tentative |
+
+Le diagnostic de l’échec est `phase=ready`, `online=true`, projet `hxtztkmbfpmzrieccwsg`. Les logs ne montrent pas un refus Auth. Le workflow complet reste en échec sur cette tête malgré les contrôles partiels réussis; aucune CI verte globale n’est déduite des7tests.
+
+### Cause du scénario reproduite indépendamment
+
+Le batch natif envoyait trois clics dans une seule évaluation JavaScript : More → Absences → résumé. Or `handleClick` attend maintenant `handleFieldClick(button)` avant de traiter la navigation générique. Même un retourfalse de cette fonction asynchrone cède à la microtâche. Dans le même batch, le bouton Absences est cherché avant que More soit rendu.
+
+Reproduction avec une fixture locale autorisant bien les absences : depuis Réglages, l’ancien batch exact lève **TypeError: Cannot read properties of null (reading 'click')**. Pendant ce batch, More n’est pas encore actif et Absences est absent. Après restitution de la main au navigateur, More devient actif et le bouton apparaît. La navigation en étapes avec attentes DOM ouvre ensuite le formulaire et rend le textarea visible. Preuve conservée : `artifacts/chantier-redesign/mobile-native-diagnostic/navigation-microtask.json`.
+
+La reproduction établit un défaut de synchronisation du test; elle ne justifie aucun affaiblissement du contrôle serveur. L’intégrateur a séparé les actions et ajouté des attentes sur l’onglet actif, le bouton, le formulaire, le résumé ouvert et la visibilité du champ. Les assertions de conservation de note et de confirmation du bouton Retour restent présentes. Le helper Java remonte désormais une erreur JavaScript immédiatement plutôt que d’attendre30secondes sur un résultat absent; il n’imprime pas l’expression contenant les identifiants.
+
+Correctif relu en lecture seule par l’expertise Mobile. Le nouveau passage CI sur sa tête corrigée reste nécessaire pour certifier la suite des rôles. L’expertise n’a modifié aucun fichier source/test. Le responsable conserve la clé personnelle S25 et a rapporté avoir revérifié son certificat public; aucune clé n’a été lue ou copiée ici.
+
+### Limites physiques conservées
+
+Les7tests natifs et les2contrôles de mise à jour apportent une preuve WebView/émulateur réelle, pas une preuve Samsung. Le S25 Ultra installé, sa session et ses données restent intacts. La recette physique, le déverrouillage du Samsung, sa caméra/GPS et le parcours Chef avec ses affectations doivent encore être exécutés sur l’appareil. Aucun iOS, envoi de courriel, publication Pages ou accès production revendiqué.

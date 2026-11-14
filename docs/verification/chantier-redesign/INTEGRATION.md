@@ -36,7 +36,7 @@ Le dessin conserve `production.html?mode=client&source=store&kind=profile` et r�
 ## Vérifications et limites
 
 - `tests/mir-field-postgres.cjs` : 23 groupes locaux PGlite, permissions/NULL role, isolation, jobs fermées, photos, idempotence, réponses forgées refusées, 2 jobs Chef, historique personnel et livraison canonique. Ce sont des tests locaux.
-- `tests/mir-field-redesign-browser.cjs` : 101 contrôles Chromium simulés, 2 rôles / 5 formats ; vrai moteur de tracé à390px ; photo A → erreur → photo B ; rapport photo Chef ; historique paginé ; incident livraison lié ; reçu vide/échec/panier concurrent/double action.
+- `tests/mir-field-redesign-browser.cjs` : 102 contrôles Chromium simulés, 2 rôles / 5 formats ; revisite Chef A→B→A, double clic pendant upload photo ; vrai moteur de tracé à390px ; photo A → erreur → photo B ; rapport photo Chef ; historique paginé ; incident livraison lié ; reçu vide/échec/panier concurrent/double action.
 - `tests/mir-field-cart.cjs` : 3 cas purs d’acquittement ; seuls les quantités et articles effectivement soumis sont retirés.
 - Les suites historiques Today/Chat conservent leurs assertions. `mir-chantier-ux-reviewed.json` versionne explicitement les nouvelles empreintes de client/moteur et de deux fonctions de présentation Punch. Les anciennes empreintes restent dans leurs fichiers d’origine.
 - Relectures Designer, Ergonomie, Android, Harmonisation et Qualité : leurs rapports conservent défauts constatés puis corrections réellement revérifiées. Le développeur intègre seul le code ; aucune modification concurrente de source applicative.

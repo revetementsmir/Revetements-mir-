@@ -1,0 +1,11 @@
+{
+  "extraId": "a26aa58e-e3ac-475c-82cd-2b329d0d9b89",
+  "conversationId": "f9264c96-c4c3-4659-ba32-3766007de9c1",
+  "messageId": "9e9b3316-c101-44b8-bc97-05fec1d1607e",
+  "jobId": "7da20261-1114-4000-8000-000000000002",
+  "toolId": "5757d93c-5dbd-4554-a1e9-7af93d01bb6d",
+  "toolStatus": "in_progress",
+  "responseVisibleToEmployee": true,
+  "extrasInCanonicalDossier": true,
+  "messageInCanonicalDossier": true
+}

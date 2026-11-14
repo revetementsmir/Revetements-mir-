@@ -1,0 +1,27 @@
+{
+  "sourceCommitBefore": "24d29734d68cd3da23c17be8693ddba08abff19f",
+  "checkpointAfter": "2bed90f64f0353c1540efa661b34dba92b22a909",
+  "note": "Rendus locaux simul\u00e9s sauf fichiers hosted- explicitement raccord\u00e9s MIR TEST. Code de travail ult\u00e9rieur avec corrections de reprise; manifestes expertises pr\u00e9cisent les empreintes exactes.",
+  "screens": {
+    "before-home-390.png": "546b9d5f212a13f747fa6a44f8393212b955edc1e3785dba49592f0d3f943588",
+    "hosted-chef-selected-a0-tasks-390.png": "77b7800d78c11cde74722ee0fbc65f5663ab43631eb020e0d5acfcbe2c8c6b08",
+    "hosted-employee-history-correction-390.png": "69b70d72f2e5a306b936cb7eff76153b89219189a41bda21eb63a1dadab8e6de",
+    "chef-messages-390.png": "1a53ffacb50d761e0dacd8547002a88531f2167ef3ff6dd0bea20980b7cf02e2",
+    "before-nav-390.png": "71d597c43d3bb6cc954320b8da2a3fa754bc83197e8ba53b49fd220df744c8d9",
+    "employee-messages-390.png": "c301081ff0abdb039bf16b0c4175094462cc378e8acb53887fda6517adcd4e8f",
+    "after-more-390.png": "17925b65b14f068c0f880cd304e06740430cf1ddad0b2f8d311cd5e21b5f4ddf",
+    "employee-punch-390.png": "72bf28ab7b536cf9b936fa06d2e9cc9326d663947e0775b1bf7a438d826803ee",
+    "chef-day-390.png": "65536878c878e37b7423118eb548b67a8f1b6ddab63e1586fb540417688000cc",
+    "employee-command-390.png": "9e12a025298dfbaaaff5ba8db168f325896ec21498c6537694ffc63e3bb15840",
+    "employee-more-390.png": "17925b65b14f068c0f880cd304e06740430cf1ddad0b2f8d311cd5e21b5f4ddf",
+    "hosted-chef-selected-b-tasks-390.png": "19246948282da02d0972ffd1f9cba08e57abf98cf0fe285166aff4e038a859e9",
+    "hosted-employee-history-oct-390.png": "7b6023e34c22136b915c4f8364ed26076fa12d56210ad3d95487760a22572548",
+    "employee-day-390.png": "5f5445ca2a07cc1e11a9a0c00935866b5076ddffa3b765fed8473d714f251a35",
+    "after-day-390.png": "519844d6736588897658a590b228566f55cb51a60015def66428f94deca9e7df",
+    "hosted-chef-selected-a2-tasks-390.png": "77b7800d78c11cde74722ee0fbc65f5663ab43631eb020e0d5acfcbe2c8c6b08",
+    "chef-command-390.png": "984c2c1a929c56a307610cc45d78d8e49039f1d1677ae1ba9c0bdcd128ea45c2",
+    "before-plus-390.png": "7728cbc33e6da8baf996d2d99026dffc236a13f100431eaa4f22f913cd710065",
+    "chef-punch-390.png": "0ddeaa09c34ae544797c3235fb499bac6db3d4ec8036c2b8cbe2484e7fb7d9da",
+    "chef-more-390.png": "294e860aeb44c33b9d21a81d656a731d8e6324422fb8803c7b824cc31a20a797"
+  }
+}

@@ -12,7 +12,14 @@ import static org.junit.Assert.*;
 /** Required CI integration test, secrets supplied privately at runtime, never in the APK. */
 @RunWith(AndroidJUnit4.class)
 public class MirRealRolesTest extends MirDeviceSetup {
- private Object js(ActivityScenario<MainActivity>s,String expression)throws Exception{CountDownLatch done=new CountDownLatch(1);String[] value={null};s.onActivity(a->a.getBridge().getWebView().evaluateJavascript(expression,r->{value[0]=r;done.countDown();}));assertTrue(done.await(10,TimeUnit.SECONDS));return value[0]==null||value[0].equals("null")?null:new JSONTokener(value[0]).nextValue();}
+ private Object js(ActivityScenario<MainActivity>s,String expression)throws Exception{
+  CountDownLatch done=new CountDownLatch(1);String[] value={null};
+  String body=expression.endsWith(";true")?expression.substring(0,expression.length()-4)+"return true;":"return ("+expression+");";
+  String script="(()=>{try{return {ok:true,value:(()=>{"+body+"})()};}catch(e){return {ok:false,error:e.message};}})()";
+  s.onActivity(a->a.getBridge().getWebView().evaluateJavascript(script,r->{value[0]=r;done.countDown();}));assertTrue(done.await(10,TimeUnit.SECONDS));
+  assertNotNull("JavaScript test returned no result",value[0]);JSONObject result=new JSONObject(value[0]);assertTrue("JavaScript test: "+result.optString("error"),result.getBoolean("ok"));
+  Object resultValue=result.opt("value");return resultValue==JSONObject.NULL?null:resultValue;
+ }
  private void waitFor(ActivityScenario<MainActivity>s,String expression)throws Exception{long end=SystemClock.uptimeMillis()+30000;while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(s,expression)))return;SystemClock.sleep(150);}screenshotSystem("failed-real-roles");fail("MIR TEST Android : résultat serveur non confirmé; état="+js(s,"JSON.stringify({proof:window.realProof,code:window.realProofCode,phase:MIRPortalActiveClient?.getStatus().phase,error:MIRPortalActiveClient?.getStatus().error?.code,online:navigator.onLine,project:MIRPortalConfig.projectRef})"));}
  private void screenshot(ActivityScenario<MainActivity>s,String name)throws Exception{
   // Wait for the rendered WebView frame, not only a changed DOM attribute.
@@ -67,8 +74,12 @@ public class MirRealRolesTest extends MirDeviceSetup {
   waitFor(s,"!!document.querySelector('#harmony-settings-form') && document.querySelector('.settings-status')?.textContent==='Enregistré dans votre compte MIR'");
   js(s,"scrollTo(0,0);true");screenshot(s,"v130002-"+role+"-settings");
   if(role.equals("employe")){
-   js(s,"document.querySelector('#portal-navigation [data-view=more]').click();document.querySelector('[data-view=absences]').click();document.querySelector('.absence-compose summary').click();true");
-   waitFor(s,"!!document.querySelector('#absence-draft-form textarea[name=note]')");
+   js(s,"document.querySelector('#portal-navigation [data-view=more]').click();true");
+   waitFor(s,"document.querySelector('#portal-navigation [data-view=more]')?.getAttribute('aria-current')==='page' && !!document.querySelector('#portal-content [data-view=absences]')");
+   js(s,"document.querySelector('#portal-content [data-view=absences]').click();true");
+   waitFor(s,"!!document.querySelector('#absence-draft-form') && !!document.querySelector('.absence-compose summary')");
+   js(s,"document.querySelector('.absence-compose summary').click();true");
+   waitFor(s,"document.querySelector('.absence-compose')?.open===true && document.querySelector('#absence-draft-form textarea[name=note]')?.getClientRects().length>0");
    js(s,"scrollTo(0,0);true");screenshot(s,"v130002-employee-absence-form");
    js(s,"(()=>{const n=document.querySelector('#absence-draft-form textarea[name=note]');n.value='RECETTE-PHASE11-VISUEL-LOCAL';n.dispatchEvent(new Event('input',{bubbles:true}));n.scrollIntoView({block:'center'});})()");
    assertEquals("RECETTE-PHASE11-VISUEL-LOCAL",js(s,"document.querySelector('#absence-draft-form textarea[name=note]').value"));

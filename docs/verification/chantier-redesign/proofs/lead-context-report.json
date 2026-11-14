@@ -1,0 +1,10 @@
+{
+  "jobId": "7da20261-1114-4000-8000-000000000002",
+  "taskId": "ebddc660-c1a2-4d2b-813f-1262e7d4fa41",
+  "reportId": "0b71c353-ce23-4f7a-b672-8cfafa9d11e7",
+  "photoUploaded": true,
+  "taskAndReportInCanonicalDossier": true,
+  "replayReturnedSameIds": true,
+  "wrongJobDenied": true,
+  "mode": "real QA Chef Auth against MIR TEST"
+}

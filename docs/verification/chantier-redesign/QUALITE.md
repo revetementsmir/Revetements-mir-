@@ -164,3 +164,25 @@ La suite PostgreSQL permanente passe **23groupes**, dont historique self-only et
 Le workflow Android privé TEST appelle les suites PostgreSQL, panier et navigateur de refonte, conserve les tests précédents et collecte les captures fonctionnelles. Cela vérifie la présence des contrôles dans la CI, pas leur résultat distant. La lecture des contrôles GitHub par `gh pr view` reste refusée ici : API GraphQL `Forbidden` après ouverture réseau. Le coordinateur dispose d’un autre outil GitHub et doit rapporter séparément la tête et l’état serveur effectif.
 
 Le formulaire de correction a aussi été vérifié lors d’un changement de journée : avant correction, passer du2au1eroctobre conservait les identifiants des segments du2octobre. L’intégrateur a raccordé la reconstruction des options à la journée choisie. Le recontrôle réel conserve maintenant les seuls segments du1eroctobre, sans aucune soumission. Preuves `hosted-history-day-segments-before.json` (`false`) puis `hosted-history-day-segments-after.json` (`true`). Le refus serveur de segment étranger reste inchangé.
+
+### Chef — sélection réelleA → B → A, défaut trouvé avant correction
+
+Après installation TEST du RPC de lecture explicitement lié à la job, A retourne l’affectationA et sa tâche051; B retourne l’affectationB et les tâches052/une nouvelle tâche distincte. Le contenu réel B comportait zéro membre d’équipe, contre un surA : ce vide est signalé au coordinateur et n’est ni assimilé à une absence ni masqué par la recette. L’hypothèse initiale du harnais « exactement un membre et une tâche par job » a donc été remplacée par la vérification des identifiants QA attendus et de leur séparation; aucun test permanent n’a été changé par cette expertise.
+
+La revisiteA aprèsB révèle toutefois un vrai défaut : le contexte Chef reste sélectionné surB et l’attente deA expire après20secondes. Le cache `user:lead:job` de `hydrateFieldJob` mémoriseA comme déjà chargé et empêche de le relire après le changement versB. Défaut transmis à l’intégrateur, avec demande de scénario permanentA→B→A. Preuves d’étapes `hosted-lead-step-0.json` et `hosted-lead-step-1.json`; journal `hosted-lead-revisit-before.txt` avant recontrôle. La réussite des lecturesA/B séparées ne certifie pas encore cette revisite.
+
+### Recontrôle final Chef après correction et fixture représentative
+
+Le coordinateur a réutilisé une équipe TEST existante pour l’affectationB du jour, avec sa tâche056 et une présence explicitement non confirmée; aucune nouvelle appartenance permanente n’a été ajoutée par cette expertise. Après passage du cache Chef à un verrou de requête en cours, le vrai parcours **A → B → A** réussit :
+
+| Sélection réelle | Affectation retournée | Équipe retournée | Tâche attendue et affichée |
+|---|---|---:|---|
+| A | jobA | 1 membre | QA051 |
+| B | jobB | 3 membres | QA056 |
+| RetourA | jobA | 1 membre | QA051 |
+
+Le nombre3 pourB est la valeur effectivement retournée par le serveur de l’équipe existante, pas un ajout de membres par le harnais. Il ne représente pas trois présences confirmées. La job003 non affectée et l’appel du RPC Chef par l’Employé sont tous deux refusés (`HTTP403`, `42501`). Zéro erreur JavaScript, aucune mutation. Preuves finales `hosted-lead-ui-readonly.json` et `.txt`; les captures `hosted-chef-selected-a0-tasks-390.png`, `hosted-chef-selected-b-tasks-390.png` et `hosted-chef-selected-a2-tasks-390.png` ont réellement été ouvertes. A et retourA sont volontairement le même état retrouvé, B affiche une tâche différente.
+
+Deux incidents du harnais ne sont pas attribués à l’application : un sélecteur de fermeture inexistant a été remplacé par le libellé accessible réel; le test négatif lit maintenant l’organisation des requêtes métier autorisées, car `status.account` est nul pour une session terrain. Les sessions QA ont ensuite été rafraîchies par le coordinateur lorsque le SDK a demandé un renouvellement; le harnais n’a pas élargi son autorisation aux écritures Auth.
+
+Le test navigateur permanent a enfin été rejoué indépendamment avec le scénario de revisite Chef et le double envoi pendant téléversement : **102contrôles réussis** (`functional-102.txt`, captures isolées dans `/tmp/mir-qa-final-102/artifacts/chantier-redesign/functional/`). Ce résultat local ne remplace pas la CI sur la prochaine tête distante. Le coordinateur a indiqué que la CI du commit intermédiaire `2bed90f` comportait encore des échecs Today/Android realroles liés au libellé de confirmation de présence, en correction par l’intégrateur. Cette expertise n’a pas consulté ce résultat directement sur GitHub et n’annonce donc pas une CI finale verte.

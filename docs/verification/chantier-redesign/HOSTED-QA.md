@@ -7,7 +7,7 @@ Projet exclusivement `hxtztkmbfpmzrieccwsg`. Aucun appel production, courriel r�
 Organisation QA `8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9`. Les identifiants de fixtures commencent par `7da20261-1114-4000-8000-`.
 
 - Jobs `000000000001` Façade A et `000000000002` Garage B, affectées aux comptes QA et de certification Employé/Chef. Job `000000000003` réservée au refus d’accès.
-- Deux équipes et affectations du jour par Chef, tâches distinctes, présences non confirmées. L’absence de Punch ne devient pas une absence.
+- Deux jobs avec affectations du jour et tâches distinctes, présences non confirmées. Pour Garage B, la recette Chef réutilise finalement l’équipe TEST existante et ses membres, avec une nouvelle affectation du jour ; aucun membre n’est déplacé. L’absence de Punch ne devient pas une absence.
 - Deux PDF synthétiques d’une page réellement téléversés dans Storage privé et référencés dans `job_documents` : famille/version/auteur/chantier canoniques. Aucune URL publique créée.
 - Deux journées historiques synthétiques Employé, 1er et 2 octobre 2026 : shifts `000000000910/911`, six segments A → déplacement → B, pause automatique de 30 minutes, état à examiner. Ces fixtures ne sont pas des pointages physiques ni une preuve du GPS.
 - Deux commandes strictement fictives **en brouillon**, `000000000950/951`, lignes `000000000960/961`. Aucune commande fournisseur, confirmation de préparation, expédition ou livraison réelle.
@@ -21,14 +21,19 @@ Les preuves JSON assainies sont conservées sous `artifacts/chantier-redesign/ho
 
 | Essai | Mode et résultat | Preuve |
 |---|---|---|
-| Photos, problème et outil | 13 scénarios HTTP authentifiés réussis : photo privée réellement téléversée, avant/pendant/après validés, bonne job, rejeu identique, contenu différent refusé, rôle/organisation/job étrangers et réponse forgée refusés | `field-contracts.json` |
+| Photos, problème et outil | 13 scénarios HTTP authentifiés réussis : photo privée réellement téléversée, étape « avant » validée, bonne job, rejeu identique, contenu différent refusé, rôle/organisation/job étrangers et réponse forgée refusés | `field-contracts.json` |
 | Extra | Extra fictif `a26aa58e-e3ac-475c-82cd-2b329d0d9b89` relu dans le dossier canonique de Garage B, sans approbation ni facturation | `canonical-links.json` |
 | Conversation Adjointe | Message `9e9b3316-c101-44b8-bc97-05fec1d1607e`, conversation privée `f9264c96-c4c3-4659-ba32-3766007de9c1` : même fil dans Message et dossier B de l’Employé, absent du Chef non participant | `canonical-links.json`, captures Qualité |
 | Rapport Chef et tâche | HTTP authentifié : action explicitement job B, vraie pièce jointe privée, rejeu sans duplication, job C refusée, rapport et tâche relus dans dossier B | `lead-context-report.json` |
 | Historique personnel | 7 scénarios HTTP réussis : deux pages distinctes, fin de pagination, jobs/déplacement/pause, filtre job, identité imposée, rôle Chef incapable de lire les deux shifts Employé, organisation étrangère refusée | `personal-history.json` |
 | Incident livraison | 7 scénarios HTTP réussis : commande/ligne/job B, rejeu même ID, contenu changé refusé, mauvaise job/ligne/organisation refusées, activité et commande relues dans dossier B | `delivery-context.json` |
+| Chef A → B → A | Interface réellement raccordée aux API : tâche A051, tâche B056 avec les trois membres effectivement retournés de l’équipe TEST, puis tâche A051 ; accès job C et RPC Chef par Employé refusés 403/42501 ; zéro erreur JavaScript, aucune mutation par le harnais | `qualite/hosted-lead-ui-readonly.json` |
 
 L’expertise Qualité a ensuite ouvert réellement l’interface locale raccordée aux API hébergées, sans mutations cachées : PDF et jobs A/B, extra, fil privé, historique et ouverture de correction. Ce niveau est distinct du navigateur utilisant le transport simulé.
+
+Le contrôle A → B → A a d’abord reproduit un cache erroné qui empêchait de recharger A ; le cache a été remplacé par une protection des requêtes en cours et le parcours a été rejoué. Le changement d’une ancienne journée dans le formulaire de correction conservait aussi les segments précédents : Oct2 → Oct1 remplace maintenant 923/924/925 par 920/921/922, sans écrire de correction pendant la recette de lecture.
+
+L’index existant `team_one_active_membership` impose une seule équipe active par personne. Les insertions de fixture avec `ON CONFLICT DO NOTHING` n’avaient donc pas ajouté l’Employé déjà membre à la nouvelle équipe B. La recette conserve cet index et les affiliations existantes : affectation du jour `000000000035` de l’équipe TEST `a3238a96-afb7-43a2-92c3-e33f23faf41f` à Garage B, Chef du jour E0 et tâche `000000000056`. Le responsable permanent de l’équipe est inchangé. Aucun parcours d’équipe n’est certifié sur une liste vide.
 
 ## Adjointe et Entrepôt
 

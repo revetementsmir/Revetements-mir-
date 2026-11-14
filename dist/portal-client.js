@@ -197,7 +197,7 @@
         if(passwordGate){emit({phase:'password_required',passwordIntent:passwordGate,user:{id:user.id,email:user.email||''},snapshot:null,account:null,error:null},'auth');return null;}
         if (currentGeneration !== generation || sequence !== readSequence || disposed) return null;
         if (status.user?.id && status.user.id !== user.id) {
-          generation++;internalOrg=null; currentGeneration = generation; emit({ phase:'loading',user:null,account:null,snapshot:null,pending:null }, 'auth');
+          generation++;internalOrg=null;leadJobSelection=null; currentGeneration = generation; emit({ phase:'loading',user:null,account:null,snapshot:null,pending:null }, 'auth');
         }
         const epoch = generation;
         emit({ user: { id: user.id, email: user.email || '' }, pending: readPending(user.id) });
