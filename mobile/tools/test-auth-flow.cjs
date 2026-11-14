@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),{webcrypto}=require('node:crypto');
 const Flow=require('../web/auth-flow.cjs'),Policy=require('../web/policy.cjs'),root=path.resolve(__dirname,'../..');
-function harness({role='employee',exchangeError=false,slots=new Map(),team=false,denyInvitation=false,roleState=null}={}){
+function harness({role='employee',exchangeError=false,slots=new Map(),team=false,denyInvitation=false,roleState=null,accountHook=null}={}){
  const requests=[],opened=[],replaced=[];let exchanges=0,accepted=false;
  const jwt=()=>Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url')+'.'+Buffer.from(JSON.stringify({sub:'00000000-0000-4000-8000-000000000005',exp:Math.floor(Date.now()/1000)+3600})).toString('base64url')+'.local-signature';
  const user={id:'00000000-0000-4000-8000-000000000005',email:'employee@example.invalid',aud:'authenticated',created_at:'2026-11-14T00:00:00Z'};
@@ -11,7 +11,7 @@ function harness({role='employee',exchangeError=false,slots=new Map(),team=false
   fetch:async(input,init)=>{const url=String(input);requests.push(url);assert.ok(url.startsWith(Flow.PROJECT+'/'),url);let body={};
    if(url.includes('/token?grant_type=pkce')){exchanges++;body=exchangeError?{error:'invalid_grant',error_description:'Expired'}:{access_token:jwt(),refresh_token:'test-refresh',expires_in:3600,token_type:'bearer',user};}
    else if(url.includes('/rpc/mir_team_accept_invitation')){if(denyInvitation)return new Response(JSON.stringify({code:'42501',message:'Invitation refusée'}),{status:403});accepted=true;body={ok:true};}
-   else if(url.includes('/rpc/mir_account_snapshot'))body={role:roleState?roleState.role:accepted?'employee':role};
+   else if(url.includes('/rpc/mir_account_snapshot')){if(accountHook?.run)return accountHook.run();body={role:roleState?roleState.role:accepted?'employee':role};}
    else if(url.includes('/token?grant_type=password'))body={access_token:jwt(),refresh_token:'test-refresh',expires_in:3600,token_type:'bearer',user};
    else if(url.endsWith('/user'))body=user;
    else if(!url.includes('/recover')&&!url.includes('/logout'))throw Error('Unexpected transport '+url);
@@ -58,4 +58,13 @@ test('native session survives a fresh SDK instance and sign out purges every enc
 
 test('a revoked role purges an already running native session on its next business RPC',async()=>{
  const state={role:'employee'},h=harness({roleState:state});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});assert.ok(h.slots.has('session'));state.role='client';assert.equal((await h.client.rpc('mir_portal_snapshot')).error.code,'42501');assert.equal(h.slots.size,0);
+});
+
+test('a late denied account read from the previous session cannot purge the next login',async()=>{
+ const hook={},h=harness({accountHook:hook});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
+ let release,entered;const started=new Promise(r=>entered=r);hook.run=()=>{hook.run=null;entered();return new Promise(r=>release=r);};
+ const old=h.client.rpc('mir_portal_snapshot');await started;
+ assert.equal((await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'})).error,null);
+ release(new Response(JSON.stringify({code:'42501',message:'Previous session denied'}),{status:403,headers:{'content-type':'application/json'}}));
+ assert.equal((await old).error.code,'SESSION_CHANGED');assert.ok(h.slots.has('session'));assert.ok((await h.client.auth.getSession()).data.session);await h.client.auth.signOut();
 });

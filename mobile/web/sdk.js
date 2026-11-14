@@ -2,7 +2,7 @@ const AuthFlow=require('./auth-flow.cjs');
 const {Native,Policy}=window.MIRAndroid||{};
 if(!Native||!window.MIRSupabase)throw Error('Initialisation Android manquante');
 const raw=window.MIRSupabase,allowedRoles=new Set(['employee','employe','chef','chef_equipe','warehouse','assistant','boss']);
-let client=null,identity=null;
+let client=null,identity=null,sessionEpoch=0;
 const capabilities=window.MIRTeamTestConfig||{};
 async function purgeBrowser(){
  for(const dialog of window.document?.querySelectorAll('dialog[data-mir-native-file]')||[]){dialog.close();dialog.remove();}
@@ -30,14 +30,16 @@ window.MIRSupabase=Object.freeze({createClient(url,key,options={}){
  const forbidden=()=>({data:null,error:{code:'42501',message:'Accès réservé aux comptes équipe MIR autorisés. Aucun rôle Admin ou client dans cette application.'}});
  client.rpc=async(name,args,...rest)=>{
   if(capabilities.teamInvitationsEnabled===true&&name==='mir_team_accept_invitation'&&/^[A-Za-z0-9_-]{43}$/.test(args?.p_token||''))return rpc(name,args,...rest);
-  const account=await rpc('mir_account_snapshot');
+  const epoch=sessionEpoch,account=await rpc('mir_account_snapshot');
+  // A denied read started before sign-out/login must never clear a newer vault.
+  if(epoch!==sessionEpoch)return {data:null,error:{code:'SESSION_CHANGED',message:'La session a changé. Recommencez la lecture.'}};
   if(account.error){if(account.error.code==='42501'||[401,403].includes(account.error.status))await client.auth.signOut();return account;}
   if(!allowedRoles.has(account.data?.role)){await client.auth.signOut();return forbidden();}
   return name==='mir_account_snapshot'?account:rpc(name,args,...rest);
  };
  const signIn=client.auth.signInWithPassword.bind(client.auth),signOut=client.auth.signOut.bind(client.auth);
- client.auth.signInWithPassword=async credentials=>{await signOut({scope:'local'});await purgeBrowser();await Native.clearAuth();identity=null;const result=await signIn(credentials);if(result.error)return result;if(capabilities.teamInvitationsEnabled===true&&/^[A-Za-z0-9_-]{43}$/.test(credentials.options?.mirInvitation||'')){const accepted=await rpc('mir_team_accept_invitation',{p_token:credentials.options.mirInvitation});if(accepted.error){await client.auth.signOut();return accepted;}}const account=await rpc('mir_account_snapshot');if(account.error||!allowedRoles.has(account.data?.role)){await signOut({scope:'local'});await purgeBrowser();await Native.clearAuth();return forbidden();}return result;};
- client.auth.signOut=async()=>{try{return await signOut({scope:'local'});}finally{identity=null;try{await purgeBrowser();}finally{await Native.clearAuth();}}};
+ client.auth.signInWithPassword=async credentials=>{sessionEpoch++;await signOut({scope:'local'});await purgeBrowser();await Native.clearAuth();identity=null;const result=await signIn(credentials);if(result.error)return result;if(capabilities.teamInvitationsEnabled===true&&/^[A-Za-z0-9_-]{43}$/.test(credentials.options?.mirInvitation||'')){const accepted=await rpc('mir_team_accept_invitation',{p_token:credentials.options.mirInvitation});if(accepted.error){await client.auth.signOut();return accepted;}}const account=await rpc('mir_account_snapshot');if(account.error||!allowedRoles.has(account.data?.role)){await signOut({scope:'local'});await purgeBrowser();await Native.clearAuth();return forbidden();}return result;};
+ client.auth.signOut=async()=>{sessionEpoch++;try{return await signOut({scope:'local'});}finally{identity=null;try{await purgeBrowser();}finally{await Native.clearAuth();}}};
  const oauth=client.auth.signInWithOAuth?.bind(client.auth),reset=client.auth.resetPasswordForEmail?.bind(client.auth);
  for(const method of ['signUp','signInWithOAuth','signInWithOtp','resetPasswordForEmail','resend','inviteUserByEmail'])client.auth[method]=async()=>({data:null,error:{code:'ANDROID_TRANSPORT_DISABLED',message:'Aucun envoi de courriel ou connexion externe dans MIR TEST.'}});
  async function pending(flow,invitation=null){await Native.writeAuth({slot:'pending',value:JSON.stringify({flow,expires:Date.now()+15*60*1000,...(capabilities.teamInvitationsEnabled===true&&/^[A-Za-z0-9_-]{43}$/.test(invitation||'')?{invitation}:{})})});}
@@ -69,6 +71,7 @@ window.MIRSupabase=Object.freeze({createClient(url,key,options={}){
  };
  client.auth.onAuthStateChange((event,session)=>{
   const next=session?.user?.id||null;
+  if(event==='SIGNED_OUT'||next!==identity)sessionEpoch++;
   if(event==='SIGNED_OUT'||identity&&next&&identity!==next)purgeBrowser().catch(()=>{});
   identity=next;
  });

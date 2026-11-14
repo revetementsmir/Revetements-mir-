@@ -1,6 +1,6 @@
 # Samsung S25 Ultra — recette Auth toujours ouverte
 
-Aucun essai physique de ce lot n’est déclaré réussi. APK local préparé0.12.1-test/120003; source exacte, empreinte APK et certificat dans la provenance. Signature debug, aucune distribution employés.
+Aucun essai physique de ce lot n’est déclaré réussi. APK local préparé0.12.2-test/120005; source exacte, empreinte APK et certificat dans la provenance. Signature debug, aucune distribution employés.
 
 - [ ] Noter Android/OneUI/WebView, source, versionCode et SHA-256. Comparer le certificat à l’application installée. Arrêter sur conflit; aucune désinstallation ni effacement pour le contourner.
 - [ ] Utiliser le candidat web du SHA vérifié pour activer le compte invité; ne pas prendre l’ancienne page Pages pour les nouveaux écrans non publiés. Courriel exact, aucun choix de rôle, mauvais compte refusé. Pas d’envoi réel autorisé.
