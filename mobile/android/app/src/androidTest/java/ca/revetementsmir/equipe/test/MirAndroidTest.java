@@ -71,6 +71,14 @@ public class MirAndroidTest extends MirDeviceSetup {
    s.onActivity(a->a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));waitFor(s,"innerHeight>innerWidth");
   }
  }
+ @Test public void lockedWindowProtectsRecentsAndRefusesVaultReads()throws Exception{
+  Context c=InstrumentationRegistry.getInstrumentation().getTargetContext();android.content.SharedPreferences prefs=c.getSharedPreferences("mir-device-auth",0);boolean original=prefs.getBoolean("enabled",false);
+  try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
+   waitFor(s,"!!window.MIRAndroid && !!window.MIRPortalActiveClient");prefs.edit().putBoolean("enabled",true).commit();
+   js(s,"window.lockProof='pending';MIRAndroid.Native.lockAuth().then(()=>MIRAndroid.Native.readAuth()).then(()=>window.lockProof='unexpected').catch(()=>window.lockProof='denied');true");waitFor(s,"window.lockProof==='denied'");
+   java.util.concurrent.atomic.AtomicBoolean secure=new java.util.concurrent.atomic.AtomicBoolean(false);s.onActivity(a->secure.set((a.getWindow().getAttributes().flags&android.view.WindowManager.LayoutParams.FLAG_SECURE)!=0));assertTrue("Locked private window must protect recents/screenshots",secure.get());
+  }finally{prefs.edit().putBoolean("enabled",original).commit();}
+ }
  @Test public void nativeVaultEncryptsAndLogoutPurges()throws Exception{
   try(ActivityScenario<MainActivity> s=ActivityScenario.launch(MainActivity.class)){
    waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");

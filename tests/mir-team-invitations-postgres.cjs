@@ -1,40 +1,7 @@
 'use strict';
-const {PGlite}=require('../tools/database/node_modules/@electric-sql/pglite');
-const fs=require('node:fs'),assert=require('node:assert/strict');
-const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
-(async()=>{const db=new PGlite();let count=0;
-try{
-await db.exec(`create role anon;create role authenticated;create schema auth;create schema mir_core;
-create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz);
-create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
-grant usage on schema auth to authenticated;grant execute on function auth.uid() to authenticated;
-create table mir_core.account_settings(singleton boolean,organization_id uuid);
-create table mir_core.memberships(organization_id uuid,user_id uuid,role text,active boolean,primary key(organization_id,user_id));
-create table mir_core.staff_capabilities(organization_id uuid,user_id uuid,staff_role text,display_name text,configured_by uuid,active boolean default true,primary key(organization_id,user_id));
-create table mir_core.jobs(organization_id uuid,id uuid,name text,archived boolean default false);
-create table mir_core.job_memberships(organization_id uuid,job_id uuid,user_id uuid,primary key(organization_id,job_id,user_id));
-create table mir_core.account_invitations(id uuid default gen_random_uuid() primary key,organization_id uuid,email text,token_hash text unique,job_ids uuid[],request_id uuid,created_by uuid,expires_at timestamptz default now()+interval '72 hours',created_at timestamptz default now(),accepted_by uuid,accepted_at timestamptz,revoked_at timestamptz,unique(organization_id,request_id));
-create function public.mir_account_create_invitation(text,uuid[],uuid) returns jsonb language sql as $$select '{}'::jsonb$$;
-create function public.mir_account_revoke_invitation(uuid) returns jsonb language sql as $$select '{}'::jsonb$$;
-create function public.mir_portal_accept_invitation(text) returns jsonb language sql as $$select '{}'::jsonb$$;
-`);
-const original=fs.readFileSync('supabase/migrations/20261108134535_mir_account_customer_auth.sql','utf8');
-const identity=original.slice(original.indexOf('create function mir_core.account_identity()'));
-await db.exec(identity.slice(0,identity.indexOf('end $$;')+7));
-await db.exec(fs.readFileSync('supabase/migrations/20261110120000_operational_roles_phase1.sql','utf8'));
-const migration=fs.readFileSync('supabase/proposals/employee-auth/team-invitations-test.sql','utf8');
-await assert.rejects(()=>db.exec(migration),/Verified MIR TEST/);await db.exec('rollback');
-await db.exec("set mir.target_project='hxtztkmbfpmzrieccwsg'");await db.exec(migration);
-for(let n=1;n<=7;n++)await db.query('insert into auth.users values($1,$2,now())',[id(n),'user'+n+'@example.invalid']);
-await db.query('insert into mir_core.account_settings values(true,$1)',[id(10)]);
-for(const [n,org,role,staff]of [[1,10,'employee','boss'],[2,10,'employee','assistant'],[3,10,'employee','employe'],[4,20,'employee','boss']]){
- await db.query('insert into mir_core.memberships values($1,$2,$3,true)',[id(org),id(n),role]);await db.query('insert into mir_core.staff_capabilities values($1,$2,$3,$4,$2,true)',[id(org),id(n),staff,'Person']);}
-await db.query('insert into mir_core.jobs values($1,$2,$3,false)',[id(10),id(30),'TEST']);
-await db.query('insert into mir_core.jobs values($1,$2,$3,false)',[id(20),id(31),'OTHER']);
-async function actor(n,sql,args=[]){await db.exec('begin');try{await db.query("select set_config('request.jwt.claim.sub',$1,true),set_config('request.jwt.claims',$2,true)",[id(n),JSON.stringify({iss:'https://hxtztkmbfpmzrieccwsg.supabase.co/auth/v1'})]);await db.exec('set local role authenticated');const result=(await db.query(sql,args)).rows[0]?.r;await db.exec('commit');return result;}catch(e){await db.exec('rollback');throw e;}}
-const action=(n,kind,request,data)=>actor(n,'select public.mir_team_invitation($1,$2,$3) r',[kind,id(request),data]);
-const prepare=(n,request,email='user5@example.invalid',role='employe',job=id(30))=>action(n,'prepare',request,{email,name:'Test Person',role,jobIds:[job]});
-const token=r=>new URL(r.activationPath,'https://example.invalid').searchParams.get('invitation');
+const assert=require('node:assert/strict');
+const {createFixture,id}=require('./helpers/mir-team-fixture.cjs');
+(async()=>{const {db,actor,action,prepare,token}=await createFixture();let count=0;try{
 const ok=name=>{count++;console.log('PASS',name);};
 await assert.rejects(()=>prepare(3,100));await assert.rejects(()=>prepare(4,101));await assert.rejects(()=>prepare(2,102,'user5@example.invalid','boss'));await assert.rejects(()=>prepare(1,103,'user5@example.invalid','admin'));await assert.rejects(()=>prepare(1,104,'user5@example.invalid','employe',id(31)));ok('manager/organization/role/job ACL');
 let inv=await prepare(2,105);assert.equal(inv.deliveryStatus,'pending');assert.equal(inv.providerReceipt,undefined);
@@ -53,5 +20,29 @@ await db.query('insert into mir_core.memberships values($1,$2,$3,true)',[id(10),
 await assert.rejects(()=>actor(7,'select public.mir_team_accept_invitation($1) r',[token(inv)]));assert.equal((await db.query('select staff_role from mir_core.staff_capabilities where user_id=$1',[id(7)])).rows[0].staff_role,'employe');ok('incompatible existing role is preserved');
 await db.query('update auth.users set email_confirmed_at=null where id=$1',[id(6)]);inv=await prepare(1,113,'user6@example.invalid');await assert.rejects(()=>actor(6,'select public.mir_team_accept_invitation($1) r',[token(inv)]));ok('unconfirmed email cannot accept');
 await db.exec('begin');await db.query("select set_config('request.jwt.claim.sub',$1,true),set_config('request.jwt.claims',$2,true)",[id(1),JSON.stringify({iss:'https://wrong-project.example/auth/v1'})]);await db.exec('set local role authenticated');await assert.rejects(()=>db.query('select public.mir_team_invitations()'));await db.exec('rollback');ok('foreign identity issuer refused');
+async function enrollment(action,tok,email,request,user=null,tag='a'.repeat(64)){
+ await db.exec('begin');try{await db.exec('set local role service_role');const r=(await db.query('select public.mir_team_enrollment($1,$2,$3,$4,$5,$6) r',[action,tok,email,id(request),user,tag])).rows[0].r;await db.exec('commit');return r;}catch(e){await db.exec('rollback');throw e;}
+}
+inv=await prepare(2,120,'user8@example.invalid');let t8=token(inv);
+await assert.rejects(()=>actor(3,'select public.mir_team_enrollment($1,$2,$3,$4,$5,$6) r',['claim',t8,'user8@example.invalid',id(121),null,'a'.repeat(64)]));
+await assert.rejects(()=>enrollment('claim',t8,'wrong@example.invalid',121));
+let claimed=await enrollment('claim',t8,'user8@example.invalid',121);assert.equal(claimed.userId,null);assert.equal(claimed.invitationId,inv.id);await assert.rejects(()=>enrollment('claim',t8,'user8@example.invalid',122),/en cours/);ok('new identity enrollment is service-only, exact-email and atomically claimed');
+await db.query('insert into auth.users values($1,$2,null,$3)',[id(8),'user8@example.invalid',JSON.stringify({mir_team_invitation:inv.id})]);
+await assert.rejects(()=>enrollment('bind',t8,'user8@example.invalid',121,id(7)));
+assert.equal((await enrollment('bind',t8,'user8@example.invalid',121,id(8))).userId,id(8));
+await assert.rejects(()=>actor(8,'select public.mir_team_accept_invitation($1) r',[t8]));
+await db.query('update auth.users set email_confirmed_at=now() where id=$1',[id(8)]);assert.equal((await actor(8,'select public.mir_team_accept_invitation($1) r',[t8])).ok,true);assert.equal((await enrollment('claim',t8,'user8@example.invalid',123)).existingAccount,true);ok('new unconfirmed identity has no business rights until verification and acceptance; no session replay');
+inv=await prepare(1,124,'user3@example.invalid');assert.equal((await enrollment('claim',token(inv),'user3@example.invalid',125)).existingAccount,true);ok('existing account never enters privileged password enrollment');
+inv=await prepare(2,126,'user9@example.invalid');const old9=token(inv);await enrollment('claim',old9,'user9@example.invalid',127);
+await db.query('insert into auth.users values($1,$2,null,$3)',[id(9),'user9@example.invalid',JSON.stringify({mir_team_invitation:inv.id})]);
+const fresh9=await action(2,'resend',128,{invitationId:inv.id});await assert.rejects(()=>enrollment('bind',old9,'user9@example.invalid',127,id(9)));assert.equal((await enrollment('bind',token(fresh9),'user9@example.invalid',127,id(9))).userId,id(9));
+await action(2,'revoke',129,{invitationId:inv.id});await assert.rejects(()=>enrollment('bind',token(fresh9),'user9@example.invalid',127,id(9)));ok('rotation and revocation invalidate in-flight enrollment capabilities');
+inv=await prepare(2,130,'user10@example.invalid');await enrollment('claim',token(inv),'user10@example.invalid',131);
+await db.query("update mir_core.team_enrollments set lease_until=now()-interval '1 second' where email=$1",['user10@example.invalid']);
+assert.equal((await enrollment('claim',token(inv),'user10@example.invalid',132,null,'b'.repeat(64))).existingAccount,true);assert.equal((await enrollment('claim',token(inv),'user10@example.invalid',132)).email,'user10@example.invalid');ok('ambiguous retry cannot silently change chosen password or duplicate identity');
+assert.equal((await actor(2,'select public.mir_team_invitation_preview($1) r',[token(inv)])).email,'user10@example.invalid');await assert.rejects(()=>actor(3,'select public.mir_team_invitation_preview($1) r',[token(inv)]));await assert.rejects(()=>actor(4,'select public.mir_team_invitation_preview($1) r',[token(inv)]));ok('email preview uses current manager rights and organization, without send status');
+await db.query('update auth.users set email_confirmed_at=now() where id=$1',[id(6)]);
+await db.query("insert into mir_core.account_invitations(organization_id,email,token_hash,job_ids,request_id,created_by) values($1,$2,encode(sha256(convert_to($3,'UTF8')),'hex'),'{}',$4,$5)",[id(20),'user6@example.invalid','z'.repeat(43),id(135),id(4)]);
+await assert.rejects(()=>actor(6,'select public.mir_team_accept_invitation($1) r',['z'.repeat(43)]));assert.equal((await db.query('select count(*)::int n from mir_core.memberships where organization_id=$1 and user_id=$2',[id(20),id(6)])).rows[0].n,0);ok('foreign-organization token cannot create a membership through the acceptance RPC');
 console.log(count+' SQL scenarios groups passed; PGlite fixture, no remote database.');
 }finally{await db.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

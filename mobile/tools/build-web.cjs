@@ -2,6 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
 const root=path.resolve(__dirname,'../..'),out=path.join(root,'mobile/www');
 if(process.env.MIR_ANDROID_ENV&&process.env.MIR_ANDROID_ENV!=='test')throw Error('Seule la recette MIR TEST est autorisée');
+for(const name of ['MIR_TEST_GOOGLE_ENABLED','MIR_TEST_RECOVERY_ENABLED','MIR_TEST_INVITATIONS_ENABLED','MIR_TEST_ENROLLMENT_ENABLED'])if(process.env[name]!==undefined&&!['true','false'].includes(process.env[name]))throw Error('Indicateur TEST invalide : '+name);
 const project='hxtztkmbfpmzrieccwsg',key='sb_publishable_jk8zsTWqQi6Borv44aaDJw_k7JSbzZh';
 const publicModules=new Set(['mir-estimate.js','mir-estimate-drafts.js','mir-estimate-upload.js']);
 const files=cp.execFileSync('git',['ls-files','-z','dist'],{cwd:root,encoding:'utf8'}).split('\0').filter(Boolean);
@@ -16,9 +17,9 @@ for(const file of files){
 }
 // New local assets must also be included before their first commit.
 fs.copyFileSync(path.join(root,'dist/google-signin.svg'),path.join(out,'google-signin.svg'));
-const capabilities={googleEnabled:process.env.MIR_TEST_GOOGLE_ENABLED==='true',recoveryEnabled:process.env.MIR_TEST_RECOVERY_ENABLED==='true',teamInvitationsEnabled:process.env.MIR_TEST_INVITATIONS_ENABLED==='true'};
+const capabilities={googleEnabled:process.env.MIR_TEST_GOOGLE_ENABLED==='true',recoveryEnabled:process.env.MIR_TEST_RECOVERY_ENABLED==='true',teamInvitationsEnabled:process.env.MIR_TEST_INVITATIONS_ENABLED!=='false',teamEnrollmentEnabled:process.env.MIR_TEST_ENROLLMENT_ENABLED!=='false'};
 fs.writeFileSync(path.join(out,'mir-team-test-config.js'),'window.MIRTeamTestConfig=Object.freeze('+JSON.stringify(capabilities)+');');
-const config={enabled:true,accountEnabled:true,passwordEnabled:true,emailEnabled:capabilities.recoveryEnabled,googleEnabled:capabilities.googleEnabled,signupEnabled:false,invitationsEnabled:capabilities.teamInvitationsEnabled,teamInvitationsEnabled:capabilities.teamInvitationsEnabled,manualInvitations:true,documentsEnabled:false,environment:'test',projectRef:project,supabaseUrl:`https://${project}.supabase.co`,publishableKey:key,siteOrigin:'https://localhost',callbackPath:'/chantier.html'};
+const config={enabled:true,accountEnabled:true,passwordEnabled:true,emailEnabled:capabilities.recoveryEnabled,googleEnabled:capabilities.googleEnabled,signupEnabled:false,invitationsEnabled:capabilities.teamInvitationsEnabled,teamInvitationsEnabled:capabilities.teamInvitationsEnabled,teamEnrollmentEnabled:capabilities.teamEnrollmentEnabled,manualInvitations:true,documentsEnabled:false,environment:'test',projectRef:project,supabaseUrl:`https://${project}.supabase.co`,publishableKey:key,siteOrigin:'https://localhost',callbackPath:'/chantier.html'};
 fs.writeFileSync(path.join(out,'portal-config.js'),'window.MIRPortalConfig=Object.freeze('+JSON.stringify(config)+');');
 fs.writeFileSync(path.join(out,'shared-config.js'),'window.MIRSharedConfig=Object.freeze('+JSON.stringify({enabled:true,supabaseUrl:config.supabaseUrl,publishableKey:key})+');');
 fs.writeFileSync(path.join(out,'mir-estimate-config.js'),'window.MIREstimateConfig=Object.freeze({enabled:false,environment:"test",apiBase:null});');

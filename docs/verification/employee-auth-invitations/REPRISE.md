@@ -57,3 +57,7 @@ Ressources régénérées après la dernière correction d’état d’invitatio
 Les26tests Auth/session sont verts sur les dernières sources. Recette web de non-régression du site : sept formats360/390/428/820/1024/1440/2560, inscription client existante, récupération, panier, Google et acceptation simulés réussis;aucun transport réel. Ses14captures générées ont été archivées hors Git puis les images historiques suivies rétablies, sans modifier le travail initial. Il ne s’agit pas du nouvel enrôlement employé sans compte, toujours absent.
 
 Atelier : suivi spécifique créé `71b664cb-723f-43d6-8c8f-8889515fed90`, en cours; feuille de route version95 laissée intacte. Le lot ne doit être marqué terminé qu’après levée des limites listées ci-dessus.
+
+## Suite autorisée et exécutée — 14 novembre 2026
+
+Le diagnostic Mir2 a identifié une connexion authentifiée à un autre projet. La connexion existante **MIR** a donné accès à MIR TEST. Frederick a ensuite explicitement autorisé l’installation du SQL et de la fonction **uniquement sur MIR TEST**, sans courriel ni Pages. L’activation sans compte, les contrôles hébergés et le nouvel APK sont détaillés dans [BILAN-20261114.md](BILAN-20261114.md); les limites historiques ci-dessus ne décrivent donc plus toutes l’état courant. Google et la recette physique restent ouverts. Historique conservé.

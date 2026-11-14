@@ -1,16 +1,3 @@
 'use strict';
-// Pure renderer only: no provider, credential, database or transport.
-const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function renderInvitation({name,organization,manager,expiresAt,activationUrl,helpEmail,preview=false}){
- for(const value of [name,organization,manager])if(typeof value!=='string'||!value.trim()||value.length>160)throw Error('Identité de courriel invalide');
- const url=new URL(activationUrl),expires=new Date(expiresAt);
- const expected=preview?'https://example.invalid':'https://revetementsmir.github.io';
- if(url.origin!==expected||url.username||url.password||url.hash||(!preview&&url.pathname!=='/Revetements-mir-/test/chantier.html')||!Number.isFinite(expires.getTime()))throw Error('Destination TEST ou expiration invalide');
- if(!preview&&(!/^[A-Za-z0-9_-]{43}$/.test(url.searchParams.get('invitation')||'')||url.searchParams.getAll('invitation').length!==1))throw Error('Lien personnel invalide');
- if(!/^[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(helpEmail||''))throw Error('Adresse d’aide à vérifier');
- const expiration=new Intl.DateTimeFormat('fr-CA',{timeZone:'America/Toronto',dateStyle:'long',timeStyle:'short'}).format(expires)+' (heure de Toronto)';
- const subject='Votre accès personnel à l’équipe MIR TEST';
- const lines=[`Bonjour ${name},`,`${manager} a préparé votre accès à ${organization}.`,`Activez votre accès avant le ${expiration} :`,url.href,'Utilisez exactement l’adresse invitée avec Google ou le parcours courriel disponible. Aucun mot de passe temporaire n’est envoyé.','Ce lien est personnel. Si le lien est expiré, demandez à votre responsable de le renouveler.',`Vous n’attendiez pas cette invitation ? Ne l’utilisez pas. Aide : ${helpEmail}.`,'MIR TEST : environnement de recette. Aucun APK de ce lot n’est autorisé à la distribution aux employés.'];
- return {subject,text:lines.join('\n\n'),html:`<!doctype html><html lang="fr-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>${subject}</title><style>body{margin:0;background:#edf1ec;color:#223128;font:16px/1.6 Arial,sans-serif}.card{max-width:560px;margin:24px auto;padding:24px;background:#fff;border:1px solid #ccd6ce}h1{font-size:25px;line-height:1.3}.cta{display:inline-block;padding:14px 20px;background:#31573b;color:#fff!important;text-decoration:none;border-radius:6px}a{color:#31573b;overflow-wrap:anywhere}.note{font-size:14px}@media(prefers-color-scheme:dark){body{background:#18231c;color:#edf1ec}.card{background:#223128;border-color:#688170}a{color:#bfe3ad}.cta{background:#31573b;color:#fff}}</style></head><body><main class="card"><p><strong>MIR · ÉQUIPE · TEST</strong></p><h1>Votre accès personnel</h1><p>${esc(lines[0])}</p><p>${esc(lines[1])}</p><p>Activez votre accès avant le <strong>${esc(expiration)}</strong>.</p><p><a class="cta" href="${esc(url.href)}">Activer mon accès MIR TEST</a></p><p>${esc(lines[4])}</p><p>${esc(lines[5])}</p><p>Vous n’attendiez pas cette invitation ? Ne l’utilisez pas. <a href="mailto:${esc(helpEmail)}">Contacter votre responsable</a>.</p><p class="note">${esc(lines[7])}</p></main></body></html>`};
-}
-module.exports={renderInvitation};
+// Compatibility entry for the existing local renderer tests (Node24).
+module.exports=require('../../functions/_shared/team-invitation-email.mjs');

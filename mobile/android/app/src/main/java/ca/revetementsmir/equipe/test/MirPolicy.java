@@ -36,6 +36,7 @@ public final class MirPolicy {
             if (!"https".equals(u.getScheme()) || !TEST_HOST.equals(u.getHost()) || u.getUserInfo() != null || (u.getPort() != -1 && u.getPort() != 443)) return false;
             String path = u.normalize().getPath();
             if (path.startsWith("/rest/v1/rpc/mir_client_") || path.startsWith("/rest/v1/rpc/mir_estimate_")) return false;
+            if (path.equals("/functions/v1/mir-team-invitations")) return true;
             if (path.startsWith("/functions/") || path.contains("..") || path.contains("\\")) return false;
             if (path.startsWith("/auth/")) return java.util.Arrays.asList("/auth/v1/token", "/auth/v1/user", "/auth/v1/logout", "/auth/v1/recover").contains(path);
             return path.startsWith("/rest/v1/") || path.startsWith("/storage/v1/") || path.startsWith("/realtime/v1/");

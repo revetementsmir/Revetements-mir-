@@ -16,14 +16,14 @@ public class MirUpgradeTest extends MirDeviceSetup {
  @Test public void prepareUpdate()throws Exception{
   File file=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir(),"phase11-roles.json");JSONObject config=new JSONObject(new String(java.nio.file.Files.readAllBytes(file.toPath()),java.nio.charset.StandardCharsets.UTF_8));assertEquals("hxtztkmbfpmzrieccwsg",config.getString("project"));JSONObject employee=config.getJSONArray("roles").getJSONObject(0);assertEquals("employe",employee.getString("role"));
   try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
-   assertEquals(120001,version());waitFor(s,"!!window.MIRPortalActiveClient");
+   assertEquals(120003,version());waitFor(s,"!!window.MIRPortalActiveClient");
    js(s,"window.upgradeProof='pending';MIRPortalActiveClient.signInPassword("+JSONObject.quote(employee.getString("email"))+","+JSONObject.quote(employee.getString("password"))+").then(()=>window.upgradeProof='ready').catch(()=>window.upgradeProof='failed');true");waitFor(s,"window.upgradeProof==='ready' && MIRPortalActiveClient.getStatus().snapshot.operations.role==='employe'");
    assertEquals("true",js(s,"localStorage.setItem('mir_update_probe','RECETTE-PHASE11-LOCAL');localStorage.getItem('mir_update_probe')==='RECETTE-PHASE11-LOCAL'"));
   }
  }
  @Test public void verifyUpdate()throws Exception{
   try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
-   assertEquals(120002,version());waitFor(s,"window.MIRPortalActiveClient?.getStatus().phase==='ready'");
+   assertEquals(120004,version());waitFor(s,"window.MIRPortalActiveClient?.getStatus().phase==='ready'");
    assertEquals("\"employe\"",js(s,"MIRPortalActiveClient.getStatus().snapshot.operations.role"));
    assertEquals("\"RECETTE-PHASE11-LOCAL\"",js(s,"localStorage.getItem('mir_update_probe')"));
   }

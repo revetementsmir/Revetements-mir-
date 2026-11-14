@@ -16,6 +16,8 @@ test('Request boundary refuses production, lookalikes, cleartext and mail endpoi
  for(const url of ['https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/','http://'+Policy.TEST+'/rest/v1/','https://'+Policy.TEST+'.evil.example/rest/v1/','https://user@'+Policy.TEST+'/rest/v1/','https://'+Policy.TEST+'/auth/v1/otp','https://'+Policy.TEST+'/functions/v1/send','https://smtp.example/'])assert.equal(Policy.allowedRequest(url),false,url);
  assert.equal(Policy.allowedRequest('https://'+Policy.TEST+'/rest/v1/rpc/mir_account_snapshot'),true);
  assert.equal(Policy.allowedRequest('https://'+Policy.TEST+'/auth/v1/recover'),true);
+ assert.equal(Policy.allowedRequest('https://'+Policy.TEST+'/functions/v1/mir-team-invitations'),true);
+ assert.equal(Policy.allowedRequest('https://'+Policy.TEST+'/functions/v1/mir-team-invitations/other'),false);
  assert.equal(Policy.allowedRequest('https://gccltmaulvrnthrbnrpd.supabase.co/auth/v1/recover'),false);
 });
 test('Only enumerated local routes enter the WebView; signed URLs stay out of external browser',()=>{
