@@ -23,6 +23,7 @@ jobs:
           node mobile/tools/test-contracts.cjs
           node mobile/tools/test-native-screen-proofs.cjs
           node mobile/tools/test-native-readiness.cjs
+          node mobile/tools/test-android-ci-environment.cjs
           node --test mobile/tools/test-auth-flow.cjs tests/mir-team-enrollment-service.cjs tests/mir-team-session-queue.cjs
           npm ci --prefix tools/database
           node tests/mir-team-invitations-postgres.cjs
@@ -134,8 +135,16 @@ jobs:
           target: default
           arch: x86_64
           profile: pixel_7
+          cores: 2
+          ram-size: 3072M
+          heap-size: 512M
+          force-avd-creation: true
+          disable-linux-hw-accel: false
+          emulator-options: -no-window -accel on -gpu swiftshader -feature -Vulkan -no-snapshot -noaudio -no-boot-anim
+          pre-emulator-launch-script: mobile/tools/android-ci-environment.sh host
           disable-animations: true
           script: |
+            mobile/tools/android-ci-environment.sh ready
             adb install "$RUNNER_TEMP/mir-version-130001.apk"
             adb install mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             mobile/tools/run-instrumentation.sh
