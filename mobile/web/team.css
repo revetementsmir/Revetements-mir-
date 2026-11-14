@@ -53,3 +53,8 @@ body, html body:has(#mir-harmony-header #portal-navigation) { padding-bottom: ca
 html[data-mir-device-locked] body>*:not(#mir-device-lock){visibility:hidden!important;pointer-events:none!important}
 #mir-email-toggle{margin-block:12px}#auth-signin-form[hidden]{display:none!important}
 .google-official{width:20px;height:20px;vertical-align:middle;margin-inline-end:10px}
+
+html body[data-field-shell=true]{padding-top:calc(68px + env(safe-area-inset-top,0px))!important;padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))!important}
+body[data-field-shell=true] #mir-native-state{position:static!important;min-height:0!important;padding:4px 16px;font-size:11px}
+body[data-field-shell=true] #mir-device-lock-option{display:none}
+body[data-field-shell=true] #portal-content:has(#harmony-settings-form) #mir-device-lock-option{display:block}

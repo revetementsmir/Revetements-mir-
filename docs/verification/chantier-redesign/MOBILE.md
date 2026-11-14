@@ -1,0 +1,119 @@
+# Mobile Android — revue de la refonte chantier
+
+## Ce qu’il faut faire
+
+Conserver le coffre et les permissions existants, puis vérifier la nouvelle expérience Employé/Chef dans la WebView Android : cinq onglets, dossier job, formulaires, caméra/fichiers, GPS ponctuel, clavier et retour. Cette revue ne modifie aucun code applicatif, test, clé ou donnée. Le seul intégrateur applicatif est le spécialiste full-stack.
+
+Méthode Atelier **Mobile Android, iOS et PWA 1.0.0** chargée par le responsable et relue dans `/tmp/mir-method-mobile-platforms.json`. Checkout de revue : `/workspace/Revetements-mir-chantier-ux`, branche `codex/refonte-chantier-employe-chef`, base `24d29734d68cd3da23c17be8693ddba08abff19f`. Le suivi Atelier reste à synchroniser par le responsable après collecte des résultats.
+
+## Les étapes
+
+1. Examiner les interfaces natives existantes et les règles d’empaquetage.
+2. Transmettre les défauts et contraintes reproductibles au seul intégrateur.
+3. Examiner les rendus après intégration aux formats 360/390/430, puis les états clavier/paysage/texte agrandi.
+4. Faire exécuter la compilation et la recette instrumentée par le responsable sur un environnement Android accéléré.
+5. Remettre un paquet personnel signé par la clé TEST existante seulement après inspection des cinq écrans. L’installation Samsung et son ancienne session restent indépendantes de la revue navigateur.
+
+## Comment savoir que c’est terminé
+
+| Contrôle | Attendu | État de cette revue |
+|---|---|---|
+| Application et données existantes | Aucun remplacement/désinstallation/effacement; app personnelle distincte et même clé pour ses mises à jour | Contraintes transmises; aucune installation effectuée |
+| Navigation | Cinq onglets visibles et stables; retour interne avant réduction de l’application | À vérifier après intégration |
+| Clavier | Champ et action Envoyer/Confirmer accessibles, sans superposition barre basse | À vérifier après intégration |
+| Caméra/fichiers | Permission à l’usage, annulation sans envoi, reprise et contexte acteur/job inchangés | Interfaces lues; essai natif non exécuté |
+| Itinéraire et GPS Punch | Lien itinéraire sans mutation; position seulement sur action explicite | Séparation confirmée dans le code de base |
+| Session | Restauration, rôle serveur, purge au logout et refus de réponses anciennes conservés | Code Auth de base relu; aucune réécriture demandée |
+| Verrou système | Masque privé pendant verrouillage/annulation, reprise unique | Code de base relu; recette native/physique à refaire |
+| Plans/PDF | Flux privé; annulation sélecteur sans altération du PDF | Interfaces lues; essai natif non exécuté |
+| Émulateur | Accélération KVM exploitable; aucun émulateur logiciel prolongé | `/dev/kvm` absent sur cet hôte; aucun émulateur lancé |
+| Samsung S25 Ultra | Installation personnelle conservatrice puis parcours réel | Toujours ouvert; pas de prétention physique |
+
+## Détails pour le chat
+
+### Constats bloquants pour la nouvelle interface
+
+**1. Réserve basse incompatible avec la nouvelle barre.** `mobile/web/team.css` impose actuellement `body { padding-bottom: calc(env(safe-area-inset-bottom) + 24px) !important; }`. La barre nouvelle doit réserver sa hauteur réelle et la zone système, dans le seul périmètre Employé/Chef. Les dernières actions et messages ne doivent pas être cachés. Les styles communs des autres rôles restent inchangés.
+
+**2. En-tête/bandeau et aide liés à l’ancien menu.** `mobile/web/bootstrap.js` injecte un bandeau réseau fixe avec 30px supplémentaires en haut et ajoute l’aide métier dans `#mir-harmony-menu`. La nouvelle composition compacte doit porter un état réseau discret et un accès Aide réel sans dépendre du gros menu supprimé. Les règles natives masquant les liens publics restent en place.
+
+**3. Retour Android sans connaissance des vues internes.** Le gestionnaire natif ferme un dialogue puis utilise `history.back()` ou minimise l’application. La navigation `setView()` de base n’est pas un historique complet. Exposer un traitement de retour du shell : formulaire/dialogue → objet parent → onglet parent, avec confirmation d’abandon uniquement pour une saisie effectivement non sauvegardée. Ne pas minimiser l’application quand un sous-écran peut être fermé.
+
+**4. Clavier : champ seul ≠ formulaire utilisable.** `keepInputVisible()` surveille `visualViewport` et recentre le champ actif. Il ne garantit pas que le compositeur et Envoyer restent visibles ensemble. Vérifier le pied de formulaire et le compositeur à 360px de hauteur utile, avec barre Android et gros texte. Les règles CSS `.message-thread > form` utilisent encore un décalage fixe de 74px : le relier au nouveau shell.
+
+### Risques à vérifier pendant l’intégration
+
+**Saisie remplacée pendant l’actualisation.** Le bootstrap décrit un rafraîchissement de snapshot toutes les 15 secondes. Son mécanisme de mémoire ne protège que `#absence-draft-form`. Les formulaires photo/extra/problème/bris/rapport ont besoin d’un état explicite lié à l’acteur et à la job. Garder une saisie sur erreur; ne la retirer qu’après confirmation serveur ou abandon explicite.
+
+**Champ fichier devenu obsolète.** Le bridge garde une référence au champ `input[type=file]` durant l’attente de caméra/sélecteur, puis affecte `input.files` et émet `change`. Si un rendu détache le champ, le résultat peut être perdu silencieusement. Figer le contexte de formulaire/acteur/job et traiter le retour sur le formulaire courant autorisé; refuser une réattribution après changement de compte ou de job. Ceci est un risque établi par lecture du flux, pas un échec physique reproduit.
+
+**Effacement trop tôt du brouillon absence.** La mémoire native de l’absence est remise à zéro dès l’événement `submit`. Ce n’est pas un accusé de réception serveur. Ne pas reprendre ce modèle pour les nouveaux formulaires; sur erreur, l’utilisateur doit retrouver ses champs et pièces en attente. Le comportement réel du formulaire absence sur retour réseau est à recetter.
+
+### Protections natives à préserver
+
+- `MainActivity` limite navigation et requêtes par `MirPolicy`, refuse le contenu mixte et les ressources distantes comme origine du bridge.
+- `windowSoftInputMode="adjustResize"` est présent; orientation et recréation d’Activity doivent rester vérifiées.
+- `navigator.geolocation.getCurrentPosition` passe par Capacitor avec demande de permission et mesure ponctuelle. `watchPosition` est refusé. L’itinéraire ouvre un lien HTTPS autorisé sans appel Punch.
+- `capturePhoto` et `pickFile` renvoient un résultat/annulation; aucun téléversement natif automatique. Formats et taille sont bornés, les photos sont lues via un FileProvider propre à l’application.
+- Le PDF privé vérifie taille/signature, propose ouvrir/enregistrer/partager et conserve les bytes hors Binder. Changement de session contrôlé avant remise du fichier.
+- Le coffre chiffré possède des emplacements distincts session/PKCE/attente. Le SDK revalide les rôles côté serveur. La génération de session protège le compte suivant contre une réponse de permissions ancienne.
+- Le verrou système est facultatif, avec masque DOM et `FLAG_SECURE` pendant verrouillage. Il ne reçoit ni biométrie ni NIP système.
+- Google et récupération restent désactivés. Le paquet personnel ne doit pas reprendre les liens OAuth de l’ancien paquet.
+
+### Matrice de preuves à compléter
+
+| Niveau | Formats/scénarios | Preuve requise |
+|---|---|---|
+| Chromium, simulation explicitement identifiée | 360×780,390×844,430×932; cinq onglets et dossier; clair/sombre/grand texte; clavier simulé et erreur réseau | Captures différentes de vrais écrans et assertions des éléments visibles |
+| WebView Android, CI accélérée | API35/36; toucher, clavier système, retour, rotation, permission refusée/annulée, PDF, reprise/session | Rapport instrumenté sur le SHA final; aucun succès déduit d’une compilation |
+| Samsung physique | S25 Ultra réel, OneUI/WebView relevés; accès TEST, fermer/rouvrir, redémarrer, verrou facultatif, logout | Réponses et captures de Frederick sans mot de passe/jeton; recette ouverte tant que non exécutée |
+
+### Résultat et limites actuels
+
+Les recommandations ci-dessus ont été transmises directement au responsable et à l’intégrateur, sans demander à Frederick de faire le relais. Aucun fichier source ou test modifié par cette expertise. Aucun build concurrent, aucune clé lue/copée et aucune opération Supabase effectuée. L’absence de KVM a été vérifiée par lecture de `/dev/kvm`; aucun émulateur logiciel n’a été lancé. Les rendus refondus n’étaient pas encore disponibles à la rédaction initiale : leur contrôle reste explicitement à compléter.
+
+### Captures avant effectivement exécutées et inspectées
+
+Commande : `NODE_PATH=/workspace/Revetements-mir-pr31/mobile/node_modules MIR_CHROMIUM_BIN=/usr/bin/chromium MIR_TODAY_BEFORE=1 MIR_TODAY_PROOF_DIR=artifacts/chantier-redesign/mobile-before node tests/mir-today-browser.cjs`.
+
+Résultat : succès, douze rendus (Employé/Chef aux formats 360,390,430,768,1024,1440). Scénario QA local injecté avec réseau externe intercepté : aucun compte réel et aucune mutation serveur. Les captures `before-chef-390.png` et `before-employee-390.png` ont réellement été ouvertes. Le gros menu/dossier, la ligne compte secondaire et le bouton flottant Aide qui chevauche le contenu sont visibles. Ces captures sont des rendus Chromium du site de base, pas une preuve WebView ou Samsung. Répertoire : `artifacts/chantier-redesign/mobile-before/`; journal `/tmp/mir-mobile-before.log`.
+
+SEO/GEO : non applicable, application métier privée; conserver les protections des parcours publics et des préversions.
+
+## Revue intermédiaire des vrais écrans refondus
+
+Exécution du script de revue temporaire `/tmp/mir-mobile-review.cjs`, sans modification du code ni des tests versionnés. Fixture `tests/helpers/mir-field-fixture.cjs` du seul intégrateur; tous les appels réseau externes sont refusés. Les résultats sont locaux et simulés.
+
+- 36 états mesurés : Employé et Chef à360/390/430px, cinq onglets puis formulaire Bris d’outil en hauteur clavier360px.
+- Aucun débordement horizontal ni erreur JavaScript dans ces états.
+- Les cinq captures Employé390 ont réellement été ouvertes, ainsi que Bris d’outil/clavier. En-tête compact, panier, avatar, barre des cinq onglets et contenu correspondant sont rendus.
+- Le formulaire à hauteur réduite révèle un défaut : textarea de329à433px de haut utile360px, bouton Envoyer à703–749px hors vue. Cela montre une visibilité insuffisante dans l’aperçu web réduit; cela ne mesure pas encore le clavier système Android.
+- Défaut transmis directement au full-stack pour correction et recontrôle. L’absence d’erreur console ne suffit donc pas à valider ce parcours.
+
+Captures et mesures : `artifacts/chantier-redesign/mobile-after/`, `measurements.json`; journal `/tmp/mir-mobile-review.log`. Les captures intermédiaires ne représentent pas encore une certification finale. Les contrôles natifs/physiques de la matrice restent ouverts.
+
+Les dix scénarios SDK natif/Auth ont été exécutés sur la branche de travail : **10/10 réussis**, transport simulé, journal `/tmp/mir-mobile-auth-baseline.txt`. Ils incluent PKCE, refus d’un rôle non autorisé, restauration/purge et refus de purge par une réponse de permissions d’une ancienne session. Ce résultat ne certifie pas le nouveau shell Android.
+
+### Deuxième passage : correction partielle du clavier
+
+Les36états ont été rejoués après modification de l’intégrateur : toujours0débordement horizontal et0erreur JavaScript. Le footer du formulaire est devenu visible à272px dans une fenêtre360px. Le champ finit257px; toutefois le bouton commence226px et recouvre31px du textarea. Ce défaut résiduel a été transmis avec ses coordonnées pour que le recentrage tienne compte du haut du footer, pas seulement du bas de la fenêtre. Capture effectivement ouverte : `artifacts/chantier-redesign/mobile-after-v2/employee-390-tool-keyboard.png`. Les coordonnées du premier passage restent dans le présent rapport; les captures/mesures du deuxième sont archivées séparément avant nouveau contrôle.
+
+Le contrôle du code a aussi révélé que le bouton natif de verrou était caché par un sélecteur de frère adjacent alors que le bootstrap l’ajoute comme enfant de `#portal-content`. L’intégrateur a corrigé ce sélecteur en descendant. Correction relue dans le code; visibilité réellement exécutée dans la WebView encore à vérifier.
+
+### Recontrôle après corrections
+
+La nouvelle expérience est maintenant conditionnée au vrai indicateur **`fieldExperienceEnabled=true`** dans le harness; les anciens écrans ne sont donc pas utilisés comme preuve de la refonte. Les48états ont été rejoués : Employé/Chef,360/390/430px, cinq onglets, Bris d’outil à hauteur360px, conversation à hauteur360px et paysage844×390. Aucun débordement horizontal ni erreur JavaScript relevé.
+
+Le clavier est simulé en conservant une hauteur d’écran fixe844px et en réduisant seulement le viewport à360px. Une simple réduction de la fenêtre Chromium réduit aussi son `screen.height` par défaut; elle ne déclenche donc pas le même état que le clavier d’un téléphone. Cette distinction a été vérifiée, pas ignorée pour obtenir du vert.
+
+Résultats mesurés à390px :
+
+- Bris d’outil : textarea de50à172px; Envoyer de226à272px. Le footer ne recouvre plus le champ. L’intégrateur a ajouté un recentrage tenant compte du haut du footer.
+- Message : nom de la destinataire visible, textarea jusqu’à316px, Envoyer jusqu’à316px dans360px utiles; barre basse masquée pendant l’état clavier. L’ancienne position sticky du formulaire a été remplacée dans le nouveau shell.
+- Les cinq onglets Employé390, l’accueil Chef390 et les deux captures clavier ont réellement été ouverts. Les rendus sont distincts et ne portent aucune certification de compte réel.
+- Le retour interne Message→liste a été exercé par `MIRFieldBack()`, puis le paysage rendu sans débordement. Ce n’est pas une pression du bouton système Android.
+- Le bootstrap remet désormais son marqueur de saisie à zéro sur l’événement explicite `mir:form-closed`; correction relue dans le code. Il ne faut toujours pas confondre `submit` et confirmation serveur.
+
+Preuves conservées : `artifacts/chantier-redesign/mobile-after-v6/`, notamment `employee-390-message-keyboard.png`, `employee-390-tool-keyboard.png` et `measurements.json`; journal `/tmp/mir-mobile-review-v6.log`. Les passagesv2/v3/v4 restent disponibles. La validation porte sur l’arbre de travail courant avant commit; la CI et l’empaquetage finaux doivent rattacher leurs résultats au SHA final.
+
+Les défauts clavier reproduits sont corrigés dans le rendu Chromium examiné. Il reste à vérifier dans la WebView accélérée : vrais clavier/retour système, refus/annulation caméra et fichiers, rotation, verrou facultatif et session. Samsung physique reste ouvert. Aucun défaut graphique critique empêchant les cinq onglets n’a été observé dans ce dernier contrôle.

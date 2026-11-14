@@ -24,6 +24,9 @@ jobs:
           node --test mobile/tools/test-auth-flow.cjs tests/mir-team-enrollment-service.cjs tests/mir-team-session-queue.cjs
           npm ci --prefix tools/database
           node tests/mir-team-invitations-postgres.cjs
+          node tests/mir-field-postgres.cjs
+          node tests/mir-field-cart.cjs
+          node tests/mir-field-redesign-browser.cjs
           node tests/mir-team-enrollment-integration.cjs
           node mobile/tools/test-enrollment-web.cjs
           node tests/mir-team-invitation-email.cjs
