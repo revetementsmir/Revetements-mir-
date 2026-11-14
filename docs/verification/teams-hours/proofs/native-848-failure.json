@@ -1,0 +1,14 @@
+{
+  "source": "84803555137a1e36285744b3e466e32e8c341f55",
+  "run": 43634415372,
+  "job": 132567951277,
+  "artifact": 14129577964,
+  "artifactSha256": "8191417b9d94f0ea50cc4a9ede9db0ff65148a2064f07f81d0410dc2be408a13",
+  "nativeSmokePassed": 8,
+  "upgradePassed": 2,
+  "failure": "Punch segment dialog remains visible after native close gesture; x is text-selected with Android Copy/Share toolbar",
+  "phase": "ready",
+  "project": "hxtztkmbfpmzrieccwsg",
+  "authLocksOrPeers": false,
+  "proofLimit": "Multiple waits shared Java line97; PNG establishes the open dialog and text selection, not a backend/Auth failure. New native CI required."
+}

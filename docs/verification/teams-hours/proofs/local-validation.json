@@ -2,9 +2,9 @@
   "scope": "Local only; no physical device or HTTP end-to-end certification",
   "testedAt": "2026-11-14T19:45:24.276Z",
   "checks": {
-    "postgresGroups": 18,
+    "postgresGroups": 20,
     "clientTests": 10,
-    "browserGroups": 13,
+    "browserGroups": 14,
     "androidContracts": 19,
     "accountSession": true,
     "fieldReceiptClient": true,
@@ -14,15 +14,19 @@
     "androidUnitTests": true,
     "androidLint": true,
     "webSyncMatchesSources": true,
-    "strictQaMarker": "QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL"
+    "strictQaMarker": "QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL",
+    "historicalPunchBrowser": true,
+    "closeControlTextSelectable": false,
+    "noteTextSelectable": true
   },
   "sources": {
-    "dist/chantier-app.js": "85f428e31740ede8465b8a992dacb6dca2b7b191b1cad9c1ea85d6e4949040a2",
+    "dist/chantier-app.js": "6a1739378225d201c6ef66e4ba378768c2993dd6829cf77edfb410d64683d318",
     "dist/portal-client.js": "0d2d3fb13b2beb64d62ff66493d4ebc7121a15eb9662a459a61f7875f2b195c5",
     "dist/portal-config.js": "200ce387414d719511c13727cab64d3e18125d5c685b7ed304bc0f7ac1214314",
-    "dist/mir-punch-management.js": "b08442d61a4caabc08a23234e417791aacdde616eb6f93e02e0e4a35b4e570ad",
+    "dist/mir-punch-management.js": "8367402edbe39ecaccbb7b3202dce2008446d2481420c66cc4feec5630386b63",
     "dist/mir-punch-management.css": "25546535977236521c00a419fca9bdfd7a8acf68487d5cb56dd1bfb30f2a828d",
     "mobile/web/sdk.js": "868cb6969389a2006202d5a1d135a19b10bf60350e3ad138b01bb063cff4d0b1",
-    "mobile/android/app/src/androidTest/java/ca/revetementsmir/equipe/test/MirRealRolesTest.java": "cc0d4f684434b40eacd016027b214dee91b6aa77303e71dc39558f602f7df0fd"
+    "mobile/android/app/src/androidTest/java/ca/revetementsmir/equipe/test/MirRealRolesTest.java": "03979ff2fbe77a924f7e7961dbe5299d266524fdedbb9e6feced900c8eae4a5d",
+    "dist/mir-field-controls.css": "2444db8c2e43eacbc8127355261c73d08b3a9d6503fe297b7ec7bab85c0b151d"
   }
 }

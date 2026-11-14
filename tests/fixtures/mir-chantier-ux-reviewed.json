@@ -9,7 +9,7 @@
     "dist/portal-config.js": "200ce387414d719511c13727cab64d3e18125d5c685b7ed304bc0f7ac1214314"
   },
   "functions": {
-    "renderPunchHours": "71cb43c01db71d55c2cf11d327a344a04a7f149546dcf5bd1e12dbd593cb71cc",
+    "renderPunchHours": "4e09c8e16d731e52879a50ea2780a5263cdf4dbcc2e8f87f89eeaaf047886234",
     "punchCorrectionDialog": "53309e7d6c7bce89dbef88955fe37e5977b5a6aca9c128786141fa8d50d810f8",
     "renderManagement": "fd649e000cf50275220955601f89a91a1dec5727e9b1f26da145f1a627c63a58"
   },

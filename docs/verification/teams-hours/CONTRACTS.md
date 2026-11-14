@@ -1,6 +1,6 @@
 # Contrats de gestion Punch — TEST
 
-Contrats issus de l’audit sur3952b05. Installés exclusivement sur MIR TEST par les migrations serveur20261114191502 et20261114193024 ; preuves de transactions ROLLBACK liées dans le bilan. Le stockage reste celui du Punch existant.
+Contrats issus de l’audit sur3952b05. Installés exclusivement sur MIR TEST par les migrations serveur20261114191502,20261114193024 et20261114200805 ; preuves de transactions ROLLBACK liées dans le bilan. Le stockage reste celui du Punch existant.
 
 ## Frontière de sécurité
 
@@ -39,3 +39,5 @@ Les données viennent des mêmes quarts/segments/corrections, équipes, JOB et a
 ## Vérifications ciblées
 
 Lecture et mutation entre organisations et cinq rôles ; entrée/sortie seules et appariement ; journée sans anomalie ; transfert214→315 à10h30 et transferts successifs/rétroactifs ; doublons/reprise ; bornes299/300/301 et exception repas ; pauses sans double déduction ; période verrouillée/réouverte ; résolution GPS et conservation historique ; mêmes résultats dans les vues et exports ; PC/tablette/téléphone. Résultats effectifs et limites dans README.md ; l’HTTP/WebView réel reste à la CI native du candidat.
+
+Les anciennes corrections personnelles utilisent aussi Vérifier puis Confirmer : leur DTO stocké est projeté côté serveur avec le calculateur canonique. La décision est liée à la révision du quart et des règles ; une révision absente/périmée est refusée avant écriture. Un reçu déjà confirmé est rejoué avant cette vérification pour conserver l’idempotence.
