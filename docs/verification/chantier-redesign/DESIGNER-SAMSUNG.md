@@ -2,7 +2,21 @@
 
 État final Designer : les cinq onglets Employé/Chef, le dossier et les formulaires ont été rendus et inspectés depuis le gel courant. Les compositions Accueil8 « Liste nette » et Punch2 « Cadran » approuvées par Frederick sont intégrées; le responsable a comparé les rendus aux deux photos originales, non visibles dans le contexte de cet agent. Les preuves ci-dessous identifient exactement les ressources rendues. Elles constituent une revue visuelle Chromium et des aperçus locaux, sans certification de service hébergé, de WebView physique ou de Samsung.
 
-## Reprise Auth après 29ab — provenance courante
+## Reprise Dessin après b849 — provenance courante
+
+Checkpoint `b849c68167b0312494d068254f0495229fc942db`, avec le correctif passif de l’iframe gelé par l’intégrateur. Parmi les 105 sources chargées, seul `dist/chantier-app.js` diffère de la livraison précédente : SHA-256 `2b2a61f888f18223aceb585f112c12067f24d7a1a9ebb8e10326ef7cb3059304`. `portal-client.js` reste `d452dd4b96163cd544cf8833fc8898fe9ae7f946dbeee2ec85faadc60eaa456b`; le SDK natif non exécuté par l’aperçu reste `451a23a3b40e6608ac1b2967786aa377ebe911a94332749f2da8a845eea7f787`. Aucune composition ni aucun écran supplémentaire n’a été ajouté.
+
+Empreinte canonique des 105 ressources : `32771ff87c1f3a1e521966ee1045f78db1204419fa34ad9f14a6582676e7adf2`. Les mêmes 16 PNG, les 37 états complets et les 35 états du fragment ont été régénérés depuis ces ressources, puis comparés aux fichiers courants et aux empreintes binaires des captures.
+
+- Manifeste durable : `screens/samsung-approved/manifest.json`, SHA-256 `7d48bd262704b058c74052124fa1a09a957dc7cfb612527da00db737612e32af`.
+- Complet 37 états : `artifacts/chantier-redesign/preview.html`, 6284979 octets, SHA-256 `228ba7b0814fdc5c9299d15e4958f6d4f2e8b27a29ed33164d4e1f11eba7cd93`.
+- Fragment 35 états : `artifacts/chantier-redesign/mir-chantier-preview.html`, 799864 octets, SHA-256 `182507876111747e96758447806895277d44f7f42b8c45d2c7e6e4b988f24bb6`.
+
+Les dix rendus des cinq onglets et des deux rôles, ainsi que les deux entrées Dessin, ont été réellement réinspectés : aucune dérive visuelle observée. Les 120 PNG conservent leurs trois formats, 60 mesures sans défilement de page ou débordement et 12 choix Home sans écriture Punch. Les contrôles des aperçus passent à nouveau : 47 vérifications pour le complet; 35 états et 10 onglets pour le fragment, sans erreur JavaScript, réseau supplémentaire, stockage ou envoi.
+
+L’historique précédent reste dans `artifacts/chantier-redesign/samsung-designer/historical-b849c681/`, avec un manifeste des 166 fichiers, en plus du Git et des rapports conservés ci-dessous. L’échec childBack de b849 reste historique. Les vues Dessin de l’aperçu sont figées; elles ne prouvent pas la conservation du document et des choix lors d’un vrai rafraîchissement. Cette correction fonctionnelle relève des contrôles distincts de Qualité, Mobile et de la nouvelle CI native. Les captures Chef locales ne deviennent pas des captures natives 29ab.
+
+## Historique — correctif Auth après 29ab
 
 Checkpoint `29abcf55c51b21f1bc3c556567160a3f9d077797`, avec les correctifs SDK/portail gelés par l’intégrateur. Aucun changement de composition ni de parcours visuel n’a été ajouté. Les mêmes 37 états complets, 35 états du fragment et 16 PNG durables ont été régénérés parce que le harnais charge `portal-client.js`.
 

@@ -5,9 +5,9 @@
     "height": 796
   },
   "nativeSimulation": "CSS team/bootstrap exactes propres à la version; retrait système48px hypothétique, pas une mesure Samsung physique",
-  "checkpointRevision": "29abcf55c51b21f1bc3c556567160a3f9d077797",
-  "sourceSnapshotSHA256": "b6a0e9295eb7646f331e575e977c30c245a4ceded9e3ec84294d6e62444f043c",
-  "sourceFreeze": "Correctif runtime Auth après29abcf55c51b21f1bc3c556567160a3f9d077797 : réponses getUser/RPC anciennes isolées de la nouvelle session. Aucun changement visuel. Les105ressources chargées sont gelées; le SDK est hashé séparément et non exécuté par cet aperçu.",
+  "checkpointRevision": "b849c68167b0312494d068254f0495229fc942db",
+  "sourceSnapshotSHA256": "32771ff87c1f3a1e521966ee1045f78db1204419fa34ad9f14a6582676e7adf2",
+  "sourceFreeze": "Correctif Dessin aprèsb849c68167b0312494d068254f0495229fc942db : snapshot passif préserve iframe/document/choix pour le même acteur, rôle et chantier autorisé, chrome et panier synchronisés. Aucune composition modifiée. Seul chantier-app.js change parmi les105ressources rendues ; SDK et portal-client restent inchangés.",
   "sources": {
     "dist/annotated-pdf.js": "a2e15b8819a947a8cb04ee3dec28d5d49cb965efb61b51f48f4f3bef2bdebc95",
     "dist/architectural-wall-geometry.js": "a2cc3d91ca3afeaec32744b0da60ee8c5ce76db5ea02b7ee0b776e0cce2e67c0",
@@ -17,7 +17,7 @@
     "dist/assets/MIR-logo-officiel-original.svg": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c",
     "dist/atelier-essai/mir-calepinage-extension.js": "c3966ad5becc006cd0fe1225976188bd194580e0105d25766898d046acc916c7",
     "dist/catalogue-fd6866b49d21.json": "a08b9bf28abba1f286d0854690ae4979eaaa723a3fe04eb86a75dffc82efdc63",
-    "dist/chantier-app.js": "b207a32216da667d9596ed8532a4a15be2f01d38d6156bb601e77daa65bdadfa",
+    "dist/chantier-app.js": "2b2a61f888f18223aceb585f112c12067f24d7a1a9ebb8e10326ef7cb3059304",
     "dist/chantier-employee.css": "273a6e69b76e223d0e7860132eb1b7bb578cb491170ad475aafd03031fa3350a",
     "dist/chantier.css": "ec0db301a1af2da28f2894f578ab306f7093d94786d90eefca697cec56b3d5ba",
     "dist/chantier.html": "c291177d8a6d533f50054fc9360d3aae8480abf04c91bbdb08ee19ca6ec5e8b1",
@@ -118,46 +118,46 @@
   "nativeAuthSourcesNotExecuted": {
     "mobile/web/sdk.js": "451a23a3b40e6608ac1b2967786aa377ebe911a94332749f2da8a845eea7f787"
   },
-  "nativeProofLimit": "Chef n’a pas été atteint par la recette native29ab. Les rendusChef de cet aperçu proviennent de fixtures Chromium locales.",
+  "nativeProofLimit": "Rendus Chromium locaux. La CIb849 a échoué dans childBack ; ces images ne constituent pas une preuve native de correction. Les anciennes capturesChef sont des fixtures locales, pas des captures natives29ab.",
   "files": [
     {
       "path": "docs/verification/chantier-redesign/screens/samsung-approved/employee-home.png",
       "sourceCapture": "artifacts/chantier-redesign/samsung-designer/approved-final-native/390/employee-dark-day.png",
       "label": "Accueil Employé, sombre",
-      "sha256": "5697fb513e6208940c6c465dda525b22ad362496da980a35909216a9e821f1e8",
-      "bytes": 51937,
+      "sha256": "4a93bcfc1f3ea67943d6018545f1ec317c69439a326eefe321aa81268ad6afcf",
+      "bytes": 51983,
       "sourceRevision": "Sources gelées identifiées ci-dessous"
     },
     {
       "path": "docs/verification/chantier-redesign/screens/samsung-approved/chef-home.png",
       "sourceCapture": "artifacts/chantier-redesign/samsung-designer/approved-final-native/390/chef-dark-day.png",
       "label": "Accueil Chef, sombre",
-      "sha256": "8dd3ef8b1106eddc6a7332756f84dd80552294d6c46d145612c17ed0847f4a12",
-      "bytes": 54538,
+      "sha256": "bd31b8b8c483f7afd749b8a45c69750ddb9c1f62baf110db7200109db0ef586f",
+      "bytes": 54351,
       "sourceRevision": "Sources gelées identifiées ci-dessous"
     },
     {
       "path": "docs/verification/chantier-redesign/screens/samsung-approved/home-job-choice.png",
       "sourceCapture": "artifacts/chantier-redesign/samsung-designer/approved-final-native/390/chef-dark-day-job-choice.png",
       "label": "Menu MIR intégré Accueil, deux jobs et adresses fictives",
-      "sha256": "19403ecf55e8873c992c16476bbd401d0be6529b405fcd509c4f62f33d682657",
-      "bytes": 70177,
+      "sha256": "b6b48783a1370b612aa9d34a5601dc8bda592b54c7dcab2f5d69e77720ea13db",
+      "bytes": 70164,
       "sourceRevision": "Sources gelées identifiées ci-dessous"
     },
     {
       "path": "docs/verification/chantier-redesign/screens/samsung-approved/home-jobB-selected.png",
       "sourceCapture": "artifacts/chantier-redesign/samsung-designer/approved-final-native/390/chef-dark-day-jobB.png",
       "label": "Accueil maintenu après choixjobB, pointagejobA inchangé",
-      "sha256": "c971c2120dc5842725db209a76f3fa4f7b42e265a3aa207e6ceff23cec7e886e",
-      "bytes": 50896,
+      "sha256": "6a605b112ab74b27c16c6b2fcacd091a376bb5085d9505cd7f70dfd77fabb16c",
+      "bytes": 50717,
       "sourceRevision": "Sources gelées identifiées ci-dessous"
     },
     {
       "path": "docs/verification/chantier-redesign/screens/samsung-approved/punch-active.png",
       "sourceCapture": "artifacts/chantier-redesign/samsung-designer/approved-final-native/390/chef-dark-punch.png",
       "label": "Punch Chef actif, sombre",
-      "sha256": "b2171b4d0e4f561c02b79caaa5e7450e277c365f74d95da72809668b0e1a7b32",
-      "bytes": 49245,
+      "sha256": "707785e779e276a10406c006e668d718a0adb9eff01c4da085d0a2cb2317ad87",
+      "bytes": 49312,
       "sourceRevision": "Sources gelées identifiées ci-dessous"
     },
     {
@@ -172,8 +172,8 @@
       "path": "docs/verification/chantier-redesign/screens/samsung-approved/punch-transfer-prepared-local.png",
       "sourceCapture": "artifacts/chantier-redesign/samsung-designer/approved-final-native/390/chef-dark-punch-transfer.png",
       "label": "Changement proposé versB, encore pointéA; aucun changement serveur",
-      "sha256": "6b31fa709899639cb69b33f7b85d2820cc9cca4a62362641022933a39f777c04",
-      "bytes": 54878,
+      "sha256": "c065ac4b835468aaf4d96fb9c08f5886e54d32d990ac7bfebf92d2678782da92",
+      "bytes": 55343,
       "sourceRevision": "Sources gelées identifiées ci-dessous"
     },
     {
@@ -260,7 +260,7 @@
       "punchJob": "00000000-0000-4000-8000-000000000353",
       "jobA": "00000000-0000-4000-8000-000000000353",
       "punchWrites": 0,
-      "summary": "En cours ailleurs\n07:35:43\nPunch",
+      "summary": "En cours ailleurs\n08:00:53\nPunch",
       "summaryAccessible": "Ouvrir Punch · Résidence des Érables",
       "scrollY": 0
     },
@@ -274,7 +274,7 @@
       "punchJob": "00000000-0000-4000-8000-000000000353",
       "jobA": "00000000-0000-4000-8000-000000000353",
       "punchWrites": 0,
-      "summary": "En cours ailleurs\n07:35:46\nPunch",
+      "summary": "En cours ailleurs\n08:00:56\nPunch",
       "summaryAccessible": "Ouvrir Punch · Résidence des Érables",
       "scrollY": 0
     },
@@ -288,7 +288,7 @@
       "punchJob": "00000000-0000-4000-8000-000000000353",
       "jobA": "00000000-0000-4000-8000-000000000353",
       "punchWrites": 0,
-      "summary": "En cours ailleurs\n07:35:49\nPunch",
+      "summary": "En cours ailleurs\n08:00:59\nPunch",
       "summaryAccessible": "Ouvrir Punch · Résidence des Érables",
       "scrollY": 0
     },
@@ -302,7 +302,7 @@
       "punchJob": "00000000-0000-4000-8000-000000000353",
       "jobA": "00000000-0000-4000-8000-000000000353",
       "punchWrites": 0,
-      "summary": "En cours ailleurs\n07:35:52\nPunch",
+      "summary": "En cours ailleurs\n08:01:02\nPunch",
       "summaryAccessible": "Ouvrir Punch · Résidence des Érables",
       "scrollY": 0
     }

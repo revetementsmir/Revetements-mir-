@@ -39,6 +39,7 @@ jobs:
           node tests/mir-samsung-ui.cjs
           node tests/mir-punch-approved-browser.cjs
           node tests/mir-field-choice-refresh-browser.cjs
+          node tests/mir-field-drawing-refresh-browser.cjs
           node tests/mir-team-enrollment-integration.cjs
           node mobile/tools/test-enrollment-web.cjs
           node tests/mir-team-invitation-email.cjs
