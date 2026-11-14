@@ -47,6 +47,31 @@ public class MirAndroidTest extends MirDeviceSetup {
   Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bitmap);try(FileOutputStream out=new FileOutputStream(new File(dir,name+".png"))){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,out));}
   int width=bitmap.getWidth()>bitmap.getHeight()?960:540;Bitmap small=Bitmap.createScaledBitmap(bitmap,width,Math.round(bitmap.getHeight()*(width/(float)bitmap.getWidth())),true);try(FileOutputStream out=new FileOutputStream(new File(dir,name+"-scaled.png"))){assertTrue(small.compress(Bitmap.CompressFormat.PNG,100,out));}small.recycle();bitmap.recycle();
  }
+ private Object jsWeb(android.webkit.WebView web,String expression)throws Exception{
+  CountDownLatch done=new CountDownLatch(1);String[] value={null};InstrumentationRegistry.getInstrumentation().runOnMainSync(()->web.evaluateJavascript(expression,result->{value[0]=result;done.countDown();}));assertTrue(done.await(10,TimeUnit.SECONDS));return value[0]==null?null:new JSONTokener(value[0]).nextValue();
+ }
+ @Test public void authMutationsShareOneOriginLockAcrossWebViews()throws Exception{
+  android.webkit.WebView[] second={null};
+  try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
+   try{
+    s.onActivity(a->a.getBridge().getWebView().loadUrl("https://localhost/native-checks.html"));
+    waitFor(s,"location.pathname==='/native-checks.html' && typeof navigator.locks?.request==='function'");
+    assertEquals("https://localhost",js(s,"location.origin"));assertEquals(Boolean.TRUE,js(s,"isSecureContext"));
+    s.onActivity(a->{second[0]=new android.webkit.WebView(a);second[0].getSettings().setJavaScriptEnabled(true);second[0].setAlpha(0f);a.addContentView(second[0],new android.view.ViewGroup.LayoutParams(1,1));second[0].loadDataWithBaseURL("https://localhost/native-checks.html","<!doctype html><title>MIR lock contention proof</title>","text/html","UTF-8",null);});
+    long ready=SystemClock.uptimeMillis()+15000;while(!Boolean.TRUE.equals(jsWeb(second[0],"isSecureContext && typeof navigator.locks?.request==='function'"))&&SystemClock.uptimeMillis()<ready)SystemClock.sleep(100);
+    assertEquals("https://localhost",jsWeb(second[0],"location.origin"));assertEquals(Boolean.TRUE,jsWeb(second[0],"isSecureContext && typeof navigator.locks?.request==='function'"));
+    js(s,"window.lockHeld=false;navigator.locks.request('mir-android-auth-transition',{mode:'exclusive'},()=>new Promise(resolve=>{window.releaseAuthLock=resolve;window.lockHeld=true;}));true");waitFor(s,"window.lockHeld===true");
+    jsWeb(second[0],"window.lockRequested=true;window.lockAcquired=false;navigator.locks.request('mir-android-auth-transition',{mode:'exclusive'},()=>{window.lockAcquired=true;});true");
+    assertEquals(Boolean.TRUE,jsWeb(second[0],"window.lockRequested"));
+    long contention=SystemClock.uptimeMillis()+10000;boolean shared=false;
+    do{js(s,"navigator.locks.query().then(q=>window.lockContention={held:q.held.some(l=>l.name==='mir-android-auth-transition'),pending:q.pending.some(l=>l.name==='mir-android-auth-transition')});true");SystemClock.sleep(100);shared=Boolean.TRUE.equals(js(s,"window.lockContention?.held===true && window.lockContention?.pending===true"));}while(!shared&&SystemClock.uptimeMillis()<contention);
+    assertTrue("LockManager reports a held lock and a pending peer WebView",shared);
+    assertEquals("Second WebView must wait for the first origin lock",Boolean.FALSE,jsWeb(second[0],"window.lockAcquired"));
+    js(s,"window.releaseAuthLock();true");long acquired=SystemClock.uptimeMillis()+10000;while(!Boolean.TRUE.equals(jsWeb(second[0],"window.lockAcquired"))&&SystemClock.uptimeMillis()<acquired)SystemClock.sleep(100);assertEquals("Second WebView acquires only after release",Boolean.TRUE,jsWeb(second[0],"window.lockAcquired"));
+    File dir=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null),"phase11-proof");assertTrue(dir.isDirectory()||dir.mkdirs());org.json.JSONObject proof=new org.json.JSONObject().put("originA","https://localhost").put("originB","https://localhost").put("secureContext",true).put("lockName","mir-android-auth-transition").put("heldAndPendingObserved",true).put("secondWaited",true).put("secondAcquiredAfterRelease",true).put("physicalDevice",false);java.nio.file.Files.write(new File(dir,"auth-webview-lock.json").toPath(),proof.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+   }finally{js(s,"window.releaseAuthLock?.();true");if(second[0]!=null)s.onActivity(a->{((android.view.ViewGroup)second[0].getParent()).removeView(second[0]);second[0].destroy();});}
+  }
+ }
  @Test public void launchRotationAndRestartUseBundledPortal()throws Exception{
   try(ActivityScenario<MainActivity> s=ActivityScenario.launch(MainActivity.class)){
    waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");

@@ -172,10 +172,14 @@
       emit({ phase, user: null, snapshot: null, account:null, pending: null, busy: false, error }, 'auth');
     }
     function requireEnabled() { if (!sdk) fail('NOT_ENABLED', 'Les accès employés sont en cours d’activation.'); }
-    async function verifiedUser() {
+    async function verifiedUser(isCurrent=()=>true) {
       requireEnabled();
       if (logoutRequested) return null;
+      const epoch=generation;
       const { data, error } = await sdk.auth.getUser();
+      // A previous account/read may finish after a newer verified identity.
+      // Its missing-session response must not clear that newer UI state.
+      if(epoch!==generation||disposed||!isCurrent())return null;
       if (error || !data?.user?.id) {
         if (!error || ['AuthSessionMissingError', 'AuthInvalidTokenResponseError'].includes(error.name) || [401, 403].includes(error.status)) {
           clearIdentity(); return null;
@@ -192,7 +196,7 @@
       if (logoutRequested) { clearIdentity(); return null; }
       let currentGeneration = generation; const sequence = ++readSequence;
       try {
-        const user = await verifiedUser();
+        const user = await verifiedUser(()=>sequence===readSequence);
         if (!user) return null;
         if(passwordGate){emit({phase:'password_required',passwordIntent:passwordGate,user:{id:user.id,email:user.email||''},snapshot:null,account:null,error:null},'auth');return null;}
         if (currentGeneration !== generation || sequence !== readSequence || disposed) return null;

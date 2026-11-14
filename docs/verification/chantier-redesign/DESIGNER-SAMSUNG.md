@@ -2,7 +2,21 @@
 
 État final Designer : les cinq onglets Employé/Chef, le dossier et les formulaires ont été rendus et inspectés depuis le gel courant. Les compositions Accueil8 « Liste nette » et Punch2 « Cadran » approuvées par Frederick sont intégrées; le responsable a comparé les rendus aux deux photos originales, non visibles dans le contexte de cet agent. Les preuves ci-dessous identifient exactement les ressources rendues. Elles constituent une revue visuelle Chromium et des aperçus locaux, sans certification de service hébergé, de WebView physique ou de Samsung.
 
-## Reprise après l’échec natif 39e — preuves du correctif
+## Reprise Auth après 29ab — provenance courante
+
+Checkpoint `29abcf55c51b21f1bc3c556567160a3f9d077797`, avec les correctifs SDK/portail gelés par l’intégrateur. Aucun changement de composition ni de parcours visuel n’a été ajouté. Les mêmes 37 états complets, 35 états du fragment et 16 PNG durables ont été régénérés parce que le harnais charge `portal-client.js`.
+
+Empreinte canonique des 105 ressources chargées : `b6a0e9295eb7646f331e575e977c30c245a4ceded9e3ec84294d6e62444f043c`. `portal-client.js` : `d452dd4b96163cd544cf8833fc8898fe9ae7f946dbeee2ec85faadc60eaa456b`. Le SDK natif n’est pas chargé ni exécuté par cet aperçu : son empreinte séparée est `451a23a3b40e6608ac1b2967786aa377ebe911a94332749f2da8a845eea7f787`. Ces deux catégories sont distinguées dans les manifestes; leurs fichiers ont été relus et vérifiés après capture.
+
+- Complet 37 états : `artifacts/chantier-redesign/preview.html`, 6284839 octets, SHA-256 `d9929cd54b703c12158a1c8880d2b412087fa2d711dff36ec326293e3ab7e9b5`.
+- Fragment 35 états : `artifacts/chantier-redesign/mir-chantier-preview.html`, 799796 octets, SHA-256 `feecb767671f81ec71fe73589726112905ee0a5d1d51b59cfc5200a9f65f5bda`.
+- Manifeste des 16 PNG : `screens/samsung-approved/manifest.json`, SHA-256 `17585cbc55cd1f7164daf31b8617589a253a23071af2f087d108244f6fa70abe`; copies binaires sans retouche.
+
+Les dix rendus des cinq onglets et deux rôles ont été réinspectés sur une planche des nouvelles captures : aucune dérive visuelle observée. Les 120 PNG conservent leurs trois formats, 60 mesures sans défilement de page ou débordement et 12 choix Home A→B→A sans écriture Punch. Les aperçus passent à nouveau leurs 47 vérifications et leurs 35 états/10 onglets, sans erreur JavaScript, réseau supplémentaire, stockage ni envoi. Ces résultats concernent les rendus locaux et leurs interactions visuelles; ils ne constituent pas une validation des courses Auth corrigées.
+
+L’historique précédent a été conservé dans `artifacts/chantier-redesign/samsung-designer/historical-29abcf55/`, avec un manifeste des 166 fichiers, en plus de l’historique Git et des rapports ci-dessous. La tentative native 29ab n’a pas atteint le rôle Chef : les images Chef de ces aperçus proviennent de fixtures Chromium locales et ne sont jamais présentées comme des captures natives 29ab. Les validations Auth, WebLocks, CI et Android du correctif restent les preuves distinctes de l’intégrateur, de Qualité et de Mobile.
+
+## Historique — correctif visuel après 39e
 
 Le commit `39e961090d988175d6fb6f7be894f34b48f54ddb` reste la référence historique. Son échec Android a été inspecté par le responsable; les preuves Chromium de ce commit ne deviennent pas une réussite native. Avant toute régénération, les 166 fichiers précédents ont été conservés dans `artifacts/chantier-redesign/samsung-designer/historical-39e9610/`, avec `archive-manifest.json`. Les 16 PNG et aperçus versionnés au commit 39e restent également consultables dans cet historique Git.
 

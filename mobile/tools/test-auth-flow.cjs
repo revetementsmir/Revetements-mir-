@@ -1,12 +1,13 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),{webcrypto}=require('node:crypto');
+const {sharedLocksFor}=require('./auth-lock-test-helper.cjs');
 const Flow=require('../web/auth-flow.cjs'),Policy=require('../web/policy.cjs'),root=path.resolve(__dirname,'../..');
-function harness({role='employee',exchangeError=false,slots=new Map(),team=false,denyInvitation=false,roleState=null,accountHook=null,userHook=null,tokenState=null,clearHook=null,browserStore=new Map()}={}){
- const requests=[],opened=[],replaced=[];let exchanges=0,accepted=false;
+function harness({role='employee',exchangeError=false,slots=new Map(),team=false,denyInvitation=false,roleState=null,accountHook=null,userHook=null,tokenState=null,clearHook=null,browserStore=new Map(),locks}={}){
+ const requests=[],opened=[],replaced=[];let exchanges=0,accepted=false,nativeClears=0;
  const jwt=()=>Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url')+'.'+Buffer.from(JSON.stringify({sub:'00000000-0000-4000-8000-000000000005',jti:tokenState?.value||'session-default',exp:Math.floor(Date.now()/1000)+3600})).toString('base64url')+'.local-signature';
  const user={id:'00000000-0000-4000-8000-000000000005',email:'employee@example.invalid',aud:'authenticated',created_at:'2026-11-14T00:00:00Z'};
- const Native={readAuth:async({slot='session'}={})=>({value:slots.get(slot)}),writeAuth:async({slot='session',value})=>{slots.set(slot,value);},removeAuthSlot:async({slot})=>slots.delete(slot),clearAuth:async()=>{if(clearHook?.run)return clearHook.run();slots.clear();},openAuth:async({url})=>opened.push(url)};
- const c=vm.createContext({console,URL,URLSearchParams,TextEncoder,TextDecoder,crypto:webcrypto,Headers,Request,Response,setTimeout,clearTimeout,setInterval,clearInterval,AbortController,Buffer,btoa,atob,WebSocket,
+ const Native={readAuth:async({slot='session'}={})=>({value:slots.get(slot)}),writeAuth:async({slot='session',value})=>{slots.set(slot,value);},removeAuthSlot:async({slot})=>slots.delete(slot),clearAuth:async()=>{nativeClears++;if(clearHook?.run)return clearHook.run();slots.clear();},openAuth:async({url})=>opened.push(url)};
+ const c=vm.createContext({navigator:locks===null?{}:{locks:locks||sharedLocksFor(slots)},console,URL,URLSearchParams,TextEncoder,TextDecoder,crypto:webcrypto,Headers,Request,Response,setTimeout,clearTimeout,setInterval,clearInterval,AbortController,Buffer,btoa,atob,WebSocket,
   location:{replace:url=>replaced.push(url)},localStorage:{clear:()=>browserStore.clear(),setItem:(k,v)=>browserStore.set(k,v),getItem:k=>browserStore.get(k)||null},sessionStorage:{clear(){}},indexedDB:{databases:async()=>[]},require:()=>Flow,
   fetch:async(input,init)=>{const url=String(input);requests.push(url);assert.ok(url.startsWith(Flow.PROJECT+'/'),url);let body={};
    if(url.includes('/token?grant_type=pkce')){exchanges++;body=exchangeError?{error:'invalid_grant',error_description:'Expired'}:{access_token:jwt(),refresh_token:'test-refresh',expires_in:3600,token_type:'bearer',user};}
@@ -22,7 +23,7 @@ function harness({role='employee',exchangeError=false,slots=new Map(),team=false
  vm.runInContext(fs.readFileSync(path.join(root,'dist/vendor/supabase-client.js'),'utf8'),c);c.window.MIRSupabase=c.MIRSupabase;
  vm.runInContext(fs.readFileSync(path.join(root,'mobile/web/sdk.js'),'utf8'),c);
  const client=c.window.MIRSupabase.createClient(Flow.PROJECT,'sb_publishable_test',{auth:{autoRefreshToken:false}});
- return{client,slots,opened,replaced,requests,accept:c.window.MIRAndroidAcceptAuth,resume:()=>c.window.MIRAndroidSession.resume(),browserStore,exchanges:()=>exchanges};
+ return{client,slots,opened,replaced,requests,accept:c.window.MIRAndroidAcceptAuth,resume:()=>c.window.MIRAndroidSession.resume(),browserStore,exchanges:()=>exchanges,nativeClears:()=>nativeClears};
 }
 test('callback and authorize reject ambiguous, injected and foreign URLs',()=>{
  const good=Flow.CALLBACK+'?flow=google&code=code-123';assert.equal(Flow.callback(good).flow,'google');
@@ -98,4 +99,52 @@ test('an old SDK instance cannot purge the new vault or update probe after recre
 test('all public getUser reads reject an obsolete result before changing private state',async()=>{
  const hook={},state={value:'public-before'},h=harness({userHook:hook,tokenState:state});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
  let release,entered;const started=new Promise(r=>entered=r);hook.run=()=>{hook.run=null;entered();return new Promise(r=>release=r);};const pending=h.client.auth.getUser();await started;state.value='public-after';await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});h.browserStore.set('probe','current');release(rejectedUser('session_not_found'));const result=await pending;assert.equal(result.error.code,'SESSION_CHANGED');assert.ok(h.slots.has('session'));assert.equal(h.browserStore.get('probe'),'current');await h.client.auth.signOut();
+});
+
+
+test('old Activity RPC refusal preserves the replacement Activity vault and update probe',async()=>{
+ const hook={},a=harness({accountHook:hook,tokenState:{value:'activity-rpc-before'}});
+ await a.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
+ let release,entered;const started=new Promise(r=>entered=r);
+ hook.run=()=>{hook.run=null;entered();return new Promise(r=>release=r);};
+ const pending=a.client.rpc('mir_portal_snapshot');await started;
+ const b=harness({slots:a.slots,browserStore:a.browserStore,tokenState:{value:'activity-rpc-after'}});
+ await b.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
+ b.browserStore.set('mir_update_probe','RECETTE-PHASE11-LOCAL');const current=b.slots.get('session');
+ release(new Response(JSON.stringify({code:'42501',message:'Old activity account denied'}),{status:401,headers:{'content-type':'application/json'}}));
+ const result=await pending;await drain();
+ const preserved=b.slots.get('session')===current,probe=b.browserStore.get('mir_update_probe')==='RECETTE-PHASE11-LOCAL';
+ assert.equal(result.error.code,'SESSION_CHANGED');
+ await a.client.auth.stopAutoRefresh();await b.client.auth.signOut();
+ assert.equal(preserved,true);assert.equal(probe,true);
+});
+for(const status of[401,403])test('a current denied account RPC still purges the current vault: '+status,async()=>{
+ const hook={},h=harness({accountHook:hook});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});h.browserStore.set('probe','private');hook.run=()=>{hook.run=null;return new Response(JSON.stringify({code:'42501',message:'Current account denied'}),{status,headers:{'content-type':'application/json'}});};assert.equal((await h.client.rpc('mir_portal_snapshot')).error.code,'42501');assert.equal(h.slots.size,0);assert.equal(h.browserStore.size,0);
+});
+test('a queued RPC refusal is revalidated after an earlier queued login completes',async()=>{
+ let listener,session={user:{id:'actor-a'},access_token:'token-a'},vault='token-a',denyNext=true,release,entered;
+ const browserStore=new Map(),started=new Promise(r=>entered=r),gate=new Promise(r=>release=r);
+ const emit=async(event,value)=>listener?.(event,value);
+ const auth={onAuthStateChange:fn=>(listener=fn,{}),getSession:async()=>({data:{session}}),setSession:async()=>{entered();await gate;return{error:null};},signOut:async()=>{session=null;await emit('SIGNED_OUT',null);return{error:null};},signInWithPassword:async()=>{session={user:{id:'actor-b'},access_token:'token-b'};vault='token-b';browserStore.set('probe','new-b');await emit('SIGNED_IN',session);return{data:{session},error:null};}};
+ const rawClient={auth,rpc:async name=>{assert.equal(name,'mir_account_snapshot');if(denyNext){denyNext=false;return{data:null,error:{status:401,code:'42501'}};}return{data:{role:'employee'}};}};
+ const context=vm.createContext({navigator:{locks:sharedLocksFor(new Map())},require:()=>Flow,localStorage:{clear:()=>browserStore.clear()},sessionStorage:{clear(){}},indexedDB:{databases:async()=>[]},window:{MIRAndroid:{Policy,Native:{readAuth:async()=>({value:vault}),clearAuth:async()=>{vault=null;}}},MIRTeamTestConfig:{},MIRSupabase:{createClient:()=>rawClient}}});
+ vm.runInContext(fs.readFileSync(path.join(root,'mobile/web/sdk.js'),'utf8'),context);
+ const client=context.window.MIRSupabase.createClient(Flow.PROJECT,'sb_publishable_test');await emit('SIGNED_IN',session);
+ const occupied=client.auth.setSession({access_token:'token-a'});await started;
+ const login=client.auth.signInWithPassword({email:'b@example.invalid',password:'local-password'});
+ const refused=client.rpc('mir_portal_snapshot');await new Promise(r=>setImmediate(r));release();await occupied;assert.equal((await login).error,null);assert.equal((await refused).error.code,'SESSION_CHANGED');assert.equal(session.user.id,'actor-b');assert.equal(vault,'token-b');assert.equal(browserStore.get('probe'),'new-b');
+});
+test('missing shared Web Locks refuses native Auth instead of using an unsafe local fallback',()=>{
+ assert.throws(()=>harness({locks:null}),error=>error.code==='ANDROID_AUTH_LOCK_UNAVAILABLE'&&/Android System WebView/.test(error.message));
+});
+for(const stage of['before-delete','after-delete'])test('two Activities serialize a new login across Native clear '+stage,async()=>{
+ const accountHook={},clearHook={},a=harness({accountHook,clearHook,tokenState:{value:'activity-a'}});await a.client.auth.signInWithPassword({email:'a@example.invalid',password:'local-password'});const before=a.nativeClears();
+ let release,entered;const gate=new Promise(r=>release=r),started=new Promise(r=>entered=r);
+ clearHook.run=async()=>{clearHook.run=null;if(stage==='after-delete')a.slots.clear();entered();await gate;if(stage==='before-delete')a.slots.clear();};
+ accountHook.run=()=>{accountHook.run=null;return new Response(JSON.stringify({code:'42501',message:'Current A denied'}),{status:401,headers:{'content-type':'application/json'}});};
+ const refused=a.client.rpc('mir_portal_snapshot');await started;
+ const b=harness({slots:a.slots,browserStore:a.browserStore,tokenState:{value:'activity-b'}});let loggedIn=false;
+ const login=b.client.auth.signInWithPassword({email:'b@example.invalid',password:'local-password'}).then(result=>{assert.equal(result.error,null);loggedIn=true;b.browserStore.set('mir_update_probe','B survives');});
+ await drain();assert.equal(loggedIn,false,'Replacement Activity must wait for the old native callback');assert.equal(b.requests.some(url=>url.includes('grant_type=password')),false,'No replacement session is written before the shared lock is released');
+ release();await Promise.all([refused,login]);assert.equal(a.nativeClears(),before+1,'Supabase removal is not followed by a second native clear');assert.ok(b.slots.has('session'));assert.equal(b.browserStore.get('mir_update_probe'),'B survives');await a.client.auth.stopAutoRefresh();await b.client.auth.signOut();
 });

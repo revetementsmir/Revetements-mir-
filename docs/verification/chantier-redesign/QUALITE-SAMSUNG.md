@@ -220,3 +220,36 @@ Les sept autres sources sont identiques aux suites18/24/24; les manifestes des d
 |`mobile/web/team.css`|`f7e8c3306ec0e4554b9d2fc09148daefa97447efde48e5b682ef08f618a2d904`|
 
 Les preuves Chromium sont des simulations de transport explicitement identifiées. Les7tests de vérificateur et5cas de pixels synthétiques ne sont ni un émulateur ni un appareil physique. Le coordinateur assure push/PR, puis Qualité surveillera les CI de la tête exacte sans réécrire les fichiers suivis. Aucun nettoyage des fixtures n’est exécuté par Qualité. Le bilan Atelier final attendra confirmation de la tête, des CI, des preuves et du nettoyage par le coordinateur; aucun lienAPKprivé ni emplacement de clé n’y sera transmis.
+
+
+### Reprise Auth après les CI rouges : vérification indépendante avant nouveau commit
+
+Le bilan CI de `29abcf55c51b21f1bc3c556567160a3f9d077797` reste **16 workflows réussis, 1 conditionnel ignoré et 1 Android échoué**. Les sept tests Android de base et les deux étapes de mise à jour sans effacement réussissent. La suite des rôles échoue ensuite à la ligne209 de la source exacte, pendant la connexion suivante : le marqueur de promesse vaut `ready`, mais la session est `signed_out`. Ce marqueur ne vaut donc pas une confirmation de session. Le diagnostic n’est plus celui du dessin de la tête8bfd. Les archives et échecs précédents restent conservés; aucune relance ni assertion supprimée par Qualité.
+
+La preuve publique du coordinateur `proofs/samsung-account-switch-race-test.json` a été relue. Elle contient des agrégats TEST et l’état natif, sans secret ni contenu privé. Des lectures Chef réussies sont suivies d’un logout; le compte appelant de l’ancienne lecture anonyme ne peut pas être déduit de ces seuls agrégats. Ils ne suffisent pas à attribuer la cause exacte de l’échec natif. Les reproductions locales suivantes établissent séparément deux défauts dans les sources de29ab :
+
+| Reproduction indépendante | Avant29ab | Recontrôle corrigé |
+|---|---|---|
+| Une ancienne lecture `getUser` reçoit401 après confirmation du compteB | EffaceB et repasse à `signed_out` | CompteB et son état vérifié conservés |
+| Une lecture RPC anonyme démarre pendant la connexionB; sa purge est mise derrière le login | Login résolu, puis sessionB et coffre effacés | Ancienne lecture refusée sans RPC métier; sessionB, identité et coffre conservés |
+
+Les deux reproductions emploient les vrais modules dans des VM locales, avec Auth, réponses RPC et stockage natif fictifs. Elles ont d’abord révélé les défauts sur des sources29ab figées, puis ont été rejouées avec les mêmes attentes. Le premier correctif SDK9261 a passé ces cas; il reste identifié comme étape intermédiaire. La correction définitive ajoute un verrou exclusif partagé par origine entre vues, sans repli local non sûr si la capacité manque. Le portail vérifie génération et séquence avant toute suppression d’identité; le SDK lie chaque lecture à l’acteur et au jeton, relit le coffre et revalide dans la file de mutation avant toute purge.
+
+Sept scénarios SDK indépendants passent sur ce dernier gel : refus401,403 et42501 courants qui purgent toujours; jeton remplacé pour le même acteur avec événement, puis par coffre partagé sans événement; remplacement d’acteur; remplacement du jeton entre contrôle après réponse et exécution de la purge en file. Chaque ancienne lecture produit zéro RPC métier. Le portail a aussi été contrôlé avec une lecture plus récente du même acteur : anciens401 et session manquante ne l’effacent plus; un401 réellement courant efface toujours l’identité. Les capacités Web Locks de ces VM sont modélisées avec une sérialisation effective; ces tests ne prouvent pas seuls le comportement de deux WebView Android.
+
+Suites permanentes exécutées directement sur les mêmes sources : **27/27 Auth avec SDK embarqué réel et transport simulé**, puis **7/7 session du portail**. Les assertions de refus, purge, rôle, reprise et stockage restent actives. L’ancien harness de contrats sans capacité de verrou a d’abord échoué explicitement `ANDROID_AUTH_LOCK_UNAVAILABLE`; sa capacité de test a été enrichie par l’intégrateur, sans utiliser de repli non sûr dans l’application.
+
+La preuve Mobile a été relue dans `native-session-review/shared-weblocks-current/results.json` et `mobile-review-provenance.json` : deux vraies pages Chromium de même origine, verrou réel tenu et seconde page en attente avant libération, coffre et sonde préservés. Deux instants de purge sont couverts. **Le LockManager est réel; le pont Native et les réponses HTTP restent simulés.** Le nouveau test Android de contention prévoit deux WebView de même origine `https://localhost`, mais son exécution native appartient à la prochaine CI. Aucun résultat Samsung physique n’est annoncé.
+
+Gel contrôlé par Qualité :
+
+| Source | SHA-256 |
+|---|---|
+| `dist/portal-client.js` | `d452dd4b96163cd544cf8833fc8898fe9ae7f946dbeee2ec85faadc60eaa456b` |
+| `mobile/web/sdk.js` | `451a23a3b40e6608ac1b2967786aa377ebe911a94332749f2da8a845eea7f787` |
+
+Preuves indépendantes ignorées, sous `artifacts/chantier-redesign/samsung-qualite-after/` : `verified-user-race-red-29ab.json`, `verified-user-race-green-shared-lock.json`, `sdk-purge-race-red-29ab.json`, `sdk-purge-race-green-shared-lock.json`, `verified-read-sequence-red-green.json` et `sdk-rpc-fences-shared-lock.json`. Elles ne sont ni des appels Supabase hébergés ni des recettes natives. Les empreintes ont été comparées à nouveau en fin de passage.
+
+Le correctif antérieur du toucher du dessin a aussi été relu et exécuté localement : ancien helper8bfd reproduit rouge sur cible désactivée et défilement non présenté; nouveau helper vert. Neuf contrôles indépendants vérifient notamment fieldset désactivé, iframe bordée/redimensionnée, interception et visibilité. Le vrai `UiDevice.click`, l’ouverture MIR, le Retour Android et la restitution exacte du focus enfant restent présents. Tous les contrôles de taille système du texte sont identiques à8bfd, avec une attente supplémentaire des métadonnées canoniques. Cette preuve est Chromium et lecture de Java; elle ne transforme pas la CI29ab rouge en réussite native complète.
+
+La prochaine action reste le push de l’intégrateur, la CI sur sa tête exacte, l’inspection de l’archive native complète puis la clôture par le coordinateur des deux fixtures synthétiques. Le nouveau runtime nécessite une provenance APK actualisée; aucun ancien candidat retenu n’est remis comme APK courant. Aucune désinstallation, suppression des données Samsung, création de compte, opération production, émission réelle de courriel ou publication n’a été exécutée par Qualité. La recette physique et la finalisation du bilan Atelier restent ouvertes. SEO/GEO : non applicable à ces contrôles de session privés; aucune surface publique ni règle d’indexation modifiée.
