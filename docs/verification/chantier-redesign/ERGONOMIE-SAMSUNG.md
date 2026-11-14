@@ -65,3 +65,21 @@ Toutes les preuves ci-dessus sont sous `artifacts/chantier-redesign/samsung/ergo
 Ce rapport ne certifie ni serveur hébergé, ni CI, ni clavier/permissions Android, ni WebView, ni TalkBack, ni Samsung physique. Mobile couvre séparément le vrai callback de retour Android simulé et la provenance native; Qualité couvre les contrats/réceptions. La recette physique reste ouverte.
 
 Aucune modification applicative ou test suivi par cette expertise, aucune opération production, émission de courriel, publication Pages, fusion, compte personnel ou distribution employés. Aucun secret transmis. SEO/GEO : non applicable à cette interface chantier privée.
+
+## Reprise ciblée après la CI de 39e9610
+
+Base exacte : `39e961090d988175d6fb6f7be894f34b48f54ddb`. Le symptôme natif rapporté est une sélection de texte Android sur une option, avec feuille encore ouverte. Fullstack reste seul auteur app/tests; cette expertise a relu le correctif et ses effets, sans nouvelle conception ni reprise de la matrice complète.
+
+La règle `user-select:none` vise les boutons et descendants des feuilles/façades MIR, dans les espaces chantier et dessin. Elle ne vise ni la page entière, ni les champs, ni les documents. La note reste sélectionnable intégralement au clavier, et le texte documentaire DOM au double-clic. Cette vérification ne remplace pas une recette du lecteur PDF Android.
+
+La mise à jour des numéros/adresses s’applique dans la feuille déjà ouverte. Lorsque les résultats du filtre ne changent pas, le bouton focalisé conserve son identité DOM. Lorsqu’une adresse nouvellement reçue correspond à la recherche courante, les résultats sont recalculés sans retaper; requête, focus logique et brouillon multiple restent conservés. Un défaut réel a été reproduit sur ce dernier cas, transmis puis corrigé avant clôture.
+
+Résultats sur le correctif :
+
+- **16/16 contrats** : `isolated-ci39e-final-contracts/results.json`.
+- **6/6 compléments indépendants** : `isolated-ci39e-final-six-source-events/results.json`. Numéro/adresse tardifs, valeur et FormData immuables avant validation, annulation, focus, disabled/optgroup, recherche, multiple avec recalcul des résultats et un seul événement input/change du contrôle source, copie des champs et texte documentaire.
+- **10 contrôles du permanent navigateur**, rejoués indépendamment pour Employé/Chef : `ci39e-permanent-browser.log`. Métadonnées réellement retardées dans le client local, annulation, façade et carte actualisées, maintien du focus, long toucher Chromium sans sélection de texte et choix restant sur Accueil sans pointage implicite.
+
+Deux attentes incorrectes de mon harnais ont été corrigées séparément : une longueur de texte fixée à25 au lieu de22 caractères, et un comptage mélangeant l’événement de recherche avec celui du contrôle source. La sélection intégrale et l’unicité des événements du contrôle source restent exigées. Aucun test suivi du dépôt n’a été modifié par cette expertise.
+
+Les empreintes du composant sont identiques entre les 16 contrats et les six compléments. `ci39e-source-fingerprints.json` conserve les neuf sources actuelles; les preuves précédentes gardent leurs empreintes historiques. Aucun écart ergonomique local restant dans ce delta et `git diff --check` réussi. Le long toucher Chromium, le WebView natif de CI et le Samsung physique restent trois niveaux distincts; aucun nouveau succès natif ou physique n’est revendiqué ici.

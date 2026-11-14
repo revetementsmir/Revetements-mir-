@@ -139,3 +139,9 @@ Les lignes ci-dessus constituent le contrat et les branches à couvrir. Le résu
 | P11 et branches exclues | Absence d’activation hors droits vérifiée dans le parcours; exclusions documentées | Aucun service désactivé n’est annoncé fonctionnel |
 
 Le passage historique précédent la direction8/2 compte36 contextes/2 394 enregistrements. Le nouveau passage utilise la même matrice métier avec les points d’entrée Punch et Accueil actualisés; son résultat final et ses empreintes sont dans `ERGONOMIE-SAMSUNG.md`. Les échecs intermédiaires et les reprises restent conservés, sans assertion neutralisée.
+
+## Complément 39e9610 — choix ouverts et copie
+
+Le contrat J01 s’étend au rafraîchissement des seuls libellés autorisés : numéros/adresses reçus pendant l’ouverture apparaissent sur place, sans nouvelle valeur, inscription, permission ou événement de soumission. Annulation, FormData, recherche, focus et brouillon multiple restent conservés. Un résultat devenu correspondant au filtre apparaît sans retaper; un résultat disabled reste indisponible.
+
+Le correctif de sélection native est limité aux boutons de choix MIR et à leurs descendants. Les champs et textes documentaires restent sélectionnables; aucune règle globale ne bloque leur copie. Contrats16/16, six compléments indépendants et dix contrôles navigateur réussis, détaillés dans `ERGONOMIE-SAMSUNG.md`. Aucun nouveau verdict Samsung/WebView ou changement des interfaces système.

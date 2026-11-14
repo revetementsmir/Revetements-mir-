@@ -38,6 +38,10 @@ Le contrôle sécurité avant/après est conservé dans la preuve hébergée. La
 
 ## Livraison et recette encore ouvertes
 
+Le premier passage CI sur `39e961090d988175d6fb6f7be894f34b48f54ddb` a réussi Chromium, compilation/Java/Lint, les7tests natifs de base et les2contrôles de mise à jour, mais a échoué au choix chantier avant les cinq captures. Le PNG réellement inspecté montre une sélection de texte Android dans l’option et la feuille encore ouverte. Les6lectures HTTP des deux RPC chantier ont répondu200 dans la fenêtre concernée ; une lecture TEST filtrée confirme les numéros/adresses QA. Cela ne démontre aucun refus Chef ou Auth.
+
+Le correctif est ciblé : les vrais boutons de choix évitent la sélection de leur texte, les champs/documents restent copiables ; le geste natif conserve `UiDevice.click` avec attente de présentation et contrôle du point touché. Les métadonnées arrivant pendant une feuille ouverte actualisent ses libellés en place sans changer les valeurs, fermer la feuille ou perdre le focus. Un nouveau scénario permanent conserve le rouge sur39e et le vert sur le correctif, avec toucher maintenu, attente, sélection et annulation. La réussite de la nouvelle CI native doit être confirmée séparément dans la PR, sans attribuer les résultats locaux à l’appareil.
+
 Les aperçus autonomes sont explicitement des simulations QA. Les captures durables se trouvent dans `screens/samsung-approved/`. Les captures WebView et métriques Android doivent provenir de l’artefact CI de la tête finale et être ouvertes réellement, avec empreintes et contrôles contre les vues répétées. Les résultats Chromium, PostgreSQL local, TEST hébergé, émulateur KVM et Samsung physique sont distincts.
 
 L’APK personnel prévu est **0.13.1-s25-test /130005**, paquet `ca.revetementsmir.equipe.recette.s25`, avec la clé TEST personnelle existante. Sa remise dépend de la nouvelle CI, de l’inspection des cinq vues et des vérifications du binaire ; le lien privé, le SHA-256 final et la provenance sont remis directement à Frederick, jamais dans Atelier. Les clés ne sont ni exportées ni intégrées au dépôt/APK. [Checklist Samsung](SAMSUNG.md).

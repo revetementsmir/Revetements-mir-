@@ -2,7 +2,23 @@
 
 État final Designer : les cinq onglets Employé/Chef, le dossier et les formulaires ont été rendus et inspectés depuis le gel courant. Les compositions Accueil8 « Liste nette » et Punch2 « Cadran » approuvées par Frederick sont intégrées; le responsable a comparé les rendus aux deux photos originales, non visibles dans le contexte de cet agent. Les preuves ci-dessous identifient exactement les ressources rendues. Elles constituent une revue visuelle Chromium et des aperçus locaux, sans certification de service hébergé, de WebView physique ou de Samsung.
 
-## Livraison Designer sur le gel courant
+## Reprise après l’échec natif 39e — preuves du correctif
+
+Le commit `39e961090d988175d6fb6f7be894f34b48f54ddb` reste la référence historique. Son échec Android a été inspecté par le responsable; les preuves Chromium de ce commit ne deviennent pas une réussite native. Avant toute régénération, les 166 fichiers précédents ont été conservés dans `artifacts/chantier-redesign/samsung-designer/historical-39e9610/`, avec `archive-manifest.json`. Les 16 PNG et aperçus versionnés au commit 39e restent également consultables dans cet historique Git.
+
+L’intégrateur a gelé le correctif de `chantier-app.js` et `mir-field-controls.js`/`.css` : gestes non sélectionnables, métadonnées rafraîchies dans la feuille sans perte de focus et filtre de recherche réappliqué lorsque l’adresse arrive. Aucune nouvelle composition ni variante n’a été ajoutée par Designer. Les mêmes 37 états complets, 35 états du fragment et 16 PNG durables ont été régénérés depuis ce correctif.
+
+Empreinte canonique des 105 ressources courantes : `82af7881b028d43b3e803910da7214a048e8b618c99de7834fd9f37364608581`. Toutes ont été comparées aux fichiers courants après capture; la lecture refuse aussi un changement pendant une passe. Le checkpoint Git du rendu est 39e, complété par ces empreintes exactes des modifications correctives; le commit correctif final est fourni dans le bilan de l’intégrateur.
+
+- Complet 37 états : `artifacts/chantier-redesign/preview.html`, 6284590 octets, SHA-256 `d94f9ead89b123eeb1185c735ffbab2789a7bbcfb92eb49783bfff42961b4bc0`.
+- Fragment 35 états : `artifacts/chantier-redesign/mir-chantier-preview.html`, 799604 octets, SHA-256 `a1f7186b5c96cc1e85121cca5e6c210d959e756663f6b2d4c93ffe5385e4db0f`.
+- Sélection durable de 16 PNG : `screens/samsung-approved/manifest.json`, SHA-256 `3d5855a02fa6e50494665457d009eb54f582fae20b513a8be111db0002cd7ab2`. Copies binaires sans retouche, sources et empreintes présentes dans le manifeste.
+
+Les 120 PNG complets des trois largeurs ont été repris : 60 mesures de hauteur sans défilement de page ou débordement aux formats 732/796/884 px, 12 trajets Home A→B→A sans écriture Punch ni changement du pointage confirmé. Le menu et ses deux adresses ainsi que « En cours ailleurs » ont été réellement ouverts à 390 px; les dix rendus finaux des cinq onglets et deux rôles ont été réexaminés sur une planche issue de ces seules captures. La composition approuvée reste identique.
+
+Les contrôles des nouveaux aperçus passent à nouveau : 47 vérifications pour le complet; 35 états et 10 onglets pour le fragment. Les deux rejouent Home A→B→A et le choix MIR Problème→Outil, sans erreur JavaScript, réseau supplémentaire, stockage ou envoi de formulaire. Ces tests portent sur les aperçus locaux; la vérification WebView/Android du correctif et la recette Samsung demeurent des niveaux distincts dans le bilan du responsable. Le statut d’échec 39e reste historique et n’est pas effacé.
+
+## Historique — livraison du commit39e9610
 
 Base de travail `6039306ac76584ee6b06859786c02eef7cfca685`. Empreinte canonique des105ressources rendues : `e6c98cb844f84ba4f5d7fad77c02554f53735eb7041d3567d3d4f43c64353b8a`. Les fichiers sont relus après capture et comparés à leurs SHA-256. Le garde a réellement refusé une passe lorsque `chantier-app.js` changeait encore; la livraison a ensuite été régénérée depuis le gel effectif. Aucun ancien rendu n’a reçu artificiellement une nouvelle empreinte.
 
