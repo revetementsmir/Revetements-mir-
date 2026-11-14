@@ -24,12 +24,13 @@ check('PRIME 40713, unité et conditionnement',()=>{
  const fs=require('node:fs'),path=require('node:path');
  assert.ok(fs.statSync(path.join(__dirname,'../dist',p.primaryImage)).size>0);
  const css=fs.readFileSync(path.join(__dirname,'../dist/mir-catalogue-photo.css'),'utf8');
- assert.match(css,/mir-prime-card[\\s\\S]*?--mir-photo-gutter:\\s*2%/);
- assert.match(css,/object-fit:\\s*contain/);
+ assert.ok(css.includes('body .mir-prime-card .mir-catalogue-photo'));
+ assert.ok(css.includes('--mir-photo-gutter: 2%'));
+ assert.ok(css.includes('object-fit: contain'));
 });
 check('ADSEAL remplace uniquement la fiche générique',()=>{
  const p=get('mir-request-adfast');
- assert.match(p.name,/ADSEAL/);assert.match(p.name,/90\\/contenant/);
+ assert.match(p.name,/ADSEAL/);assert.ok(p.name.includes('90/contenant'));
  assert.equal(p.unit,'contenant');assert.equal(p.packaging.piecesPerBox,90);
  assert.ok(p.referencePending);assert.match(p.sourceUrl,/lingettes-nettoyantes/);
  assert.match(p.notes.join(' '),/contenant de 90 lingettes/);
