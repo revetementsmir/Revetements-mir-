@@ -115,7 +115,7 @@
     const config = validateConfig(options.config, options.origin);
     const listeners = new Set();
     let status = { phase: config.enabled ? 'signed_out' : 'unavailable', user: null, snapshot: null, error: null, pending: null, busy: false };
-    let generation = 0, readSequence = 0, authSubscription = null, activePromise = null, authTimer = null, liveTimer = null, disposed = false, internalOrg = null;
+    let leadJobSelection=null;let generation = 0, readSequence = 0, authSubscription = null, activePromise = null, authTimer = null, liveTimer = null, disposed = false, internalOrg = null;
     const storage = options.operationStorage;
     const logoutKey = `mir_portal_signed_out_${config.projectRef || 'disabled'}`;
     let logoutRequested = false;
@@ -168,7 +168,7 @@
     }
     function clearIdentity(phase = 'signed_out', error = null) {
       revokeChatURLs();internalOrg=null;
-      generation++; readSequence++;
+      generation++; readSequence++;leadJobSelection=null;
       emit({ phase, user: null, snapshot: null, account:null, pending: null, busy: false, error }, 'auth');
     }
     function requireEnabled() { if (!sdk) fail('NOT_ENABLED', 'Les accès employés sont en cours d’activation.'); }
@@ -237,7 +237,7 @@
         const notifications=notificationsResponse.error?{unavailable:true,items:[],unreadCount:0,actionCount:0}:notificationsResponse.data;
         let lead=null,boss=null,logistics=null,management=null,boutiquePricing=null;
         if(operationsResponse.data?.role==='chef_equipe'){
-          const response=await sdk.rpc('mir_lead_today_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
+          const selected=config.environment==='test'&&config.fieldExperienceEnabled===true&&leadJobSelection;const response=await sdk.rpc(selected?'mir_lead_job_snapshot':'mir_lead_today_snapshot',selected?{org:internalOrg,job:selected}:{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
         }else if(operationsResponse.data?.role==='boss'){
           const response=await sdk.rpc('mir_boss_operations_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);boss=response.data;
         }
@@ -578,7 +578,7 @@
     async function jobDossier(jobId,pageBefore=null,pageSize=20){
       requireReady();if(!internalOrg||!UUID.test(jobId||''))fail('JOB_INVALID','Ce chantier ne peut pas être ouvert.');
       const {data,error}=await sdk.rpc('mir_job_dossier_snapshot',{org:internalOrg,job:jobId,page_size:Math.min(50,Math.max(1,Number(pageSize)||20)),page_before:pageBefore||null});
-      if(error)throw errorOf(error);if(!data?.job||data.job.id!==jobId)fail('RESPONSE_UNCERTAIN','Le dossier chantier reçu ne peut pas être vérifié.');if(config.environment==='test'&&config.fieldExperienceEnabled===true){const extra=await sdk.rpc('mir_field_job_snapshot',{org:internalOrg,job:jobId});if(extra.error)throw errorOf(extra.error);if(extra.data?.jobId!==jobId)fail('RESPONSE_UNCERTAIN','Le suivi du chantier reçu ne peut pas être vérifié.');data.fieldIssues=extra.data.issues||[];}return data;
+      if(error)throw errorOf(error);if(!data?.job||data.job.id!==jobId)fail('RESPONSE_UNCERTAIN','Le dossier chantier reçu ne peut pas être vérifié.');if(config.environment==='test'&&config.fieldExperienceEnabled===true){const extra=await sdk.rpc('mir_field_job_snapshot',{org:internalOrg,job:jobId});if(extra.error)throw errorOf(extra.error);if(extra.data?.jobId!==jobId)fail('RESPONSE_UNCERTAIN','Le suivi du chantier reçu ne peut pas être vérifié.');data.fieldIssues=extra.data.issues||[];if(extra.data.job?.id===jobId)data.job={...data.job,...extra.data.job};}return data;
     }
     async function fieldIssueDecide(issueId,decision,response,requestId=uuid()){requireReady();if(config.environment!=='test'||!internalOrg||!UUID.test(issueId||''))fail('ACCESS_DENIED','Traitement indisponible.');const {data,error}=await sdk.rpc('mir_field_issue_decide',{org:internalOrg,issue:issueId,decision,response,request_id:requestId});if(error)throw errorOf(error);if(!data?.ok)fail('RESPONSE_UNCERTAIN','La réponse reste à confirmer.');return data;}
     async function fieldAction(jobId,kind,payload,requestId=uuid()){
@@ -622,6 +622,8 @@
     }
     async function punchCorrection(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_correction',{org:internalOrg,correction:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function punchAdmin(action,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_admin',{org:internalOrg,action,payload});if(error)throw errorOf(error);await refresh();return data;}
+    async function leadJob(jobId){requireReady();if(config.environment!=='test'||config.fieldExperienceEnabled!==true||status.snapshot?.operations?.role!=='chef_equipe')fail('ACCESS_DENIED','Accès Chef TEST requis.');leadJobSelection=jobId;await refresh();return status.snapshot?.lead;}
+    async function punchPersonalHistory(filters={},pageAfter=null,pageSize=25){requireReady();if(config.environment!=='test'||config.fieldExperienceEnabled!==true)fail('ACCESS_DENIED','Historique TEST non activé.');const {data,error}=await sdk.rpc('mir_punch_personal_history',{org:internalOrg,filters,page_size:pageSize,page_after:pageAfter});if(error)throw errorOf(error);if(!Array.isArray(data?.items))fail('RESPONSE_UNCERTAIN','Historique personnel incomplet.');return data;}
     async function punchJournal(filters={},pageAfter=null,pageSize=25){requireReady();const {data,error}=await sdk.rpc('mir_punch_journal',{org:internalOrg,filters,page_size:pageSize,page_after:pageAfter});if(error)throw errorOf(error);return data;}
     async function timeBankRequest(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_time_bank_request',{org:internalOrg,request:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     function orderShortcutQueueKey(){return `mir_order_shortcuts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
@@ -636,12 +638,13 @@
     }
     async function syncOrderShortcutQueue(){if(!internalOrg||!navigator.onLine||!status.user?.id)return 0;const queue=readOrderShortcutQueue(),remaining=[];let synced=0;for(const intent of queue){try{const {error}=await sdk.rpc('mir_order_shortcut_update',{org:internalOrg,request_id:intent.requestId,kind:intent.kind,item_id:intent.itemId,favorite:intent.favorite,requested_position:intent.position});if(error)throw error;synced++;}catch(_){remaining.push(intent);}}writeOrderShortcutQueue(remaining);if(synced)await refresh();return synced;}
     function orderDraftQueueKey(){return `mir_order_drafts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
-    function readOrderDraftQueue(){try{const rows=JSON.parse(storage?.getItem(orderDraftQueueKey())||'[]');return Array.isArray(rows)?rows.filter(x=>x&&UUID.test(x.saveRequestId||'')&&UUID.test(x.submitRequestId||'')&&x.data&&typeof x.data==='object'):[];}catch(_){return [];}}
-    function writeOrderDraftQueue(rows){try{storage?.setItem(orderDraftQueueKey(),JSON.stringify(rows.slice(-10)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre cette commande.');}}
-    async function transmitOrderDraft(intent){
-      const saved=await sdk.rpc('mir_order_draft_save',{org:internalOrg,request_id:intent.saveRequestId,order_id:intent.orderId||null,data:intent.data});if(saved.error)throw errorOf(saved.error);
+    function readOrderDraftQueue(key=orderDraftQueueKey()){try{const rows=JSON.parse(storage?.getItem(key)||'[]');return Array.isArray(rows)?rows.filter(x=>x&&UUID.test(x.saveRequestId||'')&&UUID.test(x.submitRequestId||'')&&x.data&&typeof x.data==='object'):[];}catch(_){return [];}}
+    function writeOrderDraftQueue(rows,key=orderDraftQueueKey()){try{storage?.setItem(key,JSON.stringify(rows.slice(-10)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre cette commande.');}}
+    async function transmitOrderDraft(intent,context={org:internalOrg,user:status.user?.id,epoch:generation}){
+      const current=()=>{if(context.epoch!==generation||context.user!==status.user?.id||context.org!==internalOrg)fail('SESSION_CHANGED','La session a changé. Vérifiez la commande avec le compte d’origine.');};current();
+      const saved=await sdk.rpc('mir_order_draft_save',{org:context.org,request_id:intent.saveRequestId,order_id:intent.orderId||null,data:intent.data});if(saved.error)throw errorOf(saved.error);current();
       const orderId=saved.data?.orderId;if(!UUID.test(orderId||''))fail('RESPONSE_UNCERTAIN','Le reçu du brouillon est incomplet.',{definitive:false,needsRetry:true});
-      const submitted=await sdk.rpc('mir_order_submit',{org:internalOrg,request_id:intent.submitRequestId,order_id:orderId});if(submitted.error)throw errorOf(submitted.error);
+      const submitted=await sdk.rpc('mir_order_submit',{org:context.org,request_id:intent.submitRequestId,order_id:orderId});if(submitted.error)throw errorOf(submitted.error);current();
       if(submitted.data?.orderId!==orderId||submitted.data?.status!=='submitted'||!UUID.test(submitted.data?.receiptId||''))fail('RESPONSE_UNCERTAIN','Le reçu de soumission est incomplet.',{definitive:false,needsRetry:true});
       return submitted.data;
     }
@@ -653,7 +656,8 @@
       activePromise=(async()=>{if(!navigator.onLine){writeOrderDraftQueue([...readOrderDraftQueue().filter(x=>x.submitRequestId!==intent.submitRequestId),intent]);return{status:'draft',offline:true,clientRequestId:intent.submitRequestId};}try{const receipt=await transmitOrderDraft(intent);writeOrderDraftQueue(readOrderDraftQueue().filter(x=>x.submitRequestId!==intent.submitRequestId));return receipt;}catch(error){if(error?.definitive===false||error?.code==='NETWORK_UNCERTAIN'){writeOrderDraftQueue([...readOrderDraftQueue().filter(x=>x.submitRequestId!==intent.submitRequestId),intent]);return{status:'draft',offline:true,clientRequestId:intent.submitRequestId};}throw error;}})().finally(()=>{activePromise=null;});
       return activePromise;
     }
-    async function syncOrderDraftQueue(){if(!internalOrg||!navigator.onLine||!status.user?.id)return 0;const queue=readOrderDraftQueue(),remaining=[];let synced=0;for(const intent of queue){try{const receipt=await transmitOrderDraft(intent);emit({orderConfirmed:{userId:status.user.id,receipt}},'order-confirmed');synced++;}catch(_){remaining.push(intent);}}writeOrderDraftQueue(remaining);if(synced)await refresh();return synced;}
+    let orderSyncPromise=null;
+    async function syncOrderDraftQueue(){if(orderSyncPromise)return orderSyncPromise;if(!internalOrg||!navigator.onLine||!status.user?.id)return 0;const context={org:internalOrg,user:status.user.id,epoch:generation},key=orderDraftQueueKey();orderSyncPromise=(async()=>{let synced=0;for(const intent of readOrderDraftQueue(key)){if(context.epoch!==generation||context.user!==status.user?.id||context.org!==internalOrg)break;try{const receipt=await transmitOrderDraft(intent,context);if(context.epoch!==generation||context.user!==status.user?.id)break;writeOrderDraftQueue(readOrderDraftQueue(key).filter(x=>x.submitRequestId!==intent.submitRequestId),key);emit({orderConfirmed:{userId:context.user,receipt}},'order-confirmed');synced++;}catch(error){if(error.code==='SESSION_CHANGED')break;}}if(synced&&context.epoch===generation)await refresh();return synced;})().finally(()=>{orderSyncPromise=null;});return orderSyncPromise;}
     function expenseQueueKey(){return `mir_expense_drafts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
     function readExpenseQueue(){try{const raw=JSON.parse(storage?.getItem(expenseQueueKey())||'[]');return Array.isArray(raw)?raw.filter(x=>x&&UUID.test(x.requestId||'')&&x.data&&typeof x.data==='object'):[];}catch(_){return [];}}
     function writeExpenseQueue(rows){try{storage?.setItem(expenseQueueKey(),JSON.stringify(rows.slice(-20)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre ce brouillon.');}}
@@ -729,7 +733,7 @@
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,activateInvitation,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, previewInvitation, listInvitations, fieldAction, fieldIssueDecide, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, harmonySettings, syncHarmonySettings, dispose,
+      acceptInvitation, previewInvitation, listInvitations, fieldAction, fieldIssueDecide, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, leadJob, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, punchPersonalHistory, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, harmonySettings, syncHarmonySettings, dispose,
       chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatFileURL, chatPhotoURL,
       helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }

@@ -76,10 +76,10 @@ test('PDF chat utilise la passerelle et reste interdit aux autres scopes',async 
 test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch conservées',()=>{
  const baseline=require('./fixtures/mir-chat-baseline.json'),hash=x=>createHash('sha256').update(x).digest('hex');
  // Only the reviewed TEST configuration delta overrides the historical file pin.
- const reviewed=require('./fixtures/mir-employee-auth-reviewed.json');
- for(const [file,value]of Object.entries(baseline.files))assert.equal(hash(fs.readFileSync(file)),reviewed.files[file]||value,file);
+ const reviewed=require('./fixtures/mir-employee-auth-reviewed.json'),uxReviewed=require('./fixtures/mir-chantier-ux-reviewed.json');
+ for(const [file,value]of Object.entries(baseline.files))assert.equal(hash(fs.readFileSync(file)),uxReviewed.files[file]||reviewed.files[file]||value,file);
  const beck=require('./fixtures/mir-chat-main-215259.json');
- const approvedProtectedChanges={
+ const approvedProtectedChanges={...uxReviewed.files,
   'dist/catalogue-fd6866b49d21.json':'a08b9bf28abba1f286d0854690ae4979eaaa723a3fe04eb86a75dffc82efdc63',
   'dist/commerce.js':'4f52389a1a771c72b4900ac0d7c93a38e58c6d269e2a83e15452701327897815'
  };
@@ -101,6 +101,6 @@ test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch con
   for(const file of changed)assert.equal(hash(fs.readFileSync(file)),approvedProtectedChanges[file],`Phase3A protected file not explicitly approved: ${file}`);
  }else for(const [file,value]of Object.entries(beck.files))assert.equal(hash(fs.readFileSync(file)),approvedProtectedChanges[file]||value,'BECK/main '+file);
  const source=fs.readFileSync('dist/chantier-app.js','utf8');
- for(const [name,value]of Object.entries(baseline.functions)){const start=source.indexOf('  function '+name+'('),end=source.indexOf('\n  function ',start+1);assert.ok(start>=0,name);assert.equal(hash(source.slice(start,end<0?undefined:end)),value,name);}
+ for(const [name,value]of Object.entries(baseline.functions)){const start=source.indexOf('  function '+name+'('),end=source.indexOf('\n  function ',start+1);assert.ok(start>=0,name);assert.equal(hash(source.slice(start,end<0?undefined:end)),uxReviewed.functions[name]||value,name);}
  const client=fs.readFileSync('dist/portal-client.js','utf8');assert.match(client,/createSignedUrl\(path,300\)/);assert.doesNotMatch(client,/getPublicUrl/);
 });

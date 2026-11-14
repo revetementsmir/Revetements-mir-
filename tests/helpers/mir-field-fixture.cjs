@@ -9,12 +9,14 @@ window.MIRPortalClient={...window.MIRPortalClient,create(){
  return{config:{projectRef:'fixture-only',fieldExperienceEnabled:true},getStatus:ready,subscribe(fn){publish=fn;},async start(){publish(ready());},async refresh(){publish(ready());},async signOut(){publish({phase:'anonymous'});},
  async jobDossier(jobId){calls.push(['dossier',jobId]);return{job:jobs.find(j=>j.id===jobId),documents:[],tasks:state.lead?.tasks||[],reports:[],extras:[],orders:[],activity:activities.filter(a=>a.job_id===jobId)};},
  async fieldAction(jobId,kind,payload,requestId){calls.push(['field',jobId,kind,payload,requestId]);if(window.__fieldFixture.fail)throw Error('Serveur indisponible. Réessayez.');const item={id:requestId,job_id:jobId,activity_type:kind,created_at:new Date().toISOString(),payload:{...payload,status:'open'}};activities.push(item);return{ok:true,id:requestId,jobId,status:'open'};},
- async uploadInternal(file,scope,jobId){calls.push(['upload',scope,jobId]);return 'fixture/'+scope+'/'+jobId+'/qa/photo.jpg';},
+ async uploadInternal(file,scope,jobId){calls.push(['upload',scope,jobId,file.name]);return 'fixture/'+scope+'/'+jobId+'/qa/'+file.name;},
+ async punchPersonalHistory(filters,after){calls.push(['history',filters,after]);const rows=window.__fieldFixture.historyItems||[];return{items:after?rows.slice(1):rows.slice(0,1),nextAfter:!after&&rows.length>1?{id:rows[0].id,date:rows[0].work_date}:null};},
  async punchAction(action,jobId){calls.push(['punch',action,jobId]);state.punch.activeShift=action==='in'?{started_at:new Date().toISOString(),segment:{job_id:jobId,segment_type:'job'}}:null;publish(ready());return{serverAt:new Date().toISOString()};},
+ async leadJob(jobId){state.lead={...state.lead,selectedJobId:jobId,assignment:{...state.lead?.assignment,jobId}};publish(ready());return state.lead;},
  async leadAction(action,payload){calls.push(['lead',action,payload]);publish(ready());return{ok:true,id:crypto.randomUUID()};},
  async openConversation(kind,target){calls.push(['conversation',kind,target]);const cid=crypto.randomUUID();state.messaging.conversations.push({id:cid,kind,participants:[id,target]});return cid;},async chatMessages(){return{items:[],hasMore:false};},
  async harmonySettings(){return{theme:'light',textSize:'standard',reducedMotion:'auto',highContrast:false,notifications:{},applicable:[]};},
- async submitOrder(payload){calls.push(['order',payload]);if(window.__fieldFixture.orderWait)await window.__fieldFixture.orderWait;if(window.__fieldFixture.fail)throw Error('Commande non confirmée');const orderId=crypto.randomUUID(),receiptId=crypto.randomUUID();return{orderId,receiptId,status:'submitted'};},
+ async submitOrder(payload){calls.push(['order',payload]);if(window.__fieldFixture.badReceipt)return{};if(window.__fieldFixture.orderWait)await window.__fieldFixture.orderWait;if(window.__fieldFixture.fail)throw Error('Commande non confirmée');const orderId=crypto.randomUUID(),receiptId=crypto.randomUUID();return{orderId,receiptId,status:'submitted'};},
  async setOrderShortcut(){return{};},async command(command,payload){calls.push(['command',command,payload]);return{ok:true,result:{id:crypto.randomUUID()},snapshot:state};}
  };
 }};

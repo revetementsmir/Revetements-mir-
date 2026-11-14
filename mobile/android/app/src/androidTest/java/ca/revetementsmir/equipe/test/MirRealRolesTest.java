@@ -34,8 +34,24 @@ public class MirRealRolesTest extends MirDeviceSetup {
   try(FileOutputStream out=new FileOutputStream(file)){assertTrue(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,out));}finally{bitmap.recycle();}
  }
  private void inspectMenu(ActivityScenario<MainActivity>s,String role)throws Exception{
-  js(s,"scrollTo(0,0);document.querySelector('.mir-harmony-toggle').click();true");
-  waitFor(s,"document.querySelector('#mir-harmony-menu')?.hidden===false");
+  boolean field=role.equals("employe")||role.equals("chef_equipe");
+  if(field){
+   waitFor(s,"document.body.dataset.fieldShell==='true' && !!document.querySelector('#field-header')");
+   assertEquals("Accueil|Commande|Punch|Message|Plus",js(s,"[...document.querySelectorAll('#portal-navigation button span')].map(n=>n.textContent).join('|')"));
+   assertEquals(Boolean.TRUE,js(s,"!!document.querySelector('[data-field-cart]') && !!document.querySelector('[data-field-profile]')"));
+   for(String tab:new String[]{"day","command","punch","messages","more"}){
+    js(s,"document.querySelector('#portal-navigation [data-view="+tab+"]').click();true");
+    waitFor(s,"document.querySelector('#portal-navigation [data-view="+tab+"]')?.getAttribute('aria-current')==='page' && !!document.querySelector('#portal-content h1')");
+    screenshot(s,"v130002-"+role+"-"+tab);
+   }
+   js(s,"document.querySelector('#portal-navigation [data-view=day]').click();true");
+   screenshot(s,"v130002-"+role+"-home");
+   js(s,"document.querySelector('[data-field-profile]').click();true");
+   waitFor(s,"document.querySelector('#portal-dialog')?.open===true");
+  }else{
+   js(s,"scrollTo(0,0);document.querySelector('.mir-harmony-toggle').click();true");
+   waitFor(s,"document.querySelector('#mir-harmony-menu')?.hidden===false");
+  }
   assertEquals(Boolean.FALSE,js(s,"MIRAndroid.Policy.allowedRoute('https://localhost/production.html?mode=client')"));
   assertEquals(Boolean.FALSE,js(s,"MIRAndroid.Policy.allowedRoute('https://localhost/chantier.html?estimate=1')"));
   assertEquals(Boolean.TRUE,js(s,"MIRAndroid.Policy.allowedRoute('https://localhost/production.html?mode=client&source=store&kind=profile')"));
@@ -44,22 +60,22 @@ public class MirRealRolesTest extends MirDeviceSetup {
   // survives relocation or late insertion into the shared header.
   waitFor(s,"[...document.querySelectorAll('#mir-harmony-menu a[href]')].every(a=>MIRAndroid.Policy.allowedRoute(a.href,location.origin)||!a.getClientRects().length)");
   assertEquals(Boolean.TRUE,js(s,"[...document.querySelectorAll('#portal-navigation button')].some(b=>b.getClientRects().length)"));
-  screenshot(s,"v120006-"+role+"-menu");
-  js(s,"document.querySelector('.mir-harmony-toggle').click();scrollTo(0,0);true");
-  screenshot(s,"v120006-"+role+"-home");
-  js(s,"document.querySelector('[data-view=settings]').click();true");
+  screenshot(s,"v130002-"+role+"-menu");
+  if(field)js(s,"document.querySelector('[data-close-dialog]').click();scrollTo(0,0);true");else js(s,"document.querySelector('.mir-harmony-toggle').click();scrollTo(0,0);true");
+  if(!field)screenshot(s,"v130002-"+role+"-home");
+  if(field)js(s,"document.querySelector('[data-field-profile]').click();document.querySelector('#portal-dialog [data-view=settings]').click();true");else js(s,"document.querySelector('[data-view=settings]').click();true");
   waitFor(s,"!!document.querySelector('#harmony-settings-form') && document.querySelector('.settings-status')?.textContent==='Enregistré dans votre compte MIR'");
-  js(s,"scrollTo(0,0);true");screenshot(s,"v120006-"+role+"-settings");
+  js(s,"scrollTo(0,0);true");screenshot(s,"v130002-"+role+"-settings");
   if(role.equals("employe")){
-   js(s,"document.querySelector('.mir-harmony-toggle').click();document.querySelector('#portal-navigation [data-view=account]').click();document.querySelector('[data-view=absences]').click();true");
+   js(s,"document.querySelector('#portal-navigation [data-view=more]').click();document.querySelector('[data-view=absences]').click();document.querySelector('.absence-compose summary').click();true");
    waitFor(s,"!!document.querySelector('#absence-draft-form textarea[name=note]')");
-   js(s,"scrollTo(0,0);true");screenshot(s,"v120006-employee-absence-form");
+   js(s,"scrollTo(0,0);true");screenshot(s,"v130002-employee-absence-form");
    js(s,"(()=>{const n=document.querySelector('#absence-draft-form textarea[name=note]');n.value='RECETTE-PHASE11-VISUEL-LOCAL';n.dispatchEvent(new Event('input',{bubbles:true}));n.scrollIntoView({block:'center'});})()");
    assertEquals("RECETTE-PHASE11-VISUEL-LOCAL",js(s,"document.querySelector('#absence-draft-form textarea[name=note]').value"));
-   screenshot(s,"v120006-employee-local-note");
+   screenshot(s,"v130002-employee-local-note");
    androidx.test.uiautomator.UiDevice device=androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());device.pressBack();
    androidx.test.uiautomator.UiObject2 cancel=device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.res("android:id/button2")),5000);
-   assertNotNull("Android back requires confirmation for local input",cancel);screenshotSystem("v120006-employee-back-confirmation");cancel.click();
+   assertNotNull("Android back requires confirmation for local input",cancel);screenshotSystem("v130002-employee-back-confirmation");cancel.click();
    assertEquals("RECETTE-PHASE11-VISUEL-LOCAL",js(s,"document.querySelector('#absence-draft-form textarea[name=note]').value"));
    // No submit, save, upload or preference change; the ordinary sign-out follows.
   }

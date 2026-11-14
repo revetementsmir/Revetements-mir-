@@ -1,0 +1,13 @@
+{
+  "baseCommit": "24d29734d68cd3da23c17be8693ddba08abff19f",
+  "checkpoint": "f2e9671",
+  "reason": "Refonte chantier autorisée Employé/Chef, gated fieldExperienceEnabled in TEST/APK. Whole-file pins for additive field/history APIs, scoped drawing workflow, session-bound order replay. Punch presentation changes preserve server rules, GPS controls, correction/approval and business tests. Tested by mir-field-redesign-browser, mir-field-postgres, mir-field-cart and original suites. Historical fixtures retained.",
+  "files": {
+    "dist/portal-client.js": "3814d31f8c931397aa96fd999f53a3d0f43032a58cbc7ee5b771470a9cd8ce11",
+    "dist/production-app.js": "2b78e13731727f7fbca064b7611cadd9072cad61ee9629d0258d924c53f852c7"
+  },
+  "functions": {
+    "renderPunchHours": "9ddc1bee9e8586a15f8da90a95cda1d8a4bef786f8121ef32b83d7529e441561",
+    "punchCorrectionDialog": "53309e7d6c7bce89dbef88955fe37e5977b5a6aca9c128786141fa8d50d810f8"
+  }
+}

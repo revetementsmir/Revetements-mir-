@@ -43,16 +43,16 @@ test('Punch, client RPC et modules validés préservés depuis main',()=>{
   let source=fs.readFileSync(file,'utf8');
   // Pin the complete reviewed Auth client instead of normalizing away additions.
   // Historical baseline remains intact; all other files/function hashes still apply.
-  const reviewed=require('./fixtures/mir-employee-auth-reviewed.json');
+  const reviewed=require('./fixtures/mir-employee-auth-reviewed.json'),uxReviewed=require('./fixtures/mir-chantier-ux-reviewed.json');
   if(file==='dist/portal-client.js')assert.equal((source.match(/^      revokeChatURLs\(\);(?:internalOrg=null;)?$/gm)||[]).length,3,'all three private-blob revocation hooks retained');
-  assert.equal(hash(source),reviewed.files[file]||expected,file);
+  assert.equal(hash(source),uxReviewed.files[file]||reviewed.files[file]||expected,file);
  }
  const after=fs.readFileSync('dist/chantier-app.js','utf8');
  for(const name of ['punchCard','renderPunchHours','punchCorrectionDialog','punchDecisionDialog','renderWarehouse','renderManagement']){
   const extract=s=>{const start=s.indexOf('  function '+name+'(');assert.ok(start>=0,name);const end=s.indexOf('\n  function ',start+1);return s.slice(start,end<0?undefined:end);};
   // Some adjacent presentation helpers are intentionally added before punchCard;
   // the function bodies below each remain byte-for-byte unchanged.
-  assert.equal(hash(extract(after)),base.functions[name],name);
+  assert.equal(hash(extract(after)),require('./fixtures/mir-chantier-ux-reviewed.json').functions[name]||base.functions[name],name);
  }
  assert.doesNotMatch(fs.readFileSync('dist/mir-today.js','utf8'),/geolocation|watchPosition|\.rpc\(|\.from\(|service_role|sb_secret_/);
  assert.match(after,/portalClient\.jobDossier\(job.id\)/);

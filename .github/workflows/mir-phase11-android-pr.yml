@@ -50,6 +50,7 @@ jobs:
           name: phase11-chromium-simulation
           path: |
             artifacts/phase11/web/
+            artifacts/chantier-redesign/functional/
             artifacts/employee-auth-audit/email/
             artifacts/employee-auth-audit/enrollment-web/
             artifacts/mir-environments/
@@ -89,8 +90,8 @@ jobs:
         working-directory: mobile/android
         run: |
           ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon
-          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/mir-version-120005.apk"
-          MIR_ANDROID_VERSION_CODE=120006 ./gradlew :app:assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/mir-version-130001.apk"
+          MIR_ANDROID_VERSION_CODE=130002 ./gradlew :app:assembleDebug --no-daemon
           mkdir -p ../../artifacts/phase11
           cp app/build/outputs/apk/debug/app-debug.apk ../../artifacts/phase11/MIR-TEST-debug.apk
           cd ../..
@@ -125,7 +126,7 @@ jobs:
           profile: pixel_7
           disable-animations: true
           script: |
-            adb install "$RUNNER_TEMP/mir-version-120005.apk"
+            adb install "$RUNNER_TEMP/mir-version-130001.apk"
             adb install mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             mobile/tools/run-instrumentation.sh
             cp artifacts/phase11/instrumentation.txt artifacts/phase11/webview-tests.txt

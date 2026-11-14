@@ -1,3 +1,5 @@
+Refonte chantier TEST : **0.13.0-test /130001**, CI de mise à jour130001→130002. Nouvelle interface Employé/Chef activée dans APK TEST, mêmes sources dist ; [intégration et limites](../docs/verification/chantier-redesign/INTEGRATION.md). Recette physique Samsung ouverte. Google/courriels désactivés.
+
 # Android privé MIR — recette uniquement
 
 État actuel Auth : **0.12.2-test /120005**, backend MIR TEST installé, invitations/mot de passe actifs dans le paquet; Google et récupération restent désactivés faute de recette de fournisseur/envoi. [Bilan courant](../docs/verification/employee-auth-invitations/BILAN-20261114.md) et [Samsung Auth](../docs/verification/employee-auth-invitations/SAMSUNG-AUTH.md). Les paragraphes suivants conservent les étapes historiques.
