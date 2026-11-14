@@ -52,6 +52,10 @@ async function capture(card,name,print=false){
           assert.match(state.src,/prime-40713-box\.webp$/);
           assert.equal(state.loaded,true,'La vraie photo PRIME doit charger');
           assert.equal(state.fit,'contain','Aucun étirement de la photo');
+          if(width>=768){
+            const bounds=await card.boundingBox();
+            assert.ok(bounds.width<=425,'La photo basse résolution ne doit pas remplir une carte PC/tablette énorme');
+          }
         }
         await capture(card,version+'-'+width+'-prime',width===390);
         assert.deepEqual(errors,[],'Erreurs JS '+version+' '+width);
