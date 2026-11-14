@@ -116,7 +116,7 @@
     "tests/helpers/mir-field-fixture.cjs": "84465e8fa88e8249db7b7575a20ba4765eb94519321752ea64d3813672ad9ea8"
   },
   "nativeAuthSourcesNotExecuted": {
-    "mobile/web/sdk.js": "451a23a3b40e6608ac1b2967786aa377ebe911a94332749f2da8a845eea7f787"
+    "mobile/web/sdk.js": "868cb6969389a2006202d5a1d135a19b10bf60350e3ad138b01bb063cff4d0b1"
   },
   "nativeProofLimit": "Rendus Chromium locaux. La CIb849 a échoué dans childBack ; ces images ne constituent pas une preuve native de correction. Les anciennes capturesChef sont des fixtures locales, pas des captures natives29ab.",
   "files": [
@@ -312,5 +312,6 @@
     "Punch actif/transfert et panier sont des fixtures locales.",
     "Les rendus ne prouvent pas une écriture hébergée,la recetteAndroid ni un essaiSamsung.",
     "Copies binaires sans retouche du contenu; toutes les captures complètes restent dans les artifacts."
-  ]
+  ],
+  "nativeAuthSourceNote": "Empreinte du SDK diagnostic TEST de phases/verrous mise à jour après capture. Aucune exécution SDK dans cet aperçu; 105ressources rendues, états et PNG inchangés."
 }

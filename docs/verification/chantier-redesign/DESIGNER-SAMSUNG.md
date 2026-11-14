@@ -2,7 +2,19 @@
 
 État final Designer : les cinq onglets Employé/Chef, le dossier et les formulaires ont été rendus et inspectés depuis le gel courant. Les compositions Accueil8 « Liste nette » et Punch2 « Cadran » approuvées par Frederick sont intégrées; le responsable a comparé les rendus aux deux photos originales, non visibles dans le contexte de cet agent. Les preuves ci-dessous identifient exactement les ressources rendues. Elles constituent une revue visuelle Chromium et des aperçus locaux, sans certification de service hébergé, de WebView physique ou de Samsung.
 
-## Reprise Dessin après b849 — provenance courante
+## Mise à jour de l’empreinte SDK diagnostic TEST — aucun nouveau rendu
+
+Le SDK a reçu uniquement le diagnostic TEST de phases/verrous annoncé par l’intégrateur. Après son gel, son empreinte non exécutée par l’aperçu a été actualisée dans `nativeAuthSourcesNotExecuted` : `868cb6969389a2006202d5a1d135a19b10bf60350e3ad138b01bb063cff4d0b1`. Aucun SDK n’a été exécuté, aucun écran ou état n’a été régénéré et aucune synchronisation n’est revendiquée par cette mise à jour.
+
+Le rendu reste strictement identifié par les 105 ressources et l’empreinte `32771ff87c1f3a1e521966ee1045f78db1204419fa34ad9f14a6582676e7adf2`. Les 16 PNG gardent leurs octets et dates de modification. Les états complets et compressés, la CSS, les noms des vues et les scripts d’interaction ont été comparés avant/après : seuls l’empreinte SDK et sa note descriptive diffèrent dans les métadonnées. Les empreintes des fichiers qui les embarquent sont donc actualisées sans nouvelle recette visuelle ou native.
+
+- Manifeste durable : SHA-256 `9b5a4499dcfb6771f3c15a922d14f778d5d287319057a0e2608c415f3c7f2d50`.
+- Complet 37 états inchangés : `artifacts/chantier-redesign/preview.html`, 6285173 octets, SHA-256 `aa9054e1c2b3ae657d688e01c5c76049698ef1274ff14ff2005421b0c425169d`.
+- Fragment 35 états inchangés : `artifacts/chantier-redesign/mir-chantier-preview.html`, 799980 octets, SHA-256 `bc1466734dc8dbd4ccfef702e4d2b726523b7e0a4962560cc588960706bdaec7`.
+
+Cette opération ne diagnostique pas le blocage pendingChef et ne constitue pas une preuve native de correction. Les rapports et preuves historiques restent conservés ci-dessous.
+
+## Historique — rendu Dessin après b849
 
 Checkpoint `b849c68167b0312494d068254f0495229fc942db`, avec le correctif passif de l’iframe gelé par l’intégrateur. Parmi les 105 sources chargées, seul `dist/chantier-app.js` diffère de la livraison précédente : SHA-256 `2b2a61f888f18223aceb585f112c12067f24d7a1a9ebb8e10326ef7cb3059304`. `portal-client.js` reste `d452dd4b96163cd544cf8833fc8898fe9ae7f946dbeee2ec85faadc60eaa456b`; le SDK natif non exécuté par l’aperçu reste `451a23a3b40e6608ac1b2967786aa377ebe911a94332749f2da8a845eea7f787`. Aucune composition ni aucun écran supplémentaire n’a été ajouté.
 

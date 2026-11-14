@@ -2,12 +2,12 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),{webcrypto}=require('node:crypto');
 const {sharedLocksFor}=require('./auth-lock-test-helper.cjs');
 const Flow=require('../web/auth-flow.cjs'),Policy=require('../web/policy.cjs'),root=path.resolve(__dirname,'../..');
-function harness({role='employee',exchangeError=false,slots=new Map(),team=false,denyInvitation=false,roleState=null,accountHook=null,userHook=null,tokenState=null,clearHook=null,browserStore=new Map(),locks}={}){
+function harness({role='employee',exchangeError=false,slots=new Map(),team=false,denyInvitation=false,roleState=null,accountHook=null,userHook=null,tokenState=null,clearHook=null,browserStore=new Map(),locks,channels}={}){
  const requests=[],opened=[],replaced=[];let exchanges=0,accepted=false,nativeClears=0;
  const jwt=()=>Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url')+'.'+Buffer.from(JSON.stringify({sub:'00000000-0000-4000-8000-000000000005',jti:tokenState?.value||'session-default',exp:Math.floor(Date.now()/1000)+3600})).toString('base64url')+'.local-signature';
  const user={id:'00000000-0000-4000-8000-000000000005',email:'employee@example.invalid',aud:'authenticated',created_at:'2026-11-14T00:00:00Z'};
  const Native={readAuth:async({slot='session'}={})=>({value:slots.get(slot)}),writeAuth:async({slot='session',value})=>{slots.set(slot,value);},removeAuthSlot:async({slot})=>slots.delete(slot),clearAuth:async()=>{nativeClears++;if(clearHook?.run)return clearHook.run();slots.clear();},openAuth:async({url})=>opened.push(url)};
- const c=vm.createContext({navigator:locks===null?{}:{locks:locks||sharedLocksFor(slots)},console,URL,URLSearchParams,TextEncoder,TextDecoder,crypto:webcrypto,Headers,Request,Response,setTimeout,clearTimeout,setInterval,clearInterval,AbortController,Buffer,btoa,atob,WebSocket,
+ const c=vm.createContext({...channels?{BroadcastChannel:channels}:{},navigator:locks===null?{}:{locks:locks||sharedLocksFor(slots)},console,URL,URLSearchParams,TextEncoder,TextDecoder,crypto:webcrypto,Headers,Request,Response,setTimeout,clearTimeout,setInterval,clearInterval,AbortController,Buffer,btoa,atob,WebSocket,
   location:{replace:url=>replaced.push(url)},localStorage:{clear:()=>browserStore.clear(),setItem:(k,v)=>browserStore.set(k,v),getItem:k=>browserStore.get(k)||null},sessionStorage:{clear(){}},indexedDB:{databases:async()=>[]},require:()=>Flow,
   fetch:async(input,init)=>{const url=String(input);requests.push(url);assert.ok(url.startsWith(Flow.PROJECT+'/'),url);let body={};
    if(url.includes('/token?grant_type=pkce')){exchanges++;body=exchangeError?{error:'invalid_grant',error_description:'Expired'}:{access_token:jwt(),refresh_token:'test-refresh',expires_in:3600,token_type:'bearer',user};}
@@ -23,7 +23,7 @@ function harness({role='employee',exchangeError=false,slots=new Map(),team=false
  vm.runInContext(fs.readFileSync(path.join(root,'dist/vendor/supabase-client.js'),'utf8'),c);c.window.MIRSupabase=c.MIRSupabase;
  vm.runInContext(fs.readFileSync(path.join(root,'mobile/web/sdk.js'),'utf8'),c);
  const client=c.window.MIRSupabase.createClient(Flow.PROJECT,'sb_publishable_test',{auth:{autoRefreshToken:false}});
- return{client,slots,opened,replaced,requests,accept:c.window.MIRAndroidAcceptAuth,resume:()=>c.window.MIRAndroidSession.resume(),browserStore,exchanges:()=>exchanges,nativeClears:()=>nativeClears};
+ return{client,slots,opened,replaced,requests,accept:c.window.MIRAndroidAcceptAuth,resume:()=>c.window.MIRAndroidSession.resume(),browserStore,exchanges:()=>exchanges,nativeClears:()=>nativeClears,diagnostic:()=>c.window.MIRAndroidSession.diagnostic()};
 }
 test('callback and authorize reject ambiguous, injected and foreign URLs',()=>{
  const good=Flow.CALLBACK+'?flow=google&code=code-123';assert.equal(Flow.callback(good).flow,'google');
@@ -147,4 +147,14 @@ for(const stage of['before-delete','after-delete'])test('two Activities serializ
  const login=b.client.auth.signInWithPassword({email:'b@example.invalid',password:'local-password'}).then(result=>{assert.equal(result.error,null);loggedIn=true;b.browserStore.set('mir_update_probe','B survives');});
  await drain();assert.equal(loggedIn,false,'Replacement Activity must wait for the old native callback');assert.equal(b.requests.some(url=>url.includes('grant_type=password')),false,'No replacement session is written before the shared lock is released');
  release();await Promise.all([refused,login]);assert.equal(a.nativeClears(),before+1,'Supabase removal is not followed by a second native clear');assert.ok(b.slots.has('session'));assert.equal(b.browserStore.get('mir_update_probe'),'B survives');await a.client.auth.stopAutoRefresh();await b.client.auth.signOut();
+});
+
+test('Auth diagnostics report stages and pending Native methods without credentials or session values',async()=>{
+ const hook={},h=harness({clearHook:hook});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'private-password'});let release,entered;const gate=new Promise(r=>release=r),started=new Promise(r=>entered=r);hook.run=()=>{hook.run=null;entered();return gate.then(()=>h.slots.clear());};const out=h.client.auth.signOut();await started;const diagnostic=await h.diagnostic(),text=JSON.stringify(diagnostic);assert.equal(diagnostic.self.native.some(item=>item.method==='clearAuth'),true);assert.equal(diagnostic.locks.held.some(item=>item.name==='mir-android-auth-transition'),true);assert.doesNotMatch(text,/private-password|employee@example|access_token|refresh_token|local-signature/);release();await out;
+});
+
+test('Diagnostic peer fields use fixed method/phase/path/slot whitelists',async()=>{
+ const peers=[];class Channel{constructor(){peers.push(this);}postMessage(data){for(const peer of peers)if(peer!==this)queueMicrotask(()=>peer.onmessage?.({data:structuredClone(data)}));}}
+ const h=harness({channels:Channel}),peer=new Channel();peer.onmessage=({data})=>{if(data.type==='query')peer.postMessage({type:'state',state:{context:'peer',path:'/privatecontext.html',active:{phase:'privatealpha',userId:'sentinel-user'},native:[{method:'PrivateMethod',slot:'untrusted',args:'sentinel-token'}],queued:[],access_token:'sentinel-token'}});};
+ const result=await h.diagnostic();assert.equal(result.peers.length,1);assert.equal(result.peers[0].active.phase,'unknown');assert.equal(result.peers[0].native[0].method,'unknown');assert.equal(result.peers[0].native[0].slot,undefined);assert.equal(result.peers[0].path,'');assert.doesNotMatch(JSON.stringify(result),/sentinel|privatealpha|PrivateMethod|privatecontext|untrusted/);
 });
