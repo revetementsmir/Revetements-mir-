@@ -55,6 +55,11 @@ public class MirRealRolesTest extends MirDeviceSetup {
  }
  private void tap(ActivityScenario<MainActivity>s,String selector)throws Exception{
   // Native pointer input: no programmatic DOM click that can precede presentation.
+  if(selector.equals("#portal-dialog .dialog-close[data-close-dialog]")){
+   presentFrame(s);
+   androidx.test.uiautomator.UiObject2 close=androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.desc("Fermer la fenêtre")),10000);
+   assertNotNull("Dialog close is exposed by Android accessibility",close);assertTrue("Native close is enabled",close.isEnabled());close.click();return;
+  }
   waitFor(s,"(()=>{const n=document.querySelector("+JSONObject.quote(selector)+");return !!n&&!n.disabled&&n.getBoundingClientRect().height>0;})()");js(s,"document.querySelector("+JSONObject.quote(selector)+").scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});true");presentFrame(s);
   JSONObject point=(JSONObject)js(s,"(()=>{const n=document.querySelector("+JSONObject.quote(selector)+");if(!n)throw Error('Native target missing');const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,hit=document.elementFromPoint(x,y);return{x,y,width:innerWidth,height:innerHeight,w:r.width,h:r.height,hit:!!hit&&(hit===n||n.contains(hit))};})()");assertTrue("Native target is presented without an intercepting element",point.getBoolean("hit"));
   assertTrue("Native target has visible bounds",point.getDouble("w")>0&&point.getDouble("h")>0&&point.getDouble("x")>=0&&point.getDouble("y")>=0&&point.getDouble("x")<point.getDouble("width")&&point.getDouble("y")<point.getDouble("height"));int[] loc=new int[4];s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();web.getLocationOnScreen(loc);loc[2]=web.getWidth();loc[3]=web.getHeight();});

@@ -16,6 +16,10 @@ Preuve détaillée : [hosted-contention-20261114.json](proofs/hosted-contention-
 
 Le test Android conserve toutes ses assertions HTTP, rôles, recherche et exclusion. Il ferme désormais réellement le clavier via Android, vérifie les insets IME, cadre la carte et exige sa visibilité complète avant la capture. Ressources web générées et compilation du test Android réussies localement. La preuve d’exécution et l’inspection de la capture doivent être confirmées sur la nouvelle tête CI avant toute fusion.
 
+Le run 43642024806 sur3a58607 a échoué avant l’Adjointe : le toucher calculé par coordonnées n’a pas fermé le dialogue Déplacement. Le PNG réel a été ouvert et montre le dialogue toujours ouvert, sans sélection de texte. Le test cible maintenant ce bouton par son nom accessible Android « Fermer la fenêtre », avec un vrai toucher UiAutomator et la même assertion de fermeture. Aucun clic JavaScript ni assertion retirée. Archive d’échec14132865660, SHA ZIP9bad85bfd71d7670eb3f43e719c0323cbe54f4e7a7e23c01dc947cff2fc502d5.
+
+Limite du DTO de proposition : le nom/numéro redondant d’un segment transféré peut encore désigner l’ancien chantier. L’interface résout bien son libellé depuis le `jobId` autorisé du snapshot; le canonique final et les calculs utilisent la bonne cible. Cette métadonnée n’est pas utilisée pour afficher ou décider le chantier. Aucun nouveau correctif de schéma nécessaire pour les deux vérifications demandées.
+
 Deux nouvelles fixtures actives dédiées `8700…001/002`, segments `8800…001/002`, portent le marqueur `QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL`. Les anciens quarts fermés ne sont pas réactivés. Les nouvelles fixtures seront clôturées précisément après les contrôles Android de PR38 et de PR37 intégrée.
 
 ## Intégration autorisée
