@@ -1,0 +1,17 @@
+{
+  "source": "5c0466a native SDK",
+  "transport": "synthetic local responses; no server",
+  "scenario": "late active-client getUser(session_not_found) after same-account login",
+  "before": {
+    "vaultPresent": true,
+    "probePresent": true
+  },
+  "returnedError": {
+    "name": "AuthSessionMissingError",
+    "status": 400
+  },
+  "after": {
+    "vaultPresent": false,
+    "probePresent": false
+  }
+}

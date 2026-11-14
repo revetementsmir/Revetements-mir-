@@ -58,3 +58,15 @@ Le test natif utilise maintenant des gestes `UiDevice` sur les bornes des vrais 
 Les manifestes décrivent les PNG et pixels réellement capturés. Le bilan CI décode indépendamment les PNG, recalcule les empreintes des corps et exige cinq vues distinctes pour chacun des deux rôles ainsi qu’un panneau compte distinct de l’accueil. Quatre tests complémentaires du contrôleur refusent notamment une horloge différente sur un même ancien corps. Ces tests synthétiques ne sont pas des captures de livraison.
 
 Ces changements attendent leur nouvelle exécution Android et l’inspection réelle des captures. Aucune nouvelle recette native ni Samsung réussie n’est déduite de la compilation locale ou des anciennes captures CI.
+
+## Reprise Auth native : réponses anciennes et effacement tardif
+
+Les traces MIR TEST de la CI4d51 montrent un refus GET `/auth/v1/user` d’une ancienne session après un nouveau POST `/auth/v1/token` réussi. Un appel de compte suivant était alors sans identité. La CI5c avait également perdu la sonde locale de mise à jour malgré le rôle Employé rétabli. Ces résultats ne certifiaient pas la persistance Android.
+
+La reproduction locale utilise le vrai SDK embarqué et le coffre asynchrone : avant le correctif, quatre réponses403 anciennes (reconnexion et rafraîchissement du même compte, codes `bad_jwt` et `session_not_found`) effaçaient le nouveau coffre et sa sonde; une ancienne déconnexion suspendue dans `Native.clearAuth` pouvait aussi effacer une connexion postérieure. Les refus403 réellement courants doivent continuer à purger.
+
+Le SDK fourni transforme `session_not_found` en `AuthSessionMissingError` et peut appeler `_removeSession()` avant de retourner, même avec un JWT explicite. Le contrôleur utilise donc une instance privée du même SDK, sans persistance ni rafraîchissement, avec une clé mémoire distincte, pour vérifier l’utilisateur. Toutes les lectures publiques `getUser` de la façade native, y compris la reprise et les lectures du portail, comparent l’époque, l’identité et le jeton courant ainsi que le contenu effectif du coffre avant retour ou purge. Le jeton reste en mémoire et n’est jamais journalisé. `TOKEN_REFRESHED` invalide aussi les anciennes lectures du même compte.
+
+Les mutations natives de connexion, déconnexion, session et retour PKCE sont ordonnées. Les nettoyages internes utilisent le chemin privé pour éviter une attente circulaire; le rappel d’état attend seulement la purge locale, sans appeler une méthode Auth. Aucun nouvel essai automatique, contournement de refus, compte ou transport n’est ajouté. Le SDK fournisseur, les API web, les invitations SQL et les assertions de `MirUpgradeTest` sont préservés.
+
+`mobile/tools/test-auth-flow.cjs` compte20 scénarios avec le SDK réel, dont restauration dans une nouvelle instance, réponse provenant de l’ancien contexte, sonde locale conservée et refus courant toujours purgé. La revue indépendante Mobile a rejoué cinq cas sur le SDK corrigé et confirmé les preuves RED→GREEN. Les captures et la mise à jour Android de la nouvelle CI, puis la recette Samsung, restent nécessaires; une réussite locale ne les remplace pas.

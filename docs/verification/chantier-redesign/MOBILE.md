@@ -164,3 +164,47 @@ Les noms de fichiers et le seul test d’onglet actif ne suffisent pas. Le helpe
 Le texte «Bonjour» sans nom ne prouve pas un actorId perdu : `checkedSnapshot` refuse un actorId différent de l’utilisateur vérifié et exige son membership actif. La vue produit explicitement «Bonjour» quand `actor.name` contient `@`, pour ne pas exposer un courriel comme prénom. L’hypothèse est donc un nom QA historique égal au courriel et un compte Chef encore sans affectation; elle doit être confirmée sur son snapshot TEST. Une fois les fixtures préparées, vérifier nom, rôle, job, équipe et tâches réellement affichés dans les nouvelles captures.
 
 État à ce jalon : **validation native visuelle des cinq onglets suspendue**, malgré la CI technique verte; Samsung physique toujours ouvert. Les preuves Chromium précédentes restent distinctes et ne remplacent pas ces captures.
+
+## Diagnostic indépendant des courses Auth après4d51/5c
+
+Les logs des deux nouvelles tentatives Android ont été réellement relus :
+
+| Tête | Run et résultat observé |
+|---|---|
+| `4d51f9ad9734873241abba5326c641fdc0c15cb3` | Run43566365748/job132360992027 : compilation réussie,7tests natifs puis2tests de mise à jour réussis; échec de `MirRealRolesTest` à la connexion (`AUTH_FAILED`, `phase=signed_out`, réseau actif, cible TEST). |
+| `5c0466aafd087c10c5dbfa7d6f05a826ff050339` | Run43566712045/job132362040352 : compilation et7tests natifs réussis, préparation de mise à jour réussie; `verifyUpdate` échoue ligne28 car `mir_update_probe` vautnull au lieu du témoin attendu. Les attentes précédentes de phase ready et de rôle Employé ont passé. |
+
+Ce résultat n’autorise ni une déclaration de persistance réussie ni l’affaiblissement de l’assertion. Aucun APK de ces tentatives n’est certifié pour remise au Samsung.
+
+### Deux courses reproduites sur la source figée5c
+
+L’expertise a exécuté des scénarios indépendants avec le vrai SDK embarqué et des réponses entièrement synthétiques, en forçant la lecture de `mobile/web/sdk.js` depuis le commit5c. Aucun service hébergé, mot de passe réel ou jeton n’a été utilisé ou affiché.
+
+1. **AnciengetUser après nouvelle connexion.** Une ancienne lecture `/user` est suspendue; la connexion suivante du même compte réussit et un témoin navigateur est posé. La réponse ancienne `session_not_found` est ensuite libérée. Le SDK retourne `AuthSessionMissingError` avec statut400, puis le nouveau coffre **et** le témoin ont disparu. Le SDK appelle `_removeSession()` depuis `_getUser()` avant le `.then` de l’adaptateur : une garde uniquement placée dans ce `.then` est trop tardive. La variante `getUser(jwt)` sur le même client actif possède aussi ce chemin de suppression.
+2. **Ancien nettoyage natif après nouvelle connexion.** Une déconnexion est suspendue dans son `Native.clearAuth`; une connexion suivante peut alors réussir dans l’ancienne source. Lorsque l’ancien effacement est libéré, le coffre et le témoin du compte suivant sont effacés. Une vérification d’époque avant l’appel natif ne peut pas annuler une suppression déjà partie.
+
+Preuves sans secrets : `artifacts/chantier-redesign/mobile-native-diagnostic/auth-get-user-race.json` et `auth-signout-cleanup-race.json`.
+
+La lecture du code confirme également : `purgeBrowser()` efface localStorage/sessionStorage, puis attend les suppressions IndexedDB; son lancement sans attente depuis `SIGNED_OUT` n’est pas une barrière de fin de nettoyage. Les anciennes clausesfinally de déconnexion pouvaient donc dépasser une nouvelle connexion. Le défaut existe hors installation et peut effacer un témoin; cela ne démontre pas à lui seul la cause unique de chaque incident natif.
+
+### Relecture et recontrôle du correctif de l’intégrateur
+
+Le correctif examiné possède l’empreinte SDK `0bf114a6500069af54d6698625c521d9c893ed5a6e1e8f6571b2531c587b4ced`. Il fait vérifier l’utilisateur par un autre client SDK privé non persistant, plutôt que par le client attaché au coffre actif. Les résultats sont bornés à l’époque, l’identité **et le jeton** effectivement conservé; une rotation du jeton du même compte invalide aussi la lecture ancienne. Le nettoyage courant reconnaît `AuthSessionMissingError` même si son statut est400.
+
+Les mutations Auth et leur nettoyage sont sérialisés; le callback Auth n’attend que des opérations locales, pas un nouvel appel Auth sous verrou SDK. Le responsable et l’intégrateur conservent la responsabilité de l’implémentation; cette expertise ne modifie aucun code ou test.
+
+Rejeu indépendant du correctif, avec SDK figé pendant le contrôle : **5/5 scénarios réussis**.
+
+- Ancienne réponse `/user` après reconnexion : retourSESSION_CHANGED, nouveau coffre et témoin conservés.
+- Ancienclear natif : la nouvelle connexion attend sa fin; son coffre et son témoin sont ensuite conservés.
+- Ancienne réponse de reprise après renouvellement du jeton du même compte : coffre tourné et témoin conservés.
+- Refus courant `bad_jwt` : coffre et données navigateur purgés.
+- Refus courant `session_not_found` : coffre et données navigateur purgés.
+
+Preuve : `artifacts/chantier-redesign/mobile-native-diagnostic/auth-independent-patch.json`. Ces résultats utilisent le vrai SDK avec transport simulé; ils ne remplacent pas une nouvelle réussite native de `verifyUpdate`, dont l’assertion doit rester intacte.
+
+### Durabilité du témoin et limites d’attribution
+
+Un `localStorage.setItem` puis `getItem` dans la même WebView confirme une valeur disponible dans le renderer, pas indépendamment son écriture durable sur disque. Les deux courses ci-dessus peuvent la supprimer avant ou pendant un changement d’Activity. Si la nouvelle tentative échoue encore, un contrôle avec vrai arrêt/reprise de processus **avant** l’installation permettrait de distinguer perte préexistante et perte après mise à jour; une simple recréation de WebView dans le même processus ne suffit pas. Aucun témoin manquant ne doit être recréé par `verifyUpdate` pour obtenir du vert.
+
+La priorité immédiate reste la CI native du correctif avec l’assertion de conservation inchangée. Aucun émulateur logiciel local n’a été lancé, aucune clé n’a été lue, aucun jeton n’a été transmis et aucun paquet supplémentaire n’a été remis à Frederick pendant ce diagnostic.

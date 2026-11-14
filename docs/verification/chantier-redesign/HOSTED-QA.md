@@ -68,4 +68,14 @@ Les scénarios GPS réel, caméra Android, clavier système, retour, rotation, v
 
 Le premier Punch oublié sans journée existante ouvre une demande manuelle au bureau par conversation privée. Aucun pointage initial ni correction structurée n’est inventé. Les corrections de journées existantes réutilisent le traitement et l’audit canoniques.
 
+## Correction des courses de session Android
+
+Les CI4d51f9a et5c0466a ont révélé des échecs natifs distincts : connexion refusée après reprise, puis disparition du témoin de données navigateur malgré une session et un rôle restaurés après mise à jour. Le témoin n’a pas été supprimé du test ni réécrit pour contourner son échec.
+
+Les journaux serveur TEST ciblés montrent une connexion200, une ancienne requête utilisateur403 après déconnexion/reconnexion, puis une lecture de compte401 sans identité. Les reproductions locales avec le **vrai SDK embarqué et un transport synthétique** ont confirmé deux mécanismes : `getUser(session_not_found)` peut effacer sa session avant le retour du résultat ; un ancien nettoyage natif lent peut terminer après une nouvelle connexion et effacer son coffre et son témoin navigateur. Il ne s’agit pas d’un essai physique. Les preuves assainies sont `proofs/auth-session-race-5c.json`, `proofs/auth-signout-cleanup-race.json` et `proofs/auth-independent-patch.json`.
+
+La façade native utilise maintenant un vérificateur privé sans stockage persistant pour valider l’utilisateur, avec contrôles d’identité, d’époque et de jeton avant toute utilisation ou purge. Les mutations de connexion et les nettoyages sont ordonnés. Les refus concernant la session courante continuent de déconnecter et purger : aucune autorisation serveur n’est ignorée. Le SDK fournisseur, les API Auth web et les contrats d’invitations restent inchangés ; Google et les transports de courriel restent désactivés.
+
+Résultats locaux sur le code figé :33 tests Auth/session (20SDK,10activation,1file de session,2compte),19 contrats APK, compatibilité et activation navigateur réussis. La revue Mobile indépendante a rejoué cinq scénarios, dont refus courants et renouvellement du jeton. La nouvelle CI et son témoin de conservation restent nécessaires avant certification native ; leurs résultats et la tête finale sont consignés dans le bilan de livraison.
+
 SEO/GEO : non applicable à cette application métier privée. Aucun changement d’indexation, d’accès public ou de domaine.

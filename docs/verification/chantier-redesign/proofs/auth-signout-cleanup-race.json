@@ -1,0 +1,13 @@
+{
+  "source": "5c0466a native SDK",
+  "transport": "synthetic local native clear; no server",
+  "scenario": "old signOut native cleanup resolves after next same-account login",
+  "before": {
+    "vaultPresent": true,
+    "probePresent": true
+  },
+  "after": {
+    "vaultPresent": false,
+    "probePresent": false
+  }
+}
