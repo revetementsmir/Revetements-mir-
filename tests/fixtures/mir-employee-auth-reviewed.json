@@ -1,0 +1,8 @@
+{
+  "sourceCommit": "70257ae4fb9bb35707e62e973955139ac519dba0",
+  "reason": "Reviewed employee-auth delta: TEST capability gates only in portal-config; portal-client adds invitation enrollment and isolates session organization/offline punch owner. Existing Punch UI, Today, warehouse and management function hashes remain unchanged. Behavior covered by mir-team-session-queue, mir-account-session and enrollment tests. Historical baseline fixtures retained.",
+  "files": {
+    "dist/portal-client.js": "792e02d328ed43fdd8c80c648cf4b2abd91d50375dbe5cf313f8d20350f93e10",
+    "dist/portal-config.js": "8105aecb3826a7d5c770dc9aa185a3b3c73647804761412df5eaf7605489eb20"
+  }
+}
