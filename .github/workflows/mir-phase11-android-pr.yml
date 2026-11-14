@@ -144,6 +144,7 @@ jobs:
           pre-emulator-launch-script: mobile/tools/android-ci-environment.sh host
           disable-animations: true
           script: |
+            mobile/tools/android-ci-environment.sh host
             mobile/tools/android-ci-environment.sh ready
             adb install "$RUNNER_TEMP/mir-version-130001.apk"
             adb install mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
