@@ -25,3 +25,5 @@ Deux nouvelles fixtures actives dédiées `8700…001/002`, segments `8800…001
 ## Intégration autorisée
 
 Destination exclusive : `codex/refonte-chantier-employe-chef`, PR37 maintenue en brouillon. Fusion PR38 avec commit de fusion uniquement après réussite des deux vérifications et relecture immédiate des têtes. Aucune fusion de PR36/37 ou vers main, aucune publication Pages. L’APK personnel 130005 reste historique et ne contient pas Équipes et heures.
+
+Le run43643568396 surb138451 a révélé une erreur de syntaxe dans la nouvelle sonde de test JavaScript avant le toucher. La sonde est désormais une expression IIFE valide pour le helper evaluateJavascript; ce défaut du test est conservé dans l’historique, sans modifier l’application ni affaiblir les contrôles.
