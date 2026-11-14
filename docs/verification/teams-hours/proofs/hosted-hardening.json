@@ -1,0 +1,29 @@
+{
+  "project": "hxtztkmbfpmzrieccwsg",
+  "sqlSha256": "76a85c925262d71559af9a715d35789926417881d66f21a60b1b4e5c32f435bf",
+  "localMigration": "20261114193002_mir_punch_management_hardening_test.sql",
+  "serverMigration": "20261114193024",
+  "transport": "Authenticated SQL with controlled TEST claims, not HTTP or physical",
+  "transaction": "ROLLBACK",
+  "ownPeriodDirectDenied": true,
+  "ownPeriodManagementDenied": true,
+  "partialAbsence": {
+    "dayPart": "partial",
+    "startTime": "10:00:00",
+    "endTime": "12:00:00"
+  },
+  "existingPaginatedJournalAuthorVerified": true,
+  "afterRollback": {
+    "shifts": 0,
+    "absences": 0,
+    "periods": 0,
+    "audit": 0,
+    "receipts": 0
+  },
+  "advisorsUnchangedSinceFirstMigration": true,
+  "initialHarnessIssue": "First temporary HR seed omitted required client_request_id; transaction rolled back, corrected seed then passed. No business contract weakened.",
+  "limitations": [
+    "No hosted multi-session contention test",
+    "No physical Samsung test"
+  ]
+}

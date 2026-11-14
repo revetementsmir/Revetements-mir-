@@ -1,0 +1,29 @@
+{
+  "project": "hxtztkmbfpmzrieccwsg",
+  "preparedAt": "2026-11-14T19:43:28.584551Z",
+  "startedAt": "2026-11-14T19:28:28.584551Z",
+  "marker": "QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL",
+  "shifts": [
+    "7da20261-1114-4000-8300-000000000001",
+    "7da20261-1114-4000-8300-000000000002"
+  ],
+  "segments": [
+    "7da20261-1114-4000-8400-000000000001",
+    "7da20261-1114-4000-8400-000000000002"
+  ],
+  "employees": [
+    "3980647a-d83a-48ad-9d90-8fc2b314807f",
+    "ec421778-b39b-492e-9e4b-5e044015e98f"
+  ],
+  "job": "7da20261-1114-4000-8000-000000000001",
+  "syntheticOnly": true,
+  "noGpsOrPunchEventCreated": true,
+  "eventCountsUnchanged": [
+    0,
+    3
+  ],
+  "otherActiveCount": 1,
+  "otherActiveHash": "f6b1e1c2bb4521622d898be58f862b18",
+  "old8100FixturesRemainClosed": true,
+  "cleanup": "Required only after final CI, exact marked 8300/8400 rows; preserve history, never delete/reactivate."
+}
