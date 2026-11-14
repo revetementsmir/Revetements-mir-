@@ -20,11 +20,20 @@ check('PRIME 40713, unité et conditionnement',()=>{
  const p=get('mir-request-soffit-staples-1in');
  assert.equal(p.manufacturerReference,'40713');assert.equal(p.unit,'boîte');
  assert.equal(p.packaging.piecesPerBox,5000);
+ assert.equal(p.primaryImage,'assets/products/mir-provided-20261111/prime-40713-box.webp');
+ const fs=require('node:fs'),path=require('node:path');
+ assert.ok(fs.statSync(path.join(__dirname,'../dist',p.primaryImage)).size>0);
+ const css=fs.readFileSync(path.join(__dirname,'../dist/mir-catalogue-photo.css'),'utf8');
+ assert.match(css,/mir-prime-card[\\s\\S]*?--mir-photo-gutter:\\s*2%/);
+ assert.match(css,/object-fit:\\s*contain/);
 });
 check('ADSEAL remplace uniquement la fiche générique',()=>{
  const p=get('mir-request-adfast');
- assert.match(p.name,/ADSEAL/);assert.equal(p.unit,'contenant');
+ assert.match(p.name,/ADSEAL/);assert.match(p.name,/90\\/contenant/);
+ assert.equal(p.unit,'contenant');assert.equal(p.packaging.piecesPerBox,90);
  assert.ok(p.referencePending);assert.match(p.sourceUrl,/lingettes-nettoyantes/);
+ assert.match(p.notes.join(' '),/contenant de 90 lingettes/);
+ assert.match(p.statusLabel,/Visuel exact à confirmer/);
 });
 check('Quatre demandes d’accessoires distinctes',()=>{
  ['mir-caulk-nozzle-45-5','mir-adfast-yellow-nozzles-5',
@@ -45,8 +54,10 @@ check('Une fiche fascia visible, source et variante noires conservées',()=>{
  assert.ok(group);assert.equal(group.reviewVariants[0].label,'Noir');
  assert.equal(group.reviewVariants[1].label,'Blanc');
  assert.ok(!list.some(x=>x.id==='mir-request-fascia-screws-white-2in'));
- assert.ok(!list.some(x=>x.id==='pending-kaycan-fascia-hex-quarter-inch'));
- assert.ok(get('pending-kaycan-fascia-hex-quarter-inch'));
+ assert.ok(list.some(x=>x.id==='pending-kaycan-fascia-hex-quarter-inch'));
+ assert.deepEqual(group.reviewVariants.map(v=>v.label),['Noir','Blanc']);
+ assert.match(get('pending-kaycan-fascia-hex-quarter-inch').name,/À confirmer/);
+ assert.ok(get('pending-kaycan-fascia-hex-quarter-inch').colors.length>=0);
 });
 check('Panier fascia conserve l’itemId vrai de chaque teinte',()=>{
  const state={catalogue};
