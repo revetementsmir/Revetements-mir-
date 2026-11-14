@@ -216,8 +216,12 @@ public class MirRealRolesTest extends MirDeviceSetup {
      if(role.getString("role").equals("assistant")||role.getString("role").equals("boss")){
       tap(s,".mir-harmony-toggle");waitFor(s,"document.querySelector('#mir-harmony-menu')?.hidden===false");tap(s,"#portal-navigation [data-view=management-more]");tap(s,"#portal-content [data-view=punch-admin]");
       waitFor(s,"management Punch snapshot is rendered from the TEST RPC", "(()=>{const p=document.querySelector('.pm-page');return p?.dataset.pmAsOf&&Number.isFinite(Date.parse(p.dataset.pmAsOf))&&['3980647a-d83a-48ad-9d90-8fc2b314807f','ec421778-b39b-492e-9e4b-5e044015e98f'].every(id=>!!p.querySelector('[data-pm-detail=\"'+id+'\"]'));})()");
-      js(s,"(()=>{const n=document.querySelector('[data-pm-search]');n.value='MIR Recette';n.dispatchEvent(new Event('input',{bubbles:true}));return true;})()");
-      waitFor(s,"document.querySelectorAll('.pm-person').length===2 && document.querySelector('.pm-page')?.textContent.includes('Employé MIR Recette') && document.querySelector('.pm-page').textContent.includes('Chef MIR Recette')");
+      js(s,"window.nativeManagementPeople=[...document.querySelectorAll('.pm-person .pm-name')].map(n=>n.dataset.pmDetail);true");
+      for(String[] target:new String[][]{{"3980647a-d83a-48ad-9d90-8fc2b314807f","Employé MIR Recette"},{"ec421778-b39b-492e-9e4b-5e044015e98f","Chef MIR Recette"}}){
+       js(s,"(()=>{const n=document.querySelector('[data-pm-search]');n.value="+JSONObject.quote(target[1])+";n.dispatchEvent(new Event('input',{bubbles:true}));return true;})()");
+       waitFor(s,"unique QA employee search includes its ID/name and excludes every other employee", "(()=>{const id="+JSONObject.quote(target[0])+",name="+JSONObject.quote(target[1])+",rows=[...document.querySelectorAll('.pm-person')],n=rows[0]?.querySelector('.pm-name');return rows.length===1&&n?.dataset.pmDetail===id&&n.textContent.trim()===name&&window.nativeManagementPeople?.includes(id)&&window.nativeManagementPeople.filter(other=>other!==id).every(other=>![...document.querySelectorAll('.pm-person .pm-name')].some(n=>n.dataset.pmDetail===other));})()");
+      }
+      js(s,"scrollTo({top:0,behavior:'instant'});true");
       presentFrame(s);screenshot(s,"teams-hours-"+role.getString("role")+"-http-snapshot");
      }
 
