@@ -208,3 +208,44 @@ Preuve : `artifacts/chantier-redesign/mobile-native-diagnostic/auth-independent-
 Un `localStorage.setItem` puis `getItem` dans la même WebView confirme une valeur disponible dans le renderer, pas indépendamment son écriture durable sur disque. Les deux courses ci-dessus peuvent la supprimer avant ou pendant un changement d’Activity. Si la nouvelle tentative échoue encore, un contrôle avec vrai arrêt/reprise de processus **avant** l’installation permettrait de distinguer perte préexistante et perte après mise à jour; une simple recréation de WebView dans le même processus ne suffit pas. Aucun témoin manquant ne doit être recréé par `verifyUpdate` pour obtenir du vert.
 
 La priorité immédiate reste la CI native du correctif avec l’assertion de conservation inchangée. Aucun émulateur logiciel local n’a été lancé, aucune clé n’a été lue, aucun jeton n’a été transmis et aucun paquet supplémentaire n’a été remis à Frederick pendant ce diagnostic.
+
+## Nouveau contrôle natif sur 849f618
+
+Les résultats du [run 43568846939](https://github.com/revetementsmir/Revetements-mir-/actions/runs/43568846939), tête `849f61890d9fdd8fa68591c0b8b94e151b1d818a`, ont été relus directement : le job Chromium réussit; le job Android 132368575003 réussit la compilation, les tests Java et Lint, puis **7 tests WebView**, `prepareUpdate` et `verifyUpdate` (**1 test chacun**). La dernière vérification conserve donc le témoin navigateur et la session avec l’assertion d’origine. Cela complète le recontrôle natif manquant au paragraphe précédent; ce résultat ne prouve pas une recette Samsung.
+
+Le job Android reste globalement **en échec** : `MirRealRolesTest.inspectMenu` ligne 103 attend le contenu chantier Chef, alors que la phase est ready, le réseau actif et la cible bien `hxtztkmbfpmzrieccwsg`. Le premier rôle Employé est passé; les métadonnées numéro/adresse de la job Chef restent à corriger par l’intégrateur puis à vérifier sur une nouvelle CI. Les rôles suivants et les cinq vues Chef ne sont pas certifiés sur ce run.
+
+### Cinq vraies captures Employé inspectées
+
+Les fichiers dans `artifacts/chantier-redesign/native-849/artifacts/phase11/phase11-proof/` ont réellement été ouverts, et leurs SHA-256 recalculés puis comparés à `v130002-employe-screens.json` : **5/5 conformes**, avec cinq empreintes fichier et cinq empreintes de contenu différentes. Les captures sont des écrans système Android produits par `UiAutomation.takeScreenshot`, 1080×2400, versionCode 130002; le manifeste indique explicitement `physicalDevice:false`.
+
+| Capture | Contenu effectivement visible |
+|---|---|
+| `v130002-employe-day.png` | «Bonjour, Employé», job QA-UX-1 «QA UX 20261114 Façade A», adresse fictive, accès dossier et Itinéraire, état de pointage et accès Punch distinct. |
+| `v130002-employe-command.png` | Magasin, Banque de pliages, Dessiner une moulure, panier vide et suivi; onglet Commande actif. |
+| `v130002-employe-punch.png` | Job QA sélectionnée, nom et adresse, état prêt à commencer et bouton Commencer; onglet Punch actif. |
+| `v130002-employe-messages.png` | Conversations, recherche et fil Équipe MIR TEST; onglet Message actif. |
+| `v130002-employe-more.png` | Mes heures, Banque d’heures, Congés, Dépenses, Bris d’outil, chantiers/documents et aide; onglet Plus actif. |
+
+Le manifeste confirme un membre TEST nommé «Employé MIR Recette», deux jobs QA autorisées et la job QA-UX-1 sélectionnée. L’absence de tâche/équipe dans ce manifeste Employé ne constitue aucune preuve pour le Chef. Ces cinq images ne présentent plus les doublons de vues constatés sur 1466. La météo affiche honnêtement son indisponibilité. Les listes et actions montrées sont inspectées visuellement; cette inspection seule ne vaut pas confirmation de leurs mutations serveur.
+
+Limites conservées : parcours Chef bloqué, autres rôles non atteints sur ce run, clavier/caméra/GPS/permissions et reprise physique Samsung à recetter selon la matrice. Aucun APK de ce run remis par cette expertise; aucun changement à l’Auth, aux assertions ou au code applicatif.
+
+## Relecture indépendante du correctif de métadonnées gelé
+
+Le modèle existant `listJobs` retourne des copies. Enrichir ces copies ou une ancienne référence capturée avant un rafraîchissement perdait donc numéro/adresse malgré une réponse dossier valide. La source gelée de l’intégrateur utilise désormais `authorizedFieldJobs` : elle obtient les IDs autorisés du modèle, puis retrouve leurs références dans `state.jobs`. Après chaque attente, elle retrouve encore la référence actuellement autorisée; elle ne réécrit pas le snapshot abandonné.
+
+Le cache de valeurs est limité à l’acteur, à l’époque locale et à la job. Un WeakMap mémorise séparément l’état des objets effectivement présents dans le snapshot. Une nouvelle référence peut ainsi recevoir les valeurs déjà connues puis une lecture fraîche; les champs explicitement présents dans le nouveau snapshot ne sont pas écrasés par ce simple repli. Les nouvelles réponses dossier peuvent notamment confirmer une adresse vide. Les lectures dossier sont bornées à trois en parallèle; le chargement des listes Mes chantiers/Punch ne sélectionne pas successivement chaque chantier Chef. La sélection Chef reste liée au chantier ouvert.
+
+Contrôle indépendant exécuté avec les fonctions exactes extraites de `dist/chantier-app.js`, sans modifier cette source et avec dépendances locales simulées : **8/8 scénarios réussis**.
+
+- Référence `state.jobs` réellement enrichie malgré les copies de `listJobs`.
+- Snapshot remplacé pendant la requête : nouvelle référence enrichie, ancienne référence laissée intacte.
+- Repli du cache après snapshot incomplet, puis prise en compte d’un numéro modifié et d’une adresse supprimée.
+- Ancienne réponse refusée après changement d’acteur et réinitialisation d’époque.
+- Affectation retirée pendant l’attente : aucune métadonnée appliquée à la job devenue étrangère.
+- Sept dossiers chargés avec un maximum constaté de trois lectures simultanées.
+- Rendus répétés du même objet : une seule lecture en vol.
+- Liste de deux jobs Chef : dossiers hydratés, une seule sélection Chef correspondant à la job ouverte.
+
+Preuve : `artifacts/chantier-redesign/mobile-native-diagnostic/metadata-independent-review.json`; SHA-256 de la source examinée `a5cc3fe67184e65259f4ba9c663245e9d7dbf913375a9323ae73326d863afe52`. Le repli «Adresse à préciser» et l’absence de bouton Itinéraire sans adresse sont également présents dans la vue. Ce contrôle reste une simulation ciblée; une nouvelle CI doit confirmer la réparation du parcours Chef et produire ses captures réelles. Aucun SDK Auth, test Java ni assertion de persistance modifié. L’empreinte SDK reste `0bf114a6500069af54d6698625c521d9c893ed5a6e1e8f6571b2531c587b4ced`.

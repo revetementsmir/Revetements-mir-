@@ -1,0 +1,130 @@
+[
+  {
+    "role": "employee",
+    "simulation": true,
+    "thinSnapshotsReplaced": 3,
+    "stages": [
+      {
+        "stage": "initialA",
+        "jobId": "00000000-0000-4000-8000-000000000353",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      },
+      {
+        "stage": "A_after_thin_refresh",
+        "jobId": "00000000-0000-4000-8000-000000000353",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      },
+      {
+        "stage": "B",
+        "jobId": "00000000-0000-4000-8000-000000000454",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      },
+      {
+        "stage": "B_after_thin_refresh",
+        "jobId": "00000000-0000-4000-8000-000000000454",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      },
+      {
+        "stage": "returnA",
+        "jobId": "00000000-0000-4000-8000-000000000353",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      },
+      {
+        "stage": "returnA_after_thin_refresh",
+        "jobId": "00000000-0000-4000-8000-000000000353",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      }
+    ],
+    "twoAuthorizedJobsWithAddresses": true,
+    "foreignJobHidden": true,
+    "foreignMetadataNeverRequested": true,
+    "concurrencyObserved": 1,
+    "idleRequestsStable": true,
+    "readCount": {
+      "dossier": 9,
+      "lead": 0
+    },
+    "leadContexts": [],
+    "noBusinessMutation": true,
+    "jsErrors": [],
+    "physicalAndroid": false
+  },
+  {
+    "role": "chef",
+    "simulation": true,
+    "thinSnapshotsReplaced": 3,
+    "stages": [
+      {
+        "stage": "initialA",
+        "jobId": "00000000-0000-4000-8000-000000000353",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      },
+      {
+        "stage": "A_after_thin_refresh",
+        "jobId": "00000000-0000-4000-8000-000000000353",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      },
+      {
+        "stage": "B",
+        "jobId": "00000000-0000-4000-8000-000000000454",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      },
+      {
+        "stage": "B_after_thin_refresh",
+        "jobId": "00000000-0000-4000-8000-000000000454",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      },
+      {
+        "stage": "returnA",
+        "jobId": "00000000-0000-4000-8000-000000000353",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      },
+      {
+        "stage": "returnA_after_thin_refresh",
+        "jobId": "00000000-0000-4000-8000-000000000353",
+        "numberVisible": true,
+        "addressVisible": true,
+        "itineraryVisible": true
+      }
+    ],
+    "twoAuthorizedJobsWithAddresses": true,
+    "foreignJobHidden": true,
+    "foreignMetadataNeverRequested": true,
+    "concurrencyObserved": 2,
+    "idleRequestsStable": true,
+    "readCount": {
+      "dossier": 10,
+      "lead": 3
+    },
+    "leadContexts": [
+      "00000000-0000-4000-8000-000000000353",
+      "00000000-0000-4000-8000-000000000454",
+      "00000000-0000-4000-8000-000000000353"
+    ],
+    "noBusinessMutation": true,
+    "jsErrors": [],
+    "physicalAndroid": false
+  }
+]

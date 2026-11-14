@@ -1,0 +1,17 @@
+{
+  "sourceCommit": "849f61890d9fdd8fa68591c0b8b94e151b1d818a",
+  "workflowRun": "https://github.com/revetementsmir/Revetements-mir-/actions/runs/43568846939",
+  "artifactId": 14103595884,
+  "artifactZipSha256": "773508f93413ef8ee399f1b28c7cff485b9cdfe574c326172080a9c955dcbb10",
+  "environment": "GitHub Actions Android emulator with hardware acceleration; MIR TEST only",
+  "physicalSamsung": false,
+  "nativeSmokeTestsPassed": 7,
+  "prepareUpdatePassed": true,
+  "verifyUpdatePassed": true,
+  "sessionAndLocalStorageProbeRetained": true,
+  "employeeFiveScreens": "Captured and actually inspected; five distinct files and content hashes",
+  "chefFiveScreens": "Not certified: strict day check found missing job number/address after lead refresh",
+  "remainingFix": "Reacquire the current authorized job after refresh and reapply metadata to replacement snapshots",
+  "overallAndroidConclusion": "failure",
+  "useAsFinalCertification": false
+}
