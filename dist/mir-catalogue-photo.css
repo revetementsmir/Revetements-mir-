@@ -22,6 +22,11 @@ body.commerce .mir-catalogue-photo-detail { aspect-ratio: 4 / 3; }
 /* Photo approuvée PRIME 40713 : maximiser la boîte sans étirer la géométrie. */
 body .mir-prime-card .mir-catalogue-photo,
 body .card.prime .mir-catalogue-photo { --mir-photo-gutter: 2%; }
+/* La photo approuvée est de 256 px : ne jamais étirer la carte sur écran large. */
+@media (min-width: 768px) {
+  body .mir-prime-card,
+  body .card.prime { max-width: 420px; width: 100%; }
+}
 body .mir-catalogue-photo :is(.card-preview,.product-sample) {
   width: 100%;
   height: 100%;
