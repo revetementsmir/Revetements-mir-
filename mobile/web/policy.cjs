@@ -6,7 +6,7 @@ function allowedRequest(value,origin='https://localhost'){
   if(u.origin===origin)return true;
   if(u.protocol!=='https:'||u.hostname!==TEST)return false;
   if(/^\/rest\/v1\/rpc\/mir_(?:client_|estimate_)/.test(decodeURIComponent(u.pathname)))return false;
-  if(u.pathname.startsWith('/auth/'))return ['/auth/v1/token','/auth/v1/user','/auth/v1/logout'].includes(u.pathname);
+  if(u.pathname.startsWith('/auth/'))return ['/auth/v1/token','/auth/v1/user','/auth/v1/logout','/auth/v1/recover'].includes(u.pathname);
   return ['/rest/v1/','/storage/v1/','/realtime/v1/'].some(p=>u.pathname.startsWith(p));
  }catch{return false;}
 }

@@ -117,3 +117,7 @@ SQL/RLS local puis TEST autorisé : organisations A/B, mauvais compte, identité
 ## Bilan Atelier / PR
 
 Lot audit-plan uniquement, implémentation bloquée par le préalable publication non vérifiable. Aucun état terminé attribué aux connexions Google, invitations Boss/Adjointe, livraison courriel, biométrie ou certification Samsung. Prochaine dépendance : preuve de publication accessible puis diagnostic TEST de Frederick. Aucun changement production, fusion, publication, distribution employés, paiement ou signature release autorisé.
+
+## Complément de reprise — 14 novembre 2026
+
+Le préalable publication historique a été levé par la confirmation de Frederick. MOON et les données Atelier sont désormais accessibles dans ce chat; méthode1.3.11 fraîchement vérifiée. Les modifications locales ont été préservées et la réalisation a repris, sans activation de service ni opération production. Voir [REPRISE.md](REPRISE.md) pour les correctifs, preuves réelles et limites actuelles, dont l’enrôlement initial et les accès Supabase TEST toujours non certifiés. Les constats historiques ci-dessus sont conservés.

@@ -5,15 +5,18 @@ function harness(role='employee'){
  let authListener;const calls=[],local=new Map([['old-private','value']]);let vault='old-session',options;
  const auth={signInWithPassword:async()=>({data:{user:{id:'test-user'}}}),signOut:async()=>({error:null}),onAuthStateChange:fn=>(authListener=fn,{}),stopAutoRefresh(){},startAutoRefresh(){},getUser:async()=>({data:{user:{id:'test-user'}}})};
  const raw={auth,rpc:async name=>{calls.push(name);return {data:name==='mir_account_snapshot'?{role}: {confirmed:true},error:null};}};
- const Native={readAuth:async()=>({value:vault}),writeAuth:async({value})=>{vault=value;},clearAuth:async()=>{vault=null;}};
+ const slots=new Map();
+ const Native={readAuth:async({slot='session'}={})=>({value:slot==='session'?vault:slots.get(slot)}),writeAuth:async({value,slot='session'})=>{if(slot==='session')vault=value;else slots.set(slot,value);},removeAuthSlot:async({slot})=>slots.delete(slot),clearAuth:async()=>{vault=null;slots.clear();}};
  const window={MIRAndroid:{Native,Policy},MIRSupabase:{createClient:(url,key,opts)=>{options=opts;return raw;}}};
- vm.runInNewContext(source,{window,localStorage:{clear:()=>local.clear()},sessionStorage:{clear(){}},indexedDB:{databases:async()=>[]},setTimeout});
+ vm.runInNewContext(source,{require:name=>{assert.equal(name,'./auth-flow.cjs');return require('../web/auth-flow.cjs');},window,localStorage:{clear:()=>local.clear()},sessionStorage:{clear(){}},indexedDB:{databases:async()=>[]},setTimeout});
  const client=window.MIRSupabase.createClient('https://'+Policy.TEST,'sb_publishable_test',{});
  return{window,client,calls,local,emit:(event,session)=>authListener(event,session),vault:()=>vault,options:()=>options};
 }
 test('Request boundary refuses production, lookalikes, cleartext and mail endpoints',()=>{
- for(const url of ['https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/','http://'+Policy.TEST+'/rest/v1/','https://'+Policy.TEST+'.evil.example/rest/v1/','https://user@'+Policy.TEST+'/rest/v1/','https://'+Policy.TEST+'/auth/v1/recover','https://'+Policy.TEST+'/functions/v1/send','https://smtp.example/'])assert.equal(Policy.allowedRequest(url),false,url);
+ for(const url of ['https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/','http://'+Policy.TEST+'/rest/v1/','https://'+Policy.TEST+'.evil.example/rest/v1/','https://user@'+Policy.TEST+'/rest/v1/','https://'+Policy.TEST+'/auth/v1/otp','https://'+Policy.TEST+'/functions/v1/send','https://smtp.example/'])assert.equal(Policy.allowedRequest(url),false,url);
  assert.equal(Policy.allowedRequest('https://'+Policy.TEST+'/rest/v1/rpc/mir_account_snapshot'),true);
+ assert.equal(Policy.allowedRequest('https://'+Policy.TEST+'/auth/v1/recover'),true);
+ assert.equal(Policy.allowedRequest('https://gccltmaulvrnthrbnrpd.supabase.co/auth/v1/recover'),false);
 });
 test('Only enumerated local routes enter the WebView; signed URLs stay out of external browser',()=>{
  for(const url of ['https://localhost/plan.html','https://localhost/boutique.html','https://localhost/produit.html','https://localhost/selection.html','https://localhost/pliage.html','https://localhost/estimation.html','https://evil.example/chantier.html','https://localhost/untrusted/chantier.html','javascript:alert(1)','file:///chantier.html'])assert.equal(Policy.allowedRoute(url),false);

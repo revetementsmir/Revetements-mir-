@@ -14,7 +14,11 @@ for(const file of files){
  if(/atelier-essai\/.*(?:-candidate|index)\.html$/.test(file))continue;
  const dest=path.join(out,file.slice(5));fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,file),dest);
 }
-const config={enabled:true,accountEnabled:true,passwordEnabled:true,emailEnabled:false,googleEnabled:false,signupEnabled:false,invitationsEnabled:false,manualInvitations:false,documentsEnabled:false,environment:'test',projectRef:project,supabaseUrl:`https://${project}.supabase.co`,publishableKey:key,siteOrigin:'https://localhost',callbackPath:'/chantier.html'};
+// New local assets must also be included before their first commit.
+fs.copyFileSync(path.join(root,'dist/google-signin.svg'),path.join(out,'google-signin.svg'));
+const capabilities={googleEnabled:process.env.MIR_TEST_GOOGLE_ENABLED==='true',recoveryEnabled:process.env.MIR_TEST_RECOVERY_ENABLED==='true',teamInvitationsEnabled:process.env.MIR_TEST_INVITATIONS_ENABLED==='true'};
+fs.writeFileSync(path.join(out,'mir-team-test-config.js'),'window.MIRTeamTestConfig=Object.freeze('+JSON.stringify(capabilities)+');');
+const config={enabled:true,accountEnabled:true,passwordEnabled:true,emailEnabled:capabilities.recoveryEnabled,googleEnabled:capabilities.googleEnabled,signupEnabled:false,invitationsEnabled:capabilities.teamInvitationsEnabled,teamInvitationsEnabled:capabilities.teamInvitationsEnabled,manualInvitations:true,documentsEnabled:false,environment:'test',projectRef:project,supabaseUrl:`https://${project}.supabase.co`,publishableKey:key,siteOrigin:'https://localhost',callbackPath:'/chantier.html'};
 fs.writeFileSync(path.join(out,'portal-config.js'),'window.MIRPortalConfig=Object.freeze('+JSON.stringify(config)+');');
 fs.writeFileSync(path.join(out,'shared-config.js'),'window.MIRSharedConfig=Object.freeze('+JSON.stringify({enabled:true,supabaseUrl:config.supabaseUrl,publishableKey:key})+');');
 fs.writeFileSync(path.join(out,'mir-estimate-config.js'),'window.MIREstimateConfig=Object.freeze({enabled:false,environment:"test",apiBase:null});');

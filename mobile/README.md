@@ -1,5 +1,7 @@
 # Android privé MIR — recette uniquement
 
+Lot Auth/invitations en cours : branche `codex/test-employee-auth-invitations`, base `d4a9ec05ee9a0c2ede0713efab0add860a9507cb`. Version préparée `0.12.0-test` / `120001`; CI de ce lot prévue `120001 → 120002`. Capacités Google, récupération et invitations désactivées par défaut. [Reprise et limites actuelles](../docs/verification/employee-auth-invitations/REPRISE.md). Le texte Phase 11 ci-dessous conserve son contexte historique.
+
 Base : `a7d2d6fd10d6909d25f262aa06e921342c03d889`. Branche : `codex/phase-11-android-private`.
 
 Application TEST `ca.revetementsmir.equipe.test`, version `0.11.0-test`, code initial `110001`. Aucun projet Android ni identité de signature préexistants n’ont été trouvés dans le dépôt. Aucun déploiement du site n’est nécessaire : le portail et ses moteurs sont embarqués dans l’APK. Aucun deuxième backend, configurateur, panier, schéma ou RPC n’a été ajouté.

@@ -44,22 +44,22 @@ public class MirRealRolesTest extends MirDeviceSetup {
   // survives relocation or late insertion into the shared header.
   waitFor(s,"[...document.querySelectorAll('#mir-harmony-menu a[href]')].every(a=>MIRAndroid.Policy.allowedRoute(a.href,location.origin)||!a.getClientRects().length)");
   assertEquals(Boolean.TRUE,js(s,"[...document.querySelectorAll('#portal-navigation button')].some(b=>b.getClientRects().length)"));
-  screenshot(s,"v110002-"+role+"-menu");
+  screenshot(s,"v120002-"+role+"-menu");
   js(s,"document.querySelector('.mir-harmony-toggle').click();scrollTo(0,0);true");
-  screenshot(s,"v110002-"+role+"-home");
+  screenshot(s,"v120002-"+role+"-home");
   js(s,"document.querySelector('[data-view=settings]').click();true");
   waitFor(s,"!!document.querySelector('#harmony-settings-form') && document.querySelector('.settings-status')?.textContent==='Enregistré dans votre compte MIR'");
-  js(s,"scrollTo(0,0);true");screenshot(s,"v110002-"+role+"-settings");
+  js(s,"scrollTo(0,0);true");screenshot(s,"v120002-"+role+"-settings");
   if(role.equals("employe")){
    js(s,"document.querySelector('.mir-harmony-toggle').click();document.querySelector('#portal-navigation [data-view=account]').click();document.querySelector('[data-view=absences]').click();true");
    waitFor(s,"!!document.querySelector('#absence-draft-form textarea[name=note]')");
-   js(s,"scrollTo(0,0);true");screenshot(s,"v110002-employee-absence-form");
+   js(s,"scrollTo(0,0);true");screenshot(s,"v120002-employee-absence-form");
    js(s,"(()=>{const n=document.querySelector('#absence-draft-form textarea[name=note]');n.value='RECETTE-PHASE11-VISUEL-LOCAL';n.dispatchEvent(new Event('input',{bubbles:true}));n.scrollIntoView({block:'center'});})()");
    assertEquals("RECETTE-PHASE11-VISUEL-LOCAL",js(s,"document.querySelector('#absence-draft-form textarea[name=note]').value"));
-   screenshot(s,"v110002-employee-local-note");
+   screenshot(s,"v120002-employee-local-note");
    androidx.test.uiautomator.UiDevice device=androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());device.pressBack();
    androidx.test.uiautomator.UiObject2 cancel=device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.res("android:id/button2")),5000);
-   assertNotNull("Android back requires confirmation for local input",cancel);screenshotSystem("v110002-employee-back-confirmation");cancel.click();
+   assertNotNull("Android back requires confirmation for local input",cancel);screenshotSystem("v120002-employee-back-confirmation");cancel.click();
    assertEquals("RECETTE-PHASE11-VISUEL-LOCAL",js(s,"document.querySelector('#absence-draft-form textarea[name=note]').value"));
    // No submit, save, upload or preference change; the ordinary sign-out follows.
   }

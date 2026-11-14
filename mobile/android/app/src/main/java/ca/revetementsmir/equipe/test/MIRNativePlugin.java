@@ -2,6 +2,7 @@ package ca.revetementsmir.equipe.test;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -35,6 +36,21 @@ public class MIRNativePlugin extends Plugin {
         if(!local.get()||getBridge().getServerUrl()!=null){call.reject("Origine MIR refusée");return false;}
         return true;
     }
+    private volatile boolean authUnlocked=false;
+    private boolean lockEnabled(){return getContext().getSharedPreferences("mir-device-auth",0).getBoolean("enabled",false);}
+    private boolean authLocked(){return lockEnabled()&&!authUnlocked;}
+    private boolean slotAllowed(PluginCall call){String slot=call.getString("slot","session");if(!java.util.Arrays.asList("session","pkce","pending").contains(slot)){call.reject("Stockage Auth refusé");return false;}return true;}
+    private File authFile(PluginCall call){String slot=call.getString("slot","session");return slot.equals("session")?authFile():new File(getContext().getNoBackupFilesDir(),"mir-auth-"+slot+".enc");}
+    @Override protected void handleOnPause(){if(lockEnabled())authUnlocked=false;}
+    @PluginMethod public void authLockStatus(PluginCall call){if(!trusted(call))return;KeyguardManager manager=(KeyguardManager)getContext().getSystemService(android.content.Context.KEYGUARD_SERVICE);call.resolve(new JSObject().put("available",manager!=null&&manager.isDeviceSecure()).put("enabled",lockEnabled()).put("locked",authLocked()));}
+    @PluginMethod public void lockAuth(PluginCall call){if(!trusted(call))return;authUnlocked=false;call.resolve();}
+    @SuppressWarnings("deprecation")
+    private void confirmDevice(PluginCall call){KeyguardManager manager=(KeyguardManager)getContext().getSystemService(android.content.Context.KEYGUARD_SERVICE);if(manager==null||!manager.isDeviceSecure()){call.reject("Configurez le verrouillage système Android pour utiliser cette option.");return;}Intent intent=manager.createConfirmDeviceCredentialIntent("Déverrouiller MIR TEST","Utilisez le verrouillage de cet appareil. Aucun code n’est reçu par MIR.");if(intent==null){call.reject("Déverrouillage système indisponible");return;}startActivityForResult(call,intent,"authUnlockedResult");}
+    @PluginMethod public void unlockAuth(PluginCall call){if(!trusted(call))return;if(!authLocked()){call.resolve();return;}confirmDevice(call);}
+    @PluginMethod public void setAuthLock(PluginCall call){if(!trusted(call))return;confirmDevice(call);}
+    @ActivityCallback private void authUnlockedResult(PluginCall call,ActivityResult result){if(call==null)return;if(result.getResultCode()!=Activity.RESULT_OK){call.reject("Déverrouillage annulé");return;}authUnlocked=true;if(call.getMethodName().equals("setAuthLock"))getContext().getSharedPreferences("mir-device-auth",0).edit().putBoolean("enabled",call.getBoolean("enabled",false)).apply();call.resolve();}
+    @PluginMethod public void removeAuthSlot(PluginCall call){if(!trusted(call)||!slotAllowed(call))return;if(call.getString("slot","session").equals("session")){call.reject("Utilisez la déconnexion pour effacer la session");return;}new AtomicFile(authFile(call)).delete();call.resolve();}
+    @PluginMethod public void openAuth(PluginCall call){if(!trusted(call))return;try{Uri uri=Uri.parse(call.getString("url",""));String redirect="mirtest://auth/callback?flow=google";String challenge=uri.getQueryParameter("code_challenge");for(String parameter:uri.getQueryParameterNames())if(uri.getQueryParameters(parameter).size()!=1)throw new SecurityException();if(uri.getFragment()!=null||!"https".equals(uri.getScheme())||!MirPolicy.TEST_HOST.equals(uri.getHost())||uri.getUserInfo()!=null||uri.getPort()!=-1||!"/auth/v1/authorize".equals(uri.getPath())||!"google".equals(uri.getQueryParameter("provider"))||!redirect.equals(uri.getQueryParameter("redirect_to"))||!"s256".equals(uri.getQueryParameter("code_challenge_method"))||challenge==null||!challenge.matches("[A-Za-z0-9_-]{43,128}"))throw new SecurityException();getActivity().startActivity(new Intent(Intent.ACTION_VIEW,uri));call.resolve();}catch(Exception error){call.reject("Connexion Google TEST indisponible ou adresse refusée");}}
     private File authFile(){return new File(getContext().getNoBackupFilesDir(),"mir-auth.enc");}
     private byte[] readFile(File file)throws IOException{try(FileInputStream input=new FileInputStream(file);ByteArrayOutputStream output=new ByteArrayOutputStream()){byte[] buffer=new byte[8192];int n;while((n=input.read(buffer))!=-1){if(output.size()+n>MAX)throw new IOException();output.write(buffer,0,n);}return output.toByteArray();}}
     private javax.crypto.SecretKey key() throws Exception {
@@ -45,8 +61,8 @@ public class MIRNativePlugin extends Plugin {
         }
         return (javax.crypto.SecretKey)store.getKey("mir-test-auth-v1",null);
     }
-    @PluginMethod public void readAuth(PluginCall call){if(!trusted(call))return;try{
-        JSObject result=new JSObject();File file=authFile();
+    @PluginMethod public void readAuth(PluginCall call){if(!trusted(call)||!slotAllowed(call))return;if(authLocked()){call.reject("MIR verrouillé : utilisez le déverrouillage système.");return;}try{
+        JSObject result=new JSObject();File file=authFile(call);
         if(file.exists()){
             byte[] bytes=new AtomicFile(file).readFully();if(bytes.length<29||bytes.length>100000)throw new IOException();
             byte[] iv=new byte[12];System.arraycopy(bytes,0,iv,0,12);Cipher cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.DECRYPT_MODE,key(),new GCMParameterSpec(128,iv));
@@ -54,12 +70,12 @@ public class MIRNativePlugin extends Plugin {
         }
         call.resolve(result);
     }catch(Exception e){call.reject("Session locale illisible. Reconnectez-vous.");}}
-    @PluginMethod public void writeAuth(PluginCall call){if(!trusted(call))return;String value=call.getString("value");if(value==null||value.length()>65536){call.reject("Session invalide");return;}AtomicFile file=new AtomicFile(authFile());FileOutputStream output=null;try{
+    @PluginMethod public void writeAuth(PluginCall call){if(!trusted(call)||!slotAllowed(call))return;if(authLocked()){call.reject("MIR verrouillé");return;}String value=call.getString("value");if(value==null||value.length()>65536){call.reject("Session invalide");return;}AtomicFile file=new AtomicFile(authFile(call));FileOutputStream output=null;try{
         Cipher cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.ENCRYPT_MODE,key());byte[] ciphertext=cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
         output=file.startWrite();output.write(cipher.getIV());output.write(ciphertext);file.finishWrite(output);call.resolve();
     }catch(Exception e){if(output!=null)file.failWrite(output);call.reject("Session non conservée sur cet appareil");}}
     private void clean(File dir,boolean all){File[] files=dir.listFiles();if(files!=null)for(File f:files)if(all||System.currentTimeMillis()-f.lastModified()>86400000L)f.delete();}
-    @PluginMethod public void clearAuth(PluginCall call){if(!trusted(call))return;new AtomicFile(authFile()).delete();clean(new File(getContext().getCacheDir(),"mir-pdf"),true);clean(new File(getContext().getCacheDir(),"mir-capture"),true);getActivity().runOnUiThread(()->{getBridge().getWebView().clearHistory();getBridge().getWebView().clearCache(true);android.webkit.CookieManager.getInstance().removeAllCookies(removed->{android.webkit.CookieManager.getInstance().flush();call.resolve();});});}
+    @PluginMethod public void clearAuth(PluginCall call){if(!trusted(call))return;new AtomicFile(authFile()).delete();new AtomicFile(new File(getContext().getNoBackupFilesDir(),"mir-auth-pkce.enc")).delete();new AtomicFile(new File(getContext().getNoBackupFilesDir(),"mir-auth-pending.enc")).delete();clean(new File(getContext().getCacheDir(),"mir-pdf"),true);clean(new File(getContext().getCacheDir(),"mir-capture"),true);getActivity().runOnUiThread(()->{getBridge().getWebView().clearHistory();getBridge().getWebView().clearCache(true);android.webkit.CookieManager.getInstance().removeAllCookies(removed->{android.webkit.CookieManager.getInstance().flush();call.resolve();});});}
     @PluginMethod public void clearTemporary(PluginCall call){if(!trusted(call))return;clean(new File(getContext().getCacheDir(),"mir-pdf"),false);clean(new File(getContext().getCacheDir(),"mir-capture"),false);call.resolve();}
     @PluginMethod public void openExternal(PluginCall call){if(!trusted(call))return;String url=call.getString("url");if(!MirPolicy.external(url)){call.reject("Lien externe refusé");return;}try{getActivity().startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));call.resolve();}catch(Exception e){call.reject("Aucun navigateur disponible");}}
     @PluginMethod public void pdf(PluginCall call){if(!trusted(call))return;try{

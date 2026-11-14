@@ -1,0 +1,5 @@
+'use strict';
+const CALLBACK='mirtest://auth/callback',PROJECT='https://hxtztkmbfpmzrieccwsg.supabase.co';
+function callback(value){try{const u=new URL(value);if(u.protocol!=='mirtest:'||u.host!=='auth'||u.pathname!=='/callback'||u.hash||u.username||u.password)return null;const code=u.searchParams.get('code');if([...u.searchParams.keys()].some(k=>!['code','flow'].includes(k)||u.searchParams.getAll(k).length!==1)||!code||code.length>2048||!/^[A-Za-z0-9_.-]+$/.test(code)||!['google','recovery'].includes(u.searchParams.get('flow')))return null;return{code,flow:u.searchParams.get('flow')};}catch{return null;}}
+function authorize(value){try{const u=new URL(value);return u.origin===PROJECT&&!u.username&&!u.password&&!u.hash&&[...u.searchParams.keys()].every(k=>u.searchParams.getAll(k).length===1)&&u.pathname==='/auth/v1/authorize'&&u.searchParams.get('provider')==='google'&&u.searchParams.get('redirect_to')===CALLBACK+'?flow=google'&&u.searchParams.get('code_challenge_method')==='s256'&&/^[A-Za-z0-9_-]{43,128}$/.test(u.searchParams.get('code_challenge')||'');}catch{return false;}}
+module.exports={CALLBACK,PROJECT,callback,authorize};

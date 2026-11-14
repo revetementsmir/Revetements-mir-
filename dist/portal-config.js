@@ -17,7 +17,8 @@
  const test=typeof location==='object'&&new URLSearchParams(location.search).get('recette')==='1';
  window.MIRPortalConfig=Object.freeze({...common,...(test?{
   environment:'test',projectRef:'hxtztkmbfpmzrieccwsg',supabaseUrl:'https://hxtztkmbfpmzrieccwsg.supabase.co',
-  publishableKey:"sb_publishable_jk8zsTWqQi6Borv44aaDJw_k7JSbzZh",googleEnabled:false,signupEnabled:false
+  publishableKey:"sb_publishable_jk8zsTWqQi6Borv44aaDJw_k7JSbzZh",googleEnabled:window.MIRTeamTestConfig?.googleEnabled===true,signupEnabled:false,
+  teamInvitationsEnabled:window.MIRTeamTestConfig?.teamInvitationsEnabled===true
  }:{
   environment:'production',projectRef:'gccltmaulvrnthrbnrpd',supabaseUrl:'https://gccltmaulvrnthrbnrpd.supabase.co',
   publishableKey:'sb_publishable_fH9gUWK6pYI0G0_oVKieCw_56UqhNWK'

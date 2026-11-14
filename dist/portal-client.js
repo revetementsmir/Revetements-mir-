@@ -102,7 +102,7 @@
       SET_INVENTORY: ['stockKey', 'variant', 'quantity', 'unit', 'note'], RESERVE_ORDER: ['orderId'],
       RECORD_DELIVERY: ['orderId', 'quantities', 'note'], CANCEL_REMAINDER: ['orderId', 'quantities', 'note'],
       ASSIGN_JOB: ['jobId', 'memberIds', 'memberId', 'assigned'], ASSIGN_MEMBER_JOBS: ['memberId', 'jobIds'], SET_MEMBER_ACTIVE: ['memberId', 'active'],
-      CREATE_JOB: ['name', 'address'], INVITE_EMPLOYEE: ['email', 'jobIds'], REVOKE_INVITATION: ['invitationId']
+      CREATE_JOB: ['name', 'address'], INVITE_EMPLOYEE: ['email', 'jobIds','name','role'], REVOKE_INVITATION: ['invitationId'], RESEND_INVITATION:['invitationId']
     }[command];
     if (!fields) fail('COMMAND_UNKNOWN', 'Cette action n’est pas proposée dans le portail connecté.');
     const payload = Object.fromEntries(fields.filter(key => raw[key] !== undefined).map(key => [key, clone(raw[key])]));
@@ -383,7 +383,10 @@
       emit({ busy: true, error: null }, 'command'); readSequence++;
       try {
         let data, error;
-        if(config.manualInvitations&&['INVITE_EMPLOYEE','REVOKE_INVITATION'].includes(operation.command)){
+        if(config.environment==='test'&&config.teamInvitationsEnabled&&['INVITE_EMPLOYEE','REVOKE_INVITATION','RESEND_INVITATION'].includes(operation.command)){
+          const response=await sdk.rpc('mir_team_invitation',{p_action:operation.command==='INVITE_EMPLOYEE'?'prepare':operation.command==='RESEND_INVITATION'?'resend':'revoke',p_request_id:operation.requestId,p_data:operation.payload});
+          error=response.error;data={ok:!error,result:response.data};
+        }else if(config.manualInvitations&&['INVITE_EMPLOYEE','REVOKE_INVITATION'].includes(operation.command)){
           if(!config.invitationsEnabled)fail('INVITATIONS_DISABLED','Les invitations ne sont pas disponibles.');
           const response=operation.command==='INVITE_EMPLOYEE'
            ?await sdk.rpc('mir_account_create_invitation',{p_email:operation.payload.email,p_job_ids:operation.payload.jobIds||[],p_request_id:operation.requestId})
@@ -417,7 +420,7 @@
         if (error) throw errorOf(error);
         if (epoch !== generation || status.user?.id !== operation.userId) fail('SESSION_CHANGED', 'La session a changé. Retrouvez cette action avec le même compte.', { definitive: false, needsRetry: true });
         if (!data?.result || typeof data.result !== 'object' || Array.isArray(data.result) ||
-          (!['INVITE_EMPLOYEE', 'REVOKE_INVITATION'].includes(operation.command) && !data.snapshot))
+          (!['INVITE_EMPLOYEE', 'REVOKE_INVITATION','RESEND_INVITATION'].includes(operation.command) && !data.snapshot))
           fail('RESPONSE_UNCERTAIN', 'La confirmation de cette action manque. Réessayez la même action.', { definitive: false, needsRetry: true });
         const snapshot = data.snapshot ? checkedSnapshot(data.snapshot, operation.userId) : status.snapshot;
         clearPending(operation.userId);
@@ -461,14 +464,15 @@
       if (!/^[A-Za-z0-9_-]{43}$/.test(token || '')) fail('INVITATION_INVALID', 'Le lien d’invitation n’est pas valide.');
       const user = await verifiedUser();
       if (!user) fail('AUTH_REQUIRED', 'Connectez-vous pour accepter votre invitation.');
-      const { data, error } = await sdk.rpc('mir_portal_accept_invitation', { p_token: token });
+      const { data, error } = await sdk.rpc(config.environment==='test'&&config.teamInvitationsEnabled?'mir_team_accept_invitation':'mir_portal_accept_invitation', { p_token: token });
       if (error) throw errorOf(error, 'L’invitation n’a pas pu être confirmée. Réessayez sans recréer votre accès.');
       await refresh(); return data;
     }
     async function listInvitations() {
       requireReady();
-      if (status.snapshot.members.find(member => member.id === status.user.id)?.role !== 'admin' || !config.invitationsEnabled) return [];
-      const epoch = generation, { data, error } = await sdk.rpc('mir_portal_list_invitations');
+      if(!config.invitationsEnabled)return [];
+      if(!(config.environment==='test'&&config.teamInvitationsEnabled)&&status.snapshot.members.find(member=>member.id===status.user.id)?.role!=='admin')return [];
+      const epoch = generation, { data, error } = await sdk.rpc(config.environment==='test'&&config.teamInvitationsEnabled?'mir_team_invitations':'mir_portal_list_invitations');
       if (error) throw errorOf(error);
       if (epoch !== generation) return [];
       return Array.isArray(data) ? data : [];

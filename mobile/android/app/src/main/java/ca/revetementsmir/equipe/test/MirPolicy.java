@@ -37,7 +37,7 @@ public final class MirPolicy {
             String path = u.normalize().getPath();
             if (path.startsWith("/rest/v1/rpc/mir_client_") || path.startsWith("/rest/v1/rpc/mir_estimate_")) return false;
             if (path.startsWith("/functions/") || path.contains("..") || path.contains("\\")) return false;
-            if (path.startsWith("/auth/")) return java.util.Arrays.asList("/auth/v1/token", "/auth/v1/user", "/auth/v1/logout").contains(path);
+            if (path.startsWith("/auth/")) return java.util.Arrays.asList("/auth/v1/token", "/auth/v1/user", "/auth/v1/logout", "/auth/v1/recover").contains(path);
             return path.startsWith("/rest/v1/") || path.startsWith("/storage/v1/") || path.startsWith("/realtime/v1/");
         } catch (Exception e) { return false; }
     }

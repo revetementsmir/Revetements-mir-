@@ -40,7 +40,11 @@ function mount(){
  const observer=new MutationObserver(()=>{
   restoreAbsence();
   document.body.classList.toggle('mir-native-signin',!!document.querySelector('#auth-signin-form'));
-  for(const el of document.querySelectorAll('[data-auth-screen="signup"],[data-auth-screen="forgot"],#auth-google,.auth-divider,.auth-cart-return,.auth-card>.auth-footnote'))el.hidden=true;
+  for(const el of document.querySelectorAll('[data-auth-screen="signup"],.auth-divider,.auth-cart-return,.auth-card>.auth-footnote'))el.hidden=true;
+  const google=document.querySelector('#auth-google');if(google)google.hidden=false;
+  const signin=document.querySelector('#auth-signin-form');
+  if(signin&&!document.querySelector('#mir-email-toggle')){const button=document.createElement('button');button.type='button';button.id='mir-email-toggle';button.className='button secondary full';button.textContent='Se connecter par courriel';button.setAttribute('aria-controls','auth-signin-form');button.setAttribute('aria-expanded','false');signin.before(button);signin.hidden=true;button.onclick=()=>{signin.hidden=!signin.hidden;button.setAttribute('aria-expanded',String(!signin.hidden));if(!signin.hidden)signin.querySelector('input')?.focus();};}
+  const forgot=document.querySelector('[data-auth-screen="forgot"]');if(forgot){forgot.hidden=false;forgot.disabled=!window.MIRTeamTestConfig?.recoveryEnabled;forgot.title=forgot.disabled?'Récupération MIR TEST en attente de configuration':'';}
   const intro=document.querySelector('.auth-intro');if(intro){const title=intro.querySelector('h1');if(title&&title.textContent!=='Connexion équipe MIR')title.textContent='Connexion équipe MIR';const text=intro.querySelector('p:not(.portal-eyebrow)');if(text&&text.textContent!=='Connectez-vous avec votre compte équipe. Environnement TEST.')text.textContent='Connectez-vous avec votre compte équipe. Environnement TEST.';}
   // Harmony moves/inserts links after login. Keep permitted internal links.
   for(const link of document.querySelectorAll('a[href]')){
@@ -88,10 +92,25 @@ document.addEventListener('click',async event=>{
  if(dirty&&!confirm('Quitter cette saisie ? Les données non enregistrées sur le serveur restent à vérifier.')){event.preventDefault();event.stopImmediatePropagation();}
 },true);
 App.addListener('backButton',()=>{const dialog=document.querySelector('dialog[open]');if(dialog){if(!dialog.dataset.mirNativeFile&&dirty&&!confirm('Fermer cette saisie et quitter les changements non enregistrés ?'))return;const close=dialog.querySelector('[data-close-dialog],[data-close-production-dialog]');if(close)close.click();else{const event=new Event('cancel',{cancelable:true});if(dialog.dispatchEvent(event))dialog.close();}return;}if(dirty&&!confirm('Revenir en arrière et quitter cette saisie ?'))return;if(history.length>1)history.back();else App.minimizeApp();}).catch(()=>{});
-App.addListener('appStateChange',({isActive})=>{if(isActive){Native.clearTemporary().catch(()=>{});window.MIRAndroidSession?.resume();}else window.MIRAndroidSession?.pause();}).catch(()=>{});
+App.addListener('appStateChange',async({isActive})=>{if(isActive){try{await unlockDevice();}catch(error){showError(error);return;}Native.clearTemporary().catch(()=>{});window.MIRAndroidSession?.resume();}else{window.MIRAndroidSession?.pause();if(Native.authLockStatus){const state=await Native.authLockStatus();if(state.enabled){showDeviceLock();await Native.lockAuth();}}}}).catch(()=>{});
 // One position per explicit business action; no background/watch tracking.
 if(navigator.geolocation)navigator.geolocation.getCurrentPosition=(success,error,options={})=>{
  Geolocation.requestPermissions({permissions:['location']}).then(result=>{if(!['granted','limited'].includes(result.location)&&result.coarseLocation!=='granted')throw Error('Permission GPS refusée');return Geolocation.getCurrentPosition({enableHighAccuracy:!!options.enableHighAccuracy,timeout:Math.min(options.timeout||10000,20000),maximumAge:0});}).then(position=>success(position)).catch(reason=>error?.({code:/timeout|timed out|0010/i.test(reason.message)?3:/permission|refus|0003/i.test(reason.message)?1:2,message:reason.message}));
 };
 if(navigator.geolocation)navigator.geolocation.watchPosition=()=>{throw Error('Le suivi permanent est désactivé. Utilisez une localisation ponctuelle.');};
 Native.clearTemporary().catch(()=>{});
+
+// The SDK validates and exchanges only a pending PKCE flow from MIR TEST.
+App.addListener('appUrlOpen',({url})=>receiveAuth(url).catch(showError)).catch(()=>{});
+App.getLaunchUrl().then(result=>{if(result?.url)receiveAuth(result.url).catch(showError);}).catch(()=>{});
+
+let unlocking=null;
+function showDeviceLock(){document.documentElement.dataset.mirDeviceLocked='true';if(document.getElementById('mir-device-lock'))return;const layer=document.createElement('section');layer.id='mir-device-lock';layer.setAttribute('role','dialog');layer.setAttribute('aria-modal','true');layer.setAttribute('aria-label','MIR verrouillé');const button=document.createElement('button');button.className='button';button.textContent='Déverrouiller MIR TEST';button.onclick=()=>unlockDevice().catch(showError);layer.append(button);document.body.append(layer);button.focus();}
+function unlockDevice(){if(unlocking)return unlocking;if(!Native.authLockStatus)return Promise.resolve();unlocking=(async()=>{try{const status=await Native.authLockStatus();if(status.locked){showDeviceLock();await Native.unlockAuth();}delete document.documentElement.dataset.mirDeviceLocked;document.getElementById('mir-device-lock')?.remove();}catch(error){showDeviceLock();throw error;}finally{unlocking=null;}})();return unlocking;}
+function mountLockOption(){if(document.body.dataset.portalConnection!=='connected'||document.getElementById('mir-device-lock-option'))return;const button=document.createElement('button');button.type='button';button.id='mir-device-lock-option';button.className='button secondary';button.textContent='Verrouillage de cet appareil (facultatif)';button.onclick=async()=>{try{const state=await Native.authLockStatus();await Native.setAuthLock({enabled:!state.enabled});button.textContent=!state.enabled?'Verrouillage système activé':'Verrouillage système désactivé';}catch(error){showError(error);}};document.getElementById('portal-content')?.append(button);}
+document.addEventListener('DOMContentLoaded',()=>{mountLockOption();new MutationObserver(mountLockOption).observe(document.body,{childList:true,subtree:true});},{once:true});
+
+async function receiveAuth(url){
+ if(!window.MIRAndroidAcceptAuth)await new Promise((resolve,reject)=>{const ready=()=>{clearTimeout(timer);resolve();};const timer=setTimeout(()=>{window.removeEventListener('mir-native-auth-ready',ready);reject(Error('Connexion non initialisée. Rouvrez MIR TEST.'));},10000);window.addEventListener('mir-native-auth-ready',ready,{once:true});});
+ await unlockDevice();await window.MIRAndroidAcceptAuth(url);
+}

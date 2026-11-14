@@ -9,7 +9,9 @@ public class MirPolicyTest {
   assertFalse(MirPolicy.request("https://hxtztkmbfpmzrieccwsg.supabase.co.evil.example/rest/v1/"));
   assertFalse(MirPolicy.request("https://user@hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/"));
   assertFalse(MirPolicy.request("https://hxtztkmbfpmzrieccwsg.supabase.co/functions/v1/send"));
-  assertFalse(MirPolicy.request("https://hxtztkmbfpmzrieccwsg.supabase.co/auth/v1/recover"));
+  assertTrue(MirPolicy.request("https://hxtztkmbfpmzrieccwsg.supabase.co/auth/v1/recover"));
+  assertFalse(MirPolicy.request("https://gccltmaulvrnthrbnrpd.supabase.co/auth/v1/recover"));
+  assertFalse(MirPolicy.request("https://hxtztkmbfpmzrieccwsg.supabase.co/auth/v1/otp"));
   assertTrue(MirPolicy.navigation("https://localhost/chantier.html"));
   for(String name:new String[]{"mir_client_center_snapshot_scoped","mir_client_support_action_scoped","mir_estimate_submit"})assertFalse(MirPolicy.request("https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/"+name));
   assertTrue(MirPolicy.request("https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_management_action"));

@@ -53,7 +53,11 @@ public class MirAndroidTest extends MirDeviceSetup {
    assertEquals("https://localhost",js(s,"location.origin"));
    assertEquals("hxtztkmbfpmzrieccwsg",js(s,"MIRPortalConfig.projectRef"));
    assertEquals(Boolean.TRUE,js(s,"document.querySelector('[data-auth-screen=signup]').hidden"));
-   assertEquals(Boolean.TRUE,js(s,"document.querySelector('#auth-google').hidden"));
+   assertEquals(Boolean.FALSE,js(s,"document.querySelector('#auth-google').hidden"));
+   assertEquals(Boolean.TRUE,js(s,"document.querySelector('#auth-google').disabled"));
+   assertEquals(Boolean.TRUE,js(s,"document.querySelector('#auth-signin-form').hidden"));
+   js(s,"document.querySelector('#mir-email-toggle').click();true");
+   assertEquals(Boolean.FALSE,js(s,"document.querySelector('#auth-signin-form').hidden"));
    js(s,"document.querySelector('#auth-email').value='recette-phase11@example.invalid';localStorage.setItem('mir_phase11_probe','retained');true");
    screenshot(s,"android-signin-portrait");
    js(s,"MIRHarmonySettings.store({theme:'dark',textSize:'large',reducedMotion:'on',highContrast:true});true");
