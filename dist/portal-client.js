@@ -603,15 +603,16 @@
     async function managementAction(action,entity=null,payload={}){requireReady();if(!internalOrg||!['assistant','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès gestion requis.');const {data,error}=await sdk.rpc('mir_management_action',{org:internalOrg,action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function boutiquePriceAction(item,format,action,newPriceCents=null,reason=null){requireReady();if(!internalOrg||!['assistant','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès Prix boutique requis.');const {data,error}=await sdk.rpc('mir_boutique_price_action',{org:internalOrg,item,format:format||'',action,new_price_cents:newPriceCents,reason});if(error)throw errorOf(error);await refresh();return data;}
     const punchQueueKey=(actor,org)=>`mir_punch_queue_v2_${config.projectRef}_${org}_${actor}`;
+    const punchRoutine=()=>config.environment==='test'&&config.projectRef==='hxtztkmbfpmzrieccwsg'&&config.fieldExperienceEnabled===true&&['employe','chef_equipe'].includes(status.snapshot?.operations?.role)?'mir_field_punch_action':'mir_punch_action';
     async function punchAction(action,job=null,payload={}){
       requireReady();if(!internalOrg)fail('ACCESS_DENIED','Accès punch requis.');
-      const actor=status.user.id,org=internalOrg,epoch=generation,id=uuid(),body={...payload,deviceId:payload.deviceId||'web'},key=punchQueueKey(actor,org);
-      try{const {data,error}=await sdk.rpc('mir_punch_action',{org,request_id:id,action,job,payload:body});if(error)throw errorOf(error);if(epoch!==generation||status.user?.id!==actor)fail('SESSION_CHANGED','La session a changé. Vérifiez le pointage avec le compte d’origine.');await refresh();return data;}
+      const actor=status.user.id,org=internalOrg,epoch=generation,id=uuid(),body={...payload,deviceId:payload.deviceId||'web'},key=punchQueueKey(actor,org),routine=punchRoutine();
+      try{const {data,error}=await sdk.rpc(routine,{org,request_id:id,action,job,payload:body});if(error)throw errorOf(error);if(epoch!==generation||status.user?.id!==actor)fail('SESSION_CHANGED','La session a changé. Vérifiez le pointage avec le compte d’origine.');await refresh();return data;}
       catch(error){
         if(epoch!==generation||status.user?.id!==actor||internalOrg!==org)fail('SESSION_CHANGED','La session a changé. Aucun pointage n’est réattribué.');
         const settings=status.snapshot?.punch?.settings||{};
         if(!(settings.offlineEnabled??settings.offline_enabled)||!['in','out','switch','travel_start','travel_arrive'].includes(action)||navigator.onLine!==false&&error?.definitive!==false&&error?.code!=='NETWORK_UNCERTAIN')throw error;
-        const queue=JSON.parse(localStorage.getItem(key)||'[]');queue.push({id,actor,org,action,job,payload:{...body,source:'offline',originalAt:new Date().toISOString()}});localStorage.setItem(key,JSON.stringify(queue));return{ok:true,pending:true,serverAt:new Date().toISOString()};
+        const queue=JSON.parse(localStorage.getItem(key)||'[]');queue.push({id,actor,org,action,job,routine,payload:{...body,source:'offline',originalAt:new Date().toISOString()}});localStorage.setItem(key,JSON.stringify(queue));return{ok:true,pending:true,serverAt:new Date().toISOString()};
       }
     }
     async function syncPunchQueue(){
@@ -621,7 +622,7 @@
       for(const item of queue){
         if(epoch!==generation||status.user?.id!==actor||internalOrg!==org)return sent;
         if(item.actor!==actor||item.org!==org){remaining.push(item);continue;}
-        const {error}=await sdk.rpc('mir_punch_action',{org,request_id:item.id,action:item.action,job:item.job,payload:item.payload});if(error)remaining.push(item);else sent++;
+        const routine=config.environment==='test'&&config.projectRef==='hxtztkmbfpmzrieccwsg'&&item.routine==='mir_field_punch_action'?item.routine:punchRoutine();const {error}=await sdk.rpc(routine,{org,request_id:item.id,action:item.action,job:item.job,payload:item.payload});if(error)remaining.push(item);else sent++;
       }
       if(epoch!==generation||status.user?.id!==actor||internalOrg!==org)return sent;
       localStorage.setItem(key,JSON.stringify(remaining));if(sent)await refresh();return sent;

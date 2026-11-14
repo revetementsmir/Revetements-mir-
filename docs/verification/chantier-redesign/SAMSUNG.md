@@ -33,3 +33,20 @@ Ne pas demander de tout exécuter en même temps. Après chaque étape, relever 
 ## État
 
 Installation de l’ancien paquet personnel120007 déclarée réussie par Frederick et écran de connexion Samsung observé. Les étapes de cette nouvelle recette restent **ouvertes** jusqu’à leurs observations physiques. Chromium, les tests SDK, la compilation et l’émulateur CI accéléré sont documentés séparément ; aucun ne vaut validation Samsung.
+
+## Complément — Accueil8 et Punch2 approuvés le 14 novembre 2026
+
+Le prochain paquet personnel prévu est **0.13.1-s25-test /130005**, successeur de **0.13.0-s25-test /130004**, avec le même paquet et la même clé TEST personnelle. Avant sa remise, comparer les deux certificats sur les binaires, vérifier les ressources embarquées contre le commit final, puis ouvrir réellement les cinq vues natives. Une correspondance entre APK ne remplace pas une lecture directe du certificat installé sur le téléphone. Ne pas utiliser l’APK standard CI pour remplacer le paquet personnel.
+
+La recette physique complémentaire se déroule toujours une étape à la fois :
+
+1. Mettre à jour **MIR Recette S25** sans effacement ; confirmer la version130005 et la conservation de la session. En cas de refus Android, relever le message et arrêter.
+2. Sur Accueil, vérifier le vrai nom, les seules jobs autorisées, le menu MIR, Dossier et Itinéraire. Date/météo restent compactes ; une météo indisponible n’est pas une température. Vérifier que les quatre accès Chef ou trois accès Employé, le résumé Punch et les avis tiennent sans être coupés.
+3. Dans Punch, vérifier le chantier réel si un pointage est actif ; sinon choisir la proposition de la précédente journée travaillée ou un chantier autorisé. Aucun démarrage automatique. Vérifier le bouton rond, le symbole et le libellé, puis attendre la confirmation du serveur avant de considérer le pointage enregistré.
+4. Sur une journée de recette expressément contrôlée, préparer le transfertA→B, l’annuler, puis le confirmer. Le pointageA continue jusqu’à la confirmation ; le chrono de journée conserve son départ. Vérifier les segments côté bureau et ne pas confondre temps écoulé et heures payables.
+5. Changer d’onglet, verrouiller/déverrouiller, revenir d’arrière-plan, fermer/rouvrir puis redémarrer. Le chrono et l’aiguille se recalculent depuis les horodatages confirmés ; aucun nouveau pointage ne doit apparaître.
+6. Vérifier Commande/Magasin sans défilement de page en portrait standard : recherche, catégories, favoris, pagination et détail. Un panier ne se vide qu’après un reçu réel, sans perdre les articles ajoutés pendant l’envoi. Aucun achat ni envoi réel à faire pour vérifier seulement la navigation.
+7. Activer les grands textes et ouvrir le clavier : toutes les actions restent accessibles, au besoin dans une vue secondaire. Vérifier clair/sombre/système, retour Android depuis un choix MIR, annulation et champs obligatoires.
+8. Reprendre le verrouillage système facultatif puis la déconnexion des étapes précédentes. Aucun second NIP, aucun compte personnel implicite, aucun secret demandé dans le chat.
+
+Les shifts marquées `QA-SAMSUNG-SYNTHETIC-NOT-PHYSICAL` des comptes automatisés sont des fixtures, pas des présences réelles. Elles sont préparées puis clôturées explicitement pour la CI ; leur existence ne prouve aucune manipulation physique sur le Samsung de Frederick. Les captures Chromium et WebView, les appels TEST sous claims SQL contrôlés et la recette Samsung sont rapportés séparément.

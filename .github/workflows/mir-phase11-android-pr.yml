@@ -29,6 +29,12 @@ jobs:
           node tests/mir-field-cart.cjs
           node tests/mir-field-profile.cjs
           node tests/mir-field-redesign-browser.cjs
+          node --test tests/mir-samsung-contracts.cjs
+          node tests/mir-samsung-fixture.cjs
+          node tests/mir-punch-receipts-postgres.cjs
+          node tests/mir-punch-receipts-client.cjs
+          node tests/mir-samsung-ui.cjs
+          node tests/mir-punch-approved-browser.cjs
           node tests/mir-team-enrollment-integration.cjs
           node mobile/tools/test-enrollment-web.cjs
           node tests/mir-team-invitation-email.cjs

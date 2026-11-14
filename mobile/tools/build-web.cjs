@@ -16,7 +16,7 @@ for(const file of files){
  const dest=path.join(out,file.slice(5));fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,file),dest);
 }
 // New local assets must also be included before their first commit.
-for(const file of ['google-signin.svg','mir-field-cart.js','mir-field-views.js','mir-field.css'])fs.copyFileSync(path.join(root,'dist',file),path.join(out,file));
+for(const file of ['google-signin.svg','mir-field-cart.js','mir-field-views.js','mir-field.css','mir-field-controls.js','mir-field-controls.css','mir-field-runtime.js','mir-field-samsung.css'])fs.copyFileSync(path.join(root,'dist',file),path.join(out,file));
 const capabilities={fieldExperienceEnabled:true,googleEnabled:process.env.MIR_TEST_GOOGLE_ENABLED==='true',recoveryEnabled:process.env.MIR_TEST_RECOVERY_ENABLED==='true',teamInvitationsEnabled:process.env.MIR_TEST_INVITATIONS_ENABLED!=='false',teamEnrollmentEnabled:process.env.MIR_TEST_ENROLLMENT_ENABLED!=='false'};
 fs.writeFileSync(path.join(out,'mir-team-test-config.js'),'window.MIRTeamTestConfig=Object.freeze('+JSON.stringify(capabilities)+');');
 const config={enabled:true,fieldExperienceEnabled:true,accountEnabled:true,passwordEnabled:true,emailEnabled:capabilities.recoveryEnabled,googleEnabled:capabilities.googleEnabled,signupEnabled:false,invitationsEnabled:capabilities.teamInvitationsEnabled,teamInvitationsEnabled:capabilities.teamInvitationsEnabled,teamEnrollmentEnabled:capabilities.teamEnrollmentEnabled,manualInvitations:true,documentsEnabled:false,environment:'test',projectRef:project,supabaseUrl:`https://${project}.supabase.co`,publishableKey:key,siteOrigin:'https://localhost',callbackPath:'/chantier.html'};
@@ -26,7 +26,7 @@ fs.writeFileSync(path.join(out,'mir-estimate-config.js'),'window.MIREstimateConf
 for(const name of ['native-checks.html','native-checks.js','native-pdf.html','native-pdf.js','native-pdf-worker.mjs','team.css'])fs.copyFileSync(path.join(root,'mobile/web',name),path.join(out,name));
 const esbuild=require('esbuild');
 for(const name of ['compat','bootstrap','sdk'])esbuild.buildSync({entryPoints:[path.join(root,'mobile/web/'+name+'.js')],outfile:path.join(out,'mir-native-'+name+'.js'),bundle:true,format:'iife',target:'es2022'});
-const csp="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' blob: https://"+project+".supabase.co wss://"+project+".supabase.co; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'none'; form-action 'none'; base-uri 'self'";
+const csp="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' blob: https://"+project+".supabase.co wss://"+project+".supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'none'; form-action 'none'; base-uri 'self'";
 for(const file of fs.readdirSync(out).filter(p=>p.endsWith('.html'))){
  const pageCsp=file==='native-checks.html'?csp.replace(/connect-src[^;]+;/,"connect-src 'none';"):csp;
  const p=path.join(out,file);let html=fs.readFileSync(p,'utf8');

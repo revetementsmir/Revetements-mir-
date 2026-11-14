@@ -1,0 +1,46 @@
+{
+  "environment": "MIR TEST only",
+  "mode": "Hosted SQL read-only; titles compared by hash; no raw title, body, note or email returned",
+  "canonicalAbsenceDates": [{"id":"cf742541-3695-4439-9068-b5e68e62bde1","start_date":"2026-11-13","end_date":"2026-11-13","status":"submitted"},{"id":"ef30eaee-5b38-43a9-97ff-dfdf133d3316","start_date":"2026-11-13","end_date":"2026-11-13","status":"submitted"}],
+  "checkedAt": "2026-11-14",
+  "counts": [
+    {
+      "total": 100,
+      "user_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "entities": 100
+    },
+    {
+      "total": 2,
+      "user_id": "ec421778-b39b-492e-9e4b-5e044015e98f",
+      "entities": 2
+    }
+  ],
+  "absences": [
+    {
+      "id": "4836f504-444c-405e-82b7-02d8fe30b6c3",
+      "user_id": "ec421778-b39b-492e-9e4b-5e044015e98f",
+      "end_date": null,
+      "event_id": "290e5f05-ec66-4f6f-8a73-a6b752ae66c7",
+      "entity_id": "cf742541-3695-4439-9068-b5e68e62bde1",
+      "created_at": "2026-11-13T00:16:19.306409+00:00",
+      "event_type": "absence",
+      "start_date": null,
+      "title_hash": "995c4c0248977584e68679ac44c6b8e4",
+      "occurred_at": "2026-11-13T00:16:19.306409+00:00",
+      "target_view": "team-availability"
+    },
+    {
+      "id": "39b2393e-3ad8-4e45-883c-0f90dfbc70e6",
+      "user_id": "ec421778-b39b-492e-9e4b-5e044015e98f",
+      "end_date": null,
+      "event_id": "0e491270-46f5-4285-9986-444ca5544457",
+      "entity_id": "ef30eaee-5b38-43a9-97ff-dfdf133d3316",
+      "created_at": "2026-11-13T00:14:31.956506+00:00",
+      "event_type": "absence",
+      "start_date": null,
+      "title_hash": "995c4c0248977584e68679ac44c6b8e4",
+      "occurred_at": "2026-11-13T00:14:31.956506+00:00",
+      "target_view": "team-availability"
+    }
+  ]
+}

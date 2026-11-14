@@ -1,0 +1,47 @@
+# Accueil8, Punch2 et correctifs Samsung
+
+La PR37 reste empilée sur la branche Auth de la PR36, en brouillon. Base Auth exacte : `24d29734d68cd3da23c17be8693ddba08abff19f`. Point de reprise Samsung : `6039306ac76584ee6b06859786c02eef7cfca685`. Main relu : `d4a9ec05ee9a0c2ede0713efab0add860a9507cb`. Le SHA distant final et la CI obtenue après commit figurent dans [la PR37](https://github.com/revetementsmir/Revetements-mir-/pull/37) ; ne pas attribuer les résultats de6039306 à une nouvelle tête.
+
+## Réalisation et preuve
+
+| Besoin | Réalisation | Vérification et limites |
+|---|---|---|
+| Accueil8 « Liste nette » | Date/salutation/météo compactes, job avec choix intégré et Dossier/Itinéraire, résumé du même Punch, liste d’accès selon rôle, résumé d’avis | [Designer](DESIGNER-SAMSUNG.md), [Ergonomie](ERGONOMIE-SAMSUNG.md). Les références sont les deux photos approuvées dans la conversation ; le coordinateur les a comparées aux rendus réels, les autres experts ne prétendent pas avoir reçu ces fichiers. |
+| Punch2 « Cadran » | Chantier dans sa propre carte, chrono numérique, aiguille verte par heure écoulée, démarrer/arrêter avec symbole et libellé, Déplacement/Mes heures | [Mobile](MOBILE-SAMSUNG.md), [Qualité](QUALITE-SAMSUNG.md). Durée écoulée depuis le début confirmé ; aucun calcul de salaire ou ajout de suivi GPS. |
+| Transfert | Préparer une cible sans arrêter l’ancienne job, annuler, puis utiliser le moteur serveur existant pour le changement atomique | [Preuve hébergée](proofs/approved-punch-receipts-test.json). Même journée, frontière temporelle identique entre les deux segments. Rejeu stable, sans segment/audit supplémentaire. |
+| Dernier chantier | Dernière journée travaillée strictement antérieure au jour métier de Toronto ; uniquement une job encore active et autorisée | Les tests couvrent fin de semaine, fuseau, historique tardif et retrait d’accès. Le pointage actif prime. Aucun ancien GPS, horaire ou démarrage automatique. |
+| Commande/Magasin | Hub compact, recherche/choix MIR, catalogue complet paginé selon l’espace, détail séparé et panier commun | Variantes, favoris, quantité obligatoire, panne et ajout pendant l’acquittement sont conservés. Seules les lignes réellement confirmées sont retirées. |
+| Choix et accessibilité | Composant MIR commun aux listes simples/multiples, recherche, dates et heures ; contrôles natifs source conservés pour valeurs et validation | [Inventaire des champs](CHOICES-SAMSUNG.md), [Ergonomie](ERGONOMIE-SAMSUNG.md). Fichiers, caméra, biométrie, permissions et clavier restent Android. |
+| Palette et états | Charcoal neutre, surfaces grises, blanc cassé, vert MIR ; clair/système et préférences conservés | [Mesures de contraste](CONTRAST-SAMSUNG.md), [Harmonisation](HARMONISATION-SAMSUNG.md). Le rouge de l’arrêt/erreur est fonctionnel ; aucun orange décoratif. |
+| Grand texte et petit paysage | Adaptation progressive permettant l’accès aux informations et actions ; composition circulaire standard distincte des vues adaptées | Les rapports identifient les formats réels et différencient zoom CSS, configuration Android et essai Samsung physique. Aucun masquage global pour faire passer une capture. |
+| Notifications | Compteur serveur, pagination et identité des événements ; aucune fusion fondée sur un titre identique | [Diagnostic TEST assaini](proofs/samsung-notification-identities.json). Deux demandes RH Chef sont bien distinctes et anciennes ; leur texte historique ne doit pas les faire passer pour une absence du jour. |
+| Météo | Diagnostic précis et ouverture limitée des trois barrières APK aux deux chemins Open-Meteo nécessaires | Ville/zone seulement, pas d’adresse précise ou de GPS employé. Le proxy Work refuse encore le service public réel ; les valeurs simulées ne prouvent pas la météo en ligne sur Samsung. |
+| Auth et objets métier | SDK natif conservé, mêmes jobs/droits, même panier, moteurs pliage/dessin/PDF, messagerie et dossier Adjointe | Suites historiques maintenues. [Liaisons TEST antérieures](HOSTED-QA.md) conservées ; une nouvelle maquette n’est pas une nouvelle preuve hébergée de chaque fonction. |
+
+## Six expertises effectivement mobilisées
+
+Le développeur full-stack est le seul intégrateur des sources applicatives, tests et contrats. Designer produit les compositions, captures et aperçus ; Ergonomie vérifie choix, focus, cibles et adaptations ; Mobile vérifie reprise, politiques natives et provenance APK ; Harmonisation mesure les vrais composants ; Qualité rejoue les cas difficiles indépendamment. Leurs résultats, y compris les états rouges reproduits puis corrigés, sont conservés dans les six rapports liés ci-dessus et [le bilan d’intégration](INTEGRATION-SAMSUNG.md).
+
+MOON1.3.11 et les méthodes Atelier1.0.0 ont été consultés directement sur le serveur. Les six missions existantes sont réutilisées, sans autre éditeur des fichiers communs. Le cadrage UXv16 contient les directions approuvées ; sa mise à jour finale doit être confirmée séparément par le serveur. Une copie locale ou un lien ne valent pas synchronisation.
+
+## Backend TEST et portée des essais
+
+Un adaptateur additif `mir_field_punch_action` protège le rejeu en conservant le premier reçu. Il utilise le moteur `mir_punch_action` existant, ses verrous, contrôles GPS, permissions et règles de semaine. Le client terrain TEST choisit le même adaptateur pour l’appel immédiat et la file hors ligne ; les autres rôles gardent leur contrat existant.
+
+Migration locale gardée TEST : `20261114130418_mir_chantier_punch_receipts_test.sql`, SHA-256 `f72b0ba991dcca84d3a6e3d8f61c5c7cf2f87459b4e7da7765027b7c03f4171d`. Installation confirmée uniquement sur `hxtztkmbfpmzrieccwsg`, version serveur `20261114130509`. Aucune migration de production. Les14groupes PostgreSQL locaux couvrent aussi refus GPS, issuer/rôle/organisation, désactivation, semaine verrouillée, job étrangère, migration d’une ancienne queue et sortie rejouée.
+
+L’essai hébergé a exécuté un transfert et son rejeu sous rôle SQL `authenticated` avec claims contrôlés, dans une transaction annulée. Il confirme même reçu/segment, début de journée conservé, fermeture/ouverture au même instant et refus d’une autre intention sous le même UUID. Après `ROLLBACK` : aucun reçu, événement, segment ou audit de cet essai ne subsiste. Ce n’est ni un login HTTP, ni un contrôle GPS physique. Les réglages GPS existants n’ont pas été modifiés.
+
+Les deux shifts fictives `QA-SAMSUNG-SYNTHETIC-NOT-PHYSICAL` servent uniquement aux tests natifs avec2jobs, équipe/tâche et panier local non vide. [Préparation vérifiée](proofs/samsung-active-fixture.json). Le coordinateur clôture exactement ces fixtures après la dernière CI native, sans suppression, événement GPS inventé ou modification d’une ancienne journée réelle. Cette clôture est une opération de données TEST postérieure au commit, rapportée dans le bilan serveur. Une relance future exige une préparation QA coordonnée, pas une assertion retirée.
+
+Le contrôle sécurité avant/après est conservé dans la preuve hébergée. La nouvelle table de reçus est privée, RLS sans politique cliente et sans accès direct `authenticated` ; le seul RPC est accordé à `authenticated`, avec issuer TEST exact, rôle terrain, membre actif et `search_path` fixé. Les autres avis préexistaient, notamment la [protection contre les mots de passe compromis](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection) désactivée. Les réglages Auth ont été préservés.
+
+## Livraison et recette encore ouvertes
+
+Les aperçus autonomes sont explicitement des simulations QA. Les captures durables se trouvent dans `screens/samsung-approved/`. Les captures WebView et métriques Android doivent provenir de l’artefact CI de la tête finale et être ouvertes réellement, avec empreintes et contrôles contre les vues répétées. Les résultats Chromium, PostgreSQL local, TEST hébergé, émulateur KVM et Samsung physique sont distincts.
+
+L’APK personnel prévu est **0.13.1-s25-test /130005**, paquet `ca.revetementsmir.equipe.recette.s25`, avec la clé TEST personnelle existante. Sa remise dépend de la nouvelle CI, de l’inspection des cinq vues et des vérifications du binaire ; le lien privé, le SHA-256 final et la provenance sont remis directement à Frederick, jamais dans Atelier. Les clés ne sont ni exportées ni intégrées au dépôt/APK. [Checklist Samsung](SAMSUNG.md).
+
+Google, récupération par courriel et transports réels restent désactivés. Premier Punch oublié sans shift : traitement manuel existant au bureau ; banque d’heures selon réglages TEST existants. Recette Samsung, mise à jour installée/session, redémarrage, clavier, caméra/fichiers/GPS ponctuel et déverrouillage physique restent ouverts jusqu’aux observations de Frederick. Aucun essai émulateur ne les remplace.
+
+Aucune fusion, publication Pages, émission réelle de courriel, opération production, signature release, distribution employés ou activation paiement. SEO/GEO non applicable à ce parcours privé ; aucun moteur Responsive commun recopié.

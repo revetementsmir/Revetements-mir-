@@ -1,0 +1,109 @@
+{
+  "environment": "MIR TEST hxtztkmbfpmzrieccwsg only",
+  "mode": "Synthetic canonical fixtures via guarded SQL; RPC read under controlled authenticated claims; not a physical GPS punch",
+  "before": [
+    {
+      "checked_at": "2026-11-14 12:03:38.734967+00",
+      "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "active_count": 0,
+      "punch_event_count": 0
+    },
+    {
+      "checked_at": "2026-11-14 12:03:38.734967+00",
+      "employee_id": "ec421778-b39b-492e-9e4b-5e044015e98f",
+      "active_count": 0,
+      "punch_event_count": 3
+    }
+  ],
+  "after": [
+    {
+      "id": "7da20261-1114-4000-8100-000000000001",
+      "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "started_at": "2026-11-14 11:48:53.43491+00",
+      "ended_at": null,
+      "status": "active",
+      "device_id": "QA-SAMSUNG-SYNTHETIC-NOT-PHYSICAL",
+      "segment_id": "7da20261-1114-4000-8200-000000000001",
+      "job_id": "7da20261-1114-4000-8000-000000000001",
+      "segment_type": "job",
+      "segment_started_at": "2026-11-14 11:48:53.43491+00",
+      "event_count": 0
+    },
+    {
+      "id": "7da20261-1114-4000-8100-000000000002",
+      "employee_id": "ec421778-b39b-492e-9e4b-5e044015e98f",
+      "started_at": "2026-11-14 11:48:53.43491+00",
+      "ended_at": null,
+      "status": "active",
+      "device_id": "QA-SAMSUNG-SYNTHETIC-NOT-PHYSICAL",
+      "segment_id": "7da20261-1114-4000-8200-000000000002",
+      "job_id": "7da20261-1114-4000-8000-000000000001",
+      "segment_type": "job",
+      "segment_started_at": "2026-11-14 11:48:53.43491+00",
+      "event_count": 3
+    }
+  ],
+  "employeeRpc": [
+    {
+      "proof": {
+        "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+        "snapshot": {
+          "id": "7da20261-1114-4000-8100-000000000001",
+          "source": "online",
+          "status": "active",
+          "segment": {
+            "id": "7da20261-1114-4000-8200-000000000001",
+            "job_id": "7da20261-1114-4000-8000-000000000001",
+            "ended_at": null,
+            "shift_id": "7da20261-1114-4000-8100-000000000001",
+            "created_by": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+            "started_at": "2026-11-14T11:48:53.43491+00:00",
+            "next_job_id": null,
+            "segment_type": "job",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          },
+          "ended_at": null,
+          "device_id": "QA-SAMSUNG-SYNTHETIC-NOT-PHYSICAL",
+          "work_date": "2026-11-14",
+          "created_at": "2026-11-14T12:03:53.43491+00:00",
+          "started_at": "2026-11-14T11:48:53.43491+00:00",
+          "employee_id": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+          "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9",
+          "auto_break_minutes": 0
+        }
+      }
+    }
+  ],
+  "chefRpc": [
+    {
+      "proof": {
+        "actor": "ec421778-b39b-492e-9e4b-5e044015e98f",
+        "snapshot": {
+          "id": "7da20261-1114-4000-8100-000000000002",
+          "source": "online",
+          "status": "active",
+          "segment": {
+            "id": "7da20261-1114-4000-8200-000000000002",
+            "job_id": "7da20261-1114-4000-8000-000000000001",
+            "ended_at": null,
+            "shift_id": "7da20261-1114-4000-8100-000000000002",
+            "created_by": "ec421778-b39b-492e-9e4b-5e044015e98f",
+            "started_at": "2026-11-14T11:48:53.43491+00:00",
+            "next_job_id": null,
+            "segment_type": "job",
+            "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9"
+          },
+          "ended_at": null,
+          "device_id": "QA-SAMSUNG-SYNTHETIC-NOT-PHYSICAL",
+          "work_date": "2026-11-14",
+          "created_at": "2026-11-14T12:03:53.43491+00:00",
+          "started_at": "2026-11-14T11:48:53.43491+00:00",
+          "employee_id": "ec421778-b39b-492e-9e4b-5e044015e98f",
+          "organization_id": "8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9",
+          "auto_break_minutes": 0
+        }
+      }
+    }
+  ],
+  "cleanup": "Root must close only exact two marked fixtures after the final CI; do not delete rows or touch other shifts"
+}

@@ -4,6 +4,7 @@ const routes=new Set(['index.html','native-checks.html','native-pdf.html','chant
 function allowedRequest(value,origin='https://localhost'){
  try{const u=new URL(value,origin);if(u.username||u.password||u.port&&u.port!=='443')return false;
   if(u.origin===origin)return true;
+  if(u.protocol==='https:'&&((u.hostname==='geocoding-api.open-meteo.com'&&u.pathname==='/v1/search')||(u.hostname==='api.open-meteo.com'&&u.pathname==='/v1/forecast')))return true;
   if(u.protocol!=='https:'||u.hostname!==TEST)return false;
   if(/^\/rest\/v1\/rpc\/mir_(?:client_|estimate_)/.test(decodeURIComponent(u.pathname)))return false;
   if(u.pathname==='/functions/v1/mir-team-invitations')return true;

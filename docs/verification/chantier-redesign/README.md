@@ -1,5 +1,7 @@
 # Refonte chantier Employé et Chef
 
+**Complément Samsung et directions approuvées Accueil8/Punch2 :** [bilan actuel et matrice des besoins](BILAN-SAMSUNG.md), [captures comparables](screens/samsung-approved/), [recette personnelle](SAMSUNG.md). Les résultats6039306 conservés ci-dessous sont historiques ; la nouvelle tête et ses contrôles sont distingués dans le complément et la PR37.
+
 Branche `codex/refonte-chantier-employe-chef`, [PR37 en brouillon](https://github.com/revetementsmir/Revetements-mir-/pull/37). Base exacte Auth `24d29734d68cd3da23c17be8693ddba08abff19f`, [PR36](https://github.com/revetementsmir/Revetements-mir-/pull/36) préservée et en brouillon. Main relu `d4a9ec05ee9a0c2ede0713efab0add860a9507cb`. Aucun développement dans l’ancien dépôt MIR. Les changements préexistants du paquet S25 sont conservés dans leur checkout séparé.
 
 La nouvelle interface partage les mêmes sources `dist` entre aperçu et APK. Elle remplace la navigation chantier par **Accueil · Commande · Punch · Message · Plus**, avec panier commun et avatar. Le drapeau TEST `fieldExperienceEnabled` n’ajoute aucun droit serveur et ne publie pas le site web ordinaire.

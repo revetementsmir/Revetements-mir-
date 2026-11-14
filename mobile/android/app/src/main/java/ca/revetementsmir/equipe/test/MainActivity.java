@@ -13,6 +13,8 @@ public class MainActivity extends BridgeActivity {
     @Override public void onCreate(Bundle state) {
         registerPlugin(MIRNativePlugin.class);
         super.onCreate(state);
+        // Apply Android accessibility once, as an absolute value. MIR text preference remains independent.
+        getBridge().getWebView().getSettings().setTextZoom(Math.round(getResources().getConfiguration().fontScale * 100));
         getBridge().getWebView().getSettings().setAllowFileAccess(false);
         getBridge().getWebView().getSettings().setAllowContentAccess(false);
         getBridge().getWebView().getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW);
