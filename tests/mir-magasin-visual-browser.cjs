@@ -47,7 +47,7 @@ async function capture(card,name,print=false){
         await page.locator('#search').fill('PRIME 40713');
         const card=page.locator('article.card.prime');await card.waitFor();
         if(version==='after'){
-          const photo=card.locator('img[data-catalogue-image]');await photo.waitFor();
+          const photo=card.locator('img[data-catalogue-image]');await photo.waitFor();await photo.evaluate(image=>image.decode());
           const state=await photo.evaluate(image=>({src:image.getAttribute('src'),loaded:image.complete&&image.naturalWidth>0,fit:getComputedStyle(image).objectFit}));
           assert.match(state.src,/prime-40713-box\.webp$/);
           assert.equal(state.loaded,true,'La vraie photo PRIME doit charger');
@@ -83,7 +83,7 @@ async function capture(card,name,print=false){
     ]){
       const card=page.locator('article[data-product="'+id+'"]');await card.waitFor();
       await card.locator('[data-product-color]').selectOption('canexel-acadia');
-      const photo=card.locator('img[data-catalogue-image]');await photo.waitFor();
+      const photo=card.locator('img[data-catalogue-image]');await photo.waitFor();await photo.evaluate(image=>image.decode());
       assert.ok((await photo.getAttribute('src')).endsWith(filename),id+' : mauvaise photo du profil');
       assert.equal(await photo.evaluate(e=>e.complete&&e.naturalWidth>0),true,id+' : photo cassée');
       await capture(card,'after-390-'+id,id==='canexel-joint-cedrvue-9');
