@@ -36,6 +36,9 @@ jobs:
           node tests/mir-samsung-fixture.cjs
           node tests/mir-punch-receipts-postgres.cjs
           node tests/mir-punch-receipts-client.cjs
+          node tests/mir-teams-hours-postgres.cjs
+          node tests/mir-teams-hours-client.cjs
+          node tests/mir-teams-hours-browser.cjs
           node tests/mir-samsung-ui.cjs
           node tests/mir-punch-approved-browser.cjs
           node tests/mir-field-choice-refresh-browser.cjs
@@ -62,6 +65,8 @@ jobs:
         with:
           name: phase11-chromium-simulation
           path: |
+            artifacts/teams-hours/postgres-fixture.json
+            artifacts/teams-hours/browser/
             artifacts/phase11/web/
             artifacts/chantier-redesign/functional/
             artifacts/employee-auth-audit/email/

@@ -1,0 +1,65 @@
+{
+  "project": "hxtztkmbfpmzrieccwsg",
+  "sqlSha256": "03a2e6e6ddedd0c44b7e29bf474245ccbf762b158692bdd5125ebe38fa548165",
+  "localMigration": "20261114191433_mir_punch_management_test.sql",
+  "serverMigration": "20261114191502",
+  "transport": "authenticated SQL with controlled TEST claims; not HTTP, emulator or physical GPS",
+  "transaction": "ROLLBACK",
+  "scenario": {
+    "workDate": "2026-11-09",
+    "startToronto": "07:00",
+    "endToronto": "15:30",
+    "transferToronto": "10:30",
+    "from": "QA-UX-1",
+    "to": "QA-UX-2",
+    "sameShift": true,
+    "exactSharedSegmentBoundary": true,
+    "grossSeconds": 30600,
+    "breakSeconds": 900,
+    "paidSeconds": 29700,
+    "personalAndManagementTotalsMatch": true,
+    "submissionReplayStable": true,
+    "decisionReplayStable": true,
+    "assistantApprovalDenied": true,
+    "employeeManagementDenied": true,
+    "foreignOrganizationDenied": true
+  },
+  "afterRollback": {
+    "shifts": 0,
+    "corrections": 0,
+    "audit": 0,
+    "receipts": 0
+  },
+  "permissions": {
+    "anonymousActionExecute": false,
+    "authenticatedActionExecute": true,
+    "clientReceiptSelect": false
+  },
+  "advisors": {
+    "privateRlsNoPolicyInfo": [
+      96,
+      97
+    ],
+    "authenticatedSecurityDefinerWarnings": [
+      158,
+      161
+    ],
+    "mutableSearchPathWarnings": [
+      1,
+      1
+    ],
+    "anonymousSecurityDefinerWarnings": [
+      5,
+      5
+    ],
+    "leakedPasswordProtectionWarnings": [
+      1,
+      1
+    ]
+  },
+  "limits": [
+    "No hosted multi-session contention test",
+    "No physical Samsung verification",
+    "UI/HTTP end-to-end verification still pending"
+  ]
+}
