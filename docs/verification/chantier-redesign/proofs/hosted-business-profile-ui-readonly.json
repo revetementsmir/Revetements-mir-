@@ -1,0 +1,40 @@
+[
+  {
+    "role": "chef",
+    "realBackend": true,
+    "localSource": true,
+    "fieldExperienceEnabled": true,
+    "profileResponse": {
+      "id": "e0d9b9aa-9716-42a1-9e82-9ee65ded6bfd",
+      "name": "Chef MIR TEST",
+      "role": "chef_equipe"
+    },
+    "self": {
+      "actorId": "e0d9b9aa-9716-42a1-9e82-9ee65ded6bfd",
+      "name": "Chef MIR TEST",
+      "role": "chef_equipe"
+    },
+    "avatarInitials": "CM",
+    "accountTitle": "Chef MIR TEST",
+    "accountRoleLabel": "Chef d’équipe",
+    "authMetadataUnchangedDuringRead": true,
+    "readRPCs": [
+      "mir_account_snapshot",
+      "mir_portal_snapshot",
+      "mir_employee_operations_snapshot",
+      "mir_messaging_snapshot",
+      "mir_punch_snapshot",
+      "mir_expense_snapshot",
+      "mir_absence_snapshot",
+      "mir_notification_center",
+      "mir_field_profile",
+      "mir_lead_today_snapshot",
+      "mir_logistics_snapshot",
+      "mir_job_dossier_snapshot",
+      "mir_field_job_snapshot"
+    ],
+    "jsErrors": [],
+    "noMutation": true,
+    "physicalAndroid": false
+  }
+]

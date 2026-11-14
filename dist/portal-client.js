@@ -231,6 +231,7 @@
         if(expensesResponse.error&&!missingRoutine(expensesResponse))throw errorOf(expensesResponse.error);
         if(absencesResponse.error&&!missingRoutine(absencesResponse))throw errorOf(absencesResponse.error);
         if(notificationsResponse.error&&!missingRoutine(notificationsResponse))throw errorOf(notificationsResponse.error);
+        const profileRead=config.environment==='test'&&config.fieldExperienceEnabled===true&&['employe','chef_equipe'].includes(operationsResponse.data?.role)?sdk.rpc('mir_field_profile',{org:internalOrg}).then(response=>({response}),error=>({error})):null;
         const punch=punchResponse.error?{enabled:false,settings:{},activeShift:null,week:[],corrections:[],bankBalance:0,unavailable:true}:punchResponse.data;
         const expenses=expensesResponse.error?{unavailable:true,role:null,categories:[],expenses:[]}:expensesResponse.data;
         const absences=absencesResponse.error?{unavailable:true,role:null,requests:[]}:absencesResponse.data;
@@ -248,7 +249,12 @@
           const response=await sdk.rpc('mir_management_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);management=response.data;
           const prices=await sdk.rpc('mir_boutique_price_management',{org:internalOrg});if(prices.error)throw errorOf(prices.error);boutiquePricing=prices.data;
         }
-        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses,absences,notifications}, user.id);
+        const profileResult=profileRead?await profileRead:null;
+        if(epoch!==generation||sequence!==readSequence||disposed)return null;
+        if(profileResult?.error)throw errorOf(profileResult.error);
+        let fieldMembers=data.members;
+        if(profileResult){const response=profileResult.response;if(response.error)throw errorOf(response.error);const profile=response.data;if(!profile||profile.id!==user.id||profile.role!==operationsResponse.data.role||profile.name!==null&&typeof profile.name!=='string')fail('RESPONSE_UNCERTAIN','Le profil chantier reçu ne correspond pas au compte vérifié.');if(profile.name?.trim())fieldMembers=data.members.map(member=>member.id===user.id?{...member,name:profile.name.trim()}:member);}
+        const snapshot = checkedSnapshot({...data,members:fieldMembers,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses,absences,notifications}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {

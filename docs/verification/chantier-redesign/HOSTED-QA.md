@@ -33,6 +33,14 @@ L’expertise Qualité a ensuite ouvert réellement l’interface locale raccord
 
 Le contrôle A → B → A a d’abord reproduit un cache erroné qui empêchait de recharger A ; le cache a été remplacé par une protection des requêtes en cours et le parcours a été rejoué. Le changement d’une ancienne journée dans le formulaire de correction conservait aussi les segments précédents : Oct2 → Oct1 remplace maintenant 923/924/925 par 920/921/922, sans écrire de correction pendant la recette de lecture.
 
+## Complément : identités exactes de la CI Android
+
+La CI1466eb1 est verte techniquement, mais l’inspection des vrais PNG a révélé des doublons (Commande/Punch et Message/Plus), ainsi qu’un Chef sans affectation. Cette CI ne certifie donc pas cinq rendus natifs distincts. Les comptes natifs historiques sont différents des comptes locaux E0/E1 et des comptes de certification F7/95 : Chef `ec421778-b39b-492e-9e4b-5e044015e98f`, Employé `3980647a-d83a-48ad-9d90-8fc2b314807f`.
+
+Ces **deux comptes existants** ont maintenant les deux jobs A/B. Deux équipes QA20/21, affectations du jour40/41 et tâches60/61 ont été ajoutées au Chef natif. Chaque équipe a un membre QA Employé existant, déjà activé par les essais Auth (`552233d5-…` et `b0cf921b-…`), qui n’appartenait à aucune équipe active. Aucune identité créée, aucun mot de passe réinitialisé, aucun déplacement d’ancienne affiliation ; l’index d’unicité d’équipe active est conservé. Les présences restent non confirmées. La fixture versionnée est `supabase/test-only/fixtures/chantier-ux-native-existing-accounts.sql`.
+
+Le nom métier était déjà configuré dans `staff_capabilities`, tandis que l’enveloppe historique du portail utilisait seulement Auth full_name/courriel. Le nouveau `mir_field_profile(org)` lit uniquement l’identité courante, avec rôle et membre actifs ; aucune identité cible ne peut être fournie. Le client vérifie identité, rôle et génération de session avant d’enrichir son propre nom. Les métadonnées Auth ne sont pas artificiellement modifiées pour masquer cet écart. Quatre scénarios HTTP propres/refus d’organisation sont réussis. Une lecture serveur avec claims Chef natif confirme son vrai nom, les deux jobs, un membre et une tâche distincte dans chaque équipe ; le détail est dans `proofs/native-fixture-check.json`. Les nouveaux contrôles natifs doivent encore confirmer contenu spécifique et captures distinctes avant remise de l’APK.
+
 L’index existant `team_one_active_membership` impose une seule équipe active par personne. Les insertions de fixture avec `ON CONFLICT DO NOTHING` n’avaient donc pas ajouté l’Employé déjà membre à la nouvelle équipe B. La recette conserve cet index et les affiliations existantes : affectation du jour `000000000035` de l’équipe TEST `a3238a96-afb7-43a2-92c3-e33f23faf41f` à Garage B, Chef du jour E0 et tâche `000000000056`. Le responsable permanent de l’équipe est inchangé. Aucun parcours d’équipe n’est certifié sur une liste vide.
 
 ## Adjointe et Entrepôt
@@ -43,13 +51,14 @@ Objet commun outil : `5757d93c-5dbd-4554-a1e9-7af93d01bb6d`. La réponse finale 
 
 ## Installations TEST confirmées
 
-Les cinq propositions ont passé la revue et les tests PostgreSQL locaux avant installation. Les copies immuables, créées avec la CLI Supabase, sont versionnées dans `supabase/test-only/migrations/`, hors déploiement automatique. Chaque SQL refuse l’installation sans préalable explicite MIR TEST. Aucun secret privilégié livré au client.
+Les six propositions ont passé la revue et les tests PostgreSQL locaux avant installation. Les copies immuables, créées avec la CLI Supabase, sont versionnées dans `supabase/test-only/migrations/`, hors déploiement automatique. Chaque SQL refuse l’installation sans préalable explicite MIR TEST. Aucun secret privilégié livré au client.
 
 1. `20261114045007_mir_chantier_field_test.sql` : actions terrain canoniques, droits coalescés, pièces privées, décisions et idempotence.
 2. `20261114050907_mir_chantier_lead_context_test.sql` : mutations Chef liées à la job choisie.
 3. `20261114051849_mir_chantier_personal_history_test.sql` : lecture personnelle paginée, aucun droit manager.
 4. `20261114051932_mir_chantier_delivery_context_test.sql` : incident lié à commande/ligne/job, reçu contrôlé.
 5. `20261114052651_mir_chantier_lead_selected_job_test.sql` : lecture Chef liée à la sélection explicite et métadonnées job autorisées.
+6. `20261114060519_mir_chantier_field_profile_test.sql` : nom métier et rôle de l’identité courante uniquement, avec refus des organisations étrangères et rôles non autorisés.
 
 Chaque appel d’installation a reçu `success:true` du serveur. Ces installations TEST ne constituent pas une migration production autorisée. Les contrats historiques et tables métier sont réutilisés ; aucun second dossier ou rapport indépendant.
 

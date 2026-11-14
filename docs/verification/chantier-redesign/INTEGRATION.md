@@ -35,8 +35,9 @@ Le dessin conserve `production.html?mode=client&source=store&kind=profile` et r�
 
 ## Vérifications et limites
 
-- `tests/mir-field-postgres.cjs` : 23 groupes locaux PGlite, permissions/NULL role, isolation, jobs fermées, photos, idempotence, réponses forgées refusées, 2 jobs Chef, historique personnel et livraison canonique. Ce sont des tests locaux.
+- `tests/mir-field-postgres.cjs` : 25 groupes locaux PGlite, permissions/NULL role, isolation, jobs fermées, photos, idempotence, réponses forgées refusées, 2 jobs Chef, historique personnel et livraison canonique. Ce sont des tests locaux.
 - `tests/mir-field-redesign-browser.cjs` : 102 contrôles Chromium simulés, 2 rôles / 5 formats ; revisite Chef A→B→A, double clic pendant upload photo ; vrai moteur de tracé à390px ; photo A → erreur → photo B ; rapport photo Chef ; historique paginé ; incident livraison lié ; reçu vide/échec/panier concurrent/double action.
+- `tests/mir-field-profile.cjs` : 6 contrats SDK de nom opérationnel self-only, refus identité/rôle/organisation incompatibles, réponse tardive après déconnexion et absence d’appel en legacy. Le nom vient des capacités métier configurées; aucune métadonnée Auth n’est modifiée.
 - `tests/mir-field-cart.cjs` : 3 cas purs d’acquittement ; seuls les quantités et articles effectivement soumis sont retirés.
 - Les suites historiques Today/Chat conservent leurs assertions. `mir-chantier-ux-reviewed.json` versionne explicitement les nouvelles empreintes de client/moteur et de deux fonctions de présentation Punch. Les anciennes empreintes restent dans leurs fichiers d’origine.
 - Relectures Designer, Ergonomie, Android, Harmonisation et Qualité : leurs rapports conservent défauts constatés puis corrections réellement revérifiées. Le développeur intègre seul le code ; aucune modification concurrente de source applicative.
@@ -46,3 +47,14 @@ Le dessin conserve `production.html?mode=client&source=store&kind=profile` et r�
 - Recette Samsung physique ouverte : mise à jour compatible sans désinstallation/effacement ; connexion TEST, fermeture/réouverture, redémarrage téléphone, verrou système facultatif, caméra/fichiers/GPS ponctuel, changement de job et déconnexion avec purge de l’affichage privé. Aucune distribution employés.
 
 Les copies sous `supabase/test-only/migrations/` sont les installations TEST confirmées par le serveur, gardées immuables. Les propositions correspondent aux changements versionnés ; tout correctif ultérieur exige un nouveau fichier.
+
+
+## Reprise des preuves Android après inspection de la CI1466
+
+La CI1466 était verte mais plusieurs captures Employé/Chef étaient identiques. Elles ne prouvaient pas les cinq vues. Le contrôleur indépendant `mobile/tools/native-screen-proofs.cjs` rejette réellement cet ancien artefact (4 PNG distincts sur5 Employé; corps Commande/Punch identiques Chef).
+
+Le test natif utilise maintenant des gestes `UiDevice` sur les bornes des vrais contrôles. Il attend le contenu propre à chaque écran, le nom opérationnel vérifié, deux jobs QA autorisées et une équipe/tâches Chef non vides. Chaque capture vient de `UiAutomation.takeScreenshot`; le corps doit devenir distinct des vues précédentes puis rester stable. Le rectangle fixe exclut horloge, bandeau et barre de navigation. Aucun marqueur artificiel n’est ajouté à l’interface. Les captures rejetées sont conservées.
+
+Les manifestes décrivent les PNG et pixels réellement capturés. Le bilan CI décode indépendamment les PNG, recalcule les empreintes des corps et exige cinq vues distinctes pour chacun des deux rôles ainsi qu’un panneau compte distinct de l’accueil. Quatre tests complémentaires du contrôleur refusent notamment une horloge différente sur un même ancien corps. Ces tests synthétiques ne sont pas des captures de livraison.
+
+Ces changements attendent leur nouvelle exécution Android et l’inspection réelle des captures. Aucune nouvelle recette native ni Samsung réussie n’est déduite de la compilation locale ou des anciennes captures CI.

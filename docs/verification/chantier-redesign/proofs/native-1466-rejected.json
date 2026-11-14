@@ -1,0 +1,80 @@
+{
+  "source": "1466eb1991ed5df4a61e77fa3a2ca1d9a87829af",
+  "artifact": "14100984878",
+  "result": "rejected",
+  "roles": {
+    "employe": {
+      "pngUnique": 4,
+      "contentUnique": 4,
+      "files": [
+        {
+          "view": "day",
+          "file": "v130002-employe-day.png",
+          "sha256": "1ab79b6c1e794181efc21d17ce8b8fbea503c36d47688ee08b7cddc71f525461",
+          "contentSha256": "620534deba9ba27783b081c873dbb0fc1a7730e3b7e2edde1e893ff0bc17ef16"
+        },
+        {
+          "view": "command",
+          "file": "v130002-employe-command.png",
+          "sha256": "025a8d1f2dbdc0e832eb1565425c1223afdb10cca8dfed40e042713436ed7f61",
+          "contentSha256": "8e1fc129b4c825c15c3693e9dcf5afa2f0e8e40bc46f8e80daa7583abf3ba9c1"
+        },
+        {
+          "view": "punch",
+          "file": "v130002-employe-punch.png",
+          "sha256": "025a8d1f2dbdc0e832eb1565425c1223afdb10cca8dfed40e042713436ed7f61",
+          "contentSha256": "8e1fc129b4c825c15c3693e9dcf5afa2f0e8e40bc46f8e80daa7583abf3ba9c1"
+        },
+        {
+          "view": "messages",
+          "file": "v130002-employe-messages.png",
+          "sha256": "112282cf4e583431bab92e49134571693bc48dca5e3ad36122b66de35643a9fe",
+          "contentSha256": "6a93d474b7ee262b94fe6142602efc8d6834bdfe9a7249cdc568d1284b0c82e3"
+        },
+        {
+          "view": "more",
+          "file": "v130002-employe-more.png",
+          "sha256": "f9106ed680e5a6de5af30e9c2f632052e4522a5e99098a5b5e6722d7279bb4bd",
+          "contentSha256": "d7cf3fd0c24f73cd68cfe48eb1cc9b5a6c63115dcbcc6f1c21bac4e19e20fca0"
+        }
+      ]
+    },
+    "chef_equipe": {
+      "pngUnique": 3,
+      "contentUnique": 3,
+      "files": [
+        {
+          "view": "day",
+          "file": "v130002-chef_equipe-day.png",
+          "sha256": "d6f9fc8ede71f30944935cd2dda0b883e46820ba3699041623c038080b03a749",
+          "contentSha256": "62dca24968eedb84f6600a83f1e3da3964650ae9dd178a5d82f1f6bf21e7aee9"
+        },
+        {
+          "view": "command",
+          "file": "v130002-chef_equipe-command.png",
+          "sha256": "025a8d1f2dbdc0e832eb1565425c1223afdb10cca8dfed40e042713436ed7f61",
+          "contentSha256": "8e1fc129b4c825c15c3693e9dcf5afa2f0e8e40bc46f8e80daa7583abf3ba9c1"
+        },
+        {
+          "view": "punch",
+          "file": "v130002-chef_equipe-punch.png",
+          "sha256": "025a8d1f2dbdc0e832eb1565425c1223afdb10cca8dfed40e042713436ed7f61",
+          "contentSha256": "8e1fc129b4c825c15c3693e9dcf5afa2f0e8e40bc46f8e80daa7583abf3ba9c1"
+        },
+        {
+          "view": "messages",
+          "file": "v130002-chef_equipe-messages.png",
+          "sha256": "92e3373e3fecca161d947b9d6a1f325dc654a81f37455788e87013fb13d1da80",
+          "contentSha256": "c4334fc7a77c023e415ed7de9700ab12597df667d2c4368c787e1b2a4057f3bf"
+        },
+        {
+          "view": "more",
+          "file": "v130002-chef_equipe-more.png",
+          "sha256": "92e3373e3fecca161d947b9d6a1f325dc654a81f37455788e87013fb13d1da80",
+          "contentSha256": "c4334fc7a77c023e415ed7de9700ab12597df667d2c4368c787e1b2a4057f3bf"
+        }
+      ]
+    }
+  },
+  "checkerError": "Five distinct native PNGs required for employe; repeated system captures are not evidence\n\n4 !== 5\n"
+}

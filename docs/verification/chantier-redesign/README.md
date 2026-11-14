@@ -13,7 +13,7 @@ La nouvelle interface partage les mêmes sources `dist` entre aperçu et APK. El
 | Mobile Android | 48 états Chromium, clavier simulé avec écran physique fixe, paysage et retour interne ; coffre/session/caméra/GPS/fichiers relus, contraintes natives reprises dans la recette CI. [Rapport](MOBILE.md) |
 | Harmonisation | Composants, clair/sombre, cinq onglets, formats larges et dessin dans son cadre commun inspectés ; captures distinctes et empreintes conservées. [Rapport](HARMONISATION.md) |
 | Qualité | Défauts reproduits puis corrigés : panier concurrent, rôle NULL, réponse forgée, photo remplacée après erreur, journée/segments et retour Chef A→B→A. Lectures UI réellement raccordées à TEST. [Rapport](QUALITE.md) |
-| Full-stack | Un seul intégrateur des sources, mêmes moteurs et objets métier, cinq contrats TEST versionnés, tests permanents supplémentaires et aperçus. [Matrice complète](INTEGRATION.md) |
+| Full-stack | Un seul intégrateur des sources, mêmes moteurs et objets métier, six contrats TEST versionnés, tests permanents supplémentaires et aperçus. [Matrice complète](INTEGRATION.md) |
 
 Les méthodes MOON et Atelier ont été réellement consultées. Les six sous-agents de cette mission ont exécuté leurs mandats ; les fiches Atelier servent à conserver les méthodes et bilans, pas à prétendre qu’Atelier exécute un travailleur distant autonome.
 
@@ -43,8 +43,10 @@ L’API Atelier a confirmé les mises à jour du bilan. Le helper officiel de tr
 
 ## Contrôles
 
-La suite permanente de la refonte couvre deux rôles, cinq formats, cinq onglets, erreurs/reprise, multiclics, dessin réel, panier concurrent, photo remplacée, rapport, livraison, historique et changements de contexte. PostgreSQL local couvre23 groupes : permissions, organisations, jobs, objets privés, idempotence et contrats canoniques. Trois tests de panier isolent l’acquittement des quantités. Les suites Auth/session, autres rôles, pliages/PDF et métier historiques sont conservées. Les adaptations d’empreintes sont explicites et versionnées, avec assertions métier maintenues.
+La suite permanente de la refonte couvre deux rôles, cinq formats, cinq onglets, erreurs/reprise, multiclics, dessin réel, panier concurrent, photo remplacée, rapport, livraison, historique et changements de contexte. PostgreSQL local couvre25 groupes : permissions, organisations, jobs, objets privés, idempotence, profil personnel et contrats canoniques. Trois tests de panier isolent l’acquittement des quantités. Les suites Auth/session, autres rôles, pliages/PDF et métier historiques sont conservées. Les adaptations d’empreintes sont explicites et versionnées, avec assertions métier maintenues.
 
 Les résultats CI de la tête distante finale se lisent dans [les contrôles PR37](https://github.com/revetementsmir/Revetements-mir-/pull/37/checks) et le bilan Atelier ; ne pas réutiliser un checkpoint comme preuve finale. L’APK personnel fournit sa propre provenance et son SHA-256 dans le bilan de livraison. Aucun APK de CI à clé éphémère n’est proposé en remplacement de l’application Samsung.
+
+L’inspection indépendante de l’artefact natif1466eb1 a refusé des captures identiques malgré la CI verte. Le [rapport Mobile](MOBILE.md) conserve ce constat. Le nouveau contrôle exige le contenu propre à chaque onglet, des images réellement différentes et deux jobs avec équipes/tâches pour les identités exactes de la CI. Le vrai nom métier est lu par un RPC self-only TEST, sans modifier les métadonnées Auth. Les résultats de la nouvelle tête doivent être vérifiés avec ses captures avant remise de l’APK.
 
 Google et transports de courriel restent désactivés. Aucune fusion, publication Pages, opération production, signature release, distribution employés ou activation paiement. SEO/GEO non applicable à cette application privée.

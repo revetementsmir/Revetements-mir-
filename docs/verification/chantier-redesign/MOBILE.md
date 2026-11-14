@@ -147,3 +147,20 @@ Correctif relu en lecture seule par l’expertise Mobile. Le nouveau passage CI 
 ### Limites physiques conservées
 
 Les7tests natifs et les2contrôles de mise à jour apportent une preuve WebView/émulateur réelle, pas une preuve Samsung. Le S25 Ultra installé, sa session et ses données restent intacts. La recette physique, le déverrouillage du Samsung, sa caméra/GPS et le parcours Chef avec ses affectations doivent encore être exécutés sur l’appareil. Aucun iOS, envoi de courriel, publication Pages ou accès production revendiqué.
+
+## Inspection bloquante des captures natives1466eb1
+
+Après réussite technique de la CI de `1466eb1`, le responsable a téléchargé l’artefact14100984878 et contrôlé son empreinte. L’expertise Mobile a relu les fichiers réellement présents sous `artifacts/chantier-redesign/native-ci/artifacts/phase11/phase11-proof/` et ouvert les images Chef day, punch et more.
+
+**La réussite technique ne certifie pas cinq écrans natifs distincts.** Deux paires sont identiques octet par octet :
+
+- `v130002-chef_equipe-command.png` et `v130002-chef_equipe-punch.png` : SHA-256 `025a8d1f2dbdc0e832eb1565425c1223afdb10cca8dfed40e042713436ed7f61`. Les deux montrent Commande.
+- `v130002-chef_equipe-messages.png` et `v130002-chef_equipe-more.png` : SHA-256 `92e3373e3fecca161d947b9d6a1f325dc654a81f37455788e87013fb13d1da80`. Les deux montrent Message.
+
+Les noms de fichiers et le seul test d’onglet actif ne suffisent pas. Le helper actuel utilise déjà `UiAutomation.takeScreenshot()` après `postVisualStateCallback` et trois callbacks d’animation; il ne s’agit donc pas, dans cette source, d’un simple `WebView.draw()` à remplacer. L’écart DOM/frame système reste à corriger et reproduire : attendre un contenu spécifique de chaque onglet, conserver la capture de l’écran réellement présenté et ajouter un refus CI des empreintes identiques entre les cinq onglets d’un rôle. L’inspection des images produites demeure nécessaire. Recommandation transmise au seul intégrateur; aucun code ou test modifié par cette expertise.
+
+**Les fixtures du compte natif Chef sont également insuffisantes.** L’accueil ouvert montre «Votre prochaine affectation», JOB— et aucune équipe représentative. Cela ne permet pas de certifier le parcours chantier Chef demandé. Le responsable doit identifier le compte réellement injecté dans le runner, puis préparer ses affectations QA autorisées; aucun compte personnel ne doit être créé implicitement.
+
+Le texte «Bonjour» sans nom ne prouve pas un actorId perdu : `checkedSnapshot` refuse un actorId différent de l’utilisateur vérifié et exige son membership actif. La vue produit explicitement «Bonjour» quand `actor.name` contient `@`, pour ne pas exposer un courriel comme prénom. L’hypothèse est donc un nom QA historique égal au courriel et un compte Chef encore sans affectation; elle doit être confirmée sur son snapshot TEST. Une fois les fixtures préparées, vérifier nom, rôle, job, équipe et tâches réellement affichés dans les nouvelles captures.
+
+État à ce jalon : **validation native visuelle des cinq onglets suspendue**, malgré la CI technique verte; Samsung physique toujours ouvert. Les preuves Chromium précédentes restent distinctes et ne remplacent pas ces captures.
