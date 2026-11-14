@@ -99,6 +99,7 @@ jobs:
           npm run sync
           node tools/prepare-android-tests.cjs
           node tools/test-contracts.cjs
+          node tools/test-activity-lifecycle.cjs
       - name: Compiler APK, tests et analyse Android stricte
         working-directory: mobile/android
         run: |

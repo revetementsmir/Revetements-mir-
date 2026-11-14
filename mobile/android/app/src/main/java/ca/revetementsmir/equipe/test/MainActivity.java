@@ -10,6 +10,7 @@ import android.content.Intent;
 import java.io.ByteArrayInputStream;
 
 public class MainActivity extends BridgeActivity {
+    private boolean bridgeWebViewDestroyed=false;
     @Override public void onCreate(Bundle state) {
         registerPlugin(MIRNativePlugin.class);
         super.onCreate(state);
@@ -25,6 +26,25 @@ public class MainActivity extends BridgeActivity {
             getBridge().getWebView().loadUrl("https://localhost/native-checks.html");
     }
     @Override protected void onNewIntent(Intent intent) { super.onNewIntent(intent); openDeviceRecipe(intent); }
+    @Override public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        bridgeWebViewDestroyed=true;
+    }
+    @Override public void onDestroy() {
+        super.onDestroy();
+        // A configuration recreation can preserve the window without a detach.
+        // Capacitor has stopped its plugin thread: its old document must end too.
+        if(bridge!=null){
+            if(!bridgeWebViewDestroyed){
+                WebView web=bridge.getWebView();
+                if(web.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)web.getParent()).removeView(web);
+                bridge.onDetachedFromWindow();
+                bridgeWebViewDestroyed=true;
+            }
+            // A later window detach must not destroy the same WebView twice.
+            bridge=null;
+        }
+    }
     @Override protected void load() {
         super.load();
         if(getBridge().getServerUrl()!=null)throw new SecurityException("Ressources MIR embarquées obligatoires");
