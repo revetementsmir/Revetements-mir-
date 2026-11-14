@@ -6,7 +6,7 @@ const base=path.join(__dirname,'fixtures/native-drawing'),before=fs.readFileSync
 assert.equal(crypto.createHash('sha256').update(before).digest('hex'),provenance.sha256);
 const source=fs.readFileSync(path.resolve(__dirname,'../android/app/src/androidTest/java/ca/revetementsmir/equipe/test/MirRealRolesTest.java'),'utf8');
 function expression(code,anchor){
- const part=code.slice(code.indexOf(anchor)),match=part.match(/("(?:[^"\\]|\\.)*")\+JSONObject\.quote\(selector\)\+("(?:[^"\\]|\\.)*")/);
+ const part=code.slice(code.indexOf(anchor)),match=part.match(/("(?:[^"\\]|\\.)*")\+(?:org\.json\.)?JSONObject\.quote\(selector\)\+("(?:[^"\\]|\\.)*")/);
  assert.ok(match,'Actual Java target expression must be exercised');
  return JSON.parse(match[1])+JSON.stringify('#client-draw-profile')+JSON.parse(match[2]);
 }
@@ -16,6 +16,11 @@ const helper=source.slice(source.indexOf('private void tapDrawing('),source.inde
 assert.ok(helper.indexOf('presentFrame(s)')<helper.indexOf('JSONObject point='),'Native frame presentation precedes measurement');
 assert.match(helper,/UiDevice.*\.click\(/,'The real Android gesture stays native');
 assert.doesNotMatch(helper,/\.click\(\);true|\.evaluate.*click/,'No DOM click fallback');
+const keyboardSource=fs.readFileSync(path.resolve(__dirname,'../android/app/src/androidTest/java/ca/revetementsmir/equipe/test/MirAndroidTest.java'),'utf8'),keyboardHelper=keyboardSource.slice(keyboardSource.indexOf('private void tapEditable('),keyboardSource.indexOf('private void recordKeyboardFailure(')),keyboardPoint=expression(keyboardHelper,'org.json.JSONObject p=');
+assert.ok(keyboardHelper.indexOf('screenshot(s,')<keyboardHelper.indexOf('org.json.JSONObject p='),'Native keyboard target is presented before measurement');
+assert.match(keyboardHelper,/UiDevice.*\.click\(/);assert.doesNotMatch(keyboardHelper,/\.focus\(|showSoftInput|\.click\(\);true/);assert.match(keyboardHelper,/!n\.matches\(':disabled'\).*?!n\.readOnly/);
+const keyboardTest=keyboardSource.slice(keyboardSource.indexOf('@Test public void backKeyboardOffline'),keyboardSource.indexOf('@Test public void permissionsAndFile'));
+assert.match(keyboardTest,/uptimeMillis\(\)\+5000/);assert.match(keyboardTest,/isVisible\(androidx\.core\.view\.WindowInsetsCompat\.Type\.ime\(\)\)/);assert.match(keyboardTest,/assertTrue\("Clavier Android visible",keyboard\.get\(\)\)/);assert.doesNotMatch(keyboardTest,/\.focus\(|showSoftInput/);
 const metadata=source.slice(source.indexOf('private String fieldMetadataReady('),source.indexOf('private JSONArray assertAndroidFontScales('));
 const metadataExpressions=[...metadata.matchAll(/return ("(?:[^"\\]|\\.)*");/g)].map(m=>JSON.parse(m[1]));
 assert.equal(metadataExpressions.length,3,'Actual Java metadata waits for all three scaled views');
@@ -65,6 +70,11 @@ for(const predicate of metadataExpressions){
   assert.equal(await page.evaluate(ready),false,'Child overlay refuses the drawing pointer');
   await page.evaluate(()=>document.querySelector('iframe').style.display='none');
   assert.equal(await page.evaluate(ready),false,'A hidden frame is not divided or hit-tested');
+  await page.setContent('<style>textarea{position:absolute;left:20px;top:100px;width:280px;height:80px}#overlay{position:fixed;inset:0;z-index:10}</style><textarea id="client-draw-profile"></textarea>');
+  const editable=await page.evaluate(keyboardPoint);assert.equal(editable.visible,true);assert.equal(editable.hit,true);await page.mouse.click(editable.x,editable.y);assert.equal(await page.evaluate("document.activeElement.id"),'client-draw-profile');
+  await page.evaluate(()=>document.body.insertAdjacentHTML('beforeend','<div id="overlay"></div>'));assert.equal((await page.evaluate(keyboardPoint)).hit,false,'An overlay cannot qualify a native keyboard target');
+  await page.evaluate(()=>{document.querySelector('#overlay').remove();document.querySelector('textarea').style.top='1000px';});assert.equal((await page.evaluate(keyboardPoint)).visible,false,'An offscreen field cannot qualify a native keyboard target');
   console.log('PASS drawing native-target contract: original 8bfd disabled/scroll failures reproduced, current coordinates and both hit-tests verified (Chromium simulation).');
+  console.log('PASS keyboard native-target contract: presented editable pointer, intercepted/offscreen rejection, unchanged five-second Insets IME requirement (no Android IME claim).');
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

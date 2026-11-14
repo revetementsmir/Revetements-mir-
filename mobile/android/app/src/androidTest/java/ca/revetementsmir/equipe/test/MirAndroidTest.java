@@ -50,6 +50,22 @@ public class MirAndroidTest extends MirDeviceSetup {
  private Object jsWeb(android.webkit.WebView web,String expression)throws Exception{
   CountDownLatch done=new CountDownLatch(1);String[] value={null};InstrumentationRegistry.getInstrumentation().runOnMainSync(()->web.evaluateJavascript(expression,result->{value[0]=result;done.countDown();}));assertTrue(done.await(10,TimeUnit.SECONDS));return value[0]==null?null:new JSONTokener(value[0]).nextValue();
  }
+ private void tapEditable(ActivityScenario<MainActivity>s,String selector)throws Exception{
+  waitFor(s,"(()=>{const n=document.querySelector("+org.json.JSONObject.quote(selector)+");return !!n&&n.isConnected&&!n.matches(':disabled')&&!n.readOnly&&n.getBoundingClientRect().height>0;})()");
+  js(s,"document.querySelector("+org.json.JSONObject.quote(selector)+").scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});true");
+  screenshot(s,"android-keyboard-before-tap");
+  org.json.JSONObject p=(org.json.JSONObject)js(s,"(()=>{const n=document.querySelector("+org.json.JSONObject.quote(selector)+"),r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);return{x,y,width:innerWidth,height:innerHeight,visible:r.width>0&&r.height>0&&x>=0&&y>=0&&x<innerWidth&&y<innerHeight,hit:!!h&&(h===n||n.contains(h))};})()");
+  assertTrue("Editable target is presented inside the WebView",p.getBoolean("visible"));assertTrue("Editable target has no intercepting element",p.getBoolean("hit"));
+  int[] bounds=new int[4];s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();assertTrue("Editable WebView has window focus",web.hasWindowFocus());web.getLocationOnScreen(bounds);bounds[2]=web.getWidth();bounds[3]=web.getHeight();});
+  int x=bounds[0]+(int)Math.round(p.getDouble("x")*bounds[2]/p.getDouble("width")),y=bounds[1]+(int)Math.round(p.getDouble("y")*bounds[3]/p.getDouble("height"));assertTrue("Native editable tap delivered",UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(x,y));
+ }
+ private void recordKeyboardFailure(ActivityScenario<MainActivity>s)throws Exception{
+  File dir=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null),"phase11-proof");assertTrue(dir.isDirectory()||dir.mkdirs());
+  org.json.JSONObject state=new org.json.JSONObject();state.put("browser",js(s,"JSON.stringify({documentFocused:document.hasFocus(),activeId:document.activeElement?.id,activeTag:document.activeElement?.tagName,fieldFocused:document.activeElement===document.querySelector('#android-recipe-input'),field:document.querySelector('#android-recipe-input')?.getBoundingClientRect().toJSON(),innerHeight,viewport:window.visualViewport?{height:visualViewport.height,top:visualViewport.offsetTop}:null})"));
+  s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();android.view.inputmethod.InputMethodManager ime=(android.view.inputmethod.InputMethodManager)a.getSystemService(Context.INPUT_METHOD_SERVICE);androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(web);try{state.put("native",new org.json.JSONObject().put("windowFocus",web.hasWindowFocus()).put("webViewFocused",web.hasFocus()).put("textEditor",web.onCheckIsTextEditor()).put("imeActiveForView",ime.isActive(web)).put("imeAcceptingText",ime.isAcceptingText()).put("imeInsetsVisible",insets!=null&&insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())));}catch(org.json.JSONException e){throw new RuntimeException(e);}});
+  UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());StringBuilder imeState=new StringBuilder();for(String line:device.executeShellCommand("dumpsys input_method").split("\\R"))if(line.matches(".*(?:mCurMethodId=|mInputShown=|mShowRequested=|mImeWindowVis=|mCurFocusedWindow=|mServedView=|mNextServedView=|mServedConnecting=|mHasActiveConnection=).*"))imeState.append(line).append('\n');state.put("inputMethodState",imeState.toString());
+  java.nio.file.Files.write(new File(dir,"keyboard-before-assert.json").toPath(),state.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));device.dumpWindowHierarchy(new File(dir,"keyboard-before-assert.xml"));screenshot("keyboard-before-assert");
+ }
  @Test public void authMutationsShareOneOriginLockAcrossWebViews()throws Exception{
   android.webkit.WebView[] second={null};
   try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
@@ -139,10 +155,11 @@ public class MirAndroidTest extends MirDeviceSetup {
   UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
   try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
    waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");
-   js(s,"document.body.insertAdjacentHTML('beforeend','<form id=android-recipe-form><label>Brouillon local de recette<textarea id=android-recipe-input></textarea></label></form>');let field=document.querySelector('#android-recipe-input');field.value='RECETTE-PHASE11-LOCAL';field.focus();field.scrollIntoView({block:'center'});field.dispatchEvent(new Event('input',{bubbles:true}));true");
-   s.onActivity(a->{a.getBridge().getWebView().requestFocus();((android.view.inputmethod.InputMethodManager)a.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(a.getBridge().getWebView(),android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);});
+   js(s,"document.body.insertAdjacentHTML('beforeend','<form id=android-recipe-form><label>Brouillon local de recette<textarea id=android-recipe-input></textarea></label></form>');let field=document.querySelector('#android-recipe-input');field.value='RECETTE-PHASE11-LOCAL';field.dispatchEvent(new Event('input',{bubbles:true}));true");
+   tapEditable(s,"#android-recipe-input");
    long end=SystemClock.uptimeMillis()+5000;java.util.concurrent.atomic.AtomicBoolean keyboard=new java.util.concurrent.atomic.AtomicBoolean(false);
    while(SystemClock.uptimeMillis()<end){s.onActivity(a->{androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(a.getBridge().getWebView());keyboard.set(insets!=null&&insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime()));});if(keyboard.get())break;SystemClock.sleep(100);}
+   if(!keyboard.get())try{recordKeyboardFailure(s);}catch(Exception e){System.err.println("MIR keyboard diagnostics incomplete: "+e.getClass().getSimpleName());}
    assertTrue("Clavier Android visible",keyboard.get());screenshot(s,"android-keyboard");
    waitFor(s,"document.querySelector('#android-recipe-input').getBoundingClientRect().bottom<=innerHeight");
    device.pressBack();device.pressBack();
