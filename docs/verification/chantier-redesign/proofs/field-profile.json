@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-11-14T06:07:52.161Z",
+  "mode": "existing QA authenticated HTTP",
+  "checks": 4,
+  "results": [
+    {
+      "id": "e0d9b9aa-9716-42a1-9e82-9ee65ded6bfd",
+      "name": "Chef MIR TEST",
+      "role": "chef_equipe"
+    },
+    {
+      "id": "e1bc1702-c4d0-4a91-9894-acd88c025da4",
+      "name": "mir-test-client2@example.com",
+      "role": "employe"
+    }
+  ],
+  "foreignOrgRefused": true,
+  "noAuthMetadataModified": true
+}

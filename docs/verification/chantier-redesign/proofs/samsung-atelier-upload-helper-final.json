@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-11-14T17:00:13.937679+00:00",
+  "requestedUrl": "https://atelier.atelier-app-001.workers.dev/agent-upload.mjs",
+  "status": 403,
+  "finalUrl": "https://atelier.atelier-app-001.workers.dev/agent-upload.mjs",
+  "contentType": "text/plain; charset=UTF-8",
+  "server": "envoy",
+  "proxyError": null,
+  "bytes": 17,
+  "sha256": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c",
+  "executed": false,
+  "body": "error code: 1010",
+  "scope": "Official visual upload helper GET only; no grant requested, no script executed, no alternate endpoint or restriction bypass",
+  "mcpDataStatus": "Separate Atelier MCP list/get/update/readback succeeded; UX task v18 confirmed",
+  "previousEvidence": "samsung-atelier-upload-helper.json retains the earlier login HTML response"
+}

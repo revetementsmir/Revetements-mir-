@@ -1,0 +1,38 @@
+{
+  "source": "95e0516ab3c32962884a3495d53ae9543b49133d",
+  "runId": 43623632972,
+  "jobId": 132534564197,
+  "artifact": {
+    "id": 14124952915,
+    "bytes": 104032237,
+    "sha256": "600cf72633933b7a443ea91cdf25e57f4235f9f1ec27bf58bcd43c95cdbdba80"
+  },
+  "nativeTests": {
+    "run": 8,
+    "passed": 7,
+    "failed": 1,
+    "failedMethod": "backKeyboardOfflineAndResumePreserveLocalInput",
+    "assertion": "Clavier Android visible"
+  },
+  "upgradeChecksReached": false,
+  "realRolesReached": false,
+  "lifecycleProof": {
+    "heldAndPendingBeforeRecreate": true,
+    "peerAcquiredAfterRecreateWithoutRelease": true,
+    "newNativeBridgeResponsive": true
+  },
+  "failureEvidence": {
+    "screenshot": "failed-backKeyboardOfflineAndResumePreserveLocalInput.png",
+    "observed": "Normal HOME after Activity.close, no visible ANR.",
+    "imeSnapshotAtAssertion": false,
+    "cause": "Not established from the available failure capture."
+  },
+  "testAdjustment": {
+    "nativePointer": "UiDevice.click on a visually presented editable after viewport bounds and hit-test.",
+    "timeoutMs": 5000,
+    "requiredAssertion": "WindowInsetsCompat.Type.ime is visible.",
+    "failureCapture": "Browser/native focus, editor/IME state, filtered dumpsys input_method lines, PNG/XML while Activity is still open."
+  },
+  "appAuthOrOsConfigurationChanged": false,
+  "physicalDevice": false
+}

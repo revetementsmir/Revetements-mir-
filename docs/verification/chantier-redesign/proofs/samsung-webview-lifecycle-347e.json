@@ -1,0 +1,263 @@
+{
+  "recordedAt": "2026-11-14T17:45:23Z",
+  "source": "347e34c53826e3b6b5be52ea8b0a0505ae40e76a",
+  "runId": 43622188648,
+  "jobId": 132530109292,
+  "artifact": {
+    "id": 14124563484,
+    "bytes": 102312674,
+    "sha256": "f1c53a573de563b88dc86a398e2c354f29afad745a1ad0e2db971e7cf2516614"
+  },
+  "nativeBaseTestsPassed": 8,
+  "upgradeChecksPassed": 2,
+  "failedStage": "next-role-login",
+  "roleIndex": 1,
+  "expectedRole": "chef_equipe",
+  "proof": "pending",
+  "phase": "signed_out",
+  "drawing": null,
+  "authDiagnostic": {
+    "self": {
+      "context": "uqnukjd1q",
+      "path": "/chantier.html",
+      "top": true,
+      "clientCreated": true,
+      "active": null,
+      "queued": [
+        {
+          "id": 165,
+          "phase": "shared-lock",
+          "startedAt": 1794678293020
+        }
+      ],
+      "native": []
+    },
+    "peers": [
+      {
+        "context": "ragb3k8sf7k",
+        "path": "/chantier.html",
+        "top": true,
+        "clientCreated": true,
+        "active": {
+          "id": 130,
+          "phase": "event-native-read",
+          "startedAt": 1794678292802
+        },
+        "queued": [
+          {
+            "id": 130,
+            "phase": "event-native-read",
+            "startedAt": 1794678292802
+          }
+        ],
+        "native": [
+          {
+            "id": 122,
+            "method": "authLockStatus",
+            "startedAt": 1794678220160
+          },
+          {
+            "id": 123,
+            "method": "readAuth",
+            "startedAt": 1794678220162
+          },
+          {
+            "id": 124,
+            "method": "readAuth",
+            "startedAt": 1794678220163
+          },
+          {
+            "id": 125,
+            "method": "authLockStatus",
+            "startedAt": 1794678220455
+          },
+          {
+            "id": 126,
+            "method": "authLockStatus",
+            "startedAt": 1794678230756
+          },
+          {
+            "id": 127,
+            "method": "authLockStatus",
+            "startedAt": 1794678246848
+          },
+          {
+            "id": 128,
+            "method": "authLockStatus",
+            "startedAt": 1794678265012
+          },
+          {
+            "id": 129,
+            "method": "authLockStatus",
+            "startedAt": 1794678283682
+          },
+          {
+            "id": 131,
+            "method": "authLockStatus",
+            "startedAt": 1794678292804
+          },
+          {
+            "id": 132,
+            "method": "readAuth",
+            "startedAt": 1794678292891
+          }
+        ]
+      },
+      {
+        "context": "1yodbvlss2k",
+        "path": "/chantier.html",
+        "top": true,
+        "clientCreated": true,
+        "active": null,
+        "queued": [
+          {
+            "id": 149,
+            "phase": "shared-lock",
+            "startedAt": 1794678292813
+          }
+        ],
+        "native": [
+          {
+            "id": 145,
+            "method": "authLockStatus",
+            "startedAt": 1794678230760
+          },
+          {
+            "id": 146,
+            "method": "authLockStatus",
+            "startedAt": 1794678246848
+          },
+          {
+            "id": 147,
+            "method": "authLockStatus",
+            "startedAt": 1794678265012
+          },
+          {
+            "id": 148,
+            "method": "authLockStatus",
+            "startedAt": 1794678283686
+          },
+          {
+            "id": 150,
+            "method": "authLockStatus",
+            "startedAt": 1794678292814
+          }
+        ]
+      },
+      {
+        "context": "h1dc2jz2ui",
+        "path": "/chantier.html",
+        "top": true,
+        "clientCreated": true,
+        "active": null,
+        "queued": [
+          {
+            "id": 2,
+            "phase": "shared-lock",
+            "startedAt": 1794678292823
+          }
+        ],
+        "native": [
+          {
+            "id": 1,
+            "method": "authLockStatus",
+            "startedAt": 1794678246680
+          }
+        ]
+      },
+      {
+        "context": "fo0iw6mtnqm",
+        "path": "/chantier.html",
+        "top": true,
+        "clientCreated": true,
+        "active": null,
+        "queued": [
+          {
+            "id": 2,
+            "phase": "shared-lock",
+            "startedAt": 1794678292853
+          }
+        ],
+        "native": [
+          {
+            "id": 1,
+            "method": "authLockStatus",
+            "startedAt": 1794678264964
+          }
+        ]
+      },
+      {
+        "context": "hcypv2p8a3",
+        "path": "/chantier.html",
+        "top": true,
+        "clientCreated": true,
+        "active": null,
+        "queued": [
+          {
+            "id": 260,
+            "phase": "shared-lock",
+            "startedAt": 1794678292837
+          }
+        ],
+        "native": [
+          {
+            "id": 259,
+            "method": "authLockStatus",
+            "startedAt": 1794678283686
+          },
+          {
+            "id": 261,
+            "method": "authLockStatus",
+            "startedAt": 1794678292839
+          }
+        ]
+      }
+    ],
+    "locks": {
+      "held": [
+        {
+          "clientId": "39f552c6-7f2f-4ef7-8d36-4c8ced137e12",
+          "mode": "exclusive",
+          "name": "mir-android-auth-transition"
+        }
+      ],
+      "pending": [
+        {
+          "clientId": "a8480a33-3c16-4c2f-9f3a-2e00fd15df62",
+          "mode": "exclusive",
+          "name": "mir-android-auth-transition"
+        },
+        {
+          "clientId": "774520d1-715c-4424-a15c-c09341082d34",
+          "mode": "exclusive",
+          "name": "mir-android-auth-transition"
+        },
+        {
+          "clientId": "a43640b9-0a23-4506-b852-e14b6c66c961",
+          "mode": "exclusive",
+          "name": "mir-android-auth-transition"
+        },
+        {
+          "clientId": "6191fe06-c6cf-450e-82ae-f52121a2b944",
+          "mode": "exclusive",
+          "name": "mir-android-auth-transition"
+        },
+        {
+          "clientId": "5db41ca5-7c8b-460e-845b-3690ba09c12e",
+          "mode": "exclusive",
+          "name": "mir-android-auth-transition"
+        }
+      ]
+    }
+  },
+  "observed": [
+    "Current parent queued for mir-android-auth-transition with no active operation or pending Native call.",
+    "A previous top-level chantier parent owns event-native-read and has unresolved authLockStatus/readAuth calls.",
+    "Five other prior top-level chantier parents respond to the diagnostic and wait for the same shared lock.",
+    "No child drawing context appears in this snapshot."
+  ],
+  "dependencyReview": "Capacitor 8.6.2 Bridge.onDestroy stops its plugin HandlerThread. WebView destruction is in the separate onDetachedFromWindow callback; MainActivity previously had no explicit onDestroy WebView teardown.",
+  "scope": "Observed native failure plus source-level lifecycle review. A corrected recreation/lock test must pass in a new Android run before claiming the fix is verified there.",
+  "authValuesIncluded": false,
+  "physicalDevice": false
+}

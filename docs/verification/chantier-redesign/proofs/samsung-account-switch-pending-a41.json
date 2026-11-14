@@ -1,0 +1,88 @@
+{
+  "sourceCommit": "a41fa8268a7f9dbe44ad2af90327302fb49ae196",
+  "environment": "MIR TEST hxtztkmbfpmzrieccwsg only",
+  "windowUTC": {
+    "start": "2026-11-14T17:11:00Z",
+    "end": "2026-11-14T17:12:40Z"
+  },
+  "mode": "Read-only hosted log aggregates; no credentials, headers, tokens or message content",
+  "nativeRun": 43619169098,
+  "nativeArtifact": "https://github.com/revetementsmir/Revetements-mir-/actions/runs/43619169098/artifacts/14123188767",
+  "artifactZipSha256": "bf6751481223f07f6880849bd4db715190f23dd70ad29e095957bdb7ce337f98",
+  "nativeFailure": {
+    "line": 210,
+    "marker": "pending",
+    "phase": "signed_out",
+    "view": "absences",
+    "roleIndex": 1,
+    "expectedRole": "chef_equipe",
+    "heading": "Connexion équipe MIR",
+    "screenshotActuallyOpenedByCoordinator": true,
+    "physicalDevice": false
+  },
+  "observations": [
+    "8 native smoke checks including real cross-WebView lock contention and2 upgrade checks passed",
+    "Employee passed the previously failing drawing Back path, font trials and absence draft checks",
+    "The next Chef sign-in promise did not settle before the existing30second timeout; unlike29ab its marker is pending rather than ready",
+    "In this exact log window there is no auth/token request and no Chef actor row among the queried endpoints; Employee logout204 is recorded at17:12:04.111Z",
+    "These aggregates establish no definitive local lock/Native/SDK cause. A child SDK lock can be reproduced when createClient is deliberately invoked in a child, but that does not prove the real drawing page invoked it"
+  ],
+  "requests": [
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T17:11:00.091000",
+      "last_at": "2026-11-14T17:12:03.786000",
+      "path": "/rest/v1/rpc/mir_account_snapshot",
+      "requests": 76,
+      "status": "200"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T17:11:00.211000",
+      "last_at": "2026-11-14T17:11:52.951000",
+      "path": "/rest/v1/rpc/mir_portal_snapshot",
+      "requests": 6,
+      "status": "200"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T17:11:00.906000",
+      "last_at": "2026-11-14T17:11:53.868000",
+      "path": "/rest/v1/rpc/mir_employee_operations_snapshot",
+      "requests": 5,
+      "status": "200"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T17:11:14.476000",
+      "last_at": "2026-11-14T17:11:52.540000",
+      "path": "/auth/v1/user",
+      "requests": 9,
+      "status": "200"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T17:12:03.904000",
+      "last_at": "2026-11-14T17:12:03.904000",
+      "path": "/rest/v1/rpc/mir_employee_operations_snapshot",
+      "requests": 1,
+      "status": "403"
+    },
+    {
+      "actor": "",
+      "first_at": "2026-11-14T17:12:04.094000",
+      "last_at": "2026-11-14T17:12:04.094000",
+      "path": "/auth/v1/logout",
+      "requests": 1,
+      "status": "200"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T17:12:04.111000",
+      "last_at": "2026-11-14T17:12:04.111000",
+      "path": "/auth/v1/logout",
+      "requests": 1,
+      "status": "204"
+    }
+  ]
+}

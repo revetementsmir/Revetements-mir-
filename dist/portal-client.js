@@ -115,7 +115,7 @@
     const config = validateConfig(options.config, options.origin);
     const listeners = new Set();
     let status = { phase: config.enabled ? 'signed_out' : 'unavailable', user: null, snapshot: null, error: null, pending: null, busy: false };
-    let generation = 0, readSequence = 0, authSubscription = null, activePromise = null, authTimer = null, liveTimer = null, disposed = false, internalOrg = null;
+    let leadJobSelection=null;let generation = 0, readSequence = 0, authSubscription = null, activePromise = null, authTimer = null, liveTimer = null, disposed = false, internalOrg = null;
     const storage = options.operationStorage;
     const logoutKey = `mir_portal_signed_out_${config.projectRef || 'disabled'}`;
     let logoutRequested = false;
@@ -168,14 +168,18 @@
     }
     function clearIdentity(phase = 'signed_out', error = null) {
       revokeChatURLs();internalOrg=null;
-      generation++; readSequence++;
+      generation++; readSequence++;leadJobSelection=null;
       emit({ phase, user: null, snapshot: null, account:null, pending: null, busy: false, error }, 'auth');
     }
     function requireEnabled() { if (!sdk) fail('NOT_ENABLED', 'Les accès employés sont en cours d’activation.'); }
-    async function verifiedUser() {
+    async function verifiedUser(isCurrent=()=>true) {
       requireEnabled();
       if (logoutRequested) return null;
+      const epoch=generation;
       const { data, error } = await sdk.auth.getUser();
+      // A previous account/read may finish after a newer verified identity.
+      // Its missing-session response must not clear that newer UI state.
+      if(epoch!==generation||disposed||!isCurrent())return null;
       if (error || !data?.user?.id) {
         if (!error || ['AuthSessionMissingError', 'AuthInvalidTokenResponseError'].includes(error.name) || [401, 403].includes(error.status)) {
           clearIdentity(); return null;
@@ -192,12 +196,12 @@
       if (logoutRequested) { clearIdentity(); return null; }
       let currentGeneration = generation; const sequence = ++readSequence;
       try {
-        const user = await verifiedUser();
+        const user = await verifiedUser(()=>sequence===readSequence);
         if (!user) return null;
         if(passwordGate){emit({phase:'password_required',passwordIntent:passwordGate,user:{id:user.id,email:user.email||''},snapshot:null,account:null,error:null},'auth');return null;}
         if (currentGeneration !== generation || sequence !== readSequence || disposed) return null;
         if (status.user?.id && status.user.id !== user.id) {
-          generation++;internalOrg=null; currentGeneration = generation; emit({ phase:'loading',user:null,account:null,snapshot:null,pending:null }, 'auth');
+          generation++;internalOrg=null;leadJobSelection=null; currentGeneration = generation; emit({ phase:'loading',user:null,account:null,snapshot:null,pending:null }, 'auth');
         }
         const epoch = generation;
         emit({ user: { id: user.id, email: user.email || '' }, pending: readPending(user.id) });
@@ -231,13 +235,14 @@
         if(expensesResponse.error&&!missingRoutine(expensesResponse))throw errorOf(expensesResponse.error);
         if(absencesResponse.error&&!missingRoutine(absencesResponse))throw errorOf(absencesResponse.error);
         if(notificationsResponse.error&&!missingRoutine(notificationsResponse))throw errorOf(notificationsResponse.error);
+        const profileRead=config.environment==='test'&&config.fieldExperienceEnabled===true&&['employe','chef_equipe'].includes(operationsResponse.data?.role)?sdk.rpc('mir_field_profile',{org:internalOrg}).then(response=>({response}),error=>({error})):null;
         const punch=punchResponse.error?{enabled:false,settings:{},activeShift:null,week:[],corrections:[],bankBalance:0,unavailable:true}:punchResponse.data;
         const expenses=expensesResponse.error?{unavailable:true,role:null,categories:[],expenses:[]}:expensesResponse.data;
         const absences=absencesResponse.error?{unavailable:true,role:null,requests:[]}:absencesResponse.data;
         const notifications=notificationsResponse.error?{unavailable:true,items:[],unreadCount:0,actionCount:0}:notificationsResponse.data;
         let lead=null,boss=null,logistics=null,management=null,boutiquePricing=null;
         if(operationsResponse.data?.role==='chef_equipe'){
-          const response=await sdk.rpc('mir_lead_today_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
+          const selected=config.environment==='test'&&config.fieldExperienceEnabled===true&&leadJobSelection;const response=await sdk.rpc(selected?'mir_lead_job_snapshot':'mir_lead_today_snapshot',selected?{org:internalOrg,job:selected}:{org:internalOrg});if(response.error)throw errorOf(response.error);lead=response.data;
         }else if(operationsResponse.data?.role==='boss'){
           const response=await sdk.rpc('mir_boss_operations_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);boss=response.data;
         }
@@ -248,7 +253,12 @@
           const response=await sdk.rpc('mir_management_snapshot',{org:internalOrg});if(response.error)throw errorOf(response.error);management=response.data;
           const prices=await sdk.rpc('mir_boutique_price_management',{org:internalOrg});if(prices.error)throw errorOf(prices.error);boutiquePricing=prices.data;
         }
-        const snapshot = checkedSnapshot({...data,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses,absences,notifications}, user.id);
+        const profileResult=profileRead?await profileRead:null;
+        if(epoch!==generation||sequence!==readSequence||disposed)return null;
+        if(profileResult?.error)throw errorOf(profileResult.error);
+        let fieldMembers=data.members;
+        if(profileResult){const response=profileResult.response;if(response.error)throw errorOf(response.error);const profile=response.data;if(!profile||profile.id!==user.id||profile.role!==operationsResponse.data.role||profile.name!==null&&typeof profile.name!=='string')fail('RESPONSE_UNCERTAIN','Le profil chantier reçu ne correspond pas au compte vérifié.');if(profile.name?.trim())fieldMembers=data.members.map(member=>member.id===user.id?{...member,name:profile.name.trim()}:member);}
+        const snapshot = checkedSnapshot({...data,members:fieldMembers,operations:operationsResponse.data,messaging:messagingResponse.data,lead,boss,logistics,management,boutiquePricing,punch,expenses,absences,notifications}, user.id);
         emit({ phase: 'ready', snapshot, error: null }, 'refresh');
         return snapshot;
       } catch (error) {
@@ -578,25 +588,35 @@
     async function jobDossier(jobId,pageBefore=null,pageSize=20){
       requireReady();if(!internalOrg||!UUID.test(jobId||''))fail('JOB_INVALID','Ce chantier ne peut pas être ouvert.');
       const {data,error}=await sdk.rpc('mir_job_dossier_snapshot',{org:internalOrg,job:jobId,page_size:Math.min(50,Math.max(1,Number(pageSize)||20)),page_before:pageBefore||null});
-      if(error)throw errorOf(error);if(!data?.job||data.job.id!==jobId)fail('RESPONSE_UNCERTAIN','Le dossier chantier reçu ne peut pas être vérifié.');return data;
+      if(error)throw errorOf(error);if(!data?.job||data.job.id!==jobId)fail('RESPONSE_UNCERTAIN','Le dossier chantier reçu ne peut pas être vérifié.');if(config.environment==='test'&&config.fieldExperienceEnabled===true){const extra=await sdk.rpc('mir_field_job_snapshot',{org:internalOrg,job:jobId});if(extra.error)throw errorOf(extra.error);if(extra.data?.jobId!==jobId)fail('RESPONSE_UNCERTAIN','Le suivi du chantier reçu ne peut pas être vérifié.');data.fieldIssues=extra.data.issues||[];if(extra.data.job?.id===jobId)data.job={...data.job,...extra.data.job};}return data;
+    }
+    async function fieldIssueDecide(issueId,decision,response,requestId=uuid()){requireReady();if(config.environment!=='test'||!internalOrg||!UUID.test(issueId||''))fail('ACCESS_DENIED','Traitement indisponible.');const {data,error}=await sdk.rpc('mir_field_issue_decide',{org:internalOrg,issue:issueId,decision,response,request_id:requestId});if(error)throw errorOf(error);if(!data?.ok)fail('RESPONSE_UNCERTAIN','La réponse reste à confirmer.');return data;}
+    async function fieldAction(jobId,kind,payload,requestId=uuid()){
+      requireReady();if(config.environment!=='test')fail('FIELD_DISABLED','Le suivi chantier attend sa configuration serveur.');if(!internalOrg||!UUID.test(jobId||'')||!UUID.test(requestId||'')||!['photo','issue','tool'].includes(kind))fail('FIELD_INVALID','Cette demande chantier est invalide.');
+      const epoch=generation,{data,error}=await sdk.rpc('mir_field_action',{org:internalOrg,job:jobId,request_id:requestId,kind,payload});if(error)throw errorOf(error);
+      if(epoch!==generation)fail('SESSION_CHANGED','La session a changé. Aucun envoi réattribué.');
+      if(!data?.ok||!UUID.test(data.id||'')||data.jobId!==jobId)fail('RESPONSE_UNCERTAIN','La confirmation du dossier manque. Conservez la saisie.');return data;
     }
     async function jobDocumentURL(path){requireReady();if(typeof path!=='string'||path.length>600||path.includes('..'))fail('DOCUMENT_INVALID','Ce document ne peut pas être ouvert.');const {data,error}=await sdk.storage.from('mir-job-documents').createSignedUrl(path,300);if(error||!data?.signedUrl)throw errorOf(error||{},'Ce document privé ne peut pas être ouvert.');return data.signedUrl;}
-    async function leadAction(action,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='chef_equipe')fail('ACCESS_DENIED','Chef équipe requis.');const {data,error}=await sdk.rpc('mir_lead_action',{org:internalOrg,request_id:uuid(),action,payload});if(error)throw errorOf(error);await refresh();return data;}
+    const leadPending=new Map();
+    async function leadAction(action,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='chef_equipe')fail('ACCESS_DENIED','Chef équipe requis.');const key=JSON.stringify([generation,action,payload]);let record=leadPending.get(key);if(record?.promise)return record.promise;if(!record){record={id:uuid()};leadPending.set(key,record);}record.promise=(async()=>{const {data,error}=await sdk.rpc('mir_lead_action',{org:internalOrg,request_id:record.id,action,payload});if(error)throw errorOf(error);if(!data?.ok||!data.id)fail('RESPONSE_UNCERTAIN','La confirmation manque. Réessayez la même demande.');leadPending.delete(key);await refresh();return data;})();try{return await record.promise;}finally{record.promise=null;}}
+
     async function bossAction(action,entity,decision,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='boss')fail('ACCESS_DENIED','Boss requis.');const {data,error}=await sdk.rpc('mir_boss_action',{org:internalOrg,action,entity,decision,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function logisticsAction(action,entity=null,payload={}){requireReady();if(!internalOrg||!['warehouse','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès entrepôt requis.');const {data,error}=await sdk.rpc('mir_logistics_action',{org:internalOrg,request_id:uuid(),action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function adminLogisticsAction(action,entity=null,payload={}){requireReady();if(!internalOrg||status.snapshot?.operations?.role!=='admin')fail('ACCESS_DENIED','Admin requis.');const {data,error}=await sdk.rpc('mir_admin_logistics_action',{org:internalOrg,action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function managementAction(action,entity=null,payload={}){requireReady();if(!internalOrg||!['assistant','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès gestion requis.');const {data,error}=await sdk.rpc('mir_management_action',{org:internalOrg,action,entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function boutiquePriceAction(item,format,action,newPriceCents=null,reason=null){requireReady();if(!internalOrg||!['assistant','boss','admin'].includes(status.snapshot?.operations?.role))fail('ACCESS_DENIED','Accès Prix boutique requis.');const {data,error}=await sdk.rpc('mir_boutique_price_action',{org:internalOrg,item,format:format||'',action,new_price_cents:newPriceCents,reason});if(error)throw errorOf(error);await refresh();return data;}
     const punchQueueKey=(actor,org)=>`mir_punch_queue_v2_${config.projectRef}_${org}_${actor}`;
+    const punchRoutine=()=>config.environment==='test'&&config.projectRef==='hxtztkmbfpmzrieccwsg'&&config.fieldExperienceEnabled===true&&['employe','chef_equipe'].includes(status.snapshot?.operations?.role)?'mir_field_punch_action':'mir_punch_action';
     async function punchAction(action,job=null,payload={}){
       requireReady();if(!internalOrg)fail('ACCESS_DENIED','Accès punch requis.');
-      const actor=status.user.id,org=internalOrg,epoch=generation,id=uuid(),body={...payload,deviceId:payload.deviceId||'web'},key=punchQueueKey(actor,org);
-      try{const {data,error}=await sdk.rpc('mir_punch_action',{org,request_id:id,action,job,payload:body});if(error)throw errorOf(error);if(epoch!==generation||status.user?.id!==actor)fail('SESSION_CHANGED','La session a changé. Vérifiez le pointage avec le compte d’origine.');await refresh();return data;}
+      const actor=status.user.id,org=internalOrg,epoch=generation,id=uuid(),body={...payload,deviceId:payload.deviceId||'web'},key=punchQueueKey(actor,org),routine=punchRoutine();
+      try{const {data,error}=await sdk.rpc(routine,{org,request_id:id,action,job,payload:body});if(error)throw errorOf(error);if(epoch!==generation||status.user?.id!==actor)fail('SESSION_CHANGED','La session a changé. Vérifiez le pointage avec le compte d’origine.');await refresh();return data;}
       catch(error){
         if(epoch!==generation||status.user?.id!==actor||internalOrg!==org)fail('SESSION_CHANGED','La session a changé. Aucun pointage n’est réattribué.');
         const settings=status.snapshot?.punch?.settings||{};
         if(!(settings.offlineEnabled??settings.offline_enabled)||!['in','out','switch','travel_start','travel_arrive'].includes(action)||navigator.onLine!==false&&error?.definitive!==false&&error?.code!=='NETWORK_UNCERTAIN')throw error;
-        const queue=JSON.parse(localStorage.getItem(key)||'[]');queue.push({id,actor,org,action,job,payload:{...body,source:'offline',originalAt:new Date().toISOString()}});localStorage.setItem(key,JSON.stringify(queue));return{ok:true,pending:true,serverAt:new Date().toISOString()};
+        const queue=JSON.parse(localStorage.getItem(key)||'[]');queue.push({id,actor,org,action,job,routine,payload:{...body,source:'offline',originalAt:new Date().toISOString()}});localStorage.setItem(key,JSON.stringify(queue));return{ok:true,pending:true,serverAt:new Date().toISOString()};
       }
     }
     async function syncPunchQueue(){
@@ -606,13 +626,15 @@
       for(const item of queue){
         if(epoch!==generation||status.user?.id!==actor||internalOrg!==org)return sent;
         if(item.actor!==actor||item.org!==org){remaining.push(item);continue;}
-        const {error}=await sdk.rpc('mir_punch_action',{org,request_id:item.id,action:item.action,job:item.job,payload:item.payload});if(error)remaining.push(item);else sent++;
+        const routine=config.environment==='test'&&config.projectRef==='hxtztkmbfpmzrieccwsg'&&item.routine==='mir_field_punch_action'?item.routine:punchRoutine();const {error}=await sdk.rpc(routine,{org,request_id:item.id,action:item.action,job:item.job,payload:item.payload});if(error)remaining.push(item);else sent++;
       }
       if(epoch!==generation||status.user?.id!==actor||internalOrg!==org)return sent;
       localStorage.setItem(key,JSON.stringify(remaining));if(sent)await refresh();return sent;
     }
     async function punchCorrection(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_correction',{org:internalOrg,correction:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     async function punchAdmin(action,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_punch_admin',{org:internalOrg,action,payload});if(error)throw errorOf(error);await refresh();return data;}
+    async function leadJob(jobId){requireReady();if(config.environment!=='test'||config.fieldExperienceEnabled!==true||status.snapshot?.operations?.role!=='chef_equipe')fail('ACCESS_DENIED','Accès Chef TEST requis.');leadJobSelection=jobId;await refresh();return status.snapshot?.lead;}
+    async function punchPersonalHistory(filters={},pageAfter=null,pageSize=25){requireReady();if(config.environment!=='test'||config.fieldExperienceEnabled!==true)fail('ACCESS_DENIED','Historique TEST non activé.');const {data,error}=await sdk.rpc('mir_punch_personal_history',{org:internalOrg,filters,page_size:pageSize,page_after:pageAfter});if(error)throw errorOf(error);if(!Array.isArray(data?.items))fail('RESPONSE_UNCERTAIN','Historique personnel incomplet.');return data;}
     async function punchJournal(filters={},pageAfter=null,pageSize=25){requireReady();const {data,error}=await sdk.rpc('mir_punch_journal',{org:internalOrg,filters,page_size:pageSize,page_after:pageAfter});if(error)throw errorOf(error);return data;}
     async function timeBankRequest(entity=null,payload={}){requireReady();const {data,error}=await sdk.rpc('mir_time_bank_request',{org:internalOrg,request:entity,payload});if(error)throw errorOf(error);await refresh();return data;}
     function orderShortcutQueueKey(){return `mir_order_shortcuts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
@@ -627,23 +649,26 @@
     }
     async function syncOrderShortcutQueue(){if(!internalOrg||!navigator.onLine||!status.user?.id)return 0;const queue=readOrderShortcutQueue(),remaining=[];let synced=0;for(const intent of queue){try{const {error}=await sdk.rpc('mir_order_shortcut_update',{org:internalOrg,request_id:intent.requestId,kind:intent.kind,item_id:intent.itemId,favorite:intent.favorite,requested_position:intent.position});if(error)throw error;synced++;}catch(_){remaining.push(intent);}}writeOrderShortcutQueue(remaining);if(synced)await refresh();return synced;}
     function orderDraftQueueKey(){return `mir_order_drafts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
-    function readOrderDraftQueue(){try{const rows=JSON.parse(storage?.getItem(orderDraftQueueKey())||'[]');return Array.isArray(rows)?rows.filter(x=>x&&UUID.test(x.saveRequestId||'')&&UUID.test(x.submitRequestId||'')&&x.data&&typeof x.data==='object'):[];}catch(_){return [];}}
-    function writeOrderDraftQueue(rows){try{storage?.setItem(orderDraftQueueKey(),JSON.stringify(rows.slice(-10)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre cette commande.');}}
-    async function transmitOrderDraft(intent){
-      const saved=await sdk.rpc('mir_order_draft_save',{org:internalOrg,request_id:intent.saveRequestId,order_id:intent.orderId||null,data:intent.data});if(saved.error)throw errorOf(saved.error);
+    function readOrderDraftQueue(key=orderDraftQueueKey()){try{const rows=JSON.parse(storage?.getItem(key)||'[]');return Array.isArray(rows)?rows.filter(x=>x&&UUID.test(x.saveRequestId||'')&&UUID.test(x.submitRequestId||'')&&x.data&&typeof x.data==='object'):[];}catch(_){return [];}}
+    function writeOrderDraftQueue(rows,key=orderDraftQueueKey()){try{storage?.setItem(key,JSON.stringify(rows.slice(-10)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre cette commande.');}}
+    async function transmitOrderDraft(intent,context={org:internalOrg,user:status.user?.id,epoch:generation}){
+      const current=()=>{if(context.epoch!==generation||context.user!==status.user?.id||context.org!==internalOrg)fail('SESSION_CHANGED','La session a changé. Vérifiez la commande avec le compte d’origine.');};current();
+      const saved=await sdk.rpc('mir_order_draft_save',{org:context.org,request_id:intent.saveRequestId,order_id:intent.orderId||null,data:intent.data});if(saved.error)throw errorOf(saved.error);current();
       const orderId=saved.data?.orderId;if(!UUID.test(orderId||''))fail('RESPONSE_UNCERTAIN','Le reçu du brouillon est incomplet.',{definitive:false,needsRetry:true});
-      const submitted=await sdk.rpc('mir_order_submit',{org:internalOrg,request_id:intent.submitRequestId,order_id:orderId});if(submitted.error)throw errorOf(submitted.error);
+      const submitted=await sdk.rpc('mir_order_submit',{org:context.org,request_id:intent.submitRequestId,order_id:orderId});if(submitted.error)throw errorOf(submitted.error);current();
       if(submitted.data?.orderId!==orderId||submitted.data?.status!=='submitted'||!UUID.test(submitted.data?.receiptId||''))fail('RESPONSE_UNCERTAIN','Le reçu de soumission est incomplet.',{definitive:false,needsRetry:true});
       return submitted.data;
     }
     function submitOrder(data,orderId=null){
       requireReady();if(activePromise)return Promise.reject(new PortalError('BUSY','Une commande est déjà en cours.'));if(!internalOrg||!data||typeof data!=='object')fail('ORDER_INVALID','Cette commande ne peut pas être préparée.');
-      const intent={saveRequestId:uuid(),submitRequestId:uuid(),orderId:UUID.test(orderId||'')?orderId:null,data:clone(data)};
+      const prior=readOrderDraftQueue().find(row=>JSON.stringify(row.data)===JSON.stringify(data)&&row.orderId===(UUID.test(orderId||'')?orderId:null));
+      const intent=prior||{saveRequestId:uuid(),submitRequestId:uuid(),orderId:UUID.test(orderId||'')?orderId:null,data:clone(data)};
       if(!UUID.test(intent.saveRequestId||'')||!UUID.test(intent.submitRequestId||''))fail('UUID_REQUIRED','Le navigateur ne peut pas préparer les reçus de commande.');
-      activePromise=(async()=>{if(!navigator.onLine){writeOrderDraftQueue([...readOrderDraftQueue(),intent]);return{status:'draft',offline:true};}try{return await transmitOrderDraft(intent);}catch(error){if(error?.definitive===false||error?.code==='NETWORK_UNCERTAIN'){writeOrderDraftQueue([...readOrderDraftQueue(),intent]);return{status:'draft',offline:true};}throw error;}})().finally(()=>{activePromise=null;});
+      activePromise=(async()=>{if(!navigator.onLine){writeOrderDraftQueue([...readOrderDraftQueue().filter(x=>x.submitRequestId!==intent.submitRequestId),intent]);return{status:'draft',offline:true,clientRequestId:intent.submitRequestId};}try{const receipt=await transmitOrderDraft(intent);writeOrderDraftQueue(readOrderDraftQueue().filter(x=>x.submitRequestId!==intent.submitRequestId));return receipt;}catch(error){if(error?.definitive===false||error?.code==='NETWORK_UNCERTAIN'){writeOrderDraftQueue([...readOrderDraftQueue().filter(x=>x.submitRequestId!==intent.submitRequestId),intent]);return{status:'draft',offline:true,clientRequestId:intent.submitRequestId};}throw error;}})().finally(()=>{activePromise=null;});
       return activePromise;
     }
-    async function syncOrderDraftQueue(){if(!internalOrg||!navigator.onLine||!status.user?.id)return 0;const queue=readOrderDraftQueue(),remaining=[];let synced=0;for(const intent of queue){try{await transmitOrderDraft(intent);synced++;}catch(_){remaining.push(intent);}}writeOrderDraftQueue(remaining);if(synced)await refresh();return synced;}
+    let orderSyncPromise=null;
+    async function syncOrderDraftQueue(){if(orderSyncPromise)return orderSyncPromise;if(!internalOrg||!navigator.onLine||!status.user?.id)return 0;const context={org:internalOrg,user:status.user.id,epoch:generation},key=orderDraftQueueKey();orderSyncPromise=(async()=>{let synced=0;for(const intent of readOrderDraftQueue(key)){if(context.epoch!==generation||context.user!==status.user?.id||context.org!==internalOrg)break;try{const receipt=await transmitOrderDraft(intent,context);if(context.epoch!==generation||context.user!==status.user?.id)break;writeOrderDraftQueue(readOrderDraftQueue(key).filter(x=>x.submitRequestId!==intent.submitRequestId),key);emit({orderConfirmed:{userId:context.user,receipt}},'order-confirmed');synced++;}catch(error){if(error.code==='SESSION_CHANGED')break;}}if(synced&&context.epoch===generation)await refresh();return synced;})().finally(()=>{orderSyncPromise=null;});return orderSyncPromise;}
     function expenseQueueKey(){return `mir_expense_drafts_${config.projectRef}_${status.user?.id||'anonymous'}`;}
     function readExpenseQueue(){try{const raw=JSON.parse(storage?.getItem(expenseQueueKey())||'[]');return Array.isArray(raw)?raw.filter(x=>x&&UUID.test(x.requestId||'')&&x.data&&typeof x.data==='object'):[];}catch(_){return [];}}
     function writeExpenseQueue(rows){try{storage?.setItem(expenseQueueKey(),JSON.stringify(rows.slice(-20)));}catch(_){fail('STORAGE_REQUIRED','Autorisez le stockage local pour reprendre ce brouillon.');}}
@@ -719,7 +744,7 @@
       listeners.clear();
     }
     return Object.freeze({ config, start, refresh, sendEmail, signInGoogle, signInPassword,activateInvitation,signUpClient,resetPassword,resendConfirmation,setPassword,saveAddress,removeAddress,completeCallback, signOut, command, retry,
-      acceptInvitation, previewInvitation, listInvitations, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, harmonySettings, syncHarmonySettings, dispose,
+      acceptInvitation, previewInvitation, listInvitations, fieldAction, fieldIssueDecide, downloadPlan, openConversation, uploadInternal, internalPhotoURL, jobDossier, jobDocumentURL, leadAction, leadJob, bossAction, logisticsAction, adminLogisticsAction, managementAction, boutiquePriceAction, punchAction, syncPunchQueue, punchCorrection, punchAdmin, punchJournal, punchPersonalHistory, timeBankRequest, submitOrder, syncOrderDraftQueue, setOrderShortcut, syncOrderShortcutQueue, expenseSaveDraft, syncExpenseDrafts, expenseUploadReceipt, expenseSubmit, expenseDecide, expenseReceiptURL, absenceSaveDraft, syncAbsenceDrafts, absenceUploadAttachment, absenceSubmit, absenceDecide, absenceCancel, absenceAttachmentURL, notificationCenter, notificationState, notificationPreferences, harmonySettings, syncHarmonySettings, dispose,
       chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, chatFileURL, chatPhotoURL,
       helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,
       getStatus: () => ({ ...status }), subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener); }

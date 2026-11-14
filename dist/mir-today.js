@@ -20,7 +20,7 @@
     const now=options.now||new Date(),day=dayKey(now),area=locationKey(job);
     if(job?.weather?.summary&&job.weather.date===day)return {status:'ready',label:job.weather.summary};
     const city=typeof job?.city==='string'?job.city.trim():'';
-    if(!area&&!city)return {status:'unavailable',label:'Météo indisponible'};
+    if(!area&&!city)return {status:'unavailable',label:'Météo indisponible',reason:'Aucune ville ou zone météo n’est renseignée pour ce chantier.'};
     const key=day+':'+(area?area.latitude+':'+area.longitude:'city:'+city.toLocaleLowerCase('fr-CA')),old=cache.get(key);
     if(old&&Date.now()-old.fetchedAt<900000){if(old.status==='loading'&&onChange)old.listeners.add(onChange);return old;}
     const entry={status:'loading',label:'Météo en cours…',fetchedAt:Date.now(),listeners:new Set(onChange?[onChange]:[])};cache.set(key,entry);
@@ -40,7 +40,7 @@
       if(!response.ok)throw Error('weather');const data=await response.json(),current=data.current;
       if(!current||!String(current.time).startsWith(day)||!Number.isFinite(current.temperature_2m))throw Error('weather');
       Object.assign(entry,{status:'ready',label:Math.round(current.temperature_2m)+' °C · '+weatherLabel(current.weather_code)});
-    }).catch(()=>Object.assign(entry,{status:'unavailable',label:'Météo indisponible'})).finally(()=>{for(const listener of entry.listeners)listener(entry);entry.listeners.clear();});
+    }).catch(error=>Object.assign(entry,{status:'unavailable',label:'Météo indisponible',reason:error?.message==='ambiguous-city'?'La ville correspond à plusieurs lieux. Le bureau doit préciser la zone.':root.navigator?.onLine===false?'Hors ligne : la météo ne peut pas être actualisée.':'Le service météo n’a pas répondu avec des données du jour.'})).finally(()=>{for(const listener of entry.listeners)listener(entry);entry.listeners.clear();});
     return entry;
   }
   function personalNotices(operations){return (operations?.notifications||[]).filter(n=>!n.read_at&&!n.readAt).slice(0,3);}

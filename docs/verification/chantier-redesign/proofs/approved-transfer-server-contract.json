@@ -1,0 +1,16 @@
+{
+  "environment": "MIR TEST only",
+  "mode": "Read-only inspection of existing deployed SQL; no live transfer or GPS action executed",
+  "checkedAt": "2026-11-14T12:27Z",
+  "finding": "Existing switch closes the old segment and opens the new segment using the same now_at; current week lock wrapper remains unchanged",
+  "functions": [
+    {
+      "proname": "mir_punch_action",
+      "definition": "CREATE OR REPLACE FUNCTION public.mir_punch_action(org uuid, request_id uuid, action text, job uuid DEFAULT NULL::uuid, payload jsonb DEFAULT '{}'::jsonb)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'mir_core', 'public'\nAS $function$\nbegin\n  if exists (\n    select 1 from mir_core.time_periods p\n    where p.organization_id=org\n      and current_date between p.starts_on and p.ends_on\n      and p.status='locked'\n  ) then\n    raise exception 'Cette semaine est verrouillée; demandez une correction documentée' using errcode='42501';\n  end if;\n  return public.mir_punch_action_phase1(org,request_id,action,job,payload);\nend$function$\n"
+    },
+    {
+      "proname": "mir_punch_action_phase1",
+      "definition": "elsif action in('switch','travel_start','travel_arrive') then if shift.id is null then raise exception 'PUNCH IN requis';end if;update punch_segments set ended_at=now_at where organization_id=org and shift_id=shift.id and ended_at is null;if action='travel_start' then insert into punch_segments(organization_id,shift_id,job_id,next_job_id,segment_type,started_at,created_by) values(org,shift.id,coalesce((select job_id from punch_segments where organization_id=org and shift_id=shift.id order by started_at desc limit 1),job),job,'travel',now_at,actor) returning * into segment;else insert into punch_segments(organization_id,shift_id,job_id,segment_type,started_at,created_by) values(org,shift.id,job,'job',now_at,actor) returning * into segment;end if;\n elsif action='out' then if shift.id is null then raise exception 'Aucun punch actif';end if;update punch_segments set ended_at=now_at where organization_id=org and shift_id=shift.id and ended_at is null;update punch_shifts set ended_at=now_at,status=case when zone='outside' then 'review' else 'review' end,auto_break_minutes=case when settings.auto_break_enabled and extract(epoch from(now_at-shift.started_at))/60>=settings.break_threshold_minutes then settings.break_minutes else 0 end where organization_id=org and id=shift.id returning * into shift;\n else raise exception 'Action punch inconnue';end if;\n insert into punch_events(organization_id,shift_id,employee_id,job_id,event_type,request_id,original_at,latitude,longitude,accuracy_m,distance_m,zone_status,outside_reason,device_id,source,payload) values(org,shift.id,actor,job,action,$2,nullif(payload->>'originalAt','')::timestamptz,lat,lon,nullif(payload->>'accuracy','')::numeric,dist,zone,coalesce(payload->>'outsideReason',''),left(coalesce(payload->>'deviceId',''),160),source_"
+    }
+  ]
+}
