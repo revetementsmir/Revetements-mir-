@@ -58,7 +58,7 @@ check('Une fiche fascia visible, source et variante noires conservées',()=>{
  assert.ok(list.some(x=>x.id==='pending-kaycan-fascia-hex-quarter-inch'));
  assert.deepEqual(group.reviewVariants.map(v=>v.label),['Noir','Blanc']);
  assert.match(get('pending-kaycan-fascia-hex-quarter-inch').name,/À confirmer/);
- assert.ok(get('pending-kaycan-fascia-hex-quarter-inch').colors.length>=0);
+ assert.equal(group.reviewVariants.some(v=>v.itemId==='pending-kaycan-fascia-hex-quarter-inch'),false);
 });
 check('Panier fascia conserve l’itemId vrai de chaque teinte',()=>{
  const state={catalogue};
