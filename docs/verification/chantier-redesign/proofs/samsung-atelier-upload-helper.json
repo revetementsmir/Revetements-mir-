@@ -1,0 +1,15 @@
+{
+  "recordedAt": "2026-11-14T13:29:18Z",
+  "url": "https://atelier.atelier-app-001.workers.dev/agent-upload.mjs",
+  "method": "GET HTTPS, official URL returned by current get_agent_proposal instructions",
+  "responseStatusChain": [303, 200],
+  "contentType": "text/html; charset=utf-8",
+  "bytes": 2996,
+  "sha256": "4235e12e00601530da5833b6bdbc7ed613cdb2d415a2b11f0669417480b2ea01",
+  "htmlInsteadOfExecutableHelper": true,
+  "executed": false,
+  "uploadAttempted": false,
+  "tokenRequestedOrCopied": false,
+  "scope": "Visual proposal transfer only; authenticated MCP task and mission tools work independently.",
+  "limit": "Visual proposals remain drafts. Do not replace a visual delivery with a report or pretend that a localhost/GitHub link is an uploaded Atelier preview. Keep real screenshots and standalone QA previews in the authorized workspace/repository."
+}
