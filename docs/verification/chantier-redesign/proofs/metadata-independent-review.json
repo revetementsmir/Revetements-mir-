@@ -1,0 +1,40 @@
+{
+  "mode": "Source applicative extraite sans modification, dépendances locales simulées",
+  "sourceSha256": "a5cc3fe67184e65259f4ba9c663245e9d7dbf913375a9323ae73326d863afe52",
+  "checks": [
+    {
+      "label": "References state.jobs enrichies malgré listJobs clonant",
+      "result": "PASS"
+    },
+    {
+      "label": "Réponse en vol appliquée à la référence actuelle après remplacement",
+      "result": "PASS"
+    },
+    {
+      "label": "Cache restaure snapshot fin puis accepte nouveau numéro et adresse supprimée",
+      "result": "PASS"
+    },
+    {
+      "label": "Ancienne époque/ancien acteur refusés après réinitialisation",
+      "result": "PASS"
+    },
+    {
+      "label": "Affectation retirée pendant attente ne reçoit pas de métadonnées",
+      "result": "PASS"
+    },
+    {
+      "label": "Sept dossiers se chargent avec trois lectures simultanées maximum",
+      "result": "PASS"
+    },
+    {
+      "label": "Rendus répétés du même objet ne doublent pas la lecture",
+      "result": "PASS"
+    },
+    {
+      "label": "Liste multi-jobs : dossiers hydratés sans basculer le contexte Chef de chaque ligne",
+      "result": "PASS"
+    }
+  ],
+  "physicalDevice": false,
+  "webview": false
+}

@@ -1,0 +1,27 @@
+{
+  "project": "hxtztkmbfpmzrieccwsg",
+  "sqlSha256": "e8d15ddbf769f7da0ff54aac23c08c4c63d2f79ac6dab2eb87c8306937ed51d9",
+  "localMigration": "20261114200031_mir_punch_management_legacy_approval_test.sql",
+  "serverMigration": "20261114200805",
+  "transport": "authenticated SQL with controlled TEST claims, not HTTP or physical",
+  "transaction": "ROLLBACK",
+  "scenario": "Actual personal correction wrong_out, 07:00 to 16:00 Toronto on 2026-11-09",
+  "missingRevisionDenied": true,
+  "staleRevisionDenied": true,
+  "currentRevisionApproved": true,
+  "receiptReplayStable": true,
+  "actualMatchesPreview": true,
+  "paidSeconds": 31500,
+  "afterRollback": {
+    "shifts": 0,
+    "corrections": 0,
+    "audit": 0,
+    "receipts": 0,
+    "notifications": 0
+  },
+  "advisorsUnchanged": true,
+  "limitations": [
+    "No hosted multi-session contention test",
+    "Physical Samsung remains open"
+  ]
+}

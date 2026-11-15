@@ -151,10 +151,14 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
     });
     // Les pixels rastérisés peuvent varier entre deux captures sur le runner.
     // Vérifier les ressources, les dimensions et les styles réellement calculés.
-    layouts.push(await page.evaluate(()=>Array.from(document.body.querySelectorAll('*'),element=>{
-     const {x,y,width,height}=element.getBoundingClientRect();
+    // The PR40 navigation intentionally changes the shared header and menu.
+    // Keep byte-for-byte visual geometry, styles, images and DOM order inside
+    // the actual homepage content and footer, relative to their own sections.
+    layouts.push(await page.evaluate(()=>Array.from(document.querySelectorAll('main,main *,footer,footer *'),element=>{
+     const frame=element.closest('main,footer')||element;
+     const relative=frame.getBoundingClientRect(),{x,y,width,height}=element.getBoundingClientRect();
      const style=getComputedStyle(element);
-     return [element.tagName,x,y,width,height,style.display,style.visibility,style.font,style.color,style.backgroundColor,element.currentSrc?new URL(element.currentSrc).pathname:null];
+     return [element.tagName,x-relative.x,y-relative.y,width,height,style.display,style.visibility,style.font,style.color,style.backgroundColor,element.currentSrc?new URL(element.currentSrc).pathname:null];
     })));
     await page.screenshot({path:path.join(proof,'accueil-'+label+'-'+width+'.png'),fullPage:true,animations:'disabled'});
     sources.push(Object.fromEntries(await Promise.all(responses.map(async res=>[
@@ -162,9 +166,36 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
     ]))));
     await c.close();
    }
-   assert.deepEqual(sources[0],sources[1],'identical homepage resources '+width);
-   assert.deepEqual(layouts[0],layouts[1],'identical homepage layout '+width);
-   results.push({homepageWidth:width,height,identicalResources:true,identicalLayout:true});
+   // PR40 intentionally replaced exactly two menu assets. Verify their
+   // approved SHA-256 individually, and require every other fetched resource
+   // (including the four approved home photographs) to be byte-identical.
+   const approvedMenu={
+    '/mir-public-menu.css':'1ef60e057b3b524cf85c3f3513c41f53c712521fdeee184b02e06f08f2ddb33f',
+    '/mir-public-menu.js':'1f13e7cad5af62dca995bbdae44f239e9644de1d5eab9179ed52a486b2f1f6d7'
+   };
+   const currentResources={...sources[1]};
+   for(const [pathname,approvedSha]of Object.entries(approvedMenu)){
+    assert.equal(currentResources[pathname],approvedSha,'approved PR40 menu resource '+pathname+' '+width);
+    assert.ok(sources[0][pathname],'original menu resource existed '+pathname);
+    delete currentResources[pathname];
+   }
+   const previousResources={...sources[0]};
+   for(const pathname of Object.keys(approvedMenu))delete previousResources[pathname];
+   assert.deepEqual(currentResources,previousResources,'all non-navigation homepage resources remain byte-identical '+width);
+   // Removing the old 76px home rail (PR40) intentionally lets the approved
+   // hero use that extra height. Preserve every content tag, style, asset, X
+   // coordinate and width, and bound any vertical reflow to exactly that gain.
+   const oldLayout=layouts[0],currentLayout=layouts[1],allowedHeightGain=width<=1100?76:0;
+   assert.equal(currentLayout.length,oldLayout.length,'all homepage content/footer nodes retained '+width);
+   assert.equal(currentLayout[0][4]-oldLayout[0][4],allowedHeightGain,'home content uses precisely the removed bottom-rail space '+width);
+   for(let i=0;i<oldLayout.length;i++){
+    const beforeRow=oldLayout[i],afterRow=currentLayout[i];
+    const stable=row=>[row[0],row[1],row[3],...row.slice(5)];
+    assert.deepEqual(stable(afterRow),stable(beforeRow),'homepage node geometry/styles/assets unchanged outside vertical reflow '+width+' #'+i);
+    assert.ok(Math.abs(afterRow[2]-beforeRow[2])<=allowedHeightGain+1,'homepage vertical position within the approved rail removal '+width+' #'+i);
+    assert.ok(Math.abs(afterRow[4]-beforeRow[4])<=allowedHeightGain+1,'homepage element height within the approved rail removal '+width+' #'+i);
+   }
+   results.push({homepageWidth:width,height,approvedNavigationResourceHashes:true,identicalOtherResources:true,identicalContentLayout:true});
    console.log('PASS homepage '+width+' identical resources and layout');
   }
  }

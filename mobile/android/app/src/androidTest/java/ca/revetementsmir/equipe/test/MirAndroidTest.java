@@ -47,6 +47,57 @@ public class MirAndroidTest extends MirDeviceSetup {
   Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bitmap);try(FileOutputStream out=new FileOutputStream(new File(dir,name+".png"))){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,out));}
   int width=bitmap.getWidth()>bitmap.getHeight()?960:540;Bitmap small=Bitmap.createScaledBitmap(bitmap,width,Math.round(bitmap.getHeight()*(width/(float)bitmap.getWidth())),true);try(FileOutputStream out=new FileOutputStream(new File(dir,name+"-scaled.png"))){assertTrue(small.compress(Bitmap.CompressFormat.PNG,100,out));}small.recycle();bitmap.recycle();
  }
+ private Object jsWeb(android.webkit.WebView web,String expression)throws Exception{
+  CountDownLatch done=new CountDownLatch(1);String[] value={null};InstrumentationRegistry.getInstrumentation().runOnMainSync(()->web.evaluateJavascript(expression,result->{value[0]=result;done.countDown();}));assertTrue(done.await(10,TimeUnit.SECONDS));return value[0]==null?null:new JSONTokener(value[0]).nextValue();
+ }
+ private void tapEditable(ActivityScenario<MainActivity>s,String selector)throws Exception{
+  waitFor(s,"(()=>{const n=document.querySelector("+org.json.JSONObject.quote(selector)+");return !!n&&n.isConnected&&!n.matches(':disabled')&&!n.readOnly&&n.getBoundingClientRect().height>0;})()");
+  js(s,"document.querySelector("+org.json.JSONObject.quote(selector)+").scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});true");
+  screenshot(s,"android-keyboard-before-tap");
+  org.json.JSONObject p=(org.json.JSONObject)js(s,"(()=>{const n=document.querySelector("+org.json.JSONObject.quote(selector)+"),r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);return{x,y,width:innerWidth,height:innerHeight,visible:r.width>0&&r.height>0&&x>=0&&y>=0&&x<innerWidth&&y<innerHeight,hit:!!h&&(h===n||n.contains(h))};})()");
+  assertTrue("Editable target is presented inside the WebView",p.getBoolean("visible"));assertTrue("Editable target has no intercepting element",p.getBoolean("hit"));
+  int[] bounds=new int[4];s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();assertTrue("Editable WebView has window focus",web.hasWindowFocus());web.getLocationOnScreen(bounds);bounds[2]=web.getWidth();bounds[3]=web.getHeight();});
+  int x=bounds[0]+(int)Math.round(p.getDouble("x")*bounds[2]/p.getDouble("width")),y=bounds[1]+(int)Math.round(p.getDouble("y")*bounds[3]/p.getDouble("height"));assertTrue("Native editable tap delivered",UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(x,y));
+ }
+ private void recordKeyboardFailure(ActivityScenario<MainActivity>s)throws Exception{
+  File dir=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null),"phase11-proof");assertTrue(dir.isDirectory()||dir.mkdirs());
+  org.json.JSONObject state=new org.json.JSONObject();state.put("browser",js(s,"JSON.stringify({documentFocused:document.hasFocus(),activeId:document.activeElement?.id,activeTag:document.activeElement?.tagName,fieldFocused:document.activeElement===document.querySelector('#android-recipe-input'),field:document.querySelector('#android-recipe-input')?.getBoundingClientRect().toJSON(),innerHeight,viewport:window.visualViewport?{height:visualViewport.height,top:visualViewport.offsetTop}:null})"));
+  s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();android.view.inputmethod.InputMethodManager ime=(android.view.inputmethod.InputMethodManager)a.getSystemService(Context.INPUT_METHOD_SERVICE);androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(web);try{state.put("native",new org.json.JSONObject().put("windowFocus",web.hasWindowFocus()).put("webViewFocused",web.hasFocus()).put("textEditor",web.onCheckIsTextEditor()).put("imeActiveForView",ime.isActive(web)).put("imeAcceptingText",ime.isAcceptingText()).put("imeInsetsVisible",insets!=null&&insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())));}catch(org.json.JSONException e){throw new RuntimeException(e);}});
+  UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());StringBuilder imeState=new StringBuilder();for(String line:device.executeShellCommand("dumpsys input_method").split("\\R"))if(line.matches(".*(?:mCurMethodId=|mInputShown=|mShowRequested=|mImeWindowVis=|mCurFocusedWindow=|mServedView=|mNextServedView=|mServedConnecting=|mHasActiveConnection=).*"))imeState.append(line).append('\n');state.put("inputMethodState",imeState.toString());
+  java.nio.file.Files.write(new File(dir,"keyboard-before-assert.json").toPath(),state.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));device.dumpWindowHierarchy(new File(dir,"keyboard-before-assert.xml"));screenshot("keyboard-before-assert");
+ }
+ @Test public void authMutationsShareOneOriginLockAcrossWebViews()throws Exception{
+  android.webkit.WebView[] second={null};
+  try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
+   try{
+    s.onActivity(a->a.getBridge().getWebView().loadUrl("https://localhost/native-checks.html"));
+    waitFor(s,"location.pathname==='/native-checks.html' && typeof navigator.locks?.request==='function'");
+    assertEquals("https://localhost",js(s,"location.origin"));assertEquals(Boolean.TRUE,js(s,"isSecureContext"));
+    s.onActivity(a->{second[0]=new android.webkit.WebView(a);second[0].getSettings().setJavaScriptEnabled(true);second[0].setAlpha(0f);a.addContentView(second[0],new android.view.ViewGroup.LayoutParams(1,1));second[0].loadDataWithBaseURL("https://localhost/native-checks.html","<!doctype html><title>MIR lock contention proof</title>","text/html","UTF-8",null);});
+    long ready=SystemClock.uptimeMillis()+15000;while(!Boolean.TRUE.equals(jsWeb(second[0],"isSecureContext && typeof navigator.locks?.request==='function'"))&&SystemClock.uptimeMillis()<ready)SystemClock.sleep(100);
+    assertEquals("https://localhost",jsWeb(second[0],"location.origin"));assertEquals(Boolean.TRUE,jsWeb(second[0],"isSecureContext && typeof navigator.locks?.request==='function'"));
+    js(s,"window.lockHeld=false;navigator.locks.request('mir-android-auth-transition',{mode:'exclusive'},()=>new Promise(resolve=>{window.releaseAuthLock=resolve;window.lockHeld=true;}));true");waitFor(s,"window.lockHeld===true");
+    jsWeb(second[0],"window.lockRequested=true;window.lockAcquired=false;navigator.locks.request('mir-android-auth-transition',{mode:'exclusive'},()=>{window.lockAcquired=true;});true");
+    assertEquals(Boolean.TRUE,jsWeb(second[0],"window.lockRequested"));
+    long contention=SystemClock.uptimeMillis()+10000;boolean shared=false;
+    do{js(s,"navigator.locks.query().then(q=>window.lockContention={held:q.held.some(l=>l.name==='mir-android-auth-transition'),pending:q.pending.some(l=>l.name==='mir-android-auth-transition')});true");SystemClock.sleep(100);shared=Boolean.TRUE.equals(js(s,"window.lockContention?.held===true && window.lockContention?.pending===true"));}while(!shared&&SystemClock.uptimeMillis()<contention);
+    assertTrue("LockManager reports a held lock and a pending peer WebView",shared);
+    assertEquals("Second WebView must wait for the first origin lock",Boolean.FALSE,jsWeb(second[0],"window.lockAcquired"));
+    js(s,"window.releaseAuthLock();true");long acquired=SystemClock.uptimeMillis()+10000;while(!Boolean.TRUE.equals(jsWeb(second[0],"window.lockAcquired"))&&SystemClock.uptimeMillis()<acquired)SystemClock.sleep(100);assertEquals("Second WebView acquires only after release",Boolean.TRUE,jsWeb(second[0],"window.lockAcquired"));
+    // Hold again without ever calling its release function. Destroying this
+    // Activity must end its old JS context, even when Android keeps the window.
+    js(s,"window.recreateLockHeld=false;navigator.locks.request('mir-android-auth-transition',{mode:'exclusive'},()=>new Promise(()=>{window.recreateLockHeld=true;}));true");waitFor(s,"window.recreateLockHeld===true");
+    jsWeb(second[0],"window.acquiredAfterRecreate=false;navigator.locks.request('mir-android-auth-transition',{mode:'exclusive'},()=>{window.acquiredAfterRecreate=true;});true");
+    long recreateContention=SystemClock.uptimeMillis()+10000;boolean recreateShared=false;
+    do{js(s,"navigator.locks.query().then(q=>window.recreateContention={held:q.held.some(l=>l.name==='mir-android-auth-transition'),pending:q.pending.some(l=>l.name==='mir-android-auth-transition')});true");SystemClock.sleep(100);recreateShared=Boolean.TRUE.equals(js(s,"window.recreateContention?.held===true && window.recreateContention?.pending===true"));}while(!recreateShared&&SystemClock.uptimeMillis()<recreateContention);
+    assertTrue("A held document lock has a pending peer before Activity recreation",recreateShared);assertEquals(Boolean.FALSE,jsWeb(second[0],"window.acquiredAfterRecreate"));
+    s.recreate();long recreated=SystemClock.uptimeMillis()+10000;while(!Boolean.TRUE.equals(jsWeb(second[0],"window.acquiredAfterRecreate"))&&SystemClock.uptimeMillis()<recreated)SystemClock.sleep(100);
+    assertEquals("Activity recreation ends its old document and releases its lock without a JS release",Boolean.TRUE,jsWeb(second[0],"window.acquiredAfterRecreate"));
+    waitFor(s,"!!window.MIRPortalActiveClient && !!window.MIRAndroid");js(s,"window.newNativeResponsive=false;MIRAndroid.Native.authLockStatus().then(()=>window.newNativeResponsive=true);true");waitFor(s,"window.newNativeResponsive===true");
+    File dir=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null),"phase11-proof");assertTrue(dir.isDirectory()||dir.mkdirs());org.json.JSONObject proof=new org.json.JSONObject().put("originA","https://localhost").put("originB","https://localhost").put("secureContext",true).put("lockName","mir-android-auth-transition").put("heldAndPendingObserved",true).put("secondWaited",true).put("secondAcquiredAfterRelease",true).put("heldAndPendingBeforeRecreate",true).put("peerAcquiredAfterRecreateWithoutRelease",true).put("newNativeBridgeResponsive",true).put("physicalDevice",false);java.nio.file.Files.write(new File(dir,"auth-webview-lock.json").toPath(),proof.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+   }finally{js(s,"window.releaseAuthLock?.();true");if(second[0]!=null)s.onActivity(a->{if(second[0].getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)second[0].getParent()).removeView(second[0]);second[0].destroy();});}
+  }
+ }
  @Test public void launchRotationAndRestartUseBundledPortal()throws Exception{
   try(ActivityScenario<MainActivity> s=ActivityScenario.launch(MainActivity.class)){
    waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");
@@ -104,10 +155,11 @@ public class MirAndroidTest extends MirDeviceSetup {
   UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
   try(ActivityScenario<MainActivity>s=ActivityScenario.launch(MainActivity.class)){
    waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");
-   js(s,"document.body.insertAdjacentHTML('beforeend','<form id=android-recipe-form><label>Brouillon local de recette<textarea id=android-recipe-input></textarea></label></form>');let field=document.querySelector('#android-recipe-input');field.value='RECETTE-PHASE11-LOCAL';field.focus();field.scrollIntoView({block:'center'});field.dispatchEvent(new Event('input',{bubbles:true}));true");
-   s.onActivity(a->{a.getBridge().getWebView().requestFocus();((android.view.inputmethod.InputMethodManager)a.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(a.getBridge().getWebView(),android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);});
+   js(s,"document.body.insertAdjacentHTML('beforeend','<form id=android-recipe-form><label>Brouillon local de recette<textarea id=android-recipe-input></textarea></label></form>');let field=document.querySelector('#android-recipe-input');field.value='RECETTE-PHASE11-LOCAL';field.dispatchEvent(new Event('input',{bubbles:true}));true");
+   tapEditable(s,"#android-recipe-input");
    long end=SystemClock.uptimeMillis()+5000;java.util.concurrent.atomic.AtomicBoolean keyboard=new java.util.concurrent.atomic.AtomicBoolean(false);
    while(SystemClock.uptimeMillis()<end){s.onActivity(a->{androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(a.getBridge().getWebView());keyboard.set(insets!=null&&insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime()));});if(keyboard.get())break;SystemClock.sleep(100);}
+   if(!keyboard.get())try{recordKeyboardFailure(s);}catch(Exception e){System.err.println("MIR keyboard diagnostics incomplete: "+e.getClass().getSimpleName());}
    assertTrue("Clavier Android visible",keyboard.get());screenshot(s,"android-keyboard");
    waitFor(s,"document.querySelector('#android-recipe-input').getBoundingClientRect().bottom<=innerHeight");
    device.pressBack();device.pressBack();

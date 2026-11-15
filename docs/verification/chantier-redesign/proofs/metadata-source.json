@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-11-14T07:21:45.864052+00:00",
+  "baseHead": "849f61890d9fdd8fa68591c0b8b94e151b1d818a",
+  "workingTreeAfterIntegratorFreeze": true,
+  "simulation": true,
+  "sha256": {
+    "dist/chantier-app.js": "a5cc3fe67184e65259f4ba9c663245e9d7dbf913375a9323ae73326d863afe52",
+    "dist/mir-field-views.js": "071050f8c2207a4ae91cf940b2678a9f7210196ce459966b9d2c39766caa26f0",
+    "dist/mir-field.css": "6f2085a8f0b537509cc009264b29587bfc5ad2de025bfd4f4a89fe3517f8a077",
+    "dist/portal-client.js": "bb9c8887e4545600db36a939b0a8343f362134f0f922bfb58fd8e5e6112c25e6",
+    "tests/helpers/mir-field-fixture.cjs": "e1e4bf2308a9af1a4185faa18b10a6ebc88672b77d9cdb688ce8c364237aa1a9"
+  }
+}

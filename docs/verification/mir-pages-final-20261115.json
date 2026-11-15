@@ -1,0 +1,25 @@
+{
+  "release": "MIR-20261115-PR36-37-40",
+  "approved": true,
+  "target": "https://revetementsmir.github.io/Revetements-mir-/",
+  "mergeSubject": "Merge PR #37 — MIR intégration finale vers main",
+  "ancestors": {
+    "PR36_main": "26b0acb98aa3a17e360128fe6a69c5121094f97f",
+    "PR38": "cdb4d7df51ba3a52b69673d75186ba115de20114",
+    "PR39": "d4c343a8cbb6d5f06f148ed2bfb01fbb9799a4c8",
+    "PR40": "29ef36bf7afed708c8bfe47ffa007221f516b73e",
+    "PR37_reviewed": "afd82c4b142675796cce2d77e9d625e386d9488c"
+  },
+  "authority": "User authorized PR36→main, PR37→main, final GitHub Pages deployment only after all checks.",
+  "protection": "Main release gate rejects all intermediate revisions, requires exact two-parent PR37 merge, all listed SHA ancestors, fail-closed production capabilities.",
+  "testProject": "hxtztkmbfpmzrieccwsg",
+  "productionProject": "gccltmaulvrnthrbnrpd",
+  "releaseRestrictions": [
+    "No Supabase production schema or business data writes",
+    "No real email, Google OAuth, payments, or unreviewed EN activation",
+    "No Android release signing, distribution, or physical Samsung certification",
+    "Do not serve TEST fixtures, keys, or test backend from public production paths"
+  ],
+  "samsung": "EN ATTENTE",
+  "sourceReview": "2026-11-15; PR36 final certified at e36a0546 and merged as 26b0acb9; PR37 detailed validation at afd82c4b pending final CI. Marker is authorization intent, not proof of publication."
+}
