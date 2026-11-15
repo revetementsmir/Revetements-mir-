@@ -62,7 +62,9 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   await shop.goto(base+'/responsive.html?page=boutique.html&layout=phone');
   await Promise.race([shop.locator('[data-mir-responsive-ready=true]').waitFor(),shop.locator('[role=alert]').waitFor().then(async()=>{throw Error(await shop.locator('[role=alert]').innerText());})]);
   await shop.locator('.mir-client-menu-ready').waitFor();
-  assert(await shop.locator('.mir-mobile-tabs').evaluate(node=>{const rect=node.getBoundingClientRect(),frame=node.closest('[data-mir-responsive-viewport]').getBoundingClientRect();return rect.top>=frame.top&&rect.bottom<=frame.bottom+2;}),'barre basse des pages client intérieures reste dans le cadre tablette/téléphone');
+  const railGeometry=await shop.locator('.mir-mobile-tabs').evaluate(node=>{const rect=node.getBoundingClientRect(),frame=node.closest('[data-mir-responsive-viewport]').getBoundingClientRect();return{rail:{top:rect.top,bottom:rect.bottom,left:rect.left,right:rect.right},frame:{top:frame.top,bottom:frame.bottom,left:frame.left,right:frame.right},css:{position:getComputedStyle(node).position,bottom:getComputedStyle(node).bottom},inside:rect.top>=frame.top&&rect.bottom<=frame.bottom+2};});
+  await shop.screenshot({path:'artifacts/mir-responsive-atelier/boutique-rail-geometry.png'});
+  assert(railGeometry.inside,'barre basse des pages client dans le cadre : '+JSON.stringify(railGeometry));
   await shop.locator('.brand-collection-card').first().waitFor().catch(async error=>{console.log('SHOP DIAGNOSTIC',await shop.evaluate(()=>({grid:document.querySelector('#shop-grid')?.textContent,view:document.body.dataset.commerceView,categories:document.querySelector('#category-cards')?.innerHTML,brands:document.querySelector('#shop-brand-directory')?.innerHTML})));await shop.screenshot({path:'artifacts/mir-responsive-atelier/boutique-failure.png'});throw error;});
   const search=shop.locator('#shop-search');await search.fill('BECK');
   await shop.locator('[data-shop-card]').first().waitFor();
