@@ -92,6 +92,7 @@ const sizes=[
         const links=await nav.locator('a:visible').evaluateAll(anchors=>anchors.map(a=>[a.getAttribute('href')==='selection.html'?'Mon panier':a.textContent.trim(),a.getAttribute('href')]));
         const commonLinks = links.filter(([, href]) => !['estimation.html','selection.html'].includes(href));
         assert.ok(await header.locator('a.mir-public-cart[href="selection.html"]:visible').count(),label+' panier permanent accessible');
+        if(['boutique','produit'].includes(route))assert.equal(await page.locator('.mir-public-selection-shortcut').isVisible(),false,label+' aucun deuxième Panier affiché');
         if(!reference)reference=commonLinks;
         else assert.deepEqual(commonLinks,reference,label+' mêmes liens communs que l’accueil');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),label+' débordement');
