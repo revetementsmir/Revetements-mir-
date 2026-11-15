@@ -17,6 +17,9 @@ const routes=['index','realisations','contact','materiaux','boutique','produit',
 const sizes=[
   {name:'mobile-compact',width:360,height:780},
   {name:'mobile',width:390,height:844},
+  {name:'mobile-large',width:430,height:932},
+  {name:'tablette-portrait',width:768,height:1024},
+  {name:'tablette-grand',width:834,height:1112},
   {name:'seuil-mobile',width:760,height:900},
   {name:'seuil-bureau',width:761,height:900},
   {name:'tablette',width:820,height:1100},
@@ -49,21 +52,32 @@ const sizes=[
         const header=page.locator('header.mir-home-header');
         const menu=header.locator('.mir-client-menu-toggle');
         const nav=header.locator('nav.mir-client-links');
-        const account=header.getByRole('link',{name:'Compte'});
+        const account=header.getByRole('link',{name:'Connexion'});
         const label=route+' '+size.name;
         const small=size.width<=1100;
         await menu.waitFor({state:'attached'});
         assert.equal(await menu.isVisible(),small,label);
         assert.equal(await nav.isVisible(),!small,label);
-        assert.equal(await account.isVisible(),!small,label+' compte dans l’en-tête bureau seulement');
-        if(small)assert.ok(await page.locator('.mir-mobile-tabs a[href^="chantier.html?view=account"]:visible').count(),label+' compte dans la navigation mobile');
+        assert.equal(await account.isVisible(),true,label+' avatar Connexion sur chaque écran');
+        assert.equal(await account.getAttribute('href'),
+          route==='plan'?'chantier.html?view=account&return=studio':
+          route==='selection'?'chantier.html?view=account&return=panier':'chantier.html?view=account',
+          label+' destination Connexion existante / retour');
+        const rail=page.locator('.mir-mobile-tabs');
+        if(route==='index')assert.equal(await rail.count(),0,label+' aucune barre inférieure sur accueil');
+        else{
+          assert.equal(await rail.isVisible(),small,label+' barre inférieure réservée téléphone/tablette');
+          assert.equal(await rail.getByRole('link',{name:'Compte'}).count(),0,label+' aucun doublon Connexion');
+        }
+        assert.equal(await page.locator('a[aria-label="Connexion"]').count(),1,label+' un seul avatar Connexion');
         assert.equal(await menu.getAttribute('aria-controls'),await nav.getAttribute('id'),label);
         const closed=await header.boundingBox();
         if(small){
           if(size.width<=760){
             const logo=await header.locator('img').boundingBox();
-            const button=await menu.boundingBox(),link=await header.locator('.mir-public-cart').boundingBox();
-            assert.ok(button.height>=44&&logo.x+logo.width<=link.x&&link.x+link.width<=button.x,label+' logo, panier, menu sur une ligne');
+            const button=await menu.boundingBox(),cart=await header.locator('.mir-public-cart').boundingBox(),avatar=await account.boundingBox();
+            assert.ok(button.height>=44&&avatar.height>=44&&logo.x+logo.width<=button.x+2&&button.x+button.width<=cart.x+2&&cart.x+cart.width<=avatar.x+2&&avatar.x+avatar.width<=size.width+2,
+              label+' logo, Plus, panier, avatar de gauche à droite');
           }
           await menu.click();
           assert.equal(await menu.getAttribute('aria-expanded'),'true',label);
@@ -76,6 +90,15 @@ const sizes=[
         if(!reference)reference=commonLinks;
         else assert.deepEqual(commonLinks,reference,label+' mêmes liens communs que l’accueil');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),label+' débordement');
+        if(route==='index'){
+          assert.ok(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+2),label+' accueil sans défilement ni coupure');
+          const img=page.locator('.mir-home-showcase-photo');await img.evaluate(el=>el.decode());
+          assert.match(await img.getAttribute('src'),/mir-home-hero-20261105\.webp/,'Photo approuvée conservée');
+          assert.equal(await img.evaluate(el=>['cover','contain'].includes(getComputedStyle(el).objectFit)),true,'Photo sans étirement');
+        }
+        if((route==='index'||route==='boutique')&&['mobile-compact','mobile','mobile-large','tablette-portrait','tablette-grand','petit-pc','bureau'].includes(size.name)){
+          await page.screenshot({path:path.join(artifacts,'mir-client-nav-'+size.name+'-'+route+'.jpg'),type:'jpeg',quality:76,fullPage:route!=='index',animations:'disabled'});
+        }
         if(small){
           await page.keyboard.press('Escape');
           assert.equal(await nav.isVisible(),false,label+' ferme avec Échap');
