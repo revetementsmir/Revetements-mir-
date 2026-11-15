@@ -31,9 +31,12 @@ jobs:
         run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
       - name: Contrôler le code et la séparation métiers
         env:
-          MIR_CLIENT_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          MIR_CLIENT_BASE_SHA: 4d63be9a3afbabfc4e9211bdf026457c1e91dc52
         run: |
           git diff --check
+          # PR40 was merged on this exact first-parent baseline. Do not classify
+          # prior Auth/Chantier work in PR37 as modifications made by PR40.
+          git merge-base --is-ancestor "$MIR_CLIENT_BASE_SHA" HEAD
           node --check dist/mir-public-menu.js
           node --check tests/mir-public-menu-browser.cjs
           protected="$(git diff --name-only "$MIR_CLIENT_BASE_SHA" HEAD -- mobile supabase dist/chantier-app.js dist/portal-client.js dist/chantier.html dist/entrepot.html dist/coordination.html dist/production-app.js)"
