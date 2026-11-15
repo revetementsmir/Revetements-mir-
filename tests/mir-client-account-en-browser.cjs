@@ -23,9 +23,11 @@ async function setup(browser,viewport={width:390,height:844},initial={},fixtureC
   try{browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});}
   catch{browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});}
   for(const [width,height] of [[390,844],[834,1112],[1440,900]]){
-   const {page,context,errors}=await setup(browser,{width,height},{'mir-client-locale-v1':'en-CA'});
+   const {page,context,errors}=await setup(browser,{width,height},{});
    // The existing account mock and all real client Auth/role code remain intact.
    await page.goto(base+'chantier.html?view=account&clientLocale=1&mir-locale-preview=1');
+   await page.getByRole('heading',{name:'Mon compte MIR',exact:true}).waitFor({timeout:25000});
+   await page.locator('button[data-mir-locale="en-CA"]').click();
    await page.getByRole('heading',{name:'My MIR account',exact:true}).waitFor({timeout:25000});
    assert.equal(await page.locator('html').getAttribute('lang'),'en-CA');
    assert.equal(await page.locator('.mir-client-locale-switch button[aria-pressed=true]').innerText(),'EN');
@@ -55,8 +57,10 @@ async function setup(browser,viewport={width:390,height:844},initial={},fixtureC
    console.log('PASS customer FR-CA/EN-CA account and cart without backend side effects '+width);
    await context.close();
   }
-  const {page,context,errors}=await setup(browser,{width:390,height:844},{'mir-client-locale-v1':'en-CA'});
+  const {page,context,errors}=await setup(browser,{width:390,height:844},{});
   await page.goto(base+'chantier.html?view=account&clientLocale=1&mir-locale-preview=1');
+  await page.getByRole('heading',{name:'Mon compte MIR'}).waitFor();
+  await page.locator('button[data-mir-locale="en-CA"]').click();
   await page.getByRole('heading',{name:'My MIR account'}).waitFor();
   await page.evaluate(()=>localStorage.setItem('qa-role','employee'));
   await page.reload();
