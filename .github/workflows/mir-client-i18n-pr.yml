@@ -1,0 +1,138 @@
+name: MIR client — FR-CA / EN-CA (prepublication)
+on:
+  pull_request:
+    paths:
+      - 'dist/mir-client-*.js'
+      - 'dist/mir-client-*.css'
+      - 'dist/production-model.js'
+      - 'dist/plan-app.js'
+      - 'dist/pliage.js'
+      - 'dist/mir-estimate.js'
+      - 'dist/mir-unified-client-dossier.js'
+      - 'dist/mir-account-flow.js'
+      - 'dist/annotated-pdf.js'
+      - 'dist/mir-panel-po-pdf.js'
+      - 'dist/mir-selection-pdf.js'
+      - 'dist/mir-dossier-pdf.js'
+      - 'dist/commerce.js'
+      - 'dist/catalogue.js'
+      - 'dist/*.html'
+      - 'tests/mir-client-i18n*.cjs'
+      - 'tests/mir-client-qa-isolation.cjs'
+      - 'mobile/tools/verify-pr39-native-fixture.cjs'
+      - 'supabase/test-only/fixtures/pr41-android-native-*.sql'
+      - 'tests/mir-client-account-isolation.cjs'
+      - 'tests/mir-client-account-en-browser.cjs'
+      - 'tests/mir-client-accessibility-browser.cjs'
+      - 'tests/mir-client-email-boundary.cjs'
+      - 'tests/mir-client-mail-simulation-browser.cjs'
+      - 'tests/mir-client-unified-bilingual-browser.cjs'
+      - 'tests/mir-client-pdf-bilingual.cjs'
+      - 'tests/mir-client-i18n-pdf-browser.cjs'
+      - 'docs/verification/client-localisation-20261115.md'
+      - '.github/workflows/mir-client-i18n-pr.yml'
+permissions:
+  contents: read
+jobs:
+  bilingual-client:
+    name: FR-CA / EN-CA — integrité et navigation client
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Enforce staff and backend separation
+        run: |
+          git diff --check
+          base="${{ github.event.pull_request.base.sha }}"
+          git fetch origin "$base" --depth=1
+          forbidden="$(git diff --name-only "$base" HEAD -- mobile supabase \
+            dist/chantier-app.js dist/portal-client.js \
+            dist/entrepot.html dist/entrepot-app.js dist/coordination.html \
+            dist/production-app.js dist/mir-estimate-presentation.js \
+            dist/mir-help-center.js dist/mir-client-return.js)"
+          if [ -n "$forbidden" ]; then
+            # Fail-closed: ONLY five pinned synthetic MIR TEST fixture/validator
+            # files can differ. Any other staff, APK, Auth, SQL or email change
+            # still aborts. This strengthens the original blanket guard.
+            MIR_CLIENT_BASE_SHA="$base" node tests/mir-client-qa-isolation.cjs
+          fi
+          node --check dist/mir-client-i18n.js
+          node --check dist/mir-client-en-ca.js
+          node --check dist/mir-selection-pdf.js
+          node --check dist/mir-dossier-pdf.js
+          node --check tests/mir-client-i18n.cjs
+          node --check tests/mir-client-qa-isolation.cjs
+          node --check tests/mir-client-i18n-static.cjs
+          node --check tests/mir-client-account-isolation.cjs
+          node --check tests/mir-client-account-en-browser.cjs
+          node --check tests/mir-client-accessibility-browser.cjs
+          node --check tests/mir-client-email-boundary.cjs
+          node --check tests/mir-client-mail-simulation-browser.cjs
+          node --check tests/mir-client-unified-bilingual-browser.cjs
+          node --check tests/mir-client-i18n-browser.cjs
+          node --check tests/mir-client-pdf-bilingual.cjs
+          node --check tests/mir-client-i18n-pdf-browser.cjs
+      - name: Existing PDF and navigation contracts
+        run: |
+          node tests/mir-selection-pdf.cjs
+          node tests/mir-public-menu.cjs
+          node tests/mir-client-header.cjs
+          node tests/mir-homepage.cjs
+      - name: Bilingual glossary and PDF tests
+        run: |
+          node tests/mir-client-i18n.cjs
+          node tests/mir-client-i18n-static.cjs
+          MIR_CLIENT_BASE_SHA="${{ github.event.pull_request.base.sha }}" node tests/mir-client-account-isolation.cjs
+          node tests/mir-client-pdf-bilingual.cjs
+          MIR_CLIENT_BASE_SHA="${{ github.event.pull_request.base.sha }}" node tests/mir-client-email-boundary.cjs
+          node --test tests/mir-estimate-presentation.cjs
+      - name: Install Chromium test dependency
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
+      - name: Real FR/EN screens and no-regression (preview only)
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-client-i18n-browser.cjs
+      - name: Customer routes, keyboard, contrast and 7 screen sizes
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-client-accessibility-browser.cjs
+      - name: Auth client FR/EN, compte, récupération et séparation employés
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-client-account-en-browser.cjs
+      - name: Real PDF downloads and rasterization (two Canadian locales)
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-client-i18n-pdf-browser.cjs
+      - name: Existing internal mail templates (simulated only, no transport)
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-client-mail-simulation-browser.cjs
+      - name: Full mixed cart and bending PDF in FR-CA / EN-CA
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-client-unified-bilingual-browser.cjs
+      - name: Attach comparable browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIR-client-FR-EN-prepublication
+          path: |
+            artifacts/mir-client-*.png
+            artifacts/mir-client-matrix-*.png
+            artifacts/mir-mail-internal-fictive-*.png
+            docs/verification/account/bilingual-client-account-*.png
+            artifacts/mir-customer-pdf-*.png
+            artifacts/MIR-*selection*.pdf
+            artifacts/mir-dossier-mixte-EN-*.pdf
+            artifacts/mir-dossier-mixte-EN-*.png
+            artifacts/mir-dossier-mixte-FR-*.pdf
+            artifacts/mir-dossier-mixte-FR-*.png
+          if-no-files-found: warn
+          retention-days: 14

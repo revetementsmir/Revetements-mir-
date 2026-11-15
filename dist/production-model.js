@@ -1040,9 +1040,38 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
   }
   function clientDossierPages(order,{production=false}={}){
     const pages=[];
+    // Translate this fixed workshop warning BEFORE the established SVG wrapping.
+    // Scope is strictly client; never modify the underlying quote policy,
+    // dimensions, geometry, saved customer note or staff output.
+    const clientEnglish=typeof window==='object'&&
+      window.MIRClientLocale?.getLocale?.()==='en-CA'&&
+      window.MIRClientLocale?.isClient?.(window.location.pathname,window.location.search)===true;
     for(const item of order.items){
-      const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(item.quotePolicy.required?['Soumission obligatoire : '+item.quotePolicy.reason]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>wrapLines(line,87));
-      const primary=details.slice(0,24),columns=[primary.slice(0,12),primary.slice(12,24)];
+      const warning=item.quotePolicy.required?'Soumission obligatoire : '+item.quotePolicy.reason:null;
+      const original='Soumission obligatoire : Toute couleur personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.';
+      const visibleWarning=clientEnglish&&warning===original
+        ?'Quote required: All custom colours, including RAL, require a quote. No automatic pricing.'
+        :warning;
+      const clientFinishLines=finishLines(item).map(label=>clientEnglish&&label==='Soumission obligatoire'?'Quote required':label);
+      const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(visibleWarning?[visibleWarning]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>line===visibleWarning?[line]:wrapLines(line,87));
+      // Fit dimensioned client text by ACTUAL wrapped SVG lines, not by the
+      // number of business rows. Reserve a clear gutter before the PDF
+      // footer; spill all remaining lines onto an existing continuation sheet.
+      // Geometry, quantities, paper size and every customer-authored note stay
+      // unchanged. The shared staff renderer is not involved.
+      const fitDetails=(remaining,width,maxLines)=>{
+        const columns=[[],[]];let used=0,col=0,consumed=0;
+        for(const line of remaining){
+          const rows=wrapLines(line,width).length;
+          if(used+rows>maxLines){col++;used=0;if(col>1)break;}
+          columns[col].push(line);used+=rows;consumed++;
+        }
+        return {columns,consumed};
+      };
+      // Ten wrapped lines per column keep short follow-on fragments from
+      // straddling the column gutter and preserve footer clearance.
+      const firstLayout=fitDetails(details,42,10);
+      const primary=details.slice(0,firstLayout.consumed),columns=firstLayout.columns;
       {
         let svg=svgOpen(850,1100,'Pièce cotée '+item.id);
         svg+=multiline(40,91,[production?'MISE EN PRODUCTION · PROFIL UNIQUE':'DOSSIER DE PLIAGE'],{width:75,lineHeight:18,attrs:'font-size="12" font-weight="700" fill="#52634f"'}).svg;
@@ -1053,7 +1082,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         else if(item.kind==='panel')svg+=placeSVG(panelSVG(item,{width:710,height:325,legend:false,header:false,notes:false}),70,240);
         else svg+=svgText(65,380,'Croquis à compléter','font-size="20"');
         svg+=svgText(40,603,'MATÉRIAU / FINI','font-size="12" font-weight="700" fill="#52634f"');
-        svg+=multiline(40,628,[...materialLines(item),...finishLines(item)],{width:48,lineHeight:21,attrs:'font-size="15"'}).svg;
+        svg+=multiline(40,628,[...materialLines(item),...clientFinishLines],{width:48,lineHeight:21,attrs:'font-size="15"'}).svg;
         svg+=svgText(500,603,'QUANTITÉ / LONGUEUR','font-size="12" font-weight="700" fill="#52634f"');
         svg+=svgText(500,633,(item.quantity??'À préciser')+' pièce(s)','font-size="22" font-weight="700"');
         svg+=multiline(500,662,item.kind==='profile'?[formatMeasurement(item.lengthMM,item.unit)]:[formatMeasurement(item.widthMM,item.unit)+' × '+formatMeasurement(item.heightMM,item.unit)],{width:32,lineHeight:23,attrs:'font-size="18"'}).svg;
@@ -1062,8 +1091,11 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg+=multiline(430,790,columns[1],{width:42,lineHeight:18,attrs:'font-size="13"'}).svg;
         pages.push({name:item.id+' · '+item.name,layout:production?'bending-sheet':'mir-dossier',documentTitle:production?'Mise en production':order.requiresQuote?'Demande de soumission':order.automaticPricingAllowed?'Récapitulatif de pliage':'DOSSIER DE PLIAGE',reference:[order.poNumber||order.dossierReference,order.project].filter(Boolean).join(' · ')||'Projet à confirmer',svg:svg+svgClose,summary:primary});
       }
-      for(let start=24;start<details.length;start+=40){
-        const extra=details.slice(start,start+40),left=extra.slice(0,20),right=extra.slice(20,40);
+      for(let start=primary.length;start<details.length;){
+        const pageLayout=fitDetails(details.slice(start),43,25);
+        if(pageLayout.consumed<1)throw Error('Impossible de répartir les détails de cette fiche.');
+        const extra=details.slice(start,start+pageLayout.consumed);
+        const [left,right]=pageLayout.columns;start+=pageLayout.consumed;
         let svg=svgOpen(850,1100,'Continuation '+item.id);
         svg+=multiline(40,120,['Continuation — quantité déjà comptée',item.id+' · '+item.name],{width:75,lineHeight:27,attrs:'font-size="20" font-weight="700"'}).svg;
         svg+=svgText(40,205,'Bloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.','font-size="13" fill="#52634f"');

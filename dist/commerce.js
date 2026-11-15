@@ -13,8 +13,8 @@
     if(c?.id&&(m.colors||[]).some(x=>x.id===c.id))url.searchParams.set('color',c.id);
     return url.href;
   }
-  const number = n => new Intl.NumberFormat('fr-CA',{maximumFractionDigits:3}).format(n);
-  const money = n => new Intl.NumberFormat('fr-CA',{style:'currency',currency:'CAD'}).format(n);
+  const number = n => new Intl.NumberFormat(window.MIRClientLocale?.getLocale?.()||'fr-CA',{maximumFractionDigits:3}).format(n);
+  const money = n => new Intl.NumberFormat(window.MIRClientLocale?.getLocale?.()||'fr-CA',{style:'currency',currency:'CAD'}).format(n);
   // A tariff per area is not a price for one unmeasured panel. The configurator
   // owns the quantity calculation; this page only presents MIR's approved rate.
   function customColor(c){return ['ral','custom'].includes(c?.selectionType)||/^ral(?:\b|\s)/.test(norm(c?.system))||/^ral\s*\d/.test(norm(c?.code));}

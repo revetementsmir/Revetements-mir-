@@ -14,7 +14,7 @@
   const fractionChars={'½':.5,'¼':.25,'¾':.75,'⅛':.125,'⅜':.375,'⅝':.625,'⅞':.875};
   function parseMeasure(raw){let s=String(raw).trim().replace(/(?:po|in|mm|[″"])/gi,'').trim().replace(/[\u00a0\u202f]/g,'').replace(',','.');if(!s)return NaN;for(const [char,n] of Object.entries(fractionChars)){if(s.includes(char)){const whole=s.replace(char,'').trim();return (/^\d+(?:\.\d+)?$/.test(whole)||!whole)?Number(whole||0)+n:NaN;}}const f=s.match(/^(?:(\d+)\s+)?(\d+)\s*\/\s*(\d+)$/);if(f)return Number(f[3])>0?Number(f[1]||0)+Number(f[2])/Number(f[3]):NaN;return /^\d+(?:\.\d+)?$/.test(s)?Number(s):NaN;}
   function inches(n){if(!Number.isFinite(n))return '—';const rounded=Math.round(n*16),w=Math.floor(rounded/16),f=rounded%16;if(!f)return `${w}″`;const gcd=(a,b)=>b?gcd(b,a%b):a,g=gcd(f,16);return `${w?w+' ':''}${f/g}/${16/g}″`;}
-  function number(n){return n.toLocaleString('fr-CA',{maximumFractionDigits:2});}
+  function number(n){return n.toLocaleString(window.MIRClientLocale?.getLocale?.()||'fr-CA',{maximumFractionDigits:2});}
   let profile='l',unit='in',view='volume',items=[],project='',materials=[],selectedMaterial='',selectedColor='',busy=false;
   try{const old=JSON.parse(localStorage.getItem(STORAGE));if(old?.version===1){items=(old.items||[]).filter(i=>profiles[i.profile]&&i.dimensions&&Number.isFinite(i.lengthIn)&&i.lengthIn>0&&Number.isInteger(i.quantity)&&i.quantity>0);project=String(old.project||'');}}catch{}
   try{const r=await fetch('catalogue-fd6866b49d21.json');if(r.ok)materials=(await r.json()).materials.filter(m=>(m.applications||[]).includes('bending')).map(m=>({...m,colors:window.MIRCataloguePolicy?.sortColors(m.colors)||m.colors}));}catch{}

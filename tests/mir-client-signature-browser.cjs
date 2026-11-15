@@ -49,6 +49,14 @@ async function checkBrandCards(browser,base){
       assert.deepEqual(collectionNames,brandOptions);
       assert.equal(layout.columns,width<=700?1:width<=1100?2:3);
       assert.ok(layout.fits&&layout.sameTile&&layout.columnsAligned);
+      if(layout.pageWidth>width+2){
+        const offender=await page.evaluate(()=>[...document.querySelectorAll('body *')].flatMap(el=>{
+          const r=el.getBoundingClientRect(),style=getComputedStyle(el);
+          if(style.display==='none'||style.visibility==='hidden'||r.width===0||r.height===0||r.right<=innerWidth+2)return [];
+          return [{tag:el.tagName,id:el.id,className:typeof el.className==='string'?el.className.slice(0,85):'',right:Math.round(r.right),left:Math.round(r.left),width:Math.round(r.width),position:style.position}];
+        }).sort((a,b)=>b.right-a.right).slice(0,25));
+        console.error('MIR 320 overflow source: '+JSON.stringify({width,scrollWidth:layout.pageWidth,offender}));
+      }
       assert.ok(layout.pageWidth<=width+2,'Pas de débordement horizontal à '+width);
       if(width<=430)assert.ok(layout.height<=145,'Cartes compactes à '+width+' : '+layout.height);
       const kaycan=cards.filter({has:page.getByRole('heading',{name:'Kaycan',exact:true})});

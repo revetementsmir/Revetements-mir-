@@ -119,7 +119,10 @@
   const message=$('#mir-unified-message'),list=$('#mir-unified-pieces'),count=$('#mir-unified-count');
   const join=$('#mir-unified-associate'),pdf=$('#mir-unified-pdf'),json=$('#mir-unified-json'),status=$('#mir-unified-export-status');
   let busy=false,current=null,bendTariff,loadingTariff=false;
-  const currency=new Intl.NumberFormat('fr-CA',{style:'currency',currency:'CAD'});
+  const locale=()=>win.MIRClientLocale?.getLocale?.()==='en-CA'?'en-CA':'fr-CA';
+  const en=()=>locale()==='en-CA';
+  const tr=value=>win.MIRClientLocale?.translate?.(value,locale())||value;
+  const currency=value=>new Intl.NumberFormat(locale(),{style:'currency',currency:'CAD'}).format(value);
   async function refreshTariff(){
    if(loadingTariff||!current?.pieces.some(item=>item.spec.kind==='profile'))return;
    loadingTariff=true;
@@ -132,17 +135,17 @@
     .map(el=>Number(el.dataset.selectionPreview));
    current=read(win.localStorage,{allowedMaterialIndices:available});
    const n=current.pieces.length;
-   count.textContent=n+' pièce'+(n===1?'':'s')+' sur mesure';
+   count.textContent=en()?n+' custom '+(n===1?'piece':'pieces'):n+' pièce'+(n===1?'':'s')+' sur mesure';
    list.replaceChildren();
    if(n){
     for(const item of current.pieces){
      const row=doc.createElement('li'),strong=doc.createElement('strong');
-     strong.textContent=clean(item.spec?.name||item.snapshot?.templateSnapshot?.name||item.id||'Pièce');
+     strong.textContent=clean(item.spec?.name||item.snapshot?.templateSnapshot?.name||item.id||'Pièce');strong.setAttribute('data-mir-user-content','');
      const detail=doc.createElement('span'),quantity=Number(item.spec?.quantity)||1;
      const code=clean(item.spec?.finish?.code||item.spec?.finish?.name||'Couleur à confirmer');
-     detail.textContent=' · '+quantity+' pièce'+(quantity===1?'':'s')+' · '+code+' · repère '+clean(item.id);
+     detail.textContent=' · '+quantity+(en()?(quantity===1?' piece':' pieces'):' pièce'+(quantity===1?'':'s'))+' · '+code+(en()?' · reference ':' · repère ')+clean(item.id);
      const price=item.spec.kind==='profile'?win.MIRProduction?.pricePiece(item,{bendTariff}):null;
-     if(price?.status==='priced')detail.textContent+=' · '+currency.format(price.lineCents/100)+' avant taxes et livraison';
+     if(price?.status==='priced')detail.textContent+=' · '+currency(price.lineCents/100)+(en()?' before taxes and delivery':' avant taxes et livraison');
      row.append(strong,detail);list.append(row);
     }
    }else{
@@ -151,22 +154,22 @@
    join.hidden=true;join.disabled=true;
    if(current.errors.length)message.textContent=current.errors.join(' ');
    else if(current.link==='associate-pieces'){
-    message.textContent='Les matériaux sont au projet « '+current.materialProject+' », mais les pliages n’ont pas de nom de projet. Vous pouvez les associer explicitement.';
-    join.textContent='Associer ces pliages au projet « '+current.materialProject+' »';
+    message.textContent=en()?'Materials are saved under project “'+current.materialProject+'”, but the custom bends have no project name. You may link them explicitly.':'Les matériaux sont au projet « '+current.materialProject+' », mais les pliages n’ont pas de nom de projet. Vous pouvez les associer explicitement.';
+    join.textContent=en()?'Link these bends to project “'+current.materialProject+'”':'Associer ces pliages au projet « '+current.materialProject+' »';
     join.hidden=false;join.disabled=false;
    }else if(current.link==='associate-materials'){
-    message.textContent='Les pliages sont au projet « '+current.pieceProject+' », mais la sélection n’a pas de nom. Vous pouvez utiliser le même nom.';
-    join.textContent='Nommer ma sélection « '+current.pieceProject+' »';
+    message.textContent=en()?'The custom bends belong to project “'+current.pieceProject+'”, but the materials selection has no name. You may use the same name.':'Les pliages sont au projet « '+current.pieceProject+' », mais la sélection n’a pas de nom. Vous pouvez utiliser le même nom.';
+    join.textContent=en()?'Name my selection “'+current.pieceProject+'”':'Nommer ma sélection « '+current.pieceProject+' »';
     join.hidden=false;join.disabled=false;
    }else if(current.link==='conflict'){
-    message.textContent='Projets différents : matériaux « '+current.materialProject+' » et pièces « '+current.pieceProject+' ». Corrigez le nom dans le configurateur; aucun regroupement automatique.';
+    message.textContent=en()?'Different projects: materials “'+current.materialProject+'” and pieces “'+current.pieceProject+'”. Correct the name in the configurator; nothing is merged automatically.':'Projets différents : matériaux « '+current.materialProject+' » et pièces « '+current.pieceProject+' ». Corrigez le nom dans le configurateur; aucun regroupement automatique.';
    }else if(!current.materials.length&&!current.pieces.length){
     message.textContent='Ajoutez un matériau ou une moulure pour préparer votre dossier.';
    }else{
     message.textContent='Même projet pour les matériaux et les pièces. Aucun nouvel espace de sauvegarde ni envoi automatique.';
    }
    if(current.legacyCount){
-    message.textContent+=' '+current.legacyCount+' ancien(s) pliage(s) du formulaire rapide restent séparés. Leur reprise dans le configurateur coté est nécessaire avant un PDF déclaré complet; rien n’a été effacé.';
+    message.textContent+=en()?' '+current.legacyCount+' older quick-form bend(s) remain separate. Reopen them in the dimensioned configurator before generating a complete PDF; nothing was deleted.':' '+current.legacyCount+' ancien(s) pliage(s) du formulaire rapide restent séparés. Leur reprise dans le configurateur coté est nécessaire avant un PDF déclaré complet; rien n’a été effacé.';
    }
    const active=current.ready&&current.pieces.length>0&&!busy;
    pdf.disabled=!active;json.disabled=!active;
@@ -190,7 +193,7 @@
    try{
     const state=render(),data=payload(state);
     const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
-    const a=doc.createElement('a');a.href=url;a.download='MIR-dossier-complet-'+filename(data.project)+'.json';
+    const a=doc.createElement('a');a.href=url;a.download='MIR-dossier-complet-'+filename(data.project)+(en()?'-en-CA':'')+'.json';
     a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
     status.textContent='Sauvegarde JSON complète prête. Aucun envoi.';
    }catch(error){status.textContent='Sauvegarde impossible : '+error.message;}
@@ -203,8 +206,8 @@
     const state=render(),options=pdfOptions(state,{selectionPDF:win.MIRSelectionPDF,production:win.MIRProduction,bendTariff});
     if(!win.MIRPDF?.exportPlan)throw Error('Moteur PDF indisponible.');
     const result=await win.MIRPDF.exportPlan(options);
-    status.textContent='Dossier complet prêt · '+result.pages+' page'+(result.pages===1?'':'s')+'. Utilisez Télécharger dans le panneau.';
-   }catch(error){status.textContent='PDF non préparé : '+error.message+'. Le JSON et les dossiers originaux restent disponibles.';}
+    status.textContent=en()?'Complete project file ready · '+result.pages+' '+(result.pages===1?'page':'pages')+'. Use Download in the panel.':'Dossier complet prêt · '+result.pages+' page'+(result.pages===1?'':'s')+'. Utilisez Télécharger dans le panneau.';
+   }catch(error){status.textContent=en()?'PDF not prepared: '+tr(error.message)+'. The JSON and original project files remain available.':'PDF non préparé : '+error.message+'. Le JSON et les dossiers originaux restent disponibles.';}
    finally{busy=false;render();}
   });
   const selection=doc.querySelector('#selection-items');
@@ -215,6 +218,7 @@
   doc.addEventListener('input',event=>{if(event.target?.id==='selection-project-name')queueMicrotask(render);});
   doc.addEventListener('change',event=>{if(event.target?.closest?.('#selection-items'))queueMicrotask(render);});
   win.addEventListener('storage',event=>{if([KEYS.materials,KEYS.pieces].includes(event.key))render();});
+  win.addEventListener('mir:client-locale-changed',render);
   win.addEventListener('pageshow',event=>{render();if(event.persisted)void refreshTariff();});
   render();
   void refreshTariff();

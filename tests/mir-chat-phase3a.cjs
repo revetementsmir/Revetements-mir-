@@ -81,8 +81,21 @@ test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch con
  const beck=require('./fixtures/mir-chat-main-215259.json');
  const approvedProtectedChanges={...uxReviewed.files,
   'dist/catalogue-fd6866b49d21.json':'a08b9bf28abba1f286d0854690ae4979eaaa723a3fe04eb86a75dffc82efdc63',
-  'dist/commerce.js':'4f52389a1a771c72b4900ac0d7c93a38e58c6d269e2a83e15452701327897815'
+  'dist/commerce.js':'b33930663305142ec08b3753a4ed47dd5f3e4d0594a84d36bbc74c269e5bae28'
  };
+ function verifyCommerceLocaleOnly(){
+  // Full-source equivalence is stronger than a stale SHA pin: only two
+  // approved customer-facing Intl formatters can differ from main 33eacb5.
+  const original=require('node:child_process').execFileSync('git',['show','33eacb5741e801067178fdeec83a9489332333c6:dist/commerce.js'],{encoding:'utf8'});
+  const a="const number = n => new Intl.NumberFormat('fr-CA',{maximumFractionDigits:3}).format(n);";
+  const b="const money = n => new Intl.NumberFormat('fr-CA',{style:'currency',currency:'CAD'}).format(n);";
+  const aa="const number = n => new Intl.NumberFormat(window.MIRClientLocale?.getLocale?.()||'fr-CA',{maximumFractionDigits:3}).format(n);";
+  const bb="const money = n => new Intl.NumberFormat(window.MIRClientLocale?.getLocale?.()||'fr-CA',{style:'currency',currency:'CAD'}).format(n);";
+  assert.equal(original.split(a).length,2);assert.equal(original.split(b).length,2);
+  assert.equal(fs.readFileSync('dist/commerce.js','utf8'),original.replace(a,aa).replace(b,bb),
+    'Only the exact two customer locale formatters may change; price calculations, Auth, RLS and chat contracts are untouched');
+  assert.equal(hash(fs.readFileSync('dist/commerce.js')),'b33930663305142ec08b3753a4ed47dd5f3e4d0594a84d36bbc74c269e5bae28');
+ }
  if(process.env.GITHUB_EVENT_NAME==='pull_request'&&process.env.GITHUB_EVENT_PATH){
   // Actions checks a synthetic merge with today's main, which other approved
   // PRs may change. Guard OUR head's diff, not freeze their catalogue globally.
@@ -92,6 +105,7 @@ test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch con
   const ancestor=git('merge-base',pr.base.sha,pr.head.sha);
   const changed=git('diff','--name-only',ancestor,pr.head.sha,'--',...Object.keys(beck.files)).split('\n').filter(Boolean);
   for(const file of changed)assert.equal(hash(fs.readFileSync(file)),approvedProtectedChanges[file],`Phase3A protected file not explicitly approved: ${file}`);
+  if(changed.includes('dist/commerce.js'))verifyCommerceLocaleOnly();
  }else if(process.env.GITHUB_BASE_REF){
   // A PR checkout may omit the event payload in a restricted runner. Compare
   // the current head with the certified base instead of treating today's main
@@ -99,6 +113,7 @@ test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch con
   const git=(...args)=>require('node:child_process').execFileSync('git',args,{encoding:'utf8'}).trim(),baseRef=`origin/${process.env.GITHUB_BASE_REF}`;
   const ancestor=git('merge-base',baseRef,'HEAD'),changed=git('diff','--name-only',ancestor,'HEAD','--',...Object.keys(beck.files)).split('\n').filter(Boolean);
   for(const file of changed)assert.equal(hash(fs.readFileSync(file)),approvedProtectedChanges[file],`Phase3A protected file not explicitly approved: ${file}`);
+  if(changed.includes('dist/commerce.js'))verifyCommerceLocaleOnly();
  }else for(const [file,value]of Object.entries(beck.files))assert.equal(hash(fs.readFileSync(file)),approvedProtectedChanges[file]||value,'BECK/main '+file);
  const source=fs.readFileSync('dist/chantier-app.js','utf8');
  for(const [name,value]of Object.entries(baseline.functions)){const start=source.indexOf('  function '+name+'('),end=source.indexOf('\n  function ',start+1);assert.ok(start>=0,name);assert.equal(hash(source.slice(start,end<0?undefined:end)),uxReviewed.functions[name]||value,name);}

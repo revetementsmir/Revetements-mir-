@@ -3,7 +3,7 @@
   const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const url=s=>{try{const u=new URL(s,document.baseURI);return ['https:','http:'].includes(u.protocol)?u.href:'#';}catch{return '#';}};
   const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
-  const fmt=n=>Number(n).toLocaleString('fr-CA',{maximumFractionDigits:3});
+  const fmt=n=>Number(n).toLocaleString(window.MIRClientLocale?.getLocale?.()||'fr-CA',{maximumFractionDigits:3});
   const labels={horizontal:'Pose horizontale',vertical:'Pose verticale',panel:'Panneaux',lap:'Clins',shingle:'Bardeaux',brick:'Maçonnerie'};
   let materials=[],hiddenProducts=new Set();
   try{const r=await fetch('boutique-visibilite.json');if(r.ok)hiddenProducts=new Set((await r.json()).hidden||[]);}catch{}

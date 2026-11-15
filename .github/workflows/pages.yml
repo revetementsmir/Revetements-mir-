@@ -626,6 +626,26 @@ jobs:
         env:
           MIR_ENV_PUBLISHED_BASE: ${{ steps.deployment.outputs.page_url }}
         run: MIR_CHROMIUM_BIN=$(command -v google-chrome || command -v chromium) node tests/mir-test-production-browser.cjs
+      - name: Certifier le client FR/EN réellement servi par Pages
+        env:
+          MIR_PUBLISHED_BASE: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          base="${MIR_PUBLISHED_BASE%/}"
+          for file in index.html boutique.html selection.html chantier.html production.html mir-client-i18n.js mir-client-en-ca.js mir-client-i18n.css mir-selection-pdf.js mir-dossier-pdf.js mir-panel-po-pdf.js; do
+            curl --fail --silent --show-error --location --retry 20 --retry-delay 3 --retry-all-errors "$base/$file?pr41_sha=$GITHUB_SHA" -o "/tmp/pr41-${file//\//_}"
+            cmp "/tmp/pr41-${file//\//_}" "_site_mir/$file"
+          done
+          grep -Fq 'mir-client-i18n.js?v=release-pr41-20261115' /tmp/pr41-index.html
+          ! grep -Fq 'mir-client-locale-preview-v1' /tmp/pr41-mir-client-i18n.js
+          MIR_CHROMIUM_BIN=$(command -v google-chrome || command -v chromium) node tests/mir-client-published-browser.cjs
+      - name: Preuves visuelles du parcours bilingue réellement publié
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-client-bilingual-published
+          path: artifacts/mir-client-published-*.png
+          if-no-files-found: ignore
       - name: Preuves TEST / PRODUCTION publiées
         if: always()
         uses: actions/upload-artifact@v4

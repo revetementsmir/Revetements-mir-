@@ -1,0 +1,64 @@
+/* Public client only: the corporate header and approved account avatar stay intact. */
+.mir-client-locale-switch{display:inline-flex;gap:2px;align-items:center;flex:none;margin-inline:6px;padding:3px;border:1px solid #a5afa5;border-radius:999px;background:#fff;color:#23392a;white-space:nowrap}
+.mir-client-locale-switch button{font:700 12px/1 system-ui,sans-serif;border:0;border-radius:999px;background:transparent;color:#324333;padding:8px 9px;min-width:35px;min-height:34px;cursor:pointer}
+.mir-client-locale-switch button[aria-pressed="true"]{background:#244b39;color:#fff}
+.mir-client-locale-switch button:focus-visible{outline:3px solid #2c6a48;outline-offset:3px}
+@media(max-width:430px){.mir-client-locale-switch{margin-inline:2px;padding:2px}.mir-client-locale-switch button{min-width:32px;padding:7px 6px;font-size:11px}}
+@media(prefers-reduced-motion:reduce){.mir-client-locale-switch button{transition:none}}
+
+/* Reserve real width for the two languages on 360–430 px screens without
+ * moving the approved account avatar or introducing a second header row. */
+@media(max-width:430px){
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand,
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand{width:clamp(82px,24vw,105px)!important}
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions{gap:3px!important}
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart{padding-inline:4px!important;font-size:11px!important}
+  body.mir-public-navigation header[data-mir-public-shell] .mir-client-locale-switch{margin-inline:0;padding:2px}
+}
+
+/* Client account only: Harmony's closed Menu must never hide FR/EN.
+ * The Harmony title is an owned node; no shared business header is changed. */
+body[data-portal-mode="login"] #mir-harmony-header .mir-harmony-title:has(.mir-client-locale-switch),
+body[data-portal-mode="client"] #mir-harmony-header .mir-harmony-title:has(.mir-client-locale-switch){
+  display:flex;align-items:center;min-width:0;gap:5px;white-space:nowrap
+}
+#mir-harmony-header .mir-harmony-title>.mir-client-locale-switch{
+  margin:0;flex-shrink:0;letter-spacing:normal;font-size:12px
+}
+@media(max-width:760px){
+  body[data-portal-mode="login"] #mir-harmony-header .mir-harmony-title:has(.mir-client-locale-switch),
+  body[data-portal-mode="client"] #mir-harmony-header .mir-harmony-title:has(.mir-client-locale-switch){
+    font-size:0;letter-spacing:0
+  }
+  #mir-harmony-header .mir-harmony-title>.mir-client-locale-switch{font-size:12px}
+}
+
+/* Public client 320–430px: single-row Plus, FR/EN, cart and account avatar. */
+@media(max-width:430px){
+ body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand,
+ body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand{width:clamp(72px,22vw,96px)!important;min-width:0!important}
+}
+@media(max-width:350px){
+ body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand,
+ body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand,
+ body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand,
+ body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand{width:64px!important;min-width:0!important}
+ body.mir-public-navigation header[data-mir-public-shell] .mir-client-locale-switch{padding:1px;gap:0}
+ body.mir-public-navigation header[data-mir-public-shell] .mir-client-locale-switch button{min-width:28px;min-height:34px;padding:7px 3px;font-size:10px}
+ body.mir-public-navigation header[data-mir-public-shell] .mir-client-actions>.mir-public-cart{font-size:0!important;padding-inline:4px!important}
+ body.mir-public-navigation header[data-mir-public-shell] .mir-client-actions>.mir-public-cart::before{content:"🛒";font-size:18px;line-height:1}
+}
+
+/* Certified 320px viewport: keep the real Panier hit target with its quantity,
+ * both locale buttons and the separate 44px account control on the first row. */
+@media(max-width:350px){
+ body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>a.mir-public-cart{
+   flex:0 0 52px!important;width:52px!important;min-width:52px!important;max-width:52px!important;
+   margin:0!important;padding:3px 1px!important;justify-content:center!important;gap:0!important
+ }
+ body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>a.mir-public-cart b{
+   min-width:18px!important;width:18px!important;height:18px!important;
+   margin-left:3px!important;padding:0 1px!important;font-size:10px!important
+ }
+ body.mir-public-navigation header[data-mir-public-shell] .mir-client-locale-switch button{min-height:44px}
+}
