@@ -218,6 +218,7 @@
   doc.addEventListener('input',event=>{if(event.target?.id==='selection-project-name')queueMicrotask(render);});
   doc.addEventListener('change',event=>{if(event.target?.closest?.('#selection-items'))queueMicrotask(render);});
   win.addEventListener('storage',event=>{if([KEYS.materials,KEYS.pieces].includes(event.key))render();});
+  win.addEventListener('mir:client-locale-changed',render);
   win.addEventListener('pageshow',event=>{render();if(event.persisted)void refreshTariff();});
   render();
   void refreshTariff();
