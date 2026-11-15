@@ -33,7 +33,7 @@ for(const [file,blob]of Object.entries(pin)){
   assert.match(source,/select set_config\('mir\.target_project','hxtztkmbfpmzrieccwsg',true\)/);
   assert.match(source,/current_setting\('mir\.target_project',true\)/);
   assert.match(source,/pg_advisory_xact_lock/);
-  assert.match(source,/(?:9100|9110|9120|9130)-000000000001/);
+  assert.match(source,/7da20261-1115-4000-91(?:00|10|20|30)-00000000000/,'Exact allocated QA prefix, including the SQL generator suffix');
   assert.doesNotMatch(source,/7da20261-1114-4000-91/);
  }else{
   assert.match(source,/const HOST='hxtztkmbfpmzrieccwsg\.supabase\.co'/);
