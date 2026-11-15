@@ -227,7 +227,8 @@ body.mir-public-navigation header[data-mir-public-shell]>nav.mir-client-links>a.
     min-height:64px!important;gap:5px!important;
   }
   body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions{
-    display:flex!important;flex-wrap:nowrap!important;grid-template-columns:none!important;
+    display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+    align-items:center!important;justify-content:flex-end!important;grid-template-columns:none!important;
     order:3!important;flex:0 0 auto!important;width:auto!important;
     margin-left:0!important;gap:5px!important;
   }
