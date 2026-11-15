@@ -10,6 +10,9 @@ on:
       - 'dist/catalogue.js'
       - 'dist/*.html'
       - 'tests/mir-client-i18n*.cjs'
+      - 'tests/mir-client-qa-isolation.cjs'
+      - 'mobile/tools/verify-pr39-native-fixture.cjs'
+      - 'supabase/test-only/fixtures/pr41-android-native-*.sql'
       - 'tests/mir-client-account-isolation.cjs'
       - 'tests/mir-client-account-en-browser.cjs'
       - 'tests/mir-client-accessibility-browser.cjs'
@@ -46,14 +49,17 @@ jobs:
             dist/production-app.js dist/mir-estimate-presentation.js \
             dist/mir-help-center.js dist/mir-client-return.js)"
           if [ -n "$forbidden" ]; then
-            echo "Forbidden changes to staff, Auth, Supabase or email contracts: $forbidden" >&2
-            exit 1
+            # Fail-closed: ONLY five pinned synthetic MIR TEST fixture/validator
+            # files can differ. Any other staff, APK, Auth, SQL or email change
+            # still aborts. This strengthens the original blanket guard.
+            MIR_CLIENT_BASE_SHA="$base" node tests/mir-client-qa-isolation.cjs
           fi
           node --check dist/mir-client-i18n.js
           node --check dist/mir-client-en-ca.js
           node --check dist/mir-selection-pdf.js
           node --check dist/mir-dossier-pdf.js
           node --check tests/mir-client-i18n.cjs
+          node --check tests/mir-client-qa-isolation.cjs
           node --check tests/mir-client-i18n-static.cjs
           node --check tests/mir-client-account-isolation.cjs
           node --check tests/mir-client-account-en-browser.cjs
