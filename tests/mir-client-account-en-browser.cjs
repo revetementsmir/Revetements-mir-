@@ -45,7 +45,8 @@ async function setup(browser,viewport={width:390,height:844},initial={},fixtureC
    await page.getByRole('heading',{name:'My account',exact:true}).waitFor();
    assert.equal(await page.locator('html').getAttribute('lang'),'en-CA');
    assert.ok((await page.locator('.customer-account').innerText()).includes('My orders'));
-   assert.ok((await page.locator('.customer-account').innerText()).includes('Order ORDER-client-a'));
+   const accountText=await page.locator('.customer-account').innerText();
+   assert.ok(accountText.includes('Order ORDER-client-a'),'expected localized order title: '+accountText.slice(0,750));
    assert.ok((await page.locator('.customer-account').innerText()).includes('No addresses saved.'));
    assert.ok((await page.locator('body').innerText()).includes('a@example.invalid'));
    const checkoutCart=JSON.stringify({version:1,project:'Maison donnée client',items:[{id:'MIR-QA-1',quantity:2}]});
