@@ -216,7 +216,12 @@
   function localeControl(doc){
     const header=doc.querySelector('header.site-header,header.production-header,header.portal-header');
     if(!header)return;
+    // Harmony moves the original header actions into its collapsed menu.
+    // Place the customer language control inside Harmony's owned title slot so
+    // the control remains visible; do not touch or clone staff navigation.
+    const harmonySlot=customerAccount()?header.querySelector('.mir-harmony-title'):null;
     let group=header.querySelector('.mir-client-locale-switch');
+    if(group&&harmonySlot&&group.parentElement!==harmonySlot)harmonySlot.append(group);
     if(!group){
       const account=header.querySelector('.mir-public-account-avatar, .mir-home-account, .mir-production-client-account');
       const actions=account?.parentElement || header.querySelector('.mir-home-header-actions,.mir-client-actions,.mir-production-client-actions') || header;
@@ -227,7 +232,8 @@
         button.lang=lang;button.textContent=label;button.addEventListener('click',function(){setLocale(lang);});
         group.append(button);
       }
-      if(account&&account.parentElement===actions)actions.insertBefore(group,account);
+      if(harmonySlot)harmonySlot.append(group);
+      else if(account&&account.parentElement===actions)actions.insertBefore(group,account);
       else actions.prepend(group);
     }
     group.setAttribute('aria-label',locale==='en-CA'?'Client website language':'Langue du site client');

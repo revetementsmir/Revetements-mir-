@@ -15,3 +15,20 @@
   body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart{padding-inline:4px!important;font-size:11px!important}
   body.mir-public-navigation header[data-mir-public-shell] .mir-client-locale-switch{margin-inline:0;padding:2px}
 }
+
+/* Client account only: Harmony's closed Menu must never hide FR/EN.
+ * The Harmony title is an owned node; no shared business header is changed. */
+body[data-portal-mode="login"] #mir-harmony-header .mir-harmony-title:has(.mir-client-locale-switch),
+body[data-portal-mode="client"] #mir-harmony-header .mir-harmony-title:has(.mir-client-locale-switch){
+  display:flex;align-items:center;min-width:0;gap:5px;white-space:nowrap
+}
+#mir-harmony-header .mir-harmony-title>.mir-client-locale-switch{
+  margin:0;flex-shrink:0;letter-spacing:normal;font-size:12px
+}
+@media(max-width:760px){
+  body[data-portal-mode="login"] #mir-harmony-header .mir-harmony-title:has(.mir-client-locale-switch),
+  body[data-portal-mode="client"] #mir-harmony-header .mir-harmony-title:has(.mir-client-locale-switch){
+    font-size:0;letter-spacing:0
+  }
+  #mir-harmony-header .mir-harmony-title>.mir-client-locale-switch{font-size:12px}
+}
