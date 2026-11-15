@@ -73,3 +73,40 @@ La couverture complète de tous les parcours FR-CA / EN-CA, documents PDF inspec
 | CI sur tête actuelle | `e2ba08b` : 21 verts, 3 rouges (bilingue PDF, Android TEST, garde chat) | Correctif PDF + test de reproduction poussés sur la branche ensuite. Vérifier les workflows **sur le nouveau SHA**, pas sur une tête antérieure. |
 
 **Interdictions inchangées** : aucune écriture/migration Supabase production, aucun courriel réel, Google/paiement, signature ou distribution APK; Samsung EN ATTENTE. La recette sur appareils physiques et le backend Auth réel ne sont pas remplacés par des simulations. Aucun faux statut « terminé » si la CI finale n'est pas entièrement expliquée et si les PDF mixtes ne sont pas contrôlés dans les deux langues.
+
+
+## Matrice finale ciblée PR41 — reprise MOON du 15 novembre
+
+Cette section est la plus récente : la matrice historique en début de rapport ne doit pas être interprétée comme l'état final. Seuls les contrôles du SHA HEAD exact de PR41 font foi : https://github.com/revetementsmir/Revetements-mir-/pull/41/checks
+
+| Parcours et états FR-CA / EN-CA | Contrôles de preuve et invariant | Limites / dépendances |
+| --- | --- | --- |
+| 13 routes publiques, accueil, réalisations, contact | mir-client-i18n-static.cjs : 837 libellés sur 853 traduits, 16 noms officiels/adresses préservés. mir-client-accessibility-browser.cjs : 13 routes aux 7 largeurs 360/390/430/768/834/1024/1440 | Émulation Chrome, pas certification physique Samsung |
+| Navigation, avatar, bascule et liens profonds | mir-client-i18n-browser.cjs et mir-client-accessibility-browser.cjs : focus clavier, aria-pressed, langues, URL inchangée, menu mobile/tablette, PC, absence barre basse accueil | Aucun faux bouton EN sur site publié |
+| Matériaux, catégories, recherche, fiches produits, couleur, filtre | catalogue.js, commerce.js, suite commerce, Phase 9 et dictionnaire en-CA | SKU, marques, codes et couleurs fabricant officiels non modifiés |
+| Panier, sélection, états vides/erreurs, quantité et dossier | mir-unified-client-dossier.js, mir-account-flow.js, mir-client-unified-bilingual-browser.cjs | Aucun paiement, aucune commande distante ou réécriture des données |
+| Pliage, profil, panneaux et dessin | production.html en mode client et production-model.js, PDF mixte réel, conservation exacte du snapshot et de la géométrie | Production-app/Admin/entrepôt restent français |
+| Studio 3D, plan, import, estimation | plan.html, plan-app.js, estimation.html, mir-estimate.js, tests navigation et erreurs | Soumission distante, PDF fabricant externe et import réel non tous examinés humainement |
+| Compte client, connexion, retour, récupération, commandes, adresses, aide | mir-client-account-en-browser.cjs et mir-client-account-isolation.cjs, SDK de test simulé, employés exclus | Aucun courriel/Auth externe réel, aucune modification d'invitations employé |
+| PDF de sélection matériel, titres, date, unité et avertissements | mir-client-i18n-pdf-browser.cjs : PDF.js télécharge, extrait, rend et compare FR/EN | Aucun prix ou conversion de mesure ajouté |
+| PDF panneau, bon de commande client | mir-client-pdf-bilingual.cjs : même géométrie, quantité et référence; titres et avertissements localisés | Fournisseur et atelier métier inchangés |
+| PDF combiné matériel + pliage, notes et textes multiligne | mir-client-unified-bilingual-browser.cjs : vrais PDF de deux pages, FR et EN, snapshot inchangé; production-model.js traduit le seul avertissement commercial connu **avant** le découpage SVG, jamais les notes saisies | Attendre CI finale exacte pour attester disparition des fragments français |
+| Courriels | mir-client-email-boundary.cjs, mir-client-mail-simulation-browser.cjs : notifications internes et invitation employés rendues avec données fictives, transport absent et fichiers Edge octet-identiques | Modèles courriel Supabase Auth client externes au dépôt; aucun envoi/activation ni écriture production |
+| SEO, imprimés fabricant | Métadonnées clients localisées, robots noindex/nofollow et URL conservées | Aucune nouvelle route/hreflang sans stratégie; document fabricant original intact |
+| Cinq espaces métier et APK | Garde CI FR/EN, vérification de modes staff et tests rôles; aucun fichier métier fonctionnel ni APK source changé | La modification du seul préflight mobile/outils TEST est vérifiée par son blob exact |
+| Clavardage Phase 3A / commerce | mir-chat-phase3a.cjs prouve la parité complète commerce.js vs main 33eacb5 sauf exactement deux lignes de formatage Intl.NumberFormat. Empreinte client revue b33930663305142ec08b3753a4ed47dd5f3e4d0594a84d36bbc74c269e5bae28 | Auth, RLS, RPC, calculs, données et modules chat intacts; contrôle maintenu strict |
+| Android native MIR TEST | verify-pr39-native-fixture.cjs en lecture seule; cinq fichiers sous mobile/supabase autorisés seulement par leurs SHA Git dans mir-client-qa-isolation.cjs | Aucune donnée de production, pointage réel, distribution ou recette Samsung |
+
+### Fixture QA temporaire — preuve et fermeture ciblée
+
+Cible unique du connecteur : projet MIR TEST hxtztkmbfpmzrieccwsg, organisation QA 8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9, job QA 7da20261-1114-4000-8000-000000000001. Au contrôle de lecture précédent : quarts 8900/8910 et 9000/9010 déjà clos, aucun quart actif pour ces deux comptes, aucun objet frais. Jamais réactivés.
+
+Après exécution exclusive de la préparation SQL TEST avec verrou et garde de projet : 2 quarts synthétiques actifs 9100, 2 segments actifs 9110, 1 affectation Chef 9120 et 1 tâche 9130, sur les deux identités QA approuvées. Marqueur : QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL. Aucune écriture de GPS ou punch_action, aucun autre pointage modifié.
+
+Tant que les derniers jobs Android liés à PR41 ne sont pas terminés, conserver ces six objets. Puis utiliser exclusivement les deux scripts pr41-android-native-active-close-20261115.sql et pr41-android-native-chef-today-close-20261115.sql : fermer les segments/quarts exacts sans les effacer, supprimer seulement l'affectation et la tâche fictives si aucun lien réel; vérifier l'absence d'actif après et enregistrer la preuve Atelier. Si une vérification de collision échoue, refuser le nettoyage plutôt que toucher un autre objet.
+
+### Garde de certification / verdict
+
+Le workflow principal conserve un refus de diff pour mobile, Supabase, Auth, espaces métier, courriel et APK. Exception limitée aux **cinq** fichiers synthétiques TEST dont les blobs sont épinglés dans mir-client-qa-isolation.cjs; tout autre fichier reste interdit. La garde de clavardage épingle désormais l'intégralité du fichier client après revue des deux seules lignes de formatage.
+
+Ne pas annoncer EN public ni une certification globale sur la base d'un ancien SHA : les suites documentées, notamment le PDF mixte, chat-security et Android, doivent être vertes sur la tête finale exacte. PR41 demeure brouillon; aucune fusion ni publication; Samsung EN ATTENTE.
