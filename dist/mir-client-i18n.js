@@ -243,6 +243,35 @@
       b.setAttribute('aria-label',b.dataset.mirLocale==='en-CA'?(locale==='en-CA'?'English (Canada), selected':'Anglais canadien'):(locale==='en-CA'?'French (Canada)':'Français canadien, sélectionné'));
     }
   }
+  // Customer-only visual dates: retain server timestamps/status IDs unchanged.
+  // The existing internal/staff date() function is deliberately not modified.
+  function customerDates(doc){
+    if(!customerAccount()||doc.body?.dataset.portalMode!=='client')return;
+    const account=root.MIRPortalActiveClient?.getStatus?.().account;
+    if(!account?.orders?.length)return;
+    const statuses={draft:'Brouillon',validated:'Validée',submitted:'À confirmer',sent:'Envoyée',shipped:'Expédiée',delivered:'Livrée',cancelled:'Annulée'};
+    const fmt=value=>{
+      if(!value)return '';
+      const instant=new Date(value);
+      if(!Number.isFinite(instant.getTime()))return '';
+      return new Intl.DateTimeFormat(locale,{year:'numeric',month:'short',day:'numeric'}).format(instant);
+    };
+    const rows=doc.querySelectorAll('.customer-account .account-order');
+    for(const [index,order]of account.orders.entries()){
+      const card=rows[index];if(!card)continue;
+      const stamp=fmt(order.createdAt),status=locale==='en-CA'
+        ?translate(statuses[order.status]||order.status||'À confirmer','en-CA')
+        :(statuses[order.status]||order.status||'À confirmer');
+      const desc=card.querySelector('p');
+      if(desc&&stamp){const next=stamp+' · '+status;if(desc.textContent!==next)desc.textContent=next;}
+      card.querySelectorAll('li').forEach((item,i)=>{
+        const event=order.events?.[i],dateLabel=fmt(event?.createdAt);if(!dateLabel)return;
+        const label=event.label|| (locale==='en-CA'?'Status updated':'Statut mis à jour');
+        const next=dateLabel+' · '+label;
+        if(item.textContent!==next)item.textContent=next;
+      });
+    }
+  }
   function stopForStaff(){
     locale='fr-CA';const doc=root.document;
     walk(doc.body);metadata(doc);
@@ -253,7 +282,7 @@
     if(!active)return;
     if(staffReady()){stopForStaff();return;}
     const doc=root.document;
-    localeControl(doc);metadata(doc);walk(doc.body);clientLinks(doc);installPdfAdapter();
+    localeControl(doc);metadata(doc);walk(doc.body);customerDates(doc);clientLinks(doc);installPdfAdapter();
   }
   function schedule(){
     if(pending||!active)return;
