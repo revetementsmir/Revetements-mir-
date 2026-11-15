@@ -127,7 +127,14 @@ async function runAt(browser,base,width){
   const first=await doc.getPage(1),second=await doc.getPage(2),v=second.getViewport({scale:.6});
   const canvas=document.createElement('canvas');canvas.width=Math.ceil(v.width);canvas.height=Math.ceil(v.height);
   await second.render({canvasContext:canvas.getContext('2d'),viewport:v}).promise;
-  return {size,pages:doc.numPages,firstText:(await first.getTextContent()).items.map(x=>x.str).join(' '),secondText:(await second.getTextContent()).items.map(x=>x.str).join(' '),preview:canvas.toDataURL('image/png')};
+  const secondItems=(await second.getTextContent()).items;
+  const noteItems=secondItems.filter(item=>/Notes:|à valider\./.test(item.str));
+  const footer=secondItems.find(item=>item.str.includes('Quote request · MIR approval required before fabrication.'));
+  // PDF.js coordinates rise upwards.  The bottom of the last customer note
+  // must remain clearly ABOVE the printed footer line; no clipped text.
+  const noteFooterClearance=footer&&noteItems.length
+    ?Math.min(...noteItems.map(item=>item.transform[5]))-footer.transform[5]:null;
+  return {size,pages:doc.numPages,firstText:(await first.getTextContent()).items.map(x=>x.str).join(' '),secondText:secondItems.map(x=>x.str).join(' '),noteFooterClearance,preview:canvas.toDataURL('image/png')};
  });
  assert.ok(enDetails.size>15000&&enDetails.pages>=2,'real mixed PDF required');
  assert.match(enDetails.firstText,/MATERIALS SELECTION|MIR — Materials/,'English first sheet');
@@ -138,6 +145,7 @@ async function runAt(browser,base,width){
  assert.doesNotMatch(enDetails.secondText,/personnalisée, y compris RAL|exige une soumission|Aucun prix automatique/,'Complete custom-colour quote warning must be English, including wrapped lines');
  assert.match(enDetails.secondText,/No automatic pricing|No automatic price/,'English custom-colour warning is visible');
  assert.ok(enDetails.preview.startsWith('data:image/png;base64,'),'custom piece preview really rasterized');
+ assert.ok(enDetails.noteFooterClearance>=18,'Bilingual PDF must reserve at least 18 pt between customer note and footer, got '+enDetails.noteFooterClearance);
  const enEvent=page.waitForEvent('download');await enLink.click();const enPDF=await enEvent;
  assert.equal(enPDF.suggestedFilename(),'MIR-dossier-complet-Chalet-de-Quebec-en-CA.pdf');
  const enBytes=fs.readFileSync(await enPDF.path());assert.equal(enBytes.subarray(0,5).toString(),'%PDF-');
