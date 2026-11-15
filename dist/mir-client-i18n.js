@@ -26,7 +26,7 @@
     const name=path(file);
     if(!clientFiles.includes(name))return false;
     const params=new URLSearchParams(String(search||'').replace(/^\?/,''));
-    if(name==='chantier.html')return params.get('clientLocale')==='1'&&!params.has('invite')&&!params.has('token');
+    if(name==='chantier.html')return params.get('clientLocale')==='1'&&!params.has('invite')&&!params.has('invitation')&&!params.has('token');
     if(name!=='production.html')return true;
     return params.get('mode')==='client'&&params.get('source')!=='store';
   }

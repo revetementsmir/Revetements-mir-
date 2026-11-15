@@ -20,6 +20,7 @@ assert.equal(i18n.isClient('/chantier.html',''),false);
 assert.equal(i18n.isClient('/chantier.html','?view=account'),false);
 assert.equal(i18n.isClient('/chantier.html','?view=account&clientLocale=1'),true);
 assert.equal(i18n.isClient('/chantier.html','?view=account&clientLocale=1&invite=forbidden'),false);
+assert.equal(i18n.isClient('/chantier.html','?clientLocale=1&invitation=employee-secret'),false);
 for(const page of ['entrepot.html','coordination.html','metres.html'])assert.equal(i18n.isClient('/'+page,'?clientLocale=1'),false);
 assert.equal(i18n.isClient('/production.html','?mode=client&source=store'),false);
 assert.match(fs.readFileSync(path.join(root,'dist/mir-account-flow.js'),'utf8'),/clientAccountURL/);
