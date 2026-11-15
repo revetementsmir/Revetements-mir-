@@ -26,6 +26,10 @@ const GUARDED_TEST_NEW2="return {before,blocked,readOnlyConfigOk,otherFunctionBl
 const GUARDED_TEST_OLD3="assert.deepEqual(state.blocked,[true,true,true,true]);assert(state.xhrBlocked);";
 const GUARDED_TEST_NEW3="assert.deepEqual(state.blocked,[true,true,true,true]);assert.equal(state.readOnlyConfigOk,true,'GET config allowed in MIR TEST only');assert.equal(state.otherFunctionBlocked,true,'other service GET remains blocked');assert(state.xhrBlocked);";
 
+const RELEASE_TRIGGER_PARENT='ee3c832104618b88b1cb688343d81d41d6b354b0';
+const RELEASE_TRIGGER_SUBJECT="ci(pages): include guarded release gate in trigger paths";
+const RELEASE_TRIGGER_OLD_PATHS="'scripts/build-mir-test.cjs', '.github/workflows/pages.yml'";
+const RELEASE_TRIGGER_NEW_PATHS="'scripts/build-mir-test.cjs', 'scripts/mir-final-release-gate.cjs', '.github/workflows/pages.yml'";
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 function check(){
   if(process.env.GITHUB_REF&&process.env.GITHUB_REF!=='refs/heads/main')throw Error('Pages release requires main');
@@ -44,6 +48,20 @@ function check(){
   if(parents.length===3){
     assert.equal(subject,expectedSubject,'exact reviewed final merge only');
     assert.deepEqual(parents,reviewedParents,'no substitute release merge');
+  }else if(subject===RELEASE_TRIGGER_SUBJECT){
+    // A publish-trigger-only continuation of the fully reviewed PR36/PR37
+    // release and its two QA guard repairs. No product or backend files change.
+    assert.equal(parents.length,2,'publish trigger must be one direct child');
+    assert.equal(parents[1],RELEASE_TRIGGER_PARENT,'exact reviewed trigger parent');
+    assert.equal(git('log','-1','--pretty=%s',RELEASE_TRIGGER_PARENT),GUARDED_GET_FIX_SUBJECT);
+    const changed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').split(/\r?\n/).filter(Boolean).sort();
+    assert.deepEqual(changed,['.github/workflows/pages.yml','scripts/mir-final-release-gate.cjs'],'release trigger and gate only');
+    const priorWorkflow=git('show',RELEASE_TRIGGER_PARENT+':.github/workflows/pages.yml');
+    const nowWorkflow=fs.readFileSync('.github/workflows/pages.yml','utf8').trim();
+    assert.equal(priorWorkflow.split(RELEASE_TRIGGER_OLD_PATHS).length,2);
+    assert.equal(nowWorkflow,priorWorkflow.replace(RELEASE_TRIGGER_OLD_PATHS,RELEASE_TRIGGER_NEW_PATHS),'release gate trigger must be the only workflow change');
+    const priorFix=git('rev-list','--parents','-n','1',RELEASE_TRIGGER_PARENT).split(/\s+/);
+    assert.equal(priorFix[1],GUARDED_GET_FIX_PARENT,'read-only TEST QA lineage preserved');
   }else if(subject===GUARDED_GET_FIX_SUBJECT){
     // The previous release QA commit changed only the reviewed isolated TEST
     // read-only config rule, its refusal assertions and this release gate.

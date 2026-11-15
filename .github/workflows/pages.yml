@@ -2,7 +2,7 @@ name: Publier le site principal MIR
 on:
   push:
     branches: [main]
-    paths: ['dist/**', 'tests/**', 'server/**', 'supabase/functions/**', 'scripts/build-mir-test.cjs', '.github/workflows/pages.yml']
+    paths: ['dist/**', 'tests/**', 'server/**', 'supabase/functions/**', 'scripts/build-mir-test.cjs', 'scripts/mir-final-release-gate.cjs', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
