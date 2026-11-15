@@ -55,7 +55,8 @@ check('English PDF heading, filename and warnings without fake checkout',()=>{
  assert.match(en.faces[0].svg,/sq ft/,'English unit label only');
  const enFormatLines=[...en.faces[0].svg.matchAll(/<text x="459"[^>]*>([^<]*)<\/text>/g)].map(match=>match[1]).join(' ');
  assert.match(enFormatLines,/4 × 8 ft/,'English format label only, including PDF word-wrapping');
- assert.match(fr.faces[0].svg,/4 × 8 pi/,'French original unchanged');
+ const frFormatLines=[...fr.faces[0].svg.matchAll(/<text x="459"[^>]*>([^<]*)<\/text>/g)].map(match=>match[1]).join(' ');
+ assert.match(frFormatLines,/4 × 8 pi/,'French original unchanged, including PDF word-wrapping');
  assert.doesNotMatch(en.faces[0].svg,/Projet :|ne constitue PAS une commande|QUANTITÉ|UNITÉ/);
 });
 check('Identical validations fail safely in both locales',()=>{
