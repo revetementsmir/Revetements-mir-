@@ -151,19 +151,20 @@
     revise('mir-request-soffit-staples-1in',{
       name:'PRIME 40713 — Agrafes à soffite 1 po · 5 000/boîte',brand:'PRIME',
       manufacturerReference:'40713',packaging:{piecesPerBox:5000},dimensions:{lengthIn:1},
+      primaryImage:'assets/products/mir-provided-20261111/prime-40713-box.webp',
       notes:['Référence PRIME 40713 confirmée par MIR : 1 po, 5 000 par boîte. Vérifier la compatibilité de l’agrafeuse et la couronne avant préparation.'],
       status:'reference',statusLabel:'Référence MIR',referencePending:false
     });
     revise('mir-request-adfast',{
-      name:'ADSEAL — Lingettes nettoyantes universelles',brand:'Adfast',category:'lames-consommables',
+      name:'ADSEAL — Lingettes nettoyantes universelles · 90/contenant',brand:'Adfast',category:'lames-consommables',
       unit:'contenant',packaging:{piecesPerBox:90},
       sourceUrl:'https://lesideesdepoxy.com/products/lingettes-nettoyantes-universelles-adseal',
-      notes:['Nettoyage des résidus non durcis de scellant, silicone, colle ou mousse. Nombre de lingettes et photo de l’emballage à confirmer avant achat : des contenants ADFAST de 72 existent aussi.'],
-      status:'to_identify',statusLabel:'Emballage à confirmer',referencePending:true
+      notes:['Nettoyage des résidus non durcis de scellant, silicone, colle ou mousse. Fiche fournisseur : contenant de 90 lingettes. Photo exacte de cet emballage à confirmer; ne pas substituer un contenant de 72 lingettes.'],
+      status:'to_identify',statusLabel:'Visuel exact à confirmer',referencePending:true
     });
     const kaycanColorRequests=paletteFor(source,'Kaycan').filter(color=>!/^(noir|blanc)(?:\s|$)/i.test(color.name));
     revise('pending-kaycan-fascia-hex-quarter-inch',{
-      name:'Vis à fascia — 2 po · hex ¼ po · couleur Kaycan',brand:'Kaycan',
+      name:'À confirmer — Vis à fascia 2 po, autres teintes Kaycan',brand:'Kaycan',
       dimensions:{lengthIn:2,hexHeadIn:0.25},
       colorPolicy:kaycanColorRequests.length?'required':'none',colors:kaycanColorRequests,
       colorScope:'manufacturer_request_only',

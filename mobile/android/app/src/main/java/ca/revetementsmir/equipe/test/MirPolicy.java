@@ -33,6 +33,7 @@ public final class MirPolicy {
         try {
             URI u = URI.create(value);
             if (local(value)) return !u.getPath().contains("..") && !u.getPath().contains("\\");
+            if ("https".equals(u.getScheme()) && u.getUserInfo() == null && (u.getPort() == -1 || u.getPort() == 443) && (("geocoding-api.open-meteo.com".equals(u.getHost()) && "/v1/search".equals(u.getPath())) || ("api.open-meteo.com".equals(u.getHost()) && "/v1/forecast".equals(u.getPath())))) return true;
             if (!"https".equals(u.getScheme()) || !TEST_HOST.equals(u.getHost()) || u.getUserInfo() != null || (u.getPort() != -1 && u.getPort() != 443)) return false;
             String path = u.normalize().getPath();
             if (path.startsWith("/rest/v1/rpc/mir_client_") || path.startsWith("/rest/v1/rpc/mir_estimate_")) return false;

@@ -140,3 +140,131 @@ body.mir-public-navigation .mir-public-cart b{
   body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand,
   body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand{width:clamp(96px,30vw,145px)}
 }
+
+
+/* Navigation client maquette2 : un seul accès Compte visible par écran.
+ * L'accueil n'a jamais de barre basse; les pages intérieures la gardent
+ * sur téléphone/tablette. Aucun style global aux cinq espaces métier.
+ */
+body.mir-public-navigation header[data-mir-public-shell]>.mir-client-actions>a.mir-public-account-avatar {
+  display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;
+  width:44px;height:44px;min-width:44px;min-height:44px;padding:0;
+  border:1px solid #738b76;border-radius:50%;background:#f1f5ef;color:#1b3d27;
+  order:99;box-shadow:none;font-size:0;line-height:1;text-decoration:none;
+}
+body.mir-public-navigation header[data-mir-public-shell]>.mir-client-actions>a.mir-public-account-avatar:hover {
+  background:#e3eddc;border-color:#348511;
+}
+body.mir-public-navigation header[data-mir-public-shell]>.mir-client-actions>a.mir-public-account-avatar:focus-visible {
+  outline:3px solid #348511;outline-offset:3px;
+}
+body.mir-public-navigation header[data-mir-public-shell]>.mir-client-actions>a.mir-public-account-avatar svg {
+  display:block;width:23px;height:23px;flex:none;
+}
+body.mir-public-navigation header[data-mir-public-shell]>nav.mir-client-links>a.mir-menu-estimate {
+  display:none!important; /* desktop already has Estimation in header */
+}
+@media(max-width:1100px){
+  body.mir-public-navigation header[data-mir-public-shell]>nav.mir-client-links>a.mir-menu-estimate {
+    display:flex!important; /* Estimation stays available in Plus on phone/tablet */
+  }
+  body.mir-public-navigation.mir-public-home {padding-bottom:0!important}
+  body.mir-public-navigation.mir-public-home .mir-mobile-tabs {display:none!important}
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready {
+    width:calc(100% - 24px);padding-inline:0;gap:5px;
+  }
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-client-menu-toggle {
+    order:2!important;min-width:48px;width:auto;margin-left:auto;padding:7px 9px;
+  }
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions {
+    order:3!important;flex:0 0 auto;width:auto;min-width:0;margin:0;gap:5px;
+  }
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>a.mir-public-account-avatar {
+    display:inline-flex!important;order:99;margin-left:0;
+  }
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart {
+    margin-left:0;padding:6px 9px;min-height:44px;
+  }
+}
+@media(max-width:430px){
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand {
+    width:clamp(95px,27vw,120px);min-width:0;
+  }
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart {
+    font-size:12px;padding-inline:8px;
+  }
+}
+
+/* Same single header action on inner pages (existing rules used to hide it). */
+@media(max-width:1100px){
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>a.mir-home-account.mir-public-account-avatar{
+    display:inline-flex!important;visibility:visible!important;
+    width:44px!important;min-width:44px!important;max-width:44px;
+    padding:0!important;flex:0 0 44px;
+  }
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-menu-toggle{
+    order:2!important;margin-left:auto!important;flex:0 0 auto;
+  }
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions{
+    order:3!important;flex:0 0 auto!important;width:auto!important;min-width:0;
+    margin-left:0!important;gap:5px;
+  }
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart{
+    margin-left:0!important;
+  }
+}
+@media(max-width:430px){
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-menu-toggle{min-width:48px!important;padding-inline:7px!important}
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart{padding-inline:7px!important}
+}
+
+/* Small public header: prevent the legacy two-row grid from pushing the avatar down.
+ * Scoped to client pages; employee/chef/boss/assistant/warehouse remain untouched.
+ */
+@media(max-width:1100px){
+  body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready{
+    display:flex!important;flex-wrap:nowrap!important;align-items:center!important;
+    min-height:64px!important;gap:5px!important;
+  }
+  body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions{
+    display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+    align-items:center!important;justify-content:flex-end!important;grid-template-columns:none!important;
+    order:3!important;flex:0 0 auto!important;width:auto!important;
+    margin-left:0!important;gap:5px!important;
+  }
+  body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-client-menu-toggle{
+    order:2!important;margin-left:auto!important;flex:0 0 auto!important;
+  }
+}
+@media(max-width:760px){
+  body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready{
+    width:calc(100% - 24px)!important;padding:8px 0!important;
+  }
+  body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand,
+  body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand{
+    width:clamp(96px,27vw,118px)!important;flex:0 0 auto!important;
+  }
+}
+
+/* Tablet home: the collapsed Plus menu must not become a phantom footer.
+ * The original hero/cards are unchanged; only the menu's hidden state is fixed.
+ */
+@media(max-width:1100px){
+  body.mir-home-premium.mir-public-navigation header.site-header[data-mir-public-shell]{
+    position:relative;
+  }
+  body.mir-home-premium.mir-public-navigation header.site-header[data-mir-public-shell]>nav.mir-client-links[hidden]{
+    display:none!important;
+  }
+  body.mir-home-premium.mir-public-navigation header.site-header[data-mir-public-shell]>nav.mir-client-links:not([hidden]){
+    position:absolute;inset:100% 12px auto;z-index:52;
+  }
+}
+
+/* Boutique/produit: the common header already exposes Panier + live count.
+ * Only hide the redundant static shortcut after successful JS shell mounting.
+ * Without JavaScript the original shortcut remains as a usable fallback.
+ */
+body.mir-public-navigation.commerce .mir-public-selection-shortcut{
+  display:none;
+}

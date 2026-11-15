@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-11-14T05:30:43.422Z",
+  "checks": 7,
+  "mode": "authenticated HTTP, draft QA orders; no actual shipping",
+  "issueId": "d1f9be39-d3f4-40d9-a057-951374ee677a",
+  "job": "7da20261-1114-4000-8000-000000000002",
+  "orderId": "7da20261-1114-4000-8000-000000000951",
+  "lineId": "7da20261-1114-4000-8000-000000000961",
+  "replaySameId": true,
+  "wrongJobRefused": true,
+  "wrongLineRefused": true,
+  "foreignOrgRefused": true,
+  "canonicalDossierConfirmed": true
+}

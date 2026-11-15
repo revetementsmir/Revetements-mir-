@@ -10,7 +10,9 @@ const compactPanel=matchMedia('(max-width: 600px)');
 const shortPanel=matchMedia('(max-height: 520px) and (min-aspect-ratio: 3/2)');
 // This selects a local catalogue only; it is not authentication or authorization.
 const catalogueChannel=params.get('source')==='store'?'store':'client';
-const KEYS={templates:'mir_production_templates_v1',requests:'mir_production_requests_v1',draft:!client?'mir_production_admin_dossier_v1':catalogueChannel==='store'?'mir_production_employee_dossier_v1':'mir_production_client_dossier_v1'};
+const fieldDrawingContext=(()=>{try{return client&&catalogueChannel==='store'&&window.parent!==window?window.parent.MIRFieldDrawingContext?.():null;}catch(_){return null;}})();
+const fieldPersonal=fieldDrawingContext?.personal===true&&typeof fieldDrawingContext.ownerId==='string';
+const KEYS={templates:'mir_production_templates_v1',requests:'mir_production_requests_v1',draft:!client?'mir_production_admin_dossier_v1':catalogueChannel==='store'?(fieldPersonal?'mir_production_employee_dossier_v1_'+fieldDrawingContext.ownerId+'_'+(fieldDrawingContext.jobId||'unassigned'):'mir_production_employee_dossier_v1'):'mir_production_client_dossier_v1'};
 const unitValue=(mm,unit)=>unit==='mm'?mm:mm/25.4;
 const fmt=value=>finite(value)?String(Math.round(value*10000)/10000):'';
 const uid=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
@@ -27,7 +29,10 @@ let activeDefaultLocks={},M,materials=[],ral={colors:[]},draft,kind=client||para
 let clientStep=1,clientUnlocked=1,clientProfileSelected=false,clientWizardPlaces=[],clientEntry='choice';
 let clientDraftReady=false,legacyQuickId=null;
 let panelSketchPoints=[],panelSketchHover=null,panelSketchBefore=null;
-const clientProfileWizard=()=>client&&catalogueChannel!=='store'&&kind==='profile';
+// The authenticated chantier wrapper reuses this drawing workflow for a personal order.
+// It grants no template authoring capability; standalone store and public routes retain their rules.
+
+const clientProfileWizard=()=>client&&(catalogueChannel!=='store'||fieldPersonal)&&kind==='profile';
 const clientEditableTrace=()=>clientProfileWizard()&&draft?.template==='custom'&&(!editingItemId||existingItem()?.editableTrace===true||existingItem()?.snapshot?.templateId?.startsWith('modele-piece-'));
 const publicProfileMaterials=['aluminium','acier'];
 const publicProfileColors=['manufacturer','special'];
@@ -1370,14 +1375,14 @@ function addPiece(){
  if(!old)nextOrder.nextNumber=(order.nextNumber||1)+1;
  if(!store(KEYS.draft,{version:1,order:nextOrder}))return;
  order=nextOrder;
- if(client&&kind==='profile')window.MIRUnifiedOrderCart?.upsert?.({id:`fold:${result.item.id}`,kind:'fold',quantity:result.item.spec.quantity,snapshot:copy(result.item.snapshot),line:{itemId:selectedTemplate?.id||result.item.snapshot?.templateId||result.item.id,name:result.model.name||'Pliage sur mesure',brand:'Atelier MIR',unit:'pièce',quantity:result.item.spec.quantity,dimensionsIn:copy(result.item.snapshot?.values?.measurements||{}),colorId:result.item.spec.finish?.code||'',specification:{kind:'fold',templateSnapshot:copy(result.item.snapshot?.templateSnapshot),instanceSnapshot:copy(result.item.snapshot)}}});
+ if(client&&kind==='profile')window.MIRUnifiedOrderCart?.upsert?.({id:`fold:${fieldPersonal?fieldDrawingContext.ownerId+':'+(fieldDrawingContext.jobId||'unassigned')+':':''}${result.item.id}`,kind:'fold',...(fieldPersonal?{ownerId:fieldDrawingContext.ownerId,jobId:fieldDrawingContext.jobId||''}:{}),quantity:result.item.spec.quantity,snapshot:copy(result.item.snapshot),line:{itemId:selectedTemplate?.id||result.item.snapshot?.templateId||result.item.id,name:result.model.name||'Pliage sur mesure',brand:'Atelier MIR',unit:'pièce',quantity:result.item.spec.quantity,dimensionsIn:copy(result.item.snapshot?.values?.measurements||{}),colorId:result.item.spec.finish?.code||'',specification:{kind:'fold',templateSnapshot:copy(result.item.snapshot?.templateSnapshot),instanceSnapshot:copy(result.item.snapshot)}}});
  if(clientProfileWizard()&&legacyQuickId){
   const oldQuick=read('mir-bending-v1',null);
   if(oldQuick?.version===1&&Array.isArray(oldQuick.items)){oldQuick.items=oldQuick.items.filter(item=>item.id!==legacyQuickId);store('mir-bending-v1',oldQuick);}
   legacyQuickId=null;
  }
  editingItemId=null;
- if(clientProfileWizard()){choose('profile','l');goClientStep(1);dialog('Pliage ajouté','Il reste dans votre commande pendant la suite du parcours.',`<div class="dialog-actions stacked"><button type="button" class="secondary-button" data-close-production-dialog>Choisir dans la banque de pliages</button><button type="button" class="secondary-button" data-new-client-custom>Ajouter un pliage sur mesure</button><a class="primary-button" href="chantier.html?view=orders">Vérifier ma commande</a></div>`);const choices=$('#production-dialog');choices.close();choices.show();}
+ if(clientProfileWizard()){choose('profile','l');goClientStep(1);dialog('Pliage ajouté','Il reste dans votre commande pendant la suite du parcours.',`<div class="dialog-actions stacked"><button type="button" class="secondary-button" data-close-production-dialog>Choisir dans la banque de pliages</button><button type="button" class="secondary-button" data-new-client-custom>Ajouter un pliage sur mesure</button><a class="primary-button" href="chantier.html?view=orders">Vérifier ma commande</a></div>`);const choices=$('#production-dialog');if(!fieldPersonal){choices.close();choices.show();}}
  else {renderOrder();renderFormMetadata();updateDrawing();}
  toast(old?'Nouvelle révision enregistrée. La version précédente reste conservée.':id+(client?' ajouté au dossier.':order.poNumber?' ajouté au bon.':' enregistré dans le dossier local.'));
 }

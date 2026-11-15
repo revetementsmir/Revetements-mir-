@@ -20,7 +20,7 @@ try{restoreStyles=isolatePageStyles();}catch(error){document.body.append(page);c
 document.body.removeAttribute('style');
 const css=document.createElement('style');css.textContent=`
   .mir-live-viewport{width:100%;height:100%;container:mir-page/size;overflow:hidden;transform:translateZ(0);background:white;color:#26332b}
-  .ap-device-content.mir-live-viewport{height:auto;container-name:mir-page}
+  .ap-device-content.mir-live-viewport{height:100%;min-height:0;container-name:mir-page}
   [data-mir-responsive-page]{position:relative;isolation:isolate;min-height:100%;width:100%;font:16px/1.5 Arial,sans-serif}
   .mir-live-viewport>[data-mir-responsive-page]{height:100%;overflow:auto;overscroll-behavior:contain}
   html[data-preview-workspace] .web-document{padding:0!important;overflow:hidden!important}

@@ -1,0 +1,142 @@
+{
+  "project": "hxtztkmbfpmzrieccwsg",
+  "verifiedAt": "2026-11-14T13:05:30Z",
+  "localMigration": "supabase/test-only/migrations/20261114130418_mir_chantier_punch_receipts_test.sql",
+  "migrationSHA256": "f72b0ba991dcca84d3a6e3d8f61c5c7cf2f87459b4e7da7765027b7c03f4171d",
+  "hostedMigrationVersion": "20261114130509",
+  "installed": true,
+  "checks": [
+    {
+      "proof": {
+        "mode": "authenticated SQL claims; transaction rolled back; no physical GPS",
+        "sameReceipt": true,
+        "firstReceipt": {
+          "ok": true,
+          "zone": "unavailable",
+          "shiftId": "7da20261-1114-4000-8100-000000000001",
+          "serverAt": "2026-11-14T13:05:25.523735+00:00",
+          "distanceM": null,
+          "segmentId": "743b4d72-29d6-4c99-ae93-9da9217548f2"
+        },
+        "sameDayStart": true,
+        "changedIntentionRefused": true
+      },
+      "before": {
+        "audit": 0,
+        "events": 0,
+        "segments": 1
+      },
+      "inside_transaction": {
+        "audit": 1,
+        "events": 1,
+        "segments": 2,
+        "receiptCount": 1,
+        "sameBoundary": true
+      }
+    }
+  ],
+  "afterRollback": [
+    {
+      "result": {
+        "rls": true,
+        "rpc": "mir_field_punch_action(uuid,uuid,text,uuid,jsonb)",
+        "qaActive": [
+          {
+            "jobId": "7da20261-1114-4000-8000-000000000001",
+            "endedAt": null,
+            "shiftId": "7da20261-1114-4000-8100-000000000001",
+            "segmentId": "7da20261-1114-4000-8200-000000000001"
+          },
+          {
+            "jobId": "7da20261-1114-4000-8000-000000000001",
+            "endedAt": null,
+            "shiftId": "7da20261-1114-4000-8100-000000000002",
+            "segmentId": "7da20261-1114-4000-8200-000000000002"
+          }
+        ],
+        "chefEvents": 3,
+        "searchPath": [
+          "search_path=pg_catalog, mir_core"
+        ],
+        "anonExecute": false,
+        "employeeAudit": 0,
+        "probeReceipts": 0,
+        "employeeEvents": 0,
+        "authenticatedExecute": true,
+        "authenticatedTableSelect": false
+      }
+    }
+  ],
+  "securityAdvisors": {
+    "before": [
+      {
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "count": 95,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+      },
+      {
+        "name": "function_search_path_mutable",
+        "level": "WARN",
+        "count": 1,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable"
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "level": "WARN",
+        "count": 5,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable"
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "level": "WARN",
+        "count": 157,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "level": "WARN",
+        "count": 1,
+        "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+      }
+    ],
+    "after": [
+      {
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "count": 96,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+      },
+      {
+        "name": "function_search_path_mutable",
+        "level": "WARN",
+        "count": 1,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable"
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "level": "WARN",
+        "count": 5,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable"
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "level": "WARN",
+        "count": 158,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "level": "WARN",
+        "count": 1,
+        "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+      }
+    ],
+    "interpretation": "The additive table intentionally has RLS and no client grants/policies; only the authorized SECURITY DEFINER RPC can access it. Its execution grant is authenticated only, with exact TEST issuer, active membership and field capability checks; fixed search_path. Other warnings pre-existed; Auth settings were preserved."
+  },
+  "limits": [
+    "SQL role authenticated with controlled claims, not a browser login or physical GPS.",
+    "Switch and replay executed in one transaction then ROLLBACK; no persistent Punch event/segment/audit from the probe.",
+    "The two synthetic active fixtures remain available until the final native CI then will be closed by the explicit guarded cleanup. No employee physical attendance is claimed."
+  ]
+}
