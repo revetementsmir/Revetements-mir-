@@ -12,6 +12,7 @@ on:
       - 'tests/mir-client-i18n*.cjs'
       - 'tests/mir-client-account-isolation.cjs'
       - 'tests/mir-client-account-en-browser.cjs'
+      - 'tests/mir-client-unified-bilingual-browser.cjs'
       - 'tests/mir-client-pdf-bilingual.cjs'
       - 'tests/mir-client-i18n-pdf-browser.cjs'
       - 'docs/verification/client-localisation-20261115.md'
@@ -53,6 +54,7 @@ jobs:
           node --check tests/mir-client-i18n-static.cjs
           node --check tests/mir-client-account-isolation.cjs
           node --check tests/mir-client-account-en-browser.cjs
+          node --check tests/mir-client-unified-bilingual-browser.cjs
           node --check tests/mir-client-i18n-browser.cjs
           node --check tests/mir-client-pdf-bilingual.cjs
           node --check tests/mir-client-i18n-pdf-browser.cjs
@@ -82,6 +84,10 @@ jobs:
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
         run: node tests/mir-client-i18n-pdf-browser.cjs
+      - name: Full mixed cart and bending PDF in FR-CA / EN-CA
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-client-unified-bilingual-browser.cjs
       - name: Attach comparable browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -92,5 +98,7 @@ jobs:
             docs/verification/account/bilingual-client-account-*.png
             artifacts/mir-customer-pdf-*.png
             artifacts/MIR-*selection*.pdf
+            artifacts/mir-dossier-mixte-EN-*.pdf
+            artifacts/mir-dossier-mixte-EN-*.png
           if-no-files-found: warn
           retention-days: 14
