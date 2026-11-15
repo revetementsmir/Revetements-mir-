@@ -7,9 +7,11 @@ const source=fs.readFileSync(path.resolve(__dirname,'../dist/mir-estimate-config
 const load=search=>{const context={window:{},location:{search},URLSearchParams,Object};vm.runInNewContext(source,context);return context.window.MIREstimateConfig;};
 const production=load('');
 assert.equal(production.environment,'production');
-assert.equal(production.apiBase,'https://gccltmaulvrnthrbnrpd.supabase.co/functions/v1/mir-estimates');
+assert.equal(production.apiBase,'','production estimate send remains disabled until explicit backend authorization');
 const test=load('?recette=1');
 assert.equal(test.environment,'test');
 assert.equal(test.apiBase,'https://hxtztkmbfpmzrieccwsg.supabase.co/functions/v1/mir-estimates');
+const hosted={window:{},location:{hostname:'revetementsmir.github.io',pathname:'/Revetements-mir-/estimation.html',search:'?recette=1'},URLSearchParams,Object};
+vm.runInNewContext(source,hosted);assert.equal(hosted.window.MIREstimateConfig.environment,'production');assert.equal(hosted.window.MIREstimateConfig.apiBase,'');
 assert.deepEqual(Object.keys(production).sort(),['apiBase','environment']);
 console.log('PASS configuration Estimation P0: production et recette TEST explicites, sans secret ni appel réseau');
