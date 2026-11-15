@@ -35,6 +35,7 @@ jobs:
           node --test tests/mir-samsung-contracts.cjs
           node tests/mir-samsung-fixture.cjs
           node tests/mir-pr39-native-fixture.cjs
+          node tests/mir-pr39-native-chef-fixture.cjs
           node --test mobile/tools/test-pr39-native-fixture.cjs
           node tests/mir-punch-receipts-postgres.cjs
           node tests/mir-punch-receipts-client.cjs
