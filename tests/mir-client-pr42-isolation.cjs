@@ -22,6 +22,7 @@ const allowed=new Set([
  'supabase/test-only/README.md',
  'supabase/test-only/migrations/20261115235000_mir_native_qa_run_lease_test.sql',
  'tests/mir-client-pr42-isolation.cjs',
+ 'tests/mir-client-account-isolation.cjs',
  'tests/mir-mail-recipe-offline.cjs',
  'tests/mir-native-qa-sql-guards.cjs',
  'tests/mir-studio-public-browser.cjs',
