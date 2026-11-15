@@ -16,18 +16,19 @@
   const clientFiles=Object.freeze([
     'index.html','boutique.html','materiaux.html','produit.html','selection.html',
     'pliage.html','contact.html','realisations.html','plan.html','production.html',
-    'estimation.html','estimation-dossier.html','studio.html'
+    'estimation.html','estimation-dossier.html','studio.html','chantier.html'
   ]);
   const dict=root?.MIRClientEnglish || (typeof module==='object'&&module.exports?require('./mir-client-en-ca.js'):{});
-  const sources=new WeakMap(),attributes=new WeakMap();
+  const sources=new WeakMap(),attributes=new WeakMap(),hrefSources=new WeakMap();
   let locale='fr-CA',active=false,observer=null,pending=false;
   const path=(href)=>String(href||'').split(/[?#]/)[0].split('/').pop()||'index.html';
   function isClient(file,search=''){
     const name=path(file);
     if(!clientFiles.includes(name))return false;
-    if(name!=='production.html')return true;
     const params=new URLSearchParams(String(search||'').replace(/^\?/,''));
-    return params.get('mode')==='client' && params.get('source')!=='store';
+    if(name==='chantier.html')return params.get('clientLocale')==='1'&&!params.has('invite')&&!params.has('token');
+    if(name!=='production.html')return true;
+    return params.get('mode')==='client'&&params.get('source')!=='store';
   }
   function getLocale(){return locale;}
   function translate(value,lang=locale){
@@ -46,6 +47,14 @@
     if(m)return m[1]+' of '+m[2];
     m=value.match(/^(\d+) pièce(?:s)? sur mesure$/);
     if(m)return m[1]+' custom '+(m[1]==='1'?'piece':'pieces');
+    m=value.match(/^(\d+) commandes? dans le suivi\.$/);
+    if(m)return m[1]+' '+(m[1]==='1'?'order':'orders')+' being tracked.';
+    m=value.match(/^(\d+) adresses? enregistrées?\.$/);
+    if(m)return m[1]+' '+(m[1]==='1'?'saved address.':'saved addresses.');
+    m=value.match(/^Commande ([A-Za-z0-9_-]{1,100})$/);
+    if(m)return 'Order '+m[1];
+    m=value.match(/^Connecté avec (.+)\. Aucune commande n’a été envoyée\.$/);
+    if(m)return 'Signed in as '+m[1]+'. No order has been submitted.';
     return value;
   }
   function number(value,lang=locale,options={}){
@@ -88,6 +97,28 @@
     updateAttributes(node);
     for(let child=node.firstChild;child;child=child.nextSibling)walk(child);
   }
+  function customerAccount(){return path(root?.location?.pathname)==='chantier.html';}
+  function staffReady(){
+    if(!customerAccount())return false;
+    const phase=root.MIRPortalActiveClient?.getStatus?.().phase;
+    const mode=root.document?.body?.dataset.portalMode||'login';
+    return phase==='ready'||(mode!=='login'&&mode!=='client'&&mode!=='loading');
+  }
+  function clientLinks(doc){
+    if(customerAccount())return;
+    for(const link of doc.querySelectorAll('a[href]')){
+      if(link.closest('[data-mir-user-content]'))continue;
+      const href=link.getAttribute('href')||'';
+      let saved=hrefSources.get(link);
+      if(!saved||saved.last!==href){saved={original:href,last:href};hrefSources.set(link,saved);}
+      if(!/^chantier\.html(?:[?#]|$)/.test(saved.original))continue;
+      const parts=saved.original.split('#'),url=new URL(parts[0],root.location.href);
+      if(locale==='en-CA')url.searchParams.set('clientLocale','1');
+      else url.searchParams.delete('clientLocale');
+      const next=url.pathname.split('/').pop()+(url.search||'')+(parts[1]?'#'+parts[1]:'');
+      if(href!==next){saved.last=next;link.setAttribute('href',next);}
+    }
+  }
   function metadata(doc){
     const title=doc.querySelector('title'),desc=doc.querySelector('meta[name="description"]');
     if(title)walk(title);
@@ -95,7 +126,7 @@
     doc.documentElement.lang=locale;
   }
   function localeControl(doc){
-    const header=doc.querySelector('header.site-header,header.production-header');
+    const header=doc.querySelector('header.site-header,header.production-header,header.portal-header');
     if(!header)return;
     let group=header.querySelector('.mir-client-locale-switch');
     if(!group){
@@ -118,10 +149,17 @@
       b.setAttribute('aria-label',b.dataset.mirLocale==='en-CA'?(locale==='en-CA'?'English (Canada), selected':'Anglais canadien'):(locale==='en-CA'?'French (Canada)':'Français canadien, sélectionné'));
     }
   }
+  function stopForStaff(){
+    locale='fr-CA';const doc=root.document;
+    walk(doc.body);metadata(doc);
+    doc.querySelector('.mir-client-locale-switch')?.remove();
+    observer?.disconnect();observer=null;active=false;
+  }
   function render(){
     if(!active)return;
+    if(staffReady()){stopForStaff();return;}
     const doc=root.document;
-    localeControl(doc);metadata(doc);walk(doc.body);
+    localeControl(doc);metadata(doc);walk(doc.body);clientLinks(doc);
   }
   function schedule(){
     if(pending||!active)return;
@@ -138,7 +176,7 @@
   }
   function init(win){
     if(active)return true;
-    if(!win||!isClient(win.location.pathname,win.location.search))return false;
+    if(!win||!isClient(win.location.pathname,win.location.search)||staffReady())return false;
     // A complete English release requires separate coverage, PDF and visual certification.
     // The preview is isolated to the unpublished feature branch until the coverage gate is lifted.
     const requested=new URLSearchParams(win.location.search).get('mir-locale-preview')==='1';
@@ -153,7 +191,7 @@
       if(!active)return;
       if(records.some(r=>r.type==='characterData'||r.addedNodes?.length||r.removedNodes?.length))schedule();
     });
-    observer.observe(win.document.body,{subtree:true,childList:true,characterData:true});
+    observer.observe(win.document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['data-portal-mode','placeholder','aria-label','aria-description','title']});
     return true;
   }
   return Object.freeze({version:'0.1.0-draft',isClient,getLocale,setLocale,translate,number,cad,date,init,render,KEY});
