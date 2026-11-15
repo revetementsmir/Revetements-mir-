@@ -75,7 +75,9 @@ test('PDF chat utilise la passerelle et reste interdit aux autres scopes',async 
 });
 test('modules protégés inchangés; cartes Aujourd’hui et fonctions Punch conservées',()=>{
  const baseline=require('./fixtures/mir-chat-baseline.json'),hash=x=>createHash('sha256').update(x).digest('hex');
- for(const [file,value]of Object.entries(baseline.files))assert.equal(hash(fs.readFileSync(file)),value,file);
+ // Only the reviewed TEST configuration delta overrides the historical file pin.
+ const reviewed=require('./fixtures/mir-employee-auth-reviewed.json');
+ for(const [file,value]of Object.entries(baseline.files))assert.equal(hash(fs.readFileSync(file)),reviewed.files[file]||value,file);
  const beck=require('./fixtures/mir-chat-main-215259.json');
  const approvedProtectedChanges={
   'dist/catalogue-fd6866b49d21.json':'a08b9bf28abba1f286d0854690ae4979eaaa723a3fe04eb86a75dffc82efdc63',

@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class MirRealRolesTest extends MirDeviceSetup {
  private Object js(ActivityScenario<MainActivity>s,String expression)throws Exception{CountDownLatch done=new CountDownLatch(1);String[] value={null};s.onActivity(a->a.getBridge().getWebView().evaluateJavascript(expression,r->{value[0]=r;done.countDown();}));assertTrue(done.await(10,TimeUnit.SECONDS));return value[0]==null||value[0].equals("null")?null:new JSONTokener(value[0]).nextValue();}
- private void waitFor(ActivityScenario<MainActivity>s,String expression)throws Exception{long end=SystemClock.uptimeMillis()+30000;while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(s,expression)))return;SystemClock.sleep(150);}fail("MIR TEST Android : résultat serveur non confirmé");}
+ private void waitFor(ActivityScenario<MainActivity>s,String expression)throws Exception{long end=SystemClock.uptimeMillis()+30000;while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(s,expression)))return;SystemClock.sleep(150);}screenshotSystem("failed-real-roles");fail("MIR TEST Android : résultat serveur non confirmé; état="+js(s,"JSON.stringify({proof:window.realProof,code:window.realProofCode,phase:MIRPortalActiveClient?.getStatus().phase,error:MIRPortalActiveClient?.getStatus().error?.code,online:navigator.onLine,project:MIRPortalConfig.projectRef})"));}
  private void screenshot(ActivityScenario<MainActivity>s,String name)throws Exception{
   // Wait for the rendered WebView frame, not only a changed DOM attribute.
   CountDownLatch drawn=new CountDownLatch(1);
@@ -44,22 +44,22 @@ public class MirRealRolesTest extends MirDeviceSetup {
   // survives relocation or late insertion into the shared header.
   waitFor(s,"[...document.querySelectorAll('#mir-harmony-menu a[href]')].every(a=>MIRAndroid.Policy.allowedRoute(a.href,location.origin)||!a.getClientRects().length)");
   assertEquals(Boolean.TRUE,js(s,"[...document.querySelectorAll('#portal-navigation button')].some(b=>b.getClientRects().length)"));
-  screenshot(s,"v110002-"+role+"-menu");
+  screenshot(s,"v120006-"+role+"-menu");
   js(s,"document.querySelector('.mir-harmony-toggle').click();scrollTo(0,0);true");
-  screenshot(s,"v110002-"+role+"-home");
+  screenshot(s,"v120006-"+role+"-home");
   js(s,"document.querySelector('[data-view=settings]').click();true");
   waitFor(s,"!!document.querySelector('#harmony-settings-form') && document.querySelector('.settings-status')?.textContent==='Enregistré dans votre compte MIR'");
-  js(s,"scrollTo(0,0);true");screenshot(s,"v110002-"+role+"-settings");
+  js(s,"scrollTo(0,0);true");screenshot(s,"v120006-"+role+"-settings");
   if(role.equals("employe")){
    js(s,"document.querySelector('.mir-harmony-toggle').click();document.querySelector('#portal-navigation [data-view=account]').click();document.querySelector('[data-view=absences]').click();true");
    waitFor(s,"!!document.querySelector('#absence-draft-form textarea[name=note]')");
-   js(s,"scrollTo(0,0);true");screenshot(s,"v110002-employee-absence-form");
+   js(s,"scrollTo(0,0);true");screenshot(s,"v120006-employee-absence-form");
    js(s,"(()=>{const n=document.querySelector('#absence-draft-form textarea[name=note]');n.value='RECETTE-PHASE11-VISUEL-LOCAL';n.dispatchEvent(new Event('input',{bubbles:true}));n.scrollIntoView({block:'center'});})()");
    assertEquals("RECETTE-PHASE11-VISUEL-LOCAL",js(s,"document.querySelector('#absence-draft-form textarea[name=note]').value"));
-   screenshot(s,"v110002-employee-local-note");
+   screenshot(s,"v120006-employee-local-note");
    androidx.test.uiautomator.UiDevice device=androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());device.pressBack();
    androidx.test.uiautomator.UiObject2 cancel=device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.res("android:id/button2")),5000);
-   assertNotNull("Android back requires confirmation for local input",cancel);screenshotSystem("v110002-employee-back-confirmation");cancel.click();
+   assertNotNull("Android back requires confirmation for local input",cancel);screenshotSystem("v120006-employee-back-confirmation");cancel.click();
    assertEquals("RECETTE-PHASE11-VISUEL-LOCAL",js(s,"document.querySelector('#absence-draft-form textarea[name=note]').value"));
    // No submit, save, upload or preference change; the ordinary sign-out follows.
   }
@@ -79,7 +79,7 @@ public class MirRealRolesTest extends MirDeviceSetup {
      waitFor(s,"window.realProof==='42501'");
      assertNotEquals("ready",js(s,"MIRPortalActiveClient.getStatus().phase"));assertEquals(Boolean.TRUE,js(s,"document.querySelector('#account-bar').hidden"));
     }else{
-     js(s,"window.realProof='pending';MIRPortalActiveClient.signInPassword("+email+","+password+").then(()=>window.realProof='ready').catch(()=>window.realProof='error');true");waitFor(s,"window.realProof==='ready' && MIRPortalActiveClient.getStatus().phase==='ready'");
+     js(s,"window.realProof='pending';MIRPortalActiveClient.signInPassword("+email+","+password+").then(()=>window.realProof='ready').catch(e=>{window.realProofCode=e.code||'unknown';window.realProof='error';});true");waitFor(s,"window.realProof==='ready' && MIRPortalActiveClient.getStatus().phase==='ready'");
      assertEquals("ready",js(s,"MIRPortalActiveClient.getStatus().phase"));assertEquals(role.getString("role"),js(s,"MIRPortalActiveClient.getStatus().snapshot.operations.role"));
      String label=role.getString("role").equals("employe")?"Employé chantier":role.getString("role").equals("chef_equipe")?"Chef d’équipe":role.getString("role").equals("warehouse")?"Entrepôt et livraison":role.getString("role").equals("assistant")?"Adjointe":"Boss";
      waitFor(s,"document.body.dataset.portalConnection==='connected'");assertEquals(label,js(s,"document.querySelector('#account-role').textContent"));assertEquals(Boolean.TRUE,js(s,"document.querySelector('#portal-content').children.length>0"));

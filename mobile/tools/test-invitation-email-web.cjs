@@ -1,0 +1,6 @@
+'use strict';
+const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+(async()=>{const root=path.resolve(__dirname,'../../artifacts/employee-auth-audit/email');const html=fs.readFileSync(path.join(root,'preview.html'),'utf8');const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium',args:['--no-sandbox']});try{
+ for(const width of [390,834,1440])for(const colorScheme of ['light','dark']){const page=await browser.newPage({viewport:{width,height:1000},colorScheme});const requests=[];await page.route('**/*',r=>{requests.push(r.request().url());return r.abort();});await page.setContent(html);assert.equal(await page.locator('h1').innerText(),'Votre accès personnel');assert.equal(await page.locator('.cta').getAttribute('href'),'https://example.invalid/activation');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(requests,[]);await page.screenshot({path:path.join(root,`${width}-${colorScheme}.png`),fullPage:true});await page.close();}
+ console.log('PASS courriel fictif HTML, 3 formats × clair/sombre, aucune ressource externe ni envoi.');
+}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

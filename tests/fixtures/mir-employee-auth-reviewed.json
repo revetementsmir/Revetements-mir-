@@ -1,0 +1,8 @@
+{
+  "sourceCommit": "b0f6b1330366c5488e0a2c5c9e47341ea0e4be16",
+  "reason": "Revue du 15 novembre 2026 : configuration Auth sécurisée confirmée : signup, Google, courriel, invitations et documents désactivés en production. ?recette=1 sur le domaine public n'active pas MIR TEST; les invitations TEST sont réservées à /test/ ou localhost. Empreinte complète actualisée après audit, sans neutraliser l'assertion. Révocation des blobs, Punch, Aujourd'hui et autres modules conservés. Vérifier les contrats de séparation TEST/PRODUCTION et la garde Pages.",
+  "files": {
+    "dist/portal-client.js": "792e02d328ed43fdd8c80c648cf4b2abd91d50375dbe5cf313f8d20350f93e10",
+    "dist/portal-config.js": "460336c78e21064276a4f7152490be82f654ab83aa34506cbe3e9e483518c204"
+  }
+}

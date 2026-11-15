@@ -41,25 +41,11 @@ test('Punch, client RPC et modules validés préservés depuis main',()=>{
  const base=require('./fixtures/mir-today-baseline.json'),hash=s=>createHash('sha256').update(s).digest('hex');
  for(const [file,expected]of Object.entries(base.files)){
   let source=fs.readFileSync(file,'utf8');
-  // Phase3A's explicitly bounded chat API/upload and three blob-revocation hooks
-  // are tested separately. All non-chat client bytes remain pinned to Phase2.
-  if(file==='dist/portal-client.js'){
-   assert.equal((source.match(/^      revokeChatURLs\(\);$/gm)||[]).length,3);
-   source=source
-   .replace(/    \/\/ Phase3A chat API begin\.[\s\S]*?    \/\/ Phase3A chat API end\.\n/,'')
-   .replace(/    \/\/ Phase3C help\/support API begin\.[\s\S]*?    \/\/ Phase3C help\/support API end\.\n/,'')
-   .replace(/    \/\/ Phase8 Harmony settings API begin\.[\s\S]*?    \/\/ Phase8 Harmony settings API end\.\n/,'')
-   .replace(/      \/\/ Phase3A chat upload begin\.[\s\S]*?      \/\/ Phase3A chat upload end\.\n/,'')
-   .replaceAll('      revokeChatURLs();\n','')
-   .replace(/if\(String\(path\)\.split\('\/'\)\[1\]==='message'\)return chat(?:Photo|File)URL\(path\);/,'')
-   .replace("const mime=String(file?.type||'').toLowerCase(),extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif',...(scope==='message'?{'application/pdf':'pdf'}:{})};","const mime=String(file?.type||'').toLowerCase(),extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif'};")
-   .replace("if(!extensions[mime]||!file.size||file.size>10*1024*1024)fail('UPLOAD_INVALID',scope==='message'?'Utilisez une photo ou un PDF de 10 Mo maximum.':'Utilisez une photo JPG, PNG, WebP ou HEIC de 10 Mo maximum.');","if(!extensions[mime]||!file.size||file.size>10*1024*1024)fail('UPLOAD_INVALID','Utilisez une photo JPG, PNG, WebP ou HEIC de 10 Mo maximum.');")
-   .replace("['private','team','job']","['private','team']")
-   .replace(/      chatConversations, chatMessages, chatSearch, validateMessageAttachment, ackChatMessage, (?:chatFileURL, )?chatPhotoURL,\n/,'')
-   .replace(/      helpFAQ, supportSnapshot, supportAction, supportUpload, supportFileURL,\n/,'');
-   source=source.replace(',syncHarmonySettings().catch(()=>0)','').replace(';syncHarmonySettings().catch(()=>{})','').replace(', harmonySettings, syncHarmonySettings','');
-  }
-  assert.equal(hash(source),expected,file);
+  // Pin the complete reviewed Auth client instead of normalizing away additions.
+  // Historical baseline remains intact; all other files/function hashes still apply.
+  const reviewed=require('./fixtures/mir-employee-auth-reviewed.json');
+  if(file==='dist/portal-client.js')assert.equal((source.match(/^      revokeChatURLs\(\);(?:internalOrg=null;)?$/gm)||[]).length,3,'all three private-blob revocation hooks retained');
+  assert.equal(hash(source),reviewed.files[file]||expected,file);
  }
  const after=fs.readFileSync('dist/chantier-app.js','utf8');
  for(const name of ['punchCard','renderPunchHours','punchCorrectionDialog','punchDecisionDialog','renderWarehouse','renderManagement']){

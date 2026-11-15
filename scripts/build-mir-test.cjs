@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
 const TEST='hxtztkmbfpmzrieccwsg',PROD='gccltmaulvrnthrbnrpd';
-function build(source,target,revision,{configFile,guardFile}={}){
+function build(source,target,revision,{configFile,guardFile,employeeAuth=false}={}){
  source=path.resolve(source);target=path.resolve(target);
  if(!/^[a-f0-9]{40}$/.test(revision)||source===target||fs.existsSync(target))throw Error('A new target and an exact revision are required');
  const context={window:{},location:{search:'?recette=1'},URLSearchParams};vm.runInNewContext(fs.readFileSync(configFile||path.join(source,'portal-config.js'),'utf8'),context);
@@ -11,7 +11,7 @@ function build(source,target,revision,{configFile,guardFile}={}){
  for(const entry of entries){if(entry==='test')continue;fs.cpSync(path.join(source,entry),path.join(target,entry),{recursive:true});}
  if(guardFile)fs.copyFileSync(guardFile,path.join(target,'mir-test-guard.js'));
  const callback=config.callbackPath.replace(/\/[^/]+$/,'/test/chantier.html');
- const portal={...config,environment:'test',projectRef:TEST,supabaseUrl:`https://${TEST}.supabase.co`,callbackPath:callback,emailEnabled:false,googleEnabled:false,signupEnabled:false,invitationsEnabled:false,manualInvitations:false};
+ const portal={...config,environment:'test',projectRef:TEST,supabaseUrl:`https://${TEST}.supabase.co`,callbackPath:callback,emailEnabled:false,googleEnabled:false,signupEnabled:false,invitationsEnabled:employeeAuth===true,teamInvitationsEnabled:employeeAuth===true,teamEnrollmentEnabled:employeeAuth===true,manualInvitations:employeeAuth===true};
  const write=(name,global,value)=>fs.writeFileSync(path.join(target,name),`window.${global}=Object.freeze(${JSON.stringify(value)});\n`);
  write('portal-config.js','MIRPortalConfig',portal);
  write('shared-config.js','MIRSharedConfig',{enabled:true,environment:'test',supabaseUrl:portal.supabaseUrl,publishableKey:portal.publishableKey});
@@ -29,7 +29,7 @@ function productionManifest(directory,revision){
  visit(directory);return {environment:'production',revision,files};
 }
 function writeProductionManifest(directory,revision){const manifest=productionManifest(directory,revision);fs.writeFileSync(path.join(directory,'mir-production-release.json'),JSON.stringify(manifest,null,2)+'\n');return manifest;}
-function candidateRelease(productionSource,candidateSource,target,production,revision){
+function candidateRelease(productionSource,candidateSource,target,production,revision,{employeeAuth=false}={}){
  if(production.environment!=='production'||!/^[a-f0-9]{40}$/.test(production.revision)||!production.files||fs.existsSync(target))throw Error('Verified production manifest and new output required');
  for(const [relative,hash]of Object.entries(production.files)){
   if(relative.includes('\\')||path.isAbsolute(relative)||relative.split('/').some(part=>!part||part==='.'||part==='..')||relative.startsWith('test/')||relative==='mir-production-release.json'||! /^[a-f0-9]{64}$/.test(hash))throw Error('Invalid release path or digest');
@@ -38,9 +38,9 @@ function candidateRelease(productionSource,candidateSource,target,production,rev
  fs.mkdirSync(target,{recursive:true});
  for(const relative of Object.keys(production.files)){const destination=path.join(target,relative);fs.mkdirSync(path.dirname(destination),{recursive:true});fs.copyFileSync(path.join(productionSource,relative),destination);}
  fs.writeFileSync(path.join(target,'mir-production-release.json'),JSON.stringify(production,null,2)+'\n');
- build(candidateSource,path.join(target,'test'),revision,{configFile:path.join(target,'portal-config.js'),guardFile:path.join(target,'mir-test-guard.js')});
+ build(candidateSource,path.join(target,'test'),revision,{configFile:path.join(target,'portal-config.js'),guardFile:employeeAuth?path.join(candidateSource,'mir-test-guard.js'):path.join(target,'mir-test-guard.js'),employeeAuth});
  if(JSON.stringify(productionManifest(target,production.revision))!==JSON.stringify(production))throw Error('Production bytes changed while preparing TEST');
  return {production:production.revision,test:revision};
 }
 module.exports={build,productionManifest,writeProductionManifest,candidateRelease};
-if(require.main===module){const args=process.argv.slice(2);if(args[0]==='--production-manifest')console.log(JSON.stringify(writeProductionManifest(args[1],args[2])));else if(args[0]==='--candidate')console.log(JSON.stringify(candidateRelease(args[1],args[2],args[3],JSON.parse(fs.readFileSync(args[4])),args[5])));else console.log(JSON.stringify(build(...args)));}
+if(require.main===module){const args=process.argv.slice(2),employeeAuth=args.includes('--employee-auth');if(employeeAuth)args.splice(args.indexOf('--employee-auth'),1);if(args[0]==='--production-manifest')console.log(JSON.stringify(writeProductionManifest(args[1],args[2])));else if(args[0]==='--candidate')console.log(JSON.stringify(candidateRelease(args[1],args[2],args[3],JSON.parse(fs.readFileSync(args[4])),args[5],{employeeAuth})));else console.log(JSON.stringify(build(args[0],args[1],args[2],{employeeAuth})));}

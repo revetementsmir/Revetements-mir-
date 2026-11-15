@@ -1,5 +1,9 @@
 # Android privé MIR — recette uniquement
 
+État actuel Auth : **0.12.2-test /120005**, backend MIR TEST installé, invitations/mot de passe actifs dans le paquet; Google et récupération restent désactivés faute de recette de fournisseur/envoi. [Bilan courant](../docs/verification/employee-auth-invitations/BILAN-20261114.md) et [Samsung Auth](../docs/verification/employee-auth-invitations/SAMSUNG-AUTH.md). Les paragraphes suivants conservent les étapes historiques.
+
+Lot Auth/invitations en cours : branche `codex/test-employee-auth-invitations`, base `d4a9ec05ee9a0c2ede0713efab0add860a9507cb`. Version préparée `0.12.0-test` / `120001`; CI de ce lot prévue `120001 → 120002`. Capacités Google, récupération et invitations désactivées par défaut. [Reprise et limites actuelles](../docs/verification/employee-auth-invitations/REPRISE.md). Le texte Phase 11 ci-dessous conserve son contexte historique.
+
 Base : `a7d2d6fd10d6909d25f262aa06e921342c03d889`. Branche : `codex/phase-11-android-private`.
 
 Application TEST `ca.revetementsmir.equipe.test`, version `0.11.0-test`, code initial `110001`. Aucun projet Android ni identité de signature préexistants n’ont été trouvés dans le dépôt. Aucun déploiement du site n’est nécessaire : le portail et ses moteurs sont embarqués dans l’APK. Aucun deuxième backend, configurateur, panier, schéma ou RPC n’a été ajouté.

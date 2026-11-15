@@ -5,3 +5,8 @@ verify_jwt = false
 # PREPARED, NOT DEPLOYED. The handler verifies Auth /user AND current SQL access.
 [functions.mir-chat-files]
 verify_jwt = false
+
+# TEST only: invitation capabilities and current manager/employee identity are
+# checked by the handler and private SQL; no email transport is deployed.
+[functions.mir-team-invitations]
+verify_jwt = false
