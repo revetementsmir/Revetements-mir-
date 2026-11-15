@@ -1,8 +1,8 @@
 {
-  "sourceCommit": "70257ae4fb9bb35707e62e973955139ac519dba0",
-  "reason": "Reviewed employee-auth delta: TEST capability gates only in portal-config; portal-client adds invitation enrollment and isolates session organization/offline punch owner. Existing Punch UI, Today, warehouse and management function hashes remain unchanged. Behavior covered by mir-team-session-queue, mir-account-session and enrollment tests. Historical baseline fixtures retained.",
+  "sourceCommit": "b0f6b1330366c5488e0a2c5c9e47341ea0e4be16",
+  "reason": "Revue du 15 novembre 2026 : configuration Auth sécurisée confirmée : signup, Google, courriel, invitations et documents désactivés en production. ?recette=1 sur le domaine public n'active pas MIR TEST; les invitations TEST sont réservées à /test/ ou localhost. Empreinte complète actualisée après audit, sans neutraliser l'assertion. Révocation des blobs, Punch, Aujourd'hui et autres modules conservés. Vérifier les contrats de séparation TEST/PRODUCTION et la garde Pages.",
   "files": {
     "dist/portal-client.js": "792e02d328ed43fdd8c80c648cf4b2abd91d50375dbe5cf313f8d20350f93e10",
-    "dist/portal-config.js": "8105aecb3826a7d5c770dc9aa185a3b3c73647804761412df5eaf7605489eb20"
+    "dist/portal-config.js": "460336c78e21064276a4f7152490be82f654ab83aa34506cbe3e9e483518c204"
   }
 }
