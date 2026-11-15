@@ -214,7 +214,7 @@
     doc.documentElement.lang=locale;
   }
   function localeControl(doc){
-    const header=doc.querySelector('header.site-header,header.production-header,header.portal-header');
+    const header=doc.querySelector('header.site-header,header.production-header,header.portal-header,header.mir-client-header');
     if(!header)return;
     // Harmony moves the original header actions into its collapsed menu.
     // Place the customer language control inside Harmony's owned title slot so
