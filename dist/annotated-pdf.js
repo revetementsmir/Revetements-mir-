@@ -101,7 +101,7 @@
         ctx.fillStyle='#51a93f';ctx.fillRect(215,54,7,52);
         ctx.fillStyle='#26322c';ctx.font='34px Arial';ctx.fillText(title,250,78);
         ctx.fillStyle='#647166';ctx.font='24px Arial';ctx.fillText(subtitle,250,115);
-        ctx.textAlign='right';ctx.fillText(new Intl.DateTimeFormat(clientEN()?'en-CA':'fr-CA').format(new Date()),2890,78);ctx.textAlign='left';
+        ctx.textAlign='right';ctx.fillText(new Intl.DateTimeFormat(clientEN()?'en-CA':'fr-CA',{year:'numeric',month:'short',day:'numeric'}).format(new Date()),2890,78);ctx.textAlign='left';
         ctx.strokeStyle='#d5ddd6';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(85,155);ctx.lineTo(2890,155);ctx.stroke();
         ctx.fillStyle='#1e2c23';ctx.font='bold 39px Arial';ctx.fillText((known(face.name||tr('Élévation','Elevation'))+(part?tr(' — suite',' — continued'):'')),85,220);
         const summaryHeight=wide&&chunks[part].length?chunks[part].length*34+30:0;

@@ -48,6 +48,7 @@ jobs:
           node --check dist/mir-selection-pdf.js
           node --check dist/mir-dossier-pdf.js
           node --check tests/mir-client-i18n.cjs
+          node --check tests/mir-client-i18n-static.cjs
           node --check tests/mir-client-i18n-browser.cjs
           node --check tests/mir-client-pdf-bilingual.cjs
           node --check tests/mir-client-i18n-pdf-browser.cjs
@@ -60,6 +61,7 @@ jobs:
       - name: Bilingual glossary and PDF tests
         run: |
           node tests/mir-client-i18n.cjs
+          node tests/mir-client-i18n-static.cjs
           node tests/mir-client-pdf-bilingual.cjs
       - name: Install Chromium test dependency
         run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
