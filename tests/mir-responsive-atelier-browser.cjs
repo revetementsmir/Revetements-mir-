@@ -23,7 +23,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   const page=tab.locator('[data-mir-responsive-page]');
   const phoneFont=await page.locator('h1').evaluate(node=>parseFloat(getComputedStyle(node).fontSize));
   await page.locator('.mir-client-menu-toggle').click();assert.equal(await page.locator('.mir-client-menu-toggle').getAttribute('aria-expanded'),'true');
-  assert(await page.locator('.mir-mobile-tabs').evaluate(node=>{const rect=node.getBoundingClientRect(),frame=node.closest('[data-mir-responsive-viewport]').getBoundingClientRect();return rect.top>=frame.top&&rect.bottom<=frame.bottom+2;}),'mobile navigation must stay inside its device viewport');
+  assert.equal(await page.locator('.mir-mobile-tabs').count(),0,'Accueil client sans barre inférieure, y compris aperçu Atelier téléphone');
   await tab.keyboard.press('Escape');
   await tab.locator('#preview-phone-model').selectOption('galaxy-s26-ultra');
   assert.equal(await tab.locator('#mir-responsive-device').getAttribute('data-preview-frame'),'android');
@@ -62,6 +62,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   await shop.goto(base+'/responsive.html?page=boutique.html&layout=phone');
   await Promise.race([shop.locator('[data-mir-responsive-ready=true]').waitFor(),shop.locator('[role=alert]').waitFor().then(async()=>{throw Error(await shop.locator('[role=alert]').innerText());})]);
   await shop.locator('.mir-client-menu-ready').waitFor();
+  assert(await shop.locator('.mir-mobile-tabs').evaluate(node=>{const rect=node.getBoundingClientRect(),frame=node.closest('[data-mir-responsive-viewport]').getBoundingClientRect();return rect.top>=frame.top&&rect.bottom<=frame.bottom+2;}),'barre basse des pages client intérieures reste dans le cadre tablette/téléphone');
   await shop.locator('.brand-collection-card').first().waitFor().catch(async error=>{console.log('SHOP DIAGNOSTIC',await shop.evaluate(()=>({grid:document.querySelector('#shop-grid')?.textContent,view:document.body.dataset.commerceView,categories:document.querySelector('#category-cards')?.innerHTML,brands:document.querySelector('#shop-brand-directory')?.innerHTML})));await shop.screenshot({path:'artifacts/mir-responsive-atelier/boutique-failure.png'});throw error;});
   const search=shop.locator('#shop-search');await search.fill('BECK');
   await shop.locator('[data-shop-card]').first().waitFor();
