@@ -5,3 +5,13 @@
 .mir-client-locale-switch button:focus-visible{outline:3px solid #2c6a48;outline-offset:3px}
 @media(max-width:430px){.mir-client-locale-switch{margin-inline:2px;padding:2px}.mir-client-locale-switch button{min-width:32px;padding:7px 6px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){.mir-client-locale-switch button{transition:none}}
+
+/* Reserve real width for the two languages on 360–430 px screens without
+ * moving the approved account avatar or introducing a second header row. */
+@media(max-width:430px){
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand,
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand{width:clamp(82px,24vw,105px)!important}
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions{gap:3px!important}
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart{padding-inline:4px!important;font-size:11px!important}
+  body.mir-public-navigation header[data-mir-public-shell] .mir-client-locale-switch{margin-inline:0;padding:2px}
+}
