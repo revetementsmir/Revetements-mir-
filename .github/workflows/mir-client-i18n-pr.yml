@@ -11,6 +11,7 @@ on:
       - 'dist/*.html'
       - 'tests/mir-client-i18n*.cjs'
       - 'tests/mir-client-account-isolation.cjs'
+      - 'tests/mir-client-account-en-browser.cjs'
       - 'tests/mir-client-pdf-bilingual.cjs'
       - 'tests/mir-client-i18n-pdf-browser.cjs'
       - 'docs/verification/client-localisation-20261115.md'
@@ -51,6 +52,7 @@ jobs:
           node --check tests/mir-client-i18n.cjs
           node --check tests/mir-client-i18n-static.cjs
           node --check tests/mir-client-account-isolation.cjs
+          node --check tests/mir-client-account-en-browser.cjs
           node --check tests/mir-client-i18n-browser.cjs
           node --check tests/mir-client-pdf-bilingual.cjs
           node --check tests/mir-client-i18n-pdf-browser.cjs
@@ -72,6 +74,10 @@ jobs:
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
         run: node tests/mir-client-i18n-browser.cjs
+      - name: Auth client FR/EN, compte, récupération et séparation employés
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-client-account-en-browser.cjs
       - name: Real PDF downloads and rasterization (two Canadian locales)
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
@@ -83,6 +89,7 @@ jobs:
           name: MIR-client-FR-EN-prepublication
           path: |
             artifacts/mir-client-*.png
+            docs/verification/account/bilingual-client-account-*.png
             artifacts/mir-customer-pdf-*.png
             artifacts/MIR-*selection*.pdf
           if-no-files-found: warn
