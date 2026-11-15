@@ -37,9 +37,13 @@ jobs:
           # PR40 was merged on this exact first-parent baseline. Do not classify
           # prior Auth/Chantier work in PR37 as modifications made by PR40.
           git merge-base --is-ancestor "$MIR_CLIENT_BASE_SHA" HEAD
+          # PR40's public-only diff is immutable: later independent Android/QA
+          # fixes must not falsely appear to belong to the client navigation lot.
+          MIR_CLIENT_LOT_SHA=29ef36bf7afed708c8bfe47ffa007221f516b73e
+          git merge-base --is-ancestor "$MIR_CLIENT_LOT_SHA" HEAD
           node --check dist/mir-public-menu.js
           node --check tests/mir-public-menu-browser.cjs
-          protected="$(git diff --name-only "$MIR_CLIENT_BASE_SHA" HEAD -- mobile supabase dist/chantier-app.js dist/portal-client.js dist/chantier.html dist/entrepot.html dist/coordination.html dist/production-app.js)"
+          protected="$(git diff --name-only "$MIR_CLIENT_BASE_SHA" "$MIR_CLIENT_LOT_SHA" -- mobile supabase dist/chantier-app.js dist/portal-client.js dist/chantier.html dist/entrepot.html dist/coordination.html dist/production-app.js)"
           if [ -n "$protected" ]; then echo "Le lot client a touché un fichier métier protégé: $protected" >&2; exit 1; fi
           node tests/mir-public-menu.cjs
           node tests/mir-homepage.cjs
