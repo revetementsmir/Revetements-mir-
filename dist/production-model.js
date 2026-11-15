@@ -1053,7 +1053,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         ?'Quote required: All custom colours, including RAL, require a quote. No automatic pricing.'
         :warning;
       const clientFinishLines=finishLines(item).map(label=>clientEnglish&&label==='Soumission obligatoire'?'Quote required':label);
-      const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(visibleWarning?[visibleWarning]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>wrapLines(line,87));
+      const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(visibleWarning?[visibleWarning]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>line===visibleWarning?[line]:wrapLines(line,87));
       // Fit dimensioned client text by ACTUAL wrapped SVG lines, not by the
       // number of business rows. Reserve a clear gutter before the PDF
       // footer; spill all remaining lines onto an existing continuation sheet.

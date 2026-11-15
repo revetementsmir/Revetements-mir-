@@ -122,11 +122,16 @@ async function runAt(browser,base,width){
   const canvas=document.createElement('canvas');
   canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
   await second.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
-  return {pages:doc.numPages,text:(await second.getTextContent()).items.map(x=>x.str).join(' '),image:canvas.toDataURL('image/png')};
+  const items=(await second.getTextContent()).items;
+  const start=items.find(item=>item.str.includes('Soumission obligatoire : Toute couleur'));
+  const end=items.find(item=>item.str.includes('soumission. Aucun prix automatique.'));
+  const warningColumnCoherent=!!start&&!!end&&Math.abs(start.transform[4]-end.transform[4])<6;
+  return {pages:doc.numPages,text:items.map(x=>x.str).join(' '),warningColumnCoherent,image:canvas.toDataURL('image/png')};
  });
  assert.ok(frenchProof.pages>=2,'real FR combined dossier must contain dimensions');
  assert.match(frenchProof.text,/DOSSIER DE PLIAGE|COTES FINIES ET POINTS À VALIDER|MATÉRIAU \/ FINI/,'French dimensioned sheet must be rendered');
  assert.match(frenchProof.text,/Aucune commande transmise; détails/,'Customer note remains intact in original language');
+ assert.equal(frenchProof.warningColumnCoherent,true,'French quote-required warning must not split across two visual PDF columns');
  fs.writeFileSync(path.join(assets,'mir-dossier-mixte-FR-'+width+'.pdf'),pdf);
  fs.writeFileSync(path.join(assets,'mir-dossier-mixte-FR-'+width+'.png'),Buffer.from(frenchProof.image.split(',')[1],'base64'));
  await page.locator('button[data-mir-locale="en-CA"]').click();
