@@ -1,6 +1,6 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
-const {settings,start,finish,post,TEST}=require('./native-qa-fixture.cjs');
+const {settings,start,finish,post,waitUntilSafeUtc,TEST}=require('./native-qa-fixture.cjs');
 const now=()=>new Date().toISOString().slice(0,10);
 function testEnv(tmp){return {GITHUB_ACTIONS:'true',MIR_TEST_TARGET:'sandbox',MIR_SANDBOX_ORG_ID:'8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9',
  MIR_SANDBOX_PUBLISHABLE_KEY:'sb_publishable_QA_mock_key_never_used',
@@ -49,16 +49,16 @@ test('Different CI runs get distinct UUIDs, strict separate ownership and finish
  const original=process.cwd(),tmp=fs.mkdtempSync(path.join(os.tmpdir(),'mir-qa-native-'));
  fs.mkdirSync(path.join(tmp,'private'));process.chdir(tmp);
  try{
-   const env=testEnv(tmp),srv=mockService(),first=await start(srv.fetcher,env);
+   const env=testEnv(tmp),srv=mockService(),first=await start(srv.fetcher,env,async()=>({waited:false}));
    assert.ok(fs.existsSync(settings(env).privateFile));
    assert.equal(fs.statSync(settings(env).privateFile).mode&0o777,0o600);
    const artifact=fs.readFileSync(path.resolve('artifacts/phase11/native-qa-run-manifest.json'),'utf8');
    assert.doesNotMatch(artifact,/QA_ONLY|TEST_FAKE_ONLY|boss@example\.invalid/);
-   await assert.rejects(start(srv.fetcher,env),/already owns/,'cannot allocate twice without finishing');
+   await assert.rejects(start(srv.fetcher,env,async()=>({waited:false})),/already owns/,'cannot allocate twice without finishing');
    const done=await finish(srv.fetcher,env);assert.equal(done.state,'closed');
    assert.equal(fs.existsSync(settings(env).privateFile),false);
    const again=await finish(srv.fetcher,env);assert.equal(again.state,'none');
-   const second=await start(srv.fetcher,env);
+   const second=await start(srv.fetcher,env,async()=>({waited:false}));
    assert.notEqual(second.runId,first.runId);assert.notEqual(second.marker,first.marker);
    assert.notEqual(second.employee.shift,first.employee.shift);
    await finish(srv.fetcher,env);
@@ -72,7 +72,7 @@ test('Fail-closed cleanup failure keeps private session for retry; no false succ
  const original=process.cwd(),tmp=fs.mkdtempSync(path.join(os.tmpdir(),'mir-qa-retry-'));
  fs.mkdirSync(path.join(tmp,'private'));process.chdir(tmp);
  try{
-   const env=testEnv(tmp),srv=mockService();await start(srv.fetcher,env);
+   const env=testEnv(tmp),srv=mockService();await start(srv.fetcher,env,async()=>({waited:false}));
    const unavailable=async(url,options)=>{
      if(url.endsWith('/rest/v1/rpc/mir_qa_native_run')&&JSON.parse(options.body).p_action==='finish')
        return {ok:false,status:503,json:async()=>({error:'unavailable'})};
@@ -82,4 +82,13 @@ test('Fail-closed cleanup failure keeps private session for retry; no false succ
    assert.equal(fs.existsSync(settings(env).privateFile),true,'runner still has recovery token');
    await finish(srv.fetcher,env);assert.equal(fs.existsSync(settings(env).privateFile),false);
  }finally{process.chdir(original);fs.rmSync(tmp,{recursive:true,force:true});}
+});
+
+
+test('UTC midnight guard pauses before allocation but never weakens the SQL date precondition',async()=>{
+ let waited=null;
+ const near=await waitUntilSafeUtc(()=>new Date('2026-11-15T23:55:00.000Z'),async ms=>{waited=ms;});
+ assert.equal(near.waited,true);assert.equal(near.ms,301500);assert.equal(waited,301500);
+ const daytime=await waitUntilSafeUtc(()=>new Date('2026-11-15T14:00:00.000Z'),async()=>{throw Error('must not wait');});
+ assert.equal(daytime.waited,false);assert.equal(daytime.ms,0);
 });

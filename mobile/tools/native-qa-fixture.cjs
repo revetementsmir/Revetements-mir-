@@ -22,7 +22,10 @@ async function post(fetchImpl,url,body,headers={}){
   if(!url.startsWith(BASE+'/'))throw Error('Forbidden non-TEST endpoint');
   const response=await fetchImpl(url,{method:'POST',headers:{'content-type':'application/json',...headers},body:JSON.stringify(body),signal:AbortSignal.timeout(25000)});
   let data;try{data=await response.json();}catch{throw Error('MIR TEST request unreadable '+response.status);}
-  if(!response.ok||typeof data!=='object'||data===null)throw Error('MIR TEST rejected QA request (HTTP '+response.status+')');
+  if(!response.ok||typeof data!=='object'||data===null){
+    const failure=/^QA_[A-Z_]+/.exec(String(data?.message||''))?.[0]||'REJECTED';
+    throw Error('MIR TEST rejected QA request (HTTP '+response.status+'; '+failure+')');
+  }
   return data;
 }
 async function login(fetchImpl,config){
@@ -58,13 +61,28 @@ function verifyManifest(body,session){
     throw Error('QA fixture RPC returned inconsistent per-run identities');
   return Object.freeze({...body,readOnlyPreflight:true});
 }
-async function start(fetchImpl=fetch,env=process.env){
+/* The server refuses new QA dates during the last ten UTC minutes.
+ * Never create a fixture that may cross the day boundary mid-instrumentation.
+ * In CI only, wait for the next day before allocating the lease; no DB writes
+ * or external mail calls occur during the wait. */
+async function waitUntilSafeUtc(nowFn=()=>new Date(),sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms))){
+ const now=nowFn(),midnight=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+1);
+ const remaining=midnight-now.getTime();
+ if(remaining>0&&remaining<12*60*1000){
+   console.log('MIR TEST QA: UTC date boundary; starting on the next test day');
+   await sleep(remaining+1500);
+   return {waited:true,ms:remaining+1500};
+ }
+ return {waited:false,ms:0};
+}
+async function start(fetchImpl=fetch,env=process.env,safeWindow=waitUntilSafeUtc){
   const c=settings(env);
   if(fs.existsSync(c.privateFile))throw Error('QA runner already owns a private fixture: finish it first');
   const session={runId:crypto.randomUUID(),token:crypto.randomBytes(32).toString('hex'),projectRef:TEST};
   writePrivate(c.privateFile,session); // recoverable even when network fails after commit
   const h=await login(fetchImpl,c);
   await rpc(fetchImpl,h,'recover',session); // ONLY expired, exact, synthetic records
+  await safeWindow(); // never lease a fixture across a UTC work_date rollover
   const response=verifyManifest(await rpc(fetchImpl,h,'start',session),session);
   fs.mkdirSync(path.dirname(c.manifestFile),{recursive:true});
   const {ok,state,projectRef,runId,marker,jobId,workDate,employee,chef,lead}=response;
@@ -90,4 +108,4 @@ if(require.main===module){
   (action==='start'?start:action==='finish'?finish:async()=>{throw Error('Expected start or finish')})()
    .catch(err=>{console.error('QA lifecycle: '+err.message.replace(/Bearer\s+\S+/g,'[redacted]'));process.exitCode=1;});
 }
-module.exports={TEST,ORGANIZATION,BASE,settings,post,login,rpc,readPrivate,verifyManifest,start,finish};
+module.exports={TEST,ORGANIZATION,BASE,settings,post,login,rpc,readPrivate,verifyManifest,waitUntilSafeUtc,start,finish};
