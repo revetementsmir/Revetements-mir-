@@ -15,6 +15,8 @@ const QA_NEW_STATUS="L’accès aux fiches privées n’est pas encore raccordé
 
 const GUARDED_GET_PARENT='45cc28da0f0500d09e5b0ac4e276947be8ca741d';
 const GUARDED_GET_SUBJECT="fix(pages): allow isolated MIR TEST read-only estimate configuration";
+const GUARDED_GET_FIX_PARENT='196bfc45bd2ca562cffa7afc19cc4b3a50ea111e';
+const GUARDED_GET_FIX_SUBJECT="fix(ci): certify strict Pages gate newline parsing";
 const GUARDED_GET_OLD="const invitationService=url.pathname==='/functions/v1/mir-team-invitations'&&verb==='POST';if(url.pathname.startsWith('/functions/')&&!invitationService||(auth&&!safeAuth))throw Error('TEST_EXTERNAL_DELIVERY_DISABLED');";
 const GUARDED_GET_NEW="const invitationService=url.pathname==='/functions/v1/mir-team-invitations'&&verb==='POST';const readonlyEstimateConfig=url.pathname==='/functions/v1/mir-estimates/config'&&verb==='GET';if(url.pathname.startsWith('/functions/')&&!invitationService&&!readonlyEstimateConfig||(auth&&!safeAuth))throw Error('TEST_EXTERNAL_DELIVERY_DISABLED');";
 const GUARDED_TEST_OLD1="let xhrBlocked=false;try{new XMLHttpRequest().open('GET','https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/proof');}catch{xhrBlocked=true;}";
@@ -42,6 +44,25 @@ function check(){
   if(parents.length===3){
     assert.equal(subject,expectedSubject,'exact reviewed final merge only');
     assert.deepEqual(parents,reviewedParents,'no substitute release merge');
+  }else if(subject===GUARDED_GET_FIX_SUBJECT){
+    // The previous release QA commit changed only the reviewed isolated TEST
+    // read-only config rule, its refusal assertions and this release gate.
+    // This corrective child may change ONLY the gate parser; no site bytes,
+    // production capability or TEST backend routing can be modified here.
+    assert.equal(parents.length,2,'exact direct child of the reviewed TEST read-only patch required');
+    assert.equal(parents[1],GUARDED_GET_FIX_PARENT);
+    assert.equal(git('log','-1','--pretty=%s',GUARDED_GET_FIX_PARENT),GUARDED_GET_SUBJECT);
+    const changed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').split(/\r?\n/).filter(Boolean).sort();
+    assert.deepEqual(changed,['scripts/mir-final-release-gate.cjs'],'release gate parsing only');
+    const previousChanged=git('diff-tree','--no-commit-id','--name-only','-r',GUARDED_GET_FIX_PARENT).split(/\r?\n/).filter(Boolean).sort();
+    assert.deepEqual(previousChanged,['dist/mir-test-guard.js','scripts/mir-final-release-gate.cjs','tests/mir-test-production-browser.cjs'],'reviewed read-only TEST patch only');
+    const originalGuard=git('show',GUARDED_GET_PARENT+':dist/mir-test-guard.js');
+    const actualGuard=fs.readFileSync('dist/mir-test-guard.js','utf8').trim();
+    assert.equal(originalGuard.split(GUARDED_GET_OLD).length,2);
+    assert.equal(actualGuard,originalGuard.replace(GUARDED_GET_OLD,GUARDED_GET_NEW),'exact read-only TEST metadata route only');
+    const originalTest=git('show',GUARDED_GET_PARENT+':tests/mir-test-production-browser.cjs');
+    const expectedTest=originalTest.replace(GUARDED_TEST_OLD1,GUARDED_TEST_NEW1).replace(GUARDED_TEST_OLD2,GUARDED_TEST_NEW2).replace(GUARDED_TEST_OLD3,GUARDED_TEST_NEW3);
+    assert.equal(fs.readFileSync('tests/mir-test-production-browser.cjs','utf8').trim(),expectedTest,'exact read-only TEST assertions only');
   }else if(subject===GUARDED_GET_SUBJECT){
     // Exactly one additional release QA fix. The first PR37 merge and previous
     // post-merge QA commit are immutable parents; no product, policy or backend
@@ -49,7 +70,7 @@ function check(){
     assert.equal(parents.length,2,'only a direct child of the certified release is permitted');
     assert.equal(parents[1],GUARDED_GET_PARENT,'guard fix must follow the certified QA correction');
     assert.equal(git('log','-1','--pretty=%s',GUARDED_GET_PARENT),POST_RELEASE_QA_SUBJECT);
-    const changed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').split(/\\r?\\n/).filter(Boolean).sort();
+    const changed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').split(/\r?\n/).filter(Boolean).sort();
     assert.deepEqual(changed,['dist/mir-test-guard.js','scripts/mir-final-release-gate.cjs','tests/mir-test-production-browser.cjs']);
     const parentGuard=git('show',GUARDED_GET_PARENT+':dist/mir-test-guard.js');
     const nextGuard=fs.readFileSync('dist/mir-test-guard.js','utf8').trim();
