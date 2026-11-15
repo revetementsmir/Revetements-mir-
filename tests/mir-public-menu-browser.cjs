@@ -76,6 +76,7 @@ const sizes=[
           if(size.width<=760){
             const logo=await header.locator('img').boundingBox();
             const button=await menu.boundingBox(),cart=await header.locator('.mir-public-cart').boundingBox(),avatar=await account.boundingBox();
+            assert.equal(await header.locator('.mir-client-actions').evaluate(el=>getComputedStyle(el).flexDirection),'row',label+' actions client en ligne, jamais en colonne');
             if(size.name==='mobile-compact'&&route==='realisations')
               await page.screenshot({path:path.join(artifacts,'mir-client-nav-mobile-compact-realisations-header.jpg'),type:'jpeg',quality:80,animations:'disabled'});
             assert.ok(button.height>=44&&avatar.height>=44&&logo.x+logo.width<=button.x+2&&button.x+button.width<=cart.x+2&&cart.x+cart.width<=avatar.x+2&&avatar.x+avatar.width<=size.width+2,
