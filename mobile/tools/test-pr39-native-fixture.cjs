@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {ACTORS,ORG,JOB,MARKER,configuration,checkState,run}=require('./verify-pr39-native-fixture.cjs');
+const {ACTORS,ORG,JOB,MARKER,LEAD_ASSIGNMENT,LEAD_TASK,LEAD_MEMBER,configuration,checkState,checkLead,run}=require('./verify-pr39-native-fixture.cjs');
 const env={
  MIR_SANDBOX_ORG_ID:ORG,MIR_SANDBOX_PUBLISHABLE_KEY:'sb_publishable_QA_fixture_mock_not_a_real_key',
  MIR_SANDBOX_EMPLOYEE_EMAIL:'employee@example.invalid',MIR_SANDBOX_EMPLOYEE_PASSWORD:'QA-ONLY',
@@ -32,11 +32,27 @@ test('RPC de lecture utilise le projet TEST fixe, jamais la production',async()=
   calls.push({url,method:options.method,body:JSON.parse(options.body)});
   const auth=url.includes('/auth/v1/token'),email=auth?JSON.parse(options.body).email:null;
   const actor=auth?ACTORS[email.startsWith('employee')?0:1]:ACTORS[options.headers.authorization.endsWith('EMPLOYEE')?0:1];
-  return {ok:true,status:200,json:async()=>auth?{user:{id:actor.id},access_token:'QA_'+actor.key}:active(actor)};
+  const data=auth?{user:{id:actor.id},access_token:'QA_'+actor.key}:
+    url.endsWith('mir_lead_today_snapshot')?
+      {role:'chef_equipe',today:'2026-11-15',assignment:{id:LEAD_ASSIGNMENT,jobId:JOB},team:[{id:LEAD_MEMBER}],tasks:[{id:LEAD_TASK,completedAt:null}]}:
+      active(actor);
+  return {ok:true,status:200,json:async()=>data};
  };
  const result=await run(env,fakeFetch);
  assert.equal(result.roles.length,2);assert.equal(result.readOnly,true);
  assert.ok(calls.every(c=>c.method==='POST'&&c.url.startsWith('https://hxtztkmbfpmzrieccwsg.supabase.co/')));
  assert.ok(calls.filter(c=>c.url.endsWith('mir_punch_snapshot')).every(c=>c.body.org===ORG && c.body.employee===null));
+ assert.equal(calls.filter(c=>c.url.endsWith('mir_lead_today_snapshot')).length,1);
+ assert.equal(result.roles[1].lead.assignmentId,LEAD_ASSIGNMENT);
  assert.ok(calls.every(c=>!/punch_action|punch_admin|prod|gccltmaulvrnthrbnrpd/.test(c.url)));
+});
+
+test('Équipe et tâches Chef du jour nécessaires, sans accepter une ancienne affectation',()=>{
+ const valid={role:'chef_equipe',today:'2026-11-15',assignment:{id:LEAD_ASSIGNMENT,jobId:JOB},
+   team:[{id:LEAD_MEMBER}],tasks:[{id:LEAD_TASK,completedAt:null}]};
+ assert.equal(checkLead(valid).taskId,LEAD_TASK);
+ assert.throws(()=>checkLead({...valid,today:'2026-11-14'}),/Chef du jour/);
+ assert.throws(()=>checkLead({...valid,assignment:null}),/Chef du jour/);
+ assert.throws(()=>checkLead({...valid,tasks:[]}),/Chef du jour/);
+ assert.throws(()=>checkLead({...valid,team:[]}),/Chef du jour/);
 });
