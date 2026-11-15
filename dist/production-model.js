@@ -1040,8 +1040,19 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
   }
   function clientDossierPages(order,{production=false}={}){
     const pages=[];
+    // Translate this fixed workshop warning BEFORE the established SVG wrapping.
+    // Scope is strictly client; never modify the underlying quote policy,
+    // dimensions, geometry, saved customer note or staff output.
+    const clientEnglish=typeof window==='object'&&
+      window.MIRClientLocale?.getLocale?.()==='en-CA'&&
+      window.MIRClientLocale?.isClient?.(window.location.pathname,window.location.search)===true;
     for(const item of order.items){
-      const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(item.quotePolicy.required?['Soumission obligatoire : '+item.quotePolicy.reason]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>wrapLines(line,87));
+      const warning=item.quotePolicy.required?'Soumission obligatoire : '+item.quotePolicy.reason:null;
+      const original='Soumission obligatoire : Toute couleur personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.';
+      const visibleWarning=clientEnglish&&warning===original
+        ?'Quote required: All custom colours, including RAL, require a quote. No automatic pricing.'
+        :warning;
+      const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(visibleWarning?[visibleWarning]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>wrapLines(line,87));
       const primary=details.slice(0,24),columns=[primary.slice(0,12),primary.slice(12,24)];
       {
         let svg=svgOpen(850,1100,'Pièce cotée '+item.id);

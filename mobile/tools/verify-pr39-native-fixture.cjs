@@ -1,17 +1,17 @@
 'use strict';
 // Read-only preflight for the *two* exact MIR TEST QA accounts and fresh PR37 shifts.
-// Historical synthetic 8900/8910 are closed; no synthetic row is reactivated.
+// Historical synthetic 8900/8910 and 9000/9010 are closed; never reactivate them.
 // Sign-in is limited to existing QA identities; no punch RPC or mutation is called.
 const HOST='hxtztkmbfpmzrieccwsg.supabase.co';
 const ORG='8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9';
 const JOB='7da20261-1114-4000-8000-000000000001';
 const MARKER='QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL';
-const LEAD_ASSIGNMENT='7da20261-1114-4000-8920-000000000001';
-const LEAD_TASK='7da20261-1114-4000-8930-000000000001';
+const LEAD_ASSIGNMENT='7da20261-1115-4000-9120-000000000001';
+const LEAD_TASK='7da20261-1115-4000-9130-000000000001';
 const LEAD_MEMBER='552233d5-ae18-4c14-be85-0206e6f18549';
 const ACTORS=Object.freeze([
-  Object.freeze({key:'EMPLOYEE',id:'3980647a-d83a-48ad-9d90-8fc2b314807f',shift:'7da20261-1115-4000-9000-000000000001',segment:'7da20261-1115-4000-9010-000000000001'}),
-  Object.freeze({key:'CHEF',id:'ec421778-b39b-492e-9e4b-5e044015e98f',shift:'7da20261-1115-4000-9000-000000000002',segment:'7da20261-1115-4000-9010-000000000002'})
+  Object.freeze({key:'EMPLOYEE',id:'3980647a-d83a-48ad-9d90-8fc2b314807f',shift:'7da20261-1115-4000-9100-000000000001',segment:'7da20261-1115-4000-9110-000000000001'}),
+  Object.freeze({key:'CHEF',id:'ec421778-b39b-492e-9e4b-5e044015e98f',shift:'7da20261-1115-4000-9100-000000000002',segment:'7da20261-1115-4000-9110-000000000002'})
 ]);
 function configuration(env){
   if(env.MIR_SANDBOX_ORG_ID!==ORG)throw Error('Organisation TEST incorrecte; accès refusé');
@@ -70,7 +70,7 @@ async function run(env=process.env,fetchFn=fetch){
     }
     results.push(result);
   }
-  return {project:HOST,organization:ORG,fixture:'PR37 fresh isolated QA 9000/9010',readOnly:true,roles:results};
+  return {project:HOST,organization:ORG,fixture:'PR41 isolated QA 9100/9110',readOnly:true,roles:results};
 }
 if(require.main===module)run().then(result=>{
   console.log('PASS préparation native MIR TEST: '+result.roles.length+' comptes, 2 quarts et segments actifs, identité exacte, sans écriture métier');
