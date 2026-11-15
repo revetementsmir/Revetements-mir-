@@ -1052,6 +1052,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       const visibleWarning=clientEnglish&&warning===original
         ?'Quote required: All custom colours, including RAL, require a quote. No automatic pricing.'
         :warning;
+      const clientFinishLines=finishLines(item).map(label=>clientEnglish&&label==='Soumission obligatoire'?'Quote required':label);
       const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(visibleWarning?[visibleWarning]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>wrapLines(line,87));
       const primary=details.slice(0,24),columns=[primary.slice(0,12),primary.slice(12,24)];
       {
@@ -1064,7 +1065,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         else if(item.kind==='panel')svg+=placeSVG(panelSVG(item,{width:710,height:325,legend:false,header:false,notes:false}),70,240);
         else svg+=svgText(65,380,'Croquis à compléter','font-size="20"');
         svg+=svgText(40,603,'MATÉRIAU / FINI','font-size="12" font-weight="700" fill="#52634f"');
-        svg+=multiline(40,628,[...materialLines(item),...finishLines(item)],{width:48,lineHeight:21,attrs:'font-size="15"'}).svg;
+        svg+=multiline(40,628,[...materialLines(item),...clientFinishLines],{width:48,lineHeight:21,attrs:'font-size="15"'}).svg;
         svg+=svgText(500,603,'QUANTITÉ / LONGUEUR','font-size="12" font-weight="700" fill="#52634f"');
         svg+=svgText(500,633,(item.quantity??'À préciser')+' pièce(s)','font-size="22" font-weight="700"');
         svg+=multiline(500,662,item.kind==='profile'?[formatMeasurement(item.lengthMM,item.unit)]:[formatMeasurement(item.widthMM,item.unit)+' × '+formatMeasurement(item.heightMM,item.unit)],{width:32,lineHeight:23,attrs:'font-size="18"'}).svg;
