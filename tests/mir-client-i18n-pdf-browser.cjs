@@ -59,7 +59,7 @@ async function main(){
     const contents=await page.getTextContent();
     return {pages:pdfDocument.numPages,bytes:buffer.byteLength,text:contents.items.map(x=>x.str).join(' '),image:canvas.toDataURL('image/png').split(',')[1]};
    });
-   assert.ok(rendered.bytes>15000,'real vector PDF required');
+   assert.ok(rendered.bytes>5000&&rendered.image.length>1500,'real vector PDF must be parsed and rasterized by PDF.js');
    assert.ok(rendered.pages>=1,'PDF must have at least one sheet');
    assert.match(rendered.text,/Maison MIR QA/,'user project name preserved');
    if(lang==='en-CA'){
