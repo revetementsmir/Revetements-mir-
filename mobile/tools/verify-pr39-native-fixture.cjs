@@ -1,0 +1,60 @@
+'use strict';
+// Read-only preflight for the *two* exact MIR TEST QA accounts/shift IDs.
+// Sign-in is limited to existing QA identities; no punch RPC or mutation is called.
+const HOST='hxtztkmbfpmzrieccwsg.supabase.co';
+const ORG='8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9';
+const JOB='7da20261-1114-4000-8000-000000000001';
+const MARKER='QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL';
+const ACTORS=Object.freeze([
+  Object.freeze({key:'EMPLOYEE',id:'3980647a-d83a-48ad-9d90-8fc2b314807f',shift:'7da20261-1114-4000-8900-000000000001',segment:'7da20261-1114-4000-8910-000000000001'}),
+  Object.freeze({key:'CHEF',id:'ec421778-b39b-492e-9e4b-5e044015e98f',shift:'7da20261-1114-4000-8900-000000000002',segment:'7da20261-1114-4000-8910-000000000002'})
+]);
+function configuration(env){
+  if(env.MIR_SANDBOX_ORG_ID!==ORG)throw Error('Organisation TEST incorrecte; accès refusé');
+  const key=env.MIR_SANDBOX_PUBLISHABLE_KEY;
+  if(!/^sb_publishable_[A-Za-z0-9_-]+$/.test(key||''))throw Error('Clé publique MIR TEST manquante ou invalide');
+  return {key,actors:ACTORS.map(actor=>{
+    const email=env['MIR_SANDBOX_'+actor.key+'_EMAIL'],password=env['MIR_SANDBOX_'+actor.key+'_PASSWORD'];
+    if(!email||!password)throw Error('Compte QA absent: '+actor.key);
+    return {...actor,email,password};
+  })};
+}
+function checkState(data,actor,nowMs=Date.now()){
+  const shift=data?.activeShift,segment=shift?.segment;
+  if(!shift||shift.id!==actor.shift||shift.device_id!==MARKER||
+     shift.status!=='active'||shift.ended_at!==null||shift.ended_at===undefined||
+     segment?.id!==actor.segment||segment?.job_id!==JOB||
+     segment?.segment_type!=='job'||segment?.ended_at!==null||segment?.ended_at===undefined)
+     throw Error('Quart/segment QA actif manquant ou incohérent: '+actor.key);
+  const started=Date.parse(shift.started_at),seconds=(nowMs-started)/1000;
+  if(!Number.isFinite(seconds)||seconds<900||seconds>8*3600)
+    throw Error('Heure du quart QA hors de la fenêtre 15 min–8 h: '+actor.key);
+  return {role:actor.key,shiftId:actor.shift,segmentId:actor.segment,jobId:JOB,secondsActive:Math.floor(seconds)};
+}
+async function postJson(fetchFn,url,headers,data){
+  const response=await fetchFn(url,{
+    method:'POST',headers:{'content-type':'application/json',...headers},
+    body:JSON.stringify(data),signal:AbortSignal.timeout(20000)
+  });
+  let body;try{body=await response.json();}catch{throw Error('Réponse QA illisible ('+response.status+')');}
+  if(!response.ok)throw Error('Précondition QA RPC ou Auth refusée ('+response.status+')');
+  return body;
+}
+async function run(env=process.env,fetchFn=fetch){
+  const config=configuration(env),base='https://'+HOST,results=[];
+  for(const actor of config.actors){
+    const session=await postJson(fetchFn,base+'/auth/v1/token?grant_type=password',
+      {apikey:config.key},{email:actor.email,password:actor.password});
+    if(session?.user?.id!==actor.id||!session.access_token)
+      throw Error('Identité de compte QA inattendue: '+actor.key);
+    const punch=await postJson(fetchFn,base+'/rest/v1/rpc/mir_punch_snapshot',
+      {apikey:config.key,authorization:'Bearer '+session.access_token},
+      {org:ORG,employee:null});
+    results.push(checkState(punch,actor));
+  }
+  return {project:HOST,organization:ORG,fixture:'PR39 native QA 8900/8910',readOnly:true,roles:results};
+}
+if(require.main===module)run().then(result=>{
+  console.log('PASS préparation native MIR TEST: '+result.roles.length+' comptes, 2 quarts et segments actifs, identité exacte, sans écriture métier');
+}).catch(error=>{console.error('MIR TEST précondition: '+error.message);process.exitCode=1;});
+module.exports={ACTORS,HOST,ORG,JOB,MARKER,configuration,checkState,run};
