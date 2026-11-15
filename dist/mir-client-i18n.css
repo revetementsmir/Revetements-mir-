@@ -48,3 +48,17 @@ body[data-portal-mode="client"] #mir-harmony-header .mir-harmony-title:has(.mir-
  body.mir-public-navigation header[data-mir-public-shell] .mir-client-actions>.mir-public-cart{font-size:0!important;padding-inline:4px!important}
  body.mir-public-navigation header[data-mir-public-shell] .mir-client-actions>.mir-public-cart::before{content:"🛒";font-size:18px;line-height:1}
 }
+
+/* Certified 320px viewport: keep the real Panier hit target with its quantity,
+ * both locale buttons and the separate 44px account control on the first row. */
+@media(max-width:350px){
+ body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>a.mir-public-cart{
+   flex:0 0 52px!important;width:52px!important;min-width:52px!important;max-width:52px!important;
+   margin:0!important;padding:3px 1px!important;justify-content:center!important;gap:0!important
+ }
+ body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>a.mir-public-cart b{
+   min-width:18px!important;width:18px!important;height:18px!important;
+   margin-left:3px!important;padding:0 1px!important;font-size:10px!important
+ }
+ body.mir-public-navigation header[data-mir-public-shell] .mir-client-locale-switch button{min-height:44px}
+}
