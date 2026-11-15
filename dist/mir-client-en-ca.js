@@ -855,6 +855,24 @@ entries.push(
   ["Impossible de vérifier le compte. Votre panier reste conservé.","Unable to verify your account. Your cart is preserved."],
   ["Votre quotidien","Your daily work"]
 );
+
+entries.push(
+["Revêtements extérieurs, réalisations et moulures sur mesure à Québec. Découvrez les matériaux et préparez vos idées de façade avec Les Revêtements MIR.","Exterior siding, completed projects and custom metal trim in Québec City. Explore materials and prepare exterior ideas with Les Revêtements MIR."],
+["Explorez les revêtements et les matériaux documentés chez Les Revêtements MIR, comparez les fabricants et préparez votre sélection.","Explore documented siding and building materials from Les Revêtements MIR, compare manufacturers and prepare your selection."],
+["Explorez les profils, les finis, les couleurs et les documents des fabricants de revêtement.","Explore siding profiles, finishes, colours and manufacturer documents."],
+["Consultez les dimensions, finis et références des matériaux présentés par Les Revêtements MIR. Prix et disponibilité à confirmer.","Review dimensions, finishes and material references from Les Revêtements MIR. Prices and availability subject to confirmation."],
+["Retrouvez votre sélection de matériaux MIR, ajustez les quantités et préparez une liste pour votre projet. Il ne s'agit pas d'une commande.","Review your MIR materials selection, adjust quantities and prepare a project list. This is not an order."],
+["Retrouvez votre sélection de matériaux MIR, ajustez les quantités et préparez une liste pour votre projet. Il ne s&#39;agit pas d&#39;une commande.","Review your MIR materials selection, adjust quantities and prepare a project list. This is not an order."],
+["Configurez les dimensions de vos J, L, fascias, cache-poutres et enveloppes de colonnes.","Configure J-channels, L-shaped trim, fascia, beam covers and column wraps to your dimensions."],
+["Communiquez avec Les Revêtements MIR à Québec pour une estimation, des revêtements extérieurs ou du pliage sur mesure.","Contact Les Revêtements MIR in Québec City for an estimate, exterior siding or custom metal bending."],
+["Découvrez les réalisations des Revêtements MIR, dont un projet au cœur du centre-ville de Québec : brique traditionnelle, revêtement métallique et détails architecturaux.","Explore projects by Les Revêtements MIR, including a downtown Québec City building with traditional brick, metal siding and architectural details."],
+["Dessinez vos pliages et configurez vos panneaux métalliques, avec cotes, couleur et dossier de préparation pour l’atelier MIR.","Draw custom bent-metal profiles and configure metal panels with dimensions, colours and a workshop preparation file."],
+["Préparez votre demande d’estimation MIR avec vos coordonnées, votre adresse de chantier et vos plans PDF facultatifs.","Prepare a MIR estimate request with your contact information, project address and optional PDF plans."],
+["Explorez des matières et des teintes génériques sur une maison de démonstration en trois dimensions.","Explore generic materials and colours on a three-dimensional demonstration home."],
+["Pièces sur mesure — L’atelier MIR","Custom pieces — MIR workshop"],
+["MIR — Votre projet, matière par matière","MIR — Your project, material by material"],
+["Mon compte — Les Revêtements MIR","My account — Les Revêtements MIR"]
+);
 const dictionary=Object.freeze(Object.fromEntries(entries));
 if(typeof module==='object'&&module.exports)module.exports=dictionary;
 if(root)root.MIRClientEnglish=dictionary;
