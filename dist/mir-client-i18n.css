@@ -1,0 +1,7 @@
+/* Public client only: the corporate header and approved account avatar stay intact. */
+.mir-client-locale-switch{display:inline-flex;gap:2px;align-items:center;flex:none;margin-inline:6px;padding:3px;border:1px solid #a5afa5;border-radius:999px;background:#fff;color:#23392a;white-space:nowrap}
+.mir-client-locale-switch button{font:700 12px/1 system-ui,sans-serif;border:0;border-radius:999px;background:transparent;color:#324333;padding:8px 9px;min-width:35px;min-height:34px;cursor:pointer}
+.mir-client-locale-switch button[aria-pressed="true"]{background:#244b39;color:#fff}
+.mir-client-locale-switch button:focus-visible{outline:3px solid #2c6a48;outline-offset:3px}
+@media(max-width:430px){.mir-client-locale-switch{margin-inline:2px;padding:2px}.mir-client-locale-switch button{min-width:32px;padding:7px 6px;font-size:11px}}
+@media(prefers-reduced-motion:reduce){.mir-client-locale-switch button{transition:none}}
