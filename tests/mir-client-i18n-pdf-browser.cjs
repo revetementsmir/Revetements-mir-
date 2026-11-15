@@ -49,7 +49,7 @@ async function main(){
    const rendered=await page.evaluate(async()=>{
     const anchor=document.querySelector('#mir-pdf-ready a[download]');
     if(!anchor)throw Error('PDF not ready');
-    const buffer=await (await fetch(anchor.href)).arrayBuffer();
+    const buffer=await (await fetch(anchor.href)).arrayBuffer(),pdfByteLength=buffer.byteLength; // PDF.js may transfer/detach the input ArrayBuffer
     const PDF=await import('./vendor/pdfjs/pdf.min.mjs');
     PDF.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdfjs/pdf.worker.min.mjs',location.href).href;
     const pdfDocument=await PDF.getDocument({data:new Uint8Array(buffer),useSystemFonts:true,isEvalSupported:false}).promise;
@@ -57,8 +57,9 @@ async function main(){
     const canvas=window.document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
     await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
     const contents=await page.getTextContent();
-    return {pages:pdfDocument.numPages,bytes:buffer.byteLength,text:contents.items.map(x=>x.str).join(' '),image:canvas.toDataURL('image/png').split(',')[1]};
+    return {pages:pdfDocument.numPages,bytes:pdfByteLength,text:contents.items.map(x=>x.str).join(' '),image:canvas.toDataURL('image/png').split(',')[1]};
    });
+   console.log('MIR PDF debug',lang,{bytes:rendered.bytes,pngLength:rendered.image.length,textLength:rendered.text.length});
    assert.ok(rendered.bytes>0&&Buffer.from(rendered.image,'base64').subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex')),'PDF.js must parse a nonempty PDF and rasterize a valid PNG');
    console.log('MIR PDF proof',lang,'bytes',rendered.bytes,'png-base64-length',rendered.image.length,'text-length',rendered.text.length);
    assert.ok(rendered.pages>=1,'PDF must have at least one sheet');
