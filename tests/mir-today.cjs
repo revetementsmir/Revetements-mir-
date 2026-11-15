@@ -44,8 +44,10 @@ test('Punch, client RPC et modules validés préservés depuis main',()=>{
   // Pin the complete reviewed Auth client instead of normalizing away additions.
   // Historical baseline remains intact; all other files/function hashes still apply.
   const reviewed=require('./fixtures/mir-employee-auth-reviewed.json'),uxReviewed=require('./fixtures/mir-chantier-ux-reviewed.json');
+  // Revue spécifique au lot magasin : empreinte SHA complète, baseline historique inchangée.
+  const magasinReviewed=require('./fixtures/mir-magasin-reviewed.json');
   if(file==='dist/portal-client.js')assert.equal((source.match(/^      revokeChatURLs\(\);(?:internalOrg=null;)?$/gm)||[]).length,3,'all three private-blob revocation hooks retained');
-  assert.equal(hash(source),uxReviewed.files[file]||reviewed.files[file]||expected,file);
+  assert.equal(hash(source),magasinReviewed.files[file]||uxReviewed.files[file]||reviewed.files[file]||expected,file);
  }
  const after=fs.readFileSync('dist/chantier-app.js','utf8');
  for(const name of ['punchCard','renderPunchHours','punchCorrectionDialog','punchDecisionDialog','renderWarehouse','renderManagement']){

@@ -34,6 +34,9 @@ jobs:
           node tests/mir-field-redesign-browser.cjs
           node --test tests/mir-samsung-contracts.cjs
           node tests/mir-samsung-fixture.cjs
+          node tests/mir-pr39-native-fixture.cjs
+          node tests/mir-pr39-native-chef-fixture.cjs
+          node --test mobile/tools/test-pr39-native-fixture.cjs
           node tests/mir-punch-receipts-postgres.cjs
           node tests/mir-punch-receipts-client.cjs
           node tests/mir-teams-hours-postgres.cjs
@@ -127,6 +130,8 @@ jobs:
         env:
           ANDROID_AVD_HOME: ${{ runner.temp }}/mir-android-avd
           ANDROID_SERIAL: emulator-5554
+          MIR_SANDBOX_PUBLISHABLE_KEY: ${{ secrets.MIR_SANDBOX_PUBLISHABLE_KEY }}
+          MIR_SANDBOX_ORG_ID: ${{ secrets.MIR_SANDBOX_ORG_ID }}
           MIR_SANDBOX_EMPLOYEE_EMAIL: ${{ secrets.MIR_SANDBOX_EMPLOYEE_EMAIL }}
           MIR_SANDBOX_EMPLOYEE_PASSWORD: ${{ secrets.MIR_SANDBOX_EMPLOYEE_PASSWORD }}
           MIR_SANDBOX_CHEF_EMAIL: ${{ secrets.MIR_SANDBOX_CHEF_EMAIL }}
@@ -159,6 +164,7 @@ jobs:
           adb install -r artifacts/phase11/MIR-TEST-debug.apk
           mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#verifyUpdate'
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-verify.txt
+          node mobile/tools/verify-pr39-native-fixture.cjs
           mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirRealRolesTest'
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/real-roles.txt
           adb pull /sdcard/Android/data/ca.revetementsmir.equipe.test/files/phase11-proof artifacts/phase11/
