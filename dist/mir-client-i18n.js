@@ -209,7 +209,13 @@
         if(child.nodeType!==3)continue;
         const before=child.nodeValue,source=before.trim();
         const protectedValue=protectedPdfText(source,protectedContent);
-        const after=protectedValue===null?pdfText(source):protectedValue;
+        // A single long workshop warning can be split at arbitrary points
+        // by the existing PDF layout. Translate the fixed warning fragment
+        // only after checking protected customer-authored text.
+        let after=protectedValue===null?pdfText(source):protectedValue;
+        if(protectedValue===null&&after===source&&source.includes('personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.')){
+          after=source.replace('personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.','including RAL, requires a quote. No automatic pricing.');
+        }
         if(after!==source)child.nodeValue=before.replace(source,after);
       }
     }
