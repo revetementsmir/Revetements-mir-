@@ -11,6 +11,7 @@ return Object.freeze({remember,pending,consume,cartCount,TARGET});
 (function(){
 'use strict';if(typeof document==='undefined'||document.body?.dataset.commerceView!=='selection')return;
 const Flow=window.MIRAccountFlow,config=window.MIRPortalConfig||{},environment=config.environment||'production';
+const clientAccountURL=()=> 'chantier.html?return=checkout'+(window.MIRClientLocale?.getLocale?.()==='en-CA'?'&clientLocale=1':'')+(environment==='test'?'&recette=1':'');
 const section=document.createElement('section');section.className='mir-account-checkout';section.setAttribute('aria-labelledby','mir-checkout-title');
 section.innerHTML='<h2 id="mir-checkout-title">Vérifier mon panier</h2><p>Vous pouvez remplir votre panier sans compte. Connectez-vous au moment de préparer la suite.</p><button type="button" id="mir-checkout-start">Vérifier mon panier</button><p id="mir-checkout-status" role="status"></p><div id="mir-checkout-review" hidden></div>';
 document.querySelector('.selection-page')?.append(section);
@@ -19,10 +20,10 @@ sync();const count=document.querySelector('[data-list-count]');if(count)new Muta
 async function checkout(){const status=document.querySelector('#mir-checkout-status');
  try{
   Flow.remember(localStorage,environment);
-  if(!config.enabled||!window.MIRSupabase){location.href='chantier.html?return=checkout'+(environment==='test'?'&recette=1':'');return;}
+  if(!config.enabled||!window.MIRSupabase){location.href=clientAccountURL();return;}
   const sdk=window.MIRSupabase.createClient(config.supabaseUrl,config.publishableKey,{auth:{flowType:'pkce',detectSessionInUrl:false,storageKey:'mir_portal_auth_'+config.projectRef}});
   const {data,error}=await sdk.auth.getUser();
-  if(error||!data?.user){location.href='chantier.html?return=checkout'+(environment==='test'?'&recette=1':'');return;}
+  if(error||!data?.user){location.href=clientAccountURL();return;}
   const {data:account,error:accountError}=await sdk.rpc('mir_account_snapshot');if(accountError||account?.userId!==data.user.id)throw Error('Votre accès n’a pas pu être vérifié. Ouvrez Mon compte pour réessayer.');
   if(account.role!=='client'){status.textContent='Ce compte appartient à l’équipe MIR. Votre sélection reste conservée ; utilisez votre compte client pour la commande boutique.';return;}
   Flow.consume(localStorage,environment);
