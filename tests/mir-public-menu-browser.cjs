@@ -86,6 +86,8 @@ const sizes=[
           assert.equal(await menu.getAttribute('aria-expanded'),'true',label);
           assert.deepEqual(await header.boundingBox(),closed,label+' le menu ne pousse pas la page');
           assert.equal(await nav.evaluate(el=>getComputedStyle(el).position),'absolute',label);
+          const opened=await nav.boundingBox();
+          assert.ok(opened&&opened.y>=closed.y+closed.height-4&&opened.y<=closed.y+closed.height+5,label+' panneau Plus ancré juste sous le header');
         }
         const links=await nav.locator('a:visible').evaluateAll(anchors=>anchors.map(a=>[a.getAttribute('href')==='selection.html'?'Mon panier':a.textContent.trim(),a.getAttribute('href')]));
         const commonLinks = links.filter(([, href]) => !['estimation.html','selection.html'].includes(href));
@@ -93,9 +95,15 @@ const sizes=[
         if(!reference)reference=commonLinks;
         else assert.deepEqual(commonLinks,reference,label+' mêmes liens communs que l’accueil');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),label+' débordement');
+        // First close the intentionally opened menu. THEN measure the resting
+        // page, otherwise the open overlay is mistaken for scrolling content.
+        if(small){
+          await page.keyboard.press('Escape');
+          assert.equal(await nav.isVisible(),false,label+' ferme avec Échap');
+          assert.equal(await menu.evaluate(el=>document.activeElement===el),true,label+' retour du focus');
+        }
         if(route==='index'){
-          // The UI contract is an invisible menu AND no scroll. Do not overfit to
-          // display:none: legacy styles may also hide it via clipping/visibility.
+          // No tab rail and no hidden/open Plus panel may add page height.
           if(small)assert.equal(await nav.isVisible(),false,label+' Plus fermé, sans panneau visible');
           const layout=await page.evaluate(()=>{const rect=sel=>{const r=document.querySelector(sel)?.getBoundingClientRect();return r?{top:r.top,height:r.height,bottom:r.bottom}:null};return{window:innerHeight,scroll:document.documentElement.scrollHeight,header:rect('.site-header'),hero:rect('.mir-home-showcase'),cards:rect('.mir-home-services'),cardHeights:[...document.querySelectorAll('.mir-home-service')].map(x=>Math.round(x.getBoundingClientRect().height)),footer:rect('footer')};});
           if(layout.scroll>layout.window+2&&size.name==='tablette-portrait')
@@ -106,14 +114,10 @@ const sizes=[
           assert.equal(await img.evaluate(el=>['cover','contain'].includes(getComputedStyle(el).objectFit)),true,'Photo sans étirement');
         }
         if((route==='index'||route==='boutique')&&['mobile-compact','mobile','mobile-large','tablette-portrait','tablette-grand','petit-pc','bureau'].includes(size.name)){
-          // Capture the resting page, not the intentionally opened keyboard menu.
-          if(small){await page.keyboard.press('Escape');assert.equal(await nav.isVisible(),false,label+' menu fermé avant capture');}
+          // Capture the resting page; Escape was already tested above.
           await page.screenshot({path:path.join(artifacts,'mir-client-nav-'+size.name+'-'+route+'.jpg'),type:'jpeg',quality:76,fullPage:route!=='index',animations:'disabled'});
         }
         if(small){
-          await page.keyboard.press('Escape');
-          assert.equal(await nav.isVisible(),false,label+' ferme avec Échap');
-          assert.equal(await menu.evaluate(el=>document.activeElement===el),true,label+' retour du focus');
           if(route==='boutique'&&size.name==='mobile'){
             await menu.click();
             await nav.getByRole('link',{name:'Réalisations'}).click();
