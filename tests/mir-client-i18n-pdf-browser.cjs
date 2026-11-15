@@ -52,12 +52,12 @@ async function main(){
     const buffer=await (await fetch(anchor.href)).arrayBuffer();
     const PDF=await import('./vendor/pdfjs/pdf.min.mjs');
     PDF.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdfjs/pdf.worker.min.mjs',location.href).href;
-    const document=await PDF.getDocument({data:new Uint8Array(buffer),useSystemFonts:true,isEvalSupported:false}).promise;
-    const page=await document.getPage(1),viewport=page.getViewport({scale:.82});
+    const pdfDocument=await PDF.getDocument({data:new Uint8Array(buffer),useSystemFonts:true,isEvalSupported:false}).promise;
+    const page=await pdfDocument.getPage(1),viewport=page.getViewport({scale:.82});
     const canvas=window.document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
     await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
     const contents=await page.getTextContent();
-    return {pages:document.numPages,bytes:buffer.byteLength,text:contents.items.map(x=>x.str).join(' '),image:canvas.toDataURL('image/png').split(',')[1]};
+    return {pages:pdfDocument.numPages,bytes:buffer.byteLength,text:contents.items.map(x=>x.str).join(' '),image:canvas.toDataURL('image/png').split(',')[1]};
    });
    assert.ok(rendered.bytes>15000,'real vector PDF required');
    assert.ok(rendered.pages>=1,'PDF must have at least one sheet');
