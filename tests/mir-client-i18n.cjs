@@ -65,4 +65,12 @@ check('Identical validations fail safely in both locales',()=>{
   assert.throws(()=>PDF.buildOptions({items:[],locale:lang}),/Aucun matériau|No materials/);
  }
 });
+check('English mixed PDF warning remains fully translated across SVG line fragments',()=>{
+ const first=locale.pdfText('Soumission obligatoire : Toute couleur');
+ const second=locale.pdfText('personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.');
+ assert.equal(first,'Quote required: Any custom colour');
+ assert.equal(second,'including RAL, requires a quote. No automatic pricing.');
+ assert.doesNotMatch(first+' '+second,/personnalisée|soumission|Aucun prix/);
+ assert.equal(locale.pdfText('Aucune commande transmise; détails à valider.'),'Aucune commande transmise; détails à valider.','arbitrary client note must not be translated by fixed warning table');
+});
 console.log('MIR client locale: '+checks+' contract groups passed');
