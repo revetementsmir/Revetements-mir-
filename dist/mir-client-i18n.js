@@ -100,7 +100,7 @@
     };
     if(Object.prototype.hasOwnProperty.call(staticSheet,value))return staticSheet[value];
     const prefixes=[
-      [/^Pli ([A-Z])(?:–|-)*/, 'Bend $1'],
+      [/^Pli /,'Bend '],
       [/^Développé total = /,'Developed length = '],
       [/^Développé de tôle : /,'Developed sheet: '],
       [/^Face colorée : /,'Painted face: '],

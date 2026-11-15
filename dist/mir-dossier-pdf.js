@@ -12,7 +12,7 @@ function relocateProductionHeader(body){
  const header=[...group.children].filter(n=>n.localName==='text'&&n.getAttribute('x')==='40')
    .map(node=>({node,y:Number(node.getAttribute('y')),value:node.textContent||''}))
    .filter(item=>item.y>=85&&item.y<225).sort((a,b)=>a.y-b.y);
- if(!header.some(x=>x.y===91&&/^(DOSSIER DE PLIAGE|MISE EN PRODUCTION)/.test(x.value)))return;
+ if(!header.some(x=>x.y===91&&/^(DOSSIER DE PLIAGE|MISE EN PRODUCTION|CUSTOM BENDING FILE|PRODUCTION SHEET)/.test(x.value)))return;
  const item=header.filter(x=>x.y>=121&&x.y<154).map(x=>x.value).join(' ').trim();
  let meta=header.filter(x=>x.y>=154).map(x=>x.value).join(' ').trim();
  if(clientEN()){
