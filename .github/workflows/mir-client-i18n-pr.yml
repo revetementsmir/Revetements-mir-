@@ -64,7 +64,7 @@ jobs:
         run: |
           node tests/mir-client-i18n.cjs
           node tests/mir-client-i18n-static.cjs
-          MIR_CLIENT_BASE_SHA="$base" node tests/mir-client-account-isolation.cjs
+          MIR_CLIENT_BASE_SHA="${{ github.event.pull_request.base.sha }}" node tests/mir-client-account-isolation.cjs
           node tests/mir-client-pdf-bilingual.cjs
       - name: Install Chromium test dependency
         run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
