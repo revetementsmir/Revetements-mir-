@@ -17,8 +17,8 @@ Cette branche apporte un mécanisme de localisation client, une première traduc
 | Pliages / configurateur | pliage.html, pliage.js, production.html?mode=client, production-app.js | Textes principaux; sources métier du moteur inchangées | Toutes les validations/dessins/configurations et PDF du pliage |
 | Studio / plan 3D | plan.html, plan-app.js, studio.html | Textes principaux d’interface | Outils, import, tracés, scènes, guides, erreurs et exports |
 | Estimation / dossier privé | estimation.html, estimation-dossier.html, mir-estimate.js | Pages statiques | Formulaire généré, états d’envoi, champs et pièces privées |
-| PDF de sélection | mir-selection-pdf.js et mir-dossier-pdf.js | Texte et fichier en deux langues, dates selon la langue, chiffres sans changement | Ouvrir et inspecter les PDF complets en sortie réelle |
-| PDF, aperçu, impression | annotated-pdf.js, mir-panel-po-pdf.js, mir-unified-client-dossier.js | Inventoriés, inchangés | Chacun en FR et EN et vérification géométrique |
+| PDF de sélection | mir-selection-pdf.js et mir-dossier-pdf.js | Texte, fichiers, dates et unités d’affichage en deux langues, mêmes données | Test Chrome + PDF.js de téléchargement/rendu et inspection visuelle des deux versions |
+| PDF, aperçu, impression | annotated-pdf.js, mir-panel-po-pdf.js, mir-unified-client-dossier.js | Titres et légendes des PDF annotés et fiches de panneaux localisés seulement en contexte client, source métier inchangée | Documents de dossier combiné, tous les états d’export, rendu réel de chaque feuille et inspection visuelle en FR/EN |
 | Courriels client | mir-estimate-presentation.js et dépendance Edge | Inventaire, aucun transport modifié | Modèles EN, rendu fictif, parité Edge, zéro envoi réel |
 | Aide / compte / Auth client | mir-help-center.js, portal-client.js, chantier.html | Liens publics inventoriés, modes métier exclus | Client seul, sans modification des 5 espaces métier |
 
@@ -51,6 +51,6 @@ Les cinq espaces métier, sessions Auth, commandes, punch, géométrie, Supabase
 
 ## Vérifications de ce lot
 
-Tests ajoutés : contrats Node du dictionnaire, nombres CAD, exclusion staff, FR/EN du PDF, invariants produits; Chromium réel à 360/390/430/768/834/1024/1440 en preview, langue persistée, panier et champ non modifiés, captures avant/après, aucun EN sur URL publique; garde CI de fichiers métier. Les résultats et éventuels échecs CI se jugent uniquement sur la tête GitHub finale.
+Tests ajoutés : contrats Node du dictionnaire, nombres CAD, exclusion staff, PDF matériaux et panneaux FR/EN, invariants produits et géométrie; Chrome et PDF.js sur PDF réel avec captures comparables; Chromium réel à 360/390/430/768/834/1024/1440 en preview, langue persistée, panier et champ non modifiés, captures avant/après, aucun EN sur URL publique; garde CI de fichiers métier. Les résultats et éventuels échecs CI se jugent uniquement sur la tête GitHub finale.
 
 La couverture complète de tous les parcours FR-CA / EN-CA, documents PDF inspectés dans les deux langues, exports, courriels fictifs et revue humaine des restes FR sont encore requises avant autorisation distincte de fusion et publication.

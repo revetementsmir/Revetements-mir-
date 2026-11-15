@@ -11,6 +11,7 @@ on:
       - 'dist/*.html'
       - 'tests/mir-client-i18n*.cjs'
       - 'tests/mir-client-pdf-bilingual.cjs'
+      - 'tests/mir-client-i18n-pdf-browser.cjs'
       - 'docs/verification/client-localisation-20261115.md'
       - '.github/workflows/mir-client-i18n-pr.yml'
 permissions:
@@ -49,6 +50,7 @@ jobs:
           node --check tests/mir-client-i18n.cjs
           node --check tests/mir-client-i18n-browser.cjs
           node --check tests/mir-client-pdf-bilingual.cjs
+          node --check tests/mir-client-i18n-pdf-browser.cjs
       - name: Existing PDF and navigation contracts
         run: |
           node tests/mir-selection-pdf.cjs
@@ -65,11 +67,18 @@ jobs:
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
         run: node tests/mir-client-i18n-browser.cjs
+      - name: Real PDF downloads and rasterization (two Canadian locales)
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-client-i18n-pdf-browser.cjs
       - name: Attach comparable browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: MIR-client-FR-EN-prepublication
-          path: artifacts/mir-client-*.png
+          path: |
+            artifacts/mir-client-*.png
+            artifacts/mir-customer-pdf-*.png
+            artifacts/MIR-*selection*.pdf
           if-no-files-found: warn
           retention-days: 14
