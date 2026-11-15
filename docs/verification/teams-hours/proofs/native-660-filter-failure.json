@@ -1,0 +1,14 @@
+{
+  "source": "6607572640ce48a8be280fc45269705ef67240e9",
+  "run": 43636280772,
+  "job": 132573669807,
+  "artifact": 14130471349,
+  "artifactSha256": "cf9da97e9b9ed08b7c0e8ac0a01bcf6970528100d32ecb406a94515093c8db64",
+  "nativeSmokePassed": 8,
+  "upgradePassed": 2,
+  "newHttpSnapshotPassed": true,
+  "punchDialogClosePassed": true,
+  "failure": "Native test incorrectly required exactly2 employees for the broad search MIR Recette. Hosted read confirms five legitimate active QA roles; PNG shows at least Adjointe/Boss/Chef.",
+  "correction": "Search each unique employee/chef name; assert exactly one canonical ID/name, and exclusion of every other original roster ID. Application, SQL and fixtures unchanged.",
+  "localRegression": "Real application browser fixture with five QA names; broad search returns five, each unique search returns exactly one with all other IDs excluded."
+}

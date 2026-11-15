@@ -1,0 +1,23 @@
+{
+  "photoId": "00a5d6eb-e542-4111-a8ca-76bcc0830051",
+  "toolId": "5757d93c-5dbd-4554-a1e9-7af93d01bb6d",
+  "issueId": "9bf121b2-96d0-4975-b95b-b2321e28b074",
+  "toolRequest": "29a53c3e-76ec-4ca6-b669-e435d402b6d5",
+  "results": [
+    {
+      "job": "7da20261-1114-4000-8000-000000000001",
+      "activities": 2,
+      "issues": 1,
+      "privateDocuments": 1
+    },
+    {
+      "job": "7da20261-1114-4000-8000-000000000002",
+      "activities": 1,
+      "issues": 1,
+      "privateDocuments": 1
+    }
+  ],
+  "checks": 13,
+  "production": false,
+  "realEmail": false
+}

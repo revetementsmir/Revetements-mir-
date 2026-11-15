@@ -80,12 +80,15 @@
     const variants=[{itemId:FASCIA_IDS[0],colorId:'',label:'Noir'},
       {itemId:FASCIA_IDS[1],colorId:'',label:'Blanc'}];
     const kaycan=byId.get(FASCIA_IDS[2]);
-    if(kaycan){
-      if(kaycan.colors?.length)for(const c of kaycan.colors)
-        variants.push({itemId:kaycan.id,colorId:c.id,label:c.name+' · Kaycan'});
-      else variants.push({itemId:kaycan.id,colorId:'',label:'Couleur Kaycan · à confirmer'});
-    }
-    group(FASCIA_IDS,'Vis à fascia — 2 po · hex ¼ po',variants);
+    // Une palette fabricant n'est pas une preuve de référence de vis disponible.
+    // La demande Kaycan non confirmée demeure une fiche distincte, annotable,
+    // jusqu'à ce qu'une variante produit exacte possède sa référence fournisseur.
+    const confirmedColors=(kaycan?.storeColors||[]).filter(c=>
+      c.availabilityConfirmedForItem===true&&typeof c.supplierReference==='string'&&c.supplierReference.trim());
+    for(const color of confirmedColors)
+      variants.push({itemId:kaycan.id,colorId:color.id,label:color.name+' · Kaycan'});
+    group(confirmedColors.length?FASCIA_IDS:FASCIA_IDS.slice(0,2),
+      'Vis à fascia — 2 po · hex ¼ po',variants);
     // Une seule fiche par modèle et largeur, jamais une fusion inter-profils.
     for(const base of CANEXEL_IDS){
       const matches=items.filter(x=>x.id===base||x.id.startsWith(base+'-'));

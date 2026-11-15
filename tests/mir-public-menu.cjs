@@ -11,7 +11,7 @@ test('Le menu a une API stable et son activation reste explicitement mobile/tabl
  assert.equal(menu.version,'2.1.0');
  assert.equal(menu.breakpoint,'(max-width: 1100px)');
  assert.equal(typeof menu.init,'function');
- assert.deepEqual(menu.mobile.map(item=>item[1]),['Accueil','Boutique','Pliage','Commandes','Compte']);
+ assert.deepEqual(menu.mobile.map(item=>item[1]),['Accueil','Boutique','Pliage','Studio','Commandes']);
 });
 test('Le mode recette reste lié à MIR TEST dans les destinations publiques',()=>{
  assert.equal(menu.recipeHref('chantier.html?view=orders',true),'chantier.html?view=orders&recette=1');
@@ -72,5 +72,22 @@ test('La navigation commune garde le panier visible et les liens secondaires fac
  assert.match(css,/\.mir-mobile-tabs/);
  assert.match(css,/min-height:44px/);
  assert.match(read('mir-help-center.js'),/location\.hash==='\#aide'/);
+});
+test('Accueil sans barre basse, avatar unique et retours de dossier préservés',()=>{
+ assert.equal(menu.accountRoute('index',false),'chantier.html?view=account');
+ assert.equal(menu.accountRoute('plan',true),'chantier.html?view=account&return=studio&recette=1');
+ assert.equal(menu.accountRoute('selection',true),'chantier.html?view=account&return=panier&recette=1');
+ const js=read('mir-public-menu.js'),css=read('mir-public-menu.css');
+ assert.match(js,/current!=='index'&&\!doc\.querySelector\('\.mir-mobile-tabs'\)/);
+ assert.equal(menu.mobile.filter(x=>x[1]==='Compte').length,0,'Connexion uniquement dans avatar');
+ assert.match(js,/mir-public-account-avatar/);
+ assert.match(js,/setAttribute\('aria-label','Connexion'\)/);
+ assert.match(js,/classList\.toggle\('mir-public-home',current==='index'\)/);
+ assert.match(css,/mir-public-navigation\.mir-public-home\s*\{padding-bottom:0!important\}/);
+ assert.match(css,/mir-public-account-avatar:focus-visible/);
+ assert.match(css,/mir-client-actions>a\.mir-home-account\.mir-public-account-avatar/);
+ assert.match(css,/mir-menu-estimate/);
+ assert.match(css,/body\.mir-public-navigation\.commerce \.mir-public-selection-shortcut/);
+ for(const name of ['boutique.html','produit.html'])assert.match(read(name),/mir-public-selection-shortcut/,'panier de secours sans JS conservé');
 });
 console.log('MIR menu client : '+checks+'/'+checks+' contrats réussis');
