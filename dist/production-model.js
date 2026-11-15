@@ -1068,7 +1068,9 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         }
         return {columns,consumed};
       };
-      const firstLayout=fitDetails(details,42,11);
+      // Ten wrapped lines per column keep short follow-on fragments from
+      // straddling the column gutter and preserve footer clearance.
+      const firstLayout=fitDetails(details,42,10);
       const primary=details.slice(0,firstLayout.consumed),columns=firstLayout.columns;
       {
         let svg=svgOpen(850,1100,'Pièce cotée '+item.id);
