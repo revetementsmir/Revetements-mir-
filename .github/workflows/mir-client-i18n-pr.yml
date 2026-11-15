@@ -10,6 +10,7 @@ on:
       - 'dist/catalogue.js'
       - 'dist/*.html'
       - 'tests/mir-client-i18n*.cjs'
+      - 'tests/mir-client-pdf-bilingual.cjs'
       - 'docs/verification/client-localisation-20261115.md'
       - '.github/workflows/mir-client-i18n-pr.yml'
 permissions:
@@ -47,6 +48,7 @@ jobs:
           node --check dist/mir-dossier-pdf.js
           node --check tests/mir-client-i18n.cjs
           node --check tests/mir-client-i18n-browser.cjs
+          node --check tests/mir-client-pdf-bilingual.cjs
       - name: Existing PDF and navigation contracts
         run: |
           node tests/mir-selection-pdf.cjs
@@ -54,7 +56,9 @@ jobs:
           node tests/mir-client-header.cjs
           node tests/mir-homepage.cjs
       - name: Bilingual glossary and PDF tests
-        run: node tests/mir-client-i18n.cjs
+        run: |
+          node tests/mir-client-i18n.cjs
+          node tests/mir-client-pdf-bilingual.cjs
       - name: Install Chromium test dependency
         run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
       - name: Real FR/EN screens and no-regression (preview only)
