@@ -194,3 +194,26 @@ body.mir-public-navigation header[data-mir-public-shell]>nav.mir-client-links>a.
     font-size:12px;padding-inline:8px;
   }
 }
+
+/* Same single header action on inner pages (existing rules used to hide it). */
+@media(max-width:1100px){
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>a.mir-home-account.mir-public-account-avatar{
+    display:inline-flex!important;visibility:visible!important;
+    width:44px!important;min-width:44px!important;max-width:44px;
+    padding:0!important;flex:0 0 44px;
+  }
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-menu-toggle{
+    order:2!important;margin-left:auto!important;flex:0 0 auto;
+  }
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions{
+    order:3!important;flex:0 0 auto!important;width:auto!important;min-width:0;
+    margin-left:0!important;gap:5px;
+  }
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart{
+    margin-left:0!important;
+  }
+}
+@media(max-width:430px){
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-menu-toggle{min-width:48px!important;padding-inline:7px!important}
+  body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart{padding-inline:7px!important}
+}
