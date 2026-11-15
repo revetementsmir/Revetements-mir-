@@ -69,6 +69,17 @@ async function setup(browser,viewport={width:390,height:844},initial={},fixtureC
    const savedAddressText=await page.locator('.account-address p').first().innerText();
    assert.ok(savedAddressText.includes('Réalisations')&&savedAddressText.includes('Mon compte'),'user recipient and street must remain original, not English translated');
    assert.ok((await page.locator('body').innerText()).includes('a@example.invalid'));
+   if(width===390){
+    await page.evaluate(()=>{location.hash='#aide';});
+    const help=page.locator('dialog.mir-help-dialog');
+    await help.waitFor({state:'visible',timeout:12000});
+    await help.getByRole('heading',{name:'Help Centre'}).waitFor();
+    assert.ok((await help.innerText()).includes('How do I request an estimate?'),'English customer FAQ must show actual questions');
+    assert.ok((await help.innerText()).includes('Request help') || (await help.innerText()).includes('My requests'),'English customer support state');
+    await help.locator('.mir-help-close').click();
+    assert.equal(await help.isVisible(),false,'Help Centre closes and restores customer task');
+   }
+
    const checkoutCart=JSON.stringify({version:1,project:'Maison donnée client',items:[{id:'MIR-QA-1',quantity:2}]});
    await page.evaluate(raw=>localStorage.setItem('mir-shopping-list-v1',raw),checkoutCart);
    assert.equal(await page.evaluate(()=>localStorage.getItem('mir-shopping-list-v1')),checkoutCart);
