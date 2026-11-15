@@ -66,6 +66,94 @@
   function date(value,lang=locale,options={year:'numeric',month:'short',day:'numeric'}){
     return new Intl.DateTimeFormat(lang,options).format(value);
   }
+  // Export-time view only. Never mutate the saved drawing, customer notes,
+  // material catalogue or existing PDF configuration.
+  function pdfText(value){
+    if(typeof value!=='string')return value;
+    const exact=translate(value,'en-CA');
+    if(exact!==value)return exact;
+    const patterns=[
+      [/^Quantité : (.+)$/,'Quantity: $1'],
+      [/^Longueur L : (.+)$/,'Length L: $1'],
+      [/^Total : (.+) pi linéaires?$/,'Total: $1 linear ft'],
+      [/^Produit : (.+)$/,'Product: $1'],
+      [/^Fabricant : (.+)$/,'Manufacturer: $1'],
+      [/^Couleur : (.+)$/,'Colour: $1'],
+      [/^Face peinte : intérieure$/,'Painted face: inside'],
+      [/^Face peinte : extérieure$/,'Painted face: outside'],
+      [/^Épaisseur : (.+)$/,'Thickness: $1'],
+      [/^Repère : (.+)$/,'Reference: $1'],
+      [/^Pièce (\d+) — (.+)$/,'Piece $1 — $2'],
+      [/^([A-E]) — (Hauteur|Retour|Dos|Fond|Face|Côté gauche|Côté droit|Sous-face) : (.+)$/,'$1 — $2: $3'],
+      [/^(.+) pièce\(s\)$/,'$1 pieces'],
+      [/^(.+) pi linéaires?$/,'$1 linear ft']
+    ];
+    for(const [pattern,template]of patterns){
+      if(pattern.test(value)){
+        const result=value.replace(pattern,template);
+        // Replace only approved technical terms, not free text or identifiers.
+        if(pattern.source.includes('Hauteur|Retour')){
+          return result.replace(/\bHauteur\b/g,'Height').replace(/\bRetour\b/g,'Return')
+            .replace(/\bDos\b/g,'Back').replace(/\bFond\b/g,'Bottom')
+            .replace(/\bFace\b/g,'Face').replace(/\bCôté gauche\b/g,'Left side')
+            .replace(/\bCôté droit\b/g,'Right side').replace(/\bSous-face\b/g,'Underside');
+        }
+        return result;
+      }
+    }
+    return value;
+  }
+  function translateSvgLabels(svg){
+    if(typeof svg!=='string'||typeof root?.DOMParser!=='function')return svg;
+    const parsed=new root.DOMParser().parseFromString(svg,'image/svg+xml');
+    if(parsed.querySelector('parsererror')||parsed.documentElement.localName!=='svg')return svg;
+    // SVG text nodes only. Paths, cotes, viewBox, transform and every geometry
+    // attribute remain untouched. Arbitrary notes retain their original text.
+    for(const textNode of parsed.querySelectorAll('text,tspan')){
+      for(const child of [...textNode.childNodes]){
+        if(child.nodeType!==3)continue;
+        const before=child.nodeValue,after=pdfText(before.trim());
+        if(after!==before.trim())child.nodeValue=before.replace(before.trim(),after);
+      }
+    }
+    return new root.XMLSerializer().serializeToString(parsed.documentElement);
+  }
+  function localizePdfOptions(options){
+    if(!active||locale!=='en-CA'||staffReady()||!options||!Array.isArray(options.faces))return options;
+    const file=String(options.filename||'');
+    const englishFile=file.endsWith('.pdf')&&!/-en-CA\.pdf$/i.test(file)
+      ?file.replace(/\.pdf$/i,'-en-CA.pdf'):file;
+    return {
+      ...options,
+      title:pdfText(options.title),subtitle:pdfText(options.subtitle),
+      filename:englishFile,locale:'en-CA',
+      faces:options.faces.map(face=>({
+        ...face,
+        svg:translateSvgLabels(face.svg),
+        documentTitle:pdfText(face.documentTitle),
+        scaleNote:pdfText(face.scaleNote),footerNote:pdfText(face.footerNote),
+        sidebarTitle:pdfText(face.sidebarTitle),
+        // Name and reference fields often contain customer-entered identifiers.
+        // They are deliberately not rewritten.
+        summary:Array.isArray(face.summary)?face.summary.map(row=>
+          typeof row==='string'?pdfText(row):
+          row&&typeof row==='object'&&typeof row.label==='string'?{...row,label:pdfText(row.label)}:
+          row&&typeof row==='object'&&typeof row.text==='string'?{...row,text:pdfText(row.text)}:row
+        ):face.summary
+      }))
+    };
+  }
+  function installPdfAdapter(){
+    if(!active||staffReady()||!root?.MIRPDF||root.MIRPDF.__mirClientLocaleWrapped)return false;
+    const original=root.MIRPDF;
+    root.MIRPDF=Object.freeze({
+      ...original,
+      __mirClientLocaleWrapped:true,
+      exportPlan(options){return original.exportPlan(localizePdfOptions(options));},
+      makePlan(options){return original.makePlan(localizePdfOptions(options));}
+    });
+    return true;
+  }
   function excluded(node){
     const e=node?.nodeType===1?node:node?.parentElement;
     return !e || !!e.closest('script,style,noscript,textarea,[contenteditable],template,code,pre,[data-mir-user-content],.mir-help-message,.mir-chat-message,.mir-client-note,.mir-customer-note');
@@ -159,7 +247,7 @@
     if(!active)return;
     if(staffReady()){stopForStaff();return;}
     const doc=root.document;
-    localeControl(doc);metadata(doc);walk(doc.body);clientLinks(doc);
+    localeControl(doc);metadata(doc);walk(doc.body);clientLinks(doc);installPdfAdapter();
   }
   function schedule(){
     if(pending||!active)return;
@@ -194,5 +282,5 @@
     observer.observe(win.document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['data-portal-mode','placeholder','aria-label','aria-description','title']});
     return true;
   }
-  return Object.freeze({version:'0.1.0-draft',isClient,getLocale,setLocale,translate,number,cad,date,init,render,KEY});
+  return Object.freeze({version:'0.2.0-draft',isClient,getLocale,setLocale,translate,number,cad,date,pdfText,localizePdfOptions,installPdfAdapter,init,render,KEY});
 });
