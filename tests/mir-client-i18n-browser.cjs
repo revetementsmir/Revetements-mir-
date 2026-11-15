@@ -11,7 +11,7 @@ const server=http.createServer((req,res)=>{
  res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream'});
  fs.createReadStream(file).pipe(res);
 });
-const sizes=[360,390,430,768,834,1024,1440];
+const sizes=[320,360,390,430,768,834,1024,1440];
 async function main(){
  fs.mkdirSync(artifacts,{recursive:true});
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -22,7 +22,7 @@ async function main(){
   catch(e){const bin=[process.env.MIR_CHROMIUM_BIN,'/usr/bin/google-chrome','/usr/bin/chromium'].find(x=>x&&fs.existsSync(x));if(!bin)throw e;browser=await chromium.launch({executablePath:bin,headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});}
   let passed=0;
   for(const width of sizes){
-   const height=width>=1200?900:width>=768?1024:width===430?932:width===390?844:780;
+   const height=width>=1200?900:width>=768?1024:width===430?932:width===390?844:width===320?568:780;
    const context=await browser.newContext({viewport:{width,height},reducedMotion:'reduce'});
    const page=await context.newPage(),errors=[];
    page.on('pageerror',e=>errors.push(e.message));
