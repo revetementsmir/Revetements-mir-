@@ -182,7 +182,19 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
    const previousResources={...sources[0]};
    for(const pathname of Object.keys(approvedMenu))delete previousResources[pathname];
    assert.deepEqual(currentResources,previousResources,'all non-navigation homepage resources remain byte-identical '+width);
-   assert.deepEqual(layouts[0],layouts[1],'homepage content/footer geometry unchanged relative to sections '+width);
+   // Removing the old 76px home rail (PR40) intentionally lets the approved
+   // hero use that extra height. Preserve every content tag, style, asset, X
+   // coordinate and width, and bound any vertical reflow to exactly that gain.
+   const oldLayout=layouts[0],currentLayout=layouts[1],allowedHeightGain=width<=1100?76:0;
+   assert.equal(currentLayout.length,oldLayout.length,'all homepage content/footer nodes retained '+width);
+   assert.equal(currentLayout[0][4]-oldLayout[0][4],allowedHeightGain,'home content uses precisely the removed bottom-rail space '+width);
+   for(let i=0;i<oldLayout.length;i++){
+    const beforeRow=oldLayout[i],afterRow=currentLayout[i];
+    const stable=row=>[row[0],row[1],row[3],...row.slice(5)];
+    assert.deepEqual(stable(afterRow),stable(beforeRow),'homepage node geometry/styles/assets unchanged outside vertical reflow '+width+' #'+i);
+    assert.ok(Math.abs(afterRow[2]-beforeRow[2])<=allowedHeightGain+1,'homepage vertical position within the approved rail removal '+width+' #'+i);
+    assert.ok(Math.abs(afterRow[4]-beforeRow[4])<=allowedHeightGain+1,'homepage element height within the approved rail removal '+width+' #'+i);
+   }
    results.push({homepageWidth:width,height,approvedNavigationResourceHashes:true,identicalOtherResources:true,identicalContentLayout:true});
    console.log('PASS homepage '+width+' identical resources and layout');
   }
