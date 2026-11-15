@@ -16,8 +16,8 @@
 };
  // No ?recette=1 switch on public production pages. QA is confined to /test/
  // or explicit local development, never a production visitor's query string.
- const local=typeof location==='object'&&(!location.hostname||/^(localhost|127\\.0\\.0\\.1)$/i.test(location.hostname));
- const testPath=typeof location==='object'&&/(?:^|\\/)test\\//.test(location.pathname||'');
+ const local=typeof location==='object'&&(!location.hostname||/^(localhost|127\.0\.0\.1)$/i.test(location.hostname));
+ const testPath=typeof location==='object'&&/(?:^|\/)test\//.test(location.pathname||'');
  const test=typeof location==='object'&&(testPath||(local&&new URLSearchParams(location.search).get('recette')==='1'));
  window.MIRPortalConfig=Object.freeze({...common,...(test?{
   environment:'test',projectRef:'hxtztkmbfpmzrieccwsg',supabaseUrl:'https://hxtztkmbfpmzrieccwsg.supabase.co',
