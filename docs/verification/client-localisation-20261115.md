@@ -54,3 +54,22 @@ Les cinq espaces métier, sessions Auth, commandes, punch, géométrie, Supabase
 Tests ajoutés : vérification de la non-traduction des noms, destinataires, adresses et notes clients, deux emails internes fictifs non envoyés, couverture statique de treize pages avec exceptions vérifiées (noms propres, fabricant, adresse), contrats Node du dictionnaire, nombres CAD, exclusion staff, PDF matériaux et panneaux FR/EN, invariants produits et géométrie; Chrome et PDF.js sur PDF réel avec captures comparables; Chromium réel à 360/390/430/768/834/1024/1440 en preview, langue persistée, panier et champ non modifiés, captures avant/après, aucun EN sur URL publique; garde CI de fichiers métier. Les résultats et éventuels échecs CI se jugent uniquement sur la tête GitHub finale.
 
 La couverture complète de tous les parcours FR-CA / EN-CA, documents PDF inspectés dans les deux langues, exports, courriels fictifs et revue humaine des restes FR sont encore requises avant autorisation distincte de fusion et publication.
+
+
+## Reprise et vérifications ciblées — 15 novembre 2026 (PR41)
+
+**Base GitHub relue** : main `33eacb5`. PR41 demeure brouillon, sans fusion ni publication. Les 37 commits ajoutés depuis `83f3a39` ont été conservés : garde client sur Connexion/Compte, retour Auth sans changer les rôles, textes dynamiques, SEO noindex, PDF mixte et simulations de courriels internes, tests de navigation clavier, de compte et d'accessibilité. Ne pas refaire ces lots.
+
+| Contrôle / état réel | Preuve vérifiée | Décision / limite |
+| --- | --- | --- |
+| Client accueil, navigation, 13 pages, FR/EN | `tests/mir-client-i18n-static.cjs`, `tests/mir-client-accessibility-browser.cjs`, `tests/mir-client-i18n-browser.cjs` | Exécution CI sur SHA final requise ; aucune activation EN publique avant revue |
+| Connexion/compte, invitation et retour | `tests/mir-client-account-en-browser.cjs`, `tests/mir-client-account-isolation.cjs`; garde `chantier.html?clientLocale=1` | Ne pas changer Auth, invitations employé ni cinq espaces métier ; backend réel non exercé |
+| PDF matériel FR/EN | `tests/mir-client-i18n-pdf-browser.cjs` et captures de rendu PDF.js | Déjà vert sur `83f3a39`, réexécuter sur HEAD finale |
+| Dossier combiné matériel + pliage | `tests/mir-client-unified-bilingual-browser.cjs` | CI `e2ba08b` a détecté une phrase de couleur personnalisée divisée entre deux lignes SVG et partiellement FR ; correctif dans `mir-client-i18n.js`, test de fragments ajouté. Ne pas ignorer le contrôle |
+| Courriel | `tests/mir-client-email-boundary.cjs`, `tests/mir-client-mail-simulation-browser.cjs` | Modèles existants = notification interne MIR + invitation employé, donc aucune modification ni envoi ; les modèles Supabase Auth client ne sont pas présents dans ce dépôt |
+| SEO, documents fabricant | URL/robots existants préservés, documents externes non réécrits | Pas de hreflang/noindex levé, pas de traduction non officielle de couleur ou PDF fabricant |
+| Android métier | Workflow `android-test` sur `e2ba08b` | **Rouge hors lot** : précondition MIR TEST « Quart/segment QA actif manquant ou incohérent: EMPLOYEE »; 2 tests Android upgrade réussis avant cette précondition. Pas de correction APK ni demande de recette Samsung |
+| Clavardage / garde des fichiers | Workflow `chat-security` sur `e2ba08b` | **Rouge de garde** : empreinte de `dist/commerce.js` diffère du hash protégé de Phase 3A. Ne pas affaiblir le test ni déclarer non-régression complète ; rapprocher le changement d'affichage CAD et la protection de fichier avec le responsable de l'intégration |
+| CI sur tête actuelle | `e2ba08b` : 21 verts, 3 rouges (bilingue PDF, Android TEST, garde chat) | Correctif PDF + test de reproduction poussés sur la branche ensuite. Vérifier les workflows **sur le nouveau SHA**, pas sur une tête antérieure. |
+
+**Interdictions inchangées** : aucune écriture/migration Supabase production, aucun courriel réel, Google/paiement, signature ou distribution APK; Samsung EN ATTENTE. La recette sur appareils physiques et le backend Auth réel ne sont pas remplacés par des simulations. Aucun faux statut « terminé » si la CI finale n'est pas entièrement expliquée et si les PDF mixtes ne sont pas contrôlés dans les deux langues.
