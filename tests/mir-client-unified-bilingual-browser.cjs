@@ -5,7 +5,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
 const {chromium}=require('playwright');
 const dist=path.resolve(__dirname,'../dist');
 const assets=path.resolve(__dirname,'../artifacts');
-const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.avif':'image/avif'};
+const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.mjs':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.avif':'image/avif'};
 const server=http.createServer((req,res)=>{
  let file;try{file=path.resolve(dist,'.'+decodeURIComponent((req.url||'/').split('?')[0]));}catch{res.writeHead(400);res.end();return;}
  if(!file.startsWith(dist+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);res.end('Not found');return;}
