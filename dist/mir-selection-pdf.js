@@ -47,7 +47,16 @@
       };
     });
   }
-  function itemRows(items,locale='fr-CA'){return items.map((item,i)=>{const cells=[String(i+1).padStart(2,'0'),[item.name,item.reference].join(' · '),item.brand,[item.color,item.format].filter(Boolean).join(' · '),String(item.quantity.toLocaleString(locale,{maximumFractionDigits:6})),item.unit],limits=[3,31,17,22,9,9],lines=cells.map((v,j)=>wrap(v,limits[j],locale));return {item,index:i+1,lines,height:Math.max(85,24+20*Math.max(...lines.map(x=>x.length)))};});}
+  // Only presentation labels change: stored quantities, units and product formats stay intact.
+  function displayUnit(unit,locale){
+    if(locale!=='en-CA')return unit;
+    return ({'pièces':'pieces','pièce':'piece','pi²':'sq ft','pi2':'sq ft','pi':'ft','po':'in.','po²':'sq in','mm':'mm','m²':'sq m'})[unit]||unit;
+  }
+  function displayFormat(format,locale){
+    if(locale!=='en-CA')return format;
+    return String(format).replace(/\bpi²\b/g,'sq ft').replace(/\bpi\b/g,'ft').replace(/\bpo\b/g,'in.');
+  }
+  function itemRows(items,locale='fr-CA'){return items.map((item,i)=>{const cells=[String(i+1).padStart(2,'0'),[item.name,item.reference].join(' · '),item.brand,[item.color,displayFormat(item.format,locale)].filter(Boolean).join(' · '),String(item.quantity.toLocaleString(locale,{maximumFractionDigits:6})),displayUnit(item.unit,locale)],limits=[3,31,17,22,9,9],lines=cells.map((v,j)=>wrap(v,limits[j],locale));return {item,index:i+1,lines,height:Math.max(85,24+20*Math.max(...lines.map(x=>x.length)))};});}
   function groups(rows){const pages=[];let current=[],height=0;for(const row of rows){if(height+row.height>650&&current.length){pages.push(current);current=[];height=0;}current.push(row);height+=row.height;}if(current.length)pages.push(current);return pages;}
   function drawing(rows,project,page,total,excluded,locale='fr-CA'){
    const en=locale==='en-CA';
