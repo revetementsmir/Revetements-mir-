@@ -110,6 +110,25 @@ async function runAt(browser,base,width){
  assert.match(await page.locator('#mir-unified-export-status').innerText(),/Dossier complet prêt/);
  assert.equal(await page.locator('html').getAttribute('lang'),'fr-CA');
  assert.equal(await page.locator('.mir-client-locale-switch button[aria-pressed=true]').innerText(),'FR');
+ // Preserve a genuine FR counterpart for visual comparison with the EN
+ // material+bending PDF.  PDF.js renders the same stored drawing, offline.
+ const frenchProof=await page.evaluate(async()=>{
+  const anchor=document.querySelector('#mir-pdf-ready a[download]');
+  const bytes=await (await fetch(anchor.href)).arrayBuffer();
+  const PDF=await import('./vendor/pdfjs/pdf.min.mjs');
+  PDF.GlobalWorkerOptions.workerSrc=new URL('./vendor/pdfjs/pdf.worker.min.mjs',location.href).href;
+  const doc=await PDF.getDocument({data:new Uint8Array(bytes),useSystemFonts:true,isEvalSupported:false}).promise;
+  const second=await doc.getPage(2),viewport=second.getViewport({scale:.6});
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+  await second.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+  return {pages:doc.numPages,text:(await second.getTextContent()).items.map(x=>x.str).join(' '),image:canvas.toDataURL('image/png')};
+ });
+ assert.ok(frenchProof.pages>=2,'real FR combined dossier must contain dimensions');
+ assert.match(frenchProof.text,/DOSSIER DE PLIAGE|COTES FINIES ET POINTS À VALIDER|MATÉRIAU \/ FINI/,'French dimensioned sheet must be rendered');
+ assert.match(frenchProof.text,/Aucune commande transmise; détails/,'Customer note remains intact in original language');
+ fs.writeFileSync(path.join(assets,'mir-dossier-mixte-FR-'+width+'.pdf'),pdf);
+ fs.writeFileSync(path.join(assets,'mir-dossier-mixte-FR-'+width+'.png'),Buffer.from(frenchProof.image.split(',')[1],'base64'));
  await page.locator('button[data-mir-locale="en-CA"]').click();
  await page.waitForFunction(()=>document.documentElement.lang==='en-CA');
  assert.equal(await page.locator('#order-po').count(),0,'account/workshop fields are not duplicated');

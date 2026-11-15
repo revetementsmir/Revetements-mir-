@@ -4,6 +4,14 @@ on:
     paths:
       - 'dist/mir-client-*.js'
       - 'dist/mir-client-*.css'
+      - 'dist/production-model.js'
+      - 'dist/plan-app.js'
+      - 'dist/pliage.js'
+      - 'dist/mir-estimate.js'
+      - 'dist/mir-unified-client-dossier.js'
+      - 'dist/mir-account-flow.js'
+      - 'dist/annotated-pdf.js'
+      - 'dist/mir-panel-po-pdf.js'
       - 'dist/mir-selection-pdf.js'
       - 'dist/mir-dossier-pdf.js'
       - 'dist/commerce.js'
@@ -124,5 +132,7 @@ jobs:
             artifacts/MIR-*selection*.pdf
             artifacts/mir-dossier-mixte-EN-*.pdf
             artifacts/mir-dossier-mixte-EN-*.png
+            artifacts/mir-dossier-mixte-FR-*.pdf
+            artifacts/mir-dossier-mixte-FR-*.png
           if-no-files-found: warn
           retention-days: 14
