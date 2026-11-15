@@ -1,0 +1,40 @@
+{
+  "sourceBase": "5c0466aafd087c10c5dbfa7d6f05a826ff050339 + pending Auth correction",
+  "sdkSha256": "0bf114a6500069af54d6698625c521d9c893ed5a6e1e8f6571b2531c587b4ced",
+  "transport": "synthetic local only; real bundled SDK",
+  "results": [
+    {
+      "scenario": "old getUser denial after next login",
+      "result": "PASS",
+      "staleReadRejected": true,
+      "newVaultPreserved": true,
+      "probePreserved": true
+    },
+    {
+      "scenario": "old delayed native clear vs next login",
+      "result": "PASS",
+      "nextLoginWaitedForClear": true,
+      "newVaultPreserved": true,
+      "probePreserved": true
+    },
+    {
+      "scenario": "old resume denial after same-account refresh",
+      "result": "PASS",
+      "rotatedVaultPreserved": true,
+      "probePreserved": true
+    },
+    {
+      "scenario": "current bad_jwt",
+      "result": "PASS",
+      "vaultPurged": true,
+      "privateBrowserDataPurged": true
+    },
+    {
+      "scenario": "current session_not_found",
+      "result": "PASS",
+      "vaultPurged": true,
+      "privateBrowserDataPurged": true
+    }
+  ],
+  "nativeOrPhysicalProof": false
+}

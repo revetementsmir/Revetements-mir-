@@ -38,7 +38,7 @@ window.MIRPortalClient={...window.MIRPortalClient,create({config}){
     },async submitOrder(payload){
       const out=model.reduce(state,{...payload,type:'CREATE_ORDER',actorId,at:new Date().toISOString(),requestId:crypto.randomUUID()});
       if(!out.ok)throw new Error(out.error?.message);
-      state={...out.state,actorId};publish({...ready(),reason:'order-submit'});
+      state={...out.state,actorId};state.orders.at(-1).id=crypto.randomUUID();publish({...ready(),reason:'order-submit'});
       return {orderId:state.orders.at(-1)?.id,receiptId:crypto.randomUUID(),status:'submitted'};
     },async setOrderShortcut(kind,itemId,favorite){
       const out=model.reduce(state,{type:'SET_FAVORITE',actorId,itemId,favorite,at:new Date().toISOString(),requestId:crypto.randomUUID()});

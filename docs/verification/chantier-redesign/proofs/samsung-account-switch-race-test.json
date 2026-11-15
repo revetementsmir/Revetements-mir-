@@ -1,0 +1,175 @@
+{
+  "sourceCommit": "29abcf55c51b21f1bc3c556567160a3f9d077797",
+  "environment": "MIR TEST hxtztkmbfpmzrieccwsg only",
+  "windowUTC": {
+    "start": "2026-11-14T16:10:00Z",
+    "end": "2026-11-14T16:12:20Z"
+  },
+  "mode": "Read-only hosted log aggregates; no credentials, headers, tokens or private message content queried",
+  "nativeRun": 43613624644,
+  "nativeArtifact": "https://github.com/revetementsmir/Revetements-mir-/actions/runs/43613624644/artifacts/14120624900",
+  "artifactZipSha256": "458e8c9313af2f6e4958346deedbe03837d6939b1fd68b2b4f8e81b71b4a0321",
+  "nativeFailure": {
+    "line": 209,
+    "marker": "ready",
+    "phase": "signed_out",
+    "view": "absences",
+    "heading": "Connexion équipe MIR",
+    "drawing": null,
+    "screenshotActuallyOpenedByCoordinator": true,
+    "physicalDevice": false
+  },
+  "observations": [
+    "7 smoke and 2 upgrade checks passed; employee completed screenshots and Android font trials; next account failed before Chef recipe",
+    "Authenticated Chef account snapshots and user read succeeded, then an authenticated Chef logout occurred",
+    "An anonymous account snapshot returned401 earlier in the window; attribution to a specific caller is not established by these aggregates",
+    "Employee foreign-organization snapshot403 is an expected refusal, not proof of an authentication defect",
+    "Late portal identity clear and queued SDK purge are hypotheses requiring deterministic regression tests; no cause or fix is certified by a screenshot"
+  ],
+  "requests": [
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T16:10:00.017000",
+      "last_at": "2026-11-14T16:11:34.430000",
+      "path": "/rest/v1/rpc/mir_account_snapshot",
+      "requests": 118,
+      "status": "200"
+    },
+    {
+      "actor": "",
+      "first_at": "2026-11-14T16:10:00.290000",
+      "last_at": "2026-11-14T16:11:43.748000",
+      "path": "/rest/v1/rpc/mir_portal_snapshot",
+      "requests": 3,
+      "status": "200"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T16:10:00.314000",
+      "last_at": "2026-11-14T16:11:31.551000",
+      "path": "/rest/v1/rpc/mir_portal_snapshot",
+      "requests": 8,
+      "status": "200"
+    },
+    {
+      "actor": "",
+      "first_at": "2026-11-14T16:10:00.762000",
+      "last_at": "2026-11-14T16:10:08.428000",
+      "path": "/rest/v1/rpc/mir_employee_operations_snapshot",
+      "requests": 2,
+      "status": "200"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T16:10:00.792000",
+      "last_at": "2026-11-14T16:11:35.774000",
+      "path": "/rest/v1/rpc/mir_employee_operations_snapshot",
+      "requests": 8,
+      "status": "200"
+    },
+    {
+      "actor": "",
+      "first_at": "2026-11-14T16:10:06.690000",
+      "last_at": "2026-11-14T16:11:42.934000",
+      "path": "/auth/v1/logout",
+      "requests": 3,
+      "status": "200"
+    },
+    {
+      "actor": "",
+      "first_at": "2026-11-14T16:10:06.693000",
+      "last_at": "2026-11-14T16:11:42.928000",
+      "path": "/auth/v1/user",
+      "requests": 4,
+      "status": "200"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T16:10:06.714000",
+      "last_at": "2026-11-14T16:11:37.734000",
+      "path": "/auth/v1/logout",
+      "requests": 2,
+      "status": "204"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T16:10:06.718000",
+      "last_at": "2026-11-14T16:10:06.986000",
+      "path": "/auth/v1/user",
+      "requests": 2,
+      "status": "403"
+    },
+    {
+      "actor": "",
+      "first_at": "2026-11-14T16:10:06.960000",
+      "last_at": "2026-11-14T16:11:40.500000",
+      "path": "/auth/v1/token",
+      "requests": 4,
+      "status": "200"
+    },
+    {
+      "actor": "",
+      "first_at": "2026-11-14T16:10:07.230000",
+      "last_at": "2026-11-14T16:11:40.804000",
+      "path": "/rest/v1/rpc/mir_account_snapshot",
+      "requests": 2,
+      "status": "200"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T16:10:07.275000",
+      "last_at": "2026-11-14T16:11:30.172000",
+      "path": "/auth/v1/user",
+      "requests": 15,
+      "status": "200"
+    },
+    {
+      "actor": "3980647a-d83a-48ad-9d90-8fc2b314807f",
+      "first_at": "2026-11-14T16:11:36.065000",
+      "last_at": "2026-11-14T16:11:36.065000",
+      "path": "/rest/v1/rpc/mir_employee_operations_snapshot",
+      "requests": 1,
+      "status": "403"
+    },
+    {
+      "actor": "",
+      "first_at": "2026-11-14T16:11:40.830000",
+      "last_at": "2026-11-14T16:11:40.830000",
+      "path": "/rest/v1/rpc/mir_account_snapshot",
+      "requests": 1,
+      "status": "401"
+    },
+    {
+      "actor": "ec421778-b39b-492e-9e4b-5e044015e98f",
+      "first_at": "2026-11-14T16:11:41.928000",
+      "last_at": "2026-11-14T16:11:43.496000",
+      "path": "/rest/v1/rpc/mir_account_snapshot",
+      "requests": 3,
+      "status": "200"
+    },
+    {
+      "actor": "ec421778-b39b-492e-9e4b-5e044015e98f",
+      "first_at": "2026-11-14T16:11:42.954000",
+      "last_at": "2026-11-14T16:11:42.954000",
+      "path": "/auth/v1/user",
+      "requests": 1,
+      "status": "200"
+    },
+    {
+      "actor": "ec421778-b39b-492e-9e4b-5e044015e98f",
+      "first_at": "2026-11-14T16:11:42.960000",
+      "last_at": "2026-11-14T16:11:42.960000",
+      "path": "/auth/v1/logout",
+      "requests": 1,
+      "status": "204"
+    },
+    {
+      "actor": "ec421778-b39b-492e-9e4b-5e044015e98f",
+      "first_at": "2026-11-14T16:11:43.772000",
+      "last_at": "2026-11-14T16:11:43.772000",
+      "path": "/rest/v1/rpc/mir_portal_snapshot",
+      "requests": 1,
+      "status": "200"
+    }
+  ]
+}

@@ -15,6 +15,7 @@ on:
       - 'dist/entrepot*'
       - 'dist/metres.html'
       - 'tests/mir-phase9-catalogue*'
+      - 'tests/mir-magasin-visual-browser.cjs'
       - '.github/workflows/mir-phase9-catalogue-pr.yml'
 
 permissions:
@@ -41,6 +42,21 @@ jobs:
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
         run: node tests/mir-phase9-catalogue-browser.cjs
+      - name: Captures réelles du magasin avant / après (branche de base et PR)
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          MIR_MAGASIN_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/mir-magasin-baseline"
+          git archive "$MIR_MAGASIN_BASE_SHA" dist | tar -x -C "$RUNNER_TEMP/mir-magasin-baseline"
+          MIR_MAGASIN_BASE_DIR="$RUNNER_TEMP/mir-magasin-baseline/dist" node tests/mir-magasin-visual-browser.cjs
+      - name: Conserver les captures de la recette magasin
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: MIR-magasin-avant-apres
+          path: artifacts/mir-magasin-visual/
+          if-no-files-found: warn
       - name: Non-régressions Phases 6 à 8
         run: |
           node tests/mir-phase8-settings-client.cjs
