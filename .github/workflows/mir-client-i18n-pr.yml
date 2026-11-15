@@ -13,6 +13,8 @@ on:
       - 'tests/mir-client-account-isolation.cjs'
       - 'tests/mir-client-account-en-browser.cjs'
       - 'tests/mir-client-accessibility-browser.cjs'
+      - 'tests/mir-client-email-boundary.cjs'
+      - 'tests/mir-client-mail-simulation-browser.cjs'
       - 'tests/mir-client-unified-bilingual-browser.cjs'
       - 'tests/mir-client-pdf-bilingual.cjs'
       - 'tests/mir-client-i18n-pdf-browser.cjs'
@@ -56,6 +58,8 @@ jobs:
           node --check tests/mir-client-account-isolation.cjs
           node --check tests/mir-client-account-en-browser.cjs
           node --check tests/mir-client-accessibility-browser.cjs
+          node --check tests/mir-client-email-boundary.cjs
+          node --check tests/mir-client-mail-simulation-browser.cjs
           node --check tests/mir-client-unified-bilingual-browser.cjs
           node --check tests/mir-client-i18n-browser.cjs
           node --check tests/mir-client-pdf-bilingual.cjs
@@ -72,6 +76,8 @@ jobs:
           node tests/mir-client-i18n-static.cjs
           MIR_CLIENT_BASE_SHA="${{ github.event.pull_request.base.sha }}" node tests/mir-client-account-isolation.cjs
           node tests/mir-client-pdf-bilingual.cjs
+          MIR_CLIENT_BASE_SHA="${{ github.event.pull_request.base.sha }}" node tests/mir-client-email-boundary.cjs
+          node --test tests/mir-estimate-presentation.cjs
       - name: Install Chromium test dependency
         run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
       - name: Real FR/EN screens and no-regression (preview only)
@@ -90,6 +96,10 @@ jobs:
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
         run: node tests/mir-client-i18n-pdf-browser.cjs
+      - name: Existing internal mail templates (simulated only, no transport)
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: node tests/mir-client-mail-simulation-browser.cjs
       - name: Full mixed cart and bending PDF in FR-CA / EN-CA
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
@@ -102,6 +112,7 @@ jobs:
           path: |
             artifacts/mir-client-*.png
             artifacts/mir-client-matrix-*.png
+            artifacts/mir-mail-internal-fictive-*.png
             docs/verification/account/bilingual-client-account-*.png
             artifacts/mir-customer-pdf-*.png
             artifacts/MIR-*selection*.pdf

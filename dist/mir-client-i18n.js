@@ -156,7 +156,7 @@
   }
   function excluded(node){
     const e=node?.nodeType===1?node:node?.parentElement;
-    return !e || !!e.closest('script,style,noscript,textarea,[contenteditable],template,code,pre,[data-mir-user-content],.mir-help-message,.mir-chat-message,.mir-client-note,.mir-customer-note');
+    return !e || !!e.closest('script,style,noscript,textarea,[contenteditable],template,code,pre,[data-mir-user-content],.mir-help-message,.mir-chat-message,.mir-client-note,.mir-customer-note,.account-address h3,.account-address p');
   }
   function updateText(node){
     if(node.nodeType!==3||excluded(node))return;

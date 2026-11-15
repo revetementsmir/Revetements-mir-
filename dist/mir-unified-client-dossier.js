@@ -140,7 +140,7 @@
    if(n){
     for(const item of current.pieces){
      const row=doc.createElement('li'),strong=doc.createElement('strong');
-     strong.textContent=clean(item.spec?.name||item.snapshot?.templateSnapshot?.name||item.id||'Pièce');
+     strong.textContent=clean(item.spec?.name||item.snapshot?.templateSnapshot?.name||item.id||'Pièce');strong.setAttribute('data-mir-user-content','');
      const detail=doc.createElement('span'),quantity=Number(item.spec?.quantity)||1;
      const code=clean(item.spec?.finish?.code||item.spec?.finish?.name||'Couleur à confirmer');
      detail.textContent=' · '+quantity+(en()?(quantity===1?' piece':' pieces'):' pièce'+(quantity===1?'':'s'))+' · '+code+(en()?' · reference ':' · repère ')+clean(item.id);
