@@ -89,6 +89,8 @@
       'l’étoile':'the star',
       'par l’atelier et le fournisseur.':'by the workshop and supplier.',
       'personnalisée, y compris RAL, exige une':'including RAL, requires a',
+      'personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.':'including RAL, requires a quote. No automatic pricing.',
+      'Toute couleur personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.':'All custom colours, including RAL, require a quote. No automatic pricing.',
       'soumission. Aucun prix automatique.':'quote. No automatic pricing.',
       'La référence spéciale doit être confirmée':'The special reference must be confirmed',
       'Soumission obligatoire : Toute couleur':'Quote required: Any custom colour',
@@ -99,6 +101,9 @@
       'Soumission obligatoire : Toute couleur personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.':'Quote required: All custom colours, including RAL, require a quote. No automatic price.'
     };
     if(Object.prototype.hasOwnProperty.call(staticSheet,value))return staticSheet[value];
+    // Some SVG renderers split this fixed business warning after the prefix.
+    // Translate only the known fixed fragments; never translate customer notes.
+    if(value.startsWith('Soumission obligatoire : Toute couleur personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.'))return value.replace('Soumission obligatoire : Toute couleur personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.','Quote required: All custom colours, including RAL, require a quote. No automatic pricing.');
     const prefixes=[
       [/^Pli /,'Bend '],
       [/^Développé total = /,'Developed length = '],
