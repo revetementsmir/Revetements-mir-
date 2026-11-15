@@ -151,10 +151,14 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
     });
     // Les pixels rastérisés peuvent varier entre deux captures sur le runner.
     // Vérifier les ressources, les dimensions et les styles réellement calculés.
-    layouts.push(await page.evaluate(()=>Array.from(document.body.querySelectorAll('*'),element=>{
-     const {x,y,width,height}=element.getBoundingClientRect();
+    // The PR40 navigation intentionally changes the shared header and menu.
+    // Keep byte-for-byte visual geometry, styles, images and DOM order inside
+    // the actual homepage content and footer, relative to their own sections.
+    layouts.push(await page.evaluate(()=>Array.from(document.querySelectorAll('main,main *,footer,footer *'),element=>{
+     const frame=element.closest('main,footer')||element;
+     const relative=frame.getBoundingClientRect(),{x,y,width,height}=element.getBoundingClientRect();
      const style=getComputedStyle(element);
-     return [element.tagName,x,y,width,height,style.display,style.visibility,style.font,style.color,style.backgroundColor,element.currentSrc?new URL(element.currentSrc).pathname:null];
+     return [element.tagName,x-relative.x,y-relative.y,width,height,style.display,style.visibility,style.font,style.color,style.backgroundColor,element.currentSrc?new URL(element.currentSrc).pathname:null];
     })));
     await page.screenshot({path:path.join(proof,'accueil-'+label+'-'+width+'.png'),fullPage:true,animations:'disabled'});
     sources.push(Object.fromEntries(await Promise.all(responses.map(async res=>[
@@ -162,9 +166,24 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
     ]))));
     await c.close();
    }
-   assert.deepEqual(sources[0],sources[1],'identical homepage resources '+width);
-   assert.deepEqual(layouts[0],layouts[1],'identical homepage layout '+width);
-   results.push({homepageWidth:width,height,identicalResources:true,identicalLayout:true});
+   // PR40 intentionally replaced exactly two menu assets. Verify their
+   // approved SHA-256 individually, and require every other fetched resource
+   // (including the four approved home photographs) to be byte-identical.
+   const approvedMenu={
+    '/mir-public-menu.css':'ac266b70ac840e1e61da1231ee006d73f6d51892d06fcdd301c2f035a197162a',
+    '/mir-public-menu.js':'cf77419a524b99a3e612ca6f19e950debac6f7dc2add255db7807cf0625002bd'
+   };
+   const currentResources={...sources[1]};
+   for(const [pathname,approvedSha]of Object.entries(approvedMenu)){
+    assert.equal(currentResources[pathname],approvedSha,'approved PR40 menu resource '+pathname+' '+width);
+    assert.ok(sources[0][pathname],'original menu resource existed '+pathname);
+    delete currentResources[pathname];
+   }
+   const previousResources={...sources[0]};
+   for(const pathname of Object.keys(approvedMenu))delete previousResources[pathname];
+   assert.deepEqual(currentResources,previousResources,'all non-navigation homepage resources remain byte-identical '+width);
+   assert.deepEqual(layouts[0],layouts[1],'homepage content/footer geometry unchanged relative to sections '+width);
+   results.push({homepageWidth:width,height,approvedNavigationResourceHashes:true,identicalOtherResources:true,identicalContentLayout:true});
    console.log('PASS homepage '+width+' identical resources and layout');
   }
  }
