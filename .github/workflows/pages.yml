@@ -252,10 +252,13 @@ jobs:
             echo "Les écrans de démonstration ne doivent pas être publiés." >&2
             exit 1
           fi
-      - name: Préparer le site MIR TEST isolé
+      - name: Préparer le site MIR TEST isolé depuis les originaux fonctionnels
         run: |
-          node scripts/build-mir-test.cjs --production-manifest _site_mir "$GITHUB_SHA" > /tmp/mir-production-release-build.json
           node scripts/build-mir-test.cjs _site_mir _site_mir/test "$GITHUB_SHA"
+      - name: Studio en construction seulement sur le site public et manifeste exact
+        run: |
+          node scripts/stage-mir-studio-public.cjs _site_mir
+          node scripts/build-mir-test.cjs --production-manifest _site_mir "$GITHUB_SHA" > /tmp/mir-production-release-build.json
       - name: Charger les sources certifiées de l’application TEST
         uses: actions/checkout@v4
         with:
@@ -347,7 +350,19 @@ jobs:
           grep -F 'mir-client-signature.css?v=1' /tmp/mir-boutique.html
           fetch "$base/plan.html?verification=$GITHUB_SHA" /tmp/mir-plan-public.html
           cmp /tmp/mir-plan-public.html _site_mir/plan.html
-          grep -F 'mir-client-header.css?v=' /tmp/mir-plan-public.html
+          grep -F 'data-mir-studio-public-state="construction"' /tmp/mir-plan-public.html
+          grep -F 'En construction par l’équipe MIR' /tmp/mir-plan-public.html
+          grep -F 'Under construction by the MIR team' /tmp/mir-plan-public.html
+          fetch "$base/studio.html?verification=$GITHUB_SHA" /tmp/mir-studio-public.html
+          cmp /tmp/mir-studio-public.html _site_mir/studio.html
+          cmp /tmp/mir-plan-public.html /tmp/mir-studio-public.html
+          fetch "$base/test/plan.html?verification=$GITHUB_SHA" /tmp/mir-plan-test.html
+          cmp /tmp/mir-plan-test.html _site_mir/test/plan.html
+          grep -F 'mir-test-guard.js' /tmp/mir-plan-test.html
+          grep -F 'mir-client-header.css?v=' /tmp/mir-plan-test.html
+          fetch "$base/test/studio.html?verification=$GITHUB_SHA" /tmp/mir-studio-test.html
+          cmp /tmp/mir-studio-test.html _site_mir/test/studio.html
+          grep -F 'mir-test-guard.js' /tmp/mir-studio-test.html
           for asset in mir-bending-finishes.js plan-import.js plan-stair-vision.js mir-vertical-layout.js plan-scan-ocr.js plan-sheet-detection.js plan-spatial-dimensions.js plan-facade-visual.js plan-app.js plan-3d.js plan.css plan-annotations.js plan-annotations.css studio-wall-sections.js studio-features.js material-surface.js catalogue-fd6866b49d21.json; do
             fetch "$base/$asset?verification=$GITHUB_SHA" "/tmp/mir-$asset"
             cmp "/tmp/mir-$asset" "_site_mir/$asset"
@@ -355,8 +370,8 @@ jobs:
           grep -F 'MIRSheetDetection' /tmp/mir-plan-import.js
           grep -F 'MIRStairVision.detect' /tmp/mir-plan-import.js
           grep -F 'MIRVerticalLayout' /tmp/mir-mir-vertical-layout.js
-          grep -F 'mir-vertical-layout.js?v=1' /tmp/mir-plan-public.html
-          grep -F 'batten-spacing' /tmp/mir-plan-public.html
+          grep -F 'mir-vertical-layout.js?v=1' /tmp/mir-plan-test.html
+          grep -F 'batten-spacing' /tmp/mir-plan-test.html
           grep -F 'raster-parallel-risers-calibrated' /tmp/mir-plan-stair-vision.js
           fetch "$base/assets/mir-home-hero-20261105.avif" /tmp/mir-home-hero.avif
           fetch "$base/assets/mir-home-hero-20261105.webp" /tmp/mir-home-hero.webp

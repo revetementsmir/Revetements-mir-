@@ -1,0 +1,69 @@
+name: MIR Studio public et courriels de recette (sans envoi)
+on:
+  pull_request:
+    paths:
+      - 'ops/studio-public/**'
+      - 'scripts/stage-mir-studio-public.cjs'
+      - 'tools/qa/mir-mail-recipe.cjs'
+      - 'tests/mir-studio-public-*.cjs'
+      - 'tests/mir-mail-recipe-offline.cjs'
+      - '.github/workflows/pages.yml'
+      - '.github/workflows/mir-studio-mail-recipe-pr.yml'
+      - 'docs/verification/studio-public-courriels-20261115.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  private-staging-and-mail:
+    name: Studio TEST intact / aperçu FR-EN / courriels interceptés
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntaxe des seuls nouveaux fichiers
+        run: |
+          node --check scripts/stage-mir-studio-public.cjs
+          node --check tools/qa/mir-mail-recipe.cjs
+          node --check tests/mir-studio-public-stage.cjs
+          node --check tests/mir-studio-public-browser.cjs
+          node --check tests/mir-mail-recipe-offline.cjs
+      - name: Séparation des sources TEST/public et modèle de recette fermé
+        run: |
+          node tests/mir-studio-public-stage.cjs
+          node tests/mir-mail-recipe-offline.cjs
+          node tests/mir-test-environment.cjs
+          node tests/mir-public-menu.cjs
+          node tests/mir-studio-interactions.cjs
+          node tests/mir-client-i18n-static.cjs
+          node tests/mir-client-email-boundary.cjs
+          node tests/mir-team-invitation-email.cjs
+      - name: Vérification de la chaîne de montage Pages sans changer le site
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const y=fs.readFileSync('.github/workflows/pages.yml','utf8');
+          const test=y.indexOf('node scripts/build-mir-test.cjs _site_mir _site_mir/test');
+          const stage=y.indexOf('node scripts/stage-mir-studio-public.cjs _site_mir');
+          const manifest=y.indexOf('node scripts/build-mir-test.cjs --production-manifest _site_mir');
+          assert(test>=0&&stage>test&&manifest>stage,'generate protected TEST, stage Studio-only, then hash final public bytes');
+          assert(y.includes('node scripts/mir-final-release-gate.cjs'),'existing strict release gate preserved');
+          assert(y.includes('cmp /tmp/mir-plan-public.html _site_mir/plan.html'),'exact public output still verified');
+          assert(y.includes('cmp /tmp/mir-plan-test.html _site_mir/test/plan.html'),'original TEST must be byte checked');
+          NODE
+      - name: Captures Chrome réelles FR/EN, 7 tailles, clavier et mouvement réduit
+        run: |
+          npm install --no-save playwright@1.58.2
+          MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-public-browser.cjs
+      - name: Conserver les captures locales et aperçus fictifs sans données privées
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-studio-public-mail-offline
+          path: |
+            artifacts/studio-public/*.png
+            artifacts/mir-mail-offline/*.html
+            artifacts/mir-mail-offline/*.txt
+          if-no-files-found: warn
