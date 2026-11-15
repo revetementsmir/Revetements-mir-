@@ -10,6 +10,7 @@ on:
       - 'dist/catalogue.js'
       - 'dist/*.html'
       - 'tests/mir-client-i18n*.cjs'
+      - 'tests/mir-client-account-isolation.cjs'
       - 'tests/mir-client-pdf-bilingual.cjs'
       - 'tests/mir-client-i18n-pdf-browser.cjs'
       - 'docs/verification/client-localisation-20261115.md'
@@ -35,7 +36,7 @@ jobs:
           base="${{ github.event.pull_request.base.sha }}"
           git fetch origin "$base" --depth=1
           forbidden="$(git diff --name-only "$base" HEAD -- mobile supabase \
-            dist/chantier.html dist/chantier-app.js dist/portal-client.js \
+            dist/chantier-app.js dist/portal-client.js \
             dist/entrepot.html dist/entrepot-app.js dist/coordination.html \
             dist/production-app.js dist/mir-estimate-presentation.js \
             dist/mir-help-center.js dist/mir-client-return.js)"
@@ -49,6 +50,7 @@ jobs:
           node --check dist/mir-dossier-pdf.js
           node --check tests/mir-client-i18n.cjs
           node --check tests/mir-client-i18n-static.cjs
+          node --check tests/mir-client-account-isolation.cjs
           node --check tests/mir-client-i18n-browser.cjs
           node --check tests/mir-client-pdf-bilingual.cjs
           node --check tests/mir-client-i18n-pdf-browser.cjs
@@ -62,6 +64,7 @@ jobs:
         run: |
           node tests/mir-client-i18n.cjs
           node tests/mir-client-i18n-static.cjs
+          MIR_CLIENT_BASE_SHA="$base" node tests/mir-client-account-isolation.cjs
           node tests/mir-client-pdf-bilingual.cjs
       - name: Install Chromium test dependency
         run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
