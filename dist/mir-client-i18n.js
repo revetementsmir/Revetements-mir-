@@ -34,7 +34,7 @@
     if(lang!=='en-CA'||typeof value!=='string')return value;
     const cleaned=value.trim().normalize('NFC');
     if(!cleaned)return value;
-    const fixed=dict[cleaned] || dynamic(cleaned);
+    const fixed=Object.prototype.hasOwnProperty.call(dict,cleaned)?dict[cleaned]:dynamic(cleaned);
     return fixed===cleaned?value:value.replace(cleaned,fixed);
   }
   function dynamic(value){
@@ -141,7 +141,10 @@
     if(!win||!isClient(win.location.pathname,win.location.search))return false;
     // A complete English release requires separate coverage, PDF and visual certification.
     // The preview is isolated to the unpublished feature branch until the coverage gate is lifted.
-    const preview=new URLSearchParams(win.location.search).get('mir-locale-preview')==='1';
+    const requested=new URLSearchParams(win.location.search).get('mir-locale-preview')==='1';
+    if(requested)try{win.sessionStorage.setItem('mir-client-locale-preview-v1','1');}catch{}
+    let preview=requested;
+    if(!preview)try{preview=win.sessionStorage.getItem('mir-client-locale-preview-v1')==='1';}catch{}
     if(!preview)return false;
     active=true;
     try{if(win.localStorage.getItem(KEY)==='en-CA')locale='en-CA';}catch{}
