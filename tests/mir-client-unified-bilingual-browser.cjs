@@ -81,7 +81,7 @@ async function runAt(browser,base,width){
  assert.equal(await page.locator('#mir-unified-count').innerText(),'1 pièce sur mesure');
  assert.equal(await page.locator('#mir-unified-associate').isVisible(),false);
  assert.equal(await page.locator('#mir-unified-json').isEnabled(),true);
- const before=await page.evaluate(()=>Object.keys(localStorage).sort());
+ const before=await page.evaluate(()=>Object.keys(localStorage).filter(k=>k!=='mir-client-locale-v1').sort());
  const getJson=page.waitForEvent('download');
  await page.locator('#mir-unified-json').click();
  const json=await getJson;
@@ -96,7 +96,7 @@ async function runAt(browser,base,width){
  assert.equal(data.pieces.order.items.length,1);
  assert.deepEqual(data.pieces.order.items[0].snapshot,original.items[0].snapshot);
  assert.equal(data.pieces.order.poNumber,'MIR-TEST-LOCAL-001');
- assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage).sort()),before,'aucune troisième sauvegarde');
+ assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage).filter(k=>k!=='mir-client-locale-v1').sort()),before,'aucune troisième sauvegarde');
  await page.locator('#mir-unified-pdf').click();
  await page.locator('#mir-pdf-ready a[download]').waitFor({state:'visible',timeout:90000});
  const downloadEvent=page.waitForEvent('download');
@@ -142,7 +142,7 @@ async function runAt(browser,base,width){
  await page.locator('button[data-mir-locale="fr-CA"]').click();
  await page.waitForFunction(()=>document.documentElement.lang==='fr-CA');
 
- assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage).sort()),before,'PDF sans sauvegarde supplémentaire');
+ assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage).filter(k=>k!=='mir-client-locale-v1').sort()),before,'PDF sans sauvegarde supplémentaire');
  await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.querySelector('#mir-unified-json')?.disabled===false&&
   document.querySelectorAll('#selection-items .selection-item').length===1,{timeout:30000});
