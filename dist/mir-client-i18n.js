@@ -119,7 +119,8 @@
     for(const [re,label]of prefixes)technical=technical.replace(re,label);
     // Translate unit abbreviations in document labels only: no conversions.
     if(technical!==value||/[\d½¼¾⅛⅜⅝⅞]\s*po(?:²)?\b/.test(value)){
-      technical=technical.replace(/\bpo²\b/g,'sq in').replace(/(\d(?:[0-9\s.,½¼¾⅛⅜⅝⅞/]*))\s+po\b/g,'$1 in.');
+      technical=technical.replace(/Face ([12]) — côté indiqué par/g,'Face $1 — side marked by')
+        .replace(/\bpo²\b/g,'sq in').replace(/(\d(?:[0-9\s.,½¼¾⅛⅜⅝⅞/]*))\s+po\b/g,'$1 in.');
       return technical;
     }
     const patterns=[
@@ -153,7 +154,46 @@
     }
     return value;
   }
-  function translateSvgLabels(svg){
+  // The checkout/Studio store can contain a user-entered string identical to
+  // a UI label ("Panier", "Boutique", etc.). It is never translated in PDF output.
+  // Read approved local stores only; no writes, network, or new persistent key.
+  function customerPdfProtectedStrings(){
+    const originals=new Set(),notes=new Set();
+    const fields=/^(?:project|name|note|notes|subject|body|label|title|email|street|address|city|recipient|location|colour|color|colorName|code|sku|reference|manufacturerReference|manufacturer|brand|description)$/i;
+    const walkFields=(value,key='',depth=0)=>{
+      if(depth>16||value===null)return;
+      if(typeof value==='string'){
+        if(fields.test(key)&&value.trim()){
+          originals.add(value.trim());
+          if(/^(note|notes|body|description)$/i.test(key))notes.add(value.trim());
+        }
+      }else if(Array.isArray(value)){
+        if(value.length>1000)return;
+        for(const v of value)walkFields(v,key,depth+1);
+      }else if(typeof value==='object'){
+        for(const [k,v]of Object.entries(value).slice(0,100))walkFields(v,k,depth+1);
+      }
+    };
+    for(const key of ['mir-shopping-list-v1','mir_production_client_dossier_v1','mir-bending-v1']){
+      try{
+        const data=JSON.parse(root.localStorage?.getItem(key)||'null');
+        if(data&&typeof data==='object')walkFields(data);
+      }catch{}
+    }
+    return {originals,notes};
+  }
+  function protectedPdfText(value,protectedContent){
+    const source=String(value||'').trim();
+    if(protectedContent.originals.has(source))return source;
+    const notePrefix=source.match(/^(Notes?\s*:\s*|Emplacement\s*:\s*)(.*)$/);
+    if(notePrefix&&[...protectedContent.notes].some(note=>note.includes(notePrefix[2]))) {
+      return notePrefix[1].startsWith('Note')?'Notes: '+notePrefix[2]:'Location: '+notePrefix[2];
+    }
+    // A long user note can be wrapped into several SVG <text> fragments.
+    if(source.length>=4&&[...protectedContent.notes].some(note=>note.includes(source)))return source;
+    return null;
+  }
+  function translateSvgLabels(svg,protectedContent=customerPdfProtectedStrings()){
     if(typeof svg!=='string'||typeof root?.DOMParser!=='function')return svg;
     const parsed=new root.DOMParser().parseFromString(svg,'image/svg+xml');
     if(parsed.querySelector('parsererror')||parsed.documentElement.localName!=='svg')return svg;
@@ -162,33 +202,40 @@
     for(const textNode of parsed.querySelectorAll('text,tspan')){
       for(const child of [...textNode.childNodes]){
         if(child.nodeType!==3)continue;
-        const before=child.nodeValue,after=pdfText(before.trim());
-        if(after!==before.trim())child.nodeValue=before.replace(before.trim(),after);
+        const before=child.nodeValue,source=before.trim();
+        const protectedValue=protectedPdfText(source,protectedContent);
+        const after=protectedValue===null?pdfText(source):protectedValue;
+        if(after!==source)child.nodeValue=before.replace(source,after);
       }
     }
     return new root.XMLSerializer().serializeToString(parsed.documentElement);
   }
   function localizePdfOptions(options){
     if(!active||locale!=='en-CA'||staffReady()||!options||!Array.isArray(options.faces))return options;
+    const protectedContent=customerPdfProtectedStrings();
+    const readOnlyTranslation=text=>{
+      if(typeof text!=='string')return text;
+      return protectedPdfText(text,protectedContent)??pdfText(text);
+    };
     const file=String(options.filename||'');
     const englishFile=file.endsWith('.pdf')&&!/-en-CA\.pdf$/i.test(file)
       ?file.replace(/\.pdf$/i,'-en-CA.pdf'):file;
     return {
       ...options,
-      title:pdfText(options.title),subtitle:pdfText(options.subtitle),
+      title:readOnlyTranslation(options.title),subtitle:readOnlyTranslation(options.subtitle),
       filename:englishFile,locale:'en-CA',
       faces:options.faces.map(face=>({
         ...face,
-        svg:translateSvgLabels(face.svg),
-        documentTitle:pdfText(face.documentTitle),
-        scaleNote:pdfText(face.scaleNote),footerNote:pdfText(face.footerNote),
-        sidebarTitle:pdfText(face.sidebarTitle),
+        svg:translateSvgLabels(face.svg,protectedContent),
+        documentTitle:readOnlyTranslation(face.documentTitle),
+        scaleNote:readOnlyTranslation(face.scaleNote),footerNote:readOnlyTranslation(face.footerNote),
+        sidebarTitle:readOnlyTranslation(face.sidebarTitle),
         // Name and reference fields often contain customer-entered identifiers.
         // They are deliberately not rewritten.
         summary:Array.isArray(face.summary)?face.summary.map(row=>
-          typeof row==='string'?pdfText(row):
-          row&&typeof row==='object'&&typeof row.label==='string'?{...row,label:pdfText(row.label)}:
-          row&&typeof row==='object'&&typeof row.text==='string'?{...row,text:pdfText(row.text)}:row
+          typeof row==='string'?readOnlyTranslation(row):
+          row&&typeof row==='object'&&typeof row.label==='string'?{...row,label:readOnlyTranslation(row.label)}:
+          row&&typeof row==='object'&&typeof row.text==='string'?{...row,text:readOnlyTranslation(row.text)}:row
         ):face.summary
       }))
     };

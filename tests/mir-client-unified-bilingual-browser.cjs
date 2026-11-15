@@ -132,6 +132,8 @@ async function runAt(browser,base,width){
  assert.ok(enDetails.size>15000&&enDetails.pages>=2,'real mixed PDF required');
  assert.match(enDetails.firstText,/MATERIALS SELECTION|MIR — Materials/,'English first sheet');
  assert.match(enDetails.secondText,/MATERIAL \/ FINISH|FINISHED DIMENSIONS|QUANTITY \/ LENGTH/,'English fabrication headings must appear on the second PDF page');
+ assert.match(enDetails.secondText,/Face 1 — side marked by/,'painted-face instruction is fully in English');
+ assert.doesNotMatch(enDetails.secondText,/Foreman: À préciser|Face 1 — côté indiqué par/,'no partial French in the dimensioned sheet');
  assert.doesNotMatch(enDetails.secondText,/DOSSIER DE PLIAGE|MATÉRIAU \/ FINI|QUANTITÉ \/ LONGUEUR|COTES FINIES ET POINTS À VALIDER|Soumission obligatoire|Face colorée :|Développé total =/,'No untranslated business labels in the English dimensioned sheet');
  assert.ok(enDetails.preview.startsWith('data:image/png;base64,'),'custom piece preview really rasterized');
  const enEvent=page.waitForEvent('download');await enLink.click();const enPDF=await enEvent;

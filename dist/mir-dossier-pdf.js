@@ -18,7 +18,7 @@ function relocateProductionHeader(body){
  if(clientEN()){
   meta=meta.replace(/\bCommande : /g,'Order: ').replace(/\bChantier : /g,'Jobsite: ')
    .replace(/\bChef : /g,'Foreman: ').replace(/\bDate : /g,'Date: ')
-   .replace(/\bRévision : /g,'Revision: ').replace(/\bÀ préciser\b/g,'To confirm');
+   .replace(/\bRévision : /g,'Revision: ').replace(/À préciser/g,'To confirm');
  }
  for(const x of header)x.node.remove();
  const wrap=(value,max)=>{
