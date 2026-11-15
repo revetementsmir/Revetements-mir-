@@ -72,6 +72,56 @@
     if(typeof value!=='string')return value;
     const exact=translate(value,'en-CA');
     if(exact!==value)return exact;
+    // Exact approved terminology on dimensioned client sheets. No lookup
+    // service; never change a saved user note, SKU or manufacturer colour.
+    const staticSheet={
+      'DOSSIER DE PLIAGE':'CUSTOM BENDING FILE',
+      'Demande de soumission':'Quote request',
+      'Récapitulatif de pliage':'Bending summary',
+      'Mise en production':'Production sheet',
+      'MATÉRIAU / FINI':'MATERIAL / FINISH',
+      'QUANTITÉ / LONGUEUR':'QUANTITY / LENGTH',
+      'COTES FINIES ET POINTS À VALIDER':'FINISHED DIMENSIONS AND ITEMS TO VERIFY',
+      'Soumission obligatoire':'Quote required',
+      'Disponibilité à confirmer':'Availability to confirm',
+      'à préciser':'to confirm',
+      'à valider.':'to confirm.',
+      'l’étoile':'the star',
+      'par l’atelier et le fournisseur.':'by the workshop and supplier.',
+      'personnalisée, y compris RAL, exige une':'including RAL, requires a',
+      'soumission. Aucun prix automatique.':'quote. No automatic pricing.',
+      'La référence spéciale doit être confirmée':'The special reference must be confirmed',
+      'Soumission obligatoire : Toute couleur':'Quote required: Any custom colour',
+      'Notes : Aucune commande transmise; détails':'Notes: No order submitted; details',
+      'Face 1 — côté indiqué par':'Face 1 — side marked by',
+      'Face 2 — côté indiqué par':'Face 2 — side marked by',
+      'La référence spéciale doit être confirmée par l’atelier et le fournisseur.':'The special reference must be confirmed by the workshop and supplier.',
+      'Soumission obligatoire : Toute couleur personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.':'Quote required: All custom colours, including RAL, require a quote. No automatic price.'
+    };
+    if(Object.prototype.hasOwnProperty.call(staticSheet,value))return staticSheet[value];
+    const prefixes=[
+      [/^Pli ([A-Z])(?:–|-)*/, 'Bend $1'],
+      [/^Développé total = /,'Developed length = '],
+      [/^Développé de tôle : /,'Developed sheet: '],
+      [/^Face colorée : /,'Painted face: '],
+      [/^Soumission obligatoire : /,'Quote required: '],
+      [/^Emplacement : /,'Location: '],
+      [/^Notes : /,'Notes: '],
+      [/^Surface tarifée = /,'Priced area = '],
+      [/^Tarif MIR = /,'MIR rate = '],
+      [/^Prix par pièce = /,'Price per piece = '],
+      [/^Majoration aluminium : /,'Aluminum surcharge: '],
+      [/^A hors tout, lips compris = /,'A overall, including lips = '],
+      [/^B hors tout, lips compris = /,'B overall, including lips = '],
+      [/^C projection = /,'C projection = ']
+    ];
+    let technical=value;
+    for(const [re,label]of prefixes)technical=technical.replace(re,label);
+    // Translate unit abbreviations in document labels only: no conversions.
+    if(technical!==value||/[\d½¼¾⅛⅜⅝⅞]\s*po(?:²)?\b/.test(value)){
+      technical=technical.replace(/\bpo²\b/g,'sq in').replace(/(\d(?:[0-9\s.,½¼¾⅛⅜⅝⅞/]*))\s+po\b/g,'$1 in.');
+      return technical;
+    }
     const patterns=[
       [/^Quantité : (.+)$/,'Quantity: $1'],
       [/^Longueur L : (.+)$/,'Length L: $1'],

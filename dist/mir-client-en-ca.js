@@ -1229,6 +1229,20 @@ entries.push(
 ["Volume 3D","3D volume"],
 ["Fini à confirmer","Finish to confirm"]
 );
+
+entries.push(
+["DOSSIER DE PLIAGE","CUSTOM BENDING FILE"],
+["Demande de soumission","Quote request"],
+["Récapitulatif de pliage","Bending summary"],
+["MATÉRIAU / FINI","MATERIAL / FINISH"],
+["QUANTITÉ / LONGUEUR","QUANTITY / LENGTH"],
+["COTES FINIES ET POINTS À VALIDER","FINISHED DIMENSIONS AND ITEMS TO VERIFY"],
+["Soumission obligatoire","Quote required"],
+["Disponibilité à confirmer","Availability to confirm"],
+["Face 1 — côté indiqué par l’étoile","Face 1 — side marked by the star"],
+["Face 2 — côté indiqué par l’étoile","Face 2 — side marked by the star"],
+["La référence spéciale doit être confirmée par l’atelier et le fournisseur.","The special reference must be confirmed by the workshop and supplier."]
+);
 const dictionary=Object.freeze(Object.fromEntries(entries));
 if(typeof module==='object'&&module.exports)module.exports=dictionary;
 if(root)root.MIRClientEnglish=dictionary;

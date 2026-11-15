@@ -4,12 +4,54 @@ const clientEN=()=>root.MIRClientLocale?.isClient?.(root.location?.pathname,root
 const tr=(fr,en)=>clientEN()?en:fr;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
 function script(src){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=()=>reject(Error(tr('Le moteur PDF local ne charge pas. Réessayez.','The local PDF engine could not load. Try again.')));document.head.append(s);});}
+/* The production-model client sheets already contain their own heading.
+ * Relocate that text into the available band beneath the single MIR masthead.
+ * Never alter the actual drawing group, dimensions, data, or body layout. */
+function relocateProductionHeader(body){
+ const group=body.querySelector(':scope > g');if(!group)return;
+ const header=[...group.children].filter(n=>n.localName==='text'&&n.getAttribute('x')==='40')
+   .map(node=>({node,y:Number(node.getAttribute('y')),value:node.textContent||''}))
+   .filter(item=>item.y>=85&&item.y<225).sort((a,b)=>a.y-b.y);
+ if(!header.some(x=>x.y===91&&/^(DOSSIER DE PLIAGE|MISE EN PRODUCTION)/.test(x.value)))return;
+ const item=header.filter(x=>x.y>=121&&x.y<154).map(x=>x.value).join(' ').trim();
+ let meta=header.filter(x=>x.y>=154).map(x=>x.value).join(' ').trim();
+ if(clientEN()){
+  meta=meta.replace(/\bCommande : /g,'Order: ').replace(/\bChantier : /g,'Jobsite: ')
+   .replace(/\bChef : /g,'Foreman: ').replace(/\bDate : /g,'Date: ')
+   .replace(/\bRévision : /g,'Revision: ').replace(/\bÀ préciser\b/g,'To confirm');
+ }
+ for(const x of header)x.node.remove();
+ const wrap=(value,max)=>{
+  const lines=[];let current='';
+  for(const word of String(value||'').split(/\s+/).filter(Boolean)){
+   if(current&&current.length+word.length+1>max){lines.push(current);current=word;}
+   else current+=(current?' ':'')+word;
+  }
+  if(current)lines.push(current);
+  return lines;
+ };
+ const itemRows=wrap(item,100),metaRows=wrap(meta,105);
+ const lines=[...itemRows.map(value=>({value,weight:'700',size:14})),
+             ...metaRows.map(value=>({value,weight:'400',size:10}))];
+ // Only presentation metadata lives in this 68px band. For unusually long
+ // references keep all characters, reducing the step rather than truncating.
+ const available=218-169,step=Math.min(16,available/Math.max(1,lines.length-1));
+ lines.forEach((line,i)=>{
+  const node=body.ownerDocument.createElementNS('http://www.w3.org/2000/svg','text');
+  node.setAttribute('x','40');node.setAttribute('y',String(169+i*step));
+  node.setAttribute('font-size',String(lines.length>5?9:line.size));
+  node.setAttribute('font-weight',line.weight);
+  node.setAttribute('fill','#34483d');node.textContent=line.value;
+  group.insertBefore(node,group.firstChild);
+ });
+}
 async function make(options){const locale=clientEN()?'en-CA':'fr-CA';if(!loading)loading=script('vendor/mir-pdf/jspdf.umd.min.js').then(()=>script('vendor/mir-pdf/svg2pdf.umd.min.js')).catch(e=>{loading=null;throw e;});await loading;
  if(!logo)logo=fetch('assets/MIR-logo-officiel-original.svg').then(r=>{if(!r.ok)throw Error('Logo MIR introuvable.');return r.text();}).catch(e=>{logo=null;throw e;});
  if(!fonts)fonts=Promise.all(['Regular','Bold'].map(async weight=>{const r=await fetch('vendor/pdfjs/standard_fonts/LiberationSans-'+weight+'.ttf');if(!r.ok)throw Error('Police PDF introuvable.');const bytes=await r.arrayBuffer(),face=new FontFace('MIRDossier',bytes,{weight:weight==='Bold'?'700':'400'});await face.load();document.fonts.add(face);let binary='';for(const x of new Uint8Array(bytes))binary+=String.fromCharCode(x);return {name:weight,base64:btoa(binary)};})).catch(e=>{fonts=null;throw e;});
  const official=await logo,fontFiles=await fonts,pdf=new root.jspdf.jsPDF({unit:'pt',format:'letter',compress:true}),faces=options.faces;for(const f of fontFiles){pdf.addFileToVFS('MIR-'+f.name+'.ttf',f.base64);pdf.addFont('MIR-'+f.name+'.ttf','MIRDossier',f.name==='Bold'?'bold':'normal');}
  for(let i=0;i<faces.length;i++){if(i)pdf.addPage('letter','portrait');const face=faces[i];options.onProgress?.((locale==='en-CA'?'Creating page ':'Création de la feuille ')+(i+1)+' / '+faces.length);
  const body=new DOMParser().parseFromString(face.svg,'image/svg+xml').documentElement;if(body.querySelector('parsererror'))throw Error('Dessin PDF invalide.');
+ relocateProductionHeader(body);
  const background=body.querySelector(':scope > rect');if(background?.getAttribute('width')==='850'&&background?.getAttribute('height')==='1100')background.remove();
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 850 1100');svg.setAttribute('width','850');svg.setAttribute('height','1100');svg.setAttribute('font-family','Arial');
  const title=face.documentTitle||tr('DOSSIER D’ESTIMATION','ESTIMATE FILE'),reference=face.reference||options.reference||options.subtitle||tr('Projet à confirmer','Project to confirm');
