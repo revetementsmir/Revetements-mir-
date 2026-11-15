@@ -32,3 +32,19 @@ body[data-portal-mode="client"] #mir-harmony-header .mir-harmony-title:has(.mir-
   }
   #mir-harmony-header .mir-harmony-title>.mir-client-locale-switch{font-size:12px}
 }
+
+/* Public client 320–430px: single-row Plus, FR/EN, cart and account avatar. */
+@media(max-width:430px){
+ body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand,
+ body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand{width:clamp(72px,22vw,96px)!important;min-width:0!important}
+}
+@media(max-width:350px){
+ body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand,
+ body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand,
+ body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand,
+ body.mir-signature.mir-public-navigation header.mir-client-header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand{width:64px!important;min-width:0!important}
+ body.mir-public-navigation header[data-mir-public-shell] .mir-client-locale-switch{padding:1px;gap:0}
+ body.mir-public-navigation header[data-mir-public-shell] .mir-client-locale-switch button{min-width:28px;min-height:34px;padding:7px 3px;font-size:10px}
+ body.mir-public-navigation header[data-mir-public-shell] .mir-client-actions>.mir-public-cart{font-size:0!important;padding-inline:4px!important}
+ body.mir-public-navigation header[data-mir-public-shell] .mir-client-actions>.mir-public-cart::before{content:"🛒";font-size:18px;line-height:1}
+}

@@ -343,6 +343,7 @@
         group.append(button);
       }
       if(harmonySlot)harmonySlot.append(group);
+      else if(actions.querySelector(':scope > .mir-public-cart'))actions.insertBefore(group,actions.querySelector(':scope > .mir-public-cart'));
       else if(account&&account.parentElement===actions)actions.insertBefore(group,account);
       else actions.prepend(group);
     }

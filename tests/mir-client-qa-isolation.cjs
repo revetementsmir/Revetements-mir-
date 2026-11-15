@@ -7,11 +7,11 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const cp=require('node:child_process');
 const pin=Object.freeze({
- 'mobile/tools/verify-pr39-native-fixture.cjs':'06d8a25e9e974c19620c0ea5fcd9e0ae05523001',
- 'supabase/test-only/fixtures/pr41-android-native-active-20261115.sql':'c4922773669d1f3d36a788bc1a1c377118b276f5',
- 'supabase/test-only/fixtures/pr41-android-native-active-close-20261115.sql':'064207f3a5d19717d79e8d36799c6ca46ef057f3',
- 'supabase/test-only/fixtures/pr41-android-native-chef-today-20261115.sql':'aaa8f3831d681b6e3cf9479e1d677b3f4fdf53fc',
- 'supabase/test-only/fixtures/pr41-android-native-chef-today-close-20261115.sql':'e6d037654ee5c6009a3f4b14eccb6ebed37f4911'
+ 'mobile/tools/verify-pr39-native-fixture.cjs':'feec522e459f3b3a10e6dd5898a40371e1e36fef',
+ 'supabase/test-only/fixtures/pr41-android-native-active-20261115.sql':'e450d0e392f92346c7f729e28091d4fe0b9bbfbd',
+ 'supabase/test-only/fixtures/pr41-android-native-active-close-20261115.sql':'ae0679a21c56fc888c719bff5e9adcdaf482d896',
+ 'supabase/test-only/fixtures/pr41-android-native-chef-today-20261115.sql':'829640d0554b844647eb15c7247050e771c8842f',
+ 'supabase/test-only/fixtures/pr41-android-native-chef-today-close-20261115.sql':'dc8a5c5f83a927c3c6251c3b01ecd9cd6298581c'
 });
 const protectedFiles=['mobile','supabase','dist/chantier-app.js','dist/portal-client.js',
  'dist/entrepot.html','dist/entrepot-app.js','dist/coordination.html',
@@ -33,13 +33,13 @@ for(const [file,blob]of Object.entries(pin)){
   assert.match(source,/select set_config\('mir\.target_project','hxtztkmbfpmzrieccwsg',true\)/);
   assert.match(source,/current_setting\('mir\.target_project',true\)/);
   assert.match(source,/pg_advisory_xact_lock/);
-  assert.match(source,/7da20261-1115-4000-91(?:00|10|20|30)-00000000000/,'Exact allocated QA prefix, including the SQL generator suffix');
+  assert.match(source,/7da20261-1115-4000-92(?:00|10|20|30)-00000000000/,'Exact allocated QA prefix, including the SQL generator suffix');
   assert.doesNotMatch(source,/7da20261-1114-4000-91/);
  }else{
   assert.match(source,/const HOST='hxtztkmbfpmzrieccwsg\.supabase\.co'/);
   assert.match(source,/readOnly:true/);
-  assert.match(source,/7da20261-1115-4000-9100-000000000001/);
-  assert.match(source,/7da20261-1115-4000-9110-000000000001/);
+  assert.match(source,/7da20261-1115-4000-9200-000000000001/);
+  assert.match(source,/7da20261-1115-4000-9210-000000000001/);
  }
 }
 console.log('PASS PR41 synthetic MIR TEST exception: five SHA-pinned fixture/preflight files only; staff, production and APK protected');

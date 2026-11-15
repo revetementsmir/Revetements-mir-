@@ -34,7 +34,7 @@ const clientI18nMarkup=['',
 '  <!-- FR-CA / EN-CA: client-only, dormant until complete coverage certification. -->',
 '  <link rel="stylesheet" href="mir-client-i18n.css?v=1">',
 '  <script defer src="mir-client-en-ca.js?v=1"></script>',
-'  <script defer src="mir-client-i18n.js?v=1"></script>',
+'  <script defer src="mir-client-i18n.js?v=release-pr41-20261115"></script>',
 ''].join('\n');
 const baseHTML=fs.readFileSync(path.join(process.env.MIR_COMMERCE_BASELINE_DIR,'index.html'),'utf8');
 const currentHTML=fs.readFileSync(path.join(root,'index.html'),'utf8');

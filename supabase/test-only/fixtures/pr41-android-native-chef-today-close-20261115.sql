@@ -1,6 +1,8 @@
 -- PR41 MIR TEST native QA daily cleanup: DELETE only the two new 9120/9130 records.
 -- Existing November 14 team assignments, team tasks, memberships and all punches/audit remain.
 -- Never run until PR41 and integrated PR37 dependent native checks are finished.
+-- New isolated QA ownership: 9200/9210 shifts and 9220/9230 chef artifacts;
+-- the prior closed 9100/9110 and 9120/9130 remain unchanged.
 begin;
 -- Mandatory same-transaction session guard; run ONLY through the MIR TEST project connector.
 select set_config('mir.target_project','hxtztkmbfpmzrieccwsg',true);
@@ -10,8 +12,8 @@ declare
   job uuid:='7da20261-1114-4000-8000-000000000001';
   team uuid:='7da20261-1114-4000-8000-000000000020';
   leader uuid:='ec421778-b39b-492e-9e4b-5e044015e98f';
-  assignment uuid:='7da20261-1115-4000-9120-000000000001';
-  task uuid:='7da20261-1115-4000-9130-000000000001';
+  assignment uuid:='7da20261-1115-4000-9220-000000000001';
+  task uuid:='7da20261-1115-4000-9230-000000000001';
 begin
   if current_setting('mir.target_project',true) is distinct from 'hxtztkmbfpmzrieccwsg'
      then raise exception 'MIR TEST prerequisite required';end if;

@@ -8,7 +8,7 @@ const block=[
  '  <!-- Client FR/EN only. Guarded before translation; staff roles remain French. -->',
  '  <link rel="stylesheet" href="mir-client-i18n.css?v=1">',
  '  <script defer src="mir-client-en-ca.js?v=1"></script>',
- '  <script defer src="mir-client-i18n.js?v=1"></script>'
+ '  <script defer src="mir-client-i18n.js?v=release-pr41-20261115"></script>'
 ].join('\n');
 assert.equal(source.split(block).length,2,'exactly one client localization block');
 if(process.env.MIR_CLIENT_BASE_SHA){

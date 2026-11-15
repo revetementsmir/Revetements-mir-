@@ -4,6 +4,8 @@
 -- Leave this fixture active until all dependent PR41 + PR37 Android runs end.
 -- SYNTHETIC PR41 TEST DATA ONLY. Applied/read/closed explicitly by the coordinator.
 -- No GPS, event, real attendance or user punch is claimed by these rows.
+-- New isolated QA ownership: 9200/9210 shifts and 9220/9230 chef artifacts;
+-- the prior closed 9100/9110 and 9120/9130 remain unchanged.
 begin;
 -- Mandatory same-transaction session guard; run ONLY through the MIR TEST project connector.
 select set_config('mir.target_project','hxtztkmbfpmzrieccwsg',true);
@@ -20,7 +22,7 @@ begin
  or exists(select 1 from mir_core.time_periods p where p.organization_id=org and p.status='locked' and (now() at time zone 'America/Toronto')::date between p.starts_on and p.ends_on)
  then raise exception 'Active QA job and unlocked date required';end if;
  foreach who in array array['3980647a-d83a-48ad-9d90-8fc2b314807f'::uuid,'ec421778-b39b-492e-9e4b-5e044015e98f'::uuid] loop
-  i:=i+1;sid:=('7da20261-1115-4000-9100-00000000000'||i)::uuid;gid:=('7da20261-1115-4000-9110-00000000000'||i)::uuid;
+  i:=i+1;sid:=('7da20261-1115-4000-9200-00000000000'||i)::uuid;gid:=('7da20261-1115-4000-9210-00000000000'||i)::uuid;
   if not exists(select 1 from mir_core.memberships m where m.organization_id=org and m.user_id=who and m.active)
   or not exists(select 1 from mir_core.staff_capabilities c where c.organization_id=org and c.user_id=who and c.active and c.staff_role in('employe','chef_equipe'))
   or not exists(select 1 from mir_core.job_memberships m where m.organization_id=org and m.job_id=jid and m.user_id=who)

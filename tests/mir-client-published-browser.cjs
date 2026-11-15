@@ -20,8 +20,18 @@ if(!/^https:\/\//.test(base)||!/^[0-9a-f]{40}$/.test(sha))throw Error('Published
    await selector.waitFor({state:'visible',timeout:30000});
    assert.equal(await page.locator('html').getAttribute('lang'),'fr-CA','public French default');
    assert.equal(await selector.locator('button').count(),2,'FR and EN visible publicly');
-   const cart=JSON.stringify({version:1,project:'QA fictif, jamais envoyé',items:[{id:'qa',materialId:'QA-MATERIAL',quantity:2}]});
-   await page.evaluate(value=>localStorage.setItem('mir-shopping-list-v1',value),cart);
+   const cart=await page.evaluate(async()=>{
+     const response=await fetch('catalogue-fd6866b49d21.json');
+     if(!response.ok)throw Error('Public catalogue unavailable: '+response.status);
+     const catalogue=await response.json();
+     const m=catalogue.materials.find(item=>item.id==='hardieplank-select-625');
+     if(!m)throw Error('Certified public material missing');
+     const item={materialId:m.id,brand:m.brand,name:m.name,colorId:m.colors?.[0]?.id||null,colorName:m.colors?.[0]?.name||'À confirmer',
+       formatId:null,format:null,formatName:null,quantity:2,unit:'pi²'};
+     const value=JSON.stringify({version:1,project:'Recette fictive sans envoi',items:[item]});
+     localStorage.setItem('mir-shopping-list-v1',value);
+     return value;
+   });
    await page.screenshot({path:'artifacts/mir-client-published-'+width+'-FR.png',animations:'disabled'});
    await selector.locator('button[data-mir-locale="en-CA"]').click();
    await page.waitForFunction(()=>document.documentElement.lang==='en-CA');
