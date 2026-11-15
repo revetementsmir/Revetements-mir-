@@ -1,0 +1,26 @@
+{
+  "jobA": "7da20261-1114-4000-8000-000000000001",
+  "jobB": "7da20261-1114-4000-8000-000000000002",
+  "mode": "controlled authenticated claims, public RPC only",
+  "teamA": 1,
+  "teamB": 1,
+  "tasksA": [
+    {
+      "id": "7da20261-1114-4000-8000-000000000060",
+      "title": "QA UX native : préparer la façade A",
+      "completedAt": null
+    }
+  ],
+  "tasksB": [
+    {
+      "id": "7da20261-1114-4000-8000-000000000061",
+      "title": "QA UX native : vérifier le garage B",
+      "completedAt": null
+    }
+  ],
+  "profile": {
+    "id": "ec421778-b39b-492e-9e4b-5e044015e98f",
+    "name": "Chef MIR Recette",
+    "role": "chef_equipe"
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "checkedAt": "2026-11-14T05:25:55.405Z",
+  "environment": "MIR TEST",
+  "mode": "authenticated HTTP, synthetic QA shifts; no physical Punch",
+  "checks": 7,
+  "employeePages": [
+    {
+      "items": [
+        {
+          "id": "7da20261-1114-4000-8000-000000000911",
+          "source": "offline",
+          "status": "review",
+          "periods": [],
+          "ended_at": "2026-10-02T19:00:00+00:00",
+          "segments": [
+            {
+              "id": "7da20261-1114-4000-8000-000000000923",
+              "type": "job",
+              "jobId": "7da20261-1114-4000-8000-000000000001",
+              "endedAt": "2026-10-02T14:00:00+00:00",
+              "jobName": "QA UX 20261114 Façade A",
+              "startedAt": "2026-10-02T11:00:00+00:00"
+            },
+            {
+              "id": "7da20261-1114-4000-8000-000000000924",
+              "type": "travel",
+              "jobId": null,
+              "endedAt": "2026-10-02T14:30:00+00:00",
+              "jobName": null,
+              "startedAt": "2026-10-02T14:00:00+00:00"
+            },
+            {
+              "id": "7da20261-1114-4000-8000-000000000925",
+              "type": "job",
+              "jobId": "7da20261-1114-4000-8000-000000000002",
+              "endedAt": "2026-10-02T19:00:00+00:00",
+              "jobName": "QA UX 20261114 Garage B",
+              "startedAt": "2026-10-02T14:30:00+00:00"
+            }
+          ],
+          "work_date": "2026-10-02",
+          "started_at": "2026-10-02T11:00:00+00:00",
+          "corrections": [],
+          "auto_break_minutes": 30
+        }
+      ],
+      "nextAfter": {
+        "id": "7da20261-1114-4000-8000-000000000911",
+        "date": "2026-10-02"
+      }
+    },
+    {
+      "items": [
+        {
+          "id": "7da20261-1114-4000-8000-000000000910",
+          "source": "offline",
+          "status": "review",
+          "periods": [],
+          "ended_at": "2026-10-01T19:00:00+00:00",
+          "segments": [
+            {
+              "id": "7da20261-1114-4000-8000-000000000920",
+              "type": "job",
+              "jobId": "7da20261-1114-4000-8000-000000000001",
+              "endedAt": "2026-10-01T14:00:00+00:00",
+              "jobName": "QA UX 20261114 Façade A",
+              "startedAt": "2026-10-01T11:00:00+00:00"
+            },
+            {
+              "id": "7da20261-1114-4000-8000-000000000921",
+              "type": "travel",
+              "jobId": null,
+              "endedAt": "2026-10-01T14:30:00+00:00",
+              "jobName": null,
+              "startedAt": "2026-10-01T14:00:00+00:00"
+            },
+            {
+              "id": "7da20261-1114-4000-8000-000000000922",
+              "type": "job",
+              "jobId": "7da20261-1114-4000-8000-000000000002",
+              "endedAt": "2026-10-01T19:00:00+00:00",
+              "jobName": "QA UX 20261114 Garage B",
+              "startedAt": "2026-10-01T14:30:00+00:00"
+            }
+          ],
+          "work_date": "2026-10-01",
+          "started_at": "2026-10-01T11:00:00+00:00",
+          "corrections": [],
+          "auto_break_minutes": 30
+        }
+      ],
+      "nextAfter": {
+        "id": "7da20261-1114-4000-8000-000000000910",
+        "date": "2026-10-01"
+      }
+    },
+    {
+      "items": [],
+      "nextAfter": null
+    }
+  ],
+  "chefCannotReadEmployee": true,
+  "actorOverrideRefused": true,
+  "foreignOrganizationRefused": true
+}

@@ -1,0 +1,77 @@
+{
+  "description": "Original system-only CI evidence, captured before MIR installation. No Auth data or application content. No PNG alteration.",
+  "files": [
+    {
+      "file": "transient.png",
+      "sourceCommit": "9d660e7",
+      "sourceFile": "native-9d660e7/artifacts/phase11/system/before-tests.png",
+      "sha256": "c35bacdb98b522206335afa5b9baffd2e4e3352a40749bb747e469cd403af514"
+    },
+    {
+      "file": "transient-window.txt",
+      "sourceCommit": "9d660e7",
+      "sourceFile": "native-9d660e7/artifacts/phase11/system/before-tests-window.txt",
+      "sha256": "9c6b01f72431c421fe35b9e6b2880b177c363efd0ac4d5a4839ff2eba8d65afd"
+    },
+    {
+      "file": "transient-activity.txt",
+      "sourceCommit": "9d660e7",
+      "sourceFile": "native-9d660e7/artifacts/phase11/system/before-tests-activity.txt",
+      "sha256": "da6c2f872306c327ce04241460ab29b8b2637aaccc4f3d0138aafcfb94ba4fa9"
+    },
+    {
+      "file": "transient-ui.xml",
+      "sourceCommit": "9d660e7",
+      "sourceFile": "native-9d660e7/artifacts/phase11/system/before-tests-ui.xml",
+      "sha256": "7810652996e95bb06a388e5713fcda3161ca8e9516e687d6b49e69f2dfe6e073"
+    },
+    {
+      "file": "healthy.png",
+      "sourceCommit": "9d660e7",
+      "sourceFile": "native-9d660e7/artifacts/phase11/system/failure.png",
+      "sha256": "382f8091b6b30d93f689f5a3db1fbe5962452da89c531a6f79083cd587891337"
+    },
+    {
+      "file": "healthy-window.txt",
+      "sourceCommit": "9d660e7",
+      "sourceFile": "native-9d660e7/artifacts/phase11/system/failure-window.txt",
+      "sha256": "8c103748183aedd953943d0df6670a7f362f9c39d6a159d78e99246a5f2c74d5"
+    },
+    {
+      "file": "healthy-activity.txt",
+      "sourceCommit": "9d660e7",
+      "sourceFile": "native-9d660e7/artifacts/phase11/system/failure-activity.txt",
+      "sha256": "da6c2f872306c327ce04241460ab29b8b2637aaccc4f3d0138aafcfb94ba4fa9"
+    },
+    {
+      "file": "healthy-ui.xml",
+      "sourceCommit": "9d660e7",
+      "sourceFile": "native-9d660e7/artifacts/phase11/system/failure-ui.xml",
+      "sha256": "7810652996e95bb06a388e5713fcda3161ca8e9516e687d6b49e69f2dfe6e073"
+    },
+    {
+      "file": "anr.png",
+      "sourceCommit": "2154ac6",
+      "sourceFile": "native-2154ac6/artifacts/phase11/system/home-anr.png",
+      "sha256": "7d1484feac886461993950922decb11d75cb37c2096d313bf987eb7238add9d7"
+    },
+    {
+      "file": "anr-window.txt",
+      "sourceCommit": "2154ac6",
+      "sourceFile": "native-2154ac6/artifacts/phase11/system/home-anr-window.txt",
+      "sha256": "a0b9ea3e81f0d54f8d581f7aa17effa87b0abfdb7f6cfa7287d3e66dcb2159bc"
+    },
+    {
+      "file": "anr-activity.txt",
+      "sourceCommit": "2154ac6",
+      "sourceFile": "native-2154ac6/artifacts/phase11/system/home-anr-activity.txt",
+      "sha256": "a23289700c1263b355dad69f2f3066459f2ed42a33abda81f4733da77475844c"
+    },
+    {
+      "file": "anr-ui.xml",
+      "sourceCommit": "2154ac6",
+      "sourceFile": "native-2154ac6/artifacts/phase11/system/home-anr-ui.xml",
+      "sha256": "a5e538c318dd56073420b828214070fe660b498b625f0ad3150362c044894de6"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "role": "employee",
+    "realBackend": true,
+    "localSource": true,
+    "filteredDates": [
+      "2026-10-01",
+      "2026-10-02"
+    ],
+    "expectedQAEmployeeShifts": [
+      "7da20261-1114-4000-8000-000000000911",
+      "7da20261-1114-4000-8000-000000000910"
+    ],
+    "employeeDataIsolated": false,
+    "historicalCorrectionOpened": true,
+    "overrideFilterRefused": "22023",
+    "readRPCs": [
+      "mir_account_snapshot",
+      "mir_portal_snapshot",
+      "mir_employee_operations_snapshot",
+      "mir_messaging_snapshot",
+      "mir_punch_snapshot",
+      "mir_expense_snapshot",
+      "mir_absence_snapshot",
+      "mir_notification_center",
+      "mir_job_dossier_snapshot",
+      "mir_field_job_snapshot",
+      "mir_punch_personal_history"
+    ],
+    "jsErrors": [],
+    "noMutation": true,
+    "physicalAndroid": false
+  }
+]

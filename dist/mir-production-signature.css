@@ -196,7 +196,7 @@ body[data-client-entry="draw"] .production-workspace{min-height:0}
 body[data-client-entry="measures"] .production-workspace{margin-top:18px}
 body[data-client-entry] #mir-harmony-menu nav a[aria-current="page"]{background:#e5efdf;color:#205e21}
 @media(min-width:761px) and (max-width:1100px){
- html.mir-production-client header.mir-home-header.mir-client-header[data-mir-public-shell]{height:76px;min-height:76px;padding-block:8px;border:0}
+ html.mir-production-client header.mir-home-header.mir-client-header[data-mir-public-shell]{height:64px;min-height:64px;padding-block:8px;border:0}
 }
 /* Le parcours Pliage public conserve l’en-tête GOD MODE et n’empile pas
    l’ancienne barre mobile permanente sur les actions du configurateur. */
