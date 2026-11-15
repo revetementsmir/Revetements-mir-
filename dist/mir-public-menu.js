@@ -20,8 +20,8 @@
   ];
   const MOBILE=[
     ['index.html','Accueil','⌂','index'],['boutique.html','Boutique','▦','boutique'],
-    ['pliage.html','Pliage','⌁','pliage'],['chantier.html?view=orders','Commandes','▤','commandes'],
-    ['chantier.html?view=account','Compte','○','compte']
+    ['pliage.html','Pliage','⌁','pliage'],['plan.html','Studio','◈','plan'],
+    ['chantier.html?view=orders','Commandes','▤','commandes']
   ];
   function route(path){const file=String(path||'').split('/').pop().split(/[?#]/)[0]||'index.html';return file.replace(/\.html$/,'');}
   function currentFor(key,current){if(key==='boutique')return ['boutique','produit','selection','materiaux'].includes(current);return key===current;}
@@ -52,11 +52,13 @@
     estimate.href=recipeHref('estimation.html',test);estimate.textContent='Estimation';
     let cart=actions.querySelector('.mir-public-cart');
     if(!cart){const initial=doc.querySelector('[data-list-count]')?.textContent||'0';cart=link(doc,'selection.html','Panier','boutique',current,test);cart.className='mir-public-cart';cart.innerHTML=`Panier <b data-list-count>${initial}</b>`;actions.insertBefore(cart,account);}
+    // The avatar is the sole Connexion/Compte entry. Bottom navigation provides
+    // destinations only, with the authenticated role decided by the portal.
     // Only inner client pages use the mobile/tablet bottom rail.
     actions.append(account); // Account avatar is always the rightmost header action.
     if(current!=='index'&&!doc.querySelector('.mir-mobile-tabs')){
       const tabs=doc.createElement('nav');tabs.className='mir-mobile-tabs';tabs.setAttribute('aria-label','Navigation mobile principale');
-      for(const [href,label,icon,key] of MOBILE){const a=link(doc,key==='compte'?accountRoute(current,false):href,label,key,current,test);a.innerHTML=`<span aria-hidden="true">${icon}</span><small>${label}</small>`;tabs.append(a);}
+      for(const [href,label,icon,key] of MOBILE){const a=link(doc,href,label,key,current,test);a.innerHTML=`<span aria-hidden="true">${icon}</span><small>${label}</small>`;tabs.append(a);}
       doc.body.append(tabs);
     }
   }
