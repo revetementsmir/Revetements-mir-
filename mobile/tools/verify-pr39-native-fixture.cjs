@@ -5,6 +5,9 @@ const HOST='hxtztkmbfpmzrieccwsg.supabase.co';
 const ORG='8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9';
 const JOB='7da20261-1114-4000-8000-000000000001';
 const MARKER='QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL';
+const LEAD_ASSIGNMENT='7da20261-1114-4000-8920-000000000001';
+const LEAD_TASK='7da20261-1114-4000-8930-000000000001';
+const LEAD_MEMBER='552233d5-ae18-4c14-be85-0206e6f18549';
 const ACTORS=Object.freeze([
   Object.freeze({key:'EMPLOYEE',id:'3980647a-d83a-48ad-9d90-8fc2b314807f',shift:'7da20261-1114-4000-8900-000000000001',segment:'7da20261-1114-4000-8910-000000000001'}),
   Object.freeze({key:'CHEF',id:'ec421778-b39b-492e-9e4b-5e044015e98f',shift:'7da20261-1114-4000-8900-000000000002',segment:'7da20261-1114-4000-8910-000000000002'})
@@ -31,6 +34,14 @@ function checkState(data,actor,nowMs=Date.now()){
     throw Error('Heure du quart QA hors de la fenêtre 15 min–8 h: '+actor.key);
   return {role:actor.key,shiftId:actor.shift,segmentId:actor.segment,jobId:JOB,secondsActive:Math.floor(seconds)};
 }
+function checkLead(data){
+  if(data?.role!=='chef_equipe'||data?.today!=='2026-11-15'||
+    data?.assignment?.id!==LEAD_ASSIGNMENT||data.assignment.jobId!==JOB||
+    !Array.isArray(data.team)||!data.team.some(m=>m.id===LEAD_MEMBER)||
+    !Array.isArray(data.tasks)||!data.tasks.some(t=>t.id===LEAD_TASK&&t.completedAt===null))
+    throw Error('Affectation/équipe/tâche QA Chef du jour absente ou incohérente');
+  return {assignmentId:LEAD_ASSIGNMENT,taskId:LEAD_TASK,jobId:JOB};
+}
 async function postJson(fetchFn,url,headers,data){
   const response=await fetchFn(url,{
     method:'POST',headers:{'content-type':'application/json',...headers},
@@ -50,11 +61,17 @@ async function run(env=process.env,fetchFn=fetch){
     const punch=await postJson(fetchFn,base+'/rest/v1/rpc/mir_punch_snapshot',
       {apikey:config.key,authorization:'Bearer '+session.access_token},
       {org:ORG,employee:null});
-    results.push(checkState(punch,actor));
+    const result=checkState(punch,actor);
+    if(actor.key==='CHEF'){
+      const lead=await postJson(fetchFn,base+'/rest/v1/rpc/mir_lead_today_snapshot',
+        {apikey:config.key,authorization:'Bearer '+session.access_token},{org:ORG});
+      result.lead=checkLead(lead);
+    }
+    results.push(result);
   }
   return {project:HOST,organization:ORG,fixture:'PR39 native QA 8900/8910',readOnly:true,roles:results};
 }
 if(require.main===module)run().then(result=>{
   console.log('PASS préparation native MIR TEST: '+result.roles.length+' comptes, 2 quarts et segments actifs, identité exacte, sans écriture métier');
 }).catch(error=>{console.error('MIR TEST précondition: '+error.message);process.exitCode=1;});
-module.exports={ACTORS,HOST,ORG,JOB,MARKER,configuration,checkState,run};
+module.exports={ACTORS,HOST,ORG,JOB,MARKER,LEAD_ASSIGNMENT,LEAD_TASK,LEAD_MEMBER,configuration,checkState,checkLead,run};
