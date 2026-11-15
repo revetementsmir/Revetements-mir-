@@ -94,6 +94,7 @@ const sizes=[
         else assert.deepEqual(commonLinks,reference,label+' mêmes liens communs que l’accueil');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),label+' débordement');
         if(route==='index'){
+          if(small)assert.equal(await nav.evaluate(el=>getComputedStyle(el).display),'none',label+' Plus fermé ne crée pas de bande cachée en pied de page');
           const layout=await page.evaluate(()=>{const rect=sel=>{const r=document.querySelector(sel)?.getBoundingClientRect();return r?{top:r.top,height:r.height,bottom:r.bottom}:null};return{window:innerHeight,scroll:document.documentElement.scrollHeight,header:rect('.site-header'),hero:rect('.mir-home-showcase'),cards:rect('.mir-home-services'),cardHeights:[...document.querySelectorAll('.mir-home-service')].map(x=>Math.round(x.getBoundingClientRect().height)),footer:rect('footer')};});
           if(layout.scroll>layout.window+2&&size.name==='tablette-portrait')
             await page.screenshot({path:path.join(artifacts,'mir-client-nav-tablette-portrait-index-overflow.jpg'),type:'jpeg',quality:80,fullPage:true,animations:'disabled'});
