@@ -135,6 +135,8 @@ async function runAt(browser,base,width){
  assert.match(enDetails.secondText,/Face 1 — side marked by/,'painted-face instruction is fully in English');
  assert.doesNotMatch(enDetails.secondText,/Foreman: À préciser|Face 1 — côté indiqué par/,'no partial French in the dimensioned sheet');
  assert.doesNotMatch(enDetails.secondText,/DOSSIER DE PLIAGE|MATÉRIAU \/ FINI|QUANTITÉ \/ LONGUEUR|COTES FINIES ET POINTS À VALIDER|Soumission obligatoire|Face colorée :|Développé total =/,'No untranslated business labels in the English dimensioned sheet');
+ assert.doesNotMatch(enDetails.secondText,/personnalisée, y compris RAL|exige une soumission|Aucun prix automatique/,'Complete custom-colour quote warning must be English, including wrapped lines');
+ assert.match(enDetails.secondText,/No automatic pricing|No automatic price/,'English custom-colour warning is visible');
  assert.ok(enDetails.preview.startsWith('data:image/png;base64,'),'custom piece preview really rasterized');
  const enEvent=page.waitForEvent('download');await enLink.click();const enPDF=await enEvent;
  assert.equal(enPDF.suggestedFilename(),'MIR-dossier-complet-Chalet-de-Quebec-en-CA.pdf');
