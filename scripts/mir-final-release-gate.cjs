@@ -32,6 +32,8 @@ const RELEASE_TRIGGER_OLD_PATHS="'scripts/build-mir-test.cjs', '.github/workflow
 const RELEASE_TRIGGER_NEW_PATHS="'scripts/build-mir-test.cjs', 'scripts/mir-final-release-gate.cjs', '.github/workflows/pages.yml'";
 const POST_RELEASE_RECHECK_PARENT='586a7125a3f90bac0c53cf8a9c59cdb265b20cae';
 const POST_RELEASE_RECHECK_SUBJECT="ci(pages): fresh guarded verification of MIR TEST published origin";
+const POST_RELEASE_REPAIR_PARENT='ee9a2a0ac7e0c228c9cb46d6e5960cb5bf601f31';
+const POST_RELEASE_REPAIR_SUBJECT="fix(ci): repair guarded Pages fresh-run verification";
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 function check(){
   if(process.env.GITHUB_REF&&process.env.GITHUB_REF!=='refs/heads/main')throw Error('Pages release requires main');
@@ -64,6 +66,15 @@ function check(){
     assert.equal(nowWorkflow,priorWorkflow.replace(RELEASE_TRIGGER_OLD_PATHS,RELEASE_TRIGGER_NEW_PATHS),'release gate trigger must be the only workflow change');
     const priorFix=git('rev-list','--parents','-n','1',RELEASE_TRIGGER_PARENT).split(/\s+/);
     assert.equal(priorFix[1],GUARDED_GET_FIX_PARENT,'read-only TEST QA lineage preserved');
+  }else if(subject===POST_RELEASE_REPAIR_SUBJECT){
+    // Separate clean GitHub Pages run, since same-run retry duplicated the named
+    // Pages artifact. Product, environment, workflow and deployment files
+    // must remain byte-identical to the already verified public deployment.
+    assert.equal(parents.length,2,'exact one-parent CI repair');
+    assert.equal(parents[1],POST_RELEASE_REPAIR_PARENT,'strict previously published parent');
+    assert.equal(git('log','-1','--pretty=%s',POST_RELEASE_REPAIR_PARENT),POST_RELEASE_RECHECK_SUBJECT);
+    const changed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').split(/\r?\n/).filter(Boolean).sort();
+    assert.deepEqual(changed,['scripts/mir-final-release-gate.cjs'],'only release-gate CI correction permitted');
   }else if(subject===POST_RELEASE_RECHECK_SUBJECT){
     // Exact CI-only continuation of the successfully deployed release after
     // fixing MIR TEST's old-domain CORS allowlist. A separate Actions run ID
@@ -71,7 +82,7 @@ function check(){
     assert.equal(parents.length,2,'single-parent recheck commit required');
     assert.equal(parents[1],POST_RELEASE_RECHECK_PARENT,'exact previously published parent required');
     assert.equal(git('log','-1','--pretty=%s',POST_RELEASE_RECHECK_PARENT),RELEASE_TRIGGER_SUBJECT);
-    const changed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').split(/\\r?\\n/).filter(Boolean).sort();
+    const changed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').split(/\r?\n/).filter(Boolean).sort();
     assert.deepEqual(changed,['scripts/mir-final-release-gate.cjs'],'no production, TEST or Pages workflow asset may change');
     const parentGate=git('show',POST_RELEASE_RECHECK_PARENT+':scripts/mir-final-release-gate.cjs');
     const currentGate=fs.readFileSync('scripts/mir-final-release-gate.cjs','utf8');
@@ -79,8 +90,8 @@ function check(){
     const finish=currentGate.indexOf('  }else if(subject===GUARDED_GET_FIX_SUBJECT){',start);
     assert.ok(start>=0&&finish>start,'recheck branch must occur only once');
     const stripped=currentGate.slice(0,start)+currentGate.slice(finish);
-    const insertedConstants="const POST_RELEASE_RECHECK_PARENT='"+POST_RELEASE_RECHECK_PARENT+"';\\n"+
-      'const POST_RELEASE_RECHECK_SUBJECT="'+POST_RELEASE_RECHECK_SUBJECT+'";\\n';
+    const insertedConstants="const POST_RELEASE_RECHECK_PARENT='"+POST_RELEASE_RECHECK_PARENT+"';\n"+
+      'const POST_RELEASE_RECHECK_SUBJECT="'+POST_RELEASE_RECHECK_SUBJECT+'";\n';
     assert.equal(stripped.split(insertedConstants).length,2,'exactly one recheck constant pair');
     assert.equal(stripped.replace(insertedConstants,'').trim(),parentGate,'the original strict release gate must remain byte-identical');
   }else if(subject===GUARDED_GET_FIX_SUBJECT){
