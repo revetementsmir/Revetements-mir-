@@ -140,3 +140,57 @@ body.mir-public-navigation .mir-public-cart b{
   body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-client-brand,
   body.mir-public-navigation header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand{width:clamp(96px,30vw,145px)}
 }
+
+
+/* Navigation client maquette2 : un seul accès Compte visible par écran.
+ * L'accueil n'a jamais de barre basse; les pages intérieures la gardent
+ * sur téléphone/tablette. Aucun style global aux cinq espaces métier.
+ */
+body.mir-public-navigation header[data-mir-public-shell]>.mir-client-actions>a.mir-public-account-avatar {
+  display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;
+  width:44px;height:44px;min-width:44px;min-height:44px;padding:0;
+  border:1px solid #738b76;border-radius:50%;background:#f1f5ef;color:#1b3d27;
+  order:99;box-shadow:none;font-size:0;line-height:1;text-decoration:none;
+}
+body.mir-public-navigation header[data-mir-public-shell]>.mir-client-actions>a.mir-public-account-avatar:hover {
+  background:#e3eddc;border-color:#348511;
+}
+body.mir-public-navigation header[data-mir-public-shell]>.mir-client-actions>a.mir-public-account-avatar:focus-visible {
+  outline:3px solid #348511;outline-offset:3px;
+}
+body.mir-public-navigation header[data-mir-public-shell]>.mir-client-actions>a.mir-public-account-avatar svg {
+  display:block;width:23px;height:23px;flex:none;
+}
+body.mir-public-navigation header[data-mir-public-shell]>nav.mir-client-links>a.mir-menu-estimate {
+  display:none!important; /* desktop already has Estimation in header */
+}
+@media(max-width:1100px){
+  body.mir-public-navigation header[data-mir-public-shell]>nav.mir-client-links>a.mir-menu-estimate {
+    display:flex!important; /* Estimation stays available in Plus on phone/tablet */
+  }
+  body.mir-public-navigation.mir-public-home {padding-bottom:0!important}
+  body.mir-public-navigation.mir-public-home .mir-mobile-tabs {display:none!important}
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready {
+    width:calc(100% - 24px);padding-inline:0;gap:5px;
+  }
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-client-menu-toggle {
+    order:2!important;min-width:48px;width:auto;margin-left:auto;padding:7px 9px;
+  }
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions {
+    order:3!important;flex:0 0 auto;width:auto;min-width:0;margin:0;gap:5px;
+  }
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>a.mir-public-account-avatar {
+    display:inline-flex!important;order:99;margin-left:0;
+  }
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart {
+    margin-left:0;padding:6px 9px;min-height:44px;
+  }
+}
+@media(max-width:430px){
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-home-brand {
+    width:clamp(95px,27vw,120px);min-width:0;
+  }
+  body.mir-public-navigation.mir-public-home header[data-mir-public-shell].mir-client-menu-ready>.mir-client-actions>.mir-public-cart {
+    font-size:12px;padding-inline:8px;
+  }
+}
