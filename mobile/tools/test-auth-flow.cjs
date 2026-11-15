@@ -1,19 +1,21 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),{webcrypto}=require('node:crypto');
+const {sharedLocksFor}=require('./auth-lock-test-helper.cjs');
 const Flow=require('../web/auth-flow.cjs'),Policy=require('../web/policy.cjs'),root=path.resolve(__dirname,'../..');
-function harness({role='employee',exchangeError=false,slots=new Map(),team=false,denyInvitation=false,roleState=null,accountHook=null}={}){
- const requests=[],opened=[],replaced=[];let exchanges=0,accepted=false;
- const jwt=()=>Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url')+'.'+Buffer.from(JSON.stringify({sub:'00000000-0000-4000-8000-000000000005',exp:Math.floor(Date.now()/1000)+3600})).toString('base64url')+'.local-signature';
+function harness({role='employee',exchangeError=false,slots=new Map(),team=false,denyInvitation=false,roleState=null,accountHook=null,userHook=null,tokenState=null,clearHook=null,browserStore=new Map(),locks,channels}={}){
+ const requests=[],opened=[],replaced=[];let exchanges=0,accepted=false,nativeClears=0;
+ const jwt=()=>Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url')+'.'+Buffer.from(JSON.stringify({sub:'00000000-0000-4000-8000-000000000005',jti:tokenState?.value||'session-default',exp:Math.floor(Date.now()/1000)+3600})).toString('base64url')+'.local-signature';
  const user={id:'00000000-0000-4000-8000-000000000005',email:'employee@example.invalid',aud:'authenticated',created_at:'2026-11-14T00:00:00Z'};
- const Native={readAuth:async({slot='session'}={})=>({value:slots.get(slot)}),writeAuth:async({slot='session',value})=>{slots.set(slot,value);},removeAuthSlot:async({slot})=>slots.delete(slot),clearAuth:async()=>slots.clear(),openAuth:async({url})=>opened.push(url)};
- const c=vm.createContext({console,URL,URLSearchParams,TextEncoder,TextDecoder,crypto:webcrypto,Headers,Request,Response,setTimeout,clearTimeout,setInterval,clearInterval,AbortController,Buffer,btoa,atob,WebSocket,
-  location:{replace:url=>replaced.push(url)},localStorage:{clear(){}},sessionStorage:{clear(){}},indexedDB:{databases:async()=>[]},require:()=>Flow,
+ const Native={readAuth:async({slot='session'}={})=>({value:slots.get(slot)}),writeAuth:async({slot='session',value})=>{slots.set(slot,value);},removeAuthSlot:async({slot})=>slots.delete(slot),clearAuth:async()=>{nativeClears++;if(clearHook?.run)return clearHook.run();slots.clear();},openAuth:async({url})=>opened.push(url)};
+ const c=vm.createContext({...channels?{BroadcastChannel:channels}:{},navigator:locks===null?{}:{locks:locks||sharedLocksFor(slots)},console,URL,URLSearchParams,TextEncoder,TextDecoder,crypto:webcrypto,Headers,Request,Response,setTimeout,clearTimeout,setInterval,clearInterval,AbortController,Buffer,btoa,atob,WebSocket,
+  location:{replace:url=>replaced.push(url)},localStorage:{clear:()=>browserStore.clear(),setItem:(k,v)=>browserStore.set(k,v),getItem:k=>browserStore.get(k)||null},sessionStorage:{clear(){}},indexedDB:{databases:async()=>[]},require:()=>Flow,
   fetch:async(input,init)=>{const url=String(input);requests.push(url);assert.ok(url.startsWith(Flow.PROJECT+'/'),url);let body={};
    if(url.includes('/token?grant_type=pkce')){exchanges++;body=exchangeError?{error:'invalid_grant',error_description:'Expired'}:{access_token:jwt(),refresh_token:'test-refresh',expires_in:3600,token_type:'bearer',user};}
    else if(url.includes('/rpc/mir_team_accept_invitation')){if(denyInvitation)return new Response(JSON.stringify({code:'42501',message:'Invitation refusée'}),{status:403});accepted=true;body={ok:true};}
    else if(url.includes('/rpc/mir_account_snapshot')){if(accountHook?.run)return accountHook.run();body={role:roleState?roleState.role:accepted?'employee':role};}
    else if(url.includes('/token?grant_type=password'))body={access_token:jwt(),refresh_token:'test-refresh',expires_in:3600,token_type:'bearer',user};
-   else if(url.endsWith('/user'))body=user;
+   else if(url.includes('/token?grant_type=refresh_token'))body={access_token:jwt(),refresh_token:'test-refresh-'+(tokenState?.value||'default'),expires_in:3600,token_type:'bearer',user};
+   else if(url.endsWith('/user')){if(userHook?.run)return userHook.run();body=user;}
    else if(!url.includes('/recover')&&!url.includes('/logout'))throw Error('Unexpected transport '+url);
    return new Response(JSON.stringify(body),{status:exchangeError&&url.includes('grant_type=pkce')?400:200,headers:{'content-type':'application/json'}});
   }});
@@ -21,7 +23,7 @@ function harness({role='employee',exchangeError=false,slots=new Map(),team=false
  vm.runInContext(fs.readFileSync(path.join(root,'dist/vendor/supabase-client.js'),'utf8'),c);c.window.MIRSupabase=c.MIRSupabase;
  vm.runInContext(fs.readFileSync(path.join(root,'mobile/web/sdk.js'),'utf8'),c);
  const client=c.window.MIRSupabase.createClient(Flow.PROJECT,'sb_publishable_test',{auth:{autoRefreshToken:false}});
- return{client,slots,opened,replaced,requests,accept:c.window.MIRAndroidAcceptAuth,exchanges:()=>exchanges};
+ return{client,slots,opened,replaced,requests,accept:c.window.MIRAndroidAcceptAuth,resume:()=>c.window.MIRAndroidSession.resume(),browserStore,exchanges:()=>exchanges,nativeClears:()=>nativeClears,diagnostic:()=>c.window.MIRAndroidSession.diagnostic()};
 }
 test('callback and authorize reject ambiguous, injected and foreign URLs',()=>{
  const good=Flow.CALLBACK+'?flow=google&code=code-123';assert.equal(Flow.callback(good).flow,'google');
@@ -67,4 +69,92 @@ test('a late denied account read from the previous session cannot purge the next
  assert.equal((await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'})).error,null);
  release(new Response(JSON.stringify({code:'42501',message:'Previous session denied'}),{status:403,headers:{'content-type':'application/json'}}));
  assert.equal((await old).error.code,'SESSION_CHANGED');assert.ok(h.slots.has('session'));assert.ok((await h.client.auth.getSession()).data.session);await h.client.auth.signOut();
+});
+
+const rejectedUser=code=>new Response(JSON.stringify({code,message:'Previous request denied'}),{status:403,headers:{'content-type':'application/json','x-supabase-api-version':'2024-01-01'}});
+const drain=async()=>{for(let i=0;i<15;i++)await new Promise(r=>setTimeout(r,0));};
+for(const code of['bad_jwt','session_not_found'])test('late resume '+code+' from before re-login preserves the new vault and browser data',async()=>{
+ const hook={},state={value:'before-login'},h=harness({userHook:hook,tokenState:state});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
+ let release,entered;const started=new Promise(r=>entered=r);hook.run=()=>{hook.run=null;entered();return new Promise(r=>release=r);};const pending=h.resume();await started;state.value='after-login';assert.equal((await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'})).error,null);h.browserStore.set('probe','new-login-marker');const current=h.slots.get('session');release(rejectedUser(code));await pending;await drain();assert.equal(h.slots.get('session')===current,true,'An obsolete user response must not alter the new encrypted session');assert.equal(h.browserStore.get('probe'),'new-login-marker');assert.ok((await h.client.auth.getSession()).data.session);await h.client.auth.signOut();
+});
+for(const code of['bad_jwt','session_not_found'])test('late resume '+code+' before same-account token refresh cannot clear the refreshed session',async()=>{
+ const hook={},state={value:'before-refresh'},h=harness({userHook:hook,tokenState:state});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
+ let release,entered;const started=new Promise(r=>entered=r);hook.run=()=>{hook.run=null;entered();return new Promise(r=>release=r);};const pending=h.resume();await started;state.value='after-refresh';assert.equal((await h.client.auth.refreshSession()).error,null);h.browserStore.set('probe','refreshed-marker');const current=h.slots.get('session');release(rejectedUser(code));await pending;await drain();assert.equal(h.slots.get('session')===current,true,'An obsolete user response must not alter the new encrypted session');assert.equal(h.browserStore.get('probe'),'refreshed-marker');await h.client.auth.signOut();
+});
+for(const code of['bad_jwt','session_not_found'])test('current resume '+code+' still signs out and purges the current private data',async()=>{
+ const hook={},h=harness({userHook:hook});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});h.browserStore.set('probe','current-private-data');hook.run=()=>{hook.run=null;return rejectedUser(code);};await h.resume();await drain();assert.equal(h.slots.size,0);assert.equal(h.browserStore.size,0);
+});
+test('a delayed old sign-out cannot purge a later login or its update probe',async()=>{
+ const hook={},state={value:'old'},h=harness({clearHook:hook,tokenState:state});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
+ let release,entered;const started=new Promise(r=>entered=r);hook.run=()=>{hook.run=null;entered();return new Promise(r=>release=()=>{h.slots.clear();r();});};const out=h.client.auth.signOut();await started;state.value='new';const login=h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'}).then(result=>{assert.equal(result.error,null);h.browserStore.set('probe','after-new-login');});await drain();release();await Promise.all([out,login]);assert.ok(h.slots.has('session'));assert.equal(h.browserStore.get('probe'),'after-new-login');await h.client.auth.signOut();
+});
+test('a current getUser verifies a session restored in a fresh SDK instance',async()=>{
+ const a=harness();await a.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});const b=harness({slots:a.slots,browserStore:a.browserStore});const result=await b.client.auth.getUser();assert.equal(result.error,null);assert.equal(result.data.user.id,'00000000-0000-4000-8000-000000000005');await b.client.auth.signOut();
+});
+test('an old SDK instance cannot purge the new vault or update probe after recreation',async()=>{
+ const hook={},state={value:'activity-before'},a=harness({userHook:hook,tokenState:state});await a.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
+ let release,entered;const started=new Promise(r=>entered=r);hook.run=()=>{hook.run=null;entered();return new Promise(r=>release=r);};const pending=a.resume();await started;
+ const b=harness({slots:a.slots,browserStore:a.browserStore,tokenState:{value:'activity-after'}});assert.equal((await b.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'})).error,null);b.browserStore.set('mir_update_probe','RECETTE-PHASE11-LOCAL');const current=b.slots.get('session');release(rejectedUser('session_not_found'));await pending;await drain();assert.equal(b.slots.get('session')===current,true,'Old activity cannot clear the new encrypted session');assert.equal(b.browserStore.get('mir_update_probe'),'RECETTE-PHASE11-LOCAL');assert.equal((await b.client.auth.getUser()).error,null);await a.client.auth.stopAutoRefresh();await b.client.auth.signOut();
+});
+test('all public getUser reads reject an obsolete result before changing private state',async()=>{
+ const hook={},state={value:'public-before'},h=harness({userHook:hook,tokenState:state});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
+ let release,entered;const started=new Promise(r=>entered=r);hook.run=()=>{hook.run=null;entered();return new Promise(r=>release=r);};const pending=h.client.auth.getUser();await started;state.value='public-after';await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});h.browserStore.set('probe','current');release(rejectedUser('session_not_found'));const result=await pending;assert.equal(result.error.code,'SESSION_CHANGED');assert.ok(h.slots.has('session'));assert.equal(h.browserStore.get('probe'),'current');await h.client.auth.signOut();
+});
+
+
+test('old Activity RPC refusal preserves the replacement Activity vault and update probe',async()=>{
+ const hook={},a=harness({accountHook:hook,tokenState:{value:'activity-rpc-before'}});
+ await a.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
+ let release,entered;const started=new Promise(r=>entered=r);
+ hook.run=()=>{hook.run=null;entered();return new Promise(r=>release=r);};
+ const pending=a.client.rpc('mir_portal_snapshot');await started;
+ const b=harness({slots:a.slots,browserStore:a.browserStore,tokenState:{value:'activity-rpc-after'}});
+ await b.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});
+ b.browserStore.set('mir_update_probe','RECETTE-PHASE11-LOCAL');const current=b.slots.get('session');
+ release(new Response(JSON.stringify({code:'42501',message:'Old activity account denied'}),{status:401,headers:{'content-type':'application/json'}}));
+ const result=await pending;await drain();
+ const preserved=b.slots.get('session')===current,probe=b.browserStore.get('mir_update_probe')==='RECETTE-PHASE11-LOCAL';
+ assert.equal(result.error.code,'SESSION_CHANGED');
+ await a.client.auth.stopAutoRefresh();await b.client.auth.signOut();
+ assert.equal(preserved,true);assert.equal(probe,true);
+});
+for(const status of[401,403])test('a current denied account RPC still purges the current vault: '+status,async()=>{
+ const hook={},h=harness({accountHook:hook});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'local-password'});h.browserStore.set('probe','private');hook.run=()=>{hook.run=null;return new Response(JSON.stringify({code:'42501',message:'Current account denied'}),{status,headers:{'content-type':'application/json'}});};assert.equal((await h.client.rpc('mir_portal_snapshot')).error.code,'42501');assert.equal(h.slots.size,0);assert.equal(h.browserStore.size,0);
+});
+test('a queued RPC refusal is revalidated after an earlier queued login completes',async()=>{
+ let listener,session={user:{id:'actor-a'},access_token:'token-a'},vault='token-a',denyNext=true,release,entered;
+ const browserStore=new Map(),started=new Promise(r=>entered=r),gate=new Promise(r=>release=r);
+ const emit=async(event,value)=>listener?.(event,value);
+ const auth={onAuthStateChange:fn=>(listener=fn,{}),getSession:async()=>({data:{session}}),setSession:async()=>{entered();await gate;return{error:null};},signOut:async()=>{session=null;await emit('SIGNED_OUT',null);return{error:null};},signInWithPassword:async()=>{session={user:{id:'actor-b'},access_token:'token-b'};vault='token-b';browserStore.set('probe','new-b');await emit('SIGNED_IN',session);return{data:{session},error:null};}};
+ const rawClient={auth,rpc:async name=>{assert.equal(name,'mir_account_snapshot');if(denyNext){denyNext=false;return{data:null,error:{status:401,code:'42501'}};}return{data:{role:'employee'}};}};
+ const context=vm.createContext({navigator:{locks:sharedLocksFor(new Map())},require:()=>Flow,localStorage:{clear:()=>browserStore.clear()},sessionStorage:{clear(){}},indexedDB:{databases:async()=>[]},window:{MIRAndroid:{Policy,Native:{readAuth:async()=>({value:vault}),clearAuth:async()=>{vault=null;}}},MIRTeamTestConfig:{},MIRSupabase:{createClient:()=>rawClient}}});
+ vm.runInContext(fs.readFileSync(path.join(root,'mobile/web/sdk.js'),'utf8'),context);
+ const client=context.window.MIRSupabase.createClient(Flow.PROJECT,'sb_publishable_test');await emit('SIGNED_IN',session);
+ const occupied=client.auth.setSession({access_token:'token-a'});await started;
+ const login=client.auth.signInWithPassword({email:'b@example.invalid',password:'local-password'});
+ const refused=client.rpc('mir_portal_snapshot');await new Promise(r=>setImmediate(r));release();await occupied;assert.equal((await login).error,null);assert.equal((await refused).error.code,'SESSION_CHANGED');assert.equal(session.user.id,'actor-b');assert.equal(vault,'token-b');assert.equal(browserStore.get('probe'),'new-b');
+});
+test('missing shared Web Locks refuses native Auth instead of using an unsafe local fallback',()=>{
+ assert.throws(()=>harness({locks:null}),error=>error.code==='ANDROID_AUTH_LOCK_UNAVAILABLE'&&/Android System WebView/.test(error.message));
+});
+for(const stage of['before-delete','after-delete'])test('two Activities serialize a new login across Native clear '+stage,async()=>{
+ const accountHook={},clearHook={},a=harness({accountHook,clearHook,tokenState:{value:'activity-a'}});await a.client.auth.signInWithPassword({email:'a@example.invalid',password:'local-password'});const before=a.nativeClears();
+ let release,entered;const gate=new Promise(r=>release=r),started=new Promise(r=>entered=r);
+ clearHook.run=async()=>{clearHook.run=null;if(stage==='after-delete')a.slots.clear();entered();await gate;if(stage==='before-delete')a.slots.clear();};
+ accountHook.run=()=>{accountHook.run=null;return new Response(JSON.stringify({code:'42501',message:'Current A denied'}),{status:401,headers:{'content-type':'application/json'}});};
+ const refused=a.client.rpc('mir_portal_snapshot');await started;
+ const b=harness({slots:a.slots,browserStore:a.browserStore,tokenState:{value:'activity-b'}});let loggedIn=false;
+ const login=b.client.auth.signInWithPassword({email:'b@example.invalid',password:'local-password'}).then(result=>{assert.equal(result.error,null);loggedIn=true;b.browserStore.set('mir_update_probe','B survives');});
+ await drain();assert.equal(loggedIn,false,'Replacement Activity must wait for the old native callback');assert.equal(b.requests.some(url=>url.includes('grant_type=password')),false,'No replacement session is written before the shared lock is released');
+ release();await Promise.all([refused,login]);assert.equal(a.nativeClears(),before+1,'Supabase removal is not followed by a second native clear');assert.ok(b.slots.has('session'));assert.equal(b.browserStore.get('mir_update_probe'),'B survives');await a.client.auth.stopAutoRefresh();await b.client.auth.signOut();
+});
+
+test('Auth diagnostics report stages and pending Native methods without credentials or session values',async()=>{
+ const hook={},h=harness({clearHook:hook});await h.client.auth.signInWithPassword({email:'employee@example.invalid',password:'private-password'});let release,entered;const gate=new Promise(r=>release=r),started=new Promise(r=>entered=r);hook.run=()=>{hook.run=null;entered();return gate.then(()=>h.slots.clear());};const out=h.client.auth.signOut();await started;const diagnostic=await h.diagnostic(),text=JSON.stringify(diagnostic);assert.equal(diagnostic.self.native.some(item=>item.method==='clearAuth'),true);assert.equal(diagnostic.locks.held.some(item=>item.name==='mir-android-auth-transition'),true);assert.doesNotMatch(text,/private-password|employee@example|access_token|refresh_token|local-signature/);release();await out;
+});
+
+test('Diagnostic peer fields use fixed method/phase/path/slot whitelists',async()=>{
+ const peers=[];class Channel{constructor(){peers.push(this);}postMessage(data){for(const peer of peers)if(peer!==this)queueMicrotask(()=>peer.onmessage?.({data:structuredClone(data)}));}}
+ const h=harness({channels:Channel}),peer=new Channel();peer.onmessage=({data})=>{if(data.type==='query')peer.postMessage({type:'state',state:{context:'peer',path:'/privatecontext.html',active:{phase:'privatealpha',userId:'sentinel-user'},native:[{method:'PrivateMethod',slot:'untrusted',args:'sentinel-token'}],queued:[],access_token:'sentinel-token'}});};
+ const result=await h.diagnostic();assert.equal(result.peers.length,1);assert.equal(result.peers[0].active.phase,'unknown');assert.equal(result.peers[0].native[0].method,'unknown');assert.equal(result.peers[0].native[0].slot,undefined);assert.equal(result.peers[0].path,'');assert.doesNotMatch(JSON.stringify(result),/sentinel|privatealpha|PrivateMethod|privatecontext|untrusted/);
 });

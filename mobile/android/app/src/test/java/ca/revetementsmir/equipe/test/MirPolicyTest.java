@@ -2,6 +2,11 @@ package ca.revetementsmir.equipe.test;
 import org.junit.Test;
 import static org.junit.Assert.*;
 public class MirPolicyTest {
+ @Test public void weatherUsesOnlyTheTwoPublicReadPaths(){
+  assertTrue(MirPolicy.request("https://geocoding-api.open-meteo.com/v1/search?name=Levis"));
+  assertTrue(MirPolicy.request("https://api.open-meteo.com/v1/forecast?latitude=46.8&longitude=-71.2"));
+  for(String value:new String[]{"http://api.open-meteo.com/v1/forecast","https://api.open-meteo.com.evil.example/v1/forecast","https://user@api.open-meteo.com/v1/forecast","https://api.open-meteo.com:8443/v1/forecast","https://api.open-meteo.com/v1/search","https://geocoding-api.open-meteo.com/v1/forecast","https://api.open-meteo.com/v1/other"})assertFalse(value,MirPolicy.request(value));
+ }
  @Test public void nativeBoundaryIsFailClosed(){
   assertTrue(MirPolicy.request("https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_account_snapshot"));
   assertFalse(MirPolicy.request("https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/"));
