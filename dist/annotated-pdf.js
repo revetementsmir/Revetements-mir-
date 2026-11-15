@@ -2,6 +2,11 @@
  * geometry, materials and annotations; print scale is explicitly not asserted. */
 (function(global){
   'use strict';
+  // Shared PDF renderer: only a confirmed client route may request English.
+  // The staff renderer, geometry, measurements and saved records stay untouched.
+  const clientEN=()=>global.MIRClientLocale?.isClient?.(global.location?.pathname,global.location?.search)===true&&global.MIRClientLocale?.getLocale?.()==='en-CA';
+  const tr=(fr,en)=>clientEN()?en:fr;
+  const known=value=>clientEN()?(global.MIRClientLocale?.translate(value,'en-CA')||value):value;
   const utf8 = new TextEncoder();
   const bytes = text => utf8.encode(text);
   function concat(parts){const total=parts.reduce((n,p)=>n+p.length,0),out=new Uint8Array(total);let at=0;for(const part of parts){out.set(part,at);at+=part.length;}return out;}
@@ -25,16 +30,16 @@
     parts.push(bytes(`xref\n0 ${infoId+1}\n0000000000 65535 f \n${offsets.slice(1).map(n=>`${String(n).padStart(10,'0')} 00000 n \n`).join('')}trailer\n<< /Size ${infoId+1} /Root 1 0 R /Info ${infoId} 0 R >>\nstartxref\n${xref}\n%%EOF\n`));
     return new Blob(parts,{type:'application/pdf'});
   }
-  const loadImage=src=>new Promise((resolve,reject)=>{const img=new Image(),timer=setTimeout(()=>reject(new Error('Le chargement du dessin a pris trop de temps. Réessayez cet export.')),12000);img.onload=()=>{clearTimeout(timer);resolve(img);};img.onerror=()=>{clearTimeout(timer);reject(new Error('Une image du plan ne peut pas être intégrée au PDF.'));};img.src=src;});
+  const loadImage=src=>new Promise((resolve,reject)=>{const img=new Image(),timer=setTimeout(()=>reject(new Error(tr('Le chargement du dessin a pris trop de temps. Réessayez cet export.','The drawing took too long to load. Retry this export.'))),12000);img.onload=()=>{clearTimeout(timer);resolve(img);};img.onerror=()=>{clearTimeout(timer);reject(new Error(tr('Une image du plan ne peut pas être intégrée au PDF.','A plan image could not be embedded in the PDF.')));};img.src=src;});
   async function svgImage(svg){
     const doc=new DOMParser().parseFromString(String(svg),'image/svg+xml');
-    if(doc.querySelector('parsererror'))throw new Error('Le dessin de cette élévation est invalide.');
+    if(doc.querySelector('parsererror'))throw new Error(tr('Le dessin de cette élévation est invalide.','The drawing for this elevation is invalid.'));
     const root=doc.documentElement;root.setAttribute('xmlns','http://www.w3.org/2000/svg');
     for(const element of root.querySelectorAll('image')){
       const href=element.getAttribute('href')||element.getAttributeNS('http://www.w3.org/1999/xlink','href');
       if(!href||href.startsWith('data:'))continue;
       const url=new URL(href,document.baseURI);
-      if(url.origin!==location.origin)throw new Error('Une image distante doit être enregistrée dans le projet avant son export.');
+      if(url.origin!==location.origin)throw new Error(tr('Une image distante doit être enregistrée dans le projet avant son export.','An external image must be saved in the project before export.'));
       const response=await fetch(url,{signal:AbortSignal.timeout(15000)});if(!response.ok)throw new Error('Image du plan introuvable.');
       const blob=await response.blob();
       const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);});
@@ -57,19 +62,21 @@
   }
   function canvasJPEG(canvas){
     return new Promise((resolve,reject)=>{
-      const timer=setTimeout(()=>reject(new Error('La création de la page a pris trop de temps.')),15000);
-      canvas.toBlob(blob=>{clearTimeout(timer);blob?resolve(blob):reject(new Error('Le dessin ne peut pas être exporté.'));},'image/jpeg',.94);
+      const timer=setTimeout(()=>reject(new Error(tr('La création de la page a pris trop de temps.','The page took too long to generate.'))),15000);
+      canvas.toBlob(blob=>{clearTimeout(timer);blob?resolve(blob):reject(new Error(tr('Le dessin ne peut pas être exporté.','The drawing could not be exported.')));},'image/jpeg',.94);
     });
   }
   async function makePlan({faces,title='MIR — Plan annoté',subtitle='Étude de revêtement',filename='MIR-plan-annote.pdf',onProgress=()=>{}}={}){
-    if(!Array.isArray(faces)||!faces.length)throw new Error('Aucune élévation disponible pour l’export.');
+    if(!Array.isArray(faces)||!faces.length)throw new Error(tr('Aucune élévation disponible pour l’export.','No elevations are available for export.'));
+    title=known(title);subtitle=known(subtitle);
+    if(clientEN()&&filename==='MIR-plan-annote.pdf')filename='MIR-annotated-plan-en-CA.pdf';
     if(faces.every(f=>f.layout==='mir-dossier')){
-      if(!global.MIRDossierPDF)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='mir-dossier-pdf.js?v=rendu-1';script.onload=resolve;script.onerror=()=>reject(Error('Le moteur de dossier PDF ne charge pas.'));document.head.append(script);});
-      return global.MIRDossierPDF.make({faces,title,subtitle,filename,onProgress});
+      if(!global.MIRDossierPDF)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='mir-dossier-pdf.js?v=rendu-1';script.onload=resolve;script.onerror=()=>reject(Error(tr('Le moteur de dossier PDF ne charge pas.','The PDF project-file engine did not load.')));document.head.append(script);});
+      return global.MIRDossierPDF.make({faces,title,subtitle,filename,onProgress,locale:clientEN()?'en-CA':'fr-CA'});
     }
     const pages=[];let pageNumber=0;
     for(const face of faces){
-      onProgress(`Préparation du dessin : ${face.name||'élévation'}…`);
+      onProgress(tr('Préparation du dessin : ','Preparing drawing: ')+(face.name||tr('élévation','elevation'))+'…');
       const drawing=await svgImage(face.svg),canvas=document.createElement('canvas');
       if(face.layout==='bending-sheet'){
         canvas.width=2125;canvas.height=2750;
@@ -82,7 +89,7 @@
         continue;
       }
       canvas.width=2976;canvas.height=2105;
-      onProgress(`Mise en page : ${face.name||'élévation'}…`);
+      onProgress(tr('Mise en page : ','Laying out: ')+(face.name||tr('élévation','elevation'))+'…');
       const ctx=canvas.getContext('2d'),wide=face.layout==='wide';ctx.font='27px Arial';
       // Fabrication pages use the full printable width. Their summaries are
       // retained below the drawing, never discarded to make the page fit.
@@ -94,9 +101,9 @@
         ctx.fillStyle='#51a93f';ctx.fillRect(215,54,7,52);
         ctx.fillStyle='#26322c';ctx.font='34px Arial';ctx.fillText(title,250,78);
         ctx.fillStyle='#647166';ctx.font='24px Arial';ctx.fillText(subtitle,250,115);
-        ctx.textAlign='right';ctx.fillText(new Intl.DateTimeFormat('fr-CA').format(new Date()),2890,78);ctx.textAlign='left';
+        ctx.textAlign='right';ctx.fillText(new Intl.DateTimeFormat(clientEN()?'en-CA':'fr-CA').format(new Date()),2890,78);ctx.textAlign='left';
         ctx.strokeStyle='#d5ddd6';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(85,155);ctx.lineTo(2890,155);ctx.stroke();
-        ctx.fillStyle='#1e2c23';ctx.font='bold 39px Arial';ctx.fillText(`${face.name||'Élévation'}${part?' — suite':''}`,85,220);
+        ctx.fillStyle='#1e2c23';ctx.font='bold 39px Arial';ctx.fillText((known(face.name||tr('Élévation','Elevation'))+(part?tr(' — suite',' — continued'):'')),85,220);
         const summaryHeight=wide&&chunks[part].length?chunks[part].length*34+30:0;
         const area=wide?{x:85,y:275,w:2805,h:1640-summaryHeight}:{x:85,y:275,w:2040,h:1605};
         const iw=Math.min(area.w,area.h*drawing.ratio),ih=iw/drawing.ratio;
@@ -109,21 +116,21 @@
           }
         }else{
           ctx.fillStyle='#f4f6f2';ctx.fillRect(2195,195,695,1730);
-          ctx.fillStyle='#26322c';ctx.font='bold 26px Arial';ctx.fillText(face.sidebarTitle||'REPÈRES ET QUANTITÉS',2225,250);
+          ctx.fillStyle='#26322c';ctx.font='bold 26px Arial';ctx.fillText(known(face.sidebarTitle||tr('REPÈRES ET QUANTITÉS','REFERENCES AND QUANTITIES')),2225,250);
           ctx.font='25px Arial';let y=310;
           for(const line of chunks[part]){if(line.color&&/^#[0-9a-f]{3,8}$/i.test(line.color)){ctx.strokeStyle=line.color;ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(2225,y-8);ctx.lineTo(2265,y-8);ctx.stroke();ctx.fillStyle='#26322c';ctx.fillText(line.text,2280,y);}else{ctx.fillStyle='#26322c';ctx.fillText(line.text,2225,y);}y+=36;}
-          if(!lines.length){ctx.fillStyle='#667267';ctx.fillText('Choix et annotations du projet.',2225,310);}
+          if(!lines.length){ctx.fillStyle='#667267';ctx.fillText(tr('Choix et annotations du projet.','Project selections and annotations.'),2225,310);}
         }
         ctx.strokeStyle='#d5ddd6';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(85,1970);ctx.lineTo(2890,1970);ctx.stroke();
-        ctx.font='22px Arial';ctx.fillStyle='#5e6c61';ctx.fillText(face.scaleNote||'Échelle d’impression variable. Utiliser les cotes et la calibration du projet pour les mesures.',85,2015);
-        ctx.font='20px Arial';ctx.fillText(face.footerNote||'Document de travail — choix, dimensions et détails de pose à vérifier avant fabrication.',85,2050);
+        ctx.font='22px Arial';ctx.fillStyle='#5e6c61';ctx.fillText(known(face.scaleNote||tr('Échelle d’impression variable. Utiliser les cotes et la calibration du projet pour les mesures.','Print scale varies. Use project dimensions and calibration for measurements.')),85,2015);
+        ctx.font='20px Arial';ctx.fillText(known(face.footerNote||tr('Document de travail — choix, dimensions et détails de pose à vérifier avant fabrication.','Working document — verify selections, dimensions and installation details before fabrication.')),85,2050);
         ctx.textAlign='right';ctx.fillText(`MIR / ${String(pageNumber).padStart(2,'0')}`,2890,2035);ctx.textAlign='left';
-        onProgress(`Création de la page ${pageNumber}…`);
+        onProgress(tr('Création de la page ','Creating page ')+pageNumber+'…');
         const jpegBlob=await canvasJPEG(canvas);
         pages.push({width:canvas.width,height:canvas.height,jpeg:new Uint8Array(await jpegBlob.arrayBuffer())});
       }
     }
-    onProgress('Assemblage du PDF…');
+    onProgress(tr('Assemblage du PDF…','Assembling PDF…'));
     return {blob:assemble(pages,title),filename,pages:pages.length};
   }
   let retainedURL=null;
@@ -131,13 +138,13 @@
     const result=await makePlan(options),url=URL.createObjectURL(result.blob);
     if(retainedURL)URL.revokeObjectURL(retainedURL);retainedURL=url;
     document.getElementById('mir-pdf-ready')?.remove();
-    const panel=document.createElement('section');panel.id='mir-pdf-ready';panel.setAttribute('aria-label','Votre PDF est prêt');
+    const panel=document.createElement('section');panel.id='mir-pdf-ready';panel.setAttribute('aria-label',tr('Votre PDF est prêt','Your PDF is ready'));
     Object.assign(panel.style,{position:'fixed',bottom:'22px',right:'22px',zIndex:'10000',background:'#fff',border:'1px solid #c5d4be',boxShadow:'0 12px 50px #182a2033',padding:'18px',maxWidth:'min(420px, calc(100vw - 30px))',font:'13px/1.5 Arial',color:'#263d26'});
-    const title=document.createElement('strong');title.textContent=`Votre PDF est prêt · ${result.pages} page${result.pages>1?'s':''}`;
-    const a=document.createElement('a');a.href=url;a.download=result.filename;a.setAttribute('role','button');a.textContent=`Télécharger ${result.filename} ↓`;
+    const title=document.createElement('strong');title.textContent=tr('Votre PDF est prêt · ','Your PDF is ready · ')+result.pages+' '+tr(result.pages>1?'pages':'page',result.pages>1?'pages':'page');
+    const a=document.createElement('a');a.href=url;a.download=result.filename;a.setAttribute('role','button');a.textContent=tr('Télécharger ','Download ')+result.filename+' ↓';
     Object.assign(a.style,{display:'block',padding:'12px 15px',marginTop:'12px',background:'#29472b',color:'#fff',textDecoration:'none',overflowWrap:'anywhere',border:'0',font:'inherit',cursor:'pointer'});
-    const close=document.createElement('button');close.type='button';close.textContent='Fermer';close.setAttribute('aria-label','Fermer le téléchargement PDF');Object.assign(close.style,{border:'0',background:'transparent',color:'#5a7052',padding:'10px 0 0',font:'inherit',cursor:'pointer'});close.onclick=()=>panel.remove();
-    const preview=document.createElement('a');preview.href=url;preview.target='_blank';preview.rel='noopener';preview.textContent='Ouvrir le PDF ↗';Object.assign(preview.style,{display:'inline-block',padding:'12px 20px 0 0',color:'#29472b'});
+    const close=document.createElement('button');close.type='button';close.textContent=tr('Fermer','Close');close.setAttribute('aria-label',tr('Fermer le téléchargement PDF','Close PDF download'));Object.assign(close.style,{border:'0',background:'transparent',color:'#5a7052',padding:'10px 0 0',font:'inherit',cursor:'pointer'});close.onclick=()=>panel.remove();
+    const preview=document.createElement('a');preview.href=url;preview.target='_blank';preview.rel='noopener';preview.textContent=tr('Ouvrir le PDF ↗','Open PDF ↗');Object.assign(preview.style,{display:'inline-block',padding:'12px 20px 0 0',color:'#29472b'});
     panel.append(title,a,preview,close);document.body.appendChild(panel);a.focus();
     return {pages:result.pages,size:result.blob.size,prepared:true};
   }
