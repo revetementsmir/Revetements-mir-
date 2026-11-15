@@ -99,6 +99,8 @@ const sizes=[
           assert.equal(await img.evaluate(el=>['cover','contain'].includes(getComputedStyle(el).objectFit)),true,'Photo sans étirement');
         }
         if((route==='index'||route==='boutique')&&['mobile-compact','mobile','mobile-large','tablette-portrait','tablette-grand','petit-pc','bureau'].includes(size.name)){
+          // Capture the resting page, not the intentionally opened keyboard menu.
+          if(small){await page.keyboard.press('Escape');assert.equal(await nav.isVisible(),false,label+' menu fermé avant capture');}
           await page.screenshot({path:path.join(artifacts,'mir-client-nav-'+size.name+'-'+route+'.jpg'),type:'jpeg',quality:76,fullPage:route!=='index',animations:'disabled'});
         }
         if(small){
