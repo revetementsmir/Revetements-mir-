@@ -252,11 +252,11 @@ jobs:
             echo "Les écrans de démonstration ne doivent pas être publiés." >&2
             exit 1
           fi
-      - name: Préparer le site MIR TEST isolé depuis les originaux fonctionnels
+      - name: Préparer le site MIR TEST isolé
         run: |
+          # The existing offline Pages verifier extracts this named step verbatim.
+          # First preserve the working TEST Studio, then overlay only public HTML.
           node scripts/build-mir-test.cjs _site_mir _site_mir/test "$GITHUB_SHA"
-      - name: Studio en construction seulement sur le site public et manifeste exact
-        run: |
           node scripts/stage-mir-studio-public.cjs _site_mir
           node scripts/build-mir-test.cjs --production-manifest _site_mir "$GITHUB_SHA" > /tmp/mir-production-release-build.json
       - name: Charger les sources certifiées de l’application TEST
