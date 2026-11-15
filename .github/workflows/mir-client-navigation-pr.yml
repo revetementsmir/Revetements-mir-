@@ -1,0 +1,66 @@
+name: MIR client — navigation maquette 2 (brouillon)
+on:
+  pull_request:
+    paths:
+      - 'dist/mir-public-menu.js'
+      - 'dist/mir-public-menu.css'
+      - 'dist/mir-public-shell.css'
+      - 'dist/index.html'
+      - 'tests/mir-public-menu.cjs'
+      - 'tests/mir-public-menu-browser.cjs'
+      - 'tests/mir-homepage*'
+      - 'tests/mir-client-header*'
+      - 'docs/verification/client-navigation-20261115.md'
+      - '.github/workflows/mir-client-navigation-pr.yml'
+permissions:
+  contents: read
+jobs:
+  client-navigation:
+    name: Client FR-CA — PC, tablettes, téléphones
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Installer le navigateur de test
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
+      - name: Contrôler le code et la séparation métiers
+        env:
+          MIR_CLIENT_BASE_SHA: 4d63be9a3afbabfc4e9211bdf026457c1e91dc52
+        run: |
+          git diff --check
+          # PR40 was merged on this exact first-parent baseline. Do not classify
+          # prior Auth/Chantier work in PR37 as modifications made by PR40.
+          git merge-base --is-ancestor "$MIR_CLIENT_BASE_SHA" HEAD
+          # PR40's public-only diff is immutable: later independent Android/QA
+          # fixes must not falsely appear to belong to the client navigation lot.
+          MIR_CLIENT_LOT_SHA=29ef36bf7afed708c8bfe47ffa007221f516b73e
+          git merge-base --is-ancestor "$MIR_CLIENT_LOT_SHA" HEAD
+          node --check dist/mir-public-menu.js
+          node --check tests/mir-public-menu-browser.cjs
+          protected="$(git diff --name-only "$MIR_CLIENT_BASE_SHA" "$MIR_CLIENT_LOT_SHA" -- mobile supabase dist/chantier-app.js dist/portal-client.js dist/chantier.html dist/entrepot.html dist/coordination.html dist/production-app.js)"
+          if [ -n "$protected" ]; then echo "Le lot client a touché un fichier métier protégé: $protected" >&2; exit 1; fi
+          node tests/mir-public-menu.cjs
+          node tests/mir-homepage.cjs
+          node tests/mir-client-header.cjs
+      - name: Recette des vrais écrans téléphone, tablette et PC
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+        run: |
+          node tests/mir-public-menu-browser.cjs
+          node tests/mir-homepage-browser.cjs
+      - name: Joindre les captures des vrais écrans
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: MIR-client-navigation-PC-tablette-telephone
+          path: |
+            artifacts/mir-client-nav-*.jpg
+            artifacts/mir-accueil-*.png
+          if-no-files-found: warn
+          retention-days: 14
