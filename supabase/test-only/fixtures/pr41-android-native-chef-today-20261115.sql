@@ -10,8 +10,8 @@ declare
   job uuid:='7da20261-1114-4000-8000-000000000001';
   team uuid:='7da20261-1114-4000-8000-000000000020';
   leader uuid:='ec421778-b39b-492e-9e4b-5e044015e98f';
-  assignment uuid:='7da20261-1114-4000-9120-000000000001';
-  task uuid:='7da20261-1114-4000-9130-000000000001';
+  assignment uuid:='7da20261-1115-4000-9120-000000000001';
+  task uuid:='7da20261-1115-4000-9130-000000000001';
 begin
   if current_setting('mir.target_project',true) is distinct from 'hxtztkmbfpmzrieccwsg'
      then raise exception 'MIR TEST prerequisite required';end if;
