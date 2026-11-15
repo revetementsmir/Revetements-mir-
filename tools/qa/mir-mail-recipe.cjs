@@ -44,13 +44,13 @@ function preview({route,locale='fr-CA',environment,projectRef,data={},original={
     'LOCAL PREVIEW ONLY — no message has been sent.',
     'Hello '+name+',',
     'This is a fictional '+category+' for testing only.',
-    'Reference: '+number+'. Example item: '+item+'.',
+    'Reference: '+number+'. '+(/^(estimation|soumission|commande)/.test(route)?'Example item: '+item+'.':'No real activation or authentication link is provided.'),
     'The original recipients and all copies are suppressed; this is not a delivery receipt.'
   ]:[
     'APERÇU LOCAL UNIQUEMENT — aucun message n’a été envoyé.',
     'Bonjour '+name+',',
-    'Voici une '+category+' fictive pour la recette seulement.',
-    'Référence : '+number+'. Exemple : '+item+'.',
+    'Aperçu fictif du parcours : '+category+'.',
+    'Référence : '+number+'. '+(/^(estimation|soumission|commande)/.test(route)?'Exemple : '+item+'.':'Aucun véritable lien d’activation ou d’authentification.'),
     'Les destinataires et copies d’origine sont écartés; ceci n’est pas une preuve de livraison.'
   ];
   const html='<!doctype html><html lang="'+locale+'"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+safe(subject)+'</title><body style="margin:0;padding:28px;max-width:600px;font:16px/1.6 Arial,sans-serif;color:#203127;background:#fff"><h1 style="font-size:22px">'+safe(subject)+'</h1>'+paragraphs.map(p=>'<p>'+safe(p)+'</p>').join('')+'<p>Les Revêtements MIR</p></body></html>';

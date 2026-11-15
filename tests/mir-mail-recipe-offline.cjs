@@ -22,6 +22,8 @@ try{
    assert.deepEqual(m.suppressedOriginal,{to:2,cc:1,bcc:1});
    assert.match(m.subject,/MIR TEST/);assert.match(m.html,new RegExp('lang="'+locale+'"'));
    assert.match(m.text,/MIR-QA-2026-0042/);
+   if(route==='commande-fournisseur'&&locale==='fr-CA')assert.match(m.text,/Aperçu fictif du parcours : bon de commande fournisseur/);
+   if(route==='invitation-employe')assert.doesNotMatch(m.text,/Pliage aluminium/,'invitation must not include material quotation fixture');
    assert.match(m.html,/Personne &lt;FICTIVE&gt;/);
    assert.doesNotMatch(m.html,/client@example\.invalid|boss@example\.invalid|adjointe@example\.invalid|audit@example\.invalid|<script|api\.resend\.com/i);
    assert.doesNotMatch(m.text,/client@example\.invalid|boss@example\.invalid|adjointe@example\.invalid|audit@example\.invalid/);
