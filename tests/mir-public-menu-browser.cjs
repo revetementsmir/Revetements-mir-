@@ -94,7 +94,10 @@ const sizes=[
         else assert.deepEqual(commonLinks,reference,label+' mêmes liens communs que l’accueil');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),label+' débordement');
         if(route==='index'){
-          assert.ok(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+2),label+' accueil sans défilement ni coupure');
+          const layout=await page.evaluate(()=>{const rect=sel=>{const r=document.querySelector(sel)?.getBoundingClientRect();return r?{top:r.top,height:r.height,bottom:r.bottom}:null};return{window:innerHeight,scroll:document.documentElement.scrollHeight,header:rect('.site-header'),hero:rect('.mir-home-showcase'),cards:rect('.mir-home-services'),cardHeights:[...document.querySelectorAll('.mir-home-service')].map(x=>Math.round(x.getBoundingClientRect().height)),footer:rect('footer')};});
+          if(layout.scroll>layout.window+2&&size.name==='tablette-portrait')
+            await page.screenshot({path:path.join(artifacts,'mir-client-nav-tablette-portrait-index-overflow.jpg'),type:'jpeg',quality:80,fullPage:true,animations:'disabled'});
+          assert.ok(layout.scroll<=layout.window+2,label+' accueil sans défilement ni coupure : '+JSON.stringify(layout));
           const img=page.locator('.mir-home-showcase-photo');await img.evaluate(el=>el.decode());
           assert.match(await img.getAttribute('src'),/mir-home-hero-20261105\.webp/,'Photo approuvée conservée');
           assert.equal(await img.evaluate(el=>['cover','contain'].includes(getComputedStyle(el).objectFit)),true,'Photo sans étirement');
