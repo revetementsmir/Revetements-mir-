@@ -87,5 +87,7 @@ test('Accueil sans barre basse, avatar unique et retours de dossier préservés'
  assert.match(css,/mir-public-account-avatar:focus-visible/);
  assert.match(css,/mir-client-actions>a\.mir-home-account\.mir-public-account-avatar/);
  assert.match(css,/mir-menu-estimate/);
+ assert.match(css,/body\.mir-public-navigation\.commerce \.mir-public-selection-shortcut/);
+ for(const name of ['boutique.html','produit.html'])assert.match(read(name),/mir-public-selection-shortcut/,'panier de secours sans JS conservé');
 });
 console.log('MIR menu client : '+checks+'/'+checks+' contrats réussis');
