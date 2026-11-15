@@ -13,6 +13,17 @@ const POST_RELEASE_QA_SUBJECT="test(pages): verify disabled production estimate 
 const QA_OLD_STATUS="Connectez-vous avec votre compte équipe MIR, puis revenez à cette fiche.";
 const QA_NEW_STATUS="L’accès aux fiches privées n’est pas encore raccordé au service d’estimation.";
 
+const GUARDED_GET_PARENT='45cc28da0f0500d09e5b0ac4e276947be8ca741d';
+const GUARDED_GET_SUBJECT="fix(pages): allow isolated MIR TEST read-only estimate configuration";
+const GUARDED_GET_OLD="const invitationService=url.pathname==='/functions/v1/mir-team-invitations'&&verb==='POST';if(url.pathname.startsWith('/functions/')&&!invitationService||(auth&&!safeAuth))throw Error('TEST_EXTERNAL_DELIVERY_DISABLED');";
+const GUARDED_GET_NEW="const invitationService=url.pathname==='/functions/v1/mir-team-invitations'&&verb==='POST';const readonlyEstimateConfig=url.pathname==='/functions/v1/mir-estimates/config'&&verb==='GET';if(url.pathname.startsWith('/functions/')&&!invitationService&&!readonlyEstimateConfig||(auth&&!safeAuth))throw Error('TEST_EXTERNAL_DELIVERY_DISABLED');";
+const GUARDED_TEST_OLD1="let xhrBlocked=false;try{new XMLHttpRequest().open('GET','https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/proof');}catch{xhrBlocked=true;}";
+const GUARDED_TEST_NEW1="const configStatus=await fetch('https://hxtztkmbfpmzrieccwsg.supabase.co/functions/v1/mir-estimates/config',{method:'GET'});const readOnlyConfigOk=configStatus.ok;let otherFunctionBlocked=false;try{await fetch('https://hxtztkmbfpmzrieccwsg.supabase.co/functions/v1/mir-estimates/challenge',{method:'GET'});}catch{otherFunctionBlocked=true;}let xhrBlocked=false;try{new XMLHttpRequest().open('GET','https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/proof');}catch{xhrBlocked=true;}";
+const GUARDED_TEST_OLD2="return {before,blocked,xhrBlocked,property:";
+const GUARDED_TEST_NEW2="return {before,blocked,readOnlyConfigOk,otherFunctionBlocked,xhrBlocked,property:";
+const GUARDED_TEST_OLD3="assert.deepEqual(state.blocked,[true,true,true,true]);assert(state.xhrBlocked);";
+const GUARDED_TEST_NEW3="assert.deepEqual(state.blocked,[true,true,true,true]);assert.equal(state.readOnlyConfigOk,true,'GET config allowed in MIR TEST only');assert.equal(state.otherFunctionBlocked,true,'other service GET remains blocked');assert(state.xhrBlocked);";
+
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 function check(){
   if(process.env.GITHUB_REF&&process.env.GITHUB_REF!=='refs/heads/main')throw Error('Pages release requires main');
@@ -31,6 +42,24 @@ function check(){
   if(parents.length===3){
     assert.equal(subject,expectedSubject,'exact reviewed final merge only');
     assert.deepEqual(parents,reviewedParents,'no substitute release merge');
+  }else if(subject===GUARDED_GET_SUBJECT){
+    // Exactly one additional release QA fix. The first PR37 merge and previous
+    // post-merge QA commit are immutable parents; no product, policy or backend
+    // behavior may change except a single read-only TEST metadata endpoint.
+    assert.equal(parents.length,2,'only a direct child of the certified release is permitted');
+    assert.equal(parents[1],GUARDED_GET_PARENT,'guard fix must follow the certified QA correction');
+    assert.equal(git('log','-1','--pretty=%s',GUARDED_GET_PARENT),POST_RELEASE_QA_SUBJECT);
+    const changed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').split(/\\r?\\n/).filter(Boolean).sort();
+    assert.deepEqual(changed,['dist/mir-test-guard.js','scripts/mir-final-release-gate.cjs','tests/mir-test-production-browser.cjs']);
+    const parentGuard=git('show',GUARDED_GET_PARENT+':dist/mir-test-guard.js');
+    const nextGuard=fs.readFileSync('dist/mir-test-guard.js','utf8').trim();
+    assert.equal(parentGuard.split(GUARDED_GET_OLD).length,2,'reviewed blocked function rule expected exactly once');
+    assert.equal(nextGuard,parentGuard.replace(GUARDED_GET_OLD,GUARDED_GET_NEW),'only GET of MIR TEST estimate status may be added');
+    const parentTest=git('show',GUARDED_GET_PARENT+':tests/mir-test-production-browser.cjs');
+    const nextTest=fs.readFileSync('tests/mir-test-production-browser.cjs','utf8').trim();
+    for(const oldPart of [GUARDED_TEST_OLD1,GUARDED_TEST_OLD2,GUARDED_TEST_OLD3])assert.equal(parentTest.split(oldPart).length,2,'reviewed test change expected exactly once');
+    const expectedTest=parentTest.replace(GUARDED_TEST_OLD1,GUARDED_TEST_NEW1).replace(GUARDED_TEST_OLD2,GUARDED_TEST_NEW2).replace(GUARDED_TEST_OLD3,GUARDED_TEST_NEW3);
+    assert.equal(nextTest,expectedTest,'only the strict read-only TEST probe and refusals may change');
   }else{
     assert.equal(parents.length,2,'only a direct one-parent QA correction is permitted after PR37');
     assert.equal(subject,POST_RELEASE_QA_SUBJECT,'QA-only correction subject required');
