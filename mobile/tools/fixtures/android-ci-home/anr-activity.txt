@@ -1,0 +1,2 @@
+      topResumedActivity=ActivityRecord{4aafcc1 u0 com.android.launcher3/.uioverrides.QuickstepLauncher t7}
+  ResumedActivity: ActivityRecord{4aafcc1 u0 com.android.launcher3/.uioverrides.QuickstepLauncher t7}
