@@ -43,7 +43,7 @@ async function main(){
    assert.equal(await page.evaluate(()=>localStorage.getItem('mir-shopping-list-v1')),cart,'cart preserved at '+width);
    assert.equal(await page.locator('meta[name=robots]').getAttribute('content'),'noindex,nofollow');
    const avatar=await page.locator('header .mir-public-account-avatar').boundingBox(),localeBox=await selector.boundingBox();
-   assert.ok(avatar&&localeBox&&localeBox.right<=avatar.x+2,'language switch must precede rightmost avatar at '+width+' '+JSON.stringify({avatar,localeBox,header:await page.locator('header.site-header').boundingBox()}));
+   assert.ok(avatar&&localeBox&&localeBox.x+localeBox.width<=avatar.x+2&&avatar.x+avatar.width<=width+2,'language switch must precede rightmost avatar at '+width+' '+JSON.stringify({avatar,localeBox,header:await page.locator('header.site-header').boundingBox()}));
    const pageWidth=await page.evaluate(()=>document.documentElement.scrollWidth);
    assert.ok(pageWidth<=width+3,'horizontal overflow '+pageWidth+' > '+width);
    await page.screenshot({path:path.join(artifacts,'mir-client-en-'+width+'.png'),animations:'disabled'});
