@@ -51,6 +51,8 @@
     if(m)return m[1]+' '+(m[1]==='1'?'order':'orders')+' being tracked.';
     m=value.match(/^(\d+) adresses? enregistrées?\.$/);
     if(m)return m[1]+' '+(m[1]==='1'?'saved address.':'saved addresses.');
+    m=value.match(/^Mon panier\s*:\s*(\d+)$/);
+    if(m)return 'My cart: '+m[1];
     m=value.match(/^Commande ([A-Za-z0-9_-]{1,100})$/);
     if(m)return 'Order '+m[1];
     m=value.match(/^Connecté avec (.+)\. Aucune commande n’a été envoyée\.$/);

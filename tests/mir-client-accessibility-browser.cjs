@@ -38,6 +38,9 @@ async function testRoute(context,base,route,width,index){
  assert.equal(en.meta,originals.meta,'language switch may not change robots: '+route);
  assert.equal(en.selector,true,'EN selector announces pressed state: '+route);
  const enText=(await page.locator('body').innerText()).slice(0,15000);
+ if(width===390||width===1440){
+  await page.screenshot({path:path.join(out,'mir-client-matrix-EN-'+route.split(/[?#]/)[0].replace('.html','')+'-'+width+'.png'),animations:'disabled'});
+ }
  assert.doesNotMatch(enText,/Demander une estimation|Pliage sur mesure|Nous joindre|Voir notre boutique|Retour à mon panier/,'primary French UI remains: '+route);
  const control=page.locator('button[data-mir-locale="fr-CA"]');
  const visibility=await control.isVisible();

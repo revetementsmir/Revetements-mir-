@@ -1243,6 +1243,13 @@ entries.push(
 ["Face 2 — côté indiqué par l’étoile","Face 2 — side marked by the star"],
 ["La référence spéciale doit être confirmée par l’atelier et le fournisseur.","The special reference must be confirmed by the workshop and supplier."]
 );
+entries.push(
+ ["Réglages","Settings"],
+ ["Adresse enregistrée dans votre compte.","Address saved to your account."],
+ ["Les Revêtements MIR · Mon compte","Les Revêtements MIR · My account"],
+ ["Actualiser","Refresh"],
+ ["Réglages du compte","Account settings"]
+);
 const dictionary=Object.freeze(Object.fromEntries(entries));
 if(typeof module==='object'&&module.exports)module.exports=dictionary;
 if(root)root.MIRClientEnglish=dictionary;

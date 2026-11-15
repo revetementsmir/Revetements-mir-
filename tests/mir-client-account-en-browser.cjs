@@ -64,6 +64,10 @@ async function setup(browser,viewport={width:390,height:844},initial={},fixtureC
    await savedAddress.locator('[name=province]').fill('QC');
    await savedAddress.locator('[name=postalCode]').fill('G1A 1A1');
    await savedAddress.getByRole('button',{name:'Save address'}).click();
+   await page.getByText('Address saved to your account.',{exact:true}).waitFor();
+   assert.ok((await page.locator('body').innerText()).includes('Settings'),'Customer header settings must be English');
+   assert.equal(await page.locator('#portal-footer-label').innerText(),'Les Revêtements MIR · My account','Client account footer localized without changing the brand');
+
    await page.locator('.account-address h3').first().waitFor();
    assert.equal(await page.locator('.account-address h3').first().innerText(),'Panier','saved address name is user data, never translated');
    const savedAddressText=await page.locator('.account-address p').first().innerText();
