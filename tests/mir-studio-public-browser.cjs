@@ -34,6 +34,8 @@ const dir=path.resolve(root,'artifacts/studio-public');fs.mkdirSync(dir,{recursi
    assert.equal(await page.locator('html').getAttribute('lang'),'en-CA');
    assert.equal(await page.locator('h1').innerText(),'Under construction by the MIR team');
    assert.equal(await page.locator('.soon').innerText(),'Opening soon');
+   assert.equal(await page.locator('nav.actions').getAttribute('aria-label'),'Studio navigation');
+   assert.equal(await page.locator('.brand').getAttribute('aria-label'),'Les Revêtements MIR — home');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'no horizontal overflow EN '+w);
    assert.match(await page.title(),/Under construction/);
    await page.screenshot({path:path.join(dir,'studio-public-'+w+'-en-ca.png'),fullPage:true,animations:'disabled'});
