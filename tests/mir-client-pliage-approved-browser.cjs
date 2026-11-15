@@ -170,8 +170,8 @@ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN
    // approved SHA-256 individually, and require every other fetched resource
    // (including the four approved home photographs) to be byte-identical.
    const approvedMenu={
-    '/mir-public-menu.css':'ac266b70ac840e1e61da1231ee006d73f6d51892d06fcdd301c2f035a197162a',
-    '/mir-public-menu.js':'cf77419a524b99a3e612ca6f19e950debac6f7dc2add255db7807cf0625002bd'
+    '/mir-public-menu.css':'1ef60e057b3b524cf85c3f3513c41f53c712521fdeee184b02e06f08f2ddb33f',
+    '/mir-public-menu.js':'1f13e7cad5af62dca995bbdae44f239e9644de1d5eab9179ed52a486b2f1f6d7'
    };
    const currentResources={...sources[1]};
    for(const [pathname,approvedSha]of Object.entries(approvedMenu)){
