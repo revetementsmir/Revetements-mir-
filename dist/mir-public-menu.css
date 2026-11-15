@@ -260,3 +260,11 @@ body.mir-public-navigation header[data-mir-public-shell]>nav.mir-client-links>a.
     position:absolute;inset:100% 12px auto;z-index:52;
   }
 }
+
+/* Boutique/produit: the common header already exposes Panier + live count.
+ * Only hide the redundant static shortcut after successful JS shell mounting.
+ * Without JavaScript the original shortcut remains as a usable fallback.
+ */
+body.mir-public-navigation.commerce .mir-public-selection-shortcut{
+  display:none;
+}
