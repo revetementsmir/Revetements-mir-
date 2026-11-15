@@ -1,5 +1,5 @@
 'use strict';
-/* Chromium tests of genuine MIR public screens, before activating the feature gate. */
+/* Chromium tests of genuine MIR public screens after enabling the reviewed language switch. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium}=require('playwright');
@@ -27,8 +27,7 @@ async function main(){
    const page=await context.newPage(),errors=[];
    page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'index.html',{waitUntil:'domcontentloaded'});
-   assert.equal(await page.locator('.mir-client-locale-switch').count(),0,'no incomplete public switch');
-   await page.goto(base+'index.html?mir-locale-preview=1',{waitUntil:'domcontentloaded'});
+   assert.equal(new URL(page.url()).searchParams.has('mir-locale-preview'),false,'public route needs no preview flag');
    const selector=page.locator('.mir-client-locale-switch');
    await selector.waitFor({state:'visible'});
    assert.equal(await page.locator('html').getAttribute('lang'),'fr-CA');
@@ -68,7 +67,7 @@ async function main(){
    assert.equal(errors.length,0,'JS errors at '+width+': '+errors.join('; '));
    passed++;await context.close();
   }
-  console.log('MIR bilingual preview: '+passed+' browser viewports passed');
+  console.log('MIR bilingual public release: '+passed+' browser viewports passed');
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

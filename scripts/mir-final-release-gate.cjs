@@ -34,6 +34,10 @@ const POST_RELEASE_RECHECK_PARENT='586a7125a3f90bac0c53cf8a9c59cdb265b20cae';
 const POST_RELEASE_RECHECK_SUBJECT="ci(pages): fresh guarded verification of MIR TEST published origin";
 const POST_RELEASE_REPAIR_PARENT='ee9a2a0ac7e0c228c9cb46d6e5960cb5bf601f31';
 const POST_RELEASE_REPAIR_SUBJECT="fix(ci): repair guarded Pages fresh-run verification";
+const CLIENT_RELEASE_BASE='33eacb5741e801067178fdeec83a9489332333c6';
+const CLIENT_RELEASE_SUBJECT='Merge PR #41 — MIR client FR-CA / EN-CA';
+const CLIENT_FINAL_COMMIT_SUBJECT='release(client): publish bilingual FR-CA and EN-CA';
+const CLIENT_RELEASE_CHANGED=[".github/workflows/mir-client-i18n-pr.yml",".github/workflows/pages.yml","dist/annotated-pdf.js","dist/boutique.html","dist/catalogue.js","dist/chantier.html","dist/commerce.js","dist/contact.html","dist/estimation-dossier.html","dist/estimation.html","dist/index.html","dist/materiaux.html","dist/mir-account-flow.js","dist/mir-client-en-ca.js","dist/mir-client-i18n.css","dist/mir-client-i18n.js","dist/mir-dossier-pdf.js","dist/mir-estimate.js","dist/mir-panel-po-pdf.js","dist/mir-selection-pdf.js","dist/mir-unified-client-dossier.js","dist/plan-app.js","dist/plan.html","dist/pliage.html","dist/pliage.js","dist/production-model.js","dist/production.html","dist/produit.html","dist/realisations.html","dist/selection.html","dist/studio.html","docs/verification/client-localisation-20261115.md","mobile/tools/verify-pr39-native-fixture.cjs","scripts/mir-final-release-gate.cjs","supabase/test-only/fixtures/pr41-android-native-active-20261115.sql","supabase/test-only/fixtures/pr41-android-native-active-close-20261115.sql","supabase/test-only/fixtures/pr41-android-native-chef-today-20261115.sql","supabase/test-only/fixtures/pr41-android-native-chef-today-close-20261115.sql","tests/mir-chat-phase3a.cjs","tests/mir-client-accessibility-browser.cjs","tests/mir-client-account-en-browser.cjs","tests/mir-client-account-isolation.cjs","tests/mir-client-commerce-approved-browser.cjs","tests/mir-client-email-boundary.cjs","tests/mir-client-i18n-browser.cjs","tests/mir-client-i18n-pdf-browser.cjs","tests/mir-client-i18n-static.cjs","tests/mir-client-i18n.cjs","tests/mir-client-mail-simulation-browser.cjs","tests/mir-client-pdf-bilingual.cjs","tests/mir-client-published-browser.cjs","tests/mir-client-qa-isolation.cjs","tests/mir-client-unified-bilingual-browser.cjs"];
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 function check(){
   if(process.env.GITHUB_REF&&process.env.GITHUB_REF!=='refs/heads/main')throw Error('Pages release requires main');
@@ -49,7 +53,21 @@ function check(){
   const reviewedParents=git('rev-list','--parents','-n','1',FINAL_MERGE).split(/\s+/);
   assert.equal(git('log','-1','--pretty=%s',FINAL_MERGE),expectedSubject,'original final merge subject preserved');
   assert.deepEqual(reviewedParents,[FINAL_MERGE,PR36_MAIN,PR37_REVIEWED],'original reviewed two-parent merge preserved');
-  if(parents.length===3){
+  if(subject===CLIENT_RELEASE_SUBJECT){
+    // Only the authorized PR41 true merge may succeed after the reviewed PR37
+    // release. The prior release and its global capability checks stay intact.
+    assert.equal(parents.length,3,'PR41 must preserve both merge parents');
+    assert.equal(parents[1],CLIENT_RELEASE_BASE,'PR41 must merge onto reviewed main');
+    assert.equal(git('log','-1','--pretty=%s',parents[2]),CLIENT_FINAL_COMMIT_SUBJECT,'PR41 must end at reviewed release commit');
+    assert.equal(git('merge-base',parents[1],parents[2]),CLIENT_RELEASE_BASE,'PR41 branch ancestry mismatch');
+    const changed=git('diff','--name-only',parents[1],parents[2]).split(/\r?\n/).filter(Boolean).sort();
+    assert.deepEqual(changed,CLIENT_RELEASE_CHANGED,'PR41 exact file inventory must remain certified');
+    const client=fs.readFileSync('dist/mir-client-i18n.js','utf8');
+    assert.match(client,/if\(!win\|\|!isClient\(win.location.pathname,win.location.search\)\|\|staffReady\(\)\)return false/,'staff segregation preserved');
+    assert.doesNotMatch(client,/mir-client-locale-preview-v1|if\(!preview\)return false/,'public EN must not depend on preview');
+    assert.match(fs.readFileSync('dist/index.html','utf8'),/mir-client-i18n\.js\?v=release-pr41-20261115/,'new client JS cache identity required');
+    execFileSync('node',['tests/mir-client-qa-isolation.cjs'],{env:{...process.env,MIR_CLIENT_BASE_SHA:CLIENT_RELEASE_BASE},stdio:'pipe'});
+  }else if(parents.length===3){
     assert.equal(subject,expectedSubject,'exact reviewed final merge only');
     assert.deepEqual(parents,reviewedParents,'no substitute release merge');
   }else if(subject===RELEASE_TRIGGER_SUBJECT){

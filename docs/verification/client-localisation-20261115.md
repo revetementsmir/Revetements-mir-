@@ -110,3 +110,12 @@ Tant que les derniers jobs Android liés à PR41 ne sont pas terminés, conserve
 Le workflow principal conserve un refus de diff pour mobile, Supabase, Auth, espaces métier, courriel et APK. Exception limitée aux **cinq** fichiers synthétiques TEST dont les blobs sont épinglés dans mir-client-qa-isolation.cjs; tout autre fichier reste interdit. La garde de clavardage épingle désormais l'intégralité du fichier client après revue des deux seules lignes de formatage.
 
 Ne pas annoncer EN public ni une certification globale sur la base d'un ancien SHA : les suites documentées, notamment le PDF mixte, chat-security et Android, doivent être vertes sur la tête finale exacte. PR41 demeure brouillon; aucune fusion ni publication; Samsung EN ATTENTE.
+
+
+## Décision de publication et retrait du mode d'essai — PR41 (15 novembre 2026)
+
+Autorisation de Frederick : fusion historique PR41 sur main, puis publication via le GitHub Pages MIR existant **après** certification de la tête exacte. Le seul mode client fait apparaître FR/EN sans paramètre de prévisualisation; le cloisonnement `isClient` / `staffReady` reste intact. Les 14 fichiers HTML clients référencent la nouvelle version du même script afin d'écarter le cache ancien. Pas de changement des données, rôles ou modules métier.
+
+Le workflow GitHub Pages vérifie après déploiement, au SHA effectif, l'identité octet-à-octet des HTML principaux, scripts de langue et générateurs PDF publiés. Il ouvre aussi les pages effectivement servies dans Chromium aux largeurs 390 et 1440, sans paramètre de prévisualisation, pour vérifier la présence FR/EN, `lang`, les contenus traduits, la persistance d'un panier fictif, le retour FR et les directives `noindex,nofollow`. La PR ne vaut pas publication tant que ces contrôles Pages ne sont pas verts sur le commit fusionné.
+
+**Limites conservées :** aucune validation ni activation des modèles Supabase Auth externes; aucun courriel réel, Google, paiement, écriture Supabase production ou distribution d'APK. Recette Samsung physique EN ATTENTE. PDF fabricant externes laissés dans leur langue officielle. Les courriels internes et invitations restent simulés sans transport; les tests panier sont locaux et fictifs.

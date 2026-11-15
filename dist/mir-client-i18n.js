@@ -410,13 +410,8 @@
   function init(win){
     if(active)return true;
     if(!win||!isClient(win.location.pathname,win.location.search)||staffReady())return false;
-    // A complete English release requires separate coverage, PDF and visual certification.
-    // The preview is isolated to the unpublished feature branch until the coverage gate is lifted.
-    const requested=new URLSearchParams(win.location.search).get('mir-locale-preview')==='1';
-    if(requested)try{win.sessionStorage.setItem('mir-client-locale-preview-v1','1');}catch{}
-    let preview=requested;
-    if(!preview)try{preview=win.sessionStorage.getItem('mir-client-locale-preview-v1')==='1';}catch{}
-    if(!preview)return false;
+    // Approved public client release. isClient and staffReady guards above remain mandatory.
+    // Locale preference never mutates the customer cart or any business record.
     active=true;
     try{if(win.localStorage.getItem(KEY)==='en-CA')locale='en-CA';}catch{}
     render();
@@ -427,5 +422,5 @@
     observer.observe(win.document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['data-portal-mode','placeholder','aria-label','aria-description','title']});
     return true;
   }
-  return Object.freeze({version:'0.2.0-draft',isClient,getLocale,setLocale,translate,number,cad,date,pdfText,localizePdfOptions,installPdfAdapter,init,render,KEY});
+  return Object.freeze({version:'0.3.0-public',isClient,getLocale,setLocale,translate,number,cad,date,pdfText,localizePdfOptions,installPdfAdapter,init,render,KEY});
 });
