@@ -21,7 +21,7 @@ function validateManifest(m,now=new Date()){
   ||m.jobId!==JOB||m.workDate!==now.toISOString().slice(0,10))
   throw Error('Per-run QA manifest invalid, old or from wrong environment/date');
  const ids=[m.employee?.shift,m.employee?.segment,m.chef?.shift,m.chef?.segment,m.lead?.assignmentId,m.lead?.taskId];
- if(ids.some(v=>!UUID.test(v||''))||new Set(ids).size!==6
+ if(ids.some(v=>!UUID.test(v||'')||/^7da20261-111[45]-4000-/.test(v))||new Set(ids).size!==6
    ||m.employee.id!==ACTORS[0].id||m.chef.id!==ACTORS[1].id||m.lead.memberId!==LEAD_MEMBER)
    throw Error('Per-run QA identities incorrect or duplicated');
  return m;
