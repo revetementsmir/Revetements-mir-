@@ -524,16 +524,16 @@ jobs:
           grep -F 'event.shiftKey||outlineRightAngle' /tmp/calepinage-app.js
           grep -F 'A?.gableFromPitch?.(width,eave,leftPitch,rightPitch)' /tmp/calepinage-app.js
           grep -F 'E.setPanelSize(layout.config,axis' /tmp/calepinage-app.js
-          grep -F 'studio-wall-sections.js?v=' /tmp/mir-plan-public.html
-          grep -F 'href="plan.css?v=' /tmp/mir-plan-public.html
-          grep -F 'id="mir-side-wall-scroll"' /tmp/mir-plan-public.html
+          grep -F 'studio-wall-sections.js?v=' /tmp/mir-plan-test.html
+          grep -F 'href="plan.css?v=' /tmp/mir-plan-test.html
+          grep -F 'id="mir-side-wall-scroll"' /tmp/mir-plan-test.html
           fetch "$base/studio-wall-sections.js" /tmp/studio-wall-sections.js
           grep -F 'function masonryBand(' /tmp/studio-wall-sections.js
           fetch "$base/studio-features.js" /tmp/studio-features.js
           grep -F 'data-mir-continuous-masonry' /tmp/studio-features.js
-          grep -F 'material-coverage.js' /tmp/mir-plan-public.html
-          grep -F 'id="material-format"' /tmp/mir-plan-public.html
-          grep -F 'id="coverage-input"' /tmp/mir-plan-public.html
+          grep -F 'material-coverage.js' /tmp/mir-plan-test.html
+          grep -F 'id="material-format"' /tmp/mir-plan-test.html
+          grep -F 'id="coverage-input"' /tmp/mir-plan-test.html
           fetch "$base/material-coverage.js" /tmp/material-coverage.js
           grep -F 'function courseLayout' /tmp/material-coverage.js
           grep -F 'function panelGrid' /tmp/material-coverage.js
