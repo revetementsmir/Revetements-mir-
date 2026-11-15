@@ -40,8 +40,10 @@ const dir=path.resolve(root,'artifacts/studio-public');fs.mkdirSync(dir,{recursi
    await page.locator('button[data-mir-locale="fr-CA"]').click();
    assert.equal(await page.locator('html').getAttribute('lang'),'fr-CA');
    const target=page.locator('nav.actions a').first();await target.focus();assert.equal(await target.evaluate(el=>el===document.activeElement),true,'keyboard target reachable');
-   await page.evaluate(()=>document.documentElement.style.fontSize='24px');
+   await page.evaluate(()=>document.documentElement.style.fontSize='32px');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'large text no overflow '+w);
+   await page.locator('button[data-mir-locale="en-CA"]').click();
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'200% text EN no overflow '+w);
    assert.equal(errors.length,0,'script errors '+w+': '+errors.join(' | '));
    assert.equal(requests.length,0,'browser must make zero external requests');
    await context.close();
