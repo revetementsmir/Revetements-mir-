@@ -6,15 +6,42 @@ const {execFileSync}=require('node:child_process');
 const path=require('node:path');
 const RELEASE=path.resolve('docs/verification/mir-pages-final-20261115.json');
 const expectedSubject='Merge PR #37 — MIR intégration finale vers main';
+const FINAL_MERGE='adfe5847a00ad5b0989079a4cd494df0ba5d0b13';
+const PR36_MAIN='26b0acb98aa3a17e360128fe6a69c5121094f97f';
+const PR37_REVIEWED='bee9527ce4bbf2cbbf9718123346396c4bc3ff19';
+const POST_RELEASE_QA_SUBJECT="test(pages): verify disabled production estimate service after PR37 release";
+const QA_OLD_STATUS="Connectez-vous avec votre compte équipe MIR, puis revenez à cette fiche.";
+const QA_NEW_STATUS="L’accès aux fiches privées n’est pas encore raccordé au service d’estimation.";
+
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 function check(){
   if(process.env.GITHUB_REF&&process.env.GITHUB_REF!=='refs/heads/main')throw Error('Pages release requires main');
   const marker=JSON.parse(fs.readFileSync(RELEASE,'utf8'));
   assert.equal(marker.release,'MIR-20261115-PR36-37-40');
   assert.equal(marker.approved,true);
-  assert.equal(git('log','-1','--pretty=%s'),expectedSubject,'exact reviewed merge only');
+  // First publication requires the exact PR36→PR37 merge. The *single*
+  // post-release QA correction must be a direct child of that merge and may
+  // only change this gate and the published estimate browser expectation.
+  // Every other production/TEST/SEO release assertion below still applies.
+  const subject=git('log','-1','--pretty=%s');
   const parents=git('rev-list','--parents','-n','1','HEAD').split(/\s+/);
-  assert.equal(parents.length,3,'two-parent merge commit required');
+  const reviewedParents=git('rev-list','--parents','-n','1',FINAL_MERGE).split(/\s+/);
+  assert.equal(git('log','-1','--pretty=%s',FINAL_MERGE),expectedSubject,'original final merge subject preserved');
+  assert.deepEqual(reviewedParents,[FINAL_MERGE,PR36_MAIN,PR37_REVIEWED],'original reviewed two-parent merge preserved');
+  if(parents.length===3){
+    assert.equal(subject,expectedSubject,'exact reviewed final merge only');
+    assert.deepEqual(parents,reviewedParents,'no substitute release merge');
+  }else{
+    assert.equal(parents.length,2,'only a direct one-parent QA correction is permitted after PR37');
+    assert.equal(subject,POST_RELEASE_QA_SUBJECT,'QA-only correction subject required');
+    assert.equal(parents[1],FINAL_MERGE,'QA correction must directly follow reviewed PR37 merge');
+    const changed=git('diff-tree','--no-commit-id','--name-only','-r','HEAD').split(/\r?\n/).filter(Boolean).sort();
+    assert.deepEqual(changed,['scripts/mir-final-release-gate.cjs','tests/mir-estimate-published-browser.cjs'],'no business, security or publication assets changed');
+    const prior=execFileSync('git',['show',FINAL_MERGE+':tests/mir-estimate-published-browser.cjs'],{encoding:'utf8'});
+    const actual=fs.readFileSync('tests/mir-estimate-published-browser.cjs','utf8');
+    assert.equal(prior.split(QA_OLD_STATUS).length,2,'old expectation appears exactly once in original test');
+    assert.equal(actual,prior.replace(QA_OLD_STATUS,QA_NEW_STATUS),'exact approved fail-closed test expectation correction');
+  }
   for(const [label,sha] of Object.entries(marker.ancestors||{})){
     assert.match(sha,/^[a-f0-9]{40}$/,label);
     try{git('merge-base','--is-ancestor',sha,'HEAD');}catch{throw Error('Missing reviewed ancestor: '+label);}
