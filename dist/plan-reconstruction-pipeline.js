@@ -2,12 +2,16 @@
 (function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction.js'):root.MIRPlanReconstruction,node?require('./plan-reconstructed-roofs.js'):root.MIRReconstructedRoofs);if(node)module.exports=api;else root.MIRReconstructionPipeline=api;})(typeof window==='object'?window:globalThis,function(M,R,Roof){
  'use strict';
  const copy=M.clone,source=r=>r.sourceReference||r;
+ function sameSpan(a,b){
+  if(a.sourceViewId!==b.sourceViewId||a.anchors?.length!==2||b.anchors?.length!==2)return false;
+  return [b.anchors,b.anchors.slice().reverse()].some(p=>M.distance(a.anchors[0],p[0])<=2&&M.distance(a.anchors[1],p[1])<=2);
+ }
  function sameCaption(a,b){a=source(a);b=source(b);if(a.sourceViewId!==b.sourceViewId||!a.textBox||!b.textBox)return false;const x=a.textBox,y=b.textBox,area=p=>(p[2]-p[0])*(p[3]-p[1]),overlap=Math.max(0,Math.min(x[2],y[2])-Math.max(x[0],y[0]))*Math.max(0,Math.min(x[3],y[3])-Math.max(x[1],y[1]));return overlap/Math.min(area(x),area(y))>.65;}
  function resolveReference(candidates){
   const groups=[];for(const r of candidates.filter(r=>r.value>0&&r.scale>0)){let group=groups.find(g=>g.some(c=>sameCaption(c,r)));if(!group)groups.push(group=[]);group.push(r);}
   // An OCR alternative is resolved only if independent caption groups agree.
   // Two different written captions in conflict remain a conflict.
-  const supported=candidates.filter(r=>r.value>0&&groups.every(g=>g.some(c=>Math.abs(c.scale/r.scale-1)<=.05)));
+  const supported=candidates.filter(r=>r.value>0&&groups.every(g=>g.some(c=>Math.abs(c.scale/r.scale-1)<=.05&&(!sameSpan(c,r)||Math.abs(c.value-r.value)<=.001))));
   if(!supported.length)return {status:groups.length?'conflict':'not_found',groups:copy(groups),reference:null};
   if(Math.max(...supported.map(r=>r.scale))/Math.min(...supported.map(r=>r.scale))>1.05)return {status:'conflict',groups:copy(groups),reference:null};
   const reference=copy(supported.slice().sort((a,b)=>Number(a.kind!=='written')-Number(b.kind!=='written')||b.confidence-a.confidence)[0]);

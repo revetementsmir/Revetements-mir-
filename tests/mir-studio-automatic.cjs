@@ -4,6 +4,8 @@ const ref=(value,view,box=[40,10,70,20])=>({value,scale:value/100,sourceViewId:'
 const candidates=[ref(7,'side-a'),ref(8,'side-a'),ref(8,'side-b')],before=structuredClone(candidates),resolved=P.resolveReference(candidates);
 assert.equal(resolved.reference.value,8,'independent caption resolves a duplicate OCR hypothesis');assert.equal(resolved.alternatives[0].value,7);assert.deepEqual(candidates,before);assert.equal(resolved.confirmationRequired,true);
 assert.equal(P.resolveReference([ref(7,'side-a'),ref(8,'side-b')]).status,'conflict','distinct contradictory captions are not a majority vote or an average');
+assert.equal(P.resolveReference([ref(8,'side-a'),ref(8.1,'side-b')]).status,'conflict','the raster scale tolerance cannot reconcile different written values on the same physical span');
+const otherSpan={...ref(8.1,'side-b'),anchors:[[0,0],[0,101.25]],scale:.08};assert.ok(P.resolveReference([ref(8,'side-a'),otherSpan]).reference,'different physical spans can establish the same scale');
 assert.equal(P.resolveReference([ref(7,'side-a'),ref(8,'side-a')]).status,'conflict','an ambiguous OCR glyph alone cannot decide its own reading');assert.equal(P.resolveReference([]).status,'not_found');
 assert.equal(P.resolveReference([ref(7,'side-a'),ref(8,'side-a',[80,10,100,20])]).status,'conflict','different captions in the same view are independent evidence');
 // Small slashes with a short leader above and a long leader below: the old
