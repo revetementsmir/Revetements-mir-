@@ -52,25 +52,27 @@ Le runner `tools/qa/mir-studio-levels-local.cjs` charge le PDF original par le f
 | Jumelé Sentier FINAL | RDC à huit points; références écrites recoupées, hauteur rough du RDC citée | Huit murs présents sous quatre angles, sélection/fini et réouverture réussis. Retrait mesuré depuis les pixels, aucune profondeur reprise de l'étude. Aucun étage inventé. |
 | 351 | RDC à dix points, garage et retrait d'entrée inclus; référence et hauteur du RDC citées | Dix murs, quatre angles, sélection/fini et réouverture réussis. Enveloppe entre plancher RDC et sablière seulement : parties basses du garage et toiture non établies. |
 
-Dans `s2-final-levels-v2`, les deux recettes passent aussi par le PDF cinq pages, son analyse/rendu local, l'envoi au stockage privé TEST, le commit canonique et la lecture serveur du document/instantané. Le PDF reste un brouillon avec réserves, sans quantités complètes annoncées. Une recette distincte de seconde révision conserve l'ancienne révision intacte. Les empreintes téléchargées correspondent aux octets générés.
+Dans `s2-final-levels-v2`, les deux recettes passent aussi par le PDF cinq pages, son analyse/rendu local, l'envoi au stockage privé TEST, le commit canonique et la lecture serveur du document/instantané. Le PDF reste un brouillon avec réserves, sans quantités complètes annoncées. Une recette distincte de seconde révision conserve l'ancienne révision intacte. Les empreintes téléchargées correspondent aux octets générés. Les aperçus/PDF/rattachements sont ensuite rejoués avec les modèles réellement sauvegardés, sans les assimiler à un nouvel import, dans `s2-final-site-jumele-v3` et `s2-final-site-351-v3`.
 
-La recette employé utilise le vrai frontend web local configuré TEST et les vraies API Auth/RPC/Storage TEST, avec comptes isolés sans courriel envoyé. Seule la job assignée est visible. PDF cinq pages, zoom à 125 %, page cinq et téléchargement avec empreinte identique sont vérifiés. Écriture employé, autre job, autre organisation et utilisateur non assigné sont refusés. Les tentatives Chromium du paquet natif dépourvu du pont mobile ont échoué et restent conservées; elles ne sont pas comptées comme essais d'appareils.
+Après remplacement du raccordement interne par `studio-job-reader-bridge.js`, la recette employé utilise le vrai frontend web local configuré TEST et les vraies API Auth/RPC/Storage TEST, avec comptes isolés sans courriel envoyé. Seule la job assignée est visible. PDF cinq pages, zoom à 125 %, page cinq et téléchargement avec empreinte identique sont vérifiés. Écriture employé, autre job, autre organisation et utilisateur non assigné sont refusés. Les tentatives Chromium du paquet natif dépourvu du pont mobile ont échoué et restent conservées; elles ne sont pas comptées comme essais d'appareils.
 
 Les candidats antérieurs conservent leurs échecs : éditeur coupé, saisie perdue au changement de focus, choix de bâtiment erroné dans le runner et clic absorbé par l'ancien lecteur PDF natif. Les corrections ne convertissent pas ces tentatives en succès. Le lecteur a été remplacé par PDF.js local; sa fermeture/régénération utilise la tâche de chargement de la version PDF.js existante.
 
 ### Matrice des sept originaux
 
-La colonne S1 est le résultat historique à 36606f4. Le replay S2 final est en cours; une case en attente n'est pas un résultat simulé. Les contours des cinq autres dossiers n'ont pas été confirmés par la seule réussite de leur import.
+La colonne S1 est le résultat historique à 36606f4. Le replay S2 a réellement importé, sauvegardé et rouvert les sept originaux : 48 pages conservées et 46 vues. Les empreintes, tailles et comptes à la réouverture correspondent. Aucun appel externe d’analyse. Les contours des cinq autres dossiers n'ont pas été confirmés par la seule réussite de leur import.
 
 | Original | Pages | Vues S1 | Replay import S2 | Contour / ambiguïtés et recette restante |
 |---|---:|---:|---|---|
-| Jumelé Sentier FINAL | 5 | 5 | En cours | Recette S2 huit murs réussie; pas de plan d'étage. Échelles incertaines des autres vues non validées. |
-| 351 | 5 | 5 | En cours | Recette S2 dix murs réussie; parties basses garage à confirmer. Patio futur en béton p2; aucune toiture arrière établie. |
-| 313 | 5 | 5 | En cours | Étage seul, aucun RDC confirmé. P2 insuffisante pour confirmer un patio couvert. Contour S2 non recetté sur cet original. |
-| Samuel Forest | 5 | 5 | En cours | Étage seul; pas de RDC inventé. Contour S2 non recetté sur cet original. |
-| Des Tournesols | 5 | 5 | En cours | Porche avant couvert visible p3, source inspectée. Légende masquant une partie du dessin, géométrie non inventée. Assemblage complet non recetté. |
-| Champs fleuris no 5 | 6 | 10 | En cours | Maison et cabanon distincts, page cabanon tournée avec cinq vues. Aucun mélange des mesures/niveaux/finitions. Contours complets non recettés. |
-| 12 logements | 17 | 11 | En cours | Niveaux 0–3, fondation, toiture, élévations et coupe. Galeries/balcons couverts réellement visibles p10/p12/p13, sources inspectées. Contradictions de hauteur gardées; reconstruction de cet ensemble non recettée. |
+| Jumelé Sentier FINAL | 5 | 5 | Réussi | Recette S2 huit murs réussie; pas de plan d'étage. Échelles incertaines des autres vues non validées. |
+| 351 | 5 | 5 | Réussi | Recette S2 dix murs réussie; parties basses garage à confirmer. Patio futur en béton p2; aucune toiture arrière établie. |
+| 313 | 5 | 5 | Réussi | Étage seul, aucun RDC confirmé. P2 insuffisante pour confirmer un patio couvert. Contour S2 non recetté sur cet original. |
+| Samuel Forest | 5 | 5 | Réussi | Étage seul; pas de RDC inventé. Contour S2 non recetté sur cet original. |
+| Des Tournesols | 5 | 5 | Réussi | Porche avant couvert visible p3, source inspectée. Légende masquant une partie du dessin, géométrie non inventée. Assemblage complet non recetté. |
+| Champs fleuris no 5 | 6 | 10 | Réussi | Maison et cabanon distincts, page cabanon tournée avec cinq vues. Aucun mélange des mesures/niveaux/finitions. Contours complets non recettés. |
+| 12 logements | 17 | 11 | Réussi | Niveaux 0–3, fondation, toiture, élévations et coupe. Galeries/balcons couverts réellement visibles p10/p12/p13, sources inspectées. Contradictions de hauteur gardées; reconstruction de cet ensemble non recettée. |
+
+Le replay privé est conservé dans `s2-imports-v3`, avec copie immuable de 234 fichiers d’exécution et manifeste SHA-256 `s2-runtime-v3-manifest.json`. Les derniers écarts de code concernent uniquement l’affichage numérique de la couvrance, la fermeture/régénération PDF.js et l’extension séparée de lecture employé. Les scripts d’import, OCR, classification, inventaire, repères, stockage et modèle géométrique testés sont identiques à ceux de la livraison. La CI vérifie séparément la tête complète poussée. Les journaux gardent des avertissements OCR (83 à 248 par dossier); ce ne sont pas des cotes validées ni des erreurs bloquantes du formulaire.
 
 ### Vérifications synthétiques et existantes
 
@@ -96,6 +98,8 @@ MIR_CHROMIUM_BIN=/usr/bin/chromium node tests/mir-studio-client-360-browser.cjs
 Le workflow de PR extrait explicitement le SHA de tête et n'archive que les preuves synthétiques. La CI de la nouvelle tête reste à vérifier après push; les résultats S1 antérieurs ne valent pas certification S2.
 
 ## Backend, suivi et limites
+
+Les modules canoniques `portal-client.js` et `chantier-app.js` restent octet pour octet identiques à la base. L’extension de lecture est un fichier séparé, inactif hors du projet TEST exact; seul un bloc de trois ressources est ajouté à la page chantier. Le contrôle PR44 épingle les deux migrations par SHA-256 et vérifie intégralement les autres modules Auth/Punch/employés/mobile et les garde-fous de publication. Les anciens contrats et leurs empreintes restent inchangés.
 
 Deux migrations additives ont été appliquées avec confirmation serveur sur **MIR TEST `hxtztkmbfpmzrieccwsg` uniquement** : instantanés des documents Studio et index employé. Elles réutilisent `mir-job-documents`, `mir_core.job_documents`, les jobs canoniques et leur contrôle d'accès. Aucun remplacement du commit document existant, aucune opération production. Le serveur contrôle contrat cinq vues, taille, propriétaire et révision; il ne réanalyse pas le PDF pour recompter ses pages. Ce compte est vérifié par le générateur et le lecteur locaux.
 

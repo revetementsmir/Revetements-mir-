@@ -15,7 +15,8 @@ if(process.env.MIR_CLIENT_BASE_SHA){
  const original=cp.execFileSync('git',['show',process.env.MIR_CLIENT_BASE_SHA+':dist/chantier.html'],{cwd:root,encoding:'utf8'});
  // If the base is already PR41-released, require full byte identity.
  // Only legacy pre-PR41 bases may add the exact client-only block.
- assert.equal(original.includes(block)?source:source.replace('\n'+block,''),original,
+ const expected=process.env.MIR_STUDIO_PR44==='true'?require('./mir-studio-pr44-isolation.cjs').staffMarkup(original):original;
+ assert.equal(original.includes(block)?source:source.replace('\n'+block,''),expected,
    'staff HTML/Auth hooks/role markup must be byte-identical');
 }
 const i18n=require('../dist/mir-client-i18n.js');
