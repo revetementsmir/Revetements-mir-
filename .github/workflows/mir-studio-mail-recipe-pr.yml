@@ -20,6 +20,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -53,6 +55,13 @@ jobs:
           assert(y.includes('cmp /tmp/mir-plan-public.html _site_mir/plan.html'),'exact public output still verified');
           assert(y.includes('cmp /tmp/mir-plan-test.html _site_mir/test/plan.html'),'original TEST must be byte checked');
           NODE
+      - name: Autorisation de PR42 dans un merge local jetable, refus des fausses fusions
+        if: github.event_name == 'pull_request'
+        run: |
+          node --check scripts/mir-final-release-gate.cjs
+          node --check tests/mir-final-release-gate-pr42.cjs
+          MIR_CLIENT_BASE_SHA="${{ github.event.pull_request.base.sha }}" node tests/mir-client-pr42-isolation.cjs
+          node tests/mir-final-release-gate-pr42.cjs
       - name: Captures Chrome réelles FR/EN, 7 tailles, clavier et mouvement réduit
         run: |
           npm install --no-save playwright@1.58.2

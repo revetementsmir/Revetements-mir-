@@ -24,6 +24,8 @@ const allowed=new Set([
  'supabase/test-only/README.md',
  'supabase/test-only/migrations/20261115235000_mir_native_qa_run_lease_test.sql',
  'tests/mir-client-pr42-isolation.cjs',
+ 'tests/mir-final-release-gate-pr42.cjs',
+ 'scripts/mir-final-release-gate.cjs',
  'tests/mir-client-account-isolation.cjs',
  'tests/mir-mail-recipe-offline.cjs',
  'tests/mir-native-qa-sql-guards.cjs',
@@ -34,7 +36,7 @@ const allowed=new Set([
 ]);
 assert.ok(changed.length>0,'Expected a reviewable diff');
 assert.deepEqual(changed.filter(f=>!allowed.has(f)),[],'PR42 may only modify the exact listed source-free QA/Studio packaging files');
-for(const p of ['dist','server','supabase/functions','supabase/migrations','scripts/mir-final-release-gate.cjs']){
+for(const p of ['dist','server','supabase/functions','supabase/migrations']){
  const files=git('diff','--name-only',BASE,'HEAD','--',p).split('\n').filter(Boolean);
  assert.deepEqual(files,[],p+' must be byte-identical to main, including production/Auth/APK and guarded Pages release gate');
 }
@@ -56,6 +58,20 @@ for(const [file,hash]of Object.entries({
 const migration=fs.readFileSync('supabase/test-only/migrations/20261115235000_mir_native_qa_run_lease_test.sql','utf8');
 assert.match(migration,/^-- MIR TEST ONLY/);
 assert.doesNotMatch(migration,/gccltmaulvrnthrbnrpd|delete from mir_core\.punch_shifts|drop table/i);
+// The only release-gate modification permitted is the isolated PR42
+// branch and its constants. Old PR36/37/41 gate must survive byte-for-byte.
+const gateNow=fs.readFileSync('scripts/mir-final-release-gate.cjs','utf8');
+const oldGate=cp.execFileSync('git',['show',BASE+':scripts/mir-final-release-gate.cjs'],{encoding:'utf8'});
+const constantsStart=gateNow.indexOf('const PR42_PUBLIC_BASE='),constantsEnd=gateNow.indexOf('const git=',constantsStart);
+assert.ok(constantsStart>0&&constantsEnd>constantsStart,'PR42 extension constants required');
+const noConstants=gateNow.slice(0,constantsStart)+gateNow.slice(constantsEnd);
+const branchStart=noConstants.indexOf('  if(subject===PR42_MERGE_SUBJECT){');
+const branchToken='  }else if(subject===CLIENT_RELEASE_SUBJECT){';
+const branchEnd=noConstants.indexOf(branchToken,branchStart);
+assert.ok(branchStart>0&&branchEnd>branchStart,'PR42 release gate branch required');
+const originalGate=noConstants.slice(0,branchStart)+'  if(subject===CLIENT_RELEASE_SUBJECT){'+noConstants.slice(branchEnd+branchToken.length);
+assert.equal(originalGate,oldGate,'original MIR production release gate must remain byte-identical');
+assert.match(gateNow,/PR42_CERTIFIED_HEAD='8d9641f2c1df84c6fec3c4e4fb417168b3c92c4c'/);
 const qa=fs.readFileSync('mobile/tools/native-qa-fixture.cjs','utf8');
 assert.match(qa,/const BASE='https:\/\/'\+TEST\+'\.supabase\.co'/);
 assert.match(qa,/GITHUB_ACTIONS!=='true'/);
