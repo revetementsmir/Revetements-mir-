@@ -1,0 +1,59 @@
+/* Orchestrates the existing source geometry engine. No catalogue of houses. */
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction.js'):root.MIRPlanReconstruction,node?require('./plan-reconstructed-roofs.js'):root.MIRReconstructedRoofs);if(node)module.exports=api;else root.MIRReconstructionPipeline=api;})(typeof window==='object'?window:globalThis,function(M,R,Roof){
+ 'use strict';
+ const copy=M.clone,source=r=>r.sourceReference||r;
+ function sameCaption(a,b){a=source(a);b=source(b);if(a.sourceViewId!==b.sourceViewId||!a.textBox||!b.textBox)return false;const x=a.textBox,y=b.textBox,area=p=>(p[2]-p[0])*(p[3]-p[1]),overlap=Math.max(0,Math.min(x[2],y[2])-Math.max(x[0],y[0]))*Math.max(0,Math.min(x[3],y[3])-Math.max(x[1],y[1]));return overlap/Math.min(area(x),area(y))>.65;}
+ function resolveReference(candidates){
+  const groups=[];for(const r of candidates.filter(r=>r.value>0&&r.scale>0)){let group=groups.find(g=>g.some(c=>sameCaption(c,r)));if(!group)groups.push(group=[]);group.push(r);}
+  // An OCR alternative is resolved only if independent caption groups agree.
+  // Two different written captions in conflict remain a conflict.
+  const supported=candidates.filter(r=>r.value>0&&groups.every(g=>g.some(c=>Math.abs(c.scale/r.scale-1)<=.05)));
+  if(!supported.length)return {status:groups.length?'conflict':'not_found',groups:copy(groups),reference:null};
+  if(Math.max(...supported.map(r=>r.scale))/Math.min(...supported.map(r=>r.scale))>1.05)return {status:'conflict',groups:copy(groups),reference:null};
+  const reference=copy(supported.slice().sort((a,b)=>Number(a.kind!=='written')-Number(b.kind!=='written')||b.confidence-a.confidence)[0]);
+  return {status:groups.length>1?'cross-checked-proposal':'single-reference-proposal',reference,groups:copy(groups),alternatives:copy(candidates.filter(r=>!supported.includes(r))),confirmationRequired:true};
+ }
+ function protectedLevel(level){return !!(level.geometryRevision||level.contourDraft||level.contours?.length||level.observedPlanes?.length||level.reconstructedRoofs?.length||level.wallOpenings?.length||Object.keys(level.wallFinishes||{}).length||level.wallZones?.length);}
+ function opening(o,walls){
+  let next=copy(o);const sizes=o.writtenSizeCandidates||[];
+  if(sizes.length===1){const s=sizes[0],candidate={...next,width:s.width,height:s.height,offset:next.offset+(next.width-s.width)/2,sill:next.sill+(next.height-s.height)/2,kind:'written',writtenSize:copy(s),originalEstimate:copy(o),positionEvidence:{kind:'estimated-calibrated',status:'proposed',sourceViewId:o.sourceViewId,sourceBox:copy(o.sourceBox),scalesUsed:copy(o.scalesUsed)}};if(!M.openingIssues([candidate],walls).length)next=candidate;else next.sizeIssue='WRITTEN_SIZE_OUTSIDE_WALL';}
+  return {...next,status:'proposed',confirmationRequired:true};
+ }
+ function build(inventory,buildingId,images){
+  const levels=[],reports=[],existing=inventory.levels.filter(l=>l.buildingId===buildingId),hasGroundPlan=inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor'&&v.levelId==='ground');
+  for(const current of existing.filter(l=>inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor'&&v.levelId===l.sourceLevel))){
+   const report={levelId:current.id,status:'unresolved',issues:[]};reports.push(report);
+   if(protectedLevel(current)){report.status='preserved';report.issues.push('EXISTING_GEOMETRY_PRESERVED');continue;}
+   let proposal=R.propose(inventory,buildingId,images,{levelId:current.id});
+   if(proposal.status!=='proposed'){report.issues.push(proposal.reason);continue;}
+   if(existing.filter(l=>inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor'&&v.levelId===l.sourceLevel)).length>1){report.issues.push('LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:copy(proposal.draft),reconstructionDraft:proposal});continue;}
+   const resolution=resolveReference(proposal.referenceCandidates);proposal.referenceResolution=resolution;
+   const draft=copy(proposal.draft),oldScale=proposal.referenceCandidates[0]?.scale;
+   if(!resolution.reference){report.issues.push(resolution.status==='conflict'?'REFERENCE_CONFLICT':'SCALE_UNKNOWN');levels.push({...copy(current),contourDraft:draft,reconstructionDraft:proposal});continue;}
+   draft.reference={...resolution.reference,status:'proposed',controlReferences:[],assessment:resolution};
+   if(draft.height.kind==='estimated-calibrated'&&oldScale>0){const factor=draft.reference.scale/oldScale;draft.height.value*=factor;draft.height.scaleUsed*=factor;for(const ref of draft.height.references){ref.value*=factor;ref.relationship=copy(draft.reference);}}
+   const constrained=R.constrainProposal(draft,proposal);constrained.status='proposed';
+   const errors=M.validateDraft(constrained,inventory,current);if(proposal.heightConflict)errors.push('HEIGHT_CONFLICT');
+   if(errors.length){report.issues.push(...errors);levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
+   proposal=R.recoupRegistrations(proposal,inventory,images,constrained);proposal.draft=copy(constrained);
+   const next={...copy(current),contours:[constrained],wallOpenings:[],openingsReviewed:false,reconstruction:{version:1,status:'automatic-proposal',proposal,sourceRasterRequiredForRendering:false}};
+   next.openingProposals=R.openingsFor(proposal,inventory,images,constrained);
+   if(next.openingProposals.some(o=>o.floorCorrespondence?.status==='unresolved'))report.issues.push('OPENING_FLOOR_MATCH_UNRESOLVED');
+   let lower=hasGroundPlan?{status:'unresolved',reason:'GROUND_PLAN_TAKES_PRECEDENCE'}:R.lowerPlanes(proposal,inventory,constrained,images);
+   const volumes=R.secondaryVolumes(proposal,inventory,images,constrained),roof=R.roofProposal(proposal,inventory,constrained,{images});
+   if(lower.status==='proposed')lower.openingProposals=R.observedOpenings(lower,proposal,inventory,images,{matchingOpenings:next.openingProposals});
+   for(const volume of volumes){volume.openingProposals=R.observedOpenings(volume,proposal,inventory,images);volume.roofProposal=R.volumeRoof(volume,proposal,inventory,images);}
+   lower=R.assignOpeningSurfaces(lower,volumes);next.reconstruction.lowerProposal=lower;next.reconstruction.secondaryProposals=volumes;next.reconstruction.roofProposal=roof;
+   if(roof.status==='proposed'&&!Roof.issues(roof,{confirm:false}).length)next.reconstructedRoofs=[roof];else report.issues.push(roof.reason||'ROOF_UNRESOLVED');
+   const additions=[next,...(lower.status==='proposed'?[lower]:[]),...volumes];
+   for(const l of additions){if(l!==next){if(inventory.levels.some(old=>old.id===l.id)){report.issues.push('EXISTING_GEOMETRY_PRESERVED');continue;}l.reconstruction={version:1,status:'automatic-proposal',sourceRasterRequiredForRendering:false};if(l.roofProposal?.status==='proposed'&&!Roof.issues(l.roofProposal,{confirm:false}).length)l.reconstructedRoofs=[l.roofProposal];}
+    const walls=M.wallsFor(l,inventory,{includeProposed:true});l.wallOpenings=(l.openingProposals||[]).map(o=>opening(o,walls)).filter(o=>!M.openingIssues([o],walls).length);levels.push(l);
+   }
+   if(lower.status!=='proposed'&&!hasGroundPlan)report.issues.push(lower.reason);
+   report.status='partial-proposal';report.confirmationRequired=true;report.measurements='written and calibrated estimates remain proposed';
+  }
+  if(!reports.length)reports.push({status:'unresolved',issues:['FLOOR_SOURCE_REQUIRED']});
+  return {version:1,buildingId,status:reports.some(r=>r.status==='partial-proposal')?'partial-proposal':reports.every(r=>r.status==='preserved')?'preserved':'unresolved',levels,reports,complete:false};
+ }
+ return Object.freeze({version:1,sameCaption,resolveReference,protectedLevel,build});
+});

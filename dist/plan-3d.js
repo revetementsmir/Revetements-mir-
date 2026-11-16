@@ -409,7 +409,7 @@
 
   function build(d, options) {
     if(options.levelScene){
-      const scene=options.levelScene,points=[...scene.walls.flatMap(w=>w.poly),...(global.MIRReconstructedRoofs?(scene.roofs||[]).flatMap(r=>global.MIRReconstructedRoofs.faces(r).flatMap(f=>f.poly)):[])],cx=(Math.min(...points.map(p=>p[0]))+Math.max(...points.map(p=>p[0])))/2,cy=(Math.min(...points.map(p=>p[1]))+Math.max(...points.map(p=>p[1])))/2;
+      const scene=options.levelScene,points=[...scene.walls.flatMap(w=>w.poly),...(global.MIRReconstructedRoofs?(scene.roofs||[]).flatMap(r=>global.MIRReconstructedRoofs.faces(r,[0,0],{includeProposed:scene.includeProposed}).flatMap(f=>f.poly)):[])],cx=(Math.min(...points.map(p=>p[0]))+Math.max(...points.map(p=>p[0])))/2,cy=(Math.min(...points.map(p=>p[1]))+Math.max(...points.map(p=>p[1])))/2;
       const faces=scene.walls.map(w=>({id:w.id,wallId:w.id,levelId:w.levelId,buildingId:w.buildingId,type:'wall',role:'level-exterior-wall',
         poly:w.poly.map(([x,y,z])=>[x-cx,y-cy,z]),normal:w.normal.slice(),base:[w.from[0]-cx,w.from[1]-cy,w.base],
         u:[(w.to[0]-w.from[0])/w.length,(w.to[1]-w.from[1])/w.length,0],width:w.length,fillColor:cleanColor(w.finish?.color,'#d7d8d0'),
@@ -421,11 +421,11 @@
       }
       if(global.MIRStudioExterior)for(const corner of scene.corners||[])for(const f of global.MIRStudioExterior.cornerFaces(corner,scene.walls,[cx,cy]))faces.push({...f,fillColor:cleanColor(f.fillColor,'#8d9690'),selected:options.selectedCornerIds?.includes(corner.id)});
       for(const s of scene.soffits||[])faces.push({id:s.id,levelId:s.levelId,type:'soffit',role:'measured-soffit-section',poly:s.polygon.map(([x,y])=>[x-cx,y-cy,s.height]),normal:[0,0,-1],fillColor:cleanColor(s.color,'#d8dbd1')});
-      if(global.MIRReconstructedRoofs)for(const roof of scene.roofs||[])for(const f of global.MIRReconstructedRoofs.faces(roof,[cx,cy]))faces.push({...f,selected:options.selectedElementIds?.includes(roof.id)});
+      if(global.MIRReconstructedRoofs)for(const roof of scene.roofs||[])for(const f of global.MIRReconstructedRoofs.faces(roof,[cx,cy],{includeProposed:scene.includeProposed}))faces.push({...f,selected:options.selectedElementIds?.includes(roof.id)});
       if(global.MIRStudioExterior)for(const e of scene.elements||[])for(const f of global.MIRStudioExterior.elementFaces(e,[cx,cy]))faces.push({...f,selected:options.selectedElementIds?.includes(e.id)});
       return {faces,a:d.width/2,b:d.depth/2,e:0,top:Math.max(...points.map(p=>p[2])),ground:Math.min(...points.map(p=>p[2])),foundationDrop:0,dimensions:d,roofStyle:'unknown',
-        recess:{enabled:false,depth:0,height:0},footprint:{type:scene.walls.some(w=>w.footprintConfirmed===false)?'observed-level-walls':'level-contours',confirmed:scene.walls.every(w=>w.footprintConfirmed!==false),levelIds:scene.levels.map(l=>l.id)},porch:{enabled:false},structures:[],
-        levelScene:scene,sourcePlan:'confirmed contours and measured level heights; no inferred roof'};
+        recess:{enabled:false,depth:0,height:0},footprint:{type:scene.walls.some(w=>w.footprintConfirmed===false)?'observed-level-walls':'level-contours',confirmed:scene.walls.every(w=>w.footprintConfirmed!==false&&!w.previewOnly),levelIds:scene.levels.map(l=>l.id)},porch:{enabled:false},structures:[],
+        levelScene:scene,sourcePlan:scene.walls.some(w=>w.previewOnly)?'proposed source geometry; measurements and missing parts require review':'confirmed contours and measured level heights; no inferred roof'};
     }
     const faces = [], a = d.width / 2, b = d.depth / 2, h = d.wallHeight, rise = d.roofRise;
     const foundationDrop = positive(options.foundationDrop, 0), ground = -foundationDrop;
@@ -763,7 +763,7 @@
     const extent = mesh.faces.flatMap(f => f.poly).concat(site?site.surfaces.flatMap(p=>p.poly):[]).map(flat);
     const minX = Math.min(...extent.map(p=>p[0])), maxX = Math.max(...extent.map(p=>p[0]));
     const minY = Math.min(...extent.map(p=>p[1])), maxY = Math.max(...extent.map(p=>p[1]));
-    const padX = Math.max(18, W * .065), padTop = Math.max(18, H * .08), padBottom = Math.max(24, H * .13);
+    const padX = Math.max(18, W * .065), padTop = Math.max(18, H * .08, Number(options.viewportInsets?.top)||0), padBottom = Math.max(24, H * .13, Number(options.viewportInsets?.bottom)||0);
     const zoom=Math.max(.7,Math.min(3.5,Number.isFinite(Number(options.zoom))?Number(options.zoom):1));
     const scale = Math.max(.001, Math.min((W - 2*padX)/(maxX-minX), (H-padTop-padBottom)/(maxY-minY)))*zoom;
     const tx = W/2 - (minX+maxX)/2*scale;

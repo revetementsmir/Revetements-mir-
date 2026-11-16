@@ -8,7 +8,7 @@
  function supportingPlanes(roof){
   const result=[];for(const axis of ['x','y']){const profile=roof.profiles[axis];let previous=Infinity;for(let i=0;i<profile.length-1;i++){const a=profile[i],b=profile[i+1],slope=(b[1]-a[1])/(b[0]-a[0]);if(slope>previous+1e-8)return null;previous=slope;const plane=axis==='x'?[slope,0,a[1]-slope*a[0]]:[0,slope,a[1]-slope*a[0]];if(!result.some(p=>p.every((n,j)=>Math.abs(n-plane[j])<1e-8)))result.push(plane);}}return result;
  }
- function componentFaces(roof,center=[0,0]){if(issues(roof).length)return [];const result=[],xp=roof.profiles.x,yp=roof.profiles.y;
+ function componentFaces(roof,center=[0,0],includeProposed=false){if(issues(roof,{confirm:!includeProposed}).length)return [];const result=[],xp=roof.profiles.x,yp=roof.profiles.y;
   const planes=supportingPlanes(roof);
   if(planes){
    // A concave silhouette bounds whole roof planes. Splitting it at every
@@ -43,8 +43,8 @@
    loops.forEach((poly,i)=>{const clean=poly.filter((p,j)=>{const a=poly[(j+poly.length-1)%poly.length],b=poly[(j+1)%poly.length];return Math.abs((p[0]-a[0])*(b[1]-p[1])-(p[1]-a[1])*(b[0]-p[0]))>1e-7;});other.push({...group.faces[0],id:group.faces[0].id+':merged:'+i,suppressOutline:false,poly:clean.map(([x,y])=>[x,y,group.plane[0]*x+group.plane[1]*y+group.plane[2]])});});
   }return other;
  }
- function faces(roof,center=[0,0]){
-  if(issues(roof).length)return [];const components=[roof,...(roof.extensions||[]).map(child=>({...child,status:roof.status,finish:roof.finish}))],groups=components.map(c=>componentFaces(c,center)),result=[];
+ function faces(roof,center=[0,0],{includeProposed=false}={}){
+  if(!['proposed','confirmed'].includes(roof.status)||issues(roof,{confirm:!includeProposed}).length)return [];const components=[roof,...(roof.extensions||[]).map(child=>({...child,status:roof.status,finish:roof.finish}))],groups=components.map(c=>componentFaces(c,center,includeProposed)),result=[];
   for(let i=0;i<groups.length;i++)for(const face of groups[i]){
    if(face.type!=='roof'){result.push(face);continue;}const plane=planeAt(face);let pieces=[face.poly.map(p=>p.slice(0,2))];for(let j=0;j<groups.length;j++){if(j===i)continue;for(const other of groups[j].filter(f=>f.type==='roof'))pieces=pieces.flatMap(p=>uncovered(p,plane,other,i>j));}
    pieces.forEach((p,k)=>result.push({...face,id:face.id+':visible:'+k,roofId:roof.id,elementId:roof.id,componentId:components[i].id,poly:p.map(([x,y])=>[x,y,plane[0]*x+plane[1]*y+plane[2]]),suppressOutline:groups.length>1}));

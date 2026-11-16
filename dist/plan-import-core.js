@@ -78,7 +78,7 @@
     const length = right - left;
     return length >= 50 && count / (length + 1) > .78 ? { left, right, y, density: count / (length + 1) } : null;
   }
-  function intersections(mask, run, fontHeight) {
+  function intersections(mask, run, fontHeight, shortTicks = false) {
     const { width: w, height: h, data } = mask, reach = clamp(Math.round(fontHeight * .85), 10, 35), ys = run.y;
     const hits = [];
     for (let x = Math.max(2, run.left); x <= Math.min(w - 3, run.right); x++) {
@@ -88,10 +88,19 @@
         const p = y * w + x, ink = data[p - 1] || data[p] || data[p + 1];
         if (ink) { continuous++; longest = Math.max(longest, continuous); if (dy < -3) above++; if (dy > 3) below++; } else continuous = 0;
       }
-      if (above >= reach * .45 && below >= reach * .23 && longest >= reach * 1.1) hits.push({ x, strength: above + below + longest });
+      let slash = false;
+      if (shortTicks && (above >= 4 || below >= 4)) for (const direction of [-1, 1]) {
+        let upper = 0, lower = 0;
+        for (let d = 1; d <= 4; d++) for (const sign of [-1, 1]) {
+          const px = x + direction * sign * d, py = ys + sign * d;
+          if (px > 0 && px < w - 1 && py >= 0 && py < h && (data[py*w+px-1] || data[py*w+px] || data[py*w+px+1])) { if (sign < 0) upper++; else lower++; }
+        }
+        if (upper >= 3 && lower >= 3) slash = true;
+      }
+      if (above >= reach * .45 && below >= reach * .23 && longest >= reach * 1.1 || slash) hits.push({ x, strength: above + below + longest, slash });
     }
     const clustered = [];
-    for (const hit of hits) { const last = clustered[clustered.length - 1]; if (last && hit.x - last.right <= 5) { last.right = hit.x; if (hit.strength > last.strength) { last.x = hit.x; last.strength = hit.strength; } } else clustered.push({ ...hit, right: hit.x }); }
+    for (const hit of hits) { const last = clustered[clustered.length - 1]; if (last && hit.x - last.right <= 5) { last.right = hit.x; last.slash ||= hit.slash; if (hit.strength > last.strength) { last.x = hit.x; last.strength = hit.strength; } } else clustered.push({ ...hit, right: hit.x }); }
     return clustered;
   }
   function matchDimensionLines(image, labels, options = {}) {
@@ -104,11 +113,14 @@
       if (fh > image.height * .035 || x1 - x0 > image.width * .3) continue;
       let best = null;
       for (let y = Math.max(2, Math.floor(y0 - fh * 2.5)); y <= Math.min(image.height - 3, y1 + fh * 2.9); y++) {
-        if (y >= y0 - 2 && y <= y1 + 2) continue;
+        const textPadding = options.shortTicks ? 0 : 2;
+        if (y >= y0 - textPadding && y <= y1 + textPadding) continue;
         const run = lineRun(mask, y, Math.round(cx)); if (!run) continue;
-        const ticks = intersections(mask, run, fh);
+        if (options.shortTicks) { let actual = 0; for (let x = run.left; x <= run.right; x++) actual += mask.data[y * mask.width + x]; if (actual / (run.right - run.left + 1) < .6) continue; }
+        const ticks = intersections(mask, run, fh, options.shortTicks);
         for (let i = 0; i < ticks.length; i++) for (let j = i + 1; j < ticks.length; j++) {
           const a = ticks[i].x, b = ticks[j].x, span = b - a;
+          if (options.shortTicks && ticks.slice(i+1,j).some(t=>t.slash)) continue;
           if (span < Math.max(options.minSpanPx ?? 55, (x1 - x0) * 1.3) || a > x0 + fh || b < x1 - fh) continue;
           const centered = Math.abs((a + b) / 2 - cx) / span; if (centered > .19) continue;
           const verticalGap = Math.min(Math.abs(y - y0), Math.abs(y - y1));

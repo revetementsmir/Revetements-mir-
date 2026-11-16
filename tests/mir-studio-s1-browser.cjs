@@ -47,7 +47,10 @@ const server=http.createServer((req,res)=>{let file=path.resolve(dist,'.'+new UR
     await page.locator('#mir-pdf-final').scrollIntoViewIfNeeded();
     await page.screenshot({path:path.join(out,'import-ready-390.png')});
     await page.locator('#mir-pdf-final').click();await page.waitForFunction(()=>document.querySelector('#project-name').textContent==='synthetic-house-shed');
+    await page.waitForSelector('#mir-conversion-report',{timeout:120000});
     const entry=await page.evaluate(()=>MIRProjectStore.getActive());
+    assert.ok(entry.planData.automaticReconstruction?.house,'the actual import button requests conversion after all Studio handlers initialize');
+    assert.equal(entry.planData.reconstructionRequest,undefined,'conversion consumes the import request');
     assert.equal(entry.planData.version,3);assert.equal(entry.planData.viewInventory.views.length,8);
     assert.equal(entry.planData.viewInventory.buildings.length,2);
     const shedViews=entry.planData.viewInventory.views.filter(v=>v.buildingId==='shed');

@@ -105,15 +105,15 @@
     if(view){next.reference.pdfAnchors=next.reference.anchors.map(p=>pdfPoint(view,p));for(const p of next.points)p.pdfPoint=pdfPoint(view,p.xy);}
     return next;
   }
-  function contourWallsFor(level,inventory){
-    const c=level.contours?.find(c=>c.status==='confirmed');if(!c||validateDraft(c,inventory,level,{confirm:true}).length)return [];
+  function contourWallsFor(level,inventory,{includeProposed=false}={}){
+    const c=level.contours?.find(c=>c.status==='confirmed'||includeProposed&&c.status==='proposed');if(!c||validateDraft(c,inventory,level,{confirm:c.status==='confirmed'}).length)return [];
     const p=modelPoints(c),orientation=Math.sign(signedArea(p)),z=c.base.value,h=c.height.value;
     return p.map((a,i)=>{const b=p[(i+1)%p.length],length=distance(a,b),id=wallId(c.contourId,c.points[i].id,c.points[(i+1)%p.length].id);
       return {id,wallId:id,levelId:level.id,buildingId:level.buildingId,contourId:c.contourId,sourceViewId:c.sourceViewId,
         pointIds:[c.points[i].id,c.points[(i+1)%p.length].id],from:a,to:b,length,height:h,base:z,
         poly:[[...a,z],[...b,z],[...b,z+h],[...a,z+h]],normal:[orientation*(b[1]-a[1])/length,orientation*(a[0]-b[0])/length,0],
-        dimension:{kind:'estimated-calibrated',value:length,status:'confirmed',reference:clone(c.reference),written:clone(c.edgeMeasures?.[id]||null),anchors:[clone(c.points[i].xy),clone(c.points[(i+1)%p.length].xy)],sourceViewId:c.sourceViewId,scaleUsed:scale(c)},heightEvidence:clone(c.height),
-        finish:clone(level.wallFinishes?.[id]||null),status:'confirmed-working-geometry',occlusionIndependent:true};
+        dimension:{kind:'estimated-calibrated',value:length,status:c.status,reference:clone(c.reference),written:clone(c.edgeMeasures?.[id]||null),anchors:[clone(c.points[i].xy),clone(c.points[(i+1)%p.length].xy)],sourceViewId:c.sourceViewId,scaleUsed:scale(c)},heightEvidence:clone(c.height),
+        finish:clone(level.wallFinishes?.[id]||null),previewOnly:c.status!=='confirmed',status:c.status==='confirmed'?'confirmed-working-geometry':'proposed-working-geometry',occlusionIndependent:true};
     });
   }
   function observedPlaneIssues(plane,inventory,level,{confirm=true}={}){
@@ -128,8 +128,8 @@
     if(confirm&&plane.status!=='confirmed')errors.push('PLANE_UNCONFIRMED');
     return [...new Set(errors)];
   }
-  function observedWallsFor(level,inventory){return (level.observedPlanes||[]).filter(p=>!observedPlaneIssues(p,inventory,level).length).map(p=>({id:p.id,wallId:p.id,levelId:level.id,buildingId:level.buildingId,sourceViewId:p.sourceViewId,from:clone(p.from),to:clone(p.to),length:distance(p.from,p.to),height:p.height,base:p.base,normal:clone(p.normal),pointIds:[p.id+':start',p.id+':end'],poly:[[...p.from,p.base],[...p.to,p.base],[...p.to,p.base+p.height],[...p.from,p.base+p.height]],dimension:clone(p.measurements.width),heightEvidence:clone(p.measurements.height),finish:clone(level.wallFinishes?.[p.id]||null),status:'confirmed-observed-plane',footprintConfirmed:false,occlusionIndependent:true}));}
-  function wallsFor(level,inventory){return [...contourWallsFor(level,inventory),...observedWallsFor(level,inventory)];}
+  function observedWallsFor(level,inventory,{includeProposed=false}={}){return (level.observedPlanes||[]).filter(p=>(p.status==='confirmed'||includeProposed&&p.status==='proposed')&&!observedPlaneIssues(p,inventory,level,{confirm:!includeProposed||p.status==='confirmed'}).length).map(p=>({id:p.id,wallId:p.id,levelId:level.id,buildingId:level.buildingId,sourceViewId:p.sourceViewId,from:clone(p.from),to:clone(p.to),length:distance(p.from,p.to),height:p.height,base:p.base,normal:clone(p.normal),pointIds:[p.id+':start',p.id+':end'],poly:[[...p.from,p.base],[...p.to,p.base],[...p.to,p.base+p.height],[...p.from,p.base+p.height]],dimension:clone(p.measurements.width),heightEvidence:clone(p.measurements.height),finish:clone(level.wallFinishes?.[p.id]||null),previewOnly:p.status!=='confirmed',status:p.status==='confirmed'?'confirmed-observed-plane':'proposed-observed-plane',footprintConfirmed:false,occlusionIndependent:true}));}
+  function wallsFor(level,inventory,options={}){return [...contourWallsFor(level,inventory,options),...observedWallsFor(level,inventory,options)];}
   function commitContour(inventory,levelId,draft){
     const next=clone(inventory),level=next.levels.find(l=>l.id===levelId);if(!level)throw Error('LEVEL_UNKNOWN');
     const confirmed=confirmDraft(draft,next,level),old=level.contours||[];
@@ -159,10 +159,10 @@
       partial:!levels.length||levels.some(l=>!wallsFor(l,inventory).length||l.reconstruction?.proposal?.complete===false)||rows.some(r=>r.partial)||openings.some(o=>o.status!=='confirmed'),
       scope:'contour-walls-only; never added to legacy elevation quantities',areaUnit:'m2',purchaseQuantities:null};
   }
-  function scene(inventory,buildingId){
-    const levels=inventory.levels.filter(l=>l.buildingId===buildingId),walls=levels.flatMap(l=>wallsFor(l,inventory)),quantitiesResult=quantities(inventory,buildingId);
+  function scene(inventory,buildingId,{includeProposed=false}={}){
+    const levels=inventory.levels.filter(l=>l.buildingId===buildingId),walls=levels.flatMap(l=>wallsFor(l,inventory,{includeProposed})),quantitiesResult=quantities(inventory,buildingId);
     return {version:1,buildingId,walls,levels:levels.map(l=>({id:l.id,sourceLevel:l.sourceLevel,available:walls.some(w=>w.levelId===l.id)})),
-      openings:levels.flatMap(l=>l.wallOpenings||[]).filter(o=>o.status==='confirmed'&&!openingIssues([o],walls).length),partial:quantitiesResult.partial,quantities:quantitiesResult};
+      openings:levels.flatMap(l=>l.wallOpenings||[]).filter(o=>(o.status==='confirmed'||includeProposed&&o.status==='proposed')&&!openingIssues([o],walls).length),partial:quantitiesResult.partial,quantities:quantitiesResult};
   }
   // Monochrome enclosed-region proposal within a user-selected drawing area.
   // Coloured masks/legends never supply the boundary; open/ambiguous runs fail.

@@ -48,7 +48,7 @@
         if((current?current.geometryRevision||0:null)!==expectedRevision)throw new Error('Ce niveau a changé dans une autre fenêtre. Rechargez avant de réappliquer votre brouillon.');
         const next=JSON.parse(JSON.stringify(level));next.geometryRevision=(expectedRevision||0)+1;
         if(index<0)inventory.levels.push(next);else inventory.levels[index]=next;
-        if(window.MIRReconstructedRoofs)for(const roof of next.reconstructedRoofs||[]){if(MIRReconstructedRoofs.issues(roof).length||roof.levelId!==levelId||roof.buildingId!==buildingId||[roof,...(roof.extensions||[])].flatMap(r=>r.sources).some(s=>!inventory.views.some(v=>v.id===s.sourceViewId&&v.buildingId===buildingId&&v.kind==='elevation')))throw new Error('Toiture ou sources invalides.');}if(window.MIRLevelModel){for(const plane of next.observedPlanes||[])if(plane.status==='confirmed'&&MIRLevelModel.observedPlaneIssues(plane,inventory,next).length)throw new Error('Murs observés ou mesures invalides.');for(const contour of next.contours||[])if(contour.status==='confirmed'&&MIRLevelModel.validateDraft(contour,inventory,next,{confirm:true}).length)throw new Error('Contour ou mesures invalides.');next.wallPlanes=MIRLevelModel.wallsFor(next,inventory);}
+        if(window.MIRReconstructedRoofs)for(const roof of next.reconstructedRoofs||[]){if(MIRReconstructedRoofs.issues(roof,{confirm:roof.status!=='proposed'||next.reconstruction?.status!=='automatic-proposal'}).length||roof.levelId!==levelId||roof.buildingId!==buildingId||[roof,...(roof.extensions||[])].flatMap(r=>r.sources).some(s=>!inventory.views.some(v=>v.id===s.sourceViewId&&v.buildingId===buildingId&&v.kind==='elevation')))throw new Error('Toiture ou sources invalides.');}if(window.MIRLevelModel){for(const plane of next.observedPlanes||[])if((plane.status==='confirmed'||next.reconstruction?.status==='automatic-proposal')&&MIRLevelModel.observedPlaneIssues(plane,inventory,next,{confirm:plane.status==='confirmed'}).length)throw new Error('Murs observés ou mesures invalides.');for(const contour of next.contours||[])if((contour.status==='confirmed'||next.reconstruction?.status==='automatic-proposal')&&MIRLevelModel.validateDraft(contour,inventory,next,{confirm:contour.status==='confirmed'}).length)throw new Error('Contour ou mesures invalides.');next.wallPlanes=MIRLevelModel.wallsFor(next,inventory);}
         inventory.geometryVersion=1;inventory.levelStudio||={};inventory.levelStudio[buildingId]={activeLevelId:levelId};
         entry.updatedAt=new Date().toISOString();store.put(entry);saved=entry;
       }catch(e){problem=e;tx.abort();}};
@@ -56,6 +56,39 @@
     });
     window.dispatchEvent(new CustomEvent('mir:project-active',{detail:{id:projectId}}));return alias(record);
   }
+  const reconstructionStamp=inventory=>JSON.stringify({views:inventory.views.map(v=>[v.id,v.buildingId,v.levelId,v.direction,v.frame,v.calibration,v.evidence,v.payload?.drawingReadings]),levels:inventory.levels});
+  async function saveReconstruction({projectId,buildingId,expectedStamp,result}){
+    if(activeId()!==projectId||result.buildingId!==buildingId)throw Error('Le projet actif a changé.');
+    const connection=await db(),record=await new Promise((resolve,reject)=>{
+      const tx=connection.transaction(STORE,'readwrite'),store=tx.objectStore(STORE),read=store.get(projectId);let saved,problem;
+      read.onsuccess=()=>{try{
+        const entry=read.result,inventory=entry?.planData?.viewInventory;
+        if(activeId()!==projectId||inventory?.activeBuildingId!==buildingId||reconstructionStamp(inventory)!==expectedStamp)throw Error('Le projet a changé pendant le traitement. Vos choix sont conservés.');
+        const next=JSON.parse(JSON.stringify(result));
+        if(next.version!==1||!['partial-proposal','unresolved','preserved','cancelled'].includes(next.status)||!Array.isArray(next.reports))throw Error('Résultat de conversion invalide.');
+        if(new Set(next.levels.map(l=>l.id)).size!==next.levels.length)throw Error('Niveaux dupliqués.');
+        for(const level of next.levels){
+          const index=inventory.levels.findIndex(l=>l.id===level.id),old=inventory.levels[index];
+          if(level.buildingId!==buildingId||old&&MIRReconstructionPipeline.protectedLevel(old))throw Error('Un niveau modifié est conservé.');
+          for(const c of level.contours||[])if(c.status!=='proposed'||MIRLevelModel.validateDraft(c,inventory,level).length)throw Error('Contour proposé invalide.');
+          for(const p of level.observedPlanes||[])if(p.status!=='proposed'||MIRLevelModel.observedPlaneIssues(p,inventory,level,{confirm:false}).length)throw Error('Murs proposés invalides.');
+          for(const roof of level.reconstructedRoofs||[])if(roof.status!=='proposed'||MIRReconstructedRoofs.issues(roof,{confirm:false}).length||roof.levelId!==level.id||roof.buildingId!==buildingId||[roof,...(roof.extensions||[])].flatMap(r=>r.sources).some(s=>!inventory.views.some(v=>v.id===s.sourceViewId&&v.buildingId===buildingId&&v.kind==='elevation')))throw Error('Toiture proposée invalide.');
+          const walls=MIRLevelModel.wallsFor(level,inventory,{includeProposed:true});
+          if(MIRLevelModel.openingIssues(level.wallOpenings||[],walls).length)throw Error('Ouvertures proposées invalides.');
+          level.geometryRevision=(old?.geometryRevision||0)+1;if(index<0)inventory.levels.push(level);else inventory.levels[index]=level;
+        }
+        const allWalls=next.levels.flatMap(l=>MIRLevelModel.wallsFor(l,inventory,{includeProposed:true}));if(MIRLevelModel.openingIssues(next.levels.flatMap(l=>l.wallOpenings||[]),allWalls).length)throw Error('Une ouverture est affectée à plusieurs surfaces.');
+        entry.planData.automaticReconstruction||={};entry.planData.automaticReconstruction[buildingId]={version:1,status:next.status,reports:next.reports,at:new Date().toISOString(),complete:false};
+        delete entry.planData.reconstructionRequest;inventory.geometryVersion=1;inventory.levelStudio||={};
+        const first=next.levels.find(l=>l.contours?.length)||next.levels[0];if(first)inventory.levelStudio[buildingId]={activeLevelId:first.id};
+        // Sources, manual edits, finishes and every other building/project stay
+        // in the transaction's current record; no stale whole-project replace.
+        entry.updatedAt=new Date().toISOString();store.put(entry);saved=entry;
+      }catch(e){problem=e;tx.abort();}};
+      tx.oncomplete=()=>resolve(saved);tx.onabort=tx.onerror=()=>reject(problem||tx.error||Error('Le modèle n’a pas pu être enregistré.'));
+    });
+    window.dispatchEvent(new CustomEvent('mir:project-active',{detail:{id:projectId}}));return alias(record);
+  }
   const keys = (id,scope) => ({ studio: id ? `mir-plan-study-v2:${id}${scope?':'+scope:''}` : 'mir-plan-study-v2', takeoff: id ? `mir-takeoff-v1:${id}${scope?':'+scope:''}` : 'mir-takeoff-v1' });
-  window.MIRProjectStore = Object.freeze({ getActive, get, activate, saveActive, saveLevelGeometry, clearActive, list, activeId, keys, version: 1 });
+  window.MIRProjectStore = Object.freeze({ getActive, get, activate, saveActive, saveLevelGeometry, saveReconstruction, reconstructionStamp, clearActive, list, activeId, keys, version: 1 });
 })();

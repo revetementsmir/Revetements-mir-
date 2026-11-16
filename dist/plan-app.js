@@ -92,7 +92,7 @@
     }catch(e){message.textContent=e.message;apply.disabled=false;}};
     box.addEventListener('close',()=>box.remove(),{once:true});box.showModal();
   };
-  $('#import-pdf').onclick=()=>{clientPreview?.cancel();return window.MIRPlanImport?.open?window.MIRPlanImport.open({onImport:()=>location.reload()}):null;};
+  $('#import-pdf').onclick=()=>{clientPreview?.cancel();return window.MIRPlanImport?.open?window.MIRPlanImport.open({reconstruct:true,onImport:()=>location.reload()}):null;};
   try {
     const responses = await Promise.all([fetch('plan-data.json'),fetch('catalogue-fd6866b49d21.json?v=maconnerie-1'),fetch('takeoff-data.json')]);
     if(responses.some(r=>!r.ok)) throw Error('Chargement indisponible');

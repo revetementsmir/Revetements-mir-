@@ -82,7 +82,7 @@
     element();
     callback = typeof options.onImport === 'function' ? options.onImport : null;
     if (dialog.open) return;
-    current = fresh();
+    current = {...fresh(),reconstruct:options.reconstruct===true};
     $('#mir-pdf-view-review').replaceChildren();
     $('#mir-pdf-file').value = '';
     $('#mir-pdf-close').disabled = false;
@@ -104,7 +104,8 @@
   }
   async function load(file) {
     if (!file) return;
-    const token = ++sequence, imported = current = fresh();
+    const reconstruct=current.reconstruct;
+    const token = ++sequence, imported = current = {...fresh(),reconstruct};
     imported.file = file;
     $('#mir-pdf-view-review').replaceChildren();
     error('');
@@ -485,6 +486,7 @@
         recess: { enabled: false, confirmed: false }, footprint: { type: 'unknown' }
       };
       const takeoffSeed = { version: 1, calibrations, geometry: { buildingWidthFt: null, buildingDepthFt: null, recessStartFt: null, recessWidthFt: null, recessDepthFt: null, recessHeightFt: null, returnCladHeightFt: null, confirmed: false }, footprintEvidence: null, note: 'Échelles automatiques proposées à partir des cotes. Contrôler les mesures avant une commande.' };
+      if(imported.reconstruct)planData.reconstructionRequest={version:1,status:'pending',buildingId:imported.viewInventory.activeBuildingId};
       const entry = { id, planData, takeoffSeed, source, sourceFile: imported.file, createdAt: new Date().toISOString() };
       await MIRProjectStore.saveActive(entry);
       imported.saving = false;
