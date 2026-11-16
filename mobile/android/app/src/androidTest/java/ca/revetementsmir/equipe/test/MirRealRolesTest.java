@@ -76,6 +76,24 @@ public class MirRealRolesTest extends MirDeviceSetup {
   androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).waitForIdle(1000);
   android.graphics.Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bitmap);try{return saveScreenshot(name,bitmap,null);}finally{bitmap.recycle();}
  }
+ private boolean injectDeliberateNativeTap(int x,int y){
+  // A WebView <dialog> can receive a very short UIAutomator down/up without
+  // synthesizing its HTML button click. Deliver one genuine touchscreen
+  // press/release (not a DOM click or a retry) with a stable 130 ms hold.
+  final android.app.UiAutomation automation=InstrumentationRegistry.getInstrumentation().getUiAutomation();
+  final long downTime=SystemClock.uptimeMillis();
+  final android.view.MotionEvent down=android.view.MotionEvent.obtain(downTime,downTime,
+      android.view.MotionEvent.ACTION_DOWN,(float)x,(float)y,0);
+  down.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
+  boolean downDelivered;
+  try{downDelivered=automation.injectInputEvent(down,true);}finally{down.recycle();}
+  if(!downDelivered)return false;
+  SystemClock.sleep(130); // less than long-press timeout; fixed, single touch
+  final android.view.MotionEvent up=android.view.MotionEvent.obtain(downTime,SystemClock.uptimeMillis(),
+      android.view.MotionEvent.ACTION_UP,(float)x,(float)y,0);
+  up.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
+  try{return automation.injectInputEvent(up,true);}finally{up.recycle();}
+ }
  private void tap(ActivityScenario<MainActivity>s,String selector)throws Exception{
   // Native pointer input: no programmatic DOM click that can precede presentation.
   waitFor(s,"(()=>{const n=document.querySelector("+JSONObject.quote(selector)+");return !!n&&!n.disabled&&n.getBoundingClientRect().height>0;})()");js(s,"document.querySelector("+JSONObject.quote(selector)+").scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});true");presentFrame(s);
@@ -84,8 +102,15 @@ public class MirRealRolesTest extends MirDeviceSetup {
   // CSS pixels have the same physical scale on both axes, even when viewport height changes.
   double scale=loc[2]/point.getDouble("width");int x=loc[0]+(int)Math.round(point.getDouble("x")*scale),y=loc[1]+(int)Math.round(point.getDouble("y")*scale);
   js(s,"(()=>{window.nativeLastTap={selector:"+JSONObject.quote(selector)+",point:"+point.toString()+",screenX:"+x+",screenY:"+y+",webLeft:"+loc[0]+",webTop:"+loc[1]+",webWidth:"+loc[2]+",webHeight:"+loc[3]+",events:[]};if(!window.nativeTapProbe){window.nativeTapProbe=true;for(const type of ['pointerdown','pointerup','pointercancel','click'])document.addEventListener(type,e=>{window.nativeLastTap?.events.push({type,x:e.clientX,y:e.clientY,target:e.target.tagName,close:!!e.target.closest('[data-close-dialog]')});},true);}return true;})()");
-  assertTrue("Native tap delivered",androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(x,y));
-  if(selector.equals("#portal-dialog .dialog-close[data-close-dialog]")){waitFor(s,"native pointer reaches close control: "+js(s,"JSON.stringify(window.nativeLastTap)"),"window.nativeLastTap.events.some(e=>e.type==='click'&&e.close)");}
+  final boolean closeButton=selector.equals("#portal-dialog .dialog-close[data-close-dialog]");
+  assertTrue("Native tap delivered",closeButton?injectDeliberateNativeTap(x,y):
+      androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(x,y));
+  if(closeButton){
+    // Keep the original real-click requirement, and additionally require
+    // the actual <dialog> to be closed after the native event sequence.
+    waitFor(s,"native click closes portal dialog: "+js(s,"JSON.stringify(window.nativeLastTap)"),
+        "window.nativeLastTap.events.some(e=>e.type==='click'&&e.close) && !window.nativeLastTap.events.some(e=>e.type==='pointercancel') && document.querySelector('#portal-dialog')?.open===false");
+  }
  }
  private String drawingTargetExpression(String selector){
   return "(()=>{const f=document.querySelector('#field-drawing-frame'),d=f?.contentDocument,n=d?.querySelector("+JSONObject.quote(selector)+");if(!f||!d||!n||!n.isConnected||n.matches(':disabled'))return{ready:false};const r=n.getBoundingClientRect(),frame=f.getBoundingClientRect();if(f.offsetWidth<=0||f.offsetHeight<=0||frame.width<=0||frame.height<=0)return{ready:false};const cx=r.left+r.width/2,cy=r.top+r.height/2,sx=frame.width/f.offsetWidth,sy=frame.height/f.offsetHeight,x=frame.left+(f.clientLeft+cx)*sx,y=frame.top+(f.clientTop+cy)*sy,hit=d.elementFromPoint(cx,cy),parentHit=document.elementFromPoint(x,y);return{ready:r.width>0&&r.height>0&&cx>=0&&cy>=0&&cx<f.contentWindow.innerWidth&&cy<f.contentWindow.innerHeight&&x>=0&&y>=0&&x<innerWidth&&y<innerHeight&&!!hit&&(hit===n||n.contains(hit))&&parentHit===f,x,y,width:innerWidth,height:innerHeight,w:r.width,h:r.height,childHit:!!hit&&(hit===n||n.contains(hit)),parentHit:parentHit===f};})()";

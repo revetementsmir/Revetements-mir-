@@ -42,6 +42,11 @@ assert.match(native,/Exact per-run synthetic marker/,'Native role test validates
 assert.match(native,/Exact per-run shift/,'Native role test validates correct shift');
 assert.match(native,/Exact per-run segment/,'Native role test validates correct segment');
 assert.doesNotMatch(native,/QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL/,'Native role test cannot accept obsolete PR41 marker');
+assert.match(native,/injectDeliberateNativeTap/,'Native dialog close uses a real touchscreen injection');
+assert.match(native,/automation\.injectInputEvent\(down,true\)/,'Native down injected through Android UI automation');
+assert.match(native,/automation\.injectInputEvent\(up,true\)/,'Native release injected through Android UI automation');
+assert.match(native,/e\.type==='click'&&e\.close/,'Native close must still generate a real click');
+assert.match(native,/document\.querySelector\('#portal-dialog'\)\?\.open===false/,'Real dialog closure must also be observed');
 assert.match(ci,/node mobile\/tools\/verify-pr39-native-fixture\.cjs/);
 assert.match(ci,/node mobile\/tools\/native-qa-fixture\.cjs finish/);
 assert.match(ci,/if: always\(\)/);
