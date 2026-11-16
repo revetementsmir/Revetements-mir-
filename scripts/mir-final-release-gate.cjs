@@ -52,6 +52,11 @@ const PR42_PREP_SUBJECT='fix(pages-qa): certify public construction and preserve
 const PR42_MERGE_SUBJECT='Merge PR #42 — MIR Studio public et courriels de recette';
 const PR42_CHANGED=Object.freeze([".github/workflows/mir-client-i18n-pr.yml",".github/workflows/mir-phase11-android-pr.yml",".github/workflows/mir-studio-mail-recipe-pr.yml",".github/workflows/pages.yml","docs/verification/studio-public-courriels-20261115.md","mobile/android/app/src/androidTest/java/ca/revetementsmir/equipe/test/MirRealRolesTest.java","mobile/tools/native-qa-fixture.cjs","mobile/tools/prepare-real-qa-manifest.cjs","mobile/tools/test-native-qa-fixture.cjs","mobile/tools/test-pr39-native-fixture.cjs","mobile/tools/verify-pr39-native-fixture.cjs","ops/studio-public/under-construction.html","scripts/mir-final-release-gate.cjs","scripts/stage-mir-studio-public.cjs","supabase/test-only/README.md","supabase/test-only/migrations/20261115235000_mir_native_qa_run_lease_test.sql","tests/mir-client-account-isolation.cjs","tests/mir-client-followup-browser.cjs","tests/mir-client-pr42-isolation.cjs","tests/mir-final-release-gate-pr42.cjs","tests/mir-mail-recipe-offline.cjs","tests/mir-native-qa-sql-guards.cjs","tests/mir-pr39-native-chef-fixture.cjs","tests/mir-studio-public-browser.cjs","tests/mir-studio-public-stage.cjs","tools/qa/mir-mail-recipe.cjs"]);
 const PR42_PREP_CHANGED=Object.freeze(["scripts/mir-final-release-gate.cjs","tests/mir-client-followup-browser.cjs","tests/mir-client-pr42-isolation.cjs","tests/mir-final-release-gate-pr42.cjs"]);
+// Exception de livraison strictement bornée : test Pages post-PR42, zéro changement métier.
+const POST_PR42_RELEASE_BASE='4f8fcf4ae2e6854c9435a316a1c61a11f2f7d823';
+const POST_PR42_MERGE_SUBJECT='Merge PR #43 — MIR Pages recette Studio public TEST';
+const POST_PR42_FIX_SUBJECT='fix(pages): certify published Studio smoke on TEST';
+const POST_PR42_CHANGED=Object.freeze(['scripts/mir-final-release-gate.cjs','tests/mir-estimate-published-browser.cjs']);
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 function check(){
   if(process.env.GITHUB_REF&&process.env.GITHUB_REF!=='refs/heads/main')throw Error('Pages release requires main');
@@ -67,7 +72,39 @@ function check(){
   const reviewedParents=git('rev-list','--parents','-n','1',FINAL_MERGE).split(/\s+/);
   assert.equal(git('log','-1','--pretty=%s',FINAL_MERGE),expectedSubject,'original final merge subject preserved');
   assert.deepEqual(reviewedParents,[FINAL_MERGE,PR36_MAIN,PR37_REVIEWED],'original reviewed two-parent merge preserved');
-  if(subject===PR42_MERGE_SUBJECT){
+  if(subject===POST_PR42_MERGE_SUBJECT){
+    // Only the reviewed two-parent follow-up merge may correct the published
+    // read-only smoke test. PR42's actual deployed runtime remains byte-identical.
+    assert.equal(parents.length,3,'post-PR42 fix must preserve true merge history');
+    assert.equal(parents[1],POST_PR42_RELEASE_BASE,'post-PR42 fix must target released main exactly');
+    assert.equal(git('log','-1','--pretty=%s',parents[1]),PR42_MERGE_SUBJECT,'PR42 released parent required');
+    assert.equal(git('merge-base',parents[1],parents[2]),POST_PR42_RELEASE_BASE,'post-PR42 branch must originate from released main');
+    assert.equal(git('log','-1','--pretty=%s',parents[2]),POST_PR42_FIX_SUBJECT,'last reviewed QA commit required');
+    const changed=git('diff','--name-only',parents[1],parents[2]).split(/\r?\n/).filter(Boolean).sort();
+    assert.deepEqual(changed,POST_PR42_CHANGED,'only release gate and published Studio smoke test may change');
+    assert.equal(git('diff','--name-only',parents[1],parents[2],'--','dist','server','mobile','supabase','.github').trim(),'','business code and workflows remain unchanged');
+    // Previous release gate is byte-identical outside this exact PR43 clause.
+    const prior=execFileSync('git',['show',POST_PR42_RELEASE_BASE+':scripts/mir-final-release-gate.cjs'],{encoding:'utf8'});
+    const actual=fs.readFileSync('scripts/mir-final-release-gate.cjs','utf8');
+    const constantsStart=actual.indexOf('const POST_PR42_RELEASE_BASE=');
+    const constantsEnd=actual.indexOf('const git=',constantsStart);
+    const beforeConstants=actual.lastIndexOf('// Exception de livraison strictement bornée',constantsStart);
+    assert.ok(beforeConstants>0&&constantsStart>beforeConstants&&constantsEnd>constantsStart,'isolated PR43 constants required');
+    const unextended=actual.slice(0,beforeConstants)+actual.slice(constantsEnd);
+    const branchStart=unextended.indexOf('  if(subject===POST_PR42_MERGE_SUBJECT){');
+    const nextBranch='  }else if(subject===PR42_MERGE_SUBJECT){';
+    const branchEnd=unextended.lastIndexOf(nextBranch);
+    assert.ok(branchStart>0&&branchEnd>branchStart,'isolated PR43 branch required');
+    const original=unextended.slice(0,branchStart)+'  if(subject===PR42_MERGE_SUBJECT){'+unextended.slice(branchEnd+nextBranch.length);
+    assert.equal(original,prior,'PR36–PR42 release gate must remain byte-identical');
+    const smoke=fs.readFileSync('tests/mir-estimate-published-browser.cjs','utf8');
+    assert.match(smoke,/data-mir-studio-public-state/,'public construction must be tested');
+    assert.match(smoke,/Under construction by the MIR team/,'EN public Studio must be tested');
+    assert.match(smoke,/base\+'\/test\/plan\.html'/,'guarded TEST Studio must be exercised');
+    assert.match(smoke,/MIRTestEnvironment\?\.environment==='test'/,'TEST guard must be verified');
+    assert.match(smoke,/assert\.deepEqual\(posts,\[\]\)/,'real estimate POST remains forbidden');
+    assert.match(smoke,/assert\.deepEqual\(errors,\[\]\)/,'browser errors remain failing');
+  }else if(subject===PR42_MERGE_SUBJECT){
     // User-authorized release: ONLY PR42's reviewed two-parent
     // merge after successful checks. No other branch, direct push or flattening.
     assert.equal(parents.length,3,'PR42 must be a true merge, preserving both parents');
