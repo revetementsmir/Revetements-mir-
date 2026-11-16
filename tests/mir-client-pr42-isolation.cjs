@@ -24,6 +24,7 @@ const allowed=new Set([
  'supabase/test-only/README.md',
  'supabase/test-only/migrations/20261115235000_mir_native_qa_run_lease_test.sql',
  'tests/mir-client-pr42-isolation.cjs',
+ 'tests/mir-client-followup-browser.cjs',
  'tests/mir-final-release-gate-pr42.cjs',
  'scripts/mir-final-release-gate.cjs',
  'tests/mir-client-account-isolation.cjs',
@@ -76,6 +77,9 @@ const qa=fs.readFileSync('mobile/tools/native-qa-fixture.cjs','utf8');
 assert.match(qa,/const BASE='https:\/\/'\+TEST\+'\.supabase\.co'/);
 assert.match(qa,/GITHUB_ACTIONS!=='true'/);
 assert.match(qa,/MIR_TEST_TARGET!=='sandbox'/);
+const followup=fs.readFileSync('tests/mir-client-followup-browser.cjs','utf8');
+assert.match(followup,/html\[data-mir-studio-public-state="construction"\]/,'Published client followup must check public construction');
+assert.match(followup,/\/test\/plan\.html/,'Published client followup must test Studio tools in isolated TEST');
 const studio=fs.readFileSync('scripts/stage-mir-studio-public.cjs','utf8');
 assert.match(studio,/testPagesUnchanged:true/);
 const mail=fs.readFileSync('tools/qa/mir-mail-recipe.cjs','utf8');
