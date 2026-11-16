@@ -93,7 +93,7 @@ function check(){
     const unextended=actual.slice(0,beforeConstants)+actual.slice(constantsEnd);
     const branchStart=unextended.indexOf('  if(subject===POST_PR42_MERGE_SUBJECT){');
     const nextBranch='  }else if(subject===PR42_MERGE_SUBJECT){';
-    const branchEnd=unextended.indexOf(nextBranch,branchStart);
+    const branchEnd=unextended.lastIndexOf(nextBranch);
     assert.ok(branchStart>0&&branchEnd>branchStart,'isolated PR43 branch required');
     const original=unextended.slice(0,branchStart)+'  if(subject===PR42_MERGE_SUBJECT){'+unextended.slice(branchEnd+nextBranch.length);
     assert.equal(original,prior,'PR36–PR42 release gate must remain byte-identical');
