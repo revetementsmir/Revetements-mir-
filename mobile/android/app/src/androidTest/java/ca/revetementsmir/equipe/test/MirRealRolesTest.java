@@ -12,6 +12,29 @@ import static org.junit.Assert.*;
 /** Required CI integration test, secrets supplied privately at runtime, never in the APK. */
 @RunWith(AndroidJUnit4.class)
 public class MirRealRolesTest extends MirDeviceSetup {
+ /** Exact run-scoped MIR TEST fixture, injected into private app storage only by
+  * the trusted CI runner after backend confirmation. No client-side parameter. */
+ private JSONObject nativeQaFixture() throws Exception{
+  File file=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir(),"native-qa-run-manifest.json");
+  assertTrue("MIR TEST private run manifest required",file.isFile());
+  JSONObject fixture=new JSONObject(new String(java.nio.file.Files.readAllBytes(file.toPath()),java.nio.charset.StandardCharsets.UTF_8));
+  assertEquals("MIR TEST only","hxtztkmbfpmzrieccwsg",fixture.getString("projectRef"));
+  assertEquals("Server-confirmed active fixture","active",fixture.getString("state"));
+  String runId=fixture.getString("runId");
+  assertTrue("Fresh UUIDv4 run ID",runId.matches("[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"));
+  assertEquals("One run-specific marker","QA-NATIVE-RUN-"+runId.replace("-",""),fixture.getString("marker"));
+  assertEquals("Correct UTC work day",java.time.LocalDate.now(java.time.ZoneOffset.UTC).toString(),fixture.getString("workDate"));
+  assertEquals("Approved QA job","7da20261-1114-4000-8000-000000000001",fixture.getString("jobId"));
+  JSONObject employee=fixture.getJSONObject("employee"),chef=fixture.getJSONObject("chef");
+  assertEquals("QA employee identity","3980647a-d83a-48ad-9d90-8fc2b314807f",employee.getString("id"));
+  assertEquals("QA chef identity","ec421778-b39b-492e-9e4b-5e044015e98f",chef.getString("id"));
+  for(String key:new String[]{"shift","segment"}){
+   assertTrue("Distinct employee "+key,employee.getString(key).matches("[0-9a-f-]{36}"));
+   assertTrue("Distinct chef "+key,chef.getString(key).matches("[0-9a-f-]{36}"));
+   assertNotEquals("Run must not reuse "+key,employee.getString(key),chef.getString(key));
+  }
+  return fixture;
+ }
  private Object js(ActivityScenario<MainActivity>s,String expression)throws Exception{
   CountDownLatch done=new CountDownLatch(1);String[] value={null};
   String body=expression.endsWith(";true")?expression.substring(0,expression.length()-4)+"return true;":"return ("+expression+");";
@@ -53,6 +76,24 @@ public class MirRealRolesTest extends MirDeviceSetup {
   androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).waitForIdle(1000);
   android.graphics.Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bitmap);try{return saveScreenshot(name,bitmap,null);}finally{bitmap.recycle();}
  }
+ private boolean injectDeliberateNativeTap(int x,int y){
+  // A WebView <dialog> can receive a very short UIAutomator down/up without
+  // synthesizing its HTML button click. Deliver one genuine touchscreen
+  // press/release (not a DOM click or a retry) with a stable 130 ms hold.
+  final android.app.UiAutomation automation=InstrumentationRegistry.getInstrumentation().getUiAutomation();
+  final long downTime=SystemClock.uptimeMillis();
+  final android.view.MotionEvent down=android.view.MotionEvent.obtain(downTime,downTime,
+      android.view.MotionEvent.ACTION_DOWN,(float)x,(float)y,0);
+  down.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
+  boolean downDelivered;
+  try{downDelivered=automation.injectInputEvent(down,true);}finally{down.recycle();}
+  if(!downDelivered)return false;
+  SystemClock.sleep(130); // less than long-press timeout; fixed, single touch
+  final android.view.MotionEvent up=android.view.MotionEvent.obtain(downTime,SystemClock.uptimeMillis(),
+      android.view.MotionEvent.ACTION_UP,(float)x,(float)y,0);
+  up.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
+  try{return automation.injectInputEvent(up,true);}finally{up.recycle();}
+ }
  private void tap(ActivityScenario<MainActivity>s,String selector)throws Exception{
   // Native pointer input: no programmatic DOM click that can precede presentation.
   waitFor(s,"(()=>{const n=document.querySelector("+JSONObject.quote(selector)+");return !!n&&!n.disabled&&n.getBoundingClientRect().height>0;})()");js(s,"document.querySelector("+JSONObject.quote(selector)+").scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});true");presentFrame(s);
@@ -61,8 +102,15 @@ public class MirRealRolesTest extends MirDeviceSetup {
   // CSS pixels have the same physical scale on both axes, even when viewport height changes.
   double scale=loc[2]/point.getDouble("width");int x=loc[0]+(int)Math.round(point.getDouble("x")*scale),y=loc[1]+(int)Math.round(point.getDouble("y")*scale);
   js(s,"(()=>{window.nativeLastTap={selector:"+JSONObject.quote(selector)+",point:"+point.toString()+",screenX:"+x+",screenY:"+y+",webLeft:"+loc[0]+",webTop:"+loc[1]+",webWidth:"+loc[2]+",webHeight:"+loc[3]+",events:[]};if(!window.nativeTapProbe){window.nativeTapProbe=true;for(const type of ['pointerdown','pointerup','pointercancel','click'])document.addEventListener(type,e=>{window.nativeLastTap?.events.push({type,x:e.clientX,y:e.clientY,target:e.target.tagName,close:!!e.target.closest('[data-close-dialog]')});},true);}return true;})()");
-  assertTrue("Native tap delivered",androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(x,y));
-  if(selector.equals("#portal-dialog .dialog-close[data-close-dialog]")){waitFor(s,"native pointer reaches close control: "+js(s,"JSON.stringify(window.nativeLastTap)"),"window.nativeLastTap.events.some(e=>e.type==='click'&&e.close)");}
+  final boolean closeButton=selector.equals("#portal-dialog .dialog-close[data-close-dialog]");
+  assertTrue("Native tap delivered",closeButton?injectDeliberateNativeTap(x,y):
+      androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(x,y));
+  if(closeButton){
+    // Keep the original real-click requirement, and additionally require
+    // the actual <dialog> to be closed after the native event sequence.
+    waitFor(s,"native click closes portal dialog: "+js(s,"JSON.stringify(window.nativeLastTap)"),
+        "window.nativeLastTap.events.some(e=>e.type==='click'&&e.close) && !window.nativeLastTap.events.some(e=>e.type==='pointercancel') && document.querySelector('#portal-dialog')?.open===false");
+  }
  }
  private String drawingTargetExpression(String selector){
   return "(()=>{const f=document.querySelector('#field-drawing-frame'),d=f?.contentDocument,n=d?.querySelector("+JSONObject.quote(selector)+");if(!f||!d||!n||!n.isConnected||n.matches(':disabled'))return{ready:false};const r=n.getBoundingClientRect(),frame=f.getBoundingClientRect();if(f.offsetWidth<=0||f.offsetHeight<=0||frame.width<=0||frame.height<=0)return{ready:false};const cx=r.left+r.width/2,cy=r.top+r.height/2,sx=frame.width/f.offsetWidth,sy=frame.height/f.offsetHeight,x=frame.left+(f.clientLeft+cx)*sx,y=frame.top+(f.clientTop+cy)*sy,hit=d.elementFromPoint(cx,cy),parentHit=document.elementFromPoint(x,y);return{ready:r.width>0&&r.height>0&&cx>=0&&cy>=0&&cx<f.contentWindow.innerWidth&&cy<f.contentWindow.innerHeight&&x>=0&&y>=0&&x<innerWidth&&y<innerHeight&&!!hit&&(hit===n||n.contains(hit))&&parentHit===f,x,y,width:innerWidth,height:innerHeight,w:r.width,h:r.height,childHit:!!hit&&(hit===n||n.contains(hit)),parentHit:parentHit===f};})()";
@@ -98,7 +146,7 @@ public class MirRealRolesTest extends MirDeviceSetup {
   JSONObject data=(JSONObject)js(s,"({width:innerWidth,height:innerHeight,rects:[...document.querySelectorAll('[data-confirmed-start]')].filter(n=>n.dataset.confirmedStart&&n.getClientRects().length&&!n.closest('dialog:not([open])')).map(n=>{const range=document.createRange();range.selectNodeContents(n);const r=range.getBoundingClientRect();return{left:r.left,top:r.top,right:r.right,bottom:r.bottom};})})");int[] loc=new int[4];s.onActivity(a->{android.webkit.WebView web=a.getBridge().getWebView();web.getLocationOnScreen(loc);loc[2]=web.getWidth();loc[3]=web.getHeight();});double sx=loc[2]/data.getDouble("width"),sy=loc[3]/data.getDouble("height");JSONArray rects=data.getJSONArray("rects");for(int i=0;i<rects.length();i++){JSONObject r=rects.getJSONObject(i);android.graphics.Rect mask=new android.graphics.Rect(Math.max(crop.left,loc[0]+(int)Math.floor((r.getDouble("left")-2)*sx)),Math.max(crop.top,loc[1]+(int)Math.floor((r.getDouble("top")-2)*sy)),Math.min(crop.right,loc[0]+(int)Math.ceil((r.getDouble("right")+2)*sx)),Math.min(crop.bottom,loc[1]+(int)Math.ceil((r.getDouble("bottom")+2)*sy)));assertTrue("Only a measured clock region is masked",mask.width()>0&&mask.height()>0&&(long)mask.width()*mask.height()<(long)crop.width()*crop.height()/10);if(!dynamicRegions.contains(mask))dynamicRegions.add(mask);}
  }
  private JSONObject assertConfirmedClock(ActivityScenario<MainActivity>s)throws Exception{
-  waitFor(s,"confirmed Punch and authorized job metadata visible","!!MIRPortalActiveClient.getStatus().snapshot.punch?.activeShift && !!document.querySelector('.field-elapsed') && /rue fictive QA/.test(document.querySelector('[data-field-punch-job]')?.nextElementSibling?.textContent||'')");JSONObject clock=(JSONObject)js(s,"(()=>{const a=MIRPortalActiveClient.getStatus().snapshot.punch.activeShift;return{id:a.id,startedAt:a.started_at,device:a.device_id,seconds:Math.max(0,Math.floor((Date.now()-Date.parse(a.started_at))/1000)),day:document.querySelector('.field-elapsed').textContent,segmentId:a.segment?.id,jobId:a.segment?.job_id,displayedJobId:document.querySelector('[data-field-punch-job]')?.value||''};})()");assertEquals("Synthetic TEST fixture is explicit", "QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL",clock.getString("device"));String[] parts=clock.getString("day").split(":");assertEquals(3,parts.length);long seconds=Long.parseLong(parts[0])*3600+Long.parseLong(parts[1])*60+Long.parseLong(parts[2]);assertTrue("Displayed elapsed time follows confirmed timestamp",Math.abs(seconds-clock.getLong("seconds"))<=2);assertTrue("Representative active duration",seconds>=15*60);assertEquals("Actual pointed job remains identified",clock.getString("jobId"),clock.getString("displayedJobId"));assertFalse(clock.getString("segmentId").isEmpty());tap(s,"[data-field-movement]");waitFor(s,"confirmed segment details are visible","!!document.querySelector('#portal-dialog[open] .field-segment-time time') && /Chantier en cours/.test(document.querySelector('.field-segment-time').textContent)");JSONObject segment=(JSONObject)js(s,"(()=>{const a=MIRPortalActiveClient.getStatus().snapshot.punch.activeShift,n=document.querySelector('.field-segment-time time');return{expected:Math.max(0,Math.floor((Date.now()-Date.parse(a.segment.started_at))/1000)),value:n.textContent};})()");String[] time=segment.getString("value").split(":");assertEquals(3,time.length);assertTrue("Segment elapsed follows its own confirmed start",Math.abs(Long.parseLong(time[0])*3600+Long.parseLong(time[1])*60+Long.parseLong(time[2])-segment.getLong("expected"))<=2);tap(s,"#portal-dialog .dialog-close[data-close-dialog]");waitFor(s,"native close dismissed the Punch details",fieldContent("punch"));return clock;
+  waitFor(s,"confirmed Punch and authorized job metadata visible","!!MIRPortalActiveClient.getStatus().snapshot.punch?.activeShift && !!document.querySelector('.field-elapsed') && /rue fictive QA/.test(document.querySelector('[data-field-punch-job]')?.nextElementSibling?.textContent||'')");JSONObject clock=(JSONObject)js(s,"(()=>{const a=MIRPortalActiveClient.getStatus().snapshot.punch.activeShift;return{actorId:MIRPortalActiveClient.getStatus().snapshot.actorId,id:a.id,startedAt:a.started_at,device:a.device_id,seconds:Math.max(0,Math.floor((Date.now()-Date.parse(a.started_at))/1000)),day:document.querySelector('.field-elapsed').textContent,segmentId:a.segment?.id,jobId:a.segment?.job_id,displayedJobId:document.querySelector('[data-field-punch-job]')?.value||''};})()");JSONObject runFixture=nativeQaFixture();JSONObject exactActor=runFixture.getJSONObject(clock.getString("actorId").equals("3980647a-d83a-48ad-9d90-8fc2b314807f")?"employee":"chef");assertEquals("Active actor matches the specific QA run",clock.getString("actorId"),exactActor.getString("id"));assertEquals("Exact per-run synthetic marker",runFixture.getString("marker"),clock.getString("device"));assertEquals("Exact per-run shift",exactActor.getString("shift"),clock.getString("id"));assertEquals("Exact per-run segment",exactActor.getString("segment"),clock.getString("segmentId"));String[] parts=clock.getString("day").split(":");assertEquals(3,parts.length);long seconds=Long.parseLong(parts[0])*3600+Long.parseLong(parts[1])*60+Long.parseLong(parts[2]);assertTrue("Displayed elapsed time follows confirmed timestamp",Math.abs(seconds-clock.getLong("seconds"))<=2);assertTrue("Representative active duration",seconds>=15*60);assertEquals("Actual pointed job remains identified",clock.getString("jobId"),clock.getString("displayedJobId"));assertFalse(clock.getString("segmentId").isEmpty());tap(s,"[data-field-movement]");waitFor(s,"confirmed segment details are visible","!!document.querySelector('#portal-dialog[open] .field-segment-time time') && /Chantier en cours/.test(document.querySelector('.field-segment-time').textContent)");JSONObject segment=(JSONObject)js(s,"(()=>{const a=MIRPortalActiveClient.getStatus().snapshot.punch.activeShift,n=document.querySelector('.field-segment-time time');return{expected:Math.max(0,Math.floor((Date.now()-Date.parse(a.segment.started_at))/1000)),value:n.textContent};})()");String[] time=segment.getString("value").split(":");assertEquals(3,time.length);assertTrue("Segment elapsed follows its own confirmed start",Math.abs(Long.parseLong(time[0])*3600+Long.parseLong(time[1])*60+Long.parseLong(time[2])-segment.getLong("expected"))<=2);tap(s,"#portal-dialog .dialog-close[data-close-dialog]");waitFor(s,"native close dismissed the Punch details",fieldContent("punch"));return clock;
  }
  private JSONObject renderedScreenshot(ActivityScenario<MainActivity>s,String name,String expected,android.graphics.Rect fixedContent,java.util.Set<String> forbidden)throws Exception{
   waitFor(s,expected);presentFrame(s);long deadline=SystemClock.uptimeMillis()+12000,stableSince=0;String previous=null;int attempts=0;

@@ -38,6 +38,20 @@ const CLIENT_RELEASE_BASE='33eacb5741e801067178fdeec83a9489332333c6';
 const CLIENT_RELEASE_SUBJECT='Merge PR #41 — MIR client FR-CA / EN-CA';
 const CLIENT_FINAL_COMMIT_SUBJECT='fix(client-release): preserve public header and fresh isolated QA';
 const CLIENT_RELEASE_CHANGED=[".github/workflows/mir-client-i18n-pr.yml",".github/workflows/pages.yml","dist/annotated-pdf.js","dist/boutique.html","dist/catalogue.js","dist/chantier.html","dist/commerce.js","dist/contact.html","dist/estimation-dossier.html","dist/estimation.html","dist/index.html","dist/materiaux.html","dist/mir-account-flow.js","dist/mir-client-en-ca.js","dist/mir-client-i18n.css","dist/mir-client-i18n.js","dist/mir-dossier-pdf.js","dist/mir-estimate.js","dist/mir-panel-po-pdf.js","dist/mir-selection-pdf.js","dist/mir-unified-client-dossier.js","dist/plan-app.js","dist/plan.html","dist/pliage.html","dist/pliage.js","dist/production-model.js","dist/production.html","dist/produit.html","dist/realisations.html","dist/selection.html","dist/studio.html","docs/verification/client-localisation-20261115.md","mobile/tools/verify-pr39-native-fixture.cjs","scripts/mir-final-release-gate.cjs","supabase/test-only/fixtures/pr41-android-native-active-20261115.sql","supabase/test-only/fixtures/pr41-android-native-active-close-20261115.sql","supabase/test-only/fixtures/pr41-android-native-chef-today-20261115.sql","supabase/test-only/fixtures/pr41-android-native-chef-today-close-20261115.sql","tests/mir-chat-phase3a.cjs","tests/mir-client-accessibility-browser.cjs","tests/mir-client-account-en-browser.cjs","tests/mir-client-account-isolation.cjs","tests/mir-client-commerce-approved-browser.cjs","tests/mir-client-email-boundary.cjs","tests/mir-client-i18n-browser.cjs","tests/mir-client-i18n-pdf-browser.cjs","tests/mir-client-i18n-static.cjs","tests/mir-client-i18n.cjs","tests/mir-client-mail-simulation-browser.cjs","tests/mir-client-pdf-bilingual.cjs","tests/mir-client-published-browser.cjs","tests/mir-client-qa-isolation.cjs","tests/mir-client-signature-browser.cjs","tests/mir-client-unified-bilingual-browser.cjs"];
+const PR42_PUBLIC_BASE='65b3145f735ea11ee0f77d331270649ece7266ec';
+const PR42_CERTIFIED_HEAD='8d9641f2c1df84c6fec3c4e4fb417168b3c92c4c';
+const PR42_INITIAL_GATE='abbbcd951dba3de81368e4ce25eb49d1249b2e23';
+const PR42_INITIAL_GATE_SUBJECT='ci(pages): authorize reviewed PR42 release with strict gate';
+const PR42_GATE_ANCHOR_FIX='94e954bc78660d3b01b84feed410f843df918751';
+const PR42_GATE_ANCHOR_SUBJECT='fix(ci): certify strict PR42 Pages gate anchor';
+const PR42_PREP_PARENT='5dbb6ad8c16045505652214c78ff48e1a8ac193f';
+const PR42_PREP_PARENT_SUBJECT='fix(ci): test PR42 gate on exact pull request head';
+const PR42_PAGES_QA_PARENT='a20bf2e83acc34d1fab94b7fb05c4ddb2112d0f8';
+const PR42_PAGES_QA_PARENT_SUBJECT='fix(android-qa): stabilize real native close tap with strict click and dialog checks';
+const PR42_PREP_SUBJECT='fix(pages-qa): certify public construction and preserved TEST Studio browser';
+const PR42_MERGE_SUBJECT='Merge PR #42 — MIR Studio public et courriels de recette';
+const PR42_CHANGED=Object.freeze([".github/workflows/mir-client-i18n-pr.yml",".github/workflows/mir-phase11-android-pr.yml",".github/workflows/mir-studio-mail-recipe-pr.yml",".github/workflows/pages.yml","docs/verification/studio-public-courriels-20261115.md","mobile/android/app/src/androidTest/java/ca/revetementsmir/equipe/test/MirRealRolesTest.java","mobile/tools/native-qa-fixture.cjs","mobile/tools/prepare-real-qa-manifest.cjs","mobile/tools/test-native-qa-fixture.cjs","mobile/tools/test-pr39-native-fixture.cjs","mobile/tools/verify-pr39-native-fixture.cjs","ops/studio-public/under-construction.html","scripts/mir-final-release-gate.cjs","scripts/stage-mir-studio-public.cjs","supabase/test-only/README.md","supabase/test-only/migrations/20261115235000_mir_native_qa_run_lease_test.sql","tests/mir-client-account-isolation.cjs","tests/mir-client-followup-browser.cjs","tests/mir-client-pr42-isolation.cjs","tests/mir-final-release-gate-pr42.cjs","tests/mir-mail-recipe-offline.cjs","tests/mir-native-qa-sql-guards.cjs","tests/mir-pr39-native-chef-fixture.cjs","tests/mir-studio-public-browser.cjs","tests/mir-studio-public-stage.cjs","tools/qa/mir-mail-recipe.cjs"]);
+const PR42_PREP_CHANGED=Object.freeze(["scripts/mir-final-release-gate.cjs","tests/mir-client-followup-browser.cjs","tests/mir-client-pr42-isolation.cjs","tests/mir-final-release-gate-pr42.cjs"]);
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 function check(){
   if(process.env.GITHUB_REF&&process.env.GITHUB_REF!=='refs/heads/main')throw Error('Pages release requires main');
@@ -53,7 +67,54 @@ function check(){
   const reviewedParents=git('rev-list','--parents','-n','1',FINAL_MERGE).split(/\s+/);
   assert.equal(git('log','-1','--pretty=%s',FINAL_MERGE),expectedSubject,'original final merge subject preserved');
   assert.deepEqual(reviewedParents,[FINAL_MERGE,PR36_MAIN,PR37_REVIEWED],'original reviewed two-parent merge preserved');
-  if(subject===CLIENT_RELEASE_SUBJECT){
+  if(subject===PR42_MERGE_SUBJECT){
+    // User-authorized release: ONLY PR42's reviewed two-parent
+    // merge after successful checks. No other branch, direct push or flattening.
+    assert.equal(parents.length,3,'PR42 must be a true merge, preserving both parents');
+    assert.equal(parents[1],PR42_PUBLIC_BASE,'PR42 cannot merge onto unreviewed main');
+    assert.equal(git('log','-1','--pretty=%s',parents[1]),CLIENT_RELEASE_SUBJECT,'PR41 released parent required');
+    assert.equal(git('log','-1','--pretty=%s',parents[2]),PR42_PREP_SUBJECT,'PR42 gate certification must be the final branch commit');
+    assert.equal(git('rev-parse',parents[2]+'^'),PR42_PAGES_QA_PARENT,'PR42 published-browser correction must directly follow the native QA touch fix');
+    assert.equal(git('rev-parse',parents[2]+'^^'),PR42_PREP_PARENT,'native QA touch correction retained');
+    assert.equal(git('rev-parse',parents[2]+'^^^'),PR42_GATE_ANCHOR_FIX,'strict release gate correction retained');
+    assert.equal(git('rev-parse',parents[2]+'^^^^'),PR42_INITIAL_GATE,'original PR42 gate commit retained');
+    assert.equal(git('rev-parse',parents[2]+'^^^^^'),PR42_CERTIFIED_HEAD,'PR42 must descend from the 14/14 green head');
+    assert.equal(git('log','-1','--pretty=%s',PR42_PAGES_QA_PARENT),PR42_PAGES_QA_PARENT_SUBJECT,'native QA fix must be reviewed');
+    assert.equal(git('log','-1','--pretty=%s',PR42_PREP_PARENT),PR42_PREP_PARENT_SUBJECT,'previous successful release gate preflight retained');
+    assert.equal(git('log','-1','--pretty=%s',PR42_GATE_ANCHOR_FIX),PR42_GATE_ANCHOR_SUBJECT,'strict anchor correction retained');
+    assert.equal(git('log','-1','--pretty=%s',PR42_INITIAL_GATE),PR42_INITIAL_GATE_SUBJECT,'reviewed initial gate commit must remain intact');
+    assert.equal(git('merge-base',parents[1],parents[2]),PR42_PUBLIC_BASE,'PR42 branch must originate from exactly the released main');
+    const changed=git('diff','--name-only',parents[1],parents[2]).split(/\r?\n/).filter(Boolean).sort();
+    assert.deepEqual(changed,PR42_CHANGED,'PR42 exact reviewed file inventory required');
+    const last=git('diff-tree','--no-commit-id','--name-only','-r',parents[2]).split(/\r?\n/).filter(Boolean).sort();
+    assert.deepEqual(last,PR42_PREP_CHANGED,'only four isolated public/TEST browser and release verification files may differ in the final branch commit');
+    // Prove byte identity of original PR37–PR41 gate: only a contained PR42
+    // case and constants have been added. Old branches survive unmodified.
+    const prior=execFileSync('git',['show',PR42_PUBLIC_BASE+':scripts/mir-final-release-gate.cjs'],{encoding:'utf8'});
+    const actual=fs.readFileSync('scripts/mir-final-release-gate.cjs','utf8');
+    const constantsStart=actual.indexOf('const PR42_PUBLIC_BASE=');
+    const constantsEnd=actual.indexOf('const git=',constantsStart);
+    assert.ok(constantsStart>0&&constantsEnd>constantsStart,'PR42 constants isolated');
+    const unextended=actual.slice(0,constantsStart)+actual.slice(constantsEnd);
+    const branchStart=unextended.indexOf('  if(subject===PR42_MERGE_SUBJECT){');
+    const nextBranch='  }else if(subject===CLIENT_RELEASE_SUBJECT){';
+    const branchEnd=unextended.lastIndexOf(nextBranch);
+    assert.ok(branchStart>0&&branchEnd>branchStart,'PR42 release case isolated');
+    const original=unextended.slice(0,branchStart)+'  if(subject===CLIENT_RELEASE_SUBJECT){'+unextended.slice(branchEnd+nextBranch.length);
+    assert.equal(original,prior,'old PR36–PR41 release gate must be byte-identical');
+    const pages=fs.readFileSync('.github/workflows/pages.yml','utf8');
+    const setup=pages.indexOf('node scripts/build-mir-test.cjs _site_mir _site_mir/test');
+    const overlay=pages.indexOf('node scripts/stage-mir-studio-public.cjs _site_mir');
+    const manifest=pages.indexOf('node scripts/build-mir-test.cjs --production-manifest _site_mir');
+    assert.ok(setup>0&&overlay>setup&&manifest>overlay,'MIR TEST originals must precede public Studio overlay and manifest');
+    const studio=fs.readFileSync('ops/studio-public/under-construction.html','utf8');
+    assert.match(studio,/En construction par l’équipe MIR/);
+    assert.match(studio,/Under construction by the MIR team/);
+    assert.match(studio,/prefers-reduced-motion/);
+    assert.match(fs.readFileSync('scripts/stage-mir-studio-public.cjs','utf8'),/testPagesUnchanged:true/);
+    assert.match(fs.readFileSync('tools/qa/mir-mail-recipe.cjs','utf8'),/transportCalled:false/);
+    assert.equal(git('diff','--name-only',parents[1],parents[2],'--','dist','server','supabase/functions','supabase/migrations').trim(),'','no production, staff or client runtime may change');
+  }else if(subject===CLIENT_RELEASE_SUBJECT){
     // Only the authorized PR41 true merge may succeed after the reviewed PR37
     // release. The prior release and its global capability checks stay intact.
     assert.equal(parents.length,3,'PR41 must preserve both merge parents');

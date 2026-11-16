@@ -5,11 +5,24 @@ const org='8aabc1c9-bd01-4ca1-ad62-b89b575a6bf9',leader='ec421778-b39b-492e-9e4b
  team='7da20261-1114-4000-8000-000000000020',job='7da20261-1114-4000-8000-000000000001',
  member='552233d5-ae18-4c14-be85-0206e6f18549',
  assigned='7da20261-1114-4000-8920-000000000001',task='7da20261-1114-4000-8930-000000000001';
-const prepare=fs.readFileSync('supabase/test-only/fixtures/pr39-native-chef-today-20261115.sql','utf8'),
- close=fs.readFileSync('supabase/test-only/fixtures/pr39-native-chef-today-close-20261115.sql','utf8');
+// The historic PR39 SQL is an immutable fixture dated 2026-11-15.
+ // For disposable PGlite-only tests, set its *same strict day predicate* to
+ // the isolated database's current UTC day, without changing or deploying SQL.
+const historicalPrepare=fs.readFileSync('supabase/test-only/fixtures/pr39-native-chef-today-20261115.sql','utf8'),
+ historicalClose=fs.readFileSync('supabase/test-only/fixtures/pr39-native-chef-today-close-20261115.sql','utf8');
+assert.match(historicalPrepare,/current_date <> date '2026-11-15'/,'Keep original dated precondition unchanged');
+assert.match(historicalClose,/date '2026-11-15'/,'Keep cleanup date check unchanged');
+
 (async()=>{
  const db=new PGlite();let checks=0;
  try{
+  await db.exec("set timezone to 'UTC'");
+  const today=(await db.query('select current_date::text as today')).rows[0].today;
+  assert.match(today,/^\d{4}-\d{2}-\d{2}$/);
+  const shiftDate=(source)=>source.replaceAll("date '2026-11-15'","date '"+today+"'");
+  const prepare=shiftDate(historicalPrepare),close=shiftDate(historicalClose);
+  assert.match(prepare,/current_date <> date '\d{4}-\d{2}-\d{2}'/,'UTC date guard preserved');
+  assert.match(close,/date '\d{4}-\d{2}-\d{2}'/,'Exact cleanup date predicate preserved');
   await db.exec('create schema mir_core;create table mir_core.memberships(organization_id uuid,user_id uuid,active bool);create table mir_core.staff_capabilities(organization_id uuid,user_id uuid,active bool,staff_role text);create table mir_core.teams(organization_id uuid,id uuid,leader_id uuid);create table mir_core.jobs(organization_id uuid,id uuid,archived bool);create table mir_core.team_members(organization_id uuid,team_id uuid,user_id uuid,active bool);create table mir_core.team_day_assignments(organization_id uuid,id uuid,team_id uuid,job_id uuid,leader_id uuid,work_date date,created_by uuid,start_time time,created_at timestamptz default now(),unique(organization_id,id),unique(organization_id,team_id,work_date));create table mir_core.team_tasks(organization_id uuid,id uuid,team_id uuid,job_id uuid,work_date date,title text,created_by uuid,created_at timestamptz default now(),completed_at timestamptz,unique(organization_id,id));create table mir_core.team_attendance(organization_id uuid,assignment_id uuid,user_id uuid);');
   async function fail(sql,pattern){await assert.rejects(()=>db.exec(sql),pattern);await db.exec('rollback');}
   await fail(prepare,/MIR TEST prerequisite/);checks++;
