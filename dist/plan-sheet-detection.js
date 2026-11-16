@@ -63,8 +63,21 @@
     return null;
   }
 
+  function isDrawingIndex(rows,width=0,height=0){
+    if(rows.some(row=>/^(?:table des matieres|drawing index|sheet index|index des (?:plans|dessins)|liste des (?:plans|dessins))\b/.test(titleText(row.text))))return true;
+    if(!width||!height)return false;
+    const dates=rows.filter(r=>r.box&&/^\d{4}[-/]\d{2}[-/]\d{2}$/.test(normal(r.text).replace(/^['‘’]+|['‘’,;]+$/g,'')));
+    const columns=[];
+    for(const row of dates){let column=columns.find(c=>Math.abs(c.x-row.box[0])<width*.025);if(!column){column={x:row.box[0],rows:[]};columns.push(column);}if(!column.rows.some(r=>Math.abs(center(r.box,1)-center(row.box,1))<4))column.rows.push(row);}
+    for(const column of columns.filter(c=>c.rows.length>=5)){
+      const ys=column.rows.map(r=>center(r.box,1));if(Math.max(...ys)-Math.min(...ys)>height*.65)continue;
+      const titles=rows.filter(r=>r.box&&classify(r.text)&&r.box[2]<column.x&&column.rows.some(d=>Math.abs(center(r.box,1)-center(d.box,1))<Math.max(r.box[3]-r.box[1],d.box[3]-d.box[1])*1.8));
+      if(titles.length>=3&&Math.max(...titles.map(r=>r.box[0]))-Math.min(...titles.map(r=>r.box[0]))<width*.08)return true;
+    }
+    return false;
+  }
   function viewsForPage(rows, width = 0, height = 0) {
-    if(rows.some(row=>/^(?:table des matieres|drawing index|sheet index|index des (?:plans|dessins)|liste des (?:plans|dessins))\b/.test(titleText(row.text))))return [];
+    if(isDrawingIndex(rows,width,height))return [];
     const result = [];
     for (const row of rows) {
       if (row.confidence < 55 || row.text.length > 105) continue;
@@ -243,5 +256,5 @@
     return { dimensions: { width: result.width, depth: result.depth, wallHeight: result.wallHeight, roofRise: result.roofRise }, roofStyle: result.roofStyle, foundationDrop: result.foundationDrop, conflicts, approximated, evidence };
   }
 
-  return Object.freeze({ lines, classify, viewsForPage, divideViews, volumeEvidence, volumeFrom });
+  return Object.freeze({ lines, classify, isDrawingIndex, viewsForPage, divideViews, volumeEvidence, volumeFrom });
 });

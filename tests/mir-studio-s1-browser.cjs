@@ -8,8 +8,9 @@ const server=http.createServer((req,res)=>{let file=path.resolve(dist,'.'+new UR
   let browser;const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'mir-studio-s1-'));
   try{
     await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const base='http://127.0.0.1:'+server.address().port;
-    browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium',args:['--no-sandbox']});
-    const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];
+    const launch=()=>chromium.launchPersistentContext(path.join(tmp,'profile'),{executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium',args:['--no-sandbox'],viewport:{width:1440,height:1000}});
+    browser=await launch();
+    const page=await browser.newPage(),errors=[];
     page.on('pageerror',e=>errors.push(e.message));
     // No backend, analytics or external inference requests are permitted.
     await page.route('**/*',route=>route.request().url().startsWith(base)||route.request().url().startsWith('data:')?route.continue():route.abort());
@@ -92,6 +93,11 @@ const server=http.createServer((req,res)=>{let file=path.resolve(dist,'.'+new UR
     assert.equal(migrated.version,3);assert.equal(migrated.footprint.confirmed,true);assert.equal(migrated.recess.confirmed,true);
     assert.equal(migrated.snapshot.openingCount,1);assert.equal(migrated.snapshot.zoneCount,1);assert.ok(migrated.sourceFileBytes>0);
     assert.deepEqual(errors,[]);
+    await browser.close();browser=await launch();
+    const reopened=await browser.newPage();await reopened.route('**/*',route=>route.request().url().startsWith(base)||route.request().url().startsWith('data:')?route.continue():route.abort());
+    await reopened.goto(base+'/plan.html');await reopened.waitForFunction(()=>window.MIR_STUDY);
+    const afterRestart=await reopened.evaluate(async()=>{const p=await MIRProjectStore.getActive();return {id:p.id,bytes:p.sourceFile.size,zones:MIR_STUDY.snapshot().zoneCount,openings:MIR_STUDY.snapshot().openingCount,originalProject:!!(await MIRProjectStore.get('pdf-second-project-123'))};});
+    assert.deepEqual(afterRestart,{id:'pdf-legacy-project-123',bytes:migrated.sourceFileBytes,zones:1,openings:1,originalProject:true});
     fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({fixture:'synthetic-raster-only',views:8,buildings:2,rotatedViews:5,upperOnly:true,viewports:[390,834,1440],errors},null,2));
     console.log('PASS S1 Chromium: raster 5-view rotated shed + house + upper-only, building choice, no colour geometry, save/reopen, project isolation, 3 viewports');
   }finally{await browser?.close();server.close();fs.rmSync(tmp,{recursive:true,force:true});}

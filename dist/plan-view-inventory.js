@@ -90,7 +90,15 @@
     });
     const floorLevels=new Set(views.filter(v=>v.kind==='floor').map(v=>v.levelId));
     const evidence=views.filter(v=>['elevation','floor','foundation','section','roof'].includes(v.kind)&&(v.kind!=='floor'||floorLevels.size<=1)).flatMap(v=>v.evidence.map(e=>({...e,viewId:v.id,buildingId,levelId:v.levelId})));
-    let volume=volumeFrom(evidence);
+    const allReadings=volumeFrom(evidence);
+    const pending=evidence.filter(e=>e.estimated||normal(e.method)==='cote horizontale entre les reperes exterieurs');
+    // A measured span is not automatically the complete building width. Keep
+    // it traceable, but do not use it as a building dimension without a named
+    // overall dimension, a corroborated chain, or explicit user confirmation.
+    let volume=volumeFrom(evidence.filter(e=>!pending.includes(e)));
+    volume.evidence=evidence;volume.pending=[...new Set(pending.map(e=>e.field))];
+    volume.conflicts=[...new Set([...volume.conflicts,...allReadings.conflicts])];
+    for(const field of volume.conflicts)if(field in volume.dimensions)volume.dimensions[field]=null;
     if(inventory.migration&&buildingId===inventory.migration.originalBuildingId){
       volume={...volume,...copy(planData.detectedVolume||{}),dimensions:copy(planData.dimensions||volume.dimensions)};
     }

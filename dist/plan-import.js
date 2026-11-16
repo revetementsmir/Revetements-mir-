@@ -240,7 +240,7 @@
           try {
             const scanned = await recognize(page, base, imported, {
               mode: 'overview', cancelled: () => token !== sequence,
-              hasTitles: ({ rows, text }) => detector.viewsForPage(rows, base.width, base.height).length > 0 ||
+              hasTitles: ({ rows, text }) => detector.viewsForPage(rows, base.width, base.height).length > 0 || detector.isDrawingIndex(rows,base.width,base.height) ||
                 (!rows.length && recognizedTitles(text, base.width, base.height, detector).length > 0)
             });
             if (token !== sequence) return;
@@ -258,7 +258,7 @@
             }
           } catch (e) { ocrFailed = true; if (token === sequence) console.warn('MIR PDF : lecture des feuilles scannées indisponible', e); }
         }
-        if (!views.length && scannedSheet && !ocrFailed) for (const turn of [90, 270, 180]) {
+        if (!views.length && scannedSheet && !ocrFailed && !detector.isDrawingIndex(rows,base.width,base.height)) for (const turn of [90, 270, 180]) {
           const turned = page.getViewport({scale:1,rotation:(page.rotate+turn)%360});
           const scan = await recognize(page, turned, imported, {mode:'overview',cancelled:()=>token!==sequence});
           const turnedWords=mergeWords(scan.words,pdfWords(items,turned));
@@ -287,7 +287,7 @@
             }
           }
         }
-        imported.pages.push({page:number,rotation:base.rotation,status:views.length?'views-found':'unresolved',viewCount:views.length});
+        imported.pages.push({page:number,rotation:base.rotation,status:views.length?'views-found':detector.isDrawingIndex(rows,base.width,base.height)?'reference-index':'unresolved',viewCount:views.length});
         if (views.length) {
           const buildingEvidence=MIRViewInventory.pageBuilding(rows,detector.classify);
           prepared.push({ number, rotation:base.rotation, buildingHint:buildingEvidence?.id||null,buildingEvidence, words, scanned: scannedSheet, views: detector.divideViews(views, base.width, base.height) });
