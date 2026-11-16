@@ -67,7 +67,7 @@ assert.ok(constantsStart>0&&constantsEnd>constantsStart,'PR42 extension constant
 const noConstants=gateNow.slice(0,constantsStart)+gateNow.slice(constantsEnd);
 const branchStart=noConstants.indexOf('  if(subject===PR42_MERGE_SUBJECT){');
 const branchToken='  }else if(subject===CLIENT_RELEASE_SUBJECT){';
-const branchEnd=noConstants.indexOf(branchToken,branchStart);
+const branchEnd=noConstants.lastIndexOf(branchToken);
 assert.ok(branchStart>0&&branchEnd>branchStart,'PR42 release gate branch required');
 const originalGate=noConstants.slice(0,branchStart)+'  if(subject===CLIENT_RELEASE_SUBJECT){'+noConstants.slice(branchEnd+branchToken.length);
 assert.equal(originalGate,oldGate,'original MIR production release gate must remain byte-identical');
