@@ -95,7 +95,7 @@ MIR_CHROMIUM_BIN=/usr/bin/chromium node tests/mir-studio-s2-browser.cjs
 MIR_CHROMIUM_BIN=/usr/bin/chromium node tests/mir-studio-client-360-browser.cjs
 ```
 
-Le workflow de PR extrait explicitement le SHA de tête et n'archive que les preuves synthétiques. La CI de la nouvelle tête reste à vérifier après push; les résultats S1 antérieurs ne valent pas certification S2.
+Le workflow de PR extrait explicitement le SHA de tête et n'archive que les preuves synthétiques. Les résultats de la tête complète poussée sont relevés dans la PR44 et la tâche Atelier; les résultats S1 ou ceux d’une tête précédente ne valent pas certification de cette tête. Les premiers runs ont révélé les protections de fichiers historiques du portail : les modules ont été restaurés, le lecteur isolé dans une extension TEST, puis les anciens tests ont repassé sans changer leurs empreintes. Le nouveau contrôle intégral requiert aussi le téléchargement explicite de la base certifiée dans le checkout CI superficiel.
 
 ## Backend, suivi et limites
 
