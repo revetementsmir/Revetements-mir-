@@ -31,4 +31,12 @@ Les suites S1, S2, CLIENT 360, cotation, aperçu, lecteurs, isolation PR44, titr
 
 ## Suite nécessaire
 
+### Point de sauvegarde avant raccordement automatique
+
+Les recettes privées `conversion-form-dimensions-review-2` réimportent C3 et C4 par le formulaire. Elles conservent respectivement 15 murs / 15 ouvertures / 2 toitures et 8 murs / 10 ouvertures / 1 toiture après réouverture, sans erreur JavaScript ni requête extérieure. Les rendus avant et arrière ont été ouverts. Ce sont des recettes **assistées** : choix de référence, hauteur et confirmations QA restent nécessaires.
+
+Les corrections générales associent les cotes aux plans du contour, distinguent la source d'une taille écrite de celle du placement d'une fenêtre et dédupliquent les observations d'une même ouverture. Une ouverture partiellement cachée par une légende exige une taille écrite compatible et trois segments de cadre réellement visibles. Les murs bas peuvent rejoindre un repère de fondation observé; ce repère reste distinct du plancher pour détecter les portes. Les sources, écarts et propositions sont conservés. Les nouveaux tests gardent les assertions existantes et vérifient aussi l'annulation et la réouverture.
+
+La clarification Atelier v20 demande maintenant un parcours logiciel autonome, sans intervention d'un expert par dossier. Ce point de sauvegarde ne constitue pas cette preuve. C1 est réservé à la première recette de reconstruction sans réglage préalable sur sa géométrie; son import S1 antérieur est connu. Aucun résultat de ce cas ne doit être qualifié d'inédit après ajustement des règles sur ce cas.
+
 Terminer les ouvertures et assemblages encore manquants, vérifier toutes les façades contre les sources et les angles 3D, puis recetter la conversion complète. Les quantités restent partielles. Aucun original client dans le dépôt, aucune opération backend supplémentaire, aucune opération production, aucun courriel, aucune fusion/publication.

@@ -3,6 +3,66 @@
  'use strict';
  const normal=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),size=v=>[v.payload.sourceWidth||v.zone?.[2]||v.frame?.rasterSize[0],v.payload.sourceHeight||v.zone?.[3]||v.frame?.rasterSize[1]];
  function readings(view){return view.payload.drawingReadings?.rows||[];}
+ function contourDimensions(view,image){
+  const rows=readings(view),vertical=view.payload.drawingReadings?.verticalRows||[],masks=V.legendBoxes(image,rows);
+  const clean=rs=>rs.filter(r=>r.box?.length===4&&r.text.length<25&&r.box[0]<image.width*.81&&!masks.some(([x,y,w,h])=>(r.box[0]+r.box[2])/2>=x&&(r.box[0]+r.box[2])/2<=x+w&&(r.box[1]+r.box[3])/2>=y&&(r.box[1]+r.box[3])/2<=y+h)).map(r=>({...r,originalText:r.text,text:r.text.replace(/(\d)\s+[|Il](?=\s*['’′])/g,(_,d)=>d+'1').replace(/[*°]$/,'"').replace(/^(\d{1,2})[.−-](\d{1,2})"?$/,`$1'$2"`)}));
+  const labels=clean(rows),results=A.matchDimensionLines(image,labels,{minSpanPx:20});
+  if(vertical.length){
+   const turned={width:image.height,height:image.width,data:new Uint8ClampedArray(image.data.length)};
+   for(let y=0;y<image.height;y++)for(let x=0;x<image.width;x++){const to=((image.width-1-x)*turned.width+y)*4,from=(y*image.width+x)*4;for(let c=0;c<4;c++)turned.data[to+c]=image.data[from+c];}
+   const original=clean(vertical),rotated=original.map(r=>({...r,box:[r.box[1],image.width-r.box[2],r.box[3],image.width-r.box[0]]}));
+   results.push(...A.matchDimensionLines(turned,rotated,{minSpanPx:20}).map(c=>A.unrotateCandidate(c,image.width,image.height)));
+  }
+  return results.map(r=>({...r,id:view.id+':dimension:'+r.anchors.flat().join('-')+':'+r.referenceFt,value:r.referenceFt*.3048,kind:'written',status:'proposed',sourceViewId:view.id,sourceFrame:M.clone(view.frame),label:r.text,scale:r.feetPerPixel*.3048,confirmationRequired:true}));
+ }
+ function constrainContour(original,references){
+  const draft=M.clone(original),unit=M.scale(draft),evidence=[];if(!unit)return draft;
+  // This is a proposed, explicit operation. Loading a saved contour never
+  // invokes it; source pixel points and stable corner IDs remain available.
+  const source=original.points.map(p=>M.clone(p)),adjusted=source.map(p=>M.clone(p));
+  for(const axis of [0,1]){
+   const coords=[...new Set(source.map(p=>p.xy[axis]))].sort((a,b)=>a-b),links=[];
+   for(const r of references){if(r.sourceViewId!==draft.sourceViewId||r.kind!=='written'||!(r.value>0)||r.anchors?.length!==2)continue;
+    const [a,b]=r.anchors,other=1-axis;if(Math.abs(a[other]-b[other])>2||Math.abs(a[axis]-b[axis])<10)continue;
+    const nearest=n=>coords.map((c,i)=>({i,d:Math.abs(c-n)})).sort((a,b)=>a.d-b.d)[0],lo=nearest(Math.min(a[axis],b[axis])),hi=nearest(Math.max(a[axis],b[axis]));
+    if(lo.i===hi.i||lo.d>6||hi.d>6)continue;
+    const raster=coords[hi.i]-coords[lo.i],target=r.value/unit,difference=target-raster,tolerance=Math.max(8,raster*.05);
+    const item={axis,from:lo.i,to:hi.i,reference:M.clone(r),originalSpanPixels:raster,estimatedValue:raster*unit,value:r.value,differencePixels:difference,tolerancePixels:tolerance,status:Math.abs(difference)<=tolerance?'proposed':'unresolved',reason:Math.abs(difference)<=tolerance?null:'DIMENSION_SPAN_MISMATCH',confirmationRequired:true};evidence.push(item);if(item.status==='proposed')links.push(item);
+   }
+   const values=new Map(),conflicts=new Set();
+   for(let root=0;root<coords.length;root++){if(values.has(root))continue;values.set(root,coords[root]);const queue=[root],component=new Set([root]);let conflict=false;
+    while(queue.length){const i=queue.shift();for(const link of links.filter(l=>l.from===i||l.to===i)){const j=link.from===i?link.to:link.from,target=values.get(i)+(link.from===i?1:-1)*link.value/unit;
+      if(values.has(j)){if(Math.abs(values.get(j)-target)*unit>.001)conflict=true;}else{values.set(j,target);queue.push(j);component.add(j);}}}
+    if(conflict)for(const i of component)conflicts.add(i);
+   }
+   for(const link of links)if(conflicts.has(link.from)||conflicts.has(link.to))link.status='conflict';
+   adjusted.forEach(p=>{const i=coords.indexOf(p.xy[axis]);if(!conflicts.has(i)){p.xy[axis]=values.get(i);delete p.pdfPoint;}});const originIndex=coords.indexOf(draft.alignment?.origin?.[axis]);if(originIndex>=0&&!conflicts.has(originIndex))draft.alignment.origin[axis]=values.get(originIndex);
+  }
+  if(M.validatePolygon(adjusted.map(p=>p.xy)).length)return {...draft,dimensionAdjustment:{status:'invalid',originalPoints:source,evidence}};
+  draft.points=adjusted;draft.dimensionAdjustment={status:evidence.some(e=>e.status==='conflict')?'conflict':'proposed',originalPoints:source,evidence,kind:'written-dimensions-on-associated-contour-planes',confirmationRequired:true};return draft;
+ }
+ function openingSize(text){
+  const original=String(text).trim(),normalized=original.replace(/^[|_\s]*[lL]?(?=\s*\d)/,'').replace(/[\s|_]+$/,'').replace(/\s+[lL]$/,'').trim().normalize('NFKC').replace(/[″“”°*]/g,'"').replace(/[′’]/g,"'").replace(/[oO]/g,'0').replace(/(?<=\d)G(?=["\s])/g,'6'),match=normalized.match(/^(?:(\d+)\s*[x×]\s*\()?\s*(\d+(?:\.\d+)?)\s*(?:"|po|in)\s*[x×]\s*(\d+(?:\.\d+)?)\s*(?:"|po|in)\s*\)?$/i);
+  if(!match)return null;const count=Number(match[1]||1),width=Number(match[2])*.0254,height=Number(match[3])*.0254;if(!(count>=1&&count<=12&&width>=.15&&width<=6&&height>=.15&&height<=4))return null;
+  return {width,height,count,label:original,normalized,transcriptionReviewRequired:normalized!==original,kind:'written',status:'proposed',confirmationRequired:true};
+ }
+ function floorOpeningSizes(view,points,gaps){
+  const orientation=Math.sign(M.signedArea(points)),result=[];
+  for(const row of readings(view)){const parsed=openingSize(row.text);if(!parsed||!row.box)continue;const center=[(row.box[0]+row.box[2])/2,(row.box[1]+row.box[3])/2],font=Math.max(6,Math.min(row.box[2]-row.box[0],row.box[3]-row.box[1]));
+   const matches=gaps.map((gap,i)=>{const a=points[gap.edgeIndex],b=points[(gap.edgeIndex+1)%points.length],length=M.distance(a,b),u=b.map((n,k)=>(n-a[k])/length),n=[orientation*u[1],-orientation*u[0]],out=(center[0]-a[0])*n[0]+(center[1]-a[1])*n[1],mid=gap.anchors[0].map((v,k)=>(v+gap.anchors[1][k])/2),along=Math.abs((center[0]-mid[0])*u[0]+(center[1]-mid[1])*u[1]),span=M.distance(...gap.anchors);return {i,out,along,span,score:along+out*.2};}).filter(m=>m.out>=-font&&m.out<=Math.max(95,font*12)&&m.along<Math.max(font*3,m.span*.55)).sort((a,b)=>a.score-b.score);
+   if(!matches.length||matches[1]&&matches[1].score-matches[0].score<5)continue;
+   const gap=gaps[matches[0].i],candidate={...parsed,sourceViewId:view.id,sourceFrame:M.clone(view.frame),sourceBox:M.clone(row.box),confidence:row.confidence,edgeIndex:gap.edgeIndex,anchors:M.clone(gap.anchors),association:'caption-adjacent-to-exterior-floor-opening',transcriptionReviewRequired:parsed.transcriptionReviewRequired||row.confidence<70};
+   if(!result.some(r=>r.edgeIndex===candidate.edgeIndex&&r.width===candidate.width&&r.height===candidate.height&&M.distance(r.anchors[0],candidate.anchors[0])<4))result.push(candidate);
+  }return result;
+ }
+ function constrainProposal(draft,proposal){
+  const next=constrainContour(draft,proposal.contourDimensions||[]),height=next.height,v=proposal.views.find(v=>v.viewId===height?.sourceViewId);
+  if(height?.kind==='estimated-calibrated'&&height.relationship==='floor-span-to-elevation-registration'&&v?.envelope.status==='proposed'){
+   const scale=faceSpan(M.modelPoints(next),v.direction).length/v.envelope.box[2];height.value=M.distance(...height.anchors)*scale;height.scaleUsed=scale;
+   for(const ref of height.references){ref.value=M.distance(...ref.anchors)*scale;ref.relationship={...M.clone(next.reference),contourAdjustment:M.clone(next.dimensionAdjustment)};}
+  }
+  return next;
+ }
  function references(view,image){
   const masks=V.legendBoxes(image,readings(view)),rows=readings(view).filter(r=>r.box?.length===4&&r.text.length<50&&r.box[0]<image.width*.81&&!masks.some(([x,y,w,h])=>(r.box[0]+r.box[2])/2>=x&&(r.box[0]+r.box[2])/2<=x+w&&(r.box[1]+r.box[3])/2>=y&&(r.box[1]+r.box[3])/2<=y+h));
   const labels=rows.map(r=>{const rewrite=r.text.replace(/^(\d{1,2})[.−-](\d{1,2})\"?$/,`$1'$2"`);return {...r,text:rewrite,originalText:r.text,punctuationReview:rewrite!==r.text};});
@@ -53,28 +113,42 @@
   const spread=list=>list.length?Math.max(...list)/Math.min(...list)-1:0,scaleConflict=spread(candidates.map(r=>r.scale))>.05;
   if(scaleConflict&&reference){draft.reference={...draft.reference,value:null,label:'',suggestedScale:reference.scale,suggestedValue:reference.value,conflict:true};}
 
-  return {version:1,status:'proposed',buildingId,levelId:level.id,sourceViewId:floor.id,draft,referenceCandidates:candidates,heightCandidates:heights,views,sourceOpeningGaps:V.floorOpenings(image,outline.points),scaleConflict,heightConflict:spread(heights.map(h=>h.value))>.05,confirmationRequired:true,complete:false};
+  return {version:1,status:'proposed',buildingId,levelId:level.id,sourceViewId:floor.id,draft,referenceCandidates:candidates,heightCandidates:heights,views,sourceOpeningGaps:V.floorOpenings(image,outline.points),contourDimensions:contourDimensions(floor,image),openingSizeCandidates:floorOpeningSizes(floor,outline.points,V.floorOpenings(image,outline.points)),scaleConflict,heightConflict:spread(heights.map(h=>h.value))>.05,confirmationRequired:true,complete:false};
  }
  function openingsFor(proposal,inventory,images,draft=proposal.draft){
   if(!M.scale(draft)||!(draft.height.value>0)||M.validatePolygon(M.modelPoints(draft)).length)return [];
   const level=inventory.levels.find(l=>l.id===proposal.levelId),model=M.modelPoints(draft),height=draft.height.value,orientation=Math.sign(M.signedArea(model)),walls=model.map((from,i)=>{const to=model[(i+1)%model.length],length=M.distance(from,to);return {id:M.wallId(draft.contourId,draft.points[i].id,draft.points[(i+1)%model.length].id),from,to,length,normal:[orientation*(to[1]-from[1])/length,orientation*(from[0]-to[0])/length]};}),result=[];
   for(const v of proposal.views){if(v.envelope.status!=='proposed'||!images[v.viewId])continue;const guide=v.guides.filter(g=>g.levelHint===level.sourceLevel).sort((a,b)=>b.confidence-a.confidence)[0];if(!guide)continue;
-   const frame={front:{u:[1,0],n:[0,-1]},back:{u:[-1,0],n:[0,1]},right:{u:[0,1],n:[1,0]},left:{u:[0,-1],n:[-1,0]}}[v.direction],dot=(p,u)=>p[0]*u[0]+p[1]*u[1],facing=walls.filter(w=>dot(w.normal,frame.n)>.9),xs=facing.flatMap(w=>[dot(w.from,frame.u),dot(w.to,frame.u)]),min=Math.min(...xs),max=Math.max(...xs),scaleX=(max-min)/v.envelope.box[2],scaleY=height/(guide.y-(v.supportY??v.envelope.box[1])),seeds=proposal.sourceOpeningGaps.filter(g=>facing.some(w=>w.id===walls[g.edgeIndex]?.id)).map(g=>{const a=draft.points[g.edgeIndex].xy,b=draft.points[(g.edgeIndex+1)%draft.points.length].xy,seed=g.anchors.map(p=>{const ratio=M.distance(a,p)/M.distance(a,b),point=walls[g.edgeIndex].from.map((n,i)=>n+(walls[g.edgeIndex].to[i]-n)*ratio);return v.envelope.box[0]+(dot(point,frame.u)-min)/scaleX;});return {left:Math.min(...seed),right:Math.max(...seed)};}),boxes=seeds.flatMap(seed=>{const pad=Math.max(12,(seed.right-seed.left)*.65),l=Math.max(v.envelope.box[0],seed.left-pad),r=Math.min(v.envelope.box[0]+v.envelope.box[2],seed.right+pad);const framed=V.frameAtSeed(images[v.viewId],seed,{top:v.envelope.box[1]+3,bottom:guide.y-2});return (framed.length?framed:V.glazingFrames(images[v.viewId],[l,v.envelope.box[1],r-l,v.envelope.box[3]],{top:v.envelope.box[1]+3,bottom:guide.y-2})).filter(c=>Math.min(c.box[0]+c.box[2],seed.right)-Math.max(c.box[0],seed.left)>Math.min(c.box[2],seed.right-seed.left)*.55&&Math.abs(c.box[0]+c.box[2]/2-(seed.left+seed.right)/2)<Math.max(12,(seed.right-seed.left)*.45));});
-   for(const candidate of boxes){if((v.envelope.occlusions||[]).some(([x,y,w,h])=>{const [l,t,bw,bh]=candidate.box;return Math.max(0,Math.min(l+bw,x+w)-Math.max(l,x))*Math.max(0,Math.min(t+bh,y+h)-Math.max(t,y))>bw*bh*.1;}))continue;const [x,y,bw,bh]=candidate.box,left=min+(x-v.envelope.box[0])*scaleX,right=left+bw*scaleX,wall=facing.filter(w=>Math.min(dot(w.from,frame.u),dot(w.to,frame.u))<=left+.03&&Math.max(dot(w.from,frame.u),dot(w.to,frame.u))>=right-.03).sort((a,b)=>dot(b.from,frame.n)-dot(a.from,frame.n))[0];if(!wall)continue;
-    const first=dot(wall.from,frame.u),last=dot(wall.to,frame.u),offset=first<last?left-first:first-right,sill=(guide.y-y-bh)*scaleY,opening={id:'opening:'+v.viewId+':'+[x,y,bw,bh].map(Math.round).join('-'),sourceId:'frame:'+v.viewId+':'+[x,y,bw,bh].map(Math.round).join('-'),sourceViewId:v.viewId,sourceFrame:M.clone(inventory.views.find(s=>s.id===v.viewId).frame),sourceBox:candidate.box,wallId:wall.id,type:'window',offset,width:bw*scaleX,height:bh*scaleY,sill,status:'proposed',kind:'estimated-calibrated',scalesUsed:{x:scaleX,y:scaleY},references:[M.clone(draft.reference),M.clone(draft.height)],confirmationRequired:true};
+   const frame={front:{u:[1,0],n:[0,-1]},back:{u:[-1,0],n:[0,1]},right:{u:[0,1],n:[1,0]},left:{u:[0,-1],n:[-1,0]}}[v.direction],dot=(p,u)=>p[0]*u[0]+p[1]*u[1],facing=walls.filter(w=>dot(w.normal,frame.n)>.9),xs=facing.flatMap(w=>[dot(w.from,frame.u),dot(w.to,frame.u)]),min=Math.min(...xs),max=Math.max(...xs),scaleX=(max-min)/v.envelope.box[2],scaleY=height/(guide.y-(v.supportY??v.envelope.box[1])),seeds=proposal.sourceOpeningGaps.filter(g=>facing.some(w=>w.id===walls[g.edgeIndex]?.id)).map(g=>{const a=draft.points[g.edgeIndex].xy,b=draft.points[(g.edgeIndex+1)%draft.points.length].xy,seed=g.anchors.map(p=>{const ratio=M.distance(a,p)/M.distance(a,b),point=walls[g.edgeIndex].from.map((n,i)=>n+(walls[g.edgeIndex].to[i]-n)*ratio);return v.envelope.box[0]+(dot(point,frame.u)-min)/scaleX;});return {left:Math.min(...seed),right:Math.max(...seed),gap:g};}),boxes=seeds.flatMap(seed=>{const pad=Math.max(12,(seed.right-seed.left)*.65),l=Math.max(v.envelope.box[0],seed.left-pad),r=Math.min(v.envelope.box[0]+v.envelope.box[2],seed.right+pad);const framed=V.frameAtSeed(images[v.viewId],seed,{top:v.envelope.box[1]+3,bottom:guide.y-2});const sizes=(proposal.openingSizeCandidates||[]).filter(s=>s.edgeIndex===seed.gap.edgeIndex&&M.distance(s.anchors[0],seed.gap.anchors[0])<4),recovered=sizes.length===1?V.occludedFrameAtSeed(images[v.viewId],seed,{top:v.envelope.box[1]+3,bottom:guide.y-2,width:sizes[0].width/scaleX,height:sizes[0].height/scaleY,occlusions:v.envelope.occlusions||[]}):[];return (recovered.length?recovered:framed.length?framed:V.glazingFrames(images[v.viewId],[l,v.envelope.box[1],r-l,v.envelope.box[3]],{top:v.envelope.box[1]+3,bottom:guide.y-2})).filter(c=>Math.min(c.box[0]+c.box[2],seed.right)-Math.max(c.box[0],seed.left)>Math.min(c.box[2],seed.right-seed.left)*.55&&Math.abs(c.box[0]+c.box[2]/2-(seed.left+seed.right)/2)<Math.max(12,(c.occlusionEvidence?c.box[2]:seed.right-seed.left)*.45)).map(c=>({...c,floorGap:seed.gap}));});
+   for(const candidate of boxes){if(!candidate.occlusionEvidence&&(v.envelope.occlusions||[]).some(([x,y,w,h])=>{const [l,t,bw,bh]=candidate.box;return Math.max(0,Math.min(l+bw,x+w)-Math.max(l,x))*Math.max(0,Math.min(t+bh,y+h)-Math.max(t,y))>bw*bh*.1;}))continue;const [x,y,bw,bh]=candidate.box,left=min+(x-v.envelope.box[0])*scaleX,right=left+bw*scaleX,wall=facing.filter(w=>Math.min(dot(w.from,frame.u),dot(w.to,frame.u))<=left+.03&&Math.max(dot(w.from,frame.u),dot(w.to,frame.u))>=right-.03).sort((a,b)=>dot(b.from,frame.n)-dot(a.from,frame.n))[0];if(!wall)continue;
+    const first=dot(wall.from,frame.u),last=dot(wall.to,frame.u),offset=first<last?left-first:first-right,sill=(guide.y-y-bh)*scaleY,opening={id:'opening:'+v.viewId+':'+[x,y,bw,bh].map(Math.round).join('-'),sourceId:'frame:'+v.viewId+':'+[x,y,bw,bh].map(Math.round).join('-'),sourceViewId:v.viewId,sourceFrame:M.clone(inventory.views.find(s=>s.id===v.viewId).frame),sourceBox:candidate.box,wallId:wall.id,type:'window',offset,width:bw*scaleX,height:bh*scaleY,sill,status:'proposed',kind:'estimated-calibrated',scalesUsed:{x:scaleX,y:scaleY},references:[M.clone(draft.reference),M.clone(draft.height)],writtenSizeCandidates:(proposal.openingSizeCandidates||[]).filter(s=>s.edgeIndex===candidate.floorGap?.edgeIndex&&M.distance(s.anchors[0],candidate.floorGap.anchors[0])<4).map(M.clone),positionEvidence:{kind:'estimated-calibrated',sourceViewId:v.viewId,sourceBox:M.clone(candidate.box),scalesUsed:{x:scaleX,y:scaleY},...(candidate.occlusionEvidence?{occlusionEvidence:M.clone(candidate.occlusionEvidence)}:{}),status:'proposed'},confirmationRequired:true};
     if(offset>=0&&sill>=0&&offset+opening.width<=wall.length+.01&&sill+opening.height<=height+.01&&!result.some(o=>o.id===opening.id))result.push(opening);
    }
   }return result;
  }
- function lowerPlanes(proposal,inventory,confirmedDraft){
+ function foundationGuide(view,image,groundY,storeyPixels){
+  if(!image)return null;const result=[];
+  for(const row of readings(view)){if(row.confidence<40||!row.box||! /^(?:(?:dessus|haut|top of)\s+(?:the\s+)?)?(?:fondation|foundation)\b/.test(normal(row.text)))continue;
+   let line=S.guide(image,row.box,[0,0,image.width,image.height]);const [l,t,r,b]=row.box,font=Math.max(5,b-t);
+   if(!line)for(let y=Math.floor(b+1);y<=Math.ceil(b+font*1.8);y++){const candidate=S.horizontalRun(image,y,Math.max(0,Math.floor(l-font*3)),Math.min(image.width-1,Math.ceil(r+font*3)),230,12);if(candidate&&candidate.end-candidate.start>(r-l)*.8&&(!line||candidate.end-candidate.start>line.end-line.start))line=candidate;}
+   if(!line||line.y<groundY+2||line.y>groundY+storeyPixels*.3)continue;
+   result.push({sourceViewId:view.id,sourceFrame:M.clone(view.frame),label:row.text,box:M.clone(row.box),y:line.y,anchors:[[line.start,line.y],[line.end,line.y]],confidence:row.confidence,kind:'visible-foundation-top-guide',status:'proposed',confirmationRequired:true});
+  }return result.sort((a,b)=>b.confidence-a.confidence)[0]||null;
+ }
+ function lowerPlanes(proposal,inventory,confirmedDraft,images={}){
   if(!M.scale(confirmedDraft)||!(confirmedDraft.height.value>0)||M.validatePolygon(M.modelPoints(confirmedDraft)).length)return {status:'unresolved',reason:'LEVEL_MEASUREMENTS_REQUIRED'};
   const level=inventory.levels.find(l=>l.id===proposal.levelId),supported=proposal.views.flatMap(v=>{if(v.envelope.status!=='proposed')return [];const upper=v.guides.filter(g=>g.levelHint===level.sourceLevel).sort((a,b)=>b.confidence-a.confidence)[0],ground=v.guides.filter(g=>g.levelHint==='ground').sort((a,b)=>b.confidence-a.confidence)[0];if(!upper||!ground||ground.y-upper.y<20)return [];return [{...v,upper,ground}];});
   if(!supported.some(v=>['front','back'].includes(v.direction))||!supported.some(v=>['right','left'].includes(v.direction)))return {status:'unresolved',reason:'TWO_COMPATIBLE_ELEVATIONS_REQUIRED'};
-  const reviewed=confirmedDraft,points=M.modelPoints(reviewed),orientation=Math.sign(M.signedArea(points)),id=level.buildingId+':observed-ground',sourceViewIds=supported.map(v=>v.viewId),unit=M.scale(reviewed),heightReferences=supported.map(v=>({sourceViewId:v.viewId,value:(v.ground.y-v.upper.y)*reviewed.height.value/(v.upper.y-(v.supportY??v.envelope.box[1])),kind:'estimated-calibrated',status:'proposed',anchors:[[v.envelope.box[0],v.ground.y],[v.envelope.box[0],v.upper.y]],label:v.ground.label+' → '+v.upper.label})),height=heightReferences[0].value,planes=[];
-  const available=supported.slice();for(const v of proposal.views){if(available.some(s=>s.viewId===v.viewId)||v.envelope.status!=='proposed')continue;const upper=v.guides.filter(g=>g.levelHint===level.sourceLevel).sort((a,b)=>b.confidence-a.confidence)[0],scaleX=reviewed.height.value/(upper?.y-(v.supportY??v.envelope.box[1]));if(!upper||!scaleX)continue;available.push({...v,upper,ground:{y:upper.y+height/scaleX,kind:'estimated-calibrated',status:'proposed',sourceViewId:v.viewId,transferredFrom:M.clone(heightReferences),label:'Compatible elevation floor-height transfer; source caption occluded or unreadable',confirmationRequired:true}});}
+  const reviewed=confirmedDraft,points=M.modelPoints(reviewed),orientation=Math.sign(M.signedArea(points)),id=level.buildingId+':observed-ground',sourceViewIds=supported.map(v=>v.viewId),unit=M.scale(reviewed),planes=[];
+  const floorHeightReferences=supported.map(v=>({sourceViewId:v.viewId,value:(v.ground.y-v.upper.y)*reviewed.height.value/(v.upper.y-(v.supportY??v.envelope.box[1])),kind:'estimated-calibrated',status:'proposed',anchors:[[v.envelope.box[0],v.ground.y],[v.envelope.box[0],v.upper.y]],label:v.ground.label}));
+  for(const v of supported){v.floorGuide=M.clone(v.ground);v.foundation=foundationGuide(inventory.views.find(s=>s.id===v.viewId),images[v.viewId],v.ground.y,v.ground.y-v.upper.y);}
+  const hasFoundation=supported.some(v=>v.foundation),heightReferences=supported.filter(v=>!hasFoundation||v.foundation).map(v=>{const base=v.foundation||v.ground;return {sourceViewId:v.viewId,value:(base.y-v.upper.y)*reviewed.height.value/(v.upper.y-(v.supportY??v.envelope.box[1])),kind:'estimated-calibrated',status:'proposed',anchors:[[v.envelope.box[0],base.y],[v.envelope.box[0],v.upper.y]],label:base.label+' → '+v.upper.label,baseGuide:M.clone(base),floorGuide:M.clone(v.floorGuide)};}),height=heightReferences[0].value;
+  if(Math.max(...heightReferences.map(h=>h.value))/Math.min(...heightReferences.map(h=>h.value))>1.05)return {status:'unresolved',reason:'LOWER_WALL_HEIGHT_CONFLICT',heightReferences,confirmationRequired:true};
+  if(hasFoundation)for(const v of supported)v.ground=v.foundation||{...M.clone(v.ground),y:v.upper.y+height*(v.upper.y-(v.supportY??v.envelope.box[1]))/reviewed.height.value,kind:'estimated-calibrated',transferredFrom:M.clone(heightReferences),label:'Foundation-top registration from compatible elevations',confirmationRequired:true};
+  const available=supported.slice();for(const v of proposal.views){if(available.some(s=>s.viewId===v.viewId)||v.envelope.status!=='proposed')continue;const upper=v.guides.filter(g=>g.levelHint===level.sourceLevel).sort((a,b)=>b.confidence-a.confidence)[0],scaleX=reviewed.height.value/(upper?.y-(v.supportY??v.envelope.box[1]));if(!upper||!scaleX)continue;available.push({...v,upper,floorGuide:{y:upper.y+floorHeightReferences[0].value/scaleX,kind:'estimated-calibrated',status:'proposed',sourceViewId:v.viewId,transferredFrom:M.clone(floorHeightReferences),confirmationRequired:true},ground:{y:upper.y+height/scaleX,kind:'estimated-calibrated',status:'proposed',sourceViewId:v.viewId,transferredFrom:M.clone(heightReferences),label:'Compatible elevation floor-height transfer; source caption occluded or unreadable',confirmationRequired:true}});}
   for(let i=0;i<points.length;i++){const from=points[i],to=points[(i+1)%points.length],length=M.distance(from,to),normal=[orientation*(to[1]-from[1])/length,orientation*(from[0]-to[0])/length,0],v=available.find(v=>{const n={front:[0,-1],back:[0,1],right:[1,0],left:[-1,0]}[v.direction];return n[0]*normal[0]+n[1]*normal[1]>.999;});if(!v)continue;
    const u={front:[1,0],back:[-1,0],right:[0,1],left:[0,-1]}[v.direction],dot=p=>p[0]*u[0]+p[1]*u[1],facing=points.map((a,j)=>[a,points[(j+1)%points.length]]).filter(([a,b])=>{const n=[orientation*(b[1]-a[1]),orientation*(a[0]-b[0])];return n[0]*normal[0]+n[1]*normal[1]>0;}),xs=facing.flatMap(e=>e.map(dot)),min=Math.min(...xs),max=Math.max(...xs),scaleX=(max-min)/v.envelope.box[2],x1=v.envelope.box[0]+(dot(from)-min)/scaleX,x2=v.envelope.box[0]+(dot(to)-min)/scaleX,wallId='wall:'+id+':'+reviewed.points[i].id+':'+reviewed.points[(i+1)%points.length].id;
-   planes.push({id:wallId,from:M.clone(from),to:M.clone(to),normal,height,base:reviewed.base.value-height,status:'proposed',sourceViewId:v.viewId,sourceBox:[Math.min(x1,x2),v.upper.y,Math.abs(x2-x1),v.ground.y-v.upper.y],registration:{kind:'multi-view-elevation-registration',sourceViewIds,levelGuideTransfer:v.ground.transferredFrom?M.clone(v.ground):null,status:'proposed',counterpartWallId:M.wallId(reviewed.contourId,reviewed.points[i].id,reviewed.points[(i+1)%points.length].id),confirmationRequired:true},measurements:{width:{value:length,kind:'estimated-calibrated',status:'proposed',sourceViewId:v.viewId,anchors:[[x1,v.ground.y],[x2,v.ground.y]],scaleUsed:scaleX,reference:M.clone(reviewed.reference)},height:{value:height,kind:'estimated-calibrated',status:'proposed',sourceViewId:v.viewId,anchors:[[x1,v.ground.y],[x1,v.upper.y]],scaleUsed:height/(v.ground.y-v.upper.y),references:M.clone(heightReferences)}}});
+   planes.push({id:wallId,from:M.clone(from),to:M.clone(to),normal,height,base:reviewed.base.value-height,status:'proposed',sourceViewId:v.viewId,sourceBox:[Math.min(x1,x2),v.upper.y,Math.abs(x2-x1),v.ground.y-v.upper.y],registration:{kind:'multi-view-elevation-registration',sourceViewIds,floorGuide:M.clone(v.floorGuide||null),levelGuideTransfer:v.ground.transferredFrom?M.clone(v.ground):null,status:'proposed',counterpartWallId:M.wallId(reviewed.contourId,reviewed.points[i].id,reviewed.points[(i+1)%points.length].id),confirmationRequired:true},measurements:{width:{value:length,kind:'estimated-calibrated',status:'proposed',sourceViewId:v.viewId,anchors:[[x1,v.ground.y],[x2,v.ground.y]],scaleUsed:scaleX,reference:M.clone(reviewed.reference)},height:{value:height,kind:'estimated-calibrated',status:'proposed',sourceViewId:v.viewId,anchors:[[x1,v.ground.y],[x1,v.upper.y]],scaleUsed:height/(v.ground.y-v.upper.y),references:M.clone(heightReferences)}}});
   }
   return {status:'proposed',version:1,id,buildingId:level.buildingId,sourceLevel:null,name:'RDC — murs des élévations',nameKey:'observed-ground',contours:[],observedPlanes:planes,wallOpenings:[],openingsReviewed:false,contourStatus:'unknown',heightReferences,partial:true,confirmationRequired:true,registrationNote:'Review the visible lower walls and their correspondence to the upper floor. No ground-floor plan or complete ground contour is asserted.'};
  }
@@ -212,12 +286,57 @@
    results.push(secondary);
   }return results;
  }
+ function overlapBox(a,b){const area=Math.max(0,Math.min(a[0]+a[2],b[0]+b[2])-Math.max(a[0],b[0]))*Math.max(0,Math.min(a[1]+a[3],b[1]+b[3])-Math.max(a[1],b[1]));return {fraction:area/Math.min(a[2]*a[3],b[2]*b[3]),iou:area/(a[2]*a[3]+b[2]*b[3]-area)};}
+ function distinctOpeningFrames(candidates){
+  const result=[];for(const c of candidates.slice().sort((a,b)=>(b.priority||0)-(a.priority||0)||b.box[2]*b.box[3]-a.box[2]*a.box[3])){
+   const same=result.find(k=>{const o=overlapBox(k.box,c.box);return o.fraction>.65||o.iou>.4;});
+   if(same){same.alternateObservations||=[];same.alternateObservations.push(M.clone(c));}else result.push(M.clone(c));
+  }return result;
+ }
+ function assignOpeningSurfaces(lower,volumes){
+  const next=M.clone(lower);if(next.status!=='proposed')return next;
+  const visible=volumes.flatMap(v=>(v.observedPlanes||[]).map(p=>({...p,volumeId:v.id,buildingId:v.buildingId}))),kept=[];
+  for(const opening of next.openingProposals||[]){
+   const owner=visible.find(p=>p.buildingId===next.buildingId&&p.sourceViewId===opening.sourceViewId&&overlapBox(p.sourceBox,opening.sourceBox).fraction>.8);
+   if(owner){next.occludedSourceOpenings||=[];next.occludedSourceOpenings.push({...opening,status:'unresolved',reason:'VISIBLE_ON_SECONDARY_VOLUME',proposedWallId:owner.id,proposedVolumeId:owner.volumeId});}
+   else kept.push(opening);
+  }
+  next.openingProposals=kept;return next;
+ }
  function observedOpenings(level,proposal,inventory,images,{matchingOpenings=[]}={}){
   const results=[];
-  for(const plane of level.observedPlanes||[]){const view=inventory.views.find(v=>v.id===plane.sourceViewId),image=images[plane.sourceViewId];if(!image||!view||view.buildingId!==level.buildingId)continue;const [x,y,w,h]=plane.sourceBox,scaleX=plane.measurements.width.scaleUsed,scaleY=plane.measurements.height.scaleUsed,nominal=V.elevationOpenings(image,plane.sourceBox,{top:y+3,bottom:y+h-2}),glass=V.glazingFrames(image,plane.sourceBox,{top:y+3,bottom:y+h-2}),doors=/\bporte|\bdoor/i.test(readings(view).map(r=>r.text).join(' '))?V.grayDoorFrames(image,plane.sourceBox).map(c=>({...c,frameBox:c.box,box:c.panelBox||c.box})):[],candidates=[...nominal,...glass,...doors].sort((a,b)=>b.box[2]*b.box[3]-a.box[2]*a.box[3]),keep=[];
-   for(const c of candidates){const [l,t,ww,hh]=c.box;if((proposal.views.find(v=>v.viewId===plane.sourceViewId)?.envelope.occlusions||[]).some(([x,y,w,h])=>Math.max(0,Math.min(l+ww,x+w)-Math.max(l,x))*Math.max(0,Math.min(t+hh,y+h)-Math.max(t,y))>ww*hh*.1))continue;if(keep.some(k=>l>=k.box[0]-5&&t>=k.box[1]-5&&l+ww<=k.box[0]+k.box[2]+5&&t+hh<=k.box[1]+k.box[3]+5))continue;const door=c.type==='door'||hh>h*.58&&y+h-t-hh<h*.15;const label=readings(view).some(r=>r.box&&r.box[0]<=l+ww+8&&r.box[2]>=l-8&&r.box[1]<=t+hh+8&&r.box[3]>=t-8&&/\d{2,3}\s*["']?\s*[x×]/i.test(r.text)),corresponding=matchingOpenings.some(o=>o.sourceViewId===plane.sourceViewId&&Math.min(o.sourceBox[0]+o.sourceBox[2],l+ww)-Math.max(o.sourceBox[0],l)>Math.min(o.sourceBox[2],ww)*.6);if(!door&&!label&&!corresponding&&(ww<image.width*.025||hh<h*.18&&!(ww/hh>3.5&&ww>w*.25)))continue;const evidence=c.method==='clear-panes-and-dark-frame';if(!door&&evidence&&ww*hh<h*w*.015)continue;keep.push({...c,type:door?'door':'window'});}
-   const face=proposal.views.find(v=>v.viewId===plane.sourceViewId),u={front:[1,0],back:[-1,0],right:[0,1],left:[0,-1]}[face?.direction];if(!u)continue;const forward=(plane.to[0]-plane.from[0])*u[0]+(plane.to[1]-plane.from[1])*u[1]>0;
-   for(const c of keep){const [l,t,ww,hh]=c.box,width=ww*scaleX,height=hh*scaleY,offset=forward?(l-x)*scaleX:(x+w-l-ww)*scaleX,sill=(y+h-t-hh)*scaleY;if(offset<0||sill<-.04||offset+width>plane.measurements.width.value+.01||sill+height>plane.height+.01)continue;const id='opening:'+plane.id+':'+[l,t,ww,hh].map(Math.round).join('-');results.push({id,sourceId:'frame:'+plane.sourceViewId+':'+[l,t,ww,hh].map(Math.round).join('-'),wallId:plane.id,type:c.type,offset,sill:Math.max(0,sill),width,height,sourceViewId:plane.sourceViewId,sourceBox:M.clone(c.box),sourceFrame:M.clone(view.frame),kind:'estimated-calibrated',status:'proposed',method:c.method,scalesUsed:{x:scaleX,y:scaleY},references:M.clone(plane.measurements),confirmationRequired:true});}
+  for(const plane of level.observedPlanes||[]){
+   const view=inventory.views.find(v=>v.id===plane.sourceViewId),image=images[plane.sourceViewId];if(!image||!view||view.buildingId!==level.buildingId)continue;
+   const [x,y,w,h]=plane.sourceBox,scaleX=plane.measurements.width.scaleUsed,scaleY=plane.measurements.height.scaleUsed,dh=plane.registration.floorGuide?.y>y?plane.registration.floorGuide.y-y:h,detectionBox=[x,y,w,dh],band={top:y+3,bottom:y+dh-2};
+   const seeds=matchingOpenings.filter(o=>o.sourceViewId===plane.sourceViewId&&o.sourceBox[0]>=x&&o.sourceBox[0]+o.sourceBox[2]<=x+w);
+   const seeded=seeds.flatMap(o=>V.frameAtSeed(image,{left:o.sourceBox[0],right:o.sourceBox[0]+o.sourceBox[2]},band).map(c=>({...c,priority:4,type:'window',correspondence:o.id})));
+   const nominal=V.elevationOpenings(image,detectionBox,band).map(c=>({...c,priority:3}));
+   const assemblies=[];for(let i=0;i<nominal.length;i++)for(let j=i+1;j<nominal.length;j++){
+    const [a,b]=[nominal[i].box,nominal[j].box].sort((a,b)=>a[0]-b[0]),gap=b[0]-a[0]-a[2];
+    if(gap<3||gap>Math.min(a[2],b[2])*.23||Math.abs(a[1]-b[1])>5||Math.abs(a[1]+a[3]-b[1]-b[3])>5)continue;
+    for(const c of V.frameAtSeed(image,{left:a[0],right:b[0]+b[2]},band))if(c.box[2]>a[2]+b[2])assemblies.push({...c,priority:5,method:'closed-outer-frame-around-adjacent-panes',paneObservations:[a,b]});
+   }
+   const glass=V.glazingFrames(image,detectionBox,band).map(c=>({...c,priority:1}));
+   const neutral=['door','window'].flatMap(type=>V.grayDoorFrames(image,detectionBox,{type}).map(c=>({...c,priority:2.5,frameBox:c.box,box:c.panelBox||c.box})));
+   const candidates=[...seeded,...assemblies,...nominal,...neutral,...glass],eligible=[];
+   for(const c of candidates){
+    const [l,t,ww,hh]=c.box;
+    if((proposal.views.find(v=>v.viewId===plane.sourceViewId)?.envelope.occlusions||[]).some(b=>overlapBox(b,c.box).fraction>.1&&Math.min(b[0]+b[2],l+ww)>Math.max(b[0],l)))continue;
+    const bottomGap=y+dh-t-hh,corresponding=seeds.some(o=>Math.abs(ww/o.sourceBox[2]-1)<.3&&Math.abs(l+ww/2-o.sourceBox[0]-o.sourceBox[2]/2)<Math.max(8,ww*.2));
+    if(c.method==='closed-frame-and-neutral-glazing'&&bottomGap<dh*.12)continue;
+    const label=readings(view).some(r=>r.box&&r.box[0]<=l+ww+8&&r.box[2]>=l-8&&r.box[1]<=t+hh+8&&r.box[3]>=t-8&&/\d{2,3}\s*["']?\s*[x×]/i.test(r.text));
+    const door=c.type==='door'||c.type!=='window'&&!corresponding&&bottomGap<dh*.08&&(hh>dh*.68||hh>dh*.55&&ww>w*.18&&ww>hh);
+    const narrowTransom=ww/hh>3.5&&ww>w*.25;
+    if(c.priority===1&&!door&&!corresponding&&!label&&!narrowTransom&&!nominal.some(n=>overlapBox(n.box,c.box).fraction>.72))continue;
+    if(!door&&c.priority===1&&ww*hh<h*w*.015&&!narrowTransom)continue;
+    eligible.push({...c,type:door?'door':'window',priority:door?Math.max(3.5,c.priority):c.priority});
+   }
+   const keep=distinctOpeningFrames(eligible),face=proposal.views.find(v=>v.viewId===plane.sourceViewId),u={front:[1,0],back:[-1,0],right:[0,1],left:[0,-1]}[face?.direction];if(!u)continue;
+   const forward=(plane.to[0]-plane.from[0])*u[0]+(plane.to[1]-plane.from[1])*u[1]>0;
+   for(const c of keep){
+    const [l,t,ww,hh]=c.box,width=ww*scaleX,height=hh*scaleY,offset=forward?(l-x)*scaleX:(x+w-l-ww)*scaleX,sill=(y+h-t-hh)*scaleY;if(offset<0||sill<-.04||offset+width>plane.measurements.width.value+.01||sill+height>plane.height+.01)continue;
+    const id='opening:'+plane.id+':'+[l,t,ww,hh].map(Math.round).join('-');results.push({id,sourceId:'frame:'+plane.sourceViewId+':'+[l,t,ww,hh].map(Math.round).join('-'),wallId:plane.id,type:c.type,offset,sill:Math.max(0,sill),width,height,sourceViewId:plane.sourceViewId,sourceBox:M.clone(c.box),sourceFrame:M.clone(view.frame),kind:'estimated-calibrated',status:'proposed',method:c.method,alternateObservations:c.alternateObservations||[],paneObservations:c.paneObservations||[],scalesUsed:{x:scaleX,y:scaleY},references:M.clone(plane.measurements),confirmationRequired:true});
+   }
   }return results;
  }
  function volumeRoof(volume,proposal,inventory,images){
@@ -252,5 +371,5 @@
   if(next.roofProposal?.status==='proposed'){const roof=next.roofProposal;roof.profiles.x=roof.profiles.x.map(([x,z])=>[nx[0]+(x-old.x[0])*rx,nz[0]+(z-old.z[0])*rz]);roof.profiles.y=roof.profiles.y.map(([y,z])=>[ny[0]+(y-old.y[0])*ry,nz[0]+(z-old.z[0])*rz]);roof.fasciaBottom=nz[1];roof.userMeasurementCorrections={width:w,depth:d,height:h,originalBounds:M.clone(old)};}
   return next;
  }
- return Object.freeze({version:1,propose,wallSupport,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,openingsFor,lowerPlanes,faceSpan,references,floorGuide,size,readings});
+ return Object.freeze({version:1,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,openingsFor,lowerPlanes,faceSpan,references,floorGuide,size,readings});
 });

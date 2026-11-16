@@ -416,7 +416,8 @@
         openings:(scene.openings||[]).filter(o=>o.wallId===w.id),selected:options.selectedWallId===w.id}));
       for(const wall of faces.filter(f=>f.type==='wall'))for(const opening of wall.openings){
         const at=(u,z)=>[wall.base[0]+wall.u[0]*u+wall.normal[0]*.006,wall.base[1]+wall.u[1]*u+wall.normal[1]*.006,z],z=wall.base[2]+opening.sill;
-        faces.push({id:opening.id,openingId:opening.id,parentSurfaceId:wall.id,wallId:wall.id,levelId:wall.levelId,type:'opening',role:'wall-opening',normal:wall.normal.slice(),poly:[at(opening.offset,z),at(opening.offset+opening.width,z),at(opening.offset+opening.width,z+opening.height),at(opening.offset,z+opening.height)],fillColor:cleanColor(opening.appearance?.frameColor,'#596b62'),selected:options.selectedOpeningIds?.includes(opening.id)});
+        const graphic=global.MIRStudioSurfaces?.openingGraphic(opening)||{frameColor:opening.appearance?.frameColor||'#596b62',infillColor:opening.type==='door'?'#a4aaa2':'#a6c0bc',inset:.06};
+        faces.push({openingGraphic:graphic,id:opening.id,openingId:opening.id,parentSurfaceId:wall.id,wallId:wall.id,levelId:wall.levelId,type:'opening',role:'wall-opening',normal:wall.normal.slice(),poly:[at(opening.offset,z),at(opening.offset+opening.width,z),at(opening.offset+opening.width,z+opening.height),at(opening.offset,z+opening.height)],fillColor:cleanColor(graphic.frameColor,'#596b62'),selected:options.selectedOpeningIds?.includes(opening.id)});
       }
       if(global.MIRStudioExterior)for(const corner of scene.corners||[])for(const f of global.MIRStudioExterior.cornerFaces(corner,scene.walls,[cx,cy]))faces.push({...f,fillColor:cleanColor(f.fillColor,'#8d9690'),selected:options.selectedCornerIds?.includes(corner.id)});
       for(const s of scene.soffits||[])faces.push({id:s.id,levelId:s.levelId,type:'soffit',role:'measured-soffit-section',poly:s.polygon.map(([x,y])=>[x-cx,y-cy,s.height]),normal:[0,0,-1],fillColor:cleanColor(s.color,'#d8dbd1')});
@@ -880,7 +881,7 @@
       else if(face.type==='roof')paintRoof(face);
       else if(face.type==='soffit')paintSoffit(face);
       else if(face.type==='fascia'&&options.levelScene)paintSolid(face);
-      else if(face.type==='opening'){paintSolid(face);const [a,b,c,d]=face.poly,inset=.10;patch([mix(mix(a,b,inset),mix(d,c,inset),inset),mix(mix(b,a,inset),mix(c,d,inset),inset),mix(mix(c,d,inset),mix(b,a,inset),inset),mix(mix(d,c,inset),mix(a,b,inset),inset)],'#9eb9b5');}else if(['column','beam','divider','balcony','concrete','corner','roof-detail'].includes(face.type))paintSolid(face);
+      else if(face.type==='opening'){paintSolid(face);const [a,b,c,d]=face.poly,inset=face.openingGraphic?.inset??.10;patch([mix(mix(a,b,inset),mix(d,c,inset),inset),mix(mix(b,a,inset),mix(c,d,inset),inset),mix(mix(c,d,inset),mix(b,a,inset),inset),mix(mix(d,c,inset),mix(a,b,inset),inset)],face.openingGraphic?.infillColor||'#9eb9b5');}else if(['column','beam','divider','balcony','concrete','corner','roof-detail'].includes(face.type))paintSolid(face);
       else patch(face.poly,fascia);
       trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';if(!face.suppressOutline)ctx.stroke();
       if(face.selected||(options.previewSelection||[]).some(o=>o.kind==='structure'&&o.id===face.structureId||o.kind==='corner'&&o.id===face.cornerIndex)){trace(face.poly);ctx.strokeStyle='#348511';ctx.lineWidth=3;ctx.stroke();}

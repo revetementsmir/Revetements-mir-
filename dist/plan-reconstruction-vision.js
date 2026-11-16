@@ -165,6 +165,19 @@
   }
   candidates.sort((a,b)=>b.score-a.score);return candidates[0]?[candidates[0]]:[];
  }
+ function occludedFrameAtSeed(image,seed,{top,bottom,width,height,occlusions=[]}){
+  if(!(width>15&&height>15)||!occlusions.length)return [];
+  const {width:w,height:h}=image,ink=structuralInk(image),masked=(x,y)=>occlusions.some(([l,t,r,b])=>x>=l-3&&x<=l+r+3&&y>=t-3&&y<=t+b+3),hit=(x,y)=>x>=0&&x<w&&y>=0&&y<h&&!masked(x,y)&&!!ink[Math.round(y)*w+Math.round(x)],center=(seed.left+seed.right)/2,pad=Math.max(12,width*.55),candidates=[];
+  const edge=(x,y0,y1)=>{let n=0,support=0,anchors=[];for(let y=Math.ceil(y0);y<=y1;y++){if(masked(x,y))continue;n++;if(hit(x,y)){support++;if(!anchors.length)anchors.push([x,y]);anchors[1]=[x,y];}}return {count:n,ratio:support/(n||1),anchors};};
+  for(let y=Math.ceil(top+height);y<Math.min(h-2,bottom);y++)for(let x=Math.max(1,Math.floor(center-width/2-pad));x<=Math.min(w-width-2,Math.ceil(center-width/2+pad));x++){
+   if(!hit(x,y))continue;const t=y-height,covered=occlusions.reduce((n,[l,ot,r,b])=>n+Math.max(0,Math.min(x+width,l+r)-Math.max(x,l))*Math.max(0,Math.min(y,ot+b)-Math.max(t,ot)),0);if(covered<width*height*.1||covered>width*height*.9)continue;
+   const left=edge(x,t,y);if(left.count<8||left.ratio<.78)continue;
+   for(let dx=-4;dx<=4;dx++){const r=Math.round(x+width)+dx,right=edge(r,t,y);if(right.count<8||right.ratio<.78)continue;let baseline=0,visible=0;for(let xx=x;xx<=r;xx++){if(masked(xx,y))continue;visible++;if(hit(xx,y)||hit(xx,y-1)||hit(xx,y+1))baseline++;}if(visible<(r-x)*.9||baseline/(visible||1)<.85)continue;
+    let white=0,count=0;for(let yy=Math.ceil(t+3);yy<y-3;yy++)for(let xx=x+3;xx<r-3;xx++){if(masked(xx,yy))continue;const i=(yy*w+xx)*4;white+=Number(Math.min(image.data[i],image.data[i+1],image.data[i+2])>225);count++;}const fraction=white/(count||1);if(fraction<.5||count<50)continue;
+    let below=0;for(let yy=y+3;yy<=Math.min(h-1,y+10);yy++)below+=Number(hit(x,yy))+Number(hit(r,yy));candidates.push({box:[x,t,r-x,height],score:fraction*100-Math.abs((x+r)/2-center)*.15-Math.abs(dx)*2-below*5,method:'visible-frame-and-cross-view-written-size',status:'proposed',confirmationRequired:true,occlusionEvidence:{observedSegments:[[[x,y],[r,y]],left.anchors,right.anchors],occlusions:occlusions.map(b=>b.slice()),knownSizePixels:[width,height],unseenTop:'height from compatible written dimension; never from legend pixels'}});
+   }
+  }candidates.sort((a,b)=>b.score-a.score);return candidates[0]?[candidates[0]]:[];
+ }
  function secondaryEnvelope(image,primary,{side='right',expectedWidth=null,expectedBase=null}={}){
   if(primary.status!=='proposed')return {status:'unresolved',reason:'PRIMARY_REGISTRATION_REQUIRED'};
   const {width:w,height:h}=image,[px,py,pw,ph]=primary.box,ink=structuralInk(image),origin=side==='right'?px+pw:px,left=Math.max(Math.round(w*.15),Math.floor(side==='right'?origin:origin-pw*.75)),right=Math.min(Math.round(w*.75),Math.ceil(side==='right'?origin+pw*.75:origin)),top=Math.max(0,Math.floor(py+ph*.3)),bottom=Math.min(h-1,Math.ceil((expectedBase??py+ph)+ph*.08)),candidates=[];
@@ -188,13 +201,16 @@
   }
   candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'SECONDARY_DEPTH_NOT_REPRESENTED'};
  }
- function grayDoorFrames(image,box){
+ function grayDoorFrames(image,box,{type='door'}={}){
   const {width:w,height:h}=image,[bx,by,bw,bh]=box,mask=new Uint8Array(w*h),ink=structuralInk(image),left=Math.max(0,Math.floor(bx)),right=Math.min(w-1,Math.ceil(bx+bw)),top=Math.max(0,Math.floor(by)),bottom=Math.min(h-1,Math.ceil(by+bh));
   for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++){const j=(y*w+x)*4,hi=Math.max(image.data[j],image.data[j+1],image.data[j+2]),lo=Math.min(image.data[j],image.data[j+1],image.data[j+2]);mask[y*w+x]=Number(lo>65&&hi<225&&hi-lo<35);}
-  const raw=components(closing(mask,w,h,2,2),w,h).filter(c=>c.box[0]>left+8&&c.box[0]+c.box[2]<right-8&&c.box[1]>top+bh*.15&&c.box[2]>22&&c.box[3]>bh*.43&&c.box[3]<bh*.95&&c.box[2]/c.box[3]>.2&&c.box[2]/c.box[3]<2.3&&c.area/(c.box[2]*c.box[3])>.65),groups=[];
+  const raw=components(closing(mask,w,h,2,2),w,h).filter(c=>c.box[0]>left+8&&c.box[0]+c.box[2]<right-8&&c.box[1]>top+bh*.15&&c.box[2]>22&&c.box[3]>Math.max(15,bh*(type==='door'?.43:.08))&&c.box[3]<bh*(type==='door'?.95:.6)&&c.box[2]/c.box[3]>.2&&c.box[2]/c.box[3]<(type==='door'?2.3:8)&&c.area/(c.box[2]*c.box[3])>.65),groups=[];
   for(const c of raw.sort((a,b)=>a.box[0]-b.box[0])){const [x,y,ww,hh]=c.box,g=groups.find(g=>Math.abs(g.box[1]-y)<7&&Math.abs(g.box[1]+g.box[3]-y-hh)<7&&x-g.box[0]-g.box[2]<bw*.06);if(g){const r=Math.max(x+ww,g.box[0]+g.box[2]),b=Math.max(y+hh,g.box[1]+g.box[3]);g.box=[g.box[0],Math.min(y,g.box[1]),r-g.box[0],b-Math.min(y,g.box[1])];}else groups.push({box:c.box});}
-  const framed=([x,y,ww,hh])=>{let hits=0,total=0;for(let yy=y;yy<=y+hh;yy++)for(const xx of [x,x+ww]){let found=false;for(let dx=-6;dx<=6;dx++)if(xx+dx>=0&&xx+dx<w)found||=!!ink[Math.round(yy)*w+Math.round(xx+dx)];hits+=Number(found);total++;}return hits/(total||1)>.75;};
-  return groups.filter(g=>framed(g.box)).map(g=>({box:[g.box[0]-3,g.box[1]-3,g.box[2]+6,g.box[3]+6],panelBox:g.box.slice(),framePaddingPx:3,type:'door',method:'closed-frame-and-neutral-door-panels',status:'proposed',confirmationRequired:true}));
+  const framed=([x,y,ww,hh])=>{
+   const samples=[];for(let row=1;row<6;row++)for(let col=1;col<6;col++){const j=(Math.floor(y+hh*row/6)*w+Math.floor(x+ww*col/6))*4;samples.push((image.data[j]+image.data[j+1]+image.data[j+2])/3);}samples.sort((a,b)=>a-b);const background=samples[Math.floor(samples.length/2)],dark=(xx,yy)=>{if(xx<0||yy<0||xx>=w||yy>=h)return false;const at=Math.round(yy)*w+Math.round(xx),j=at*4;return !!ink[at]&&(image.data[j]+image.data[j+1]+image.data[j+2])/3<background-25;};
+   let hits=0,total=0;for(let yy=y;yy<=y+hh;yy++)for(const xx of [x,x+ww]){let found=false;for(let dx=-6;dx<=6;dx++)found||=dark(xx+dx,yy);hits+=Number(found);total++;}const vertical=hits/(total||1);hits=0;total=0;for(let xx=x;xx<=x+ww;xx++)for(const yy of [y,y+hh]){let found=false;for(let dy=-6;dy<=6;dy++)found||=dark(xx,yy+dy);hits+=Number(found);total++;}return vertical>.75&&hits/(total||1)>.7;
+  };
+  return groups.filter(g=>framed(g.box)).map(g=>({box:[g.box[0]-3,g.box[1]-3,g.box[2]+6,g.box[3]+6],panelBox:g.box.slice(),framePaddingPx:3,type,method:type==='door'?'closed-frame-and-neutral-door-panels':'closed-frame-and-neutral-glazing',status:'proposed',confirmationRequired:true}));
  }
  function canopyEnvelope(image,primary,upperY){
   if(primary.status!=='proposed'||!Number.isFinite(upperY))return {status:'unresolved',reason:'CANOPY_LEVEL_REQUIRED'};
@@ -211,5 +227,5 @@
   for(let x=Math.max(0,Math.floor(direction==='right'?bx-bw*.35:bx+bw+bw*.025));x<Math.min(w,direction==='right'?bx-bw*.025:bx+bw+bw*.35);x++){let count=0,last=topY;for(let y=Math.max(0,Math.round(topY));y<Math.min(h,by+bh+bh*.1);y++)if(ink[y*w+x]){count++;last=y;}if(count>Math.max(80,(by+bh-topY)*.73))candidates.push({x,count,last});}
   const groups=[];for(const c of candidates){if(!groups.length||c.x-groups.at(-1).at(-1).x>20)groups.push([c]);else groups.at(-1).push(c);}const group=groups.filter(g=>g.at(-1).x-g[0].x>=4&&g.at(-1).x-g[0].x<=35).sort((a,b)=>b.reduce((s,c)=>s+c.count,0)-a.reduce((s,c)=>s+c.count,0))[0];return group?{status:'proposed',box:[group[0].x,topY,group.at(-1).x-group[0].x,Math.min(group[0].last,group.at(-1).last)-topY],sourceViewId:primary.sourceViewId,sourceFrame:primary.sourceFrame,method:'side-post-two-visible-edges',confirmationRequired:true}:{status:'unresolved',reason:'CANOPY_DEPTH_NOT_REPRESENTED'};
  }
- return Object.freeze({version:1,floorEnvelope,wallEnvelope,canopyEnvelope,canopySide,secondaryEnvelope,secondarySide,roofProfile,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
+ return Object.freeze({version:1,floorEnvelope,wallEnvelope,canopyEnvelope,canopySide,secondaryEnvelope,secondarySide,roofProfile,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
 });

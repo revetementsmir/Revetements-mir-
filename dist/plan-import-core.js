@@ -109,7 +109,7 @@
         const ticks = intersections(mask, run, fh);
         for (let i = 0; i < ticks.length; i++) for (let j = i + 1; j < ticks.length; j++) {
           const a = ticks[i].x, b = ticks[j].x, span = b - a;
-          if (span < Math.max(55, (x1 - x0) * 1.3) || a > x0 + fh || b < x1 - fh) continue;
+          if (span < Math.max(options.minSpanPx ?? 55, (x1 - x0) * 1.3) || a > x0 + fh || b < x1 - fh) continue;
           const centered = Math.abs((a + b) / 2 - cx) / span; if (centered > .19) continue;
           const verticalGap = Math.min(Math.abs(y - y0), Math.abs(y - y1));
           const distanceScore = 1 - clamp(verticalGap / (fh * 3), 0, 1);

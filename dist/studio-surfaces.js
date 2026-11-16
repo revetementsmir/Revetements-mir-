@@ -22,9 +22,12 @@
     for(const line of b.lines){const position=(line.x-box[0])/(box[2]-box[0]),clip=E.clipLineToZone(face,zone.id,'vertical',position);for(const points of clip.segments){if(validWidth)lines+=path(points,`data-batten-relief="project-width" data-batten-width-in="${widthIn}" stroke="#15291e" stroke-opacity=".5" stroke-width="${widthIn*perIn+1}"`);lines+=path(points,`data-batten-spacing-in="${Number(b.spacingIn.toFixed(6))}" data-batten-width-status="${validWidth?'user-measurement':'unresolved'}" stroke="${validWidth?esc(choice.battenColor||choice.color||'#d3d6cd'):'#536357'}" stroke-width="${validWidth?widthIn*perIn:.8}" ${validWidth?'':'stroke-dasharray="3 2"'}`);}}
    }
   });
-  for(const o of face.openings){const original=(level.wallOpenings||[]).find(a=>a.id===o.id),p=o.polygon;lines+=`<polygon data-wall-opening="${esc(o.id)}" points="${p.map(p=>p.join(',')).join(' ')}" fill="#a6c0bc" stroke="${esc(original?.appearance?.frameColor||'#596b62')}" stroke-width="3"/>`;}
+  for(const o of face.openings){const original=(level.wallOpenings||[]).find(a=>a.id===o.id),p=o.polygon,g=openingGraphic(original||o),[x0,y0,x1,y1]=bounds(p),inner=rect(x0+(x1-x0)*g.inset,y0+(y1-y0)*g.inset,(x1-x0)*(1-2*g.inset),(y1-y0)*(1-2*g.inset));lines+=`<g data-wall-opening="${esc(o.id)}"><polygon points="${p.map(p=>p.join(',')).join(' ')}" fill="${esc(g.frameColor)}"/><polygon points="${inner.map(p=>p.join(',')).join(' ')}" fill="${esc(g.infillColor)}"/></g>`;}
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" data-meters-per-unit=".01"><defs>${defs}</defs>${body}${lines}</svg>`;
  }
  function pickZone(w,level,point,materials=[]){const face=faceFor(w,level,materials,1);for(const zone of face.zones.slice().reverse()){const [x0,y0,x1,y1]=bounds(zone.polygon);if(point[0]<x0||point[0]>x1||point[1]<y0||point[1]>y1)continue;const clip=E.clipLineToZone(face,zone.id,'vertical',(point[0]-x0)/(x1-x0));if(clip.segments.some(s=>point[1]>=Math.min(...s.map(p=>p[1]))-1e-6&&point[1]<=Math.max(...s.map(p=>p[1]))+1e-6))return zone.id;}return null;}
- return Object.freeze({version:1,faceFor,layoutFor,battenLayout,svg,pickZone,isBatten});
+ // Display symbols share colours and proportions in 2D and 3D. This inset
+ // does not assert a measured frame profile or contribute to quantities.
+ function openingGraphic(o){return {frameColor:o.appearance?.frameColor||'#596b62',infillColor:o.type==='door'?(o.appearance?.panelColor||'#a4aaa2'):'#a6c0bc',inset:.06};}
+ return Object.freeze({version:1,faceFor,layoutFor,battenLayout,svg,pickZone,isBatten,openingGraphic});
 });

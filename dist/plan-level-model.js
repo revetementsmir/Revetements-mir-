@@ -76,6 +76,7 @@
     if(draft.sourceViewId&&(!view||view.buildingId!==level.buildingId||view.kind!=='floor'||view.levelId!==level.sourceLevel))errors.push('SOURCE_LEVEL');
     if(!draft.points?.every(p=>p.id&&p.xy?.length===2)||new Set(draft.points?.map(p=>p.id)).size!==draft.points?.length)errors.push('POINT_ID');
     if(!scale(draft))errors.push('SCALE_UNKNOWN');
+    if(draft.dimensionAdjustment?.status==='conflict')errors.push('DIMENSION_CONFLICT');
     const points=modelPoints(draft);errors.push(...validatePolygon(points));
     if(confirm&&!established(draft.reference))errors.push('REFERENCE_UNCONFIRMED');
     if(view&&draft.reference?.controlReferences?.length){const assessment=referenceAssessment({...view,calibration:{}},[draft.reference,...draft.reference.controlReferences]);if(assessment.conflict)errors.push('REFERENCE_CONFLICT');if(assessment.deformed)errors.push('RASTER_DEFORMED');}
