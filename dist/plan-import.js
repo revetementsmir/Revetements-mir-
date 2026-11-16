@@ -69,7 +69,7 @@
       <div class="mir-pdf-upload"><label for="mir-pdf-file"><strong>Choisir mon PDF</strong><span>Fichier de ${MAX_FILE_MB} Mo maximum</span><input id="mir-pdf-file" type="file" accept="application/pdf,.pdf"></label><p>Le PDF et son analyse restent sur cet appareil.</p></div>
       <div id="mir-pdf-error" class="mir-pdf-error" role="alert" hidden></div>
       <div class="mir-pdf-working"><p id="mir-pdf-status" role="status" aria-live="polite"></p><progress id="mir-pdf-progress" aria-label="Analyse du PDF" max="100" hidden></progress></div>
-      <footer class="mir-pdf-bottom"><div><div id="mir-pdf-view-review"></div><details class="mir-pdf-detected"><summary>Vues repérées</summary><div id="mir-pdf-assigned" class="mir-pdf-assigned"></div></details><p id="mir-pdf-volume-note" class="mir-pdf-fine"></p></div><button type="button" id="mir-pdf-final" class="mir-pdf-primary" disabled>Ouvrir mon projet →</button></footer>
+      <footer class="mir-pdf-bottom"><div><div id="mir-pdf-view-review"></div><details class="mir-pdf-detected" open><summary>Vues repérées</summary><div id="mir-pdf-assigned" class="mir-pdf-assigned"></div></details><p id="mir-pdf-volume-note" class="mir-pdf-fine"></p></div><button type="button" id="mir-pdf-final" class="mir-pdf-primary" disabled>Ouvrir mon projet →</button></footer>
     </div>`;
     document.body.append(dialog);
     $('#mir-pdf-close').onclick = () => close();

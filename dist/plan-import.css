@@ -61,3 +61,5 @@
 .mir-pdf-bottom { flex-wrap:wrap; }
 .mir-pdf-bottom > div { min-width:0; flex:1 1 300px; }
 #building-views-dialog { max-width:min(960px,96vw); max-height:90dvh; overflow:auto; }
+
+.mir-pdf-assigned { max-height:130px; overflow:auto; }
