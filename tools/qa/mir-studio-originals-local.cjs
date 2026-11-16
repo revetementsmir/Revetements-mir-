@@ -39,7 +39,7 @@ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://loc
         const chooser=page.locator('[data-active-building]');
         if(await chooser.count()){
           result.buildingChoices=await chooser.locator('option').evaluateAll(options=>options.map(o=>({id:o.value,label:o.textContent})));
-          if(!await chooser.inputValue()){const choice=result.buildingChoices.find(o=>o.id==='house')||result.buildingChoices.find(o=>o.id==='unresolved')||result.buildingChoices.find(o=>o.id);await chooser.selectOption(choice.id);result.recipeSelectedBuilding=choice.id;}
+          if(!await chooser.inputValue()){const choice=result.buildingChoices.find(o=>o.id.startsWith('house'))||result.buildingChoices.find(o=>o.id==='unresolved')||result.buildingChoices.find(o=>o.id);await chooser.selectOption(choice.id);result.recipeSelectedBuilding=choice.id;}
         }
         if(await page.locator('#mir-pdf-final').isEnabled()){
           await page.locator('#mir-pdf-final').click();await page.waitForFunction(title=>window.MIR_STUDY&&document.querySelector('#project-name').textContent===title,path.basename(item.path).replace(/\.pdf$/i,''),{timeout:90000});

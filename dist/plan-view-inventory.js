@@ -12,7 +12,9 @@
   function hash(s){let n=2166136261;for(const c of s)n=Math.imul(n^c.charCodeAt(0),16777619);return (n>>>0).toString(36);}
   function buildingHint(text){
     const s=normal(text),shed=/\b(cabanon|remise|shed|outbuilding)\b/.test(s),house=/\b(maison|residence|house|dwelling)\b/.test(s);
-    return shed===house?null:shed?'shed':'house';
+    if(shed===house)return null;
+    const model=s.match(/\b(?:maison\s+modele|model\s+house)\s*#?\s*(\d{1,4})\b/);
+    return shed?'shed':model?'house-model-'+model[1]:'house';
   }
   function levelHint(text){
     const s=normal(text);
@@ -32,8 +34,9 @@
     if(identities.length===1){const row=explicit.find(r=>buildingHint(r.text)===identities[0]);return {id:identities[0],text:row.text,box:row.box,method:'explicit-building-label'};}
     // A project cartouche may name the house while the sheet itself explicitly
     // names a shed. The sheet label above always takes priority.
-    const model=usable.find(r=>/^(?:maison\s+modele|model\s+house)\s*#?\s*\d{1,4}\s*$/.test(normal(r.text).trim()));
-    return model?{id:'house',text:model.text,box:model.box,method:'project-house-label-proposed'}:null;
+    const models=usable.filter(r=>/^(?:maison\s+modele|model\s+house)\s*#?\s*\d{1,4}\s*$/.test(normal(r.text).trim().replace(/[.,;:]+$/,'')));
+    if(new Set(models.map(r=>buildingHint(r.text))).size!==1)return null;
+    const model=models[0];return {id:buildingHint(model.text),text:model.text,box:model.box,method:'project-house-label-proposed'};
   }
   function placeholder(key){return {key,name:names[key],page:null,bbox:[0,0,1200,800],textureBox:[0,0,1200,800],physicalWidth:null,zones:[],openings:[],roof:[],base:[],fascia:[],soffit:[],detected:{},candidates:[],occlusions:[],printedDimensions:[],importedStatus:'unassigned',calibrationStatus:'not_found',textureBottom:0,sourceImage:null};}
   function create(records,source,pages=[]){
@@ -55,7 +58,8 @@
     if(views.some(view=>!view.buildingId)){
       known.push('unresolved');for(const view of views)if(!view.buildingId)view.buildingId='unresolved';
     }
-    const buildings=known.map(id=>({id,name:id==='house'?'Maison':id==='shed'?'Cabanon':'Bâtiment à confirmer',status:id==='unresolved'?'unresolved':'proposed',contours:[],wallPlanes:[]}));
+    const houseModels=known.filter(id=>id.startsWith('house-model-'));
+    const buildings=known.map(id=>({id,name:id==='house'?'Maison':id.startsWith('house-model-')?'Maison'+(houseModels.length>1?' '+id.slice(12):''):id==='shed'?'Cabanon':'Bâtiment à confirmer',status:id==='unresolved'?'unresolved':'proposed',contours:[],wallPlanes:[]}));
     const inventory={schema:'mir-view-inventory',version:1,files:[{id:fileId,...source}],pages,buildings,views,levels:[],activeBuildingId:buildings.length===1?buildings[0].id:null,rendererSelections:{}};
     refresh(inventory);return inventory;
   }

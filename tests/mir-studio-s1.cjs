@@ -58,7 +58,11 @@ assert.deepEqual(migrated.faces,legacy.faces);assert.deepEqual(migrated.extraFie
 assert.equal(migrated.viewInventory.views[0].levelId,null);assert.deepEqual(migrated.viewInventory.levels,[]);
 assert.equal(I.levelHint('First Floor Plan'),null,'regional ambiguity retained');
 assert.equal(I.pageBuilding([{text:'Maison Modèle #5',confidence:95},{text:'CABANON',confidence:95}],S.classify).id,'shed','project house label never overrides the sheet shed label');
-assert.equal(I.pageBuilding([{text:'Maison Modèle #5',confidence:95}],S.classify).id,'house');
+assert.equal(I.pageBuilding([{text:'Maison Modèle #5,',confidence:95}],S.classify).id,'house-model-5');
+assert.equal(I.pageBuilding([{text:'Maison Modèle #6.',confidence:95}],S.classify).id,'house-model-6');
+assert.equal(I.pageBuilding([{text:'Maison Modèle #5',confidence:95},{text:'Maison Modèle #6',confidence:95}],S.classify),null);
+const distinctModels=I.create([record('Plan étage Maison Modèle #5',1,null,12),record('Plan étage Maison Modèle #6',2,null,20)],source);
+assert.equal(distinctModels.buildings.length,2);distinctModels.activeBuildingId='house-model-5';assert.equal(I.adapt({viewInventory:distinctModels},S.volumeFrom).dimensions.width,12);
 assert.equal(I.pageBuilding([{text:'Note : maison modèle #5',confidence:95}],S.classify),null);
 for(const matrix of [[2,0,0,-2,0,800],[0,2,2,0,0,0],[-2,0,0,2,600,0],[0,-2,-2,0,800,600]]){
   const view={frame:{pdfToRaster:matrix,cropToRaster:[1,0,0,1,20,30]}};
