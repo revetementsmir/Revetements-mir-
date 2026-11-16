@@ -8,6 +8,8 @@ Les toitures proviennent de profils mesurés dans des vues compatibles. Les extr
 
 Un retour de toiture peut rejoindre le toit principal. Lorsqu'un même trait est ajusté deux fois à quelques pixels près, le pan existant sert de référence au raccord; les deux profils et leur résidu restent dans la provenance. Les faces coplanaires sont réunies pour supprimer les arêtes artificielles. Les surfaces superposées sont découpées à leur intersection, et l'ordre d'affichage dépend de leur chevauchement réel. Le retour avant du cas privé C3 est une toiture à versants, pas une paroi de revêtement. L'interprétation erronée en pignon bardé a été retirée et reste documentée dans l'historique privé/Atelier.
 
+Le raccordement automatique ultérieur, ses trois recettes et leurs limites sont consignés dans [le bilan du moteur automatique](mir-studio-automatic.md). Les recettes assistées ci-dessous restent des preuves historiques distinctes.
+
 ## Preuves et limites
 
 Les originaux, OCR, coordonnées, captures et recettes détaillées restent hors dépôt dans `/workspace/mir-studio-private`. Aucune analyse externe. Les confirmations des recettes sont des validations QA, pas une approbation client.
