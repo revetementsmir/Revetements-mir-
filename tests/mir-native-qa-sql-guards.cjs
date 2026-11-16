@@ -33,6 +33,15 @@ assert.doesNotMatch(sql,/drop table|truncate|alter table mir_core\.punch_shifts|
 assert.match(ci,/group: mir-native-qa-shared-\$\{\{ github\.repository \}\}/);
 assert.match(ci,/cancel-in-progress: false/);
 assert.match(ci,/node mobile\/tools\/native-qa-fixture\.cjs start/);
+assert.match(ci,/node mobile\/tools\/prepare-real-qa-manifest\.cjs/);
+assert.ok(ci.indexOf('node mobile/tools/native-qa-fixture.cjs start')<ci.indexOf('node mobile/tools/prepare-real-qa-manifest.cjs'),'Android manifest injected after confirmed server run');
+assert.ok(ci.indexOf('node mobile/tools/prepare-real-qa-manifest.cjs')<ci.indexOf('node mobile/tools/verify-pr39-native-fixture.cjs'),'Preflight checks only after injecting native runtime fixture');
+const native=read('mobile/android/app/src/androidTest/java/ca/revetementsmir/equipe/test/MirRealRolesTest.java');
+assert.match(native,/native-qa-run-manifest\.json/,'Native role test reads private run manifest');
+assert.match(native,/Exact per-run synthetic marker/,'Native role test validates server-sourced marker');
+assert.match(native,/Exact per-run shift/,'Native role test validates correct shift');
+assert.match(native,/Exact per-run segment/,'Native role test validates correct segment');
+assert.doesNotMatch(native,/QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL/,'Native role test cannot accept obsolete PR41 marker');
 assert.match(ci,/node mobile\/tools\/verify-pr39-native-fixture\.cjs/);
 assert.match(ci,/node mobile\/tools\/native-qa-fixture\.cjs finish/);
 assert.match(ci,/if: always\(\)/);

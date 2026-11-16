@@ -14,6 +14,8 @@ const allowed=new Set([
  '.github/workflows/pages.yml',
  'docs/verification/studio-public-courriels-20261115.md',
  'mobile/tools/native-qa-fixture.cjs',
+ 'mobile/tools/prepare-real-qa-manifest.cjs',
+ 'mobile/android/app/src/androidTest/java/ca/revetementsmir/equipe/test/MirRealRolesTest.java',
  'mobile/tools/test-native-qa-fixture.cjs',
  'mobile/tools/test-pr39-native-fixture.cjs',
  'mobile/tools/verify-pr39-native-fixture.cjs',
@@ -31,10 +33,19 @@ const allowed=new Set([
 ]);
 assert.ok(changed.length>0,'Expected a reviewable diff');
 assert.deepEqual(changed.filter(f=>!allowed.has(f)),[],'PR42 may only modify the exact listed source-free QA/Studio packaging files');
-for(const p of ['dist','server','supabase/functions','supabase/migrations','mobile/android','scripts/mir-final-release-gate.cjs']){
+for(const p of ['dist','server','supabase/functions','supabase/migrations','scripts/mir-final-release-gate.cjs']){
  const files=git('diff','--name-only',BASE,'HEAD','--',p).split('\n').filter(Boolean);
  assert.deepEqual(files,[],p+' must be byte-identical to main, including production/Auth/APK and guarded Pages release gate');
 }
+// Native Android source files remain immutable; only one instrumented TEST
+// assertion may follow the exact runtime fixture IDs of its own CI run.
+const javaFixture='mobile/android/app/src/androidTest/java/ca/revetementsmir/equipe/test/MirRealRolesTest.java';
+assert.deepEqual(git('diff','--name-only',BASE,'HEAD','--','mobile/android').split('\n').filter(Boolean),[javaFixture],
+  'Only the native Android TEST assertion may change; app/APK sources remain byte-identical');
+const native=fs.readFileSync(javaFixture,'utf8');
+assert.match(native,/native-qa-run-manifest\.json/);
+assert.match(native,/Exact per-run synthetic marker/);
+assert.doesNotMatch(native,/QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL/);
 for(const [file,hash]of Object.entries({
  'supabase/test-only/fixtures/pr41-android-native-active-20261115.sql':'e450d0e392f92346c7f729e28091d4fe0b9bbfbd',
  'supabase/test-only/fixtures/pr41-android-native-active-close-20261115.sql':'ae0679a21c56fc888c719bff5e9adcdaf482d896',

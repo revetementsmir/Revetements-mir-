@@ -60,3 +60,9 @@ Le Studio public, la langue FR-CA/EN-CA, les copies Studio TEST, les modèles de
 
 ### Horloge UTC et maintien du fail-closed (complément de recette)
 Le serveur MIR TEST refuse toute nouvelle fixture durant les 10 dernières minutes d'une journée UTC pour éviter qu'un test Chef utilisant `current_date` change de jour. Le lanceur CI attend de façon bornée le début de la journée suivante lorsqu'il approche de ce seuil (marge de 12 minutes), **avant la création du bail**. Le serveur garde toutes ses validations strictes. Une panne ou interruption avant l'allocation ne réactive jamais un ancien quart. Ce comportement est testé avec une horloge simulée et sera confirmé dans la CI réelle.
+
+### Contrôle Android instrumenté — passage aux identifiants exacts du run
+
+Premier essai de la nouvelle RPC : le 16 novembre UTC, création de nouveaux quarts/segments et attribution d'une fiche Chef **réussies**, puis nettoyage **réussi même après échec**. Les anciennes lignes de PR41 sont demeurées closes. Le test Java `MirRealRolesTest` a toutefois échoué sur sa dernière constante `QA-TEAMS-HOURS-SYNTHETIC-NOT-PHYSICAL`, alors que la réponse serveur portait le marqueur nouveau `QA-NATIVE-RUN-…`. L'échec est une ancienne assertion de fixture, pas une erreur de l'application.
+
+Correctif ciblé : après `native-qa-fixture.cjs start`, `prepare-real-qa-manifest.cjs` installe le **manifeste non secret** de cette exécution dans les fichiers privés de l'émulateur (jamais intégré à l'APK). `MirRealRolesTest.java` exige ce fichier et compare pour chaque rôle le marqueur, le quart et le segment **strictement égaux** aux UUID transmis par la RPC TEST du run; il vérifie aussi org/serveur TEST, date UTC et JOB. Aucune tolérance nouvelle, et la copie `mobile/android` ne modifie que cet unique test instrumenté, pas le logiciel de production. La suite entière reste requise avant tout statut vert.

@@ -36,6 +36,7 @@ jobs:
           node tests/mir-samsung-fixture.cjs
           node tests/mir-pr39-native-fixture.cjs
           node tests/mir-pr39-native-chef-fixture.cjs
+          node --check mobile/tools/prepare-real-qa-manifest.cjs
           node --test mobile/tools/test-pr39-native-fixture.cjs mobile/tools/test-native-qa-fixture.cjs
           node tests/mir-native-qa-sql-guards.cjs
           node tests/mir-punch-receipts-postgres.cjs
@@ -174,6 +175,7 @@ jobs:
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-verify.txt
           # Allocate new TEST-only UUIDs/lease AFTER upgrades, just before dependent tests.
           node mobile/tools/native-qa-fixture.cjs start
+          node mobile/tools/prepare-real-qa-manifest.cjs
           node mobile/tools/verify-pr39-native-fixture.cjs
           mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirRealRolesTest'
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/real-roles.txt
