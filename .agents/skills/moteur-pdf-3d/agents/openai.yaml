@@ -1,0 +1,4 @@
+interface:
+  display_name: "Moteur PDF vers 3D"
+  short_description: "Développer un convertisseur autonome de plans PDF en 3D"
+  default_prompt: "Utilise $moteur-pdf-3d pour développer et vérifier le moteur autonome de conversion PDF vers bâtiment 3D dans le projet existant."
