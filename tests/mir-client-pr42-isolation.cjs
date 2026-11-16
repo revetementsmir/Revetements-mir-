@@ -27,6 +27,7 @@ const allowed=new Set([
  'tests/mir-client-account-isolation.cjs',
  'tests/mir-mail-recipe-offline.cjs',
  'tests/mir-native-qa-sql-guards.cjs',
+ 'tests/mir-pr39-native-chef-fixture.cjs',
  'tests/mir-studio-public-browser.cjs',
  'tests/mir-studio-public-stage.cjs',
  'tools/qa/mir-mail-recipe.cjs'
