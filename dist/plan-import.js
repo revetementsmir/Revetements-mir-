@@ -381,7 +381,7 @@
           const result = prepareView(canvas, crop, structuralHints, sheet.number, view, calibrationScale, visualFrame, measuredStairs, foundation, foundationGuides);
           Object.assign(result,{name:view.name,direction:view.face||null,titleBox:view.box.map(value=>value*scale),buildingHint:MIRViewInventory.buildingHint(view.name)||sheet.buildingHint,
             buildingEvidence:sheet.buildingEvidence?{...sheet.buildingEvidence,box:sheet.buildingEvidence.box?.map(value=>value*scale),frame:'raster-page',needsReview:true}:null,
-            sourceRotation:sheet.rotation,sourceCrop:crop,sourceFrame:{pdfToRaster:[...viewport.transform],cropToRaster:[1,0,0,1,crop[0],crop[1]],rasterSize:[canvas.width,canvas.height],units:'pixels'},volumeEvidence:viewEvidence});
+            drawingReadings:{version:1,frame:'view-pixels',rows:localRows.slice(0,1200).map(r=>({...r,box:r.box.map((n,i)=>n-crop[i%2])})),words:reading.words.slice(0,6000).map(r=>({...r,box:r.box.map((n,i)=>n-crop[i%2])})),verticalRows:reading.verticalRows.slice(0,600).map(r=>({...r,box:r.box.map((n,i)=>n-crop[i%2])}))},sourceWidth:crop[2],sourceHeight:crop[3],sourceRotation:sheet.rotation,sourceCrop:crop,sourceFrame:{pdfToRaster:[...viewport.transform],cropToRaster:[1,0,0,1,crop[0],crop[1]],rasterSize:[canvas.width,canvas.height],units:'pixels'},volumeEvidence:viewEvidence});
           imported.views.push(result);
         }
       } catch (e) { if (token === sequence) { skipped++; console.warn('MIR PDF : vue non préparée', sheet.number, e); } }

@@ -48,7 +48,7 @@
         if((current?current.geometryRevision||0:null)!==expectedRevision)throw new Error('Ce niveau a changé dans une autre fenêtre. Rechargez avant de réappliquer votre brouillon.');
         const next=JSON.parse(JSON.stringify(level));next.geometryRevision=(expectedRevision||0)+1;
         if(index<0)inventory.levels.push(next);else inventory.levels[index]=next;
-        if(window.MIRLevelModel){for(const contour of next.contours||[])if(contour.status==='confirmed'&&MIRLevelModel.validateDraft(contour,inventory,next,{confirm:true}).length)throw new Error('Contour ou mesures invalides.');next.wallPlanes=MIRLevelModel.wallsFor(next,inventory);}
+        if(window.MIRReconstructedRoofs)for(const roof of next.reconstructedRoofs||[]){if(MIRReconstructedRoofs.issues(roof).length||roof.levelId!==levelId||roof.buildingId!==buildingId||[roof,...(roof.extensions||[])].flatMap(r=>r.sources).some(s=>!inventory.views.some(v=>v.id===s.sourceViewId&&v.buildingId===buildingId&&v.kind==='elevation')))throw new Error('Toiture ou sources invalides.');}if(window.MIRLevelModel){for(const plane of next.observedPlanes||[])if(plane.status==='confirmed'&&MIRLevelModel.observedPlaneIssues(plane,inventory,next).length)throw new Error('Murs observés ou mesures invalides.');for(const contour of next.contours||[])if(contour.status==='confirmed'&&MIRLevelModel.validateDraft(contour,inventory,next,{confirm:true}).length)throw new Error('Contour ou mesures invalides.');next.wallPlanes=MIRLevelModel.wallsFor(next,inventory);}
         inventory.geometryVersion=1;inventory.levelStudio||={};inventory.levelStudio[buildingId]={activeLevelId:levelId};
         entry.updatedAt=new Date().toISOString();store.put(entry);saved=entry;
       }catch(e){problem=e;tx.abort();}};

@@ -104,7 +104,7 @@
     if(view){next.reference.pdfAnchors=next.reference.anchors.map(p=>pdfPoint(view,p));for(const p of next.points)p.pdfPoint=pdfPoint(view,p.xy);}
     return next;
   }
-  function wallsFor(level,inventory){
+  function contourWallsFor(level,inventory){
     const c=level.contours?.find(c=>c.status==='confirmed');if(!c||validateDraft(c,inventory,level,{confirm:true}).length)return [];
     const p=modelPoints(c),orientation=Math.sign(signedArea(p)),z=c.base.value,h=c.height.value;
     return p.map((a,i)=>{const b=p[(i+1)%p.length],length=distance(a,b),id=wallId(c.contourId,c.points[i].id,c.points[(i+1)%p.length].id);
@@ -115,6 +115,20 @@
         finish:clone(level.wallFinishes?.[id]||null),status:'confirmed-working-geometry',occlusionIndependent:true};
     });
   }
+  function observedPlaneIssues(plane,inventory,level,{confirm=true}={}){
+    const errors=[],view=inventory.views.find(v=>v.id===plane.sourceViewId),registration=plane.registration,linked=(registration?.sourceViewIds||[]).map(id=>inventory.views.find(v=>v.id===id));
+    if(!plane.id||!plane.from?.every(finite)||plane.from.length!==2||!plane.to?.every(finite)||plane.to.length!==2||distance(plane.from,plane.to)<.01||!positive(plane.height)||!finite(plane.base)||!plane.normal?.every(finite)||plane.normal.length!==3||Math.abs(Math.hypot(...plane.normal)-1)>.001)errors.push('PLANE_GEOMETRY');
+    if(!view||view.kind!=='elevation'||view.buildingId!==level.buildingId||plane.sourceBox?.length!==4||!plane.sourceBox.every(finite)||!positive(plane.sourceBox[2])||!positive(plane.sourceBox[3]))errors.push('SOURCE_BUILDING');
+    if(registration?.kind!=='multi-view-elevation-registration'||linked.length<2||linked.some(v=>!v||v.buildingId!==level.buildingId||v.kind!=='elevation')||!linked.some(v=>['front','back'].includes(v?.direction))||!linked.some(v=>['left','right'].includes(v?.direction))||confirm&&registration.status!=='confirmed')errors.push('ALIGNMENT_UNKNOWN');
+    for(const [key,value]of [['width',plane.from&&plane.to?distance(plane.from,plane.to):null],['height',plane.height]]){const m=plane.measurements?.[key];if(!m||!positive(m.value)||Math.abs(m.value-value)>.01||!['written','estimated-calibrated','user-measurement'].includes(m.kind)||m.sourceViewId!==plane.sourceViewId||m.anchors?.length!==2||!m.anchors.every(p=>p.length===2&&p.every(finite))||!positive(m.scaleUsed)||Math.abs(distance(...m.anchors)*m.scaleUsed-m.value)>.01||confirm&&m.status!=='confirmed')errors.push('PLANE_MEASUREMENTS');}
+    if(!plane.id?.startsWith('wall:'+level.id+':')||(level.observedPlanes||[]).filter(p=>p.id===plane.id).length>1)errors.push('PLANE_ID');
+    if(plane.from?.length===2&&plane.to?.length===2&&plane.normal?.length===3&&(Math.abs((plane.to[0]-plane.from[0])*plane.normal[0]+(plane.to[1]-plane.from[1])*plane.normal[1])>.001||Math.abs(plane.normal[2])>.001))errors.push('PLANE_GEOMETRY');
+    if(plane.sourceBox?.length===4&&plane.measurements?.width&&plane.measurements?.height&&(Math.abs(plane.sourceBox[2]*plane.measurements.width.scaleUsed-distance(plane.from,plane.to))>.01||Math.abs(plane.sourceBox[3]*plane.measurements.height.scaleUsed-plane.height)>.01))errors.push('PLANE_MEASUREMENTS');
+    if(confirm&&plane.status!=='confirmed')errors.push('PLANE_UNCONFIRMED');
+    return [...new Set(errors)];
+  }
+  function observedWallsFor(level,inventory){return (level.observedPlanes||[]).filter(p=>!observedPlaneIssues(p,inventory,level).length).map(p=>({id:p.id,wallId:p.id,levelId:level.id,buildingId:level.buildingId,sourceViewId:p.sourceViewId,from:clone(p.from),to:clone(p.to),length:distance(p.from,p.to),height:p.height,base:p.base,normal:clone(p.normal),pointIds:[p.id+':start',p.id+':end'],poly:[[...p.from,p.base],[...p.to,p.base],[...p.to,p.base+p.height],[...p.from,p.base+p.height]],dimension:clone(p.measurements.width),heightEvidence:clone(p.measurements.height),finish:clone(level.wallFinishes?.[p.id]||null),status:'confirmed-observed-plane',footprintConfirmed:false,occlusionIndependent:true}));}
+  function wallsFor(level,inventory){return [...contourWallsFor(level,inventory),...observedWallsFor(level,inventory)];}
   function commitContour(inventory,levelId,draft){
     const next=clone(inventory),level=next.levels.find(l=>l.id===levelId);if(!level)throw Error('LEVEL_UNKNOWN');
     const confirmed=confirmDraft(draft,next,level),old=level.contours||[];
@@ -138,10 +152,10 @@
       const xs=[...new Set(ops.flatMap(o=>[o.offset,o.offset+o.width]))].sort((a,b)=>a-b);let deduction=0;
       if(valid)for(let i=1;i<xs.length;i++){const spans=ops.filter(o=>o.offset<xs[i]&&o.offset+o.width>xs[i-1]).map(o=>[o.sill,o.sill+o.height]).sort((a,b)=>a[0]-b[0]);let top=-Infinity,covered=0;for(const [a,b]of spans){covered+=Math.max(0,b-Math.max(a,top));top=Math.max(top,b);}deduction+=(xs[i]-xs[i-1])*covered;}
       const openingsReviewed=levels.find(l=>l.id===w.levelId)?.openingsReviewed===true;
-      return {wallId:w.id,levelId:w.levelId,grossM2:w.length*w.height,openingM2:valid?deduction:null,netM2:valid&&openingsReviewed?w.length*w.height-deduction:null,knownNetM2:valid?w.length*w.height-deduction:null,partial:!valid||!openingsReviewed,finish:w.finish};
+      return {wallId:w.id,levelId:w.levelId,grossM2:w.length*w.height,openingM2:valid?deduction:null,netM2:valid&&openingsReviewed?w.length*w.height-deduction:null,knownNetM2:valid?w.length*w.height-deduction:null,partial:!valid||!openingsReviewed||w.footprintConfirmed===false,finish:w.finish};
     });
     return {rows,issues,grossM2:rows.reduce((s,r)=>s+r.grossM2,0),knownNetM2:valid?rows.reduce((s,r)=>s+r.knownNetM2,0):null,
-      partial:!levels.length||levels.some(l=>!wallsFor(l,inventory).length)||rows.some(r=>r.partial)||openings.some(o=>o.status!=='confirmed'),
+      partial:!levels.length||levels.some(l=>!wallsFor(l,inventory).length||l.reconstruction?.proposal?.complete===false)||rows.some(r=>r.partial)||openings.some(o=>o.status!=='confirmed'),
       scope:'contour-walls-only; never added to legacy elevation quantities',areaUnit:'m2',purchaseQuantities:null};
   }
   function scene(inventory,buildingId){
@@ -171,5 +185,5 @@
     if(p.length>80||p.length<4)return null;
     return {points:p.map(([x,y])=>[rx+x*step,ry+y*step]),status:'proposed',method:'user-region-monochrome-enclosed-runs',exteriorUnverified:true,colourMasksUsed:false};
   }
-  return Object.freeze({version:1,clone,distance,signedArea,validatePolygon,established,referenceAssessment,estimateSegment,dimensionCandidates,pdfPoint,scale,modelPoints,wallId,draftFor,validateDraft,confirmDraft,commitContour,wallsFor,openingIssues,quantities,scene,proposeRaster});
+  return Object.freeze({version:1,clone,distance,signedArea,validatePolygon,established,referenceAssessment,estimateSegment,dimensionCandidates,pdfPoint,scale,modelPoints,wallId,draftFor,validateDraft,confirmDraft,commitContour,wallsFor,observedPlaneIssues,observedWallsFor,openingIssues,quantities,scene,proposeRaster});
 });

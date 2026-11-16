@@ -131,7 +131,7 @@
   function dimensionsFrom(options) {
     if(options.levelScene){
       const walls=options.levelScene.walls;
-      if(!Array.isArray(walls)||!walls.length||walls.some(w=>w.poly?.length!==4||w.poly.some(p=>p.length!==3||!p.every(Number.isFinite))))throw new RangeError('Confirmez le contour et la hauteur du niveau.');
+      if(!Array.isArray(walls)||!walls.length||walls.some(w=>!Array.isArray(w.poly)||w.poly.length<3||w.poly.some(p=>p.length!==3||!p.every(Number.isFinite))))throw new RangeError('Confirmez le contour et la hauteur du niveau.');
       const points=walls.flatMap(w=>w.poly),range=axis=>Math.max(...points.map(p=>p[axis]))-Math.min(...points.map(p=>p[axis]));
       const width=range(0),depth=range(1),wallHeight=range(2);
       if(!(width>0&&depth>0&&wallHeight>0))throw new RangeError('Contour ou hauteur invalide.');
@@ -409,7 +409,7 @@
 
   function build(d, options) {
     if(options.levelScene){
-      const scene=options.levelScene,points=scene.walls.flatMap(w=>w.poly),cx=(Math.min(...points.map(p=>p[0]))+Math.max(...points.map(p=>p[0])))/2,cy=(Math.min(...points.map(p=>p[1]))+Math.max(...points.map(p=>p[1])))/2;
+      const scene=options.levelScene,points=[...scene.walls.flatMap(w=>w.poly),...(global.MIRReconstructedRoofs?(scene.roofs||[]).flatMap(r=>global.MIRReconstructedRoofs.faces(r).flatMap(f=>f.poly)):[])],cx=(Math.min(...points.map(p=>p[0]))+Math.max(...points.map(p=>p[0])))/2,cy=(Math.min(...points.map(p=>p[1]))+Math.max(...points.map(p=>p[1])))/2;
       const faces=scene.walls.map(w=>({id:w.id,wallId:w.id,levelId:w.levelId,buildingId:w.buildingId,type:'wall',role:'level-exterior-wall',
         poly:w.poly.map(([x,y,z])=>[x-cx,y-cy,z]),normal:w.normal.slice(),base:[w.from[0]-cx,w.from[1]-cy,w.base],
         u:[(w.to[0]-w.from[0])/w.length,(w.to[1]-w.from[1])/w.length,0],width:w.length,fillColor:cleanColor(w.finish?.color,'#d7d8d0'),
@@ -418,15 +418,12 @@
         const at=(u,z)=>[wall.base[0]+wall.u[0]*u+wall.normal[0]*.006,wall.base[1]+wall.u[1]*u+wall.normal[1]*.006,z],z=wall.base[2]+opening.sill;
         faces.push({id:opening.id,openingId:opening.id,parentSurfaceId:wall.id,wallId:wall.id,levelId:wall.levelId,type:'opening',role:'wall-opening',normal:wall.normal.slice(),poly:[at(opening.offset,z),at(opening.offset+opening.width,z),at(opening.offset+opening.width,z+opening.height),at(opening.offset,z+opening.height)],fillColor:cleanColor(opening.appearance?.frameColor,'#596b62'),selected:options.selectedOpeningIds?.includes(opening.id)});
       }
-      for(const corner of scene.corners||[]){if(!corner.finish.enabled&&!corner.finish.materialId&&!corner.finish.color)continue;const width=Number(corner.finish.width)>0?corner.finish.width:.08;
-        corner.wallIds.forEach((wallId,i)=>{const wall=scene.walls.find(w=>w.id===wallId),end=i===0?wall.from:wall.to,delta=[end[0]-corner.point[0],end[1]-corner.point[1]],length=Math.hypot(...delta),p=[corner.point[0]-cx+corner.normals[i][0]*.008,corner.point[1]-cy+corner.normals[i][1]*.008],q=[p[0]+delta[0]/length*Math.min(width,length),p[1]+delta[1]/length*Math.min(width,length)];
-          faces.push({id:corner.id+':'+i,cornerId:corner.id,parentSurfaceId:wall.id,type:'corner',role:'level-corner-finish',normal:corner.normals[i].slice(),poly:[[...p,corner.base],[...q,corner.base],[...q,corner.base+corner.height],[...p,corner.base+corner.height]],fillColor:cleanColor(corner.finish.color,'#8d9690'),selected:options.selectedCornerIds?.includes(corner.id)});
-        });
-      }
+      if(global.MIRStudioExterior)for(const corner of scene.corners||[])for(const f of global.MIRStudioExterior.cornerFaces(corner,scene.walls,[cx,cy]))faces.push({...f,fillColor:cleanColor(f.fillColor,'#8d9690'),selected:options.selectedCornerIds?.includes(corner.id)});
       for(const s of scene.soffits||[])faces.push({id:s.id,levelId:s.levelId,type:'soffit',role:'measured-soffit-section',poly:s.polygon.map(([x,y])=>[x-cx,y-cy,s.height]),normal:[0,0,-1],fillColor:cleanColor(s.color,'#d8dbd1')});
+      if(global.MIRReconstructedRoofs)for(const roof of scene.roofs||[])for(const f of global.MIRReconstructedRoofs.faces(roof,[cx,cy]))faces.push({...f,selected:options.selectedElementIds?.includes(roof.id)});
       if(global.MIRStudioExterior)for(const e of scene.elements||[])for(const f of global.MIRStudioExterior.elementFaces(e,[cx,cy]))faces.push({...f,selected:options.selectedElementIds?.includes(e.id)});
       return {faces,a:d.width/2,b:d.depth/2,e:0,top:Math.max(...points.map(p=>p[2])),ground:Math.min(...points.map(p=>p[2])),foundationDrop:0,dimensions:d,roofStyle:'unknown',
-        recess:{enabled:false,depth:0,height:0},footprint:{type:'level-contours',confirmed:true,levelIds:scene.levels.map(l=>l.id)},porch:{enabled:false},structures:[],
+        recess:{enabled:false,depth:0,height:0},footprint:{type:scene.walls.some(w=>w.footprintConfirmed===false)?'observed-level-walls':'level-contours',confirmed:scene.walls.every(w=>w.footprintConfirmed!==false),levelIds:scene.levels.map(l=>l.id)},porch:{enabled:false},structures:[],
         levelScene:scene,sourcePlan:'confirmed contours and measured level heights; no inferred roof'};
     }
     const faces = [], a = d.width / 2, b = d.depth / 2, h = d.wallHeight, rise = d.roofRise;
@@ -807,7 +804,7 @@
       ...info,toleranceRelative:TEXTURE_WIDTH_TOLERANCE
     }));
     const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,'roof-detail':4,column:4,beam:4,concrete:4,corner:4,balcony:4,opening:4};
-    const visible = mesh.faces.filter(f=>dot(f.normal,camera)>.0001).map(f=>({...f,depth:f.poly.reduce((sum,p)=>sum+dot(p,camera),0)/f.poly.length}));
+    let visible = mesh.faces.filter(f=>dot(f.normal,camera)>.0001).map(f=>({...f,depth:f.poly.reduce((sum,p)=>sum+dot(p,camera),0)/f.poly.length}));
     const visibleById=new Map(visible.map(face=>[face.id,face]));
     for(const face of visible){
       const parent=visibleById.get(face.parentSurfaceId);
@@ -816,6 +813,7 @@
       if(parent)face.depth=Math.max(face.depth,parent.depth+.00001);
     }
     visible.sort((a,b)=>a.depth-b.depth || faceOrder[a.type]-faceOrder[b.type]);
+    if(options.levelScene&&global.MIRSceneOrder)visible=global.MIRSceneOrder.order(visible,{project,depth:p=>dot(p,camera)});
 
     function paintWall(face) {
       trace(face.poly);ctx.save();ctx.clip();ctx.fillStyle=face.fillColor||'#d7d8d0';ctx.fill();
@@ -845,7 +843,7 @@
 
     function paintRoof(face) {
       const light = Math.max(0, dot(face.normal,[-.28,-.40,.82]));
-      trace(face.poly);ctx.save();ctx.clip();ctx.fillStyle=roofColor;ctx.fill();
+      trace(face.poly);ctx.save();ctx.clip();ctx.fillStyle=face.fillColor||roofColor;ctx.fill();
       ctx.fillStyle=`rgba(13,21,18,${Math.max(.025,.20-light*.17)})`;ctx.fill();
       // Exact exposure in the surface plane, never a fixed change of altitude.
       for(const row of roofCourses(face.poly,options.roofExposureIn).segments)
@@ -881,9 +879,10 @@
       if(face.type==='wall')paintWall(face);
       else if(face.type==='roof')paintRoof(face);
       else if(face.type==='soffit')paintSoffit(face);
+      else if(face.type==='fascia'&&options.levelScene)paintSolid(face);
       else if(face.type==='opening'){paintSolid(face);const [a,b,c,d]=face.poly,inset=.10;patch([mix(mix(a,b,inset),mix(d,c,inset),inset),mix(mix(b,a,inset),mix(c,d,inset),inset),mix(mix(c,d,inset),mix(b,a,inset),inset),mix(mix(d,c,inset),mix(a,b,inset),inset)],'#9eb9b5');}else if(['column','beam','divider','balcony','concrete','corner','roof-detail'].includes(face.type))paintSolid(face);
       else patch(face.poly,fascia);
-      trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';ctx.stroke();
+      trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';if(!face.suppressOutline)ctx.stroke();
       if(face.selected||(options.previewSelection||[]).some(o=>o.kind==='structure'&&o.id===face.structureId||o.kind==='corner'&&o.id===face.cornerIndex)){trace(face.poly);ctx.strokeStyle='#348511';ctx.lineWidth=3;ctx.stroke();}
     }
     state.size = [W,H,dpr];

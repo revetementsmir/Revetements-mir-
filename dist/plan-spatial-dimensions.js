@@ -308,5 +308,5 @@
     return entries;
   }
 
-  return Object.freeze({ evidence, readAnchors });
+  return Object.freeze({ evidence, readAnchors, spatialSpan, guide, horizontalRun, hasTick });
 });

@@ -2,6 +2,8 @@
 
 Travail dans la branche `codex/mir-studio-s1-import` et la [PR44](https://github.com/revetementsmir/Revetements-mir-/pull/44), sans fusion ni publication. Le [bilan S1](mir-studio-s1-import.md) à `36606f45507f2943a6e3f915d9e14221cc3156c7` reste inchangé. Base relue : `e9bd39bc5dd4c40663c56bfc21759c543ab4e8d9`. Les anciennes PR2/8/9/11 ne sont pas reprises.
 
+Le complément de conversion et les corrections de toiture sont suivis dans [leur bilan distinct](mir-studio-reconstruction.md). Les recettes ci-dessous décrivent la livraison S2 antérieure; elles ne certifient pas les nouveaux parcours de conversion.
+
 ## Comportement et contrat
 
 L'inventaire S1 reste la source des bâtiments, niveaux, vues, calibrations et repères. S2 lui ajoute `geometryVersion: 1`, des contours versionnés, brouillons, historique et révisions de niveau. La simple ouverture d'un ancien projet ne crée ni contour ni RDC. Le rendu historique et ses réglages restent accessibles.
@@ -66,13 +68,13 @@ La colonne S1 est le résultat historique à 36606f4. Le replay S2 a réellement
 |---|---:|---:|---|---|
 | Jumelé Sentier FINAL | 5 | 5 | Réussi | Recette S2 huit murs réussie; pas de plan d'étage. Échelles incertaines des autres vues non validées. |
 | 351 | 5 | 5 | Réussi | Recette S2 dix murs réussie; parties basses garage à confirmer. Patio futur en béton p2; aucune toiture arrière établie. |
-| 313 | 5 | 5 | Réussi | Étage seul, aucun RDC confirmé. P2 insuffisante pour confirmer un patio couvert. Contour S2 non recetté sur cet original. |
-| Samuel Forest | 5 | 5 | Réussi | Étage seul; pas de RDC inventé. Contour S2 non recetté sur cet original. |
+| 313 | 5 | 5 | Réussi | Étage seul, aucun RDC confirmé. P2 insuffisante pour confirmer un patio couvert. Recette ultérieure de contour proposé et toiture : voir le complément de conversion. Bâtiment complet non validé. |
+| Samuel Forest | 5 | 5 | Réussi | Étage seul; pas de RDC inventé. Recette ultérieure de contour proposé et toiture : voir le complément de conversion. Bâtiment complet non validé. |
 | Des Tournesols | 5 | 5 | Réussi | Porche avant couvert visible p3, source inspectée. Légende masquant une partie du dessin, géométrie non inventée. Assemblage complet non recetté. |
 | Champs fleuris no 5 | 6 | 10 | Réussi | Maison et cabanon distincts, page cabanon tournée avec cinq vues. Aucun mélange des mesures/niveaux/finitions. Contours complets non recettés. |
 | 12 logements | 17 | 11 | Réussi | Niveaux 0–3, fondation, toiture, élévations et coupe. Galeries/balcons couverts réellement visibles p10/p12/p13, sources inspectées. Contradictions de hauteur gardées; reconstruction de cet ensemble non recettée. |
 
-Le replay privé est conservé dans `s2-imports-v3`, avec copie immuable de 234 fichiers d’exécution et manifeste SHA-256 `s2-runtime-v3-manifest.json`. Les derniers écarts de code concernent uniquement l’affichage numérique de la couvrance et la mise à jour immédiate des longueurs/ajustements après changement d’échelle, les libellés et inconnues du PDF, la fermeture/régénération PDF.js et l’extension séparée de lecture employé. Les scripts d’import, OCR, classification, inventaire, repères, stockage et modèle géométrique testés sont identiques à ceux de la livraison. La CI vérifie séparément la tête complète poussée. Les journaux gardent des avertissements OCR (83 à 248 par dossier); ce ne sont pas des cotes validées ni des erreurs bloquantes du formulaire.
+Le replay privé est conservé dans `s2-imports-v3`, avec copie immuable de 234 fichiers d’exécution et manifeste SHA-256 `s2-runtime-v3-manifest.json`. Les derniers écarts de code concernent uniquement l’affichage numérique de la couvrance et la mise à jour immédiate des longueurs/ajustements après changement d’échelle, les libellés et inconnues du PDF, la fermeture/régénération PDF.js et l’extension séparée de lecture employé. Les scripts d’import, OCR, classification, inventaire, repères, stockage et modèle géométrique de ce replay correspondent à la livraison S2 historique à `318684803aa164f8df631869bcf4397caa1f0a63`; les nouvelles modifications de conversion sont recettées séparément. La CI vérifie séparément la tête complète poussée. Les journaux gardent des avertissements OCR (83 à 248 par dossier); ce ne sont pas des cotes validées ni des erreurs bloquantes du formulaire.
 
 ### Vérifications synthétiques et existantes
 
