@@ -43,7 +43,10 @@ jobs:
         with:
           node-version: 22
       - name: Syntax and existing contracts
+        env:
+          MIR_CLIENT_BASE_SHA: ${{ github.event.pull_request.base.sha || 'e9bd39bc5dd4c40663c56bfc21759c543ab4e8d9' }}
         run: |
+          git fetch origin "$MIR_CLIENT_BASE_SHA" --depth=1
           git diff --check
           for file in dist/plan-import.js dist/plan-sheet-detection.js dist/plan-scan-ocr.js dist/plan-view-inventory.js dist/plan-view-review.js dist/project-store.js dist/plan-app.js dist/takeoff-app.js dist/plan-level-model.js dist/plan-level-studio.js dist/studio*.js dist/mir-private-document-viewer.js; do node --check "$file"; done
           node tests/mir-studio-s1.cjs
@@ -51,7 +54,7 @@ jobs:
           node tests/mir-studio-preview.cjs
           node tests/mir-studio-cotation.cjs
           node tests/mir-studio-job-reader.cjs
-          MIR_CLIENT_BASE_SHA="${{ github.event.pull_request.base.sha }}" node tests/mir-studio-pr44-isolation.cjs
+          node tests/mir-studio-pr44-isolation.cjs
           node tests/mir-plan-sheet-detection.cjs
           node tests/mir-studio-grounds.cjs
           node tests/mir-studio-interactions.cjs
