@@ -1,0 +1,60 @@
+name: MIR Studio S1 import inventory
+on:
+  pull_request:
+    paths:
+      - 'dist/plan*.js'
+      - 'dist/plan*.html'
+      - 'dist/plan-import.css'
+      - 'dist/project-store.js'
+      - 'dist/takeoff-app.js'
+      - 'dist/metres.html'
+      - 'dist/mir-client-en-ca.js'
+      - 'dist/mir-client-i18n.js'
+      - 'docs/verification/mir-studio-s1-import.md'
+      - 'tests/mir-studio-s1*.cjs'
+      - 'tests/helpers/mir-studio-s1-fixture.cjs'
+      - '.github/workflows/mir-studio-s1-pr.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax and existing contracts
+        run: |
+          git diff --check
+          for file in dist/plan-import.js dist/plan-sheet-detection.js dist/plan-scan-ocr.js dist/plan-view-inventory.js dist/plan-view-review.js dist/project-store.js dist/plan-app.js dist/takeoff-app.js; do node --check "$file"; done
+          node tests/mir-studio-s1.cjs
+          node tests/mir-plan-sheet-detection.cjs
+          node tests/mir-studio-grounds.cjs
+          node tests/mir-studio-interactions.cjs
+          node tests/mir-studio-wall-sections.cjs
+          node tests/mir-balcony.cjs
+          node tests/mir-structure-hints.cjs
+          node tests/mir-stair-vision.cjs
+          node tests/mir-client-i18n-static.cjs
+          node tests/mir-studio-public-stage.cjs
+      - name: Browser dependency
+        run: npm install --no-save playwright@1.58.2
+      - name: Raster import and legacy persistence (synthetic only, no backend)
+        run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-s1-browser.cjs
+      - name: Existing large PDF, rendering and interaction regressions
+        run: |
+          node tests/mir-plan-pdf-browser.cjs
+          node tests/mir-studio-wall-sections-browser.cjs
+          node tests/mir-studio-terrain-browser.cjs
+      - name: Synthetic proofs only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-studio-s1-synthetic-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/studio-s1/
+          if-no-files-found: warn

@@ -3,6 +3,33 @@
 (function(root){
 'use strict';
 const entries = [
+['Ce plan montre l’étage. Aucun RDC n’est confirmé.','This plan shows the upper floor. No ground floor is confirmed.'],['PDF d’origine','Original PDF'],
+["VOTRE MAISON, VOTRE PROJET","YOUR HOME, YOUR PROJECT"],
+["Importez votre plan.","Import your plan."],
+["Le Studio repère le solage, les étages et les élévations pour préparer votre maquette.","The Studio identifies foundations, floors and elevations to prepare your preview."],
+["Votre PDF","Your PDF"],
+["Analyse automatique","Automatic analysis"],
+["Votre studio","Your Studio"],
+["Choisir mon PDF","Choose my PDF"],
+["Fichier de 150 Mo maximum","File up to 150 MB"],
+["Le PDF et son analyse restent sur cet appareil.","The PDF and its analysis stay on this device."],
+["Analyse terminée. Votre dossier est prêt.","Analysis complete. Your project is ready."],
+["Analyse terminée. Aucune vue utilisable repérée.","Analysis complete. No usable view found."],
+["Ouvrir mon projet →","Open my project →"],
+["Vues repérées","Detected views"],
+["Choisissez le PDF de votre projet.","Choose your project PDF."],
+["Le PDF n’a pas été importé.","The PDF was not imported."],
+["Des cotes se contredisent.","Some dimensions conflict."],
+["Certaines dimensions sont estimées à partir du dessin.","Some dimensions are estimated from the drawing."],
+["Certaines feuilles n’ont pas pu être lues.","Some sheets could not be read."],
+["Contenu conservé sur cet appareil.","Content kept on this device."],
+["Enregistrement du dossier…","Saving your project…"],
+["Aperçu indicatif : contour et murs cachés à confirmer.","Indicative preview: outline and hidden walls need confirmation."],
+
+['Aperçu indicatif · contour et murs cachés à confirmer','Indicative preview · outline and hidden walls need confirmation'],
+['Cotes principales repérées. La maquette 3D s’ouvrira automatiquement. Aperçu indicatif : contour et murs cachés à confirmer.','Main dimensions found. The 3D preview will open automatically. Indicative preview: outline and hidden walls need confirmation.'],
+['Bâtiment et vues','Building and views'],['Surfaces proposées','Proposed surfaces'],
+
 ['Accueil','Home'],['Boutique','Shop'],['Revêtements','Siding'],['Réalisations','Projects'],
 ['Pliage','Custom bending'],['Pliage sur mesure','Custom metal bending'],['Studio','Studio'],
 ['Studio 3D','3D Studio'],['Nous joindre','Contact us'],['Contact','Contact'],['Compte','Account'],

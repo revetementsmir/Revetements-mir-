@@ -48,3 +48,16 @@
   .mir-pdf-upload p{max-width:none;margin-top:8px}
   .mir-pdf-bottom>button{width:100%;margin-top:12px}
 }
+
+/* The source inventory remains usable on phone, tablet and desktop. */
+.mir-view-review { margin:16px 0; min-width:0; }
+.mir-view-review label { display:grid; gap:6px; margin:12px 0; }
+.mir-view-review select { width:100%; min-height:44px; max-width:100%; font:inherit; padding:8px; }
+.mir-view-review button,.mir-view-review summary { min-height:44px; padding:10px; cursor:pointer; }
+.mir-view-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:16px; }
+.mir-view-list fieldset { min-width:0; border:1px solid #aaa; padding:12px; }
+.mir-view-list legend { overflow-wrap:anywhere; }
+.mir-view-list img { width:100%; max-height:240px; object-fit:contain; background:white; }
+.mir-pdf-bottom { flex-wrap:wrap; }
+.mir-pdf-bottom > div { min-width:0; flex:1 1 300px; }
+#building-views-dialog { max-width:min(960px,96vw); max-height:90dvh; overflow:auto; }

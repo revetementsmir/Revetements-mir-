@@ -39,6 +39,13 @@
     return fixed===cleaned?value:value.replace(cleaned,fixed);
   }
   function dynamic(value){
+    let importMatch=value.match(/^À compléter dans Volume & retours : (.+)\.$/);
+    if(importMatch){const fields={'largeur':'width','profondeur':'depth','hauteur des murs':'wall height','montée du toit':'roof rise','forme de toiture':'roof shape'};return 'To complete in Volume & returns: '+importMatch[1].split(', ').map(x=>fields[x]||x).join(', ')+'.';}
+    importMatch=value.match(/^Analyse des feuilles · (\d+) sur (\d+)…$/);
+    if(importMatch)return 'Reading sheets · '+importMatch[1]+' of '+importMatch[2]+'…';
+    importMatch=value.match(/^Préparation des vues · feuille (\d+) sur (\d+)…$/);
+    if(importMatch)return 'Preparing views · sheet '+importMatch[1]+' of '+importMatch[2]+'…';
+
     let m=value.match(/^(\d+) références?$/i);
     if(m)return m[1]+' '+(m[1]==='1'?'reference':'references');
     m=value.match(/^(\d+) pièce(?:s)? · ([\d\s,.]+) pi linéaires?$/);

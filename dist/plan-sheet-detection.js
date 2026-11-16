@@ -45,7 +45,9 @@
 
   function classify(text) {
     const title = titleText(text);
-    if (/\b(?:existant[e]?s?|demolition|existing|detail|details|typique|typical|legende|legend|voir|see)\b/.test(title)) return null;
+    if (/\b(?:existant[e]?s?|demolition|existing|detail|details|typique|typical|legende|legend|voir|see|notes?|index|sommaire|contents|cartouche|schedule|tableau|table)\b/.test(title)) return null;
+    if (/^vue en plan\s*$/.test(title)) return {kind:'floor'};
+    if (/^(?:plan\s+(?:(?:d'amenagement|d'amenagement du|d'amenagement de l')\s*[-–—:]?\s*)?(?:r\s*[-.]?\s*d\s*[-.]?\s*c\.?|rdc|etage)(?:\s+\d+)?|(?:upper|main)\s+(?:storey|story)\s+plan)\s*(?:(?:[-–—:]\s*)?(?:maison|cabanon|house|shed|echelle|scale)\b.*)?$/.test(title)) return { kind: 'floor' };
     const frontTitle = title.match(/^(?:elevations?|facades?|vues?\s+(?:de\s+)?(?:face\s+)?|cote)\s+(?:(?:exterieur[e]?s?|facade|laterale|du|de la)\s+)*(.*)$/);
     const reverseTitle = title.match(/^(front|rear|back|left(?: side)?|right(?: side)?|nord|sud|est|ouest|north|south|east|west)\s*(?:[-–:]\s*)?elevation\b/);
     const direction = (frontTitle?.[1] || reverseTitle?.[1])?.replace(/^[([]\s*/, '').replace(/[)\]]\s*$/, '');
@@ -62,6 +64,7 @@
   }
 
   function viewsForPage(rows, width = 0, height = 0) {
+    if(rows.some(row=>/^(?:table des matieres|drawing index|sheet index|index des (?:plans|dessins)|liste des (?:plans|dessins))\b/.test(titleText(row.text))))return [];
     const result = [];
     for (const row of rows) {
       if (row.confidence < 55 || row.text.length > 105) continue;
@@ -70,14 +73,22 @@
       const title = titleText(row.text).split(/\s+(?:echelle|scale)\b/)[0].trim();
       const floor = title.match(/\b(?:niveau|etage)\s+(\d+)\b/)?.[1];
       const key = view.face || (view.kind === 'floor' && floor ? 'floor-' + floor : title);
-      const previous = result.findIndex(r => r.key === key);
+      // OCR passes may repeat the same title at the same location. A direction
+      // alone is never a unique view: two buildings can both have a front.
+      const previous = result.findIndex(r => {
+        if(r.kind!==view.kind||r.face!==view.face)return false;
+        const shared=Math.max(0,Math.min(r.box[2],row.box[2])-Math.max(r.box[0],row.box[0]))*Math.max(0,Math.min(r.box[3],row.box[3])-Math.max(r.box[1],row.box[1]));
+        const area=box=>(box[2]-box[0])*(box[3]-box[1]);
+        return shared>Math.min(area(r.box),area(row.box))*.65;
+      });
       const outsideDrawing = width > 0 && center(row.box, 0) > width * .84;
       const record = { ...view, key, name: row.text, title, box: row.box, source: row.source, outsideDrawing };
       if (previous < 0) result.push(record);
-      else if (result[previous].outsideDrawing && !outsideDrawing) result[previous] = record;
+      else if (result[previous].outsideDrawing && !outsideDrawing || row.text.length<result[previous].name.length) result[previous] = record;
     }
     const hasDrawingTitle = result.some(view => view.face || view.kind === 'section');
     return result.filter(view => {
+      if (view.outsideDrawing && result.some(other => other !== view && other.key === view.key && !other.outsideDrawing)) return false;
       if (hasDrawingTitle && view.source === 'ocr' && /^(?:solage|fondations?)$/.test(view.title)) return false;
       if (!width || !height) return true;
       // A list of short, left-aligned titles close together is a drawing index.
@@ -89,6 +100,20 @@
 
   function divideViews(views, width, height) {
     if (views.length <= 1) return views.map(view => ({ ...view, crop: [0, 0, width, height] }));
+    // A tall central floor drawing can span the two rows of elevations beside
+    // it. Cutting the whole page into horizontal bands would sever that plan.
+    const columns=[];
+    for(const view of [...views].sort((a,b)=>center(a.box,0)-center(b.box,0))){
+      const x=center(view.box,0),column=columns.at(-1);
+      if(!column||Math.abs(column.x-x)>width*.14)columns.push({x,views:[view]});else{column.views.push(view);column.x=column.views.reduce((sum,v)=>sum+center(v.box,0),0)/column.views.length;}
+    }
+    if(columns.length>=3&&columns.some(c=>c.views.length===1&&c.views[0].kind==='floor')&&columns.filter(c=>c.views.length>1).length>=2){
+      const cuts=[0,...columns.slice(1).map((c,i)=>Math.round((columns[i].x+c.x)/2)),width];
+      return columns.flatMap((column,i)=>{
+        const local=column.views.map(v=>({...v,box:[v.box[0]-cuts[i],v.box[1],v.box[2]-cuts[i],v.box[3]]}));
+        return divideViews(local,cuts[i+1]-cuts[i],height).map(v=>({...v,box:[v.box[0]+cuts[i],v.box[1],v.box[2]+cuts[i],v.box[3]],crop:[v.crop[0]+cuts[i],...v.crop.slice(1)],split:true}));
+      });
+    }
     const rows = [];
     for (const view of [...views].sort((a, b) => center(a.box, 1) - center(b.box, 1))) {
       const y = center(view.box, 1), row = rows.at(-1);

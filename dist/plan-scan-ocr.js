@@ -125,12 +125,12 @@
 
   async function scan(page, base, { worker, mode = 'overview', regions, vertical = false, cancelled = () => false, hasTitles }) {
     const detail = mode === 'detail';
-    const scale = Math.min(3, (detail ? detailEdge : overviewEdge) / Math.max(base.width, base.height));
-    const viewport = page.getViewport({ scale });
-    const areas = (detail && regions?.length ? regions : [[0, 0, base.width, base.height]])
+    const scale = Math.min(3, (detail ? detailEdge : mode==='titles'?4450:overviewEdge) / Math.max(base.width, base.height));
+    const viewport = page.getViewport({ scale, rotation:base.rotation });
+    const areas = ((detail || mode==='titles') && regions?.length ? regions : [[0, 0, base.width, base.height]])
       .map(region => bounds(region, scale, viewport)).filter(([, , w, h]) => w >= 16 && h >= 16);
     const passes = [
-      { boxes: detail ? areas.flatMap(tiles) : areas, orientations: [''] },
+      { boxes: detail || mode==='titles' ? areas.flatMap(tiles) : areas, orientations: [''] },
       { boxes: detail && vertical ? areas.flatMap(sideStrips) : [], orientations: ['cw', 'ccw'] }
     ];
     const words = [], rows = [], verticalWords = [], texts = [];
@@ -151,7 +151,7 @@
       const { width, height } = base;
       const retryScale = Math.min(3, 4450 / Math.max(width, height));
       if (retryScale > scale) {
-        const retryView = page.getViewport({ scale: retryScale });
+        const retryView = page.getViewport({ scale: retryScale, rotation:base.rotation });
         // Small drawing labels are often below the drawing or in the lower
         // cartouche. Retry those bands before moving to the next page.
         const titleBands = [[.8 * width, .61 * height, .2 * width, .38 * height], [.1 * width, .55 * height, .7 * width, .44 * height]];

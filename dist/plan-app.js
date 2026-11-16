@@ -60,6 +60,32 @@
   }
 
   $('#studio-example').onclick=async()=>{await window.MIRProjectStore?.clearActive();location.reload();};
+  const viewButton=document.createElement('button');viewButton.type='button';viewButton.className='small-link';
+  viewButton.id='review-building-views';viewButton.textContent=window.MIRViewReview?.t('Bâtiment et vues')||'Bâtiment et vues';viewButton.hidden=true;
+  document.querySelector('.project-bar').append(viewButton);
+  viewButton.onclick=()=>{
+    const draft=window.MIRViewInventory.migrate(activeProject.planData,activeProject.source);
+    const box=document.createElement('dialog');box.className='studio-dialog';box.id='building-views-dialog';
+    const content=document.createElement('div'),apply=document.createElement('button'),cancel=document.createElement('button'),message=document.createElement('p');
+    apply.textContent=window.MIRClientLocale?.getLocale()==='en-CA'?'Open Studio':'Ouvrir le Studio';apply.className='primary';
+    cancel.textContent=window.MIRClientLocale?.getLocale()==='en-CA'?'Close':'Fermer';cancel.onclick=()=>{box.close();box.remove();};
+    box.append(content,message,apply,cancel);document.body.append(box);
+    MIRViewReview.mount(content,draft.viewInventory,()=>{apply.disabled=!draft.viewInventory.activeBuildingId;});
+    apply.disabled=!draft.viewInventory.activeBuildingId;
+    apply.onclick=async()=>{apply.disabled=true;try{
+      // Legacy records retain their complete existing render model and storage.
+      // New records already use per-building/per-view namespaces.
+      const planData=activeProject.planData.viewInventory?draft:{...draft,legacyRenderPreserved:true};
+      if(!activeProject.planData.viewInventory){
+        for(const view of draft.viewInventory.views){const f=activeProject.planData.faces.find(f=>f.key===view.direction);if(f)draft.viewInventory.rendererSelections[view.buildingId]={...draft.viewInventory.rendererSelections[view.buildingId],[view.direction]:view.id};}
+        const projected=MIRViewInventory.adapt(planData,MIRSheetDetection.volumeFrom);
+        const keys=MIRProjectStore.keys(activeProject.id,projected.rendererScopeKey);
+        for(const [oldKey,newKey] of [[STORAGE,keys.studio],[TAKEOFF_STORAGE,keys.takeoff]]){const raw=JSON.parse(localStorage.getItem(oldKey)||'null');if(raw&&!localStorage.getItem(newKey))localStorage.setItem(newKey,JSON.stringify(MIRViewInventory.encodeState(raw,projected)));}
+      }
+      await MIRProjectStore.saveActive({...activeProject,planData});location.reload();
+    }catch(e){message.textContent=e.message;apply.disabled=false;}};
+    box.addEventListener('close',()=>box.remove(),{once:true});box.showModal();
+  };
   $('#import-pdf').onclick=()=>window.MIRPlanImport?.open?window.MIRPlanImport.open({onImport:()=>location.reload()}):null;
   try {
     const responses = await Promise.all([fetch('plan-data.json'),fetch('catalogue-fd6866b49d21.json?v=maconnerie-1'),fetch('takeoff-data.json')]);
@@ -69,7 +95,9 @@
     for(const product of bending)if(!materials.some(m=>m.id===product.id))materials.push({...product,applications:['bending']});
     materials=materials.map(m=>({...m,documents:Array.isArray(m.documents)?m.documents:[]}));
     activeProject=await window.MIRProjectStore?.getActive();
-    if(activeProject?.planData){for(const link of document.querySelectorAll('.studio-source-links a[href^="assets/"]'))link.hidden=true;data=activeProject.planData;takeoffSeed=activeProject.takeoffSeed;STORAGE+=':'+activeProject.id;TAKEOFF_STORAGE+=':'+activeProject.id;}
+    if(activeProject?.planData){viewButton.hidden=false;
+      if(activeProject.sourceFile instanceof Blob){const sourceButton=document.createElement('button');sourceButton.type='button';sourceButton.className='small-link';sourceButton.textContent=window.MIRClientLocale?.getLocale()==='en-CA'?'Original PDF':'PDF d’origine';sourceButton.onclick=()=>{const url=URL.createObjectURL(activeProject.sourceFile);window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);};document.querySelector('.project-bar').append(sourceButton);}
+      for(const link of document.querySelectorAll('.studio-source-links a[href^="assets/"]'))link.hidden=true;data=activeProject.planData;takeoffSeed=activeProject.takeoffSeed;const keys=MIRProjectStore.keys(activeProject.id,data.rendererScopeKey);STORAGE=keys.studio;TAKEOFF_STORAGE=keys.takeoff;}
     if(!Array.isArray(data.faces)||!data.faces.length)throw Error('Aucune élévation dans le dossier');
     for(const f of data.faces){for(const k of ['zones','openings','roof','base','fascia','soffit','detected'])if(!Array.isArray(f[k]))f[k]=[];f.candidates||=0;f.textureBox||=f.bbox;}
     if(data.projectKind==='imported-pdf')for(const f of data.faces){
@@ -111,7 +139,7 @@
   const orientationNames={horizontal:'Horizontale',vertical:'Verticale'};
   const defaults = () => ({version:2,catalogueVersion:4,face:data.faces.find(f=>f.importedStatus==='assigned')?.key||'front',view:'3d',displayMode:'client',alignWindow:true,selected:{kind:'zone',id:'pignon_gauche'},selections:{},customZones:{front:[],right:[],back:[],left:[]},zoneOverrides:{},openingOverrides:{},addedOpenings:{front:[],right:[],back:[],left:[]},bands:{},openingTrims:{},openingStyles:{},panelLayouts:{},transitions:[],manualTransitionModes:{},panelStockRotation:true,volumeOverride:null,recessOverride:null,soffitId:'kaycan-sp600-vented',soffitColor:NEUTRAL,fasciaId:'kaycan-fascia-6-0480',fasciaColor:NEUTRAL,rotation:28});
   let state=defaults(),history=[],detection=false,neutral=false,drawMode=null,drag=null,toastTimer,selectedJoint=null,suppressClick=false;
-  try {const old=JSON.parse(localStorage.getItem(STORAGE));if(old?.version===2&&data.faces.some(f=>f.key===old.face))state={...state,...old};}catch(_){}
+  try {const raw=JSON.parse(localStorage.getItem(STORAGE));const old=raw&&window.MIRViewInventory?MIRViewInventory.decodeState(raw,data):raw;if(old?.version===2&&data.faces.some(f=>f.key===old.face))state={...state,...old};}catch(_){}
   for(const field of ['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','openingStyles','panelLayouts'])if(!state[field]||typeof state[field]!=='object'||Array.isArray(state[field]))state[field]=defaults()[field];
   for(const f of data.faces){if(!Array.isArray(state.customZones[f.key]))state.customZones[f.key]=[];if(!Array.isArray(state.addedOpenings[f.key]))state.addedOpenings[f.key]=[];}
   if(!Array.isArray(state.transitions))state.transitions=[];
@@ -174,7 +202,7 @@
   for(const f of data.faces)for(const z of allZones(f))state.selections[key(f.key,z.id)]=choice(f,z);
   function normalizeFinish(kind){const m=materialById.get(state[kind+'Id']),c=officialColor(m,{colorId:state[kind+'ColorId']});state[kind+'ColorId']=c.colorId;state[kind+'Color']=c.color;}
   normalizeFinish('soffit');normalizeFinish('fascia');
-  function readTakeoff(){try{const item=JSON.parse(localStorage.getItem(TAKEOFF_STORAGE));return item?.version===1?item:{};}catch(_){return {};}}
+  function readTakeoff(){try{const item=JSON.parse(localStorage.getItem(TAKEOFF_STORAGE));return item?.version===1?(window.MIRViewInventory?MIRViewInventory.decodeState(item,data):item):{};}catch(_){return {};}}
   function feetPerPixel(f){if(f.renderFeetPerPixel>0)return f.renderFeetPerPixel;const c=readTakeoff().calibrations?.[f.key]||takeoffSeed.calibrations?.[f.key];return E.calibrate(c?.anchors,c?.referenceFt);}
   function normalFace(f){return {...f,feetPerPixel:feetPerPixel(f),zones:allZones(f).map(z=>({...z,selection:choice(f,z)})),openings:allOpenings(f)};}
   function decoratedFace(f,projected=false){
@@ -261,7 +289,7 @@
   function toast(message) {clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').classList.add('show');toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),4200);}
   let studyRevision=0;
   function notifyStudy(){if(window.parent&&window.parent!==window)window.parent.postMessage({type:'mir:study-change',source:'mir-studio',version:2,revision:++studyRevision},window.location.origin);}
-  function save(){for(const field of ['bands','openingTrims'])for(const [id,config] of Object.entries(state[field]))state[field][id]={...config,...officialColor(materialById.get(config.materialId),config)};for(const f of data.faces)for(const z of allZones(f))if(choice(f,z).pattern==='panel')state.panelLayouts[key(f.key,z.id)]=panelLayoutFor(f,z);try{localStorage.setItem(STORAGE,JSON.stringify(state));notifyStudy();$('#saved-label').textContent='Choix enregistrés sur cet appareil';}catch(_){$('#saved-label').textContent='Mémoire locale indisponible · exportez vos choix';}}
+  function save(){for(const field of ['bands','openingTrims'])for(const [id,config] of Object.entries(state[field]))state[field][id]={...config,...officialColor(materialById.get(config.materialId),config)};for(const f of data.faces)for(const z of allZones(f))if(choice(f,z).pattern==='panel')state.panelLayouts[key(f.key,z.id)]=panelLayoutFor(f,z);try{localStorage.setItem(STORAGE,JSON.stringify(window.MIRViewInventory?MIRViewInventory.encodeState(state,data,JSON.parse(localStorage.getItem(STORAGE)||'{}')):state));notifyStudy();$('#saved-label').textContent='Choix enregistrés sur cet appareil';}catch(_){$('#saved-label').textContent='Mémoire locale indisponible · exportez vos choix';}}
   function checkpoint() {history.push(clone(state));if(history.length>30)history.shift();$('#undo').disabled=false;}
   function modify(fn) {checkpoint();fn();save();render();}
   function setChoice(patch){const z=currentZone();if(!z)return;modify(()=>{const old=choice(face(),z),changedProduct=patch.materialId&&patch.materialId!==old.materialId,raw={...old,...patch};if(changedProduct){delete raw.formatId;delete raw.exposureIn;delete raw.battenSpacingIn;delete state.manualTransitionModes[key(state.face,z.id)];}state.selections[key(state.face,z.id)]=normalChoice(raw);if(changedProduct||Object.hasOwn(patch,'formatId')||Object.hasOwn(patch,'orientation'))delete state.panelLayouts[key(state.face,z.id)];selectedJoint=null;});}
@@ -588,6 +616,7 @@
         else if(facadeVisuals.size)$('#stage-note').textContent='Détails des élévations projetés sur le volume';
         if(result.rendered&&data.projectKind==='imported-pdf'&&state.concreteSteps?.sourceCandidateId&&!result.errors?.length)
           $('#stage-note').textContent='Marches détectées par pixels et cotes du PDF · position et hauteur à confirmer';
+        if(data.projectKind==='imported-pdf'&&data.footprint?.type==='unknown'){$('#stage-note').textContent='Aperçu indicatif · contour et murs cachés à confirmer';result.previewStatus='indicative-contour-unknown';}
         window.MIR_RENDER_DIAGNOSTICS=result;
       } catch(error) {
         if(n!==rendering)return;
@@ -907,6 +936,23 @@
   $('#align-window').onchange=e=>{state.alignWindow=e.target.checked;save();};
   $('#mir-edit-accent').onclick=()=>{const g=$('#geometry-controls');g.open=true;g.scrollIntoView({behavior:'smooth',block:'nearest'});$('#geo-x').focus({preventScroll:true});};
   $('#mir-remove-accent').onclick=()=>{if(currentZone()?.custom&&state.selected.kind==='zone')$('#delete-region').click();};
+  const proposalsButton=document.createElement('button');proposalsButton.type='button';proposalsButton.id='review-color-proposals';
+  proposalsButton.textContent=window.MIRClientLocale?.getLocale()==='en-CA'?'Proposed surfaces':'Surfaces proposées';proposalsButton.hidden=!data.viewInventory;
+  $('#show-detection').after(proposalsButton);
+  proposalsButton.onclick=()=>{
+    const f=face(),proposals=f.colorProposals||[],en=window.MIRClientLocale?.getLocale()==='en-CA';
+    const box=document.createElement('dialog');box.className='studio-dialog';
+    const title=document.createElement('h2');title.textContent=en?'Check each surface on your plan':'Vérifiez chaque surface sur votre plan';box.append(title);
+    const note=document.createElement('p');note.textContent=en?'A colour can be a legend or a mask. Confirm only a visible wall surface.':'Une couleur peut être une légende ou un masque. Confirmez uniquement une surface de mur visible.';box.append(note);
+    if(!proposals.length){const empty=document.createElement('p');empty.textContent=en?'No proposed surfaces for this view.':'Aucune surface proposée pour cette vue.';box.append(empty);}
+    for(const [i,proposal]of proposals.entries()){
+      const section=document.createElement('div');section.innerHTML=`<svg viewBox="0 0 ${f.sourceWidth} ${f.sourceHeight}" style="width:100%;max-height:300px"><image href="${esc(f.sourceImage)}" width="${f.sourceWidth}" height="${f.sourceHeight}"/><polygon points="${pts(proposal.polygon)}" fill="#00880030" stroke="#008800" stroke-width="3"/></svg>`;
+      const confirm=document.createElement('button');confirm.textContent=en?'Confirm as wall surface':'Confirmer comme surface de mur';
+      const sourceId=f.viewId+':'+proposal.id;confirm.disabled=allZones(f).some(z=>z.sourceProposalId===sourceId);
+      confirm.onclick=()=>{modify(()=>{const id='confirmed-color-'+i;state.customZones[f.key].push({id,name:(en?'Confirmed surface ':'Surface confirmée ')+(i+1),polygon:clone(proposal.polygon),kind:'siding',custom:true,needsReview:false,sourceProposalId:sourceId,provenance:{method:'user-confirmed-color-proposal',viewId:f.viewId}});state.selections[key(f.key,id)]=normalChoice({},facadeMaterials[0]?.id);});confirm.disabled=true;};section.append(confirm);box.append(section);
+    }
+    const close=document.createElement('button');close.textContent=en?'Close':'Fermer';close.onclick=()=>box.close();box.append(close);document.body.append(box);box.addEventListener('close',()=>box.remove(),{once:true});box.showModal();
+  };
   $('#add-accent').onclick=addAccent;$('#draw-accent').onclick=()=>{if(state.selected.kind!=='zone')state.selected={kind:'zone',id:allZones(face())[0]?.id||null};state.view='2d';render();drawMode=drawMode?null:'accent';$('#mode-help').hidden=!drawMode;$('#mode-help').textContent='Tracez la nouvelle zone. L’option d’alignement cale ses deux côtés sur la fenêtre située dessous lorsqu’elle est identifiable. Les autres bords proches restent aimantés. Échap annule ; les dimensions restent modifiables.';};
   function zoneContains(point,z,zones){
     if(!pointInside(point,z.polygon))return false;const seen=new Set([z.id]);let parent=z.parent;
@@ -1103,7 +1149,7 @@
   const sharedFields=['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','openingStyles','panelLayouts','transitions','manualTransitionModes','panelStockRotation','soffitId','soffitColorId','soffitColor','fasciaId','fasciaColorId','fasciaColor','roofId','roofColorId','roofColor','roofStyle','gableCornices','porch','structures','concreteSteps','siteStyle','returnFinishes','volumeOverride','recessOverride'];
   function syncStudy(){
     if((window.MIRProjectStore?.activeId()||null)!==(activeProject?.id||null)){location.reload();return;}
-    let incoming;try{incoming=JSON.parse(localStorage.getItem(STORAGE));}catch(_){return;}if(incoming?.version!==2)return;
+    let incoming;try{incoming=JSON.parse(localStorage.getItem(STORAGE));if(incoming&&window.MIRViewInventory)incoming=MIRViewInventory.decodeState(incoming,data);}catch(_){return;}if(incoming?.version!==2)return;
     const next=Object.fromEntries(sharedFields.filter(k=>Object.prototype.hasOwnProperty.call(incoming,k)).map(k=>[k,incoming[k]]));
     const current=Object.fromEntries(Object.keys(next).map(k=>[k,state[k]]));if(JSON.stringify(next)===JSON.stringify(current))return;
     // Share edits, keep each window's camera, selected face and display mode.
@@ -1149,5 +1195,5 @@
   studioFeatures=window.MIRStudioFeatures?.setup({$,state:()=>state,data:()=>data,materials,roofControls:!adminContext,modify,save,render,renderDrawing,officialColor,colorsFor,openMaterial,toast,normalChoice,choice,allZones,face,currentZone,feetPerPixel,readTakeoff,takeoffSeed,sceneGeometryBase,patternDef,frontMasonryBand,frontFoundationHeight});
   $('#duplicate-zone').onclick=()=>{const z=currentZone();if(!z)return toast('Choisissez une zone à reproduire.');const b=bounds(z.polygon),dx=(b[2]-b[0])*.05,dy=(b[3]-b[1])*.05,id=newId('copie');modify(()=>{const copyZone={...clone(z),id,name:z.name+' · copie',parent:z.parent||z.id,custom:true,polygon:z.polygon.map(([x,y])=>[x+dx,y+dy])};state.customZones[state.face].push(copyZone);state.selections[key(state.face,id)]=normalChoice(choice(face(),z));if(state.panelLayouts[key(state.face,z.id)])state.panelLayouts[key(state.face,id)]=clone(state.panelLayouts[key(state.face,z.id)]);state.selected={kind:'zone',id};state.view='2d';});$('#geometry-controls').open=true;toast('Zone reproduite avec sa matière. Ajustez sa position et sa taille.');};
   if(data.projectKind==='imported-pdf'&&!studioFeatures?.canRender())state.view='2d';
-  save();render();
+  render();
 })();

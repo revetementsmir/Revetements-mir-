@@ -22,6 +22,8 @@
   async function dependencies() {
     await Promise.all([
       script('plan-import-core.js', 'MIRPDFAnalysis'),
+      script('plan-view-inventory.js', 'MIRViewInventory'),
+      script('plan-view-review.js', 'MIRViewReview'),
       script('plan-structure-notes.js', 'MIRStructuralNotes'),
       script('plan-stair-vision.js', 'MIRStairVision'),
       script('plan-sheet-detection.js?v=architecture', 'MIRSheetDetection'),
@@ -48,7 +50,7 @@
   function busy(value) {
     current.busy = value;
     $('#mir-pdf-file').disabled = value;
-    $('#mir-pdf-final').disabled = value || !current.ready;
+    $('#mir-pdf-final').disabled = value || !current.ready || (current.viewInventory && !current.viewInventory.activeBuildingId);
   }
   function element() {
     if (dialog) return;
@@ -67,7 +69,7 @@
       <div class="mir-pdf-upload"><label for="mir-pdf-file"><strong>Choisir mon PDF</strong><span>Fichier de ${MAX_FILE_MB} Mo maximum</span><input id="mir-pdf-file" type="file" accept="application/pdf,.pdf"></label><p>Le PDF et son analyse restent sur cet appareil.</p></div>
       <div id="mir-pdf-error" class="mir-pdf-error" role="alert" hidden></div>
       <div class="mir-pdf-working"><p id="mir-pdf-status" role="status" aria-live="polite"></p><progress id="mir-pdf-progress" aria-label="Analyse du PDF" max="100" hidden></progress></div>
-      <footer class="mir-pdf-bottom"><div><h3>Vues repérées</h3><div id="mir-pdf-assigned" class="mir-pdf-assigned"></div><p id="mir-pdf-volume-note" class="mir-pdf-fine"></p></div><button type="button" id="mir-pdf-final" class="mir-pdf-primary" disabled>Ouvrir mon projet →</button></footer>
+      <footer class="mir-pdf-bottom"><div><div id="mir-pdf-view-review"></div><details class="mir-pdf-detected"><summary>Vues repérées</summary><div id="mir-pdf-assigned" class="mir-pdf-assigned"></div></details><p id="mir-pdf-volume-note" class="mir-pdf-fine"></p></div><button type="button" id="mir-pdf-final" class="mir-pdf-primary" disabled>Ouvrir mon projet →</button></footer>
     </div>`;
     document.body.append(dialog);
     $('#mir-pdf-close').onclick = () => close();
@@ -75,12 +77,13 @@
     $('#mir-pdf-file').onchange = event => void load(event.target.files?.[0]);
     $('#mir-pdf-final').onclick = finish;
   }
-  function fresh() { return { file: null, job: null, pageCount: 0, assignments: {}, references: [], sha256: null, ready: false }; }
+  function fresh() { return { file: null, job: null, pageCount: 0, references: [], views: [], pages: [], sha256: null, ready: false }; }
   function open(options = {}) {
     element();
     callback = typeof options.onImport === 'function' ? options.onImport : null;
     if (dialog.open) return;
     current = fresh();
+    $('#mir-pdf-view-review').replaceChildren();
     $('#mir-pdf-file').value = '';
     $('#mir-pdf-close').disabled = false;
     error('');
@@ -103,6 +106,7 @@
     if (!file) return;
     const token = ++sequence, imported = current = fresh();
     imported.file = file;
+    $('#mir-pdf-view-review').replaceChildren();
     error('');
     progress('Vérification du fichier…', 0);
     renderSummary();
@@ -116,7 +120,7 @@
       const buffer = await file.arrayBuffer();
       if (token !== sequence) return;
       if (!new TextDecoder('latin1').decode(buffer.slice(0, 1024)).includes('%PDF-')) throw new Error('Le contenu de ce fichier ne correspond pas à un PDF.');
-      if (file.size <= 50 * MIB && globalThis.crypto?.subtle?.digest) {
+      if (globalThis.crypto?.subtle?.digest) {
         const digest = await crypto.subtle.digest('SHA-256', buffer);
         if (token !== sequence) return;
         imported.sha256 = [...new Uint8Array(digest)].map(n => n.toString(16).padStart(2, '0')).join('');
@@ -127,7 +131,9 @@
       imported.pageCount = pdf.numPages;
       await detectSheets(pdf, imported, token);
       if (token !== sequence) return;
-      imported.ready = !!(Object.keys(imported.assignments).length || imported.references.length);
+      imported.viewInventory = MIRViewInventory.create(imported.views, {filename: imported.file.name, bytes: imported.file.size, sha256: imported.sha256, pageCount: imported.pageCount}, imported.pages);
+      imported.ready = imported.views.length > 0;
+      MIRViewReview.mount($('#mir-pdf-view-review'), imported.viewInventory, () => { renderSummary(); busy(false); });
       renderSummary();
       progress(imported.ready ? 'Analyse terminée. Votre dossier est prêt.' : 'Analyse terminée. Aucune vue utilisable repérée.', null);
       if (!imported.ready) error('Le PDF doit contenir des vues dont les titres sont lisibles, par exemple « Plan des fondations », « Plan du rez-de-chaussée » ou « Élévation avant ».');
@@ -224,7 +230,8 @@
       let page;
       try {
         page = await pdf.getPage(number);
-        const base = page.getViewport({ scale: 1 }), items = (await page.getTextContent()).items;
+        let base = page.getViewport({ scale: 1 });
+        const items = (await page.getTextContent()).items;
         if (token !== sequence) return;
         let words = pdfWords(items, base), rows = detector.lines(words), views = detector.viewsForPage(rows, base.width, base.height), scannedSheet = false;
         const textLength = words.reduce((total, word) => total + word.text.trim().length, 0);
@@ -251,20 +258,52 @@
             }
           } catch (e) { ocrFailed = true; if (token === sequence) console.warn('MIR PDF : lecture des feuilles scannées indisponible', e); }
         }
-        if (views.length) prepared.push({ number, words, scanned: scannedSheet, views: detector.divideViews(views, base.width, base.height) });
-      } catch (e) { if (token === sequence) { skipped++; console.warn('MIR PDF : feuille illisible', number, e); } }
+        if (!views.length && scannedSheet && !ocrFailed) for (const turn of [90, 270, 180]) {
+          const turned = page.getViewport({scale:1,rotation:(page.rotate+turn)%360});
+          const scan = await recognize(page, turned, imported, {mode:'overview',cancelled:()=>token!==sequence});
+          const turnedWords=mergeWords(scan.words,pdfWords(items,turned));
+          const turnedRows=[...(scan.rows||[]),...detector.lines(turnedWords)];
+          const found=detector.viewsForPage(turnedRows,turned.width,turned.height);
+          if(found.length){base=turned;words=turnedWords;rows=turnedRows;views=found;break;}
+        }
+        if(scannedSheet&&views.length>1&&!ocrFailed){
+          const fine=await recognize(page,base,imported,{mode:'titles',cancelled:()=>token!==sequence});
+          words=mergeWords(fine.words,words);rows=[...(fine.rows||[]),...detector.lines(words)];
+          views=detector.viewsForPage([...views.map(v=>({text:v.name,box:v.box,source:v.source,confidence:100})),...rows],base.width,base.height);
+          // A plan between columns of elevations may be missed by a whole-page
+          // OCR pass. Read the actual gap, keeping every coordinate in the same
+          // upright page frame. This does not infer a floor or a building.
+          const titled=views.filter(v=>v.face).sort((a,b)=>(a.box[0]+a.box[2])-(b.box[0]+b.box[2]));
+          const gaps=titled.slice(1).map((v,i)=>({index:i+1,span:(v.box[0]+v.box[2]-titled[i].box[0]-titled[i].box[2])/2})).sort((a,b)=>b.span-a.span);
+          if(titled.length>=3&&gaps[0]?.span>base.width*.25){
+            const cut=gaps[0].index,left=Math.max(...titled.slice(0,cut).map(v=>v.box[2])),right=Math.min(...titled.slice(cut).map(v=>v.box[0]));
+            if(right-left>base.width*.12){
+              const x=Math.max(0,left-base.width*.02),w=Math.min(base.width,right+base.width*.02)-x;
+              const titleY=titled.map(v=>(v.box[1]+v.box[3])/2),midY=(Math.min(...titleY)+Math.max(...titleY))/2;
+              const y=Math.max(0,midY-base.height*.10),h=Math.min(base.height-y,base.height*.22);
+              const middle=await recognize(page,base,imported,{mode:'titles',regions:[[x,y,w,h]],cancelled:()=>token!==sequence});
+              words=mergeWords(middle.words,words);rows=[...rows,...middle.rows,...detector.lines(words)];
+              views=detector.viewsForPage([...views.map(v=>({text:v.name,box:v.box,source:v.source,confidence:100})),...rows],base.width,base.height);
+            }
+          }
+        }
+        imported.pages.push({page:number,rotation:base.rotation,status:views.length?'views-found':'unresolved',viewCount:views.length});
+        if (views.length) {
+          const buildingEvidence=MIRViewInventory.pageBuilding(rows,detector.classify);
+          prepared.push({ number, rotation:base.rotation, buildingHint:buildingEvidence?.id||null,buildingEvidence, words, scanned: scannedSheet, views: detector.divideViews(views, base.width, base.height) });
+        }
+      } catch (e) { if (token === sequence) { skipped++; imported.pages.push({page:number,status:'read-failed',viewCount:0});console.warn('MIR PDF : feuille illisible', number, e); } }
       finally { page?.cleanup(); }
     }
-    const evidence = [];
     for (const [i, sheet] of prepared.entries()) {
       if (token !== sequence) return;
       progress(`Préparation des vues · feuille ${i + 1} sur ${prepared.length}…`, 62 + i / prepared.length * 34);
       let page, canvas;
       try {
         page = await pdf.getPage(sheet.number);
-        const base = page.getViewport({ scale: 1 }), scale = Math.min(3, 2100 / Math.max(base.width, base.height));
+        const base = page.getViewport({ scale: 1, rotation:sheet.rotation }), scale = Math.min(3, 2100 / Math.max(base.width, base.height));
         let sourceWords = sheet.words, scannedVertical = [], detailedRows = [];
-        const detailedViews = sheet.views.filter(view => view.face || ['section', 'foundation', 'roof'].includes(view.kind));
+        const detailedViews = sheet.views.filter(view => view.face || ['section', 'foundation', 'floor', 'roof'].includes(view.kind));
         if (sheet.scanned && detailedViews.length && !ocrFailed) {
           try {
             const detailed = await recognize(page, base, imported, {
@@ -277,7 +316,7 @@
           } catch (e) { if (token === sequence) console.warn('MIR PDF : certaines cotes fines n’ont pas pu être lues', e); }
           if (token !== sequence) return;
         }
-        const viewport = page.getViewport({ scale });
+        const viewport = page.getViewport({ scale, rotation:sheet.rotation });
         canvas = await raster(page, viewport);
         if (token !== sequence) return;
         const atRasterScale = word => ({ ...word, box: word.box.map(value => value * scale) });
@@ -308,14 +347,14 @@
           const localRows = rows.filter(word => inCrop(word, crop));
           const calibrationScale = measureLines(canvas, geometry.image, words, verticalWords, crop);
           const structuralHints = window.MIRStructuralNotes.withinCrop(hints, crop);
-          evidence.push(...detector.volumeEvidence(localRows, view, sheet.number, MIRPDFAnalysis.parseDimension, calibrationScale.feetPerPixel ? calibrationScale.accepted : []));
+          const viewEvidence=detector.volumeEvidence(localRows, view, sheet.number, MIRPDFAnalysis.parseDimension, calibrationScale.feetPerPixel ? calibrationScale.accepted : []);
           const spatial = window.MIRSpatialDimensions;
           const reading = {
             rows: localRows, words: words.filter(word => inCrop(word, crop)), verticalRows: verticalRows.filter(word => inCrop(word, crop)),
             page: sheet.number, view, crop, accepted: calibrationScale.accepted || [], geometry
           };
           const anchors = view.face ? spatial.readAnchors(reading, MIRPDFAnalysis.parseDimension) : undefined;
-          evidence.push(...spatial.evidence(reading, MIRPDFAnalysis.parseDimension, anchors));
+          viewEvidence.push(...spatial.evidence(reading, MIRPDFAnalysis.parseDimension, anchors));
           const shiftLevel=record=>({y:record.y-crop[1],line:record.line?{y:record.line.y-crop[1]}:null});
           const foundationGuides=anchors?.levels?.foundations?.length&&anchors.levels.grade?.line
             ?{levels:{grade:shiftLevel(anchors.levels.grade),foundations:anchors.levels.foundations.map(shiftLevel)}}:null;
@@ -340,13 +379,15 @@
           }).map(candidate=>({...candidate,page:sheet.number,viewKind:view.kind,
             viewName:view.name,needsReview:true}));
           const result = prepareView(canvas, crop, structuralHints, sheet.number, view, calibrationScale, visualFrame, measuredStairs, foundation, foundationGuides);
-          if (view.face && !imported.assignments[view.face]) imported.assignments[view.face] = result;
-          else imported.references.push(result);
+          Object.assign(result,{name:view.name,direction:view.face||null,titleBox:view.box.map(value=>value*scale),buildingHint:MIRViewInventory.buildingHint(view.name)||sheet.buildingHint,
+            buildingEvidence:sheet.buildingEvidence?{...sheet.buildingEvidence,box:sheet.buildingEvidence.box?.map(value=>value*scale),frame:'raster-page',needsReview:true}:null,
+            sourceRotation:sheet.rotation,sourceCrop:crop,sourceFrame:{pdfToRaster:[...viewport.transform],cropToRaster:[1,0,0,1,crop[0],crop[1]],rasterSize:[canvas.width,canvas.height],units:'pixels'},volumeEvidence:viewEvidence});
+          imported.views.push(result);
         }
       } catch (e) { if (token === sequence) { skipped++; console.warn('MIR PDF : vue non préparée', sheet.number, e); } }
       finally { if (canvas) canvas.width = canvas.height = 1; page?.cleanup(); }
     }
-    imported.volume = detector.volumeFrom(evidence);
+    imported.volume = detector.volumeFrom([]);
     imported.skipped = skipped;
     imported.ocrFailed = ocrFailed;
   }
@@ -385,31 +426,35 @@
     } finally { image.width = image.height = 1; }
     const cal = calibration(scale, crop);
     if (!view.face) return { page: number, crop, sourceImage, calibration: cal, kind: view.kind, name: view.name, structuralHints,stairCandidates };
-    const zones = regions.map((r, i) => ({ id: `pdf-zone-${i + 1}`, name: `Zone ${i + 1}`, polygon: r.polygon, kind: 'siding', parent: null, provenance: r.provenance, needsReview: true, detected: true }));
-    const openings = regions.flatMap((r, i) => r.holes.filter(p => { const b = A.bbox(p); return b[2] - b[0] > 15 && b[3] - b[1] > 15; }).map((p, j) => ({ id: `pdf-opening-${i + 1}-${j + 1}`, type: 'window', polygon: p, bbox: A.bbox(p), occluded: false, dimension: 'Ouverture détectée à vérifier.', needsReview: true })));
-    return { ...placeholder(view.face), kind: 'elevation', page: number, bbox: [0, 0, w, h], textureBox: [0, 0, w, h], zones, openings, sourceImage, sourceImageBox: [0, 0, w, h], sourceWidth: w, sourceHeight: h, sourcePageSize: [canvas.width, canvas.height], sourceCrop: crop, ...(visualFrame&&{visualFrame}), ...(foundation&&{foundation}), ...(foundationGuides&&{foundationGuides}), calibration: cal, importedStatus: 'assigned', calibrationStatus: cal.status, structuralHints,stairCandidates, detected: { regions: zones.length, openings: openings.length, method: 'Surfaces colorées repérées localement.' }, printedDimensions: cal.evidence.map(c => c.normalized || c.text), textureReference: view.split ? 'Cadrage automatique d’une feuille avec plusieurs vues.' : 'Élévation repérée par le titre de la feuille.' };
+    // Colours can be a legend or an opaque mask. Retain proposals separately
+    // until a person traces/confirms wall geometry in the Studio.
+    const colorProposals=regions.map((r,i)=>({id:`pdf-color-${i+1}`,polygon:r.polygon,holes:r.holes,provenance:r.provenance,needsReview:true}));
+    const zones=[],openings=[];
+    return { ...placeholder(view.face), kind: 'elevation', colorProposals, page: number, bbox: [0, 0, w, h], textureBox: [0, 0, w, h], zones, openings, sourceImage, sourceImageBox: [0, 0, w, h], sourceWidth: w, sourceHeight: h, sourcePageSize: [canvas.width, canvas.height], sourceCrop: crop, ...(visualFrame&&{visualFrame}), ...(foundation&&{foundation}), ...(foundationGuides&&{foundationGuides}), calibration: cal, importedStatus: 'assigned', calibrationStatus: cal.status, structuralHints,stairCandidates, detected: { regions: zones.length, openings: openings.length, method: 'Surfaces colorées repérées localement.' }, printedDimensions: cal.evidence.map(c => c.normalized || c.text), textureReference: view.split ? 'Cadrage automatique d’une feuille avec plusieurs vues.' : 'Élévation repérée par le titre de la feuille.' };
   }
-  function placeholder(key) { return { key, name: FACE_NAMES[key], page: null, bbox: [0, 0, 1200, 800], textureBox: [0, 0, 1200, 800], physicalWidth: null, zones: [], openings: [], roof: [], base: [], fascia: [], soffit: [], detected: {}, candidates: [], occlusions: [], printedDimensions: [], importedStatus: 'unassigned', calibrationStatus: 'not_found', textureBottom: 0, textureReference: 'Façade non importée.', sourceImage: null }; }
   function calibration(s, crop) {
     const [x, y] = crop;
-    if (!s?.feetPerPixel || !s.referenceFt || !s.anchors) return { referenceFt: null, anchors: [], verified: false, status: s?.status || 'not_found', provenance: 'Aucune échelle retenue; aucune surface calculable.', evidence: [] };
+    if (!s?.feetPerPixel || !s.referenceFt || !s.anchors) return { referenceFt: null, anchors: [], verified: false, status: s?.status || 'not_found', provenance: 'Aucune échelle retenue; aucune surface calculable.', evidence: [...(s?.candidates||[])].map(c=>({...c,anchors:c.anchors?.map(p=>[p[0]-x,p[1]-y])})) };
     return { referenceFt: s.referenceFt, anchors: s.anchors.map(p => [p[0] - x, p[1] - y]), verified: false, status: s.status, provenance: 'Cote écrite reliée automatiquement aux intersections de sa ligne et de ses rappels; échelle proposée à vérifier.', evidence: (s.accepted || []).map(c => ({ text: c.text, normalized: c.normalized, referenceFt: c.referenceFt, anchors: c.anchors.map(p => [p[0] - x, p[1] - y]), spanPx: c.spanPx, axis: c.axis, source: c.source, ocrConfidence: c.confidence ?? null, correctedCharacters: !!c.corrected })), spread: s.spread ?? null, axesCompared: !!(s.scaleX && s.scaleY) };
   }
   function renderSummary() {
-    const rows = [...Object.values(current.assignments), ...current.references];
-    $('#mir-pdf-assigned').innerHTML = rows.map(row => `<span class="ready"><b>${esc(row.name)}</b><small>Page ${row.page}</small></span>`).join('') || '<p>Les vues détectées apparaîtront ici.</p>';
+    const rows = current.views;
+    if(current.viewInventory){const projected=MIRViewInventory.adapt({viewInventory:current.viewInventory},MIRSheetDetection.volumeFrom);current.volume=projected.detectedVolume;}
+    $('#mir-pdf-assigned').innerHTML = rows.map(row => `<span class="ready"><b>${esc(row.direction ? FACE_NAMES[row.direction]+' · '+row.name : row.name)}</b><small>Page ${row.page}</small></span>`).join('') || '<p>Les vues détectées apparaîtront ici.</p>';
     const floorStairs=rows.flatMap(r=>r.stairCandidates||[]);
     const volume = current.volume;
     if (!volume) { $('#mir-pdf-volume-note').textContent = ''; return; }
     const missing = Object.entries(VOLUME_NAMES).filter(([key]) => (key === 'roofStyle' ? volume.roofStyle : volume.dimensions[key]) == null).map(([, label]) => label);
     const cautions = [];
+    const selectedFloors=current.viewInventory?.views.filter(v=>v.buildingId===current.viewInventory.activeBuildingId&&v.kind==='floor')||[];
+    if(selectedFloors.length&&selectedFloors.every(v=>v.levelId==='upper'))cautions.push('Ce plan montre l’étage. Aucun RDC n’est confirmé.');
     if (volume.conflicts.length) cautions.push('Des cotes se contredisent.');
     if (volume.approximated.length) cautions.push('Certaines dimensions sont estimées à partir du dessin.');
     if (current.skipped || current.ocrFailed) cautions.push('Certaines feuilles n’ont pas pu être lues.');
-    if (!Object.keys(current.assignments).length) cautions.push('Aucune élévation orientée avant, arrière, gauche ou droite n’a été reconnue.');
+    if (!rows.some(v=>v.direction)) cautions.push('Aucune élévation orientée avant, arrière, gauche ou droite n’a été reconnue.');
     if (floorStairs.length) cautions.push(floorStairs.length+' escalier(s) ou groupe(s) de marches repérés par pixels et cotes, à valider dans le Studio.');
     $('#mir-pdf-volume-note').textContent = [
-      missing.length ? `À compléter dans Volume & retours : ${missing.join(', ')}.` : 'Cotes principales repérées. La maquette 3D s’ouvrira automatiquement.',
+      missing.length ? `À compléter dans Volume & retours : ${missing.join(', ')}.` : 'Cotes principales repérées. La maquette 3D s’ouvrira automatiquement. Aperçu indicatif : contour et murs cachés à confirmer.',
       ...cautions
     ].join(' ');
   }
@@ -421,16 +466,18 @@
     busy(true); error(''); progress('Enregistrement du dossier…', 98);
     try {
       const id = `pdf-${crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)}`;
-      const faces = Object.keys(FACE_NAMES).map(key => imported.assignments[key] || placeholder(key));
+      const projected=MIRViewInventory.adapt({viewInventory:imported.viewInventory},MIRSheetDetection.volumeFrom);
+      const faces=projected.faces;
+      imported.references=projected.referencePages;
       const calibrations = Object.fromEntries(faces.map(f => [f.key, f.calibration || { referenceFt: null, anchors: [], verified: false, status: 'not_found', provenance: 'Façade non repérée.', evidence: [] }]));
-      const source = { filename: imported.file.name, bytes: imported.file.size, pageCount: imported.pageCount, sha256: imported.sha256, fingerprintStatus: imported.sha256 ? 'sha256' : imported.file.size > 50 * MIB ? 'skipped-for-large-file' : 'unavailable-in-this-context', privacy: 'browser-local', importedAt: new Date().toISOString() };
+      const source = { filename: imported.file.name, bytes: imported.file.size, pageCount: imported.pageCount, sha256: imported.sha256, fingerprintStatus: imported.sha256 ? 'sha256' : 'unavailable-in-this-context', privacy: 'browser-local', importedAt: new Date().toISOString() };
       const structuralHints = [...faces.flatMap(f => (f.structuralHints || []).map(h => ({ ...h, assignedView: f.key }))), ...imported.references.flatMap(r => (r.structuralHints || []).map(h => ({ ...h, assignedView: r.kind })))];
       const stairCandidates=[...faces.flatMap(f=>(f.stairCandidates||[]).map(c=>({...c,assignedView:f.key}))),
         ...imported.references.flatMap(r=>(r.stairCandidates||[]).map(c=>({...c,assignedView:r.kind})))];
       const volume = imported.volume;
       const dimensionStatus = Object.values(volume.dimensions).every(Number.isFinite) && volume.roofStyle ? 'detected' : 'incomplete';
       const planData = {
-        version: 2, projectKind: 'imported-pdf', id, title: imported.file.name.replace(/\.pdf$/i, ''), source: `PDF importé · ${imported.pageCount} pages`,
+        ...projected,viewInventory:imported.viewInventory,version: 3, projectKind: 'imported-pdf', id, title: imported.file.name.replace(/\.pdf$/i, ''), source: `PDF importé · ${imported.pageCount} pages`,
         sourceSha256: imported.sha256, analysis: 'Titres et cotes du PDF relevés automatiquement; motifs de marches mesurés dans les pixels lorsque l’échelle est disponible. Les contours, emplacements et hauteurs restent à vérifier.',
         faces, referencePages: imported.references, sourceMetadata: source, structuralHints,stairCandidates,
         dimensions: volume.dimensions, dimensionStatus, detectedVolume: { roofStyle: volume.roofStyle, foundationDrop: volume.foundationDrop, conflicts: volume.conflicts, approximated: volume.approximated, evidence: volume.evidence },
@@ -449,5 +496,5 @@
       error(readableError(e)); progress('Votre projet précédent est conservé. Réessayez l’enregistrement.', null); busy(false);
     }
   }
-  window.MIRPlanImport = Object.freeze({ open, close, version: '2.0-auto' });
+  window.MIRPlanImport = Object.freeze({ open, close, version: '3.0-inventory' });
 })();
