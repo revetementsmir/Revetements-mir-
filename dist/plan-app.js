@@ -14,7 +14,7 @@
   let STORAGE = 'mir-plan-study-v2';
   let TAKEOFF_STORAGE = 'mir-takeoff-v1';
   const RECESS_FIELDS = {recessStartFt:'start',recessWidthFt:'width',recessDepthFt:'depth',recessHeightFt:'height'};
-  let data, materials, takeoffSeed, activeProject=null, studioFeatures=null;
+  let data, materials, takeoffSeed, activeProject=null, studioFeatures=null, levelStudio=null;
   const facadeVisuals = new Map();
 
   async function prepareFacadeVisual(f) {
@@ -556,6 +556,7 @@
   }
   async function renderDrawing(){
     const f=face(),n=++rendering;
+    if(levelStudio?.active()&&await levelStudio.renderDrawing())return;
     renderCoverageSummary();
     $('#elevation').hidden=state.view==='3d';$('#three-canvas').hidden=state.view!=='3d';$('#rotate-control').hidden=state.view!=='3d';
     $('#volume-unavailable').hidden=true;
@@ -837,7 +838,7 @@
     if(editable){const [x0,y0,x1,y1]=bounds(item.polygon),[bx,by,bw,bh]=f.bbox,vs={x:(x0-bx)/bw*100,y:(y0-by)/bh*100,w:(x1-x0)/bw*100,h:(y1-y0)/bh*100};for(const [k,v] of Object.entries(vs))$(`#geo-${k}`).value=Number(v.toFixed(1));$('#delete-region').textContent=item.custom?'Supprimer '+(opening?'cette ouverture':'cet accent'):'Rétablir le contour du plan';$('#geometry-note').textContent=item.custom?'Accent modifiable : choisissez sa position et ses dimensions en % de la façade, ou glissez-le dans le plan 2D.':'Proportions du tracé. Échelle et contours à valider dans le dossier de métrés.';}
   }
   function renderFinish(){for(const kind of ['soffit','fascia']){const rows=kind==='soffit'?soffits:fascias,m=productOptions('#'+kind+'-brand','#'+kind+'-product',rows,state[kind+'Id']);colorOptions('#'+kind+'-color',m,state[kind+'ColorId']);}const sm=materialById.get(state.soffitId);$('#soffit-type').textContent=sm?.soffitType==='vented'?'Ventilé / perforé · échantillon à valider':sm?.soffitType==='solid'?'Plein / non perforé · ventilation du système à vérifier':sm?.soffitType==='concealed'?'Ventilation cachée · ouvertures dans les rainures du profil':'Ventilation à confirmer · rendu neutre';}
-  function render(){ensureSelected();$('#align-window').checked=state.alignWindow!==false;renderDrawing();renderZones();renderControl();renderFinish();studioFeatures?.renderUI();$('#undo').disabled=!history.length;$('#display-client').setAttribute('aria-pressed',state.displayMode==='client');$('#display-atelier').setAttribute('aria-pressed',state.displayMode==='atelier');$('#display-note').textContent=state.displayMode==='atelier'?'Dimensions de découpe en pouces · échelle à valider.':'Une vue claire des matières et des finitions.';}
+  function render(){ensureSelected();$('#align-window').checked=state.alignWindow!==false;renderDrawing();renderZones();renderControl();renderFinish();studioFeatures?.renderUI();levelStudio?.renderControls();$('#undo').disabled=!history.length;$('#display-client').setAttribute('aria-pressed',state.displayMode==='client');$('#display-atelier').setAttribute('aria-pressed',state.displayMode==='atelier');$('#display-note').textContent=state.displayMode==='atelier'?'Dimensions de découpe en pouces · échelle à valider.':'Une vue claire des matières et des finitions.';}
   function selectZone(id){state.selected={kind:'zone',id};let selected=currentZone();const zs=allZones(face()), seen=new Set();while(selected?.parent&&!seen.has(selected.id)){seen.add(selected.id);selected=zs.find(z=>z.id===selected.parent);}if(selected?.viewOnly==='2d'){state.view='2d';toast('Ce contour latéral reste éditable en 2D. Les retours du retrait sont réglés dans Super admin · Métrés.');}save();render();}
   function openLibrary(){renderLibrary();$('#library-dialog').showModal();}
   function renderLibrary(){
@@ -967,6 +968,7 @@
   }
   function pickThree(clientX,clientY){
     const hit=window.MIR3D.pick?.($('#three-canvas'),clientX,clientY);if(!hit)return false;
+    if(levelStudio?.handleHit(hit))return true;
     if(studioFeatures?.handleHit(hit))return true;
     if(hit.type==='fascia'||hit.type==='soffit'){const kind=hit.type==='fascia'?'fascia':'soffit';$('.finish-section').open=true;$('#'+kind+'-product').focus();toast(kind==='fascia'?'Fascia sélectionné : choisissez le fabricant et le fini.':'Soffite sélectionné : choisissez le profil et le fini.');return true;}
     if(hit.type!=='wall'){toast('Toiture du volume d’étude. Cliquez sur un mur, une fenêtre, un soffite ou un fascia pour les modifier.');return false;}
@@ -1151,7 +1153,7 @@
   });}
   $('#export-svg').onclick=()=>{exportFile(`MIR_${state.face}_etude.svg`,'image/svg+xml',facadeSVG(face(),{export:true,annotated:state.displayMode==='atelier'}));toast('Vue SVG exportée · échelles et contours à calibrer.');};
   $('#export-pdf').onclick=async()=>{if(!window.MIRPDF?.exportPlan)return toast('L’export PDF n’a pas chargé. Rechargez la page.');const button=$('#export-pdf');button.disabled=true;button.textContent='Préparation du PDF…';try{await window.MIRPDF.exportPlan({title:'MIR · étude des quatre élévations',subtitle:'Choix fabricants, calepinage et estimations à calibrer — sans valeur de construction',filename:'MIR_Etude_annotee_4_elevations.pdf',faces:exportFaces()});toast('PDF des quatre élévations préparé avec les choix et annotations actuels.');}catch(e){toast('Le PDF n’a pas pu être créé : '+String(e.message||e));}finally{button.disabled=false;button.textContent='PDF des 4 élévations ↗';}};
-  $('#export-project').onclick=()=>{const result={...clone(state),project:data.title||'MIR · étude',exportedAt:new Date().toISOString(),sourceSha256:data.sourceSha256,...sceneGeometry(),disclaimer:'Choix d’étude et estimations à calibrer. Finitions documentées quand une référence fabricant est indiquée. Maçonneries génériques et teintes numériques utilisées pour la visualisation. Quantités à valider avant commande.',facades:data.faces.map(f=>({face:f.key,zones:allZones(f).map(z=>({...z,selection:choice(f,z)})),openings:allOpenings(f)})),soffit:materialById.get(state.soffitId),fascia:materialById.get(state.fasciaId)};exportFile('MIR_choix_du_projet.json','application/json',JSON.stringify(result,null,2));toast('Choix, joints, contours et géométrie exportés.');};
+  $('#export-project').onclick=()=>{const result={...clone(state),project:data.title||'MIR · étude',exportedAt:new Date().toISOString(),sourceSha256:data.sourceSha256,levelGeometry:data.viewInventory?{inventory:clone(data.viewInventory),quantities:MIRLevelModel.quantities(data.viewInventory,data.viewInventory.activeBuildingId)}:null,...sceneGeometry(),disclaimer:'Choix d’étude et estimations à calibrer. Finitions documentées quand une référence fabricant est indiquée. Maçonneries génériques et teintes numériques utilisées pour la visualisation. Quantités à valider avant commande.',facades:data.faces.map(f=>({face:f.key,zones:allZones(f).map(z=>({...z,selection:choice(f,z)})),openings:allOpenings(f)})),soffit:materialById.get(state.soffitId),fascia:materialById.get(state.fasciaId)};exportFile('MIR_choix_du_projet.json','application/json',JSON.stringify(result,null,2));toast('Choix, joints, contours et géométrie exportés.');};
   const sharedFields=['selections','customZones','zoneOverrides','openingOverrides','addedOpenings','bands','openingTrims','openingStyles','panelLayouts','transitions','manualTransitionModes','panelStockRotation','soffitId','soffitColorId','soffitColor','fasciaId','fasciaColorId','fasciaColor','roofId','roofColorId','roofColor','roofStyle','gableCornices','porch','structures','concreteSteps','siteStyle','returnFinishes','volumeOverride','recessOverride'];
   function syncStudy(){
     if((window.MIRProjectStore?.activeId()||null)!==(activeProject?.id||null)){location.reload();return;}
@@ -1199,6 +1201,9 @@
   }
   window.MIR_STUDY={captureEstimation,snapshot:()=>clone({face:state.face,view:state.view,displayMode:state.displayMode,alignWindow:state.alignWindow!==false,selected:state.selected,zoneCount:allZones(face()).length,openingCount:allOpenings(face()).length,soffitId:state.soffitId,soffitColor:state.soffitColor,fasciaId:state.fasciaId,fasciaColor:state.fasciaColor,choices:state.selections,bands:state.bands,openingTrims:state.openingTrims,panelLayouts:state.panelLayouts,transitions:state.transitions,...sceneGeometry(),paintOrder:orderedZones(decoratedFace(face()).zones).map(z=>z.id)}),exportFaces,pickThree,embedded,swatches:{loaded:swatchImages.size,missing:missingSwatchCount},source:data.analysis};
   studioFeatures=window.MIRStudioFeatures?.setup({$,state:()=>state,data:()=>data,materials,roofControls:!adminContext,modify,save,render,renderDrawing,officialColor,colorsFor,openMaterial,toast,normalChoice,choice,allZones,face,currentZone,feetPerPixel,readTakeoff,takeoffSeed,sceneGeometryBase,patternDef,frontMasonryBand,frontFoundationHeight});
+  levelStudio=window.MIRLevelStudio?.setup({data:()=>data,project:()=>activeProject,state:()=>state,materials,colorsFor,officialColor,render,toast,
+    updateEntry:entry=>{activeProject=entry;data=entry.planData;},openingSources:()=>data.faces.flatMap(f=>allOpenings(f).map(o=>({sourceId:(f.viewId||f.key)+':'+o.id,name:f.name+' · '+(o.name||o.id)})))});
+  window.MIR_LEVEL_STUDIO=levelStudio;
   $('#duplicate-zone').onclick=()=>{const z=currentZone();if(!z)return toast('Choisissez une zone à reproduire.');const b=bounds(z.polygon),dx=(b[2]-b[0])*.05,dy=(b[3]-b[1])*.05,id=newId('copie');modify(()=>{const copyZone={...clone(z),id,name:z.name+' · copie',parent:z.parent||z.id,custom:true,polygon:z.polygon.map(([x,y])=>[x+dx,y+dy])};state.customZones[state.face].push(copyZone);state.selections[key(state.face,id)]=normalChoice(choice(face(),z));if(state.panelLayouts[key(state.face,z.id)])state.panelLayouts[key(state.face,id)]=clone(state.panelLayouts[key(state.face,z.id)]);state.selected={kind:'zone',id};state.view='2d';});$('#geometry-controls').open=true;toast('Zone reproduite avec sa matière. Ajustez sa position et sa taille.');};
   if(data.projectKind==='imported-pdf'&&!studioFeatures?.canRender())state.view='2d';
   render();

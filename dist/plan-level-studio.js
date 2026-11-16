@@ -1,0 +1,234 @@
+/* Level workflow inside the existing Studio. No network or separate project store. */
+(function(root){
+  'use strict';
+  const M=root.MIRLevelModel,esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const english={
+    'Niveau':'Floor','Choisir le niveau':'Choose a floor','RDC':'Ground floor','Étage':'Upper floor','Sous-sol':'Basement',
+    'Contour et mesures':'Outline and measurements','Voir les élévations':'View elevations','Ajouter un niveau':'Add a floor','Nom du niveau':'Floor name',
+    'Aucun plan de niveau fourni.':'No floor plan supplied.','Aucun RDC fourni.':'No ground floor supplied.',
+    'Choisissez un niveau, vérifiez son contour, puis ouvrez la vue 360°.':'Choose a floor, check its outline, then open the 360° view.',
+    'Contour à vérifier':'Outline to review','Contour confirmé':'Confirmed outline','Brouillon conservé':'Draft kept','Enregistré sur cet appareil':'Saved on this device',
+    'Contour extérieur du niveau':'Exterior floor outline','Plan source':'Source floor plan','Tracer les points':'Trace points','Mesure de référence':'Reference measurement',
+    'Cote de contrôle':'Check dimension','Délimiter le dessin':'Select the drawing area','Proposer un contour':'Propose an outline','Annuler le dernier point':'Undo last point',
+    'Cliquez sur les angles extérieurs. Glissez un point pour le corriger.':'Click exterior corners. Drag a point to adjust it.',
+    'Choisissez deux points représentant une mesure connue.':'Choose two points representing a known measurement.',
+    'Glissez un cadre autour du dessin, en excluant légendes et cartouches.':'Drag a box around the drawing, excluding legends and title blocks.',
+    'Proposition locale à vérifier : une pièce fermée ne prouve pas le contour extérieur.':'Local proposal to review: an enclosed room does not establish the exterior outline.',
+    'Aucun contour suffisamment lisible. Tracez les points sur le plan.':'No sufficiently legible outline. Trace points on the plan.',
+    'Unité':'Unit','Mètres':'Metres','Pieds':'Feet','Valeur de référence':'Reference value','Nature de la mesure':'Measurement source',
+    'Cote écrite':'Written dimension','Mesure fournie':'Provided measurement','Hypothèse':'Assumption','Mesure estimée à l’échelle':'Estimated scaled measurement',
+    'Ajouter la cote de contrôle':'Add check dimension','Valeur de contrôle':'Check value','Références recoupées':'References cross-checked',
+    'Une seule référence disponible':'Only one reference available','Échelle absente':'Scale unavailable','Échelles contradictoires':'Conflicting scales','Dessin déformé entre les axes':'Drawing distorted between axes',
+    'Hauteur du niveau':'Floor wall height','Altitude de base':'Base elevation','Repère local : zéro ne signifie pas RDC.':'Local datum: zero does not mean ground floor.',
+    'Vue justifiant la hauteur':'View supporting the height','Mesure à fournir':'Measurement needed','Vues compatibles':'Compatible views',
+    'Cette vue représente ce niveau':'This view represents this floor','Chercher une mesure':'Find a measurement','Largeur':'Width','Profondeur':'Depth','Hauteur':'Height',
+    'Aucune dimension compatible trouvée.':'No compatible dimension found.','Vérifiez le niveau : cette cote peut être la hauteur totale du bâtiment.':'Check the floor: this dimension may be the total building height.',
+    'Points et cotes':'Points and dimensions','Point':'Point','Supprimer':'Remove','Cote écrite du segment':'Written segment dimension','Ajuster le trait':'Adjust the line',
+    'Contour vérifié':'Outline checked','Échelle vérifiée':'Scale checked','Hauteur vérifiée':'Height checked','Position du niveau vérifiée':'Floor position checked',
+    'Confirmer et voir le résultat':'Confirm and view result','Conserver le brouillon':'Keep draft','Fermer':'Close','Les points non validés restent en brouillon.':'Unvalidated points stay in the draft.',
+    'Vérifiez le contour, l’échelle, la hauteur et la position avant de confirmer.':'Check the outline, scale, height and position before confirming.',
+    'Contour invalide : corrigez les points qui se croisent ou se répètent.':'Invalid outline: fix crossing or repeated points.',
+    'Cette dimension reste à confirmer.':'This dimension needs confirmation.','Des cotes se contredisent.':'Some dimensions conflict.',
+    'La source appartient à un autre bâtiment ou niveau.':'The source belongs to a different building or floor.',
+    'Mur':'Wall','Choisir un mur':'Choose a wall','Finition du mur':'Wall finish','Matière':'Material','Fini':'Finish','Sans finition attribuée':'No finish assigned',
+    'Ouvertures du mur':'Wall openings','Source de l’ouverture':'Opening source','Nouvelle ouverture mesurée':'New measured opening','Distance depuis le début du mur':'Distance from wall start',
+    'Hauteur d’allège':'Sill height','Ajouter l’ouverture':'Add opening','Ouvertures vérifiées pour ce niveau':'Openings reviewed for this floor',
+    'Ouverture hors du mur ou source déjà affectée.':'Opening outside the wall or source already assigned.',
+    'Murs des niveaux':'Floor walls','Quantités partielles':'Partial quantities','Surfaces des murs vérifiées':'Wall surfaces reviewed',
+    'Brut':'Gross','Ouvertures':'Openings','Net':'Net','À confirmer':'To confirm',
+    'Ces surfaces remplacent le relevé des élévations pour les murs concernés : ne pas additionner les deux.':'These areas replace the elevation takeoff for these walls: do not add both.',
+    'Les quantités d’achat, les murs sans hauteur et les ouvertures non vérifiées restent à confirmer.':'Purchase quantities, walls without heights and unreviewed openings still need confirmation.',
+    'Niveaux non établis exclus du rendu. Toiture non reconstruite.':'Unestablished floors excluded from rendering. Roof not reconstructed.',
+    'Mur sélectionné dans le même modèle 2D et 360°.':'Wall selected in the same 2D and 360° model.',
+    'Cette modification du niveau ne change pas les anciennes retouches des élévations.':'This floor edit does not change existing elevation edits.',
+    'Mesures enregistrées avec leur source et leurs points.':'Measurements saved with their source and points.'
+    ,'Mesurer dans cette vue':'Measure in this view','Dimension à mesurer':'Dimension to measure','Utiliser cette proposition':'Use this proposal',
+    'Valeur de la cote connue':'Known dimension value','Ajouter cette référence':'Add this reference',
+    'Cette dimension n’est pas représentée dans cette vue.':'This dimension is not represented in this view.',
+    'Remplacer l’échelle automatique par les nouvelles références':'Replace automatic scale with new references',
+    'Repère ou texte de la cote':'Dimension label or text','Repère commun aux niveaux':'Shared floor datum',
+    'Choisissez un angle commun aux niveaux et vérifiez leur orientation.':'Choose a common corner for the floors and check their orientation.',
+    'Rotation du plan':'Plan rotation','Décalage X':'X offset','Décalage Y':'Y offset','Ce plan de niveau reste à nommer.':'This floor plan still needs a name.',
+    'La mesure reste une proposition jusqu’à la confirmation du niveau.':'The measurement remains a proposal until the floor is confirmed.'
+  };
+  const t=s=>root.MIRClientLocale?.getLocale()==='en-CA'?(english[s]||s):s;
+  const fmt=n=>Number.isFinite(n)?new Intl.NumberFormat(root.MIRClientLocale?.getLocale()||'fr-CA',{maximumFractionDigits:2}).format(n):t('À confirmer');
+  const name=l=>l.name||t({ground:'RDC',upper:'Étage',basement:'Sous-sol'}[l.sourceLevel]||'Niveau')+(l.sourceLevel?.startsWith('level-')?' '+l.sourceLevel.slice(6):'');
+  const options=(rows,value)=>rows.map(([id,label])=>`<option value="${esc(id)}"${id===(value||'')?' selected':''}>${esc(label)}</option>`).join('');
+  const select=(id,label,rows,value)=>`<label>${t(label)}<select id="${id}">${options(rows,value)}</select></label>`;
+  const input=(id,label,value,extra='')=>`<label>${t(label)}<input id="${id}" type="number" step="any" value="${value??''}" ${extra}></label>`;
+  const uuid=prefix=>prefix+'-'+crypto.randomUUID();
+  function quantitiesHTML(inventory,buildingId){
+    const q=M.quantities(inventory,buildingId);if(!q.rows.length)return '';
+    return `<h3>${t('Murs des niveaux')}</h3><p><strong>${t(q.partial?'Quantités partielles':'Surfaces des murs vérifiées')}</strong> · ${fmt(q.grossM2)} m² ${t('Brut')}</p><p>${t('Ces surfaces remplacent le relevé des élévations pour les murs concernés : ne pas additionner les deux.')}</p><div class="mir-level-quantity-list">${q.rows.map((r,i)=>`<p data-wall-quantity="${esc(r.wallId)}">${t('Mur')} ${i+1} · ${t('Brut')} ${fmt(r.grossM2)} · ${t('Ouvertures')} ${fmt(r.openingM2)} · ${t('Net')} ${fmt(r.netM2)} m²</p>`).join('')}</div><p>${t('Les quantités d’achat, les murs sans hauteur et les ouvertures non vérifiées restent à confirmer.')}</p>`;
+  }
+  function setup(api){
+    if(!api.data().viewInventory)return null;
+    const inv=()=>api.data().viewInventory,building=()=>inv().activeBuildingId,levels=()=>inv().levels.filter(l=>l.buildingId===building());
+    let levelId=inv().levelStudio?.[building()]?.activeLevelId||'',enabled=!!levelId,selectedWallId=null,lastMessage='',dialog=null;
+    const bar=document.createElement('section');bar.id='mir-level-toolbar';bar.className='mir-level-toolbar';document.querySelector('.project-bar').after(bar);
+    const controls=document.createElement('section');controls.id='mir-level-wall-controls';controls.className='mir-level-wall-controls';document.querySelector('#studio-controls').prepend(controls);
+    const level=()=>levels().find(l=>l.id===levelId),scene=()=>M.scene(inv(),building());
+    async function persist(next,expected=level()?.geometryRevision||0){
+      const saved=await MIRProjectStore.saveLevelGeometry({projectId:api.project().id,buildingId:building(),levelId:next.id,expectedRevision:expected,level:next});
+      api.updateEntry(saved);lastMessage=t('Enregistré sur cet appareil');renderBar();api.render();return saved;
+    }
+    function renderBar(){
+      const list=levels(),l=level();
+      bar.innerHTML=`<p>${t('Choisissez un niveau, vérifiez son contour, puis ouvrez la vue 360°.')}</p><div class="mir-level-actions">${select('mir-level-select','Niveau',[['',t('Choisir le niveau')],...list.map(l=>[l.id,name(l)])],enabled?levelId:'')}<button id="mir-level-edit" type="button" ${!l?'disabled':''}>${t('Contour et mesures')}</button><button id="mir-level-facades" type="button">${t('Voir les élévations')}</button><button id="mir-level-add" type="button">${t('Ajouter un niveau')}</button></div><p id="mir-level-status" role="status">${esc(lastMessage||(!list.length?t(inv().views.some(v=>v.buildingId===building()&&v.kind==='floor')?'Ce plan de niveau reste à nommer.':'Aucun plan de niveau fourni.'):l?.contourDraft?t('Brouillon conservé'):l?.contours?.some(c=>c.status==='confirmed')?t('Contour confirmé'):t('Contour à vérifier')))} ${list.length&&list.every(l=>l.sourceLevel==='upper')?t('Aucun RDC fourni.'):''}</p>`;
+      bar.querySelector('#mir-level-select').onchange=e=>{levelId=e.target.value;enabled=!!levelId;selectedWallId=null;renderBar();api.render();};
+      bar.querySelector('#mir-level-edit').onclick=()=>void edit();
+      bar.querySelector('#mir-level-facades').onclick=()=>{enabled=false;renderBar();api.render();};
+      bar.querySelector('#mir-level-add').onclick=()=>{
+        const box=document.createElement('dialog');box.className='mir-level-dialog';box.innerHTML=`<form method="dialog"><label>${t('Nom du niveau')}<input id="mir-level-name" maxlength="80" required></label><button value="save">${t('Ajouter un niveau')}</button><button value="cancel" formnovalidate>${t('Fermer')}</button></form>`;document.body.append(box);
+        box.addEventListener('close',async()=>{const value=box.querySelector('input').value.trim();if(box.returnValue==='save'&&value){const id=uuid('level');try{await persist({id,buildingId:building(),sourceLevel:null,name:value,status:'user-added',contours:[],wallPlanes:[]},null);levelId=id;enabled=true;renderBar();api.render();}catch(e){api.toast(e.message);}}box.remove();},{once:true});box.showModal();
+      };
+    }
+    const messages=codes=>codes.map(code=>t(['DIMENSION_CONFLICT','REFERENCE_CONFLICT','RASTER_DEFORMED'].includes(code)?'Des cotes se contredisent.':code.startsWith('SOURCE')?'La source appartient à un autre bâtiment ou niveau.':['SCALE_UNKNOWN','REFERENCE_UNCONFIRMED','HEIGHT_UNKNOWN','BASE_UNKNOWN','ALIGNMENT_UNKNOWN','MEASUREMENT_LABEL'].includes(code)?'Cette dimension reste à confirmer.':'Contour invalide : corrigez les points qui se croisent ou se répètent.')).filter((x,i,a)=>a.indexOf(x)===i).join(' ');
+    async function edit(){
+      const current=level();if(!current)return;
+      const expected=current.geometryRevision||0,sources=inv().views.filter(v=>v.buildingId===building()),plans=sources.filter(v=>v.kind==='floor'&&v.levelId===current.sourceLevel);
+      let draft=M.clone(current.contourDraft||current.contours?.[0]||M.draftFor(plans.length===1?plans[0]:null,current)),unit=.3048,mode='trace',measurement=[],region=null,undo=[],selectedPoint=null;
+      const source=()=>sources.find(v=>v.id===draft.sourceViewId),size=()=>[source()?.payload.sourceWidth||source()?.zone?.[2]||source()?.payload.bbox?.[2]||source()?.frame?.rasterSize[0]||1000,source()?.payload.sourceHeight||source()?.zone?.[3]||source()?.payload.bbox?.[3]||source()?.frame?.rasterSize[1]||800];
+      dialog=document.createElement('dialog');dialog.id='mir-level-editor';dialog.className='mir-level-dialog';document.body.append(dialog);
+      const notice=(text)=>{dialog.querySelector('#mir-contour-message').textContent=text;};
+      const checkpoint=()=>{undo.push(M.clone(draft));if(undo.length>30)undo.shift();};
+      function measureView(view,field){
+        const represented=field==='wallHeight'?['elevation','section'].includes(view.kind):field==='depth'?view.kind==='floor'||view.kind==='elevation'&&['left','right'].includes(view.direction):view.kind==='floor'||view.kind==='elevation'&&['front','back'].includes(view.direction);
+        if(!represented)return notice(t('Cette dimension n’est pas représentée dans cette vue.'));
+        const box=document.createElement('dialog');box.id='mir-view-measurement';box.className='mir-level-dialog';document.body.append(box);
+        const w=view.payload.sourceWidth||view.zone?.[2]||view.payload.bbox?.[2]||view.frame?.rasterSize[0]||1000,h=view.payload.sourceHeight||view.zone?.[3]||view.payload.bbox?.[3]||view.frame?.rasterSize[1]||800;
+        let target=[],reference=[],refs=[],pick='target',estimate=null;
+        box.innerHTML=`<h2>${t('Mesurer dans cette vue')}</h2><p data-mir-user-content>${esc(view.payload.name)} · p. ${view.page}</p><p>${t('Choisissez deux points représentant une mesure connue.')}</p><div class="mir-contour-tools"><button data-pick="target" type="button">${t('Dimension à mesurer')}</button><button data-pick="reference" type="button">${t('Mesure de référence')}</button></div><div class="mir-contour-map"><svg viewBox="0 0 ${w} ${h}" style="touch-action:none"><image href="${esc(view.payload.sourceImage)}" width="${w}" height="${h}"/><g id="mir-measure-markers"></g></svg></div>${input('mir-view-reference-value','Valeur de la cote connue','', 'min="0"')}<p>${unit===1?t('Mètres'):t('Pieds')}</p><button id="mir-view-reference-add" type="button">${t('Ajouter cette référence')}</button><label><input type="checkbox" id="mir-view-replace-scale"> ${t('Remplacer l’échelle automatique par les nouvelles références')}</label><p id="mir-view-estimate" role="status"></p><p>${t('La mesure reste une proposition jusqu’à la confirmation du niveau.')}</p><button id="mir-view-estimate-use" type="button" disabled>${t('Utiliser cette proposition')}</button><button id="mir-view-measure-close" type="button">${t('Fermer')}</button>`;
+        const $=s=>box.querySelector(s),svg=$('svg');
+        function update(){
+          const measuredView=$('#mir-view-replace-scale').checked?{...view,calibration:{}}:view;
+          estimate=M.estimateSegment(measuredView,target,refs);estimate.originalCalibration=M.clone(view.calibration);estimate.replacedAutomaticScale=$('#mir-view-replace-scale').checked;
+          const status=estimate.assessment.deformed?'Dessin déformé entre les axes':estimate.assessment.conflict?'Échelles contradictoires':estimate.references.length>1?'Références recoupées':estimate.scaleUsed?'Une seule référence disponible':'Échelle absente';
+          $('#mir-view-estimate').textContent=t('Mesure estimée à l’échelle')+' : '+fmt(estimate.value==null?null:estimate.value/unit)+' '+(unit===1?'m':'ft')+' · '+t(status)+' ('+estimate.references.length+')'+(estimate.range?' · '+estimate.range.map(n=>fmt(n/unit)).join(' – '):'');
+          $('#mir-view-estimate-use').disabled=estimate.value==null;
+          $('#mir-measure-markers').innerHTML=[...target.map(p=>[p,'#b54b13']),...reference.map(p=>[p,'#348511'])].map(([[x,y],color])=>`<circle cx="${x}" cy="${y}" r="${w/100}" fill="${color}"/>`).join('');
+        }
+        svg.onclick=e=>{const p=new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse()),a=[p.x,p.y];if(pick==='target'){if(target.length===2)target=[];target.push(a);}else{if(reference.length===2)reference=[];reference.push(a);}update();};
+        box.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{pick=b.dataset.pick;box.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===pick)));});
+        $('#mir-view-reference-add').onclick=()=>{const value=Number($('#mir-view-reference-value').value)*unit;if(value>0&&reference.length===2){refs.push({value,anchors:M.clone(reference),sourceViewId:view.id,kind:'written',status:'proposed'});reference=[];update();}};
+        $('#mir-view-replace-scale').onchange=update;
+        $('#mir-view-estimate-use').onclick=()=>{if(estimate.value==null)return;draft.dimensionSuggestions||={};draft.dimensionSuggestions[field]=M.clone(estimate);if(field==='wallHeight')draft.height={...M.clone(estimate),label:t('Mesure estimée à l’échelle')};if(!draft.links.some(l=>l.sourceViewId===view.id))draft.links.push({sourceViewId:view.id,status:'confirmed',relationship:'user-measured-compatible-view'});box.close();box.remove();render();notice(t('La mesure reste une proposition jusqu’à la confirmation du niveau.'));};
+        $('#mir-view-measure-close').onclick=()=>{box.close();box.remove();};box.addEventListener('cancel',()=>box.remove(),{once:true});update();box.showModal();
+      }
+      function graphics(){const [w,h]=size(),s=M.scale(draft),poly=draft.points.map(p=>p.xy.join(',')).join(' '),radius=Math.max(w,h)/125;
+        const image=source()?.payload.sourceImage;
+        return `<svg id="mir-contour-drawing" viewBox="0 0 ${w} ${h}" role="img" aria-label="${t('Contour extérieur du niveau')}">${image?`<image href="${esc(image)}" width="${w}" height="${h}" opacity=".75"/>`:''}${region?`<rect x="${region[0]}" y="${region[1]}" width="${region[2]}" height="${region[3]}" fill="#34851112" stroke="#348511" stroke-dasharray="10 6"/>`:''}<polygon points="${poly}" fill="#34851112" stroke="#348511" stroke-width="${radius/2}"/>${draft.points.map((p,i)=>`<circle data-point="${p.id}" cx="${p.xy[0]}" cy="${p.xy[1]}" r="${radius}" fill="${p.id===selectedPoint?'#e79920':'#348511'}"/><text x="${p.xy[0]+radius}" y="${p.xy[1]-radius}" font-size="${radius*2}">${i+1}</text>`).join('')}${[...(draft.reference.anchors||[]),...measurement].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="${radius}" fill="#a84e11"/>`).join('')}${draft.alignment?.origin?`<circle cx="${draft.alignment.origin[0]}" cy="${draft.alignment.origin[1]}" r="${radius*1.5}" fill="none" stroke="#2465a0" stroke-width="${radius/2}"/>`:''}</svg>`;
+      }
+      function bindGraphic(){
+        const svg=dialog.querySelector('#mir-contour-drawing');let drag=null,moved=false;
+        const point=e=>{const p=new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse()),[w,h]=size();return [Math.max(0,Math.min(w,p.x)),Math.max(0,Math.min(h,p.y))];};
+        svg.onpointerdown=e=>{const id=e.target.dataset.point;if(id&&mode==='trace'){checkpoint();selectedPoint=id;drag={id,start:point(e)};svg.setPointerCapture(e.pointerId);}else if(mode==='region'){drag={start:point(e)};svg.setPointerCapture(e.pointerId);}moved=false;};
+        svg.onpointermove=e=>{if(!drag)return;const p=point(e);moved=true;if(drag.id){const item=draft.points.find(p=>p.id===drag.id);item.xy=p;const circle=svg.querySelector(`[data-point="${drag.id}"]`);circle.setAttribute('cx',p[0]);circle.setAttribute('cy',p[1]);svg.querySelector('polygon').setAttribute('points',draft.points.map(p=>p.xy.join(',')).join(' '));}else{region=[Math.min(p[0],drag.start[0]),Math.min(p[1],drag.start[1]),Math.abs(p[0]-drag.start[0]),Math.abs(p[1]-drag.start[1])];}};
+        svg.onpointerup=e=>{if(drag){drag=null;render();return;}if(moved)return;const p=point(e);if(mode==='trace'){checkpoint();draft.points.push({id:uuid('point'),xy:p});if(!draft.alignment.origin)draft.alignment.origin=M.clone(p);render();}else if(mode==='alignment'){draft.alignment.origin=p;draft.alignment.status='proposed';render();}else if(mode==='reference'||mode==='control'){measurement.push(p);if(measurement.length===2){if(mode==='reference'){draft.reference.anchors=M.clone(measurement);measurement=[];}render();}}};
+      }
+      function render(){
+        const opened=[...dialog.querySelectorAll('details')].map(el=>el.open),scroll=dialog.scrollTop;
+        const view=source(),s=M.scale(draft),assessment=view?M.referenceAssessment({...view,calibration:{}},[draft.reference,...draft.reference.controlReferences||[]]):null;
+        const status=assessment?.deformed?'Dessin déformé entre les axes':assessment?.conflict?'Échelles contradictoires':assessment?.references.length>1?'Références recoupées':s?'Une seule référence disponible':'Échelle absente';
+        const linked=new Set(draft.links.map(l=>l.sourceViewId));
+        dialog.innerHTML=`<h2>${t('Contour extérieur du niveau')} · ${esc(name(current))}</h2>${select('mir-contour-source','Plan source',[['',t('Aucun plan de niveau fourni.')],...plans.map(v=>[v.id,v.payload.name+' · p. '+v.page])],draft.sourceViewId)}
+          <div class="mir-contour-tools">${[['trace','Tracer les points'],['reference','Mesure de référence'],['control','Cote de contrôle'],['region','Délimiter le dessin'],['alignment','Repère commun aux niveaux']].map(([id,label])=>`<button type="button" data-contour-mode="${id}" aria-pressed="${mode===id}">${t(label)}</button>`).join('')}<button id="mir-contour-propose" type="button" ${!region||!view?'disabled':''}>${t('Proposer un contour')}</button><button id="mir-contour-undo" type="button" ${!undo.length?'disabled':''}>${t('Annuler le dernier point')}</button></div>
+          <p>${t(mode==='trace'?'Cliquez sur les angles extérieurs. Glissez un point pour le corriger.':mode==='alignment'?'Choisissez un angle commun aux niveaux et vérifiez leur orientation.':mode==='region'?'Glissez un cadre autour du dessin, en excluant légendes et cartouches.':'Choisissez deux points représentant une mesure connue.')}</p><div class="mir-contour-map">${graphics()}</div><p>${t('Choisissez un angle commun aux niveaux et vérifiez leur orientation.')}</p><div class="mir-contour-fields">${select('mir-contour-plan-rotation','Rotation du plan',[[0,'0°'],[90,'90°'],[180,'180°'],[270,'270°']].map(([n,s])=>[String(n),s]),String(draft.alignment.rotationDegrees))}${input('mir-contour-offset-x','Décalage X',draft.alignment.offset[0]/unit)}${input('mir-contour-offset-y','Décalage Y',draft.alignment.offset[1]/unit)}</div>
+          <div class="mir-contour-fields">${select('mir-contour-unit','Unité',[['ft',t('Pieds')],['m',t('Mètres')]],unit===1?'m':'ft')}${input('mir-contour-reference','Valeur de référence',draft.reference.value==null?'':draft.reference.value/unit,'min="0"')}${select('mir-contour-ref-kind','Nature de la mesure',[['written',t('Cote écrite')],['user-measurement',t('Mesure fournie')],['hypothesis',t('Hypothèse')]],draft.reference.kind)}${input('mir-contour-control','Valeur de contrôle','', 'min="0"')}<button type="button" id="mir-contour-add-control" ${measurement.length!==2?'disabled':''}>${t('Ajouter la cote de contrôle')}</button></div><p id="mir-reference-status">${t(status)} · ${t('Mesures enregistrées avec leur source et leurs points.')}</p>
+          <label>${t('Repère ou texte de la cote')} · ${t('Mesure de référence')}<input id="mir-contour-ref-label" type="text" maxlength="240" value="${esc(draft.reference.label)}"></label>
+          <div class="mir-contour-fields">${input('mir-contour-height','Hauteur du niveau',draft.height.value==null?'':draft.height.value/unit,'min="0"')}${select('mir-contour-height-kind','Nature de la mesure',[['written',t('Cote écrite')],['user-measurement',t('Mesure fournie')],['estimated-calibrated',t('Mesure estimée à l’échelle')],['hypothesis',t('Hypothèse')]],draft.height.kind)}${select('mir-contour-height-source','Vue justifiant la hauteur',[['',t('Mesure à fournir')],...sources.filter(v=>['floor','elevation','section'].includes(v.kind)).map(v=>[v.id,v.payload.name+' · p. '+v.page])],draft.height.sourceViewId)}${input('mir-contour-base','Altitude de base',draft.base.value/unit)}</div><label>${t('Repère ou texte de la cote')} · ${t('Hauteur du niveau')}<input id="mir-contour-height-label" type="text" maxlength="240" value="${esc(draft.height.label)}"></label><p>${t('Repère local : zéro ne signifie pas RDC.')}</p>
+          <details><summary>${t('Vues compatibles')}</summary>${select('mir-find-field','Chercher une mesure',[['width',t('Largeur')],['depth',t('Profondeur')],['wallHeight',t('Hauteur')]],'wallHeight')}${sources.filter(v=>['elevation','section','floor'].includes(v.kind)).map(v=>`<label><input type="checkbox" data-level-link="${esc(v.id)}" ${linked.has(v.id)?'checked':''}> ${t('Cette vue représente ce niveau')} · <span data-mir-user-content>${esc(v.payload.name)} · p. ${v.page}</span></label><button data-measure-view="${esc(v.id)}" type="button" ${!linked.has(v.id)&&!(v.kind==='floor'&&v.levelId===current.sourceLevel)?'disabled':''}>${t('Mesurer dans cette vue')}</button>`).join('')}<button id="mir-find-dimensions" type="button">${t('Chercher une mesure')}</button><div id="mir-dimension-candidates"></div></details>
+          <details><summary>${t('Points et cotes')}</summary><div class="mir-contour-points">${draft.points.map((p,i)=>{const next=draft.points[(i+1)%draft.points.length],id=M.wallId(draft.contourId,p.id,next.id);return `<fieldset><legend>${t('Point')} ${i+1}</legend><label>X <input data-point-axis="x" data-point-id="${p.id}" type="number" step="any" value="${s?Number((M.modelPoints(draft)[i][0]/unit).toFixed(4)):''}" ${!s?'disabled':''}></label><label>Y <input data-point-axis="y" data-point-id="${p.id}" type="number" step="any" value="${s?Number((M.modelPoints(draft)[i][1]/unit).toFixed(4)):''}" ${!s?'disabled':''}></label><p>${t('Mesure estimée à l’échelle')} : ${fmt(s?M.distance(p.xy,next.xy)*s/unit:null)}</p><label>${t('Cote écrite du segment')}<input data-edge-measure="${esc(id)}" type="number" step="any" min="0" value="${draft.edgeMeasures[id]?.value?draft.edgeMeasures[id].value/unit:''}"></label><button type="button" data-adjust-edge="${i}" ${!s?'disabled':''}>${t('Ajuster le trait')}</button><button type="button" data-remove-point="${p.id}">${t('Supprimer')}</button></fieldset>`;}).join('')}</div></details>
+          <p id="mir-contour-message" role="status"></p><div class="mir-contour-confirmations">${[['outline','Contour vérifié'],['reference','Échelle vérifiée'],['height','Hauteur vérifiée'],['base','Position du niveau vérifiée']].map(([id,label])=>`<label><input type="checkbox" data-confirm="${id}"> ${t(label)}</label>`).join('')}</div><div class="mir-level-actions"><button id="mir-contour-confirm" class="primary" type="button">${t('Confirmer et voir le résultat')}</button><button id="mir-contour-save" type="button">${t('Conserver le brouillon')}</button><button id="mir-contour-close" type="button">${t('Fermer')}</button></div><p>${t('Les points non validés restent en brouillon.')}</p>`;
+        bindGraphic();dialog.querySelectorAll('details').forEach((el,i)=>el.open=opened[i]||false);dialog.scrollTop=scroll;
+        const $=s=>dialog.querySelector(s);
+        function refreshGeometry(){
+          const holder=dialog.querySelector('.mir-contour-map');holder.innerHTML=graphics();bindGraphic();
+          const p=M.modelPoints(draft);dialog.querySelectorAll('[data-point-axis]').forEach(el=>{if(el===document.activeElement)return;const i=draft.points.findIndex(p=>p.id===el.dataset.pointId),axis=el.dataset.pointAxis==='x'?0:1;el.value=p[i]?Number((p[i][axis]/unit).toFixed(4)):'';el.disabled=!M.scale(draft);});
+          const a=view?M.referenceAssessment({...view,calibration:{}},[draft.reference,...draft.reference.controlReferences||[]]):null;
+          $('#mir-reference-status').textContent=t(a?.deformed?'Dessin déformé entre les axes':a?.conflict?'Échelles contradictoires':a?.references.length>1?'Références recoupées':M.scale(draft)?'Une seule référence disponible':'Échelle absente')+' · '+t('Mesures enregistrées avec leur source et leurs points.');
+        }
+        $('#mir-contour-source').onchange=e=>{checkpoint();draft=M.draftFor(sources.find(v=>v.id===e.target.value),current);render();};
+        dialog.querySelectorAll('[data-contour-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.contourMode;measurement=[];render();});
+        $('#mir-contour-undo').onclick=()=>{draft=undo.pop();render();};
+        $('#mir-contour-unit').onchange=e=>{unit=e.target.value==='m'?1:.3048;render();};
+        $('#mir-contour-plan-rotation').onchange=e=>{draft.alignment.rotationDegrees=Number(e.target.value);refreshGeometry();};
+        for(const [id,index]of [['#mir-contour-offset-x',0],['#mir-contour-offset-y',1]])$(id).onchange=e=>{draft.alignment.offset[index]=Number(e.target.value)*unit;refreshGeometry();};
+        $('#mir-contour-reference').onchange=e=>{const value=e.target.value?Number(e.target.value)*unit:null;if(value!==draft.reference.value){draft.reference.label='';$('#mir-contour-ref-label').value='';}draft.reference.value=value;draft.reference.status='proposed';refreshGeometry();};
+        $('#mir-contour-ref-kind').onchange=e=>{draft.reference.kind=e.target.value;};
+        $('#mir-contour-ref-label').oninput=e=>draft.reference.label=e.target.value;
+        $('#mir-contour-height-label').oninput=e=>draft.height.label=e.target.value;
+        $('#mir-contour-height').onchange=e=>{draft.height.value=e.target.value?Number(e.target.value)*unit:null;draft.height.status='proposed';};
+        $('#mir-contour-height-kind').onchange=e=>draft.height.kind=e.target.value;
+        $('#mir-contour-height-source').onchange=e=>{draft.height.sourceViewId=e.target.value||null;if(e.target.value&&!draft.links.some(l=>l.sourceViewId===e.target.value))draft.links.push({sourceViewId:e.target.value,status:'confirmed',relationship:'user-selected-height-source'});};
+        $('#mir-contour-base').onchange=e=>{draft.base.value=e.target.value===''?null:Number(e.target.value)*unit;draft.base.kind='user-measurement';};
+        $('#mir-contour-add-control').onclick=()=>{const value=Number($('#mir-contour-control').value)*unit;if(value>0&&measurement.length===2){draft.reference.controlReferences.push({value,anchors:M.clone(measurement),kind:'written',sourceViewId:draft.sourceViewId,status:'proposed'});measurement=[];render();}};
+        dialog.querySelectorAll('[data-level-link]').forEach(el=>el.onchange=()=>{draft.links=draft.links.filter(l=>l.sourceViewId!==el.dataset.levelLink);if(el.checked)draft.links.push({sourceViewId:el.dataset.levelLink,status:'confirmed',relationship:'same-floor-reviewed'});const button=dialog.querySelector(`[data-measure-view="${el.dataset.levelLink}"]`);if(button)button.disabled=!el.checked;});
+        dialog.querySelectorAll('[data-measure-view]').forEach(button=>button.onclick=()=>measureView(sources.find(v=>v.id===button.dataset.measureView),$('#mir-find-field').value));
+        $('#mir-find-dimensions').onclick=()=>{const field=$('#mir-find-field').value,items=M.dimensionCandidates(inv(),current,field,draft.links),box=$('#mir-dimension-candidates');box.innerHTML=items.length?items.map((c,i)=>`<button type="button" data-candidate="${i}">${t(c.kind==='written'?'Cote écrite':'Mesure estimée à l’échelle')} · ${fmt(c.value/unit)} · p. ${sources.find(v=>v.id===c.sourceViewId)?.page} <span data-mir-user-content>${esc(c.text)}</span></button>${c.warning?`<p>${t('Vérifiez le niveau : cette cote peut être la hauteur totale du bâtiment.')}</p>`:''}`).join(''):`<p>${t('Aucune dimension compatible trouvée.')}</p>`;box.querySelectorAll('[data-candidate]').forEach(b=>b.onclick=()=>{const c=items[Number(b.dataset.candidate)];draft.dimensionSuggestions||={};draft.dimensionSuggestions[field]=M.clone(c);if(field==='wallHeight'){draft.height={...M.clone(c),label:c.text};render();}else notice(t('Cette dimension reste à confirmer.')+' '+fmt(c.value/unit));});};
+        dialog.querySelectorAll('[data-point-axis]').forEach(el=>el.onchange=()=>{checkpoint();const index=draft.points.findIndex(p=>p.id===el.dataset.pointId),p=draft.points[index],axis=el.dataset.pointAxis==='x'?0:1,xy=M.modelPoints(draft)[index],currentScale=M.scale(draft);xy[axis]=Number(el.value)*unit;const a=draft.alignment,r=a.rotationDegrees*Math.PI/180,x=xy[0]-a.offset[0],y=xy[1]-a.offset[1];p.xy=[(x*Math.cos(r)+y*Math.sin(r))/currentScale+a.origin[0],-(-x*Math.sin(r)+y*Math.cos(r))/currentScale+a.origin[1]];refreshGeometry();});
+        dialog.querySelectorAll('[data-remove-point]').forEach(b=>b.onclick=()=>{checkpoint();draft.points=draft.points.filter(p=>p.id!==b.dataset.removePoint);render();});
+        dialog.querySelectorAll('[data-edge-measure]').forEach(el=>el.onchange=()=>{draft.edgeMeasures[el.dataset.edgeMeasure]={value:el.value?Number(el.value)*unit:null,kind:'written',status:'proposed',sourceViewId:draft.sourceViewId,label:t('Cote écrite du segment')};});
+        dialog.querySelectorAll('[data-adjust-edge]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.adjustEdge),a=draft.points[i],end=draft.points[(i+1)%draft.points.length],measure=draft.edgeMeasures[M.wallId(draft.contourId,a.id,end.id)],length=M.distance(a.xy,end.xy);if(!measure?.value||!length||!s)return;checkpoint();end.xy=end.xy.map((x,k)=>a.xy[k]+(x-a.xy[k])*measure.value/s/length);render();});
+        $('#mir-contour-propose').onclick=async()=>{try{const image=new Image();image.src=view.payload.sourceImage;await image.decode();const [w,h]=size(),canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(image,0,0,w,h);const proposal=M.proposeRaster(ctx.getImageData(0,0,w,h),region);canvas.width=canvas.height=1;if(!proposal)return notice(t('Aucun contour suffisamment lisible. Tracez les points sur le plan.'));checkpoint();draft.points=proposal.points.map(xy=>({id:uuid('point'),xy}));draft.proposal={...proposal,points:undefined};if(!draft.alignment.origin)draft.alignment.origin=M.clone(draft.points[0].xy);render();notice(t('Proposition locale à vérifier : une pièce fermée ne prouve pas le contour extérieur.'));}catch(e){notice(e.message);}};
+        async function saveDraft(close){try{await persist({...M.clone(current),contourDraft:M.clone(draft)},expected);notice(t('Brouillon conservé'));if(close){dialog.close();dialog.remove();dialog=null;}else editAfterSave();}catch(e){notice(e.message);}}
+        function editAfterSave(){dialog.close();dialog.remove();dialog=null;void edit();}
+        $('#mir-contour-save').onclick=()=>void saveDraft(true);
+        $('#mir-contour-close').onclick=()=>void saveDraft(true);
+        dialog.oncancel=e=>{e.preventDefault();void saveDraft(true);};
+        $('#mir-contour-confirm').onclick=async()=>{
+          if(![...dialog.querySelectorAll('[data-confirm]')].every(e=>e.checked))return notice(t('Vérifiez le contour, l’échelle, la hauteur et la position avant de confirmer.'));
+          const reviewed=M.clone(draft);for(const field of ['reference','height','base','alignment'])reviewed[field].status='confirmed';
+          const errors=M.validateDraft(reviewed,inv(),current,{confirm:true});
+          if(errors.length){try{await persist({...M.clone(current),contourDraft:M.clone(draft)},expected);const msg=messages(errors);dialog.close();dialog.remove();dialog=null;await edit();dialog.querySelector('#mir-contour-message').textContent=msg+' '+t('Brouillon conservé');}catch(e){notice(e.message);}return;}
+          try{const next=M.commitContour(inv(),current.id,reviewed).levels.find(l=>l.id===current.id);await persist(next,expected);enabled=true;dialog.close();dialog.remove();dialog=null;api.render();}catch(e){notice(e.message);}
+        };
+      }
+      render();dialog.showModal();
+    }
+    function planSVG(){
+      const l=level(),c=l?.contours?.[0]||l?.contourDraft,view=inv().views.find(v=>v.id===c?.sourceViewId),w=view?.payload.sourceWidth||view?.zone?.[2]||view?.payload.bbox?.[2]||view?.frame?.rasterSize[0]||1000,h=view?.payload.sourceHeight||view?.zone?.[3]||view?.payload.bbox?.[3]||view?.frame?.rasterSize[1]||800;
+      const walls=l?M.wallsFor(l,inv()):[],points=c?.points||[];
+      return `<svg viewBox="0 0 ${w} ${h}" data-level-plan="${esc(l?.id)}" aria-label="${t('Contour extérieur du niveau')}">${view?.payload.sourceImage?`<image href="${esc(view.payload.sourceImage)}" width="${w}" height="${h}" opacity=".7"/>`:''}${points.length?`<polygon points="${points.map(p=>p.xy.join(',')).join(' ')}" fill="#34851115" stroke="#348511" stroke-width="3"/>`:''}${walls.map((wall,i)=>{const a=points[i].xy,b=points[(i+1)%points.length].xy;return `<g data-level-wall="${esc(wall.id)}" tabindex="0" role="button" aria-label="${t('Mur')} ${i+1}"><path d="M ${a.join(' ')} L ${b.join(' ')}" fill="none" stroke="${wall.id===selectedWallId?'#348511':esc(wall.finish?.color||'#536357')}" stroke-width="${wall.id===selectedWallId?15:10}"/><text x="${(a[0]+b[0])/2}" y="${(a[1]+b[1])/2-12}" font-size="${w/65}" fill="#18251d">${i+1}</text></g>`;}).join('')}</svg>`;
+    }
+    function renderControls(){
+      controls.hidden=!enabled;document.querySelector('#studio-controls').classList.toggle('mir-level-active',enabled);
+      document.querySelector('#workspace').classList.toggle('mir-level-active',enabled);
+      if(!enabled)return;
+      const l=level();if(!l)return;
+      const walls=M.wallsFor(l,inv());if(!walls.some(w=>w.id===selectedWallId))selectedWallId=walls[0]?.id||null;
+      const wall=walls.find(w=>w.id===selectedWallId),finish=l.wallFinishes?.[selectedWallId],materials=api.materials.filter(m=>m.applications?.some(a=>['siding','masonry','panel'].includes(a))),material=materials.find(m=>m.id===finish?.materialId),colors=api.colorsFor(material);
+      const openings=api.openingSources?.()||[];
+      controls.innerHTML=`<h2>${t('Finition du mur')}</h2>${select('mir-level-wall','Choisir un mur',[['',t('Choisir un mur')],...walls.map((w,i)=>[w.id,t('Mur')+' '+(i+1)+' · '+fmt(w.length)+' m'])],selectedWallId)}${wall?`<p>${fmt(wall.length)} × ${fmt(wall.height)} m</p>${select('mir-wall-material','Matière',[['',t('Sans finition attribuée')],...materials.map(m=>[m.id,m.brand+' · '+m.name])],material?.id)}${select('mir-wall-color','Fini',[['',t('À confirmer')],...colors.map((c,i)=>[String(i),c.name||c.label||c.id||String(i+1)])],finish?.colorIndex==null?'':String(finish.colorIndex))}<h3>${t('Ouvertures du mur')}</h3>${(l.wallOpenings||[]).filter(o=>o.wallId===wall.id).map(o=>`<p>${fmt(o.width)} × ${fmt(o.height)} m <button data-remove-opening="${esc(o.id)}" type="button">${t('Supprimer')}</button></p>`).join('')}<details><summary>${t('Ajouter l’ouverture')}</summary>${select('mir-wall-opening-source','Source de l’ouverture',[['',t('Nouvelle ouverture mesurée')],...openings.map(o=>[o.sourceId,o.name])],'')}<div class="mir-opening-fields">${input('mir-opening-offset','Distance depuis le début du mur','0','min="0"')}${input('mir-opening-width','Largeur','','min="0"')}${input('mir-opening-height','Hauteur','','min="0"')}${input('mir-opening-sill','Hauteur d’allège','0','min="0"')}</div><p>m</p><button id="mir-wall-add-opening" type="button">${t('Ajouter l’ouverture')}</button></details><label><input id="mir-level-openings-reviewed" type="checkbox" ${l.openingsReviewed?'checked':''}> ${t('Ouvertures vérifiées pour ce niveau')}</label>`:`<p>${t('Cette dimension reste à confirmer.')}</p>`}<p id="mir-wall-message" role="status"></p><p>${t('Cette modification du niveau ne change pas les anciennes retouches des élévations.')}</p>${quantitiesHTML(inv(),building())}`;
+      const $=s=>controls.querySelector(s),save=async(next)=>{try{await persist(next);}catch(e){$('#mir-wall-message').textContent=e.message;}};
+      $('#mir-level-wall').onchange=e=>{selectedWallId=e.target.value;api.render();};if(!wall)return;
+      $('#mir-wall-material').onchange=e=>{const next=M.clone(l);next.wallFinishes||={};next.wallFinishes[wall.id]={materialId:e.target.value,...api.officialColor(materials.find(m=>m.id===e.target.value),{}),provenance:'user-selected-wall-finish'};void save(next);};
+      $('#mir-wall-color').onchange=e=>{const index=e.target.value===''?null:Number(e.target.value),c=index==null?null:colors[index],next=M.clone(l);next.wallFinishes||={};next.wallFinishes[wall.id]={...(finish||{}),...api.officialColor(material,{colorId:c?.id}),colorIndex:index};void save(next);};
+      $('#mir-wall-add-opening').onclick=()=>{const next=M.clone(l),sourceId=$('#mir-wall-opening-source').value,opening={id:uuid('opening'),sourceId:sourceId||uuid('manual-opening'),wallId:wall.id,offset:Number($('#mir-opening-offset').value),width:Number($('#mir-opening-width').value),height:Number($('#mir-opening-height').value),sill:Number($('#mir-opening-sill').value),status:'confirmed',kind:'user-measurement'};next.wallOpenings=[...(next.wallOpenings||[]),opening];next.openingsReviewed=false;
+        const all=levels().flatMap(level=>level.id===l.id?next.wallOpenings:level.wallOpenings||[]);if(M.openingIssues(all,scene().walls).length)return $('#mir-wall-message').textContent=t('Ouverture hors du mur ou source déjà affectée.');void save(next);};
+      controls.querySelectorAll('[data-remove-opening]').forEach(b=>b.onclick=()=>{const next=M.clone(l);next.wallOpenings=next.wallOpenings.filter(o=>o.id!==b.dataset.removeOpening);next.openingsReviewed=false;void save(next);});
+      $('#mir-level-openings-reviewed').onchange=e=>{const next=M.clone(l);next.openingsReviewed=e.target.checked;void save(next);};
+    }
+    async function renderDrawing(){
+      if(!enabled||!level())return false;
+      renderControls();
+      const state=api.state(),q=scene(),three=state.view==='3d',$=s=>document.querySelector(s);
+      $('#elevation').hidden=three;$('#three-canvas').hidden=!three;$('#volume-unavailable').hidden=true;$('#rotate-control').hidden=!three;
+      $('#mir-side-wall-scroll').hidden=true;$('#mir-site-toggle').hidden=true;$('#mir-stairs-toggle').hidden=true;
+      $('#mir-fullscreen').hidden=!three;$('#mir-zoom-controls').hidden=!three;$('#mir-zoom-label').textContent=Math.round((state.cameraZoom||1)*100)+' %';
+      $('#rotation').value=state.rotation;$('#rotation-value').textContent=state.rotation+'°';
+      $('#view-2d').setAttribute('aria-pressed',String(!three));$('#view-3d').setAttribute('aria-pressed',String(three));
+      $('#stage-title').textContent=name(level())+(three?' · 360°':' · 2D');$('#stage-subtitle').textContent=t('Mur sélectionné dans le même modèle 2D et 360°.');
+      $('#stage-note').textContent=t('Niveaux non établis exclus du rendu. Toiture non reconstruite.');
+      if(!three){$('#elevation').innerHTML=planSVG();$('#elevation').querySelectorAll('[data-level-wall]').forEach(el=>{const choose=()=>{selectedWallId=el.dataset.levelWall;api.render();};el.onclick=choose;el.onkeydown=e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();choose();}};});}
+      else if(!q.walls.length){$('#three-canvas').hidden=true;$('#elevation').hidden=false;$('#elevation').innerHTML=`<p>${t('Cette dimension reste à confirmer.')}</p><button id="mir-level-edit-inline">${t('Contour et mesures')}</button>`;$('#mir-level-edit-inline').onclick=()=>void edit();root.MIR_RENDER_DIAGNOSTICS={rendered:false,reason:'level-measurements-unconfirmed'};}
+      else{try{root.MIR_RENDER_DIAGNOSTICS=await MIR3D.render($('#three-canvas'),{levelScene:q,selectedWallId,angle:state.rotation,elevation:state.cameraElevation,zoom:state.cameraZoom,views:{}});}catch(e){$('#stage-note').textContent=e.message;root.MIR_RENDER_DIAGNOSTICS={rendered:false,error:e.message};}}
+      return true;
+    }
+    function handleHit(hit){if(!enabled||!scene().walls.some(w=>w.id===hit.surfaceId))return false;selectedWallId=hit.surfaceId;const l=levels().find(l=>l.id===scene().walls.find(w=>w.id===selectedWallId).levelId);levelId=l.id;api.render();return true;}
+    renderBar();root.addEventListener('mir:client-locale-changed',()=>{renderBar();if(dialog){dialog.close();dialog.remove();dialog=null;}api.render();});
+    return {active:()=>enabled,renderDrawing,renderControls,handleHit,edit,scene,snapshot:()=>({levelId,selectedWallId,enabled,scene:scene()})};
+  }
+  root.MIRLevelStudio=Object.freeze({setup,quantitiesHTML,t});
+})(window);

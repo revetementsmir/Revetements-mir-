@@ -129,6 +129,14 @@
   }
 
   function dimensionsFrom(options) {
+    if(options.levelScene){
+      const walls=options.levelScene.walls;
+      if(!Array.isArray(walls)||!walls.length||walls.some(w=>w.poly?.length!==4||w.poly.some(p=>p.length!==3||!p.every(Number.isFinite))))throw new RangeError('Confirmez le contour et la hauteur du niveau.');
+      const points=walls.flatMap(w=>w.poly),range=axis=>Math.max(...points.map(p=>p[axis]))-Math.min(...points.map(p=>p[axis]));
+      const width=range(0),depth=range(1),wallHeight=range(2);
+      if(!(width>0&&depth>0&&wallHeight>0))throw new RangeError('Contour ou hauteur invalide.');
+      return {width,depth,wallHeight,roofRise:0};
+    }
     const d = {};
     for (const name of Object.keys(DEFAULTS)) d[name] = positive(options.dimensions && options.dimensions[name], DEFAULTS[name]);
     const rise = options.dimensions && options.dimensions.roofRise;
@@ -400,6 +408,16 @@
   }
 
   function build(d, options) {
+    if(options.levelScene){
+      const scene=options.levelScene,points=scene.walls.flatMap(w=>w.poly),cx=(Math.min(...points.map(p=>p[0]))+Math.max(...points.map(p=>p[0])))/2,cy=(Math.min(...points.map(p=>p[1]))+Math.max(...points.map(p=>p[1])))/2;
+      const faces=scene.walls.map(w=>({id:w.id,wallId:w.id,levelId:w.levelId,buildingId:w.buildingId,type:'wall',role:'level-exterior-wall',
+        poly:w.poly.map(([x,y,z])=>[x-cx,y-cy,z]),normal:w.normal.slice(),base:[w.from[0]-cx,w.from[1]-cy,w.base],
+        u:[(w.to[0]-w.from[0])/w.length,(w.to[1]-w.from[1])/w.length,0],width:w.length,fillColor:cleanColor(w.finish?.color,'#d7d8d0'),
+        openings:(scene.openings||[]).filter(o=>o.wallId===w.id),selected:options.selectedWallId===w.id}));
+      return {faces,a:d.width/2,b:d.depth/2,e:0,top:Math.max(...points.map(p=>p[2])),ground:Math.min(...points.map(p=>p[2])),foundationDrop:0,dimensions:d,roofStyle:'unknown',
+        recess:{enabled:false,depth:0,height:0},footprint:{type:'level-contours',confirmed:true,levelIds:scene.levels.map(l=>l.id)},porch:{enabled:false},structures:[],
+        levelScene:scene,sourcePlan:'confirmed contours and measured level heights; no inferred roof'};
+    }
     const faces = [], a = d.width / 2, b = d.depth / 2, h = d.wallHeight, rise = d.roofRise;
     const foundationDrop = positive(options.foundationDrop, 0), ground = -foundationDrop;
     const recess = recessFrom(d, options), footprint = footprintMetrics(d, recess);
@@ -645,7 +663,8 @@
         'Any continuation below ground follows foundationDrop as a display assumption, not a foundation drawing.',
         mesh.porch.enabled?'The optional porch includes its projecting underside at its own height; no duplicate ceiling is added at that height.':ceiling?'The recess ceiling excludes the projecting porch; no porch is inferred unless explicitly enabled.':mesh.roofStyle==='duplex'?'The full-height duplex setback follows the roof edge; no inter-storey ceiling or projecting porch is inferred.':'The caller-selected generic roof outline is retained with its own roof underside; no inter-storey ceiling or porch is inferred.',
         'Return finishes, openings, product coverage and waste are not resolved by this geometry.'
-      ]:[], sourcePlan:mesh.sourcePlan, schematic:true };
+      ]:[], sourcePlan:mesh.sourcePlan, schematic:true,
+      ...(mesh.levelScene?{levelModelVersion:1,levelIds:mesh.levelScene.levels.map(l=>l.id),partial:mesh.levelScene.partial,quantities:mesh.levelScene.quantities}:{} ) };
   }
 
   function geometry(options = {}) {
@@ -806,6 +825,9 @@
         const color=cleanColor(options.returnMasonry.color,null);
         if(color&&top>base&&w>0)patch([local(face,0,base),local(face,w,base),local(face,w,top),local(face,0,top)],color);
       }
+      if(face.role==='level-exterior-wall')for(const opening of face.openings||[]){
+        const z=face.base[2]+opening.sill;patch([local(face,opening.offset,z),local(face,opening.offset+opening.width,z),local(face,opening.offset+opening.width,z+opening.height),local(face,opening.offset,z+opening.height)],'#859e9a');
+      }
       const shade = Math.max(0,.105 - dot(face.normal,[-.35,-.85,.4])*.07);
       trace(face.poly);ctx.fillStyle=`rgba(21,32,26,${shade})`;ctx.fill();ctx.restore();
     }
@@ -851,12 +873,13 @@
       else if(['column','beam','divider','balcony','concrete','corner','roof-detail'].includes(face.type))paintSolid(face);
       else patch(face.poly,fascia);
       trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';ctx.stroke();
+      if(face.selected){trace(face.poly);ctx.strokeStyle='#348511';ctx.lineWidth=3;ctx.stroke();}
     }
     state.size = [W,H,dpr];
     state.pickingRenderId=token;
     state.hitSurfaces=visible.map(face=>{
       const view=face.textureView||(['front','right','back','left'].includes(face.id)?face.id:null),item=images[view];
-      const surface={surfaceId:face.id,type:face.type,role:face.role||null,view,screenPolygon:face.poly.map(project)};
+      const surface={surfaceId:face.id,wallId:face.wallId||null,levelId:face.levelId||null,type:face.type,role:face.role||null,view,screenPolygon:face.poly.map(project)};
       if(Number.isInteger(face.cornerIndex))surface.cornerIndex=face.cornerIndex;
       if(face.structureId){surface.structureId=face.structureId;surface.material=face.material;surface.sourceStatus=face.sourceStatus;}
       if(face.returnId){surface.returnId=face.returnId;surface.independentFinish=!!mesh.recess.returnFinishAssigned?.[face.returnId];}
@@ -904,7 +927,8 @@
       recess:options.recess&&typeof options.recess==='object'?{...options.recess,returnColors:{...(options.recess.returnColors||{})}}:options.recess,
       porch:options.porch&&typeof options.porch==='object'?{...options.porch,divider:options.porch.divider&&typeof options.porch.divider==='object'?{...options.porch.divider}:options.porch.divider}:options.porch,
       structures:Array.isArray(options.structures)?options.structures.map(s=>s&&({...s,origin:Array.isArray(s.origin)?s.origin.slice():s.origin,size:Array.isArray(s.size)?s.size.slice():s.size})):options.structures,
-      footprint:options.footprint&&typeof options.footprint==='object'?{...options.footprint,recess:options.footprint.recess&&typeof options.footprint.recess==='object'?{...options.footprint.recess}:options.footprint.recess}:options.footprint};
+      footprint:options.footprint&&typeof options.footprint==='object'?{...options.footprint,recess:options.footprint.recess&&typeof options.footprint.recess==='object'?{...options.footprint.recess}:options.footprint.recess}:options.footprint,
+      levelScene:options.levelScene?JSON.parse(JSON.stringify(options.levelScene)):undefined};
     state.options=snapshot;
     const names=['front','right','back','left','return-left','return-right'];
     state.pending=true;

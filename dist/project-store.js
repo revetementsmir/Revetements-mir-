@@ -36,6 +36,26 @@
   async function clearActive() { try { localStorage.removeItem(ACTIVE); } catch (_) {} window.dispatchEvent(new CustomEvent('mir:project-active', { detail: { id: null } })); }
   async function list() { const rows = await request('readonly', store => store.getAll()); return rows.map(e => ({ id: e.id, title: e.planData?.title, filename: e.source?.filename, createdAt: e.createdAt })).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))); }
   async function activate(id) { const entry = await get(id); if (!entry) throw new Error('Ce projet n’est plus disponible sur cet appareil.'); return saveActive(entry); }
+  async function saveLevelGeometry({projectId,buildingId,levelId,expectedRevision,level}){
+    if(activeId()!==projectId||level.id!==levelId||level.buildingId!==buildingId)throw new Error('Le projet actif a changé. Votre brouillon est conservé dans cette fenêtre.');
+    const connection=await db();
+    const record=await new Promise((resolve,reject)=>{
+      const tx=connection.transaction(STORE,'readwrite'),store=tx.objectStore(STORE),read=store.get(projectId);let saved,problem;
+      read.onsuccess=()=>{try{
+        const entry=read.result,inventory=entry?.planData?.viewInventory;
+        if(!inventory||!inventory.buildings.some(b=>b.id===buildingId))throw new Error('Bâtiment introuvable.');
+        const index=inventory.levels.findIndex(l=>l.id===levelId),current=inventory.levels[index];
+        if((current?current.geometryRevision||0:null)!==expectedRevision)throw new Error('Ce niveau a changé dans une autre fenêtre. Rechargez avant de réappliquer votre brouillon.');
+        const next=JSON.parse(JSON.stringify(level));next.geometryRevision=(expectedRevision||0)+1;
+        if(index<0)inventory.levels.push(next);else inventory.levels[index]=next;
+        if(window.MIRLevelModel){for(const contour of next.contours||[])if(contour.status==='confirmed'&&MIRLevelModel.validateDraft(contour,inventory,next,{confirm:true}).length)throw new Error('Contour ou mesures invalides.');next.wallPlanes=MIRLevelModel.wallsFor(next,inventory);}
+        inventory.geometryVersion=1;inventory.levelStudio||={};inventory.levelStudio[buildingId]={activeLevelId:levelId};
+        entry.updatedAt=new Date().toISOString();store.put(entry);saved=entry;
+      }catch(e){problem=e;tx.abort();}};
+      tx.oncomplete=()=>resolve(saved);tx.onabort=tx.onerror=()=>reject(problem||tx.error||new Error('Le niveau n’a pas pu être enregistré.'));
+    });
+    window.dispatchEvent(new CustomEvent('mir:project-active',{detail:{id:projectId}}));return alias(record);
+  }
   const keys = (id,scope) => ({ studio: id ? `mir-plan-study-v2:${id}${scope?':'+scope:''}` : 'mir-plan-study-v2', takeoff: id ? `mir-takeoff-v1:${id}${scope?':'+scope:''}` : 'mir-takeoff-v1' });
-  window.MIRProjectStore = Object.freeze({ getActive, get, activate, saveActive, clearActive, list, activeId, keys, version: 1 });
+  window.MIRProjectStore = Object.freeze({ getActive, get, activate, saveActive, saveLevelGeometry, clearActive, list, activeId, keys, version: 1 });
 })();

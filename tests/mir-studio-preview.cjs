@@ -1,0 +1,11 @@
+'use strict';
+const assert=require('node:assert/strict'),P=require('../dist/studio-client-preview.js');
+(async()=>{let state={windows:{a:{frame:'white'},b:{frame:'black'}},columns:{a:'red',b:'blue'},corners:{a:'grey',b:'green'}},saved=structuredClone(state),count=0;
+const p=P.create({read:()=>state,replace:x=>state=x,persist:async x=>{saved=x;count++;}}),original=structuredClone(state);
+p.begin({kind:'opening',id:'a'});state.windows.a.frame='red';state.windows.a.frame='green';assert.deepEqual(saved,original);assert.equal(count,0);p.cancel();assert.deepEqual(state,original);
+p.begin({kind:'opening',id:'a'});p.scope('all');for(const w of Object.values(state.windows))w.frame='orange';p.cancel();assert.deepEqual(state,original,'group cancellation restores individual differences');
+p.begin({kind:'column',id:'a'});state.columns.a='yellow';p.begin({kind:'corner',id:'a'});assert.equal(state.columns.a,'red','changing target cancels an unfinished preview');state.corners.a='white';await p.confirm();assert.equal(saved.corners.a,'white');assert.equal(saved.corners.b,'green');assert.equal(count,1);
+const committed=structuredClone(saved);p.begin({kind:'opening',id:'b'});state.windows.b.frame='yellow';p.scope('all');assert.deepEqual(state,committed,'changing scope resets the prior trial before the next group choice');p.cancel();
+const fail=P.create({read:()=>state,replace:x=>state=x,persist:async()=>{throw Error('storage unavailable');}});fail.begin({kind:'opening',id:'a'});state.windows.a.frame='new';await assert.rejects(()=>fail.confirm(),/storage/);assert.equal(fail.active(),true,'failed persistence keeps the draft reviewable');fail.cancel();assert.deepEqual(state,committed);
+console.log('PASS Studio preview: no persistence before Confirm, full individual/group rollback, target/scope changes, one commit and failed-save recovery');
+})().catch(e=>{console.error(e);process.exitCode=1;});

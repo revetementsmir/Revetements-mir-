@@ -64,12 +64,16 @@
     refresh(inventory);return inventory;
   }
   function refresh(inventory){
+    const previousLevels=new Map((inventory.levels||[]).map(level=>[level.id,level]));
     for(const [building,slots]of Object.entries(inventory.rendererSelections||{}))for(const [direction,id]of Object.entries(slots))
       if(id&&!inventory.views.some(v=>v.id===id&&v.buildingId===building&&v.direction===direction))slots[direction]=null;
     inventory.levels=[...new Map(inventory.views.filter(v=>v.levelId).map(v=>{
       const id=(v.buildingId||'unresolved')+':'+v.levelId;
-      return [id,{id,buildingId:v.buildingId,sourceLevel:v.levelId,status:v.associations?.level==='confirmed'?'confirmed':'proposed',contours:[],wallPlanes:[]}];
+      return [id,{...previousLevels.get(id),id,buildingId:v.buildingId,sourceLevel:v.levelId,status:v.associations?.level==='confirmed'?'confirmed':'proposed',contours:previousLevels.get(id)?.contours||[],wallPlanes:previousLevels.get(id)?.wallPlanes||[]}];
     })).values()];
+    // Explicit levels and orphaned reviewed contours remain available. A view
+    // reassignment must never erase a customer's geometry, finishes or drafts.
+    for(const level of previousLevels.values())if(!inventory.levels.some(l=>l.id===level.id))inventory.levels.push(level);
     return inventory;
   }
   function candidates(inventory,buildingId,direction){return inventory.views.filter(v=>v.buildingId===buildingId&&v.kind==='elevation'&&v.direction===direction);}
