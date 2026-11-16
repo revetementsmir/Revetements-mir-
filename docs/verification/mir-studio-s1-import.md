@@ -1,6 +1,6 @@
 # MIR Studio S1 — inventaire et import des vues
 
-Lot en vérification. Base relue : `e9bd39bc5dd4c40663c56bfc21759c543ab4e8d9`, après PR43. Branche unique : `codex/mir-studio-s1-import`. Aucune fusion ni publication S1 autorisée par ce lot. Les PR2/8/9/11 et les travaux employés locaux sont préservés.
+Import S1 vérifié localement et proposé dans la [PR de travail #44](https://github.com/revetementsmir/Revetements-mir-/pull/44). Base relue : `e9bd39bc5dd4c40663c56bfc21759c543ab4e8d9`, après PR43. Branche unique : `codex/mir-studio-s1-import`. Aucune fusion ni publication S1 effectuée. Les PR2/8/9/11 et les travaux employés locaux sont préservés.
 
 ## Comportement réalisé
 
@@ -24,7 +24,7 @@ Un contour inconnu reste `unknown`. La prévisualisation 3D éventuelle est indi
 - Les cotes ne sont rapprochées qu'à l'intérieur du bâtiment sélectionné. Les plans de niveaux différents restent distincts; les contradictions restent nulles/à confirmer, sans moyenne appliquée.
 - L'adaptateur `adapt` est pur. Il fournit les quatre directions actuelles et les références du seul bâtiment sélectionné.
 - Une simple ouverture d'un ancien projet ne réécrit ni le plan ni ses réglages. La migration est explicite depuis « Bâtiment et vues »; elle copie les faits source, garde les champs inconnus, les faces originales et les confirmations existantes. Elle ne déduit aucun niveau absent.
-- Les anciennes clés locales sont conservées. Après migration, les espaces de stockage sont séparés par projet et bâtiment; les champs attachés à une vue sont sérialisés avec son identifiant stable. Le modèle original et ses choix ne sont pas effacés pour revenir en arrière.
+- Les anciennes clés locales sont conservées et référencées dans la migration. Après migration, les espaces de stockage sont séparés par projet et bâtiment; les champs attachés à une vue sont sérialisés avec son identifiant stable. La migration utilise la source exacte de l'ancienne face, jamais une référence trouvée dans la même direction. Si les anciennes faces appartiennent à plusieurs bâtiments, les réglages globaux sans propriétaire certain restent archivés dans leur espace original et ne sont pas dupliqués entre bâtiments. Le modèle original et ses choix ne sont pas effacés.
 
 ## Recette et confidentialité
 
@@ -32,19 +32,27 @@ Le rapport utilisateur du 16 novembre a été lu depuis l'archive privée reçue
 
 Aucun original, texte OCR client, aperçu de plan privé, ZIP privé, lien temporaire ou secret n'est ajouté au dépôt ou aux artefacts publics. Le runner `tools/qa/mir-studio-originals-local.cjs` exige un manifeste et une destination hors dépôt; il ne transmet les sources à aucun service d'analyse. Ses captures et résultats détaillés restent privés. Ses requêtes externes sont bloquées pendant la recette. La CI utilise exclusivement les fixtures synthétiques.
 
-### Matrice des originaux — état de recette
+### Matrice des sept originaux — recette réelle du 16 novembre 2026
 
-Les comptes ci-dessous désignent des vues, pas des pans de mur. Une importation réussie ne certifie pas ses dimensions ni ses contours.
+Les comptes ci-dessous désignent des vues, pas des pans de mur. Chaque original a été chargé par le formulaire local, sauvegardé dans IndexedDB, ouvert dans le Studio, puis rechargé. Les empreintes, tailles du PDF conservé et nombres de vues à la réouverture correspondent. Les rendus source et Studio ont été ouverts pour inspection. Une importation réussie ne certifie pas ses dimensions ni ses contours.
 
-| Original | Pages | Base e9bd39b : vues réellement importées | S1 | Points à vérifier/conserver |
-|---|---:|---:|---|---|
-| Jumelé Sentier FINAL | 5 | 5 | En cours de recette finale | Aucun plan d'étage dans ce fichier; étude existante distincte, pas de profondeur de retrait inventée. |
-| 351 | 5 | 4 | En cours de recette finale | RDC refusé sur la base; garage intégré et détail ne doivent pas devenir un second bâtiment. |
-| 313 | 5 | 5 | En cours de recette finale | Seul le plan de l'étage est fourni; aucun RDC confirmé. |
-| Samuel Forest | 5 | 4 | En cours de recette finale | Titre d'aménagement étage refusé sur la base; doublons OCR de la même boîte à réunir. |
-| Des Tournesols | 5 | 5 | En cours de recette finale | RDC en première page, légendes colorées exclues de la géométrie. |
-| Champs fleuris no 5 | 6 | 4 | Corrections en recette | Base : seulement les quatre élévations de maison; cabanon et RDC tournés manqués. Candidat initial : 9 entrées, dont un doublon; cinq vues du cabanon non encore complètes. Échecs conservés. |
-| 12 logements | 17 | En cours | En cours de recette finale | Implantation, notes, index, fondation, toiture, niveaux, coupe et détails distincts. |
+Calibrations proposées par vue : R = lectures recoupées, U = cote unique, F = faible confiance, C = conflit, A = absente. Même R reste non confirmé (`verified: false`). Les bâtiments non nommés avec certitude gardent « Bâtiment à confirmer »; les niveaux lus restent proposés.
+
+| Original | Pages | Base e9bd39b : vues importées | S1 : vues importées et rouvertes | Bâtiment / niveaux / orientation | Échelle et dimensions restantes |
+|---|---:|---:|---:|---|---|
+| Jumelé Sentier FINAL | 5 | 5 | 5 | Groupe à confirmer; 4 élévations + RDC, 0°. Aucun plan d'étage fourni. | 3R, 1C, 1F. Largeur isolée gardée en attente; dimensions globales nulles. Aucun retrait repris de l'étude. |
+| 351 | 5 | 4 | 5 | Groupe à confirmer; 4 élévations + RDC, 0°. « Plan R-D-C » maintenant reconnu. | 1R, 1F, 3A. Dimensions globales manquantes. Garage intégré non séparé en bâtiment. |
+| 313 | 5 | 5 | 5 | Groupe à confirmer; 4 élévations + étage seulement, 0°. Aucun RDC créé. | 2F, 3A. Dimensions globales manquantes. |
+| Samuel Forest | 5 | 4 | 5 | Groupe à confirmer; 4 élévations + étage seulement, 0°. Titre d'aménagement reconnu. | 1U, 1F, 3A. Dimensions globales manquantes. Aucun RDC créé. |
+| Des Tournesols | 5 | 5 | 5 | Groupe à confirmer; RDC p1 + 4 élévations, 0°. | 1R, 4A. Dimensions globales manquantes. Légendes conservées dans l'image, sans mur automatique. |
+| Champs fleuris no 5 | 6 | 4 | 10 | Cabanon : 5 vues p1 redressée à 270°, dont le plan central complet. Maison : RDC p2 redressé à 270° et 4 élévations p3–6 à 0°. Deux bâtiments séparés. | 1R, 3U, 2F, 4A. Dimensions globales manquantes pour les deux bâtiments; aucune cote ou matière propagée entre eux. |
+| 12 logements | 17 | 12, dont 1 faux positif | 11 | Groupe à confirmer; fondation p4, niveaux 0–3 p5–8, toiture p9, élévations p10–13, coupe p16; 0°. Index p1 écarté. | 4R, 3C, 2F, 2A. Largeur/profondeur en attente, hauteur contradictoire nulle. Proposition de hauteur de toit conservée avec provenance, non confirmée. |
+
+Total S1 : **46 vues**, **48 pages sources conservées**, sept imports et réouvertures réussis. Pour le 12 logements, index, code, implantation, escalier, notes et détails (p1–3, p14–15, p17) restent accessibles dans le PDF original; ils ne sont pas transformés en murs ou plans de niveau.
+
+Échecs conservés dans la comparaison : la base manque le RDC de 351, l'étage de Samuel et les vues tournées de Champs fleuris; elle prend une ligne de l'index du 12 logements pour une coupe. Les premiers candidats S1 de Champs fleuris ont donné 8 ou 9 entrées, parfois avec doublon ou plan central absent, avant correction. Ils ne sont pas comptés comme réussite. Des avertissements OCR et des lignes/cadrages illisibles persistent sur les originaux; ils expliquent les calibrations absentes ou faibles et restent dans les journaux privés. Aucun échec bloquant final du formulaire ou de réouverture n'a été observé.
+
+La recette originale finale utilise le code d'import épinglé à `9036a2ad5ae27c6394440c0016e551b2ab6a09b1`, copie privée `final-source-v4` avec empreintes des scripts. Les derniers changements de livraison concernent seulement la migration d'anciens réglages, ses régressions et ce compte rendu; ils ne modifient pas le parcours de nouvel import ainsi testé. Les preuves privées détaillées ne sont pas publiées.
 
 ### Contrôles synthétiques déjà exécutés
 
@@ -52,11 +60,13 @@ Les comptes ci-dessous désignent des vues, pas des pans de mur. Une importation
 - Avant/après de la même fixture raster : base 3 vues sur 8; S1 conserve huit vues et deux bâtiments, avec cinq vues de cabanon sur une page tournée à 270°.
 - Titres FR/EN et contre-exemples de notes, cartouches et index; boîtes OCR qui se chevauchent; plan central entre deux colonnes d'élévations.
 - Identifiants stables, conflit de dimensions, étage sans RDC, absence de mélange des cotes maison/cabanon, aller-retour des quatre rotations et cadrages.
-- Import, sauvegarde/réouverture, changement de bâtiment, retouches de matière/zone/ouverture conservées, isolation des projets, migration explicite et ouverture d'un ancien projet sans écriture.
+- Import, sauvegarde/réouverture, fermeture puis relance du navigateur avec profil persistant, changement de bâtiment, retouches de matière/zone/ouverture conservées, isolation des projets, migration explicite et ouverture d'un ancien projet sans écriture. Régression de migration : une référence portant la même direction n'hérite pas des finitions de l'ancienne face; des propriétaires multiples ne reçoivent pas une copie du volume global.
 - Parcours Chromium aux dimensions 390×844, 834×1112 et 1440×1000; captures synthétiques ouvertes pour inspection, distinctes d'appareils physiques.
 - Ancienne suite navigateur du PDF synthétique 108 Mo / 67 pages conservée et exécutée sans modification des assertions. Suites murs détachés et terrain/interactions exécutées. Suites Node existantes pertinentes conservées.
 
-La CI de la tête poussée et la matrice finale restent à relever avant clôture. Aucun test sur Samsung n'est demandé. Aucun backend, Supabase production, courriel réel, paiement, Google, signature de release ou distribution n'est nécessaire à ce lot.
+Le workflow S1 vérifie explicitement le SHA de tête de PR et exécute les contrats, l'import raster synthétique, la persistance et les suites navigateur existantes. Les contrôles exacts de la dernière tête sont relevés dans la PR et la tâche Atelier après le push; un succès d'une tête précédente ne vaut pas certification de la suivante.
+
+Tests non exécutés : import des sept originaux sur appareils physiques téléphone/tablette, Safari et Samsung. Les trois formats d'écran ont été testés dans Chromium avec des plans synthétiques uniquement, sans les présenter comme une recette des originaux sur ces appareils. Les cotes manuelles exhaustives, contours confirmés par niveau, retours cachés et quantités 360° ne sont pas établis par S1. Aucun accès Supabase manuel, migration backend, courriel réel, paiement, signature de release ou distribution effectué. Les workflows TEST existants restent inchangés.
 
 ## Reproduction
 

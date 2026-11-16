@@ -77,10 +77,16 @@
       // New records already use per-building/per-view namespaces.
       const planData=activeProject.planData.viewInventory?draft:{...draft,legacyRenderPreserved:true};
       if(!activeProject.planData.viewInventory){
-        for(const view of draft.viewInventory.views){const f=activeProject.planData.faces.find(f=>f.key===view.direction);if(f)draft.viewInventory.rendererSelections[view.buildingId]={...draft.viewInventory.rendererSelections[view.buildingId],[view.direction]:view.id};}
-        const projected=MIRViewInventory.adapt(planData,MIRSheetDetection.volumeFrom);
-        const keys=MIRProjectStore.keys(activeProject.id,projected.rendererScopeKey);
-        for(const [oldKey,newKey] of [[STORAGE,keys.studio],[TAKEOFF_STORAGE,keys.takeoff]]){const raw=JSON.parse(localStorage.getItem(oldKey)||'null');if(raw&&!localStorage.getItem(newKey))localStorage.setItem(newKey,JSON.stringify(MIRViewInventory.encodeState(raw,projected)));}
+        MIRViewInventory.prepareLegacyMigration(draft.viewInventory);
+        draft.viewInventory.migration.legacyStorageKeys={studio:STORAGE,takeoff:TAKEOFF_STORAGE};
+        for(const building of draft.viewInventory.buildings){
+          const keys=MIRProjectStore.keys(activeProject.id,'building-'+building.id);
+          for(const [oldKey,newKey] of [[STORAGE,keys.studio],[TAKEOFF_STORAGE,keys.takeoff]]){
+            const raw=JSON.parse(localStorage.getItem(oldKey)||'null');
+            const migrated=raw&&MIRViewInventory.migrateSavedState(raw,planData,building.id);
+            if(migrated&&!localStorage.getItem(newKey))localStorage.setItem(newKey,JSON.stringify(migrated));
+          }
+        }
       }
       await MIRProjectStore.saveActive({...activeProject,planData});location.reload();
     }catch(e){message.textContent=e.message;apply.disabled=false;}};

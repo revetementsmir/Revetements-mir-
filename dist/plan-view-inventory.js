@@ -117,7 +117,9 @@
     if(planData.viewInventory)return copy(planData);
     const records=[...(planData.faces||[]).filter(f=>f.page||f.sourceImage),...(planData.referencePages||[])];
     const inventory=create(records,source||planData.sourceMetadata||{filename:planData.title,bytes:0});
-    inventory.migration={fromVersion:planData.version,method:'source-facts-only',originalBuildingId:inventory.activeBuildingId,legacyFaces:copy(planData.faces||[])};
+    const originalFaces=(planData.faces||[]).filter(f=>f.page||f.sourceImage);
+    inventory.migration={fromVersion:planData.version,method:'source-facts-only',originalBuildingId:inventory.activeBuildingId,
+      legacySlots:Object.fromEntries(originalFaces.map((f,i)=>[f.key,inventory.views[i].id])),legacyFaces:copy(planData.faces||[])};
     for(const view of inventory.views){view.levelId=null;view.associationStatus='unresolved';view.associations={building:'unresolved',level:'unresolved',direction:'unresolved'};view.provenance.method='legacy-source-facts';}
     inventory.levels=[];
     return {...copy(planData),version:3,viewInventory:inventory};
@@ -156,6 +158,33 @@
     out.face=mapping[state.face]||(encode?ids.front:'front');
     return out;
   }
-  return Object.freeze({create,refresh,adapt,migrate,selected,candidates,placeholder,buildingHint,pageBuilding,levelHint,pdfToLocal,localToPDF,
+  function prepareLegacyMigration(inventory){
+    const legacy=inventory.migration;if(!legacy)return;
+    const primary=Object.values(legacy.legacySlots||{}).map(id=>inventory.views.find(v=>v.id===id)).filter(Boolean);
+    const owners=[...new Set(primary.map(v=>v.buildingId).filter(Boolean))];
+    if(!primary.length&&inventory.buildings.length===1)owners.push(inventory.buildings[0].id);
+    legacy.originalBuildingId=owners.length===1?owners[0]:null;legacy.globalAssignmentStatus=owners.length===1?'preserved':'unresolved';
+    for(const view of primary){
+      if(!view.buildingId||!view.direction)continue;
+      if(primary.filter(v=>v.buildingId===view.buildingId&&v.direction===view.direction).length!==1)continue;
+      const slots=inventory.rendererSelections[view.buildingId]||={};
+      if(!Object.hasOwn(slots,view.direction))slots[view.direction]=view.id;
+    }
+  }
+  function migrateSavedState(state,plan,buildingId){
+    const inventory=plan.viewInventory,legacy=inventory?.migration;if(!legacy)return null;
+    const ids=legacy.legacySlots||{},owner=legacy.originalBuildingId;
+    const belongs=key=>inventory.views.find(v=>v.id===ids[key])?.buildingId===buildingId;
+    const allowed=directions.filter(key=>belongs(key)||(buildingId===owner&&!ids[key]));
+    if(!allowed.length&&buildingId!==owner)return null;
+    const scoped=buildingId===owner?copy(state):{version:state.version};
+    const hasViewKey=k=>allowed.some(key=>k===key||k.startsWith(key+':')||k.startsWith(key+'-'));
+    for(const field of [...mapFields,...faceFields])if(state[field]&&!Array.isArray(state[field]))scoped[field]=Object.fromEntries(Object.entries(state[field]).filter(([key])=>hasViewKey(key)));
+    for(const field of ['transitions','customSegments','customSoffits','panelLayouts'])if(Array.isArray(state[field]))scoped[field]=state[field].filter(item=>allowed.includes(item.face)||buildingId===owner&&!item.face);
+    scoped.face=allowed.includes(state.face)?state.face:allowed[0]||'front';
+    const mappingPlan={viewInventory:inventory,faces:directions.map(key=>({key,viewId:belongs(key)?ids[key]:undefined}))};
+    return translateState(scoped,mappingPlan,true);
+  }
+  return Object.freeze({create,refresh,adapt,migrate,prepareLegacyMigration,migrateSavedState,selected,candidates,placeholder,buildingHint,pageBuilding,levelHint,pdfToLocal,localToPDF,
     encodeState:(state,plan,previous)=>translateState(state,plan,true,previous),decodeState:(state,plan)=>translateState(state,plan,false)});
 });
