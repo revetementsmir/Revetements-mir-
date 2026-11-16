@@ -8,13 +8,19 @@ const cp=require('node:child_process');
 const MAIN='65b3145f735ea11ee0f77d331270649ece7266ec';
 const REVIEWED='8d9641f2c1df84c6fec3c4e4fb417168b3c92c4c';
 const SUBJECT='Merge PR #42 — MIR Studio public et courriels de recette';
-const PREP='fix(ci): certify strict PR42 Pages gate anchor';
-const FIRST_PREP='abbbcd951dba3de81368e4ce25eb49d1249b2e23';
+const PREP='fix(ci): test PR42 gate on exact pull request head';
+const FIRST_PREP='94e954bc78660d3b01b84feed410f843df918751';
+const SECOND_PREP='abbbcd951dba3de81368e4ce25eb49d1249b2e23';
 const git=(...args)=>cp.execFileSync('git',args,{encoding:'utf8',stdio:['pipe','pipe','pipe']}).trim();
-const candidate=git('rev-parse','HEAD');
-assert.equal(git('rev-parse','HEAD^'),FIRST_PREP,'strict gate fix must directly follow first preparation');
-assert.equal(git('rev-parse','HEAD^^'),REVIEWED,'reviewed green SHA must remain ancestor of release gate');
-assert.equal(git('log','-1','--pretty=%s'),PREP,'certified gate preparation commit');
+// GitHub Actions' default pull_request checkout is a temporary two-parent
+// merge. Inspect the exact PR head (second parent), never the temporary merge.
+const checkout=git('rev-parse','HEAD');
+const checkoutParents=git('rev-list','--parents','-n','1',checkout).split(/\s+/);
+const candidate=checkoutParents.length===3&&checkoutParents[1]===MAIN?checkoutParents[2]:checkout;
+assert.equal(git('rev-parse',candidate+'^'),FIRST_PREP,'final gate commit must follow the strict anchor correction');
+assert.equal(git('rev-parse',candidate+'^^'),SECOND_PREP,'initial gate commit must remain an ancestor');
+assert.equal(git('rev-parse',candidate+'^^^'),REVIEWED,'reviewed 14/14 green SHA must remain ancestor');
+assert.equal(git('log','-1','--pretty=%s',candidate),PREP,'certified gate preparation commit');
 assert.equal(git('merge-base',MAIN,candidate),MAIN,'cannot issue Pages from an unreviewed main ancestor');
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mir-pr42-gate-'));
 const worktree=path.join(dir,'site');
