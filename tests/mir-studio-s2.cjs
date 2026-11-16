@@ -67,4 +67,8 @@ const mesh=sandbox.window.MIR3D.mesh({levelScene:M.scene(built,'house')});
 assert.deepEqual(Array.from(mesh.faces.filter(f=>f.type==='wall'),f=>f.id),M.scene(built,'house').walls.map(w=>w.id),'same wall IDs in source model and renderer');
 assert.equal(mesh.footprint.type,'level-contours');assert.equal(mesh.dimensions.width,12,'never fall back to study width');
 assert.ok(mesh.faces.every(f=>f.type==='wall'),'no unknown roof is invented');
+
+
+const writtenConflict=M.referenceAssessment({id:'synthetic-view',calibration:{}},[{sourceViewId:'synthetic-view',kind:'written',value:12,anchors:[[0,0],[1200,0]]},{sourceViewId:'synthetic-view',kind:'written',value:12.1,anchors:[[1200,0],[0,0]]}]);assert.equal(writtenConflict.conflict,true,'two written values for the same span remain contradictory even below raster-deformation tolerance');assert.equal(writtenConflict.scale,null);
+
 console.log('PASS S2: multi-retreat independent levels, source ownership, unknown/conflicting measurements, stable wall IDs, opening union, persistence contracts and source-only raster proposals');

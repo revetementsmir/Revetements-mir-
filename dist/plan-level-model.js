@@ -33,12 +33,13 @@
     }
     if(!refs.length&&positive(cal.referenceFt)&&cal.anchors?.length===2&&!['conflict','low_confidence'].includes(cal.status))return referenceAssessment({...view,calibration:{evidence:[]}},[{value:cal.referenceFt*.3048,anchors:cal.anchors,label:cal.provenance}]);
     const spread=rs=>rs.length?Math.max(...rs.map(r=>r.scale))/Math.min(...rs.map(r=>r.scale))-1:0;
+    const writtenConflict=refs.some((a,i)=>a.kind==='written'&&refs.slice(i+1).some(b=>b.kind==='written'&&Math.min(distance(a.anchors[0],b.anchors[0])+distance(a.anchors[1],b.anchors[1]),distance(a.anchors[0],b.anchors[1])+distance(a.anchors[1],b.anchors[0]))<4&&Math.abs(a.value-b.value)>.001));
     const withinAxisConflict=['x','y','diagonal'].some(axis=>spread(refs.filter(r=>r.axis===axis))>.05);
     const x=refs.find(r=>r.axis==='x'),y=refs.find(r=>r.axis==='y'),deformed=!!(x&&y&&Math.abs(x.scale/y.scale-1)>.05);
     const sourceConflict=cal.status==='conflict'&&!provided.length;
-    const conflict=withinAxisConflict||sourceConflict||!deformed&&spread(refs)>.05;
+    const conflict=writtenConflict||withinAxisConflict||sourceConflict||!deformed&&spread(refs)>.05;
     const chosen=refs[0]||null; // Documented reference, never a silent average.
-    return {references:refs,scale:!conflict&&!deformed?chosen?.scale||null:null,chosen,spread:spread(refs),conflict,deformed,status:conflict?'conflict':deformed?'deformed':refs.length>1?'cross_checked':refs.length?'single_reference':'not_found'};
+    return {references:refs,scale:!conflict&&!deformed?chosen?.scale||null:null,chosen,spread:spread(refs),writtenConflict,conflict,deformed,status:conflict?'conflict':deformed?'deformed':refs.length>1?'cross_checked':refs.length?'single_reference':'not_found'};
   }
   function pdfPoint(view,p){const m=view.frame?.pdfToRaster,c=view.frame?.cropToRaster;if(!m||!c)return null;const det=m[0]*m[3]-m[1]*m[2];if(!det)return null;const x=p[0]+c[4]-m[4],y=p[1]+c[5]-m[5];return [(x*m[3]-y*m[2])/det,(y*m[0]-x*m[1])/det];}
   function estimateSegment(view,anchors,provided=[]){

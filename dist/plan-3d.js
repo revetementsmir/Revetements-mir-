@@ -414,6 +414,17 @@
         poly:w.poly.map(([x,y,z])=>[x-cx,y-cy,z]),normal:w.normal.slice(),base:[w.from[0]-cx,w.from[1]-cy,w.base],
         u:[(w.to[0]-w.from[0])/w.length,(w.to[1]-w.from[1])/w.length,0],width:w.length,fillColor:cleanColor(w.finish?.color,'#d7d8d0'),
         openings:(scene.openings||[]).filter(o=>o.wallId===w.id),selected:options.selectedWallId===w.id}));
+      for(const wall of faces.filter(f=>f.type==='wall'))for(const opening of wall.openings){
+        const at=(u,z)=>[wall.base[0]+wall.u[0]*u+wall.normal[0]*.006,wall.base[1]+wall.u[1]*u+wall.normal[1]*.006,z],z=wall.base[2]+opening.sill;
+        faces.push({id:opening.id,openingId:opening.id,parentSurfaceId:wall.id,wallId:wall.id,levelId:wall.levelId,type:'opening',role:'wall-opening',normal:wall.normal.slice(),poly:[at(opening.offset,z),at(opening.offset+opening.width,z),at(opening.offset+opening.width,z+opening.height),at(opening.offset,z+opening.height)],fillColor:cleanColor(opening.appearance?.frameColor,'#596b62'),selected:options.selectedOpeningIds?.includes(opening.id)});
+      }
+      for(const corner of scene.corners||[]){if(!corner.finish.enabled&&!corner.finish.materialId&&!corner.finish.color)continue;const width=Number(corner.finish.width)>0?corner.finish.width:.08;
+        corner.wallIds.forEach((wallId,i)=>{const wall=scene.walls.find(w=>w.id===wallId),end=i===0?wall.from:wall.to,delta=[end[0]-corner.point[0],end[1]-corner.point[1]],length=Math.hypot(...delta),p=[corner.point[0]-cx+corner.normals[i][0]*.008,corner.point[1]-cy+corner.normals[i][1]*.008],q=[p[0]+delta[0]/length*Math.min(width,length),p[1]+delta[1]/length*Math.min(width,length)];
+          faces.push({id:corner.id+':'+i,cornerId:corner.id,parentSurfaceId:wall.id,type:'corner',role:'level-corner-finish',normal:corner.normals[i].slice(),poly:[[...p,corner.base],[...q,corner.base],[...q,corner.base+corner.height],[...p,corner.base+corner.height]],fillColor:cleanColor(corner.finish.color,'#8d9690'),selected:options.selectedCornerIds?.includes(corner.id)});
+        });
+      }
+      for(const s of scene.soffits||[])faces.push({id:s.id,levelId:s.levelId,type:'soffit',role:'measured-soffit-section',poly:s.polygon.map(([x,y])=>[x-cx,y-cy,s.height]),normal:[0,0,-1],fillColor:cleanColor(s.color,'#d8dbd1')});
+      if(global.MIRStudioExterior)for(const e of scene.elements||[])for(const f of global.MIRStudioExterior.elementFaces(e,[cx,cy]))faces.push({...f,selected:options.selectedElementIds?.includes(e.id)});
       return {faces,a:d.width/2,b:d.depth/2,e:0,top:Math.max(...points.map(p=>p[2])),ground:Math.min(...points.map(p=>p[2])),foundationDrop:0,dimensions:d,roofStyle:'unknown',
         recess:{enabled:false,depth:0,height:0},footprint:{type:'level-contours',confirmed:true,levelIds:scene.levels.map(l=>l.id)},porch:{enabled:false},structures:[],
         levelScene:scene,sourcePlan:'confirmed contours and measured level heights; no inferred roof'};
@@ -698,7 +709,7 @@
     const point=[(clientX-(box.left||0))*state.size[0]/box.width,(clientY-(box.top||0))*state.size[1]/box.height];
     const surface=surfaceAt(state,point);if(!surface)return null;
     const hit={surfaceId:surface.surfaceId,type:surface.type,role:surface.role||null,view:surface.view||null,screenPoint:point,renderId:state.pickingRenderId};
-    if(Number.isInteger(surface.cornerIndex))hit.cornerIndex=surface.cornerIndex;
+    for(const key of ['openingId','cornerId','elementId','wallId','levelId'])if(surface[key])hit[key]=surface[key];if(Number.isInteger(surface.cornerIndex))hit.cornerIndex=surface.cornerIndex;
     if(surface.structureId){hit.structureId=surface.structureId;hit.material=surface.material;}
     if(surface.returnId)hit.returnId=surface.returnId;
     if(surface.role==='porch-divider')return {...hit,type:'wall',view:'front',zoneId:'pilier',sharedFinish:true};
@@ -784,18 +795,18 @@
     const roofColor=cleanColor(options.roofColor,'#505658');
     const soffitType = ['vented','solid','concealed'].includes(options.soffitType) ? options.soffitType : 'neutral';
     const textureBottoms = {};
-    for (const name of ['front','right','back','left','return-left','return-right']) {
+    for (const name of [...new Set(['front','right','back','left','return-left','return-right',...Object.keys(images)])]) {
       const value = options.textureBottoms && options.textureBottoms[name];
       textureBottoms[name] = value != null && Number.isFinite(Number(value)) ? Number(value) : 0;
     }
     const textureScales=Object.fromEntries(Object.entries(images).filter(([,item])=>item).map(([view,item])=>[
-      view,textureScale(item,view.startsWith('return-')?mesh.recess.depth:(view==='front'||view==='back'?d.width:d.depth),d.wallHeight)
+      view,textureScale(item,mesh.faces.find(f=>f.id===view)?.width||(view.startsWith('return-')?mesh.recess.depth:(view==='front'||view==='back'?d.width:d.depth)),options.levelScene?.walls.find(w=>w.id===view)?.height||d.wallHeight)
     ]));
     const textureScaleWarnings=Object.entries(textureScales).filter(([,info])=>info.calibrated&&info.relativeWidthDifference>TEXTURE_WIDTH_TOLERANCE).map(([view,info])=>({
       code:'TEXTURE_MODEL_WIDTH_MISMATCH',view,message:'Volume et élévation à recaler : la couvrance garde l’échelle du dessin.',
       ...info,toleranceRelative:TEXTURE_WIDTH_TOLERANCE
     }));
-    const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,'roof-detail':4,column:4,beam:4,concrete:4,corner:4,balcony:4};
+    const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,'roof-detail':4,column:4,beam:4,concrete:4,corner:4,balcony:4,opening:4};
     const visible = mesh.faces.filter(f=>dot(f.normal,camera)>.0001).map(f=>({...f,depth:f.poly.reduce((sum,p)=>sum+dot(p,camera),0)/f.poly.length}));
     const visibleById=new Map(visible.map(face=>[face.id,face]));
     for(const face of visible){
@@ -849,7 +860,7 @@
     }
 
     function paintSoffit(face) {
-      patch(face.poly,soffit);ctx.save();trace(face.poly);ctx.clip();
+      patch(face.poly,face.fillColor||soffit);ctx.save();trace(face.poly);ctx.clip();
       const [a,b,c,d]=face.poly;
       const length=Math.hypot(...sub(b,a));
       for(const row of soffitCourses(face.poly,options.soffitCoverageIn).segments)
@@ -870,17 +881,17 @@
       if(face.type==='wall')paintWall(face);
       else if(face.type==='roof')paintRoof(face);
       else if(face.type==='soffit')paintSoffit(face);
-      else if(['column','beam','divider','balcony','concrete','corner','roof-detail'].includes(face.type))paintSolid(face);
+      else if(face.type==='opening'){paintSolid(face);const [a,b,c,d]=face.poly,inset=.10;patch([mix(mix(a,b,inset),mix(d,c,inset),inset),mix(mix(b,a,inset),mix(c,d,inset),inset),mix(mix(c,d,inset),mix(b,a,inset),inset),mix(mix(d,c,inset),mix(a,b,inset),inset)],'#9eb9b5');}else if(['column','beam','divider','balcony','concrete','corner','roof-detail'].includes(face.type))paintSolid(face);
       else patch(face.poly,fascia);
       trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';ctx.stroke();
-      if(face.selected){trace(face.poly);ctx.strokeStyle='#348511';ctx.lineWidth=3;ctx.stroke();}
+      if(face.selected||(options.previewSelection||[]).some(o=>o.kind==='structure'&&o.id===face.structureId||o.kind==='corner'&&o.id===face.cornerIndex)){trace(face.poly);ctx.strokeStyle='#348511';ctx.lineWidth=3;ctx.stroke();}
     }
     state.size = [W,H,dpr];
     state.pickingRenderId=token;
     state.hitSurfaces=visible.map(face=>{
-      const view=face.textureView||(['front','right','back','left'].includes(face.id)?face.id:null),item=images[view];
+      const view=face.textureView||(images[face.id]?face.id:['front','right','back','left'].includes(face.id)?face.id:null),item=images[view];
       const surface={surfaceId:face.id,wallId:face.wallId||null,levelId:face.levelId||null,type:face.type,role:face.role||null,view,screenPolygon:face.poly.map(project)};
-      if(Number.isInteger(face.cornerIndex))surface.cornerIndex=face.cornerIndex;
+      for(const key of ['openingId','cornerId','elementId'])if(face[key])surface[key]=face[key];if(Number.isInteger(face.cornerIndex))surface.cornerIndex=face.cornerIndex;
       if(face.structureId){surface.structureId=face.structureId;surface.material=face.material;surface.sourceStatus=face.sourceStatus;}
       if(face.returnId){surface.returnId=face.returnId;surface.independentFinish=!!mesh.recess.returnFinishAssigned?.[face.returnId];}
       if(face.type==='wall'&&item){
@@ -930,7 +941,7 @@
       footprint:options.footprint&&typeof options.footprint==='object'?{...options.footprint,recess:options.footprint.recess&&typeof options.footprint.recess==='object'?{...options.footprint.recess}:options.footprint.recess}:options.footprint,
       levelScene:options.levelScene?JSON.parse(JSON.stringify(options.levelScene)):undefined};
     state.options=snapshot;
-    const names=['front','right','back','left','return-left','return-right'];
+    const names=[...new Set(['front','right','back','left','return-left','return-right',...Object.keys(snapshot.views)])];
     state.pending=true;
     try {
       const settled=await Promise.allSettled(names.map(key=>loadSVG(snapshot.views[key])));

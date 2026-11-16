@@ -18,3 +18,5 @@
 .mir-level-quantity-list{max-height:280px;overflow:auto;font-size:13px}.mir-opening-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mir-opening-fields input{width:100%}
 #elevation svg [data-level-wall]{cursor:pointer}#elevation svg [data-level-wall]:focus{outline:none;filter:drop-shadow(0 0 4px #348511)}
 @media(max-width:650px){.mir-level-toolbar{padding:14px;margin:14px 12px}.mir-level-actions>*{flex:1 1 100%}.mir-level-dialog{padding:14px;width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}.mir-level-dialog h2{font-size:22px}.mir-contour-fields{grid-template-columns:1fr 1fr}.mir-contour-tools button{flex:1 1 45%}.mir-level-wall-controls{padding:16px}}
+
+.mir-level-confirm-actions{display:flex;gap:.7rem;position:sticky;bottom:0;background:#f7f5ef;padding:.6rem 0}.mir-level-confirm-actions button{flex:1;min-height:44px}.mir-level-pending{outline:2px solid #78a14c;outline-offset:3px}

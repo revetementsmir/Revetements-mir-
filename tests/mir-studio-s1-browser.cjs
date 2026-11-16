@@ -62,7 +62,9 @@ const server=http.createServer((req,res)=>{let file=path.resolve(dist,'.'+new UR
     // Persist actual UI edits, reopen and switch buildings through the review UI.
     await page.locator('#view-2d').click();
     await page.locator('#add-accent').click();
+    await page.locator('#mir-choice-confirm').click();
     await page.locator('#edit-openings').click();await page.locator('#add-window').click();
+    await page.locator('#mir-choice-confirm').click();
     const houseEdits=await page.evaluate(()=>MIR_STUDY.snapshot());
     assert.equal(houseEdits.zoneCount,1);assert.equal(houseEdits.openingCount,1);
     await page.reload();await page.waitForFunction(()=>window.MIR_STUDY);

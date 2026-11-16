@@ -1,0 +1,30 @@
+/* Shared physical wall surface adapter. Existing MIR clipping, profiles and grids remain authoritative. */
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./takeoff-engine.js'):root.MIRTakeoff,node?require('./material-coverage.js'):root.MIRMaterialCoverage,node?require('./material-surface.js'):root.MIRMaterialSurface,node?require('./mir-vertical-layout.js'):root.MIRVerticalLayout);if(node)module.exports=api;else root.MIRStudioSurfaces=api;})(typeof window==='object'?window:globalThis,function(E,C,S,V){
+ 'use strict';const FT=1/.3048,clone=x=>JSON.parse(JSON.stringify(x)),rect=(x,y,w,h)=>[[x,y],[x+w,y],[x+w,y+h],[x,y+h]],esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c])),bounds=p=>[Math.min(...p.map(p=>p[0])),Math.min(...p.map(p=>p[1])),Math.max(...p.map(p=>p[0])),Math.max(...p.map(p=>p[1]))],isBatten=m=>/board\s*(?:&|and|et)\s*batten/i.test(m?.name||'');
+ function faceFor(w,level,materials=[],coordinateScale=FT){const product=materials.find(m=>m.id===w.finish?.materialId),rootId=w.id+':finish';return {key:w.id,feetPerPixel:FT/coordinateScale,
+  zones:[{id:rootId,kind:product?.applications?.includes('masonry')?'masonry':'siding',polygon:rect(0,0,w.length*coordinateScale,w.height*coordinateScale),selection:clone(w.finish||{})},...(level.wallZones||[]).filter(z=>z.wallId===w.id).map(z=>({...clone(z),kind:materials.find(m=>m.id===z.selection?.materialId)?.applications?.includes('masonry')?'masonry':'siding',parent:rootId,polygon:z.polygon.map(p=>p.map(v=>v*coordinateScale))}))],
+  openings:(level.wallOpenings||[]).filter(o=>o.wallId===w.id&&o.status==='confirmed').map(o=>({id:o.id,type:o.type||'window',polygon:rect(o.offset*coordinateScale,(w.height-o.sill-o.height)*coordinateScale,o.width*coordinateScale,o.height*coordinateScale)}))};}
+ function layoutFor(face,zone,material,level){const grid=C.panelGrid(bounds(zone.polygon),face.feetPerPixel,material,zone.selection||{});return {grid,layout:level.panelLayouts?.[zone.id]||{vertical:grid.vertical||[],horizontal:grid.horizontal||[]}};}
+ function battenLayout(face,zone,material){const choice=zone.selection||{},b=bounds(zone.polygon),known=V?.battens({polygon:zone.polygon,feetPerPixel:face.feetPerPixel,material,choice,openings:face.openings});if(known?.lines.length)return known;
+  const spec=C.coverageSpec(material,choice);if(!isBatten(material)||!(spec.exposureIn>0))return {lines:[],complete:false};const step=spec.exposureIn/(face.feetPerPixel*12),lines=[];for(let x=b[0]+step;x<b[2]-1e-6&&lines.length<400;x+=step)lines.push({x});return {lines,spacingIn:spec.exposureIn,complete:true,alignment:'documented-covering-from-wall-datum'};
+ }
+ function svg(w,level,{materials=[],sampleFor}={}){const scale=100,face=faceFor(w,level,materials,scale),width=w.length*scale,height=w.height*scale,prefix='wall-'+w.id.replace(/[^a-zA-Z0-9_-]/g,'-');let defs='',body='',lines='';
+  face.zones.forEach((zone,i)=>{const material=materials.find(m=>m.id===zone.selection?.materialId)||{},choice={pattern:material.renderPattern,...zone.selection},id=prefix+'-'+i,box=bounds(zone.polygon),batten=isBatten(material);
+   defs+=S.patternDef({id,material,choice:batten?{...choice,pattern:'plain'}:choice,feetPerPixel:face.feetPerPixel,bounds:box,anchorX:0,anchorY:height,sample:sampleFor?.(material,choice)});
+   body+=`<polygon data-wall-surface="${esc(zone.id)}" data-profile="${batten?'board-batten':esc(choice.pattern||'plain')}" points="${zone.polygon.map(p=>p.join(',')).join(' ')}" fill="url(#${id})"/>`;
+   const path=(points,attrs)=>`<path d="M ${points.map(p=>p.join(' ')).join(' L ')}" fill="none" ${attrs}/>`;
+   const spec=C.coverageSpec(material,choice);
+   if(spec.type==='panel'){
+    const {layout}=layoutFor(face,zone,material,level),clipped=E.panelLayout(face,zone.id,layout,{maxWidthIn:spec.widthIn,maxLengthIn:spec.lengthIn,stockKnown:!!(spec.widthIn&&spec.lengthIn),rotationAllowed:false});
+    for(const [axis,rows]of [['vertical',clipped.vertical],['horizontal',clipped.horizontal]])for(const row of rows)for(const points of row.segments)lines+=path(points,`data-panel-joint="${axis}" data-format-id="${esc(spec.formatId)}" stroke="#3c4b3d" stroke-width=".8"`);
+   }
+   if(batten){const b=battenLayout(face,zone,material),widthIn=Number(choice.battenWidthIn),validWidth=widthIn>0&&widthIn<(b.spacingIn||Infinity),perIn=1/(face.feetPerPixel*12);
+    for(const line of b.lines){const position=(line.x-box[0])/(box[2]-box[0]),clip=E.clipLineToZone(face,zone.id,'vertical',position);for(const points of clip.segments){if(validWidth)lines+=path(points,`data-batten-relief="project-width" data-batten-width-in="${widthIn}" stroke="#15291e" stroke-opacity=".5" stroke-width="${widthIn*perIn+1}"`);lines+=path(points,`data-batten-spacing-in="${Number(b.spacingIn.toFixed(6))}" data-batten-width-status="${validWidth?'user-measurement':'unresolved'}" stroke="${validWidth?esc(choice.battenColor||choice.color||'#d3d6cd'):'#536357'}" stroke-width="${validWidth?widthIn*perIn:.8}" ${validWidth?'':'stroke-dasharray="3 2"'}`);}}
+   }
+  });
+  for(const o of face.openings){const original=(level.wallOpenings||[]).find(a=>a.id===o.id),p=o.polygon;lines+=`<polygon data-wall-opening="${esc(o.id)}" points="${p.map(p=>p.join(',')).join(' ')}" fill="#a6c0bc" stroke="${esc(original?.appearance?.frameColor||'#596b62')}" stroke-width="3"/>`;}
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" data-meters-per-unit=".01"><defs>${defs}</defs>${body}${lines}</svg>`;
+ }
+ function pickZone(w,level,point,materials=[]){const face=faceFor(w,level,materials,1);for(const zone of face.zones.slice().reverse()){const [x0,y0,x1,y1]=bounds(zone.polygon);if(point[0]<x0||point[0]>x1||point[1]<y0||point[1]>y1)continue;const clip=E.clipLineToZone(face,zone.id,'vertical',(point[0]-x0)/(x1-x0));if(clip.segments.some(s=>point[1]>=Math.min(...s.map(p=>p[1]))-1e-6&&point[1]<=Math.max(...s.map(p=>p[1]))+1e-6))return zone.id;}return null;}
+ return Object.freeze({version:1,faceFor,layoutFor,battenLayout,svg,pickZone,isBatten});
+});

@@ -1,17 +1,31 @@
-name: MIR Studio S1 import inventory
+name: MIR Studio S1 + S2 contours and site dossier
 on:
   pull_request:
     paths:
       - 'dist/plan*.js'
       - 'dist/plan*.html'
       - 'dist/plan-import.css'
+      - 'dist/plan*.css'
+      - 'dist/studio*.js'
+      - 'dist/studio*.css'
+      - 'dist/annotated-pdf.js'
+      - 'dist/mir-dossier-pdf.js'
+      - 'dist/mir-private-document-viewer.*'
+      - 'dist/chantier.html'
+      - 'dist/portal-client.js'
+      - 'dist/chantier-app.js'
+      - 'supabase/migrations/*mir_studio*.sql'
       - 'dist/project-store.js'
       - 'dist/takeoff-app.js'
       - 'dist/metres.html'
       - 'dist/mir-client-en-ca.js'
       - 'dist/mir-client-i18n.js'
       - 'docs/verification/mir-studio-s1-import.md'
-      - 'tests/mir-studio-s1*.cjs'
+      - 'tests/mir-studio-*.cjs'
+      - 'tests/helpers/mir-studio-s2-model.cjs'
+      - 'docs/verification/mir-studio-s2.md'
+      - 'tools/qa/mir-studio*.cjs'
+      - 'tools/qa/helpers/mir-studio*.cjs'
       - 'tests/helpers/mir-studio-s1-fixture.cjs'
       - '.github/workflows/mir-studio-s1-pr.yml'
   workflow_dispatch:
@@ -31,8 +45,11 @@ jobs:
       - name: Syntax and existing contracts
         run: |
           git diff --check
-          for file in dist/plan-import.js dist/plan-sheet-detection.js dist/plan-scan-ocr.js dist/plan-view-inventory.js dist/plan-view-review.js dist/project-store.js dist/plan-app.js dist/takeoff-app.js; do node --check "$file"; done
+          for file in dist/plan-import.js dist/plan-sheet-detection.js dist/plan-scan-ocr.js dist/plan-view-inventory.js dist/plan-view-review.js dist/project-store.js dist/plan-app.js dist/takeoff-app.js dist/plan-level-model.js dist/plan-level-studio.js dist/studio*.js dist/mir-private-document-viewer.js; do node --check "$file"; done
           node tests/mir-studio-s1.cjs
+          node tests/mir-studio-s2.cjs
+          node tests/mir-studio-preview.cjs
+          node tests/mir-studio-cotation.cjs
           node tests/mir-plan-sheet-detection.cjs
           node tests/mir-studio-grounds.cjs
           node tests/mir-studio-interactions.cjs
@@ -40,12 +57,24 @@ jobs:
           node tests/mir-balcony.cjs
           node tests/mir-structure-hints.cjs
           node tests/mir-stair-vision.cjs
+          node tests/mir-vertical-layout.cjs
+          node tests/mir-new-materials.cjs
+          node tests/mir-bending-lengths.cjs
           node tests/mir-client-i18n-static.cjs
           node tests/mir-studio-public-stage.cjs
+      - name: Private document SQL contracts in disposable PostgreSQL
+        run: |
+          npm ci --prefix tools/database --ignore-scripts --no-audit --no-fund
+          node tests/mir-job-dossier-postgres.cjs
+          node tests/mir-studio-site-postgres.cjs
       - name: Browser dependency
         run: npm install --no-save playwright@1.58.2
       - name: Raster import and legacy persistence (synthetic only, no backend)
         run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-s1-browser.cjs
+      - name: Contours, client Confirm/Cancel, five-page local PDF (synthetic only)
+        run: |
+          MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-s2-browser.cjs
+          MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-client-360-browser.cjs
       - name: Existing large PDF, rendering and interaction regressions
         run: |
           node tests/mir-plan-pdf-browser.cjs
@@ -56,5 +85,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mir-studio-s1-synthetic-${{ github.event.pull_request.head.sha || github.sha }}
-          path: artifacts/studio-s1/
+          path: |
+            artifacts/studio-s1/
+            artifacts/studio-s2/
           if-no-files-found: warn

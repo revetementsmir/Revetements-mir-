@@ -70,7 +70,7 @@
     if(!Array.isArray(faces)||!faces.length)throw new Error(tr('Aucune élévation disponible pour l’export.','No elevations are available for export.'));
     title=known(title);subtitle=known(subtitle);
     if(clientEN()&&filename==='MIR-plan-annote.pdf')filename='MIR-annotated-plan-en-CA.pdf';
-    if(faces.every(f=>f.layout==='mir-dossier')){
+    if(faces.every(f=>f.layout==='mir-dossier')||faces.every(f=>f.layout==='mir-site-five')){
       if(!global.MIRDossierPDF)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='mir-dossier-pdf.js?v=rendu-1';script.onload=resolve;script.onerror=()=>reject(Error(tr('Le moteur de dossier PDF ne charge pas.','The PDF project-file engine did not load.')));document.head.append(script);});
       return global.MIRDossierPDF.make({faces,title,subtitle,filename,onProgress,locale:clientEN()?'en-CA':'fr-CA'});
     }
