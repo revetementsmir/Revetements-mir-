@@ -440,7 +440,7 @@
   function renderSummary() {
     const rows = current.views;
     if(current.viewInventory){const projected=MIRViewInventory.adapt({viewInventory:current.viewInventory},MIRSheetDetection.volumeFrom);current.volume=projected.detectedVolume;}
-    $('#mir-pdf-assigned').innerHTML = rows.map(row => `<span class="ready"><b>${esc(row.direction ? FACE_NAMES[row.direction]+' · '+row.name : row.name)}</b><small>Page ${row.page}</small></span>`).join('') || '<p>Les vues détectées apparaîtront ici.</p>';
+    $('#mir-pdf-assigned').innerHTML = rows.map(row => `<span class="ready"><b>${row.direction ? `<span>${esc(FACE_NAMES[row.direction])}</span> · ` : ''}<span data-mir-user-content>${esc(row.name)}</span></b><small>Page ${row.page}</small></span>`).join('') || '<p>Les vues détectées apparaîtront ici.</p>';
     const floorStairs=rows.flatMap(r=>r.stairCandidates||[]);
     const volume = current.volume;
     if (!volume) { $('#mir-pdf-volume-note').textContent = ''; return; }
@@ -453,10 +453,10 @@
     if (current.skipped || current.ocrFailed) cautions.push('Certaines feuilles n’ont pas pu être lues.');
     if (!rows.some(v=>v.direction)) cautions.push('Aucune élévation orientée avant, arrière, gauche ou droite n’a été reconnue.');
     if (floorStairs.length) cautions.push(floorStairs.length+' escalier(s) ou groupe(s) de marches repérés par pixels et cotes, à valider dans le Studio.');
-    $('#mir-pdf-volume-note').textContent = [
+    $('#mir-pdf-volume-note').innerHTML = [
       missing.length ? `À compléter dans Volume & retours : ${missing.join(', ')}.` : 'Cotes principales repérées. La maquette 3D s’ouvrira automatiquement. Aperçu indicatif : contour et murs cachés à confirmer.',
       ...cautions
-    ].join(' ');
+    ].map(note=>`<span>${esc(note)}</span>`).join(' ');
   }
 
   async function finish() {

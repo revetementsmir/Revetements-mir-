@@ -52,7 +52,7 @@ Total S1 : **46 vues**, **48 pages sources conservées**, sept imports et réouv
 
 Échecs conservés dans la comparaison : la base manque le RDC de 351, l'étage de Samuel et les vues tournées de Champs fleuris; elle prend une ligne de l'index du 12 logements pour une coupe. Les premiers candidats S1 de Champs fleuris ont donné 8 ou 9 entrées, parfois avec doublon ou plan central absent, avant correction. Ils ne sont pas comptés comme réussite. Des avertissements OCR et des lignes/cadrages illisibles persistent sur les originaux; ils expliquent les calibrations absentes ou faibles et restent dans les journaux privés. Aucun échec bloquant final du formulaire ou de réouverture n'a été observé.
 
-La recette originale finale utilise le code d'import épinglé à `9036a2ad5ae27c6394440c0016e551b2ab6a09b1`, copie privée `final-source-v4` avec empreintes des scripts. Les derniers changements de livraison concernent seulement la migration d'anciens réglages, ses régressions et ce compte rendu; ils ne modifient pas le parcours de nouvel import ainsi testé. Les preuves privées détaillées ne sont pas publiées.
+La recette originale finale utilise le code d'analyse épinglé à `9036a2ad5ae27c6394440c0016e551b2ab6a09b1`, copie privée `final-source-v4` avec empreintes des scripts. Les derniers changements de livraison concernent la migration d'anciens réglages, les libellés FR/EN des badges et avertissements, leurs régressions et ce compte rendu; ils ne modifient pas l'analyse des nouveaux imports ainsi testée. Les preuves privées détaillées ne sont pas publiées.
 
 ### Contrôles synthétiques déjà exécutés
 

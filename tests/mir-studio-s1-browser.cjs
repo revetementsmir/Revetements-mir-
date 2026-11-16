@@ -30,15 +30,22 @@ const server=http.createServer((req,res)=>{let file=path.resolve(dist,'.'+new UR
     assert.equal(await page.locator('#mir-pdf-final').isEnabled(),false,'multiple buildings require a choice');
     await page.locator('[data-active-building]').selectOption('house');
     await page.evaluate(()=>MIRClientLocale.setLocale('en-CA'));
+    await page.waitForFunction(()=>document.querySelector('#mir-pdf-assigned').innerText.includes('Front · FRONT ELEVATION SHED'));
+    assert.match(await page.locator('#mir-pdf-volume-note').innerText(),/This plan shows the upper floor/);
+    assert.doesNotMatch(await page.locator('#mir-pdf-volume-note').innerText(),/Ce plan montre|profondeur|hauteur des murs/);
     await page.locator('#mir-pdf-view-review [data-active-building]').selectOption('shed');
     assert.match(await page.locator('#mir-pdf-view-review').innerText(),/Choose the building to work on/);
     await page.screenshot({path:path.join(out,'import-en.png')});
     await page.evaluate(()=>MIRClientLocale.setLocale('fr-CA'));
     await page.locator('#mir-pdf-view-review [data-active-building]').selectOption('house');
+    await page.waitForFunction(()=>document.querySelector('#mir-pdf-assigned').innerText.includes('Avant · FRONT ELEVATION SHED'));
     for(const [width,height]of [[390,844],[834,1112],[1440,1000]]){
       await page.setViewportSize({width,height});await page.screenshot({path:path.join(out,'import-'+width+'.png')});
       assert.ok(await page.locator('#mir-pdf-import').evaluate(el=>el.scrollWidth<=el.clientWidth+1));
     }
+    await page.setViewportSize({width:390,height:844});
+    await page.locator('#mir-pdf-final').scrollIntoViewIfNeeded();
+    await page.screenshot({path:path.join(out,'import-ready-390.png')});
     await page.locator('#mir-pdf-final').click();await page.waitForFunction(()=>document.querySelector('#project-name').textContent==='synthetic-house-shed');
     const entry=await page.evaluate(()=>MIRProjectStore.getActive());
     assert.equal(entry.planData.version,3);assert.equal(entry.planData.viewInventory.views.length,8);
@@ -72,7 +79,7 @@ const server=http.createServer((req,res)=>{let file=path.resolve(dist,'.'+new UR
     await Promise.all([page.waitForNavigation({waitUntil:'load'}),page.locator('#building-views-dialog button.primary').click()]);
     await page.waitForFunction(()=>window.MIR_STUDY);assert.equal(await page.evaluate(()=>MIR_STUDY.snapshot().openingCount),1);
     assert.deepEqual(await page.evaluate(()=>MIR_STUDY.snapshot().choices),houseEdits.choices);
-    for(const [width,height]of [[390,844],[834,1112],[1440,1000]]){await page.setViewportSize({width,height});await page.screenshot({path:path.join(out,'studio-'+width+'.png')});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}
+    for(const [width,height]of [[390,844],[834,1112],[1440,1000]]){await page.setViewportSize({width,height});await page.screenshot({path:path.join(out,'studio-'+width+'.png')});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));if(width===390){await page.locator('#elevation').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,'studio-detail-390.png')});await page.evaluate(()=>scrollTo(0,0));}}
     await page.evaluate(async()=>{const e=await MIRProjectStore.getActive();await MIRProjectStore.saveActive({...e,id:'pdf-second-project-123',planData:{...e.planData,id:'pdf-second-project-123',title:'Second synthetic project'}});});
     assert.equal(await page.evaluate(async id=>(await MIRProjectStore.get(id)).planData.title,originalId),'synthetic-house-shed');
     // Legacy data and saved choices are unchanged by merely opening a project.
