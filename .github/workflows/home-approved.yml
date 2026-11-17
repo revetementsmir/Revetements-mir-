@@ -1,0 +1,41 @@
+name: Approved home responsive QA
+on:
+  push:
+    branches: [codex/home-responsive-approved-20261117]
+    paths:
+      - 'dist/index.html'
+      - 'dist/mir-home-approved.*'
+      - 'scripts/qa-home-approved.cjs'
+      - '.github/workflows/home-approved.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  responsive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Browser dependencies
+        run: |
+          npm install --prefix "$RUNNER_TEMP/mir-home-tools" --no-audit --no-fund playwright@1.65.1 pngjs@7.0.0
+          "$RUNNER_TEMP/mir-home-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Build locked reference and selected home
+        run: |
+          git worktree add "$RUNNER_TEMP/mir-baseline" 3a3f646fdca0167563b425e3d51099654f4894f8
+          (cd "$RUNNER_TEMP/mir-baseline" && VERCEL_GIT_COMMIT_SHA=3a3f646fdca0167563b425e3d51099654f4894f8 node scripts/build-prestige-preview.cjs)
+          VERCEL_GIT_COMMIT_SHA="$GITHUB_SHA" node scripts/build-prestige-preview.cjs
+      - name: Viewports, FR/EN, real links, rotation and unchanged desktop
+        run: NODE_PATH="$RUNNER_TEMP/mir-home-tools/node_modules" MIR_BASE_ROOT="$RUNNER_TEMP/mir-baseline/.prestige-preview" node scripts/qa-home-approved.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-home-approved-${{ github.sha }}
+          path: proof/home-approved/
+          retention-days: 30
+          if-no-files-found: error

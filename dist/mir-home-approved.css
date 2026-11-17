@@ -1,5 +1,5 @@
 /* Approved responsive home only. The locked desktop DOM and CSS are untouched. */
-#mir-approved-home{display:none}
+.mir-approved-home{display:none}
 body.mir-home-approved{margin:0;display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0;background:#242522;padding:0!important}
 body.mir-home-approved #contenu{display:flex;flex:1 1 0;min-height:0;margin:0;padding:0}
 body.mir-home-approved #contenu>.mir-prestige-home-hero,body.mir-home-approved #decouvrir{display:none!important}
@@ -8,7 +8,7 @@ body.mir-home-approved #mir-prestige-header{flex:0 0 auto;min-height:64px!import
 body.mir-home-approved #mir-prestige-header>.mir-client-brand{width:clamp(130px,19vw,204px)!important;margin:0!important}
 body.mir-home-approved #mir-prestige-header .mir-prestige-actions{margin:0!important;gap:clamp(6px,1.4vw,18px)!important}
 body.mir-home-approved #mir-prestige-header>nav.mir-prestige-nav{display:none!important}
-body.mir-home-approved .mir-approved-home{display:grid;width:100%;min-height:0;grid-template-rows:minmax(0,1fr) auto minmax(140px,24%);background:#242522;color:#f4f1ea;font-family:"DM Sans",Arial,sans-serif}
+body.mir-home-approved .mir-approved-home{display:grid;flex:1 1 0;align-self:stretch;width:100%;min-height:0;grid-template-rows:minmax(0,1fr) auto minmax(140px,24%);background:#242522;color:#f4f1ea;font-family:"DM Sans",Arial,sans-serif}
 .mir-approved-home *{box-sizing:border-box}
 .mir-approved-hero{position:relative;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto}
 .mir-approved-photo{position:relative;min-height:0;overflow:hidden}
@@ -79,3 +79,5 @@ body[data-mir-home-layout=phone] .mir-approved-paths a>span:last-child{font-size
 @media(max-height:650px){body[data-mir-home-layout=phone] .mir-approved-choices{padding-bottom:16px}body[data-mir-home-layout=phone] .mir-approved-paths a{min-height:67px;padding:10px 0}body[data-mir-home-layout=phone] .mir-approved-intro{padding-bottom:16px}body[data-mir-home-layout=phone] .mir-approved-lead{font-size:12px}}
 /* Preserve text access for unusually short windows and enlarged accessibility text. */
 @media(max-height:450px){body.mir-home-approved{height:auto;min-height:100dvh}body.mir-home-approved .mir-approved-hero{min-height:300px}body.mir-home-approved .mir-approved-gallery{min-height:150px}}
+/* Keep the existing functional tablet menu above the hero. */
+body.mir-home-approved #mir-prestige-header.mir-client-menu-open>nav.mir-prestige-nav{display:grid!important;position:absolute!important;top:100%!important;left:0!important;right:0!important;grid-template-columns:1fr 1fr!important;gap:0 24px!important;padding:16px 4%!important;background:#242522!important;max-height:calc(100dvh - 64px);overflow:auto}
