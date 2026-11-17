@@ -1,5 +1,5 @@
 /* Physical corners and explicitly placed exterior elements. No inferred dimensions. */
-(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,()=>node?require('./plan-import-core.js'):root.MIRPDFAnalysis);if(node)module.exports=api;else root.MIRStudioExterior=api;})(typeof window==='object'?window:globalThis,function(M,analysis){
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,()=>node?require('./plan-import-core.js'):root.MIRPDFAnalysis,()=>node?require('./plan-reconstruction.js'):root.MIRPlanReconstruction);if(node)module.exports=api;else root.MIRStudioExterior=api;})(typeof window==='object'?window:globalThis,function(M,analysis,reconstruction){
  'use strict';const number=x=>typeof x==='number'&&Number.isFinite(x),copy=M.clone;
  function corners(level,inventory){const contour=level.contours?.find(c=>c.status==='confirmed'),walls=M.wallsFor(level,inventory);if(!contour)return observedCorners(level,inventory);if(!walls.length)return [];return walls.map((w,i)=>{const before=walls[(i+walls.length-1)%walls.length],id='corner:'+contour.contourId+':'+w.pointIds[0],cross=(w.to[0]-w.from[0])*(before.from[1]-w.from[1])-(w.to[1]-w.from[1])*(before.from[0]-w.from[0]);return {id,levelId:level.id,buildingId:level.buildingId,point:w.from.slice(),base:w.base,height:w.height,wallIds:[before.id,w.id],normals:[before.normal,w.normal],group:Math.abs(before.normal[1]+w.normal[1])<1e-9?'unresolved':before.normal[1]+w.normal[1]<0?'front':'back',turnCross:cross,angle:cross*M.signedArea(walls.map(w=>w.from))>0?'outside':'inside',finish:copy(level.cornerFinishes?.[id]||{}),sourcePointId:w.pointIds[0]};}).filter(c=>Math.abs(c.turnCross)>1e-8);}
  function observedCorners(level,inventory){const walls=M.wallsFor(level,inventory),result=[];for(const after of walls){const before=walls.find(w=>w.id!==after.id&&M.distance(w.to,after.from)<1e-6);if(!before||Math.abs(before.normal[0]*after.normal[1]-before.normal[1]*after.normal[0])<1e-6)continue;const point=after.from.slice(),id='corner:observed:'+level.id+':'+[before.id,after.id].sort().join(':'),base=Math.max(before.base,after.base),height=Math.min(before.base+before.height,after.base+after.height)-base;if(height<=0)continue;const cross=(after.to[0]-point[0])*(before.from[1]-point[1])-(after.to[1]-point[1])*(before.from[0]-point[0]),orientation=Math.sign((after.to[1]-point[1])*after.normal[0]+(point[0]-after.to[0])*after.normal[1]);result.push({id,levelId:level.id,buildingId:level.buildingId,point,base,height,wallIds:[before.id,after.id],normals:[before.normal,after.normal],group:Math.abs(before.normal[1]+after.normal[1])<1e-9?'unresolved':before.normal[1]+after.normal[1]<0?'front':'back',turnCross:cross,angle:cross*orientation>0?'outside':'inside',finish:copy(level.cornerFinishes?.[id]||{}),sourcePointId:null,source:'observed-wall-junction'});}return result;}
@@ -7,9 +7,9 @@
  function issues(element){const errors=[];if(!element?.id||!['column','beam','slab','deck','stairs','roof','driveway','foundation'].includes(element.type))errors.push('ELEMENT_TYPE');if(!Array.isArray(element?.origin)||element.origin.length!==3||!element.origin.every(v=>number(v)&&Math.abs(v)<=10000)||!Array.isArray(element.size)||element.size.length!==3||!element.size.every((v,i)=>element.surfaceOnly&&i===1?v===null:number(v)&&v>0&&v<=1000)||!number(element.rotationDegrees))errors.push('ELEMENT_DIMENSIONS');if(!['proposed','confirmed'].includes(element.status)||!['existing','future','proposed'].includes(element.phase))errors.push('ELEMENT_STATUS');if(element.status==='confirmed'&&!['user-measurement','written','estimated-calibrated'].includes(element.provenance?.kind))errors.push('ELEMENT_SOURCE');return errors;}
  // Validate generated details against this building before the atomic save.
  // A displayed finish or a nominal thickness never confirms source geometry.
- function proposalIssues(level,inventory){
+ function proposalIssues(level,inventory,{registeredOnly=false}={}){
   const errors=[],elements=level.exteriorElements||[],zones=level.wallZones||[],entryRoofs=(level.reconstructedRoofs||[]).filter(r=>r.entryAssembly),walls=M.wallsFor(level,inventory,{includeProposed:true}),ids=[...elements,...zones,...(level.reconstructedRoofs||[])].map(e=>e.id);
-  if(new Set(ids).size!==ids.length)errors.push('EXTERIOR_DUPLICATE');
+  if(!registeredOnly&&new Set(ids).size!==ids.length)errors.push('EXTERIOR_DUPLICATE');
   function sourceIssues(detail){
    const view=inventory.views.find(v=>v.id===detail.sourceViewId&&v.buildingId===level.buildingId&&v.kind==='elevation'),box=detail.sourceBox;
    if(!view||JSON.stringify(detail.sourceFrame)!==JSON.stringify(view.frame))errors.push('EXTERIOR_SOURCE');
@@ -43,6 +43,7 @@
    let count=0;
    function inspect(record,primaryId,depth){
     if(depth>3||++count>128){errors.push('EXTERIOR_SOURCE_OBSERVATIONS');return;}
+    if(record.axisRegistration!==undefined||['column','beam'].includes(detail.type)&&record.levelBand?.relationship==='same-level-datum-pair')registeredProjection(record);
     const observations=[],check=source=>{observations.push(source);observationIssues(source);if(source&&typeof source==='object'&&!Array.isArray(source))inspect(source,source.sourceViewId,depth+1);};
     for(const key of ['depth','topEvidence'])if(record[key]!==undefined)check(record[key]);
     for(const key of ['alternateDepthObservations','alternateObservations','sources'])if(record[key]!==undefined){
@@ -129,6 +130,97 @@
    if(!Array.isArray(leader)||leader.length<2||leader.length>128)errors.push('EXTERIOR_SOURCE_BOUNDS');
    else observationIssues({...evidence,sourceBox:undefined,anchors:leader},{anchorsRequired:true,sourceKind:'floor',anchorLimit:128});
   }
+  // Registered entrance evidence remains meaningful only in the same metric
+  // source frame. Do not turn a matching mutable geometry snapshot into proof.
+  let registeredContext;
+  const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),point=p=>Array.isArray(p)&&p.length===2&&p.every(number),near=(a,b,t=1e-8)=>number(a)&&number(b)&&Math.abs(a-b)<=t;
+  const reference=r=>r&&({sourceViewId:r.sourceViewId,value:r.value,anchors:r.anchors}),alignment=a=>a&&({origin:a.origin,offset:a.offset,rotationDegrees:a.rotationDegrees,kind:a.kind,sourceViewId:a.sourceViewId,referenceSourceViewId:a.referenceSourceViewId}),base=b=>b&&({value:b.value,referenceLevelId:b.referenceLevelId,referenceLevelHint:b.referenceLevelHint,references:b.references});
+  const contourGeometry=c=>c&&({sourceViewId:c.sourceViewId,points:c.points,reference:reference(c.reference),height:{value:c.height?.value,sourceViewId:c.height?.sourceViewId,relationship:c.height?.relationship,datumEvidence:c.height?.datumEvidence},alignment:alignment(c.alignment),base:base(c.base)});
+  const label=s=>String(s||'').trim().replace(/[.\s]+$/,'').toUpperCase();
+  const registeredRows=new Map();
+  function gridReadings(view){
+   if(registeredRows.has(view.id))return registeredRows.get(view.id);
+   const width=view.payload?.sourceWidth||view.frame?.rasterSize?.[0],height=view.payload?.sourceHeight||view.frame?.rasterSize?.[1],file=inventory.files?.find(f=>f.id===view.fileId);
+   const retryValid=row=>{
+    const r=row?.retry,c=r?.gridCircle,b=row?.box,region=r?.region,token=label(row?.text),kind=/^\d{1,2}$/.test(token)&&Number(token)>0?'number':/^[A-Z]$/.test(token)?'letter':null;
+    if(row?.source!=='ocr-local-grid-bubble'||row.labelStatus!=='proposed'||row.sourceViewId&&row.sourceViewId!==view.id||!(row.confidence>=55)||r?.purpose!=='source-raster-grid-bubble'||r.labelConflict||!view.fileId||!file||r.sourceViewId!==view.id||r.sourceFileId!==view.fileId||r.sourcePage!==view.page||!same(r.sourceFrame,view.frame)||!kind||c?.kind!==kind||!point(c.center)||!(c.radius>3&&c.ringSupport>=.9)||!Array.isArray(b)||b.length!==4||!b.every(number)||!Array.isArray(region)||region.length!==4||!region.every(number)||region[0]<0||region[1]<0||!(region[2]>0&&region[3]>0)||region[0]+region[2]>width||region[1]+region[3]>height||b[0]<region[0]||b[1]<region[1]||b[2]>region[0]+region[2]||b[3]>region[1]+region[3]||!number(r.scale)||r.scale<=0||!number(r.padding)||r.padding<0||![8,10].includes(r.psm)||!Array.isArray(r.attempts)||r.attempts.length>16||!r.attempts.some(a=>a?.usable===true&&a.confidence===row.confidence&&label(a.token)===token)||r.attempts.some(a=>a?.usable===true&&a.confidence>=55&&label(a.token)!==token))return false;
+    const expected=[c.center[0]-c.radius*.45,c.center[1]-c.radius*.45,c.center[0]+c.radius*.45,c.center[1]+c.radius*.45];if(b.some((n,i)=>!near(n,expected[i])))return false;
+    const native=r.nativeSource;if(native&&(native.method!=='retained-pdf-region'||native.sourceViewId!==view.id||native.sourceFileId!==view.fileId||native.sourcePage!==view.page||!file.sha256||native.sourceSha256!==file.sha256||!same(native.sourceFrame,view.frame)||!same(native.sourceRegion,region)))return false;
+    return true;
+   };
+   const original=(view.payload?.drawingReadings?.rows||[]).filter(r=>r.source!=='ocr-local-grid-bubble'||retryValid(r)),retries=level.reconstruction?.proposal?.localReadingRetries||[];
+   const rows=[...original,...(Array.isArray(retries)&&retries.length<=1024?retries.filter(r=>r?.sourceViewId===view.id&&retryValid(r)):[])];registeredRows.set(view.id,rows);return rows;
+  }
+  function labelledPoint(view,observation,text){
+   const b=observation?.textBox,p=observation?.point;
+   return view&&observation?.sourceViewId===view.id&&point(p)&&Array.isArray(b)&&b.length===4&&b.every(number)&&near(p[0],(b[0]+b[2])/2)&&near(p[1],(b[1]+b[3])/2)&&gridReadings(view).some(r=>!r.retry?.labelConflict&&(r.confidence??0)>=55&&label(r.text)===label(text)&&same(r.box,b));
+  }
+  function registeredContour(){
+   if(registeredContext!==undefined)return registeredContext;
+   const fail=()=>{errors.push('ENTRY_REGISTERED_CONTOUR');return registeredContext=null;},c=level.contours?.length===1&&level.contours[0],proposal=level.reconstruction?.proposal,reg=c?.levelRegistration,xy=reg?.xy,z=c?.base,a=c?.alignment,floor=inventory.views.find(v=>v.id===c?.sourceViewId&&v.kind==='floor'&&v.buildingId===level.buildingId&&v.levelId===level.sourceLevel),ref=inventory.views.find(v=>v.id===xy?.referenceSourceViewId&&v.kind==='floor'&&v.buildingId===level.buildingId);
+   if(!c||!floor||!ref||!Array.isArray(c.points)||!c.points.every(p=>p?.id&&point(p.xy))||!point(a?.origin)||!point(a?.offset)||a.rotationDegrees!==0||a.kind!=='source-labelled-grid-registration'||!number(z?.value)||reg?.status!=='proposed'||reg.sourceLevel!==level.sourceLevel||xy?.status!=='proposed'||reg.z?.status!=='proposed'||xy.sourceViewId!==floor.id||a.sourceViewId!==floor.id||a.referenceSourceViewId!==ref.id||!same(alignment(a),alignment(reg.alignment))||!same(alignment(a),alignment(xy.alignment))||!same(base(z),base(reg.base))||!same(base(z),base(reg.z.base))||proposal?.levelId!==level.id||proposal.buildingId!==level.buildingId||!same(contourGeometry(c),contourGeometry(proposal.draft))||M.validateDraft(c,inventory,level).length)return fail();
+   const scale=M.scale(c),rs=xy.referenceScaleUsed,checks=xy.checks,refLevel=ref.id===floor.id?level:inventory.levels.find(l=>l.buildingId===level.buildingId&&l.contours?.some(c=>c.sourceViewId===ref.id)),refContour=refLevel?.contours.find(c=>c.sourceViewId===ref.id);
+   if(!(scale>0&&rs>0)||!near(xy.scaleUsed,scale)||!same(reference(xy.reference),reference(c.reference))||!refContour||!near(rs,M.scale(refContour))||!point(xy.referenceOrigin)||!point(xy.matchedReferenceOrigin)||!same(xy.origin,a.origin)||!same(xy.offset,a.offset)||!Array.isArray(checks)||checks.length<5||checks.length>128)return fail();
+   const first=axis=>checks.filter(c=>c?.axis===axis).sort((a,b)=>label(a.label).localeCompare(label(b.label),undefined,{numeric:true}))[0],x=first('x'),y=first('y');
+   if(!x||!y||!point(x.moving?.point)||!point(y.moving?.point)||!point(x.reference?.point)||!point(y.reference?.point)||xy.axisLabels?.x!==x.label||xy.axisLabels?.y!==y.label||!same(a.origin,[x.moving.point[0],y.moving.point[1]])||!same(xy.matchedReferenceOrigin,[x.reference.point[0],y.reference.point[1]])||!same(xy.referenceOrigin,refContour.alignment?.origin)||!near(a.offset[0],(xy.matchedReferenceOrigin[0]-xy.referenceOrigin[0])*rs)||!near(a.offset[1],-(xy.matchedReferenceOrigin[1]-xy.referenceOrigin[1])*rs))return fail();
+   for(const check of checks){const axis=check?.axis==='x'?0:check?.axis==='y'?1:null;
+    if(axis===null||!labelledPoint(floor,check.moving,check.label)||!labelledPoint(ref,check.reference,check.label)||!same(check.moving.sourceFrame,floor.frame)||!same(check.reference.sourceFrame,ref.frame))return fail();
+    const moving=(check.moving.point[axis]-a.origin[axis])*scale,referenceDistance=(check.reference.point[axis]-xy.matchedReferenceOrigin[axis])*rs,tolerance=Math.max(.02,3*Math.max(scale,rs));
+    if(!near(check.movingDistance,moving)||!near(check.referenceDistance,referenceDistance)||!near(check.residual,moving-referenceDistance)||!near(check.tolerance,tolerance)||Math.abs(moving-referenceDistance)>tolerance)return fail();
+   }
+   const root=z.referenceLevelId===level.id?level:inventory.levels.find(l=>l.id===z.referenceLevelId&&l.buildingId===level.buildingId),rootBase=root?.contours?.[0]?.base;
+   if(!root||root.sourceLevel!==z.referenceLevelHint||rootBase?.referenceLevelId!==root.id||!near(rootBase.value,0)||!Array.isArray(z.references)||!z.references.length||z.references.length>128)return fail();
+   let hint=root.sourceLevel,value=0;
+   for(const edge of z.references){const view=inventory.views.find(v=>v.id===edge?.sourceViewId&&v.buildingId===level.buildingId&&v.kind==='elevation'),from=edge?.datums?.from,to=edge?.datums?.to,r=edge?.reference;
+    if(!view||!same(edge.sourceFrame,view.frame)||from?.sourceViewId!==view.id||to?.sourceViewId!==view.id||!same(from.sourceFrame,view.frame)||!same(to.sourceFrame,view.frame)||from.levelHint!==edge.from||to.levelHint!==edge.to||from.datumType!=='floor'||to.datumType!=='floor'||!number(from.y)||!number(to.y)||!Array.isArray(r?.anchors)||r.anchors.length!==2||!r.anchors.every(point)||!(M.distance(...r.anchors)>1)||!(r.value>0)||!near(edge.scaleUsed,r.value/M.distance(...r.anchors))||!near(edge.delta,(from.y-to.y)*edge.scaleUsed))return fail();
+    if(level.id!==root.id){if(edge.from===hint){value+=edge.delta;hint=edge.to;}else if(edge.to===hint){value-=edge.delta;hint=edge.from;}else return fail();}
+   }
+   if(level.id===root.id?!near(z.value,0):hint!==level.sourceLevel||!near(z.value,value))return fail();
+   return registeredContext={c,proposal,floor,scale};
+  }
+  function registeredProjection(source){
+   const context=registeredContour(),g=source?.axisRegistration,b=source?.levelBand,raw=g?.pixelRegistration,view=inventory.views.find(v=>v.id===source?.sourceViewId&&v.buildingId===level.buildingId&&v.kind==='elevation');
+   if(!context)return null;
+   const {c,proposal,floor,scale}=context,axis=view?.direction==='front'?0:['left','right'].includes(view?.direction)?1:null,axisName=axis===0?'x':'y',sign=view?.direction==='left'?-1:1;
+   if(!view||axis===null||source.axis!==undefined&&source.axis!==axisName||!g||!b||g.status!=='proposed'||raw?.status!=='proposed'||g.floorSourceViewId!==floor.id||g.elevationSourceViewId!==view.id||g.buildingId!==level.buildingId||g.sourceLevel!==level.sourceLevel||raw.floorSourceViewId!==floor.id||raw.elevationSourceViewId!==view.id||raw.buildingId!==level.buildingId||raw.sourceLevel!==level.sourceLevel||!same(g.sourceFrames,{floor:floor.frame,elevation:view.frame})||!same(raw.sourceFrames,g.sourceFrames)||!same(source.sourceFrame,view.frame)||!same(reference(g.reference),reference(c.reference))||!Array.isArray(g.checks)||g.checks.length<(axis===0?3:2)||g.checks.length>64||!same(raw.checks,g.checks)){errors.push('ENTRY_REGISTERED_SOURCE');return null;}
+   const info=Array.isArray(proposal.views)&&proposal.views.find(v=>v.viewId===view.id&&v.direction===view.direction),expected=info&&Array.isArray(info.guides)&&reconstruction()?.levelBand?.(info,c,inventory);
+   if(!expected||!same(b,expected)||!same(source.referenceGuide,b.lower)||!near(source.scaleY??source.scalesUsed?.y,b.scaleY)||!same(b.sourceFrame,view.frame)||[b.lower,b.upper].some(d=>d?.sourceViewId!==view.id||!same(d.sourceFrame,view.frame)||d.sourceGuide?.method!=='caption-and-visible-monochrome-datum-stroke'||!(d.sourceGuide.support>=.7))){errors.push('ENTRY_REGISTERED_DATUM');return null;}
+   const xs=[],ys=[];
+   for(const check of g.checks){if(!labelledPoint(floor,check?.floor,check?.label)||!labelledPoint(view,check?.elevation,check?.label)||!near(check.floorPixelCoordinate,check.floor.point[axis])||!near(check.sourcePixelX,check.elevation.point[0])){errors.push('ENTRY_REGISTERED_AXIS');return null;}xs.push(check.floor.point[axis]);ys.push(check.elevation.point[0]);}
+   const mx=xs.reduce((n,x)=>n+x,0)/xs.length,my=ys.reduce((n,y)=>n+y,0)/ys.length,den=xs.reduce((n,x)=>n+(x-mx)**2,0),fit=xs.reduce((n,x,i)=>n+(x-mx)*(ys[i]-my),0)/den,offset=my-fit*mx,planSign=axis===0?1:-1,pixelsPerMetre=fit/(sign*planSign*scale),offsetPixels=offset+fit*c.alignment.origin[axis]-fit*c.alignment.offset[axis]/(planSign*scale);
+   if(!(den>1&&pixelsPerMetre>0)||raw.units!=='source-pixels'||g.units!=='metres-to-source-pixels'||raw.transform?.floorAxis!==axisName||g.transform?.modelAxis!==axisName||g.transform.projectionSign!==sign||!near(raw.transform.scale,fit)||!near(raw.transform.offset,offset)||!near(g.transform.pixelsPerMetre,pixelsPerMetre)||!near(g.transform.offsetPixels,offsetPixels)||!near(g.scaleUsed,1/pixelsPerMetre)||!near(source.scaleX??source.scalesUsed?.x,g.scaleUsed)||g.checks.some(check=>!near(check.predictedPixelX,fit*check.floorPixelCoordinate+offset)||!near(check.residual,check.predictedPixelX-check.sourcePixelX)||Math.abs(check.residual)>3)){errors.push('ENTRY_REGISTERED_AXIS');return null;}
+   return {view,c,band:b,model:([x,y])=>[sign*(x-offsetPixels)/pixelsPerMetre,c.base.value+(b.bottomY-y)*b.scaleY]};
+  }
+  function registeredRoofIssues(roof){
+   if(!Array.isArray(roof.sources)||!roof.sources.some(s=>s?.axisRegistration!==undefined||s?.levelBand!==undefined))return;
+   const assembly=roof.entryAssembly,sideIds=assembly?.sideViewIds;
+   if(roof.levelId!==level.id||roof.buildingId!==level.buildingId||!Array.isArray(sideIds)||new Set(sideIds).size!==sideIds.length||roof.sources.filter(s=>s?.axis==='x'&&s.sourceViewId===assembly.frontViewId).length!==1||roof.sources.filter(s=>s?.axis==='y').length!==sideIds?.length||sideIds.some(id=>roof.sources.filter(s=>s?.axis==='y'&&s.sourceViewId===id).length!==1))errors.push('ENTRY_REGISTERED_SOURCE');
+   const projected=[],primary=new Set();
+   for(const source of roof.sources){const registration=registeredProjection(source);if(!registration)continue;
+    if(!Array.isArray(source.anchors)||source.anchors.length<2||!source.anchors.every(point)){errors.push('ENTRY_REGISTERED_PROFILE');continue;}
+    const profile=source.anchors.map(registration.model).sort((a,b)=>a[0]-b[0]),target=roof.profiles?.[source.axis],tolerance=primary.has(source.axis)?Math.max(.05,source.scaleX*3,source.scaleY*3):1e-8;primary.add(source.axis);
+    if(!Array.isArray(target)||target.length!==profile.length||target.some((p,i)=>!point(p)||!near(p[0],profile[i][0],tolerance)||!near(p[1],profile[i][1],tolerance)))errors.push('ENTRY_REGISTERED_PROFILE');
+    const evidence=source.profileEvidence;
+    if(source.axis==='x'){
+     const slopes=evidence?.slopes,p=evidence?.points;
+     if(evidence?.status!=='proposed'||!Array.isArray(slopes)||slopes.length!==2||slopes.some(s=>!s||typeof s!=='object')||!Array.isArray(p)||p.length<3||!p.every(point))errors.push('ENTRY_REGISTERED_PROFILE');
+     else {const [a,b]=slopes,anchors=[[a.eaveX,a.eaveY],[a.highX,p[1][1]],[b.highX,p[2][1]],[b.eaveX,b.eaveY]].filter((q,i,points)=>!i||q[0]-points[i-1][0]>.5);
+      if(!same(anchors,source.anchors)||slopes.some(s=>!number(s.m)||!number(s.c)||!near(s.eaveY,s.m*s.eaveX+s.c,2)||!Array.isArray(s.fit?.sourceSamples)||s.fit.sourceSamples.length<3||s.fit.sourceSamples.filter(q=>point(q)&&Math.abs(q[1]-s.m*q[0]-s.c)<=2.5).length<s.fit.sourceSamples.length*.8)||!near(p[1][1],a.m*a.highX+a.c,2)||!near(p[2][1],b.m*b.highX+b.c,2))errors.push('ENTRY_REGISTERED_PROFILE');
+     }
+    }else if(evidence?.status!=='proposed'||!same(evidence.points,source.anchors)||!(evidence.support?.ratio>=.88))errors.push('ENTRY_REGISTERED_PROFILE');
+    projected.push({source,profile,registration});
+   }
+   const front=projected.find(p=>p.source.axis==='x'),wall=walls.find(w=>w.id===roof.entryAssembly?.parentWallId),x=roof.profiles?.x,y=roof.profiles?.y;
+   if(!front||!wall||!Array.isArray(x)||!x.length||!x.every(point)||!Array.isArray(y)||!y.length||!y.every(point))return;
+   const tol=front.source.scaleY*2,crest=Math.max(...x.map(p=>p[1])),residuals=roof.connection?.orthogonalHeightResiduals;
+   if(wall.normal[1]>-.999||roof.connection?.kind!=='observed-entry-roof-at-wall'||roof.connection.parentWallId!==wall.id||!near(roof.connection.wallY,wall.from[1])||!near(y.at(-1)[0],wall.from[1])||y[0][0]>=wall.from[1]||x[0][0]<Math.min(wall.from[0],wall.to[0])-front.source.scaleX*2||x.at(-1)[0]>Math.max(wall.from[0],wall.to[0])+front.source.scaleX*2||x.some(p=>p[1]<wall.base-tol||p[1]>wall.base+wall.height+tol)||!Array.isArray(residuals))errors.push('ENTRY_REGISTERED_ATTACHMENT');
+   else for(const p of projected.filter(p=>p.source.axis==='y')){const residual=Math.max(Math.abs(p.profile[0][1]-x[0][1]),Math.abs(p.profile.at(-1)[1]-crest)),stored=residuals.find(r=>r.sourceViewId===p.source.sourceViewId);if(!stored||!near(stored.residual,residual)||residual>Math.max(.04,front.source.scaleY*3,p.source.scaleY*3))errors.push('ENTRY_REGISTERED_ATTACHMENT');}
+  }
+  if(registeredOnly){
+   for(const element of elements){const records=registeredRecords(element.provenance);if(records.length&&(element.levelId!==level.id||element.buildingId!==level.buildingId||!walls.some(w=>w.id===element.parentWallId)))errors.push('ENTRY_REGISTERED_ATTACHMENT');for(const record of records)registeredProjection(record);}
+   for(const roof of entryRoofs)registeredRoofIssues(roof);
+   return [...new Set(errors)];
+  }
   for(const e of elements){errors.push(...issues(e));sourceIssues(e);contributingIssues(e);if(e.parentWallId&&!walls.some(w=>w.id===e.parentWallId))errors.push('EXTERIOR_WALL');}
   for(const z of zones){sourceIssues(z);contributingIssues(z);const wall=walls.find(w=>w.id===z.wallId);if(!z.id||!wall)errors.push('EXTERIOR_ZONE_WALL');const invalid=M.validatePolygon(z.polygon);if(invalid.length)errors.push('EXTERIOR_ZONE_POLYGON');else if(wall&&z.polygon.some(([x,y])=>x<-.000001||y<-.000001||x>wall.length+.000001||y>wall.height+.000001))errors.push('EXTERIOR_ZONE_BOUNDS');}
   // The new entrance contract identifies actual orthogonal views. Merely
@@ -139,6 +231,7 @@
    if(roof.levelId!==level.id||roof.buildingId!==level.buildingId)errors.push('ENTRY_ROOF_OWNERSHIP');
    if(roof.status!=='proposed')errors.push('EXTERIOR_PROPOSAL_STATUS');
    planEvidenceIssues(roof);
+   registeredRoofIssues(roof);
    if(!walls.some(w=>w.id===assembly.parentWallId))errors.push('EXTERIOR_WALL');
    const front=inventory.views.find(v=>v.id===assembly.frontViewId&&v.buildingId===level.buildingId&&v.kind==='elevation'&&v.direction==='front');
    if(roof.observedFascia!==undefined){
@@ -158,6 +251,21 @@
   }
   return [...new Set(errors)];
  }
+ function registeredRecords(value,depth=0){
+  if(!value||typeof value!=='object'||depth>4)return [];
+  if(Array.isArray(value))return value.slice(0,128).flatMap(v=>registeredRecords(v,depth+1));
+  const records=value.axisRegistration!==undefined||value.levelBand?.relationship==='same-level-datum-pair'?[value]:[];
+  for(const key of ['depth','topEvidence','alternateDepthObservations','alternateObservations','sources'])records.push(...registeredRecords(value[key],depth+1));return records;
+ }
+ function registeredSourceIssues(level,inventory){return proposalIssues(level,inventory,{registeredOnly:true});}
+ function historyIssues(nextLevel,previousLevel){
+  const errors=[],proof=r=>JSON.stringify({sourceViewId:r.sourceViewId,sourceFrame:r.sourceFrame,sourceBox:r.sourceBox,anchors:r.anchors,axisRegistration:r.axisRegistration,levelBand:r.levelBand,profileEvidence:r.profileEvidence});
+  const nextRoofs=Array.isArray(nextLevel?.reconstructedRoofs)?nextLevel.reconstructedRoofs:[],nextElements=Array.isArray(nextLevel?.exteriorElements)?nextLevel.exteriorElements:[];
+  const compare=(oldRecords,newRecords)=>{for(const previous of oldRecords){const next=newRecords.filter(r=>r.sourceViewId===previous.sourceViewId&&r.axisRegistration&&r.levelBand);if(!next.length)errors.push('ENTRY_REGISTERED_EVIDENCE_LOST');else if(!next.some(r=>proof(r)===proof(previous)))errors.push('ENTRY_REGISTERED_EVIDENCE_CHANGED');}};
+  for(const roof of previousLevel?.reconstructedRoofs||[]){if(!roof.entryAssembly)continue;const before=registeredRecords(roof.sources);if(!before.length)continue;const next=nextRoofs.find(r=>r.id===roof.id&&r.entryAssembly);compare(before,registeredRecords(next?.sources));}
+  for(const element of previousLevel?.exteriorElements||[]){const before=registeredRecords(element.provenance);if(!before.length)continue;const next=nextElements.find(e=>e.id===element.id);compare(before,registeredRecords(next?.provenance));}
+  return [...new Set(errors)];
+ }
  function scene(inventory,buildingId,{includeProposed=false,includeProposedElements=includeProposed}={}){const scene=M.scene(inventory,buildingId,{includeProposed}),levels=inventory.levels.filter(l=>l.buildingId===buildingId);return {...scene,includeProposed,includeProposedElements,roofs:levels.flatMap(l=>(l.reconstructedRoofs||[]).filter(r=>r.status==='confirmed'||includeProposed&&r.status==='proposed').map(r=>({...copy(r),finish:copy(l.roofFinishes?.[r.id]||r.finish||{})}))),soffits:levels.flatMap(l=>(l.soffits||[]).filter(s=>s.status==='confirmed'&&Number.isFinite(s.height)&&s.polygon?.length===4).map(s=>({...copy(s),levelId:l.id}))),corners:levels.flatMap(l=>corners(l,inventory)),elements:levels.flatMap(l=>(l.exteriorElements||[]).filter(e=>!issues(e).length&&(e.status==='confirmed'||includeProposedElements&&e.status==='proposed')).map(e=>({...copy(e),levelId:l.id,buildingId}))),partial:scene.partial||levels.some(l=>l.reconstruction?.proposal?.complete===false||(l.reconstructedRoofs||[]).some(r=>r.quantityStatus!=='complete'))||levels.some(l=>(l.exteriorElements||[]).some(e=>e.status!=='confirmed'||e.surfaceOnly||issues(e).length))};}
  function elementFaces(e,center=[0,0]){if(issues(e).length)return [];const [x,y,z]=e.origin,[w,d,h]=e.size,a=e.rotationDegrees*Math.PI/180,transform=([u,v,t])=>[x+u*Math.cos(a)-v*Math.sin(a)-center[0],y+u*Math.sin(a)+v*Math.cos(a)-center[1],z+t],color=/^#[0-9a-f]{6}$/i.test(e.color||'')?e.color:e.status==='proposed'?'#b9b4a2':'#a7aaa3';
   const box=(u,v,t,bw,bd,bh,index)=>{const p=[[u,v,t],[u+bw,v,t],[u+bw,v+bd,t],[u,v+bd,t],[u,v,t+bh],[u+bw,v,t+bh],[u+bw,v+bd,t+bh],[u,v+bd,t+bh]].map(transform),quads=[[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7],[4,5,6,7]],normals=[[0,-1,0],[1,0,0],[0,1,0],[-1,0,0],[0,0,1]];if(e.type==='beam'){quads.push([3,2,1,0]);normals.push([0,0,-1]);}return quads.map((q,i)=>({id:e.id+':'+index+':'+i,elementId:e.id,type:e.type==='column'?'column':e.type==='beam'?'beam':'concrete',poly:q.map(j=>p[j]),normal:[normals[i][0]*Math.cos(a)-normals[i][1]*Math.sin(a),normals[i][0]*Math.sin(a)+normals[i][1]*Math.cos(a),normals[i][2]],fillColor:color,role:'exterior-'+e.type,status:e.status,levelId:e.levelId}));};
@@ -165,5 +273,5 @@
   if(e.type==='stairs'){if(!Number.isInteger(e.count)||e.count<1||e.count>30)return [];return Array.from({length:e.count},(_,i)=>box(0,i*d/e.count,0,w,d/e.count,h*(i+1)/e.count,i)).flat();}return box(0,0,0,w,d,h,0);
  }
  function patchGroup(level,items,id,scope,patch,field){const next=copy(level);next[field]||={};const chosen=items.find(x=>x.id===id);if(!chosen)return next;for(const item of items.filter(x=>scope==='all'||scope==='front'&&x.group==='front'||scope==='back'&&x.group==='back'||scope==='single'&&x.id===id))next[field][item.id]={...next[field][item.id],...copy(patch)};return next;}
- return Object.freeze({version:1,corners,cornerFaces,issues,proposalIssues,scene,elementFaces,patchGroup});
+ return Object.freeze({version:1,corners,cornerFaces,issues,proposalIssues,registeredSourceIssues,historyIssues,scene,elementFaces,patchGroup});
 });

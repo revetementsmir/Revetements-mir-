@@ -107,6 +107,7 @@
    lower=R.assignOpeningSurfaces(lower,volumes);next.reconstruction.lowerProposal=lower;next.reconstruction.secondaryProposals=volumes;next.reconstruction.roofProposal=roof;
    if(roof.status==='proposed'&&!Roof.issues(roof,{confirm:false}).length)next.reconstructedRoofs=[roof];else if(roofHost)report.issues.push(roof.reason||'ROOF_UNRESOLVED');
    if(roof.pitchEvidence){if(roof.pitchEvidence.status==='conflict')report.issues.push('ROOF_PITCH_CONFLICT');report.issues.push(...new Set(roof.pitchEvidence.observations.filter(o=>o.association?.status!=='proposed').map(o=>o.association?.reason||o.reason||'ROOF_PITCH_FACE_UNRESOLVED')));}
+   if(roof.roofPlanEvidence)report.issues.push(...roof.roofPlanEvidence.issues);
    const additions=[next,...(lower.status==='proposed'?[lower]:[]),...volumes],generated=[];
    for(const l of additions){if(l!==next){if(inventory.levels.some(old=>old.id===l.id)){report.issues.push('EXISTING_GEOMETRY_PRESERVED');continue;}l.reconstruction={version:1,status:'automatic-proposal',sourceRasterRequiredForRendering:false};if(l.roofProposal?.status==='proposed'&&!Roof.issues(l.roofProposal,{confirm:false}).length)l.reconstructedRoofs=[l.roofProposal];}
     const walls=M.wallsFor(l,inventory,{includeProposed:true});l.wallOpenings=(l.openingProposals||[]).map(o=>opening(o,walls)).filter(o=>!M.openingIssues([o],walls).length);levels.push(l);generated.push(l);
@@ -124,6 +125,20 @@
    if(lower.status!=='proposed'&&!hasGroundPlan&&!requiresLevelAlignment)report.issues.push(lower.reason);
    report.status='partial-proposal';report.confirmationRequired=true;report.measurements='written and calibrated estimates remain proposed';
   }
+  if(requiresLevelAlignment&&Exterior?.buildRegisteredEntries&&levels.some(l=>l.reconstruction?.status==='automatic-proposal')){
+   // A separate source registration pass owns entry assemblies across the
+   // completed stack. The legacy whole-house exterior builder stays guarded.
+   const exterior=Exterior.buildRegisteredEntries(inventory,buildingId,images,levels);
+   for(const detail of exterior.byLevel||[]){const target=levels.find(l=>l.id===detail.levelId),report=reports.find(r=>r.levelId===detail.levelId);if(!target||!report)throw Error('EXTERIOR_LEVEL_MISMATCH');
+    if((detail.wallZones||[]).length)throw Error('REGISTERED_ENTRIES_ONLY');if(target.reconstruction?.status!=='automatic-proposal')continue;
+    const walls=M.wallsFor(target,inventory,{includeProposed:true});
+    for(const element of detail.exteriorElements||[])if(element.levelId!==target.id||element.buildingId!==buildingId||!walls.some(w=>w.id===element.parentWallId)||!['column','beam'].includes(element.type))throw Error('ENTRY_ELEMENT_INVALID');
+    for(const roof of detail.reconstructedRoofs||[])if(Roof.issues(roof,{confirm:false}).length||roof.levelId!==target.id||roof.buildingId!==buildingId||!walls.some(w=>w.id===roof.entryAssembly?.parentWallId))throw Error('ENTRY_ROOF_INVALID');
+    target.exteriorElements=[...(target.exteriorElements||[]),...copy(detail.exteriorElements||[])];target.reconstructedRoofs=[...(target.reconstructedRoofs||[]),...copy(detail.reconstructedRoofs||[])];
+    target.reconstruction.exterior={version:exterior.version,issues:copy(detail.issues||[]),conflicts:copy(detail.conflicts||[]),complete:false};report.issues=[...new Set([...report.issues,...(detail.issues||[])])];
+    report.exterior={elements:target.exteriorElements.length,roofs:target.reconstructedRoofs.filter(r=>r.entryAssembly).length,zones:(target.wallZones||[]).length,conflicts:(detail.conflicts||[]).length,complete:false};
+   }
+  }
   if(requiresLevelAlignment&&Exterior?.buildRegisteredWallZones&&levels.some(l=>l.reconstruction?.status==='automatic-proposal')){
    // Registered wall bands can carry source cladding before every balcony,
    // foundation or entrance has its own established level and depth. Keep
@@ -132,8 +147,9 @@
    for(const detail of exterior.byLevel||[]){const target=levels.find(l=>l.id===detail.levelId),report=reports.find(r=>r.levelId===detail.levelId);if(!target||!report)throw Error('EXTERIOR_LEVEL_MISMATCH');
     if((detail.exteriorElements||[]).length||(detail.reconstructedRoofs||[]).length)throw Error('REGISTERED_WALL_ZONES_ONLY');
     if(target.reconstruction?.status!=='automatic-proposal')continue;
-    target.wallZones=[...(target.wallZones||[]),...copy(detail.wallZones||[])];target.reconstruction.exterior={version:exterior.version,issues:copy(detail.issues||[]),conflicts:copy(detail.conflicts||[]),complete:false};
-    report.issues=[...new Set([...report.issues,...(detail.issues||[])])];report.exterior={elements:0,roofs:0,zones:target.wallZones.length,conflicts:(detail.conflicts||[]).length,complete:false};
+    target.wallZones=[...(target.wallZones||[]),...copy(detail.wallZones||[])];const previous=target.reconstruction.exterior;
+    target.reconstruction.exterior={version:exterior.version,issues:[...new Set([...(previous?.issues||[]),...(detail.issues||[])])],conflicts:[...copy(previous?.conflicts||[]),...copy(detail.conflicts||[])],complete:false};
+    report.issues=[...new Set([...report.issues,...(detail.issues||[])])];report.exterior={elements:(target.exteriorElements||[]).length,roofs:(target.reconstructedRoofs||[]).filter(r=>r.entryAssembly).length,zones:target.wallZones.length,conflicts:target.reconstruction.exterior.conflicts.length,complete:false};
    }
   }
   if(!reports.length)reports.push({status:'unresolved',issues:[inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor')?'FLOOR_LEVEL_REQUIRED':'FLOOR_SOURCE_REQUIRED']});

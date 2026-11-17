@@ -1,6 +1,6 @@
 /* Two measured orthographic profiles bound one physical roof surface. No
  * rectangle/rise fallback, symmetry assumption or PDF texture is used. */
-(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.MIRReconstructedRoofs=api;})(typeof window==='object'?window:globalThis,function(){
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(()=>node?require('./plan-roof-plan-evidence.js'):root.MIRRoofPlanEvidence);if(node)module.exports=api;else root.MIRReconstructedRoofs=api;})(typeof window==='object'?window:globalThis,function(planEvidenceModule){
  'use strict';const finite=Number.isFinite;
  const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),copy=v=>JSON.parse(JSON.stringify(v));
  function pitchGeometry(roof){return {profiles:copy(roof.profiles),extensions:(roof.extensions||[]).map(r=>({id:r.id,profiles:copy(r.profiles)}))};}
@@ -58,6 +58,20 @@
   }
   for(const child of previous?.extensions||[])errors.push(...pitchHistoryIssues((roof.extensions||[]).find(p=>p.id===child.id),child));return [...new Set(errors)];
  }
+ function planEvidenceIssues(roof,{confirm=false}={}){
+  if(roof?.roofPlanEvidence===undefined&&!(roof?.extensions||[]).some(c=>c.roofPlanEvidence!==undefined))return [];
+  const plan=planEvidenceModule();return plan?.geometryIssues?plan.geometryIssues(roof,{confirm}):['ROOF_PLAN_MODULE_REQUIRED'];
+ }
+ function planSourceIssues(roof,inventory){
+  const errors=[];
+  if(roof?.roofPlanEvidence!==undefined){const plan=planEvidenceModule();errors.push(...(plan?.evidenceIssues?plan.evidenceIssues(roof,inventory,{confirm:false}):['ROOF_PLAN_MODULE_REQUIRED']));}
+  for(const child of roof?.extensions||[])errors.push(...planSourceIssues(child,inventory));return [...new Set(errors)];
+ }
+ function planHistoryIssues(roof,previous){
+  const errors=[];
+  if(previous?.roofPlanEvidence!==undefined){const plan=planEvidenceModule();errors.push(...(plan?.historyIssues?plan.historyIssues(roof,previous):['ROOF_PLAN_MODULE_REQUIRED']));}
+  for(const child of previous?.extensions||[])errors.push(...planHistoryIssues((roof?.extensions||[]).find(c=>c.id===child.id),child));return [...new Set(errors)];
+ }
  function observedFasciaIssues(roof){
   if(roof.observedFascia===undefined)return [];
   const faces=roof.observedFascia,xp=roof.profiles?.x,yp=roof.profiles?.y;
@@ -75,7 +89,7 @@
    if(!roof.sources?.some(s=>s.sourceViewId===face.sourceViewId)||!face.sourceFrame||!Array.isArray(face.anchors)||face.anchors.length<2||face.anchors.some(a=>!Array.isArray(a)||a.length!==2||!a.every(finite))||!(face.scaleX>0&&face.scaleY>0))errors.push('ROOF_OBSERVED_FASCIA_SOURCE');
   }return errors;
  }
- function issues(roof,{confirm=true,depth=0}={}){const errors=[];if(!roof?.id||!roof.levelId||!roof.buildingId)errors.push('ROOF_ID');if(confirm&&roof.status!=='confirmed')errors.push('ROOF_UNCONFIRMED');for(const key of ['x','y']){const p=roof?.profiles?.[key];if(!Array.isArray(p)||p.length<2||p.length>12||p.some((p,i,a)=>p.length!==2||!p.every(finite)||p.some(n=>Math.abs(n)>10000)||i&&p[0]<=a[i-1][0]))errors.push('ROOF_PROFILE');}if(!Array.isArray(roof?.sources)||roof.sources.length<2||roof.sources.some(s=>!s.sourceViewId||!s.sourceFrame||!s.anchors?.length||!finite(s.scaleX)||!finite(s.scaleY)||s.scaleX<=0||s.scaleY<=0))errors.push('ROOF_SOURCE');if((roof.extensions||[]).length>8||depth>0&&roof.extensions?.length)errors.push('ROOF_COMPONENTS');else for(const child of roof.extensions||[]){if(child.levelId!==roof.levelId||child.buildingId!==roof.buildingId||child.id===roof.id||issues(child,{confirm:false,depth:depth+1}).length)errors.push('ROOF_COMPONENTS');}if(!errors.includes('ROOF_PROFILE')){errors.push(...observedFasciaIssues(roof));errors.push(...pitchEvidenceIssues(roof,{confirm}));if(confirm)for(const child of roof.extensions||[])errors.push(...pitchEvidenceIssues(child,{confirm:true}));}return [...new Set(errors)];}
+ function issues(roof,{confirm=true,depth=0}={}){const errors=[];if(!roof?.id||!roof.levelId||!roof.buildingId)errors.push('ROOF_ID');if(confirm&&roof.status!=='confirmed')errors.push('ROOF_UNCONFIRMED');for(const key of ['x','y']){const p=roof?.profiles?.[key];if(!Array.isArray(p)||p.length<2||p.length>12||p.some((p,i,a)=>p.length!==2||!p.every(finite)||p.some(n=>Math.abs(n)>10000)||i&&p[0]<=a[i-1][0]))errors.push('ROOF_PROFILE');}if(!Array.isArray(roof?.sources)||roof.sources.length<2||roof.sources.some(s=>!s.sourceViewId||!s.sourceFrame||!s.anchors?.length||!finite(s.scaleX)||!finite(s.scaleY)||s.scaleX<=0||s.scaleY<=0))errors.push('ROOF_SOURCE');if((roof.extensions||[]).length>8||depth>0&&roof.extensions?.length)errors.push('ROOF_COMPONENTS');else for(const child of roof.extensions||[]){if(child.levelId!==roof.levelId||child.buildingId!==roof.buildingId||child.id===roof.id||issues(child,{confirm:false,depth:depth+1}).length)errors.push('ROOF_COMPONENTS');}if(!errors.includes('ROOF_PROFILE')){errors.push(...observedFasciaIssues(roof));errors.push(...pitchEvidenceIssues(roof,{confirm}));errors.push(...planEvidenceIssues(roof,{confirm}));if(confirm)for(const child of roof.extensions||[])errors.push(...pitchEvidenceIssues(child,{confirm:true}));}return [...new Set(errors)];}
  function clip(poly,a,b,c,side){const result=[],value=p=>side*(a*p[0]+b*p[1]+c);for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length],u=value(p),v=value(q);if(u<=1e-9)result.push(p);if((u<-1e-9&&v>1e-9)||(u>1e-9&&v<-1e-9)){const t=u/(u-v);result.push([p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t]);}}return result;}
  const area=p=>Math.abs(p.reduce((s,a,i)=>{const b=p[(i+1)%p.length];return s+a[0]*b[1]-a[1]*b[0];},0))/2;
  function supportingPlanes(roof){
@@ -126,5 +140,5 @@
    pieces.forEach((p,k)=>result.push({...face,id:face.id+':visible:'+k,roofId:roof.id,elementId:roof.id,componentId:components[i].id,poly:p.map(([x,y])=>[x,y,plane[0]*x+plane[1]*y+plane[2]]),suppressOutline:groups.length>1}));
   }return mergeCoplanar(result);
  }
- return Object.freeze({version:1,issues,faces,pitchGeometry,pitchEvidenceIssues,pitchSourceIssues,pitchHistoryIssues});
+ return Object.freeze({version:1,issues,faces,pitchGeometry,pitchEvidenceIssues,pitchSourceIssues,pitchHistoryIssues,planEvidenceIssues,planSourceIssues,planHistoryIssues});
 });

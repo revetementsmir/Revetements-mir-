@@ -1,5 +1,5 @@
 /* Local source-to-model proposals. Review is explicit; legacy projects are read only. */
-(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction-vision.js'):root.MIRReconstructionVision,node?require('./plan-import-core.js'):root.MIRPDFAnalysis,node?require('./plan-spatial-dimensions.js'):root.MIRSpatialDimensions,()=>node?require('./plan-grid-registration.js'):root.MIRGridRegistration,()=>node?require('./plan-roof-pitch-evidence.js'):root.MIRRoofPitchEvidence);if(node)module.exports=api;else root.MIRPlanReconstruction=api;})(typeof window==='object'?window:globalThis,function(M,V,A,S,gridRegistration,roofPitchEvidence){
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction-vision.js'):root.MIRReconstructionVision,node?require('./plan-import-core.js'):root.MIRPDFAnalysis,node?require('./plan-spatial-dimensions.js'):root.MIRSpatialDimensions,()=>node?require('./plan-grid-registration.js'):root.MIRGridRegistration,()=>node?require('./plan-roof-pitch-evidence.js'):root.MIRRoofPitchEvidence,()=>node?require('./plan-roof-plan-evidence.js'):root.MIRRoofPlanEvidence);if(node)module.exports=api;else root.MIRPlanReconstruction=api;})(typeof window==='object'?window:globalThis,function(M,V,A,S,gridRegistration,roofPitchEvidence,roofPlanEvidence){
  'use strict';
  const normal=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),size=v=>[v.payload.sourceWidth||v.zone?.[2]||v.frame?.rasterSize[0],v.payload.sourceHeight||v.zone?.[3]||v.frame?.rasterSize[1]];
  function readings(view){return view.payload.drawingReadings?.rows||[];}
@@ -705,6 +705,13 @@ function localizeTargetContour(image,points){
   const {profiles,sources,checks}=assembled;
   const roof={version:1,id:'roof:'+proposal.levelId+':main',levelId:proposal.levelId,buildingId:proposal.buildingId,status:'proposed',profiles,sources,checks,complete:false,confirmationRequired:true,kind:'estimated-calibrated',quantityStatus:'partial-unreviewed',registrationChoices:M.clone(ridgeChoices),fasciaBottom:reviewed.base.value+reviewed.height.value,note:'Only the roof bounded by these source profiles is proposed. Porches, garage roofs and unrepresented volumes remain separate.'};
   if(images)roof.extensions=roofExtensions(proposal,inventory,images,reviewed,roof);
+  // A separate roof plan can locate returns outside the room contour. It
+  // supplies XY only: each added component still needs its own orthogonal
+  // elevation profiles and an observed ridge reaching the parent surface.
+  if(images&&inventory.views.some(v=>v.kind==='roof'&&v.buildingId===roof.buildingId)){
+   const plan=roofPlanEvidence(),assessment=plan?.propose(roof,proposal,inventory,reviewed,images,{registerElevation:elevationRegistration});
+   if(assessment?.evidence){roof.extensions=[...(roof.extensions||[]),...assessment.extensions];roof.roofPlanEvidence=assessment.evidence;}
+  }
   const pitch=roofPitchEvidence();if(pitch){const evidence=pitch.assess(roof,inventory,reviewed,images||{});if(evidence.observations.length)roof.pitchEvidence=evidence;}
   return roof;
  }

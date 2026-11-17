@@ -952,17 +952,24 @@
   const established=groups.filter(g=>framed(g.box)).map(g=>({box:[g.box[0]-3,g.box[1]-3,g.box[2]+6,g.box[3]+6],panelBox:g.box.slice(),framePaddingPx:3,type,method:type==='door'?'closed-frame-and-neutral-door-panels':'closed-frame-and-neutral-glazing',status:'proposed',confirmationRequired:true}));
   return type==='door'?[...established,...fragmentedDoorFrames(image,box,parts,raw,established)]:established;
  }
- function canopyEnvelope(image,primary,upperY){
-  if(primary.status!=='proposed'||!Number.isFinite(upperY))return {status:'unresolved',reason:'CANOPY_LEVEL_REQUIRED'};
+ function canopyEnvelope(image,primary,upperY,{all=false}={}){
+  if(primary.status!=='proposed'||!Number.isFinite(upperY))return all?[]:{status:'unresolved',reason:'CANOPY_LEVEL_REQUIRED'};
   const {width:w,height:h}=image,[bx,by,bw,bh]=primary.box,ink=structuralInk(image),mask=new Uint8Array(w*h),top=Math.max(0,Math.floor(upperY-30)),bottom=Math.min(h-1,Math.ceil(upperY+bh*.23));
   for(let y=top;y<=bottom;y++)for(let x=Math.max(0,Math.floor(bx));x<=Math.min(w-1,Math.ceil(bx+bw));x++){const j=(y*w+x)*4;mask[y*w+x]=Number(Math.max(image.data[j],image.data[j+1],image.data[j+2])<150&&Math.max(image.data[j],image.data[j+1],image.data[j+2])-Math.min(image.data[j],image.data[j+1],image.data[j+2])<40);}
-  const lines=components(opening(mask,w,h,Math.round(bw*.12),0),w,h).map(c=>c.box).filter(b=>b[2]>bw*.29&&b[2]<bw*.7&&b[3]<10),candidates=[];
+  // Several independent porches can each occupy less than a third of a long
+  // facade. The multi-candidate path still requires two source-supported posts
+  // at the ends of each individual beam; it does not partition by symmetry.
+  const lines=components(opening(mask,w,h,Math.round(all?Math.max(8,bw*.03):bw*.12),0),w,h).map(c=>c.box).filter(b=>b[2]>(all?Math.max(60,bw*.1):bw*.29)&&b[2]<bw*.7&&b[3]<10),candidates=[];
   for(const [x,y,width,thickness]of lines){const roofY=y+thickness,start=roofY+2,end=Math.min(h-1,Math.ceil(by+bh+bh*.18)),columns=[];
    for(const center of [x,x+width]){const edges=[];for(let xx=Math.max(0,Math.floor(center-16));xx<=Math.min(w-1,Math.ceil(center+16));xx++){let count=0,last=start;for(let yy=start;yy<=end;yy++)if(ink[yy*w+xx]){count++;last=yy;}if(count>Math.max(80,(end-start)*.68))edges.push({x:xx,last,count});}if(!edges.length){columns.push(null);continue;}const groups=[];for(const edge of edges){if(!groups.length||edge.x-groups.at(-1).at(-1).x>3)groups.push([edge]);else groups.at(-1).push(edge);}const last=groups.at(-1).at(-1),previous=groups.length>1&&last.x-groups.at(-2)[0].x<=25?groups.at(-2):groups.at(-1),first=previous[0];columns.push({x:first.x,width:last.x-first.x>=4?last.x-first.x:null,bottom:Math.min(first.last,last.last),support:Math.min(first.count,last.count)});}
-   if(columns.some(c=>!c))continue;const [a,b]=columns,base=Math.min(a.bottom,b.bottom);if(base-roofY<bh*.3||b.x-a.x<bw*.25)continue;candidates.push({status:'proposed',box:[a.x,roofY,b.x-a.x,base-roofY],columns,beamLine:[x,y,width,thickness],sourceViewId:primary.sourceViewId,sourceFrame:primary.sourceFrame,method:'two-supported-posts-and-lower-roof-beam-guide',score:width*Math.min(a.support,b.support),confirmationRequired:true});
-  }candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'CANOPY_POSTS_NOT_ESTABLISHED'};
+   if(columns.some(c=>!c))continue;const [a,b]=columns,base=Math.min(a.bottom,b.bottom);if(base-roofY<bh*.3||b.x-a.x<(all?width*.8:bw*.25))continue;candidates.push({status:'proposed',box:[a.x,roofY,b.x-a.x,base-roofY],columns,beamLine:[x,y,width,thickness],sourceViewId:primary.sourceViewId,sourceFrame:primary.sourceFrame,method:'two-supported-posts-and-lower-roof-beam-guide',score:width*Math.min(a.support,b.support),confirmationRequired:true});
+  }candidates.sort((a,b)=>b.score-a.score);
+  // The upper and lower edges of one beam can both locate the same posts.
+  // Keep one observation of those posts, without discarding a second porch.
+  if(all){const distinct=[];for(const c of candidates)if(!distinct.some(p=>p.columns.every((post,i)=>Math.abs(post.x-c.columns[i].x)<=3&&Math.abs(post.bottom-c.columns[i].bottom)<=3)))distinct.push(c);return distinct;}
+  return candidates[0]||{status:'unresolved',reason:'CANOPY_POSTS_NOT_ESTABLISHED'};
  }
- function canopySide(image,primary,topY,{direction='right'}={}){
+ function canopySide(image,primary,topY,{direction='right',all=false}={}){
   const {width:w,height:h}=image,[bx,by,bw,bh]=primary.box,ink=structuralInk(image),candidates=[];
   // A detached dimension extension below a landing is not a continuation of
   // the post. Keep the supported vertical run attached to the canopy region.
@@ -973,7 +980,7 @@
    const supported=runs.filter(r=>r.first-topY<=startLimit&&r.count>Math.max(80,(by+bh-topY)*.73)).sort((a,b)=>b.count-a.count)[0];
    if(supported)candidates.push({x,count:supported.count,last:supported.last});
   }
-  const groups=[];for(const c of candidates){if(!groups.length||c.x-groups.at(-1).at(-1).x>20)groups.push([c]);else groups.at(-1).push(c);}const group=groups.filter(g=>g.at(-1).x-g[0].x>=4&&g.at(-1).x-g[0].x<=35).sort((a,b)=>b.reduce((s,c)=>s+c.count,0)-a.reduce((s,c)=>s+c.count,0))[0];return group?{status:'proposed',box:[group[0].x,topY,group.at(-1).x-group[0].x,Math.min(group[0].last,group.at(-1).last)-topY],sourceViewId:primary.sourceViewId,sourceFrame:primary.sourceFrame,method:'side-post-two-visible-edges',confirmationRequired:true}:{status:'unresolved',reason:'CANOPY_DEPTH_NOT_REPRESENTED'};
+  const groups=[];for(const c of candidates){if(!groups.length||c.x-groups.at(-1).at(-1).x>20)groups.push([c]);else groups.at(-1).push(c);}const observed=groups.filter(g=>g.at(-1).x-g[0].x>=4&&g.at(-1).x-g[0].x<=35).sort((a,b)=>b.reduce((s,c)=>s+c.count,0)-a.reduce((s,c)=>s+c.count,0)).map(group=>({status:'proposed',box:[group[0].x,topY,group.at(-1).x-group[0].x,Math.min(group[0].last,group.at(-1).last)-topY],sourceViewId:primary.sourceViewId,sourceFrame:primary.sourceFrame,method:'side-post-two-visible-edges',confirmationRequired:true}));return all?observed:observed[0]||{status:'unresolved',reason:'CANOPY_DEPTH_NOT_REPRESENTED'};
  }
  // A beam guide is only ink. A visible beam face needs two separated horizontal
  // boundaries joined at both ends. The caller must independently establish its

@@ -1,5 +1,64 @@
 # Seven original PDF dossiers: cold import and reconstruction evidence
 
+## 2026-11-17 resumption: secondary roofs remain under verification
+
+The resumed work starts from pushed revision `888b322`; it does not recover or
+claim validation of the stopped session's unpushed local changes. PR 44 remains
+a draft. D01 still requires source verification of its entrance roofs, patio
+roof returns, lower rear roofs and the two requested exterior walls. Automatic
+conversion is implemented; a complete faithful D01 reconstruction is **not**
+demonstrated by this checkpoint.
+
+The reading-priority correction at `d2290c0` preserves the main 42/64-region
+budget and the fundamental level/dimension regions. On the same privately
+retained D01 import, this recovers seven level-caption readings but leaves no
+roof-grid regions in the saturated main queue. A separately bounded phase now
+allows up to 24 missing floor/roof grid regions after that queue. It uses the
+same detector, OCR acceptance rules, conflict handling and source frames; it
+does not infer labels from their order. Successful, failed and contradictory
+attempts are retained, and identical regions are not read twice in one refined
+inventory.
+
+The geometry changes add two source-dependent paths:
+
+- Registered entrance assemblies are evaluated after the full level stack.
+  Each contributing elevation needs its own labelled axes and observed datum
+  pair. Ambiguous side-depth associations and components outside the receiving
+  wall's level or extent remain unresolved.
+- Roof-plan hips and ridges can locate returns outside the occupied-floor
+  contour. A component also needs two orthogonal elevation profiles and a
+  source-supported join to the parent roof. The plan never supplies an invented
+  height. The parent profile is preserved; lower roofs and ambiguous ownership
+  require their own association instead of a flat filler.
+
+New roof-return provenance uses `roofPlanEvidence`, separate from the existing
+flat-entry `planEvidence` contract. Persistence validates the proposed levels
+together and keeps regional readings with their proposals while preserving
+the original imported source views. Source/frame/profile mismatches and loss
+of an established component's evidence are rejected; finishes remain editable.
+
+Synthetic tests cover four roof-return directions, three asymmetric returns,
+real raster/profile detection, observed joints, contradictory elevations,
+registered entrances on different levels, source-label persistence, bounded
+reading schedules, cancellation and the existing flat-entry geometry. The
+new browser storage test exercises the real IndexedDB transaction and reopen
+path in CI; local Node results are not a substitute for that browser gate.
+
+The private Node replay of D01 imports all 17 pages and identifies 11 views.
+Both frozen `888b322` and `d2290c0` produce unresolved geometry in this runtime,
+with scale-reference conflicts and subsequent level-registration refusal. A
+separate private-house Node baseline is also unresolved at unchanged `888b322`.
+These results differ from the earlier Chromium receipt and therefore do not
+establish a regression caused by this change, preservation of original visual
+fidelity, or a new success count. The fallback uses actual production modules,
+PDF.js, Tesseract and a Node canvas/transport adapter; browser execution, the
+private originals and synthetic regression evidence remain distinct.
+
+No private PDF, OCR transcription, raster, source fingerprint or source
+coordinates are committed. The historical checkpoints below retain their
+original execution boundaries and must not be presented as verification of
+the current branch head.
+
 ## Scope
 
 The client goal is an automatic PDF-to-building proposal that includes entrance

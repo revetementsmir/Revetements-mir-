@@ -124,6 +124,41 @@
   const priority=(a,b)=>a.region.priority-b.region.priority;
   return [...fundamental.sort(priority),...supplementary.sort(priority)].slice(0,multiLevel?64:42);
  }
+ function readingRegionKey(view,region){
+  const crop=Array.isArray(region)?region:(()=>{const {left,top,right,bottom}=readingCrop(view,region);return [left,top,right-left,bottom-top];})();
+  return JSON.stringify([view.id,view.fileId??null,view.page??null,view.frame??null,crop]);
+ }
+ function gridAttemptKeys(inventory,buildingId){
+  const keys=new Set();for(const view of inventory.views.filter(v=>v.buildingId===buildingId)){
+   const readings=view.payload?.drawingReadings||{};
+   for(const row of [...(Array.isArray(readings.rows)?readings.rows:[]),...(Array.isArray(readings.gridAttempts)?readings.gridAttempts:[])]){const r=row?.retry;if(r?.purpose!=='source-raster-grid-bubble'||r.sourceViewId!==view.id||JSON.stringify(r.sourceFrame)!==JSON.stringify(view.frame)||r.sourceFileId!==undefined&&r.sourceFileId!==view.fileId||r.sourcePage!==undefined&&r.sourcePage!==view.page||!Array.isArray(r.region)||r.region.length!==4||!r.region.every(Number.isFinite))continue;keys.add(readingRegionKey(view,r.region));}
+  }return keys;
+ }
+ function roofGridWorkItems(inventory,buildingId,sourceImages={}, {attempted=new Set()}={}){
+  const Grid=root.MIRGridRegistration;if(!Grid?.alignRoofPlan)return [];
+  const available=v=>v.buildingId===buildingId&&v.payload?.sourceImage&&sourceImages[v.id],floors=inventory.views.filter(v=>v.kind==='floor'&&available(v)),roofs=inventory.views.filter(v=>v.kind==='roof'&&available(v)),needed=new Set();
+  // A classified roof needs its own grid even without a readable pitch label.
+  // Invalid frames and contradictory transforms cannot be repaired by spending
+  // more OCR on unrelated circles. Only missing axes/labels enter this phase.
+  for(const roof of roofs)for(const floor of floors){
+   const registration=Grid.alignRoofPlan(floor,roof,sourceImages[floor.id],sourceImages[roof.id]);
+   if(registration.reason==='GRID_AXES_INSUFFICIENT'){
+    if(registration.sources?.[0])needed.add(floor.id);
+    if(registration.sources?.[1])needed.add(roof.id);
+   }else if(registration.reason==='GRID_LABELS_INSUFFICIENT'){needed.add(floor.id);needed.add(roof.id);}
+  }
+  const seen=gridAttemptKeys(inventory,buildingId);for(const key of attempted)seen.add(key);
+  const groups=[...roofs,...floors].filter(v=>needed.has(v.id)).map(view=>{
+   const candidates=gridRegions(view,sourceImages[view.id],{includeRoof:true}).filter(region=>!seen.has(readingRegionKey(view,region))),numbers=candidates.filter(r=>r.gridCircle.kind==='number'),letters=candidates.filter(r=>r.gridCircle.kind==='letter');
+   // Both independent axes are useful before additional labels of one family.
+   // This orders source crops only; no label is inferred from that ordering.
+   return [...numbers.slice(0,3),...letters.slice(0,2),...numbers.slice(3),...letters.slice(2)].map(region=>({view,region}));
+  });
+  // An independently bounded phase: the original 42/64 queue is untouched.
+  // Twenty-four extra regions are reserved for roof/floor registration after
+  // originals showed that a saturated main queue left all roof axes unread.
+  const work=[];for(let round=0;work.length<24;round++){let added=false;for(const group of groups){const item=group[round];if(!item)continue;const key=readingRegionKey(item.view,item.region);if(seen.has(key))continue;seen.add(key);work.push(item);added=true;if(work.length===24)break;}if(!added)break;}return work;
+ }
  // Re-read a bounded region from the retained PDF, never from a resampled
  // screenshot. Coordinates remain those of the upright imported view.
  function captionGuideMasks(canvas,{padding=0,scale=1,left=0,top=0}={}){
@@ -336,11 +371,12 @@
   }return evidence;
  }
  async function refine(inventory,buildingId,{images:sourceImages={},progress=()=>{},cancelled=()=>false,sourceFile=null}={}){
-  const next=JSON.parse(JSON.stringify(inventory)),evidence=[],native=sourceReader(sourceFile,next.files||[]),dimensionBudget={remaining:12};let work,keyDiscovery,pitchRegions;try{evidence.push(...await refineHorizontalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));work=workItems(next,buildingId,sourceImages);keyDiscovery=root.MIRKeyedWallObservations?.discover(next,buildingId,sourceImages);pitchRegions=next.views.filter(v=>v.buildingId===buildingId&&v.kind==='roof').flatMap(v=>root.MIRRoofPitchEvidence?.regions(v)||[]);}catch(error){await native.close();throw error;}if(!work.length&&!keyDiscovery?.regions.length&&!pitchRegions.length){try{evidence.push(...await refineVerticalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));evidence.push(...await refineOpeningFrames(next,buildingId,sourceImages,native,{progress,cancelled}));return {inventory:next,evidence};}finally{await native.close();}}
-  await dependencies();const worker=await root.Tesseract.createWorker('eng',1,{workerPath:asset('vendor/tesseract/worker.min.js'),corePath:asset('vendor/tesseract-core/'),langPath:asset('vendor/tessdata/'),workerBlobURL:false,gzip:true});
-  let activeCanvas=null;try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});let workerMode='7';const images=new Map();
-   for(let i=0;i<work.length;i++){
-    if(cancelled())break;const {view,region}=work[i];progress(i+1,work.length,view.page);let image=images.get(view.id);if(!image){image=new Image();image.src=view.payload.sourceImage;await image.decode();images.set(view.id,image);}
+  const next=JSON.parse(JSON.stringify(inventory)),evidence=[],native=sourceReader(sourceFile,next.files||[]),dimensionBudget={remaining:12};let work,keyDiscovery,pitchRegions,roofPending=false;try{evidence.push(...await refineHorizontalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));work=workItems(next,buildingId,sourceImages);keyDiscovery=root.MIRKeyedWallObservations?.discover(next,buildingId,sourceImages);pitchRegions=next.views.filter(v=>v.buildingId===buildingId&&v.kind==='roof').flatMap(v=>root.MIRRoofPitchEvidence?.regions(v)||[]);if(!work.length&&!keyDiscovery?.regions.length&&!pitchRegions.length&&!cancelled())roofPending=roofGridWorkItems(next,buildingId,sourceImages).length>0;}catch(error){await native.close();throw error;}if(!work.length&&!keyDiscovery?.regions.length&&!pitchRegions.length&&!roofPending){try{evidence.push(...await refineVerticalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));evidence.push(...await refineOpeningFrames(next,buildingId,sourceImages,native,{progress,cancelled}));return {inventory:next,evidence};}finally{await native.close();}}
+  let worker=null,activeCanvas=null;try{await dependencies();worker=await root.Tesseract.createWorker('eng',1,{workerPath:asset('vendor/tesseract/worker.min.js'),corePath:asset('vendor/tesseract-core/'),langPath:asset('vendor/tessdata/'),workerBlobURL:false,gzip:true});await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});let workerMode='7';const images=new Map(),attempted=gridAttemptKeys(next,buildingId);
+   const processRegion=async({view,region},phase)=>{
+    const regionKey=readingRegionKey(view,region);if(attempted.has(regionKey))return;attempted.add(regionKey);
+    view.payload.drawingReadings||={rows:[]};view.payload.drawingReadings.rows||=[];
+    let image=images.get(view.id);if(!image){image=new Image();image.src=view.payload.sourceImage;await image.decode();images.set(view.id,image);}
     const {x0,y0,x1,y1,font,w,h,left,top,right,bottom}=readingCrop(view,region),initialScale=region.grid?5:4;let scale=initialScale,padding=region.grid?scale*4:0,canvas=document.createElement('canvas'),nativeSource=null,nativeAttempt=null,ocrMasks=[];activeCanvas=canvas;canvas.width=(right-left)*scale+padding*2;canvas.height=(bottom-top)*scale+padding*2;let ctx=canvas.getContext('2d',{willReadFrequently:!!region.grid});if(region.grid){ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);}ctx.drawImage(image,left,top,right-left,bottom-top,padding,padding,(right-left)*scale,(bottom-top)*scale);
     if(region.purpose==='source-paired-scale-dimension'||region.purpose==='source-neighbouring-measurements'||region.caption){const source=await native.render(view,[left,top,right-left,bottom-top],{factor:6,padding:12});nativeAttempt={status:source.status,reason:source.reason};if(source.status==='proposed'){canvas.width=canvas.height=1;canvas=source.canvas;activeCanvas=canvas;ctx=canvas.getContext('2d',{willReadFrequently:true});scale=source.provenance.scaleFactor;padding=source.provenance.padding;nativeSource=source.provenance;}}
     if(region.caption)ocrMasks=captionGuideMasks(canvas,{padding,scale,left,top});
@@ -371,19 +407,23 @@
      {
       const circle=region.gridCircle,[cx,cy]=circle.center,r=circle.radius;
       const row={text:token,confidence,source:'ocr-local-grid-bubble',labelStatus:labelConflict?'conflict':read.usable?'proposed':'unresolved',box:[cx-r*.45,cy-r*.45,cx+r*.45,cy+r*.45],
-       retry:{purpose:'source-raster-grid-bubble',gridCircle:JSON.parse(JSON.stringify(circle)),sourceViewId:view.id,sourceFrame:JSON.parse(JSON.stringify(view.frame)),region:[left,top,right-left,bottom-top],scale,psm:read.psm,padding,maskRadius:circle.radius*.7,preprocessing:read.preprocessing,attempts,labelConflict,...(nativeSource?{nativeSource}:{}),...(nativeAttempt?{nativeAttempt}:{})}};
+       retry:{purpose:'source-raster-grid-bubble',phase,phaseRegionLimit:phase==='roof-registration'?24:work.length,gridCircle:JSON.parse(JSON.stringify(circle)),sourceViewId:view.id,sourceFileId:view.fileId,sourcePage:view.page,sourceFrame:JSON.parse(JSON.stringify(view.frame)),region:[left,top,right-left,bottom-top],scale,psm:read.psm,padding,maskRadius:circle.radius*.7,preprocessing:read.preprocessing,attempts,labelConflict,...(nativeSource?{nativeSource}:{}),...(nativeAttempt?{nativeAttempt}:{})}};
       if(read.usable)view.payload.drawingReadings.rows.push(row);evidence.push({sourceViewId:view.id,...row});
+      (view.payload.drawingReadings.gridAttempts||=[]).push(JSON.parse(JSON.stringify(row)));
      }
-     continue;
+     return;
     }
     canvas.width=canvas.height=1;for(const block of data.blocks||[])for(const paragraph of block.paragraphs||[])for(const line of paragraph.lines||[]){if(!line.text.trim()||!line.bbox)continue;const b=line.bbox,capture=block.readingCapture||{left,top,scale,padding,nativeSource,region:[left,top,right-left,bottom-top]},row={text:line.text.trim(),confidence:line.confidence,source:'ocr-local-region-retry',box:[(b.x0-capture.padding)/capture.scale+capture.left,(b.y0-capture.padding)/capture.scale+capture.top,(b.x1-capture.padding)/capture.scale+capture.left,(b.y1-capture.padding)/capture.scale+capture.top],retry:{originalText:region.row.text,originalConfidence:region.row.confidence,...(region.row.readingParts?{readingParts:JSON.parse(JSON.stringify(region.row.readingParts))}:{}),...(region.captionRegionEvidence?{captionRegionEvidence:JSON.parse(JSON.stringify(region.captionRegionEvidence))}:{}),region:capture.region,scale:capture.scale,padding:capture.padding,psm:block.readingPsm||7,...(readingAttempts?{readingAttempts}:{}),...(ocrMasks.length?{ocrMasks}:{}),...(capture.nativeSource?{nativeSource:capture.nativeSource}:{}),...(nativeAttempt?{nativeAttempt}:{}),purpose:region.purpose||(region.caption?'level-caption':region.dimension?'dimension-label':'opening-caption'),sourceViewId:view.id,sourceFrame:JSON.parse(JSON.stringify(view.frame))}};view.payload.drawingReadings.rows.push(row);evidence.push({sourceViewId:view.id,...row});}
-   }
+   };
+   for(let i=0;i<work.length;i++){if(cancelled())break;progress(i+1,work.length,work[i].view.page);await processRegion(work[i],'main');}
+   const roofWork=cancelled()?[]:roofGridWorkItems(next,buildingId,sourceImages,{attempted});
+   for(let i=0;i<roofWork.length;i++){if(cancelled())break;progress(i+1,roofWork.length,roofWork[i].view.page,'roof-registration');await processRegion(roofWork[i],'roof-registration');}
    evidence.push(...await refineHorizontalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));
    evidence.push(...await refineVerticalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));
    evidence.push(...await refineKeyedWallKeys(next,buildingId,sourceImages,native,worker,{progress,cancelled,discovery:keyDiscovery}));
    evidence.push(...await refineRoofPitches(next,buildingId,native,worker,{progress,cancelled}));
    evidence.push(...await refineOpeningFrames(next,buildingId,sourceImages,native,{progress,cancelled}));
-  }finally{if(activeCanvas)activeCanvas.width=activeCanvas.height=1;try{await worker.terminate();}finally{await native.close();}}return {inventory:next,evidence};
+  }finally{if(activeCanvas)activeCanvas.width=activeCanvas.height=1;try{if(worker)await worker.terminate();}finally{await native.close();}}return {inventory:next,evidence};
  }
- root.MIRReconstructionReadings=Object.freeze({datumCaptionBands,datumCaptionRegions,readingCrop,fragmentedCaptions,neighbouringMeasurements,regions,openingRegions,gridRegions,workItems,captionGuideMasks,sourceTilePlan,sourceReader,dimensionWordRetry,mapDimensionProof,nativeEvidenceTile,nativeDimensionTile,horizontalDimensionCandidates,verifyHorizontalDimension,refineHorizontalDimensions,verticalDimensionPairs,verifyVerticalDimension,refineVerticalDimensions,refineKeyedWallKeys,refineRoofPitches,mapOpeningFrameProof,verifyOpeningFrame,refineOpeningFrames,refine});
+ root.MIRReconstructionReadings=Object.freeze({datumCaptionBands,datumCaptionRegions,readingCrop,fragmentedCaptions,neighbouringMeasurements,regions,openingRegions,gridRegions,workItems,readingRegionKey,roofGridWorkItems,captionGuideMasks,sourceTilePlan,sourceReader,dimensionWordRetry,mapDimensionProof,nativeEvidenceTile,nativeDimensionTile,horizontalDimensionCandidates,verifyHorizontalDimension,refineHorizontalDimensions,verticalDimensionPairs,verifyVerticalDimension,refineVerticalDimensions,refineKeyedWallKeys,refineRoofPitches,mapOpeningFrameProof,verifyOpeningFrame,refineOpeningFrames,refine});
 })(window);
