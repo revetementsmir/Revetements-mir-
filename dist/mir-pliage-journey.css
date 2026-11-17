@@ -136,3 +136,55 @@ body.mir-prestige[data-client-entry=measures] #client-step-scroll :is(input,sele
  body.mir-prestige[data-client-entry] #production-dimensions :is(.client-measures-grid,.client-angles-grid){margin-block:4px}
  body.mir-prestige[data-client-entry] .client-angle-heading{margin-top:3px;gap:4px}
 }
+
+/* Material and colour stay together; the optional technical details retain
+   their original fields in an explicitly opened view. */
+body.mir-prestige[data-client-entry][data-client-stage="3"] .piece-finish{margin:8px 0 0;padding:0;border:0}
+body.mir-prestige[data-client-entry][data-client-stage="3"] .color-source-field:has(#production-material){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+body.mir-prestige[data-client-entry][data-client-stage="3"] .color-source-field:has(#production-material)>label{grid-column:1;grid-row:1}
+body.mir-prestige[data-client-entry][data-client-stage="3"] .color-source-field:has(#production-material)>#production-color-grid{grid-column:2;grid-row:1;margin:0;padding:0}
+body.mir-prestige[data-client-entry][data-client-stage="3"] #production-profile-options{margin:8px 0 0}
+body.mir-prestige[data-client-entry][data-client-stage="3"] .client-painted-face{margin:0}
+body.mir-prestige[data-client-entry][data-client-stage="3"] .client-face-choices{margin:3px 0}
+body.mir-prestige[data-client-entry][data-client-stage="3"] .client-face-choices button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 5px;min-height:82px}
+body.mir-prestige[data-client-entry][data-client-stage="3"] .client-face-choices svg{display:block;width:132px;max-width:100%;height:62px}
+body.mir-prestige[data-client-entry][data-client-stage="3"] .client-painted-face>.field-hint{margin:2px 0;font-size:11px;line-height:1.3}
+body.mir-prestige[data-client-entry][data-client-stage="3"] #client-optional-metal{margin:0;padding:0}
+body.mir-prestige[data-client-entry][data-client-stage="3"] #client-optional-metal summary{font-size:12px;padding:3px 0}
+body.mir-prestige[data-client-entry][data-client-stage="3"]:has(#client-optional-metal[open]) .finish-fields>:not(#client-optional-metal),
+body.mir-prestige[data-client-entry][data-client-stage="3"]:has(#client-optional-metal[open]) #production-profile-options{display:none!important}
+body.mir-prestige[data-client-entry][data-client-stage="3"] #client-optional-metal[open]{display:grid;gap:6px}
+body.mir-prestige[data-client-entry] #client-optional-metal :is(p,label){font-size:12px;line-height:1.35;margin:0}
+body.mir-prestige[data-client-entry] #client-optional-metal textarea{min-height:56px;height:56px}
+body.mir-prestige[data-client-entry] .client-measure-field>.mir-default-readonly{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+body.mir-prestige[data-client-entry] .client-measure-field input[readonly]{background:#e9e6df;color:#4b4d46}
+body.mir-prestige[data-client-entry] .client-recap-measures,
+body.mir-prestige[data-client-entry] .client-recap-angles{display:flex;flex-wrap:wrap;gap:4px 14px}
+body.mir-prestige[data-client-entry] #client-piece-recap dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px}
+body.mir-prestige[data-client-entry] #client-piece-recap dt{font-size:11px;color:var(--mir-muted)}
+body.mir-prestige[data-client-entry] #client-piece-recap dd{margin:0;font-size:13px}
+@media(max-width:779px) and (max-height:710px){
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #client-step-scroll{display:grid;grid-template-columns:minmax(0,1fr) 106px;column-gap:6px;row-gap:2px}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #client-step-scroll>*{grid-column:1/-1}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #client-step-count{grid-column:2;grid-row:1;float:none;margin:0;text-align:right}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #client-step-title{grid-column:1;grid-row:1}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #client-step-hint{grid-column:1;grid-row:2;margin:0;font-size:10px;line-height:14px}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #client-local-save[data-client-save-state=saved]{grid-column:2;grid-row:2;margin:0;text-align:right;font-size:10px;line-height:14px}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #client-step-length{grid-column:1;grid-row:3;align-self:start;margin:4px 0 0;line-height:14px}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #measure-hint{grid-column:1;grid-row:3;align-self:end;min-height:0;margin:0 0 3px;font-size:10px;line-height:14px}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #client-step-scroll>.section-heading{grid-column:2;grid-row:3;float:none;width:auto;height:44px;margin:0}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #production-dimensions{grid-row:4}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #production-profile-options{grid-row:5}
+ body.mir-prestige[data-client-entry] .client-measures-grid[data-client-side-count="7"]{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ body.mir-prestige[data-client-entry] .client-angles-grid[data-client-angle-count="4"]{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ body.mir-prestige[data-client-entry] .client-angles-grid[data-client-angle-count="4"] .client-angle-field>label{display:grid;gap:2px}
+ body.mir-prestige[data-client-entry] .client-angles-grid[data-client-angle-count="4"] .client-angle-field>label>span{display:flex;gap:3px;max-width:none;line-height:12px}
+ body.mir-prestige[data-client-entry] .client-angles-grid[data-client-angle-count="4"] .client-angle-field input{padding-inline:4px}
+}
+body.mir-prestige[data-client-entry][data-client-stage="3"] :is(.finish-fields,.color-source-field){gap:6px}
+body.mir-prestige[data-client-entry][data-client-stage="3"] :is(.finish-fields,.color-source-field) label{gap:3px;font-size:12px;line-height:16px}
+body.mir-prestige[data-client-entry][data-client-stage="3"] :is(.finish-fields,.color-source-field) select{height:44px;min-height:44px;padding:6px 8px;font-size:16px;line-height:20px}
+@media(max-width:779px) and (max-height:710px){
+ body.mir-prestige[data-client-entry][data-client-stage="3"] .client-face-choices button{min-height:74px}
+ body.mir-prestige[data-client-entry][data-client-stage="3"] .client-face-choices svg{height:54px}
+}

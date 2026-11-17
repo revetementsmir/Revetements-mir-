@@ -408,3 +408,43 @@ body.mir-prestige[data-mir-client-pages] .subnav[data-mir-page-visible="true"] a
   body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-example svg { max-height:100px; }
   body.mir-prestige[data-mir-client-pages="pliage"] #bend-drawing { height:170px; }
 }
+
+/* CI2: apply the actual photo constraints after the stable-siding palette rule,
+ * and keep related items in one row at each breakpoint. No crop or clipping. */
+body.mir-prestige[data-mir-client-pages="produit"] #product-detail { width:100%; margin-inline:0; }
+body.mir-prestige[data-mir-client-pages="produit"] main>.wrap { width:100%; }
+body.mir-prestige[data-mir-client-pages="produit"] #product-detail .product-main-photo {
+  height:180px!important; min-height:0!important; aspect-ratio:auto!important;
+}
+body.mir-prestige[data-mir-client-pages="produit"] #product-detail .product-main-photo :is(img,svg,canvas) { max-height:180px; }
+body.mir-prestige[data-mir-client-pages="produit"] #related-grid .shop-card-photo {
+  height:140px!important; min-height:0!important; aspect-ratio:auto!important;
+}
+body.mir-prestige[data-mir-client-pages="produit"] #related-grid .shop-card-copy { padding-top:8px; }
+body.mir-prestige[data-mir-client-pages="produit"] #related-grid .shop-card-copy h3 { min-height:0; font-size:20px; line-height:1.25; margin:5px 0 8px; }
+body.mir-prestige[data-mir-client-pages="produit"] #related-grid .shop-card-size { min-height:0; margin:6px 0; }
+body.mir-prestige[data-mir-client-pages="produit"] .product-order-fields { margin:6px 0; gap:8px; }
+body.mir-prestige[data-mir-client-pages="produit"] .product-actions-main { margin:8px 0 6px; }
+body.mir-prestige[data-mir-client-pages="produit"] .product-save-note { margin:6px 0; }
+body.mir-prestige[data-mir-client-pages="produit"] .mir-signature-footer,
+body.mir-prestige[data-mir-client-pages="estimation"] .mir-signature-footer { margin-top:4px!important; }
+body.mir-prestige[data-mir-client-pages="materiaux"] #product-list { display:grid; grid-template-columns:minmax(0,1fr); max-width:760px; margin-inline:auto; }
+body.mir-prestige[data-mir-client-pages="materiaux"] .page-main .page-heading h1 { font-size:32px; margin:6px 0 10px; }
+body.mir-prestige[data-mir-client-pages="selection"] .mir-cart-heading { margin-bottom:4px; }
+body.mir-prestige[data-mir-client-pages="selection"] .mir-cart-confirm { padding:16px; gap:10px; }
+body.mir-prestige[data-mir-client-pages="selection"] .mir-cart-confirm h2 { color:#f4f1ea; margin:0; }
+body.mir-prestige[data-mir-client-pages="selection"] #mir-cart-amounts { padding:10px 0; }
+body.mir-prestige[data-mir-client-pages="selection"] .mir-unified-controls { margin:8px 0; gap:8px; }
+body.mir-prestige[data-mir-client-pages="pliage"] #contenu { width:min(1200px,calc(100% - 36px)); }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-exports button { min-height:44px; padding:8px; font-size:12px; line-height:1.2; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-list-section>.notice-inline { margin:8px 0; font-size:11px; line-height:1.35; }
+@media(max-width:759px) {
+  body.mir-prestige[data-mir-client-pages="produit"] #product-detail .product-main-photo { height:160px!important; }
+  body.mir-prestige[data-mir-client-pages="produit"] #product-detail .product-main-photo :is(img,svg,canvas) { max-height:160px; }
+  body.mir-prestige[data-mir-client-pages="produit"] .mir-product-title h1 { font-size:22px; line-height:1.1; margin:4px 0 8px; }
+}
+@media(max-height:650px) {
+  body.mir-prestige[data-mir-client-pages="produit"] #product-detail .product-main-photo { height:125px!important; }
+  body.mir-prestige[data-mir-client-pages="produit"] #product-detail .product-main-photo :is(img,svg,canvas) { max-height:125px; }
+  body.mir-prestige[data-mir-client-pages="materiaux"] .page-main .page-heading h1 { font-size:29px; }
+}

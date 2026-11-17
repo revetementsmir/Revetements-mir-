@@ -1,0 +1,157 @@
+/* Account and historical Studio presentation. No document overflow clipping. */
+body[data-mir-client-workspace] {
+ --mir-workspace-paper:#f4f1ea;
+ --mir-workspace-ink:#242522;
+ --mir-workspace-line:#d4cdbf;
+ padding-bottom:0!important;
+ min-height:100dvh;
+}
+body[data-mir-client-workspace] :is(.mir-workspace-off-page,.mir-workspace-inactive-host,.mir-workspace-shell-empty),
+body[data-mir-client-workspace] [hidden] { display:none!important; }
+.mir-workspace-sr { position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap; }
+body[data-mir-client-workspace] .mir-workspace-pages {
+ position:static!important;inset:auto!important;display:grid!important;
+ grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;
+ gap:6px;width:100%;margin:6px 0;padding:0!important;border:0;
+ background:transparent;transform:none;box-shadow:none;z-index:auto;
+}
+body[data-mir-client-workspace] .mir-workspace-pages>label { display:block;min-width:0;margin:0; }
+body[data-mir-client-workspace] .mir-workspace-pages :is(button,select) {
+ display:block;width:100%;min-width:0;height:44px;min-height:44px!important;
+ margin:0;padding:7px 9px;border:1px solid var(--mir-workspace-line);
+ border-radius:3px;background:#fffefa;color:var(--mir-workspace-ink);
+ font:500 14px/1.25 Arial,sans-serif;box-sizing:border-box;
+}
+body[data-mir-client-workspace] .mir-workspace-pages button { font-size:20px; }
+body[data-mir-client-workspace] .mir-workspace-pages button:disabled { opacity:.4; }
+body[data-mir-client-workspace] :is(button,select,input,a):focus-visible { outline:2px solid #8b785a;outline-offset:2px; }
+
+/* The existing login and signup forms remain real, with unchanged requirements,
+   submit listeners, errors and disabled states. Information has its own pages. */
+body[data-mir-client-workspace=account] :is(.portal-shell,.portal-shell.auth-shell) {
+ display:block!important;width:min(560px,calc(100% - 24px))!important;
+ max-width:560px!important;min-height:0!important;padding:8px 0!important;margin:0 auto!important;
+}
+body[data-mir-client-workspace=account] :is(#portal-main,#portal-content) { padding:0!important;margin:0;min-width:0;min-height:0; }
+body[data-mir-client-workspace=account] :is(.portal-sidebar,.portal-footer) { display:none!important; }
+body[data-mir-client-workspace=account] .auth-grid { display:flex!important;flex-direction:column;gap:4px!important;margin:0;padding:0;width:100%;max-width:none; }
+body[data-mir-client-workspace=account] .auth-intro { padding:0!important;margin:0;max-width:none!important; }
+body[data-mir-client-workspace=account] .auth-intro h1 { margin:2px 0!important;font:400 25px/1.14 Arial,sans-serif!important;letter-spacing:-.035em!important; }
+body[data-mir-client-workspace=account] .auth-intro>p { margin:5px 0!important;font-size:13px!important;line-height:1.45!important; }
+body[data-mir-client-workspace=account] .auth-intro .portal-eyebrow { font-size:10px!important;letter-spacing:.1em; }
+body[data-mir-client-workspace=account] .auth-cart-return { display:inline-flex;align-items:center;min-height:44px!important;margin:0!important;font-size:13px!important; }
+body[data-mir-client-workspace=account] .auth-card,
+body[data-mir-client-workspace=account] .auth-card:has(#auth-signin-form) {
+ display:flex;flex-direction:column;width:100%;max-width:none;gap:6px;
+ padding:10px!important;margin:0!important;border:1px solid var(--mir-workspace-line);border-radius:3px;box-shadow:none;
+}
+body[data-mir-client-workspace=account] .auth-card>* { order:0!important;margin:0; }
+body[data-mir-client-workspace=account] .auth-card form { display:grid;gap:6px!important;min-width:0; }
+body[data-mir-client-workspace=account] .auth-card label { margin:0!important;gap:3px!important;font-size:12px!important;line-height:1.25!important; }
+body[data-mir-client-workspace=account] .auth-card input:not([type=checkbox]) {
+ display:block;width:100%;height:44px;min-height:44px!important;padding:8px 10px!important;font-size:16px!important;line-height:1.25!important;
+}
+body[data-mir-client-workspace=account] .auth-card .auth-show-password { min-height:30px!important;display:flex;align-items:center;gap:8px!important; }
+body[data-mir-client-workspace=account] .auth-card .auth-show-password input { width:22px;height:22px;min-width:22px;min-height:22px;margin:0; }
+body[data-mir-client-workspace=account] .auth-card button { min-height:44px!important;margin:0!important;padding:8px!important;font-size:13px!important;line-height:1.25!important; }
+body[data-mir-client-workspace=account] .mir-auth-secondary-actions { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px; }
+body[data-mir-client-workspace=account] .mir-auth-secondary-actions:has(> :only-child) { grid-template-columns:1fr; }
+body[data-mir-client-workspace=account] .auth-card :is(.auth-footnote,.auth-error,.auth-message) { margin:0!important;font-size:12px!important;line-height:1.4!important; }
+body[data-mir-client-workspace=account] .auth-card :is(.auth-error,.auth-message) { padding:7px 9px!important; }
+body[data-mir-client-workspace=account] .auth-card details { margin:0;border:0;padding:0; }
+body[data-mir-client-workspace=account] .auth-card details>label { margin:0 0 6px!important; }
+body[data-mir-client-workspace=account] .account-two-fields { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px; }
+body[data-mir-client-workspace=account] .auth-divider { display:none!important; }
+body[data-mir-client-workspace=account] :is(.mir-prestige-account-support,.mir-help-launch) { min-height:44px!important;padding:0!important;margin:0!important;border:0!important;position:static!important;inset:auto!important;transform:none!important; }
+body[data-mir-client-workspace=account] [data-mir-preview-account-notice] { width:100%;max-width:none!important;margin:0 0 6px!important;padding:7px 9px!important;font-size:12px!important;line-height:1.35!important; }
+body[data-mir-client-workspace=account]:not([data-mir-account-page=help]) .mir-signature-footer { display:none!important; }
+body[data-mir-client-workspace=account][data-mir-account-page=help] .mir-signature-footer { width:min(560px,calc(100% - 24px));margin:4px auto 0;padding:8px!important;min-height:0; }
+
+/* Studio controls are paged above a persistent preview. Original engine roots
+   (including delegated listeners on extra-controls) remain intact. */
+body[data-mir-client-workspace=studio]>main {
+ width:calc(100% - 24px)!important;max-width:1440px!important;margin:6px auto!important;
+ padding:0!important;min-height:0;
+}
+body[data-mir-client-workspace=studio] .mir-studio-workspace-top { display:grid;gap:0;margin:0 0 6px; }
+body[data-mir-client-workspace=studio] .part-nav {
+ position:static!important;inset:auto!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));
+ width:100%;max-width:none;gap:4px!important;padding:0!important;margin:0!important;
+ overflow:visible!important;border:0!important;transform:none!important;box-shadow:none!important;
+}
+body[data-mir-client-workspace=studio] .part-nav button {
+ width:100%;min-width:0;min-height:44px!important;margin:0;padding:6px!important;
+ border:1px solid var(--mir-workspace-line);font-size:11px!important;line-height:1.2;white-space:normal;
+}
+body[data-mir-client-workspace=studio] .workspace {
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important;
+ align-items:start;margin:0!important;border:0!important;background:transparent;
+}
+body[data-mir-client-workspace=studio] .drawing-column { display:block;position:static!important;inset:auto!important;margin:0;padding:0;border:0;min-width:0; }
+body[data-mir-client-workspace=studio] :is(.stage,#elevation,#three-canvas) { height:var(--mir-studio-stage-height,170px)!important;min-height:0!important;max-height:none!important; }
+body[data-mir-client-workspace=studio] .stage { width:100%;position:relative;margin:0!important; }
+body[data-mir-client-workspace=studio] #elevation { padding:24px 6px 4px!important; }
+body[data-mir-client-workspace=studio] #elevation svg { max-width:100%!important;width:100%;height:100%;max-height:100%!important; }
+body[data-mir-client-workspace=studio] .studio-loading { padding:16px!important;margin:0!important;font-size:13px;line-height:1.4; }
+body[data-mir-client-workspace=studio] .stage-label { top:6px!important;left:7px!important;right:7px!important;gap:4px;flex-wrap:wrap; }
+body[data-mir-client-workspace=studio] #stage-title { font-size:9px!important; }
+body[data-mir-client-workspace=studio] #stage-subtitle { display:none!important; }
+body[data-mir-client-workspace=studio] .mir-zoom-controls { top:6px!important;bottom:auto!important;right:6px!important;padding:2px;gap:2px; }
+body[data-mir-client-workspace=studio] #studio-controls { display:block!important;width:100%;min-width:0;position:static!important;inset:auto!important;border:1px solid var(--mir-workspace-line);padding:8px!important;margin:0!important;background:#fffefa; }
+body[data-mir-client-workspace=studio] .zone-controls { padding:0!important;min-width:0; }
+body[data-mir-client-workspace=studio] .control-heading { margin:0 0 5px;padding:0!important;border:0; }
+body[data-mir-client-workspace=studio] .control-heading :is(.step,.eyebrow) { display:none; }
+body[data-mir-client-workspace=studio] #selected-title { margin:0;font-size:15px!important;line-height:1.25; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel { min-width:0;margin:0!important;padding:0!important;border:0!important; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel [data-mir-workspace-branch] { margin:0!important;padding:0!important;border:0!important;min-width:0; }
+body[data-mir-client-workspace=studio] .mir-workspace-field { display:grid;gap:3px;min-width:0;margin:0 0 6px!important; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel :is(input:not([type=checkbox]),select) {
+ width:100%;min-width:0;min-height:44px!important;max-width:100%;margin:0!important;padding:7px 9px!important;
+ font-size:16px!important;line-height:1.25;border-radius:3px;box-sizing:border-box;
+}
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel :is(button,a,summary) { min-height:44px!important;max-width:100%;margin:0!important;padding:7px 9px!important;font-size:12px!important;line-height:1.25;white-space:normal;box-sizing:border-box; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel a { display:inline-flex;align-items:center; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel button { border:1px solid var(--mir-workspace-line); }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel label { font-size:12px!important;line-height:1.25!important;margin:0; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel :is(p,small) { margin:3px 0!important;font-size:12px!important;line-height:1.4!important; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel :is(h1,h2,h3) { margin:3px 0!important;font-size:20px!important;line-height:1.2!important;letter-spacing:-.025em; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel :is(.view-toolbar,.display-toolbar,.rotate-control,.stage-bottom,.edit-toolbar,.drawing-footer,.project-bar,.studio-source-links) { position:static!important;inset:auto!important;display:flex;flex-wrap:wrap;gap:6px!important;padding:0!important;margin:0!important;width:100%;min-height:0; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel .project-bar>* { flex:1 1 40%; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel :is(.face-tabs,.mode-tabs,.compact-actions,.export-actions) { display:flex;flex-wrap:wrap;gap:4px; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel .face-tabs button { flex:1; }
+body[data-mir-client-workspace=studio] [data-mir-studio-panel=project] { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px; }
+body[data-mir-client-workspace=studio] [data-mir-studio-panel=project] button { min-height:44px!important;width:100%; }
+body[data-mir-client-workspace=studio] :is(#zone-colors,#zone-list) { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px!important;padding:0!important; }
+body[data-mir-client-workspace=studio] :is(#zone-colors,#zone-list) button { min-width:0;padding:5px!important;min-height:44px!important;overflow-wrap:anywhere; }
+body[data-mir-client-workspace=studio] #zone-colors img { width:24px;max-height:24px;object-fit:contain; }
+body[data-mir-client-workspace=studio] #zone-list small { display:block; }
+body[data-mir-client-workspace=studio] .label-row { margin:0 0 5px; }
+body[data-mir-client-workspace=studio] :is(.material-preview,.extra-panel,.finish-content,.save-panel,.detail-control,.project-notes,.detection-panel) { padding:0!important;margin:0!important;border:0!important;min-width:0;max-width:100%; }
+body[data-mir-client-workspace=studio] .material-sample { width:52px;height:44px;min-height:0; }
+body[data-mir-client-workspace=studio] .alignment-option { min-height:44px;display:flex;align-items:center;gap:8px; }
+body[data-mir-client-workspace=studio] .geometry-grid { grid-template-columns:repeat(2,minmax(0,1fr));gap:6px; }
+body[data-mir-client-workspace=studio] .mir-workspace-studio-panel .project-notes { display:block!important; }
+
+@media(min-width:780px) {
+ body[data-mir-client-workspace=studio]>main { width:calc(100% - 40px)!important; }
+ body[data-mir-client-workspace=studio] .part-nav { grid-template-columns:repeat(6,minmax(0,1fr)); }
+ body[data-mir-client-workspace=studio] .part-nav button { font-size:12px!important; }
+ body[data-mir-client-workspace=studio] .workspace { grid-template-columns:minmax(0,1fr) minmax(280px,340px)!important;gap:14px!important; }
+ body[data-mir-client-workspace=studio] #studio-controls { padding:12px!important; }
+ body[data-mir-client-workspace=studio] #elevation { padding:35px 12px 8px!important; }
+ body[data-mir-client-workspace=account] :is(.portal-shell,.portal-shell.auth-shell) { padding-top:18px!important; }
+}
+@media(max-width:360px) {
+ body[data-mir-client-workspace=account] :is(.portal-shell,.portal-shell.auth-shell) { width:calc(100% - 16px)!important;padding-top:5px!important; }
+ body[data-mir-client-workspace=account] .auth-card { padding:8px!important; }
+ body[data-mir-client-workspace=account] .auth-intro h1 { font-size:23px!important; }
+ body[data-mir-client-workspace=studio]>main { width:calc(100% - 16px)!important;margin-top:4px!important; }
+ body[data-mir-client-workspace=studio] .part-nav button { font-size:10px!important; }
+ body[data-mir-client-workspace] .mir-workspace-pages :is(button,select) { font-size:13px; }
+}
+/* Last, deliberately more specific than native-ID layout rules above. These
+   nodes are reachable through the upper page selector, never overflow-clipped. */
+body[data-mir-client-workspace=studio] #studio-controls :is(.mir-workspace-off-page,.mir-workspace-inactive-host,[hidden]),
+body[data-mir-client-workspace=account] .auth-card .mir-workspace-off-page,
+body[data-mir-client-workspace] .mir-workspace-off-page.mir-workspace-off-page,
+body[data-mir-client-workspace] .mir-workspace-shell-empty.mir-workspace-shell-empty { display:none!important; }

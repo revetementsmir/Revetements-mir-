@@ -245,7 +245,7 @@
       const documentPages = documents ? listPager(documents, ':scope > .product-resource', () => compact() ? 2 : 4, {label:['Documents', 'Documents']}) : null;
       const related = $('.product-related'), relatedGrid = $('#related-grid');
       if (relatedGrid) {
-        listPager(relatedGrid, ':scope > *', () => compact() ? 1 : 3, {label:['Produits', 'Products']});
+        listPager(relatedGrid, ':scope > *', () => innerWidth < 760 ? 1 : innerWidth < 1101 ? 2 : 3, {label:['Produits', 'Products']});
         all('.shop-card-swatches', relatedGrid).forEach(swatches => {
           listPager(swatches, ':scope > [data-card-color]', 5, {label:['Couleurs', 'Colours'], groupHeaders:'.mir-colour-group'});
           const details = swatches.closest('details'); if (details) details.open = false;
@@ -254,10 +254,10 @@
       const technicalExtras = technical ? [...technical.children].filter(node => node !== docs && node.tagName !== 'SUMMARY') : [];
       const price = [$('#product-price-note'), $('#product-price-details')];
       const groups = [
-        section('Aperçu', 'Overview', [gallery, $('.product-intro', title), ...price, $('.product-quickfacts', info)]),
-        section('Couleur', 'Colour', [gallery, colour]),
+        section('Aperçu', 'Overview', [title, gallery, $('.product-intro', title), ...price, $('.product-quickfacts', info)]),
+        section('Couleur', 'Colour', [title, gallery, colour]),
         section('Quantité et panier', 'Quantity and cart', [
-          ...price, $('.product-format', info), $('.product-order-fields', info),
+          title, ...price, $('.product-format', info), $('.product-order-fields', info),
           $('#product-quantity-note'), $('.product-actions-main', info),
           $('#product-added'), $('.product-save-note', info)
         ]),
@@ -282,11 +282,17 @@
     const itemPages = listPager(items, ':scope > .selection-item', 1, {label:['Articles', 'Items']});
     const pieces = listPager($('#mir-unified-pieces'), ':scope > li', 1, {label:['Pièces', 'Pieces']});
     const project = $('#mir-project-dossier');
+    const exports = $('.mir-piece-exports'), footnote = $('.mir-unified-footnote');
+    const customSummary = custom ? [...custom.children].filter(node => node !== exports && node !== footnote) : [];
     const groups = [
       section('Matériaux', 'Materials', [items, itemPages?.nav, $('#selection-summary')]),
-      section('Pièces sur mesure', 'Custom pieces', [custom]),
-      section('Vérifier et demander', 'Review and request', [$('#mir-cart-confirm'), $('.selection-note')]),
-      section('Projet et sauvegardes', 'Project and backups', [project, $('.mir-cart-project-links')], () => { if (project) project.open = true; })
+      section('Pièces sur mesure', 'Custom pieces', [custom, ...customSummary]),
+      section('Vérifier et demander', 'Review and request', [$('#mir-cart-confirm')]),
+      section('Projet et sauvegardes', 'Project and backups', [project, $('.mir-cart-project-links')], () => { if (project) project.open = true; }),
+      section('Documents des pièces', 'Piece documents', [custom, exports], () => { if (exports) exports.open = true; }),
+      section('À propos de votre panier', 'About your cart', [
+        ...all('.mir-cart-heading > p'), custom, footnote, $('.selection-note')
+      ])
     ];
     const controller = pager(area, groups, {before:$('.mir-cart-workspace')});
     const addAccount = () => {
@@ -310,7 +316,7 @@
     const brands = $('#brand-buttons'), products = $('#product-list');
     if (!brands || !products) return;
     listPager(brands, ':scope > button', 6, {label:['Fabricants', 'Manufacturers']});
-    const references = listPager(products, ':scope > .product-card', () => compact() ? 1 : 2, {
+    const references = listPager(products, ':scope > .product-card', 1, {
       label:['Références', 'References'], groupHeaders:'.catalogue-group-heading'
     });
     const controls = $('.catalogue-controls'), toolbar = $('.catalogue-toolbar');
@@ -321,10 +327,11 @@
     controls?.append(showResults);
     const updateResultsLabel = () => setText(showResults, text('Voir les références', 'View references'));
     const controller = pager(main, [
-      section('Choisir un fabricant', 'Choose a manufacturer', [$('.page-heading'), $('.brand-sidebar')]),
+      section('Choisir un fabricant', 'Choose a manufacturer', [$('.brand-sidebar')]),
       section('Les références', 'References', [products, references.nav, $('#catalogue-empty')]),
       section('Rechercher et filtrer', 'Search and filter', [toolbar, controls, $('#brand-note')], updateResultsLabel),
-      section('Le guide des matériaux', 'Materials guide', [$('.catalogue-guidance'), $('.subnav')])
+      section('Le guide des matériaux', 'Materials guide', [$('.catalogue-guidance'), $('.subnav')]),
+      section('À propos du guide', 'About this guide', [$('.page-heading')])
     ]);
     const materialLinks = $('.subnav', main);
     if (materialLinks) main.insertBefore(materialLinks, controller.nav.nextSibling);

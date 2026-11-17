@@ -30,6 +30,7 @@ const scenes = [
   ['realisations', 'realisations.html', true], ['materiaux', 'materiaux.html']
 ];
 const results = [], captures = [], blocked = [], layoutDiagnostics = [];
+let activeCase = null;
 const filter = process.env.MIR_CLIENT_PARCOURS_FILTER || '';
 const modelSelector = '#client-saved-options [data-saved-template], #client-standard-options [data-client-profile]';
 const slug = value => value.replace(/[^a-z0-9-]/gi, '-');
@@ -58,15 +59,16 @@ async function capture(page, name, detail = {}) {
 }
 async function check(name, fn) {
   if (filter && !name.includes(filter)) return;
-  const start = Date.now();
+  const start = Date.now(), diagnosticStart = layoutDiagnostics.length;
+  activeCase = name;
   try {
     const detail = await fn();
-    results.push({ name, passed: true, durationMs: Date.now() - start, ...detail });
+    results.push({ name, passed: true, durationMs: Date.now() - start, layoutDiagnosticRange: [diagnosticStart, layoutDiagnostics.length], ...detail });
     console.log('PASS ' + name);
   } catch (error) {
-    results.push({ name, passed: false, durationMs: Date.now() - start, error: String(error.stack || error).slice(0, 6000) });
+    results.push({ name, passed: false, durationMs: Date.now() - start, layoutDiagnosticRange: [diagnosticStart, layoutDiagnostics.length], error: String(error.stack || error), details: error.details || null });
     console.error('FAIL ' + name + ': ' + error.message);
-  }
+  } finally { activeCase = null; }
 }
 async function withPage(browser, base, size, name, fn) {
   const context = await browser.newContext({ viewport: size, hasTouch: size.width <= 834, reducedMotion: 'reduce', serviceWorkers: 'block' });
@@ -90,11 +92,49 @@ async function withPage(browser, base, size, name, fn) {
     throw error;
   } finally { await context.close(); }
 }
+
+async function readyStudio(page) {
+  const deadline = Date.now() + 45000;
+  let requestedView = null;
+  try {
+    await page.waitForFunction(() => typeof window.MIR_STUDY?.snapshot === 'function', null, { timeout: 45000 });
+    requestedView = await page.evaluate(() => window.MIR_STUDY.snapshot().view);
+    assert.ok(['2d', '3d'].includes(requestedView), 'Studio exposes a known requested view');
+    await page.waitForFunction(view => {
+      if (view === '2d') return !!document.querySelector('#elevation svg') && !document.querySelector('#elevation .studio-loading');
+      const canvas = document.querySelector('#three-canvas');
+      return !!canvas && window.MIR3D?.diagnostics?.(canvas)?.rendered === true;
+    }, requestedView, { timeout: Math.max(1, deadline - Date.now()) });
+  } catch (error) {
+    const state = await page.evaluate(() => {
+      const canvas = document.querySelector('#three-canvas');
+      let snapshot = null, renderer = null;
+      try { snapshot = window.MIR_STUDY?.snapshot?.(); } catch (error) { snapshot = { error: String(error.message || error) }; }
+      try { renderer = canvas && window.MIR3D?.diagnostics?.(canvas); } catch (error) { renderer = { error: String(error.message || error) }; }
+      return {
+        engineReady: typeof window.MIR_STUDY?.snapshot === 'function',
+        requestedView: snapshot?.view || null,
+        project: document.querySelector('#project-name')?.textContent,
+        loader: document.querySelector('#elevation .studio-loading')?.textContent || null,
+        elevationHasSVG: !!document.querySelector('#elevation svg'),
+        elevationMessage: document.querySelector('#elevation')?.textContent?.trim().slice(0, 300),
+        rendered: renderer?.rendered === true,
+        renderError: renderer?.error || window.MIR_RENDER_DIAGNOSTICS?.error || null,
+        stageNote: document.querySelector('#stage-note')?.textContent,
+        swatches: window.MIR_STUDY?.swatches || null,
+        canvas: canvas ? { width: canvas.width, height: canvas.height, rect: canvas.getBoundingClientRect().toJSON() } : null
+      };
+    });
+    throw new Error('Studio did not finish ' + (requestedView ? 'the requested ' + requestedView + ' rendering' : 'engine startup') + ' within 45 seconds; a loading screen is not an accepted visualizer: ' + JSON.stringify(state), { cause: error });
+  }
+}
+
 async function goto(page, base, route) {
   const response = await page.goto(base + '/test/' + route, { waitUntil: 'load' });
   assert.equal(response?.ok(), true, 'real generated TEST page responds');
   await page.locator('#mir-prestige-header').waitFor();
   if (route.startsWith('production.html')) await page.waitForFunction(() => !!window.MIRProductionWorkspace);
+  if (route.split('?')[0] === 'plan.html') await readyStudio(page);
   await settle(page);
 }
 
@@ -109,21 +149,36 @@ async function horizontalListingAccess(page, scope) {
     });
     const positions = rails.map(rail => ({ rail, left: rail.scrollLeft, top: rail.scrollTop }));
     const observed = [], problems = [];
+    const waitForSnap = async rail => {
+      const deadline = performance.now() + 1200;
+      let previous = rail.scrollLeft, stableFrames = 0;
+      while (performance.now() < deadline) {
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        const current = rail.scrollLeft;
+        stableFrames = Math.abs(current - previous) < .25 ? stableFrames + 1 : 0;
+        previous = current;
+        if (stableFrames >= 4) return true;
+      }
+      return false;
+    };
     try {
       for (const rail of rails) {
         const controls = [...rail.querySelectorAll('a[href],button,summary,[role=button]')].filter(element => element.checkVisibility({ checkVisibilityCSS: true, checkOpacity: true }));
         const reached = [];
         for (const element of controls) {
           const initialScroll = rail.scrollLeft;
-          element.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
-          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          element.scrollIntoView({ block: 'nearest', inline: 'start', behavior: 'instant' });
+          const initialRect = element.getBoundingClientRect(), initialBounds = rail.getBoundingClientRect();
+          const requestedScroll = Math.max(0, Math.min(rail.scrollWidth - rail.clientWidth, rail.scrollLeft + initialRect.left - initialBounds.left - rail.clientLeft));
+          rail.scrollTo({ left: requestedScroll, behavior: 'instant' });
+          const snapSettled = await waitForSnap(rail);
           const rect = element.getBoundingClientRect(), bounds = rail.getBoundingClientRect();
           const label = (element.getAttribute('aria-label') || element.textContent || '').trim().slice(0, 90);
           const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
           const visible = rect.left >= Math.max(0, bounds.left) - 2 && rect.right <= Math.min(innerWidth, bounds.right) + 2 && rect.top >= -2 && rect.bottom <= innerHeight + 2;
           const accessible = !!hit && (element.contains(hit) || hit.contains(element));
-          if (!visible || !accessible) problems.push({ element: label, reason: visible ? 'rail control remains covered after scrolling' : 'rail control cannot fit after scrolling', rect: rect.toJSON(), rail: bounds.toJSON() });
-          reached.push({ label, scrollBefore: initialScroll, scrollAfter: rail.scrollLeft, visible, accessible });
+          if (!snapSettled || !visible || !accessible) problems.push({ element: label, reason: !snapSettled ? 'rail scroll did not settle' : visible ? 'rail control remains covered after scrolling' : 'rail control cannot fit after scrolling', rect: rect.toJSON(), rail: bounds.toJSON() });
+          reached.push({ label, scrollBefore: initialScroll, requestedScroll, scrollAfter: rail.scrollLeft, snapSettled, visible, accessible });
         }
         observed.push({ rail: rail.id || rail.className, width: rail.clientWidth, scrollWidth: rail.scrollWidth, reached });
       }
@@ -134,15 +189,15 @@ async function horizontalListingAccess(page, scope) {
     }
     return { rails: observed, problems };
   }, scope);
-  assert.deepEqual(result.problems, [], 'every horizontal listing control is reachable by actual scrolling: ' + JSON.stringify(result));
-  return result.rails;
+  return result;
 }
 
 // Read actual rectangles, clipping ancestors and hit targets. An overflow:hidden
 // declaration alone can never make a cut-off page pass this assertion.
 async function layout(page, { scrolling = false, scope = 'body', menuOpen = false } = {}) {
   await settle(page);
-  const horizontalRails = scrolling ? await horizontalListingAccess(page, scope) : [];
+  const horizontal = scrolling ? await horizontalListingAccess(page, scope) : { rails: [], problems: [] };
+  const horizontalRails = horizontal.rails;
   const value = await page.evaluate(({ scrolling, scope, menuOpen }) => {
     const shown = element => {
       const rect = element.getBoundingClientRect();
@@ -215,7 +270,7 @@ async function layout(page, { scrolling = false, scope = 'body', menuOpen = fals
         scrollTop: element.scrollTop, scrollLeft: element.scrollLeft
       };
     });
-    const selectedSections = [...document.querySelectorAll('select[data-mir-section-select]')].filter(shown).map(select => ({
+    const selectedSections = [...document.querySelectorAll('select[data-mir-section-select],#mir-account-workspace-pages-select,#mir-studio-workspace-pages-select')].filter(shown).map(select => ({
       id: select.id, value: select.value, label: select.selectedOptions[0]?.textContent,
       options: [...select.options].map(option => ({ value: option.value, label: option.textContent })),
       dialog: select.closest('dialog')?.id || null
@@ -225,13 +280,14 @@ async function layout(page, { scrolling = false, scope = 'body', menuOpen = fals
     return {
       viewport: { width: innerWidth, height: innerHeight },
       document: { width: root.scrollWidth, height: root.scrollHeight, clientHeight: root.clientHeight, scrollX, scrollY },
-      problems: problems.slice(0, 25), innerScroll, bottomNavigation, menuOpen,
+      problems, innerScroll, bottomNavigation, menuOpen,
       diagnostic: { route: location.pathname + location.search + location.hash, scope, entry: document.body.dataset.clientEntry, stage: document.body.dataset.clientStage, selectedSections, module, containers }
     };
   }, { scrolling, scope, menuOpen });
   // Preserve the complete container diagnosis even when the readable assertion
   // message is shortened. This reads layout only and changes no acceptance rule.
-  layoutDiagnostics.push({ ...value, horizontalRails });
+  layoutDiagnostics.push({ case: activeCase, ...value, horizontalRails, horizontalRailProblems: horizontal.problems });
+  assert.deepEqual(horizontal.problems, [], 'every horizontal listing control is reachable by actual scrolling: ' + JSON.stringify(horizontal));
   assert.ok(value.document.width <= value.viewport.width + 2, 'no horizontal document overflow: ' + JSON.stringify(value));
   assert.deepEqual(value.bottomNavigation, [], 'no lower navigation bar');
   if (!scrolling) assert.ok(value.document.height <= value.document.clientHeight + 2, 'non-list page fits one screen: ' + JSON.stringify(value));
@@ -292,6 +348,54 @@ async function inspectSections(page, name, size) {
     }
   }
   if (sections.length) await select.selectOption(sections[0].value);
+  return visited;
+}
+
+// Collect presentation failures without concealing later controls. Browser or
+// geometry errors still abort; collected layout assertions fail the whole case.
+async function collectLayout(page, failures, detail, options) {
+  const start = layoutDiagnostics.length;
+  try { await layout(page, options); }
+  catch (error) {
+    if (error.code !== 'ERR_ASSERTION') throw error;
+    failures.push({ ...detail, error: String(error.stack || error), layoutDiagnosticRange: [start, layoutDiagnostics.length] });
+  }
+}
+function requireLayouts(failures, details) {
+  if (!failures.length) return;
+  const error = new Error(failures.length + ' layout checks failed; every reachable requested screen was inspected: ' + failures.map(item => (item.profile || item.screen || '') + ' / ' + (item.phase || item.section || '')).join(', '));
+  error.details = { ...details, layoutFailures: failures };
+  throw error;
+}
+async function inspectWorkspaceSections(page, name, size) {
+  if (![320, 834].includes(size.width) || !['connexion', 'demandes', 'studio-test'].includes(name)) return [];
+  const selector = name === 'studio-test' ? '#mir-studio-workspace-pages-select' : '#mir-account-workspace-pages-select';
+  const select = page.locator(selector);
+  await select.waitFor();
+  const visited = [], failures = [];
+  const traverse = async screen => {
+    const sections = await select.locator('option').evaluateAll(nodes => nodes.filter(node => !node.disabled).map(node => ({ value: node.value, text: node.textContent })));
+    assert.ok(sections.length >= 3, 'workspace exposes its real section controls');
+    for (const section of sections) {
+      await select.selectOption(section.value); await settle(page);
+      assert.equal(await select.inputValue(), section.value, 'workspace section stays selected');
+      await collectLayout(page, failures, { screen, section: section.text });
+      await capture(page, name + '-' + screen + '-section-' + section.value + '-' + size.width, { viewport: size, screen, section: section.text });
+      visited.push({ screen, ...section });
+    }
+    await select.selectOption(sections[0].value); await settle(page);
+  };
+  await traverse(name === 'studio-test' ? 'studio' : 'connexion');
+  if (name === 'connexion') {
+    await page.locator('[data-auth-screen="signup"]').click();
+    await page.locator('#auth-signup-form').waitFor();
+    await page.waitForFunction(() => ['form', 'address-1', 'address-2', 'info', 'help'].every(value => [...document.querySelectorAll('#mir-account-workspace-pages-select option')].some(option => option.value === value)));
+    await traverse('inscription');
+    // The real screen action is exercised; no submit, login or account write.
+    await page.locator('[data-auth-screen="signin"]').click();
+    await page.locator('#auth-signin-form').waitFor(); await settle(page);
+  }
+  requireLayouts(failures, { visited, accountSubmitted: false });
   return visited;
 }
 
@@ -473,7 +577,7 @@ async function oblique(page, base, size) {
 async function allProfileMeasures(page, base, size) {
   await goto(page, base, 'production.html?mode=client&kind=profile'); await openModels(page);
   const profiles = await page.locator('[data-client-profile]').evaluateAll(nodes => nodes.map(node => node.dataset.clientProfile));
-  const visited = [];
+  const visited = [], layoutFailures = [];
   let checkedHem = false;
   for (const id of profiles) {
     await selectProfile(page, '[data-client-profile="' + id + '"]');
@@ -491,7 +595,8 @@ async function allProfileMeasures(page, base, size) {
         await page.locator('#client-hem-options').click();
         await page.locator('#client-hem-index').selectOption(index);
         await page.locator('#client-hem-interior').fill('135');
-        await layout(page, { scope: '#production-dialog' });
+        await collectLayout(page, layoutFailures, { profile: id, phase: 'explicit hem dialog' }, { scope: '#production-dialog' });
+        await capture(page, 'modele-' + id + '-repli-dialogue-' + size.width, { viewport: size, profile: id, phase: 'explicit hem dialog' });
         await page.locator('#client-open-model-hem').click();
         assert.equal(await page.locator('[data-client-bend-angle="' + index + '"]').inputValue(), '135', 'explicit hem action changes only the requested bend');
         await page.locator('#client-reset-model-angles').click();
@@ -499,12 +604,13 @@ async function allProfileMeasures(page, base, size) {
         checkedHem = true;
       }
     }
-    await layout(page);
+    await collectLayout(page, layoutFailures, { profile: id, phase: 'all dimensions and angles' });
     await capture(page, 'modele-' + id + '-cotes-' + size.width, { viewport: size, profile: id, sideCount: all });
     visited.push({ id, sides: all });
     await openModels(page);
   }
   assert.equal(checkedHem, true, 'at least one real MIR hem profile was exercised');
+  requireLayouts(layoutFailures, { visited, originalHemAndReset: checkedHem });
   return { visited, originalHemAndReset: checkedHem };
 }
 
@@ -613,7 +719,7 @@ async function main() {
     assert.ok(previewGuard >= 0 && previewGuard < html.indexOf('mir-test-guard.js'), 'read-only guard precedes TEST runtime on ' + route);
     assert.match(html, /connect-src 'self'/, 'CSP present in ' + route);
   }
-  const sourceFiles = ['dist/mir-prestige.js', 'dist/mir-prestige.css', 'dist/mir-client-pages.js', 'dist/mir-client-pages.css', 'dist/mir-client-pliage-viewport.js', 'dist/mir-pliage-journey.css', 'dist/production-app.js', 'dist/production.html', 'dist/production-model.js', 'scripts/build-prestige-preview.cjs'];
+  const sourceFiles = ['dist/mir-prestige.js', 'dist/mir-prestige.css', 'dist/mir-client-pages.js', 'dist/mir-client-pages.css', 'dist/mir-client-workspaces.js', 'dist/mir-client-workspaces.css', 'dist/mir-client-pliage-viewport.js', 'dist/mir-pliage-journey.css', 'dist/production-app.js', 'dist/production.html', 'dist/production-model.js', 'scripts/build-prestige-preview.cjs'];
   const files = Object.fromEntries(sourceFiles.map(file => [file, crypto.createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex')]));
   const server = await serve(build);
   let browser, version;
@@ -625,9 +731,10 @@ async function main() {
       for (const [name, route, scrolling = false] of scenes) await check('page-' + name + '-' + size.width, () => withPage(browser, server.base, size, name + '-' + size.width, async page => {
         await goto(page, server.base, route); await header(page, size, name);
         const sections = await inspectSections(page, name, size);
+        const workspaceSections = await inspectWorkspaceSections(page, name, size);
         const geometry = await layout(page, { scrolling });
         await capture(page, name + '-' + size.width, { viewport: size, scrollingAllowed: scrolling });
-        return { viewport: size, sections, geometry };
+        return { viewport: size, sections, workspaceSections, geometry };
       }));
       await check('parcours-pliage-' + size.width, () => withPage(browser, server.base, size, 'parcours-pliage-' + size.width, page => folding(page, server.base, size)));
       await check('commerce-' + size.width, () => withPage(browser, server.base, size, 'commerce-' + size.width, page => commerce(page, server.base, size)));

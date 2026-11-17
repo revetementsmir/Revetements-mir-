@@ -60,7 +60,7 @@ function applyStoreColorLock(){
 const profiles={l:{name:'Pliage en L',dimensions:{A:3,B:2}},j:{name:'Pliage en J',dimensions:{A:1,B:3,C:1}},z:{name:'Pliage en Z',dimensions:{A:2,B:4,C:2}},beam5:{name:'Cache-poutre · 5 côtés',dimensions:{A:1,B:6,C:8,D:6,E:1}},omega:{name:'Oméga',dimensions:{A:1,B:2,C:4,D:2,E:1}},custom:{name:'Profil personnalisé',segments:[{label:'A',length:4},{label:'B',length:3},{label:'C',length:2}],bends:[{mode:'interior',angle:90,direction:'left'},{mode:'interior',angle:90,direction:'right'}],startAngle:0},...window.MIRBendingPresets?.catalog(),j_soffite:{name:'J à soffite · 12 pi',template:'j',mirProfileId:'j_soffite',dimensions:{A:1,B:3,C:1}}};
 const phase10ProfileIds=new Set((window.MIRBendingPresets?.VARIANTS||[]).map(({id})=>id));
 const shapes=[['rectangle','Rectangle'],['square','Carré'],['right-triangle','Triangle rectangle'],['triangle','Triangle à sommet'],['roof-slope','Panneau haut rampant X/12'],['trapezoid','Trapèze'],['parallelogram','Parallélogramme'],['pointed','Côté en pointe']];
-function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));if(client&&catalogueChannel!=='store'&&[KEYS.draft,'mir_client_active_profile_v1'].includes(key)){const label=document.querySelector('.workshop-banner span:last-child');if(label)label.textContent=(key===KEYS.draft?'Dossier':'Tracé')+' enregistré sur cet appareil';if(clientProfileWizard()){let status=$('#client-local-save');if(!status){status=document.createElement('p');status.id='client-local-save';status.className='field-hint';status.setAttribute('role','status');$('#client-step-hint')?.after(status);}status.textContent=(key===KEYS.draft?'Dossier':'Tracé')+' enregistré sur cet appareil';}}return true;}catch{const status=$('#client-local-save');if(status)status.textContent='Sauvegarde locale indisponible · exportez votre dossier';toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
+function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));if(key===KEYS.draft)window.dispatchEvent(new CustomEvent('mir:workshop-saved'));if(client&&catalogueChannel!=='store'&&[KEYS.draft,'mir_client_active_profile_v1'].includes(key)){const label=document.querySelector('.workshop-banner span:last-child');if(label)label.textContent=(key===KEYS.draft?'Dossier':'Tracé')+' enregistré sur cet appareil';if(clientProfileWizard()){let status=$('#client-local-save');if(!status){status=document.createElement('p');status.id='client-local-save';status.className='field-hint';status.setAttribute('role','status');$('#client-step-hint')?.after(status);}status.textContent='Enregistré';status.title='Enregistré sur cet appareil';status.setAttribute('aria-label','Enregistré sur cet appareil');status.dataset.clientSaveState='saved';}}return true;}catch{const status=$('#client-local-save');if(status){status.textContent='Sauvegarde locale indisponible · exportez votre dossier';status.dataset.clientSaveState='error';status.removeAttribute('aria-label');}toast('La sauvegarde locale est indisponible. Exportez votre dossier JSON.');return false;}}
 function persist(){store(KEYS.draft,{version:1,order});}
 function toast(text,{quiet=false}={}){$('#production-toast').textContent=text;$('#production-toast').classList.toggle('visible',!quiet);clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#production-toast').classList.remove('visible'),4400);}
 function closeDialog(){pendingPOAfterSave=null;$('#production-dialog').close();}
@@ -235,7 +235,7 @@ function renderClientMeasurements(){
   const label=segments[index].label+'–'+segments[index+1].label,hem=bend.mode==='hem',value=clientInteriorAngle(bend);
   return `<div class="client-angle-field${hem?' client-hem-angle':''}"><label><span>${esc(label)} <small>${hem?'Repli':'°'}</small></span><input data-client-bend-angle="${index}" type="number" min="0.001" max="180" step="any" value="${esc(value)}" aria-label="${hem?'Retour écrasé':'Angle intérieur'} ${esc(label)} en degrés"${hem?' readonly aria-readonly="true" title="Repli 180° conservé du modèle"':''}></label></div>`;
  }).join('');
- return `<div class="client-measures-grid" data-client-side-count="${segments.length}">${sides}</div><section class="client-angle-controls" aria-label="Angles de votre modèle"><div class="client-angle-heading"><h3>Angles du modèle</h3><button type="button" id="client-reset-model-angles" class="plain-button">Rétablir les angles</button>${bends.some(bend=>bend.mode==='hem')?'<button type="button" id="client-hem-options" class="plain-button">Options des replis</button>':''}</div><div class="client-angles-grid">${angles}</div></section>`;
+ return `<div class="client-measures-grid" data-client-side-count="${segments.length}">${sides}</div><section class="client-angle-controls" aria-label="Angles de votre modèle"><div class="client-angle-heading"><h3>Angles du modèle</h3><button type="button" id="client-reset-model-angles" class="plain-button">Rétablir les angles</button>${bends.some(bend=>bend.mode==='hem')?'<button type="button" id="client-hem-options" class="plain-button">Options des replis</button>':''}</div><div class="client-angles-grid" data-client-angle-count="${bends.length}">${angles}</div></section>`;
 }
 
 function roofFactor(){return window.MIRPanelRoof?.pitchFactor(draft.roofPitch);}
@@ -275,7 +275,7 @@ function renderDimensions(){
   for(const input of $('#production-dimensions').querySelectorAll('[data-segment-length]')){
    const segment=draft.segments?.[Number(input.dataset.segmentLength)];
    if(!locked.has(segment?.mirFieldId))continue;
-   input.readOnly=true;input.setAttribute('aria-readonly','true');
+   input.readOnly=true;input.setAttribute('aria-readonly','true');input.title='Cote fixe du modèle MIR';
    input.insertAdjacentHTML('afterend','<small class="mir-default-readonly">Cote fixe du modèle MIR</small>');
   }
  }
@@ -349,7 +349,7 @@ function renderProfileOptions(){
  if(clientProfileWizard()){
   const face=draft.coloredFace||{},side=face.side;
   const developedModel=build(draft),developed=Number.isFinite(developedModel.finishedSegmentSumMM)?`<p class="mir-developed-total" data-client-stage="2">Développé total = ${esc(M.formatMeasurement(developedModel.finishedSegmentSumMM,developedModel.unit))}</p>`:'';
-  $('#production-profile-options').innerHTML=`${developed}<div class="client-painted-face" data-client-stage="3"><strong>Face colorée</strong><div class="client-face-choices" role="group" aria-label="Face colorée de la moulure">${['left','right'].map((direction,index)=>`<button type="button" data-client-face="${direction}" aria-pressed="${side===direction}">★ Face ${index+1}</button>`).join('')}</div><p class="field-hint">L’étoile sur le dessin indique le côté peint.</p></div>${rule?`<div data-client-stage="2">${rule}</div>`:''}`;
+  $('#production-profile-options').innerHTML=`${developed}<div class="client-painted-face" data-client-stage="3"><strong>Face colorée</strong><div class="client-face-choices" role="group" aria-label="Face colorée de la moulure">${['left','right'].map((direction,index)=>{const faceModel={...drawingModel().model,coloredFace:{side:direction,segmentId:window.MIRBendingPresets?.preferredFaceSegment?.(draft)||face.segmentId||labels[0]||'A'}};return `<button type="button" data-client-face="${direction}" aria-pressed="${side===direction}" aria-label="Face ${index+1}, côté indiqué par le trait bleu">${compactClientProfileSVG(faceModel,{painted:true,width:132,height:62})}<span>Face ${index+1}</span></button>`;}).join('')}</div><p class="field-hint">Le trait bleu indique le côté peint.</p></div>${rule?`<div data-client-stage="2">${rule}</div>`:''}`;
   return;
  }
  const faceOpen=$('#production-profile-options details')?.open||draft.coloredFace?.side;
@@ -391,7 +391,11 @@ function renderPanelOptions(){
   for(const button of $('#production-panel-options').querySelectorAll('[data-panel-no-lip]'))button.disabled=true;
  }
 }
-function renderColors(){const block=$('#production-color-fields');$('#color-system').value=colorSystem;if(colorSystem==='manufacturer'){const brandLabel=clientProfileWizard()?'Marque':'Fabricant / produit de référence';block.innerHTML=`<div class="color-source-field"><label>${brandLabel}<select id="production-material"><option value="">Choisir le fabricant et le produit</option>${availableMaterials().map(m=>`<option value="${esc(m.id)}"${m.id===materialId?' selected':''}>${esc(m.brand+' · '+m.name)}</option>`).join('')}</select></label>${(chosenMaterial()?.colors||[]).length>20&&!clientProfileWizard()?`<label>Rechercher une teinte du fabricant<input id="production-color-search" class="color-search" type="search" placeholder="Nom ou code, ex. 56068, noir…" value="${esc(colorQuery)}"></label><p id="color-count" class="color-count"></p>`:""}<p class="color-field-label">Couleur</p><div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Couleur"></div><p class="field-hint">${kind==='panel'?'Références Unico publiées. La disponibilité du fini sur le calibre choisi reste à confirmer.':'Chaque échantillon appartient au nuancier de ce produit. L’offre sur votre pièce doit être confirmée.'}</p></div>`;renderColorGrid();}else if(colorSystem==='ral'){block.innerHTML=`<div class="color-source-field"><label>Rechercher un code RAL Classic<input id="production-color-search" class="color-search" type="search" placeholder="Ex. 7016, black, vert…" value="${esc(colorQuery)}"></label><label>Code de la couleur<select id="production-ral"><option value="">Choisir un code RAL</option>${ral.colors.map(c=>`<option value="${esc(c.id)}"${c.id===colorId?' selected':''}>${esc(c.code+' · '+(c.nameEn||c.name))}</option>`).join('')}</select></label><p id="color-count" class="color-count"></p><div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Codes RAL Classic"></div><p class="field-hint">${esc(ral.displayNotice||'Aperçu écran indicatif. Valider la teinte demandée sur un nuancier physique avant fabrication.')}</p></div>`;renderColorGrid();}else{block.innerHTML=`<div class="color-source-field"><label>Nuancier ou fabricant<input id="special-color-system" value="${esc(draft.finish?.system||'')}" maxlength="60" placeholder="Ex. Nuancier à préciser"></label><div class="two-fields"><label>Code exact<input id="special-color-code" value="${esc(draft.finish?.code||'')}" maxlength="80" placeholder="Référence demandée"></label><label>Nom de la couleur<input id="special-color-name" value="${esc(draft.finish?.name||'')}" maxlength="100" placeholder="Si connu"></label></div><p class="field-hint">Cette référence est une demande spéciale à faire confirmer. Aucun équivalent fabricant ni teinte numérique n’est inventé.</p></div>`;}updateFinish();applyStoreColorLock();}
+function renderColors(){const block=$('#production-color-fields');$('#color-system').value=colorSystem;if(colorSystem==='manufacturer'){const brandLabel=clientProfileWizard()?'Marque':'Fabricant / produit de référence';block.innerHTML=`<div class="color-source-field"><label>${brandLabel}<select id="production-material"><option value="">Choisir le fabricant et le produit</option>${availableMaterials().map(m=>`<option value="${esc(m.id)}"${m.id===materialId?' selected':''}>${esc(m.brand+' · '+m.name)}</option>`).join('')}</select></label>${(chosenMaterial()?.colors||[]).length>20&&!clientProfileWizard()?`<label>Rechercher une teinte du fabricant<input id="production-color-search" class="color-search" type="search" placeholder="Nom ou code, ex. 56068, noir…" value="${esc(colorQuery)}"></label><p id="color-count" class="color-count"></p>`:""}<p class="color-field-label">Couleur</p><div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Couleur"></div><p class="field-hint">${kind==='panel'?'Références Unico publiées. La disponibilité du fini sur le calibre choisi reste à confirmer.':'Chaque échantillon appartient au nuancier de ce produit. L’offre sur votre pièce doit être confirmée.'}</p></div>`;renderColorGrid();}else if(colorSystem==='ral'){block.innerHTML=`<div class="color-source-field"><label>Rechercher un code RAL Classic<input id="production-color-search" class="color-search" type="search" placeholder="Ex. 7016, black, vert…" value="${esc(colorQuery)}"></label><label>Code de la couleur<select id="production-ral"><option value="">Choisir un code RAL</option>${ral.colors.map(c=>`<option value="${esc(c.id)}"${c.id===colorId?' selected':''}>${esc(c.code+' · '+(c.nameEn||c.name))}</option>`).join('')}</select></label><p id="color-count" class="color-count"></p><div id="production-color-grid" class="color-choice-grid" role="group" aria-label="Codes RAL Classic"></div><p class="field-hint">${esc(ral.displayNotice||'Aperçu écran indicatif. Valider la teinte demandée sur un nuancier physique avant fabrication.')}</p></div>`;renderColorGrid();}else{block.innerHTML=`<div class="color-source-field"><label>Nuancier ou fabricant<input id="special-color-system" value="${esc(draft.finish?.system||'')}" maxlength="60" placeholder="Ex. Nuancier à préciser"></label><div class="two-fields"><label>Code exact<input id="special-color-code" value="${esc(draft.finish?.code||'')}" maxlength="80" placeholder="Référence demandée"></label><label>Nom de la couleur<input id="special-color-name" value="${esc(draft.finish?.name||'')}" maxlength="100" placeholder="Si connu"></label></div><p class="field-hint">Cette référence est une demande spéciale à faire confirmer. Aucun équivalent fabricant ni teinte numérique n’est inventé.</p></div>`;}if(clientProfileWizard()){
+ const optional=$('#client-optional-metal');optional.querySelector('.client-finish-reference-note')?.remove();
+ const note=block.querySelector('.color-source-field>.field-hint');if(note){note.classList.add('client-finish-reference-note');optional.append(note);}
+ block.querySelector('.color-field-label')?.remove();
+ }updateFinish();applyStoreColorLock();}
 function renderColorGrid(){
  const grid=$('#production-color-grid');if(!grid)return;
  if(clientProfileWizard()&&(!draft.material?.type||colorSystem==='manufacturer'&&!chosenMaterial())){grid.innerHTML='<p class="field-hint">'+(!draft.material?.type?'Choisissez d’abord le matériau pour consulter son nuancier.':'Choisissez le fabricant et le produit pour consulter ses teintes.')+'</p>';if($('#color-count'))$('#color-count').textContent='';return;}
@@ -400,7 +404,7 @@ function renderColorGrid(){
   :(window.MIRCataloguePolicy?.sortColors(chosenMaterial()?.colors)||(chosenMaterial()?.colors||[])).filter(c=>`${c.name||''} ${c.code||''} ${c.collection||''}`.toLocaleLowerCase('fr').includes(colorQuery.toLocaleLowerCase('fr')));
  if($('#color-count'))$('#color-count').textContent=`${colors.length} codes · aperçus indicatifs`;
  if(clientProfileWizard()){
-  grid.innerHTML='<label class="client-color-select">Couleur du fabricant<select id="production-client-color" aria-label="Couleur du fabricant"><option value="">Choisir la couleur</option>'+colors.map(c=>'<option value="'+esc(c.id)+'"'+(c.id===colorId?' selected':'')+'>'+esc([c.name||c.nameEn,c.code].filter(Boolean).join(' · '))+'</option>').join('')+'</select></label>'+(colors.length?'':'<p class="field-hint">Aucune teinte documentée pour cette référence.</p>');
+  grid.innerHTML='<label class="client-color-select">Choisir la couleur<select id="production-client-color" aria-label="Couleur du fabricant"><option value="">Choisir la couleur</option>'+colors.map(c=>'<option value="'+esc(c.id)+'"'+(c.id===colorId?' selected':'')+'>'+esc([c.name||c.nameEn,c.code].filter(Boolean).join(' · '))+'</option>').join('')+'</select></label>'+(colors.length?'':'<p class="field-hint">Aucune teinte documentée pour cette référence.</p>');
   return;
  }
  const flat=kind==='profile'&&colorSystem==='manufacturer'&&
@@ -571,9 +575,9 @@ function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,ri
   return `<g class="mir-angle-annotation" pointer-events="none" role="img" aria-label="${esc('Angle '+sides+' : '+label)}"><path d="M ${start.map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep} ${end.map(fmt).join(' ')}" fill="none" stroke="#348511" stroke-width="2.5"/>${text}</g>`;
  }).join('');
 }
-function compactClientProfileSVG(model,{illustrative=false}={}){
- const width=Math.max(240,$('#production-drawing').clientWidth||innerWidth-44);
- const height=innerHeight<=710?92:Math.max(110,Math.min(innerHeight*.17,145));
+function compactClientProfileSVG(model,{illustrative=false,painted=false,width:givenWidth,height:givenHeight}={}){
+ const width=givenWidth||Math.max(240,$('#production-drawing').clientWidth||innerWidth-44);
+ const height=givenHeight||(innerHeight<=710?92:Math.max(110,Math.min(innerHeight*.17,145)));
  const points=model.pointsMM||[];
  if(points.length<2)return '';
  const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
@@ -591,7 +595,7 @@ function compactClientProfileSVG(model,{illustrative=false}={}){
   labels.push('<g class="client-compact-side" data-marker-label="'+esc(label)+'"><path d="M'+mid.map(fmt).join(',')+'L'+p.map(fmt).join(',')+'" stroke="#8a8b80" stroke-width=".7"/><rect x="'+fmt(p[0]-10)+'" y="'+fmt(p[1]-10)+'" width="20" height="20" rx="3" fill="#ece8df"/><text x="'+fmt(p[0])+'" y="'+fmt(p[1]+4.5)+'" text-anchor="middle" font-size="13" font-weight="600" fill="#242522">'+esc(label)+'</text></g>');
  }
  // Render the existing physical model; only the screen projection and labels are compact.
- const profile=M.profileDiagramContent(model,mapped,{markers:false,illustrative:true,highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height]})
+ const profile=M.profileDiagramContent(model,mapped,{markers:false,illustrative:!painted,highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height]})
   .replace('stroke-width="9"','stroke-width="4"')
   .replace(/(<path[^>]*stroke="#dfe8e3"[^>]*stroke-width=")4"/,(_,prefix)=>prefix+'1.5"');
  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+esc(model.name)+'"><title>'+esc(model.name)+(illustrative?' — proportions du modèle, cotes à saisir':' — cotes de la pièce')+'</title>'+profile+labels.join('')+'</svg>';
@@ -888,8 +892,8 @@ function syncPieceNameField(){
 }
 const clientStages=[
  {title:'Choisissez votre moulure',hint:'Sélectionnez un modèle ci-dessous ou dessinez votre propre profil.',action:'Passer aux mesures'},
- {title:'Mesures et angles',hint:'Les lettres correspondent au dessin. Angles du modèle modifiables.',action:'Matériau et couleur'},
- {title:'Matériau et couleur',hint:'Choisissez le métal, sa couleur et la face à peindre.',action:'Quantité et récapitulatif'},
+ {title:'Mesures et angles',hint:'Angles du modèle modifiables.',action:'Matériau et couleur'},
+ {title:'Matériau et couleur',hint:'Choisissez le métal, sa couleur et la face à peindre.',action:'Continuer'},
  {title:'Quantité et récapitulatif',hint:'Indiquez le nombre de pièces et vérifiez vos choix avant l’ajout au panier.'}
 ];
 function clientTracePrompt(){return matchMedia('(any-pointer:coarse)').matches?'Touchez la grille pour placer le premier point.':'Cliquez sur la grille pour placer le premier point.';}
@@ -931,10 +935,10 @@ function mountClientWizard(active){
   const nodes=[
    [$('.template-section'),type,1],
    [config.querySelector('.section-heading'),scroll,2],[$('#measure-hint'),scroll,2],
-   [$('#production-dimensions'),scroll,2],[$('#production-profile-options'),scroll,null],
-   [$('.piece-finish'),scroll,3],[$('#add-production-piece').closest('.config-section'),scroll,4],
+   [$('#production-dimensions'),scroll,2],[ $('.piece-finish'),scroll,3],
+   [$('#production-profile-options'),scroll,null],[$('#add-production-piece').closest('.config-section'),scroll,4],
    [$('#material-thickness').closest('.two-fields'),optional,null],[$('#thickness-hint'),optional,null],
-   [$('#production-location').closest('label'),optional,null],[$('#production-note').closest('label'),optional,null],[$('#panel-price'),$('#client-step-actions'),null]
+   [$('#selected-finish'),optional,null],[$('#production-location').closest('label'),optional,null],[$('#production-note').closest('label'),optional,null],[$('#panel-price'),$('#client-step-actions'),null]
   ];
   clientWizardPlaces=nodes.map(([node,destination,stage])=>{
    const marker=document.createComment('configurateur client');
@@ -1179,7 +1183,7 @@ function renderValidation(model){const box=$('#production-validation');const err
 function renderPanelMaterialControls(){
  const panel=kind==='panel',m=draft.material||{},options=panel?[['aluminium-extrude','Aluminium extrudé · sur mesure'],['aluminium',editingItemId&&!m.productRef&&m.type==='aluminium'?'Aluminium · référence du dossier':'Aluminium plié · Unico U-P1'],['acier',editingItemId&&!m.productRef&&m.type==='acier'?'Acier · référence du dossier':'Acier · Unico U-P1']]:[['aluminium','Aluminium'],['acier','Acier'],['acier-inoxydable','Acier inoxydable'],['autre','Autre métal à préciser']];
  const publicProfile=clientProfileWizard();
- $('#production-material-label').textContent=publicProfile?'Matériau':'Type de métal';
+ $('#production-material-label').textContent=publicProfile?'Choisir le matériau':'Type de métal';
  if(publicProfile){
   const publicOptions=options.filter(([id])=>publicProfileMaterials.includes(id));
   options.splice(0,options.length,['','Choisir le matériau'],...publicOptions);
