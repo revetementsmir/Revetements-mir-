@@ -56,9 +56,10 @@
  }
  function workItems(inventory,buildingId,sourceImages={}){
   const views=inventory.views.filter(v=>v.buildingId===buildingId&&['floor','elevation'].includes(v.kind)&&v.payload.sourceImage).sort((a,b)=>Number(b.kind==='floor')-Number(a.kind==='floor'));
-  // Scale and level readings from every contributing view precede opening
-  // details, while retaining the bounded six-label / 42-region OCR budget.
-  return views.flatMap(view=>[...regions(view,sourceImages[view.id]),...gridRegions(view,sourceImages[view.id]),...openingRegions(view,sourceImages[view.id]).map(region=>({...region,priority:4}))].map(region=>({view,region}))).sort((a,b)=>a.region.priority-b.region.priority).slice(0,64);
+  // Grid recognition runs only for separate floor plans that actually need
+  // cross-level XY registration. Single-floor clients keep their OCR budget.
+  const multiLevel=new Set(views.filter(v=>v.kind==='floor').map(v=>v.levelId).filter(Boolean)).size>1;
+  return views.flatMap(view=>[...regions(view,sourceImages[view.id]),...(multiLevel?gridRegions(view,sourceImages[view.id]):[]),...openingRegions(view,sourceImages[view.id]).map(region=>({...region,priority:4}))].map(region=>({view,region}))).sort((a,b)=>a.region.priority-b.region.priority).slice(0,multiLevel?64:42);
  }
  async function refine(inventory,buildingId,{images:sourceImages={},progress=()=>{},cancelled=()=>false}={}){
   const next=JSON.parse(JSON.stringify(inventory)),work=workItems(next,buildingId,sourceImages),evidence=[];if(!work.length)return {inventory:next,evidence};
