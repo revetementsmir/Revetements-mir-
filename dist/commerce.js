@@ -236,7 +236,7 @@
   function hydrateChips(container=document){
     for(const card of container.querySelectorAll('[data-shop-card]')){
       const material=materials.find(m=>m.id===card.dataset.shopCard);
-      if(!material||(material.keepProductPhoto&&!material.paintPotIndices))continue;
+      if(!material)continue;
       if(material.screwPreview)renderScrew(card.querySelector('.card-preview'),material,null);
       if(material.paintPotIndices)renderPaintPot(card.querySelector('.card-preview'),material,null);
       for(const button of card.querySelectorAll('[data-card-color]')){
@@ -481,7 +481,7 @@
     if(photoButton)photoButton.onclick=()=>showPhoto(im);
     document.querySelectorAll('[data-photo]').forEach(b=>b.onclick=()=>{showPhoto(ims[+b.dataset.photo]);document.querySelectorAll('[data-photo]').forEach(a=>a.setAttribute('aria-pressed',a===b));});
     function updateURL(){const p=new URLSearchParams({id:m.id});if(qs.get('return')==='cart')p.set('return','cart');if(shopContext)p.set('from',shopContext);if(activeColor)p.set('color',activeColor.id);if(activeFormat)p.set('format',activeFormat.id);if(recipeMode)p.set('recette','1');history.replaceState(null,'',location.pathname+'?'+p);}
-    function colorState(){$('#product-price-note').textContent=productPriceNote(m,activeColor);const priceDetails=productPriceDetails(m,activeColor);$('#product-price-details').textContent=priceDetails;$('#product-price-details').hidden=!priceDetails;const priceTable=$('.product-facts-table tbody');if(priceTable)priceTable.innerHTML=facts(withFormat(m,activeFormat),activeColor).map(([a,b])=>`<tr><th scope="row">${esc(a)}</th><td>${esc(b)}</td></tr>`).join('');const configure=$('#product-configure');if(configure)configure.href=configurationURL(m,activeColor);document.querySelectorAll('[data-color]').forEach(b=>{const selected=b.dataset.color===activeColor?.id;b.setAttribute('aria-pressed',selected);const c=cs.find(c=>c.id===b.dataset.color);if(c){b.setAttribute('aria-label',`${m.brand} — ${c.name}${c.code?' — code '+c.code:''} — ${m.finish||m.name}${selected?' — sélectionné':''}`);if(!m.keepProductPhoto)V.paintChip(b.querySelector('.mir-colour-chip')||b,m,c);}});$('#selected-color-name').textContent=activeColor?.name||(m.colorStatus==='not_applicable'?(m.finish||'Sans option de couleur'):'À confirmer');$('#color-note').textContent=activeColor?`${activeColor.availabilityNote||'Teinte du fabricant; disponibilité à confirmer.'} ${V.smooth(m,activeColor)?'Le fini lisse reste lisse; la photo originale du profil est accessible à gauche.':activeColor.swatchTextureNote||''}`:m.colorStatus==='not_applicable'?'Le fini est défini par la référence; aucun nuancier de couleur ne s’applique.':'Le nuancier exact de cette référence reste à confirmer avec le fabricant.';showSelected();updateURL();}
+    function colorState(){$('#product-price-note').textContent=productPriceNote(m,activeColor);const priceDetails=productPriceDetails(m,activeColor);$('#product-price-details').textContent=priceDetails;$('#product-price-details').hidden=!priceDetails;const priceTable=$('.product-facts-table tbody');if(priceTable)priceTable.innerHTML=facts(withFormat(m,activeFormat),activeColor).map(([a,b])=>`<tr><th scope="row">${esc(a)}</th><td>${esc(b)}</td></tr>`).join('');const configure=$('#product-configure');if(configure)configure.href=configurationURL(m,activeColor);document.querySelectorAll('[data-color]').forEach(b=>{const selected=b.dataset.color===activeColor?.id;b.setAttribute('aria-pressed',selected);const c=cs.find(c=>c.id===b.dataset.color);if(c){b.setAttribute('aria-label',`${m.brand} — ${c.name}${c.code?' — code '+c.code:''} — ${m.finish||m.name}${selected?' — sélectionné':''}`);V.paintChip(b.querySelector('.mir-colour-chip')||b,m,c);}});$('#selected-color-name').textContent=activeColor?.name||(m.colorStatus==='not_applicable'?(m.finish||'Sans option de couleur'):'À confirmer');$('#color-note').textContent=activeColor?`${activeColor.availabilityNote||'Teinte du fabricant; disponibilité à confirmer.'} ${V.smooth(m,activeColor)?'Le fini lisse reste lisse; la photo originale du profil est accessible à gauche.':activeColor.swatchTextureNote||''}`:m.colorStatus==='not_applicable'?'Le fini est défini par la référence; aucun nuancier de couleur ne s’applique.':'Le nuancier exact de cette référence reste à confirmer avec le fabricant.';showSelected();updateURL();}
     document.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{
       activeColor=cs.find(c=>c.id===b.dataset.color);
       const field=$('#product-format');
@@ -634,32 +634,12 @@
       fascia.images=[{src:screwAssetRoot+'fascia-2po.webp',alt:'Illustration de la vis de fascia 2 po',cardPresentation:'packshot',note:'Illustration de référence fournie par MIR.'}];
       attachScrewPreview(fascia,'fascia-2po');
     }
-    const hardieKit=materials.find(m=>m.id==='hardie-colorplus-touch-up-kit');
-    const hardieColor=colors(materials.find(m=>m.id==='hardieplank-select-825')||{}).find(c=>c.id==='hardie-etain-vieilli');
-    if(hardieKit&&hardieColor){
-      const source='https://www.jameshardie.com/product-catalog/accessories-siding-products/hardie-colorplus-touch-up-kits/touch-up-kit/';
-      hardieKit.keepProductPhoto=true;
-      hardieKit.documents=[...hardieKit.documents,{kind:'technical',title:'James Hardie — kit de retouche ColorPlus',url:source,verified:true}];
-      // Keep documented kit colours and their packaging references. The existing
-      // Aged Pewter range reference remains available without duplicating an ID.
-      if(!(hardieKit.colors||[]).some(color=>color.id===hardieColor.id)){
-        hardieKit.colors=[...(hardieKit.colors||[]),{...hardieColor,name:'Étain vieilli (Aged Pewter)',
-          availabilityNote:'Teinte de référence. Disponibilité du kit dans cette teinte à confirmer avec MIR.'}];
-      }
-    }
+    // Touch-up palettes are shared catalogue data. Keep the photographed kit
+    // unchanged; its colour references are rendered independently in the picker.
     const canexelPaint=materials.find(m=>m.id==='canexel-touch-up-284ml');
     if(canexelPaint){
-      const source='https://boutique.aluminiumbbouchard.ca/produit/peinture-de-retouche-pour-le-canexel-284ml/';
-      const guide=colors(materials.find(m=>m.id==='canexel-vstyle')||{});
-      const names=['Acadia','Barista','Blanc','Bleu minuit','Bois de grange','Bois de Santal','Charbon','Falaise','Granit','Gris brume','Loup gris','Moka foncé','Noir','Renard roux','Rouge campagne','Sable','Scandinave','Sierra','Toundra','Yellowstone'];
       canexelPaint.keepProductPhoto=true;
       canexelPaint.paintPotIndices={'blanc':0,'noir':1,'gris brume':2,'sable':3,'bleu minuit':4,'granit':5,'toundra':6,'charbon':7,'moka fonce':8,'scandinave':9,'bois de santal':10,'acadia':11,'sierra':12,'barista':13,'falaise':14,'loup gris':15};
-      canexelPaint.documents=[...canexelPaint.documents,{kind:'technical',title:'Aluminium B. Bouchard — couleurs et format 284 ml',url:source,verified:true}];
-      canexelPaint.colors=names.map(name=>{
-        const reference=guide.find(c=>norm(c.name)===norm(name));
-        return {...reference,id:reference?.id||'canexel-'+norm(name).replaceAll(' ','-'),name,
-          sourceUrl:source,availabilityNote:'Teinte répertoriée par le détaillant. Disponibilité MIR à confirmer.'};
-      });
     }
   }
   async function init(){updateCount();const [response,visibility,adseal,kaycanSwatches,regionalPricing]=await Promise.all([fetch('./catalogue-fd6866b49d21.json'),fetch('./boutique-visibilite.json',{cache:'no-cache'}),fetch('./catalogue-adseal-4580.json').then(r=>r.ok?r.json():null).catch(()=>null),fetch(screwAssetRoot+'kaycan-fascia-colours.json').then(r=>r.ok?r.json():{}).catch(()=>({})),fetch('./mir-regional-pricing-20261110.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null)]);if(!visibility.ok)throw new Error('La disponibilité des articles ne peut pas être vérifiée. Réessayez dans un instant.');const {hidden}=await visibility.json();if(!Array.isArray(hidden))throw new Error('La disponibilité des articles est invalide.');hiddenProducts=new Set([...hidden,'hardieplank-select-725','hardieplank-smooth-725']);if(!response.ok)throw new Error('Le catalogue ne peut pas être chargé. Réessayez dans un instant.');materials=((await response.json()).materials||[]).map(material=>({...material,colors:window.MIRCataloguePolicy?.sortColors(material.colors)||material.colors}));for(const material of materials){const price=regionalPricing?.priced?.[material.id];if(price)material.regionalPricing={...price,researchedOn:regionalPricing.researchedOn,markupPercent:regionalPricing.markupPercent};}

@@ -10,9 +10,16 @@
     'canexel-vstyle':fixed('canexel-2.webp',1070,313),
     'canexel-cedrvue-9':fixed('canexel-4.webp',1070,313),
     'canexel-board-batten':fixed('canexel-1.webp',1070,313),
-    // These are fixed detail crops of the corresponding manufacturer's actual
-    // installed profile. No generic board or fabricated dimensions are added.
-    'st-laurent-lap-825':fixed('st-laurent-4.jpg',993,691,[310,0,240,185],'Détail du bardage à clin St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.'),
+    // The user selected the same fibre-cement colour specimen as James Hardie.
+    // Only the colour template is shared; St-Laurent retains its own palette,
+    // product dimensions and manufacturer references.
+    'st-laurent-lap-825':{
+      ...fixed('hardieplank-cedarmill.png',600,600,null,
+        'Échantillon de teinte St-Laurent sur le gabarit de fibrociment James Hardie. Le profil, le grain et les dimensions exacts du produit ne sont pas représentés.'),
+      assetKind:'shared_fibre_cement_colour_template',previewForSwatches:true,
+      sourcePreview:'./assets/products/st-laurent-4.jpg'
+    },
+    // V-Groove and Board & Batten keep their distinct installed geometry.
     'st-laurent-v-groove-825':fixed('st-vgroove-9.jpg',993,691,[750,505,240,180],'Détail du profil V-Groove St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.'),
     'st-laurent-board-batten-12':fixed('st-board-9.jpg',993,691,[440,410,370,195],'Détail Board & Batten St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.'),
     'hardie-board-batten':fixed('hardiepanel-smooth.png',600,600,null,'Échantillon du composant HardiePanel lisse. Les couvre-joints et l’assemblage Board & Batten ne sont pas représentés.'),
@@ -42,7 +49,15 @@
   };
   function baseFor(material){
     if(!(material.applications||[]).includes('siding')||!['CanExel','James Hardie','St-Laurent','JDP / Juste du Pin','Rialux'].includes(material.brand))return null;
-    if(material.stableSidingPreview)return {...material.stableSidingPreview};
+    if(material.stableSidingPreview){
+      const base={...material.stableSidingPreview};
+      if(material.brand==='St-Laurent'&&material.renderPattern==='lap'){
+        base.previewForSwatches=true;
+        base.assetKind='shared_fibre_cement_colour_template';
+        base.note='Échantillon de teinte St-Laurent sur le même gabarit de fibrociment James Hardie. Le profil, le grain et les dimensions exacts du produit ne sont pas représentés.';
+      }
+      return base;
+    }
     if(bases[material.id])return {...bases[material.id]};
     if(material.brand!=='James Hardie')return null;
     const image=(material.images||[]).find(image=>image.src===material.primaryImage&&image.assetKind==='manufacturer_profile_texture'&&image.exactProductMatch===true);

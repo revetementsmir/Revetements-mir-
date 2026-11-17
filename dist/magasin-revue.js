@@ -72,6 +72,22 @@
    const colorId=selection.colorId||card.querySelector('[data-product-color]')?.value;
    const color=item.storeColors?.find(option=>option.id===colorId)||item.colors?.find(option=>option.id===colorId);
    const V=window.MIRMaterialPreview;
+   const material=materials.find(m=>m.id===item.materialId);
+   if(material?.keepProductPhoto){
+     const visual=card.querySelector('[data-visual]'),caption=card.querySelector('[data-visual-label]');
+     V.cancel(visual);visual.innerHTML=imageMarkup(item,photoFor(item));
+     const swatch=color?.swatchUrl||color?.swatchImage;
+     const localSwatch=typeof swatch==='string'&&/^(?:\.\/)?assets\/[\w./-]+\.(?:png|webp|jpe?g|avif)$/i.test(swatch);
+     // Assign the link before the asynchronous chip load. An older colour
+     // request must never overwrite the newest supplier link after resolving.
+     const source=card.querySelector('[data-supplier-link]');if(source)source.href=color?.sourceUrl||item.sourceUrl;
+     if(color&&localSwatch){
+       caption.innerHTML='<span style="display:inline-flex;align-items:center;gap:.5rem"><span data-touch-up-swatch data-color-id="'+safe(color.id)+'" role="img" aria-label="'+safe(color.name)+'" style="display:inline-block;flex:none;width:2rem;height:1.4rem;border:1px solid currentColor;border-radius:3px;overflow:hidden"><img src="'+safe(swatch)+'" alt="" style="display:block;width:100%;height:100%;object-fit:cover"></span><span><span>Échantillon de teinte</span> · <span data-mir-source-color>'+safe(color.name)+'</span></span></span>';
+       await V.paintChip(caption.querySelector('[data-touch-up-swatch]'),material,{...color,swatchUrl:swatch});
+     }else if(color)caption.innerHTML='<span>Photo du contenant</span> · <span data-mir-source-color>'+safe(color.name)+'</span> · <span>Teinte non représentée</span>';
+     else caption.textContent=V.photoLabel(photoFor(item));
+     return;
+   }
    if(await window.MIRStoreSidingPreviews?.render(card.querySelector('[data-visual]'),card.querySelector('[data-visual-label]'),materials.find(m=>m.id===item.materialId),color))return;
    const photo=color?.variantImage?{src:color.variantImage,assetKind:'supplier_product_photo',alt:item.name+' · '+color.name}:color?null:photoFor(item);
    card.querySelector('[data-visual]').innerHTML=imageMarkup(item,photo);

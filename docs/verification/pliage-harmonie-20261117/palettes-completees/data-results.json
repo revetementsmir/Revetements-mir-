@@ -1,0 +1,78 @@
+{
+  "baseSha": "bb39e142e646022a20eb804dacd8001321c7ee19",
+  "generatedAt": "2026-11-17T17:15:39.320Z",
+  "scope": "Static catalogue and actual pure employee store model. No browser or physical device certification.",
+  "checks": [
+    {
+      "name": "131 product identities; 129 unrelated products exactly preserved",
+      "pass": true
+    },
+    {
+      "name": "Only authorized palette and provenance fields changed on touch-up products",
+      "pass": true
+    },
+    {
+      "name": "Hardie exactly 19 regional colours; same IDs in canonical, client and siding reference",
+      "pass": true
+    },
+    {
+      "name": "Historical black packaging and Aged Pewter identity preserved without duplication",
+      "pass": true
+    },
+    {
+      "name": "CanExel exactly 20 references, including four documented legacy colours",
+      "pass": true
+    },
+    {
+      "name": "All 5 St-Laurent fibre-cement palettes remain complete and unchanged",
+      "pass": true
+    },
+    {
+      "name": "All 19 Hardie, 16 current CanExel and 24 St-Laurent source swatches exist locally",
+      "pass": true,
+      "detail": {
+        "verifiedAssets": 59
+      }
+    },
+    {
+      "name": "Overlay points to the actual updated canonical SHA256",
+      "pass": true
+    },
+    {
+      "name": "Actual employee-store model exposes the same 19/20/24 palettes",
+      "pass": true
+    },
+    {
+      "name": "Both touch-up products remain non-orderable; actual configureLine rejects them",
+      "pass": true
+    },
+    {
+      "name": "St-Laurent lap 6.25 and 8.25 use matching Hardie colour-template geometry",
+      "pass": true,
+      "detail": [
+        {
+          "suffix": "625",
+          "baseImage": "./assets/products/mir-siding-625/base-hardieplank.png"
+        },
+        {
+          "suffix": "825",
+          "baseImage": "./assets/products/hardieplank-cedarmill.png"
+        }
+      ]
+    },
+    {
+      "name": "V-Groove and Board & Batten keep their own profile geometry",
+      "pass": true
+    },
+    {
+      "name": "New sample and availability notes translate through the real client locale module",
+      "pass": true
+    },
+    {
+      "name": "Edited JavaScript files parse",
+      "pass": true
+    }
+  ],
+  "passed": 14,
+  "failed": 0
+}

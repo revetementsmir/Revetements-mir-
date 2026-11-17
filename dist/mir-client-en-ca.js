@@ -8047,6 +8047,27 @@ entries.push(...[
   ]
 ]);
 entries.push(["Voir l’aperçu fabricant original","View the original manufacturer preview"]);
+// Complete touch-up palettes and shared fibre-cement colour specimens.
+const touchUpPaletteNotes = [
+  ['Échantillon de teinte','Colour sample'],
+  ['Photo du contenant','Container photo'],
+  ['Teinte non représentée','Selected colour not shown'],
+  ['Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.','ColorPlus colour from the Québec palette. Confirm the kit reference and availability with MIR.'],
+  ['19 teintes Statement Québec pour la retouche. Référence locale du kit et disponibilité MIR à confirmer.','19 Québec Statement colours for touch-ups. Confirm the local kit reference and availability with MIR.'],
+  ['James Hardie — couleurs Statement Québec 06/2025','James Hardie — Québec Statement colours 06/2025']
+];
+entries.push(...touchUpPaletteNotes);
+entries.push([
+  touchUpPaletteNotes[3][0]+' Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.',
+  touchUpPaletteNotes[3][1]+' Colour chart sample; the photographed container does not change colour.'
+]);
+for(const note of [
+  ['Échantillon de teinte St-Laurent sur le gabarit de fibrociment James Hardie. Le profil, le grain et les dimensions exacts du produit ne sont pas représentés.','St-Laurent colour sample on the James Hardie fibre-cement template. The product’s exact profile, grain and dimensions are not represented.'],
+  ['Échantillon de teinte St-Laurent sur le même gabarit de fibrociment James Hardie. Le profil, le grain et les dimensions exacts du produit ne sont pas représentés.','St-Laurent colour sample on the same James Hardie fibre-cement template. The product’s exact profile, grain and dimensions are not represented.']
+]){
+  entries.push(note);
+  entries.push(['Illustration de la couleur choisie. Rendu écran indicatif. '+note[0],'Illustration of the selected colour. Screen colours are indicative. '+note[1]]);
+}
 const dictionary=Object.freeze(Object.fromEntries(entries));
 if(typeof module==='object'&&module.exports)module.exports=dictionary;
 if(root)root.MIRClientEnglish=dictionary;

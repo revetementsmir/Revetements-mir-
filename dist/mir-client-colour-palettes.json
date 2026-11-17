@@ -2,13 +2,18 @@
   "version": 1,
   "reviewedOn": "2026-11-17",
   "scope": "client_only_presentation_overlay",
-  "catalogueSourceSha256": "a08b9bf28abba1f286d0854690ae4979eaaa723a3fe04eb86a75dffc82efdc63",
+  "catalogueSourceSha256": "4fb95308c21b11f97ec8bf8871899c2356df73f19fe6c0dfef4f9e6d8e10bde5",
   "policy": {
     "preserveIds": true,
     "preservePrices": true,
-    "preserveSharedCatalogue": true,
+    "preserveSharedCatalogue": false,
     "availabilityIsNotInventory": true,
-    "noAutomaticCompatibilityExpansion": true
+    "noAutomaticCompatibilityExpansion": true,
+    "sharedCatalogueChangeScope": [
+      "hardie-colorplus-touch-up-kit.colors",
+      "canexel-touch-up-284ml.colors",
+      "touch_up_palette_provenance"
+    ]
   },
   "clientHiddenProductIds": [
     "hardieplank-select-725",
@@ -8732,6 +8737,499 @@
         "stockConfirmed": false,
         "note": "16 teintes actuelles et 4 anciennes références de retouche. Compatibilité et disponibilité à confirmer avec MIR."
       }
+    },
+    "hardie-colorplus-touch-up-kit": {
+      "colors": [
+        {
+          "id": "hardie-blanc-arctique",
+          "name": "Blanc arctique",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 181,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/blanc-arctique.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-pierre-des-champs",
+          "name": "Pierre des champs",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 170,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/pierre-des-champs.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-beige-navajo",
+          "name": "Beige Navajo",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 180,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/beige-navajo.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-brun-kaki",
+          "name": "Brun kaki",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 169,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/brun-kaki.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-taupe-monterey",
+          "name": "Taupe Monterey",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 175,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/taupe-monterey.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-ecorce",
+          "name": "Écorce",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 172,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/ecorce.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-espresso",
+          "name": "Espresso",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 173,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/espresso.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-sauge",
+          "name": "Sauge",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 174,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/sauge.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-gris-ardoise",
+          "name": "Gris ardoise",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 182,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/gris-ardoise.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-bleu-acier",
+          "name": "Bleu acier",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 183,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/bleu-acier.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-brume-legere",
+          "name": "Brume légère",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 184,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/brume-legere.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-gris-perle",
+          "name": "Gris perle",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 185,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/gris-perle.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-etain-vieilli",
+          "name": "Étain vieilli (Aged Pewter)",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 186,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/etain-vieilli.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-gris-nocturne",
+          "name": "Gris nocturne",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 187,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/gris-nocturne.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-bleu-de-soiree",
+          "name": "Bleu de soirée",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 171,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/bleu-de-soiree.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-bleu-ocean",
+          "name": "Bleu océan",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 179,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/bleu-ocean.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-gris-fer",
+          "name": "Gris fer",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 176,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/gris-fer.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-rouge-campagnard",
+          "name": "Rouge campagnard",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Teinte ColorPlus du nuancier Québec. Référence du kit et disponibilité MIR à confirmer.",
+          "pdfImageXref": 177,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/rouge-campagnard.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current"
+          ],
+          "kitAvailabilityConfirmed": false
+        },
+        {
+          "id": "hardie-noir-minuit",
+          "name": "Noir minuit (Midnight Black)",
+          "hex": null,
+          "sourceUrl": "https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf",
+          "collection": "ColorPlus — Statement Québec",
+          "verified": true,
+          "availabilityNote": "Étiquette fournie : Midnight Black 4960831 / Blackwater 4100703. Même kit de retouche; prix et disponibilité MIR à confirmer.",
+          "pdfImageXref": 178,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/noir-minuit.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "finishGroup": "opaque",
+          "paletteStatus": "current_regional_reference",
+          "reviewedOn": "2026-11-17",
+          "evidenceIds": [
+            "hardie-quebec-0625",
+            "hardie-touch-up-product-current",
+            "MIR_user_provided_packaging_photo"
+          ],
+          "code": "4960831",
+          "commercialName": "Midnight Black",
+          "packagingAliases": [
+            {
+              "name": "Midnight Black",
+              "code": "4960831"
+            },
+            {
+              "name": "Blackwater",
+              "code": "4100703"
+            }
+          ],
+          "evidence": {
+            "kind": "MIR_user_provided_packaging_photo",
+            "receivedOn": "2026-11-17",
+            "messageImagePosition": 3,
+            "packagingCode": "LLA0531",
+            "upc": "856296003436",
+            "originalFileAvailable": false
+          },
+          "kitAvailabilityConfirmed": false
+        }
+      ],
+      "clientPalette": {
+        "scope": "quebec_statement_touch_up_reference",
+        "sourceIds": [
+          "hardie-quebec-0625",
+          "hardie-touch-up-product-current"
+        ],
+        "groups": [
+          "opaque"
+        ],
+        "stockConfirmed": false,
+        "note": "19 teintes Statement Québec pour la retouche. Référence locale du kit et disponibilité MIR à confirmer."
+      }
     }
   },
   "sources": [
@@ -8814,6 +9312,14 @@
       "type": "manufacturer",
       "verification": "current_web_page_or_indexed_document",
       "finding": "Trim width 3.5 inches exists in both opaque and two-tone format groups; individual colour group membership is not published."
+    },
+    {
+      "id": "hardie-touch-up-product-current",
+      "url": "https://www.jameshardie.com/product-catalog/accessories-siding-products/hardie-colorplus-touch-up-kits/touch-up-kit/",
+      "reviewedOn": "2026-11-17",
+      "type": "manufacturer",
+      "verification": "opened_official_source",
+      "finding": "Manufacturer touch-up kits are formulated to match ColorPlus finishes. Regional kit stock and per-colour SKUs are not established by the palette."
     }
   ]
 }

@@ -360,6 +360,16 @@
       caption.textContent=productVisualLabel(item)+(color?' · Teinte à confirmer':'');return;
     }
     const previewColor={...color,swatchUrl:color.swatchUrl||color.swatchImage};
+    if(material.keepProductPhoto){
+      V.cancel(element);element.innerHTML=productVisual(item);
+      const swatch=previewColor.swatchUrl;
+      const localSwatch=typeof swatch==='string'&&/^(?:\.\/)?assets\/[\w./-]+\.(?:png|webp|jpe?g|avif)$/i.test(swatch);
+      if(localSwatch){
+        caption.innerHTML='<span style="display:inline-flex;align-items:center;gap:.5rem"><span data-touch-up-swatch data-color-id="'+esc(color.id)+'" role="img" aria-label="'+esc(color.name)+'" style="display:inline-block;flex:none;width:2rem;height:1.4rem;border:1px solid currentColor;border-radius:3px;overflow:hidden"><img src="'+esc(swatch)+'" alt="" style="display:block;width:100%;height:100%;object-fit:cover"></span><span><span>Échantillon de teinte</span> · <span data-mir-source-color>'+esc(color.name)+'</span></span></span>';
+        await V.paintChip(caption.querySelector('[data-touch-up-swatch]'),material,previewColor);
+      }else caption.innerHTML='<span>Photo du contenant</span> · <span data-mir-source-color>'+esc(color.name)+'</span> · <span>Teinte non représentée</span>';
+      return;
+    }
     const selection={...material,selectedFormatId:formatId};
     const recipe=V.recipe(selection,previewColor);
     caption.textContent=recipe.kind==='exact_variant'?'Photo de la couleur · '+color.name+(recipe.formatMatch?'':' · Format à confirmer'):

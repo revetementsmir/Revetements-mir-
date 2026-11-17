@@ -1,0 +1,98 @@
+name: MIR — Couleurs et aperçu TEST
+
+on:
+  push:
+    branches: [codex/pliage-harmonie-20261117]
+    paths:
+      - 'dist/**'
+      - 'tests/mir-client-colours-browser.cjs'
+      - 'docs/verification/pliage-harmonie-20261117/colour-cutout-qa/**'
+      - 'docs/verification/pliage-harmonie-20261117/palettes-completees/**'
+      - '.github/workflows/mir-pliage-harmonie-colours-cutouts.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mir-pliage-harmonie-colours-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  isolated-visual-qa:
+    name: Palettes et aperçu isolé
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: 'true'
+      MIR_COLOUR_STAGE: ci-palettes
+    steps:
+      - name: Checkout exact requested commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install isolated test dependencies
+        id: dependencies
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2 pngjs@7.0.0
+      - name: Install the test browser
+        id: browser
+        run: |
+          npx playwright install --with-deps chromium
+          node -e 'const fs=require("fs"),{chromium}=require("playwright");fs.appendFileSync(process.env.GITHUB_ENV,"MIR_CHROMIUM_BIN="+chromium.executablePath()+"\n")'
+          sudo ln -sf "$(node -e 'process.stdout.write(require("playwright").chromium.executablePath())')" /usr/bin/chromium
+      - name: Record exact source and diff
+        if: ${{ always() && steps.dependencies.outcome == 'success' }}
+        run: |
+          mkdir -p docs/verification/pliage-harmonie-20261117/colour-cutout-qa/ci
+          git rev-parse HEAD > docs/verification/pliage-harmonie-20261117/colour-cutout-qa/ci/source-revision.txt
+          git diff --stat bb39e142e646022a20eb804dacd8001321c7ee19..HEAD > docs/verification/pliage-harmonie-20261117/colour-cutout-qa/ci/source-stat.txt
+          git diff bb39e142e646022a20eb804dacd8001321c7ee19..HEAD -- dist/commerce.js dist/material-preview.js dist/mir-client-siding-previews.js dist/mir-store-siding-previews.js dist/magasin-revue.js dist/chantier-app.js > docs/verification/pliage-harmonie-20261117/colour-cutout-qa/ci/source-review.patch
+      - name: Verify independent palette and identity contracts
+        if: ${{ always() && steps.dependencies.outcome == 'success' }}
+        run: node docs/verification/pliage-harmonie-20261117/colour-cutout-qa/verify-data.cjs
+      - name: Capture original saved revision
+        if: ${{ always() && steps.browser.outcome == 'success' }}
+        env:
+          MIR_COLOUR_CUTOUT_PHASE: before
+        run: node docs/verification/pliage-harmonie-20261117/colour-cutout-qa/capture.cjs
+      - name: Verify and capture current revision
+        if: ${{ always() && steps.browser.outcome == 'success' }}
+        env:
+          MIR_COLOUR_CUTOUT_PHASE: after
+        run: node docs/verification/pliage-harmonie-20261117/colour-cutout-qa/capture.cjs
+      - name: Run existing catalogue colour regression suite
+        if: ${{ always() && steps.browser.outcome == 'success' }}
+        run: node tests/mir-client-colours-browser.cjs
+      - name: Build isolated TEST preview
+        id: preview_build
+        if: ${{ always() && steps.dependencies.outcome == 'success' }}
+        run: node scripts/build-prestige-preview.cjs
+      - name: Verify preview protections
+        if: ${{ always() && steps.browser.outcome == 'success' && steps.preview_build.outcome == 'success' }}
+        run: |
+          python3 -m http.server 8768 --bind 127.0.0.1 --directory .prestige-preview > /tmp/mir-preview-server.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
+          node -e 'const retry=async()=>{for(let i=0;i<50;i++){try{const r=await fetch("http://127.0.0.1:8768/test/mir-test-environment.json");if(r.ok)return;}catch{}await new Promise(r=>setTimeout(r,100));}throw Error("TEST preview server did not start");};retry().catch(e=>{console.error(e);process.exitCode=1;});'
+          node tests/mir-prestige-preview-security.cjs
+      - name: Verify existing gallery, PDFs and TEST boundaries
+        if: ${{ always() && steps.browser.outcome == 'success' && steps.preview_build.outcome == 'success' }}
+        run: node tests/mir-pliage-harmonie-preview-browser.cjs
+      - name: Save actual QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-pliage-harmonie-colours-${{ github.sha }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            docs/verification/pliage-harmonie-20261117/colour-cutout-qa/
+            docs/verification/pliage-harmonie-20261117/palettes-completees/
+            docs/verification/boutique-colours-20261117/ci-palettes/
+            docs/verification/prestige-20261117/preview-security-results.json
+            docs/verification/pliage-harmonie-20261117/preview-browser.json
+            docs/verification/pliage-harmonie-20261117/gallery-*.png
