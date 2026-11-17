@@ -99,13 +99,34 @@
       if (previous < 0) result.push(record);
       else if (result[previous].outsideDrawing && !outsideDrawing || row.text.length<result[previous].name.length) result[previous] = record;
     }
-    const hasDrawingTitle = result.some(view => view.face || view.kind === 'section');
-    return result.filter(view => {
-      if (view.outsideDrawing && result.some(other => other !== view && other.key === view.key && !other.outsideDrawing)) return false;
+    // A full-sheet title is commonly printed twice: once below the actual
+    // architectural drawing and once inside the right-side title block.
+    // These are two observations of ONE sheet, not two drawings. Keep the
+    // drawing caption as the view's identity and retain the title block as
+    // independent traceable metadata. Distinct views/levels remain separate.
+    const duplicates=new Set();
+    for(const candidate of result){
+      if(!width||!height||!candidate.outsideDrawing||
+         !['floor','roof','foundation'].includes(candidate.kind)||
+         center(candidate.box,1)<height*.45)continue;
+      const related=result.filter(other=>other!==candidate&&!other.outsideDrawing&&
+        other.kind===candidate.kind&&other.key===candidate.key&&other.title===candidate.title);
+      if(related.length!==1)continue;
+      const drawing=related[0];
+      if(center(drawing.box,0)>width*.82)continue;
+      drawing.sheetTitle={text:candidate.name,box:[...candidate.box],source:candidate.source,
+        kind:candidate.kind,key:candidate.key,matchingDrawingTitleBox:[...drawing.box],
+        method:'matched-sheet-title-block-and-drawing-caption',status:'proposed',confirmationRequired:true};
+      duplicates.add(candidate);
+    }
+    const unique=result.filter(view=>!duplicates.has(view));
+    const hasDrawingTitle = unique.some(view => view.face || view.kind === 'section');
+    return unique.filter(view => {
+      if (view.outsideDrawing && unique.some(other => other !== view && other.key === view.key && !other.outsideDrawing)) return false;
       if (hasDrawingTitle && view.source === 'ocr' && /^(?:solage|fondations?)$/.test(view.title)) return false;
       if (!width || !height) return true;
       // A list of short, left-aligned titles close together is a drawing index.
-      const stacked = result.filter(other => Math.abs(view.box[0] - other.box[0]) <= width * .022 &&
+      const stacked = unique.filter(other => Math.abs(view.box[0] - other.box[0]) <= width * .022 &&
         Math.abs(center(view.box, 1) - center(other.box, 1)) <= height * .11);
       return stacked.length < 3;
     });
