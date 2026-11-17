@@ -2,6 +2,32 @@
 
 ## 2026-11-17 resumption: secondary roofs remain under verification
 
+### Native verification of apparently observed dimension spans
+
+The source investigation also identified a separate failure: a small raster
+can make a structural corner look like a dimension end mark. An apparently
+observed span can then introduce a false scale conflict. A new raster-only
+phase checks the selected partial references against the retained PDF at
+factor two, using the same caption and anchors. This phase is bounded to eight
+regions and leaves the existing twelve horizontal/vertical native checks and
+their ordering intact. It never changes the inscription, value, confidence or
+anchors to obtain agreement with another scale.
+
+An available native refusal prevents that association from serving as a scale
+reference or contour constraint. Genuine native dimension marks with
+contradictory written values remain contradictory. Missing sources, exhausted
+budget and cancellation remain explicit and do not erase an existing conflict;
+an unavailable PDF can be checked when it becomes available again. A fraction
+token is rejected as a separate measurement only when an actual enclosing OCR
+line demonstrates that it is a suffix. The full inscription is not invented.
+
+The synthetic regression uses a real high-resolution structural outline and
+its two-times downsample to reproduce a false-positive end mark, in both axes.
+It verifies the native refusal, true conflicting dimensions, immutable source
+identity, cache boundaries, separate budget and cleanup. A private diagnostic
+on the already-refined D01 inventory is the next execution gate; it will be
+reported separately from a fresh full import.
+
 The resumed work starts from pushed revision `888b322`; it does not recover or
 claim validation of the stopped session's unpushed local changes. PR 44 remains
 a draft. D01 still requires source verification of its entrance roofs, patio

@@ -1,5 +1,5 @@
 /* Local source-to-model proposals. Review is explicit; legacy projects are read only. */
-(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction-vision.js'):root.MIRReconstructionVision,node?require('./plan-import-core.js'):root.MIRPDFAnalysis,node?require('./plan-spatial-dimensions.js'):root.MIRSpatialDimensions,()=>node?require('./plan-grid-registration.js'):root.MIRGridRegistration,()=>node?require('./plan-roof-pitch-evidence.js'):root.MIRRoofPitchEvidence,()=>node?require('./plan-roof-plan-evidence.js'):root.MIRRoofPlanEvidence);if(node)module.exports=api;else root.MIRPlanReconstruction=api;})(typeof window==='object'?window:globalThis,function(M,V,A,S,gridRegistration,roofPitchEvidence,roofPlanEvidence){
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction-vision.js'):root.MIRReconstructionVision,node?require('./plan-import-core.js'):root.MIRPDFAnalysis,node?require('./plan-spatial-dimensions.js'):root.MIRSpatialDimensions,()=>node?require('./plan-grid-registration.js'):root.MIRGridRegistration,()=>node?require('./plan-roof-pitch-evidence.js'):root.MIRRoofPitchEvidence,()=>node?require('./plan-roof-plan-evidence.js'):root.MIRRoofPlanEvidence,()=>node?require('./plan-dimension-source-evidence.js'):root.MIRDimensionSourceEvidence);if(node)module.exports=api;else root.MIRPlanReconstruction=api;})(typeof window==='object'?window:globalThis,function(M,V,A,S,gridRegistration,roofPitchEvidence,roofPlanEvidence,dimensionSourceEvidence){
  'use strict';
  const normal=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),size=v=>[v.payload.sourceWidth||v.zone?.[2]||v.frame?.rasterSize[0],v.payload.sourceHeight||v.zone?.[3]||v.frame?.rasterSize[1]];
  function readings(view){return view.payload.drawingReadings?.rows||[];}
@@ -13,7 +13,7 @@
    const original=clean(vertical),rotated=original.map(r=>({...r,box:[r.box[1],image.width-r.box[2],r.box[3],image.width-r.box[0]]}));
    results.push(...A.matchDimensionLines(turned,rotated,{minSpanPx:20,shortTicks:true,allowTextGap:true,preferReliableReadings:true}).map(c=>A.unrotateCandidate(c,image.width,image.height)));
   }
-  return results.map(r=>({...r,id:view.id+':dimension:'+r.anchors.flat().join('-')+':'+r.referenceFt,value:r.referenceFt*.3048,kind:'written',status:'proposed',sourceViewId:view.id,sourceFrame:M.clone(view.frame),label:r.text,scale:r.feetPerPixel*.3048,confirmationRequired:true}));
+  return results.map(r=>({...r,id:view.id+':dimension:'+r.anchors.flat().join('-')+':'+r.referenceFt,value:r.referenceFt*.3048,kind:'written',status:'proposed',sourceViewId:view.id,sourceFrame:M.clone(view.frame),label:r.text,scale:r.feetPerPixel*.3048,confirmationRequired:true})).map(r=>dimensionSourceEvidence()?.apply(view,r)||r);
  }
  // A rough/foundation/roof height inscription is a construction measurement,
  // not a named storey datum. Keep its real dimension marks and caption without
@@ -113,7 +113,7 @@
   const bounds=outline?.sourceBounds,references=[];
   if(!Array.isArray(bounds)||bounds.length!==4||!bounds.every(Number.isFinite)||bounds[2]<=0||bounds[3]<=0)return references;
   for(const d of dimensions||[]){
-   if(d.sourceViewId!==view.id||d.kind!=='written'||!Number.isFinite(d.value)||d.value<=0||d.anchors?.length!==2||!d.anchors.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))||d.source!=='pdf-text'&&(d.confidence??0)<70)continue;
+   if(d.nativeAssociationEvidence?.associationEligibility==='rejected'||d.sourceViewId!==view.id||d.kind!=='written'||!Number.isFinite(d.value)||d.value<=0||d.anchors?.length!==2||!d.anchors.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))||d.source!=='pdf-text'&&(d.confidence??0)<70)continue;
    const extentEvidence=floorExtentEvidence(d,outline,image);if(!extentEvidence)continue;
    const association=floorDimensionAssociation(view,d,outline,image);if(association)references.push({...M.clone(d),association:'observed-overall-floor-dimension',sourceAssociation:association,extentEvidence,confirmationRequired:true});
   }return references;
@@ -129,7 +129,8 @@
    const span=M.distance(...d.anchors);if(span<20||span>Math.max(w,h)*1.1)continue;
    const nearby=d.anchors.every(p=>p[0]>=x-pad&&p[0]<=x+w+pad&&p[1]>=y-pad&&p[1]<=y+h+pad),association=nearby?null:floorDimensionAssociation(view,d,outline,image);
    if(!nearby&&!association)continue;
-   const lineEvidence=image?A.dimensionLineEvidence(image,d,{labels:[...readings(view),...(view.payload.drawingReadings?.verticalRows||[])]}):null;
+   const nativeAssociation=d.nativeAssociationEvidence||dimensionSourceEvidence()?.evidenceFor(view,d),lineEvidence=nativeAssociation?.verificationPerformed?nativeAssociation.lineEvidence:image?A.dimensionLineEvidence(image,d,{labels:[...readings(view),...(view.payload.drawingReadings?.verticalRows||[])]}):null;
+   if(nativeAssociation&&!nativeAssociation.verificationPerformed)unresolvedReferences.push({...M.clone(d),scaleEligibility:'pending-native-source-verification',reason:nativeAssociation.reason,nativeAssociationEvidence:M.clone(nativeAssociation),confirmationRequired:true});
    if(lineEvidence&&lineEvidence.status!=='observed'){unresolvedReferences.push({...M.clone(d),scaleEligibility:'unresolved',lineEvidence});continue;}
    // OCR often returns both a complete feet/inches inscription and its
    // individual tokens. The suffix is not another dimension or independent
@@ -166,6 +167,17 @@
   // cannot silently replace their conflict with a separate overall dimension.
   return {references:observed.map(r=>({...M.clone(r),association:'independent-floor-dimensions',confirmationRequired:true})),conflict:!assessment.scale,assessment,unresolvedReferences,...(controls.length?{corroboratingOverallReferences:M.clone(controls)}:{})};
  }
+ function partialDimensionCandidates(inventory,buildingId,images){
+  // Select exactly the independently associated floor captions used by the
+  // scale resolver. Native checking never selects a value by scale agreement.
+  const result=[];
+  for(const floor of inventory.views.filter(v=>v.buildingId===buildingId&&v.kind==='floor')){
+   const image=images[floor.id];if(!image)continue;
+   const detected=V.floorEnvelope(image,{sourceViewId:floor.id,frame:floor.frame,rows:readings(floor)}),outline=detected.status==='proposed'?detected:crossFloorOutline(inventory,floor,images,detected);if(outline.status!=='proposed')continue;
+   const dimensions=contourDimensions(floor,image),written=referenceObservations(floor,image),direct=[...written.references.filter(r=>floorExtentEvidence(r,outline,image)),...overallScaleReferences(floor,dimensions,outline,image)];
+   result.push(...partialScaleReferences(floor,dimensions,outline.sourceBounds,{outline,image,controlReferences:direct}).references);
+  }return result;
+ }
  function constrainContour(original,references){
   const draft=M.clone(original),unit=M.scale(draft),evidence=[];if(!unit)return draft;
   // This is a proposed, explicit operation. Loading a saved contour never
@@ -178,8 +190,8 @@
     const nearest=n=>coords.map((c,i)=>({i,d:Math.abs(c-n)})).sort((a,b)=>a.d-b.d)[0],lo=nearest(Math.min(a[axis],b[axis])),hi=nearest(Math.max(a[axis],b[axis]));
     if(lo.i===hi.i||lo.d>6||hi.d>6)continue;
     const raster=coords[hi.i]-coords[lo.i],target=r.value/unit,difference=target-raster,tolerance=Math.max(8,raster*.05);
-    const uncertain=r.source!=='pdf-text'&&r.confidence!=null&&r.confidence<70;
-    const item={axis,from:lo.i,to:hi.i,reference:M.clone(r),originalSpanPixels:raster,estimatedValue:raster*unit,value:r.value,differencePixels:difference,tolerancePixels:tolerance,status:!uncertain&&Math.abs(difference)<=tolerance?'proposed':'unresolved',reason:uncertain?'DIMENSION_TRANSCRIPTION_UNCERTAIN':Math.abs(difference)<=tolerance?null:'DIMENSION_SPAN_MISMATCH',confirmationRequired:true};evidence.push(item);if(item.status==='proposed')links.push(item);
+    const associationRejected=r.nativeAssociationEvidence?.associationEligibility==='rejected',uncertain=associationRejected||r.source!=='pdf-text'&&r.confidence!=null&&r.confidence<70;
+    const item={axis,from:lo.i,to:hi.i,reference:M.clone(r),originalSpanPixels:raster,estimatedValue:raster*unit,value:r.value,differencePixels:difference,tolerancePixels:tolerance,status:!uncertain&&Math.abs(difference)<=tolerance?'proposed':'unresolved',reason:associationRejected?'DIMENSION_SOURCE_ASSOCIATION_UNRESOLVED':uncertain?'DIMENSION_TRANSCRIPTION_UNCERTAIN':Math.abs(difference)<=tolerance?null:'DIMENSION_SPAN_MISMATCH',confirmationRequired:true};evidence.push(item);if(item.status==='proposed')links.push(item);
    }
    const values=new Map(),conflicts=new Set();
    for(let root=0;root<coords.length;root++){if(values.has(root))continue;values.set(root,coords[root]);const queue=[root],component=new Set([root]);let conflict=false;
@@ -227,11 +239,12 @@
   const observed=[],unresolvedReferences=[];
   for(const r of matched.filter(r=>r.referenceFt>=9&&r.spanPx>image.width*.18&&r.confidence>=0)){
    const original=labels.find(l=>l.box.every((n,i)=>Math.abs(n-r.textBox[i])<2)&&l.text===r.text),rasterEvidence=r.lineEvidence?.status==='observed'?r.lineEvidence:A.dimensionLineEvidence(image,r,{labels:readings(view)}),nativeEvidence=rasterEvidence.reason==='DIMENSION_END_MARKS_REQUIRED'?nativeDimensionEvidence(view,r):null,lineEvidence=nativeEvidence||rasterEvidence;
-   const candidate={...r,value:r.referenceFt*.3048,kind:'written',status:'proposed',sourceViewId:view.id,sourceFrame:M.clone(view.frame),label:original?.originalText||r.text,punctuationReview:!!original?.punctuationReview,transcriptionReviewRequired:r.confidence<50||!!original?.punctuationReview,scale:r.feetPerPixel*.3048,lineEvidence,confirmationRequired:true};
+   let candidate={...r,value:r.referenceFt*.3048,kind:'written',status:'proposed',sourceViewId:view.id,sourceFrame:M.clone(view.frame),label:original?.originalText||r.text,punctuationReview:!!original?.punctuationReview,transcriptionReviewRequired:r.confidence<50||!!original?.punctuationReview,scale:r.feetPerPixel*.3048,lineEvidence,confirmationRequired:true};
+   candidate=dimensionSourceEvidence()?.apply(view,candidate)||candidate;
    // A high-confidence inscription does not prove its association to a span.
    // Keep the failed association for review, without using it as a metric
    // reference or declaring a contradiction against an independently read view.
-   if(lineEvidence.status==='observed')observed.push(candidate);else unresolvedReferences.push({...candidate,scaleEligibility:'unresolved'});
+   if(candidate.lineEvidence.status==='observed')observed.push(candidate);else unresolvedReferences.push({...candidate,scaleEligibility:'unresolved'});
   }
   return {references:observed,unresolvedReferences};
  }
@@ -923,5 +936,5 @@ function localizeTargetContour(image,points){
   if(next.roofProposal?.status==='proposed'){const roof=next.roofProposal;roof.profiles.x=roof.profiles.x.map(([x,z])=>[nx[0]+(x-old.x[0])*rx,nz[0]+(z-old.z[0])*rz]);roof.profiles.y=roof.profiles.y.map(([y,z])=>[ny[0]+(y-old.y[0])*ry,nz[0]+(z-old.z[0])*rz]);roof.fasciaBottom=nz[1];roof.userMeasurementCorrections={width:w,depth:d,height:h,originalBounds:M.clone(old)};}
   return next;
  }
- return Object.freeze({version:1,constructionHeightObservations,elevationApertureFrames,openingSpanRegistration,observedEnvelopeLimits,nativeDimensionEvidence,verticalReferenceAssessment,localizeTargetContour,registeredSpan,gridElevationEnvelope,crossFloorOutline,levelBand,floorExtentEvidence,floorDimensionAssociation,overallScaleReferences,partialScaleReferences,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,sourceOpeningType,openingFrameSearches,nativeOpeningCandidates,openingsFor,lowerPlanes,faceSpan,referenceObservations,references,floorGuide,datumFromCaption,heightFromLevelDatums,size,readings});
+ return Object.freeze({version:1,constructionHeightObservations,elevationApertureFrames,openingSpanRegistration,observedEnvelopeLimits,nativeDimensionEvidence,verticalReferenceAssessment,localizeTargetContour,registeredSpan,gridElevationEnvelope,crossFloorOutline,levelBand,floorExtentEvidence,floorDimensionAssociation,overallScaleReferences,partialScaleReferences,partialDimensionCandidates,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,sourceOpeningType,openingFrameSearches,nativeOpeningCandidates,openingsFor,lowerPlanes,faceSpan,referenceObservations,references,floorGuide,datumFromCaption,heightFromLevelDatums,size,readings});
 });

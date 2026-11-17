@@ -71,6 +71,7 @@ jobs:
           node tests/mir-studio-dimension-word-retry.cjs
           node tests/mir-studio-native-vertical-dimensions.cjs
           node tests/mir-studio-native-horizontal-dimensions.cjs
+          node tests/mir-studio-native-dimension-association.cjs
           node tests/mir-studio-native-height-scale.cjs
           node tests/mir-studio-native-line-consumer.cjs
           node tests/mir-studio-elevation-grid.cjs

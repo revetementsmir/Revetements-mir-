@@ -1,10 +1,10 @@
 /* MIR: dimension marks are matched to measured extension-line intersections.
  * No drawing scale or building dimension is assumed when evidence is absent. */
 (function (root, factory) {
-  const api = factory();
+  const api = factory(() => typeof module === 'object' && module.exports ? require('./plan-dimension-source-evidence.js') : root.MIRDimensionSourceEvidence);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.MIRPDFAnalysis = api;
-})(typeof window === 'object' ? window : globalThis, function () {
+})(typeof window === 'object' ? window : globalThis, function (dimensionSourceEvidence) {
   'use strict';
   const finite = Number.isFinite;
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -211,7 +211,7 @@
   function matchDimensionLines(image, labels, options = {}) {
     const localPaperContrast = !!(options.lightConstructionLines && options.requireDimensionMarks), baseMask = inkMask(image, options.lightConstructionLines ? { threshold: 235, saturation: 30 } : {}),
       mask = localPaperContrast ? paperLineMask(image, baseMask) : baseMask, results = [], seen = new Set();
-    const assessAssociation = !!(options.shortTicks && options.preferReliableReadings), associationReasons = ['DIMENSION_ANNOTATION_CONTEXT', 'DIMENSION_COLOURED_ANNOTATION', 'DIMENSION_MULTI_VALUE_CONTEXT', 'DIMENSION_CAPTION_ASSOCIATION_AMBIGUOUS'];
+    const assessAssociation = !!(options.shortTicks && options.preferReliableReadings), associationReasons = ['DIMENSION_ANNOTATION_CONTEXT', 'DIMENSION_COLOURED_ANNOTATION', 'DIMENSION_MULTI_VALUE_CONTEXT', 'DIMENSION_CAPTION_ASSOCIATION_AMBIGUOUS', 'DIMENSION_CAPTION_FRAGMENT'];
     const eligible = evidence => !evidence || (options.requireDimensionMarks ? evidence.status === 'observed' : !associationReasons.includes(evidence.reason));
     const sameReading = (a, b) => {
       if (Math.abs(a.referenceFt - b.referenceFt) > 1e-9 || a.axis !== b.axis) return false;
@@ -325,6 +325,8 @@
     // quoted value as an independent construction length.
     const multiValue = text => !/['′’]|\b(?:ft|feet|pi|pieds?)\b/i.test(text) && /\d+(?:[.,]\d+)?\s*["″][^\d'′’]{0,8}\d+(?:[.,]\d+)?\s*["″]/.test(text);
     if (context.some(multiValue)) return unresolved('DIMENSION_MULTI_VALUE_CONTEXT', { anchors: anchors.map(p => p.slice()), captionBox: box.slice(), sourceCaptions: labels.filter(row => covers(row) && multiValue(String(row.text || ''))).map(row => ({ text: row.text, box: row.box.slice(), source: row.source || 'ocr', confidence: row.confidence ?? null })) });
+    const fragment = dimensionSourceEvidence()?.captionFragment(dimension, labels);
+    if (fragment) return fragment;
     if (image.data.length !== image.width * image.height) {
       let neutral = 0, coloured = 0;
       for (let y = Math.max(0, Math.ceil(box[1])); y < Math.min(image.height, box[3]); y++) for (let x = Math.max(0, Math.ceil(box[0])); x < Math.min(image.width, box[2]); x++) {
