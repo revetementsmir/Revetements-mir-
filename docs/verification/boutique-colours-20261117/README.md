@@ -1,5 +1,16 @@
 # Boutique MIR — miniatures, formats et nuanciers
 
+## Aperçu TEST livré
+
+- [Boutique navigable](https://mir-studio-test-7fknp1kuu-desk17.vercel.app/test/boutique.html?view=brands)
+- [Échantillon CanExel interactif](https://mir-studio-test-7fknp1kuu-desk17.vercel.app/test/produit.html?id=canexel-ridgewood-d5)
+- [21 captures ciblées PC, tablette et téléphone](https://mir-studio-test-7fknp1kuu-desk17.vercel.app/test/boutique-colours-galerie.html)
+- [Galerie générale de 114 captures](https://mir-studio-test-7fknp1kuu-desk17.vercel.app/test/prestige-captures.html)
+
+Déploiement Vercel Preview `dpl_DsFUTZbK6c9aTp38FFbKLQyQiNNA`, état READY, source exacte `5d7af016a1cc77ac9a8e4b3e9c2adeabb7c7cb6a`. La protection Vercel existante est conservée; une connexion autorisée peut être nécessaire. Aucune publication en production.
+
+Six URL vérifiées en ligne : HTTP 200, manifeste TEST et révision conformes, CSP limitée à la même origine et noindex présents. Garde TEST injecté dans les quatre pages HTML contrôlées. Preuve : `hosted-preview.json`. Les essais fonctionnels et responsive ont été réalisés dans Chromium local sur le même code applicatif; les contrôles de l’hébergement sont des lectures HTTP authentifiées.
+
 ## Ce qu’il faut faire
 
 Correction client demandée par Frederick le 17 novembre 2026 : uniformiser les miniatures des catégories, retirer les clins fibrociment 7,25 et 5,25 po de l’offre MIR, améliorer le visuel Kaycan, rendre tous les choix de couleur accessibles et conserver le même échantillon lorsque la couleur change. Retrouver les pots de retouche CanExel existants. Source de départ : `8bf0bdf`, branche `codex/client-prestige-20261117`.

@@ -1,0 +1,85 @@
+{
+  "checkedAt": "2026-11-17T15:09:35.295Z",
+  "deployment": {
+    "id": "dpl_DsFUTZbK6c9aTp38FFbKLQyQiNNA",
+    "url": "https://mir-studio-test-7fknp1kuu-desk17.vercel.app",
+    "state": "READY",
+    "target": null,
+    "sourceRevision": "5d7af016a1cc77ac9a8e4b3e9c2adeabb7c7cb6a",
+    "protected": true
+  },
+  "environment": {
+    "environment": "test",
+    "projectRef": "hxtztkmbfpmzrieccwsg",
+    "revision": "5d7af016a1cc77ac9a8e4b3e9c2adeabb7c7cb6a"
+  },
+  "checks": [
+    {
+      "path": "/test/mir-test-environment.json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "guardInjected": null
+    },
+    {
+      "path": "/test/boutique.html?view=brands",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "guardInjected": true
+    },
+    {
+      "path": "/test/produit.html?id=canexel-ridgewood-d5",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "guardInjected": true
+    },
+    {
+      "path": "/test/boutique-colours-galerie.html",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "guardInjected": true
+    },
+    {
+      "path": "/test/prestige-captures.html",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "guardInjected": true
+    },
+    {
+      "path": "/test/mir-client-colour-palettes.json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "guardInjected": null
+    }
+  ],
+  "method": "Authenticated read-only HTTP checks on hosted preview; functional and responsive browser verification performed locally against the same application source revision.",
+  "productionPublished": false,
+  "productionWrites": false,
+  "realEmails": false,
+  "realEstimateSubmissions": false,
+  "paletteProductCount": 21,
+  "paletteColourCount": 390
+}
