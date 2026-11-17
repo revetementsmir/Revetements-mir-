@@ -102,3 +102,13 @@ jobs:
             artifacts/studio-s2/
             artifacts/studio-reconstruction/
           if-no-files-found: warn
+
+      - name: Temporary Studio runtime for local QA (repo-public assets only)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-studio-local-qa-runtime-${{ github.event.pull_request.head.sha || github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 1
