@@ -1,0 +1,221 @@
+/* Only the explicit public routes enhanced by mir-client-pages.js.
+ * No body/document overflow clipping: all retained sections have real controls.
+ */
+body[data-mir-client-pages] { --mir-client-page-ink:#242522; --mir-client-page-paper:#f4f1ea; }
+body[data-mir-client-pages] [data-mir-page-visible="false"],
+body[data-mir-client-pages] [data-mir-list-visible="false"] { display:none!important; }
+body[data-mir-client-pages] .mir-client-pages-main { padding-top:0!important; padding-bottom:0!important; min-height:0; }
+body[data-mir-client-pages] .mir-client-pages-nav,
+body[data-mir-client-pages] .mir-client-list-controls {
+  display:flex; align-items:center; gap:8px; width:100%; box-sizing:border-box;
+  margin:10px auto 16px; padding:0; min-height:44px; max-width:1200px;
+  color:var(--mir-client-page-ink); background:transparent; border:0;
+}
+body[data-mir-client-pages] .mir-client-pages-nav>label { flex:1; min-width:0; display:block; margin:0; }
+body[data-mir-client-pages] .mir-client-pages-caption { position:absolute; width:1px; height:1px; clip-path:inset(50%); white-space:nowrap; overflow:hidden; }
+body[data-mir-client-pages] .mir-client-pages-nav select {
+  appearance:auto; width:100%; min-width:0; min-height:44px; padding:8px 30px 8px 12px;
+  border:1px solid #cfc7b8; border-radius:3px; background:#fffdf8; color:#242522;
+  font:500 15px/1.3 "DM Sans",Arial,sans-serif;
+}
+body[data-mir-client-pages] :is(.mir-client-pages-nav,.mir-client-list-controls)>button {
+  flex:0 0 44px; min-width:44px; width:44px; min-height:44px; height:44px;
+  padding:0; display:grid; place-items:center; border:1px solid #cfc7b8; border-radius:3px;
+  background:#fffdf8; color:#242522; font:400 20px/1 Arial,sans-serif;
+}
+body[data-mir-client-pages] :is(.mir-client-pages-nav,.mir-client-list-controls)>button:disabled { opacity:.42; cursor:default; }
+body[data-mir-client-pages] .mir-client-pages-nav output { min-width:34px; text-align:center; font:500 12px/1.3 "DM Sans",Arial,sans-serif; }
+body[data-mir-client-pages] .mir-client-list-controls { justify-content:flex-start; gap:12px; margin:8px 0 12px; }
+body[data-mir-client-pages] .mir-client-list-controls[hidden] { display:none!important; }
+body[data-mir-client-pages] .mir-client-list-controls output { flex:1; font-size:12px; line-height:1.4; text-align:center; }
+body[data-mir-client-pages] main>.mir-client-pages-nav { width:min(1200px,calc(100% - 40px)); }
+body[data-mir-client-pages] .mir-signature-footer { margin-top:12px!important; }
+
+/* Editorial sections retain their original photography, text and links. */
+body[data-mir-client-pages] :is(.mir-entry-intro,.mir-entry-steps,.mir-entry-next,.mir-contact,.mir-editorial-help,.mir-home-services) {
+  padding-top:12px!important; padding-bottom:12px!important; gap:24px;
+}
+body[data-mir-client-pages] .mir-prestige-home-hero { min-height:0!important; height:auto; }
+body[data-mir-client-pages] .mir-prestige-home-photo { min-height:0; margin:0; }
+body[data-mir-client-pages] .mir-prestige-home-photo img { min-height:0!important; height:100%; object-fit:cover; }
+body[data-mir-client-pages] .mir-prestige-home-copy { padding:20px 32px; }
+body[data-mir-client-pages] .mir-prestige-home-copy h1 { font-size:clamp(36px,4vw,56px); margin:10px 0 12px; }
+body[data-mir-client-pages] .mir-prestige-home-lead { margin:8px 0 12px; font-size:15px; line-height:1.4; }
+body[data-mir-client-pages] .mir-home-paths a { min-height:48px; padding:10px 0; }
+body[data-mir-client-pages] .mir-home-paths strong { font-size:21px; }
+body[data-mir-client-pages] .mir-home-paths small { font-size:12px; }
+body[data-mir-client-pages] .mir-home-discover { min-height:44px; margin-top:8px; display:flex; align-items:center; }
+body[data-mir-client-pages] .mir-home-service-media { height:180px!important; aspect-ratio:auto!important; }
+body[data-mir-client-pages] .mir-home-service-media img { object-fit:cover; height:100%; }
+body[data-mir-client-pages] .mir-home-service-copy { padding-top:12px; }
+body[data-mir-client-pages] .mir-home-service-copy strong { font-size:24px; }
+body[data-mir-client-pages] .mir-home-service-copy>span { display:block!important; }
+body[data-mir-client-pages] .mir-entry-intro figure { height:360px; aspect-ratio:auto; }
+body[data-mir-client-pages] :is(.mir-entry-intro h1,.mir-contact h1) { font-size:clamp(34px,4vw,52px); margin:10px 0 14px; }
+body[data-mir-client-pages] :is(.mir-entry-intro,.mir-contact-intro)>div>p { line-height:1.5; }
+body[data-mir-client-pages] .mir-entry-steps h2 { font-size:27px; margin:10px 0; }
+body[data-mir-client-pages] .mir-entry-steps p { margin:8px 0 12px; line-height:1.5; }
+body[data-mir-client-pages] .mir-client-contact-sections { display:block!important; }
+body[data-mir-client-pages] .mir-contact-details { max-width:720px; }
+body[data-mir-client-pages] .mir-contact-details>div { padding:14px 0; }
+body[data-mir-client-pages] .mir-contact-label { margin-bottom:7px; }
+body[data-mir-client-pages] .mir-contact-details :is(a,p) { font-size:18px; line-height:1.4; }
+body[data-mir-client-pages] .mir-contact-details .contact-phone { font-size:28px; }
+
+/* One answer at a time on phones; the existing search filter keeps ownership. */
+body[data-mir-client-pages="aide"] main { padding-top:12px!important; padding-bottom:0!important; }
+body[data-mir-client-pages="aide"] .mir-prestige-help-intro { padding-bottom:12px; gap:14px; }
+body[data-mir-client-pages="aide"] h1 { font-size:36px; margin:6px 0 10px; }
+body[data-mir-client-pages="aide"] .mir-prestige-help-intro p { margin:6px 0; line-height:1.5; font-size:14px; }
+body[data-mir-client-pages="aide"] .mir-prestige-help-grid { display:block; margin-top:0; }
+body[data-mir-client-pages="aide"] .mir-prestige-faq summary { padding:12px 0; min-height:44px; font-size:17px; }
+body[data-mir-client-pages="aide"] .mir-prestige-faq p { margin:8px 0 14px; font-size:15px; line-height:1.6; }
+body[data-mir-client-pages="aide"] .mir-prestige-help-grid aside { padding-top:12px; }
+
+/* Product overview / colour / quantity / technical documents are separate views. */
+body[data-mir-client-pages="produit"] main { width:min(1200px,calc(100% - 40px)); margin-inline:auto; }
+body[data-mir-client-pages="produit"] #product-detail { display:block!important; padding:0!important; }
+body[data-mir-client-pages="produit"] .mir-product-return { min-height:36px; margin:4px 0; font-size:13px; }
+body[data-mir-client-pages="produit"] .product-breadcrumb { margin:0; }
+body[data-mir-client-pages="produit"] .mir-product-title h1 { font-size:clamp(24px,3vw,36px); margin:5px 0 10px; line-height:1.12; }
+body[data-mir-client-pages="produit"] .mir-product-title .product-intro { margin:6px 0 12px; line-height:1.5; }
+body[data-mir-client-pages="produit"] .product-gallery { width:100%; max-width:500px; margin:0 auto 8px; }
+body.mir-prestige[data-commerce-view][data-mir-client-pages="produit"] .product-gallery { position:static!important; padding-block:0!important; }
+body[data-mir-client-pages="produit"] .product-main-photo { height:220px!important; min-height:0!important; aspect-ratio:auto!important; }
+body.mir-prestige[data-commerce-view][data-mir-client-pages="produit"] .product-gallery .product-main-photo { height:220px!important; }
+body[data-mir-client-pages="produit"] .product-main-photo :is(img,svg,canvas) { max-height:220px; object-fit:contain; }
+body[data-mir-client-pages="produit"] .mir-sample-note { margin:6px 0; font-size:11px; line-height:1.4; }
+body[data-mir-client-pages="produit"] .product-info { width:100%; max-width:760px; margin:0 auto; padding:0; }
+body[data-mir-client-pages="produit"] .product-color-section { margin:10px 0 0; }
+body[data-mir-client-pages="produit"] .product-color-heading { line-height:1.4; gap:8px; margin-bottom:8px; }
+body[data-mir-client-pages="produit"] .product-color-picker { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:6px; max-height:none; overflow:visible; }
+body.mir-prestige[data-commerce-view][data-mir-client-pages="produit"] .product-color-picker { grid-template-columns:repeat(8,minmax(0,1fr)); }
+body[data-mir-client-pages="produit"] .product-color-picker [data-color] { min-width:0; width:100%; min-height:44px; height:44px; margin:0; }
+body[data-mir-client-pages="produit"] .product-format { margin:12px 0; }
+body[data-mir-client-pages="produit"] .product-order-fields { margin:12px 0; }
+body[data-mir-client-pages="produit"] .product-info :is(input,select) { min-height:44px; font-size:16px!important; }
+body[data-mir-client-pages="produit"] .product-actions-main { margin:14px 0 8px; }
+body[data-mir-client-pages="produit"] .product-save-note { font-size:12px; line-height:1.5; margin:10px 0; }
+body[data-mir-client-pages="produit"] .mir-product-technical { margin:0; padding:0; }
+body[data-mir-client-pages="produit"] .mir-product-technical>summary { min-height:44px; padding:10px 0; }
+body[data-mir-client-pages="produit"] .product-docs { display:block; padding:0; margin:0; gap:0; }
+body[data-mir-client-pages="produit"] .product-docs h2 { font-size:24px; margin:12px 0; }
+body[data-mir-client-pages="produit"] .product-facts-table :is(th,td) { padding:8px; font-size:13px; line-height:1.4; overflow-wrap:anywhere; }
+body[data-mir-client-pages="produit"] .product-source-note { font-size:12px; line-height:1.4; margin:10px 0; }
+body[data-mir-client-pages="produit"] .product-resource { padding:12px 0; min-height:44px; }
+body[data-mir-client-pages="produit"] .product-related { padding:0; }
+body[data-mir-client-pages="produit"] .product-related h2 { font-size:25px; margin:8px 0 12px; }
+body[data-mir-client-pages="produit"] .related-grid .shop-card-photo { height:140px!important; aspect-ratio:auto; }
+body[data-mir-client-pages="produit"] .related-grid .shop-card-copy { padding-top:10px; }
+
+/* The cart keeps every line in the DOM. Only its presentation is paginated. */
+body[data-mir-client-pages="selection"] .selection-page { padding-bottom:0!important; }
+body[data-mir-client-pages="selection"] .mir-cart-return { min-height:32px; margin:4px 0; }
+body[data-mir-client-pages="selection"] .mir-cart-heading { margin-bottom:8px; padding-bottom:0; }
+body[data-mir-client-pages="selection"] .mir-cart-heading h1 { font-size:32px; margin:5px 0; }
+body[data-mir-client-pages="selection"] .mir-cart-heading p { font-size:13px; line-height:1.4; margin:6px 0; }
+body[data-mir-client-pages="selection"] .mir-cart-workspace { display:block; }
+body[data-mir-client-pages="selection"] .selection-item { padding:12px 0; gap:10px 12px; }
+body[data-mir-client-pages="selection"] .selection-item h2 { font-size:18px; margin:4px 0 8px; }
+body[data-mir-client-pages="selection"] .selection-item p { margin:5px 0; font-size:12px; line-height:1.4; }
+body[data-mir-client-pages="selection"] .selection-item :is(.mir-cart-color,.mir-cart-format) { margin:8px 8px 0 0; gap:4px; }
+body[data-mir-client-pages="selection"] .selection-item :is(input,select) { min-height:44px; padding:7px 9px; font-size:16px; }
+body[data-mir-client-pages="selection"] .selection-item .mir-line-amount { font-size:17px; }
+body[data-mir-client-pages="selection"] .selection-item .mir-line-amount small { margin-top:2px; }
+body[data-mir-client-pages="selection"] .selection-summary { margin-top:8px; padding-top:10px; font-size:12px; }
+body[data-mir-client-pages="selection"] .selection-summary small { font-size:11px; line-height:1.4; }
+body[data-mir-client-pages="selection"] .mir-cart-confirm { position:static; max-width:650px; padding:20px; gap:14px; }
+body[data-mir-client-pages="selection"] .mir-cart-confirm h2 { font-size:26px; }
+body[data-mir-client-pages="selection"] #mir-cart-amounts { padding:12px 0; }
+body[data-mir-client-pages="selection"] .mir-unified-dossier { margin:0; padding:0; border:0; }
+body[data-mir-client-pages="selection"] .mir-unified-head { gap:12px; }
+body[data-mir-client-pages="selection"] .mir-unified-head h2 { font-size:24px; margin:4px 0 8px; }
+body[data-mir-client-pages="selection"] .mir-unified-head p:not(.eyebrow) { margin:6px 0; font-size:12px; line-height:1.4; }
+body[data-mir-client-pages="selection"] #mir-unified-pieces { margin:8px 0; }
+body[data-mir-client-pages="selection"] #mir-unified-pieces li { padding:10px 0; line-height:1.5; }
+body[data-mir-client-pages="selection"] .mir-piece-exports { margin:8px 0; }
+body[data-mir-client-pages="selection"] .mir-unified-footnote { margin:8px 0; font-size:11px; line-height:1.4; }
+body[data-mir-client-pages="selection"] .mir-cart-project-links { margin:8px 0; }
+body[data-mir-client-pages="selection"] .mir-project-dossier .selection-project { padding:12px 0; }
+body[data-mir-client-pages="selection"] .selection-note { margin:8px 0; font-size:11px; line-height:1.4; }
+
+/* Existing estimate fields and handlers stay intact, including disabled states. */
+body[data-mir-client-pages="estimation"] main.wrap { max-width:760px; padding-bottom:0; }
+body[data-mir-client-pages="estimation"] .mir-checkout-back { min-height:32px; margin:4px 0; }
+body[data-mir-client-pages="estimation"] .estimate-intro { padding:0 0 8px; }
+body[data-mir-client-pages="estimation"] .estimate-intro h1 { font-size:31px; margin:5px 0 8px; }
+body[data-mir-client-pages="estimation"] .estimate-intro p { margin:5px 0; font-size:13px; line-height:1.4; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] #estimate-form { display:block; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] fieldset { padding:0; border:0; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] legend { font-size:16px; margin-bottom:4px; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] .estimate-fields { display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] label { margin:7px 0; gap:5px; font-size:13px; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] :is(input,textarea) { min-height:44px; padding:9px 11px; font-size:16px; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] #estimate-status { padding:8px 12px; margin:7px 0; font-size:12px; line-height:1.4; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] #estimate-source { margin:4px 0; font-size:11px; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] .estimate-review { padding:14px; margin:6px 0; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] .estimate-review h3 { font-size:23px; margin:0 0 10px; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] .estimate-review ul { margin:8px 0; line-height:1.4; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] :is(#estimate-draft-state,#estimate-errors,.estimate-privacy,#estimate-limits) { margin:6px 0; font-size:11px; line-height:1.4; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] #estimate-file-list { margin:8px 0; padding-left:18px; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] #estimate-file-list li { overflow-wrap:anywhere; font-size:12px; line-height:1.4; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] .estimate-submit { margin-top:6px; padding-top:6px; }
+body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] .mir-client-pages-nav { margin:8px 0 12px; }
+
+@media(max-width:759px) {
+  body[data-mir-client-pages] .mir-client-pages-nav { margin:8px auto 10px; }
+  body[data-mir-client-pages] .mir-client-pages-nav output { min-width:30px; font-size:11px; }
+  body[data-mir-client-pages] .mir-client-pages-nav select { font-size:14px; padding-left:8px; }
+  body[data-mir-client-pages] .mir-prestige-home-hero { display:flex; flex-direction:column; }
+  body[data-mir-client-pages] .mir-prestige-home-photo { width:100%; height:136px; aspect-ratio:auto; }
+  body[data-mir-client-pages] .mir-prestige-home-photo picture { display:block; height:100%; }
+  body[data-mir-client-pages] .mir-prestige-home-photo figcaption { bottom:8px; padding:5px 8px; font-size:9px; }
+  body[data-mir-client-pages] .mir-prestige-home-copy { padding:12px 20px; }
+  body[data-mir-client-pages] .mir-prestige-home-copy h1 { font-size:35px; line-height:1.05; letter-spacing:-1.2px; margin:0 0 10px; }
+  body[data-mir-client-pages] .mir-home-paths a { padding:8px 0; }
+  body[data-mir-client-pages] .mir-home-paths strong { font-size:19px; }
+  body[data-mir-client-pages] .mir-home-paths small { font-size:11px; }
+  body[data-mir-client-pages] .mir-home-discover { font-size:12px; margin-top:4px; min-height:40px; }
+  body[data-mir-client-pages] .mir-home-services { display:block!important; }
+  body[data-mir-client-pages] .mir-home-service-media { height:180px; }
+  body[data-mir-client-pages] .mir-home-service-copy { padding-top:10px; }
+  body[data-mir-client-pages] .mir-entry-intro { display:flex; flex-direction:column; gap:14px; }
+  body[data-mir-client-pages] .mir-entry-intro figure { width:100%; height:145px; }
+  body[data-mir-client-pages] .mir-entry-intro h1 { font-size:34px; margin:6px 0 10px; }
+  body[data-mir-client-pages] .mir-entry-intro>div>p:not(.eyebrow) { font-size:14px; line-height:1.45; margin:8px 0 12px; }
+  body[data-mir-client-pages] .mir-entry-steps { display:block; }
+  body[data-mir-client-pages] .mir-entry-steps article { padding:12px 0; }
+  body[data-mir-client-pages] .mir-contact h1 { font-size:35px; }
+  body[data-mir-client-pages] .mir-contact-intro>p:not(.eyebrow) { font-size:14px; line-height:1.5; }
+  body[data-mir-client-pages="aide"] h1 { font-size:30px; }
+  body[data-mir-client-pages="aide"] .mir-prestige-help-intro { display:block; }
+  body[data-mir-client-pages="aide"] .mir-prestige-help-search { margin-top:8px; }
+  body[data-mir-client-pages="produit"] .product-main-photo { height:170px!important; }
+  body.mir-prestige[data-commerce-view][data-mir-client-pages="produit"] .product-gallery .product-main-photo { height:170px!important; }
+  body[data-mir-client-pages="produit"] .product-main-photo :is(img,svg,canvas) { max-height:170px; }
+  body[data-mir-client-pages="produit"] .mir-product-title h1 { font-size:24px; }
+  body[data-mir-client-pages="produit"] .product-color-picker { grid-template-columns:repeat(6,minmax(0,1fr)); }
+  body.mir-prestige[data-commerce-view][data-mir-client-pages="produit"] .product-color-picker { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  body[data-mir-client-pages="produit"] .product-color-heading { flex-wrap:wrap; }
+  body[data-mir-client-pages="produit"] .product-quickfacts { margin:8px 0; }
+  body[data-mir-client-pages="produit"] .product-price-note { margin:8px 0; }
+  body[data-mir-client-pages="produit"] .related-grid { display:block!important; }
+  body[data-mir-client-pages="selection"] .selection-item { grid-template-columns:64px minmax(0,1fr) 32px; }
+  body[data-mir-client-pages="selection"] .selection-item-photo { width:64px; height:80px; }
+  body[data-mir-client-pages="selection"] .selection-item h2 { font-size:16px; }
+  body[data-mir-client-pages="selection"] .selection-qty { width:70px; }
+  body[data-mir-client-pages="selection"] .selection-unit { margin-left:6px; }
+  body[data-mir-client-pages="selection"] .mir-unified-head { display:block; }
+  body[data-mir-client-pages="selection"] .mir-unified-badge { padding:4px 0; }
+  body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages] .estimate-fields { grid-template-columns:1fr; }
+}
+@media(max-height:650px) {
+  body[data-mir-client-pages] .mir-prestige-home-photo { height:90px; }
+  body[data-mir-client-pages] .mir-prestige-home-copy { padding-block:8px; }
+  body[data-mir-client-pages] .mir-prestige-home-copy h1 { font-size:28px; }
+  body[data-mir-client-pages] .mir-home-paths a { padding:4px 0; }
+  body[data-mir-client-pages] .mir-home-paths strong { font-size:17px; }
+  body[data-mir-client-pages] .mir-entry-intro figure { height:110px; }
+  body[data-mir-client-pages="produit"] .product-main-photo { height:120px!important; }
+  body[data-mir-client-pages="produit"] .product-main-photo :is(img,svg,canvas) { max-height:120px; }
+}

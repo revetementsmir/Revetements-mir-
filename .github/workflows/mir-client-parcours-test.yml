@@ -1,0 +1,78 @@
+name: MIR — Parcours client TEST sans barre basse
+
+on:
+  push:
+    branches: [codex/client-parcours-test-20261117]
+    paths:
+      - 'dist/**'
+      - 'scripts/build-mir-test.cjs'
+      - 'scripts/build-prestige-preview.cjs'
+      - 'vercel.json'
+      - 'tests/mir-client-parcours-browser.cjs'
+      - 'tests/mir-client-parcours-logic.cjs'
+      - 'tests/helpers/mir-static-http.cjs'
+      - '.github/workflows/mir-client-parcours-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mir-client-parcours-test-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  client-parcours:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Record the exact reviewed source
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          rm -rf docs/verification/client-parcours-test-20261117
+          mkdir -p docs/verification/client-parcours-test-20261117
+          git show --no-patch --format=fuller HEAD > docs/verification/client-parcours-test-20261117/source.txt
+          git status --short >> docs/verification/client-parcours-test-20261117/source.txt
+      - name: Install the isolated browser runner
+        run: |
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2
+          npx playwright install --with-deps chromium
+          node -e 'const fs=require("fs"),{chromium}=require("playwright");fs.appendFileSync(process.env.GITHUB_ENV,"MIR_CHROMIUM_BIN="+chromium.executablePath()+"\n")'
+      - name: Check the acceptance script syntax
+        run: node --check tests/mir-client-parcours-browser.cjs
+      - name: Verify model preservation, fractions and order snapshots
+        run: |
+          node tests/mir-client-parcours-logic.cjs
+          node tests/mir-phase10-bending.cjs
+          node --test tests/mir-pliage-harmonie-geometry.cjs
+      - name: Prepare the exact earlier UI for visual comparison
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/mir-client-parcours-baseline" a2235c50466b0a21fecb7b1be8216dfd5006829c
+          node -e 'const fs=require("fs");fs.appendFileSync(process.env.GITHUB_ENV,"MIR_CLIENT_PARCOURS_BASELINE="+process.env.RUNNER_TEMP+"/mir-client-parcours-baseline/.prestige-preview\n")'
+      - name: Build the earlier guarded preview without new layout assertions
+        working-directory: ${{ runner.temp }}/mir-client-parcours-baseline
+        env:
+          VERCEL_GIT_COMMIT_SHA: a2235c50466b0a21fecb7b1be8216dfd5006829c
+        run: node scripts/build-prestige-preview.cjs
+      - name: Build the guarded preview for this SHA
+        env:
+          VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
+        run: node scripts/build-prestige-preview.cjs
+      - name: Exercise real client pages, dimensions, angles and local cart
+        run: node tests/mir-client-parcours-browser.cjs
+      - name: Save current acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-client-parcours-test-${{ github.sha }}
+          retention-days: 14
+          if-no-files-found: error
+          path: docs/verification/client-parcours-test-20261117/

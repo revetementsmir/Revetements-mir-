@@ -45,7 +45,7 @@
    next.addEventListener('click', () => { view.index++; paint(view); });
    controls.set(key, view);
   }
-  if (!view.nav.isConnected) host.after(view.nav);
+  if (!view.nav.isConnected) host.before(view.nav);
   if (items.length !== view.items.length) view.index = 0;
   view.items = items;
   view.size = size;
@@ -56,7 +56,8 @@
   view.count = Math.ceil(view.items.length / view.size);
   view.index = Math.max(0, Math.min(view.index, view.count - 1));
   view.items.forEach((item, index) => {
-   item.classList.toggle('client-viewport-off-page', Math.floor(index / view.size) !== view.index);
+   const start=Math.min(view.index*view.size,Math.max(0,view.items.length-view.size));
+   item.classList.toggle('client-viewport-off-page', index<start||index>=start+view.size);
   });
   document.querySelectorAll('#client-standard-options .client-model-group').forEach(group => {
    const visible = Array.from(group.querySelectorAll('[data-client-profile]'))
@@ -84,7 +85,7 @@
   for(const view of controls.values())view.nav.hidden=state!=='models'||view.count<=1;
   if (state === 'models') {
    paginate('Pages de modèles', '#client-saved-options [data-saved-template], #client-standard-options [data-client-profile]',
-    $('#client-model-options'), wide ? (innerHeight < 900 ? 4 : 8) : short ? 4 : 6);
+    $('#client-model-options'), 6);
 
   }
  }

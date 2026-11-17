@@ -52,19 +52,13 @@
     estimate.href=recipeHref('estimation.html',test);estimate.textContent='Estimation';
     let cart=actions.querySelector('.mir-public-cart');
     if(!cart){const initial=doc.querySelector('[data-list-count]')?.textContent||'0';cart=link(doc,'selection.html','Panier','boutique',current,test);cart.className='mir-public-cart';cart.innerHTML=`Panier <b data-list-count>${initial}</b>`;actions.insertBefore(cart,account);}
-    // The avatar is the sole Connexion/Compte entry. Bottom navigation provides
-    // destinations only, with the authenticated role decided by the portal.
-    // Only inner client pages use the mobile/tablet bottom rail.
-    actions.append(account); // Account avatar is always the rightmost header action.
-    if(current!=='index'&&!doc.querySelector('.mir-mobile-tabs')){
-      const tabs=doc.createElement('nav');tabs.className='mir-mobile-tabs';tabs.setAttribute('aria-label','Navigation mobile principale');
-      for(const [href,label,icon,key] of MOBILE){const a=link(doc,href,label,key,current,test);a.innerHTML=`<span aria-hidden="true">${icon}</span><small>${label}</small>`;tabs.append(a);}
-      doc.body.append(tabs);
-    }
+    actions.append(account);
+    // All client destinations are available from the header.
+    doc.querySelectorAll('.mir-mobile-tabs').forEach(node=>node.remove());
   }
   function init(win){
     const doc=win.document;
-    if(doc.documentElement.hasAttribute('data-mir-harmony'))return null;
+    if(doc.documentElement.hasAttribute('data-mir-harmony')||doc.querySelector('script[src^="mir-prestige.js"]'))return null;
     const header=doc.querySelector('header.mir-client-header, header.mir-home-header');
     const nav=header?.querySelector('nav.mir-client-links');
     if(!header||!nav||header.querySelector('.mir-client-menu-toggle'))return null;
@@ -75,12 +69,12 @@
     doc.body.classList.toggle('mir-public-home',current==='index');
     const media=win.matchMedia(BREAKPOINT);
     const isMobile=()=>{const viewport=header.closest('[data-mir-responsive-viewport]');return viewport?viewport.clientWidth<=1100:media.matches;};
-    const toggle=doc.createElement('button');toggle.type='button';toggle.className='mir-client-menu-toggle';toggle.textContent='Plus';
+    const toggle=doc.createElement('button');toggle.type='button';toggle.className='mir-client-menu-toggle';toggle.textContent='Menu';
     if(!nav.id)nav.id='mir-client-links-menu';
-    toggle.setAttribute('aria-controls',nav.id);toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ouvrir les liens utiles');header.insertBefore(toggle,nav);
+    toggle.setAttribute('aria-controls',nav.id);toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ouvrir le menu');header.insertBefore(toggle,nav);
     let mobile=false;
-    function close(restoreFocus=false){nav.hidden=true;header.classList.remove('mir-client-menu-open');toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ouvrir les liens utiles');if(restoreFocus)toggle.focus();}
-    function open(){nav.hidden=false;header.classList.add('mir-client-menu-open');toggle.setAttribute('aria-expanded','true');toggle.setAttribute('aria-label','Fermer les liens utiles');}
+    function close(restoreFocus=false){nav.hidden=true;header.classList.remove('mir-client-menu-open');toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ouvrir le menu');if(restoreFocus)toggle.focus();}
+    function open(){nav.hidden=false;header.classList.add('mir-client-menu-open');toggle.setAttribute('aria-expanded','true');toggle.setAttribute('aria-label','Fermer le menu');}
     function sync(){const now=isMobile();header.classList.toggle('mir-client-menu-ready',now);toggle.hidden=!now;if(!now){nav.hidden=false;header.classList.remove('mir-client-menu-open');toggle.setAttribute('aria-expanded','false');}else if(!mobile)close(false);mobile=now;}
     toggle.addEventListener('click',()=>{if(isMobile())(toggle.getAttribute('aria-expanded')==='true'?close:open)(true);});
     nav.addEventListener('click',event=>{if(isMobile()&&event.target.closest?.('a'))close(false);});
