@@ -35535,8 +35535,8 @@
     },
     {
       "id": "mir-request-mac-screws",
-      "brand": "À confirmer",
-      "name": "Vis pour revêtement MAC — référence à préciser",
+      "brand": "MAC Métal architectural",
+      "name": "Vis pour revêtement MAC — boîte de 500",
       "manufacturerCode": null,
       "sku": null,
       "family": "Fixation",
@@ -35544,18 +35544,21 @@
         "fastener",
         "accessory"
       ],
-      "description": "Vis pour revêtement MAC, selon la demande MIR. La photo montre une tête à empreinte carrée. Longueur, calibre, protection et quantité par emballage restent à préciser.",
-      "sourceUrl": null,
+      "description": "Vis pour revêtement MAC Métal architectural, boîte de 500. Référence détaillant 1790291. La longueur publiée est de 1½ po; une version du titre indique 1⅛ po. Longueur exacte à confirmer avec MIR.",
+      "sourceUrl": "https://boutique.aluminiumbbouchard.ca/produit/vis-mac-metal-1-1-2-500pcs/",
       "documents": [],
       "colors": [],
       "colorStatus": "not_applicable",
       "dimensions": {},
-      "packaging": {},
-      "unit": "À confirmer",
+      "packaging": {
+        "piecesPerBox": 500,
+        "unit": "boîte"
+      },
+      "unit": "boîte de 500 vis",
       "status": "pending_identity",
       "commercialStatus": "identity_incomplete_not_orderable",
       "orderable": false,
-      "orderableReason": "Longueur, calibre, référence fournisseur et conditionnement à préciser avant sélection.",
+      "orderableReason": "Longueur exacte et photo de cette référence à confirmer avant sélection.",
       "images": [],
       "primaryImage": null,
       "imageStatus": "missing_original_user_photo",
@@ -35565,21 +35568,45 @@
       "catalogueScope": "MIR_requested_product_identity_incomplete",
       "researchedOn": "2026-11-17",
       "notes": [
-        "Utilisation indiquée par MIR : « vis pour mac ». Le fabricant de la vis et la compatibilité exacte ne sont pas encore documentés.",
-        "Ne pas substituer une vis Light Trim Phillips/Torx ni attribuer une référence Kaycan à partir de cette photo."
+        "Référence fournie par MIR chez Aluminium B. Bouchard. Le code 1790291 est une référence détaillant, pas un SKU MIR.",
+        "Le prix et le stock du détaillant ne constituent pas le prix ou le stock MIR."
       ],
       "gaps": [
-        "Longueur, calibre, protection, fournisseur et quantité par emballage à préciser.",
+        "Longueur exacte, calibre et protection à confirmer.",
         "Prix et stock MIR à confirmer.",
-        "Photo originale transmise dans le message à intégrer."
+        "Photo originale du produit à intégrer."
       ],
       "sourceEvidence": {
         "kind": "MIR_user_provided_photo_and_text",
         "receivedOn": "2026-11-17",
         "messageImagePosition": 1,
         "userIdentification": "vis pour mac",
-        "originalFileAvailable": false
-      }
+        "originalFileAvailable": false,
+        "retailerPageReviewedOn": "2026-11-17",
+        "retailerProductCode": "1790291",
+        "linkedImageUrl": "https://boutique.aluminiumbbouchard.ca/wp-content/uploads/2023/11/Vis-Rialux-600x600.jpg",
+        "linkedImageDownloaded": false,
+        "lengthConflict": {
+          "observedTitleIn": 1.125,
+          "observedSpecificationsIn": 1.5,
+          "confirmation": "awaiting_MIR"
+        }
+      },
+      "retailerCode": "1790291",
+      "specifications": [
+        {
+          "label": "Conditionnement",
+          "value": "500 vis par boîte"
+        },
+        {
+          "label": "Référence détaillant",
+          "value": "Aluminium B. Bouchard — 1790291"
+        },
+        {
+          "label": "Longueur publiée",
+          "value": "1½ po dans les spécifications; 1⅛ po dans une version du titre — à confirmer"
+        }
+      ]
     }
   ],
   "schemaVersion": "5.2",

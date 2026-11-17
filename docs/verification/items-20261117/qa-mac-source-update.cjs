@@ -1,0 +1,43 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict'),{once}=require('node:events');
+const {chromium}=require('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const repo=path.resolve(__dirname,'../../..'),root=repo+'/dist',out=repo+'/docs/verification/items-20261117';
+const fieldFixture=require(repo+'/tests/helpers/mir-field-fixture.cjs');
+const fixtureSource=fs.readFileSync(root+'/portal-client.js','utf8')+';('+fieldFixture.toString()+')();'+`
+(()=>{const original=MIRPortalClient.create;MIRPortalClient.create=(...args)=>{const api=original(...args),start=api.start;api.start=async()=>{const catalogue=await(await fetch('catalogue-fd6866b49d21.json')).json();__fieldFixture.state.catalogue=MIREmployeeStore.buildCatalogue(catalogue);return start();};return api;};})();`;
+const types={'.html':'text/html','.js':'application/javascript','.json':'application/json','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.avif':'image/avif','.svg':'image/svg+xml'};
+const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://local').pathname));if(!file.startsWith(root+path.sep)||req.method!=='GET')return res.writeHead(404).end();fs.readFile(file,(error,bytes)=>{if(error)return res.writeHead(404).end();res.setHeader('content-type',types[path.extname(file)]||'application/octet-stream');res.end(bytes);});});
+(async()=>{
+ fs.mkdirSync(out,{recursive:true});server.listen(0,'127.0.0.1');await once(server,'listening');const base='http://127.0.0.1:'+server.address().port;
+ const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});const captures=[],checks=[],blocked=[],pageerrors=[];
+ const make=async(width,fixture=false)=>{const context=await browser.newContext({viewport:{width,height:width===390?844:1100},serviceWorkers:'block',reducedMotion:'reduce'});await context.route('**/*',r=>{const url=new URL(r.request().url());if(url.origin!==base||r.request().method()!=='GET'){blocked.push({host:url.host,path:url.pathname,method:r.request().method()});return r.abort();}if(fixture&&url.pathname==='/portal-client.js')return r.fulfill({contentType:'application/javascript',body:fixtureSource});return r.continue();});const page=await context.newPage();page.setDefaultTimeout(30000);page.on('pageerror',error=>pageerrors.push({width,fixture,message:error.message}));return {page,context};};
+ const capture=async(page,name,meta)=>{await page.evaluate(async()=>{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))]);await Promise.race([Promise.all([...document.images].filter(i=>{const r=i.getBoundingClientRect();return i.checkVisibility()&&r.bottom>0&&r.top<innerHeight;}).map(i=>i.decode().catch(()=>{}))),new Promise(r=>setTimeout(r,1500))]);});await page.screenshot({path:out+'/'+name+'.png',fullPage:false,animations:'disabled'});console.log('capture '+name);captures.push({file:name+'.png',...meta,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)});};
+
+ const id='mir-request-mac-screws';
+ try{
+  for(const width of [1440,390]){
+   const publicCtx=await make(width),p=publicCtx.page;
+   for(const query of ['MAC','1790291']){await p.goto(base+'/boutique.html?view=all&q='+encodeURIComponent(query));await p.locator('[data-shop-card="'+id+'"]').waitFor();checks.push({surface:'boutique-search',width,id,query,found:true});}
+   for(const language of ['fr-CA','en-CA']){
+    await p.evaluate(lang=>localStorage.setItem('mir-client-locale-v1',lang),language);await p.goto(base+'/produit.html?id='+id);await p.locator('#product-add').waitFor();await p.waitForFunction(lang=>document.documentElement.lang===lang,language);
+    if(language==='en-CA')await p.waitForFunction(()=>!/Ajout indisponible/.test(document.querySelector('#product-add').innerText));
+    assert.equal(await p.locator('#product-add').isDisabled(),true);
+    const visibleText=await p.locator('#product-detail').innerText();assert.match(visibleText,/500/);assert.match(visibleText,/1790291/);
+    const unit=await p.locator('#product-unit').evaluate(el=>({value:el.value,label:el.selectedOptions[0].textContent}));assert.equal(unit.value,'boîtes');assert.equal(unit.label,language==='en-CA'?'boxes':'boîtes');
+    assert.equal(await p.locator('#product-photo img').count(),0);
+    await p.evaluate(()=>scrollTo(0,0));await capture(p,'qa-boutique-vis-mac-'+(language==='en-CA'?'en-':'')+width,{surface:'boutique',language,width,id,simulated:false});
+    checks.push({surface:'boutique',language,width,id,unit,addDisabled:true,photoMissingExplicit:true,visibleText});
+   }
+   await publicCtx.context.close();
+   const reviewCtx=await make(width),r=reviewCtx.page,alerts=[];r.on('dialog',async dialog=>{alerts.push(dialog.message());await dialog.dismiss();});await r.goto(base+'/magasin-revue.html');await r.locator('#products [data-product]').first().waitFor();
+   await r.locator('#search').fill('MAC');const card=r.locator('[data-product="'+id+'"]');await card.waitFor();const reviewText=await card.innerText();assert.match(reviewText,/500/);await capture(r,'qa-magasin-revue-vis-mac-'+width,{surface:'magasin-revue',width,id,simulated:true,state:'Catalogue local et panier d’essai'});
+   await card.locator('[data-product-qty]').fill('2');await card.locator('[data-add]').click();assert.equal(await r.locator('#cart .cart-line').count(),0);assert.ok(alerts.length);assert.match(alerts[0],/Longueur exacte et photo/);checks.push({surface:'magasin-revue',width,id,visibleText:reviewText,cartLines:0,localRejection:alerts});await reviewCtx.context.close();
+   const fieldCtx=await make(width,true),f=fieldCtx.page;await f.goto(base+'/chantier.html?recette=1');await f.locator('#field-header').waitFor();await f.locator('#portal-navigation [data-view=command]').click();await f.locator('[data-field-catalogue=material]').click();
+   const filterSheet=await f.locator('[data-field-store-filters]').isVisible();if(filterSheet)await f.locator('[data-field-store-filters]').click();await f.locator('#catalogue-search').fill('MAC');if(filterSheet)await f.locator('#portal-dialog [data-close-dialog]').last().click();await f.locator('[data-field-product="'+id+'"]').click();const fieldCard=f.locator('.field-store-detail [data-product="'+id+'"]');await fieldCard.waitFor();const fieldText=await f.locator('.field-store-detail').innerText();assert.match(fieldText,/500/);
+   await capture(f,'qa-chantier-fixture-vis-mac-'+width,{surface:'chantier-terrain',width,id,simulated:true,state:'Vrai écran, snapshot fixture local; aucune connexion réelle'});
+   await fieldCard.locator('[data-product-qty]').fill('2');await fieldCard.locator('[data-add-item]').click();const toast=await f.locator('#portal-toast').innerText();assert.match(toast,/Longueur exacte et photo/);assert.equal(toast.includes('Article ajouté'),false);const calls=await f.evaluate(()=>__fieldFixture.calls.filter(x=>['order','command','upload','field'].includes(x[0])));assert.deepEqual(calls,[]);checks.push({surface:'chantier-terrain-fixture',width,id,visibleText:fieldText,toast,fixtureCalls:calls});await fieldCtx.context.close();
+  }
+ }finally{await browser.close();server.close();}
+ assert.deepEqual(pageerrors,[]);assert.ok(captures.every(x=>!x.overflow));
+ const report={sourceRoot:root,capturedAt:new Date().toISOString(),sourceUpdate:'Aluminium B. Bouchard retail page supplied by MIR; reference 1790291; box of 500; length unresolved; original photo unavailable.',captures,checks,pageerrors,blockedNetworkAttempts:blocked,externalRequestsTransmitted:0,realSubmissions:0,limitations:['Only MAC was rechecked; PRIME and Hardie captures are unchanged.','Length conflict remains 1⅛ in title / 1½ in specifications; no length selected or invented.','Employee UI screenshots marked fixture use the existing local test snapshot, not a connected server catalogue.','Retailer price/stock are not MIR price/stock. Original linked image is not available locally.']};fs.writeFileSync(out+'/qa-mac-source-update.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({captures:captures.length,checks:checks.length,pageerrors:pageerrors.length,blockedAttempts:blocked.length,externalTransmitted:0,success:true}));
+})().catch(error=>{console.error(error);server.close();process.exitCode=1;});

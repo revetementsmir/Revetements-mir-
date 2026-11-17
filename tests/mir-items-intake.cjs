@@ -87,21 +87,33 @@ check('La surcouche boutique conserve la référence noire et ajoute Étain viei
   assert.equal(prepared.keepProductPhoto, true);
 });
 
-check('Vis pour MAC : demande identifiée par usage, aucune référence commerciale inventée', () => {
-  assert.equal(mac.brand, 'À confirmer');
+check('Vis pour MAC : référence détaillant et boîte de 500, sans SKU ni longueur inventés', () => {
+  assert.equal(mac.brand, 'MAC Métal architectural');
+  assert.equal(mac.retailerCode, '1790291');
+  assert.equal(mac.sourceUrl, 'https://boutique.aluminiumbbouchard.ca/produit/vis-mac-metal-1-1-2-500pcs/');
   assert.equal(mac.manufacturerCode, null);
   assert.equal(mac.sku, null);
   assert.equal(mac.status, 'pending_identity');
   assert.equal(mac.orderable, false);
-  assert.equal(mac.unit, 'À confirmer');
+  assert.equal(mac.unit, 'boîte de 500 vis');
   assert.deepEqual(mac.dimensions, {});
-  assert.deepEqual(mac.packaging, {});
+  assert.deepEqual(mac.packaging, {piecesPerBox: 500, unit: 'boîte'});
+  assert.equal(Quantity.policy(mac).defaultUnit, 'boîtes');
   assert.deepEqual(mac.colors, []);
   assert.deepEqual(mac.images, []);
   assert.equal(mac.primaryImage, null);
   assert.equal(mac.sourceEvidence.userIdentification, 'vis pour mac');
   assert.equal(mac.sourceEvidence.originalFileAvailable, false);
-  assert.match(mac.notes.join(' '), /fabricant.*compatibilité exacte.*pas encore documentés/);
+  assert.equal(mac.sourceEvidence.linkedImageDownloaded, false);
+  assert.equal(mac.sourceEvidence.retailerProductCode, '1790291');
+  assert.deepEqual(mac.sourceEvidence.lengthConflict, {
+    observedTitleIn: 1.125,
+    observedSpecificationsIn: 1.5,
+    confirmation: 'awaiting_MIR'
+  });
+  assert.match(mac.notes.join(' '), /référence détaillant, pas un SKU MIR/);
+  assert.match(mac.orderableReason, /Longueur exacte.*photo/);
+  assert.ok(mac.specifications.some(spec => spec.label === 'Longueur publiée' && spec.value.includes('1½') && spec.value.includes('1⅛') && spec.value.includes('confirmer')));
 });
 
 check('Catalogue employé : références reprises, MAC et kit bloqués avant commande', () => {
@@ -122,7 +134,11 @@ check('Catalogue employé : références reprises, MAC et kit bloqués avant com
   const employeeMac = employee.find(item => item.id === macId);
   assert.equal(employeeMac.primaryImage, null);
   assert.equal(employeeMac.manufacturerReference, null);
-  assert.equal(employeeMac.unit, 'à confirmer');
+  assert.equal(employeeMac.sku, null);
+  assert.equal(employeeMac.unit, 'boîte');
+  assert.equal(employeeMac.packaging.piecesPerBox, 500);
+  assert.deepEqual(employeeMac.dimensions, {});
+  assert.equal(employeeMac.stockLengthIn, null);
   const primeLine = Store.configureLine({catalogue: employee}, {itemId: primeId, quantity: 1});
   assert.equal(primeLine.ok, true);
   assert.equal(primeLine.line.itemId, primeId);

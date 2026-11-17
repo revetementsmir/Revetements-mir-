@@ -3,6 +3,18 @@
 (function(root){
 'use strict';
 const entries = [
+["Vis pour revêtement MAC — boîte de 500","Screws for MAC siding — box of 500"],
+["Vis pour revêtement MAC Métal architectural, boîte de 500. Référence détaillant 1790291. La longueur publiée est de 1½ po; une version du titre indique 1⅛ po. Longueur exacte à confirmer avec MIR.","Screws for MAC Métal architectural siding, box of 500. Retailer reference 1790291. The published length is 1½ in.; one version of the title states 1⅛ in. Confirm the exact length with MIR."],
+["Longueur exacte et photo de cette référence à confirmer avant sélection.","Confirm the exact length and photo for this reference before selection."],
+["boîte de 500 vis","box of 500 screws"],
+["500 vis par boîte","500 screws per box"],
+["Référence détaillant","Retailer reference"],
+["Longueur publiée","Published length"],
+["1½ po dans les spécifications; 1⅛ po dans une version du titre — à confirmer","1½ in. in the specifications; 1⅛ in. in one version of the title — to be confirmed"],
+["Référence fournie par MIR chez Aluminium B. Bouchard. Le code 1790291 est une référence détaillant, pas un SKU MIR.","Reference supplied by MIR at Aluminium B. Bouchard. Code 1790291 is a retailer reference, not a MIR SKU."],
+["Le prix et le stock du détaillant ne constituent pas le prix ou le stock MIR.","The retailer's pricing and stock do not represent MIR pricing or stock."],
+["Longueur exacte, calibre et protection à confirmer.","Exact length, gauge and coating to be confirmed."],
+["Photo originale du produit à intégrer.","Original product photo to be added."],
 ["Ajout indisponible · fiche à compléter","Unavailable to add · details pending"],
 ["Référence exacte à confirmer avant sélection","Confirm the exact reference before selecting"],
 ["Photo non disponible · visuel de remplacement","Photo unavailable · placeholder image"],
