@@ -92,6 +92,37 @@ function unrelatedWallFinishes(inventory,selectedWallId){
 }
 function privateJSON(value){return JSON.stringify(value,(key,entry)=>['sourceImage','sourceImageDataUrl'].includes(key)?undefined:entry,2);}
 
+function decodeSourceRaster(dataUrl){
+  assert.equal(typeof dataUrl,'string','Persisted raster must be a data URL.');
+  const comma=dataUrl.indexOf(','),header=dataUrl.slice(0,comma),encoded=dataUrl.slice(comma+1);
+  const mime=header==='data:image/png;base64'?'image/png':header==='data:image/jpeg;base64'?'image/jpeg':null;
+  assert.ok(mime,'Persisted raster must be base64 PNG or JPEG.');
+  assert.ok(encoded.length>0&&encoded.length<=Math.ceil(64*1024*1024/3)*4&&encoded.length%4===0&&/^[A-Za-z0-9+/]+={0,2}$/.test(encoded),'Invalid or oversized persisted raster base64.');
+  const bytes=Buffer.from(encoded,'base64');
+  assert.ok(bytes.toString('base64')===encoded,'Persisted raster base64 must be canonical.');
+  const signature=mime==='image/png'?bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])):bytes.length>=4&&bytes[0]===255&&bytes[1]===216&&bytes[2]===255&&bytes.at(-2)===255&&bytes.at(-1)===217;
+  assert.ok(signature,'Persisted raster bytes do not match their MIME type.');
+  return {mime,extension:mime==='image/png'?'png':'jpg',bytes,sha256:crypto.createHash('sha256').update(bytes).digest('hex')};
+}
+
+function exportSourceRasters(inventory,caseOut,{projectId=null,phase='automatic-terminal-persisted-snapshot'}={}){
+  assert.ok(Array.isArray(inventory?.views)&&inventory.views.length,'Persisted inventory has no source views to export.');
+  const dir=path.join(fs.realpathSync(caseOut),'source-rasters');fs.mkdirSync(dir,{mode:0o700});
+  const manifest={schemaVersion:1,status:'in-progress',projectId,phase,method:'Exact persisted sourceImage data URL bytes; no PDF rerender, canvas decode or recompression.',views:[]};
+  const write=()=>fs.writeFileSync(path.join(dir,'manifest.json'),privateJSON(manifest),{mode:0o600});write();
+  try{
+    for(const [index,view] of inventory.views.entries()){
+      // The view ID and original client filename never become filesystem paths.
+      // Decode and release one encoded raster at a time; do not assemble a second
+      // array of all source images just to retain the private evidence.
+      const raster=decodeSourceRaster(view.payload?.sourceImage),name='view-'+String(index+1).padStart(3,'0')+'.'+raster.extension;
+      fs.writeFileSync(path.join(dir,name),raster.bytes,{mode:0o600,flag:'wx'});
+      manifest.views.push({viewId:view.id,fileId:view.fileId??view.sourceFileId??null,page:view.page,zone:view.zone??null,orientation:view.orientation??null,frame:view.frame??null,cropToRaster:view.frame?.cropToRaster??null,width:view.payload?.sourceWidth??null,height:view.payload?.sourceHeight??null,mime:raster.mime,sha256:raster.sha256,bytes:raster.bytes.length,path:'source-rasters/'+name});write();
+    }
+    manifest.status='exported';write();return {...manifest,manifestPath:'source-rasters/manifest.json'};
+  }catch(error){manifest.status='failed';manifest.error=error.message;write();throw error;}
+}
+
 function assertDeepEqual(actual,expected,message='Stored values changed.'){
   // Keep the same strict equality semantics without Node formatting enormous
   // raster strings into a character-by-character assertion diff on failure.
@@ -122,4 +153,4 @@ async function waitForAsync(check,{timeoutMs,intervalMs=100,now=Date.now,pause=m
   }
 }
 
-module.exports={TERMINAL_STATUSES,DEFAULT_EXPECTED,canonicalPath,within,outsideRepositories,parseArgs,evaluateProof,withoutFinish,levelGeometry,unrelatedWallFinishes,privateJSON,waitForAsync,assertDeepEqual};
+module.exports={TERMINAL_STATUSES,DEFAULT_EXPECTED,canonicalPath,within,outsideRepositories,parseArgs,evaluateProof,withoutFinish,levelGeometry,unrelatedWallFinishes,privateJSON,decodeSourceRaster,exportSourceRasters,waitForAsync,assertDeepEqual};

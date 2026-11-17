@@ -257,6 +257,20 @@ async function runCase(browser,base,item,config,app){
     proof.visibleStatus=await page.locator('#mir-level-status,#mir-conversion-report,#mir-pdf-error').allTextContents().catch(()=>[]);
     await page.screenshot({path:path.join(caseOut,'failure.png')}).catch(()=>{});
   }finally{
+    try{
+      // readSnapshot already obtained this inventory from IndexedDB. Preserve
+      // those exact encoded pixels before privateJSON omits the large strings
+      // and before the browser context (and its persisted project) is closed.
+      let inventory=proof.inventory,projectId=proof.imported?.id,phase='automatic-terminal-persisted-snapshot';
+      if(!inventory){
+        const saved=await page.evaluate(async()=>{if(!window.MIRProjectStore)return null;const e=await MIRProjectStore.getActive();return e?{id:e.id,inventory:e.planData?.viewInventory}:null;});
+        inventory=saved?.inventory;projectId=saved?.id;phase='final-persisted-snapshot-after-early-failure';
+      }
+      proof.sourceRasters=inventory?.views?.length?H.exportSourceRasters(inventory,caseOut,{projectId,phase}):{status:'not-available',reason:'No persisted imported inventory exists.'};
+    }catch(error){
+      proof.sourceRasters={status:'failed',message:error.message};
+      proof.failure??={message:'Private source raster export failed: '+error.message,stack:error.stack};
+    }
     proof.errors.server=app.errors.slice(serverErrorStart);
     Object.assign(proof,H.evaluateProof(proof,item.expected));proof.finishedAt=new Date().toISOString();proof.totalSeconds=(Date.now()-started)/1000;
     writePrivate(path.join(caseOut,'result.json'),proof);await context.close();

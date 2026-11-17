@@ -80,11 +80,17 @@
       return image.data[i + 3] > 160 && Math.max(r, g, b) - Math.min(r, g, b) <= 12 ? (r + g + b) / 3 : null;
     };
     const value = pixel(x, y); if (value === null || value < 235 || value > 249) return null;
-    const sides = [-1, 1].map(sign => [2, 4].map(offset => pixel(x + (axis ? sign * offset : 0), y + (axis ? 0 : sign * offset))));
-    if (sides.flat().some(v => v === null || v < 248 || v - value < 6)) return null;
-    const paper = sides.map(values => Math.min(...values));
-    if (Math.abs(paper[0] - paper[1]) > 4) return null;
-    return { point: [x, y], value, paper, contrast: Math.min(...paper) - value };
+    const sides = [-1, 1].map(sign => [2, 3, 4].map(offset => pixel(x + (axis ? sign * offset : 0), y + (axis ? 0 : sign * offset))));
+    if (sides.flat().some(v => v === null)) return null;
+    // A nearby digit or JPEG ringing may contaminate one paper sample.
+    // Require a majority of bright paper on EACH side, without changing the
+    // contrast floor, stroke range, continuity or mark/witness requirements.
+    const paper = sides.map(values => values.slice().sort((a, b) => a - b)[1]);
+    if (paper.some(v => v < 248 || v - value < 6) || Math.abs(paper[0] - paper[1]) > 4) return null;
+    // The nearest opposite margins must still be brighter than the stroke;
+    // a median must not convert a five-pixel grey band into a thin hairline.
+    if (sides.some(values => values[0] <= value)) return null;
+    return { point: [x, y], value, paper, contrast: Math.min(...paper) - value, marginSamples: sides, marginOffsets: [2, 3, 4], paperStatistic: 'median-per-side' };
   }
   function paperLineMask(image, base) {
     const data = base.data.slice(), w = image.width, h = image.height;
@@ -232,7 +238,17 @@
         // threshold for their line too. A fixed 50 px run discarded these
         // before the endpoint and caption checks could inspect them.
         const minRun = options.shortTicks ? Math.max(20, Math.min(50, options.minSpanPx ?? 55)) : 50;
-        const run = lineRun(mask, y, Math.round(cx), 4, minRun); if (!run) continue;
+        let run = lineRun(mask, y, Math.round(cx), 4, minRun), sourceLineSeed = null;
+        if (!run && localPaperContrast) {
+          // The caption centre may coincide with one JPEG-contaminated paper
+          // probe. Start on observed ink within two pixels, keeping the same
+          // run continuity and the original caption centre for association.
+          const nearby = [-1, 1, -2, 2].map(offset => ({ offset, run: lineRun(mask, y, Math.round(cx) + offset, 4, minRun) })).filter(c => c.run);
+          if (nearby.length && nearby.every(c => Math.abs(c.run.left - nearby[0].run.left) <= 2 && Math.abs(c.run.right - nearby[0].run.right) <= 2)) {
+            run = nearby[0].run; sourceLineSeed = { point: [Math.round(cx) + nearby[0].offset, y], captionCenter: [cx, y], maximumOffsetPx: 2, method: 'nearby-observed-ink-same-source-run' };
+          }
+        }
+        if (!run) continue;
         if (options.shortTicks) { let actual = 0; for (let x = run.left; x <= run.right; x++) actual += mask.data[y * mask.width + x]; if (actual / (run.right - run.left + 1) < .6) continue; }
         const ticks = intersections(mask, run, fh, options.shortTicks);
         for (let i = 0; i < ticks.length; i++) for (let j = i + 1; j < ticks.length; j++) {
@@ -245,7 +261,7 @@
           const centeringScore = 1 - centered / .2;
           const score = .5 * centeringScore + .3 * distanceScore + .2 * run.density;
           if (!best || score > best.score) {
-            const candidate = { text: dim.text, normalized: dim.normalized, referenceFt: dim.valueFt, anchors: [[a, y], [b, y]], spanPx: span, feetPerPixel: dim.valueFt / span, score, confidence: label.confidence ?? 100, source: label.source || 'ocr', textBox: label.box.slice(), corrected: dim.corrected, axis: options.axis || 'x' };
+            const candidate = { text: dim.text, normalized: dim.normalized, referenceFt: dim.valueFt, anchors: [[a, y], [b, y]], spanPx: span, feetPerPixel: dim.valueFt / span, score, confidence: label.confidence ?? 100, source: label.source || 'ocr', textBox: label.box.slice(), corrected: dim.corrected, axis: options.axis || 'x', ...(sourceLineSeed ? { sourceLineSeed } : {}) };
             const evidence = options.requireDimensionMarks || assessAssociation ? dimensionLineEvidence(image, candidate, { labels, allowCrossedTerminals: !!options.allowCrossedTerminals, localPaperContrast }) : null;
             if (eligible(evidence)) best = options.requireDimensionMarks ? { ...candidate, lineEvidence: evidence } : candidate;
           }
@@ -428,7 +444,7 @@
       if (ends.every(length => length <= Math.max(3, Math.ceil(font * .75)))) for (const marker of markers) if (marker.kind === 'unresolved-end-mark') { marker.kind = 'crossed-terminal-witnesses'; marker.terminalExtensions = ends.slice(); }
     }
     const evidence = { kind: 'dimension-line-with-end-marks-and-witnesses', axis: axis === 0 ? 'x' : 'y', anchors: anchors.map(p => p.slice()), captionBox: box.slice(), segments: gap ? [[point(span[0], coordinate), point(gap[0], coordinate)], [point(gap[1], coordinate), point(span[1], coordinate)]] : [anchors.map(p => p.slice())], gap: gap?.map(u => point(u, coordinate)) || null, pixelSupport, maxGap, markers,
-      ...(contrastCount ? { paperContrast: { method: 'opposing-local-paper-margins', pixels: contrastCount, minimumContrast, samples: contrastSamples, maximumStrokeWidthPx: 3, minimumPaperValue: 248 } } : {}) };
+      ...(contrastCount ? { paperContrast: { method: 'opposing-local-paper-margins', pixels: contrastCount, minimumContrast, samples: contrastSamples, maximumStrokeWidthPx: 3, minimumPaperValue: 248 } } : {}), ...(dimension.sourceLineSeed ? { sourceLineSeed: JSON.parse(JSON.stringify(dimension.sourceLineSeed)) } : {}) };
     if (pixelSupport < .85 || maxGap > 4 || count < 12) return unresolved('DIMENSION_LINE_SUPPORT', evidence);
     if (markers.some(m => !['diagonal-tick', 'compact-diagonal-tick', 'crossed-terminal-witnesses'].includes(m.kind) || !m.witnesses.length)) return unresolved('DIMENSION_END_MARKS_REQUIRED', evidence);
     // This opt-in path recovers long, consistently faded drafting strokes.
@@ -472,8 +488,10 @@
     const mapReading = r => ({ ...r, box: mapBox(r.box), ...(r.readingParts ? { readingParts: r.readingParts.map(mapReading) } : {}) });
     const q = [map([c.textBox[0], c.textBox[1]]), map([c.textBox[2], c.textBox[3]])];
     const result = { ...c, anchors: c.anchors.map(map), textBox: [Math.min(q[0][0], q[1][0]), Math.min(q[0][1], q[1][1]), Math.max(q[0][0], q[1][0]), Math.max(q[0][1], q[1][1])], axis: 'y' };
+    const mapSeed = seed => ({ ...seed, point: map(seed.point), captionCenter: map(seed.captionCenter) });
+    if (c.sourceLineSeed) result.sourceLineSeed = mapSeed(c.sourceLineSeed);
     if (c.sourceReading) result.sourceReading = mapReading(c.sourceReading);
-    if (['caption-interrupted-dimension-line', 'dimension-line-with-end-marks-and-witnesses'].includes(c.lineEvidence?.kind)) result.lineEvidence = { ...c.lineEvidence, ...(c.lineEvidence.axis ? { axis: 'y' } : {}), ...(c.lineEvidence.anchors ? { anchors: c.lineEvidence.anchors.map(map) } : {}), captionBox: result.textBox.slice(), segments: c.lineEvidence.segments.map(s => s.map(map)), gap: c.lineEvidence.gap?.map(map) || null, markers: c.lineEvidence.markers.map(m => ({ ...m, point: map(m.point), ...(m.strokeCenter ? { strokeCenter: map(m.strokeCenter) } : {}), ...(m.offAxisPixels ? { offAxisPixels: m.offAxisPixels.map(points => points.map(map)) } : {}), witnesses: m.witnesses.map(s => s.map(map)) })), ...(c.lineEvidence.paperContrast ? { paperContrast: { ...c.lineEvidence.paperContrast, samples: c.lineEvidence.paperContrast.samples.map(s => ({ ...s, point: map(s.point) })) } } : {}) };
+    if (['caption-interrupted-dimension-line', 'dimension-line-with-end-marks-and-witnesses'].includes(c.lineEvidence?.kind)) result.lineEvidence = { ...c.lineEvidence, ...(c.lineEvidence.axis ? { axis: 'y' } : {}), ...(c.lineEvidence.anchors ? { anchors: c.lineEvidence.anchors.map(map) } : {}), captionBox: result.textBox.slice(), segments: c.lineEvidence.segments.map(s => s.map(map)), gap: c.lineEvidence.gap?.map(map) || null, markers: c.lineEvidence.markers.map(m => ({ ...m, point: map(m.point), ...(m.strokeCenter ? { strokeCenter: map(m.strokeCenter) } : {}), ...(m.offAxisPixels ? { offAxisPixels: m.offAxisPixels.map(points => points.map(map)) } : {}), witnesses: m.witnesses.map(s => s.map(map)) })), ...(c.lineEvidence.paperContrast ? { paperContrast: { ...c.lineEvidence.paperContrast, samples: c.lineEvidence.paperContrast.samples.map(s => ({ ...s, point: map(s.point) })) } } : {}), ...(c.lineEvidence.sourceLineSeed ? { sourceLineSeed: mapSeed(c.lineEvidence.sourceLineSeed) } : {}) };
     return result;
   }
   function simplify(poly, tolerance = 2) {

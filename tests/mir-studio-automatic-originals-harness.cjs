@@ -57,8 +57,32 @@ try{
   write(items);fs.mkdirSync(path.join(neighbor,'new-proof'));assert.throws(()=>H.parseArgs(args,repo),/new directory/,'Old evidence cannot silently be reused.');
   const secondRepo=path.join(temp,'baseline');fs.mkdirSync(path.join(secondRepo,'dist'),{recursive:true});fs.writeFileSync(path.join(secondRepo,'dist','plan.html'),'baseline');
   assert.throws(()=>H.parseArgs(['--manifest',manifest,'--out',path.join(secondRepo,'proof'),'--repo-root',secondRepo],repo),/outside/,'The frozen comparison repo is protected too.');
+
+  const png='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jv5kAAAAASUVORK5CYII=';
+  const jpeg='/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AL+AD//Z';
+  const frame={pdfToRaster:[2,0,0,-2,0,200],cropToRaster:[1,0,0,1,20,30],rasterSize:[1,1],units:'pixels'};
+  const inventory={views:[{id:'../../client-name',fileId:'synthetic-file',page:1,zone:[20,30,1,1],orientation:270,frame,payload:{sourceWidth:1,sourceHeight:1,sourceImage:'data:image/png;base64,'+png}},{id:'other-view',page:2,payload:{sourceWidth:1,sourceHeight:1,sourceImage:'data:image/jpeg;base64,'+jpeg}}]};
+  const originalInventory=structuredClone(inventory),caseOut=path.join(neighbor,'raster-case');fs.mkdirSync(caseOut);
+  const exported=H.exportSourceRasters(inventory,caseOut,{projectId:'synthetic-project'});
+  assert.equal(exported.status,'exported');assert.equal(exported.views.length,2);
+  assert.deepEqual(exported.views.map(v=>v.path),['source-rasters/view-001.png','source-rasters/view-002.jpg'],'Untrusted view identifiers never determine private artifact paths.');
+  for(const [i,encoded] of [png,jpeg].entries()){
+    const file=path.join(caseOut,exported.views[i].path),bytes=Buffer.from(encoded,'base64');
+    assert.deepEqual(fs.readFileSync(file),bytes,'The actual persisted JPEG/PNG bytes must survive without a PDF rerender or recompression.');
+    assert.equal(exported.views[i].sha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+    assert.equal(fs.statSync(file).mode&0o777,0o600);
+  }
+  assert.deepEqual(exported.views[0].frame,frame);assert.deepEqual(exported.views[0].cropToRaster,[1,0,0,1,20,30]);
+  assert.deepEqual(inventory,originalInventory,'Capturing evidence must not mutate the persisted source observations.');
+  assert.ok(!H.privateJSON({inventory,sourceRasters:exported}).includes(png),'Large raster data URLs stay out of the JSON proof.');
+  assert.throws(()=>H.exportSourceRasters(inventory,caseOut),/EEXIST/,'Private raster evidence cannot silently overwrite a prior export.');
+  for(const invalid of ['https://example.invalid/source.png','data:image/svg+xml;base64,'+png,'data:image/png;base64,AB==','data:image/png;base64,AAAA=','data:image/png;base64,'+png+'\n','data:image/jpeg;base64,'+png])assert.throws(()=>H.decodeSourceRaster(invalid));
+  const failedOut=path.join(neighbor,'failed-raster-case');fs.mkdirSync(failedOut);
+  assert.throws(()=>H.exportSourceRasters({views:[inventory.views[0],{id:'missing-source',payload:{}}]},failedOut),/data URL/);
+  const partial=JSON.parse(fs.readFileSync(path.join(failedOut,'source-rasters','manifest.json')));
+  assert.equal(partial.status,'failed');assert.equal(partial.views.length,1,'Earlier exact rasters remain inspectable when a later source is missing.');
 }finally{fs.rmSync(temp,{recursive:true,force:true});}
-console.log('PASS automatic-originals harness: empty-model rejection, expected refusals, workflow completion, runtime failures, geometry/finish distinction and private output boundaries.');
+console.log('PASS automatic-originals harness: empty-model rejection, expected refusals, workflow completion, runtime failures, geometry/finish distinction, private output boundaries and exact persisted PNG/JPEG evidence.');
 
 (async()=>{
   let elapsed=0,calls=0;

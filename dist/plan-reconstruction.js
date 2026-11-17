@@ -156,7 +156,7 @@
   // Raster downsampling can leave true dimension lines paler than wall ink.
   // This extra path requires original neutral strokes, two diagonal marks
   // and continuing witnesses; it never relaxes the wall/legacy ink mask.
-  const longLabels=labels.filter(r=>(A.parseDimension(r.text,{ocr:r.source!=='pdf-text'})?.valueFt||0)>=9),pale=A.matchDimensionLines(image,longLabels,{shortTicks:true,allowTextGap:true,preferReliableReadings:true,lightConstructionLines:true,requireDimensionMarks:true,allowCrossedTerminals:true});
+  const longLabels=A.wordsToLabels(labels,{includeProvenance:true}).filter(r=>(A.parseDimension(r.text,{ocr:r.source!=='pdf-text'})?.valueFt||0)>=9),pale=A.matchDimensionLines(image,longLabels,{shortTicks:true,allowTextGap:true,preferReliableReadings:true,lightConstructionLines:true,requireDimensionMarks:true,allowCrossedTerminals:true});
   const matched=ordinary.slice();for(const candidate of pale){const same=matched.findIndex(r=>Math.abs(r.referenceFt-candidate.referenceFt)<1e-9&&r.textBox.every((n,i)=>Math.abs(n-candidate.textBox[i])<2));if(same<0)matched.push(candidate);else if(!matched[same].lineEvidence)matched[same]=candidate;}
   const observed=[],unresolvedReferences=[];
   for(const r of matched.filter(r=>r.referenceFt>=9&&r.spanPx>image.width*.18&&r.confidence>=0)){
