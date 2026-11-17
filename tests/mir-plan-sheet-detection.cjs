@@ -33,6 +33,32 @@ const duplicateTitle = S.viewsForPage(S.lines([
 ]), 500);
 assert.equal(duplicateTitle.length,1);
 assert.deepEqual(duplicateTitle[0].box,[52,350,141,365]);
+// Full-sheet plan titles occur under the drawing and again in a vertical
+// cartouche. They identify ONE level; an OCR duplicate is not a second plan.
+for(const [caption,kind,key] of [['PLAN NIVEAU 3','floor','floor-3'],['PLAN DE TOITURE','roof','plan de toiture']]){
+ const drawing={text:caption,box:[295,615,445,637],confidence:94,source:'ocr'};
+ const cartouche={text:caption,box:[875,530,985,552],confidence:98,source:'ocr'};
+ const legend={text:'ARCHITECTURE',box:[872,590,979,608],confidence:96,source:'ocr'};
+ const classified=S.viewsForPage([drawing,cartouche,legend],1000,700);
+ assert.equal(classified.length,1,'drawing caption and matching cartouche title are one sheet');
+ assert.equal(classified[0].kind,kind);
+ assert.equal(classified[0].key,key);
+ assert.deepEqual(classified[0].box,drawing.box,'the drawing title wins over the cartouche duplicate');
+ assert.equal(classified[0].sheetTitle.text,caption);
+ assert.equal(classified[0].sheetTitle.method,'matched-sheet-title-block-and-drawing-caption');
+ assert.deepEqual(classified[0].sheetTitle.box,cartouche.box);
+ assert.equal(S.divideViews(classified,1000,700).length,1,'duplicate titles cannot split a full drawing');
+ assert.equal(S.viewsForPage([cartouche,legend],1000,700).length,1,'the cartouche title still classifies a sheet when the smaller caption is missed');
+}
+assert.deepEqual(S.classify('PLAN NIVEAU 0'),{kind:'floor'});
+assert.deepEqual(S.classify('PLAN NIVEAU 3'),{kind:'floor'});
+assert.deepEqual(S.classify('PLAN DE TOITURE'),{kind:'roof'});
+// Two actual drawings in the drawing area remain two views; this correction
+// must not collapse legitimate multi-view PDF pages.
+const adjacent=S.viewsForPage([{text:'PLAN NIVEAU 2',box:[100,360,230,380],confidence:95},
+ {text:'PLAN NIVEAU 3',box:[560,360,690,380],confidence:95}],1000,700);
+assert.equal(adjacent.length,2);
+assert.deepEqual(adjacent.map(v=>v.key),['floor-2','floor-3']);
 const indexTitles=['Plan niveau 0','Plan niveau 1','Plan niveau 2','Plan niveau 3'].map((text,i)=>({
   text,box:[380,180+i*7,440,186+i*7],confidence:92,source:'ocr'
 }));
