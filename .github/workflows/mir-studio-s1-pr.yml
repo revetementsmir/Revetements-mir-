@@ -57,6 +57,7 @@ jobs:
           node tests/mir-studio-legend-occlusion.cjs
           node tests/mir-studio-exterior-reconstruction.cjs
           node tests/mir-studio-exterior-integration.cjs
+          node tests/mir-studio-entry-elements.cjs
           node tests/mir-studio-preview.cjs
           node tests/mir-studio-cotation.cjs
           node tests/mir-studio-job-reader.cjs
