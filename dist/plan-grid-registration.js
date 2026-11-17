@@ -30,7 +30,7 @@
    return {status:'unresolved',reason:'GRID_SOURCE_UNAVAILABLE',bubbles:[]};
   const {width:w,height:h}=image,N=24,dirs=Array.from({length:N},(_,i)=>[Math.cos(2*Math.PI*i/N),Math.sin(2*Math.PI*i/N)]);
   const score=(x,y,r)=>{let hits=0;for(const [u,v] of dirs)if(dark(image,x+u*r,y+v*r)||dark(image,x+u*(r-1),y+v*(r-1))||dark(image,x+u*(r+1),y+v*(r+1)))hits++;return hits/N;};
-  const minRadius=Math.max(7,Math.round(Math.min(w,h)*.007)),maxRadius=Math.min(38,Math.round(Math.min(w,h)*.024));
+  const minRadius=Math.max(7,Math.round(Math.min(w,h)*.007)),maxRadius=Math.min(42,Math.max(22,Math.round(Math.min(w,h)*.03)));
   const bands=[['number',[.08,.02,.83,.20]],['letter',[.06,.13,.20,.87]]],bubbles=[];
   for(const [kind,[xl,yl,xr,yb]]of bands){
    const rough=[];for(let y=Math.floor(h*yl);y<h*yb;y+=4)for(let x=Math.floor(w*xl);x<w*xr;x+=4){
