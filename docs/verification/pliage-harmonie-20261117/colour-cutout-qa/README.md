@@ -53,3 +53,11 @@ Les captures et résultats réellement produits seront téléversés dans l’ar
 ## Limites restantes
 
 La première exécution GitHub Actions et l’inspection de ses captures restent à faire. Aucun aperçu Vercel de cette reprise n’est encore déclaré livré dans ce rapport. Chromium simulé ne certifie ni Safari ni un téléphone physique. La galerie de la passation conserve ses preuves antérieures, distinctes des nouvelles vérifications de couleurs.
+
+## Première CI — correction de l’environnement
+
+Le workflow [44135422084](https://github.com/revetementsmir/Revetements-mir-/actions/runs/44135422084), exécuté sur le commit `5ccf9152a2090d448836177bd8948bb0ecd6f9a1`, a réussi les 19 contrats de données et la construction de l’aperçu TEST. Son installation navigateur a échoué : `ubuntu-latest` avait basculé vers Ubuntu 26.04, non pris en charge par Playwright 1.58.2 (`Playwright does not support chromium on ubuntu26.04-x64`). Les étapes navigateur ont donc été ignorées; aucune nouvelle capture ne découle de ce run.
+
+Correction limitée : fixer le runner à `ubuntu-24.04`. Les versions de dépendances, scénarios et assertions restent identiques. Ce changement ne corrige ni ne masque un défaut du site; une nouvelle exécution complète est nécessaire. Les captures historiques éventuellement présentes dans le premier artefact restent des preuves antérieures.
+
+Avant les essais, le checkout CI éphémère efface uniquement `preview-security-results.json`, `preview-browser.json` et les trois sorties `gallery-390.png`, `gallery-834.png`, `gallery-1440.png` concernées. Ces fichiers suivis en Git ne peuvent ainsi plus être réexportés comme de nouvelles preuves après une étape ignorée. Les dossiers et captures sources de la passation sont conservés. Les nouveaux résultats de couleurs indiquent leur phase, leurs empreintes et le SHA exécuté.

@@ -21,7 +21,7 @@ concurrency:
 jobs:
   isolated-visual-qa:
     name: Palettes et aperçu isolé
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       CI: 'true'
@@ -32,6 +32,13 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Clear only generated browser evidence from this checkout
+        run: |
+          rm -f docs/verification/prestige-20261117/preview-security-results.json
+          rm -f docs/verification/pliage-harmonie-20261117/preview-browser.json
+          for width in 390 834 1440; do
+            rm -f "docs/verification/pliage-harmonie-20261117/gallery-${width}.png"
+          done
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
