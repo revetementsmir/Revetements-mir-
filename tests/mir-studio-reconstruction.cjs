@@ -116,4 +116,28 @@ const foundationRaster=image(),foundationView={id:'foundation-elevation',frame,p
  assert.equal(R.partialScaleReferences(source,[first,{...second,confidence:20}],bounds).references.length,0,'low-confidence OCR excluded');
  }
 
+// Numbered level datums on elevations, as encountered in multi-storey plans.
+// Verify visible source guides and avoid silently multiplying storey heights.
+{
+ const im={width:1000,height:650,data:new Uint8ClampedArray(1000*650*4).fill(255)};
+ const levels=[['PLANCHER NIVEAU 0',625],['PLANCHER NIVEAU 1',580],['PLANCHER NIVEAU 2',470],['PLANCHER NIVEAU 3',380],['PLAFOND NIVEAU 3',300]];
+ for(const [,y] of levels)for(let x=740;x<=925;x++)im.data.set([0,0,0,255],(y*im.width+x)*4);
+ const view={id:'synthetic-numbered-elevation',frame:{units:'pixels'},payload:{drawingReadings:{rows:levels.map(([text,y])=>({text,box:[770,y-16,870,y-8],confidence:96,source:'ocr'}))}}};
+ const env={status:'proposed',box:[120,240,580,370]},guides=R.floorGuide(view,im,env);
+ assert.equal(guides.length,5,'all four numbered floors and labelled top ceiling are independently read');
+ assert.deepEqual(guides.filter(g=>g.datumType==='floor').map(g=>g.levelHint).sort(),['level-0','level-1','level-2','level-3']);
+ assert.equal(guides.find(g=>g.datumType==='ceiling').levelHint,'level-3');
+ assert.deepEqual(R.datumFromCaption('PLANCHER NIVEAU 0'),{levelHint:'level-0',datumType:'floor'});
+ assert.deepEqual(R.datumFromCaption('PLAFOND NIVEAU 3'),{levelHint:'level-3',datumType:'ceiling'});
+ assert.deepEqual(R.datumFromCaption('Dessus plancher R-D-C'),{levelHint:'ground',datumType:'floor'});
+ assert.equal(R.datumFromCaption('NOTE PLANCHER NIVEAU 1'),null,'a note is not a datum');
+ assert.equal(R.datumFromCaption('PLANCHER NIVEAU O'),null,'unverified OCR O does not become zero');
+ const sourceView={viewId:view.id,envelope:env,facing:{length:580},guides},inventory={views:[view]},reference={scale:.02,value:2,anchors:[[0,0],[100,0]],sourceViewId:'floor',kind:'written',status:'proposed'};
+ const exact=(level,expected)=>{const matches=R.heightFromLevelDatums([sourceView],level,reference,inventory);assert.equal(matches.length,1);assert.ok(Math.abs(matches[0].value-expected)<1e-9);assert.equal(matches[0].relationship,'two-visible-level-datums');assert.equal(matches[0].confirmationRequired,true);assert.equal(matches[0].sourceViewId,view.id);};
+ exact('level-0',.9);exact('level-1',2.2);exact('level-2',1.8);exact('level-3',1.6);
+ assert.equal(R.heightFromLevelDatums([sourceView],'level-4',reference,inventory).length,0,'an absent upper storey cannot borrow the main roof height');
+ assert.equal(R.heightFromLevelDatums([sourceView],'level-1',null,inventory).length,0,'a missing horizontal scale blocks height inference');
+ assert.equal(R.heightFromLevelDatums([{...sourceView,guides:guides.filter(g=>g.levelHint==='level-1')}],'level-1',reference,inventory).length,0,'only one datum is insufficient');
+ assert.equal(R.floorGuide(view,{...im,data:new Uint8ClampedArray(im.data.length).fill(255)},env).length,0,'OCR captions without visible guides cannot create floor elevations');
+}
 console.log('PASS reconstruction: automatic multi-retreat proposal, masks excluded, source frames retained, upper-only and unknown dimensions preserved, source-free elevations share physical walls/openings/material atlases; pointed ridges and continuous hip-roof junctions');
