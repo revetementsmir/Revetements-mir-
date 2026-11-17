@@ -1,5 +1,5 @@
 /* Local source-to-model proposals. Review is explicit; legacy projects are read only. */
-(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction-vision.js'):root.MIRReconstructionVision,node?require('./plan-import-core.js'):root.MIRPDFAnalysis,node?require('./plan-spatial-dimensions.js'):root.MIRSpatialDimensions,()=>node?require('./plan-grid-registration.js'):root.MIRGridRegistration,()=>node?require('./plan-roof-pitch-evidence.js'):root.MIRRoofPitchEvidence,()=>node?require('./plan-roof-plan-evidence.js'):root.MIRRoofPlanEvidence,()=>node?require('./plan-dimension-source-evidence.js'):root.MIRDimensionSourceEvidence);if(node)module.exports=api;else root.MIRPlanReconstruction=api;})(typeof window==='object'?window:globalThis,function(M,V,A,S,gridRegistration,roofPitchEvidence,roofPlanEvidence,dimensionSourceEvidence){
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction-vision.js'):root.MIRReconstructionVision,node?require('./plan-import-core.js'):root.MIRPDFAnalysis,node?require('./plan-spatial-dimensions.js'):root.MIRSpatialDimensions,()=>node?require('./plan-grid-registration.js'):root.MIRGridRegistration,()=>node?require('./plan-roof-pitch-evidence.js'):root.MIRRoofPitchEvidence,()=>node?require('./plan-roof-plan-evidence.js'):root.MIRRoofPlanEvidence,()=>node?require('./plan-dimension-source-evidence.js'):root.MIRDimensionSourceEvidence,()=>node?require('./plan-native-witness-measurement.js'):root.MIRNativeWitnessMeasurement);if(node)module.exports=api;else root.MIRPlanReconstruction=api;})(typeof window==='object'?window:globalThis,function(M,V,A,S,gridRegistration,roofPitchEvidence,roofPlanEvidence,dimensionSourceEvidence,nativeWitnessMeasurement){
  'use strict';
  const normal=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),size=v=>[v.payload.sourceWidth||v.zone?.[2]||v.frame?.rasterSize[0],v.payload.sourceHeight||v.zone?.[3]||v.frame?.rasterSize[1]];
  function readings(view){return view.payload.drawingReadings?.rows||[];}
@@ -324,7 +324,7 @@
   return floors.length?floors:observations;
  }
  function verticalReferenceAssessment(view){
-  const observations=view?.payload?.drawingReadings?.verticalDimensions||[],point=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite),references=[],unresolved=[];
+  const observations=view?.payload?.drawingReadings?.verticalDimensions||[],point=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite),references=[],unresolved=[],measurementIssues=[];
   for(const original of observations){
    const d=M.clone(original),native=d.nativeSource,proof=d.lineEvidence,anchors=d.anchors,span=anchors?.length===2&&anchors.every(point)?M.distance(...anchors):0;
    const sameFrame=d.sourceFrame&&view.frame&&JSON.stringify(d.sourceFrame)===JSON.stringify(view.frame),parsed=A.parseDimension(d.text||d.sourceReading?.text||'',{ocr:d.sourceReading?.source!=='pdf-text'});
@@ -332,14 +332,24 @@
    const datumMatches=span>10&&d.datumEvidence?.upper?.sourceViewId===view.id&&d.datumEvidence?.lower?.sourceViewId===view.id&&Number.isFinite(d.datumEvidence.upper.y)&&Number.isFinite(d.datumEvidence.lower.y)&&Math.abs(Math.min(...anchors.map(p=>p[1]))-d.datumEvidence.upper.y)<=2&&Math.abs(Math.max(...anchors.map(p=>p[1]))-d.datumEvidence.lower.y)<=2;
    const supported=datumMatches&&d.kind==='written'&&d.status==='proposed'&&d.sourceViewId===view.id&&sameFrame&&sourceMatches&&span>10&&Math.abs(anchors[0][0]-anchors[1][0])<=2&&Number.isFinite(d.value)&&d.value>0&&parsed&&Math.abs(parsed.valueFt*.3048-d.value)<.001&&proof?.status==='observed'&&proof.axis==='y'&&proof.anchors?.length===2&&proof.anchors.every((p,i)=>point(p)&&M.distance(p,anchors[i])<=1e-6)&&d.nativeLineEvidence?.status==='observed'&&d.datumEvidence?.lower&&d.datumEvidence?.upper;
    if(!supported||d.sourceReading?.source!=='pdf-text'&&!(d.confidence>=70)){unresolved.push({...d,scaleEligibility:'unresolved'});continue;}
+   if(d.measurementEvidence||d.measuredAnchors||d.originalAnchors){
+    const N=nativeWitnessMeasurement(),issues=N?.validate?N.validate(d,{view}):['NATIVE_WITNESS_MODULE_REQUIRED'];
+    if(issues.length){measurementIssues.push(...issues);unresolved.push({...d,scaleEligibility:'conflict',measurementIssues:issues});continue;}
+    if(d.measurementEvidence.status==='observed'){
+     // One normalisation point: consumers still use reference.anchors, while
+     // the raw observation and both original marker proofs remain intact.
+     const measuredScale=d.value/M.distance(...d.measuredAnchors);
+     references.push({...d,originalAnchors:M.clone(d.anchors),anchors:M.clone(d.measuredAnchors),label:d.text,scale:measuredScale,calibration:{...d.calibration,metresPerPixel:measuredScale},source:d.sourceReading?.source||'ocr',confirmationRequired:true});continue;
+    }
+   }
    references.push({...d,label:d.text,scale:d.value/span,source:d.sourceReading?.source||'ocr',confirmationRequired:true});
   }
   const assessment=M.referenceAssessment({id:view?.id,calibration:{}},references);
   // The level datum graph already requires independently written Y scales
   // to agree within one percent. Apply that same guard before choosing a
   // height, so the result cannot depend on the order of source captions.
-  if(assessment.spread>.01)assessment.conflict=true;
-  return {status:assessment.conflict?'conflict':assessment.scale?'proposed':observations.length?'unresolved':'not-found',references,unresolved,assessment,reference:assessment.scale?references.slice().sort((a,b)=>(b.confidence||0)-(a.confidence||0))[0]:null,confirmationRequired:true};
+  if(assessment.spread>.01||measurementIssues.length)assessment.conflict=true;
+  return {status:assessment.conflict?'conflict':assessment.scale?'proposed':observations.length?'unresolved':'not-found',references,unresolved,assessment,...(measurementIssues.length?{measurementIssues:[...new Set(measurementIssues)]}:{}),reference:assessment.scale?references.slice().sort((a,b)=>(b.confidence||0)-(a.confidence||0))[0]:null,confirmationRequired:true};
  }
  function heightFromLevelDatums(views,levelHint,reference,inventory,{includeAlternativePairs=false}={}){
   // No invented height: both limits must be visible on the same elevation.

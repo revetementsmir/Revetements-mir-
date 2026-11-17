@@ -24,9 +24,60 @@ line demonstrates that it is a suffix. The full inscription is not invented.
 The synthetic regression uses a real high-resolution structural outline and
 its two-times downsample to reproduce a false-positive end mark, in both axes.
 It verifies the native refusal, true conflicting dimensions, immutable source
-identity, cache boundaries, separate budget and cleanup. A private diagnostic
-on the already-refined D01 inventory is the next execution gate; it will be
-reported separately from a fresh full import.
+identity, cache boundaries, separate budget and cleanup. The private diagnostic
+on the already-refined D01 inventory has now executed at `50c4990`, with the
+real retained-PDF reader and no OCR. Five false associations are refused; the
+scale conflicts are removed and all four metric XY registrations are proposed.
+The scene is still empty because two long vertical-datum checks conflict.
+This isolated phase and rebuild are explicitly distinct from a fresh import.
+
+The 16 workflows at `50c4990` passed, including Studio run `44175813467` and
+the actual IndexedDB roof-return and registered-entry tests. Their invented
+drawings verify the implementation and persistence; they do not certify D01.
+
+### Native witness precision and the resumed original model
+
+The retained source evidence exposes a separate rounding problem. Native
+dimension marks were verified, but the calibration endpoints still inherited
+integer positions from the low-resolution datum guides. Extrapolating the
+short calibrated span across several levels can therefore produce a false
+inter-view disagreement. Source inspection supports measuring the actual
+rail/witness intersections in a bounded native crop, while preserving the
+original dimension proof, written value, confidence and observed datum guides.
+The implementation reuses the already-open factor-two native tile. It adds no
+OCR, no PDF rendering and no region to the shared twelve-candidate native
+budget. It measures neutral witness strokes on both sides of a validated
+dimension rail, outside the diagonal-tick stencil. Retained pixel samples can
+replay the centroid calculation; ambiguous, coloured, short or missing witness
+strokes cannot manufacture a precise endpoint. An unavailable precision result
+keeps the old reference and its existing conflicts. Written contradictions
+remain conflicts.
+
+The graph tolerance and reference-selection rules are unchanged. A single
+validated normalization in `verticalReferenceAssessment` supplies precise
+anchors to the existing scale consumers, with the original anchors and marker
+proofs preserved. The observed floor/ceiling guides are not moved. Persistence
+rechecks the source file/frame/crop/affines, retained reading and pixel proof,
+then the derived heights and level bases, even when a level has no entrance or
+roof. Unresolved drafts retain their readings too. Evidence loss or mutation
+aborts the transaction; finishes and legacy models remain supported.
+
+The private incremental candidate remeasured six usable D01 vertical dimensions
+from the retained original in 16.873 seconds, without OCR. Its rebuild took
+116.06 seconds. All four metric XY/Z registrations are proposed and the model
+now contains **16 walls, 41 openings and one roof**. Four actual `MIR3D`
+perspectives were generated in the Node adapter; orthographic SVG projections
+are separate diagnostics and are not substitutes for them. This is a partial
+model: the requested entrance/patio roofs and keyed exterior walls are still
+missing. It does not establish a new cold-import or browser fidelity receipt.
+
+Synthetic regressions reproduce two failing long datum checks with rounded
+endpoints, then pass using real native raster measurements and unchanged
+tolerances. True written conflicts and displaced floor guides still fail.
+The browser gate covers actual IndexedDB save/reload, two levels without roofs
+or entries, both written and derived heights, native evidence loss, unchanged
+source views, finishes, unresolved drafts and legacy data. Its result must be
+reported for the exact pushed head; a local fixture is not an IndexedDB run.
 
 The resumed work starts from pushed revision `888b322`; it does not recover or
 claim validation of the stopped session's unpushed local changes. PR 44 remains

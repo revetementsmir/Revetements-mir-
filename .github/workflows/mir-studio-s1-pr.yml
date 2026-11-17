@@ -55,7 +55,7 @@ jobs:
         run: |
           git fetch origin "$MIR_CLIENT_BASE_SHA" --depth=1
           git diff --check
-          for file in dist/plan-import.js dist/plan-sheet-detection.js dist/plan-scan-ocr.js dist/plan-view-inventory.js dist/plan-view-review.js dist/project-store.js dist/plan-app.js dist/takeoff-app.js dist/plan-level-model.js dist/plan-reconstruction*.js dist/plan-reconstructed*.js dist/plan-keyed-wall-observations.js dist/plan-scene-order.js dist/plan-level-studio.js dist/studio*.js dist/mir-private-document-viewer.js; do node --check "$file"; done
+          for file in dist/plan-import.js dist/plan-sheet-detection.js dist/plan-scan-ocr.js dist/plan-view-inventory.js dist/plan-view-review.js dist/project-store.js dist/plan-app.js dist/takeoff-app.js dist/plan-level-model.js dist/plan-reconstruction*.js dist/plan-reconstructed*.js dist/plan-keyed-wall-observations.js dist/plan-native-witness*.js dist/plan-scene-order.js dist/plan-level-studio.js dist/studio*.js dist/mir-private-document-viewer.js; do node --check "$file"; done
           node --check tests/mir-studio-entry-assemblies-browser.cjs
           node tests/mir-studio-s1.cjs
           node tests/mir-studio-s2.cjs
@@ -70,6 +70,7 @@ jobs:
           node tests/mir-studio-neighbouring-measurements.cjs
           node tests/mir-studio-dimension-word-retry.cjs
           node tests/mir-studio-native-vertical-dimensions.cjs
+          node tests/mir-studio-native-witness-measurement.cjs
           node tests/mir-studio-native-horizontal-dimensions.cjs
           node tests/mir-studio-native-dimension-association.cjs
           node tests/mir-studio-native-height-scale.cjs
@@ -178,6 +179,8 @@ jobs:
         run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-roof-plan-store-browser.cjs
       - name: Registered entry levels and source persistence (synthetic only)
         run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-registered-entry-store-browser.cjs
+      - name: Native witness precision and source persistence (synthetic only)
+        run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-native-witness-store-browser.cjs
       - name: Existing large PDF, rendering and interaction regressions
         run: |
           node tests/mir-plan-pdf-browser.cjs

@@ -255,12 +255,13 @@
    const index=rows.findIndex(r=>r.id===pair.id);if(index>=0)rows[index]=observation;else rows.push(observation);evidence.push({sourceViewId:view.id,source:'native-horizontal-dimension',purpose:'source-horizontal-dimension-line',...observation,box:observation.textBox.slice()});progress(used,capacity,view.page);
   }return evidence;
  }
- async function verifyVerticalDimension(native,view,pair){
+ async function verifyVerticalDimension(native,view,pair,{cancelled=()=>false}={}){
   const A=root.MIRPDFAnalysis,base=JSON.parse(JSON.stringify(pair)),unresolved=reason=>({...base,status:'unresolved',reason});
   if(!A?.dimensionLineEvidence||pair.sourceViewId!==view.id||JSON.stringify(pair.sourceFrame)!==JSON.stringify(view.frame))return unresolved('VERTICAL_DIMENSION_SOURCE_MISMATCH');
   const parsed=A.parseDimension(pair.text,{ocr:pair.sourceReading?.source!=='pdf-text'}),sourceRows=view.payload.drawingReadings?.verticalRows||[],sourceReading=sourceRows.some(row=>row.text===pair.text&&row.confidence===pair.confidence&&row.box?.length===4&&row.box.every((n,i)=>n===pair.textBox[i]));
   const datums=[pair.datumEvidence?.upper,pair.datumEvidence?.lower],validDatum=g=>g?.sourceViewId===view.id&&JSON.stringify(g.sourceFrame)===JSON.stringify(view.frame)&&g.sourceGuide?.support>=.7&&g.sourceGuide.anchors?.length===2&&g.sourceGuide.anchors.every(p=>p.length===2&&p.every(Number.isFinite)&&p[1]===g.y);
   if(!sourceReading||!parsed||Math.abs(parsed.valueFt*.3048-pair.value)>1e-9||!datums.every(validDatum))return unresolved('VERTICAL_DIMENSION_SOURCE_MISMATCH');
+  if(cancelled())return unresolved('VERTICAL_DIMENSION_CANCELLED');
   const tile=await nativeDimensionTile(native,view,pair.region,view.payload.drawingReadings?.verticalRows||[]);if(tile.status!=='proposed')return unresolved(tile.reason||'SOURCE_PDF_UNAVAILABLE');
   try{
    const {image,map,back,labels}=tile,textBox=[...map(pair.textBox.slice(0,2)),...map(pair.textBox.slice(2))],y0=map([0,pair.datumEvidence.upper.y])[1],y1=map([0,pair.datumEvidence.lower.y])[1],candidates=[];
@@ -275,13 +276,16 @@
    base.candidateEvidence=candidates;
    if(groups.length!==1)return {...base,status:'unresolved',reason:groups.length?'VERTICAL_DIMENSION_ASSOCIATION_AMBIGUOUS':candidates.some(c=>c.lineEvidence.reason==='DIMENSION_INTERMEDIATE_MARKS')?'DIMENSION_INTERMEDIATE_MARKS':'VERTICAL_DIMENSION_SOURCE_MARKS_REQUIRED'};
    const captionCenter=(pair.textBox[0]+pair.textBox[2])/2,chosen=groups[0].sort((a,b)=>b.lineEvidence.pixelSupport-a.lineEvidence.pixelSupport||Math.abs(a.anchors[0][0]-captionCenter)-Math.abs(b.anchors[0][0]-captionCenter))[0];
-   return {...base,...chosen,status:'proposed',calibration:{kind:'estimated-calibrated',axis:'y',metresPerPixel:pair.value/Math.abs(chosen.anchors[1][1]-chosen.anchors[0][1]),sourceReferenceId:pair.id,confirmationRequired:true}};
+   // Reuse this already bounded factor-two tile. Precision neither spends a
+   // further region nor changes the original detected marks or datum guides.
+   const precision=root.MIRNativeWitnessMeasurement?.measure(image,{nativeLineEvidence:chosen.nativeLineEvidence,sourceAnchors:chosen.anchors,nativeSource:tile.provenance},{cancelled});
+   return {...base,...chosen,status:'proposed',...(precision?{measurementEvidence:precision.measurementEvidence,...(precision.status==='observed'?{measuredAnchors:precision.measuredAnchors}:{})}:{}),calibration:{kind:'estimated-calibrated',axis:'y',metresPerPixel:pair.value/Math.abs(chosen.anchors[1][1]-chosen.anchors[0][1]),sourceReferenceId:pair.id,confirmationRequired:true}};
   }finally{tile.release();}
  }
  async function refineVerticalDimensions(inventory,buildingId,sourceImages,native,{cancelled=()=>false,progress=()=>{},maxRegions=12,budget:sharedBudget=null}={}){
   const work=inventory.views.filter(v=>v.buildingId===buildingId).flatMap(view=>verticalDimensionPairs(view,sourceImages[view.id]).map(pair=>({view,pair}))).sort((a,b)=>b.pair.confidence-a.pair.confidence),evidence=[],budget=Number.isFinite(maxRegions)?Math.max(0,Math.min(12,Math.floor(maxRegions))):12;
   for(let i=0;i<work.length;i++){
-   const {view,pair}=work[i],observation=cancelled()?{...pair,reason:'VERTICAL_DIMENSION_CANCELLED'}:i>=budget||sharedBudget&&sharedBudget.remaining<=0?{...pair,reason:'VERTICAL_DIMENSION_BUDGET'}:await (async()=>{if(sharedBudget)sharedBudget.remaining--;return verifyVerticalDimension(native,view,pair);})();
+   const {view,pair}=work[i],observation=cancelled()?{...pair,reason:'VERTICAL_DIMENSION_CANCELLED'}:i>=budget||sharedBudget&&sharedBudget.remaining<=0?{...pair,reason:'VERTICAL_DIMENSION_BUDGET'}:await (async()=>{if(sharedBudget)sharedBudget.remaining--;return verifyVerticalDimension(native,view,pair,{cancelled});})();
    const rows=view.payload.drawingReadings.verticalDimensions||=([]),index=rows.findIndex(r=>r.id===observation.id);if(index>=0)rows[index]=observation;else rows.push(observation);
    evidence.push({sourceViewId:view.id,source:'native-vertical-dimension',purpose:'source-datum-bound-vertical-dimension',...observation,box:observation.textBox.slice()});if(i<budget)progress(i+1,Math.min(work.length,budget),view.page);
   }

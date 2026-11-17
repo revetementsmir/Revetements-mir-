@@ -17,6 +17,15 @@
     return { ...entry, planData, takeoffSeed, projectData: planData, takeoffData: takeoffSeed };
   }
   function activeId() { try { return localStorage.getItem(ACTIVE) || null; } catch (_) { return null; } }
+  function guardNativeWitnesses(next,previous,inventory){
+    const guard=window.MIRNativeWitnessStore;
+    if(!guard){
+      const carries=value=>value&&typeof value==='object'&&(Object.prototype.hasOwnProperty.call(value,'measurementEvidence')||Object.prototype.hasOwnProperty.call(value,'measuredAnchors')||Object.prototype.hasOwnProperty.call(value,'originalAnchors')||Object.values(value).some(carries));
+      if(carries(next)||carries(previous))throw new Error('Le contrôle des mesures natives est indisponible.');
+      return;
+    }
+    if(guard.sourceIssues(next,inventory).length||guard.historyIssues(next,previous).length)throw new Error('Les mesures natives et leurs sources doivent être conservées.');
+  }
   async function getActive() { const id = activeId(); return id ? alias(await request('readonly', store => store.get(id))) : null; }
   async function get(id) { if (!/^pdf-[a-zA-Z0-9-]{6,100}$/.test(id || '')) return null; return alias(await request('readonly', store => store.get(id))); }
   async function saveActive(entry) {
@@ -48,6 +57,7 @@
         if((current?current.geometryRevision||0:null)!==expectedRevision)throw new Error('Ce niveau a changé dans une autre fenêtre. Rechargez avant de réappliquer votre brouillon.');
         const next=JSON.parse(JSON.stringify(level));next.geometryRevision=(expectedRevision||0)+1;
         if(index<0)inventory.levels.push(next);else inventory.levels[index]=next;
+        guardNativeWitnesses(next,current,inventory);
         if(window.MIRStudioExterior&&(MIRStudioExterior.registeredSourceIssues(next,inventory).length||MIRStudioExterior.historyIssues(next,current).length))throw new Error('Les repères et les sources des entrées doivent être conservés.');
         if(window.MIRReconstructedRoofs)for(const roof of current?.reconstructedRoofs||[])if(MIRReconstructedRoofs.pitchHistoryIssues(next.reconstructedRoofs?.find(r=>r.id===roof.id),roof).length||MIRReconstructedRoofs.planHistoryIssues(next.reconstructedRoofs?.find(r=>r.id===roof.id),roof).length)throw new Error('Les sources de toiture doivent être conservées.');
         if(window.MIRReconstructedRoofs)for(const roof of next.reconstructedRoofs||[]){if(MIRReconstructedRoofs.issues(roof,{confirm:roof.status!=='proposed'||next.reconstruction?.status!=='automatic-proposal'}).length||MIRReconstructedRoofs.pitchSourceIssues(roof,inventory).length||MIRReconstructedRoofs.planSourceIssues(roof,inventory).length||MIRReconstructedRoofs.pitchHistoryIssues(roof,current?.reconstructedRoofs?.find(r=>r.id===roof.id)).length||MIRReconstructedRoofs.planHistoryIssues(roof,current?.reconstructedRoofs?.find(r=>r.id===roof.id)).length||roof.levelId!==levelId||roof.buildingId!==buildingId||[roof,...(roof.extensions||[])].flatMap(r=>r.sources).some(s=>!inventory.views.some(v=>v.id===s.sourceViewId&&v.buildingId===buildingId&&v.kind==='elevation')))throw new Error('Toiture ou sources invalides.');}if(window.MIRLevelModel){for(const plane of next.observedPlanes||[])if((plane.status==='confirmed'||next.reconstruction?.status==='automatic-proposal')&&MIRLevelModel.observedPlaneIssues(plane,inventory,next,{confirm:plane.status==='confirmed'}).length)throw new Error('Murs observés ou mesures invalides.');for(const contour of next.contours||[])if((contour.status==='confirmed'||next.reconstruction?.status==='automatic-proposal')&&MIRLevelModel.validateDraft(contour,inventory,next,{confirm:contour.status==='confirmed'}).length)throw new Error('Contour ou mesures invalides.');next.wallPlanes=MIRLevelModel.wallsFor(next,inventory);}
@@ -71,7 +81,10 @@
         if(new Set(next.levels.map(l=>l.id)).size!==next.levels.length)throw Error('Niveaux dupliqués.');
         const retries=next.localReadingRetries||[];
         if(!Array.isArray(retries)||retries.some(r=>!inventory.views.some(v=>v.id===r.sourceViewId&&v.buildingId===buildingId)||r.box?.length!==4||!r.box.every(Number.isFinite)))throw Error('Sources de lecture invalides.');
-        for(const level of next.levels)if(level.reconstruction?.proposal)level.reconstruction.proposal.localReadingRetries=JSON.parse(JSON.stringify(retries));
+        for(const level of next.levels){
+          if(level.reconstruction?.proposal)level.reconstruction.proposal.localReadingRetries=JSON.parse(JSON.stringify(retries));
+          if(level.reconstructionDraft)level.reconstructionDraft.localReadingRetries=JSON.parse(JSON.stringify(retries));
+        }
         // Validate cross-level sources against the complete proposed set, not
         // the incidental insertion order. Imported source rows stay unchanged.
         const validationInventory={...inventory,levels:[...inventory.levels.filter(l=>!next.levels.some(n=>n.id===l.id)),...next.levels]};
@@ -80,6 +93,7 @@
         for(const level of next.levels){
           const index=inventory.levels.findIndex(l=>l.id===level.id),old=inventory.levels[index];
           if(level.buildingId!==buildingId||old&&MIRReconstructionPipeline.protectedLevel(old))throw Error('Un niveau modifié est conservé.');
+          guardNativeWitnesses(level,old,validationInventory);
           for(const c of level.contours||[])if(c.status!=='proposed'||MIRLevelModel.validateDraft(c,inventory,level).length)throw Error('Contour proposé invalide.');
           for(const p of level.observedPlanes||[])if(p.status!=='proposed'||MIRLevelModel.observedPlaneIssues(p,inventory,level,{confirm:false}).length)throw Error('Murs proposés invalides.');
           for(const roof of level.reconstructedRoofs||[])if(roof.status!=='proposed'||MIRReconstructedRoofs.issues(roof,{confirm:false}).length||MIRReconstructedRoofs.pitchSourceIssues(roof,validationInventory).length||MIRReconstructedRoofs.planSourceIssues(roof,validationInventory).length||roof.levelId!==level.id||roof.buildingId!==buildingId||[roof,...(roof.extensions||[])].flatMap(r=>r.sources).some(s=>!inventory.views.some(v=>v.id===s.sourceViewId&&v.buildingId===buildingId&&v.kind==='elevation')))throw Error('Toiture proposée invalide.');
