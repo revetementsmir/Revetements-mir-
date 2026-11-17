@@ -55,4 +55,21 @@ const missingGap={levelId:upper.id,views:[{viewId:front.id,direction:'front',env
 strokeFrame([0,0,0]);const recovered=R.openingsFor(missingGap,original,{[front.id]:frameImage},upper.contours[0]);assert.equal(recovered.length,1);assert.equal(recovered[0].sourceViewId,front.id);assert.equal(recovered[0].floorCorrespondence.status,'unresolved');assert.equal(recovered[0].status,'proposed');assert.ok(Math.abs(recovered[0].width-2)<.05);
 missingGap.views[0].envelope.occlusions=[[280,360,150,120]];assert.equal(R.openingsFor(missingGap,original,{[front.id]:frameImage},upper.contours[0]).length,0,'a legend mask cannot create an opening');
 missingGap.views[0].envelope.occlusions=[];strokeFrame([0,200,0]);assert.equal(R.openingsFor(missingGap,original,{[front.id]:frameImage},upper.contours[0]).length,0,'a coloured annotation is not an aperture');
+// Multi-floor imports must preserve calibrated source diagnostics even when
+// the floors have no proven shared XY / vertical datum.
+{
+ const I=require('../dist/plan-view-inventory.js');
+ const viewRows=[{page:1,name:'Plan RDC Maison',kind:'floor'},{page:2,name:'Plan étage Maison',kind:'floor'}].map(v=>({...v,sourceWidth:1000,sourceHeight:650,sourceCrop:[0,0,1000,650]}));
+ const multiple=I.create(viewRows,{filename:'synthetic-two-floor.pdf',bytes:1600,sha256:'synthetic-multilevel'});
+ const makeImage=()=>{const w=1000,h=650,out={width:w,height:h,data:new Uint8ClampedArray(w*h*4).fill(255)},poly=[[220,150],[730,150],[730,520],[600,520],[600,450],[450,450],[450,500],[220,500]];
+  poly.forEach((a,i)=>{const b=poly[(i+1)%poly.length],length=Math.hypot(b[0]-a[0],b[1]-a[1]);for(let n=0;n<=length;n++){const x=Math.round(a[0]+(b[0]-a[0])*n/length),y=Math.round(a[1]+(b[1]-a[1])*n/length);for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++)out.data.set([0,0,0,255],((y+dy)*w+x+dx)*4);}});return out;};
+ const pixels=makeImage(),sources=Object.fromEntries(multiple.views.map(v=>[v.id,pixels]));
+ const original=structuredClone(multiple),result=P.build(multiple,'house',sources);
+ assert.deepEqual(multiple,original,'automatic analysis must not mutate the source inventory');
+ assert.equal(result.levels.length,2,'each floor retains an independent editable draft, not invented walls');
+ assert.equal(result.status,'unresolved');
+ for(const row of result.reports){assert.ok(row.issues.includes('LEVEL_ALIGNMENT_REQUIRED'),'missing shared level datum is explicit');assert.ok(row.issues.includes('SCALE_UNKNOWN'),'scale extraction failure is not hidden behind level alignment');}
+ for(const floor of result.levels){assert.ok(floor.contourDraft?.points?.length>=4);assert.equal(floor.reconstructionDraft?.referenceResolution?.status,'not_found');assert.equal(floor.contours?.length||0,0);}
+ assert.equal(M.scene(multiple,'house').walls.length,0,'unregistered floors cannot become confirmed 3D');
+}
 console.log('PASS automatic pipeline: short dimension marks, independent OCR alternatives, conflicts retained, proposed render distinct from validated measures, existing geometry preserved');
