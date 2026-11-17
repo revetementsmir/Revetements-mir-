@@ -52,6 +52,8 @@ for(const [caption,kind,key] of [['PLAN NIVEAU 3','floor','floor-3'],['PLAN DE T
 }
 assert.deepEqual(S.classify('PLAN NIVEAU 0'),{kind:'floor'});
 assert.deepEqual(S.classify('PLAN NIVEAU 3'),{kind:'floor'});
+assert.deepEqual(S.classify('titre: PLAN NIVEAU 3'),{kind:'floor'},'OCR joining titre: to the label must not erase the level');
+assert.deepEqual(S.classify('titre: PLAN DE TOITURE'),{kind:'roof'},'the roof title block must not become a floor');
 assert.deepEqual(S.classify('PLAN DE TOITURE'),{kind:'roof'});
 // Two actual drawings in the drawing area remain two views; this correction
 // must not collapse legitimate multi-view PDF pages.
@@ -59,6 +61,22 @@ const adjacent=S.viewsForPage([{text:'PLAN NIVEAU 2',box:[100,360,230,380],confi
  {text:'PLAN NIVEAU 3',box:[560,360,690,380],confidence:95}],1000,700);
 assert.equal(adjacent.length,2);
 assert.deepEqual(adjacent.map(v=>v.key),['floor-2','floor-3']);
+const I=require('../dist/plan-view-inventory.js');
+const sourceTitle=S.viewsForPage([{text:'PLAN NIVEAU 3',box:[250,610,390,630],confidence:98},
+ {text:'PLAN NIVEAU 3',box:[870,530,975,548],confidence:98}],1000,700)[0];
+const incoming=I.create([{
+ page:8,name:sourceTitle.name,kind:sourceTitle.kind,titleBox:sourceTitle.box,
+ sourceWidth:1000,sourceHeight:700,sourceCrop:[0,0,1000,700],
+ sheetTitleEvidence:{...sourceTitle.sheetTitle,frame:'raster-page'}
+}],{filename:'synthetic-titleblock.pdf',bytes:500,sha256:'synthetic-titleblock'});
+assert.equal(incoming.views.length,1);
+assert.equal(incoming.views[0].levelId,'level-3','sheet title must become the level source');
+assert.equal(incoming.views[0].provenance.sheetTitle.text,'PLAN NIVEAU 3');
+assert.equal(incoming.views[0].provenance.sheetTitle.method,'matched-sheet-title-block-and-drawing-caption');
+assert.equal(incoming.views[0].provenance.sheetTitle.confirmationRequired,true);
+const roofSheet=I.create([{page:9,name:'PLAN DE TOITURE',kind:'roof',sourceWidth:1000,sourceHeight:700,sourceCrop:[0,0,1000,700]}],{filename:'synthetic-roof.pdf',bytes:50,sha256:'synthetic-roof'});
+assert.equal(roofSheet.views[0].kind,'roof');
+assert.equal(roofSheet.levels.length,0,'a roof drawing is not a new floor');
 const indexTitles=['Plan niveau 0','Plan niveau 1','Plan niveau 2','Plan niveau 3'].map((text,i)=>({
   text,box:[380,180+i*7,440,186+i*7],confidence:92,source:'ocr'
 }));
