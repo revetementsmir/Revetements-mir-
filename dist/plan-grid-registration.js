@@ -22,6 +22,46 @@
    }best=Math.max(best,hits/32);
   }return best;
  }
+ function bubbleRegions(image){
+  // Discover candidate ring locations from source ink BEFORE OCR. This avoids
+  // depending on tiny 1/A/B labels in an entire 17-page raster document.
+  // Labels are read separately from the interior, never inferred by ordering.
+  if(!image?.data||image.width<250||image.height<250||image.width*image.height>12000000)
+   return {status:'unresolved',reason:'GRID_SOURCE_UNAVAILABLE',bubbles:[]};
+  const {width:w,height:h}=image,N=24,dirs=Array.from({length:N},(_,i)=>[Math.cos(2*Math.PI*i/N),Math.sin(2*Math.PI*i/N)]);
+  const score=(x,y,r)=>{let hits=0;for(const [u,v] of dirs)if(dark(image,x+u*r,y+v*r)||dark(image,x+u*(r-1),y+v*(r-1))||dark(image,x+u*(r+1),y+v*(r+1)))hits++;return hits/N;};
+  const minRadius=Math.max(7,Math.round(Math.min(w,h)*.007)),maxRadius=Math.min(38,Math.round(Math.min(w,h)*.024));
+  const bands=[['number',[.08,.02,.83,.20]],['letter',[.06,.13,.20,.87]]],bubbles=[];
+  for(const [kind,[xl,yl,xr,yb]]of bands){
+   const rough=[];for(let y=Math.floor(h*yl);y<h*yb;y+=4)for(let x=Math.floor(w*xl);x<w*xr;x+=4){
+    let best=null;for(let r=minRadius;r<=maxRadius;r+=3){const value=score(x,y,r);if(value>=.68&&(!best||value>best.score))best={x,y,r,score:value};}
+    if(best)rough.push(best);
+   }
+   rough.sort((a,b)=>b.score-a.score);
+   const unique=[];
+   for(const first of rough){
+    if(unique.some(c=>Math.hypot(c.x-first.x,c.y-first.y)<Math.max(14,c.r*1.5)))continue;
+    let best=first;for(let y=first.y-4;y<=first.y+4;y++)for(let x=first.x-4;x<=first.x+4;x++)for(let r=Math.max(minRadius,first.r-3);r<=Math.min(maxRadius,first.r+3);r++){
+     const value=score(x,y,r);if(value>best.score)best={x,y,r,score:value};
+    }
+    if(best.score>=.9)unique.push(best);
+    if(unique.length>=80)break;
+   }
+   const axis=kind==='number'?'y':'x',tolerance=kind==='number'?Math.max(3,h*.0025):Math.max(8,w*.006);
+   let chosen=[];
+   for(const c of unique){
+    const group=unique.filter(v=>Math.abs(v[axis]-c[axis])<=tolerance&&Math.abs(v.r-c.r)<=Math.max(3,c.r*.20));
+    if(group.length>chosen.length||group.length===chosen.length&&group.reduce((sum,v)=>sum+v.score,0)>chosen.reduce((sum,v)=>sum+v.score,0))chosen=group;
+   }
+   const linear=kind==='number'?'x':'y';chosen.sort((a,b)=>a[linear]-b[linear]);
+   const span=chosen.length?chosen.at(-1)[linear]-chosen[0][linear]:0;
+   if(chosen.length<(kind==='number'?3:2)||span<(kind==='number'?w:h)*.18)continue;
+   bubbles.push(...chosen.slice(0,12).map(v=>({kind,center:[v.x,v.y],radius:v.r,ringSupport:v.score,
+    sourceMethod:'source-raster-closed-grid-ring',confirmationRequired:true})));
+  }
+  const ok=bubbles.filter(b=>b.kind==='number').length>=3&&bubbles.filter(b=>b.kind==='letter').length>=2;
+  return {status:ok?'proposed':'unresolved',reason:ok?null:'GRID_AXES_INSUFFICIENT',bubbles,confirmationRequired:true};
+ }
  function markers(view,image){
   if(!view||view.kind!=='floor'||!image?.data||image.width<250||image.height<250||image.width*image.height>3e7)return {status:'unresolved',reason:'GRID_SOURCE_UNAVAILABLE'};
   const rows=view.payload?.drawingReadings?.rows||[],numeric=[],letters=[];
@@ -85,5 +125,5 @@
   const valid=Object.values(byLevel).filter(v=>v.status==='proposed').length;
   return {status:valid===floors.length-1?'proposed':'partial',referenceLevelId:origin.levelId,referenceSourceViewId:origin.id,byLevel,confirmationRequired:true};
  }
- return Object.freeze({version:1,markers,alignViews,forBuilding});
+ return Object.freeze({version:1,bubbleRegions,markers,alignViews,forBuilding});
 });
