@@ -1,5 +1,13 @@
 # Boutique MIR — cadrage des images, 17 novembre 2026
 
+## Aperçu TEST livré
+
+- [Boutique corrigée](https://mir-studio-test-pj2roqzh6-desk17.vercel.app/test/boutique.html?view=brands)
+- [Comparatif avant/après, PC, tablette et téléphone](https://mir-studio-test-pj2roqzh6-desk17.vercel.app/test/boutique-images-comparaison.html)
+- [Galerie complète du parcours client](https://mir-studio-test-pj2roqzh6-desk17.vercel.app/test/prestige-captures.html)
+
+Déploiement Vercel Preview protégé, état READY, source `68bb0cdaa8c96c3b6a1c3be957686c1ba5e8ecb9`. Les quatre chemins vérifiés répondent HTTP 200 et portent les protections CSP et noindex; voir `hosted-preview.json`. Les tests navigateur et captures correspondent à cette source locale. Aucun déploiement en production.
+
 ## État initial vérifié
 
 Source figée depuis le commit indiqué dans `before-revision.txt`, copiée sous `/tmp/mir-boutique-images-before-20261117/dist` avant les corrections. Aucun changement applicatif dans cette capture. Les deux vues réelles ont été ouvertes : `boutique.html?view=brands` et `boutique.html?view=all`.
