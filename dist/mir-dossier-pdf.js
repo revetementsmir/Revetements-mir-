@@ -49,6 +49,17 @@ async function make(options){const locale=clientEN()?'en-CA':'fr-CA';if(!loading
  if(!logo)logo=fetch('assets/MIR-logo-officiel-original.svg').then(r=>{if(!r.ok)throw Error('Logo MIR introuvable.');return r.text();}).catch(e=>{logo=null;throw e;});
  if(!fonts)fonts=Promise.all(['Regular','Bold'].map(async weight=>{const r=await fetch('vendor/pdfjs/standard_fonts/LiberationSans-'+weight+'.ttf');if(!r.ok)throw Error('Police PDF introuvable.');const bytes=await r.arrayBuffer(),face=new FontFace('MIRDossier',bytes,{weight:weight==='Bold'?'700':'400'});await face.load();document.fonts.add(face);let binary='';for(const x of new Uint8Array(bytes))binary+=String.fromCharCode(x);return {name:weight,base64:btoa(binary)};})).catch(e=>{fonts=null;throw e;});
  const official=await logo,fontFiles=await fonts,pdf=new root.jspdf.jsPDF({unit:'pt',format:'letter',compress:true}),faces=options.faces;for(const f of fontFiles){pdf.addFileToVFS('MIR-'+f.name+'.ttf',f.base64);pdf.addFont('MIR-'+f.name+'.ttf','MIRDossier',f.name==='Bold'?'bold':'normal');}
+ if(faces.some(f=>f.layout==='mir-site-five')){
+  if(faces.length!==5||faces.some((f,i)=>f.layout!=='mir-site-five'||f.key!==['front','right','back','left','soffits'][i]))throw Error('Le PDF chantier doit contenir exactement les cinq vues ordonnées.');
+  for(const [i,face]of faces.entries()){
+   const {width,height}=face.paper;if(!(width>=800&&height>=600&&width<=14000&&height<=14000))throw Error('Format chantier illisible.');
+   if(i===0){pdf.deletePage(1);pdf.addPage([width,height],width>height?'landscape':'portrait');}else pdf.addPage([width,height],width>height?'landscape':'portrait');
+   const svg=new DOMParser().parseFromString(face.svg,'image/svg+xml').documentElement;if(svg.localName!=='svg'||svg.querySelector('parsererror,script,foreignObject'))throw Error('Dessin chantier invalide.');
+   for(const node of [svg,...svg.querySelectorAll('text,g')])node.setAttribute('font-family','MIRDossier');
+   await pdf.svg(svg,{x:0,y:0,width,height});options.onProgress?.('Page '+(i+1)+' / 5');
+  }
+  if(pdf.getNumberOfPages()!==5)throw Error('Nombre de pages chantier invalide.');pdf.setProperties({title:options.title,author:'Les Revêtements MIR',creator:'MIR Studio — chantier'});return {blob:pdf.output('blob'),filename:options.filename,pages:5};
+ }
  for(let i=0;i<faces.length;i++){if(i)pdf.addPage('letter','portrait');const face=faces[i];options.onProgress?.((locale==='en-CA'?'Creating page ':'Création de la feuille ')+(i+1)+' / '+faces.length);
  const body=new DOMParser().parseFromString(face.svg,'image/svg+xml').documentElement;if(body.querySelector('parsererror'))throw Error('Dessin PDF invalide.');
  relocateProductionHeader(body);

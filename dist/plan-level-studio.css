@@ -1,0 +1,22 @@
+.mir-level-toolbar{margin:16px auto;max-width:1440px;padding:18px 24px;background:#f1f5ed;border:1px solid #d8e1d2;border-radius:8px;color:#223c2b}
+.mir-level-toolbar p{margin:0 0 10px}.mir-level-actions,.mir-contour-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.mir-level-toolbar label,.mir-level-dialog label,.mir-level-wall-controls label{display:grid;gap:6px;margin:10px 0;min-width:0}
+.mir-level-toolbar select,.mir-level-dialog input,.mir-level-dialog select,.mir-level-wall-controls input,.mir-level-wall-controls select{font:inherit;padding:10px;min-height:44px;max-width:100%;border:1px solid #c8d3c4;border-radius:5px;background:#fff;box-sizing:border-box}
+.mir-level-dialog input[type=checkbox],.mir-level-wall-controls input[type=checkbox]{min-height:24px;width:24px;vertical-align:middle}
+.mir-level-dialog button,.mir-level-toolbar button,.mir-level-wall-controls button{font:inherit;min-height:44px;padding:10px 14px;border:1px solid #b9cbb1;border-radius:5px;background:#f4f7f1;color:#233a2b;cursor:pointer}
+.mir-level-dialog button.primary{background:#348511;color:white}.mir-level-dialog button[aria-pressed=true]{background:#dbe8cf}
+.mir-level-dialog button:disabled{opacity:.5;cursor:default}.mir-level-dialog :focus-visible,.mir-level-toolbar :focus-visible,.mir-level-wall-controls :focus-visible{outline:3px solid #348511;outline-offset:2px}
+.mir-level-dialog{width:min(1100px,96vw);max-height:92dvh;overflow:auto;padding:24px;box-sizing:border-box;border:1px solid #c5d2be;border-radius:12px;background:#fafbf8;color:#18251d}
+.mir-level-dialog::backdrop{background:#142d20b8}.mir-level-dialog h2{font-size:26px;margin:0 0 16px}
+.mir-contour-map{background:white;border:1px solid #c4cdbf;max-height:65dvh;overflow:auto}.mir-contour-map svg{width:100%;height:min(60dvh,650px);display:block;min-height:300px;touch-action:none;cursor:crosshair}
+.mir-contour-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;align-items:end}.mir-contour-fields input{width:100%}
+.mir-contour-points{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.mir-contour-points fieldset{min-width:0;border:1px solid #c8d3c4}.mir-contour-points input{width:100%}
+.mir-contour-confirmations{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px}.mir-contour-confirmations label{display:flex;align-items:center}
+.mir-level-dialog details{padding:14px 0;border-block:1px solid #dde4d8}.mir-level-dialog summary{min-height:44px;cursor:pointer}
+#mir-contour-message,#mir-wall-message{color:#844017;font-weight:600}.mir-level-wall-controls{padding:22px}.mir-level-wall-controls h2{font-size:24px}
+.mir-level-active.controls> :not(#mir-level-wall-controls){display:none!important}.workspace.mir-level-active .edit-toolbar,.workspace.mir-level-active .zones-heading,.workspace.mir-level-active #zone-list,.workspace.mir-level-active .detection-panel,.workspace.mir-level-active .face-tabs,.workspace.mir-level-active .part-nav,.workspace.mir-level-active .display-toolbar,.workspace.mir-level-active #coverage-summary,.workspace.mir-level-active .drawing-footer{display:none!important}
+.mir-level-quantity-list{max-height:280px;overflow:auto;font-size:13px}.mir-opening-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mir-opening-fields input{width:100%}
+#elevation svg [data-level-wall]{cursor:pointer}#elevation svg [data-level-wall]:focus{outline:none;filter:drop-shadow(0 0 4px #348511)}
+@media(max-width:650px){.mir-level-toolbar{padding:14px;margin:14px 12px}.mir-level-actions>*{flex:1 1 100%}.mir-level-dialog{padding:14px;width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}.mir-level-dialog h2{font-size:22px}.mir-contour-fields{grid-template-columns:1fr 1fr}.mir-contour-tools button{flex:1 1 45%}.mir-level-wall-controls{padding:16px}}
+
+.mir-level-confirm-actions{display:flex;gap:.7rem;position:sticky;bottom:0;background:#f7f5ef;padding:.6rem 0}.mir-level-confirm-actions button{flex:1;min-height:44px}.mir-level-pending{outline:2px solid #78a14c;outline-offset:3px}

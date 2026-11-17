@@ -78,7 +78,7 @@
   function returnChoice(id){ensureState();const raw=state().returnFinishes[id];if(raw)return api.normalChoice(raw);const f=data().faces.find(f=>f.key==='front'),z=f?.zones.find(z=>z.id==='centre_RDC')||f?.zones[0];return z?api.choice(f,z):api.normalChoice({},siding[0]?.id);}
   function selectPart(next,id){
    if(next==='roof'&&!roofControls)return;
-   part=next;if(next==='return')returnId=id||'return-left';
+   api.beginChoice?.(next==='facade'?'zone':next,id??(next==='facade'?state().selected.id:next));part=next;if(next==='return')returnId=id||'return-left';
    if(next==='structure')state().selected={kind:'structure',id:id||state().structures?.[0]?.id||null};
    else if(next==='corner'){
     state().selected={kind:'corner',id:Number.isInteger(id)?id:null};
@@ -86,7 +86,7 @@
    }
    else if(['roof','soffit','fascia','return'].includes(next))state().selected={kind:next,id:id||next};
    else if(next==='facade'&&!['zone','opening'].includes(state().selected.kind))state().selected={kind:'zone',id:api.allZones(api.face())[0]?.id||null};
-   save();render();if(window.innerWidth<801)$('#studio-controls').scrollIntoView({behavior:'smooth',block:'start'});
+   save();render();if(!api.previewActive?.()&&window.innerWidth<801)$('#studio-controls').scrollIntoView({behavior:'smooth',block:'start'});
   }
   function inferredPart(){const kind=state().selected.kind;return kind==='zone'||kind==='opening'?'facade':['roof','soffit','fascia','structure','return','corner'].includes(kind)?kind:part;}
   function choiceHTML(m,colorId,attr){const cs=colorsFor(m);return `<div class="extra-colors">${cs.map(c=>`<button ${attr}="${esc(c.id)}" aria-pressed="${c.id===colorId}" title="${esc(c.name)}">${c.swatchUrl?`<img src="${esc(c.swatchUrl)}" alt="" loading="lazy">`:''}<span>${esc(c.name)}</span></button>`).join('')}</div>${cs.length?'':'<p>Le nuancier exact de ce produit reste à confirmer.</p>'}`;}
@@ -373,7 +373,7 @@
    if(t.id==='structure-support'){const o=currentStructure();if(o)modify(()=>o.material=t.value);}
    if(t.id==='mir-corner-enabled')modify(()=>state().cornerFinishes.enabled=t.checked);
    if(t.id==='mir-corner-scope'){
-    cornerScope=t.value;renderUI();$('#mir-corner-scope')?.focus({preventScroll:true});
+    api.previewScope?.(t.value);cornerScope=t.value;renderUI();$('#mir-corner-scope')?.focus({preventScroll:true});
    }
    if(t.id==='mir-corner-metal'&&['steel','aluminum'].includes(t.value)){
     modify(()=>setCornerFinish({metal:t.value,materialId:null,colorId:null}));
@@ -414,11 +414,12 @@
   $('#focus-model').onclick=()=>$('#stage').scrollIntoView({behavior:'smooth',block:'center'});
   $('#volume-settings').onclick=openVolume;$('#complete-volume').onclick=openVolume;$('#stay-2d').onclick=()=>{state().view='2d';save();render();};
   $('#project-menu').onclick=openProjects;$('#show-source').onclick=openSource;
-  $('#import-pdf').onclick=()=>root.MIRPlanImport?.open?root.MIRPlanImport.open({onImport:()=>location.reload()}):toast('L’import PDF n’a pas chargé. Rechargez la page.');
+  // The entry point owns import and its conversion request. Do not replace
+  // its handler here: that used to silently disable reconstruction on PDFs.
   $('#orbit-left').onclick=()=>{state().rotation=(state().rotation-30+360)%360;save();renderDrawing();};$('#orbit-right').onclick=()=>{state().rotation=(state().rotation+30)%360;save();renderDrawing();};$('#orbit-under').onclick=()=>{state().cameraElevation=5;save();renderDrawing();toast('Caméra maintenue au niveau du sol.');};$('#orbit-reset').onclick=()=>{state().rotation=28;state().cameraElevation=22;state().cameraZoom=1;save();renderDrawing();};
   function handleHit(hit){if(hit.returnId){selectPart('return',hit.returnId);return true;}if(hit.type==='roof-detail'){selectPart('roof');return true;}if(['roof','fascia','soffit'].includes(hit.type)){selectPart(hit.type);return true;}if(['beam','column'].includes(hit.type)){selectPart('structure',hit.structureId);return true;}
    if(hit.type==='corner'||hit.role==='aluminum-corner-proposal'){selectPart('corner',hit.cornerIndex);return true;}return false;}
-  return {renderUI,threeOptions,returnViews,handleHit,selectPart,canRender,returnChoice,dimensions,normalizeRoof,ensureState};
+  return {setCornerScope:value=>{cornerScope=value;renderUI();},renderUI,threeOptions,returnViews,handleHit,selectPart,canRender,returnChoice,dimensions,normalizeRoof,ensureState};
  }
  root.MIRStudioFeatures={setup};
 })(window);

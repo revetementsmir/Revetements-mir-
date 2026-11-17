@@ -129,6 +129,14 @@
   }
 
   function dimensionsFrom(options) {
+    if(options.levelScene){
+      const walls=options.levelScene.walls;
+      if(!Array.isArray(walls)||!walls.length||walls.some(w=>!Array.isArray(w.poly)||w.poly.length<3||w.poly.some(p=>p.length!==3||!p.every(Number.isFinite))))throw new RangeError('Confirmez le contour et la hauteur du niveau.');
+      const points=walls.flatMap(w=>w.poly),range=axis=>Math.max(...points.map(p=>p[axis]))-Math.min(...points.map(p=>p[axis]));
+      const width=range(0),depth=range(1),wallHeight=range(2);
+      if(!(width>0&&depth>0&&wallHeight>0))throw new RangeError('Contour ou hauteur invalide.');
+      return {width,depth,wallHeight,roofRise:0};
+    }
     const d = {};
     for (const name of Object.keys(DEFAULTS)) d[name] = positive(options.dimensions && options.dimensions[name], DEFAULTS[name]);
     const rise = options.dimensions && options.dimensions.roofRise;
@@ -400,6 +408,25 @@
   }
 
   function build(d, options) {
+    if(options.levelScene){
+      const scene=options.levelScene,points=[...scene.walls.flatMap(w=>w.poly),...(global.MIRReconstructedRoofs?(scene.roofs||[]).flatMap(r=>global.MIRReconstructedRoofs.faces(r,[0,0],{includeProposed:scene.includeProposed}).flatMap(f=>f.poly)):[]),...(global.MIRStudioExterior?(scene.elements||[]).flatMap(e=>global.MIRStudioExterior.elementFaces(e).flatMap(f=>f.poly)):[])],cx=(Math.min(...points.map(p=>p[0]))+Math.max(...points.map(p=>p[0])))/2,cy=(Math.min(...points.map(p=>p[1]))+Math.max(...points.map(p=>p[1])))/2;
+      const faces=scene.walls.map(w=>({id:w.id,wallId:w.id,levelId:w.levelId,buildingId:w.buildingId,type:'wall',role:'level-exterior-wall',
+        poly:w.poly.map(([x,y,z])=>[x-cx,y-cy,z]),normal:w.normal.slice(),base:[w.from[0]-cx,w.from[1]-cy,w.base],
+        u:[(w.to[0]-w.from[0])/w.length,(w.to[1]-w.from[1])/w.length,0],width:w.length,fillColor:cleanColor(w.finish?.color,'#d7d8d0'),
+        openings:(scene.openings||[]).filter(o=>o.wallId===w.id),selected:options.selectedWallId===w.id}));
+      for(const wall of faces.filter(f=>f.type==='wall'))for(const opening of wall.openings){
+        const at=(u,z)=>[wall.base[0]+wall.u[0]*u+wall.normal[0]*.006,wall.base[1]+wall.u[1]*u+wall.normal[1]*.006,z],z=wall.base[2]+opening.sill;
+        const graphic=global.MIRStudioSurfaces?.openingGraphic(opening)||{frameColor:opening.appearance?.frameColor||'#596b62',infillColor:opening.type==='door'?'#a4aaa2':'#a6c0bc',inset:.06};
+        faces.push({openingGraphic:graphic,id:opening.id,openingId:opening.id,parentSurfaceId:wall.id,wallId:wall.id,levelId:wall.levelId,type:'opening',role:'wall-opening',normal:wall.normal.slice(),poly:[at(opening.offset,z),at(opening.offset+opening.width,z),at(opening.offset+opening.width,z+opening.height),at(opening.offset,z+opening.height)],fillColor:cleanColor(graphic.frameColor,'#596b62'),selected:options.selectedOpeningIds?.includes(opening.id)});
+      }
+      if(global.MIRStudioExterior)for(const corner of scene.corners||[])for(const f of global.MIRStudioExterior.cornerFaces(corner,scene.walls,[cx,cy]))faces.push({...f,fillColor:cleanColor(f.fillColor,'#8d9690'),selected:options.selectedCornerIds?.includes(corner.id)});
+      for(const s of scene.soffits||[])faces.push({id:s.id,levelId:s.levelId,type:'soffit',role:'measured-soffit-section',poly:s.polygon.map(([x,y])=>[x-cx,y-cy,s.height]),normal:[0,0,-1],fillColor:cleanColor(s.color,'#d8dbd1')});
+      if(global.MIRReconstructedRoofs)for(const roof of scene.roofs||[])for(const f of global.MIRReconstructedRoofs.faces(roof,[cx,cy],{includeProposed:scene.includeProposed}))faces.push({...f,selected:options.selectedElementIds?.includes(roof.id)});
+      if(global.MIRStudioExterior)for(const e of scene.elements||[])for(const f of global.MIRStudioExterior.elementFaces(e,[cx,cy]))faces.push({...f,selected:options.selectedElementIds?.includes(e.id)});
+      return {faces,a:d.width/2,b:d.depth/2,e:0,top:Math.max(...points.map(p=>p[2])),ground:Math.min(...points.map(p=>p[2])),foundationDrop:0,dimensions:d,roofStyle:'unknown',
+        recess:{enabled:false,depth:0,height:0},footprint:{type:scene.walls.some(w=>w.footprintConfirmed===false)?'observed-level-walls':'level-contours',confirmed:scene.walls.every(w=>w.footprintConfirmed!==false&&!w.previewOnly),levelIds:scene.levels.map(l=>l.id)},porch:{enabled:false},structures:[],
+        levelScene:scene,sourcePlan:scene.walls.some(w=>w.previewOnly)?'proposed source geometry; measurements and missing parts require review':'confirmed contours and measured level heights; no inferred roof'};
+    }
     const faces = [], a = d.width / 2, b = d.depth / 2, h = d.wallHeight, rise = d.roofRise;
     const foundationDrop = positive(options.foundationDrop, 0), ground = -foundationDrop;
     const recess = recessFrom(d, options), footprint = footprintMetrics(d, recess);
@@ -645,7 +672,8 @@
         'Any continuation below ground follows foundationDrop as a display assumption, not a foundation drawing.',
         mesh.porch.enabled?'The optional porch includes its projecting underside at its own height; no duplicate ceiling is added at that height.':ceiling?'The recess ceiling excludes the projecting porch; no porch is inferred unless explicitly enabled.':mesh.roofStyle==='duplex'?'The full-height duplex setback follows the roof edge; no inter-storey ceiling or projecting porch is inferred.':'The caller-selected generic roof outline is retained with its own roof underside; no inter-storey ceiling or porch is inferred.',
         'Return finishes, openings, product coverage and waste are not resolved by this geometry.'
-      ]:[], sourcePlan:mesh.sourcePlan, schematic:true };
+      ]:[], sourcePlan:mesh.sourcePlan, schematic:true,
+      ...(mesh.levelScene?{levelModelVersion:1,levelIds:mesh.levelScene.levels.map(l=>l.id),partial:mesh.levelScene.partial,quantities:mesh.levelScene.quantities}:{} ) };
   }
 
   function geometry(options = {}) {
@@ -679,7 +707,7 @@
     const point=[(clientX-(box.left||0))*state.size[0]/box.width,(clientY-(box.top||0))*state.size[1]/box.height];
     const surface=surfaceAt(state,point);if(!surface)return null;
     const hit={surfaceId:surface.surfaceId,type:surface.type,role:surface.role||null,view:surface.view||null,screenPoint:point,renderId:state.pickingRenderId};
-    if(Number.isInteger(surface.cornerIndex))hit.cornerIndex=surface.cornerIndex;
+    for(const key of ['openingId','cornerId','elementId','wallId','levelId'])if(surface[key])hit[key]=surface[key];if(Number.isInteger(surface.cornerIndex))hit.cornerIndex=surface.cornerIndex;
     if(surface.structureId){hit.structureId=surface.structureId;hit.material=surface.material;}
     if(surface.returnId)hit.returnId=surface.returnId;
     if(surface.role==='porch-divider')return {...hit,type:'wall',view:'front',zoneId:'pilier',sharedFinish:true};
@@ -735,7 +763,7 @@
     const extent = mesh.faces.flatMap(f => f.poly).concat(site?site.surfaces.flatMap(p=>p.poly):[]).map(flat);
     const minX = Math.min(...extent.map(p=>p[0])), maxX = Math.max(...extent.map(p=>p[0]));
     const minY = Math.min(...extent.map(p=>p[1])), maxY = Math.max(...extent.map(p=>p[1]));
-    const padX = Math.max(18, W * .065), padTop = Math.max(18, H * .08), padBottom = Math.max(24, H * .13);
+    const padX = Math.max(18, W * .065), padTop = Math.max(18, H * .08, Number(options.viewportInsets?.top)||0), padBottom = Math.max(24, H * .13, Number(options.viewportInsets?.bottom)||0);
     const zoom=Math.max(.7,Math.min(3.5,Number.isFinite(Number(options.zoom))?Number(options.zoom):1));
     const scale = Math.max(.001, Math.min((W - 2*padX)/(maxX-minX), (H-padTop-padBottom)/(maxY-minY)))*zoom;
     const tx = W/2 - (minX+maxX)/2*scale;
@@ -765,19 +793,19 @@
     const roofColor=cleanColor(options.roofColor,'#505658');
     const soffitType = ['vented','solid','concealed'].includes(options.soffitType) ? options.soffitType : 'neutral';
     const textureBottoms = {};
-    for (const name of ['front','right','back','left','return-left','return-right']) {
+    for (const name of [...new Set(['front','right','back','left','return-left','return-right',...Object.keys(images)])]) {
       const value = options.textureBottoms && options.textureBottoms[name];
       textureBottoms[name] = value != null && Number.isFinite(Number(value)) ? Number(value) : 0;
     }
     const textureScales=Object.fromEntries(Object.entries(images).filter(([,item])=>item).map(([view,item])=>[
-      view,textureScale(item,view.startsWith('return-')?mesh.recess.depth:(view==='front'||view==='back'?d.width:d.depth),d.wallHeight)
+      view,textureScale(item,mesh.faces.find(f=>f.id===view)?.width||(view.startsWith('return-')?mesh.recess.depth:(view==='front'||view==='back'?d.width:d.depth)),options.levelScene?.walls.find(w=>w.id===view)?.height||d.wallHeight)
     ]));
     const textureScaleWarnings=Object.entries(textureScales).filter(([,info])=>info.calibrated&&info.relativeWidthDifference>TEXTURE_WIDTH_TOLERANCE).map(([view,info])=>({
       code:'TEXTURE_MODEL_WIDTH_MISMATCH',view,message:'Volume et élévation à recaler : la couvrance garde l’échelle du dessin.',
       ...info,toleranceRelative:TEXTURE_WIDTH_TOLERANCE
     }));
-    const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,'roof-detail':4,column:4,beam:4,concrete:4,corner:4,balcony:4};
-    const visible = mesh.faces.filter(f=>dot(f.normal,camera)>.0001).map(f=>({...f,depth:f.poly.reduce((sum,p)=>sum+dot(p,camera),0)/f.poly.length}));
+    const faceOrder = {wall:0,divider:0,soffit:1,roof:2,fascia:3,'roof-detail':4,column:4,beam:4,concrete:4,corner:4,balcony:4,opening:4};
+    let visible = mesh.faces.filter(f=>dot(f.normal,camera)>.0001).map(f=>({...f,depth:f.poly.reduce((sum,p)=>sum+dot(p,camera),0)/f.poly.length}));
     const visibleById=new Map(visible.map(face=>[face.id,face]));
     for(const face of visible){
       const parent=visibleById.get(face.parentSurfaceId);
@@ -786,6 +814,7 @@
       if(parent)face.depth=Math.max(face.depth,parent.depth+.00001);
     }
     visible.sort((a,b)=>a.depth-b.depth || faceOrder[a.type]-faceOrder[b.type]);
+    if(options.levelScene&&global.MIRSceneOrder)visible=global.MIRSceneOrder.order(visible,{project,depth:p=>dot(p,camera)});
 
     function paintWall(face) {
       trace(face.poly);ctx.save();ctx.clip();ctx.fillStyle=face.fillColor||'#d7d8d0';ctx.fill();
@@ -806,13 +835,16 @@
         const color=cleanColor(options.returnMasonry.color,null);
         if(color&&top>base&&w>0)patch([local(face,0,base),local(face,w,base),local(face,w,top),local(face,0,top)],color);
       }
+      if(face.role==='level-exterior-wall')for(const opening of face.openings||[]){
+        const z=face.base[2]+opening.sill;patch([local(face,opening.offset,z),local(face,opening.offset+opening.width,z),local(face,opening.offset+opening.width,z+opening.height),local(face,opening.offset,z+opening.height)],'#859e9a');
+      }
       const shade = Math.max(0,.105 - dot(face.normal,[-.35,-.85,.4])*.07);
       trace(face.poly);ctx.fillStyle=`rgba(21,32,26,${shade})`;ctx.fill();ctx.restore();
     }
 
     function paintRoof(face) {
       const light = Math.max(0, dot(face.normal,[-.28,-.40,.82]));
-      trace(face.poly);ctx.save();ctx.clip();ctx.fillStyle=roofColor;ctx.fill();
+      trace(face.poly);ctx.save();ctx.clip();ctx.fillStyle=face.fillColor||roofColor;ctx.fill();
       ctx.fillStyle=`rgba(13,21,18,${Math.max(.025,.20-light*.17)})`;ctx.fill();
       // Exact exposure in the surface plane, never a fixed change of altitude.
       for(const row of roofCourses(face.poly,options.roofExposureIn).segments)
@@ -827,7 +859,7 @@
     }
 
     function paintSoffit(face) {
-      patch(face.poly,soffit);ctx.save();trace(face.poly);ctx.clip();
+      patch(face.poly,face.fillColor||soffit);ctx.save();trace(face.poly);ctx.clip();
       const [a,b,c,d]=face.poly;
       const length=Math.hypot(...sub(b,a));
       for(const row of soffitCourses(face.poly,options.soffitCoverageIn).segments)
@@ -848,16 +880,18 @@
       if(face.type==='wall')paintWall(face);
       else if(face.type==='roof')paintRoof(face);
       else if(face.type==='soffit')paintSoffit(face);
-      else if(['column','beam','divider','balcony','concrete','corner','roof-detail'].includes(face.type))paintSolid(face);
+      else if(face.type==='fascia'&&options.levelScene)paintSolid(face);
+      else if(face.type==='opening'){paintSolid(face);const [a,b,c,d]=face.poly,inset=face.openingGraphic?.inset??.10;patch([mix(mix(a,b,inset),mix(d,c,inset),inset),mix(mix(b,a,inset),mix(c,d,inset),inset),mix(mix(c,d,inset),mix(b,a,inset),inset),mix(mix(d,c,inset),mix(a,b,inset),inset)],face.openingGraphic?.infillColor||'#9eb9b5');}else if(['column','beam','divider','balcony','concrete','corner','roof-detail'].includes(face.type))paintSolid(face);
       else patch(face.poly,fascia);
-      trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';ctx.stroke();
+      trace(face.poly);ctx.strokeStyle=face.type==='roof'?'rgba(20,27,25,.54)':'rgba(28,38,30,.24)';ctx.lineWidth=face.type==='fascia'?.55:.75;ctx.lineJoin='round';if(!face.suppressOutline)ctx.stroke();
+      if(face.selected||(options.previewSelection||[]).some(o=>o.kind==='structure'&&o.id===face.structureId||o.kind==='corner'&&o.id===face.cornerIndex)){trace(face.poly);ctx.strokeStyle='#348511';ctx.lineWidth=3;ctx.stroke();}
     }
     state.size = [W,H,dpr];
     state.pickingRenderId=token;
     state.hitSurfaces=visible.map(face=>{
-      const view=face.textureView||(['front','right','back','left'].includes(face.id)?face.id:null),item=images[view];
-      const surface={surfaceId:face.id,type:face.type,role:face.role||null,view,screenPolygon:face.poly.map(project)};
-      if(Number.isInteger(face.cornerIndex))surface.cornerIndex=face.cornerIndex;
+      const view=face.textureView||(images[face.id]?face.id:['front','right','back','left'].includes(face.id)?face.id:null),item=images[view];
+      const surface={surfaceId:face.id,wallId:face.wallId||null,levelId:face.levelId||null,type:face.type,role:face.role||null,view,screenPolygon:face.poly.map(project)};
+      for(const key of ['openingId','cornerId','elementId'])if(face[key])surface[key]=face[key];if(Number.isInteger(face.cornerIndex))surface.cornerIndex=face.cornerIndex;
       if(face.structureId){surface.structureId=face.structureId;surface.material=face.material;surface.sourceStatus=face.sourceStatus;}
       if(face.returnId){surface.returnId=face.returnId;surface.independentFinish=!!mesh.recess.returnFinishAssigned?.[face.returnId];}
       if(face.type==='wall'&&item){
@@ -904,9 +938,10 @@
       recess:options.recess&&typeof options.recess==='object'?{...options.recess,returnColors:{...(options.recess.returnColors||{})}}:options.recess,
       porch:options.porch&&typeof options.porch==='object'?{...options.porch,divider:options.porch.divider&&typeof options.porch.divider==='object'?{...options.porch.divider}:options.porch.divider}:options.porch,
       structures:Array.isArray(options.structures)?options.structures.map(s=>s&&({...s,origin:Array.isArray(s.origin)?s.origin.slice():s.origin,size:Array.isArray(s.size)?s.size.slice():s.size})):options.structures,
-      footprint:options.footprint&&typeof options.footprint==='object'?{...options.footprint,recess:options.footprint.recess&&typeof options.footprint.recess==='object'?{...options.footprint.recess}:options.footprint.recess}:options.footprint};
+      footprint:options.footprint&&typeof options.footprint==='object'?{...options.footprint,recess:options.footprint.recess&&typeof options.footprint.recess==='object'?{...options.footprint.recess}:options.footprint.recess}:options.footprint,
+      levelScene:options.levelScene?JSON.parse(JSON.stringify(options.levelScene)):undefined};
     state.options=snapshot;
-    const names=['front','right','back','left','return-left','return-right'];
+    const names=[...new Set(['front','right','back','left','return-left','return-right',...Object.keys(snapshot.views)])];
     state.pending=true;
     try {
       const settled=await Promise.allSettled(names.map(key=>loadSVG(snapshot.views[key])));

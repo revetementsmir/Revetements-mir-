@@ -1,0 +1,97 @@
+'use strict';
+const assert=require('node:assert/strict');
+const S=require('../dist/plan-sheet-detection.js'),I=require('../dist/plan-view-inventory.js');
+for(const title of ['Plan R-D-C','PLAN D’AMÉNAGEMENT – ÉTAGE','Plan RDC','Plan R.D.C.','Main storey plan','Upper story plan'])
+  assert.deepEqual(S.classify(title),{kind:'floor'},title);
+for(const title of ['Notes : Plan R-D-C','PLAN R-D-C voir notes','PLAN D’AMÉNAGEMENT – ÉTAGE index','Index : Plan étage',
+  'Table des matières : Plan RDC','Cartouche Plan R-D-C','Plan R-D-C notes générales','Plan de détails RDC'])assert.equal(S.classify(title),null,title);
+const rows=['Élévation avant maison','Élévation avant cabanon','Élévation arrière maison'].map((text,i)=>({text,box:[20+i*200,300,170+i*200,316],confidence:100}));
+const views=S.divideViews(S.viewsForPage(rows,650,400),650,400);
+assert.equal(views.length,3,'same direction, different buildings must survive');
+assert.equal(views[0].crop[2],views[1].crop[0]);
+assert.deepEqual(S.classify('VUE EN PLAN'),{kind:'floor'});
+assert.equal(S.classify('VUE EN PLAN voir note'),null);
+assert.deepEqual(S.viewsForPage([{text:'Index des dessins',box:[10,10,150,25],confidence:100},...rows.slice(0,2)],650,400),[]);
+const tableTitles=['Plan niveau 0','Plan niveau 1','Plan niveau 2','Élévation avant','Coupe schématique'];
+const datedIndex=tableTitles.flatMap((text,i)=>[{text,box:[100,30+i*35,245,42+i*35],confidence:90},{text:'2026-04-01',box:[330,30+i*35,410,42+i*35],confidence:90}]);
+assert.equal(S.isDrawingIndex(datedIndex,700,500),true);assert.deepEqual(S.viewsForPage(datedIndex,700,500),[],'compact dated index is not a section');
+assert.equal(S.isDrawingIndex([...rows,{text:'2026-04-01',box:[500,10,580,22]}],650,400),false,'one cartouche date is not an index');
+assert.equal(S.viewsForPage([{text:'Élévation arrière',box:[100,200,230,220],confidence:100},{text:'Élévation arrière arrière',box:[100,200,330,220],confidence:100}],500,400).length,1,'overlapping OCR row and words are one source title');
+const staggered=[['Élévation arrière',30,200],['Élévation avant',30,450],['Vue en plan',250,350],['Élévation gauche',450,200],['Élévation droite',450,450]].map(([text,x,y])=>({text,box:[x,y,x+100,y+15],confidence:100}));
+const five=S.divideViews(S.viewsForPage(staggered,650,550),650,550);
+assert.equal(five.length,5);assert.equal(five.find(v=>v.kind==='floor').crop[3],550,'central plan is not cut by elevation rows');
+assert.deepEqual(five.map(v=>v.box).sort((a,b)=>a[0]-b[0]||a[1]-b[1]),staggered.map(v=>v.box).sort((a,b)=>a[0]-b[0]||a[1]-b[1]));
+const record=(name,page,direction,value,extra={})=>({name,page,kind:direction?'elevation':'floor',direction,sourceCrop:[0,0,300,200],
+  sourceFrame:{pdfToRaster:[2,0,0,-2,0,800],cropToRaster:[1,0,0,1,0,0]},sourceRotation:90,
+  calibration:{referenceFt:value,anchors:[[20,150],[250,150]],status:'single_dimension',verified:false},
+  volumeEvidence:[{field:'width',value,text:'synthetic dimension',page}],zones:[],openings:[],...extra});
+const source={filename:'synthetic.pdf',bytes:1000,sha256:'a'.repeat(64)};
+const inventory=I.create([record('Élévation avant maison',1,'front',12),record('Élévation avant cabanon',2,'front',3),
+  record('Plan d’aménagement – étage maison',3,null,12),record('Élévation avant maison',4,'front',13)],source);
+assert.equal(new Set(inventory.views.map(v=>v.id)).size,4);
+assert.equal(inventory.activeBuildingId,null);
+assert.deepEqual(inventory,I.create([record('Élévation avant maison',1,'front',12),record('Élévation avant cabanon',2,'front',3),record('Plan d’aménagement – étage maison',3,null,12),record('Élévation avant maison',4,'front',13)],source),'stable IDs');
+inventory.activeBuildingId='house';
+let plan=I.adapt({viewInventory:inventory},S.volumeFrom);
+assert.equal(plan.faces[0].sourceImage, null,'duplicate front is unresolved, never first wins');
+assert.equal(plan.dimensions.width,null,'contradiction stays unresolved');
+inventory.rendererSelections.house={front:inventory.views[0].id};
+plan=I.adapt({viewInventory:inventory},S.volumeFrom);
+assert.equal(plan.faces[0].calibration.referenceFt,12);
+assert.equal(plan.faces[0].viewId,inventory.views[0].id);
+inventory.activeBuildingId='shed';
+const shed=I.adapt({viewInventory:inventory},S.volumeFrom);
+assert.equal(shed.dimensions.width,3);
+assert.equal(shed.faces[0].calibration.referenceFt,3);
+assert.ok(!shed.structuralHints.length);
+assert.equal(shed.footprint.type,'unknown');assert.equal(shed.footprint.confirmed,false);
+const uncertain=I.create([record('Élévation avant maison',1,'front',12,{volumeEvidence:[{field:'width',value:12,method:'cote horizontale entre les repères extérieurs'},{field:'wallHeight',value:3,estimated:true},{field:'wallHeight',value:10,estimated:true}]})],source);
+const uncertainProjection=I.adapt({viewInventory:uncertain},S.volumeFrom);
+assert.equal(uncertainProjection.dimensions.width,null);assert.equal(uncertainProjection.dimensions.wallHeight,null);
+assert.ok(uncertainProjection.detectedVolume.conflicts.includes('wallHeight'));
+assert.equal(uncertainProjection.detectedVolume.evidence.length,3);assert.ok(uncertainProjection.detectedVolume.pending.includes('width'));
+assert.deepEqual(inventory.levels.map(l=>l.sourceLevel),['upper'],'upper-only never supplies ground floor');
+const a={version:2,face:'front',selections:{'front:z':{materialId:'house-material'}},customZones:{front:[{id:'z',polygon:[[0,0],[1,0],[1,1]]}]},openingOverrides:{'front:o':[[1,2]]},transitions:[{face:'front',id:'t'}]};
+const encoded=I.encodeState(a,plan);
+assert.deepEqual(I.decodeState(encoded,plan).selections,a.selections);
+const alt=structuredClone(plan);alt.faces[0]={...alt.faces[0],viewId:inventory.views[3].id};
+assert.deepEqual(I.decodeState(encoded,alt).selections,{});
+const second=I.encodeState({...a,selections:{'front:z':{materialId:'other-view'}}},alt,encoded);
+assert.deepEqual(I.decodeState(second,plan).selections,a.selections,'other source view survives edits');
+assert.deepEqual(I.decodeState(second,plan).openingOverrides,a.openingOverrides);
+assert.deepEqual(I.decodeState(second,plan).transitions,a.transitions);
+const legacy={version:2,id:'pdf-legacy-123',faces:[{key:'front',page:1,name:'Avant',sourceImage:'data:image/jpeg;base64,AA',zones:[{id:'custom',material:'old'}],openings:[]}],dimensions:{width:12},recess:{enabled:true,confirmed:true},extraField:{confirmation:true}};
+const original=structuredClone(legacy),migrated=I.migrate(legacy,source);
+assert.deepEqual(legacy,original,'migration is pure');
+assert.deepEqual(migrated.faces,legacy.faces);assert.deepEqual(migrated.extraField,legacy.extraField);
+assert.equal(migrated.viewInventory.views[0].levelId,null);assert.deepEqual(migrated.viewInventory.levels,[]);
+const legacyMixed={...legacy,faces:[{...record('Avant',1,'front',12),key:'front'},{...record('Droite',2,'right',12),key:'right'}],referencePages:[record('Élévation avant maison',3,'front',20)]};
+const mixed=I.migrate(legacyMixed,source),inv=mixed.viewInventory,oldFront=inv.views[0],oldRight=inv.views[1],houseReference=inv.views[2];
+inv.buildings.push({id:'shed',name:'Cabanon'});oldFront.buildingId='shed';oldRight.buildingId='shed';I.prepareLegacyMigration(inv);
+assert.equal(inv.rendererSelections.shed.front,oldFront.id);assert.equal(inv.rendererSelections.house,undefined,'a reference is not the original renderer face');
+const oldChoices={version:2,face:'front',volumeOverride:{width:12},selections:{'front:z':{materialId:'old-shed'},'right:z':{materialId:'right-finish'}},calibrations:{front:{verified:true,referenceFt:12}},transitions:[]};
+const shedState=I.migrateSavedState(oldChoices,mixed,'shed');
+assert.equal(I.migrateSavedState(oldChoices,mixed,'house'),null,'never move old facade finishes onto a different source in the same direction');
+inv.activeBuildingId='shed';assert.deepEqual(I.decodeState(shedState,I.adapt(mixed,S.volumeFrom)).selections,oldChoices.selections);
+oldRight.buildingId='house';I.prepareLegacyMigration(inv);
+assert.equal(inv.migration.globalAssignmentStatus,'unresolved');
+assert.equal(I.migrateSavedState(oldChoices,mixed,'house').volumeOverride,undefined,'ambiguous old volume is archived, not copied to both buildings');
+assert.equal(oldChoices.volumeOverride.width,12,'original saved settings remain intact');
+assert.notEqual(houseReference.id,oldFront.id);
+assert.equal(I.levelHint('First Floor Plan'),null,'regional ambiguity retained');
+assert.equal(I.pageBuilding([{text:'Maison Modèle #5',confidence:95},{text:'CABANON',confidence:95}],S.classify).id,'shed','project house label never overrides the sheet shed label');
+assert.equal(I.pageBuilding([{text:'Maison Modèle #5,',confidence:95}],S.classify).id,'house-model-5');
+assert.equal(I.pageBuilding([{text:'Maison Modèle #6.',confidence:95}],S.classify).id,'house-model-6');
+assert.equal(I.pageBuilding([{text:'Maison Modèle #5',confidence:95},{text:'Maison Modèle #6',confidence:95}],S.classify),null);
+const distinctModels=I.create([record('Plan étage Maison Modèle #5',1,null,12),record('Plan étage Maison Modèle #6',2,null,20)],source);
+assert.equal(distinctModels.buildings.length,2);distinctModels.activeBuildingId='house-model-5';assert.equal(I.adapt({viewInventory:distinctModels},S.volumeFrom).dimensions.width,12);
+assert.equal(I.pageBuilding([{text:'Note : maison modèle #5',confidence:95}],S.classify),null);
+for(const matrix of [[2,0,0,-2,0,800],[0,2,2,0,0,0],[-2,0,0,2,600,0],[0,-2,-2,0,800,600]]){
+  const view={frame:{pdfToRaster:matrix,cropToRaster:[1,0,0,1,20,30]}};
+  const pdf=[75,120],local=I.pdfToLocal(view,pdf);assert.deepEqual(I.localToPDF(view,local),pdf,'crop/rotation frame round trip');
+}
+const takeoff={version:1,calibrations:{front:{verified:true,referenceFt:10}},segments:{'front-eave-0':{lengthFt:5}},customSegments:[{id:'line',face:'front',points:[[1,2],[3,4]]}],panelLayouts:[{face:'front',zoneId:'z'}]};
+const encodedTakeoff=I.encodeState(takeoff,plan),decodedTakeoff=I.decodeState(encodedTakeoff,plan);
+for(const field of ['calibrations','segments','customSegments','panelLayouts'])assert.deepEqual(decodedTakeoff[field],takeoff[field]);
+assert.deepEqual(I.decodeState(encodedTakeoff,alt).customSegments,[],'takeoff lines remain on their own view');
+console.log('PASS S1: titles/counterexamples, stable sources, no overwrite, buildings, upper-only, conflicts, per-view edits, lossless explicit migration');
