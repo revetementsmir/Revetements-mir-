@@ -35615,6 +35615,296 @@
         }
       ],
       "requestableWithoutPhoto": true
+    },
+    {
+      "family": "Outil de coupe",
+      "applications": [
+        "cutting-tool",
+        "accessory"
+      ],
+      "colors": [],
+      "colorStatus": "not_applicable",
+      "unit": "pièce",
+      "status": "mir_reference",
+      "commercialStatus": "MIR_product",
+      "orderable": true,
+      "requestableWithoutPhoto": true,
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "missing_original_user_photo",
+      "renderPattern": "plain",
+      "allowedPatterns": [],
+      "allowedOrientations": [],
+      "researchedOn": "2026-11-17",
+      "sku": null,
+      "manufacturerCode": null,
+      "documents": [],
+      "id": "dewalt-bimetal-hole-saws",
+      "brand": "DEWALT",
+      "name": "DEWALT ELITE — Scie-cloche bimétal",
+      "description": "Choisissez parmi 15 diamètres documentés de 2 à 5 po. Scie-cloche DEWALT ELITE bimétal pour bois et métal mince. Prix et disponibilité au Canada à confirmer avec MIR.",
+      "sourceUrl": "https://www.dewalt.com/en-us/product/dah3003232l/dewalt-2-51mm-elite-series-bimetal-hole-saw",
+      "dimensions": {},
+      "formatAxis": "diameter",
+      "formats": [
+        {
+          "id": "dah3003232l",
+          "label": "2 po (51 mm)",
+          "diameterIn": 2,
+          "diameterMm": 51,
+          "manufacturerCode": "DAH3003232L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3003232l/dewalt-2-51mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3003434l",
+          "label": "2 1/8 po (54 mm)",
+          "diameterIn": 2.125,
+          "diameterMm": 54,
+          "manufacturerCode": "DAH3003434L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3003434l/2-18-54mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3003636l",
+          "label": "2 1/4 po (57 mm)",
+          "diameterIn": 2.25,
+          "diameterMm": 57,
+          "manufacturerCode": "DAH3003636L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3003636l/2-14-57mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": null
+        },
+        {
+          "id": "dah3004040l",
+          "label": "2 1/2 po (64 mm)",
+          "diameterIn": 2.5,
+          "diameterMm": 64,
+          "manufacturerCode": "DAH3004040L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah13set/elite-series-bimetal-hole-saw-kit-13pc",
+          "arborIncluded": null
+        },
+        {
+          "id": "dah3004242l",
+          "label": "2 5/8 po (67 mm)",
+          "diameterIn": 2.625,
+          "diameterMm": 67,
+          "manufacturerCode": "DAH3004242L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3004242l/dewalt-2-58-67mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3004444l",
+          "label": "2 3/4 po (70 mm)",
+          "diameterIn": 2.75,
+          "diameterMm": 70,
+          "manufacturerCode": "DAH3004444L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3004444l/2-34-70mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3004848l",
+          "label": "3 po (76 mm)",
+          "diameterIn": 3,
+          "diameterMm": 76,
+          "manufacturerCode": "DAH3004848L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3004848l/3-76mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3005252l",
+          "label": "3 1/4 po (83 mm)",
+          "diameterIn": 3.25,
+          "diameterMm": 83,
+          "manufacturerCode": "DAH3005252L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3005252l/3-14-83mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3005656l",
+          "label": "3 1/2 po (89 mm)",
+          "diameterIn": 3.5,
+          "diameterMm": 89,
+          "manufacturerCode": "DAH3005656L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3005656l/3-12-89mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3005858l",
+          "label": "3 5/8 po (92 mm)",
+          "diameterIn": 3.625,
+          "diameterMm": 92,
+          "manufacturerCode": "DAH3005858L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3005858l/3-58-92mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3006464l",
+          "label": "4 po (102 mm)",
+          "diameterIn": 4,
+          "diameterMm": 102,
+          "manufacturerCode": "DAH3006464L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3006464l/4-102mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3006666l",
+          "label": "4 1/8 po (105 mm)",
+          "diameterIn": 4.125,
+          "diameterMm": 105,
+          "manufacturerCode": "DAH3006666L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3006666l/4-18-105mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3006868l",
+          "label": "4 1/4 po (108 mm)",
+          "diameterIn": 4.25,
+          "diameterMm": 108,
+          "manufacturerCode": "DAH3006868L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3006868l/4-14-108mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3007272l",
+          "label": "4 1/2 po (114 mm)",
+          "diameterIn": 4.5,
+          "diameterMm": 114,
+          "manufacturerCode": "DAH3007272L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3007272l/4-12-114mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        },
+        {
+          "id": "dah3008080l",
+          "label": "5 po (127 mm)",
+          "diameterIn": 5,
+          "diameterMm": 127,
+          "manufacturerCode": "DAH3008080L",
+          "unit": "pièces",
+          "sourceUrl": "https://www.dewalt.com/en-us/product/dah3008080l/5-127mm-elite-series-bimetal-hole-saw",
+          "arborIncluded": false
+        }
+      ],
+      "requestReference": {
+        "kind": "manufacturer_variants",
+        "verified": true
+      },
+      "catalogueScope": "MIR_requested_manufacturer_variants",
+      "sourceEvidence": {
+        "type": "user_photo_and_manufacturer",
+        "receivedOn": "2026-11-17",
+        "originalFileAvailable": false,
+        "userPhotoBrandConfirmed": false,
+        "userPhotoDiameterIn": 3.625,
+        "manufacturerFamily": "ELITE SERIES BiMetal",
+        "sourceRegion": "US",
+        "sourceAccess": "official_manufacturer_search_index",
+        "exhaustiveManufacturerRangeConfirmed": false,
+        "canadaAvailabilityConfirmed": false
+      },
+      "specifications": [
+        {
+          "label": "Porte-scie",
+          "value": "Porte-scie compatible requis. Inclusion et compatibilité à confirmer selon le diamètre."
+        },
+        {
+          "label": "Disponibilité",
+          "value": "Références fabricant documentées; offre et délai MIR à confirmer."
+        }
+      ],
+      "notes": [
+        "Les diamètres proposés appartiennent à la gamme ELITE bimétal. Les anciennes références DAH1800 ne sont pas proposées."
+      ],
+      "gaps": [
+        "Photo originale du produit à intégrer.",
+        "Prix, stock MIR et conditionnement à confirmer."
+      ]
+    },
+    {
+      "family": "Outil de coupe",
+      "applications": [
+        "cutting-tool",
+        "accessory"
+      ],
+      "colors": [],
+      "colorStatus": "not_applicable",
+      "unit": "pièce",
+      "status": "mir_reference",
+      "commercialStatus": "MIR_product",
+      "orderable": true,
+      "requestableWithoutPhoto": true,
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "missing_original_user_photo",
+      "renderPattern": "plain",
+      "allowedPatterns": [],
+      "allowedOrientations": [],
+      "researchedOn": "2026-11-17",
+      "sku": null,
+      "manufacturerCode": null,
+      "documents": [],
+      "id": "leiluo-oscillating-hcs-44mm",
+      "brand": "LEILUO",
+      "name": "LEILUO — Lame oscillante HCS bois et plastique · 44 mm",
+      "description": "Lame pour outil oscillant en acier HCS, largeur de coupe de 44 mm, pour bois et plastique. Fixation et compatibilité avec votre outil à confirmer avant utilisation.",
+      "dimensions": {
+        "widthMm": 44
+      },
+      "formats": [],
+      "requestReference": {
+        "kind": "user_identified",
+        "verified": true
+      },
+      "catalogueScope": "MIR_user_identified_blade",
+      "sourceUrl": null,
+      "sourceEvidence": {
+        "type": "user_photo",
+        "receivedOn": "2026-11-17",
+        "originalFileAvailable": false,
+        "visibleBrand": "LEILUO",
+        "visibleMarkings": [
+          "WOOD PLASTIC",
+          "HCS Standard Blade",
+          "Width:44mm"
+        ],
+        "individualSkuConfirmed": false,
+        "mountingCompatibilityConfirmed": false
+      },
+      "specifications": [
+        {
+          "label": "Acier",
+          "value": "HCS — acier à haute teneur en carbone"
+        },
+        {
+          "label": "Matériaux à couper",
+          "value": "Bois et plastique"
+        },
+        {
+          "label": "Fixation",
+          "value": "Compatibilité à confirmer avec votre outil oscillant."
+        }
+      ],
+      "notes": [
+        "La largeur de 44 mm est relevée sur la lame fournie en photo. Aucune profondeur de coupe ni référence de coffret attribuée à cette lame."
+      ],
+      "gaps": [
+        "Photo originale du produit à intégrer.",
+        "Référence unitaire, fixation et conditionnement à confirmer.",
+        "Prix et stock MIR à confirmer."
+      ]
     }
   ],
   "schemaVersion": "5.2",

@@ -7770,6 +7770,196 @@ for (const name of ['Acadia','Barista','Blanc','Bleu minuit','Bois de grange','B
   entries.push(['Photo de retouche MIR · '+name+' · touche de peinture sèche sur le couvercle. Rendu écran indicatif.','MIR touch-up paint photo · '+name+' · dried paint sample on the lid. Screen colours are indicative.']);
   entries.push(['Pot CanExel · '+name+' · couleur du couvercle indicative.','CanExel container · '+name+' · lid colour is indicative.']);
 }
+// Cutting tools: display translations do not mutate variant IDs or stored units.
+entries.push(...[
+  [
+    "Outil de coupe",
+    "Cutting tool"
+  ],
+  [
+    "Outil de coupe, Accessoire",
+    "Cutting tool, Accessory"
+  ],
+  [
+    "DEWALT ELITE — Scie-cloche bimétal",
+    "DEWALT ELITE — Bi-metal hole saw"
+  ],
+  [
+    "Choisissez parmi 15 diamètres documentés de 2 à 5 po. Scie-cloche DEWALT ELITE bimétal pour bois et métal mince. Prix et disponibilité au Canada à confirmer avec MIR.",
+    "Choose from 15 documented diameters from 2 to 5 in. DEWALT ELITE bi-metal hole saw for wood and thin metal. Confirm Canadian availability and pricing with MIR."
+  ],
+  [
+    "LEILUO — Lame oscillante HCS bois et plastique · 44 mm",
+    "LEILUO — HCS oscillating blade for wood and plastic · 44 mm"
+  ],
+  [
+    "Lame pour outil oscillant en acier HCS, largeur de coupe de 44 mm, pour bois et plastique. Fixation et compatibilité avec votre outil à confirmer avant utilisation.",
+    "HCS steel oscillating-tool blade with a 44 mm cutting width, for wood and plastic. Confirm the mount and compatibility with your tool before use."
+  ],
+  [
+    "Diamètre",
+    "Diameter"
+  ],
+  [
+    "Choisir le diamètre",
+    "Choose a diameter"
+  ],
+  [
+    "Diamètres proposés",
+    "Available diameters"
+  ],
+  [
+    "Diamètre à confirmer",
+    "Diameter to confirm"
+  ],
+  [
+    "Diamètres : 2 à 5 po",
+    "Diameters: 2 to 5 in."
+  ],
+  [
+    "Choisissez le diamètre avant de saisir la quantité.",
+    "Choose a diameter before entering a quantity."
+  ],
+  [
+    "Le diamètre de cet article doit être choisi.",
+    "Choose a diameter for this item."
+  ],
+  [
+    "Porte-scie",
+    "Arbor"
+  ],
+  [
+    "Porte-scie compatible requis. Inclusion et compatibilité à confirmer selon le diamètre.",
+    "A compatible arbor is required. Confirm inclusion and compatibility for the selected diameter."
+  ],
+  [
+    "Références fabricant documentées; offre et délai MIR à confirmer.",
+    "Documented manufacturer references; confirm MIR availability and lead time."
+  ],
+  [
+    "Acier",
+    "Steel"
+  ],
+  [
+    "HCS — acier à haute teneur en carbone",
+    "HCS — high-carbon steel"
+  ],
+  [
+    "Matériaux à couper",
+    "Cutting materials"
+  ],
+  [
+    "Bois et plastique",
+    "Wood and plastic"
+  ],
+  [
+    "Compatibilité à confirmer avec votre outil oscillant.",
+    "Confirm compatibility with your oscillating tool."
+  ],
+  [
+    "Photo originale du produit à intégrer.",
+    "Original product photo to be added."
+  ],
+  [
+    "Prix, stock MIR et conditionnement à confirmer.",
+    "Confirm MIR pricing, stock and packaging."
+  ],
+  [
+    "Référence unitaire, fixation et conditionnement à confirmer.",
+    "Confirm the individual reference, mount and packaging."
+  ],
+  [
+    "Diamètre pour DEWALT ELITE — Scie-cloche bimétal",
+    "Diameter for DEWALT ELITE — Bi-metal hole saw"
+  ],
+  [
+    "Quantité pour DEWALT ELITE — Scie-cloche bimétal",
+    "Quantity for DEWALT ELITE — Bi-metal hole saw"
+  ],
+  [
+    "Retirer DEWALT ELITE — Scie-cloche bimétal",
+    "Remove DEWALT ELITE — Bi-metal hole saw"
+  ],
+  [
+    "Diamètre pour LEILUO — Lame oscillante HCS bois et plastique · 44 mm",
+    "Diameter for LEILUO — HCS oscillating blade for wood and plastic · 44 mm"
+  ],
+  [
+    "Quantité pour LEILUO — Lame oscillante HCS bois et plastique · 44 mm",
+    "Quantity for LEILUO — HCS oscillating blade for wood and plastic · 44 mm"
+  ],
+  [
+    "Retirer LEILUO — Lame oscillante HCS bois et plastique · 44 mm",
+    "Remove LEILUO — HCS oscillating blade for wood and plastic · 44 mm"
+  ]
+]);
+entries.push(...[
+  [
+    "Quantités entières. 2 po (51 mm).",
+    "Whole quantities. 2 in. (51 mm)."
+  ],
+  [
+    "Quantités entières. 2 1/8 po (54 mm).",
+    "Whole quantities. 2 1/8 in. (54 mm)."
+  ],
+  [
+    "Quantités entières. 2 1/4 po (57 mm).",
+    "Whole quantities. 2 1/4 in. (57 mm)."
+  ],
+  [
+    "Quantités entières. 2 1/2 po (64 mm).",
+    "Whole quantities. 2 1/2 in. (64 mm)."
+  ],
+  [
+    "Quantités entières. 2 5/8 po (67 mm).",
+    "Whole quantities. 2 5/8 in. (67 mm)."
+  ],
+  [
+    "Quantités entières. 2 3/4 po (70 mm).",
+    "Whole quantities. 2 3/4 in. (70 mm)."
+  ],
+  [
+    "Quantités entières. 3 po (76 mm).",
+    "Whole quantities. 3 in. (76 mm)."
+  ],
+  [
+    "Quantités entières. 3 1/4 po (83 mm).",
+    "Whole quantities. 3 1/4 in. (83 mm)."
+  ],
+  [
+    "Quantités entières. 3 1/2 po (89 mm).",
+    "Whole quantities. 3 1/2 in. (89 mm)."
+  ],
+  [
+    "Quantités entières. 3 5/8 po (92 mm).",
+    "Whole quantities. 3 5/8 in. (92 mm)."
+  ],
+  [
+    "Quantités entières. 4 po (102 mm).",
+    "Whole quantities. 4 in. (102 mm)."
+  ],
+  [
+    "Quantités entières. 4 1/8 po (105 mm).",
+    "Whole quantities. 4 1/8 in. (105 mm)."
+  ],
+  [
+    "Quantités entières. 4 1/4 po (108 mm).",
+    "Whole quantities. 4 1/4 in. (108 mm)."
+  ],
+  [
+    "Quantités entières. 4 1/2 po (114 mm).",
+    "Whole quantities. 4 1/2 in. (114 mm)."
+  ],
+  [
+    "Quantités entières. 5 po (127 mm).",
+    "Whole quantities. 5 in. (127 mm)."
+  ],
+  [
+    "Quantités entières. pièce.",
+    "Whole quantities. piece."
+  ]
+]);
+entries.push(['Sans option de couleur','No colour option']);
 const dictionary=Object.freeze(Object.fromEntries(entries));
 if(typeof module==='object'&&module.exports)module.exports=dictionary;
 if(root)root.MIRClientEnglish=dictionary;

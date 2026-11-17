@@ -12,7 +12,7 @@ const byId=new Map(materials.map(item=>[item.id,item]));
 const accessories=['mir-caulk-nozzle-45-5','mir-adfast-yellow-nozzles-5','mir-caulk-sausage-nozzle','mir-bates-caulk-gun'];
 
 test('inventaire canonique sans identifiant en double',()=>{
-  assert.equal(materials.length,129);
+  assert.equal(materials.length,131);
   assert.equal(byId.size,materials.length);
   for(const item of materials)assert.ok(item.id&&item.name&&item.brand,`identité incomplète: ${item.id}`);
 });

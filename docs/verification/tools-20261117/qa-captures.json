@@ -1,0 +1,102 @@
+{
+  "checkedAt": "2026-11-17T16:00:57.045Z",
+  "checks": [
+    {
+      "file": "qa-produit-dewalt-1440.png",
+      "width": 1440,
+      "language": "fr-CA",
+      "framing": "Fiche complète",
+      "overflow": false,
+      "scrollY": 0
+    },
+    {
+      "file": "qa-produit-leiluo-1440.png",
+      "width": 1440,
+      "language": "fr-CA",
+      "framing": "Fiche complète",
+      "overflow": false,
+      "scrollY": 0
+    },
+    {
+      "file": "qa-produit-dewalt-en-1440.png",
+      "width": 1440,
+      "language": "en-CA",
+      "framing": "Fiche complète",
+      "overflow": false,
+      "scrollY": 0
+    },
+    {
+      "file": "qa-produit-leiluo-en-1440.png",
+      "width": 1440,
+      "language": "en-CA",
+      "framing": "Fiche complète",
+      "overflow": false,
+      "scrollY": 0
+    },
+    {
+      "file": "qa-produit-dewalt-834.png",
+      "width": 834,
+      "language": "fr-CA",
+      "framing": "Fiche complète",
+      "overflow": false,
+      "scrollY": 0
+    },
+    {
+      "file": "qa-produit-leiluo-834.png",
+      "width": 834,
+      "language": "fr-CA",
+      "framing": "Fiche complète",
+      "overflow": false,
+      "scrollY": 0
+    },
+    {
+      "file": "qa-produit-dewalt-en-834.png",
+      "width": 834,
+      "language": "en-CA",
+      "framing": "Fiche complète",
+      "overflow": false,
+      "scrollY": 0
+    },
+    {
+      "file": "qa-produit-leiluo-en-834.png",
+      "width": 834,
+      "language": "en-CA",
+      "framing": "Fiche complète",
+      "overflow": false,
+      "scrollY": 0
+    },
+    {
+      "file": "qa-produit-dewalt-390.png",
+      "width": 390,
+      "language": "fr-CA",
+      "framing": "Choix du diamètre",
+      "overflow": false,
+      "scrollY": 683
+    },
+    {
+      "file": "qa-produit-leiluo-390.png",
+      "width": 390,
+      "language": "fr-CA",
+      "framing": "Quantité de la lame",
+      "overflow": false,
+      "scrollY": 721
+    },
+    {
+      "file": "qa-produit-dewalt-en-390.png",
+      "width": 390,
+      "language": "en-CA",
+      "framing": "Choix du diamètre",
+      "overflow": false,
+      "scrollY": 683
+    },
+    {
+      "file": "qa-produit-leiluo-en-390.png",
+      "width": 390,
+      "language": "en-CA",
+      "framing": "Quantité de la lame",
+      "overflow": false,
+      "scrollY": 697
+    }
+  ],
+  "success": true
+}

@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-11-17T16:01:16.191Z",
+  "checks": [
+    {
+      "width": 1440,
+      "images": 27,
+      "allImagesDecoded": true,
+      "filtersPass": true,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 834,
+      "images": 27,
+      "allImagesDecoded": true,
+      "filtersPass": true,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 390,
+      "images": 27,
+      "allImagesDecoded": true,
+      "filtersPass": true,
+      "overflow": false,
+      "errors": []
+    }
+  ],
+  "success": true
+}

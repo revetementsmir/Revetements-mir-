@@ -34,7 +34,7 @@
     const a=m.applications||[];
     if(a.includes('fastener')||/Fixation/i.test(m.family||''))return 'fixations';
     if(a.includes('sealant')||a.includes('siding-joint')||/Membrane/i.test(m.family||''))return 'membranes-joints';
-    if(a.includes('touch-up'))return 'lames-consommables';
+    if(a.includes('touch-up')||a.includes('cutting-tool'))return 'lames-consommables';
     if(a.includes('bending')||a.includes('capping'))return 'pliages';
     if(a.includes('siding')||a.includes('architectural-panel'))return 'revetements';
     return 'soffites-moulures';
@@ -83,7 +83,10 @@
       items.push({id:m.id,materialId:m.id,name:m.name,description:m.description||'',brand:m.brand||null,category,unit,unitLabel:m.unit||unit,
         unitBasis:'internal_request_unit',quantityStep:1,sku:null,manufacturerReference:m.manufacturerCode||m.dimensions?.manufacturerPid||null,
         packaging:copy(m.packaging||{}),mirPreferred:m.mirPreferred===true,
-        formats:copy((m.formats||[]).filter(f=>clean(f.id)&&finite(f.lengthIn)&&f.lengthIn>0)),
+        ...(m.formatAxis==='diameter'?{formatAxis:'diameter'}:{}),
+        formats:copy((m.formats||[]).filter(f=>clean(f.id)&&(m.formatAxis==='diameter'
+          ?finite(f.diameterIn)&&f.diameterIn>0||finite(f.diameterMm)&&f.diameterMm>0
+          :finite(f.lengthIn)&&f.lengthIn>0))),
         colorPolicy,colors,colorScope,colorNote,baseColorId:m.colorStatus==='primed_only'?'primed':fixedFinish?.id||null,
         baseColorName:m.colorStatus==='primed_only'?'Apprêté':fixedFinish?.name||null,dimensions:copy(m.dimensions||{}),
         stockLengthIn:finite(m.dimensions?.lengthIn)?m.dimensions.lengthIn:null,measureFields:[],profile:null,
@@ -712,11 +715,15 @@
       if(spec.unit&&spec.unit!==item.unit)fail('UNIT_MISMATCH','L’unité doit rester celle de l’article; aucune conversion boîte/pièce n’est automatique.');
       if(spec.brand&&spec.brand!==item.brand)fail('BRAND_MISMATCH','Choisir la référence de la bonne marque; la couleur ne peut pas être transférée à une autre marque.');
       const formats=item.formats||[];let format=null;
-      if(formats.length>1&&!spec.formatId)fail('FORMAT_REQUIRED','Choisir le format ou la longueur de cet article.');
+      if(formats.length>1&&!spec.formatId)fail('FORMAT_REQUIRED',item.formatAxis==='diameter'?'Choisir le diamètre de cet article.':'Choisir le format ou la longueur de cet article.');
       if(spec.formatId){format=formats.find(f=>f.id===spec.formatId);if(!format)fail('FORMAT_UNKNOWN','Ce format ne correspond pas à l’article sélectionné.');}
       else if(formats.length===1)format=formats[0];
       const formatId=formats.length>1?format?.id||null:null;
-      const dimensions={...copy(item.dimensions||{}),...(format?{lengthIn:format.lengthIn,...(finite(format.widthIn)?{widthIn:format.widthIn}:{}),...(format.measurementKind?{measurementKind:format.measurementKind}:{})}:{})};
+      const diameterFormat=item.formatAxis==='diameter';
+      const dimensions={...copy(item.dimensions||{}),...(format?(diameterFormat?{
+        ...(finite(format.diameterIn)&&format.diameterIn>0?{diameterIn:format.diameterIn}:{}),
+        ...(finite(format.diameterMm)&&format.diameterMm>0?{diameterMm:format.diameterMm}:{})
+      }:{lengthIn:format.lengthIn,...(finite(format.widthIn)?{widthIn:format.widthIn}:{}),...(format.measurementKind?{measurementKind:format.measurementKind}:{})}):{})};
       const manufacturerReference=format?.manufacturerCode||item.manufacturerReference||null;
       let colorId=item.baseColorId||null,colorName=item.baseColorName||null;
       if(item.colorPolicy==='none'){
@@ -738,7 +745,7 @@
       const supplierColor=item.storeColors?.find(color=>color.id===colorId);
       const line={itemId:item.id,name:item.name,brand:item.brand||null,materialId:item.materialId||null,
         quantity,unit:item.unit,colorId,colorName,colorScope:item.colorScope||null,dimensionsIn,
-        profile:item.profile||null,stockLengthIn:format?.lengthIn||item.stockLengthIn||null,sku:item.sku||null,
+        profile:item.profile||null,stockLengthIn:diameterFormat?null:format?.lengthIn||item.stockLengthIn||null,sku:item.sku||null,
         manufacturerReference,packaging:copy(item.packaging||{}),formatId,format:copy(format),formatLabel:format?.label||null,
         referencePending:!!item.referencePending,reservable:!item.referencePending,
         manufacturingReviewRequired:!!item.manufacturingReviewRequired,

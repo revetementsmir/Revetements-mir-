@@ -20,8 +20,8 @@
      '<option value="'+i+'" data-item-id="'+safe(v.itemId)+'" data-color-id="'+safe(v.colorId||'')+'">'+safe(v.label)+'</option>').join('');
    if(type==='color')return '<option value="">Choisir la couleur</option>'+
      (window.MIRCataloguePolicy?.sortColors(item.storeColors||item.colors)||(item.storeColors||item.colors||[])).map(c=>'<option value="'+safe(c.id)+'"'+(item.baseColorId===c.id?' selected':'')+'>'+safe(c.name)+'</option>').join('');
-   return '<option value="">Choisir la longueur</option>'+
-     (item.formats||[]).map(f=>'<option value="'+safe(f.id)+'">'+safe(f.label||f.lengthIn+' po')+'</option>').join('');
+   return '<option value="">'+(item.formatAxis==='diameter'?'Choisir le diamètre':'Choisir la longueur')+'</option>'+
+     (item.formats||[]).map(f=>'<option value="'+safe(f.id)+'">'+safe(f.label||(f.diameterIn?f.diameterIn+' po':f.diameterMm?f.diameterMm+' mm':f.lengthIn+' po'))+'</option>').join('');
  }
  function card(item){
    const grouped=item.reviewVariants?.length>1,needsColor=!grouped&&item.colorPolicy==='required'&&item.colors?.length;
@@ -31,7 +31,7 @@
      '<div class="visual mir-catalogue-photo" data-visual>'+imageMarkup(item)+'</div><p class="mir-photo-caption" data-visual-label>'+
      safe(window.MIRMaterialPreview.photoLabel(photoFor(item)))+'</p><div class="card-body"><h2>'+safe(item.name)+'</h2>'+
      (grouped?'<label>Couleur / type<select data-product-variant>'+options(item,'variant')+'</select></label>':'')+
-     (format?'<label>Longueur / format<select data-product-format>'+options(item,'format')+'</select></label>':'')+
+     (format?'<label>'+(item.formatAxis==='diameter'?'Diamètre':'Longueur / format')+'<select data-product-format>'+options(item,'format')+'</select></label>':'')+
      (!format&&!grouped&&item.formats?.length===1?'<small>'+safe(item.formats[0].label||'')+'</small>':'')+
      (needsColor?'<label>Couleur<select data-product-color>'+options(item,'color')+'</select></label>':'')+
      (item.referencePending?'<small>Référence ou disponibilité à confirmer</small>':'')+

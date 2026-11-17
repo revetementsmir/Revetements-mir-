@@ -1,0 +1,872 @@
+{
+  "capturedAt": "2026-11-17T15:58:34.970Z",
+  "canonicalCatalogue": "dist/catalogue-fd6866b49d21.json",
+  "captures": [
+    {
+      "file": "qa-boutique-dewalt-1440.png",
+      "surface": "boutique",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 1440,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-leiluo-1440.png",
+      "surface": "boutique",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 1440,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-produit-dewalt-1440.png",
+      "surface": "produit",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 1440,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Fiche complète"
+    },
+    {
+      "file": "qa-produit-leiluo-1440.png",
+      "surface": "produit",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 1440,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Fiche complète"
+    },
+    {
+      "file": "qa-panier-fr-1440.png",
+      "surface": "panier",
+      "width": 1440,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-panier-en-1440.png",
+      "surface": "panier",
+      "width": 1440,
+      "language": "en-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-produit-dewalt-en-1440.png",
+      "surface": "produit",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 1440,
+      "language": "en-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Fiche complète"
+    },
+    {
+      "file": "qa-produit-leiluo-en-1440.png",
+      "surface": "produit",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 1440,
+      "language": "en-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Fiche complète"
+    },
+    {
+      "file": "qa-magasin-dewalt-1440.png",
+      "surface": "magasin-revue",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 1440,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-leiluo-1440.png",
+      "surface": "magasin-revue",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 1440,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-panier-1440.png",
+      "surface": "magasin-panier",
+      "width": 1440,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-terrain-dewalt-1440.png",
+      "surface": "terrain-fixture",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 1440,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-terrain-leiluo-1440.png",
+      "surface": "terrain-fixture",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 1440,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-terrain-panier-1440.png",
+      "surface": "terrain-panier-fixture",
+      "width": 1440,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-dewalt-834.png",
+      "surface": "boutique",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 834,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-leiluo-834.png",
+      "surface": "boutique",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 834,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-produit-dewalt-834.png",
+      "surface": "produit",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 834,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Fiche complète"
+    },
+    {
+      "file": "qa-produit-leiluo-834.png",
+      "surface": "produit",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 834,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Fiche complète"
+    },
+    {
+      "file": "qa-panier-fr-834.png",
+      "surface": "panier",
+      "width": 834,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-panier-en-834.png",
+      "surface": "panier",
+      "width": 834,
+      "language": "en-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-produit-dewalt-en-834.png",
+      "surface": "produit",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 834,
+      "language": "en-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Fiche complète"
+    },
+    {
+      "file": "qa-produit-leiluo-en-834.png",
+      "surface": "produit",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 834,
+      "language": "en-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Fiche complète"
+    },
+    {
+      "file": "qa-magasin-dewalt-834.png",
+      "surface": "magasin-revue",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 834,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-leiluo-834.png",
+      "surface": "magasin-revue",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 834,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-panier-834.png",
+      "surface": "magasin-panier",
+      "width": 834,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-terrain-dewalt-834.png",
+      "surface": "terrain-fixture",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 834,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-terrain-leiluo-834.png",
+      "surface": "terrain-fixture",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 834,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-terrain-panier-834.png",
+      "surface": "terrain-panier-fixture",
+      "width": 834,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-dewalt-390.png",
+      "surface": "boutique",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 390,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-leiluo-390.png",
+      "surface": "boutique",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 390,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-produit-dewalt-390.png",
+      "surface": "produit",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 390,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Choix du diamètre"
+    },
+    {
+      "file": "qa-produit-leiluo-390.png",
+      "surface": "produit",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 390,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Quantité de la lame"
+    },
+    {
+      "file": "qa-panier-fr-390.png",
+      "surface": "panier",
+      "width": 390,
+      "language": "fr-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-panier-en-390.png",
+      "surface": "panier",
+      "width": 390,
+      "language": "en-CA",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-produit-dewalt-en-390.png",
+      "surface": "produit",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 390,
+      "language": "en-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Choix du diamètre"
+    },
+    {
+      "file": "qa-produit-leiluo-en-390.png",
+      "surface": "produit",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 390,
+      "language": "en-CA",
+      "simulated": false,
+      "overflow": false,
+      "framing": "Quantité de la lame"
+    },
+    {
+      "file": "qa-magasin-dewalt-390.png",
+      "surface": "magasin-revue",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 390,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-leiluo-390.png",
+      "surface": "magasin-revue",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 390,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-panier-390.png",
+      "surface": "magasin-panier",
+      "width": 390,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-terrain-dewalt-390.png",
+      "surface": "terrain-fixture",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 390,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-terrain-leiluo-390.png",
+      "surface": "terrain-fixture",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 390,
+      "simulated": true,
+      "overflow": false
+    },
+    {
+      "file": "qa-terrain-panier-390.png",
+      "surface": "terrain-panier-fixture",
+      "width": 390,
+      "simulated": true,
+      "overflow": false
+    }
+  ],
+  "checks": [
+    {
+      "surface": "boutique-search",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 1440,
+      "found": true
+    },
+    {
+      "surface": "boutique-search",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 1440,
+      "found": true
+    },
+    {
+      "surface": "public-cart",
+      "width": 1440,
+      "lines": [
+        {
+          "materialId": "dewalt-bimetal-hole-saws",
+          "formatId": "dah3005858l",
+          "reference": "DAH3005858L",
+          "quantity": 2,
+          "unit": "pièces"
+        },
+        {
+          "materialId": "dewalt-bimetal-hole-saws",
+          "formatId": "dah3008080l",
+          "reference": "DAH3008080L",
+          "quantity": 3,
+          "unit": "pièces"
+        },
+        {
+          "materialId": "leiluo-oscillating-hcs-44mm",
+          "formatId": null,
+          "reference": null,
+          "quantity": 4,
+          "unit": "pièces"
+        }
+      ],
+      "reloadPreserved": true,
+      "localePreserved": true,
+      "enText": "DEWALT\nDEWALT ELITE — Bi-metal hole saw\n\nFinish: No colour option\nDiameter: 3 5/8 in. (92 mm)\nPrice on request\n\nDiameter\nChoose a diameter\n2 in. (51 mm)\n2 1/8 in. (54 mm)\n2 1/4 in. (57 mm)\n2 1/2 in. (64 mm)\n2 5/8 in. (67 mm)\n2 3/4 in. (70 mm)\n3 in. (76 mm)\n3 1/4 in. (83 mm)\n3 1/2 in. (89 mm)\n3 5/8 in. (92 mm)\n4 in. (102 mm)\n4 1/8 in. (105 mm)\n4 1/4 in. (108 mm)\n4 1/2 in. (114 mm)\n5 in. (127 mm)\n\nWhole quantities. 3 5/8 in. (92 mm).\n\nQuantity\nRequired unit\npieces\n×\n\nAmount to confirm\nBefore taxes and delivery\n\nDEWALT\nDEWALT ELITE — Bi-metal hole saw\n\nFinish: No colour option\nDiameter: 5 in. (127 mm)\nPrice on request\n\nDiameter\nChoose a diameter\n2 in. (51 mm)\n2 1/8 in. (54 mm)\n2 1/4 in. (57 mm)\n2 1/2 in. (64 mm)\n2 5/8 in. (67 mm)\n2 3/4 in. (70 mm)\n3 in. (76 mm)\n3 1/4 in. (83 mm)\n3 1/2 in. (89 mm)\n3 5/8 in. (92 mm)\n4 in. (102 mm)\n4 1/8 in. (105 mm)\n4 1/4 in. (108 mm)\n4 1/2 in. (114 mm)\n5 in. (127 mm)\n\nWhole quantities. 5 in. (127 mm).\n\nQuantity\nRequired unit\npieces\n×\n\nAmount to confirm\nBefore taxes and delivery\n\nLEILUO\nLEILUO — HCS oscillating blade for wood and plastic · 44 mm\n\nFinish: No colour option\nPrice on request\n\nWhole quantities. piece.\n\nQuantity\nRequired unit\npieces\n×\n\nAmount to confirm\nBefore taxes and delivery"
+    },
+    {
+      "surface": "product-en",
+      "width": 1440,
+      "id": "dewalt-bimetal-hole-saws",
+      "visibleText": "DEWALT →\nDEWALT ELITE — Bi-metal hole saw\n\nChoose from 15 documented diameters from 2 to 5 in. DEWALT ELITE bi-metal hole saw for wood and thin metal. Confirm Canadian availability and pricing with MIR.\n\nManufacturer image to be added\n\nPhoto unavailable · placeholder image\n\nPrice on request\n\nDiameter\nChoose a diameter\n2 in. (51 mm)\n2 1/8 in. (54 mm)\n2 1/4 in. (57 mm)\n2 1/2 in. (64 mm)\n2 5/8 in. (67 mm)\n2 3/4 in. (70 mm)\n3 in. (76 mm)\n3 1/4 in. (83 mm)\n3 1/2 in. (89 mm)\n3 5/8 in. (92 mm)\n4 in. (102 mm)\n4 1/8 in. (105 mm)\n4 1/4 in. (108 mm)\n4 1/2 in. (114 mm)\n5 in. (127 mm)\nRequested quantity\nRequired unit\npieces\n\nWhole quantities. 3 5/8 in. (92 mm).\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "options": [
+        "Choose a diameter",
+        "2 in. (51 mm)",
+        "2 1/8 in. (54 mm)",
+        "2 1/4 in. (57 mm)",
+        "2 1/2 in. (64 mm)",
+        "2 5/8 in. (67 mm)",
+        "2 3/4 in. (70 mm)",
+        "3 in. (76 mm)",
+        "3 1/4 in. (83 mm)",
+        "3 1/2 in. (89 mm)",
+        "3 5/8 in. (92 mm)",
+        "4 in. (102 mm)",
+        "4 1/8 in. (105 mm)",
+        "4 1/4 in. (108 mm)",
+        "4 1/2 in. (114 mm)",
+        "5 in. (127 mm)"
+      ]
+    },
+    {
+      "surface": "product-en",
+      "width": 1440,
+      "id": "leiluo-oscillating-hcs-44mm",
+      "visibleText": "LEILUO →\nLEILUO — HCS oscillating blade for wood and plastic · 44 mm\n\nHCS steel oscillating-tool blade with a 44 mm cutting width, for wood and plastic. Confirm the mount and compatibility with your tool before use.\n\nManufacturer image to be added\n\nPhoto unavailable · placeholder image\n\nPrice on request\n\nRequested quantity\nRequired unit\npieces\n\nWhole quantities. piece.\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "options": []
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 1440,
+      "cartLines": 3,
+      "cartText": "Panier d’essai · 3 lignes\nDEWALT ELITE — Scie-cloche bimétal\n3 5/8 po (92 mm) · DAH3005858L\n2 pièce\nRetirer du panier\nDEWALT ELITE — Scie-cloche bimétal\n5 po (127 mm) · DAH3008080L\n3 pièce\nRetirer du panier\nLEILUO — Lame oscillante HCS bois et plastique · 44 mm\n4 pièce\nRetirer du panier\n\nSimulation locale uniquement : aucune commande ou livraison transmise.",
+      "alerts": [],
+      "reloadPersistence": "Le panier d’essai est volontairement en mémoire seulement; pas de persistance applicative ajoutée."
+    },
+    {
+      "surface": "terrain-fixture",
+      "width": 1440,
+      "cartLines": [
+        {
+          "itemId": "dewalt-bimetal-hole-saws",
+          "quantity": 2,
+          "colorId": null,
+          "formatId": "dah3005858l",
+          "dimensionsIn": {},
+          "cartKey": "9d055592-9402-4c9b-9836-ed95c116c4fa"
+        },
+        {
+          "itemId": "dewalt-bimetal-hole-saws",
+          "quantity": 3,
+          "colorId": null,
+          "formatId": "dah3008080l",
+          "dimensionsIn": {},
+          "cartKey": "c6e8bc60-bb88-4739-b4bb-06d38331fbe9"
+        },
+        {
+          "itemId": "leiluo-oscillating-hcs-44mm",
+          "quantity": 4,
+          "colorId": null,
+          "formatId": null,
+          "dimensionsIn": {},
+          "cartKey": "86b357b4-dd25-4111-8daf-b0b0a4d91be0"
+        }
+      ],
+      "reloadPreserved": true,
+      "cartText": "DEWALT ELITE — Scie-cloche bimétal\nDEWALT · Réf. DAH3005858L · 3 5/8 po (92 mm)\npièce\n×\nDEWALT ELITE — Scie-cloche bimétal\nDEWALT · Réf. DAH3008080L · 5 po (127 mm)\npièce\n×\nLEILUO — Lame oscillante HCS bois et plastique · 44 mm\nLEILUO\npièce\n×",
+      "fixtureWrites": []
+    },
+    {
+      "surface": "boutique-search",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 834,
+      "found": true
+    },
+    {
+      "surface": "boutique-search",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 834,
+      "found": true
+    },
+    {
+      "surface": "public-cart",
+      "width": 834,
+      "lines": [
+        {
+          "materialId": "dewalt-bimetal-hole-saws",
+          "formatId": "dah3005858l",
+          "reference": "DAH3005858L",
+          "quantity": 2,
+          "unit": "pièces"
+        },
+        {
+          "materialId": "dewalt-bimetal-hole-saws",
+          "formatId": "dah3008080l",
+          "reference": "DAH3008080L",
+          "quantity": 3,
+          "unit": "pièces"
+        },
+        {
+          "materialId": "leiluo-oscillating-hcs-44mm",
+          "formatId": null,
+          "reference": null,
+          "quantity": 4,
+          "unit": "pièces"
+        }
+      ],
+      "reloadPreserved": true,
+      "localePreserved": true,
+      "enText": "DEWALT\nDEWALT ELITE — Bi-metal hole saw\n\nFinish: No colour option\nDiameter: 3 5/8 in. (92 mm)\nPrice on request\n\nDiameter\nChoose a diameter\n2 in. (51 mm)\n2 1/8 in. (54 mm)\n2 1/4 in. (57 mm)\n2 1/2 in. (64 mm)\n2 5/8 in. (67 mm)\n2 3/4 in. (70 mm)\n3 in. (76 mm)\n3 1/4 in. (83 mm)\n3 1/2 in. (89 mm)\n3 5/8 in. (92 mm)\n4 in. (102 mm)\n4 1/8 in. (105 mm)\n4 1/4 in. (108 mm)\n4 1/2 in. (114 mm)\n5 in. (127 mm)\n\nWhole quantities. 3 5/8 in. (92 mm).\n\nQuantity\nRequired unit\npieces\n×\n\nAmount to confirm\nBefore taxes and delivery\n\nDEWALT\nDEWALT ELITE — Bi-metal hole saw\n\nFinish: No colour option\nDiameter: 5 in. (127 mm)\nPrice on request\n\nDiameter\nChoose a diameter\n2 in. (51 mm)\n2 1/8 in. (54 mm)\n2 1/4 in. (57 mm)\n2 1/2 in. (64 mm)\n2 5/8 in. (67 mm)\n2 3/4 in. (70 mm)\n3 in. (76 mm)\n3 1/4 in. (83 mm)\n3 1/2 in. (89 mm)\n3 5/8 in. (92 mm)\n4 in. (102 mm)\n4 1/8 in. (105 mm)\n4 1/4 in. (108 mm)\n4 1/2 in. (114 mm)\n5 in. (127 mm)\n\nWhole quantities. 5 in. (127 mm).\n\nQuantity\nRequired unit\npieces\n×\n\nAmount to confirm\nBefore taxes and delivery\n\nLEILUO\nLEILUO — HCS oscillating blade for wood and plastic · 44 mm\n\nFinish: No colour option\nPrice on request\n\nWhole quantities. piece.\n\nQuantity\nRequired unit\npieces\n×\n\nAmount to confirm\nBefore taxes and delivery"
+    },
+    {
+      "surface": "product-en",
+      "width": 834,
+      "id": "dewalt-bimetal-hole-saws",
+      "visibleText": "DEWALT →\nDEWALT ELITE — Bi-metal hole saw\n\nChoose from 15 documented diameters from 2 to 5 in. DEWALT ELITE bi-metal hole saw for wood and thin metal. Confirm Canadian availability and pricing with MIR.\n\nManufacturer image to be added\n\nPhoto unavailable · placeholder image\n\nPrice on request\n\nDiameter\nChoose a diameter\n2 in. (51 mm)\n2 1/8 in. (54 mm)\n2 1/4 in. (57 mm)\n2 1/2 in. (64 mm)\n2 5/8 in. (67 mm)\n2 3/4 in. (70 mm)\n3 in. (76 mm)\n3 1/4 in. (83 mm)\n3 1/2 in. (89 mm)\n3 5/8 in. (92 mm)\n4 in. (102 mm)\n4 1/8 in. (105 mm)\n4 1/4 in. (108 mm)\n4 1/2 in. (114 mm)\n5 in. (127 mm)\nRequested quantity\nRequired unit\npieces\n\nWhole quantities. 3 5/8 in. (92 mm).\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "options": [
+        "Choose a diameter",
+        "2 in. (51 mm)",
+        "2 1/8 in. (54 mm)",
+        "2 1/4 in. (57 mm)",
+        "2 1/2 in. (64 mm)",
+        "2 5/8 in. (67 mm)",
+        "2 3/4 in. (70 mm)",
+        "3 in. (76 mm)",
+        "3 1/4 in. (83 mm)",
+        "3 1/2 in. (89 mm)",
+        "3 5/8 in. (92 mm)",
+        "4 in. (102 mm)",
+        "4 1/8 in. (105 mm)",
+        "4 1/4 in. (108 mm)",
+        "4 1/2 in. (114 mm)",
+        "5 in. (127 mm)"
+      ]
+    },
+    {
+      "surface": "product-en",
+      "width": 834,
+      "id": "leiluo-oscillating-hcs-44mm",
+      "visibleText": "LEILUO →\nLEILUO — HCS oscillating blade for wood and plastic · 44 mm\n\nHCS steel oscillating-tool blade with a 44 mm cutting width, for wood and plastic. Confirm the mount and compatibility with your tool before use.\n\nManufacturer image to be added\n\nPhoto unavailable · placeholder image\n\nPrice on request\n\nRequested quantity\nRequired unit\npieces\n\nWhole quantities. piece.\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "options": []
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 834,
+      "cartLines": 3,
+      "cartText": "Panier d’essai · 3 lignes\nDEWALT ELITE — Scie-cloche bimétal\n3 5/8 po (92 mm) · DAH3005858L\n2 pièce\nRetirer du panier\nDEWALT ELITE — Scie-cloche bimétal\n5 po (127 mm) · DAH3008080L\n3 pièce\nRetirer du panier\nLEILUO — Lame oscillante HCS bois et plastique · 44 mm\n4 pièce\nRetirer du panier\n\nSimulation locale uniquement : aucune commande ou livraison transmise.",
+      "alerts": [],
+      "reloadPersistence": "Le panier d’essai est volontairement en mémoire seulement; pas de persistance applicative ajoutée."
+    },
+    {
+      "surface": "terrain-fixture",
+      "width": 834,
+      "cartLines": [
+        {
+          "itemId": "dewalt-bimetal-hole-saws",
+          "quantity": 2,
+          "colorId": null,
+          "formatId": "dah3005858l",
+          "dimensionsIn": {},
+          "cartKey": "2f303589-9bf8-46dd-92c8-69cf12a8d235"
+        },
+        {
+          "itemId": "dewalt-bimetal-hole-saws",
+          "quantity": 3,
+          "colorId": null,
+          "formatId": "dah3008080l",
+          "dimensionsIn": {},
+          "cartKey": "a8d76bd0-8601-4d26-839d-b7d760963668"
+        },
+        {
+          "itemId": "leiluo-oscillating-hcs-44mm",
+          "quantity": 4,
+          "colorId": null,
+          "formatId": null,
+          "dimensionsIn": {},
+          "cartKey": "1b5ad3cf-c565-425a-9b7d-d7c57c9bc40b"
+        }
+      ],
+      "reloadPreserved": true,
+      "cartText": "DEWALT ELITE — Scie-cloche bimétal\nDEWALT · Réf. DAH3005858L · 3 5/8 po (92 mm)\npièce\n×\nDEWALT ELITE — Scie-cloche bimétal\nDEWALT · Réf. DAH3008080L · 5 po (127 mm)\npièce\n×\nLEILUO — Lame oscillante HCS bois et plastique · 44 mm\nLEILUO\npièce\n×",
+      "fixtureWrites": []
+    },
+    {
+      "surface": "boutique-search",
+      "id": "dewalt-bimetal-hole-saws",
+      "width": 390,
+      "found": true
+    },
+    {
+      "surface": "boutique-search",
+      "id": "leiluo-oscillating-hcs-44mm",
+      "width": 390,
+      "found": true
+    },
+    {
+      "surface": "public-cart",
+      "width": 390,
+      "lines": [
+        {
+          "materialId": "dewalt-bimetal-hole-saws",
+          "formatId": "dah3005858l",
+          "reference": "DAH3005858L",
+          "quantity": 2,
+          "unit": "pièces"
+        },
+        {
+          "materialId": "dewalt-bimetal-hole-saws",
+          "formatId": "dah3008080l",
+          "reference": "DAH3008080L",
+          "quantity": 3,
+          "unit": "pièces"
+        },
+        {
+          "materialId": "leiluo-oscillating-hcs-44mm",
+          "formatId": null,
+          "reference": null,
+          "quantity": 4,
+          "unit": "pièces"
+        }
+      ],
+      "reloadPreserved": true,
+      "localePreserved": true,
+      "enText": "DEWALT\nDEWALT ELITE — Bi-metal hole saw\n\nFinish: No colour option\nDiameter: 3 5/8 in. (92 mm)\nPrice on request\n\nDiameter\nChoose a diameter\n2 in. (51 mm)\n2 1/8 in. (54 mm)\n2 1/4 in. (57 mm)\n2 1/2 in. (64 mm)\n2 5/8 in. (67 mm)\n2 3/4 in. (70 mm)\n3 in. (76 mm)\n3 1/4 in. (83 mm)\n3 1/2 in. (89 mm)\n3 5/8 in. (92 mm)\n4 in. (102 mm)\n4 1/8 in. (105 mm)\n4 1/4 in. (108 mm)\n4 1/2 in. (114 mm)\n5 in. (127 mm)\n\nWhole quantities. 3 5/8 in. (92 mm).\n\nQuantity\nRequired unit\npieces\n×\n\nAmount to confirm\nBefore taxes and delivery\n\nDEWALT\nDEWALT ELITE — Bi-metal hole saw\n\nFinish: No colour option\nDiameter: 5 in. (127 mm)\nPrice on request\n\nDiameter\nChoose a diameter\n2 in. (51 mm)\n2 1/8 in. (54 mm)\n2 1/4 in. (57 mm)\n2 1/2 in. (64 mm)\n2 5/8 in. (67 mm)\n2 3/4 in. (70 mm)\n3 in. (76 mm)\n3 1/4 in. (83 mm)\n3 1/2 in. (89 mm)\n3 5/8 in. (92 mm)\n4 in. (102 mm)\n4 1/8 in. (105 mm)\n4 1/4 in. (108 mm)\n4 1/2 in. (114 mm)\n5 in. (127 mm)\n\nWhole quantities. 5 in. (127 mm).\n\nQuantity\nRequired unit\npieces\n×\n\nAmount to confirm\nBefore taxes and delivery\n\nLEILUO\nLEILUO — HCS oscillating blade for wood and plastic · 44 mm\n\nFinish: No colour option\nPrice on request\n\nWhole quantities. piece.\n\nQuantity\nRequired unit\npieces\n×\n\nAmount to confirm\nBefore taxes and delivery"
+    },
+    {
+      "surface": "product-en",
+      "width": 390,
+      "id": "dewalt-bimetal-hole-saws",
+      "visibleText": "DEWALT →\nDEWALT ELITE — Bi-metal hole saw\n\nChoose from 15 documented diameters from 2 to 5 in. DEWALT ELITE bi-metal hole saw for wood and thin metal. Confirm Canadian availability and pricing with MIR.\n\nManufacturer image to be added\n\nPhoto unavailable · placeholder image\n\nPrice on request\n\nDiameter\nChoose a diameter\n2 in. (51 mm)\n2 1/8 in. (54 mm)\n2 1/4 in. (57 mm)\n2 1/2 in. (64 mm)\n2 5/8 in. (67 mm)\n2 3/4 in. (70 mm)\n3 in. (76 mm)\n3 1/4 in. (83 mm)\n3 1/2 in. (89 mm)\n3 5/8 in. (92 mm)\n4 in. (102 mm)\n4 1/8 in. (105 mm)\n4 1/4 in. (108 mm)\n4 1/2 in. (114 mm)\n5 in. (127 mm)\nRequested quantity\nRequired unit\npieces\n\nWhole quantities. 3 5/8 in. (92 mm).\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "options": [
+        "Choose a diameter",
+        "2 in. (51 mm)",
+        "2 1/8 in. (54 mm)",
+        "2 1/4 in. (57 mm)",
+        "2 1/2 in. (64 mm)",
+        "2 5/8 in. (67 mm)",
+        "2 3/4 in. (70 mm)",
+        "3 in. (76 mm)",
+        "3 1/4 in. (83 mm)",
+        "3 1/2 in. (89 mm)",
+        "3 5/8 in. (92 mm)",
+        "4 in. (102 mm)",
+        "4 1/8 in. (105 mm)",
+        "4 1/4 in. (108 mm)",
+        "4 1/2 in. (114 mm)",
+        "5 in. (127 mm)"
+      ]
+    },
+    {
+      "surface": "product-en",
+      "width": 390,
+      "id": "leiluo-oscillating-hcs-44mm",
+      "visibleText": "LEILUO →\nLEILUO — HCS oscillating blade for wood and plastic · 44 mm\n\nHCS steel oscillating-tool blade with a 44 mm cutting width, for wood and plastic. Confirm the mount and compatibility with your tool before use.\n\nManufacturer image to be added\n\nPhoto unavailable · placeholder image\n\nPrice on request\n\nRequested quantity\nRequired unit\npieces\n\nWhole quantities. piece.\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "options": []
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 390,
+      "cartLines": 3,
+      "cartText": "Panier d’essai · 3 lignes\nDEWALT ELITE — Scie-cloche bimétal\n3 5/8 po (92 mm) · DAH3005858L\n2 pièce\nRetirer du panier\nDEWALT ELITE — Scie-cloche bimétal\n5 po (127 mm) · DAH3008080L\n3 pièce\nRetirer du panier\nLEILUO — Lame oscillante HCS bois et plastique · 44 mm\n4 pièce\nRetirer du panier\n\nSimulation locale uniquement : aucune commande ou livraison transmise.",
+      "alerts": [],
+      "reloadPersistence": "Le panier d’essai est volontairement en mémoire seulement; pas de persistance applicative ajoutée."
+    },
+    {
+      "surface": "terrain-fixture",
+      "width": 390,
+      "cartLines": [
+        {
+          "itemId": "dewalt-bimetal-hole-saws",
+          "quantity": 2,
+          "colorId": null,
+          "formatId": "dah3005858l",
+          "dimensionsIn": {},
+          "cartKey": "0bd56692-c534-4b14-89e8-26b8bbf56700"
+        },
+        {
+          "itemId": "dewalt-bimetal-hole-saws",
+          "quantity": 3,
+          "colorId": null,
+          "formatId": "dah3008080l",
+          "dimensionsIn": {},
+          "cartKey": "dc7cd299-bc33-4cd7-a15c-e63a4f34e0e7"
+        },
+        {
+          "itemId": "leiluo-oscillating-hcs-44mm",
+          "quantity": 4,
+          "colorId": null,
+          "formatId": null,
+          "dimensionsIn": {},
+          "cartKey": "1e63506c-a3be-454b-bea5-1390855b5f8b"
+        }
+      ],
+      "reloadPreserved": true,
+      "cartText": "DEWALT ELITE — Scie-cloche bimétal\nDEWALT · Réf. DAH3005858L · 3 5/8 po (92 mm)\npièce\n×\nDEWALT ELITE — Scie-cloche bimétal\nDEWALT · Réf. DAH3008080L · 5 po (127 mm)\npièce\n×\nLEILUO — Lame oscillante HCS bois et plastique · 44 mm\nLEILUO\npièce\n×",
+      "fixtureWrites": []
+    }
+  ],
+  "pageerrors": [],
+  "blockedRequests": [
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    }
+  ],
+  "externalRequestsTransmitted": 0,
+  "realSubmissions": 0,
+  "limitations": [
+    "Photos originales indisponibles : absence de photo annoncée, aucune image substituée.",
+    "Magasin : panier d’essai local, pas de commande réelle.",
+    "Terrain : vrai écran avec snapshot de recette local et catalogue canonique; aucune connexion réelle.",
+    "Aucun prix, stock ou conditionnement inventé."
+  ],
+  "success": true
+}

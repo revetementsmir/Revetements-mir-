@@ -136,9 +136,13 @@ check('Garde boutique : seule une référence MIR explicitement autorisée peut 
     assert.ok(line, 'Fonction photo absente : ' + name);
     return line;
   });
+  const toolGuardStart = source.indexOf('  function confirmedToolReference(');
+  const toolGuardEnd = source.indexOf('  // The two cutting tools', toolGuardStart);
+  assert.ok(toolGuardStart >= 0 && toolGuardEnd > toolGuardStart);
+  const toolGuard = source.slice(toolGuardStart, toolGuardEnd);
   const hiddenProducts = new Set(JSON.parse(read('dist/boutique-visibilite.json')).hidden);
-  const context = vm.createContext({hiddenProducts, URL, document: {baseURI: 'http://127.0.0.1/produit.html'}, location: {origin: 'http://127.0.0.1'}});
-  vm.runInContext(declarations.concat(photoFunctions).join('\n') + '\n' +
+  const context = vm.createContext({hiddenProducts, formats: Quantity.formats, URL, document: {baseURI: 'http://127.0.0.1/produit.html'}, location: {origin: 'http://127.0.0.1'}});
+  vm.runInContext(declarations.concat(photoFunctions).join('\n') + '\n' + toolGuard + '\n' +
     'globalThis.allowed = m => Boolean(requestable(m));\n' +
     'globalThis.before = m => Boolean(sold(m) && hasExactImage(m) && m.status !== "pending_identity" && m.orderable !== false);', context);
   assert.equal(context.allowed(mac), true);
@@ -154,7 +158,7 @@ check('Garde boutique : seule une référence MIR explicitement autorisée peut 
   hiddenProducts.add(macId);
   assert.equal(context.allowed(mac), false, 'Le drapeau ne contourne pas la visibilité boutique');
   hiddenProducts.delete(macId);
-  assert.deepEqual(materials.filter(item => context.allowed(item) !== context.before(item)).map(item => item.id), [macId], 'Aucun autre article du catalogue ne change de droit d’ajout');
+  assert.deepEqual(materials.filter(item => !['dewalt-bimetal-hole-saws', 'leiluo-oscillating-hcs-44mm'].includes(item.id)).filter(item => context.allowed(item) !== context.before(item)).map(item => item.id), [macId], 'Aucun autre article ancien du catalogue ne change de droit d’ajout');
 });
 
 check('Catalogue employé : MAC accepté localement en boîtes entières, kit toujours bloqué', () => {

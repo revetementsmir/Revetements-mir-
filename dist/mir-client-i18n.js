@@ -99,8 +99,8 @@
     if(m)return m[1].replace(',','.')+' usable sq. ft. per piece. '+translate(m[2],'en-CA');
     m=value.match(/^([\d\s,.\u00a0]+)\s*\$\s*(?:CA)?\s*\/\s*(.+)$/);
     if(m){const amount=Number(m[1].replace(/[\s\u00a0]/g,'').replace(',','.'));if(Number.isFinite(amount))return new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(amount)+' / '+translate(m[2],'en-CA');}
-    m=value.match(/^(Longueur|Longueurs|Largeur) : (.+)$/);
-    if(m)return ({Longueur:'Length',Longueurs:'Lengths',Largeur:'Width'})[m[1]]+': '+displayDimensions(m[2]);
+    m=value.match(/^(Longueur|Longueurs|Largeur|Diamètre|Diamètres) : (.+)$/);
+    if(m)return ({Longueur:'Length',Longueurs:'Lengths',Largeur:'Width',Diamètre:'Diameter',Diamètres:'Diameters'})[m[1]]+': '+displayDimensions(m[2]);
     m=value.match(/^Couleurs (.+)$/);
     if(m)return m[1]+' colours';
     m=value.match(/^(.+) : voir les matériaux$/);

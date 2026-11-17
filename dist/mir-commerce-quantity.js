@@ -10,7 +10,9 @@
  const number=n=>new Intl.NumberFormat('fr-CA',{maximumFractionDigits:6}).format(n);
  function formats(m,colorId=null){
   const allowed=m.colors?.find(color=>color.id===colorId)?.formatIds;
-  return (m.formats||[]).filter(f=>f.id&&(positive(f.lengthIn)||positive(f.volumeMl))&&(!allowed||allowed.includes(f.id)));
+  return (m.formats||[]).filter(f=>f.id&&(m.formatAxis==='diameter'
+   ?positive(f.diameterIn)||positive(f.diameterMm)
+   :positive(f.lengthIn)||positive(f.volumeMl))&&(!allowed||allowed.includes(f.id)));
  }
  function policy(m={},formatId=null,colorId=null){
   const d=m.dimensions||{},c=m.coverage||{},p=m.packaging||{},app=m.applications||[];
@@ -53,12 +55,12 @@
   const explanation=packagingCount?number(packagingCount)+' éléments par '+packageLabel+'. '+(area?number(area)+' pi² utiles par pièce. ':'')+(m.unit||'Conditionnement MIR à confirmer.'):
    area?number(area)+' pi² par pièce complète (surface utile).':
    'Quantités entières. '+(format?.label||m.unit||'Conditionnement MIR à confirmer.')+'.';
-  return {rules,area,missingFormat,defaultUnit:rules[0].unit,note:missingFormat?'Choisissez le format avant de saisir la quantité.':explanation};
+  return {rules,area,missingFormat,defaultUnit:rules[0].unit,note:missingFormat?(m.formatAxis==='diameter'?'Choisissez le diamètre avant de saisir la quantité.':'Choisissez le format avant de saisir la quantité.'):explanation};
  }
  function validate(m,item){
   const p=policy(m,item.formatId,item.colorId),q=Number(item.quantity),rule=p.rules.find(r=>r.unit===item.unit);
   if(m.requireColor&&!m.colors?.some(color=>color.id===item.colorId))return {ok:false,message:'Choisissez une couleur pour cet article.',suggestion:null,policy:p};
-  if(p.missingFormat)return {ok:false,message:'Le format de cet article doit être choisi.',suggestion:null,policy:p};
+  if(p.missingFormat)return {ok:false,message:m.formatAxis==='diameter'?'Le diamètre de cet article doit être choisi.':'Le format de cet article doit être choisi.',suggestion:null,policy:p};
   if(!rule)return {ok:false,message:'Unité incompatible avec le conditionnement. '+p.note,suggestion:null,policy:p};
   const count=q/rule.step;
   if(!positive(q)||q>1000000||(rule.step===1?!Number.isInteger(q):!near(count,Math.round(count)))){

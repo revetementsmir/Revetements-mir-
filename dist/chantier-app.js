@@ -340,8 +340,8 @@
   function renderShortcuts(folds=false){const items=shortcutItems(folds),manual=items.some(item=>favoriteIds().includes(item.id));return `<section class="order-shortcuts" aria-labelledby="${folds?'fold':'material'}-shortcuts-title"><div><h2 id="${folds?'fold':'material'}-shortcuts-title">${folds?'Pliages':'Matériel'} rapides</h2><small>${manual?'Vos favoris personnels':'Vos plus utilisés'}</small></div><div class="shortcut-grid">${items.map(item=>`<button type="button" class="shortcut-tile" ${folds?`data-configure="${esc(item.id)}"`:`data-shortcut-item="${esc(item.id)}"`}><strong>${esc(item.name)}</strong><span>${folds?'Configurer':'Choisir la quantité'}</span></button>`).join('')||'<p>Aucun raccourci pour le moment.</p>'}</div></section>`;}
   function colorPriority(color){const name=String(color?.name||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();return /(^|\b)(noir|black)(\b|$)/.test(name)?0:/(^|\b)(blanc|white)(\b|$)/.test(name)?1:2;}
   function colorOptions(item,value='') {const selected=value||item.baseColorId||'',colors=window.MIRCataloguePolicy?.sortColors(item.colors)||[...(item.colors||[])].sort((a,b)=>colorPriority(a)-colorPriority(b));return `<option value=""${selected?'':' selected'}>${colors.length?'Choisir la couleur':'Teinte à confirmer'}</option>`+colors.map(color=>`<option value="${esc(color.id)}"${selected===color.id?' selected':''}>${esc(color.name)}</option>`).join('');}
-  function formatLabel(format){return format?.label||(format?.widthIn?`${num(format.widthIn)} × ${num(format.lengthIn)} po`:format?.lengthIn?`${num(format.lengthIn)} po`:'');}
-  function formatOptions(item,value=''){return '<option value="">Choisir le format</option>'+(item.formats||[]).map(format=>`<option value="${esc(format.id)}"${value===format.id?' selected':''}>${esc(formatLabel(format))}</option>`).join('');}
+  function formatLabel(format){return format?.label||(format?.diameterIn?`${num(format.diameterIn)} po`:format?.diameterMm?`${num(format.diameterMm)} mm`:format?.widthIn?`${num(format.widthIn)} × ${num(format.lengthIn)} po`:format?.lengthIn?`${num(format.lengthIn)} po`:'');}
+  function formatOptions(item,value=''){return '<option value="">'+(item.formatAxis==='diameter'?'Choisir le diamètre':'Choisir le format')+'</option>'+(item.formats||[]).map(format=>`<option value="${esc(format.id)}"${value===format.id?' selected':''}>${esc(formatLabel(format))}</option>`).join('');}
   async function updateProductPreview(card,item,colorId){
     const element=card?.querySelector('[data-product-sample]'),caption=card?.querySelector('.product-preview-caption'),V=window.MIRMaterialPreview;
     if(!element||!V||!item)return;
@@ -386,7 +386,7 @@
       (favorite?'Retirer des favoris':'Ajouter aux favoris')+' : '+esc(item.name)+'">'+icon('heart')+'</button></div>'+
       '<p class="product-preview-caption mir-photo-caption">'+esc(productVisualLabel(item))+'</p><div class="product-body"><h3>'+esc(item.name)+'</h3>'+
       variant+
-      (!custom&&!group&&(item.formats||[]).length>1?'<label>Longueur / format<select data-product-format="'+esc(item.id)+'">'+formatOptions(item)+'</select></label>':'')+
+      (!custom&&!group&&(item.formats||[]).length>1?'<label>'+(item.formatAxis==='diameter'?'Diamètre':'Longueur / format')+'<select data-product-format="'+esc(item.id)+'">'+formatOptions(item)+'</select></label>':'')+
       (!custom&&!group&&item.formats?.length===1?'<p class="product-format">'+esc(formatLabel(item.formats[0]))+'</p>':'')+
       (needsColor&&!custom?'<label>Couleur<select data-product-color="'+esc(item.id)+'">'+colorOptions(item)+'</select></label>':'')+
       (item.referencePending?'<small class="mir-review-pending">Référence ou disponibilité à confirmer</small>':'')+

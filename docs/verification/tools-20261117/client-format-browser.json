@@ -1,0 +1,28 @@
+{
+  "fixtureOnly": true,
+  "realOrdersSent": 0,
+  "results": [
+    {
+      "width": 1440,
+      "selectionRequired": true,
+      "diameterPreserved": true,
+      "manufacturerCodeUpdated": true,
+      "priceUpdated": true,
+      "cartReloadPreserved": true,
+      "blade44mm": true,
+      "externalBlocked": 0,
+      "errors": []
+    },
+    {
+      "width": 390,
+      "selectionRequired": true,
+      "diameterPreserved": true,
+      "manufacturerCodeUpdated": true,
+      "priceUpdated": true,
+      "cartReloadPreserved": true,
+      "blade44mm": true,
+      "externalBlocked": 0,
+      "errors": []
+    }
+  ]
+}
