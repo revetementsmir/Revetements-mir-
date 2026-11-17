@@ -1,0 +1,26 @@
+/* Locked desktop home: approved capture 98483.png, original source a2235c5.
+ * The original editorial CSS supplies the hero, text and three cards unchanged.
+ * Only the later shared-header overrides and section controls are reversed here.
+ * Loaded on index.html only; mobile and all other routes retain their own rules.
+ */
+@media (min-width:1101px) {
+  body.mir-prestige-home #mir-prestige-header {
+    min-height:90px!important;
+    padding-top:20px!important;
+  }
+  body.mir-prestige-home #mir-prestige-header>.mir-client-brand {
+    width:166px!important;
+    margin-bottom:20px!important;
+  }
+  body.mir-prestige-home #mir-prestige-header .mir-prestige-actions {
+    margin-bottom:20px!important;
+  }
+  body.mir-prestige-home #mir-prestige-header>nav.mir-prestige-nav,
+  body.mir-prestige-home main .mir-client-pages-nav,
+  body.mir-prestige-home main .mir-client-list-controls {
+    display:none!important;
+  }
+  body.mir-prestige-home #hero-title {
+    color:#f4f1ea;
+  }
+}

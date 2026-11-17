@@ -16,6 +16,9 @@
   const $ = (selector, root = doc) => root.querySelector(selector);
   const all = (selector, root = doc) => [...root.querySelectorAll(selector)];
   const compact = () => innerWidth < 760;
+  // Frederick locked the desktop home to the approved original composition.
+  // Its hero and three illustrated cards remain one ordinary document.
+  const desktopHome = route === 'index.html' ? matchMedia('(min-width:1101px)') : null;
   const isEnglish = () => /^en\b/i.test(window.MIRClientLocale?.getLocale?.() || doc.documentElement.lang || 'fr');
   const text = (fr, en) => isEnglish() ? en : fr;
   const wording = label => typeof label === 'string' ? label : text(label[0], label[1]);
@@ -577,7 +580,17 @@
     if (route === 'materiaux.html') materials(main);
     if (route === 'pliage.html') bendingLanding(main);
     if (route === 'estimation.html' || route === 'selection.html') estimate();
+    const syncHomePresentation = () => {
+      if (!desktopHome) return;
+      const locked = desktopHome.matches;
+      body.toggleAttribute('data-mir-home-desktop-locked', locked);
+      if (locked) body.removeAttribute('data-mir-client-pages');
+      else body.dataset.mirClientPages = 'index';
+      main.classList.toggle('mir-client-pages-main', !locked);
+    };
+    syncHomePresentation();
     doc.addEventListener('click', event => {
+      if (desktopHome?.matches) return;
       const link = event.target.closest('a[href^="#"]');
       if (!link || link.getAttribute('href') === '#') return;
       const target = doc.getElementById(link.hash.slice(1));
@@ -585,9 +598,10 @@
       event.preventDefault(); reveal(target);
       history.replaceState(history.state, '', location.pathname + location.search + link.hash);
     });
-    const fromHash = () => { if (location.hash) reveal(doc.getElementById(location.hash.slice(1))); };
+    const fromHash = () => { if (location.hash && !desktopHome?.matches) reveal(doc.getElementById(location.hash.slice(1))); };
     window.addEventListener('hashchange', fromHash); fromHash();
     const refresh = () => {
+      syncHomePresentation();
       controllers.forEach(controller => controller.refresh());
       lists.filter(list => list.container.isConnected).forEach(list => list.refresh());
       measure();

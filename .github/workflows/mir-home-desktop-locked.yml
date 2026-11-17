@@ -1,0 +1,69 @@
+name: MIR — Accueil PC conforme à la référence
+
+on:
+  push:
+    branches: [codex/home-desktop-locked-20261117]
+    paths:
+      - 'dist/index.html'
+      - 'dist/mir-home-desktop-locked.css'
+      - 'dist/mir-client-pages.js'
+      - 'tests/mir-home-desktop-locked.cjs'
+      - '.github/workflows/mir-home-desktop-locked.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mir-home-desktop-locked-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  home-desktop:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Record the exact desktop candidate
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          mkdir -p docs/verification/home-desktop-locked-20261117
+          git show --no-patch --format=fuller HEAD > docs/verification/home-desktop-locked-20261117/source.txt
+          git status --short >> docs/verification/home-desktop-locked-20261117/source.txt
+      - name: Install the isolated browser runner
+        run: |
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2 pngjs@7.0.0
+          npx playwright install --with-deps chromium
+          node -e 'const fs=require("fs"),{chromium}=require("playwright");fs.appendFileSync(process.env.GITHUB_ENV,"MIR_CHROMIUM_BIN="+chromium.executablePath()+"\n")'
+      - name: Check targeted acceptance syntax
+        run: node --check tests/mir-home-desktop-locked.cjs
+      - name: Prepare the exact original desktop reference
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/mir-home-desktop-reference" a2235c50466b0a21fecb7b1be8216dfd5006829c
+          node -e 'const fs=require("fs");fs.appendFileSync(process.env.GITHUB_ENV,"MIR_HOME_DESKTOP_BASELINE="+process.env.RUNNER_TEMP+"/mir-home-desktop-reference/.prestige-preview\n")'
+      - name: Build the real guarded reference
+        working-directory: ${{ runner.temp }}/mir-home-desktop-reference
+        env:
+          VERCEL_GIT_COMMIT_SHA: a2235c50466b0a21fecb7b1be8216dfd5006829c
+        run: node scripts/build-prestige-preview.cjs
+      - name: Build the guarded candidate for this SHA
+        env:
+          VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
+        run: node scripts/build-prestige-preview.cjs
+      - name: Compare only the real desktop home in FR and EN
+        run: node tests/mir-home-desktop-locked.cjs
+      - name: Save desktop reference and candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-home-desktop-locked-${{ github.sha }}
+          retention-days: 14
+          if-no-files-found: error
+          path: docs/verification/home-desktop-locked-20261117/
