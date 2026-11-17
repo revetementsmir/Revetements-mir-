@@ -53,3 +53,13 @@ body.mir-prestige #mir-prestige-header :is(.brand,.mir-client-brand) img{width:1
 body.mir-prestige[data-mir-prestige-tools=production]{background:var(--mir-paper)!important;color:var(--mir-ink)!important}
 body.mir-prestige[data-mir-prestige-tools=production] .workshop-banner{display:none!important}
 body.mir-prestige[data-mir-prestige-tools=production] :is(.quote-notice,.notice-inline,.piece-readiness,.piece-summary,.production-order,.order-empty){background:#eae5dc;color:var(--mir-muted);border-color:var(--mir-line)}
+/* The phone footer keeps only the logo and signature; the mobile tab bar stays separate. */
+@media(max-width:600px){
+ body.mir-prestige .mir-signature-footer{grid-template-columns:96px minmax(0,1fr);gap:8px 14px;margin-top:20px;padding:14px 16px}
+ body.mir-prestige .mir-signature-footer-logo{display:flex;align-items:center;width:96px;min-height:44px}
+ body.mir-prestige .mir-signature-footer p{min-width:0;font-size:12px;line-height:1.4}
+ body.mir-prestige .mir-signature-footer nav{display:none}
+ body.mir-prestige [data-mir-test-banner]{left:auto!important;right:6px!important;bottom:calc(6px + env(safe-area-inset-bottom))!important;padding:1px 5px!important;font-size:0!important;line-height:0!important}
+ body.mir-prestige [data-mir-test-banner]::before{content:"TEST";display:block;font:700 9px/12px system-ui;letter-spacing:.04em}
+ body.mir-prestige:not(.mir-prestige-home) [data-mir-test-banner]{bottom:calc(72px + env(safe-area-inset-bottom))!important}
+}
