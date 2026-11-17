@@ -1,5 +1,5 @@
 /* Orchestrates the existing source geometry engine. No catalogue of houses. */
-(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction.js'):root.MIRPlanReconstruction,node?require('./plan-reconstructed-roofs.js'):root.MIRReconstructedRoofs);if(node)module.exports=api;else root.MIRReconstructionPipeline=api;})(typeof window==='object'?window:globalThis,function(M,R,Roof){
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction.js'):root.MIRPlanReconstruction,node?require('./plan-reconstructed-roofs.js'):root.MIRReconstructedRoofs,node?require('./plan-reconstructed-exterior.js'):root.MIRReconstructedExterior);if(node)module.exports=api;else root.MIRReconstructionPipeline=api;})(typeof window==='object'?window:globalThis,function(M,R,Roof,Exterior){
  'use strict';
  const copy=M.clone,source=r=>r.sourceReference||r;
  function sameSpan(a,b){
@@ -17,7 +17,7 @@
   const reference=copy(supported.slice().sort((a,b)=>Number(a.kind!=='written')-Number(b.kind!=='written')||b.confidence-a.confidence)[0]);
   return {status:groups.length>1?'cross-checked-proposal':'single-reference-proposal',reference,groups:copy(groups),alternatives:copy(candidates.filter(r=>!supported.includes(r))),confirmationRequired:true};
  }
- function protectedLevel(level){return !!(level.geometryRevision||level.contourDraft||level.contours?.length||level.observedPlanes?.length||level.reconstructedRoofs?.length||level.wallOpenings?.length||Object.keys(level.wallFinishes||{}).length||level.wallZones?.length);}
+ function protectedLevel(level){return !!(level.geometryRevision||level.contourDraft||level.contours?.length||level.observedPlanes?.length||level.reconstructedRoofs?.length||level.wallOpenings?.length||Object.keys(level.wallFinishes||{}).length||level.wallZones?.length||level.exteriorElements?.length||level.soffits?.length||Object.keys(level.cornerFinishes||{}).length);}
  function opening(o,walls){
   let next=copy(o);const sizes=o.writtenSizeCandidates||[];
   if(sizes.length===1){const s=sizes[0],candidate={...next,width:s.width,height:s.height,offset:next.offset+(next.width-s.width)/2,sill:next.sill+(next.height-s.height)/2,kind:'written',writtenSize:copy(s),originalEstimate:copy(o),positionEvidence:{kind:'estimated-calibrated',status:'proposed',sourceViewId:o.sourceViewId,sourceBox:copy(o.sourceBox),scalesUsed:copy(o.scalesUsed)}};if(!M.openingIssues([candidate],walls).length)next=candidate;else next.sizeIssue='WRITTEN_SIZE_OUTSIDE_WALL';}
@@ -49,9 +49,16 @@
    for(const volume of volumes){volume.openingProposals=R.observedOpenings(volume,proposal,inventory,images);volume.roofProposal=R.volumeRoof(volume,proposal,inventory,images);}
    lower=R.assignOpeningSurfaces(lower,volumes);next.reconstruction.lowerProposal=lower;next.reconstruction.secondaryProposals=volumes;next.reconstruction.roofProposal=roof;
    if(roof.status==='proposed'&&!Roof.issues(roof,{confirm:false}).length)next.reconstructedRoofs=[roof];else report.issues.push(roof.reason||'ROOF_UNRESOLVED');
-   const additions=[next,...(lower.status==='proposed'?[lower]:[]),...volumes];
+   const additions=[next,...(lower.status==='proposed'?[lower]:[]),...volumes],generated=[];
    for(const l of additions){if(l!==next){if(inventory.levels.some(old=>old.id===l.id)){report.issues.push('EXISTING_GEOMETRY_PRESERVED');continue;}l.reconstruction={version:1,status:'automatic-proposal',sourceRasterRequiredForRendering:false};if(l.roofProposal?.status==='proposed'&&!Roof.issues(l.roofProposal,{confirm:false}).length)l.reconstructedRoofs=[l.roofProposal];}
-    const walls=M.wallsFor(l,inventory,{includeProposed:true});l.wallOpenings=(l.openingProposals||[]).map(o=>opening(o,walls)).filter(o=>!M.openingIssues([o],walls).length);levels.push(l);
+    const walls=M.wallsFor(l,inventory,{includeProposed:true});l.wallOpenings=(l.openingProposals||[]).map(o=>opening(o,walls)).filter(o=>!M.openingIssues([o],walls).length);levels.push(l);generated.push(l);
+   }
+   if(Exterior){
+    const exterior=Exterior.build(proposal,inventory,images,constrained,generated);
+    for(const detail of exterior.byLevel||[]){const target=generated.find(l=>l.id===detail.levelId);if(!target)throw Error('EXTERIOR_LEVEL_MISMATCH');target.exteriorElements=[...(target.exteriorElements||[]),...copy(detail.exteriorElements||[])];target.wallZones=[...(target.wallZones||[]),...copy(detail.wallZones||[])];target.reconstruction.exterior={version:exterior.version,issues:copy(detail.issues||[]),conflicts:copy(detail.conflicts||[]),complete:false};report.issues.push(...(detail.issues||[]));}
+    report.issues.push(...(exterior.issues||[]));report.issues=[...new Set(report.issues)];
+    report.exterior={elements:generated.reduce((n,l)=>n+(l.exteriorElements||[]).length,0),zones:generated.reduce((n,l)=>n+(l.wallZones||[]).length,0),conflicts:(exterior.byLevel||[]).reduce((n,l)=>n+(l.conflicts||[]).length,0),complete:false};
+    next.reconstruction.exteriorReport={version:exterior.version,issues:copy(exterior.issues||[]),complete:false};
    }
    if(lower.status!=='proposed'&&!hasGroundPlan)report.issues.push(lower.reason);
    report.status='partial-proposal';report.confirmationRequired=true;report.measurements='written and calibrated estimates remain proposed';

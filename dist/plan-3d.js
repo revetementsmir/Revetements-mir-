@@ -409,7 +409,7 @@
 
   function build(d, options) {
     if(options.levelScene){
-      const scene=options.levelScene,points=[...scene.walls.flatMap(w=>w.poly),...(global.MIRReconstructedRoofs?(scene.roofs||[]).flatMap(r=>global.MIRReconstructedRoofs.faces(r,[0,0],{includeProposed:scene.includeProposed}).flatMap(f=>f.poly)):[])],cx=(Math.min(...points.map(p=>p[0]))+Math.max(...points.map(p=>p[0])))/2,cy=(Math.min(...points.map(p=>p[1]))+Math.max(...points.map(p=>p[1])))/2;
+      const scene=options.levelScene,points=[...scene.walls.flatMap(w=>w.poly),...(global.MIRReconstructedRoofs?(scene.roofs||[]).flatMap(r=>global.MIRReconstructedRoofs.faces(r,[0,0],{includeProposed:scene.includeProposed}).flatMap(f=>f.poly)):[]),...(global.MIRStudioExterior?(scene.elements||[]).flatMap(e=>global.MIRStudioExterior.elementFaces(e).flatMap(f=>f.poly)):[])],cx=(Math.min(...points.map(p=>p[0]))+Math.max(...points.map(p=>p[0])))/2,cy=(Math.min(...points.map(p=>p[1]))+Math.max(...points.map(p=>p[1])))/2;
       const faces=scene.walls.map(w=>({id:w.id,wallId:w.id,levelId:w.levelId,buildingId:w.buildingId,type:'wall',role:'level-exterior-wall',
         poly:w.poly.map(([x,y,z])=>[x-cx,y-cy,z]),normal:w.normal.slice(),base:[w.from[0]-cx,w.from[1]-cy,w.base],
         u:[(w.to[0]-w.from[0])/w.length,(w.to[1]-w.from[1])/w.length,0],width:w.length,fillColor:cleanColor(w.finish?.color,'#d7d8d0'),

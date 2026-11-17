@@ -53,6 +53,10 @@ jobs:
           node tests/mir-studio-s2.cjs
           node tests/mir-studio-reconstruction.cjs
           node tests/mir-studio-automatic.cjs
+          node tests/mir-studio-automatic-originals-harness.cjs
+          node tests/mir-studio-legend-occlusion.cjs
+          node tests/mir-studio-exterior-reconstruction.cjs
+          node tests/mir-studio-exterior-integration.cjs
           node tests/mir-studio-preview.cjs
           node tests/mir-studio-cotation.cjs
           node tests/mir-studio-job-reader.cjs

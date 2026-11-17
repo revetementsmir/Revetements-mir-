@@ -113,10 +113,18 @@
   return groups.filter(g=>hasFrame(g.box)).map(g=>({box:[g.box[0]-pad,g.box[1]-pad,g.box[2]+pad*2,g.box[3]+pad*2],status:'proposed',method:'clear-panes-and-dark-frame',confirmationRequired:true}));
  }
  function legendBoxes(image,rows){
-  const titles=rows.filter(r=>/^(?:legende|legend)\s*[:.]?$/i.test(String(r.text).normalize('NFD').replace(/[\u0300-\u036f]/g,''))&&r.box);if(!titles.length)return [];
+  const titles=rows.filter(r=>r.box?.length===4&&r.box.every(Number.isFinite)&&/^(?:legende|legend)\s*[:.]?$/i.test(String(r.text).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()));if(!titles.length)return [];
   const {width:w,height:h}=image,ink=monochrome(image),horizontal=opening(ink,w,h,Math.round(w*.1),0),lines=components(horizontal,w,h).map(c=>c.box).filter(b=>b[2]>w*.25&&b[3]<12),boxes=[];
-  for(const title of titles){const [l,t,r,b]=title.box,candidates=[];for(const upper of lines)for(const lower of lines){const left=upper[0],right=upper[0]+upper[2],top=upper[1],bottom=lower[1]+lower[3];if(top>=t||bottom<=b||left>=l||right<=r||Math.abs(left-lower[0])>8||lower[2]<(right-left)*.6||bottom-top>h*.7)continue;
-    let supported=0;for(let y=top;y<=bottom;y++){let a=false,b=false;for(let dx=-4;dx<=4;dx++){a||=!!ink[y*w+Math.max(0,Math.min(w-1,left+dx))];b||=!!ink[y*w+Math.max(0,Math.min(w-1,right+dx))];}supported+=Number(a&&b);}if(supported/(bottom-top)>.8)candidates.push([left,top,right-left,bottom-top]);}
+  const pairedSupport=(left,right,top,bottom)=>{const from=Math.max(0,Math.floor(top)),to=Math.min(h,Math.ceil(bottom));let supported=0;for(let y=from;y<to;y++){let a=false,b=false;for(let dx=-4;dx<=4;dx++){a||=left+dx>=0&&left+dx<w&&!!ink[y*w+left+dx];b||=right+dx>=0&&right+dx<w&&!!ink[y*w+right+dx];}supported+=Number(a&&b);}return supported/(to-from||1);};
+  for(const title of titles){const [l,t,r,b]=title.box,candidates=[];if(l>=r||t>=b)continue;for(const upper of lines){const left=upper[0],right=upper[0]+upper[2],top=upper[1];if(top>=t||left>=l||right<=r)continue;
+    for(const lower of lines){const bottom=lower[1]+lower[3];if(bottom<=b||Math.abs(left-lower[0])>8||lower[2]<(right-left)*.6||bottom-top>h*.7)continue;
+     if(pairedSupport(left,right,top,bottom)>.8)candidates.push([left,top,right-left,bottom-top]);}
+    // A bottom-cropped annotation has no lower border. Its heading, upper
+    // border and both sides continuing to the actual image edge are required;
+    // touching a crop edge alone must never erase a building or window.
+    const visibleHeight=h-top,edgeRows=Math.max(5,Math.round(h*.01));
+    if(b<h&&visibleHeight<=h*.7&&visibleHeight>=Math.max(30,(b-t)*2)&&t-top<=Math.max(24,(b-t)*3)&&pairedSupport(left,right,top,h)>.8&&pairedSupport(left,right,h-edgeRows,h)>.8)candidates.push([left,top,right-left,visibleHeight]);
+   }
    candidates.sort((a,b)=>b[2]*b[3]-a[2]*a[3]);if(candidates[0]&&!boxes.some(b=>Math.abs(b[0]-candidates[0][0])<10&&Math.abs(b[1]-candidates[0][1])<10))boxes.push(candidates[0]);
   }return boxes;
  }
