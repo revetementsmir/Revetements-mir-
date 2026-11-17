@@ -1,5 +1,5 @@
 /* Orchestrates the existing source geometry engine. No catalogue of houses. */
-(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction.js'):root.MIRPlanReconstruction,node?require('./plan-reconstructed-roofs.js'):root.MIRReconstructedRoofs,node?require('./plan-reconstructed-exterior.js'):root.MIRReconstructedExterior,node?require('./plan-grid-registration.js'):root.MIRGridRegistration);if(node)module.exports=api;else root.MIRReconstructionPipeline=api;})(typeof window==='object'?window:globalThis,function(M,R,Roof,Exterior,Grid){
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction.js'):root.MIRPlanReconstruction,node?require('./plan-reconstructed-roofs.js'):root.MIRReconstructedRoofs,node?require('./plan-reconstructed-exterior.js'):root.MIRReconstructedExterior,node?require('./plan-grid-registration.js'):root.MIRGridRegistration,node?require('./plan-keyed-wall-observations.js'):root.MIRKeyedWallObservations);if(node)module.exports=api;else root.MIRReconstructionPipeline=api;})(typeof window==='object'?window:globalThis,function(M,R,Roof,Exterior,Grid,KeyedWalls){
  'use strict';
  const copy=M.clone,source=r=>r.sourceReference||r;
  function sameSpan(a,b){
@@ -35,7 +35,7 @@
   const draft=copy(proposal.draft),oldScale=proposal.referenceCandidates[0]?.scale;
   if(!resolution.reference)return {proposal,resolution,draft};
   draft.reference={...resolution.reference,status:'proposed',controlReferences:[],assessment:resolution};
-  if(draft.height.kind==='estimated-calibrated'&&draft.height.calibrationMethod!=='independent-vertical-source'&&oldScale>0){const factor=draft.reference.scale/oldScale;draft.height.value*=factor;draft.height.scaleUsed*=factor;for(const ref of draft.height.references){ref.value*=factor;ref.relationship=draft.height.relationship==='two-visible-level-datums'?{...ref.relationship,sourceReference:copy(draft.reference)}:copy(draft.reference);}}
+  if(draft.height.kind==='estimated-calibrated'&&draft.height.calibrationMethod!=='independent-vertical-source'&&oldScale>0){const factor=draft.reference.scale/oldScale;draft.height.value*=factor;draft.height.scaleUsed*=factor;for(const ref of draft.height.references){ref.value*=factor;ref.relationship=['two-visible-level-datums','visible-envelope-surface-limits'].includes(draft.height.relationship)?{...ref.relationship,sourceReference:copy(draft.reference)}:copy(draft.reference);}}
   const constrained=R.constrainProposal(draft,proposal);constrained.status='proposed';
   const errors=M.validateDraft(constrained,inventory,current);if(proposal.heightConflict)errors.push('HEIGHT_CONFLICT');
   // Every compatible elevation contributes an independently calibrated datum
@@ -65,6 +65,7 @@
   // choose a new coordinate zero over it without an explicit source-backed
   // transformation into that persisted frame. Keep the remaining drafts.
   const registration=requiresLevelAlignment?(floorLevels.some(protectedLevel)?{status:'unresolved',reason:'EXISTING_LEVEL_FRAME_REQUIRED',byLevel:Object.fromEntries([...prepared.keys()].map(id=>[id,{status:'unresolved',reason:'EXISTING_LEVEL_FRAME_REQUIRED',issues:['EXISTING_LEVEL_FRAME_REQUIRED']}]))}:Grid.registerPreparedLevels(inventory,buildingId,registrationInput,images,{elevationCalibrations})):null;
+  const keyedDiscovery=floorLevels.some(l=>!protectedLevel(l))?KeyedWalls?.discover(inventory,buildingId,images):null;
   const topOrdinal=floorLevels.every(l=>ordinal(l.sourceLevel)!==null)?Math.max(...floorLevels.map(l=>ordinal(l.sourceLevel))):null;
   for(const current of floorLevels){
    const grid=gridAlignment.byLevel?.[current.sourceLevel]||null;
@@ -74,10 +75,16 @@
    if(proposal.status==='proposed'&&grid)proposal.gridAlignment=copy(grid);
    if(proposal.status!=='proposed'){report.issues.push(proposal.reason);if(proposal.outlineRecovery)report.outlineRecovery=copy(proposal.outlineRecovery);continue;}
    const {resolution,draft,constrained,errors}=preparedLevel;
+   // A keyed wall note can establish a local height before its endpoints and
+   // balcony altitude are known. Preserve these observations without adding
+   // an unregistered plane to the model or confirmed quantities.
+   const keyed=KeyedWalls?.propose(inventory,buildingId,images,current,constrained||draft,{discovery:keyedDiscovery});
+   if(keyed&&(keyed.observations.length||keyed.issues.length)){report.keyedWalls=copy(keyed);report.issues.push(...keyed.issues);}
    if(proposal.unresolvedScaleReferences?.some(r=>r.reason==='DIMENSION_ENDPOINT_PRECISION_REQUIRED'))report.issues.push('DIMENSION_ENDPOINT_PRECISION_REQUIRED');
    if(!resolution.reference){report.issues.push(resolution.status==='conflict'?'REFERENCE_CONFLICT':resolution.status==='low_confidence'?'SCALE_TRANSCRIPTION_UNCERTAIN':'SCALE_UNKNOWN');if(requiresLevelAlignment)report.issues.push('LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:draft,reconstructionDraft:proposal});continue;}
    if(constrained.dimensionAdjustment?.evidence.some(e=>e.reason==='DIMENSION_TRANSCRIPTION_UNCERTAIN'))report.issues.push('DIMENSION_TRANSCRIPTION_UNCERTAIN');
    if(constrained.height?.axisScaleComparison?.status==='review-required')report.issues.push('VERTICAL_AXIS_SCALE_REVIEW');
+   if(errors.includes('HEIGHT_UNKNOWN')){const observations=inventory.views.filter(v=>v.buildingId===buildingId&&v.kind==='elevation').flatMap(v=>v.payload?.drawingReadings?.constructionHeights||[]);if(observations.some(o=>o.status==='proposed'&&o.measurementRole==='rough')){report.issues.push('HEIGHT_LEVEL_ASSOCIATION_REQUIRED');report.unassignedHeightObservations=copy(observations);}}
    if(errors.length){report.issues.push(...errors);if(requiresLevelAlignment)report.issues.push('LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
    // Calibrate and constrain each floor independently before reporting missing
    // inter-level registration. A shared elevation is not an XY datum and must
@@ -89,7 +96,7 @@
     const alignedErrors=M.validateDraft(constrained,inventory,current);if(alignedErrors.length){report.issues.push(...alignedErrors,'LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
    }
    proposal=R.recoupRegistrations(proposal,inventory,images,constrained);proposal.draft=copy(constrained);
-   const next={...copy(current),contours:[constrained],wallOpenings:[],openingsReviewed:false,reconstruction:{version:1,status:'automatic-proposal',proposal,sourceRasterRequiredForRendering:false}};
+   const next={...copy(current),contours:[constrained],wallOpenings:[],openingsReviewed:false,reconstruction:{version:1,status:'automatic-proposal',proposal,sourceRasterRequiredForRendering:false,...(report.keyedWalls?{keyedWalls:copy(report.keyedWalls)}:{})}};
    const unresolvedOpeningCandidates=[];next.openingProposals=R.openingsFor(proposal,inventory,images,constrained,{unresolvedCandidates:unresolvedOpeningCandidates});
    if(unresolvedOpeningCandidates.length){next.reconstruction.openingObservations={unresolvedCandidates:copy(unresolvedOpeningCandidates),complete:false};report.issues.push(...new Set(unresolvedOpeningCandidates.map(o=>o.reason)));}
    if(next.openingProposals.some(o=>o.floorCorrespondence?.status==='unresolved'))report.issues.push('OPENING_FLOOR_MATCH_UNRESOLVED');
@@ -99,6 +106,7 @@
    for(const volume of volumes){volume.openingProposals=R.observedOpenings(volume,proposal,inventory,images);volume.roofProposal=R.volumeRoof(volume,proposal,inventory,images);}
    lower=R.assignOpeningSurfaces(lower,volumes);next.reconstruction.lowerProposal=lower;next.reconstruction.secondaryProposals=volumes;next.reconstruction.roofProposal=roof;
    if(roof.status==='proposed'&&!Roof.issues(roof,{confirm:false}).length)next.reconstructedRoofs=[roof];else if(roofHost)report.issues.push(roof.reason||'ROOF_UNRESOLVED');
+   if(roof.pitchEvidence){if(roof.pitchEvidence.status==='conflict')report.issues.push('ROOF_PITCH_CONFLICT');report.issues.push(...new Set(roof.pitchEvidence.observations.filter(o=>o.association?.status!=='proposed').map(o=>o.association?.reason||o.reason||'ROOF_PITCH_FACE_UNRESOLVED')));}
    const additions=[next,...(lower.status==='proposed'?[lower]:[]),...volumes],generated=[];
    for(const l of additions){if(l!==next){if(inventory.levels.some(old=>old.id===l.id)){report.issues.push('EXISTING_GEOMETRY_PRESERVED');continue;}l.reconstruction={version:1,status:'automatic-proposal',sourceRasterRequiredForRendering:false};if(l.roofProposal?.status==='proposed'&&!Roof.issues(l.roofProposal,{confirm:false}).length)l.reconstructedRoofs=[l.roofProposal];}
     const walls=M.wallsFor(l,inventory,{includeProposed:true});l.wallOpenings=(l.openingProposals||[]).map(o=>opening(o,walls)).filter(o=>!M.openingIssues([o],walls).length);levels.push(l);generated.push(l);

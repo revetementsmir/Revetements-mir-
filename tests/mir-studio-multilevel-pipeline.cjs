@@ -30,9 +30,9 @@ function fixture({omitAxis=false,missingZ=false,conflictingZ=false}={}){
  const im=images['elevation-front'];for(let n=0;n<4;n++){const y=950-n*150-110;for(let yy=y;yy<=y+50;yy++)for(let x=200;x<=250;x++)if(yy<=y+1||yy>=y+49||x<=201||x>=249)im.data.set([0,0,0,255],(yy*im.width+x)*4);}
  return {inventory,proposals,images};
 }
-function pipeline(f){
+function pipeline(f,{keyed=null}={}){
  const calls={propose:[],roof:[],lower:0,secondary:0,exterior:0,wallZones:0};
- const window={MIRLevelModel:M,MIRPlanReconstruction:{...R,
+ const window={MIRKeyedWallObservations:keyed,MIRLevelModel:M,MIRPlanReconstruction:{...R,
   propose:(inventory,buildingId,images,{levelId})=>{assert.equal(inventory,f.inventory);assert.equal(buildingId,'house');assert.equal(images,f.images);calls.propose.push(levelId);return clone(f.proposals[levelId]);},
   roofProposal:(...args)=>{calls.roof.push(args[0].levelId);return R.roofProposal(...args);},
   lowerPlanes:(...args)=>{calls.lower++;return R.lowerPlanes(...args);},
@@ -72,4 +72,13 @@ const cladding=fixture(),front=cladding.inventory.views.find(v=>v.id==='elevatio
 const ink=(x,y)=>im.data.set([50,50,50,255],(y*im.width+x)*4);for(let row=0;row<=40;row++){const y=350+row*15;for(let x=400;x<=650;x++)ink(x,y);if(row<40)for(let x=400+(row%2?15:0);x<=650;x+=30)for(let yy=y;yy<=y+15;yy++)ink(x,yy);}
 const cladPipeline=pipeline(cladding),cladResult=cladPipeline.api.build(cladding.inventory,'house',cladding.images);assert.equal(cladPipeline.calls.wallZones,1);assert.equal(cladPipeline.calls.exterior,0);assert.equal(cladResult.levels.length,4);
 for(const l of cladResult.levels){assert.ok(l.wallZones.length>0,'each registered level keeps nonempty source cladding');assert.ok(l.wallZones.every(z=>z.levelId===l.id&&z.buildingId==='house'));assert.deepEqual(X.proposalIssues(l,cladding.inventory),[]);const report=cladResult.reports.find(r=>r.levelId===l.id);assert.equal(report.exterior.zones,l.wallZones.length);assert.ok(report.issues.includes('EXTERIOR_ASSEMBLY_LEVEL_MATCH_REQUIRED'));assert.equal(l.exteriorElements?.length||0,0);}
+// Two source-keyed low walls lack a proven balcony base and endpoints.
+// Keep those observations through the real build/save shape, but they must
+// never inflate wall geometry or become surfaces with invented dimensions.
+const keyedFixture=fixture(),keyedCalls={discover:0,propose:0},discovery={notes:[{id:'synthetic-wall-note'}]},keyedObservation={id:'source-low-wall-a',geometryStatus:'unresolved',sourceViewId:'floor-3',sourceFrame:keyedFixture.inventory.views[3].frame,sourceNote:{kind:'written',value:1.1,status:'proposed'},unresolved:['KEYED_WALL_BASE_UNRESOLVED','KEYED_WALL_EXTENT_UNRESOLVED']};
+const keyedPipeline=pipeline(keyedFixture,{keyed:{discover:(inventory,buildingId,images)=>{keyedCalls.discover++;assert.equal(inventory,keyedFixture.inventory);assert.equal(images,keyedFixture.images);assert.equal(buildingId,'house');return discovery;},propose:(inventory,buildingId,images,level,draft,options)=>{keyedCalls.propose++;assert.equal(options.discovery,discovery);assert.equal(draft.sourceViewId,'floor-'+level.sourceLevel.slice(6));return {version:1,status:level.sourceLevel==='level-3'?'unresolved':'not-found',buildingId,levelId:level.id,observations:level.sourceLevel==='level-3'?[keyedObservation,{...clone(keyedObservation),id:'source-low-wall-b'}]:[],issues:level.sourceLevel==='level-3'?keyedObservation.unresolved:[],geometryCreated:false,complete:false};}}});
+const keyedResult=keyedPipeline.api.build(keyedFixture.inventory,'house',keyedFixture.images),keyedLevel=keyedResult.levels.find(l=>l.sourceLevel==='level-3');
+assert.equal(keyedCalls.discover,1,'bounded source search is shared by the four levels');assert.equal(keyedCalls.propose,4);assert.equal(keyedLevel.reconstruction.keyedWalls.observations.length,2);assert.ok(keyedResult.reports.find(r=>r.levelId===keyedLevel.id).issues.includes('KEYED_WALL_BASE_UNRESOLVED'));
+assert.equal(M.scene({...keyedFixture.inventory,levels:keyedResult.levels},'house',{includeProposed:true}).walls.length,16,'unresolved low-wall notes are not invented additional walls');assert.equal(keyedLevel.observedPlanes?.length||0,0);
+assert.deepEqual(clone(keyedLevel.reconstruction.keyedWalls).observations,[keyedObservation,{...keyedObservation,id:'source-low-wall-b'}],'source identities and unresolved written-height provenance survive JSON reopening');
 console.log('PASS multilevel pipeline: source-local scales, metric XYZ, nonempty stable walls, per-level openings, one top roof, explicit missing data and preserved saved projects');

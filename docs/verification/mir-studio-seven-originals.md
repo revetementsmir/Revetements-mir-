@@ -623,3 +623,52 @@ All 16 GitHub workflows succeed, including [Studio run 44113627273](https://gith
 That green CI does not override the real C7 regression or the visible geometry
 errors. Subsequent diagnostic replays are recorded privately and must not be
 substituted for a new form-import recipe.
+
+## Seven fresh imports — 1fe9e57
+
+Immutable runtime `1fe9e570fdf90ec22ff8f8d506e3e0dd183cbb4c` imports all
+48 pages and 46 views through the real form. The strict nonempty-model and
+finish/save/reopen assertions remain unchanged. Results: **zero certified
+complete models, four partial models and three empty scenes**. No geometry,
+contour, orientation, height or dimension was injected into any recipe.
+
+| Case | Pages / views | Walls / openings / root roofs | Actual outcome | Seconds |
+| --- | --- | --- | --- | ---: |
+| C1 | 5 / 5 | 0 / 0 / 0 | Boundary support unresolved; reserved from this rule tuning | 87.348 |
+| C2 | 5 / 5 | 10 / 8 / 1 | First partial model and full workflow; garage door and exterior details missing | 114.057 |
+| C3 | 5 / 5 | 15 / 15 / 3 | Partial; ten masonry regions and earlier roof components preserved | 140.069 |
+| C4 | 5 / 5 | 8 / 13 / 1 | Partial; two false texture-cell openings removed; entrance roof still missing | 126.936 |
+| C5 | 5 / 5 | 0 / 0 / 0 | Eight-sided contour recovered; height remains unknown | 136.774 |
+| C6 | 6 / 10 | 0 / 0 / 0 | House height unknown; house and shed remain separate | 106.005 |
+| C7 | 17 / 11 | 16 / 43 / 1 | Four levels and main roof recovered; full workflow, incomplete rear envelope | 727.660 |
+
+C2/C3/C4/C7 pass four 3D angles, wall selection, finish confirmation, identical
+geometry and choices after reopening, and FR-CA/EN-CA at 390/834/1440. Their
+source-independent renders were opened. Viewports are Chromium emulation,
+not physical-device certification. C3/C4 retain upper-only source plans;
+additional observed lower surfaces do not become confirmed supplied floors.
+C1 was withheld from tuning in this follow-up, but was historically inspected;
+it is not presented as an entirely unseen document.
+
+C7 imports in 432.827 seconds and converts in 131.020 seconds. JavaScript heap
+samples are 30.6 MB after import, 345.4 MB after generation and 68.1 MB after
+reopen, not peaks or total browser memory. The registered four-level contour
+now produces walls again, and the main roof is visible. Its rear upper levels
+still lack openings; balconies, secondary roofs, masonry and the specifically
+requested under-roof walls are not demonstrated. A four-wall upper contour
+does not prove those target walls or their roof intersections.
+
+The common fixes preserve actual dashed wall-top guides, reject caption
+fragments as independent scale readings, retain imprecise short endpoint
+measurements without treating them as exact contradictory scales, and select
+the local vertical datum reference without depending on floor iteration order.
+Actual incompatible observations still refuse registration. Source-backed
+corner openings recover the C5 contour, while C4 texture-cell ambiguities
+remain recorded instead of becoming windows.
+
+All 392 served assets match this exact commit in both runs. All 46 persisted
+JPEG source exports pass byte-hash, MIME, frame, dimensions and private-permission
+checks. No client source, OCR, geometry or capture is published. The 79 Node
+suites and all 16 GitHub workflows pass, including [Studio run44118529526](https://github.com/revetementsmir/Revetements-mir-/actions/runs/44118529526).
+These checks do not certify source fidelity. Further local changes and source
+replays must receive a new exact-revision form-import recipe.

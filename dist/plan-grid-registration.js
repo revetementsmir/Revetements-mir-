@@ -30,13 +30,17 @@
    return {status:'unresolved',reason:'GRID_SOURCE_UNAVAILABLE',bubbles:[]};
   const {width:w,height:h}=image,N=24,dirs=Array.from({length:N},(_,i)=>[Math.cos(2*Math.PI*i/N),Math.sin(2*Math.PI*i/N)]);
   const score=(x,y,r,coarse=false)=>{let hits=0;for(const [u,v] of dirs)if(dark(image,x+u*r,y+v*r)||dark(image,x+u*(r-1),y+v*(r-1))||dark(image,x+u*(r+1),y+v*(r+1))||coarse&&(dark(image,x+u*(r-2),y+v*(r-2))||dark(image,x+u*(r+2),y+v*(r+2))))hits++;return hits/N;};
+  // A hatch fills arbitrary sampled circles as well as their surroundings.
+  // A true outline has a mostly clear annulus on both sides; a central glyph
+  // and a single axis leader may interrupt it without becoming a solid disk.
+  const clearance=(x,y,r)=>{let inner=0,outer=0;for(const [u,v] of dirs){if(dark(image,x+u*r*.6,y+v*r*.6))inner++;if(dark(image,x+u*(r+Math.max(3,r*.3)),y+v*(r+Math.max(3,r*.3))))outer++;}return {innerInkFraction:inner/N,outerInkFraction:outer/N};};
   const minRadius=Math.max(7,Math.round(Math.min(w,h)*.007)),maxRadius=Math.min(42,Math.max(22,Math.round(Math.min(w,h)*.03)));
   const horizontalElevation=['elevation-number','elevation-letter'].includes(layout),elevationKind=layout==='elevation-letter'?'letter':'number';
   const bands=horizontalElevation?[[elevationKind,[.03,.02,.90,.28]]]:[['number',[.08,.02,.83,.20]],['letter',[.06,.13,.20,.87]]],bubbles=[];
   for(const [kind,[xl,yl,xr,yb]]of bands){
    const rough=[];for(let y=Math.floor(h*yl);y<h*yb;y+=4)for(let x=Math.floor(w*xl);x<w*xr;x+=4){
     let best=null;for(let r=minRadius;r<=maxRadius;r+=3){const value=score(x,y,r,true);if(value>=.68&&(!best||value>best.score))best={x,y,r,score:value};}
-    if(best)rough.push(best);
+    if(best){const blank=clearance(best.x,best.y,best.r);if(blank.innerInkFraction<=.5&&blank.outerInkFraction<=.5)rough.push(best);}
    }
    rough.sort((a,b)=>b.score-a.score);
    const unique=[];
@@ -45,7 +49,7 @@
     let best={...first,score:score(first.x,first.y,first.r)};for(let y=first.y-4;y<=first.y+4;y++)for(let x=first.x-4;x<=first.x+4;x++)for(let r=Math.max(minRadius,first.r-3);r<=Math.min(maxRadius,first.r+3);r++){
      const value=score(x,y,r);if(value>best.score)best={x,y,r,score:value};
     }
-    if(best.score>=.9)unique.push(best);
+    if(best.score>=.9){const blank=clearance(best.x,best.y,best.r);if(blank.innerInkFraction<=.35&&blank.outerInkFraction<=.35)unique.push({...best,...blank});}
     if(unique.length>=80)break;
    }
    const horizontal=horizontalElevation||kind==='number',axis=horizontal?'y':'x',tolerance=horizontal?Math.max(3,h*.0025):Math.max(8,w*.006);
@@ -58,14 +62,14 @@
    const linear=horizontal?'x':'y';chosen.sort((a,b)=>a[linear]-b[linear]);
    const span=chosen.length?chosen.at(-1)[linear]-chosen[0][linear]:0;
    if(chosen.length<(kind==='number'?3:2)||span<(horizontal?w:h)*.18)continue;
-   bubbles.push(...chosen.slice(0,12).map(v=>({kind,center:[v.x,v.y],radius:v.r,ringSupport:v.score,
+   bubbles.push(...chosen.slice(0,12).map(v=>({kind,center:[v.x,v.y],radius:v.r,ringSupport:v.score,innerInkFraction:v.innerInkFraction,outerInkFraction:v.outerInkFraction,
     sourceMethod:'source-raster-closed-grid-ring',confirmationRequired:true})));
   }
   const ok=horizontalElevation?bubbles.filter(b=>b.kind===elevationKind).length>=(elevationKind==='number'?3:2):bubbles.filter(b=>b.kind==='number').length>=3&&bubbles.filter(b=>b.kind==='letter').length>=2;
   return {status:ok?'proposed':'unresolved',reason:ok?null:'GRID_AXES_INSUFFICIENT',bubbles,confirmationRequired:true};
  }
- function markers(view,image){
-  if(!view||view.kind!=='floor'||!image?.data||image.width<250||image.height<250||image.width*image.height>3e7)return {status:'unresolved',reason:'GRID_SOURCE_UNAVAILABLE'};
+ function planMarkers(view,image,{includeRoof=false}={}){
+  if(!view||!(view.kind==='floor'||includeRoof&&view.kind==='roof')||!image?.data||image.width<250||image.height<250||image.width*image.height>3e7)return {status:'unresolved',reason:'GRID_SOURCE_UNAVAILABLE'};
   const rows=view.payload?.drawingReadings?.rows||[],numeric=[],letters=[];
   for(const row of rows){
    if(row.retry?.labelConflict||row.box?.length!==4||!row.box.every(finite)||(row.confidence??0)<55)continue;
@@ -105,9 +109,10 @@
   return {scale,offset,maxResidual:Math.max(...errors.map(Math.abs))};
  }
  const matching=(a,b)=>{const index=new Map(b.map(v=>[v.label,v]));return a.filter(v=>index.has(v.label)).map(v=>[v,index.get(v.label)]);};
- function alignViews(referenceView,movingView,referenceImage,movingImage){
-  if(!referenceView||!movingView||referenceView.buildingId!==movingView.buildingId||referenceView.levelId===movingView.levelId||referenceView.kind!=='floor'||movingView.kind!=='floor')return {status:'unresolved',reason:'GRID_SOURCE_LEVEL'};
-  const reference=markers(referenceView,referenceImage),moving=markers(movingView,movingImage);
+ function markers(view,image){return planMarkers(view,image);}
+ function alignPlanViews(referenceView,movingView,referenceImage,movingImage,{roof=false}={}){
+  if(!referenceView||!movingView||referenceView.buildingId!==movingView.buildingId||!roof&&referenceView.levelId===movingView.levelId||referenceView.kind!=='floor'||movingView.kind!==(roof?'roof':'floor'))return {status:'unresolved',reason:'GRID_SOURCE_LEVEL'};
+  const reference=planMarkers(referenceView,referenceImage),moving=planMarkers(movingView,movingImage,{includeRoof:roof});
   if(reference.status!=='observed'||moving.status!=='observed')return {status:'unresolved',reason:'GRID_AXES_INSUFFICIENT',sources:[reference.reason,moving.reason]};
   const horizontal=matching(moving.numbers,reference.numbers),vertical=matching(moving.letters,reference.letters);
   if(horizontal.length<3||vertical.length<2)return {status:'unresolved',reason:'GRID_LABELS_INSUFFICIENT'};
@@ -117,6 +122,17 @@
   if(x.maxResidual>tolerance||y.maxResidual>tolerance||nonUniformity>.05)return {status:'conflict',reason:'GRID_TRANSFORM_CONFLICT',residual:{x:x.maxResidual,y:y.maxResidual},nonUniformity};
   const evidence=[...horizontal.map(([from,to])=>({axis:'x',label:from.label,moving:{sourceViewId:movingView.id,sourceBox:copy(from.box),point:copy(from.center)},reference:{sourceViewId:referenceView.id,sourceBox:copy(to.box),point:copy(to.center)}})),...vertical.map(([from,to])=>({axis:'y',label:from.label,moving:{sourceViewId:movingView.id,sourceBox:copy(from.box),point:copy(from.center)},reference:{sourceViewId:referenceView.id,sourceBox:copy(to.box),point:copy(to.center)}}))];
   return {status:'proposed',method:'matched-labelled-raster-grid-bubbles',movingSourceViewId:movingView.id,referenceSourceViewId:referenceView.id,transform:{scaleX:x.scale,offsetX:x.offset,scaleY:y.scale,offsetY:y.offset},residual:{x:x.maxResidual,y:y.maxResidual},nonUniformity,matchedHorizontal:horizontal.length,matchedVertical:vertical.length,evidence,confirmationRequired:true,notAGeometryConfirmation:true};
+ }
+ function alignViews(referenceView,movingView,referenceImage,movingImage){return alignPlanViews(referenceView,movingView,referenceImage,movingImage);}
+ function alignRoofPlan(floorView,roofView,floorImage,roofImage){
+  const valid=(view,image)=>{
+   const frame=view?.frame,page=frame?.rasterSize,crop=frame?.cropToRaster,size=[view?.payload?.sourceWidth??page?.[0],view?.payload?.sourceHeight??page?.[1]];
+   if(!frame||!image?.data||image.data.length!==image.width*image.height*4||!Array.isArray(page)||page.length!==2||!page.every(n=>finite(n)&&n>0)||!size.every((n,i)=>finite(n)&&n===[image.width,image.height][i]))return false;
+   if(crop===undefined)return size.every((n,i)=>n===page[i]);
+   return Array.isArray(crop)&&crop.length===6&&crop.every(finite)&&crop.slice(0,4).every((n,i)=>n===[1,0,0,1][i])&&crop[4]>=0&&crop[5]>=0&&size.every((n,i)=>n+crop[i+4]<=page[i]);
+  };
+  if(!valid(floorView,floorImage)||!valid(roofView,roofImage))return {status:'unresolved',reason:'ROOF_GRID_SOURCE_FRAME_REQUIRED'};
+  return {...alignPlanViews(floorView,roofView,floorImage,roofImage,{roof:true}),referenceSourceFrame:copy(floorView.frame),movingSourceFrame:copy(roofView.frame),scope:'roof-plan-to-floor-source-pixels'};
  }
  const order=label=>label==='basement'?-1:label==='ground'||label==='level-0'?0:label==='upper'?1:(/^level-\d+$/.test(String(label))?Number(label.slice(6)):1000);
  function forBuilding(inventory,buildingId,images){
@@ -233,5 +249,5 @@
   return {...observed,status:conflict?'conflict':'proposed',reason:conflict?'ELEVATION_GRID_SCALE_CONFLICT':null,units:'metres-to-source-pixels',pixelRegistration:observed,transform:{modelAxis:observed.transform.floorAxis,projectionSign,pixelsPerMetre,offsetPixels},scaleUsed,reference:copy(reference),elevationReference:copy(elevationReference)};
  }
 
- return Object.freeze({version:1,alignElevationAxes,elevationAxisRegistration,bubbleRegions,markers,alignViews,forBuilding,metricAlignment,datumNetwork,registerPreparedLevels});
+ return Object.freeze({version:1,alignElevationAxes,elevationAxisRegistration,bubbleRegions,markers,alignViews,alignRoofPlan,forBuilding,metricAlignment,datumNetwork,registerPreparedLevels});
 });

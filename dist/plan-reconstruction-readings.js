@@ -85,10 +85,10 @@
    for(let i=0;i<=counts.length;i++){const active=i<counts.length&&counts[i]>threshold&&counts[i]<(right-left)*.7;if(active&&start==null)start=i;if(!active&&start!=null){const height=i-start;if(height>=4&&height<=20){const box=[left,top+start-1,right,top+i+1],cx=(left+right)/2,cy=(box[1]+box[3])/2;if(!masks.some(([x,y,w,h])=>cx>=x&&cx<=x+w&&cy>=y&&cy<=y+h)&&!out.some(r=>Math.abs(r.row.box[0]-left)<12&&Math.abs(r.row.box[1]-box[1])<6))out.push({row:{text:'',box,confidence:0},window:true,purpose:'caption-near-exterior-floor-opening',gap:JSON.parse(JSON.stringify(gap)),tight:true});}start=null;}}
   }return out.slice(0,18);
  }
- function gridRegions(view,image){
+ function gridRegions(view,image,{includeRoof=false}={}){
   // Grid numerals and letters are too small for full-page OCR in large PDFs.
   // Source ink first finds candidate circles. Local OCR reads only interiors.
-  const layout=view.kind==='floor'?'floor':view.kind==='elevation'&&['front','back'].includes(view.direction)?'elevation-number':view.kind==='elevation'&&['left','right'].includes(view.direction)?'elevation-letter':null;
+  const layout=view.kind==='floor'||includeRoof&&view.kind==='roof'?'floor':view.kind==='elevation'&&['front','back'].includes(view.direction)?'elevation-number':view.kind==='elevation'&&['left','right'].includes(view.direction)?'elevation-letter':null;
   if(!layout||!image||!root.MIRGridRegistration?.bubbleRegions)return [];
   const detected=root.MIRGridRegistration.bubbleRegions(image,{layout});
   if(detected.status!=='proposed')return [];
@@ -105,11 +105,13 @@
   });
  }
  function workItems(inventory,buildingId,sourceImages={}){
-  const views=inventory.views.filter(v=>v.buildingId===buildingId&&['floor','elevation'].includes(v.kind)&&v.payload.sourceImage).sort((a,b)=>Number(b.kind==='floor')-Number(a.kind==='floor'));
-  // Grid recognition runs only for separate floor plans that actually need
-  // cross-level XY registration. Single-floor clients keep their OCR budget.
+  const roofIds=new Set(inventory.views.filter(v=>v.buildingId===buildingId&&v.kind==='roof'&&root.MIRRoofPitchEvidence?.regions(v).length).map(v=>v.id)),roofRegistration=roofIds.size>0&&inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor');
+  const views=inventory.views.filter(v=>v.buildingId===buildingId&&(['floor','elevation'].includes(v.kind)||roofRegistration&&roofIds.has(v.id))&&v.payload.sourceImage).sort((a,b)=>Number(b.kind==='floor')-Number(a.kind==='floor'));
+  // Grid OCR runs for cross-level registration or an observed roof pitch
+  // requiring a real floor-to-roof transform. No roof kind is rewritten as
+  // a floor; the same bubble detector, thresholds and total budget apply.
   const multiLevel=new Set(views.filter(v=>v.kind==='floor').map(v=>v.levelId).filter(Boolean)).size>1;
-  return views.flatMap(view=>[...regions(view,sourceImages[view.id]),...(multiLevel?gridRegions(view,sourceImages[view.id]):[]),...openingRegions(view,sourceImages[view.id]).map(region=>({...region,priority:4}))].map(region=>({view,region}))).sort((a,b)=>a.region.priority-b.region.priority).slice(0,multiLevel?64:42);
+  return views.flatMap(view=>(view.kind==='roof'?gridRegions(view,sourceImages[view.id],{includeRoof:true}):[...regions(view,sourceImages[view.id]),...(multiLevel||roofRegistration&&view.kind==='floor'?gridRegions(view,sourceImages[view.id]):[]),...openingRegions(view,sourceImages[view.id]).map(region=>({...region,priority:4}))]).map(region=>({view,region}))).sort((a,b)=>a.region.priority-b.region.priority).slice(0,multiLevel?64:42);
  }
  // Re-read a bounded region from the retained PDF, never from a resampled
  // screenshot. Coordinates remain those of the upright imported view.
@@ -170,12 +172,13 @@
   if(Number.isFinite(out.maxGap))out.maxGap*=scale;
   return out;
  }
- async function nativeDimensionTile(native,view,region,sourceRows){
-  const tile=await native.render(view,region,{factor:2,padding:12});if(tile.status!=='proposed')return tile;
+ async function nativeEvidenceTile(native,view,region,sourceRows,{factor=2,padding=12}={}){
+  const tile=await native.render(view,region,{factor,padding});if(tile.status!=='proposed')return tile;
   const release=()=>{tile.canvas.width=tile.canvas.height=1;},p=tile.provenance,m=p?.viewToTile,same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
-  if(!p||typeof p.sourceSha256!=='string'||!p.sourceSha256||p.sourceViewId!==view.id||p.sourceFileId!==view.fileId||p.sourcePage!==view.page||!same(p.sourceFrame,view.frame)||!same(p.sourceRegion,region)||p.scaleFactor!==2||p.padding!==12||!Array.isArray(m)||m.length!==6||!m.every(Number.isFinite)||!same(m,[2,0,0,2,12-region[0]*2,12-region[1]*2])){release();return {status:'unresolved',reason:'NATIVE_DIMENSION_FRAME_MISMATCH'};}
+  if(!p||typeof p.sourceSha256!=='string'||!p.sourceSha256||p.sourceViewId!==view.id||p.sourceFileId!==view.fileId||p.sourcePage!==view.page||!same(p.sourceFrame,view.frame)||!same(p.sourceRegion,region)||p.scaleFactor!==factor||p.padding!==padding||!Array.isArray(m)||m.length!==6||!m.every(Number.isFinite)||!same(m,[factor,0,0,factor,padding-region[0]*factor,padding-region[1]*factor])){release();return {status:'unresolved',reason:'NATIVE_DIMENSION_FRAME_MISMATCH'};}
   try{const image=tile.canvas.getContext('2d',{willReadFrequently:true}).getImageData(0,0,tile.canvas.width,tile.canvas.height),map=q=>[q[0]*m[0]+m[4],q[1]*m[3]+m[5]],back=q=>[(q[0]-m[4])/m[0],(q[1]-m[5])/m[3]],labels=(sourceRows||[]).filter(r=>r.box?.length===4).map(r=>({...r,box:[...map(r.box.slice(0,2)),...map(r.box.slice(2))]}));return {status:'proposed',image,map,back,labels,provenance:JSON.parse(JSON.stringify(p)),release};}catch(error){release();throw error;}
  }
+ async function nativeDimensionTile(native,view,region,sourceRows){return nativeEvidenceTile(native,view,region,sourceRows,{factor:2,padding:12});}
  function captionOverlap(a,b){if(a?.length!==4||b?.length!==4)return 0;const area=p=>(p[2]-p[0])*(p[3]-p[1]);return Math.max(0,Math.min(a[2],b[2])-Math.max(a[0],b[0]))*Math.max(0,Math.min(a[3],b[3])-Math.max(a[1],b[1]))/Math.min(area(a),area(b));}
  function sameDimensionSpan(a,b){return a?.length===2&&b?.length===2&&[b,b.slice().reverse()].some(points=>a.every((p,i)=>Math.hypot(p[0]-points[i][0],p[1]-points[i][1])<=2));}
  function dimensionSourceReading(view,candidate){
@@ -236,10 +239,93 @@
    const rows=view.payload.drawingReadings.verticalDimensions||=([]),index=rows.findIndex(r=>r.id===observation.id);if(index>=0)rows[index]=observation;else rows.push(observation);
    evidence.push({sourceViewId:view.id,source:'native-vertical-dimension',purpose:'source-datum-bound-vertical-dimension',...observation,box:observation.textBox.slice()});if(i<budget)progress(i+1,Math.min(work.length,budget),view.page);
   }
+  // Written ROUGH and foundation chains may have no named floor datum.
+  // Preserve these source measurements without silently assigning a level.
+  for(const view of inventory.views.filter(v=>v.buildingId===buildingId)){
+   if(cancelled())break;
+   const observations=root.MIRPlanReconstruction?.constructionHeightObservations?.(view,sourceImages[view.id])||[];if(!observations.length)continue;
+   view.payload.drawingReadings.constructionHeights=observations;
+   evidence.push(...observations.map(observation=>({sourceViewId:view.id,source:'source-construction-height',purpose:'source-construction-height-without-level-association',...observation,box:observation.textBox.slice()})));
+  }
   return evidence;
  }
+ // Boxed note keys are read from their own retained-source pixels. The
+ // nearby height note selects a search region, never an expected key value.
+ async function refineKeyedWallKeys(inventory,buildingId,sourceImages,native,worker,{cancelled=()=>false,progress=()=>{},discovery=null}={}){
+  const K=root.MIRKeyedWallObservations;if(!K)return [];
+  const found=discovery||K.discover(inventory,buildingId,sourceImages),evidence=[];
+  for(let i=0;i<found.regions.length;i++){
+   const region=found.regions[i],view=inventory.views.find(v=>v.id===region.sourceViewId&&v.buildingId===buildingId);if(!view)continue;
+   const observation={id:region.id,sourceViewId:view.id,sourceFrame:JSON.parse(JSON.stringify(view.frame)),frameId:region.frame.id,frame:JSON.parse(JSON.stringify(region.frame)),box:region.frame.box.slice(),region:region.region.slice(),candidateEvidence:JSON.parse(JSON.stringify(region.candidateEvidence)),source:'native-keyed-wall-key',purpose:'source-boxed-wall-note-key',status:'unresolved',text:'',confidence:0,confirmationRequired:true};
+   const tile=cancelled()?{status:'unresolved',reason:'KEYED_WALL_READING_CANCELLED'}:await native.render(view,region.region,{factor:6,padding:12});
+   if(tile.status==='proposed')try{const p=tile.provenance,same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);if(p?.method!=='retained-pdf-region'||p.sourceViewId!==view.id||p.sourceFileId!==view.fileId||p.sourcePage!==view.page||!same(p.sourceFrame,view.frame)||!same(p.sourceRegion,region.region)){observation.reason='KEYED_WALL_SOURCE_FRAME_REQUIRED';}else {await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''});const {data}=await worker.recognize(tile.canvas,{}, {blocks:true}),text=String(data.text||'').trim().replace(/\s+/g,'').toUpperCase(),confidence=Number(data.confidence)||0;Object.assign(observation,{text,confidence,nativeSource:JSON.parse(JSON.stringify(tile.provenance)),status:/^[A-Z0-9]{1,4}$/.test(text)&&confidence>=70?'proposed':'unresolved',...(!/^[A-Z0-9]{1,4}$/.test(text)||confidence<70?{reason:'KEYED_WALL_KEY_UNCERTAIN'}:{})});}}finally{tile.canvas.width=tile.canvas.height=1;}
+   else observation.reason=tile.reason||'SOURCE_PDF_UNAVAILABLE';
+   const values=view.payload.drawingReadings.keyedWallKeys||=([]),index=values.findIndex(v=>v.id===observation.id);if(index>=0){const previous=values[index],history=[...(previous.previousReadings||[]),{...previous,previousReadings:undefined}];observation.previousReadings=history.slice(-4);if(history.some(r=>r.confidence>=70&&r.status==='proposed'&&observation.status==='proposed'&&r.text!==observation.text)||previous.status==='conflict'){observation.status='conflict';observation.reason='KEYED_WALL_KEY_CONFLICT';}values[index]=observation;}else values.push(observation);evidence.push(observation);progress(i+1,found.regions.length,view.page);
+  }
+  return evidence;
+ }
+ // A pitch caption schedules native OCR; no expected rise, denominator or
+ // target house is passed to the worker. Every transcription keeps its own
+ // source tile and the bounding box of the actual observed ratio.
+ async function refineRoofPitches(inventory,buildingId,native,worker,{cancelled=()=>false,progress=()=>{},maxRegions=8}={}){
+  const P=root.MIRRoofPitchEvidence;if(!P)return [];
+  const copy=v=>JSON.parse(JSON.stringify(v)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),work=inventory.views.filter(v=>v.buildingId===buildingId&&v.kind==='roof').flatMap(view=>P.regions(view).map(region=>({view,region}))),limit=Math.max(0,Math.min(8,Number.isFinite(maxRegions)?Math.floor(maxRegions):8)),evidence=[];
+  for(let i=0;i<work.length;i++){
+   const {view,region}=work[i],observation={...copy(region),kind:'written',source:'ocr-local-native-roof-pitch',text:'',confidence:0,sourceBox:copy(region.caption.sourceBox),readingAttempts:[]},valid=[];
+   if(cancelled())observation.reason='ROOF_PITCH_READING_CANCELLED';else if(i>=limit)observation.reason='ROOF_PITCH_READING_BUDGET';else for(const [box,psm,threshold] of [[region.region,6,null],[region.ratioRegion,7,null],[region.ratioRegion,7,140]]){
+    if(cancelled()){observation.reason='ROOF_PITCH_READING_CANCELLED';break;}
+    const tile=await native.render(view,box,{factor:6,padding:12});
+    if(tile.status!=='proposed'){observation.readingAttempts.push({region:copy(box),psm,status:'unresolved',reason:tile.reason||'SOURCE_PDF_UNAVAILABLE'});continue;}
+    try{const p=tile.provenance,file=inventory.files?.find(f=>f.id===view.fileId);
+     if(p?.method!=='retained-pdf-region'||p.sourceViewId!==view.id||p.sourceFileId!==view.fileId||p.sourcePage!==view.page||!file?.sha256||p.sourceSha256!==file.sha256||!same(p.sourceFrame,view.frame)||!same(p.sourceRegion,box)||!(p.scaleFactor>0)||!Number.isFinite(p.padding)){observation.readingAttempts.push({region:copy(box),psm,status:'unresolved',reason:'ROOF_PITCH_SOURCE_FRAME_REQUIRED'});continue;}
+     if(psm===6&&!threshold){const ctx=tile.canvas.getContext('2d',{willReadFrequently:true}),pixels=ctx.getImageData(0,0,tile.canvas.width,tile.canvas.height),captionBox=region.caption.sourceBox.map((n,j)=>(n-box[j%2])*p.scaleFactor+p.padding),nativeArrow=P.arrow(pixels,{caption:{sourceBox:captionBox}});if(nativeArrow)observation.nativeArrow={...copy(nativeArrow),anchors:nativeArrow.anchors.map(a=>a.map((n,j)=>(n-p.padding)/p.scaleFactor+box[j])),head:{depth:nativeArrow.head.depth/p.scaleFactor,halfWidth:nativeArrow.head.halfWidth/p.scaleFactor},nativeAnchors:copy(nativeArrow.anchors),nativeSource:copy(p),sourceViewId:view.id,sourceFrame:copy(view.frame)};}
+     // The independent contrast attempt removes pale hatch/colour only in
+     // the OCR tile. It never supplies roof strokes or replaces source ink.
+     if(threshold){const ctx=tile.canvas.getContext('2d',{willReadFrequently:true}),pixels=ctx.getImageData(0,0,tile.canvas.width,tile.canvas.height);for(let i=0;i<pixels.data.length;i+=4){const d=pixels.data,hi=Math.max(d[i],d[i+1],d[i+2]),lo=Math.min(d[i],d[i+1],d[i+2]),value=hi<threshold&&hi-lo<65?0:255;d.set([value,value,value,255],i);}ctx.putImageData(pixels,0,0);}
+     await worker.setParameters({tessedit_pageseg_mode:String(psm),tessedit_char_whitelist:''});const {data}=await worker.recognize(tile.canvas,{}, {blocks:true}),lines=[];
+     for(const block of data.blocks||[])for(const paragraph of block.paragraphs||[])for(const line of paragraph.lines||[]){const b=line.bbox;if(!b||![b.x0,b.y0,b.x1,b.y1].every(Number.isFinite)||b.x1<=b.x0||b.y1<=b.y0)continue;const mapped=[(b.x0-p.padding)/p.scaleFactor+box[0],(b.y0-p.padding)/p.scaleFactor+box[1],(b.x1-p.padding)/p.scaleFactor+box[0],(b.y1-p.padding)/p.scaleFactor+box[1]];if(mapped[0]<box[0]-.01||mapped[1]<box[1]-.01||mapped[2]>box[0]+box[2]+.01||mapped[3]>box[1]+box[3]+.01)continue;lines.push({text:String(line.text||'').trim(),confidence:Number(line.confidence)||0,sourceBox:mapped});}
+     const attempt={region:copy(box),psm,preprocessing:threshold?'ocr-only-neutral-contrast-140':'native-source-colours',text:String(data.text||'').trim(),confidence:Number(data.confidence)||0,lines,nativeSource:copy(p)};observation.readingAttempts.push(attempt);
+     for(const line of lines){const ratio=P.parse(line.text);if(ratio)valid.push({...line,ratio,nativeSource:copy(p),psm});}
+    }finally{tile.canvas.width=tile.canvas.height=1;}
+   }
+   const best=valid.sort((a,b)=>b.confidence-a.confidence)[0];
+   if(best){const captionConfidence=Math.max(region.caption.confidence||0,...observation.readingAttempts.flatMap(a=>(a.lines||[]).filter(l=>/^\s*(?:pente|pitch|slope)\s*$/i.test(l.text)).map(l=>l.confidence))),confidence=Math.min(best.confidence,captionConfidence),conflict=valid.some(v=>v.confidence>=70&&best.confidence>=70&&v.ratio.value!==best.ratio.value);Object.assign(observation,{text:best.text,confidence,sourceBox:best.sourceBox,ratio:best.ratio,nativeSource:best.nativeSource,status:conflict?'conflict':confidence>=70?'proposed':'unresolved',reason:conflict?'ROOF_PITCH_TRANSCRIPTION_CONFLICT':confidence>=70?null:'ROOF_PITCH_TRANSCRIPTION_UNCERTAIN'});}
+   else observation.reason||='ROOF_PITCH_TRANSCRIPTION_UNCERTAIN';
+   const readings=view.payload.drawingReadings.roofPitchReadings||=([]),at=readings.findIndex(r=>r.id===observation.id);
+   if(at>=0){const old=readings[at];observation.previousReadings=[...(old.previousReadings||[]),{...old,previousReadings:undefined}].slice(-4);if(old.status==='conflict'||old.status==='proposed'&&observation.status==='proposed'&&P.parse(old.text)?.value!==P.parse(observation.text)?.value){observation.status='conflict';observation.reason='ROOF_PITCH_TRANSCRIPTION_CONFLICT';}readings[at]=observation;}else readings.push(observation);
+   evidence.push({...copy(observation),box:observation.sourceBox.slice()});if(i<limit)progress(i+1,Math.min(work.length,limit),view.page);
+  }return evidence;
+ }
+ // Native aperture tiles refine source observations only. Their search seed is
+ // an existing floor gap projected by the same reconstruction module.
+ function mapOpeningFrameProof(proof,back,size){
+  const out=JSON.parse(JSON.stringify(proof)),box=b=>{const a=back(b.slice(0,2)),z=back([b[0]+b[2],b[1]+b[3]]);return [a[0],a[1],z[0]-a[0],z[1]-a[1]];};
+  if(out.box)out.box=box(out.box);if(out.edges)for(const edge of Object.values(out.edges))if(edge.anchors)edge.anchors=edge.anchors.map(back);if(out.cornerPoints)out.cornerPoints=out.cornerPoints.map(back);if(out.extensions)for(const group of Object.values(out.extensions))for(const edge of group)if(edge.anchors)edge.anchors=edge.anchors.map(back);if(out.jambContinuationAbove)for(const edge of out.jambContinuationAbove)if(edge.anchors)edge.anchors=edge.anchors.map(back);
+  out.rasterSize=size.slice();out.coordinateSystem='source-raster-pixels';out.metricsUnit='native-samples';return out;
+ }
+ async function verifyOpeningFrame(native,inventory,view,search,{cancelled=()=>false}={}){
+  const V=root.MIRReconstructionVision,copy=x=>JSON.parse(JSON.stringify(x)),base=copy(search),unresolved=reason=>({...base,status:'unresolved',reason,candidates:[],confirmationRequired:true}),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),point=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite),floor=inventory.views.find(v=>v.id===search.floorSourceViewId),level=inventory.levels?.find(l=>l.id===search.levelId),region=search.region,seed=search.seed,band=search.band,size=[view.payload?.sourceWidth||view.zone?.[2]||view.frame?.rasterSize?.[0],view.payload?.sourceHeight||view.zone?.[3]||view.frame?.rasterSize?.[1]];
+  if(!V?.patternedFrameAtSeed||view.kind!=='elevation'||!floor||floor.kind!=='floor'||!level||level.buildingId!==view.buildingId||level.sourceLevel!==floor.levelId||search.buildingId!==view.buildingId||floor.buildingId!==view.buildingId||search.sourceViewId!==view.id||!same(search.sourceFrame,view.frame)||!same(search.floorSourceFrame,floor.frame)||search.sourceGap?.kind!=='source-gap'||search.sourceGap.status!=='proposed'||search.sourceGap.colouredOcclusion||!search.sourceGap.sourcePixelEvidence||search.sourceGap.anchors?.length!==2||!search.sourceGap.anchors.every(point)||!region?.every(Number.isFinite)||region.length!==4||!Number.isFinite(seed?.left)||!Number.isFinite(seed?.right)||seed.left>=seed.right||!Number.isFinite(band?.top)||!Number.isFinite(band?.bottom)||band.top>=band.bottom||seed.left<region[0]||seed.right>region[0]+region[2]||band.top<region[1]||band.bottom>region[1]+region[3])return unresolved('NATIVE_OPENING_SOURCE_MISMATCH');
+  if(cancelled())return unresolved('NATIVE_OPENING_CANCELLED');const tile=await nativeEvidenceTile(native,view,region,[],{factor:4,padding:12});if(tile.status!=='proposed')return unresolved(tile.reason||'SOURCE_PDF_UNAVAILABLE');
+  try{
+   if(cancelled())return {...unresolved('NATIVE_OPENING_CANCELLED'),nativeSource:copy(tile.provenance)};
+   const nativeSeed={left:tile.map([seed.left,0])[0],right:tile.map([seed.right,0])[0]},nativeBand={top:tile.map([0,band.top])[1],bottom:tile.map([0,band.bottom])[1]},result=V.patternedFrameAtSeed(tile.image,nativeSeed,{...nativeBand,sourceScale:4}),raw=result.candidates||[],mapped=raw.map(candidate=>{const b=candidate.box,a=tile.back(b.slice(0,2)),z=tile.back([b[0]+b[2],b[1]+b[3]]);return {...copy(candidate),box:[a[0],a[1],z[0]-a[0],z[1]-a[1]],...(candidate.frameEvidence?{frameEvidence:mapOpeningFrameProof(candidate.frameEvidence,tile.back,size)}:{}),confirmationRequired:true};});
+   return {...base,status:result.status==='proposed'?'proposed':'unresolved',...(result.reason?{reason:result.reason}:{}),candidates:mapped,nativeCandidates:copy(raw),nativeSource:copy(tile.provenance),nativeSearch:{seed:nativeSeed,band:nativeBand},confirmationRequired:true};
+  }catch(error){return {...unresolved('NATIVE_OPENING_READ_FAILED'),nativeSource:copy(tile.provenance),errorName:String(error?.name||'Error')};}finally{tile.release();}
+ }
+ async function refineOpeningFrames(inventory,buildingId,sourceImages,native,{cancelled=()=>false,progress=()=>{},maxRegions=24}={}){
+  const R=root.MIRPlanReconstruction,P=root.MIRReconstructionPipeline;if(!R?.openingFrameSearches)return [];
+  const work=[],preparationRefusals=[],copy=x=>JSON.parse(JSON.stringify(x)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),limit=Number.isFinite(maxRegions)?Math.max(0,Math.min(24,Math.floor(maxRegions))):24;
+  for(const level of inventory.levels||[]){if(level.buildingId!==buildingId)continue;const floor=inventory.views.find(v=>v.kind==='floor'&&v.buildingId===buildingId&&v.levelId===level.sourceLevel),refuse=reason=>{if(!floor)return;const w=floor.payload?.sourceWidth||floor.zone?.[2]||floor.frame?.rasterSize?.[0],h=floor.payload?.sourceHeight||floor.zone?.[3]||floor.frame?.rasterSize?.[1];if(w>0&&h>0)preparationRefusals.push({status:'unresolved',reason,sourceViewId:floor.id,sourceFrame:copy(floor.frame),buildingId,levelId:level.id,purpose:'source-native-opening-preparation',source:'native-opening-frame',box:[0,0,w,h],confirmationRequired:true});};if(!P?.prepare||!R.recoupRegistrations){refuse('NATIVE_OPENING_PIPELINE_REQUIRED');continue;}const proposal=R.propose(inventory,buildingId,sourceImages,{levelId:level.id});if(proposal.status!=='proposed'){refuse(proposal.reason||'NATIVE_OPENING_PROPOSAL_REQUIRED');continue;}const prepared=P.prepare(proposal,inventory,level);if(!prepared.constrained||prepared.errors?.length||!prepared.resolution?.reference){refuse(prepared.errors?.[0]||'NATIVE_OPENING_PREPARATION_REQUIRED');continue;}R.recoupRegistrations(proposal,inventory,sourceImages,prepared.constrained);for(const search of R.openingFrameSearches(proposal,inventory,sourceImages,prepared.constrained)||[]){const view=inventory.views.find(v=>v.id===search.sourceViewId&&v.buildingId===buildingId);if(!view||work.some(w=>w.search.floorSourceViewId===search.floorSourceViewId&&w.search.sourceViewId===search.sourceViewId&&same(w.search.sourceGap?.anchors,search.sourceGap?.anchors)&&same(w.search.region,search.region)))continue;work.push({view,search});}}
+  const evidence=preparationRefusals;let used=0;for(const {view,search}of work){view.payload||={};view.payload.drawingReadings||={rows:[]};const rows=view.payload.drawingReadings.nativeOpeningFrames||=([]),at=rows.findIndex(r=>r.floorSourceViewId===search.floorSourceViewId&&r.sourceViewId===search.sourceViewId&&same(r.sourceFrame,search.sourceFrame)&&same(r.sourceGap?.anchors,search.sourceGap?.anchors)&&same(r.region,search.region));
+   if(at>=0&&rows[at].nativeSource&&rows[at].status==='proposed')continue;
+   let observation;if(cancelled())observation={...copy(search),status:'unresolved',reason:'NATIVE_OPENING_CANCELLED',candidates:[],confirmationRequired:true};else if(used>=limit)observation={...copy(search),status:'unresolved',reason:'NATIVE_OPENING_BUDGET',candidates:[],confirmationRequired:true};else{used++;observation=await verifyOpeningFrame(native,inventory,view,search,{cancelled});}
+   if(at>=0){observation.previousReadings=[...(rows[at].previousReadings||[]),{...copy(rows[at]),previousReadings:undefined}].slice(-4);rows[at]=observation;}else rows.push(observation);
+   const [x,y,w,h]=search.region;evidence.push({...copy(observation),source:'native-opening-frame',purpose:'source-floor-gap-to-native-elevation-frame',box:[x,y,x+w,y+h]});if(used<=limit)progress(used,Math.min(work.length,limit),view.page);
+  }return evidence;
+ }
  async function refine(inventory,buildingId,{images:sourceImages={},progress=()=>{},cancelled=()=>false,sourceFile=null}={}){
-  const next=JSON.parse(JSON.stringify(inventory)),evidence=[],native=sourceReader(sourceFile,next.files||[]),dimensionBudget={remaining:12};let work;try{evidence.push(...await refineHorizontalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));work=workItems(next,buildingId,sourceImages);}catch(error){await native.close();throw error;}if(!work.length){try{evidence.push(...await refineVerticalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));return {inventory:next,evidence};}finally{await native.close();}}
+  const next=JSON.parse(JSON.stringify(inventory)),evidence=[],native=sourceReader(sourceFile,next.files||[]),dimensionBudget={remaining:12};let work,keyDiscovery,pitchRegions;try{evidence.push(...await refineHorizontalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));work=workItems(next,buildingId,sourceImages);keyDiscovery=root.MIRKeyedWallObservations?.discover(next,buildingId,sourceImages);pitchRegions=next.views.filter(v=>v.buildingId===buildingId&&v.kind==='roof').flatMap(v=>root.MIRRoofPitchEvidence?.regions(v)||[]);}catch(error){await native.close();throw error;}if(!work.length&&!keyDiscovery?.regions.length&&!pitchRegions.length){try{evidence.push(...await refineVerticalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));evidence.push(...await refineOpeningFrames(next,buildingId,sourceImages,native,{progress,cancelled}));return {inventory:next,evidence};}finally{await native.close();}}
   await dependencies();const worker=await root.Tesseract.createWorker('eng',1,{workerPath:asset('vendor/tesseract/worker.min.js'),corePath:asset('vendor/tesseract-core/'),langPath:asset('vendor/tessdata/'),workerBlobURL:false,gzip:true});
   let activeCanvas=null;try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});let workerMode='7';const images=new Map();
    for(let i=0;i<work.length;i++){
@@ -283,7 +369,10 @@
    }
    evidence.push(...await refineHorizontalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));
    evidence.push(...await refineVerticalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));
+   evidence.push(...await refineKeyedWallKeys(next,buildingId,sourceImages,native,worker,{progress,cancelled,discovery:keyDiscovery}));
+   evidence.push(...await refineRoofPitches(next,buildingId,native,worker,{progress,cancelled}));
+   evidence.push(...await refineOpeningFrames(next,buildingId,sourceImages,native,{progress,cancelled}));
   }finally{if(activeCanvas)activeCanvas.width=activeCanvas.height=1;try{await worker.terminate();}finally{await native.close();}}return {inventory:next,evidence};
  }
- root.MIRReconstructionReadings=Object.freeze({datumCaptionBands,datumCaptionRegions,readingCrop,fragmentedCaptions,neighbouringMeasurements,regions,openingRegions,gridRegions,workItems,captionGuideMasks,sourceTilePlan,sourceReader,dimensionWordRetry,mapDimensionProof,nativeDimensionTile,horizontalDimensionCandidates,verifyHorizontalDimension,refineHorizontalDimensions,verticalDimensionPairs,verifyVerticalDimension,refineVerticalDimensions,refine});
+ root.MIRReconstructionReadings=Object.freeze({datumCaptionBands,datumCaptionRegions,readingCrop,fragmentedCaptions,neighbouringMeasurements,regions,openingRegions,gridRegions,workItems,captionGuideMasks,sourceTilePlan,sourceReader,dimensionWordRetry,mapDimensionProof,nativeEvidenceTile,nativeDimensionTile,horizontalDimensionCandidates,verifyHorizontalDimension,refineHorizontalDimensions,verticalDimensionPairs,verifyVerticalDimension,refineVerticalDimensions,refineKeyedWallKeys,refineRoofPitches,mapOpeningFrameProof,verifyOpeningFrame,refineOpeningFrames,refine});
 })(window);

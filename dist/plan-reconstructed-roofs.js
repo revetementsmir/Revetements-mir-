@@ -2,6 +2,62 @@
  * rectangle/rise fallback, symmetry assumption or PDF texture is used. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.MIRReconstructedRoofs=api;})(typeof window==='object'?window:globalThis,function(){
  'use strict';const finite=Number.isFinite;
+ const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),copy=v=>JSON.parse(JSON.stringify(v));
+ function pitchGeometry(roof){return {profiles:copy(roof.profiles),extensions:(roof.extensions||[]).map(r=>({id:r.id,profiles:copy(r.profiles)}))};}
+ function pitchEvidenceIssues(roof,{confirm=false}={}){
+  const p=roof.pitchEvidence;if(p===undefined)return [];
+  if(!p||p.version!==1||p.roofId!==roof.id||p.levelId!==roof.levelId||p.buildingId!==roof.buildingId||!Array.isArray(p.observations)||!Array.isArray(p.checks)||p.observations.length>128||p.checks.length>128||!['conflict','unresolved','consistent','not-found'].includes(p.status))return ['ROOF_PITCH_EVIDENCE'];
+  if(!same(p.geometry,pitchGeometry(roof)))return ['ROOF_PITCH_EVIDENCE_STALE'];
+  // Recompute the existing mesh without recursively reading this evidence.
+  // A stored check is not permission to hide a contradiction or change a roof.
+  const clean=copy(roof);delete clean.pitchEvidence;for(const child of clean.extensions||[])delete child.pitchEvidence;
+  const mesh=faces(clean,[0,0],{includeProposed:true}).filter(f=>f.type==='roof'),seen=new Set(),errors=[];
+  const box=b=>Array.isArray(b)&&b.length===4&&b.every(finite)&&b[2]>b[0]&&b[3]>b[1];
+  for(const o of p.observations){
+   if(!o?.id||seen.has(o.id)||!o.sourceViewId||!o.sourceFileId||!Number.isInteger(o.sourcePage)||!o.sourceFrame||!box(o.sourceBox)||!o.association||!['proposed','unresolved','conflict'].includes(o.status)){errors.push('ROOF_PITCH_EVIDENCE');continue;}seen.add(o.id);
+   if(o.status==='proposed'&&(!(o.ratio?.rise>0&&o.ratio.run>0)||!finite(o.ratio.value)||Math.abs(o.ratio.value-o.ratio.rise/o.ratio.run)>1e-9))errors.push('ROOF_PITCH_EVIDENCE');
+   if(o.association.status==='proposed'&&!p.checks.some(c=>c.observationId===o.id))errors.push('ROOF_PITCH_EVIDENCE');
+  }
+  const checked=new Set();let conflict=false;
+  for(const c of p.checks){
+   const o=p.observations.find(o=>o.id===c.observationId),a=o?.association,face=mesh.find(f=>f.id===c.faceId&&f.componentId===c.componentId),slope=face&&Math.hypot(face.normal[0],face.normal[1])/face.normal[2];
+   if(checked.has(c.observationId)||!o||o.status!=='proposed'||a?.status!=='proposed'||a.faceId!==c.faceId||a.componentId!==c.componentId||!face||!same(a.facePolygon,face.poly)||!finite(slope)||![c.writtenRatio,c.measuredRatio,c.difference,c.tolerance].every(finite)||c.tolerance<0||Math.abs(c.writtenRatio-o.ratio.value)>1e-9||Math.abs(c.measuredRatio-slope)>1e-9||Math.abs(c.difference-(c.writtenRatio-slope))>1e-9){errors.push('ROOF_PITCH_EVIDENCE');continue;}
+   checked.add(c.observationId);const disagrees=Math.abs(c.writtenRatio-slope)>c.tolerance;
+   if(c.status!==(disagrees?'conflict':'consistent'))errors.push('ROOF_PITCH_EVIDENCE');conflict||=disagrees;
+  }
+  if((p.status==='conflict')!==conflict)errors.push('ROOF_PITCH_EVIDENCE');
+  if(confirm&&conflict)errors.push('ROOF_PITCH_CONFLICT');return [...new Set(errors)];
+ }
+ function pitchSourceIssues(roof,inventory){
+  const errors=[],p=roof.pitchEvidence;
+  if(p!==undefined){
+   if(!p||!Array.isArray(p.observations))errors.push('ROOF_PITCH_SOURCE');
+   else for(const o of p.observations){
+    const view=inventory.views.find(v=>v.id===o.sourceViewId&&v.buildingId===roof.buildingId&&v.kind==='roof'),b=o.sourceBox,w=view?.payload?.sourceWidth||view?.frame?.rasterSize?.[0],h=view?.payload?.sourceHeight||view?.frame?.rasterSize?.[1];
+    if(!view||!finite(w)||!finite(h)||view.fileId!==o.sourceFileId||view.page!==o.sourcePage||!same(view.frame,o.sourceFrame)||!Array.isArray(b)||b.length!==4||!b.every(finite)||b[0]<0||b[1]<0||b[2]>w||b[3]>h){errors.push('ROOF_PITCH_SOURCE');continue;}
+    for(const n of [o.nativeSource,o.nativeArrow?.nativeSource])if(n&&(n.method!=='retained-pdf-region'||n.sourceViewId!==view.id||n.sourceFileId!==view.fileId||n.sourcePage!==view.page||!same(n.sourceFrame,view.frame)))errors.push('ROOF_PITCH_SOURCE');
+    if(o.nativeArrow&&(o.nativeArrow.sourceViewId!==view.id||!same(o.nativeArrow.sourceFrame,view.frame)||!o.nativeArrow.nativeSource))errors.push('ROOF_PITCH_SOURCE');
+    const a=o.association;if(a?.status==='proposed'){
+     const floor=inventory.views.find(v=>v.id===a.floorSourceViewId&&v.kind==='floor'&&v.buildingId===roof.buildingId),g=a.gridRegistration;
+     if(!floor||!same(floor.frame,a.floorSourceFrame)||g?.status!=='proposed'||g.referenceSourceViewId!==floor.id||g.movingSourceViewId!==view.id||!same(g.referenceSourceFrame,floor.frame)||!same(g.movingSourceFrame,view.frame)||a.floorReference?.sourceViewId!==floor.id)errors.push('ROOF_PITCH_SOURCE');
+    }
+   }
+  }
+  for(const child of roof.extensions||[])errors.push(...pitchSourceIssues(child,inventory));return [...new Set(errors)];
+ }
+ function pitchHistoryIssues(roof,previous){
+  if(!roof)return previous?.pitchEvidence||(previous?.extensions||[]).some(c=>pitchHistoryIssues(null,c).length)?['ROOF_PITCH_EVIDENCE_LOST']:[];
+  const errors=[],old=previous?.pitchEvidence,next=roof.pitchEvidence;
+  // Finishing or reopening a roof cannot discard an inconvenient source.
+  // New assessments may change face ownership, but retain the written reading.
+  const reading=o=>[o.id,o.text,o.ratio,o.sourceViewId,o.sourceFileId,o.sourcePage,o.sourceFrame,o.sourceBox,o.nativeSource];
+  if(old&&(!next||!Array.isArray(next.observations)||(old.observations||[]).some(o=>!next.observations.some(n=>same(reading(n),reading(o))||(n.previousReadings||[]).some(p=>same(reading(p),reading(o)))))))errors.push('ROOF_PITCH_EVIDENCE_LOST');
+  if(old&&next&&Array.isArray(next.observations))for(const o of old.observations||[])if(o.association?.status==='proposed'){
+   const n=next.observations.find(n=>n.id===o.id),before=old.checks?.find(c=>c.observationId===o.id),after=next.checks?.find(c=>c.observationId===o.id);
+   if(n?.association?.status!=='proposed'||!after||same(old.geometry,next.geometry)&&(!same(n.association,o.association)||!same(before,after)))errors.push('ROOF_PITCH_EVIDENCE_LOST');
+  }
+  for(const child of previous?.extensions||[])errors.push(...pitchHistoryIssues((roof.extensions||[]).find(p=>p.id===child.id),child));return [...new Set(errors)];
+ }
  function observedFasciaIssues(roof){
   if(roof.observedFascia===undefined)return [];
   const faces=roof.observedFascia,xp=roof.profiles?.x,yp=roof.profiles?.y;
@@ -19,7 +75,7 @@
    if(!roof.sources?.some(s=>s.sourceViewId===face.sourceViewId)||!face.sourceFrame||!Array.isArray(face.anchors)||face.anchors.length<2||face.anchors.some(a=>!Array.isArray(a)||a.length!==2||!a.every(finite))||!(face.scaleX>0&&face.scaleY>0))errors.push('ROOF_OBSERVED_FASCIA_SOURCE');
   }return errors;
  }
- function issues(roof,{confirm=true,depth=0}={}){const errors=[];if(!roof?.id||!roof.levelId||!roof.buildingId)errors.push('ROOF_ID');if(confirm&&roof.status!=='confirmed')errors.push('ROOF_UNCONFIRMED');for(const key of ['x','y']){const p=roof?.profiles?.[key];if(!Array.isArray(p)||p.length<2||p.length>12||p.some((p,i,a)=>p.length!==2||!p.every(finite)||p.some(n=>Math.abs(n)>10000)||i&&p[0]<=a[i-1][0]))errors.push('ROOF_PROFILE');}if(!Array.isArray(roof?.sources)||roof.sources.length<2||roof.sources.some(s=>!s.sourceViewId||!s.sourceFrame||!s.anchors?.length||!finite(s.scaleX)||!finite(s.scaleY)||s.scaleX<=0||s.scaleY<=0))errors.push('ROOF_SOURCE');if((roof.extensions||[]).length>8||depth>0&&roof.extensions?.length)errors.push('ROOF_COMPONENTS');else for(const child of roof.extensions||[]){if(child.levelId!==roof.levelId||child.buildingId!==roof.buildingId||child.id===roof.id||issues(child,{confirm:false,depth:depth+1}).length)errors.push('ROOF_COMPONENTS');}if(!errors.includes('ROOF_PROFILE'))errors.push(...observedFasciaIssues(roof));return [...new Set(errors)];}
+ function issues(roof,{confirm=true,depth=0}={}){const errors=[];if(!roof?.id||!roof.levelId||!roof.buildingId)errors.push('ROOF_ID');if(confirm&&roof.status!=='confirmed')errors.push('ROOF_UNCONFIRMED');for(const key of ['x','y']){const p=roof?.profiles?.[key];if(!Array.isArray(p)||p.length<2||p.length>12||p.some((p,i,a)=>p.length!==2||!p.every(finite)||p.some(n=>Math.abs(n)>10000)||i&&p[0]<=a[i-1][0]))errors.push('ROOF_PROFILE');}if(!Array.isArray(roof?.sources)||roof.sources.length<2||roof.sources.some(s=>!s.sourceViewId||!s.sourceFrame||!s.anchors?.length||!finite(s.scaleX)||!finite(s.scaleY)||s.scaleX<=0||s.scaleY<=0))errors.push('ROOF_SOURCE');if((roof.extensions||[]).length>8||depth>0&&roof.extensions?.length)errors.push('ROOF_COMPONENTS');else for(const child of roof.extensions||[]){if(child.levelId!==roof.levelId||child.buildingId!==roof.buildingId||child.id===roof.id||issues(child,{confirm:false,depth:depth+1}).length)errors.push('ROOF_COMPONENTS');}if(!errors.includes('ROOF_PROFILE')){errors.push(...observedFasciaIssues(roof));errors.push(...pitchEvidenceIssues(roof,{confirm}));if(confirm)for(const child of roof.extensions||[])errors.push(...pitchEvidenceIssues(child,{confirm:true}));}return [...new Set(errors)];}
  function clip(poly,a,b,c,side){const result=[],value=p=>side*(a*p[0]+b*p[1]+c);for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length],u=value(p),v=value(q);if(u<=1e-9)result.push(p);if((u<-1e-9&&v>1e-9)||(u>1e-9&&v<-1e-9)){const t=u/(u-v);result.push([p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t]);}}return result;}
  const area=p=>Math.abs(p.reduce((s,a,i)=>{const b=p[(i+1)%p.length];return s+a[0]*b[1]-a[1]*b[0];},0))/2;
  function supportingPlanes(roof){
@@ -70,5 +126,5 @@
    pieces.forEach((p,k)=>result.push({...face,id:face.id+':visible:'+k,roofId:roof.id,elementId:roof.id,componentId:components[i].id,poly:p.map(([x,y])=>[x,y,plane[0]*x+plane[1]*y+plane[2]]),suppressOutline:groups.length>1}));
   }return mergeCoplanar(result);
  }
- return Object.freeze({version:1,issues,faces});
+ return Object.freeze({version:1,issues,faces,pitchGeometry,pitchEvidenceIssues,pitchSourceIssues,pitchHistoryIssues});
 });

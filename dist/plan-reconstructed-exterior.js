@@ -340,7 +340,7 @@
   // A source annotation can hide one post without hiding the roof above it.
   // Keep that support unresolved while retaining independently observed roof
   // profiles; never complete the missing post by symmetry or by its neighbour.
-  if(columns.length<2)report.issues.push('ENTRY_ASSEMBLY_SUPPORT_PARTIAL');
+  if(columns.length<2)report.issues.push('ENTRY_COLUMN_SUPPORT_PARTIAL');
   const wall=owners.find(o=>o.wall.id===columns[0].parentWallId).wall,wallY=wall.from[1],levelId=columns[0].levelId;
   const blockers=(xs,ys,zs)=>owners.filter(({wall:other})=>other.id!==wall.id&&other.from[1]<ys[1]-.001&&
    Math.min(xs[1],Math.max(other.from[0],other.to[0]))-Math.max(xs[0],Math.min(other.from[0],other.to[0]))>.001&&
@@ -411,9 +411,10 @@
   if(hiddenBy.length){report.issues.push('ENTRY_ROOF_HIDDEN_BY_NEARER_VOLUME');report.conflicts||=[];report.conflicts.push({type:'roof',reason:'ENTRY_ROOF_HIDDEN_BY_NEARER_VOLUME',entryAssemblyId:id,occludingWallIds:hiddenBy});return;}
   const sourceRecord=(view,anchors,registration,axis)=>({axis,sourceViewId:view.id,sourceFrame:copy(view.frame),anchors:copy(anchors),scaleX:registration.sx,scaleY:registration.sz,kind:'estimated-calibrated',status:'proposed',referenceGuide:copy(registration.guide)});
   report.reconstructedRoofs.push({version:1,id:id+':roof',levelId,buildingId:proposal.buildingId,status:'proposed',kind:'estimated-calibrated',sourceCategory:'pdf-entry-assembly',entryAssembly:copy(assembly),
-   profiles:{x:xProfile,y:chosen.points},sources:[sourceRecord(source,frontPoints,fr,'x'),...profiles.map(p=>sourceRecord(p.side.source,p.raw.points,p.side.registration,'y'))],
+   profiles:{x:xProfile,y:chosen.points},sources:[{...sourceRecord(source,frontPoints,fr,'x'),profileEvidence:copy(profile)},...profiles.map(p=>({...sourceRecord(p.side.source,p.raw.points,p.side.registration,'y'),profileEvidence:copy(p.raw)}))],
    connection:{kind:'observed-entry-roof-at-wall',parentWallId:wall.id,wallY,orthogonalHeightResiduals:profiles.map(p=>({sourceViewId:p.side.source.id,residual:p.residual})),frontAndSidePitches:'independent-source-profiles'},
    complete:false,confirmationRequired:true,quantityStatus:'partial-unreviewed',thickness:null,soffitStatus:'unresolved',note:'Observed entrance roof surface; hidden section, underside and structural assembly remain unknown.'});
+  if(columns.length<2)report.issues.push('ENTRY_ASSEMBLY_SUPPORT_PARTIAL');
   report.issues.push('ENTRY_ROOF_UNDERSIDE_UNRESOLVED');
  }
  function canopyColumns(proposal,inventory,images,reviewed,targets,byLevel){

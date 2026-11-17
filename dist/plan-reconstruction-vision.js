@@ -630,6 +630,19 @@
  // hatches. The clear region selects a search strip only: its coloured edge
  // never supplies a roof dimension without neighbouring source strokes and
  // independently observed ridge/eave junctions.
+ function sourceStrokeFit(points){
+   if(!Array.isArray(points)||points.length<3||!points.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))||points.some((p,i)=>i&&p[0]<=points[i-1][0]))return null;
+   const fit=points=>{const n=points.length,sx=points.reduce((s,p)=>s+p[0],0),sy=points.reduce((s,p)=>s+p[1],0),sxx=points.reduce((s,p)=>s+p[0]*p[0],0),sxy=points.reduce((s,p)=>s+p[0]*p[1],0),m=(n*sxy-sx*sy)/(n*sxx-sx*sx);return {m,c:(sy-m*sx)/n};};
+   const first=fit(points),direct=points.filter(([x,y])=>Math.abs(y-first.m*x-first.c)<2);if(direct.length>=points.length*.8)return {points:direct,estimator:'least-squares-source-ink'};
+   // Short hatch strokes can bias the first fit. Try a bounded set of source
+   // point pairs, retaining the same residual and minimum support criteria.
+   const span=points.at(-1)[0]-points[0][0],step=Math.max(1,Math.ceil(points.length/32)),seeds=points.filter((_,i)=>i%step===0||i===points.length-1);let best=null;
+   for(let i=0;i<seeds.length;i++)for(let j=i+1;j<seeds.length;j++){
+    const a=seeds[i],b=seeds[j];if(b[0]-a[0]<span*.5)continue;const m=(b[1]-a[1])/(b[0]-a[0]),c=a[1]-m*a[0],inliers=points.filter(([x,y])=>Math.abs(y-m*x-c)<2);if(inliers.length<points.length*.8)continue;
+    const line=fit(inliers);if([points[0],points.at(-1)].some(([x,y])=>Math.abs(y-line.m*x-line.c)>=2))continue;const refined=points.filter(([x,y])=>Math.abs(y-line.m*x-line.c)<2);if(refined.length<points.length*.8)continue;const error=refined.reduce((n,[x,y])=>n+Math.abs(y-line.m*x-line.c),0)/refined.length;
+    if(!best||refined.length>best.points.length||refined.length===best.points.length&&error<best.error)best={points:refined,estimator:'bounded-consensus-on-observed-source-pixels',error};
+   }return best;
+ }
  function entryRoofProfile(image,envelope){
   const unresolved=base=>({status:'unresolved',reason:'ROOF_SLOPE_OCCLUDED',...(base?{base}:{})});
   if(!image?.data||envelope?.status!=='proposed'||!Array.isArray(envelope.box)||!envelope.box.every(Number.isFinite))return unresolved();
@@ -663,9 +676,9 @@
     const approximate=fit(observed);if(sign*approximate.m<.18||sign*approximate.m>1.1)return null;
     const samples=[];for(const[x,y]of observed){const ys=[];for(let yy=Math.max(0,y-5);yy<=y;yy++)if(ink[yy*w+x])ys.push(yy);if(ys.length)samples.push([x,ys[Math.floor(ys.length/2)]]);}
     if(samples.length<observed.length*.65)return null;
-    const line=fit(samples),refined=samples.filter(([x,y])=>Math.abs(y-line.m*x-line.c)<2);if(refined.length<samples.length*.8)return null;
+    const fitted=sourceStrokeFit(samples);if(!fitted)return null;const refined=fitted.points;
     const result=fit(refined);if(sign*result.m<.18||sign*result.m>1.1)return null;
-    return {...result,start:observed[0][0],end:observed.at(-1)[0],support:samples.length/observed.length,fit:{method:'source-ink-beside-connected-roof-interior',sampleCount:refined.length},visibleEndpoint:refined[sign<0?refined.length-1:0]};
+    return {...result,start:observed[0][0],end:observed.at(-1)[0],support:samples.length/observed.length,fit:{method:'source-ink-beside-connected-roof-interior',sampleCount:refined.length,estimator:fitted.estimator,residualPixels:2,minimumSupport:.8,sourceSamples:samples,inlierSamples:refined},visibleEndpoint:refined[sign<0?refined.length-1:0]};
    };
    const a=slope(-1),b=slope(1);if(!a||!b)continue;
    let y,lx,rx;
@@ -807,16 +820,47 @@
   const framePadding=Math.max(2,Math.round(image.width/525)),requiredWidth=Math.max(1,width-framePadding*2)*.65;
   for(const group of groups){const l=Math.min(...group.parts.map(p=>p.box[0])),r=Math.max(...group.parts.map(p=>p.box[0]+p.box[2]));if(r-l>=requiredWidth)return {method:'coherent-neutral-pane-group-inside-observed-frame',sourceBox:box.slice(),parts:group.parts,coveredWidth:r-l,requiredWidth,framePaddingPx:framePadding,maximumPaneGap:Math.max(10,bandHeight*.1),status:'proposed',confirmationRequired:true};}return null;
  }
- function frameAtSeed(image,seed,{top,bottom}){
-  const {width:w,height:h}=image,ink=structuralInk(image),expected=seed.right-seed.left,pad=Math.max(10,expected*.2),edges=[];
-  const scan=(center,side)=>{for(let x=Math.max(0,Math.floor(center-pad));x<=Math.min(w-1,Math.ceil(center+pad));x++){let start=null,last=-100;for(let y=Math.max(0,Math.floor(top));y<=Math.min(h-1,Math.ceil(bottom));y++){if(!ink[y*w+x])continue;if(y-last>3){if(start!==null&&last-start>=22&&last-start<(bottom-top)*.94)edges.push({x,top:start,bottom:last,side});start=y;}last=y;}if(start!==null&&last-start>=22&&last-start<(bottom-top)*.94)edges.push({x,top:start,bottom:last,side});}};
+ function frameCandidatesAtSeed(image,seed,{top,bottom,sourceScale=1,measureWhite=true}){
+  const {width:w,height:h}=image,ink=structuralInk(image),expected=seed.right-seed.left,pad=Math.max(10*sourceScale,expected*.2),edges=[];
+  const scan=(center,side)=>{for(let x=Math.max(0,Math.floor(center-pad));x<=Math.min(w-1,Math.ceil(center+pad));x++){let start=null,last=-100;for(let y=Math.max(0,Math.floor(top));y<=Math.min(h-1,Math.ceil(bottom));y++){if(!ink[y*w+x])continue;if(y-last>3*sourceScale){if(start!==null&&last-start>=22*sourceScale&&last-start<(bottom-top)*.94)edges.push({x,top:start,bottom:last,side});start=y;}last=y;}if(start!==null&&last-start>=22*sourceScale&&last-start<(bottom-top)*.94)edges.push({x,top:start,bottom:last,side});}};
   scan(seed.left,'left');scan(seed.right,'right');const candidates=[];
-  for(const a of edges.filter(e=>e.side==='left'))for(const b of edges.filter(e=>e.side==='right')){const width=b.x-a.x,t=Math.max(a.top,b.top),bt=Math.min(a.bottom,b.bottom),height=bt-t;if(width<expected*.7||width>expected*1.55||Math.abs(a.top-b.top)>8||Math.abs(a.bottom-b.bottom)>8||height<22)continue;
+  for(const a of edges.filter(e=>e.side==='left'))for(const b of edges.filter(e=>e.side==='right')){const width=b.x-a.x,t=Math.max(a.top,b.top),bt=Math.min(a.bottom,b.bottom),height=bt-t;if(width<expected*.7||width>expected*1.55||Math.abs(a.top-b.top)>8*sourceScale||Math.abs(a.bottom-b.bottom)>8*sourceScale||height<22*sourceScale)continue;
    const horizontal=y=>{let n=0;for(let x=a.x;x<=b.x;x++){let hit=false;for(let dy=-2;dy<=2;dy++)if(y+dy>=0&&y+dy<h)hit||=!!ink[(y+dy)*w+x];n+=Number(hit);}return n/(width+1);};if(Math.min(horizontal(t),horizontal(bt))<.68)continue;
-   let white=0,n=0;for(let y=t+3;y<bt-3;y++)for(let x=a.x+3;x<b.x-3;x++){const j=(y*w+x)*4;white+=Number(Math.min(image.data[j],image.data[j+1],image.data[j+2])>225);n++;}const fraction=white/(n||1);if(fraction<.48)continue;
-   candidates.push({box:[a.x,t,width,height],score:width*height*fraction,method:'floor-gap-and-closed-elevation-frame',status:'proposed',confirmationRequired:true});
+   let white=0,n=0;if(measureWhite)for(let y=t+3;y<bt-3;y++)for(let x=a.x+3;x<b.x-3;x++){const j=(y*w+x)*4;white+=Number(Math.min(image.data[j],image.data[j+1],image.data[j+2])>225);n++;}const fraction=white/(n||1);
+   candidates.push({box:[a.x,t,width,height],score:width*height*fraction,whiteFraction:fraction,method:'floor-gap-and-closed-elevation-frame',status:'proposed',confirmationRequired:true});
   }
-  candidates.sort((a,b)=>b.score-a.score);for(const c of candidates){const paneEvidence=coherentPaneGroup(image,c.box,{bandHeight:bottom-top});if(paneEvidence)return [{...c,paneEvidence}];}return [];
+  return candidates;
+ }
+ function frameAtSeed(image,seed,{top,bottom}){
+  const candidates=frameCandidatesAtSeed(image,seed,{top,bottom}).filter(c=>c.whiteFraction>=.48);candidates.sort((a,b)=>b.score-a.score);for(const c of candidates){const paneEvidence=coherentPaneGroup(image,c.box,{bandHeight:bottom-top});if(paneEvidence){delete c.whiteFraction;return [{...c,paneEvidence}];}}return [];
+ }
+
+ function patternedFrameAtSeed(image,seed,{top,bottom,sourceScale=1}={}){
+  const unresolved=reason=>({status:'unresolved',reason,candidates:[]});if(!image?.data||![seed?.left,seed?.right,top,bottom,sourceScale].every(Number.isFinite)||sourceScale<=0||sourceScale>8||seed.right<=seed.left||bottom<=top)return unresolved('OPENING_FRAME_SOURCE_REQUIRED');
+  const {width:w,height:h,data}=image,ink=structuralInk(image),expected=seed.right-seed.left,pixelPad=Math.max(1,Math.ceil(2*sourceScale)),retained=[];
+  for(const candidate of frameCandidatesAtSeed(image,seed,{top,bottom,sourceScale,measureWhite:false}).sort((a,b)=>b.box[2]*b.box[3]-a.box[2]*a.box[3])){
+   if(retained.some(q=>{const a=q.box,b=candidate.box;return Math.max(0,Math.min(a[0]+a[2],b[0]+b[2])-Math.max(a[0],b[0]))*Math.max(0,Math.min(a[1]+a[3],b[1]+b[3])-Math.max(a[1],b[1]))>Math.min(a[2]*a[3],b[2]*b[3])*.4;}))continue;
+   const [x,y,ww,hh]=candidate.box;if(Math.abs(ww-expected)>Math.max(6*sourceScale,expected*.1)||Math.abs(x+ww/2-(seed.left+seed.right)/2)>Math.max(3*sourceScale,expected*.08))continue;
+   const histogram=new Uint32Array(766);let sampleCount=0;for(let yy=Math.ceil(y+3*sourceScale);yy<y+hh-3*sourceScale;yy++)for(let xx=Math.ceil(x+3*sourceScale);xx<x+ww-3*sourceScale;xx++){const i=(yy*w+xx)*4;histogram[data[i]+data[i+1]+data[i+2]]++;sampleCount++;}if(sampleCount<20*sourceScale*sourceScale)continue;let count=0,background=0;for(let value=0;value<histogram.length;value++){count+=histogram[value];if(count>Math.floor(sampleCount*.8)){background=value/3;break;}}
+   const line=(axis,fixed,start,end)=>{let hits=0,total=0,gap=0,maxGap=0,contrast=0;for(let at=Math.ceil(start);at<=Math.floor(end);at++){const px=axis==='y'?fixed:at,py=axis==='y'?at:fixed;total++;if(px<0||py<0||px>=w||py>=h){maxGap=Math.max(maxGap,++gap);continue;}const i=py*w+px,j=i*4,value=(data[j]+data[j+1]+data[j+2])/3;if(ink[i]&&value<background-25){hits++;gap=0;contrast+=background-value;}else maxGap=Math.max(maxGap,++gap);}return {anchors:axis==='y'?[[fixed,start],[fixed,end]]:[[start,fixed],[end,fixed]],support:hits/(total||1),supportedSamples:hits,totalSamples:total,maxUnsupportedSamples:maxGap,contrast:contrast/(hits||1)};};
+   const best=(axis,center,start,end)=>{let found=null;for(let d=-pixelPad;d<=pixelPad;d++){const c=line(axis,Math.round(center)+d,Math.round(start),Math.round(end));if(!found||c.support>found.support||c.support===found.support&&c.maxUnsupportedSamples<found.maxUnsupportedSamples)found=c;}return found;};
+   const vertical={left:best('y',x,y,y+hh),right:best('y',x+ww,y,y+hh)},l=vertical.left.anchors[0][0],r=vertical.right.anchors[0][0],horizontal={top:best('x',y,l,r),bottom:best('x',y+hh,l,r)},t=horizontal.top.anchors[0][1],b=horizontal.bottom.anchors[0][1];
+   const edges={left:line('y',l,t,b),right:line('y',r,t,b),top:line('x',t,l,r),bottom:line('x',b,l,r)};if(r<=l||b<=t||Object.values(edges).some(e=>e.support<.8||e.maxUnsupportedSamples>3*sourceScale))continue;
+   const cornerPoints=[[l,t],[r,t],[r,b],[l,b]],cornersObserved=cornerPoints.map(([xx,yy])=>{for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(xx+dx>=0&&yy+dy>=0&&xx+dx<w&&yy+dy<h&&ink[(yy+dy)*w+xx+dx])return true;return false;});if(!cornersObserved.every(Boolean))continue;
+   // A railing has long head and foot rails through neighbouring bays. At
+   // least one of the frame's horizontal boundaries must actually end near
+   // its two jambs; the plan aperture cannot turn those rails into a window.
+   const extensions={};for(const [name,yy]of [['top',t],['bottom',b]])extensions[name]=[line('x',yy,Math.max(0,l-12*sourceScale),Math.max(0,l-4*sourceScale)),line('x',yy,Math.min(w-1,r+4*sourceScale),Math.min(w-1,r+12*sourceScale))];
+   if(!Object.values(extensions).some(ends=>ends.every(e=>e.support<.35)))continue;
+   // A railing crossbar inside a taller aperture is not its head. Both
+   // observed jambs continuing upward identify that truncated rectangle.
+   const jambTolerance=Math.ceil(Math.max(6*sourceScale,expected*.1)),continuation=center=>{let found=null;for(let xx=Math.max(0,center-jambTolerance);xx<=Math.min(w-1,center+jambTolerance);xx++){const e=line('y',xx,Math.max(0,t-12*sourceScale),Math.max(0,t-4*sourceScale));if(!found||e.support>found.support||e.support===found.support&&e.maxUnsupportedSamples<found.maxUnsupportedSamples)found=e;}return found;},jambContinuationAbove=[continuation(l),continuation(r)];
+   if(jambContinuationAbove.every(e=>e.support>=.8&&e.maxUnsupportedSamples<=3*sourceScale))continue;
+   const box=[l,t,r-l,b-t];if(box[0]<0||box[1]<top-2*sourceScale||box[0]+box[2]>w||box[1]+box[3]>bottom+2*sourceScale)continue;
+   retained.push({box,method:'source-plan-aperture-and-four-contrasted-frame-edges',status:'proposed',confirmationRequired:true,frameEvidence:{version:1,status:'proposed',method:'four-observed-dark-frame-edges-in-patterned-panel',coordinateSystem:'source-raster-pixels',rasterSize:[w,h],box:box.slice(),edges,cornerPoints,cornersObserved,extensions,jambContinuationAbove,background,backgroundQuantile:.8,contrastThreshold:25,samplingScale:sourceScale,metricsUnit:'native-samples',minimumEdgeSupport:.8,maximumGapSamples:3*sourceScale,panelMaterial:null,confirmationRequired:true}});
+  }
+  retained.sort((a,b)=>b.box[2]*b.box[3]-a.box[2]*a.box[3]);const candidates=[];for(const c of retained)if(!candidates.some(q=>Math.max(0,Math.min(q.box[0]+q.box[2],c.box[0]+c.box[2])-Math.max(q.box[0],c.box[0]))*Math.max(0,Math.min(q.box[1]+q.box[3],c.box[1]+c.box[3])-Math.max(q.box[1],c.box[1]))>Math.min(q.box[2]*q.box[3],c.box[2]*c.box[3])*.4))candidates.push(c);
+  return candidates.length?{status:'proposed',candidates,confirmationRequired:true}:unresolved('OPENING_FRAME_FOUR_SOURCE_EDGES_REQUIRED');
  }
  function occludedFrameAtSeed(image,seed,{top,bottom,width,height,occlusions=[]}){
   if(!(width>15&&height>15)||!occlusions.length)return [];
@@ -991,5 +1035,5 @@
   }
   candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
  }
- return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,floorSlidingFrameEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,roofEaveJunctions,roofCeilingBand,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,closedCellNeighborhood,coherentPaneGroup,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
+ return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,floorSlidingFrameEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,sourceStrokeFit,secondaryEnvelope,secondarySide,roofProfile,roofEaveJunctions,roofCeilingBand,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,closedCellNeighborhood,coherentPaneGroup,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,patternedFrameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
 });
