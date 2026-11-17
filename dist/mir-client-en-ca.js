@@ -3,6 +3,11 @@
 (function(root){
 'use strict';
 const entries = [
+["Vis MAC Métal — 1½ po · boîte de 500","MAC Métal screws — 1½ in. · box of 500"],
+["Vis de 1½ po pour revêtement MAC Métal architectural, boîte de 500. Longueur confirmée par MIR. Référence détaillant 1790291; prix et disponibilité MIR sur demande.","1½ in. screws for MAC Métal architectural siding, box of 500. Length confirmed by MIR. Retailer reference 1790291; MIR pricing and availability on request."],
+["1½ po — confirmée par MIR","1½ in. — confirmed by MIR"],
+["Calibre et protection à confirmer avec le fournisseur.","Gauge and coating to be confirmed with the supplier."],
+["Longueur confirmée par MIR : 1½ po. La différence de titre du détaillant est conservée uniquement dans le dossier de vérification.","Length confirmed by MIR: 1½ in. The retailer title discrepancy is retained only in the verification record."],
 ["Vis pour revêtement MAC — boîte de 500","Screws for MAC siding — box of 500"],
 ["Vis pour revêtement MAC Métal architectural, boîte de 500. Référence détaillant 1790291. La longueur publiée est de 1½ po; une version du titre indique 1⅛ po. Longueur exacte à confirmer avec MIR.","Screws for MAC Métal architectural siding, box of 500. Retailer reference 1790291. The published length is 1½ in.; one version of the title states 1⅛ in. Confirm the exact length with MIR."],
 ["Longueur exacte et photo de cette référence à confirmer avant sélection.","Confirm the exact length and photo for this reference before selection."],

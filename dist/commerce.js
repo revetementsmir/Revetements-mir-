@@ -53,7 +53,9 @@
   const orientation={vertical:'Verticale',horizontal:'Horizontale'};
   const sold=m=>!!m&&!hiddenProducts.has(m.id)&&m.status!=='visualization_only'&&m.commercialStatus!=='not_for_sale';
   const hasExactImage=m=>!!heroImage(m)&&!/^missing|provisional|placeholder/i.test(String(m.imageStatus||''));
-  const requestable=m=>sold(m)&&hasExactImage(m)&&m.status!=='pending_identity'&&m.orderable!==false;
+  // A MIR-confirmed retailer reference can be requested while its original
+  // photo is being added. Other missing-photo and pending items stay blocked.
+  const requestable=m=>sold(m)&&(hasExactImage(m)||(m.requestableWithoutPhoto===true&&m.status==='mir_reference'&&m.retailerCode&&m.sourceUrl))&&m.status!=='pending_identity'&&m.orderable!==false;
   const category=m=>O.category(m);
   const formats=Q.formats;
   function formatOptions(m,colorId,selected,showDimensions=false){return '<option value="">Choisir le format</option>'+formats(m,colorId).map(f=>`<option value="${esc(f.id)}"${f.id===selected?' selected':''}>${esc(formatLabel(f))}${showDimensions&&f.widthIn?` · ${fraction(f.widthIn)} × ${fraction(f.lengthIn)} po`:''}</option>`).join('');}

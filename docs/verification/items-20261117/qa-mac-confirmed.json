@@ -1,0 +1,288 @@
+{
+  "sourceRoot": "/workspace/mir-prestige/dist",
+  "capturedAt": "2026-11-17T15:38:45.240Z",
+  "sourceUpdate": "Aluminium B. Bouchard retail page supplied by MIR; reference 1790291; box of 500; length 1½ in confirmed by MIR; local cart addition permitted; original photo unavailable.",
+  "captures": [
+    {
+      "file": "qa-boutique-vis-mac-1440.png",
+      "surface": "boutique",
+      "language": "fr-CA",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-vis-mac-en-1440.png",
+      "surface": "boutique",
+      "language": "en-CA",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-revue-vis-mac-1440.png",
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "qa-chantier-fixture-vis-mac-1440.png",
+      "surface": "chantier-terrain",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-vis-mac-390.png",
+      "surface": "boutique",
+      "language": "fr-CA",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-vis-mac-en-390.png",
+      "surface": "boutique",
+      "language": "en-CA",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-revue-vis-mac-390.png",
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "qa-chantier-fixture-vis-mac-390.png",
+      "surface": "chantier-terrain",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    }
+  ],
+  "checks": [
+    {
+      "surface": "boutique-search",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "query": "MAC",
+      "found": true
+    },
+    {
+      "surface": "boutique-search",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "query": "1790291",
+      "found": true
+    },
+    {
+      "surface": "boutique",
+      "language": "fr-CA",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "unit": {
+        "value": "boîtes",
+        "label": "boîtes"
+      },
+      "addEnabled": true,
+      "photoMissingExplicit": true,
+      "visibleText": "MAC Métal architectural →\nVis MAC Métal — 1½ po · boîte de 500\n\nVis de 1½ po pour revêtement MAC Métal architectural, boîte de 500. Longueur confirmée par MIR. Référence détaillant 1790291; prix et disponibilité MIR sur demande.\n\nVisuel fabricant à compléter\n\nPhoto non disponible · visuel de remplacement\n\nPrix sur demande\n\nQuantité souhaitée\nUnité du besoin\nboîtes\n\n500 éléments par boîte. boîte de 500 vis\n\nAjouter au panier\n＋\n\nVotre sélection est conservée sur cet appareil. Les quantités, le conditionnement et la couleur seront confirmés avec MIR.",
+      "localCart": [
+        {
+          "materialId": "mir-request-mac-screws",
+          "quantity": 2,
+          "unit": "boîtes"
+        }
+      ]
+    },
+    {
+      "surface": "boutique",
+      "language": "en-CA",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "unit": {
+        "value": "boîtes",
+        "label": "boxes"
+      },
+      "addEnabled": true,
+      "photoMissingExplicit": true,
+      "visibleText": "MAC Métal architectural →\nMAC Métal screws — 1½ in. · box of 500\n\n1½ in. screws for MAC Métal architectural siding, box of 500. Length confirmed by MIR. Retailer reference 1790291; MIR pricing and availability on request.\n\nManufacturer image to be added\n\nPhoto unavailable · placeholder image\n\nPrice on request\n\nRequested quantity\nRequired unit\nboxes\n\n500 items per box. box of 500 screws\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "localCart": [
+        {
+          "materialId": "mir-request-mac-screws",
+          "quantity": 2,
+          "unit": "boîtes"
+        }
+      ]
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "visibleText": "Visuel indisponible\n\nVisuel à compléter\n\nVis MAC Métal — 1½ po · boîte de 500\nboîte · 500 / boîte\nAjouter\nAnnoter\nRetirer du magasin\nFiche fournisseur",
+      "cartLines": 1,
+      "cartText": "Vis MAC Métal — 1½ po · boîte de 500\n2 boîte\nRetirer du panier",
+      "localRejection": []
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "visibleText": "MAGASIN\n\nVis MAC Métal — 1½ po · boîte de 500\n\nChoisissez les options et la quantité.\n\nboîte · 500 vis / boîte\n\nAjouter",
+      "toast": "Article ajouté à votre demande.",
+      "cartQuantity": 2,
+      "cartText": "Vis MAC Métal — 1½ po · boîte de 500\nMAC Métal architectural · 500 vis / boîte\nboîte\n×",
+      "fixtureCalls": []
+    },
+    {
+      "surface": "boutique-search",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "query": "MAC",
+      "found": true
+    },
+    {
+      "surface": "boutique-search",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "query": "1790291",
+      "found": true
+    },
+    {
+      "surface": "boutique",
+      "language": "fr-CA",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "unit": {
+        "value": "boîtes",
+        "label": "boîtes"
+      },
+      "addEnabled": true,
+      "photoMissingExplicit": true,
+      "visibleText": "MAC Métal architectural →\nVis MAC Métal — 1½ po · boîte de 500\n\nVis de 1½ po pour revêtement MAC Métal architectural, boîte de 500. Longueur confirmée par MIR. Référence détaillant 1790291; prix et disponibilité MIR sur demande.\n\nVisuel fabricant à compléter\n\nPhoto non disponible · visuel de remplacement\n\nPrix sur demande\n\nQuantité souhaitée\nUnité du besoin\nboîtes\n\n500 éléments par boîte. boîte de 500 vis\n\nAjouter au panier\n＋\n\nVotre sélection est conservée sur cet appareil. Les quantités, le conditionnement et la couleur seront confirmés avec MIR.",
+      "localCart": [
+        {
+          "materialId": "mir-request-mac-screws",
+          "quantity": 2,
+          "unit": "boîtes"
+        }
+      ]
+    },
+    {
+      "surface": "boutique",
+      "language": "en-CA",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "unit": {
+        "value": "boîtes",
+        "label": "boxes"
+      },
+      "addEnabled": true,
+      "photoMissingExplicit": true,
+      "visibleText": "MAC Métal architectural →\nMAC Métal screws — 1½ in. · box of 500\n\n1½ in. screws for MAC Métal architectural siding, box of 500. Length confirmed by MIR. Retailer reference 1790291; MIR pricing and availability on request.\n\nManufacturer image to be added\n\nPhoto unavailable · placeholder image\n\nPrice on request\n\nRequested quantity\nRequired unit\nboxes\n\n500 items per box. box of 500 screws\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "localCart": [
+        {
+          "materialId": "mir-request-mac-screws",
+          "quantity": 2,
+          "unit": "boîtes"
+        }
+      ]
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "visibleText": "Visuel indisponible\n\nVisuel à compléter\n\nVis MAC Métal — 1½ po · boîte de 500\nboîte · 500 / boîte\nAjouter\nAnnoter\nRetirer du magasin\nFiche fournisseur",
+      "cartLines": 1,
+      "cartText": "Vis MAC Métal — 1½ po · boîte de 500\n2 boîte\nRetirer du panier",
+      "localRejection": []
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "visibleText": "MAGASIN\n\nVis MAC Métal — 1½ po · boîte de 500\n\nChoisissez les options et la quantité.\n\nboîte · 500 vis / boîte\n\nAjouter",
+      "toast": "Article ajouté à votre demande.",
+      "cartQuantity": 2,
+      "cartText": "Vis MAC Métal — 1½ po · boîte de 500\nMAC Métal architectural · 500 vis / boîte\nboîte\n×",
+      "fixtureCalls": []
+    }
+  ],
+  "pageerrors": [],
+  "blockedNetworkAttempts": [
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    }
+  ],
+  "externalRequestsTransmitted": 0,
+  "realSubmissions": 0,
+  "limitations": [
+    "Only MAC was rechecked; PRIME and Hardie captures are unchanged.",
+    "MIR confirmed the 1½ in length; calibre/coating remain to be verified with supplier.",
+    "Employee UI screenshots marked fixture use the existing local test snapshot, not a connected server catalogue.",
+    "Retailer price/stock are not MIR price/stock. Original linked image is not available locally."
+  ]
+}

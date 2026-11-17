@@ -87,18 +87,24 @@ check('La surcouche boutique conserve la référence noire et ajoute Étain viei
   assert.equal(prepared.keepProductPhoto, true);
 });
 
-check('Vis pour MAC : référence détaillant et boîte de 500, sans SKU ni longueur inventés', () => {
+check('Vis pour MAC : longueur 1½ po confirmée par MIR, quantités entières de boîtes de 500', () => {
   assert.equal(mac.brand, 'MAC Métal architectural');
   assert.equal(mac.retailerCode, '1790291');
   assert.equal(mac.sourceUrl, 'https://boutique.aluminiumbbouchard.ca/produit/vis-mac-metal-1-1-2-500pcs/');
   assert.equal(mac.manufacturerCode, null);
   assert.equal(mac.sku, null);
-  assert.equal(mac.status, 'pending_identity');
-  assert.equal(mac.orderable, false);
+  assert.equal(mac.status, 'mir_reference');
+  assert.equal(mac.orderable, true);
+  assert.equal(mac.requestableWithoutPhoto, true);
   assert.equal(mac.unit, 'boîte de 500 vis');
-  assert.deepEqual(mac.dimensions, {});
+  assert.deepEqual(mac.dimensions, {lengthIn: 1.5});
   assert.deepEqual(mac.packaging, {piecesPerBox: 500, unit: 'boîte'});
   assert.equal(Quantity.policy(mac).defaultUnit, 'boîtes');
+  assert.equal(Quantity.validate(mac, {quantity: 1, unit: 'boîtes'}).ok, true);
+  for (const quantity of [0, -1, 0.5, 1.5]) {
+    assert.equal(Quantity.validate(mac, {quantity, unit: 'boîtes'}).ok, false, 'Quantité ' + quantity);
+  }
+  assert.equal(Quantity.validate(mac, {quantity: 500, unit: 'pièces'}).ok, false, 'Aucune vente unitaire déduite de la boîte');
   assert.deepEqual(mac.colors, []);
   assert.deepEqual(mac.images, []);
   assert.equal(mac.primaryImage, null);
@@ -109,18 +115,53 @@ check('Vis pour MAC : référence détaillant et boîte de 500, sans SKU ni long
   assert.deepEqual(mac.sourceEvidence.lengthConflict, {
     observedTitleIn: 1.125,
     observedSpecificationsIn: 1.5,
-    confirmation: 'awaiting_MIR'
+    confirmation: 'MIR_confirmed_1.5in'
+  });
+  assert.deepEqual(mac.sourceEvidence.userLengthConfirmation, {
+    receivedOn: '2026-11-17', answer: '1½ po', lengthIn: 1.5
   });
   assert.match(mac.notes.join(' '), /référence détaillant, pas un SKU MIR/);
-  assert.match(mac.orderableReason, /Longueur exacte.*photo/);
-  assert.ok(mac.specifications.some(spec => spec.label === 'Longueur publiée' && spec.value.includes('1½') && spec.value.includes('1⅛') && spec.value.includes('confirmer')));
+  assert.ok(mac.specifications.some(spec => spec.label === 'Longueur' && spec.value === '1½ po — confirmée par MIR'));
 });
 
-check('Catalogue employé : références reprises, MAC et kit bloqués avant commande', () => {
+check('Garde boutique : seule une référence MIR explicitement autorisée peut être demandée sans photo', () => {
+  const source = read('dist/commerce.js');
+  const declarations = ['safe', 'localAsset', 'sold', 'hasExactImage', 'requestable'].map(name => {
+    const line = source.split('\n').find(value => value.startsWith('  const ' + name + ' ' ) || value.startsWith('  const ' + name + '='));
+    assert.ok(line, 'Fonction de garde absente : ' + name);
+    return line;
+  });
+  const photoFunctions = ['images', 'heroImage'].map(name => {
+    const line = source.split('\n').find(value => value.startsWith('  function ' + name + '('));
+    assert.ok(line, 'Fonction photo absente : ' + name);
+    return line;
+  });
+  const hiddenProducts = new Set(JSON.parse(read('dist/boutique-visibilite.json')).hidden);
+  const context = vm.createContext({hiddenProducts, URL, document: {baseURI: 'http://127.0.0.1/produit.html'}, location: {origin: 'http://127.0.0.1'}});
+  vm.runInContext(declarations.concat(photoFunctions).join('\n') + '\n' +
+    'globalThis.allowed = m => Boolean(requestable(m));\n' +
+    'globalThis.before = m => Boolean(sold(m) && hasExactImage(m) && m.status !== "pending_identity" && m.orderable !== false);', context);
+  assert.equal(context.allowed(mac), true);
+  assert.equal(context.allowed(prime), true, 'Les produits photographiés restent accessibles sans le nouveau drapeau');
+  assert.equal(context.allowed(kit), false);
+  assert.equal(context.allowed(null), false);
+  for (const changes of [
+    {requestableWithoutPhoto: false}, {requestableWithoutPhoto: undefined}, {requestableWithoutPhoto: 'true'},
+    {status: 'pending_identity'}, {status: 'documented_reference'}, {status: 'visualization_only'},
+    {retailerCode: null}, {retailerCode: ''}, {sourceUrl: null}, {sourceUrl: ''},
+    {orderable: false}, {commercialStatus: 'not_for_sale'}
+  ]) assert.equal(context.allowed({...mac, ...changes}), false, JSON.stringify(changes));
+  hiddenProducts.add(macId);
+  assert.equal(context.allowed(mac), false, 'Le drapeau ne contourne pas la visibilité boutique');
+  hiddenProducts.delete(macId);
+  assert.deepEqual(materials.filter(item => context.allowed(item) !== context.before(item)).map(item => item.id), [macId], 'Aucun autre article du catalogue ne change de droit d’ajout');
+});
+
+check('Catalogue employé : MAC accepté localement en boîtes entières, kit toujours bloqué', () => {
   const original = JSON.stringify(catalogue);
   const employee = Store.buildCatalogue(catalogue);
   assert.equal(new Set(employee.map(item => item.id)).size, employee.length);
-  for (const id of [macId, kitId]) {
+  for (const id of [kitId]) {
     const item = employee.find(candidate => candidate.id === id);
     assert.ok(item, id);
     assert.equal(item.orderable, false);
@@ -137,8 +178,20 @@ check('Catalogue employé : références reprises, MAC et kit bloqués avant com
   assert.equal(employeeMac.sku, null);
   assert.equal(employeeMac.unit, 'boîte');
   assert.equal(employeeMac.packaging.piecesPerBox, 500);
-  assert.deepEqual(employeeMac.dimensions, {});
-  assert.equal(employeeMac.stockLengthIn, null);
+  assert.deepEqual(employeeMac.dimensions, {lengthIn: 1.5});
+  assert.equal(employeeMac.stockLengthIn, 1.5);
+  assert.equal(employeeMac.orderable, true);
+  assert.equal(employeeMac.referencePending, false);
+  const macLine = Store.configureLine({catalogue: employee}, {itemId: macId, quantity: 1, unit: 'boîte'});
+  assert.equal(macLine.ok, true);
+  assert.equal(macLine.line.itemId, macId);
+  assert.equal(macLine.line.unit, 'boîte');
+  assert.equal(macLine.line.packaging.piecesPerBox, 500);
+  assert.equal(macLine.line.sku, null);
+  assert.equal(macLine.line.manufacturerReference, null);
+  const halfBox = Store.configureLine({catalogue: employee}, {itemId: macId, quantity: 0.5});
+  assert.equal(halfBox.ok, false);
+  assert.equal(halfBox.error.code, 'INVALID_QUANTITY');
   const primeLine = Store.configureLine({catalogue: employee}, {itemId: primeId, quantity: 1});
   assert.equal(primeLine.ok, true);
   assert.equal(primeLine.line.itemId, primeId);

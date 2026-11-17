@@ -4,6 +4,8 @@ Consultation effective le 17 novembre 2026, via le service web de lecture/recher
 
 ## Conclusion
 
+**Confirmation utilisateur reçue après la recherche : MIR a répondu « 1½ po » le 17 novembre 2026.** Cette réponse règle la longueur retenue pour sa référence; elle est conservée dans `sourceEvidence.userLengthConfirmation`. L’ancienne divergence de titre reste une preuve historique, sans être présentée comme une longueur encore à choisir dans la fiche.
+
 Les documents officiels consultés ne permettent pas de rattacher l’UGS détaillant **1790291** à un code de vis MAC précis. Cette valeur doit rester une **référence du détaillant Aluminium B. Bouchard**, sans la transformer en SKU fabricant ou MIR.
 
 MAC documente notamment une vis à bois anticorrosion de **1⅛ po, A059.250, sac de 250**. Cette référence ne peut pas remplacer automatiquement l’article Bouchard annoncé en **500 pièces**, dont la longueur a été lue différemment pendant la session. Le type de support et le profil de revêtement comptent également : les accessoires MAC ne forment pas une référence universelle.
@@ -21,7 +23,7 @@ Source : [Vis Mac métal — Aluminium B. Bouchard](https://boutique.aluminiumbb
 | UGS | 1790291 | 1790291 |
 | Marque affichée | Mac Métal architectural | Mac Métal architectural |
 
-La seconde lecture a effectivement ouvert la page et reçu le titre, la description et les spécifications en 1½ po. Elle ne reproduit pas le titre en 1⅛ po signalé lors de la première lecture. L’origine de cette différence de rendu/version n’est pas établie; aucune correction de longueur ne doit être déduite de la seule URL ou d’un seul champ. La confirmation demandée à l’utilisateur reste pertinente.
+La seconde lecture a effectivement ouvert la page et reçu le titre, la description et les spécifications en 1½ po. Elle ne reproduit pas le titre en 1⅛ po signalé lors de la première lecture. L’origine de cette différence de rendu/version n’est pas établie. La longueur n’a pas été déduite de la seule URL ou d’un seul champ : la confirmation MIR reçue ensuite est la preuve qui autorise à retenir 1½ po.
 
 Le prix affiché **28,00 $** et l’indication de stock sont ceux de ce détaillant. Ils ne confirment ni prix ni stock MIR et n’ont pas été intégrés au catalogue.
 
@@ -62,4 +64,6 @@ Cette liste diffère des références autoperçantes visibles dans la charte et 
 
 Recherche ciblée sur le domaine officiel pour `1790291`, `vis 1 1/2`, `vis 1 1/8` et `A059.250`, puis ouverture des documents ci-dessus. Aucun résultat officiel consulté ne prouve la correspondance entre le produit Bouchard et un code MAC. Cette absence de preuve ne signifie pas que la référence de 1½ po n’existe pas.
 
-À ce stade, les éléments utilisables sont le lien fourni par l’utilisateur, l’UGS et le conditionnement déclarés par le détaillant, avec leur provenance. La longueur retenue, le code fabricant, le support prévu, le calibre et la protection restent à confirmer avant d’attribuer une compatibilité précise ou d’autoriser la commande. Aucune norme relevée dans un guide de gamme n’est transférée automatiquement à la vis photographiée.
+Les éléments utilisables sont le lien fourni par l’utilisateur, l’UGS et le conditionnement déclarés par le détaillant, ainsi que la longueur de **1½ po confirmée par MIR**. La référence peut entrer dans une demande locale en boîtes de 500, avec une autorisation explicite de demande sans photo. Cette permission ne certifie ni stock, ni prix, ni correspondance avec un code fabricant. Le support précis, le calibre et la protection restent à vérifier avant d’affirmer une compatibilité technique détaillée. Aucune norme relevée dans un guide de gamme n’est transférée automatiquement à la vis photographiée.
+
+Contrôle après confirmation : `node tests/mir-items-intake.cjs` — **8 contrôles réussis**. Le kit Hardie non confirmé reste bloqué; les données et photos PRIME restent inchangées. Aucun fichier applicatif modifié par le relecteur.

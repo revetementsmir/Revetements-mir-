@@ -35536,7 +35536,7 @@
     {
       "id": "mir-request-mac-screws",
       "brand": "MAC Métal architectural",
-      "name": "Vis pour revêtement MAC — boîte de 500",
+      "name": "Vis MAC Métal — 1½ po · boîte de 500",
       "manufacturerCode": null,
       "sku": null,
       "family": "Fixation",
@@ -35544,35 +35544,37 @@
         "fastener",
         "accessory"
       ],
-      "description": "Vis pour revêtement MAC Métal architectural, boîte de 500. Référence détaillant 1790291. La longueur publiée est de 1½ po; une version du titre indique 1⅛ po. Longueur exacte à confirmer avec MIR.",
+      "description": "Vis de 1½ po pour revêtement MAC Métal architectural, boîte de 500. Longueur confirmée par MIR. Référence détaillant 1790291; prix et disponibilité MIR sur demande.",
       "sourceUrl": "https://boutique.aluminiumbbouchard.ca/produit/vis-mac-metal-1-1-2-500pcs/",
       "documents": [],
       "colors": [],
       "colorStatus": "not_applicable",
-      "dimensions": {},
+      "dimensions": {
+        "lengthIn": 1.5
+      },
       "packaging": {
         "piecesPerBox": 500,
         "unit": "boîte"
       },
       "unit": "boîte de 500 vis",
-      "status": "pending_identity",
-      "commercialStatus": "identity_incomplete_not_orderable",
-      "orderable": false,
-      "orderableReason": "Longueur exacte et photo de cette référence à confirmer avant sélection.",
+      "status": "mir_reference",
+      "commercialStatus": "MIR_product",
+      "orderable": true,
       "images": [],
       "primaryImage": null,
       "imageStatus": "missing_original_user_photo",
       "renderPattern": "plain",
       "allowedPatterns": [],
       "allowedOrientations": [],
-      "catalogueScope": "MIR_requested_product_identity_incomplete",
+      "catalogueScope": "MIR_confirmed_retailer_reference",
       "researchedOn": "2026-11-17",
       "notes": [
         "Référence fournie par MIR chez Aluminium B. Bouchard. Le code 1790291 est une référence détaillant, pas un SKU MIR.",
-        "Le prix et le stock du détaillant ne constituent pas le prix ou le stock MIR."
+        "Le prix et le stock du détaillant ne constituent pas le prix ou le stock MIR.",
+        "Longueur confirmée par MIR : 1½ po. La différence de titre du détaillant est conservée uniquement dans le dossier de vérification."
       ],
       "gaps": [
-        "Longueur exacte, calibre et protection à confirmer.",
+        "Calibre et protection à confirmer avec le fournisseur.",
         "Prix et stock MIR à confirmer.",
         "Photo originale du produit à intégrer."
       ],
@@ -35589,11 +35591,20 @@
         "lengthConflict": {
           "observedTitleIn": 1.125,
           "observedSpecificationsIn": 1.5,
-          "confirmation": "awaiting_MIR"
+          "confirmation": "MIR_confirmed_1.5in"
+        },
+        "userLengthConfirmation": {
+          "receivedOn": "2026-11-17",
+          "answer": "1½ po",
+          "lengthIn": 1.5
         }
       },
       "retailerCode": "1790291",
       "specifications": [
+        {
+          "label": "Longueur",
+          "value": "1½ po — confirmée par MIR"
+        },
         {
           "label": "Conditionnement",
           "value": "500 vis par boîte"
@@ -35601,12 +35612,9 @@
         {
           "label": "Référence détaillant",
           "value": "Aluminium B. Bouchard — 1790291"
-        },
-        {
-          "label": "Longueur publiée",
-          "value": "1½ po dans les spécifications; 1⅛ po dans une version du titre — à confirmer"
         }
-      ]
+      ],
+      "requestableWithoutPhoto": true
     }
   ],
   "schemaVersion": "5.2",

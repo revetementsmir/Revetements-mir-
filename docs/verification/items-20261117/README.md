@@ -6,7 +6,7 @@ Source de départ : `1104e2e`, branche `codex/client-prestige-20261117`. Cinq im
 
 | Article | Traitement | Ce qui reste à préciser |
 | --- | --- | --- |
-| Vis pour revêtement MAC | Fiche `mir-request-mac-screws` enrichie avec le lien B. Bouchard fourni ensuite par MIR : marque MAC Métal architectural, boîte de 500, référence détaillant `1790291`. Fiche consultable mais ajout bloqué. | Longueur contradictoire selon les lectures de la page (titre 1⅛, description/spécifications 1½), calibre, protection, prix MIR et photo originale téléchargeable. Aucune référence fabricant déduite du code détaillant. |
+| Vis pour revêtement MAC | Même fiche `mir-request-mac-screws` : marque MAC Métal architectural, **1½ po confirmé par MIR**, boîte de 500, référence détaillant `1790291`. Ajout au panier local permis sur cette référence confirmée, même si sa photo reste à intégrer. | Calibre/protection fournisseur, prix et stock MIR, photo originale téléchargeable. Aucun code fabricant déduit du code détaillant. |
 | Trousse James Hardie ColorPlus | Fiche existante `hardie-colorplus-touch-up-kit` enrichie. Une référence de teinte documentée : Midnight Black `4960831` / Blackwater `4100703`, les deux noms figurant sur la même boîte `LLA0531`, UPC `856296003436`. La référence client Étain vieilli existante reste disponible comme référence de gamme. | Prix, disponibilité et conditionnement de vente MIR; photo originale de cette boîte. Ajout toujours bloqué. Les inscriptions partiellement masquées de la photo des contenants ne servent pas à créer une autre variante. |
 | Clous PRIME 20031 | Fiche existante `prime-paper-strip-20031` conservée sans duplication : 3¼ po, diamètre 0,120 po, 34°, lisses brillants, bandes papier, 2 000/boîte. Les deux photos locales déjà présentes sont conservées. | Prix et stock MIR; les nouvelles images haute définition ne sont pas encore intégrées. |
 
@@ -35,6 +35,12 @@ Les tests de catalogue Phase 9, de quantités client, de traduction et les 16 co
 
 ## Complément — lien fournisseur des vis MAC
 
-[Même fiche transmise par MIR chez Aluminium B. Bouchard](https://boutique.aluminiumbbouchard.ca/produit/vis-mac-metal-1-1-2-500pcs/). Le conditionnement de 500 est documenté. Le code `1790291` reste un code détaillant et n’est pas placé dans le champ fabricant ou SKU MIR. Le prix détaillant n’est pas repris dans la tarification MIR. La longueur a été demandée à MIR en raison de la divergence de titre; aucune dimension effective n’est inventée. Le rapport `mac-source-review.md` compare également les références officielles MAC sans les assimiler à cet article.
+[Même fiche transmise par MIR chez Aluminium B. Bouchard](https://boutique.aluminiumbbouchard.ca/produit/vis-mac-metal-1-1-2-500pcs/). Le conditionnement de 500 est documenté. Le code `1790291` reste un code détaillant et n’est pas placé dans le champ fabricant ou SKU MIR. Le prix détaillant n’est pas repris dans la tarification MIR. La longueur a d’abord été demandée à MIR en raison de la divergence de titre; sa réponse explicite « 1½ po » confirme maintenant la dimension retenue. Le rapport `mac-source-review.md` compare également les références officielles MAC sans les assimiler à cet article.
 
 Après ce complément, `qa-mac-source-update.json` et `.md` consignent 12 contrôles supplémentaires et 8 vues MAC renouvelées. Ils remplacent les anciens relevés MAC des rapports précédents. Recherche par nom/code, boîte de 500, unités FR/EN, blocages d’ajout et absence de débordement/erreur sont vérifiés. Les captures PRIME et Hardie restent inchangées.
+
+## État final après confirmation MIR
+
+MIR a confirmé « 1½ po » dans la conversation. La fiche MAC garde son identifiant et documente cette confirmation. Le conditionnement reste 500 par boîte. Le drapeau explicite `requestableWithoutPhoto` autorise cette demande locale quand la référence détaillant, sa source et le statut MIR confirmé sont présents; les autres fiches sans photo ou à identité incomplète conservent leurs blocages. Le kit Hardie reste bloqué comme auparavant. Aucun envoi de commande réel n’est ajouté.
+
+Les rapports `qa-mac-source-update.*` restent la preuve de l’étape intermédiaire avant cette réponse; `qa-mac-confirmed.*` constitue le résultat final et les huit captures MAC correspondantes sont remplacées. PRIME et Hardie ne sont pas recapturés inutilement.
