@@ -130,6 +130,8 @@ const foundationRaster=image(),foundationView={id:'foundation-elevation',frame,p
  assert.deepEqual(R.datumFromCaption('PLANCHER NIVEAU 0'),{levelHint:'level-0',datumType:'floor'});
  assert.deepEqual(R.datumFromCaption('PLAFOND NIVEAU 3'),{levelHint:'level-3',datumType:'ceiling'});
  assert.deepEqual(R.datumFromCaption('Dessus plancher R-D-C'),{levelHint:'ground',datumType:'floor'});
+ assert.deepEqual(R.datumFromCaption('Upper floor'),{levelHint:'upper',datumType:'floor'},'legacy imported single-storey elevation text remains supported');
+ assert.deepEqual(R.datumFromCaption('Ground floor'),{levelHint:'ground',datumType:'floor'});
  assert.equal(R.datumFromCaption('NOTE PLANCHER NIVEAU 1'),null,'a note is not a datum');
  assert.equal(R.datumFromCaption('PLANCHER NIVEAU O'),null,'unverified OCR O does not become zero');
  const sourceView={viewId:view.id,envelope:env,facing:{length:580},guides},inventory={views:[view]},reference={scale:.02,value:2,anchors:[[0,0],[100,0]],sourceViewId:'floor',kind:'written',status:'proposed'};
