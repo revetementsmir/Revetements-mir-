@@ -46,4 +46,36 @@ assert.deepEqual(fresh,original,'reading grid evidence may not mutate existing p
 assert.equal(checked.levels.some(level=>(level.contours||[]).length>0),false,'grid lines without walls must not produce a house');
 assert.equal(checked.reports.find(v=>v.levelId==='house:level-1').gridAlignment.status,'proposed','registered axes remain visible in diagnostics');
 assert.equal(checked.reports.find(v=>v.levelId==='house:level-1').gridAlignment.notAGeometryConfirmation,true);
+// OCR-independent raster grid bubbles: the generic page scan need not read a
+// tiny glyph before targeted local recognition is scheduled.
+{
+ const withoutReadings=structuredClone(base.view);
+ withoutReadings.payload.drawingReadings.rows=[];
+ const proposed=Grid.bubbleRegions(base.image);
+ assert.equal(proposed.status,'proposed','ring geometry supplies targeted OCR regions');
+ assert.ok(proposed.bubbles.filter(v=>v.kind==='number').length>=3);
+ assert.ok(proposed.bubbles.filter(v=>v.kind==='letter').length>=2);
+ assert.ok(proposed.bubbles.every(v=>v.ringSupport>=.9&&v.confirmationRequired));
+ assert.equal(Grid.markers(withoutReadings,base.image).status,'unresolved','unlabelled circles alone are not floor registration');
+ assert.equal(Grid.bubbleRegions({...base.image,data:new Uint8ClampedArray(base.image.data.length).fill(255)}).status,'unresolved');
+ assert.equal(Grid.bubbleRegions(drawing({colour:[0,155,210]}).image).status,'unresolved','colour annotations never supply black grid bubbles');
+ assert.equal(Grid.bubbleRegions(drawing({omit:['B']}).image).status,'unresolved','an absent second axis must not be filled');
+ const one=proposed.bubbles.find(v=>v.kind==='number');
+ const forged=structuredClone(base.view);
+ forged.payload.drawingReadings.rows=[{text:'A',box:[one.center[0]-4,one.center[1]-4,one.center[0]+4,one.center[1]+4],source:'ocr-local-grid-bubble',confidence:99,retry:{gridCircle:one}}];
+ assert.equal(Grid.markers(forged,base.image).status,'unresolved','letter text in numbered bubble cannot be promoted');
+ // Import-local OCR work queue must include true ring candidates even when
+ // the initial full-page OCR returned no labelled axes.
+ const initialWindow=global.window,initialDocument=global.document;
+ global.window={MIRGridRegistration:Grid};
+ global.document={currentScript:{src:'http://localhost/plan-reconstruction-readings.js'}};
+ try{
+  require('../dist/plan-reconstruction-readings.js');
+  const item=structuredClone(withoutReadings);
+  item.payload.sourceImage='synthetic-raster';
+  const tasks=global.window.MIRReconstructionReadings.workItems({views:[item]},'house',{[item.id]:base.image});
+  assert.ok(tasks.filter(x=>x.region.grid).length>=5,'grid OCR regions are enqueued from source rings without initial OCR text');
+  assert.ok(tasks.filter(x=>x.region.grid).every(x=>x.region.purpose==='source-raster-grid-bubble'&&x.region.gridCircle.ringSupport>=.9));
+ }finally{global.window=initialWindow;global.document=initialDocument;}
+}
 console.log('PASS grid registration: two orthogonal labelled raster axes, provenance, rejection of OCR duplication, missing/coloured bubbles, distortion and cross-building association');
