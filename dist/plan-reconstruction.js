@@ -162,6 +162,9 @@
  }
  function datumFromCaption(text){
   const label=normal(text).replace(/^(?:[a-z0-9:|_]\s+)?(?:(?:dessus|top of)\s+)?/,'');
+  // Preserve legacy English labels used by single-storey imports.
+  const older=label.match(/^(upper|second|2nd|ground|main)\s+floor\b/);
+  if(older)return {levelHint:/^(ground|main)$/.test(older[1])?'ground':'upper',datumType:'floor'};
   if(!/^(?:plancher|plafond|floor\b|ceiling\b)/.test(label))return null;
   const datumType=/^(?:plafond|ceiling\b)/.test(label)?'ceiling':'floor';
   const number=label.match(/\b(?:niv(?:eau)?\.?|level|etage)\s*(\d{1,2})\b/);
