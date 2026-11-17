@@ -15,6 +15,10 @@
   body.mir-prestige-home #mir-prestige-header .mir-prestige-actions {
     margin-bottom:20px!important;
   }
+  /* The original public shell supplied this spacing before the cart count. */
+  body.mir-prestige-home #mir-prestige-header .mir-public-cart b {
+    margin-left:7px;
+  }
   body.mir-prestige-home #mir-prestige-header>nav.mir-prestige-nav,
   body.mir-prestige-home main .mir-client-pages-nav,
   body.mir-prestige-home main .mir-client-list-controls {
