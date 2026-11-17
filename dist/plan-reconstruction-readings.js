@@ -42,7 +42,12 @@
   if(view.kind!=='floor'||!image||!root.MIRGridRegistration?.bubbleRegions)return [];
   const detected=root.MIRGridRegistration.bubbleRegions(image);
   if(detected.status!=='proposed')return [];
-  return detected.bubbles.slice(0,40).map(circle=>{
+  const prior=view.payload.drawingReadings?.rows||[];
+  return detected.bubbles.filter(circle=>!prior.some(row=>{
+   if(!(row.confidence>=70)||row.box?.length!==4)return false;
+   const word=String(row.text||'').trim().toUpperCase(),valid=circle.kind==='number'?/^\d{1,2}$/.test(word)&&Number(word)>0:/^[A-Z]$/.test(word);
+   return valid&&Math.hypot((row.box[0]+row.box[2])/2-circle.center[0],(row.box[1]+row.box[3])/2-circle.center[1])<circle.radius*.6;
+  })).slice(0,40).map(circle=>{
    const [x,y]=circle.center,half=Math.max(3,circle.radius*.48);
    return {row:{text:'',box:[x-half,y-half,x+half,y+half],confidence:0},
     priority:1.5,grid:true,tight:true,gridCircle:JSON.parse(JSON.stringify(circle)),
