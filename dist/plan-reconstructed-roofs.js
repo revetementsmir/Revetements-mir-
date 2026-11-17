@@ -2,7 +2,24 @@
  * rectangle/rise fallback, symmetry assumption or PDF texture is used. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.MIRReconstructedRoofs=api;})(typeof window==='object'?window:globalThis,function(){
  'use strict';const finite=Number.isFinite;
- function issues(roof,{confirm=true,depth=0}={}){const errors=[];if(!roof?.id||!roof.levelId||!roof.buildingId)errors.push('ROOF_ID');if(confirm&&roof.status!=='confirmed')errors.push('ROOF_UNCONFIRMED');for(const key of ['x','y']){const p=roof?.profiles?.[key];if(!Array.isArray(p)||p.length<2||p.length>12||p.some((p,i,a)=>p.length!==2||!p.every(finite)||p.some(n=>Math.abs(n)>10000)||i&&p[0]<=a[i-1][0]))errors.push('ROOF_PROFILE');}if(!Array.isArray(roof?.sources)||roof.sources.length<2||roof.sources.some(s=>!s.sourceViewId||!s.sourceFrame||!s.anchors?.length||!finite(s.scaleX)||!finite(s.scaleY)||s.scaleX<=0||s.scaleY<=0))errors.push('ROOF_SOURCE');if((roof.extensions||[]).length>8||depth>0&&roof.extensions?.length)errors.push('ROOF_COMPONENTS');else for(const child of roof.extensions||[]){if(child.levelId!==roof.levelId||child.buildingId!==roof.buildingId||child.id===roof.id||issues(child,{confirm:false,depth:depth+1}).length)errors.push('ROOF_COMPONENTS');}return [...new Set(errors)];}
+ function observedFasciaIssues(roof){
+  if(roof.observedFascia===undefined)return [];
+  const faces=roof.observedFascia,xp=roof.profiles?.x,yp=roof.profiles?.y;
+  if(!Array.isArray(faces)||faces.length>16||finite(roof.fasciaBottom)||!Array.isArray(xp)||!Array.isArray(yp))return ['ROOF_OBSERVED_FASCIA'];
+  const ids=new Set(),errors=[],dot=(a,b)=>a.reduce((s,n,i)=>s+n*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],delta=(a,b)=>a.map((n,i)=>n-b[i]);
+  for(const face of faces){
+   const p=face?.poly,n=face?.normal;
+   if(!face?.id||ids.has(face.id)||face.status!=='proposed'||!Array.isArray(p)||p.length!==4||p.some(v=>!Array.isArray(v)||v.length!==3||!v.every(finite))||!Array.isArray(n)||n.length!==3||!n.every(finite)||Math.abs(Math.hypot(...n)-1)>1e-6||Math.abs(n[2])>1e-8){errors.push('ROOF_OBSERVED_FASCIA');continue;}
+   ids.add(face.id);
+   const zmax=Math.max(...xp.map(v=>v[1]),...yp.map(v=>v[1]));
+   if(p.some(v=>Math.abs(dot(delta(v,p[0]),n))>1e-7||Math.abs(v[2])>10000||v[2]>zmax+.001||v[0]<xp[0][0]-.001||v[0]>xp.at(-1)[0]+.001||v[1]<yp[0][0]-.001||v[1]>yp.at(-1)[0]+.001))errors.push('ROOF_OBSERVED_FASCIA');
+   if(roof.entryAssembly&&(Math.abs(n[0])+Math.abs(n[1]+1)+Math.abs(n[2])>1e-8||p.some(v=>Math.abs(v[1]-yp[0][0])>.001)||roof.roofForm==='flat'&&Math.abs(Math.max(...p.map(v=>v[2]))-zmax)>.001))errors.push('ROOF_OBSERVED_FASCIA');
+   const turns=p.map((v,i)=>dot(cross(delta(p[(i+1)%4],v),delta(p[(i+2)%4],p[(i+1)%4])),n));
+   if(!turns.every(v=>v>1e-8)&&!turns.every(v=>v< -1e-8))errors.push('ROOF_OBSERVED_FASCIA');
+   if(!roof.sources?.some(s=>s.sourceViewId===face.sourceViewId)||!face.sourceFrame||!Array.isArray(face.anchors)||face.anchors.length<2||face.anchors.some(a=>!Array.isArray(a)||a.length!==2||!a.every(finite))||!(face.scaleX>0&&face.scaleY>0))errors.push('ROOF_OBSERVED_FASCIA_SOURCE');
+  }return errors;
+ }
+ function issues(roof,{confirm=true,depth=0}={}){const errors=[];if(!roof?.id||!roof.levelId||!roof.buildingId)errors.push('ROOF_ID');if(confirm&&roof.status!=='confirmed')errors.push('ROOF_UNCONFIRMED');for(const key of ['x','y']){const p=roof?.profiles?.[key];if(!Array.isArray(p)||p.length<2||p.length>12||p.some((p,i,a)=>p.length!==2||!p.every(finite)||p.some(n=>Math.abs(n)>10000)||i&&p[0]<=a[i-1][0]))errors.push('ROOF_PROFILE');}if(!Array.isArray(roof?.sources)||roof.sources.length<2||roof.sources.some(s=>!s.sourceViewId||!s.sourceFrame||!s.anchors?.length||!finite(s.scaleX)||!finite(s.scaleY)||s.scaleX<=0||s.scaleY<=0))errors.push('ROOF_SOURCE');if((roof.extensions||[]).length>8||depth>0&&roof.extensions?.length)errors.push('ROOF_COMPONENTS');else for(const child of roof.extensions||[]){if(child.levelId!==roof.levelId||child.buildingId!==roof.buildingId||child.id===roof.id||issues(child,{confirm:false,depth:depth+1}).length)errors.push('ROOF_COMPONENTS');}if(!errors.includes('ROOF_PROFILE'))errors.push(...observedFasciaIssues(roof));return [...new Set(errors)];}
  function clip(poly,a,b,c,side){const result=[],value=p=>side*(a*p[0]+b*p[1]+c);for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length],u=value(p),v=value(q);if(u<=1e-9)result.push(p);if((u<-1e-9&&v>1e-9)||(u>1e-9&&v<-1e-9)){const t=u/(u-v);result.push([p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t]);}}return result;}
  const area=p=>Math.abs(p.reduce((s,a,i)=>{const b=p[(i+1)%p.length];return s+a[0]*b[1]-a[1]*b[0];},0))/2;
  function supportingPlanes(roof){
@@ -24,6 +41,9 @@
    const evaluate=(profile,value)=>{const i=Math.max(0,Math.min(profile.length-2,profile.findIndex((p,i)=>i<profile.length-1&&value>=p[0]-1e-8&&value<=profile[i+1][0]+1e-8))),a=profile[i],b=profile[i+1];return a[1]+(b[1]-a[1])*(value-a[0])/(b[0]-a[0]);},edges=[['x-min',xp[0][0],yp,[ -1,0,0]],['x-max',xp.at(-1)[0],yp,[1,0,0]],['y-min',yp[0][0],xp,[0,-1,0]],['y-max',yp.at(-1)[0],xp,[0,1,0]]];
    for(const [edge,fixed,profile,normal]of edges){if(roof.joinedEdges?.includes(edge))continue;for(let i=0;i<profile.length-1;i++){const at=n=>edge[0]==='x'?[fixed,n]:[n,fixed],a=at(profile[i][0]),b=at(profile[i+1][0]),za=Math.min(evaluate(xp,a[0]),evaluate(yp,a[1])),zb=Math.min(evaluate(xp,b[0]),evaluate(yp,b[1])),bottom=roof.fasciaBottom;if(Math.min(za,zb)<=bottom+.002)continue;result.push({id:roof.id+':fascia:'+edge+':'+i,roofId:roof.id,elementId:roof.id,levelId:roof.levelId,buildingId:roof.buildingId,type:'fascia',role:'source-wall-to-eave-fascia',normal,poly:[[a[0]-center[0],a[1]-center[1],bottom],[b[0]-center[0],b[1]-center[1],bottom],[b[0]-center[0],b[1]-center[1],zb],[a[0]-center[0],a[1]-center[1],za]],fillColor:roof.finish?.fasciaColor||'#d5d8cf',status:roof.status,quantityStatus:'partial-unreviewed'});}}
   }
+  // Explicit source faces can describe a stepped flat-roof edge without
+  // extruding that front height through the hidden roof section.
+  for(const face of roof.observedFascia||[])result.push({id:face.id,roofId:roof.id,elementId:roof.id,levelId:roof.levelId,buildingId:roof.buildingId,type:'fascia',role:'source-observed-roof-fascia',normal:face.normal.slice(),poly:face.poly.map(([x,y,z])=>[x-center[0],y-center[1],z]),fillColor:/^#[0-9a-f]{6}$/i.test(roof.finish?.fasciaColor||'')?roof.finish.fasciaColor:'#d5d8cf',status:roof.status,quantityStatus:'partial-unreviewed'});
   return result;
  }
  function planeAt(face){const [a,b,c]=face.poly,n=face.normal;return [-(n[0]/n[2]),-(n[1]/n[2]),a[2]+n[0]/n[2]*a[0]+n[1]/n[2]*a[1]];}

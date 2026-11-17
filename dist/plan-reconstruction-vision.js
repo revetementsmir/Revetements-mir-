@@ -235,5 +235,62 @@
   for(let x=Math.max(0,Math.floor(direction==='right'?bx-bw*.35:bx+bw+bw*.025));x<Math.min(w,direction==='right'?bx-bw*.025:bx+bw+bw*.35);x++){let count=0,last=topY;for(let y=Math.max(0,Math.round(topY));y<Math.min(h,by+bh+bh*.1);y++)if(ink[y*w+x]){count++;last=y;}if(count>Math.max(80,(by+bh-topY)*.73))candidates.push({x,count,last});}
   const groups=[];for(const c of candidates){if(!groups.length||c.x-groups.at(-1).at(-1).x>20)groups.push([c]);else groups.at(-1).push(c);}const group=groups.filter(g=>g.at(-1).x-g[0].x>=4&&g.at(-1).x-g[0].x<=35).sort((a,b)=>b.reduce((s,c)=>s+c.count,0)-a.reduce((s,c)=>s+c.count,0))[0];return group?{status:'proposed',box:[group[0].x,topY,group.at(-1).x-group[0].x,Math.min(group[0].last,group.at(-1).last)-topY],sourceViewId:primary.sourceViewId,sourceFrame:primary.sourceFrame,method:'side-post-two-visible-edges',confirmationRequired:true}:{status:'unresolved',reason:'CANOPY_DEPTH_NOT_REPRESENTED'};
  }
- return Object.freeze({version:1,floorEnvelope,wallEnvelope,canopyEnvelope,canopySide,secondaryEnvelope,secondarySide,roofProfile,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
+ // A beam guide is only ink. A visible beam face needs two separated horizontal
+ // boundaries joined at both ends. The caller must independently establish its
+ // position/depth and distinguish a side return from the front beam's section.
+ function entryBands(image,{left,right,nearY,height,occlusions=[]}){
+  if(!image?.data||![left,right,nearY,height].every(Number.isFinite)||right-left<12||height<30)return [];
+  const {width:w,height:h}=image,ink=structuralInk(image),pad=Math.max(2,Math.min(5,Math.round(w/700))),span=right-left;
+  const masked=(x,y)=>occlusions.some(([l,t,bw,bh])=>x>=l&&x<=l+bw&&y>=t&&y<=t+bh);
+  const hit=(x,y)=>x>=0&&x<w&&y>=0&&y<h&&!masked(x,y)&&!!ink[Math.round(y)*w+Math.round(x)];
+  const rows=[],top=Math.max(0,Math.floor(nearY-height*.16)),bottom=Math.min(h-1,Math.ceil(nearY+height*.08));
+  for(let y=top;y<=bottom;y++){
+   let count=0,total=0;for(let x=Math.ceil(left+pad);x<=Math.floor(right-pad);x++){total++;count+=Number(hit(x,y));}
+   if(count/(total||1)<.82)continue;
+   if(rows.length&&y-rows.at(-1).bottom<=1)rows.at(-1).bottom=y;else rows.push({top:y,bottom:y});
+  }
+  const candidates=[],edge=(around,t,b)=>{
+   let best=null;for(let x=Math.round(around-pad);x<=Math.round(around+pad);x++){let n=0;for(let y=Math.ceil(t);y<=Math.floor(b);y++)n+=Number(hit(x,y));const support=n/(Math.floor(b)-Math.ceil(t)+1);if(support>=.78&&(!best||Math.abs(x-around)<Math.abs(best.x-around)))best={x,support};}return best;
+  };
+  for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){
+   const a=rows[i],b=rows[j],gap=b.top-a.bottom,thickness=Math.max(a.bottom-a.top+1,b.bottom-b.top+1);
+   if(gap<Math.max(4,thickness*2)||b.top-a.bottom>height*.15||thickness>Math.max(5,height*.025))continue;
+   const l=edge(left,a.bottom,b.top),r=edge(right,a.bottom,b.top);if(!l||!r||r.x-l.x<span*.9)continue;
+   const box=[l.x,(a.top+a.bottom)/2,r.x-l.x,(b.top+b.bottom-a.top-a.bottom)/2];
+   if(occlusions.some(([x,y,bw,bh])=>Math.min(x+bw,box[0]+box[2])>Math.max(x,box[0])&&Math.min(y+bh,box[1]+box[3])>Math.max(y,box[1])))continue;
+   // A filled/coloured annotation and the width of one thick stroke cannot
+   // provide an empty, independently bounded beam face.
+   let clear=0,total=0;for(let y=a.bottom+2;y<b.top-1;y++)for(let x=Math.ceil(l.x+pad);x<r.x-pad;x+=2){total++;clear+=Number(!hit(x,y));}
+   if(!total||clear/total<.55)continue;
+   candidates.push({status:'proposed',box,anchors:[[box[0],box[1]],[box[0]+box[2],box[1]],[box[0]+box[2],box[1]+box[3]],[box[0],box[1]+box[3]]],method:'paired-horizontal-boundaries-and-closed-ends',score:Math.abs(box[1]+box[3]-nearY),confirmationRequired:true});
+  }
+  return candidates.sort((a,b)=>a.score-b.score||a.box[3]-b.box[3]);
+ }
+ // Single rising side silhouette of an attached entrance roof. Both heights
+ // come from the separately calibrated front view; every proposed segment,
+ // including the lower edge, must still be visible in this side view.
+ function entrySideRoof(image,{wallX,postBox,eaveY,crestY,direction='right',tolerance=3,occlusions=[]}){
+  if(!image?.data||!Array.isArray(postBox)||![wallX,eaveY,crestY,tolerance,...postBox].every(Number.isFinite)||eaveY-crestY<5)return {status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
+  const {width:w,height:h}=image,ink=structuralInk(image),sign=direction==='right'?-1:1,postEdge=direction==='right'?postBox[0]:postBox[0]+postBox[2],distance=(postEdge-wallX)*sign;
+  if(distance<8)return {status:'unresolved',reason:'ENTRY_ROOF_ATTACHMENT_UNRESOLVED'};
+  const pad=Math.max(2,Math.min(8,Math.ceil(tolerance))),masked=(x,y)=>occlusions.some(([l,t,bw,bh])=>x>=l-2&&x<=l+bw+2&&y>=t-2&&y<=t+bh+2);
+  const hit=(x,y)=>x>=0&&x<w&&y>=0&&y<h&&!masked(x,y)&&!!ink[Math.round(y)*w+Math.round(x)];
+  const support=(a,b)=>{const count=Math.max(1,Math.ceil(Math.abs(b[0]-a[0])));let hits=0,gap=0,maxGap=0;for(let i=0;i<=count;i++){const x=a[0]+(b[0]-a[0])*i/count,y=a[1]+(b[1]-a[1])*i/count;let found=false;for(let dy=-1;dy<=1;dy++)found||=hit(x,y+dy);if(found){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {ratio:hits/(count+1),maxGap};};
+  const candidates=[];
+  for(let depth=Math.ceil(distance);depth<=Math.ceil(distance*1.8);depth++){
+   const x=Math.round(wallX+sign*depth);if(x<1||x>w-2)continue;
+   for(let y=Math.round(eaveY-pad);y<=Math.round(eaveY+pad);y++){
+    if(!hit(x,y))continue;
+    for(let peak=Math.round(crestY-pad);peak<=Math.round(crestY+pad);peak++){
+     if(!hit(wallX,peak))continue;const a=[x,y],b=[wallX,peak],s=support(a,b);if(s.ratio<.88||s.maxGap>Math.max(4,depth*.055))continue;
+     let baseline=null;for(let dy=0;dy<=Math.max(6,pad*2);dy++){const test=support([x,y+dy],[wallX,y+dy]);if(test.ratio>=.8&&test.maxGap<=Math.max(4,depth*.08)){baseline={y:y+dy,...test};break;}}
+     if(!baseline)continue;const box=[Math.min(x,wallX),peak,Math.abs(wallX-x),baseline.y-peak];
+     if(occlusions.some(([l,t,bw,bh])=>Math.min(l+bw,box[0]+box[2])>Math.max(l,box[0])&&Math.min(t+bh,box[1]+box[3])>Math.max(t,box[1])))continue;
+     candidates.push({status:'proposed',points:[a,b],box,baseline,method:'supported-side-slope-and-eave-to-wall-boundary',support:s,score:s.ratio*100+depth*.1-Math.abs(y-eaveY)-Math.abs(peak-crestY),confirmationRequired:true});
+    }
+   }
+  }
+  candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
+ }
+ return Object.freeze({version:1,floorEnvelope,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
 });

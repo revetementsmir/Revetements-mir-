@@ -14,6 +14,17 @@ function proposedDetails(){
  return {inventory,level,source,wall,foundation,masonry};
 }
 
+function entryDetails(){
+ const sample=proposedDetails(),side=structuredClone(sample.source);side.id='synthetic-entry-right';side.direction='right';sample.inventory.views.push(side);
+ const observation=(view,box)=>({kind:'estimated-calibrated',status:'proposed',sourceViewId:view.id,sourceFrame:structuredClone(view.frame),sourceBox:box,boxFormat:'xywh',anchors:[[box[0],box[1]],[box[0]+box[2],box[1]+box[3]]],scalesUsed:{x:.02,y:.015}});
+ const frontEvidence=observation(sample.source,[220,300,200,20]),sideEvidence=observation(side,[100,300,80,20]);
+ const beam={...structuredClone(sample.foundation),id:'synthetic-entry-beam',type:'beam',origin:[2,-1,2.4],size:[4,null,.3],surfaceOnly:true,sourceBox:frontEvidence.sourceBox,provenance:{...frontEvidence,sourceCategory:'pdf-source-proposal',sources:[frontEvidence,sideEvidence],sourceViewIds:[sample.source.id,side.id]}};
+ const column={...structuredClone(beam),id:'synthetic-entry-column',type:'column',size:[.2,.3,2.4],surfaceOnly:false,provenance:{...frontEvidence,sourceCategory:'pdf-source-proposal',depth:{...sideEvidence,value:.3,unit:'m'},alternateDepthObservations:[],sourceViewIds:[sample.source.id,side.id]}};
+ const roof={id:'synthetic-entry-roof',levelId:sample.level.id,buildingId:'house',status:'proposed',profiles:{x:[[2,2.8],[4,3.5],[6,2.8]],y:[[-1.3,2.8],[0,3.4]]},entryAssembly:{version:1,frontViewId:sample.source.id,sideViewIds:[side.id],parentWallId:sample.wall.id},sources:[{axis:'x',sourceViewId:sample.source.id,sourceFrame:structuredClone(sample.source.frame),anchors:[[220,300],[320,250],[420,300]],scaleX:.02,scaleY:.015,kind:'estimated-calibrated',status:'proposed'},{axis:'y',sourceViewId:side.id,sourceFrame:structuredClone(side.frame),anchors:[[100,300],[180,250]],scaleX:.02,scaleY:.015,kind:'estimated-calibrated',status:'proposed'}]};
+ sample.level.exteriorElements=[beam,column];sample.level.wallZones=[];sample.level.reconstructedRoofs=[roof];
+ return {...sample,side,beam,column,roof};
+}
+
 (async()=>{
  const sample=proposedDetails(),untouched=structuredClone(sample.inventory);
  const P=require('../dist/plan-reconstruction-pipeline.js');
@@ -40,6 +51,80 @@ function proposedDetails(){
  reject(level=>{level.wallZones[0].wallId='synthetic-absent-wall';},'EXTERIOR_ZONE_WALL','A material region cannot reference a nonexistent wall.');
  reject(level=>{level.wallZones[0].id=level.exteriorElements[0].id;},'EXTERIOR_DUPLICATE','Generated identities are unique across elements and zones.');
  assert.deepEqual(sample.inventory,untouched,'Validation never rewrites source geometry or statuses.');
+
+ // A paired-view shape must validate every contributing observation, not only
+ // its front view. Each view retains its own frame and independent x/y scale.
+ const entry=entryDetails(),entryBefore=structuredClone(entry.inventory);
+ assert.deepEqual(X.proposalIssues(entry.level,entry.inventory),[],'Valid orthogonal entry roof, visible beam skin and column depth evidence are accepted.');
+ const rejectEntry=(mutate,code,label)=>{const inventory=structuredClone(entry.inventory),level=inventory.levels.find(l=>l.id===entry.level.id);mutate(level,inventory);assert.ok(X.proposalIssues(level,inventory).includes(code),label);};
+ rejectEntry(level=>{level.exteriorElements[1].provenance.depth.sourceViewId='synthetic-missing-side';},'EXTERIOR_SOURCE','A missing column depth source fails validation.');
+ rejectEntry((level,inventory)=>{const foreign=structuredClone(entry.side);foreign.id='synthetic-foreign-side';foreign.buildingId='shed';inventory.views.push(foreign);level.exteriorElements[1].provenance.depth.sourceViewId=foreign.id;},'EXTERIOR_SOURCE','A different building cannot establish column depth.');
+ rejectEntry(level=>{level.exteriorElements[1].provenance.depth.sourceFrame.pdfToRaster[0]=2;},'EXTERIOR_SOURCE','Depth uses its exact original frame.');
+ rejectEntry(level=>{level.exteriorElements[1].provenance.depth.sourceBox=[-1,300,80,20];},'EXTERIOR_SOURCE_BOUNDS','A negative depth-source box is rejected.');
+ rejectEntry(level=>{level.exteriorElements[1].provenance.alternateDepthObservations=[{...structuredClone(entry.column.provenance.depth),sourceBox:[990,300,80,20]}];},'EXTERIOR_SOURCE_BOUNDS','Alternate depth observations are checked even when the preferred observation is valid.');
+ rejectEntry(level=>{level.exteriorElements[0].provenance.sources[1].anchors[0][1]=801;},'EXTERIOR_SOURCE_BOUNDS','A hidden out-of-frame supporting anchor is rejected.');
+ rejectEntry(level=>{level.exteriorElements[0].provenance.sources[1].scalesUsed.y=0;},'EXTERIOR_SOURCE_SCALE','A contributing source cannot have a zero vertical scale.');
+ rejectEntry(level=>{level.exteriorElements[1].provenance.depth.value=-.3;},'EXTERIOR_SOURCE_DIMENSIONS','A negative observed depth is invalid.');
+ rejectEntry(level=>{level.exteriorElements[1].provenance.depth='invalid';},'EXTERIOR_SOURCE','Malformed nested evidence returns a validation error without throwing.');
+ rejectEntry(level=>{level.exteriorElements[1].provenance.topEvidence={...structuredClone(entry.column.provenance.depth),sourceViewId:'synthetic-missing-top'};},'EXTERIOR_SOURCE','The observed beam underside contributing to column height needs a valid source.');
+ rejectEntry(level=>{level.exteriorElements[1].provenance.alternateObservations=[{...structuredClone(entry.column.provenance.depth),sourceFrame:{wrong:true}}];},'EXTERIOR_SOURCE','Repeated observations retain validated frames.');
+ rejectEntry(level=>{level.exteriorElements[0].provenance.sourceViewIds.push('synthetic-missing-view');},'EXTERIOR_SOURCE','An unresolvable contributing source ID is rejected.');
+ rejectEntry((level,inventory)=>{const extra=structuredClone(entry.side);extra.id='synthetic-unrecorded-side';inventory.views.push(extra);level.exteriorElements[0].provenance.sourceViewIds.push(extra.id);},'EXTERIOR_SOURCE_OBSERVATIONS','An ID alone cannot stand in for a recorded frame and source observation.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].sources[1].axis='x';},'ENTRY_ROOF_SOURCE_AXES','Two records of the same axis cannot establish a two-axis roof.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].entryAssembly.sideViewIds={id:entry.side.id};},'ENTRY_ROOF_SOURCE_AXES','Malformed side declarations return a validation error without throwing.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].sources[1].sourceViewId=entry.source.id;level.reconstructedRoofs[0].sources[1].sourceFrame=structuredClone(entry.source.frame);},'ENTRY_ROOF_SOURCE_AXES','Relabelling the front source as y does not establish roof depth.');
+ rejectEntry((level,inventory)=>{inventory.views.find(v=>v.id===entry.side.id).direction='front';},'ENTRY_ROOF_SOURCE_AXES','A claimed side view must really be a left or right elevation.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].sources[1].sourceFrame.cropToRaster[4]=1;},'EXTERIOR_SOURCE','A roof source frame is checked against the source view.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].sources[1].anchors[1][0]=1001;},'EXTERIOR_SOURCE_BOUNDS','A roof profile anchor must lie inside the source raster.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].sources[1].scaleY=-.015;},'EXTERIOR_SOURCE_SCALE','Roof scales must be positive.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].buildingId='shed';},'ENTRY_ROOF_OWNERSHIP','An entrance roof cannot belong to a different building.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].levelId='house:upper';},'ENTRY_ROOF_OWNERSHIP','An entrance roof cannot belong to a different level.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].entryAssembly.parentWallId='synthetic-absent-wall';},'EXTERIOR_WALL','An entrance roof must keep its real supporting facade association.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].status='confirmed';},'EXTERIOR_PROPOSAL_STATUS','An automatically generated entrance roof does not arrive preconfirmed.');
+ rejectEntry(level=>{level.reconstructedRoofs[0].id=level.exteriorElements[0].id;},'EXTERIOR_DUPLICATE','Roof and exterior element IDs must remain distinct.');
+ assert.deepEqual(entry.inventory,entryBefore,'Contributing source validation never changes the imported evidence.');
+ const roofOnly=structuredClone(entry.inventory),roofOnlyLevel=roofOnly.levels.find(l=>l.id===entry.level.id);roofOnlyLevel.exteriorElements=[];assert.deepEqual(X.proposalIssues(roofOnlyLevel,roofOnly),[],'An entry roof can be validated independently of exterior element presence.');
+
+ // A flat entrance's full footprint is a separate floor-plan observation;
+ // the visible side projection alone cannot establish its hidden attachment.
+ const flat=entryDetails(),floor=flat.inventory.views.find(v=>v.kind==='floor'&&v.buildingId==='house'&&v.levelId==='ground'),planLabel={text:'Toit plat avec membrane',sourceBox:[440,620,680,640],boxFormat:'xyxy'};
+ floor.payload.drawingReadings={rows:[{text:planLabel.text,box:structuredClone(planLabel.sourceBox),source:'pdf-text',confidence:100}]};
+ flat.roof.roofForm='flat';flat.roof.profiles={x:[[2,2.8],[6,2.8]],y:[[-1.3,2.8],[0,2.8]]};flat.roof.planEvidence={sourceViewId:floor.id,sourceFrame:structuredClone(floor.frame),anchors:[[220,745],[420,745],[420,680],[220,680]],sourceBox:[220,680,200,65],boxFormat:'xywh',scaleX:.02,scaleY:.02,kind:'estimated-calibrated',status:'proposed',alignment:structuredClone(flat.level.contours[0].alignment),footprint:[[2,-1.3],[6,-1.3],[6,0],[2,0]],label:planLabel,leader:{points:[[440,630],[430,630],[380,710]],method:'connected-note-leader-to-closed-footprint'}};
+ flat.roof.sources[0].scaleY=.02;
+ assert.deepEqual(X.proposalIssues(flat.level,flat.inventory),[],'A labelled floor footprint with its actual registered corners supports the flat entrance envelope.');
+ flat.roof.observedFascia=[{id:flat.roof.id+':front-fascia',sourceViewId:flat.source.id,sourceFrame:structuredClone(flat.source.frame),sourceBox:[220,300,200,25],boxFormat:'xywh',anchors:[[220,300],[420,300],[420,325],[220,325]],scaleX:.02,scaleY:.02,status:'proposed',poly:[[2,-1.3,2.3],[6,-1.3,2.3],[6,-1.3,2.8],[2,-1.3,2.8]],normal:[0,-1,0]}];
+ assert.deepEqual(X.proposalIssues(flat.level,flat.inventory),[],'An observed front fascia retains its own source section and anchors.');
+ const rejectPlan=(mutate,code,label)=>{const inventory=structuredClone(flat.inventory),level=inventory.levels.find(l=>l.id===flat.level.id);mutate(level.reconstructedRoofs[0],inventory,level);assert.ok(X.proposalIssues(level,inventory).includes(code),label);};
+ rejectPlan(roof=>{delete roof.planEvidence;},'ENTRY_ROOF_PLAN_REQUIRED','This flat entrance contract cannot discard its floor footprint proof.');
+ rejectPlan(roof=>{roof.planEvidence.sourceViewId=flat.source.id;roof.planEvidence.sourceFrame=structuredClone(flat.source.frame);},'EXTERIOR_SOURCE','An elevation cannot substitute for the declared floor observation.');
+ rejectPlan((roof,inventory)=>{const foreign=inventory.views.find(v=>v.kind==='floor'&&v.buildingId!=='house');roof.planEvidence.sourceViewId=foreign.id;roof.planEvidence.sourceFrame=structuredClone(foreign.frame);},'EXTERIOR_SOURCE','Another building cannot supply a flat-roof footprint.');
+ rejectPlan(roof=>{roof.planEvidence.sourceFrame.cropToRaster[4]=5;},'EXTERIOR_SOURCE','The floor observation retains its exact source frame.');
+ rejectPlan(roof=>{roof.planEvidence.anchors[0][1]=801;},'EXTERIOR_SOURCE_BOUNDS','Floor footprint anchors stay within the source raster.');
+ rejectPlan(roof=>{roof.planEvidence.scaleY=0;},'EXTERIOR_SOURCE_SCALE','A flat-roof footprint needs a positive second scale.');
+ rejectPlan(roof=>{roof.planEvidence.footprint[0][0]+=.2;},'ENTRY_ROOF_PLAN_FOOTPRINT','The physical footprint must reproduce its source corners.');
+ rejectPlan(roof=>{roof.profiles.y[0][0]-=.3;},'ENTRY_ROOF_PLAN_FOOTPRINT','The rendered roof cannot extend beyond its observed plan footprint.');
+ rejectPlan(roof=>{roof.planEvidence.alignment.offset[0]+=.5;roof.planEvidence.footprint=roof.planEvidence.footprint.map(([x,y])=>[x+.5,y]);roof.profiles.x=roof.profiles.x.map(([x,z])=>[x+.5,z]);},'ENTRY_ROOF_PLAN_REGISTRATION','A self-consistent but shifted plan transform cannot contradict the existing floor registration.');
+ rejectPlan(roof=>{roof.planEvidence.label.text='Unobserved flat roof label';},'ENTRY_ROOF_PLAN_LABEL','The copied roof label must exist in this source plan.');
+ rejectPlan(roof=>{roof.planEvidence.leader.points[0][0]=1001;},'EXTERIOR_SOURCE_BOUNDS','The note leader cannot refer to off-page points.');
+ rejectPlan(roof=>{roof.observedFascia[0].sourceViewId=flat.side.id;roof.observedFascia[0].sourceFrame=structuredClone(flat.side.frame);},'ENTRY_ROOF_FASCIA_SOURCE','A side return cannot provide the front fascia face.');
+ rejectPlan(roof=>{roof.observedFascia[0].sourceFrame.pdfToRaster[0]=2;},'EXTERIOR_SOURCE','The fascia must use the actual source frame.');
+ rejectPlan(roof=>{roof.observedFascia[0].sourceBox=[990,300,200,25];},'EXTERIOR_SOURCE_BOUNDS','A fascia source section must be in bounds.');
+ rejectPlan(roof=>{roof.observedFascia[0].scaleY=0;},'EXTERIOR_SOURCE_SCALE','The fascia height needs a positive independent vertical scale.');
+ rejectPlan(roof=>{roof.observedFascia[0].scaleY=.05;},'ENTRY_ROOF_FASCIA_SOURCE','The fascia cannot use a different calibration from its matching front roof observation.');
+ rejectPlan(roof=>{roof.observedFascia[0].status='confirmed';},'EXTERIOR_PROPOSAL_STATUS','An observed fascia remains proposed with its roof.');
+
+ // Only solid beams gain a true underside. Unknown beam depth remains one
+ // observed skin; existing foundation and column face contracts are preserved.
+ const solidBeam={...entry.beam,surfaceOnly:false,size:[4,.3,.3],rotationDegrees:90},beamFaces=X.elementFaces(solidBeam),bottomFace=beamFaces.find(face=>face.normal[2]<-.99);
+ assert.equal(beamFaces.length,6);assert.ok(bottomFace,'A solid beam has a real downward-facing underside.');
+ for(const point of bottomFace.poly)close(point[2],2.4,'beam underside altitude');
+ assert.deepEqual(bottomFace.normal,[0,0,-1]);assert.ok(bottomFace.poly.every(p=>p[0]>=1.7-1e-8&&p[0]<=2+1e-8&&p[1]>=-1-1e-8&&p[1]<=3+1e-8),'The underside follows the same rotated beam coordinates.');
+ assert.equal(X.elementFaces(entry.beam).length,1,'An unknown-depth beam does not acquire invented solid faces.');
+ assert.equal(X.elementFaces(entry.column).length,5,'Historical column meshes retain their existing face count.');
+ assert.equal(X.elementFaces(sample.foundation).length,5,'Historical foundation meshes retain their existing face count.');
+ const manualBeam={id:'synthetic-manual-beam',type:'beam',phase:'existing',status:'confirmed',origin:[0,0,2.4],size:[3,.2,.25],rotationDegrees:0,provenance:{kind:'user-measurement',label:'Historical manual addition'}};
+ assert.deepEqual(X.issues(manualBeam),[],'Manually positioned historical beams need no invented PDF source metadata.');
+ assert.equal(X.elementFaces(manualBeam).length,6,'Historical manual beams render with their own real dimensions.');
 
  // Existing confirmed additions remain available. New automatic additions are
  // visible only in an explicit proposal preview, and remain proposals there.
@@ -98,5 +183,5 @@ function proposedDetails(){
  assert.ok(proposedRender.hitSurfaces.some(surface=>surface.elementId===sample.foundation.id),'The foundation is represented in 3D selection geometry.');
  for(const surface of proposedRender.hitSurfaces)for(const [x,y]of surface.screenPolygon)assert.ok(Number.isFinite(x)&&Number.isFinite(y)&&x>=0&&x<=960&&y>=0&&y<=640,'Expanded source geometry remains inside the default fitted viewport.');
  D.dispose(canvas);
- console.log('PASS exterior integration: source ownership/bounds/status, valid wall polygons, opt-in proposals, independent element preview, observed masonry versus selected product, foundation mesh and 3D ground bounds (no pixel/browser claim).');
+ console.log('PASS exterior integration: all contributing source frames/bounds/scales, orthogonal entry roof ownership, beam underside and unknown-depth skin, source statuses, valid wall polygons, opt-in proposals, observed masonry, foundation mesh and 3D ground bounds (no pixel/browser claim).');
 })().catch(error=>{console.error(error.stack);process.exitCode=1;});

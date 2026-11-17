@@ -67,14 +67,15 @@
         const next=JSON.parse(JSON.stringify(result));
         if(next.version!==1||!['partial-proposal','unresolved','preserved','cancelled'].includes(next.status)||!Array.isArray(next.reports))throw Error('Résultat de conversion invalide.');
         if(new Set(next.levels.map(l=>l.id)).size!==next.levels.length)throw Error('Niveaux dupliqués.');
-        const exteriorIds=next.levels.flatMap(l=>[...(l.exteriorElements||[]),...(l.wallZones||[])].map(e=>e.id));if(new Set(exteriorIds).size!==exteriorIds.length)throw Error('Éléments extérieurs dupliqués.');
+        const exteriorIdsFor=levels=>levels.flatMap(l=>[...(l.exteriorElements||[]),...(l.wallZones||[]),...(l.reconstructedRoofs||[]).flatMap(r=>[r,...(r.extensions||[])])].map(e=>e.id));
+        const exteriorIds=exteriorIdsFor(next.levels),preservedIds=new Set(exteriorIdsFor(inventory.levels.filter(l=>!next.levels.some(n=>n.id===l.id))));if(new Set(exteriorIds).size!==exteriorIds.length||exteriorIds.some(id=>preservedIds.has(id)))throw Error('Éléments extérieurs dupliqués.');
         for(const level of next.levels){
           const index=inventory.levels.findIndex(l=>l.id===level.id),old=inventory.levels[index];
           if(level.buildingId!==buildingId||old&&MIRReconstructionPipeline.protectedLevel(old))throw Error('Un niveau modifié est conservé.');
           for(const c of level.contours||[])if(c.status!=='proposed'||MIRLevelModel.validateDraft(c,inventory,level).length)throw Error('Contour proposé invalide.');
           for(const p of level.observedPlanes||[])if(p.status!=='proposed'||MIRLevelModel.observedPlaneIssues(p,inventory,level,{confirm:false}).length)throw Error('Murs proposés invalides.');
           for(const roof of level.reconstructedRoofs||[])if(roof.status!=='proposed'||MIRReconstructedRoofs.issues(roof,{confirm:false}).length||roof.levelId!==level.id||roof.buildingId!==buildingId||[roof,...(roof.extensions||[])].flatMap(r=>r.sources).some(s=>!inventory.views.some(v=>v.id===s.sourceViewId&&v.buildingId===buildingId&&v.kind==='elevation')))throw Error('Toiture proposée invalide.');
-          if((level.exteriorElements?.length||level.wallZones?.length)&&(!window.MIRStudioExterior||MIRStudioExterior.proposalIssues(level,inventory).length))throw Error('Éléments extérieurs proposés ou sources invalides.');
+          if((level.exteriorElements?.length||level.wallZones?.length||level.reconstructedRoofs?.some(r=>r.entryAssembly))&&(!window.MIRStudioExterior||MIRStudioExterior.proposalIssues(level,inventory).length))throw Error('Éléments extérieurs proposés ou sources invalides.');
           const walls=MIRLevelModel.wallsFor(level,inventory,{includeProposed:true});
           if(MIRLevelModel.openingIssues(level.wallOpenings||[],walls).length)throw Error('Ouvertures proposées invalides.');
           level.geometryRevision=(old?.geometryRevision||0)+1;if(index<0)inventory.levels.push(level);else inventory.levels[index]=level;

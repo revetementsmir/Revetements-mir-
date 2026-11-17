@@ -23,6 +23,8 @@ on:
       - 'docs/verification/mir-studio-s1-import.md'
       - 'tests/mir-studio-*.cjs'
       - 'tests/helpers/mir-studio-s2-model.cjs'
+      - 'tests/helpers/mir-studio-entry-fixture.cjs'
+      - 'tests/helpers/mir-studio-flat-entry-fixture.cjs'
       - 'docs/verification/mir-studio-s2.md'
       - 'tools/qa/mir-studio*.cjs'
       - 'tools/qa/helpers/mir-studio*.cjs'
@@ -49,6 +51,7 @@ jobs:
           git fetch origin "$MIR_CLIENT_BASE_SHA" --depth=1
           git diff --check
           for file in dist/plan-import.js dist/plan-sheet-detection.js dist/plan-scan-ocr.js dist/plan-view-inventory.js dist/plan-view-review.js dist/project-store.js dist/plan-app.js dist/takeoff-app.js dist/plan-level-model.js dist/plan-reconstruction*.js dist/plan-reconstructed*.js dist/plan-scene-order.js dist/plan-level-studio.js dist/studio*.js dist/mir-private-document-viewer.js; do node --check "$file"; done
+          node --check tests/mir-studio-entry-assemblies-browser.cjs
           node tests/mir-studio-s1.cjs
           node tests/mir-studio-s2.cjs
           node tests/mir-studio-reconstruction.cjs
@@ -58,6 +61,8 @@ jobs:
           node tests/mir-studio-exterior-reconstruction.cjs
           node tests/mir-studio-exterior-integration.cjs
           node tests/mir-studio-entry-elements.cjs
+          node tests/mir-studio-entry-assemblies.cjs
+          node tests/mir-studio-flat-entry-roofs.cjs
           node tests/mir-studio-preview.cjs
           node tests/mir-studio-cotation.cjs
           node tests/mir-studio-job-reader.cjs
@@ -88,6 +93,8 @@ jobs:
           MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-s2-browser.cjs
           MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-reconstruction-browser.cjs
           MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-client-360-browser.cjs
+      - name: Hip and flat entrance roof, beam and fascia choices (synthetic only)
+        run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-entry-assemblies-browser.cjs
       - name: Existing large PDF, rendering and interaction regressions
         run: |
           node tests/mir-plan-pdf-browser.cjs
@@ -102,4 +109,5 @@ jobs:
             artifacts/studio-s1/
             artifacts/studio-s2/
             artifacts/studio-reconstruction/
+            artifacts/studio-entry-assemblies/
           if-no-files-found: warn
