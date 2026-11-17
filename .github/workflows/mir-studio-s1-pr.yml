@@ -66,12 +66,14 @@ jobs:
           node tests/mir-studio-native-source-crop.cjs
           node tests/mir-studio-fragmented-captions.cjs
           node tests/mir-studio-neighbouring-measurements.cjs
+          node tests/mir-studio-dimension-word-retry.cjs
           node tests/mir-studio-elevation-grid.cjs
           node tests/mir-studio-level-datum-scale.cjs
           node tests/mir-studio-datum-frame.cjs
           node tests/mir-studio-metric-registration.cjs
           node tests/mir-studio-multilevel-pipeline.cjs
           node tests/mir-studio-cross-floor-outline.cjs
+          node tests/mir-studio-contour-localization.cjs
           node tests/mir-studio-automatic.cjs
           node tests/mir-studio-automatic-originals-harness.cjs
           node tests/mir-studio-legend-occlusion.cjs
@@ -84,6 +86,7 @@ jobs:
           node tests/mir-studio-floor-thin-lines.cjs
           node tests/mir-studio-door-boundary.cjs
           node tests/mir-studio-sliding-boundary.cjs
+          node tests/mir-studio-framed-wall-network.cjs
           node tests/mir-studio-wall-contrast.cjs
           node tests/mir-studio-elevation-document-frame.cjs
           node tests/mir-studio-fragmented-openings.cjs
@@ -91,6 +94,7 @@ jobs:
           node tests/mir-studio-source-scale.cjs
           node tests/mir-studio-partial-scale.cjs
           node tests/mir-studio-calibration-marks.cjs
+          node tests/mir-studio-mark-extent.cjs
           node tests/mir-studio-paper-contrast.cjs
           node tests/mir-studio-dimension-association.cjs
           node tests/mir-studio-reference-observations.cjs

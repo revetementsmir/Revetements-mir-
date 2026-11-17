@@ -48,6 +48,15 @@
   for(let side=0;side<2;side++){
    const position=positions[side],extreme=ends[side],difference=Math.abs(position-extreme);
    if(difference<=3){evidence.push({method:'raster-endpoint-tolerance',differencePixels:difference,tolerancePx:3});continue;}
+   // An intersection cluster can anchor the edge of a diagonal tick. The
+   // line reader retains its actual source centre separately. Use that
+   // observed point only for association, preserving the original anchors,
+   // written value and scale; neither tolerance is enlarged or accumulated.
+   const line=dimension.lineEvidence,point=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite),same=(a,b)=>point(a)&&point(b)&&M.distance(a,b)<1e-6;
+   if(dimension.sourceViewId&&dimension.sourceViewId===outline.sourceViewId&&dimension.sourceFrame&&outline.sourceFrame&&JSON.stringify(dimension.sourceFrame)===JSON.stringify(outline.sourceFrame)&&line?.status==='observed'&&line.kind==='dimension-line-with-end-marks-and-witnesses'&&line.axis===(axis===0?'x':'y')&&line.anchors?.length===2&&line.anchors.every((p,i)=>same(p,anchors[i]))){
+    const anchor=anchors.find(p=>p[axis]===position),marks=(line.markers||[]).filter(m=>same(m.point,anchor)&&['diagonal-tick','compact-diagonal-tick'].includes(m.kind)&&point(m.strokeCenter)&&m.anchorTolerancePx>0&&m.anchorTolerancePx<=2&&M.distance(m.strokeCenter,anchor)<=m.anchorTolerancePx&&m.witnesses?.length&&m.witnesses.every(w=>w.length===2&&w.every(point)&&same(w[0],m.strokeCenter))),mark=marks.length===1?marks[0]:null;
+    if(mark&&Math.abs(mark.strokeCenter[axis]-extreme)<=3){evidence.push({method:'observed-dimension-mark-to-contour',sourceAnchor:anchor.slice(),strokeCenter:mark.strokeCenter.slice(),markEvidence:M.clone(mark),differencePixels:Math.abs(mark.strokeCenter[axis]-extreme),originalDifferencePixels:difference,tolerancePx:3,anchorsPreserved:true});continue;}
+   }
    // Thick source strokes have an outer edge distinct from the dimension's
    // centreline. A larger offset is allowed only inside the SAME observed
    // wall stroke, never from a percentage of the building's overall width.
@@ -260,6 +269,35 @@
   if(left<0||right>im.width-1||!(right>left)||top.chosen.y<0||bottom.chosen.y>im.height-1)return {status:'unresolved',reason:'ELEVATION_GRID_OUTSIDE_SOURCE_FRAME',registration};
   return {status:'proposed',method:'floor-contour-shared-axes-and-visible-level-datums',sourceViewId:elevation.id,sourceFrame:M.clone(elevation.frame||null),box:[left,top.chosen.y,right-left,bottom.chosen.y-top.chosen.y],occlusions:[],gridRegistration:registration,verticalDatums:{from:M.clone(bottom.chosen),to:M.clone(top.chosen)},sourceContour:{sourceViewId:floor.id,sourceFrame:M.clone(floor.frame||null),points:M.clone(outline.points)},confirmationRequired:true,geometryCreated:false};
  }
+ // A donor contour is a search template, not the target's exact stroke centre.
+ // Relocalize an edge only when both target corners independently show the
+ // same outer stroke and its inside parallel. Dimensions never guide this fit.
+ // Ambiguous edges keep their projected coordinates; the entire target raster
+ // must support the resulting polygon before any point is replaced.
+function localizeTargetContour(image,points){
+ if(!image?.data||M.validatePolygon(points).length)return {status:'unresolved',reason:'TARGET_BOUNDARY_INVALID'};
+ const originalEvidence=V.floorBoundaryEvidence(image,points);if(originalEvidence.some(e=>e.status!=='proposed'))return {status:'unresolved',reason:'TARGET_BOUNDARY_UNSUPPORTED'};
+ const {width:w,height:h}=image,ink=V.monochrome(image),search=Math.max(2,Math.round(w/525)),cornerTolerance=Math.max(1,Math.round(w/1100)),minimum=Math.max(18,Math.round(Math.max(w,h)*.015)),maximumBand=Math.min(w,h)*.04,orientation=Math.sign(points.reduce((s,p,i)=>{const b=points[(i+1)%points.length];return s+p[0]*b[1]-b[0]*p[1];},0));
+ const hit=(x,y)=>{x=Math.round(x);y=Math.round(y);return x>=0&&x<w&&y>=0&&y<h&&!!ink[y*w+x];};
+ const line=(p,u,axis,at,start,length=minimum)=>{let hits=0,gap=0,maxGap=0;for(let n=start;n<=start+length;n++){const q=p.map((v,i)=>i===axis?at:v+u[i]*n);if(hit(...q)){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:hits/(length+1),maxGap,anchors:[p.map((v,i)=>i===axis?at:v+u[i]*start),p.map((v,i)=>i===axis?at:v+u[i]*(start+length))]};};
+ const groups=(lo,hi,read)=>{const out=[];for(let at=lo;at<=hi;at++){const obs=read(at);if(obs.support<.94||obs.maxGap>2)continue;const prior=out.at(-1);if(prior&&at===prior.high+1){prior.high=at;prior.samples.push(obs);}else out.push({low:at,high:at,samples:[obs]});}return out.map(g=>({...g,at:(g.low+g.high)/2}));};
+ const cornerLine=(p,u,axis,inside)=>{
+  const outer=groups(Math.floor(p[axis]-search),Math.ceil(p[axis]+search),at=>line(p,u,axis,at,search)),candidates=[];
+  for(const stroke of outer){if(stroke.high-stroke.low>Math.max(6,search*2)||line(p,u,axis,stroke.low-1,search).support>=.94||line(p,u,axis,stroke.high+1,search).support>=.94)continue;let missing=0,ends=false;for(let n=1;n<=Math.max(5,cornerTolerance*4+2);n++){const q=p.map((v,i)=>i===axis?stroke.at:v-u[i]*n);if(!hit(...q)){if(++missing>=2){ends=true;break;}}else missing=0;}if(!ends)continue;
+   const lo=inside>0?Math.ceil(stroke.high+cornerTolerance*1.5):Math.floor(stroke.low-maximumBand),hi=inside>0?Math.ceil(stroke.high+maximumBand):Math.floor(stroke.low-cornerTolerance*1.5);
+   const parallels=groups(lo,hi,at=>line(p,u,axis,at,Math.max(search,Math.ceil(Math.abs(at-stroke.at)+cornerTolerance))));
+   for(const inner of parallels){const start=Math.max(search,Math.ceil(Math.abs(inner.at-stroke.at)+cornerTolerance)),a=inside>0?stroke.high+1:inner.high+1,b=inside>0?inner.low-1:stroke.low-1;if(b-a<1)continue;
+    let clear=0;for(let n=start;n<=start+minimum;n++){let white=false;for(let at=a;at<=b;at++){const q=p.map((v,i)=>i===axis?at:v+u[i]*n);white||=!hit(...q);}clear+=Number(white);}if(clear/(minimum+1)<.9)continue;
+    candidates.push({at:stroke.at,stroke:{low:stroke.low,high:stroke.high,evidence:line(p,u,axis,stroke.at,search)},paired:{at:inner.at,low:inner.low,high:inner.high,evidence:line(p,u,axis,inner.at,start)},sourceCorner:p.slice(),axis,inside,ends:true,distance:Math.abs(stroke.at-p[axis]),clearSupport:clear/(minimum+1)});break;
+   }
+  }
+  const distinct=candidates.filter((c,i)=>!candidates.slice(0,i).some(p=>p.at===c.at));return distinct.length===1?{status:'observed',...distinct[0]}:{status:'unresolved',reason:distinct.length?'TARGET_STROKE_AMBIGUOUS':'TARGET_PAIRED_CORNER_REQUIRED',candidates:distinct};
+ };
+ const edges=[];for(let i=0;i<points.length;i++){const a=points[i],b=points[(i+1)%points.length],dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy),axis=Math.abs(dx)<1e-6?0:Math.abs(dy)<1e-6?1:null;if(axis===null)return {status:'unresolved',reason:'TARGET_AXIS_EDGE_REQUIRED'};const u=[dx/length,dy/length],inside=axis===0?-orientation*u[1]:orientation*u[0],from=cornerLine(a,u,axis,inside),to=cornerLine(b,u.map(n=>-n),axis,inside);if(from.status!=='observed'||to.status!=='observed'||Math.abs(from.at-to.at)>cornerTolerance){edges.push({i,status:'unresolved',from,to});continue;}edges.push({i,status:'observed',axis,at:(from.at+to.at)/2,from,to,residual:Math.abs(from.at-to.at),tolerancePx:cornerTolerance});}
+ if(edges.every(e=>e.status!=='observed'))return {status:'unresolved',reason:'TARGET_CORNER_LOCALIZATION_REQUIRED',edges};
+ const localized=points.map(p=>p.slice());for(const edge of edges.filter(e=>e.status==='observed')){localized[edge.i][edge.axis]=edge.at;localized[(edge.i+1)%points.length][edge.axis]=edge.at;}if(M.validatePolygon(localized).length)return {status:'unresolved',reason:'TARGET_LOCALIZATION_INVALID',edges};const evidence=V.floorBoundaryEvidence(image,localized);
+ return {status:evidence.every(e=>e.status==='proposed')?'proposed':'unresolved',method:'target-local-paired-corners',points:localized,originalPoints:points,edges,sourceEdgeEvidence:evidence,localizedEdges:edges.filter(e=>e.status==='observed').map(e=>e.i),geometryConfirmed:false};
+}
  function crossFloorOutline(inventory,floor,images,original){
   // A detected contour on another level is only a search template. Every
   // projected edge must still exist in this level's own raster; aligned
@@ -284,10 +322,10 @@
    if(M.validatePolygon(projected).length||projected.some(([x,y])=>x<0||y<0||x>=image.width||y>=image.height)){attempt.reason='PROJECTED_BOUNDARY_INVALID';continue;}
    // Keep corner identity independent of the donor's start vertex/winding.
    const indexes=projected.map((_,i)=>i);if(M.signedArea(projected)<0)indexes.reverse();
-   const left=Math.min(...projected.map(p=>p[0])),tolerance=Math.max(2,Math.round(image.width/525)),first=indexes.filter(i=>projected[i][0]<=left+tolerance).sort((a,b)=>projected[a][1]-projected[b][1]||projected[a][0]-projected[b][0])[0],at=indexes.indexOf(first),sourceIndexes=[...indexes.slice(at),...indexes.slice(0,at)],points=sourceIndexes.map(i=>projected[i]);
-   const edgeEvidence=V.floorBoundaryEvidence(image,points);attempt.sourceEdgeEvidence=M.clone(edgeEvidence);
+   const left=Math.min(...projected.map(p=>p[0])),tolerance=Math.max(2,Math.round(image.width/525)),first=indexes.filter(i=>projected[i][0]<=left+tolerance).sort((a,b)=>projected[a][1]-projected[b][1]||projected[a][0]-projected[b][0])[0],at=indexes.indexOf(first),sourceIndexes=[...indexes.slice(at),...indexes.slice(0,at)],projectedPoints=sourceIndexes.map(i=>projected[i]),localization=localizeTargetContour(image,projectedPoints),points=localization.status==='proposed'?localization.points:projectedPoints;
+   const edgeEvidence=localization.status==='proposed'?localization.sourceEdgeEvidence:V.floorBoundaryEvidence(image,points);attempt.sourceEdgeEvidence=M.clone(edgeEvidence);attempt.targetLocalization=M.clone(localization);
    attempt.status=edgeEvidence.every(e=>e.status==='proposed')?'proposed':'unresolved';attempt.reason=attempt.status==='proposed'?null:'BOUNDARY_SOURCE_SUPPORT';
-   candidates.push({donor,outline,registration,inverse,points,sourceIndexes,edgeEvidence,attempt});
+   candidates.push({donor,outline,registration,inverse,points,sourceIndexes,edgeEvidence,localization,attempt});
   }
   const recovery={method:'cross-floor-labelled-grid-and-target-strokes',originalReason:original.reason,attempts,confirmationRequired:true};
   if(!candidates.length)return {...original,recovery};
@@ -301,7 +339,7 @@
   const chosen=supported[0],xs=chosen.points.map(p=>p[0]),ys=chosen.points.map(p=>p[1]);
   return {status:'proposed',method:'cross-floor-labelled-grid-and-target-strokes',sourceViewId:floor.id,sourceFrame:M.clone(floor.frame||null),points:chosen.points,sourceBounds:[Math.min(...xs),Math.min(...ys),Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys)],sourceEdgeEvidence:M.clone(chosen.edgeEvidence),metricScale:null,confirmationRequired:true,
    excludes:['coloured-masks','unobserved-target-edges','unregistered-levels','conflicting-floor-footprints'],
-   recovery:{...recovery,sourceViewId:floor.id,sourceFrame:M.clone(floor.frame||null),sourcePoints:M.clone(chosen.points),donorSourceViewId:chosen.donor.id,donorSourceFrame:M.clone(chosen.donor.frame||null),donorOutline:M.clone(chosen.outline),donorPointIndices:M.clone(chosen.sourceIndexes),registration:M.clone(chosen.registration),donorToTargetTransform:M.clone(chosen.inverse),gridObservations:{donor:Grid.markers(chosen.donor,images[chosen.donor.id]),target:Grid.markers(floor,image)},corroboratingSourceViewIds:supported.map(c=>c.donor.id)},
+   recovery:{...recovery,sourceViewId:floor.id,sourceFrame:M.clone(floor.frame||null),sourcePoints:M.clone(chosen.points),donorSourceViewId:chosen.donor.id,donorSourceFrame:M.clone(chosen.donor.frame||null),donorOutline:M.clone(chosen.outline),donorPointIndices:M.clone(chosen.sourceIndexes),targetLocalization:M.clone(chosen.localization),registration:M.clone(chosen.registration),donorToTargetTransform:M.clone(chosen.inverse),gridObservations:{donor:Grid.markers(chosen.donor,images[chosen.donor.id]),target:Grid.markers(floor,image)},corroboratingSourceViewIds:supported.map(c=>c.donor.id)},
    warning:'A registered contour is supported by this level’s own source strokes; ownership and measurements remain proposed.'};
  }
  function propose(inventory,buildingId,images,{levelId}={}){
@@ -622,5 +660,5 @@
   if(next.roofProposal?.status==='proposed'){const roof=next.roofProposal;roof.profiles.x=roof.profiles.x.map(([x,z])=>[nx[0]+(x-old.x[0])*rx,nz[0]+(z-old.z[0])*rz]);roof.profiles.y=roof.profiles.y.map(([y,z])=>[ny[0]+(y-old.y[0])*ry,nz[0]+(z-old.z[0])*rz]);roof.fasciaBottom=nz[1];roof.userMeasurementCorrections={width:w,depth:d,height:h,originalBounds:M.clone(old)};}
   return next;
  }
- return Object.freeze({version:1,registeredSpan,gridElevationEnvelope,crossFloorOutline,levelBand,floorExtentEvidence,floorDimensionAssociation,overallScaleReferences,partialScaleReferences,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,openingsFor,lowerPlanes,faceSpan,referenceObservations,references,floorGuide,datumFromCaption,heightFromLevelDatums,size,readings});
+ return Object.freeze({version:1,localizeTargetContour,registeredSpan,gridElevationEnvelope,crossFloorOutline,levelBand,floorExtentEvidence,floorDimensionAssociation,overallScaleReferences,partialScaleReferences,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,openingsFor,lowerPlanes,faceSpan,referenceObservations,references,floorGuide,datumFromCaption,heightFromLevelDatums,size,readings});
 });

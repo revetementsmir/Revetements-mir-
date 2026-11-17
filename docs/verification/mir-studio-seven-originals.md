@@ -419,3 +419,96 @@ Targeted source diagnostics and synthetic regressions support these rules.
 They do not constitute a new seven-original recipe or certification of the
 two requested exterior walls. New fresh-form results must be recorded against
 the frozen candidate separately from the historical baselines above.
+
+## Fresh original-source recipe — 4361019
+
+All seven originals were imported again through the real form in fresh
+Chromium contexts against the immutable application archive of
+`4361019fadac8950f0abb7794d2c7a70cc81256a`. The 392 served application assets
+matched that exact commit in both the six-case run and the separate C7 run.
+These are new import-triggered conversions, without injected geometry,
+dimensions, calibration, orientation, openings or a previously corrected model.
+The historical results above remain separate checkpoints.
+
+All **48 pages and 46 views** imported. The result is **zero certified complete
+models, one partial model and six empty scenes**. The recipe retained
+`requireModel: true` and `requireWorkflow: true` for every original: C3 passed
+that partial-model workflow contract; the other six cases failed it. An empty
+scene is not credited with a finish, reopen or responsive-model workflow.
+
+| Private case | Pages / views | Associated source levels | Walls / openings / root roofs | Result / remaining blocker | Total seconds |
+| --- | --- | --- | --- | --- | ---: |
+| C1 | 5 / 5 | Ground | 0 / 0 / 0 | `BOUNDARY_SOURCE_SUPPORT` | 72.497 |
+| C2 | 5 / 5 | Ground | 0 / 0 / 0 | `BOUNDARY_SOURCE_SUPPORT` | 93.714 |
+| C3 | 5 / 5 | Upper; lower facade and secondary-volume geometry remain proposals | 15 / 15 / 3 | Partial model; roof registration and exterior details still require verification | 137.184 |
+| C4 | 5 / 5 | Upper only | 0 / 0 / 0 | `SCALE_TRANSCRIPTION_UNCERTAIN`; no ground floor implicitly confirmed | 82.888 |
+| C5 | 5 / 5 | Ground only | 0 / 0 / 0 | `BOUNDARY_SOURCE_SUPPORT`; no upper floor invented | 91.980 |
+| C6 | 6 / 10 | House ground; secondary floor view remains unassigned | 0 / 0 / 0 | Explicit house selection: `HEIGHT_UNKNOWN` | 105.940 |
+| C7 | 17 / 11 | Numbered levels 0, 1, 2, 3 | 0 / 0 / 0 | Four draft contours; `SCALE_UNKNOWN` on levels 0–2 and `LEVEL_ALIGNMENT_REQUIRED` | 557.452 |
+
+C3 now produces the main roof, alongside the secondary-volume and flat-entry
+roofs. Its three root roof records also contain one nested roof return; that
+return is not counted as a fourth independent roof. Four actual rendered
+angles were opened and inspected, followed by wall selection, a material
+change, confirmation, save and reopen. The complete model, source inventory,
+stored PDF bytes and finish assignment were preserved. Its reconstructed
+elevation contains no source raster, and the building remains visible in 3D
+without the PDF image.
+
+FR-CA and EN-CA both passed at 390×844, 834×1112 and 1440×1000 with unchanged
+geometry and finishes, nonempty rendered walls and no horizontal overflow.
+The six private viewport captures were opened and inspected. These are
+Chromium viewport emulations, not physical phone, tablet or Samsung tests.
+
+This is still not a geometrically certified C3 conversion. A residual in the
+main roof's vertical registration remains unconfirmed against the source.
+Source-front/back comparison also leaves the rear secondary-volume door,
+visible foundation and lower opening, steps and automatic masonry/material
+extents unresolved. The proposal explicitly retains uncertain transcription,
+occlusion and flat-entry construction details. A roof's presence and a passing
+finish/reopen workflow do not establish its dimensional fidelity or confirmed
+quantities.
+
+C6 keeps the two buildings separate and retains all ten views. The five views
+on its first page keep their 270-degree orientation, including a floor view
+whose level is still unresolved. The house was selected explicitly through the
+existing chooser. No secondary-building conversion or new secondary-building
+workflow is claimed for this run.
+
+C7 retains four draft contours but generates no wall, opening or roof. Levels
+0, 1 and 2 lack an accepted calibration; the highest level retains an X/Y grid
+alignment proposal, while common level alignment remains unresolved. The
+alignment guard was not bypassed. Neither requested exterior wall under the
+roof is demonstrated: presence, polygonization, roof intersections, independent
+finishes and persistence of those walls remain unverified.
+
+C1 was kept outside the tuning of this follow-up. It is an original already
+tested in earlier checkpoints, not evidence from a previously unseen dossier.
+None of these seven results establishes universal automatic conversion.
+Application/network errors and sampled JavaScript heaps are recorded in the
+private reports; memory samples are not peak or total process-memory claims.
+CI and synthetic regression results must be reported separately from this
+original-source recipe.
+
+### Exact imported raster evidence
+
+Intermediate source diagnostics used PNG rerenders from PDF.js at the recorded
+view frames. Those PNGs are **not the JPEG rasters persisted by the real import**.
+They must not substitute for those imported pixels when reproducing dimension
+rails, contrast thresholds, contour decisions or model-generation success.
+Diagnostic results are not promoted to fresh-form acceptance evidence.
+
+The recipe now exports the exact persisted JPEG/PNG bytes one view at a time
+before closing the browser context, without rendering or recompressing them.
+A private manifest records each encoded raster's hash, MIME type, view/page,
+frame and crop transform; generated artifact names do not contain client names.
+Partial exports remain visible and an export error fails the recipe. Synthetic
+helper tests cover byte preservation, MIME/base64 validation, output names,
+non-overwrite and preservation of earlier evidence after a later failure.
+
+The seven results at `4361019` predate this export addition. **The new exact-raster
+export has not yet been exercised by a fresh original-PDF recipe.** Existing
+private reports and rendered captures remain valid for the outcomes recorded
+above, but they do not retroactively contain the discarded imported raster
+bytes. No original, OCR text, client capture or source coordinates are included
+in this public document or its fixtures.

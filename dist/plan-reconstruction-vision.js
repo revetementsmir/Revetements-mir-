@@ -206,10 +206,93 @@
   if(candidates.some(other=>{if(other===best||other.area<best.area*.35)return false;const [x,y,bw,bh]=best.sourceBounds,[ox,oy,ow,oh]=other.sourceBounds,overlap=Math.max(0,Math.min(x+bw,ox+ow)-Math.max(x,ox))*Math.max(0,Math.min(y+bh,oy+oh)-Math.max(y,oy));return overlap<Math.min(best.area,other.area)*.8;}))return {status:'unresolved',reason:'WALL_NETWORK_AMBIGUOUS'};
   return {status:'proposed',method:'paired-source-wall-enclosure',sourceViewId,sourceFrame:frame,points:best.points,sourceBounds:best.sourceBounds,sourceCorners:best.sourceCorners.map(c=>({...c,tolerancePx:tolerance})),sourceEdgeEvidence:best.sourceEdgeEvidence.map((e,i)=>({...e,anchors:[best.points[i].slice(),best.points[(i+1)%4].slice()],tolerancePx:tolerance})),confirmationRequired:true,metricScale:null,excludes:['coloured-masks','unpaired-dimension-leaders','unconnected-furniture','labelled-notes-and-schedules'],warning:'A closed source wall network is a proposal; building/level ownership and measurements must be checked.'};
  }
+ // Rebuild a filled-ink candidate from the wall strokes themselves.
+ // Thin dimensions and opening swings may join the original filled region;
+ // they are not perimeter walls. Only closed, paired source frames can bridge
+ // separate thick wall strokes. The original raster verifies every final edge.
+ function framedFloorEnvelope(image,legacy,{sourceViewId=null,frame=null,rows=[]}={}){
+  const {width:w,height:h}=image,k=Math.max(2,Math.round(w/525)),minimum=k*4,tolerance=Math.max(1,Math.floor(k/2)),maximumBand=k*6;
+  if(!legacy.sourceBounds)return null;
+  const ink=monochrome(image),radius=Math.max(1,Math.floor(k/3)),thick=opening(ink,w,h,radius,radius),[bx,by,bw,bh]=legacy.sourceBounds;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(x<bx-k*2||x>bx+bw+k*2||y<by-k*2||y>by+bh+k*2)thick[y*w+x]=0;
+  const mask=thick.slice(),segments={x:[],y:[]};
+  for(const axis of ['x','y']){
+   const vertical=axis==='y',parts=components(opening(thick,w,h,vertical?0:minimum/2,vertical?minimum/2:0),w,h);
+   for(const part of parts){const cross=part.box[vertical?2:3];
+    if(cross>k*2.5){if(cross<maximumBand*2)segments[axis].push(...componentAxisSegments(part,thick,w,vertical,minimum,tolerance));continue;}
+    segments[axis].push({at:part.box[vertical?0:1]+(cross-1)/2,start:part.box[vertical?1:0],end:part.box[vertical?1:0]+part.box[vertical?3:2]-1});
+   }
+   if(segments[axis].length>300)return null;
+  }
+  const point=(axis,n,d)=>axis==='x'?[n,d]:[d,n],pixel=(source,axis,n,d)=>{const [x,y]=point(axis,n,d).map(Math.round);return x>=0&&y>=0&&x<w&&y<h&&!!source[y*w+x];};
+  function support(source,axis,start,end,at){let hits=0,gap=0,maxGap=0;for(let n=Math.ceil(start);n<=end;n++){if(pixel(source,axis,n,at)){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:hits/(Math.floor(end)-Math.ceil(start)+1),maxGap};}
+  function fill(axis,start,end,at,other){for(let n=Math.ceil(start);n<=end;n++)for(let d=Math.floor(Math.min(at,other))-radius;d<=Math.ceil(Math.max(at,other))+radius;d++){const [x,y]=point(axis,n,d);if(x>=0&&y>=0&&x<w&&y<h)mask[y*w+x]=1;}}
+  const bands=[];
+  for(const axis of ['x','y'])for(const a of segments[axis])for(const b of segments[axis]){
+   const depth=b.at-a.at,start=Math.max(a.start,b.start),end=Math.min(a.end,b.end);
+   if(depth<k+1||depth>maximumBand||end-start<minimum)continue;
+   bands.push({axis,from:start,to:end,at:a.at,depth});fill(axis,start,end,a.at,b.at);
+  }
+  if(bands.length<4||bands.length>1500)return null;
+  // Source partitions in both directions distinguish a wall network from a
+  // pair of frames, isolated furniture, or a dimension diagram.
+  if(!['x','y'].every(axis=>segments[axis].some(s=>s.at>(axis==='x'?by:bx)+maximumBand&&s.at<(axis==='x'?by+bh:bx+bw)-maximumBand&&s.end-s.start>(axis==='x'?bw:bh)*.15)))return null;
+  const links=[];
+  for(const axis of ['x','y'])for(const a of segments[axis])for(const b of segments[axis]){
+   if(b.start-a.end<k*2.5||b.start-a.end>w*.2||Math.abs(a.at-b.at)>tolerance)continue;
+   let found=null;
+   for(let at=Math.round((a.at+b.at)/2)-tolerance;at<=Math.round((a.at+b.at)/2)+tolerance&&!found;at++){
+    const outer=support(ink,axis,a.end,b.start,at);if(outer.support<.95||outer.maxGap>tolerance)continue;
+    for(const side of [-1,1])for(let depth=k+1;depth<=maximumBand;depth++){
+     if(found)break;const parallel=support(ink,axis,a.end,b.start,at+side*depth);if(parallel.support<.95||parallel.maxGap>tolerance)continue;
+     const neighbour=(before)=>Array.from({length:depth+1},(_,i)=>i+k).some(d=>{const start=before?a.end-d-k*2:b.start+d;return support(thick,axis,start,start+k*2,at+side*depth).support>=.9;});
+     if(!neighbour(true)||!neighbour(false))continue;
+     const cap=n=>{let hits=0;for(let d=0;d<=depth;d++)if(Array.from({length:radius*2+1},(_,i)=>i-radius).some(i=>pixel(ink,axis,n+i,at+side*d)))hits++;return hits/(depth+1);};
+     const near=n=>Array.from({length:k*2+1},(_,i)=>n+i-k).find(p=>cap(p)>=.9),left=near(a.end),right=near(b.start);if(left===undefined||right===undefined)continue;
+     found={axis,from:Math.min(left,a.end),to:Math.max(right,b.start),at,side,depth,outer,parallel,jambs:[left,right].map(n=>({anchors:[point(axis,n,at),point(axis,n,at+side*depth)],support:cap(n)})),method:'paired-source-frame-and-adjacent-wall-strokes'};
+    }
+   }
+   if(found){links.push(found);fill(axis,found.from,found.to,found.at,found.at+found.side*found.depth);}
+   if(links.length>256)return null;
+  }
+  if(!links.length)return null;
+  const filled=fillHoles(closing(mask,w,h,radius,radius),w,h),parts=components(filled,w,h),largest=parts[0];
+  if(!largest||largest.area<bw*bh*.5||parts.some(p=>p!==largest&&p.area>largest.area*.35))return null;
+  const chosen=new Uint8Array(mask.length);for(const i of largest.pixels)chosen[i]=1;
+  const clean=opening(chosen,w,h,Math.max(2,Math.round(k*.75)),Math.max(2,Math.round(k*.75))),simple=simplify(outline(clean,w,h),Math.max(2,k*1.25));
+  // Align to the independently bounded wall bands, then check the source.
+  // Aligning a thin frame to the darkest nearby line can select its inside
+  // skin and shrink the building by a wall thickness.
+  let points=consolidateAxes(alignOutline(simple,mask,w,h,k),k);const junctions=[];
+  if(points.length<4||points.length>60)return null;
+  for(let pass=0;pass<12;pass++){
+   let fixed=false;const sign=Math.sign(points.reduce((s,a,i)=>{const b=points[(i+1)%points.length];return s+a[0]*b[1]-b[0]*a[1];},0));
+   for(let skip=points.length-3;skip>=2&&!fixed;skip--)for(let i=0;i<points.length&&!fixed;i++){
+    const j=(i+skip)%points.length,a=points[i],b=points[j],dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);if(!length||Math.min(Math.abs(dx),Math.abs(dy))>.01)continue;
+    const normal=[-sign*dy/length,sign*dx/length],between=Array.from({length:skip-1},(_,t)=>points[(i+t+1)%points.length]),offsets=between.map(p=>(p[0]-a[0])*normal[0]+(p[1]-a[1])*normal[1]);
+    if(offsets.some(d=>d<-.01)||Math.max(...offsets)>maximumBand||Math.max(...offsets)<1)continue;
+    const evidence=floorBoundaryEvidence(image,[a,b],ink)[0];if(evidence.status!=='proposed'||evidence.support<.94)continue;
+    const keep=points.filter((p,index)=>{const distance=(index-i+points.length)%points.length;return distance===0||distance>=skip;});junctions.push({anchors:[a.slice(),b.slice()],removed:between.map(p=>p.slice()),sourceEdgeEvidence:evidence,method:'source-supported-inner-band-junction'});points=removeStraight(keep);fixed=true;
+   }
+   if(!fixed)break;
+  }
+  if(points.length<4||points.length>40||points.some((a,i)=>{const b=points[(i+1)%points.length];return Math.min(Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]))>.01;}))return null;
+  for(let i=0;i<points.length;i++)for(let j=i+1;j<points.length;j++){
+   if(j===i+1||i===0&&j===points.length-1)continue;
+   const a=points[i],b=points[(i+1)%points.length],c=points[j],d=points[(j+1)%points.length];
+   if(Math.max(Math.min(a[0],b[0]),Math.min(c[0],d[0]))<=Math.min(Math.max(a[0],b[0]),Math.max(c[0],d[0]))+.01&&Math.max(Math.min(a[1],b[1]),Math.min(c[1],d[1]))<=Math.min(Math.max(a[1],b[1]),Math.max(c[1],d[1]))+.01)return null;
+  }
+  const evidence=floorBoundaryEvidence(image,points,ink);if(evidence.some(e=>e.status!=='proposed'||e.support<.94))return null;
+  // A small accepted island is not the whole building that failed above.
+  const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),bounds=[Math.min(...xs),Math.min(...ys),Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys)];
+  if(bounds.some((value,i)=>Math.abs(value-legacy.sourceBounds[i])>maximumBand)||documentLabelsInside(rows,bounds[0],bounds[1],bounds[0]+bounds[2],bounds[1]+bounds[3]))return null;
+  return {status:'proposed',method:'paired-source-framed-wall-network',sourceViewId,sourceFrame:frame,points,sourceBounds:bounds,sourceEdgeEvidence:evidence,sourceFrameConnections:links,sourceJunctionRepairs:junctions,confirmationRequired:true,metricScale:null,excludes:['coloured-masks','dimension-leaders','opening-swing-arcs','unproved-wall-gaps'],warning:'Source wall bands and closed opening frames propose this boundary; they do not confirm metric dimensions or openings.'};
+ }
  function floorEnvelope(image,options={}){
   const legacy=solidFloorEnvelope(image,options);if(legacy.reason==='SOURCE_SIZE')return legacy;
   const evidence=legacy.status==='proposed'?floorBoundaryEvidence(image,legacy.points):null;
   if(evidence?.every(e=>e.status==='proposed'))return {...legacy,sourceEdgeEvidence:evidence};
+  const framed=legacy.status==='proposed'?framedFloorEnvelope(image,legacy,options):null;if(framed)return framed;
   const recovered=thinFloorEnvelope(image,options);if(recovered.status==='proposed'||recovered.reason==='WALL_NETWORK_AMBIGUOUS')return recovered;
   return evidence?{status:'unresolved',reason:'BOUNDARY_SOURCE_SUPPORT',sourceEdgeEvidence:evidence}:legacy;
  }
