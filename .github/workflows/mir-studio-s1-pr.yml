@@ -29,6 +29,7 @@ on:
       - 'tests/helpers/mir-studio-flat-entry-fixture.cjs'
       - 'tests/helpers/mir-studio-flat-measured-entry-fixture.cjs'
       - 'tests/fixtures/roof-plan-evidence.cjs'
+      - 'tests/fixtures/keyed-wall-source-fixture.cjs'
       - 'docs/verification/mir-studio-seven-originals.md'
       - 'docs/verification/mir-studio-s2.md'
       - 'tools/qa/mir-studio*.cjs'
@@ -82,6 +83,7 @@ jobs:
           node tests/mir-studio-metric-registration.cjs
           node tests/mir-studio-multilevel-pipeline.cjs
           node tests/mir-studio-keyed-wall-observations.cjs
+          node tests/mir-studio-keyed-wall-resolution.cjs
           node tests/mir-studio-opening-registration.cjs
           node tests/mir-studio-roof-pitch-guards.cjs
           node tests/mir-studio-grid-ring-isolation.cjs
@@ -181,6 +183,8 @@ jobs:
         run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-registered-entry-store-browser.cjs
       - name: Native witness precision and source persistence (synthetic only)
         run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-native-witness-store-browser.cjs
+      - name: Keyed walls and source persistence (synthetic only)
+        run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-keyed-wall-store-browser.cjs
       - name: Existing large PDF, rendering and interaction regressions
         run: |
           node tests/mir-plan-pdf-browser.cjs

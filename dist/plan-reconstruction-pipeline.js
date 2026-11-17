@@ -96,7 +96,15 @@
     const alignedErrors=M.validateDraft(constrained,inventory,current);if(alignedErrors.length){report.issues.push(...alignedErrors,'LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
    }
    proposal=R.recoupRegistrations(proposal,inventory,images,constrained);proposal.draft=copy(constrained);
+   // A local note alone remains an observation. Resolve a wall only after its
+   // plan footprint, its own key and its registered vertical datum agree.
+   const resolvedKeyed=KeyedWalls?.resolve?.(inventory,buildingId,images,current,constrained,{proposal,discovery:keyedDiscovery});
+   if(resolvedKeyed&&(resolvedKeyed.observations.length||resolvedKeyed.issues.length)){
+    report.issues=report.issues.filter(issue=>!report.keyedWalls?.issues?.includes(issue));
+    report.keyedWalls=copy(resolvedKeyed);report.issues.push(...resolvedKeyed.issues);
+   }
    const next={...copy(current),contours:[constrained],wallOpenings:[],openingsReviewed:false,reconstruction:{version:1,status:'automatic-proposal',proposal,sourceRasterRequiredForRendering:false,...(report.keyedWalls?{keyedWalls:copy(report.keyedWalls)}:{})}};
+   if(resolvedKeyed?.observedPlanes?.length)next.observedPlanes=copy(resolvedKeyed.observedPlanes);
    const unresolvedOpeningCandidates=[];next.openingProposals=R.openingsFor(proposal,inventory,images,constrained,{unresolvedCandidates:unresolvedOpeningCandidates});
    if(unresolvedOpeningCandidates.length){next.reconstruction.openingObservations={unresolvedCandidates:copy(unresolvedOpeningCandidates),complete:false};report.issues.push(...new Set(unresolvedOpeningCandidates.map(o=>o.reason)));}
    if(next.openingProposals.some(o=>o.floorCorrespondence?.status==='unresolved'))report.issues.push('OPENING_FLOOR_MATCH_UNRESOLVED');

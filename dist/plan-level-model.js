@@ -117,6 +117,10 @@
     });
   }
   function observedPlaneIssues(plane,inventory,level,{confirm=true}={}){
+    if(plane?.kind==='source-keyed-wall'||plane?.keyedWallEvidence!==undefined){
+      const keyed=typeof module==='object'&&module.exports?require('./plan-keyed-wall-observations.js'):(typeof window==='object'?window:globalThis).MIRKeyedWallObservations;
+      return keyed?.issues?keyed.issues(plane,inventory,level,{confirm}):['KEYED_WALL_MODULE_REQUIRED'];
+    }
     const errors=[],view=inventory.views.find(v=>v.id===plane.sourceViewId),registration=plane.registration,linked=(registration?.sourceViewIds||[]).map(id=>inventory.views.find(v=>v.id===id));
     if(!plane.id||!plane.from?.every(finite)||plane.from.length!==2||!plane.to?.every(finite)||plane.to.length!==2||distance(plane.from,plane.to)<.01||!positive(plane.height)||!finite(plane.base)||!plane.normal?.every(finite)||plane.normal.length!==3||Math.abs(Math.hypot(...plane.normal)-1)>.001)errors.push('PLANE_GEOMETRY');
     if(!view||view.kind!=='elevation'||view.buildingId!==level.buildingId||plane.sourceBox?.length!==4||!plane.sourceBox.every(finite)||!positive(plane.sourceBox[2])||!positive(plane.sourceBox[3]))errors.push('SOURCE_BUILDING');
@@ -128,7 +132,7 @@
     if(confirm&&plane.status!=='confirmed')errors.push('PLANE_UNCONFIRMED');
     return [...new Set(errors)];
   }
-  function observedWallsFor(level,inventory,{includeProposed=false}={}){return (level.observedPlanes||[]).filter(p=>(p.status==='confirmed'||includeProposed&&p.status==='proposed')&&!observedPlaneIssues(p,inventory,level,{confirm:!includeProposed||p.status==='confirmed'}).length).map(p=>({id:p.id,wallId:p.id,levelId:level.id,buildingId:level.buildingId,sourceViewId:p.sourceViewId,from:clone(p.from),to:clone(p.to),length:distance(p.from,p.to),height:p.height,base:p.base,normal:clone(p.normal),pointIds:[p.id+':start',p.id+':end'],poly:[[...p.from,p.base],[...p.to,p.base],[...p.to,p.base+p.height],[...p.from,p.base+p.height]],dimension:clone(p.measurements.width),heightEvidence:clone(p.measurements.height),finish:clone(level.wallFinishes?.[p.id]||null),previewOnly:p.status!=='confirmed',status:p.status==='confirmed'?'confirmed-observed-plane':'proposed-observed-plane',footprintConfirmed:false,occlusionIndependent:true}));}
+  function observedWallsFor(level,inventory,{includeProposed=false}={}){return (level.observedPlanes||[]).filter(p=>(p.status==='confirmed'||includeProposed&&p.status==='proposed')&&!observedPlaneIssues(p,inventory,level,{confirm:!includeProposed||p.status==='confirmed'}).length).map(p=>({id:p.id,wallId:p.id,levelId:level.id,buildingId:level.buildingId,sourceViewId:p.sourceViewId,from:clone(p.from),to:clone(p.to),length:distance(p.from,p.to),height:p.height,base:p.base,normal:clone(p.normal),pointIds:[p.id+':start',p.id+':end'],poly:[[...p.from,p.base],[...p.to,p.base],[...p.to,p.base+p.height],[...p.from,p.base+p.height]],dimension:clone(p.measurements.width),heightEvidence:clone(p.measurements.height),...(p.kind==='source-keyed-wall'?{sourceKind:p.kind,footprint:clone(p.footprint),thickness:p.thickness}:{}),finish:clone(level.wallFinishes?.[p.id]||null),previewOnly:p.status!=='confirmed',status:p.status==='confirmed'?'confirmed-observed-plane':'proposed-observed-plane',footprintConfirmed:false,occlusionIndependent:true}));}
   function wallsFor(level,inventory,options={}){return [...contourWallsFor(level,inventory,options),...observedWallsFor(level,inventory,options)];}
   function commitContour(inventory,levelId,draft){
     const next=clone(inventory),level=next.levels.find(l=>l.id===levelId);if(!level)throw Error('LEVEL_UNKNOWN');

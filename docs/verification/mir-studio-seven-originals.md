@@ -76,8 +76,12 @@ endpoints, then pass using real native raster measurements and unchanged
 tolerances. True written conflicts and displaced floor guides still fail.
 The browser gate covers actual IndexedDB save/reload, two levels without roofs
 or entries, both written and derived heights, native evidence loss, unchanged
-source views, finishes, unresolved drafts and legacy data. Its result must be
-reported for the exact pushed head; a local fixture is not an IndexedDB run.
+source views, finishes, unresolved drafts and legacy data. That actual browser
+gate passed at `4aa7596` in Studio run `44182592537`, job `134390558949`;
+its logs were inspected. All 16 workflows passed at that head. Two workflows
+outside Studio required a retry: a Chromium launch timeout and a shop route
+initialization race in the FR/EN matrix. No code changed for those retries.
+This synthetic receipt does not establish browser fidelity of the original.
 
 The resumed work starts from pushed revision `888b322`; it does not recover or
 claim validation of the stopped session's unpushed local changes. PR 44 remains
@@ -808,3 +812,12 @@ checks. No client source, OCR, geometry or capture is published. The 79 Node
 suites and all 16 GitHub workflows pass, including [Studio run44118529526](https://github.com/revetementsmir/Revetements-mir-/actions/runs/44118529526).
 These checks do not certify source fidelity. Further local changes and source
 replays must receive a new exact-revision form-import recipe.
+
+
+## Keyed exterior walls — source-resolved proposal
+
+The keyed-wall pass now resolves one physical wall per independently observed plan footprint after metric level registration. It retains both skins, the free cap, contact with the parent, the written local height and an independently registered deck datum. Roofing lines, pickets, search-window limits and colour alone cannot supply physical ends. The model keeps the footprint and thickness with each wall; the existing preview represents its centre plane.
+
+A private replay of the immutable candidate `896aca1` on retained C7 source readings produced **18 walls, 41 openings and 1 main roof**, compared with 16 walls on that same source-reading lineage. Both new keyed-wall proposals pass the final source validator, including replay against the original imported views with native readings retained separately. Four perspectives were rendered by the existing MIR3D renderer on the Node canvas adapter. This is an incremental source replay, not a browser import or a complete building acceptance. Entrance/patio roofs remain a separate active correction. No private PDF, raster, OCR text or building coordinates are included in git or CI.
+
+The final persistence guard validates PDF identity, frame, page, crop transforms, current key readings and immutable source geometry. Original imported views stay unchanged; current native records are retained alongside the proposal and earlier attempts remain in their recorded history. Invented fixtures exercise cap/roof/picket ambiguity, detached bases, source mutation, native-key conflicts, confirmation-only changes, finishes and atomic save/reload. The browser test is part of this commit's CI; its result must be checked on this exact head.
