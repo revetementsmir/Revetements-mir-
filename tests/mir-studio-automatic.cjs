@@ -72,4 +72,7 @@ missingGap.views[0].envelope.occlusions=[];strokeFrame([0,200,0]);assert.equal(R
  for(const floor of result.levels){assert.ok(floor.contourDraft?.points?.length>=4);assert.equal(floor.reconstructionDraft?.referenceResolution?.status,'not_found');assert.equal(floor.contours?.length||0,0);}
  assert.equal(M.scene(multiple,'house').walls.length,0,'unregistered floors cannot become confirmed 3D');
 }
+const unassignedFloor={views:[{id:'unassigned-floor',kind:'floor',buildingId:'shed',levelId:null}],levels:[]};
+assert.deepEqual(P.build(unassignedFloor,'shed',{}).reports[0].issues,['FLOOR_LEVEL_REQUIRED'],'a detected floor without an associated level is not a missing floor drawing');
+assert.deepEqual(P.build(unassignedFloor,'house',{}).reports[0].issues,['FLOOR_SOURCE_REQUIRED'],'another building cannot supply its floor');
 console.log('PASS automatic pipeline: short dimension marks, independent OCR alternatives, conflicts retained, proposed render distinct from validated measures, existing geometry preserved');

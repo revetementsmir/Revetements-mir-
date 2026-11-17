@@ -29,19 +29,19 @@
   if(!image?.data||image.width<250||image.height<250||image.width*image.height>12000000)
    return {status:'unresolved',reason:'GRID_SOURCE_UNAVAILABLE',bubbles:[]};
   const {width:w,height:h}=image,N=24,dirs=Array.from({length:N},(_,i)=>[Math.cos(2*Math.PI*i/N),Math.sin(2*Math.PI*i/N)]);
-  const score=(x,y,r)=>{let hits=0;for(const [u,v] of dirs)if(dark(image,x+u*r,y+v*r)||dark(image,x+u*(r-1),y+v*(r-1))||dark(image,x+u*(r+1),y+v*(r+1)))hits++;return hits/N;};
+  const score=(x,y,r,coarse=false)=>{let hits=0;for(const [u,v] of dirs)if(dark(image,x+u*r,y+v*r)||dark(image,x+u*(r-1),y+v*(r-1))||dark(image,x+u*(r+1),y+v*(r+1))||coarse&&(dark(image,x+u*(r-2),y+v*(r-2))||dark(image,x+u*(r+2),y+v*(r+2))))hits++;return hits/N;};
   const minRadius=Math.max(7,Math.round(Math.min(w,h)*.007)),maxRadius=Math.min(42,Math.max(22,Math.round(Math.min(w,h)*.03)));
   const bands=[['number',[.08,.02,.83,.20]],['letter',[.06,.13,.20,.87]]],bubbles=[];
   for(const [kind,[xl,yl,xr,yb]]of bands){
    const rough=[];for(let y=Math.floor(h*yl);y<h*yb;y+=4)for(let x=Math.floor(w*xl);x<w*xr;x+=4){
-    let best=null;for(let r=minRadius;r<=maxRadius;r+=3){const value=score(x,y,r);if(value>=.68&&(!best||value>best.score))best={x,y,r,score:value};}
+    let best=null;for(let r=minRadius;r<=maxRadius;r+=3){const value=score(x,y,r,true);if(value>=.68&&(!best||value>best.score))best={x,y,r,score:value};}
     if(best)rough.push(best);
    }
    rough.sort((a,b)=>b.score-a.score);
    const unique=[];
    for(const first of rough){
     if(unique.some(c=>Math.hypot(c.x-first.x,c.y-first.y)<Math.max(14,c.r*1.5)))continue;
-    let best=first;for(let y=first.y-4;y<=first.y+4;y++)for(let x=first.x-4;x<=first.x+4;x++)for(let r=Math.max(minRadius,first.r-3);r<=Math.min(maxRadius,first.r+3);r++){
+    let best={...first,score:score(first.x,first.y,first.r)};for(let y=first.y-4;y<=first.y+4;y++)for(let x=first.x-4;x<=first.x+4;x++)for(let r=Math.max(minRadius,first.r-3);r<=Math.min(maxRadius,first.r+3);r++){
      const value=score(x,y,r);if(value>best.score)best={x,y,r,score:value};
     }
     if(best.score>=.9)unique.push(best);
@@ -66,7 +66,7 @@
   if(!view||view.kind!=='floor'||!image?.data||image.width<250||image.height<250||image.width*image.height>3e7)return {status:'unresolved',reason:'GRID_SOURCE_UNAVAILABLE'};
   const rows=view.payload?.drawingReadings?.rows||[],numeric=[],letters=[];
   for(const row of rows){
-   if(row.box?.length!==4||!row.box.every(finite)||(row.confidence??0)<55)continue;
+   if(row.retry?.labelConflict||row.box?.length!==4||!row.box.every(finite)||(row.confidence??0)<55)continue;
    const label=String(row.text||'').trim().replace(/[.\s]+$/,'').toUpperCase();
    const type=/^\d{1,2}$/.test(label)&&Number(label)>0?'number':/^[A-Z]$/.test(label)?'letter':null;
    if(!type)continue;
@@ -81,7 +81,7 @@
   }
   const select=(items,axis,extent)=>{
    if(!items.length)return [];
-   const middle=median(items.map(v=>v.center[axis])),tolerance=Math.max(5,extent*.015),close=items.filter(v=>Math.abs(v.center[axis]-middle)<=tolerance),count=new Map();
+   const anchors=items.filter(v=>v.sourceCircle),pool=anchors.length>=(axis===1?3:2)?anchors:items,middle=median(pool.map(v=>v.center[axis])),tolerance=Math.max(5,extent*.015),close=items.filter(v=>Math.abs(v.center[axis]-middle)<=tolerance),count=new Map();
    for(const v of close)count.set(v.label,(count.get(v.label)||0)+1);
    if([...count.values()].some(v=>v>1))return [];
    return close.sort((a,b)=>a.label.localeCompare(b.label,undefined,{numeric:true}));
@@ -127,5 +127,62 @@
   const valid=Object.values(byLevel).filter(v=>v.status==='proposed').length;
   return {status:valid===floors.length-1?'proposed':'partial',referenceLevelId:origin.levelId,referenceSourceViewId:origin.id,byLevel,confirmationRequired:true};
  }
- return Object.freeze({version:1,bubbleRegions,markers,alignViews,forBuilding});
+ // Convert the already observed labelled axes to one metric frame. The
+ // origin is a named grid intersection, never the bounding box of a floor.
+ // Pixel points and independent floor calibrations are not changed here.
+ const span=anchors=>Math.hypot(anchors[1][0]-anchors[0][0],anchors[1][1]-anchors[0][1]);
+ const validAnchors=a=>Array.isArray(a)&&a.length===2&&a.every(p=>Array.isArray(p)&&p.length===2&&p.every(finite))&&span(a)>1;
+ const numericScale=r=>finite(r?.value)&&r.value>0&&validAnchors(r.anchors)?r.value/span(r.anchors):null;
+ const metricTolerance=(a,b)=>Math.max(.02,3*Math.max(a,b));
+ function metricAlignment(reference,moving,inventory,images){
+  const rv=inventory.views.find(v=>v.id===reference.draft.sourceViewId),mv=inventory.views.find(v=>v.id===moving.draft.sourceViewId),rs=numericScale(reference.draft.reference),ms=numericScale(moving.draft.reference);
+  if(!rv||!mv||rv.kind!=='floor'||mv.kind!=='floor'||rv.buildingId!==mv.buildingId||reference.draft.reference?.sourceViewId!==rv.id||moving.draft.reference?.sourceViewId!==mv.id||!rs||!ms)return {status:'unresolved',reason:'GRID_METRIC_REFERENCE_REQUIRED'};
+  if([reference,moving].some(p=>p.draft.reference.conflict||p.draft.reference.status==='conflict'||p.draft.reference.kind==='hypothesis'||p.draft.dimensionAdjustment?.status==='conflict'))return {status:'conflict',reason:'GRID_METRIC_REFERENCE_CONFLICT'};
+  const r=markers(rv,images[rv.id]),m=markers(mv,images[mv.id]);if(r.status!=='observed'||m.status!=='observed')return {status:'unresolved',reason:'GRID_AXES_INSUFFICIENT'};
+  const horizontal=matching(m.numbers,r.numbers),vertical=matching(m.letters,r.letters);
+  if(horizontal.length<3||vertical.length<2)return {status:'unresolved',reason:'GRID_LABELS_INSUFFICIENT'};
+  const firstX=horizontal[0],firstY=vertical[0],origin=[firstX[0].center[0],firstY[0].center[1]],matchedReferenceOrigin=[firstX[1].center[0],firstY[1].center[1]],referenceOrigin=[r.numbers[0].center[0],r.letters[0].center[1]],offset=[(matchedReferenceOrigin[0]-referenceOrigin[0])*rs,-(matchedReferenceOrigin[1]-referenceOrigin[1])*rs],checks=[],tolerance=metricTolerance(rs,ms);
+  for(const [axis,pairs]of [[0,horizontal],[1,vertical]])for(const [from,to]of pairs){const movingDistance=(from.center[axis]-origin[axis])*ms,referenceDistance=(to.center[axis]-matchedReferenceOrigin[axis])*rs,residual=movingDistance-referenceDistance;checks.push({axis:axis===0?'x':'y',label:from.label,movingDistance,referenceDistance,residual,tolerance,kind:'estimated-calibrated',moving:{sourceViewId:mv.id,sourceFrame:copy(mv.frame||null),sourcePage:mv.page,point:copy(from.center),textBox:copy(from.box)},reference:{sourceViewId:rv.id,sourceFrame:copy(rv.frame||null),sourcePage:rv.page,point:copy(to.center),textBox:copy(to.box)}});}
+  const common={method:'metric-labelled-grid-intersection',sourceViewId:mv.id,referenceSourceViewId:rv.id,origin,referenceOrigin,matchedReferenceOrigin,offset,axisLabels:{x:firstX[0].label,y:firstY[0].label},scaleUsed:ms,referenceScaleUsed:rs,reference:copy(moving.draft.reference),referenceCalibration:copy(reference.draft.reference),checks,tolerance,toleranceReason:'20 mm minimum or three source pixels at the coarser independent calibration; proposed visual registration, not confirmed quantities',maxResidual:Math.max(...checks.map(c=>Math.abs(c.residual))),confirmationRequired:true};
+  if(checks.some(c=>Math.abs(c.residual)>c.tolerance))return {...common,status:'conflict',reason:'GRID_METRIC_SCALE_CONFLICT'};
+  return {...common,status:'proposed',alignment:{origin,offset,rotationDegrees:0,kind:'source-labelled-grid-registration',status:'proposed',axisLabels:copy(common.axisLabels),sourceViewId:mv.id,referenceSourceViewId:rv.id,checks:copy(checks),confirmationRequired:true}};
+ }
+ function datumNetwork(inventory,buildingId,prepared,referenceLevel,calibrations=[]){
+  const allowedViews=new Map(inventory.views.filter(v=>v.buildingId===buildingId&&v.kind==='elevation').map(v=>[v.id,v])),bySource=new Map(),issues=[];
+  const add=(id,key,item)=>{let v=bySource.get(id);if(!v){v={guides:[],calibrations:[]};bySource.set(id,v);}v[key].push(item);};
+  for(const p of prepared){for(const v of p.proposal?.views||[])if(allowedViews.has(v.viewId))for(const g of v.guides||[])if(g.datumType==='floor'&&g.levelHint&&finite(g.y)&&g.sourceViewId===v.viewId&&g.box?.length===4&&g.box.every(finite)&&(g.confidence??0)>=30)add(v.viewId,'guides',g);for(const c of p.draft.height?.references||[])if(allowedViews.has(c.sourceViewId))add(c.sourceViewId,'calibrations',c);}
+  for(const c of calibrations)if(allowedViews.has(c.sourceViewId))add(c.sourceViewId,'calibrations',c);
+  const edges=[],labels=new Set(prepared.map(p=>p.sourceLevel));
+  for(const [viewId,observations]of bySource){
+   const view=allowedViews.get(viewId);if(observations.calibrations.some(c=>c.conflict||c.status==='conflict')){issues.push({sourceViewId:viewId,reason:'LEVEL_DATUM_CALIBRATION_CONFLICT',references:copy(observations.calibrations)});continue;}const cal=observations.calibrations.filter(c=>numericScale(c)&&['written','estimated-calibrated','user-measurement'].includes(c.kind)&&!['conflict','unresolved'].includes(c.status)&&!c.conflict&&(!c.scale||Math.abs(c.scale/numericScale(c)-1)<.001)&&((c.kind==='written'&&((c.confidence??c.ocrConfidence??0)>=70||c.source==='pdf-text'))||c.kind==='user-measurement'||c.kind==='estimated-calibrated'&&inventory.views.some(v=>v.id===(c.relationship?.sourceReference?.sourceViewId||c.relationship?.sourceViewId)&&v.buildingId===buildingId&&v.kind==='floor')));
+   if(!cal.length){issues.push({sourceViewId:viewId,reason:'LEVEL_DATUM_CALIBRATION_REQUIRED'});continue;}
+   const chosen=cal[0],scale=numericScale(chosen),calConflict=cal.some(c=>Math.abs(numericScale(c)/scale-1)>.01)||cal.some((a,i)=>a.kind==='written'&&cal.slice(i+1).some(b=>b.kind==='written'&&Math.min(Math.hypot(a.anchors[0][0]-b.anchors[0][0],a.anchors[0][1]-b.anchors[0][1])+Math.hypot(a.anchors[1][0]-b.anchors[1][0],a.anchors[1][1]-b.anchors[1][1]),Math.hypot(a.anchors[0][0]-b.anchors[1][0],a.anchors[0][1]-b.anchors[1][1])+Math.hypot(a.anchors[1][0]-b.anchors[0][0],a.anchors[1][1]-b.anchors[0][1]))<4&&Math.abs(a.value-b.value)>.001));
+   if(calConflict){issues.push({sourceViewId:viewId,reason:'LEVEL_DATUM_CALIBRATION_CONFLICT',references:copy(cal)});continue;}
+   const grouped=new Map();for(const g of observations.guides.filter(g=>labels.has(g.levelHint))){let group=grouped.get(g.levelHint);if(!group){group=[];grouped.set(g.levelHint,group);}if(!group.some(v=>Math.abs(v.y-g.y)<1e-6&&v.label===g.label))group.push(g);}
+   const clean=[];for(const [label,group]of grouped){const best=group.slice().sort((a,b)=>(b.confidence||0)-(a.confidence||0))[0];if(group.some(g=>Math.abs(g.y-best.y)>2)){issues.push({sourceViewId:viewId,levelHint:label,reason:'LEVEL_DATUM_POSITION_CONFLICT',observations:copy(group)});continue;}clean.push(best);}
+   clean.sort((a,b)=>order(a.levelHint)-order(b.levelHint));
+   for(let i=0;i<clean.length;i++)for(let j=i+1;j<clean.length;j++){const a=clean[i],b=clean[j],delta=(a.y-b.y)*scale;if(!(delta>0)){issues.push({sourceViewId:viewId,reason:'LEVEL_DATUM_ORDER_CONFLICT',observations:[copy(a),copy(b)]});continue;}edges.push({from:a.levelHint,to:b.levelHint,delta,scaleUsed:scale,tolerance:metricTolerance(scale,scale),sourceViewId:viewId,sourceFrame:copy(view.frame||null),sourcePage:view.page,anchors:[[chosen.anchors[0][0],a.y],[chosen.anchors[0][0],b.y]],datums:{from:copy(a),to:copy(b)},reference:copy(chosen),kind:'estimated-calibrated',status:'proposed',confirmationRequired:true});}
+  }
+  const values=new Map(),paths=new Map(),byLevel={},referenceLabel=referenceLevel.sourceLevel;
+  // Coordinate zero is attached to an observed reference-floor datum. It is
+  // not a terrain altitude and cannot be established from the grid alone.
+  if(!edges.some(e=>e.from===referenceLabel||e.to===referenceLabel))return {status:'unresolved',reason:'LEVEL_VERTICAL_DATUM_REQUIRED',byLevel,edges,issues};
+  values.set(referenceLabel,0);paths.set(referenceLabel,[]);const queue=[referenceLabel];
+  while(queue.length){const from=queue.shift();for(const e of edges){const to=e.from===from?e.to:e.to===from?e.from:null;if(!to||values.has(to))continue;values.set(to,values.get(from)+(e.from===from?e.delta:-e.delta));paths.set(to,[...paths.get(from),e]);queue.push(to);}}
+  const checks=edges.filter(e=>values.has(e.from)&&values.has(e.to)).map(e=>({...copy(e),residual:values.get(e.to)-values.get(e.from)-e.delta})),conflicts=checks.filter(e=>Math.abs(e.residual)>e.tolerance),sourceConflicts=issues.filter(i=>i.reason.endsWith('CONFLICT'));
+  for(const p of prepared){const value=values.get(p.sourceLevel);if(value===undefined){byLevel[p.sourceLevel]={status:'unresolved',reason:'LEVEL_VERTICAL_DATUM_REQUIRED'};continue;}if(conflicts.length||sourceConflicts.length){byLevel[p.sourceLevel]={status:'conflict',reason:'LEVEL_VERTICAL_DATUM_CONFLICT',checks,issues:sourceConflicts};continue;}
+   const path=paths.get(p.sourceLevel),rootEvidence=checks.filter(e=>e.from===referenceLabel||e.to===referenceLabel);byLevel[p.sourceLevel]={status:'proposed',base:{value,kind:p.sourceLevel===referenceLabel?'local-datum':'estimated-calibrated',status:'proposed',sourceViewId:(path[0]||rootEvidence[0]).sourceViewId,referenceLevelId:referenceLevel.levelId,referenceLevelHint:referenceLabel,label:'relative to observed reference-floor datum; not terrain elevation',references:copy(path.length?path:rootEvidence),checks:checks.filter(e=>e.from===p.sourceLevel||e.to===p.sourceLevel),confirmationRequired:true}};
+  }
+  return {status:conflicts.length||sourceConflicts.length?'conflict':Object.values(byLevel).every(v=>v.status==='proposed')?'proposed':'partial',byLevel,edges,checks,issues,confirmationRequired:true};
+ }
+ function registerPreparedLevels(inventory,buildingId,prepared,images,{elevationCalibrations=[]}={}){
+  const levels=prepared.map(p=>({...p,sourceLevel:inventory.levels.find(l=>l.id===p.levelId&&l.buildingId===buildingId)?.sourceLevel})).filter(p=>p.sourceLevel&&p.draft?.sourceViewId&&inventory.views.some(v=>v.id===p.draft.sourceViewId&&v.buildingId===buildingId&&v.kind==='floor'&&v.levelId===p.sourceLevel)).sort((a,b)=>order(a.sourceLevel)-order(b.sourceLevel)),byLevel={};
+  if(levels.length!==prepared.length)return {status:'unresolved',reason:'LEVEL_SOURCE_BUILDING',byLevel};
+  if(levels.length<2||new Set(levels.map(p=>p.sourceLevel)).size!==levels.length)return {status:'unresolved',reason:'LEVEL_SOURCE_AMBIGUOUS',byLevel};
+  const reference=levels[0],vertical=datumNetwork(inventory,buildingId,levels,reference,elevationCalibrations);
+  for(const p of levels){const xy=metricAlignment(reference,p,inventory,images),z=vertical.byLevel[p.sourceLevel]||{status:'unresolved',reason:vertical.reason||'LEVEL_VERTICAL_DATUM_REQUIRED'},ok=xy.status==='proposed'&&z.status==='proposed';byLevel[p.levelId]={status:ok?'proposed':xy.status==='conflict'||z.status==='conflict'?'conflict':'unresolved',sourceLevel:p.sourceLevel,xy,z,...(ok?{alignment:copy(xy.alignment),base:copy(z.base)}:{}),issues:[xy.reason,z.reason].filter(Boolean),confirmationRequired:true};}
+  return {version:1,status:Object.values(byLevel).every(v=>v.status==='proposed')?'proposed':Object.values(byLevel).some(v=>v.status==='proposed')?'partial':'unresolved',buildingId,referenceLevelId:reference.levelId,byLevel,vertical,confirmationRequired:true,notAGeometryConfirmation:true};
+ }
+
+ return Object.freeze({version:1,bubbleRegions,markers,alignViews,forBuilding,metricAlignment,datumNetwork,registerPreparedLevels});
 });

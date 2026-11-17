@@ -262,3 +262,89 @@ PDF conversion, complete exterior quantities, or release readiness for all
 clients. The existing client finish/reopen contracts must be rerun in synthetic
 browser CI on the exact integrated revision; an original browser acceptance
 run remains a separate missing proof.
+
+## Fresh browser baseline at `683563c`
+
+On 2026-11-17, the seven originals were imported through the real PDF form in
+fresh Chromium contexts against frozen application revision
+`683563c874bd60a00e4389ec7318eb3994ede92a`. All 392 served application asset
+hashes matched that exact commit in each completed run. The C1–C7 aliases below
+belong to this new private manifest; historical D01–D07 observations above are
+retained as separate checkpoints.
+
+This pass exercised the import-triggered conversion, including targeted local
+OCR, without injecting a contour, calibration, height, orientation, opening or
+model. All seven imports finished: **48 pages and 46 views**. The outcome was
+**zero certified complete buildings, one partial model and six empty scenes**.
+The strict recipe still required a model and the finish/reopen workflow for
+every case; the six unresolved cases failed those requirements.
+
+| Private case | Pages / views | Associated source levels | Walls / openings / roofs | Outcome / blocking observations | Total seconds |
+| --- | --- | --- | --- | --- | ---: |
+| C1 | 5 / 5 | Ground | 0 / 0 / 0 | `BOUNDARY_SOURCE_SUPPORT` | 69.795 |
+| C2 | 5 / 5 | Ground | 0 / 0 / 0 | `BOUNDARY_SOURCE_SUPPORT` | 79.812 |
+| C3 | 5 / 5 | Upper; lower facade/volume observations remain separate proposals | 15 / 14 / 2 | Partial proposal; main roof height conflict, masonry/foundation/occluded details unresolved | 116.875 |
+| C4 | 5 / 5 | Upper only | 0 / 0 / 0 | `SCALE_TRANSCRIPTION_UNCERTAIN`; no ground floor implicitly confirmed | 80.295 |
+| C5 | 5 / 5 | Ground only | 0 / 0 / 0 | `BOUNDARY_SOURCE_SUPPORT`; no upper floor invented | 84.894 |
+| C6 | 6 / 10 | House ground; secondary floor view remains unassigned | 0 / 0 / 0 | Explicit house selection: `HEIGHT_UNKNOWN` | 91.034 |
+| C7 | 17 / 11 | Numbered levels 0, 1, 2, 3 | 0 / 0 / 0 | Wall support, boundary complexity/support, reference conflict and level alignment unresolved | 475.887 |
+
+C3 completed four actual rendered 3D angles, selection of a reconstructed wall,
+a different material, confirmation and reload. Geometry, stable IDs, source
+inventory, conversion report, original stored PDF bytes and finish assignment
+were unchanged after reload. Its clean elevation contained no source raster.
+The four captures were opened and inspected: the main roof is absent and the
+upper envelope is open. The two produced roofs do not establish a complete
+roof system, and this successful partial-model workflow is not a fidelity pass.
+
+C6 also received a separate fresh import with an explicit secondary-building
+selection (95.831 seconds). All ten views remained available; its five views on
+the first page retained their 270-degree orientation and distinct building.
+One is classified as a floor view but has no assigned level. The pipeline
+returned `FLOOR_SOURCE_REQUIRED` with an empty scene; this is an association
+failure, not evidence that the source document contains no floor drawing.
+
+C7 did not generate any walls, including the two requested exterior walls under
+the roof. No presence, polygonization, roof-intersection or material-persistence
+success is claimed for those walls. Level-alignment and source checks remained
+enabled throughout this baseline.
+
+The completed runs recorded no page exception, failed application request or
+external request. OCR warnings are retained privately. Sampled JavaScript heaps
+were approximately 13–31 MB after import and 30–66 MB after conversion; C3 was
+113 MB after reload. These are samples, not peak or total process-memory claims.
+Times include local processing and may be affected by concurrent test work.
+
+### Recipe corrections and evidence limits
+
+The initial recipe could accept an asynchronous false terminal observation as
+truthy with the installed Playwright polling implementation. A minimal browser
+reproducer confirmed this before repair. Explicit bounded Node-side polling
+now awaits the actual observation, including after reload. Tests cover false
+observations, a deadline, rejected reads and never-resolving reads. Strict deep
+comparisons now report concise hashes on failure instead of constructing huge
+source-raster assertion diffs; their equality semantics are unchanged.
+
+Premature initial failures, a later exit-137 memory interruption during C3's
+reload, and one deliberately interrupted import remain in private evidence.
+They are not classified as completed engine refusals. C3's successful result
+above comes from a new original import with the repaired recipe.
+
+Original screenshots and reports remain private. This baseline used Chromium
+at 1440×1000 in FR-CA; it is not a physical phone, tablet or Samsung test, and
+does not establish original-source FR/EN responsive acceptance. Synthetic
+browser checks and later exact-head CI must be reported separately. Subsequent
+recipe runs additionally require FR-CA/EN-CA at 390×844, 834×1112 and 1440×1000
+with unchanged geometry/finishes and no horizontal overflow; those new checks
+must not be retroactively attributed to this baseline.
+
+A subsequent fresh C3 import against the same frozen `683563c` application
+exercised those six language/viewport combinations after finish confirmation
+and reload. It passed the stricter recipe in 112.343 seconds with the same
+15-wall, 14-opening, two-roof partial model. All six combinations preserved the
+model and inventory, rendered nonempty geometry and had no horizontal overflow.
+Private screenshots from each combination were opened and inspected; the main
+roof remains absent in every view. This establishes responsive handling of
+that partial proposal in Chromium, not source fidelity or physical-device
+acceptance. The other six original dossiers have no equivalent model workflow
+because their baseline scenes are empty.

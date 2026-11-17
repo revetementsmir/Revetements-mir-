@@ -81,7 +81,9 @@
           level.geometryRevision=(old?.geometryRevision||0)+1;if(index<0)inventory.levels.push(level);else inventory.levels[index]=level;
         }
         const allWalls=next.levels.flatMap(l=>MIRLevelModel.wallsFor(l,inventory,{includeProposed:true}));if(MIRLevelModel.openingIssues(next.levels.flatMap(l=>l.wallOpenings||[]),allWalls).length)throw Error('Une ouverture est affectée à plusieurs surfaces.');
-        entry.planData.automaticReconstruction||={};entry.planData.automaticReconstruction[buildingId]={version:1,status:next.status,reports:next.reports,at:new Date().toISOString(),complete:false};
+        const retries=next.localReadingRetries||[];
+        if(!Array.isArray(retries)||retries.some(r=>!inventory.views.some(v=>v.id===r.sourceViewId&&v.buildingId===buildingId)||r.box?.length!==4||!r.box.every(Number.isFinite)))throw Error('Sources de lecture invalides.');
+        entry.planData.automaticReconstruction||={};entry.planData.automaticReconstruction[buildingId]={version:1,status:next.status,reports:next.reports,localReadingRetries:retries,at:new Date().toISOString(),complete:false};
         delete entry.planData.reconstructionRequest;inventory.geometryVersion=1;inventory.levelStudio||={};
         const first=next.levels.find(l=>l.contours?.length)||next.levels[0];if(first)inventory.levelStudio[buildingId]={activeLevelId:first.id};
         // Sources, manual edits, finishes and every other building/project stay

@@ -60,11 +60,11 @@
     }
     return labels;
   }
-  function inkMask(image) {
+  function inkMask(image, { threshold = 185, saturation = 75 } = {}) {
     const { width: w, height: h, data } = image, mask = new Uint8Array(w * h), channels = data.length === w * h ? 1 : 4;
     for (let i = 0; i < mask.length; i++) {
       if (channels === 1) mask[i] = data[i] < 145 ? 1 : 0;
-      else { const p = i * 4, max = Math.max(data[p], data[p + 1], data[p + 2]), min = Math.min(data[p], data[p + 1], data[p + 2]); mask[i] = data[p + 3] > 160 && max < 185 && max - min < 75 ? 1 : 0; }
+      else { const p = i * 4, max = Math.max(data[p], data[p + 1], data[p + 2]), min = Math.min(data[p], data[p + 1], data[p + 2]); mask[i] = data[p + 3] > 160 && max < threshold && max - min < saturation ? 1 : 0; }
     }
     return { data: mask, width: w, height: h };
   }
@@ -177,7 +177,7 @@
     return groups.length === 1 ? { candidate: candidates.sort((a, b) => b.score - a.score)[0], ambiguous: false } : { candidate: null, ambiguous: true };
   }
   function matchDimensionLines(image, labels, options = {}) {
-    const mask = inkMask(image), results = [], seen = new Set();
+    const mask = inkMask(image, options.lightConstructionLines ? { threshold: 235, saturation: 30 } : {}), results = [], seen = new Set();
     const sameReading = (a, b) => {
       if (Math.abs(a.referenceFt - b.referenceFt) > 1e-9 || a.axis !== b.axis) return false;
       if (![b.anchors, b.anchors.slice().reverse()].some(points => a.anchors.every((p, i) => Math.hypot(p[0] - points[i][0], p[1] - points[i][1]) <= 2))) return false;
@@ -215,7 +215,11 @@
           const distanceScore = 1 - clamp(verticalGap / (fh * 3), 0, 1);
           const centeringScore = 1 - centered / .2;
           const score = .5 * centeringScore + .3 * distanceScore + .2 * run.density;
-          if (!best || score > best.score) best = { text: dim.text, normalized: dim.normalized, referenceFt: dim.valueFt, anchors: [[a, y], [b, y]], spanPx: span, feetPerPixel: dim.valueFt / span, score, confidence: label.confidence ?? 100, source: label.source || 'ocr', textBox: label.box.slice(), corrected: dim.corrected, axis: options.axis || 'x' };
+          if (!best || score > best.score) {
+            const candidate = { text: dim.text, normalized: dim.normalized, referenceFt: dim.valueFt, anchors: [[a, y], [b, y]], spanPx: span, feetPerPixel: dim.valueFt / span, score, confidence: label.confidence ?? 100, source: label.source || 'ocr', textBox: label.box.slice(), corrected: dim.corrected, axis: options.axis || 'x' };
+            const evidence = options.requireDimensionMarks ? dimensionLineEvidence(image, candidate, { labels, allowCrossedTerminals: !!options.allowCrossedTerminals }) : null;
+            if (!evidence || evidence.status === 'observed') best = evidence ? { ...candidate, lineEvidence: evidence } : candidate;
+          }
         }
       }
       // Opt-in only: the import path keeps its existing line association.
@@ -228,6 +232,7 @@
         if (interrupted.ambiguous || mixedAmbiguity) best = null;
         else if (c) best = { text: dim.text, normalized: dim.normalized, referenceFt: dim.valueFt, ...c, feetPerPixel: dim.valueFt / c.spanPx, confidence: label.confidence ?? 100, source: label.source || 'ocr', textBox: label.box.slice(), corrected: dim.corrected, axis: options.axis || 'x' };
       }
+      if (best && options.requireDimensionMarks) { const evidence = dimensionLineEvidence(image, best, { labels, allowCrossedTerminals: !!options.allowCrossedTerminals }); best = evidence.status === 'observed' ? { ...best, lineEvidence: evidence } : null; }
       if (best && best.feetPerPixel >= .00005 && best.feetPerPixel <= 10) {
         if (options.preferReliableReadings) {
           // A retry of this same inscription may improve its reading. Keep
@@ -244,6 +249,90 @@
       }
     }
     return results.sort((a, b) => b.score - a.score);
+  }
+  function dimensionLineEvidence(image, dimension, { labels = [], allowCrossedTerminals = false } = {}) {
+    // A parsed number near a wall is not yet a measured span. This stricter
+    // assessment is opt-in for automatic calibration; raw OCR candidates and
+    // the legacy dimension reader remain available for review.
+    const anchors = dimension?.anchors, box = dimension?.textBox;
+    const unresolved = (reason, evidence = {}) => ({ status: 'unresolved', reason, ...evidence });
+    if (!image?.data || anchors?.length !== 2 || !anchors.every(p => p?.length === 2 && p.every(finite)) || box?.length !== 4 || !box.every(finite)) return unresolved('DIMENSION_SOURCE_REQUIRED');
+    const axis = Math.abs(anchors[0][1] - anchors[1][1]) <= 2 ? 0 : Math.abs(anchors[0][0] - anchors[1][0]) <= 2 ? 1 : null;
+    if (axis === null) return unresolved('DIMENSION_AXIS_UNRESOLVED');
+    const across = 1 - axis, coordinate = (anchors[0][across] + anchors[1][across]) / 2, span = anchors.map(p => p[axis]).sort((a, b) => a - b), font = Math.max(8, box[across + 2] - box[across]), caption = [box[axis], box[axis + 2]], extent = [box[across], box[across + 2]];
+    if (span[1] - span[0] < 20 || caption[0] < span[0] - font || caption[1] > span[1] + font) return unresolved('DIMENSION_CAPTION_ASSOCIATION');
+    const point = (u, v) => axis === 0 ? [u, v] : [v, u];
+    const sample = (u, v, strong = false) => {
+      const [x, y] = point(Math.round(u), Math.round(v));
+      if (x < 0 || y < 0 || x >= image.width || y >= image.height) return 0;
+      if (image.data.length === image.width * image.height) return Number(image.data[y * image.width + x] < 145);
+      const i = (y * image.width + x) * 4, hi = Math.max(...image.data.subarray(i, i + 3)), lo = Math.min(...image.data.subarray(i, i + 3));
+      return Number(image.data[i + 3] > 160 && hi < (strong ? 185 : 235) && hi - lo < (strong ? 75 : 30));
+    };
+    // Joined opening labels, schedule cells and fire-rating text cannot lend
+    // their individual number tokens to an adjacent construction/wall line.
+    const covers = row => row.box?.length === 4 && row.box.every(finite) && box[0] >= row.box[0] - 1 && box[1] >= row.box[1] - 1 && box[2] <= row.box[2] + 1 && box[3] <= row.box[3] + 1;
+    const context = labels.filter(covers).map(row => String(row.text || ''));
+    const lineContext = labels.filter(row => row.box?.length === 4 && row.box.every(finite) && Math.abs((row.box[1] + row.box[3] - box[1] - box[3]) / 2) <= font * .7 && Math.max(0, row.box[0] - box[2], box[0] - row.box[2]) < font * 4).map(row => String(row.text || ''));
+    if (context.some(text => /(?:\d[\d\s'".,/−-]*(?:mm|cm|m|ft|in|po|pi)?\s*[x×]\s*[\d\s'".,/−-]*\d|\b(?:notes?|tableau|schedule|index)\b)/i.test(text)) || lineContext.some(text => /\b\d+\s*min(?:utes?)?\b/i.test(text))) return unresolved('DIMENSION_ANNOTATION_CONTEXT');
+    if (image.data.length !== image.width * image.height) {
+      let neutral = 0, coloured = 0;
+      for (let y = Math.max(0, Math.ceil(box[1])); y < Math.min(image.height, box[3]); y++) for (let x = Math.max(0, Math.ceil(box[0])); x < Math.min(image.width, box[2]); x++) {
+        const i = (y * image.width + x) * 4, r = image.data[i], g = image.data[i + 1], b = image.data[i + 2], hi = Math.max(r, g, b), lo = Math.min(r, g, b);
+        if (hi < 185 && hi - lo < 75) neutral++;
+        if ((r + g + b) / 3 < 180 && hi - lo > 100) coloured++;
+      }
+      if (coloured >= 4 && coloured > neutral * 2) return unresolved('DIMENSION_COLOURED_ANNOTATION');
+    }
+    const textOnLine = coordinate >= extent[0] - 1 && coordinate <= extent[1] + 1;
+    const gap = textOnLine ? [Math.floor(caption[0] - 1), Math.ceil(caption[1] + 1)] : null;
+    let hits = 0, count = 0, misses = 0, maxGap = 0;
+    for (let u = Math.ceil(span[0]); u <= Math.floor(span[1]); u++) {
+      if (gap && u >= gap[0] && u <= gap[1]) { misses = 0; continue; }
+      const hit = sample(u, coordinate - 1) || sample(u, coordinate) || sample(u, coordinate + 1); count++;
+      if (hit) { hits++; misses = 0; } else maxGap = Math.max(maxGap, ++misses);
+    }
+    const pixelSupport = hits / (count || 1), markers = [], radius = Math.max(4, Math.min(6, Math.round(font * .4))), reach = Math.ceil(font * 3);
+    for (const endpoint of anchors) {
+      const u = endpoint[axis], v = endpoint[across], witnesses = [];
+      for (const sign of [-1, 1]) {
+        let last = radius, missing = 0;
+        for (let d = radius + 1; d <= reach; d++) {
+          if (sample(u - 1, v + sign * d) || sample(u, v + sign * d) || sample(u + 1, v + sign * d)) { last = d; missing = 0; } else if (++missing > 1) break;
+        }
+        if (last - radius >= Math.max(6, Math.ceil(font * .6))) witnesses.push([endpoint.slice(), point(u, v + sign * last)]);
+      }
+      let diagonal = false;
+      for (const direction of [-1, 1]) {
+        const direct = [0, 0], free = [0, 0];
+        for (let d = 2; d <= 6; d++) for (const sign of [-1, 1]) {
+          const x = u + direction * sign * d, y = v + sign * d;
+          if (!sample(x, y, true)) continue;
+          const k = sign < 0 ? 0 : 1; direct[k]++;
+          if (!(sample(x, v - reach, true) && sample(x, v + reach, true))) free[k]++;
+        }
+        if (Math.min(...direct) >= 2 && Math.min(...free) >= 1) diagonal = true;
+      }
+      markers.push({ point: endpoint.slice(), kind: diagonal ? 'diagonal-tick' : 'unresolved-end-mark', witnesses });
+    }
+    if (allowCrossedTerminals && markers.every(m => m.witnesses.length === 2)) {
+      // Some source dimensions terminate at plain crossed extension lines.
+      // Only the actual two ends of the observed run qualify: a pair of
+      // internal wall intersections cannot borrow the longer wall's line.
+      const ends = span.map((u, i) => {
+        const direction = i ? 1 : -1, limit = Math.ceil(font * 1.5); let last = 0, missing = 0;
+        for (let d = 1; d <= limit; d++) {
+          const at = u + direction * d;
+          if (sample(at, coordinate - 1) || sample(at, coordinate) || sample(at, coordinate + 1)) { last = d; missing = 0; } else if (++missing > 1) break;
+        }
+        return last;
+      });
+      if (ends.every(length => length <= Math.max(3, Math.ceil(font * .75)))) for (const marker of markers) if (marker.kind === 'unresolved-end-mark') { marker.kind = 'crossed-terminal-witnesses'; marker.terminalExtensions = ends.slice(); }
+    }
+    const evidence = { kind: 'dimension-line-with-end-marks-and-witnesses', axis: axis === 0 ? 'x' : 'y', anchors: anchors.map(p => p.slice()), captionBox: box.slice(), segments: gap ? [[point(span[0], coordinate), point(gap[0], coordinate)], [point(gap[1], coordinate), point(span[1], coordinate)]] : [anchors.map(p => p.slice())], gap: gap?.map(u => point(u, coordinate)) || null, pixelSupport, maxGap, markers };
+    if (pixelSupport < .85 || maxGap > 4 || count < 12) return unresolved('DIMENSION_LINE_SUPPORT', evidence);
+    if (markers.some(m => !['diagonal-tick', 'crossed-terminal-witnesses'].includes(m.kind) || !m.witnesses.length)) return unresolved('DIMENSION_END_MARKS_REQUIRED', evidence);
+    return { status: 'observed', ...evidence, confirmationRequired: true };
   }
   function resolveScale(candidates) {
     const geometric = candidates.filter(c => c.score >= .61 && c.spanPx >= 60 && c.referenceFt > 0 && finite(c.feetPerPixel));
@@ -320,5 +409,5 @@
     }
     return components.sort((a, b) => b.areaPx - a.areaPx).slice(0, 24);
   }
-  return { parseDimension, wordsToLabels, inkMask, matchDimensionLines, resolveScale, unrotateCandidate, proposeColoredZones, bbox, area, median };
+  return { parseDimension, wordsToLabels, inkMask, matchDimensionLines, dimensionLineEvidence, resolveScale, unrotateCandidate, proposeColoredZones, bbox, area, median };
 });

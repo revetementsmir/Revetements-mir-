@@ -1,5 +1,5 @@
 'use strict';
-const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{isDeepStrictEqual}=require('node:util'),crypto=require('node:crypto');
 
 const TERMINAL_STATUSES=['partial-proposal','unresolved','preserved','cancelled'];
 const DEFAULT_EXPECTED={statuses:['partial-proposal'],requireModel:true,requireWorkflow:true};
@@ -66,7 +66,7 @@ function evaluateProof(proof,expected){
   const steps=proof.steps||{},modelPresent=(proof.model?.walls?.length||0)>0;
   const errors=proof.errors||{};
   const infrastructureOK=!proof.failure&&['page','requests','http','requestFailed','server'].every(key=>!(errors[key]||[]).length);
-  const workflowVerified=!!(infrastructureOK&&steps.import&&steps.conversion&&modelPresent&&steps.render3d&&steps.finish&&steps.reopen);
+  const workflowVerified=!!(infrastructureOK&&steps.import&&steps.conversion&&modelPresent&&steps.render3d&&steps.finish&&steps.reopen&&steps.responsive);
   const violations=[];
   if(!infrastructureOK)violations.push('RUNTIME_OR_HARNESS_FAILURE');
   if(!expected.statuses.includes(proof.reconstructionStatus))violations.push('UNEXPECTED_RECONSTRUCTION_STATUS');
@@ -92,4 +92,34 @@ function unrelatedWallFinishes(inventory,selectedWallId){
 }
 function privateJSON(value){return JSON.stringify(value,(key,entry)=>['sourceImage','sourceImageDataUrl'].includes(key)?undefined:entry,2);}
 
-module.exports={TERMINAL_STATUSES,DEFAULT_EXPECTED,canonicalPath,within,outsideRepositories,parseArgs,evaluateProof,withoutFinish,levelGeometry,unrelatedWallFinishes,privateJSON};
+function assertDeepEqual(actual,expected,message='Stored values changed.'){
+  // Keep the same strict equality semantics without Node formatting enormous
+  // raster strings into a character-by-character assertion diff on failure.
+  if(isDeepStrictEqual(actual,expected))return;
+  const digest=value=>crypto.createHash('sha256').update(JSON.stringify(value)??String(value)).digest('hex');
+  assert.fail(message+' Actual SHA-256: '+digest(actual)+'; expected SHA-256: '+digest(expected)+'.');
+}
+
+async function waitForAsync(check,{timeoutMs,intervalMs=100,now=Date.now,pause=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}){
+  assert.ok(Number.isFinite(timeoutMs)&&timeoutMs>0,'An explicit positive timeout is required.');
+  const deadline=now()+timeoutMs;
+  // Browser waitForFunction polling treats the returned Promise as truthy in
+  // some Playwright versions. Await the IndexedDB observation in Node before
+  // accepting it; an unresolved or false observation is never completion.
+  while(true){
+    let timer;
+    const timeout=()=>Error('Timed out waiting for asynchronous terminal observation.');
+    try{
+      const observation=await Promise.race([
+        Promise.resolve().then(check),
+        new Promise((resolve,reject)=>{timer=setTimeout(()=>reject(timeout()),Math.max(0,deadline-now()));})
+      ]);
+      if(observation)return;
+    }finally{clearTimeout(timer);}
+    const remaining=deadline-now();
+    if(remaining<=0)throw timeout();
+    await pause(Math.min(intervalMs,remaining));
+  }
+}
+
+module.exports={TERMINAL_STATUSES,DEFAULT_EXPECTED,canonicalPath,within,outsideRepositories,parseArgs,evaluateProof,withoutFinish,levelGeometry,unrelatedWallFinishes,privateJSON,waitForAsync,assertDeepEqual};

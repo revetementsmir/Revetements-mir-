@@ -92,7 +92,7 @@ async function verify3D(page,proof,caseOut,action){
     },{angle,previous},{timeout:90000});
     const rendering=await page.evaluate(()=>MIR_RENDER_DIAGNOSTICS);
     assert.equal(rendering.levelModelVersion,1,'3D must render the reconstructed level model.');
-    assert.deepEqual(rendering.errors||[],[],'3D texture/render errors.');
+    H.assertDeepEqual(rendering.errors||[],[],'3D texture/render errors.');
     assert.ok(rendering.wallParts?.length,'3D has no model wall geometry.');
     const hits=rendering.hitSurfaces.filter(surface=>wallIds.has(surface.surfaceId));actualWallHits+=hits.length;
     for(const hit of hits)assert.ok(hit.screenPolygon.length>=3&&hit.screenPolygon.every(point=>point.every(Number.isFinite)),'Invalid 3D hit polygon.');
@@ -118,35 +118,64 @@ async function verifyFinishAndReopen(page,proof,caseOut,action,memory){
   action('finish','select material',{wallId:selected,materialId});await page.locator('#mir-wall-material').selectOption(materialId);
   await page.waitForFunction(()=>MIR_LEVEL_STUDIO.pending());
   const previewStored=await readSnapshot(page);
-  assert.deepEqual(previewStored.inventory,before.inventory,'Preview must not persist any source or geometry changes.');
+  H.assertDeepEqual(previewStored.inventory,before.inventory,'Preview must not persist any source or geometry changes.');
   action('finish','confirm finish',{wallId:selected,materialId});await page.locator('#mir-level-confirm').click();
   await page.waitForFunction(()=>!MIR_LEVEL_STUDIO.pending(),null,{timeout:90000});
   const after=await readSnapshot(page);
   assert.equal(after.id,before.id);assert.equal(after.buildingId,before.buildingId);
   assert.equal(after.model.walls.find(w=>w.id===selected)?.finish?.materialId,materialId,'Saved finish differs from the selected material.');
-  assert.deepEqual(H.withoutFinish(after.model),H.withoutFinish(before.model),'Choosing a finish changed the model geometry or its confirmation status.');
-  assert.deepEqual(H.levelGeometry(after.inventory),H.levelGeometry(before.inventory),'Choosing a finish changed source geometry or non-wall finishes.');
-  assert.deepEqual(H.unrelatedWallFinishes(after.inventory,selected),H.unrelatedWallFinishes(before.inventory,selected),'Another wall finish changed.');
-  assert.deepEqual(after.inventory.views,before.inventory.views,'Source observations changed while saving a finish.');
+  H.assertDeepEqual(H.withoutFinish(after.model),H.withoutFinish(before.model),'Choosing a finish changed the model geometry or its confirmation status.');
+  H.assertDeepEqual(H.levelGeometry(after.inventory),H.levelGeometry(before.inventory),'Choosing a finish changed source geometry or non-wall finishes.');
+  H.assertDeepEqual(H.unrelatedWallFinishes(after.inventory,selected),H.unrelatedWallFinishes(before.inventory,selected),'Another wall finish changed.');
+  H.assertDeepEqual(after.inventory.views,before.inventory.views,'Source observations changed while saving a finish.');
   proof.finish={wallId:selected,materialId,exactAssignment:true,unrelatedSurfacesUnchanged:true,geometryAndStatusUnchanged:true};
   proof.steps.finish=true;await page.screenshot({path:path.join(caseOut,'finish-saved.png')});
   action('navigation','reload project');await page.reload();
-  await page.waitForFunction(async id=>window.MIR_LEVEL_STUDIO&&window.MIRProjectStore&&(await MIRProjectStore.getActive())?.id===id,after.id,{timeout:90000});
+  await H.waitForAsync(()=>page.evaluate(async id=>window.MIR_LEVEL_STUDIO&&window.MIRProjectStore&&(await MIRProjectStore.getActive())?.id===id,after.id),{timeoutMs:90000});
   const reopened=await readSnapshot(page,{hashSource:true});
   assert.equal(reopened.id,after.id);assert.equal(reopened.buildingId,after.buildingId);
   assert.equal(reopened.source.sourceFileSha,proof.source.sha256);assert.equal(reopened.source.bytes,proof.source.bytes);
-  assert.deepEqual(reopened.model,after.model,'Geometry, surface IDs, statuses or finishes changed after reopening.');
-  assert.deepEqual(reopened.inventory,after.inventory,'Stored source inventory changed after reopening.');
-  assert.deepEqual(reopened.report,after.report,'Reopening unexpectedly reran or replaced the conversion.');
+  H.assertDeepEqual(reopened.model,after.model,'Geometry, surface IDs, statuses or finishes changed after reopening.');
+  H.assertDeepEqual(reopened.inventory,after.inventory,'Stored source inventory changed after reopening.');
+  H.assertDeepEqual(reopened.report,after.report,'Reopening unexpectedly reran or replaced the conversion.');
   assert.equal(reopened.request,null);
   proof.reopened={id:reopened.id,buildingId:reopened.buildingId,sameGeometryAndFinishes:true,sourceFileSha:reopened.source.sourceFileSha};
   proof.steps.reopen=true;await memory('reopened');await page.screenshot({path:path.join(caseOut,'project-reopened.png')});
 }
+async function verifyResponsive(page,proof,caseOut,action){
+  const before=await readSnapshot(page);assert.ok(before.model.walls.length,'Responsive proof requires reconstructed walls.');
+  proof.responsive={status:'running',realDevices:false,browser:'Chromium viewport emulation',captures:[]};
+  action('view','open 3D for responsive checks');await page.locator('#view-3d').click();
+  for(const locale of ['fr-CA','en-CA']){
+    action('view','change interface language',{locale});await page.evaluate(value=>MIRClientLocale.setLocale(value),locale);
+    assert.equal(await page.evaluate(()=>MIRClientLocale.getLocale()),locale,'Requested interface locale was not applied.');
+    await page.waitForFunction(expected=>document.querySelector('#mir-level-wall-controls')?.textContent.includes(expected),locale==='en-CA'?'Wall finish':'Finition du mur');
+    for(const [width,height]of [[390,844],[834,1112],[1440,1000]]){
+      action('view','resize browser viewport',{locale,width,height});await page.setViewportSize({width,height});
+      await page.locator('#three-canvas').scrollIntoViewIfNeeded();
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      const layout=await page.evaluate(()=>({width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,canvasWidth:document.querySelector('#three-canvas').getBoundingClientRect().width,rendered:!!MIR_RENDER_DIAGNOSTICS?.rendered,wallParts:MIR_RENDER_DIAGNOSTICS?.wallParts?.length||0,modelVersion:MIR_RENDER_DIAGNOSTICS?.levelModelVersion}));
+      assert.ok(layout.scrollWidth<=width+1,'Horizontal overflow in '+locale+' at '+width+'px.');
+      assert.ok(layout.canvasWidth>0&&layout.canvasWidth<=width+1&&layout.rendered&&layout.wallParts>0,'Reconstructed 3D model is not visible at '+width+'px.');
+      assert.equal(layout.modelVersion,1);
+      const current=await readSnapshot(page);assert.equal(current.id,before.id);assert.ok(current.model.walls.length);
+      H.assertDeepEqual(current.model,before.model,'Responsive layout or language changed model geometry or finishes.');
+      H.assertDeepEqual(current.inventory,before.inventory,'Responsive layout or language changed saved source inventory.');
+      const stem='responsive-'+locale+'-'+width;
+      const viewport=await page.screenshot({path:path.join(caseOut,stem+'-viewport.png')});
+      const model=await page.locator('#three-canvas').screenshot({path:path.join(caseOut,stem+'-model.png')});
+      proof.responsive.captures.push({locale,width,height,layout,sameModelAndFinishes:true,viewportSha256:hash(viewport),modelSha256:hash(model)});
+    }
+  }
+  proof.responsive.status='verified';proof.steps.responsive=true;
+  await page.evaluate(()=>MIRClientLocale.setLocale('fr-CA'));await page.setViewportSize({width:1440,height:1000});
+}
+
 async function runCase(browser,base,item,config,app){
   const caseOut=path.join(config.out,item.caseId);fs.mkdirSync(caseOut,{mode:0o700});
   const started=Date.now(),serverErrorStart=app.errors.length;
   const proof={schemaVersion:1,caseId:item.caseId,sourceKind:item.sourceKind,expected:item.expected,sourceRevision:app.sourceRevision,startedAt:new Date().toISOString(),
-    steps:{import:false,conversion:false,render3d:false,finish:false,reopen:false},reconstructionStatus:'not-run',workflowVerified:false,
+    steps:{import:false,conversion:false,render3d:false,finish:false,reopen:false,responsive:false},responsive:{status:'not-run',realDevices:false,reason:'Requires a nonempty reconstructed model and completed save/reopen workflow.'},reconstructionStatus:'not-run',workflowVerified:false,
     autonomy:{status:'not-demonstrated',freshBrowserContext:true,harnessGeometryEdits:0,scope:'This execution only; does not establish generalization or source-code independence.'},
     fidelity:{status:'unverified',reason:'No independent geometric reference or tolerance evaluation is performed by this runner.'},
     actions:[],errors:{page:[],requests:[],http:[],requestFailed:[],server:[],console:[]},jsHeapSamples:[]};
@@ -167,7 +196,7 @@ async function runCase(browser,base,item,config,app){
   try{
     const bytes=fs.readFileSync(item.path);proof.source={sha256:hash(bytes),bytes:bytes.length};assert.equal(proof.source.sha256,item.sha256,'Original SHA-256 differs from private manifest.');
     await page.goto(base+'/plan.html');await page.waitForFunction(()=>window.MIR_STUDY&&window.MIRProjectStore,null,{timeout:90000});
-    assert.deepEqual(await page.evaluate(()=>MIRProjectStore.list()),[],'Browser context already contains projects.');
+    H.assertDeepEqual(await page.evaluate(()=>MIRProjectStore.list()),[],'Browser context already contains projects.');
     assert.equal(await page.evaluate(()=>MIRProjectStore.activeId()),null,'A previous model is active before import.');
     action('input','select original PDF');await page.locator('#import-pdf').click();await page.locator('#mir-pdf-file').setInputFiles(item.path);
     await page.waitForFunction(()=>{
@@ -195,12 +224,12 @@ async function runCase(browser,base,item,config,app){
       assert.ok(opened.source.pages>0&&opened.inventory.views.length>0,'The imported PDF has no pages or views.');
       if(proof.selectedBuildingId)assert.equal(opened.buildingId,proof.selectedBuildingId);
       proof.imported={id:opened.id,buildingId:opened.buildingId,source:opened.source,views:opened.inventory.views.length};proof.steps.import=true;
-      await page.waitForFunction(async statuses=>{
+      await H.waitForAsync(()=>page.evaluate(async statuses=>{
         if(!window.MIR_LEVEL_STUDIO||!window.MIRProjectStore)return false;
         const e=await MIRProjectStore.getActive(),buildingId=e?.planData.viewInventory?.activeBuildingId;
         const report=e?.planData.automaticReconstruction?.[buildingId],button=document.querySelector('#mir-level-convert');
         return statuses.includes(report?.status)&&!e.planData.reconstructionRequest&&button&&!button.disabled&&!document.querySelector('#mir-level-stop-conversion')&&!MIR_LEVEL_STUDIO.pending();
-      },H.TERMINAL_STATUSES,{timeout:config.timeoutMs});
+      },H.TERMINAL_STATUSES),{timeoutMs:config.timeoutMs});
       const imported=await readSnapshot(page);assert.ok(imported);
       assert.equal(imported.id,opened.id);assert.equal(imported.buildingId,opened.buildingId);assert.equal(imported.source.sha256,item.sha256);
       proof.steps.conversion=true;proof.reconstructionStatus=imported.report.status;
@@ -220,6 +249,7 @@ async function runCase(browser,base,item,config,app){
         }
         await verify3D(page,proof,caseOut,action);
         await verifyFinishAndReopen(page,proof,caseOut,action,memory);
+        await verifyResponsive(page,proof,caseOut,action);
       }
     }
   }catch(error){

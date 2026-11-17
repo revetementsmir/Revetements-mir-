@@ -41,12 +41,39 @@
  }
  function consolidateAxes(points,tolerance){for(const axis of [0,1]){const ordered=points.map((p,i)=>({value:p[axis],i,weight:Math.abs(points[(i+points.length-1)%points.length][1-axis]-p[1-axis])+Math.abs(points[(i+1)%points.length][1-axis]-p[1-axis])})).sort((a,b)=>a.value-b.value),groups=[];for(const item of ordered){if(!groups.length||item.value-groups.at(-1).at(-1).value>tolerance)groups.push([item]);else groups.at(-1).push(item);}for(const group of groups){const chosen=group.reduce((a,b)=>b.weight>a.weight?b:a);for(const item of group)points[item.i][axis]=chosen.value;}}return removeStraight(points);}
  function monochrome(image){const out=new Uint8Array(image.width*image.height);for(let i=0;i<out.length;i++){const j=i*4,r=image.data[j],g=image.data[j+1],b=image.data[j+2];out[i]=Number(image.data[j+3]>100&&(r+g+b)<630&&Math.max(r,g,b)-Math.min(r,g,b)<45);}return out;}
+ // A missing boundary segment is explainable only when its own raster shows
+ // both jambs, the hinged leaf and a curved swing between them. Text, masks or
+ // a simple L shape cannot substitute for that independent source evidence.
+ function floorDoorEvidence(image,a,b,run,ink=monochrome(image)){
+ const {width:w,height:h}=image,k=Math.max(2,Math.round(w/525)),length=Math.hypot(b[0]-a[0],b[1]-a[1]),u=[(b[0]-a[0])/length,(b[1]-a[1])/length],inside=run.inside,tolerance=Math.max(1,Math.round(k/2));
+ const point=(n,v)=>[a[0]+u[0]*n+inside[0]*v,a[1]+u[1]*n+inside[1]*v];
+ const hit=(n,v,pad=tolerance)=>{const [cx,cy]=point(n,v);for(let dy=-pad;dy<=pad;dy++)for(let dx=-pad;dx<=pad;dx++){const x=Math.round(cx+dx),y=Math.round(cy+dy);if(x>=0&&x<w&&y>=0&&y<h&&ink[y*w+x])return true;}return false;};
+ const series=points=>{let hits=0,gap=0,maxGap=0;for(const p of points){if(hit(...p)){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:hits/points.length,maxGap};};
+ const line=(n0,v0,n1,v1)=>{const len=Math.hypot(n1-n0,v1-v0),points=Array.from({length:Math.max(2,Math.ceil(len)+1)},(_,i)=>[n0+(n1-n0)*i/(Math.ceil(len)),v0+(v1-v0)*i/Math.ceil(len)]);return series(points);};
+ const gapWidth=run.to-run.from,maxWidth=Math.min(w*.07,length*.2,Math.max(k*8,gapWidth*4)),search=Math.ceil(Math.min(maxWidth,gapWidth*2)),jambs=[];
+ for(let n=Math.floor(run.from-search);n<=Math.ceil(run.to+search);n++){if(n<k*3||n>length-k*3||n>run.from-tolerance&&n<run.to+tolerance)continue;for(let depth=k;depth<=k*6;depth++){const p=line(n,0,n,depth);if(p.support>=.85&&p.maxGap<=2)jambs.push({n,depth});}}
+ const candidates=[];
+ for(const left of jambs.filter(j=>j.n<=run.from))for(const right of jambs.filter(j=>j.n>=run.to)){
+  const radius=right.n-left.n,depth=left.depth;if(depth!==right.depth||radius<Math.max(k*4,gapWidth)||radius>maxWidth||depth>radius*.65)continue;
+  const leftWall=line(left.n-radius*.4,0,left.n-k,0),rightWall=line(right.n+k,0,right.n+radius*.4,0);if(leftWall.support<.9||rightWall.support<.9)continue;
+  for(const side of [1,-1]){const center=side===1?left.n:right.n,leaf=line(center,depth,center,depth+radius);if(leaf.support<.8||leaf.maxGap>k*2)continue;
+   const count=Math.ceil(Math.PI*radius/2),samples=Array.from({length:count+1},(_,i)=>[center+side*radius*Math.cos(i/count*Math.PI/2),depth+radius*Math.sin(i/count*Math.PI/2)]),arc=series(samples),middle=series(samples.slice(Math.floor(count/3),Math.ceil(count*2/3)));
+   if(arc.support<.82||arc.maxGap>k*2||middle.support<.85)continue;
+   candidates.push({from:left.n,to:right.n,depth,radius,side,score:arc.support+leaf.support+middle.support,arc,leaf,jambs:[left,right],sourcePoints:{hinge:point(center,depth),leafTip:point(center,depth+radius),oppositeJamb:point(center+side*radius,depth)},arcPoints:samples.filter((_,i)=>i%Math.max(1,Math.floor(count/8))===0).map(p=>point(...p)),leftWall,rightWall});
+  }
+ }
+ candidates.sort((a,b)=>b.score-a.score||a.arc.maxGap-b.arc.maxGap||a.radius-b.radius);const best=candidates[0];return best?{...best,kind:'observed-door-swing',method:'two-jambs-leaf-and-quarter-circle',coordinateSystem:'source-raster-pixels',status:'proposed',confirmationRequired:true,tolerancePx:tolerance,metricWidth:null,note:'The observed door gap explains missing wall ink; it does not establish a written width, height or confirmed opening.'}:null;
+}
  function floorBoundaryEvidence(image,points,ink=monochrome(image)){
-  const {width:w,height:h}=image,k=Math.max(2,Math.round(w/525));
-  return points.map((a,i)=>{const b=points[(i+1)%points.length],length=Math.hypot(b[0]-a[0],b[1]-a[1]),u=[(b[0]-a[0])/length,(b[1]-a[1])/length],diagonal=Math.abs(b[0]-a[0])>k&&Math.abs(b[1]-a[1])>k,pad=diagonal?Math.max(1,Math.round(k/2)):k;let hits=0,gap=0,maxGap=0;
-   for(let n=0;n<=length;n++){let hit=false;for(let d=-pad;d<=pad;d++){const x=Math.round(a[0]+u[0]*n-u[1]*d),y=Math.round(a[1]+u[1]*n+u[0]*d);if(x>=0&&x<w&&y>=0&&y<h)hit||=!!ink[y*w+x];}if(hit){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}
-   const support=hits/(Math.floor(length)+1),supported=length>0&&support>=(length<k*5?.65:.86)&&maxGap<=Math.max(4,k*2);
-   return {edgeIndex:i,anchors:[a.slice(),b.slice()],support,maxGap,tolerancePx:pad,status:supported?'proposed':'unresolved',method:'source-stroke-along-boundary'};
+  const {width:w,height:h}=image,k=Math.max(2,Math.round(w/525)),limit=Math.max(4,k*2),orientation=Math.sign(points.reduce((s,p,i)=>{const b=points[(i+1)%points.length];return s+p[0]*b[1]-b[0]*p[1];},0));
+  return points.map((a,i)=>{const b=points[(i+1)%points.length],length=Math.hypot(b[0]-a[0],b[1]-a[1]),u=[(b[0]-a[0])/length,(b[1]-a[1])/length],diagonal=Math.abs(b[0]-a[0])>k&&Math.abs(b[1]-a[1])>k,pad=diagonal?Math.max(1,Math.round(k/2)):k,samples=[],runs=[];let hits=0,gap=0,maxGap=0;
+   for(let n=0;n<=length;n++){let hit=false;for(let d=-pad;d<=pad;d++){const x=Math.round(a[0]+u[0]*n-u[1]*d),y=Math.round(a[1]+u[1]*n+u[0]*d);if(x>=0&&x<w&&y>=0&&y<h)hit||=!!ink[y*w+x];}samples.push(hit);if(hit){hits++;if(gap>limit)runs.push({from:n-gap,to:n-1});gap=0;}else maxGap=Math.max(maxGap,++gap);}
+   if(gap>limit)runs.push({from:samples.length-gap,to:samples.length-1});
+   const support=hits/(Math.floor(length)+1),enoughInk=length>0&&support>=(length<k*5?.65:.86),openingEvidence=[];
+   if(enoughInk&&!diagonal&&runs.length&&runs.length<=12)for(const run of runs){const evidence=floorDoorEvidence(image,a,b,{...run,inside:[-orientation*u[1],orientation*u[0]]},ink);if(evidence)openingEvidence.push({...evidence,edgeIndex:i,explainedRun:run});}
+   let unexplainedMaxGap=0,unexplainedGap=0;for(let n=0;n<samples.length;n++){if(samples[n]||openingEvidence.some(e=>n>=e.from&&n<=e.to))unexplainedGap=0;else unexplainedMaxGap=Math.max(unexplainedMaxGap,++unexplainedGap);}
+   const supported=enoughInk&&unexplainedMaxGap<=limit;
+   return {edgeIndex:i,anchors:[a.slice(),b.slice()],support,maxGap,tolerancePx:pad,status:supported?'proposed':'unresolved',method:openingEvidence.length?'source-strokes-and-observed-door-swing':'source-stroke-along-boundary',...(openingEvidence.length?{unexplainedMaxGap,openingEvidence}:{} )};
   });
  }
  function documentLabelsInside(rows,left,top,right,bottom){const labels=rows.filter(row=>Array.isArray(row.box)&&row.box.length===4&&(row.confidence??100)>=50&&row.box[0]>left&&row.box[1]>top&&row.box[2]<right&&row.box[3]<bottom).map(row=>String(row.text||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s*[:.]$/,''));return labels.some(text=>/^(?:legende|legend|notes?(?: generales?)?|general notes?|(?:door|window|finish) schedule|tableau(?: des? .+)?)$/i.test(text))||new Set(labels.filter(text=>/^(?:(?:nom|no\.?|numero) (?:du |de )?projet|project (?:name|number)|echelle|scale|date|dessine par|drawn by|revision)$/i.test(text))).size>=2;}
@@ -201,8 +228,11 @@
  // The historical detector is retained when its source spines are already
  // established. Thin or pale facades need additional independent evidence.
  function wallEnvelope(image,expectedWidth,options={}){
-  const original=solidWallEnvelope(image,expectedWidth,options);
-  return original.status==='proposed'?original:contrastWallEnvelope(image,expectedWidth,options);
+  const original=solidWallEnvelope(image,expectedWidth,options),rows=options.rows||[],panels=legendBoxes(image,rows.map(row=>/^(?:notes? (?:generales?|general)|general notes?|index|sommaire|table of contents|cartouche|title block)\s*[:.]?$/i.test(String(row.text).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim())?{...row,text:'LEGEND'}:row),{minimumWidthRatio:.04});
+  const box=original.box,pad=Math.max(2,Math.round(image.width/800)),documentFrame=original.status==='proposed'&&panels.some(([x,y,w,h])=>[box[0],box[0]+box[2]].some(edge=>edge>=x-pad&&edge<=x+w+pad)&&Math.min(box[1]+box[3],y+h)-Math.max(box[1],y)>box[3]*.5);
+  if(original.status==='proposed'&&!documentFrame)return original;
+  const fallback=contrastWallEnvelope(image,expectedWidth,{...options,occlusions:[...(options.occlusions||[]),...panels]});
+  return documentFrame?{...fallback,rejectedEnvelope:{reason:'ELEVATION_DOCUMENT_FRAME',box:original.box,documentPanels:panels}}:fallback;
  }
  function contrastWallEnvelope(image,expectedWidth,{sourceViewId=null,frame=null,occlusions=[],rows=[]}={}){
   const {width:w,height:h,data}=image;
@@ -319,12 +349,12 @@
   const hasFrame=([x,y,pw,ph])=>{let supported=0,total=0;for(let yy=y;yy<y+ph;yy++){for(const xx of [x,x+pw]){let hit=false;for(let dx=-pad-2;dx<=pad+2;dx++)if(xx+dx>=0&&xx+dx<w)hit||=!!ink[Math.round(yy)*w+Math.round(xx+dx)];supported+=Number(hit);total++;}}return supported/(total||1)>.7;};
   return groups.filter(g=>hasFrame(g.box)).map(g=>({box:[g.box[0]-pad,g.box[1]-pad,g.box[2]+pad*2,g.box[3]+pad*2],status:'proposed',method:'clear-panes-and-dark-frame',confirmationRequired:true}));
  }
- function legendBoxes(image,rows){
+ function legendBoxes(image,rows,{minimumWidthRatio=.25}={}){
   const titles=rows.filter(r=>r.box?.length===4&&r.box.every(Number.isFinite)&&/^(?:legende|legend)\s*[:.]?$/i.test(String(r.text).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()));if(!titles.length)return [];
   // Thin markup crossing a black frame can interrupt its horizontal pixels.
   // Bridge only those small gaps; heading and both original vertical sides
   // still have to prove a legend before any source region is masked.
-  const {width:w,height:h}=image,ink=monochrome(image),horizontal=opening(closing(ink,w,h,3,0),w,h,Math.round(w*.1),0),lines=components(horizontal,w,h).map(c=>c.box).filter(b=>b[2]>w*.25&&b[3]<12),boxes=[];
+  const {width:w,height:h}=image,ink=monochrome(image),horizontal=opening(closing(ink,w,h,3,0),w,h,Math.round(w*Math.min(.1,minimumWidthRatio*.4)),0),lines=components(horizontal,w,h).map(c=>c.box).filter(b=>b[2]>w*minimumWidthRatio&&b[3]<12),boxes=[];
   const pairedSupport=(left,right,top,bottom)=>{const from=Math.max(0,Math.floor(top)),to=Math.min(h,Math.ceil(bottom));let supported=0;for(let y=from;y<to;y++){let a=false,b=false;for(let dx=-4;dx<=4;dx++){a||=left+dx>=0&&left+dx<w&&!!ink[y*w+left+dx];b||=right+dx>=0&&right+dx<w&&!!ink[y*w+right+dx];}supported+=Number(a&&b);}return supported/(to-from||1);};
   for(const title of titles){const [l,t,r,b]=title.box,candidates=[];if(l>=r||t>=b)continue;for(const upper of lines){const left=upper[0],right=upper[0]+upper[2],top=upper[1];if(top>=t||left>=l||right<=r)continue;
     for(const lower of lines){const bottom=lower[1]+lower[3];if(bottom<=b||Math.abs(left-lower[0])>8||lower[2]<(right-left)*.6||bottom-top>h*.7)continue;
@@ -627,5 +657,5 @@
   }
   candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
  }
- return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
+ return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
 });

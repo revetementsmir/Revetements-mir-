@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
 const H=require('../tools/qa/helpers/mir-studio-automatic-proof.cjs');
-const empty={steps:{import:true,conversion:true,render3d:true,finish:true,reopen:true},model:{walls:[]},reconstructionStatus:'partial-proposal',errors:{}};
+const empty={steps:{import:true,conversion:true,render3d:true,finish:true,reopen:true,responsive:true},model:{walls:[]},reconstructionStatus:'partial-proposal',errors:{}};
 const verdict=H.evaluateProof(empty,H.DEFAULT_EXPECTED);
 assert.equal(verdict.workflowVerified,false,'Empty reconstruction cannot pass even if stale step flags are all true.');
 assert.equal(verdict.passed,false);assert.ok(verdict.violations.includes('MODEL_REQUIRED_BUT_EMPTY'));
@@ -12,6 +12,7 @@ assert.equal(refusalVerdict.workflowVerified,false,'Expected refusal is never re
 const completed={...empty,model:{walls:[{id:'synthetic-wall'}]}};
 assert.equal(H.evaluateProof(completed,H.DEFAULT_EXPECTED).passed,true);
 assert.equal(H.evaluateProof({...completed,steps:{...completed.steps,reopen:false}},H.DEFAULT_EXPECTED).passed,false,'Saving alone does not prove reopening.');
+assert.equal(H.evaluateProof({...completed,steps:{...completed.steps,responsive:false}},H.DEFAULT_EXPECTED).passed,false,'Responsive FR/EN checks cannot be skipped in a completed new recipe.');
 assert.equal(H.evaluateProof({...completed,failure:{message:'synthetic failure'}},H.DEFAULT_EXPECTED).passed,false,'A caught case failure cannot disappear from the final verdict.');
 assert.equal(H.evaluateProof({...completed,errors:{http:[{status:404}]}},H.DEFAULT_EXPECTED).passed,false,'A missing application resource cannot pass as successful.');
 assert.equal(H.evaluateProof({...completed,reconstructionStatus:'preserved'},H.DEFAULT_EXPECTED).passed,false,'An old preserved model is not a fresh automatic proposal.');
@@ -25,6 +26,17 @@ const after=structuredClone(before);after.levels[0].geometryRevision++;after.lev
 assert.deepEqual(H.levelGeometry(before),H.levelGeometry(after));assert.deepEqual(H.unrelatedWallFinishes(before,'a'),H.unrelatedWallFinishes(after,'a'));
 after.levels[0].wallFinishes.b.materialId='unexpected';assert.notDeepEqual(H.unrelatedWallFinishes(before,'a'),H.unrelatedWallFinishes(after,'a'));
 after.levels[0].roofFinishes.r.materialId='unexpected';assert.notDeepEqual(H.levelGeometry(before),H.levelGeometry(after));
+
+const large={sourceImage:'synthetic-private-raster-'+ 'x'.repeat(1000000),levels:[{id:'level',height:3}]};
+H.assertDeepEqual(large,structuredClone(large),'Equal source inventory must pass.');
+const unequal=structuredClone(large);unequal.levels[0].height=4;
+assert.throws(()=>H.assertDeepEqual(unequal,large,'Geometry changed.'),error=>{
+  assert.match(error.message,/Geometry changed\. Actual SHA-256: [a-f0-9]{64}; expected SHA-256: [a-f0-9]{64}\./);
+  assert.ok(error.message.length<250,'Failure diagnostics must not format large source rasters.');
+  assert.ok(!error.message.includes('synthetic-private-raster'));
+  return true;
+});
+assert.throws(()=>H.assertDeepEqual({height:'3'},{height:3}),/Stored values changed/,'Strict equality must still reject type changes.');
 
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'mir-automatic-harness-contract-'));
 try{
@@ -47,3 +59,15 @@ try{
   assert.throws(()=>H.parseArgs(['--manifest',manifest,'--out',path.join(secondRepo,'proof'),'--repo-root',secondRepo],repo),/outside/,'The frozen comparison repo is protected too.');
 }finally{fs.rmSync(temp,{recursive:true,force:true});}
 console.log('PASS automatic-originals harness: empty-model rejection, expected refusals, workflow completion, runtime failures, geometry/finish distinction and private output boundaries.');
+
+(async()=>{
+  let elapsed=0,calls=0;
+  await H.waitForAsync(async()=>{await Promise.resolve();calls++;return calls===3;},{timeoutMs:100,intervalMs:10,now:()=>elapsed,pause:async ms=>{elapsed+=ms;}});
+  assert.equal(calls,3,'A Promise resolving false must be polled again, not accepted as completion.');assert.equal(elapsed,20);
+  calls=0;elapsed=0;
+  await assert.rejects(H.waitForAsync(async()=>{calls++;return false;},{timeoutMs:25,intervalMs:10,now:()=>elapsed,pause:async ms=>{elapsed+=ms;}}),/Timed out/);
+  assert.equal(elapsed,25,'False terminal observations must respect the original deadline.');assert.equal(calls,4);
+  await assert.rejects(H.waitForAsync(async()=>{throw Error('read failed');},{timeoutMs:100}),/read failed/,'An IndexedDB error cannot count as completion.');
+  const started=Date.now();await assert.rejects(H.waitForAsync(()=>new Promise(()=>{}),{timeoutMs:30}),/Timed out/,'A never-resolving read is bounded by the same deadline.');assert.ok(Date.now()-started<1000,'A pending observation cannot hang the recipe.');
+  console.log('PASS asynchronous terminal wait: false Promise observations, bounded timeout, pending read and read failure.');
+})().catch(error=>{console.error(error);process.exitCode=1;});
