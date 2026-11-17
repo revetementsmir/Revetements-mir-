@@ -56,7 +56,7 @@ jobs:
         run: |
           git fetch origin "$MIR_CLIENT_BASE_SHA" --depth=1
           git diff --check
-          for file in dist/plan-import.js dist/plan-sheet-detection.js dist/plan-scan-ocr.js dist/plan-view-inventory.js dist/plan-view-review.js dist/project-store.js dist/plan-app.js dist/takeoff-app.js dist/plan-level-model.js dist/plan-reconstruction*.js dist/plan-reconstructed*.js dist/plan-keyed-wall-observations.js dist/plan-native-witness*.js dist/plan-scene-order.js dist/plan-level-studio.js dist/studio*.js dist/mir-private-document-viewer.js; do node --check "$file"; done
+          for file in dist/plan-import.js dist/plan-sheet-detection.js dist/plan-scan-ocr.js dist/plan-view-inventory.js dist/plan-view-review.js dist/project-store.js dist/plan-app.js dist/takeoff-app.js dist/plan-level-model.js dist/plan-reconstruction*.js dist/plan-reconstructed*.js dist/plan-roof*.js dist/plan-keyed-wall-observations.js dist/plan-native-witness*.js dist/plan-scene-order.js dist/plan-level-studio.js dist/studio*.js dist/mir-private-document-viewer.js; do node --check "$file"; done
           node --check tests/mir-studio-entry-assemblies-browser.cjs
           node tests/mir-studio-s1.cjs
           node tests/mir-studio-s2.cjs
@@ -92,6 +92,8 @@ jobs:
           node tests/mir-studio-roof-grid-registration.cjs
           node tests/mir-studio-roof-pitch-evidence.cjs
           node tests/mir-studio-roof-plan-evidence.cjs
+          node tests/mir-studio-roof-hip-candidates.cjs
+          node tests/mir-studio-roof-datum-registration.cjs
           node tests/mir-studio-native-roof-pitches.cjs
           node tests/mir-studio-native-opening-frames.cjs
           node tests/mir-studio-construction-height-observations.cjs
@@ -108,10 +110,16 @@ jobs:
           node tests/mir-studio-irregular-masonry.cjs
           node tests/mir-studio-registered-wall-zones.cjs
           node tests/mir-studio-registered-entries.cjs
+          node tests/mir-studio-entry-wall-stack.cjs
           node tests/mir-studio-masonry-reading-scope.cjs
           node tests/mir-studio-entry-elements.cjs
           node tests/mir-studio-entry-assemblies.cjs
           node tests/mir-studio-entry-profile-vision.cjs
+          node tests/mir-studio-entry-face-profile.cjs
+          node tests/mir-studio-entry-roof-plan.cjs
+          node tests/mir-studio-entry-roof-only.cjs
+          node tests/mir-studio-entry-side-source.cjs
+          node tests/mir-studio-entry-source-guards.cjs
           node tests/mir-studio-entry-source-stroke-fit.cjs
           node tests/mir-studio-floor-thin-lines.cjs
           node tests/mir-studio-door-boundary.cjs
@@ -183,8 +191,14 @@ jobs:
         run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-registered-entry-store-browser.cjs
       - name: Native witness precision and source persistence (synthetic only)
         run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-native-witness-store-browser.cjs
+      - name: Entry attachment across registered levels (synthetic only)
+        run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-entry-wall-stack-store-browser.cjs
       - name: Keyed walls and source persistence (synthetic only)
         run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-keyed-wall-store-browser.cjs
+      - name: Partial hip source persistence (synthetic only)
+        run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-roof-plan-store-browser.cjs --partial-hip
+      - name: Roof-only entries and source persistence (synthetic only)
+        run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-entry-wall-stack-store-browser.cjs --roof-only
       - name: Existing large PDF, rendering and interaction regressions
         run: |
           node tests/mir-plan-pdf-browser.cjs

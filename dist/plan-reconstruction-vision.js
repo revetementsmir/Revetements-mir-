@@ -643,6 +643,71 @@
     if(!best||refined.length>best.points.length||refined.length===best.points.length&&error<best.error)best={points:refined,estimator:'bounded-consensus-on-observed-source-pixels',error};
    }return best;
  }
+ // A closed, independently observed fascia face can anchor a small pointed
+ // roof even when hatch cells partition every white part of its interior.
+ // The two slopes still need their own source samples and a visible common
+ // junction. Neither a post foot nor an assumed symmetry supplies an extent.
+ function faceAnchoredEntryProfile(image,envelope,face){
+  const no=reason=>({status:'unresolved',reason}),point=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite),box=face?.box;
+  if(!image?.data||envelope?.status!=='proposed'||face?.status!=='proposed'||face.method!=='paired-horizontal-boundaries-and-closed-ends'||!Array.isArray(box)||box.length!==4||!box.every(Number.isFinite)||box[2]<30||box[3]<3||!Array.isArray(face.anchors)||face.anchors.length!==4)return no('ENTRY_ROOF_CLOSED_FACE_REQUIRED');
+  const {width:w,height:h}=image,[left,top,span,depth]=box,right=left+span,bottom=top+depth,corners=[[left,top],[right,top],[right,bottom],[left,bottom]],masks=envelope.occlusions||[];
+  if(!Number.isInteger(w)||!Number.isInteger(h)||w*h>12000000||image.data.length!==w*h*4||left<1||right>=w-1||top<1||bottom>=h-1||span>w*.75||depth>span*.2||face.anchors.some((p,i)=>!point(p)||p.some((n,j)=>Math.abs(n-corners[i][j])>1e-8))||face.sourceViewId!==undefined&&face.sourceViewId!==envelope.sourceViewId||face.sourceFrame!==undefined&&JSON.stringify(face.sourceFrame)!==JSON.stringify(envelope.sourceFrame))return no('ENTRY_ROOF_CLOSED_FACE_REQUIRED');
+  const overlaps=([x,y,bw,bh])=>Math.min(right,x+bw)>Math.max(left,x)&&Math.min(bottom,y+bh)>Math.max(top,y);
+  if(masks.some(overlaps))return no('ENTRY_ROOF_SOURCE_OCCLUDED');
+  const ink=structuralInk(image),masked=(x,y)=>masks.some(([l,t,rw,rh])=>x>=l&&x<=l+rw&&y>=t&&y<=t+rh),lum=(x,y)=>{const i=(y*w+x)*4;return (image.data[i]+image.data[i+1]+image.data[i+2])/3;};
+  for(let i=0;i<ink.length;i++)if(ink[i]){const j=i*4,hi=Math.max(image.data[j],image.data[j+1],image.data[j+2]),lo=Math.min(image.data[j],image.data[j+1],image.data[j+2]);if(hi>190&&hi-lo>18)ink[i]=0;}
+  const raw=(x,y)=>{x=Math.round(x);y=Math.round(y);return x>=0&&x<w&&y>=0&&y<h&&!masked(x,y)&&!!ink[y*w+x];};
+  const hit=(x,y,r=1)=>{x=Math.round(x);y=Math.round(y);for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++)if(raw(x+dx,y+dy))return true;return false;};
+  const segment=(a,b)=>{const n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])));let hits=0,gap=0,maxGap=0;for(let i=0;i<=n;i++){if(hit(a[0]+(b[0]-a[0])*i/n,a[1]+(b[1]-a[1])*i/n)){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:hits/(n+1),maxGap};};
+  const boundary=corners.map((a,i)=>({anchors:[a,corners[(i+1)%4]],...segment(a,corners[(i+1)%4])}));
+  if(boundary.some(b=>b.support<.9||b.maxGap>2))return no('ENTRY_ROOF_CLOSED_FACE_REQUIRED');
+  // Do not accept the width of one filled stroke as a closed face.
+  let clear=0,total=0;for(let y=Math.ceil(top+2);y<=Math.floor(bottom-2);y++)for(let x=Math.ceil(left+2);x<=Math.floor(right-2);x+=2){total++;clear+=Number(!raw(x,y));}
+  if(!total||clear/total<.55)return no('ENTRY_ROOF_CLOSED_FACE_REQUIRED');
+  const pad=2,minimumRise=Math.max(6,span*.08),step=Math.max(1,Math.ceil(span/72)),maxGap=4,coarse=[];
+  const ends=ex=>{const out=[];for(const dx of [-pad,0,pad])for(const dy of [-pad,0,pad]){const p=[Math.round(ex+dx),Math.round(top+dy)];if(hit(...p)&&segment(p,[ex,top]).support>=.9)out.push(p);}return out;};
+  const leftEnds=ends(left),rightEnds=ends(right);
+  for(let x=Math.ceil(left+span*.15);x<=Math.floor(right-span*.15);x+=step)for(let y=Math.max(1,Math.ceil(top-span*.65));y<=Math.floor(top-minimumRise);y+=step){
+   if(!hit(x,y))continue;const apex=[x,y],pair=[];
+   for(const options of [leftEnds,rightEnds]){let best=null;for(const a of options){const slope=(a[1]-y)/Math.abs(a[0]-x);if(slope<.18||slope>1.1)continue;const s=segment(a,apex);if(s.support<.9||s.maxGap>maxGap)continue;const score=s.support-.0001*(Math.abs(a[1]-top)+Math.min(Math.abs(a[0]-left),Math.abs(a[0]-right)));if(!best||score>best.score)best={anchor:a,...s,score};}pair.push(best);}
+   if(pair.every(Boolean))coarse.push({apex,pair});
+   if(coarse.length>512)return no('ENTRY_ROOF_SOURCE_COMPLEXITY');
+  }
+  if(!coarse.length)return no('ROOF_SLOPE_OCCLUDED');
+  const fit=points=>{const n=points.length,sx=points.reduce((s,p)=>s+p[0],0),sy=points.reduce((s,p)=>s+p[1],0),sxx=points.reduce((s,p)=>s+p[0]*p[0],0),sxy=points.reduce((s,p)=>s+p[0]*p[1],0),m=(n*sxy-sx*sy)/(n*sxx-sx*sx);return {m,c:(sy-m*sx)/n};};
+  const refine=(a,b,sign,iterations=2)=>{
+   const line={m:(b[1]-a[1])/(b[0]-a[0])};line.c=a[1]-line.m*a[0];const samples=[];
+   for(let x=Math.ceil(Math.min(a[0],b[0])+2);x<=Math.floor(Math.max(a[0],b[0])-2);x++){
+    const expected=line.m*x+line.c,ys=[];for(let y=Math.max(0,Math.round(expected-2));y<=Math.min(h-1,Math.round(expected+2));y++)if(raw(x,y))ys.push({y,l:lum(x,y)});
+    if(!ys.length)continue;const darkest=Math.min(...ys.map(p=>p.l)),core=ys.filter(p=>p.l<=darkest+Math.max(8,(210-darkest)*.12));samples.push([x,core.reduce((s,p)=>s+p.y,0)/core.length]);
+   }
+   if(samples.length<Math.abs(a[0]-b[0])*.8||samples.length<8)return null;
+   const supported=sourceStrokeFit(samples);if(!supported)return null;const fitted=fit(supported.points);
+   if(!Number.isFinite(fitted.m)||sign*fitted.m<.18||sign*fitted.m>1.1)return null;
+   if(iterations>0)return refine([a[0],fitted.m*a[0]+fitted.c],[b[0],fitted.m*b[0]+fitted.c],sign,iterations-1);
+   const residual=supported.points.reduce((n,p)=>n+Math.abs(p[1]-fitted.m*p[0]-fitted.c),0)/supported.points.length;
+   return {...fitted,support:samples.length/(Math.abs(a[0]-b[0])-3),fit:{method:'source-stroke-centres-from-closed-face',sampleCount:supported.points.length,estimator:supported.estimator,residualPixels:2,minimumSupport:.8,sourceSamples:samples,inlierSamples:supported.points,meanResidualPixels:residual}};
+  };
+  const candidates=[];
+  for(const c of coarse){
+   const a=refine(c.pair[0].anchor,c.apex,-1),b=refine(c.pair[1].anchor,c.apex,1);if(!a||!b)continue;
+   const x=(b.c-a.c)/(a.m-b.m),y=a.m*x+a.c,eaves=[[left,a.m*left+a.c],[right,b.m*right+b.c]];
+   if(![x,y,...eaves.flat()].every(Number.isFinite)||x<=left+span*.12||x>=right-span*.12||Math.abs(x-c.apex[0])>step+4||Math.abs(y-c.apex[1])>step+4||top-y<minimumRise||eaves.some(p=>Math.abs(p[1]-top)>3)||Math.abs(eaves[0][1]-eaves[1][1])>3||!hit(x,y)||masked(x,y))continue;
+   const traces=eaves.map(p=>segment(p,[x,y]));if(traces.some(s=>s.support<.9||s.maxGap>maxGap)||eaves.some((p,i)=>segment(p,corners[i]).support<.9))continue;
+   // A masked interval is unknown even when samples on either side line up.
+   if(masks.some(([mx,my,mw,mh])=>Math.min(right,mx+mw)>Math.max(left,mx)&&Math.min(bottom,my+mh)>Math.max(y,my)))continue;
+   const predictedSamples=[a,b].flatMap(s=>s.fit.sourceSamples),meanResidual=(a.fit.meanResidualPixels+b.fit.meanResidualPixels)/2;
+   candidates.push({a,b,apex:[x,y],eaves,traces,meanResidual,sampleCount:predictedSamples.length});
+  }
+  if(!candidates.length)return no('ROOF_SLOPE_OCCLUDED');
+  // Every supported family matters. A score must not choose between distinct
+  // source roofs that happen to start at the same face.
+  candidates.sort((a,b)=>a.meanResidual-b.meanResidual||b.sampleCount-a.sampleCount);const chosen=candidates[0],tolerance=Math.max(2,span*.012);
+  if(candidates.some(c=>Math.hypot(c.apex[0]-chosen.apex[0],c.apex[1]-chosen.apex[1])>tolerance||c.eaves.some((p,i)=>Math.abs(p[1]-chosen.eaves[i][1])>tolerance)))return no('ENTRY_ROOF_PROFILE_AMBIGUOUS');
+  const {a,b,apex,eaves}=chosen,base={start:left,end:right,y:bottom};
+  for(const [i,s]of [a,b].entries())Object.assign(s,{start:s.fit.sourceSamples[0][0],end:s.fit.sourceSamples.at(-1)[0],eaveX:eaves[i][0],eaveY:eaves[i][1],highX:apex[0],highY:apex[1],eaveJunction:{x:eaves[i][0],y:eaves[i][1],support:chosen.traces[i].support},ridgeEvidence:{kind:'observed-pointed-apex',point:apex.slice()},visibleEndpoint:apex.slice()});
+  return {status:'proposed',method:'face-anchored-source-slopes-and-observed-apex',points:[eaves[0],apex,apex.slice(),eaves[1]],base,slopes:[a,b],faceEvidence:{...JSON.parse(JSON.stringify(face)),boundary,interiorClearFraction:clear/total},apexEvidence:{status:'observed',point:apex.slice(),compatibleFits:candidates.length,tolerancePixels:tolerance,bounds:[Math.min(...candidates.map(c=>c.apex[0])),Math.min(...candidates.map(c=>c.apex[1])),Math.max(...candidates.map(c=>c.apex[0])),Math.max(...candidates.map(c=>c.apex[1]))]},sourceViewId:envelope.sourceViewId,sourceFrame:envelope.sourceFrame,confirmationRequired:true};
+ }
  function entryRoofProfile(image,envelope){
   const unresolved=base=>({status:'unresolved',reason:'ROOF_SLOPE_OCCLUDED',...(base?{base}:{})});
   if(!image?.data||envelope?.status!=='proposed'||!Array.isArray(envelope.box)||!envelope.box.every(Number.isFinite))return unresolved();
@@ -748,9 +813,9 @@
   if(Math.abs(ends[0].y-ends[1].y)>1)return no('ROOF_FASCIA_UNDERSIDE_DISAGREES');
   return {status:'observed',method:'roof-edge-and-two-neutral-fascia-returns-at-ceiling',upper:top,ends,ceiling:JSON.parse(JSON.stringify(ceiling)),offsetPixels:depth,unobservedMiddle:'The continuous underside is not asserted through coloured annotations.',confirmationRequired:true};
  }
- function roofProfile(image,envelope,rows=[],{entry=false}={}){
+ function roofProfile(image,envelope,rows=[],{entry=false,face=null}={}){
   if(envelope.status!=='proposed')return {status:'unresolved',reason:'WALL_REGISTRATION_REQUIRED'};
-  if(entry)return entryRoofProfile(image,envelope);
+  if(entry)return face?faceAnchoredEntryProfile(image,envelope,face):entryRoofProfile(image,envelope);
   const {width:w,height:h}=image,[bx,by,bw]=envelope.box,ink=structuralInk(image),occlusions=envelope.occlusions||[];
   // Pale cyan/green quantity masks are not structural ink. Genuine dark
   // source strokes remain eligible; neutral faded strokes are recovered below.
@@ -952,6 +1017,142 @@
   const established=groups.filter(g=>framed(g.box)).map(g=>({box:[g.box[0]-3,g.box[1]-3,g.box[2]+6,g.box[3]+6],panelBox:g.box.slice(),framePaddingPx:3,type,method:type==='door'?'closed-frame-and-neutral-door-panels':'closed-frame-and-neutral-glazing',status:'proposed',confirmationRequired:true}));
   return type==='door'?[...established,...fragmentedDoorFrames(image,box,parts,raw,established)]:established;
  }
+ function entryRoofFaces(image,primary,upperY){
+  const result=[];result.issues=[];
+  if(!image?.data||primary?.status!=='proposed'||!Array.isArray(primary.box)||!primary.box.every(Number.isFinite)||!Number.isFinite(upperY))return result;
+  const {width:w,height:h}=image,[bx,,bw,bh]=primary.box;
+  if(w*h>12000000||image.data.length!==w*h*4||!(bw>0&&bh>0))return result;
+  const mask=new Uint8Array(w*h),top=Math.max(0,Math.floor(upperY-30)),bottom=Math.min(h-1,Math.ceil(upperY+bh*.23));
+  for(let y=top;y<=bottom;y++)for(let x=Math.max(0,Math.floor(bx));x<=Math.min(w-1,Math.ceil(bx+bw));x++){const j=(y*w+x)*4,hi=Math.max(image.data[j],image.data[j+1],image.data[j+2]),lo=Math.min(image.data[j],image.data[j+1],image.data[j+2]);mask[y*w+x]=Number(hi<150&&hi-lo<40);}
+  const lines=components(opening(mask,w,h,Math.round(Math.max(8,bw*.03)),0),w,h).map(c=>c.box).filter(b=>b[2]>Math.max(60,bw*.1)&&b[2]<bw*.7&&b[3]<10),faces=[];
+  if(lines.length>64){result.issues.push('ENTRY_CANDIDATE_COMPLEXITY');return result;}
+  for(const [x,y,width,thickness]of lines)for(const face of entryBands(image,{left:x,right:x+width,nearY:y+thickness,height:bh,occlusions:primary.occlusions||[]})){
+   if(faces.some(f=>f.box.every((n,i)=>Math.abs(n-face.box[i])<.01)))continue;
+   faces.push({...face,sourceViewId:primary.sourceViewId,sourceFrame:primary.sourceFrame});
+   if(faces.length>64){result.issues.push('ENTRY_CANDIDATE_COMPLEXITY');return result;}
+  }
+  for(const face of faces){
+   const profile=faceAnchoredEntryProfile(image,{...primary,box:face.box},face);if(profile.status!=='proposed')continue;
+   const old=result.find(c=>Math.abs(c.face.box[0]-face.box[0])<=2&&Math.abs(c.face.box[0]+c.face.box[2]-face.box[0]-face.box[2])<=2&&Math.abs(c.face.box[1]+c.face.box[3]-face.box[1]-face.box[3])<=2&&Math.hypot(c.profile.points[1][0]-profile.points[1][0],c.profile.points[1][1]-profile.points[1][1])<=2);
+   const observation={status:'proposed',method:'closed-source-face-and-independent-roof-slopes',sourceViewId:primary.sourceViewId,sourceFrame:primary.sourceFrame,face,profile,confirmationRequired:true};
+   // Nested decorative lines on the same closed face do not create another
+   // roof. Preserve the outer observed face only when the profiles agree.
+   if(old){if(face.box[3]>old.face.box[3])Object.assign(old,observation);}else result.push(observation);
+   if(result.length>32){result.length=0;result.issues.push('ENTRY_CANDIDATE_COMPLEXITY');return result;}
+  }
+  return result;
+ }
+ // A plan may expose only the front of a lower roof beyond a higher eave.
+ // Retain its own three rives and two diagonal fragments. Nothing here draws
+ // the concealed rear edge or assigns an elevation to the observed pixels.
+ function entryRoofPlanBoundaries(image,{span,wallY,outward=1,tolerance=3,maxDepth=null,ridgeX=null}={}){
+  const result=[];result.issues=[];
+  if(!image?.data||!Array.isArray(span)||span.length!==2||!span.every(Number.isFinite)||!Number.isFinite(wallY)||![1,-1].includes(outward)||!(tolerance>=0&&tolerance<=4))return result;
+  const {width:w,height:h}=image,[left,right]=span,width=right-left;
+  if(!Number.isInteger(w)||!Number.isInteger(h)||w*h>12000000||image.data.length!==w*h*4||width<30||left<2||right>=w-2||ridgeX!==null&&(!Number.isFinite(ridgeX)||ridgeX<=left||ridgeX>=right))return result;
+  // Rejected/ambiguous rays also cost work. The result-count limit alone
+  // cannot bound them, or the robust fit attempted for each source ray.
+  const limits={pixelChecks:4000000,diagonalHypotheses:16384,fitSamples:131072},work=result.work={pixelChecks:0,diagonalHypotheses:0,fitCalls:0,fitSamples:0,boundaryPairs:0,limits},stopped={code:'ENTRY_ROOF_PLAN_WORK_LIMIT'};
+  const spend=(key,amount=1)=>{if(work[key]+amount>limits[key]){work.exhausted=key;work.rejectedCharge=amount;throw stopped;}work[key]+=amount;};
+  try{
+  const distance=Math.min(Number.isFinite(maxDepth)?maxDepth:width*2,h),ink=new Uint8Array(w*h),l=Math.max(2,Math.floor(left-tolerance-2)),r=Math.min(w-3,Math.ceil(right+tolerance+2)),a=Math.max(2,Math.floor(Math.min(wallY,wallY+outward*distance))-3),b=Math.min(h-3,Math.ceil(Math.max(wallY,wallY+outward*distance))+3);
+  const neutral=(x,y)=>{spend('pixelChecks');const i=(y*w+x)*4,hi=Math.max(image.data[i],image.data[i+1],image.data[i+2]),lo=Math.min(image.data[i],image.data[i+1],image.data[i+2]);return image.data[i+3]>100&&hi-lo<18?(image.data[i]+image.data[i+1]+image.data[i+2])/3:null;};
+  for(let y=a;y<=b;y++)for(let x=l;x<=r;x++){const value=neutral(x,y);if(value===null||value>=240)continue;const contrast=[[2,0],[-2,0],[0,2],[0,-2]].some(([dx,dy])=>{const n=neutral(x+dx,y+dy);return n!==null&&n-value>=12;});if(contrast)ink[y*w+x]=1;}
+  work.preparationPixelChecks=work.pixelChecks;
+  const readInk=(x,y)=>{spend('pixelChecks');return ink[y*w+x];};
+  const hit=(x,y,radius=1)=>{x=Math.round(x);y=Math.round(y);for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++)if(x+dx>=0&&x+dx<w&&y+dy>=0&&y+dy<h&&readInk(x+dx,y+dy))return true;return false;};
+  const support=(from,to)=>{const n=Math.ceil(Math.hypot(to[0]-from[0],to[1]-from[1]));let count=0,gap=0,maxGap=0;for(let i=0;i<=n;i++){if(hit(from[0]+(to[0]-from[0])*i/n,from[1]+(to[1]-from[1])*i/n)){count++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:count/(n+1),maxGap};};
+  // This preliminary check has the same thresholds as support(). Once a
+  // gap exceeds three pixels the ray cannot recover, so scanning its tail
+  // adds work but cannot change the decision. Retained proofs still use the
+  // complete support calculation below.
+  const supportedRay=(from,to)=>{const n=Math.ceil(Math.hypot(to[0]-from[0],to[1]-from[1]));let count=0,gap=0;for(let i=0;i<=n;i++){if(hit(from[0]+(to[0]-from[0])*i/n,from[1]+(to[1]-from[1])*i/n)){count++;gap=0;}else if(++gap>3)return false;}return count/(n+1)>=.9;};
+  const side=(x,y)=>{let last=y,gap=0,count=0;for(let yy=y;outward*(yy-wallY)>0;yy-=outward){if(hit(x,yy)){last=yy;gap=0;count++;}else if(++gap>2)break;}return {anchors:[[x,y],[x,last]],count,length:Math.abs(y-last)};};
+  // An independently observed strip of paper separates a roof edge from a
+  // nearby gutter. Tolerant line sampling must not bridge that separator and
+  // relabel the gutter as a continuation of the roof's own side rive.
+  const terminates=(x,y)=>{let last=y,gap=0;for(let d=1;d<=Math.max(8,Math.ceil(width*.08));d++){const yy=y+outward*d;if(yy<a||yy>b)break;if([-1,0,1].every(dx=>{const n=neutral(x+dx,yy);return n!==null&&n>=248;}))break;if(hit(x,yy)){last=yy;gap=0;}else if(++gap>2)break;}return Math.abs(last-y)<=3;};
+  const diagonal=(corner,targetY,sign)=>{
+   const found=[];for(let x=Math.ceil(corner[0]+(sign>0?5:-width*.48));x<=Math.floor(corner[0]+(sign>0?width*.48:-5));x++){
+    spend('diagonalHypotheses');
+    const end=[x,targetY];if(!supportedRay(corner,end))continue;
+    const dx=end[0]-corner[0],dy=end[1]-corner[1];let m=dy/dx,c=corner[1]-m*corner[0],samples=[],fit=null,samplingLine=null;
+    for(let iteration=0;iteration<3;iteration++){
+     samplingLine={m,c};
+     samples=[];for(let xx=Math.ceil(Math.min(corner[0],x));xx<=Math.floor(Math.max(corner[0],x));xx++){const expected=m*xx+c,ys=[];for(let yy=Math.max(a,Math.round(expected-2));yy<=Math.min(b,Math.round(expected+2));yy++)if(readInk(xx,yy))ys.push({y:yy,l:neutral(xx,yy)});if(ys.length){const low=Math.min(...ys.map(p=>p.l)),core=ys.filter(p=>p.l<=low+10);samples.push([xx,core.reduce((n,p)=>n+p.y,0)/core.length]);}}
+     if(samples.length<Math.abs(dx)*.8||samples.length<5){fit=null;break;}spend('fitSamples',samples.length);work.fitCalls++;fit=sourceStrokeFit(samples);if(!fit)break;const n=fit.points.length,sx=fit.points.reduce((n,p)=>n+p[0],0),sy=fit.points.reduce((n,p)=>n+p[1],0),sxx=fit.points.reduce((n,p)=>n+p[0]*p[0],0),sxy=fit.points.reduce((n,p)=>n+p[0]*p[1],0);m=(n*sxy-sx*sy)/(n*sxx-sx*sx);c=(sy-m*sx)/n;
+    }
+    if(!fit||!Number.isFinite(m)||Math.abs(m)<.2||Math.abs(m*corner[0]+c-corner[1])>2)continue;const fittedEnd=[(targetY-c)/m,targetY],verified=support(corner,fittedEnd);if(Math.abs(fittedEnd[0]-x)>3||verified.support<.9||verified.maxGap>3)continue;
+    // This guide comes from the independently registered front apex. It
+    // selects among supported source strokes; it supplies no missing pixels
+    // or rear edge. The producer still needs the observed side profile and
+    // checks the complete 3D intersection before proposing a roof.
+    if(Number.isFinite(ridgeX)&&Math.abs(fittedEnd[0]-(corner[0]+(ridgeX-corner[0])*(targetY-corner[1])/(wallY-corner[1])))>3)continue;
+    found.push({anchors:[corner,fittedEnd],...verified,sourceSamples:samples,inlierSamples:fit.points,fit:{m,c},samplingLine,sampleRange:[Math.ceil(Math.min(corner[0],x)),Math.floor(Math.max(corner[0],x))]});
+   }
+   if(!found.length)return null;found.sort((a,b)=>b.support-a.support||a.maxGap-b.maxGap);const best=found[0];if(found.some(f=>Math.abs(f.anchors[1][0]-best.anchors[1][0])>3))return null;return best;
+  };
+  for(let d=5;d<=distance;d++){
+   const y=Math.round(wallY+outward*d);if(y<a+2||y>b-2)continue;const options=[];
+   for(let x=Math.ceil(left-tolerance);x<=Math.floor(left+tolerance);x++){if(!hit(x,y,0)||!terminates(x,y))continue;const s=side(x,y);if(s.length>=Math.max(8,width*.12))options.push(s);}
+   for(const one of options)for(let x=Math.ceil(right-tolerance);x<=Math.floor(right+tolerance);x++){
+    work.boundaryPairs++;
+    if(!hit(x,y,0)||!terminates(x,y))continue;const two=side(x,y),eave={anchors:[one.anchors[0],two.anchors[0]],...support(one.anchors[0],two.anchors[0])};
+    if(two.length<Math.max(8,width*.12)||eave.support<.9||eave.maxGap>3)continue;
+    const run=Math.max(8,Math.floor(Math.min(one.length,two.length)*.75)),targetY=y-outward*run,diagonals=[diagonal(one.anchors[0],targetY,1),diagonal(two.anchors[0],targetY,-1)];
+    if(diagonals.some(s=>!s)||diagonals[0].anchors[1][0]>=diagonals[1].anchors[1][0]-2)continue;
+    const observed={status:'observed',method:'three-own-plan-rives-and-two-observed-diagonal-fragments',eave,sides:[one,two],diagonals,spanResiduals:[one.anchors[0][0]-left,two.anchors[0][0]-right],sourceRegion:[l,a,r-l+1,b-a+1],search:{span:span.slice(),wallY,outward,tolerance,maxDepth:distance,...(Number.isFinite(ridgeX)?{ridgeX}: {})},rear:{status:'unresolved',pixelsObserved:false},confirmationRequired:true};
+    const old=result.find(c=>Math.abs(c.eave.anchors[0][1]-y)<=2&&c.eave.anchors.every((p,i)=>Math.abs(p[0]-observed.eave.anchors[i][0])<=2));
+    const residual=observed.spanResiduals.reduce((n,x)=>n+Math.abs(x),0),oldResidual=old?.spanResiduals.reduce((n,x)=>n+Math.abs(x),0);
+    if(old){if(residual<oldResidual)Object.assign(old,observed);}else result.push(observed);
+    if(result.length>24){result.length=0;result.issues.push('ENTRY_ROOF_PLAN_COMPLEXITY');return result;}
+   }
+  }
+  for(let i=result.length-1;i>=0;i--){
+   const observation=result[i],points=[...observation.eave.anchors,...observation.sides.flatMap(s=>s.anchors),...observation.diagonals.flatMap(d=>[...d.anchors,...d.sourceSamples])],px=Math.floor(Math.min(...points.map(p=>p[0])))-6,py=Math.floor(Math.min(...points.map(p=>p[1])))-6,pw=Math.ceil(Math.max(...points.map(p=>p[0])))+6-px+1,ph=Math.ceil(Math.max(...points.map(p=>p[1])))+6-py+1;
+   if(px<0||py<0||px+pw>w||py+ph>h||pw*ph>160000){result.splice(i,1);result.issues.push('ENTRY_ROOF_PLAN_PIXEL_BUDGET');continue;}
+   const hex=[];for(let y=py;y<py+ph;y++)for(let x=px;x<px+pw;x++){spend('pixelChecks');const at=(y*w+x)*4;for(let c=0;c<4;c++)hex.push(image.data[at+c].toString(16).padStart(2,'0'));}
+   observation.pixelEvidence={version:1,encoding:'rgba-hex',sourceRegion:[px,py,pw,ph],sourceRasterSize:[w,h],rgbaHex:hex.join('')};
+  }
+  return result;
+  }catch(error){if(error!==stopped)throw error;work.discardedObservations=result.length;result.length=0;result.status='unresolved';result.issues=['ENTRY_ROOF_PLAN_WORK_LIMIT'];return result;}
+ }
+ // Replays the retained source pixels and line fits after serialization. It
+ // validates observations only; grid/level/roof ownership is checked by X.
+ function entryRoofPlanBoundaryIssues(proof,{sourceSize}={}){
+  const fail=code=>[code],point=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),near=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<=1e-8;
+  try{
+   const p=proof,pixel=p?.pixelEvidence,region=pixel?.sourceRegion,size=pixel?.sourceRasterSize;
+   if(p?.status!=='observed'||p.method!=='three-own-plan-rives-and-two-observed-diagonal-fragments'||pixel?.version!==1||pixel.encoding!=='rgba-hex'||!Array.isArray(region)||region.length!==4||!region.every(Number.isInteger)||!Array.isArray(size)||size.length!==2||!size.every(n=>Number.isInteger(n)&&n>0)||sourceSize&&!same(size,sourceSize)||region[0]<0||region[1]<0||region[2]<1||region[3]<1||region[2]*region[3]>160000||region[0]+region[2]>size[0]||region[1]+region[3]>size[1]||typeof pixel.rgbaHex!=='string'||pixel.rgbaHex.length!==region[2]*region[3]*8||!/^[0-9a-f]+$/.test(pixel.rgbaHex))return fail('ENTRY_ROOF_PLAN_PIXEL_EVIDENCE');
+   const [px,py,w,h]=region,data=new Uint8ClampedArray(w*h*4);for(let i=0;i<data.length;i++)data[i]=parseInt(pixel.rgbaHex.slice(i*2,i*2+2),16);
+   const roi=p.sourceRegion,search=p.search,eave=p.eave?.anchors;
+   if(!Array.isArray(roi)||roi.length!==4||!roi.every(Number.isFinite)||roi[0]<0||roi[1]<0||roi[2]<=0||roi[3]<=0||roi[0]+roi[2]>size[0]||roi[1]+roi[3]>size[1]||!point(search?.span)||!(search.span[1]-search.span[0]>=30)||!Number.isFinite(search.wallY)||![1,-1].includes(search.outward)||!(search.tolerance>=0&&search.tolerance<=4)||!Number.isFinite(search.maxDepth)||!(search.maxDepth>0&&search.maxDepth<=size[1])||!Array.isArray(eave)||eave.length!==2||!eave.every(point)||!near(eave[0][1],eave[1][1])||eave[1][0]<=eave[0][0]||search.outward*(eave[0][1]-search.wallY)<=0||!Array.isArray(p.sides)||p.sides.length!==2||!Array.isArray(p.diagonals)||p.diagonals.length!==2||p.rear?.status!=='unresolved'||p.rear.pixelsObserved!==false)return fail('ENTRY_ROOF_PLAN_BOUNDARY');
+   if(search.ridgeX!==undefined&&(!Number.isFinite(search.ridgeX)||search.ridgeX<=search.span[0]||search.ridgeX>=search.span[1]))return fail('ENTRY_ROOF_PLAN_BOUNDARY');
+   const allPoints=[...eave,...p.sides.flatMap(s=>s?.anchors||[]),...p.diagonals.flatMap(s=>[...(s?.anchors||[]),...(s?.sourceSamples||[])])];
+   if(allPoints.length>12000||!allPoints.every(q=>point(q)&&q[0]>=px+5&&q[0]<=px+w-6&&q[1]>=py+5&&q[1]<=py+h-6))return fail('ENTRY_ROOF_PLAN_PIXEL_EVIDENCE');
+   const neutral=(x,y)=>{x-=px;y-=py;if(x<0||x>=w||y<0||y>=h)return null;const i=(y*w+x)*4,hi=Math.max(data[i],data[i+1],data[i+2]),lo=Math.min(data[i],data[i+1],data[i+2]);return data[i+3]>100&&hi-lo<18?(data[i]+data[i+1]+data[i+2])/3:null;},cache=new Map();
+   const ink=(x,y)=>{if(x<roi[0]||x>=roi[0]+roi[2]||y<roi[1]||y>=roi[1]+roi[3])return false;const key=(y-py)*w+x-px;if(cache.has(key))return cache.get(key);const value=neutral(x,y),yes=value!==null&&value<240&&[[2,0],[-2,0],[0,2],[0,-2]].some(([dx,dy])=>{const n=neutral(x+dx,y+dy);return n!==null&&n-value>=12;});cache.set(key,yes);return yes;};
+   const hit=(x,y,r=1)=>{x=Math.round(x);y=Math.round(y);for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++)if(ink(x+dx,y+dy))return true;return false;};
+   const support=(from,to)=>{const n=Math.ceil(Math.hypot(to[0]-from[0],to[1]-from[1]));let count=0,gap=0,maxGap=0;for(let i=0;i<=n;i++){if(hit(from[0]+(to[0]-from[0])*i/n,from[1]+(to[1]-from[1])*i/n)){count++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:count/(n+1),maxGap};};
+   const supported=o=>{const s=support(...o.anchors);return near(s.support,o.support)&&s.maxGap===o.maxGap&&s.support>=.9&&s.maxGap<=3;};
+   if(!supported(p.eave)||!Array.isArray(p.spanResiduals)||p.spanResiduals.length!==2||eave.some((q,i)=>!near(p.spanResiduals[i],q[0]-search.span[i])||Math.abs(p.spanResiduals[i])>search.tolerance))return fail('ENTRY_ROOF_PLAN_BOUNDARY');
+   const width=search.span[1]-search.span[0];
+   for(let i=0;i<2;i++){
+    const s=p.sides[i];if(!Array.isArray(s.anchors)||s.anchors.length!==2||!same(s.anchors[0],eave[i])||!near(s.anchors[0][0],s.anchors[1][0])||search.outward*(s.anchors[0][1]-s.anchors[1][1])<Math.max(8,width*.12))return fail('ENTRY_ROOF_PLAN_BOUNDARY');
+    const [x,y]=eave[i];let last=y,gap=0,count=0;for(let yy=y;search.outward*(yy-search.wallY)>0;yy-=search.outward){if(hit(x,yy)){last=yy;gap=0;count++;}else if(++gap>2)break;}
+    if(!near(last,s.anchors[1][1])||count!==s.count||!near(s.length,Math.abs(y-last)))return fail('ENTRY_ROOF_PLAN_BOUNDARY');
+    last=y;gap=0;for(let d=1;d<=Math.max(8,Math.ceil(width*.08));d++){const yy=y+search.outward*d;if(yy<roi[1]||yy>roi[1]+roi[3]-1)break;if([-1,0,1].every(dx=>{const n=neutral(x+dx,yy);return n!==null&&n>=248;}))break;if(hit(x,yy)){last=yy;gap=0;}else if(++gap>2)break;}if(Math.abs(last-y)>3)return fail('ENTRY_ROOF_PLAN_BOUNDARY');
+    const d=p.diagonals[i],line=d.samplingLine,range=d.sampleRange;
+    if(!Array.isArray(d.anchors)||d.anchors.length!==2||!same(d.anchors[0],eave[i])||!supported(d)||!Number.isFinite(line?.m)||!Number.isFinite(line?.c)||!Array.isArray(range)||range.length!==2||!range.every(Number.isInteger)||range[1]<range[0]||range[1]-range[0]>width||range[0]<eave[0][0]-3||range[1]>eave[1][0]+3)return fail('ENTRY_ROOF_PLAN_LINE_FIT');
+    const samples=[];for(let x=range[0];x<=range[1];x++){const expected=line.m*x+line.c,ys=[];for(let y=Math.max(roi[1],Math.round(expected-2));y<=Math.min(roi[1]+roi[3]-1,Math.round(expected+2));y++)if(ink(x,y))ys.push({y,l:neutral(x,y)});if(ys.length){const low=Math.min(...ys.map(p=>p.l)),core=ys.filter(p=>p.l<=low+10);samples.push([x,core.reduce((n,p)=>n+p.y,0)/core.length]);}}
+    const fitted=sourceStrokeFit(samples);if(!fitted||!same(samples,d.sourceSamples)||!same(fitted.points,d.inlierSamples))return fail('ENTRY_ROOF_PLAN_LINE_FIT');
+    const n=fitted.points.length,sx=fitted.points.reduce((n,p)=>n+p[0],0),sy=fitted.points.reduce((n,p)=>n+p[1],0),sxx=fitted.points.reduce((n,p)=>n+p[0]*p[0],0),sxy=fitted.points.reduce((n,p)=>n+p[0]*p[1],0),m=(n*sxy-sx*sy)/(n*sxx-sx*sx),c=(sy-m*sx)/n;
+    if(!near(m,d.fit?.m)||!near(c,d.fit?.c)||Math.abs(m)<.2||Math.abs(m*eave[i][0]+c-eave[i][1])>2||!near(d.anchors[1][1],m*d.anchors[1][0]+c)||Number.isFinite(search.ridgeX)&&Math.abs(d.anchors[1][0]-(eave[i][0]+(search.ridgeX-eave[i][0])*(d.anchors[1][1]-eave[i][1])/(search.wallY-eave[i][1])))>3)return fail('ENTRY_ROOF_PLAN_LINE_FIT');
+   }
+   if(p.diagonals[0].anchors[1][0]>=p.diagonals[1].anchors[1][0]-2)return fail('ENTRY_ROOF_PLAN_BOUNDARY');
+   return [];
+  }catch{return fail('ENTRY_ROOF_PLAN_PIXEL_EVIDENCE');}
+ }
  function canopyEnvelope(image,primary,upperY,{all=false}={}){
   if(primary.status!=='proposed'||!Number.isFinite(upperY))return all?[]:{status:'unresolved',reason:'CANOPY_LEVEL_REQUIRED'};
   const {width:w,height:h}=image,[bx,by,bw,bh]=primary.box,ink=structuralInk(image),mask=new Uint8Array(w*h),top=Math.max(0,Math.floor(upperY-30)),bottom=Math.min(h-1,Math.ceil(upperY+bh*.23));
@@ -1016,31 +1217,90 @@
   }
   return candidates.sort((a,b)=>a.score-b.score||a.box[3]-b.box[3]);
  }
+ function entryRoofStrokeTools(){return typeof module==='object'&&module.exports?require('./plan-roof-hip-candidates.js'):globalThis.MIRRoofHipCandidates;}
+ // A flattened coloured highlight can cover a genuine dark wall stroke.
+ // Only a narrow, vertically continuous stroke with two matching background
+ // flanks may supply the contact pixel. A coloured line on white paper or a
+ // uniform fill cannot satisfy the equal RGB attenuation on both flanks.
+ function entryWallContactProbe(read,size,wallX,crestY,eaveY){
+  const [w,h]=size,x=Math.round(wallX),top=Math.floor(crestY)-6,bottom=Math.ceil(eaveY)+6;
+  if(![wallX,crestY,eaveY].every(Number.isFinite)||x<2||x>=w-2||top<0||bottom>=h||bottom-top<12||bottom-top>512)return null;
+  const shade=c=>({r:c>>>24,g:(c>>>16)&255,b:(c>>>8)&255,a:c&255}),at=(xx,yy)=>{const c=read(xx,yy);return c===null?null:shade(c);};
+  const stroke=yy=>{
+   const c=at(x,yy);if(!c||c.a<=100)return {hit:false,recovered:false};
+   if(c.r+c.g+c.b<630&&Math.max(c.r,c.g,c.b)-Math.min(c.r,c.g,c.b)<45)return {hit:true,recovered:false};
+   for(const offset of [1,2]){
+    const a=at(x-offset,yy),b=at(x+offset,yy);if(!a||!b||a.a<=100||b.a<=100||Math.max(Math.abs(a.r-b.r),Math.abs(a.g-b.g),Math.abs(a.b-b.b))>16)continue;
+    const deltas=[a,b].map(p=>[p.r-c.r,p.g-c.g,p.b-c.b]);
+    if(deltas.every(d=>Math.min(...d)>=12&&Math.max(...d)-Math.min(...d)<=12))return {hit:true,recovered:true};
+   }
+   return {hit:false,recovered:false};
+  };
+  let count=0,gap=0,maxGap=0,recovered=0;for(let y=top;y<=bottom;y++){const s=stroke(y);if(s.hit){count++;gap=0;recovered+=Number(s.recovered);}else maxGap=Math.max(maxGap,++gap);}
+  if(!stroke(Math.round(crestY)).hit||count/(bottom-top+1)<.9||maxGap>2)return null;
+  return {version:1,method:'continuous-wall-stroke-with-matching-colour-flanks',contact:[wallX,crestY],sourceX:x,offsetPixels:x-wallX,anchors:[[x,top],[x,bottom]],support:count/(bottom-top+1),maxGap,recoveredPixelCount:recovered,search:{wallX,crestY,eaveY}};
+ }
+ function entryWallContact(image,wallX,crestY,eaveY){
+  const {width:w,height:h,data}=image,samples=new Map(),read=(x,y)=>{if(x<0||x>=w||y<0||y>=h)return null;const index=y*w+x,j=index*4,c=(data[j]*16777216+data[j+1]*65536+data[j+2]*256+data[j+3])>>>0;samples.set(index,c);return c;},proof=entryWallContactProbe(read,[w,h],wallX,crestY,eaveY);
+  return proof&&samples.size<=4096?{...proof,sourcePixels:{method:'bounded-source-rgba-samples',rasterSize:[w,h],pixels:[...samples].sort((a,b)=>a[0]-b[0])}}:null;
+ }
+ function entryWallContactIssues(proof,{sourceSize}={}){
+  const p=proof?.sourcePixels,size=p?.rasterSize,same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),search=proof?.search;
+  if(proof?.version!==1||proof.method!=='continuous-wall-stroke-with-matching-colour-flanks'||p?.method!=='bounded-source-rgba-samples'||!Array.isArray(size)||size.length!==2||!size.every(n=>Number.isInteger(n)&&n>0)||size[0]*size[1]>12000000||sourceSize&&!same(size,sourceSize)||!Array.isArray(p.pixels)||!p.pixels.length||p.pixels.length>4096||!search)return ['ENTRY_ROOF_WALL_CONTACT_EVIDENCE'];
+  const pixels=new Map();let previous=-1,missing=false;
+  for(const pair of p.pixels){if(!Array.isArray(pair)||pair.length!==2||!pair.every(Number.isInteger)||pair[0]<=previous||pair[0]<0||pair[0]>=size[0]*size[1]||pair[1]<0||pair[1]>4294967295)return ['ENTRY_ROOF_WALL_CONTACT_EVIDENCE'];previous=pair[0];pixels.set(pair[0],pair[1]);}
+  const read=(x,y)=>{const value=pixels.get(y*size[0]+x);if(value===undefined){missing=true;return null;}return value;},replay=entryWallContactProbe(read,size,search.wallX,search.crestY,search.eaveY),stored={...proof};delete stored.sourcePixels;
+  return replay&&!missing&&same(replay,stored)?[]:['ENTRY_ROOF_WALL_CONTACT_EVIDENCE'];
+ }
+ function entrySideRoofIssues(proof,{sourceSize}={}){
+  const p=proof,same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),H=entryRoofStrokeTools();
+  if(p?.eaveConstraint===undefined&&p?.sourceSlopeEvidence===undefined&&p?.wallContactEvidence===undefined)return [];
+  if(p?.status!=='proposed'||p.method!=='supported-side-slope-and-eave-to-wall-boundary'||!Array.isArray(p.points)||p.points.length!==2||p.points.some(q=>!Array.isArray(q)||q.length!==2||!q.every(Number.isFinite))||p.eaveConstraint?.method!=='individual-plan-front-edge-and-terminated-side-slope'||!Number.isFinite(p.eaveConstraint.sourcePixelX)||!(p.eaveConstraint.tolerancePixels>=0&&p.eaveConstraint.tolerancePixels<=4)||Math.abs(p.points[0][0]-p.eaveConstraint.sourcePixelX)>p.eaveConstraint.tolerancePixels+1e-9||!H?.validateElevationSegment||!same(p.sourceSlopeEvidence?.anchors,p.points)||!same(p.wallContactEvidence?.contact,p.points[1])||p.wallContactEvidence?.search?.eaveY!==p.points[0][1]||entryWallContactIssues(p.wallContactEvidence,{sourceSize}).length||H.validateElevationSegment(p.sourceSlopeEvidence,{sourceSize}).length)return ['ENTRY_ROOF_SIDE_SOURCE_EVIDENCE'];
+  return [];
+ }
  // Single rising side silhouette of an attached entrance roof. Both heights
  // come from the separately calibrated front view; every proposed segment,
  // including the lower edge, must still be visible in this side view.
- function entrySideRoof(image,{wallX,postBox,eaveY,crestY,direction='right',tolerance=3,occlusions=[]}){
-  if(!image?.data||!Array.isArray(postBox)||![wallX,eaveY,crestY,tolerance,...postBox].every(Number.isFinite)||eaveY-crestY<5)return {status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
-  const {width:w,height:h}=image,ink=structuralInk(image),sign=direction==='right'?-1:1,postEdge=direction==='right'?postBox[0]:postBox[0]+postBox[2],distance=(postEdge-wallX)*sign;
+ function entrySideRoof(image,{wallX,postBox,eaveY,crestY,direction='right',tolerance=3,occlusions=[],sourceEaveX=null,horizontalTolerance=3}){
+  const fromPlan=Number.isFinite(sourceEaveX);
+  if(!image?.data||!fromPlan&&!Array.isArray(postBox)||![wallX,eaveY,crestY,tolerance,...(fromPlan?[sourceEaveX,horizontalTolerance]:postBox||[])].every(Number.isFinite)||fromPlan&&!(horizontalTolerance>=0&&horizontalTolerance<=4)||eaveY-crestY<5)return {status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
+  const {width:w,height:h}=image,ink=structuralInk(image),sign=direction==='right'?-1:1,postEdge=fromPlan?sourceEaveX:direction==='right'?postBox[0]:postBox[0]+postBox[2],distance=(postEdge-wallX)*sign;
   if(distance<8)return {status:'unresolved',reason:'ENTRY_ROOF_ATTACHMENT_UNRESOLVED'};
   const pad=Math.max(2,Math.min(8,Math.ceil(tolerance))),masked=(x,y)=>occlusions.some(([l,t,bw,bh])=>x>=l-2&&x<=l+bw+2&&y>=t-2&&y<=t+bh+2);
-  const hit=(x,y)=>x>=0&&x<w&&y>=0&&y<h&&!masked(x,y)&&!!ink[Math.round(y)*w+Math.round(x)];
+  const H=fromPlan?entryRoofStrokeTools():null,reader=fromPlan?H?.neutralStrokeReader?.(image):null,wallContacts=new Map();
+  if(fromPlan&&!reader)return {status:'unresolved',reason:'ENTRY_ROOF_SIDE_SOURCE_READER_REQUIRED'};
+  const hit=(x,y)=>x>=0&&x<w&&y>=0&&y<h&&!masked(x,y)&&(!!ink[Math.round(y)*w+Math.round(x)]||!!reader?.at(x,y));
   const support=(a,b)=>{const count=Math.max(1,Math.ceil(Math.abs(b[0]-a[0])));let hits=0,gap=0,maxGap=0;for(let i=0;i<=count;i++){const x=a[0]+(b[0]-a[0])*i/count,y=a[1]+(b[1]-a[1])*i/count;let found=false;for(let dy=-1;dy<=1;dy++)found||=hit(x,y+dy);if(found){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {ratio:hits/(count+1),maxGap};};
   const candidates=[];
-  for(let depth=Math.ceil(distance);depth<=Math.ceil(distance*1.8);depth++){
-   const x=Math.round(wallX+sign*depth);if(x<1||x>w-2)continue;
+  try{
+  for(let depth=Math.max(8,Math.ceil(distance-(fromPlan?horizontalTolerance:0)));depth<=Math.ceil(fromPlan?distance+horizontalTolerance:distance*1.8);depth++){
+   const x=Math.round(wallX+sign*depth);if(x<1||x>w-2||fromPlan&&Math.abs(x-sourceEaveX)>horizontalTolerance+1e-9)continue;
    for(let y=Math.round(eaveY-pad);y<=Math.round(eaveY+pad);y++){
     if(!hit(x,y))continue;
     for(let peak=Math.round(crestY-pad);peak<=Math.round(crestY+pad);peak++){
-     if(!hit(wallX,peak))continue;const a=[x,y],b=[wallX,peak],s=support(a,b);if(s.ratio<.88||s.maxGap>Math.max(4,depth*.055))continue;
+     let wallContactEvidence=null;
+     if(fromPlan){const key=peak+':'+y;if(!wallContacts.has(key))wallContacts.set(key,entryWallContact(image,wallX,peak,y));wallContactEvidence=wallContacts.get(key);if(!wallContactEvidence||masked(wallX,peak))continue;}
+     else if(!hit(wallX,peak))continue;
+     const a=[x,y],b=[wallX,peak],s=support(a,b);if(s.ratio<.88||s.maxGap>Math.max(4,depth*.055))continue;
      let baseline=null;for(let dy=0;dy<=Math.max(6,pad*2);dy++){const test=support([x,y+dy],[wallX,y+dy]);if(test.ratio>=.8&&test.maxGap<=Math.max(4,depth*.08)){baseline={y:y+dy,...test};break;}}
-     if(!baseline)continue;const box=[Math.min(x,wallX),peak,Math.abs(wallX-x),baseline.y-peak];
+     if(!baseline)continue;
+     if(fromPlan){
+      const slope=(peak-y)/(wallX-x),beyond=support([x+sign*3,y+slope*sign*3],[x+sign*10,y+slope*sign*10]),corner=support(a,[x,baseline.y]);
+      // A point in the middle of a longer roof slope is not its eave. The
+      // plan's individual front edge must meet an actual terminated side
+      // slope and its observed lower boundary, without using a post foot.
+      if(beyond.ratio>=.55||corner.ratio<.8||corner.maxGap>2)continue;
+     }
+     const box=[Math.min(x,wallX),peak,Math.abs(wallX-x),baseline.y-peak];
      if(occlusions.some(([l,t,bw,bh])=>Math.min(l+bw,box[0]+box[2])>Math.max(l,box[0])&&Math.min(t+bh,box[1]+box[3])>Math.max(t,box[1])))continue;
-     candidates.push({status:'proposed',points:[a,b],box,baseline,method:'supported-side-slope-and-eave-to-wall-boundary',support:s,score:s.ratio*100+depth*.1-Math.abs(y-eaveY)-Math.abs(peak-crestY),confirmationRequired:true});
+     candidates.push({status:'proposed',points:[a,b],box,baseline,method:'supported-side-slope-and-eave-to-wall-boundary',support:s,...(fromPlan?{wallContactEvidence,eaveConstraint:{sourcePixelX:sourceEaveX,tolerancePixels:horizontalTolerance,method:'individual-plan-front-edge-and-terminated-side-slope'}}:{}),score:s.ratio*100+depth*.1-Math.abs(y-eaveY)-Math.abs(peak-crestY),confirmationRequired:true});
     }
    }
   }
-  candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
+  }catch(error){if(fromPlan&&error.code==='ROOF_PLAN_HIP_CANDIDATE_WORK_LIMIT')return {status:'unresolved',reason:'ENTRY_ROOF_SIDE_PIXEL_WORK_LIMIT'};throw error;}
+  candidates.sort((a,b)=>b.score-a.score);
+  if(fromPlan){for(const candidate of candidates){candidate.sourceSlopeEvidence=H.elevationSegment(image,candidate.points);if(!entrySideRoofIssues(candidate,{sourceSize:[w,h]}).length)return candidate;}return {status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};}
+  return candidates[0]||{status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
  }
- return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,floorSlidingFrameEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,sourceStrokeFit,secondaryEnvelope,secondarySide,roofProfile,roofEaveJunctions,roofCeilingBand,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,closedCellNeighborhood,coherentPaneGroup,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,patternedFrameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
+ return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,floorSlidingFrameEvidence,componentAxisSegments,wallEnvelope,entryRoofFaces,entryRoofPlanBoundaries,entryRoofPlanBoundaryIssues,canopyEnvelope,canopySide,entryBands,entrySideRoof,entrySideRoofIssues,sourceStrokeFit,secondaryEnvelope,secondarySide,roofProfile,roofEaveJunctions,roofCeilingBand,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,closedCellNeighborhood,coherentPaneGroup,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,patternedFrameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
 });

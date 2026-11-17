@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http'),{chromium}=require('playwright');
 const {makeProposedRoofScene,makeRoofPlanScene,moveGridReadingsToRetries}=require('./fixtures/roof-plan-evidence.cjs');
 const P=require('../dist/plan-roof-plan-evidence.js'),R=require('../dist/plan-reconstruction.js');
-const complete=makeProposedRoofScene({directions:['left','right','back']}),missing=makeRoofPlanScene();
+const partialHip=process.argv.includes('--partial-hip'),complete=partialHip?require('./mir-studio-roof-hip-candidates.cjs').makePartialHipRoofScene():makeProposedRoofScene({directions:['left','right','back']}),missing=makeRoofPlanScene();
 delete missing.images.front;delete missing.images.back;
 const assessment=P.propose(missing.parent,missing.proposal,missing.inventory,missing.reviewed,missing.images,{registerElevation:R.elevationRegistration});
 const partialRoof={...structuredClone(missing.parent),extensions:assessment.extensions,roofPlanEvidence:assessment.evidence};
@@ -58,6 +58,6 @@ const dist=path.resolve(__dirname,'../dist'),server=http.createServer((req,res)=
   await page.reload();await page.waitForFunction(()=>window.MIRProjectStore&&window.MIRRoofPlanEvidence);
   const reopened=await page.evaluate(async p=>(await MIRProjectStore.get(p.projectId)).planData.viewInventory.levels.find(l=>l.id===p.levelId).reconstructedRoofs[0],proof);
   assert.deepEqual(reopened,proof.finalRoof);
-  console.log('PASS roof plan browser storage: actual source-derived asymmetric returns, stable child finishes, source preservation, atomic invalid/stale/lost evidence refusals and unresolved preview');
+  console.log('PASS roof plan browser storage'+(partialHip?' (partial hip boundaries and replayable raster proof)':'')+': actual source-derived asymmetric returns, stable child finishes, source preservation, atomic invalid/stale/lost evidence refusals and unresolved preview');
  }finally{await browser?.close();server.close();}
 })().catch(error=>{console.error(error.stack);process.exitCode=1;});

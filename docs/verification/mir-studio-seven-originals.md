@@ -821,3 +821,111 @@ The keyed-wall pass now resolves one physical wall per independently observed pl
 A private replay of the immutable candidate `896aca1` on retained C7 source readings produced **18 walls, 41 openings and 1 main roof**, compared with 16 walls on that same source-reading lineage. Both new keyed-wall proposals pass the final source validator, including replay against the original imported views with native readings retained separately. Four perspectives were rendered by the existing MIR3D renderer on the Node canvas adapter. This is an incremental source replay, not a browser import or a complete building acceptance. Entrance/patio roofs remain a separate active correction. No private PDF, raster, OCR text or building coordinates are included in git or CI.
 
 The final persistence guard validates PDF identity, frame, page, crop transforms, current key readings and immutable source geometry. Original imported views stay unchanged; current native records are retained alongside the proposal and earlier attempts remain in their recorded history. Invented fixtures exercise cap/roof/picket ambiguity, detached bases, source mutation, native-key conflicts, confirmation-only changes, finishes and atomic save/reload. The browser test is part of this commit's CI; its result must be checked on this exact head.
+
+## Verified keyed-wall checkpoint — cf6c969
+
+All **16 workflows passed at `cf6c969`**. The keyed-wall browser journal was
+inspected in [Studio run `44191417565`, job `134421511662`](https://github.com/revetementsmir/Revetements-mir-/actions/runs/44191417565/job/134421511662).
+It records the actual synthetic IndexedDB persistence gate, including retained
+source evidence, confirmation, finishes and rejection of invalid mutations.
+This receipt validates that implementation at that head; original-source
+browser acceptance remains separate.
+
+The newer private D01/C7 result has the following explicit lineage:
+
+| Stage | Execution boundary | Result |
+| --- | --- | --- |
+| Fresh original import at `4aa7596` | Production importer in the private Node adapter | 17 pages and 11 views; newly retained source inventory and rasters |
+| Full targeted refinement at `4aa7596` | Production `refine` resumed from that completed import | Complete reading pass and its retained evidence |
+| Keyed-wall phase with the final keyed-wall module | Production twelve-region key reader on that refined inventory | Twelve bounded reads, with prior readings and native provenance preserved |
+| Reconstruction at `cf6c969` | `P.build` reuses the preceding refined inventory | Four proposed levels, **18 walls, 43 openings and one main roof** |
+
+This is a fresh import followed by recorded resumptions, not one uninterrupted
+form conversion at `cf6c969`. Both keyed walls validate against the original
+imported views with current readings retained separately. Node rendering and
+source guards do not establish browser upload, IndexedDB persistence or complete
+source fidelity for this original. The earlier 41-opening replay remains a
+different reading lineage and is preserved above.
+
+### Private integration replay — bc9bc76
+
+The frozen integration candidate `bc9bc76` reuses that same fresh-import and
+refinement lineage. It produces **18 walls, 43 openings and four root roofs**:
+one main roof and three individual entrance roofs. The main roof also has one
+left return component; that nested component is separate from the root-roof
+count. Source guards pass against both the analysis inventory and the original
+import with **145 current retained reading records** composed from the full
+refinement and key phase. Earlier attempts remain recorded.
+
+This is a private Node reproduction using the production modules and renderer,
+not a new browser recipe on the original. Entrance supports, hidden sections
+and unestablished components remain unresolved. The right and rear main-roof
+returns are still being corrected; this checkpoint claims no success for them.
+The final integration head and its browser/original-source receipts must be
+recorded separately after verification.
+
+### Automatic client sequence and remaining limits
+
+The client path is: **import PDF → open the saved project → targeted `refine`
+→ `P.build` → atomic `saveReconstruction` → proposed 3D scene**. The import
+retains its original views and a pending reconstruction request. Opening that
+project starts conversion for the selected building; the reading pass supplies
+the retained source evidence, and the saved nonempty model opens in 3D. This
+flow uses the application modules without an agent conversation or manual
+geometry input. Its implementation is distinct from the private Node receipts
+above.
+
+Existing edited projects remain protected against automatic replacement.
+Revision and active-project checks guard the save; automatic reassignment of
+earlier edits to a changed topology is not demonstrated. Processing runs in
+the browser and can be interrupted by closing or reloading the page; duration
+and memory on a client device remain part of browser acceptance. Multiple
+levels require compatible source axes and vertical datums, so missing or
+contradictory associations can still leave a partial model. Finishes may be
+saved on proposed geometry, but they do not confirm its measurements:
+**proposed surfaces remain excluded from validated purchase quantities**.
+
+The historical receipts retain their original scope. No private filename,
+source transcription, raster, crop, source fingerprint or building coordinate
+is added to git by this update.
+
+## Ordinary refinement with entrance and patio roofs — 042b49c
+
+The immutable private candidate `042b49c` starts from the unchanged raw inventory
+of the newer original import and executes the ordinary production `refine`,
+without a pre-refined inventory or an extra isolated keyed-wall phase. This
+pass takes 481.194 seconds and retains 139 evidence records, with 173 actual
+OCR calls. Reconstruction takes 133.303 seconds and produces **four levels,
+18 walls, 43 openings and four root roofs**. The root roofs are the main roof
+and three independent entrance roofs. The main roof additionally contains
+**three patio return components: left, right and rear**.
+
+The four perspectives come from the production MIR3D renderer on Node canvas;
+the front and rear renders were opened and inspected. This execution reuses
+the recorded raw import, so it is not a fresh form import in this execution.
+It is also not a browser persistence recipe on the original. No manually
+prepared readings, dimensions or geometry are supplied to the refinement.
+
+The new entrance reader combines a closed frontal face, observed source
+slopes, its individual roof-plan boundary and registered side attachment.
+The bounded plan search refuses unresolved or excessive work. The patio
+reader preserves the observed source profiles and labels the model
+intersection as calculated. Its finite-profile check retains the existing
+three-pixel vertical limit; it does not compare a derived horizontal
+intersection error as if it were an independent source observation.
+
+The final changes after this private candidate affect validation only: exact
+derived PDF coordinates and confirmation status transitions are accepted,
+while altered source values still fail; the browser guard resolves the actual
+`MIRPlanReconstruction` export. A VM contract exercises the real browser
+validator, including a source refusal, and fails when the former alias is
+restored in memory. Synthetic Chromium/IndexedDB gates cover roof returns,
+roof-only entries spanning two levels, parent confirmation, finishes, atomic
+refusals and reopening. Their result must be read on the published head.
+
+The building remains a partial proposal. Entrance supports, hidden sections,
+undersides, some masonry and opening associations, and alternative roof
+hypotheses remain unresolved. This result demonstrates the requested roof
+components on this source, not universal PDF conversion or complete quantities.
+An existing saved automatic model is protected just like an edited model:
+the new reconstruction path requires a new import or an empty model.

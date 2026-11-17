@@ -1,7 +1,7 @@
 /* Roof-plan returns are source observations. A plan supplies XY, never Z.
  * Only a supported hip/ridge, two orthogonal elevation profiles and a sourced
  * intersection with the parent can produce a roof component. */
-(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-grid-registration.js'):root.MIRGridRegistration,node?require('./plan-reconstructed-roofs.js'):root.MIRReconstructedRoofs,node?require('./plan-reconstruction-vision.js'):root.MIRReconstructionVision);if(node)module.exports=api;else root.MIRRoofPlanEvidence=api;})(typeof window==='object'?window:globalThis,function(M,Grid,Roof,V){
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-grid-registration.js'):root.MIRGridRegistration,node?require('./plan-reconstructed-roofs.js'):root.MIRReconstructedRoofs,node?require('./plan-reconstruction-vision.js'):root.MIRReconstructionVision,node?require('./plan-roof-hip-candidates.js'):root.MIRRoofHipCandidates);if(node)module.exports=api;else root.MIRRoofPlanEvidence=api;})(typeof window==='object'?window:globalThis,function(M,Grid,Roof,V,H){
  'use strict';
  const finite=Number.isFinite,copy=M.clone,same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),point=p=>Array.isArray(p)&&p.length===2&&p.every(finite),unique=a=>[...new Set(a)];
  const frames={front:{axis:'x',sign:1,normal:'y',outward:-1},back:{axis:'x',sign:-1,normal:'y',outward:1},right:{axis:'y',sign:1,normal:'x',outward:1},left:{axis:'y',sign:-1,normal:'x',outward:-1}};
@@ -10,16 +10,21 @@
  const corners=b=>[[b[0],b[1]],[b[2],b[1]],[b[2],b[3]],[b[0],b[3]]];
  const geometry=r=>({profiles:copy(r.profiles??null),extensions:(Array.isArray(r.extensions)?r.extensions:[]).map(e=>({id:e?.id,profiles:copy(e?.profiles??null)}))});
  const sourceSize=v=>[v?.payload?.sourceWidth||v?.frame?.rasterSize?.[0],v?.payload?.sourceHeight||v?.frame?.rasterSize?.[1]];
+ function reviewedSource(value,view){
+  if(!value?.reference||!Array.isArray(value.points)||value.points.some(p=>!p||!point(p.xy)||p.pdfPoint!==undefined&&!same(p.pdfPoint,M.pdfPoint(view,p.xy)))||value.reference.pdfAnchors!==undefined&&(!Array.isArray(value.reference.anchors)||!same(value.reference.pdfAnchors,value.reference.anchors.map(p=>M.pdfPoint(view,p)))))return null;
+  const measure=m=>{if(m==null)return null;const out=copy(m);if(['proposed','confirmed'].includes(out.status))out.status='proposed';return out;},reference=measure(value.reference);delete reference.pdfAnchors;
+  return {reference,points:value.points.map(p=>{const out=copy(p);delete out.pdfPoint;return out;}),alignment:measure(value.alignment),base:measure(value.base),height:measure(value.height)};
+ }
  // Original imported rows stay immutable in storage. Regional OCR is retained
  // separately with the proposal; accept it only in its exact source frame.
  function localGridReading(row,view,inventory){
   const r=row?.retry,c=r?.gridCircle,b=row?.box,region=r?.region,size=sourceSize(view),label=String(row?.text||'').trim().toUpperCase();
   const inside=p=>point(p)&&size.every((n,i)=>finite(n)&&n>0&&p[i]>=0&&p[i]<=n);
-  if(row?.source!=='ocr-local-grid-bubble'||row.labelStatus!=='proposed'||row.sourceViewId!==view.id||r?.sourceViewId!==view.id||r.purpose!=='source-raster-grid-bubble'||!same(r.sourceFrame,view.frame)||r.sourceFileId!==undefined&&r.sourceFileId!==view.fileId||r.sourcePage!==undefined&&r.sourcePage!==view.page||r.labelConflict)return false;
+  if(row?.source!=='ocr-local-grid-bubble'||row.labelStatus!=='proposed'||row.sourceViewId!==undefined&&row.sourceViewId!==view.id||r?.sourceViewId!==view.id||r.purpose!=='source-raster-grid-bubble'||!same(r.sourceFrame,view.frame)||r.sourceFileId!==undefined&&r.sourceFileId!==view.fileId||r.sourcePage!==undefined&&r.sourcePage!==view.page||r.labelConflict)return false;
   if(!Array.isArray(b)||b.length!==4||!b.every(finite)||!inside(b.slice(0,2))||!inside(b.slice(2))||b[2]<=b[0]||b[3]<=b[1]||!Array.isArray(region)||region.length!==4||!region.every(finite)||region[2]<=0||region[3]<=0||!inside(region.slice(0,2))||!inside([region[0]+region[2],region[1]+region[3]])||b[0]<region[0]||b[1]<region[1]||b[2]>region[0]+region[2]||b[3]>region[1]+region[3])return false;
   if(!c||!inside(c.center)||!finite(c.radius)||c.radius<=3||!(c.ringSupport>=.9)||!['number','letter'].includes(c.kind)||!(c.kind==='number'?/^\d{1,2}$/.test(label)&&Number(label)>0:/^[A-Z]$/.test(label))||M.distance(c.center,[(b[0]+b[2])/2,(b[1]+b[3])/2])>c.radius*.4)return false;
   if(!Array.isArray(r.attempts)||r.attempts.length<1||r.attempts.length>8||!r.attempts.some(a=>a?.usable&&a.token===label&&a.confidence>=55)||r.attempts.some(a=>a?.usable&&(a.token!==label||!(a.confidence>=55))))return false;
-  const native=r.nativeSource;if(native&&(native.method!=='retained-pdf-region'||native.sourceViewId!==view.id||native.sourceFileId!==view.fileId||native.sourcePage!==view.page||!same(native.sourceFrame,view.frame)||!same(native.sourceRegion,region)||!inventory?.files?.some(f=>f.id===view.fileId&&f.sha256&&f.sha256===native.sourceSha256)))return false;
+  const native=r.nativeSource;if(r.nativeAttempt?.status==='proposed'&&!native)return false;if(native&&(native.method!=='retained-pdf-region'||native.sourceViewId!==view.id||native.sourceFileId!==view.fileId||native.sourcePage!==view.page||!same(native.sourceFrame,view.frame)||!same(native.sourceRegion,region)||!inventory?.files?.some(f=>f.id===view.fileId&&f.sha256&&f.sha256===native.sourceSha256)))return false;
   return true;
  }
  function projection(reference,registration){
@@ -83,7 +88,7 @@
    }
   }return out;
  }
- function observe(roof,inventory,reviewed,images={}){
+ function observe(roof,inventory,reviewed,images={},options={}){
   if(!inventory.views.some(v=>v.kind==='roof'&&v.buildingId===roof.buildingId))return {version:1,status:'not-found',observations:[],issues:[]};
   const result={version:1,roofId:roof.id,levelId:roof.levelId,buildingId:roof.buildingId,status:'unresolved',observations:[],issues:[],geometry:geometry(roof)},floor=inventory.views.find(v=>v.id===reviewed.sourceViewId&&v.kind==='floor'&&v.buildingId===roof.buildingId),unit=M.scale(reviewed);
   if(!floor||!unit||!reviewed.points?.length||reviewed.alignment?.rotationDegrees!==0){result.issues.push('ROOF_PLAN_FLOOR_REGISTRATION_REQUIRED');return result;}
@@ -98,12 +103,12 @@
    if(!project){result.issues.push(grid.reason||'ROOF_PLAN_GRID_REGISTRATION_REQUIRED');continue;}
    const candidates=[];
    for(const [basis,box]of [['parent-roof-profiles',primary],...(different?[['floor-contour',floorBox]]:[])]){
-    const found=returns(images[view.id],bounds(corners(box).map(project.source)));result.issues.push(...found.issues);
+    const host=bounds(corners(box).map(project.source)),found=returns(images[view.id],host),hips=H?.detect?.(images[view.id],host,{cancelled:options.cancelled})||{candidates:[],issues:['ROOF_PLAN_HIP_DETECTOR_UNAVAILABLE']};result.issues.push(...found.issues,...hips.issues);found.push(...hips.candidates);
     for(const source of found){
-     const footprint=source.anchors.map(project.model),b=bounds(footprint);
-     if(candidates.some(o=>o.direction===source.direction&&bounds(o.footprint).slice(0,2).every((n,i)=>Math.abs(n-b[i])<Math.max(project.scaleX,project.scaleY)*4)&&M.distance(o.hip.node,source.hip.node)<4))continue;
-     const id='roof-plan-return:'+view.id+':'+source.direction+':'+source.anchors[0].map(Math.round).join('-'),sourceBox=bounds(source.anchors),insideParent=footprint.every(([x,y])=>x>=primary[0]-unit*3&&x<=primary[2]+unit*3&&y>=primary[1]-unit*3&&y<=primary[3]+unit*3);
-     candidates.push({...copy(source),id,kind:'source-roof-plan-return',status:'proposed',sourceViewId:view.id,sourceFileId:view.fileId,sourcePage:view.page,sourceFrame:copy(view.frame),sourceBox:[sourceBox[0],sourceBox[1],sourceBox[2]-sourceBox[0],sourceBox[3]-sourceBox[1]],boxFormat:'xywh',footprint,gridRegistration:copy(grid),hostBasis:basis,parentExtentAmbiguous:insideParent,scaleX:project.scaleX,scaleY:project.scaleY,association:{status:'unresolved',reason:insideParent?'ROOF_PLAN_PARENT_COMPONENT_OVERLAP_UNRESOLVED':'ROOF_RETURN_ELEVATION_PROFILES_REQUIRED'},confirmationRequired:true});
+     const footprint=source.anchors.map(project.model);
+     if(candidates.some(o=>o.direction===source.direction&&o.anchors.slice(0,2).every((a,i)=>M.distance(a,source.anchors[i])<4)&&M.distance(o.hip.node,source.hip.node)<4))continue;
+     const id='roof-plan-return:'+view.id+':'+source.direction+':'+source.anchors[0].map(Math.round).join('-')+(source.mode?':hip-'+source.hip.node.map(Math.round).join('-'):''),sourceBox=bounds(source.anchors),insideParent=footprint.every(([x,y])=>x>=primary[0]-unit*3&&x<=primary[2]+unit*3&&y>=primary[1]-unit*3&&y<=primary[3]+unit*3);
+     candidates.push({...copy(source),id,kind:'source-roof-plan-return',status:'proposed',sourceViewId:view.id,sourceFileId:view.fileId,sourcePage:view.page,sourceFrame:copy(view.frame),...(source.mode?{sourceFileSha256:inventory.files?.find(f=>f.id===view.fileId)?.sha256??null}:{}),sourceBox:[sourceBox[0],sourceBox[1],sourceBox[2]-sourceBox[0],sourceBox[3]-sourceBox[1]],boxFormat:'xywh',footprint,gridRegistration:copy(grid),hostBasis:basis,parentExtentAmbiguous:insideParent,scaleX:project.scaleX,scaleY:project.scaleY,association:{status:'unresolved',reason:insideParent?'ROOF_PLAN_PARENT_COMPONENT_OVERLAP_UNRESOLVED':'ROOF_RETURN_ELEVATION_PROFILES_REQUIRED'},confirmationRequired:true});
     }
    }result.observations.push(...candidates);if(result.observations.length>48){result.observations=result.observations.slice(0,48);result.issues.push('ROOF_PLAN_OBSERVATION_LIMIT');break;}
   }
@@ -115,21 +120,38 @@
   const f=frames[observation.direction],b=bounds(observation.footprint),result=[];
   for(const info of proposal.views||[]){
    const frame=frames[info.direction],view=inventory.views.find(v=>v.id===info.viewId&&v.kind==='elevation'&&v.buildingId===proposal.buildingId&&v.direction===info.direction),r=frame&&view&&registerElevation(info,reviewed,inventory);
-   if(!r||!['u','z','pixelU','pixelZ'].every(k=>typeof r[k]==='function')||![r.sx,r.sz].every(n=>finite(n)&&n>0)||info.direction!==observation.direction&&frame.axis!==f.normal)continue;
+   const envelope=r?.envelope||info.envelope;
+   if(!r||envelope?.status!=='proposed'||!Array.isArray(envelope.box)||!envelope.box.every(finite)||!['u','z','pixelU','pixelZ'].every(k=>typeof r[k]==='function')||![r.sx,r.sz].every(n=>finite(n)&&n>0)||info.direction!==observation.direction&&frame.axis!==f.normal)continue;
    const index=frame.axis==='x'?0:1,range=[b[index],b[index+2]];
    // A side crop must include the observed ridge into the parent, not stop
    // at the plan's open attachment edge. This enlarges a search window only.
    if(info.direction!==observation.direction&&parentRoof){const p=parentRoof.profiles[frame.axis],depth=range[1]-range[0];if(f.outward<0)range[1]=Math.min(p.at(-1)[0],range[1]+depth);else range[0]=Math.max(p[0][0],range[0]-depth);}
-   const span=range.map(n=>frame.sign*n),pixels=span.map(r.pixelU).sort((a,b)=>a-b),box=[pixels[0],info.envelope.box[1],pixels[1]-pixels[0],info.envelope.box[3]],size=sourceSize(view);
+   const span=range.map(n=>frame.sign*n),pixels=span.map(r.pixelU).sort((a,b)=>a-b),box=[pixels[0],envelope.box[1],pixels[1]-pixels[0],envelope.box[3]],size=sourceSize(view);
    if(box[0]<0||box[0]+box[2]>size[0]||box[1]<0||box[1]+box[3]>size[1]||box[2]<8)continue;
-   result.push({sourceViewId:view.id,sourceFileId:view.fileId,sourcePage:view.page,sourceFrame:copy(view.frame),direction:info.direction,axis:frame.axis,sign:frame.sign,role:info.direction===observation.direction?'outer-eave-profile':'orthogonal-return-profile',sourceBox:box,boxFormat:'xywh',scaleX:r.sx,scaleY:r.sz,registration:{min:r.min,max:r.max,wallBox:copy(info.envelope.box),supportY:info.supportY??info.envelope.box[1],base:reviewed.base.value,guide:copy(r.guide),levelBand:copy(r.levelBand||null)},envelope:{...copy(info.envelope),box},transform:r});
+   result.push({sourceViewId:view.id,sourceFileId:view.fileId,sourcePage:view.page,sourceFrame:copy(view.frame),direction:info.direction,axis:frame.axis,sign:frame.sign,role:info.direction===observation.direction?'outer-eave-profile':'orthogonal-return-profile',sourceBox:box,boxFormat:'xywh',scaleX:r.sx,scaleY:r.sz,registration:{min:r.min,max:r.max,wallBox:copy(envelope.box),supportY:r.envelope?envelope.box[1]:info.supportY??envelope.box[1],base:reviewed.base.value,guide:copy(r.guide),levelBand:copy(r.levelBand||null),...(r.datumRegistration?{method:'independent-ceiling-and-native-scale',datumRegistration:copy(r.datumRegistration)}:{})},envelope:{...copy(envelope),box},transform:r});
   }return result;
+ }
+ function profileConstraint(observation,region,reviewed){
+  const map=projection(reviewed,observation.gridRegistration),index=region.axis==='x'?0:1,q=region.registration,pixelU=u=>q.wallBox[0]+(u-q.min)/region.scaleX,convert=p=>pixelU(region.sign*map.model(p)[index]);
+  return {role:region.role,sourceBox:copy(region.sourceBox),eaveXs:(region.role==='outer-eave-profile'?observation.anchors.slice(0,2):observation.anchors.slice(0,1)).map(convert).sort((a,b)=>a-b),ridgeX:convert(observation.hip.node)};
  }
  const line=(a,b)=>Math.abs(b[0]-a[0])<1e-9?null:{m:(b[1]-a[1])/(b[0]-a[0]),c:a[1]-(b[1]-a[1])/(b[0]-a[0])*a[0]};
  function value(profile,x){for(let i=0;i<profile.length-1;i++){const a=profile[i],b=profile[i+1];if(x>=a[0]-1e-8&&x<=b[0]+1e-8)return a[1]+(b[1]-a[1])*(x-a[0])/(b[0]-a[0]);}return null;}
+ function finiteProfileComparison(sourceProfile,modelProfile){
+  // Both finite source strokes must already have pixel support. The maximum
+  // vertical difference of two linear splines occurs at their joint knots.
+  // No segment or observation is moved to the calculated intersection.
+  const valid=p=>Array.isArray(p)&&p.length===3&&p.every(point)&&p.slice(1).every((q,i)=>(q[0]-p[i][0])*Math.sign(p[2][0]-p[0][0])>1e-8);
+  if(!valid(sourceProfile)||!valid(modelProfile)||Math.abs(sourceProfile[0][0]-modelProfile[0][0])>1e-8||Math.abs(sourceProfile[2][0]-modelProfile[2][0])>1e-8)return null;
+  const source=sourceProfile.slice().sort((a,b)=>a[0]-b[0]),model=modelProfile.slice().sort((a,b)=>a[0]-b[0]),domain=[source[0][0],source[2][0]],xs=unique([...source,...model].map(p=>p[0])).sort((a,b)=>a-b),knots=xs.map(x=>{const sourceY=value(source,x),modelY=value(model,x);return {x,sourceY,modelY,verticalResidual:modelY-sourceY};});
+  if(knots.some(k=>![k.x,k.sourceY,k.modelY,k.verticalResidual].every(finite)))return null;const maximumAbsoluteVerticalResidual=Math.max(...knots.map(k=>Math.abs(k.verticalResidual)));
+  return {method:'finite-piecewise-linear-vertical-residuals',sourceProfile:copy(sourceProfile),modelProfile:copy(modelProfile),domain,knots,maximumAbsoluteVerticalResidual,tolerancePixels:3,status:maximumAbsoluteVerticalResidual<=3?'compatible':'conflict'};
+ }
+ const equivalentNumbers=(a,b)=>typeof a==='number'||typeof b==='number'?finite(a)&&finite(b)&&Math.abs(a-b)<1e-8:Array.isArray(a)||Array.isArray(b)?Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.every((v,i)=>equivalentNumbers(v,b[i])):a&&b&&typeof a==='object'&&typeof b==='object'?same(Object.keys(a).sort(),Object.keys(b).sort())&&Object.keys(a).every(k=>equivalentNumbers(a[k],b[k])):a===b;
  function associate(observation,regions,roof,inventory,reviewed,images){
-  const unresolved=reason=>({status:'unresolved',reason}),f=frames[observation.direction],t=f.axis,n=f.normal,ni=n==='x'?0:1,ti=1-ni,b=bounds(observation.footprint),outer=f.outward<0?b[ni]:b[ni+2],primary=regions.find(r=>r.role==='outer-eave-profile');
+  const unresolved=reason=>({status:'unresolved',reason}),f=frames[observation.direction],t=f.axis,n=f.normal,ni=n==='x'?0:1,ti=1-ni,b=bounds(observation.footprint),outer=f.outward<0?b[ni]:b[ni+2],primary=regions.find(r=>r.role==='outer-eave-profile'),newMode=observation.mode==='two-hip-diagonals-and-ridge';
   if(observation.parentExtentAmbiguous)return unresolved('ROOF_PLAN_PARENT_COMPONENT_OVERLAP_UNRESOLVED');
+  if(newMode&&regions.some(r=>r.profile?.reason==='ROOF_RETURN_SOURCE_PROFILE_AMBIGUOUS'))return unresolved('ROOF_RETURN_SOURCE_PROFILE_AMBIGUOUS');
   if(!primary||!primary.profile?.slopes?.[0]||!primary.profile.slopes[1])return unresolved('ROOF_RETURN_OUTER_PROFILE_REQUIRED');
   const convert=(r,s)=>({source:s,eave:[r.sign*r.transform.u(s.eaveX),r.transform.z(s.eaveY)],high:[r.sign*r.transform.u(s.highX),r.transform.z(s.highY)]}),halves=primary.profile.slopes.slice(0,2).map(s=>convert(primary,s)).sort((a,b)=>a.eave[0]-b.eave[0]),a=line(halves[0].eave,halves[0].high),z=line(halves[1].eave,halves[1].high),pixelTolerance=3,xyTolerance=pixelTolerance*Math.max(observation.scaleX,observation.scaleY,primary.scaleX),zTolerance=primary.scaleY*pixelTolerance;
   if(!a||!z||a.m<=0||z.m>=0)return unresolved('ROOF_RETURN_OUTER_PROFILE_REQUIRED');
@@ -139,14 +161,15 @@
   const candidates=[],conflicts=[];
   for(const side of regions.filter(r=>r.role==='orthogonal-return-profile'))for(const s of side.profile?.slopes||[]){
    if(!s)continue;const h=convert(side,s),l=line(h.eave,h.high),tolerance=pixelTolerance*Math.max(side.scaleX,observation.scaleX,observation.scaleY),heightTolerance=pixelTolerance*Math.max(side.scaleY,primary.scaleY);
-   if(l&&l.m*f.outward<0&&Math.abs(h.eave[0]-outer)<=tolerance&&Math.abs(h.high[0]-hipPoint[ni])<=tolerance&&(Math.abs(h.eave[1]-halves[0].eave[1])>heightTolerance||Math.abs(h.high[1]-crest)>heightTolerance)){conflicts.push({sourceViewId:side.sourceViewId,sourceFrame:copy(side.sourceFrame),observedEaveHeight:h.eave[1],observedRidgeHeight:h.high[1],outerProfileEaveHeight:halves[0].eave[1],outerProfileRidgeHeight:crest,tolerance:heightTolerance});continue;}
+   if(l&&l.m*f.outward<0&&Math.abs(h.eave[0]-outer)<=tolerance&&(newMode||Math.abs(h.high[0]-hipPoint[ni])<=tolerance)&&(Math.abs(h.eave[1]-halves[0].eave[1])>heightTolerance||Math.abs(h.high[1]-crest)>heightTolerance)){conflicts.push({sourceViewId:side.sourceViewId,sourceFrame:copy(side.sourceFrame),observedEaveHeight:h.eave[1],observedRidgeHeight:h.high[1],outerProfileEaveHeight:halves[0].eave[1],outerProfileRidgeHeight:crest,tolerance:heightTolerance});continue;}
    if(!l||l.m*f.outward>=0||Math.abs(h.eave[0]-outer)>tolerance||Math.abs(h.eave[1]-halves[0].eave[1])>heightTolerance||Math.abs(h.high[1]-crest)>heightTolerance)continue;
-   const ridge=(crest-l.c)/l.m;if(Math.abs(ridge-hipPoint[ni])>tolerance||Math.abs(ridge-h.high[0])>tolerance)continue;
+   const ridge=(crest-l.c)/l.m;if(Math.abs(ridge-hipPoint[ni])>tolerance||!newMode&&Math.abs(ridge-h.high[0])>tolerance)continue;
    const parentAtPeak=value(roof.profiles[t],peak);if(parentAtPeak===null||parentAtPeak<crest-1e-8)continue;
    const joins=[];for(let i=0;i<roof.profiles[n].length-1;i++){const p=roof.profiles[n][i],q=roof.profiles[n][i+1],slope=(q[1]-p[1])/(q[0]-p[0]);if(slope*f.outward>=0)continue;const u=p[0]+(crest-p[1])/slope;if(u<p[0]-1e-8||u>q[0]+1e-8||(u-ridge)*f.outward>=-tolerance)continue;joins.push(u);}
-   if(!joins.length)continue;joins.sort((a,b)=>Math.abs(a-ridge)-Math.abs(b-ridge));const join=joins[0],world=u=>ni===0?[u,peak]:[peak,u],planAnchors=[map.source(world(ridge)),map.source(world(join))],planInk=sourceInk(images[observation.sourceViewId]),planProof=planInk&&support(planInk,...planAnchors),elevationAnchors=[[side.transform.pixelU(side.sign*ridge),side.transform.pixelZ(crest)],[side.transform.pixelU(side.sign*join),side.transform.pixelZ(crest)]],sideInk=sourceInk(images[side.sourceViewId]),sideProof=sideInk&&support(sideInk,...elevationAnchors);
+   if(!joins.length)continue;joins.sort((a,b)=>Math.abs(a-ridge)-Math.abs(b-ridge));const join=joins[0],world=u=>ni===0?[u,peak]:[peak,u],planAnchors=[map.source(world(ridge)),map.source(world(join))],planInk=sourceInk(images[observation.sourceViewId]),planProof=planInk&&support(planInk,...planAnchors),modelAnchors=[[side.transform.pixelU(side.sign*ridge),side.transform.pixelZ(crest)],[side.transform.pixelU(side.sign*join),side.transform.pixelZ(crest)]],elevationAnchors=newMode?[[h.source.highX,h.source.highY],[modelAnchors[1][0],h.source.highY]]:modelAnchors,sourceEave=[h.source.eaveX,h.source.eaveY],comparison=newMode?finiteProfileComparison([sourceEave,...elevationAnchors],[sourceEave,...modelAnchors]):null,projection=newMode?{method:'observed-ridge-and-separate-model-projection',modelNodeKind:'calculated-intersection',modelAnchors,observedAnchors:copy(elevationAnchors),residuals:elevationAnchors.map((p,i)=>p.map((n,j)=>n-modelAnchors[i][j])),residualMetric:'finite-profile-vertical-pixels',finiteProfileComparison:comparison,planNodeX:side.profileConstraint.ridgeX,planResidualX:modelAnchors[0][0]-side.profileConstraint.ridgeX,tolerancePixels:pixelTolerance,endpointKind:'model-join-coordinate-on-observed-ridge'}:null,sideInk=sourceInk(images[side.sourceViewId]),sideProof=newMode?H.elevationSegment(images[side.sourceViewId],elevationAnchors):sideInk&&support(sideInk,...elevationAnchors);
+   if(projection&&(comparison?.status!=='compatible'||Math.abs(projection.planResidualX)>pixelTolerance))continue;
    if(!planProof||!sideProof||!supported(planProof)||!supported(sideProof))continue;
-   candidates.push({side,h,ridge,join,planAnchors,planProof,elevationAnchors,sideProof,difference:h.high[1]-crest});
+   candidates.push({side,h,ridge,join,planAnchors,planProof,elevationAnchors,sideProof,projection,difference:h.high[1]-crest});
   }
   if(conflicts.length)return {...unresolved('ROOF_RETURN_ORTHOGONAL_PROFILES_CONFLICT'),conflicts};
   if(!candidates.length)return unresolved('ROOF_RETURN_ORTHOGONAL_PROFILE_OR_SOURCED_JOIN_REQUIRED');
@@ -154,17 +177,26 @@
   const c=candidates[0],primaryAnchors=[[halves[0].source.eaveX,halves[0].source.eaveY],[primary.transform.pixelU(primary.sign*peak),primary.transform.pixelZ(crest)],[halves[1].source.eaveX,halves[1].source.eaveY]],sources=[{sourceViewId:primary.sourceViewId,sourceFrame:copy(primary.sourceFrame),axis:t,anchors:primaryAnchors,scaleX:primary.scaleX,scaleY:primary.scaleY},{sourceViewId:c.side.sourceViewId,sourceFrame:copy(c.side.sourceFrame),axis:n,anchors:[[c.h.source.eaveX,c.h.source.eaveY],[c.h.source.highX,c.h.source.highY],c.elevationAnchors[1]],scaleX:c.side.scaleX,scaleY:c.side.scaleY}],profiles={[t]:[halves[0].eave,[peak,crest],halves[1].eave],[n]:[c.h.eave,[c.ridge,crest],[c.join,crest]].sort((a,b)=>a[0]-b[0])};
   const extension={version:1,id:roof.id+':'+observation.id,levelId:roof.levelId,buildingId:roof.buildingId,status:'proposed',kind:'estimated-calibrated',profiles,sources,connection:{kind:'source-roof-plan-return',parentRoofId:roof.id,observationId:observation.id,direction:observation.direction,join:{axis:n,value:c.join,height:crest,method:'observed-ridge-and-intersection-with-parent-profile'},orthogonalHeightDifference:c.difference},complete:false,confirmationRequired:true,quantityStatus:'partial-unreviewed'};
   if(Roof.issues(extension,{confirm:false}).length)return unresolved('ROOF_RETURN_COMPONENT_INVALID');
-  return {status:'proposed',componentId:extension.id,profiles:copy(profiles),sources:copy(sources),join:copy(extension.connection.join),planRidge:{anchors:c.planAnchors,...c.planProof},elevationRidge:{sourceViewId:c.side.sourceViewId,sourceFrame:copy(c.side.sourceFrame),anchors:c.elevationAnchors,...c.sideProof},orthogonalHeightDifference:c.difference,extension};
+  return {status:'proposed',componentId:extension.id,profiles:copy(profiles),sources:copy(sources),join:copy(extension.connection.join),planRidge:{anchors:c.planAnchors,...c.planProof},elevationRidge:{sourceViewId:c.side.sourceViewId,sourceFrame:copy(c.side.sourceFrame),anchors:c.elevationAnchors,...c.sideProof,...(c.projection?{projection:c.projection}:{})},orthogonalHeightDifference:c.difference,extension};
  }
  function propose(roof,proposal,inventory,reviewed,images={},options={}){
-  const evidence=observe(roof,inventory,reviewed,images),extensions=[],readProfile=options.roofProfile||V.roofProfile;
+  const evidence=observe(roof,inventory,reviewed,images,options),extensions=[],pending=[],readProfile=options.roofProfile||V.roofProfile;
   if(evidence.status==='not-found')return {version:1,status:'not-found',extensions:[],evidence:null,issues:[]};
   for(const o of evidence.observations){
    const regions=elevationRegions(o,proposal,inventory,reviewed,options.registerElevation,roof);
-   for(const r of regions){const view=inventory.views.find(v=>v.id===r.sourceViewId);r.profile=images[r.sourceViewId]?readProfile(images[r.sourceViewId],r.envelope,view.payload?.drawingReadings?.rows||[]):null;}
+   for(const r of regions){const view=inventory.views.find(v=>v.id===r.sourceViewId);
+    if(o.mode==='two-hip-diagonals-and-ridge'){r.profileConstraint=profileConstraint(o,r,reviewed);r.profile=images[r.sourceViewId]?H.profile(images[r.sourceViewId],r.profileConstraint,{cancelled:options.cancelled}):null;}
+    else r.profile=images[r.sourceViewId]?readProfile(images[r.sourceViewId],r.envelope,view.payload?.drawingReadings?.rows||[]):null;
+   }
    o.elevationRegions=regions.map(({transform,envelope,...r})=>copy(r));
-   const association=associate(o,regions,roof,inventory,reviewed,images),extension=association.extension;delete association.extension;
+   const association=associate(o,regions,roof,inventory,reviewed,images),extension=association.extension;delete association.extension;pending.push({o,association,extension});
+  }
+  for(const {o,association,extension}of pending){
    if(extension){
+    // Distinct pixel-supported junctions at the same two outer endpoints
+    // remain alternatives until the elevations distinguish them.
+    const alternatives=pending.filter(p=>p.o!==o&&p.extension&&p.o.sourceViewId===o.sourceViewId&&p.o.direction===o.direction&&p.o.anchors.slice(0,2).every((a,i)=>M.distance(a,o.anchors[i])<=4));
+    if(alternatives.length){o.association={status:'unresolved',reason:'ROOF_RETURN_PLAN_HYPOTHESES_AMBIGUOUS',alternatives:alternatives.map(p=>p.o.id)};continue;}
     const box=roofBounds(extension),existing=[...(roof.extensions||[]),...extensions].find(e=>roofBounds(e).every((n,i)=>Math.abs(n-box[i])<Math.max(o.scaleX,o.scaleY)*3));
     if(existing)o.association={status:'unresolved',reason:'ROOF_RETURN_EXISTING_COMPONENT_ASSOCIATION_REQUIRED'};
     else if((roof.extensions||[]).length+extensions.length>=8)o.association={status:'unresolved',reason:'ROOF_RETURN_COMPONENT_LIMIT'};
@@ -183,11 +215,11 @@
    if(!same(p.geometry,geometry(roof)))errors.push('ROOF_PLAN_EVIDENCE_STALE');
    const ids=new Set();for(const o of p.observations){
     if(!o?.id||ids.has(o.id)||o.status!=='proposed'||!frames[o.direction]||!['proposed','unresolved'].includes(o.association?.status)){errors.push('ROOF_PLAN_EVIDENCE');continue;}ids.add(o.id);
-    if(o.association.status==='proposed'){const c=(roof.extensions||[]).find(c=>c.id===o.association.componentId);if(!c||o.parentExtentAmbiguous||!same(c.profiles,o.association.profiles)||!same(c.sources,o.association.sources)||!same(c.connection?.join,o.association.join)||c.connection?.observationId!==o.id)errors.push('ROOF_PLAN_ASSOCIATION');}
+    if(o.association.status==='proposed'){const c=(roof.extensions||[]).find(c=>c.id===o.association.componentId);if(!c||o.parentExtentAmbiguous||!same(c.profiles,o.association.profiles)||!same(c.sources,o.association.sources)||!same(c.connection?.join,o.association.join)||c.connection?.observationId!==o.id)errors.push('ROOF_PLAN_ASSOCIATION');if(o.mode==='two-hip-diagonals-and-ridge'){if(!Array.isArray(o.elevationRegions))errors.push('ROOF_PLAN_EVIDENCE');else if(o.elevationRegions.some(r=>r?.profile?.reason==='ROOF_RETURN_SOURCE_PROFILE_AMBIGUOUS'))errors.push('ROOF_RETURN_SOURCE_PROFILE_AMBIGUOUS');}}
     else if(!o.association.reason)errors.push('ROOF_PLAN_ASSOCIATION');
    }
    if((p.status==='proposed')!==p.observations.some(o=>o?.association?.status==='proposed'))errors.push('ROOF_PLAN_EVIDENCE');
-   if(confirm&&(p.status==='unresolved'||p.observations.some(o=>o?.association?.status!=='proposed')||p.issues.includes('ROOF_PLAN_PARENT_EXTENT_OWNERSHIP_UNRESOLVED')))errors.push('ROOF_PLAN_UNRESOLVED');
+   if(confirm&&(p.status==='unresolved'||p.observations.some(o=>o?.association?.status!=='proposed')||p.issues.length))errors.push('ROOF_PLAN_UNRESOLVED');
   }
   for(const child of Array.isArray(roof?.extensions)?roof.extensions:[])errors.push(...geometryIssues(child,{confirm}));return unique(errors);
  }
@@ -204,7 +236,8 @@
   const host=p.hostEnvelopes,primary=roofBounds(roof),floorBox=bounds(M.modelPoints(r)),ownershipUnresolved=p.observations.some(o=>o?.parentExtentAmbiguous);
   if(!host||!same(host.parentProfiles,primary)||!same(host.floorContour,floorBox)||host.ownershipUnresolved!==ownershipUnresolved||ownershipUnresolved!==p.issues.includes('ROOF_PLAN_PARENT_EXTENT_OWNERSHIP_UNRESOLVED'))errors.push('ROOF_PLAN_HOST_ENVELOPE');
   const stored=(inventory?.levels||[]).filter(l=>l.buildingId===roof.buildingId).flatMap(l=>l.contours||[]).filter(c=>c.contourId===r.contourId&&c.sourceViewId===r.sourceViewId);
-  if(stored.length&&!stored.some(c=>same(c.reference,r.reference)&&same(c.alignment,r.alignment)&&same(c.points,r.points)))errors.push('ROOF_PLAN_REFERENCE_STALE');
+  const referenceSource=reviewedSource(r,floor);if(!referenceSource)errors.push('ROOF_PLAN_REFERENCE');
+  if(stored.length&&!stored.some(c=>{const current=reviewedSource(c,floor);return current&&referenceSource&&same(current,referenceSource);}))errors.push('ROOF_PLAN_REFERENCE_STALE');
   const ids=new Set();
   for(const o of p.observations){
    const view=viewFor(o?.sourceViewId,'roof'),g=o?.gridRegistration,t=g?.transform,map=g&&projection(r,g),b=o?.sourceBox;
@@ -215,7 +248,7 @@
    for(const e of g.evidence){
     if(!['x','y'].includes(e.axis)||e.moving?.sourceViewId!==view.id||e.reference?.sourceViewId!==floor.id||!inBounds(e.moving?.point,view)||!inBounds(e.reference?.point,floor)){errors.push('ROOF_PLAN_GRID');continue;}
     for(const [record,source] of [[e.moving,view],[e.reference,floor]]){
-     const box=record.sourceBox,rows=[...(source.payload?.drawingReadings?.rows||[]),...localRows.filter(row=>localGridReading(row,source,inventory))];
+     const box=record.sourceBox,rows=[...(source.payload?.drawingReadings?.rows||[]).filter(row=>row?.source!=='ocr-local-grid-bubble'||localGridReading(row,source,inventory)),...localRows.filter(row=>localGridReading(row,source,inventory))];
      if(!Array.isArray(box)||box.length!==4||!box.every(finite)||box[2]<=box[0]||box[3]<=box[1]||!same(record.point,[(box[0]+box[2])/2,(box[1]+box[3])/2])||!rows.some(row=>!row.retry?.labelConflict&&(row.confidence??0)>=55&&same(row.box,box)&&String(row.text||'').trim().replace(/[.\s]+$/,'').toUpperCase()===e.label))errors.push('ROOF_PLAN_GRID');
     }
     labels[e.axis].add(e.label);const axis=e.axis==='x'?0:1,scale=axis===0?t.scaleX:t.scaleY,offset=axis===0?t.offsetX:t.offsetY;
@@ -223,36 +256,60 @@
    }
    if(labels.x.size<3||labels.y.size<2||Math.abs(t.scaleX/t.scaleY-1)>.05||![t.scaleX,t.scaleY].every(n=>n>.2&&n<5))errors.push('ROOF_PLAN_GRID');
    if(!Array.isArray(o.footprint)||o.footprint.length!==4||o.footprint.some((q,i)=>!point(q)||M.distance(q,map.model(o.anchors[i]))>1e-8)||Math.abs(o.scaleX-map.scaleX)>1e-10||Math.abs(o.scaleY-map.scaleY)>1e-10)errors.push('ROOF_PLAN_FOOTPRINT');
-   if(!Array.isArray(o.boundary)||!Array.isArray(o.hip?.diagonals)||!Array.isArray(o.elevationRegions||[])){errors.push('ROOF_PLAN_STROKES');continue;}
-   const strokes=[...o.boundary,...o.hip.diagonals,o.hip?.ridge];
-   if(strokes.length!==6||strokes.some(s=>!s||!supported(s)||!Array.isArray(s.anchors)||s.anchors.length!==2||s.anchors.some(q=>!inBounds(q,view)))||!inBounds(o.hip?.node,view)||!Array.isArray(o.sourcePans)||o.sourcePans.length!==3||o.sourcePans.some(poly=>!Array.isArray(poly)||poly.length<3||poly.some(q=>!inBounds(q,view)))){errors.push('ROOF_PLAN_STROKES');continue;}
-   const [aa,bb,cc,dd]=o.anchors,node=o.hip.node,end=o.hip.ridge?.anchors?.[1];
-   if(!same(o.boundary.map(s=>s.anchors),[[aa,bb],[aa,dd],[bb,cc]])||!same(o.hip.diagonals.map(s=>s.anchors),[[aa,node],[bb,node]])||!same(o.hip.ridge?.anchors?.[0],node)||!same(o.sourcePans,[[aa,bb,node],[aa,node,end,dd],[bb,cc,end,node]]))errors.push('ROOF_PLAN_STROKES');
+   if(o.mode==='two-hip-diagonals-and-ridge'){
+    const hipIssues=H?.validate?.(o,{sourceSize:sourceSize(view)})||['ROOF_PLAN_HIP_DETECTOR_UNAVAILABLE'];errors.push(...hipIssues);if(hipIssues.length)continue;
+    if(o.sourceFileSha256!==(inventory?.files?.find(f=>f.id===view.fileId)?.sha256??null))errors.push('ROOF_PLAN_HIP_SOURCE');
+    const sourceHost=['parent-roof-profiles','floor-contour'].includes(o.hostBasis)&&bounds(corners(o.hostBasis==='parent-roof-profiles'?primary:floorBox).map(map.source));
+    if(!sourceHost||!same(o.hipEvidence?.search?.host,sourceHost))errors.push('ROOF_PLAN_HIP_SEARCH');
+    if(!Array.isArray(o.elevationRegions)){errors.push('ROOF_PLAN_STROKES');continue;}
+   }else{
+    if(o.mode!==undefined||!Array.isArray(o.boundary)||!Array.isArray(o.hip?.diagonals)||!Array.isArray(o.elevationRegions||[])){errors.push('ROOF_PLAN_STROKES');continue;}
+    const strokes=[...o.boundary,...o.hip.diagonals,o.hip?.ridge];
+    if(strokes.length!==6||strokes.some(s=>!s||!supported(s)||!Array.isArray(s.anchors)||s.anchors.length!==2||s.anchors.some(q=>!inBounds(q,view)))||!inBounds(o.hip?.node,view)||!Array.isArray(o.sourcePans)||o.sourcePans.length!==3||o.sourcePans.some(poly=>!Array.isArray(poly)||poly.length<3||poly.some(q=>!inBounds(q,view)))){errors.push('ROOF_PLAN_STROKES');continue;}
+    const [aa,bb,cc,dd]=o.anchors,node=o.hip.node,end=o.hip.ridge?.anchors?.[1];
+    if(!same(o.boundary.map(s=>s.anchors),[[aa,bb],[aa,dd],[bb,cc]])||!same(o.hip.diagonals.map(s=>s.anchors),[[aa,node],[bb,node]])||!same(o.hip.ridge?.anchors?.[0],node)||!same(o.sourcePans,[[aa,bb,node],[aa,node,end,dd],[bb,cc,end,node]]))errors.push('ROOF_PLAN_STROKES');
+   }
    if(Array.isArray(o.footprint)&&o.footprint.every(point)){const inside=o.footprint.every(([x,y])=>x>=primary[0]-r.scale*3&&x<=primary[2]+r.scale*3&&y>=primary[1]-r.scale*3&&y<=primary[3]+r.scale*3);if(o.parentExtentAmbiguous!==inside)errors.push('ROOF_PLAN_HOST_ENVELOPE');}
-   for(const region of o.elevationRegions||[]){if(!region){errors.push('ROOF_PLAN_ELEVATION_SOURCE');continue;}const ev=viewFor(region.sourceViewId,'elevation'),box=region.sourceBox,q=region.registration,wall=q?.wallBox;if(!ev||ev.direction!==region.direction||!same(ev.frame,region.sourceFrame)||ev.fileId!==region.sourceFileId||ev.page!==region.sourcePage||!Array.isArray(box)||box.length!==4||!box.every(finite)||box[2]<=0||box[3]<=0||!inBounds(box.slice(0,2),ev)||!inBounds([box[0]+box[2],box[1]+box[3]],ev)||![region.scaleX,region.scaleY].every(n=>finite(n)&&n>0)||!Array.isArray(wall)||wall.length!==4||!wall.every(finite)||wall[2]<=0||wall[3]<=0||![q?.min,q?.max,q?.base,q?.supportY,q?.guide?.y].every(finite)||q.base!==r.base?.value||Math.abs((q.max-q.min)/wall[2]-region.scaleX)>1e-10||Math.abs((q.levelBand?.scaleY??r.height?.value/(q.guide.y-q.supportY))-region.scaleY)>1e-10)errors.push('ROOF_PLAN_ELEVATION_SOURCE');}
+   for(const region of o.elevationRegions||[]){if(!region){errors.push('ROOF_PLAN_ELEVATION_SOURCE');continue;}const ev=viewFor(region.sourceViewId,'elevation'),box=region.sourceBox,q=region.registration,wall=q?.wallBox,datum=q?.datumRegistration;
+    if(!ev||ev.direction!==region.direction||!same(ev.frame,region.sourceFrame)||ev.fileId!==region.sourceFileId||ev.page!==region.sourcePage||!Array.isArray(box)||box.length!==4||!box.every(finite)||box[2]<=0||box[3]<=0||!inBounds(box.slice(0,2),ev)||!inBounds([box[0]+box[2],box[1]+box[3]],ev)||![region.scaleX,region.scaleY].every(n=>finite(n)&&n>0)||!Array.isArray(wall)||wall.length!==4||!wall.every(finite)||wall[2]<=0||wall[3]<=0||![q?.min,q?.max,q?.base,q?.supportY,q?.guide?.y].every(finite)||q.base!==r.base?.value||Math.abs((q.max-q.min)/wall[2]-region.scaleX)>1e-10||Math.abs((datum?.scaleY??q.levelBand?.scaleY??r.height?.value/(q.guide.y-q.supportY))-region.scaleY)>1e-10){errors.push('ROOF_PLAN_ELEVATION_SOURCE');continue;}
+    if(datum){const engine=typeof module==='object'&&module.exports?require('./plan-reconstruction.js'):globalThis.MIRPlanReconstruction;
+     errors.push(...(engine?.roofDatumRegistrationIssues?.(datum,r,inventory)||['ROOF_DATUM_REGISTRATION_SOURCE']));
+     if(q.method!=='independent-ceiling-and-native-scale'||q.guide.kind!=='calculated-coordinate'||q.guide.observed!==false||q.guide.y!==datum.projectedFloorY||q.base!==datum.base||r.height?.value!==datum.height||q.supportY!==datum.datum?.y||region.scaleX!==datum.scaleX||region.scaleY!==datum.scaleY||q.levelBand!==null)errors.push('ROOF_DATUM_REGISTRATION_SOURCE');
+    }else if(q.method==='independent-ceiling-and-native-scale'||q.guide.kind==='calculated-coordinate'||q.guide.observed===false)errors.push('ROOF_DATUM_REGISTRATION_SOURCE');
+    if(o.mode==='two-hip-diagonals-and-ridge'){
+     const expected=profileConstraint(o,region,r);if(!same(expected,region.profileConstraint))errors.push('ROOF_RETURN_PROFILE_SEARCH');
+     if(region.profile?.status==='proposed'||region.profile?.slopes?.some(Boolean))errors.push(...(H?.validateProfile?.(region.profile,{sourceSize:sourceSize(ev),constraint:expected})||['ROOF_RETURN_PROFILE_EVIDENCE']));
+    }
+   }
    if(errors.includes('ROOF_PLAN_ELEVATION_SOURCE'))continue;
    if(o.association?.status==='proposed'){
     const a=o.association,component=(roof.extensions||[]).find(c=>c.id===a.componentId),er=viewFor(a.elevationRidge?.sourceViewId,'elevation');
     if(!component||o.parentExtentAmbiguous||!same(component.profiles,a.profiles)||!same(component.sources,a.sources)||!same(component.connection?.join,a.join)||!a.join||![a.join.value,a.join.height].every(finite)||component.connection?.observationId!==o.id||!supported(a.planRidge||{})||!supported(a.elevationRidge||{})||a.planRidge?.anchors?.length!==2||!a.planRidge.anchors.every(q=>inBounds(q,view))||!er||!same(er.frame,a.elevationRidge.sourceFrame)||a.elevationRidge?.anchors?.length!==2||!a.elevationRidge.anchors.every(q=>inBounds(q,er))||!Array.isArray(a.sources)||a.sources.length!==2||a.sources.some(s=>!s)){errors.push('ROOF_PLAN_ASSOCIATION');continue;}
+    if(o.mode==='two-hip-diagonals-and-ridge')errors.push(...H.validateElevationSegment(a.elevationRidge,{sourceSize:sourceSize(er)}));
     const dirs=a.sources.map(s=>viewFor(s.sourceViewId,'elevation')?.direction),f=frames[o.direction];if(!dirs.includes(o.direction)||!dirs.some(d=>frames[d]?.axis===f.normal)){errors.push('ROOF_PLAN_ELEVATION_AXES');continue;}
     const pair=a.sources.every(s=>{const ev=viewFor(s.sourceViewId,'elevation'),region=o.elevationRegions.find(r=>r.sourceViewId===s.sourceViewId);return ev&&same(ev.frame,s.sourceFrame)&&s.axis===frames[ev.direction]?.axis&&s.anchors?.length===3&&s.anchors.every(q=>inBounds(q,ev))&&region&&region.scaleX===s.scaleX&&region.scaleY===s.scaleY;});if(!pair){errors.push('ROOF_PLAN_ELEVATION_SOURCE');continue;}
     const primarySource=a.sources.find(s=>viewFor(s.sourceViewId,'elevation').direction===o.direction),sideSource=a.sources.find(s=>s!==primarySource),regionFor=s=>o.elevationRegions.find(r=>r.sourceViewId===s.sourceViewId),coordinates=(s,p)=>{const region=regionFor(s),q=region.registration;return [frames[region.direction].sign*(q.min+(p[0]-q.wallBox[0])*s.scaleX),q.base+(q.guide.y-p[1])*s.scaleY];};
     if(!primarySource||!sideSource){errors.push('ROOF_PLAN_ELEVATION_AXES');continue;}
-    const tangential=primarySource.anchors.map(p=>coordinates(primarySource,p)),side=sideSource.anchors.map(p=>coordinates(sideSource,p)),slope=line(side[0],side[1]),crest=tangential[1][1],ridge=slope&&(crest-slope.c)/slope.m,normal=[side[0],[ridge,crest],side[2]].sort((a,b)=>a[0]-b[0]),close=(a,b)=>Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.every((p,i)=>point(p)&&point(b[i])&&M.distance(p,b[i])<1e-8);
+    const tangential=primarySource.anchors.map(p=>coordinates(primarySource,p)),side=sideSource.anchors.map(p=>coordinates(sideSource,p)),slope=line(side[0],side[1]),crest=tangential[1][1],ridge=slope&&(crest-slope.c)/slope.m,newMode=o.mode==='two-hip-diagonals-and-ridge',normal=[side[0],[ridge,crest],newMode?[side[2][0],crest]:side[2]].sort((a,b)=>a[0]-b[0]),close=(a,b)=>Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.every((p,i)=>point(p)&&point(b[i])&&M.distance(p,b[i])<1e-8);
     if(!finite(ridge)||!close(tangential,component.profiles[f.axis])||!close(normal,component.profiles[f.normal]))errors.push('ROOF_PLAN_PROFILE_SOURCE');
     const peak=tangential[1][0],join=a.join,parentNormal=value(roof.profiles[f.normal],join.value),parentTangent=value(roof.profiles[f.axis],peak),world=n=>f.normal==='x'?[n,peak]:[peak,n],plan=[map.source(world(ridge)),map.source(world(join.value))];
+    if(newMode){
+     const pr=regionFor(primarySource),sr=regionFor(sideSource),points=pr.profile?.points,q=sr.registration,projection=a.elevationRidge.projection,project=(u,z)=>[q.wallBox[0]+(sr.sign*u-q.min)/sr.scaleX,q.guide.y-(z-q.base)/sr.scaleY],expectedModel=[project(ridge,crest),project(join.value,crest)],expectedObserved=[sideSource.anchors[1],[expectedModel[1][0],sideSource.anchors[1][1]]],residuals=expectedObserved.map((p,i)=>p.map((n,j)=>n-expectedModel[i][j])),comparison=finiteProfileComparison([sideSource.anchors[0],...expectedObserved],[sideSource.anchors[0],...expectedModel]),planNodeX=sr.profileConstraint?.ridgeX,planResidualX=expectedModel[0][0]-planNodeX,primaryExpected=points?.length===4?(pr.sign<0?[points[3],points[1],points[0]]:[points[0],points[1],points[3]]):null;
+     if(!close(primaryExpected,primarySource.anchors)||!sr.profile?.slopes?.filter(Boolean).some(s=>close(s.sourceStroke?.anchors,sideSource.anchors.slice(0,2)))||!close(sideSource.anchors.slice(1),a.elevationRidge.anchors)||projection?.method!=='observed-ridge-and-separate-model-projection'||projection.modelNodeKind!=='calculated-intersection'||projection.residualMetric!=='finite-profile-vertical-pixels'||projection.endpointKind!=='model-join-coordinate-on-observed-ridge'||projection.tolerancePixels!==3||!close(projection.modelAnchors,expectedModel)||!close(projection.observedAnchors,expectedObserved)||!close(a.elevationRidge.anchors,expectedObserved)||!close(projection.residuals,residuals)||comparison?.status!=='compatible'||projection.finiteProfileComparison?.tolerancePixels!==3||!equivalentNumbers(projection.finiteProfileComparison,comparison)||!finite(planResidualX)||Math.abs(planResidualX)>3||projection.planNodeX!==planNodeX||!finite(projection.planResidualX)||Math.abs(projection.planResidualX-planResidualX)>1e-8||Math.abs(side[2][0]-join.value)>1e-8||!finite(a.orthogonalHeightDifference)||Math.abs(a.orthogonalHeightDifference-(side[1][1]-crest))>1e-8)errors.push('ROOF_RETURN_JOIN_PROJECTION');
+    }
     if(join.axis!==f.normal||Math.abs(join.height-crest)>1e-8||parentNormal===null||parentTangent===null||Math.abs(Math.min(parentNormal,parentTangent)-crest)>1e-8||!close(plan,a.planRidge.anchors)||(join.value-ridge)*f.outward>=0)errors.push('ROOF_PLAN_JOIN');
    }else if(o.association?.status!=='unresolved'||!o.association.reason)errors.push('ROOF_PLAN_ASSOCIATION');
   }
   if((p.status==='proposed')!==p.observations.some(o=>o.association?.status==='proposed'))errors.push('ROOF_PLAN_EVIDENCE');
-  if(confirm&&(p.status==='unresolved'||p.observations.some(o=>o.association?.status!=='proposed')||p.issues.includes('ROOF_PLAN_PARENT_EXTENT_OWNERSHIP_UNRESOLVED')))errors.push('ROOF_PLAN_UNRESOLVED');
+  if(confirm&&(p.status==='unresolved'||p.observations.some(o=>o.association?.status!=='proposed')||p.issues.length))errors.push('ROOF_PLAN_UNRESOLVED');
   return unique(errors);
  }
  function historyIssues(roof,previous){
   const old=previous?.roofPlanEvidence;if(!old)return [];
   const next=roof?.roofPlanEvidence;if(!next||!Array.isArray(next.observations)||!Array.isArray(old.observations))return ['ROOF_PLAN_EVIDENCE_LOST'];
-  const source=o=>o&&[o.id,o.sourceViewId,o.sourceFileId,o.sourcePage,o.sourceFrame,o.anchors,o.boundary,o.hip,o.sourcePans,o.gridRegistration];
-  if(!same(old.reference,next.reference)||(old.observations||[]).some(o=>!next.observations.some(n=>same(source(n),source(o))&&(!(o.association?.status==='proposed')||same(n.association,o.association)))))return ['ROOF_PLAN_EVIDENCE_LOST'];return [];
+  const source=o=>o&&[o.id,o.sourceViewId,o.sourceFileId,o.sourcePage,o.sourceFrame,o.anchors,o.boundary,o.hip,o.sourcePans,o.gridRegistration,o.mode,o.footprintKind,o.boundaryFragments,o.boundaryCompleteness,o.unobservedIntervals,o.unresolvedBoundaries,o.hipEvidence,o.sourceFileSha256,o.sourceBox,o.footprint,o.hostBasis];
+  const keptRegions=(o,n)=>(o.elevationRegions||[]).every(r=>(!r.registration?.datumRegistration||(n.elevationRegions||[]).some(s=>s.sourceViewId===r.sourceViewId&&same(s.registration?.datumRegistration,r.registration.datumRegistration)))&&(!r.profile?.profileEvidence||(n.elevationRegions||[]).some(s=>s.sourceViewId===r.sourceViewId&&same(s.profile?.profileEvidence,r.profile.profileEvidence))));
+  if(!same(old.reference,next.reference)||(old.observations||[]).some(o=>!next.observations.some(n=>same(source(n),source(o))&&keptRegions(o,n)&&(!(o.association?.status==='proposed')||same(n.association,o.association)))))return ['ROOF_PLAN_EVIDENCE_LOST'];return [];
  }
- return Object.freeze({version:1,observe,elevationRegions,propose,geometryIssues,evidenceIssues,historyIssues});
+ return Object.freeze({version:1,localGridReading,finiteProfileComparison,observe,elevationRegions,propose,geometryIssues,evidenceIssues,historyIssues});
 });
