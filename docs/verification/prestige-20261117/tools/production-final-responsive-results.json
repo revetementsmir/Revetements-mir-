@@ -1,0 +1,178 @@
+[
+  {
+    "name": "panel",
+    "width": 390,
+    "lang": "fr-CA",
+    "scroll": 390,
+    "header": true,
+    "logoWidth": 112,
+    "notePlaceholder": "Détail utile à la fabrication…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "panel",
+    "width": 390,
+    "lang": "en-CA",
+    "scroll": 390,
+    "header": true,
+    "logoWidth": 112,
+    "notePlaceholder": "Useful fabrication details…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 390,
+    "lang": "fr-CA",
+    "scroll": 390,
+    "header": true,
+    "logoWidth": 112,
+    "notePlaceholder": "Détail utile à la fabrication…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 390,
+    "lang": "en-CA",
+    "scroll": 390,
+    "header": true,
+    "logoWidth": 112,
+    "notePlaceholder": "Useful fabrication details…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "panel",
+    "width": 768,
+    "lang": "fr-CA",
+    "scroll": 768,
+    "header": true,
+    "logoWidth": 150,
+    "notePlaceholder": "Détail utile à la fabrication…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "panel",
+    "width": 768,
+    "lang": "en-CA",
+    "scroll": 768,
+    "header": true,
+    "logoWidth": 150,
+    "notePlaceholder": "Useful fabrication details…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 768,
+    "lang": "fr-CA",
+    "scroll": 768,
+    "header": true,
+    "logoWidth": 150,
+    "notePlaceholder": "Détail utile à la fabrication…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 768,
+    "lang": "en-CA",
+    "scroll": 768,
+    "header": true,
+    "logoWidth": 150,
+    "notePlaceholder": "Useful fabrication details…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "panel",
+    "width": 1024,
+    "lang": "fr-CA",
+    "scroll": 1024,
+    "header": true,
+    "logoWidth": 150,
+    "notePlaceholder": "Détail utile à la fabrication…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "panel",
+    "width": 1024,
+    "lang": "en-CA",
+    "scroll": 1024,
+    "header": true,
+    "logoWidth": 150,
+    "notePlaceholder": "Useful fabrication details…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 1024,
+    "lang": "fr-CA",
+    "scroll": 1024,
+    "header": true,
+    "logoWidth": 150,
+    "notePlaceholder": "Détail utile à la fabrication…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 1024,
+    "lang": "en-CA",
+    "scroll": 1024,
+    "header": true,
+    "logoWidth": 150,
+    "notePlaceholder": "Useful fabrication details…",
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "panel",
+    "width": 1440,
+    "lang": "fr-CA",
+    "scroll": 1440,
+    "header": true,
+    "logoWidth": 166,
+    "notePlaceholder": "Détail utile à la fabrication…",
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "panel",
+    "width": 1440,
+    "lang": "en-CA",
+    "scroll": 1440,
+    "header": true,
+    "logoWidth": 166,
+    "notePlaceholder": "Useful fabrication details…",
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 1440,
+    "lang": "fr-CA",
+    "scroll": 1440,
+    "header": true,
+    "logoWidth": 166,
+    "notePlaceholder": "Détail utile à la fabrication…",
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 1440,
+    "lang": "en-CA",
+    "scroll": 1440,
+    "header": true,
+    "logoWidth": 166,
+    "notePlaceholder": "Useful fabrication details…",
+    "nav": "none",
+    "errors": []
+  }
+]

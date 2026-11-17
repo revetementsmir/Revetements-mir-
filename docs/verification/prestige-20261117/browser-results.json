@@ -1,0 +1,1434 @@
+{
+  "browser": "Chromium 155.0.8059.79",
+  "date": "2026-11-17T13:45:00.916Z",
+  "localOnly": true,
+  "physicalDevices": false,
+  "externalRequestsBlocked": 43,
+  "blockedRequests": [
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    }
+  ],
+  "results": [
+    {
+      "name": "accueil FR 1440",
+      "passed": true,
+      "route": "index.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "boutique FR 1440",
+      "passed": true,
+      "route": "boutique.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "produit FR 1440",
+      "passed": true,
+      "route": "produit.html?id=hardieplank-select-625&color=hardie-pierre-des-champs",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "panier FR 1440",
+      "passed": true,
+      "route": "selection.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "estimation FR 1440",
+      "passed": true,
+      "route": "estimation.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "pliages FR 1440",
+      "passed": true,
+      "route": "pliage.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "configurateur-pliage FR 1440",
+      "passed": true,
+      "route": "production.html?mode=client&kind=profile",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "studio-test FR 1440",
+      "passed": true,
+      "route": "plan.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "maison FR 1440",
+      "passed": true,
+      "route": "maison.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "chantiers FR 1440",
+      "passed": true,
+      "route": "chantiers.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "connexion FR 1440",
+      "passed": true,
+      "route": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "demandes-deconnecte FR 1440",
+      "passed": true,
+      "route": "chantier.html?view=orders&clientLocale=1",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "aide FR 1440",
+      "passed": true,
+      "route": "aide.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "contact FR 1440",
+      "passed": true,
+      "route": "contact.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "realisations FR 1440",
+      "passed": true,
+      "route": "realisations.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "materiaux FR 1440",
+      "passed": true,
+      "route": "materiaux.html",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "Commerce réel local 1440",
+      "passed": true,
+      "quantity": 3,
+      "materialId": "hardieplank-select-625",
+      "colour": "Pierre des champs",
+      "estimateSubmitted": false,
+      "customPieceFixture": true
+    },
+    {
+      "name": "Compte et suivi simulés 1440",
+      "passed": true,
+      "simulatedSDK": true,
+      "realAccountCreated": false,
+      "emailSent": false
+    },
+    {
+      "name": "accueil FR 390",
+      "passed": true,
+      "route": "index.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "boutique FR 390",
+      "passed": true,
+      "route": "boutique.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "produit FR 390",
+      "passed": true,
+      "route": "produit.html?id=hardieplank-select-625&color=hardie-pierre-des-champs",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "panier FR 390",
+      "passed": true,
+      "route": "selection.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "estimation FR 390",
+      "passed": true,
+      "route": "estimation.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "pliages FR 390",
+      "passed": true,
+      "route": "pliage.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "configurateur-pliage FR 390",
+      "passed": true,
+      "route": "production.html?mode=client&kind=profile",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "studio-test FR 390",
+      "passed": true,
+      "route": "plan.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "maison FR 390",
+      "passed": true,
+      "route": "maison.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "chantiers FR 390",
+      "passed": true,
+      "route": "chantiers.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "connexion FR 390",
+      "passed": true,
+      "route": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "demandes-deconnecte FR 390",
+      "passed": true,
+      "route": "chantier.html?view=orders&clientLocale=1",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "aide FR 390",
+      "passed": true,
+      "route": "aide.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "contact FR 390",
+      "passed": true,
+      "route": "contact.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "realisations FR 390",
+      "passed": true,
+      "route": "realisations.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "materiaux FR 390",
+      "passed": true,
+      "route": "materiaux.html",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "name": "Commerce réel local 390",
+      "passed": false,
+      "error": "search context retained\n\n'' !== 'HardiePlank'\n"
+    },
+    {
+      "name": "Compte et suivi simulés 390",
+      "passed": true,
+      "simulatedSDK": true,
+      "realAccountCreated": false,
+      "emailSent": false
+    },
+    {
+      "name": "accueil FR 834",
+      "passed": true,
+      "route": "index.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "boutique FR 834",
+      "passed": true,
+      "route": "boutique.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "produit FR 834",
+      "passed": true,
+      "route": "produit.html?id=hardieplank-select-625&color=hardie-pierre-des-champs",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "panier FR 834",
+      "passed": true,
+      "route": "selection.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "estimation FR 834",
+      "passed": true,
+      "route": "estimation.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "pliages FR 834",
+      "passed": true,
+      "route": "pliage.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "configurateur-pliage FR 834",
+      "passed": true,
+      "route": "production.html?mode=client&kind=profile",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "studio-test FR 834",
+      "passed": true,
+      "route": "plan.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "maison FR 834",
+      "passed": true,
+      "route": "maison.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "chantiers FR 834",
+      "passed": true,
+      "route": "chantiers.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "connexion FR 834",
+      "passed": true,
+      "route": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "demandes-deconnecte FR 834",
+      "passed": true,
+      "route": "chantier.html?view=orders&clientLocale=1",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "aide FR 834",
+      "passed": true,
+      "route": "aide.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "contact FR 834",
+      "passed": true,
+      "route": "contact.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "realisations FR 834",
+      "passed": true,
+      "route": "realisations.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "materiaux FR 834",
+      "passed": true,
+      "route": "materiaux.html",
+      "width": 834,
+      "overflow": false
+    },
+    {
+      "name": "Commerce réel local 834",
+      "passed": true,
+      "quantity": 3,
+      "materialId": "hardieplank-select-625",
+      "colour": "Pierre des champs",
+      "estimateSubmitted": false,
+      "customPieceFixture": true
+    },
+    {
+      "name": "Compte et suivi simulés 834",
+      "passed": true,
+      "simulatedSDK": true,
+      "realAccountCreated": false,
+      "emailSent": false
+    },
+    {
+      "name": "accueil EN 1440",
+      "passed": true,
+      "heading": "Your project\nstarts here.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "boutique EN 1440",
+      "passed": true,
+      "heading": "Siding shop.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "produit EN 1440",
+      "passed": true,
+      "heading": "HardiePlank Select Cedarmill — 6.25 in",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "panier EN 1440",
+      "passed": true,
+      "heading": "My cart. 0",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "estimation EN 1440",
+      "passed": true,
+      "heading": "Your estimate request.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "pliages EN 1440",
+      "passed": true,
+      "heading": "Metal bending\nto your dimensions.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "configurateur-pliage EN 1440",
+      "passed": true,
+      "heading": "Configurez votre moulure.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "studio-test EN 1440",
+      "passed": true,
+      "heading": "Imagine your exterior.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "maison EN 1440",
+      "passed": true,
+      "heading": "An exterior that reflects\nyou.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "chantiers EN 1440",
+      "passed": true,
+      "heading": "Plan your\njob.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "connexion EN 1440",
+      "passed": true,
+      "heading": "My MIR account",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "demandes-deconnecte EN 1440",
+      "passed": true,
+      "heading": "My MIR account",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "aide EN 1440",
+      "passed": true,
+      "heading": "Answers.\nMade simple.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "contact EN 1440",
+      "passed": true,
+      "heading": "The right advice.\nThe right start.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "realisations EN 1440",
+      "passed": true,
+      "heading": "Exteriors\nbuilt to last.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "materiaux EN 1440",
+      "passed": true,
+      "heading": "The right profile.\nThe right colour.",
+      "fullTranslationCertified": false
+    },
+    {
+      "name": "Isolation chantier.html",
+      "passed": true
+    },
+    {
+      "name": "Isolation entrepot.html",
+      "passed": true
+    },
+    {
+      "name": "Isolation coordination.html",
+      "passed": true
+    },
+    {
+      "name": "Isolation production.html",
+      "passed": true
+    },
+    {
+      "name": "Isolation production.html?mode=client&source=store",
+      "passed": true
+    }
+  ],
+  "captures": [
+    {
+      "file": "screens/accueil-1440.png",
+      "page": "index.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "accueil",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/boutique-1440.png",
+      "page": "boutique.html?view=all",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "boutique",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/produit-1440.png",
+      "page": "produit.html?id=hardieplank-select-625&from=view%3Dall&color=hardie-pierre-des-champs",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "produit",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "panier",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/estimation-1440.png",
+      "page": "estimation.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "estimation",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/pliages-1440.png",
+      "page": "pliage.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "pliages",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/configurateur-pliage-1440.png",
+      "page": "production.html?mode=client&kind=profile",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "configurateur-pliage",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/studio-test-1440.png",
+      "page": "plan.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "studio-test",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/maison-1440.png",
+      "page": "maison.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "maison",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/chantiers-1440.png",
+      "page": "chantiers.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "chantiers",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/connexion-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "connexion",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/demandes-deconnecte-1440.png",
+      "page": "chantier.html?view=orders&clientLocale=1",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "demandes-deconnecte",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/aide-1440.png",
+      "page": "aide.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "aide",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/contact-1440.png",
+      "page": "contact.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "contact",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/realisations-1440.png",
+      "page": "realisations.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "realisations",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/materiaux-1440.png",
+      "page": "materiaux.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "materiaux",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/recherche-1440.png",
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "Recherche",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/categorie-1440.png",
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "Catégorie Fibrociment",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-rempli-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "data": "local synthetic drawing + real catalogue",
+      "title": "Panier matériaux et pliage",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/estimation-panier-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "Demande depuis le panier — non envoyée",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-rempli-en-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "Cart",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/inscription-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Inscription — sans soumission",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/compte-simulation-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Compte client — simulation locale",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/suivi-simulation-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Suivi — simulation locale",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/suivi-en-simulation-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "en-CA",
+      "data": "existing local SDK fixture",
+      "title": "Requests — local simulation",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/accueil-390.png",
+      "page": "index.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "accueil",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/boutique-390.png",
+      "page": "boutique.html?view=all",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "boutique",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/produit-390.png",
+      "page": "produit.html?id=hardieplank-select-625&from=view%3Dall&color=hardie-pierre-des-champs",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "produit",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-390.png",
+      "page": "selection.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "panier",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/estimation-390.png",
+      "page": "estimation.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "estimation",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/pliages-390.png",
+      "page": "pliage.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "pliages",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/configurateur-pliage-390.png",
+      "page": "production.html?mode=client&kind=profile",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "configurateur-pliage",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/studio-test-390.png",
+      "page": "plan.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "studio-test",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/maison-390.png",
+      "page": "maison.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "maison",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/chantiers-390.png",
+      "page": "chantiers.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "chantiers",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/connexion-390.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "connexion",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/demandes-deconnecte-390.png",
+      "page": "chantier.html?view=orders&clientLocale=1",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "demandes-deconnecte",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/aide-390.png",
+      "page": "aide.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "aide",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/contact-390.png",
+      "page": "contact.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "contact",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/realisations-390.png",
+      "page": "realisations.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "realisations",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/materiaux-390.png",
+      "page": "materiaux.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "materiaux",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/recherche-390.png",
+      "page": "boutique.html?view=all",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "Recherche",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/inscription-390.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Inscription — sans soumission",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/compte-simulation-390.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Compte client — simulation locale",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/suivi-simulation-390.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Suivi — simulation locale",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/suivi-en-simulation-390.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "language": "en-CA",
+      "data": "existing local SDK fixture",
+      "title": "Requests — local simulation",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/accueil-834.png",
+      "page": "index.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "accueil",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/boutique-834.png",
+      "page": "boutique.html?view=all",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "boutique",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/produit-834.png",
+      "page": "produit.html?id=hardieplank-select-625&from=view%3Dall&color=hardie-pierre-des-champs",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "produit",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "panier",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/estimation-834.png",
+      "page": "estimation.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "estimation",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/pliages-834.png",
+      "page": "pliage.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "pliages",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/configurateur-pliage-834.png",
+      "page": "production.html?mode=client&kind=profile",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "configurateur-pliage",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/studio-test-834.png",
+      "page": "plan.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "studio-test",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/maison-834.png",
+      "page": "maison.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "maison",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/chantiers-834.png",
+      "page": "chantiers.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "chantiers",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/connexion-834.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "connexion",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/demandes-deconnecte-834.png",
+      "page": "chantier.html?view=orders&clientLocale=1",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "demandes-deconnecte",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/aide-834.png",
+      "page": "aide.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "aide",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/contact-834.png",
+      "page": "contact.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "contact",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/realisations-834.png",
+      "page": "realisations.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "realisations",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/materiaux-834.png",
+      "page": "materiaux.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "materiaux",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/recherche-834.png",
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "Recherche",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/categorie-834.png",
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "Catégorie Fibrociment",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-rempli-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "fr-CA",
+      "data": "local synthetic drawing + real catalogue",
+      "title": "Panier matériaux et pliage",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/estimation-panier-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "Demande depuis le panier — non envoyée",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-rempli-en-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "en-CA",
+      "title": "Cart",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/inscription-834.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Inscription — sans soumission",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/compte-simulation-834.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Compte client — simulation locale",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/suivi-simulation-834.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Suivi — simulation locale",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/suivi-en-simulation-834.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "language": "en-CA",
+      "data": "existing local SDK fixture",
+      "title": "Requests — local simulation",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/accueil-en-1440.png",
+      "page": "index.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "accueil",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/boutique-en-1440.png",
+      "page": "boutique.html?view=all",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "boutique",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/produit-en-1440.png",
+      "page": "produit.html?id=hardieplank-select-625&from=view%3Dall&color=hardie-pierre-des-champs",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "produit",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-en-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "panier",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/estimation-en-1440.png",
+      "page": "estimation.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "estimation",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/pliages-en-1440.png",
+      "page": "pliage.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "pliages",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/configurateur-pliage-en-1440.png",
+      "page": "production.html?mode=client&kind=profile",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "configurateur-pliage",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/studio-test-en-1440.png",
+      "page": "plan.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "studio-test",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/maison-en-1440.png",
+      "page": "maison.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "maison",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/chantiers-en-1440.png",
+      "page": "chantiers.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "chantiers",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/connexion-en-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "connexion",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/demandes-deconnecte-en-1440.png",
+      "page": "chantier.html?view=orders&clientLocale=1",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "demandes-deconnecte",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/aide-en-1440.png",
+      "page": "aide.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "aide",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/contact-en-1440.png",
+      "page": "contact.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "contact",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/realisations-en-1440.png",
+      "page": "realisations.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "realisations",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/materiaux-en-1440.png",
+      "page": "materiaux.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "materiaux",
+      "pendingImages": []
+    }
+  ]
+}

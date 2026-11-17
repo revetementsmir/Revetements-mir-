@@ -1,0 +1,189 @@
+/* Client account presentation only. Staff roles and invitations never receive
+   the mir-prestige-account class (see the small guard in the companion script). */
+body.mir-prestige-account {
+  --p-ink:var(--mir-ink,#242522);--p-muted:var(--mir-muted,#676760);
+  --p-line:#d8d4cb;--p-bg:var(--mir-paper,#f4f1ea);
+  background:var(--mir-paper,#f4f1ea);color:var(--mir-ink,#242522);
+}
+html[data-mir-harmony] body.mir-prestige-account>header#mir-harmony-header{display:none!important}
+body.mir-prestige-account .portal-shell,
+body.mir-prestige-account .portal-shell.auth-shell {
+  display:block!important;width:min(1240px,calc(100% - 112px));max-width:1240px!important;
+  min-height:0;padding:70px 0 100px!important;margin:0 auto;
+}
+body.mir-prestige-account #portal-main{min-width:0;padding:0}
+body.mir-prestige-account #portal-content{min-width:0}
+body.mir-prestige-account .portal-sidebar,
+body.mir-prestige-account .portal-footer{display:none!important}
+body.mir-prestige-account .auth-grid{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,470px);gap:clamp(48px,8vw,128px);
+  align-items:start;padding:0;margin:0;max-width:none;
+}
+body.mir-prestige-account .auth-intro{padding:22px 0;max-width:540px}
+body.mir-prestige-account .auth-intro .portal-eyebrow,
+body.mir-prestige-account .customer-account .portal-eyebrow{
+  font-size:11px;letter-spacing:.2em;font-weight:600;color:var(--mir-muted,#676760);
+}
+body.mir-prestige-account .auth-intro h1,
+body.mir-prestige-account .customer-account h1{
+  font:400 clamp(38px,4.6vw,66px)/1.08 Arial,Helvetica,sans-serif;
+  color:var(--mir-ink,#242522);letter-spacing:-.045em;margin:24px 0;
+}
+body.mir-prestige-account .auth-intro>p:not(.portal-eyebrow){
+  font-size:17px;line-height:1.7;color:var(--mir-muted,#676760);max-width:440px;
+}
+body.mir-prestige-account .auth-cart-return{
+  color:var(--mir-ink,#242522);font-size:14px;min-height:48px;
+  text-decoration:underline;text-underline-offset:7px;margin-top:30px;
+}
+body.mir-prestige-account .auth-card{
+  width:100%;max-width:none;justify-self:stretch;border:0;border-radius:0;
+  padding:30px 34px;background:#fffefa;box-shadow:0 8px 40px #24252205;
+}
+body.mir-prestige-account .auth-card:has(#auth-signin-form){display:flex;flex-direction:column}
+body.mir-prestige-account .auth-card:has(#auth-signin-form)>form{order:0}
+body.mir-prestige-account .auth-card:has(#auth-signin-form)>.auth-text-button{order:1}
+body.mir-prestige-account .auth-card:has(#auth-signin-form)>[data-auth-screen=signup]{order:2}
+body.mir-prestige-account .auth-card:has(#auth-signin-form)>.auth-error{order:3}
+body.mir-prestige-account .auth-card:has(#auth-signin-form)>#auth-google{order:4;margin-top:24px}
+body.mir-prestige-account .auth-card:has(#auth-signin-form)>.auth-footnote{order:5}
+body.mir-prestige-account .auth-card:has(#auth-signin-form)>.auth-divider{display:none}
+body.mir-prestige-account .auth-card>.mir-prestige-account-support{order:6;margin-top:18px;padding-top:12px;margin-bottom:0}
+body.mir-prestige-account .auth-card>.mir-help-launch{order:7;margin-top:0}
+body.mir-prestige-account .auth-card form{gap:19px}
+body.mir-prestige-account .auth-card label,
+body.mir-prestige-account .account-address-form label{
+  font-size:13px;line-height:1.6;font-weight:500;color:var(--mir-ink,#242522);gap:8px;
+}
+body.mir-prestige-account .auth-card input:not([type=checkbox]),
+body.mir-prestige-account .account-address-form input{
+  border:1px solid #c8c5bc;border-radius:2px;background:#fff;color:var(--mir-ink,#242522);
+  padding:12px 14px;min-height:50px;font:400 16px/1.5 Arial,Helvetica,sans-serif;
+}
+body.mir-prestige-account .auth-show-password input{accent-color:var(--mir-ink,#242522)}
+body.mir-prestige-account .auth-card .auth-show-password{font-size:13px;gap:10px;font-weight:400}
+body.mir-prestige-account .auth-card button,
+body.mir-prestige-account .customer-account .button{
+  border-radius:2px;min-height:49px;font-size:14px;font-weight:500;letter-spacing:.01em;
+}
+body.mir-prestige-account .auth-card .button:not(.secondary):not(.quiet),
+body.mir-prestige-account .account-address-form .button{
+  background:var(--mir-ink,#242522);border:1px solid var(--mir-ink,#242522);color:#fff;
+}
+body.mir-prestige-account .auth-card .button.secondary,
+body.mir-prestige-account .customer-account .button.secondary{
+  background:transparent;border:1px solid #b3afa5;color:var(--mir-ink,#242522);
+}
+body.mir-prestige-account .auth-card .button.quiet,
+body.mir-prestige-account .auth-text-button,
+body.mir-prestige-account .customer-account .button.quiet{
+  color:var(--mir-ink,#242522);background:transparent;border:0;
+}
+body.mir-prestige-account .auth-card .button:disabled{opacity:.52}
+body.mir-prestige-account .auth-card #auth-google{margin:0;display:flex;align-items:center;justify-content:center;gap:10px}
+body.mir-prestige-account .auth-footnote{color:var(--mir-muted,#676760);font-size:12px;line-height:1.7}
+body.mir-prestige-account .auth-divider{margin:25px 0;color:var(--mir-muted,#676760);font-size:12px}
+body.mir-prestige-account .auth-divider:before,
+body.mir-prestige-account .auth-divider:after{background:#dedad1}
+body.mir-prestige-account .auth-card details{border-top:1px solid #dedad1;padding-top:14px}
+body.mir-prestige-account .auth-card details summary{cursor:pointer;min-height:44px;font-size:13px;line-height:1.6}
+body.mir-prestige-account .auth-card details p{font-size:12px;line-height:1.7;color:var(--mir-muted,#676760)}
+body.mir-prestige-account .auth-card details label{margin-block:12px}
+body.mir-prestige-account .auth-error,
+body.mir-prestige-account .auth-message{border-radius:2px;border-left-width:3px}
+body.mir-prestige-account .auth-message{background:#efefe8;color:#414a3b;border-color:#8f9a83}
+body.mir-prestige-account .customer-account{max-width:none;padding:0}
+body.mir-prestige-account .customer-account>p:not(.portal-eyebrow){font-size:16px;color:var(--mir-muted,#676760);line-height:1.6}
+body.mir-prestige-account .account-tabs{gap:28px;padding:15px 0 0;margin:30px 0 36px;border-bottom:1px solid #c8c5bc}
+body.mir-prestige-account .account-tabs button{
+  border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;
+  font-size:14px;padding:14px 0;min-height:50px;color:var(--mir-muted,#676760);
+}
+body.mir-prestige-account .account-tabs button[aria-pressed=true]{color:var(--mir-ink,#242522);border-color:var(--mir-ink,#242522);background:transparent}
+body.mir-prestige-account .account-overview{gap:50px;margin:0 0 45px}
+body.mir-prestige-account .account-overview article{border:0;border-bottom:1px solid #d8d4cb;background:transparent;border-radius:0;padding:10px 0 30px}
+body.mir-prestige-account .account-overview h2,
+body.mir-prestige-account .account-addresses>h2{font-size:24px;font-weight:400;letter-spacing:-.025em;color:var(--mir-ink,#242522)}
+body.mir-prestige-account .account-overview p{font-size:15px;color:var(--mir-muted,#676760)}
+body.mir-prestige-account .account-address,
+body.mir-prestige-account .account-order{padding:25px 0;border:0;border-bottom:1px solid #d8d4cb;background:transparent;border-radius:0}
+body.mir-prestige-account .account-order h3,
+body.mir-prestige-account .account-address h3{font-weight:500;font-size:18px}
+body.mir-prestige-account .account-order ul{padding-left:20px;font-size:14px;line-height:1.8;color:var(--mir-muted,#676760)}
+body.mir-prestige-account .account-address-form{background:#fffefa;border:0;border-radius:0;padding:30px;gap:18px}
+body.mir-prestige-account .account-addresses>details>summary{font-size:14px;font-weight:500}
+body.mir-prestige-account .account-dependency{border-radius:0;background:#e9e5dc;font-size:14px;padding:18px 22px}
+body.mir-prestige-account .portal-empty{border:0;background:transparent;border-radius:0;text-align:left;padding:28px 0 36px}
+body.mir-prestige-account .portal-empty h3{font-size:26px;font-weight:400;letter-spacing:-.025em;color:var(--mir-ink,#242522)}
+body.mir-prestige-account .portal-empty p{font-size:15px;color:var(--mir-muted,#676760);margin:15px 0 20px}
+body.mir-prestige-account .portal-empty a{display:inline-flex;min-height:44px;align-items:center;color:var(--mir-ink,#242522);text-decoration:underline;text-underline-offset:5px}
+body.mir-prestige-account #account-bar{width:min(1240px,calc(100% - 112px));margin:24px auto 0;padding:15px 0;border:0;border-bottom:1px solid #d8d4cb;background:transparent;color:var(--mir-muted,#676760);gap:16px}
+body.mir-prestige-account #account-bar strong{font-size:13px;font-weight:500}
+body.mir-prestige-account #account-bar button{border:0;border-radius:0;background:transparent;font-size:12px;color:var(--mir-ink,#242522)}
+body.mir-prestige-account .mir-prestige-account-support{border-top:1px solid #d8d4cb;padding-top:25px;margin-top:30px;font-size:13px;line-height:1.8;color:var(--mir-muted,#676760)}
+body.mir-prestige-account .mir-prestige-account-support a{display:inline-flex;min-height:44px;align-items:center;text-decoration:underline;text-underline-offset:5px;color:var(--mir-ink,#242522)}
+body.mir-prestige-account .mir-help-launch{
+ position:static!important;inset:auto!important;transform:none!important;pointer-events:auto!important;
+ display:inline-flex;align-items:center;min-height:44px;margin:18px 0 0;padding:10px 0;
+ background:transparent!important;color:var(--mir-ink,#242522)!important;border:0!important;
+ border-radius:0!important;box-shadow:none!important;font:400 14px/1.5 Arial,sans-serif!important;
+ text-decoration:underline;text-underline-offset:5px;
+}
+body.mir-prestige-account :is(input,button,a,summary):focus-visible{outline:2px solid #8b6f48;outline-offset:4px}
+/* Public help page: no login, network request, or support submission. */
+.mir-prestige-help{background:var(--mir-paper,#f4f1ea);color:var(--mir-ink,#242522)}
+.mir-prestige-help main{width:min(1240px,calc(100% - 112px));margin:0 auto;padding:64px 0 90px}
+.mir-prestige-help-intro{display:grid;grid-template-columns:1.1fr 1fr;gap:70px;align-items:end;padding-bottom:46px;border-bottom:1px solid #d8d4cb}
+body.mir-prestige-help .eyebrow{font:500 11px/1.6 Arial,sans-serif;letter-spacing:.18em;color:var(--mir-muted,#676760)}
+.mir-prestige-help h1{font:400 clamp(38px,5vw,65px)/1.1 Arial,Helvetica,sans-serif;letter-spacing:-.045em;margin:20px 0 0}
+.mir-prestige-help h1 em{font-family:Georgia,serif;font-weight:400}
+.mir-prestige-help-intro>div>p:not(.eyebrow){font-size:16px;line-height:1.7;color:var(--mir-muted,#676760);max-width:480px}
+.mir-prestige-help-search{display:grid;gap:10px;font-size:13px;font-weight:500;margin-top:24px}
+.mir-prestige-help-search input{width:100%;min-height:52px;padding:13px 16px;border:1px solid #b9b4a8;background:#fffefa;font-size:16px;border-radius:2px;color:var(--mir-ink,#242522)}
+.mir-prestige-help-grid{display:grid;grid-template-columns:260px minmax(0,1fr);gap:80px;margin-top:50px}
+.mir-prestige-help-grid h2{font-size:24px;font-weight:400;letter-spacing:-.03em;margin:0 0 16px}
+.mir-prestige-help-grid aside p{font-size:14px;line-height:1.8;color:var(--mir-muted,#676760);margin-bottom:22px}
+.mir-prestige-help-grid aside a{display:inline-flex;align-items:center;min-height:48px;background:var(--mir-ink,#242522);color:#fff;text-decoration:none;padding:12px 22px;font-size:14px}
+.mir-prestige-faq{border-bottom:1px solid #d8d4cb;padding:0 0 4px}
+.mir-prestige-faq:first-of-type{border-top:1px solid #d8d4cb}
+.mir-prestige-faq summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:77px;font-size:17px;line-height:1.5;padding:20px 0}
+.mir-prestige-faq summary::-webkit-details-marker{display:none}
+.mir-prestige-faq summary:after{content:'+';font-size:25px;font-weight:300;color:#8b7b63;flex:none}
+.mir-prestige-faq[open] summary:after{content:'−'}
+.mir-prestige-faq p{font-size:15px;line-height:1.85;color:var(--mir-muted,#676760);max-width:660px;margin:0 0 22px}
+.mir-prestige-faq a{color:var(--mir-ink,#242522);text-underline-offset:4px}
+.mir-prestige-help-empty{padding:26px 0;font-size:15px;line-height:1.7;color:var(--mir-muted,#676760)}
+.mir-prestige-help [hidden]{display:none!important}
+.mir-prestige-help :is(input,a,summary):focus-visible{outline:2px solid #8b6f48;outline-offset:4px}
+@media(max-width:1100px){
+ body.mir-prestige-account .portal-shell,body.mir-prestige-account .portal-shell.auth-shell{width:calc(100% - 64px);padding:45px 0 70px!important}
+ body.mir-prestige-account .auth-grid{gap:36px;grid-template-columns:minmax(0,1fr) minmax(310px,1fr)}
+ body.mir-prestige-account .auth-card{padding:26px}
+ body.mir-prestige-account #account-bar{width:calc(100% - 64px);flex-wrap:wrap}
+ .mir-prestige-help main{width:calc(100% - 64px);padding:46px 0 70px}
+ .mir-prestige-help-intro{gap:36px}.mir-prestige-help-grid{grid-template-columns:220px minmax(0,1fr);gap:40px}
+}
+@media(max-width:700px){
+ body.mir-prestige-account .portal-shell,body.mir-prestige-account .portal-shell.auth-shell{width:calc(100% - 36px);padding:30px 0 50px!important}
+ body.mir-prestige-account .auth-grid{grid-template-columns:minmax(0,1fr);gap:26px}
+ body.mir-prestige-account .auth-intro{padding:0;max-width:none}
+ body.mir-prestige-account .auth-intro h1,body.mir-prestige-account .customer-account h1{font-size:39px;margin:16px 0}
+ body.mir-prestige-account .auth-intro>p:not(.portal-eyebrow){font-size:15px}
+ body.mir-prestige-account .auth-cart-return{margin-top:8px;font-size:13px}
+ body.mir-prestige-account .auth-card{padding:25px 20px}
+ body.mir-prestige-account #account-bar{width:calc(100% - 36px);margin-top:16px;gap:8px}
+ body.mir-prestige-account #account-bar>p{display:flex;flex-wrap:wrap;gap:7px}
+ body.mir-prestige-account #account-bar>div{display:flex;flex-wrap:wrap}
+ body.mir-prestige-account .account-overview{grid-template-columns:1fr;gap:16px;margin-bottom:30px}
+ body.mir-prestige-account .account-tabs{gap:26px;margin:22px 0 26px}
+ body.mir-prestige-account .account-tabs button{flex:none}
+ body.mir-prestige-account .account-address-form{padding:22px 18px}
+ body.mir-prestige-account .account-two-fields{grid-template-columns:1fr}
+ .mir-prestige-help main{width:calc(100% - 36px);padding:32px 0 48px}
+ .mir-prestige-help-intro{grid-template-columns:1fr;gap:24px;padding-bottom:30px}
+ .mir-prestige-help h1{font-size:42px;margin-top:15px}
+ .mir-prestige-help-intro>div>p:not(.eyebrow){font-size:15px;margin-top:0}
+ .mir-prestige-help-grid{display:flex;flex-direction:column-reverse;gap:35px;margin-top:26px}
+ .mir-prestige-faq summary{font-size:16px;min-height:72px;padding:18px 0}
+ .mir-prestige-faq p{font-size:14px}.mir-prestige-help-grid aside{border-top:1px solid #d8d4cb;padding-top:25px}
+}

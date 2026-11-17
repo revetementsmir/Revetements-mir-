@@ -12,3 +12,10 @@ mobile/android/app/src/androidTest/assets/phase10-four.pdf
 *.jks
 tools/database/node_modules/
 supabase/.temp/
+
+.prestige-preview/
+
+# Regenerable standalone gallery and downloadable archive
+docs/verification/prestige-20261117/prestige-captures-autonome.html
+docs/verification/prestige-20261117/mir-prestige-captures.tar.gz
+dist/prestige-captures.tar.gz

@@ -1,0 +1,24 @@
+[
+  {
+    "width": 390,
+    "pieces": 2,
+    "quantities": [
+      2,
+      3
+    ],
+    "dimensionA": "3 1/2",
+    "cartCount": "2",
+    "sendRequests": 0
+  },
+  {
+    "width": 1440,
+    "pieces": 2,
+    "quantities": [
+      2,
+      3
+    ],
+    "dimensionA": "3 1/2",
+    "cartCount": "2",
+    "sendRequests": 0
+  }
+]

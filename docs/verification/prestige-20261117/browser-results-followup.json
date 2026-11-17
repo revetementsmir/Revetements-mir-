@@ -1,0 +1,343 @@
+{
+  "browser": "Chromium 155.0.8059.79",
+  "date": "2026-11-17T13:45:50.609Z",
+  "localOnly": true,
+  "physicalDevices": false,
+  "externalRequestsBlocked": 36,
+  "blockedRequests": [
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "GET",
+      "path": "/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "method": "POST",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices"
+    }
+  ],
+  "results": [
+    {
+      "name": "Commerce réel local 1440",
+      "passed": true,
+      "quantity": 3,
+      "materialId": "hardieplank-select-625",
+      "colour": "Pierre des champs",
+      "estimateSubmitted": false,
+      "customPieceFixture": true
+    },
+    {
+      "name": "Commerce réel local 390",
+      "passed": true,
+      "quantity": 3,
+      "materialId": "hardieplank-select-625",
+      "colour": "Pierre des champs",
+      "estimateSubmitted": false,
+      "customPieceFixture": true
+    },
+    {
+      "name": "Commerce réel local 834",
+      "passed": true,
+      "quantity": 3,
+      "materialId": "hardieplank-select-625",
+      "colour": "Pierre des champs",
+      "estimateSubmitted": false,
+      "customPieceFixture": true
+    }
+  ],
+  "captures": [
+    {
+      "file": "screens/recherche-1440.png",
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "Recherche",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/categorie-1440.png",
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "Catégorie Fibrociment",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-rempli-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "data": "local synthetic drawing + real catalogue",
+      "title": "Panier matériaux et pliage",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/estimation-panier-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "Demande depuis le panier — non envoyée",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-rempli-en-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "Cart",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/recherche-390.png",
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "Recherche",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/categorie-390.png",
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "Catégorie Fibrociment",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-rempli-390.png",
+      "page": "selection.html",
+      "width": 390,
+      "language": "fr-CA",
+      "data": "local synthetic drawing + real catalogue",
+      "title": "Panier matériaux et pliage",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/estimation-panier-390.png",
+      "page": "selection.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "Demande depuis le panier — non envoyée",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-rempli-en-390.png",
+      "page": "selection.html",
+      "width": 390,
+      "language": "en-CA",
+      "title": "Cart",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/recherche-834.png",
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "Recherche",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/categorie-834.png",
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "Catégorie Fibrociment",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-rempli-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "fr-CA",
+      "data": "local synthetic drawing + real catalogue",
+      "title": "Panier matériaux et pliage",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/estimation-panier-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "Demande depuis le panier — non envoyée",
+      "pendingImages": []
+    },
+    {
+      "file": "screens/panier-rempli-en-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "en-CA",
+      "title": "Cart",
+      "pendingImages": []
+    }
+  ]
+}

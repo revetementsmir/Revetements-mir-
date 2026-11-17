@@ -1,0 +1,21 @@
+{
+  "result": [
+    {
+      "test": "English search fibre cement",
+      "products": 22
+    },
+    "English search empty state",
+    "Product description EN→FR→EN; typed quantity, official colour and unit values preserved"
+  ],
+  "sourceColour": "Noir minuit",
+  "units": [
+    {
+      "value": "pi²",
+      "text": "sq. ft."
+    },
+    {
+      "value": "pièces",
+      "text": "pieces"
+    }
+  ]
+}

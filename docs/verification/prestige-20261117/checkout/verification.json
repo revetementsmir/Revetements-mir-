@@ -1,0 +1,26 @@
+{
+  "mode": "local browser with all external calls blocked; confirmation fixture only, no submission",
+  "results": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "checks": "amount update, custom pieces visible and preserved, cart estimate summary and no send, responsive",
+      "externalRequestsBlocked": 3,
+      "pageErrors": []
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "checks": "amount update, custom pieces visible and preserved, cart estimate summary and no send, responsive",
+      "externalRequestsBlocked": 3,
+      "pageErrors": []
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "checks": "amount update, custom pieces visible and preserved, cart estimate summary and no send, responsive",
+      "externalRequestsBlocked": 3,
+      "pageErrors": []
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "errors": [],
+  "checks": [
+    {
+      "palette": "anthracite",
+      "format": "1440",
+      "overflow": false
+    },
+    {
+      "palette": "grege",
+      "format": "1440",
+      "overflow": false
+    },
+    {
+      "palette": "cuivre",
+      "format": "1440",
+      "overflow": false
+    },
+    {
+      "palette": "anthracite",
+      "format": "390",
+      "overflow": false
+    },
+    {
+      "selectorWorks": true
+    }
+  ]
+}

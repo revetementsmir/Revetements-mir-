@@ -16,9 +16,10 @@
   const clientFiles=Object.freeze([
     'index.html','boutique.html','materiaux.html','produit.html','selection.html',
     'pliage.html','contact.html','realisations.html','plan.html','production.html',
-    'estimation.html','estimation-dossier.html','studio.html','chantier.html'
+    'estimation.html','estimation-dossier.html','studio.html','chantier.html','maison.html','chantiers.html','aide.html'
   ]);
   const dict=root?.MIRClientEnglish || (typeof module==='object'&&module.exports?require('./mir-client-en-ca.js'):{});
+  const cataloguePhrases=Object.keys(dict).filter(key=>key.length>=18&&dict[key]!==key).sort((a,b)=>b.length-a.length);
   const sources=new WeakMap(),attributes=new WeakMap(),hrefSources=new WeakMap();
   let locale='fr-CA',active=false,observer=null,pending=false;
   const path=(href)=>String(href||'').split(/[?#]/)[0].split('/').pop()||'index.html';
@@ -26,7 +27,13 @@
     const name=path(file);
     if(!clientFiles.includes(name))return false;
     const params=new URLSearchParams(String(search||'').replace(/^\?/,''));
-    if(name==='chantier.html')return params.get('clientLocale')==='1'&&!params.has('invite')&&!params.has('invitation')&&!params.has('token');
+    if(name==='chantier.html'){
+      // The portal may consume the invitation URL before locale initialisation.
+      // Presence only: never read or display the invitation credential itself.
+      let invitationPending=false;
+      try{invitationPending=!!root?.sessionStorage?.getItem('mir_portal_invitation_v1')||!!root?.document?.querySelector('[data-mir-invitation="true"]');}catch{}
+      return params.get('clientLocale')==='1'&&!invitationPending&&!params.has('invite')&&!params.has('invitation')&&!params.has('token');
+    }
     if(name!=='production.html')return true;
     return params.get('mode')==='client'&&params.get('source')!=='store';
   }
@@ -57,7 +64,65 @@
     if(m)return 'Order '+m[1];
     m=value.match(/^Connecté avec (.+)\. Aucune commande n’a été envoyée\.$/);
     if(m)return 'Signed in as '+m[1]+'. No order has been submitted.';
+    m=value.match(/^Aucun résultat(?: pour « (.*?) »)?\. Aucun filtre actif\. Essayez un nom de produit, un fabricant ou un code couleur, par exemple « panneau Hardie » ou « 458-264 »\.$/);
+    if(m)return 'No results'+(m[1]?' for “'+m[1]+'”':'')+'. No filters selected. Try a product name, manufacturer or colour code, such as “Hardie panel” or “458-264”.';
+    m=value.match(/^Aucun résultat(?: pour « (.*?) »)?\. Filtres actifs : (.+)\. Modifiez ces filtres ou utilisez Réinitialiser\.$/);
+    if(m)return 'No results'+(m[1]?' for “'+m[1]+'”':'')+'. Active filters: '+m[2].replace(/fabricant « /g,'manufacturer “').replace(/famille « /g,'family “').replace(/type « /g,'type “').replace(/ »/g,'”')+'. Change these filters or select Reset.';
+    m=value.match(/^(\d+) articles? dans votre panier\.$/);
+    if(m)return m[1]+' '+(m[1]==='1'?'item':'items')+' in your cart.';
+    m=value.match(/^Aperçu métal neutre\. Le nom et l’échantillon du fabricant ci-contre définissent la couleur choisie\. Somme des côtés : (.+?); largeur de la bobine : (.+?)\. Le développé final dépend du rayon et des corrections de pliage\.$/);
+    if(m)return 'Neutral metal preview. The manufacturer name and sample alongside define the selected colour. Total sides: '+m[1]+'; coil width: '+m[2]+'. The final developed width depends on the radius and bending allowances.';
+    // Read-only technical captions: retain letters and numeric measurements.
+    m=value.match(/^([A-Z] · )([\d\s.,¼½¾⅛⅜⅝⅞/]+ (?:po|mm))$/);
+    if(m)return m[1]+displayDimensions(m[2]);
+    m=value.match(/^Développé total = ([\d\s.,¼½¾⅛⅜⅝⅞/]+ (?:po|mm))$/);
+    if(m)return 'Developed length = '+displayDimensions(m[1]);
+    m=value.match(/^Pli ([A-Z] → [A-Z])$/);
+    if(m)return 'Bend '+m[1];
+    m=value.match(/^Sens du pli (\d+)$/);
+    if(m)return 'Bend '+m[1]+' direction';
+    // Strict presentation patterns. No catalogue records, option values or
+    // customer content are rewritten; manufacturer colour names remain source labels.
+    m=value.match(/^(\d+) (nuances?|nuances référencées|couleurs documentées)$/);
+    if(m)return m[1]+' '+(m[1]==='1'?'colour':'colours')+(m[2].includes('documentées')?' documented':m[2].includes('référencées')?' listed':'');
+    m=value.match(/^(\d+) références?( · .+)$/);
+    if(m)return m[1]+' '+(m[1]==='1'?'reference':'references')+m[2];
+    m=value.match(/^(\d+) fabricants · choisissez votre collection$/);
+    if(m)return m[1]+' manufacturers · choose a collection';
+    m=value.match(/^(\d+) cotes? ou détails? à renseigner$/);
+    if(m)return m[1]+' measurements or details to enter';
+    m=value.match(/^([\d.,]+) pi² par pièce complète \(surface utile\)\.$/);
+    if(m)return m[1].replace(',','.')+' sq. ft. per full piece (usable coverage).';
+    m=value.match(/^([\d\s,\u00a0]+) éléments par (boîte|paquet)\. (.*)$/);
+    if(m)return Number(m[1].replace(/[\s,\u00a0]/g,'')).toLocaleString('en-CA')+' items per '+(m[2]==='boîte'?'box':'pack')+'. '+translate(m[3],'en-CA');
+    m=value.match(/^([\d.,]+) pi² utiles par pièce\. (.*)$/);
+    if(m)return m[1].replace(',','.')+' usable sq. ft. per piece. '+translate(m[2],'en-CA');
+    m=value.match(/^([\d\s,.\u00a0]+)\s*\$\s*(?:CA)?\s*\/\s*(.+)$/);
+    if(m){const amount=Number(m[1].replace(/[\s\u00a0]/g,'').replace(',','.'));if(Number.isFinite(amount))return new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(amount)+' / '+translate(m[2],'en-CA');}
+    m=value.match(/^(Longueur|Longueurs|Largeur) : (.+)$/);
+    if(m)return ({Longueur:'Length',Longueurs:'Lengths',Largeur:'Width'})[m[1]]+': '+displayDimensions(m[2]);
+    m=value.match(/^Couleurs (.+)$/);
+    if(m)return m[1]+' colours';
+    m=value.match(/^(.+) : voir les matériaux$/);
+    if(m&&Object.prototype.hasOwnProperty.call(dict,m[1]))return translate(m[1],'en-CA')+': view materials';
+    if(/^[\d¼½¾⅛⅜⅝⅞]/.test(value)&&/\b(?:po|pi)\b/.test(value)&&!/[a-zA-ZÀ-ÖØ-öø-ÿ]/.test(value.replace(/largeur réelle|nominal|visibles|po|pi|PID|mils|mm|cm|m/g,'')))return displayDimensions(value);
+    const sourcePrefixes=[
+      ['Document du produit. ','Product document. '],
+      ['Document du système ou de la gamme. ','System or product-line document. '],
+      ['Visuel fabricant · ','Manufacturer image · '],
+      ['Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif. ','Manufacturer reference; confirm availability, lead time and the MIR offering. Screen colours are indicative. ']
+    ];
+    for(const [source,target]of sourcePrefixes){if(value.startsWith(source))return target+translate(value.slice(source.length),'en-CA');}
+    for(const separator of [' · ',' / ']){
+      if(value.includes(separator)){
+        const parts=value.split(separator);
+        if(parts.every(part=>Object.prototype.hasOwnProperty.call(dict,part)))return parts.map(part=>dict[part]).join(separator);
+      }
+    }
     return value;
+  }
+  function displayDimensions(value){
+    return String(value).replace(/(\d),(\d)/g,'$1.$2').replace(/\bpo²/g,'sq. in.').replace(/\bpi²/g,'sq. ft.').replace(/\bpo\b/g,'in.').replace(/\bpi\b/g,'ft').replace(/largeur réelle/g,'actual width').replace(/visibles/g,'exposure').replace(/ à /g,' to ');
   }
   function number(value,lang=locale,options={}){
     return new Intl.NumberFormat(lang,{maximumFractionDigits:3,...options}).format(value);
@@ -266,22 +331,43 @@
   }
   function excluded(node){
     const e=node?.nodeType===1?node:node?.parentElement;
-    return !e || !!e.closest('script,style,noscript,textarea,[contenteditable],template,code,pre,[data-mir-user-content],.mir-help-message,.mir-chat-message,.mir-client-note,.mir-customer-note,.account-address h3,.account-address p,.mir-help-request strong,.mir-help-side section > h2');
+    return !e || !!e.closest('script,style,noscript,textarea,[contenteditable],template,code,pre,[data-mir-user-content],.mir-help-message,.mir-chat-message,.mir-client-note,.mir-customer-note,.account-address h3,.account-address p,.mir-help-request strong,.mir-help-side section > h2,#selected-color-name,.mir-cart-finish,select[data-cart-color] option,.official-color b,[data-mir-source-color]');
+  }
+  // Catalogue paragraphs often join multiple independently sourced notes.
+  // Translate exact curated segments only inside read-only product information.
+  function catalogueComposite(value){
+    if(locale!=='en-CA')return value;
+    const clean=value.trim();
+    if(Object.prototype.hasOwnProperty.call(dict,clean))return translate(value);
+    const fragments=[];let masked=value;
+    for(const source of cataloguePhrases){
+      if(!masked.includes(source))continue;
+      const token='\uE000'+fragments.length+'\uE001';fragments.push(dict[source]);masked=masked.split(source).join(token);
+    }
+    masked=translate(masked);
+    return masked.replace(/\uE000(\d+)\uE001/g,(_,i)=>fragments[Number(i)]);
   }
   function updateText(node){
     if(node.nodeType!==3||excluded(node))return;
     const now=node.nodeValue;
     let info=sources.get(node);
     if(!info||now!==info.last){info={source:now,last:now};sources.set(node,info);}
-    const next=translate(info.source);
+    let next=translate(info.source);
+    if(locale==='en-CA'&&node.parentElement?.closest('.product-source-note,.product-photo-note,.product-color-description,.document-note,.product-docs'))next=catalogueComposite(info.source);
     if(now!==next){info.last=next;node.nodeValue=next;}
   }
   function updateAttributes(el){
-    if(!el||el.nodeType!==1||excluded(el))return;
+    if(!el||el.nodeType!==1||(excluded(el)&&el.tagName!=='TEXTAREA'))return;
+    // HTML options without a value derive their business value from visible text.
+    // Freeze the original value before localising the label (units must stay stable).
+    if(el.tagName==='OPTION'&&!el.hasAttribute('value'))el.setAttribute('value',el.value);
     let info=attributes.get(el);
     if(!info){info=Object.create(null);attributes.set(el,info);}
     for(const name of ['aria-label','aria-description','placeholder','title','alt']){
+      // Translate only the static prompt, never the customer's textarea content.
+      if(el.tagName==='TEXTAREA'&&name!=='placeholder')continue;
       if(!el.hasAttribute(name))continue;
+      if((name==='title'||name==='aria-label')&&el.matches('[data-color],[data-card-color]'))continue;
       const now=el.getAttribute(name),prior=info[name];
       if(!prior||prior.last!==now)info[name]={source:now,last:now};
       const translated=translate(info[name].source);
@@ -291,6 +377,7 @@
   function walk(node){
     if(!node||node.nodeType===8)return;
     if(node.nodeType===3){updateText(node);return;}
+    if(node.nodeType===1&&node.tagName==='TEXTAREA'){updateAttributes(node);return;}
     if(node.nodeType!==1||excluded(node))return;
     updateAttributes(node);
     for(let child=node.firstChild;child;child=child.nextSibling)walk(child);
@@ -311,8 +398,7 @@
       if(!saved||saved.last!==href){saved={original:href,last:href};hrefSources.set(link,saved);}
       if(!/^chantier\.html(?:[?#]|$)/.test(saved.original))continue;
       const parts=saved.original.split('#'),url=new URL(parts[0],root.location.href);
-      if(locale==='en-CA')url.searchParams.set('clientLocale','1');
-      else url.searchParams.delete('clientLocale');
+      url.searchParams.set('clientLocale','1');
       const next=url.pathname.split('/').pop()+(url.search||'')+(parts[1]?'#'+parts[1]:'');
       if(href!==next){saved.last=next;link.setAttribute('href',next);}
     }
@@ -386,12 +472,12 @@
   function stopForStaff(){
     locale='fr-CA';const doc=root.document;
     walk(doc.body);metadata(doc);
-    doc.querySelector('.mir-client-locale-switch')?.remove();
+    doc.querySelectorAll('.mir-client-locale-switch').forEach(control=>control.remove());
     observer?.disconnect();observer=null;active=false;
   }
   function render(){
     if(!active)return;
-    if(staffReady()){stopForStaff();return;}
+    if(staffReady()||!isClient(root.location.pathname,root.location.search)){stopForStaff();return;}
     const doc=root.document;
     localeControl(doc);metadata(doc);walk(doc.body);customerDates(doc);clientLinks(doc);installPdfAdapter();
   }

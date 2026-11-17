@@ -1,0 +1,13 @@
+{
+  "total": 112,
+  "initialPC": 48,
+  "phones": 32,
+  "all": 112,
+  "decoded": 112,
+  "dialog": true,
+  "phoneOverflow": false,
+  "download": "prestige-captures.tar.gz",
+  "autonomous": 112,
+  "noRemoteAssets": true,
+  "errors": []
+}

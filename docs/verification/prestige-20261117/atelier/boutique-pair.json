@@ -1,0 +1,15 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "before": "../before/boutique.png",
+  "after": "boutique-after.png",
+  "matchingContentAfter": "boutique-after-fabricants.png",
+  "defaultTitle": "Les matériaux",
+  "matchingTitle": "Collections par fabricant",
+  "errors": [],
+  "blockedRemoteRequests": 1,
+  "remoteRequestsSent": 0,
+  "production": false
+}

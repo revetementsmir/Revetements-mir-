@@ -1,0 +1,17 @@
+{
+  "result": [
+    "Accueil → maison (TEST propagation issue reported to integrator)",
+    "Maison → boutique",
+    "Accueil → chantiers → pliage",
+    "Gallery filter, enlarge, next and close",
+    "Materials search empty and material documentation dialog",
+    "New heading translations and language persistence",
+    "Verified published telephone/email destinations, not called/sent"
+  ],
+  "english": {
+    "index": "Your projectstarts here.",
+    "maison": "An exterior that reflectsyou.",
+    "chantiers": "Plan yourjob.",
+    "contact": "The right advice.The right start."
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "scenario": "employee-link",
+    "pass": true
+  },
+  {
+    "scenario": "employee-ready",
+    "pass": true
+  },
+  {
+    "scenario": "invitation",
+    "pass": true
+  }
+]

@@ -1,0 +1,175 @@
+/* Client tools only. Materials, geometry and staff interfaces are never recoloured. */
+body[data-mir-prestige-tools]{--tool-ink:var(--mir-ink,#242522);--tool-paper:var(--mir-paper,#f4f1ea);--tool-accent:var(--mir-accent,#bda889);--tool-line:#d8d3c9;--tool-muted:#69685f;background:var(--tool-paper);color:var(--tool-ink)}
+body[data-mir-prestige-tools] :is(.eyebrow,.field-hint,.small-note,.drawing-note,.notice-inline){color:var(--tool-muted)}
+body[data-mir-prestige-tools] :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea){background:#fffefa;border:1px solid #ccc6bb;border-radius:3px;color:var(--tool-ink);min-height:46px;font-size:15px}
+body[data-mir-prestige-tools] :is(a,button,input,select,textarea,summary):focus-visible{outline:3px solid #867155;outline-offset:4px}
+body[data-mir-prestige-tools] :is(.mir-button,.primary,.primary-button,.export){background:var(--tool-ink);border-color:var(--tool-ink);color:#fffefa;border-radius:3px;box-shadow:none;min-height:48px}
+body[data-mir-prestige-tools] :is(.mir-button,.primary,.primary-button,.export):not(:disabled):hover{background:#44443d;border-color:#44443d}
+body[data-mir-prestige-tools] :is(.primary-button,.secondary-button,.quiet-button,.primary,.small-link,summary){touch-action:manipulation}
+body[data-mir-prestige-tools] :is(.step,.step-dot){background:#e9e1d3;border:0;color:var(--tool-ink)}
+body[data-mir-prestige-tools] :is(.view-switch,.view-toggle,.mode-tabs) button[aria-pressed=true]{background:var(--tool-ink);color:white;border-color:var(--tool-ink);box-shadow:none}
+body[data-mir-prestige-tools] :is(.secondary-button,.quiet-button){background:transparent;border-color:#bcb4a6;color:var(--tool-ink);border-radius:3px}
+/* Bending: a material sample and a short, legible sequence. */
+body[data-mir-prestige-tools=bending] .page-main{max-width:1320px;padding:64px 48px 58px;margin:auto}
+body[data-mir-prestige-tools=bending] .client-bend-hero{grid-template-columns:1fr 1fr;gap:72px;padding-bottom:52px}
+body[data-mir-prestige-tools=bending] .client-bend-copy h1{font-size:clamp(44px,4.8vw,70px);font-weight:400;line-height:1.07;letter-spacing:-.045em;margin:20px 0 24px}
+body[data-mir-prestige-tools=bending] .client-bend-copy h1 em{display:block;font-family:Georgia,serif;font-weight:400;color:#867155}
+body[data-mir-prestige-tools=bending] .client-bend-copy>p:not(.eyebrow){color:var(--tool-muted);font-size:17px;line-height:1.8;max-width:420px}
+body[data-mir-prestige-tools=bending] .client-bend-copy .mir-button{min-width:240px;padding:16px 24px;margin-top:28px;font-weight:500}
+body[data-mir-prestige-tools=bending] .client-bend-copy small{font-size:12px;color:var(--tool-muted);margin-top:16px}
+body[data-mir-prestige-tools=bending] .client-bend-example{background:var(--tool-ink);border-radius:2px;padding:28px;margin:0;box-shadow:none;color:#eee9e0}
+body[data-mir-prestige-tools=bending] .client-bend-example figcaption{border-color:#ffffff26;font-size:10px;letter-spacing:.14em}
+body[data-mir-prestige-tools=bending] .client-bend-example svg{margin:24px 0 12px}
+body[data-mir-prestige-tools=bending] .client-bend-example svg pattern path{stroke:#bda889}
+body[data-mir-prestige-tools=bending] .client-bend-example svg linearGradient stop:first-child{stop-color:#d5c9b8}
+body[data-mir-prestige-tools=bending] .client-bend-example svg linearGradient stop:last-child{stop-color:#96866e}
+body[data-mir-prestige-tools=bending] .client-bend-example svg g[stroke]{stroke:#e6dccd}
+body[data-mir-prestige-tools=bending] .client-bend-example svg path[fill="#699071"]{fill:#a89b86}
+body[data-mir-prestige-tools=bending] .client-bend-example svg g[fill]{fill:#f5efe4}
+body[data-mir-prestige-tools=bending] .prestige-bend-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));list-style:none;padding:30px 0;margin:0;border-top:1px solid var(--tool-line);border-bottom:1px solid var(--tool-line);gap:36px}
+body[data-mir-prestige-tools=bending] .prestige-bend-steps li{display:flex;gap:18px;align-items:baseline}
+body[data-mir-prestige-tools=bending] .prestige-bend-steps li>span{font-family:Georgia,serif;font-size:22px;color:#8b785a}
+body[data-mir-prestige-tools=bending] .prestige-bend-steps strong{font-size:15px;font-weight:500}
+body[data-mir-prestige-tools=bending] .prestige-bend-steps p{font-size:13px;line-height:1.6;color:var(--tool-muted);margin:8px 0 0}
+body[data-mir-prestige-tools=bending] .client-bend-quick{border:0;margin-top:28px}
+body[data-mir-prestige-tools=bending] .client-bend-quick>summary{font-size:14px;padding:22px 0;border:0}
+body[data-mir-prestige-tools=bending] :is(.bend-view,.bend-form,.bend-list-section){background:#fffefa;border:1px solid var(--tool-line);border-radius:3px;box-shadow:none}
+body[data-mir-prestige-tools=bending] .bend-view{border:0;background:#ece8df}
+body[data-mir-prestige-tools=bending] .bend-workspace{gap:36px}
+body[data-mir-prestige-tools=bending] :is(.bend-view-head,.bend-view-foot,.form-section,.bend-list-head){border-color:var(--tool-line)}
+body[data-mir-prestige-tools=bending] .subnav{padding-top:24px;color:var(--tool-muted)}
+/* Guided production: the workflow remains owned by production-app.js. */
+body[data-mir-prestige-tools=production] .workshop-banner{background:var(--tool-ink);color:#e9e2d6}
+body[data-mir-prestige-tools=production] .production-wrap{max-width:1440px;margin:auto;padding-inline:48px}
+body[data-mir-prestige-tools=production] #client-entry{max-width:1200px;padding:58px 0 90px;margin:auto}
+body[data-mir-prestige-tools=production] #client-entry h1{font-size:clamp(32px,4.2vw,58px);font-weight:400;letter-spacing:-.04em;line-height:1.12;max-width:900px;margin:20px 0}
+body[data-mir-prestige-tools=production] #client-entry>.eyebrow{font-size:11px;letter-spacing:.15em;color:#8b785a;margin-top:34px}
+body[data-mir-prestige-tools=production] #client-entry-intro{font-size:17px;color:var(--tool-muted);line-height:1.7}
+body[data-mir-prestige-tools=production] .client-entry-cards{gap:32px;margin-top:40px}
+body[data-mir-prestige-tools=production] .client-entry-cards>button{min-height:180px;padding:32px;background:#fffefa;border:0;border-top:2px solid var(--tool-accent);border-radius:2px;box-shadow:none;grid-template-columns:48px 1fr 20px;color:var(--tool-ink)}
+body[data-mir-prestige-tools=production] .client-entry-cards>button:hover{background:#ebe5da;border-color:var(--tool-ink)}
+body[data-mir-prestige-tools=production] .client-entry-cards strong{font-size:20px;font-weight:500;line-height:1.4}
+body[data-mir-prestige-tools=production] .client-entry-cards small{font-size:14px;line-height:1.6;color:var(--tool-muted);margin-top:10px}
+body[data-mir-prestige-tools=production] .client-entry-icon{color:#8b785a;font-size:34px}
+body[data-mir-prestige-tools=production] :is(.production-intro h1,.production-order h2){font-weight:400;color:var(--tool-ink)}
+body[data-mir-prestige-tools=production] :is(.production-intro h1,.production-order h2) em{font-family:Georgia,serif;font-weight:400;color:#867155}
+body[data-mir-prestige-tools=production] .mir-production-steps{background:transparent;border:0;border-bottom:1px solid var(--tool-line);border-radius:0;padding:20px 0 28px;margin-bottom:28px}
+body[data-mir-prestige-tools=production] .mir-production-steps li,body[data-mir-prestige-tools=production] .mir-production-steps strong{color:var(--tool-ink)}
+body[data-mir-prestige-tools=production] #client-step-list button{background:transparent;border:0;color:var(--tool-muted);border-radius:0;min-height:46px}
+body[data-mir-prestige-tools=production] #client-step-list button[aria-current=step]{background:#e9e1d3;color:var(--tool-ink)}
+body[data-mir-prestige-tools=production] :is(.drawing-card,.config-card,.production-order,.order-card){border-color:var(--tool-line);border-radius:3px;box-shadow:none;background:#fffefa}
+body[data-mir-prestige-tools=production] .drawing-card{background:#eeeae2}
+body[data-mir-prestige-tools=production] :is(.drawing-head,.drawing-legend,.config-section,.section-heading){border-color:var(--tool-line)}
+body[data-mir-prestige-tools=production] .template-button{background:#fffefa;border:1px solid var(--tool-line);border-radius:3px;box-shadow:none;color:var(--tool-ink)}
+body[data-mir-prestige-tools=production] .template-button[aria-pressed=true]{background:#e9e1d3;color:var(--tool-ink);border-color:#938169}
+body[data-mir-prestige-tools=production] .kind-bar{border-color:var(--tool-line)}
+body[data-mir-prestige-tools=production] .kind-bar button[aria-pressed=true]{background:#e9e1d3;color:var(--tool-ink);border-color:#938169}
+body[data-mir-prestige-tools=production] #client-model-options>p{font-size:16px;color:var(--tool-muted)}
+body[data-mir-prestige-tools=production] .mir-unified-client-shortcut{background:#e9e3d8;color:var(--tool-ink);border:0;border-radius:2px}
+/* Existing TEST Studio: import is the single dark action, tools remain available. */
+body[data-mir-prestige-tools=plan] main{max-width:1600px;padding:38px 48px 48px;margin:auto}
+body[data-mir-prestige-tools=plan] .mir-studio-tools{max-width:1600px;margin:auto;padding:20px 48px 0}
+body[data-mir-prestige-tools=plan] .mir-studio-tools button{background:transparent;border:0;border-bottom:1px solid #b6a589;color:var(--tool-muted);padding:8px 0;font-size:13px}
+body[data-mir-prestige-tools=plan] .studio-intro{gap:40px;align-items:center;margin-bottom:35px}
+body[data-mir-prestige-tools=plan] .studio-intro h1{font-size:clamp(36px,4.4vw,62px);font-weight:400;color:var(--tool-ink)}
+body[data-mir-prestige-tools=plan] .studio-intro h1 em{color:#867155;font-family:Georgia,serif}
+body[data-mir-prestige-tools=plan] .studio-intro .intro-copy{font-size:16px;max-width:510px;color:var(--tool-muted);line-height:1.7}
+body[data-mir-prestige-tools=plan] .studio-start{max-width:450px;display:flex;flex-direction:row;justify-content:flex-end;flex-wrap:wrap;gap:10px}
+body[data-mir-prestige-tools=plan] .studio-start .primary{padding:12px 18px}
+body[data-mir-prestige-tools=plan] .studio-start .primary:not(#import-pdf){background:transparent;color:var(--tool-ink);border:1px solid #c5bdae}
+body[data-mir-prestige-tools=plan] .studio-start small{flex-basis:100%;margin-top:5px;color:var(--tool-muted)}
+body[data-mir-prestige-tools=plan] .project-bar{background:transparent;border:0;border-bottom:1px solid var(--tool-line);border-radius:0;padding:16px 0;gap:18px;margin-bottom:24px}
+body[data-mir-prestige-tools=plan] .workspace{border:0;gap:28px;grid-template-columns:minmax(0,1fr) 340px;background:transparent}
+body[data-mir-prestige-tools=plan] .drawing-column{min-width:0;background:transparent;border:0}
+body[data-mir-prestige-tools=plan] .controls{background:#fffefa;border:0;border-radius:3px;box-shadow:none}
+body[data-mir-prestige-tools=plan] :is(.part-nav,.view-toolbar,.display-toolbar,.edit-toolbar,.drawing-footer,.zones-heading){background:transparent;border-color:var(--tool-line)}
+body[data-mir-prestige-tools=plan] .part-nav{padding:0 0 14px;gap:8px}
+body[data-mir-prestige-tools=plan] .part-nav button[aria-pressed=true]{background:var(--tool-ink);color:#fffefa}
+body[data-mir-prestige-tools=plan] .face-tabs button[aria-pressed=true]{background:#e4dccf;color:var(--tool-ink)}
+body[data-mir-prestige-tools=plan] .stage{background:#e9e5dc;border:1px solid var(--tool-line);border-radius:2px}
+body[data-mir-prestige-tools=plan] .edit-toolbar{padding-inline:0}
+body[data-mir-prestige-tools=plan] .edit-toolbar button{border-radius:2px}
+body[data-mir-prestige-tools=plan] .edit-toolbar #add-accent{background:#e4dccf;color:var(--tool-ink)}
+body[data-mir-prestige-tools=plan] .controls :is(h2,label,.controls-top,.finish-section){color:var(--tool-ink)}
+body[data-mir-prestige-tools=plan] .controls :is(.control-heading,.controls-top,.finish-section,.detail-control){border-color:var(--tool-line)}
+body[data-mir-prestige-tools=plan] .material-preview{background:#f0ece4}
+body[data-mir-prestige-tools=plan] .project-notes{gap:40px;border-top:1px solid var(--tool-line);padding-top:36px;margin-top:40px}
+/* The legacy demo is still clearly identified as a generic demonstration. */
+body[data-mir-prestige-tools=demo]{--ivory:var(--tool-paper);--ink:var(--tool-ink);--green:var(--tool-accent);--line:var(--tool-line);--muted:var(--tool-muted);--paper:#fffefa;--soft:#e9e3d7}
+body[data-mir-prestige-tools=demo]>aside{background:#e9e3d7!important;color:var(--tool-muted);font-size:13px!important}
+body[data-mir-prestige-tools=demo] main{max-width:1500px;padding:48px}
+body[data-mir-prestige-tools=demo] .intro h1{font:400 clamp(34px,3.8vw,54px)/1.12 Arial,sans-serif;letter-spacing:-.04em}
+body[data-mir-prestige-tools=demo] .intro p.description{font-size:15px}
+body[data-mir-prestige-tools=demo] .studio{gap:32px}
+body[data-mir-prestige-tools=demo] :is(.controls,.viewer,.requirements){border-color:var(--tool-line);border-radius:2px;box-shadow:none}
+body[data-mir-prestige-tools=demo] .stage{background:radial-gradient(ellipse at center,#fffefa,#e6e0d6)}
+body[data-mir-prestige-tools=demo] .requirements{background:#e9e3d7;padding:22px}
+body[data-mir-prestige-tools=demo] :is(.generic-note,.requirements p,.material-hint,.summary-row,.export-note,.disclaimer){font-size:12px;line-height:1.65;color:var(--tool-muted)}
+body[data-mir-prestige-tools=demo] .radio-input:checked+.zone-label{background:#e9e1d3;border-color:#9b886a}
+body[data-mir-prestige-tools=demo] .radio-input:checked+.material-label{border-color:#9b886a;box-shadow:0 0 0 1px #9b886a}
+@media(max-width:1100px){
+body[data-mir-prestige-tools=bending] .page-main{padding:42px 28px}
+body[data-mir-prestige-tools=bending] .client-bend-hero{gap:36px}
+body[data-mir-prestige-tools=bending] .prestige-bend-steps{gap:22px}
+body[data-mir-prestige-tools=production] .production-wrap{padding-inline:28px}
+body[data-mir-prestige-tools=plan] main{padding:30px 24px}
+body[data-mir-prestige-tools=plan] .mir-studio-tools{padding-inline:24px}
+body[data-mir-prestige-tools=plan] .workspace{gap:20px;grid-template-columns:minmax(0,1fr) 300px}
+body[data-mir-prestige-tools=plan] .studio-intro{gap:22px}
+body[data-mir-prestige-tools=plan] .studio-start{max-width:310px}
+body[data-mir-prestige-tools=demo] main{padding:36px 24px}
+}
+@media(max-width:760px){
+body[data-mir-prestige-tools=bending] .page-main{padding:34px 22px}
+body[data-mir-prestige-tools=bending] .client-bend-hero{grid-template-columns:1fr;gap:32px;padding-bottom:32px}
+body[data-mir-prestige-tools=bending] .client-bend-copy h1{font-size:46px}
+body[data-mir-prestige-tools=bending] .client-bend-copy>p:not(.eyebrow){font-size:16px}
+body[data-mir-prestige-tools=bending] .client-bend-copy .mir-button{width:100%;min-width:0}
+body[data-mir-prestige-tools=bending] .client-bend-example{padding:20px}
+body[data-mir-prestige-tools=bending] .prestige-bend-steps{grid-template-columns:1fr;padding:24px 0;gap:23px}
+body[data-mir-prestige-tools=bending] .prestige-bend-steps li{gap:18px}
+body[data-mir-prestige-tools=bending] .client-bend-quick{margin-top:10px}
+body[data-mir-prestige-tools=bending] .bend-workspace{gap:20px}
+body[data-mir-prestige-tools=production] .production-wrap{padding-inline:20px}
+body[data-mir-prestige-tools=production] #client-entry{padding:28px 0 48px}
+body[data-mir-prestige-tools=production] #client-entry h1{font-size:34px;max-width:450px}
+body[data-mir-prestige-tools=production] #client-entry-intro{font-size:15px}
+body[data-mir-prestige-tools=production] .client-entry-cards{grid-template-columns:1fr;gap:18px;margin-top:28px}
+body[data-mir-prestige-tools=production] .client-entry-cards>button{padding:24px;min-height:142px;grid-template-columns:34px 1fr 14px}
+body[data-mir-prestige-tools=production] .client-entry-cards strong{font-size:18px}
+body[data-mir-prestige-tools=production] .client-entry-cards small{font-size:13px}
+body[data-mir-prestige-tools=plan] main{padding:26px 18px}
+body[data-mir-prestige-tools=plan] .mir-studio-tools{padding-inline:18px}
+body[data-mir-prestige-tools=plan] .studio-intro{display:block}
+body[data-mir-prestige-tools=plan] .studio-start{justify-content:flex-start;max-width:none;margin-top:24px}
+body[data-mir-prestige-tools=plan] .studio-start .primary{flex:1 1 auto}
+body[data-mir-prestige-tools=plan] .studio-start small{text-align:left}
+body[data-mir-prestige-tools=plan] .workspace{display:flex;flex-direction:column;gap:24px}
+body[data-mir-prestige-tools=plan] .workspace>*{width:100%}
+body[data-mir-prestige-tools=plan] .project-bar{flex-wrap:wrap;gap:10px 18px}
+body[data-mir-prestige-tools=plan] .part-nav{overflow:auto}
+body[data-mir-prestige-tools=plan] .view-toolbar{flex-wrap:wrap;gap:12px}
+body[data-mir-prestige-tools=plan] .project-notes{gap:22px}
+body[data-mir-prestige-tools=demo] main{padding:30px 18px}
+body[data-mir-prestige-tools=demo] .studio{gap:24px}
+body[data-mir-prestige-tools=demo] .material-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* Match the legacy signature selector's specificity without changing global rules. */
+body[data-mir-prestige-tools=bending] .client-bend-copy .mir-button{background:var(--tool-ink);border-color:var(--tool-ink);color:#fffefa}
+body[data-mir-prestige-tools=bending] .client-bend-copy .mir-button:hover{background:#44443d;border-color:#44443d}
+body[data-mir-prestige-tools=production] :is(.drawing-head,.section-heading) h2{color:var(--tool-ink)}
+body[data-mir-prestige-tools=production] .client-entry-cards>button strong{color:var(--tool-ink)}
+@media(max-width:1100px){
+ body[data-mir-prestige-tools=production][data-client-entry] #client-step-actions{position:sticky;bottom:calc(68px + env(safe-area-inset-bottom));z-index:20;background:#fffefa;border-top:1px solid var(--tool-line);box-shadow:none;padding:12px 14px}
+ body[data-mir-prestige-tools=production][data-client-entry] .config-card{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+}
+body[data-mir-prestige-tools] :is(.page-main,.studio-intro,.controls,.production-intro) .eyebrow{color:#8b785a}
+@media(max-width:1100px){
+ body[data-mir-prestige-tools=production][data-client-entry] #client-step-scroll{padding-bottom:90px;scroll-padding-bottom:160px}
+ body[data-mir-prestige-tools=production][data-client-entry] #client-step-scroll :is(input,select,textarea){scroll-margin-bottom:160px}
+}
+body[data-mir-prestige-tools=production] .config-card :is(label,.letter-label,.fraction-field){min-width:0;max-width:100%}
+body[data-mir-prestige-tools=production] .config-card .fraction-field>input{min-width:0;max-width:100%}
+@media(min-width:761px) and (max-width:1100px){
+ body[data-mir-prestige-tools=production] .config-card :is(.dimension-fields,.two-fields,.three-fields){grid-template-columns:minmax(0,1fr)}
+}

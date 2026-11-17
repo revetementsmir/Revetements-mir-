@@ -23,7 +23,9 @@ try{
    assert.match(html,/prefers-reduced-motion/);
    assert.match(html,/href="boutique\.html"/);
    assert.match(html,/href="index\.html"/);
-   assert.doesNotMatch(html,/<script[^>]+src=/);
+   const presentationScripts=[...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(match=>match[1].split('?')[0]);
+   assert.deepEqual(presentationScripts,['mir-public-menu.js','mir-prestige.js'],'only public navigation presentation scripts are allowed');
+   assert.doesNotMatch(html,/src="(?:plan|studio|production|portal|shared|mir-estimate)[^"\s]*\.js/,'no Studio engine or backend script on public construction page');
    assert.doesNotMatch(html,/mir-test-guard\.js|supabase\.co/);
    assert.equal(sha(path.join(test,name)),before[name]);
    assert.equal(sha(path.join(DIST,name)),sources[name],'original Studio source must remain unchanged');

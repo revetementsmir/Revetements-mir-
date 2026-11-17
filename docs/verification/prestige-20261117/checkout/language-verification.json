@@ -1,0 +1,30 @@
+{
+  "mode": "Browser local, all external requests blocked",
+  "englishChecks": {
+    "finish": true,
+    "onRequest": true,
+    "colour": true,
+    "pieces": true,
+    "coverage": true,
+    "noResidue": true
+  },
+  "fr": "JAMES HARDIE\nHardiePlank Select Cedarmill — 6,25 po\n\nFinition : Pierre des champs\nPrix sur demande\n\nTeinte\nNoir minuit\nBlanc arctique\nPierre des champs\nBeige Navajo\nBrun kaki\nTaupe Monterey\nÉcorce\nEspresso\nSauge\nGris ardoise\nBleu acier\nBrume légère\nGris perle\nÉtain vieilli\nGris nocturne\nBleu de soirée\nBleu océan\nGris fer\nRouge campagnard\n\n5 pi² par pièce complète (surface utile).\n\nQuantité\nUnité du besoin\npi²\npièces\n×\n\nMontant à confirmer\nAvant taxes et livraison",
+  "en": "JAMES HARDIE\nHardiePlank Select Cedarmill — 6,25 po\n\nFinish: Pierre des champs\nPrice on request\n\nColour\nNoir minuit\nBlanc arctique\nPierre des champs\nBeige Navajo\nBrun kaki\nTaupe Monterey\nÉcorce\nEspresso\nSauge\nGris ardoise\nBleu acier\nBrume légère\nGris perle\nÉtain vieilli\nGris nocturne\nBleu de soirée\nBleu océan\nGris fer\nRouge campagnard\n\n5 sq. ft. per full piece (usable coverage).\n\nQuantity\nRequired unit\nsq. ft.\npieces\n×\n\nAmount to confirm\nBefore taxes and delivery",
+  "returned": "JAMES HARDIE\nHardiePlank Select Cedarmill — 6,25 po\n\nFinition : Pierre des champs\nPrix sur demande\n\nTeinte\nNoir minuit\nBlanc arctique\nPierre des champs\nBeige Navajo\nBrun kaki\nTaupe Monterey\nÉcorce\nEspresso\nSauge\nGris ardoise\nBleu acier\nBrume légère\nGris perle\nÉtain vieilli\nGris nocturne\nBleu de soirée\nBleu océan\nGris fer\nRouge campagnard\n\n5 pi² par pièce complète (surface utile).\n\nQuantité\nUnité du besoin\npi²\npièces\n×\n\nMontant à confirmer\nAvant taxes et livraison",
+  "valuesBefore": [
+    "pi²",
+    "pièces"
+  ],
+  "valuesAfter": [
+    "pi²",
+    "pièces"
+  ],
+  "storageUnchanged": true,
+  "returnedFrench": true,
+  "pageErrors": [],
+  "englishUnitSelection": {
+    "savedValue": "pièces",
+    "reloadValue": "pièces",
+    "returnedOptionLabel": "pièces"
+  }
+}

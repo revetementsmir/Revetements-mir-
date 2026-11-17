@@ -25,8 +25,9 @@
   <link rel="stylesheet" href="mir-client-i18n.css?v=1">
   <script defer src="mir-client-en-ca.js?v=1"></script>
   <script defer src="mir-client-i18n.js?v=release-pr41-20261115"></script>
-</head>
-<body class="mir-home-premium">
+  <link rel="stylesheet" href="mir-prestige-editorial.css?v=20261117">
+<link rel="stylesheet" href="mir-prestige.css?v=1"><script defer src="mir-prestige.js?v=1"></script></head>
+<body class="mir-home-premium mir-prestige-editorial">
   <a class="skip" href="#contenu">Aller au contenu</a>
   <header class="site-header mir-home-header">
     <a class="brand brand-logo mir-home-brand" href="index.html" aria-label="Les Revêtements MIR — accueil"><img src="assets/MIR-logo-officiel-original.svg" alt="Les Revêtements MIR" width="364" height="91"></a>
@@ -44,22 +45,23 @@
     </div>
   </header>
   <main id="contenu">
-    <section class="mir-home-showcase" aria-labelledby="hero-title">
-      <picture class="mir-home-hero-asset">
-        <source type="image/avif" srcset="assets/mir-home-hero-20261105.avif">
-        <img class="mir-home-showcase-photo" src="assets/mir-home-hero-20261105.webp" alt="Illustration d’une maison contemporaine entourée d’arbres, avec revêtements foncés, pierre claire et touches de bois" width="1672" height="941" fetchpriority="high" decoding="async">
-      </picture>
-      <div class="mir-home-showcase-inner">
-        <p class="mir-home-kicker">Revêtements extérieurs · Québec</p>
-        <h1 id="hero-title">Des façades qui ont<br>du <em>caractère.</em></h1>
-        <p class="mir-home-lead">Revêtements extérieurs, moulures sur mesure et finitions soignées pour vos projets, des premières idées jusqu'aux derniers détails.</p>
-        <div class="mir-home-showcase-actions">
-          <a class="mir-home-main-cta" href="realisations.html">Voir nos réalisations</a>
-          <a class="mir-home-second-cta" href="boutique.html">Voir notre boutique</a>
-        </div>
+    <section class="mir-prestige-home-hero" aria-labelledby="hero-title">
+      <figure class="mir-prestige-home-photo">
+        <picture><source type="image/avif" srcset="assets/mir-home-hero-20261105.avif"><img src="assets/mir-home-hero-20261105.webp" alt="Illustration d’une maison contemporaine entourée d’arbres, avec revêtements foncés, pierre claire et touches de bois" width="1672" height="941" fetchpriority="high" decoding="async"></picture>
+        <figcaption>Revêtements extérieurs · Québec</figcaption>
+      </figure>
+      <div class="mir-prestige-home-copy">
+        <p class="mir-editorial-overline">LES REVÊTEMENTS MIR</p>
+        <h1 id="hero-title">Votre projet<br>commence <em>ici.</em></h1>
+        <p class="mir-prestige-home-lead">Une maison à rénover?<br>Un chantier à préparer?</p>
+        <nav class="mir-home-paths" aria-label="Choisir votre parcours">
+          <a href="maison.html"><span><strong>Pour ma maison</strong><small>Inspiration et matériaux.</small></span><span aria-hidden="true">↗</span></a>
+          <a href="chantiers.html"><span><strong>Pour mes chantiers</strong><small>Pliages et préparation de commande.</small></span><span aria-hidden="true">↗</span></a>
+        </nav>
+        <a class="mir-home-discover" href="#decouvrir">Découvrir tout MIR <span aria-hidden="true">→</span></a>
       </div>
     </section>
-    <section class="mir-home-services wrap" aria-label="Découvrez nos expertises">
+    <section id="decouvrir" class="mir-home-services wrap" aria-label="Découvrez nos expertises">
       <a class="mir-home-service" href="boutique.html">
         <span class="mir-home-service-media"><img src="assets/mir-home-card-revetement-20261105.webp" alt="Illustration d’un revêtement extérieur noir texturé à clins horizontaux" loading="lazy" decoding="async" width="800" height="600"></span>
         <span class="mir-home-service-copy">
@@ -80,7 +82,7 @@
         <span class="mir-home-service-media"><img src="assets/mir-home-card-studio-20261105.webp" alt="Illustration d’une façade 3D qui passe d’un plan filaire à une maison avec revêtements" loading="lazy" decoding="async" width="800" height="600"></span>
         <span class="mir-home-service-copy">
           <strong>Imaginez votre façade en 3D</strong>
-          <span>Visualisez différents revêtements et travaillez avec votre propre plan PDF.</span>
+          <span>Découvrez le Studio et les outils actuellement disponibles.</span>
           <b>Accéder au studio 3D</b>
         </span>
       </a>

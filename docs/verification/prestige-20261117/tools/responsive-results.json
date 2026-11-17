@@ -1,0 +1,362 @@
+[
+  {
+    "name": "pliage",
+    "width": 390,
+    "lang": "fr-CA",
+    "scroll": 390,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "pliage",
+    "width": 390,
+    "lang": "en-CA",
+    "scroll": 390,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 390,
+    "lang": "fr-CA",
+    "scroll": 390,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 390,
+    "lang": "en-CA",
+    "scroll": 390,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "plan-test",
+    "width": 390,
+    "lang": "fr-CA",
+    "scroll": 390,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "plan-test",
+    "width": 390,
+    "lang": "en-CA",
+    "scroll": 390,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-demo",
+    "width": 390,
+    "lang": "fr-CA",
+    "scroll": 390,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-demo",
+    "width": 390,
+    "lang": "en-CA",
+    "scroll": 390,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-public",
+    "width": 390,
+    "lang": "fr-CA",
+    "scroll": 390,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-public",
+    "width": 390,
+    "lang": "en-CA",
+    "scroll": 390,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "pliage",
+    "width": 768,
+    "lang": "fr-CA",
+    "scroll": 768,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "pliage",
+    "width": 768,
+    "lang": "en-CA",
+    "scroll": 768,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 768,
+    "lang": "fr-CA",
+    "scroll": 768,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 768,
+    "lang": "en-CA",
+    "scroll": 768,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "plan-test",
+    "width": 768,
+    "lang": "fr-CA",
+    "scroll": 768,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "plan-test",
+    "width": 768,
+    "lang": "en-CA",
+    "scroll": 768,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-demo",
+    "width": 768,
+    "lang": "fr-CA",
+    "scroll": 768,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-demo",
+    "width": 768,
+    "lang": "en-CA",
+    "scroll": 768,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-public",
+    "width": 768,
+    "lang": "fr-CA",
+    "scroll": 768,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-public",
+    "width": 768,
+    "lang": "en-CA",
+    "scroll": 768,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "pliage",
+    "width": 1024,
+    "lang": "fr-CA",
+    "scroll": 1024,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "pliage",
+    "width": 1024,
+    "lang": "en-CA",
+    "scroll": 1024,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 1024,
+    "lang": "fr-CA",
+    "scroll": 1024,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 1024,
+    "lang": "en-CA",
+    "scroll": 1024,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "plan-test",
+    "width": 1024,
+    "lang": "fr-CA",
+    "scroll": 1024,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "plan-test",
+    "width": 1024,
+    "lang": "en-CA",
+    "scroll": 1024,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-demo",
+    "width": 1024,
+    "lang": "fr-CA",
+    "scroll": 1024,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-demo",
+    "width": 1024,
+    "lang": "en-CA",
+    "scroll": 1024,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-public",
+    "width": 1024,
+    "lang": "fr-CA",
+    "scroll": 1024,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "studio-public",
+    "width": 1024,
+    "lang": "en-CA",
+    "scroll": 1024,
+    "header": true,
+    "nav": "grid",
+    "errors": []
+  },
+  {
+    "name": "pliage",
+    "width": 1440,
+    "lang": "fr-CA",
+    "scroll": 1440,
+    "header": true,
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "pliage",
+    "width": 1440,
+    "lang": "en-CA",
+    "scroll": 1440,
+    "header": true,
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 1440,
+    "lang": "fr-CA",
+    "scroll": 1440,
+    "header": true,
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "production",
+    "width": 1440,
+    "lang": "en-CA",
+    "scroll": 1440,
+    "header": true,
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "plan-test",
+    "width": 1440,
+    "lang": "fr-CA",
+    "scroll": 1440,
+    "header": true,
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "plan-test",
+    "width": 1440,
+    "lang": "en-CA",
+    "scroll": 1440,
+    "header": true,
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "studio-demo",
+    "width": 1440,
+    "lang": "fr-CA",
+    "scroll": 1440,
+    "header": true,
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "studio-demo",
+    "width": 1440,
+    "lang": "en-CA",
+    "scroll": 1440,
+    "header": true,
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "studio-public",
+    "width": 1440,
+    "lang": "fr-CA",
+    "scroll": 1440,
+    "header": true,
+    "nav": "none",
+    "errors": []
+  },
+  {
+    "name": "studio-public",
+    "width": 1440,
+    "lang": "en-CA",
+    "scroll": 1440,
+    "header": true,
+    "nav": "none",
+    "errors": []
+  }
+]

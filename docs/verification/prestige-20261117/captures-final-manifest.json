@@ -1,0 +1,929 @@
+{
+  "captures": [
+    {
+      "file": "screens/accueil-1440.png",
+      "page": "index.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "accueil",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/boutique-1440.png",
+      "page": "boutique.html?view=all",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "boutique",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/produit-1440.png",
+      "page": "produit.html?id=hardieplank-select-625&from=view%3Dall&color=hardie-pierre-des-champs",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "produit",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/panier-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "panier",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/estimation-1440.png",
+      "page": "estimation.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "estimation",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/pliages-1440.png",
+      "page": "pliage.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "pliages",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/configurateur-pliage-1440.png",
+      "page": "production.html?mode=client&kind=profile",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "configurateur-pliage",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/studio-test-1440.png",
+      "page": "plan.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "studio-test",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/maison-1440.png",
+      "page": "maison.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "maison",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/chantiers-1440.png",
+      "page": "chantiers.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "chantiers",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/connexion-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "connexion",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/demandes-deconnecte-1440.png",
+      "page": "chantier.html?view=orders&clientLocale=1",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "demandes-deconnecte",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/aide-1440.png",
+      "page": "aide.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "aide",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/contact-1440.png",
+      "page": "contact.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "contact",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/realisations-1440.png",
+      "page": "realisations.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "realisations",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/materiaux-1440.png",
+      "page": "materiaux.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "materiaux",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/recherche-1440.png",
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "Recherche",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/categorie-1440.png",
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "Catégorie Fibrociment",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/panier-rempli-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "data": "local synthetic drawing + real catalogue",
+      "title": "Panier matériaux et pliage",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/estimation-panier-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "fr-CA",
+      "title": "Demande depuis le panier — non envoyée",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/panier-rempli-en-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "Cart",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/inscription-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Inscription — sans soumission",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": true
+    },
+    {
+      "file": "screens/compte-simulation-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Compte client — simulation locale",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": true
+    },
+    {
+      "file": "screens/accueil-390.png",
+      "page": "index.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "accueil",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/boutique-390.png",
+      "page": "boutique.html?view=all",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "boutique",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/produit-390.png",
+      "page": "produit.html?id=hardieplank-select-625&from=view%3Dall&color=hardie-pierre-des-champs",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "produit",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/panier-390.png",
+      "page": "selection.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "panier",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/estimation-390.png",
+      "page": "estimation.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "estimation",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/pliages-390.png",
+      "page": "pliage.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "pliages",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/configurateur-pliage-390.png",
+      "page": "production.html?mode=client&kind=profile",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "configurateur-pliage",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/studio-test-390.png",
+      "page": "plan.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "studio-test",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/maison-390.png",
+      "page": "maison.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "maison",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/chantiers-390.png",
+      "page": "chantiers.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "chantiers",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/connexion-390.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "connexion",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/demandes-deconnecte-390.png",
+      "page": "chantier.html?view=orders&clientLocale=1",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "demandes-deconnecte",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/aide-390.png",
+      "page": "aide.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "aide",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/contact-390.png",
+      "page": "contact.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "contact",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/realisations-390.png",
+      "page": "realisations.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "realisations",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/materiaux-390.png",
+      "page": "materiaux.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "materiaux",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/recherche-390.png",
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "Recherche",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/categorie-390.png",
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "Catégorie Fibrociment",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/panier-rempli-390.png",
+      "page": "selection.html",
+      "width": 390,
+      "language": "fr-CA",
+      "data": "local synthetic drawing + real catalogue",
+      "title": "Panier matériaux et pliage",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/estimation-panier-390.png",
+      "page": "selection.html",
+      "width": 390,
+      "language": "fr-CA",
+      "title": "Demande depuis le panier — non envoyée",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/panier-rempli-en-390.png",
+      "page": "selection.html",
+      "width": 390,
+      "language": "en-CA",
+      "title": "Cart",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": false
+    },
+    {
+      "file": "screens/inscription-390.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Inscription — sans soumission",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": true
+    },
+    {
+      "file": "screens/compte-simulation-390.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Compte client — simulation locale",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": true
+    },
+    {
+      "file": "screens/accueil-834.png",
+      "page": "index.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "accueil",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/boutique-834.png",
+      "page": "boutique.html?view=all",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "boutique",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/produit-834.png",
+      "page": "produit.html?id=hardieplank-select-625&from=view%3Dall&color=hardie-pierre-des-champs",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "produit",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/panier-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "panier",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/estimation-834.png",
+      "page": "estimation.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "estimation",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/pliages-834.png",
+      "page": "pliage.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "pliages",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/configurateur-pliage-834.png",
+      "page": "production.html?mode=client&kind=profile",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "configurateur-pliage",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/studio-test-834.png",
+      "page": "plan.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "studio-test",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/maison-834.png",
+      "page": "maison.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "maison",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/chantiers-834.png",
+      "page": "chantiers.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "chantiers",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/connexion-834.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "connexion",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/demandes-deconnecte-834.png",
+      "page": "chantier.html?view=orders&clientLocale=1",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "demandes-deconnecte",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/aide-834.png",
+      "page": "aide.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "aide",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/contact-834.png",
+      "page": "contact.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "contact",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/realisations-834.png",
+      "page": "realisations.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "realisations",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/materiaux-834.png",
+      "page": "materiaux.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "materiaux",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/recherche-834.png",
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "Recherche",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/categorie-834.png",
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "Catégorie Fibrociment",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/panier-rempli-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "fr-CA",
+      "data": "local synthetic drawing + real catalogue",
+      "title": "Panier matériaux et pliage",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/estimation-panier-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "fr-CA",
+      "title": "Demande depuis le panier — non envoyée",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/panier-rempli-en-834.png",
+      "page": "selection.html",
+      "width": 834,
+      "language": "en-CA",
+      "title": "Cart",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": false
+    },
+    {
+      "file": "screens/inscription-834.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Inscription — sans soumission",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": true
+    },
+    {
+      "file": "screens/compte-simulation-834.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Compte client — simulation locale",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": true
+    },
+    {
+      "file": "screens/accueil-en-1440.png",
+      "page": "index.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "accueil",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/boutique-en-1440.png",
+      "page": "boutique.html?view=all",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "boutique",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/produit-en-1440.png",
+      "page": "produit.html?id=hardieplank-select-625&from=view%3Dall&color=hardie-pierre-des-champs",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "produit",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/panier-en-1440.png",
+      "page": "selection.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "panier",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/estimation-en-1440.png",
+      "page": "estimation.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "estimation",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/pliages-en-1440.png",
+      "page": "pliage.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "pliages",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/configurateur-pliage-en-1440.png",
+      "page": "production.html?mode=client&kind=profile",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "configurateur-pliage",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/studio-test-en-1440.png",
+      "page": "plan.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "studio-test",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/maison-en-1440.png",
+      "page": "maison.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "maison",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/chantiers-en-1440.png",
+      "page": "chantiers.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "chantiers",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/connexion-en-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "connexion",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/demandes-deconnecte-en-1440.png",
+      "page": "chantier.html?view=orders&clientLocale=1",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "demandes-deconnecte",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/aide-en-1440.png",
+      "page": "aide.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "aide",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/contact-en-1440.png",
+      "page": "contact.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "contact",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/realisations-en-1440.png",
+      "page": "realisations.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "realisations",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/materiaux-en-1440.png",
+      "page": "materiaux.html",
+      "width": 1440,
+      "language": "en-CA",
+      "title": "materiaux",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": false
+    },
+    {
+      "file": "screens/suivi-simulation-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Suivi — simulation locale",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": true
+    },
+    {
+      "file": "screens/suivi-en-simulation-1440.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 1440,
+      "language": "en-CA",
+      "data": "existing local SDK fixture",
+      "title": "Requests — local simulation",
+      "pendingImages": [],
+      "viewport": "PC",
+      "simulated": true
+    },
+    {
+      "file": "screens/suivi-simulation-390.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Suivi — simulation locale",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": true
+    },
+    {
+      "file": "screens/suivi-en-simulation-390.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 390,
+      "language": "en-CA",
+      "data": "existing local SDK fixture",
+      "title": "Requests — local simulation",
+      "pendingImages": [],
+      "viewport": "Téléphone",
+      "simulated": true
+    },
+    {
+      "file": "screens/suivi-simulation-834.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "language": "fr-CA",
+      "data": "existing local SDK fixture",
+      "title": "Suivi — simulation locale",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": true
+    },
+    {
+      "file": "screens/suivi-en-simulation-834.png",
+      "page": "chantier.html?view=account&clientLocale=1",
+      "width": 834,
+      "language": "en-CA",
+      "data": "existing local SDK fixture",
+      "title": "Requests — local simulation",
+      "pendingImages": [],
+      "viewport": "Tablette",
+      "simulated": true
+    }
+  ]
+}
