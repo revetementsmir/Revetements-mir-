@@ -36,16 +36,20 @@
    if(protectedLevel(current)){report.status='preserved';report.issues.push('EXISTING_GEOMETRY_PRESERVED');continue;}
    let proposal=R.propose(inventory,buildingId,images,{levelId:current.id});
    if(proposal.status!=='proposed'){report.issues.push(proposal.reason);continue;}
-   if(existing.filter(l=>inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor'&&v.levelId===l.sourceLevel)).length>1){report.issues.push('LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:copy(proposal.draft),reconstructionDraft:proposal});continue;}
+   const requiresLevelAlignment=existing.filter(l=>inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor'&&v.levelId===l.sourceLevel)).length>1;
    const resolution=resolveReference(proposal.referenceCandidates);proposal.referenceResolution=resolution;
    const draft=copy(proposal.draft),oldScale=proposal.referenceCandidates[0]?.scale;
-   if(!resolution.reference){report.issues.push(resolution.status==='conflict'?'REFERENCE_CONFLICT':resolution.status==='low_confidence'?'SCALE_TRANSCRIPTION_UNCERTAIN':'SCALE_UNKNOWN');levels.push({...copy(current),contourDraft:draft,reconstructionDraft:proposal});continue;}
+   if(!resolution.reference){report.issues.push(resolution.status==='conflict'?'REFERENCE_CONFLICT':resolution.status==='low_confidence'?'SCALE_TRANSCRIPTION_UNCERTAIN':'SCALE_UNKNOWN');if(requiresLevelAlignment)report.issues.push('LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:draft,reconstructionDraft:proposal});continue;}
    draft.reference={...resolution.reference,status:'proposed',controlReferences:[],assessment:resolution};
    if(draft.height.kind==='estimated-calibrated'&&oldScale>0){const factor=draft.reference.scale/oldScale;draft.height.value*=factor;draft.height.scaleUsed*=factor;for(const ref of draft.height.references){ref.value*=factor;ref.relationship=copy(draft.reference);}}
    const constrained=R.constrainProposal(draft,proposal);constrained.status='proposed';
    if(constrained.dimensionAdjustment?.evidence.some(e=>e.reason==='DIMENSION_TRANSCRIPTION_UNCERTAIN'))report.issues.push('DIMENSION_TRANSCRIPTION_UNCERTAIN');
    const errors=M.validateDraft(constrained,inventory,current);if(proposal.heightConflict)errors.push('HEIGHT_CONFLICT');
-   if(errors.length){report.issues.push(...errors);levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
+   if(errors.length){report.issues.push(...errors);if(requiresLevelAlignment)report.issues.push('LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
+   // Calibrate and constrain each floor independently before reporting missing
+   // inter-level registration. A shared elevation is not an XY datum and must
+   // never be used to invent the relative translation or base elevation.
+   if(requiresLevelAlignment){report.issues.push('LEVEL_ALIGNMENT_REQUIRED');report.measurements='floor scale and contour constraints proposed; shared level datum missing';proposal.draft=copy(constrained);levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
    proposal=R.recoupRegistrations(proposal,inventory,images,constrained);proposal.draft=copy(constrained);
    const next={...copy(current),contours:[constrained],wallOpenings:[],openingsReviewed:false,reconstruction:{version:1,status:'automatic-proposal',proposal,sourceRasterRequiredForRendering:false}};
    next.openingProposals=R.openingsFor(proposal,inventory,images,constrained);
