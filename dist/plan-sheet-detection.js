@@ -15,6 +15,8 @@
   const center = (box, axis) => (box[axis] + box[axis + 2]) / 2;
   const titleText = text => normal(text)
     .replace(/^[^a-z0-9]+/, '')
+    // OCR may join the printed "titre:" heading with the sheet caption.
+    .replace(/^(?:titre|title)\s*:\s*(?=(?:plan\b|roof\s+plan\b))/, '')
     .replace(/^(?:[a-z]\d{0,2}|\d{1,2})\s*[^a-z0-9\s]+\s*(?=elevations?|facades?|plan|coupe|section|[a-z]+\s+elevation)/, '')
     .replace(/^\d{1,2}\s+(?=elevations?|facades?|plan|coupe|section)/, '')
     .replace(/\s*[:;,.]+$/, '');
