@@ -1,5 +1,5 @@
 /* Orchestrates the existing source geometry engine. No catalogue of houses. */
-(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction.js'):root.MIRPlanReconstruction,node?require('./plan-reconstructed-roofs.js'):root.MIRReconstructedRoofs,node?require('./plan-reconstructed-exterior.js'):root.MIRReconstructedExterior);if(node)module.exports=api;else root.MIRReconstructionPipeline=api;})(typeof window==='object'?window:globalThis,function(M,R,Roof,Exterior){
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,node?require('./plan-reconstruction.js'):root.MIRPlanReconstruction,node?require('./plan-reconstructed-roofs.js'):root.MIRReconstructedRoofs,node?require('./plan-reconstructed-exterior.js'):root.MIRReconstructedExterior,node?require('./plan-grid-registration.js'):root.MIRGridRegistration);if(node)module.exports=api;else root.MIRReconstructionPipeline=api;})(typeof window==='object'?window:globalThis,function(M,R,Roof,Exterior,Grid){
  'use strict';
  const copy=M.clone,source=r=>r.sourceReference||r;
  function sameSpan(a,b){
@@ -31,10 +31,13 @@
  }
  function build(inventory,buildingId,images){
   const levels=[],reports=[],existing=inventory.levels.filter(l=>l.buildingId===buildingId),hasGroundPlan=inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor'&&v.levelId==='ground');
+  const gridAlignment=Grid?.forBuilding?.(inventory,buildingId,images)||{status:'unresolved',reason:'GRID_MODULE_UNAVAILABLE',byLevel:{}};
   for(const current of existing.filter(l=>inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor'&&v.levelId===l.sourceLevel))){
-   const report={levelId:current.id,status:'unresolved',issues:[]};reports.push(report);
+   const grid=gridAlignment.byLevel?.[current.sourceLevel]||null;
+   const report={levelId:current.id,status:'unresolved',issues:[],...(grid?{gridAlignment:copy(grid)}:{})};reports.push(report);
    if(protectedLevel(current)){report.status='preserved';report.issues.push('EXISTING_GEOMETRY_PRESERVED');continue;}
    let proposal=R.propose(inventory,buildingId,images,{levelId:current.id});
+   if(proposal.status==='proposed'&&grid)proposal.gridAlignment=copy(grid);
    if(proposal.status!=='proposed'){report.issues.push(proposal.reason);continue;}
    const requiresLevelAlignment=existing.filter(l=>inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor'&&v.levelId===l.sourceLevel)).length>1;
    const resolution=resolveReference(proposal.referenceCandidates);proposal.referenceResolution=resolution;
@@ -49,7 +52,7 @@
    // Calibrate and constrain each floor independently before reporting missing
    // inter-level registration. A shared elevation is not an XY datum and must
    // never be used to invent the relative translation or base elevation.
-   if(requiresLevelAlignment){report.issues.push('LEVEL_ALIGNMENT_REQUIRED');report.measurements='floor scale and contour constraints proposed; shared level datum missing';proposal.draft=copy(constrained);levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
+   if(requiresLevelAlignment){report.issues.push('LEVEL_ALIGNMENT_REQUIRED');if(grid?.status==='proposed')report.issues.push('GRID_XY_ALIGNMENT_PROPOSED');if(grid?.status==='conflict')report.issues.push('GRID_XY_ALIGNMENT_CONFLICT');report.measurements='floor scale and contour constraints proposed; independent XY grid is not a verified base elevation';proposal.draft=copy(constrained);levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
    proposal=R.recoupRegistrations(proposal,inventory,images,constrained);proposal.draft=copy(constrained);
    const next={...copy(current),contours:[constrained],wallOpenings:[],openingsReviewed:false,reconstruction:{version:1,status:'automatic-proposal',proposal,sourceRasterRequiredForRendering:false}};
    next.openingProposals=R.openingsFor(proposal,inventory,images,constrained);
