@@ -23,7 +23,7 @@
  if(!avatar){avatar=document.createElement('a');actions.append(avatar);}avatar.classList.add('mir-public-account-avatar');avatar.href=url('chantier.html?view=account&clientLocale=1');avatar.innerHTML=svg('account');avatar.setAttribute('aria-label',t('Mon compte'));avatar.title=t('Mon compte');
  let cart=actions.querySelector('.mir-public-cart');if(!cart){cart=document.createElement('a');cart.className='mir-public-cart';actions.prepend(cart);}cart.href=url('selection.html');cart.innerHTML=svg('cart')+'<span class="mir-cart-word">'+t('Panier')+'</span><b data-prestige-cart-count>0</b>';cart.setAttribute('aria-label',t('Panier'));
  const search=document.createElement('a');search.className='mir-prestige-search';search.href=url('boutique.html#shop-search');search.innerHTML=svg('search');search.setAttribute('aria-label',t('Rechercher un produit'));actions.prepend(search);
- const locale=header.querySelector('.mir-client-locale-switch,.languages');if(locale){locale.classList.add('mir-client-locale-switch');actions.append(locale);}actions.querySelectorAll(':scope > .site-link').forEach(el=>el.remove());actions.append(avatar);
+ let locale=header.querySelector('.mir-client-locale-switch,.languages');if(locale){locale.classList.add('mir-client-locale-switch');actions.append(locale);}actions.querySelectorAll(':scope > .site-link').forEach(el=>el.remove());actions.append(avatar);
  const navigation=[['boutique.html','Boutique',['boutique.html','produit.html','materiaux.html']],['pliage.html','Pliages sur mesure',['pliage.html','production.html']],['plan.html','Studio 3D',['plan.html','studio.html']],['realisations.html','Réalisations',['realisations.html']],['chantier.html?view=orders&clientLocale=1','Mes commandes',['chantier.html']],['aide.html','Aide',['aide.html']],['contact.html','Contact',['contact.html']],['estimation.html','Estimation',['estimation.html']]];
  let nav=header.querySelector('nav.mir-client-links');if(!nav){nav=document.createElement('nav');header.append(nav);}nav.className='mir-client-links mir-prestige-nav';nav.id='mir-prestige-desktop-nav';nav.setAttribute('aria-label',t('Navigation principale'));nav.hidden=false;
  nav.replaceChildren(...navigation.map(([href,label,active])=>{const a=document.createElement('a');a.href=url(href);a.textContent=t(label);a.dataset.fr=label;a.dataset.en=english[label]||label;if((active.includes(file)&&(!account||q.get('view')==='orders'))||file==='studio-public.html'&&active.includes('plan.html'))a.setAttribute('aria-current','page');return a;}));
@@ -50,9 +50,16 @@
   if(restore)menu.focus({preventScroll:true});
  }
  function openMenu(){nav.hidden=false;header.classList.add('mir-client-menu-open');menu.setAttribute('aria-expanded','true');menu.setAttribute('aria-label',t('Fermer le menu'));}
+ function placeLocale(){
+  locale=header.querySelector('.mir-client-locale-switch,.languages');
+  if(!locale)return;
+  locale.classList.add('mir-client-locale-switch');
+  if(mobileMenu.matches){if(locale.parentElement!==nav)nav.append(locale);}
+  else if(locale.parentElement!==actions||locale.nextElementSibling!==avatar)actions.insertBefore(locale,avatar);
+ }
  function syncMenu(){
   menu.hidden=!mobileMenu.matches;closeMenu();nav.hidden=mobileMenu.matches;
-  if(locale){if(mobileMenu.matches)nav.append(locale);else actions.insertBefore(locale,avatar);}
+  placeLocale();
  }
  menu.addEventListener('click',()=>menu.getAttribute('aria-expanded')==='true'?closeMenu():openMenu());
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&menu.getAttribute('aria-expanded')==='true'){event.preventDefault();closeMenu(true);}});
@@ -60,6 +67,8 @@
  nav.addEventListener('click',event=>{if(event.target.closest('a')&&mobileMenu.matches)closeMenu();});
  if(mobileMenu.addEventListener)mobileMenu.addEventListener('change',syncMenu);else mobileMenu.addListener(syncMenu);
  syncMenu();
+ // Account localization is inserted asynchronously after the public header.
+ new MutationObserver(placeLocale).observe(header,{childList:true,subtree:true});
  function counts(){let materials=0,pieces=0;try{materials=JSON.parse(localStorage.getItem('mir-shopping-list-v1')||'{}').items?.length||0;pieces=JSON.parse(localStorage.getItem('mir_production_client_dossier_v1')||'{}').order?.items?.length||0;}catch{}const value=String(materials+pieces);document.querySelectorAll('[data-prestige-cart-count],[data-list-count]').forEach(el=>{if(el.textContent!==value)el.textContent=value;});}
  counts();addEventListener('storage',counts);addEventListener('pageshow',counts);document.addEventListener('click',()=>{setTimeout(counts,0);setTimeout(counts,180);});document.addEventListener('change',()=>setTimeout(counts,0));
  const cartObserver=new MutationObserver(()=>counts());document.querySelectorAll('[data-list-count]').forEach(el=>cartObserver.observe(el,{childList:true,characterData:true,subtree:true}));

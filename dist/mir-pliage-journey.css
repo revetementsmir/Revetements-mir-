@@ -37,7 +37,7 @@ body.mir-prestige[data-client-entry] .client-viewport-pages{justify-content:flex
 body.mir-prestige[data-client-entry] .client-viewport-pages button{width:44px;height:44px;border:1px solid var(--mir-line);border-radius:3px;color:var(--mir-ink);background:#fffefa}
 body.mir-prestige[data-client-entry=measures] .production-workspace{height:auto;min-height:0;margin:0 auto;gap:18px;align-items:start}
 body.mir-prestige[data-client-entry=measures][data-client-stage="2"] .production-workspace{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
-body.mir-prestige[data-client-entry=measures] .config-card{display:block;min-width:0;background:transparent;border:0;box-shadow:none;overflow:visible}
+body.mir-prestige[data-client-entry=measures] .config-card{display:block;min-width:0;padding:0;background:transparent;border:0;box-shadow:none;overflow:visible}
 body.mir-prestige[data-client-entry] #client-step-scroll{overflow:visible;padding:0;scrollbar-gutter:auto}
 body.mir-prestige[data-client-entry] #client-step-count{font:400 12px/1.4 "DM Sans",Arial,sans-serif;letter-spacing:.03em;margin:0 0 5px;color:var(--mir-muted)}
 body.mir-prestige[data-client-entry] #client-step-title{font:400 clamp(22px,2.1vw,28px)/1.15 "DM Sans",Arial,sans-serif;margin:0;color:var(--mir-ink);letter-spacing:-.03em}
@@ -84,7 +84,7 @@ body.mir-prestige[data-client-entry] #client-piece-recap :is(p,dl){margin:5px 0}
  body.mir-prestige[data-client-entry=models] #client-entry h1{font-size:26px;margin:4px 0}
  body.mir-prestige[data-client-entry=models] #client-entry>.eyebrow{margin:3px 0 4px}
  body.mir-prestige[data-client-entry=measures][data-client-stage="2"] .production-workspace{grid-template-columns:minmax(0,1fr);gap:9px}
- body.mir-prestige[data-client-entry=measures][data-client-stage="2"] #production-drawing svg{height:clamp(90px,17svh,145px)}
+ body.mir-prestige[data-client-entry=measures][data-client-stage="2"] #production-drawing svg{height:clamp(110px,17svh,145px)}
  body.mir-prestige[data-client-entry] #client-step-title{font-size:23px}
  body.mir-prestige[data-client-entry] #client-step-hint{font-size:12px;margin:4px 0 8px}
  body.mir-prestige[data-client-entry] #production-dimensions :is(.client-measures-grid,.client-angles-grid){gap:6px}
@@ -92,7 +92,7 @@ body.mir-prestige[data-client-entry] #client-piece-recap :is(p,dl){margin:5px 0}
 @media(max-height:710px) and (max-width:779px){
  body.mir-prestige[data-client-entry] #production-main{padding-block:7px}
  body.mir-prestige[data-client-entry] #client-entry{padding:0}
- body.mir-prestige[data-client-entry=measures][data-client-stage="2"] #production-drawing svg{height:76px}
+ body.mir-prestige[data-client-entry=measures][data-client-stage="2"] #production-drawing svg{height:92px}
  body.mir-prestige[data-client-entry=measures] .production-workspace{gap:5px}
  body.mir-prestige[data-client-entry] #client-step-title{font-size:21px}
  body.mir-prestige[data-client-entry] #client-step-hint{margin:3px 0 5px;font-size:11px;line-height:1.25}
@@ -119,3 +119,20 @@ body.mir-prestige[data-client-entry] .client-face-choices button[aria-pressed=tr
 body.mir-prestige[data-client-entry] #production-client-color{width:100%;min-height:44px}
 
 body.mir-prestige[data-client-entry][data-client-stage="3"] #production-color-grid{display:block!important}
+
+/* Recover the space formerly reserved for the removed bottom navigation. */
+body.mir-prestige[data-client-entry=measures] #client-local-save{margin:2px 0;font-size:11px;line-height:1.3;color:var(--mir-muted)}
+body.mir-prestige[data-client-entry=measures] #client-step-scroll{scroll-padding-bottom:0}
+body.mir-prestige[data-client-entry=measures] #client-step-scroll :is(input,select,textarea){scroll-margin-bottom:0}
+@media(max-width:779px){
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #client-step-scroll>.section-heading{float:right;width:106px;margin:0 0 4px 8px}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #measure-hint{min-height:44px;display:flex;align-items:center;font-size:11px;line-height:1.3;margin:0 0 4px}
+ body.mir-prestige[data-client-entry][data-client-stage="2"] #production-dimensions{clear:both}
+}
+@media(max-width:779px) and (max-height:710px){
+ body.mir-prestige[data-client-entry=measures] #client-step-count{float:right;margin:0 0 0 8px;font-size:10px;line-height:25px}
+ body.mir-prestige[data-client-entry=measures] #client-step-title{font-size:20px;line-height:25px}
+ body.mir-prestige[data-client-entry=measures] #client-step-length{margin:4px 0;font-size:11px;line-height:1.4}
+ body.mir-prestige[data-client-entry] #production-dimensions :is(.client-measures-grid,.client-angles-grid){margin-block:4px}
+ body.mir-prestige[data-client-entry] .client-angle-heading{margin-top:3px;gap:4px}
+}

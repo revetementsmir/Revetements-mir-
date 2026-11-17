@@ -32,3 +32,9 @@ Les pages Accueil, Maison, Chantiers, Contact, Aide, Produit, Panier et Estimati
 ## Limites de recette
 
 Aucun appareil physique n’est certifié. Le navigateur local ne démarre pas dans cet environnement; la CI utilise Chromium. L’aperçu protégé conserve les gardes existantes : API externes, connexion et envois désactivés; panier et exports locaux disponibles. Les tests historiques qui exigent une barre basse sont obsolètes pour la nouvelle demande et ne constituent pas une validation de cette navigation.
+
+## Recette initiale et corrections
+
+Le run GitHub Actions 44157826668 a exécuté Chromium 145 sur le SHA 3fc1f19ae4cb10bb080c8d185233412c529630f6 : 7 cas réussis, 73 cas arrêtés. Les résultats ne constituent pas une validation visuelle. Les causes démontrées ont été corrigées : sections Produit non initialisées, masquage Accueil, réserve CSS de barre basse, placement du badge TEST et langue ajoutée tardivement au compte. Les cas d’évitement et antispam sont exclus uniquement quand ils sont volontairement hors écran; les bandes de Boutique/Réalisations doivent être accessibles par défilement réel.
+
+Treize groupes ciblés des vraies fonctions du moteur passent maintenant, dont les modèles canoniques, les fractions, les snapshots, la règle du J et la modification d’angle avant saisie de la première cote. Les petits diagrammes mobiles utilisent les points du modèle réel et des repères lisibles. La seconde recette doit confirmer les nouvelles pages Matériaux/Pliage et les correctifs de disposition. Les modules compte/Studio restent à intégrer et vérifier.

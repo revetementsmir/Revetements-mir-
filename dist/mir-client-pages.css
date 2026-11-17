@@ -4,6 +4,10 @@
 body[data-mir-client-pages] { --mir-client-page-ink:#242522; --mir-client-page-paper:#f4f1ea; }
 body[data-mir-client-pages] [data-mir-page-visible="false"],
 body[data-mir-client-pages] [data-mir-list-visible="false"] { display:none!important; }
+/* The existing palette intentionally uses display:flex!important on each swatch.
+ * Keep list pagination stronger than that presentation rule, without changing
+ * the catalogue's own hidden/search/availability state. */
+body.mir-prestige[data-mir-client-pages] :is(.product-color-picker,.shop-card-swatches)>.mir-colour-option[data-mir-list-visible="false"] { display:none!important; }
 body[data-mir-client-pages] .mir-client-pages-main { padding-top:0!important; padding-bottom:0!important; min-height:0; }
 body[data-mir-client-pages] .mir-client-pages-nav,
 body[data-mir-client-pages] .mir-client-list-controls {
@@ -218,4 +222,189 @@ body[data-mir-client-pages] #mir-estimate-dialog[data-mir-client-estimate-pages]
   body[data-mir-client-pages] .mir-entry-intro figure { height:110px; }
   body[data-mir-client-pages="produit"] .product-main-photo { height:120px!important; }
   body[data-mir-client-pages="produit"] .product-main-photo :is(img,svg,canvas) { max-height:120px; }
+}
+
+/* A hidden section is controlled by its top selector. This wins over the
+ * existing mobile display:block!important on the home service collection. */
+body.mir-prestige[data-mir-client-pages] [data-mir-page-visible="false"],
+body.mir-prestige[data-mir-client-pages] [data-mir-list-visible="false"] { display:none!important; }
+body[data-mir-client-pages="aide"] .mir-prestige-help-search { margin-top:0; }
+body[data-mir-client-pages="aide"] .mir-prestige-help-intro .eyebrow { margin-top:0; }
+body[data-mir-client-pages="aide"] .mir-prestige-help-search input { min-height:44px; padding-block:10px; }
+body[data-mir-client-pages="estimation"] .estimate-intro { margin-top:10px; }
+body[data-mir-client-pages="estimation"] #mir-estimate-dialog fieldset { margin:0; }
+body[data-mir-client-pages="estimation"] #mir-estimate-dialog[data-mir-client-estimate-pages] .estimate-fields { gap:0 12px; }
+
+/* The material guide has no implicit catalogue scrolling exception. */
+body.mir-prestige[data-mir-client-pages="materiaux"] main { width:min(1200px,calc(100% - 36px)); margin-inline:auto; }
+body[data-mir-client-pages="materiaux"] .page-heading { padding:0 0 10px; }
+body[data-mir-client-pages="materiaux"] .page-heading .eyebrow { margin:4px 0; font-size:10px; }
+body[data-mir-client-pages="materiaux"] .page-heading h1 { font-size:32px; line-height:1.08; margin:6px 0 10px; }
+body[data-mir-client-pages="materiaux"] .page-heading>p:not(.eyebrow) { font-size:13px; line-height:1.45; margin:6px 0; max-width:700px; }
+body[data-mir-client-pages="materiaux"] .catalogue-layout { display:block; padding:0; margin:0; }
+body[data-mir-client-pages="materiaux"] .brand-sidebar { margin:0; }
+body[data-mir-client-pages="materiaux"] .brand-sidebar h2 { margin:4px 0 8px; font-size:14px; }
+body.mir-prestige[data-mir-client-pages="materiaux"] .brand-buttons {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px;
+  overflow:visible; padding:0; max-width:900px;
+}
+body[data-mir-client-pages="materiaux"] .brand-buttons button {
+  white-space:normal; min-height:44px; padding:8px 10px; font-size:12px; gap:6px;
+  min-width:0; border:1px solid #cfc7b8; color:#242522; background:#fffdf8;
+}
+body[data-mir-client-pages="materiaux"] .catalogue-bend-link { display:flex; margin-top:10px; padding:10px 0; min-height:44px; font-size:12px; }
+body[data-mir-client-pages="materiaux"] .catalogue-toolbar { padding:0 0 8px; gap:10px; }
+body[data-mir-client-pages="materiaux"] .catalogue-toolbar h2 { font-size:26px; margin:6px 0; }
+body[data-mir-client-pages="materiaux"] .catalogue-controls { grid-template-columns:1fr 1fr; margin:12px 0; gap:12px; }
+body[data-mir-client-pages="materiaux"] .catalogue-controls label { min-width:0; font-size:12px; }
+body[data-mir-client-pages="materiaux"] .catalogue-controls :is(input,select) { min-height:44px; font-size:16px; min-width:0; width:100%; padding:8px 10px; }
+body[data-mir-client-pages="materiaux"] .mir-client-section-action { min-height:44px; grid-column:1/-1; border:1px solid #242522; background:#242522; color:#fffdf8; padding:10px 16px; font-size:14px; }
+body[data-mir-client-pages="materiaux"] #brand-note { margin:10px 0; font-size:13px; line-height:1.5; }
+body[data-mir-client-pages="materiaux"] .product-list { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+body[data-mir-client-pages="materiaux"] .catalogue-group-heading { margin:0; padding-bottom:4px; font-size:14px; line-height:1.3; }
+body[data-mir-client-pages="materiaux"] .product-card { padding:10px; gap:0; }
+body[data-mir-client-pages="materiaux"] .product-card>.mir-client-pages-nav { margin:0 0 8px; gap:4px; }
+body[data-mir-client-pages="materiaux"] .product-card>.mir-client-pages-nav select { font-size:12px; padding-inline:6px 16px; }
+body[data-mir-client-pages="materiaux"] .catalogue-product-photo { height:130px; aspect-ratio:auto; margin:0 0 6px; }
+body[data-mir-client-pages="materiaux"] .catalogue-product-photo img { padding:8px; }
+body[data-mir-client-pages="materiaux"] .product-card .product-meta { min-height:24px; margin:0 0 5px; }
+body[data-mir-client-pages="materiaux"] .product-card .profile-diagram { width:34px; height:24px; }
+body[data-mir-client-pages="materiaux"] .product-card h3 { font-size:19px; min-height:0; line-height:1.2; margin:4px 0 8px; }
+body[data-mir-client-pages="materiaux"] .product-specs { gap:4px; margin:0 0 8px; }
+body[data-mir-client-pages="materiaux"] .product-specs span { padding:3px 5px; font-size:10px; }
+body[data-mir-client-pages="materiaux"] .product-description { font-size:13px; line-height:1.45; margin:6px 0 12px; }
+body[data-mir-client-pages="materiaux"] .product-card .color-strip { height:auto; min-height:23px; flex-wrap:wrap; overflow:visible; margin:4px 0 10px; }
+body[data-mir-client-pages="materiaux"] .product-card .color-strip small { margin-left:0; font-size:11px; }
+body[data-mir-client-pages="materiaux"] .product-actions { display:grid; grid-template-columns:1fr 1fr; gap:4px 8px; padding-top:5px; }
+body[data-mir-client-pages="materiaux"] .product-actions :is(a,button) { display:flex; align-items:center; min-height:44px; font-size:12px; text-align:left; padding:4px 0; }
+body[data-mir-client-pages="materiaux"] .product-actions>span { font-size:11px; align-self:center; }
+body[data-mir-client-pages="materiaux"] .catalogue-guidance { display:block; margin:0; padding:10px 0; }
+body[data-mir-client-pages="materiaux"] .catalogue-guidance h2 { font-size:29px; margin:10px 0; }
+body[data-mir-client-pages="materiaux"] .catalogue-guidance p { font-size:14px; line-height:1.55; margin:12px 0; }
+body[data-mir-client-pages="materiaux"] .catalogue-guidance>a { display:flex; align-items:center; min-height:44px; font-size:13px; }
+body[data-mir-client-pages="materiaux"] #material-dialog { padding:16px; max-height:calc(100dvh - 24px); background:#f4f1ea; }
+body[data-mir-client-pages="materiaux"] .material-modal-head { margin:0 0 6px; gap:10px; }
+body[data-mir-client-pages="materiaux"] #material-close { min-height:44px; padding:8px; }
+body[data-mir-client-pages="materiaux"] #material-title { font-size:24px; line-height:1.2; margin:6px 0 10px; }
+body[data-mir-client-pages="materiaux"] #material-body>p { margin:10px 0; font-size:14px; line-height:1.55; }
+body[data-mir-client-pages="materiaux"] .material-section { margin:0; padding:8px 0; }
+body[data-mir-client-pages="materiaux"] .material-section h3 { margin:0 0 8px; font-size:15px; }
+body[data-mir-client-pages="materiaux"] .material-dimensions { gap:8px; margin:0; }
+body[data-mir-client-pages="materiaux"] .material-dimensions>div { padding:8px; }
+body[data-mir-client-pages="materiaux"] .official-colors { grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+body[data-mir-client-pages="materiaux"] .official-color .swatch { height:44px; margin-bottom:4px; }
+body[data-mir-client-pages="materiaux"] .official-color b { font-size:12px; }
+body[data-mir-client-pages="materiaux"] .official-color small { font-size:10px; }
+body[data-mir-client-pages="materiaux"] .document-note { margin:8px 0; font-size:12px; line-height:1.45; }
+body[data-mir-client-pages="materiaux"] .source-link { display:flex; align-items:center; width:max-content; max-width:100%; min-height:44px; margin-top:6px; }
+body[data-mir-client-pages="materiaux"] .material-documents a { min-height:44px; padding:10px; }
+body[data-mir-client-pages="materiaux"] .material-notes { font-size:13px; line-height:1.5; }
+body[data-mir-client-pages="materiaux"] .material-action-row { margin-top:8px; gap:10px; }
+
+/* The legacy quick form keeps one complete dimension panel. Its full drawing
+ * has its own accessible preview instead of reducing the dimension labels. */
+body.mir-prestige[data-mir-client-pages="pliage"] main { width:min(1200px,calc(100% - 36px)); margin-inline:auto; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-hero { gap:24px; padding:6px 0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-copy h1 { font-size:40px; line-height:1.08; margin:8px 0 10px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-copy>p:not(.eyebrow) { font-size:14px; line-height:1.5; margin:8px 0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-copy .mir-button { margin-top:12px; min-height:44px; padding:12px 16px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-copy small { margin-top:7px; font-size:11px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-example { padding:14px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-example svg { margin:8px 0; max-height:220px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .prestige-bend-steps { padding:12px 0; gap:18px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .prestige-bend-steps p { margin-top:5px; font-size:13px; line-height:1.5; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-quick { margin:0; padding:0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-quick>summary { min-height:44px; padding:8px 0; font-size:12px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-quick-content { padding:0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-quick-content>.notice-inline { font-size:13px; line-height:1.45; margin:6px 0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .profile-tabs { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:0; border:0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .profile-tabs button { display:grid; min-height:88px; padding:8px; gap:4px; border:1px solid #cfc7b8; font-size:12px; color:#242522; }
+body.mir-prestige[data-mir-client-pages="pliage"] .profile-tabs svg { width:100%; height:56px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-workspace { display:block; margin:0; padding:0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-form { max-width:760px; margin-inline:auto; padding:0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .form-section { margin:0; padding:0; border:0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .form-section-title { margin:0 0 6px; min-height:44px; gap:8px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .form-section-title h3 { font-size:16px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-form .field-label { display:block; margin-bottom:4px; font-size:12px; line-height:1.3; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-form :is(input,select) { padding:8px 10px; min-height:44px; font-size:16px; color:#242522; background:#fffdf8; }
+body.mir-prestige[data-mir-client-pages="pliage"] .unit-select select { padding:6px; font-size:13px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-fields { gap:8px 10px; margin-top:8px; }
+body.mir-prestige[data-mir-client-pages="pliage"] #bend-fields { grid-template-columns:repeat(3,minmax(0,1fr)); }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-form .length-row { padding-top:8px; }
+body.mir-prestige[data-mir-client-pages="pliage"] :is(.field-hint,.bend-errors) { margin-top:7px; font-size:12px; line-height:1.4; }
+body.mir-prestige[data-mir-client-pages="pliage"] #bend-errors:empty { display:none; }
+body.mir-prestige[data-mir-client-pages="pliage"] #bend-errors { margin-bottom:0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-view { position:static; padding:12px; max-width:650px; margin-inline:auto; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-view-head { flex-direction:row; align-items:center; gap:8px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-view-head h2 { margin:4px 0; font-size:20px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-view-head .eyebrow { margin:0; font-size:9px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .view-toggle button { min-height:44px; font-size:11px; padding:6px 8px; }
+body.mir-prestige[data-mir-client-pages="pliage"] #bend-drawing { height:280px; aspect-ratio:auto; }
+body.mir-prestige[data-mir-client-pages="pliage"] #bend-drawing svg { width:100%; height:100%; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-view-foot { padding-top:8px; font-size:11px; }
+body.mir-prestige[data-mir-client-pages="pliage"] #bend-preview-note { margin:8px 0 0; font-size:12px; line-height:1.45; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-colors { grid-template-columns:repeat(8,minmax(0,1fr)); gap:8px; max-height:none; overflow:visible; margin:8px 0; padding:3px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-colors button { min-height:44px; height:44px; aspect-ratio:auto; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-colors button span { min-height:44px; font-size:11px; line-height:1.2; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-colors button:has(>span) { height:auto; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-colors button>span { height:auto; }
+body.mir-prestige[data-mir-client-pages="pliage"] .selected-color-name { margin:8px 0 0; }
+body.mir-prestige[data-mir-client-pages="pliage"] #bend-color-search-label { display:block; margin-top:8px; }
+body.mir-prestige[data-mir-client-pages="pliage"] #add-bend { margin-top:12px; min-height:44px; padding:12px 14px; }
+body.mir-prestige[data-mir-client-pages="pliage"] #page-status { margin:8px 0; font-size:12px; line-height:1.5; }
+body.mir-prestige[data-mir-client-pages="pliage"] #page-status:empty { display:none; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-list-section { padding:0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-list-head { padding-bottom:10px; gap:10px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-list-head h2 { margin:4px 0; font-size:25px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-list-head .eyebrow { margin:0; }
+body.mir-prestige[data-mir-client-pages="pliage"] #bend-project { min-height:44px; padding:8px 10px; font-size:16px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-empty { padding:20px 12px; font-size:13px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-item { padding:10px 0; gap:8px 12px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-item .item-qty input { min-height:44px; font-size:16px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-item>a { min-height:44px; display:flex; align-items:center; font-size:12px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-list-bottom { margin-top:12px; gap:10px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .bend-list-section>.notice-inline { margin-top:10px; font-size:12px; line-height:1.45; }
+body.mir-prestige[data-mir-client-pages="pliage"] .mir-custom-models { margin:0; padding:0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .mir-custom-models-heading h2 { font-size:24px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .mir-custom-models-intro { font-size:12px; line-height:1.4; margin:6px 0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .mir-custom-model-preview { min-height:0; height:110px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .mir-custom-model-body { padding:10px; }
+body.mir-prestige[data-mir-client-pages="pliage"] .mir-custom-model-body h3 { font-size:18px; margin:4px 0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .mir-custom-model-body p { margin:6px 0; font-size:12px; line-height:1.4; }
+body.mir-prestige[data-mir-client-pages="pliage"] .mir-custom-models-local { font-size:11px; line-height:1.4; margin:8px 0; }
+body.mir-prestige[data-mir-client-pages="pliage"] .mir-custom-model-action { min-height:44px; }
+body.mir-prestige[data-mir-client-pages] .subnav[data-mir-page-visible="true"] { display:flex!important; position:static; gap:8px 18px; flex-wrap:wrap; margin:4px 0 10px; padding:0; }
+body.mir-prestige[data-mir-client-pages] .subnav[data-mir-page-visible="true"] a { display:flex; align-items:center; min-height:44px; font-size:12px; }
+
+@media(max-width:759px) {
+  body.mir-prestige[data-mir-client-pages="materiaux"] .brand-buttons { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body[data-mir-client-pages="materiaux"] .catalogue-controls { grid-template-columns:1fr; }
+  body[data-mir-client-pages="materiaux"] .product-list { display:block; }
+  body[data-mir-client-pages="materiaux"] .catalogue-group-heading { margin-bottom:6px; }
+  body[data-mir-client-pages="materiaux"] .catalogue-product-photo { height:86px; }
+  body[data-mir-client-pages="materiaux"] .official-colors { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-hero { grid-template-columns:1fr; gap:12px; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-copy h1 { font-size:32px; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-copy h1 em { display:inline; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-example svg { max-height:150px; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .prestige-bend-steps { grid-template-columns:1fr; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .bend-colors { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  body.mir-prestige[data-mir-client-pages="pliage"] #bend-drawing { height:210px; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .bend-list-head { flex-direction:column; align-items:stretch; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .bend-list-bottom { flex-direction:column; align-items:stretch; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .bend-item { grid-template-columns:56px minmax(0,1fr) 32px; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .bend-item>a { grid-column:1/-1; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .mir-custom-model-grid { grid-template-columns:1fr; }
+}
+@media(max-height:650px) {
+  body[data-mir-client-pages="aide"] h1 { font-size:26px; line-height:1.1; margin:4px 0 8px; }
+  body[data-mir-client-pages="aide"] .mir-prestige-help-intro { padding-bottom:6px; }
+  body[data-mir-client-pages="aide"] .mir-prestige-faq p { font-size:14px; line-height:1.45; margin:6px 0 10px; }
+  body[data-mir-client-pages="chantiers"] .mir-entry-intro { gap:10px; padding-block:8px!important; }
+  body[data-mir-client-pages="chantiers"] .mir-entry-intro figure { height:100px; }
+  body[data-mir-client-pages="materiaux"] .page-heading h1 { font-size:29px; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-copy .eyebrow { margin:0; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-copy h1 { font-size:29px; }
+  body.mir-prestige[data-mir-client-pages="pliage"] .client-bend-example svg { max-height:100px; }
+  body.mir-prestige[data-mir-client-pages="pliage"] #bend-drawing { height:170px; }
 }

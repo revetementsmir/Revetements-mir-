@@ -29,7 +29,7 @@ const scenes = [
   ['aide', 'aide.html'], ['contact', 'contact.html'],
   ['realisations', 'realisations.html', true], ['materiaux', 'materiaux.html']
 ];
-const results = [], captures = [], blocked = [];
+const results = [], captures = [], blocked = [], layoutDiagnostics = [];
 const filter = process.env.MIR_CLIENT_PARCOURS_FILTER || '';
 const modelSelector = '#client-saved-options [data-saved-template], #client-standard-options [data-client-profile]';
 const slug = value => value.replace(/[^a-z0-9-]/gi, '-');
@@ -98,13 +98,58 @@ async function goto(page, base, route) {
   await settle(page);
 }
 
+async function horizontalListingAccess(page, scope) {
+  const result = await page.evaluate(async scope => {
+    // Only the two expressly scrollable listings may use horizontal rails.
+    if (!['boutique.html', 'realisations.html'].includes(location.pathname.split('/').pop())) return { rails: [], problems: [] };
+    const host = document.querySelector(scope), originalWindow = { left: scrollX, top: scrollY };
+    const rails = [...host.querySelectorAll('*')].filter(element => {
+      const rect = element.getBoundingClientRect();
+      return rect.width > 3 && rect.height > 3 && element.checkVisibility({ checkVisibilityCSS: true, checkOpacity: true }) && /auto|scroll/.test(getComputedStyle(element).overflowX) && element.scrollWidth > element.clientWidth + 2;
+    });
+    const positions = rails.map(rail => ({ rail, left: rail.scrollLeft, top: rail.scrollTop }));
+    const observed = [], problems = [];
+    try {
+      for (const rail of rails) {
+        const controls = [...rail.querySelectorAll('a[href],button,summary,[role=button]')].filter(element => element.checkVisibility({ checkVisibilityCSS: true, checkOpacity: true }));
+        const reached = [];
+        for (const element of controls) {
+          const initialScroll = rail.scrollLeft;
+          element.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          const rect = element.getBoundingClientRect(), bounds = rail.getBoundingClientRect();
+          const label = (element.getAttribute('aria-label') || element.textContent || '').trim().slice(0, 90);
+          const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+          const visible = rect.left >= Math.max(0, bounds.left) - 2 && rect.right <= Math.min(innerWidth, bounds.right) + 2 && rect.top >= -2 && rect.bottom <= innerHeight + 2;
+          const accessible = !!hit && (element.contains(hit) || hit.contains(element));
+          if (!visible || !accessible) problems.push({ element: label, reason: visible ? 'rail control remains covered after scrolling' : 'rail control cannot fit after scrolling', rect: rect.toJSON(), rail: bounds.toJSON() });
+          reached.push({ label, scrollBefore: initialScroll, scrollAfter: rail.scrollLeft, visible, accessible });
+        }
+        observed.push({ rail: rail.id || rail.className, width: rail.clientWidth, scrollWidth: rail.scrollWidth, reached });
+      }
+    } finally {
+      for (const position of positions) position.rail.scrollTo({ left: position.left, top: position.top, behavior: 'instant' });
+      window.scrollTo({ ...originalWindow, behavior: 'instant' });
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }
+    return { rails: observed, problems };
+  }, scope);
+  assert.deepEqual(result.problems, [], 'every horizontal listing control is reachable by actual scrolling: ' + JSON.stringify(result));
+  return result.rails;
+}
+
 // Read actual rectangles, clipping ancestors and hit targets. An overflow:hidden
 // declaration alone can never make a cut-off page pass this assertion.
 async function layout(page, { scrolling = false, scope = 'body', menuOpen = false } = {}) {
   await settle(page);
+  const horizontalRails = scrolling ? await horizontalListingAccess(page, scope) : [];
   const value = await page.evaluate(({ scrolling, scope, menuOpen }) => {
     const shown = element => {
       const rect = element.getBoundingClientRect();
+      // These are deliberate nonvisual controls, confirmed in the first CI
+      // capture. A focused skip link remains subject to every layout check.
+      if (element.matches('a.skip[href^="#"],a.skip-link[href^="#"],a.portal-skip[href^="#"]') && element !== document.activeElement && rect.bottom <= 0 && document.getElementById(element.hash.slice(1))) return false;
+      if (element.closest('.estimate-honeypot[aria-hidden="true"]') && element.matches('input[name="website"][tabindex="-1"]')) return false;
       if (rect.width < 3 || rect.height < 3 || !element.checkVisibility({ checkVisibilityCSS: true, checkOpacity: true })) return false;
       const style = getComputedStyle(element);
       return !['hidden', 'collapse'].includes(style.visibility) && style.clip !== 'rect(0px, 0px, 0px, 0px)' && style.clipPath !== 'inset(50%)';
@@ -115,11 +160,19 @@ async function layout(page, { scrolling = false, scope = 'body', menuOpen = fals
     const elements = [...host.querySelectorAll(interactive + ',h1,h2,h3,p,legend,output,[role=alert],[role=status]')].filter(shown);
     const problems = [], root = document.scrollingElement;
     const badge = document.querySelector('[data-mir-test-banner]')?.getBoundingClientRect();
+    const isScrollableListing = scrolling && ['boutique.html', 'realisations.html'].includes(location.pathname.split('/').pop());
+    const inVerifiedHorizontalRail = element => {
+      if (!isScrollableListing) return false;
+      for (let parent = element.parentElement; parent && parent !== host; parent = parent.parentElement) {
+        if (/auto|scroll/.test(getComputedStyle(parent).overflowX) && parent.scrollWidth > parent.clientWidth + 2) return true;
+      }
+      return false;
+    };
     for (const element of elements) {
       if (element.closest('svg') || element.matches('[data-mir-test-banner]')) continue;
       const rect = element.getBoundingClientRect();
       const control = element.matches(interactive);
-      if (rect.left < -2 || rect.right > innerWidth + 2) problems.push({ element: name(element), reason: 'horizontal', rect: rect.toJSON() });
+      if ((rect.left < -2 || rect.right > innerWidth + 2) && !inVerifiedHorizontalRail(element)) problems.push({ element: name(element), reason: 'horizontal', rect: rect.toJSON() });
       if (!scrolling && (rect.top < -2 || rect.bottom > innerHeight + 2)) problems.push({ element: name(element), reason: 'outside viewport', rect: rect.toJSON() });
       if (!scrolling) for (let parent = element.parentElement; parent && parent !== document.body; parent = parent.parentElement) {
         const css = getComputedStyle(parent), box = parent.getBoundingClientRect();
@@ -141,16 +194,50 @@ async function layout(page, { scrolling = false, scope = 'body', menuOpen = fals
     }).map(name) : [];
     const bottomNavigation = [...document.querySelectorAll('nav,[role=navigation],.mir-mobile-tabs')].filter(shown).filter(element => {
       const style = getComputedStyle(element), rect = element.getBoundingClientRect();
-      return ['fixed', 'sticky'].includes(style.position) && rect.top > innerHeight * .55 && rect.bottom >= innerHeight - 45;
+      const intersects = rect.top < innerHeight && rect.bottom > 0 && rect.left < innerWidth && rect.right > 0;
+      const bottomAnchored = style.bottom !== 'auto';
+      const lowerFixed = style.position === 'fixed' && (bottomAnchored || rect.bottom >= innerHeight - 45);
+      const lowerSticky = style.position === 'sticky' && bottomAnchored && style.top === 'auto';
+      return intersects && rect.top > innerHeight * .55 && (lowerFixed || lowerSticky);
     }).map(name);
-    return { viewport: { width: innerWidth, height: innerHeight }, document: { width: root.scrollWidth, height: root.scrollHeight, clientHeight: root.clientHeight }, problems: problems.slice(0, 25), innerScroll, bottomNavigation, menuOpen };
+    const containers = [...document.querySelectorAll('#mir-prestige-header,#mir-prestige-header>.mir-client-brand,#mir-prestige-header .mir-prestige-actions,#mir-prestige-desktop-nav,.mir-client-locale-switch,main,footer.mir-signature-footer,.config-card,#client-step-scroll,#client-step-actions')].map(element => {
+      const style = getComputedStyle(element), rect = element.getBoundingClientRect();
+      return {
+        element: name(element), rect: rect.toJSON(), display: style.display,
+        width: style.width, height: style.height, minHeight: style.minHeight, maxHeight: style.maxHeight,
+        padding: { top: style.paddingTop, right: style.paddingRight, bottom: style.paddingBottom, left: style.paddingLeft },
+        margin: { top: style.marginTop, right: style.marginRight, bottom: style.marginBottom, left: style.marginLeft },
+        gap: style.gap, gridTemplateColumns: style.gridTemplateColumns,
+        position: style.position, top: style.top, bottom: style.bottom,
+        overflowX: style.overflowX, overflowY: style.overflowY,
+        clientWidth: element.clientWidth, scrollWidth: element.scrollWidth,
+        clientHeight: element.clientHeight, scrollHeight: element.scrollHeight,
+        scrollTop: element.scrollTop, scrollLeft: element.scrollLeft
+      };
+    });
+    const selectedSections = [...document.querySelectorAll('select[data-mir-section-select]')].filter(shown).map(select => ({
+      id: select.id, value: select.value, label: select.selectedOptions[0]?.textContent,
+      options: [...select.options].map(option => ({ value: option.value, label: option.textContent })),
+      dialog: select.closest('dialog')?.id || null
+    }));
+    let module = null;
+    try { module = window.MIRClientPages?.inspect?.() || null; } catch (error) { module = { diagnosticError: String(error.message || error) }; }
+    return {
+      viewport: { width: innerWidth, height: innerHeight },
+      document: { width: root.scrollWidth, height: root.scrollHeight, clientHeight: root.clientHeight, scrollX, scrollY },
+      problems: problems.slice(0, 25), innerScroll, bottomNavigation, menuOpen,
+      diagnostic: { route: location.pathname + location.search + location.hash, scope, entry: document.body.dataset.clientEntry, stage: document.body.dataset.clientStage, selectedSections, module, containers }
+    };
   }, { scrolling, scope, menuOpen });
+  // Preserve the complete container diagnosis even when the readable assertion
+  // message is shortened. This reads layout only and changes no acceptance rule.
+  layoutDiagnostics.push({ ...value, horizontalRails });
   assert.ok(value.document.width <= value.viewport.width + 2, 'no horizontal document overflow: ' + JSON.stringify(value));
   assert.deepEqual(value.bottomNavigation, [], 'no lower navigation bar');
   if (!scrolling) assert.ok(value.document.height <= value.document.clientHeight + 2, 'non-list page fits one screen: ' + JSON.stringify(value));
   assert.deepEqual(value.innerScroll, [], 'non-list sections do not conceal an inner scrollbar');
   assert.deepEqual(value.problems, [], 'content and actions remain visible: ' + JSON.stringify(value));
-  return value;
+  return { ...value, horizontalRails };
 }
 
 async function header(page, size, name) {
@@ -571,7 +658,7 @@ async function main() {
     }));
   } finally {
     const failed = results.filter(result => !result.passed);
-    fs.writeFileSync(path.join(out, 'results.json'), JSON.stringify({ source: sha, manifest, browser: version, generatedAt: new Date().toISOString(), completeMatrix: !filter, filter: filter || null, previewOnly: true, backendWrites: false, productionDeployment: false, sizes, files, passed: results.length - failed.length, failed: failed.length, results, captures, blocked }, null, 2) + '\n');
+    fs.writeFileSync(path.join(out, 'results.json'), JSON.stringify({ source: sha, manifest, browser: version, generatedAt: new Date().toISOString(), completeMatrix: !filter, filter: filter || null, previewOnly: true, backendWrites: false, productionDeployment: false, sizes, files, passed: results.length - failed.length, failed: failed.length, results, captures, blocked, layoutDiagnostics }, null, 2) + '\n');
     if (browser) await browser.close();
     await server.close();
   }

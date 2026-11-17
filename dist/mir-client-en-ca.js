@@ -8069,6 +8069,7 @@ for(const note of [
   entries.push(['Illustration de la couleur choisie. Rendu écran indicatif. '+note[0],'Illustration of the selected colour. Screen colours are indicative. '+note[1]]);
 }
 entries.push(...[["Toutes vos mesures et vos angles", "All your dimensions and angles"], ["Les lettres correspondent au dessin. Les angles du modèle sont conservés et modifiables.", "The letters match the drawing. The model angles are preserved and can be adjusted."], ["Choisissez le métal, sa couleur et la face à peindre.", "Choose the material, colour and painted side."], ["Quantité et récapitulatif", "Quantity and review"], ["Indiquez le nombre de pièces et vérifiez vos choix avant l’ajout au panier.", "Enter the number of pieces and review your choices before adding to the cart."], ["Angles du modèle", "Model angles"], ["Rétablir les angles", "Restore model angles"], ["Options des replis", "Hem options"], ["Choisir le matériau", "Choose a material"], ["Repli", "Hem"], ["Matériau", "Material"], ["Ouvrir le menu", "Open menu"], ["Fermer le menu", "Close menu"], ["Menu", "Menu"], ["Mesures et angles", "Dimensions and angles"]]);
+entries.push(["Les lettres correspondent au dessin. Angles du modèle modifiables.","The letters match the drawing. Model angles can be adjusted."],["Longueur de vente :","Stock length:"]);
 const dictionary=Object.freeze(Object.fromEntries(entries));
 if(typeof module==='object'&&module.exports)module.exports=dictionary;
 if(root)root.MIRClientEnglish=dictionary;

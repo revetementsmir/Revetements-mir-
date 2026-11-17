@@ -280,7 +280,7 @@ function renderDimensions(){
   }
  }
  $('#client-step-length').innerHTML=clientProfileWizard()
-  ?'<p class="client-stock-length"><strong>Longueur de vente</strong> '+esc(window.MIRBendingLengths.label(draft))+' · '+esc(M.formatMeasurement(M.parseMeasurement(draft.length,unit).mm,unit))+'</p>':'';
+  ?'<p class="client-stock-length" title="'+esc(window.MIRBendingLengths.label(draft))+'"><strong>Longueur de vente :</strong> '+esc(M.formatMeasurement(M.parseMeasurement(draft.length,unit).mm,unit))+'</p>':'';
  if(kind==='profile'&&!authoring){
   const stock=stockLengthCheck();
   for(const input of document.querySelectorAll('#production-dimensions [data-measure="length"],#client-step-length [data-measure="length"]')){
@@ -481,7 +481,13 @@ function drawingModel(){const actual=build();if(actual.valid)return {model:actua
    // No preview length is written into the draft or the order.
    const preview=copy(source.model.spec);
    preview.name=draft.name||preview.name;preview.finish=copy(draft.finish||{});preview.coloredFace=copy(draft.coloredFace||{});
-   if(draft.template==='custom'&&draft.bends?.length===preview.bends?.length){preview.bends=copy(draft.bends);preview.startAngle=draft.startAngle;}
+   if(draft.template==='custom'&&draft.bends?.length===source.model.bends?.length){
+    if(preview.template!=='custom'){
+     preview.template='custom';
+     preview.segments=source.model.segments.map(segment=>({label:segment.label,length:unitValue(segment.lengthMM,preview.unit)}));
+    }
+    preview.bends=copy(draft.bends);preview.startAngle=draft.startAngle;
+   }
    const model=build(preview);if(model.valid)return {model,illustrative:true};
   }
  }
@@ -565,7 +571,33 @@ function profileAnglesOverlay(model,{segments,folds},labels,handles,[leftEdge,ri
   return `<g class="mir-angle-annotation" pointer-events="none" role="img" aria-label="${esc('Angle '+sides+' : '+label)}"><path d="M ${start.map(fmt).join(' ')} A ${fmt(r)} ${fmt(r)} 0 0 ${sweep} ${end.map(fmt).join(' ')}" fill="none" stroke="#348511" stroke-width="2.5"/>${text}</g>`;
  }).join('');
 }
+function compactClientProfileSVG(model,{illustrative=false}={}){
+ const width=Math.max(240,$('#production-drawing').clientWidth||innerWidth-44);
+ const height=innerHeight<=710?92:Math.max(110,Math.min(innerHeight*.17,145));
+ const points=model.pointsMM||[];
+ if(points.length<2)return '';
+ const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+ const scale=Math.min((width-76)/Math.max(1,maxX-minX),(height-44)/Math.max(1,maxY-minY));
+ const mapped=points.map(([x,y])=>[width/2+(x-(minX+maxX)/2)*scale,height/2-(y-(minY+maxY)/2)*scale]);
+ const occupied=[],labels=[];
+ for(let index=0;index<mapped.length-1;index++){
+  const a=mapped[index],b=mapped[index+1],dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy)||1;
+  const mid=[(a[0]+b[0])/2,(a[1]+b[1])/2],normal=[-dy/length,dx/length];
+  const side=(mid[0]-width/2)*normal[0]+(mid[1]-height/2)*normal[1]>=0?1:-1;
+  const candidates=[side,-side].flatMap(direction=>[14,24,34].flatMap(gap=>[0,16,-16].map(slide=>[mid[0]+normal[0]*gap*direction+dx/length*slide,mid[1]+normal[1]*gap*direction+dy/length*slide])));
+  const p=candidates.find(([x,y])=>x>=12&&x<=width-12&&y>=11&&y<=height-11&&occupied.every(q=>Math.abs(q[0]-x)>=22||Math.abs(q[1]-y)>=21))||[Math.max(12,Math.min(width-12,mid[0]+normal[0]*14*side)),Math.max(11,Math.min(height-11,mid[1]+normal[1]*14*side))];
+  occupied.push(p);
+  const label=model.segments[index]?.label||String.fromCharCode(65+index);
+  labels.push('<g class="client-compact-side" data-marker-label="'+esc(label)+'"><path d="M'+mid.map(fmt).join(',')+'L'+p.map(fmt).join(',')+'" stroke="#8a8b80" stroke-width=".7"/><rect x="'+fmt(p[0]-10)+'" y="'+fmt(p[1]-10)+'" width="20" height="20" rx="3" fill="#ece8df"/><text x="'+fmt(p[0])+'" y="'+fmt(p[1]+4.5)+'" text-anchor="middle" font-size="13" font-weight="600" fill="#242522">'+esc(label)+'</text></g>');
+ }
+ // Render the existing physical model; only the screen projection and labels are compact.
+ const profile=M.profileDiagramContent(model,mapped,{markers:false,illustrative:true,highContrast:true,horizontalBounds:[0,width],verticalBounds:[0,height]})
+  .replace('stroke-width="9"','stroke-width="4"')
+  .replace(/(<path[^>]*stroke="#dfe8e3"[^>]*stroke-width=")4"/,(_,prefix)=>prefix+'1.5"');
+ return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-label="'+esc(model.name)+'"><title>'+esc(model.name)+(illustrative?' — proportions du modèle, cotes à saisir':' — cotes de la pièce')+'</title>'+profile+labels.join('')+'</svg>';
+}
 function diagramSVG(model,{illustrative=false,small=false,interactive=true}={}){
+ if(clientProfileWizard()&&model.kind==='profile'&&interactive&&!small&&clientStep===2&&innerWidth<780&&tool==='select')return compactClientProfileSVG(model,{illustrative});
  if(model.kind==='panel'&&window.MIRProductionVolume)return panelDiagramSVG(model,{illustrative,small,interactive});
  const freehand=interactive&&tool==='draw'&&model.kind==='profile';
  const grid=freehand?traceGridSVG(model.unit):'';
@@ -856,7 +888,7 @@ function syncPieceNameField(){
 }
 const clientStages=[
  {title:'Choisissez votre moulure',hint:'Sélectionnez un modèle ci-dessous ou dessinez votre propre profil.',action:'Passer aux mesures'},
- {title:'Toutes vos mesures et vos angles',hint:'Les lettres correspondent au dessin. Les angles du modèle sont conservés et modifiables.',action:'Matériau et couleur'},
+ {title:'Mesures et angles',hint:'Les lettres correspondent au dessin. Angles du modèle modifiables.',action:'Matériau et couleur'},
  {title:'Matériau et couleur',hint:'Choisissez le métal, sa couleur et la face à peindre.',action:'Quantité et récapitulatif'},
  {title:'Quantité et récapitulatif',hint:'Indiquez le nombre de pièces et vérifiez vos choix avant l’ajout au panier.'}
 ];

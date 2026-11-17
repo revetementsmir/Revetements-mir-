@@ -71,7 +71,7 @@ body.mir-prestige .mir-signature-footer{display:grid!important;grid-template-col
 body.mir-prestige .mir-signature-footer-logo{display:flex;align-items:center;width:108px;min-height:40px}
 body.mir-prestige .mir-signature-footer p{margin:0;font-size:12px;line-height:1.4;text-align:right}
 body.mir-prestige .mir-signature-footer nav{display:none!important}
-body.mir-prestige [data-mir-test-banner]{position:absolute!important;top:1px!important;right:3px!important;bottom:auto!important;left:auto!important;z-index:31!important;pointer-events:none!important;padding:0 3px!important;font-size:0!important;line-height:0!important}
+body.mir-prestige [data-mir-test-banner]{position:absolute!important;top:1px!important;right:auto!important;bottom:auto!important;left:3px!important;z-index:31!important;pointer-events:none!important;padding:0 3px!important;font-size:0!important;line-height:0!important}
 body.mir-prestige [data-mir-test-banner]::before{content:"TEST";display:block;font:700 8px/10px system-ui;letter-spacing:.04em}
 @media(min-width:1101px){
  body.mir-prestige #mir-prestige-header{min-height:66px!important;padding-top:12px!important}

@@ -8,7 +8,8 @@
   const doc = document, body = doc.body;
   const route = location.pathname.split('/').pop() || 'index.html';
   const supported = new Set(['index.html', 'maison.html', 'chantiers.html',
-    'contact.html', 'aide.html', 'produit.html', 'selection.html', 'estimation.html']);
+    'contact.html', 'aide.html', 'produit.html', 'selection.html', 'estimation.html',
+    'materiaux.html', 'pliage.html']);
   if (!supported.has(route)) return;
   const controllers = [], lists = [], knownLists = new WeakMap();
   let serial = 0, measureQueued = false;
@@ -58,7 +59,11 @@
     status.setAttribute('data-mir-page-status', '');
     status.setAttribute('aria-live', 'polite');
     nav.append(previous, label, status, next);
-    host.insertBefore(nav, options.before || host.firstChild);
+    let before = options.before || host.firstChild;
+    /* A product component can be nested inside the page shell. insertBefore
+     * requires a direct child, so use that component's containing page block. */
+    while (before && before.parentNode !== host) before = before.parentNode;
+    host.insertBefore(nav, before || host.firstChild);
     let current = 0;
     const api = {
       nav, groups,
@@ -203,10 +208,12 @@
   function help(main) {
     const answers = $('#help-answers'), aside = $('.mir-prestige-help-grid > aside');
     if (!answers) return;
+    const search = $('.mir-prestige-help-search');
+    const introduction = $('.mir-prestige-help-intro > div:nth-child(2) > p');
     const pages = listPager(answers, ':scope > details', () => compact() ? 1 : 2, {label:['Réponses', 'Answers']});
     const helpPager = pager(main, [
-      section('Questions fréquentes', 'Frequently asked questions', [answers, pages.nav]),
-      section('Un conseil personnalisé', 'Personal advice', [aside])
+      section('Questions fréquentes', 'Frequently asked questions', [search, answers, pages.nav]),
+      section('Un conseil personnalisé', 'Personal advice', [introduction, aside])
     ], {before:$('.mir-prestige-help-grid')});
     const openVisible = () => {
       for (const row of pages.entries) if (row.dataset.mirListVisible === 'true') row.open = true;
@@ -299,6 +306,190 @@
     if (location.hash === '#mir-unified-dossier' || new URLSearchParams(location.search).get('view') === 'dossier') controller.show(1);
     void pieces;
   }
+  function materials(main) {
+    const brands = $('#brand-buttons'), products = $('#product-list');
+    if (!brands || !products) return;
+    listPager(brands, ':scope > button', 6, {label:['Fabricants', 'Manufacturers']});
+    const references = listPager(products, ':scope > .product-card', () => compact() ? 1 : 2, {
+      label:['Références', 'References'], groupHeaders:'.catalogue-group-heading'
+    });
+    const controls = $('.catalogue-controls'), toolbar = $('.catalogue-toolbar');
+    const showResults = button('data-mir-show-material-results', '', '');
+    showResults.className = 'mir-client-section-action';
+    showResults.removeAttribute('aria-label');
+    showResults.setAttribute('data-mir-user-content', '');
+    controls?.append(showResults);
+    const updateResultsLabel = () => setText(showResults, text('Voir les références', 'View references'));
+    const controller = pager(main, [
+      section('Choisir un fabricant', 'Choose a manufacturer', [$('.page-heading'), $('.brand-sidebar')]),
+      section('Les références', 'References', [products, references.nav, $('#catalogue-empty')]),
+      section('Rechercher et filtrer', 'Search and filter', [toolbar, controls, $('#brand-note')], updateResultsLabel),
+      section('Le guide des matériaux', 'Materials guide', [$('.catalogue-guidance'), $('.subnav')])
+    ]);
+    const materialLinks = $('.subnav', main);
+    if (materialLinks) main.insertBefore(materialLinks, controller.nav.nextSibling);
+    updateResultsLabel();
+    showResults.addEventListener('click', () => { references.show(0); controller.show(1, true); });
+    brands.addEventListener('click', event => {
+      if (event.target.closest('[data-brand]')) { references.show(0); controller.show(1, true); }
+    });
+    const releaseReplacedPanels = () => {
+      for (let index = controllers.length - 1; index >= 0; index--)
+        if (!controllers[index].nav.isConnected) controllers.splice(index, 1);
+      for (let index = lists.length - 1; index >= 0; index--)
+        if (!lists[index].container.isConnected) lists.splice(index, 1);
+    };
+    const installCards = () => {
+      releaseReplacedPanels();
+      all(':scope > .product-card', products).forEach(card => {
+        if (card.dataset.mirMaterialCardPages) return;
+        card.dataset.mirMaterialCardPages = 'true';
+        pager(card, [
+          section('Profil et formats', 'Profile and sizes', [
+            $('.catalogue-product-photo', card), $('.product-meta', card), $('.product-specs', card)
+          ]),
+          section('Description et couleurs', 'Description and colours', [
+            $('.product-description', card), $('.color-strip', card)
+          ])
+        ]);
+      });
+    };
+    new MutationObserver(installCards).observe(products, {childList:true});
+    installCards();
+    const dialog = $('#material-dialog'), content = $('#material-body');
+    let dialogController = null;
+    const installDialog = () => {
+      const lead = $(':scope > p', content);
+      if (!lead || lead.dataset.mirMaterialPages) return;
+      lead.dataset.mirMaterialPages = 'true';
+      releaseReplacedPanels();
+      if (dialogController) {
+        const index = controllers.indexOf(dialogController);
+        if (index >= 0) controllers.splice(index, 1);
+      }
+      const panels = all(':scope > .material-section', content);
+      const dimensions = panels.find(panel => $('.material-dimensions', panel));
+      const colours = panels.find(panel => $('.official-colors', panel) || $('.source-link', panel));
+      const documents = panels.find(panel => $('.material-documents', panel));
+      const notes = panels.find(panel => $('.material-notes', panel));
+      if (dimensions) listPager($('.material-dimensions', dimensions), ':scope > div', () => compact() ? 4 : 8, {
+        label:['Dimensions', 'Dimensions']
+      });
+      if (colours) listPager($('.official-colors', colours), ':scope > .official-color', () => compact() ? 4 : 8, {
+        label:['Couleurs', 'Colours']
+      });
+      if (documents) listPager($('.material-documents', documents), ':scope > a', () => compact() ? 2 : 4, {
+        label:['Documents', 'Documents']
+      });
+      if (notes) listPager($('.material-notes', notes), ':scope > li', () => compact() ? 1 : 3, {
+        label:['Notes', 'Notes']
+      });
+      const groups = [
+        section('Présentation', 'Overview', [lead]),
+        section('Dimensions et pose', 'Dimensions and installation', [dimensions]),
+        section('Couleurs', 'Colours', [colours]),
+        section('Documentation', 'Documentation', [documents]),
+        section('À savoir', 'Good to know', [notes]),
+        section('Sources et projet', 'Sources and project', [$('.material-action-row', content)])
+      ];
+      dialogController = pager(content, groups);
+      dialog.dataset.mirClientMaterialPages = 'true';
+    };
+    if (dialog && content) {
+      new MutationObserver(installDialog).observe(content, {childList:true, subtree:true});
+      installDialog();
+    }
+  }
+  function bendingLanding(main) {
+    const quick = $('#client-bend-quick'), content = $('.client-bend-quick-content');
+    if (!quick || !content) return;
+    const form = $('.bend-form'), workspace = $('.bend-workspace'), preview = $('.bend-view');
+    const formSections = all(':scope > .form-section', form);
+    const dimensions = formSections[0], finish = formSections[1], review = formSections[2];
+    const errors = $('#bend-errors'), status = $('#page-status');
+    /* Keep the exact validation/status nodes and their IDs. Sharing them between
+     * steps avoids a disabled action whose explanation is on a hidden step. */
+    if (errors) content.append(errors);
+    if (status) content.append(status);
+    const profiles = listPager($('#profile-tabs'), ':scope > [data-profile]', 6, {label:['Profils', 'Profiles']});
+    const colours = listPager($('#bend-colors'), ':scope > [data-color]', () => compact() ? 8 : 16, {label:['Couleurs', 'Colours']});
+    listPager($('#bend-items'), ':scope > .bend-item', 1, {label:['Pièces', 'Pieces']});
+    const material = $('#bend-material')?.closest('label');
+    const finishTitle = $('.form-section-title', finish), finishFields = $('.bend-fields', finish);
+    const finishNote = finish?.lastElementChild;
+    const custom = $('[data-custom-model-channel]', content);
+    const initiallyOpen = quick.open;
+    const openQuick = () => { if (!quick.open) quick.open = true; };
+    const quickSection = (fr, en, nodes) => section(fr, en, [quick, ...nodes], openQuick);
+    const groups = [
+      section('Pliage sur mesure', 'Custom bending', [$('.client-bend-hero')]),
+      section('Comment ça fonctionne', 'How it works', [$('.prestige-bend-steps'), $('.subnav')]),
+      quickSection('Formulaire rapide · profil', 'Quick form · profile', [
+        $(':scope > .notice-inline', content), profiles?.nav, $('#profile-tabs')
+      ]),
+      quickSection('Toutes les mesures', 'All measurements', [workspace, form, dimensions, errors]),
+      quickSection('Aperçu de la pièce', 'Piece preview', [
+        workspace, preview, $('.bend-view-head'), $('#bend-drawing'), $('.bend-view-foot')
+      ]),
+      quickSection('À savoir sur l’aperçu', 'About the preview', [
+        workspace, preview, $('.bend-view-head'), $('.bend-view-foot'), $('#bend-preview-note')
+      ]),
+      quickSection('Le matériau', 'Material', [
+        workspace, form, finish, finishTitle, material, finishFields, finishNote, errors
+      ]),
+      quickSection('La couleur', 'Colour', [
+        workspace, form, finish, finishTitle, material, $('#bend-color-search-label'),
+        $('#bend-color-count'), colours?.nav, $('#bend-colors'), $('#bend-color-name'), $('#bend-color-note'), errors
+      ]),
+      quickSection('Vérifier cette pièce', 'Review this piece', [workspace, form, review, errors, status]),
+      quickSection('Mon dossier de pliages', 'My bending project', [$('.bend-list-section'), status])
+    ];
+    /* These existing containers only provide layout. Each visible child belongs
+     * to a real section; the inputs, draft listeners and drawing remain intact. */
+    const controller = pager(main, groups);
+    const bendingLinks = $('.subnav', main);
+    if (bendingLinks) main.insertBefore(bendingLinks, controller.nav.nextSibling);
+    const choose = index => {
+      controller.show(index, true);
+      $('[data-mir-section-select]', controller.nav)?.focus({preventScroll:true});
+    };
+    $('#profile-tabs')?.addEventListener('click', event => {
+      if (event.target.closest('[data-profile]')) choose(3);
+    });
+    const colourReset = () => colours?.show(0);
+    $('#bend-material')?.addEventListener('change', colourReset);
+    $('#bend-color-search')?.addEventListener('input', colourReset);
+    const revealChosenColour = () => {
+      const chosen = $('#bend-colors [aria-pressed="true"]');
+      if (chosen) colours?.reveal(chosen);
+    };
+    new MutationObserver(revealChosenColour).observe($('#bend-colors'), {childList:true});
+    revealChosenColour();
+    const installCustomModels = () => {
+      if (!custom || custom.hidden || !custom.children.length) return;
+      const grid = $('.mir-custom-model-grid', custom);
+      if (grid) listPager(grid, ':scope > .mir-custom-model-card', () => compact() ? 1 : 3, {
+        label:['Modèles', 'Models']
+      });
+      if (!controller.groups.some(group => group.nodes.includes(custom))) {
+        controller.groups.push(quickSection('Les modèles de l’atelier', 'Workshop models', [custom]));
+        controller.refresh();
+      }
+    };
+    if (custom) {
+      custom.dataset.mirPageVisible = 'false';
+      new MutationObserver(installCustomModels).observe(custom, {
+        childList:true, subtree:true, attributes:true, attributeFilter:['hidden']
+      });
+      installCustomModels();
+    }
+    /* Restoring a source-owned draft opens the original details after its fetch.
+     * Keep that intent and its values; never recreate or persist the draft here. */
+    new MutationObserver(() => {
+      if (quick.open && controller.index < 2) controller.show(3);
+    }).observe(quick, {attributes:true, attributeFilter:['open']});
+    if (initiallyOpen) controller.show(3);
+  }
   function estimate() {
     const dialog = $('#mir-estimate-dialog'), form = $('#estimate-form'), fields = $('#estimate-fields');
     if (!dialog || !form || !fields || form.dataset.mirClientSteps) return;
@@ -315,7 +506,9 @@
       ]),
       section('Vérifier la demande', 'Review request', [$('.estimate-review', form), $('.estimate-privacy', form), $('.estimate-submit', form)])
     ];
-    const controller = pager(form, groups, {before:fields});
+    const pageIntro = route === 'estimation.html' ? $('.estimate-intro') : null;
+    if (pageIntro) groups.unshift(section('Votre demande', 'Your request', [pageIntro]));
+    const controller = pager(pageIntro ? $('main') : form, groups, {before:pageIntro || fields});
     let validating = false;
     const markValidation = event => {
       if (event.type === 'keydown' && event.key !== 'Enter') return;
@@ -333,7 +526,7 @@
     };
     new MutationObserver(installSummaryLists).observe(summaries, {childList:true, subtree:true});
     installSummaryLists();
-    const received = () => { if (dialog.dataset.received === 'true') controller.show(3); };
+    const received = () => { if (dialog.dataset.received === 'true') controller.show(groups.length - 1); };
     new MutationObserver(received).observe(dialog, {attributes:true, attributeFilter:['data-received']});
     received();
   }
@@ -346,6 +539,8 @@
     if (route === 'aide.html') help(main);
     if (route === 'produit.html') product(main);
     if (route === 'selection.html') cart(main);
+    if (route === 'materiaux.html') materials(main);
+    if (route === 'pliage.html') bendingLanding(main);
     if (route === 'estimation.html' || route === 'selection.html') estimate();
     doc.addEventListener('click', event => {
       const link = event.target.closest('a[href^="#"]');
