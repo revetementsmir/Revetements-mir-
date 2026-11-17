@@ -1,0 +1,12 @@
+/* Guided customer and embedded employee profiles only. Admin and panels do not opt in. */
+html.mir-production-client body[data-client-entry] .config-card :is(label,.fraction-field,input,select){min-width:0;max-width:100%}
+html.mir-production-client body[data-client-entry] .fraction-field{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,.7fr);gap:6px;width:100%}
+html.mir-production-client body[data-client-entry] .fraction-field :is(input,select){width:100%;min-height:44px}
+@media(max-width:900px){
+ html.mir-production-client body[data-client-entry][data-client-stage="2"] .dimension-fields{grid-template-columns:minmax(0,1fr)}
+}
+/* Public post-add choices use show(), not the modal top layer. Keep the cart action reachable. */
+html.mir-production-client body[data-client-entry] #production-dialog[open]:not(:modal){position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);margin:0;z-index:120;max-height:calc(100dvh - 32px)}
+@media(max-width:1100px){
+ html.mir-production-client body[data-client-entry] #production-dialog[open]:not(:modal){top:calc(50% - 34px);max-height:calc(100dvh - 104px)}
+}

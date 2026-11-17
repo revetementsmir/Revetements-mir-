@@ -1,0 +1,46 @@
+PASS 6/12 : portée 108 po, montée 27 po et pointe 123 po
+PASS Pente 6 / 12 avec espaces
+PASS Pente numérique 6
+PASS Pentes gauche/droite indépendantes
+PASS Fractions chantier
+PASS Largeur verrouillée, fermeture exacte
+PASS Solin brique sans cotes inventées
+PASS Coin 86 degrés possible
+PASS Coin J : clouage minimum = retour + 1¼
+PASS Exception J requiert acceptation explicite
+PASS Snapshot J avec exception transférable en production
+PASS Tracé SHIFT orthogonal
+PASS Solin brique et coin avec J sont directement accessibles sur la vraie page de production
+PASS Les pages principales ne renvoient plus vers les écrans de démonstration
+PASS La page des coins charge les composants de production
+PASS Les dix modèles canoniques Phase 10 sont disponibles dans le configurateur
+PASS Fascia et L replié gardent le retour écrasé
+PASS Fascia Phase 10 verrouille le retour à 3/4 po
+PASS Les trois topologies décidées par Frederick n’inventent aucune cote
+PASS Goutte d’eau exige un développé total exactement égal à 8 po
+PASS Les variantes dérivées et profils historiques restent accessibles hors décompte
+PASS Beam avec replis : sept segments, deux retours écrasés
+PASS Les solins brique ne préremplissent aucune cote inconnue
+PASS Le J intégré avertit pour le clouage inférieur au minimum
+PASS La correction automatique du J respecte le minimum
+PASS Une exception J exige une acceptation nominative
+PASS Le J ne peut pas contourner la règle après modification de la topologie
+PASS Les profils sont chargés directement sur la page de production
+PASS La page calepinage expose les contrôles préparés
+PASS Studio : clin 7 po sur 10 pi = 17 rangs complets + coupe de 1 po
+PASS Studio : panneaux 4×8 / 4×10 gardent leur format et leur orientation
+PASS Studio : la vue 2D ne repeint plus le soffite comme une bande sur le mur
+PASS Studio : le retrait central reste continu sur les deux étages
+PASS Studio : le grain du fibrociment reste indépendant de la couvrance
+PASS MIR : nouvelle version conservée en brouillon jusqu’au tarif, ancienne version intacte
+PASS Mesures standard MIR : fractions, verrouillage et longueur
+PASS Mesures standard MIR : cote verrouillée vide interdite
+PASS Mesures standard MIR : nouvelles fiches privées et usage magasin contrôlé
+PASS Pliage MIR : retour écrasé avec un raccord arrondi
+PASS Repères A-B-C : le solveur garde tous les badges dans le cadre et cible le milieu exact
+PASS Tracé MIR : un repli manuel reste écrasé après une petite retouche
+PASS Sauvegarde MIR : modèles et mesures seulement, pas de commandes
+PASS Sauvegarde MIR : ne jamais remplacer un modèle local par une vieille version
+PASS Sauvegarde MIR : rejeter fichiers erronés et doublons sans écriture
+PASS Sauvegarde MIR : interface réservée à l’atelier local
+Tests MIR : 45/45 réussis.

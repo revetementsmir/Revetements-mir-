@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "cases": [
+    "A puis B pendant préparation : seul B est peint, catalogue inchangé, préparation mutualisée",
+    "Réinitialisation pendant préparation : aucun ancien choix ne revient",
+    "Fiche retirée : aucun rendu différé sur le nœud déconnecté",
+    "Deux fiches : sélections indépendantes malgré cache partagé",
+    "Produit non pris en charge : rendu historique laissé au consommateur",
+    "Préparation indisponible : retour explicite au consommateur, sans exception non gérée"
+  ],
+  "method": "Module réel exécuté en VM Node; préparation différée contrôlée, DOM et moteur de teinte simulés. Complément à la recette navigateur magasin/chantier réalisée par root.",
+  "applicationEdits": 0,
+  "networkRequests": 0,
+  "cartWrites": 0
+}

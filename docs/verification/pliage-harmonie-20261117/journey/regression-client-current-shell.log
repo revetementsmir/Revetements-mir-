@@ -1,0 +1,13 @@
+AssertionError [ERR_ASSERTION]: wizard fits one screen 360 {"horizontal":true,"vertical":false,"landing":false,"entry":"choice","width":360,"height":876,"viewport":780}
+
+false !== true
+
+    at noOverflow (/workspace/mir-prestige/docs/verification/pliage-harmonie-20261117/journey/harnesses/legacy-functional-current-shell.cjs:79:10)
+    at async /workspace/mir-prestige/docs/verification/pliage-harmonie-20261117/journey/harnesses/legacy-functional-current-shell.cjs:102:1420 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

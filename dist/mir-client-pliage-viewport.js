@@ -20,7 +20,8 @@
  order.prepend(backToWizard);
  order.addEventListener('click', (event) => {
   if (body.dataset.clientEntry && event.target.closest('[data-edit-piece]')) {
-   history.replaceState(null,'',location.pathname+location.search);
+   // A fragment navigation also clears CSS :target; replaceState alone leaves the dossier visible.
+   location.replace(location.pathname+location.search+'#production-main');
   }
  });
 

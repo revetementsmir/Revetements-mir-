@@ -1,0 +1,271 @@
+{
+  "materials": 22,
+  "colors": 375,
+  "groups": {
+    "opaque": 348,
+    "two-tone": 27
+  },
+  "changed": [
+    {
+      "id": "hardieplank-select-825",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/hardieplank-cedarmill.png",
+      "viewBox": [
+        0,
+        0,
+        600,
+        600
+      ]
+    },
+    {
+      "id": "hardiepanel",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/hardiepanel-smooth.png",
+      "viewBox": [
+        0,
+        0,
+        600,
+        600
+      ]
+    },
+    {
+      "id": "canexel-ridgewood-d5",
+      "colors": 16,
+      "distinctTables": 16,
+      "base": "./assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp",
+      "viewBox": [
+        0,
+        188,
+        1254,
+        879
+      ]
+    },
+    {
+      "id": "jdp-akta-306-antique",
+      "colors": 9,
+      "distinctTables": 9,
+      "base": "./assets/catalogue-swatches/jdp-gris-antique-c790727e.png",
+      "viewBox": [
+        0,
+        500,
+        1500,
+        1000
+      ]
+    },
+    {
+      "id": "rialux-bosco",
+      "colors": 5,
+      "distinctTables": 5,
+      "base": "./assets/products/rialux-bosco.webp",
+      "viewBox": [
+        0,
+        0,
+        280,
+        187
+      ]
+    },
+    {
+      "id": "hardieplank-select-625",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/mir-siding-625/base-hardieplank.png"
+    },
+    {
+      "id": "hardieplank-select-725",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/hardieplank-cedarmill.png",
+      "viewBox": [
+        0,
+        0,
+        600,
+        600
+      ]
+    },
+    {
+      "id": "hardieplank-smooth-625",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/hardieplank-smooth.png",
+      "viewBox": [
+        0,
+        0,
+        600,
+        600
+      ]
+    },
+    {
+      "id": "hardieplank-smooth-725",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/hardieplank-smooth.png",
+      "viewBox": [
+        0,
+        0,
+        600,
+        600
+      ]
+    },
+    {
+      "id": "hardieplank-smooth-825",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/hardieplank-smooth.png",
+      "viewBox": [
+        0,
+        0,
+        600,
+        600
+      ]
+    },
+    {
+      "id": "hardiepanel-cedarmill",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/hardiepanel-cedarmill.png",
+      "viewBox": [
+        0,
+        0,
+        600,
+        600
+      ]
+    },
+    {
+      "id": "hardieshingle-straight",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/hardieshingle-straight.png",
+      "viewBox": [
+        0,
+        0,
+        600,
+        600
+      ]
+    },
+    {
+      "id": "hardieshingle-staggered",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/hardieshingle-staggered.png",
+      "viewBox": [
+        0,
+        0,
+        600,
+        600
+      ]
+    },
+    {
+      "id": "st-laurent-lap-625",
+      "colors": 24,
+      "distinctTables": 24,
+      "base": "./assets/products/mir-siding-625/base-hardieplank.png"
+    },
+    {
+      "id": "st-laurent-lap-825",
+      "colors": 24,
+      "distinctTables": 24,
+      "base": "./assets/products/st-laurent-4.jpg",
+      "viewBox": [
+        310,
+        0,
+        240,
+        185
+      ]
+    },
+    {
+      "id": "st-laurent-v-groove-825",
+      "colors": 24,
+      "distinctTables": 24,
+      "base": "./assets/products/st-vgroove-9.jpg",
+      "viewBox": [
+        750,
+        505,
+        240,
+        180
+      ]
+    },
+    {
+      "id": "canexel-vstyle",
+      "colors": 16,
+      "distinctTables": 16,
+      "base": "./assets/products/canexel-2.webp",
+      "viewBox": [
+        0,
+        0,
+        1070,
+        313
+      ]
+    },
+    {
+      "id": "canexel-cedrvue-9",
+      "colors": 16,
+      "distinctTables": 16,
+      "base": "./assets/products/canexel-4.webp",
+      "viewBox": [
+        0,
+        0,
+        1070,
+        313
+      ]
+    },
+    {
+      "id": "canexel-board-batten",
+      "colors": 7,
+      "distinctTables": 7,
+      "base": "./assets/products/canexel-1.webp",
+      "viewBox": [
+        0,
+        0,
+        1070,
+        313
+      ]
+    },
+    {
+      "id": "jdp-bluhouss-307",
+      "colors": 1,
+      "distinctTables": 1,
+      "base": "./assets/products/jdp-bluhouss-307.webp",
+      "viewBox": [
+        640,
+        760,
+        720,
+        480
+      ]
+    },
+    {
+      "id": "st-laurent-board-batten-12",
+      "colors": 24,
+      "distinctTables": 24,
+      "base": "./assets/products/st-board-9.jpg",
+      "viewBox": [
+        440,
+        410,
+        370,
+        195
+      ]
+    },
+    {
+      "id": "hardie-board-batten",
+      "colors": 19,
+      "distinctTables": 19,
+      "base": "./assets/products/hardiepanel-smooth.png",
+      "viewBox": [
+        0,
+        0,
+        600,
+        600
+      ]
+    }
+  ],
+  "inputUnchanged": true,
+  "elapsedMs": 3373,
+  "unprepared": [],
+  "cacheSecondRunRequests": 0,
+  "externalRequests": [],
+  "missingSource": {
+    "noPreview": true,
+    "untouched": true
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "revision": "3573d90f064e95459c18a8b6ba8a4462bfaa1dc0",
+  "hashes": {
+    "mir-selection-pdf.js": "307917099bfb6e621e5106f70f88ca29d1ef24c50250bd4c96395b4effe20d54",
+    "mir-dossier-pdf.js": "34f6d380522a392df160f5c6c528e94dc602242e74be7aca368d89434a604d99",
+    "mir-panel-po-pdf.js": "cb90113fabe1d1b5c5af56a91d2c51325be4b9043d8891651215d592f6cb4269",
+    "annotated-pdf.js": "f2a031a17aab0a4fbd4d69a40784ce37aaee31a9b980c240381f5d8e4a3adc47",
+    "production-model.js": "b4ca9fe8bd850e59dacfb4d38be0c48fcdf3e187d0b7177c51b22f9af835c37f",
+    "mir-client-i18n.js": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+  },
+  "checks": [
+    {
+      "name": "panel-long fr-CA leaves source input untouched",
+      "ok": true
+    },
+    {
+      "name": "panel-long fr-CA text stays on page",
+      "ok": true
+    },
+    {
+      "name": "panel-long fr-CA raster header text stays on page",
+      "ok": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(c.canvasText.every(x=>x.x>=80&&x.x+x.width<=2900&&x.y>=0&&x.y<=2105))\n"
+    },
+    {
+      "name": "panel-long fr-CA keeps official colour ending",
+      "ok": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(canvasText.includes('FIN-COULEUR-QA'))\n"
+    },
+    {
+      "name": "panel-long fr-CA keeps project ending",
+      "ok": true
+    },
+    {
+      "name": "panel-long fr-CA exact panel dimensions and quantity",
+      "ok": true
+    },
+    {
+      "name": "panel-long en-CA leaves source input untouched",
+      "ok": true
+    },
+    {
+      "name": "panel-long en-CA text stays on page",
+      "ok": true
+    },
+    {
+      "name": "panel-long en-CA raster header text stays on page",
+      "ok": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(c.canvasText.every(x=>x.x>=80&&x.x+x.width<=2900&&x.y>=0&&x.y<=2105))\n"
+    },
+    {
+      "name": "panel-long en-CA keeps official colour ending",
+      "ok": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(canvasText.includes('FIN-COULEUR-QA'))\n"
+    },
+    {
+      "name": "panel-long en-CA keeps project ending",
+      "ok": true
+    },
+    {
+      "name": "panel-long en-CA exact panel dimensions and quantity",
+      "ok": true
+    }
+  ],
+  "failures": [
+    "panel-long fr-CA raster header text stays on page: The expression evaluated to a falsy value:\n\n  assert.ok(c.canvasText.every(x=>x.x>=80&&x.x+x.width<=2900&&x.y>=0&&x.y<=2105))\n",
+    "panel-long fr-CA keeps official colour ending: The expression evaluated to a falsy value:\n\n  assert.ok(canvasText.includes('FIN-COULEUR-QA'))\n",
+    "panel-long en-CA raster header text stays on page: The expression evaluated to a falsy value:\n\n  assert.ok(c.canvasText.every(x=>x.x>=80&&x.x+x.width<=2900&&x.y>=0&&x.y<=2105))\n",
+    "panel-long en-CA keeps official colour ending: The expression evaluated to a falsy value:\n\n  assert.ok(canvasText.includes('FIN-COULEUR-QA'))\n"
+  ]
+}

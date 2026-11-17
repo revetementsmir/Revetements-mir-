@@ -227,7 +227,7 @@
     const cs=colors(m),groupFor=c=>c.paletteStatus==='legacy_touch_up_only'?'legacy':c.finishGroup||'',groups=[...new Set(cs.map(groupFor))];
     const labels={'opaque':'Couleurs opaques','two-tone':'Couleurs deux tons','legacy':'Anciennes couleurs de retouche'};
     return groups.map(group=>(groups.length>1&&labels[group]?'<span class="mir-colour-group">'+labels[group]+'</span>':'')+cs.filter(c=>groupFor(c)===group).map(c=>{
-      const visual=localAsset(c.swatchUrl)||/^#[0-9a-f]{6}$/i.test(c.hex||'')?swatch(c):'<span aria-hidden="true">—</span>';
+      const visual=m.stableSidingPreview?.previewForSwatches?V.stableSidingSVG(m,c):localAsset(c.swatchUrl)||/^#[0-9a-f]{6}$/i.test(c.hex||'')?swatch(c):'<span aria-hidden="true">—</span>';
       const attrs=card?'data-card-color="'+esc(c.id)+'" data-material="'+esc(m.id)+'"':'data-color="'+esc(c.id)+'"';
       return '<button type="button" class="mir-colour-option'+(card?' shop-swatch-small':'')+swatchClass(c)+'" '+attrs+' title="'+esc(c.name)+'" aria-label="'+esc(m.brand+' — '+c.name)+'" aria-pressed="false"><span class="mir-colour-chip">'+visual+'</span><span class="mir-colour-label" data-mir-source-color>'+esc(c.name)+'</span></button>';
     }).join('')).join('');
@@ -253,7 +253,8 @@
   const brandSwatches={
     'mac-norwood':'mac-bouleau-fume',
     'vicwest-bellara-plank135':'vicwest-amber-birch',
-    'kaycan-urbanix-6-9920':'kaycan-urbanix-recolte-de-cedre'
+    'kaycan-urbanix-6-9920':'kaycan-urbanix-recolte-de-cedre',
+    'jdp-akta-306-antique':'jdp-gris-antique'
   };
   function brandCover(products){
     for(const product of products){
@@ -512,6 +513,9 @@
     $('#product-detail').prepend(title);
     const gallery=$('.product-gallery'),photos=document.createElement('details');photos.className='mir-product-photos';photos.innerHTML=m.stableSidingPreview?'<summary>Échantillon et sources</summary>':'<summary>Photo du profil et sources</summary>';
     for(const node of [...gallery.children])if(node.id!=='product-photo')photos.append(node);gallery.append(photos);
+    if(localAsset(m.stableSidingPreview?.sourcePreview)){
+      const source=document.createElement('a');source.href=localAsset(m.stableSidingPreview.sourcePreview);source.target='_blank';source.rel='noopener';source.textContent='Voir l’aperçu fabricant original';photos.append(source);
+    }
     const picker=$('.product-color-picker');
     if(cs.length>32){
       const search=document.createElement('label');search.className='mir-colour-search';

@@ -1,0 +1,13 @@
+{
+  "baseline": "3573d90",
+  "files": {
+    "dist/pliage.html": "d714310a7a6378f2f8e3dce753a254c87f10d7d25bfe4263bde7c0aa82d4606b",
+    "dist/pliage.js": "2ea4cd20afe32763e9517a5bb461aedea34157e4a89a5a84f4276ba0374fdac9",
+    "dist/mir-client-pliage.css": "dfb4636195ae3a83991619eadb63215358e88e689ee4ed53e33b921d1b623677",
+    "dist/mir-client-pliage-viewport.js": "b779840768d194c21d55155beadd920580ccd82055c67285ed592416d4b56ef3",
+    "dist/production.html": "70d564f48b5e81976c7ab07453c1df2a171f00826026fca38b923edf56eb18f4",
+    "dist/mir-pliage-journey.css": "2b989f465216647b2dcb52c709c9251820a91353b14d6e46e577d7842e2e0548",
+    "tests/mir-pliage-harmonie-journey-browser.cjs": "3afdd6087378e87753f5930d689930539ca1848bde8f6c976125e6f3eb57ef0a",
+    "tests/mir-pliage-harmonie-dialog-browser.cjs": "39d45e8bea7783fcd162a109e8160664d2137b54756ae2357d19143de364e886"
+  }
+}

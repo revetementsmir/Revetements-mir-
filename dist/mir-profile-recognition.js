@@ -29,7 +29,7 @@
     const right=angles.length===sides-1&&angles.every(value=>close(value,90));
     const signs=angles.map(value=>Math.sign(value));
     let code='custom',label='Profil sur mesure',certainty='low';
-    if(angles.some(value=>close(value,180))){code='hem';label='Profil avec retour écrasé';certainty='medium';}
+    if(bends.some(bend=>bend?.mode==='hem')){code='hem';label='Profil avec retour écrasé';certainty='medium';}
     else if(right&&sides===2){code='l';label='Profil en L';certainty='high';}
     else if(right&&sides===3&&signs[0]!==signs[1]){code='z';label='Profil en Z';certainty='high';}
     else if(right&&sides===3&&signs[0]===signs[1]){code='j-u';label='Profil en J / U';certainty='medium';}

@@ -1,0 +1,1454 @@
+{
+  "phase": "panel-before",
+  "sourceMode": "HEAD PDF engines served locally",
+  "revision": "3573d90f064e95459c18a8b6ba8a4462bfaa1dc0",
+  "hashes": {
+    "mir-selection-pdf.js": "307917099bfb6e621e5106f70f88ca29d1ef24c50250bd4c96395b4effe20d54",
+    "mir-dossier-pdf.js": "34f6d380522a392df160f5c6c528e94dc602242e74be7aca368d89434a604d99",
+    "mir-panel-po-pdf.js": "cb90113fabe1d1b5c5af56a91d2c51325be4b9043d8891651215d592f6cb4269",
+    "annotated-pdf.js": "f2a031a17aab0a4fbd4d69a40784ce37aaee31a9b980c240381f5d8e4a3adc47",
+    "production-model.js": "b4ca9fe8bd850e59dacfb4d38be0c48fcdf3e187d0b7177c51b22f9af835c37f",
+    "mir-client-i18n.js": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+  },
+  "cases": [
+    {
+      "scenario": {
+        "name": "panel-long",
+        "client": true,
+        "lang": "fr-CA"
+      },
+      "filename": "panel-long-fr-CA.pdf",
+      "pages": [
+        {
+          "page": 1,
+          "text": "",
+          "bounds": [],
+          "paper": [
+            1190.551,
+            841.89
+          ]
+        },
+        {
+          "page": 2,
+          "text": "",
+          "bounds": [],
+          "paper": [
+            1190.551,
+            841.89
+          ]
+        }
+      ],
+      "clipped": [],
+      "inputUnchanged": true,
+      "canvasText": [
+        {
+          "text": "MIR",
+          "x": 85,
+          "y": 100,
+          "width": 108.1474609375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "MIR — Commande panneaux",
+          "x": 250,
+          "y": 78,
+          "width": 449.76953125,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparation des pièces sur mesure FIN-PROJET-QA",
+          "x": 250,
+          "y": 115,
+          "width": 2866.8984375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "17 nov. 2026",
+          "x": 2752.99609375,
+          "y": 78,
+          "width": 137.00390625,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Résumé du bon QA-PANELS-001",
+          "x": 85,
+          "y": 220,
+          "width": 608.1943359375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Résumé, mur et repères. Validation fournisseur et atelier requise.",
+          "x": 103,
+          "y": 1893,
+          "width": 720.71533203125,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Échelle d’impression variable. Utiliser les cotes et la calibration du projet pour les mesures.",
+          "x": 85,
+          "y": 2015,
+          "width": 884.0712890625,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Document de travail — choix, dimensions et détails de pose à vérifier avant fabrication.",
+          "x": 85,
+          "y": 2050,
+          "width": 770.390625,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "MIR / 01",
+          "x": 2814.423828125,
+          "y": 2035,
+          "width": 75.576171875,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "MIR",
+          "x": 85,
+          "y": 100,
+          "width": 108.1474609375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "MIR — Commande panneaux",
+          "x": 250,
+          "y": 78,
+          "width": 449.76953125,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparation des pièces sur mesure FIN-PROJET-QA",
+          "x": 250,
+          "y": 115,
+          "width": 2866.8984375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "17 nov. 2026",
+          "x": 2752.99609375,
+          "y": 78,
+          "width": 137.00390625,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Panneau QA-P1",
+          "x": 85,
+          "y": 220,
+          "width": 292.576171875,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Panneau QA-P1 • 1 dessin • quantité 4 • fabrication à confirmer.",
+          "x": 103,
+          "y": 1893,
+          "width": 705.82275390625,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Échelle d’impression variable. Utiliser les cotes et la calibration du projet pour les mesures.",
+          "x": 85,
+          "y": 2015,
+          "width": 884.0712890625,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Document de travail — choix, dimensions et détails de pose à vérifier avant fabrication.",
+          "x": 85,
+          "y": 2050,
+          "width": 770.390625,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "MIR / 02",
+          "x": 2814.423828125,
+          "y": 2035,
+          "width": 75.576171875,
+          "paper": [
+            2976,
+            2105
+          ]
+        }
+      ],
+      "panelModel": {
+        "version": "1.0.0",
+        "kind": "panel",
+        "id": "",
+        "name": "Panneau QA",
+        "spec": {
+          "kind": "panel",
+          "shape": "rectangle",
+          "name": "Panneau QA",
+          "unit": "in",
+          "width": 48,
+          "height": 36,
+          "relief": 1,
+          "lip": 1,
+          "bottomEdgeId": "bottom",
+          "quantity": 4,
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "thickness": 2,
+            "thicknessUnit": "mm"
+          },
+          "finish": {
+            "manufacturer": "Unico",
+            "name": "Teinte officielle complexe QA Teinte officielle complexe QA FIN-COULEUR-QA",
+            "code": "QC-QA-123"
+          },
+          "perforation": {
+            "enabled": true,
+            "edgeId": "bottom",
+            "details": "Perforation fictive confirmée sur le bas. FIN-PERFORATION-QA"
+          }
+        },
+        "shape": "rectangle",
+        "unit": "in",
+        "mirrorX": false,
+        "dimensionBasis": null,
+        "widthMM": 1219.1999999999998,
+        "heightMM": 914.4,
+        "reliefMM": 25.4,
+        "parameters": {},
+        "interpretation": "",
+        "pointsMM": [
+          [
+            0,
+            0
+          ],
+          [
+            1219.2,
+            0
+          ],
+          [
+            1219.2,
+            914.4
+          ],
+          [
+            0,
+            914.4
+          ]
+        ],
+        "edges": [
+          {
+            "id": "bottom",
+            "name": "Bas",
+            "start": [
+              0,
+              0
+            ],
+            "end": [
+              1219.1999999999998,
+              0
+            ],
+            "lengthMM": 1219.1999999999998,
+            "headingDeg": 0,
+            "interiorAngleDeg": 90,
+            "lipMM": 25.4
+          },
+          {
+            "id": "right",
+            "name": "Droite",
+            "start": [
+              1219.1999999999998,
+              0
+            ],
+            "end": [
+              1219.1999999999998,
+              914.4
+            ],
+            "lengthMM": 914.4,
+            "headingDeg": 90,
+            "interiorAngleDeg": 90,
+            "lipMM": 25.4
+          },
+          {
+            "id": "top",
+            "name": "Haut",
+            "start": [
+              1219.1999999999998,
+              914.4
+            ],
+            "end": [
+              0,
+              914.4
+            ],
+            "lengthMM": 1219.1999999999998,
+            "headingDeg": 180,
+            "interiorAngleDeg": 90,
+            "lipMM": 25.4
+          },
+          {
+            "id": "left",
+            "name": "Gauche",
+            "start": [
+              0,
+              914.4
+            ],
+            "end": [
+              0,
+              0
+            ],
+            "lengthMM": 914.4,
+            "headingDeg": -90,
+            "interiorAngleDeg": 90,
+            "lipMM": 25.4
+          }
+        ],
+        "bbox": {
+          "minX": 0,
+          "maxX": 1219.1999999999998,
+          "minY": 0,
+          "maxY": 914.4
+        },
+        "areaMM2": 1114836.4799999997,
+        "bottomEdgeId": "bottom",
+        "perforation": {
+          "enabled": true,
+          "edgeId": "bottom",
+          "details": "Perforation fictive confirmée sur le bas. FIN-PERFORATION-QA"
+        },
+        "quantity": 4,
+        "material": {
+          "type": "aluminium",
+          "name": "Aluminium QA",
+          "productRef": null,
+          "gauge": "",
+          "thicknessMM": 2
+        },
+        "finish": {
+          "manufacturer": "Unico",
+          "name": "Teinte officielle complexe QA Teinte officielle complexe QA FIN-COULEUR-QA",
+          "code": "QC-QA-123",
+          "system": "",
+          "selectionType": null,
+          "special": false,
+          "hex": null
+        },
+        "quotePolicy": {
+          "version": "mir-color-quote-1",
+          "required": false,
+          "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+          "automaticPricingAllowed": false,
+          "customColor": false,
+          "label": "Prix sur demande",
+          "selectionType": "manufacturer",
+          "status": "price_unconfigured"
+        },
+        "lengthMM": null,
+        "location": "",
+        "note": "",
+        "developedWidthMM": null,
+        "developedWidth": null,
+        "developmentStatus": "requires_workshop_bend_parameters",
+        "validation": {
+          "valid": true,
+          "geometryComplete": true,
+          "specificationComplete": true,
+          "productionReady": true,
+          "errors": [],
+          "pending": [],
+          "warnings": [],
+          "workshopValidationRequired": true
+        },
+        "valid": true,
+        "complete": true,
+        "productionReady": true,
+        "pricing": {
+          "schema": "mir-piece-pricing-1",
+          "status": "on_request",
+          "requiresQuote": false,
+          "automaticPricingAllowed": false,
+          "currency": "CAD",
+          "rate": null,
+          "rateUnit": "in2",
+          "rateCents": null,
+          "areaSqIn": null,
+          "unitAmount": null,
+          "unitCents": null,
+          "quantity": 4,
+          "lineAmount": null,
+          "lineCents": null,
+          "basis": "projected_outer_area_including_lips",
+          "tariffId": null,
+          "taxIncluded": null,
+          "taxStatus": "not_calculated",
+          "shippingStatus": "not_calculated",
+          "label": "Prix sur demande",
+          "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+          "sourceKind": "user_instruction",
+          "geometryErrors": [],
+          "quotePolicy": {
+            "version": "mir-color-quote-1",
+            "required": false,
+            "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+            "automaticPricingAllowed": false,
+            "customColor": false,
+            "label": "Prix sur demande",
+            "selectionType": "manufacturer",
+            "status": "price_unconfigured"
+          }
+        }
+      },
+      "geometry": [
+        [
+          "M 60 103 L 1340 103",
+          "M 396.00 609.00 L 508.00 609.00 L 508.00 525.00 L 396.00 525.00 Z",
+          "M 875 393 L 1325 393",
+          "M 62 918 L 1338 918"
+        ],
+        [
+          "M 60 103 L 1340 103",
+          "M 213.00 592.88 L 562.00 592.88 L 562.00 331.13 L 213.00 331.13 Z",
+          "M 220.27 585.60 L 554.73 585.60 L 554.73 338.40 L 220.27 338.40 Z",
+          "M 213 598.875 L 213 666.875",
+          "M 562 598.875 L 562 666.875",
+          "M 213 658.875 L 562 658.875",
+          "M 215 658.875 l 12,-6 v 12 z M 560 658.875 l -12,-6 v 12 z",
+          "M 568 331.125 L 693 331.125",
+          "M 568 592.875 L 693 592.875",
+          "M 685 331.125 L 685 592.875",
+          "M 685 333.125 l -6,12 h 12 z M 685 590.875 l -6,-12 h 12 z",
+          "M 387.5 592.875 L 387.5 607.875",
+          "M 213 592.875 L 562 592.875",
+          "M 562 462 L 577 462",
+          "M 387.5 331.125 L 387.5 316.125",
+          "M 213 462 L 198 462",
+          "M 830 421 L 1311 421",
+          "M 831 497 L 1312 497",
+          "M 832 541 L 1312 541",
+          "M 832 586 L 1312 586",
+          "M 832 631 L 1312 631",
+          "M 832 676 L 1312 676",
+          "M 62 918 L 1338 918"
+        ]
+      ],
+      "model": [
+        {
+          "id": "QA-HEM",
+          "quantity": 2,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                50.8,
+                -38.1
+              ],
+              "headingDeg": -90
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                -38.1
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": -270
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 31.75,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                19.05,
+                0
+              ],
+              "headingDeg": -180
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": -90,
+              "turnDeg": -90,
+              "label": "Rotation -90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right",
+              "turnDeg": -180,
+              "label": "Retour écrasé 180° · droite",
+              "at": [
+                50.8,
+                -38.1
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "signed",
+              "angle": 90,
+              "turnDeg": 90,
+              "label": "Rotation 90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        },
+        {
+          "id": "QA-ANGLES",
+          "quantity": 3,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 114.3,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                114.3,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 44.449999999999996,
+              "start": [
+                114.3,
+                0
+              ],
+              "end": [
+                111.1993247421,
+                44.341722034
+              ],
+              "headingDeg": 94
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 53.974999999999994,
+              "start": [
+                111.1993247421,
+                44.341722034
+              ],
+              "end": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "headingDeg": 6
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "end": [
+                160.8961095941,
+                87.8749300524
+              ],
+              "headingDeg": 96
+            }
+          ],
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 86,
+              "direction": "left",
+              "turnDeg": 94,
+              "label": "86° intérieur · gauche",
+              "at": [
+                114.3,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "interior",
+              "angle": 92,
+              "direction": "right",
+              "turnDeg": -88,
+              "label": "92° intérieur · droite",
+              "at": [
+                111.1993247421,
+                44.341722034
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left",
+              "turnDeg": 90,
+              "label": "90° intérieur · gauche",
+              "at": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "name": "panel-long",
+        "client": true,
+        "lang": "en-CA"
+      },
+      "filename": "panel-long-en-CA.pdf",
+      "pages": [
+        {
+          "page": 1,
+          "text": "",
+          "bounds": [],
+          "paper": [
+            1190.551,
+            841.89
+          ]
+        },
+        {
+          "page": 2,
+          "text": "",
+          "bounds": [],
+          "paper": [
+            1190.551,
+            841.89
+          ]
+        }
+      ],
+      "clipped": [],
+      "inputUnchanged": true,
+      "canvasText": [
+        {
+          "text": "MIR",
+          "x": 85,
+          "y": 100,
+          "width": 108.1474609375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "MIR — Panel order",
+          "x": 250,
+          "y": 78,
+          "width": 290.9921875,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparation des pièces sur mesure FIN-PROJET-QA",
+          "x": 250,
+          "y": 115,
+          "width": 2866.8984375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Nov 17, 2026",
+          "x": 2747.23046875,
+          "y": 78,
+          "width": 142.76953125,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Order summary QA-PANELS-001",
+          "x": 85,
+          "y": 220,
+          "width": 606.1376953125,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Summary, wall and references. Supplier and workshop approval required.",
+          "x": 103,
+          "y": 1893,
+          "width": 812.451171875,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Print scale varies. Use project dimensions and calibration for measurements.",
+          "x": 85,
+          "y": 2015,
+          "width": 747.1083984375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Working document — verify selections, dimensions and installation details before fabrication.",
+          "x": 85,
+          "y": 2050,
+          "width": 820.048828125,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "MIR / 01",
+          "x": 2814.423828125,
+          "y": 2035,
+          "width": 75.576171875,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "MIR",
+          "x": 85,
+          "y": 100,
+          "width": 108.1474609375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "MIR — Panel order",
+          "x": 250,
+          "y": 78,
+          "width": 290.9921875,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparation des pièces sur mesure FIN-PROJET-QA",
+          "x": 250,
+          "y": 115,
+          "width": 2866.8984375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Nov 17, 2026",
+          "x": 2747.23046875,
+          "y": 78,
+          "width": 142.76953125,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Panel QA-P1",
+          "x": 85,
+          "y": 220,
+          "width": 234.076171875,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Panel QA-P1 • 1 drawing • quantity 4 • fabrication to confirm.",
+          "x": 103,
+          "y": 1893,
+          "width": 669.64111328125,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Print scale varies. Use project dimensions and calibration for measurements.",
+          "x": 85,
+          "y": 2015,
+          "width": 747.1083984375,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "Working document — verify selections, dimensions and installation details before fabrication.",
+          "x": 85,
+          "y": 2050,
+          "width": 820.048828125,
+          "paper": [
+            2976,
+            2105
+          ]
+        },
+        {
+          "text": "MIR / 02",
+          "x": 2814.423828125,
+          "y": 2035,
+          "width": 75.576171875,
+          "paper": [
+            2976,
+            2105
+          ]
+        }
+      ],
+      "panelModel": {
+        "version": "1.0.0",
+        "kind": "panel",
+        "id": "",
+        "name": "Panneau QA",
+        "spec": {
+          "kind": "panel",
+          "shape": "rectangle",
+          "name": "Panneau QA",
+          "unit": "in",
+          "width": 48,
+          "height": 36,
+          "relief": 1,
+          "lip": 1,
+          "bottomEdgeId": "bottom",
+          "quantity": 4,
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "thickness": 2,
+            "thicknessUnit": "mm"
+          },
+          "finish": {
+            "manufacturer": "Unico",
+            "name": "Teinte officielle complexe QA Teinte officielle complexe QA FIN-COULEUR-QA",
+            "code": "QC-QA-123"
+          },
+          "perforation": {
+            "enabled": true,
+            "edgeId": "bottom",
+            "details": "Perforation fictive confirmée sur le bas. FIN-PERFORATION-QA"
+          }
+        },
+        "shape": "rectangle",
+        "unit": "in",
+        "mirrorX": false,
+        "dimensionBasis": null,
+        "widthMM": 1219.1999999999998,
+        "heightMM": 914.4,
+        "reliefMM": 25.4,
+        "parameters": {},
+        "interpretation": "",
+        "pointsMM": [
+          [
+            0,
+            0
+          ],
+          [
+            1219.2,
+            0
+          ],
+          [
+            1219.2,
+            914.4
+          ],
+          [
+            0,
+            914.4
+          ]
+        ],
+        "edges": [
+          {
+            "id": "bottom",
+            "name": "Bas",
+            "start": [
+              0,
+              0
+            ],
+            "end": [
+              1219.1999999999998,
+              0
+            ],
+            "lengthMM": 1219.1999999999998,
+            "headingDeg": 0,
+            "interiorAngleDeg": 90,
+            "lipMM": 25.4
+          },
+          {
+            "id": "right",
+            "name": "Droite",
+            "start": [
+              1219.1999999999998,
+              0
+            ],
+            "end": [
+              1219.1999999999998,
+              914.4
+            ],
+            "lengthMM": 914.4,
+            "headingDeg": 90,
+            "interiorAngleDeg": 90,
+            "lipMM": 25.4
+          },
+          {
+            "id": "top",
+            "name": "Haut",
+            "start": [
+              1219.1999999999998,
+              914.4
+            ],
+            "end": [
+              0,
+              914.4
+            ],
+            "lengthMM": 1219.1999999999998,
+            "headingDeg": 180,
+            "interiorAngleDeg": 90,
+            "lipMM": 25.4
+          },
+          {
+            "id": "left",
+            "name": "Gauche",
+            "start": [
+              0,
+              914.4
+            ],
+            "end": [
+              0,
+              0
+            ],
+            "lengthMM": 914.4,
+            "headingDeg": -90,
+            "interiorAngleDeg": 90,
+            "lipMM": 25.4
+          }
+        ],
+        "bbox": {
+          "minX": 0,
+          "maxX": 1219.1999999999998,
+          "minY": 0,
+          "maxY": 914.4
+        },
+        "areaMM2": 1114836.4799999997,
+        "bottomEdgeId": "bottom",
+        "perforation": {
+          "enabled": true,
+          "edgeId": "bottom",
+          "details": "Perforation fictive confirmée sur le bas. FIN-PERFORATION-QA"
+        },
+        "quantity": 4,
+        "material": {
+          "type": "aluminium",
+          "name": "Aluminium QA",
+          "productRef": null,
+          "gauge": "",
+          "thicknessMM": 2
+        },
+        "finish": {
+          "manufacturer": "Unico",
+          "name": "Teinte officielle complexe QA Teinte officielle complexe QA FIN-COULEUR-QA",
+          "code": "QC-QA-123",
+          "system": "",
+          "selectionType": null,
+          "special": false,
+          "hex": null
+        },
+        "quotePolicy": {
+          "version": "mir-color-quote-1",
+          "required": false,
+          "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+          "automaticPricingAllowed": false,
+          "customColor": false,
+          "label": "Prix sur demande",
+          "selectionType": "manufacturer",
+          "status": "price_unconfigured"
+        },
+        "lengthMM": null,
+        "location": "",
+        "note": "",
+        "developedWidthMM": null,
+        "developedWidth": null,
+        "developmentStatus": "requires_workshop_bend_parameters",
+        "validation": {
+          "valid": true,
+          "geometryComplete": true,
+          "specificationComplete": true,
+          "productionReady": true,
+          "errors": [],
+          "pending": [],
+          "warnings": [],
+          "workshopValidationRequired": true
+        },
+        "valid": true,
+        "complete": true,
+        "productionReady": true,
+        "pricing": {
+          "schema": "mir-piece-pricing-1",
+          "status": "on_request",
+          "requiresQuote": false,
+          "automaticPricingAllowed": false,
+          "currency": "CAD",
+          "rate": null,
+          "rateUnit": "in2",
+          "rateCents": null,
+          "areaSqIn": null,
+          "unitAmount": null,
+          "unitCents": null,
+          "quantity": 4,
+          "lineAmount": null,
+          "lineCents": null,
+          "basis": "projected_outer_area_including_lips",
+          "tariffId": null,
+          "taxIncluded": null,
+          "taxStatus": "not_calculated",
+          "shippingStatus": "not_calculated",
+          "label": "Prix sur demande",
+          "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+          "sourceKind": "user_instruction",
+          "geometryErrors": [],
+          "quotePolicy": {
+            "version": "mir-color-quote-1",
+            "required": false,
+            "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+            "automaticPricingAllowed": false,
+            "customColor": false,
+            "label": "Prix sur demande",
+            "selectionType": "manufacturer",
+            "status": "price_unconfigured"
+          }
+        }
+      },
+      "geometry": [
+        [
+          "M 60 103 L 1340 103",
+          "M 396.00 609.00 L 508.00 609.00 L 508.00 525.00 L 396.00 525.00 Z",
+          "M 875 393 L 1325 393",
+          "M 62 918 L 1338 918"
+        ],
+        [
+          "M 60 103 L 1340 103",
+          "M 213.00 592.88 L 562.00 592.88 L 562.00 331.13 L 213.00 331.13 Z",
+          "M 220.27 585.60 L 554.73 585.60 L 554.73 338.40 L 220.27 338.40 Z",
+          "M 213 598.875 L 213 666.875",
+          "M 562 598.875 L 562 666.875",
+          "M 213 658.875 L 562 658.875",
+          "M 215 658.875 l 12,-6 v 12 z M 560 658.875 l -12,-6 v 12 z",
+          "M 568 331.125 L 693 331.125",
+          "M 568 592.875 L 693 592.875",
+          "M 685 331.125 L 685 592.875",
+          "M 685 333.125 l -6,12 h 12 z M 685 590.875 l -6,-12 h 12 z",
+          "M 387.5 592.875 L 387.5 607.875",
+          "M 213 592.875 L 562 592.875",
+          "M 562 462 L 577 462",
+          "M 387.5 331.125 L 387.5 316.125",
+          "M 213 462 L 198 462",
+          "M 830 421 L 1311 421",
+          "M 831 497 L 1312 497",
+          "M 832 541 L 1312 541",
+          "M 832 586 L 1312 586",
+          "M 832 631 L 1312 631",
+          "M 832 676 L 1312 676",
+          "M 62 918 L 1338 918"
+        ]
+      ],
+      "model": [
+        {
+          "id": "QA-HEM",
+          "quantity": 2,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                50.8,
+                -38.1
+              ],
+              "headingDeg": -90
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                -38.1
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": -270
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 31.75,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                19.05,
+                0
+              ],
+              "headingDeg": -180
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": -90,
+              "turnDeg": -90,
+              "label": "Rotation -90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right",
+              "turnDeg": -180,
+              "label": "Retour écrasé 180° · droite",
+              "at": [
+                50.8,
+                -38.1
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "signed",
+              "angle": 90,
+              "turnDeg": 90,
+              "label": "Rotation 90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        },
+        {
+          "id": "QA-ANGLES",
+          "quantity": 3,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 114.3,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                114.3,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 44.449999999999996,
+              "start": [
+                114.3,
+                0
+              ],
+              "end": [
+                111.1993247421,
+                44.341722034
+              ],
+              "headingDeg": 94
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 53.974999999999994,
+              "start": [
+                111.1993247421,
+                44.341722034
+              ],
+              "end": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "headingDeg": 6
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "end": [
+                160.8961095941,
+                87.8749300524
+              ],
+              "headingDeg": 96
+            }
+          ],
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 86,
+              "direction": "left",
+              "turnDeg": 94,
+              "label": "86° intérieur · gauche",
+              "at": [
+                114.3,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "interior",
+              "angle": 92,
+              "direction": "right",
+              "turnDeg": -88,
+              "label": "92° intérieur · droite",
+              "at": [
+                111.1993247421,
+                44.341722034
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left",
+              "turnDeg": 90,
+              "label": "90° intérieur · gauche",
+              "at": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        }
+      ]
+    }
+  ],
+  "blocked": [
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    }
+  ],
+  "pageerrors": []
+}

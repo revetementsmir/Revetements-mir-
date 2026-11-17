@@ -1,0 +1,222 @@
+{
+  "baseline": "3573d90",
+  "environment": "Local Chromium emulation, not physical-device certification",
+  "externalRequestsAllowed": false,
+  "nonGetRequestsAllowed": false,
+  "submissionClicked": false,
+  "journeys": [
+    {
+      "width": 1440,
+      "height": 1050,
+      "channels": [
+        "client",
+        "employee"
+      ],
+      "result": "PASS",
+      "evidence": "journey-final.log: PASS journey 1440",
+      "finalDialogCssVerifiedBy": "dialog-audit.json",
+      "hemEvidence": [
+        "hem-client-1440.json",
+        "hem-employee-1440.json"
+      ]
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "channels": [
+        "client",
+        "employee"
+      ],
+      "result": "PASS",
+      "evidence": "journey-final.log: PASS journey 834",
+      "finalDialogCssVerifiedBy": "dialog-audit.json",
+      "hemEvidence": [
+        "hem-client-834.json",
+        "hem-employee-834.json"
+      ]
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "channels": [
+        "client",
+        "employee"
+      ],
+      "result": "PASS after final dialog CSS",
+      "evidence": "journey-mobile-final.log: PASS journey 390",
+      "hemEvidence": [
+        "hem-client-390.json",
+        "hem-employee-390.json"
+      ],
+      "audit": {
+        "width": 390,
+        "height": 844,
+        "quick": "explicit choices, fractions, unit conversion, profile/reload/back preservation, quota failure",
+        "contexts": [
+          {
+            "scope": "client",
+            "quantity": 2,
+            "material": "aluminium",
+            "colour": "30",
+            "destination": "selection.html",
+            "cartLines": 1,
+            "fixtureCalls": []
+          },
+          {
+            "scope": "employee",
+            "quantity": 2,
+            "material": "aluminium",
+            "colour": "30",
+            "destination": "chantier.html?view=orders",
+            "cartLines": 1,
+            "fixtureCalls": [
+              [
+                "dossier",
+                "00000000-0000-4000-8000-000000000353"
+              ],
+              [
+                "dossier",
+                "00000000-0000-4000-8000-000000000454"
+              ]
+            ]
+          }
+        ],
+        "errors": [],
+        "blocked": [
+          {
+            "method": "GET",
+            "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+          },
+          {
+            "method": "GET",
+            "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+          },
+          {
+            "method": "GET",
+            "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+          },
+          {
+            "method": "POST",
+            "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+          },
+          {
+            "method": "GET",
+            "url": "https://geocoding-api.open-meteo.com/v1/search?name=Qu%C3%A9bec&count=10&language=fr&countryCode=CA"
+          }
+        ]
+      }
+    }
+  ],
+  "finalDialogChecks": [
+    {
+      "width": 1440,
+      "height": 1050,
+      "rect": {
+        "x": 395,
+        "y": 360.265625,
+        "width": 650,
+        "height": 329.46875
+      },
+      "reachable": {
+        "hit": true,
+        "inside": true,
+        "focused": true,
+        "dialogScroll": 0
+      },
+      "cartReached": true,
+      "errors": []
+    },
+    {
+      "width": 834,
+      "height": 1112,
+      "rect": {
+        "x": 92,
+        "y": 357.265625,
+        "width": 650,
+        "height": 329.46875
+      },
+      "reachable": {
+        "hit": true,
+        "inside": true,
+        "focused": true,
+        "dialogScroll": 0
+      },
+      "cartReached": true,
+      "errors": []
+    },
+    {
+      "width": 360,
+      "height": 780,
+      "rect": {
+        "x": 12,
+        "y": 198.953125,
+        "width": 336,
+        "height": 314.09375
+      },
+      "reachable": {
+        "hit": true,
+        "inside": true,
+        "focused": true,
+        "dialogScroll": 0
+      },
+      "cartReached": true,
+      "errors": []
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "rect": {
+        "x": 97,
+        "y": 18,
+        "width": 650,
+        "height": 286
+      },
+      "reachable": {
+        "hit": true,
+        "inside": true,
+        "focused": true,
+        "dialogScroll": 15
+      },
+      "cartReached": true,
+      "errors": []
+    },
+    {
+      "width": 780,
+      "height": 360,
+      "rect": {
+        "x": 65,
+        "y": 18,
+        "width": 650,
+        "height": 256
+      },
+      "reachable": {
+        "hit": true,
+        "inside": true,
+        "focused": true,
+        "dialogScroll": 45
+      },
+      "cartReached": true,
+      "errors": []
+    }
+  ],
+  "legacyFieldRefresh": {
+    "result": "PASS",
+    "checks": 12,
+    "roles": 2,
+    "evidence": "regression-field-refresh.log"
+  },
+  "legacyClient": {
+    "result": "NOT a full PASS",
+    "limits": [
+      "Exact first-paint position assertions fail identically before changes; 0.90625px at 360 and 1.203125px at 428.",
+      "Functional copy reaches obsolete one-screen assertion at 360x780; vertical scrolling remains allowed. Original tests are unchanged."
+    ],
+    "evidence": [
+      "regression-baseline-first-paint.log",
+      "regression-baseline-first-paint-428.log",
+      "regression-baseline-choice-360.log",
+      "regression-client-current-shell.log"
+    ]
+  },
+  "note": "Per-width PASS lines and structured proofs are authoritative. The older generic three-sizes footer in the filtered mobile log is not used to infer other viewport results."
+}

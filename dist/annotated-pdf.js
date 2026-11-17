@@ -97,32 +97,34 @@
       for(let i=0;i<Math.max(1,lines.length);i+=chunkSize)chunks.push(lines.slice(i,i+chunkSize));
       for(let part=0;part<chunks.length;part++){
         pageNumber++;ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle='#26322c';ctx.font='bold 59px Arial';ctx.fillText('MIR',85,100);
-        ctx.fillStyle='#51a93f';ctx.fillRect(215,54,7,52);
-        ctx.fillStyle='#26322c';ctx.font='34px Arial';ctx.fillText(title,250,78);
-        ctx.fillStyle='#647166';ctx.font='24px Arial';ctx.fillText(subtitle,250,115);
+        ctx.fillStyle='#242522';ctx.font='bold 59px Arial';ctx.fillText('MIR',85,100);
+        ctx.fillStyle='#bda889';ctx.fillRect(215,54,7,52);
+        ctx.fillStyle='#242522';ctx.font='34px Arial';const titleRows=wrap(ctx,title,2200);titleRows.forEach((value,i)=>ctx.fillText(value,250,78+i*39));
+        ctx.fillStyle='#625e55';ctx.font='24px Arial';const subtitleRows=wrap(ctx,subtitle,2640),subtitleY=115+(titleRows.length-1)*39;subtitleRows.forEach((value,i)=>ctx.fillText(value,250,subtitleY+i*29));
+        const dividerY=Math.max(155,subtitleY+(subtitleRows.length-1)*29+34);
         ctx.textAlign='right';ctx.fillText(new Intl.DateTimeFormat(clientEN()?'en-CA':'fr-CA',{year:'numeric',month:'short',day:'numeric'}).format(new Date()),2890,78);ctx.textAlign='left';
-        ctx.strokeStyle='#d5ddd6';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(85,155);ctx.lineTo(2890,155);ctx.stroke();
-        ctx.fillStyle='#1e2c23';ctx.font='bold 39px Arial';ctx.fillText((known(face.name||tr('Élévation','Elevation'))+(part?tr(' — suite',' — continued'):'')),85,220);
+        ctx.strokeStyle='#d8cdbc';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(85,dividerY);ctx.lineTo(2890,dividerY);ctx.stroke();
+        ctx.fillStyle='#242522';ctx.font='bold 39px Arial';const faceRows=wrap(ctx,known(face.name||tr('Élévation','Elevation'))+(part?tr(' — suite, quantité déjà comptée',' — continued, quantity already counted'):''),wide?2805:2040);faceRows.forEach((value,i)=>ctx.fillText(value,85,dividerY+65+i*45));
+        const drawingTop=dividerY+120+(faceRows.length-1)*45;
         const summaryHeight=wide&&chunks[part].length?chunks[part].length*34+30:0;
-        const area=wide?{x:85,y:275,w:2805,h:1640-summaryHeight}:{x:85,y:275,w:2040,h:1605};
+        const area=wide?{x:85,y:drawingTop,w:2805,h:1915-drawingTop-summaryHeight}:{x:85,y:drawingTop,w:2040,h:1880-drawingTop};
         const iw=Math.min(area.w,area.h*drawing.ratio),ih=iw/drawing.ratio;
-        ctx.drawImage(drawing.image,area.x+(area.w-iw)/2,area.y+(area.h-ih)/2,iw,ih);
+        if(!wide||part===0)ctx.drawImage(drawing.image,area.x+(area.w-iw)/2,area.y+(area.h-ih)/2,iw,ih);
         if(wide){
           if(chunks[part].length){
-            const top=area.y+area.h+14;ctx.fillStyle='#f4f6f2';ctx.fillRect(85,top,2805,summaryHeight-10);
+            const top=part?drawingTop:area.y+area.h+14;ctx.fillStyle='#f4f1ea';ctx.fillRect(85,top,2805,summaryHeight-10);
             ctx.font='25px Arial';let y=top+28;
-            for(const line of chunks[part]){ctx.fillStyle='#405744';ctx.fillText(line.text,103,y);y+=34;}
+            for(const line of chunks[part]){ctx.fillStyle='#625e55';ctx.fillText(line.text,103,y);y+=34;}
           }
         }else{
-          ctx.fillStyle='#f4f6f2';ctx.fillRect(2195,195,695,1730);
-          ctx.fillStyle='#26322c';ctx.font='bold 26px Arial';ctx.fillText(known(face.sidebarTitle||tr('REPÈRES ET QUANTITÉS','REFERENCES AND QUANTITIES')),2225,250);
+          ctx.fillStyle='#f4f1ea';ctx.fillRect(2195,195,695,1730);
+          ctx.fillStyle='#242522';ctx.font='bold 26px Arial';ctx.fillText(known(face.sidebarTitle||tr('REPÈRES ET QUANTITÉS','REFERENCES AND QUANTITIES')),2225,250);
           ctx.font='25px Arial';let y=310;
-          for(const line of chunks[part]){if(line.color&&/^#[0-9a-f]{3,8}$/i.test(line.color)){ctx.strokeStyle=line.color;ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(2225,y-8);ctx.lineTo(2265,y-8);ctx.stroke();ctx.fillStyle='#26322c';ctx.fillText(line.text,2280,y);}else{ctx.fillStyle='#26322c';ctx.fillText(line.text,2225,y);}y+=36;}
-          if(!lines.length){ctx.fillStyle='#667267';ctx.fillText(tr('Choix et annotations du projet.','Project selections and annotations.'),2225,310);}
+          for(const line of chunks[part]){if(line.color&&/^#[0-9a-f]{3,8}$/i.test(line.color)){ctx.strokeStyle=line.color;ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(2225,y-8);ctx.lineTo(2265,y-8);ctx.stroke();ctx.fillStyle='#242522';ctx.fillText(line.text,2280,y);}else{ctx.fillStyle='#242522';ctx.fillText(line.text,2225,y);}y+=36;}
+          if(!lines.length){ctx.fillStyle='#625e55';ctx.fillText(tr('Choix et annotations du projet.','Project selections and annotations.'),2225,310);}
         }
-        ctx.strokeStyle='#d5ddd6';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(85,1970);ctx.lineTo(2890,1970);ctx.stroke();
-        ctx.font='22px Arial';ctx.fillStyle='#5e6c61';ctx.fillText(known(face.scaleNote||tr('Échelle d’impression variable. Utiliser les cotes et la calibration du projet pour les mesures.','Print scale varies. Use project dimensions and calibration for measurements.')),85,2015);
+        ctx.strokeStyle='#d8cdbc';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(85,1970);ctx.lineTo(2890,1970);ctx.stroke();
+        ctx.font='22px Arial';ctx.fillStyle='#625e55';ctx.fillText(known(face.scaleNote||tr('Échelle d’impression variable. Utiliser les cotes et la calibration du projet pour les mesures.','Print scale varies. Use project dimensions and calibration for measurements.')),85,2015);
         ctx.font='20px Arial';ctx.fillText(known(face.footerNote||tr('Document de travail — choix, dimensions et détails de pose à vérifier avant fabrication.','Working document — verify selections, dimensions and installation details before fabrication.')),85,2050);
         ctx.textAlign='right';ctx.fillText(`MIR / ${String(pageNumber).padStart(2,'0')}`,2890,2035);ctx.textAlign='left';
         onProgress(tr('Création de la page ','Creating page ')+pageNumber+'…');

@@ -1,0 +1,122 @@
+{
+  "cases": [
+    {
+      "width": 1440,
+      "topic": "geometry",
+      "captures": 6,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "topic": "journey",
+      "captures": 29,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "topic": "samples",
+      "captures": 13,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "topic": "pdf",
+      "captures": 26,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "topic": "mobile-navigation",
+      "bendingActive": true
+    },
+    {
+      "width": 834,
+      "topic": "geometry",
+      "captures": 6,
+      "overflow": false
+    },
+    {
+      "width": 834,
+      "topic": "journey",
+      "captures": 26,
+      "overflow": false
+    },
+    {
+      "width": 834,
+      "topic": "samples",
+      "captures": 13,
+      "overflow": false
+    },
+    {
+      "width": 834,
+      "topic": "pdf",
+      "captures": 26,
+      "overflow": false
+    },
+    {
+      "width": 834,
+      "topic": "mobile-navigation",
+      "bendingActive": true
+    },
+    {
+      "width": 390,
+      "topic": "geometry",
+      "captures": 6,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "topic": "journey",
+      "captures": 26,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "topic": "samples",
+      "captures": 13,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "topic": "pdf",
+      "captures": 26,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "topic": "mobile-navigation",
+      "bendingActive": true
+    }
+  ],
+  "externalTransmitted": 0,
+  "realSubmissions": 0,
+  "errors": [],
+  "physicalDevices": false,
+  "pdfs": 10,
+  "passed": true,
+  "files": {
+    "production-app.js": "f977fe5f57708fdf7b7cd6f26d8b92e1ac12b8968f28124f88803890be47a318",
+    "production-model.js": "ae3d15fe991cca10d4cf92457a95b21d3be879b9225c5bcd33b603aa32cc77fe",
+    "mir-profile-recognition.js": "98f9ecc343eeb901c8b0b1a20e0fe8e77895ba383704a585d35760881469deda",
+    "pliage.js": "2ea4cd20afe32763e9517a5bb461aedea34157e4a89a5a84f4276ba0374fdac9",
+    "mir-client-siding-previews.js": "fd097428e053def217a24559eed4910841fe387b420544a320bda4852b4aca0d",
+    "mir-store-siding-previews.js": "6014010845a12a23fc6e9d4a4492df931fe0a9b0b43bcda839a61e37c8f9c415",
+    "material-preview.js": "def40cbfdd80fdabd49d3896352e35191ec3f1c701a12fef9bc9943dc02ca3e7",
+    "commerce.js": "3fc8445eec325583486d9c2a4a3b06a0d286067d4c2fc3b43f7926d5d26c9c0e",
+    "chantier-app.js": "9711fd008ad8db9196d6e6e5bd20babaefc50767c07ca0e870176ac67a6cb830",
+    "magasin-revue.js": "a7ea414d19d0baa51e0e635b56b63b8ad3be944d769cb7e6a8521bf42e7a8f28",
+    "mir-client-en-ca.js": "d076da3e9a27b430275dba9d969f07853f555bf24178c36da686169a30487afa",
+    "mir-dossier-pdf.js": "5060ecb6432239db132629686ce4e1c281023c003f912edb8009a9e2a1643503",
+    "mir-selection-pdf.js": "ea7366db440853a1a56d283e9119f6e154769662492b2c70540030e82601924c",
+    "annotated-pdf.js": "de0a3f7ebcd6971e735d7258ba6137cba425ee84fa033474af842cc357a52a38",
+    "mir-panel-po-pdf.js": "380b90ee029d88516736f0f1a07cf82591b83f16c49ca34ce175dc5da4f27e5d",
+    "production.html": "70d564f48b5e81976c7ab07453c1df2a171f00826026fca38b923edf56eb18f4",
+    "mir-pliage-journey.css": "2b989f465216647b2dcb52c709c9251820a91353b14d6e46e577d7842e2e0548",
+    "pliage.html": "d714310a7a6378f2f8e3dce753a254c87f10d7d25bfe4263bde7c0aa82d4606b",
+    "mir-client-pliage-viewport.js": "b779840768d194c21d55155beadd920580ccd82055c67285ed592416d4b56ef3",
+    "mir-client-pliage.css": "dfb4636195ae3a83991619eadb63215358e88e689ee4ed53e33b921d1b623677",
+    "magasin-revue.html": "d30383d468792cb5c615b6cae7608f970934347b63c85ed92076f25b626e0b7f",
+    "chantier.html": "4325fd1fa33cd2dde65cba23d8e17cf5eae5a6764a0cc4749b1645bae179ea89",
+    "mir-prestige.js": "6bd4f74307cd713a9be56c0d49cde40517c03b94dc28334f2a55e85faba0aa3c"
+  }
+}

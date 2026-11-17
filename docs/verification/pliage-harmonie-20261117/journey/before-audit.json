@@ -1,0 +1,86 @@
+[
+  {
+    "width": 1440,
+    "height": 1050,
+    "baseline": "3573d90",
+    "quick": {
+      "quantity": "1",
+      "material": "royal-alumipro-coil-132419",
+      "colour": "Noir · 30",
+      "enabled": true
+    },
+    "wizard": {
+      "quantity": "",
+      "material": "",
+      "enabled": false,
+      "status": "Choisissez un matériau."
+    },
+    "errors": [],
+    "fixtureCalls": [
+      [
+        "dossier",
+        "00000000-0000-4000-8000-000000000353"
+      ],
+      [
+        "dossier",
+        "00000000-0000-4000-8000-000000000454"
+      ]
+    ]
+  },
+  {
+    "width": 834,
+    "height": 1112,
+    "baseline": "3573d90",
+    "quick": {
+      "quantity": "1",
+      "material": "royal-alumipro-coil-132419",
+      "colour": "Noir · 30",
+      "enabled": true
+    },
+    "wizard": {
+      "quantity": "",
+      "material": "",
+      "enabled": false,
+      "status": "Choisissez un matériau."
+    },
+    "errors": [],
+    "fixtureCalls": [
+      [
+        "dossier",
+        "00000000-0000-4000-8000-000000000353"
+      ],
+      [
+        "dossier",
+        "00000000-0000-4000-8000-000000000454"
+      ]
+    ]
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "baseline": "3573d90",
+    "quick": {
+      "quantity": "1",
+      "material": "royal-alumipro-coil-132419",
+      "colour": "Noir · 30",
+      "enabled": true
+    },
+    "wizard": {
+      "quantity": "",
+      "material": "",
+      "enabled": false,
+      "status": "Choisissez un matériau."
+    },
+    "errors": [],
+    "fixtureCalls": [
+      [
+        "dossier",
+        "00000000-0000-4000-8000-000000000353"
+      ],
+      [
+        "dossier",
+        "00000000-0000-4000-8000-000000000454"
+      ]
+    ]
+  }
+]

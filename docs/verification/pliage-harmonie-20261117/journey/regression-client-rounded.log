@@ -1,0 +1,12 @@
+PASS démarrage sans écran atelier 360×780 tactile
+PASS démarrage sans écran atelier 390×844 tactile
+AssertionError [ERR_ASSERTION]: heading y remains within 1 CSS pixel; baseline 3573d90 shifts 0.90625px
+    at verifyFirstPaint (/tmp/safe-mir-client-pliage-rounded-browser.cjs:51:73)
+    at async /tmp/safe-mir-client-pliage-rounded-browser.cjs:70:4 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

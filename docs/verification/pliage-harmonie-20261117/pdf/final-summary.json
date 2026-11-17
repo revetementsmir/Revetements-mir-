@@ -1,0 +1,26 @@
+{
+  "revision": "3573d90f064e95459c18a8b6ba8a4462bfaa1dc0",
+  "cases": 8,
+  "pages": 24,
+  "checks": 60,
+  "failures": [],
+  "pageErrors": [],
+  "hashes": {
+    "mir-selection-pdf.js": "ea7366db440853a1a56d283e9119f6e154769662492b2c70540030e82601924c",
+    "mir-dossier-pdf.js": "5060ecb6432239db132629686ce4e1c281023c003f912edb8009a9e2a1643503",
+    "mir-panel-po-pdf.js": "380b90ee029d88516736f0f1a07cf82591b83f16c49ca34ce175dc5da4f27e5d",
+    "annotated-pdf.js": "de0a3f7ebcd6971e735d7258ba6137cba425ee84fa033474af842cc357a52a38",
+    "production-model.js": "ae3d15fe991cca10d4cf92457a95b21d3be879b9225c5bcd33b603aa32cc77fe",
+    "mir-client-i18n.js": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+  },
+  "hashesStillMatch": {
+    "mir-selection-pdf.js": true,
+    "mir-dossier-pdf.js": true,
+    "mir-panel-po-pdf.js": true,
+    "annotated-pdf.js": true,
+    "production-model.js": true,
+    "mir-client-i18n.js": true
+  },
+  "staffSourceSvgsByteIdentical": true,
+  "readme": "README.md"
+}

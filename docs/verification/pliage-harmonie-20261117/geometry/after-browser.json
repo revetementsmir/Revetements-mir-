@@ -1,0 +1,4992 @@
+{
+  "phase": "after",
+  "capturedAt": "2026-11-17T16:22:29.936Z",
+  "viewportCaptures": true,
+  "physicalDevices": false,
+  "results": [
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "short-first-return",
+      "hemPrompt": true,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ]
+      ],
+      "bends": [],
+      "segments": [],
+      "valid": false,
+      "recognition": {
+        "code": "incomplete",
+        "label": "Tracé en cours",
+        "suggestedName": "Moulure dessinée",
+        "sides": 0,
+        "certainty": "none"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          174.5315367264149,
+          91.9815367264149
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 45,
+          "turnDeg": 45,
+          "label": "Rotation 45°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.19999999999999,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            104.6815367264,
+            53.8815367264
+          ],
+          "headingDeg": 45
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.149999999999984
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 0,
+      "targetHeading": 24.343823112742133,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62535389276026,
+          31.37993611653455
+        ],
+        [
+          91.76699570159495,
+          41.85010394668866
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 1,
+      "targetHeading": 69.34382311274213,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62535389276026,
+          31.37993611653455
+        ],
+        [
+          77.58543907071419,
+          55.147074640214896
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 2,
+      "targetHeading": 103.76153398785347,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67935188286026,
+          54.38806023977764
+        ],
+        [
+          54.63716369909603,
+          79.05893298380475
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 3,
+      "targetHeading": 148.76153398785345,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67935188286026,
+          54.38806023977764
+        ],
+        [
+          38.9619382298234,
+          67.56052941692465
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 4,
+      "targetHeading": 188.6594442506198,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.57003525681537,
+          45.62581034528505
+        ],
+        [
+          15.45957731625521,
+          41.801558521024646
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 5,
+      "targetHeading": 233.6594442506198,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.57003525681537,
+          45.62581034528505
+        ],
+        [
+          25.518414566245262,
+          25.16588085891581
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 6,
+      "targetHeading": -68.73510625390162,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.688138929652034,
+          26.47421502016053
+        ],
+        [
+          54.90021846672129,
+          2.8036089737849963
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 7,
+      "targetHeading": -23.73510625390162,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.688138929652034,
+          26.47421502016053
+        ],
+        [
+          68.93970888933097,
+          16.250492879464602
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 0,
+      "targetHeading": 20.907467027924096,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.08733957470076,
+          53.131428090256826
+        ],
+        [
+          147.67875841401957,
+          66.72778440377637
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 1,
+      "targetHeading": 65.9074670279241,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.08733957470076,
+          53.131428090256826
+        ],
+        [
+          127.64019743931553,
+          87.91243745230798
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 2,
+      "targetHeading": 111.02367344972625,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.80190301192681,
+          92.51040155997214
+        ],
+        [
+          88.89999999999999,
+          126.079544393498
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 3,
+      "targetHeading": 156.02367344972623,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.80190301192681,
+          92.51040155997214
+        ],
+        [
+          66.98942113996026,
+          107.99268517428432
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 4,
+      "targetHeading": 193.63493606503826,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.78968071700302,
+          80.02552838410811
+        ],
+        [
+          24.763436171123196,
+          71.04403547765297
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 5,
+      "targetHeading": 238.63493606503826,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.78968071700302,
+          80.02552838410811
+        ],
+        [
+          41.95904665607328,
+          47.493145244511766
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 6,
+      "targetHeading": -77.56434095792747,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22854231522341,
+          42.0931962971264
+        ],
+        [
+          83.43311575155454,
+          4.887081547963874
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 7,
+      "targetHeading": -32.56434095792747,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22854231522341,
+          42.0931962971264
+        ],
+        [
+          107.33874786953382,
+          21.58600976996151
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 0,
+      "targetHeading": 14.993934596658491,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.64355104232712,
+          76.19650715439937
+        ],
+        [
+          208.84777755312848,
+          90.98217167596
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 1,
+      "targetHeading": 59.99393459665849,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.64355104232712,
+          76.19650715439937
+        ],
+        [
+          182.22379031072808,
+          125.68683371789007
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 2,
+      "targetHeading": 101.42233476205291,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.7218459143802,
+          126.99251580704683
+        ],
+        [
+          130.40389135301865,
+          183.01060578293726
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 3,
+      "targetHeading": 146.4223347620529,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.7218459143802,
+          126.99251580704683
+        ],
+        [
+          94.10807220380994,
+          158.60028467861713
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 4,
+      "targetHeading": 199.42143926730728,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.01168594008124,
+          108.95800743381254
+        ],
+        [
+          38.113617984339754,
+          89.95482952488706
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 5,
+      "targetHeading": 244.42143926730728,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.01168594008124,
+          108.95800743381254
+        ],
+        [
+          67.33727255921868,
+          57.40904212595878
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 6,
+      "targetHeading": -67.83162307108886,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.86627309178577,
+          60.13516810942501
+        ],
+        [
+          127.43066639485012,
+          7.20975416233572
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 7,
+      "targetHeading": -22.831623071088856,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.86627309178577,
+          60.13516810942501
+        ],
+        [
+          158.53852092764828,
+          37.959577747103666
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "short-first-return",
+      "hemPrompt": true,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ]
+      ],
+      "bends": [],
+      "segments": [],
+      "valid": false,
+      "recognition": {
+        "code": "incomplete",
+        "label": "Tracé en cours",
+        "suggestedName": "Moulure dessinée",
+        "sides": 0,
+        "certainty": "none"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          174.5315367264149,
+          91.9815367264149
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 45,
+          "turnDeg": 45,
+          "label": "Rotation 45°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.19999999999999,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            104.6815367264,
+            53.8815367264
+          ],
+          "headingDeg": 45
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.149999999999984
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 0,
+      "targetHeading": 24.343850832776706,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62535714396454,
+          31.379944740546225
+        ],
+        [
+          91.76699388726784,
+          41.85012376676131
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 1,
+      "targetHeading": 69.34385083277671,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62535714396454,
+          31.379944740546225
+        ],
+        [
+          77.58543082323624,
+          55.147087599165616
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 2,
+      "targetHeading": 103.76147178250184,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67936956660921,
+          54.38804951387229
+        ],
+        [
+          54.63720816772391,
+          79.05892881781726
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 3,
+      "targetHeading": 148.76147178250184,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67936956660921,
+          54.38804951387229
+        ],
+        [
+          38.961970214779484,
+          67.56054226935125
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 4,
+      "targetHeading": 188.65949125217762,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.570029083156236,
+          45.62580195331572
+        ],
+        [
+          15.459574279760432,
+          41.801529530145984
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 5,
+      "targetHeading": 233.65949125217762,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.570029083156236,
+          45.62580195331572
+        ],
+        [
+          25.518425176524786,
+          25.1658601196282
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 6,
+      "targetHeading": -68.73505782849878,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.688148755566445,
+          26.47421069970803
+        ],
+        [
+          54.900248298619644,
+          2.803612439231408
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 7,
+      "targetHeading": -23.735057828498782,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.688148755566445,
+          26.47421069970803
+        ],
+        [
+          68.93972735615037,
+          16.250508210840923
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 0,
+      "targetHeading": 20.907498322900263,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.08734523801516,
+          53.1314407551919
+        ],
+        [
+          147.67875665099376,
+          66.72781650875568
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 1,
+      "targetHeading": 65.90749832290027,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.08734523801516,
+          53.1314407551919
+        ],
+        [
+          127.64018410522729,
+          87.91245861221464
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 2,
+      "targetHeading": 111.02360682026435,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.80193674821527,
+          92.51038655628449
+        ],
+        [
+          88.89999999999999,
+          126.07973374290992
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 3,
+      "targetHeading": 156.02360682026435,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.80193674821527,
+          92.51038655628449
+        ],
+        [
+          66.98947288067387,
+          107.99271065414281
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 4,
+      "targetHeading": 193.6349766474714,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.78966901202638,
+          80.02550918194407
+        ],
+        [
+          24.76343082772101,
+          71.0439900499104
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 5,
+      "targetHeading": 238.6349766474714,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.78966901202638,
+          80.02550918194407
+        ],
+        [
+          41.95905799369348,
+          47.49311199637576
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 6,
+      "targetHeading": -77.56429423968063,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22855977006228,
+          42.093185149601524
+        ],
+        [
+          83.43316354378145,
+          4.88707709035576
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 7,
+      "targetHeading": -32.564294239680635,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22855977006228,
+          42.093185149601524
+        ],
+        [
+          107.33878204565997,
+          21.58602480469495
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 0,
+      "targetHeading": 14.993959748154907,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.6435594063581,
+          76.19652163779227
+        ],
+        [
+          208.847779426596,
+          90.98221039270544
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 1,
+      "targetHeading": 59.99395974815491,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.6435594063581,
+          76.19652163779227
+        ],
+        [
+          182.22377694966968,
+          125.68686074732943
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 2,
+      "targetHeading": 101.4222617423072,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.72188636813564,
+          126.99248895232348
+        ],
+        [
+          130.40400319819676,
+          183.01059335216564
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 3,
+      "targetHeading": 146.4222617423072,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.72188636813564,
+          126.99248895232348
+        ],
+        [
+          94.10815293965041,
+          158.60031850452697
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 4,
+      "targetHeading": 199.4214860220579,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.01167475402306,
+          108.95798406424666
+        ],
+        [
+          38.11362230535522,
+          89.95476217319222
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 5,
+      "targetHeading": 244.4214860220579,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.01167475402306,
+          108.95798406424666
+        ],
+        [
+          67.33730343837905,
+          57.4089986214882
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 6,
+      "targetHeading": -67.8315831341832,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.86629756789807,
+          60.13515780472503
+        ],
+        [
+          127.43072776158476,
+          7.209758888688377
+        ]
+      ]
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 7,
+      "targetHeading": -22.831583134183205,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.86629756789807,
+          60.13515780472503
+        ],
+        [
+          158.53856086081052,
+          37.95960415657215
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "short-first-return",
+      "hemPrompt": true,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ]
+      ],
+      "bends": [],
+      "segments": [],
+      "valid": false,
+      "recognition": {
+        "code": "incomplete",
+        "label": "Tracé en cours",
+        "suggestedName": "Moulure dessinée",
+        "sides": 0,
+        "certainty": "none"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          174.5315367264149,
+          91.9815367264149
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 45,
+          "turnDeg": 45,
+          "label": "Rotation 45°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.19999999999999,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            104.6815367264,
+            53.8815367264
+          ],
+          "headingDeg": 45
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.149999999999984
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 0,
+      "targetHeading": 24.34387855282138,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62536039516583,
+          31.379953364562613
+        ],
+        [
+          91.76699207293049,
+          41.8501435868403
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 1,
+      "targetHeading": 69.34387855282138,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62536039516583,
+          31.379953364562613
+        ],
+        [
+          77.585422575749,
+          55.14710055811706
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 2,
+      "targetHeading": 103.76152675028543,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67935394035805,
+          54.38805899182378
+        ],
+        [
+          54.63716887300351,
+          79.05893249909624
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 3,
+      "targetHeading": 148.76152675028544,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67935394035805,
+          54.38805899182378
+        ],
+        [
+          38.96194195125966,
+          67.56053091230119
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 4,
+      "targetHeading": 188.6594171707447,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.57003881376271,
+          45.62581518030296
+        ],
+        [
+          15.459579065737806,
+          41.801575224073595
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 5,
+      "targetHeading": 233.6594171707447,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.57003881376271,
+          45.62581518030296
+        ],
+        [
+          25.518408453156784,
+          25.165892807828378
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 6,
+      "targetHeading": -68.73507667462606,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.68814493153105,
+          26.47421238113441
+        ],
+        [
+          54.90023668868553,
+          2.8036110905510547
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 7,
+      "targetHeading": -23.735076674626058,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.68814493153105,
+          26.47421238113441
+        ],
+        [
+          68.93972016926222,
+          16.25050224419651
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 0,
+      "targetHeading": 20.907529617891704,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.0873509013254,
+          53.13145342013626
+        ],
+        [
+          147.67875488794954,
+          66.7278486137497
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 1,
+      "targetHeading": 65.9075296178917,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.0873509013254,
+          53.13145342013626
+        ],
+        [
+          127.640170771121,
+          87.91247977212436
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 2,
+      "targetHeading": 111.02366738927637,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.8019060804963,
+          92.51040019527571
+        ],
+        [
+          88.89999999999999,
+          126.07956161619799
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 3,
+      "targetHeading": 156.02366738927637,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.8019060804963,
+          92.51040019527571
+        ],
+        [
+          66.98942584616546,
+          107.99268749187127
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 4,
+      "targetHeading": 193.6349108517636,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.7896879891414,
+          80.02554031412879
+        ],
+        [
+          24.76343949091737,
+          71.04406370124589
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 5,
+      "targetHeading": 238.6349108517636,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.7896879891414,
+          80.02554031412879
+        ],
+        [
+          41.95903961218686,
+          47.49316590109847
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 6,
+      "targetHeading": -77.56430454186874,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22855592096515,
+          42.09318760782392
+        ],
+        [
+          83.43315300476172,
+          4.887078073332731
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 7,
+      "targetHeading": -32.56430454186874,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22855592096515,
+          42.09318760782392
+        ],
+        [
+          107.33877450922927,
+          21.586021489271666
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 0,
+      "targetHeading": 14.993984899664106,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.64356777038697,
+          76.1965361211962
+        ],
+        [
+          208.84778130004747,
+          90.98224910947138
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 1,
+      "targetHeading": 59.993984899664106,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.64356777038697,
+          76.1965361211962
+        ],
+        [
+          182.22376358859267,
+          125.68688777677667
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 2,
+      "targetHeading": 101.42232566367157,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.72185095498705,
+          126.9925124609066
+        ],
+        [
+          130.4039052891141,
+          183.01060423405028
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 3,
+      "targetHeading": 146.4223256636716,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.72185095498705,
+          126.9925124609066
+        ],
+        [
+          94.10808226362715,
+          158.6002888933872
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 4,
+      "targetHeading": 199.42140764762425,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.01169350509045,
+          108.95802323836745
+        ],
+        [
+          38.113615062119415,
+          89.95487507404106
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 5,
+      "targetHeading": 244.42140764762425,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.01169350509045,
+          108.95802323836745
+        ],
+        [
+          67.33725167602904,
+          57.409071547530274
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 6,
+      "targetHeading": -67.83159940644163,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.86628759512595,
+          60.135162003364265
+        ],
+        [
+          127.43070275776104,
+          7.209756962934826
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 7,
+      "targetHeading": -22.831599406441626,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.86628759512595,
+          60.135162003364265
+        ],
+        [
+          158.53854459007957,
+          37.95959339605321
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "short-first-return",
+      "hemPrompt": true,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ]
+      ],
+      "bends": [],
+      "segments": [],
+      "valid": false,
+      "recognition": {
+        "code": "incomplete",
+        "label": "Tracé en cours",
+        "suggestedName": "Moulure dessinée",
+        "sides": 0,
+        "certainty": "none"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          174.5315367264149,
+          91.9815367264149
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 45,
+          "turnDeg": 45,
+          "label": "Rotation 45°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.19999999999999,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            104.6815367264,
+            53.8815367264
+          ],
+          "headingDeg": 45
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.15
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 0,
+      "targetHeading": 24.343850832776706,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62535714396454,
+          31.379944740546225
+        ],
+        [
+          91.76699388726784,
+          41.85012376676131
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 1,
+      "targetHeading": 69.34385083277671,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62535714396454,
+          31.379944740546225
+        ],
+        [
+          77.58543082323624,
+          55.147087599165616
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 2,
+      "targetHeading": 103.76148841002487,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67936483973501,
+          54.38805238091428
+        ],
+        [
+          54.63719628123686,
+          79.05892993139263
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 3,
+      "targetHeading": 148.76148841002487,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67936483973501,
+          54.38805238091428
+        ],
+        [
+          38.96196166518263,
+          67.5605388338943
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 4,
+      "targetHeading": 188.65945779056446,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.57003347834164,
+          45.625807927774204
+        ],
+        [
+          15.459576441516429,
+          41.801550169495485
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 5,
+      "targetHeading": 233.65945779056446,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.57003347834164,
+          45.625807927774204
+        ],
+        [
+          25.518417622793216,
+          25.16587488445749
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 6,
+      "targetHeading": -68.73509146425516,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.68814193059313,
+          26.47421370064631
+        ],
+        [
+          54.9002275777089,
+          2.8036100321674766
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 7,
+      "targetHeading": -23.735091464255163,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.68814193059313,
+          26.47421370064631
+        ],
+        [
+          68.9397145293005,
+          16.250497561832578
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 0,
+      "targetHeading": 20.907498322900263,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.08734523801516,
+          53.1314407551919
+        ],
+        [
+          147.67875665099376,
+          66.72781650875568
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 1,
+      "targetHeading": 65.90749832290027,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.08734523801516,
+          53.1314407551919
+        ],
+        [
+          127.64018410522729,
+          87.91245861221464
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 2,
+      "targetHeading": 111.02362801407735,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.80192601721967,
+          92.51039132873237
+        ],
+        [
+          88.89999999999999,
+          126.07967351362393
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 3,
+      "targetHeading": 156.02362801407736,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.80192601721967,
+          92.51039132873237
+        ],
+        [
+          66.98945642274083,
+          107.99270254939597
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 4,
+      "targetHeading": 193.63494867168066,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.78967708093435,
+          80.02552241909417
+        ],
+        [
+          24.76343451123011,
+          71.04402136585027
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 5,
+      "targetHeading": 238.63494867168066,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.78967708093435,
+          80.02552241909417
+        ],
+        [
+          41.95905017802134,
+          47.4931349162154
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 6,
+      "targetHeading": -77.56432274988904,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22854911809696,
+          42.09319195247192
+        ],
+        [
+          83.4331343781671,
+          4.8870798106444795
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 7,
+      "targetHeading": -32.564322749889044,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22854911809696,
+          42.09319195247192
+        ],
+        [
+          107.33876118938907,
+          21.586015629617382
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 0,
+      "targetHeading": 14.993959748154907,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.6435594063581,
+          76.19652163779227
+        ],
+        [
+          208.847779426596,
+          90.98221039270544
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 1,
+      "targetHeading": 59.99395974815491,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.6435594063581,
+          76.19652163779227
+        ],
+        [
+          182.22377694966968,
+          125.68686074732943
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 2,
+      "targetHeading": 101.422280055394,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.72187622248404,
+          126.99249568739533
+        ],
+        [
+          130.40397514783413,
+          183.01059646977137
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 3,
+      "targetHeading": 146.422280055394,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.72187622248404,
+          126.99249568739533
+        ],
+        [
+          94.10813269139105,
+          158.60031002112143
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 4,
+      "targetHeading": 199.42145507715506,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.0116821575784,
+          108.95799953153038
+        ],
+        [
+          38.11361944545993,
+          89.95480675030164
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 5,
+      "targetHeading": 244.42145507715506,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.0116821575784,
+          108.95799953153038
+        ],
+        [
+          67.33728300082372,
+          57.409027415171515
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 6,
+      "targetHeading": -67.83161123875946,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.8662803434591,
+          60.13516505639239
+        ],
+        [
+          127.43068457631463,
+          7.209755562634079
+        ]
+      ]
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 7,
+      "targetHeading": -22.831611238759464,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.8662803434591,
+          60.13516505639239
+        ],
+        [
+          158.5385327588705,
+          37.959585571581044
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "short-first-return",
+      "hemPrompt": true,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ]
+      ],
+      "bends": [],
+      "segments": [],
+      "valid": false,
+      "recognition": {
+        "code": "incomplete",
+        "label": "Tracé en cours",
+        "suggestedName": "Moulure dessinée",
+        "sides": 0,
+        "certainty": "none"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          174.5315367264149,
+          91.9815367264149
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 45,
+          "turnDeg": 45,
+          "label": "Rotation 45°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.19999999999999,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            104.6815367264,
+            53.8815367264
+          ],
+          "headingDeg": 45
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.149999999999984
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 0,
+      "targetHeading": 24.343850832776706,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62535714396454,
+          31.379944740546225
+        ],
+        [
+          91.76699388726784,
+          41.85012376676131
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 1,
+      "targetHeading": 69.34385083277671,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62535714396454,
+          31.379944740546225
+        ],
+        [
+          77.58543082323624,
+          55.147087599165616
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 2,
+      "targetHeading": 103.76148841002487,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67936483973501,
+          54.38805238091428
+        ],
+        [
+          54.63719628123686,
+          79.05892993139263
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 3,
+      "targetHeading": 148.76148841002487,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67936483973501,
+          54.38805238091428
+        ],
+        [
+          38.96196166518263,
+          67.5605388338943
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 4,
+      "targetHeading": 188.6594442506198,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.57003525681537,
+          45.62581034528505
+        ],
+        [
+          15.45957731625521,
+          41.801558521024646
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 5,
+      "targetHeading": 233.6594442506198,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.57003525681537,
+          45.62581034528505
+        ],
+        [
+          25.518414566245262,
+          25.16588085891581
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 6,
+      "targetHeading": -68.73509146425516,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.68814193059313,
+          26.47421370064631
+        ],
+        [
+          54.9002275777089,
+          2.8036100321674766
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 7,
+      "targetHeading": -23.735091464255163,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.68814193059313,
+          26.47421370064631
+        ],
+        [
+          68.9397145293005,
+          16.250497561832578
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 0,
+      "targetHeading": 20.907498322900263,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.08734523801516,
+          53.1314407551919
+        ],
+        [
+          147.67875665099376,
+          66.72781650875568
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 1,
+      "targetHeading": 65.90749832290027,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.08734523801516,
+          53.1314407551919
+        ],
+        [
+          127.64018410522729,
+          87.91245861221464
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 2,
+      "targetHeading": 111.02362801407735,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.80192601721967,
+          92.51039132873237
+        ],
+        [
+          88.89999999999999,
+          126.07967351362393
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 3,
+      "targetHeading": 156.02362801407736,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.80192601721967,
+          92.51039132873237
+        ],
+        [
+          66.98945642274083,
+          107.99270254939597
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 4,
+      "targetHeading": 193.63493606503826,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.78968071700302,
+          80.02552838410811
+        ],
+        [
+          24.763436171123196,
+          71.04403547765297
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 5,
+      "targetHeading": 238.63493606503826,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.78968071700302,
+          80.02552838410811
+        ],
+        [
+          41.95904665607328,
+          47.493145244511766
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 6,
+      "targetHeading": -77.56432274988904,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22854911809696,
+          42.09319195247192
+        ],
+        [
+          83.4331343781671,
+          4.8870798106444795
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 7,
+      "targetHeading": -32.564322749889044,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22854911809696,
+          42.09319195247192
+        ],
+        [
+          107.33876118938907,
+          21.586015629617382
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 0,
+      "targetHeading": 14.993959748154907,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.6435594063581,
+          76.19652163779227
+        ],
+        [
+          208.847779426596,
+          90.98221039270544
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 1,
+      "targetHeading": 59.99395974815491,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.6435594063581,
+          76.19652163779227
+        ],
+        [
+          182.22377694966968,
+          125.68686074732943
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 2,
+      "targetHeading": 101.422280055394,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.72187622248404,
+          126.99249568739533
+        ],
+        [
+          130.40397514783413,
+          183.01059646977137
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 3,
+      "targetHeading": 146.422280055394,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.72187622248404,
+          126.99249568739533
+        ],
+        [
+          94.10813269139105,
+          158.60031002112143
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 4,
+      "targetHeading": 199.42143926730728,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.01168594008124,
+          108.95800743381254
+        ],
+        [
+          38.113617984339754,
+          89.95482952488706
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 5,
+      "targetHeading": 244.42143926730728,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.01168594008124,
+          108.95800743381254
+        ],
+        [
+          67.33727255921868,
+          57.40904212595878
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 6,
+      "targetHeading": -67.83161123875946,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.8662803434591,
+          60.13516505639239
+        ],
+        [
+          127.43068457631463,
+          7.209755562634079
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 7,
+      "targetHeading": -22.831611238759464,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.8662803434591,
+          60.13516505639239
+        ],
+        [
+          158.5385327588705,
+          37.959585571581044
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "short-first-return",
+      "hemPrompt": true,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ]
+      ],
+      "bends": [],
+      "segments": [],
+      "valid": false,
+      "recognition": {
+        "code": "incomplete",
+        "label": "Tracé en cours",
+        "suggestedName": "Moulure dessinée",
+        "sides": 0,
+        "certainty": "none"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          174.5315367264149,
+          91.9815367264149
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 45,
+          "turnDeg": 45,
+          "label": "Rotation 45°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.19999999999999,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            104.6815367264,
+            53.8815367264
+          ],
+          "headingDeg": 45
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.15
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 0,
+      "targetHeading": 24.34387855282138,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62536039516583,
+          31.379953364562613
+        ],
+        [
+          91.76699207293049,
+          41.8501435868403
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 1,
+      "targetHeading": 69.34387855282138,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          68.62536039516583,
+          31.379953364562613
+        ],
+        [
+          77.585422575749,
+          55.14710055811706
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 2,
+      "targetHeading": 103.76148841002487,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67936483973501,
+          54.38805238091428
+        ],
+        [
+          54.63719628123686,
+          79.05892993139263
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 3,
+      "targetHeading": 148.76148841002487,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          60.67936483973501,
+          54.38805238091428
+        ],
+        [
+          38.96196166518263,
+          67.5605388338943
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 4,
+      "targetHeading": 188.6594442506198,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.57003525681537,
+          45.62581034528505
+        ],
+        [
+          15.45957731625521,
+          41.801558521024646
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 5,
+      "targetHeading": 233.6594442506198,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          40.57003525681537,
+          45.62581034528505
+        ],
+        [
+          25.518414566245262,
+          25.16588085891581
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 6,
+      "targetHeading": -68.73509146425516,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.68814193059313,
+          26.47421370064631
+        ],
+        [
+          54.9002275777089,
+          2.8036100321674766
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 6,
+      "quadrant": 7,
+      "targetHeading": -23.735091464255163,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          50.8,
+          38.099999999999994
+        ],
+        [
+          45.68814193059313,
+          26.47421370064631
+        ],
+        [
+          68.9397145293005,
+          16.250497561832578
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 0,
+      "targetHeading": 20.907529617891704,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.0873509013254,
+          53.13145342013626
+        ],
+        [
+          147.67875488794954,
+          66.7278486137497
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 1,
+      "targetHeading": 65.9075296178917,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          112.0873509013254,
+          53.13145342013626
+        ],
+        [
+          127.640170771121,
+          87.91247977212436
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 2,
+      "targetHeading": 111.02362801407735,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.80192601721967,
+          92.51039132873237
+        ],
+        [
+          88.89999999999999,
+          126.07967351362393
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 3,
+      "targetHeading": 156.02362801407736,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          101.80192601721967,
+          92.51039132873237
+        ],
+        [
+          66.98945642274083,
+          107.99270254939597
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 4,
+      "targetHeading": 193.63493606503826,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.78968071700302,
+          80.02552838410811
+        ],
+        [
+          24.763436171123196,
+          71.04403547765297
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 5,
+      "targetHeading": 238.63493606503826,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          61.78968071700302,
+          80.02552838410811
+        ],
+        [
+          41.95904665607328,
+          47.493145244511766
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 6,
+      "targetHeading": -77.56432274988904,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22854911809696,
+          42.09319195247192
+        ],
+        [
+          83.4331343781671,
+          4.8870798106444795
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 10,
+      "quadrant": 7,
+      "targetHeading": -32.564322749889044,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          88.89999999999999,
+          63.5
+        ],
+        [
+          75.22854911809696,
+          42.09319195247192
+        ],
+        [
+          107.33876118938907,
+          21.586015629617382
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 0,
+      "targetHeading": 14.993984899664106,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.64356777038697,
+          76.1965361211962
+        ],
+        [
+          208.84778130004747,
+          90.98224910947138
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 1,
+      "targetHeading": 59.993984899664106,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          153.64356777038697,
+          76.1965361211962
+        ],
+        [
+          182.22376358859267,
+          125.68688777677667
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 2,
+      "targetHeading": 101.422280055394,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.72187622248404,
+          126.99249568739533
+        ],
+        [
+          130.40397514783413,
+          183.01059646977137
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 3,
+      "targetHeading": 146.422280055394,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          141.72187622248404,
+          126.99249568739533
+        ],
+        [
+          94.10813269139105,
+          158.60031002112143
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 4,
+      "targetHeading": 199.42143926730728,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.01168594008124,
+          108.95800743381254
+        ],
+        [
+          38.113617984339754,
+          89.95482952488706
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 5,
+      "targetHeading": 244.42143926730728,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          92.01168594008124,
+          108.95800743381254
+        ],
+        [
+          67.33727255921868,
+          57.40904212595878
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 6,
+      "targetHeading": -67.83161123875946,
+      "expectedTurn": 45,
+      "method": "tap",
+      "actualTurn": 45,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.8662803434591,
+          60.13516505639239
+        ],
+        [
+          127.43068457631463,
+          7.209755562634079
+        ]
+      ]
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "quadrants-and-scales",
+      "scaleIn": 14,
+      "quadrant": 7,
+      "targetHeading": -22.831611238759464,
+      "expectedTurn": 90,
+      "method": "drag",
+      "actualTurn": 90,
+      "points": [
+        [
+          120.64999999999999,
+          95.25
+        ],
+        [
+          105.8662803434591,
+          60.13516505639239
+        ],
+        [
+          158.5385327588705,
+          37.959585571581044
+        ]
+      ]
+    }
+  ],
+  "errors": [],
+  "blockedAttemptCount": 6,
+  "externalTransmitted": 0,
+  "realSubmissions": 0
+}

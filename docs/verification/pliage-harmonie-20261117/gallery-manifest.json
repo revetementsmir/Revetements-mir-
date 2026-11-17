@@ -1,0 +1,2656 @@
+{
+  "captures": 245,
+  "pdfs": 10,
+  "entries": [
+    {
+      "topic": "geometry",
+      "file": "geometry--after-client-return-confirmed-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Retour écrasé confirmé",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-client-return-confirmed-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Retour écrasé confirmé",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-client-return-confirmed-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Retour écrasé confirmé",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-client-short-first-return-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-client-short-first-return-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-client-short-first-return-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-client-tap-diagonal-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-client-tap-diagonal-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-client-tap-diagonal-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-employee-return-confirmed-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Retour écrasé confirmé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-employee-return-confirmed-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Retour écrasé confirmé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-employee-return-confirmed-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Retour écrasé confirmé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-employee-short-first-return-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-employee-short-first-return-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-employee-short-first-return-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-employee-tap-diagonal-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-employee-tap-diagonal-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--after-employee-tap-diagonal-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-client-short-first-return-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-client-short-first-return-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-client-short-first-return-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-client-tap-diagonal-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-client-tap-diagonal-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-client-tap-diagonal-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-employee-short-first-return-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-employee-short-first-return-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-employee-short-first-return-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Petit rebord · retour écrasé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-employee-tap-diagonal-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-employee-tap-diagonal-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "geometry",
+      "file": "geometry--before-employee-tap-diagonal-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Accrochage à 45°",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-added-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Pièce ajoutée au panier",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-added-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Pièce ajoutée au panier",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-added-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Pièce ajoutée au panier",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-cart-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Panier",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-cart-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Panier",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-cart-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Panier",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-cart-en-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Panier",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-cart-en-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Panier",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-cart-en-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Panier",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-choice-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Choix du profil",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-choice-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Choix du profil",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-choice-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Choix du profil",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-details-empty-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Matériau, couleur et quantité",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-details-empty-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Matériau, couleur et quantité",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-details-empty-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Matériau, couleur et quantité",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-details-en-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Matériau, couleur et quantité",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-details-en-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Matériau, couleur et quantité",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-details-en-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Matériau, couleur et quantité",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-details-ready-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Matériau, couleur et quantité",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-details-ready-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Matériau, couleur et quantité",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-details-ready-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Matériau, couleur et quantité",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-hem-added-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-hem-added-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-hem-added-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-hem-choice-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-hem-choice-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-hem-choice-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-hem-drawn-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Pli double · mesures conservées",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-hem-drawn-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Pli double · mesures conservées",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-hem-drawn-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Pli double · mesures conservées",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-measures-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Mesures et angles",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-measures-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Mesures et angles",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-measures-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Mesures et angles",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-quantity-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-quantity-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-client-quantity-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-dialog-360x780.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-dialog-780x360.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-dialog-844x390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-added-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Pièce ajoutée au panier employé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-added-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Pièce ajoutée au panier employé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-added-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Pièce ajoutée au panier employé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-choice-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-choice-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-choice-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-command-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Pliage employé · détails",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-command-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Pliage employé · détails",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-command-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Pliage employé · détails",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-details-empty-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Métal, couleur et quantité · employé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-details-empty-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Métal, couleur et quantité · employé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-details-empty-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Métal, couleur et quantité · employé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-details-ready-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Métal, couleur et quantité · employé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-details-ready-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Métal, couleur et quantité · employé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-details-ready-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Métal, couleur et quantité · employé",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-hem-added-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-hem-added-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-hem-added-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-hem-choice-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-hem-choice-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-hem-choice-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-hem-drawn-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Pli double · mesures conservées",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-hem-drawn-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Pli double · mesures conservées",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-hem-drawn-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Pli double · mesures conservées",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-measures-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-measures-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-measures-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-quantity-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-quantity-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-employee-quantity-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-landing-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Pliages sur mesure",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-landing-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Pliages sur mesure",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-landing-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Pliages sur mesure",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-quick-empty-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Préparer un pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-quick-empty-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Préparer un pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-quick-empty-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Préparer un pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-quick-ready-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Préparer un pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-quick-ready-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Préparer un pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-quick-ready-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Préparer un pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-quick-ready-en-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Préparer un pliage",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-quick-ready-en-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Préparer un pliage",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--after-quick-ready-en-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Préparer un pliage",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-client-choice-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Choix du profil",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-client-choice-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Choix du profil",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-client-choice-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Choix du profil",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-client-details-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Matériau, couleur et quantité",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-client-details-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Matériau, couleur et quantité",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-client-details-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Matériau, couleur et quantité",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-client-measures-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Mesures et angles",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-client-measures-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Mesures et angles",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-client-measures-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Mesures et angles",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-employee-choice-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-employee-choice-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-employee-choice-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-employee-command-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Pliage employé · détails",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-employee-command-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Pliage employé · détails",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-employee-command-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Pliage employé · détails",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-employee-measures-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-employee-measures-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-employee-measures-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Parcours de pliage",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-landing-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Pliages sur mesure",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-landing-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Pliages sur mesure",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-landing-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Pliages sur mesure",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-quick-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Préparer un pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-quick-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Préparer un pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "journey",
+      "file": "journey--before-quick-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Préparer un pliage",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--bending-order-fr-CA-page1.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Commande de pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--bending-order-fr-CA-page2.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Commande de pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--bending-order-fr-CA-page3.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Commande de pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--bending-order-fr-CA-page4.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Commande de pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--bending-order-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Commande de pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-en-CA-page1.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-en-CA-page2.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-en-CA-page3.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-en-CA-page4.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-en-CA-page5.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-en-CA.pdf",
+      "type": "pdf",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-fr-CA-page1.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-fr-CA-page2.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-fr-CA-page3.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-fr-CA-page4.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-fr-CA-page5.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--estimate-mixed-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--panel-long-en-CA-page1.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--panel-long-en-CA-page2.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--panel-long-en-CA.pdf",
+      "type": "pdf",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--panel-long-fr-CA-page1.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--panel-long-fr-CA-page2.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--panel-long-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--panel-order-fr-CA-page1.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Commande de panneaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--panel-order-fr-CA-page2.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Commande de panneaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--panel-order-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Commande de panneaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--selection-long-en-CA-page1.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Sélection de matériaux",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--selection-long-en-CA-page2.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Sélection de matériaux",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--selection-long-en-CA.pdf",
+      "type": "pdf",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Sélection de matériaux",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--selection-long-fr-CA-page1.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Sélection de matériaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--selection-long-fr-CA-page2.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Sélection de matériaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--after--selection-long-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Sélection de matériaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--bending-order-fr-CA-page1.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Commande de pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--bending-order-fr-CA-page2.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Commande de pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--bending-order-fr-CA-page3.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Commande de pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--bending-order-fr-CA-page4.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Commande de pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--bending-order-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Commande de pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-en-CA-page1.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-en-CA-page2.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-en-CA-page3.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-en-CA-page4.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-en-CA-page5.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-en-CA.pdf",
+      "type": "pdf",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-fr-CA-page1.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-fr-CA-page2.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-fr-CA-page3.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-fr-CA-page4.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-fr-CA-page5.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--estimate-mixed-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Estimation · matériaux et pliages",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--panel-order-fr-CA-page1.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Commande de panneaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--panel-order-fr-CA-page2.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Commande de panneaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--panel-order-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Commande de panneaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--selection-long-en-CA-page1.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Sélection de matériaux",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--selection-long-en-CA.pdf",
+      "type": "pdf",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Sélection de matériaux",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--selection-long-fr-CA-page1.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Sélection de matériaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--before--selection-long-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Sélection de matériaux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--headers-after--headers-en-CA-page3.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Documents PDF",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--headers-after--headers-en-CA-page4.png",
+      "type": "png",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Documents PDF",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--headers-after--headers-en-CA.pdf",
+      "type": "pdf",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Documents PDF",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--headers-after--headers-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "after",
+      "width": "pdf",
+      "title": "Documents PDF",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--headers-before--headers-en-CA-page3.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Documents PDF",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--headers-before--headers-en-CA-page4.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Documents PDF",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--headers-before--headers-en-CA.pdf",
+      "type": "pdf",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Documents PDF",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--headers-before--headers-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Documents PDF",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--panel-before--panel-long-en-CA-page1.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--panel-before--panel-long-en-CA-page2.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--panel-before--panel-long-en-CA.pdf",
+      "type": "pdf",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "EN",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--panel-before--panel-long-fr-CA-page1.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--panel-before--panel-long-fr-CA-page2.png",
+      "type": "png",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "pdf",
+      "file": "pdf--panel-before--panel-long-fr-CA.pdf",
+      "type": "pdf",
+      "phase": "before",
+      "width": "pdf",
+      "title": "Panneaux · identification complète",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-akta-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-akta-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-akta-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-bluhouss-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-bluhouss-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-bluhouss-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-bosco-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-bosco-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-bosco-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-brands-jdp-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Collection Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-brands-jdp-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Collection Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-brands-jdp-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Collection Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-brands-rialux-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Collection Rialux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-brands-rialux-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Collection Rialux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-brands-rialux-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Collection Rialux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-chantier-akta-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-chantier-akta-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-chantier-akta-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-chantier-bluhouss-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-chantier-bluhouss-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-chantier-bluhouss-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-chantier-bosco-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-chantier-bosco-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-chantier-bosco-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-jdp-cards-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Produits Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-jdp-cards-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Produits Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-jdp-cards-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Produits Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-magasin-revue-akta-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-magasin-revue-akta-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-magasin-revue-akta-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-magasin-revue-bluhouss-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-magasin-revue-bluhouss-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-magasin-revue-bluhouss-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-magasin-revue-bosco-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-magasin-revue-bosco-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-magasin-revue-bosco-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": true
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-rialux-cards-1440.png",
+      "type": "png",
+      "phase": "after",
+      "width": "1440",
+      "title": "Échantillons et magasin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-rialux-cards-390.png",
+      "type": "png",
+      "phase": "after",
+      "width": "390",
+      "title": "Échantillons et magasin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--after-rialux-cards-834.png",
+      "type": "png",
+      "phase": "after",
+      "width": "834",
+      "title": "Échantillons et magasin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-akta-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-akta-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-akta-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Juste du Pin Äkta",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-bluhouss-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-bluhouss-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-bluhouss-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Juste du Pin Bluhouss 307",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-bosco-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-bosco-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-bosco-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Rialux Bosco",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-brands-jdp-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Collection Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-brands-jdp-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Collection Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-brands-jdp-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Collection Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-brands-rialux-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Collection Rialux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-brands-rialux-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Collection Rialux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-brands-rialux-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Collection Rialux",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-jdp-cards-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Produits Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-jdp-cards-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Produits Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-jdp-cards-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Produits Juste du Pin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-rialux-cards-1440.png",
+      "type": "png",
+      "phase": "before",
+      "width": "1440",
+      "title": "Échantillons et magasin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-rialux-cards-390.png",
+      "type": "png",
+      "phase": "before",
+      "width": "390",
+      "title": "Échantillons et magasin",
+      "lang": "FR",
+      "employee": false
+    },
+    {
+      "topic": "samples",
+      "file": "samples--before-rialux-cards-834.png",
+      "type": "png",
+      "phase": "before",
+      "width": "834",
+      "title": "Échantillons et magasin",
+      "lang": "FR",
+      "employee": false
+    }
+  ]
+}

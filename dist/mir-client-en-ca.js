@@ -7960,6 +7960,93 @@ entries.push(...[
   ]
 ]);
 entries.push(['Sans option de couleur','No colour option']);
+
+// Pliage and specimen review — 2026-11-17.
+entries.push(...[
+  [
+    "Nombre de pièces",
+    "Number of pieces"
+  ],
+  [
+    "Choisissez un matériau",
+    "Choose a material"
+  ],
+  [
+    "Choisissez une couleur.",
+    "Choose a colour."
+  ],
+  [
+    "Choisissez d’abord le matériau.",
+    "Choose the material first."
+  ],
+  [
+    "Les couleurs disponibles s’afficheront après le choix du matériau.",
+    "Available colours will appear after you choose a material."
+  ],
+  [
+    "Aucune couleur vérifiée n’est disponible pour cette référence. Consultez MIR avant de continuer.",
+    "No verified colour is available for this product. Contact MIR before continuing."
+  ],
+  [
+    "Vérifier cette pièce",
+    "Review this piece"
+  ],
+  [
+    "Vous pourrez vérifier la pièce, puis l’ajouter au panier.",
+    "You can review the piece, then add it to your cart."
+  ],
+  [
+    "La sauvegarde locale est indisponible. Gardez cette page ouverte pour conserver vos mesures.",
+    "Local saving is unavailable. Keep this page open to retain your measurements."
+  ],
+  [
+    "Détail du bois Äkta antiqué, issu de la photo plane officielle Gris antique. Même grain et même cadrage pour chaque teinte. Dimensions non représentées.",
+    "Detail of antique-finish Äkta wood from the official flat Gris antique photograph. The same grain and framing are retained for every colour. Dimensions are not represented."
+  ],
+  [
+    "Détail du bardage Bosco, recadré dans la photo de pose officielle Rialux, sans le dessin superposé. Même grain et même cadrage pour chaque teinte. Dimensions non représentées.",
+    "Detail of Bosco siding cropped from the official Rialux installation photograph, excluding the overlaid drawing. The same grain and framing are retained for every colour. Dimensions are not represented."
+  ],
+  [
+    "Détail de la texture fabricant Bluhouss 307, recadré dans son aperçu. Perspective et dimensions non représentatives.",
+    "Detail of the manufacturer’s Bluhouss 307 texture, cropped from its preview. Perspective and dimensions are not representative."
+  ],
+  [
+    "Aperçu fabricant original",
+    "Original manufacturer preview"
+  ],
+  [
+    "Matériau, couleur et quantité",
+    "Material, colour and quantity"
+  ],
+  [
+    "Choisis le matériau, la couleur et la quantité de pièces.",
+    "Choose the material, colour and number of pieces."
+  ],
+  [
+    "Voir mon panier",
+    "View my cart"
+  ]
+]);
+entries.push(...[
+  [
+    "Choisissez le matériau, la couleur et la quantité",
+    "Choose the material, colour and quantity"
+  ],
+  [
+    "Renseignez ces trois choix avant d’ajouter la pièce au panier.",
+    "Complete these three choices before adding the piece to your cart."
+  ],
+  [
+    "Il reste dans votre panier pendant la suite du parcours.",
+    "It stays in your cart as you continue."
+  ],
+  [
+    "ajouté au panier.",
+    "added to your cart."
+  ]
+]);
+entries.push(["Voir l’aperçu fabricant original","View the original manufacturer preview"]);
 const dictionary=Object.freeze(Object.fromEntries(entries));
 if(typeof module==='object'&&module.exports)module.exports=dictionary;
 if(root)root.MIRClientEnglish=dictionary;

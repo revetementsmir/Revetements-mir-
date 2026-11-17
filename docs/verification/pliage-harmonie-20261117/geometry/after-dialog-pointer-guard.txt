@@ -1,0 +1,14 @@
+✔ a physical click on a label permits exactly its associated forwarded radio click (2.088086ms)
+✔ ghost click with no new press remains blocked, including a label and its control (0.352631ms)
+✔ keyboard click remains accepted without a pointer press (0.221747ms)
+✔ direct radio and button physical clicks remain accepted (0.226585ms)
+✔ a pending label activation never authorizes an unrelated control (0.215849ms)
+✔ close resets pending activation and backdrop still requires a genuine press (1.308524ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10.478398

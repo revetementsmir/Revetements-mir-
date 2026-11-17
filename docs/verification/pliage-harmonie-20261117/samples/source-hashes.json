@@ -1,0 +1,33 @@
+{
+  "createdAt": "2026-11-17T16:29:23.370Z",
+  "files": [
+    {
+      "file": "dist/commerce.js",
+      "sha256": "3fc8445eec325583486d9c2a4a3b06a0d286067d4c2fc3b43f7926d5d26c9c0e"
+    },
+    {
+      "file": "dist/material-preview.js",
+      "sha256": "def40cbfdd80fdabd49d3896352e35191ec3f1c701a12fef9bc9943dc02ca3e7"
+    },
+    {
+      "file": "dist/mir-client-siding-previews.js",
+      "sha256": "fd097428e053def217a24559eed4910841fe387b420544a320bda4852b4aca0d"
+    },
+    {
+      "file": "dist/mir-store-siding-previews.js",
+      "sha256": "6014010845a12a23fc6e9d4a4492df931fe0a9b0b43bcda839a61e37c8f9c415"
+    },
+    {
+      "file": "dist/magasin-revue.html",
+      "sha256": "d30383d468792cb5c615b6cae7608f970934347b63c85ed92076f25b626e0b7f"
+    },
+    {
+      "file": "dist/magasin-revue.js",
+      "sha256": "a7ea414d19d0baa51e0e635b56b63b8ad3be944d769cb7e6a8521bf42e7a8f28"
+    },
+    {
+      "file": "dist/chantier-app.js",
+      "sha256": "9711fd008ad8db9196d6e6e5bd20babaefc50767c07ca0e870176ac67a6cb830"
+    }
+  ]
+}

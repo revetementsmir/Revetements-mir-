@@ -1,0 +1,123 @@
+{
+  "mission": "b5c95993-abff-4e6f-844d-fade08027d2f",
+  "auditedAt": "2026-11-17",
+  "scope": "read-only source research; no app/catalogue mutations",
+  "localJdpFlatSamples": [
+    {
+      "colour": "Gris antique",
+      "path": "dist/assets/catalogue-swatches/jdp-gris-antique-c790727e.png",
+      "source": "https://jdprevetement.com/wp-content/uploads/2021/01/Gris-antique_v2-1500x2000.png",
+      "width": 1500,
+      "height": 2000,
+      "visuallyInspected": true,
+      "sha256": "fe8e94c2d92a66100dc12aae856df09b0150e91e750937e90d6dd6fa05c3e3e7"
+    },
+    {
+      "colour": "Platine",
+      "path": "dist/assets/catalogue-swatches/jdp-platine-01f8446f.png",
+      "source": "https://jdprevetement.com/wp-content/uploads/2021/01/Blanc-Platine-1500x2000.png",
+      "width": 1500,
+      "height": 2000,
+      "visuallyInspected": true,
+      "sha256": "833e5f6c3c1c05436cf943f77f4a9e952479781245b140ea623c9b63c653eaa4"
+    },
+    {
+      "colour": "Érable",
+      "path": "dist/assets/catalogue-swatches/jdp-erable-dda419ba.jpeg",
+      "source": "https://jdprevetement.com/wp-content/uploads/2021/01/AKTA_ERABLE_antiqué.jpg",
+      "width": 1200,
+      "height": 1200,
+      "visuallyInspected": true,
+      "sha256": "5f71c2de198246f9430ce8435a2bf12ddad29f357a142c7259fcc371ee038da0"
+    },
+    {
+      "colour": "Birmanie",
+      "path": "dist/assets/catalogue-swatches/jdp-birmanie-bdf1d438.jpeg",
+      "source": "https://jdprevetement.com/wp-content/uploads/2021/01/BIRMANIE_ANTIQUE.jpg",
+      "width": 1200,
+      "height": 1200,
+      "visuallyInspected": true,
+      "sha256": "d9cfd1f84df7bd6b2a095e8db91d3a8b4dd92da5c5272aa313d211f3c41d2ec4"
+    },
+    {
+      "colour": "Macchiato",
+      "path": "dist/assets/catalogue-swatches/jdp-macchiato-325b7af9.jpeg",
+      "source": "https://jdprevetement.com/wp-content/uploads/2021/01/MACCHIATO_ANTIQUE.jpg",
+      "width": 1200,
+      "height": 1200,
+      "visuallyInspected": true,
+      "sha256": "26895a9d8c5686128e27e9389bb1ca13b3b7acdc01de3b993e3e3f5fe945a890"
+    }
+  ],
+  "rialuxBoscoOfficialPlaneLinks": [
+    {
+      "colour": "Beige dune",
+      "sourcePage": "https://lightbeans.com/en/texture/rialux/bosco-brun-dune",
+      "imageUrl": "https://cdn.lightbeans.com/textures/bbbca97caafce72ec2874d6b4d244952/PREVIEW_POPUP/plane-1800.webp",
+      "discoveredBy": "official product page image link labelled surface",
+      "webImageResolved": true,
+      "localDownloaded": false,
+      "visuallyInspected": false
+    },
+    {
+      "colour": "Blanc alpin",
+      "sourcePage": "https://lightbeans.com/en/texture/rialux/bosco-blanc-alpin",
+      "imageUrl": "https://cdn.lightbeans.com/textures/ab35a4c017a50eae8b53093f1788fb72/PREVIEW_POPUP/plane-1800.webp",
+      "discoveredBy": "official product page image link labelled surface",
+      "webImageResolved": false,
+      "localDownloaded": false,
+      "visuallyInspected": false
+    },
+    {
+      "colour": "Brun terra",
+      "sourcePage": "https://lightbeans.com/en/texture/rialux/bosco-brun-terra",
+      "imageUrl": "https://cdn.lightbeans.com/textures/a1ccb60b2ce8a98ac40c669ce98e828d/PREVIEW_POPUP/plane-1800.webp",
+      "discoveredBy": "official product page image link labelled surface",
+      "webImageResolved": true,
+      "localDownloaded": false,
+      "visuallyInspected": false
+    },
+    {
+      "colour": "Gris galet",
+      "sourcePage": "https://lightbeans.com/en/texture/rialux/bosco-gris-galet",
+      "imageUrl": "https://cdn.lightbeans.com/textures/f635bb50ea80386cb58313b7a602f35d/PREVIEW_POPUP/plane-1800.webp",
+      "discoveredBy": "official product page image link labelled surface",
+      "webImageResolved": true,
+      "localDownloaded": false,
+      "visuallyInspected": false
+    },
+    {
+      "colour": "Noir absolu",
+      "sourcePage": "https://lightbeans.com/en/texture/rialux/bosco-noir-absolu",
+      "imageUrl": "https://cdn.lightbeans.com/textures/60b76d772a1499d57079e6a9f6ef98c1/PREVIEW_POPUP/plane-1800.webp",
+      "discoveredBy": "official product page image link labelled surface",
+      "webImageResolved": true,
+      "localDownloaded": false,
+      "visuallyInspected": false
+    }
+  ],
+  "bluhouss307": {
+    "sourcePage": "https://lightbeans.com/en/texture/jdp-revetement/cedre-blanc-ecobleach-antique-profil-307",
+    "exposedImage": "https://cdn.lightbeans.com/textures/9bb4c3eb0a9d4f84a1709a5fa3132c55/PREVIEW_POPUP/01.png",
+    "flatSourceFound": false,
+    "note": "Exact 307 profile confirmed; no reliable flat local source discovered. 306 is distinct.",
+    "installedPhotoCandidate": {
+      "page": "https://jdprevetement.com/projects/batisse/",
+      "documentedCollection": "Bluhouss",
+      "documentedProfile": "Cèdre Blanc",
+      "documentedFinish": "Antique",
+      "profile307Inference": "JDP collection page maps Bluhouss white cedar to profile307; project page does not spell out307.",
+      "images": [
+        "https://jdprevetement.com/wp-content/uploads/2021/01/TIFF-STROM-QC-JUSTEDUPIN-2-2000x1299.png",
+        "https://jdprevetement.com/wp-content/uploads/2021/01/TIFF-STROM-QC-JUSTEDUPIN-4-2000x884.png",
+        "https://jdprevetement.com/wp-content/uploads/2021/01/Screen-Shot-2023-02-13-at-10.50.53-AM.png",
+        "https://jdprevetement.com/wp-content/uploads/2021/01/Screen-Shot-2023-02-13-at-10.51.30-AM.png",
+        "https://jdprevetement.com/wp-content/uploads/2021/01/Screen-Shot-2023-02-13-at-10.51.43-AM.png"
+      ],
+      "localDownloaded": false,
+      "visuallyInspected": false,
+      "downloadResult": "Tunnel connection failed:403 Forbidden for first image"
+    }
+  },
+  "downloadLimitation": "Direct public JDP page and Lightbeans plane image downloads with approved network requests both failed: Tunnel connection failed: 403 Forbidden. Web connector resolves several image URLs but returns text-only ImageDisplayed placeholders, no image bytes."
+}

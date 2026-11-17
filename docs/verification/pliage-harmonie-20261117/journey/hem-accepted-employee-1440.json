@@ -1,0 +1,229 @@
+{
+  "version": "1.0.0",
+  "kind": "profile",
+  "id": "",
+  "name": "Profil dessiné",
+  "template": "custom",
+  "unit": "in",
+  "spec": {
+    "kind": "profile",
+    "unit": "in",
+    "quantity": "",
+    "material": {
+      "type": "",
+      "name": "",
+      "productRef": null,
+      "thickness": "",
+      "thicknessUnit": "in",
+      "gauge": ""
+    },
+    "finish": {},
+    "coloredFace": {
+      "side": "",
+      "segmentId": "A"
+    },
+    "location": "",
+    "note": "",
+    "template": "custom",
+    "name": "Profil dessiné",
+    "segments": [
+      {
+        "label": "A",
+        "length": "0.5"
+      },
+      {
+        "label": "B",
+        "length": "2"
+      }
+    ],
+    "bends": [
+      {
+        "mode": "hem",
+        "angle": 180,
+        "direction": "right"
+      }
+    ],
+    "startAngle": 0,
+    "length": 120,
+    "mirrorX": false
+  },
+  "segments": [
+    {
+      "id": "A",
+      "label": "A",
+      "name": "",
+      "lengthMM": 12.7,
+      "start": [
+        0,
+        0
+      ],
+      "end": [
+        12.7,
+        0
+      ],
+      "headingDeg": 0
+    },
+    {
+      "id": "B",
+      "label": "B",
+      "name": "",
+      "lengthMM": 50.8,
+      "start": [
+        12.7,
+        0
+      ],
+      "end": [
+        -38.1,
+        0
+      ],
+      "headingDeg": -180
+    }
+  ],
+  "bends": [
+    {
+      "mode": "hem",
+      "angle": 180,
+      "direction": "right",
+      "turnDeg": -180,
+      "label": "Retour écrasé 180° · droite",
+      "at": [
+        12.7,
+        0
+      ],
+      "from": "A",
+      "to": "B"
+    }
+  ],
+  "pointsMM": [
+    [
+      0,
+      0
+    ],
+    [
+      12.7,
+      0
+    ],
+    [
+      -38.1,
+      0
+    ]
+  ],
+  "bbox": {
+    "minX": -38.1,
+    "maxX": 12.7,
+    "minY": 0,
+    "maxY": 0
+  },
+  "coloredFace": {
+    "side": null,
+    "segmentId": "A"
+  },
+  "quantity": null,
+  "material": {
+    "type": "",
+    "name": "",
+    "productRef": null,
+    "gauge": "",
+    "thicknessMM": null
+  },
+  "finish": {
+    "manufacturer": "",
+    "name": "",
+    "code": "",
+    "system": "",
+    "selectionType": null,
+    "special": false,
+    "hex": null
+  },
+  "quotePolicy": {
+    "version": "mir-color-quote-1",
+    "required": false,
+    "reason": "Choisissez une référence de couleur avant de demander le prix.",
+    "automaticPricingAllowed": false,
+    "customColor": false,
+    "label": "Couleur à préciser",
+    "selectionType": "unspecified",
+    "status": "finish_required"
+  },
+  "lengthMM": 3048,
+  "location": "",
+  "note": "",
+  "finishedSegmentSumMM": 63.5,
+  "developedWidthMM": null,
+  "developedWidth": null,
+  "developmentStatus": "requires_workshop_bend_parameters",
+  "validation": {
+    "valid": true,
+    "geometryComplete": true,
+    "specificationComplete": false,
+    "productionReady": false,
+    "errors": [],
+    "pending": [
+      {
+        "code": "QUANTITY_REQUIRED",
+        "path": "quantity",
+        "message": "Quantité entière à préciser."
+      },
+      {
+        "code": "MATERIAL_REQUIRED",
+        "path": "material.type",
+        "message": "Matière à préciser."
+      },
+      {
+        "code": "COLOR_SOURCE_REQUIRED",
+        "path": "finish",
+        "message": "Précisez le fabricant ou le nuancier de la couleur."
+      },
+      {
+        "code": "COLOR_CODE_REQUIRED",
+        "path": "finish.code",
+        "message": "Référence de couleur à préciser."
+      },
+      {
+        "code": "COLORED_FACE_REQUIRED",
+        "path": "coloredFace.side",
+        "message": "Indiquez le côté coloré, gauche ou droit en suivant A vers les segments suivants."
+      }
+    ],
+    "warnings": [],
+    "workshopValidationRequired": true
+  },
+  "valid": true,
+  "complete": false,
+  "productionReady": false,
+  "pricing": {
+    "schema": "mir-piece-pricing-1",
+    "status": "on_request",
+    "requiresQuote": false,
+    "automaticPricingAllowed": false,
+    "currency": "CAD",
+    "rate": null,
+    "rateUnit": "in2",
+    "rateCents": null,
+    "areaSqIn": null,
+    "unitAmount": null,
+    "unitCents": null,
+    "quantity": null,
+    "lineAmount": null,
+    "lineCents": null,
+    "basis": "projected_outer_area_including_lips",
+    "tariffId": null,
+    "taxIncluded": null,
+    "taxStatus": "not_calculated",
+    "shippingStatus": "not_calculated",
+    "label": "Prix sur demande",
+    "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+    "sourceKind": "user_instruction",
+    "geometryErrors": [],
+    "quotePolicy": {
+      "version": "mir-color-quote-1",
+      "required": false,
+      "reason": "Choisissez une référence de couleur avant de demander le prix.",
+      "automaticPricingAllowed": false,
+      "customColor": false,
+      "label": "Couleur à préciser",
+      "selectionType": "unspecified",
+      "status": "finish_required"
+    }
+  }
+}

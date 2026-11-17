@@ -324,11 +324,11 @@
   }
   function productVisual(item) {
     const photo=cataloguePhoto(item),V=window.MIRMaterialPreview;
-    return V.photoImage(photo,item.name)||(isFold(item)?foldSVG(item):V.photoUnavailable());
+    return window.MIRStoreSidingPreviews?.markup(materialMap.get(item.materialId))||V.photoImage(photo,item.name)||(isFold(item)?foldSVG(item):V.photoUnavailable());
   }
   function productVisualLabel(item){
     const photo=cataloguePhoto(item);
-    return photo?window.MIRMaterialPreview.photoLabel(photo):isFold(item)?'Dessin du pliage':'Visuel à compléter';
+    return window.MIRStoreSidingPreviews?.label(materialMap.get(item.materialId))||(photo?window.MIRMaterialPreview.photoLabel(photo):isFold(item)?'Dessin du pliage':'Visuel à compléter');
   }
   const favoriteIds=()=>state.favorites[actorId]||[];
   function shortcutItems(folds=false){
@@ -348,6 +348,7 @@
     colorId ||= card.querySelector('[data-product-color]')?.value;
     const color=item.storeColors?.find(c=>c.id===colorId)||item.colors?.find(c=>c.id===colorId);
     const formatId=card.querySelector('[data-product-format]')?.value||item.formats?.[0]?.id||'';
+    if(await window.MIRStoreSidingPreviews?.render(element,caption,materialMap.get(item.materialId),color))return;
     if(color?.variantImage){
       V.cancel(element);
       element.innerHTML=V.photoImage({src:color.variantImage,assetKind:'supplier_product_photo'},item.name+' · '+color.name)||V.photoUnavailable();
@@ -1186,7 +1187,7 @@
 
     if(button.hasAttribute('data-field-team-summary')){openDialog(dialogHeader('MON ÉQUIPE','Équipe, tâches et rapport','Une présence non confirmée ne signifie pas une absence.')+'<div class=field-list><button class=field-row data-view=lead-team>Équipe et présences</button><button class=field-row data-field-tasks>Tâches du chantier</button><button class=field-row data-lead-report>Préparer le rapport</button></div>');return true;}
     if(button.dataset.fieldPage){fieldCataloguePage+=button.dataset.fieldPage==='next'?1:-1;renderCatalogueGrid();return true;}
-    if(button.dataset.fieldProduct){const item=fieldCatalogueItems.get(button.dataset.fieldProduct)||itemById(button.dataset.fieldProduct);if(!item)return true;if(isFold(item)){showFold(item.id);return true;}openDialog('<div class=field-store-detail>'+dialogHeader('MAGASIN',item.name,'Choisissez les options et la quantité.')+productCard(item)+'</div>');const detail=$('.field-store-detail');detail?.querySelector('.product-body h3')?.remove();const visual=detail?.querySelector('.product-visual');if(visual&&!visual.querySelector('img,canvas'))visual.classList.add('field-product-no-photo');window.MIRFieldChoices?.upgrade();return true;}
+    if(button.dataset.fieldProduct){const item=fieldCatalogueItems.get(button.dataset.fieldProduct)||itemById(button.dataset.fieldProduct);if(!item)return true;if(isFold(item)){showFold(item.id);return true;}openDialog('<div class=field-store-detail>'+dialogHeader('MAGASIN',item.name,'Choisissez les options et la quantité.')+productCard(item)+'</div>');const detail=$('.field-store-detail');detail?.querySelector('.product-body h3')?.remove();const visual=detail?.querySelector('.product-visual');if(visual&&!visual.querySelector('img,canvas,.mir-store-siding-sample,[data-mir-stable-siding]'))visual.classList.add('field-product-no-photo');window.MIRFieldChoices?.upgrade();return true;}
     if(button.hasAttribute('data-field-profile')){openDialog(dialogHeader('MON COMPTE',actor()?.name||'Équipe MIR',mode==='chef_equipe'?'Chef d’équipe':'Employé chantier')+`<p>${esc(clientStatus?.user?.email||'')}</p><div class="field-list"><button type="button" class="field-row" data-view="settings">Réglages ${icon('arrow')}</button></div><hr><button type="button" class="button danger full" id="portal-signout">Déconnexion</button>`);return true;}
     if(button.hasAttribute('data-field-cart')){setView('catalogue');reviewingOrder=true;renderCart();return true;}
     if(button.dataset.fieldCatalogue){ui.fieldCatalogue=button.dataset.fieldCatalogue;setView('catalogue');category=button.dataset.fieldCatalogue==='fold'?'pliages':'all';renderCatalogueGrid();return true;}

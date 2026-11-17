@@ -1,0 +1,1536 @@
+{
+  "phase": "before",
+  "capturedAt": "2026-11-17T16:16:30.597Z",
+  "viewportCaptures": true,
+  "physicalDevices": false,
+  "results": [
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "short-first-return",
+      "hemPrompt": false,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          70.39493911737145,
+          45.52083928429252
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 171.6002,
+          "turnDeg": 171.6002,
+          "label": "Rotation 171.6002°",
+          "at": [
+            12.7,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 12.7,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            12.7,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            12.7,
+            0
+          ],
+          "end": [
+            -37.5550604185,
+            7.4208424278
+          ],
+          "headingDeg": 171.6002
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          177.79999999999998,
+          88.89999999999999
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 41.6335,
+          "turnDeg": 41.6335,
+          "label": "Rotation 41.6335°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.46416,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            107.9500606062,
+            50.799983634
+          ],
+          "headingDeg": 41.6335
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "client",
+      "input": "mouse",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.149999999999984
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "short-first-return",
+      "hemPrompt": false,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          70.39493911737145,
+          45.52083928429252
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 171.6002,
+          "turnDeg": 171.6002,
+          "label": "Rotation 171.6002°",
+          "at": [
+            12.7,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 12.7,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            12.7,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            12.7,
+            0
+          ],
+          "end": [
+            -37.5550604185,
+            7.4208424278
+          ],
+          "headingDeg": 171.6002
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          177.79999999999998,
+          88.89999999999999
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 41.6335,
+          "turnDeg": 41.6335,
+          "label": "Rotation 41.6335°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.46416,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            107.9500606062,
+            50.799983634
+          ],
+          "headingDeg": 41.6335
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 1440,
+      "channel": "employee",
+      "input": "mouse",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.149999999999984
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "short-first-return",
+      "hemPrompt": false,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          70.39494244545966,
+          45.52086182258086
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 171.6002,
+          "turnDeg": 171.6002,
+          "label": "Rotation 171.6002°",
+          "at": [
+            12.7,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 12.7,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            12.7,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            12.7,
+            0
+          ],
+          "end": [
+            -37.5550604185,
+            7.4208424278
+          ],
+          "headingDeg": 171.6002
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          177.79999999999998,
+          88.89999999999999
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 41.6335,
+          "turnDeg": 41.6335,
+          "label": "Rotation 41.6335°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.46416,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            107.9500606062,
+            50.799983634
+          ],
+          "headingDeg": 41.6335
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "client",
+      "input": "touch",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.149999999999984
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "short-first-return",
+      "hemPrompt": false,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          70.39493933147449,
+          45.520840734230866
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 171.6002,
+          "turnDeg": 171.6002,
+          "label": "Rotation 171.6002°",
+          "at": [
+            12.7,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 12.7,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            12.7,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            12.7,
+            0
+          ],
+          "end": [
+            -37.5550604185,
+            7.4208424278
+          ],
+          "headingDeg": 171.6002
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          177.79999999999998,
+          88.89999999999999
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 41.6335,
+          "turnDeg": 41.6335,
+          "label": "Rotation 41.6335°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.46416,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            107.9500606062,
+            50.799983634
+          ],
+          "headingDeg": 41.6335
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 834,
+      "channel": "employee",
+      "input": "touch",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.15
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "short-first-return",
+      "hemPrompt": false,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          70.39493933147449,
+          45.520840734230866
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 171.6002,
+          "turnDeg": 171.6002,
+          "label": "Rotation 171.6002°",
+          "at": [
+            12.7,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 12.7,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            12.7,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            12.7,
+            0
+          ],
+          "end": [
+            -37.5550604185,
+            7.4208424278
+          ],
+          "headingDeg": 171.6002
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          177.79999999999998,
+          88.89999999999999
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 41.6335,
+          "turnDeg": 41.6335,
+          "label": "Rotation 41.6335°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.46416,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            107.9500606062,
+            50.799983634
+          ],
+          "headingDeg": 41.6335
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "client",
+      "input": "touch",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.149999999999984
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "short-first-return",
+      "hemPrompt": false,
+      "points": [
+        [
+          107.94999999999999,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          70.39493643160091,
+          45.52082109582004
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 171.6002,
+          "turnDeg": 171.6002,
+          "label": "Rotation 171.6002°",
+          "at": [
+            12.7,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 12.7,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            12.7,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            12.7,
+            0
+          ],
+          "end": [
+            -37.5550604185,
+            7.4208424278
+          ],
+          "headingDeg": 171.6002
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "tap-diagonal",
+      "points": [
+        [
+          69.85,
+          38.099999999999994
+        ],
+        [
+          120.64999999999999,
+          38.099999999999994
+        ],
+        [
+          177.79999999999998,
+          88.89999999999999
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 41.6335,
+          "turnDeg": 41.6335,
+          "label": "Rotation 41.6335°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 76.46416,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            107.9500606062,
+            50.799983634
+          ],
+          "headingDeg": 41.6335
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "custom",
+        "label": "Profil sur mesure",
+        "sides": 2,
+        "certainty": "low",
+        "suggestedName": "Moulure sur mesure · 2 côtés"
+      }
+    },
+    {
+      "width": 390,
+      "channel": "employee",
+      "input": "touch",
+      "case": "two-consecutive-right-angles",
+      "points": [
+        [
+          57.15,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          19.049999999999997
+        ],
+        [
+          107.94999999999999,
+          57.14999999999999
+        ],
+        [
+          69.85,
+          57.15
+        ]
+      ],
+      "bends": [
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            0
+          ],
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "mode": "signed",
+          "angle": 90,
+          "turnDeg": 90,
+          "label": "Rotation 90°",
+          "at": [
+            50.8,
+            38.1
+          ],
+          "from": "B",
+          "to": "C"
+        }
+      ],
+      "segments": [
+        {
+          "id": "A",
+          "label": "A",
+          "name": "",
+          "lengthMM": 50.8,
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            50.8,
+            0
+          ],
+          "headingDeg": 0
+        },
+        {
+          "id": "B",
+          "label": "B",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            0
+          ],
+          "end": [
+            50.8,
+            38.1
+          ],
+          "headingDeg": 90
+        },
+        {
+          "id": "C",
+          "label": "C",
+          "name": "",
+          "lengthMM": 38.099999999999994,
+          "start": [
+            50.8,
+            38.1
+          ],
+          "end": [
+            12.7,
+            38.1
+          ],
+          "headingDeg": 180
+        }
+      ],
+      "valid": true,
+      "recognition": {
+        "code": "j-u",
+        "label": "Profil en J / U",
+        "sides": 3,
+        "certainty": "medium",
+        "suggestedName": "Moulure en J / U"
+      }
+    }
+  ],
+  "errors": [],
+  "blockedAttemptCount": 6,
+  "externalTransmitted": 0,
+  "realSubmissions": 0
+}

@@ -1,0 +1,86 @@
+{
+  "baseline": "3573d90",
+  "sourceHashes": {
+    "dist/production-app.js": {
+      "beforeSha256": "2b78e13731727f7fbca064b7611cadd9072cad61ee9629d0258d924c53f852c7",
+      "afterSha256": "f977fe5f57708fdf7b7cd6f26d8b92e1ac12b8968f28124f88803890be47a318",
+      "identicalToBaseline": false
+    },
+    "dist/mir-profile-recognition.js": {
+      "beforeSha256": "7af9fc679fe576a99a8ce85dec3761a116627d4c1b5dacb66ce37cb0206cfc1f",
+      "afterSha256": "98f9ecc343eeb901c8b0b1a20e0fe8e77895ba383704a585d35760881469deda",
+      "identicalToBaseline": false
+    },
+    "dist/production-model.js": {
+      "beforeSha256": "b4ca9fe8bd850e59dacfb4d38be0c48fcdf3e187d0b7177c51b22f9af835c37f",
+      "afterSha256": "ae3d15fe991cca10d4cf92457a95b21d3be879b9225c5bcd33b603aa32cc77fe",
+      "identicalToBaseline": false
+    },
+    "dist/production-volume.js": {
+      "beforeSha256": "c8e58d92c9513456025840e1b7d64db3b7a2fc00f04e79d527d0f8ff10453a40",
+      "afterSha256": "c8e58d92c9513456025840e1b7d64db3b7a2fc00f04e79d527d0f8ff10453a40",
+      "identicalToBaseline": true
+    }
+  },
+  "newUnitTests": {
+    "before": {
+      "pass": 2,
+      "fail": 4
+    },
+    "after": {
+      "pass": 6,
+      "fail": 0
+    }
+  },
+  "existingRegressionTests": [
+    {
+      "command": "node tests/mir-profile-recognition.cjs",
+      "passed": 7
+    },
+    {
+      "command": "node tests/mir-pages-regressions.cjs",
+      "passed": 45
+    },
+    {
+      "command": "node tests/mir-retours-cotes.cjs",
+      "passed": 9
+    }
+  ],
+  "browser": {
+    "beforeCases": 18,
+    "afterCases": 162,
+    "confirmedHemCases": 18,
+    "widths": [
+      1440,
+      834,
+      390
+    ],
+    "physicalDevices": false,
+    "externalTransmitted": 0,
+    "realSubmissions": 0
+  },
+  "readOnlyStoreRaceAudit": {
+    "passed": 6,
+    "method": "Actual adapter with controlled asynchronous preparation; DOM and colour renderer simulated"
+  },
+  "modelDependency": "production-model.js modified by coordinated PDF work; not edited by geometry agent",
+  "dialogPointerGuard": {
+    "before": {
+      "pass": 5,
+      "fail": 1
+    },
+    "after": {
+      "pass": 6,
+      "fail": 0
+    },
+    "nativeConfirmationCasesPassed": 18,
+    "modalTouchProtocol": {
+      "separationAfterDrawingMs": 400,
+      "contactDurationMs": 70,
+      "selector": "label card SVG area",
+      "forcedClicks": false,
+      "syntheticDOMEvents": false
+    },
+    "instantEmulatedTapCertified": false
+  }
+}

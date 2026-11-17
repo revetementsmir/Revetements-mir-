@@ -1,0 +1,324 @@
+{
+  "createdAt": "2026-11-17T16:28:43.530Z",
+  "network": "Local GET only; employee SDK simulated; no business action sent",
+  "results": [
+    {
+      "surface": "magasin-revue (simulation locale)",
+      "width": 1440,
+      "specimen": "akta",
+      "initial": {
+        "width": 324.65625,
+        "height": 216.4375,
+        "viewBox": "0 500 1500 1000",
+        "source": "./assets/catalogue-swatches/jdp-gris-antique-c790727e.png",
+        "visible": true
+      },
+      "colors": [
+        "jdp-portobello",
+        "jdp-gris-antique"
+      ],
+      "file": "after-magasin-revue-akta-1440.png",
+      "passed": true
+    },
+    {
+      "surface": "magasin-revue (simulation locale)",
+      "width": 1440,
+      "specimen": "bluhouss",
+      "initial": {
+        "width": 324.65625,
+        "height": 216.4375,
+        "viewBox": "640 760 720 480",
+        "source": "./assets/products/jdp-bluhouss-307.webp",
+        "visible": true
+      },
+      "colors": [
+        "jdp-bluhouss307-ecobleach"
+      ],
+      "file": "after-magasin-revue-bluhouss-1440.png",
+      "passed": true
+    },
+    {
+      "surface": "magasin-revue (simulation locale)",
+      "width": 1440,
+      "specimen": "bosco",
+      "initial": {
+        "width": 324.65625,
+        "height": 216.4375,
+        "viewBox": "0 0 280 187",
+        "source": "./assets/products/rialux-bosco.webp",
+        "visible": true
+      },
+      "colors": [
+        "rialux-bosco-beige-dune",
+        "rialux-bosco-noir-absolu"
+      ],
+      "file": "after-magasin-revue-bosco-1440.png",
+      "passed": true
+    },
+    {
+      "surface": "chantier (fixture locale)",
+      "width": 1440,
+      "specimen": "akta",
+      "initial": {
+        "width": 528,
+        "height": 160,
+        "viewBox": "0 500 1500 1000",
+        "source": "./assets/catalogue-swatches/jdp-gris-antique-c790727e.png",
+        "visible": true
+      },
+      "colors": [
+        "jdp-portobello",
+        "jdp-gris-antique"
+      ],
+      "file": "after-chantier-akta-1440.png",
+      "passed": true
+    },
+    {
+      "surface": "chantier (fixture locale)",
+      "width": 1440,
+      "specimen": "bluhouss",
+      "initial": {
+        "width": 528,
+        "height": 160,
+        "viewBox": "640 760 720 480",
+        "source": "./assets/products/jdp-bluhouss-307.webp",
+        "visible": true
+      },
+      "colors": [
+        "jdp-bluhouss307-ecobleach"
+      ],
+      "file": "after-chantier-bluhouss-1440.png",
+      "passed": true
+    },
+    {
+      "surface": "chantier (fixture locale)",
+      "width": 1440,
+      "specimen": "bosco",
+      "initial": {
+        "width": 528,
+        "height": 160,
+        "viewBox": "0 0 280 187",
+        "source": "./assets/products/rialux-bosco.webp",
+        "visible": true
+      },
+      "colors": [
+        "rialux-bosco-beige-dune",
+        "rialux-bosco-noir-absolu"
+      ],
+      "file": "after-chantier-bosco-1440.png",
+      "passed": true
+    },
+    {
+      "surface": "magasin-revue (simulation locale)",
+      "width": 834,
+      "specimen": "akta",
+      "initial": {
+        "width": 256,
+        "height": 170.65625,
+        "viewBox": "0 500 1500 1000",
+        "source": "./assets/catalogue-swatches/jdp-gris-antique-c790727e.png",
+        "visible": true
+      },
+      "colors": [
+        "jdp-portobello",
+        "jdp-gris-antique"
+      ],
+      "file": "after-magasin-revue-akta-834.png",
+      "passed": true
+    },
+    {
+      "surface": "magasin-revue (simulation locale)",
+      "width": 834,
+      "specimen": "bluhouss",
+      "initial": {
+        "width": 256,
+        "height": 170.65625,
+        "viewBox": "640 760 720 480",
+        "source": "./assets/products/jdp-bluhouss-307.webp",
+        "visible": true
+      },
+      "colors": [
+        "jdp-bluhouss307-ecobleach"
+      ],
+      "file": "after-magasin-revue-bluhouss-834.png",
+      "passed": true
+    },
+    {
+      "surface": "magasin-revue (simulation locale)",
+      "width": 834,
+      "specimen": "bosco",
+      "initial": {
+        "width": 256,
+        "height": 170.65625,
+        "viewBox": "0 0 280 187",
+        "source": "./assets/products/rialux-bosco.webp",
+        "visible": true
+      },
+      "colors": [
+        "rialux-bosco-beige-dune",
+        "rialux-bosco-noir-absolu"
+      ],
+      "file": "after-magasin-revue-bosco-834.png",
+      "passed": true
+    },
+    {
+      "surface": "chantier (fixture locale)",
+      "width": 834,
+      "specimen": "akta",
+      "initial": {
+        "width": 528,
+        "height": 160,
+        "viewBox": "0 500 1500 1000",
+        "source": "./assets/catalogue-swatches/jdp-gris-antique-c790727e.png",
+        "visible": true
+      },
+      "colors": [
+        "jdp-portobello",
+        "jdp-gris-antique"
+      ],
+      "file": "after-chantier-akta-834.png",
+      "passed": true
+    },
+    {
+      "surface": "chantier (fixture locale)",
+      "width": 834,
+      "specimen": "bluhouss",
+      "initial": {
+        "width": 528,
+        "height": 160,
+        "viewBox": "640 760 720 480",
+        "source": "./assets/products/jdp-bluhouss-307.webp",
+        "visible": true
+      },
+      "colors": [
+        "jdp-bluhouss307-ecobleach"
+      ],
+      "file": "after-chantier-bluhouss-834.png",
+      "passed": true
+    },
+    {
+      "surface": "chantier (fixture locale)",
+      "width": 834,
+      "specimen": "bosco",
+      "initial": {
+        "width": 528,
+        "height": 160,
+        "viewBox": "0 0 280 187",
+        "source": "./assets/products/rialux-bosco.webp",
+        "visible": true
+      },
+      "colors": [
+        "rialux-bosco-beige-dune",
+        "rialux-bosco-noir-absolu"
+      ],
+      "file": "after-chantier-bosco-834.png",
+      "passed": true
+    },
+    {
+      "surface": "magasin-revue (simulation locale)",
+      "width": 390,
+      "specimen": "akta",
+      "initial": {
+        "width": 356,
+        "height": 237.328125,
+        "viewBox": "0 500 1500 1000",
+        "source": "./assets/catalogue-swatches/jdp-gris-antique-c790727e.png",
+        "visible": true
+      },
+      "colors": [
+        "jdp-portobello",
+        "jdp-gris-antique"
+      ],
+      "file": "after-magasin-revue-akta-390.png",
+      "passed": true
+    },
+    {
+      "surface": "magasin-revue (simulation locale)",
+      "width": 390,
+      "specimen": "bluhouss",
+      "initial": {
+        "width": 356,
+        "height": 237.328125,
+        "viewBox": "640 760 720 480",
+        "source": "./assets/products/jdp-bluhouss-307.webp",
+        "visible": true
+      },
+      "colors": [
+        "jdp-bluhouss307-ecobleach"
+      ],
+      "file": "after-magasin-revue-bluhouss-390.png",
+      "passed": true
+    },
+    {
+      "surface": "magasin-revue (simulation locale)",
+      "width": 390,
+      "specimen": "bosco",
+      "initial": {
+        "width": 356,
+        "height": 237.328125,
+        "viewBox": "0 0 280 187",
+        "source": "./assets/products/rialux-bosco.webp",
+        "visible": true
+      },
+      "colors": [
+        "rialux-bosco-beige-dune",
+        "rialux-bosco-noir-absolu"
+      ],
+      "file": "after-magasin-revue-bosco-390.png",
+      "passed": true
+    },
+    {
+      "surface": "chantier (fixture locale)",
+      "width": 390,
+      "specimen": "akta",
+      "initial": {
+        "width": 356,
+        "height": 160,
+        "viewBox": "0 500 1500 1000",
+        "source": "./assets/catalogue-swatches/jdp-gris-antique-c790727e.png",
+        "visible": true
+      },
+      "colors": [
+        "jdp-portobello",
+        "jdp-gris-antique"
+      ],
+      "file": "after-chantier-akta-390.png",
+      "passed": true
+    },
+    {
+      "surface": "chantier (fixture locale)",
+      "width": 390,
+      "specimen": "bluhouss",
+      "initial": {
+        "width": 356,
+        "height": 160,
+        "viewBox": "640 760 720 480",
+        "source": "./assets/products/jdp-bluhouss-307.webp",
+        "visible": true
+      },
+      "colors": [
+        "jdp-bluhouss307-ecobleach"
+      ],
+      "file": "after-chantier-bluhouss-390.png",
+      "passed": true
+    },
+    {
+      "surface": "chantier (fixture locale)",
+      "width": 390,
+      "specimen": "bosco",
+      "initial": {
+        "width": 356,
+        "height": 160,
+        "viewBox": "0 0 280 187",
+        "source": "./assets/products/rialux-bosco.webp",
+        "visible": true
+      },
+      "colors": [
+        "rialux-bosco-beige-dune",
+        "rialux-bosco-noir-absolu"
+      ],
+      "file": "after-chantier-bosco-390.png",
+      "passed": true
+    }
+  ]
+}

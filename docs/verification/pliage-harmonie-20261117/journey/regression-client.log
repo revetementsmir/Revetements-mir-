@@ -1,0 +1,20 @@
+AssertionError [ERR_ASSERTION]: l’en-tête ne déplace pas les choix
++ actual - expected
+
+  {
+    height: 76.15625,
+    width: 320,
+    x: 20,
++   y: 222.5
+-   y: 221.59375
+  }
+
+    at verifyFirstPaint (/tmp/safe-mir-client-pliage-approved-browser.cjs:51:11)
+    at async /tmp/safe-mir-client-pliage-approved-browser.cjs:70:4 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

@@ -1,0 +1,89 @@
+✖ accrochage 45°/90° relatif au dernier côté dans tous les quadrants (1.323356ms)
+✔ axes absolus et hystérésis conservés, aucun saut à travers ±180° (0.295096ms)
+✖ retour écrasé proposé dès le petit premier rebord, peu importe orientation/échelle (0.95411ms)
+✔ édition existante, sens du hem et deux angles distincts conservés (1.381542ms)
+✖ la reconnaissance ne transforme pas un angle aigu valide en retour écrasé (2.204148ms)
+✖ clic et tap appliquent le même aimant avant l’arrondi de grille (1.880239ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 2
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14.31128
+
+✖ failing tests:
+
+test at tests/mir-pliage-harmonie-geometry.cjs:11:1
+✖ accrochage 45°/90° relatif au dernier côté dans tous les quadrants (1.323356ms)
+  AssertionError [ERR_ASSERTION]: {"previous":17,"turn":-135,"delta":-1,"actual":-118.99999999999997}
+      at TestContext.<anonymous> (/workspace/mir-prestige/tests/mir-pliage-harmonie-geometry.cjs:14:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/mir-pliage-harmonie-geometry.cjs:20:1
+✖ retour écrasé proposé dès le petit premier rebord, peu importe orientation/échelle (0.95411ms)
+  AssertionError [ERR_ASSERTION]: {"degrees":0,"scale":0.1,"sign":-1,"bend":{"mode":"signed","angle":-177.1376}}
+  
+  'signed' !== 'hem'
+  
+      at TestContext.<anonymous> (/workspace/mir-prestige/tests/mir-pliage-harmonie-geometry.cjs:23:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'signed',
+    expected: 'hem',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/mir-pliage-harmonie-geometry.cjs:32:1
+✖ la reconnaissance ne transforme pas un angle aigu valide en retour écrasé (2.204148ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be strictly unequal to: 'hem'
+      at TestContext.<anonymous> (/workspace/mir-prestige/tests/mir-pliage-harmonie-geometry.cjs:34:235)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'hem',
+    expected: 'hem',
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/mir-pliage-harmonie-geometry.cjs:48:1
+✖ clic et tap appliquent le même aimant avant l’arrondi de grille (1.880239ms)
+  AssertionError [ERR_ASSERTION]: {"raw":[200,197],"grid":[200,192],"point":[200,192],"start":[120,120]}
+      at TestContext.<anonymous> (/workspace/mir-prestige/tests/mir-pliage-harmonie-geometry.cjs:49:88)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

@@ -1,0 +1,2546 @@
+{
+  "sourceLengthsMM": [
+    12.7,
+    50.8
+  ],
+  "order": {
+    "id": "DOS-304743ee-5944-4a47-a286-fbbb736cdc00",
+    "project": "",
+    "poNumber": "",
+    "foreman": "",
+    "date": "2026-11-17",
+    "revision": "A",
+    "notes": "",
+    "items": [
+      {
+        "id": "M001",
+        "kind": "profile",
+        "spec": {
+          "kind": "profile",
+          "id": "M001",
+          "unit": "in",
+          "length": "120",
+          "quantity": 2,
+          "material": {
+            "type": "aluminium",
+            "name": "",
+            "productRef": null,
+            "thickness": "",
+            "thicknessUnit": "in",
+            "gauge": ""
+          },
+          "finish": {
+            "manufacturer": "Westlake Royal",
+            "selectionType": "manufacturer",
+            "hex": null,
+            "swatchUrl": null,
+            "swatchImage": null,
+            "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+            "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+            "displayOnly": false,
+            "system": "Nuancier Westlake Royal",
+            "name": "Noir",
+            "code": "30"
+          },
+          "location": "",
+          "note": "",
+          "perforation": {},
+          "mirrorX": false,
+          "template": "custom",
+          "startAngle": 0,
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left"
+            }
+          ],
+          "segments": [
+            {
+              "label": "A",
+              "name": "Aile A",
+              "length": "3.5"
+            },
+            {
+              "label": "B",
+              "name": "Aile B",
+              "length": "2.25"
+            }
+          ],
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "A"
+          },
+          "name": "Pliage en L"
+        },
+        "snapshot": {
+          "schema": "mir-production-instance-1",
+          "id": "M001",
+          "templateId": "mir-standard-profile-l",
+          "templateVersion": 1,
+          "templateSnapshot": {
+            "schema": "mir-production-template-1",
+            "id": "mir-standard-profile-l",
+            "name": "Pliage en L",
+            "version": 1,
+            "description": "Modèle standard MIR; cotes de fabrication à renseigner.",
+            "kind": "profile",
+            "topology": {
+              "kind": "profile",
+              "segments": [
+                {
+                  "label": "A",
+                  "name": "Aile A"
+                },
+                {
+                  "label": "B",
+                  "name": "Aile B"
+                }
+              ],
+              "bends": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left"
+                }
+              ],
+              "startAngle": 0,
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "A"
+              }
+            },
+            "fields": [
+              {
+                "key": "A",
+                "label": "A · Aile A",
+                "type": "measure",
+                "value": null,
+                "required": true
+              },
+              {
+                "key": "B",
+                "label": "B · Aile B",
+                "type": "measure",
+                "value": null,
+                "required": true
+              },
+              {
+                "key": "length",
+                "label": "Longueur de la pièce",
+                "type": "measure",
+                "value": null,
+                "required": true
+              }
+            ],
+            "previewProportions": {
+              "illustrative": true,
+              "unitless": true,
+              "segmentRatios": [
+                1,
+                0.6666666666666667
+              ]
+            },
+            "clientDefaults": {},
+            "measurementDefaults": null,
+            "referenceUnit": null,
+            "previousVersion": null,
+            "fingerprint": "b6f764da"
+          },
+          "modelVersion": "1.0.0",
+          "revision": 1,
+          "previousRevisionId": null,
+          "values": {
+            "id": "M001",
+            "instanceId": "M001",
+            "name": "Pliage en L",
+            "unit": "in",
+            "measurements": {
+              "A": "3.5",
+              "B": "2.25",
+              "length": "120"
+            },
+            "quantity": 2,
+            "material": {
+              "type": "aluminium",
+              "name": "",
+              "productRef": null,
+              "thickness": "",
+              "thicknessUnit": "in",
+              "gauge": ""
+            },
+            "finish": {
+              "manufacturer": "Westlake Royal",
+              "selectionType": "manufacturer",
+              "hex": null,
+              "swatchUrl": null,
+              "swatchImage": null,
+              "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+              "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+              "displayOnly": false,
+              "system": "Nuancier Westlake Royal",
+              "name": "Noir",
+              "code": "30"
+            },
+            "length": "120",
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            },
+            "mirrorX": false,
+            "perforation": {},
+            "lips": {},
+            "location": "",
+            "note": ""
+          },
+          "spec": {
+            "kind": "profile",
+            "id": "M001",
+            "unit": "in",
+            "length": "120",
+            "quantity": 2,
+            "material": {
+              "type": "aluminium",
+              "name": "",
+              "productRef": null,
+              "thickness": "",
+              "thicknessUnit": "in",
+              "gauge": ""
+            },
+            "finish": {
+              "manufacturer": "Westlake Royal",
+              "selectionType": "manufacturer",
+              "hex": null,
+              "swatchUrl": null,
+              "swatchImage": null,
+              "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+              "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+              "displayOnly": false,
+              "system": "Nuancier Westlake Royal",
+              "name": "Noir",
+              "code": "30"
+            },
+            "location": "",
+            "note": "",
+            "perforation": {},
+            "mirrorX": false,
+            "template": "custom",
+            "startAngle": 0,
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left"
+              }
+            ],
+            "segments": [
+              {
+                "label": "A",
+                "name": "Aile A",
+                "length": "3.5"
+              },
+              {
+                "label": "B",
+                "name": "Aile B",
+                "length": "2.25"
+              }
+            ],
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            },
+            "name": "Pliage en L"
+          },
+          "measurements": {
+            "A": "3.5",
+            "B": "2.25",
+            "length": "120"
+          },
+          "geometry": {
+            "kind": "profile",
+            "pointsMM": [
+              [
+                0,
+                0
+              ],
+              [
+                88.9,
+                0
+              ],
+              [
+                88.9,
+                57.15
+              ]
+            ],
+            "segments": [
+              {
+                "id": "A",
+                "label": "A",
+                "name": "Aile A",
+                "lengthMM": 88.89999999999999,
+                "start": [
+                  0,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  0
+                ],
+                "headingDeg": 0
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "name": "Aile B",
+                "lengthMM": 57.15,
+                "start": [
+                  88.9,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  57.15
+                ],
+                "headingDeg": 90
+              }
+            ],
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left",
+                "turnDeg": 90,
+                "label": "90° intérieur · gauche",
+                "at": [
+                  88.9,
+                  0
+                ],
+                "from": "A",
+                "to": "B"
+              }
+            ],
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            }
+          },
+          "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Pliage en L · coupe et cotes finies\"><title>Pliage en L · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M001 · Pliage en L</text><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"left\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"279,283.7143 284.8779,298.6241 300.8743,299.6069 288.5106,309.8045 292.5191,325.3217 279,316.7143 265.4809,325.3217 269.4894,309.8045 257.1257,299.6069 273.1221,298.6241\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M50,382.7143L50,414.7143 M508,382.7143L508,414.7143 M50,414.7143L508,414.7143\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"279\" data-anchor-y=\"382.7143\" data-segment-start-x=\"50\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"382.7143\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(279,414.7143) rotate(0)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 3 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,382.7143L476,382.7143 M508,88.2857L476,88.2857 M476,382.7143L476,88.2857\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"508\" data-anchor-y=\"235.5\" data-segment-start-x=\"508\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"88.2857\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(476,235.5) rotate(90)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 1/4 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 3 1/2 po · Aile A</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 90°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 1/4 po · Aile B</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 5 3/4 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 1 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+          "status": "specified",
+          "quotePolicy": {
+            "version": "mir-color-quote-1",
+            "required": false,
+            "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+            "automaticPricingAllowed": false,
+            "customColor": false,
+            "label": "Prix sur demande",
+            "selectionType": "manufacturer",
+            "status": "price_unconfigured"
+          },
+          "pricing": {
+            "schema": "mir-piece-pricing-1",
+            "status": "on_request",
+            "requiresQuote": false,
+            "automaticPricingAllowed": false,
+            "currency": "CAD",
+            "rate": null,
+            "rateUnit": "in2",
+            "rateCents": null,
+            "areaSqIn": null,
+            "unitAmount": null,
+            "unitCents": null,
+            "quantity": 2,
+            "lineAmount": null,
+            "lineCents": null,
+            "basis": "projected_outer_area_including_lips",
+            "tariffId": null,
+            "taxIncluded": null,
+            "taxStatus": "not_calculated",
+            "shippingStatus": "not_calculated",
+            "label": "Prix sur demande",
+            "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+            "sourceKind": "user_instruction",
+            "geometryErrors": [],
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Prix sur demande",
+              "selectionType": "manufacturer",
+              "status": "price_unconfigured"
+            }
+          },
+          "workshopValidationRequired": true,
+          "revisionId": "M001-r1-93b62a42"
+        },
+        "history": [],
+        "selection": {
+          "materialId": "royal-alumipro-coil-132419",
+          "colorSystem": "manufacturer",
+          "colorId": "royal-30",
+          "storeColorMode": "employee"
+        },
+        "savedAt": "2026-11-17T16:47:58.643Z"
+      },
+      {
+        "id": "M002",
+        "editableTrace": true,
+        "kind": "profile",
+        "spec": {
+          "kind": "profile",
+          "id": "M002",
+          "unit": "in",
+          "length": 120,
+          "quantity": 3,
+          "material": {
+            "type": "aluminium",
+            "name": "",
+            "productRef": null,
+            "thickness": "",
+            "thicknessUnit": "in",
+            "gauge": ""
+          },
+          "finish": {
+            "manufacturer": "Westlake Royal",
+            "selectionType": "manufacturer",
+            "hex": null,
+            "swatchUrl": null,
+            "swatchImage": null,
+            "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+            "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+            "displayOnly": false,
+            "system": "Nuancier Westlake Royal",
+            "name": "Noir",
+            "code": "30"
+          },
+          "location": "",
+          "note": "",
+          "perforation": {},
+          "mirrorX": false,
+          "template": "custom",
+          "startAngle": 0,
+          "bends": [
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right"
+            }
+          ],
+          "segments": [
+            {
+              "label": "A",
+              "name": "",
+              "length": "0.5"
+            },
+            {
+              "label": "B",
+              "name": "",
+              "length": "2"
+            }
+          ],
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "B"
+          },
+          "name": "Profil dessiné"
+        },
+        "snapshot": {
+          "schema": "mir-production-instance-1",
+          "id": "M002",
+          "templateId": "modele-piece-M002-b9d719a8-1e32-43d2-9fd5-ae2323b30fe4",
+          "templateVersion": 1,
+          "templateSnapshot": {
+            "schema": "mir-production-template-1",
+            "id": "modele-piece-M002-b9d719a8-1e32-43d2-9fd5-ae2323b30fe4",
+            "name": "Profil dessiné",
+            "version": 1,
+            "description": "",
+            "kind": "profile",
+            "topology": {
+              "kind": "profile",
+              "segments": [
+                {
+                  "label": "A",
+                  "name": ""
+                },
+                {
+                  "label": "B",
+                  "name": ""
+                }
+              ],
+              "bends": [
+                {
+                  "mode": "hem",
+                  "angle": 180,
+                  "direction": "right"
+                }
+              ],
+              "startAngle": 0,
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "B"
+              }
+            },
+            "fields": [
+              {
+                "key": "A",
+                "label": "A",
+                "type": "measure",
+                "value": null,
+                "required": true
+              },
+              {
+                "key": "B",
+                "label": "B",
+                "type": "measure",
+                "value": null,
+                "required": true
+              },
+              {
+                "key": "length",
+                "label": "Longueur de la pièce",
+                "type": "measure",
+                "value": null,
+                "required": true
+              }
+            ],
+            "previewProportions": {
+              "illustrative": true,
+              "unitless": true,
+              "segmentRatios": [
+                0.25,
+                1
+              ]
+            },
+            "clientDefaults": {},
+            "measurementDefaults": null,
+            "referenceUnit": null,
+            "previousVersion": null,
+            "fingerprint": "30294f14"
+          },
+          "modelVersion": "1.0.0",
+          "revision": 1,
+          "previousRevisionId": null,
+          "values": {
+            "id": "M002",
+            "instanceId": "M002",
+            "name": "Profil dessiné",
+            "unit": "in",
+            "measurements": {
+              "A": "0.5",
+              "B": "2",
+              "length": 120
+            },
+            "quantity": 3,
+            "material": {
+              "type": "aluminium",
+              "name": "",
+              "productRef": null,
+              "thickness": "",
+              "thicknessUnit": "in",
+              "gauge": ""
+            },
+            "finish": {
+              "manufacturer": "Westlake Royal",
+              "selectionType": "manufacturer",
+              "hex": null,
+              "swatchUrl": null,
+              "swatchImage": null,
+              "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+              "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+              "displayOnly": false,
+              "system": "Nuancier Westlake Royal",
+              "name": "Noir",
+              "code": "30"
+            },
+            "length": 120,
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "B"
+            },
+            "mirrorX": false,
+            "perforation": {},
+            "lips": {},
+            "location": "",
+            "note": ""
+          },
+          "spec": {
+            "kind": "profile",
+            "id": "M002",
+            "unit": "in",
+            "length": 120,
+            "quantity": 3,
+            "material": {
+              "type": "aluminium",
+              "name": "",
+              "productRef": null,
+              "thickness": "",
+              "thicknessUnit": "in",
+              "gauge": ""
+            },
+            "finish": {
+              "manufacturer": "Westlake Royal",
+              "selectionType": "manufacturer",
+              "hex": null,
+              "swatchUrl": null,
+              "swatchImage": null,
+              "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+              "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+              "displayOnly": false,
+              "system": "Nuancier Westlake Royal",
+              "name": "Noir",
+              "code": "30"
+            },
+            "location": "",
+            "note": "",
+            "perforation": {},
+            "mirrorX": false,
+            "template": "custom",
+            "startAngle": 0,
+            "bends": [
+              {
+                "mode": "hem",
+                "angle": 180,
+                "direction": "right"
+              }
+            ],
+            "segments": [
+              {
+                "label": "A",
+                "name": "",
+                "length": "0.5"
+              },
+              {
+                "label": "B",
+                "name": "",
+                "length": "2"
+              }
+            ],
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "B"
+            },
+            "name": "Profil dessiné"
+          },
+          "measurements": {
+            "A": "0.5",
+            "B": "2",
+            "length": 120
+          },
+          "geometry": {
+            "kind": "profile",
+            "pointsMM": [
+              [
+                0,
+                0
+              ],
+              [
+                12.7,
+                0
+              ],
+              [
+                -38.1,
+                0
+              ]
+            ],
+            "segments": [
+              {
+                "id": "A",
+                "label": "A",
+                "name": "",
+                "lengthMM": 12.7,
+                "start": [
+                  0,
+                  0
+                ],
+                "end": [
+                  12.7,
+                  0
+                ],
+                "headingDeg": 0
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "name": "",
+                "lengthMM": 50.8,
+                "start": [
+                  12.7,
+                  0
+                ],
+                "end": [
+                  -38.1,
+                  0
+                ],
+                "headingDeg": -180
+              }
+            ],
+            "bends": [
+              {
+                "mode": "hem",
+                "angle": 180,
+                "direction": "right",
+                "turnDeg": -180,
+                "label": "Retour écrasé 180° · droite",
+                "at": [
+                  12.7,
+                  0
+                ],
+                "from": "A",
+                "to": "B"
+              }
+            ],
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "B"
+            }
+          },
+          "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Profil dessiné · coupe et cotes finies\"><title>Profil dessiné · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M002 · Profil dessiné</text><path d=\"M393.5 235.5 L508 235.5 A5 5 0 0 1 508 245.5 L50 245.5\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M393.5 235.5 L508 235.5 A5 5 0 0 1 508 245.5 L50 245.5\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"left\" data-painted-segment=\"B\"><polygon class=\"profile-painted-star\" points=\"279,298.5 284.8779,313.4098 300.8743,314.3926 288.5106,324.5902 292.5191,340.1074 279,331.5 265.4809,340.1074 269.4894,324.5902 257.1257,314.3926 273.1221,313.4098\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M393.5,235.5L393.5,203.5 M508,235.5L508,203.5 M393.5,203.5L508,203.5\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"450.75\" data-anchor-y=\"235.5\" data-segment-start-x=\"393.5\" data-segment-start-y=\"235.5\" data-segment-end-x=\"508\" data-segment-end-y=\"235.5\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(450.75,203.5) rotate(0)\"><rect x=\"-43.5\" y=\"-12\" width=\"87\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,245.5L508,277.5 M50,245.5L50,277.5 M508,277.5L50,277.5\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"279\" data-anchor-y=\"245.5\" data-segment-start-x=\"508\" data-segment-start-y=\"245.5\" data-segment-end-x=\"50\" data-segment-end-y=\"245.5\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(279,277.5) rotate(0)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 1/2 po</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 180° — retour écrasé</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 po</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 2 1/2 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 1 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+          "status": "specified",
+          "quotePolicy": {
+            "version": "mir-color-quote-1",
+            "required": false,
+            "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+            "automaticPricingAllowed": false,
+            "customColor": false,
+            "label": "Prix sur demande",
+            "selectionType": "manufacturer",
+            "status": "price_unconfigured"
+          },
+          "pricing": {
+            "schema": "mir-piece-pricing-1",
+            "status": "on_request",
+            "requiresQuote": false,
+            "automaticPricingAllowed": false,
+            "currency": "CAD",
+            "rate": null,
+            "rateUnit": "in2",
+            "rateCents": null,
+            "areaSqIn": null,
+            "unitAmount": null,
+            "unitCents": null,
+            "quantity": 3,
+            "lineAmount": null,
+            "lineCents": null,
+            "basis": "projected_outer_area_including_lips",
+            "tariffId": null,
+            "taxIncluded": null,
+            "taxStatus": "not_calculated",
+            "shippingStatus": "not_calculated",
+            "label": "Prix sur demande",
+            "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+            "sourceKind": "user_instruction",
+            "geometryErrors": [],
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Prix sur demande",
+              "selectionType": "manufacturer",
+              "status": "price_unconfigured"
+            }
+          },
+          "workshopValidationRequired": true,
+          "revisionId": "M002-r1-62fc591a"
+        },
+        "history": [],
+        "selection": {
+          "materialId": "royal-alumipro-coil-132419",
+          "colorSystem": "manufacturer",
+          "colorId": "royal-30",
+          "storeColorMode": "employee"
+        },
+        "savedAt": "2026-11-17T16:48:01.152Z"
+      }
+    ],
+    "nextNumber": 3
+  },
+  "item": {
+    "id": "M002",
+    "editableTrace": true,
+    "kind": "profile",
+    "spec": {
+      "kind": "profile",
+      "id": "M002",
+      "unit": "in",
+      "length": 120,
+      "quantity": 3,
+      "material": {
+        "type": "aluminium",
+        "name": "",
+        "productRef": null,
+        "thickness": "",
+        "thicknessUnit": "in",
+        "gauge": ""
+      },
+      "finish": {
+        "manufacturer": "Westlake Royal",
+        "selectionType": "manufacturer",
+        "hex": null,
+        "swatchUrl": null,
+        "swatchImage": null,
+        "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+        "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+        "displayOnly": false,
+        "system": "Nuancier Westlake Royal",
+        "name": "Noir",
+        "code": "30"
+      },
+      "location": "",
+      "note": "",
+      "perforation": {},
+      "mirrorX": false,
+      "template": "custom",
+      "startAngle": 0,
+      "bends": [
+        {
+          "mode": "hem",
+          "angle": 180,
+          "direction": "right"
+        }
+      ],
+      "segments": [
+        {
+          "label": "A",
+          "name": "",
+          "length": "0.5"
+        },
+        {
+          "label": "B",
+          "name": "",
+          "length": "2"
+        }
+      ],
+      "coloredFace": {
+        "side": "left",
+        "segmentId": "B"
+      },
+      "name": "Profil dessiné"
+    },
+    "snapshot": {
+      "schema": "mir-production-instance-1",
+      "id": "M002",
+      "templateId": "modele-piece-M002-b9d719a8-1e32-43d2-9fd5-ae2323b30fe4",
+      "templateVersion": 1,
+      "templateSnapshot": {
+        "schema": "mir-production-template-1",
+        "id": "modele-piece-M002-b9d719a8-1e32-43d2-9fd5-ae2323b30fe4",
+        "name": "Profil dessiné",
+        "version": 1,
+        "description": "",
+        "kind": "profile",
+        "topology": {
+          "kind": "profile",
+          "segments": [
+            {
+              "label": "A",
+              "name": ""
+            },
+            {
+              "label": "B",
+              "name": ""
+            }
+          ],
+          "bends": [
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right"
+            }
+          ],
+          "startAngle": 0,
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "B"
+          }
+        },
+        "fields": [
+          {
+            "key": "A",
+            "label": "A",
+            "type": "measure",
+            "value": null,
+            "required": true
+          },
+          {
+            "key": "B",
+            "label": "B",
+            "type": "measure",
+            "value": null,
+            "required": true
+          },
+          {
+            "key": "length",
+            "label": "Longueur de la pièce",
+            "type": "measure",
+            "value": null,
+            "required": true
+          }
+        ],
+        "previewProportions": {
+          "illustrative": true,
+          "unitless": true,
+          "segmentRatios": [
+            0.25,
+            1
+          ]
+        },
+        "clientDefaults": {},
+        "measurementDefaults": null,
+        "referenceUnit": null,
+        "previousVersion": null,
+        "fingerprint": "30294f14"
+      },
+      "modelVersion": "1.0.0",
+      "revision": 1,
+      "previousRevisionId": null,
+      "values": {
+        "id": "M002",
+        "instanceId": "M002",
+        "name": "Profil dessiné",
+        "unit": "in",
+        "measurements": {
+          "A": "0.5",
+          "B": "2",
+          "length": 120
+        },
+        "quantity": 3,
+        "material": {
+          "type": "aluminium",
+          "name": "",
+          "productRef": null,
+          "thickness": "",
+          "thicknessUnit": "in",
+          "gauge": ""
+        },
+        "finish": {
+          "manufacturer": "Westlake Royal",
+          "selectionType": "manufacturer",
+          "hex": null,
+          "swatchUrl": null,
+          "swatchImage": null,
+          "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+          "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+          "displayOnly": false,
+          "system": "Nuancier Westlake Royal",
+          "name": "Noir",
+          "code": "30"
+        },
+        "length": 120,
+        "coloredFace": {
+          "side": "left",
+          "segmentId": "B"
+        },
+        "mirrorX": false,
+        "perforation": {},
+        "lips": {},
+        "location": "",
+        "note": ""
+      },
+      "spec": {
+        "kind": "profile",
+        "id": "M002",
+        "unit": "in",
+        "length": 120,
+        "quantity": 3,
+        "material": {
+          "type": "aluminium",
+          "name": "",
+          "productRef": null,
+          "thickness": "",
+          "thicknessUnit": "in",
+          "gauge": ""
+        },
+        "finish": {
+          "manufacturer": "Westlake Royal",
+          "selectionType": "manufacturer",
+          "hex": null,
+          "swatchUrl": null,
+          "swatchImage": null,
+          "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+          "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+          "displayOnly": false,
+          "system": "Nuancier Westlake Royal",
+          "name": "Noir",
+          "code": "30"
+        },
+        "location": "",
+        "note": "",
+        "perforation": {},
+        "mirrorX": false,
+        "template": "custom",
+        "startAngle": 0,
+        "bends": [
+          {
+            "mode": "hem",
+            "angle": 180,
+            "direction": "right"
+          }
+        ],
+        "segments": [
+          {
+            "label": "A",
+            "name": "",
+            "length": "0.5"
+          },
+          {
+            "label": "B",
+            "name": "",
+            "length": "2"
+          }
+        ],
+        "coloredFace": {
+          "side": "left",
+          "segmentId": "B"
+        },
+        "name": "Profil dessiné"
+      },
+      "measurements": {
+        "A": "0.5",
+        "B": "2",
+        "length": 120
+      },
+      "geometry": {
+        "kind": "profile",
+        "pointsMM": [
+          [
+            0,
+            0
+          ],
+          [
+            12.7,
+            0
+          ],
+          [
+            -38.1,
+            0
+          ]
+        ],
+        "segments": [
+          {
+            "id": "A",
+            "label": "A",
+            "name": "",
+            "lengthMM": 12.7,
+            "start": [
+              0,
+              0
+            ],
+            "end": [
+              12.7,
+              0
+            ],
+            "headingDeg": 0
+          },
+          {
+            "id": "B",
+            "label": "B",
+            "name": "",
+            "lengthMM": 50.8,
+            "start": [
+              12.7,
+              0
+            ],
+            "end": [
+              -38.1,
+              0
+            ],
+            "headingDeg": -180
+          }
+        ],
+        "bends": [
+          {
+            "mode": "hem",
+            "angle": 180,
+            "direction": "right",
+            "turnDeg": -180,
+            "label": "Retour écrasé 180° · droite",
+            "at": [
+              12.7,
+              0
+            ],
+            "from": "A",
+            "to": "B"
+          }
+        ],
+        "coloredFace": {
+          "side": "left",
+          "segmentId": "B"
+        }
+      },
+      "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Profil dessiné · coupe et cotes finies\"><title>Profil dessiné · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M002 · Profil dessiné</text><path d=\"M393.5 235.5 L508 235.5 A5 5 0 0 1 508 245.5 L50 245.5\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M393.5 235.5 L508 235.5 A5 5 0 0 1 508 245.5 L50 245.5\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"left\" data-painted-segment=\"B\"><polygon class=\"profile-painted-star\" points=\"279,298.5 284.8779,313.4098 300.8743,314.3926 288.5106,324.5902 292.5191,340.1074 279,331.5 265.4809,340.1074 269.4894,324.5902 257.1257,314.3926 273.1221,313.4098\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M393.5,235.5L393.5,203.5 M508,235.5L508,203.5 M393.5,203.5L508,203.5\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"450.75\" data-anchor-y=\"235.5\" data-segment-start-x=\"393.5\" data-segment-start-y=\"235.5\" data-segment-end-x=\"508\" data-segment-end-y=\"235.5\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(450.75,203.5) rotate(0)\"><rect x=\"-43.5\" y=\"-12\" width=\"87\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,245.5L508,277.5 M50,245.5L50,277.5 M508,277.5L50,277.5\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"279\" data-anchor-y=\"245.5\" data-segment-start-x=\"508\" data-segment-start-y=\"245.5\" data-segment-end-x=\"50\" data-segment-end-y=\"245.5\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(279,277.5) rotate(0)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 1/2 po</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 180° — retour écrasé</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 po</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 2 1/2 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 1 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+      "status": "specified",
+      "quotePolicy": {
+        "version": "mir-color-quote-1",
+        "required": false,
+        "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+        "automaticPricingAllowed": false,
+        "customColor": false,
+        "label": "Prix sur demande",
+        "selectionType": "manufacturer",
+        "status": "price_unconfigured"
+      },
+      "pricing": {
+        "schema": "mir-piece-pricing-1",
+        "status": "on_request",
+        "requiresQuote": false,
+        "automaticPricingAllowed": false,
+        "currency": "CAD",
+        "rate": null,
+        "rateUnit": "in2",
+        "rateCents": null,
+        "areaSqIn": null,
+        "unitAmount": null,
+        "unitCents": null,
+        "quantity": 3,
+        "lineAmount": null,
+        "lineCents": null,
+        "basis": "projected_outer_area_including_lips",
+        "tariffId": null,
+        "taxIncluded": null,
+        "taxStatus": "not_calculated",
+        "shippingStatus": "not_calculated",
+        "label": "Prix sur demande",
+        "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+        "sourceKind": "user_instruction",
+        "geometryErrors": [],
+        "quotePolicy": {
+          "version": "mir-color-quote-1",
+          "required": false,
+          "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+          "automaticPricingAllowed": false,
+          "customColor": false,
+          "label": "Prix sur demande",
+          "selectionType": "manufacturer",
+          "status": "price_unconfigured"
+        }
+      },
+      "workshopValidationRequired": true,
+      "revisionId": "M002-r1-62fc591a"
+    },
+    "history": [],
+    "selection": {
+      "materialId": "royal-alumipro-coil-132419",
+      "colorSystem": "manufacturer",
+      "colorId": "royal-30",
+      "storeColorMode": "employee"
+    },
+    "savedAt": "2026-11-17T16:48:01.152Z"
+  },
+  "unchanged": true,
+  "pages": [
+    {
+      "name": "M001 · Pliage en L",
+      "hasSvg": true,
+      "summary": [
+        "A = 3 1/2 po",
+        "Pli A–B = 90°",
+        "B = 2 1/4 po",
+        "Développé total = 5 3/4 po (nominal)",
+        "Face colorée : Face 1 — côté indiqué par l’étoile"
+      ]
+    },
+    {
+      "name": "M002 · Profil dessiné",
+      "hasSvg": true,
+      "summary": [
+        "A = 1/2 po",
+        "Pli A–B = 180° — retour écrasé",
+        "B = 2 po",
+        "Développé total = 2 1/2 po (nominal)",
+        "Face colorée : Face 1 — côté indiqué par l’étoile"
+      ]
+    }
+  ],
+  "cart": [
+    {
+      "id": "fold:M001",
+      "kind": "fold",
+      "quantity": 2,
+      "snapshot": {
+        "schema": "mir-production-instance-1",
+        "id": "M001",
+        "templateId": "mir-standard-profile-l",
+        "templateVersion": 1,
+        "templateSnapshot": {
+          "schema": "mir-production-template-1",
+          "id": "mir-standard-profile-l",
+          "name": "Pliage en L",
+          "version": 1,
+          "description": "Modèle standard MIR; cotes de fabrication à renseigner.",
+          "kind": "profile",
+          "topology": {
+            "kind": "profile",
+            "segments": [
+              {
+                "label": "A",
+                "name": "Aile A"
+              },
+              {
+                "label": "B",
+                "name": "Aile B"
+              }
+            ],
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left"
+              }
+            ],
+            "startAngle": 0,
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            }
+          },
+          "fields": [
+            {
+              "key": "A",
+              "label": "A · Aile A",
+              "type": "measure",
+              "value": null,
+              "required": true
+            },
+            {
+              "key": "B",
+              "label": "B · Aile B",
+              "type": "measure",
+              "value": null,
+              "required": true
+            },
+            {
+              "key": "length",
+              "label": "Longueur de la pièce",
+              "type": "measure",
+              "value": null,
+              "required": true
+            }
+          ],
+          "previewProportions": {
+            "illustrative": true,
+            "unitless": true,
+            "segmentRatios": [
+              1,
+              0.6666666666666667
+            ]
+          },
+          "clientDefaults": {},
+          "measurementDefaults": null,
+          "referenceUnit": null,
+          "previousVersion": null,
+          "fingerprint": "b6f764da"
+        },
+        "modelVersion": "1.0.0",
+        "revision": 1,
+        "previousRevisionId": null,
+        "values": {
+          "id": "M001",
+          "instanceId": "M001",
+          "name": "Pliage en L",
+          "unit": "in",
+          "measurements": {
+            "A": "3.5",
+            "B": "2.25",
+            "length": "120"
+          },
+          "quantity": 2,
+          "material": {
+            "type": "aluminium",
+            "name": "",
+            "productRef": null,
+            "thickness": "",
+            "thicknessUnit": "in",
+            "gauge": ""
+          },
+          "finish": {
+            "manufacturer": "Westlake Royal",
+            "selectionType": "manufacturer",
+            "hex": null,
+            "swatchUrl": null,
+            "swatchImage": null,
+            "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+            "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+            "displayOnly": false,
+            "system": "Nuancier Westlake Royal",
+            "name": "Noir",
+            "code": "30"
+          },
+          "length": "120",
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "A"
+          },
+          "mirrorX": false,
+          "perforation": {},
+          "lips": {},
+          "location": "",
+          "note": ""
+        },
+        "spec": {
+          "kind": "profile",
+          "id": "M001",
+          "unit": "in",
+          "length": "120",
+          "quantity": 2,
+          "material": {
+            "type": "aluminium",
+            "name": "",
+            "productRef": null,
+            "thickness": "",
+            "thicknessUnit": "in",
+            "gauge": ""
+          },
+          "finish": {
+            "manufacturer": "Westlake Royal",
+            "selectionType": "manufacturer",
+            "hex": null,
+            "swatchUrl": null,
+            "swatchImage": null,
+            "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+            "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+            "displayOnly": false,
+            "system": "Nuancier Westlake Royal",
+            "name": "Noir",
+            "code": "30"
+          },
+          "location": "",
+          "note": "",
+          "perforation": {},
+          "mirrorX": false,
+          "template": "custom",
+          "startAngle": 0,
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left"
+            }
+          ],
+          "segments": [
+            {
+              "label": "A",
+              "name": "Aile A",
+              "length": "3.5"
+            },
+            {
+              "label": "B",
+              "name": "Aile B",
+              "length": "2.25"
+            }
+          ],
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "A"
+          },
+          "name": "Pliage en L"
+        },
+        "measurements": {
+          "A": "3.5",
+          "B": "2.25",
+          "length": "120"
+        },
+        "geometry": {
+          "kind": "profile",
+          "pointsMM": [
+            [
+              0,
+              0
+            ],
+            [
+              88.9,
+              0
+            ],
+            [
+              88.9,
+              57.15
+            ]
+          ],
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "Aile A",
+              "lengthMM": 88.89999999999999,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                88.9,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "Aile B",
+              "lengthMM": 57.15,
+              "start": [
+                88.9,
+                0
+              ],
+              "end": [
+                88.9,
+                57.15
+              ],
+              "headingDeg": 90
+            }
+          ],
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left",
+              "turnDeg": 90,
+              "label": "90° intérieur · gauche",
+              "at": [
+                88.9,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            }
+          ],
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "A"
+          }
+        },
+        "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Pliage en L · coupe et cotes finies\"><title>Pliage en L · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M001 · Pliage en L</text><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"left\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"279,283.7143 284.8779,298.6241 300.8743,299.6069 288.5106,309.8045 292.5191,325.3217 279,316.7143 265.4809,325.3217 269.4894,309.8045 257.1257,299.6069 273.1221,298.6241\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M50,382.7143L50,414.7143 M508,382.7143L508,414.7143 M50,414.7143L508,414.7143\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"279\" data-anchor-y=\"382.7143\" data-segment-start-x=\"50\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"382.7143\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(279,414.7143) rotate(0)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 3 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,382.7143L476,382.7143 M508,88.2857L476,88.2857 M476,382.7143L476,88.2857\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"508\" data-anchor-y=\"235.5\" data-segment-start-x=\"508\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"88.2857\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(476,235.5) rotate(90)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 1/4 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 3 1/2 po · Aile A</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 90°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 1/4 po · Aile B</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 5 3/4 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 1 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+        "status": "specified",
+        "quotePolicy": {
+          "version": "mir-color-quote-1",
+          "required": false,
+          "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+          "automaticPricingAllowed": false,
+          "customColor": false,
+          "label": "Prix sur demande",
+          "selectionType": "manufacturer",
+          "status": "price_unconfigured"
+        },
+        "pricing": {
+          "schema": "mir-piece-pricing-1",
+          "status": "on_request",
+          "requiresQuote": false,
+          "automaticPricingAllowed": false,
+          "currency": "CAD",
+          "rate": null,
+          "rateUnit": "in2",
+          "rateCents": null,
+          "areaSqIn": null,
+          "unitAmount": null,
+          "unitCents": null,
+          "quantity": 2,
+          "lineAmount": null,
+          "lineCents": null,
+          "basis": "projected_outer_area_including_lips",
+          "tariffId": null,
+          "taxIncluded": null,
+          "taxStatus": "not_calculated",
+          "shippingStatus": "not_calculated",
+          "label": "Prix sur demande",
+          "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+          "sourceKind": "user_instruction",
+          "geometryErrors": [],
+          "quotePolicy": {
+            "version": "mir-color-quote-1",
+            "required": false,
+            "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+            "automaticPricingAllowed": false,
+            "customColor": false,
+            "label": "Prix sur demande",
+            "selectionType": "manufacturer",
+            "status": "price_unconfigured"
+          }
+        },
+        "workshopValidationRequired": true,
+        "revisionId": "M001-r1-93b62a42"
+      },
+      "line": {
+        "itemId": "mir-standard-profile-l",
+        "name": "Pliage en L",
+        "brand": "Atelier MIR",
+        "unit": "pièce",
+        "quantity": 2,
+        "dimensionsIn": {
+          "A": "3.5",
+          "B": "2.25",
+          "length": "120"
+        },
+        "colorId": "30",
+        "specification": {
+          "kind": "fold",
+          "templateSnapshot": {
+            "schema": "mir-production-template-1",
+            "id": "mir-standard-profile-l",
+            "name": "Pliage en L",
+            "version": 1,
+            "description": "Modèle standard MIR; cotes de fabrication à renseigner.",
+            "kind": "profile",
+            "topology": {
+              "kind": "profile",
+              "segments": [
+                {
+                  "label": "A",
+                  "name": "Aile A"
+                },
+                {
+                  "label": "B",
+                  "name": "Aile B"
+                }
+              ],
+              "bends": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left"
+                }
+              ],
+              "startAngle": 0,
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "A"
+              }
+            },
+            "fields": [
+              {
+                "key": "A",
+                "label": "A · Aile A",
+                "type": "measure",
+                "value": null,
+                "required": true
+              },
+              {
+                "key": "B",
+                "label": "B · Aile B",
+                "type": "measure",
+                "value": null,
+                "required": true
+              },
+              {
+                "key": "length",
+                "label": "Longueur de la pièce",
+                "type": "measure",
+                "value": null,
+                "required": true
+              }
+            ],
+            "previewProportions": {
+              "illustrative": true,
+              "unitless": true,
+              "segmentRatios": [
+                1,
+                0.6666666666666667
+              ]
+            },
+            "clientDefaults": {},
+            "measurementDefaults": null,
+            "referenceUnit": null,
+            "previousVersion": null,
+            "fingerprint": "b6f764da"
+          },
+          "instanceSnapshot": {
+            "schema": "mir-production-instance-1",
+            "id": "M001",
+            "templateId": "mir-standard-profile-l",
+            "templateVersion": 1,
+            "templateSnapshot": {
+              "schema": "mir-production-template-1",
+              "id": "mir-standard-profile-l",
+              "name": "Pliage en L",
+              "version": 1,
+              "description": "Modèle standard MIR; cotes de fabrication à renseigner.",
+              "kind": "profile",
+              "topology": {
+                "kind": "profile",
+                "segments": [
+                  {
+                    "label": "A",
+                    "name": "Aile A"
+                  },
+                  {
+                    "label": "B",
+                    "name": "Aile B"
+                  }
+                ],
+                "bends": [
+                  {
+                    "mode": "interior",
+                    "angle": 90,
+                    "direction": "left"
+                  }
+                ],
+                "startAngle": 0,
+                "coloredFace": {
+                  "side": "left",
+                  "segmentId": "A"
+                }
+              },
+              "fields": [
+                {
+                  "key": "A",
+                  "label": "A · Aile A",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                },
+                {
+                  "key": "B",
+                  "label": "B · Aile B",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                },
+                {
+                  "key": "length",
+                  "label": "Longueur de la pièce",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                }
+              ],
+              "previewProportions": {
+                "illustrative": true,
+                "unitless": true,
+                "segmentRatios": [
+                  1,
+                  0.6666666666666667
+                ]
+              },
+              "clientDefaults": {},
+              "measurementDefaults": null,
+              "referenceUnit": null,
+              "previousVersion": null,
+              "fingerprint": "b6f764da"
+            },
+            "modelVersion": "1.0.0",
+            "revision": 1,
+            "previousRevisionId": null,
+            "values": {
+              "id": "M001",
+              "instanceId": "M001",
+              "name": "Pliage en L",
+              "unit": "in",
+              "measurements": {
+                "A": "3.5",
+                "B": "2.25",
+                "length": "120"
+              },
+              "quantity": 2,
+              "material": {
+                "type": "aluminium",
+                "name": "",
+                "productRef": null,
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {
+                "manufacturer": "Westlake Royal",
+                "selectionType": "manufacturer",
+                "hex": null,
+                "swatchUrl": null,
+                "swatchImage": null,
+                "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+                "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+                "displayOnly": false,
+                "system": "Nuancier Westlake Royal",
+                "name": "Noir",
+                "code": "30"
+              },
+              "length": "120",
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "A"
+              },
+              "mirrorX": false,
+              "perforation": {},
+              "lips": {},
+              "location": "",
+              "note": ""
+            },
+            "spec": {
+              "kind": "profile",
+              "id": "M001",
+              "unit": "in",
+              "length": "120",
+              "quantity": 2,
+              "material": {
+                "type": "aluminium",
+                "name": "",
+                "productRef": null,
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {
+                "manufacturer": "Westlake Royal",
+                "selectionType": "manufacturer",
+                "hex": null,
+                "swatchUrl": null,
+                "swatchImage": null,
+                "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+                "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+                "displayOnly": false,
+                "system": "Nuancier Westlake Royal",
+                "name": "Noir",
+                "code": "30"
+              },
+              "location": "",
+              "note": "",
+              "perforation": {},
+              "mirrorX": false,
+              "template": "custom",
+              "startAngle": 0,
+              "bends": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left"
+                }
+              ],
+              "segments": [
+                {
+                  "label": "A",
+                  "name": "Aile A",
+                  "length": "3.5"
+                },
+                {
+                  "label": "B",
+                  "name": "Aile B",
+                  "length": "2.25"
+                }
+              ],
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "A"
+              },
+              "name": "Pliage en L"
+            },
+            "measurements": {
+              "A": "3.5",
+              "B": "2.25",
+              "length": "120"
+            },
+            "geometry": {
+              "kind": "profile",
+              "pointsMM": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  88.9,
+                  0
+                ],
+                [
+                  88.9,
+                  57.15
+                ]
+              ],
+              "segments": [
+                {
+                  "id": "A",
+                  "label": "A",
+                  "name": "Aile A",
+                  "lengthMM": 88.89999999999999,
+                  "start": [
+                    0,
+                    0
+                  ],
+                  "end": [
+                    88.9,
+                    0
+                  ],
+                  "headingDeg": 0
+                },
+                {
+                  "id": "B",
+                  "label": "B",
+                  "name": "Aile B",
+                  "lengthMM": 57.15,
+                  "start": [
+                    88.9,
+                    0
+                  ],
+                  "end": [
+                    88.9,
+                    57.15
+                  ],
+                  "headingDeg": 90
+                }
+              ],
+              "bends": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left",
+                  "turnDeg": 90,
+                  "label": "90° intérieur · gauche",
+                  "at": [
+                    88.9,
+                    0
+                  ],
+                  "from": "A",
+                  "to": "B"
+                }
+              ],
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "A"
+              }
+            },
+            "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Pliage en L · coupe et cotes finies\"><title>Pliage en L · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M001 · Pliage en L</text><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"left\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"279,283.7143 284.8779,298.6241 300.8743,299.6069 288.5106,309.8045 292.5191,325.3217 279,316.7143 265.4809,325.3217 269.4894,309.8045 257.1257,299.6069 273.1221,298.6241\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M50,382.7143L50,414.7143 M508,382.7143L508,414.7143 M50,414.7143L508,414.7143\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"279\" data-anchor-y=\"382.7143\" data-segment-start-x=\"50\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"382.7143\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(279,414.7143) rotate(0)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 3 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,382.7143L476,382.7143 M508,88.2857L476,88.2857 M476,382.7143L476,88.2857\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"508\" data-anchor-y=\"235.5\" data-segment-start-x=\"508\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"88.2857\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(476,235.5) rotate(90)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 1/4 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 3 1/2 po · Aile A</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 90°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 1/4 po · Aile B</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 5 3/4 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 1 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+            "status": "specified",
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Prix sur demande",
+              "selectionType": "manufacturer",
+              "status": "price_unconfigured"
+            },
+            "pricing": {
+              "schema": "mir-piece-pricing-1",
+              "status": "on_request",
+              "requiresQuote": false,
+              "automaticPricingAllowed": false,
+              "currency": "CAD",
+              "rate": null,
+              "rateUnit": "in2",
+              "rateCents": null,
+              "areaSqIn": null,
+              "unitAmount": null,
+              "unitCents": null,
+              "quantity": 2,
+              "lineAmount": null,
+              "lineCents": null,
+              "basis": "projected_outer_area_including_lips",
+              "tariffId": null,
+              "taxIncluded": null,
+              "taxStatus": "not_calculated",
+              "shippingStatus": "not_calculated",
+              "label": "Prix sur demande",
+              "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+              "sourceKind": "user_instruction",
+              "geometryErrors": [],
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Prix sur demande",
+                "selectionType": "manufacturer",
+                "status": "price_unconfigured"
+              }
+            },
+            "workshopValidationRequired": true,
+            "revisionId": "M001-r1-93b62a42"
+          }
+        }
+      },
+      "updatedAt": "2026-11-17T16:47:58.645Z"
+    },
+    {
+      "id": "fold:M002",
+      "kind": "fold",
+      "quantity": 3,
+      "snapshot": {
+        "schema": "mir-production-instance-1",
+        "id": "M002",
+        "templateId": "modele-piece-M002-b9d719a8-1e32-43d2-9fd5-ae2323b30fe4",
+        "templateVersion": 1,
+        "templateSnapshot": {
+          "schema": "mir-production-template-1",
+          "id": "modele-piece-M002-b9d719a8-1e32-43d2-9fd5-ae2323b30fe4",
+          "name": "Profil dessiné",
+          "version": 1,
+          "description": "",
+          "kind": "profile",
+          "topology": {
+            "kind": "profile",
+            "segments": [
+              {
+                "label": "A",
+                "name": ""
+              },
+              {
+                "label": "B",
+                "name": ""
+              }
+            ],
+            "bends": [
+              {
+                "mode": "hem",
+                "angle": 180,
+                "direction": "right"
+              }
+            ],
+            "startAngle": 0,
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "B"
+            }
+          },
+          "fields": [
+            {
+              "key": "A",
+              "label": "A",
+              "type": "measure",
+              "value": null,
+              "required": true
+            },
+            {
+              "key": "B",
+              "label": "B",
+              "type": "measure",
+              "value": null,
+              "required": true
+            },
+            {
+              "key": "length",
+              "label": "Longueur de la pièce",
+              "type": "measure",
+              "value": null,
+              "required": true
+            }
+          ],
+          "previewProportions": {
+            "illustrative": true,
+            "unitless": true,
+            "segmentRatios": [
+              0.25,
+              1
+            ]
+          },
+          "clientDefaults": {},
+          "measurementDefaults": null,
+          "referenceUnit": null,
+          "previousVersion": null,
+          "fingerprint": "30294f14"
+        },
+        "modelVersion": "1.0.0",
+        "revision": 1,
+        "previousRevisionId": null,
+        "values": {
+          "id": "M002",
+          "instanceId": "M002",
+          "name": "Profil dessiné",
+          "unit": "in",
+          "measurements": {
+            "A": "0.5",
+            "B": "2",
+            "length": 120
+          },
+          "quantity": 3,
+          "material": {
+            "type": "aluminium",
+            "name": "",
+            "productRef": null,
+            "thickness": "",
+            "thicknessUnit": "in",
+            "gauge": ""
+          },
+          "finish": {
+            "manufacturer": "Westlake Royal",
+            "selectionType": "manufacturer",
+            "hex": null,
+            "swatchUrl": null,
+            "swatchImage": null,
+            "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+            "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+            "displayOnly": false,
+            "system": "Nuancier Westlake Royal",
+            "name": "Noir",
+            "code": "30"
+          },
+          "length": 120,
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "B"
+          },
+          "mirrorX": false,
+          "perforation": {},
+          "lips": {},
+          "location": "",
+          "note": ""
+        },
+        "spec": {
+          "kind": "profile",
+          "id": "M002",
+          "unit": "in",
+          "length": 120,
+          "quantity": 3,
+          "material": {
+            "type": "aluminium",
+            "name": "",
+            "productRef": null,
+            "thickness": "",
+            "thicknessUnit": "in",
+            "gauge": ""
+          },
+          "finish": {
+            "manufacturer": "Westlake Royal",
+            "selectionType": "manufacturer",
+            "hex": null,
+            "swatchUrl": null,
+            "swatchImage": null,
+            "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+            "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+            "displayOnly": false,
+            "system": "Nuancier Westlake Royal",
+            "name": "Noir",
+            "code": "30"
+          },
+          "location": "",
+          "note": "",
+          "perforation": {},
+          "mirrorX": false,
+          "template": "custom",
+          "startAngle": 0,
+          "bends": [
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right"
+            }
+          ],
+          "segments": [
+            {
+              "label": "A",
+              "name": "",
+              "length": "0.5"
+            },
+            {
+              "label": "B",
+              "name": "",
+              "length": "2"
+            }
+          ],
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "B"
+          },
+          "name": "Profil dessiné"
+        },
+        "measurements": {
+          "A": "0.5",
+          "B": "2",
+          "length": 120
+        },
+        "geometry": {
+          "kind": "profile",
+          "pointsMM": [
+            [
+              0,
+              0
+            ],
+            [
+              12.7,
+              0
+            ],
+            [
+              -38.1,
+              0
+            ]
+          ],
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 12.7,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                12.7,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                12.7,
+                0
+              ],
+              "end": [
+                -38.1,
+                0
+              ],
+              "headingDeg": -180
+            }
+          ],
+          "bends": [
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right",
+              "turnDeg": -180,
+              "label": "Retour écrasé 180° · droite",
+              "at": [
+                12.7,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            }
+          ],
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "B"
+          }
+        },
+        "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Profil dessiné · coupe et cotes finies\"><title>Profil dessiné · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M002 · Profil dessiné</text><path d=\"M393.5 235.5 L508 235.5 A5 5 0 0 1 508 245.5 L50 245.5\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M393.5 235.5 L508 235.5 A5 5 0 0 1 508 245.5 L50 245.5\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"left\" data-painted-segment=\"B\"><polygon class=\"profile-painted-star\" points=\"279,298.5 284.8779,313.4098 300.8743,314.3926 288.5106,324.5902 292.5191,340.1074 279,331.5 265.4809,340.1074 269.4894,324.5902 257.1257,314.3926 273.1221,313.4098\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M393.5,235.5L393.5,203.5 M508,235.5L508,203.5 M393.5,203.5L508,203.5\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"450.75\" data-anchor-y=\"235.5\" data-segment-start-x=\"393.5\" data-segment-start-y=\"235.5\" data-segment-end-x=\"508\" data-segment-end-y=\"235.5\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(450.75,203.5) rotate(0)\"><rect x=\"-43.5\" y=\"-12\" width=\"87\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,245.5L508,277.5 M50,245.5L50,277.5 M508,277.5L50,277.5\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"279\" data-anchor-y=\"245.5\" data-segment-start-x=\"508\" data-segment-start-y=\"245.5\" data-segment-end-x=\"50\" data-segment-end-y=\"245.5\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(279,277.5) rotate(0)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 1/2 po</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 180° — retour écrasé</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 po</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 2 1/2 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 1 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+        "status": "specified",
+        "quotePolicy": {
+          "version": "mir-color-quote-1",
+          "required": false,
+          "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+          "automaticPricingAllowed": false,
+          "customColor": false,
+          "label": "Prix sur demande",
+          "selectionType": "manufacturer",
+          "status": "price_unconfigured"
+        },
+        "pricing": {
+          "schema": "mir-piece-pricing-1",
+          "status": "on_request",
+          "requiresQuote": false,
+          "automaticPricingAllowed": false,
+          "currency": "CAD",
+          "rate": null,
+          "rateUnit": "in2",
+          "rateCents": null,
+          "areaSqIn": null,
+          "unitAmount": null,
+          "unitCents": null,
+          "quantity": 3,
+          "lineAmount": null,
+          "lineCents": null,
+          "basis": "projected_outer_area_including_lips",
+          "tariffId": null,
+          "taxIncluded": null,
+          "taxStatus": "not_calculated",
+          "shippingStatus": "not_calculated",
+          "label": "Prix sur demande",
+          "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+          "sourceKind": "user_instruction",
+          "geometryErrors": [],
+          "quotePolicy": {
+            "version": "mir-color-quote-1",
+            "required": false,
+            "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+            "automaticPricingAllowed": false,
+            "customColor": false,
+            "label": "Prix sur demande",
+            "selectionType": "manufacturer",
+            "status": "price_unconfigured"
+          }
+        },
+        "workshopValidationRequired": true,
+        "revisionId": "M002-r1-62fc591a"
+      },
+      "line": {
+        "itemId": "modele-piece-M002-b9d719a8-1e32-43d2-9fd5-ae2323b30fe4",
+        "name": "Profil dessiné",
+        "brand": "Atelier MIR",
+        "unit": "pièce",
+        "quantity": 3,
+        "dimensionsIn": {
+          "A": "0.5",
+          "B": "2",
+          "length": 120
+        },
+        "colorId": "30",
+        "specification": {
+          "kind": "fold",
+          "templateSnapshot": {
+            "schema": "mir-production-template-1",
+            "id": "modele-piece-M002-b9d719a8-1e32-43d2-9fd5-ae2323b30fe4",
+            "name": "Profil dessiné",
+            "version": 1,
+            "description": "",
+            "kind": "profile",
+            "topology": {
+              "kind": "profile",
+              "segments": [
+                {
+                  "label": "A",
+                  "name": ""
+                },
+                {
+                  "label": "B",
+                  "name": ""
+                }
+              ],
+              "bends": [
+                {
+                  "mode": "hem",
+                  "angle": 180,
+                  "direction": "right"
+                }
+              ],
+              "startAngle": 0,
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "B"
+              }
+            },
+            "fields": [
+              {
+                "key": "A",
+                "label": "A",
+                "type": "measure",
+                "value": null,
+                "required": true
+              },
+              {
+                "key": "B",
+                "label": "B",
+                "type": "measure",
+                "value": null,
+                "required": true
+              },
+              {
+                "key": "length",
+                "label": "Longueur de la pièce",
+                "type": "measure",
+                "value": null,
+                "required": true
+              }
+            ],
+            "previewProportions": {
+              "illustrative": true,
+              "unitless": true,
+              "segmentRatios": [
+                0.25,
+                1
+              ]
+            },
+            "clientDefaults": {},
+            "measurementDefaults": null,
+            "referenceUnit": null,
+            "previousVersion": null,
+            "fingerprint": "30294f14"
+          },
+          "instanceSnapshot": {
+            "schema": "mir-production-instance-1",
+            "id": "M002",
+            "templateId": "modele-piece-M002-b9d719a8-1e32-43d2-9fd5-ae2323b30fe4",
+            "templateVersion": 1,
+            "templateSnapshot": {
+              "schema": "mir-production-template-1",
+              "id": "modele-piece-M002-b9d719a8-1e32-43d2-9fd5-ae2323b30fe4",
+              "name": "Profil dessiné",
+              "version": 1,
+              "description": "",
+              "kind": "profile",
+              "topology": {
+                "kind": "profile",
+                "segments": [
+                  {
+                    "label": "A",
+                    "name": ""
+                  },
+                  {
+                    "label": "B",
+                    "name": ""
+                  }
+                ],
+                "bends": [
+                  {
+                    "mode": "hem",
+                    "angle": 180,
+                    "direction": "right"
+                  }
+                ],
+                "startAngle": 0,
+                "coloredFace": {
+                  "side": "left",
+                  "segmentId": "B"
+                }
+              },
+              "fields": [
+                {
+                  "key": "A",
+                  "label": "A",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                },
+                {
+                  "key": "B",
+                  "label": "B",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                },
+                {
+                  "key": "length",
+                  "label": "Longueur de la pièce",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                }
+              ],
+              "previewProportions": {
+                "illustrative": true,
+                "unitless": true,
+                "segmentRatios": [
+                  0.25,
+                  1
+                ]
+              },
+              "clientDefaults": {},
+              "measurementDefaults": null,
+              "referenceUnit": null,
+              "previousVersion": null,
+              "fingerprint": "30294f14"
+            },
+            "modelVersion": "1.0.0",
+            "revision": 1,
+            "previousRevisionId": null,
+            "values": {
+              "id": "M002",
+              "instanceId": "M002",
+              "name": "Profil dessiné",
+              "unit": "in",
+              "measurements": {
+                "A": "0.5",
+                "B": "2",
+                "length": 120
+              },
+              "quantity": 3,
+              "material": {
+                "type": "aluminium",
+                "name": "",
+                "productRef": null,
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {
+                "manufacturer": "Westlake Royal",
+                "selectionType": "manufacturer",
+                "hex": null,
+                "swatchUrl": null,
+                "swatchImage": null,
+                "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+                "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+                "displayOnly": false,
+                "system": "Nuancier Westlake Royal",
+                "name": "Noir",
+                "code": "30"
+              },
+              "length": 120,
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "B"
+              },
+              "mirrorX": false,
+              "perforation": {},
+              "lips": {},
+              "location": "",
+              "note": ""
+            },
+            "spec": {
+              "kind": "profile",
+              "id": "M002",
+              "unit": "in",
+              "length": 120,
+              "quantity": 3,
+              "material": {
+                "type": "aluminium",
+                "name": "",
+                "productRef": null,
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {
+                "manufacturer": "Westlake Royal",
+                "selectionType": "manufacturer",
+                "hex": null,
+                "swatchUrl": null,
+                "swatchImage": null,
+                "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+                "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR.",
+                "displayOnly": false,
+                "system": "Nuancier Westlake Royal",
+                "name": "Noir",
+                "code": "30"
+              },
+              "location": "",
+              "note": "",
+              "perforation": {},
+              "mirrorX": false,
+              "template": "custom",
+              "startAngle": 0,
+              "bends": [
+                {
+                  "mode": "hem",
+                  "angle": 180,
+                  "direction": "right"
+                }
+              ],
+              "segments": [
+                {
+                  "label": "A",
+                  "name": "",
+                  "length": "0.5"
+                },
+                {
+                  "label": "B",
+                  "name": "",
+                  "length": "2"
+                }
+              ],
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "B"
+              },
+              "name": "Profil dessiné"
+            },
+            "measurements": {
+              "A": "0.5",
+              "B": "2",
+              "length": 120
+            },
+            "geometry": {
+              "kind": "profile",
+              "pointsMM": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  12.7,
+                  0
+                ],
+                [
+                  -38.1,
+                  0
+                ]
+              ],
+              "segments": [
+                {
+                  "id": "A",
+                  "label": "A",
+                  "name": "",
+                  "lengthMM": 12.7,
+                  "start": [
+                    0,
+                    0
+                  ],
+                  "end": [
+                    12.7,
+                    0
+                  ],
+                  "headingDeg": 0
+                },
+                {
+                  "id": "B",
+                  "label": "B",
+                  "name": "",
+                  "lengthMM": 50.8,
+                  "start": [
+                    12.7,
+                    0
+                  ],
+                  "end": [
+                    -38.1,
+                    0
+                  ],
+                  "headingDeg": -180
+                }
+              ],
+              "bends": [
+                {
+                  "mode": "hem",
+                  "angle": 180,
+                  "direction": "right",
+                  "turnDeg": -180,
+                  "label": "Retour écrasé 180° · droite",
+                  "at": [
+                    12.7,
+                    0
+                  ],
+                  "from": "A",
+                  "to": "B"
+                }
+              ],
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "B"
+              }
+            },
+            "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Profil dessiné · coupe et cotes finies\"><title>Profil dessiné · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M002 · Profil dessiné</text><path d=\"M393.5 235.5 L508 235.5 A5 5 0 0 1 508 245.5 L50 245.5\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M393.5 235.5 L508 235.5 A5 5 0 0 1 508 245.5 L50 245.5\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"left\" data-painted-segment=\"B\"><polygon class=\"profile-painted-star\" points=\"279,298.5 284.8779,313.4098 300.8743,314.3926 288.5106,324.5902 292.5191,340.1074 279,331.5 265.4809,340.1074 269.4894,324.5902 257.1257,314.3926 273.1221,313.4098\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M393.5,235.5L393.5,203.5 M508,235.5L508,203.5 M393.5,203.5L508,203.5\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"450.75\" data-anchor-y=\"235.5\" data-segment-start-x=\"393.5\" data-segment-start-y=\"235.5\" data-segment-end-x=\"508\" data-segment-end-y=\"235.5\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(450.75,203.5) rotate(0)\"><rect x=\"-43.5\" y=\"-12\" width=\"87\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,245.5L508,277.5 M50,245.5L50,277.5 M508,277.5L50,277.5\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"279\" data-anchor-y=\"245.5\" data-segment-start-x=\"508\" data-segment-start-y=\"245.5\" data-segment-end-x=\"50\" data-segment-end-y=\"245.5\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(279,277.5) rotate(0)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 1/2 po</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 180° — retour écrasé</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 po</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 2 1/2 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 1 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+            "status": "specified",
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Prix sur demande",
+              "selectionType": "manufacturer",
+              "status": "price_unconfigured"
+            },
+            "pricing": {
+              "schema": "mir-piece-pricing-1",
+              "status": "on_request",
+              "requiresQuote": false,
+              "automaticPricingAllowed": false,
+              "currency": "CAD",
+              "rate": null,
+              "rateUnit": "in2",
+              "rateCents": null,
+              "areaSqIn": null,
+              "unitAmount": null,
+              "unitCents": null,
+              "quantity": 3,
+              "lineAmount": null,
+              "lineCents": null,
+              "basis": "projected_outer_area_including_lips",
+              "tariffId": null,
+              "taxIncluded": null,
+              "taxStatus": "not_calculated",
+              "shippingStatus": "not_calculated",
+              "label": "Prix sur demande",
+              "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+              "sourceKind": "user_instruction",
+              "geometryErrors": [],
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Prix sur demande",
+                "selectionType": "manufacturer",
+                "status": "price_unconfigured"
+              }
+            },
+            "workshopValidationRequired": true,
+            "revisionId": "M002-r1-62fc591a"
+          }
+        }
+      },
+      "updatedAt": "2026-11-17T16:48:01.153Z"
+    }
+  ]
+}

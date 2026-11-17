@@ -12,9 +12,9 @@
   const t=(fr,en)=>clientEN()?en:fr;
   const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
   const num=value=>Number.isFinite(value)?Number(value.toFixed(2)).toLocaleString(clientEN()?'en-CA':'fr-CA'):'?';
-  const txt=(x,y,value,size=21,extra='')=>'<text x="'+x+'" y="'+y+'" font-family="Arial,Helvetica,sans-serif" font-size="'+size+'"'+(/(?:^|\s)fill\s*=/.test(extra)?'':' fill="#263f30"')+' '+extra+'>'+esc(value)+'</text>';
-  const rect=(x,y,w,h,fill='#fff',stroke='#d8e3d8',radius=0)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+radius+'" fill="'+fill+'" stroke="'+stroke+'"/>';
-  const line=(x,y,x2,y2,color='#dbe3d9',sw=2)=>'<path d="M '+x+' '+y+' L '+x2+' '+y2+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'"/>';
+  const txt=(x,y,value,size=21,extra='')=>'<text x="'+x+'" y="'+y+'" font-family="Arial,Helvetica,sans-serif" font-size="'+size+'"'+(/(?:^|\s)fill\s*=/.test(extra)?'':' fill="#242522"')+' '+extra+'>'+esc(value)+'</text>';
+  const rect=(x,y,w,h,fill='#fff',stroke='#d8cdbc',radius=0)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+radius+'" fill="'+fill+'" stroke="'+stroke+'"/>';
+  const line=(x,y,x2,y2,color='#d8cdbc',sw=2)=>'<path d="M '+x+' '+y+' L '+x2+' '+y2+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'"/>';
   const svg=body=>'<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1000" viewBox="0 0 1400 1000"><rect width="1400" height="1000" fill="white"/>'+body+'</svg>';
   const fmt=(model,mm,api)=>api.formatMeasurement(mm,model.unit);
   const volumeAPI=root?.MIRProductionVolume||
@@ -22,20 +22,34 @@
   const row=v=>String(v||'').trim();
   const max=(str,n)=>String(str??'').slice(0,n);
   function sectionHeading(title,kicker){
-    return rect(0,0,1400,15,'#28553a','#28553a')+
-      txt(62,73,'MIR',41,'font-weight="800" fill="#28553a"')+
+    return rect(0,0,1400,15,'#bda889','#bda889')+
+      txt(62,73,'MIR',41,'font-weight="800" fill="#242522"')+
       txt(185,72,title,30,'font-weight="700"')+
-      txt(1338,69,kicker,16,'text-anchor="end" fill="#657869"')+
-      line(60,103,1340,103,'#d3dfd4',2);
+      txt(1338,69,kicker,16,'text-anchor="end" fill="#625e55"')+
+      line(60,103,1340,103,'#d8cdbc',2);
   }
-  function property(x,y,label,value){
-    return txt(x,y,label,15,'fill="#667967" font-weight="700"')+
-      txt(x,y+27,max(value||t('À confirmer','To confirm'),48),21,'font-weight="600"');
+  let measureContext;
+  function propertyRows(value,width=230){
+    const source=String(value||t('À confirmer','To confirm')),rows=[];let current='';
+    if(root?.document)measureContext ||= root.document.createElement('canvas').getContext('2d');
+    if(measureContext)measureContext.font='600 20px Arial';
+    const measure=v=>measureContext?measureContext.measureText(v).width:[...v].reduce((sum,c)=>sum+(/[MW@%]/.test(c)?.9:/[ilI1 .,;:!|]/.test(c)?.28:/[A-Z0-9]/.test(c)?.65:.5)*20,0);
+    for(let word of source.split(/\s+/)){
+      while(measure(word)>width){if(current){rows.push(current);current='';}let end=word.length;while(end>1&&measure(word.slice(0,end))>width)end--;rows.push(word.slice(0,end));word=word.slice(end);}
+      if(!word)continue;
+      if(current&&measure(current+' '+word)>width){rows.push(current);current=word;}else current+=(current?' ':'')+word;
+    }
+    if(current)rows.push(current);return rows;
   }
+  function property(x,y,label,value,width=230){
+    const all=propertyRows(value,width-12),shown=all.slice(0,2);if(all.length>2)shown[1]+='…';
+    return txt(x,y,label,15,'fill="#625e55" font-weight="700"')+shown.map((line,i)=>txt(x,y+27+i*24,line,20,'font-weight="600"')).join('');
+  }
+  function fullProperty(label,value,width=230){return propertyRows(value,width-12).length>2?[label+' : '+value]:[];}
   function footer(y='955'){
-    return line(62,918,1338,918,'#dae3d8',2)+
-      txt(62,948,t('COTES FINIES • CROQUIS NON À L’ÉCHELLE • VALIDATION ATELIER OBLIGATOIRE','FINISHED DIMENSIONS • NOT TO SCALE • WORKSHOP APPROVAL REQUIRED'),15,'fill="#6a7b6b"')+
-      txt(1338,948,t('AUCUN ENVOI AUTOMATIQUE','NO AUTOMATIC SUBMISSION'),15,'text-anchor="end" fill="#6a7b6b"');
+    return line(62,918,1338,918,'#d8cdbc',2)+
+      txt(62,948,t('COTES FINIES • CROQUIS NON À L’ÉCHELLE • VALIDATION ATELIER OBLIGATOIRE','FINISHED DIMENSIONS • NOT TO SCALE • WORKSHOP APPROVAL REQUIRED'),15,'fill="#625e55"')+
+      txt(1338,948,t('AUCUN ENVOI AUTOMATIQUE','NO AUTOMATIC SUBMISSION'),15,'text-anchor="end" fill="#625e55"');
   }
   // A = largeur hors tout, B = hauteur hors tout.
   // Les anciens ronds 1-2-3-4 représentent les côtés du contour, pas des
@@ -60,7 +74,7 @@
     const drawn=points.map(project);
     const shapePath=ps=>ps.map((p,i)=>(i?'L ':'M ')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ')+' Z';
     const d=shapePath(drawn);
-    let out='<path '+attribute+'="'+esc(model.id||model.name)+'" d="'+d+'" fill="'+(model.finish?.hex||'#e7efe5')+'" fill-opacity="0.55" stroke="#28553a" stroke-width="'+(full?3.8:2.3)+'"/>';
+    let out='<path '+attribute+'="'+esc(model.id||model.name)+'" d="'+d+'" fill="'+(model.finish?.hex||'#e9e2d6')+'" fill-opacity="0.55" stroke="#242522" stroke-width="'+(full?3.8:2.3)+'"/>';
     if(!full)return out;
     const lipTotal=model.edges.reduce((s,e)=>s+(e.lipMM||0),0);
     const mesh=volumeAPI?.buildMesh?.(model);
@@ -71,7 +85,7 @@
     // No fictitious rectangle or approximate offset around sloped sides.
     if(mesh?.valid && lipTotal>0){
       const inner=mesh.front.map(project);
-      out+='<path data-mir-lip-inner="true" d="'+shapePath(inner)+'" fill="#fff" fill-opacity="0.73" stroke="#729c76" stroke-width="2.5"/>';
+      out+='<path data-mir-lip-inner="true" d="'+shapePath(inner)+'" fill="#fff" fill-opacity="0.73" stroke="#bda889" stroke-width="2.5"/>';
     }
     const sign=Math.sign(points.reduce((s,p,i)=>s+p[0]*points[(i+1)%points.length][1]-points[(i+1)%points.length][0]*p[1],0))||1;
     const xL=Math.min(...drawn.map(p=>p[0])),xR=Math.max(...drawn.map(p=>p[0]));
@@ -79,13 +93,13 @@
     const dimY=yB+66,dimX=xR+123;
     // True outer-envelope dimensions, not the lip-free face.
     out+=line(xL,yB+6,xL,dimY+8,'#607b65',1.5)+line(xR,yB+6,xR,dimY+8,'#607b65',1.5);
-    out+=line(xL,dimY,xR,dimY,'#28553a',2.1);
-    out+='<path d="M '+(xL+2)+' '+dimY+' l 12,-6 v 12 z M '+(xR-2)+' '+dimY+' l -12,-6 v 12 z" fill="#28553a"/>';
-    out+=txt((xL+xR)/2,dimY+27,'A · largeur hors tout',17,'text-anchor="middle" font-weight="700" data-mir-dimension-a="true"');
+    out+=line(xL,dimY,xR,dimY,'#242522',2.1);
+    out+='<path d="M '+(xL+2)+' '+dimY+' l 12,-6 v 12 z M '+(xR-2)+' '+dimY+' l -12,-6 v 12 z" fill="#242522"/>';
+    out+=txt((xL+xR)/2,dimY+27,t('A · largeur hors tout','A · overall width'),17,'text-anchor="middle" font-weight="700" data-mir-dimension-a="true"');
     out+=line(xR+6,yT,dimX+8,yT,'#607b65',1.5)+line(xR+6,yB,dimX+8,yB,'#607b65',1.5);
-    out+=line(dimX,yT,dimX,yB,'#28553a',2.1);
-    out+='<path d="M '+dimX+' '+(yT+2)+' l -6,12 h 12 z M '+dimX+' '+(yB-2)+' l -6,-12 h 12 z" fill="#28553a"/>';
-    const B='B · hauteur hors tout';
+    out+=line(dimX,yT,dimX,yB,'#242522',2.1);
+    out+='<path d="M '+dimX+' '+(yT+2)+' l -6,12 h 12 z M '+dimX+' '+(yB-2)+' l -6,-12 h 12 z" fill="#242522"/>';
+    const B=t('B · hauteur hors tout','B · overall height');
     out+=txt(dimX+33,(yT+yB)/2,B,17,'text-anchor="middle" font-weight="700" data-mir-dimension-b="true" transform="rotate(-90 '+(dimX+33)+' '+((yT+yB)/2)+')"');
     // Étiquettes courtes pour le chantier : uniquement le nom du côté.
     // Les valeurs de lips restent dans le tableau détaillé du bon et la vraie
@@ -207,21 +221,21 @@
       out+=rect(px+dx/2-22,py+dy/2-16,44,30,'#fff','#c6d5c7',5);
       out+=txt(px+dx/2,py+dy/2+5,item.sourceLayout?.sourcePieceId||item.id,14,'text-anchor="middle" font-weight="700"');
     });
-    return out+txt(84,805,t('Chaque repère correspond à une seule pièce du bon. Emplacement indicatif, hors tout à confirmer sur les fiches.','Each reference identifies one piece on this order. Locations are indicative; verify overall dimensions on the fabrication sheets.'),15,'fill="#657869"');
+    return out+txt(84,805,t('Chaque repère correspond à une seule pièce du bon. Emplacement indicatif, hors tout à confirmer sur les fiches.','Each reference identifies one piece on this order. Locations are indicative; verify overall dimensions on the fabrication sheets.'),15,'fill="#625e55"');
   }
   function cover(po,panels,api){
     const quantity=panels.reduce((n,i)=>n+(Number(i.spec.quantity)||0),0);
     let body=sectionHeading(t('BON DE COMMANDE · PANNEAUX','PURCHASE ORDER · PANELS'),t('RÉVISION ','REVISION ')+(po.revision||1));
     body+=txt(65,156,max(po.poNumber,90),31,'font-weight="700"')+
-      txt(1338,157,panels.length+t(' références • ',' references • ')+quantity+t(' pièces',' pieces'),23,'text-anchor="end" font-weight="700" fill="#28553a"');
-    body+=rect(64,183,1274,154,'#f3f7ef','#dce5d7',12);
-    body+=property(85,218,t('CHANTIER','JOBSITE'),max(po.job,60))+property(518,218,t('FOURNISSEUR','SUPPLIER'),max(po.supplier?.name,55))+property(990,218,t('LIVRAISON','DELIVERY'),max(po.shipTo,46));
-    body+=txt(85,315,t('Responsable : ','Person in charge: ')+max(po.foreman||'À préciser',55),16,'fill="#56705d"')+
-      txt(518,315,t('Contact : ','Contact: ')+max(po.supplier?.email||'À vérifier',62),16,'fill="#56705d"')+
-      txt(990,315,t('Date demandée : ','Requested date: ')+max(po.requestedDate||'À confirmer',25),16,'fill="#56705d"');
+      txt(1338,157,panels.length+t(' références • ',' references • ')+quantity+t(' pièces',' pieces'),23,'text-anchor="end" font-weight="700" fill="#242522"');
+    body+=rect(64,183,1274,154,'#f4f1ea','#d8cdbc',12);
+    body+=property(85,218,t('CHANTIER','JOBSITE'),po.job,400)+property(518,218,t('FOURNISSEUR','SUPPLIER'),po.supplier?.name,440)+property(990,218,t('LIVRAISON','DELIVERY'),po.shipTo,320);
+    body+=txt(85,315,t('Responsable : ','Person in charge: ')+max(po.foreman||'À préciser',55),16,'fill="#625e55"')+
+      txt(518,315,t('Contact : ','Contact: ')+max(po.supplier?.email||'À vérifier',62),16,'fill="#625e55"')+
+      txt(990,315,t('Date demandée : ','Requested date: ')+max(po.requestedDate||'À confirmer',25),16,'fill="#625e55"');
     body+=wallSketch(panels,api);
     body+=txt(874,378,t('PIÈCES À FABRIQUER','PIECES TO FABRICATE'),21,'font-weight="700"');
-    body+=line(875,393,1325,393,'#cbdacb',2);
+    body+=line(875,393,1325,393,'#d8cdbc',2);
     const shown=panels.slice(0,12);
     shown.forEach((item,i)=>{
       const model=api.buildPanel(item.spec),top=422+i*31,reference=item.sourceLayout?.sourcePieceId||item.id;
@@ -230,37 +244,37 @@
         txt(1310,top,'× '+model.quantity,16,'text-anchor="end"');
     });
     if(panels.length>shown.length)body+=txt(878,807,'+'+(panels.length-shown.length)+t(' références : voir leurs fiches cotées.',' references: see dimensioned sheets.'),16,'fill="#a3662b"');
-    body+=rect(68,841,1264,52,'#edf3e9','#d7e5d2',7)+txt(84,872,t('Une pièce par fiche • aucune pièce répétée • bon local non transmis','One piece per sheet • no duplicates • local order not submitted'),19,'font-weight="700" fill="#31563a"');
+    body+=rect(68,841,1264,52,'#f4f1ea','#d8cdbc',7)+txt(84,872,t('Une pièce par fiche • aucune pièce répétée • bon local non transmis','One piece per sheet • no duplicates • local order not submitted'),19,'font-weight="700" fill="#242522"');
     body+=footer();
-    return {name:t('Résumé du bon ','Order summary ')+po.poNumber,layout:'wide',svg:svg(body),summary:[t('Résumé, mur et repères. Validation fournisseur et atelier requise.','Summary, wall and references. Supplier and workshop approval required.')]};
+    return {name:t('Résumé du bon ','Order summary ')+po.poNumber,layout:'wide',svg:svg(body),summary:[t('Résumé, mur et repères. Validation fournisseur et atelier requise.','Summary, wall and references. Supplier and workshop approval required.'),...fullProperty(t('Chantier','Jobsite'),po.job,400),...fullProperty(t('Fournisseur','Supplier'),po.supplier?.name,440),...fullProperty(t('Livraison','Delivery'),po.shipTo,320),...(String(po.foreman||'').length>55?[t('Responsable : ','Person in charge: ')+po.foreman]:[]),...(String(po.supplier?.email||'').length>62?[t('Contact : ','Contact: ')+po.supplier.email]:[])]};
   }
   function panelPage(po,item,index,total,api){
     const m=api.buildPanel(item.spec);
     let body=sectionHeading(t('FICHE DE FABRICATION · PANNEAU ','FABRICATION SHEET · PANEL ')+(index+1)+'/'+total,t('BON ','ORDER ')+max(po.poNumber,45));
     const reference=item.sourceLayout?.sourcePieceId||item.id;
     body+=txt(65,151,t('Panneau ','Panel ')+max(reference,64),34,'font-weight="800"')+
-      txt(1330,150,t('QTÉ ','QTY ')+m.quantity,26,'font-weight="800" text-anchor="end" fill="#28553a"');
-    body+=rect(62,177,720,708,'#f8faf6','#dce5d8',12);
+      txt(1330,150,t('QTÉ ','QTY ')+m.quantity,26,'font-weight="800" text-anchor="end" fill="#242522"');
+    body+=rect(62,177,720,708,'#f4f1ea','#d8cdbc',12);
     body+=txt(85,215,t('VUE COTÉE · UNE PIÈCE','DIMENSIONED VIEW · ONE PIECE'),19,'font-weight="700"');
     body+=geometry(m,{x:100,y:248,w:630,h:505},'data-mir-panel-main',api);
-    body+=rect(100,758,668,104,'#eaf3e6','#c4d9c0',9);
+    body+=rect(100,758,668,104,'#e9e2d6','#d8cdbc',9);
     body+=txt(119,792,t('A · LARGEUR HORS TOUT : ','A · OVERALL WIDTH: ')+fmt(m,m.widthMM,api),24,'font-weight="800" data-mir-ab-summary="A"')+
       txt(119,832,t('B · HAUTEUR HORS TOUT : ','B · OVERALL HEIGHT: ')+fmt(m,m.heightMM,api),24,'font-weight="800" data-mir-ab-summary="B"');
-    body+=txt(110,878,t('A et B incluent les lèvres. Ne pas confondre avec la face visible.','A and B include the lips. Do not confuse them with the visible face.'),15,'fill="#607162"');
-    body+=rect(806,177,531,708,'#fff','#dce5d8',12);
+    body+=txt(110,878,t('A et B incluent les lèvres. Ne pas confondre avec la face visible.','A and B include the lips. Do not confuse them with the visible face.'),15,'fill="#625e55"');
+    body+=rect(806,177,531,708,'#fff','#d8cdbc',12);
     body+=property(831,214,'PROJECTION C',fmt(m,m.reliefMM,api));
     body+=property(1090,214,t('MATIÈRE','MATERIAL'),m.material?.name||m.material?.type||'À préciser');
     body+=property(831,291,t('FINITION','FINISH'),m.finish?.name||'À préciser');
-    body+=property(1090,291,t('CODE / GAGE','CODE / GAUGE'),max((m.finish?.code||'À préciser')+' · '+(m.material?.gauge||m.material?.thicknessMM&&num(m.material.thicknessMM)+' mm'||t('épaisseur à confirmer','thickness to confirm')),30));
+    body+=property(1090,291,t('CODE / GAGE','CODE / GAUGE'),(m.finish?.code||'À préciser')+' · '+(m.material?.gauge||m.material?.thicknessMM&&num(m.material.thicknessMM)+' mm'||t('épaisseur à confirmer','thickness to confirm')));
     body+=property(831,370,t('BAS APRÈS POSE','BOTTOM AFTER INSTALLATION'),m.edges.find(e=>e.id===m.bottomEdgeId)?.name||'À préciser');
     body+=property(1090,370,'PERFORATION',m.perforation.enabled?t('Oui — détails à valider','Yes — details need review'):t('Non','No'));
-    body+=line(830,421,1311,421,'#d7e5d7',2);
+    body+=line(830,430,1311,430,'#d8cdbc',2);
     body+=txt(832,454,t('CÔTÉS, LIPS ET ANGLES','SIDES, LIPS AND ANGLES'),20,'font-weight="800"')+
       txt(832,484,t('Côté','Side'),15,'font-weight="700"')+
       txt(1000,484,t('Longueur','Length'),15,'font-weight="700"')+
       txt(1145,484,'Lip',15,'font-weight="700"')+
       txt(1260,484,t('Angle','Angle'),15,'font-weight="700"');
-    body+=line(831,497,1312,497,'#d8e4d8',1);
+    body+=line(831,497,1312,497,'#d8cdbc',1);
     const limit=7;
     m.edges.slice(0,limit).forEach((edge,i)=>{
       const y=528+i*45;
@@ -268,16 +282,16 @@
         txt(1000,y,fmt(m,edge.lengthMM,api),15)+
         txt(1144,y,fmt(m,edge.lipMM,api),15)+
         txt(1260,y,num(edge.interiorAngleDeg)+'°',15);
-      body+=line(832,y+13,1312,y+13,'#edf2ec',1);
+      body+=line(832,y+13,1312,y+13,'#e9e2d6',1);
     });
     const detailsAfter=m.edges.slice(limit);
     if(!detailsAfter.length){
-      body+=txt(833,866,t('Cotes réelles conservées • développé de pli à valider.','Actual dimensions retained • developed length requires approval.'),14,'fill="#667d68"');
+      body+=txt(833,866,t('Cotes réelles conservées • développé de pli à valider.','Actual dimensions retained • developed length requires approval.'),14,'fill="#625e55"');
     }else{
       body+=txt(832,872,detailsAfter.length+t(' autres côtés : liste complémentaire sans second dessin.',' additional sides: supplementary list, no second drawing.'),15,'fill="#955e2a"');
     }
     body+=footer();
-    const pages=[{name:t('Panneau ','Panel ')+reference,layout:'wide',svg:svg(body),summary:[t('Panneau ','Panel ')+reference+t(' • 1 dessin • quantité ',' • 1 drawing • quantity ')+m.quantity+t(' • fabrication à confirmer.',' • fabrication to confirm.')]}];
+    const pages=[{name:t('Panneau ','Panel ')+reference,layout:'wide',svg:svg(body),summary:[t('Panneau ','Panel ')+reference+t(' • 1 dessin • quantité ',' • 1 drawing • quantity ')+m.quantity+t(' • fabrication à confirmer.',' • fabrication to confirm.'),...fullProperty(t('Matière','Material'),m.material?.name||m.material?.type),...fullProperty(t('Finition','Finish'),m.finish?.name),...fullProperty(t('Code / gage','Code / gauge'),(m.finish?.code||'À préciser')+' · '+(m.material?.gauge||m.material?.thicknessMM&&num(m.material.thicknessMM)+' mm'||t('épaisseur à confirmer','thickness to confirm'))),...(m.note?[t('Note : ','Note: ')+m.note]:[]),...(m.perforation?.enabled&&m.perforation.details?[t('Perforation : ','Perforation: ')+m.perforation.details]:[])]}];
     for(let start=0;start<detailsAfter.length;start+=14){
       const group=detailsAfter.slice(start,start+14),offset=limit+start;
       let extra=sectionHeading(t('DÉTAILS DE COUPE · ','CUTTING DETAILS · ')+reference,t('AUCUN NOUVEAU PANNEAU','NO ADDITIONAL PANEL'));

@@ -15,10 +15,33 @@
     'st-laurent-lap-825':fixed('st-laurent-4.jpg',993,691,[310,0,240,185],'Détail du bardage à clin St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.'),
     'st-laurent-v-groove-825':fixed('st-vgroove-9.jpg',993,691,[750,505,240,180],'Détail du profil V-Groove St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.'),
     'st-laurent-board-batten-12':fixed('st-board-9.jpg',993,691,[440,410,370,195],'Détail Board & Batten St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.'),
-    'hardie-board-batten':fixed('hardiepanel-smooth.png',600,600,null,'Échantillon du composant HardiePanel lisse. Les couvre-joints et l’assemblage Board & Batten ne sont pas représentés.')
+    'hardie-board-batten':fixed('hardiepanel-smooth.png',600,600,null,'Échantillon du composant HardiePanel lisse. Les couvre-joints et l’assemblage Board & Batten ne sont pas représentés.'),
+    // The genuine flat Äkta photograph already supplied by JDP. Never cut a
+    // rectangular "board" from the manufacturer's spherical material previews.
+    'jdp-akta-306-antique':{
+      baseImage:'./assets/catalogue-swatches/jdp-gris-antique-c790727e.png',width:1500,height:2000,
+      viewBox:[0,500,1500,1000],maskPath:'M0 500H1500V1500H0Z',
+      assetKind:'manufacturer_texture_detail',previewForSwatches:true,sourceUrl:'https://jdprevetement.com/collections/akta/',
+      note:'Détail du bois Äkta antiqué, issu de la photo plane officielle Gris antique. Même grain et même cadrage pour chaque teinte. Dimensions non représentées.'
+    },
+    // The source is the actual Bosco installation photograph. Its upper-left
+    // material-only area excludes the superimposed diagram and all windows.
+    'rialux-bosco':{
+      ...fixed('rialux-bosco.webp',800,534,[0,0,280,187],
+        'Détail du bardage Bosco, recadré dans la photo de pose officielle Rialux, sans le dessin superposé. Même grain et même cadrage pour chaque teinte. Dimensions non représentées.'),
+      maskPath:'M0 0H280V187H0Z',assetKind:'manufacturer_installed_detail',previewForSwatches:true,sourceUrl:'https://www.rialux.com/collections/'
+    },
+    // This is explicitly a small texture detail of JDP's original preview,
+    // not a newly photographed flat board or a representation of its shape.
+    'jdp-bluhouss-307':{
+      ...fixed('jdp-bluhouss-307.webp',2000,2000,[640,760,720,480],
+        'Détail de la texture fabricant Bluhouss 307, recadré dans son aperçu. Perspective et dimensions non représentatives.'),
+      maskPath:'M640 760H1360V1240H640Z',assetKind:'manufacturer_preview_texture_detail',previewForSwatches:true,
+      sourceUrl:'https://jdprevetement.com/collections/bluhouss/',sourcePreview:'./assets/products/jdp-bluhouss-307.webp'
+    }
   };
   function baseFor(material){
-    if(!(material.applications||[]).includes('siding')||!['CanExel','James Hardie','St-Laurent'].includes(material.brand))return null;
+    if(!(material.applications||[]).includes('siding')||!['CanExel','James Hardie','St-Laurent','JDP / Juste du Pin','Rialux'].includes(material.brand))return null;
     if(material.stableSidingPreview)return {...material.stableSidingPreview};
     if(bases[material.id])return {...bases[material.id]};
     if(material.brand!=='James Hardie')return null;
@@ -48,5 +71,9 @@
         images:[...variants,...(material.images||[]).filter(image=>image.assetKind!=='mir_siding_color_demo')]};
     }));
   }
-  root.MIRClientSidingPreviews=Object.freeze({prepare});
+  // Read-only geometry contract for the employee shop. Preparation remains
+  // explicit: callers keep their catalogue data and lazy-cache prepared copies.
+  root.MIRClientSidingPreviews=Object.freeze({prepare,baseFor:material=>{
+    const base=baseFor(material);return base?JSON.parse(JSON.stringify(base)):null;
+  }});
 })(typeof window!=='undefined'?window:globalThis);

@@ -1,0 +1,13 @@
+{"events":[{"type":"pointerdown","detail":0,"target":"svg","id":"","text":"\n   \n    \n    \n   \n   \n   \n   ","prevented":false},{"type":"pointerup","detail":0,"target":"svg","id":"","text":"\n   \n    \n    \n   \n   \n   \n   ","prevented":false},{"type":"click","detail":1,"target":"svg","id":"","text":"\n   \n    \n    \n   \n   \n   \n   ","prevented":false},{"type":"click","detail":1,"target":"INPUT","id":"","text":"","prevented":false},{"type":"pointerdown","detail":0,"target":"BUTTON","id":"","text":"Confirmer le repli","prevented":false},{"type":"pointerup","detail":0,"target":"BUTTON","id":"","text":"Confirmer le repli","prevented":false},{"type":"click","detail":1,"target":"BUTTON","id":"","text":"Confirmer le repli","prevented":false}],"visible":592}
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+false !== true
+
+    at /tmp/mir-hem-edge-tap.cjs:24:11 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

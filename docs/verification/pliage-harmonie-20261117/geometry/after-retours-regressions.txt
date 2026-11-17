@@ -1,0 +1,10 @@
+PASS Double retour : B-C et D-A ont chacun un arrondi de 180 degrés
+PASS Les données de fabrication ne changent pas pendant la présentation
+PASS Deux longueurs identiques avec angle droit restent un L
+PASS La fermeture D-A est absente si D est plus court que A
+PASS Les jambes disjointes ne sont jamais reliées même si leurs longueurs correspondent
+PASS Toutes les étiquettes A-D sont présentes une seule fois avec un identifiant
+PASS Sur mobile, les repères des deux feuilles restent nettement séparés
+PASS Le retour symétrique fonctionne aussi en miroir
+PASS Les cotes de la capture A=2, B=1½, C=1 7/16, D=1¼ restent ouvertes
+MIR A-D: 9/9 tests réussis

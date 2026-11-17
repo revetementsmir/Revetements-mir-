@@ -1,0 +1,26 @@
+--- tests/mir-client-pliage-approved-browser.cjs
++++ docs/verification/pliage-harmonie-20261117/journey/harnesses/legacy-original-guarded.cjs
+@@ -1,8 +1,8 @@
+ 'use strict';
+ // Native MIR UI and geometry; no Supabase writes, orders or payment calls.
+ const assert=require('node:assert/strict'),fs=require('fs'),path=require('path'),http=require('http'),{once}=require('events'),crypto=require('crypto');
+-const {chromium}=require('playwright'),M=require('../dist/production-model.js');
+-const root=path.resolve(__dirname,'../dist'),proof=process.env.MIR_CLIENT_PLIAGE_PROOF_DIR?path.resolve(process.env.MIR_CLIENT_PLIAGE_PROOF_DIR):path.resolve(__dirname,'../docs/verification/client-pliage');fs.mkdirSync(proof,{recursive:true});
++const {chromium}=require('playwright'),M=require(path.resolve(__dirname,'../../../../../dist/production-model.js'));
++const root=path.resolve(path.resolve(__dirname,'../../../../../tests'),'../dist'),proof=process.env.MIR_CLIENT_PLIAGE_PROOF_DIR?path.resolve(process.env.MIR_CLIENT_PLIAGE_PROOF_DIR):path.resolve(path.resolve(__dirname,'../../../../../tests'),'../docs/verification/client-pliage');fs.mkdirSync(proof,{recursive:true});
+ function serve(dir){return http.createServer((req,res)=>{const f=path.resolve(dir,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!f.startsWith(dir+path.sep)||!fs.existsSync(f)||!fs.statSync(f).isFile())return res.writeHead(404).end();res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.js':'application/javascript','.mjs':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.avif':'image/avif','.webp':'image/webp'})[path.extname(f)]||'application/octet-stream');fs.createReadStream(f).pipe(res);});}
+ const spec={kind:'profile',template:'l',unit:'in',dimensions:{A:3.5,B:2.25},length:120,quantity:2,material:{type:'aluminium'},finish:{system:'special',code:'QA',name:'Recette'},coloredFace:{side:'left',segmentId:'A'}};
+ const t=M.createTemplate(spec,{id:'qa-client-model',name:'Modèle publié de recette'});assert.equal(t.ok,true);
+@@ -10,10 +10,10 @@
+ const dossier={version:1,order:{id:'qa-existing-dossier',project:'Dossier existant QA',foreman:'',date:'',notes:'',items:[{id:'M001',kind:'profile',spec:made.spec,snapshot:made.snapshot,history:[]}]}};
+ const quick={version:1,project:'Liste rapide QA',items:[{id:'quick-existing',profile:'l',dimensions:{A:3.5,B:2.25},lengthIn:120,quantity:2}]};
+ const modelRecord={id:t.template.id,name:t.template.name,currentVersion:1,versions:[t.template],channels:{client:true,store:false,po:true},archived:false,allowed:{materials:['aluminium','acier'],colorSystems:['manufacturer','special']}};
+-async function contextFor(browser,base,viewport){const context=await browser.newContext({viewport,isMobile:viewport.width<=428,hasTouch:viewport.width<=1024});await context.route('**/*',route=>{if(!route.request().url().startsWith(base))return route.abort();return route.continue();});return context;}
++async function contextFor(browser,base,viewport){const context=await browser.newContext({viewport,isMobile:viewport.width<=428,hasTouch:viewport.width<=1024});await context.route('**/*',route=>{if((!route.request().url().startsWith(base)||route.request().method()!=='GET'))return route.abort();return route.continue();});return context;}
+ async function verifyFirstPaint(browser,base,{width,height,touch}){
+  const context=await browser.newContext({viewport:{width,height},isMobile:touch,hasTouch:touch});
+- await context.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
++ await context.route('**/*',route=>route.request().url().startsWith(base)&&route.request().method()==='GET'?route.continue():route.abort());
+  try{
+   const page=await context.newPage();
+   await page.goto(base+'/pliage.html');

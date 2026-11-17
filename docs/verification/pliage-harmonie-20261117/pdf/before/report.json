@@ -1,0 +1,5148 @@
+{
+  "phase": "before",
+  "revision": "3573d90f064e95459c18a8b6ba8a4462bfaa1dc0",
+  "hashes": {
+    "mir-selection-pdf.js": "307917099bfb6e621e5106f70f88ca29d1ef24c50250bd4c96395b4effe20d54",
+    "mir-dossier-pdf.js": "34f6d380522a392df160f5c6c528e94dc602242e74be7aca368d89434a604d99",
+    "mir-panel-po-pdf.js": "cb90113fabe1d1b5c5af56a91d2c51325be4b9043d8891651215d592f6cb4269",
+    "annotated-pdf.js": "f2a031a17aab0a4fbd4d69a40784ce37aaee31a9b980c240381f5d8e4a3adc47",
+    "production-model.js": "b4ca9fe8bd850e59dacfb4d38be0c48fcdf3e187d0b7177c51b22f9af835c37f",
+    "mir-client-i18n.js": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+  },
+  "cases": [
+    {
+      "scenario": {
+        "name": "selection-long",
+        "client": true,
+        "lang": "fr-CA"
+      },
+      "filename": "selection-long-fr-CA.pdf",
+      "pages": [
+        {
+          "page": 1,
+          "text": "17 nov. 2026\n\nSÉLECTION DE MATÉRIAUX\n\nProjet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparatio\n\nProjet : Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara\n\nN°\n \nARTICLE / RÉFÉRENCE\n \nFABRICANT\n \nFINI / FORMAT\n \nQUANTITÉ\n \nUNITÉ\n\n01\n \nNom de produit synthétique très\ndétaillé pour contrôle de la\npagination Nom de produit\nsynthétique très détaillé pour\ncontrôle de la pagination Nom\nde produit synthétique très\ndétaillé pour contrôle de la\npagination Nom de produit\nsynthétique très détaillé pour\ncontrôle de la pagination Nom\nde produit synthétique très\ndétaillé pour contrôle de la\npagination Nom de produit\nsynthétique très détaillé pour\ncontrôle de la pagination Nom\nde produit synthétique très\ndétaillé pour contrôle de la\npagination FIN-NOM-QA ·\nREFERENCE-QA-LONGUE-REFERENCE-Q\nA-LONGUE-REFERENCE-QA-LONGUE-RE\nFERENCE-QA-LONGUE-REF\nMarque QA\n \nNoir officiel QA · 48\npo × 120 po\n7\n \npièces\n02\n \nMatériau synthétique QA ·\nQA-MAT-001\nMarque QA\n \nNoir officiel QA · 48\npo × 120 po\n7\n \npièces\nDocument de préparation : ceci ne constitue PAS une commande.\n\nPrix, stocks, unités de vente et compatibilités à confirmer par MIR.\n\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n1 / 1",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "SÉLECTION DE MATÉRIAUX",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 225.18287999999995,
+              "height": 16.56
+            },
+            {
+              "text": "Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparatio",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 450.77759999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Projet : Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara",
+              "x": 28.8,
+              "y": 655.2,
+              "width": 583.2575999999996,
+              "height": 11.52
+            },
+            {
+              "text": "N°",
+              "x": 31.68,
+              "y": 623.52,
+              "width": 9.68544,
+              "height": 8.64
+            },
+            {
+              "text": "ARTICLE / RÉFÉRENCE",
+              "x": 56.16,
+              "y": 623.52,
+              "width": 97.82208000000001,
+              "height": 8.64
+            },
+            {
+              "text": "FABRICANT",
+              "x": 233.28,
+              "y": 623.52,
+              "width": 50.36256,
+              "height": 8.64
+            },
+            {
+              "text": "FINI / FORMAT",
+              "x": 330.48,
+              "y": 623.52,
+              "width": 60.40224000000001,
+              "height": 8.64
+            },
+            {
+              "text": "QUANTITÉ",
+              "x": 462.24,
+              "y": 623.52,
+              "width": 44.11584,
+              "height": 8.64
+            },
+            {
+              "text": "UNITÉ",
+              "x": 521.28,
+              "y": 623.52,
+              "width": 25.89408,
+              "height": 8.64
+            },
+            {
+              "text": "01",
+              "x": 31.68,
+              "y": 595.44,
+              "width": 11.20896,
+              "height": 10.08
+            },
+            {
+              "text": "Nom de produit synthétique très",
+              "x": 56.16,
+              "y": 595.44,
+              "width": 142.78319999999997,
+              "height": 10.08
+            },
+            {
+              "text": "détaillé pour contrôle de la",
+              "x": 56.16,
+              "y": 581.04,
+              "width": 118.15775999999998,
+              "height": 10.08
+            },
+            {
+              "text": "pagination Nom de produit",
+              "x": 56.16,
+              "y": 566.64,
+              "width": 118.16784000000001,
+              "height": 10.08
+            },
+            {
+              "text": "synthétique très détaillé pour",
+              "x": 56.16,
+              "y": 552.24,
+              "width": 128.79216,
+              "height": 10.08
+            },
+            {
+              "text": "contrôle de la pagination Nom",
+              "x": 56.16,
+              "y": 537.84,
+              "width": 133.84224,
+              "height": 10.08
+            },
+            {
+              "text": "de produit synthétique très",
+              "x": 56.16,
+              "y": 523.44,
+              "width": 118.71216000000001,
+              "height": 10.08
+            },
+            {
+              "text": "détaillé pour contrôle de la",
+              "x": 56.16,
+              "y": 509.04,
+              "width": 118.15775999999998,
+              "height": 10.08
+            },
+            {
+              "text": "pagination Nom de produit",
+              "x": 56.16,
+              "y": 494.64,
+              "width": 118.16784000000001,
+              "height": 10.08
+            },
+            {
+              "text": "synthétique très détaillé pour",
+              "x": 56.16,
+              "y": 480.24,
+              "width": 128.79216,
+              "height": 10.08
+            },
+            {
+              "text": "contrôle de la pagination Nom",
+              "x": 56.16,
+              "y": 465.84,
+              "width": 133.84224,
+              "height": 10.08
+            },
+            {
+              "text": "de produit synthétique très",
+              "x": 56.16,
+              "y": 451.44,
+              "width": 118.71216000000001,
+              "height": 10.08
+            },
+            {
+              "text": "détaillé pour contrôle de la",
+              "x": 56.16,
+              "y": 437.04,
+              "width": 118.15775999999998,
+              "height": 10.08
+            },
+            {
+              "text": "pagination Nom de produit",
+              "x": 56.16,
+              "y": 422.64,
+              "width": 118.16784000000001,
+              "height": 10.08
+            },
+            {
+              "text": "synthétique très détaillé pour",
+              "x": 56.16,
+              "y": 408.24,
+              "width": 128.79216,
+              "height": 10.08
+            },
+            {
+              "text": "contrôle de la pagination Nom",
+              "x": 56.16,
+              "y": 393.84,
+              "width": 133.84224,
+              "height": 10.08
+            },
+            {
+              "text": "de produit synthétique très",
+              "x": 56.16,
+              "y": 379.44,
+              "width": 118.71216000000001,
+              "height": 10.08
+            },
+            {
+              "text": "détaillé pour contrôle de la",
+              "x": 56.16,
+              "y": 365.04,
+              "width": 118.15775999999998,
+              "height": 10.08
+            },
+            {
+              "text": "pagination FIN-NOM-QA ·",
+              "x": 56.16,
+              "y": 350.64,
+              "width": 115.85951999999999,
+              "height": 10.08
+            },
+            {
+              "text": "REFERENCE-QA-LONGUE-REFERENCE-Q",
+              "x": 56.16,
+              "y": 336.24,
+              "width": 202.56768000000002,
+              "height": 10.08
+            },
+            {
+              "text": "A-LONGUE-REFERENCE-QA-LONGUE-RE",
+              "x": 56.16,
+              "y": 321.84,
+              "width": 199.22112000000004,
+              "height": 10.08
+            },
+            {
+              "text": "FERENCE-QA-LONGUE-REF",
+              "x": 56.16,
+              "y": 307.44,
+              "width": 135.41472000000005,
+              "height": 10.08
+            },
+            {
+              "text": "Marque QA",
+              "x": 233.28,
+              "y": 595.44,
+              "width": 51.50880000000002,
+              "height": 10.08
+            },
+            {
+              "text": "Noir officiel QA · 48",
+              "x": 330.48,
+              "y": 595.44,
+              "width": 86.73840000000008,
+              "height": 10.08
+            },
+            {
+              "text": "po × 120 po",
+              "x": 330.48,
+              "y": 581.04,
+              "width": 53.484480000000076,
+              "height": 10.08
+            },
+            {
+              "text": "7",
+              "x": 462.24,
+              "y": 595.44,
+              "width": 5.60448,
+              "height": 10.08
+            },
+            {
+              "text": "pièces",
+              "x": 521.28,
+              "y": 595.44,
+              "width": 29.1312,
+              "height": 10.08
+            },
+            {
+              "text": "02",
+              "x": 31.68,
+              "y": 275.76,
+              "width": 11.20896,
+              "height": 10.08
+            },
+            {
+              "text": "Matériau synthétique QA ·",
+              "x": 56.16,
+              "y": 275.76,
+              "width": 116.44416,
+              "height": 10.08
+            },
+            {
+              "text": "QA-MAT-001",
+              "x": 56.16,
+              "y": 261.36,
+              "width": 59.33088000000001,
+              "height": 10.08
+            },
+            {
+              "text": "Marque QA",
+              "x": 233.28,
+              "y": 275.76,
+              "width": 51.50880000000002,
+              "height": 10.08
+            },
+            {
+              "text": "Noir officiel QA · 48",
+              "x": 330.48,
+              "y": 275.76,
+              "width": 86.73840000000008,
+              "height": 10.08
+            },
+            {
+              "text": "po × 120 po",
+              "x": 330.48,
+              "y": 261.36,
+              "width": 53.484480000000076,
+              "height": 10.08
+            },
+            {
+              "text": "7",
+              "x": 462.24,
+              "y": 275.76,
+              "width": 5.60448,
+              "height": 10.08
+            },
+            {
+              "text": "pièces",
+              "x": 521.28,
+              "y": 275.76,
+              "width": 29.1312,
+              "height": 10.08
+            },
+            {
+              "text": "Document de préparation : ceci ne constitue PAS une commande.",
+              "x": 28.8,
+              "y": 108,
+              "width": 315.59472000000005,
+              "height": 10.08
+            },
+            {
+              "text": "Prix, stocks, unités de vente et compatibilités à confirmer par MIR.",
+              "x": 28.8,
+              "y": 91.44000000000005,
+              "width": 273.92976000000016,
+              "height": 9.36
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "1 / 1",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        }
+      ],
+      "clipped": [
+        {
+          "page": 1,
+          "text": "Projet : Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara",
+          "x": 28.8,
+          "y": 655.2,
+          "width": 583.2575999999996,
+          "height": 11.52
+        }
+      ],
+      "inputUnchanged": true,
+      "geometry": [
+        [
+          "M40 692H810",
+          "M40 777H810"
+        ]
+      ],
+      "model": [
+        {
+          "id": "QA-HEM",
+          "quantity": 2,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                50.8,
+                -38.1
+              ],
+              "headingDeg": -90
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                -38.1
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": -270
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 31.75,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                19.05,
+                0
+              ],
+              "headingDeg": -180
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": -90,
+              "turnDeg": -90,
+              "label": "Rotation -90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right",
+              "turnDeg": -180,
+              "label": "Retour écrasé 180° · droite",
+              "at": [
+                50.8,
+                -38.1
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "signed",
+              "angle": 90,
+              "turnDeg": 90,
+              "label": "Rotation 90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        },
+        {
+          "id": "QA-ANGLES",
+          "quantity": 3,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 114.3,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                114.3,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 44.449999999999996,
+              "start": [
+                114.3,
+                0
+              ],
+              "end": [
+                111.1993247421,
+                44.341722034
+              ],
+              "headingDeg": 94
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 53.974999999999994,
+              "start": [
+                111.1993247421,
+                44.341722034
+              ],
+              "end": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "headingDeg": 6
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "end": [
+                160.8961095941,
+                87.8749300524
+              ],
+              "headingDeg": 96
+            }
+          ],
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 86,
+              "direction": "left",
+              "turnDeg": 94,
+              "label": "86° intérieur · gauche",
+              "at": [
+                114.3,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "interior",
+              "angle": 92,
+              "direction": "right",
+              "turnDeg": -88,
+              "label": "92° intérieur · droite",
+              "at": [
+                111.1993247421,
+                44.341722034
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left",
+              "turnDeg": 90,
+              "label": "90° intérieur · gauche",
+              "at": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "name": "selection-long",
+        "client": true,
+        "lang": "en-CA"
+      },
+      "filename": "selection-long-en-CA.pdf",
+      "pages": [
+        {
+          "page": 1,
+          "text": "Nov 17, 2026\n\nMATERIALS SELECTION\n\nProjet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparatio\n\nProject: Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara\n\nNo.\n \nITEM / REFERENCE\n \nMANUFACTURER\n \nFINISH / SIZE\n \nQUANTITY\n \nUNIT\n\n01\n \nNom de produit synthétique très\ndétaillé pour contrôle de la\npagination Nom de produit\nsynthétique très détaillé pour\ncontrôle de la pagination Nom\nde produit synthétique très\ndétaillé pour contrôle de la\npagination Nom de produit\nsynthétique très détaillé pour\ncontrôle de la pagination Nom\nde produit synthétique très\ndétaillé pour contrôle de la\npagination Nom de produit\nsynthétique très détaillé pour\ncontrôle de la pagination Nom\nde produit synthétique très\ndétaillé pour contrôle de la\npagination FIN-NOM-QA ·\nREFERENCE-QA-LONGUE-REFERENCE-Q\nA-LONGUE-REFERENCE-QA-LONGUE-RE\nFERENCE-QA-LONGUE-REF\nMarque QA\n \nNoir officiel QA · 48\nin. × 120 in.\n7\n \npieces\n02\n \nMatériau synthétique QA ·\nQA-MAT-001\nMarque QA\n \nNoir officiel QA · 48\nin. × 120 in.\n7\n \npieces\nPreparation document: this is NOT an order.\n\nMIR must confirm pricing, stock, sales units and compatibility.\n\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n1 / 1",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "MATERIALS SELECTION",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 195.75576,
+              "height": 16.56
+            },
+            {
+              "text": "Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparatio",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 450.77759999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Project: Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara",
+              "x": 28.8,
+              "y": 655.2,
+              "width": 586.4716799999994,
+              "height": 11.52
+            },
+            {
+              "text": "No.",
+              "x": 31.68,
+              "y": 623.52,
+              "width": 13.90176,
+              "height": 8.64
+            },
+            {
+              "text": "ITEM / REFERENCE",
+              "x": 56.16,
+              "y": 623.52,
+              "width": 81.03456000000001,
+              "height": 8.64
+            },
+            {
+              "text": "MANUFACTURER",
+              "x": 233.28,
+              "y": 623.52,
+              "width": 73.3968,
+              "height": 8.64
+            },
+            {
+              "text": "FINISH / SIZE",
+              "x": 330.48,
+              "y": 623.52,
+              "width": 54.63936000000001,
+              "height": 8.64
+            },
+            {
+              "text": "QUANTITY",
+              "x": 462.24,
+              "y": 623.52,
+              "width": 44.11584,
+              "height": 8.64
+            },
+            {
+              "text": "UNIT",
+              "x": 521.28,
+              "y": 623.52,
+              "width": 20.13984,
+              "height": 8.64
+            },
+            {
+              "text": "01",
+              "x": 31.68,
+              "y": 595.44,
+              "width": 11.20896,
+              "height": 10.08
+            },
+            {
+              "text": "Nom de produit synthétique très",
+              "x": 56.16,
+              "y": 595.44,
+              "width": 142.78319999999997,
+              "height": 10.08
+            },
+            {
+              "text": "détaillé pour contrôle de la",
+              "x": 56.16,
+              "y": 581.04,
+              "width": 118.15775999999998,
+              "height": 10.08
+            },
+            {
+              "text": "pagination Nom de produit",
+              "x": 56.16,
+              "y": 566.64,
+              "width": 118.16784000000001,
+              "height": 10.08
+            },
+            {
+              "text": "synthétique très détaillé pour",
+              "x": 56.16,
+              "y": 552.24,
+              "width": 128.79216,
+              "height": 10.08
+            },
+            {
+              "text": "contrôle de la pagination Nom",
+              "x": 56.16,
+              "y": 537.84,
+              "width": 133.84224,
+              "height": 10.08
+            },
+            {
+              "text": "de produit synthétique très",
+              "x": 56.16,
+              "y": 523.44,
+              "width": 118.71216000000001,
+              "height": 10.08
+            },
+            {
+              "text": "détaillé pour contrôle de la",
+              "x": 56.16,
+              "y": 509.04,
+              "width": 118.15775999999998,
+              "height": 10.08
+            },
+            {
+              "text": "pagination Nom de produit",
+              "x": 56.16,
+              "y": 494.64,
+              "width": 118.16784000000001,
+              "height": 10.08
+            },
+            {
+              "text": "synthétique très détaillé pour",
+              "x": 56.16,
+              "y": 480.24,
+              "width": 128.79216,
+              "height": 10.08
+            },
+            {
+              "text": "contrôle de la pagination Nom",
+              "x": 56.16,
+              "y": 465.84,
+              "width": 133.84224,
+              "height": 10.08
+            },
+            {
+              "text": "de produit synthétique très",
+              "x": 56.16,
+              "y": 451.44,
+              "width": 118.71216000000001,
+              "height": 10.08
+            },
+            {
+              "text": "détaillé pour contrôle de la",
+              "x": 56.16,
+              "y": 437.04,
+              "width": 118.15775999999998,
+              "height": 10.08
+            },
+            {
+              "text": "pagination Nom de produit",
+              "x": 56.16,
+              "y": 422.64,
+              "width": 118.16784000000001,
+              "height": 10.08
+            },
+            {
+              "text": "synthétique très détaillé pour",
+              "x": 56.16,
+              "y": 408.24,
+              "width": 128.79216,
+              "height": 10.08
+            },
+            {
+              "text": "contrôle de la pagination Nom",
+              "x": 56.16,
+              "y": 393.84,
+              "width": 133.84224,
+              "height": 10.08
+            },
+            {
+              "text": "de produit synthétique très",
+              "x": 56.16,
+              "y": 379.44,
+              "width": 118.71216000000001,
+              "height": 10.08
+            },
+            {
+              "text": "détaillé pour contrôle de la",
+              "x": 56.16,
+              "y": 365.04,
+              "width": 118.15775999999998,
+              "height": 10.08
+            },
+            {
+              "text": "pagination FIN-NOM-QA ·",
+              "x": 56.16,
+              "y": 350.64,
+              "width": 115.85951999999999,
+              "height": 10.08
+            },
+            {
+              "text": "REFERENCE-QA-LONGUE-REFERENCE-Q",
+              "x": 56.16,
+              "y": 336.24,
+              "width": 202.56768000000002,
+              "height": 10.08
+            },
+            {
+              "text": "A-LONGUE-REFERENCE-QA-LONGUE-RE",
+              "x": 56.16,
+              "y": 321.84,
+              "width": 199.22112000000004,
+              "height": 10.08
+            },
+            {
+              "text": "FERENCE-QA-LONGUE-REF",
+              "x": 56.16,
+              "y": 307.44,
+              "width": 135.41472000000005,
+              "height": 10.08
+            },
+            {
+              "text": "Marque QA",
+              "x": 233.28,
+              "y": 595.44,
+              "width": 51.50880000000002,
+              "height": 10.08
+            },
+            {
+              "text": "Noir officiel QA · 48",
+              "x": 330.48,
+              "y": 595.44,
+              "width": 86.73840000000008,
+              "height": 10.08
+            },
+            {
+              "text": "in. × 120 in.",
+              "x": 330.48,
+              "y": 581.04,
+              "width": 52.33536000000007,
+              "height": 10.08
+            },
+            {
+              "text": "7",
+              "x": 462.24,
+              "y": 595.44,
+              "width": 5.60448,
+              "height": 10.08
+            },
+            {
+              "text": "pieces",
+              "x": 521.28,
+              "y": 595.44,
+              "width": 29.1312,
+              "height": 10.08
+            },
+            {
+              "text": "02",
+              "x": 31.68,
+              "y": 275.76,
+              "width": 11.20896,
+              "height": 10.08
+            },
+            {
+              "text": "Matériau synthétique QA ·",
+              "x": 56.16,
+              "y": 275.76,
+              "width": 116.44416,
+              "height": 10.08
+            },
+            {
+              "text": "QA-MAT-001",
+              "x": 56.16,
+              "y": 261.36,
+              "width": 59.33088000000001,
+              "height": 10.08
+            },
+            {
+              "text": "Marque QA",
+              "x": 233.28,
+              "y": 275.76,
+              "width": 51.50880000000002,
+              "height": 10.08
+            },
+            {
+              "text": "Noir officiel QA · 48",
+              "x": 330.48,
+              "y": 275.76,
+              "width": 86.73840000000008,
+              "height": 10.08
+            },
+            {
+              "text": "in. × 120 in.",
+              "x": 330.48,
+              "y": 261.36,
+              "width": 52.33536000000007,
+              "height": 10.08
+            },
+            {
+              "text": "7",
+              "x": 462.24,
+              "y": 275.76,
+              "width": 5.60448,
+              "height": 10.08
+            },
+            {
+              "text": "pieces",
+              "x": 521.28,
+              "y": 275.76,
+              "width": 29.1312,
+              "height": 10.08
+            },
+            {
+              "text": "Preparation document: this is NOT an order.",
+              "x": 28.8,
+              "y": 108,
+              "width": 212.04287999999997,
+              "height": 10.08
+            },
+            {
+              "text": "MIR must confirm pricing, stock, sales units and compatibility.",
+              "x": 28.8,
+              "y": 91.44000000000005,
+              "width": 254.70432000000017,
+              "height": 9.36
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "1 / 1",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        }
+      ],
+      "clipped": [
+        {
+          "page": 1,
+          "text": "Project: Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara",
+          "x": 28.8,
+          "y": 655.2,
+          "width": 586.4716799999994,
+          "height": 11.52
+        }
+      ],
+      "inputUnchanged": true,
+      "geometry": [
+        [
+          "M40 692H810",
+          "M40 777H810"
+        ]
+      ],
+      "model": [
+        {
+          "id": "QA-HEM",
+          "quantity": 2,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                50.8,
+                -38.1
+              ],
+              "headingDeg": -90
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                -38.1
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": -270
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 31.75,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                19.05,
+                0
+              ],
+              "headingDeg": -180
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": -90,
+              "turnDeg": -90,
+              "label": "Rotation -90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right",
+              "turnDeg": -180,
+              "label": "Retour écrasé 180° · droite",
+              "at": [
+                50.8,
+                -38.1
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "signed",
+              "angle": 90,
+              "turnDeg": 90,
+              "label": "Rotation 90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        },
+        {
+          "id": "QA-ANGLES",
+          "quantity": 3,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 114.3,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                114.3,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 44.449999999999996,
+              "start": [
+                114.3,
+                0
+              ],
+              "end": [
+                111.1993247421,
+                44.341722034
+              ],
+              "headingDeg": 94
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 53.974999999999994,
+              "start": [
+                111.1993247421,
+                44.341722034
+              ],
+              "end": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "headingDeg": 6
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "end": [
+                160.8961095941,
+                87.8749300524
+              ],
+              "headingDeg": 96
+            }
+          ],
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 86,
+              "direction": "left",
+              "turnDeg": 94,
+              "label": "86° intérieur · gauche",
+              "at": [
+                114.3,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "interior",
+              "angle": 92,
+              "direction": "right",
+              "turnDeg": -88,
+              "label": "92° intérieur · droite",
+              "at": [
+                111.1993247421,
+                44.341722034
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left",
+              "turnDeg": 90,
+              "label": "90° intérieur · gauche",
+              "at": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "name": "estimate-mixed",
+        "client": true,
+        "lang": "fr-CA"
+      },
+      "filename": "estimate-mixed-fr-CA.pdf",
+      "pages": [
+        {
+          "page": 1,
+          "text": "17 nov. 2026\n\nSÉLECTION DE MATÉRIAUX\n\nProjet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparatio\n\nProjet : Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara\n\nN°\n \nARTICLE / RÉFÉRENCE\n \nFABRICANT\n \nFINI / FORMAT\n \nQUANTITÉ\n \nUNITÉ\n\n01\n \nMatériau synthétique QA ·\nQA-MAT-001\nMarque QA\n \nNoir officiel QA · 48\npo × 120 po\n7\n \npièces\nDocument de préparation : ceci ne constitue PAS une commande.\n\nPrix, stocks, unités de vente et compatibilités à confirmer par MIR.\n\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n1 / 5",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "SÉLECTION DE MATÉRIAUX",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 225.18287999999995,
+              "height": 16.56
+            },
+            {
+              "text": "Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparatio",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 450.77759999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Projet : Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara",
+              "x": 28.8,
+              "y": 655.2,
+              "width": 583.2575999999996,
+              "height": 11.52
+            },
+            {
+              "text": "N°",
+              "x": 31.68,
+              "y": 623.52,
+              "width": 9.68544,
+              "height": 8.64
+            },
+            {
+              "text": "ARTICLE / RÉFÉRENCE",
+              "x": 56.16,
+              "y": 623.52,
+              "width": 97.82208000000001,
+              "height": 8.64
+            },
+            {
+              "text": "FABRICANT",
+              "x": 233.28,
+              "y": 623.52,
+              "width": 50.36256,
+              "height": 8.64
+            },
+            {
+              "text": "FINI / FORMAT",
+              "x": 330.48,
+              "y": 623.52,
+              "width": 60.40224000000001,
+              "height": 8.64
+            },
+            {
+              "text": "QUANTITÉ",
+              "x": 462.24,
+              "y": 623.52,
+              "width": 44.11584,
+              "height": 8.64
+            },
+            {
+              "text": "UNITÉ",
+              "x": 521.28,
+              "y": 623.52,
+              "width": 25.89408,
+              "height": 8.64
+            },
+            {
+              "text": "01",
+              "x": 31.68,
+              "y": 595.44,
+              "width": 11.20896,
+              "height": 10.08
+            },
+            {
+              "text": "Matériau synthétique QA ·",
+              "x": 56.16,
+              "y": 595.44,
+              "width": 116.44416,
+              "height": 10.08
+            },
+            {
+              "text": "QA-MAT-001",
+              "x": 56.16,
+              "y": 581.04,
+              "width": 59.33088000000001,
+              "height": 10.08
+            },
+            {
+              "text": "Marque QA",
+              "x": 233.28,
+              "y": 595.44,
+              "width": 51.50880000000002,
+              "height": 10.08
+            },
+            {
+              "text": "Noir officiel QA · 48",
+              "x": 330.48,
+              "y": 595.44,
+              "width": 86.73840000000008,
+              "height": 10.08
+            },
+            {
+              "text": "po × 120 po",
+              "x": 330.48,
+              "y": 581.04,
+              "width": 53.484480000000076,
+              "height": 10.08
+            },
+            {
+              "text": "7",
+              "x": 462.24,
+              "y": 595.44,
+              "width": 5.60448,
+              "height": 10.08
+            },
+            {
+              "text": "pièces",
+              "x": 521.28,
+              "y": 595.44,
+              "width": 29.1312,
+              "height": 10.08
+            },
+            {
+              "text": "Document de préparation : ceci ne constitue PAS une commande.",
+              "x": 28.8,
+              "y": 108,
+              "width": 315.59472000000005,
+              "height": 10.08
+            },
+            {
+              "text": "Prix, stocks, unités de vente et compatibilités à confirmer par MIR.",
+              "x": 28.8,
+              "y": 91.44000000000005,
+              "width": 273.92976000000016,
+              "height": 9.36
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "1 / 5",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 2,
+          "text": "17 nov. 2026\n\nDOSSIER DE PLIAGE\n\nQA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur\n\nResponsable fictif QA · Date : 2026-12-01 · Révision : A\nrénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord d · Chef :\nCommande : QA-LOCAL-001 · Chantier : Projet synthétique du secteur nord de Québec pour les travaux de\n\nQA-HEM · Retour écrasé QA\n\nA · 2 po\nB · 1 1/2 po\nC · 1 1/2 po\nD · 1 1/4 po\n\nMATÉRIAU / FINI\n\nAluminium\n0.6096 mm\nKaycan\nNoir officiel QA\nCode QC-QA-123\n\nQUANTITÉ / LONGUEUR\n\n2 pièce(s)\n\n120 po\n\nCOTES FINIES ET POINTS À VALIDER\n\nA = 2 po\nPli A–B = 90°\nB = 1 1/2 po\nPli B–C = 180° — retour écrasé\nC = 1 1/2 po\nPli C–D = 90°\nD = 1 1/4 po\nDéveloppé total = 6 1/4 po (nominal)\nFace colorée : Face 1 — côté indiqué par\nl’étoile\nRepère QA : conserver la note française et\nchaque détail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail de fabrication. Repère QA :\nconserver la\nnote française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise\net chaque détail de fabrication. Repère QA\n: conserver la note française et chaque\n\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n2 / 5",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "DOSSIER DE PLIAGE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 168.18336000000002,
+              "height": 16.56
+            },
+            {
+              "text": "QA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 465.3028799999999,
+              "height": 10.08
+            },
+            {
+              "text": "Responsable fictif QA · Date : 2026-12-01 · Révision : A",
+              "x": 28.8,
+              "y": 635.76,
+              "width": 177.53040000000007,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "rénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord d · Chef :",
+              "x": 28.8,
+              "y": 647.28,
+              "width": 331.15680000000003,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "Commande : QA-LOCAL-001 · Chantier : Projet synthétique du secteur nord de Québec pour les travaux de",
+              "x": 28.8,
+              "y": 658.8,
+              "width": 343.1376,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "QA-HEM · Retour écrasé QA",
+              "x": 28.8,
+              "y": 670.3199999999999,
+              "width": 134.32607999999996,
+              "height": 10.08
+            },
+            {
+              "text": "A · 2 po",
+              "x": 304.800662109375,
+              "y": 543.744,
+              "width": 33.45623999999994,
+              "height": 9.72
+            },
+            {
+              "text": "B · 1 1/2 po",
+              "x": 414.216,
+              "y": 524.5376660156251,
+              "width": 49.649759999999915,
+              "height": 9.72
+            },
+            {
+              "text": "C · 1 1/2 po",
+              "x": 366.264,
+              "y": 524.8058203125,
+              "width": 50.19407999999985,
+              "height": 9.72
+            },
+            {
+              "text": "D · 1 1/4 po",
+              "x": 277.31017968749995,
+              "y": 585.216,
+              "width": 50.194079999999914,
+              "height": 9.72
+            },
+            {
+              "text": "MATÉRIAU / FINI",
+              "x": 28.8,
+              "y": 357.84,
+              "width": 69.04224,
+              "height": 8.64
+            },
+            {
+              "text": "Aluminium",
+              "x": 28.8,
+              "y": 339.84,
+              "width": 50.3928,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "0.6096 mm",
+              "x": 28.8,
+              "y": 324.72,
+              "width": 54.00000000000001,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Kaycan",
+              "x": 28.8,
+              "y": 309.6,
+              "width": 36.007200000000005,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Noir officiel QA",
+              "x": 28.8,
+              "y": 294.48,
+              "width": 71.94959999999999,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Code QC-QA-123",
+              "x": 28.8,
+              "y": 279.36,
+              "width": 85.7844,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "QUANTITÉ / LONGUEUR",
+              "x": 360,
+              "y": 357.84,
+              "width": 100.6992,
+              "height": 8.64
+            },
+            {
+              "text": "2 pièce(s)",
+              "x": 360,
+              "y": 336.24,
+              "width": 73.02239999999998,
+              "height": 15.84
+            },
+            {
+              "text": "120 po",
+              "x": 360,
+              "y": 315.36,
+              "width": 39.61872000000001,
+              "height": 12.959999999999999
+            },
+            {
+              "text": "COTES FINIES ET POINTS À VALIDER",
+              "x": 28.8,
+              "y": 241.92000000000007,
+              "width": 156.7728,
+              "height": 8.64
+            },
+            {
+              "text": "A = 2 po",
+              "x": 28.8,
+              "y": 223.20000000000005,
+              "width": 35.08128,
+              "height": 9.36
+            },
+            {
+              "text": "Pli A–B = 90°",
+              "x": 28.8,
+              "y": 210.24,
+              "width": 55.43928,
+              "height": 9.36
+            },
+            {
+              "text": "B = 1 1/2 po",
+              "x": 28.8,
+              "y": 197.27999999999997,
+              "width": 50.67504,
+              "height": 9.36
+            },
+            {
+              "text": "Pli B–C = 180° — retour écrasé",
+              "x": 28.8,
+              "y": 184.32000000000005,
+              "width": 130.83408000000003,
+              "height": 9.36
+            },
+            {
+              "text": "C = 1 1/2 po",
+              "x": 28.8,
+              "y": 171.36,
+              "width": 51.1992,
+              "height": 9.36
+            },
+            {
+              "text": "Pli C–D = 90°",
+              "x": 28.8,
+              "y": 158.39999999999998,
+              "width": 56.48759999999999,
+              "height": 9.36
+            },
+            {
+              "text": "D = 1 1/4 po",
+              "x": 28.8,
+              "y": 145.44000000000005,
+              "width": 51.1992,
+              "height": 9.36
+            },
+            {
+              "text": "Développé total = 6 1/4 po (nominal)",
+              "x": 28.8,
+              "y": 132.48000000000002,
+              "width": 151.04232000000005,
+              "height": 9.36
+            },
+            {
+              "text": "Face colorée : Face 1 — côté indiqué par",
+              "x": 28.8,
+              "y": 119.51999999999998,
+              "width": 171.56880000000012,
+              "height": 9.36
+            },
+            {
+              "text": "l’étoile",
+              "x": 28.8,
+              "y": 106.55999999999995,
+              "width": 26.51688,
+              "height": 9.36
+            },
+            {
+              "text": "Repère QA : conserver la note française et",
+              "x": 309.6,
+              "y": 223.20000000000005,
+              "width": 177.27839999999992,
+              "height": 9.36
+            },
+            {
+              "text": "chaque détail de fabrication. Repère QA :",
+              "x": 309.6,
+              "y": 210.24,
+              "width": 171.5687999999999,
+              "height": 9.36
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 309.6,
+              "y": 197.27999999999997,
+              "width": 156.00311999999994,
+              "height": 9.36
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 309.6,
+              "y": 184.32000000000005,
+              "width": 138.27527999999992,
+              "height": 9.36
+            },
+            {
+              "text": "conserver la",
+              "x": 309.6,
+              "y": 171.36,
+              "width": 50.96519999999999,
+              "height": 9.36
+            },
+            {
+              "text": "note française et chaque détail de",
+              "x": 309.6,
+              "y": 158.39999999999998,
+              "width": 140.39999999999992,
+              "height": 9.36
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 309.6,
+              "y": 145.44000000000005,
+              "width": 174.67631999999992,
+              "height": 9.36
+            },
+            {
+              "text": "française",
+              "x": 309.6,
+              "y": 132.48000000000002,
+              "width": 37.96416000000001,
+              "height": 9.36
+            },
+            {
+              "text": "et chaque détail de fabrication. Repère QA",
+              "x": 309.6,
+              "y": 119.51999999999998,
+              "width": 176.77295999999993,
+              "height": 9.36
+            },
+            {
+              "text": ": conserver la note française et chaque",
+              "x": 309.6,
+              "y": 106.55999999999995,
+              "width": 161.18855999999994,
+              "height": 9.36
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "2 / 5",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 3,
+          "text": "17 nov. 2026\n\nDOSSIER DE PLIAGE\n\nQA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur\n\nContinuation — quantité déjà comptée\nQA-HEM · Retour écrasé QA\n\nBloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.\n\ndétail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail de\nfabrication. Repère QA : conserver la note\nfrançaise et chaque détail de fa\nNotes : Repère QA : conserver la note\nfrançaise et chaque détail de fabrication.\nRepère\nQA : conserver la note française et chaque\ndétail de fabrication. Repère QA :\nconserver\nla note française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise et chaque détail de fabrication.\nRepère QA : conserver la note française et\nchaque détail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail\nde fabrication. Repère QA : conserver la\nnote française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise et chaque détail de fabrication.\nRepère QA : conserver la note française et\nchaque détail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail de fabrication. Repère QA :\nconserver la\nnote française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise\net chaque détail de fabrication.\nFIN-NOTE-QA\n\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n3 / 5",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "DOSSIER DE PLIAGE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 168.18336000000002,
+              "height": 16.56
+            },
+            {
+              "text": "QA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 465.3028799999999,
+              "height": 10.08
+            },
+            {
+              "text": "Continuation — quantité déjà comptée",
+              "x": 28.8,
+              "y": 705.6,
+              "width": 262.944,
+              "height": 14.399999999999999
+            },
+            {
+              "text": "QA-HEM · Retour écrasé QA",
+              "x": 28.8,
+              "y": 686.16,
+              "width": 191.8944,
+              "height": 14.399999999999999
+            },
+            {
+              "text": "Bloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 359.81712000000033,
+              "height": 9.36
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 604.8,
+              "width": 148.91183999999996,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 28.8,
+              "y": 588.96,
+              "width": 168.00335999999996,
+              "height": 10.08
+            },
+            {
+              "text": "détail de",
+              "x": 28.8,
+              "y": 573.12,
+              "width": 38.08224,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 557.28,
+              "width": 188.11295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française et chaque détail de fa",
+              "x": 28.8,
+              "y": 541.44,
+              "width": 139.99103999999997,
+              "height": 10.08
+            },
+            {
+              "text": "Notes : Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 525.6,
+              "width": 170.74511999999996,
+              "height": 10.08
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 509.76,
+              "width": 180.86543999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Repère",
+              "x": 28.8,
+              "y": 493.92,
+              "width": 33.052319999999995,
+              "height": 10.08
+            },
+            {
+              "text": "QA : conserver la note française et chaque",
+              "x": 28.8,
+              "y": 478.08,
+              "width": 190.92527999999993,
+              "height": 10.08
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 462.24,
+              "width": 148.91183999999996,
+              "height": 10.08
+            },
+            {
+              "text": "conserver",
+              "x": 28.8,
+              "y": 446.4,
+              "width": 44.2512,
+              "height": 10.08
+            },
+            {
+              "text": "la note française et chaque détail de",
+              "x": 28.8,
+              "y": 430.56,
+              "width": 161.83439999999993,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 414.72,
+              "width": 188.11295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 398.88,
+              "width": 180.86543999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Repère QA : conserver la note française et",
+              "x": 28.8,
+              "y": 383.04,
+              "width": 190.91519999999994,
+              "height": 10.08
+            },
+            {
+              "text": "chaque détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 367.2,
+              "width": 184.76639999999995,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 28.8,
+              "y": 351.36,
+              "width": 168.00335999999996,
+              "height": 10.08
+            },
+            {
+              "text": "détail",
+              "x": 28.8,
+              "y": 335.52,
+              "width": 24.08112,
+              "height": 10.08
+            },
+            {
+              "text": "de fabrication. Repère QA : conserver la",
+              "x": 28.8,
+              "y": 319.68,
+              "width": 179.71632,
+              "height": 10.08
+            },
+            {
+              "text": "note française et chaque détail de",
+              "x": 28.8,
+              "y": 303.84,
+              "width": 151.19999999999996,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 288,
+              "width": 188.11295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 272.15999999999997,
+              "width": 180.86543999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Repère QA : conserver la note française et",
+              "x": 28.8,
+              "y": 256.32000000000005,
+              "width": 190.91519999999994,
+              "height": 10.08
+            },
+            {
+              "text": "chaque détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 240.48000000000002,
+              "width": 184.76639999999995,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 309.6,
+              "y": 604.8,
+              "width": 168.0033600000001,
+              "height": 10.08
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 309.6,
+              "y": 588.96,
+              "width": 148.91184000000015,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la",
+              "x": 309.6,
+              "y": 573.12,
+              "width": 54.88560000000002,
+              "height": 10.08
+            },
+            {
+              "text": "note française et chaque détail de",
+              "x": 309.6,
+              "y": 557.28,
+              "width": 151.20000000000007,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 309.6,
+              "y": 541.44,
+              "width": 188.11296000000013,
+              "height": 10.08
+            },
+            {
+              "text": "française",
+              "x": 309.6,
+              "y": 525.6,
+              "width": 40.88447999999999,
+              "height": 10.08
+            },
+            {
+              "text": "et chaque détail de fabrication.",
+              "x": 309.6,
+              "y": 509.76,
+              "width": 137.1888000000001,
+              "height": 10.08
+            },
+            {
+              "text": "FIN-NOTE-QA",
+              "x": 309.6,
+              "y": 493.92,
+              "width": 65.44944000000001,
+              "height": 10.08
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "3 / 5",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 4,
+          "text": "17 nov. 2026\n\nDOSSIER DE PLIAGE\n\nQA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur\n\nResponsable fictif QA · Date : 2026-12-01 · Révision : A\nrénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord d · Chef :\nCommande : QA-LOCAL-001 · Chantier : Projet synthétique du secteur nord de Québec pour les travaux de\n\nQA-ANGLES · Deux angles consécutifs QA\n\nA · 4 1/2 po\nB · 1 3/4 po\nC · 2 1/8 po\nD · 1 1/2 po\n\nMATÉRIAU / FINI\n\nAluminium\n0.6096 mm\nKaycan\nNoir officiel QA\nCode QC-QA-123\n\nQUANTITÉ / LONGUEUR\n\n3 pièce(s)\n\n120 po\n\nCOTES FINIES ET POINTS À VALIDER\n\nA = 4 1/2 po\nPli A–B = 86°\nB = 1 3/4 po\nPli B–C = 92°\nC = 2 1/8 po\nPli C–D = 90°\nD = 1 1/2 po\nDéveloppé total = 9 7/8 po (nominal)\nFace colorée : Face 1 — côté indiqué par\nl’étoile\nDeux angles 86° puis 92° restent\ndistincts. FIN-ANGLES-QA\nNotes : Repère QA : conserver la note\nfrançaise et chaque détail de fabrication.\nRepère\nQA : conserver la note française et chaque\ndétail de fabrication. Repère QA :\nconserver\nla note française et chaque détail de\nfabrication. Repère QA : conserver la note\n\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n4 / 5",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "DOSSIER DE PLIAGE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 168.18336000000002,
+              "height": 16.56
+            },
+            {
+              "text": "QA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 465.3028799999999,
+              "height": 10.08
+            },
+            {
+              "text": "Responsable fictif QA · Date : 2026-12-01 · Révision : A",
+              "x": 28.8,
+              "y": 635.76,
+              "width": 177.53040000000007,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "rénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord d · Chef :",
+              "x": 28.8,
+              "y": 647.28,
+              "width": 331.15680000000003,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "Commande : QA-LOCAL-001 · Chantier : Projet synthétique du secteur nord de Québec pour les travaux de",
+              "x": 28.8,
+              "y": 658.8,
+              "width": 343.1376,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "QA-ANGLES · Deux angles consécutifs QA",
+              "x": 28.8,
+              "y": 670.3199999999999,
+              "width": 204.80543999999992,
+              "height": 10.08
+            },
+            {
+              "text": "A · 4 1/2 po",
+              "x": 241.980194784375,
+              "y": 407.664,
+              "width": 49.64975999999994,
+              "height": 9.72
+            },
+            {
+              "text": "B · 1 3/4 po",
+              "x": 326.201062950399,
+              "y": 504.61177821562194,
+              "width": 49.64975999999974,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "C · 2 1/8 po",
+              "x": 365.28262898111706,
+              "y": 519.448251273402,
+              "width": 50.194079999999964,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "D · 1 1/2 po",
+              "x": 443.727190473402,
+              "y": 580.6652654188829,
+              "width": 50.19407999999991,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "MATÉRIAU / FINI",
+              "x": 28.8,
+              "y": 357.84,
+              "width": 69.04224,
+              "height": 8.64
+            },
+            {
+              "text": "Aluminium",
+              "x": 28.8,
+              "y": 339.84,
+              "width": 50.3928,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "0.6096 mm",
+              "x": 28.8,
+              "y": 324.72,
+              "width": 54.00000000000001,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Kaycan",
+              "x": 28.8,
+              "y": 309.6,
+              "width": 36.007200000000005,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Noir officiel QA",
+              "x": 28.8,
+              "y": 294.48,
+              "width": 71.94959999999999,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Code QC-QA-123",
+              "x": 28.8,
+              "y": 279.36,
+              "width": 85.7844,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "QUANTITÉ / LONGUEUR",
+              "x": 360,
+              "y": 357.84,
+              "width": 100.6992,
+              "height": 8.64
+            },
+            {
+              "text": "3 pièce(s)",
+              "x": 360,
+              "y": 336.24,
+              "width": 73.02239999999998,
+              "height": 15.84
+            },
+            {
+              "text": "120 po",
+              "x": 360,
+              "y": 315.36,
+              "width": 39.61872000000001,
+              "height": 12.959999999999999
+            },
+            {
+              "text": "COTES FINIES ET POINTS À VALIDER",
+              "x": 28.8,
+              "y": 241.92000000000007,
+              "width": 156.7728,
+              "height": 8.64
+            },
+            {
+              "text": "A = 4 1/2 po",
+              "x": 28.8,
+              "y": 223.20000000000005,
+              "width": 50.67504,
+              "height": 9.36
+            },
+            {
+              "text": "Pli A–B = 86°",
+              "x": 28.8,
+              "y": 210.24,
+              "width": 55.43928,
+              "height": 9.36
+            },
+            {
+              "text": "B = 1 3/4 po",
+              "x": 28.8,
+              "y": 197.27999999999997,
+              "width": 50.67504,
+              "height": 9.36
+            },
+            {
+              "text": "Pli B–C = 92°",
+              "x": 28.8,
+              "y": 184.32000000000005,
+              "width": 55.96343999999999,
+              "height": 9.36
+            },
+            {
+              "text": "C = 2 1/8 po",
+              "x": 28.8,
+              "y": 171.36,
+              "width": 51.1992,
+              "height": 9.36
+            },
+            {
+              "text": "Pli C–D = 90°",
+              "x": 28.8,
+              "y": 158.39999999999998,
+              "width": 56.48759999999999,
+              "height": 9.36
+            },
+            {
+              "text": "D = 1 1/2 po",
+              "x": 28.8,
+              "y": 145.44000000000005,
+              "width": 51.1992,
+              "height": 9.36
+            },
+            {
+              "text": "Développé total = 9 7/8 po (nominal)",
+              "x": 28.8,
+              "y": 132.48000000000002,
+              "width": 151.04232000000005,
+              "height": 9.36
+            },
+            {
+              "text": "Face colorée : Face 1 — côté indiqué par",
+              "x": 28.8,
+              "y": 119.51999999999998,
+              "width": 171.56880000000012,
+              "height": 9.36
+            },
+            {
+              "text": "l’étoile",
+              "x": 28.8,
+              "y": 106.55999999999995,
+              "width": 26.51688,
+              "height": 9.36
+            },
+            {
+              "text": "Deux angles 86° puis 92° restent",
+              "x": 309.6,
+              "y": 223.20000000000005,
+              "width": 136.43135999999996,
+              "height": 9.36
+            },
+            {
+              "text": "distincts. FIN-ANGLES-QA",
+              "x": 309.6,
+              "y": 210.24,
+              "width": 111.71159999999998,
+              "height": 9.36
+            },
+            {
+              "text": "Notes : Repère QA : conserver la note",
+              "x": 309.6,
+              "y": 197.27999999999997,
+              "width": 158.54903999999993,
+              "height": 9.36
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 309.6,
+              "y": 184.32000000000005,
+              "width": 167.94647999999995,
+              "height": 9.36
+            },
+            {
+              "text": "Repère",
+              "x": 309.6,
+              "y": 171.36,
+              "width": 30.69144,
+              "height": 9.36
+            },
+            {
+              "text": "QA : conserver la note française et chaque",
+              "x": 309.6,
+              "y": 158.39999999999998,
+              "width": 177.2877599999999,
+              "height": 9.36
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 309.6,
+              "y": 145.44000000000005,
+              "width": 138.27527999999992,
+              "height": 9.36
+            },
+            {
+              "text": "conserver",
+              "x": 309.6,
+              "y": 132.48000000000002,
+              "width": 41.0904,
+              "height": 9.36
+            },
+            {
+              "text": "la note française et chaque détail de",
+              "x": 309.6,
+              "y": 119.51999999999998,
+              "width": 150.27479999999994,
+              "height": 9.36
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 309.6,
+              "y": 106.55999999999995,
+              "width": 174.67631999999992,
+              "height": 9.36
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "4 / 5",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 5,
+          "text": "17 nov. 2026\n\nDOSSIER DE PLIAGE\n\nQA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur\n\nContinuation — quantité déjà comptée\nQA-ANGLES · Deux angles consécutifs QA\n\nBloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.\n\nfrançaise et chaque détail de fabrication.\nRepère QA : conserver la note française et\nchaque détail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail\nde fabrication. Repère QA : conserver la\nnote française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise et chaque détail de fabrication.\nRepère QA : conserver la note française et\nchaque détail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail de fabrication. Repère QA :\nconserver la\nnote française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise\net chaque détail de fabrication.\nFIN-NOTE-QA\n\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n5 / 5",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "DOSSIER DE PLIAGE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 168.18336000000002,
+              "height": 16.56
+            },
+            {
+              "text": "QA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 465.3028799999999,
+              "height": 10.08
+            },
+            {
+              "text": "Continuation — quantité déjà comptée",
+              "x": 28.8,
+              "y": 705.6,
+              "width": 262.944,
+              "height": 14.399999999999999
+            },
+            {
+              "text": "QA-ANGLES · Deux angles consécutifs QA",
+              "x": 28.8,
+              "y": 686.16,
+              "width": 292.5792,
+              "height": 14.399999999999999
+            },
+            {
+              "text": "Bloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 359.81712000000033,
+              "height": 9.36
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 604.8,
+              "width": 180.86543999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Repère QA : conserver la note française et",
+              "x": 28.8,
+              "y": 588.96,
+              "width": 190.91519999999994,
+              "height": 10.08
+            },
+            {
+              "text": "chaque détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 573.12,
+              "width": 184.76639999999995,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 28.8,
+              "y": 557.28,
+              "width": 168.00335999999996,
+              "height": 10.08
+            },
+            {
+              "text": "détail",
+              "x": 28.8,
+              "y": 541.44,
+              "width": 24.08112,
+              "height": 10.08
+            },
+            {
+              "text": "de fabrication. Repère QA : conserver la",
+              "x": 28.8,
+              "y": 525.6,
+              "width": 179.71632,
+              "height": 10.08
+            },
+            {
+              "text": "note française et chaque détail de",
+              "x": 28.8,
+              "y": 509.76,
+              "width": 151.19999999999996,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 493.92,
+              "width": 188.11295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 478.08,
+              "width": 180.86543999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Repère QA : conserver la note française et",
+              "x": 28.8,
+              "y": 462.24,
+              "width": 190.91519999999994,
+              "height": 10.08
+            },
+            {
+              "text": "chaque détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 446.4,
+              "width": 184.76639999999995,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 28.8,
+              "y": 430.56,
+              "width": 168.00335999999996,
+              "height": 10.08
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 414.72,
+              "width": 148.91183999999996,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la",
+              "x": 28.8,
+              "y": 398.88,
+              "width": 54.885600000000004,
+              "height": 10.08
+            },
+            {
+              "text": "note française et chaque détail de",
+              "x": 28.8,
+              "y": 383.04,
+              "width": 151.19999999999996,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 367.2,
+              "width": 188.11295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française",
+              "x": 28.8,
+              "y": 351.36,
+              "width": 40.88447999999999,
+              "height": 10.08
+            },
+            {
+              "text": "et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 335.52,
+              "width": 137.18880000000001,
+              "height": 10.08
+            },
+            {
+              "text": "FIN-NOTE-QA",
+              "x": 28.8,
+              "y": 319.68,
+              "width": 65.44944000000001,
+              "height": 10.08
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "5 / 5",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        }
+      ],
+      "clipped": [
+        {
+          "page": 1,
+          "text": "Projet : Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara",
+          "x": 28.8,
+          "y": 655.2,
+          "width": 583.2575999999996,
+          "height": 11.52
+        }
+      ],
+      "inputUnchanged": true,
+      "geometry": [
+        [
+          "M40 333H810"
+        ],
+        [
+          "M260 85 L540 85 L540 295 A5 5 0 0 1 530 295 L530 85 L355 85",
+          "M260 85 L540 85 L540 295 A5 5 0 0 1 530 295 L530 85 L355 85",
+          "484,30 489.8779,44.9098 505.8743,45.8926 493.5106,56.0902 497.5191,71.6074 484,63 470.4809,71.6074 474.4894,56.0902 462.1257,45.8926 478.1221,44.9098",
+          "M424,117L400,85",
+          "M540,85L572,85 M540,295L572,295 M572,85L572,295",
+          "M530,295L498,295 M530,85L498,85 M498,295L498,85",
+          "M394.5,53L442.5,85"
+        ],
+        [],
+        [
+          "M202.9898 295 L476.1394 295 L468.7295 189.0339 L597.0102 175.5511 L587.4929 85",
+          "M202.9898 295 L476.1394 295 L468.7295 189.0339 L597.0102 175.5511 L587.4929 85",
+          "339.5646,196 345.4424,210.9098 361.4389,211.8926 349.0752,222.0902 353.0836,237.6074 339.5646,229 326.0455,237.6074 330.054,222.0902 317.6903,211.8926 333.6867,210.9098",
+          "M202.9898,295L202.9898,327 M476.1394,295L476.1394,327 M202.9898,327L476.1394,327",
+          "M438.8382,220.3076L472.4344,242.017",
+          "M468.7295,189.0339L465.3846,157.2092 M597.0102,175.5511L593.6653,143.7264 M465.3846,157.2092L593.6653,143.7264",
+          "M621.5676,103.0621L592.2515,130.2755"
+        ],
+        []
+      ],
+      "model": [
+        {
+          "id": "QA-HEM",
+          "quantity": 2,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                50.8,
+                -38.1
+              ],
+              "headingDeg": -90
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                -38.1
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": -270
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 31.75,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                19.05,
+                0
+              ],
+              "headingDeg": -180
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": -90,
+              "turnDeg": -90,
+              "label": "Rotation -90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right",
+              "turnDeg": -180,
+              "label": "Retour écrasé 180° · droite",
+              "at": [
+                50.8,
+                -38.1
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "signed",
+              "angle": 90,
+              "turnDeg": 90,
+              "label": "Rotation 90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        },
+        {
+          "id": "QA-ANGLES",
+          "quantity": 3,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 114.3,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                114.3,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 44.449999999999996,
+              "start": [
+                114.3,
+                0
+              ],
+              "end": [
+                111.1993247421,
+                44.341722034
+              ],
+              "headingDeg": 94
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 53.974999999999994,
+              "start": [
+                111.1993247421,
+                44.341722034
+              ],
+              "end": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "headingDeg": 6
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "end": [
+                160.8961095941,
+                87.8749300524
+              ],
+              "headingDeg": 96
+            }
+          ],
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 86,
+              "direction": "left",
+              "turnDeg": 94,
+              "label": "86° intérieur · gauche",
+              "at": [
+                114.3,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "interior",
+              "angle": 92,
+              "direction": "right",
+              "turnDeg": -88,
+              "label": "92° intérieur · droite",
+              "at": [
+                111.1993247421,
+                44.341722034
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left",
+              "turnDeg": 90,
+              "label": "90° intérieur · gauche",
+              "at": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "name": "estimate-mixed",
+        "client": true,
+        "lang": "en-CA"
+      },
+      "filename": "estimate-mixed-en-CA.pdf",
+      "pages": [
+        {
+          "page": 1,
+          "text": "Nov 17, 2026\n\nMATERIALS SELECTION\n\nProjet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparatio\n\nProject: Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara\n\nNo.\n \nITEM / REFERENCE\n \nMANUFACTURER\n \nFINISH / SIZE\n \nQUANTITY\n \nUNIT\n\n01\n \nMatériau synthétique QA ·\nQA-MAT-001\nMarque QA\n \nNoir officiel QA · 48\nin. × 120 in.\n7\n \npieces\nPreparation document: this is NOT an order.\n\nMIR must confirm pricing, stock, sales units and compatibility.\n\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n1 / 5",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "MATERIALS SELECTION",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 195.75576,
+              "height": 16.56
+            },
+            {
+              "text": "Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et préparatio",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 450.77759999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Project: Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara",
+              "x": 28.8,
+              "y": 655.2,
+              "width": 586.4716799999994,
+              "height": 11.52
+            },
+            {
+              "text": "No.",
+              "x": 31.68,
+              "y": 623.52,
+              "width": 13.90176,
+              "height": 8.64
+            },
+            {
+              "text": "ITEM / REFERENCE",
+              "x": 56.16,
+              "y": 623.52,
+              "width": 81.03456000000001,
+              "height": 8.64
+            },
+            {
+              "text": "MANUFACTURER",
+              "x": 233.28,
+              "y": 623.52,
+              "width": 73.3968,
+              "height": 8.64
+            },
+            {
+              "text": "FINISH / SIZE",
+              "x": 330.48,
+              "y": 623.52,
+              "width": 54.63936000000001,
+              "height": 8.64
+            },
+            {
+              "text": "QUANTITY",
+              "x": 462.24,
+              "y": 623.52,
+              "width": 44.11584,
+              "height": 8.64
+            },
+            {
+              "text": "UNIT",
+              "x": 521.28,
+              "y": 623.52,
+              "width": 20.13984,
+              "height": 8.64
+            },
+            {
+              "text": "01",
+              "x": 31.68,
+              "y": 595.44,
+              "width": 11.20896,
+              "height": 10.08
+            },
+            {
+              "text": "Matériau synthétique QA ·",
+              "x": 56.16,
+              "y": 595.44,
+              "width": 116.44416,
+              "height": 10.08
+            },
+            {
+              "text": "QA-MAT-001",
+              "x": 56.16,
+              "y": 581.04,
+              "width": 59.33088000000001,
+              "height": 10.08
+            },
+            {
+              "text": "Marque QA",
+              "x": 233.28,
+              "y": 595.44,
+              "width": 51.50880000000002,
+              "height": 10.08
+            },
+            {
+              "text": "Noir officiel QA · 48",
+              "x": 330.48,
+              "y": 595.44,
+              "width": 86.73840000000008,
+              "height": 10.08
+            },
+            {
+              "text": "in. × 120 in.",
+              "x": 330.48,
+              "y": 581.04,
+              "width": 52.33536000000007,
+              "height": 10.08
+            },
+            {
+              "text": "7",
+              "x": 462.24,
+              "y": 595.44,
+              "width": 5.60448,
+              "height": 10.08
+            },
+            {
+              "text": "pieces",
+              "x": 521.28,
+              "y": 595.44,
+              "width": 29.1312,
+              "height": 10.08
+            },
+            {
+              "text": "Preparation document: this is NOT an order.",
+              "x": 28.8,
+              "y": 108,
+              "width": 212.04287999999997,
+              "height": 10.08
+            },
+            {
+              "text": "MIR must confirm pricing, stock, sales units and compatibility.",
+              "x": 28.8,
+              "y": 91.44000000000005,
+              "width": 254.70432000000017,
+              "height": 9.36
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "1 / 5",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 2,
+          "text": "Nov 17, 2026\n\nCUSTOM BENDING FILE\n\nQA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur\n\nForeman: Responsable fictif QA · Date: 2026-12-01 · Revision: A\nrénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord d ·\nOrder: QA-LOCAL-001 · Jobsite: Projet synthétique du secteur nord de Québec pour les travaux de\n\nQA-HEM · Retour écrasé QA\n\nA · 2 in.\nB · 1 1/2 in.\nC · 1 1/2 in.\nD · 1 1/4 in.\n\nMATERIAL / FINISH\n\nAluminum\n0.6096 mm\nKaycan\nNoir officiel QA\nCode QC-QA-123\n\nQUANTITY / LENGTH\n\n2 pieces\n\n120 in.\n\nFINISHED DIMENSIONS AND ITEMS TO VERIFY\n\nA = 2 in.\nBend A–B = 90°\nB = 1 1/2 in.\nBend B–C = 180° — retour écrasé\nC = 1 1/2 in.\nBend C–D = 90°\nD = 1 1/4 in.\nDeveloped length = 6 1/4 in. (nominal)\nPainted face: Face 1 — side marked by\nthe star\nRepère QA : conserver la note française et\nchaque détail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail de fabrication. Repère QA :\nconserver la\nnote française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise\net chaque détail de fabrication. Repère QA\n: conserver la note française et chaque\n\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n2 / 5",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "CUSTOM BENDING FILE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 193.0068,
+              "height": 16.56
+            },
+            {
+              "text": "QA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 465.3028799999999,
+              "height": 10.08
+            },
+            {
+              "text": "Foreman: Responsable fictif QA · Date: 2026-12-01 · Revision: A",
+              "x": 28.8,
+              "y": 635.76,
+              "width": 206.33040000000014,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "rénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord d ·",
+              "x": 28.8,
+              "y": 647.28,
+              "width": 309.97440000000006,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "Order: QA-LOCAL-001 · Jobsite: Projet synthétique du secteur nord de Québec pour les travaux de",
+              "x": 28.8,
+              "y": 658.8,
+              "width": 315.93600000000004,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "QA-HEM · Retour écrasé QA",
+              "x": 28.8,
+              "y": 670.3199999999999,
+              "width": 134.32607999999996,
+              "height": 10.08
+            },
+            {
+              "text": "A · 2 in.",
+              "x": 305.07356250000004,
+              "y": 543.744,
+              "width": 32.90219999999993,
+              "height": 9.72
+            },
+            {
+              "text": "B · 1 1/2 in.",
+              "x": 414.216,
+              "y": 524.264765625,
+              "width": 49.09571999999986,
+              "height": 9.72
+            },
+            {
+              "text": "C · 1 1/2 in.",
+              "x": 366.264,
+              "y": 524.532919921875,
+              "width": 49.64003999999992,
+              "height": 9.72
+            },
+            {
+              "text": "D · 1 1/4 in.",
+              "x": 277.58308007812496,
+              "y": 585.216,
+              "width": 49.64003999999992,
+              "height": 9.72
+            },
+            {
+              "text": "MATERIAL / FINISH",
+              "x": 28.8,
+              "y": 357.84,
+              "width": 80.06688000000001,
+              "height": 8.64
+            },
+            {
+              "text": "Aluminum",
+              "x": 28.8,
+              "y": 339.84,
+              "width": 47.995200000000004,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "0.6096 mm",
+              "x": 28.8,
+              "y": 324.72,
+              "width": 54.00000000000001,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Kaycan",
+              "x": 28.8,
+              "y": 309.6,
+              "width": 36.007200000000005,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Noir officiel QA",
+              "x": 28.8,
+              "y": 294.48,
+              "width": 71.94959999999999,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Code QC-QA-123",
+              "x": 28.8,
+              "y": 279.36,
+              "width": 85.7844,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "QUANTITY / LENGTH",
+              "x": 360,
+              "y": 357.84,
+              "width": 86.78016000000002,
+              "height": 8.64
+            },
+            {
+              "text": "2 pieces",
+              "x": 360,
+              "y": 336.24,
+              "width": 62.472959999999986,
+              "height": 15.84
+            },
+            {
+              "text": "120 in.",
+              "x": 360,
+              "y": 315.36,
+              "width": 38.88000000000001,
+              "height": 12.959999999999999
+            },
+            {
+              "text": "FINISHED DIMENSIONS AND ITEMS TO VERIFY",
+              "x": 28.8,
+              "y": 241.92000000000007,
+              "width": 195.15167999999997,
+              "height": 8.64
+            },
+            {
+              "text": "A = 2 in.",
+              "x": 28.8,
+              "y": 223.20000000000005,
+              "width": 34.547760000000004,
+              "height": 9.36
+            },
+            {
+              "text": "Bend A–B = 90°",
+              "x": 28.8,
+              "y": 210.24,
+              "width": 66.89591999999999,
+              "height": 9.36
+            },
+            {
+              "text": "B = 1 1/2 in.",
+              "x": 28.8,
+              "y": 197.27999999999997,
+              "width": 50.14152,
+              "height": 9.36
+            },
+            {
+              "text": "Bend B–C = 180° — retour écrasé",
+              "x": 28.8,
+              "y": 184.32000000000005,
+              "width": 142.29072000000005,
+              "height": 9.36
+            },
+            {
+              "text": "C = 1 1/2 in.",
+              "x": 28.8,
+              "y": 171.36,
+              "width": 50.665679999999995,
+              "height": 9.36
+            },
+            {
+              "text": "Bend C–D = 90°",
+              "x": 28.8,
+              "y": 158.39999999999998,
+              "width": 67.94424000000001,
+              "height": 9.36
+            },
+            {
+              "text": "D = 1 1/4 in.",
+              "x": 28.8,
+              "y": 145.44000000000005,
+              "width": 50.665679999999995,
+              "height": 9.36
+            },
+            {
+              "text": "Developed length = 6 1/4 in. (nominal)",
+              "x": 28.8,
+              "y": 132.48000000000002,
+              "width": 158.32440000000005,
+              "height": 9.36
+            },
+            {
+              "text": "Painted face: Face 1 — side marked by",
+              "x": 28.8,
+              "y": 119.51999999999998,
+              "width": 163.7625600000001,
+              "height": 9.36
+            },
+            {
+              "text": "the star",
+              "x": 28.8,
+              "y": 106.55999999999995,
+              "width": 31.18752,
+              "height": 9.36
+            },
+            {
+              "text": "Repère QA : conserver la note française et",
+              "x": 309.6,
+              "y": 223.20000000000005,
+              "width": 177.27839999999992,
+              "height": 9.36
+            },
+            {
+              "text": "chaque détail de fabrication. Repère QA :",
+              "x": 309.6,
+              "y": 210.24,
+              "width": 171.5687999999999,
+              "height": 9.36
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 309.6,
+              "y": 197.27999999999997,
+              "width": 156.00311999999994,
+              "height": 9.36
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 309.6,
+              "y": 184.32000000000005,
+              "width": 138.27527999999992,
+              "height": 9.36
+            },
+            {
+              "text": "conserver la",
+              "x": 309.6,
+              "y": 171.36,
+              "width": 50.96519999999999,
+              "height": 9.36
+            },
+            {
+              "text": "note française et chaque détail de",
+              "x": 309.6,
+              "y": 158.39999999999998,
+              "width": 140.39999999999992,
+              "height": 9.36
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 309.6,
+              "y": 145.44000000000005,
+              "width": 174.67631999999992,
+              "height": 9.36
+            },
+            {
+              "text": "française",
+              "x": 309.6,
+              "y": 132.48000000000002,
+              "width": 37.96416000000001,
+              "height": 9.36
+            },
+            {
+              "text": "et chaque détail de fabrication. Repère QA",
+              "x": 309.6,
+              "y": 119.51999999999998,
+              "width": 176.77295999999993,
+              "height": 9.36
+            },
+            {
+              "text": ": conserver la note française et chaque",
+              "x": 309.6,
+              "y": 106.55999999999995,
+              "width": 161.18855999999994,
+              "height": 9.36
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "2 / 5",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 3,
+          "text": "Nov 17, 2026\n\nCUSTOM BENDING FILE\n\nQA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur\n\nContinuation — quantité déjà comptée\nQA-HEM · Retour écrasé QA\n\nBloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.\n\ndétail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail de\nfabrication. Repère QA : conserver la note\nfrançaise et chaque détail de fa\nNotes: Repère QA : conserver la note\nfrançaise et chaque détail de fabrication.\nRepère\nQA : conserver la note française et chaque\ndétail de fabrication. Repère QA :\nconserver\nla note française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise et chaque détail de fabrication.\nRepère QA : conserver la note française et\nchaque détail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail\nde fabrication. Repère QA : conserver la\nnote française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise et chaque détail de fabrication.\nRepère QA : conserver la note française et\nchaque détail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail de fabrication. Repère QA :\nconserver la\nnote française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise\net chaque détail de fabrication.\nFIN-NOTE-QA\n\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n3 / 5",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "CUSTOM BENDING FILE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 193.0068,
+              "height": 16.56
+            },
+            {
+              "text": "QA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 465.3028799999999,
+              "height": 10.08
+            },
+            {
+              "text": "Continuation — quantité déjà comptée",
+              "x": 28.8,
+              "y": 705.6,
+              "width": 262.944,
+              "height": 14.399999999999999
+            },
+            {
+              "text": "QA-HEM · Retour écrasé QA",
+              "x": 28.8,
+              "y": 686.16,
+              "width": 191.8944,
+              "height": 14.399999999999999
+            },
+            {
+              "text": "Bloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 359.81712000000033,
+              "height": 9.36
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 604.8,
+              "width": 148.91183999999996,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 28.8,
+              "y": 588.96,
+              "width": 168.00335999999996,
+              "height": 10.08
+            },
+            {
+              "text": "détail de",
+              "x": 28.8,
+              "y": 573.12,
+              "width": 38.08224,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 557.28,
+              "width": 188.11295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française et chaque détail de fa",
+              "x": 28.8,
+              "y": 541.44,
+              "width": 139.99103999999997,
+              "height": 10.08
+            },
+            {
+              "text": "Notes: Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 525.6,
+              "width": 167.95295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 509.76,
+              "width": 180.86543999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Repère",
+              "x": 28.8,
+              "y": 493.92,
+              "width": 33.052319999999995,
+              "height": 10.08
+            },
+            {
+              "text": "QA : conserver la note française et chaque",
+              "x": 28.8,
+              "y": 478.08,
+              "width": 190.92527999999993,
+              "height": 10.08
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 462.24,
+              "width": 148.91183999999996,
+              "height": 10.08
+            },
+            {
+              "text": "conserver",
+              "x": 28.8,
+              "y": 446.4,
+              "width": 44.2512,
+              "height": 10.08
+            },
+            {
+              "text": "la note française et chaque détail de",
+              "x": 28.8,
+              "y": 430.56,
+              "width": 161.83439999999993,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 414.72,
+              "width": 188.11295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 398.88,
+              "width": 180.86543999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Repère QA : conserver la note française et",
+              "x": 28.8,
+              "y": 383.04,
+              "width": 190.91519999999994,
+              "height": 10.08
+            },
+            {
+              "text": "chaque détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 367.2,
+              "width": 184.76639999999995,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 28.8,
+              "y": 351.36,
+              "width": 168.00335999999996,
+              "height": 10.08
+            },
+            {
+              "text": "détail",
+              "x": 28.8,
+              "y": 335.52,
+              "width": 24.08112,
+              "height": 10.08
+            },
+            {
+              "text": "de fabrication. Repère QA : conserver la",
+              "x": 28.8,
+              "y": 319.68,
+              "width": 179.71632,
+              "height": 10.08
+            },
+            {
+              "text": "note française et chaque détail de",
+              "x": 28.8,
+              "y": 303.84,
+              "width": 151.19999999999996,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 288,
+              "width": 188.11295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 272.15999999999997,
+              "width": 180.86543999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Repère QA : conserver la note française et",
+              "x": 28.8,
+              "y": 256.32000000000005,
+              "width": 190.91519999999994,
+              "height": 10.08
+            },
+            {
+              "text": "chaque détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 240.48000000000002,
+              "width": 184.76639999999995,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 309.6,
+              "y": 604.8,
+              "width": 168.0033600000001,
+              "height": 10.08
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 309.6,
+              "y": 588.96,
+              "width": 148.91184000000015,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la",
+              "x": 309.6,
+              "y": 573.12,
+              "width": 54.88560000000002,
+              "height": 10.08
+            },
+            {
+              "text": "note française et chaque détail de",
+              "x": 309.6,
+              "y": 557.28,
+              "width": 151.20000000000007,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 309.6,
+              "y": 541.44,
+              "width": 188.11296000000013,
+              "height": 10.08
+            },
+            {
+              "text": "française",
+              "x": 309.6,
+              "y": 525.6,
+              "width": 40.88447999999999,
+              "height": 10.08
+            },
+            {
+              "text": "et chaque détail de fabrication.",
+              "x": 309.6,
+              "y": 509.76,
+              "width": 137.1888000000001,
+              "height": 10.08
+            },
+            {
+              "text": "FIN-NOTE-QA",
+              "x": 309.6,
+              "y": 493.92,
+              "width": 65.44944000000001,
+              "height": 10.08
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "3 / 5",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 4,
+          "text": "Nov 17, 2026\n\nCUSTOM BENDING FILE\n\nQA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur\n\nForeman: Responsable fictif QA · Date: 2026-12-01 · Revision: A\nrénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord d ·\nOrder: QA-LOCAL-001 · Jobsite: Projet synthétique du secteur nord de Québec pour les travaux de\n\nQA-ANGLES · Deux angles consécutifs QA\n\nA · 4 1/2 in.\nB · 1 3/4 in.\nC · 2 1/8 in.\nD · 1 1/2 in.\n\nMATERIAL / FINISH\n\nAluminum\n0.6096 mm\nKaycan\nNoir officiel QA\nCode QC-QA-123\n\nQUANTITY / LENGTH\n\n3 pieces\n\n120 in.\n\nFINISHED DIMENSIONS AND ITEMS TO VERIFY\n\nA = 4 1/2 in.\nBend A–B = 86°\nB = 1 3/4 in.\nBend B–C = 92°\nC = 2 1/8 in.\nBend C–D = 90°\nD = 1 1/2 in.\nDeveloped length = 9 7/8 in. (nominal)\nPainted face: Face 1 — side marked by\nthe star\nDeux angles 86° puis 92° restent\ndistincts. FIN-ANGLES-QA\nNotes: Repère QA : conserver la note\nfrançaise et chaque détail de fabrication.\nRepère\nQA : conserver la note française et chaque\ndétail de fabrication. Repère QA :\nconserver\nla note française et chaque détail de\nfabrication. Repère QA : conserver la note\n\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n4 / 5",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "CUSTOM BENDING FILE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 193.0068,
+              "height": 16.56
+            },
+            {
+              "text": "QA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 465.3028799999999,
+              "height": 10.08
+            },
+            {
+              "text": "Foreman: Responsable fictif QA · Date: 2026-12-01 · Revision: A",
+              "x": 28.8,
+              "y": 635.76,
+              "width": 206.33040000000014,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "rénovation extérieure et préparation des pièces sur mesure Projet synthétique du secteur nord d ·",
+              "x": 28.8,
+              "y": 647.28,
+              "width": 309.97440000000006,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "Order: QA-LOCAL-001 · Jobsite: Projet synthétique du secteur nord de Québec pour les travaux de",
+              "x": 28.8,
+              "y": 658.8,
+              "width": 315.93600000000004,
+              "height": 7.199999999999999
+            },
+            {
+              "text": "QA-ANGLES · Deux angles consécutifs QA",
+              "x": 28.8,
+              "y": 670.3199999999999,
+              "width": 204.80543999999992,
+              "height": 10.08
+            },
+            {
+              "text": "A · 4 1/2 in.",
+              "x": 242.25309517500003,
+              "y": 407.664,
+              "width": 49.095719999999965,
+              "height": 9.72
+            },
+            {
+              "text": "B · 1 3/4 in.",
+              "x": 326.2200995193324,
+              "y": 504.33954259663255,
+              "width": 49.0957199999999,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "C · 2 1/8 in.",
+              "x": 365.55403439484814,
+              "y": 519.4767771318591,
+              "width": 49.64004000000002,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "D · 1 1/2 in.",
+              "x": 443.7557163318592,
+              "y": 580.3938600051519,
+              "width": 49.640040000000134,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "MATERIAL / FINISH",
+              "x": 28.8,
+              "y": 357.84,
+              "width": 80.06688000000001,
+              "height": 8.64
+            },
+            {
+              "text": "Aluminum",
+              "x": 28.8,
+              "y": 339.84,
+              "width": 47.995200000000004,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "0.6096 mm",
+              "x": 28.8,
+              "y": 324.72,
+              "width": 54.00000000000001,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Kaycan",
+              "x": 28.8,
+              "y": 309.6,
+              "width": 36.007200000000005,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Noir officiel QA",
+              "x": 28.8,
+              "y": 294.48,
+              "width": 71.94959999999999,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Code QC-QA-123",
+              "x": 28.8,
+              "y": 279.36,
+              "width": 85.7844,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "QUANTITY / LENGTH",
+              "x": 360,
+              "y": 357.84,
+              "width": 86.78016000000002,
+              "height": 8.64
+            },
+            {
+              "text": "3 pieces",
+              "x": 360,
+              "y": 336.24,
+              "width": 62.472959999999986,
+              "height": 15.84
+            },
+            {
+              "text": "120 in.",
+              "x": 360,
+              "y": 315.36,
+              "width": 38.88000000000001,
+              "height": 12.959999999999999
+            },
+            {
+              "text": "FINISHED DIMENSIONS AND ITEMS TO VERIFY",
+              "x": 28.8,
+              "y": 241.92000000000007,
+              "width": 195.15167999999997,
+              "height": 8.64
+            },
+            {
+              "text": "A = 4 1/2 in.",
+              "x": 28.8,
+              "y": 223.20000000000005,
+              "width": 50.14152,
+              "height": 9.36
+            },
+            {
+              "text": "Bend A–B = 86°",
+              "x": 28.8,
+              "y": 210.24,
+              "width": 66.89591999999999,
+              "height": 9.36
+            },
+            {
+              "text": "B = 1 3/4 in.",
+              "x": 28.8,
+              "y": 197.27999999999997,
+              "width": 50.14152,
+              "height": 9.36
+            },
+            {
+              "text": "Bend B–C = 92°",
+              "x": 28.8,
+              "y": 184.32000000000005,
+              "width": 67.42008,
+              "height": 9.36
+            },
+            {
+              "text": "C = 2 1/8 in.",
+              "x": 28.8,
+              "y": 171.36,
+              "width": 50.665679999999995,
+              "height": 9.36
+            },
+            {
+              "text": "Bend C–D = 90°",
+              "x": 28.8,
+              "y": 158.39999999999998,
+              "width": 67.94424000000001,
+              "height": 9.36
+            },
+            {
+              "text": "D = 1 1/2 in.",
+              "x": 28.8,
+              "y": 145.44000000000005,
+              "width": 50.665679999999995,
+              "height": 9.36
+            },
+            {
+              "text": "Developed length = 9 7/8 in. (nominal)",
+              "x": 28.8,
+              "y": 132.48000000000002,
+              "width": 158.32440000000005,
+              "height": 9.36
+            },
+            {
+              "text": "Painted face: Face 1 — side marked by",
+              "x": 28.8,
+              "y": 119.51999999999998,
+              "width": 163.7625600000001,
+              "height": 9.36
+            },
+            {
+              "text": "the star",
+              "x": 28.8,
+              "y": 106.55999999999995,
+              "width": 31.18752,
+              "height": 9.36
+            },
+            {
+              "text": "Deux angles 86° puis 92° restent",
+              "x": 309.6,
+              "y": 223.20000000000005,
+              "width": 136.43135999999996,
+              "height": 9.36
+            },
+            {
+              "text": "distincts. FIN-ANGLES-QA",
+              "x": 309.6,
+              "y": 210.24,
+              "width": 111.71159999999998,
+              "height": 9.36
+            },
+            {
+              "text": "Notes: Repère QA : conserver la note",
+              "x": 309.6,
+              "y": 197.27999999999997,
+              "width": 155.95631999999995,
+              "height": 9.36
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 309.6,
+              "y": 184.32000000000005,
+              "width": 167.94647999999995,
+              "height": 9.36
+            },
+            {
+              "text": "Repère",
+              "x": 309.6,
+              "y": 171.36,
+              "width": 30.69144,
+              "height": 9.36
+            },
+            {
+              "text": "QA : conserver la note française et chaque",
+              "x": 309.6,
+              "y": 158.39999999999998,
+              "width": 177.2877599999999,
+              "height": 9.36
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 309.6,
+              "y": 145.44000000000005,
+              "width": 138.27527999999992,
+              "height": 9.36
+            },
+            {
+              "text": "conserver",
+              "x": 309.6,
+              "y": 132.48000000000002,
+              "width": 41.0904,
+              "height": 9.36
+            },
+            {
+              "text": "la note française et chaque détail de",
+              "x": 309.6,
+              "y": 119.51999999999998,
+              "width": 150.27479999999994,
+              "height": 9.36
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 309.6,
+              "y": 106.55999999999995,
+              "width": 174.67631999999992,
+              "height": 9.36
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "4 / 5",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 5,
+          "text": "Nov 17, 2026\n\nCUSTOM BENDING FILE\n\nQA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur\n\nContinuation — quantité déjà comptée\nQA-ANGLES · Deux angles consécutifs QA\n\nBloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.\n\nfrançaise et chaque détail de fabrication.\nRepère QA : conserver la note française et\nchaque détail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail\nde fabrication. Repère QA : conserver la\nnote française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise et chaque détail de fabrication.\nRepère QA : conserver la note française et\nchaque détail de fabrication. Repère QA :\nconserver la note française et chaque\ndétail de fabrication. Repère QA :\nconserver la\nnote française et chaque détail de\nfabrication. Repère QA : conserver la note\nfrançaise\net chaque détail de fabrication.\nFIN-NOTE-QA\n\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n5 / 5",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "CUSTOM BENDING FILE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 193.0068,
+              "height": 16.56
+            },
+            {
+              "text": "QA-LOCAL-001 · Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieur",
+              "x": 28.8,
+              "y": 682.56,
+              "width": 465.3028799999999,
+              "height": 10.08
+            },
+            {
+              "text": "Continuation — quantité déjà comptée",
+              "x": 28.8,
+              "y": 705.6,
+              "width": 262.944,
+              "height": 14.399999999999999
+            },
+            {
+              "text": "QA-ANGLES · Deux angles consécutifs QA",
+              "x": 28.8,
+              "y": 686.16,
+              "width": 292.5792,
+              "height": 14.399999999999999
+            },
+            {
+              "text": "Bloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 359.81712000000033,
+              "height": 9.36
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 604.8,
+              "width": 180.86543999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Repère QA : conserver la note française et",
+              "x": 28.8,
+              "y": 588.96,
+              "width": 190.91519999999994,
+              "height": 10.08
+            },
+            {
+              "text": "chaque détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 573.12,
+              "width": 184.76639999999995,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 28.8,
+              "y": 557.28,
+              "width": 168.00335999999996,
+              "height": 10.08
+            },
+            {
+              "text": "détail",
+              "x": 28.8,
+              "y": 541.44,
+              "width": 24.08112,
+              "height": 10.08
+            },
+            {
+              "text": "de fabrication. Repère QA : conserver la",
+              "x": 28.8,
+              "y": 525.6,
+              "width": 179.71632,
+              "height": 10.08
+            },
+            {
+              "text": "note française et chaque détail de",
+              "x": 28.8,
+              "y": 509.76,
+              "width": 151.19999999999996,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 493.92,
+              "width": 188.11295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 478.08,
+              "width": 180.86543999999995,
+              "height": 10.08
+            },
+            {
+              "text": "Repère QA : conserver la note française et",
+              "x": 28.8,
+              "y": 462.24,
+              "width": 190.91519999999994,
+              "height": 10.08
+            },
+            {
+              "text": "chaque détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 446.4,
+              "width": 184.76639999999995,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la note française et chaque",
+              "x": 28.8,
+              "y": 430.56,
+              "width": 168.00335999999996,
+              "height": 10.08
+            },
+            {
+              "text": "détail de fabrication. Repère QA :",
+              "x": 28.8,
+              "y": 414.72,
+              "width": 148.91183999999996,
+              "height": 10.08
+            },
+            {
+              "text": "conserver la",
+              "x": 28.8,
+              "y": 398.88,
+              "width": 54.885600000000004,
+              "height": 10.08
+            },
+            {
+              "text": "note française et chaque détail de",
+              "x": 28.8,
+              "y": 383.04,
+              "width": 151.19999999999996,
+              "height": 10.08
+            },
+            {
+              "text": "fabrication. Repère QA : conserver la note",
+              "x": 28.8,
+              "y": 367.2,
+              "width": 188.11295999999993,
+              "height": 10.08
+            },
+            {
+              "text": "française",
+              "x": 28.8,
+              "y": 351.36,
+              "width": 40.88447999999999,
+              "height": 10.08
+            },
+            {
+              "text": "et chaque détail de fabrication.",
+              "x": 28.8,
+              "y": 335.52,
+              "width": 137.18880000000001,
+              "height": 10.08
+            },
+            {
+              "text": "FIN-NOTE-QA",
+              "x": 28.8,
+              "y": 319.68,
+              "width": 65.44944000000001,
+              "height": 10.08
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "5 / 5",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        }
+      ],
+      "clipped": [
+        {
+          "page": 1,
+          "text": "Project: Projet synthétique du secteur nord de Québec pour les travaux de rénovation extérieure et prépara",
+          "x": 28.8,
+          "y": 655.2,
+          "width": 586.4716799999994,
+          "height": 11.52
+        }
+      ],
+      "inputUnchanged": true,
+      "geometry": [
+        [
+          "M40 333H810"
+        ],
+        [
+          "M260 85 L540 85 L540 295 A5 5 0 0 1 530 295 L530 85 L355 85",
+          "M260 85 L540 85 L540 295 A5 5 0 0 1 530 295 L530 85 L355 85",
+          "484,30 489.8779,44.9098 505.8743,45.8926 493.5106,56.0902 497.5191,71.6074 484,63 470.4809,71.6074 474.4894,56.0902 462.1257,45.8926 478.1221,44.9098",
+          "M424,117L400,85",
+          "M540,85L572,85 M540,295L572,295 M572,85L572,295",
+          "M530,295L498,295 M530,85L498,85 M498,295L498,85",
+          "M394.5,53L442.5,85"
+        ],
+        [],
+        [
+          "M202.9898 295 L476.1394 295 L468.7295 189.0339 L597.0102 175.5511 L587.4929 85",
+          "M202.9898 295 L476.1394 295 L468.7295 189.0339 L597.0102 175.5511 L587.4929 85",
+          "339.5646,196 345.4424,210.9098 361.4389,211.8926 349.0752,222.0902 353.0836,237.6074 339.5646,229 326.0455,237.6074 330.054,222.0902 317.6903,211.8926 333.6867,210.9098",
+          "M202.9898,295L202.9898,327 M476.1394,295L476.1394,327 M202.9898,327L476.1394,327",
+          "M438.8382,220.3076L472.4344,242.017",
+          "M468.7295,189.0339L465.3846,157.2092 M597.0102,175.5511L593.6653,143.7264 M465.3846,157.2092L593.6653,143.7264",
+          "M621.5676,103.0621L592.2515,130.2755"
+        ],
+        []
+      ],
+      "model": [
+        {
+          "id": "QA-HEM",
+          "quantity": 2,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                50.8,
+                -38.1
+              ],
+              "headingDeg": -90
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                -38.1
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": -270
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 31.75,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                19.05,
+                0
+              ],
+              "headingDeg": -180
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": -90,
+              "turnDeg": -90,
+              "label": "Rotation -90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right",
+              "turnDeg": -180,
+              "label": "Retour écrasé 180° · droite",
+              "at": [
+                50.8,
+                -38.1
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "signed",
+              "angle": 90,
+              "turnDeg": 90,
+              "label": "Rotation 90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        },
+        {
+          "id": "QA-ANGLES",
+          "quantity": 3,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 114.3,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                114.3,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 44.449999999999996,
+              "start": [
+                114.3,
+                0
+              ],
+              "end": [
+                111.1993247421,
+                44.341722034
+              ],
+              "headingDeg": 94
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 53.974999999999994,
+              "start": [
+                111.1993247421,
+                44.341722034
+              ],
+              "end": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "headingDeg": 6
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "end": [
+                160.8961095941,
+                87.8749300524
+              ],
+              "headingDeg": 96
+            }
+          ],
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 86,
+              "direction": "left",
+              "turnDeg": 94,
+              "label": "86° intérieur · gauche",
+              "at": [
+                114.3,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "interior",
+              "angle": 92,
+              "direction": "right",
+              "turnDeg": -88,
+              "label": "92° intérieur · droite",
+              "at": [
+                111.1993247421,
+                44.341722034
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left",
+              "turnDeg": 90,
+              "label": "90° intérieur · gauche",
+              "at": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "name": "bending-order",
+        "client": false,
+        "lang": "fr-CA"
+      },
+      "filename": "bending-order-fr-CA.pdf",
+      "pages": [
+        {
+          "page": 1,
+          "text": "",
+          "bounds": [],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 2,
+          "text": "",
+          "bounds": [],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 3,
+          "text": "",
+          "bounds": [],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 4,
+          "text": "",
+          "bounds": [],
+          "paper": [
+            612,
+            792
+          ]
+        }
+      ],
+      "clipped": [],
+      "inputUnchanged": true,
+      "geometry": [
+        [
+          "M260 85 L540 85 L540 295 A5 5 0 0 1 530 295 L530 85 L355 85",
+          "M260 85 L540 85 L540 295 A5 5 0 0 1 530 295 L530 85 L355 85",
+          "484,30 489.8779,44.9098 505.8743,45.8926 493.5106,56.0902 497.5191,71.6074 484,63 470.4809,71.6074 474.4894,56.0902 462.1257,45.8926 478.1221,44.9098",
+          "M424,117L400,85",
+          "M540,85L572,85 M540,295L572,295 M572,85L572,295",
+          "M530,295L498,295 M530,85L498,85 M498,295L498,85",
+          "M394.5,53L442.5,85"
+        ],
+        [],
+        [
+          "M202.9898 295 L476.1394 295 L468.7295 189.0339 L597.0102 175.5511 L587.4929 85",
+          "M202.9898 295 L476.1394 295 L468.7295 189.0339 L597.0102 175.5511 L587.4929 85",
+          "339.5646,196 345.4424,210.9098 361.4389,211.8926 349.0752,222.0902 353.0836,237.6074 339.5646,229 326.0455,237.6074 330.054,222.0902 317.6903,211.8926 333.6867,210.9098",
+          "M202.9898,295L202.9898,327 M476.1394,295L476.1394,327 M202.9898,327L476.1394,327",
+          "M438.8382,220.3076L472.4344,242.017",
+          "M468.7295,189.0339L465.3846,157.2092 M597.0102,175.5511L593.6653,143.7264 M465.3846,157.2092L593.6653,143.7264",
+          "M621.5676,103.0621L592.2515,130.2755"
+        ],
+        []
+      ],
+      "model": [
+        {
+          "id": "QA-HEM",
+          "quantity": 2,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                50.8,
+                -38.1
+              ],
+              "headingDeg": -90
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                -38.1
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": -270
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 31.75,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                19.05,
+                0
+              ],
+              "headingDeg": -180
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": -90,
+              "turnDeg": -90,
+              "label": "Rotation -90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right",
+              "turnDeg": -180,
+              "label": "Retour écrasé 180° · droite",
+              "at": [
+                50.8,
+                -38.1
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "signed",
+              "angle": 90,
+              "turnDeg": 90,
+              "label": "Rotation 90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        },
+        {
+          "id": "QA-ANGLES",
+          "quantity": 3,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 114.3,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                114.3,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 44.449999999999996,
+              "start": [
+                114.3,
+                0
+              ],
+              "end": [
+                111.1993247421,
+                44.341722034
+              ],
+              "headingDeg": 94
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 53.974999999999994,
+              "start": [
+                111.1993247421,
+                44.341722034
+              ],
+              "end": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "headingDeg": 6
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "end": [
+                160.8961095941,
+                87.8749300524
+              ],
+              "headingDeg": 96
+            }
+          ],
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 86,
+              "direction": "left",
+              "turnDeg": 94,
+              "label": "86° intérieur · gauche",
+              "at": [
+                114.3,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "interior",
+              "angle": 92,
+              "direction": "right",
+              "turnDeg": -88,
+              "label": "92° intérieur · droite",
+              "at": [
+                111.1993247421,
+                44.341722034
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left",
+              "turnDeg": 90,
+              "label": "90° intérieur · gauche",
+              "at": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "name": "panel-order",
+        "client": false,
+        "lang": "fr-CA"
+      },
+      "filename": "panel-order-fr-CA.pdf",
+      "pages": [
+        {
+          "page": 1,
+          "text": "",
+          "bounds": [],
+          "paper": [
+            1190.551,
+            841.89
+          ]
+        },
+        {
+          "page": 2,
+          "text": "",
+          "bounds": [],
+          "paper": [
+            1190.551,
+            841.89
+          ]
+        }
+      ],
+      "clipped": [],
+      "inputUnchanged": true,
+      "geometry": [
+        [
+          "M 60 103 L 1340 103",
+          "M 396.00 609.00 L 508.00 609.00 L 508.00 525.00 L 396.00 525.00 Z",
+          "M 875 393 L 1325 393",
+          "M 62 918 L 1338 918"
+        ],
+        [
+          "M 60 103 L 1340 103",
+          "M 213.00 592.88 L 562.00 592.88 L 562.00 331.13 L 213.00 331.13 Z",
+          "M 220.27 585.60 L 554.73 585.60 L 554.73 338.40 L 220.27 338.40 Z",
+          "M 213 598.875 L 213 666.875",
+          "M 562 598.875 L 562 666.875",
+          "M 213 658.875 L 562 658.875",
+          "M 215 658.875 l 12,-6 v 12 z M 560 658.875 l -12,-6 v 12 z",
+          "M 568 331.125 L 693 331.125",
+          "M 568 592.875 L 693 592.875",
+          "M 685 331.125 L 685 592.875",
+          "M 685 333.125 l -6,12 h 12 z M 685 590.875 l -6,-12 h 12 z",
+          "M 387.5 592.875 L 387.5 607.875",
+          "M 213 592.875 L 562 592.875",
+          "M 562 462 L 577 462",
+          "M 387.5 331.125 L 387.5 316.125",
+          "M 213 462 L 198 462",
+          "M 830 421 L 1311 421",
+          "M 831 497 L 1312 497",
+          "M 832 541 L 1312 541",
+          "M 832 586 L 1312 586",
+          "M 832 631 L 1312 631",
+          "M 832 676 L 1312 676",
+          "M 62 918 L 1338 918"
+        ]
+      ],
+      "model": [
+        {
+          "id": "QA-HEM",
+          "quantity": 2,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                50.8,
+                -38.1
+              ],
+              "headingDeg": -90
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                50.8,
+                -38.1
+              ],
+              "end": [
+                50.8,
+                0
+              ],
+              "headingDeg": -270
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 31.75,
+              "start": [
+                50.8,
+                0
+              ],
+              "end": [
+                19.05,
+                0
+              ],
+              "headingDeg": -180
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": -90,
+              "turnDeg": -90,
+              "label": "Rotation -90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "hem",
+              "angle": 180,
+              "direction": "right",
+              "turnDeg": -180,
+              "label": "Retour écrasé 180° · droite",
+              "at": [
+                50.8,
+                -38.1
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "signed",
+              "angle": 90,
+              "turnDeg": 90,
+              "label": "Rotation 90°",
+              "at": [
+                50.8,
+                0
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        },
+        {
+          "id": "QA-ANGLES",
+          "quantity": 3,
+          "lengthMM": 3048,
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 114.3,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                114.3,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 44.449999999999996,
+              "start": [
+                114.3,
+                0
+              ],
+              "end": [
+                111.1993247421,
+                44.341722034
+              ],
+              "headingDeg": 94
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 53.974999999999994,
+              "start": [
+                111.1993247421,
+                44.341722034
+              ],
+              "end": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "headingDeg": 6
+            },
+            {
+              "id": "D",
+              "label": "D",
+              "name": "",
+              "lengthMM": 38.099999999999994,
+              "start": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "end": [
+                160.8961095941,
+                87.8749300524
+              ],
+              "headingDeg": 96
+            }
+          ],
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 86,
+              "direction": "left",
+              "turnDeg": 94,
+              "label": "86° intérieur · gauche",
+              "at": [
+                114.3,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "interior",
+              "angle": 92,
+              "direction": "right",
+              "turnDeg": -88,
+              "label": "92° intérieur · droite",
+              "at": [
+                111.1993247421,
+                44.341722034
+              ],
+              "from": "B",
+              "to": "C"
+            },
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left",
+              "turnDeg": 90,
+              "label": "90° intérieur · gauche",
+              "at": [
+                164.8786440446,
+                49.9836458389
+              ],
+              "from": "C",
+              "to": "D"
+            }
+          ],
+          "material": {
+            "type": "aluminium",
+            "name": "Aluminium QA",
+            "productRef": null,
+            "gauge": "",
+            "thicknessMM": 0.6096
+          },
+          "finish": {
+            "manufacturer": "Kaycan",
+            "name": "Noir officiel QA",
+            "code": "QC-QA-123",
+            "system": "manufacturer",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        }
+      ]
+    }
+  ],
+  "blocked": [
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    }
+  ],
+  "pageerrors": []
+}

@@ -1,0 +1,40 @@
+--- tests/mir-client-pliage-approved-browser.cjs
++++ docs/verification/pliage-harmonie-20261117/journey/harnesses/baseline-first-paint-360.cjs
+@@ -1,19 +1,19 @@
+ 'use strict';
+ // Native MIR UI and geometry; no Supabase writes, orders or payment calls.
+ const assert=require('node:assert/strict'),fs=require('fs'),path=require('path'),http=require('http'),{once}=require('events'),crypto=require('crypto');
+-const {chromium}=require('playwright'),M=require('../dist/production-model.js');
+-const root=path.resolve(__dirname,'../dist'),proof=process.env.MIR_CLIENT_PLIAGE_PROOF_DIR?path.resolve(process.env.MIR_CLIENT_PLIAGE_PROOF_DIR):path.resolve(__dirname,'../docs/verification/client-pliage');fs.mkdirSync(proof,{recursive:true});
+-function serve(dir){return http.createServer((req,res)=>{const f=path.resolve(dir,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!f.startsWith(dir+path.sep)||!fs.existsSync(f)||!fs.statSync(f).isFile())return res.writeHead(404).end();res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.js':'application/javascript','.mjs':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.avif':'image/avif','.webp':'image/webp'})[path.extname(f)]||'application/octet-stream');fs.createReadStream(f).pipe(res);});}
++const {chromium}=require('playwright'),M=require(path.resolve(__dirname,'../../../../../dist/production-model.js'));
++const root=path.resolve(path.resolve(__dirname,'../../../../../tests'),'../dist'),proof=process.env.MIR_CLIENT_PLIAGE_PROOF_DIR?path.resolve(process.env.MIR_CLIENT_PLIAGE_PROOF_DIR):path.resolve(path.resolve(__dirname,'../../../../../tests'),'../docs/verification/client-pliage');fs.mkdirSync(proof,{recursive:true});
++function serve(dir){return http.createServer((req,res)=>{const f=path.resolve(dir,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!f.startsWith(dir+path.sep)||!fs.existsSync(f)||!fs.statSync(f).isFile())return res.writeHead(404).end();res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.js':'application/javascript','.mjs':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.avif':'image/avif','.webp':'image/webp'})[path.extname(f)]||'application/octet-stream');if(['.html','.js','.css'].includes(path.extname(f))){try{return res.end(require('child_process').execFileSync('git',['show','3573d90:dist/'+path.relative(dir,f)],{cwd:path.resolve(__dirname,'../../../../..'),maxBuffer:16*1024*1024}))}catch{}}fs.createReadStream(f).pipe(res);});}
+ const spec={kind:'profile',template:'l',unit:'in',dimensions:{A:3.5,B:2.25},length:120,quantity:2,material:{type:'aluminium'},finish:{system:'special',code:'QA',name:'Recette'},coloredFace:{side:'left',segmentId:'A'}};
+ const t=M.createTemplate(spec,{id:'qa-client-model',name:'Modèle publié de recette'});assert.equal(t.ok,true);
+ const made=M.instantiateTemplate(t.template,{id:'M001',unit:'in',measurements:{A:3.5,B:2.25},length:120,quantity:2,material:spec.material,finish:spec.finish,coloredFace:spec.coloredFace});assert.equal(made.ok,true);
+ const dossier={version:1,order:{id:'qa-existing-dossier',project:'Dossier existant QA',foreman:'',date:'',notes:'',items:[{id:'M001',kind:'profile',spec:made.spec,snapshot:made.snapshot,history:[]}]}};
+ const quick={version:1,project:'Liste rapide QA',items:[{id:'quick-existing',profile:'l',dimensions:{A:3.5,B:2.25},lengthIn:120,quantity:2}]};
+ const modelRecord={id:t.template.id,name:t.template.name,currentVersion:1,versions:[t.template],channels:{client:true,store:false,po:true},archived:false,allowed:{materials:['aluminium','acier'],colorSystems:['manufacturer','special']}};
+-async function contextFor(browser,base,viewport){const context=await browser.newContext({viewport,isMobile:viewport.width<=428,hasTouch:viewport.width<=1024});await context.route('**/*',route=>{if(!route.request().url().startsWith(base))return route.abort();return route.continue();});return context;}
++async function contextFor(browser,base,viewport){const context=await browser.newContext({viewport,isMobile:viewport.width<=428,hasTouch:viewport.width<=1024});await context.route('**/*',route=>{if((!route.request().url().startsWith(base)||route.request().method()!=='GET'))return route.abort();return route.continue();});return context;}
+ async function verifyFirstPaint(browser,base,{width,height,touch}){
+  const context=await browser.newContext({viewport:{width,height},isMobile:touch,hasTouch:touch});
+- await context.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
++ await context.route('**/*',route=>route.request().url().startsWith(base)&&route.request().method()==='GET'?route.continue():route.abort());
+  try{
+   const page=await context.newPage();
+   await page.goto(base+'/pliage.html');
+@@ -63,11 +63,7 @@
+ (async()=>{const server=serve(root);server.listen(0,'127.0.0.1');await once(server,'listening');const base='http://127.0.0.1:'+server.address().port;
+ const beforeDir=process.env.MIR_CLIENT_BASELINE_DIR,before=beforeDir?serve(path.resolve(beforeDir)):null;if(before){before.listen(0,'127.0.0.1');await once(before,'listening');}
+ const browser=await chromium.launch({executablePath:process.env.MIR_CHROMIUM_BIN||'/usr/bin/chromium'}),results=[];try{
+- for(const [width,height,touch] of [
+-  [360,780,true],[390,844,true],[428,926,true],[844,390,true],
+-  [768,1024,true],[834,1112,true],[1112,834,true],
+-  [1024,768,false],[1280,720,false],[1440,900,false],[1920,1080,false],[3440,1440,false]
+- ])await verifyFirstPaint(browser,base,{width,height,touch});
++ await verifyFirstPaint(browser,base,{width:360,height:780,touch:true});console.log('Baseline first paint passed at 360');return;
+  for(const [width,height]of [[360,780],[390,844],[428,926],[600,900],[601,900],[834,1112],[1024,768],[1348,926],[1440,900]]){
+  const c=await contextFor(browser,base,{width,height}),page=await c.newPage(),errors=[];page.setDefaultTimeout(15000);page.on('pageerror',e=>{errors.push(e.stack);console.log('PAGEERROR '+page.url()+' '+e.stack);});
+  await page.addInitScript(({dossier,quick,modelRecord})=>{if(!sessionStorage.getItem('qa-seeded')){localStorage.setItem('mir_production_client_dossier_v1',JSON.stringify(dossier));localStorage.setItem('mir-bending-v1',JSON.stringify(quick));localStorage.setItem('mir_production_templates_v1',JSON.stringify({version:1,records:[modelRecord]}));sessionStorage.setItem('qa-seeded','1');}},{dossier,quick,modelRecord});

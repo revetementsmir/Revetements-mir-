@@ -1,0 +1,59 @@
+[
+  {
+    "width": 390,
+    "height": 844,
+    "quick": "explicit choices, fractions, unit conversion, profile/reload/back preservation, quota failure",
+    "contexts": [
+      {
+        "scope": "client",
+        "quantity": 2,
+        "material": "aluminium",
+        "colour": "30",
+        "destination": "selection.html",
+        "cartLines": 1,
+        "fixtureCalls": []
+      },
+      {
+        "scope": "employee",
+        "quantity": 2,
+        "material": "aluminium",
+        "colour": "30",
+        "destination": "chantier.html?view=orders",
+        "cartLines": 1,
+        "fixtureCalls": [
+          [
+            "dossier",
+            "00000000-0000-4000-8000-000000000353"
+          ],
+          [
+            "dossier",
+            "00000000-0000-4000-8000-000000000454"
+          ]
+        ]
+      }
+    ],
+    "errors": [],
+    "blocked": [
+      {
+        "method": "GET",
+        "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+      },
+      {
+        "method": "GET",
+        "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+      },
+      {
+        "method": "GET",
+        "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+      },
+      {
+        "method": "POST",
+        "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+      },
+      {
+        "method": "GET",
+        "url": "https://geocoding-api.open-meteo.com/v1/search?name=Qu%C3%A9bec&count=10&language=fr&countryCode=CA"
+      }
+    ]
+  }
+]

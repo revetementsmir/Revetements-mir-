@@ -1,0 +1,3507 @@
+{
+  "phase": "after",
+  "revision": "3573d90f064e95459c18a8b6ba8a4462bfaa1dc0",
+  "hashes": {
+    "mir-dossier-pdf.js": "5060ecb6432239db132629686ce4e1c281023c003f912edb8009a9e2a1643503",
+    "production-model.js": "ae3d15fe991cca10d4cf92457a95b21d3be879b9225c5bcd33b603aa32cc77fe",
+    "annotated-pdf.js": "de0a3f7ebcd6971e735d7258ba6137cba425ee84fa033474af842cc357a52a38",
+    "mir-client-i18n.js": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+  },
+  "cases": [
+    {
+      "locale": "fr-CA",
+      "order": {
+        "poNumber": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX",
+        "project": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB",
+        "foreman": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEED",
+        "date": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+        "revision": "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "items": [
+          {
+            "kind": "profile",
+            "template": "custom",
+            "unit": "in",
+            "startAngle": 0,
+            "material": {
+              "type": "aluminium",
+              "name": "Aluminium QA",
+              "thickness": 0.024,
+              "thicknessUnit": "in"
+            },
+            "finish": {
+              "system": "manufacturer",
+              "manufacturer": "Kaycan",
+              "name": "Noir officiel QA",
+              "code": "QC-QA-123",
+              "selectionType": "manufacturer"
+            },
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            },
+            "id": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI",
+            "name": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A",
+            "quantity": 13,
+            "length": 120,
+            "segments": [
+              {
+                "label": "A",
+                "length": 2
+              },
+              {
+                "label": "B",
+                "length": 1.5
+              },
+              {
+                "label": "C",
+                "length": 1.5
+              },
+              {
+                "label": "D",
+                "length": 1.25
+              }
+            ],
+            "bends": [
+              {
+                "mode": "signed",
+                "angle": -90
+              },
+              {
+                "mode": "hem",
+                "direction": "right"
+              },
+              {
+                "mode": "signed",
+                "angle": 90
+              }
+            ],
+            "note": "Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil.FIN-NOTE-UN"
+          },
+          {
+            "kind": "profile",
+            "template": "custom",
+            "unit": "in",
+            "startAngle": 0,
+            "material": {
+              "type": "aluminium",
+              "name": "Aluminium QA",
+              "thickness": 0.024,
+              "thicknessUnit": "in"
+            },
+            "finish": {
+              "system": "manufacturer",
+              "manufacturer": "Kaycan",
+              "name": "Noir officiel QA",
+              "code": "QC-QA-123",
+              "selectionType": "manufacturer"
+            },
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            },
+            "id": "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK",
+            "name": "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B",
+            "quantity": 17,
+            "length": 132,
+            "segments": [
+              {
+                "label": "A",
+                "length": 4.5
+              },
+              {
+                "label": "B",
+                "length": 1.75
+              },
+              {
+                "label": "C",
+                "length": 2.125
+              },
+              {
+                "label": "D",
+                "length": 1.5
+              }
+            ],
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 86,
+                "direction": "left"
+              },
+              {
+                "mode": "interior",
+                "angle": 92,
+                "direction": "right"
+              },
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left"
+              }
+            ],
+            "note": "Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes fFIN-NOTE-DEUX"
+          }
+        ]
+      },
+      "normalizedFieldsPreserved": true,
+      "inputUnchanged": true,
+      "storageUnchanged": true,
+      "facesUnchanged": true,
+      "modelUnchanged": true,
+      "sourceFaces": [
+        {
+          "name": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI · NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A",
+          "continuation": false
+        },
+        {
+          "name": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI · Continuation",
+          "continuation": true
+        },
+        {
+          "name": "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK · QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B",
+          "continuation": false
+        },
+        {
+          "name": "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK · Continuation",
+          "continuation": true
+        }
+      ],
+      "pages": [
+        {
+          "page": 1,
+          "text": "17 nov. 2026\n\nDOSSIER DE PLIAGE\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…\n\nA · 2 po\nB · 1 1/2 po\nC · 1 1/2 po\nD · 1 1/4 po\n\nMATÉRIAU / FINI\n\nAluminium\n0.6096 mm\nKaycan\nNoir officiel QA\nCode QC-QA-123\n\nQUANTITÉ / LONGUEUR\n\n13 pièce(s)\n\n120 po\n\nCOTES FINIES ET POINTS À VALIDER\n\nA = 2 po\nPli A–B = 90°\nB = 1 1/2 po\nPli B–C = 180° — retour écrasé\nC = 1 1/2 po\nPli C–D = 90°\nD = 1 1/4 po\nDéveloppé total = 6 1/4 po (nominal)\nFace colorée : Face 1 — côté indiqué par\nl’étoile\nNotes françaises synthétiques du premier\nprofil. Notes françaises synthétiques du\npremier profil. Notes françaises\nsynthétiques du premier profil. Notes\nfrançaises\nsynthétiques du premier profil. Notes\nfrançaises synthétiques du premier profil.\nNotes\nfrançaises synthétiques du premier profil.\nNotes françaises synthétiques du premier\n\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·\n\nIdentification complète en annexe · aucune quantité supplémentaire.\n\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n1 / 8",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "DOSSIER DE PLIAGE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 168.18336000000002,
+              "height": 16.56
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 281.9577600000001,
+              "height": 8.64
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…",
+              "x": 28.8,
+              "y": 675.36,
+              "width": 301.13856000000015,
+              "height": 8.64
+            },
+            {
+              "text": "A · 2 po",
+              "x": 304.800662109375,
+              "y": 543.744,
+              "width": 33.45623999999994,
+              "height": 9.72
+            },
+            {
+              "text": "B · 1 1/2 po",
+              "x": 414.216,
+              "y": 524.5376660156251,
+              "width": 49.649759999999915,
+              "height": 9.72
+            },
+            {
+              "text": "C · 1 1/2 po",
+              "x": 366.264,
+              "y": 524.8058203125,
+              "width": 50.19407999999985,
+              "height": 9.72
+            },
+            {
+              "text": "D · 1 1/4 po",
+              "x": 277.31017968749995,
+              "y": 585.216,
+              "width": 50.194079999999914,
+              "height": 9.72
+            },
+            {
+              "text": "MATÉRIAU / FINI",
+              "x": 28.8,
+              "y": 357.84,
+              "width": 69.04224,
+              "height": 8.64
+            },
+            {
+              "text": "Aluminium",
+              "x": 28.8,
+              "y": 339.84,
+              "width": 50.3928,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "0.6096 mm",
+              "x": 28.8,
+              "y": 324.72,
+              "width": 54.00000000000001,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Kaycan",
+              "x": 28.8,
+              "y": 309.6,
+              "width": 36.007200000000005,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Noir officiel QA",
+              "x": 28.8,
+              "y": 294.48,
+              "width": 71.94959999999999,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Code QC-QA-123",
+              "x": 28.8,
+              "y": 279.36,
+              "width": 85.7844,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "QUANTITÉ / LONGUEUR",
+              "x": 360,
+              "y": 357.84,
+              "width": 100.6992,
+              "height": 8.64
+            },
+            {
+              "text": "13 pièce(s)",
+              "x": 360,
+              "y": 336.24,
+              "width": 81.82943999999998,
+              "height": 15.84
+            },
+            {
+              "text": "120 po",
+              "x": 360,
+              "y": 315.36,
+              "width": 39.61872000000001,
+              "height": 12.959999999999999
+            },
+            {
+              "text": "COTES FINIES ET POINTS À VALIDER",
+              "x": 28.8,
+              "y": 241.92000000000007,
+              "width": 156.7728,
+              "height": 8.64
+            },
+            {
+              "text": "A = 2 po",
+              "x": 28.8,
+              "y": 223.20000000000005,
+              "width": 35.08128,
+              "height": 9.36
+            },
+            {
+              "text": "Pli A–B = 90°",
+              "x": 28.8,
+              "y": 210.24,
+              "width": 55.43928,
+              "height": 9.36
+            },
+            {
+              "text": "B = 1 1/2 po",
+              "x": 28.8,
+              "y": 197.27999999999997,
+              "width": 50.67504,
+              "height": 9.36
+            },
+            {
+              "text": "Pli B–C = 180° — retour écrasé",
+              "x": 28.8,
+              "y": 184.32000000000005,
+              "width": 130.83408000000003,
+              "height": 9.36
+            },
+            {
+              "text": "C = 1 1/2 po",
+              "x": 28.8,
+              "y": 171.36,
+              "width": 51.1992,
+              "height": 9.36
+            },
+            {
+              "text": "Pli C–D = 90°",
+              "x": 28.8,
+              "y": 158.39999999999998,
+              "width": 56.48759999999999,
+              "height": 9.36
+            },
+            {
+              "text": "D = 1 1/4 po",
+              "x": 28.8,
+              "y": 145.44000000000005,
+              "width": 51.1992,
+              "height": 9.36
+            },
+            {
+              "text": "Développé total = 6 1/4 po (nominal)",
+              "x": 28.8,
+              "y": 132.48000000000002,
+              "width": 151.04232000000005,
+              "height": 9.36
+            },
+            {
+              "text": "Face colorée : Face 1 — côté indiqué par",
+              "x": 28.8,
+              "y": 119.51999999999998,
+              "width": 171.56880000000012,
+              "height": 9.36
+            },
+            {
+              "text": "l’étoile",
+              "x": 28.8,
+              "y": 106.55999999999995,
+              "width": 26.51688,
+              "height": 9.36
+            },
+            {
+              "text": "Notes françaises synthétiques du premier",
+              "x": 309.6,
+              "y": 223.20000000000005,
+              "width": 172.11167999999998,
+              "height": 9.36
+            },
+            {
+              "text": "profil. Notes françaises synthétiques du",
+              "x": 309.6,
+              "y": 210.24,
+              "width": 163.25711999999996,
+              "height": 9.36
+            },
+            {
+              "text": "premier profil. Notes françaises",
+              "x": 309.6,
+              "y": 197.27999999999997,
+              "width": 129.44879999999998,
+              "height": 9.36
+            },
+            {
+              "text": "synthétiques du premier profil. Notes",
+              "x": 309.6,
+              "y": 184.32000000000005,
+              "width": 152.33399999999995,
+              "height": 9.36
+            },
+            {
+              "text": "françaises",
+              "x": 309.6,
+              "y": 171.36,
+              "width": 42.64416000000001,
+              "height": 9.36
+            },
+            {
+              "text": "synthétiques du premier profil. Notes",
+              "x": 309.6,
+              "y": 158.39999999999998,
+              "width": 152.33399999999995,
+              "height": 9.36
+            },
+            {
+              "text": "françaises synthétiques du premier profil.",
+              "x": 309.6,
+              "y": 145.44000000000005,
+              "width": 170.53919999999997,
+              "height": 9.36
+            },
+            {
+              "text": "Notes",
+              "x": 309.6,
+              "y": 132.48000000000002,
+              "width": 24.43896,
+              "height": 9.36
+            },
+            {
+              "text": "françaises synthétiques du premier profil.",
+              "x": 309.6,
+              "y": 119.51999999999998,
+              "width": 170.53919999999997,
+              "height": 9.36
+            },
+            {
+              "text": "Notes françaises synthétiques du premier",
+              "x": 309.6,
+              "y": 106.55999999999995,
+              "width": 172.11167999999998,
+              "height": 9.36
+            },
+            {
+              "text": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 338.63759999999974,
+              "height": 10.08
+            },
+            {
+              "text": "Identification complète en annexe · aucune quantité supplémentaire.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 239.35823999999982,
+              "height": 7.92
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "1 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 2,
+          "text": "17 nov. 2026\n\nIDENTIFICATION DU DOSSIER\n\nAnnexe au document précédent\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·\nNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\nOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\nPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A\nCommande : XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX · Chantier :\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB · Chef :\nDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\nEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEED · Date :\nFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF · Révision :\nGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG\n\nInformations complémentaires seulement · quantités déjà comptées.\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n2 / 8",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "IDENTIFICATION DU DOSSIER",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 239.87159999999994,
+              "height": 16.56
+            },
+            {
+              "text": "Annexe au document précédent",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 122.42016,
+              "height": 8.64
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 328.9507200000003,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·",
+              "x": 28.8,
+              "y": 629.28,
+              "width": 341.2483200000003,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 614.16,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 599.04,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB",
+              "x": 28.8,
+              "y": 583.92,
+              "width": 391.87008,
+              "height": 10.08
+            },
+            {
+              "text": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·",
+              "x": 28.8,
+              "y": 553.6800000000001,
+              "width": 316.62287999999995,
+              "height": 10.08
+            },
+            {
+              "text": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+              "x": 28.8,
+              "y": 538.56,
+              "width": 320.2214400000001,
+              "height": 10.08
+            },
+            {
+              "text": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+              "x": 28.8,
+              "y": 523.44,
+              "width": 344.6150399999997,
+              "height": 10.08
+            },
+            {
+              "text": "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A",
+              "x": 28.8,
+              "y": 508.32,
+              "width": 324.4651200000003,
+              "height": 10.08
+            },
+            {
+              "text": "Commande : XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 478.08,
+              "width": 389.4206400000002,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX · Chantier :",
+              "x": 28.8,
+              "y": 462.96,
+              "width": 387.70704000000035,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 447.84,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 432.72,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB · Chef :",
+              "x": 28.8,
+              "y": 417.6,
+              "width": 427.1097600000001,
+              "height": 10.08
+            },
+            {
+              "text": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+              "x": 28.8,
+              "y": 402.48,
+              "width": 429.3878399999998,
+              "height": 10.08
+            },
+            {
+              "text": "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEED · Date :",
+              "x": 28.8,
+              "y": 387.36,
+              "width": 438.6009600000003,
+              "height": 10.08
+            },
+            {
+              "text": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF · Révision :",
+              "x": 28.8,
+              "y": 372.24,
+              "width": 298.55952000000013,
+              "height": 10.08
+            },
+            {
+              "text": "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+              "x": 28.8,
+              "y": 357.12,
+              "width": 469.92960000000005,
+              "height": 10.08
+            },
+            {
+              "text": "Informations complémentaires seulement · quantités déjà comptées.",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 281.10240000000016,
+              "height": 8.64
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "2 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 3,
+          "text": "17 nov. 2026\n\nDOSSIER DE PLIAGE\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…\n\nprofil. Notes françaises synthétiques du\npremier profil. Notes françaises\nsynthétiques\ndu premier profil. Notes françaises\nsynthétiques du premier profil.FIN-NOTE-UN\nContinuation — quantité déjà comptée IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·\n\nIdentification complète en annexe · aucune quantité supplémentaire.\n\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n3 / 8",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "DOSSIER DE PLIAGE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 168.18336000000002,
+              "height": 16.56
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 281.9577600000001,
+              "height": 8.64
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…",
+              "x": 28.8,
+              "y": 675.36,
+              "width": 301.13856000000015,
+              "height": 8.64
+            },
+            {
+              "text": "profil. Notes françaises synthétiques du",
+              "x": 28.8,
+              "y": 604.8,
+              "width": 175.81535999999994,
+              "height": 10.08
+            },
+            {
+              "text": "premier profil. Notes françaises",
+              "x": 28.8,
+              "y": 588.96,
+              "width": 139.4064,
+              "height": 10.08
+            },
+            {
+              "text": "synthétiques",
+              "x": 28.8,
+              "y": 573.12,
+              "width": 56.56896,
+              "height": 10.08
+            },
+            {
+              "text": "du premier profil. Notes françaises",
+              "x": 28.8,
+              "y": 557.28,
+              "width": 153.40752,
+              "height": 10.08
+            },
+            {
+              "text": "synthétiques du premier profil.FIN-NOTE-UN",
+              "x": 28.8,
+              "y": 541.44,
+              "width": 200.40048000000004,
+              "height": 10.08
+            },
+            {
+              "text": "Continuation — quantité déjà comptée IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 525.4905599999994,
+              "height": 10.08
+            },
+            {
+              "text": "Identification complète en annexe · aucune quantité supplémentaire.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 239.35823999999982,
+              "height": 7.92
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "3 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 4,
+          "text": "17 nov. 2026\n\nIDENTIFICATION DU DOSSIER\n\nAnnexe au document précédent\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB\nContinuation — quantité déjà comptée IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·\nNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\nOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\nPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A\nBloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.\n\nInformations complémentaires seulement · quantités déjà comptées.\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n4 / 8",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "IDENTIFICATION DU DOSSIER",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 239.87159999999994,
+              "height": 16.56
+            },
+            {
+              "text": "Annexe au document précédent",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 122.42016,
+              "height": 8.64
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 328.9507200000003,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·",
+              "x": 28.8,
+              "y": 629.28,
+              "width": 341.2483200000003,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 614.16,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 599.04,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB",
+              "x": 28.8,
+              "y": 583.92,
+              "width": 391.87008,
+              "height": 10.08
+            },
+            {
+              "text": "Continuation — quantité déjà comptée IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·",
+              "x": 28.8,
+              "y": 553.6800000000001,
+              "width": 490.77503999999954,
+              "height": 10.08
+            },
+            {
+              "text": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+              "x": 28.8,
+              "y": 538.56,
+              "width": 320.2214400000001,
+              "height": 10.08
+            },
+            {
+              "text": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+              "x": 28.8,
+              "y": 523.44,
+              "width": 344.6150399999997,
+              "height": 10.08
+            },
+            {
+              "text": "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A",
+              "x": 28.8,
+              "y": 508.32,
+              "width": 324.4651200000003,
+              "height": 10.08
+            },
+            {
+              "text": "Bloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.",
+              "x": 28.8,
+              "y": 478.08,
+              "width": 387.4953599999999,
+              "height": 10.08
+            },
+            {
+              "text": "Informations complémentaires seulement · quantités déjà comptées.",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 281.10240000000016,
+              "height": 8.64
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "4 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 5,
+          "text": "17 nov. 2026\n\nDOSSIER DE PLIAGE\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…\n\nA · 4 1/2 po\nB · 1 3/4 po\nC · 2 1/8 po\nD · 1 1/2 po\n\nMATÉRIAU / FINI\n\nAluminium\n0.6096 mm\nKaycan\nNoir officiel QA\nCode QC-QA-123\n\nQUANTITÉ / LONGUEUR\n\n17 pièce(s)\n\n132 po\n\nCOTES FINIES ET POINTS À VALIDER\n\nA = 4 1/2 po\nPli A–B = 86°\nB = 1 3/4 po\nPli B–C = 92°\nC = 2 1/8 po\nPli C–D = 90°\nD = 1 1/2 po\nDéveloppé total = 9 7/8 po (nominal)\nFace colorée : Face 1 — côté indiqué par\nl’étoile\nNotes françaises synthétiques du second\nprofil. Notes françaises synthétiques du\nsecond\nprofil. Notes françaises synthétiques du\nsecond profil. Notes françaises\nsynthétiques\ndu second profil. Notes françaises\nsynthétiques du second profil. Notes\nfrançaises\n\nKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·\n\nIdentification complète en annexe · aucune quantité supplémentaire.\n\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n5 / 8",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "DOSSIER DE PLIAGE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 168.18336000000002,
+              "height": 16.56
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 281.9577600000001,
+              "height": 8.64
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…",
+              "x": 28.8,
+              "y": 675.36,
+              "width": 301.13856000000015,
+              "height": 8.64
+            },
+            {
+              "text": "A · 4 1/2 po",
+              "x": 241.980194784375,
+              "y": 407.664,
+              "width": 49.64975999999994,
+              "height": 9.72
+            },
+            {
+              "text": "B · 1 3/4 po",
+              "x": 326.201062950399,
+              "y": 504.61177821562194,
+              "width": 49.64975999999974,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "C · 2 1/8 po",
+              "x": 365.28262898111706,
+              "y": 519.448251273402,
+              "width": 50.194079999999964,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "D · 1 1/2 po",
+              "x": 443.727190473402,
+              "y": 580.6652654188829,
+              "width": 50.19407999999991,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "MATÉRIAU / FINI",
+              "x": 28.8,
+              "y": 357.84,
+              "width": 69.04224,
+              "height": 8.64
+            },
+            {
+              "text": "Aluminium",
+              "x": 28.8,
+              "y": 339.84,
+              "width": 50.3928,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "0.6096 mm",
+              "x": 28.8,
+              "y": 324.72,
+              "width": 54.00000000000001,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Kaycan",
+              "x": 28.8,
+              "y": 309.6,
+              "width": 36.007200000000005,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Noir officiel QA",
+              "x": 28.8,
+              "y": 294.48,
+              "width": 71.94959999999999,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Code QC-QA-123",
+              "x": 28.8,
+              "y": 279.36,
+              "width": 85.7844,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "QUANTITÉ / LONGUEUR",
+              "x": 360,
+              "y": 357.84,
+              "width": 100.6992,
+              "height": 8.64
+            },
+            {
+              "text": "17 pièce(s)",
+              "x": 360,
+              "y": 336.24,
+              "width": 81.82943999999998,
+              "height": 15.84
+            },
+            {
+              "text": "132 po",
+              "x": 360,
+              "y": 315.36,
+              "width": 39.61872000000001,
+              "height": 12.959999999999999
+            },
+            {
+              "text": "COTES FINIES ET POINTS À VALIDER",
+              "x": 28.8,
+              "y": 241.92000000000007,
+              "width": 156.7728,
+              "height": 8.64
+            },
+            {
+              "text": "A = 4 1/2 po",
+              "x": 28.8,
+              "y": 223.20000000000005,
+              "width": 50.67504,
+              "height": 9.36
+            },
+            {
+              "text": "Pli A–B = 86°",
+              "x": 28.8,
+              "y": 210.24,
+              "width": 55.43928,
+              "height": 9.36
+            },
+            {
+              "text": "B = 1 3/4 po",
+              "x": 28.8,
+              "y": 197.27999999999997,
+              "width": 50.67504,
+              "height": 9.36
+            },
+            {
+              "text": "Pli B–C = 92°",
+              "x": 28.8,
+              "y": 184.32000000000005,
+              "width": 55.96343999999999,
+              "height": 9.36
+            },
+            {
+              "text": "C = 2 1/8 po",
+              "x": 28.8,
+              "y": 171.36,
+              "width": 51.1992,
+              "height": 9.36
+            },
+            {
+              "text": "Pli C–D = 90°",
+              "x": 28.8,
+              "y": 158.39999999999998,
+              "width": 56.48759999999999,
+              "height": 9.36
+            },
+            {
+              "text": "D = 1 1/2 po",
+              "x": 28.8,
+              "y": 145.44000000000005,
+              "width": 51.1992,
+              "height": 9.36
+            },
+            {
+              "text": "Développé total = 9 7/8 po (nominal)",
+              "x": 28.8,
+              "y": 132.48000000000002,
+              "width": 151.04232000000005,
+              "height": 9.36
+            },
+            {
+              "text": "Face colorée : Face 1 — côté indiqué par",
+              "x": 28.8,
+              "y": 119.51999999999998,
+              "width": 171.56880000000012,
+              "height": 9.36
+            },
+            {
+              "text": "l’étoile",
+              "x": 28.8,
+              "y": 106.55999999999995,
+              "width": 26.51688,
+              "height": 9.36
+            },
+            {
+              "text": "Notes françaises synthétiques du second",
+              "x": 309.6,
+              "y": 223.20000000000005,
+              "width": 170.56727999999998,
+              "height": 9.36
+            },
+            {
+              "text": "profil. Notes françaises synthétiques du",
+              "x": 309.6,
+              "y": 210.24,
+              "width": 163.25711999999996,
+              "height": 9.36
+            },
+            {
+              "text": "second",
+              "x": 309.6,
+              "y": 197.27999999999997,
+              "width": 30.176640000000003,
+              "height": 9.36
+            },
+            {
+              "text": "profil. Notes françaises synthétiques du",
+              "x": 309.6,
+              "y": 184.32000000000005,
+              "width": 163.25711999999996,
+              "height": 9.36
+            },
+            {
+              "text": "second profil. Notes françaises",
+              "x": 309.6,
+              "y": 171.36,
+              "width": 127.90439999999997,
+              "height": 9.36
+            },
+            {
+              "text": "synthétiques",
+              "x": 309.6,
+              "y": 158.39999999999998,
+              "width": 52.52832,
+              "height": 9.36
+            },
+            {
+              "text": "du second profil. Notes françaises",
+              "x": 309.6,
+              "y": 145.44000000000005,
+              "width": 140.90543999999994,
+              "height": 9.36
+            },
+            {
+              "text": "synthétiques du second profil. Notes",
+              "x": 309.6,
+              "y": 132.48000000000002,
+              "width": 150.78959999999995,
+              "height": 9.36
+            },
+            {
+              "text": "françaises",
+              "x": 309.6,
+              "y": 119.51999999999998,
+              "width": 42.64416000000001,
+              "height": 9.36
+            },
+            {
+              "text": "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 539.2900799999995,
+              "height": 10.08
+            },
+            {
+              "text": "Identification complète en annexe · aucune quantité supplémentaire.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 239.35823999999982,
+              "height": 7.92
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "5 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 6,
+          "text": "17 nov. 2026\n\nIDENTIFICATION DU DOSSIER\n\nAnnexe au document précédent\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB\nKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·\nQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ\nRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\nSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B\nCommande : XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX · Chantier :\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB · Chef :\nDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\nEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEED · Date :\nFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF · Révision :\nGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG\n\nInformations complémentaires seulement · quantités déjà comptées.\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n6 / 8",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "IDENTIFICATION DU DOSSIER",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 239.87159999999994,
+              "height": 16.56
+            },
+            {
+              "text": "Annexe au document précédent",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 122.42016,
+              "height": 8.64
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 328.9507200000003,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·",
+              "x": 28.8,
+              "y": 629.28,
+              "width": 341.2483200000003,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 614.16,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 599.04,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB",
+              "x": 28.8,
+              "y": 583.92,
+              "width": 391.87008,
+              "height": 10.08
+            },
+            {
+              "text": "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·",
+              "x": 28.8,
+              "y": 553.6800000000001,
+              "width": 495.4823999999999,
+              "height": 10.08
+            },
+            {
+              "text": "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ",
+              "x": 28.8,
+              "y": 538.56,
+              "width": 344.6150399999997,
+              "height": 10.08
+            },
+            {
+              "text": "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+              "x": 28.8,
+              "y": 523.44,
+              "width": 320.2214400000001,
+              "height": 10.08
+            },
+            {
+              "text": "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B",
+              "x": 28.8,
+              "y": 508.32,
+              "width": 324.4651200000003,
+              "height": 10.08
+            },
+            {
+              "text": "Commande : XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 478.08,
+              "width": 389.4206400000002,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX · Chantier :",
+              "x": 28.8,
+              "y": 462.96,
+              "width": 387.70704000000035,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 447.84,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 432.72,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB · Chef :",
+              "x": 28.8,
+              "y": 417.6,
+              "width": 427.1097600000001,
+              "height": 10.08
+            },
+            {
+              "text": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+              "x": 28.8,
+              "y": 402.48,
+              "width": 429.3878399999998,
+              "height": 10.08
+            },
+            {
+              "text": "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEED · Date :",
+              "x": 28.8,
+              "y": 387.36,
+              "width": 438.6009600000003,
+              "height": 10.08
+            },
+            {
+              "text": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF · Révision :",
+              "x": 28.8,
+              "y": 372.24,
+              "width": 298.55952000000013,
+              "height": 10.08
+            },
+            {
+              "text": "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+              "x": 28.8,
+              "y": 357.12,
+              "width": 469.92960000000005,
+              "height": 10.08
+            },
+            {
+              "text": "Informations complémentaires seulement · quantités déjà comptées.",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 281.10240000000016,
+              "height": 8.64
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "6 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 7,
+          "text": "17 nov. 2026\n\nDOSSIER DE PLIAGE\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…\n\nsynthétiques du second profil. Notes\nfrançaises synthétiques du second profil.\nNotes\nfrançaises synthétiques du second profil.\nNotes françaises synthétiques du second\nprofil. Notes françaises synthétiques du\nsecond profil. Notes fFIN-NOTE-DEUX\nContinuation — quantité déjà comptée KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK\n\nIdentification complète en annexe · aucune quantité supplémentaire.\n\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n7 / 8",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "DOSSIER DE PLIAGE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 168.18336000000002,
+              "height": 16.56
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 281.9577600000001,
+              "height": 8.64
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…",
+              "x": 28.8,
+              "y": 675.36,
+              "width": 301.13856000000015,
+              "height": 8.64
+            },
+            {
+              "text": "synthétiques du second profil. Notes",
+              "x": 28.8,
+              "y": 604.8,
+              "width": 162.38879999999992,
+              "height": 10.08
+            },
+            {
+              "text": "françaises synthétiques du second profil.",
+              "x": 28.8,
+              "y": 588.96,
+              "width": 181.99439999999993,
+              "height": 10.08
+            },
+            {
+              "text": "Notes",
+              "x": 28.8,
+              "y": 573.12,
+              "width": 26.31888,
+              "height": 10.08
+            },
+            {
+              "text": "françaises synthétiques du second profil.",
+              "x": 28.8,
+              "y": 557.28,
+              "width": 181.99439999999993,
+              "height": 10.08
+            },
+            {
+              "text": "Notes françaises synthétiques du second",
+              "x": 28.8,
+              "y": 541.44,
+              "width": 183.6878399999999,
+              "height": 10.08
+            },
+            {
+              "text": "profil. Notes françaises synthétiques du",
+              "x": 28.8,
+              "y": 525.6,
+              "width": 175.81535999999994,
+              "height": 10.08
+            },
+            {
+              "text": "second profil. Notes fFIN-NOTE-DEUX",
+              "x": 28.8,
+              "y": 509.76,
+              "width": 173.49696000000006,
+              "height": 10.08
+            },
+            {
+              "text": "Continuation — quantité déjà comptée KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 470.6855999999994,
+              "height": 10.08
+            },
+            {
+              "text": "Identification complète en annexe · aucune quantité supplémentaire.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 239.35823999999982,
+              "height": 7.92
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "7 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 8,
+          "text": "17 nov. 2026\n\nIDENTIFICATION DU DOSSIER\n\nAnnexe au document précédent\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB\nContinuation — quantité déjà comptée KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK\nLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·\nQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ\nRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\nSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B\nBloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.\n\nInformations complémentaires seulement · quantités déjà comptées.\nDemande de soumission · validation MIR requise avant fabrication.\n\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n \n8 / 8",
+          "bounds": [
+            {
+              "text": "17 nov. 2026",
+              "x": 529.7684765624999,
+              "y": 756.72,
+              "width": 54.09143999999996,
+              "height": 9.36
+            },
+            {
+              "text": "IDENTIFICATION DU DOSSIER",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 239.87159999999994,
+              "height": 16.56
+            },
+            {
+              "text": "Annexe au document précédent",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 122.42016,
+              "height": 8.64
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 328.9507200000003,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·",
+              "x": 28.8,
+              "y": 629.28,
+              "width": 341.2483200000003,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 614.16,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 599.04,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB",
+              "x": 28.8,
+              "y": 583.92,
+              "width": 391.87008,
+              "height": 10.08
+            },
+            {
+              "text": "Continuation — quantité déjà comptée KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+              "x": 28.8,
+              "y": 553.6800000000001,
+              "width": 435.9700799999998,
+              "height": 10.08
+            },
+            {
+              "text": "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·",
+              "x": 28.8,
+              "y": 538.56,
+              "width": 230.87231999999992,
+              "height": 10.08
+            },
+            {
+              "text": "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ",
+              "x": 28.8,
+              "y": 523.44,
+              "width": 344.6150399999997,
+              "height": 10.08
+            },
+            {
+              "text": "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+              "x": 28.8,
+              "y": 508.32,
+              "width": 320.2214400000001,
+              "height": 10.08
+            },
+            {
+              "text": "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B",
+              "x": 28.8,
+              "y": 493.2,
+              "width": 324.4651200000003,
+              "height": 10.08
+            },
+            {
+              "text": "Bloc complémentaire seulement · aucun dessin, matériau, longueur ou quantité répété.",
+              "x": 28.8,
+              "y": 462.96,
+              "width": 387.4953599999999,
+              "height": 10.08
+            },
+            {
+              "text": "Informations complémentaires seulement · quantités déjà comptées.",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 281.10240000000016,
+              "height": 8.64
+            },
+            {
+              "text": "Demande de soumission · validation MIR requise avant fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 255.8131200000002,
+              "height": 8.64
+            },
+            {
+              "text": "Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 226.13183999999998,
+              "height": 7.92
+            },
+            {
+              "text": "8 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        }
+      ]
+    },
+    {
+      "locale": "en-CA",
+      "order": {
+        "poNumber": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX",
+        "project": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB",
+        "foreman": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEED",
+        "date": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+        "revision": "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "items": [
+          {
+            "kind": "profile",
+            "template": "custom",
+            "unit": "in",
+            "startAngle": 0,
+            "material": {
+              "type": "aluminium",
+              "name": "Aluminium QA",
+              "thickness": 0.024,
+              "thicknessUnit": "in"
+            },
+            "finish": {
+              "system": "manufacturer",
+              "manufacturer": "Kaycan",
+              "name": "Noir officiel QA",
+              "code": "QC-QA-123",
+              "selectionType": "manufacturer"
+            },
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            },
+            "id": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI",
+            "name": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A",
+            "quantity": 13,
+            "length": 120,
+            "segments": [
+              {
+                "label": "A",
+                "length": 2
+              },
+              {
+                "label": "B",
+                "length": 1.5
+              },
+              {
+                "label": "C",
+                "length": 1.5
+              },
+              {
+                "label": "D",
+                "length": 1.25
+              }
+            ],
+            "bends": [
+              {
+                "mode": "signed",
+                "angle": -90
+              },
+              {
+                "mode": "hem",
+                "direction": "right"
+              },
+              {
+                "mode": "signed",
+                "angle": 90
+              }
+            ],
+            "note": "Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil. Notes françaises synthétiques du premier profil.FIN-NOTE-UN"
+          },
+          {
+            "kind": "profile",
+            "template": "custom",
+            "unit": "in",
+            "startAngle": 0,
+            "material": {
+              "type": "aluminium",
+              "name": "Aluminium QA",
+              "thickness": 0.024,
+              "thicknessUnit": "in"
+            },
+            "finish": {
+              "system": "manufacturer",
+              "manufacturer": "Kaycan",
+              "name": "Noir officiel QA",
+              "code": "QC-QA-123",
+              "selectionType": "manufacturer"
+            },
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            },
+            "id": "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK",
+            "name": "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B",
+            "quantity": 17,
+            "length": 132,
+            "segments": [
+              {
+                "label": "A",
+                "length": 4.5
+              },
+              {
+                "label": "B",
+                "length": 1.75
+              },
+              {
+                "label": "C",
+                "length": 2.125
+              },
+              {
+                "label": "D",
+                "length": 1.5
+              }
+            ],
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 86,
+                "direction": "left"
+              },
+              {
+                "mode": "interior",
+                "angle": 92,
+                "direction": "right"
+              },
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left"
+              }
+            ],
+            "note": "Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes françaises synthétiques du second profil. Notes fFIN-NOTE-DEUX"
+          }
+        ]
+      },
+      "normalizedFieldsPreserved": true,
+      "inputUnchanged": true,
+      "storageUnchanged": true,
+      "facesUnchanged": true,
+      "modelUnchanged": true,
+      "sourceFaces": [
+        {
+          "name": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI · NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A",
+          "continuation": false
+        },
+        {
+          "name": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI · Continuation",
+          "continuation": true
+        },
+        {
+          "name": "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK · QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B",
+          "continuation": false
+        },
+        {
+          "name": "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK · Continuation",
+          "continuation": true
+        }
+      ],
+      "pages": [
+        {
+          "page": 1,
+          "text": "Nov 17, 2026\n\nCUSTOM BENDING FILE\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…\n\nA · 2 in.\nB · 1 1/2 in.\nC · 1 1/2 in.\nD · 1 1/4 in.\n\nMATERIAL / FINISH\n\nAluminum\n0.6096 mm\nKaycan\nNoir officiel QA\nCode QC-QA-123\n\nQUANTITY / LENGTH\n\n13 pieces\n\n120 in.\n\nFINISHED DIMENSIONS AND ITEMS TO VERIFY\n\nA = 2 in.\nBend A–B = 90°\nB = 1 1/2 in.\nBend B–C = 180° — hem\nC = 1 1/2 in.\nBend C–D = 90°\nD = 1 1/4 in.\nDeveloped length = 6 1/4 in. (nominal)\nPainted face: Face 1 — side marked by\nthe star\nNotes françaises synthétiques du premier\nprofil. Notes françaises synthétiques du\npremier profil. Notes françaises\nsynthétiques du premier profil. Notes\nfrançaises\nsynthétiques du premier profil. Notes\nfrançaises synthétiques du premier profil.\nNotes\nfrançaises synthétiques du premier profil.\nNotes françaises synthétiques du premier\n\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·\n\nFull identification in appendix · no additional quantity.\n\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n1 / 8",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "CUSTOM BENDING FILE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 193.0068,
+              "height": 16.56
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 281.9577600000001,
+              "height": 8.64
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…",
+              "x": 28.8,
+              "y": 675.36,
+              "width": 301.13856000000015,
+              "height": 8.64
+            },
+            {
+              "text": "A · 2 in.",
+              "x": 305.07356250000004,
+              "y": 543.744,
+              "width": 32.90219999999993,
+              "height": 9.72
+            },
+            {
+              "text": "B · 1 1/2 in.",
+              "x": 414.216,
+              "y": 524.264765625,
+              "width": 49.09571999999986,
+              "height": 9.72
+            },
+            {
+              "text": "C · 1 1/2 in.",
+              "x": 366.264,
+              "y": 524.532919921875,
+              "width": 49.64003999999992,
+              "height": 9.72
+            },
+            {
+              "text": "D · 1 1/4 in.",
+              "x": 277.58308007812496,
+              "y": 585.216,
+              "width": 49.64003999999992,
+              "height": 9.72
+            },
+            {
+              "text": "MATERIAL / FINISH",
+              "x": 28.8,
+              "y": 357.84,
+              "width": 80.06688000000001,
+              "height": 8.64
+            },
+            {
+              "text": "Aluminum",
+              "x": 28.8,
+              "y": 339.84,
+              "width": 47.995200000000004,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "0.6096 mm",
+              "x": 28.8,
+              "y": 324.72,
+              "width": 54.00000000000001,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Kaycan",
+              "x": 28.8,
+              "y": 309.6,
+              "width": 36.007200000000005,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Noir officiel QA",
+              "x": 28.8,
+              "y": 294.48,
+              "width": 71.94959999999999,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Code QC-QA-123",
+              "x": 28.8,
+              "y": 279.36,
+              "width": 85.7844,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "QUANTITY / LENGTH",
+              "x": 360,
+              "y": 357.84,
+              "width": 86.78016000000002,
+              "height": 8.64
+            },
+            {
+              "text": "13 pieces",
+              "x": 360,
+              "y": 336.24,
+              "width": 71.27999999999999,
+              "height": 15.84
+            },
+            {
+              "text": "120 in.",
+              "x": 360,
+              "y": 315.36,
+              "width": 38.88000000000001,
+              "height": 12.959999999999999
+            },
+            {
+              "text": "FINISHED DIMENSIONS AND ITEMS TO VERIFY",
+              "x": 28.8,
+              "y": 241.92000000000007,
+              "width": 195.15167999999997,
+              "height": 8.64
+            },
+            {
+              "text": "A = 2 in.",
+              "x": 28.8,
+              "y": 223.20000000000005,
+              "width": 34.547760000000004,
+              "height": 9.36
+            },
+            {
+              "text": "Bend A–B = 90°",
+              "x": 28.8,
+              "y": 210.24,
+              "width": 66.89591999999999,
+              "height": 9.36
+            },
+            {
+              "text": "B = 1 1/2 in.",
+              "x": 28.8,
+              "y": 197.27999999999997,
+              "width": 50.14152,
+              "height": 9.36
+            },
+            {
+              "text": "Bend B–C = 180° — hem",
+              "x": 28.8,
+              "y": 184.32000000000005,
+              "width": 105.37488,
+              "height": 9.36
+            },
+            {
+              "text": "C = 1 1/2 in.",
+              "x": 28.8,
+              "y": 171.36,
+              "width": 50.665679999999995,
+              "height": 9.36
+            },
+            {
+              "text": "Bend C–D = 90°",
+              "x": 28.8,
+              "y": 158.39999999999998,
+              "width": 67.94424000000001,
+              "height": 9.36
+            },
+            {
+              "text": "D = 1 1/4 in.",
+              "x": 28.8,
+              "y": 145.44000000000005,
+              "width": 50.665679999999995,
+              "height": 9.36
+            },
+            {
+              "text": "Developed length = 6 1/4 in. (nominal)",
+              "x": 28.8,
+              "y": 132.48000000000002,
+              "width": 158.32440000000005,
+              "height": 9.36
+            },
+            {
+              "text": "Painted face: Face 1 — side marked by",
+              "x": 28.8,
+              "y": 119.51999999999998,
+              "width": 163.7625600000001,
+              "height": 9.36
+            },
+            {
+              "text": "the star",
+              "x": 28.8,
+              "y": 106.55999999999995,
+              "width": 31.18752,
+              "height": 9.36
+            },
+            {
+              "text": "Notes françaises synthétiques du premier",
+              "x": 309.6,
+              "y": 223.20000000000005,
+              "width": 172.11167999999998,
+              "height": 9.36
+            },
+            {
+              "text": "profil. Notes françaises synthétiques du",
+              "x": 309.6,
+              "y": 210.24,
+              "width": 163.25711999999996,
+              "height": 9.36
+            },
+            {
+              "text": "premier profil. Notes françaises",
+              "x": 309.6,
+              "y": 197.27999999999997,
+              "width": 129.44879999999998,
+              "height": 9.36
+            },
+            {
+              "text": "synthétiques du premier profil. Notes",
+              "x": 309.6,
+              "y": 184.32000000000005,
+              "width": 152.33399999999995,
+              "height": 9.36
+            },
+            {
+              "text": "françaises",
+              "x": 309.6,
+              "y": 171.36,
+              "width": 42.64416000000001,
+              "height": 9.36
+            },
+            {
+              "text": "synthétiques du premier profil. Notes",
+              "x": 309.6,
+              "y": 158.39999999999998,
+              "width": 152.33399999999995,
+              "height": 9.36
+            },
+            {
+              "text": "françaises synthétiques du premier profil.",
+              "x": 309.6,
+              "y": 145.44000000000005,
+              "width": 170.53919999999997,
+              "height": 9.36
+            },
+            {
+              "text": "Notes",
+              "x": 309.6,
+              "y": 132.48000000000002,
+              "width": 24.43896,
+              "height": 9.36
+            },
+            {
+              "text": "françaises synthétiques du premier profil.",
+              "x": 309.6,
+              "y": 119.51999999999998,
+              "width": 170.53919999999997,
+              "height": 9.36
+            },
+            {
+              "text": "Notes françaises synthétiques du premier",
+              "x": 309.6,
+              "y": 106.55999999999995,
+              "width": 172.11167999999998,
+              "height": 9.36
+            },
+            {
+              "text": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 338.63759999999974,
+              "height": 10.08
+            },
+            {
+              "text": "Full identification in appendix · no additional quantity.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 185.20919999999995,
+              "height": 7.92
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "1 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 2,
+          "text": "Nov 17, 2026\n\nFILE IDENTIFICATION\n\nAppendix to the preceding document\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·\nNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\nOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\nPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A\nOrder: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX · Jobsite:\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB · Foreman:\nDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\nEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEED · Date:\nFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF · Revision:\nGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG\n\nAdditional information only · quantities already counted.\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n2 / 8",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "FILE IDENTIFICATION",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 172.73736,
+              "height": 16.56
+            },
+            {
+              "text": "Appendix to the preceding document",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 140.65056,
+              "height": 8.64
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 328.9507200000003,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·",
+              "x": 28.8,
+              "y": 629.28,
+              "width": 341.2483200000003,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 614.16,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 599.04,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB",
+              "x": 28.8,
+              "y": 583.92,
+              "width": 391.87008,
+              "height": 10.08
+            },
+            {
+              "text": "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·",
+              "x": 28.8,
+              "y": 553.6800000000001,
+              "width": 316.62287999999995,
+              "height": 10.08
+            },
+            {
+              "text": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+              "x": 28.8,
+              "y": 538.56,
+              "width": 320.2214400000001,
+              "height": 10.08
+            },
+            {
+              "text": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+              "x": 28.8,
+              "y": 523.44,
+              "width": 344.6150399999997,
+              "height": 10.08
+            },
+            {
+              "text": "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A",
+              "x": 28.8,
+              "y": 508.32,
+              "width": 324.4651200000003,
+              "height": 10.08
+            },
+            {
+              "text": "Order: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 478.08,
+              "width": 360.2894400000003,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX · Jobsite:",
+              "x": 28.8,
+              "y": 462.96,
+              "width": 378.75600000000037,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 447.84,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 432.72,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB · Foreman:",
+              "x": 28.8,
+              "y": 417.6,
+              "width": 443.3587200000001,
+              "height": 10.08
+            },
+            {
+              "text": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+              "x": 28.8,
+              "y": 402.48,
+              "width": 429.3878399999998,
+              "height": 10.08
+            },
+            {
+              "text": "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEED · Date:",
+              "x": 28.8,
+              "y": 387.36,
+              "width": 435.8088000000003,
+              "height": 10.08
+            },
+            {
+              "text": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF · Revision:",
+              "x": 28.8,
+              "y": 372.24,
+              "width": 295.7673600000001,
+              "height": 10.08
+            },
+            {
+              "text": "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+              "x": 28.8,
+              "y": 357.12,
+              "width": 469.92960000000005,
+              "height": 10.08
+            },
+            {
+              "text": "Additional information only · quantities already counted.",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 231.10272000000006,
+              "height": 8.64
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "2 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 3,
+          "text": "Nov 17, 2026\n\nCUSTOM BENDING FILE\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…\n\nprofil. Notes françaises synthétiques du\npremier profil. Notes françaises\nsynthétiques\ndu premier profil. Notes françaises\nsynthétiques du premier profil.FIN-NOTE-UN\nContinued — quantity already counted IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·\n\nFull identification in appendix · no additional quantity.\n\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n3 / 8",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "CUSTOM BENDING FILE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 193.0068,
+              "height": 16.56
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 281.9577600000001,
+              "height": 8.64
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…",
+              "x": 28.8,
+              "y": 675.36,
+              "width": 301.13856000000015,
+              "height": 8.64
+            },
+            {
+              "text": "profil. Notes françaises synthétiques du",
+              "x": 28.8,
+              "y": 604.8,
+              "width": 175.81535999999994,
+              "height": 10.08
+            },
+            {
+              "text": "premier profil. Notes françaises",
+              "x": 28.8,
+              "y": 588.96,
+              "width": 139.4064,
+              "height": 10.08
+            },
+            {
+              "text": "synthétiques",
+              "x": 28.8,
+              "y": 573.12,
+              "width": 56.56896,
+              "height": 10.08
+            },
+            {
+              "text": "du premier profil. Notes françaises",
+              "x": 28.8,
+              "y": 557.28,
+              "width": 153.40752,
+              "height": 10.08
+            },
+            {
+              "text": "synthétiques du premier profil.FIN-NOTE-UN",
+              "x": 28.8,
+              "y": 541.44,
+              "width": 200.40048000000004,
+              "height": 10.08
+            },
+            {
+              "text": "Continued — quantity already counted IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 526.0550399999994,
+              "height": 10.08
+            },
+            {
+              "text": "Full identification in appendix · no additional quantity.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 185.20919999999995,
+              "height": 7.92
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "3 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 4,
+          "text": "Nov 17, 2026\n\nFILE IDENTIFICATION\n\nAppendix to the preceding document\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB\nContinued — quantity already counted IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·\nNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\nOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\nPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A\nAdditional information only · no drawing, material, length or quantity repeated.\n\nAdditional information only · quantities already counted.\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n4 / 8",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "FILE IDENTIFICATION",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 172.73736,
+              "height": 16.56
+            },
+            {
+              "text": "Appendix to the preceding document",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 140.65056,
+              "height": 8.64
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 328.9507200000003,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·",
+              "x": 28.8,
+              "y": 629.28,
+              "width": 341.2483200000003,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 614.16,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 599.04,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB",
+              "x": 28.8,
+              "y": 583.92,
+              "width": 391.87008,
+              "height": 10.08
+            },
+            {
+              "text": "Continued — quantity already counted IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJI ·",
+              "x": 28.8,
+              "y": 553.6800000000001,
+              "width": 490.7851199999996,
+              "height": 10.08
+            },
+            {
+              "text": "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+              "x": 28.8,
+              "y": 538.56,
+              "width": 320.2214400000001,
+              "height": 10.08
+            },
+            {
+              "text": "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+              "x": 28.8,
+              "y": 523.44,
+              "width": 344.6150399999997,
+              "height": 10.08
+            },
+            {
+              "text": "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP FIN-A",
+              "x": 28.8,
+              "y": 508.32,
+              "width": 324.4651200000003,
+              "height": 10.08
+            },
+            {
+              "text": "Additional information only · no drawing, material, length or quantity repeated.",
+              "x": 28.8,
+              "y": 478.08,
+              "width": 345.4516799999998,
+              "height": 10.08
+            },
+            {
+              "text": "Additional information only · quantities already counted.",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 231.10272000000006,
+              "height": 8.64
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "4 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 5,
+          "text": "Nov 17, 2026\n\nCUSTOM BENDING FILE\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…\n\nA · 4 1/2 in.\nB · 1 3/4 in.\nC · 2 1/8 in.\nD · 1 1/2 in.\n\nMATERIAL / FINISH\n\nAluminum\n0.6096 mm\nKaycan\nNoir officiel QA\nCode QC-QA-123\n\nQUANTITY / LENGTH\n\n17 pieces\n\n132 in.\n\nFINISHED DIMENSIONS AND ITEMS TO VERIFY\n\nA = 4 1/2 in.\nBend A–B = 86°\nB = 1 3/4 in.\nBend B–C = 92°\nC = 2 1/8 in.\nBend C–D = 90°\nD = 1 1/2 in.\nDeveloped length = 9 7/8 in. (nominal)\nPainted face: Face 1 — side marked by\nthe star\nNotes françaises synthétiques du second\nprofil. Notes françaises synthétiques du\nsecond\nprofil. Notes françaises synthétiques du\nsecond profil. Notes françaises\nsynthétiques\ndu second profil. Notes françaises\nsynthétiques du second profil. Notes\nfrançaises\n\nKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·\n\nFull identification in appendix · no additional quantity.\n\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n5 / 8",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "CUSTOM BENDING FILE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 193.0068,
+              "height": 16.56
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 281.9577600000001,
+              "height": 8.64
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…",
+              "x": 28.8,
+              "y": 675.36,
+              "width": 301.13856000000015,
+              "height": 8.64
+            },
+            {
+              "text": "A · 4 1/2 in.",
+              "x": 242.25309517500003,
+              "y": 407.664,
+              "width": 49.095719999999965,
+              "height": 9.72
+            },
+            {
+              "text": "B · 1 3/4 in.",
+              "x": 326.2200995193324,
+              "y": 504.33954259663255,
+              "width": 49.0957199999999,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "C · 2 1/8 in.",
+              "x": 365.55403439484814,
+              "y": 519.4767771318591,
+              "width": 49.64004000000002,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "D · 1 1/2 in.",
+              "x": 443.7557163318592,
+              "y": 580.3938600051519,
+              "width": 49.640040000000134,
+              "height": 9.719999999999999
+            },
+            {
+              "text": "MATERIAL / FINISH",
+              "x": 28.8,
+              "y": 357.84,
+              "width": 80.06688000000001,
+              "height": 8.64
+            },
+            {
+              "text": "Aluminum",
+              "x": 28.8,
+              "y": 339.84,
+              "width": 47.995200000000004,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "0.6096 mm",
+              "x": 28.8,
+              "y": 324.72,
+              "width": 54.00000000000001,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Kaycan",
+              "x": 28.8,
+              "y": 309.6,
+              "width": 36.007200000000005,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Noir officiel QA",
+              "x": 28.8,
+              "y": 294.48,
+              "width": 71.94959999999999,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "Code QC-QA-123",
+              "x": 28.8,
+              "y": 279.36,
+              "width": 85.7844,
+              "height": 10.799999999999999
+            },
+            {
+              "text": "QUANTITY / LENGTH",
+              "x": 360,
+              "y": 357.84,
+              "width": 86.78016000000002,
+              "height": 8.64
+            },
+            {
+              "text": "17 pieces",
+              "x": 360,
+              "y": 336.24,
+              "width": 71.27999999999999,
+              "height": 15.84
+            },
+            {
+              "text": "132 in.",
+              "x": 360,
+              "y": 315.36,
+              "width": 38.88000000000001,
+              "height": 12.959999999999999
+            },
+            {
+              "text": "FINISHED DIMENSIONS AND ITEMS TO VERIFY",
+              "x": 28.8,
+              "y": 241.92000000000007,
+              "width": 195.15167999999997,
+              "height": 8.64
+            },
+            {
+              "text": "A = 4 1/2 in.",
+              "x": 28.8,
+              "y": 223.20000000000005,
+              "width": 50.14152,
+              "height": 9.36
+            },
+            {
+              "text": "Bend A–B = 86°",
+              "x": 28.8,
+              "y": 210.24,
+              "width": 66.89591999999999,
+              "height": 9.36
+            },
+            {
+              "text": "B = 1 3/4 in.",
+              "x": 28.8,
+              "y": 197.27999999999997,
+              "width": 50.14152,
+              "height": 9.36
+            },
+            {
+              "text": "Bend B–C = 92°",
+              "x": 28.8,
+              "y": 184.32000000000005,
+              "width": 67.42008,
+              "height": 9.36
+            },
+            {
+              "text": "C = 2 1/8 in.",
+              "x": 28.8,
+              "y": 171.36,
+              "width": 50.665679999999995,
+              "height": 9.36
+            },
+            {
+              "text": "Bend C–D = 90°",
+              "x": 28.8,
+              "y": 158.39999999999998,
+              "width": 67.94424000000001,
+              "height": 9.36
+            },
+            {
+              "text": "D = 1 1/2 in.",
+              "x": 28.8,
+              "y": 145.44000000000005,
+              "width": 50.665679999999995,
+              "height": 9.36
+            },
+            {
+              "text": "Developed length = 9 7/8 in. (nominal)",
+              "x": 28.8,
+              "y": 132.48000000000002,
+              "width": 158.32440000000005,
+              "height": 9.36
+            },
+            {
+              "text": "Painted face: Face 1 — side marked by",
+              "x": 28.8,
+              "y": 119.51999999999998,
+              "width": 163.7625600000001,
+              "height": 9.36
+            },
+            {
+              "text": "the star",
+              "x": 28.8,
+              "y": 106.55999999999995,
+              "width": 31.18752,
+              "height": 9.36
+            },
+            {
+              "text": "Notes françaises synthétiques du second",
+              "x": 309.6,
+              "y": 223.20000000000005,
+              "width": 170.56727999999998,
+              "height": 9.36
+            },
+            {
+              "text": "profil. Notes françaises synthétiques du",
+              "x": 309.6,
+              "y": 210.24,
+              "width": 163.25711999999996,
+              "height": 9.36
+            },
+            {
+              "text": "second",
+              "x": 309.6,
+              "y": 197.27999999999997,
+              "width": 30.176640000000003,
+              "height": 9.36
+            },
+            {
+              "text": "profil. Notes françaises synthétiques du",
+              "x": 309.6,
+              "y": 184.32000000000005,
+              "width": 163.25711999999996,
+              "height": 9.36
+            },
+            {
+              "text": "second profil. Notes françaises",
+              "x": 309.6,
+              "y": 171.36,
+              "width": 127.90439999999997,
+              "height": 9.36
+            },
+            {
+              "text": "synthétiques",
+              "x": 309.6,
+              "y": 158.39999999999998,
+              "width": 52.52832,
+              "height": 9.36
+            },
+            {
+              "text": "du second profil. Notes françaises",
+              "x": 309.6,
+              "y": 145.44000000000005,
+              "width": 140.90543999999994,
+              "height": 9.36
+            },
+            {
+              "text": "synthétiques du second profil. Notes",
+              "x": 309.6,
+              "y": 132.48000000000002,
+              "width": 150.78959999999995,
+              "height": 9.36
+            },
+            {
+              "text": "françaises",
+              "x": 309.6,
+              "y": 119.51999999999998,
+              "width": 42.64416000000001,
+              "height": 9.36
+            },
+            {
+              "text": "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 539.2900799999995,
+              "height": 10.08
+            },
+            {
+              "text": "Full identification in appendix · no additional quantity.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 185.20919999999995,
+              "height": 7.92
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "5 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 6,
+          "text": "Nov 17, 2026\n\nFILE IDENTIFICATION\n\nAppendix to the preceding document\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB\nKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·\nQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ\nRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\nSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B\nOrder: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX · Jobsite:\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB · Foreman:\nDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\nEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEED · Date:\nFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF · Revision:\nGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG\n\nAdditional information only · quantities already counted.\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n6 / 8",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "FILE IDENTIFICATION",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 172.73736,
+              "height": 16.56
+            },
+            {
+              "text": "Appendix to the preceding document",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 140.65056,
+              "height": 8.64
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 328.9507200000003,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·",
+              "x": 28.8,
+              "y": 629.28,
+              "width": 341.2483200000003,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 614.16,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 599.04,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB",
+              "x": 28.8,
+              "y": 583.92,
+              "width": 391.87008,
+              "height": 10.08
+            },
+            {
+              "text": "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·",
+              "x": 28.8,
+              "y": 553.6800000000001,
+              "width": 495.4823999999999,
+              "height": 10.08
+            },
+            {
+              "text": "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ",
+              "x": 28.8,
+              "y": 538.56,
+              "width": 344.6150399999997,
+              "height": 10.08
+            },
+            {
+              "text": "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+              "x": 28.8,
+              "y": 523.44,
+              "width": 320.2214400000001,
+              "height": 10.08
+            },
+            {
+              "text": "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B",
+              "x": 28.8,
+              "y": 508.32,
+              "width": 324.4651200000003,
+              "height": 10.08
+            },
+            {
+              "text": "Order: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 478.08,
+              "width": 360.2894400000003,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX · Jobsite:",
+              "x": 28.8,
+              "y": 462.96,
+              "width": 378.75600000000037,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 447.84,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 432.72,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB · Foreman:",
+              "x": 28.8,
+              "y": 417.6,
+              "width": 443.3587200000001,
+              "height": 10.08
+            },
+            {
+              "text": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+              "x": 28.8,
+              "y": 402.48,
+              "width": 429.3878399999998,
+              "height": 10.08
+            },
+            {
+              "text": "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEED · Date:",
+              "x": 28.8,
+              "y": 387.36,
+              "width": 435.8088000000003,
+              "height": 10.08
+            },
+            {
+              "text": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF · Revision:",
+              "x": 28.8,
+              "y": 372.24,
+              "width": 295.7673600000001,
+              "height": 10.08
+            },
+            {
+              "text": "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+              "x": 28.8,
+              "y": 357.12,
+              "width": 469.92960000000005,
+              "height": 10.08
+            },
+            {
+              "text": "Additional information only · quantities already counted.",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 231.10272000000006,
+              "height": 8.64
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "6 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 7,
+          "text": "Nov 17, 2026\n\nCUSTOM BENDING FILE\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…\n\nsynthétiques du second profil. Notes\nfrançaises synthétiques du second profil.\nNotes\nfrançaises synthétiques du second profil.\nNotes françaises synthétiques du second\nprofil. Notes françaises synthétiques du\nsecond profil. Notes fFIN-NOTE-DEUX\nContinued — quantity already counted KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK\n\nFull identification in appendix · no additional quantity.\n\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n7 / 8",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "CUSTOM BENDING FILE",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 193.0068,
+              "height": 16.56
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 281.9577600000001,
+              "height": 8.64
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·…",
+              "x": 28.8,
+              "y": 675.36,
+              "width": 301.13856000000015,
+              "height": 8.64
+            },
+            {
+              "text": "synthétiques du second profil. Notes",
+              "x": 28.8,
+              "y": 604.8,
+              "width": 162.38879999999992,
+              "height": 10.08
+            },
+            {
+              "text": "françaises synthétiques du second profil.",
+              "x": 28.8,
+              "y": 588.96,
+              "width": 181.99439999999993,
+              "height": 10.08
+            },
+            {
+              "text": "Notes",
+              "x": 28.8,
+              "y": 573.12,
+              "width": 26.31888,
+              "height": 10.08
+            },
+            {
+              "text": "françaises synthétiques du second profil.",
+              "x": 28.8,
+              "y": 557.28,
+              "width": 181.99439999999993,
+              "height": 10.08
+            },
+            {
+              "text": "Notes françaises synthétiques du second",
+              "x": 28.8,
+              "y": 541.44,
+              "width": 183.6878399999999,
+              "height": 10.08
+            },
+            {
+              "text": "profil. Notes françaises synthétiques du",
+              "x": 28.8,
+              "y": 525.6,
+              "width": 175.81535999999994,
+              "height": 10.08
+            },
+            {
+              "text": "second profil. Notes fFIN-NOTE-DEUX",
+              "x": 28.8,
+              "y": 509.76,
+              "width": 173.49696000000006,
+              "height": 10.08
+            },
+            {
+              "text": "Continued — quantity already counted KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 471.2500799999995,
+              "height": 10.08
+            },
+            {
+              "text": "Full identification in appendix · no additional quantity.",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 185.20919999999995,
+              "height": 7.92
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "7 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        },
+        {
+          "page": 8,
+          "text": "Nov 17, 2026\n\nFILE IDENTIFICATION\n\nAppendix to the preceding document\n\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\nYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\nCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB\nContinued — quantity already counted KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK\nLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·\nQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ\nRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\nSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B\nAdditional information only · no drawing, material, length or quantity repeated.\n\nAdditional information only · quantities already counted.\nQuote request · MIR approval required before fabrication.\n\nExact dimensions shown. Do not measure from the printed drawing.\n \n8 / 8",
+          "bounds": [
+            {
+              "text": "Nov 17, 2026",
+              "x": 527.5198828125,
+              "y": 756.72,
+              "width": 55.64519999999997,
+              "height": 9.36
+            },
+            {
+              "text": "FILE IDENTIFICATION",
+              "x": 28.8,
+              "y": 700.56,
+              "width": 172.73736,
+              "height": 16.56
+            },
+            {
+              "text": "Appendix to the preceding document",
+              "x": 28.8,
+              "y": 685.44,
+              "width": 140.65056,
+              "height": 8.64
+            },
+            {
+              "text": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "x": 28.8,
+              "y": 644.4,
+              "width": 328.9507200000003,
+              "height": 10.08
+            },
+            {
+              "text": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYX ·",
+              "x": 28.8,
+              "y": 629.28,
+              "width": 341.2483200000003,
+              "height": 10.08
+            },
+            {
+              "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "x": 28.8,
+              "y": 614.16,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+              "x": 28.8,
+              "y": 599.04,
+              "width": 349.0905600000003,
+              "height": 10.08
+            },
+            {
+              "text": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCAB",
+              "x": 28.8,
+              "y": 583.92,
+              "width": 391.87008,
+              "height": 10.08
+            },
+            {
+              "text": "Continued — quantity already counted KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+              "x": 28.8,
+              "y": 553.6800000000001,
+              "width": 435.98015999999984,
+              "height": 10.08
+            },
+            {
+              "text": "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLK ·",
+              "x": 28.8,
+              "y": 538.56,
+              "width": 230.87231999999992,
+              "height": 10.08
+            },
+            {
+              "text": "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ",
+              "x": 28.8,
+              "y": 523.44,
+              "width": 344.6150399999997,
+              "height": 10.08
+            },
+            {
+              "text": "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+              "x": 28.8,
+              "y": 508.32,
+              "width": 320.2214400000001,
+              "height": 10.08
+            },
+            {
+              "text": "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS FIN-B",
+              "x": 28.8,
+              "y": 493.2,
+              "width": 324.4651200000003,
+              "height": 10.08
+            },
+            {
+              "text": "Additional information only · no drawing, material, length or quantity repeated.",
+              "x": 28.8,
+              "y": 462.96,
+              "width": 345.4516799999998,
+              "height": 10.08
+            },
+            {
+              "text": "Additional information only · quantities already counted.",
+              "x": 28.8,
+              "y": 662.4,
+              "width": 231.10272000000006,
+              "height": 8.64
+            },
+            {
+              "text": "Quote request · MIR approval required before fabrication.",
+              "x": 28.8,
+              "y": 41.04000000000008,
+              "width": 218.8425600000001,
+              "height": 8.64
+            },
+            {
+              "text": "Exact dimensions shown. Do not measure from the printed drawing.",
+              "x": 28.8,
+              "y": 26.639999999999986,
+              "width": 237.5603999999999,
+              "height": 7.92
+            },
+            {
+              "text": "8 / 8",
+              "x": 566.38828125,
+              "y": 26.639999999999986,
+              "width": 16.787520000000008,
+              "height": 8.64
+            }
+          ],
+          "paper": [
+            612,
+            792
+          ]
+        }
+      ]
+    }
+  ],
+  "blocked": [
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    }
+  ],
+  "errors": [],
+  "checks": [
+    {
+      "name": "fr-CA normalizedFieldsPreserved",
+      "ok": true
+    },
+    {
+      "name": "fr-CA inputUnchanged",
+      "ok": true
+    },
+    {
+      "name": "fr-CA storageUnchanged",
+      "ok": true
+    },
+    {
+      "name": "fr-CA facesUnchanged",
+      "ok": true
+    },
+    {
+      "name": "fr-CA modelUnchanged",
+      "ok": true
+    },
+    {
+      "name": "fr-CA one document group per source face",
+      "ok": true
+    },
+    {
+      "name": "fr-CA face 1 complete ordered identifier and name",
+      "ok": true
+    },
+    {
+      "name": "fr-CA face 1 complete project and reference",
+      "ok": true
+    },
+    {
+      "name": "fr-CA face 2 complete ordered identifier and name",
+      "ok": true
+    },
+    {
+      "name": "fr-CA face 2 complete project and reference",
+      "ok": true
+    },
+    {
+      "name": "fr-CA continuation 2 no old header over detail area",
+      "ok": true
+    },
+    {
+      "name": "fr-CA face 3 complete ordered identifier and name",
+      "ok": true
+    },
+    {
+      "name": "fr-CA face 3 complete project and reference",
+      "ok": true
+    },
+    {
+      "name": "fr-CA face 4 complete ordered identifier and name",
+      "ok": true
+    },
+    {
+      "name": "fr-CA face 4 complete project and reference",
+      "ok": true
+    },
+    {
+      "name": "fr-CA continuation 4 no old header over detail area",
+      "ok": true
+    },
+    {
+      "name": "fr-CA quantity 13 appears once",
+      "ok": true
+    },
+    {
+      "name": "fr-CA quantity 17 appears once",
+      "ok": true
+    },
+    {
+      "name": "fr-CA retains FIN-NOTE-UN",
+      "ok": true
+    },
+    {
+      "name": "fr-CA retains FIN-NOTE-DEUX",
+      "ok": true
+    },
+    {
+      "name": "fr-CA retains QC-QA-123",
+      "ok": true
+    },
+    {
+      "name": "fr-CA retains Noir officiel QA",
+      "ok": true
+    },
+    {
+      "name": "fr-CA text bounds stay on paper",
+      "ok": true
+    },
+    {
+      "name": "en-CA normalizedFieldsPreserved",
+      "ok": true
+    },
+    {
+      "name": "en-CA inputUnchanged",
+      "ok": true
+    },
+    {
+      "name": "en-CA storageUnchanged",
+      "ok": true
+    },
+    {
+      "name": "en-CA facesUnchanged",
+      "ok": true
+    },
+    {
+      "name": "en-CA modelUnchanged",
+      "ok": true
+    },
+    {
+      "name": "en-CA one document group per source face",
+      "ok": true
+    },
+    {
+      "name": "English continuation heading",
+      "ok": true
+    },
+    {
+      "name": "English continuation notice",
+      "ok": true
+    },
+    {
+      "name": "en-CA face 1 complete ordered identifier and name",
+      "ok": true
+    },
+    {
+      "name": "en-CA face 1 complete project and reference",
+      "ok": true
+    },
+    {
+      "name": "en-CA face 2 complete ordered identifier and name",
+      "ok": true
+    },
+    {
+      "name": "en-CA face 2 complete project and reference",
+      "ok": true
+    },
+    {
+      "name": "en-CA continuation 2 no old header over detail area",
+      "ok": true
+    },
+    {
+      "name": "en-CA face 3 complete ordered identifier and name",
+      "ok": true
+    },
+    {
+      "name": "en-CA face 3 complete project and reference",
+      "ok": true
+    },
+    {
+      "name": "en-CA face 4 complete ordered identifier and name",
+      "ok": true
+    },
+    {
+      "name": "en-CA face 4 complete project and reference",
+      "ok": true
+    },
+    {
+      "name": "en-CA continuation 4 no old header over detail area",
+      "ok": true
+    },
+    {
+      "name": "en-CA quantity 13 appears once",
+      "ok": true
+    },
+    {
+      "name": "en-CA quantity 17 appears once",
+      "ok": true
+    },
+    {
+      "name": "en-CA retains FIN-NOTE-UN",
+      "ok": true
+    },
+    {
+      "name": "en-CA retains FIN-NOTE-DEUX",
+      "ok": true
+    },
+    {
+      "name": "en-CA retains QC-QA-123",
+      "ok": true
+    },
+    {
+      "name": "en-CA retains Noir officiel QA",
+      "ok": true
+    },
+    {
+      "name": "en-CA text bounds stay on paper",
+      "ok": true
+    },
+    {
+      "name": "no JavaScript errors",
+      "ok": true
+    }
+  ],
+  "hashesAtCompletion": {
+    "mir-dossier-pdf.js": "5060ecb6432239db132629686ce4e1c281023c003f912edb8009a9e2a1643503",
+    "production-model.js": "ae3d15fe991cca10d4cf92457a95b21d3be879b9225c5bcd33b603aa32cc77fe",
+    "annotated-pdf.js": "de0a3f7ebcd6971e735d7258ba6137cba425ee84fa033474af842cc357a52a38",
+    "mir-client-i18n.js": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+  }
+}

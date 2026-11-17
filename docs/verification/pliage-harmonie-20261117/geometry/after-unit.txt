@@ -1,0 +1,14 @@
+✔ accrochage 45°/90° relatif au dernier côté dans tous les quadrants (2.618748ms)
+✔ axes absolus et hystérésis conservés, aucun saut à travers ±180° (0.179064ms)
+✔ retour écrasé proposé dès le petit premier rebord, peu importe orientation/échelle (4.995568ms)
+✔ édition existante, sens du hem et deux angles distincts conservés (1.359218ms)
+✔ la reconnaissance ne transforme pas un angle aigu valide en retour écrasé (2.764122ms)
+✔ clic et tap appliquent le même aimant avant l’arrondi de grille (2.120622ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19.549295

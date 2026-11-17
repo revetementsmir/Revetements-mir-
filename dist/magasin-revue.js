@@ -13,7 +13,7 @@
  }
  function imageMarkup(item,photo=photoFor(item)){
    const V=window.MIRMaterialPreview;
-   return V.photoImage(photo,item.name)||V.photoUnavailable();
+   return window.MIRStoreSidingPreviews?.markup(materials.find(m=>m.id===item.materialId))||V.photoImage(photo,item.name)||V.photoUnavailable();
  }
  function options(item,type){
    if(type==='variant')return (item.reviewVariants||[]).map((v,i)=>
@@ -29,7 +29,7 @@
    const annotated=notes.annotations[item.id]||'',hidden=notes.hidden.includes(item.id);
    return '<article class="card'+(item.id==='mir-request-soffit-staples-1in'?' prime':'')+'" data-product="'+safe(item.id)+'">'+
      '<div class="visual mir-catalogue-photo" data-visual>'+imageMarkup(item)+'</div><p class="mir-photo-caption" data-visual-label>'+
-     safe(window.MIRMaterialPreview.photoLabel(photoFor(item)))+'</p><div class="card-body"><h2>'+safe(item.name)+'</h2>'+
+     safe(window.MIRStoreSidingPreviews?.label(materials.find(m=>m.id===item.materialId))||window.MIRMaterialPreview.photoLabel(photoFor(item)))+'</p><div class="card-body"><h2>'+safe(item.name)+'</h2>'+
      (grouped?'<label>Couleur / type<select data-product-variant>'+options(item,'variant')+'</select></label>':'')+
      (format?'<label>'+(item.formatAxis==='diameter'?'Diamètre':'Longueur / format')+'<select data-product-format>'+options(item,'format')+'</select></label>':'')+
      (!format&&!grouped&&item.formats?.length===1?'<small>'+safe(item.formats[0].label||'')+'</small>':'')+
@@ -65,13 +65,14 @@
      '<p>Ajoute des produits pour essayer les choix.</p>')+
     '<p class="subtle">Simulation locale uniquement : aucune commande ou livraison transmise.</p>';
  }
- function updateImage(card){
+ async function updateImage(card){
    const selection=Review.selection(card,byId);
    const item=selection.item||byId(card.dataset.product);
    if(!item)return;
    const colorId=selection.colorId||card.querySelector('[data-product-color]')?.value;
-   const color=item.storeColors?.find(option=>option.id===colorId);
+   const color=item.storeColors?.find(option=>option.id===colorId)||item.colors?.find(option=>option.id===colorId);
    const V=window.MIRMaterialPreview;
+   if(await window.MIRStoreSidingPreviews?.render(card.querySelector('[data-visual]'),card.querySelector('[data-visual-label]'),materials.find(m=>m.id===item.materialId),color))return;
    const photo=color?.variantImage?{src:color.variantImage,assetKind:'supplier_product_photo',alt:item.name+' · '+color.name}:color?null:photoFor(item);
    card.querySelector('[data-visual]').innerHTML=imageMarkup(item,photo);
    card.querySelector('[data-visual-label]').textContent=color?.variantImage?'Photo de la variante · '+color.name:

@@ -1,0 +1,344 @@
+{
+  "createdAt": "2026-11-17T16:18:17.059Z",
+  "phase": "before",
+  "site": "/tmp/mir-samples-before-20261117/dist",
+  "network": "Local GET only; no external actions",
+  "results": [
+    {
+      "scene": "brands-jdp",
+      "page": "boutique.html?view=brands",
+      "width": 1440,
+      "file": "before-brands-jdp-1440.png",
+      "metrics": {
+        "width": 421.328125,
+        "height": 280.875,
+        "ratio": 1.500055629728527,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/jdp-akta-portobello.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "brands-rialux",
+      "page": "boutique.html?view=brands",
+      "width": 1440,
+      "file": "before-brands-rialux-1440.png",
+      "metrics": {
+        "width": 421.34375,
+        "height": 280.890625,
+        "ratio": 1.5000278133170162,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/rialux-tiago-ecorce-sample.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "jdp-cards",
+      "page": "boutique.html?brand=JDP%20%2F%20Juste%20du%20Pin&view=all",
+      "width": 1440,
+      "file": "before-jdp-cards-1440.png",
+      "metrics": {
+        "width": 421.328125,
+        "height": 280.875,
+        "ratio": 1.500055629728527,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/jdp-akta-portobello.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "rialux-cards",
+      "page": "boutique.html?brand=Rialux&view=all",
+      "width": 1440,
+      "file": "before-rialux-cards-1440.png",
+      "metrics": {
+        "width": 421.328125,
+        "height": 280.875,
+        "ratio": 1.500055629728527,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/rialux-bosco-beige-dune-sample.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "akta",
+      "page": "produit.html?id=jdp-akta-306-antique",
+      "width": 1440,
+      "file": "before-akta-1440.png",
+      "metrics": {
+        "width": 540,
+        "height": 540,
+        "ratio": 1,
+        "sources": [
+          "http://127.0.0.1:40277/assets/catalogue-swatches/jdp-blanc-arctique-c88462e4.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "bluhouss",
+      "page": "produit.html?id=jdp-bluhouss-307",
+      "width": 1440,
+      "file": "before-bluhouss-1440.png",
+      "metrics": {
+        "width": 540,
+        "height": 540,
+        "ratio": 1,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/jdp-bluhouss-307.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "bosco",
+      "page": "produit.html?id=rialux-bosco",
+      "width": 1440,
+      "file": "before-bosco-1440.png",
+      "metrics": {
+        "width": 540,
+        "height": 540,
+        "ratio": 1,
+        "sources": [
+          "http://127.0.0.1:40277/assets/catalogue-swatches/rialux-bosco-noir-absolu-06bb9483.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "brands-jdp",
+      "page": "boutique.html?view=brands",
+      "width": 834,
+      "file": "before-brands-jdp-834.png",
+      "metrics": {
+        "width": 379,
+        "height": 252.65625,
+        "ratio": 1.5000618429189858,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/jdp-akta-portobello.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "brands-rialux",
+      "page": "boutique.html?view=brands",
+      "width": 834,
+      "file": "before-brands-rialux-834.png",
+      "metrics": {
+        "width": 379,
+        "height": 252.65625,
+        "ratio": 1.5000618429189858,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/rialux-tiago-ecorce-sample.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "jdp-cards",
+      "page": "boutique.html?brand=JDP%20%2F%20Juste%20du%20Pin&view=all",
+      "width": 834,
+      "file": "before-jdp-cards-834.png",
+      "metrics": {
+        "width": 379,
+        "height": 252.65625,
+        "ratio": 1.5000618429189858,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/jdp-akta-portobello.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "rialux-cards",
+      "page": "boutique.html?brand=Rialux&view=all",
+      "width": 834,
+      "file": "before-rialux-cards-834.png",
+      "metrics": {
+        "width": 379,
+        "height": 252.65625,
+        "ratio": 1.5000618429189858,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/rialux-bosco-beige-dune-sample.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "akta",
+      "page": "produit.html?id=jdp-akta-306-antique",
+      "width": 834,
+      "file": "before-akta-834.png",
+      "metrics": {
+        "width": 420,
+        "height": 420,
+        "ratio": 1,
+        "sources": [
+          "http://127.0.0.1:40277/assets/catalogue-swatches/jdp-blanc-arctique-c88462e4.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "bluhouss",
+      "page": "produit.html?id=jdp-bluhouss-307",
+      "width": 834,
+      "file": "before-bluhouss-834.png",
+      "metrics": {
+        "width": 420,
+        "height": 420,
+        "ratio": 1,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/jdp-bluhouss-307.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "bosco",
+      "page": "produit.html?id=rialux-bosco",
+      "width": 834,
+      "file": "before-bosco-834.png",
+      "metrics": {
+        "width": 420,
+        "height": 420,
+        "ratio": 1,
+        "sources": [
+          "http://127.0.0.1:40277/assets/catalogue-swatches/rialux-bosco-noir-absolu-06bb9483.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "brands-jdp",
+      "page": "boutique.html?view=brands",
+      "width": 390,
+      "file": "before-brands-jdp-390.png",
+      "metrics": {
+        "width": 354,
+        "height": 236,
+        "ratio": 1.5,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/jdp-akta-portobello.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "brands-rialux",
+      "page": "boutique.html?view=brands",
+      "width": 390,
+      "file": "before-brands-rialux-390.png",
+      "metrics": {
+        "width": 354,
+        "height": 236,
+        "ratio": 1.5,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/rialux-tiago-ecorce-sample.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "jdp-cards",
+      "page": "boutique.html?brand=JDP%20%2F%20Juste%20du%20Pin&view=all",
+      "width": 390,
+      "file": "before-jdp-cards-390.png",
+      "metrics": {
+        "width": 354,
+        "height": 236,
+        "ratio": 1.5,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/jdp-akta-portobello.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "rialux-cards",
+      "page": "boutique.html?brand=Rialux&view=all",
+      "width": 390,
+      "file": "before-rialux-cards-390.png",
+      "metrics": {
+        "width": 354,
+        "height": 236,
+        "ratio": 1.5,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/rialux-bosco-beige-dune-sample.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "akta",
+      "page": "produit.html?id=jdp-akta-306-antique",
+      "width": 390,
+      "file": "before-akta-390.png",
+      "metrics": {
+        "width": 354,
+        "height": 265.5,
+        "ratio": 1.3333333333333333,
+        "sources": [
+          "http://127.0.0.1:40277/assets/catalogue-swatches/jdp-blanc-arctique-c88462e4.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "bluhouss",
+      "page": "produit.html?id=jdp-bluhouss-307",
+      "width": 390,
+      "file": "before-bluhouss-390.png",
+      "metrics": {
+        "width": 354,
+        "height": 265.5,
+        "ratio": 1.3333333333333333,
+        "sources": [
+          "http://127.0.0.1:40277/assets/products/jdp-bluhouss-307.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    },
+    {
+      "scene": "bosco",
+      "page": "produit.html?id=rialux-bosco",
+      "width": 390,
+      "file": "before-bosco-390.png",
+      "metrics": {
+        "width": 354,
+        "height": 265.5,
+        "ratio": 1.3333333333333333,
+        "sources": [
+          "http://127.0.0.1:40277/assets/catalogue-swatches/rialux-bosco-noir-absolu-06bb9483.webp"
+        ],
+        "overflow": false
+      },
+      "errors": []
+    }
+  ]
+}

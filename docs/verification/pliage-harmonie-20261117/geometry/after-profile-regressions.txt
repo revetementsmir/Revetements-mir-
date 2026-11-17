@@ -1,0 +1,8 @@
+PASS Aucune proposition avant deux côtés
+PASS L : 2 côtés, 90°
+PASS Z : deux angles opposés
+PASS J/U : deux angles même sens
+PASS Retour écrasé classé distinctement
+PASS Profil libre 4 côtés, 86° : ne pas imposer un modèle
+PASS La reconnaissance ne modifie ni cotes ni angles
+MIR reconnaissance: 7 tests réussis

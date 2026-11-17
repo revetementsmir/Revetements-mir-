@@ -574,7 +574,10 @@
     return lines;
   }
   function fabricationBendLabel(bend) {
-    if (bend?.mode === 'hem') return '180° — retour écrasé';
+    if (bend?.mode === 'hem') {
+      const en=typeof window==='object'&&window.MIRClientLocale?.getLocale?.()==='en-CA'&&window.MIRClientLocale?.isClient?.(window.location.pathname,window.location.search)===true;
+      return en?'180° — hem':'180° — retour écrasé';
+    }
     if (Number.isFinite(bend?.angle)) return decimal(Math.abs(bend.angle)) + '°';
     return bend?.label || 'à préciser';
   }

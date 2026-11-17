@@ -1,0 +1,35 @@
+✖ a physical click on a label permits exactly its associated forwarded radio click (2.536409ms)
+✔ ghost click with no new press remains blocked, including a label and its control (0.444556ms)
+✔ keyboard click remains accepted without a pointer press (0.376596ms)
+✔ direct radio and button physical clicks remain accepted (0.50114ms)
+✔ a pending label activation never authorizes an unrelated control (0.308395ms)
+✔ close resets pending activation and backdrop still requires a genuine press (2.026595ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15.168515
+
+✖ failing tests:
+
+test at tests/mir-pliage-dialog-pointer-guard.cjs:13:1
+✖ a physical click on a label permits exactly its associated forwarded radio click (2.536409ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (/workspace/mir-prestige/tests/mir-pliage-dialog-pointer-guard.cjs:13:206)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

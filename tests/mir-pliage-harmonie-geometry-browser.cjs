@@ -1,0 +1,52 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict'),{once}=require('node:events'),{chromium}=require('playwright'),fieldFixture=require('./helpers/mir-field-fixture.cjs');
+const root=path.resolve(__dirname,'../dist'),proof=path.resolve(__dirname,'../docs/verification/pliage-harmonie-20261117/geometry'),phase=process.env.MIR_GEOMETRY_PHASE||'after',hemDetail=process.env.MIR_GEOMETRY_DETAIL==='hem';
+const snapshot=phase==='before'?'/tmp/mir-geometry-before':root;
+const server=http.createServer((req,res)=>{const pathname=new URL(req.url,'http://local').pathname,file=path.resolve(root,'.'+decodeURIComponent(pathname));if(req.method!=='GET'||!file.startsWith(root+path.sep))return res.writeHead(404).end();const source=['production-app.js','mir-profile-recognition.js'].includes(path.basename(file))?path.join(snapshot,path.basename(file)):file;fs.readFile(source,(error,bytes)=>{if(error)return res.writeHead(404).end();if(pathname==='/portal-client.js')bytes=Buffer.concat([bytes,Buffer.from(';('+fieldFixture.toString()+')();')]);res.setHeader('content-type',({'.html':'text/html','.js':'application/javascript','.json':'application/json','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg'})[path.extname(file)]||'application/octet-stream');res.end(bytes);});});
+(async()=>{
+ fs.mkdirSync(proof,{recursive:true});server.listen(0,'127.0.0.1');await once(server,'listening');const base='http://127.0.0.1:'+server.address().port,browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});const results=[],errors=[],blocked=[];
+ try{for(const width of [1440,834,390])for(const channel of ['client','employee']){
+ const touch=width!==1440,context=await browser.newContext({viewport:{width,height:width===390?844:1112},hasTouch:touch,isMobile:false,reducedMotion:'reduce',serviceWorkers:'block'});
+ await context.route('**/*',route=>{const u=new URL(route.request().url());if(u.origin!==base||route.request().method()!=='GET'){blocked.push({host:u.host,method:route.request().method()});return route.abort();}return route.continue();});const page=await context.newPage();page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push({width,channel,message:e.message}));let frame=page;
+ if(channel==='employee'){await page.goto(base+'/chantier.html?recette=1');await page.locator('#field-header').waitFor();await page.locator('#portal-navigation [data-view=command]').click();await page.locator('[data-field-draw]').click();frame=await(await page.locator('#field-drawing-frame').elementHandle()).contentFrame();}else await page.goto(base+'/production.html?mode=client&kind=profile&recette=1');
+ await frame.waitForFunction(()=>!!window.MIRProductionWorkspace);await frame.locator('#client-draw-profile').click();
+ const cdp=touch?await context.newCDPSession(page):null;
+ const at=async(x,y)=>{await frame.locator('#production-drawing').scrollIntoViewIfNeeded();const point=await frame.locator('#production-drawing svg').evaluate((svg,[x,y])=>{const p=svg.createSVGPoint();p.x=x;p.y=y;const q=p.matrixTransform(svg.getScreenCTM());return{x:q.x,y:q.y};},[x,y]);if(frame!==page){const b=await page.locator('#field-drawing-frame').boundingBox();point.x+=b.x;point.y+=b.y;}return point;};
+ const tap=async(x,y)=>{const p=await at(x,y);if(touch)await page.touchscreen.tap(p.x,p.y);else await page.mouse.click(p.x,p.y);};
+ const gesture=async(a,b)=>{const p=await at(...a),q=await at(...b);if(touch){await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p]});for(let i=1;i<=6;i++)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:p.x+(q.x-p.x)*i/6,y:p.y+(q.y-p.y)*i/6}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}else{await page.mouse.move(p.x,p.y);await page.mouse.down();await page.mouse.move(q.x,q.y,{steps:6});await page.mouse.up();}};
+ const reset=async(scale=14)=>{if(await frame.locator('#trace-hem-form').isVisible())await frame.locator('#trace-hem-form [data-close-production-dialog]').click();await frame.locator('#client-new-trace').click();await frame.locator('#trace-height').selectOption(String(scale));await frame.locator('#production-drawing').scrollIntoViewIfNeeded();};
+ const state=()=>frame.evaluate(()=>{const s=MIRProductionWorkspace.getLivePreviewState();return{points:s.drawPointsMM,spec:s.model.spec,bends:s.model.bends,segments:s.model.segments,valid:s.model.valid,recognition:MIRProfileRecognition.recognize(s.model)};});
+ const capture=async(name)=>{await page.screenshot({path:path.join(proof,phase+'-'+channel+'-'+name+'-'+width+'.png'),fullPage:false,animations:'disabled'});};
+ if(hemDetail){
+  for(let repetition=1;repetition<=3;repetition++){
+   await reset(14);await gesture([300,340],[320,340]);const before=await state();await gesture([320,340],[240,328]);assert.equal(await frame.locator('#trace-hem-form').isVisible(),true);
+   const direction=repetition===2?'left':'right';
+   if(touch){await new Promise(resolve=>setTimeout(resolve,400));const box=await frame.locator('#trace-hem-form label:has(input[value='+direction+'])').boundingBox();await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+20,y:box.y+20}]});await new Promise(resolve=>setTimeout(resolve,70));await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await frame.waitForFunction(direction=>document.querySelector('#trace-hem-form input[value='+direction+']')?.checked,direction);}else await frame.locator('#trace-hem-form input[value='+direction+']').check();
+   await frame.locator('#trace-hem-form button[type=submit]')[touch?'tap':'click']();await frame.locator('#trace-hem-form').waitFor({state:'hidden'});const accepted=await state();
+   assert.equal(accepted.valid,true);assert.equal(accepted.bends[0].mode,'hem');assert.equal(accepted.bends[0].direction,direction);assert.equal(accepted.spec.bends[0].mode,'hem');assert.equal(accepted.recognition.code,'hem');assert.equal(accepted.points.length,3);assert.deepEqual(accepted.points.slice(0,2),before.points);
+   const drawnLengths=accepted.points.slice(1).map((p,i)=>Math.hypot(p[0]-accepted.points[i][0],p[1]-accepted.points[i][1]));assert.equal(accepted.segments.length,2);drawnLengths.forEach((n,i)=>assert.ok(Math.abs(n-accepted.segments[i].lengthMM)<.0013));
+   results.push({width,channel,input:touch?'touch':'mouse',case:'short-first-return-confirmed',repetition,direction,firstGesturePoints:before.points,drawnLengths,...accepted});
+   if(repetition===1)await capture('return-confirmed');
+  }
+  if(channel==='employee')assert.deepEqual(await page.evaluate(()=>__fieldFixture.calls.filter(x=>['order','command','upload','field'].includes(x[0]))),[]);
+  await context.close();console.log(phase+' '+channel+' '+width+' hem accepted three times');continue;
+ }
+ await reset(14);await gesture([300,340],[320,340]);await gesture([320,340],[240,328]);let hemPrompt=await frame.locator('#trace-hem-form').isVisible();const shortFirst=await state();await capture('short-first-return');results.push({width,channel,input:touch?'touch':'mouse',case:'short-first-return',hemPrompt:!!hemPrompt,...shortFirst});
+ if(hemPrompt){await frame.locator('#trace-hem-form input[value=right]').check();await frame.locator('#trace-hem-form button[type=submit]').click();const committed=await state();assert.equal(committed.bends[0].mode,'hem');assert.equal(committed.bends[0].direction,'right');}
+ if(phase==='after')assert.ok(hemPrompt,'short first return is offered on first gesture '+channel+' '+width);
+ await reset(14);await tap(240,340);await tap(320,340);await tap(400,262);const snapCase=await state();await capture('tap-diagonal');results.push({width,channel,input:touch?'touch':'mouse',case:'tap-diagonal',...snapCase});
+ if(phase==='after'){assert.equal(snapCase.bends.length,1);assert.ok(Math.abs(Math.abs(snapCase.bends[0].turnDeg)-45)<.01,'45 degree tap '+channel+' '+width);}
+ await reset(10);await gesture([260,360],[360,360]);await gesture([360,360],[360,280]);await gesture([360,280],[280,280]);const double=await state();assert.deepEqual(double.bends.map(b=>b.mode),['signed','signed']);assert.deepEqual(double.bends.map(b=>Math.round(b.turnDeg)),[90,90]);results.push({width,channel,input:touch?'touch':'mouse',case:'two-consecutive-right-angles',...double});
+ if(phase==='after')for(const scale of [6,10,14])for(let quadrant=0;quadrant<8;quadrant++){
+  await reset(scale);const target=17+quadrant*45,turn=quadrant%2?90:45,previous=(target-turn)*Math.PI/180,centre=[320,260];
+  await gesture(centre,[centre[0]+55*Math.cos(previous),centre[1]-55*Math.sin(previous)]);const initial=await state();assert.equal(initial.points.length,2);
+  const actualPrevious=Math.atan2(initial.points[1][1]-initial.points[0][1],initial.points[1][0]-initial.points[0][0])*180/Math.PI,targetFromSide=actualPrevious+turn,factor=520/(scale*25.4),last=initial.points.at(-1),a=[140+last[0]*factor,395-last[1]*factor],r=(targetFromSide+1)*Math.PI/180,b=[a[0]+80*Math.cos(r),a[1]-80*Math.sin(r)];
+  const method=quadrant%2?'drag':'tap';if(method==='drag')await gesture(a,b);else await tap(...b);
+  const actual=await state();assert.equal(actual.bends.length,1);assert.equal(actual.bends[0].mode,'signed');assert.ok(Math.abs(actual.bends[0].turnDeg-turn)<.01,JSON.stringify({width,channel,scale,quadrant,target,turn,method,actual:actual.bends}));
+  results.push({width,channel,input:touch?'touch':'mouse',case:'quadrants-and-scales',scaleIn:scale,quadrant,targetHeading:targetFromSide,expectedTurn:turn,method,actualTurn:actual.bends[0].turnDeg,points:actual.points});
+ }
+ if(channel==='employee')assert.deepEqual(await page.evaluate(()=>__fieldFixture.calls.filter(x=>['order','command','upload','field'].includes(x[0]))),[]);
+ await context.close();console.log(phase+' '+channel+' '+width+' captured');
+ }}finally{await browser.close();server.close();}
+ assert.deepEqual(errors,[]);fs.writeFileSync(path.join(proof,phase+(hemDetail?'-hem-acceptance':'-browser')+'.json'),JSON.stringify({phase,capturedAt:new Date().toISOString(),viewportCaptures:true,physicalDevices:false,results,errors,blockedAttemptCount:blocked.length,externalTransmitted:0,realSubmissions:0},null,2)+'\n');console.log(JSON.stringify({phase,cases:results.length,errors:errors.length}));
+})().catch(error=>{console.error(error);server.close();process.exitCode=1;});

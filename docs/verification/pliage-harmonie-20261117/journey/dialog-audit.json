@@ -1,0 +1,92 @@
+[
+  {
+    "width": 1440,
+    "height": 1050,
+    "rect": {
+      "x": 395,
+      "y": 360.265625,
+      "width": 650,
+      "height": 329.46875
+    },
+    "reachable": {
+      "hit": true,
+      "inside": true,
+      "focused": true,
+      "dialogScroll": 0
+    },
+    "cartReached": true,
+    "errors": []
+  },
+  {
+    "width": 834,
+    "height": 1112,
+    "rect": {
+      "x": 92,
+      "y": 357.265625,
+      "width": 650,
+      "height": 329.46875
+    },
+    "reachable": {
+      "hit": true,
+      "inside": true,
+      "focused": true,
+      "dialogScroll": 0
+    },
+    "cartReached": true,
+    "errors": []
+  },
+  {
+    "width": 360,
+    "height": 780,
+    "rect": {
+      "x": 12,
+      "y": 198.953125,
+      "width": 336,
+      "height": 314.09375
+    },
+    "reachable": {
+      "hit": true,
+      "inside": true,
+      "focused": true,
+      "dialogScroll": 0
+    },
+    "cartReached": true,
+    "errors": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "rect": {
+      "x": 97,
+      "y": 18,
+      "width": 650,
+      "height": 286
+    },
+    "reachable": {
+      "hit": true,
+      "inside": true,
+      "focused": true,
+      "dialogScroll": 15
+    },
+    "cartReached": true,
+    "errors": []
+  },
+  {
+    "width": 780,
+    "height": 360,
+    "rect": {
+      "x": 65,
+      "y": 18,
+      "width": 650,
+      "height": 256
+    },
+    "reachable": {
+      "hit": true,
+      "inside": true,
+      "focused": true,
+      "dialogScroll": 45
+    },
+    "cartReached": true,
+    "errors": []
+  }
+]

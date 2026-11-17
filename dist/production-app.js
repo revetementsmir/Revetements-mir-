@@ -776,7 +776,7 @@ const clientStages=[
  {title:'Vérifiez les mesures et les angles',hint:'Vérifiez chaque côté et son angle sur le dessin.',action:'Suivant'},
  {title:'Longueur de vente MIR',hint:'Longueur fixe : 10 pi pour les moulures; 12 pi uniquement pour le J à soffite. Les cotes des côtés restent personnalisables.',action:'Suivant'},
  {title:'Choisissez la face colorée',hint:'Suivez le tracé de A vers le dernier côté. Choisissez de quel côté du trait se trouve la face à peindre.',action:'Suivant'},
- {title:'Choisissez le matériau et la couleur',hint:'Sélectionnez le matériau, puis la teinte. Vous pourrez ensuite ajouter la pièce à votre dossier.'}
+ {title:'Choisissez le matériau, la couleur et la quantité',hint:'Renseignez ces trois choix avant d’ajouter la pièce au panier.'}
 ];
 function clientTracePrompt(){return matchMedia('(any-pointer:coarse)').matches?'Touchez la grille pour placer le premier point.':'Cliquez sur la grille pour placer le premier point.';}
 function focusClientEntry(selector='#client-entry-title'){
@@ -1000,7 +1000,7 @@ function updateDrawing({keepForm=false}={}){
   renderPieceGuidance(actual,blockJ);
   updateV4Totals(actual);
  const quote=M.quotePolicy(draft);$('#custom-color-quote').hidden=authoring||!quote.required;renderPiecePrice(actual,geometryErrors);
- $('#add-production-piece').innerHTML=authoring?'Enregistrer le modèle <span aria-hidden="true">＋</span>':editingItemId?'Enregistrer la révision <span aria-hidden="true">✓</span>':quote.required?'Ajouter à ma soumission <span aria-hidden="true">＋</span>':(client?'Ajouter au dossier':'Enregistrer dans mon dossier')+' <span aria-hidden="true">'+(client?'＋':'✓')+'</span>';if(!keepForm)renderTools();
+ $('#add-production-piece').innerHTML=authoring?'Enregistrer le modèle <span aria-hidden="true">＋</span>':editingItemId?'Enregistrer la révision <span aria-hidden="true">✓</span>':quote.required?'Ajouter à ma soumission <span aria-hidden="true">＋</span>':(fieldPersonal?'Ajouter au panier':client?'Ajouter au dossier':'Enregistrer dans mon dossier')+' <span aria-hidden="true">'+(client?'＋':'✓')+'</span>';if(!keepForm)renderTools();
  renderClientWizard(actual,blockJ);
  if(!client)window.MIRAdminWizard?.updatePreview({model:actual,tool,kind,authoring,editingItemId,drawPointsMM:drawPoints.map(point=>point.slice()),canUndo:kind==='panel'?panelDirectUndo.length>0:freeformCanUndo(),canRedo:kind==='panel'?panelDirectRedo.length>0:freeformRedo.length>0});
 }
@@ -1382,9 +1382,9 @@ function addPiece(){
   legacyQuickId=null;
  }
  editingItemId=null;
- if(clientProfileWizard()){choose('profile','l');goClientStep(1);dialog('Pliage ajouté','Il reste dans votre commande pendant la suite du parcours.',`<div class="dialog-actions stacked"><button type="button" class="secondary-button" data-close-production-dialog>Choisir dans la banque de pliages</button><button type="button" class="secondary-button" data-new-client-custom>Ajouter un pliage sur mesure</button><a class="primary-button" href="chantier.html?view=orders">Vérifier ma commande</a></div>`);const choices=$('#production-dialog');if(!fieldPersonal){choices.close();choices.show();}}
+ if(clientProfileWizard()){choose('profile','l');goClientStep(1);dialog('Pliage ajouté',fieldPersonal?'Il reste dans votre commande pendant la suite du parcours.':'Il reste dans votre panier pendant la suite du parcours.',`<div class="dialog-actions stacked"><button type="button" class="secondary-button" data-new-client-model>Choisir dans la banque de pliages</button><button type="button" class="secondary-button" data-new-client-custom>Ajouter un pliage sur mesure</button><a class="primary-button" href="${fieldPersonal?'chantier.html?view=orders':'selection.html'}">${fieldPersonal?'Vérifier ma commande':'Voir mon panier'}</a></div>`);const choices=$('#production-dialog');if(!fieldPersonal){choices.close();choices.show();}}
  else {renderOrder();renderFormMetadata();updateDrawing();}
- toast(old?'Nouvelle révision enregistrée. La version précédente reste conservée.':id+(client?' ajouté au dossier.':order.poNumber?' ajouté au bon.':' enregistré dans le dossier local.'));
+ toast(old?'Nouvelle révision enregistrée. La version précédente reste conservée.':id+(clientProfileWizard()&&!fieldPersonal?' ajouté au panier.':client?' ajouté au dossier.':order.poNumber?' ajouté au bon.':' enregistré dans le dossier local.'));
 }
 function saveWorkspacePiece(){
  if(client||authoring)return false;
@@ -1598,8 +1598,7 @@ function toCustom(points,base=draft){
   const oldHem=base?.bends?.[i]?.mode==='hem';
   // Le tracé crée un repli à la main; une retouche de ses points conserve
   // ce repli tant que l'écart avec 180° reste dans la tolérance de 12°.
-  const nearReturn=departure<=12&&(
-    tool==='draw'&&length>=Math.hypot(c[0]-b[0],c[1]-b[1])||oldHem);
+  const nearReturn=departure<=12&&(tool==='draw'||oldHem);
   if(departure<1e-5||nearReturn){
    bends.push({mode:'hem',angle:180,direction:oldHem?base.bends[i].direction:(departure<1e-5||turn>0?'left':'right')});
    renderedHeading+=180;
@@ -1673,8 +1672,11 @@ function magneticHeading(raw, gesture){
  const step=Math.PI/4;
  let target=Math.round(raw/step)*step;
  if(gesture.heading!==undefined){
-  for(const normal of [gesture.heading-Math.PI/2,gesture.heading+Math.PI/2]){
-   if(difference(normal)<difference(target))target=normal;
+  // The same 45° increments apply to an oblique preceding side, including
+  // continuation and reversal. Compare circular distances across ±180°.
+  for(let turn=-4;turn<=4;turn++){
+   const relative=gesture.heading+turn*step;
+   if(difference(relative)<difference(target))target=relative;
   }
  }
  if(difference(target)<=2.5*Math.PI/180){
@@ -1876,7 +1878,7 @@ function endPoint(event){
   drawDragPreview(null,gesture);
   if(event.type!=='pointerup'||!canDrawProfile()||!drawingCanvasHit(event,{targetRequired:false})){suppressClick=true;return;}
   if(!gesture.moved){
-   if(event.pointerType==='touch'){const point=localPoint(event);if(point)appendTracePoint(point);suppressClick=true;}
+   if(event.pointerType==='touch'){appendTappedTracePoint(event);suppressClick=true;}
    return;
   }
   suppressClick=true;
@@ -1899,14 +1901,16 @@ function endPoint(event){
  if(moved){renderDimensions();renderProfileOptions();updateDrawing();}
 }
 
-function magneticTapPoint(point, previousDegrees){
+function appendTappedTracePoint(event){
+ if(!drawPoints.length){const point=localPoint(event);if(point)appendTracePoint(point);return;}
  const start=drawPoints.at(-1),before=drawPoints.at(-2);
- const dx=point[0]-start[0],dy=point[1]-start[1],raw=Math.atan2(dy,dx);
- const previous=finite(previousDegrees)?previousDegrees*Math.PI/180:before?Math.atan2(start[1]-before[1],start[0]-before[0]):undefined;
- const heading=magneticHeading(raw,{heading:previous});
- if(heading===raw)return point;
- const along=dx*Math.cos(heading)+dy*Math.sin(heading);
- return [start[0]+along*Math.cos(heading),start[1]+along*Math.sin(heading)];
+ const previous=drawPoints.length>=3?build().segments.at(-1)?.headingDeg:undefined;
+ const heading=finite(previous)?previous*Math.PI/180:before?Math.atan2(start[1]-before[1],start[0]-before[0]):undefined;
+ // Mouse clicks, touch taps and drags use the raw pointer angle before the
+ // grid rounds the length; rounding X/Y first can turn a 45° aim into 41°.
+ const point=event.shiftKey||rightAngleSnap
+  ?draggedSegment(event,{start,heading})?.point:localPoint(event);
+ if(point)appendTracePoint(point);
 }
 function focusProfileDimensions(bendIndex){
  // La refonte admin place les cotes dans un accordéon fermé sur mobile.
@@ -2084,13 +2088,7 @@ function drawingClick(event){
  if(event.target.closest("[data-edit-panel-measure],[data-edit-panel-edge]"))return;
  if(suppressClick){suppressClick=false;return;}
  if(!canDrawProfile()||!drawingCanvasHit(event))return;
- const raw=localPoint(event);
- if(!raw)return;
- const heading=drawPoints.length>=3?build().segments.at(-1)?.headingDeg:undefined;
- const point=event.shiftKey&&drawPoints.length
-  ?draggedSegment(event,{start:drawPoints.at(-1),heading:finite(heading)?heading*Math.PI/180:drawPoints.length===2?Math.atan2(drawPoints[1][1]-drawPoints[0][1],drawPoints[1][0]-drawPoints[0][0]):undefined})?.point
-  :rightAngleSnap&&drawPoints.length?magneticTapPoint(raw,heading):raw;
- if(point)appendTracePoint(point);
+ appendTappedTracePoint(event);
 }
 function exportMirTemplates(){
  const output=window.MIRTemplateBackup?.create(templates);
@@ -2376,6 +2374,8 @@ function handleClick(event){if(event.target.closest('[data-toggle-painted-face]'
  if(d.freeformFinish!==undefined)return freeformFinish();
  if(d.mirContinueAction!==undefined)return continueChoice(d.mirContinueAction);
  if(clientProfileWizard()){
+  if(d.newClientCustom!==undefined){closeDialog();choose('profile','custom');startProfileDrawing({fullscreen:false});focusClientEntry('#production-drawing');return;}
+  if(d.newClientModel!==undefined){closeDialog();clientEntry='models';updateDrawing();focusClientEntry();return;}
   if(d.clientStep)return goClientStep(Number(d.clientStep));
   if(button.id==='client-step-back'){if(clientStep===2&&draft.template==='custom')return resumeClientTrace();return goClientStep(clientStep-1);}
   if(button.id==='client-new-trace'){choose('profile','custom');startProfileDrawing({fullscreen:false});return;}
@@ -2718,20 +2718,24 @@ async function boot(){M=window.MIRProduction;if(!M?.createTemplate)throw new Err
  document.addEventListener('click',handleClick);document.addEventListener('input',handleInput);document.addEventListener('change',handleChange);document.addEventListener('submit',handleSubmit);document.addEventListener('keydown',handleKey);document.addEventListener('keydown',traceShift);document.addEventListener('keyup',traceShift);
  const stage=$('#production-drawing');stage.addEventListener('pointerdown',beginPointDrag);stage.addEventListener('pointermove',movePoint);stage.addEventListener('pointerup',endPoint);stage.addEventListener('pointercancel',endPoint);stage.addEventListener('pointerleave',event=>{if(drag?.type==='trace'&&!drag.moved)endPoint(event);});stage.addEventListener('click',drawingClick);stage.addEventListener('wheel',event=>{if(client&&kind!=='panel'&&view!=='volume')return;event.preventDefault();setZoom(zoom*Math.exp(-event.deltaY*.001));},{passive:false});
  const modal=$('#production-dialog');
- let modalPressed=false,backdropPressed=false;
+ let modalPressed=false,backdropPressed=false,forwardedLabelControl=null;
  modal.addEventListener('pointerdown',event=>{
   const bounds=modal.getBoundingClientRect();
-  modalPressed=true;
+  modalPressed=true;forwardedLabelControl=null;
   backdropPressed=event.target===modal&&(event.clientX<bounds.left||event.clientX>bounds.right||event.clientY<bounds.top||event.clientY>bounds.bottom);
  });
  modal.addEventListener('click',event=>{
-  // A touch that ends on the drawing can open this dialog before the browser
-  // sends its click. Wait for a new press while keeping keyboard clicks.
-  if(event.detail>0&&!modalPressed){event.preventDefault();event.stopPropagation();}
+  // A touch ending on the drawing can open this dialog before its click.
+  // A fresh press is required, except keyboard activation and the single
+  // native control click forwarded by a label that received that fresh press.
+  const forwarded=event.target===forwardedLabelControl;
+  if(event.detail>0&&!modalPressed&&!forwarded){event.preventDefault();event.stopPropagation();}
   else if(event.target===modal&&backdropPressed)closeDialog();
+  const label=event.target.closest?.('label');
+  forwardedLabelControl=event.detail>0&&modalPressed&&label?.control!==event.target?label?.control||null:null;
   modalPressed=backdropPressed=false;
  },true);
- modal.addEventListener('close',()=>{modalPressed=backdropPressed=false;});
+ modal.addEventListener('close',()=>{modalPressed=backdropPressed=false;forwardedLabelControl=null;});
  choose(kind,kind==='panel'?'rectangle':'l');const requestedMaterial=params.get('material');if(kind==='panel'&&['unico-up1-acier','unico-up1-aluminium'].includes(requestedMaterial)){const type=requestedMaterial.endsWith('aluminium')?'aluminium':'acier';draft.material={type,name:'Unico U-P1 — '+(type==='acier'?'Acier':'Aluminium plié'),productRef:requestedMaterial,thickness:'',thicknessUnit:'mm',gauge:''};materialId=availableMaterials()[0]?.id||'';colorSystem='manufacturer';const requestedColor=params.get('color'),palette=availableMaterials().find(m=>m.colors.some(c=>c.id===requestedColor));if(palette){materialId=palette.id;colorId=requestedColor;}render();}const linked=params.get('template');if(linked&&templates.some(record=>record.id===linked))useSavedTemplate(linked);if(!client&&params.get('view')==='models'){workflow='models';render();}if(!client&&params.get('view')==='requests'){workflow='requests';render();}if(client&&params.get('kind')==='profile'&&!linked)choose('profile','custom');
  if(clientProfileWizard()&&!linked&&!params.get('profile')){
   const active=read('mir_client_active_profile_v1',null);
