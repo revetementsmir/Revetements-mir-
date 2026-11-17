@@ -1,0 +1,76 @@
+{
+  "deployment": {
+    "id": "dpl_BzciTCiWoZ2hFonNgderZcij8UfJ",
+    "url": "mir-studio-test-brwixe5rn-desk17.vercel.app",
+    "name": "mir-studio-test",
+    "target": null,
+    "state": "READY",
+    "sha": "af141c18c024da8e5772901b1063c4ffae1c6b93"
+  },
+  "teamId": "team_iAvmCeq2FbaeeMzbfOK79EAL",
+  "projectId": "prj_u52jhK8wezpzFlHy5VBxVOJRh4Lt",
+  "gallery": "https://mir-studio-test-brwixe5rn-desk17.vercel.app/test/tools-20261117.html",
+  "hostedChecks": [
+    {
+      "path": "/test/mir-test-environment.json",
+      "status": 200,
+      "success": true,
+      "bodyLength": 126,
+      "manifest": {
+        "environment": "test",
+        "projectRef": "hxtztkmbfpmzrieccwsg",
+        "revision": "af141c18c024da8e5772901b1063c4ffae1c6b93"
+      }
+    },
+    {
+      "path": "/test/tools-20261117.html",
+      "status": 200,
+      "success": true,
+      "bodyLength": 18448,
+      "guard": true,
+      "csp": true,
+      "noindex": true
+    },
+    {
+      "path": "/test/produit.html?id=dewalt-bimetal-hole-saws",
+      "status": 200,
+      "success": true,
+      "bodyLength": 5614,
+      "guard": true,
+      "csp": true,
+      "noindex": true
+    },
+    {
+      "path": "/test/magasin-revue.html",
+      "status": 200,
+      "success": true,
+      "bodyLength": 6571,
+      "guard": true,
+      "csp": true,
+      "noindex": true
+    },
+    {
+      "path": "/test/catalogue-fd6866b49d21.json",
+      "status": 200,
+      "success": true,
+      "bodyLength": 1961130,
+      "products": [
+        {
+          "id": "dewalt-bimetal-hole-saws",
+          "formats": 15,
+          "photo": null
+        },
+        {
+          "id": "leiluo-oscillating-hcs-44mm",
+          "formats": 0,
+          "widthMm": 44,
+          "photo": null
+        }
+      ]
+    }
+  ],
+  "accessProtection": "Vercel Authentication retained; verification via authorized Vercel connector",
+  "productionDeployment": false,
+  "externalWrites": 0,
+  "realSubmissions": 0
+}

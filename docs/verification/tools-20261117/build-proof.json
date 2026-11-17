@@ -1,0 +1,18 @@
+{
+  "sourceRevision": "af141c18c024da8e5772901b1063c4ffae1c6b93",
+  "applicationSourceHashes": {
+    "catalogue-fd6866b49d21.json": "06e6b2bef385e6b1a1b02647782efb6e0afb3b95a74590ebcc33375fcaabe004",
+    "commerce.js": "3551b7da4f8fa97ce78dcee52a3197487b8519df7d7bf433409df332d56119fe",
+    "mir-commerce-quantity.js": "2afc56d18b91e03256adcf448981a392156b08740a77086a2b6ad37ee733f94f",
+    "employee-store-model.js": "cb980dfe924ec64838411e607efb7b5d63fcbc365177d91db921b790026095d0",
+    "chantier-app.js": "aa099c089f2176d7b9439e298a6098fe3d09132808d9f2c511047fe33e3594cc",
+    "magasin-revue.js": "8cfdbce0cbc0d4fb49e589725079a0d858547e02e843d9cddf19d4536c42a4db",
+    "mir-client-i18n.js": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf",
+    "mir-client-en-ca.js": "12f4cd81cb5a8e89e60bad3e1983a0a30232c2147d1dbfa7cf79949e73e45c35"
+  },
+  "captureFiles": 27,
+  "localBuildSourceMatches": true,
+  "environment": "test",
+  "projectRef": "hxtztkmbfpmzrieccwsg",
+  "externalRequestsEnabled": false
+}
