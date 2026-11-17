@@ -36,23 +36,50 @@
    for(let i=0;i<=counts.length;i++){const active=i<counts.length&&counts[i]>threshold&&counts[i]<(right-left)*.7;if(active&&start==null)start=i;if(!active&&start!=null){const height=i-start;if(height>=4&&height<=20){const box=[left,top+start-1,right,top+i+1],cx=(left+right)/2,cy=(box[1]+box[3])/2;if(!masks.some(([x,y,w,h])=>cx>=x&&cx<=x+w&&cy>=y&&cy<=y+h)&&!out.some(r=>Math.abs(r.row.box[0]-left)<12&&Math.abs(r.row.box[1]-box[1])<6))out.push({row:{text:'',box,confidence:0},window:true,purpose:'caption-near-exterior-floor-opening',gap:JSON.parse(JSON.stringify(gap)),tight:true});}start=null;}}
   }return out.slice(0,18);
  }
+ function gridRegions(view,image){
+  // Grid numerals and letters are too small for full-page OCR in large PDFs.
+  // Source ink first finds candidate circles. Local OCR reads only interiors.
+  if(view.kind!=='floor'||!image||!root.MIRGridRegistration?.bubbleRegions)return [];
+  const detected=root.MIRGridRegistration.bubbleRegions(image);
+  if(detected.status!=='proposed')return [];
+  return detected.bubbles.slice(0,40).map(circle=>{
+   const [x,y]=circle.center,half=Math.max(3,circle.radius*.48);
+   return {row:{text:'',box:[x-half,y-half,x+half,y+half],confidence:0},
+    priority:1.5,grid:true,tight:true,gridCircle:JSON.parse(JSON.stringify(circle)),
+    purpose:'source-raster-grid-bubble'};
+  });
+ }
  function workItems(inventory,buildingId,sourceImages={}){
   const views=inventory.views.filter(v=>v.buildingId===buildingId&&['floor','elevation'].includes(v.kind)&&v.payload.sourceImage).sort((a,b)=>Number(b.kind==='floor')-Number(a.kind==='floor'));
   // Scale and level readings from every contributing view precede opening
   // details, while retaining the bounded six-label / 42-region OCR budget.
-  return views.flatMap(view=>[...regions(view,sourceImages[view.id]),...openingRegions(view,sourceImages[view.id]).map(region=>({...region,priority:4}))].map(region=>({view,region}))).sort((a,b)=>a.region.priority-b.region.priority).slice(0,42);
+  return views.flatMap(view=>[...regions(view,sourceImages[view.id]),...gridRegions(view,sourceImages[view.id]),...openingRegions(view,sourceImages[view.id]).map(region=>({...region,priority:4}))].map(region=>({view,region}))).sort((a,b)=>a.region.priority-b.region.priority).slice(0,64);
  }
  async function refine(inventory,buildingId,{images:sourceImages={},progress=()=>{},cancelled=()=>false}={}){
   const next=JSON.parse(JSON.stringify(inventory)),work=workItems(next,buildingId,sourceImages),evidence=[];if(!work.length)return {inventory:next,evidence};
   await dependencies();const worker=await root.Tesseract.createWorker('eng',1,{workerPath:asset('vendor/tesseract/worker.min.js'),corePath:asset('vendor/tesseract-core/'),langPath:asset('vendor/tessdata/'),workerBlobURL:false,gzip:true});
-  try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});const images=new Map();
+  try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});let workerMode='7';const images=new Map();
    for(let i=0;i<work.length;i++){
     if(cancelled())break;const {view,region}=work[i];progress(i+1,work.length,view.page);let image=images.get(view.id);if(!image){image=new Image();image.src=view.payload.sourceImage;await image.decode();images.set(view.id,image);}
-    const [x0,y0,x1,y1]=region.row.box,font=Math.max(5,y1-y0),w=view.payload.sourceWidth,h=view.payload.sourceHeight,left=Math.max(0,Math.floor(x0-font*(region.caption?1.5:.5))),top=Math.max(0,Math.floor(y0-font*(region.tight ? .1 : .35))),right=Math.min(w,Math.ceil(x1+font*(region.caption?3:.5))),bottom=Math.min(h,Math.ceil(y1+font*(region.tight ? .1 : .4))),scale=4,canvas=document.createElement('canvas');canvas.width=(right-left)*scale;canvas.height=(bottom-top)*scale;canvas.getContext('2d').drawImage(image,left,top,right-left,bottom-top,0,0,canvas.width,canvas.height);
+    const [x0,y0,x1,y1]=region.row.box,font=Math.max(5,y1-y0),w=view.payload.sourceWidth,h=view.payload.sourceHeight,left=Math.max(0,Math.floor(x0-(region.grid?0:font*(region.caption?1.5:.5)))),top=Math.max(0,Math.floor(y0-font*(region.grid?0:region.tight?.1:.35))),right=Math.min(w,Math.ceil(x1+(region.grid?0:font*(region.caption?3:.5)))),bottom=Math.min(h,Math.ceil(y1+font*(region.grid?0:region.tight?.1:.4))),scale=region.grid?5:4,canvas=document.createElement('canvas');canvas.width=(right-left)*scale;canvas.height=(bottom-top)*scale;canvas.getContext('2d').drawImage(image,left,top,right-left,bottom-top,0,0,canvas.width,canvas.height);
+    const desired=region.grid?'10':'7';
+    if(workerMode!==desired){await worker.setParameters({tessedit_pageseg_mode:desired,tessedit_char_whitelist:region.grid?'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ':''});workerMode=desired;}
     const {data}=await worker.recognize(canvas,{}, {blocks:true});canvas.width=canvas.height=1;
+    if(region.grid){
+     const kind=region.gridCircle.kind,token=String(data.text||'').trim().toUpperCase().replace(/\\s+/g,'').replace(/[.,:;]+$/,'');
+     const good=kind==='number'?/^\\d{1,2}$/.test(token)&&Number(token)>0:/^[A-Z]$/.test(token);
+     const confidence=Number(data.confidence)||0;
+     if(good&&confidence>=55){
+      const circle=region.gridCircle,[cx,cy]=circle.center,r=circle.radius;
+      const row={text:token,confidence,source:'ocr-local-grid-bubble',box:[cx-r*.45,cy-r*.45,cx+r*.45,cy+r*.45],
+       retry:{purpose:'source-raster-grid-bubble',gridCircle:JSON.parse(JSON.stringify(circle)),sourceViewId:view.id,sourceFrame:JSON.parse(JSON.stringify(view.frame)),region:[left,top,right-left,bottom-top],scale,psm:10}};
+      view.payload.drawingReadings.rows.push(row);evidence.push({sourceViewId:view.id,...row});
+     }
+     continue;
+    }
     for(const block of data.blocks||[])for(const paragraph of block.paragraphs||[])for(const line of paragraph.lines||[]){if(!line.text.trim()||!line.bbox)continue;const b=line.bbox,row={text:line.text.trim(),confidence:line.confidence,source:'ocr-local-region-retry',box:[b.x0/scale+left,b.y0/scale+top,b.x1/scale+left,b.y1/scale+top],retry:{originalText:region.row.text,originalConfidence:region.row.confidence,region:[left,top,right-left,bottom-top],scale,psm:7,purpose:region.purpose||(region.caption?'level-caption':region.dimension?'dimension-label':'opening-caption'),sourceViewId:view.id,sourceFrame:JSON.parse(JSON.stringify(view.frame))}};view.payload.drawingReadings.rows.push(row);evidence.push({sourceViewId:view.id,...row});}
    }
   }finally{await worker.terminate();}return {inventory:next,evidence};
  }
- root.MIRReconstructionReadings=Object.freeze({regions,openingRegions,workItems,refine});
+ root.MIRReconstructionReadings=Object.freeze({regions,openingRegions,gridRegions,workItems,refine});
 })(window);
