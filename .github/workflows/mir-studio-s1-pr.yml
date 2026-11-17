@@ -63,6 +63,10 @@ jobs:
           node tests/mir-studio-grid-sampling.cjs
           node tests/mir-studio-grid-labelled-groups.cjs
           node tests/mir-studio-grid-reading-policy.cjs
+          node tests/mir-studio-native-source-crop.cjs
+          node tests/mir-studio-fragmented-captions.cjs
+          node tests/mir-studio-neighbouring-measurements.cjs
+          node tests/mir-studio-elevation-grid.cjs
           node tests/mir-studio-level-datum-scale.cjs
           node tests/mir-studio-datum-frame.cjs
           node tests/mir-studio-metric-registration.cjs
@@ -71,6 +75,7 @@ jobs:
           node tests/mir-studio-automatic.cjs
           node tests/mir-studio-automatic-originals-harness.cjs
           node tests/mir-studio-legend-occlusion.cjs
+          node tests/mir-studio-roof-eave-evidence.cjs
           node tests/mir-studio-exterior-reconstruction.cjs
           node tests/mir-studio-exterior-integration.cjs
           node tests/mir-studio-entry-elements.cjs
@@ -78,6 +83,7 @@ jobs:
           node tests/mir-studio-entry-profile-vision.cjs
           node tests/mir-studio-floor-thin-lines.cjs
           node tests/mir-studio-door-boundary.cjs
+          node tests/mir-studio-sliding-boundary.cjs
           node tests/mir-studio-wall-contrast.cjs
           node tests/mir-studio-elevation-document-frame.cjs
           node tests/mir-studio-fragmented-openings.cjs
@@ -85,6 +91,8 @@ jobs:
           node tests/mir-studio-source-scale.cjs
           node tests/mir-studio-partial-scale.cjs
           node tests/mir-studio-calibration-marks.cjs
+          node tests/mir-studio-paper-contrast.cjs
+          node tests/mir-studio-dimension-association.cjs
           node tests/mir-plan-dimension-ticks.cjs
           node tests/mir-plan-interrupted-dimensions.cjs
           node tests/mir-studio-flat-entry-roofs.cjs

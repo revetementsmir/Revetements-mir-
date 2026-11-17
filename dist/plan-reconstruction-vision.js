@@ -47,22 +47,57 @@
  function floorDoorEvidence(image,a,b,run,ink=monochrome(image)){
  const {width:w,height:h}=image,k=Math.max(2,Math.round(w/525)),length=Math.hypot(b[0]-a[0],b[1]-a[1]),u=[(b[0]-a[0])/length,(b[1]-a[1])/length],inside=run.inside,tolerance=Math.max(1,Math.round(k/2));
  const point=(n,v)=>[a[0]+u[0]*n+inside[0]*v,a[1]+u[1]*n+inside[1]*v];
- const hit=(n,v,pad=tolerance)=>{const [cx,cy]=point(n,v);for(let dy=-pad;dy<=pad;dy++)for(let dx=-pad;dx<=pad;dx++){const x=Math.round(cx+dx),y=Math.round(cy+dy);if(x>=0&&x<w&&y>=0&&y<h&&ink[y*w+x])return true;}return false;};
+ // Thin neutral swing arcs can survive the PDF/JPEG raster as pale strokes.
+ // Require brighter paper on opposite sides of each such pixel; a colour
+ // fill, blank patch, broad grey region or compression speck is not a stroke.
+ const observedCache=new Map(),observed=(x,y)=>{const at=y*w+x;if(ink[at])return true;if(observedCache.has(at))return observedCache.get(at);const j=at*4,d=image.data,r=d[j],g=d[j+1],b=d[j+2];let found=false;
+  if(d[j+3]>100&&Math.max(r,g,b)<240&&Math.max(r,g,b)-Math.min(r,g,b)<25)for(const [dx,dy]of [[3,0],[0,3],[3,3],[3,-3]]){if(x-dx<0||x-dx>=w||x+dx<0||x+dx>=w||y-dy<0||y-dy>=h||y+dy<0||y+dy>=h)continue;const neighbours=[((y-dy)*w+x-dx)*4,((y+dy)*w+x+dx)*4];if(neighbours.every(n=>Math.min(d[n]-r,d[n+1]-g,d[n+2]-b)>=18&&Math.max(d[n],d[n+1],d[n+2])-Math.min(d[n],d[n+1],d[n+2])<25)){found=true;break;}}
+  observedCache.set(at,found);return found;};
+ const hit=(n,v,pad=tolerance)=>{const [cx,cy]=point(n,v);for(let dy=-pad;dy<=pad;dy++)for(let dx=-pad;dx<=pad;dx++){const x=Math.round(cx+dx),y=Math.round(cy+dy);if(x>=0&&x<w&&y>=0&&y<h&&observed(x,y))return true;}return false;};
  const series=points=>{let hits=0,gap=0,maxGap=0;for(const p of points){if(hit(...p)){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:hits/points.length,maxGap};};
  const line=(n0,v0,n1,v1)=>{const len=Math.hypot(n1-n0,v1-v0),points=Array.from({length:Math.max(2,Math.ceil(len)+1)},(_,i)=>[n0+(n1-n0)*i/(Math.ceil(len)),v0+(v1-v0)*i/Math.ceil(len)]);return series(points);};
+ const wallSupport=(n0,n1,depth)=>{let hits=0,gap=0,maxGap=0;const count=Math.max(1,Math.ceil(n1-n0));for(let i=0;i<=count;i++){const [x,y]=point(n0+(n1-n0)*i/count,depth).map(Math.round),hit=x>=0&&x<w&&y>=0&&y<h&&ink[y*w+x];if(hit){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:hits/(count+1),maxGap};};
+ const adjacentWallPair=(left,right,radius)=>{for(let depth=-k;depth<=k;depth++){const before=wallSupport(left-radius,left-k,depth),after=wallSupport(right+k,right+radius,depth);if(before.support>=.9&&after.support>=.9&&before.maxGap<=2&&after.maxGap<=2)return {before,after,depth};}return null;};
  const gapWidth=run.to-run.from,maxWidth=Math.min(w*.07,length*.2,Math.max(k*8,gapWidth*4)),search=Math.ceil(Math.min(maxWidth,gapWidth*2)),jambs=[];
  for(let n=Math.floor(run.from-search);n<=Math.ceil(run.to+search);n++){if(n<k*3||n>length-k*3||n>run.from-tolerance&&n<run.to+tolerance)continue;for(let depth=k;depth<=k*6;depth++){const p=line(n,0,n,depth);if(p.support>=.85&&p.maxGap<=2)jambs.push({n,depth});}}
  const candidates=[];
  for(const left of jambs.filter(j=>j.n<=run.from))for(const right of jambs.filter(j=>j.n>=run.to)){
   const radius=right.n-left.n,depth=left.depth;if(depth!==right.depth||radius<Math.max(k*4,gapWidth)||radius>maxWidth||depth>radius*.65)continue;
-  const leftWall=line(left.n-radius*.4,0,left.n-k,0),rightWall=line(right.n+k,0,right.n+radius*.4,0);if(leftWall.support<.9||rightWall.support<.9)continue;
+  const neighbours=adjacentWallPair(left.n,right.n,radius);if(!neighbours)continue;const leftWall={...neighbours.before,normalOffset:neighbours.depth},rightWall={...neighbours.after,normalOffset:neighbours.depth};
   for(const side of [1,-1]){const center=side===1?left.n:right.n,leaf=line(center,depth,center,depth+radius);if(leaf.support<.8||leaf.maxGap>k*2)continue;
+   const leafExtension=line(center,depth+radius+k,center,depth+radius+k*3);if(leafExtension.support>.65||leafExtension.maxGap<Math.max(3,tolerance+1))continue;
    const count=Math.ceil(Math.PI*radius/2),samples=Array.from({length:count+1},(_,i)=>[center+side*radius*Math.cos(i/count*Math.PI/2),depth+radius*Math.sin(i/count*Math.PI/2)]),arc=series(samples),middle=series(samples.slice(Math.floor(count/3),Math.ceil(count*2/3)));
    if(arc.support<.82||arc.maxGap>k*2||middle.support<.85)continue;
-   candidates.push({from:left.n,to:right.n,depth,radius,side,score:arc.support+leaf.support+middle.support,arc,leaf,jambs:[left,right],sourcePoints:{hinge:point(center,depth),leafTip:point(center,depth+radius),oppositeJamb:point(center+side*radius,depth)},arcPoints:samples.filter((_,i)=>i%Math.max(1,Math.floor(count/8))===0).map(p=>point(...p)),leftWall,rightWall});
+   const tangentLength=Math.max(3,Math.min(radius*.25,k*3)),tangentSteps=Math.ceil(tangentLength),atLeaf=series(Array.from({length:tangentSteps},(_,j)=>[center+side*(j+1),depth+radius])),atJamb=series(Array.from({length:tangentSteps},(_,j)=>[center+side*radius,depth+j+1]));
+   candidates.push({from:left.n,to:right.n,depth,radius,side,score:arc.support+leaf.support+middle.support,arc,leaf,leafExtension,tangents:{atLeaf,atJamb},jambs:[left,right],sourcePoints:{hinge:point(center,depth),leafTip:point(center,depth+radius),oppositeJamb:point(center+side*radius,depth)},arcPoints:samples.filter((_,i)=>i%Math.max(1,Math.floor(count/8))===0).map(p=>point(...p)),leftWall,rightWall});
   }
  }
- candidates.sort((a,b)=>b.score-a.score||a.arc.maxGap-b.arc.maxGap||a.radius-b.radius);const best=candidates[0];return best?{...best,kind:'observed-door-swing',method:'two-jambs-leaf-and-quarter-circle',coordinateSystem:'source-raster-pixels',status:'proposed',confirmationRequired:true,tolerancePx:tolerance,metricWidth:null,note:'The observed door gap explains missing wall ink; it does not establish a written width, height or confirmed opening.'}:null;
+ candidates.sort((a,b)=>b.score-a.score||a.arc.maxGap-b.arc.maxGap||a.radius-b.radius);const best=candidates[0];return best?{...best,kind:'observed-door-swing',method:'two-jambs-leaf-and-quarter-circle',coordinateSystem:'source-raster-pixels',status:'proposed',confirmationRequired:true,tolerancePx:tolerance,sourcePixelRule:{primary:'monochrome',pale:{maximumChannelExclusive:240,maximumChromaExclusive:25,minimumOppositeContrast:18,oppositeProbePixels:3}},metricWidth:null,note:'The observed door gap explains missing wall ink; it does not establish a written width, height or confirmed opening.'}:null;
+}
+ // Sliding openings have no swing arc. Require their two jambs, a continuous
+ // rail, two offset tracks and their visible joint on this same wall.
+ function floorSlidingFrameEvidence(image,a,b,run,ink=monochrome(image)){
+ const {width:w,height:h}=image,k=Math.max(2,Math.round(w/525)),length=Math.hypot(b[0]-a[0],b[1]-a[1]),u=[(b[0]-a[0])/length,(b[1]-a[1])/length],inside=run.inside,point=(n,d)=>[a[0]+u[0]*n+inside[0]*d,a[1]+u[1]*n+inside[1]*d],hit=(n,d)=>{const [x,y]=point(n,d).map(Math.round);return x>=0&&x<w&&y>=0&&y<h&&!!ink[y*w+x];};
+ const support=values=>{let n=0,gap=0,maxGap=0;for(const h of values){if(h){n++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:n/values.length,maxGap};};
+ const min=Math.max(k*4,Math.floor(run.from-Math.min(w*.12,length*.35))),max=Math.min(length-k*4,Math.ceil(run.to+Math.min(w*.12,length*.35))),caps=[];
+ for(let n=min;n<=max;n++){if(n>=run.from&&n<=run.to)continue;let best=null;for(let start=-k;start<=k;start++)for(let end=start+k*2;end<=k*5;end++){const s=support(Array.from({length:end-start+1},(_,i)=>hit(n,start+i)));if(s.support<.9||s.maxGap>1)continue;const c={n,start,end,...s};if(!best||end-start>best.end-best.start)best=c;}if(best)caps.push(best);}
+ const candidates=[];
+ for(const left of caps.filter(c=>c.n<run.from))for(const right of caps.filter(c=>c.n>run.to)){
+  const span=right.n-left.n,lo=Math.max(left.start,right.start),hi=Math.min(left.end,right.end),ns=Array.from({length:Math.max(0,right.n-left.n-3)},(_,i)=>left.n+i+2);if(span<k*6||span>Math.min(w*.12,length*.35)||hi-lo<k*2||!ns.length)continue;
+  const rails=[];for(let d=lo+1;d<hi;d++){const s=support(ns.map(n=>hit(n,d)));if(s.support>=.9&&s.maxGap<=k)rails.push({depth:d,...s});}
+  for(const rail of rails){const tracks=[];
+   for(let d=lo+1;d<hi;d++){if(Math.abs(d-rail.depth)<3)continue;const observed=ns.map(n=>hit(n,d)&&Array.from({length:Math.abs(d-rail.depth)-1},(_,i)=>!hit(n,Math.min(d,rail.depth)+i+1)).some(Boolean));let first=null;for(let i=0;i<=observed.length;i++){if(observed[i]&&first===null)first=i;if((!observed[i]||i===observed.length)&&first!==null){if(i-first>=span*.28)tracks.push({depth:d,from:ns[first],to:ns[i-1],support:1});first=null;}}}
+   for(const first of tracks)for(const second of tracks){if(Math.abs(first.depth-second.depth)<Math.max(2,k/2)||Math.abs(first.from-left.n)>k||Math.abs(second.to-right.n)>k||first.to>left.n+span*.75||second.from<left.n+span*.25||Math.abs(first.to-second.from)>k*2)continue;
+    const union=support(ns.map(n=>hit(n,first.depth)||hit(n,second.depth)));if(union.support<.9||union.maxGap>k)continue;
+    let joint=null;for(let n=Math.min(first.to,second.from)-k;n<=Math.max(first.to,second.from)+k;n++){const lo=Math.min(first.depth,second.depth),hi=Math.max(first.depth,second.depth),s=support(Array.from({length:hi-lo+1},(_,i)=>hit(n,lo+i)));if(s.support>=.9&&s.maxGap<=1){joint={n,from:point(n,lo),to:point(n,hi),...s};break;}}if(!joint)continue;
+    // Both wall skins continue past the jambs; an isolated diagram or a pair
+    // of dimension ticks cannot stand in for a bounded opening in this wall.
+    let continuation=null;for(let d=-k;d<=k;d++){const before=support(Array.from({length:k*4},(_,i)=>hit(left.n-k-i,d))),after=support(Array.from({length:k*4},(_,i)=>hit(right.n+k+i,d)));if(before.support>=.9&&after.support>=.9&&before.maxGap<=1&&after.maxGap<=1){continuation={depth:d,before,after};break;}}if(!continuation)continue;
+    candidates.push({from:left.n,to:right.n,kind:'observed-sliding-frame',method:'paired-jambs-continuous-rail-and-offset-sliding-tracks',status:'proposed',confirmationRequired:true,metricWidth:null,coordinateSystem:'source-raster-pixels',jambs:[left,right].map(c=>({...c,anchors:[point(c.n,c.start),point(c.n,c.end)]})),rail:{...rail,anchors:[point(left.n,rail.depth),point(right.n,rail.depth)]},tracks:[first,second].map(t=>({...t,anchors:[point(t.from,t.depth),point(t.to,t.depth)]})),joint,continuation,coverage:union,swing:null});
+   }
+  }
+ }
+ candidates.sort((a,b)=>b.coverage.support-a.coverage.support||(a.to-a.from)-(b.to-b.from));return candidates[0]||null;
 }
  function floorBoundaryEvidence(image,points,ink=monochrome(image)){
   const {width:w,height:h}=image,k=Math.max(2,Math.round(w/525)),limit=Math.max(4,k*2),orientation=Math.sign(points.reduce((s,p,i)=>{const b=points[(i+1)%points.length];return s+p[0]*b[1]-b[0]*p[1];},0));
@@ -70,10 +105,10 @@
    for(let n=0;n<=length;n++){let hit=false;for(let d=-pad;d<=pad;d++){const x=Math.round(a[0]+u[0]*n-u[1]*d),y=Math.round(a[1]+u[1]*n+u[0]*d);if(x>=0&&x<w&&y>=0&&y<h)hit||=!!ink[y*w+x];}samples.push(hit);if(hit){hits++;if(gap>limit)runs.push({from:n-gap,to:n-1});gap=0;}else maxGap=Math.max(maxGap,++gap);}
    if(gap>limit)runs.push({from:samples.length-gap,to:samples.length-1});
    const support=hits/(Math.floor(length)+1),enoughInk=length>0&&support>=(length<k*5?.65:.86),openingEvidence=[];
-   if(enoughInk&&!diagonal&&runs.length&&runs.length<=12)for(const run of runs){const evidence=floorDoorEvidence(image,a,b,{...run,inside:[-orientation*u[1],orientation*u[0]]},ink);if(evidence)openingEvidence.push({...evidence,edgeIndex:i,explainedRun:run});}
+   if(enoughInk&&!diagonal&&runs.length&&runs.length<=12)for(const run of runs){const context={...run,inside:[-orientation*u[1],orientation*u[0]]},evidence=floorDoorEvidence(image,a,b,context,ink)||floorSlidingFrameEvidence(image,a,b,context,ink);if(evidence)openingEvidence.push({...evidence,edgeIndex:i,explainedRun:run});}
    let unexplainedMaxGap=0,unexplainedGap=0;for(let n=0;n<samples.length;n++){if(samples[n]||openingEvidence.some(e=>n>=e.from&&n<=e.to))unexplainedGap=0;else unexplainedMaxGap=Math.max(unexplainedMaxGap,++unexplainedGap);}
    const supported=enoughInk&&unexplainedMaxGap<=limit;
-   return {edgeIndex:i,anchors:[a.slice(),b.slice()],support,maxGap,tolerancePx:pad,status:supported?'proposed':'unresolved',method:openingEvidence.length?'source-strokes-and-observed-door-swing':'source-stroke-along-boundary',...(openingEvidence.length?{unexplainedMaxGap,openingEvidence}:{} )};
+   return {edgeIndex:i,anchors:[a.slice(),b.slice()],support,maxGap,tolerancePx:pad,status:supported?'proposed':'unresolved',method:openingEvidence.some(e=>e.kind==='observed-sliding-frame')?'source-strokes-and-observed-sliding-frame':openingEvidence.length?'source-strokes-and-observed-door-swing':'source-stroke-along-boundary',...(openingEvidence.length?{unexplainedMaxGap,openingEvidence}:{} )};
   });
  }
  function documentLabelsInside(rows,left,top,right,bottom){const labels=rows.filter(row=>Array.isArray(row.box)&&row.box.length===4&&(row.confidence??100)>=50&&row.box[0]>left&&row.box[1]>top&&row.box[2]<right&&row.box[3]<bottom).map(row=>String(row.text||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s*[:.]$/,''));return labels.some(text=>/^(?:legende|legend|notes?(?: generales?)?|general notes?|(?:door|window|finish) schedule|tableau(?: des? .+)?)$/i.test(text))||new Set(labels.filter(text=>/^(?:(?:nom|no\.?|numero) (?:du |de )?projet|project (?:name|number)|echelle|scale|date|dessine par|drawn by|revision)$/i.test(text))).size>=2;}
@@ -438,10 +473,29 @@
   }
   const chosen=candidates.sort((a,b)=>b.area-a.area)[0];if(!chosen)return unresolved(base);delete chosen.area;return chosen;
  }
+ // A supported slope can run into a fascia mask before its raster group ends.
+ // Keep the actual slope/upper-edge junction when the horizontal source stroke
+ // and the termination of the diagonal both demonstrate it.
+ function roofEaveJunctions(ink,w,h,envelope,slopes){
+  if(!slopes?.[0]||!slopes?.[1])return [];
+  const [bx,by,bw]=envelope.box,left=Math.max(0,Math.floor(slopes[0].eaveX)),right=Math.min(w-1,Math.ceil(slopes[1].eaveX));if(right-left<bw*.85||right-left>bw*1.6)return [];
+  const hit=(x,y,pad=1)=>{x=Math.round(x);y=Math.round(y);for(let dy=-pad;dy<=pad;dy++)for(let dx=-pad;dx<=pad;dx++)if(x+dx>=0&&x+dx<w&&y+dy>=0&&y+dy<h&&ink[(y+dy)*w+x+dx])return true;return false;},bands=[];
+  for(let y=Math.max(0,Math.round(by-22));y<=Math.min(h-1,Math.round(by+5));y++){let count=0,run=0,longest=0;for(let x=left;x<=right;x++){if(ink[y*w+x]){count++;longest=Math.max(longest,++run);}else run=0;}if(count/(right-left+1)<.72||longest<bw*.25)continue;const last=bands.at(-1);if(last&&y===last.bottom+1){last.bottom=y;last.support=Math.max(last.support,count/(right-left+1));}else bands.push({top:y,bottom:y,support:count/(right-left+1)});}
+  const result=[];
+  for(const band of bands){const y=(band.top+band.bottom)/2,junctions=[];for(let i=0;i<2;i++){const slope=slopes[i],x=(y-slope.c)/slope.m,inward=i===0?1:-1;if(!Number.isFinite(x)||Math.abs(x-slope.eaveX)>Math.max(8,bw*.08)||!hit(x,y))continue;
+    const extent=Math.max(10,Math.min(24,bw*.04)),offsets=Array.from({length:Math.floor(extent)-5},(_,j)=>j+6),support=sign=>offsets.reduce((n,d)=>n+Number(hit(x+inward*d*sign,slope.m*(x+inward*d*sign)+slope.c,1)),0)/offsets.length,inside=support(1),outside=support(-1);
+    // A dimension line crossing an uninterrupted slope cannot be its eave.
+    if(inside<.8||outside>.45)continue;junctions.push({index:i,x,y,method:'supported-roof-slope-terminates-at-horizontal-source-edge',horizontal:{anchors:[[left,y],[right,y]],strokeBand:[band.top,band.bottom],support:band.support},diagonal:{insideSupport:inside,outsideSupport:outside,probeRange:[6,extent]},sourceStrokeEndpoint:[slope.eaveX,slope.eaveY],status:'proposed',confirmationRequired:true});
+   }if(junctions.length){result.push(...junctions);break;}
+  }return result;
+ }
  function roofProfile(image,envelope,rows=[],{entry=false}={}){
   if(envelope.status!=='proposed')return {status:'unresolved',reason:'WALL_REGISTRATION_REQUIRED'};
   if(entry)return entryRoofProfile(image,envelope);
   const {width:w,height:h}=image,[bx,by,bw]=envelope.box,ink=structuralInk(image),occlusions=envelope.occlusions||[];
+  // Pale cyan/green quantity masks are not structural ink. Genuine dark
+  // source strokes remain eligible; neutral faded strokes are recovered below.
+  for(let i=0;i<ink.length;i++){const j=i*4,r=image.data[j],g=image.data[j+1],b=image.data[j+2];if(Math.max(r,g,b)-Math.min(r,g,b)>=18&&Math.max(r,g,b)>100)ink[i]=0;}
   // Recover only grey drawing strokes still present beneath translucent
   // legends. OCR legend text and its frame never supply roof geometry.
   for(const [x0,y0,rw,rh]of occlusions){for(let y=Math.max(0,y0-3);y<Math.min(h,y0+rh+4);y++)for(let x=Math.max(0,x0-3);x<Math.min(w,x0+rw+4);x++)ink[Math.round(y)*w+Math.round(x)]=0;for(let y=Math.max(0,y0+5);y<Math.min(h,y0+rh-5);y++)for(let x=Math.max(0,x0+5);x<Math.min(w,x0+rw-5);x++){const i=Math.round(y)*w+Math.round(x),j=i*4,r=image.data[j],g=image.data[j+1],b=image.data[j+2];ink[i]=Number(Math.max(r,g,b)-Math.min(r,g,b)<18&&Math.max(r,g,b)<238);}for(const row of rows){const [l,t,r,b]=row.box||[];if(l<x0||r>x0+rw||t<y0||b>y0+rh)continue;for(let y=Math.max(0,Math.floor(t)-2);y<Math.min(h,Math.ceil(b)+2);y++)for(let x=Math.max(0,Math.floor(l)-2);x<Math.min(w,Math.ceil(r)+2);x++)ink[y*w+x]=0;}}
@@ -468,10 +522,11 @@
    return {...best,m,c,start,end,eaveX,eaveY:m*eaveX+c,highX:ridge?.intersection??highX,highY:ridge?.y??high,ridgeEvidence:ridge,support:anchored.length/(end-start+1),fit:{method:'least-squares-supported-stroke-centreline',sampleCount:samples.length},visibleEndpoint:[highX,high]};
   }
   const a=slope(-1),b=slope(1);if(!a||!b)return {status:'unresolved',reason:'ROOF_SLOPE_OCCLUDED',base,slopes:[a,b]};
+  for(const junction of roofEaveJunctions(ink,w,h,envelope,[a,b]))Object.assign([a,b][junction.index],{eaveX:junction.x,eaveY:junction.y,eaveJunction:junction});
   if(Math.abs(a.highY-b.highY)>bw*.035||a.highX>b.highX+10)return {status:'unresolved',reason:'ROOF_PROFILES_DISAGREE',base,slopes:[a,b]};
   const ridgeY=Math.round(Math.max(a.highY,b.highY));if(base.y-ridgeY<20)return {status:'unresolved',reason:'ROOF_RISE_UNKNOWN'};
   if(b.highX-a.highX>8){let support=0,count=0;for(let x=Math.ceil(a.highX+2);x<=Math.floor(b.highX-2);x++){let hit=false;for(let dy=-3;dy<=3;dy++)if(ridgeY+dy>=0&&ridgeY+dy<h)hit||=!!ink[(ridgeY+dy)*w+x];support+=Number(hit);count++;}if(support/(count||1)<.7)return {status:'unresolved',reason:'ROOF_RIDGE_OCCLUDED',base,slopes:[a,b],ridgeSupport:support/(count||1)};}
-  return {status:'proposed',method:'source-eaves-and-two-supported-slopes',points:[[a.eaveX,base.y],[a.highX,ridgeY],[b.highX,ridgeY],[b.eaveX,base.y]],base,slopes:[a,b],sourceViewId:envelope.sourceViewId,sourceFrame:envelope.sourceFrame,confirmationRequired:true};
+  return {status:'proposed',method:'source-eaves-and-two-supported-slopes',points:[[a.eaveX,a.eaveJunction?a.eaveY:base.y],[a.highX,ridgeY],[b.highX,ridgeY],[b.eaveX,b.eaveJunction?b.eaveY:base.y]],base,slopes:[a,b],sourceViewId:envelope.sourceViewId,sourceFrame:envelope.sourceFrame,confirmationRequired:true};
  }
  function frameAtSeed(image,seed,{top,bottom}){
   const {width:w,height:h}=image,ink=structuralInk(image),expected=seed.right-seed.left,pad=Math.max(10,expected*.2),edges=[];
@@ -657,5 +712,5 @@
   }
   candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
  }
- return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
+ return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,floorSlidingFrameEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,roofEaveJunctions,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
 });

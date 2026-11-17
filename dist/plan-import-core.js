@@ -68,6 +68,32 @@
     }
     return { data: mask, width: w, height: h };
   }
+  function paperLineContrast(image, x, y, axis = 0) {
+    // Downsampled CAD hairlines can be almost white. This is a local,
+    // two-sided paper contrast observation, not a new global ink threshold.
+    // Broad grey fills, coloured markup and uniform paper have no such pair
+    // of opposing brighter margins. Strong marks keep their old thresholds.
+    x = Math.round(x); y = Math.round(y);
+    if (image.data.length !== image.width * image.height * 4 || x < 5 || y < 5 || x >= image.width - 5 || y >= image.height - 5) return null;
+    const pixel = (xx, yy) => {
+      const i = (yy * image.width + xx) * 4, r = image.data[i], g = image.data[i + 1], b = image.data[i + 2];
+      return image.data[i + 3] > 160 && Math.max(r, g, b) - Math.min(r, g, b) <= 12 ? (r + g + b) / 3 : null;
+    };
+    const value = pixel(x, y); if (value === null || value < 235 || value > 249) return null;
+    const sides = [-1, 1].map(sign => [2, 4].map(offset => pixel(x + (axis ? sign * offset : 0), y + (axis ? 0 : sign * offset))));
+    if (sides.flat().some(v => v === null || v < 248 || v - value < 6)) return null;
+    const paper = sides.map(values => Math.min(...values));
+    if (Math.abs(paper[0] - paper[1]) > 4) return null;
+    return { point: [x, y], value, paper, contrast: Math.min(...paper) - value };
+  }
+  function paperLineMask(image, base) {
+    const data = base.data.slice(), w = image.width, h = image.height;
+    for (let y = 5; y < h - 5; y++) for (let x = 5; x < w - 5; x++) {
+      const i = y * w + x;
+      if (!data[i] && paperLineContrast(image, x, y)) data[i] = 1;
+    }
+    return { data, width: w, height: h };
+  }
   function lineRun(mask, y, center, gap = 4, minimum = 50) {
     const { width: w, height: h, data } = mask;
     const black = x => { if (x < 0 || x >= w) return 0; for (let yy = Math.max(0, y - 1); yy <= Math.min(h - 1, y + 1); yy++) if (data[yy * w + x]) return 1; return 0; };
@@ -177,7 +203,10 @@
     return groups.length === 1 ? { candidate: candidates.sort((a, b) => b.score - a.score)[0], ambiguous: false } : { candidate: null, ambiguous: true };
   }
   function matchDimensionLines(image, labels, options = {}) {
-    const mask = inkMask(image, options.lightConstructionLines ? { threshold: 235, saturation: 30 } : {}), results = [], seen = new Set();
+    const localPaperContrast = !!(options.lightConstructionLines && options.requireDimensionMarks), baseMask = inkMask(image, options.lightConstructionLines ? { threshold: 235, saturation: 30 } : {}),
+      mask = localPaperContrast ? paperLineMask(image, baseMask) : baseMask, results = [], seen = new Set();
+    const assessAssociation = !!(options.shortTicks && options.preferReliableReadings), associationReasons = ['DIMENSION_ANNOTATION_CONTEXT', 'DIMENSION_COLOURED_ANNOTATION', 'DIMENSION_MULTI_VALUE_CONTEXT', 'DIMENSION_CAPTION_ASSOCIATION_AMBIGUOUS'];
+    const eligible = evidence => !evidence || (options.requireDimensionMarks ? evidence.status === 'observed' : !associationReasons.includes(evidence.reason));
     const sameReading = (a, b) => {
       if (Math.abs(a.referenceFt - b.referenceFt) > 1e-9 || a.axis !== b.axis) return false;
       if (![b.anchors, b.anchors.slice().reverse()].some(points => a.anchors.every((p, i) => Math.hypot(p[0] - points[i][0], p[1] - points[i][1]) <= 2))) return false;
@@ -217,8 +246,8 @@
           const score = .5 * centeringScore + .3 * distanceScore + .2 * run.density;
           if (!best || score > best.score) {
             const candidate = { text: dim.text, normalized: dim.normalized, referenceFt: dim.valueFt, anchors: [[a, y], [b, y]], spanPx: span, feetPerPixel: dim.valueFt / span, score, confidence: label.confidence ?? 100, source: label.source || 'ocr', textBox: label.box.slice(), corrected: dim.corrected, axis: options.axis || 'x' };
-            const evidence = options.requireDimensionMarks ? dimensionLineEvidence(image, candidate, { labels, allowCrossedTerminals: !!options.allowCrossedTerminals }) : null;
-            if (!evidence || evidence.status === 'observed') best = evidence ? { ...candidate, lineEvidence: evidence } : candidate;
+            const evidence = options.requireDimensionMarks || assessAssociation ? dimensionLineEvidence(image, candidate, { labels, allowCrossedTerminals: !!options.allowCrossedTerminals, localPaperContrast }) : null;
+            if (eligible(evidence)) best = options.requireDimensionMarks ? { ...candidate, lineEvidence: evidence } : candidate;
           }
         }
       }
@@ -232,7 +261,7 @@
         if (interrupted.ambiguous || mixedAmbiguity) best = null;
         else if (c) best = { text: dim.text, normalized: dim.normalized, referenceFt: dim.valueFt, ...c, feetPerPixel: dim.valueFt / c.spanPx, confidence: label.confidence ?? 100, source: label.source || 'ocr', textBox: label.box.slice(), corrected: dim.corrected, axis: options.axis || 'x' };
       }
-      if (best && options.requireDimensionMarks) { const evidence = dimensionLineEvidence(image, best, { labels, allowCrossedTerminals: !!options.allowCrossedTerminals }); best = evidence.status === 'observed' ? { ...best, lineEvidence: evidence } : null; }
+      if (best && (options.requireDimensionMarks || assessAssociation)) { const evidence = dimensionLineEvidence(image, best, { labels, allowCrossedTerminals: !!options.allowCrossedTerminals, localPaperContrast }); best = eligible(evidence) ? options.requireDimensionMarks ? { ...best, lineEvidence: evidence } : best : null; }
       if (best && best.feetPerPixel >= .00005 && best.feetPerPixel <= 10) {
         if (options.preferReliableReadings) {
           // A retry of this same inscription may improve its reading. Keep
@@ -250,7 +279,7 @@
     }
     return results.sort((a, b) => b.score - a.score);
   }
-  function dimensionLineEvidence(image, dimension, { labels = [], allowCrossedTerminals = false } = {}) {
+  function dimensionLineEvidence(image, dimension, { labels = [], allowCrossedTerminals = false, localPaperContrast = false } = {}) {
     // A parsed number near a wall is not yet a measured span. This stricter
     // assessment is opt-in for automatic calibration; raw OCR candidates and
     // the legacy dimension reader remain available for review.
@@ -275,6 +304,11 @@
     const context = labels.filter(covers).map(row => String(row.text || ''));
     const lineContext = labels.filter(row => row.box?.length === 4 && row.box.every(finite) && Math.abs((row.box[1] + row.box[3] - box[1] - box[3]) / 2) <= font * .7 && Math.max(0, row.box[0] - box[2], box[0] - row.box[2]) < font * 4).map(row => String(row.text || ''));
     if (context.some(text => /(?:\d[\d\s'".,/−-]*(?:mm|cm|m|ft|in|po|pi)?\s*[x×]\s*[\d\s'".,/−-]*\d|\b(?:notes?|tableau|schedule|index)\b)/i.test(text)) || lineContext.some(text => /\b\d+\s*min(?:utes?)?\b/i.test(text))) return unresolved('DIMENSION_ANNOTATION_CONTEXT');
+    // OCR can lose the separator in a compact two-value inscription. Keep
+    // its literal ambiguity instead of inventing an X or treating each
+    // quoted value as an independent construction length.
+    const multiValue = text => !/['′’]|\b(?:ft|feet|pi|pieds?)\b/i.test(text) && /\d+(?:[.,]\d+)?\s*["″][^\d'′’]{0,8}\d+(?:[.,]\d+)?\s*["″]/.test(text);
+    if (context.some(multiValue)) return unresolved('DIMENSION_MULTI_VALUE_CONTEXT', { anchors: anchors.map(p => p.slice()), captionBox: box.slice(), sourceCaptions: labels.filter(row => covers(row) && multiValue(String(row.text || ''))).map(row => ({ text: row.text, box: row.box.slice(), source: row.source || 'ocr', confidence: row.confidence ?? null })) });
     if (image.data.length !== image.width * image.height) {
       let neutral = 0, coloured = 0;
       for (let y = Math.max(0, Math.ceil(box[1])); y < Math.min(image.height, box[3]); y++) for (let x = Math.max(0, Math.ceil(box[0])); x < Math.min(image.width, box[2]); x++) {
@@ -284,12 +318,36 @@
       }
       if (coloured >= 4 && coloured > neutral * 2) return unresolved('DIMENSION_COLOURED_ANNOTATION');
     }
+    // A wall/window edge can contain incidental diagonal strokes. It cannot
+    // take a caption across another uninterrupted, nearer parallel source
+    // line. Keep that association ambiguous; do not choose a different value
+    // merely because it would agree with the rest of the drawing.
+    const captionEdge = coordinate < extent[0] ? extent[0] : coordinate > extent[1] ? extent[1] : coordinate, captionGap = Math.abs(coordinate - captionEdge), separation = Math.max(4, font * .5);
+    if (captionGap > font * 1.5 && span[1] - span[0] >= 80) {
+      const direction = Math.sign(coordinate - captionEdge), first = captionEdge + direction * 2, last = coordinate - direction * separation;
+      for (let v = first; direction * (last - v) >= 0; v += direction) {
+        let supported = 0, total = 0, gapRun = 0, longestGap = 0;
+        for (let u = Math.ceil(span[0]); u <= Math.floor(span[1]); u++) {
+          const hit = sample(u, v); total++;
+          if (hit) { supported++; gapRun = 0; } else longestGap = Math.max(longestGap, ++gapRun);
+        }
+        if (supported / total >= .9 && longestGap <= 4) return unresolved('DIMENSION_CAPTION_ASSOCIATION_AMBIGUOUS', { anchors: anchors.map(p => p.slice()), captionBox: box.slice(), interveningLine: { anchors: [point(span[0], Math.round(v)), point(span[1], Math.round(v))], pixelSupport: supported / total, maxGap: longestGap, method: 'nearer-continuous-parallel-source-line' } });
+      }
+    }
     const textOnLine = coordinate >= extent[0] - 1 && coordinate <= extent[1] + 1;
     const gap = textOnLine ? [Math.floor(caption[0] - 1), Math.ceil(caption[1] + 1)] : null;
-    let hits = 0, count = 0, misses = 0, maxGap = 0;
+    let hits = 0, count = 0, misses = 0, maxGap = 0, contrastCount = 0, minimumContrast = Infinity;
+    const contrastSamples = [];
     for (let u = Math.ceil(span[0]); u <= Math.floor(span[1]); u++) {
       if (gap && u >= gap[0] && u <= gap[1]) { misses = 0; continue; }
-      const hit = sample(u, coordinate - 1) || sample(u, coordinate) || sample(u, coordinate + 1); count++;
+      let hit = sample(u, coordinate - 1) || sample(u, coordinate) || sample(u, coordinate + 1); count++;
+      if (!hit && localPaperContrast) for (const delta of [0, -1, 1]) {
+        const p = point(u, coordinate + delta), observed = paperLineContrast(image, p[0], p[1], axis);
+        if (!observed) continue;
+        hit = 1; contrastCount++; minimumContrast = Math.min(minimumContrast, observed.contrast);
+        if (contrastSamples.length < 12 && (contrastSamples.length === 0 || u - contrastSamples.at(-1).point[axis] >= (span[1] - span[0]) / 12)) contrastSamples.push(observed);
+        break;
+      }
       if (hit) { hits++; misses = 0; } else maxGap = Math.max(maxGap, ++misses);
     }
     const pixelSupport = hits / (count || 1), markers = [], radius = Math.max(4, Math.min(6, Math.round(font * .4))), reach = Math.ceil(font * 3);
@@ -328,25 +386,55 @@
           if (!mark || score > mark.score) mark = { score, center: point(centerU, centerV), witnesses };
         }
       }
-      markers.push({ point: endpoint.slice(), kind: mark ? 'diagonal-tick' : 'unresolved-end-mark', witnesses: mark?.witnesses || witnessesAt(u, v), ...(mark ? { strokeCenter: mark.center, anchorTolerancePx: 2 } : {}) });
+      // At thumbnail resolution a real diagonal can retain only one strong
+      // off-axis pixel on either side. It is considered only for this long
+      // faded-line path, with two independent continuing witnesses; the
+      // complete line's real terminals are checked below as well.
+      if (!mark && contrastCount >= count * .65 && span[1] - span[0] >= Math.max(160, font * 12)) {
+        for (let du = -1; du <= 1; du++) for (let dv = -1; dv <= 1; dv++) {
+          if (Math.hypot(du, dv) > 1) continue;
+          const centerU = u + du, centerV = v + dv, crossingReach = clamp(Math.round(font * .85), 10, 35), witnesses = witnessesAt(centerU, centerV);
+          if (witnesses.length !== 2) continue;
+          for (const direction of [-1, 1]) {
+            const free = [[], []];
+            for (let d = 2; d <= 3; d++) for (const sign of [-1, 1]) {
+              const x = centerU + direction * sign * d, y = centerV + sign * d;
+              if (!sample(x, y, true)) continue;
+              const acrossStroke = sample(x, centerV - crossingReach, true) && sample(x, centerV + crossingReach, true), alongStroke = sample(centerU - crossingReach, y, true) && sample(centerU + crossingReach, y, true);
+              if (!acrossStroke && !alongStroke) free[sign < 0 ? 0 : 1].push(point(x, y));
+            }
+            if (!free.every(points => points.length)) continue;
+            const score = Math.min(...free.map(points => points.length)) * 10 - Math.hypot(du, dv);
+            if (!mark || score > mark.score) mark = { score, center: point(centerU, centerV), witnesses, compact: true, offAxisPixels: free };
+          }
+        }
+      }
+      markers.push({ point: endpoint.slice(), kind: mark ? mark.compact ? 'compact-diagonal-tick' : 'diagonal-tick' : 'unresolved-end-mark', witnesses: mark?.witnesses || witnessesAt(u, v), ...(mark ? { strokeCenter: mark.center, anchorTolerancePx: mark.compact ? 1 : 2, ...(mark.compact ? { offAxisPixels: mark.offAxisPixels } : {}) } : {}) });
     }
+    const lineAt = (u, v) => sample(u, v) || localPaperContrast && (() => { const p = point(u, v); return !!paperLineContrast(image, p[0], p[1], axis); })();
+    const terminalExtensions = () => span.map((u, i) => {
+      const direction = i ? 1 : -1, limit = Math.ceil(font * 1.5); let last = 0, missing = 0;
+      for (let d = 1; d <= limit; d++) {
+        const at = u + direction * d;
+        if (lineAt(at, coordinate - 1) || lineAt(at, coordinate) || lineAt(at, coordinate + 1)) { last = d; missing = 0; } else if (++missing > 1) break;
+      }
+      return last;
+    });
     if (allowCrossedTerminals && markers.every(m => m.witnesses.length === 2)) {
       // Some source dimensions terminate at plain crossed extension lines.
       // Only the actual two ends of the observed run qualify: a pair of
       // internal wall intersections cannot borrow the longer wall's line.
-      const ends = span.map((u, i) => {
-        const direction = i ? 1 : -1, limit = Math.ceil(font * 1.5); let last = 0, missing = 0;
-        for (let d = 1; d <= limit; d++) {
-          const at = u + direction * d;
-          if (sample(at, coordinate - 1) || sample(at, coordinate) || sample(at, coordinate + 1)) { last = d; missing = 0; } else if (++missing > 1) break;
-        }
-        return last;
-      });
+      const ends = terminalExtensions();
       if (ends.every(length => length <= Math.max(3, Math.ceil(font * .75)))) for (const marker of markers) if (marker.kind === 'unresolved-end-mark') { marker.kind = 'crossed-terminal-witnesses'; marker.terminalExtensions = ends.slice(); }
     }
-    const evidence = { kind: 'dimension-line-with-end-marks-and-witnesses', axis: axis === 0 ? 'x' : 'y', anchors: anchors.map(p => p.slice()), captionBox: box.slice(), segments: gap ? [[point(span[0], coordinate), point(gap[0], coordinate)], [point(gap[1], coordinate), point(span[1], coordinate)]] : [anchors.map(p => p.slice())], gap: gap?.map(u => point(u, coordinate)) || null, pixelSupport, maxGap, markers };
+    const evidence = { kind: 'dimension-line-with-end-marks-and-witnesses', axis: axis === 0 ? 'x' : 'y', anchors: anchors.map(p => p.slice()), captionBox: box.slice(), segments: gap ? [[point(span[0], coordinate), point(gap[0], coordinate)], [point(gap[1], coordinate), point(span[1], coordinate)]] : [anchors.map(p => p.slice())], gap: gap?.map(u => point(u, coordinate)) || null, pixelSupport, maxGap, markers,
+      ...(contrastCount ? { paperContrast: { method: 'opposing-local-paper-margins', pixels: contrastCount, minimumContrast, samples: contrastSamples, maximumStrokeWidthPx: 3, minimumPaperValue: 248 } } : {}) };
     if (pixelSupport < .85 || maxGap > 4 || count < 12) return unresolved('DIMENSION_LINE_SUPPORT', evidence);
-    if (markers.some(m => !['diagonal-tick', 'crossed-terminal-witnesses'].includes(m.kind) || !m.witnesses.length)) return unresolved('DIMENSION_END_MARKS_REQUIRED', evidence);
+    if (markers.some(m => !['diagonal-tick', 'compact-diagonal-tick', 'crossed-terminal-witnesses'].includes(m.kind) || !m.witnesses.length)) return unresolved('DIMENSION_END_MARKS_REQUIRED', evidence);
+    // This opt-in path recovers long, consistently faded drafting strokes.
+    // Isolated compression pixels must not repair arbitrary structural gaps;
+    // both dark diagonal ticks and continuing witnesses remain mandatory.
+    if (contrastCount && (span[1] - span[0] < Math.max(160, font * 12) || contrastCount < count * .65 || markers.some(m => !['diagonal-tick', 'compact-diagonal-tick'].includes(m.kind) || !m.witnesses.length) || markers.some(m => m.kind === 'compact-diagonal-tick') && terminalExtensions().some(length => length > Math.max(3, Math.ceil(font * .75))))) return unresolved('DIMENSION_PAPER_CONTRAST_UNRESOLVED', evidence);
     return { status: 'observed', ...evidence, confirmationRequired: true };
   }
   function resolveScale(candidates) {
@@ -385,7 +473,7 @@
     const q = [map([c.textBox[0], c.textBox[1]]), map([c.textBox[2], c.textBox[3]])];
     const result = { ...c, anchors: c.anchors.map(map), textBox: [Math.min(q[0][0], q[1][0]), Math.min(q[0][1], q[1][1]), Math.max(q[0][0], q[1][0]), Math.max(q[0][1], q[1][1])], axis: 'y' };
     if (c.sourceReading) result.sourceReading = mapReading(c.sourceReading);
-    if (c.lineEvidence?.kind === 'caption-interrupted-dimension-line') result.lineEvidence = { ...c.lineEvidence, captionBox: result.textBox.slice(), segments: c.lineEvidence.segments.map(s => s.map(map)), gap: c.lineEvidence.gap.map(map), markers: c.lineEvidence.markers.map(m => ({ ...m, point: map(m.point), witnesses: m.witnesses.map(s => s.map(map)) })) };
+    if (['caption-interrupted-dimension-line', 'dimension-line-with-end-marks-and-witnesses'].includes(c.lineEvidence?.kind)) result.lineEvidence = { ...c.lineEvidence, ...(c.lineEvidence.axis ? { axis: 'y' } : {}), ...(c.lineEvidence.anchors ? { anchors: c.lineEvidence.anchors.map(map) } : {}), captionBox: result.textBox.slice(), segments: c.lineEvidence.segments.map(s => s.map(map)), gap: c.lineEvidence.gap?.map(map) || null, markers: c.lineEvidence.markers.map(m => ({ ...m, point: map(m.point), ...(m.strokeCenter ? { strokeCenter: map(m.strokeCenter) } : {}), ...(m.offAxisPixels ? { offAxisPixels: m.offAxisPixels.map(points => points.map(map)) } : {}), witnesses: m.witnesses.map(s => s.map(map)) })), ...(c.lineEvidence.paperContrast ? { paperContrast: { ...c.lineEvidence.paperContrast, samples: c.lineEvidence.paperContrast.samples.map(s => ({ ...s, point: map(s.point) })) } } : {}) };
     return result;
   }
   function simplify(poly, tolerance = 2) {

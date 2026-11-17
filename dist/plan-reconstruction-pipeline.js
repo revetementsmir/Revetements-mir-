@@ -45,9 +45,9 @@
   if(!errors.length&&constrained.height.relationship==='two-visible-level-datums')for(const v of proposal.views){
    const view=inventory.views.find(s=>s.id===v.viewId&&s.kind==='elevation'&&s.buildingId===current.buildingId),band=R.levelBand(v,constrained,inventory);
    if(!view||v.envelope?.status!=='proposed'||!band||!['front','back','left','right'].includes(v.direction))continue;
-   const span=R.faceSpan(M.modelPoints(constrained),v.direction,{world:true}),box=v.envelope.box;
+   const span=R.registeredSpan(M.modelPoints(constrained),v.direction,v.envelope,{world:true}),box=v.envelope.box;
    if(!box?.every(Number.isFinite)||!(box[2]>0)||!(span.length>0&&Number.isFinite(span.length)))continue;
-   elevationCalibrations.push({kind:'estimated-calibrated',status:'proposed',value:span.length,sourceViewId:view.id,sourceFrame:copy(view.frame||null),anchors:[[box[0],band.bottomY],[box[0]+box[2],band.bottomY]],relationship:{kind:'floor-to-elevation-span',sourceReference:copy(constrained.reference),sourcePlanSpan:copy(R.faceSpan(constrained.points.map(p=>p.xy),v.direction)),contourAdjustment:copy(constrained.dimensionAdjustment||null),datumPair:{lower:copy(band.lower),upper:copy(band.upper)}},confirmationRequired:true});
+   elevationCalibrations.push({kind:'estimated-calibrated',status:'proposed',value:span.length,sourceViewId:view.id,sourceFrame:copy(view.frame||null),anchors:[[box[0],band.bottomY],[box[0]+box[2],band.bottomY]],relationship:{kind:'floor-to-elevation-span',sourceReference:copy(constrained.reference),sourcePlanSpan:copy(R.registeredSpan(constrained.points.map(p=>p.xy),v.direction,v.envelope)),contourAdjustment:copy(constrained.dimensionAdjustment||null),datumPair:{lower:copy(band.lower),upper:copy(band.upper)}},confirmationRequired:true});
   }
   return {proposal,resolution,draft,constrained,errors,elevationCalibrations};
  }

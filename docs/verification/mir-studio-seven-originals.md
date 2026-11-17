@@ -378,3 +378,44 @@ correctly reports `FLOOR_LEVEL_REQUIRED` / “Ce plan de niveau reste à nommer.
 it does not invent a floor assignment. No finish, reopen or responsive-model
 workflow is credited to an empty scene. Terminal screenshots were inspected;
 all original-source evidence remains private.
+
+## Calibration-mark repair — b575832
+
+A new C3 import against frozen runtime
+`b575832cd36ad0fcdb5746d3afbf09214ab3e65a` restores the baseline **15 walls,
+14 openings and two roofs**. The correction searches immediately beside a
+sampled dimension anchor for its observed tick; it does not change the written
+value, calibration anchors or confidence threshold. Orthogonal object corners
+still fail the dimension-mark check.
+
+The strict original-source recipe passes in 116.672 seconds: four 3D angles,
+finish confirmation, save/reopen with identical model and inventory, and
+FR-CA/EN-CA at 390×844, 834×1112 and 1440×1000. All 392 served resources match
+this exact commit. Private captures were opened and inspected. Physical wall,
+opening and roof geometry matches the baseline; calibration provenance now
+also records the observed marks.
+
+This remains **one partial model**: the main roof is still absent. This repair
+was rerun on C3 only; the other six dossiers have no new result at this SHA.
+The rejected seven-dossier candidate above remains part of the record.
+
+## Source-reading and registration follow-up
+
+The next candidate adds bounded re-reading from the retained PDF Blob with
+local PDF.js and Tesseract. Its source hash, page, crop, rotation, scale and
+pixel transforms are retained. A native OCR tile cannot replace a view from
+another source file. Fragmented datum captions and neighbouring numerical
+tokens are read together; the software never supplies a missing word or
+separator. Ambiguous multi-value captions cannot calibrate a wall edge.
+
+Independent source observations now support sliding-door interruptions,
+faded dimension lines with real terminal ticks and witnesses, shared axes
+between plans and elevations, and roof-slope/eave junctions. Coloured masks
+cannot extend a roof slope. A ceiling height remains distinct from the
+floor-to-floor interval. These changes preserve the earlier rejection of
+unsupported geometry, calibration conflicts and existing-project changes.
+
+Targeted source diagnostics and synthetic regressions support these rules.
+They do not constitute a new seven-original recipe or certification of the
+two requested exterior walls. New fresh-form results must be recorded against
+the frozen candidate separately from the historical baselines above.

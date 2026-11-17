@@ -22,7 +22,7 @@
    }best=Math.max(best,hits/32);
   }return best;
  }
- function bubbleRegions(image){
+ function bubbleRegions(image,{layout='floor'}={}){
   // Discover candidate ring locations from source ink BEFORE OCR. This avoids
   // depending on tiny 1/A/B labels in an entire 17-page raster document.
   // Labels are read separately from the interior, never inferred by ordering.
@@ -31,7 +31,8 @@
   const {width:w,height:h}=image,N=24,dirs=Array.from({length:N},(_,i)=>[Math.cos(2*Math.PI*i/N),Math.sin(2*Math.PI*i/N)]);
   const score=(x,y,r,coarse=false)=>{let hits=0;for(const [u,v] of dirs)if(dark(image,x+u*r,y+v*r)||dark(image,x+u*(r-1),y+v*(r-1))||dark(image,x+u*(r+1),y+v*(r+1))||coarse&&(dark(image,x+u*(r-2),y+v*(r-2))||dark(image,x+u*(r+2),y+v*(r+2))))hits++;return hits/N;};
   const minRadius=Math.max(7,Math.round(Math.min(w,h)*.007)),maxRadius=Math.min(42,Math.max(22,Math.round(Math.min(w,h)*.03)));
-  const bands=[['number',[.08,.02,.83,.20]],['letter',[.06,.13,.20,.87]]],bubbles=[];
+  const horizontalElevation=['elevation-number','elevation-letter'].includes(layout),elevationKind=layout==='elevation-letter'?'letter':'number';
+  const bands=horizontalElevation?[[elevationKind,[.03,.02,.90,.28]]]:[['number',[.08,.02,.83,.20]],['letter',[.06,.13,.20,.87]]],bubbles=[];
   for(const [kind,[xl,yl,xr,yb]]of bands){
    const rough=[];for(let y=Math.floor(h*yl);y<h*yb;y+=4)for(let x=Math.floor(w*xl);x<w*xr;x+=4){
     let best=null;for(let r=minRadius;r<=maxRadius;r+=3){const value=score(x,y,r,true);if(value>=.68&&(!best||value>best.score))best={x,y,r,score:value};}
@@ -47,19 +48,20 @@
     if(best.score>=.9)unique.push(best);
     if(unique.length>=80)break;
    }
-   const axis=kind==='number'?'y':'x',tolerance=kind==='number'?Math.max(3,h*.0025):Math.max(8,w*.006);
+   const horizontal=horizontalElevation||kind==='number',axis=horizontal?'y':'x',tolerance=horizontal?Math.max(3,h*.0025):Math.max(8,w*.006);
    let chosen=[];
    for(const c of unique){
     const group=unique.filter(v=>Math.abs(v[axis]-c[axis])<=tolerance&&Math.abs(v.r-c.r)<=Math.max(3,c.r*.20));
+    if(horizontalElevation&&(group.length<(kind==='number'?3:2)||Math.max(...group.map(v=>v.x))-Math.min(...group.map(v=>v.x))<w*.18))continue;
     if(group.length>chosen.length||group.length===chosen.length&&group.reduce((sum,v)=>sum+v.score,0)>chosen.reduce((sum,v)=>sum+v.score,0))chosen=group;
    }
-   const linear=kind==='number'?'x':'y';chosen.sort((a,b)=>a[linear]-b[linear]);
+   const linear=horizontal?'x':'y';chosen.sort((a,b)=>a[linear]-b[linear]);
    const span=chosen.length?chosen.at(-1)[linear]-chosen[0][linear]:0;
-   if(chosen.length<(kind==='number'?3:2)||span<(kind==='number'?w:h)*.18)continue;
+   if(chosen.length<(kind==='number'?3:2)||span<(horizontal?w:h)*.18)continue;
    bubbles.push(...chosen.slice(0,12).map(v=>({kind,center:[v.x,v.y],radius:v.r,ringSupport:v.score,
     sourceMethod:'source-raster-closed-grid-ring',confirmationRequired:true})));
   }
-  const ok=bubbles.filter(b=>b.kind==='number').length>=3&&bubbles.filter(b=>b.kind==='letter').length>=2;
+  const ok=horizontalElevation?bubbles.filter(b=>b.kind===elevationKind).length>=(elevationKind==='number'?3:2):bubbles.filter(b=>b.kind==='number').length>=3&&bubbles.filter(b=>b.kind==='letter').length>=2;
   return {status:ok?'proposed':'unresolved',reason:ok?null:'GRID_AXES_INSUFFICIENT',bubbles,confirmationRequired:true};
  }
  function markers(view,image){
@@ -184,5 +186,47 @@
   return {version:1,status:Object.values(byLevel).every(v=>v.status==='proposed')?'proposed':Object.values(byLevel).some(v=>v.status==='proposed')?'partial':'unresolved',buildingId,referenceLevelId:reference.levelId,byLevel,vertical,confirmationRequired:true,notAGeometryConfirmation:true};
  }
 
- return Object.freeze({version:1,bubbleRegions,markers,alignViews,forBuilding,metricAlignment,datumNetwork,registerPreparedLevels});
+ // Horizontal observation only. This neither creates a height nor supplies
+ // the missing coordinate perpendicular to an elevation.
+ function alignElevationAxes(floorView,elevationView,floorImage,elevationImage){
+  const direction=elevationView?.direction,axis=['front','back'].includes(direction)?0:['left','right'].includes(direction)?1:null,family=axis===0?'number':'letter',minimum=axis===0?3:2;
+  if(axis===null||floorView?.kind!=='floor'||elevationView?.kind!=='elevation'||floorView.buildingId!==elevationView.buildingId)return {status:'unresolved',reason:'ELEVATION_GRID_SOURCE_REQUIRED'};
+  const frameMatches=(v,im)=>{const expected=[v.payload?.sourceWidth||v.zone?.[2]||v.frame?.rasterSize?.[0],v.payload?.sourceHeight||v.zone?.[3]||v.frame?.rasterSize?.[1]];return im?.data&&Number.isInteger(im.width)&&Number.isInteger(im.height)&&im.width>0&&im.height>0&&im.data.length===im.width*im.height*4&&expected.every((n,i)=>n==null||Number.isInteger(n)&&n>0&&n===[im.width,im.height][i]);};
+  if(!frameMatches(floorView,floorImage)||!frameMatches(elevationView,elevationImage))return {status:'unresolved',reason:'ELEVATION_GRID_FRAME_REQUIRED'};
+  const w=elevationImage?.width,h=elevationImage?.height;
+  const floor=markers(floorView,floorImage);if(floor.status!=='observed')return {status:'unresolved',reason:'ELEVATION_GRID_FLOOR_AXES_REQUIRED'};
+  const floorMarkers=axis===0?floor.numbers:floor.letters,known=new Map(floorMarkers.map(m=>[m.label,m])),circles=[],observations=elevationView.payload?.drawingReadings?.rows||[];
+  for(const row of observations){
+   if(row.retry?.labelConflict||!(row.confidence>=55)||row.box?.length!==4||!row.box.every(finite))continue;
+   const label=String(row.text||'').trim().toUpperCase().replace(/[.\s]+$/,'');if(!known.has(label))continue;
+   const center=[(row.box[0]+row.box[2])/2,(row.box[1]+row.box[3])/2],height=row.box[3]-row.box[1],sourceCircle=row.retry?.gridCircle;
+   if(height<3||row.box[2]<=row.box[0]||row.box[0]<0||row.box[1]<0||row.box[2]>w||row.box[3]>h||center[1]>h*.28||sourceCircle&&(sourceCircle.kind!==family||!Array.isArray(sourceCircle.center)||sourceCircle.center.length!==2||!sourceCircle.center.every(finite)||!(sourceCircle.radius>3)||!(sourceCircle.ringSupport>=.9)||Math.hypot(center[0]-sourceCircle.center[0],center[1]-sourceCircle.center[1])>sourceCircle.radius*.4))continue;
+   const support=circleSupport(elevationImage,center,height);if(support<.68)continue;
+   let item=circles.find(c=>Math.hypot(c.center[0]-center[0],c.center[1]-center[1])<Math.max(3,height*.6));
+   if(item){if(item.label!==label)item.conflict=true;continue;}
+   circles.push({label,center,box:copy(row.box),confidence:row.confidence,ringSupport:support,sourceCircle:copy(sourceCircle||null),sourceViewId:elevationView.id});
+  }
+  const groups=[];for(const c of circles){if(c.conflict)continue;const group=circles.filter(v=>!v.conflict&&Math.abs(v.center[1]-c.center[1])<=Math.max(3,h*.003));if(group.length<minimum||new Set(group.map(m=>m.label)).size!==group.length||Math.max(...group.map(m=>m.center[0]))-Math.min(...group.map(m=>m.center[0]))<w*.18)continue;const key=group.map(m=>m.label+':'+m.center.join(',')).sort().join('|');if(!groups.some(g=>g.key===key))groups.push({key,markers:group});}
+  const sign=['back','left'].includes(direction)?-1:1,expectedSign=axis===0?sign:-sign,fits=[];
+  for(const group of groups){
+   const pairs=group.markers.map(m=>[{center:[known.get(m.label).center[axis],0]},m]),f=fit(pairs,0);if(!f||!(f.scale*expectedSign>0)||!finite(f.offset))continue;
+   const tolerance=3,checks=group.markers.map(m=>({label:m.label,floorPixelCoordinate:known.get(m.label).center[axis],sourcePixelX:m.center[0],predictedPixelX:f.scale*known.get(m.label).center[axis]+f.offset,residual:f.scale*known.get(m.label).center[axis]+f.offset-m.center[0],floor:{sourceViewId:floorView.id,point:copy(known.get(m.label).center),textBox:copy(known.get(m.label).box)},elevation:{sourceViewId:elevationView.id,point:copy(m.center),textBox:copy(m.box),sourceCircle:copy(m.sourceCircle)}}));
+   fits.push({status:f.maxResidual>tolerance?'conflict':'proposed',reason:f.maxResidual>tolerance?'ELEVATION_GRID_RESIDUAL_CONFLICT':null,transform:{floorAxis:axis===0?'x':'y',scale:f.scale,offset:f.offset},maxResidualPixels:f.maxResidual,tolerancePixels:tolerance,checks});
+  }
+  if(!fits.length)return groups.length?{status:'conflict',reason:'ELEVATION_GRID_DIRECTION_CONFLICT'}:circles.some(c=>c.conflict)?{status:'conflict',reason:'ELEVATION_GRID_LABEL_CONFLICT'}:{status:'unresolved',reason:'ELEVATION_GRID_LABELS_REQUIRED'};
+  const good=fits.filter(f=>f.status==='proposed');if(good.length>1&&good.some(f=>Math.abs(f.transform.offset-good[0].transform.offset)>3||Math.abs(f.transform.scale/good[0].transform.scale-1)>.01))return {status:'conflict',reason:'ELEVATION_GRID_GROUP_AMBIGUOUS',candidates:fits};
+  const best=good[0]||fits[0];return {...best,version:1,buildingId:floorView.buildingId,sourceLevel:floorView.levelId,floorSourceViewId:floorView.id,elevationSourceViewId:elevationView.id,sourceFrames:{floor:copy(floorView.frame||null),elevation:copy(elevationView.frame||null)},units:'source-pixels',method:'shared-labelled-horizontal-axis-registration',verticalStatus:'unresolved',perpendicularStatus:'unresolved',confirmationRequired:true,notAGeometryConfirmation:true};
+ }
+
+ function elevationAxisRegistration(floorView,elevationView,floorImage,elevationImage,draft,{elevationReference=null}={}){
+  if(draft?.sourceViewId!==floorView?.id||draft.reference?.sourceViewId!==floorView?.id)return {status:'unresolved',reason:'ELEVATION_GRID_SOURCE_REQUIRED'};
+  const unit=numericScale(draft.reference),alignment=draft.alignment,reference=draft.reference;
+  if(!unit||reference.status==='conflict'||reference.conflict||reference.kind==='hypothesis'||!Array.isArray(alignment?.origin)||alignment.origin.length!==2||!alignment.origin.every(finite)||!Array.isArray(alignment?.offset)||alignment.offset.length!==2||!alignment.offset.every(finite)||alignment.rotationDegrees!==0)return {status:'unresolved',reason:'ELEVATION_GRID_CALIBRATION_REQUIRED'};
+  const observed=alignElevationAxes(floorView,elevationView,floorImage,elevationImage);if(observed.status!=='proposed')return observed;
+  const direction=elevationView.direction,axis=observed.transform.floorAxis==='x'?0:1,planSign=axis===0?1:-1,projectionSign=['back','left'].includes(direction)?-1:1,a=observed.transform.scale,b=observed.transform.offset,pixelsPerMetre=a/(projectionSign*planSign*unit),offsetPixels=b+a*alignment.origin[axis]-a*alignment.offset[axis]/(planSign*unit),scaleUsed=1/pixelsPerMetre,calScale=elevationReference?numericScale(elevationReference):null;
+  const conflict=elevationReference&&(elevationReference.sourceViewId!==elevationView.id||!calScale||elevationReference.status==='conflict'||elevationReference.conflict||elevationReference.kind==='hypothesis'||Math.abs(calScale/scaleUsed-1)>.05);
+  return {...observed,status:conflict?'conflict':'proposed',reason:conflict?'ELEVATION_GRID_SCALE_CONFLICT':null,units:'metres-to-source-pixels',pixelRegistration:observed,transform:{modelAxis:observed.transform.floorAxis,projectionSign,pixelsPerMetre,offsetPixels},scaleUsed,reference:copy(reference),elevationReference:copy(elevationReference)};
+ }
+
+ return Object.freeze({version:1,alignElevationAxes,elevationAxisRegistration,bubbleRegions,markers,alignViews,forBuilding,metricAlignment,datumNetwork,registerPreparedLevels});
 });
