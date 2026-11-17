@@ -11,6 +11,8 @@ function pair(){const image=raster(),a=dimension(image,{anchors:[[180,230],[340,
 const bounds=[100,100,600,500],input=pair(),pixels=Buffer.from(input.image.data),before=structuredClone([input.view,input.a,input.b]);
 const assess=(im,d,options)=>A.dimensionLineEvidence(im,d,options);
 for(const d of [input.a,input.b]){const proof=assess(input.image,d);assert.equal(proof.status,'observed');assert.ok(proof.markers.every(m=>m.kind==='diagonal-tick'&&m.witnesses.length===2));assert.equal(proof.pixelSupport,1);assert.deepEqual(proof.anchors,d.anchors);}
+const offset=structuredClone(input.a);offset.anchors=offset.anchors.map(([x,y])=>[x+1,y]);const offsetBefore=structuredClone(offset),localized=assess(input.image,offset);
+assert.equal(localized.status,'observed','an anchor on the stroke edge must retain a nearby real diagonal tick');assert.deepEqual(offset,offsetBefore,'mark localization never edits written endpoints or measures');assert.ok(localized.markers.every(m=>m.anchorTolerancePx===2&&Math.hypot(m.strokeCenter[0]-m.point[0],m.strokeCenter[1]-m.point[1])<=2));assert.ok(localized.markers.some(m=>m.strokeCenter.some((n,i)=>n!==m.point[i])));
 const accepted=R.partialScaleReferences(input.view,[input.a,input.b],bounds,{image:input.image});
 assert.equal(accepted.references.length,2);assert.equal(accepted.conflict,false);assert.equal(accepted.assessment.scale,.0125);assert.ok(accepted.references.every(d=>d.lineEvidence.status==='observed'));
 assert.deepEqual([input.view,input.a,input.b],before);assert.deepEqual(Buffer.from(input.image.data),pixels,'calibration assessment never paints missing ticks or glyphs');
@@ -26,6 +28,9 @@ for(const options of [{ticks:false},{witnesses:false},{colour:[0,160,50]}]){
 const objects=raster();line(objects,[100,250],[780,250]);for(const x of [180,340])line(objects,[x,180],[x,320]);
 const token={...input.a,text:'24"',label:'24"',value:.6096,anchors:[[180,250],[340,250]],textBox:[250,230,270,240]};
 assert.equal(assess(objects,token).reason,'DIMENSION_END_MARKS_REQUIRED');assert.equal(assess(objects,token,{allowCrossedTerminals:true}).reason,'DIMENSION_END_MARKS_REQUIRED','internal crossings cannot use the pale-line terminal exception');
+const shortPosts=raster();line(shortPosts,[100,250],[780,250]);
+for(const x of [180,340])for(const dx of [-3,-2,-1,1,2,3])line(shortPosts,[x+dx,238],[x+dx,262]);
+assert.equal(assess(shortPosts,token).status,'unresolved','short paired closet strokes are not bilateral diagonal ticks, including after bounded localization');
 const rejected=R.partialScaleReferences(input.view,[token,{...token,text:'36"',value:.9144,textBox:[450,230,470,240],anchors:[[380,250],[540,250]]}],bounds,{image:objects});
 assert.equal(rejected.references.length,0);assert.equal(rejected.conflict,false);assert.equal(rejected.unresolvedReferences.length,2,'unsupported candidates remain visible instead of becoming a false scale conflict');
 assert.ok(rejected.unresolvedReferences.every(d=>d.scaleEligibility==='unresolved'&&d.lineEvidence.reason));

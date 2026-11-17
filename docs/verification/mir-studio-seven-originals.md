@@ -348,3 +348,33 @@ roof remains absent in every view. This establishes responsive handling of
 that partial proposal in Chromium, not source fidelity or physical-device
 acceptance. The other six original dossiers have no equivalent model workflow
 because their baseline scenes are empty.
+
+
+## Rejected registration candidate — 7d528bf
+
+The fresh-form harness was rerun on all seven originals against frozen runtime
+`7d528bfafed5a2e540e57885b8bc6d60faf9c64e`. All 48 pages imported, retaining
+46 views. **Zero complete models, zero partial models and seven empty scenes**
+were produced. This candidate is not accepted as preserving the original-source
+workflow, regardless of its synthetic test results.
+
+C3 regressed from the baseline 15 walls / 14 openings / 2 roofs to
+`SCALE_TRANSCRIPTION_UNCERTAIN`. The imported views were identical; the new
+calibration mark check rejected valid short ticks whose observed centres lay
+slightly beside their sampled anchors. This failure is retained and requires a
+new original-source run after correction, not a relaxed confidence threshold.
+
+C7 imported 17 pages and 11 views in a complete 503.488-second run. All three
+moving floor grids now match the reference grid with observed named axes. The
+ambiguous first numeric marker remains excluded and its conflicting OCR reads
+are saved. The reference-level contour is recovered, but its scale is unknown;
+two other contours still fail source support/complexity and the highest floor's
+scale transcription is uncertain. No wall, opening or roof is produced. The two
+requested exterior walls under the roof therefore remain unproved.
+
+The five other primary dossiers retain their baseline refusal categories. A
+separate C6 secondary-building run preserves its five rotated views and now
+correctly reports `FLOOR_LEVEL_REQUIRED` / “Ce plan de niveau reste à nommer.”;
+it does not invent a floor assignment. No finish, reopen or responsive-model
+workflow is credited to an empty scene. Terminal screenshots were inspected;
+all original-source evidence remains private.

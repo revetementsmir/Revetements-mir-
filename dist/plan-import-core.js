@@ -294,26 +294,41 @@
     }
     const pixelSupport = hits / (count || 1), markers = [], radius = Math.max(4, Math.min(6, Math.round(font * .4))), reach = Math.ceil(font * 3);
     for (const endpoint of anchors) {
-      const u = endpoint[axis], v = endpoint[across], witnesses = [];
-      for (const sign of [-1, 1]) {
-        let last = radius, missing = 0;
-        for (let d = radius + 1; d <= reach; d++) {
-          if (sample(u - 1, v + sign * d) || sample(u, v + sign * d) || sample(u + 1, v + sign * d)) { last = d; missing = 0; } else if (++missing > 1) break;
+      const u = endpoint[axis], v = endpoint[across];
+      const witnessesAt = (x, y) => {
+        const found = [];
+        for (const sign of [-1, 1]) {
+          let last = radius, missing = 0;
+          for (let d = radius + 1; d <= reach; d++) {
+            if (sample(x - 1, y + sign * d) || sample(x, y + sign * d) || sample(x + 1, y + sign * d)) { last = d; missing = 0; } else if (++missing > 1) break;
+          }
+          if (last - radius >= Math.max(6, Math.ceil(font * .6))) found.push([point(x, y), point(x, y + sign * last)]);
         }
-        if (last - radius >= Math.max(6, Math.ceil(font * .6))) witnesses.push([endpoint.slice(), point(u, v + sign * last)]);
-      }
-      let diagonal = false;
-      for (const direction of [-1, 1]) {
-        const direct = [0, 0], free = [0, 0];
-        for (let d = 2; d <= 6; d++) for (const sign of [-1, 1]) {
-          const x = u + direction * sign * d, y = v + sign * d;
-          if (!sample(x, y, true)) continue;
-          const k = sign < 0 ? 0 : 1; direct[k]++;
-          if (!(sample(x, v - reach, true) && sample(x, v + reach, true))) free[k]++;
+        return found;
+      };
+      let mark = null;
+      // An intersection cluster can select the edge of a two-pixel stroke.
+      // Locate the mark within that bounded raster uncertainty, retaining
+      // both the measured anchor and the actually observed mark centre.
+      for (let du = -2; du <= 2; du++) for (let dv = -2; dv <= 2; dv++) {
+        if (Math.hypot(du, dv) > 2) continue;
+        const centerU = u + du, centerV = v + dv, crossingReach = clamp(Math.round(font * .85), 10, 35);
+        for (const direction of [-1, 1]) {
+          const direct = [0, 0], free = [0, 0];
+          for (let d = 2; d <= 6; d++) for (const sign of [-1, 1]) {
+            const x = centerU + direction * sign * d, y = centerV + sign * d;
+            if (!sample(x, y, true)) continue;
+            const k = sign < 0 ? 0 : 1; direct[k]++;
+            const acrossStroke = sample(x, centerV - crossingReach, true) && sample(x, centerV + crossingReach, true), alongStroke = sample(centerU - crossingReach, y, true) && sample(centerU + crossingReach, y, true);
+            if (!acrossStroke && !alongStroke) free[k]++;
+          }
+          if (Math.min(...direct) < 2 || Math.min(...free) < 1) continue;
+          const witnesses = witnessesAt(centerU, centerV); if (!witnesses.length) continue;
+          const score = Math.min(...direct) * 10 + Math.min(...free) - Math.hypot(du, dv);
+          if (!mark || score > mark.score) mark = { score, center: point(centerU, centerV), witnesses };
         }
-        if (Math.min(...direct) >= 2 && Math.min(...free) >= 1) diagonal = true;
       }
-      markers.push({ point: endpoint.slice(), kind: diagonal ? 'diagonal-tick' : 'unresolved-end-mark', witnesses });
+      markers.push({ point: endpoint.slice(), kind: mark ? 'diagonal-tick' : 'unresolved-end-mark', witnesses: mark?.witnesses || witnessesAt(u, v), ...(mark ? { strokeCenter: mark.center, anchorTolerancePx: 2 } : {}) });
     }
     if (allowCrossedTerminals && markers.every(m => m.witnesses.length === 2)) {
       // Some source dimensions terminate at plain crossed extension lines.
