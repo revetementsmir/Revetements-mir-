@@ -512,3 +512,49 @@ private reports and rendered captures remain valid for the outcomes recorded
 above, but they do not retroactively contain the discarded imported raster
 bytes. No original, OCR text, client capture or source coordinates are included
 in this public document or its fixtures.
+
+## First four-level workflow — dd63c82
+
+Fresh form imports against immutable runtime
+`dd63c822323f4a4f592803a5a2eba8da19f6b917` again process all 48 pages and
+46 views. **Zero certified complete models, two partial models and five empty
+scenes** result. Every case retains the strict nonempty-model and complete
+workflow requirements. C3 and C7 pass that workflow; the five empty cases fail.
+
+| Case | Pages / views | Walls / openings / root roofs | Actual outcome | Seconds |
+| --- | --- | --- | --- | ---: |
+| C1 | 5 / 5 | 0 / 0 / 0 | Boundary source support unresolved; reserved from this tuning | 74.252 |
+| C2 | 5 / 5 | 0 / 0 / 0 | Contour recovered; scale transcription remains uncertain | 88.661 |
+| C3 | 5 / 5 | 15 / 15 / 3 | Partial; four angles, finish, save/reopen and six FR/EN viewports pass | 137.691 |
+| C4 | 5 / 5 | 0 / 0 / 0 | Scale unknown; upper-only source retained | 79.098 |
+| C5 | 5 / 5 | 0 / 0 / 0 | Boundary source support unresolved | 100.028 |
+| C6 | 6 / 10 | 0 / 0 / 0 | House height unknown; buildings remain separate | 93.116 |
+| C7 | 17 / 11 | 16 / 33 / 0 | First partial four-level model and complete finish/reopen workflow | 700.176 |
+
+C7's independent floor references and named grids now establish proposed X/Y/Z
+registration for levels 0–3. The complete geometry and selected finish survive
+save/reopen. Four rendered angles and FR-CA/EN-CA at 390/834/1440 are exercised;
+the building remains visible without the PDF raster. These are Chromium
+viewport tests, not physical devices. The recorded JavaScript heap samples
+are approximately 36 MB after import, 244 MB after model generation and 224 MB
+after reopen; they are not peaks or total browser memory.
+
+C7 is **not faithful or complete**. No roof or balcony is generated. Source
+comparison identifies incorrectly joined lower-floor window proposals and
+missing openings. Four main-contour walls exist on the highest level, but that
+count does not demonstrate the two specifically requested exterior walls or
+their roof junctions. Those targets remain unverified. C3 retains the earlier
+exterior-detail and vertical-calibration limitations; its nested roof return
+is still not counted as a fourth independent roof.
+
+All 392 served assets match this exact commit for both runs. The new evidence
+export also passes on the originals: all 46 persisted JPEG rasters are retained
+privately with verified byte hashes, MIME type, dimensions, source frames,
+orientation and crop metadata. This is the first checkpoint with those exact
+saved image bytes, distinct from earlier PNG diagnostic rerenders. No private
+source image, OCR or client geometry is included in this report or the CI.
+
+The exact-commit Studio CI run
+[44104725280](https://github.com/revetementsmir/Revetements-mir-/actions/runs/44104725280)
+passes its Node, disposable SQL and synthetic browser contracts. That CI does
+not certify the two original-source partial models or the missing roof walls.

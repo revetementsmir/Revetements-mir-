@@ -54,7 +54,7 @@
   if(!image?.data||!validBox(box))return [];
   const b=intersection(box,[0,0,image.width,image.height]);if(!b||b[2]<45||b[3]<18)return [];
   const x0=Math.ceil(b[0]),x1=Math.floor(b[0]+b[2]-1),y0=Math.ceil(b[1]),y1=Math.floor(b[1]+b[3]-1),minRun=Math.max(25,b[2]*.55);
-  const ink=(x,y)=>{if(x<0||y<0||x>=image.width||y>=image.height)return false;const p=(y*image.width+x)*4,r=image.data[p],g=image.data[p+1],bl=image.data[p+2];return image.data[p+3]>160&&Math.min(r,g,bl)<145&&(Math.max(r,g,bl)<205||Math.max(r,g,bl)-Math.min(r,g,bl)>55);};
+  const ink=(x,y)=>{if(x<0||y<0||x>=image.width||y>=image.height)return false;const p=(y*image.width+x)*4,r=image.data[p],g=image.data[p+1],bl=image.data[p+2];return image.data[p+3]>160&&Math.min(r,g,bl)<145&&Math.max(r,g,bl)<205&&Math.max(r,g,bl)-Math.min(r,g,bl)<35;};
   const rows=[];
   for(let y=y0;y<=y1;y++){
    let begin=null,last=-10,best=null;
@@ -84,6 +84,127 @@
    const previous=g[i],moved=c.joints.filter(x=>Math.min(...previous.joints.map(y=>Math.abs(x-y)))>Math.max(2,c.pitch*.25));return moved.length>=c.joints.length*.5;
   })).map(g=>({box:[Math.max(...g.map(c=>c.left)),g[0].top,Math.min(...g.map(c=>c.right))-Math.max(...g.map(c=>c.left)),g.at(-1).bottom-g[0].top],
    method:'visible-courses-and-staggered-interior-joints',courses:g.length,coursePixels:median(g.map(c=>c.pitch)),jointSpacingPixels:median(g.map(c=>c.spacing)),status:'proposed',confirmationRequired:true}));
+ }
+ // Irregular stone does not have uniform brick courses. Observe its closed
+ // source cells, then require a real leader from a material caption. Pixel
+ // thresholds follow the caption's source height, not a particular PDF size.
+ function stoneCaptions(rows,masks=[]){
+  const labels=materialLabels({payload:{drawingReadings:{rows}}}).filter(r=>! /\b(?:notes?|index|sommaire|contents|tableau|schedule)\b/.test(normal(r.text)));
+  return labels.map(row=>{const [x,y,r,b]=row.box,font=b-y,bounds=row.box.slice();
+   for(const next of rows){if(next.box?.length!==4||next.box[1]<y||next.box[3]>b+font*3.5||next.box[0]<x-font||next.box[2]>r+font||next.box[2]<=x||next.box[0]>=r)continue;bounds[3]=Math.max(bounds[3],next.box[3]);}
+   return {label:row.text,sourceBox:copy(row.box),box:[bounds[0],bounds[1],bounds[2]-bounds[0],bounds[3]-bounds[1]],font,confidence:row.confidence,source:row.source};
+  }).filter((c,i,a)=>c.font>0&&!masks.some(m=>intersection(c.box,m))&&!a.slice(0,i).some(p=>p.sourceBox.every((n,j)=>n===c.sourceBox[j])));
+ }
+ function stoneInk(image,x,y,threshold=205){
+  x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=image.width||y>=image.height)return false;
+  const p=(y*image.width+x)*4,r=image.data[p],g=image.data[p+1],b=image.data[p+2];
+  return image.data[p+3]>160&&Math.max(r,g,b)-Math.min(r,g,b)<35&&(r+g+b)/3<threshold;
+ }
+ function stoneLeader(image,caption,box,masks,unit){
+  const contains=(b,x,y)=>x>=b[0]&&y>=b[1]&&x<b[0]+b[2]&&y<b[1]+b[3],tolerance=Math.max(1,Math.round(unit));
+  const segment=(a,b,minimum=20*unit)=>{const length=M.distance(a,b);if(length<minimum)return null;let hits=0,gap=0,maxGap=0;const count=Math.ceil(length);
+   for(let i=0;i<=count;i++){const x=a[0]+(b[0]-a[0])*i/count,y=a[1]+(b[1]-a[1])*i/count;if(masks.some(m=>contains(m,x,y)))return null;
+    let hit=false;for(let dy=-tolerance;dy<=tolerance&&!hit;dy++)for(let dx=-tolerance;dx<=tolerance;dx++)if(stoneInk(image,x+dx,y+dy,185)){hit=true;break;}
+    if(hit){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);
+   }
+   return hits/(count+1)>=.9&&maxGap<=Math.max(1,3*unit)?{anchors:[a,b],support:hits/(count+1),maxGap,pixelTolerance:tolerance}:null;
+  };
+  const [cx,cy,cw,ch]=caption.box,[x,y,w,h]=box;if(intersection(caption.box,box))return null;
+  const left=cx+cw<x,right=cx>x+w;if(!left&&!right)return null;
+  const captionX=left?cx+cw+2*unit:cx-2*unit,edgeX=left?x-2*unit:x+w+2*unit,distance=Math.abs(edgeX-captionX),sign=left?1:-1;
+  if(distance<8*unit||distance>caption.font*18)return null;
+  const ylo=Math.max(y,cy-caption.font*5),yhi=Math.min(y+h,cy+ch+caption.font*5),step=Math.max(1,Math.floor(unit));let best=null;
+  for(let ay=Math.ceil(cy);ay<=cy+ch+2*unit;ay+=step){const origin=[captionX,ay],stems=[{a:origin,stem:null}];
+   for(let length=8*unit;length<=caption.font*2;length+=2*unit){const a=[captionX+length*sign,ay],stem=segment(origin,a,8*unit);if(stem)stems.push({a,stem});}
+   for(const {a,stem}of stems)for(let by=Math.ceil(ylo);by<=yhi;by+=step){const b=[edgeX,by],ev=segment(a,b);if(!ev)continue;
+    const slope=(by-ay)/(edgeX-a[0]),inside=[edgeX+sign*10*unit,by+slope*sign*10*unit],extension=segment(a,inside);if(!extension)continue;
+    const proof={...extension,stem,caption:caption.label,captionBox:copy(caption.sourceBox),captionConfidence:caption.confidence??null,captionSource:caption.source||'ocr',method:'caption-adjacent-neutral-ink-leader-crosses-closed-cell-cluster'};
+    if(!best||proof.support>best.support)best=proof;
+   }
+  }return best;
+ }
+ // Exact run boundaries give simple polygons. Split at branches/holes and
+ // before the polygon vertex limit; no bounding rectangle fills unknown ink.
+ function mergeStonePolygons(polygons){
+  const join=(a,b)=>{const lines=new Map();for(const p of [a,b])for(let i=0;i<p.length;i++){const q=p[i],r=p[(i+1)%p.length],axis=q[1]===r[1]?0:q[0]===r[0]?1:null;if(axis===null)return null;
+    const key=axis+':'+q[1-axis],list=lines.get(key)||[];list.push({axis,c:q[1-axis],lo:Math.min(q[axis],r[axis]),hi:Math.max(q[axis],r[axis]),sign:Math.sign(r[axis]-q[axis])});lines.set(key,list);
+   }
+   const edges=[];let shared=0;
+   for(const list of lines.values()){const cuts=[...new Set(list.flatMap(e=>[e.lo,e.hi]))].sort((a,b)=>a-b);
+    for(let i=1;i<cuts.length;i++){const lo=cuts[i-1],hi=cuts[i],mid=(lo+hi)/2,owners=list.filter(e=>e.lo<mid&&e.hi>mid),sum=owners.reduce((n,e)=>n+e.sign,0);if(!sum){if(owners.length)shared+=hi-lo;continue;}if(Math.abs(sum)!==1)return null;
+     const {axis,c}=owners[0],point=n=>axis===0?[n,c]:[c,n];edges.push(sum>0?[point(lo),point(hi)]:[point(hi),point(lo)]);
+    }
+   }
+   if(!shared)return null;
+   const key=p=>p.join(','),next=new Map();for(const [a,b]of edges){if(next.has(key(a)))return null;next.set(key(a),b);}
+   const start=edges[0][0],points=[start];let cursor=next.get(key(start));while(cursor&&key(cursor)!==key(start)&&points.length<=edges.length){points.push(cursor);cursor=next.get(key(cursor));}
+   if(!cursor||points.length!==edges.length)return null; // More than one loop is a hole, never a fill.
+   const simple=points.filter((p,i)=>{const before=points[(i+points.length-1)%points.length],after=points[(i+1)%points.length];return (p[0]-before[0])*(after[1]-p[1])!==(p[1]-before[1])*(after[0]-p[0]);});
+   return simple.length<=190&&!M.validatePolygon(simple).length?simple:null;
+  };
+  const merged=polygons.slice();let changed=true;
+  while(changed){changed=false;for(let i=0;i<merged.length&&!changed;i++)for(let j=i+1;j<merged.length;j++){const combined=join(merged[i],merged[j]);if(!combined)continue;merged[i]=combined;merged.splice(j,1);changed=true;break;}}
+  return merged;
+ }
+ function stonePolygons(mask,width,height,origin,{box=null,masks=[]}={}){
+  const polygons=[];let active=[];
+  const polygon=band=>{const left=[],right=[];let previous=null;
+   for(const row of band){const [y,l,r]=row;if(!previous){left.push([l,y]);right.push([r,y]);}else {if(l!==previous[1])left.push([previous[1],y],[l,y]);if(r!==previous[2])right.push([previous[2],y],[r,y]);}previous=row;}
+   left.push([previous[1],previous[0]+1]);right.push([previous[2],previous[0]+1]);
+   return [...left,...right.reverse()].map(([x,y])=>[x+origin[0],y+origin[1]]);
+  };
+  const flush=()=>{for(const band of active)polygons.push(polygon(band));active=[];};
+  const occupied=(x,y)=>{if(!mask[y*width+x])return false;const px=x+origin[0],py=y+origin[1];if(box&&(px<box[0]||py<box[1]||px+1>box[0]+box[2]||py+1>box[1]+box[3]))return false;return !masks.some(m=>px<m[0]+m[2]&&px+1>m[0]&&py<m[1]+m[3]&&py+1>m[1]);};
+  for(let y=0;y<height;y++){const runs=[];for(let x=0;x<width;){if(!occupied(x,y)){x++;continue;}const l=x;while(x<width&&occupied(x,y))x++;runs.push([y,l,x]);}
+   const compatible=runs.length===active.length&&runs.every((r,i)=>{const p=active[i].at(-1);return p[0]===y-1&&Math.min(r[2],p[2])>Math.max(r[1],p[1]);});
+   if(!compatible||active.some((band,i)=>polygon([...band,runs[i]]).length>190))flush();
+   if(!active.length)active=runs.map(r=>[r]);else runs.forEach((r,i)=>active[i].push(r));
+   if(polygons.length+active.length>80){const merged=mergeStonePolygons(polygons);polygons.splice(0,polygons.length,...merged);if(polygons.length+active.length>80)return {status:'unresolved',reason:'MASONRY_REGION_COMPLEXITY',polygons:[]};}
+  }flush();return {status:'observed',polygons:mergeStonePolygons(polygons)};
+ }
+ function irregularMasonry(image,box,rows,{masks=[]}={}){
+  const empty=reason=>({status:'unresolved',reason,candidates:[]});
+  if(!image?.data||image.data.length!==image.width*image.height*4||!validBox(box))return empty('MASONRY_SOURCE_REQUIRED');
+  const bounds=intersection(box,[0,0,image.width,image.height]),captions=stoneCaptions(rows,masks);if(!bounds||!captions.length)return empty('MASONRY_CAPTION_REQUIRED');
+  const unit=median(captions.map(c=>c.font))/8,x0=Math.ceil(bounds[0]),y0=Math.ceil(bounds[1]),w=Math.floor(bounds[0]+bounds[2])-x0,h=Math.floor(bounds[1]+bounds[3])-y0;
+  if(!(unit>0)||w<1||h<1||w*h>6000000)return empty('MASONRY_SOURCE_COMPLEXITY');
+  // Raster hatching itself frequently produces low-confidence OCR fragments
+  // ("I", "ee", "—"). Only established text boxes mask the cell detector;
+  // detected legends/openings remain unconditional exclusions.
+  const captionMasks=rows.filter(r=>r.box?.length===4&&r.box.every(finite)&&(r.source==='pdf-text'||r.confidence>=70)&&/[a-z0-9]{2}/i.test(normal(r.text))).map(r=>[r.box[0],r.box[1],r.box[2]-r.box[0],r.box[3]-r.box[1]]),blocked=new Uint8Array(w*h),ink=new Uint8Array(w*h),labels=new Int32Array(w*h),work=new Int32Array(w*h),cells=[];
+  for(const m of [...masks,...captionMasks].filter(validBox)){const cut=intersection(m,[x0,y0,w,h]);if(!cut)continue;for(let y=Math.max(0,Math.floor(cut[1]-y0));y<Math.min(h,Math.ceil(cut[1]+cut[3]-y0));y++)for(let x=Math.max(0,Math.floor(cut[0]-x0));x<Math.min(w,Math.ceil(cut[0]+cut[2]-x0));x++)blocked[y*w+x]=1;}
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)ink[y*w+x]=Number(stoneInk(image,x+x0,y+y0));
+  for(let start=0;start<w*h;start++){
+   if(labels[start]||blocked[start]||ink[start])continue;let head=0,tail=1,left=start%w,right=left,top=Math.floor(start/w),bottom=top,touches=false;work[0]=start;labels[start]=-1;
+   while(head<tail){const id=work[head++],x=id%w,y=Math.floor(id/w);left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);
+    for(const next of [x>0?id-1:-1,x+1<w?id+1:-1,y>0?id-w:-1,y+1<h?id+w:-1]){if(next<0){touches=true;continue;}if(blocked[next]){if(!ink[next])touches=true;continue;}if(labels[next]||ink[next])continue;labels[next]=-1;work[tail++]=next;}
+   }
+   const cw=right-left+1,ch=bottom-top+1;if(touches||cw<4*unit||ch<3*unit||tail<20*unit*unit||cw>120*unit||ch>65*unit||Math.max(cw/ch,ch/cw)>12||tail/(cw*ch)<.6)continue;
+   const id=cells.length+1;for(let i=0;i<tail;i++)labels[work[i]]=id;cells.push({id,box:[left+x0,top+y0,cw,ch],interiorPixels:tail});
+   if(cells.length>3000)return empty('MASONRY_CELL_COMPLEXITY');
+  }
+  const seen=new Set(),groups=[];
+  for(const first of cells){if(seen.has(first.id))continue;const queue=[first],group=[];seen.add(first.id);
+   while(queue.length){const a=queue.pop();group.push(a);for(const b of cells){if(seen.has(b.id))continue;const dx=Math.max(a.box[0]-b.box[0]-b.box[2],b.box[0]-a.box[0]-a.box[2],0),dy=Math.max(a.box[1]-b.box[1]-b.box[3],b.box[1]-a.box[1]-a.box[3],0);if(dx<=4*unit&&dy<=4*unit){seen.add(b.id);queue.push(b);}}}
+   if(group.length<8)continue;const l=Math.min(...group.map(c=>c.box[0])),t=Math.min(...group.map(c=>c.box[1])),r=Math.max(...group.map(c=>c.box[0]+c.box[2])),b=Math.max(...group.map(c=>c.box[1]+c.box[3])),density=group.reduce((sum,c)=>sum+c.interiorPixels,0)/((r-l)*(b-t));
+   if(density<.16||r-l<16*unit||b-t<15*unit)continue;
+   const q=(values,p)=>values.slice().sort((a,b)=>a-b)[Math.floor((values.length-1)*p)],variation=axis=>q(group.map(c=>c.box[axis]),.8)/q(group.map(c=>c.box[axis]),.2),heightVariation=variation(3),widthVariation=variation(2);
+   if(heightVariation<1.4||widthVariation<1.4)continue;
+   const cb=[l,t,r-l,b-t],leaders=captions.map(c=>stoneLeader(image,c,cb,masks,unit)).filter(Boolean);if(leaders.length)groups.push({box:cb,cells:group,leaders,density,heightVariation,widthVariation});
+  }
+  const candidates=[];
+  for(const group of groups){const accepted=new Set(group.cells.map(c=>c.id)),mask=new Uint8Array(w*h),radius=Math.max(1,Math.round(unit));
+   for(const c of group.cells)for(let y=c.box[1]-y0;y<c.box[1]-y0+c.box[3];y++)for(let x=c.box[0]-x0;x<c.box[0]-x0+c.box[2];x++){const id=y*w+x;if(!accepted.has(labels[id]))continue;mask[id]=1;
+    // Include only the immediately observed neutral joint ink. Never bridge
+    // white/coloured gaps or a source opening/legend with dilation.
+    for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){const xx=x+dx,yy=y+dy;if(xx<0||yy<0||xx>=w||yy>=h)continue;const next=yy*w+xx;if(!blocked[next]&&ink[next])mask[next]=1;}
+   }
+   const traced=stonePolygons(mask,w,h,[x0,y0]);if(traced.status!=='observed')return empty(traced.reason);
+   const candidate={...group,polygons:traced.polygons,method:'source-linked-irregular-closed-stone-cells',normalization:{basis:'observed-material-caption-height',pixelsPerUnit:unit,captionHeight:unit*8},sourceExtent:'observed-cell-interiors-and-adjacent-neutral-joints',status:'proposed',confirmationRequired:true};
+   // Working raster is never copied into project provenance or persistence.
+   Object.defineProperty(candidate,'raster',{value:{mask,width:w,height:h,origin:[x0,y0]}});candidates.push(candidate);
+  }
+  return {status:candidates.length?'proposed':'unresolved',reason:candidates.length?null:'MASONRY_EXTENT_UNRESOLVED',candidates};
  }
  function sourceMasks(viewInfo,view,image){
   const masks=[...(viewInfo.envelope.occlusions||[]),...V.legendBoxes(image,R.readings(view))].filter(validBox);
@@ -139,9 +260,11 @@
   const a=pointAt(w,frame,registration.u(box[0])),b=pointAt(w,frame,registration.u(box[0]+box[2])),offsets=[M.distance(w.from,a),M.distance(w.from,b)].sort((a,b)=>a-b);
   const top=Math.max(0,w.base+w.height-registration.z(box[1])),height=Math.min(w.height-top,box[3]*registration.sz),width=Math.min(w.length,offsets[1])-offsets[0];
   if(!(width>.01&&height>.01))return null;
-  return {id:'masonry:'+w.id+':'+view.id+':'+sourceKey(box),wallId:w.id,levelId:w.levelId,buildingId:w.buildingId,kind:'masonry',polygon:rect(offsets[0],top,width,height),
-   selection:{pattern:'brick',color:'#ad9989'},appearanceStatus:'illustrative-masonry; product-and-colour-unselected',status:'proposed',sourceViewId:view.id,sourceFrame:copy(view.frame),sourceBox:copy(box),thickness:copy(thicknessEvidence),
-   quantityStatus:'partial-unreviewed',confirmationRequired:true,provenance:{...provenance(view,box,registration,hatch.method),hatch:copy(hatch),materialLabels:labels.map(row=>({label:row.text,sourceViewId:view.id,sourceBox:copy(row.box),boxFormat:'xyxy'})),extentStatus:'observed-courses-only',unseenArea:null}};
+  const polygon=hatch.sourcePolygon?hatch.sourcePolygon.map(([x,y])=>[M.distance(w.from,pointAt(w,frame,registration.u(x))),w.base+w.height-registration.z(y)]):rect(offsets[0],top,width,height);
+  if(M.validatePolygon(polygon).length||polygon.some(([x,y])=>x<0||y<0||x>w.length||y>w.height))return null;
+  return {id:'masonry:'+w.id+':'+view.id+':'+sourceKey(box)+(hatch.sourcePolygon?':outline:'+sourceKey(hatch.sourcePolygon.flat()):''),wallId:w.id,levelId:w.levelId,buildingId:w.buildingId,kind:'masonry',polygon,
+   selection:{pattern:hatch.sourcePolygon?'plain':'brick',color:'#ad9989'},appearanceStatus:'illustrative-masonry; product-and-colour-unselected',status:'proposed',sourceViewId:view.id,sourceFrame:copy(view.frame),sourceBox:copy(box),thickness:copy(thicknessEvidence),
+   quantityStatus:'partial-unreviewed',confirmationRequired:true,provenance:{...provenance(view,box,registration,hatch.method),hatch:copy(hatch),materialLabels:labels.map(row=>({label:row.text,sourceViewId:view.id,sourceBox:copy(row.box),boxFormat:'xyxy'})),extentStatus:hatch.sourcePolygon?'observed-cell-union-only':'observed-courses-only',unseenArea:null}};
  }
  function generated(level){return level.reconstruction?.status==='automatic-proposal'&&!level.geometryRevision&&!(level.contours||[]).some(c=>c.status==='confirmed')&&!(level.observedPlanes||[]).some(p=>p.status==='confirmed');}
  function physicalDuplicates(result){
@@ -362,7 +485,7 @@
   report.issues.push('BALCONY_SLAB_EXTENT_UNRESOLVED');
  }
  function build(proposal,inventory,images,reviewed,generatedLevels=[]){
-  const byLevel=[],issues=[];
+  const byLevel=[],issues=[],stoneByView=new Map();
   const targets=generatedLevels.filter(l=>l.buildingId===proposal.buildingId&&generated(l));
   const allWalls=targets.flatMap(l=>M.wallsFor(l,inventory,{includeProposed:true}));
   for(const level of targets){
@@ -371,9 +494,15 @@
    for(const info of proposal.views||[]){
     const view=inventory.views.find(v=>v.id===info.viewId),frame=frames[info.direction],image=images?.[info.viewId];
     if(!view||view.kind!=='elevation'||view.buildingId!==proposal.buildingId||view.direction!==info.direction||!frame||!image?.data||info.envelope?.status!=='proposed')continue;
+    const sourceSize=[view.payload?.sourceWidth||view.frame?.rasterSize?.[0],view.payload?.sourceHeight||view.frame?.rasterSize?.[1]];
+    if(sourceSize.some((n,i)=>n!=null&&n!==[image.width,image.height][i])){result.issues.push('EXTERIOR_SOURCE_FRAME_MISMATCH');continue;}
     const registration=R.elevationRegistration(info,reviewed,inventory);
     if(!registration||![registration.sx,registration.sz].every(n=>finite(n)&&n>0)){result.issues.push('EXTERIOR_REGISTRATION_UNRESOLVED');continue;}
     const masks=sourceMasks(info,view,image),labels=materialLabels(view);
+    if(labels.length&&!stoneByView.has(view.id)){
+     const openings=targets.flatMap(l=>M.wallsFor(l,inventory,{includeProposed:true}).filter(w=>dot(w.normal,frame.n)>.999).flatMap(w=>projectedOpeningBoxes(w,l,registration,frame)));
+     stoneByView.set(view.id,irregularMasonry(image,info.envelope.box,R.readings(view),{masks:[...masks,...openings]}));
+    }
     for(const wall of walls.filter(w=>dot(w.normal,frame.n)>.999)){
      const wb=wallBox(wall,registration,frame);if(!validBox(wb))continue;
      const openings=projectedOpeningBoxes(wall,level,registration,frame),nearer=nearerWallBoxes(wall,allWalls,registration,frame),blocked=[...masks,...openings,...nearer];
@@ -388,6 +517,20 @@
        const box=intersection(hatch.box,wb);if(!box)continue;
        const zone=masonryZone(wall,view,box,registration,frame,hatch,thick,labels);if(zone)observed.push(zone);
       }
+      const stone=stoneByView.get(view.id),regularZones=observed.slice();if(stone?.reason==='MASONRY_REGION_COMPLEXITY')result.issues.push(stone.reason);
+      for(const cluster of stone?.candidates||[]){
+       const raster=cluster.raster,traced=stonePolygons(raster.mask,raster.width,raster.height,raster.origin,{box:wb,masks:blocked});
+       if(traced.status!=='observed'){result.issues.push(traced.reason);continue;}
+       for(const polygon of traced.polygons){
+        const xs=polygon.map(p=>p[0]),ys=polygon.map(p=>p[1]),box=[Math.min(...xs),Math.min(...ys),Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys)];
+        // Existing regular-course evidence owns its pixels already. A second
+        // detector never adds another overlapping material deduction.
+        if(regularZones.some(z=>intersection(z.sourceBox,box)))continue;
+        const hatch={method:cluster.method,sourcePolygon:polygon,leaders:copy(cluster.leaders),normalization:copy(cluster.normalization),cellCount:cluster.cells.length,sourceCellBounds:cluster.cells.filter(c=>intersection(c.box,box)).map(c=>copy(c.box)),sourceExtent:cluster.sourceExtent,confirmationRequired:true};
+        const zone=masonryZone(wall,view,box,registration,frame,hatch,thick,labels);if(zone)observed.push(zone);
+       }
+      }
+      if(observed.length>80){observed.splice(regularZones.length);result.issues.push('MASONRY_REGION_COMPLEXITY');}
       if(!observed.length)result.issues.push('MASONRY_EXTENT_UNRESOLVED');
      }
      result.wallZones.push(...observed);
@@ -414,5 +557,5 @@
   for(const result of byLevel){physicalDuplicates(result);result.roofProposals=result.reconstructedRoofs;result.issues=[...new Set(result.issues)];issues.push(...result.issues);}
   return {version:1,byLevel,issues:[...new Set(issues)],complete:false,status:byLevel.some(l=>l.exteriorElements.length||l.wallZones.length||l.reconstructedRoofs.length)?'partial-proposal':'unresolved'};
  }
- return Object.freeze({version:1,build,entryBeamFace,entryRoofStroke,subtractBoxes,masonryHatches,materialLabels,writtenThickness,thickness});
+ return Object.freeze({version:1,build,entryBeamFace,entryRoofStroke,subtractBoxes,masonryHatches,irregularMasonry,stonePolygons,materialLabels,writtenThickness,thickness});
 });

@@ -572,6 +572,30 @@
    }if(junctions.length){result.push(...junctions);break;}
   }return result;
  }
+ // A roof covering and a ceiling are different source lines. Keep their
+ // measured separation only when both neutral fascia returns visibly connect
+ // the supported roof edge to short underside strokes at the ceiling datum.
+ // The coloured middle is not used as a line and no wall is extended here.
+ function roofCeilingBand(image,profile,ceiling,{wallHeightPixels,occlusions=[],sourceView}={}){
+  const no=reason=>({status:'unresolved',reason}),s=profile?.slopes;
+  if(!image?.data||profile?.status!=='proposed'||s?.length!==2||s.some(q=>!q||!Number.isFinite(q.eaveX)||!Number.isFinite(q.eaveY)||!(q.support>=.8))||!Number.isFinite(ceiling?.y)||ceiling.datumType!=='ceiling'||!(ceiling.sourceGuide?.support>=.7)||ceiling.sourceGuide?.anchors?.length!==2||!ceiling.sourceGuide.anchors.every(p=>p?.length===2&&p.every(Number.isFinite)&&Math.abs(p[1]-ceiling.y)<=1))return no('ROOF_CEILING_BAND_SOURCE_REQUIRED');
+  const size=[sourceView?.payload?.sourceWidth||sourceView?.zone?.[2]||sourceView?.frame?.rasterSize?.[0],sourceView?.payload?.sourceHeight||sourceView?.zone?.[3]||sourceView?.frame?.rasterSize?.[1]];
+  if(!Number.isInteger(image.width)||!Number.isInteger(image.height)||image.width<=0||image.height<=0||image.data.length!==image.width*image.height*4||!size.every((n,i)=>Number.isInteger(n)&&n>0&&n===[image.width,image.height][i])||!sourceView?.frame||ceiling.sourceViewId!==sourceView.id||JSON.stringify(ceiling.sourceFrame)!==JSON.stringify(sourceView.frame)||profile.sourceViewId&&profile.sourceViewId!==sourceView.id||profile.sourceFrame&&JSON.stringify(profile.sourceFrame)!==JSON.stringify(sourceView.frame))return no('ROOF_CEILING_BAND_SOURCE_FRAME_REQUIRED');
+  const [a,b]=s.slice().sort((p,q)=>p.eaveX-q.eaveX),span=b.eaveX-a.eaveX,upperY=(a.eaveY+b.eaveY)/2,depth=ceiling.y-upperY,{width:w,height:h,data:d}=image;
+  if(!(span>60&&Math.abs(a.eaveY-b.eaveY)<=2&&depth>2&&depth<=Math.min(span*.025,wallHeightPixels*.2)))return no('ROOF_CEILING_BAND_GEOMETRY_REQUIRED');
+  const neutral=(x,y)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=w||y>=h||occlusions.some(([l,t,rw,rh])=>x>=l&&x<=l+rw&&y>=t&&y<=t+rh))return false;const n=(y*w+x)*4,r=d[n],g=d[n+1],b=d[n+2];return d[n+3]>100&&Math.max(r,g,b)-Math.min(r,g,b)<26&&r+g+b<630;};
+  const run=(from,to)=>{const steps=Math.ceil(Math.hypot(to[0]-from[0],to[1]-from[1])),samples=[];let hits=0,gap=0,maxGap=0;for(let i=0;i<=steps;i++){const p=from.map((n,j)=>n+(to[j]-n)*i/steps);let hit=false;for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)hit||=neutral(p[0]+dx,p[1]+dy);if(hit){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);if(i===0||i===steps||i%Math.max(1,Math.round(steps/8))===0)samples.push({point:p,observed:hit});}return {anchors:[from,to],support:hits/(steps+1),maxGap,samples};};
+  const top=run([a.eaveX,upperY],[b.eaveX,upperY]);if(top.support<.85||top.maxGap>8)return no('ROOF_UPPER_EDGE_REQUIRED');
+  const ends=[];
+  for(const [slope,sign]of [[a,1],[b,-1]]){const candidates=[];for(let x=Math.ceil(slope.eaveX-2);x<=Math.floor(slope.eaveX+2);x++)for(let y=Math.ceil(ceiling.y-1);y<=Math.floor(ceiling.y+1);y++){
+    const side=run([x,upperY],[x,y]),length=Math.max(12,Math.round(span*.025)),bottom=run([x,y],[x+sign*length,y]);
+    if(side.support>=.85&&side.maxGap<=1&&bottom.support>=.9&&bottom.maxGap<=2)candidates.push({x,y,side,bottom});
+   }
+   candidates.sort((p,q)=>Math.abs(p.x-slope.eaveX)+Math.abs(p.y-ceiling.y)-Math.abs(q.x-slope.eaveX)-Math.abs(q.y-ceiling.y));if(!candidates.length)return no('ROOF_FASCIA_RETURN_REQUIRED');ends.push(candidates[0]);
+  }
+  if(Math.abs(ends[0].y-ends[1].y)>1)return no('ROOF_FASCIA_UNDERSIDE_DISAGREES');
+  return {status:'observed',method:'roof-edge-and-two-neutral-fascia-returns-at-ceiling',upper:top,ends,ceiling:JSON.parse(JSON.stringify(ceiling)),offsetPixels:depth,unobservedMiddle:'The continuous underside is not asserted through coloured annotations.',confirmationRequired:true};
+ }
  function roofProfile(image,envelope,rows=[],{entry=false}={}){
   if(envelope.status!=='proposed')return {status:'unresolved',reason:'WALL_REGISTRATION_REQUIRED'};
   if(entry)return entryRoofProfile(image,envelope);
@@ -795,5 +819,5 @@
   }
   candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
  }
- return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,floorSlidingFrameEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,roofEaveJunctions,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
+ return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,floorSlidingFrameEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,roofEaveJunctions,roofCeilingBand,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
 });

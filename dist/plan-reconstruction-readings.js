@@ -111,8 +111,106 @@
   if(word.status!=='proposed'){readingAttempts.push({psm:8,status:'unresolved',reason:word.reason,region:wordRegion});return {data,readingAttempts,workerMode:null};}
   try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:''});const second=await worker.recognize(word.canvas,{}, {blocks:true});readingAttempts.push({psm:8,text:second.data.text,confidence:second.data.confidence,region:wordRegion,nativeSource:word.provenance});return {data:{...data,blocks:[...(data.blocks||[]).map(b=>({...b,readingPsm:7})),...(second.data.blocks||[]).map(b=>({...b,readingPsm:8,readingCapture:{left,top,scale:word.provenance.scaleFactor,padding:word.provenance.padding,nativeSource:word.provenance,region:wordRegion}}))]},readingAttempts,workerMode:'8:'};}finally{word.canvas.width=word.canvas.height=1;}
  }
+ // Source floor/ceiling strokes only bound the search. A written value is
+ // eligible for Y calibration only after the retained PDF supplies its own
+ // dimension rail, two ticks and witnesses, without intermediate marks.
+ // No horizontal calibration or assumed pixel isotropy supplies the height.
+ function verticalDimensionPairs(view,image){
+  const R=root.MIRPlanReconstruction,A=root.MIRPDFAnalysis,validBox=b=>b?.length===4&&b.every(Number.isFinite)&&b[2]>b[0]&&b[3]>b[1];
+  if(!['elevation','section'].includes(view?.kind)||!image?.data||!R?.floorGuide||!A?.parseDimension)return [];
+  const guides=R.floorGuide(view,image),rows=view.payload.drawingReadings?.verticalRows||[],pairs=[];
+  for(const row of rows){
+   if(!validBox(row.box)||(row.confidence??0)<30)continue;const parsed=A.parseDimension(row.text,{ocr:row.source!=='pdf-text'});if(!parsed||!(parsed.valueFt>0))continue;
+   const font=Math.max(8,row.box[2]-row.box[0]),center=(row.box[1]+row.box[3])/2;
+   for(const lower of guides.filter(g=>g.datumType==='floor'))for(const upper of guides.filter(g=>g.y<lower.y-20)){
+    const next=/^level-\d+$/.test(lower.levelHint)?'level-'+(Number(lower.levelHint.slice(6))+1):lower.levelHint==='ground'?'upper':null;
+    if(!(upper.datumType==='ceiling'&&upper.levelHint===lower.levelHint||upper.datumType==='floor'&&upper.levelHint===next))continue;
+    if(row.box[1]<upper.y||row.box[3]>lower.y||Math.abs(center-(lower.y+upper.y)/2)/(lower.y-upper.y)>.19)continue;
+    const left=Math.max(0,Math.floor(row.box[0]-font*3)),right=Math.min(image.width,Math.ceil(row.box[2]+font*3)),top=Math.max(0,Math.floor(upper.y-font*2)),bottom=Math.min(image.height,Math.ceil(lower.y+font*2)),region=[left,top,right-left,bottom-top],id=view.id+':vertical-dimension:'+row.box.join('-')+':'+row.text+':'+upper.y+'-'+lower.y;
+    if(!pairs.some(p=>p.id===id))pairs.push({id,kind:'written',status:'unresolved',value:parsed.valueFt*.3048,unit:'m',text:row.text,confidence:row.confidence,sourceViewId:view.id,sourceFrame:JSON.parse(JSON.stringify(view.frame)),textBox:row.box.slice(),sourceReading:JSON.parse(JSON.stringify(row)),datumEvidence:{upper:JSON.parse(JSON.stringify(upper)),lower:JSON.parse(JSON.stringify(lower))},region,confirmationRequired:true});
+   }
+  }
+  return pairs.sort((a,b)=>b.confidence-a.confidence||Number(b.datumEvidence.upper.datumType==='ceiling')-Number(a.datumEvidence.upper.datumType==='ceiling'));
+ }
+ function mapDimensionProof(proof,map){
+  const out=JSON.parse(JSON.stringify(proof)),axis=proof.axis==='x'?0:1,unit=axis?[0,1]:[1,0],scale=Math.hypot(...map(unit).map((v,i)=>v-map([0,0])[i])),box=b=>{const a=map(b.slice(0,2)),z=map(b.slice(2));return [Math.min(a[0],z[0]),Math.min(a[1],z[1]),Math.max(a[0],z[0]),Math.max(a[1],z[1])];},marker=m=>({...m,point:map(m.point),...(m.strokeCenter?{strokeCenter:map(m.strokeCenter)}:{}),...(m.anchorTolerancePx!=null?{anchorTolerancePx:m.anchorTolerancePx*scale}:{}),...(m.terminalExtensions?{terminalExtensions:m.terminalExtensions.map(n=>n*scale)}:{}),...(m.offAxisPixels?{offAxisPixels:m.offAxisPixels.map(points=>points.map(map))}:{}),witnesses:m.witnesses.map(s=>s.map(map))});
+  if(out.anchors)out.anchors=out.anchors.map(map);if(out.captionBox)out.captionBox=box(out.captionBox);if(out.segments)out.segments=out.segments.map(s=>s.map(map));if(out.gap)out.gap=out.gap.map(map);if(out.markers)out.markers=out.markers.map(marker);
+  if(out.intermediateMarkCheck){out.intermediateMarkCheck.markers=out.intermediateMarkCheck.markers.map(marker);out.intermediateMarkCheck.searchedSpan=out.intermediateMarkCheck.searchedSpan.map(n=>map(axis?[0,n]:[n,0])[axis]);}
+  if(out.interveningLine?.anchors)out.interveningLine.anchors=out.interveningLine.anchors.map(map);
+  if(out.paperContrast?.samples){out.paperContrast.samples=out.paperContrast.samples.map(s=>({...s,point:map(s.point)}));out.paperContrast.maximumStrokeWidthPx*=scale;}
+  if(Number.isFinite(out.maxGap))out.maxGap*=scale;
+  return out;
+ }
+ async function nativeDimensionTile(native,view,region,sourceRows){
+  const tile=await native.render(view,region,{factor:2,padding:12});if(tile.status!=='proposed')return tile;
+  const release=()=>{tile.canvas.width=tile.canvas.height=1;},p=tile.provenance,m=p?.viewToTile,same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+  if(!p||typeof p.sourceSha256!=='string'||!p.sourceSha256||p.sourceViewId!==view.id||p.sourceFileId!==view.fileId||p.sourcePage!==view.page||!same(p.sourceFrame,view.frame)||!same(p.sourceRegion,region)||p.scaleFactor!==2||p.padding!==12||!Array.isArray(m)||m.length!==6||!m.every(Number.isFinite)||!same(m,[2,0,0,2,12-region[0]*2,12-region[1]*2])){release();return {status:'unresolved',reason:'NATIVE_DIMENSION_FRAME_MISMATCH'};}
+  try{const image=tile.canvas.getContext('2d',{willReadFrequently:true}).getImageData(0,0,tile.canvas.width,tile.canvas.height),map=q=>[q[0]*m[0]+m[4],q[1]*m[3]+m[5]],back=q=>[(q[0]-m[4])/m[0],(q[1]-m[5])/m[3]],labels=(sourceRows||[]).filter(r=>r.box?.length===4).map(r=>({...r,box:[...map(r.box.slice(0,2)),...map(r.box.slice(2))]}));return {status:'proposed',image,map,back,labels,provenance:JSON.parse(JSON.stringify(p)),release};}catch(error){release();throw error;}
+ }
+ function captionOverlap(a,b){if(a?.length!==4||b?.length!==4)return 0;const area=p=>(p[2]-p[0])*(p[3]-p[1]);return Math.max(0,Math.min(a[2],b[2])-Math.max(a[0],b[0]))*Math.max(0,Math.min(a[3],b[3])-Math.max(a[1],b[1]))/Math.min(area(a),area(b));}
+ function sameDimensionSpan(a,b){return a?.length===2&&b?.length===2&&[b,b.slice().reverse()].some(points=>a.every((p,i)=>Math.hypot(p[0]-points[i][0],p[1]-points[i][1])<=2));}
+ function dimensionSourceReading(view,candidate){
+  const rows=view.payload.drawingReadings?.rows||[],parts=candidate.sourceReading?.readingParts,exact=(row,part)=>row.box?.length===4&&part.box?.length===4&&row.box.every((n,i)=>n===part.box[i])&&row.text===(part.originalText||part.text);
+  if(parts?.length)return parts.every(part=>rows.some(row=>exact(row,part)))?JSON.parse(JSON.stringify(candidate.sourceReading)):null;
+  const source=candidate.sourceReading,text=source?.originalText||candidate.label||source?.text||candidate.text,row=rows.find(r=>r.text===text&&r.box?.length===4&&r.box.every((n,i)=>n===candidate.textBox[i]));return row?JSON.parse(JSON.stringify(row)):null;
+ }
+ function horizontalDimensionCandidates(view,image){
+  const R=root.MIRPlanReconstruction;if(!image?.data||!R?.referenceObservations||!['floor','elevation','section'].includes(view.kind))return [];
+  const observations=R.referenceObservations(view,image),result=[];
+  for(const candidate of observations.unresolvedReferences||[]){const proof=candidate.lineEvidence,a=candidate.anchors,box=candidate.textBox;
+   if(proof?.reason!=='DIMENSION_END_MARKS_REQUIRED'||proof.pixelSupport<.85||proof.maxGap>4||a?.length!==2||!a.every(p=>p.length===2&&p.every(Number.isFinite))||Math.abs(a[0][1]-a[1][1])>2||box?.length!==4||!box.every(Number.isFinite)||JSON.stringify(candidate.sourceFrame)!==JSON.stringify(view.frame)||candidate.sourceViewId!==view.id)continue;
+   const sourceReading=dimensionSourceReading(view,candidate);if(!sourceReading)continue;const font=Math.max(8,box[3]-box[1]),left=Math.max(0,Math.floor(Math.min(...a.map(p=>p[0]),box[0])-font*3)),right=Math.min(image.width,Math.ceil(Math.max(...a.map(p=>p[0]),box[2])+font*3)),top=Math.max(0,Math.floor(Math.min(...a.map(p=>p[1]),box[1])-font*2.5)),bottom=Math.min(image.height,Math.ceil(Math.max(...a.map(p=>p[1]),box[3])+font*2.5));
+   const pair={...JSON.parse(JSON.stringify(candidate)),id:view.id+':native-dimension:x:'+a.flat().join('-')+':'+box.join('-'),axis:'x',status:'unresolved',sourceReading,sourceCandidate:JSON.parse(JSON.stringify(candidate)),region:[left,top,right-left,bottom-top],confirmationRequired:true,notAMeasurementConfirmation:true};
+   if(!result.some(r=>sameDimensionSpan(r.anchors,pair.anchors)&&captionOverlap(r.textBox,pair.textBox)>=.65))result.push(pair);
+  }return result;
+ }
+ async function verifyHorizontalDimension(native,view,pair){
+  const A=root.MIRPDFAnalysis,base=JSON.parse(JSON.stringify(pair)),unresolved=reason=>({...base,status:'unresolved',reason}),source=pair.sourceCandidate,reading=source&&dimensionSourceReading(view,source);
+  if(!A?.dimensionLineEvidence||!reading||reading.confidence!==pair.confidence||pair.text!==source.text||pair.value!==source.value||pair.confidence!==source.confidence||pair.sourceViewId!==view.id||JSON.stringify(pair.sourceFrame)!==JSON.stringify(view.frame)||!sameDimensionSpan(pair.anchors,source.anchors)||JSON.stringify(pair.textBox)!==JSON.stringify(source.textBox)||JSON.stringify(pair.sourceReading)!==JSON.stringify(reading)||source.lineEvidence?.reason!=='DIMENSION_END_MARKS_REQUIRED')return unresolved('NATIVE_DIMENSION_SOURCE_MISMATCH');
+  const tile=await nativeDimensionTile(native,view,pair.region,view.payload.drawingReadings.rows);if(tile.status!=='proposed')return unresolved(tile.reason||'SOURCE_PDF_UNAVAILABLE');
+  try{const {image,map,back,labels}=tile,textBox=[...map(pair.textBox.slice(0,2)),...map(pair.textBox.slice(2))],anchors=pair.anchors.map(map),proof=A.dimensionLineEvidence(image,{...source,textBox,anchors},{labels,localPaperContrast:true,rejectIntermediateMarks:true}),lineEvidence=mapDimensionProof(proof,back);return {...base,status:proof.status==='observed'?'proposed':'unresolved',...(proof.status==='observed'?{}:{reason:proof.reason}),anchors:anchors.map(back),lineEvidence,nativeLineEvidence:proof,nativeSource:tile.provenance};}finally{tile.release();}
+ }
+ async function refineHorizontalDimensions(inventory,buildingId,sourceImages,native,{cancelled=()=>false,progress=()=>{},maxRegions=12,budget=null}={}){
+  const work=inventory.views.filter(v=>v.buildingId===buildingId).flatMap(view=>horizontalDimensionCandidates(view,sourceImages[view.id]).map(pair=>({view,pair}))),evidence=[],capacity=Number.isFinite(maxRegions)?Math.max(0,Math.min(12,Math.floor(maxRegions))):12;let used=0;
+  for(const {view,pair} of work){const rows=view.payload.drawingReadings.nativeDimensionLines||=([]);if(rows.some(r=>r.sourceViewId===view.id&&JSON.stringify(r.sourceFrame)===JSON.stringify(view.frame)&&sameDimensionSpan(r.anchors,pair.anchors)&&captionOverlap(r.textBox,pair.textBox)>=.65&&(r.nativeSource||r.reason==='SOURCE_PDF_UNAVAILABLE')))continue;
+   let observation;if(cancelled())observation={...pair,reason:'NATIVE_DIMENSION_CANCELLED'};else if(used>=capacity||budget&&budget.remaining<=0)observation={...pair,reason:'NATIVE_DIMENSION_BUDGET'};else{used++;if(budget)budget.remaining--;observation=await verifyHorizontalDimension(native,view,pair);}
+   const index=rows.findIndex(r=>r.id===pair.id);if(index>=0)rows[index]=observation;else rows.push(observation);evidence.push({sourceViewId:view.id,source:'native-horizontal-dimension',purpose:'source-horizontal-dimension-line',...observation});progress(used,capacity,view.page);
+  }return evidence;
+ }
+ async function verifyVerticalDimension(native,view,pair){
+  const A=root.MIRPDFAnalysis,base=JSON.parse(JSON.stringify(pair)),unresolved=reason=>({...base,status:'unresolved',reason});
+  if(!A?.dimensionLineEvidence||pair.sourceViewId!==view.id||JSON.stringify(pair.sourceFrame)!==JSON.stringify(view.frame))return unresolved('VERTICAL_DIMENSION_SOURCE_MISMATCH');
+  const parsed=A.parseDimension(pair.text,{ocr:pair.sourceReading?.source!=='pdf-text'}),sourceRows=view.payload.drawingReadings?.verticalRows||[],sourceReading=sourceRows.some(row=>row.text===pair.text&&row.confidence===pair.confidence&&row.box?.length===4&&row.box.every((n,i)=>n===pair.textBox[i]));
+  const datums=[pair.datumEvidence?.upper,pair.datumEvidence?.lower],validDatum=g=>g?.sourceViewId===view.id&&JSON.stringify(g.sourceFrame)===JSON.stringify(view.frame)&&g.sourceGuide?.support>=.7&&g.sourceGuide.anchors?.length===2&&g.sourceGuide.anchors.every(p=>p.length===2&&p.every(Number.isFinite)&&p[1]===g.y);
+  if(!sourceReading||!parsed||Math.abs(parsed.valueFt*.3048-pair.value)>1e-9||!datums.every(validDatum))return unresolved('VERTICAL_DIMENSION_SOURCE_MISMATCH');
+  const tile=await nativeDimensionTile(native,view,pair.region,view.payload.drawingReadings?.verticalRows||[]);if(tile.status!=='proposed')return unresolved(tile.reason||'SOURCE_PDF_UNAVAILABLE');
+  try{
+   const {image,map,back,labels}=tile,textBox=[...map(pair.textBox.slice(0,2)),...map(pair.textBox.slice(2))],y0=map([0,pair.datumEvidence.upper.y])[1],y1=map([0,pair.datumEvidence.lower.y])[1],candidates=[];
+   base.nativeSource=JSON.parse(JSON.stringify(tile.provenance));
+   for(let x=12+4;x<image.width-12-4;x++){
+    if(x>=textBox[0]-1&&x<=textBox[2]+1)continue;
+    const anchors=[[x,y0],[x,y1]],proof=A.dimensionLineEvidence(image,{text:pair.text,textBox,anchors,confidence:pair.confidence,referenceFt:pair.value/.3048},{labels,localPaperContrast:true,rejectIntermediateMarks:true});
+    if(proof.status==='observed'||proof.pixelSupport>=.85&&proof.maxGap<=4)candidates.push({anchors:anchors.map(back),lineEvidence:mapDimensionProof(proof,back),nativeLineEvidence:proof});
+   }
+   const observed=candidates.filter(c=>c.lineEvidence.status==='observed'),groups=[];
+   for(const c of observed){let group=groups.find(g=>g.every(q=>Math.abs(q.anchors[0][0]-c.anchors[0][0])<=2));if(!group)groups.push(group=[]);group.push(c);}
+   base.candidateEvidence=candidates;
+   if(groups.length!==1)return {...base,status:'unresolved',reason:groups.length?'VERTICAL_DIMENSION_ASSOCIATION_AMBIGUOUS':candidates.some(c=>c.lineEvidence.reason==='DIMENSION_INTERMEDIATE_MARKS')?'DIMENSION_INTERMEDIATE_MARKS':'VERTICAL_DIMENSION_SOURCE_MARKS_REQUIRED'};
+   const captionCenter=(pair.textBox[0]+pair.textBox[2])/2,chosen=groups[0].sort((a,b)=>b.lineEvidence.pixelSupport-a.lineEvidence.pixelSupport||Math.abs(a.anchors[0][0]-captionCenter)-Math.abs(b.anchors[0][0]-captionCenter))[0];
+   return {...base,...chosen,status:'proposed',calibration:{kind:'estimated-calibrated',axis:'y',metresPerPixel:pair.value/Math.abs(chosen.anchors[1][1]-chosen.anchors[0][1]),sourceReferenceId:pair.id,confirmationRequired:true}};
+  }finally{tile.release();}
+ }
+ async function refineVerticalDimensions(inventory,buildingId,sourceImages,native,{cancelled=()=>false,progress=()=>{},maxRegions=12,budget:sharedBudget=null}={}){
+  const work=inventory.views.filter(v=>v.buildingId===buildingId).flatMap(view=>verticalDimensionPairs(view,sourceImages[view.id]).map(pair=>({view,pair}))).sort((a,b)=>b.pair.confidence-a.pair.confidence),evidence=[],budget=Number.isFinite(maxRegions)?Math.max(0,Math.min(12,Math.floor(maxRegions))):12;
+  for(let i=0;i<work.length;i++){
+   const {view,pair}=work[i],observation=cancelled()?{...pair,reason:'VERTICAL_DIMENSION_CANCELLED'}:i>=budget||sharedBudget&&sharedBudget.remaining<=0?{...pair,reason:'VERTICAL_DIMENSION_BUDGET'}:await (async()=>{if(sharedBudget)sharedBudget.remaining--;return verifyVerticalDimension(native,view,pair);})();
+   const rows=view.payload.drawingReadings.verticalDimensions||=([]),index=rows.findIndex(r=>r.id===observation.id);if(index>=0)rows[index]=observation;else rows.push(observation);
+   evidence.push({sourceViewId:view.id,source:'native-vertical-dimension',purpose:'source-datum-bound-vertical-dimension',...observation});if(i<budget)progress(i+1,Math.min(work.length,budget),view.page);
+  }
+  return evidence;
+ }
  async function refine(inventory,buildingId,{images:sourceImages={},progress=()=>{},cancelled=()=>false,sourceFile=null}={}){
-  const next=JSON.parse(JSON.stringify(inventory)),work=workItems(next,buildingId,sourceImages),evidence=[],native=sourceReader(sourceFile,next.files||[]);if(!work.length)return {inventory:next,evidence};
+  const next=JSON.parse(JSON.stringify(inventory)),evidence=[],native=sourceReader(sourceFile,next.files||[]),dimensionBudget={remaining:12};let work;try{evidence.push(...await refineHorizontalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));work=workItems(next,buildingId,sourceImages);}catch(error){await native.close();throw error;}if(!work.length){try{evidence.push(...await refineVerticalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));return {inventory:next,evidence};}finally{await native.close();}}
   await dependencies();const worker=await root.Tesseract.createWorker('eng',1,{workerPath:asset('vendor/tesseract/worker.min.js'),corePath:asset('vendor/tesseract-core/'),langPath:asset('vendor/tessdata/'),workerBlobURL:false,gzip:true});
   let activeCanvas=null;try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});let workerMode='7';const images=new Map();
    for(let i=0;i<work.length;i++){
@@ -154,7 +252,9 @@
     }
     canvas.width=canvas.height=1;for(const block of data.blocks||[])for(const paragraph of block.paragraphs||[])for(const line of paragraph.lines||[]){if(!line.text.trim()||!line.bbox)continue;const b=line.bbox,capture=block.readingCapture||{left,top,scale,padding,nativeSource,region:[left,top,right-left,bottom-top]},row={text:line.text.trim(),confidence:line.confidence,source:'ocr-local-region-retry',box:[(b.x0-capture.padding)/capture.scale+capture.left,(b.y0-capture.padding)/capture.scale+capture.top,(b.x1-capture.padding)/capture.scale+capture.left,(b.y1-capture.padding)/capture.scale+capture.top],retry:{originalText:region.row.text,originalConfidence:region.row.confidence,...(region.row.readingParts?{readingParts:JSON.parse(JSON.stringify(region.row.readingParts))}:{}),region:capture.region,scale:capture.scale,padding:capture.padding,psm:block.readingPsm||7,...(readingAttempts?{readingAttempts}:{}),...(ocrMasks.length?{ocrMasks}:{}),...(capture.nativeSource?{nativeSource:capture.nativeSource}:{}),...(nativeAttempt?{nativeAttempt}:{}),purpose:region.purpose||(region.caption?'level-caption':region.dimension?'dimension-label':'opening-caption'),sourceViewId:view.id,sourceFrame:JSON.parse(JSON.stringify(view.frame))}};view.payload.drawingReadings.rows.push(row);evidence.push({sourceViewId:view.id,...row});}
    }
+   evidence.push(...await refineHorizontalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));
+   evidence.push(...await refineVerticalDimensions(next,buildingId,sourceImages,native,{progress,cancelled,budget:dimensionBudget}));
   }finally{if(activeCanvas)activeCanvas.width=activeCanvas.height=1;try{await worker.terminate();}finally{await native.close();}}return {inventory:next,evidence};
  }
- root.MIRReconstructionReadings=Object.freeze({fragmentedCaptions,neighbouringMeasurements,regions,openingRegions,gridRegions,workItems,captionGuideMasks,sourceTilePlan,sourceReader,dimensionWordRetry,refine});
+ root.MIRReconstructionReadings=Object.freeze({fragmentedCaptions,neighbouringMeasurements,regions,openingRegions,gridRegions,workItems,captionGuideMasks,sourceTilePlan,sourceReader,dimensionWordRetry,mapDimensionProof,nativeDimensionTile,horizontalDimensionCandidates,verifyHorizontalDimension,refineHorizontalDimensions,verticalDimensionPairs,verifyVerticalDimension,refineVerticalDimensions,refine});
 })(window);

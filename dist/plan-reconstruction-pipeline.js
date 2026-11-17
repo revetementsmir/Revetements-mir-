@@ -35,7 +35,7 @@
   const draft=copy(proposal.draft),oldScale=proposal.referenceCandidates[0]?.scale;
   if(!resolution.reference)return {proposal,resolution,draft};
   draft.reference={...resolution.reference,status:'proposed',controlReferences:[],assessment:resolution};
-  if(draft.height.kind==='estimated-calibrated'&&oldScale>0){const factor=draft.reference.scale/oldScale;draft.height.value*=factor;draft.height.scaleUsed*=factor;for(const ref of draft.height.references){ref.value*=factor;ref.relationship=draft.height.relationship==='two-visible-level-datums'?{...ref.relationship,sourceReference:copy(draft.reference)}:copy(draft.reference);}}
+  if(draft.height.kind==='estimated-calibrated'&&draft.height.calibrationMethod!=='independent-vertical-source'&&oldScale>0){const factor=draft.reference.scale/oldScale;draft.height.value*=factor;draft.height.scaleUsed*=factor;for(const ref of draft.height.references){ref.value*=factor;ref.relationship=draft.height.relationship==='two-visible-level-datums'?{...ref.relationship,sourceReference:copy(draft.reference)}:copy(draft.reference);}}
   const constrained=R.constrainProposal(draft,proposal);constrained.status='proposed';
   const errors=M.validateDraft(constrained,inventory,current);if(proposal.heightConflict)errors.push('HEIGHT_CONFLICT');
   // Every compatible elevation contributes an independently calibrated datum
@@ -45,6 +45,9 @@
   if(!errors.length&&constrained.height.relationship==='two-visible-level-datums')for(const v of proposal.views){
    const view=inventory.views.find(s=>s.id===v.viewId&&s.kind==='elevation'&&s.buildingId===current.buildingId),band=R.levelBand(v,constrained,inventory);
    if(!view||v.envelope?.status!=='proposed'||!band||!['front','back','left','right'].includes(v.direction))continue;
+   const vertical=R.verticalReferenceAssessment(view);
+   if(vertical.status==='proposed'){elevationCalibrations.push(...copy(vertical.references));continue;}
+   if(vertical.status==='conflict'){elevationCalibrations.push({sourceViewId:view.id,status:'conflict',conflict:true,references:copy(vertical.references)});continue;}
    const span=R.registeredSpan(M.modelPoints(constrained),v.direction,v.envelope,{world:true}),box=v.envelope.box;
    if(!box?.every(Number.isFinite)||!(box[2]>0)||!(span.length>0&&Number.isFinite(span.length)))continue;
    elevationCalibrations.push({kind:'estimated-calibrated',status:'proposed',value:span.length,sourceViewId:view.id,sourceFrame:copy(view.frame||null),anchors:[[box[0],band.bottomY],[box[0]+box[2],band.bottomY]],relationship:{kind:'floor-to-elevation-span',sourceReference:copy(constrained.reference),sourcePlanSpan:copy(R.registeredSpan(constrained.points.map(p=>p.xy),v.direction,v.envelope)),contourAdjustment:copy(constrained.dimensionAdjustment||null),datumPair:{lower:copy(band.lower),upper:copy(band.upper)}},confirmationRequired:true});
@@ -73,6 +76,7 @@
    const {resolution,draft,constrained,errors}=preparedLevel;
    if(!resolution.reference){report.issues.push(resolution.status==='conflict'?'REFERENCE_CONFLICT':resolution.status==='low_confidence'?'SCALE_TRANSCRIPTION_UNCERTAIN':'SCALE_UNKNOWN');if(requiresLevelAlignment)report.issues.push('LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:draft,reconstructionDraft:proposal});continue;}
    if(constrained.dimensionAdjustment?.evidence.some(e=>e.reason==='DIMENSION_TRANSCRIPTION_UNCERTAIN'))report.issues.push('DIMENSION_TRANSCRIPTION_UNCERTAIN');
+   if(constrained.height?.axisScaleComparison?.status==='review-required')report.issues.push('VERTICAL_AXIS_SCALE_REVIEW');
    if(errors.length){report.issues.push(...errors);if(requiresLevelAlignment)report.issues.push('LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
    // Calibrate and constrain each floor independently before reporting missing
    // inter-level registration. A shared elevation is not an XY datum and must

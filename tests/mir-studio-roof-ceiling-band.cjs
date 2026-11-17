@@ -1,0 +1,28 @@
+'use strict';
+const assert=require('node:assert/strict'),V=require('../dist/plan-reconstruction-vision.js'),R=require('../dist/plan-reconstruction.js'),M=require('../dist/plan-level-model.js'),Roof=require('../dist/plan-reconstructed-roofs.js');
+const frame={units:'pixels',rasterSize:[800,650],pdfToRaster:[1,0,0,-1,0,650],cropToRaster:[1,0,0,1,0,0]},ink=[40,40,40,255],colour=[190,70,210,255];
+function drawing({returns=true,colourOnly=false,underside=true}={}){
+ const im={width:800,height:650,data:new Uint8ClampedArray(800*650*4).fill(255)},set=(x,y,c)=>im.data.set(c,(y*im.width+x)*4),line=(a,b,c)=>{const n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1]));for(let i=0;i<=n;i++)set(Math.round(a[0]+(b[0]-a[0])*i/n),Math.round(a[1]+(b[1]-a[1])*i/n),c);};
+ const c=colourOnly?colour:ink;
+ line([120,191],[600,191],c);if(returns){line([120,191],[120,200],c);line([600,191],[600,200],c);}
+ if(underside){line([120,200],[140,200],c);line([580,200],[600,200],c);}
+ // A quantity markup hides most of the lower edge. Its pixels are not
+ // counted as evidence; two observed end strokes establish the association.
+ line([141,200],[579,200],colour);
+ return im;
+}
+const floor={id:'plan',kind:'floor',levelId:'level-2',buildingId:'house',frame},sources=['front','right'].map(direction=>({id:'e-'+direction,kind:'elevation',direction,buildingId:'house',frame})),level={id:'house:level-2',sourceLevel:'level-2',buildingId:'house'},inventory={views:[floor,...sources],levels:[level]};
+const infos=sources.map(v=>{const datum=(type,y)=>({sourceViewId:v.id,sourceFrame:frame,levelHint:'level-2',datumType:type,y,confidence:96,sourceGuide:{support:1,anchors:[[650,y],[750,y]]}});return {viewId:v.id,direction:v.direction,envelope:{status:'proposed',box:[120,200,480,160]},guides:[datum('floor',360),datum('ceiling',200)],roofProfile:{status:'proposed',slopes:[{eaveX:120,eaveY:191,highX:360,highY:71,support:1},{eaveX:600,eaveY:191,highX:360,highY:71,support:1}]}};});
+const image=drawing(),profile=infos[0].roofProfile,ceiling=infos[0].guides[1],options={wallHeightPixels:160,sourceView:sources[0]},proof=V.roofCeilingBand(image,profile,ceiling,options);
+assert.equal(proof.status,'observed');assert.equal(proof.offsetPixels,9);assert.equal(proof.ends.length,2);assert.ok(proof.ends.every(e=>e.side.support===1&&e.bottom.support===1));assert.ok(proof.unobservedMiddle);
+for(const [im,p,g,opts]of [[drawing({returns:false}),profile,ceiling,options],[drawing({underside:false}),profile,ceiling,options],[drawing({colourOnly:true}),profile,ceiling,options],[image,profile,{...ceiling,datumType:'floor'},options],[image,profile,{...ceiling,sourceGuide:{support:0,anchors:[[650,200],[750,200]]}},options],[image,profile,{...ceiling,sourceGuide:{anchors:[[650,200],[750,200]]}},options],[image,null,ceiling,options],[image,profile,ceiling,{...options,occlusions:[[117,185,30,25]]}],[image,profile,{...ceiling,y:240},options]])assert.equal(V.roofCeilingBand(im,p,g,opts).status,'unresolved','annotations, missing returns/undersides/datums and legend-covered corners cannot associate a roof');
+for(const support of [undefined,NaN]){const unsupported=structuredClone(profile);unsupported.slopes[0].support=support;assert.equal(V.roofCeilingBand(image,unsupported,ceiling,options).status,'unresolved');}
+for(const override of [{sourceView:{...sources[0],id:'foreign'}},{sourceView:{...sources[0],frame:{...frame,rasterSize:[900,650]}}},{sourceView:{...sources[0],payload:{sourceWidth:799,sourceHeight:650}}}])assert.equal(V.roofCeilingBand(image,profile,ceiling,{...options,...override}).status,'unresolved');
+const cropped={...sources[0],frame:{...frame,rasterSize:[1600,1300],cropToRaster:[1,0,0,1,75,40]},payload:{sourceWidth:800,sourceHeight:650}},cropDatum={...ceiling,sourceFrame:cropped.frame};assert.equal(V.roofCeilingBand(image,profile,cropDatum,{...options,sourceView:cropped}).status,'observed','a crop uses its local raster dimensions while retaining the page frame');
+const draft=M.draftFor(floor,level);draft.points=[[120,100],[600,100],[600,580],[120,580]].map((xy,i)=>({id:'p'+i,xy}));draft.reference={kind:'written',value:4.8,anchors:[[120,580],[600,580]]};draft.alignment={origin:[120,580],offset:[0,0],rotationDegrees:0};draft.base={value:0};draft.height={kind:'estimated-calibrated',value:3.2,sourceViewId:sources[0].id,relationship:'two-visible-level-datums',datumEvidence:{lower:infos[0].guides[0],upper:infos[0].guides[1]}};
+const proposal={buildingId:'house',levelId:level.id,draft,views:infos},before=structuredClone({proposal,inventory,draft}),images=Object.fromEntries(sources.map(v=>[v.id,image]));
+assert.equal(R.roofProposal(proposal,inventory,draft).status,'unresolved','the old datum distance guard stays active without independent source pixels');
+const roof=R.roofProposal(proposal,inventory,draft,{images});assert.equal(roof.status,'proposed');assert.equal(roof.fasciaBottom,3.2);assert.ok(Math.abs(Math.min(...roof.profiles.x.map(p=>p[1]))-3.38)<1e-9);assert.ok(roof.sources.every(s=>s.ceilingBandEvidence?.status==='observed'));assert.deepEqual(Roof.issues(roof,{confirm:false}),[]);assert.ok(Roof.faces(roof,[0,0],{includeProposed:true}).length>0);
+assert.equal(R.roofProposal(proposal,inventory,draft,{images:{...images,[sources[1].id]:drawing({returns:false})}}).status,'unresolved','one associated axis does not invent the missing orthogonal roof');
+assert.deepEqual({proposal,inventory,draft},before,'ceiling, source roof endpoints, height and contour remain unchanged');
+console.log('PASS roof/ceiling separation: observed neutral fascia returns, annotation/legend refusal, original distance guard, both roof axes, real roof faces and immutable source geometry');

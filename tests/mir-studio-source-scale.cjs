@@ -145,4 +145,14 @@ for(const anchors of [[[300,180],[300,180]],[[300,180],[301,181]],[[NaN,180],[74
  assert.equal(associated(s,d),null,'degenerate or nonfinite endpoints cannot establish source association');
  assert.equal(overall(s,[d]).length,0,'degenerate or nonfinite endpoints cannot supply a calibration');
 }
+// Independent overall and partial captions corroborate one source scale.
+// Neither an uncertain whole span alone nor duplicate OCR is sufficient.
+{
+ const A=require('../dist/plan-import-core.js'),P=require('../dist/plan-reconstruction-pipeline.js'),s=fixture(),part=dimension(s,{anchors:[[300,180],[500,180]],value:2,box:[360,160,420,175],confidence:75}),whole=dimension(s,{anchors:[[240,140],[740,140]],value:5,box:[450,120,510,135],confidence:60});
+ whole.lineEvidence=A.dimensionLineEvidence(s.image,whole);assert.equal(whole.lineEvidence.status,'observed');
+ const options={outline:s.outline,image:s.image,controlReferences:[whole]},read=()=>R.partialScaleReferences(s.view,[part],s.outline.sourceBounds,options),before=structuredClone([part,whole]);
+ assert.equal(partial(s,[part]).references.length,0);const result=read();assert.equal(result.references.length,1);assert.equal(result.corroboratingOverallReferences.length,1);assert.equal(result.conflict,false);assert.equal(P.resolveReference([whole,...result.references]).status,'cross-checked-proposal');assert.deepEqual([part,whole],before);
+ for(const mutate of [c=>c.confidence=54,c=>c.sourceViewId='other',c=>c.sourceFrame={units:'pixels'},c=>c.lineEvidence.status='unresolved',c=>c.textBox=part.textBox,c=>c.anchors=[[250,140],[730,140]]]){const bad=structuredClone(whole);mutate(bad);assert.equal(R.partialScaleReferences(s.view,[part],s.outline.sourceBounds,{...options,controlReferences:[bad]}).references.length,0,'weak, duplicate, foreign or unproved overall captions cannot corroborate a lone partial span');}
+ const contrary={...structuredClone(whole),value:5.5,scale:5.5/500,text:'5500 mm',label:'5500 mm'},conflict=R.partialScaleReferences(s.view,[part],s.outline.sourceBounds,{...options,controlReferences:[contrary]});assert.equal(conflict.conflict,true);assert.equal(conflict.references.length,1);assert.equal(P.resolveReference([contrary,...conflict.references]).status,'conflict','a conflicting overall reading is retained, not silently replaced by the strong partial');
+}
 console.log('PASS source scale: horizontal/vertical overall spans, bounded endpoint uncertainty, observed partial margin witnesses and unchanged source transcription; missing/coloured/interrupted/foreign/detail/weak/degenerate evidence and merely similar overall spans refused.');

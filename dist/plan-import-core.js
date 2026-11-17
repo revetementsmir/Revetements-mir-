@@ -295,7 +295,7 @@
     }
     return results.sort((a, b) => b.score - a.score);
   }
-  function dimensionLineEvidence(image, dimension, { labels = [], allowCrossedTerminals = false, localPaperContrast = false } = {}) {
+  function dimensionLineEvidence(image, dimension, { labels = [], allowCrossedTerminals = false, localPaperContrast = false, rejectIntermediateMarks = false } = {}) {
     // A parsed number near a wall is not yet a measured span. This stricter
     // assessment is opt-in for automatic calibration; raw OCR candidates and
     // the legacy dimension reader remain available for review.
@@ -367,9 +367,7 @@
       if (hit) { hits++; misses = 0; } else maxGap = Math.max(maxGap, ++misses);
     }
     const pixelSupport = hits / (count || 1), markers = [], radius = Math.max(4, Math.min(6, Math.round(font * .4))), reach = Math.ceil(font * 3);
-    for (const endpoint of anchors) {
-      const u = endpoint[axis], v = endpoint[across];
-      const witnessesAt = (x, y) => {
+    const witnessesAt = (x, y) => {
         const found = [];
         for (const sign of [-1, 1]) {
           let last = radius, missing = 0;
@@ -379,7 +377,9 @@
           if (last - radius >= Math.max(6, Math.ceil(font * .6))) found.push([point(x, y), point(x, y + sign * last)]);
         }
         return found;
-      };
+    };
+    const observeMark = endpoint => {
+      const u = endpoint[axis], v = endpoint[across];
       let mark = null;
       // An intersection cluster can select the edge of a two-pixel stroke.
       // Locate the mark within that bounded raster uncertainty, retaining
@@ -425,8 +425,9 @@
           }
         }
       }
-      markers.push({ point: endpoint.slice(), kind: mark ? mark.compact ? 'compact-diagonal-tick' : 'diagonal-tick' : 'unresolved-end-mark', witnesses: mark?.witnesses || witnessesAt(u, v), ...(mark ? { strokeCenter: mark.center, anchorTolerancePx: mark.compact ? 1 : 2, ...(mark.compact ? { offAxisPixels: mark.offAxisPixels } : {}) } : {}) });
-    }
+      return { point: endpoint.slice(), kind: mark ? mark.compact ? 'compact-diagonal-tick' : 'diagonal-tick' : 'unresolved-end-mark', witnesses: mark?.witnesses || witnessesAt(u, v), ...(mark ? { strokeCenter: mark.center, anchorTolerancePx: mark.compact ? 1 : 2, ...(mark.compact ? { offAxisPixels: mark.offAxisPixels } : {}) } : {}) };
+    };
+    markers.push(...anchors.map(observeMark));
     const lineAt = (u, v) => sample(u, v) || localPaperContrast && (() => { const p = point(u, v); return !!paperLineContrast(image, p[0], p[1], axis); })();
     const terminalExtensions = () => span.map((u, i) => {
       const direction = i ? 1 : -1, limit = Math.ceil(font * 1.5); let last = 0, missing = 0;
@@ -447,6 +448,21 @@
       ...(contrastCount ? { paperContrast: { method: 'opposing-local-paper-margins', pixels: contrastCount, minimumContrast, samples: contrastSamples, maximumStrokeWidthPx: 3, minimumPaperValue: 248 } } : {}), ...(dimension.sourceLineSeed ? { sourceLineSeed: JSON.parse(JSON.stringify(dimension.sourceLineSeed)) } : {}) };
     if (pixelSupport < .85 || maxGap > 4 || count < 12) return unresolved('DIMENSION_LINE_SUPPORT', evidence);
     if (markers.some(m => !['diagonal-tick', 'compact-diagonal-tick', 'crossed-terminal-witnesses'].includes(m.kind) || !m.witnesses.length)) return unresolved('DIMENSION_END_MARKS_REQUIRED', evidence);
+    if (rejectIntermediateMarks) {
+      // A caption belongs to one marked interval, not an entire dimension
+      // chain. Reuse the exact endpoint detector on actual witness strokes;
+      // the numerical value never supplies or moves a source point.
+      const internal = [], margin = 5;
+      for (let u = Math.ceil(span[0] + margin); u <= Math.floor(span[1] - margin); u++) {
+        if (!witnessesAt(u, coordinate).length) continue;
+        const marker = observeMark(point(u, coordinate));
+        if (!marker.strokeCenter || !['diagonal-tick', 'compact-diagonal-tick'].includes(marker.kind)) continue;
+        if (markers.some(end => Math.abs((end.strokeCenter || end.point)[axis] - marker.strokeCenter[axis]) <= margin)) continue;
+        if (!internal.some(other => Math.abs(other.strokeCenter[axis] - marker.strokeCenter[axis]) <= 3)) internal.push(marker);
+      }
+      evidence.intermediateMarkCheck = { method: 'source-witnesses-and-shared-diagonal-detector', searchedSpan: span.slice(), markers: internal };
+      if (internal.length) return unresolved('DIMENSION_INTERMEDIATE_MARKS', evidence);
+    }
     // This opt-in path recovers long, consistently faded drafting strokes.
     // Isolated compression pixels must not repair arbitrary structural gaps;
     // both dark diagonal ticks and continuing witnesses remain mandatory.
