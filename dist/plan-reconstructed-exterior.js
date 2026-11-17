@@ -172,6 +172,32 @@
   }
   result.exteriorElements=elements.filter(e=>!conflicts.has(e));if(conflicts.size)result.issues.push('FOUNDATION_MULTIVIEW_EXTENT_CONFLICT');
  }
+ // Detect a beam face only when two independent horizontal ink edges are
+ // visible above the same two source-supported posts. A line weight is NOT
+ // a physical section; the depth remains unknown until separately reviewed.
+ function entryBeamFace(image,canopy,masks=[]){
+  const guide=canopy?.beamLine;if(!image?.data||!validBox(guide)||canopy.columns?.length!==2||canopy.columns.some(c=>!(c.width>0)))return {status:'unresolved',reason:'ENTRY_BEAM_SECTION_UNRESOLVED'};
+  const ink=V.structuralInk(image),w=image.width,h=image.height,[x,y,width,weight]=guide,first=Math.max(1,Math.round(x+width*.08)),last=Math.min(w-2,Math.round(x+width*.92)),n=Math.max(1,Math.ceil((last-first)/160));
+  const row=at=>{let hits=0,total=0;for(let px=first;px<=last;px+=n){total++;let found=false;for(let delta=-1;delta<=1;delta++){const py=Math.round(at+delta);if(py>=0&&py<h&&ink[py*w+px])found=true;}hits+=Number(found);}return hits/(total||1);};
+  const top=Math.round(y+weight*.5);if(row(top)<.73)return {status:'unresolved',reason:'ENTRY_BEAM_TOP_EDGE_UNRESOLVED'};
+  const minGap=Math.max(6,Math.ceil(weight+3)),maxGap=Math.min(52,Math.floor(canopy.box[3]*.11));let bottom=null;
+  for(let py=top+minGap;py<=top+maxGap&&py<h;py++){const test=[x,y,width,py-y];if(masks.some(mask=>intersection(test,mask)))continue;if(row(py)>.73){bottom=py;break;}}
+  if(bottom===null)return {status:'unresolved',reason:'ENTRY_BEAM_SECTION_UNRESOLVED'};
+  return {status:'proposed',box:[x,y,width,bottom-y],anchors:[[x,y],[x+width,bottom]],method:'two-supported-horizontal-beam-edges-between-posts',confirmationRequired:true};
+ }
+ // A secondary roof is proposed only when a continuous roof line is visible
+ // in a second orthographic view; porch/beam edges alone are insufficient.
+ function entryRoofStroke(image,xFront,xBack,yFront,masks=[]){
+  if(!image?.data||![xFront,xBack,yFront].every(finite)||Math.abs(xBack-xFront)<20)return {status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
+  const ink=V.structuralInk(image),w=image.width,h=image.height,span=Math.abs(xBack-xFront),count=Math.max(18,Math.ceil(span/3)),rise=Math.min(72,Math.floor(span*.75));let best=null;
+  for(let offset=-4;offset<=4;offset+=2)for(let delta=-rise;delta<=rise;delta+=2){let hits=0,first=0,last=0,blocked=0;
+   for(let i=0;i<=count;i++){const t=i/count,x=Math.round(xFront+(xBack-xFront)*t),y=Math.round(yFront+offset+delta*t);if(x<1||x>=w-1||y<2||y>=h-2){blocked++;continue;}if(masks.some(b=>validBox(b)&&x>=b[0]-2&&x<=b[0]+b[2]+2&&y>=b[1]-2&&y<=b[1]+b[3]+2)){blocked++;continue;}let found=false;for(let dy=-2;dy<=2&&!found;dy++)for(let dx=-1;dx<=1;dx++)if(ink[(y+dy)*w+x+dx]){found=true;break;}hits+=Number(found);if(i<count*.18)first+=Number(found);if(i>count*.82)last+=Number(found);
+   }
+   const score=hits/(count+1);if(blocked||score<.77||first/Math.max(1,Math.ceil(count*.18))<.64||last/Math.max(1,Math.ceil(count*.18))<.64)continue;
+   const rank=score-Math.abs(offset)*.002-Math.abs(delta)*.00005;if(!best||rank>best.rank)best={status:'proposed',anchors:[[xFront,yFront+offset],[xBack,yFront+offset+delta]],support:score,rank,method:'continuous-side-roof-stroke-with-front-height-cross-check',confirmationRequired:true};
+  }
+  return best||{status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
+ }
  function canopyColumns(proposal,inventory,images,reviewed,targets,byLevel){
   const views=(proposal.views||[]).filter(info=>info.envelope?.status==='proposed'&&inventory.views.some(v=>v.id===info.viewId&&v.buildingId===proposal.buildingId&&v.kind==='elevation'&&v.direction===info.direction)&&images?.[info.viewId]?.data),front=views.find(v=>v.direction==='front');
   if(!front)return;
@@ -203,6 +229,7 @@
   if(!sideCandidates.length){report.issues.push('COLUMN_DEPTH_UNRESOLVED');return;}
   const side=sideCandidates[0];
   if(sideCandidates.some(other=>Math.abs(other.ys[0]-side.ys[0])>.05||Math.abs(other.ys[1]-side.ys[1])>.05)){report.issues.push('COLUMN_DEPTH_CONFLICT');return;}
+  const addedColumns=[];
   for(const column of canopy.columns){
    if(!(column.width>0)){report.issues.push('COLUMN_SECTION_UNRESOLVED');continue;}
    const owner=ownerFor(column,side.ys);if(!owner){report.issues.push('COLUMN_OWNER_DEPTH_CONFLICT');continue;}
@@ -225,17 +252,51 @@
     const reason=blockers.some(o=>o.wall.from[1]<side.ys[0]+.001)?'COLUMN_HIDDEN_BY_NEARER_VOLUME':'COLUMN_WALL_INTERSECTION';
     result.issues.push(reason);result.conflicts||=[];result.conflicts.push({type:'column',reason,candidates:[copy(element)],occludingWallIds:blockers.map(o=>o.wall.id)});continue;
    }
-   result.exteriorElements.push(element);
+   result.exteriorElements.push(element);addedColumns.push(element);
   }
-  // A roof/beam guide is a raster stroke, not a measured beam section or roof slope.
-  report.issues.push('ENTRY_BEAM_SECTION_UNRESOLVED','ENTRY_ROOF_GEOMETRY_UNRESOLVED','BALCONY_SLAB_EXTENT_UNRESOLVED');
+  report.issues.push('BALCONY_SLAB_EXTENT_UNRESOLVED');
+  // Never create a roof or a beam from only one post or an occluded face.
+  if(addedColumns.length!==2||addedColumns[0].parentWallId!==addedColumns[1].parentWallId){report.issues.push('ENTRY_BEAM_SECTION_UNRESOLVED','ENTRY_ROOF_GEOMETRY_UNRESOLVED');return;}
+  const beam=entryBeamFace(images[front.viewId],canopy,frontMasks);
+  if(beam.status==='proposed'){
+   const [x,y,width,height]=beam.box,origin=[fr.u(x),side.ys[0],fr.z(y+height)],size=[width*fr.sx,null,height*fr.sz];
+   const owner=ownerFor(canopy.columns[0],side.ys)||possibleOwner;
+   if(size[0]>.01&&size[2]>.01&&origin.every(finite)){
+    const result=byLevel.find(r=>r.levelId===owner.level.id);
+    result.exteriorElements.push({id:'beam:'+owner.wall.id+':'+source.id+':'+sourceKey(beam.box),type:'beam',phase:'existing',status:'proposed',surfaceOnly:true,levelId:owner.level.id,buildingId:proposal.buildingId,parentWallId:owner.wall.id,
+     origin,size,rotationDegrees:0,sourceViewId:source.id,sourceFrame:copy(source.frame),sourceBox:copy(beam.box),color:'#a6aca3',supportMaterial:'unknown',quantityStatus:'partial-unknown-depth',confirmationRequired:true,
+     provenance:{...provenance(source,beam.box,fr,beam.method),supportColumnIds:addedColumns.map(c=>c.id),crossViewIds:sideCandidates.map(c=>c.source.id),depth:{value:null,kind:'unresolved',status:'unresolved'},structuralVerification:false}});
+    result.issues.push('ENTRY_BEAM_DEPTH_UNRESOLVED');
+   }else result.issues.push('ENTRY_BEAM_SECTION_UNRESOLVED');
+  }else report.issues.push(beam.reason||'ENTRY_BEAM_SECTION_UNRESOLVED');
+  const candidates=[];
+  for(const candidate of sideCandidates){
+   const sign=frames[candidate.source.direction].u[1],owner=ownerFor(canopy.columns[0],candidate.ys)||possibleOwner,wallY=owner.wall.from[1];
+   if(!(wallY>candidate.ys[1]+.04))continue;
+   const frontZ=fr.z(canopy.beamLine[1]),xFront=candidate.registration.pixelU(candidate.ys[0]*sign),xBack=candidate.registration.pixelU(wallY*sign),frontY=candidate.registration.pixelZ(frontZ);
+   const masks=sourceMasks(views.find(v=>v.viewId===candidate.source.id),candidate.source,images[candidate.source.id]);
+   const stroke=entryRoofStroke(images[candidate.source.id],xFront,xBack,frontY,masks);
+   if(stroke.status!=='proposed')continue;
+   const zFront=candidate.registration.z(stroke.anchors[0][1]),zBack=candidate.registration.z(stroke.anchors[1][1]);
+   if(Math.abs(zFront-frontZ)>.08||Math.abs(zBack-zFront)>.9)continue;
+   candidates.push({stroke,candidate,owner,frontZ:zFront,backZ:zBack,frontY:candidate.ys[0],backY:wallY});
+  }
+  if(candidates.length&&candidates.every(c=>Math.abs(c.frontY-candidates[0].frontY)<.05&&Math.abs(c.backY-candidates[0].backY)<.05&&Math.abs(c.backZ-candidates[0].backZ)<.08)){
+   const chosen=candidates[0],owner=chosen.owner,result=byLevel.find(r=>r.levelId===owner.level.id),edge=canopy.beamLine;
+   const xs=[fr.u(edge[0]),fr.u(edge[0]+edge[2])].sort((a,b)=>a-b),maxZ=Math.max(chosen.frontZ,chosen.backZ),ys=[[chosen.frontY,chosen.frontZ],[chosen.backY,chosen.backZ]].sort((a,b)=>a[0]-b[0]);
+   const roof={version:1,id:'roof:entry:'+owner.wall.id+':'+source.id+':'+sourceKey(edge),levelId:owner.level.id,buildingId:proposal.buildingId,kind:'estimated-calibrated',status:'proposed',
+    profiles:{x:[[xs[0],maxZ],[xs[1],maxZ]],y:ys},sources:[{sourceViewId:source.id,sourceFrame:copy(source.frame),anchors:[[edge[0],edge[1]],[edge[0]+edge[2],edge[1]]],scaleX:fr.sx,scaleY:fr.sz},...candidates.map(c=>({sourceViewId:c.candidate.source.id,sourceFrame:copy(c.candidate.source.frame),anchors:copy(c.stroke.anchors),scaleX:c.candidate.registration.sx,scaleY:c.candidate.registration.sz}))],
+    checks:[{method:'front-horizontal-roof-edge-and-side-stroke',sideSupport:chosen.stroke.support,sideSources:candidates.map(c=>c.candidate.source.id),status:'proposed'}],complete:false,quantityStatus:'partial-unreviewed',confirmationRequired:true,note:'Entrance roof profile inferred from front and side roof strokes; connection, thickness and structural support remain unverified.'};
+   if(xs[1]-xs[0]>.1&&ys[1][0]-ys[0][0]>.1){result.roofProposals.push(roof);result.issues.push('ENTRY_ROOF_STRUCTURE_UNVERIFIED');}
+   else report.issues.push('ENTRY_ROOF_GEOMETRY_UNRESOLVED');
+  }else report.issues.push(candidates.length?'ENTRY_ROOF_MULTIVIEW_CONFLICT':'ENTRY_ROOF_GEOMETRY_UNRESOLVED');
  }
  function build(proposal,inventory,images,reviewed,generatedLevels=[]){
   const byLevel=[],issues=[];
   const targets=generatedLevels.filter(l=>l.buildingId===proposal.buildingId&&generated(l));
   const allWalls=targets.flatMap(l=>M.wallsFor(l,inventory,{includeProposed:true}));
   for(const level of targets){
-   const result={levelId:level.id,exteriorElements:[],wallZones:[],issues:[]};byLevel.push(result);
+   const result={levelId:level.id,exteriorElements:[],roofProposals:[],wallZones:[],issues:[]};byLevel.push(result);
    const walls=M.wallsFor(level,inventory,{includeProposed:true});
    for(const info of proposal.views||[]){
     const view=inventory.views.find(v=>v.id===info.viewId),frame=frames[info.direction],image=images?.[info.viewId];
@@ -280,5 +341,5 @@
   for(const result of byLevel){physicalDuplicates(result);result.issues=[...new Set(result.issues)];issues.push(...result.issues);}
   return {version:1,byLevel,issues:[...new Set(issues)],complete:false,status:byLevel.some(l=>l.exteriorElements.length||l.wallZones.length)?'partial-proposal':'unresolved'};
  }
- return Object.freeze({version:1,build,subtractBoxes,masonryHatches,materialLabels,writtenThickness,thickness});
+ return Object.freeze({version:1,build,entryBeamFace,entryRoofStroke,subtractBoxes,masonryHatches,materialLabels,writtenThickness,thickness});
 });
