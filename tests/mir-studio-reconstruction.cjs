@@ -84,4 +84,23 @@ const hiddenWindow=image(600,400),hiddenArea=[190,70,145,110];for(const [a,b]of 
 for(let y=70;y<=180;y++)for(let x=190;x<=335;x++)hiddenWindow.data.set([245,245,245,255],(y*600+x)*4);stroke(hiddenWindow,[190,180],[335,180],4);
 const recovery={top:100,bottom:260,width:100,height:80,occlusions:[hiddenArea]},occluded=V.occludedFrameAtSeed(hiddenWindow,{left:270,right:310},recovery);assert.equal(occluded.length,1,'visible bottom and side frames can locate a partially hidden opening with a compatible written size');assert.ok(Math.abs(occluded[0].box[0]-250)<=3);assert.ok(Math.abs(occluded[0].box[1]+occluded[0].box[3]-200)<=3);assert.equal(occluded[0].occlusionEvidence.observedSegments.length,3);assert.equal(V.occludedFrameAtSeed(hiddenWindow,{left:270,right:310},{...recovery,height:null}).length,0,'an unknown height is never filled from legend pixels');const legendOnly=image(600,400);stroke(legendOnly,[190,180],[335,180],4);assert.equal(V.occludedFrameAtSeed(legendOnly,{left:270,right:310},recovery).length,0,'a legend boundary alone is not an opening');
 const foundationRaster=image(),foundationView={id:'foundation-elevation',frame,payload:{drawingReadings:{rows:[{text:'DESSUS FONDATION',box:[100,500,230,512],confidence:95}]}}};stroke(foundationRaster,[80,518],[255,518],2);const foundation=R.foundationGuide(foundationView,foundationRaster,490,200);assert.ok(foundation&&Math.abs(foundation.y-518)<3);assert.equal(foundation.kind,'visible-foundation-top-guide');assert.equal(R.foundationGuide(foundationView,image(),490,200),null,'a caption without a visible datum cannot extend a wall');assert.equal(R.foundationGuide(foundationView,foundationRaster,400,200),null,'a distant line is not a plausible foundation-top registration');
+
+ // Partial dimensions are view-scale evidence only, never wall-length evidence.
+ const source={id:'source-floor',calibration:{evidence:[]}},bounds=[150,100,500,360];
+ const floorDimension=(value,anchors,extra={})=>({value,anchors,scale:value/M.distance(...anchors),sourceViewId:source.id,kind:'written',confidence:90,status:'proposed',...extra});
+ const first=floorDimension(2,[[200,150],[300,150]]);
+ const second=floorDimension(3,[[450,200],[450,350]]);
+ const corroborated=R.partialScaleReferences(source,[first,second],bounds);
+ assert.equal(corroborated.references.length,2,'two independent partial dimensions corroborate scale');
+ assert.equal(corroborated.conflict,false);
+ assert.ok(Math.abs(corroborated.assessment.scale-.02)<1e-10);
+ assert.equal(corroborated.references[0].confirmationRequired,true);
+ assert.equal(R.partialScaleReferences(source,[first],bounds).references.length,0,'one partial label is insufficient');
+ assert.equal(R.partialScaleReferences(source,[first,{...first}],bounds).references.length,0,'duplicate OCR is insufficient');
+ assert.equal(R.partialScaleReferences(source,[first,floorDimension(3,[[205,150],[305,150]])],bounds).conflict,true,'conflicting scale is not averaged');
+ assert.equal(R.partialScaleReferences(source,[first,floorDimension(2.4,[[450,200],[450,350]])],bounds).conflict,true,'cross-axis distortion is rejected');
+ assert.equal(R.partialScaleReferences(source,[first,{...second,sourceViewId:'other-building'}],bounds).references.length,0,'no unrelated view');
+ assert.equal(R.partialScaleReferences(source,[first,floorDimension(3,[[800,200],[800,350]])],bounds).references.length,0,'outside footprint excluded');
+ assert.equal(R.partialScaleReferences(source,[first,{...second,confidence:20}],bounds).references.length,0,'low-confidence OCR excluded');
+
 console.log('PASS reconstruction: automatic multi-retreat proposal, masks excluded, source frames retained, upper-only and unknown dimensions preserved, source-free elevations share physical walls/openings/material atlases; pointed ridges and continuous hip-roof junctions');
