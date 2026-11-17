@@ -69,6 +69,7 @@ jobs:
           node tests/mir-studio-entry-profile-vision.cjs
           node tests/mir-studio-floor-thin-lines.cjs
           node tests/mir-studio-wall-contrast.cjs
+          node tests/mir-studio-fragmented-openings.cjs
           node tests/mir-studio-reading-priority.cjs
           node tests/mir-studio-source-scale.cjs
           node tests/mir-studio-partial-scale.cjs

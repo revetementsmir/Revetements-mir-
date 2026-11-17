@@ -429,7 +429,7 @@
    const forward=(plane.to[0]-plane.from[0])*u[0]+(plane.to[1]-plane.from[1])*u[1]>0;
    for(const c of keep){
     const [l,t,ww,hh]=c.box,width=ww*scaleX,height=hh*scaleY,offset=forward?(l-x)*scaleX:(x+w-l-ww)*scaleX,sill=(y+h-t-hh)*scaleY;if(offset<0||sill<-.04||offset+width>plane.measurements.width.value+.01||sill+height>plane.height+.01)continue;
-    const id='opening:'+plane.id+':'+[l,t,ww,hh].map(Math.round).join('-');results.push({id,sourceId:'frame:'+plane.sourceViewId+':'+[l,t,ww,hh].map(Math.round).join('-'),wallId:plane.id,type:c.type,offset,sill:Math.max(0,sill),width,height,sourceViewId:plane.sourceViewId,sourceBox:M.clone(c.box),sourceFrame:M.clone(view.frame),kind:'estimated-calibrated',status:'proposed',method:c.method,alternateObservations:c.alternateObservations||[],paneObservations:c.paneObservations||[],scalesUsed:{x:scaleX,y:scaleY},references:M.clone(plane.measurements),confirmationRequired:true});
+    const id='opening:'+plane.id+':'+[l,t,ww,hh].map(Math.round).join('-');results.push({id,sourceId:'frame:'+plane.sourceViewId+':'+[l,t,ww,hh].map(Math.round).join('-'),wallId:plane.id,type:c.type,offset,sill:Math.max(0,sill),width,height,sourceViewId:plane.sourceViewId,sourceBox:M.clone(c.box),sourceFrame:M.clone(view.frame),kind:'estimated-calibrated',status:'proposed',method:c.method,...(c.fragmentEvidence?{fragmentEvidence:{...M.clone(c.fragmentEvidence),sourceViewId:view.id,sourceFrame:M.clone(view.frame)}}:{}),alternateObservations:c.alternateObservations||[],paneObservations:c.paneObservations||[],scalesUsed:{x:scaleX,y:scaleY},references:M.clone(plane.measurements),confirmationRequired:true});
    }
   }return results;
  }

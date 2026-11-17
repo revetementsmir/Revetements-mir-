@@ -50,12 +50,51 @@
   });
  }
  function documentLabelsInside(rows,left,top,right,bottom){const labels=rows.filter(row=>Array.isArray(row.box)&&row.box.length===4&&(row.confidence??100)>=50&&row.box[0]>left&&row.box[1]>top&&row.box[2]<right&&row.box[3]<bottom).map(row=>String(row.text||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s*[:.]$/,''));return labels.some(text=>/^(?:legende|legend|notes?(?: generales?)?|general notes?|(?:door|window|finish) schedule|tableau(?: des? .+)?)$/i.test(text))||new Set(labels.filter(text=>/^(?:(?:nom|no\.?|numero) (?:du |de )?projet|project (?:name|number)|echelle|scale|date|dessine par|drawn by|revision)$/i.test(text))).size>=2;}
- function thinFloorEnvelope(image,{sourceViewId=null,frame=null,rows=[]}={}){
+ function componentAxisSegments(component,ink,w,vertical,minimum,tolerance){
+  const cross=vertical?0:1,start=component.box[cross],columns=Array.from({length:component.box[cross+2]},()=>[]),groups=[];
+  // Work from the component's own pixels, not every point in its bounding
+  // box. Connected parallel skins can share a component through a short
+  // transverse block; their white middle is never a longitudinal stroke.
+  for(const i of component.pixels){const x=i%w,y=(i-x)/w;columns[(vertical?x:y)-start].push(vertical?y:x);}
+  let previous=[];
+  for(let offset=0;offset<columns.length;offset++){
+   const positions=columns[offset].sort((a,b)=>a-b),at=start+offset,current=[];
+   for(let first=0;first<positions.length;){
+    let last=first;while(last+1<positions.length&&positions[last+1]===positions[last]+1)last++;
+    let a=positions[first],b=positions[last];first=last+1;
+    const observed=n=>ink[vertical?n*w+at:at*w+n];
+    while(a<=b&&!observed(a))a++;while(b>=a&&!observed(b))b--;
+    if(b-a+1<minimum)continue;let hits=0,gap=0,maxGap=0;
+    for(let n=a;n<=b;n++){if(observed(n)){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}
+    if(hits/(b-a+1)<.94||maxGap>2)continue;
+    current.push({at,start:a,end:b,length:b-a+1,sourceSupport:hits/(b-a+1)});
+   }
+   // Adjacent occupied columns of one thick stroke share their actual
+   // interval. A short bridge cannot merge the two longer wall skins.
+   let cursor=0;
+   for(const segment of current){
+    while(cursor<previous.length&&previous[cursor].end<segment.start)cursor++;
+    let group=null;
+    for(let i=cursor;i<previous.length&&previous[i].start<=segment.end;i++){
+     const prior=previous[i],overlap=Math.min(prior.end,segment.end)-Math.max(prior.start,segment.start)+1;
+     if(overlap/Math.max(prior.length,segment.length)>=.9&&Math.abs(prior.start-segment.start)<=tolerance&&Math.abs(prior.end-segment.end)<=tolerance){group=prior.group;break;}
+    }
+    if(!group){group={best:segment};groups.push(group);}else if(segment.length>group.best.length||segment.length===group.best.length&&segment.sourceSupport>group.best.sourceSupport)group.best=segment;
+    segment.group=group;
+   }
+   previous=current;
+  }
+  return groups.map(({best})=>({at:best.at,start:best.start,end:best.end,length:best.length}));
+ }
+ function thinFloorEnvelope(image,{sourceViewId=null,frame=null,rows=[]}={},recoverWideComponents=false){
   const {width:w,height:h}=image,ink=monochrome(image),unit=Math.max(1,w/1000),minimum=Math.max(18,Math.round(Math.max(w,h)*.015)),tolerance=Math.max(1,Math.round(w/1100)),maximumBand=Math.min(w,h)*.04,lines={};
+  let hasWideComponents=false;
   // Preserve thin source strokes. A search width bounds the pairing work; it
   // never supplies a wall thickness, length, or an absent corner.
   for(const axis of ['x','y']){
-   const vertical=axis==='y',mask=opening(closing(ink,w,h,vertical?0:1,vertical?1:0),w,h,vertical?0:Math.floor(minimum/2),vertical?Math.floor(minimum/2):0),segments=components(mask,w,h).filter(c=>c.box[vertical?2:3]<=Math.max(6,unit*4)&&c.box[vertical?3:2]>=minimum).map(c=>({at:c.box[vertical?0:1]+(c.box[vertical?2:3]-1)/2,start:c.box[vertical?1:0],end:c.box[vertical?1:0]+c.box[vertical?3:2]-1,length:c.box[vertical?3:2]})).sort((a,b)=>a.at-b.at),groups=[];
+   const vertical=axis==='y',mask=opening(closing(ink,w,h,vertical?0:1,vertical?1:0),w,h,vertical?0:Math.floor(minimum/2),vertical?Math.floor(minimum/2):0),parts=components(mask,w,h),maximumWidth=Math.max(6,unit*4),segments=parts.filter(c=>c.box[vertical?2:3]<=maximumWidth&&c.box[vertical?3:2]>=minimum).map(c=>({at:c.box[vertical?0:1]+(c.box[vertical?2:3]-1)/2,start:c.box[vertical?1:0],end:c.box[vertical?1:0]+c.box[vertical?3:2]-1,length:c.box[vertical?3:2]})),groups=[];
+   for(const component of parts){const width=component.box[vertical?2:3];if(width<=maximumWidth||width>maximumBand||component.box[vertical?3:2]<minimum)continue;hasWideComponents=true;if(recoverWideComponents)segments.push(...componentAxisSegments(component,ink,w,vertical,minimum,tolerance));}
+   segments.sort((a,b)=>a.at-b.at);
    for(const segment of segments){const group=groups.at(-1);if(group&&segment.at-group.at<=tolerance){group.parts.push(segment);if(segment.length>group.best.length){group.best=segment;group.at=segment.at;}}else groups.push({axis,at:segment.at,parts:[segment],best:segment});}
    if(groups.length>350)return {status:'unresolved',reason:'WALL_NETWORK_COMPLEXITY'};
    for(const line of groups){const length=vertical?h:w;line.observed=new Uint8Array(length);line.sum=new Uint32Array(length+1);for(let n=0;n<length;n++){for(let d=-tolerance;d<=tolerance;d++){const x=vertical?Math.round(line.at+d):n,y=vertical?n:Math.round(line.at+d);if(x>=0&&x<w&&y>=0&&y<h&&ink[y*w+x]){line.observed[n]=1;break;}}line.sum[n+1]=line.sum[n]+line.observed[n];}line.start=Math.min(...line.parts.map(p=>p.start));line.end=Math.max(...line.parts.map(p=>p.end));}
@@ -101,7 +140,7 @@
     }
    }
   }
-  candidates.sort((a,b)=>b.area-a.area);const best=candidates[0];if(!best)return {status:'unresolved',reason:'THIN_WALL_BOUNDARY_UNRESOLVED'};
+  candidates.sort((a,b)=>b.area-a.area);const best=candidates[0];if(!best)return !recoverWideComponents&&hasWideComponents?thinFloorEnvelope(image,{sourceViewId,frame,rows},true):{status:'unresolved',reason:'THIN_WALL_BOUNDARY_UNRESOLVED'};
   if(candidates.some(other=>{if(other===best||other.area<best.area*.35)return false;const [x,y,bw,bh]=best.sourceBounds,[ox,oy,ow,oh]=other.sourceBounds,overlap=Math.max(0,Math.min(x+bw,ox+ow)-Math.max(x,ox))*Math.max(0,Math.min(y+bh,oy+oh)-Math.max(y,oy));return overlap<Math.min(best.area,other.area)*.8;}))return {status:'unresolved',reason:'WALL_NETWORK_AMBIGUOUS'};
   return {status:'proposed',method:'paired-source-wall-enclosure',sourceViewId,sourceFrame:frame,points:best.points,sourceBounds:best.sourceBounds,sourceCorners:best.sourceCorners.map(c=>({...c,tolerancePx:tolerance})),sourceEdgeEvidence:best.sourceEdgeEvidence.map((e,i)=>({...e,anchors:[best.points[i].slice(),best.points[(i+1)%4].slice()],tolerancePx:tolerance})),confirmationRequired:true,metricScale:null,excludes:['coloured-masks','unpaired-dimension-leaders','unconnected-furniture','labelled-notes-and-schedules'],warning:'A closed source wall network is a proposal; building/level ownership and measurements must be checked.'};
  }
@@ -451,16 +490,59 @@
   }
   candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'SECONDARY_DEPTH_NOT_REPRESENTED'};
  }
+ function neutralFrameEvidence(image,box){
+  const {width:w,height:h,data}=image,[x,y,ww,hh]=box,samples=[];
+  for(let row=1;row<6;row++)for(let col=1;col<6;col++){const j=(Math.floor(y+hh*row/6)*w+Math.floor(x+ww*col/6))*4;samples.push((data[j]+data[j+1]+data[j+2])/3);}
+  samples.sort((a,b)=>a-b);const background=samples[Math.floor(samples.length/2)],contrastThreshold=25;
+  // Annotation colour can interrupt a panel, but can never supply its frame.
+  // Each side must have one fixed, dark, nearly neutral source line.
+  const dark=(xx,yy)=>{if(xx<0||yy<0||xx>=w||yy>=h)return false;const j=(Math.round(yy)*w+Math.round(xx))*4,hi=Math.max(data[j],data[j+1],data[j+2]),lo=Math.min(data[j],data[j+1],data[j+2]);return data[j+3]>100&&hi-lo<45&&(data[j]+data[j+1]+data[j+2])/3<background-contrastThreshold;};
+  const interrupted=(xx,yy)=>{if(xx<0||yy<0||xx>=w||yy>=h)return false;const j=(Math.round(yy)*w+Math.round(xx))*4;return Math.max(data[j],data[j+1],data[j+2])-Math.min(data[j],data[j+1],data[j+2])>=45;};
+  const line=(axis,fixed,start,end)=>{let hits=0,total=0,contrast=0,gap=0,unexplained=0,maxGap=0,maxUnexplainedGap=0,lastColour=-Infinity;const colourInterruptions=[];for(let n=Math.ceil(start);n<=Math.floor(end);n++){const xx=axis==='y'?fixed:n,yy=axis==='y'?n:fixed;total++;if(!dark(xx,yy)){const colour=interrupted(xx,yy);gap++;unexplained=colour?0:unexplained+1;maxGap=Math.max(maxGap,gap);maxUnexplainedGap=Math.max(maxUnexplainedGap,unexplained);if(colour){const point=[xx,yy];if(n===lastColour+1)colourInterruptions.at(-1).anchors[1]=point;else colourInterruptions.push({anchors:[point,point],use:'interruption-only; never a boundary'});lastColour=n;}continue;}gap=0;unexplained=0;hits++;const j=(Math.round(yy)*w+Math.round(xx))*4;contrast+=background-(data[j]+data[j+1]+data[j+2])/3;}return {coordinate:fixed,support:hits/(total||1),contrast:contrast/(hits||1),sampleCount:total,maxGap,maxUnexplainedGap,colourInterruptions};};
+  const best=(axis,at,start,end,from,to)=>{let result=null;for(let delta=from;delta<=to;delta++){const candidate=line(axis,Math.round(at)+delta,start,end);if(!result||candidate.support>result.support||candidate.support===result.support&&Math.abs(delta)<Math.abs(result.coordinate-at))result=candidate;}return result;};
+  const sides={left:best('y',x,y,y+hh,-6,2),right:best('y',x+ww,y,y+hh,-2,6),top:best('x',y,x,x+ww,-6,2),bottom:best('x',y+hh,x,x+ww,-2,6)},l=sides.left.coordinate,r=sides.right.coordinate,t=sides.top.coordinate,b=sides.bottom.coordinate;
+  const edges={left:{...line('y',l,t,b),anchors:[[l,t],[l,b]]},right:{...line('y',r,t,b),anchors:[[r,t],[r,b]]},top:{...line('x',t,l,r),anchors:[[l,t],[r,t]]},bottom:{...line('x',b,l,r),anchors:[[l,b],[r,b]]}};
+  const corners=[[l,t],[r,t],[r,b],[l,b]].map(([xx,yy])=>{for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++)if(dark(xx+dx,yy+dy))return true;return false;});
+  return {box:[l,t,r-l,b-t],background,contrastThreshold,tolerancePx:6,maxGapPx:8,maxUnexplainedGapPx:3,edges,corners,closed:r>l&&b>t&&Object.values(edges).every(e=>e.support>=.8&&e.maxGap<=8&&e.maxUnexplainedGap<=3)&&corners.every(Boolean)};
+ }
+ function fragmentedDoorFrames(image,box,parts,seeds,established){
+  const {width:w,height:h,data}=image,[bx,by,bw,bh]=box,within=(a,b)=>Math.max(0,Math.min(a[0]+a[2],b[0]+b[2])-Math.max(a[0],b[0]))*Math.max(0,Math.min(a[1]+a[3],b[1]+b[3])-Math.max(a[1],b[1]))/Math.min(a[2]*a[3],b[2]*b[3]),result=[];
+  // A short coloured interruption may split an otherwise neutral door into
+  // one large panel and one small aligned strip. Do not merge independent
+  // framed apertures or arbitrary grey cells from an annotation table.
+  for(const seed of seeds){
+   const [x,y,ww,hh]=seed.box;if(established.some(c=>within(c.panelBox||c.box,seed.box)>.4)||Math.abs(by+bh-y-hh)>Math.max(8,bh*.12))continue;
+   const before=neutralFrameEvidence(image,seed.box),supported=name=>before.edges[name].support>=.8&&before.edges[name].maxGap<=8&&before.edges[name].maxUnexplainedGap<=3;
+   if(!supported('left')||!supported('right')||supported('top')===supported('bottom'))continue;
+   const above=!supported('top'),candidates=[];
+   for(const part of parts){
+    if(part===seed)continue;const [px,py,pw,ph]=part.box,gap=above?y-py-ph:py-y-hh;
+    if(gap<1||gap>8||ph<4||ph>hh*.25||Math.abs(px-x)>2||Math.abs(px+pw-x-ww)>2||part.area/(pw*ph)<.65)continue;
+    const top=above?py:y,bottom=above?y+hh:py+ph,joined=[Math.min(x,px),top,Math.max(x+ww,px+pw)-Math.min(x,px),bottom-top];
+    if(joined[0]<=bx+8||joined[0]+joined[2]>=bx+bw-8||joined[1]<=by+bh*.15||joined[3]>=bh*.95||joined[2]/joined[3]<=.2||joined[2]/joined[3]>=2.3)continue;
+    const gapBox=[Math.max(x,px),above?py+ph:y+hh,Math.min(x+ww,px+pw)-Math.max(x,px),gap];let coloured=0,count=0,maxWhiteRun=0;
+    for(let yy=gapBox[1];yy<gapBox[1]+gapBox[3];yy++){let whiteRun=0;for(let xx=gapBox[0]+2;xx<gapBox[0]+gapBox[2]-2;xx++){const j=(yy*w+xx)*4,hi=Math.max(data[j],data[j+1],data[j+2]),lo=Math.min(data[j],data[j+1],data[j+2]);coloured+=Number(hi-lo>=45);whiteRun=lo>225&&hi-lo<35?whiteRun+1:0;maxWhiteRun=Math.max(maxWhiteRun,whiteRun);count++;}}
+    // A visible white separator between two partly masked frames is contrary
+    // evidence, even if most of that interval is covered by annotation colour.
+    if(coloured/(count||1)<.65||maxWhiteRun>8)continue;
+    const frame=neutralFrameEvidence(image,joined);if(!frame.closed)continue;
+    candidates.push({box:frame.box,panelBox:joined,type:'door',method:'closed-frame-and-fragmented-neutral-door-panels',status:'proposed',confirmationRequired:true,fragmentEvidence:{version:1,method:'aligned-neutral-parts-with-observed-dark-frame',coordinateSystem:'source-raster-pixels',rasterSize:[w,h],searchBox:box.slice(),parts:[part,seed].sort((a,b)=>a.box[1]-b.box[1]).map(p=>({box:p.box.slice(),area:p.area,fill:p.area/(p.box[2]*p.box[3])})),gaps:[{box:gapBox,pixels:gap,colouredFraction:coloured/(count||1),maxWhiteRun,use:'interruption-only; never a boundary'}],edges:frame.edges,corners:frame.corners,background:frame.background,contrastThreshold:frame.contrastThreshold,tolerancePx:frame.tolerancePx,maxGapPx:frame.maxGapPx,maxUnexplainedGapPx:frame.maxUnexplainedGapPx}});
+   }
+   // Several different closed unions are ambiguous; no score chooses one.
+   if(candidates.length!==1)continue;const candidate=candidates[0];if(!result.some(c=>within(c.panelBox,candidate.panelBox)>.4))result.push(candidate);
+  }return result;
+ }
  function grayDoorFrames(image,box,{type='door'}={}){
   const {width:w,height:h}=image,[bx,by,bw,bh]=box,mask=new Uint8Array(w*h),ink=structuralInk(image),left=Math.max(0,Math.floor(bx)),right=Math.min(w-1,Math.ceil(bx+bw)),top=Math.max(0,Math.floor(by)),bottom=Math.min(h-1,Math.ceil(by+bh));
   for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++){const j=(y*w+x)*4,hi=Math.max(image.data[j],image.data[j+1],image.data[j+2]),lo=Math.min(image.data[j],image.data[j+1],image.data[j+2]);mask[y*w+x]=Number(lo>65&&hi<225&&hi-lo<35);}
-  const raw=components(closing(mask,w,h,2,2),w,h).filter(c=>c.box[0]>left+8&&c.box[0]+c.box[2]<right-8&&c.box[1]>top+bh*.15&&c.box[2]>22&&c.box[3]>Math.max(15,bh*(type==='door'?.43:.08))&&c.box[3]<bh*(type==='door'?.95:.6)&&c.box[2]/c.box[3]>.2&&c.box[2]/c.box[3]<(type==='door'?2.3:8)&&c.area/(c.box[2]*c.box[3])>.65),groups=[];
+  const parts=components(closing(mask,w,h,2,2),w,h),raw=parts.filter(c=>c.box[0]>left+8&&c.box[0]+c.box[2]<right-8&&c.box[1]>top+bh*.15&&c.box[2]>22&&c.box[3]>Math.max(15,bh*(type==='door'?.43:.08))&&c.box[3]<bh*(type==='door'?.95:.6)&&c.box[2]/c.box[3]>.2&&c.box[2]/c.box[3]<(type==='door'?2.3:8)&&c.area/(c.box[2]*c.box[3])>.65),groups=[];
   for(const c of raw.sort((a,b)=>a.box[0]-b.box[0])){const [x,y,ww,hh]=c.box,g=groups.find(g=>Math.abs(g.box[1]-y)<7&&Math.abs(g.box[1]+g.box[3]-y-hh)<7&&x-g.box[0]-g.box[2]<bw*.06);if(g){const r=Math.max(x+ww,g.box[0]+g.box[2]),b=Math.max(y+hh,g.box[1]+g.box[3]);g.box=[g.box[0],Math.min(y,g.box[1]),r-g.box[0],b-Math.min(y,g.box[1])];}else groups.push({box:c.box});}
   const framed=([x,y,ww,hh])=>{
    const samples=[];for(let row=1;row<6;row++)for(let col=1;col<6;col++){const j=(Math.floor(y+hh*row/6)*w+Math.floor(x+ww*col/6))*4;samples.push((image.data[j]+image.data[j+1]+image.data[j+2])/3);}samples.sort((a,b)=>a-b);const background=samples[Math.floor(samples.length/2)],dark=(xx,yy)=>{if(xx<0||yy<0||xx>=w||yy>=h)return false;const at=Math.round(yy)*w+Math.round(xx),j=at*4;return !!ink[at]&&(image.data[j]+image.data[j+1]+image.data[j+2])/3<background-25;};
    let hits=0,total=0;for(let yy=y;yy<=y+hh;yy++)for(const xx of [x,x+ww]){let found=false;for(let dx=-6;dx<=6;dx++)found||=dark(xx+dx,yy);hits+=Number(found);total++;}const vertical=hits/(total||1);hits=0;total=0;for(let xx=x;xx<=x+ww;xx++)for(const yy of [y,y+hh]){let found=false;for(let dy=-6;dy<=6;dy++)found||=dark(xx,yy+dy);hits+=Number(found);total++;}return vertical>.75&&hits/(total||1)>.7;
   };
-  return groups.filter(g=>framed(g.box)).map(g=>({box:[g.box[0]-3,g.box[1]-3,g.box[2]+6,g.box[3]+6],panelBox:g.box.slice(),framePaddingPx:3,type,method:type==='door'?'closed-frame-and-neutral-door-panels':'closed-frame-and-neutral-glazing',status:'proposed',confirmationRequired:true}));
+  const established=groups.filter(g=>framed(g.box)).map(g=>({box:[g.box[0]-3,g.box[1]-3,g.box[2]+6,g.box[3]+6],panelBox:g.box.slice(),framePaddingPx:3,type,method:type==='door'?'closed-frame-and-neutral-door-panels':'closed-frame-and-neutral-glazing',status:'proposed',confirmationRequired:true}));
+  return type==='door'?[...established,...fragmentedDoorFrames(image,box,parts,raw,established)]:established;
  }
  function canopyEnvelope(image,primary,upperY){
   if(primary.status!=='proposed'||!Number.isFinite(upperY))return {status:'unresolved',reason:'CANOPY_LEVEL_REQUIRED'};
@@ -545,5 +627,5 @@
   }
   candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
  }
- return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
+ return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
 });

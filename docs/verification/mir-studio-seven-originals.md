@@ -207,12 +207,41 @@ and an internal wall network in both directions. Crossing dimension rails,
 labelled notes/tables and competing disjoint enclosures do not establish a
 building. Open or more complex thin contours remain unresolved.
 
+When that historical thin-wall path finds no contour, a second bounded pass
+can separate observed axial strokes within connected parallel wall skins.
+Short transverse blocks can join the two skins into a component wider than
+the historical filter; that does not justify replacing them with the white
+centre of their bounding box. Retained axes use occupied source coordinates,
+at least 94 percent exact stroke support and gaps no greater than two pixels.
+The existing paired-corner, interior-network, source-edge and ambiguity checks
+remain in force. Previously accepted thin and solid outlines stay unchanged.
+
+A private replay recovered one main floor outline in D01; the other three
+floor-outline failures remained. This is a contour proposal, not a four-level
+building. Door openings, external structures and relative level registration
+are separate unresolved questions; no level-alignment guard was removed.
+
 The historical elevation detector is retained when successful. A fallback for
 pale facades requires locally contrasting neutral strokes, paired side spines,
 top/bottom support, material immediately inside both side boundaries, and an
 observed interior opening frame outside known masks. Uniform colour fills,
 partial title blocks and separated dimension rails cannot provide this proof.
 An envelope remains separate from a source-supported level height.
+
+### Door panels interrupted by an annotation
+
+A narrow annotation can split a neutral door panel into separate raster
+components, leaving the historical single-component frame check incomplete.
+An additional proposed opening may join a large panel with a nearby aligned
+strip only when four dark neutral frame edges and their corners support the
+union. The annotation establishes the interruption only; it supplies no frame
+edge. Missing or ambiguous boundaries and evidence of separate frames remain
+reasons to refuse the union. Historical accepted openings remain available.
+
+The proposal retains the original component boxes, observed gap and frame
+support, attached to the source view and frame. Its position is still an
+estimated calibrated opening. A raised entrance must not be moved to ground
+level merely because its landing or steps have not been reconstructed.
 
 ## Review limits
 
