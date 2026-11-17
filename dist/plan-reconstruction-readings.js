@@ -66,8 +66,8 @@
     if(workerMode!==desired){await worker.setParameters({tessedit_pageseg_mode:desired,tessedit_char_whitelist:region.grid?'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ':''});workerMode=desired;}
     const {data}=await worker.recognize(canvas,{}, {blocks:true});canvas.width=canvas.height=1;
     if(region.grid){
-     const kind=region.gridCircle.kind,token=String(data.text||'').trim().toUpperCase().replace(/\\s+/g,'').replace(/[.,:;]+$/,'');
-     const good=kind==='number'?/^\\d{1,2}$/.test(token)&&Number(token)>0:/^[A-Z]$/.test(token);
+     const kind=region.gridCircle.kind,token=String(data.text||'').trim().toUpperCase().replace(/\s+/g,'').replace(/[.,:;]+$/,'');
+     const good=kind==='number'?/^\d{1,2}$/.test(token)&&Number(token)>0:/^[A-Z]$/.test(token);
      const confidence=Number(data.confidence)||0;
      if(good&&confidence>=55){
       const circle=region.gridCircle,[cx,cy]=circle.center,r=circle.radius;
