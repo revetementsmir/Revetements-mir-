@@ -52,7 +52,7 @@ Les captures et résultats réellement produits seront téléversés dans l’ar
 
 ## Limites restantes
 
-La première exécution GitHub Actions et l’inspection de ses captures restent à faire. Aucun aperçu Vercel de cette reprise n’est encore déclaré livré dans ce rapport. Chromium simulé ne certifie ni Safari ni un téléphone physique. La galerie de la passation conserve ses preuves antérieures, distinctes des nouvelles vérifications de couleurs.
+Les captures réelles du deuxième run sont disponibles pour inspection, mais le parcours panier du nouveau harnais doit être réexécuté avec une quantité conforme au conditionnement affiché (diagnostic ci-dessous). Aucun aperçu Vercel de cette reprise n’est encore déclaré livré dans ce rapport. Chromium simulé ne certifie ni Safari ni un téléphone physique. La galerie de la passation conserve ses preuves antérieures, distinctes des nouvelles vérifications de couleurs.
 
 ## Première CI — correction de l’environnement
 
@@ -60,4 +60,14 @@ Le workflow [44135422084](https://github.com/revetementsmir/Revetements-mir-/act
 
 Correction limitée : fixer le runner à `ubuntu-24.04`. Les versions de dépendances, scénarios et assertions restent identiques. Ce changement ne corrige ni ne masque un défaut du site; une nouvelle exécution complète est nécessaire. Les captures historiques éventuellement présentes dans le premier artefact restent des preuves antérieures.
 
-Avant les essais, le checkout CI éphémère efface uniquement `preview-security-results.json`, `preview-browser.json` et les trois sorties `gallery-390.png`, `gallery-834.png`, `gallery-1440.png` concernées. Ces fichiers suivis en Git ne peuvent ainsi plus être réexportés comme de nouvelles preuves après une étape ignorée. Les dossiers et captures sources de la passation sont conservés. Les nouveaux résultats de couleurs indiquent leur phase, leurs empreintes et le SHA exécuté.
+Avant les essais, le checkout CI éphémère efface uniquement les sorties générées `colour-cutout-qa/before`, `colour-cutout-qa/after`, `boutique-colours-20261117/ci-palettes`, `preview-security-results.json`, `preview-browser.json` et les trois sorties `gallery-390.png`, `gallery-834.png`, `gallery-1440.png` concernées. Ces fichiers suivis en Git ne peuvent ainsi plus être réexportés comme de nouvelles preuves après une étape ignorée. Les dossiers et captures sources `geometry`, `journey`, `samples` et `pdf` de la passation sont conservés. Les nouveaux résultats de couleurs indiquent leur phase, leurs empreintes et le SHA exécuté.
+
+## Deuxième CI — correction de la quantité dans le harnais
+
+Le workflow [44136312201](https://github.com/revetementsmir/Revetements-mir-/actions/runs/44136312201), exécuté sur `4d65ee41fbe0f99a8a8247c2e36fbe2ea7711c97`, a réellement lancé Chromium et produit 45 captures avant et 45 après. Les données passent 19/19, la suite historique de couleurs 70/70, les protections TEST 11/11 et la galerie 15 cas avec 10 PDF, aucune erreur JavaScript ni requête externe transmise. L’artefact `14352359094` a pour SHA256 `8fc965f2b05fde1fdc6c106a13157af64cb83849bcb28132107298cf1c4151a0`.
+
+Le nouveau harnais a réussi 105/108 contrôles avant et 141/144 après. Les trois échecs de chaque phase sont identiques : à 390, 834 et 1440 px, le scénario Saint-Laurent attend l’avis d’ajout au panier après avoir saisi `2` dans le champ de quantité. Or `MIRCommerceQuantity.policy` choisit par défaut les pi² par multiples de **5** pour ce clin; `validate` refuse donc correctement 2 pi². Ce défaut se trouve dans la saisie du harnais, sans régression du site. La suite historique réussit le même ajout en respectant le pas affiché.
+
+Correction limitée à `capture.cjs` : saisir deux fois le pas positif du champ (10 pi² ici), enregistrer quantité, unité, pas et validité avant le clic, puis exiger que le champ soit valide. Toutes les assertions de palette, d’interdiction d’ajout des retouches, de pixels du panier et de persistance restent présentes. Aucun résultat panier n’est déclaré acquis avant le nouveau run.
+
+L’inspection visuelle indépendante de ce même run a ensuite repéré une légende cachée dans la fiche employé : la règle générale `.field-store-detail .product-preview-caption{display:none}` masquait le petit échantillon des retouches ou la mention « Teinte non représentée ». Après la correction ciblée du site, le harnais exige dans la phase après que leur légende marquée `data-keep-product-photo-caption` soit visible et que chaque échantillon présent soit également visible. Le CSS `mir-field-samsung.css` est désormais inclus dans les empreintes avant/après. La phase avant conserve le rendu historique, sans lui attribuer cette correction.

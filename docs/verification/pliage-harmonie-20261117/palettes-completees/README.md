@@ -22,6 +22,8 @@ Les 131 identifiants produits sont conservés. Les 129 produits sans rapport ave
 
 Les noms de couleur restent les noms source en FR et EN. Les nouveaux libellés, les notes de disponibilité et les notes de gabarit ont des équivalents EN. Les noms du nuancier sont protégés par `data-mir-source-color` dans les nouvelles légendes.
 
+La revue des captures CI a révélé que le style de la fiche employé masquait toutes les légendes, y compris celles des retouches. Le marqueur `data-keep-product-photo-caption` et une règle ciblée dans `mir-field-samsung.css` rendent maintenant visible leur légende compacte : swatch de la teinte choisie, ou mention « Teinte non représentée » pour les anciennes CanExel. Les deux produits `keepProductPhoto` sont seuls concernés; les légendes des autres produits restent inchangées. La vérification visuelle de ce correctif est confiée au nouveau passage CI, qui doit également attester l’empreinte de cette feuille CSS.
+
 ## Sources vérifiées
 
 1. [James Hardie — brochure Québec 06/2025](https://www.gentek.ca/wp-content/uploads/sites/2/2025/06/HS2533_QC_FR_0625.pdf) : 19 références Statement. Document fabricant distribué par Gentek; le nuancier indexé a été relu. L’ouverture web intégrale dépassait la limite de taille du service (environ 22 Mo).

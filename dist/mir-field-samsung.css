@@ -96,3 +96,5 @@ body[data-field-home-compact=true] .field-home-list{gap:2px!important}body[data-
 
 body[data-field-shell=true] .field-home-job-choice{margin:0;display:block}body[data-field-shell=true] .field-home-job-choice .mir-choice-trigger{border:0!important;background:transparent!important;padding:0!important;min-height:44px;text-align:left}body[data-field-shell=true] .field-home-job-choice .mir-choice-rich>strong{font-size:1.375rem!important}body[data-field-shell=true] .field-home-job-choice .mir-choice-rich>span{display:none}body[data-field-home-compact=true] .field-home-job-choice .mir-choice-rich>strong{font-size:1.25rem!important}
 body[data-field-shell=true] .field-home-job-select>.mir-choice-chevron{font-size:1.25rem!important;line-height:1!important;height:auto!important;min-height:44px;align-self:stretch}
+/* Touch-up containers keep their photo; their chosen shade needs a visible caption. */
+.field-store-detail .product-preview-caption[data-keep-product-photo-caption]:not(:empty){display:block;margin:0;padding:8px 12px 0;font-size:.8125rem;line-height:1.4}

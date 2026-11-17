@@ -1,13 +1,13 @@
 {
-  "createdAt": "2026-11-17T17:16:43.919Z",
+  "createdAt": "2026-11-17T17:40:24.928Z",
   "baseline": "bb39e142e646022a20eb804dacd8001321c7ee19",
-  "sourceRevision": "bb39e142e646022a20eb804dacd8001321c7ee19",
+  "sourceRevision": "4d65ee41fbe0f99a8a8247c2e36fbe2ea7711c97",
   "sourceHashes": {
     "catalogue-fd6866b49d21.json": "4fb95308c21b11f97ec8bf8871899c2356df73f19fe6c0dfef4f9e6d8e10bde5",
     "mir-client-colour-palettes.json": "1fc525861a8de01b08fec043c4c9b626015735f2808dd05e111dc93e0d2ac7f7",
     "mir-client-siding-previews.js": "470532fa67b59d33a63aeab86f0143984f7c04d33b96f78f7a8c5c3d45c49ef0",
     "magasin-revue.js": "cea87e0de5068c5bc0fda30fe56000e17d381d82402b9bf84d8cce0f191a81be",
-    "chantier-app.js": "1ba9c51c977aff5b4879253f5eefa2cc7bb205a1ec5bebd711e58bbe5f9924f3",
+    "chantier-app.js": "aaf8af04fb5e92456f09658b8d1168f6f3c232a4ffdfc28e0a6ad75052a6e991",
     "commerce.js": "32f41b12595b997ea7886ede09e96930e4c283c3e122e3668688f0634898fe0b"
   },
   "scope": "Data and pure employee model only; no browser or hosted verification claimed",

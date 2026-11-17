@@ -395,7 +395,7 @@
       '" data-product="'+esc(item.id)+'"><div class="product-visual mir-catalogue-photo"><div class="product-sample" data-product-sample>'+productVisual(item)+
       '</div><button type="button" class="favorite-button" data-favorite="'+esc(item.id)+'" aria-pressed="'+favorite+'" aria-label="'+
       (favorite?'Retirer des favoris':'Ajouter aux favoris')+' : '+esc(item.name)+'">'+icon('heart')+'</button></div>'+
-      '<p class="product-preview-caption mir-photo-caption">'+esc(productVisualLabel(item))+'</p><div class="product-body"><h3>'+esc(item.name)+'</h3>'+
+      '<p class="product-preview-caption mir-photo-caption"'+(materialMap.get(item.materialId)?.keepProductPhoto?' data-keep-product-photo-caption':'')+'>'+esc(productVisualLabel(item))+'</p><div class="product-body"><h3>'+esc(item.name)+'</h3>'+
       variant+
       (!custom&&!group&&(item.formats||[]).length>1?'<label>'+(item.formatAxis==='diameter'?'Diamètre':'Longueur / format')+'<select data-product-format="'+esc(item.id)+'">'+formatOptions(item)+'</select></label>':'')+
       (!custom&&!group&&item.formats?.length===1?'<p class="product-format">'+esc(formatLabel(item.formats[0]))+'</p>':'')+

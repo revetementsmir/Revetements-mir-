@@ -34,6 +34,9 @@ jobs:
           persist-credentials: false
       - name: Clear only generated browser evidence from this checkout
         run: |
+          rm -rf docs/verification/pliage-harmonie-20261117/colour-cutout-qa/before
+          rm -rf docs/verification/pliage-harmonie-20261117/colour-cutout-qa/after
+          rm -rf docs/verification/boutique-colours-20261117/ci-palettes
           rm -f docs/verification/prestige-20261117/preview-security-results.json
           rm -f docs/verification/pliage-harmonie-20261117/preview-browser.json
           for width in 390 834 1440; do

@@ -1,5 +1,19 @@
 # Passation MIR — 17 novembre 2026
 
+## Reprise — couleurs et aperçu TEST
+
+**Le détourage a été annulé par Frederick.** Ne pas le reprendre et ne pas intégrer les images générées pendant la tentative. Les photographies originales des produits et la maison de l’accueil sont conservées. Les consignes de détourage dans l’historique ci-dessous ne sont plus actives.
+
+Les palettes et leur présentation sont sauvegardées au commit `5ccf9152a2090d448836177bd8948bb0ecd6f9a1` sur la même branche : 19 couleurs James Hardie pour le kit ColorPlus, 20 références de retouche CanExel, 24 couleurs St-Laurent conservées sur les cinq produits. Les clins St-Laurent utilisent le gabarit de couleur des clins Hardie correspondants; les profils V-Groove et Board & Batten restent distincts. Les contenants restent photographiés tels quels, avec un échantillon de teinte séparé dans le magasin.
+
+Les 131 produits sont conservés; les seules modifications de données produit concernent les deux retouches. Elles restent non commandables (`orderable:false`). Les quatre anciennes couleurs CanExel sans swatch vérifié restent explicitement sans aperçu de teinte. Aucun prix, stock ou SKU n’a été inventé.
+
+Rapports dédiés : `palettes-completees/README.md` et `colour-cutout-qa/README.md`. Les contrôles locaux donnent 14/14 et 19/19. La première CI `44135422084` a réussi les contrats et le build, puis a été bloquée avant le navigateur par Ubuntu 26.04 non pris en charge par Playwright 1.58.2. Le commit `4d65ee41fbe0f99a8a8247c2e36fbe2ea7711c97` fixe uniquement le runner à Ubuntu 24.04 et empêche de réexporter d’anciens rapports comme de nouvelles preuves.
+
+La vérification navigateur et le nouvel hébergement TEST sont en cours à ce point de sauvegarde. Les anciens aperçus ne constituent pas la livraison de cette reprise. Aucune publication en production n’est autorisée.
+
+## Historique conservé — état sauvegardé au commit bb39e14
+
 ## Reprendre ici, sans recommencer
 
 Dépôt : `revetementsmir/Revetements-mir-`. Copie : `/workspace/mir-prestige`. Branche : `codex/pliage-harmonie-20261117`, créée depuis `3573d90f064e95459c18a8b6ba8a4462bfaa1dc0` (branche précédente `codex/client-prestige-20261117`). Le lot est réalisé et testé localement. Sources et agents gelés. Le nouvel aperçu hébergé reste à déployer et vérifier; ne pas confondre un ancien aperçu avec ce lot.
