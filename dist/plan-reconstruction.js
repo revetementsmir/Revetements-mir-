@@ -160,13 +160,43 @@
    for(let y=Math.max(0,Math.floor(t-font*1.8));y<=Math.min(image.height-1,Math.ceil(b+font*1.8));y++){if(y>=t&&y<=b)continue;const line=S.horizontalRun(image,y,Math.max(0,Math.floor(l-font*3)),Math.min(image.width-1,Math.ceil(r+font*2)),230,18);if(!line||line.end-line.start<(r-l)*.8)continue;const distance=Math.abs(y-envelope.box[1]);if(distance>28)continue;candidates.push({y,line:{start:line.start,end:line.end},sourceViewId:view.id,label:row.text,box:M.clone(row.box),confidence:row.confidence,sourceFrame:M.clone(view.frame),score:(line.end-line.start)-distance*3});}
   }candidates.sort((a,b)=>b.score-a.score);return candidates[0]||null;
  }
+ function datumFromCaption(text){
+  const label=normal(text).replace(/^(?:[a-z0-9:|_]\s+)?(?:(?:dessus|top of)\s+)?/,'');
+  if(!/^(?:plancher|plafond|floor\b|ceiling\b)/.test(label))return null;
+  const datumType=/^(?:plafond|ceiling\b)/.test(label)?'ceiling':'floor';
+  const number=label.match(/\b(?:niv(?:eau)?\.?|level|etage)\s*(\d{1,2})\b/);
+  const levelHint=number?'level-'+Number(number[1]):/\b(?:r[.\s-]*d[.\s-]*c|rez[ -]de[ -]chaussee|ground)\b/.test(label)?'ground':/\b(?:etage|upper|second|2nd)\b/.test(label)?'upper':null;
+  return levelHint?{levelHint,datumType}:null;
+ }
  function floorGuide(view,image,envelope){
   const rows=readings(view),h=image.height,crop=[0,0,image.width,h],items=[];
-  for(const row of rows){const label=normal(row.text);if(!/^(?:[a-z0-9:|_]\s+)?(?:(?:[drj2]essus|dessus)\s+)?(?:plancher|(?:upper|ground|second)\s+floor|floor\b)/.test(label)||!/(etage?|upper|second|r[.\s-]*d[.\s-]*c|ground)/.test(label)||row.confidence<30)continue;
-   let line=S.guide(image,row.box,crop);if(!line){const [l,t,r,b]=row.box,font=Math.max(4,b-t);for(let y=Math.ceil(b+1);y<=Math.ceil(b+font*1.7);y++){const candidate=S.horizontalRun(image,y,Math.max(0,Math.floor(l-font*3)),Math.min(image.width-1,Math.ceil(r+font*2)),238,18);if(candidate&&candidate.end-candidate.start>(r-l)*.85&&(!line||candidate.end-candidate.start-(y-b)*2>line.end-line.start-(line.y-b)*2))line=candidate;}}if(!line)continue;const upper=/etage?|upper|second/.test(label),y=line.y;if(y<envelope.box[1]+h*.07||y>envelope.box[1]+envelope.box[3]+h*.1)continue;
-   items.push({sourceViewId:view.id,label:row.text,box:row.box,y,sourceFrame:M.clone(view.frame),levelHint:upper?'upper':'ground',confidence:row.confidence});
+  for(const row of rows){
+   const datum=datumFromCaption(row.text);
+   if(!datum||row.box?.length!==4||!row.box.every(Number.isFinite)||(row.confidence??0)<30)continue;
+   let line=S.guide(image,row.box,crop);
+   if(!line){const [l,t,r,b]=row.box,font=Math.max(4,b-t);for(let y=Math.ceil(b+1);y<=Math.ceil(b+font*1.7);y++){const candidate=S.horizontalRun(image,y,Math.max(0,Math.floor(l-font*3)),Math.min(image.width-1,Math.ceil(r+font*2)),238,18);if(candidate&&candidate.end-candidate.start>(r-l)*.85&&(!line||candidate.end-candidate.start-(y-b)*2>line.end-line.start-(line.y-b)*2))line=candidate;}}
+   if(!line)continue;
+   const y=line.y;if(y<envelope.box[1]+h*.07||y>envelope.box[1]+envelope.box[3]+h*.1)continue;
+   items.push({sourceViewId:view.id,label:row.text,box:row.box,y,sourceFrame:M.clone(view.frame),levelHint:datum.levelHint,datumType:datum.datumType,confidence:row.confidence,confirmationRequired:true});
   }
-  const keep=[];for(const item of items.sort((a,b)=>b.confidence-a.confidence))if(!keep.some(q=>q.levelHint===item.levelHint&&(Math.abs(q.y-item.y)<6||Math.max(0,Math.min(q.box[2],item.box[2])-Math.max(q.box[0],item.box[0]))*Math.max(0,Math.min(q.box[3],item.box[3])-Math.max(q.box[1],item.box[1]))/Math.min((q.box[2]-q.box[0])*(q.box[3]-q.box[1]),(item.box[2]-item.box[0])*(item.box[3]-item.box[1]))>.65)))keep.push(item);return keep;
+  const keep=[];for(const item of items.sort((a,b)=>b.confidence-a.confidence))if(!keep.some(q=>q.levelHint===item.levelHint&&q.datumType===item.datumType&&(Math.abs(q.y-item.y)<6||Math.max(0,Math.min(q.box[2],item.box[2])-Math.max(q.box[0],item.box[0]))*Math.max(0,Math.min(q.box[3],item.box[3])-Math.max(q.box[1],item.box[1]))/Math.min((q.box[2]-q.box[0])*(q.box[3]-q.box[1]))>.65)))keep.push(item);return keep;
+ }
+ function heightFromLevelDatums(views,levelHint,reference,inventory){
+  // No invented height: both limits must be visible on the same elevation.
+  // A floor at level N is paired to level N+1, or a ceiling at level N.
+  const next=/^level-\d+$/.test(levelHint)?'level-'+(Number(levelHint.slice(6))+1):levelHint==='ground'?'upper':null,found=[];
+  if(!(reference?.scale>0))return found;
+  for(const v of views){
+   if(v.envelope?.status!=='proposed'||!(v.envelope.box?.[2]>0)||!(v.facing?.length>0))continue;
+   const bottom=v.guides?.filter(g=>g.levelHint===levelHint&&g.datumType==='floor').sort((a,b)=>b.confidence-a.confidence)[0];if(!bottom)continue;
+   const nextFloors=(v.guides||[]).filter(g=>g.levelHint===next&&g.datumType==='floor'&&g.y<bottom.y-10),ceilings=(v.guides||[]).filter(g=>g.levelHint===levelHint&&g.datumType==='ceiling'&&g.y<bottom.y-10);
+   const top=(nextFloors.length?nextFloors:ceilings).sort((a,b)=>b.confidence-a.confidence)[0];if(!top)continue;
+   const scale=reference.scale*v.facing.length/v.envelope.box[2],pixels=bottom.y-top.y,value=scale*pixels;
+   if(!(value>=.45&&value<=20)||pixels>v.envelope.box[3]*.8)continue;
+   const anchors=[[v.envelope.box[0],bottom.y],[v.envelope.box[0],top.y]],sourceFrame=inventory?.views?.find(s=>s.id===v.viewId)?.frame||bottom.sourceFrame||null;
+   found.push({kind:'estimated-calibrated',status:'proposed',value,sourceViewId:v.viewId,sourceFrame:M.clone(sourceFrame),anchors,scaleUsed:scale,label:bottom.label+' / '+top.label,references:[M.clone(reference)],relationship:'two-visible-level-datums',datumEvidence:{lower:M.clone(bottom),upper:M.clone(top),differencePixels:pixels,sourceViewId:v.viewId},confirmationRequired:true});
+  }
+  return found.sort((a,b)=>b.datumEvidence.lower.confidence+b.datumEvidence.upper.confidence-a.datumEvidence.lower.confidence-a.datumEvidence.upper.confidence);
  }
  function faceSpan(points,direction,{world=false}={}){const n={front:[0,world?-1:1],back:[0,world?1:-1],right:[1,0],left:[-1,0]}[direction],axis=['front','back'].includes(direction)?0:1,sign=Math.sign(M.signedArea(points)),edges=points.map((a,i)=>[a,points[(i+1)%points.length]]).filter(([a,b])=>(sign*(b[1]-a[1])*n[0]+sign*(a[0]-b[0])*n[1])>0),coordinates=edges.flatMap(e=>e.map(p=>p[axis])),total=Math.max(...coordinates)-Math.min(...coordinates),dominant=edges.slice().sort((a,b)=>Math.abs(b[0][axis]-b[1][axis])-Math.abs(a[0][axis]-a[1][axis]))[0],chosen=dominant&&Math.abs(dominant[0][axis]-dominant[1][axis])>total*.75?dominant.map(p=>p[axis]):coordinates;return {axis,min:Math.min(...chosen),max:Math.max(...chosen),length:Math.max(...chosen)-Math.min(...chosen)};}
  function propose(inventory,buildingId,images,{levelId}={}){
@@ -190,10 +220,11 @@
   const candidates=[...direct,...partial.references,...transferred].sort((a,b)=>Number(String(b.normalized||'').includes("'"))-Number(String(a.normalized||'').includes("'"))||Number(a.kind!=='written')-Number(b.kind!=='written')||(b.confidence||0)-(a.confidence||0)||(b.score||0)-(a.score||0)),reference=candidates[0];
   const draft=M.draftFor(floor,level);draft.points=outline.points.map((xy,i)=>({id:'auto-'+floor.id+'-p'+i,xy}));draft.proposal={...outline,points:undefined};draft.alignment={origin:[bounds[0],bounds[1]+bounds[3]],offset:[0,0],rotationDegrees:0,status:'proposed',kind:'source-orientation-review'};
   if(reference)draft.reference={...M.clone(reference),controlReferences:[],assessment:{status:'review-required'},status:'proposed'};
-  const heights=views.flatMap(v=>v.guides.filter(g=>g.levelHint===level.sourceLevel&&v.envelope.status==='proposed').map(g=>{
+  const legacyHeights=views.flatMap(v=>v.guides.filter(g=>g.levelHint===level.sourceLevel&&g.datumType==='floor'&&v.envelope.status==='proposed').map(g=>{
    const localScale=reference?reference.scale*v.facing.length/v.envelope.box[2]:null,anchors=[[v.envelope.box[0],g.y],[v.envelope.box[0],v.supportY??v.envelope.box[1]]];
    return {kind:'estimated-calibrated',status:'proposed',value:localScale?M.distance(...anchors)*localScale:null,sourceViewId:v.viewId,sourceFrame:M.clone(inventory.views.find(x=>x.id===v.viewId).frame),anchors,scaleUsed:localScale,label:g.label,references:reference?[{kind:'estimated-calibrated',value:localScale*v.envelope.box[2],anchors:[[v.envelope.box[0],g.y],[v.envelope.box[0]+v.envelope.box[2],g.y]],sourceViewId:v.viewId,relationship:M.clone(reference)}]:[],relationship:'floor-span-to-elevation-registration',confirmationRequired:true};
   })).filter(h=>h.value>0).sort((a,b)=>views.find(v=>v.viewId===b.sourceViewId).guides.find(g=>g.levelHint===level.sourceLevel).confidence-views.find(v=>v.viewId===a.sourceViewId).guides.find(g=>g.levelHint===level.sourceLevel).confidence);
+  const datumHeights=heightFromLevelDatums(views,level.sourceLevel,reference,inventory),heights=datumHeights.length?datumHeights:/^level-\d+$/.test(level.sourceLevel)?[]:legacyHeights;
   if(heights.length)draft.height=M.clone(heights[0]);draft.links=views.filter(v=>v.guides.some(g=>g.levelHint===level.sourceLevel)).map(v=>({sourceViewId:v.viewId,status:'proposed',relationship:'floor-elevation-registration'}));
   const spread=list=>list.length?Math.max(...list)/Math.min(...list)-1:0,scaleConflict=partial.conflict||spread(candidates.map(r=>r.scale))>.05;
   if(scaleConflict&&reference){draft.reference={...draft.reference,value:null,label:'',suggestedScale:reference.scale,suggestedValue:reference.value,conflict:true};}
@@ -465,5 +496,5 @@
   if(next.roofProposal?.status==='proposed'){const roof=next.roofProposal;roof.profiles.x=roof.profiles.x.map(([x,z])=>[nx[0]+(x-old.x[0])*rx,nz[0]+(z-old.z[0])*rz]);roof.profiles.y=roof.profiles.y.map(([y,z])=>[ny[0]+(y-old.y[0])*ry,nz[0]+(z-old.z[0])*rz]);roof.fasciaBottom=nz[1];roof.userMeasurementCorrections={width:w,depth:d,height:h,originalBounds:M.clone(old)};}
   return next;
  }
- return Object.freeze({version:1,floorExtentEvidence,floorDimensionAssociation,overallScaleReferences,partialScaleReferences,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,openingsFor,lowerPlanes,faceSpan,references,floorGuide,size,readings});
+ return Object.freeze({version:1,floorExtentEvidence,floorDimensionAssociation,overallScaleReferences,partialScaleReferences,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,openingsFor,lowerPlanes,faceSpan,references,floorGuide,datumFromCaption,heightFromLevelDatums,size,readings});
 });
