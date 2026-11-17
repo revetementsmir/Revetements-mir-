@@ -233,9 +233,10 @@
       detail.dataset.mirClientSectionsReady = 'true';
       const gallery = $('.product-gallery', detail), colour = $('.product-color-section', detail);
       const picker = $('.product-color-picker', detail);
-      if (picker) listPager(picker, ':scope > [data-color]', () => compact() ? 8 : 16, {
+      const colourPages = picker ? listPager(picker, ':scope > [data-color]', () => compact() ? (innerHeight < 700 ? 4 : 8) : 8, {
         label:['Couleurs', 'Colours'], groupHeaders:'.mir-colour-group'
-      });
+      }) : null;
+      colourPages?.reveal($('[aria-pressed="true"]', picker || detail));
       const technical = $('#product-technical'), docs = $('#product-docs'), photos = $('.mir-product-photos');
       const facts = docs?.children[0], documents = docs?.children[1];
       const tableBody = $('tbody', facts || doc);
@@ -255,14 +256,15 @@
       const price = [$('#product-price-note'), $('#product-price-details')];
       const groups = [
         section('Aperçu', 'Overview', [title, gallery, $('.product-intro', title), ...price, $('.product-quickfacts', info)]),
-        section('Couleur', 'Colour', [title, gallery, colour]),
+        section('Couleur', 'Colour', [title, gallery, colour, $('.product-color-heading', colour || detail), picker, colourPages?.nav]),
         section('Quantité et panier', 'Quantity and cart', [
           title, ...price, $('.product-format', info), $('.product-order-fields', info),
           $('#product-quantity-note'), $('.product-actions-main', info),
           $('#product-added'), $('.product-save-note', info)
         ]),
         section('Fiche technique', 'Technical details', [technical, facts], () => { if (technical) technical.open = true; }),
-        section('Documents et sources', 'Documents and sources', [technical, documents, documentPages?.nav, ...technicalExtras], () => { if (technical) technical.open = true; }),
+        section('Documents', 'Documents', [technical, documents, documentPages?.nav], () => { if (technical) technical.open = true; }),
+        section('Sources et disponibilité', 'Sources and availability', [technical, ...technicalExtras, colour, $('#color-note')], () => { if (technical) technical.open = true; }),
         section('À découvrir aussi', 'Related products', [related])
       ];
       if (!colour || colour.hidden) groups.splice(1, 1);
@@ -284,17 +286,43 @@
     const project = $('#mir-project-dossier');
     const exports = $('.mir-piece-exports'), footnote = $('.mir-unified-footnote');
     const customSummary = custom ? [...custom.children].filter(node => node !== exports && node !== footnote) : [];
+    const confirmation = $('#mir-cart-confirm'), materialPDF = $('#selection-export-pdf');
+    const pdfStatus = $('#selection-pdf-status'), confirmationNote = confirmation?.lastElementChild;
+    const confirmationMain = confirmation ? [...confirmation.children].filter(node =>
+      node !== materialPDF && node !== pdfStatus && node !== confirmationNote) : [];
+    const materialView = view => { body.dataset.mirCartLineView = view; };
     const groups = [
-      section('Matériaux', 'Materials', [items, itemPages?.nav, $('#selection-summary')]),
+      section('Matériaux', 'Materials', [items, itemPages?.nav], () => materialView('details')),
       section('Pièces sur mesure', 'Custom pieces', [custom, ...customSummary]),
-      section('Vérifier et demander', 'Review and request', [$('#mir-cart-confirm')]),
-      section('Projet et sauvegardes', 'Project and backups', [project, $('.mir-cart-project-links')], () => { if (project) project.open = true; }),
-      section('Documents des pièces', 'Piece documents', [custom, exports], () => { if (exports) exports.open = true; }),
+      section('Vérifier et demander', 'Review and request', [confirmation, ...confirmationMain]),
+      section('Projet et sauvegardes', 'Project and backups', [project], () => { if (project) project.open = true; }),
+      section('Documents du projet', 'Project documents', [
+        custom, exports, confirmation, materialPDF, pdfStatus, confirmationNote
+      ], () => { if (exports) exports.open = true; }),
       section('À propos de votre panier', 'About your cart', [
-        ...all('.mir-cart-heading > p'), custom, footnote, $('.selection-note')
-      ])
+        ...all('.mir-cart-heading > p'), custom, footnote, $('.mir-cart-project-links')
+      ]),
+      section('Quantités des matériaux', 'Material quantities', [items, itemPages?.nav], () => materialView('quantity')),
+      section('Résumé de la sélection', 'Selection summary', [$('#selection-summary'), $('.selection-note')])
     ];
     const controller = pager(area, groups, {before:$('.mir-cart-workspace')});
+    const markLineParts = () => {
+      all(':scope > .selection-item', items).forEach(row => {
+        const information = $(':scope > div', row);
+        all(':scope > *', row).forEach(node => {
+          if (node === information || node.matches('.remove-selection')) return;
+          node.dataset.mirCartPart = node.matches('.selection-qty,.selection-unit,.mir-line-amount') ? 'quantity' : 'details';
+        });
+        if (information) [...information.children].forEach(node => {
+          if (node.matches('h2,.mir-quantity-status')) return;
+          node.dataset.mirCartPart = 'details';
+        });
+      });
+    };
+    if (items) {
+      new MutationObserver(markLineParts).observe(items, {childList:true, subtree:true});
+      markLineParts();
+    }
     const addAccount = () => {
       const account = $('.mir-account-checkout');
       if (account && !controller.groups.some(group => group.nodes.includes(account))) {

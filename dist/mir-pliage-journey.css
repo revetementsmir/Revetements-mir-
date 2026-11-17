@@ -188,3 +188,11 @@ body.mir-prestige[data-client-entry][data-client-stage="3"] :is(.finish-fields,.
  body.mir-prestige[data-client-entry][data-client-stage="3"] .client-face-choices button{min-height:74px}
  body.mir-prestige[data-client-entry][data-client-stage="3"] .client-face-choices svg{height:54px}
 }
+
+/* Seven-sided profiles keep every measure and angle, the 44px controls,
+   the legible drawing and the signature in a short mobile viewport. */
+@media(max-width:779px) and (max-height:710px){
+ body.mir-prestige[data-client-entry=measures][data-client-stage="2"]:has(.client-measures-grid[data-client-side-count="7"]) #production-main{padding-block:2px}
+ body.mir-prestige[data-client-entry=measures][data-client-stage="2"]:has(.client-measures-grid[data-client-side-count="7"]) #production-preview{padding:3px}
+ body.mir-prestige[data-client-entry=measures][data-client-stage="2"]:has(.client-measures-grid[data-client-side-count="7"]) .production-workspace{gap:2px}
+}

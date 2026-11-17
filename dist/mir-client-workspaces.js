@@ -112,8 +112,12 @@
   add('project','Ouvrir mon projet',controls,start?Array.from(start.children).filter(node=>node!==startNote):[]);
   add('project-state','Mon plan et son volume',controls,[$('.project-bar')]);
   const view=$('.view-toolbar');add('view','Vue et élévation',controls,[...(view?Array.from(view.children):[]),$('.controls-top'),$('.mir-jump-controls')]);
-  const display=$('.display-toolbar');add('display','Affichage et rotation',controls,[display,$('#rotate-control'),$('.stage-bottom')]);
+  const display=$('.display-toolbar');add('display','Affichage et rotation',controls,[display,$('#rotate-control'),$('.stage-bottom'),$('#mir-site-toggle'),$('#mir-stairs-toggle')]);
   const stage=$('#stage');if(stage&&stage.parentElement!==drawing)drawing.append(stage);
+  // Keep the real view controls together in one reserved row. Terrain and
+  // stairs remain reachable through Display; fullscreen and zoom never overlap.
+  const stageActions=$('.mir-stage-actions'),zoom=$('#mir-zoom-controls');
+  if(stageActions&&zoom)stageActions.append(zoom);
   const material=$('#material-controls');
   add('material','Fabricant et profil',material,[...pairFor('material-manufacturer'),...pairFor('material')]);
   add('format','Format et couvrance',material,[$('#material-format-field'),$('#coverage-input-field')]);
@@ -134,7 +138,7 @@
   add('edit','Outils des zones',controls,[$('.edit-toolbar'),$('#mode-help')]);
   direct('zones','Choisir une zone',$('#zone-list'),{grid:true});
   const zones=$('#zone-list');if(zones)controls.append(zones);
-  const zoneHeading=$('.zones-heading');if(zoneHeading){const entry=studio.panels.find(panel=>panel.id==='zones');if(entry){entry.common=[zoneHeading];controls.append(zoneHeading);}}
+  const zoneHeading=$('.zones-heading');if(zoneHeading){const entry=studio.panels.find(panel=>panel.id==='zones');if(entry){entry.common=[zoneHeading];zones.before(zoneHeading);}}
   add('coverage','Surfaces et quantités',controls,[$('#coverage-summary')]);
   add('export','Enregistrer et exporter',controls,[$('.drawing-footer'),$('.save-panel')]);
   add('info','À propos du studio',controls,[intro?.firstElementChild,startNote,$('.project-notes'),$('.studio-source-links'),$('.mir-studio-tools')]);
@@ -181,16 +185,27 @@
   const branches=all('[data-mir-workspace-branch]',panel.root);
   mark(panel.root,false);for(const branch of branches)mark(branch,false);for(const unit of units)mark(unit,false);
   panel.root.style.setProperty('position','absolute','important');panel.root.style.setProperty('visibility','hidden','important');
-  panel.root.style.setProperty('width',Math.max(180,studio.controls.clientWidth-20)+'px','important');
+  const controlsCSS=getComputedStyle(studio.controls),contentWidth=studio.controls.clientWidth-(parseFloat(controlsCSS.paddingLeft)||0)-(parseFloat(controlsCSS.paddingRight)||0);
+  panel.root.style.setProperty('width',Math.max(180,contentWidth)+'px','important');
   panel.root.style.setProperty('height','auto','important');panel.root.style.setProperty('max-height','none','important');
+  let commonHeight=0;
+  for(const node of panel.common||[]){
+   if(hiddenByApp(node))continue;
+   const commonOff=node.classList.contains(off);mark(node,false);
+   const rect=node.getBoundingClientRect(),css=getComputedStyle(node);
+   commonHeight+=rect.height+(parseFloat(css.marginTop)||0)+(parseFloat(css.marginBottom)||0);
+   mark(node,commonOff);
+  }
+  const measured=units.map(unit=>{const rect=unit.getBoundingClientRect(),css=getComputedStyle(unit);return {unit,height:rect.height+(parseFloat(css.marginTop)||0)+(parseFloat(css.marginBottom)||0)};}).filter(item=>item.height>=1);
   const rows=[];let row=[],height=0;
-  const summaryAllowance=panel.details?0:0;
-  for(const unit of units){
-   const rect=unit.getBoundingClientRect(),css=getComputedStyle(unit),size=Math.max(0,rect.height)+(parseFloat(css.marginTop)||0)+(parseFloat(css.marginBottom)||0)+6;
-   if(!size||rect.height<1)continue;
-   const cost=panel.grid?Math.max(44,size)/3:size;
-   if(row.length&&(height+cost>budget-summaryAllowance||panel.grid&&row.length>=6)){rows.push(row);row=[];height=0;}
-   row.push(unit);height+=cost;
+  const rootCSS=getComputedStyle(panel.root),columns=panel.grid?Math.max(1,rootCSS.gridTemplateColumns.split(/\s+/).length):1;
+  const gap=panel.grid?(parseFloat(rootCSS.rowGap)||0):6;
+  // A grid row costs the height of its tallest card. Dividing each card by
+  // three undercounts a partial or uneven row and can push the footer offscreen.
+  for(let index=0;index<measured.length;index+=columns){
+   const group=measured.slice(index,index+columns),cost=Math.max(...group.map(item=>item.height));
+   if(row.length&&(height+gap+cost>budget-commonHeight||panel.grid&&row.length+group.length>6)){rows.push(row);row=[];height=0;}
+   height+=(row.length?gap:0)+cost;row.push(...group.map(item=>item.unit));
   }
   if(row.length)rows.push(row);
   if(style===null)panel.root.removeAttribute('style');else panel.root.setAttribute('style',style);
