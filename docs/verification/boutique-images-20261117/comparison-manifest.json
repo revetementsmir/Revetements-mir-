@@ -1,0 +1,90 @@
+{
+  "createdAt": "2026-11-17T14:24:16.173Z",
+  "beforeRevision": "62680332f39d2b51a00bf5f72f36e406e965fe7c",
+  "pairs": [
+    {
+      "view": "brands",
+      "width": 1440,
+      "stage": "grille",
+      "before": "before-brands-1440-grille.png",
+      "after": "after-brands-1440-grille.png"
+    },
+    {
+      "view": "brands",
+      "width": 1440,
+      "stage": "top",
+      "before": "before-brands-1440.png",
+      "after": "after-brands-1440.png"
+    },
+    {
+      "view": "brands",
+      "width": 834,
+      "stage": "grille",
+      "before": "before-brands-834-grille.png",
+      "after": "after-brands-834-grille.png"
+    },
+    {
+      "view": "brands",
+      "width": 834,
+      "stage": "top",
+      "before": "before-brands-834.png",
+      "after": "after-brands-834.png"
+    },
+    {
+      "view": "brands",
+      "width": 390,
+      "stage": "grille",
+      "before": "before-brands-390-grille.png",
+      "after": "after-brands-390-grille.png"
+    },
+    {
+      "view": "brands",
+      "width": 390,
+      "stage": "top",
+      "before": "before-brands-390.png",
+      "after": "after-brands-390.png"
+    },
+    {
+      "view": "all",
+      "width": 1440,
+      "stage": "grille",
+      "before": "before-all-1440-grille.png",
+      "after": "after-all-1440-grille.png"
+    },
+    {
+      "view": "all",
+      "width": 1440,
+      "stage": "top",
+      "before": "before-all-1440.png",
+      "after": "after-all-1440.png"
+    },
+    {
+      "view": "all",
+      "width": 834,
+      "stage": "grille",
+      "before": "before-all-834-grille.png",
+      "after": "after-all-834-grille.png"
+    },
+    {
+      "view": "all",
+      "width": 834,
+      "stage": "top",
+      "before": "before-all-834.png",
+      "after": "after-all-834.png"
+    },
+    {
+      "view": "all",
+      "width": 390,
+      "stage": "grille",
+      "before": "before-all-390-grille.png",
+      "after": "after-all-390-grille.png"
+    },
+    {
+      "view": "all",
+      "width": 390,
+      "stage": "top",
+      "before": "before-all-390.png",
+      "after": "after-all-390.png"
+    }
+  ]
+}

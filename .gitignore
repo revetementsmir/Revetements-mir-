@@ -19,3 +19,6 @@ supabase/.temp/
 docs/verification/prestige-20261117/prestige-captures-autonome.html
 docs/verification/prestige-20261117/mir-prestige-captures.tar.gz
 dist/prestige-captures.tar.gz
+
+# Rebuildable standalone boutique screenshot comparison
+docs/verification/boutique-images-20261117/comparaison-autonome.html

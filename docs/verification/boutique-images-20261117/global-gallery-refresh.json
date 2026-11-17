@@ -1,0 +1,73 @@
+{
+  "createdAt": "2026-11-17T14:25:47.833Z",
+  "captures": [
+    {
+      "file": "screens/recherche-1440.png",
+      "width": 1440,
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "cards": 8,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/categorie-1440.png",
+      "width": 1440,
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "cards": 17,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/recherche-834.png",
+      "width": 834,
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "cards": 8,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/categorie-834.png",
+      "width": 834,
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "cards": 17,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/recherche-390.png",
+      "width": 390,
+      "page": "boutique.html?q=HardiePlank&view=all",
+      "cards": 8,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/categorie-390.png",
+      "width": 390,
+      "page": "boutique.html?family=fibre&view=all#collections",
+      "cards": 17,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/boutique-1440.png",
+      "copiedFrom": "after-all-1440.png",
+      "passed": true
+    },
+    {
+      "file": "screens/boutique-834.png",
+      "copiedFrom": "after-all-834.png",
+      "passed": true
+    },
+    {
+      "file": "screens/boutique-390.png",
+      "copiedFrom": "after-all-390.png",
+      "passed": true
+    },
+    {
+      "file": "screens/boutique-en-1440.png",
+      "copiedFrom": "after-all-1440-en.png",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "createdAt": "2026-11-17T14:26:02.710Z",
+  "results": [
+    {
+      "width": 1440,
+      "choices": 12,
+      "imagesDecoded": 24,
+      "modal": true,
+      "horizontalOverflow": false,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "width": 834,
+      "choices": 12,
+      "imagesDecoded": 24,
+      "modal": true,
+      "horizontalOverflow": false,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "width": 390,
+      "choices": 12,
+      "imagesDecoded": 24,
+      "modal": true,
+      "horizontalOverflow": false,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "standalone": true,
+      "testedVia": "setContent (file navigation restricted by browser policy)",
+      "imagesDecoded": 24,
+      "networkRequests": 0,
+      "passed": true
+    }
+  ]
+}

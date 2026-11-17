@@ -70,6 +70,14 @@
   const presentation=V.photoType, photoLabel=V.photoLabel;
   function placeholder(){return '<div class="product-placeholder" role="img" aria-label="Photo fabricant non disponible"><svg viewBox="0 0 160 110" fill="none" stroke="currentColor" stroke-width="1"><path d="M18 85V30l65-15 60 31v50L78 70 18 85Zm0-55 60 26 65-10M78 56v40M38 25l61 27M58 20l61 28"/></svg><span>Visuel fabricant à compléter</span></div>';}
   function imageMarkup(m,large=false,c=null){if(m.stableSidingPreview)return V.stableSidingSVG(m,c)||placeholder();if(m.paintPotIndices)return paintPotMarkup(m,c);const im=heroImage(m);return im?V.photoImage(im,m.name,{loading:large?'eager':'lazy',priority:large}):placeholder();}
+  // A texture can fill the card; an object, drawing or colour demo must remain whole.
+  function cardImageLayout(m,image){
+    if(m.stableSidingPreview||m.paintPotIndices||m.screwPreview||m.id==='gentek-coil-3037')return 'object';
+    if(/^(?:jdp-akta|jdp-bluhouss|rialux-bosco)(?:-|$)/.test(m.id||''))return 'object';
+    if(/sphere|jdp-akta|jdp-bluhouss|rialux-bosco/i.test((image?.assetKind||'')+' '+(image?.src||'')))return 'object';
+    if(/kaycan-sp600|lp-38-cedar-panel-sample/i.test(image?.src||''))return 'object';
+    return ['sample','installed'].includes(presentation(image))?'material':'object';
+  }
 
   // CanExel touch-up: each can is independently cropped onto a 600x600
   // bitmap. Never show the surrounding cells from the 4x4 studio atlas.
@@ -179,7 +187,7 @@
     canvas.dataset.colorId=c.id;
     canvas.hidden=false;
   }
-  function renderVisual(element,m,c){if(m.paintPotIndices)return renderPaintPot(element,m,c);if(m.screwPreview)return renderScrew(element,m,c);if(m.keepProductPhoto)c=null;const recipe=V.recipe(m,c);if(recipe.kind==='missing_product'||recipe.kind==='missing_variant'){V.cancel(element);element.innerHTML=placeholder();return;}const rendered=V.render(element,m,c),request=element._materialPreviewRequest;return Promise.resolve(rendered).then(r=>{if(element._materialPreviewRequest===request&&element.querySelector('.sample-unavailable'))element.innerHTML=placeholder();return r;});}
+  function renderVisual(element,m,c){if(m.paintPotIndices)return renderPaintPot(element,m,c);if(m.screwPreview)return renderScrew(element,m,c);if(m.keepProductPhoto)c=null;const recipe=V.recipe(m,c);const cardFrame=element.closest('.shop-card-photo');if(cardFrame){const sample=['manufacturer_sample','smooth_preview','color_reference_preview'].includes(recipe.kind);cardFrame.dataset.imageLayout=cardImageLayout(m,sample?{...recipe.image,src:recipe.src,cardPresentation:'sample'}:recipe.image||heroImage(m));}if(recipe.kind==='missing_product'||recipe.kind==='missing_variant'){V.cancel(element);element.innerHTML=placeholder();return;}const rendered=V.render(element,m,c),request=element._materialPreviewRequest;return Promise.resolve(rendered).then(r=>{if(element._materialPreviewRequest===request&&element.querySelector('.sample-unavailable'))element.innerHTML=placeholder();return r;});}
   function colors(m){return window.MIRCataloguePolicy?.sortColors(m?.colors)||(Array.isArray(m?.colors)?m.colors:[]);}
   function swatchClass(c){return !localAsset(c.swatchUrl)&&!/^#[0-9a-f]{6}$/i.test(c.hex||'')?' mir-named-swatch':'';}
   function swatch(c){return localAsset(c.swatchUrl)?`<img src="${esc(localAsset(c.swatchUrl))}" alt="" loading="lazy">`:/^#[0-9a-f]{6}$/i.test(c.hex||'')?`<span aria-hidden="true" style="display:block;width:100%;height:100%;background-color:${c.hex}"></span>`:`<span>${esc(c.name)}</span>`;}
@@ -187,7 +195,7 @@
   function persist(){try{localStorage.setItem(KEY,JSON.stringify(list));updateCount();return true;}catch{notify('Le navigateur ne peut pas enregistrer cette sélection. Téléchargez votre liste.');return false;}}
   function updateCount(){document.querySelectorAll('[data-list-count]').forEach(el=>el.textContent=list.items.length);}
   function unitOptions(value,m,formatId){return (m?Q.policy(m,formatId).rules.map(r=>r.unit).concat(value&&!Q.policy(m,formatId).rules.some(r=>r.unit===value)?[value]:[]):units).map(u=>`<option${u===value?' selected':''}>${esc(u)}</option>`).join('');}
-  function card(m){const im=heroImage(m),cs=colors(m),shown=cs.slice(0,3),f=formats(m),price=m.regionalPricing&&!m.regionalPricing.formatPrices?productPriceNote(m,cs[0]):m.regionalPricing?.formatPrices?'Prix selon le format':'Prix sur demande';return `<article class="shop-card" data-shop-card="${esc(m.id)}"><a data-card-link href="${esc(productHref(m.id))}"><div class="shop-card-photo" data-photo-type="${presentation(im)}"><div class="card-preview">${imageMarkup(m)}</div><span class="card-photo-label">${esc(photoLabel(im))}</span></div></a><div class="shop-card-copy"><span class="shop-card-brand">${esc(m.brand)}</span><h3><a data-card-link href="${esc(productHref(m.id))}">${esc(m.name)}</a></h3><p class="shop-card-size">${esc(f.length>1?f.map(formatLabel).join(' · '):dimensions(m))}</p><p class="product-price-note shop-card-price">${esc(price)}</p><details class="mir-card-colors"${cs.length?'':' hidden'}><summary>${cs.length} nuance${cs.length>1?'s':''}</summary><div class="shop-card-swatches" aria-label="Nuances de ${esc(m.name)}">${shown.map(c=>`<button type="button" class="shop-swatch-small${swatchClass(c)}" data-card-color="${esc(c.id)}" data-material="${esc(m.id)}" title="${esc(c.name)}" aria-label="Voir ${esc(c.name)} sur ${esc(m.name)}" aria-pressed="false">${swatch(c)}</button>`).join('')}${cs.length>3?`<a href="${esc(productHref(m.id))}" class="more-colors">+${cs.length-3}</a>`:''}</div><p class="card-color-name">${m.status==='pending_identity'?'Référence à identifier':cs.length?`${cs.length} nuances référencées`:m.colorStatus==='not_applicable'?esc(m.finish||'Fini de la référence'):esc(m.finish||'Finition à préciser')}</p></details><a class="product-card-link" data-card-link href="${esc(productHref(m.id))}">Choisir ce matériau <span>→</span></a></div></article>`;}
+  function card(m){const im=heroImage(m),cs=colors(m),shown=cs.slice(0,3),f=formats(m),price=m.regionalPricing&&!m.regionalPricing.formatPrices?productPriceNote(m,cs[0]):m.regionalPricing?.formatPrices?'Prix selon le format':'Prix sur demande';return `<article class="shop-card" data-shop-card="${esc(m.id)}"><a data-card-link href="${esc(productHref(m.id))}"><div class="shop-card-photo mir-catalogue-photo" data-photo-type="${presentation(im)}" data-image-layout="${cardImageLayout(m,im)}"><div class="card-preview">${imageMarkup(m)}</div><span class="card-photo-label">${esc(photoLabel(im))}</span></div></a><div class="shop-card-copy"><span class="shop-card-brand">${esc(m.brand)}</span><h3><a data-card-link href="${esc(productHref(m.id))}">${esc(m.name)}</a></h3><p class="shop-card-size">${esc(f.length>1?f.map(formatLabel).join(' · '):dimensions(m))}</p><p class="product-price-note shop-card-price">${esc(price)}</p><details class="mir-card-colors"${cs.length?'':' hidden'}><summary>${cs.length} nuance${cs.length>1?'s':''}</summary><div class="shop-card-swatches" aria-label="Nuances de ${esc(m.name)}">${shown.map(c=>`<button type="button" class="shop-swatch-small${swatchClass(c)}" data-card-color="${esc(c.id)}" data-material="${esc(m.id)}" title="${esc(c.name)}" aria-label="Voir ${esc(c.name)} sur ${esc(m.name)}" aria-pressed="false">${swatch(c)}</button>`).join('')}${cs.length>3?`<a href="${esc(productHref(m.id))}" class="more-colors">+${cs.length-3}</a>`:''}</div><p class="card-color-name">${m.status==='pending_identity'?'Référence à identifier':cs.length?`${cs.length} nuances référencées`:m.colorStatus==='not_applicable'?esc(m.finish||'Fini de la référence'):esc(m.finish||'Finition à préciser')}</p></details><a class="product-card-link" data-card-link href="${esc(productHref(m.id))}">Choisir ce matériau <span>→</span></a></div></article>`;}
   function hydrateChips(container=document){
     for(const card of container.querySelectorAll('[data-shop-card]')){
       const material=materials.find(m=>m.id===card.dataset.shopCard);
@@ -213,24 +221,25 @@
     for(const product of products){
       const swatch=product.colors?.find(color=>color.id===brandSwatches[product.id]&&color.verified);
       const src=localAsset(swatch?.swatchUrl);
-      if(src)return {src, framing:'material'};
+      if(src)return {src, image:{src,cardPresentation:'sample'},framing:'material'};
     }
     const candidates=products.flatMap(product=>images(product)).filter(image=>!/drawing|diagram/i.test(image.assetKind));
     const installed=candidates.find(image=>presentation(image)==='installed'&&!/family/i.test(image.assetKind));
     const sample=candidates.find(image=>presentation(image)==='sample'&&!/sphere/i.test(image.assetKind));
-    const image=installed||sample||candidates.find(image=>!/family/i.test(image.assetKind))||candidates[0];
+    const gentek=products[0]?.brand==='Gentek Canada'?candidates.find(image=>/\/gentek-2\.jpg$/.test(image.src)):null;
+    const image=gentek||installed||sample||candidates.find(image=>!/family/i.test(image.assetKind))||candidates[0];
     if(!image)return null;
-    const sphere=/sphere|jdp-akta-portobello|jdp-bluhouss/i.test((image.assetKind||'')+' '+image.src);
-    const framing=sphere?'sample-crop':installed||sample?'material':'packshot';
-    return {src:localAsset(image.src),framing};
+    const framing=cardImageLayout({},image);
+    const position=/kaycan-soffit-installed/.test(image.src)?'50% 35%':/lp-lap-installed/.test(image.src)?'50% 45%':image.cardObjectPosition;
+    return {src:localAsset(image.src),image:{...image,cardObjectPosition:position},framing};
   }
   function brandCollectionCard(brand,products){
     const cover=brandCover(products);
     const types=[...new Set(products.map(O.section))].map(id=>O.sections.find(section=>section[0]===id)?.[1]).filter(Boolean);
     const count=products.length;
     return `<a class="brand-collection-card" href="?brand=${encodeURIComponent(brand)}#collections">
-      <div class="brand-collection-image" data-framing="${cover?.framing||'empty'}">
-        ${cover?`<img src="${esc(cover.src)}" alt="" loading="lazy" decoding="async">`:'<span>Photo à venir</span>'}
+      <div class="brand-collection-image mir-catalogue-photo" data-framing="${cover?.framing||'empty'}">
+        ${cover?V.photoImage({...cover.image,src:cover.src,alt:''},'',{loading:'lazy'}):'<span>Photo à venir</span>'}
       </div>
       <div class="brand-collection-copy">
         <span class="brand-collection-count">${count} référence${count===1?'':'s'}</span>

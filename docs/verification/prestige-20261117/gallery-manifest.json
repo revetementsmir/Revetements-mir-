@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-11-17T14:04:24.076Z",
+  "createdAt": "2026-11-17T14:26:23.571Z",
   "type": "browser-capture-gallery",
   "standalone": "prestige-captures-autonome.html",
   "draftsIncluded": false,
@@ -16,9 +16,9 @@
       "pendingImages": [],
       "name": "01-boutique-1440.png",
       "mime": "image/png",
-      "size": 183049,
-      "originalSize": 191382,
-      "sha256": "1ab04bf76dacb30e53c5aea9118974899c9fba6ad9f55cf4414c0213aa4ab8ae",
+      "size": 190733,
+      "originalSize": 200842,
+      "sha256": "0d4c4ec25ea6ca4ac805be933e0d611708938138a71c241cb6ba70f6a96c579d",
       "file": "screens/boutique-1440.png"
     },
     {
@@ -33,9 +33,9 @@
       "pendingImages": [],
       "name": "02-categorie-1440.png",
       "mime": "image/png",
-      "size": 183695,
-      "originalSize": 191963,
-      "sha256": "bfe5cedacddcebd2ec81d775d054c59ffeea0a7da5553570909fd8bae7c5f189",
+      "size": 190556,
+      "originalSize": 201092,
+      "sha256": "a32083fa79c213c9fbf9a449fad0cd6bc84caa15a72f1e5841dafc1b025516a6",
       "file": "screens/categorie-1440.png"
     },
     {
@@ -50,9 +50,9 @@
       "pendingImages": [],
       "name": "03-recherche-1440.png",
       "mime": "image/png",
-      "size": 181719,
-      "originalSize": 190432,
-      "sha256": "d8c0509a91422b63a815d77e993b99f332e08c51dd289152467227b832c5eb82",
+      "size": 189303,
+      "originalSize": 199704,
+      "sha256": "d6132eef60764c0fe2debd38646a80e2f1193e8bb745d21123932b6010405938",
       "file": "screens/recherche-1440.png"
     },
     {
@@ -67,9 +67,9 @@
       "pendingImages": [],
       "name": "04-boutique-en-1440.png",
       "mime": "image/png",
-      "size": 176582,
-      "originalSize": 185857,
-      "sha256": "d63eef94a66278d5abc76421e5acd3126c4c2e085894dbddf4962b7e0c234ce3",
+      "size": 185607,
+      "originalSize": 196464,
+      "sha256": "0cdfe16cfe613b7d108dadad41f8ea5496d959878c87556e5c575da3346e1e79",
       "file": "screens/boutique-en-1440.png"
     },
     {
@@ -84,9 +84,9 @@
       "pendingImages": [],
       "name": "05-boutique-834.png",
       "mime": "image/png",
-      "size": 113228,
-      "originalSize": 117988,
-      "sha256": "ff728e8b757032cdcc743a63b5bc4837f165aaf981aedd744f59aefa8c1af449",
+      "size": 120794,
+      "originalSize": 125393,
+      "sha256": "00423ab50c66c471dc25779f48a1eda6143b33e16ac48eca681ebe951e686804",
       "file": "screens/boutique-834.png"
     },
     {
@@ -101,9 +101,9 @@
       "pendingImages": [],
       "name": "06-categorie-834.png",
       "mime": "image/png",
-      "size": 113880,
-      "originalSize": 118789,
-      "sha256": "c67a376ad5ef6fa64e5ebe48d5468e119cead3ef0016d4d989ad9abdaf735f1c",
+      "size": 116567,
+      "originalSize": 117834,
+      "sha256": "931eb35e596f981e2be132780c77ccf28fc6b00482f91bd6c77a0d04fec614fb",
       "file": "screens/categorie-834.png"
     },
     {
@@ -118,9 +118,9 @@
       "pendingImages": [],
       "name": "07-recherche-834.png",
       "mime": "image/png",
-      "size": 112189,
-      "originalSize": 116754,
-      "sha256": "4e1c106633355c16f75cd243cbe0eab4b897eb0ae35dcf1abf6ba3a3896e60b3",
+      "size": 119263,
+      "originalSize": 123921,
+      "sha256": "f7327a2b8b4865222edced9854498a521ac71d85a84aa00f3d29221086963ddf",
       "file": "screens/recherche-834.png"
     },
     {
@@ -135,9 +135,9 @@
       "pendingImages": [],
       "name": "08-boutique-390.png",
       "mime": "image/png",
-      "size": 44240,
-      "originalSize": 44240,
-      "sha256": "86988323934e1b827e11e3111cc57181d17a87669e45acb26e6502d869461e89",
+      "size": 59307,
+      "originalSize": 61063,
+      "sha256": "bf0839c36294780342d043714e6dc1b005bf9985bdb1cfade42a611759524ee8",
       "file": "screens/boutique-390.png"
     },
     {
@@ -152,9 +152,9 @@
       "pendingImages": [],
       "name": "09-categorie-390.png",
       "mime": "image/png",
-      "size": 44824,
-      "originalSize": 44824,
-      "sha256": "05b96b98fd1dbf4b3c42f63c417721b786a0771fc3d7d91910761c95f53469cc",
+      "size": 74094,
+      "originalSize": 78040,
+      "sha256": "d11e41f4ab67893f21f49852fcb3a45cd704baffd4c76f97f34e6362a3de993a",
       "file": "screens/categorie-390.png"
     },
     {
@@ -169,9 +169,9 @@
       "pendingImages": [],
       "name": "10-recherche-390.png",
       "mime": "image/png",
-      "size": 43265,
-      "originalSize": 43265,
-      "sha256": "6afbb3155c67f358ff1955be008de0a87b52616708d34f31ad9bc38e35ce0d2f",
+      "size": 58362,
+      "originalSize": 60167,
+      "sha256": "131e86fdd547010d55de5eec90f19966387eaba19c689d3cf1002ed39fcc7b36",
       "file": "screens/recherche-390.png"
     },
     {

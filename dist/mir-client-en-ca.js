@@ -7649,6 +7649,7 @@ entries.push(...[
     "Useful fabrication detail..."
   ]
 ]);
+entries.push(['Aperçu de teinte','Colour preview'],['Couleur choisie','Selected colour'],['Pot de retouche MIR · teinte indicative','MIR touch-up paint · indicative colour']);
 const dictionary=Object.freeze(Object.fromEntries(entries));
 if(typeof module==='object'&&module.exports)module.exports=dictionary;
 if(root)root.MIRClientEnglish=dictionary;

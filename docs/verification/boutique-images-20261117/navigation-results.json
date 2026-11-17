@@ -1,0 +1,354 @@
+{
+  "createdAt": "2026-11-17T14:22:04.245Z",
+  "network": "local GET only",
+  "results": [
+    {
+      "width": 1440,
+      "language": "fr-CA",
+      "passed": true,
+      "brands": 20,
+      "products": 78,
+      "searchResults": 5,
+      "localCart": {
+        "count": 1,
+        "quantity": 2,
+        "colour": "hardie-pierre-des-champs",
+        "unit": "pièces"
+      },
+      "estimateSubmitted": false,
+      "errors": [],
+      "blocked": [
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "language": "en-CA",
+      "passed": true,
+      "brands": 20,
+      "products": 78,
+      "searchResults": 5,
+      "localCart": {
+        "count": 1,
+        "quantity": 2,
+        "colour": "hardie-pierre-des-champs",
+        "unit": "pièces"
+      },
+      "estimateSubmitted": false,
+      "errors": [],
+      "blocked": [
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        }
+      ]
+    },
+    {
+      "width": 834,
+      "language": "fr-CA",
+      "passed": true,
+      "brands": 20,
+      "products": 78,
+      "searchResults": 5,
+      "localCart": {
+        "count": 1,
+        "quantity": 2,
+        "colour": "hardie-pierre-des-champs",
+        "unit": "pièces"
+      },
+      "estimateSubmitted": false,
+      "errors": [],
+      "blocked": [
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        }
+      ]
+    },
+    {
+      "width": 834,
+      "language": "en-CA",
+      "passed": true,
+      "brands": 20,
+      "products": 78,
+      "searchResults": 5,
+      "localCart": {
+        "count": 1,
+        "quantity": 2,
+        "colour": "hardie-pierre-des-champs",
+        "unit": "pièces"
+      },
+      "estimateSubmitted": false,
+      "errors": [],
+      "blocked": [
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "language": "fr-CA",
+      "passed": true,
+      "brands": 20,
+      "products": 78,
+      "searchResults": 5,
+      "localCart": {
+        "count": 1,
+        "quantity": 2,
+        "colour": "hardie-pierre-des-champs",
+        "unit": "pièces"
+      },
+      "estimateSubmitted": false,
+      "errors": [],
+      "blocked": [
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "language": "en-CA",
+      "passed": true,
+      "brands": 20,
+      "products": 78,
+      "searchResults": 5,
+      "localCart": {
+        "count": 1,
+        "quantity": 2,
+        "colour": "hardie-pierre-des-champs",
+        "unit": "pièces"
+      },
+      "estimateSubmitted": false,
+      "errors": [],
+      "blocked": [
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        },
+        {
+          "method": "POST",
+          "url": "https://hxtztkmbfpmzrieccwsg.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+        }
+      ]
+    }
+  ]
+}
