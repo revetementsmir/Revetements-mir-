@@ -93,6 +93,7 @@ jobs:
           node tests/mir-studio-calibration-marks.cjs
           node tests/mir-studio-paper-contrast.cjs
           node tests/mir-studio-dimension-association.cjs
+          node tests/mir-studio-reference-observations.cjs
           node tests/mir-plan-dimension-ticks.cjs
           node tests/mir-plan-interrupted-dimensions.cjs
           node tests/mir-studio-flat-entry-roofs.cjs
