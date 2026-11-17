@@ -72,10 +72,12 @@
    if(!type)continue;
    const center=[(row.box[0]+row.box[2])/2,(row.box[1]+row.box[3])/2],height=row.box[3]-row.box[1];
    if(!(height>=3&&height<image.height*.055)||!(row.box[2]>row.box[0]))continue;
+   const sourceCircle=row.retry?.gridCircle||null;
+   if(sourceCircle&&(!['number','letter'].includes(sourceCircle.kind)||sourceCircle.kind!==type||!Array.isArray(sourceCircle.center)||sourceCircle.center.length!==2||!(sourceCircle.radius>3)||Math.hypot(center[0]-sourceCircle.center[0],center[1]-sourceCircle.center[1])>sourceCircle.radius*.4||!(sourceCircle.ringSupport>=.9)))continue;
    const inBand=type==='number'?center[1]<image.height*.2&&center[0]>image.width*.08&&center[0]<image.width*.82:center[0]<image.width*.25&&center[1]>image.height*.12&&center[1]<image.height*.9;
    if(!inBand)continue;
    const support=circleSupport(image,center,height);if(support<.68)continue;
-   (type==='number'?numeric:letters).push({label,center,box:copy(row.box),confidence:row.confidence,ringSupport:support,sourceViewId:view.id});
+   (type==='number'?numeric:letters).push({label,center,box:copy(row.box),confidence:row.confidence,ringSupport:support,sourceViewId:view.id,...(sourceCircle?{sourceCircle:copy(sourceCircle)}:{})});
   }
   const select=(items,axis,extent)=>{
    if(!items.length)return [];
