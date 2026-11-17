@@ -36,4 +36,14 @@ assert.equal(invalid({buildingId:'shed'}).status,'unresolved','a different build
 assert.equal(Grid.alignViews(base.view,base.view,base.image,base.image).status,'unresolved','same-level loops are not a cross-level registration');
 const blank=new Uint8ClampedArray(base.image.data.length).fill(255);
 assert.equal(Grid.alignViews(base.view,next.view,{...base.image,data:blank},next.image).status,'unresolved','labels without source ink are not evidence');
+// The pipeline independently reports XY evidence, even when wall/level
+// geometry is absent. Grid matching is never a backdoor confirmation.
+const P=require('../dist/plan-reconstruction-pipeline.js');
+const fresh={...structuredClone(inventory),levels:[{id:'house:level-0',buildingId:'house',sourceLevel:'level-0'},{id:'house:level-1',buildingId:'house',sourceLevel:'level-1'}]};
+const original=structuredClone(fresh);
+const checked=P.build(fresh,'house',images);
+assert.deepEqual(fresh,original,'reading grid evidence may not mutate existing projects');
+assert.equal(checked.levels.some(level=>(level.contours||[]).length>0),false,'grid lines without walls must not produce a house');
+assert.equal(checked.reports.find(v=>v.levelId==='house:level-1').gridAlignment.status,'proposed','registered axes remain visible in diagnostics');
+assert.equal(checked.reports.find(v=>v.levelId==='house:level-1').gridAlignment.notAGeometryConfirmation,true);
 console.log('PASS grid registration: two orthogonal labelled raster axes, provenance, rejection of OCR duplication, missing/coloured bubbles, distortion and cross-building association');
