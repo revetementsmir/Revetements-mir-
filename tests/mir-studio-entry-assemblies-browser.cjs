@@ -221,6 +221,7 @@ async function exerciseCase(browser,base,sample,sourceRevision){
     for(const locale of ['fr-CA','en-CA']){
       await page.evaluate(value=>MIRClientLocale.setLocale(value),locale);
       assert.match(await page.locator('#mir-conversion-report').innerText(),locale==='fr-CA'?/Modèle proposé/:/Proposed model/);
+      assert.equal(await page.locator('#stage-subtitle').textContent(),locale==='fr-CA'?'Toiture sélectionnée dans le même modèle 2D et 360°.':'Roof selected in the same 2D and 360° model.');
       if(sample.name==='flat')assert.match(await page.locator('[data-roof-drainage-note]').innerText(),locale==='fr-CA'?/Pente de drainage à confirmer/:/Drainage slope remains to be confirmed/);
       for(const [width,height]of [[390,844],[834,1112],[1440,1000]]){
         await page.setViewportSize({width,height});await renderAngle(page,25);await page.locator('#stage').scrollIntoViewIfNeeded();
