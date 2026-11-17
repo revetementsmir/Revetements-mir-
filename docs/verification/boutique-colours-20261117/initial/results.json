@@ -1,0 +1,256 @@
+{
+  "stage": "initial",
+  "generatedAt": "2026-11-17T14:41:06.405Z",
+  "scope": "Local Chromium; no physical device or Safari certification",
+  "checks": [
+    {
+      "name": "1440 categories",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n0 !== 6\n"
+    },
+    {
+      "name": "1440 cards CanExel",
+      "pass": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(await cards.count()>0)\n"
+    },
+    {
+      "name": "1440 cards James Hardie",
+      "pass": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(await cards.count()>0)\n"
+    },
+    {
+      "name": "1440 cards St-Laurent",
+      "pass": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(await cards.count()>0)\n"
+    },
+    {
+      "name": "1440 product hardieplank-select-825",
+      "pass": false,
+      "error": "hardieplank-select-825 no palette"
+    },
+    {
+      "name": "1440 product hardiepanel",
+      "pass": false,
+      "error": "hardiepanel no palette"
+    },
+    {
+      "name": "1440 product canexel-ridgewood-d5",
+      "pass": false,
+      "error": "canexel-ridgewood-d5 no palette"
+    },
+    {
+      "name": "1440 product hardieplank-select-625",
+      "pass": false,
+      "error": "hardieplank-select-625 no palette"
+    },
+    {
+      "name": "1440 product hardieplank-smooth-625",
+      "pass": false,
+      "error": "hardieplank-smooth-625 no palette"
+    },
+    {
+      "name": "1440 product hardieplank-smooth-825",
+      "pass": false,
+      "error": "hardieplank-smooth-825 no palette"
+    },
+    {
+      "name": "1440 product hardiepanel-cedarmill",
+      "pass": false,
+      "error": "hardiepanel-cedarmill no palette"
+    },
+    {
+      "name": "1440 product hardieshingle-straight",
+      "pass": false,
+      "error": "hardieshingle-straight no palette"
+    },
+    {
+      "name": "1440 product hardieshingle-staggered",
+      "pass": false,
+      "error": "hardieshingle-staggered no palette"
+    },
+    {
+      "name": "1440 product st-laurent-lap-625",
+      "pass": false,
+      "error": "st-laurent-lap-625 no palette"
+    },
+    {
+      "name": "1440 product st-laurent-lap-825",
+      "pass": false,
+      "error": "st-laurent-lap-825 no palette"
+    },
+    {
+      "name": "1440 product st-laurent-v-groove-825",
+      "pass": false,
+      "error": "st-laurent-v-groove-825 no palette"
+    },
+    {
+      "name": "1440 product canexel-vstyle",
+      "pass": false,
+      "error": "canexel-vstyle no palette"
+    },
+    {
+      "name": "1440 product canexel-cedrvue-9",
+      "pass": false,
+      "error": "canexel-cedrvue-9 no palette"
+    },
+    {
+      "name": "1440 product canexel-board-batten",
+      "pass": false,
+      "error": "canexel-board-batten no palette"
+    },
+    {
+      "name": "1440 product st-laurent-board-batten-12",
+      "pass": false,
+      "error": "st-laurent-board-batten-12 no palette"
+    },
+    {
+      "name": "1440 product hardie-board-batten",
+      "pass": false,
+      "error": "hardie-board-batten no palette"
+    },
+    {
+      "name": "1440 unavailable hardieplank-select-725",
+      "pass": false,
+      "error": "The input did not match the regular expression /indisponible|introuvable|available|not found/i. Input:\n\n'Le nuancier ne peut pas être chargé. Réessayez dans un instant.'\n"
+    },
+    {
+      "name": "1440 unavailable hardieplank-smooth-725",
+      "pass": false,
+      "error": "The input did not match the regular expression /indisponible|introuvable|available|not found/i. Input:\n\n'Le nuancier ne peut pas être chargé. Réessayez dans un instant.'\n"
+    },
+    {
+      "name": "1440 unavailable hardieplank-select-525",
+      "pass": false,
+      "error": "The input did not match the regular expression /indisponible|introuvable|available|not found/i. Input:\n\n'Le nuancier ne peut pas être chargé. Réessayez dans un instant.'\n"
+    },
+    {
+      "name": "1440 unavailable hardieplank-smooth-525",
+      "pass": false,
+      "error": "The input did not match the regular expression /indisponible|introuvable|available|not found/i. Input:\n\n'Le nuancier ne peut pas être chargé. Réessayez dans un instant.'\n"
+    },
+    {
+      "name": "1440 legacy incompatible cart",
+      "pass": false,
+      "error": "locator.waitFor: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('.selection-item').first() to be visible\u001b[22m\n"
+    },
+    {
+      "name": "1440 javascript errors",
+      "pass": true
+    }
+  ],
+  "requests": 1054,
+  "blocked": [
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    }
+  ],
+  "sourceHashes": {
+    "commerce.js": "d6133c609c7a39b54a5fb6ea8cffe8e16c74408378c6239e3231501b7598a024",
+    "material-preview.js": "4d5f0d0e235fe6b31091094cd07d46b141ba7864f56c62ce33c6a77d116baf48",
+    "mir-prestige.css": "5c66611b9a6276bff020825eecbde1a7cd3d6d2ad82268199da6ed8fd2a0680d"
+  },
+  "nonReadLocalRequests": [],
+  "passed": 1,
+  "failed": 26
+}

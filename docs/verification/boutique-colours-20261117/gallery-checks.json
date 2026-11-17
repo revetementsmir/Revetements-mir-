@@ -1,0 +1,41 @@
+{
+  "createdAt": "2026-11-17T15:03:31.370Z",
+  "results": [
+    {
+      "width": 1440,
+      "capturesDecoded": 21,
+      "filters": true,
+      "modal": true,
+      "horizontalOverflow": false,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "width": 834,
+      "capturesDecoded": 21,
+      "filters": true,
+      "modal": true,
+      "horizontalOverflow": false,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "width": 390,
+      "capturesDecoded": 21,
+      "filters": true,
+      "modal": true,
+      "horizontalOverflow": false,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "standalone": true,
+      "testedVia": "setContent because file navigation is restricted by browser policy",
+      "capturesDecoded": 21,
+      "networkRequests": 0,
+      "applicationLinks": 0,
+      "modal": true,
+      "passed": true
+    }
+  ]
+}

@@ -7650,6 +7650,80 @@ entries.push(...[
   ]
 ]);
 entries.push(['Aperçu de teinte','Colour preview'],['Couleur choisie','Selected colour'],['Pot de retouche MIR · teinte indicative','MIR touch-up paint · indicative colour']);
+// Customer colour selection and catalogue availability messages. These labels
+// translate presentation only; manufacturer names, IDs and stored units stay intact.
+entries.push(
+  ['Couleurs opaques','Solid colours'],
+  ['Couleurs deux tons','Two-tone colours'],
+  ['Anciennes couleurs de retouche','Legacy touch-up colours'],
+  ['Photo du contenant · teinte non représentée','Container photo · selected colour not shown'],
+  ['Consulter la teinte chez le fabricant','View this colour on the manufacturer’s website'],
+  ['Article retiré du catalogue · à retirer du panier.','Item removed from the catalogue · remove it from your cart.'],
+  ['Un article a été retiré du catalogue. Retirez-le du panier avant de demander une estimation.','An item has been removed from the catalogue. Remove it from your cart before requesting an estimate.'],
+  ['Retirer du panier','Remove from cart'],
+  ['La disponibilité des articles ne peut pas être vérifiée. Réessayez dans un instant.','Item availability could not be verified. Please try again in a moment.'],
+  ['La disponibilité des articles est invalide.','Item availability information is invalid.'],
+  ['Le catalogue ne peut pas être chargé. Réessayez dans un instant.','The catalogue could not be loaded. Please try again in a moment.'],
+  ['Le nuancier ne peut pas être chargé. Réessayez dans un instant.','The colour chart could not be loaded. Please try again in a moment.']
+);
+const clientPreviewNotes = [
+  ['Détail du bardage à clin St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.','Detail of St-Laurent lap siding, cropped from the manufacturer’s installation photo. Dimensions are not shown.'],
+  ['Détail du profil V-Groove St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.','Detail of the St-Laurent V-Groove profile, cropped from the manufacturer’s installation photo. Dimensions are not shown.'],
+  ['Détail Board & Batten St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.','St-Laurent Board & Batten detail, cropped from the manufacturer’s installation photo. Dimensions are not shown.'],
+  ['Échantillon du composant HardiePanel lisse. Les couvre-joints et l’assemblage Board & Batten ne sont pas représentés.','Sample of the smooth HardiePanel component. Battens and the assembled Board & Batten system are not shown.'],
+  ['Le même échantillon, le même cadrage, le même grain et les mêmes ombres sont conservés pour chaque couleur. Teinte écran indicative.','The same sample, framing, grain and shadows are retained for every colour. Screen colours are indicative.'],
+  ['Le même échantillon, le même fond et le même grain sont conservés pour chaque couleur.','The same sample, background and grain are retained for every colour.']
+];
+for (const [source,target] of clientPreviewNotes) {
+  entries.push([source,target]);
+  entries.push(['Illustration de la couleur choisie. Rendu écran indicatif. '+source,'Illustration of the selected colour. Screen colours are indicative. '+target]);
+}
+const clientAvailabilityNotes = [
+  ['Format Canada Est non listé au tableau Québec 06/2025; combinaison profil/couleur à confirmer.','Eastern Canada size not listed in the Québec June 2025 chart; confirm the profile and colour combination.'],
+  ['Clin lisse documenté Canada Est; profil et couleur à confirmer au Québec.','Smooth lap siding documented for Eastern Canada; confirm the profile and colour in Québec.'],
+  ['Canada Est : les rives décalées ne sont pas listées au tableau Québec 06/2025.','Eastern Canada: staggered-edge shingles are not listed in the Québec June 2025 chart.'],
+  ['Teinte du nuancier fibrociment St-Laurent. Compatibilité avec le profil et le fini, disponibilité et délai à confirmer avec MIR.','Colour from the St-Laurent fibre cement chart. Confirm compatibility with the profile and finish, availability and lead time with MIR.'],
+  ['Retouche assortie à une teinte CanExel actuelle. Format et disponibilité MIR à confirmer.','Touch-up paint matching a current CanExel colour. Confirm size and availability with MIR.'],
+  ['Ancienne teinte CanExel répertoriée pour la retouche. Correspondance et disponibilité MIR à confirmer.','Legacy CanExel colour listed for touch-ups. Confirm the colour match and availability with MIR.'],
+  ['Aperçu de la teinte indisponible. Faites confirmer la correspondance avec un échantillon.','Colour preview unavailable. Confirm the match with a physical sample.']
+];
+entries.push(...clientAvailabilityNotes);
+const clientTextureNote=['Échantillon couleur de la brochure; son grain ne certifie pas la texture du profil sélectionné. Les finis lisse et Cedarmill restent distincts.','Colour sample from the brochure; its grain does not establish the selected profile’s texture. Smooth and Cedarmill finishes remain distinct.'];
+entries.push(clientTextureNote);
+// The colour note is emitted as one text node. Cover its exact known combinations
+// instead of translating colour names or rewriting arbitrary catalogue content.
+for (const [source,target] of clientAvailabilityNotes.slice(0,3)) {
+  entries.push([source+' '+clientTextureNote[0],target+' '+clientTextureNote[1]]);
+  entries.push([source+' Le fini lisse reste lisse; la photo originale du profil est accessible à gauche.',target+' The smooth finish stays smooth; the original profile photo is available on the left.']);
+}
+entries.push([
+  clientAvailabilityNotes[5][0]+' '+clientAvailabilityNotes[6][0],
+  clientAvailabilityNotes[5][1]+' '+clientAvailabilityNotes[6][1]
+]);
+entries.push(
+  ['Rechercher une couleur par nom ou code','Search colours by name or code'],
+  ['Couleur :','Colour:'],
+  ['paquets','packs'],
+  ['Contenants par boîte','Containers per box'],
+  ['Retouche','Touch-up'],
+  ['Horizontale','Horizontal'],
+  ['Verticale','Vertical'],
+  ['Photo du profil et sources','Profile photo and sources'],
+  ['Page fabricant →','Manufacturer page →'],
+  ['Consultez les prescriptions et la version du fabricant.','Check the manufacturer’s requirements and document version.'],
+  ['16 teintes actuelles et 4 anciennes références de retouche. Compatibilité et disponibilité à confirmer avec MIR.','16 current colours and 4 legacy touch-up references. Confirm compatibility and availability with MIR.'],
+  ['Collection Statement documentée pour le Québec. Le fini du profil et la disponibilité MIR restent à confirmer.','Statement Collection documented for Québec. Confirm the profile finish and availability with MIR.'],
+  ['Nuancier fabricant actuel. Disponibilité, délai et offre MIR à confirmer.','Current manufacturer colour palette. Confirm availability, lead time and the MIR offering.'],
+  ['Nuancier fibrociment St-Laurent. Compatibilité de la teinte avec le profil et le fini à confirmer.','St-Laurent fibre cement colour palette. Confirm colour compatibility with the profile and finish.'],
+  ['CanExel — Anciennes teintes de retouche','CanExel — Legacy touch-up colours'],
+  ['Pot CanExel · tache de peinture sèche, teinte indicative','CanExel container · dried paint sample, indicative colour'],
+  ['Photo du produit · teinte au nuancier','Product photo · colour shown in the chart'],
+  ['Photo du produit. L’échantillon de teinte est dans le nuancier.','Product photo. The colour sample is in the colour chart.']
+);
+for (const name of ['Acadia','Barista','Blanc','Bleu minuit','Bois de grange','Bois de Santal','Charbon','Falaise','Granit','Gris brume','Loup gris','Moka foncé','Noir','Renard roux','Rouge campagne','Sable','Scandinave','Sierra','Toundra','Yellowstone']) {
+  entries.push(['Photo de retouche MIR · '+name+' · touche de peinture sèche sur le couvercle. Rendu écran indicatif.','MIR touch-up paint photo · '+name+' · dried paint sample on the lid. Screen colours are indicative.']);
+  entries.push(['Pot CanExel · '+name+' · couleur du couvercle indicative.','CanExel container · '+name+' · lid colour is indicative.']);
+}
 const dictionary=Object.freeze(Object.fromEntries(entries));
 if(typeof module==='object'&&module.exports)module.exports=dictionary;
 if(root)root.MIRClientEnglish=dictionary;

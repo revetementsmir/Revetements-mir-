@@ -1,0 +1,241 @@
+{
+  "stage": "final-categories",
+  "generatedAt": "2026-11-17T14:59:57.418Z",
+  "scope": "Local Chromium; no physical device or Safari certification",
+  "checks": [
+    {
+      "name": "1440 categories",
+      "pass": true,
+      "detail": [
+        {
+          "category": "fibre",
+          "src": "http://127.0.0.1:39325/assets/products/hardieplank-cedarmill.png",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "wood",
+          "src": "http://127.0.0.1:39325/assets/products/canexel-3.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "metal",
+          "src": "http://127.0.0.1:39325/assets/products/rialux-tiago-ecorce-sample.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "vinyl",
+          "src": "http://127.0.0.1:39325/assets/products/gentek-vinyl-9.jpg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "finish",
+          "src": "http://127.0.0.1:39325/assets/products/kaycan-sp600-perfore-sample.jpeg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "fix",
+          "src": "http://127.0.0.1:39325/assets/products/adseal-dws4580-original-alpha.png",
+          "w": 48,
+          "h": 48,
+          "fit": "contain",
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "name": "1440 javascript errors",
+      "pass": true
+    },
+    {
+      "name": "834 categories",
+      "pass": true,
+      "detail": [
+        {
+          "category": "fibre",
+          "src": "http://127.0.0.1:39325/assets/products/hardieplank-cedarmill.png",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "wood",
+          "src": "http://127.0.0.1:39325/assets/products/canexel-3.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "metal",
+          "src": "http://127.0.0.1:39325/assets/products/rialux-tiago-ecorce-sample.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "vinyl",
+          "src": "http://127.0.0.1:39325/assets/products/gentek-vinyl-9.jpg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "finish",
+          "src": "http://127.0.0.1:39325/assets/products/kaycan-sp600-perfore-sample.jpeg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "fix",
+          "src": "http://127.0.0.1:39325/assets/products/adseal-dws4580-original-alpha.png",
+          "w": 48,
+          "h": 48,
+          "fit": "contain",
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "name": "834 javascript errors",
+      "pass": true
+    },
+    {
+      "name": "390 categories",
+      "pass": true,
+      "detail": [
+        {
+          "category": "fibre",
+          "src": "http://127.0.0.1:39325/assets/products/hardieplank-cedarmill.png",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "wood",
+          "src": "http://127.0.0.1:39325/assets/products/canexel-3.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "metal",
+          "src": "http://127.0.0.1:39325/assets/products/rialux-tiago-ecorce-sample.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "vinyl",
+          "src": "http://127.0.0.1:39325/assets/products/gentek-vinyl-9.jpg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "finish",
+          "src": "http://127.0.0.1:39325/assets/products/kaycan-sp600-perfore-sample.jpeg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "fix",
+          "src": "http://127.0.0.1:39325/assets/products/adseal-dws4580-original-alpha.png",
+          "w": 48,
+          "h": 48,
+          "fit": "contain",
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "name": "390 javascript errors",
+      "pass": true
+    }
+  ],
+  "requests": 378,
+  "blocked": [
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    }
+  ],
+  "sourceHashes": {
+    "commerce.js": "df5d9a56ea126082d8608e98c88ee6459fb711c45510b926d08fd31bc38f7bc7",
+    "material-preview.js": "7121a11755fc6486ae203ed497e2f79c583f73edd910c527acd7dce707a55443",
+    "mir-client-colour-palettes.json": "ca08c9c93cdb6a603aae31d46ece55f1ab59a6023353adfae63225ea98e2c045",
+    "mir-client-siding-previews.js": "93f3a6c923852674444f32206365bd6f7b40e370b60d097033360adc33c2127f",
+    "mir-prestige.css": "5c66611b9a6276bff020825eecbde1a7cd3d6d2ad82268199da6ed8fd2a0680d",
+    "mir-prestige-colours.css": "010a5ebadcadabe0cafa0b9dc864bf8ec911ce58261e709431483545bdf6b62d",
+    "mir-prestige-category-thumbnails.css": "7dac4591dd3884c8789ec81be7d2c83b8a195d4940c5c1d5cade33575a195e92",
+    "mir-client-i18n.js": "ca4c069e393b949a0f9bce60dbab5aa2de161e527cad046816dcaedec2c122d3",
+    "mir-client-en-ca.js": "3d6914f58d1954224484d76afa7f46274dbdcbf47ea53a658ce39286c4f5440d",
+    "mir-estimate.js": "3710f601c059f4e0e6c7a83616209729c775b222d7f9c334ced63e6d39052e32"
+  },
+  "loads": [
+    {
+      "url": "boutique.html",
+      "width": 1440,
+      "elapsedMs": 6822
+    },
+    {
+      "url": "boutique.html",
+      "width": 834,
+      "elapsedMs": 5569
+    },
+    {
+      "url": "boutique.html",
+      "width": 390,
+      "elapsedMs": 5256
+    }
+  ],
+  "sourceHashesAfter": {
+    "commerce.js": "df5d9a56ea126082d8608e98c88ee6459fb711c45510b926d08fd31bc38f7bc7",
+    "material-preview.js": "7121a11755fc6486ae203ed497e2f79c583f73edd910c527acd7dce707a55443",
+    "mir-client-colour-palettes.json": "ca08c9c93cdb6a603aae31d46ece55f1ab59a6023353adfae63225ea98e2c045",
+    "mir-client-siding-previews.js": "93f3a6c923852674444f32206365bd6f7b40e370b60d097033360adc33c2127f",
+    "mir-prestige.css": "5c66611b9a6276bff020825eecbde1a7cd3d6d2ad82268199da6ed8fd2a0680d",
+    "mir-prestige-colours.css": "010a5ebadcadabe0cafa0b9dc864bf8ec911ce58261e709431483545bdf6b62d",
+    "mir-prestige-category-thumbnails.css": "7dac4591dd3884c8789ec81be7d2c83b8a195d4940c5c1d5cade33575a195e92",
+    "mir-client-i18n.js": "ca4c069e393b949a0f9bce60dbab5aa2de161e527cad046816dcaedec2c122d3",
+    "mir-client-en-ca.js": "3d6914f58d1954224484d76afa7f46274dbdcbf47ea53a658ce39286c4f5440d",
+    "mir-estimate.js": "3710f601c059f4e0e6c7a83616209729c775b222d7f9c334ced63e6d39052e32"
+  },
+  "sourcesStable": true,
+  "nonReadLocalRequests": [],
+  "passed": 6,
+  "failed": 0
+}

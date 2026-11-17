@@ -1,0 +1,62 @@
+{
+  "reviewedOn": "2026-11-17",
+  "products": 21,
+  "colourEntries": 390,
+  "productCounts": {
+    "canexel-ridgewood-d5": 16,
+    "canexel-vstyle": 16,
+    "canexel-cedrvue-9": 16,
+    "canexel-board-batten": 7,
+    "hardieplank-select-825": 19,
+    "hardiepanel": 19,
+    "hardieplank-select-625": 19,
+    "hardieplank-select-725": 19,
+    "hardieplank-smooth-625": 19,
+    "hardieplank-smooth-725": 19,
+    "hardieplank-smooth-825": 19,
+    "hardiepanel-cedarmill": 19,
+    "hardieshingle-straight": 19,
+    "hardieshingle-staggered": 19,
+    "hardietrim-smooth-54-35": 5,
+    "st-laurent-lap-625": 24,
+    "st-laurent-lap-825": 24,
+    "st-laurent-v-groove-825": 24,
+    "st-laurent-trim-35": 24,
+    "st-laurent-board-batten-12": 24,
+    "canexel-touch-up-284ml": 20
+  },
+  "clientHiddenProductIds": [
+    "hardieplank-select-725",
+    "hardieplank-smooth-725"
+  ],
+  "fiveQuarterFibreCementReferences": [],
+  "existingWoodActualWidth525Preserved": [
+    "maibec-moderne-emplus-6",
+    "maibec-clin-rainure-emplus-6",
+    "maibec-contemporain-emplus-6"
+  ],
+  "missingLocalSwatches": [
+    {
+      "productId": "canexel-touch-up-284ml",
+      "colorId": "canexel-bois-de-grange",
+      "sourceUrl": "https://boutique.aluminiumbbouchard.ca/wp-content/uploads/2023/10/255_Maibec_CanExel_Barnwood_Swatch.jpg"
+    },
+    {
+      "productId": "canexel-touch-up-284ml",
+      "colorId": "canexel-renard-roux",
+      "sourceUrl": "https://boutique.aluminiumbbouchard.ca/wp-content/uploads/2023/10/255_Maibec_CanExel_RedFox_Swatch.jpg"
+    },
+    {
+      "productId": "canexel-touch-up-284ml",
+      "colorId": "canexel-rouge-campagne",
+      "sourceUrl": "https://boutique.aluminiumbbouchard.ca/wp-content/uploads/2023/10/255_Maibec_CanExel_CountryRed_Swatch.jpg"
+    },
+    {
+      "productId": "canexel-touch-up-284ml",
+      "colorId": "canexel-yellowstone",
+      "sourceUrl": "https://boutique.aluminiumbbouchard.ca/wp-content/uploads/2023/10/255_Maibec_CanExel_Yellowstone_Swatch.jpg"
+    }
+  ],
+  "downloadLimitation": "Direct read-only downloads of identified retailer swatches and Gentek PDF returned HTTP/proxy403; no bypass attempted. Four exact pot photos are not present.",
+  "catalogueSourceSha256": "a08b9bf28abba1f286d0854690ae4979eaaa723a3fe04eb86a75dffc82efdc63"
+}

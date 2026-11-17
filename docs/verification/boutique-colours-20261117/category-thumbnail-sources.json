@@ -1,0 +1,12 @@
+{
+  "scope": "boutique category navigation only; catalogue media and product photos remain unchanged",
+  "frame": { "width": 48, "height": 48 },
+  "categories": {
+    "fibre": { "src": "./assets/products/hardieplank-cedarmill.png", "alt": "Détail de fibrociment", "presentation": "sample", "fit": "cover", "reason": "Existing verified material image; avoids studio margins in the current small SVG." },
+    "wood": { "src": "./assets/products/canexel-3.webp", "alt": "Détail de bois d’ingénierie", "presentation": "sample", "fit": "cover", "reason": "Existing CanExel material image; navigation category illustration only." },
+    "metal": { "src": "./assets/products/rialux-tiago-ecorce-sample.webp", "alt": "Détail de revêtement métallique", "presentation": "sample", "fit": "cover", "reason": "Current real Rialux sample retained." },
+    "vinyl": { "src": "./assets/products/gentek-vinyl-9.jpg", "alt": "Détail de revêtement en vinyle", "presentation": "sample", "fit": "cover", "reason": "Verified Gentek Sequoia vinyl profile photograph; enough source resolution for a 48 px category image." },
+    "finish": { "src": "./assets/products/kaycan-sp600-perfore-sample.jpeg", "alt": "Détail de soffite perforé", "presentation": "sample", "fit": "cover", "reason": "Existing original Kaycan SP600 brochure photograph; 178×103 source is sufficient here, not proposed as the large brand cover." },
+    "fix": { "keepExistingImageMarkup": true, "presentation": "packshot", "fit": "contain", "reason": "Keep complete accessory geometry, activate the existing sourceFrame wrapper in the category canvas." }
+  }
+}

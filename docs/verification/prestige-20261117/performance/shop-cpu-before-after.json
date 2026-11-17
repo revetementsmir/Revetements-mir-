@@ -1,0 +1,526 @@
+{
+  "route": "boutique.html?view=all",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "network": "Local GET/HEAD only; all external requests blocked.",
+  "method": "Chromium CDP CPU sampling plus display-only i18n render instrumentation injected through local route interception. No source locale change. First cards = Playwright first .shop-card visible after DOMContentLoaded. Cold page/browser context for every scenario.",
+  "before": [
+    {
+      "mode": "instrumented",
+      "dom": 385,
+      "first": 31627,
+      "total": 32758,
+      "locale": {
+        "calls": 22,
+        "ms": 1437.0000000009313,
+        "max": 118.40000000037253
+      },
+      "cards": 76,
+      "swatches": 1484,
+      "domNodes": 8183,
+      "nav": {
+        "name": "http://127.0.0.1:45989/boutique.html?view=all",
+        "entryType": "navigation",
+        "startTime": 0,
+        "duration": 448.30000000074506,
+        "navigationId": 1979,
+        "initiatorType": "navigation",
+        "deliveryType": "",
+        "nextHopProtocol": "http/1.1",
+        "renderBlockingStatus": "non-blocking",
+        "contentType": "text/html",
+        "contentEncoding": "",
+        "workerStart": 0,
+        "workerRouterEvaluationStart": 0,
+        "workerCacheLookupStart": 0,
+        "workerMatchedSourceType": "",
+        "workerFinalSourceType": "",
+        "redirectStart": 0,
+        "redirectEnd": 0,
+        "fetchStart": 1,
+        "domainLookupStart": 1,
+        "domainLookupEnd": 1,
+        "connectStart": 1,
+        "secureConnectionStart": 0,
+        "connectEnd": 1,
+        "requestStart": 13.800000000745058,
+        "responseStart": 30.700000000186265,
+        "firstInterimResponseStart": 0,
+        "finalResponseHeadersStart": 30.700000000186265,
+        "responseEnd": 33.5,
+        "transferSize": 7933,
+        "encodedBodySize": 7633,
+        "decodedBodySize": 7633,
+        "responseStatus": 200,
+        "serverTiming": [],
+        "unloadEventStart": 0,
+        "unloadEventEnd": 0,
+        "domInteractive": 75.20000000018626,
+        "domContentLoadedEventStart": 376.30000000074506,
+        "domContentLoadedEventEnd": 376.40000000037253,
+        "domComplete": 448.30000000074506,
+        "loadEventStart": 448.30000000074506,
+        "loadEventEnd": 448.30000000074506,
+        "type": "navigate",
+        "redirectCount": 0,
+        "activationStart": 0,
+        "criticalCHRestart": 0,
+        "notRestoredReasons": null,
+        "confidence": {
+          "randomizedTriggerRate": 0.4994798,
+          "value": "low"
+        }
+      },
+      "top": [
+        [
+          "fold mir-catalogue-policy.js?v=phase9-1",
+          13830
+        ],
+        [
+          " mir-catalogue-policy.js?v=phase9-1",
+          7028
+        ],
+        [
+          "image.onload material-preview.js?v=stable-siding-625-20261111",
+          1607
+        ],
+        [
+          "excluded mir-client-i18n.js?v=release-pr41-20261115",
+          1120
+        ],
+        [
+          "(idle) ",
+          1099
+        ],
+        [
+          "(program) ",
+          836
+        ],
+        [
+          "(garbage collector) ",
+          399
+        ],
+        [
+          "sortColors mir-catalogue-policy.js?v=phase9-1",
+          275
+        ],
+        [
+          "matchesBase mir-catalogue-policy.js?v=phase9-1",
+          221
+        ],
+        [
+          "priority mir-catalogue-policy.js?v=phase9-1",
+          221
+        ],
+        [
+          "woodLike mir-catalogue-policy.js?v=phase9-1",
+          194
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)black(?:\\s|$) ",
+          156
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)bright white(?:\\s|$) ",
+          128
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)pure white(?:\\s|$) ",
+          125
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)imperial white(?:\\s|$) ",
+          123
+        ]
+      ]
+    },
+    {
+      "mode": "no-observer",
+      "dom": 325,
+      "first": 29357,
+      "total": 30448,
+      "locale": {
+        "calls": 1,
+        "ms": 7.2000000001862645,
+        "max": 7.2000000001862645
+      },
+      "cards": 76,
+      "swatches": 1484,
+      "domNodes": 8183,
+      "nav": {
+        "name": "http://127.0.0.1:45989/boutique.html?view=all",
+        "entryType": "navigation",
+        "startTime": 0,
+        "duration": 517.3999999994412,
+        "navigationId": 5933,
+        "initiatorType": "navigation",
+        "deliveryType": "",
+        "nextHopProtocol": "http/1.1",
+        "renderBlockingStatus": "non-blocking",
+        "contentType": "text/html",
+        "contentEncoding": "",
+        "workerStart": 0,
+        "workerRouterEvaluationStart": 0,
+        "workerCacheLookupStart": 0,
+        "workerMatchedSourceType": "",
+        "workerFinalSourceType": "",
+        "redirectStart": 0,
+        "redirectEnd": 0,
+        "fetchStart": 1.5,
+        "domainLookupStart": 1.5,
+        "domainLookupEnd": 1.5,
+        "connectStart": 1.5,
+        "secureConnectionStart": 0,
+        "connectEnd": 1.5,
+        "requestStart": 6.3999999994412065,
+        "responseStart": 10.099999999627471,
+        "firstInterimResponseStart": 0,
+        "finalResponseHeadersStart": 10.099999999627471,
+        "responseEnd": 12.299999999813735,
+        "transferSize": 7933,
+        "encodedBodySize": 7633,
+        "decodedBodySize": 7633,
+        "responseStatus": 200,
+        "serverTiming": [],
+        "unloadEventStart": 0,
+        "unloadEventEnd": 0,
+        "domInteractive": 46,
+        "domContentLoadedEventStart": 263.29999999981374,
+        "domContentLoadedEventEnd": 263.5,
+        "domComplete": 517.0999999996275,
+        "loadEventStart": 517.3999999994412,
+        "loadEventEnd": 517.3999999994412,
+        "type": "navigate",
+        "redirectCount": 0,
+        "activationStart": 0,
+        "criticalCHRestart": 0,
+        "notRestoredReasons": null,
+        "confidence": {
+          "randomizedTriggerRate": 0.4994798,
+          "value": "high"
+        }
+      },
+      "top": [
+        [
+          "fold mir-catalogue-policy.js?v=phase9-1",
+          14167
+        ],
+        [
+          " mir-catalogue-policy.js?v=phase9-1",
+          6650
+        ],
+        [
+          "image.onload material-preview.js?v=stable-siding-625-20261111",
+          1257
+        ],
+        [
+          "(idle) ",
+          999
+        ],
+        [
+          "(program) ",
+          496
+        ],
+        [
+          "sortColors mir-catalogue-policy.js?v=phase9-1",
+          251
+        ],
+        [
+          "(garbage collector) ",
+          243
+        ],
+        [
+          "priority mir-catalogue-policy.js?v=phase9-1",
+          217
+        ],
+        [
+          "matchesBase mir-catalogue-policy.js?v=phase9-1",
+          184
+        ],
+        [
+          "woodLike mir-catalogue-policy.js?v=phase9-1",
+          180
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)black(?:\\s|$) ",
+          142
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)noir(?:\\s|$) ",
+          120
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)imperial white(?:\\s|$) ",
+          112
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)bright white(?:\\s|$) ",
+          109
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)bone white(?:\\s|$) ",
+          107
+        ]
+      ]
+    },
+    {
+      "mode": "disabled",
+      "dom": 207,
+      "first": 28058,
+      "total": 29177,
+      "cards": 76,
+      "swatches": 1484,
+      "domNodes": 8180,
+      "nav": {
+        "name": "http://127.0.0.1:45989/boutique.html?view=all",
+        "entryType": "navigation",
+        "startTime": 0,
+        "duration": 293,
+        "navigationId": 1434,
+        "initiatorType": "navigation",
+        "deliveryType": "",
+        "nextHopProtocol": "http/1.1",
+        "renderBlockingStatus": "non-blocking",
+        "contentType": "text/html",
+        "contentEncoding": "",
+        "workerStart": 0,
+        "workerRouterEvaluationStart": 0,
+        "workerCacheLookupStart": 0,
+        "workerMatchedSourceType": "",
+        "workerFinalSourceType": "",
+        "redirectStart": 0,
+        "redirectEnd": 0,
+        "fetchStart": 0.5,
+        "domainLookupStart": 0.5,
+        "domainLookupEnd": 0.5,
+        "connectStart": 0.5,
+        "secureConnectionStart": 0,
+        "connectEnd": 0.5,
+        "requestStart": 9.700000000186265,
+        "responseStart": 10.900000000372529,
+        "firstInterimResponseStart": 0,
+        "finalResponseHeadersStart": 10.900000000372529,
+        "responseEnd": 11.700000000186265,
+        "transferSize": 7933,
+        "encodedBodySize": 7633,
+        "decodedBodySize": 7633,
+        "responseStatus": 200,
+        "serverTiming": [],
+        "unloadEventStart": 0,
+        "unloadEventEnd": 0,
+        "domInteractive": 48.90000000037253,
+        "domContentLoadedEventStart": 196.20000000018626,
+        "domContentLoadedEventEnd": 196.40000000037253,
+        "domComplete": 293,
+        "loadEventStart": 293,
+        "loadEventEnd": 293,
+        "type": "navigate",
+        "redirectCount": 0,
+        "activationStart": 0,
+        "criticalCHRestart": 0,
+        "notRestoredReasons": null,
+        "confidence": {
+          "randomizedTriggerRate": 0.4994798,
+          "value": "low"
+        }
+      },
+      "top": [
+        [
+          "fold mir-catalogue-policy.js?v=phase9-1",
+          13359
+        ],
+        [
+          " mir-catalogue-policy.js?v=phase9-1",
+          6684
+        ],
+        [
+          "image.onload material-preview.js?v=stable-siding-625-20261111",
+          1187
+        ],
+        [
+          "(idle) ",
+          1032
+        ],
+        [
+          "(program) ",
+          366
+        ],
+        [
+          "(garbage collector) ",
+          308
+        ],
+        [
+          "sortColors mir-catalogue-policy.js?v=phase9-1",
+          260
+        ],
+        [
+          "matchesBase mir-catalogue-policy.js?v=phase9-1",
+          234
+        ],
+        [
+          "priority mir-catalogue-policy.js?v=phase9-1",
+          188
+        ],
+        [
+          "woodLike mir-catalogue-policy.js?v=phase9-1",
+          180
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)noir(?:\\s|$) ",
+          126
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)imperial white(?:\\s|$) ",
+          122
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)black(?:\\s|$) ",
+          115
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)blanc(?:\\s|$) ",
+          112
+        ],
+        [
+          "RegExp: (?:^|[-/·]\\s*)bone white(?:\\s|$) ",
+          112
+        ]
+      ]
+    }
+  ],
+  "afterCommercePaletteCache": [
+    {
+      "mode": "instrumented",
+      "dom": 382,
+      "first": 6251,
+      "total": 7308,
+      "locale": {
+        "calls": 22,
+        "ms": 1564.2999999988824,
+        "max": 102.29999999981374
+      },
+      "cards": 76,
+      "swatches": 1484,
+      "domNodes": 8183,
+      "nav": {
+        "name": "http://127.0.0.1:44343/boutique.html?view=all",
+        "entryType": "navigation",
+        "startTime": 0,
+        "duration": 468.79999999981374,
+        "navigationId": 7394,
+        "initiatorType": "navigation",
+        "deliveryType": "",
+        "nextHopProtocol": "http/1.1",
+        "renderBlockingStatus": "non-blocking",
+        "contentType": "text/html",
+        "contentEncoding": "",
+        "workerStart": 0,
+        "workerRouterEvaluationStart": 0,
+        "workerCacheLookupStart": 0,
+        "workerMatchedSourceType": "",
+        "workerFinalSourceType": "",
+        "redirectStart": 0,
+        "redirectEnd": 0,
+        "fetchStart": 2.099999999627471,
+        "domainLookupStart": 2.099999999627471,
+        "domainLookupEnd": 2.099999999627471,
+        "connectStart": 2.099999999627471,
+        "secureConnectionStart": 0,
+        "connectEnd": 2.099999999627471,
+        "requestStart": 20.09999999962747,
+        "responseStart": 29.59999999962747,
+        "firstInterimResponseStart": 0,
+        "finalResponseHeadersStart": 29.59999999962747,
+        "responseEnd": 31,
+        "transferSize": 7933,
+        "encodedBodySize": 7633,
+        "decodedBodySize": 7633,
+        "responseStatus": 200,
+        "serverTiming": [],
+        "unloadEventStart": 0,
+        "unloadEventEnd": 0,
+        "domInteractive": 74.09999999962747,
+        "domContentLoadedEventStart": 373.29999999981374,
+        "domContentLoadedEventEnd": 373.5,
+        "domComplete": 468.69999999925494,
+        "loadEventStart": 468.79999999981374,
+        "loadEventEnd": 468.79999999981374,
+        "type": "navigate",
+        "redirectCount": 0,
+        "activationStart": 0,
+        "criticalCHRestart": 0,
+        "notRestoredReasons": null,
+        "confidence": {
+          "randomizedTriggerRate": 0.4994798,
+          "value": "low"
+        }
+      },
+      "top": [
+        [
+          "image.onload material-preview.js?v=stable-siding-625-20261111",
+          2270
+        ],
+        [
+          "(idle) ",
+          1192
+        ],
+        [
+          "excluded mir-client-i18n.js?v=release-pr41-20261115",
+          1171
+        ],
+        [
+          "(program) ",
+          854
+        ],
+        [
+          "fold mir-catalogue-policy.js?v=phase9-1",
+          106
+        ],
+        [
+          "updateAttributes mir-client-i18n.js?v=release-pr41-20261115",
+          90
+        ],
+        [
+          "walk mir-client-i18n.js?v=release-pr41-20261115",
+          76
+        ],
+        [
+          " material-preview.js?v=stable-siding-625-20261111",
+          63
+        ],
+        [
+          " mir-catalogue-policy.js?v=phase9-1",
+          59
+        ],
+        [
+          "render commerce.js?v=phase9-catalogue-1",
+          52
+        ],
+        [
+          "(garbage collector) ",
+          46
+        ],
+        [
+          "init commerce.js?v=phase9-catalogue-1",
+          35
+        ],
+        [
+          "computeBox ",
+          32
+        ],
+        [
+          " commerce.js?v=phase9-catalogue-1",
+          28
+        ],
+        [
+          "safe commerce.js?v=phase9-catalogue-1",
+          14
+        ]
+      ]
+    }
+  ],
+  "improvementPct": 80.2,
+  "finding": "Repeated catalogue-policy fold/sortColors calls dominate the pre-cache render. Disabling the locale observer or locale module does not remove that bottleneck. Caching the client palette sort reduces first visible cards from 31.627 s to 6.251 s with all 76 cards and 1484 swatches still present. Locale source remains unchanged."
+}

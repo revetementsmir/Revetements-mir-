@@ -1,0 +1,300 @@
+{
+  "stage": "calibration",
+  "generatedAt": "2026-11-17T14:44:14.037Z",
+  "scope": "Local Chromium; no physical device or Safari certification",
+  "checks": [
+    {
+      "name": "1440 categories",
+      "pass": false,
+      "error": "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#shop-grid') to be visible\u001b[22m\n\u001b[2m    3 × locator resolved to hidden <div id=\"shop-grid\" class=\"shop-grouped-grid\"></div>\u001b[22m\n"
+    },
+    {
+      "name": "1440 cards CanExel",
+      "pass": false,
+      "error": "page.goto: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:38343/boutique.html?brand=CanExel\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    },
+    {
+      "name": "1440 cards James Hardie",
+      "pass": false,
+      "error": "page.goto: Navigation to \"http://127.0.0.1:38343/boutique.html?brand=James%20Hardie\" is interrupted by another navigation to \"http://127.0.0.1:38343/boutique.html?brand=CanExel\"\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:38343/boutique.html?brand=James%20Hardie\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    },
+    {
+      "name": "1440 cards St-Laurent",
+      "pass": false,
+      "error": "page.goto: Navigation to \"http://127.0.0.1:38343/boutique.html?brand=St-Laurent\" is interrupted by another navigation to \"http://127.0.0.1:38343/boutique.html?brand=James%20Hardie\"\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:38343/boutique.html?brand=St-Laurent\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    },
+    {
+      "name": "1440 card to product colour link",
+      "pass": false,
+      "error": "page.goto: Navigation to \"http://127.0.0.1:38343/boutique.html?brand=CanExel\" is interrupted by another navigation to \"http://127.0.0.1:38343/boutique.html?brand=St-Laurent\"\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:38343/boutique.html?brand=CanExel\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    },
+    {
+      "name": "1440 product hardieplank-select-825",
+      "pass": false,
+      "error": "page.goto: Navigation to \"http://127.0.0.1:38343/produit.html?id=hardieplank-select-825\" is interrupted by another navigation to \"http://127.0.0.1:38343/boutique.html?brand=CanExel\"\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:38343/produit.html?id=hardieplank-select-825\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    },
+    {
+      "name": "1440 product hardiepanel",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:38343/assets/products/hardiepanel-smooth.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:38343/assets/products/hardiepanel-smooth.png",
+            "http://127.0.0.1:38343/assets/products/hardiepanel-smooth.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 76.11383925515165
+        },
+        "spread": {
+          "luminanceLevels": 5,
+          "p10": 49,
+          "p90": 50
+        }
+      }
+    },
+    {
+      "name": "1440 product canexel-ridgewood-d5",
+      "pass": false,
+      "error": "locator.click: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.mir-client-locale-switch').first().getByRole('button', { name: 'EN', exact: true })\u001b[22m\n"
+    },
+    {
+      "name": "1440 product hardieplank-select-625",
+      "pass": false,
+      "error": "locator.click: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.mir-client-locale-switch').first().getByRole('button', { name: 'EN', exact: true })\u001b[22m\n"
+    },
+    {
+      "name": "1440 product hardieplank-smooth-625",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:38343/assets/products/hardieplank-smooth.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:38343/assets/products/hardieplank-smooth.png",
+            "http://127.0.0.1:38343/assets/products/hardieplank-smooth.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 73.17554254809338
+        },
+        "spread": {
+          "luminanceLevels": 35,
+          "p10": 27,
+          "p90": 51
+        }
+      }
+    },
+    {
+      "name": "1440 product hardieplank-smooth-825",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:38343/assets/products/hardieplank-smooth.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:38343/assets/products/hardieplank-smooth.png",
+            "http://127.0.0.1:38343/assets/products/hardieplank-smooth.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 73.17554254809338
+        },
+        "spread": {
+          "luminanceLevels": 35,
+          "p10": 27,
+          "p90": 51
+        }
+      }
+    },
+    {
+      "name": "1440 product hardiepanel-cedarmill",
+      "pass": false,
+      "error": "locator.click: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-color=\"hardie-noir-minuit\"]')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" title=\"Noir minuit\" aria-pressed=\"true\" class=\"mir-colour-option\" data-color=\"hardie-noir-minuit\" aria-label=\"James Hardie — Noir minuit — Select Cedarmill — grain de cèdre — sélectionné\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n"
+    },
+    {
+      "name": "1440 product hardieshingle-straight",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 product hardieshingle-staggered",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 product st-laurent-lap-625",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 product st-laurent-lap-825",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 product st-laurent-v-groove-825",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 product canexel-vstyle",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 product canexel-cedrvue-9",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 product canexel-board-batten",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 product st-laurent-board-batten-12",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 product hardie-board-batten",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 two-tone grain visible",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 touch-up canexel-touch-up-284ml",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 touch-up hardie-colorplus-touch-up-kit",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 unavailable hardieplank-select-725",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 unavailable hardieplank-smooth-725",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 unavailable hardieplank-select-525",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 unavailable hardieplank-smooth-525",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 legacy incompatible cart",
+      "pass": false,
+      "error": "page.evaluate: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 javascript errors",
+      "pass": true
+    }
+  ],
+  "requests": 1107,
+  "blocked": [
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    }
+  ],
+  "sourceHashes": {
+    "commerce.js": "5d327e178f30a3d17ee93de956099de8273a8a11f9f6b8bc864b2c07f6494e69",
+    "material-preview.js": "7121a11755fc6486ae203ed497e2f79c583f73edd910c527acd7dce707a55443",
+    "mir-client-colour-palettes.json": "74ff2e9161940da3b6e9c9daf4f8c020f7d4b61efe00948948b39c7be82f83e1",
+    "mir-client-siding-previews.js": "93f3a6c923852674444f32206365bd6f7b40e370b60d097033360adc33c2127f",
+    "mir-prestige.css": "5c66611b9a6276bff020825eecbde1a7cd3d6d2ad82268199da6ed8fd2a0680d"
+  },
+  "nonReadLocalRequests": [],
+  "passed": 4,
+  "failed": 27
+}

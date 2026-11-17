@@ -115,7 +115,7 @@
   function stableSidingRecipe(m, c) {
     const base = m.stableSidingPreview, color = c || m.colors?.[0];
     if (!base || !color) return null;
-    const image = exactImage(m, color), src = local(base.baseImage), lut = image?.colorLut;
+    const image = exactImage(m, color), src = local(base.baseImage), lut = base.colorLuts?.[color.id] || image?.colorLut;
     const width = Number(base.width), height = Number(base.height);
     if (!src || !Number.isFinite(width) || width <= 0 || !Number.isFinite(height) || height <= 0 ||
         typeof base.maskPath !== 'string' || !base.maskPath.trim() ||
@@ -199,6 +199,66 @@
       image.onerror=()=>resolve(null);image.src=url;
     });
   }
+  // Opt-in client preparation only. Existing callers and internal catalogue
+  // recipes retain their original rendering. Both caches contain local assets.
+  const sidingPixels = new Map(), sidingTables = new Map();
+  function sidingSample(src, base) {
+    const url=local(src);if(!url)return Promise.resolve(null);
+    const key=JSON.stringify([url,base?.width,base?.height,base?.viewBox,base?.maskPath]);
+    if(!sidingPixels.has(key))sidingPixels.set(key,new Promise(resolve=>{
+      const image=new Image();
+      image.onload=()=>{
+        try{
+          const canvas=document.createElement('canvas');canvas.width=base?128:64;canvas.height=base?96:32;
+          const ctx=canvas.getContext('2d',{willReadFrequently:true});
+          if(base){
+            const [x,y,w,h]=base.viewBox||[0,0,base.width,base.height];
+            ctx.scale(canvas.width/w,canvas.height/h);ctx.translate(-x,-y);
+            ctx.clip(new Path2D(base.maskPath));ctx.drawImage(image,0,0,base.width,base.height);
+          // The central chip excludes manufacturer badges (notably CanExel's
+          // turquoise corner star) as well as labels and outer margins.
+          }else ctx.drawImage(image,image.naturalWidth*.2,image.naturalHeight*.2,image.naturalWidth*.6,image.naturalHeight*.6,0,0,canvas.width,canvas.height);
+          const data=ctx.getImageData(0,0,canvas.width,canvas.height).data,pixels=[];
+          for(let i=0;i<data.length;i+=4)if(data[i+3]>230){const rgb=[data[i]/255,data[i+1]/255,data[i+2]/255];pixels.push({rgb,y:rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722});}
+          pixels.sort((a,b)=>a.y-b.y);if(!pixels.length)return resolve(null);
+          const mean=[0,0,0];pixels.forEach(p=>p.rgb.forEach((v,i)=>mean[i]+=v/pixels.length));
+          const stops=[.05,.25,.5,.75,.95].map(q=>{
+            const start=Math.floor((pixels.length-1)*Math.max(0,q-.025)),end=Math.max(start+1,Math.ceil((pixels.length-1)*Math.min(1,q+.025))),rgb=[0,0,0];
+            for(let i=start;i<end;i++)pixels[i].rgb.forEach((v,c)=>rgb[c]+=v/(end-start));return rgb;
+          });
+          // Cache a few statistics, never full decoded pictures or pixel arrays.
+          resolve({mean,stops,low:pixels[Math.floor((pixels.length-1)*.05)].y,mid:pixels[Math.floor((pixels.length-1)*.5)].y,high:pixels[Math.floor((pixels.length-1)*.95)].y});
+        }catch{resolve(null);}
+      };
+      image.onerror=()=>resolve(null);image.src=url;
+    }));
+    return sidingPixels.get(key);
+  }
+  async function sidingColorLut(base,color) {
+    if(!base||!color)return null;
+    const group=color.finishGroup||(/deux tons|two.tone/.test(norm(color.collection))?'two-tone':'opaque');
+    const key=JSON.stringify([base.baseImage,base.width,base.height,base.viewBox,base.maskPath,!!base.useColourDistribution,color.swatchUrl,color.hex,group]);
+    if(!sidingTables.has(key))sidingTables.set(key,(async()=>{
+      const [source,sample]=await Promise.all([sidingSample(base.baseImage,base),sidingSample(color.swatchUrl)]);
+      const hex=/^#[0-9a-f]{6}$/i.test(color.hex||'')?[1,3,5].map(i=>parseInt(color.hex.slice(i,i+2),16)/255):null;
+      const mean=sample?.mean||hex;if(!source||!mean)return null;
+      // Quantiles keep the two-tone colour distribution, not its photographed
+      // grain: every shade is mapped onto the very same source sample pixels.
+      const stops=sample&&(group==='two-tone'||base.useColourDistribution)?sample.stops:null;
+      const clamp=value=>Math.max(0,Math.min(1,value));
+      return Object.fromEntries(['r','g','b'].map((channel,c)=>[channel,Array.from({length:129},(_,index)=>{
+        const light=index/128;let value;
+        if(stops){
+          const position=clamp((light-source.low)/Math.max(.025,source.high-source.low))*4,low=Math.min(3,Math.floor(position)),fraction=position-low;
+          value=stops[low][c]*(1-fraction)+stops[low+1][c]*fraction;
+          if(light<source.low)value*=light/Math.max(.025,source.low);
+          else if(light>source.high)value*=light/Math.max(.025,source.high);
+        }else value=mean[c]*light/Math.max(.025,source.mid);
+        return Number(clamp(value).toFixed(5));
+      })]));
+    })());
+    return sidingTables.get(key);
+  }
   function smoothSVG(m,c,hex) {
     if(!(m.applications||[]).includes('siding'))return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 680" role="img" aria-label="${esc(m.name+' · '+c.name+' · référence de couleur')}"><rect width="800" height="680" fill="#fff"/><rect x="184" y="144" width="432" height="372" rx="3" fill="${esc(hex)}" stroke="#26352b" stroke-opacity=".18"/><text x="400" y="590" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#354735">${esc(c.name)}</text><text x="400" y="622" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#697567">Référence de couleur · aperçu à l’écran</text><text x="400" y="648" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#697567">Photo du produit accessible séparément</text></svg>`;
     const panel = m.renderPattern === 'panel' || /panel|panneau/.test(norm(m.name));
@@ -274,5 +334,5 @@
     element.style.backgroundColor=hex;element.replaceChildren();element.dataset.displayColor=hex;
   }
   function cancel(element){if(element)element._materialPreviewRequest=Symbol('cancelled-preview');}
-  root.MIRMaterialPreview={recipe,render,svg,stableSidingSVG,paintChip,displayColor,colorLut,smooth,colorReference,cancel,photoType,photoLabel,photoImage,photoUnavailable};
+  root.MIRMaterialPreview={recipe,render,svg,stableSidingSVG,paintChip,displayColor,colorLut,sidingColorLut,smooth,colorReference,cancel,photoType,photoLabel,photoImage,photoUnavailable};
 })(typeof window!=='undefined'?window:globalThis);

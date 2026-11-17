@@ -1,0 +1,99 @@
+{
+  "createdAt": "2026-11-17T14:40:04.614Z",
+  "method": "new stylesheet injected onto frozen HEAD; not final integrated captures",
+  "results": [
+    {
+      "width": 1440,
+      "frames": [
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        }
+      ],
+      "horizontalOverflow": false,
+      "passed": true
+    },
+    {
+      "width": 834,
+      "frames": [
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        }
+      ],
+      "horizontalOverflow": false,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "frames": [
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        },
+        {
+          "width": 48,
+          "height": 48
+        }
+      ],
+      "horizontalOverflow": false,
+      "passed": true
+    }
+  ]
+}

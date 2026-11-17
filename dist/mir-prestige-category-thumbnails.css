@@ -1,0 +1,102 @@
+/* Client catalogue only: a common thumbnail canvas for the six category links. */
+body.mir-prestige[data-commerce-view="shop"] #category-cards .category-card {
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+body.mir-prestige[data-commerce-view="shop"] #category-cards .category-photo {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e1ddd4;
+  border-radius: 1px;
+  isolation: isolate;
+}
+
+body.mir-prestige[data-commerce-view="shop"] #category-cards .category-photo > :is(img, svg, .mir-photo-trim) {
+  grid-area: 1 / 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+body.mir-prestige[data-commerce-view="shop"] #category-cards .category-photo img {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 0;
+  object-fit: cover;
+  object-position: center;
+  filter: none;
+  mix-blend-mode: normal;
+  transform: none;
+}
+
+/* The existing SVG samples include studio margins. Crop their material area
+   uniformly in this tiny navigation preview; the product visuals stay intact. */
+body.mir-prestige[data-commerce-view="shop"] #category-cards [data-category="fibre"] .category-photo > svg {
+  transform: scale(2.2);
+  transform-origin: center;
+}
+
+body.mir-prestige[data-commerce-view="shop"] #category-cards [data-category="wood"] .category-photo > svg {
+  transform: scale(1.5);
+  transform-origin: center;
+}
+
+/* Preserve the full profile or accessory instead of cropping its geometry. */
+body.mir-prestige[data-commerce-view="shop"] #category-cards .category-photo img[data-presentation="profile"],
+body.mir-prestige[data-commerce-view="shop"] #category-cards .category-photo[data-presentation="packshot"] img {
+  object-fit: contain;
+  padding: 3px;
+}
+
+body.mir-prestige[data-commerce-view="shop"] #category-cards .category-photo :is(.mir-photo-trim, .mir-photo-trim-viewport) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Honour the catalogue's verified empty-margin crop without stretching objects. */
+@supports (width: 1cqh) {
+  body.mir-prestige[data-commerce-view="shop"] #category-cards .category-photo .mir-photo-trim {
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    place-items: center;
+    container-type: size;
+    box-sizing: border-box;
+    padding: 3px;
+  }
+
+  body.mir-prestige[data-commerce-view="shop"] #category-cards .category-photo .mir-photo-trim-viewport {
+    position: relative;
+    overflow: hidden;
+    width: min(100cqw, calc(100cqh * var(--mir-trim-ratio)));
+    height: auto;
+    aspect-ratio: var(--mir-trim-ratio);
+  }
+
+  body.mir-prestige[data-commerce-view="shop"] #category-cards .category-photo .mir-photo-trim-viewport > img {
+    position: absolute;
+    inset: var(--mir-source-top) auto auto var(--mir-source-left);
+    width: var(--mir-source-width);
+    height: var(--mir-source-height);
+    max-width: none;
+    max-height: none;
+    padding: 0;
+  }
+}

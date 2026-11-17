@@ -1,0 +1,211 @@
+{
+  "stage": "final-verification",
+  "generatedAt": "2026-11-17T14:57:43.698Z",
+  "scope": "Local Chromium; no physical device or Safari certification",
+  "checks": [
+    {
+      "name": "1440 viewport evidence",
+      "pass": true
+    },
+    {
+      "name": "1440 legacy incompatible cart",
+      "pass": true
+    },
+    {
+      "name": "1440 javascript errors",
+      "pass": true
+    },
+    {
+      "name": "834 viewport evidence",
+      "pass": true
+    },
+    {
+      "name": "834 legacy incompatible cart",
+      "pass": true
+    },
+    {
+      "name": "834 javascript errors",
+      "pass": true
+    },
+    {
+      "name": "390 viewport evidence",
+      "pass": true
+    },
+    {
+      "name": "390 legacy incompatible cart",
+      "pass": true
+    },
+    {
+      "name": "390 javascript errors",
+      "pass": true
+    }
+  ],
+  "requests": 1782,
+  "blocked": [
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    }
+  ],
+  "sourceHashes": {
+    "commerce.js": "9007be5255ea1c3a332ae28ac0617a09021ccbb0eab691467475169ab79190e8",
+    "material-preview.js": "7121a11755fc6486ae203ed497e2f79c583f73edd910c527acd7dce707a55443",
+    "mir-client-colour-palettes.json": "ca08c9c93cdb6a603aae31d46ece55f1ab59a6023353adfae63225ea98e2c045",
+    "mir-client-siding-previews.js": "93f3a6c923852674444f32206365bd6f7b40e370b60d097033360adc33c2127f",
+    "mir-prestige.css": "5c66611b9a6276bff020825eecbde1a7cd3d6d2ad82268199da6ed8fd2a0680d",
+    "mir-prestige-colours.css": "010a5ebadcadabe0cafa0b9dc864bf8ec911ce58261e709431483545bdf6b62d",
+    "mir-prestige-category-thumbnails.css": "7dac4591dd3884c8789ec81be7d2c83b8a195d4940c5c1d5cade33575a195e92",
+    "mir-client-i18n.js": "ca4c069e393b949a0f9bce60dbab5aa2de161e527cad046816dcaedec2c122d3",
+    "mir-client-en-ca.js": "3d6914f58d1954224484d76afa7f46274dbdcbf47ea53a658ce39286c4f5440d",
+    "mir-estimate.js": "3710f601c059f4e0e6c7a83616209729c775b222d7f9c334ced63e6d39052e32"
+  },
+  "loads": [
+    {
+      "url": "produit.html?id=canexel-ridgewood-d5",
+      "width": 1440,
+      "elapsedMs": 2563
+    },
+    {
+      "url": "produit.html?id=hardieplank-select-625",
+      "width": 1440,
+      "elapsedMs": 2426
+    },
+    {
+      "url": "produit.html?id=st-laurent-lap-625",
+      "width": 1440,
+      "elapsedMs": 1848
+    },
+    {
+      "url": "boutique.html?brand=James%20Hardie",
+      "width": 1440,
+      "elapsedMs": 2042
+    },
+    {
+      "url": "selection.html",
+      "width": 1440,
+      "elapsedMs": 1775
+    },
+    {
+      "url": "produit.html?id=canexel-ridgewood-d5",
+      "width": 834,
+      "elapsedMs": 2110
+    },
+    {
+      "url": "produit.html?id=hardieplank-select-625",
+      "width": 834,
+      "elapsedMs": 1861
+    },
+    {
+      "url": "produit.html?id=st-laurent-lap-625",
+      "width": 834,
+      "elapsedMs": 1869
+    },
+    {
+      "url": "boutique.html?brand=James%20Hardie",
+      "width": 834,
+      "elapsedMs": 2228
+    },
+    {
+      "url": "selection.html",
+      "width": 834,
+      "elapsedMs": 2230
+    },
+    {
+      "url": "produit.html?id=canexel-ridgewood-d5",
+      "width": 390,
+      "elapsedMs": 2647
+    },
+    {
+      "url": "produit.html?id=hardieplank-select-625",
+      "width": 390,
+      "elapsedMs": 1704
+    },
+    {
+      "url": "produit.html?id=st-laurent-lap-625",
+      "width": 390,
+      "elapsedMs": 2507
+    },
+    {
+      "url": "boutique.html?brand=James%20Hardie",
+      "width": 390,
+      "elapsedMs": 2654
+    },
+    {
+      "url": "selection.html",
+      "width": 390,
+      "elapsedMs": 2048
+    }
+  ],
+  "sourceHashesAfter": {
+    "commerce.js": "9007be5255ea1c3a332ae28ac0617a09021ccbb0eab691467475169ab79190e8",
+    "material-preview.js": "7121a11755fc6486ae203ed497e2f79c583f73edd910c527acd7dce707a55443",
+    "mir-client-colour-palettes.json": "ca08c9c93cdb6a603aae31d46ece55f1ab59a6023353adfae63225ea98e2c045",
+    "mir-client-siding-previews.js": "93f3a6c923852674444f32206365bd6f7b40e370b60d097033360adc33c2127f",
+    "mir-prestige.css": "5c66611b9a6276bff020825eecbde1a7cd3d6d2ad82268199da6ed8fd2a0680d",
+    "mir-prestige-colours.css": "010a5ebadcadabe0cafa0b9dc864bf8ec911ce58261e709431483545bdf6b62d",
+    "mir-prestige-category-thumbnails.css": "7dac4591dd3884c8789ec81be7d2c83b8a195d4940c5c1d5cade33575a195e92",
+    "mir-client-i18n.js": "ca4c069e393b949a0f9bce60dbab5aa2de161e527cad046816dcaedec2c122d3",
+    "mir-client-en-ca.js": "3d6914f58d1954224484d76afa7f46274dbdcbf47ea53a658ce39286c4f5440d",
+    "mir-estimate.js": "3710f601c059f4e0e6c7a83616209729c775b222d7f9c334ced63e6d39052e32"
+  },
+  "sourcesStable": true,
+  "nonReadLocalRequests": [],
+  "passed": 9,
+  "failed": 0
+}

@@ -1,0 +1,159 @@
+{
+  "createdAt": "2026-11-17T15:03:10.760Z",
+  "network": "Local GET only; external operations blocked",
+  "results": [
+    {
+      "scene": "ridgewood",
+      "width": 1440,
+      "selected": "Noir",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "ridgewood-sierra",
+      "width": 1440,
+      "selected": "Sierra",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "st-laurent",
+      "width": 1440,
+      "selected": "Ipé",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "pot-canexel",
+      "width": 1440,
+      "selected": "Sierra",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "kit-hardie",
+      "width": 1440,
+      "selected": "Étain vieilli (Aged Pewter)",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "ridgewood",
+      "width": 834,
+      "selected": "Noir",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "ridgewood-sierra",
+      "width": 834,
+      "selected": "Sierra",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "st-laurent",
+      "width": 834,
+      "selected": "Ipé",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "pot-canexel",
+      "width": 834,
+      "selected": "Sierra",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "kit-hardie",
+      "width": 834,
+      "selected": "Étain vieilli (Aged Pewter)",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "ridgewood",
+      "width": 390,
+      "selected": "Noir",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "ridgewood-sierra",
+      "width": 390,
+      "selected": "Sierra",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "st-laurent",
+      "width": 390,
+      "selected": "Ipé",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "pot-canexel",
+      "width": 390,
+      "selected": "Sierra",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "kit-hardie",
+      "width": 390,
+      "selected": "Étain vieilli (Aged Pewter)",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "brands",
+      "width": 1440,
+      "selected": null,
+      "categoryVinylSource": "http://127.0.0.1:35769/assets/products/gentek-vinyl-9.jpg",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "shop-colours",
+      "width": 1440,
+      "selected": null,
+      "categoryVinylSource": "http://127.0.0.1:35769/assets/products/gentek-vinyl-9.jpg",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "brands",
+      "width": 834,
+      "selected": null,
+      "categoryVinylSource": "http://127.0.0.1:35769/assets/products/gentek-vinyl-9.jpg",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "shop-colours",
+      "width": 834,
+      "selected": null,
+      "categoryVinylSource": "http://127.0.0.1:35769/assets/products/gentek-vinyl-9.jpg",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "brands",
+      "width": 390,
+      "selected": null,
+      "categoryVinylSource": "http://127.0.0.1:35769/assets/products/gentek-vinyl-9.jpg",
+      "errors": [],
+      "passed": true
+    },
+    {
+      "scene": "shop-colours",
+      "width": 390,
+      "selected": null,
+      "categoryVinylSource": "http://127.0.0.1:35769/assets/products/gentek-vinyl-9.jpg",
+      "errors": [],
+      "passed": true
+    }
+  ]
+}

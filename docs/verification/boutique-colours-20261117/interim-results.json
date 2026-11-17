@@ -1,0 +1,43 @@
+{
+  "createdAt": "2026-11-17T14:45:09.179Z",
+  "results": [
+    {
+      "name": "brands",
+      "url": "boutique.html?view=brands",
+      "errors": [],
+      "bodyWidth": 1440,
+      "palette": [],
+      "actionTop": []
+    },
+    {
+      "name": "ridgewood",
+      "url": "produit.html?id=canexel-ridgewood-d5",
+      "errors": [],
+      "bodyWidth": 1440,
+      "palette": [
+        {
+          "height": 339.125,
+          "options": 16
+        }
+      ],
+      "actionTop": [
+        1028.75
+      ]
+    },
+    {
+      "name": "st-laurent",
+      "url": "produit.html?id=st-laurent-lap-625",
+      "errors": [],
+      "bodyWidth": 1440,
+      "palette": [
+        {
+          "height": 357.5,
+          "options": 24
+        }
+      ],
+      "actionTop": [
+        1077.078125
+      ]
+    }
+  ]
+}

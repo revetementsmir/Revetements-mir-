@@ -1,0 +1,682 @@
+{
+  "auditedOn": "2026-11-17",
+  "scope": "Read-only audit of five St-Laurent local reference products; no runtime catalogue, prices, availability or business data edited.",
+  "catalogue": "dist/catalogue-fd6866b49d21.json",
+  "catalogueSha256": "a08b9bf28abba1f286d0854690ae4979eaaa723a3fe04eb86a75dffc82efdc63",
+  "counts": {
+    "products": 5,
+    "paletteEntriesPerProduct": 24,
+    "uniqueColorIds": 24,
+    "localSwatchesPresent": 24,
+    "currentManufacturerPaletteNames": 24
+  },
+  "products": [
+    {
+      "id": "st-laurent-lap-625",
+      "name": "St-Laurent — Bardage à clin 6,25 po",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/bardage-a-clin/",
+      "localColorCount": 24,
+      "sameColorIdsAsFirstProduct": true,
+      "dimensions": {
+        "widthIn": 6.25,
+        "lengthIn": 144,
+        "thicknessIn": 0.3125
+      },
+      "coverage": {
+        "usefulWidthIn": 5,
+        "perPackSqFt": 20,
+        "piecesPerPack": 4,
+        "sourceUrl": "https://www.fabstlaurent.com/produit/bardage-a-clin/"
+      },
+      "dimensionsAgreeWithCurrentProductPage": true,
+      "paletteEvidence": "product_page_links_common_fibre_cement_palette",
+      "paletteScopeRecommendation": "manufacturer_collection_not_verified_individual_finish_combination"
+    },
+    {
+      "id": "st-laurent-lap-825",
+      "name": "St-Laurent — Bardage à clin 8,25 po",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/bardage-a-clin/",
+      "localColorCount": 24,
+      "sameColorIdsAsFirstProduct": true,
+      "dimensions": {
+        "widthIn": 8.25,
+        "lengthIn": 144,
+        "thicknessIn": 0.3125
+      },
+      "coverage": {
+        "usefulWidthIn": 7,
+        "perPackSqFt": 28,
+        "piecesPerPack": 4,
+        "sourceUrl": "https://www.fabstlaurent.com/produit/bardage-a-clin/"
+      },
+      "dimensionsAgreeWithCurrentProductPage": true,
+      "paletteEvidence": "product_page_links_common_fibre_cement_palette",
+      "paletteScopeRecommendation": "manufacturer_collection_not_verified_individual_finish_combination"
+    },
+    {
+      "id": "st-laurent-v-groove-825",
+      "name": "St-Laurent — V-Groove Architectural",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/v-groove-architectural/",
+      "localColorCount": 24,
+      "sameColorIdsAsFirstProduct": true,
+      "dimensions": {
+        "widthIn": 8.25,
+        "lengthIn": 144,
+        "thicknessIn": 0.625
+      },
+      "coverage": {
+        "usefulWidthIn": 7,
+        "piecesPerPack": 2,
+        "perPackSqFt": 14,
+        "sourceUrl": "https://www.fabstlaurent.com/produit/v-groove-architectural/"
+      },
+      "dimensionsAgreeWithCurrentProductPage": true,
+      "paletteEvidence": "product_page_links_common_fibre_cement_palette",
+      "paletteScopeRecommendation": "manufacturer_collection_not_verified_individual_finish_combination"
+    },
+    {
+      "id": "st-laurent-trim-35",
+      "name": "St-Laurent — Moulure 3½ po",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/moulures/",
+      "localColorCount": 24,
+      "sameColorIdsAsFirstProduct": true,
+      "dimensions": {
+        "widthIn": 3.5,
+        "lengthIn": 144,
+        "thicknessIn": 1
+      },
+      "coverage": null,
+      "dimensionsAgreeWithCurrentProductPage": true,
+      "paletteEvidence": "product_page_links_common_fibre_cement_palette",
+      "paletteScopeRecommendation": "manufacturer_collection_not_verified_individual_finish_combination"
+    },
+    {
+      "id": "st-laurent-board-batten-12",
+      "name": "St-Laurent Board & Batten — planche 12 po",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/board-batten/",
+      "localColorCount": 24,
+      "sameColorIdsAsFirstProduct": true,
+      "dimensions": {
+        "statedWidthIn": 12,
+        "thicknessIn": 0.3125,
+        "battenWidthIn": 2.5,
+        "battenThicknessIn": 0.75,
+        "battenLengthIn": 144
+      },
+      "coverage": {
+        "usefulWidthIn": 12,
+        "perPackSqFt": 36,
+        "piecesPerPack": 3,
+        "sourceUrl": "https://www.fabstlaurent.com/produit/board-batten/"
+      },
+      "dimensionsAgreeWithCurrentProductPage": true,
+      "paletteEvidence": "product_page_links_common_fibre_cement_palette",
+      "paletteScopeRecommendation": "manufacturer_collection_not_verified_individual_finish_combination"
+    }
+  ],
+  "colors": [
+    {
+      "id": "st-laurent-lin",
+      "nameFr": "Lin",
+      "nameEnOfficial": "Linen",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-lin-96feffcb.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        1528,
+        1029
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "4c761adbc107589765d3d6e49ae3ac65bd5738f3932a11fd1ce299dbaf25ca05",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/10/Fiber-Cement_Linen.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-blanc",
+      "nameFr": "Blanc",
+      "nameEnOfficial": "White",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-blanc-9f5fd19e.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1725
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "14d9119787d2bac7d17e90b8f3b5cc2e14ac69ea3c725ed75e8907e3555574fd",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_BlancNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-argent",
+      "nameFr": "Argent",
+      "nameEnOfficial": "Silver",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-argent-c73797c0.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1662
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "a7613ecb04f6b04a3d7e411c6824e4d480e32716438c1d7a9f8798bf659887fe",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_ArgentNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-aspen",
+      "nameFr": "Aspen",
+      "nameEnOfficial": "Aspen",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-aspen-08609c2c.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1727
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "98421bd627f7a44920e913e199da6898512ee2c2b9c7a9a5c5fa45b830e2d2bd",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_AspenNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-bouleau",
+      "nameFr": "Bouleau",
+      "nameEnOfficial": "Birch",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-bouleau-2cb8c8a4.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1646
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "29953c3932ab2c3814d12a2f00e007330b21b6afc12e5b3489f1ce7d9efd189d",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_Bouleaux_NEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-eucalyptus",
+      "nameFr": "Eucalyptus",
+      "nameEnOfficial": "Eucalyptus",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-eucalyptus-98e5bf93.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1655
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "bfb7bc70f25f5f41a12361cc7a348cd66a47d4edcc438a61b3bd80acabe960f3",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/09/Fibrociment_Eucalyptus_v1-1.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-gris-cendre",
+      "nameFr": "Gris cendre",
+      "nameEnOfficial": "Cinder Grey",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-gris-cendre-4d875855.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1682
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "dd343005e3d0e888200584d32d40d27487d54937047ad768db0cb2d84b25dccb",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_GrisCendreNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-saule-argente",
+      "nameFr": "Saule argenté",
+      "nameEnOfficial": "Willow",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-saule-argente-d12be8f2.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1685
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "20e3c975e518a86eef7ad348f0a20332959b93b841422c2ffe81bfeae3a51f1a",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_SauleArgenteNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-frene",
+      "nameFr": "Frêne",
+      "nameEnOfficial": "Ash",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-frene-1315408a.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1670
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "2781696cb9481d9cef02eade731fc58dece3236f0943c9c1142830de03672e0a",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_FreneNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-bois-de-greve",
+      "nameFr": "Bois de grève",
+      "nameEnOfficial": "Driftwood",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-bois-de-greve-433c5e68.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1641
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "b707e40e9e1e09bff399209dc80a6e4e71ea475d763daa357188e7dd5044dc29",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_BoisdeGreveNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-bois-d-erable",
+      "nameFr": "Bois d’érable",
+      "nameEnOfficial": "Maple Wood",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-bois-d-erable-6c1615c7.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1604
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "6726bd51686c49090e4f3f8a7baabab05b10a66120703e5e70b546c3f800ffba",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_Boisd_ErableNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-miel-naturel",
+      "nameFr": "Miel naturel",
+      "nameEnOfficial": "Natural Honey",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-miel-naturel-b6212416.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1615
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "333fda57c992c5720afb280b44a9b265a784b24c745ec196c4d61e8812b5a256",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_MielNaturelNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-ipe",
+      "nameFr": "Ipé",
+      "nameEnOfficial": "Ipe",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-ipe-eaf7416d.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1570
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "089e1c3f8ff6e6aee5f2576ed95742c5aedfa8fca83e2de44defd7c2a377cc3e",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_IpeeNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-bois-de-chene",
+      "nameFr": "Bois de chêne",
+      "nameEnOfficial": "Oak",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-bois-de-chene-d65256ff.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1637
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "36a0e9c9afcc981ae9ecc1d219fd5062db9bc4669f3ee2ca8d3a55497997d952",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_BoisdeCheneNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-peuplier",
+      "nameFr": "Peuplier",
+      "nameEnOfficial": "Poplar",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-peuplier-5419710e.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1566
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "879a63c0750c28d44538705b056d3cda6ecb4f76baeb2593fea3f1807017c02f",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_PeuplierNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-noisetier",
+      "nameFr": "Noisetier",
+      "nameEnOfficial": "Hazel",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-noisetier-75d84231.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1625
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "7ed8040a431951d084670e716b151d710a8efffd1cc27a95da0951e73bc7e630",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_NoisetieNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-pruche-vieillie",
+      "nameFr": "Pruche vieillie",
+      "nameEnOfficial": "Aged Hemlock",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-pruche-vieillie-c84dac05.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1644
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "d820706d0b2512383b40ebc9ad20b2d4dac831ff5681267b4d65e89b7fac0bf6",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_PrucheVieillieNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-ecorce",
+      "nameFr": "Écorce",
+      "nameEnOfficial": "Bark",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-ecorce-52270f0a.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1690
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "58bf0087cdbb375507bf196fa8f59e0c89c67804f6ea1368687a0c0e1bb3e8e5",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_EcorceNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-torrefie",
+      "nameFr": "Torréfié",
+      "nameEnOfficial": "Torrefied",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-torrefie-a4f427ae.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1660
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "3e677da85e74e6cb4fd00d55070cbd6e1077060304033a146d15d3fbcd105270",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_TorrefieNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-espresso",
+      "nameFr": "Espresso",
+      "nameEnOfficial": "Espresso",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-espresso-46cec358.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1655
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "023e8afd732081448a572eb3c9ac8d6112aeb28cb052eafddd99d1bc216d4164",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_EspressoNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-kingwood",
+      "nameFr": "Kingwood",
+      "nameEnOfficial": "Kingwood",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-kingwood-3bb512a8.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1655
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "6fa08cda3ca909694ff57480fe143b2f257f3c6b91cee001e67ff5a3a6f2f5df",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_KingwoodNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-charbon-de-bois",
+      "nameFr": "Charbon de bois",
+      "nameEnOfficial": "Charcoal",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-charbon-de-bois-61df8a08.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1576
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "8706e0115560209a86ff7bbed358e0c30a81fd949d1a0f73d9110772b45b80db",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_CharbondeBoisNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-ebene",
+      "nameFr": "Ébène",
+      "nameEnOfficial": "Ebony",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-ebene-e89ea570.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1590
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "656cd7fa344ad1b0e42e71a81732ef5972fa8b2e9512bd1b6354798079f93325",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_EbeneNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    },
+    {
+      "id": "st-laurent-noir",
+      "nameFr": "Noir",
+      "nameEnOfficial": "Black",
+      "localAsset": "./assets/catalogue-swatches/st-laurent-noir-7859d6b3.jpeg",
+      "localAssetExists": true,
+      "localAssetDimensions": [
+        2560,
+        1655
+      ],
+      "localAssetFormat": "JPEG",
+      "sha256": "022897b2c759faf3c3cadd63f21d39c7763f09bc62621c754e86817dfa2b2504",
+      "officialAssetInSourceCatalogue": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Face_NoirNEW2026-scaled.jpg",
+      "officialPaletteFr": "https://www.fabstlaurent.com/revetements-exterieurs/fibrociment/couleurs/",
+      "officialPaletteEn": "https://www.fabstlaurent.com/en/exterior-coverings/fiber-cement/colors/",
+      "namePresenceVerifiedOnCurrentPalette": true,
+      "finishGroup": null,
+      "finishGroupStatus": "not_published_by_current_palette",
+      "productFinishCompatibilityStatus": "not_established_per_colour_by_current_palette",
+      "assetOriginStatus": "existing_catalogue_localized_original_not_redownloaded"
+    }
+  ],
+  "findings": [
+    {
+      "id": "lap_widths",
+      "status": "verified",
+      "summary": "Current St-Laurent lap page specifies physical widths 6.25 and 8.25 inches, exposures 5 and 7 inches. Keep existing product IDs and geometry.",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/bardage-a-clin/"
+    },
+    {
+      "id": "other_lap_widths",
+      "status": "not_current_st_laurent_offer_evidence",
+      "summary": "5.25 and 7.25 inch widths occur in the general James Hardie coverage table, not the current St-Laurent lap range. Linked guide is internally dated September 2019 despite /2026/04 path.",
+      "sourceUrl": "https://www.fabstlaurent.com/wp-content/uploads/2026/04/Fibrociment_Guide-Installation_New.pdf",
+      "sourcePage": 4
+    },
+    {
+      "id": "vgroove_finish",
+      "status": "verified",
+      "summary": "Current V-Groove page explicitly describes a smooth profile, 8.25 inch total width, 7 inch exposure, horizontal or vertical installation, shown in Bouleau.",
+      "sourceUrl": "https://www.fabstlaurent.com/produit/v-groove-architectural/"
+    },
+    {
+      "id": "trim_formats",
+      "status": "verified_in_current_fr_and_en_product_pages",
+      "opaqueWidthsIn": [
+        3.5,
+        4.5,
+        5.5,
+        7.25,
+        9.25,
+        11.25
+      ],
+      "twoToneWidthsIn": [
+        3.5,
+        4.5
+      ],
+      "thicknessIn": 1,
+      "lengthIn": 144,
+      "sourceUrl": "https://www.fabstlaurent.com/produit/moulures/"
+    },
+    {
+      "id": "finish_matrix",
+      "status": "unresolved",
+      "summary": "Current common palette has no opaque/two-tone or smooth/textured classification per colour. Product pages linking the common palette do not substantiate every one of the 120 product-colour combinations."
+    },
+    {
+      "id": "panel_scope",
+      "status": "unresolved",
+      "summary": "Board & Batten page documents 12 inch boards and battens. A general HardiePanel guide on the domain does not establish current St-Laurent colour/finish/size combinations for all 4x8/4x9/4x10 panels."
+    }
+  ],
+  "recommendations": [
+    "Reuse all 24 existing manufacturer swatch assets as collection palette samples; do not calculate hex values or recolour product images from those samples.",
+    "Keep catalogue IDs and 6.25/8.25 geometries unchanged; do not substitute 5.25/7.25 references.",
+    "Do not label all 120 combinations verified until a manufacturer matrix supports exact product, finish and colour.",
+    "Keep finishGroup null where unsupported; never infer opaque/two-tone from name, image hue, or another substrate.",
+    "For future trim widths above4.5in do not offer two-tone variants based on generic palette.",
+    "Maintain stable French colour IDs and source values; official English labels may be a display mapping only.",
+    "Treat official source images as manufacturer collection swatches, not proof of product texture compatibility."
+  ]
+}

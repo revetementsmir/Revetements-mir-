@@ -15,7 +15,9 @@ node scripts/build-prestige-preview.cjs
 
 Le premier script ne publie rien. Le deuxième prépare l’aperçu local isolé existant; son hébergement relève du responsable de livraison.
 
-Le manifeste de galerie reprend les 91 captures de `captures-final-manifest.json`, remplace les quatre vues de configurateur de profil par six captures finales FR/EN, et ajoute six captures du Studio public « en construction », six du configurateur de panneau et six de la démonstration Studio historique (PC, tablette et téléphone, français et anglais), ainsi que la confirmation simulée. Total attendu : 112 captures, dont 48 PC, 32 tablette et 32 téléphone.
+Le manifeste de galerie reprend les 91 captures de `captures-final-manifest.json`, remplace les quatre vues de configurateur de profil par six captures finales FR/EN, et ajoute six captures du Studio public « en construction », six du configurateur de panneau et six de la démonstration Studio historique (PC, tablette et téléphone, français et anglais), ainsi que la confirmation simulée. Le lot couleurs ajoute les fiches produit anglaises sur tablette et téléphone. Total attendu : 114 captures, dont 48 PC, 33 tablette et 33 téléphone.
+
+Le lot `boutique-colours-20261117` renouvelle seize captures Boutique / Catégorie / Recherche / Fiche produit après les corrections de miniatures, nuanciers et cadrage des noms. La galerie ciblée `dist/boutique-colours-galerie.html` complète ces preuves avec les changements de couleur et les retouches; ses images intermédiaires ne sont pas intégrées à la galerie finale.
 
 Après une nouvelle capture, conserver son nom ou mettre à jour son entrée dans `captures-gallery-manifest.json`. Une entrée décrit `file` (relatif au dossier de vérification), `title`, `page`, `viewport`, `language`, `state` et `simulated`. Ne jamais classer un avant, un rendu intermédiaire ou une simulation comme résultat final réel. Les captures compte/suivi et confirmation portent explicitement la mention de simulation; les formulaires d’inscription n’ont pas été soumis.
 

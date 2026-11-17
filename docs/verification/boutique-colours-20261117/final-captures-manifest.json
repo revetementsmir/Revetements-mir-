@@ -1,0 +1,215 @@
+{
+  "createdAt": "2026-11-17T15:03:10.760Z",
+  "captures": [
+    {
+      "file": "after-brands-1440.png",
+      "page": "boutique.html?view=brands",
+      "title": "Fabricants et échantillon Kaycan",
+      "width": 1440,
+      "viewport": "PC",
+      "language": "FR-CA",
+      "before": "before-brands-1440.png",
+      "selected": null
+    },
+    {
+      "file": "after-shop-colours-1440.png",
+      "page": "boutique.html?view=all",
+      "title": "Boutique — toutes les nuances",
+      "width": 1440,
+      "viewport": "PC",
+      "language": "FR-CA",
+      "before": "before-colours-card-1440.png",
+      "selected": null
+    },
+    {
+      "file": "after-ridgewood-1440.png",
+      "page": "produit.html?id=canexel-ridgewood-d5",
+      "title": "Ridgewood — nuancier complet",
+      "width": 1440,
+      "viewport": "PC",
+      "language": "FR-CA",
+      "before": "before-product-1440.png",
+      "selected": "Noir"
+    },
+    {
+      "file": "after-ridgewood-sierra-1440.png",
+      "page": "produit.html?id=canexel-ridgewood-d5&color=canexel-sierra&recette=1",
+      "title": "Ridgewood — couleur Sierra sélectionnée",
+      "width": 1440,
+      "viewport": "PC",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Sierra"
+    },
+    {
+      "file": "after-st-laurent-1440.png",
+      "page": "produit.html?id=st-laurent-lap-625&color=st-laurent-ipe&recette=1",
+      "title": "St-Laurent — couleur Ipé sélectionnée",
+      "width": 1440,
+      "viewport": "PC",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Ipé"
+    },
+    {
+      "file": "after-pot-canexel-1440.png",
+      "page": "produit.html?id=canexel-touch-up-284ml&color=canexel-sierra&recette=1",
+      "title": "Pot CanExel — couleur Sierra sélectionnée",
+      "width": 1440,
+      "viewport": "PC",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Sierra"
+    },
+    {
+      "file": "after-kit-hardie-1440.png",
+      "page": "produit.html?id=hardie-colorplus-touch-up-kit",
+      "title": "Kit de retouche Hardie — nuancier",
+      "width": 1440,
+      "viewport": "PC",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Étain vieilli (Aged Pewter)"
+    },
+    {
+      "file": "after-brands-834.png",
+      "page": "boutique.html?view=brands",
+      "title": "Fabricants et échantillon Kaycan",
+      "width": 834,
+      "viewport": "Tablette",
+      "language": "FR-CA",
+      "before": "before-brands-834.png",
+      "selected": null
+    },
+    {
+      "file": "after-shop-colours-834.png",
+      "page": "boutique.html?view=all",
+      "title": "Boutique — toutes les nuances",
+      "width": 834,
+      "viewport": "Tablette",
+      "language": "FR-CA",
+      "before": "before-colours-card-834.png",
+      "selected": null
+    },
+    {
+      "file": "after-ridgewood-834.png",
+      "page": "produit.html?id=canexel-ridgewood-d5",
+      "title": "Ridgewood — nuancier complet",
+      "width": 834,
+      "viewport": "Tablette",
+      "language": "FR-CA",
+      "before": "before-product-834.png",
+      "selected": "Noir"
+    },
+    {
+      "file": "after-ridgewood-sierra-834.png",
+      "page": "produit.html?id=canexel-ridgewood-d5&color=canexel-sierra&recette=1",
+      "title": "Ridgewood — couleur Sierra sélectionnée",
+      "width": 834,
+      "viewport": "Tablette",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Sierra"
+    },
+    {
+      "file": "after-st-laurent-834.png",
+      "page": "produit.html?id=st-laurent-lap-625&color=st-laurent-ipe&recette=1",
+      "title": "St-Laurent — couleur Ipé sélectionnée",
+      "width": 834,
+      "viewport": "Tablette",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Ipé"
+    },
+    {
+      "file": "after-pot-canexel-834.png",
+      "page": "produit.html?id=canexel-touch-up-284ml&color=canexel-sierra&recette=1",
+      "title": "Pot CanExel — couleur Sierra sélectionnée",
+      "width": 834,
+      "viewport": "Tablette",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Sierra"
+    },
+    {
+      "file": "after-kit-hardie-834.png",
+      "page": "produit.html?id=hardie-colorplus-touch-up-kit",
+      "title": "Kit de retouche Hardie — nuancier",
+      "width": 834,
+      "viewport": "Tablette",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Étain vieilli (Aged Pewter)"
+    },
+    {
+      "file": "after-brands-390.png",
+      "page": "boutique.html?view=brands",
+      "title": "Fabricants et échantillon Kaycan",
+      "width": 390,
+      "viewport": "Téléphone",
+      "language": "FR-CA",
+      "before": "before-brands-390.png",
+      "selected": null
+    },
+    {
+      "file": "after-shop-colours-390.png",
+      "page": "boutique.html?view=all",
+      "title": "Boutique — toutes les nuances",
+      "width": 390,
+      "viewport": "Téléphone",
+      "language": "FR-CA",
+      "before": "before-colours-card-390.png",
+      "selected": null
+    },
+    {
+      "file": "after-ridgewood-390.png",
+      "page": "produit.html?id=canexel-ridgewood-d5",
+      "title": "Ridgewood — nuancier complet",
+      "width": 390,
+      "viewport": "Téléphone",
+      "language": "FR-CA",
+      "before": "before-product-390.png",
+      "selected": "Noir"
+    },
+    {
+      "file": "after-ridgewood-sierra-390.png",
+      "page": "produit.html?id=canexel-ridgewood-d5&color=canexel-sierra&recette=1",
+      "title": "Ridgewood — couleur Sierra sélectionnée",
+      "width": 390,
+      "viewport": "Téléphone",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Sierra"
+    },
+    {
+      "file": "after-st-laurent-390.png",
+      "page": "produit.html?id=st-laurent-lap-625&color=st-laurent-ipe&recette=1",
+      "title": "St-Laurent — couleur Ipé sélectionnée",
+      "width": 390,
+      "viewport": "Téléphone",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Ipé"
+    },
+    {
+      "file": "after-pot-canexel-390.png",
+      "page": "produit.html?id=canexel-touch-up-284ml&color=canexel-sierra&recette=1",
+      "title": "Pot CanExel — couleur Sierra sélectionnée",
+      "width": 390,
+      "viewport": "Téléphone",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Sierra"
+    },
+    {
+      "file": "after-kit-hardie-390.png",
+      "page": "produit.html?id=hardie-colorplus-touch-up-kit",
+      "title": "Kit de retouche Hardie — nuancier",
+      "width": 390,
+      "viewport": "Téléphone",
+      "language": "FR-CA",
+      "before": null,
+      "selected": "Étain vieilli (Aged Pewter)"
+    }
+  ]
+}

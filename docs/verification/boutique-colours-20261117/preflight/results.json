@@ -1,0 +1,938 @@
+{
+  "stage": "preflight",
+  "generatedAt": "2026-11-17T14:45:53.061Z",
+  "scope": "Local Chromium; no physical device or Safari certification",
+  "checks": [
+    {
+      "name": "1440 categories",
+      "pass": true,
+      "detail": [
+        {
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "w": 48,
+          "h": 48,
+          "fit": "contain",
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "name": "1440 cards CanExel",
+      "pass": true,
+      "detail": [
+        {
+          "id": "canexel-cedrvue-9",
+          "count": 16
+        },
+        {
+          "id": "canexel-board-batten",
+          "count": 7
+        },
+        {
+          "id": "canexel-vstyle",
+          "count": 16
+        },
+        {
+          "id": "canexel-ridgewood-d5",
+          "count": 16
+        },
+        {
+          "id": "canexel-touch-up-284ml",
+          "count": 20
+        }
+      ]
+    },
+    {
+      "name": "1440 cards James Hardie",
+      "pass": true,
+      "detail": [
+        {
+          "id": "hardieplank-smooth-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-smooth-825",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-825",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel-cedarmill",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-staggered",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-straight",
+          "count": 19
+        },
+        {
+          "id": "hardietrim-smooth-54-35",
+          "count": 5
+        },
+        {
+          "id": "hardie-colorplus-touch-up-kit",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "name": "1440 cards St-Laurent",
+      "pass": true,
+      "detail": [
+        {
+          "id": "st-laurent-lap-625",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-lap-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-v-groove-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-board-batten-12",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-trim-35",
+          "count": 24
+        }
+      ]
+    },
+    {
+      "name": "1440 card to product colour link",
+      "pass": true
+    },
+    {
+      "name": "1440 product hardieplank-select-825",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:39597/assets/products/hardieplank-cedarmill.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/hardieplank-cedarmill.png",
+            "http://127.0.0.1:39597/assets/products/hardieplank-cedarmill.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 74.53229615937565
+        },
+        "spread": {
+          "luminanceLevels": 54,
+          "p10": 31,
+          "p90": 58
+        }
+      }
+    },
+    {
+      "name": "1440 product hardiepanel",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:39597/assets/products/hardiepanel-smooth.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/hardiepanel-smooth.png",
+            "http://127.0.0.1:39597/assets/products/hardiepanel-smooth.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 76.11383925515165
+        },
+        "spread": {
+          "luminanceLevels": 5,
+          "p10": 49,
+          "p90": 50
+        }
+      }
+    },
+    {
+      "name": "1440 product canexel-ridgewood-d5",
+      "pass": true,
+      "detail": {
+        "colours": 16,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 188 1254 879",
+          "key": "[\"http://127.0.0.1:39597/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp\",1254,1254,[0,188,1254,879],\"M0 188H1254V1067H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp",
+            "http://127.0.0.1:39597/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp"
+          ],
+          "paths": [
+            "M0 188H1254V1067H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 205200,
+          "changedRatio": 0.7024029574861368,
+          "meanDelta": 50.761494488943654
+        },
+        "spread": {
+          "luminanceLevels": 86,
+          "p10": 98,
+          "p90": 141
+        }
+      }
+    },
+    {
+      "name": "1440 product hardieplank-select-625",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 1536 922",
+          "key": "[\"http://127.0.0.1:39597/assets/products/mir-siding-625/base-hardieplank.png\",1536,922,[0,0,1536,922],\"M0 108H1536V816H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/mir-siding-625/base-hardieplank.png",
+            "http://127.0.0.1:39597/assets/products/mir-siding-625/base-hardieplank.png"
+          ],
+          "paths": [
+            "M0 108H1536V816H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 134460,
+          "changedRatio": 0.4602587800369686,
+          "meanDelta": 34.7779831587595
+        },
+        "spread": {
+          "luminanceLevels": 137,
+          "p10": 42,
+          "p90": 55
+        }
+      }
+    },
+    {
+      "name": "1440 product hardieplank-smooth-625",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:39597/assets/products/hardieplank-smooth.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/hardieplank-smooth.png",
+            "http://127.0.0.1:39597/assets/products/hardieplank-smooth.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 73.17554254809338
+        },
+        "spread": {
+          "luminanceLevels": 35,
+          "p10": 27,
+          "p90": 51
+        }
+      }
+    },
+    {
+      "name": "1440 product hardieplank-smooth-825",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:39597/assets/products/hardieplank-smooth.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/hardieplank-smooth.png",
+            "http://127.0.0.1:39597/assets/products/hardieplank-smooth.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 73.17554254809338
+        },
+        "spread": {
+          "luminanceLevels": 35,
+          "p10": 27,
+          "p90": 51
+        }
+      }
+    },
+    {
+      "name": "1440 product hardiepanel-cedarmill",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:39597/assets/products/hardiepanel-cedarmill.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/hardiepanel-cedarmill.png",
+            "http://127.0.0.1:39597/assets/products/hardiepanel-cedarmill.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 75.85948517833916
+        },
+        "spread": {
+          "luminanceLevels": 53,
+          "p10": 35,
+          "p90": 58
+        }
+      }
+    },
+    {
+      "name": "1440 product hardieshingle-straight",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:39597/assets/products/hardieshingle-straight.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/hardieshingle-straight.png",
+            "http://127.0.0.1:39597/assets/products/hardieshingle-straight.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291181,
+          "changedRatio": 0.9967173273088246,
+          "meanDelta": 73.12983158759499
+        },
+        "spread": {
+          "luminanceLevels": 62,
+          "p10": 36,
+          "p90": 53
+        }
+      }
+    },
+    {
+      "name": "1440 product hardieshingle-staggered",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:39597/assets/products/hardieshingle-staggered.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/hardieshingle-staggered.png",
+            "http://127.0.0.1:39597/assets/products/hardieshingle-staggered.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291127,
+          "changedRatio": 0.9965324844252755,
+          "meanDelta": 73.39965085233108
+        },
+        "spread": {
+          "luminanceLevels": 65,
+          "p10": 33,
+          "p90": 54
+        }
+      }
+    },
+    {
+      "name": "1440 product st-laurent-lap-625",
+      "pass": true,
+      "detail": {
+        "colours": 24,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 1536 922",
+          "key": "[\"http://127.0.0.1:39597/assets/products/mir-siding-625/base-hardieplank.png\",1536,922,[0,0,1536,922],\"M0 108H1536V816H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/mir-siding-625/base-hardieplank.png",
+            "http://127.0.0.1:39597/assets/products/mir-siding-625/base-hardieplank.png"
+          ],
+          "paths": [
+            "M0 108H1536V816H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 134460,
+          "changedRatio": 0.4602587800369686,
+          "meanDelta": 10.87252344766208
+        },
+        "spread": {
+          "luminanceLevels": 138,
+          "p10": 21,
+          "p90": 56
+        }
+      }
+    },
+    {
+      "name": "1440 product st-laurent-lap-825",
+      "pass": true,
+      "detail": {
+        "colours": 24,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "310 0 240 185",
+          "key": "[\"http://127.0.0.1:39597/assets/products/st-laurent-4.jpg\",993,691,[310,0,240,185],\"M0 0H993V691H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/st-laurent-4.jpg",
+            "http://127.0.0.1:39597/assets/products/st-laurent-4.jpg"
+          ],
+          "paths": [
+            "M0 0H993V691H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 258120,
+          "changedRatio": 0.8835489833641405,
+          "meanDelta": 20.583555829396865
+        },
+        "spread": {
+          "luminanceLevels": 57,
+          "p10": 36,
+          "p90": 52
+        }
+      }
+    },
+    {
+      "name": "1440 product st-laurent-v-groove-825",
+      "pass": true,
+      "detail": {
+        "colours": 24,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "750 505 240 180",
+          "key": "[\"http://127.0.0.1:39597/assets/products/st-vgroove-9.jpg\",993,691,[750,505,240,180],\"M0 0H993V691H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/st-vgroove-9.jpg",
+            "http://127.0.0.1:39597/assets/products/st-vgroove-9.jpg"
+          ],
+          "paths": [
+            "M0 0H993V691H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 262440,
+          "changedRatio": 0.8983364140480592,
+          "meanDelta": 20.589987677141096
+        },
+        "spread": {
+          "luminanceLevels": 47,
+          "p10": 37,
+          "p90": 52
+        }
+      }
+    },
+    {
+      "name": "1440 product canexel-vstyle",
+      "pass": true,
+      "detail": {
+        "colours": 16,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 1070 313",
+          "key": "[\"http://127.0.0.1:39597/assets/products/canexel-2.webp\",1070,313,[0,0,1070,313],\"M0 0H1070V313H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/canexel-2.webp",
+            "http://127.0.0.1:39597/assets/products/canexel-2.webp"
+          ],
+          "paths": [
+            "M0 0H1070V313H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 85320,
+          "changedRatio": 0.2920517560073937,
+          "meanDelta": 23.413428493188196
+        },
+        "spread": {
+          "luminanceLevels": 113,
+          "p10": 110,
+          "p90": 230
+        }
+      }
+    },
+    {
+      "name": "1440 product canexel-cedrvue-9",
+      "pass": true,
+      "detail": {
+        "colours": 16,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 1070 313",
+          "key": "[\"http://127.0.0.1:39597/assets/products/canexel-4.webp\",1070,313,[0,0,1070,313],\"M0 0H1070V313H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/canexel-4.webp",
+            "http://127.0.0.1:39597/assets/products/canexel-4.webp"
+          ],
+          "paths": [
+            "M0 0H1070V313H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 85320,
+          "changedRatio": 0.2920517560073937,
+          "meanDelta": 25.383915246114878
+        },
+        "spread": {
+          "luminanceLevels": 109,
+          "p10": 126,
+          "p90": 230
+        }
+      }
+    },
+    {
+      "name": "1440 product canexel-board-batten",
+      "pass": true,
+      "detail": {
+        "colours": 7,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 1070 313",
+          "key": "[\"http://127.0.0.1:39597/assets/products/canexel-1.webp\",1070,313,[0,0,1070,313],\"M0 0H1070V313H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/canexel-1.webp",
+            "http://127.0.0.1:39597/assets/products/canexel-1.webp"
+          ],
+          "paths": [
+            "M0 0H1070V313H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 85320,
+          "changedRatio": 0.2920517560073937,
+          "meanDelta": 11.592534401314438
+        },
+        "spread": {
+          "luminanceLevels": 51,
+          "p10": 91,
+          "p90": 230
+        }
+      }
+    },
+    {
+      "name": "1440 product st-laurent-board-batten-12",
+      "pass": true,
+      "detail": {
+        "colours": 24,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "440 410 370 195",
+          "key": "[\"http://127.0.0.1:39597/assets/products/st-board-9.jpg\",993,691,[440,410,370,195],\"M0 0H993V691H0Z\"]",
+          "images": [
+            "http://127.0.0.1:39597/assets/products/st-board-9.jpg",
+            "http://127.0.0.1:39597/assets/products/st-board-9.jpg"
+          ],
+          "paths": [
+            "M0 0H993V691H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 288788,
+          "changedRatio": 0.9885260491545149,
+          "meanDelta": 22.09191141233655
+        },
+        "spread": {
+          "luminanceLevels": 51,
+          "p10": 44,
+          "p90": 53
+        }
+      }
+    },
+    {
+      "name": "1440 product hardie-board-batten",
+      "pass": false,
+      "error": "page.waitForFunction: Timeout 30000ms exceeded."
+    },
+    {
+      "name": "1440 two-tone grain visible",
+      "pass": true,
+      "detail": {
+        "id": "canexel-sierra",
+        "luminanceLevels": 72,
+        "p10": 85,
+        "p90": 115
+      }
+    },
+    {
+      "name": "1440 touch-up canexel-touch-up-284ml",
+      "pass": true,
+      "detail": {
+        "colours": 20
+      }
+    },
+    {
+      "name": "1440 touch-up hardie-colorplus-touch-up-kit",
+      "pass": true,
+      "detail": {
+        "colours": 1
+      }
+    },
+    {
+      "name": "1440 unavailable hardieplank-select-725",
+      "pass": false,
+      "error": "page.waitForFunction: Timeout 30000ms exceeded."
+    },
+    {
+      "name": "1440 unavailable hardieplank-smooth-725",
+      "pass": false,
+      "error": "page.waitForFunction: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 unavailable hardieplank-select-525",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 unavailable hardieplank-smooth-525",
+      "pass": false,
+      "error": "page.goto: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 legacy incompatible cart",
+      "pass": false,
+      "error": "page.evaluate: Target page, context or browser has been closed"
+    },
+    {
+      "name": "1440 javascript errors",
+      "pass": true
+    }
+  ],
+  "requests": 4634,
+  "blocked": [
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    }
+  ],
+  "sourceHashes": {
+    "commerce.js": "5d327e178f30a3d17ee93de956099de8273a8a11f9f6b8bc864b2c07f6494e69",
+    "material-preview.js": "7121a11755fc6486ae203ed497e2f79c583f73edd910c527acd7dce707a55443",
+    "mir-client-colour-palettes.json": "ca08c9c93cdb6a603aae31d46ece55f1ab59a6023353adfae63225ea98e2c045",
+    "mir-client-siding-previews.js": "93f3a6c923852674444f32206365bd6f7b40e370b60d097033360adc33c2127f",
+    "mir-prestige.css": "5c66611b9a6276bff020825eecbde1a7cd3d6d2ad82268199da6ed8fd2a0680d"
+  },
+  "nonReadLocalRequests": [],
+  "passed": 25,
+  "failed": 6
+}

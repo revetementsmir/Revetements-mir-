@@ -1,0 +1,30 @@
+{
+  "reviewedOn": "2026-11-17",
+  "recommended": {
+    "src": "./assets/catalogue-swatches/kaycan-urbanix-recolte-de-cedre-27d78710.webp",
+    "width": 400,
+    "height": 400,
+    "productId": "kaycan-urbanix-6-9920",
+    "colourId": "kaycan-urbanix-recolte-de-cedre",
+    "label": "Échantillon officiel Urbanix — Récolte de Cèdre",
+    "kind": "manufacturer material swatch; not an installed-product photograph",
+    "officialAsset": "https://www.kaycan.com/wp-content/uploads/2023/07/harvest-cedar-urbanix.webp",
+    "sourcePage": "https://www.kaycan.com/product/aluminium/revetement-daluminium/urbanix-revetements-exterieur-et-soffites-en-aluminium/?lang=fr",
+    "existingCatalogueStatus": "localized_original; verified collection name and asset",
+    "visualInspection": "Local original viewed: warm wood-grain aluminum finish, full texture, no studio margin; no retouching or raster enlargement.",
+    "framing": "3:2 cover for manufacturer navigation only",
+    "scope": "Kaycan collection cover only; no product SKU image, colour availability or catalogue mutation"
+  },
+  "otherLocalAssets": [
+    {"src":"./assets/products/kaycan-soffit-installed.jpg","width":380,"height":400,"assessment":"Current installed soffit image; genuine but dark, low-resolution and includes building details."},
+    {"src":"./assets/products/kaycan-urbanix-5.png","width":148,"height":137,"assessment":"Official profile drawing, unsuitable as a photo or large prestige cover."},
+    {"src":"./assets/products/kaycan-sp600-perfore-sample.jpeg","width":178,"height":103,"assessment":"Real original brochure close-up; suitable for small category thumbnail, too small for a large brand cover."},
+    {"src":"./assets/catalogue-swatches/kaycan-davinci-pecan.webp","width":400,"height":400,"assessment":"Official vinyl sample, inspectable but less crisp and less representative of aluminum than Urbanix."},
+    {"src":"./assets/catalogue-swatches/kaycan-urbanix-rockwood-fd907034.webp","width":400,"height":400,"assessment":"Official material sample; much darker and less legible than Harvest Cedar."}
+  ],
+  "newOfficialCandidate": {
+    "src": "https://www.kaycan.com/wp-content/uploads/2023/07/urbanix-overview.jpg",
+    "provenance": "Image linked directly by official Urbanix product page, verified through web open/click.",
+    "status": "Not downloaded or visually approved: environment proxy returned 403 on permitted direct reads. No alternate proxy used. Not integrated."
+  }
+}

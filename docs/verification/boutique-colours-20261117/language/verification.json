@@ -1,0 +1,654 @@
+{
+  "mode": "Local GET requests only; all external requests and non-GET methods blocked",
+  "allowedLocalGet": 922,
+  "blockedRequests": 8,
+  "pageErrors": [],
+  "cases": [
+    {
+      "key": "canexel",
+      "url": "http://127.0.0.1:8765/produit.html?id=canexel-ridgewood-d5",
+      "fr": {
+        "note": "Illustration de la couleur choisie. Rendu écran indicatif. Le même échantillon, le même cadrage, le même grain et les mêmes ombres sont conservés pour chaque couleur. Teinte écran indicative.",
+        "colourNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif.",
+        "sample": "Échantillon MIR · rendu écran indicatif",
+        "groups": [
+          "Couleurs opaques",
+          "Couleurs deux tons",
+          "Couleurs opaques",
+          "Couleurs deux tons",
+          "Anciennes couleurs de retouche"
+        ],
+        "name": "Noir",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Toundra",
+          "Gris brume",
+          "Sable",
+          "Bleu minuit",
+          "Granit",
+          "Charbon",
+          "Moka foncé",
+          "Scandinave",
+          "Bois de Santal",
+          "Acadia",
+          "Sierra",
+          "Barista",
+          "Falaise",
+          "Loup gris"
+        ],
+        "values": [
+          "paquets"
+        ],
+        "storage": null,
+        "lang": "fr-CA"
+      },
+      "en": {
+        "note": "Illustration of the selected colour. Screen colours are indicative. The same sample, framing, grain and shadows are retained for every colour. Screen colours are indicative.",
+        "colourNote": "Manufacturer reference; confirm availability, lead time and the MIR offering. Screen colours are indicative.",
+        "sample": "MIR sample · screen colours are indicative",
+        "groups": [
+          "Solid colours",
+          "Two-tone colours",
+          "Solid colours",
+          "Two-tone colours",
+          "Legacy touch-up colours"
+        ],
+        "name": "Noir",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Toundra",
+          "Gris brume",
+          "Sable",
+          "Bleu minuit",
+          "Granit",
+          "Charbon",
+          "Moka foncé",
+          "Scandinave",
+          "Bois de Santal",
+          "Acadia",
+          "Sierra",
+          "Barista",
+          "Falaise",
+          "Loup gris"
+        ],
+        "values": [
+          "paquets"
+        ],
+        "storage": null,
+        "lang": "en-CA"
+      },
+      "roundTrip": true
+    },
+    {
+      "key": "st-laurent",
+      "url": "http://127.0.0.1:8765/produit.html?id=st-laurent-lap-825",
+      "fr": {
+        "note": "Illustration de la couleur choisie. Rendu écran indicatif. Détail du bardage à clin St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.",
+        "colourNote": "Teinte du nuancier fibrociment St-Laurent. Compatibilité avec le profil et le fini, disponibilité et délai à confirmer avec MIR.",
+        "sample": "Échantillon MIR · rendu écran indicatif",
+        "groups": [],
+        "name": "Noir",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Lin",
+          "Argent",
+          "Aspen",
+          "Bouleau",
+          "Eucalyptus",
+          "Gris cendre",
+          "Saule argenté",
+          "Frêne",
+          "Bois de grève",
+          "Bois d’érable",
+          "Miel naturel",
+          "Ipé",
+          "Bois de chêne",
+          "Peuplier",
+          "Noisetier",
+          "Pruche vieillie",
+          "Écorce",
+          "Torréfié",
+          "Espresso",
+          "Kingwood",
+          "Charbon de bois",
+          "Ébène"
+        ],
+        "values": [
+          "pi²",
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "fr-CA"
+      },
+      "en": {
+        "note": "Illustration of the selected colour. Screen colours are indicative. Detail of St-Laurent lap siding, cropped from the manufacturer’s installation photo. Dimensions are not shown.",
+        "colourNote": "Colour from the St-Laurent fibre cement chart. Confirm compatibility with the profile and finish, availability and lead time with MIR.",
+        "sample": "MIR sample · screen colours are indicative",
+        "groups": [],
+        "name": "Noir",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Lin",
+          "Argent",
+          "Aspen",
+          "Bouleau",
+          "Eucalyptus",
+          "Gris cendre",
+          "Saule argenté",
+          "Frêne",
+          "Bois de grève",
+          "Bois d’érable",
+          "Miel naturel",
+          "Ipé",
+          "Bois de chêne",
+          "Peuplier",
+          "Noisetier",
+          "Pruche vieillie",
+          "Écorce",
+          "Torréfié",
+          "Espresso",
+          "Kingwood",
+          "Charbon de bois",
+          "Ébène"
+        ],
+        "values": [
+          "pi²",
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "en-CA"
+      },
+      "roundTrip": true
+    },
+    {
+      "key": "st-laurent-vgroove",
+      "url": "http://127.0.0.1:8765/produit.html?id=st-laurent-v-groove-825",
+      "fr": {
+        "note": "Illustration de la couleur choisie. Rendu écran indicatif. Détail du profil V-Groove St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.",
+        "colourNote": "Teinte du nuancier fibrociment St-Laurent. Compatibilité avec le profil et le fini, disponibilité et délai à confirmer avec MIR.",
+        "sample": "Échantillon MIR · rendu écran indicatif",
+        "groups": [],
+        "name": "Noir",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Lin",
+          "Argent",
+          "Aspen",
+          "Bouleau",
+          "Eucalyptus",
+          "Gris cendre",
+          "Saule argenté",
+          "Frêne",
+          "Bois de grève",
+          "Bois d’érable",
+          "Miel naturel",
+          "Ipé",
+          "Bois de chêne",
+          "Peuplier",
+          "Noisetier",
+          "Pruche vieillie",
+          "Écorce",
+          "Torréfié",
+          "Espresso",
+          "Kingwood",
+          "Charbon de bois",
+          "Ébène"
+        ],
+        "values": [
+          "pi²",
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "fr-CA"
+      },
+      "en": {
+        "note": "Illustration of the selected colour. Screen colours are indicative. Detail of the St-Laurent V-Groove profile, cropped from the manufacturer’s installation photo. Dimensions are not shown.",
+        "colourNote": "Colour from the St-Laurent fibre cement chart. Confirm compatibility with the profile and finish, availability and lead time with MIR.",
+        "sample": "MIR sample · screen colours are indicative",
+        "groups": [],
+        "name": "Noir",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Lin",
+          "Argent",
+          "Aspen",
+          "Bouleau",
+          "Eucalyptus",
+          "Gris cendre",
+          "Saule argenté",
+          "Frêne",
+          "Bois de grève",
+          "Bois d’érable",
+          "Miel naturel",
+          "Ipé",
+          "Bois de chêne",
+          "Peuplier",
+          "Noisetier",
+          "Pruche vieillie",
+          "Écorce",
+          "Torréfié",
+          "Espresso",
+          "Kingwood",
+          "Charbon de bois",
+          "Ébène"
+        ],
+        "values": [
+          "pi²",
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "en-CA"
+      },
+      "roundTrip": true
+    },
+    {
+      "key": "st-laurent-board",
+      "url": "http://127.0.0.1:8765/produit.html?id=st-laurent-board-batten-12",
+      "fr": {
+        "note": "Illustration de la couleur choisie. Rendu écran indicatif. Détail Board & Batten St-Laurent, recadré dans la photo de pose fabricant. Dimensions non représentées.",
+        "colourNote": "Teinte du nuancier fibrociment St-Laurent. Compatibilité avec le profil et le fini, disponibilité et délai à confirmer avec MIR.",
+        "sample": "Échantillon MIR · rendu écran indicatif",
+        "groups": [],
+        "name": "Noir",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Lin",
+          "Argent",
+          "Aspen",
+          "Bouleau",
+          "Eucalyptus",
+          "Gris cendre",
+          "Saule argenté",
+          "Frêne",
+          "Bois de grève",
+          "Bois d’érable",
+          "Miel naturel",
+          "Ipé",
+          "Bois de chêne",
+          "Peuplier",
+          "Noisetier",
+          "Pruche vieillie",
+          "Écorce",
+          "Torréfié",
+          "Espresso",
+          "Kingwood",
+          "Charbon de bois",
+          "Ébène"
+        ],
+        "values": [
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "fr-CA"
+      },
+      "en": {
+        "note": "Illustration of the selected colour. Screen colours are indicative. St-Laurent Board & Batten detail, cropped from the manufacturer’s installation photo. Dimensions are not shown.",
+        "colourNote": "Colour from the St-Laurent fibre cement chart. Confirm compatibility with the profile and finish, availability and lead time with MIR.",
+        "sample": "MIR sample · screen colours are indicative",
+        "groups": [],
+        "name": "Noir",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Lin",
+          "Argent",
+          "Aspen",
+          "Bouleau",
+          "Eucalyptus",
+          "Gris cendre",
+          "Saule argenté",
+          "Frêne",
+          "Bois de grève",
+          "Bois d’érable",
+          "Miel naturel",
+          "Ipé",
+          "Bois de chêne",
+          "Peuplier",
+          "Noisetier",
+          "Pruche vieillie",
+          "Écorce",
+          "Torréfié",
+          "Espresso",
+          "Kingwood",
+          "Charbon de bois",
+          "Ébène"
+        ],
+        "values": [
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "en-CA"
+      },
+      "roundTrip": true
+    },
+    {
+      "key": "hardie",
+      "url": "http://127.0.0.1:8765/produit.html?id=hardiepanel",
+      "fr": {
+        "note": "Illustration de la couleur choisie. Rendu écran indicatif. Le même échantillon, le même cadrage, le même grain et les mêmes ombres sont conservés pour chaque couleur. Teinte écran indicative.",
+        "colourNote": "Référence fabricant; disponibilité, délai et offre MIR à confirmer. Affichage écran indicatif. Le fini lisse reste lisse; la photo originale du profil est accessible à gauche.",
+        "sample": "Échantillon MIR · rendu écran indicatif",
+        "groups": [
+          "Couleurs opaques",
+          "Couleurs deux tons",
+          "Anciennes couleurs de retouche"
+        ],
+        "name": "Noir minuit",
+        "labels": [
+          "Noir minuit",
+          "Blanc arctique",
+          "Pierre des champs",
+          "Beige Navajo",
+          "Brun kaki",
+          "Taupe Monterey",
+          "Écorce",
+          "Espresso",
+          "Sauge",
+          "Gris ardoise",
+          "Bleu acier",
+          "Brume légère",
+          "Gris perle",
+          "Étain vieilli",
+          "Gris nocturne",
+          "Bleu de soirée",
+          "Bleu océan",
+          "Gris fer",
+          "Rouge campagnard"
+        ],
+        "values": [
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "fr-CA"
+      },
+      "en": {
+        "note": "Illustration of the selected colour. Screen colours are indicative. The same sample, framing, grain and shadows are retained for every colour. Screen colours are indicative.",
+        "colourNote": "Manufacturer reference; availability, lead time and MIR offering to be confirmed. On-screen appearance is indicative. The smooth finish remains smooth; the original profile photo is available on the left.",
+        "sample": "MIR sample · screen colours are indicative",
+        "groups": [
+          "Solid colours",
+          "Two-tone colours",
+          "Legacy touch-up colours"
+        ],
+        "name": "Noir minuit",
+        "labels": [
+          "Noir minuit",
+          "Blanc arctique",
+          "Pierre des champs",
+          "Beige Navajo",
+          "Brun kaki",
+          "Taupe Monterey",
+          "Écorce",
+          "Espresso",
+          "Sauge",
+          "Gris ardoise",
+          "Bleu acier",
+          "Brume légère",
+          "Gris perle",
+          "Étain vieilli",
+          "Gris nocturne",
+          "Bleu de soirée",
+          "Bleu océan",
+          "Gris fer",
+          "Rouge campagnard"
+        ],
+        "values": [
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "en-CA"
+      },
+      "roundTrip": true
+    },
+    {
+      "key": "hardie-smooth",
+      "url": "http://127.0.0.1:8765/produit.html?id=hardieplank-smooth-625",
+      "fr": {
+        "note": "Illustration de la couleur choisie. Rendu écran indicatif. Le même échantillon, le même cadrage, le même grain et les mêmes ombres sont conservés pour chaque couleur. Teinte écran indicative.",
+        "colourNote": "Clin lisse documenté Canada Est; profil et couleur à confirmer au Québec. Le fini lisse reste lisse; la photo originale du profil est accessible à gauche.",
+        "sample": "Échantillon MIR · rendu écran indicatif",
+        "groups": [
+          "Couleurs opaques",
+          "Couleurs deux tons",
+          "Anciennes couleurs de retouche"
+        ],
+        "name": "Noir minuit",
+        "labels": [
+          "Noir minuit",
+          "Blanc arctique",
+          "Pierre des champs",
+          "Beige Navajo",
+          "Brun kaki",
+          "Taupe Monterey",
+          "Écorce",
+          "Espresso",
+          "Sauge",
+          "Gris ardoise",
+          "Bleu acier",
+          "Brume légère",
+          "Gris perle",
+          "Étain vieilli",
+          "Gris nocturne",
+          "Bleu de soirée",
+          "Bleu océan",
+          "Gris fer",
+          "Rouge campagnard"
+        ],
+        "values": [
+          "pi²",
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "fr-CA"
+      },
+      "en": {
+        "note": "Illustration of the selected colour. Screen colours are indicative. The same sample, framing, grain and shadows are retained for every colour. Screen colours are indicative.",
+        "colourNote": "Smooth lap siding documented for Eastern Canada; confirm the profile and colour in Québec. The smooth finish stays smooth; the original profile photo is available on the left.",
+        "sample": "MIR sample · screen colours are indicative",
+        "groups": [
+          "Solid colours",
+          "Two-tone colours",
+          "Legacy touch-up colours"
+        ],
+        "name": "Noir minuit",
+        "labels": [
+          "Noir minuit",
+          "Blanc arctique",
+          "Pierre des champs",
+          "Beige Navajo",
+          "Brun kaki",
+          "Taupe Monterey",
+          "Écorce",
+          "Espresso",
+          "Sauge",
+          "Gris ardoise",
+          "Bleu acier",
+          "Brume légère",
+          "Gris perle",
+          "Étain vieilli",
+          "Gris nocturne",
+          "Bleu de soirée",
+          "Bleu océan",
+          "Gris fer",
+          "Rouge campagnard"
+        ],
+        "values": [
+          "pi²",
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "en-CA"
+      },
+      "roundTrip": true
+    },
+    {
+      "key": "paint-current",
+      "url": "http://127.0.0.1:8765/produit.html?id=canexel-touch-up-284ml&color=canexel-blanc",
+      "fr": {
+        "note": "Photo de retouche MIR · Blanc · touche de peinture sèche sur le couvercle. Rendu écran indicatif.",
+        "colourNote": "Retouche assortie à une teinte CanExel actuelle. Format et disponibilité MIR à confirmer.",
+        "sample": "Pot CanExel · tache de peinture sèche, teinte indicative",
+        "groups": [
+          "Couleurs opaques",
+          "Couleurs deux tons",
+          "Anciennes couleurs de retouche"
+        ],
+        "name": "Blanc",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Bleu minuit",
+          "Granit",
+          "Gris brume",
+          "Sable",
+          "Toundra",
+          "Acadia",
+          "Barista",
+          "Bois de Santal",
+          "Charbon",
+          "Falaise",
+          "Loup gris",
+          "Moka foncé",
+          "Scandinave",
+          "Sierra",
+          "Bois de grange",
+          "Renard roux",
+          "Rouge campagne",
+          "Yellowstone"
+        ],
+        "values": [
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "fr-CA"
+      },
+      "en": {
+        "note": "MIR touch-up paint photo · Blanc · dried paint sample on the lid. Screen colours are indicative.",
+        "colourNote": "Touch-up paint matching a current CanExel colour. Confirm size and availability with MIR.",
+        "sample": "CanExel container · dried paint sample, indicative colour",
+        "groups": [
+          "Solid colours",
+          "Two-tone colours",
+          "Legacy touch-up colours"
+        ],
+        "name": "Blanc",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Bleu minuit",
+          "Granit",
+          "Gris brume",
+          "Sable",
+          "Toundra",
+          "Acadia",
+          "Barista",
+          "Bois de Santal",
+          "Charbon",
+          "Falaise",
+          "Loup gris",
+          "Moka foncé",
+          "Scandinave",
+          "Sierra",
+          "Bois de grange",
+          "Renard roux",
+          "Rouge campagne",
+          "Yellowstone"
+        ],
+        "values": [
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "en-CA"
+      },
+      "roundTrip": true
+    },
+    {
+      "key": "paint-legacy",
+      "url": "http://127.0.0.1:8765/produit.html?id=canexel-touch-up-284ml&color=canexel-bois-de-grange",
+      "fr": {
+        "note": "Photo du contenant · teinte non représentée",
+        "colourNote": "Ancienne teinte CanExel répertoriée pour la retouche. Correspondance et disponibilité MIR à confirmer. Aperçu de la teinte indisponible. Faites confirmer la correspondance avec un échantillon.",
+        "sample": "Pot CanExel · tache de peinture sèche, teinte indicative",
+        "groups": [
+          "Couleurs opaques",
+          "Couleurs deux tons",
+          "Anciennes couleurs de retouche"
+        ],
+        "name": "Bois de grange",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Bleu minuit",
+          "Granit",
+          "Gris brume",
+          "Sable",
+          "Toundra",
+          "Acadia",
+          "Barista",
+          "Bois de Santal",
+          "Charbon",
+          "Falaise",
+          "Loup gris",
+          "Moka foncé",
+          "Scandinave",
+          "Sierra",
+          "Bois de grange",
+          "Renard roux",
+          "Rouge campagne",
+          "Yellowstone"
+        ],
+        "values": [
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "fr-CA"
+      },
+      "en": {
+        "note": "Container photo · selected colour not shown",
+        "colourNote": "Legacy CanExel colour listed for touch-ups. Confirm the colour match and availability with MIR. Colour preview unavailable. Confirm the match with a physical sample.",
+        "sample": "CanExel container · dried paint sample, indicative colour",
+        "groups": [
+          "Solid colours",
+          "Two-tone colours",
+          "Legacy touch-up colours"
+        ],
+        "name": "Bois de grange",
+        "labels": [
+          "Noir",
+          "Blanc",
+          "Bleu minuit",
+          "Granit",
+          "Gris brume",
+          "Sable",
+          "Toundra",
+          "Acadia",
+          "Barista",
+          "Bois de Santal",
+          "Charbon",
+          "Falaise",
+          "Loup gris",
+          "Moka foncé",
+          "Scandinave",
+          "Sierra",
+          "Bois de grange",
+          "Renard roux",
+          "Rouge campagne",
+          "Yellowstone"
+        ],
+        "values": [
+          "pièces"
+        ],
+        "storage": null,
+        "lang": "en-CA"
+      },
+      "roundTrip": true
+    }
+  ]
+}

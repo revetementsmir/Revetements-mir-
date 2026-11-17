@@ -1150,6 +1150,26 @@
       "language": "EN-CA",
       "state": "Profil : cotes, matière et quantité",
       "simulated": false
+    },
+    {
+      "file": "screens/produit-en-834.png",
+      "page": "produit.html?id=hardieplank-select-625&from=view%3Dall&color=hardie-pierre-des-champs",
+      "width": 834,
+      "viewport": "Tablette",
+      "language": "EN-CA",
+      "title": "Fiche produit",
+      "pendingImages": [],
+      "simulated": false
+    },
+    {
+      "file": "screens/produit-en-390.png",
+      "page": "produit.html?id=hardieplank-select-625&from=view%3Dall&color=hardie-pierre-des-champs",
+      "width": 390,
+      "viewport": "Téléphone",
+      "language": "EN-CA",
+      "title": "Fiche produit",
+      "pendingImages": [],
+      "simulated": false
     }
   ]
 }

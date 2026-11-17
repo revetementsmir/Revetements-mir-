@@ -1,0 +1,127 @@
+{
+  "createdAt": "2026-11-17T15:00:30.836Z",
+  "captures": [
+    {
+      "file": "screens/produit-1440.png",
+      "language": "FR-CA",
+      "width": 1440,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/produit-390.png",
+      "language": "FR-CA",
+      "width": 390,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/produit-834.png",
+      "language": "FR-CA",
+      "width": 834,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/produit-en-1440.png",
+      "language": "EN-CA",
+      "width": 1440,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/produit-en-834.png",
+      "language": "EN-CA",
+      "width": 834,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "file": "screens/produit-en-390.png",
+      "language": "EN-CA",
+      "width": 390,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "categoryVinylSource": "http://127.0.0.1:36393/assets/products/gentek-vinyl-9.jpg",
+      "file": "screens/boutique-1440.png",
+      "language": "FR-CA",
+      "width": 1440,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "categoryVinylSource": "http://127.0.0.1:36393/assets/products/gentek-vinyl-9.jpg",
+      "file": "screens/recherche-1440.png",
+      "language": "FR-CA",
+      "width": 1440,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "categoryVinylSource": "http://127.0.0.1:36393/assets/products/gentek-vinyl-9.jpg",
+      "file": "screens/categorie-1440.png",
+      "language": "FR-CA",
+      "width": 1440,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "categoryVinylSource": "http://127.0.0.1:36393/assets/products/gentek-vinyl-9.jpg",
+      "file": "screens/boutique-390.png",
+      "language": "FR-CA",
+      "width": 390,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "categoryVinylSource": "http://127.0.0.1:36393/assets/products/gentek-vinyl-9.jpg",
+      "file": "screens/recherche-390.png",
+      "language": "FR-CA",
+      "width": 390,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "categoryVinylSource": "http://127.0.0.1:36393/assets/products/gentek-vinyl-9.jpg",
+      "file": "screens/categorie-390.png",
+      "language": "FR-CA",
+      "width": 390,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "categoryVinylSource": "http://127.0.0.1:36393/assets/products/gentek-vinyl-9.jpg",
+      "file": "screens/boutique-834.png",
+      "language": "FR-CA",
+      "width": 834,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "categoryVinylSource": "http://127.0.0.1:36393/assets/products/gentek-vinyl-9.jpg",
+      "file": "screens/recherche-834.png",
+      "language": "FR-CA",
+      "width": 834,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "categoryVinylSource": "http://127.0.0.1:36393/assets/products/gentek-vinyl-9.jpg",
+      "file": "screens/categorie-834.png",
+      "language": "FR-CA",
+      "width": 834,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "categoryVinylSource": "http://127.0.0.1:36393/assets/products/gentek-vinyl-9.jpg",
+      "file": "screens/boutique-en-1440.png",
+      "language": "EN-CA",
+      "width": 1440,
+      "errors": [],
+      "passed": true
+    }
+  ]
+}

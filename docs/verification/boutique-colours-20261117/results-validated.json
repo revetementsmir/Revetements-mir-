@@ -1,0 +1,1572 @@
+{
+  "status": "PASS",
+  "method": "Latest validation for each named scenario; original raw runs retained. No application changes by the test agent.",
+  "reasonForTargetedReruns": [
+    "A final CSS adjustment lets long colour names expand the option height; cards and touch-up controls were rechecked at all 3 viewport sizes.",
+    "The legacy cart wording changed from indisponible to retiré; test expectation corrected.",
+    "Playwright correctly refuses to click an aria-disabled estimate link. The test now asserts the disabled control then calls the local public MIREstimate.open(cart) API to verify the second guard, without any submission.",
+    "Category vinyl thumbnail corrected from an aluminium texture to the actual Sequoia vinyl photo gentek-vinyl-9.jpg; only category geometry, load and exact source were rechecked at all 3 widths."
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 834,
+      "height": 1112
+    },
+    {
+      "width": 390,
+      "height": 844
+    },
+    {
+      "width": 350,
+      "height": 780,
+      "scope": "Labels and overflow stress check"
+    }
+  ],
+  "passed": 70,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "1440 categories",
+      "pass": true,
+      "detail": [
+        {
+          "category": "fibre",
+          "src": "http://127.0.0.1:39325/assets/products/hardieplank-cedarmill.png",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "wood",
+          "src": "http://127.0.0.1:39325/assets/products/canexel-3.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "metal",
+          "src": "http://127.0.0.1:39325/assets/products/rialux-tiago-ecorce-sample.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "vinyl",
+          "src": "http://127.0.0.1:39325/assets/products/gentek-vinyl-9.jpg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "finish",
+          "src": "http://127.0.0.1:39325/assets/products/kaycan-sp600-perfore-sample.jpeg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "fix",
+          "src": "http://127.0.0.1:39325/assets/products/adseal-dws4580-original-alpha.png",
+          "w": 48,
+          "h": 48,
+          "fit": "contain",
+          "loaded": true
+        }
+      ],
+      "validatedIn": "final-categories"
+    },
+    {
+      "name": "1440 cards CanExel",
+      "pass": true,
+      "detail": [
+        {
+          "id": "canexel-cedrvue-9",
+          "count": 16
+        },
+        {
+          "id": "canexel-board-batten",
+          "count": 7
+        },
+        {
+          "id": "canexel-vstyle",
+          "count": 16
+        },
+        {
+          "id": "canexel-ridgewood-d5",
+          "count": 16
+        },
+        {
+          "id": "canexel-touch-up-284ml",
+          "count": 20
+        }
+      ],
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "1440 cards James Hardie",
+      "pass": true,
+      "detail": [
+        {
+          "id": "hardieplank-smooth-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-smooth-825",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-825",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel-cedarmill",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-staggered",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-straight",
+          "count": 19
+        },
+        {
+          "id": "hardietrim-smooth-54-35",
+          "count": 5
+        },
+        {
+          "id": "hardie-colorplus-touch-up-kit",
+          "count": 1
+        }
+      ],
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "1440 cards St-Laurent",
+      "pass": true,
+      "detail": [
+        {
+          "id": "st-laurent-lap-625",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-lap-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-v-groove-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-board-batten-12",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-trim-35",
+          "count": 24
+        }
+      ],
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "1440 card to product colour link",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product hardieplank-select-825",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:37559/assets/products/hardieplank-cedarmill.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/hardieplank-cedarmill.png",
+            "http://127.0.0.1:37559/assets/products/hardieplank-cedarmill.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 74.53171766961046
+        },
+        "spread": {
+          "luminanceLevels": 54,
+          "p10": 31,
+          "p90": 58
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product hardiepanel",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:37559/assets/products/hardiepanel-smooth.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/hardiepanel-smooth.png",
+            "http://127.0.0.1:37559/assets/products/hardiepanel-smooth.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 76.11375025672622
+        },
+        "spread": {
+          "luminanceLevels": 5,
+          "p10": 49,
+          "p90": 50
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product canexel-ridgewood-d5",
+      "pass": true,
+      "detail": {
+        "colours": 16,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 188 1254 879",
+          "key": "[\"http://127.0.0.1:37559/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp\",1254,1254,[0,188,1254,879],\"M0 188H1254V1067H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp",
+            "http://127.0.0.1:37559/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp"
+          ],
+          "paths": [
+            "M0 188H1254V1067H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 205200,
+          "changedRatio": 0.7024029574861368,
+          "meanDelta": 50.76163140959814
+        },
+        "spread": {
+          "luminanceLevels": 86,
+          "p10": 98,
+          "p90": 141
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product hardieplank-select-625",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 1536 922",
+          "key": "[\"http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png\",1536,922,[0,0,1536,922],\"M0 108H1536V816H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png",
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png"
+          ],
+          "paths": [
+            "M0 108H1536V816H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 134460,
+          "changedRatio": 0.4602587800369686,
+          "meanDelta": 34.77794208256316
+        },
+        "spread": {
+          "luminanceLevels": 137,
+          "p10": 42,
+          "p90": 55
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product hardieplank-smooth-625",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:37559/assets/products/hardieplank-smooth.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/hardieplank-smooth.png",
+            "http://127.0.0.1:37559/assets/products/hardieplank-smooth.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 73.17552885602794
+        },
+        "spread": {
+          "luminanceLevels": 35,
+          "p10": 27,
+          "p90": 51
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product hardieplank-smooth-825",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:37559/assets/products/hardieplank-smooth.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/hardieplank-smooth.png",
+            "http://127.0.0.1:37559/assets/products/hardieplank-smooth.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 73.17552885602794
+        },
+        "spread": {
+          "luminanceLevels": 35,
+          "p10": 27,
+          "p90": 51
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product hardiepanel-cedarmill",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:37559/assets/products/hardiepanel-cedarmill.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/hardiepanel-cedarmill.png",
+            "http://127.0.0.1:37559/assets/products/hardiepanel-cedarmill.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291600,
+          "changedRatio": 0.9981515711645101,
+          "meanDelta": 75.8580030122544
+        },
+        "spread": {
+          "luminanceLevels": 53,
+          "p10": 35,
+          "p90": 58
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product hardieshingle-straight",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:37559/assets/products/hardieshingle-straight.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/hardieshingle-straight.png",
+            "http://127.0.0.1:37559/assets/products/hardieshingle-straight.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291181,
+          "changedRatio": 0.9967173273088246,
+          "meanDelta": 73.12902033271719
+        },
+        "spread": {
+          "luminanceLevels": 62,
+          "p10": 36,
+          "p90": 53
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product hardieshingle-staggered",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 600 600",
+          "key": "[\"http://127.0.0.1:37559/assets/products/hardieshingle-staggered.png\",600,600,[0,0,600,600],\"M0 0H600V600H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/hardieshingle-staggered.png",
+            "http://127.0.0.1:37559/assets/products/hardieshingle-staggered.png"
+          ],
+          "paths": [
+            "M0 0H600V600H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 291127,
+          "changedRatio": 0.9965324844252755,
+          "meanDelta": 73.39899363318956
+        },
+        "spread": {
+          "luminanceLevels": 65,
+          "p10": 33,
+          "p90": 54
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product st-laurent-lap-625",
+      "pass": true,
+      "detail": {
+        "colours": 24,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 1536 922",
+          "key": "[\"http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png\",1536,922,[0,0,1536,922],\"M0 108H1536V816H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png",
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png"
+          ],
+          "paths": [
+            "M0 108H1536V816H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 134460,
+          "changedRatio": 0.4602587800369686,
+          "meanDelta": 10.87250633258027
+        },
+        "spread": {
+          "luminanceLevels": 138,
+          "p10": 21,
+          "p90": 56
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product st-laurent-lap-825",
+      "pass": true,
+      "detail": {
+        "colours": 24,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "310 0 240 185",
+          "key": "[\"http://127.0.0.1:37559/assets/products/st-laurent-4.jpg\",993,691,[310,0,240,185],\"M0 0H993V691H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/st-laurent-4.jpg",
+            "http://127.0.0.1:37559/assets/products/st-laurent-4.jpg"
+          ],
+          "paths": [
+            "M0 0H993V691H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 258120,
+          "changedRatio": 0.8835489833641405,
+          "meanDelta": 20.583685904018623
+        },
+        "spread": {
+          "luminanceLevels": 57,
+          "p10": 36,
+          "p90": 52
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product st-laurent-v-groove-825",
+      "pass": true,
+      "detail": {
+        "colours": 24,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "750 505 240 180",
+          "key": "[\"http://127.0.0.1:37559/assets/products/st-vgroove-9.jpg\",993,691,[750,505,240,180],\"M0 0H993V691H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/st-vgroove-9.jpg",
+            "http://127.0.0.1:37559/assets/products/st-vgroove-9.jpg"
+          ],
+          "paths": [
+            "M0 0H993V691H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 262440,
+          "changedRatio": 0.8983364140480592,
+          "meanDelta": 20.589997946190184
+        },
+        "spread": {
+          "luminanceLevels": 47,
+          "p10": 37,
+          "p90": 52
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product canexel-vstyle",
+      "pass": true,
+      "detail": {
+        "colours": 16,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 1070 313",
+          "key": "[\"http://127.0.0.1:37559/assets/products/canexel-2.webp\",1070,313,[0,0,1070,313],\"M0 0H1070V313H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/canexel-2.webp",
+            "http://127.0.0.1:37559/assets/products/canexel-2.webp"
+          ],
+          "paths": [
+            "M0 0H1070V313H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 85320,
+          "changedRatio": 0.2920517560073937,
+          "meanDelta": 23.41333607174642
+        },
+        "spread": {
+          "luminanceLevels": 113,
+          "p10": 110,
+          "p90": 230
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product canexel-cedrvue-9",
+      "pass": true,
+      "detail": {
+        "colours": 16,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 1070 313",
+          "key": "[\"http://127.0.0.1:37559/assets/products/canexel-4.webp\",1070,313,[0,0,1070,313],\"M0 0H1070V313H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/canexel-4.webp",
+            "http://127.0.0.1:37559/assets/products/canexel-4.webp"
+          ],
+          "paths": [
+            "M0 0H1070V313H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 85320,
+          "changedRatio": 0.2920517560073937,
+          "meanDelta": 25.383925515163963
+        },
+        "spread": {
+          "luminanceLevels": 109,
+          "p10": 126,
+          "p90": 230
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product canexel-board-batten",
+      "pass": true,
+      "detail": {
+        "colours": 7,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "0 0 1070 313",
+          "key": "[\"http://127.0.0.1:37559/assets/products/canexel-1.webp\",1070,313,[0,0,1070,313],\"M0 0H1070V313H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/canexel-1.webp",
+            "http://127.0.0.1:37559/assets/products/canexel-1.webp"
+          ],
+          "paths": [
+            "M0 0H1070V313H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 85320,
+          "changedRatio": 0.2920517560073937,
+          "meanDelta": 11.592524132265352
+        },
+        "spread": {
+          "luminanceLevels": 51,
+          "p10": 91,
+          "p90": 230
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 product st-laurent-board-batten-12",
+      "pass": true,
+      "detail": {
+        "colours": 24,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 540,
+            "h": 540
+          },
+          "viewBox": "440 410 370 195",
+          "key": "[\"http://127.0.0.1:37559/assets/products/st-board-9.jpg\",993,691,[440,410,370,195],\"M0 0H993V691H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/st-board-9.jpg",
+            "http://127.0.0.1:37559/assets/products/st-board-9.jpg"
+          ],
+          "paths": [
+            "M0 0H993V691H0Z"
+          ]
+        },
+        "difference": {
+          "width": 540,
+          "height": 541,
+          "changedPixels": 288788,
+          "changedRatio": 0.9885260491545149,
+          "meanDelta": 22.092137331416446
+        },
+        "spread": {
+          "luminanceLevels": 51,
+          "p10": 44,
+          "p90": 53
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 two-tone grain visible",
+      "pass": true,
+      "detail": {
+        "id": "canexel-sierra",
+        "luminanceLevels": 72,
+        "p10": 85,
+        "p90": 115
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 touch-up canexel-touch-up-284ml",
+      "pass": true,
+      "detail": {
+        "colours": 20
+      },
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "1440 touch-up hardie-colorplus-touch-up-kit",
+      "pass": true,
+      "detail": {
+        "colours": 1
+      },
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "1440 unavailable hardieplank-select-725",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 unavailable hardieplank-smooth-725",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 unavailable hardieplank-select-525",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 unavailable hardieplank-smooth-525",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 legacy incompatible cart",
+      "pass": true,
+      "validatedIn": "final-verification"
+    },
+    {
+      "name": "1440 javascript errors",
+      "pass": true,
+      "validatedIn": "final-categories"
+    },
+    {
+      "name": "834 categories",
+      "pass": true,
+      "detail": [
+        {
+          "category": "fibre",
+          "src": "http://127.0.0.1:39325/assets/products/hardieplank-cedarmill.png",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "wood",
+          "src": "http://127.0.0.1:39325/assets/products/canexel-3.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "metal",
+          "src": "http://127.0.0.1:39325/assets/products/rialux-tiago-ecorce-sample.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "vinyl",
+          "src": "http://127.0.0.1:39325/assets/products/gentek-vinyl-9.jpg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "finish",
+          "src": "http://127.0.0.1:39325/assets/products/kaycan-sp600-perfore-sample.jpeg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "fix",
+          "src": "http://127.0.0.1:39325/assets/products/adseal-dws4580-original-alpha.png",
+          "w": 48,
+          "h": 48,
+          "fit": "contain",
+          "loaded": true
+        }
+      ],
+      "validatedIn": "final-categories"
+    },
+    {
+      "name": "834 cards CanExel",
+      "pass": true,
+      "detail": [
+        {
+          "id": "canexel-cedrvue-9",
+          "count": 16
+        },
+        {
+          "id": "canexel-board-batten",
+          "count": 7
+        },
+        {
+          "id": "canexel-vstyle",
+          "count": 16
+        },
+        {
+          "id": "canexel-ridgewood-d5",
+          "count": 16
+        },
+        {
+          "id": "canexel-touch-up-284ml",
+          "count": 20
+        }
+      ],
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "834 cards James Hardie",
+      "pass": true,
+      "detail": [
+        {
+          "id": "hardieplank-smooth-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-smooth-825",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-825",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel-cedarmill",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-staggered",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-straight",
+          "count": 19
+        },
+        {
+          "id": "hardietrim-smooth-54-35",
+          "count": 5
+        },
+        {
+          "id": "hardie-colorplus-touch-up-kit",
+          "count": 1
+        }
+      ],
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "834 cards St-Laurent",
+      "pass": true,
+      "detail": [
+        {
+          "id": "st-laurent-lap-625",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-lap-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-v-groove-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-board-batten-12",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-trim-35",
+          "count": 24
+        }
+      ],
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "834 card to product colour link",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "834 product canexel-ridgewood-d5",
+      "pass": true,
+      "detail": {
+        "colours": 16,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 420,
+            "h": 420
+          },
+          "viewBox": "0 188 1254 879",
+          "key": "[\"http://127.0.0.1:37559/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp\",1254,1254,[0,188,1254,879],\"M0 188H1254V1067H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp",
+            "http://127.0.0.1:37559/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp"
+          ],
+          "paths": [
+            "M0 188H1254V1067H0Z"
+          ]
+        },
+        "difference": {
+          "width": 420,
+          "height": 421,
+          "changedPixels": 124320,
+          "changedRatio": 0.7030878859857482,
+          "meanDelta": 50.78702635448479
+        },
+        "spread": {
+          "luminanceLevels": 86,
+          "p10": 98,
+          "p90": 141
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "834 product hardieplank-select-625",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 420,
+            "h": 420
+          },
+          "viewBox": "0 0 1536 922",
+          "key": "[\"http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png\",1536,922,[0,0,1536,922],\"M0 108H1536V816H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png",
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png"
+          ],
+          "paths": [
+            "M0 108H1536V816H0Z"
+          ]
+        },
+        "difference": {
+          "width": 420,
+          "height": 421,
+          "changedPixels": 81480,
+          "changedRatio": 0.46080760095011875,
+          "meanDelta": 34.78788033027938
+        },
+        "spread": {
+          "luminanceLevels": 113,
+          "p10": 42,
+          "p90": 55
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "834 product st-laurent-lap-625",
+      "pass": true,
+      "detail": {
+        "colours": 24,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 420,
+            "h": 420
+          },
+          "viewBox": "0 0 1536 922",
+          "key": "[\"http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png\",1536,922,[0,0,1536,922],\"M0 108H1536V816H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png",
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png"
+          ],
+          "paths": [
+            "M0 108H1536V816H0Z"
+          ]
+        },
+        "difference": {
+          "width": 420,
+          "height": 421,
+          "changedPixels": 81480,
+          "changedRatio": 0.46080760095011875,
+          "meanDelta": 10.876597669946838
+        },
+        "spread": {
+          "luminanceLevels": 122,
+          "p10": 22,
+          "p90": 56
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "834 two-tone grain visible",
+      "pass": true,
+      "detail": {
+        "id": "canexel-sierra",
+        "luminanceLevels": 73,
+        "p10": 85,
+        "p90": 115
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "834 touch-up canexel-touch-up-284ml",
+      "pass": true,
+      "detail": {
+        "colours": 20
+      },
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "834 touch-up hardie-colorplus-touch-up-kit",
+      "pass": true,
+      "detail": {
+        "colours": 1
+      },
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "834 unavailable hardieplank-select-725",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "834 unavailable hardieplank-smooth-725",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "834 unavailable hardieplank-select-525",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "834 unavailable hardieplank-smooth-525",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "834 legacy incompatible cart",
+      "pass": true,
+      "validatedIn": "final-verification"
+    },
+    {
+      "name": "834 javascript errors",
+      "pass": true,
+      "validatedIn": "final-categories"
+    },
+    {
+      "name": "390 categories",
+      "pass": true,
+      "detail": [
+        {
+          "category": "fibre",
+          "src": "http://127.0.0.1:39325/assets/products/hardieplank-cedarmill.png",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "wood",
+          "src": "http://127.0.0.1:39325/assets/products/canexel-3.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "metal",
+          "src": "http://127.0.0.1:39325/assets/products/rialux-tiago-ecorce-sample.webp",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "vinyl",
+          "src": "http://127.0.0.1:39325/assets/products/gentek-vinyl-9.jpg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "finish",
+          "src": "http://127.0.0.1:39325/assets/products/kaycan-sp600-perfore-sample.jpeg",
+          "w": 48,
+          "h": 48,
+          "fit": "cover",
+          "loaded": true
+        },
+        {
+          "category": "fix",
+          "src": "http://127.0.0.1:39325/assets/products/adseal-dws4580-original-alpha.png",
+          "w": 48,
+          "h": 48,
+          "fit": "contain",
+          "loaded": true
+        }
+      ],
+      "validatedIn": "final-categories"
+    },
+    {
+      "name": "390 cards CanExel",
+      "pass": true,
+      "detail": [
+        {
+          "id": "canexel-cedrvue-9",
+          "count": 16
+        },
+        {
+          "id": "canexel-board-batten",
+          "count": 7
+        },
+        {
+          "id": "canexel-vstyle",
+          "count": 16
+        },
+        {
+          "id": "canexel-ridgewood-d5",
+          "count": 16
+        },
+        {
+          "id": "canexel-touch-up-284ml",
+          "count": 20
+        }
+      ],
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "390 cards James Hardie",
+      "pass": true,
+      "detail": [
+        {
+          "id": "hardieplank-smooth-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-smooth-825",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-825",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel-cedarmill",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-staggered",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-straight",
+          "count": 19
+        },
+        {
+          "id": "hardietrim-smooth-54-35",
+          "count": 5
+        },
+        {
+          "id": "hardie-colorplus-touch-up-kit",
+          "count": 1
+        }
+      ],
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "390 cards St-Laurent",
+      "pass": true,
+      "detail": [
+        {
+          "id": "st-laurent-lap-625",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-lap-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-v-groove-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-board-batten-12",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-trim-35",
+          "count": 24
+        }
+      ],
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "390 card to product colour link",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "390 product canexel-ridgewood-d5",
+      "pass": true,
+      "detail": {
+        "colours": 16,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 354,
+            "h": 227.875
+          },
+          "viewBox": "0 188 1254 879",
+          "key": "[\"http://127.0.0.1:37559/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp\",1254,1254,[0,188,1254,879],\"M0 188H1254V1067H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp",
+            "http://127.0.0.1:37559/assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp"
+          ],
+          "paths": [
+            "M0 188H1254V1067H0Z"
+          ]
+        },
+        "difference": {
+          "width": 354,
+          "height": 228,
+          "changedPixels": 74328,
+          "changedRatio": 0.9209039548022598,
+          "meanDelta": 66.51774209535137
+        },
+        "spread": {
+          "luminanceLevels": 84,
+          "p10": 97,
+          "p90": 140
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "390 product hardieplank-select-625",
+      "pass": true,
+      "detail": {
+        "colours": 19,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 354,
+            "h": 227.875
+          },
+          "viewBox": "0 0 1536 922",
+          "key": "[\"http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png\",1536,922,[0,0,1536,922],\"M0 108H1536V816H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png",
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png"
+          ],
+          "paths": [
+            "M0 108H1536V816H0Z"
+          ]
+        },
+        "difference": {
+          "width": 354,
+          "height": 228,
+          "changedPixels": 58056,
+          "changedRatio": 0.7192982456140351,
+          "meanDelta": 54.17921746456537
+        },
+        "spread": {
+          "luminanceLevels": 30,
+          "p10": 43,
+          "p90": 54
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "390 product st-laurent-lap-625",
+      "pass": true,
+      "detail": {
+        "colours": 24,
+        "geometry": {
+          "tag": "svg",
+          "box": {
+            "w": 354,
+            "h": 227.875
+          },
+          "viewBox": "0 0 1536 922",
+          "key": "[\"http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png\",1536,922,[0,0,1536,922],\"M0 108H1536V816H0Z\"]",
+          "images": [
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png",
+            "http://127.0.0.1:37559/assets/products/mir-siding-625/base-hardieplank.png"
+          ],
+          "paths": [
+            "M0 108H1536V816H0Z"
+          ]
+        },
+        "difference": {
+          "width": 354,
+          "height": 228,
+          "changedPixels": 58056,
+          "changedRatio": 0.7192982456140351,
+          "meanDelta": 16.950552582020023
+        },
+        "spread": {
+          "luminanceLevels": 43,
+          "p10": 23,
+          "p90": 55
+        }
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "390 two-tone grain visible",
+      "pass": true,
+      "detail": {
+        "id": "canexel-sierra",
+        "luminanceLevels": 71,
+        "p10": 85,
+        "p90": 114
+      },
+      "validatedIn": "final"
+    },
+    {
+      "name": "390 touch-up canexel-touch-up-284ml",
+      "pass": true,
+      "detail": {
+        "colours": 20
+      },
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "390 touch-up hardie-colorplus-touch-up-kit",
+      "pass": true,
+      "detail": {
+        "colours": 1
+      },
+      "validatedIn": "final-recheck"
+    },
+    {
+      "name": "390 unavailable hardieplank-select-725",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "390 unavailable hardieplank-smooth-725",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "390 unavailable hardieplank-select-525",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "390 unavailable hardieplank-smooth-525",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "390 legacy incompatible cart",
+      "pass": true,
+      "validatedIn": "final-verification"
+    },
+    {
+      "name": "390 javascript errors",
+      "pass": true,
+      "validatedIn": "final-categories"
+    },
+    {
+      "name": "350 labels canexel-ridgewood-d5",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "350 labels hardieplank-select-625",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "350 labels st-laurent-lap-625",
+      "pass": true,
+      "validatedIn": "final"
+    },
+    {
+      "name": "1440 viewport evidence",
+      "pass": true,
+      "validatedIn": "final-verification"
+    },
+    {
+      "name": "834 viewport evidence",
+      "pass": true,
+      "validatedIn": "final-verification"
+    },
+    {
+      "name": "390 viewport evidence",
+      "pass": true,
+      "validatedIn": "final-verification"
+    }
+  ],
+  "runs": [
+    {
+      "path": "final/results.json",
+      "passed": 64,
+      "failed": 3,
+      "sourcesStableDuringRun": true
+    },
+    {
+      "path": "final-recheck/results.json",
+      "passed": 18,
+      "failed": 3,
+      "sourcesStableDuringRun": true
+    },
+    {
+      "path": "final-verification/results.json",
+      "passed": 9,
+      "failed": 0,
+      "sourcesStableDuringRun": true
+    },
+    {
+      "path": "final-categories/results.json",
+      "passed": 6,
+      "failed": 0,
+      "sourcesStableDuringRun": true
+    }
+  ],
+  "finalSourceHashes": {
+    "commerce.js": "df5d9a56ea126082d8608e98c88ee6459fb711c45510b926d08fd31bc38f7bc7",
+    "material-preview.js": "7121a11755fc6486ae203ed497e2f79c583f73edd910c527acd7dce707a55443",
+    "mir-client-colour-palettes.json": "ca08c9c93cdb6a603aae31d46ece55f1ab59a6023353adfae63225ea98e2c045",
+    "mir-client-siding-previews.js": "93f3a6c923852674444f32206365bd6f7b40e370b60d097033360adc33c2127f",
+    "mir-prestige.css": "5c66611b9a6276bff020825eecbde1a7cd3d6d2ad82268199da6ed8fd2a0680d",
+    "mir-prestige-colours.css": "010a5ebadcadabe0cafa0b9dc864bf8ec911ce58261e709431483545bdf6b62d",
+    "mir-prestige-category-thumbnails.css": "7dac4591dd3884c8789ec81be7d2c83b8a195d4940c5c1d5cade33575a195e92",
+    "mir-client-i18n.js": "ca4c069e393b949a0f9bce60dbab5aa2de161e527cad046816dcaedec2c122d3",
+    "mir-client-en-ca.js": "3d6914f58d1954224484d76afa7f46274dbdcbf47ea53a658ce39286c4f5440d",
+    "mir-estimate.js": "3710f601c059f4e0e6c7a83616209729c775b222d7f9c334ced63e6d39052e32"
+  },
+  "network": {
+    "localRequests": 17317,
+    "localMethodsOtherThanGetHead": 0,
+    "blockedExternalRequests": 142,
+    "blockedMethods": {
+      "POST": 142
+    },
+    "externalRequestsActuallyAllowed": 0,
+    "blockedEndpointPurpose": "Existing app attempts POST to mir_public_boutique_prices RPC; interception aborts these before any external network request."
+  },
+  "pixels": {
+    "representativeRangePercent": [
+      29.21,
+      99.82
+    ],
+    "scope": "First and last compatible colours on 16 public siding profiles desktop; 3 representative profiles at 834 and390. Renderer unit/browser suite separately covers all prepared colour tables."
+  },
+  "limitations": [
+    "No physical device, Safari/iOS, or display colour calibration.",
+    "Screen renders are indicative, not manufacturer proof of exact finish or availability.",
+    "Four legacy CanExel touch-up colours preserve the existing generic container photo with colour not represented; no invented exact-colour pot.",
+    "Hardie touch-up kit retains its existing one-colour reference and original product photo.",
+    "Public Hardie Board & Batten was already hidden and stays hidden. No5¼ fibre-cement item existed; hypothetical direct URLs are unavailable.",
+    "Full-page screenshots can place sticky elements at the current scroll position. Use final-verification/*viewport*.png for device-screen review."
+  ]
+}

@@ -1,0 +1,616 @@
+{
+  "stage": "final-recheck",
+  "generatedAt": "2026-11-17T14:55:30.368Z",
+  "scope": "Local Chromium; no physical device or Safari certification",
+  "checks": [
+    {
+      "name": "1440 cards CanExel",
+      "pass": true,
+      "detail": [
+        {
+          "id": "canexel-cedrvue-9",
+          "count": 16
+        },
+        {
+          "id": "canexel-board-batten",
+          "count": 7
+        },
+        {
+          "id": "canexel-vstyle",
+          "count": 16
+        },
+        {
+          "id": "canexel-ridgewood-d5",
+          "count": 16
+        },
+        {
+          "id": "canexel-touch-up-284ml",
+          "count": 20
+        }
+      ]
+    },
+    {
+      "name": "1440 cards James Hardie",
+      "pass": true,
+      "detail": [
+        {
+          "id": "hardieplank-smooth-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-smooth-825",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-825",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel-cedarmill",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-staggered",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-straight",
+          "count": 19
+        },
+        {
+          "id": "hardietrim-smooth-54-35",
+          "count": 5
+        },
+        {
+          "id": "hardie-colorplus-touch-up-kit",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "name": "1440 cards St-Laurent",
+      "pass": true,
+      "detail": [
+        {
+          "id": "st-laurent-lap-625",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-lap-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-v-groove-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-board-batten-12",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-trim-35",
+          "count": 24
+        }
+      ]
+    },
+    {
+      "name": "1440 touch-up canexel-touch-up-284ml",
+      "pass": true,
+      "detail": {
+        "colours": 20
+      }
+    },
+    {
+      "name": "1440 touch-up hardie-colorplus-touch-up-kit",
+      "pass": true,
+      "detail": {
+        "colours": 1
+      }
+    },
+    {
+      "name": "1440 legacy incompatible cart",
+      "pass": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#cart-estimate')\u001b[22m\n\u001b[2m    - locator resolved to <a class=\"mir-button\" id=\"cart-estimate\" aria-disabled=\"true\" href=\"/estimation.html\">Demander une estimation</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    57 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "name": "1440 javascript errors",
+      "pass": true
+    },
+    {
+      "name": "834 cards CanExel",
+      "pass": true,
+      "detail": [
+        {
+          "id": "canexel-cedrvue-9",
+          "count": 16
+        },
+        {
+          "id": "canexel-board-batten",
+          "count": 7
+        },
+        {
+          "id": "canexel-vstyle",
+          "count": 16
+        },
+        {
+          "id": "canexel-ridgewood-d5",
+          "count": 16
+        },
+        {
+          "id": "canexel-touch-up-284ml",
+          "count": 20
+        }
+      ]
+    },
+    {
+      "name": "834 cards James Hardie",
+      "pass": true,
+      "detail": [
+        {
+          "id": "hardieplank-smooth-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-smooth-825",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-825",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel-cedarmill",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-staggered",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-straight",
+          "count": 19
+        },
+        {
+          "id": "hardietrim-smooth-54-35",
+          "count": 5
+        },
+        {
+          "id": "hardie-colorplus-touch-up-kit",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "name": "834 cards St-Laurent",
+      "pass": true,
+      "detail": [
+        {
+          "id": "st-laurent-lap-625",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-lap-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-v-groove-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-board-batten-12",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-trim-35",
+          "count": 24
+        }
+      ]
+    },
+    {
+      "name": "834 touch-up canexel-touch-up-284ml",
+      "pass": true,
+      "detail": {
+        "colours": 20
+      }
+    },
+    {
+      "name": "834 touch-up hardie-colorplus-touch-up-kit",
+      "pass": true,
+      "detail": {
+        "colours": 1
+      }
+    },
+    {
+      "name": "834 legacy incompatible cart",
+      "pass": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#cart-estimate')\u001b[22m\n\u001b[2m    - locator resolved to <a class=\"mir-button\" id=\"cart-estimate\" aria-disabled=\"true\" href=\"/estimation.html\">Demander une estimation</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    57 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n"
+    },
+    {
+      "name": "834 javascript errors",
+      "pass": true
+    },
+    {
+      "name": "390 cards CanExel",
+      "pass": true,
+      "detail": [
+        {
+          "id": "canexel-cedrvue-9",
+          "count": 16
+        },
+        {
+          "id": "canexel-board-batten",
+          "count": 7
+        },
+        {
+          "id": "canexel-vstyle",
+          "count": 16
+        },
+        {
+          "id": "canexel-ridgewood-d5",
+          "count": 16
+        },
+        {
+          "id": "canexel-touch-up-284ml",
+          "count": 20
+        }
+      ]
+    },
+    {
+      "name": "390 cards James Hardie",
+      "pass": true,
+      "detail": [
+        {
+          "id": "hardieplank-smooth-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-smooth-825",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-625",
+          "count": 19
+        },
+        {
+          "id": "hardieplank-select-825",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel",
+          "count": 19
+        },
+        {
+          "id": "hardiepanel-cedarmill",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-staggered",
+          "count": 19
+        },
+        {
+          "id": "hardieshingle-straight",
+          "count": 19
+        },
+        {
+          "id": "hardietrim-smooth-54-35",
+          "count": 5
+        },
+        {
+          "id": "hardie-colorplus-touch-up-kit",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "name": "390 cards St-Laurent",
+      "pass": true,
+      "detail": [
+        {
+          "id": "st-laurent-lap-625",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-lap-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-v-groove-825",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-board-batten-12",
+          "count": 24
+        },
+        {
+          "id": "st-laurent-trim-35",
+          "count": 24
+        }
+      ]
+    },
+    {
+      "name": "390 touch-up canexel-touch-up-284ml",
+      "pass": true,
+      "detail": {
+        "colours": 20
+      }
+    },
+    {
+      "name": "390 touch-up hardie-colorplus-touch-up-kit",
+      "pass": true,
+      "detail": {
+        "colours": 1
+      }
+    },
+    {
+      "name": "390 legacy incompatible cart",
+      "pass": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#cart-estimate')\u001b[22m\n\u001b[2m    - locator resolved to <a class=\"mir-button\" id=\"cart-estimate\" aria-disabled=\"true\" href=\"/estimation.html\">Demander une estimation</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    57 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "name": "390 javascript errors",
+      "pass": true
+    }
+  ],
+  "requests": 3258,
+  "blocked": [
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    }
+  ],
+  "sourceHashes": {
+    "commerce.js": "9007be5255ea1c3a332ae28ac0617a09021ccbb0eab691467475169ab79190e8",
+    "material-preview.js": "7121a11755fc6486ae203ed497e2f79c583f73edd910c527acd7dce707a55443",
+    "mir-client-colour-palettes.json": "ca08c9c93cdb6a603aae31d46ece55f1ab59a6023353adfae63225ea98e2c045",
+    "mir-client-siding-previews.js": "93f3a6c923852674444f32206365bd6f7b40e370b60d097033360adc33c2127f",
+    "mir-prestige.css": "5c66611b9a6276bff020825eecbde1a7cd3d6d2ad82268199da6ed8fd2a0680d",
+    "mir-prestige-colours.css": "010a5ebadcadabe0cafa0b9dc864bf8ec911ce58261e709431483545bdf6b62d",
+    "mir-prestige-category-thumbnails.css": "7dac4591dd3884c8789ec81be7d2c83b8a195d4940c5c1d5cade33575a195e92",
+    "mir-client-i18n.js": "ca4c069e393b949a0f9bce60dbab5aa2de161e527cad046816dcaedec2c122d3",
+    "mir-client-en-ca.js": "3d6914f58d1954224484d76afa7f46274dbdcbf47ea53a658ce39286c4f5440d",
+    "mir-estimate.js": "3710f601c059f4e0e6c7a83616209729c775b222d7f9c334ced63e6d39052e32"
+  },
+  "loads": [
+    {
+      "url": "boutique.html?brand=CanExel",
+      "width": 1440,
+      "elapsedMs": 2790
+    },
+    {
+      "url": "boutique.html?brand=James%20Hardie",
+      "width": 1440,
+      "elapsedMs": 2848
+    },
+    {
+      "url": "boutique.html?brand=St-Laurent",
+      "width": 1440,
+      "elapsedMs": 2030
+    },
+    {
+      "url": "produit.html?id=canexel-touch-up-284ml",
+      "width": 1440,
+      "elapsedMs": 2354
+    },
+    {
+      "url": "produit.html?id=hardie-colorplus-touch-up-kit",
+      "width": 1440,
+      "elapsedMs": 1995
+    },
+    {
+      "url": "boutique.html?brand=James%20Hardie",
+      "width": 1440,
+      "elapsedMs": 2422
+    },
+    {
+      "url": "selection.html",
+      "width": 1440,
+      "elapsedMs": 1869
+    },
+    {
+      "url": "boutique.html?brand=CanExel",
+      "width": 834,
+      "elapsedMs": 2124
+    },
+    {
+      "url": "boutique.html?brand=James%20Hardie",
+      "width": 834,
+      "elapsedMs": 2506
+    },
+    {
+      "url": "boutique.html?brand=St-Laurent",
+      "width": 834,
+      "elapsedMs": 1792
+    },
+    {
+      "url": "produit.html?id=canexel-touch-up-284ml",
+      "width": 834,
+      "elapsedMs": 2484
+    },
+    {
+      "url": "produit.html?id=hardie-colorplus-touch-up-kit",
+      "width": 834,
+      "elapsedMs": 1763
+    },
+    {
+      "url": "boutique.html?brand=James%20Hardie",
+      "width": 834,
+      "elapsedMs": 2102
+    },
+    {
+      "url": "selection.html",
+      "width": 834,
+      "elapsedMs": 1517
+    },
+    {
+      "url": "boutique.html?brand=CanExel",
+      "width": 390,
+      "elapsedMs": 2041
+    },
+    {
+      "url": "boutique.html?brand=James%20Hardie",
+      "width": 390,
+      "elapsedMs": 2186
+    },
+    {
+      "url": "boutique.html?brand=St-Laurent",
+      "width": 390,
+      "elapsedMs": 2008
+    },
+    {
+      "url": "produit.html?id=canexel-touch-up-284ml",
+      "width": 390,
+      "elapsedMs": 2344
+    },
+    {
+      "url": "produit.html?id=hardie-colorplus-touch-up-kit",
+      "width": 390,
+      "elapsedMs": 1735
+    },
+    {
+      "url": "boutique.html?brand=James%20Hardie",
+      "width": 390,
+      "elapsedMs": 2086
+    },
+    {
+      "url": "selection.html",
+      "width": 390,
+      "elapsedMs": 1884
+    }
+  ],
+  "sourceHashesAfter": {
+    "commerce.js": "9007be5255ea1c3a332ae28ac0617a09021ccbb0eab691467475169ab79190e8",
+    "material-preview.js": "7121a11755fc6486ae203ed497e2f79c583f73edd910c527acd7dce707a55443",
+    "mir-client-colour-palettes.json": "ca08c9c93cdb6a603aae31d46ece55f1ab59a6023353adfae63225ea98e2c045",
+    "mir-client-siding-previews.js": "93f3a6c923852674444f32206365bd6f7b40e370b60d097033360adc33c2127f",
+    "mir-prestige.css": "5c66611b9a6276bff020825eecbde1a7cd3d6d2ad82268199da6ed8fd2a0680d",
+    "mir-prestige-colours.css": "010a5ebadcadabe0cafa0b9dc864bf8ec911ce58261e709431483545bdf6b62d",
+    "mir-prestige-category-thumbnails.css": "7dac4591dd3884c8789ec81be7d2c83b8a195d4940c5c1d5cade33575a195e92",
+    "mir-client-i18n.js": "ca4c069e393b949a0f9bce60dbab5aa2de161e527cad046816dcaedec2c122d3",
+    "mir-client-en-ca.js": "3d6914f58d1954224484d76afa7f46274dbdcbf47ea53a658ce39286c4f5440d",
+    "mir-estimate.js": "3710f601c059f4e0e6c7a83616209729c775b222d7f9c334ced63e6d39052e32"
+  },
+  "sourcesStable": true,
+  "nonReadLocalRequests": [],
+  "passed": 18,
+  "failed": 3
+}
