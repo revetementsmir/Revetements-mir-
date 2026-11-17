@@ -107,11 +107,22 @@
  function workItems(inventory,buildingId,sourceImages={}){
   const roofIds=new Set(inventory.views.filter(v=>v.buildingId===buildingId&&v.kind==='roof'&&root.MIRRoofPitchEvidence?.regions(v).length).map(v=>v.id)),roofRegistration=roofIds.size>0&&inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor');
   const views=inventory.views.filter(v=>v.buildingId===buildingId&&(['floor','elevation'].includes(v.kind)||roofRegistration&&roofIds.has(v.id))&&v.payload.sourceImage).sort((a,b)=>Number(b.kind==='floor')-Number(a.kind==='floor'));
-  // Grid OCR runs for cross-level registration or an observed roof pitch
-  // requiring a real floor-to-roof transform. No roof kind is rewritten as
-  // a floor; the same bubble detector, thresholds and total budget apply.
+  // Roof registration is supplementary: adding its grid must not evict
+  // captions or other readings already needed by the floors and elevations.
+  // A single-floor grid used only to register a roof is supplementary too.
+  // Keep the original region budget; unread roof axes stay unresolved.
   const multiLevel=new Set(views.filter(v=>v.kind==='floor').map(v=>v.levelId).filter(Boolean)).size>1;
-  return views.flatMap(view=>(view.kind==='roof'?gridRegions(view,sourceImages[view.id],{includeRoof:true}):[...regions(view,sourceImages[view.id]),...(multiLevel||roofRegistration&&view.kind==='floor'?gridRegions(view,sourceImages[view.id]):[]),...openingRegions(view,sourceImages[view.id]).map(region=>({...region,priority:4}))]).map(region=>({view,region}))).sort((a,b)=>a.region.priority-b.region.priority).slice(0,multiLevel?64:42);
+  const fundamental=[],supplementary=[],add=(target,view,regions)=>target.push(...regions.map(region=>({view,region})));
+  for(const view of views){
+   const image=sourceImages[view.id];
+   if(view.kind==='roof'){add(supplementary,view,gridRegions(view,image,{includeRoof:true}));continue;}
+   add(fundamental,view,regions(view,image));
+   if(multiLevel)add(fundamental,view,gridRegions(view,image));
+   else if(roofRegistration&&view.kind==='floor')add(supplementary,view,gridRegions(view,image));
+   add(fundamental,view,openingRegions(view,image).map(region=>({...region,priority:4})));
+  }
+  const priority=(a,b)=>a.region.priority-b.region.priority;
+  return [...fundamental.sort(priority),...supplementary.sort(priority)].slice(0,multiLevel?64:42);
  }
  // Re-read a bounded region from the retained PDF, never from a resampled
  // screenshot. Coordinates remain those of the upright imported view.
