@@ -48,7 +48,7 @@
         frame:record.sourceFrame||null,kind:record.kind,direction:record.direction||record.key||null,
         buildingId:record.buildingHint||buildingHint(record.name),levelId:record.kind==='floor'?levelHint(record.name):null,
         associationStatus:'proposed',associations:{building:'proposed',level:'proposed',direction:'proposed'},calibration:copy(record.calibration||{}),
-        provenance:{method:'local-pdf-titles-and-pixels',title:record.name,titleBox:record.titleBox||null,titleBoxFrame:'raster-page',building:record.buildingEvidence||null,needsReview:true},
+        provenance:{method:'local-pdf-titles-and-pixels',title:record.name,titleBox:record.titleBox||null,titleBoxFrame:'raster-page',building:record.buildingEvidence||null,...(record.sheetTitleEvidence?{sheetTitle:copy(record.sheetTitleEvidence)}:{}),needsReview:true},
         evidence:record.volumeEvidence||[],payload:copy(record)};
     });
     for(const view of views)for(const field of ['building','level','direction'])if(!view[field==='direction'?field:field+'Id'])view.associations[field]='unresolved';
