@@ -73,8 +73,11 @@ assert.equal(checked.reports.find(v=>v.levelId==='house:level-1').gridAlignment.
   require('../dist/plan-reconstruction-readings.js');
   const item=structuredClone(withoutReadings);
   item.payload.sourceImage='synthetic-raster';
-  const tasks=global.window.MIRReconstructionReadings.workItems({views:[item]},'house',{[item.id]:base.image});
-  assert.ok(tasks.filter(x=>x.region.grid).length>=5,'grid OCR regions are enqueued from source rings without initial OCR text');
+  const one=global.window.MIRReconstructionReadings.workItems({views:[item]},'house',{[item.id]:base.image});
+  assert.equal(one.filter(x=>x.region.grid).length,0,'single-floor imports do not pay the multi-level grid OCR cost');
+  const other=structuredClone(item);other.id='synthetic-other-floor';other.levelId='level-1';
+  const tasks=global.window.MIRReconstructionReadings.workItems({views:[item,other]},'house',{[item.id]:base.image,[other.id]:base.image});
+  assert.ok(tasks.filter(x=>x.region.grid).length>=10,'multi-floor grid OCR regions are enqueued even without initial OCR text');
   assert.ok(tasks.filter(x=>x.region.grid).every(x=>x.region.purpose==='source-raster-grid-bubble'&&x.region.gridCircle.ringSupport>=.9));
  }finally{global.window=initialWindow;global.document=initialDocument;}
 }
