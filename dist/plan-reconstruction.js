@@ -424,7 +424,8 @@ function localizeTargetContour(image,points){
   const spread=list=>list.length?Math.max(...list)/Math.min(...list)-1:0,scaleConflict=partial.conflict||spread(candidates.map(r=>r.scale))>.05;
   if(scaleConflict&&reference){draft.reference={...draft.reference,value:null,label:'',suggestedScale:reference.scale,suggestedValue:reference.value,conflict:true};}
 
-  return {version:1,status:'proposed',buildingId,levelId:level.id,sourceViewId:floor.id,draft,referenceCandidates:candidates,unresolvedScaleReferences:[...floorReferences.unresolvedReferences,...(partial.unresolvedReferences||[])],heightCandidates:heights,heightAlternatives,verticalCalibrations,views,sourceOpeningGaps:V.floorOpenings(image,outline.points),contourDimensions:dimensions,openingSizeCandidates:floorOpeningSizes(floor,outline.points,V.floorOpenings(image,outline.points)),scaleConflict,heightConflict:verticalCalibrations.some(a=>a.status==='conflict')||spread(heights.map(h=>h.value))>.05,confirmationRequired:true,complete:false};
+  const sourceOpeningGaps=V.floorOpenings(image,outline.points,{boundaryEvidence:outline.sourceEdgeEvidence});
+  return {version:1,status:'proposed',buildingId,levelId:level.id,sourceViewId:floor.id,draft,referenceCandidates:candidates,unresolvedScaleReferences:[...floorReferences.unresolvedReferences,...(partial.unresolvedReferences||[])],heightCandidates:heights,heightAlternatives,verticalCalibrations,views,sourceOpeningGaps,contourDimensions:dimensions,openingSizeCandidates:floorOpeningSizes(floor,outline.points,sourceOpeningGaps),scaleConflict,heightConflict:verticalCalibrations.some(a=>a.status==='conflict')||spread(heights.map(h=>h.value))>.05,confirmationRequired:true,complete:false};
  }
  function levelBand(viewInfo,draft,inventory){
   if(draft.height?.relationship!=='two-visible-level-datums')return null;
@@ -447,11 +448,17 @@ function localizeTargetContour(image,points){
    // A continuous floor wall line can hide its opening gap. A closed,
    // monochrome aperture in the compatible elevation is independent evidence;
    // it remains a proposal without claiming a floor-plan correspondence.
-   for(const candidate of V.elevationOpenings(images[v.viewId],v.envelope.box,{top:(band?.topY??v.supportY??v.envelope.box[1])+3,bottom:guide.y-2})){
+   const apertureBand={top:(band?.topY??v.supportY??v.envelope.box[1])+3,bottom:guide.y-2},paneOptions={bandHeight:apertureBand.bottom-apertureBand.top},independentFrames=V.elevationOpenings(images[v.viewId],v.envelope.box,apertureBand).flatMap(candidate=>{const paneEvidence=V.coherentPaneGroup(images[v.viewId],candidate.box,paneOptions);return paneEvidence?[{...candidate,paneEvidence}]:[];});
+   // Closing white pixels can erase a thin dark window frame and connect its
+   // glazing to the wall background. These untouched pane components provide
+   // search seeds only: each resulting aperture still needs its actual frame.
+   for(const pane of V.glazingFrames(images[v.viewId],v.envelope.box,{...apertureBand,preserveThinFrames:true}))for(const candidate of V.frameAtSeed(images[v.viewId],{left:pane.box[0],right:pane.box[0]+pane.box[2]},apertureBand))if(!independentFrames.some(c=>overlapBox(c.box,candidate.box).fraction>.4))independentFrames.push(candidate);
+   for(const candidate of independentFrames){
     if(!boxes.some(b=>overlapBox(b.box,candidate.box).fraction>.4))boxes.push({...candidate,floorCorrespondence:{status:'unresolved',reason:'FLOOR_GAP_NOT_DETECTED'}});
    }
    for(const candidate of boxes){if(!candidate.occlusionEvidence&&(v.envelope.occlusions||[]).some(([x,y,w,h])=>{const [l,t,bw,bh]=candidate.box;return Math.max(0,Math.min(l+bw,x+w)-Math.max(l,x))*Math.max(0,Math.min(t+bh,y+h)-Math.max(t,y))>bw*bh*.1;}))continue;const [x,y,bw,bh]=candidate.box,left=min+(x-v.envelope.box[0])*scaleX,right=left+bw*scaleX,wall=facing.filter(w=>Math.min(dot(w.from,frame.u),dot(w.to,frame.u))<=left+.03&&Math.max(dot(w.from,frame.u),dot(w.to,frame.u))>=right-.03).sort((a,b)=>dot(b.from,frame.n)-dot(a.from,frame.n))[0];if(!wall)continue;
     const first=dot(wall.from,frame.u),last=dot(wall.to,frame.u),offset=first<last?left-first:first-right,sill=(guide.y-y-bh)*scaleY,opening={id:'opening:'+v.viewId+':'+[x,y,bw,bh].map(Math.round).join('-'),sourceId:'frame:'+v.viewId+':'+[x,y,bw,bh].map(Math.round).join('-'),sourceViewId:v.viewId,sourceFrame:M.clone(inventory.views.find(s=>s.id===v.viewId).frame),sourceBox:candidate.box,...(candidate.floorCorrespondence?{floorCorrespondence:M.clone(candidate.floorCorrespondence)}:{}),wallId:wall.id,type:'window',offset,width:bw*scaleX,height:bh*scaleY,sill,status:'proposed',kind:'estimated-calibrated',scalesUsed:{x:scaleX,y:scaleY},references:[M.clone(draft.reference),M.clone(draft.height)],writtenSizeCandidates:(proposal.openingSizeCandidates||[]).filter(s=>s.edgeIndex===candidate.floorGap?.edgeIndex&&M.distance(s.anchors[0],candidate.floorGap.anchors[0])<4).map(M.clone),positionEvidence:{kind:'estimated-calibrated',sourceViewId:v.viewId,sourceBox:M.clone(candidate.box),scalesUsed:{x:scaleX,y:scaleY},...(candidate.occlusionEvidence?{occlusionEvidence:M.clone(candidate.occlusionEvidence)}:{}),status:'proposed'},confirmationRequired:true};
+    if(candidate.paneEvidence)opening.paneEvidence={...M.clone(candidate.paneEvidence),sourceViewId:v.viewId,sourceFrame:M.clone(opening.sourceFrame)};
     if(offset>=0&&sill>=0&&offset+opening.width<=wall.length+.01&&sill+opening.height<=height+.01&&!result.some(o=>o.id===opening.id))result.push(opening);
    }
   }return result;

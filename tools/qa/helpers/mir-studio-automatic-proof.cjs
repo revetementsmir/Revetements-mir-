@@ -131,6 +131,28 @@ function assertDeepEqual(actual,expected,message='Stored values changed.'){
   assert.fail(message+' Actual SHA-256: '+digest(actual)+'; expected SHA-256: '+digest(expected)+'.');
 }
 
+function conversionTerminalObserver(){
+  let observedBusy=false;
+  return observation=>{
+    if(!observation?.available)return false;
+    if(observation.stopVisible||observation.buttonPresent&&observation.buttonDisabled)observedBusy=true;
+    const idle=observation.buttonPresent&&!observation.buttonDisabled&&!observation.stopVisible&&!observation.pending;
+    if(!idle)return false;
+    const terminal=TERMINAL_STATUSES.includes(observation.reportStatus);
+    if(terminal&&!observation.requestPending)return true;
+    // A store rejection leaves the source project available and the Convert
+    // control enabled, but no terminal report. This is a failed recipe, never
+    // an implicit success and never a reason to wait the full OCR timeout.
+    // Requiring an observed busy state avoids mistaking the initial idle UI
+    // before automatic startup for such a refusal.
+    if(observedBusy&&!terminal){
+      const error=Error('Automatic conversion stopped without a persisted terminal report. Visible status: '+(observation.visibleStatus||'(empty)'));
+      error.code='CONVERSION_STOPPED_WITHOUT_REPORT';throw error;
+    }
+    return false;
+  };
+}
+
 async function waitForAsync(check,{timeoutMs,intervalMs=100,now=Date.now,pause=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}){
   assert.ok(Number.isFinite(timeoutMs)&&timeoutMs>0,'An explicit positive timeout is required.');
   const deadline=now()+timeoutMs;
@@ -153,4 +175,4 @@ async function waitForAsync(check,{timeoutMs,intervalMs=100,now=Date.now,pause=m
   }
 }
 
-module.exports={TERMINAL_STATUSES,DEFAULT_EXPECTED,canonicalPath,within,outsideRepositories,parseArgs,evaluateProof,withoutFinish,levelGeometry,unrelatedWallFinishes,privateJSON,decodeSourceRaster,exportSourceRasters,waitForAsync,assertDeepEqual};
+module.exports={TERMINAL_STATUSES,DEFAULT_EXPECTED,canonicalPath,within,outsideRepositories,parseArgs,evaluateProof,withoutFinish,levelGeometry,unrelatedWallFinishes,privateJSON,decodeSourceRaster,exportSourceRasters,conversionTerminalObserver,waitForAsync,assertDeepEqual};

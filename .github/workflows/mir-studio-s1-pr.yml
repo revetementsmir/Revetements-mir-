@@ -65,6 +65,7 @@ jobs:
           node tests/mir-studio-grid-reading-policy.cjs
           node tests/mir-studio-native-source-crop.cjs
           node tests/mir-studio-fragmented-captions.cjs
+          node tests/mir-studio-datum-caption-regions.cjs
           node tests/mir-studio-neighbouring-measurements.cjs
           node tests/mir-studio-dimension-word-retry.cjs
           node tests/mir-studio-native-vertical-dimensions.cjs
@@ -83,6 +84,7 @@ jobs:
           node tests/mir-studio-legend-occlusion.cjs
           node tests/mir-studio-roof-eave-evidence.cjs
           node tests/mir-studio-roof-ceiling-band.cjs
+          node tests/mir-studio-roof-ridge-annotations.cjs
           node tests/mir-studio-exterior-reconstruction.cjs
           node tests/mir-studio-exterior-integration.cjs
           node tests/mir-studio-irregular-masonry.cjs
@@ -93,6 +95,8 @@ jobs:
           node tests/mir-studio-door-boundary.cjs
           node tests/mir-studio-sliding-boundary.cjs
           node tests/mir-studio-framed-wall-network.cjs
+          node tests/mir-studio-floor-opening-evidence.cjs
+          node tests/mir-studio-opening-pane-evidence.cjs
           node tests/mir-studio-wall-contrast.cjs
           node tests/mir-studio-elevation-document-frame.cjs
           node tests/mir-studio-fragmented-openings.cjs
@@ -141,6 +145,8 @@ jobs:
         run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-entry-assemblies-browser.cjs
       - name: Source-generated masonry, finish choices and reopen (synthetic only)
         run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-irregular-masonry-browser.cjs
+      - name: Native reading evidence and atomic persistence (synthetic only)
+        run: MIR_CHROMIUM_BIN="$(command -v google-chrome || command -v chromium)" node tests/mir-studio-native-reading-store-browser.cjs
       - name: Existing large PDF, rendering and interaction regressions
         run: |
           node tests/mir-plan-pdf-browser.cjs

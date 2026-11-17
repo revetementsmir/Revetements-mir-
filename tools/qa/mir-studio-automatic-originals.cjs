@@ -224,12 +224,16 @@ async function runCase(browser,base,item,config,app){
       assert.ok(opened.source.pages>0&&opened.inventory.views.length>0,'The imported PDF has no pages or views.');
       if(proof.selectedBuildingId)assert.equal(opened.buildingId,proof.selectedBuildingId);
       proof.imported={id:opened.id,buildingId:opened.buildingId,source:opened.source,views:opened.inventory.views.length};proof.steps.import=true;
-      await H.waitForAsync(()=>page.evaluate(async statuses=>{
-        if(!window.MIR_LEVEL_STUDIO||!window.MIRProjectStore)return false;
-        const e=await MIRProjectStore.getActive(),buildingId=e?.planData.viewInventory?.activeBuildingId;
-        const report=e?.planData.automaticReconstruction?.[buildingId],button=document.querySelector('#mir-level-convert');
-        return statuses.includes(report?.status)&&!e.planData.reconstructionRequest&&button&&!button.disabled&&!document.querySelector('#mir-level-stop-conversion')&&!MIR_LEVEL_STUDIO.pending();
-      },H.TERMINAL_STATUSES),{timeoutMs:config.timeoutMs});
+      const terminalObservation=H.conversionTerminalObserver();
+      await H.waitForAsync(async()=>{
+        const observation=await page.evaluate(async()=>{
+          if(!window.MIR_LEVEL_STUDIO||!window.MIRProjectStore)return {available:false};
+          const e=await MIRProjectStore.getActive(),buildingId=e?.planData.viewInventory?.activeBuildingId;
+          const report=e?.planData.automaticReconstruction?.[buildingId],button=document.querySelector('#mir-level-convert');
+          return {available:!!e,reportStatus:report?.status||null,requestPending:!!e?.planData.reconstructionRequest,buttonPresent:!!button,buttonDisabled:!!button?.disabled,stopVisible:!!document.querySelector('#mir-level-stop-conversion'),pending:!!MIR_LEVEL_STUDIO.pending(),visibleStatus:document.querySelector('#mir-level-status')?.textContent?.trim()||''};
+        });
+        proof.lastConversionObservation=observation;return terminalObservation(observation);
+      },{timeoutMs:config.timeoutMs});
       const imported=await readSnapshot(page);assert.ok(imported);
       assert.equal(imported.id,opened.id);assert.equal(imported.buildingId,opened.buildingId);assert.equal(imported.source.sha256,item.sha256);
       proof.steps.conversion=true;proof.reconstructionStatus=imported.report.status;
@@ -253,7 +257,7 @@ async function runCase(browser,base,item,config,app){
       }
     }
   }catch(error){
-    proof.failure={message:error.message,stack:error.stack};
+    proof.failure={message:error.message,stack:error.stack,...(error.code?{code:error.code}:{})};
     proof.visibleStatus=await page.locator('#mir-level-status,#mir-conversion-report,#mir-pdf-error').allTextContents().catch(()=>[]);
     await page.screenshot({path:path.join(caseOut,'failure.png')}).catch(()=>{});
   }finally{

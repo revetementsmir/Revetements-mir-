@@ -558,3 +558,27 @@ The exact-commit Studio CI run
 [44104725280](https://github.com/revetementsmir/Revetements-mir-/actions/runs/44104725280)
 passes its Node, disposable SQL and synthetic browser contracts. That CI does
 not certify the two original-source partial models or the missing roof walls.
+
+## Native-reading persistence regression — 93a6d0b
+
+The next original-source runs against
+`93a6d0bf561ebbc1f00ea872e7d946b9c83408ca` were deliberately interrupted.
+The native horizontal/vertical evidence producers supplied `textBox`, while
+the existing atomic reconstruction store requires a finite four-coordinate
+`box` for every reading. This producer/store mismatch can reject the result;
+the original recipe previously kept waiting for a terminal persisted report.
+
+C2 completed its source import before interruption. C7 was interrupted during
+its run. Neither interruption is a completed geometry recipe or proof of a
+particular visible product refusal. The other five cases were not executed on
+this revision. The accepted seven-case matrix remains the `dd63c82` matrix
+above; no model or workflow success is inferred from these interrupted runs.
+
+The correction copies each producer's actual source text box into its evidence
+record. It does not relax the store validation. A synthetic browser test checks
+both real producers through IndexedDB, save/reopen, unchanged sources/settings,
+and atomic refusal of missing boxes and foreign source IDs. The private recipe
+now reports an explicit failure when an observed running conversion returns to
+idle without a persisted terminal report; it cannot turn that state into a
+successful conversion. A fresh original-source run is still required after
+these corrections.

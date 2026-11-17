@@ -17,6 +17,19 @@ assert.equal(H.evaluateProof({...completed,failure:{message:'synthetic failure'}
 assert.equal(H.evaluateProof({...completed,errors:{http:[{status:404}]}},H.DEFAULT_EXPECTED).passed,false,'A missing application resource cannot pass as successful.');
 assert.equal(H.evaluateProof({...completed,reconstructionStatus:'preserved'},H.DEFAULT_EXPECTED).passed,false,'An old preserved model is not a fresh automatic proposal.');
 
+const idleObservation={available:true,buttonPresent:true,buttonDisabled:false,stopVisible:false,pending:false,reportStatus:null,requestPending:true,visibleStatus:''};
+const busyObservation={...idleObservation,buttonDisabled:true,stopVisible:true,visibleStatus:'Synthetic reading in progress'};
+const stopped=H.conversionTerminalObserver();
+assert.equal(stopped({available:false}),false);assert.equal(stopped(idleObservation),false,'An idle UI before automatic startup is not a completed conversion or a refusal.');
+assert.equal(stopped(busyObservation),false);
+assert.equal(stopped({...idleObservation,pending:true}),false,'A pending choice cannot be mistaken for a terminal transaction.');
+assert.throws(()=>stopped({...idleObservation,visibleStatus:'Synthetic source validation refused'}),error=>error.code==='CONVERSION_STOPPED_WITHOUT_REPORT'&&/Synthetic source validation refused/.test(error.message),'A busy-to-idle transition without a persisted terminal report fails immediately with its visible reason.');
+const successful=H.conversionTerminalObserver();assert.equal(successful(busyObservation),false);
+assert.equal(successful({...idleObservation,reportStatus:'partial-proposal',requestPending:true}),false,'A pending reconstruction request still prevents completion.');
+assert.equal(successful({...idleObservation,reportStatus:'partial-proposal',requestPending:false}),true);
+const idleWithStaleReport=H.conversionTerminalObserver();assert.equal(idleWithStaleReport({...busyObservation,reportStatus:'partial-proposal',requestPending:false}),false,'A report cannot complete the recipe while the UI is still processing.');
+for(const patch of [{buttonPresent:false},{buttonDisabled:true},{stopVisible:true},{pending:true}])assert.equal(H.conversionTerminalObserver()({...idleObservation,...patch,reportStatus:'partial-proposal',requestPending:false}),false,'Every terminal UI condition remains necessary.');
+
 const model={walls:[{id:'synthetic-wall',height:3,status:'proposed',finish:{materialId:'before'}}],roofs:[],partial:true};
 const changed=structuredClone(model);changed.walls[0].finish.materialId='after';
 assert.deepEqual(H.withoutFinish(changed),H.withoutFinish(model));
@@ -93,5 +106,8 @@ console.log('PASS automatic-originals harness: empty-model rejection, expected r
   assert.equal(elapsed,25,'False terminal observations must respect the original deadline.');assert.equal(calls,4);
   await assert.rejects(H.waitForAsync(async()=>{throw Error('read failed');},{timeoutMs:100}),/read failed/,'An IndexedDB error cannot count as completion.');
   const started=Date.now();await assert.rejects(H.waitForAsync(()=>new Promise(()=>{}),{timeoutMs:30}),/Timed out/,'A never-resolving read is bounded by the same deadline.');assert.ok(Date.now()-started<1000,'A pending observation cannot hang the recipe.');
+  const terminal=H.conversionTerminalObserver();let observations=0;
+  await assert.rejects(H.waitForAsync(async()=>terminal(++observations===1?busyObservation:{...idleObservation,visibleStatus:'Synthetic store rejected'}),{timeoutMs:1000,intervalMs:1}),error=>error.code==='CONVERSION_STOPPED_WITHOUT_REPORT','A real async observation failure must propagate instead of becoming a truthy completion.');
+  assert.equal(observations,2,'A stopped conversion is rejected on its first idle observation.');
   console.log('PASS asynchronous terminal wait: false Promise observations, bounded timeout, pending read and read failure.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
