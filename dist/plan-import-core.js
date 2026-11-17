@@ -67,7 +67,7 @@
     }
     return { data: mask, width: w, height: h };
   }
-  function lineRun(mask, y, center, gap = 4) {
+  function lineRun(mask, y, center, gap = 4, minimum = 50) {
     const { width: w, height: h, data } = mask;
     const black = x => { if (x < 0 || x >= w) return 0; for (let yy = Math.max(0, y - 1); yy <= Math.min(h - 1, y + 1); yy++) if (data[yy * w + x]) return 1; return 0; };
     if (!black(center)) return null;
@@ -76,7 +76,7 @@
     misses = 0;
     for (let x = center + 1; x < w; x++) { if (black(x)) { right = x; misses = 0; count++; } else if (++misses > gap) break; }
     const length = right - left;
-    return length >= 50 && count / (length + 1) > .78 ? { left, right, y, density: count / (length + 1) } : null;
+    return length >= minimum && count / (length + 1) > .78 ? { left, right, y, density: count / (length + 1) } : null;
   }
   function intersections(mask, run, fontHeight, shortTicks = false) {
     const { width: w, height: h, data } = mask, reach = clamp(Math.round(fontHeight * .85), 10, 35), ys = run.y;
@@ -88,7 +88,7 @@
         const p = y * w + x, ink = data[p - 1] || data[p] || data[p + 1];
         if (ink) { continuous++; longest = Math.max(longest, continuous); if (dy < -3) above++; if (dy > 3) below++; } else continuous = 0;
       }
-      let slash = false;
+      let slash = false, markerStrength = 0;
       if (shortTicks && (above >= 4 || below >= 4)) for (const direction of [-1, 1]) {
         let upper = 0, lower = 0;
         for (let d = 1; d <= 4; d++) for (const sign of [-1, 1]) {
@@ -96,11 +96,25 @@
           if (px > 0 && px < w - 1 && py >= 0 && py < h && (data[py*w+px-1] || data[py*w+px] || data[py*w+px+1])) { if (sign < 0) upper++; else lower++; }
         }
         if (upper >= 3 && lower >= 3) slash = true;
+        // A nearby appliance/wall can have a stronger vertical intersection
+        // than the dimension's short diagonal tick. Compare the tick's two
+        // off-axis arms, excluding ink explained by a through-going vertical.
+        // A thick orthogonal crossing alone must not acquire that priority.
+        let upperDirect = 0, lowerDirect = 0, upperFree = 0, lowerFree = 0;
+        for (let d = 2; d <= 6; d++) for (const sign of [-1, 1]) {
+          const px = x + direction * sign * d, py = ys + sign * d;
+          if (px < 0 || px >= w || py < 0 || py >= h || !data[py*w+px]) continue;
+          const through = ys-reach >= 0 && ys+reach < h && data[(ys-reach)*w+px] && data[(ys+reach)*w+px];
+          if (sign < 0) { upperDirect++; upperFree += Number(!through); }
+          else { lowerDirect++; lowerFree += Number(!through); }
+        }
+        if (Math.min(upperDirect, lowerDirect) >= 2 && Math.min(upperFree, lowerFree) >= 1)
+          markerStrength = Math.max(markerStrength, Math.min(upperDirect, lowerDirect)*10 + upperDirect + lowerDirect + Math.min(upperFree, lowerFree));
       }
-      if (above >= reach * .45 && below >= reach * .23 && longest >= reach * 1.1 || slash) hits.push({ x, strength: above + below + longest, slash });
+      if (above >= reach * .45 && below >= reach * .23 && longest >= reach * 1.1 || slash) hits.push({ x, strength: above + below + longest, slash, markerStrength });
     }
     const clustered = [];
-    for (const hit of hits) { const last = clustered[clustered.length - 1]; if (last && hit.x - last.right <= 5) { last.right = hit.x; last.slash ||= hit.slash; if (hit.strength > last.strength) { last.x = hit.x; last.strength = hit.strength; } } else clustered.push({ ...hit, right: hit.x }); }
+    for (const hit of hits) { const last = clustered[clustered.length - 1]; if (last && hit.x - last.right <= 5) { last.right = hit.x; last.slash ||= hit.slash; if (hit.markerStrength > last.markerStrength || hit.markerStrength === last.markerStrength && hit.strength > last.strength) { last.x = hit.x; last.strength = hit.strength; last.markerStrength = hit.markerStrength; } } else clustered.push({ ...hit, right: hit.x }); }
     return clustered;
   }
   function matchDimensionLines(image, labels, options = {}) {
@@ -115,7 +129,11 @@
       for (let y = Math.max(2, Math.floor(y0 - fh * 2.5)); y <= Math.min(image.height - 3, y1 + fh * 2.9); y++) {
         const textPadding = options.shortTicks ? 0 : 2;
         if (y >= y0 - textPadding && y <= y1 + textPadding) continue;
-        const run = lineRun(mask, y, Math.round(cx)); if (!run) continue;
+        // Short, explicitly ticked detail dimensions use the requested span
+        // threshold for their line too. A fixed 50 px run discarded these
+        // before the endpoint and caption checks could inspect them.
+        const minRun = options.shortTicks ? Math.max(20, Math.min(50, options.minSpanPx ?? 55)) : 50;
+        const run = lineRun(mask, y, Math.round(cx), 4, minRun); if (!run) continue;
         if (options.shortTicks) { let actual = 0; for (let x = run.left; x <= run.right; x++) actual += mask.data[y * mask.width + x]; if (actual / (run.right - run.left + 1) < .6) continue; }
         const ticks = intersections(mask, run, fh, options.shortTicks);
         for (let i = 0; i < ticks.length; i++) for (let j = i + 1; j < ticks.length; j++) {

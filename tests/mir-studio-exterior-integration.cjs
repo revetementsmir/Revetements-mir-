@@ -183,5 +183,34 @@ function entryDetails(){
  assert.ok(proposedRender.hitSurfaces.some(surface=>surface.elementId===sample.foundation.id),'The foundation is represented in 3D selection geometry.');
  for(const surface of proposedRender.hitSurfaces)for(const [x,y]of surface.screenPolygon)assert.ok(Number.isFinite(x)&&Number.isFinite(y)&&x>=0&&x<=960&&y>=0&&y<=640,'Expanded source geometry remains inside the default fitted viewport.');
  D.dispose(canvas);
- console.log('PASS exterior integration: all contributing source frames/bounds/scales, orthogonal entry roof ownership, beam underside and unknown-depth skin, source statuses, valid wall polygons, opt-in proposals, observed masonry, foundation mesh and 3D ground bounds (no pixel/browser claim).');
+ // Completing hidden collinear sides needs the original written depth and
+ // the exact observed rear/eave/side boundaries, not just a plausible box.
+ const {measuredFlatEntryFixture}=require('./helpers/mir-studio-flat-measured-entry-fixture.cjs'),Flat=require('../dist/plan-reconstructed-flat-roofs.js');
+ for(const chain of [false,true]){
+  const sample=measuredFlatEntryFixture({chain}),result=Flat.build(sample.proposal,sample.inventory,sample.images,sample.reviewed,sample.levels),detail=result.byLevel.find(l=>l.reconstructedRoofs?.length),host=sample.levels.find(l=>l.id===detail.levelId);
+  host.reconstructedRoofs=detail.reconstructedRoofs;assert.deepEqual(X.proposalIssues(host,sample.inventory),[]);
+  const invalid=[
+   ['different source frame',r=>{r.planEvidence.depthConstraint.components[0].sourceFrame.units='other';}],
+   ['different written value',r=>{r.planEvidence.depthConstraint.components[0].value+=.2;}],
+   ['coherent numeric tampering without changing the written label',r=>{const d=r.planEvidence.depthConstraint,c=d.components[0];c.value+=.04;c.referenceFt=c.value/.3048;d.value+=.04;d.referenceFt=d.value/.3048;d.residual=d.estimatedValue-d.value;}],
+   ['caption absent from source',r=>{r.planEvidence.depthConstraint.components[0].label='2000 mm';}],
+   ['missing component',r=>{r.planEvidence.depthConstraint.components=[];}],
+   ['altered end of dimension',r=>{r.planEvidence.depthConstraint.anchors[1][1]-=10;}],
+   ['invented side continuation',r=>{r.planEvidence.boundaryEvidence.completedSides[0][1][0]+=8;}],
+   ['missing observed side',r=>{r.planEvidence.boundaryEvidence.observedSides=[];}],
+   ['changed measured method',r=>{delete r.planEvidence.boundaryMethod;}]
+  ];
+  for(const [name,alter]of invalid){const changed=structuredClone(host);alter(changed.reconstructedRoofs[0]);assert.ok(X.proposalIssues(changed,sample.inventory).includes('ENTRY_ROOF_PLAN_DEPTH'),name);}
+  if(chain){const changed=structuredClone(host),d=changed.reconstructedRoofs[0].planEvidence.depthConstraint;d.components[0].anchors[1][1]+=5;d.components[1].anchors[0][1]+=5;assert.ok(X.proposalIssues(changed,sample.inventory).includes('ENTRY_ROOF_PLAN_DEPTH'),'every component matches its own observed span; a correct total does not excuse wrong intermediate anchors');}
+  const browserContext={window:{MIRLevelModel:M}};vm.runInNewContext(fs.readFileSync(require.resolve('../dist/studio-exterior-model.js'),'utf8'),browserContext);browserContext.window.MIRPDFAnalysis=require('../dist/plan-import-core.js');
+  assert.equal(browserContext.window.MIRStudioExterior.proposalIssues(host,sample.inventory).length,0,'the source parser can load after the exterior model, as in the browser script order');
+ }
+ const estimatedSample=measuredFlatEntryFixture({dimension:false}),estimatedResult=Flat.build(estimatedSample.proposal,estimatedSample.inventory,estimatedSample.images,estimatedSample.reviewed,estimatedSample.levels),estimatedDetail=estimatedResult.byLevel.find(l=>l.reconstructedRoofs?.length),estimatedHost=estimatedSample.levels.find(l=>l.id===estimatedDetail.levelId);
+ estimatedHost.reconstructedRoofs=estimatedDetail.reconstructedRoofs;assert.equal(estimatedHost.reconstructedRoofs[0].planEvidence.boundaryMethod,'source-estimated-collinear-closure');assert.deepEqual(X.proposalIssues(estimatedHost,estimatedSample.inventory),[]);
+ for(const alter of [r=>{r.entryAssembly.sideViewIds.pop();},r=>{r.planEvidence.depthConstraint={kind:'written',value:.8};},r=>{r.planEvidence.boundaryEvidence.rear[0][1]-=8;},r=>{r.planEvidence.boundaryEvidence.observedSides[0][1][0]+=8;},r=>{const b=r.planEvidence.boundaryEvidence,seen=b.observedSides[0];seen[1][1]=seen[0][1]+Math.sign(b.rear[0][1]-b.eave[0][1])*6;b.completedSides[0][0]=structuredClone(seen[1]);}]){
+  const changed=structuredClone(estimatedHost);alter(changed.reconstructedRoofs[0]);assert.ok(X.proposalIssues(changed,estimatedSample.inventory).includes('ENTRY_ROOF_PLAN_DEPTH'),'estimated closure needs both side views and its own unaltered observations');
+ }
+ const translated=structuredClone(estimatedHost),evidence=translated.reconstructedRoofs[0].planEvidence;evidence.sourceBox[0]+=10;for(const field of ['rear','eave'])for(const p of evidence.boundaryEvidence[field])p[0]+=10;for(const field of ['observedSides','completedSides'])for(const pair of evidence.boundaryEvidence[field])for(const p of pair)p[0]+=10;
+ assert.ok(X.proposalIssues(translated,estimatedSample.inventory).includes('ENTRY_ROOF_PLAN_FOOTPRINT'),'source box and boundary evidence cannot move independently of the footprint anchors');
+ console.log('PASS exterior integration: contributing sources, measured/estimated plan-depth evidence, orthogonal entry roof ownership, beam underside and unknown-depth skin, source statuses, valid wall polygons, opt-in proposals, observed masonry, foundation mesh and 3D ground bounds (no pixel/browser claim).');
 })().catch(error=>{console.error(error.stack);process.exitCode=1;});

@@ -8,13 +8,19 @@
  }
  function sameCaption(a,b){a=source(a);b=source(b);if(a.sourceViewId!==b.sourceViewId||!a.textBox||!b.textBox)return false;const x=a.textBox,y=b.textBox,area=p=>(p[2]-p[0])*(p[3]-p[1]),overlap=Math.max(0,Math.min(x[2],y[2])-Math.max(x[0],y[0]))*Math.max(0,Math.min(x[3],y[3])-Math.max(x[1],y[1]));return overlap/Math.min(area(x),area(y))>.65;}
  function resolveReference(candidates){
-  const groups=[];for(const r of candidates.filter(r=>r.value>0&&r.scale>0)){let group=groups.find(g=>g.some(c=>sameCaption(c,r)));if(!group)groups.push(group=[]);group.push(r);}
+  const confidence=r=>source(r).confidence??r.confidence??0,trusted=r=>['pdf-text','manual-correction'].includes(source(r).source||r.source)||source(r).kind==='user-measurement';
+  const numeric=candidates.filter(r=>r.value>0&&r.scale>0),readable=numeric.filter(r=>trusted(r)||confidence(r)>=25),groups=[];
+  for(const r of readable){let group=groups.find(g=>g.some(c=>sameCaption(c,r)));if(!group)groups.push(group=[]);group.push(r);}
   // An OCR alternative is resolved only if independent caption groups agree.
   // Two different written captions in conflict remain a conflict.
-  const supported=candidates.filter(r=>r.value>0&&groups.every(g=>g.some(c=>Math.abs(c.scale/r.scale-1)<=.05&&(!sameSpan(c,r)||Math.abs(c.value-r.value)<=.001))));
-  if(!supported.length)return {status:groups.length?'conflict':'not_found',groups:copy(groups),reference:null};
+  const supported=readable.filter(r=>groups.every(g=>g.some(c=>Math.abs(c.scale/r.scale-1)<=.05&&(!sameSpan(c,r)||Math.abs(c.value-r.value)<=.001))));
+  if(!supported.length)return {status:groups.length?'conflict':numeric.length?'low_confidence':'not_found',groups:copy(groups),reference:null,unreadable:copy(numeric.filter(r=>!readable.includes(r)))};
   if(Math.max(...supported.map(r=>r.scale))/Math.min(...supported.map(r=>r.scale))>1.05)return {status:'conflict',groups:copy(groups),reference:null};
-  const reference=copy(supported.slice().sort((a,b)=>Number(a.kind!=='written')-Number(b.kind!=='written')||b.confidence-a.confidence)[0]);
+  // A lone uncertain OCR glyph cannot set the dimensions of the building.
+  // Independent captions can corroborate a moderate reading; duplicate OCR
+  // of one caption cannot provide that second observation.
+  if(!supported.some(r=>trusted(r)||confidence(r)>=(groups.length>1?55:70)))return {status:'low_confidence',groups:copy(groups),reference:null,alternatives:copy(candidates),confirmationRequired:true};
+  const reference=copy(supported.slice().sort((a,b)=>Number(!(trusted(a)||confidence(a)>=70))-Number(!(trusted(b)||confidence(b)>=70))||Number(a.kind!=='written')-Number(b.kind!=='written')||confidence(b)-confidence(a))[0]);
   return {status:groups.length>1?'cross-checked-proposal':'single-reference-proposal',reference,groups:copy(groups),alternatives:copy(candidates.filter(r=>!supported.includes(r))),confirmationRequired:true};
  }
  function protectedLevel(level){return !!(level.geometryRevision||level.contourDraft||level.contours?.length||level.observedPlanes?.length||level.reconstructedRoofs?.length||level.wallOpenings?.length||Object.keys(level.wallFinishes||{}).length||level.wallZones?.length||level.exteriorElements?.length||level.soffits?.length||Object.keys(level.cornerFinishes||{}).length);}
@@ -33,10 +39,11 @@
    if(existing.filter(l=>inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor'&&v.levelId===l.sourceLevel)).length>1){report.issues.push('LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:copy(proposal.draft),reconstructionDraft:proposal});continue;}
    const resolution=resolveReference(proposal.referenceCandidates);proposal.referenceResolution=resolution;
    const draft=copy(proposal.draft),oldScale=proposal.referenceCandidates[0]?.scale;
-   if(!resolution.reference){report.issues.push(resolution.status==='conflict'?'REFERENCE_CONFLICT':'SCALE_UNKNOWN');levels.push({...copy(current),contourDraft:draft,reconstructionDraft:proposal});continue;}
+   if(!resolution.reference){report.issues.push(resolution.status==='conflict'?'REFERENCE_CONFLICT':resolution.status==='low_confidence'?'SCALE_TRANSCRIPTION_UNCERTAIN':'SCALE_UNKNOWN');levels.push({...copy(current),contourDraft:draft,reconstructionDraft:proposal});continue;}
    draft.reference={...resolution.reference,status:'proposed',controlReferences:[],assessment:resolution};
    if(draft.height.kind==='estimated-calibrated'&&oldScale>0){const factor=draft.reference.scale/oldScale;draft.height.value*=factor;draft.height.scaleUsed*=factor;for(const ref of draft.height.references){ref.value*=factor;ref.relationship=copy(draft.reference);}}
    const constrained=R.constrainProposal(draft,proposal);constrained.status='proposed';
+   if(constrained.dimensionAdjustment?.evidence.some(e=>e.reason==='DIMENSION_TRANSCRIPTION_UNCERTAIN'))report.issues.push('DIMENSION_TRANSCRIPTION_UNCERTAIN');
    const errors=M.validateDraft(constrained,inventory,current);if(proposal.heightConflict)errors.push('HEIGHT_CONFLICT');
    if(errors.length){report.issues.push(...errors);levels.push({...copy(current),contourDraft:constrained,reconstructionDraft:proposal});continue;}
    proposal=R.recoupRegistrations(proposal,inventory,images,constrained);proposal.draft=copy(constrained);

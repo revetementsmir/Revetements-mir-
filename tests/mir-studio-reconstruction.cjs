@@ -14,6 +14,17 @@ const textures=Object.fromEntries(scene.walls.map(w=>[w.id,require('../dist/stud
 for(const direction of ['front','right','back','left']){const projection=E.project(scene,direction),svg=E.svg(scene,{direction,textures});assert.ok(projection.walls.length);assert.ok(projection.viewBox.every(Number.isFinite));assert.match(svg,/data-source-raster="absent"/);assert.doesNotMatch(svg,/<image|sourceImage|data:image\/jpeg/);for(const row of projection.walls)assert.ok(svg.includes(row.wall.id));}
 const facing=E.project(scene,'front');assert.ok(facing.walls.some(r=>r.wall.id===first.id));assert.match(E.svg(scene,{direction:'front',textures}),/data-level-opening="synthetic-window"/);assert.throws(()=>E.project(scene,'unknown'),/ELEVATION_DIRECTION/);
 assert.equal(R.faceSpan([[0,0],[100,0],[100,120],[60,120],[60,100],[0,100]],'left').length,100);assert.equal(R.faceSpan([[0,0],[100,0],[100,120],[60,120],[60,100],[0,100]],'right').length,120,'level setbacks keep their directional extents');
+// A recessed return does not stretch the primary elevation registration.
+// Source pixels increase downwards; world Y increases toward the back.
+const registrationInventory=fixture(),registrationLevel=registrationInventory.levels.find(l=>l.sourceLevel==='upper'&&l.buildingId==='house'),registrationDraft=registrationLevel.contours[0],physicalOutline=[[0,.8],[2,.8],[2,0],[12,0],[12,7],[0,7]];
+registrationDraft.points=physicalOutline.map(([x,y],i)=>({id:'registration-'+i,xy:[120+x*50,680-y*50]}));
+for(const [direction,expected]of Object.entries({front:[2,12],back:[-12,0],left:[-7,-.8],right:[0,7]})){
+ const info={direction,envelope:{status:'proposed',box:[100,100,350,600]},guides:[{levelHint:'upper',y:400,confidence:100}]},registration=R.elevationRegistration(info,registrationDraft,registrationInventory);
+ assert.ok(Math.abs(registration.u(100)-expected[0])<1e-8&&Math.abs(registration.u(450)-expected[1])<1e-8,'exact primary registration '+direction);
+ const pixelSpan=R.faceSpan(registrationDraft.points.map(p=>p.xy),direction).length*.02,worldSpan=R.faceSpan(M.modelPoints(registrationDraft),direction,{world:true}).length;
+ assert.ok(Math.abs(pixelSpan-worldSpan)<1e-8,'source/world directional spans agree '+direction);
+ if(direction==='left')assert.ok(registration.pixelU(0)>470,'projecting front attachment remains outside the recessed primary envelope');
+}
 // Observed lower wall planes never manufacture a ground-floor contour.
 const observedInventory=structuredClone(inventory),building=observedInventory.buildings[0].id;
 observedInventory.views.push({id:'synthetic-front',kind:'elevation',direction:'front',buildingId:building,payload:{}},{id:'synthetic-right',kind:'elevation',direction:'right',buildingId:building,payload:{}});

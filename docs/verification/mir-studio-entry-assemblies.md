@@ -13,8 +13,10 @@ The updated converter handles two distinct source configurations:
   profiles establish the roof surface. Eaves are observed separately from the
   posts. Front and side pitches remain independent. Closed, compatible beam
   bands produce the front facing and only the observed lateral returns.
-- **Flat entrance roof:** a roof note must connect by a visible leader to a
-  closed footprint in the registered floor plan. A front facing above an
+- **Flat entrance roof:** a roof note must connect by a visible leader to an
+  observed footprint in the registered floor plan. Partial collinear sides
+  require either an anchored written depth or independent front/left/right
+  observations that remain explicitly estimated. A front facing above an
   observed door and compatible lateral projections establish its placement.
   The full plan footprint remains distinct from the visible side overhang.
   This path does not create columns or a structural beam.
@@ -40,6 +42,9 @@ Missing or incompatible views, unrelated notes, colour annotations alone and
 opaque nearer volumes cannot supply hidden geometry. In particular, a central
 nearer wall can suppress the beam/roof even when both posts remain visible.
 Existing reviewed geometry and finishes remain protected from regeneration.
+An observed contradictory post level blocks the dependent entrance assembly;
+it cannot be discarded merely because the other side is usable. A missing or
+masked observation remains distinct from that contradiction.
 
 ## Source and persistence contracts
 
@@ -74,6 +79,11 @@ Check the workflow for the exact revision being reviewed before claiming a
 browser pass.
 
 ## Original-PDF gate
+
+The [seven-original follow-up](mir-studio-seven-originals.md) records actual cold
+imports through the production code with a private Node/Canvas adapter, the
+baseline failure matrix and subsequent source-supported corrections. That
+execution remains distinct from the original browser workflow below.
 
 Synthetic contracts and manual source inspection are not successful original
 PDF imports. The private annotated development PDFs have not completed a fresh

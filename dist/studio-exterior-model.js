@@ -1,5 +1,5 @@
 /* Physical corners and explicitly placed exterior elements. No inferred dimensions. */
-(function(root,factory){const api=factory(typeof module==='object'&&module.exports?require('./plan-level-model.js'):root.MIRLevelModel);if(typeof module==='object'&&module.exports)module.exports=api;else root.MIRStudioExterior=api;})(typeof window==='object'?window:globalThis,function(M){
+(function(root,factory){const node=typeof module==='object'&&module.exports,api=factory(node?require('./plan-level-model.js'):root.MIRLevelModel,()=>node?require('./plan-import-core.js'):root.MIRPDFAnalysis);if(node)module.exports=api;else root.MIRStudioExterior=api;})(typeof window==='object'?window:globalThis,function(M,analysis){
  'use strict';const number=x=>typeof x==='number'&&Number.isFinite(x),copy=M.clone;
  function corners(level,inventory){const contour=level.contours?.find(c=>c.status==='confirmed'),walls=M.wallsFor(level,inventory);if(!contour)return observedCorners(level,inventory);if(!walls.length)return [];return walls.map((w,i)=>{const before=walls[(i+walls.length-1)%walls.length],id='corner:'+contour.contourId+':'+w.pointIds[0],cross=(w.to[0]-w.from[0])*(before.from[1]-w.from[1])-(w.to[1]-w.from[1])*(before.from[0]-w.from[0]);return {id,levelId:level.id,buildingId:level.buildingId,point:w.from.slice(),base:w.base,height:w.height,wallIds:[before.id,w.id],normals:[before.normal,w.normal],group:Math.abs(before.normal[1]+w.normal[1])<1e-9?'unresolved':before.normal[1]+w.normal[1]<0?'front':'back',turnCross:cross,angle:cross*M.signedArea(walls.map(w=>w.from))>0?'outside':'inside',finish:copy(level.cornerFinishes?.[id]||{}),sourcePointId:w.pointIds[0]};}).filter(c=>Math.abs(c.turnCross)>1e-8);}
  function observedCorners(level,inventory){const walls=M.wallsFor(level,inventory),result=[];for(const after of walls){const before=walls.find(w=>w.id!==after.id&&M.distance(w.to,after.from)<1e-6);if(!before||Math.abs(before.normal[0]*after.normal[1]-before.normal[1]*after.normal[0])<1e-6)continue;const point=after.from.slice(),id='corner:observed:'+level.id+':'+[before.id,after.id].sort().join(':'),base=Math.max(before.base,after.base),height=Math.min(before.base+before.height,after.base+after.height)-base;if(height<=0)continue;const cross=(after.to[0]-point[0])*(before.from[1]-point[1])-(after.to[1]-point[1])*(before.from[0]-point[0]),orientation=Math.sign((after.to[1]-point[1])*after.normal[0]+(point[0]-after.to[0])*after.normal[1]);result.push({id,levelId:level.id,buildingId:level.buildingId,point,base,height,wallIds:[before.id,after.id],normals:[before.normal,after.normal],group:Math.abs(before.normal[1]+after.normal[1])<1e-9?'unresolved':before.normal[1]+after.normal[1]<0?'front':'back',turnCross:cross,angle:cross*orientation>0?'outside':'inside',finish:copy(level.cornerFinishes?.[id]||{}),sourcePointId:null,source:'observed-wall-junction'});}return result;}
@@ -59,16 +59,56 @@
    }
    inspect(p,detail.sourceViewId,0);
   }
+  function depthConstraintIssues(evidence,view,roof){
+   const measured=evidence.boundaryMethod==='written-depth-between-observed-attachment-and-eave',estimated=evidence.boundaryMethod==='source-estimated-collinear-closure';
+   if(!measured&&!estimated&&!evidence.depthConstraint&&!evidence.boundaryEvidence)return;
+   const fail=()=>errors.push('ENTRY_ROOF_PLAN_DEPTH'),d=evidence.depthConstraint,b=evidence.boundaryEvidence,box=evidence.sourceBox;
+   const point=p=>Array.isArray(p)&&p.length===2&&p.every(number),pair=p=>Array.isArray(p)&&p.length===2&&p.every(point),near=(p,q,t=1e-6)=>point(p)&&point(q)&&M.distance(p,q)<=t;
+   if(!measured&&!estimated||!b||!view||!Array.isArray(box)||box.length!==4||!box.every(number)||box[2]<=0||box[3]<=0){fail();return;}
+   const [x,y,w,h]=box,rows=[...(view.payload?.drawingReadings?.rows||[]),...(view.payload?.drawingReadings?.verticalRows||[])],normal=s=>String(s||'').replace(/\s+/g,'').replace(/[’′]/g,"'").replace(/[″“”]/g,'"');
+   const sameSource=r=>r?.sourceViewId===view.id&&JSON.stringify(r.sourceFrame)===JSON.stringify(view.frame),vertical=r=>pair(r.anchors)&&Math.abs(r.anchors[0][0]-r.anchors[1][0])<=2&&r.anchors[1][1]>r.anchors[0][1];
+   if(measured){
+   if(!d||!pair(d.anchors)||!Array.isArray(d.components)||d.components.length<1||d.components.length>2||!sameSource(d)||d.kind!=='written'||d.status!=='proposed'||d.axis!=='y'||!vertical(d)||!number(d.value)||d.value<=0||d.corrected){fail();return;}
+   let total=0;
+   for(const [index,c]of d.components.entries()){
+    if(!sameSource(c)||c.kind!=='written'||c.status!=='proposed'||c.axis!=='y'||!vertical(c)||!number(c.value)||c.value<=0||c.corrected||!Array.isArray(c.textBox)||c.textBox.length!==4||!c.textBox.every(number)||!normal(c.label)){fail();return;}
+    observationIssues({...c,sourceBox:c.textBox,boxFormat:'xyxy',scaleX:evidence.scaleX,scaleY:evidence.scaleY},{anchorsRequired:true,sourceKind:'floor'});
+    if(!rows.some(row=>normal(row.text)===normal(c.label)&&row.box?.length===4&&row.box.every((n,i)=>number(n)&&Math.abs(n-c.textBox[i])<=1)))fail();
+    const parsed=analysis()?.parseDimension?.(c.label,{ocr:false});
+    if(!parsed||Math.abs(parsed.valueFt*.3048-c.value)>1e-8||Math.abs((c.anchors[1][1]-c.anchors[0][1])*evidence.scaleY-c.value)>Math.max(.025,c.value*.05))fail();
+    if(number(c.referenceFt)&&Math.abs(c.referenceFt*.3048-c.value)>1e-8)fail();
+    if(index&&!near(d.components[index-1].anchors[1],c.anchors[0],2))fail();
+    total+=c.value;
+   }
+   if(!near(d.anchors[0],d.components[0].anchors[0])||!near(d.anchors[1],d.components.at(-1).anchors[1])||Math.abs(total-d.value)>1e-8)fail();
+   if(normal(d.label)!==normal(d.components.map(c=>c.label).join(' + ')))fail();
+   const estimate=h*evidence.scaleY,residual=estimate-d.value;
+   if(!number(d.estimatedValue)||!number(d.residual)||!number(estimate)||Math.abs(d.estimatedValue-estimate)>1e-8||Math.abs(d.residual-residual)>1e-8||Math.abs(residual)>Math.max(.025,d.value*.05))fail();
+   if(d.anchors[0][0]<=x||d.anchors[0][0]>=x+w||Math.abs(d.anchors[0][1]-y)>2||Math.abs(d.anchors[1][1]-y-h)>2)fail();
+   }else{
+    const directions=new Set((roof.entryAssembly?.sideViewIds||[]).map(id=>inventory.views.find(v=>v.id===id&&v.buildingId===level.buildingId)?.direction));
+    if(d!==undefined||evidence.kind!=='estimated-calibrated'||!directions.has('left')||!directions.has('right'))fail();
+   }
+   const outward=Math.cos((evidence.alignment?.rotationDegrees||0)*Math.PI/180)>0?1:-1,rear=outward>0?y:y+h,eave=outward>0?y+h:y;
+   const completionKind=measured?'collinear-continuation-constrained-by-written-depth':'collinear-continuation-between-observed-attachment-and-eave';
+   if(!pair(b.rear)||!pair(b.eave)||!near(b.rear[0],[x,rear])||!near(b.rear[1],[x+w,rear])||!near(b.eave[0],[x,eave])||!near(b.eave[1],[x+w,eave])||b.completionKind!==completionKind||!Array.isArray(b.observedSides)||b.observedSides.length!==2||!Array.isArray(b.completedSides)||b.completedSides.length!==2){fail();return;}
+   for(let i=0;i<2;i++){
+    const seen=b.observedSides[i],completed=b.completedSides[i],edge=x+i*w;
+    if(!pair(seen)||!pair(completed)||!near(seen[0],[edge,eave])||Math.abs(seen[1][0]-edge)>1e-6||seen[1][1]<y||seen[1][1]>y+h||M.distance(...seen)<Math.max(6,estimated?h*.4:0)||!near(completed[0],seen[1])||!near(completed[1],[edge,rear]))fail();
+   }
+  }
   function planEvidenceIssues(roof){
    const evidence=roof.planEvidence;
    if(!evidence){if(roof.roofForm==='flat')errors.push('ENTRY_ROOF_PLAN_REQUIRED');return;}
    const view=observationIssues(evidence,{anchorsRequired:true,sourceKind:'floor'});
+   depthConstraintIssues(evidence,view,roof);
    if(evidence.status!=='proposed')errors.push('EXTERIOR_PROPOSAL_STATUS');
    const alignment=evidence.alignment,point=p=>Array.isArray(p)&&p.length===2&&p.every(number),validAlignment=point(alignment?.origin)&&point(alignment?.offset)&&number(alignment?.rotationDegrees),anchors=evidence.anchors,footprint=evidence.footprint;
    if(!validAlignment)errors.push('ENTRY_ROOF_PLAN_REGISTRATION');
    const validFootprint=Array.isArray(footprint)&&footprint.length===4&&footprint.every(point)&&!M.validatePolygon(footprint).length;
    if(!validFootprint||!Array.isArray(anchors)||anchors.length!==4)errors.push('ENTRY_ROOF_PLAN_FOOTPRINT');
    else if(validAlignment&&number(evidence.scaleX)&&number(evidence.scaleY)){
+    if(anchors.every(point)){const xs=anchors.map(p=>p[0]),ys=anchors.map(p=>p[1]),actual=[Math.min(...xs),Math.min(...ys),Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys)];if(!Array.isArray(evidence.sourceBox)||evidence.sourceBox.length!==4||evidence.sourceBox.some((n,i)=>!number(n)||Math.abs(n-actual[i])>1e-6))errors.push('ENTRY_ROOF_PLAN_FOOTPRINT');}
     const angle=alignment.rotationDegrees*Math.PI/180,transform=([x,y])=>{const u=(x-alignment.origin[0])*evidence.scaleX,v=-(y-alignment.origin[1])*evidence.scaleY;return [u*Math.cos(angle)-v*Math.sin(angle)+alignment.offset[0],u*Math.sin(angle)+v*Math.cos(angle)+alignment.offset[1]];};
     if(anchors.some((p,i)=>!point(p)||M.distance(transform(p),footprint[i])>1e-6))errors.push('ENTRY_ROOF_PLAN_FOOTPRINT');
     if(footprint.some((p,i)=>{const q=footprint[(i+1)%4];return Math.abs(p[0]-q[0])>1e-6&&Math.abs(p[1]-q[1])>1e-6;}))errors.push('ENTRY_ROOF_PLAN_FOOTPRINT');

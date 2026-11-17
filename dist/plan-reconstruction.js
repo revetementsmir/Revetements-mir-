@@ -5,7 +5,7 @@
  function readings(view){return view.payload.drawingReadings?.rows||[];}
  function contourDimensions(view,image){
   const rows=readings(view),vertical=view.payload.drawingReadings?.verticalRows||[],masks=V.legendBoxes(image,rows);
-  const clean=rs=>rs.filter(r=>r.box?.length===4&&r.text.length<25&&r.box[0]<image.width*.81&&!masks.some(([x,y,w,h])=>(r.box[0]+r.box[2])/2>=x&&(r.box[0]+r.box[2])/2<=x+w&&(r.box[1]+r.box[3])/2>=y&&(r.box[1]+r.box[3])/2<=y+h)).map(r=>({...r,originalText:r.text,text:r.text.replace(/(\d)\s+[|Il](?=\s*['’′])/g,(_,d)=>d+'1').replace(/[*°]$/,'"').replace(/^(\d{1,2})[.−-](\d{1,2})"?$/,`$1'$2"`)}));
+  const clean=rs=>rs.filter(r=>r.box?.length===4&&r.text.length<25&&r.box[0]<image.width*.81&&!masks.some(([x,y,w,h])=>(r.box[0]+r.box[2])/2>=x&&(r.box[0]+r.box[2])/2<=x+w&&(r.box[1]+r.box[3])/2>=y&&(r.box[1]+r.box[3])/2<=y+h)).map(r=>({...r,originalText:r.text,text:r.text.replace(/(\d)\s+[|Il](?=\s*['’′])/g,(_,d)=>d+'1').replace(/[*°]$/,'"').replace(/^(\d{1,2})[−-](\d{1,2})"?$/,`$1'$2"`)}));
   const labels=clean(rows),results=A.matchDimensionLines(image,labels,{minSpanPx:20,shortTicks:true});
   if(vertical.length){
    const turned={width:image.height,height:image.width,data:new Uint8ClampedArray(image.data.length)};
@@ -22,16 +22,21 @@
   const [x,y,w,h]=bounds,pad=Math.max(12,Math.min(35,Math.min(w,h)*.08)),observed=[];
   for(const d of dimensions||[]){
    if(d.sourceViewId!==view.id||d.kind!=='written'||!Number.isFinite(d.value)||d.value<=0||!Array.isArray(d.anchors)||d.anchors.length!==2||!d.anchors.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)))continue;
-   if(d.confidence!=null&&d.confidence<50)continue;
+   if(d.source!=='pdf-text'&&d.confidence!=null&&d.confidence<70)continue;
    const span=M.distance(...d.anchors);if(span<20||span>Math.max(w,h)*1.1)continue;
    if(!d.anchors.every(p=>p[0]>=x-pad&&p[0]<=x+w+pad&&p[1]>=y-pad&&p[1]<=y+h+pad))continue;
    if(observed.some(previous=>Math.min(M.distance(previous.anchors[0],d.anchors[0])+M.distance(previous.anchors[1],d.anchors[1]),M.distance(previous.anchors[0],d.anchors[1])+M.distance(previous.anchors[1],d.anchors[0]))<4&&Math.abs(previous.value-d.value)<.001))continue;
    observed.push(d);
   }
-  if(observed.length<2)return {references:[],conflict:false};
-  const assessment=M.referenceAssessment(view,observed);
-  if(!assessment.scale)return {references:[],conflict:true,assessment};
-  return {references:observed.map(r=>({...M.clone(r),association:'independent-floor-dimensions',confirmationRequired:true})),conflict:false,assessment};
+  const captions=[];
+  for(const d of observed){const box=d.textBox,duplicate=box?.length===4&&captions.some(previous=>{const p=previous.textBox;if(p?.length!==4)return false;const overlap=Math.max(0,Math.min(p[2],box[2])-Math.max(p[0],box[0]))*Math.max(0,Math.min(p[3],box[3])-Math.max(p[1],box[1]));return overlap/Math.min((p[2]-p[0])*(p[3]-p[1]),(box[2]-box[0])*(box[3]-box[1]))>.65;});if(!duplicate)captions.push(d);}
+  if(captions.length<2)return {references:[],conflict:false};
+  // Assess these source-associated inscriptions only. A previous page-wide
+  // OCR calibration may refer to another detail or include a stale reading.
+  const assessment=M.referenceAssessment({...view,calibration:{}},observed);
+  // Keep contradictory source readings in the candidate set so the pipeline
+  // cannot silently replace their conflict with a separate overall dimension.
+  return {references:observed.map(r=>({...M.clone(r),association:'independent-floor-dimensions',confirmationRequired:true})),conflict:!assessment.scale,assessment};
  }
  function constrainContour(original,references){
   const draft=M.clone(original),unit=M.scale(draft),evidence=[];if(!unit)return draft;
@@ -45,7 +50,8 @@
     const nearest=n=>coords.map((c,i)=>({i,d:Math.abs(c-n)})).sort((a,b)=>a.d-b.d)[0],lo=nearest(Math.min(a[axis],b[axis])),hi=nearest(Math.max(a[axis],b[axis]));
     if(lo.i===hi.i||lo.d>6||hi.d>6)continue;
     const raster=coords[hi.i]-coords[lo.i],target=r.value/unit,difference=target-raster,tolerance=Math.max(8,raster*.05);
-    const item={axis,from:lo.i,to:hi.i,reference:M.clone(r),originalSpanPixels:raster,estimatedValue:raster*unit,value:r.value,differencePixels:difference,tolerancePixels:tolerance,status:Math.abs(difference)<=tolerance?'proposed':'unresolved',reason:Math.abs(difference)<=tolerance?null:'DIMENSION_SPAN_MISMATCH',confirmationRequired:true};evidence.push(item);if(item.status==='proposed')links.push(item);
+    const uncertain=r.source!=='pdf-text'&&r.confidence!=null&&r.confidence<70;
+    const item={axis,from:lo.i,to:hi.i,reference:M.clone(r),originalSpanPixels:raster,estimatedValue:raster*unit,value:r.value,differencePixels:difference,tolerancePixels:tolerance,status:!uncertain&&Math.abs(difference)<=tolerance?'proposed':'unresolved',reason:uncertain?'DIMENSION_TRANSCRIPTION_UNCERTAIN':Math.abs(difference)<=tolerance?null:'DIMENSION_SPAN_MISMATCH',confirmationRequired:true};evidence.push(item);if(item.status==='proposed')links.push(item);
    }
    const values=new Map(),conflicts=new Set();
    for(let root=0;root<coords.length;root++){if(values.has(root))continue;values.set(root,coords[root]);const queue=[root],component=new Set([root]);let conflict=false;
@@ -76,14 +82,14 @@
  function constrainProposal(draft,proposal){
   const next=constrainContour(draft,proposal.contourDimensions||[]),height=next.height,v=proposal.views.find(v=>v.viewId===height?.sourceViewId);
   if(height?.kind==='estimated-calibrated'&&height.relationship==='floor-span-to-elevation-registration'&&v?.envelope.status==='proposed'){
-   const scale=faceSpan(M.modelPoints(next),v.direction).length/v.envelope.box[2];height.value=M.distance(...height.anchors)*scale;height.scaleUsed=scale;
+   const scale=faceSpan(M.modelPoints(next),v.direction,{world:true}).length/v.envelope.box[2];height.value=M.distance(...height.anchors)*scale;height.scaleUsed=scale;
    for(const ref of height.references){ref.value=M.distance(...ref.anchors)*scale;ref.relationship={...M.clone(next.reference),contourAdjustment:M.clone(next.dimensionAdjustment)};}
   }
   return next;
  }
  function references(view,image){
   const masks=V.legendBoxes(image,readings(view)),rows=readings(view).filter(r=>r.box?.length===4&&r.text.length<50&&r.box[0]<image.width*.81&&!masks.some(([x,y,w,h])=>(r.box[0]+r.box[2])/2>=x&&(r.box[0]+r.box[2])/2<=x+w&&(r.box[1]+r.box[3])/2>=y&&(r.box[1]+r.box[3])/2<=y+h));
-  const labels=rows.map(r=>{const rewrite=r.text.replace(/^(\d{1,2})[.−-](\d{1,2})\"?$/,`$1'$2"`);return {...r,text:rewrite,originalText:r.text,punctuationReview:rewrite!==r.text};});
+  const labels=rows.map(r=>{const rewrite=r.text.replace(/^(\d{1,2})[−-](\d{1,2})\"?$/,`$1'$2"`);return {...r,text:rewrite,originalText:r.text,punctuationReview:rewrite!==r.text};});
   return A.matchDimensionLines(image,labels,{shortTicks:true}).filter(r=>r.referenceFt>=9&&r.spanPx>image.width*.18&&r.confidence>=0).map(r=>{
    const original=labels.find(l=>l.box.every((n,i)=>Math.abs(n-r.textBox[i])<2)&&l.text===r.text);
    return {...r,value:r.referenceFt*.3048,kind:'written',status:'proposed',sourceViewId:view.id,sourceFrame:M.clone(view.frame),label:original?.originalText||r.text,punctuationReview:!!original?.punctuationReview,transcriptionReviewRequired:r.confidence<50||!!original?.punctuationReview,scale:r.feetPerPixel*.3048,confirmationRequired:true};
@@ -102,15 +108,15 @@
   }
   const keep=[];for(const item of items.sort((a,b)=>b.confidence-a.confidence))if(!keep.some(q=>q.levelHint===item.levelHint&&(Math.abs(q.y-item.y)<6||Math.max(0,Math.min(q.box[2],item.box[2])-Math.max(q.box[0],item.box[0]))*Math.max(0,Math.min(q.box[3],item.box[3])-Math.max(q.box[1],item.box[1]))/Math.min((q.box[2]-q.box[0])*(q.box[3]-q.box[1]),(item.box[2]-item.box[0])*(item.box[3]-item.box[1]))>.65)))keep.push(item);return keep;
  }
- function faceSpan(points,direction){const n={front:[0,1],back:[0,-1],right:[1,0],left:[-1,0]}[direction],axis=['front','back'].includes(direction)?0:1,sign=Math.sign(M.signedArea(points)),edges=points.map((a,i)=>[a,points[(i+1)%points.length]]).filter(([a,b])=>(sign*(b[1]-a[1])*n[0]+sign*(a[0]-b[0])*n[1])>0),coordinates=edges.flatMap(e=>e.map(p=>p[axis])),total=Math.max(...coordinates)-Math.min(...coordinates),dominant=edges.slice().sort((a,b)=>Math.abs(b[0][axis]-b[1][axis])-Math.abs(a[0][axis]-a[1][axis]))[0],chosen=dominant&&Math.abs(dominant[0][axis]-dominant[1][axis])>total*.75?dominant.map(p=>p[axis]):coordinates;return {axis,min:Math.min(...chosen),max:Math.max(...chosen),length:Math.max(...chosen)-Math.min(...chosen)};}
+ function faceSpan(points,direction,{world=false}={}){const n={front:[0,world?-1:1],back:[0,world?1:-1],right:[1,0],left:[-1,0]}[direction],axis=['front','back'].includes(direction)?0:1,sign=Math.sign(M.signedArea(points)),edges=points.map((a,i)=>[a,points[(i+1)%points.length]]).filter(([a,b])=>(sign*(b[1]-a[1])*n[0]+sign*(a[0]-b[0])*n[1])>0),coordinates=edges.flatMap(e=>e.map(p=>p[axis])),total=Math.max(...coordinates)-Math.min(...coordinates),dominant=edges.slice().sort((a,b)=>Math.abs(b[0][axis]-b[1][axis])-Math.abs(a[0][axis]-a[1][axis]))[0],chosen=dominant&&Math.abs(dominant[0][axis]-dominant[1][axis])>total*.75?dominant.map(p=>p[axis]):coordinates;return {axis,min:Math.min(...chosen),max:Math.max(...chosen),length:Math.max(...chosen)-Math.min(...chosen)};}
  function propose(inventory,buildingId,images,{levelId}={}){
   const levels=inventory.levels.filter(l=>l.buildingId===buildingId&&(!levelId||l.id===levelId)),level=levels.find(l=>inventory.views.some(v=>v.kind==='floor'&&v.levelId===l.sourceLevel&&v.buildingId===buildingId));
   if(!level)return {version:1,status:'unresolved',reason:'FLOOR_SOURCE_REQUIRED'};
   const plans=inventory.views.filter(v=>v.kind==='floor'&&v.levelId===level.sourceLevel&&v.buildingId===buildingId);if(plans.length!==1)return {version:1,status:'unresolved',reason:'FLOOR_SOURCE_AMBIGUOUS'};
   const floor=plans[0],image=images[floor.id];if(!image)return {version:1,status:'unresolved',reason:'SOURCE_UNAVAILABLE'};
-  const outline=V.floorEnvelope(image,{sourceViewId:floor.id,frame:floor.frame});if(outline.status!=='proposed')return {version:1,status:'unresolved',reason:outline.reason};
+  const outline=V.floorEnvelope(image,{sourceViewId:floor.id,frame:floor.frame,rows:readings(floor)});if(outline.status!=='proposed')return {version:1,status:'unresolved',reason:outline.reason};
   const bounds=outline.sourceBounds,elevations=inventory.views.filter(v=>v.buildingId===buildingId&&v.kind==='elevation'&&['front','right','back','left'].includes(v.direction)),views=[];
-  for(const v of elevations){const im=images[v.id];if(!im)continue;const facing=faceSpan(outline.points,v.direction),expected=facing.length,envelope=V.wallEnvelope(im,expected,{sourceViewId:v.id,frame:v.frame,occlusions:V.legendBoxes(im,readings(v))}),refs=references(v,im),guides=envelope.status==='proposed'?floorGuide(v,im,envelope):[];
+  for(const v of elevations){const im=images[v.id];if(!im)continue;const facing=faceSpan(outline.points,v.direction),expected=facing.length,envelope=V.wallEnvelope(im,expected,{sourceViewId:v.id,frame:v.frame,occlusions:V.legendBoxes(im,readings(v)),rows:readings(v)}),refs=references(v,im),guides=envelope.status==='proposed'?floorGuide(v,im,envelope):[];
    const support=envelope.status==='proposed'?wallSupport(v,im,envelope):null;views.push({viewId:v.id,direction:v.direction,facing,envelope,supportY:support?.y??envelope.box?.[1],supportEvidence:support,roofProfile:V.roofProfile(im,envelope,readings(v)),references:refs,guides});
   }
   const direct=references(floor,image).filter(r=>Math.abs(r.spanPx/bounds[2]-1)<.04&&Math.abs(Math.min(...r.anchors.map(p=>p[0]))-bounds[0])<bounds[2]*.05);
@@ -266,14 +272,17 @@
  }
  function elevationRegistration(viewInfo,reviewed,inventory){
   if(viewInfo.envelope.status!=='proposed')return null;const floor=inventory.views.find(v=>v.id===reviewed.sourceViewId),level=inventory.levels.find(l=>l.contours?.some(c=>c.contourId===reviewed.contourId))||inventory.levels.find(l=>l.sourceLevel===floor?.levelId&&l.buildingId===floor?.buildingId),guide=viewInfo.guides.filter(g=>g.levelHint===level?.sourceLevel).sort((a,b)=>b.confidence-a.confidence)[0];if(!guide)return null;
-  const points=M.modelPoints(reviewed),orientation=Math.sign(M.signedArea(points)),frame={front:{u:[1,0],n:[0,-1]},back:{u:[-1,0],n:[0,1]},right:{u:[0,1],n:[1,0]},left:{u:[0,-1],n:[-1,0]}}[viewInfo.direction],dot=p=>p[0]*frame.u[0]+p[1]*frame.u[1],edges=points.map((a,i)=>[a,points[(i+1)%points.length]]).filter(([a,b])=>orientation*((b[1]-a[1])*frame.n[0]+(a[0]-b[0])*frame.n[1])>0),xs=edges.flatMap(e=>e.map(dot)),min=Math.min(...xs),max=Math.max(...xs),sx=(max-min)/viewInfo.envelope.box[2],sz=reviewed.height.value/(guide.y-(viewInfo.supportY??viewInfo.envelope.box[1]));
+  // The raster envelope was fitted to the dominant facing span. Reusing the
+  // union of recessed returns here stretches it and shifts attachments.
+  const span=faceSpan(M.modelPoints(reviewed),viewInfo.direction,{world:true}),reverse=['back','left'].includes(viewInfo.direction),min=reverse?-span.max:span.min,max=reverse?-span.min:span.max,sx=(max-min)/viewInfo.envelope.box[2],sz=reviewed.height.value/(guide.y-(viewInfo.supportY??viewInfo.envelope.box[1]));
+  if(!(sx>0&&sz>0&&Number.isFinite(sx)&&Number.isFinite(sz)))return null;
   return {guide,sx,sz,min,max,u:pixel=>min+(pixel-viewInfo.envelope.box[0])*sx,z:pixel=>reviewed.base.value+(guide.y-pixel)*sz,pixelU:value=>viewInfo.envelope.box[0]+(value-min)/sx,pixelZ:value=>guide.y-(value-reviewed.base.value)/sz};
  }
  function recoupRegistrations(proposal,inventory,images,reviewed){
   const next=M.clone(proposal),level=inventory.levels.find(l=>l.id===proposal.levelId),unit=M.scale(reviewed);if(!level||!unit||!(reviewed.height.value>0))return next;
   for(const v of next.views){
    if(v.envelope.status!=='proposed'||v.guides.some(g=>g.levelHint===level.sourceLevel)||!images[v.viewId])continue;
-   const image=images[v.viewId],box=v.envelope.box,span=faceSpan(M.modelPoints(reviewed),v.direction),scale=span.length/box[2],support=v.supportY??box[1],expected=support+reviewed.height.value/scale,tolerance=Math.max(3,(expected-support)*.035),matches=[];
+   const image=images[v.viewId],box=v.envelope.box,span=faceSpan(M.modelPoints(reviewed),v.direction,{world:true}),scale=span.length/box[2],support=v.supportY??box[1],expected=support+reviewed.height.value/scale,tolerance=Math.max(3,(expected-support)*.035),matches=[];
    // A caption lost to OCR can be recouped from a visible datum outside the
    // building, with the reviewed height and this view's independent scale.
    // No visible datum means no registration, even if the height is known.

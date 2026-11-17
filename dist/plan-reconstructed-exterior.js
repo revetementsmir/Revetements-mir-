@@ -202,14 +202,18 @@
  }
  function entranceDetails({proposal,inventory,images,front,source,fr,canopy,sideCandidates,columns,owners,byLevel,hints,frontMasks}){
   const report=byLevel.find(r=>r.levelId===columns[0]?.levelId);
-  if(!report||columns.length!==2||columns[0].parentWallId!==columns[1].parentWallId){
+  if(!report||!columns.length||columns.some(column=>column.parentWallId!==columns[0].parentWallId)){
    for(const item of byLevel)item.issues.push('ENTRY_ASSEMBLY_SUPPORT_UNRESOLVED');return;
   }
+  // A source annotation can hide one post without hiding the roof above it.
+  // Keep that support unresolved while retaining independently observed roof
+  // profiles; never complete the missing post by symmetry or by its neighbour.
+  if(columns.length<2)report.issues.push('ENTRY_ASSEMBLY_SUPPORT_PARTIAL');
   const wall=owners.find(o=>o.wall.id===columns[0].parentWallId).wall,wallY=wall.from[1],levelId=columns[0].levelId;
   const blockers=(xs,ys,zs)=>owners.filter(({wall:other})=>other.id!==wall.id&&other.from[1]<ys[1]-.001&&
    Math.min(xs[1],Math.max(other.from[0],other.to[0]))-Math.max(xs[0],Math.min(other.from[0],other.to[0]))>.001&&
    Math.min(zs[1],other.base+other.height)-Math.max(zs[0],other.base)>.001).map(o=>o.wall.id);
-  const id='entry:'+wall.id+':'+source.id+':'+sourceKey(canopy.beamLine),assembly={version:1,id,frontViewId:source.id,sideViewIds:sideCandidates.map(s=>s.source.id),parentWallId:wall.id};
+  const id='entry:'+wall.id+':'+source.id+':'+sourceKey(canopy.beamLine),assembly={version:1,id,frontViewId:source.id,sideViewIds:sideCandidates.map(s=>s.source.id),parentWallId:wall.id,supportStatus:columns.length===2?'observed-proposed':'partial-unresolved'};
   const sourceFor=(s,box,method)=>provenance(s.source,box,s.registration,method),frontSpan=[canopy.columns[0].x,canopy.columns[1].x+canopy.columns[1].width];
   const frontBands=V.entryBands(images[front.viewId],{left:frontSpan[0],right:frontSpan[1],nearY:canopy.box[1],height:canopy.box[3],occlusions:frontMasks});
   const sides=sideCandidates.map(side=>{
@@ -250,14 +254,14 @@
   }else report.issues.push(frontBands.length&&sides.some(s=>s.bands.length)?'ENTRY_BEAM_LEVEL_CONFLICT':'ENTRY_BEAM_SECTION_UNRESOLVED');
 
   // The canopy has its own observed eaves, independent of the post footprint.
-  const [bx,by,bw]=canopy.beamLine,profile=V.roofProfile(images[front.viewId],{...front.envelope,box:[bx,by,bw,canopy.box[3]],occlusions:frontMasks},R.readings(source));
+  const [bx,by,bw]=canopy.beamLine,profile=V.roofProfile(images[front.viewId],{...front.envelope,box:[bx,by,bw,canopy.box[3]],occlusions:frontMasks},R.readings(source),{entry:true});
   if(profile.status!=='proposed'){report.issues.push('ENTRY_ROOF_GEOMETRY_UNRESOLVED');return;}
   const [a,b]=profile.slopes,frontPoints=[[a.eaveX,a.eaveY],[a.highX,profile.points[1][1]],[b.highX,profile.points[2][1]],[b.eaveX,b.eaveY]].filter((p,i,points)=>!i||p[0]-points[i-1][0]>.5);
   if(frontPoints.length<3||frontPoints.some((p,i)=>!p.every(finite)||i&&p[0]<=frontPoints[i-1][0])){report.issues.push('ENTRY_ROOF_GEOMETRY_UNRESOLVED');return;}
   const bounds=[Math.min(...frontPoints.map(p=>p[0])),Math.min(...frontPoints.map(p=>p[1])),Math.max(...frontPoints.map(p=>p[0]))-Math.min(...frontPoints.map(p=>p[0])),Math.max(...frontPoints.map(p=>p[1]))-Math.min(...frontPoints.map(p=>p[1]))];
   if(frontMasks.some(mask=>intersection(bounds,mask))){report.issues.push('ENTRY_ROOF_SOURCE_OCCLUDED');return;}
   const xProfile=frontPoints.map(([x,y])=>[fr.u(x),fr.z(y)]),eaveZ=xProfile[0][1],crestZ=Math.max(...xProfile.map(p=>p[1])),tol=Math.max(.04,fr.sz*3);
-  if(Math.abs(xProfile.at(-1)[1]-eaveZ)>tol||crestZ-eaveZ<.08||xProfile[0][0]>columns[0].origin[0]||xProfile.at(-1)[0]<columns[1].origin[0]+columns[1].size[0]){report.issues.push('ENTRY_ROOF_FRONT_PROFILE_CONFLICT');return;}
+  if(Math.abs(xProfile.at(-1)[1]-eaveZ)>tol||crestZ-eaveZ<.08||xProfile[0][0]>fr.u(frontSpan[0])||xProfile.at(-1)[0]<fr.u(frontSpan[1])){report.issues.push('ENTRY_ROOF_FRONT_PROFILE_CONFLICT');return;}
   const profiles=[];
   for(const side of sides){
    const raw=V.entrySideRoof(images[side.source.id],{wallX:side.wallX,postBox:side.box,eaveY:side.registration.pixelZ(eaveZ),crestY:side.registration.pixelZ(crestZ),direction:side.direction,tolerance:Math.max(5,tol/side.registration.sz),occlusions:side.masks});
@@ -291,11 +295,16 @@
   if(canopy.status!=='proposed')return;
   const frontMasks=sourceMasks(front,source,images[front.viewId]);
   const owners=targets.flatMap(level=>M.wallsFor(level,inventory,{includeProposed:true}).filter(w=>w.normal[1]<-.999).map(wall=>({level,wall}))),ownerFor=(column,depth=null)=>{
-   const center=fr.u(column.x+column.width/2),base=fr.z(column.bottom);
-   return owners.filter(o=>center>=Math.min(o.wall.from[0],o.wall.to[0])&&center<=Math.max(o.wall.from[0],o.wall.to[0])&&Math.abs(o.wall.base-base)<=Math.max(.08,o.wall.height*.05)&&(!depth||o.wall.from[1]>=depth[1]-.001)).sort((a,b)=>a.wall.from[1]-b.wall.from[1])[0];
+   const center=fr.u(column.x+column.width/2),base=fr.z(column.bottom),top=fr.z(canopy.box[1]);
+   // A post can start on an observed raised landing. Its base remains the
+   // elevation reading; ownership only requires the whole vertical span to
+   // belong to the parent wall, rather than snapping it to the foundation.
+   return owners.filter(o=>{const tolerance=Math.max(.08,o.wall.height*.05);return center>=Math.min(o.wall.from[0],o.wall.to[0])&&center<=Math.max(o.wall.from[0],o.wall.to[0])&&base>=o.wall.base-tolerance&&top<=o.wall.base+o.wall.height+tolerance&&top>base&&(!depth||o.wall.from[1]>=depth[1]-.001);}).sort((a,b)=>a.wall.from[1]-b.wall.from[1])[0];
   };
   const possibleOwner=canopy.columns.map(column=>ownerFor(column)).find(Boolean);if(!possibleOwner)return;
-  const report=byLevel.find(r=>r.levelId===possibleOwner.level.id),sideCandidates=[];
+  const report=byLevel.find(r=>r.levelId===possibleOwner.level.id),sideCandidates=[],sideConflicts=[];
+  const visibleFrontPosts=canopy.columns.filter(column=>{const box=[column.x,canopy.box[1],column.width,column.bottom-canopy.box[1]];return validBox(box)&&!frontMasks.some(mask=>intersection(box,mask));});
+  if(!visibleFrontPosts.length){report.issues.push('COLUMN_DEPTH_UNRESOLVED');return;}
   // Both side views may support a depth. A disagreement is kept unresolved.
   for(const side of views.filter(v=>['left','right'].includes(v.direction))){
    const sr=R.elevationRegistration(side,reviewed,inventory);if(!sr||![sr.sx,sr.sz].every(n=>finite(n)&&n>0))continue;
@@ -304,10 +313,23 @@
    const sideSource=inventory.views.find(v=>v.id===side.viewId),masks=sourceMasks(side,sideSource,images[side.viewId]);
    if(masks.some(mask=>intersection(sidePost.box,mask))){report.issues.push('COLUMN_SOURCE_OCCLUDED');continue;}
    const sign=frames[side.direction].u[1],ys=[sr.u(sidePost.box[0])*sign,sr.u(sidePost.box[0]+sidePost.box[2])*sign].sort((a,b)=>a-b),base=sr.z(sidePost.box[1]+sidePost.box[3]),top=sr.z(sidePost.box[1]);
-   const frontBase=fr.z(canopy.box[1]+canopy.box[3]),frontTop=fr.z(canopy.box[1]),tolerance=Math.max(.05,(frontTop-frontBase)*.04);
-   if(Math.abs(base-frontBase)>tolerance||Math.abs(top-frontTop)>tolerance){report.issues.push('COLUMN_LEVEL_CONFLICT');continue;}
+   const frontTop=fr.z(canopy.box[1]);
+   // A truncated post ends at the annotation, not at the entrance landing.
+   // Compare the side against independently visible front feet only.
+   const consistent=visibleFrontPosts.some(column=>{const frontBase=fr.z(column.bottom),tolerance=Math.max(.05,(frontTop-frontBase)*.04);return Math.abs(base-frontBase)<=tolerance&&Math.abs(top-frontTop)<=tolerance;});
+   if(!consistent){
+    report.issues.push('COLUMN_LEVEL_CONFLICT');
+    sideConflicts.push({type:'column',reason:'COLUMN_LEVEL_CONFLICT',status:'conflict',sourceViewId:sideSource.id,sourceFrame:copy(sideSource.frame),sourceBox:copy(sidePost.box),
+     observation:{base,top,provenance:provenance(sideSource,sidePost.box,sr,sidePost.method)},
+     frontObservations:visibleFrontPosts.map(column=>({base:fr.z(column.bottom),top:frontTop,provenance:provenance(source,[column.x,canopy.box[1],column.width,column.bottom-canopy.box[1]],fr,'visible-front-post-edges')}))});
+    continue;
+   }
    sideCandidates.push({source:sideSource,box:sidePost.box,registration:sr,ys,base,top,method:sidePost.method,direction:side.direction,masks});
   }
+  // A missing or masked view supplies no contradictory measurement. An
+  // observed conflicting side does: retain it and stop the dependent
+  // assembly instead of silently taking the other side's depth/level.
+  if(sideConflicts.length){report.conflicts||=[];report.conflicts.push(...sideConflicts);return;}
   if(!sideCandidates.length){report.issues.push('COLUMN_DEPTH_UNRESOLVED');return;}
   const side=sideCandidates[0];
   if(sideCandidates.some(other=>Math.abs(other.ys[0]-side.ys[0])>.05||Math.abs(other.ys[1]-side.ys[1])>.05)){report.issues.push('COLUMN_DEPTH_CONFLICT');return;}

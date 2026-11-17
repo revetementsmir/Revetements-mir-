@@ -8,6 +8,14 @@ assert.equal(P.resolveReference([ref(8,'side-a'),ref(8.1,'side-b')]).status,'con
 const otherSpan={...ref(8.1,'side-b'),anchors:[[0,0],[0,101.25]],scale:.08};assert.ok(P.resolveReference([ref(8,'side-a'),otherSpan]).reference,'different physical spans can establish the same scale');
 assert.equal(P.resolveReference([ref(7,'side-a'),ref(8,'side-a')]).status,'conflict','an ambiguous OCR glyph alone cannot decide its own reading');assert.equal(P.resolveReference([]).status,'not_found');
 assert.equal(P.resolveReference([ref(7,'side-a'),ref(8,'side-a',[80,10,100,20])]).status,'conflict','different captions in the same view are independent evidence');
+const uncertain={...ref(8,'side-a'),source:'ocr',confidence:1};
+assert.equal(P.resolveReference([uncertain]).status,'low_confidence');assert.equal(P.resolveReference([uncertain]).reference,null,'an unreadable whole-span glyph cannot calibrate a building');
+const moderate={...uncertain,confidence:35};assert.equal(P.resolveReference([moderate]).reference,null,'a single uncertain but parseable OCR reading still needs corroboration');
+assert.equal(P.resolveReference([moderate,{...moderate}]).reference,null,'duplicate OCR is not a second caption');
+assert.ok(P.resolveReference([moderate,{...ref(8,'side-b'),source:'ocr-local-region-retry',confidence:60}]).reference,'independent consistent captions corroborate a moderate reading');
+assert.ok(P.resolveReference([{...uncertain,source:'pdf-text'}]).reference,'embedded PDF text does not depend on an OCR confidence field');
+assert.equal(P.resolveReference([uncertain,{...uncertain,confidence:94}]).reference.value,8,'a reliable retry of the same source caption can establish its value');
+assert.equal(P.resolveReference([{...moderate,kind:'written'},{...ref(8,'side-b'),confidence:94}]).reference.confidence,94,'a weak direct transcription does not outrank a reliable independently transferred measurement');
 // Small slashes with a short leader above and a long leader below: the old
 // long-intersection rule omitted the internal endpoints of a chained cote.
 const image={width:800,height:400,data:new Uint8ClampedArray(800*400*4).fill(255)},ink=(x,y)=>image.data.set([0,0,0,255],(y*800+x)*4);
@@ -18,6 +26,22 @@ const label=[{text:'14 ft',box:[385,85,415,93],confidence:100}];
 assert.equal(A.matchDimensionLines(image,label)[0].spanPx,599,'old association reproduces the erroneous whole span');
 const corrected=A.matchDimensionLines(image,label,{shortTicks:true})[0];assert.ok(Math.abs(corrected.spanPx-300)<3,'internal marks delimit the actual written dimension');
 assert.equal(A.matchDimensionLines(image,[{...label[0],text:'NOTE: 14 ft'}],{shortTicks:true}).length,0,'a note does not become a construction dimension');
+// A short detail cote must reach the same endpoint checks as a large span.
+// It is useful for a roof overhang, but cannot calibrate a whole building.
+const detail=(endpoints=true,colour=[0,0,0])=>{
+ const im={width:500,height:400,data:new Uint8ClampedArray(500*400*4).fill(255)},dot=(x,y)=>im.data.set([...colour,255],(y*im.width+x)*4);
+ for(let x=180;x<=217;x++)dot(x,150);
+ if(endpoints)for(const x of [180,217]){for(let y=142;y<=163;y++)dot(x,y);for(let d=-3;d<=3;d++)for(let dx=0;dx<=1;dx++)dot(x+d+dx,150-d);}
+ return im;
+};
+const detailLabel={text:'18"',box:[191,136,205,144],confidence:94,source:'ocr'},detailImage=detail(),detailView={id:'detail-floor',frame:{units:'pixels',rasterSize:[500,400]},payload:{drawingReadings:{rows:[detailLabel]}}};
+const detailCotes=R.contourDimensions(detailView,detailImage);
+assert.equal(detailCotes.length,1,'two visible short ticks establish a detail dimension under 50 pixels');
+assert.equal(detailCotes[0].spanPx,37);assert.ok(Math.abs(detailCotes[0].value-.4572)<1e-10);assert.equal(detailCotes[0].sourceViewId,detailView.id);assert.deepEqual(detailCotes[0].sourceFrame,detailView.frame);assert.equal(detailCotes[0].status,'proposed');
+assert.equal(A.matchDimensionLines(detailImage,[detailLabel]).length,0,'ordinary scale detection retains its minimum span');
+assert.equal(A.resolveScale(detailCotes).feetPerPixel,null,'a tiny detail alone never establishes the building scale');
+assert.equal(R.contourDimensions(detailView,detail(false)).length,0,'text near a short unbounded line is insufficient');
+assert.equal(R.contourDimensions(detailView,detail(true,[0,190,255])).length,0,'a coloured mark is not a construction dimension line');
 // A preview must not promote geometry or quantities to confirmed facts.
 const inv=fixture(),original=structuredClone(inv),level=inv.levels[0],c=level.contours[0];c.status='proposed';c.reference.status='proposed';c.height.status='proposed';c.base.status='proposed';c.alignment.status='proposed';level.reconstruction={status:'automatic-proposal'};
 const proposedBefore=structuredClone(inv),walls=M.wallsFor(level,inv,{includeProposed:true});assert.ok(walls.length);assert.equal(M.wallsFor(level,inv).length,0);assert.ok(walls.every(w=>w.previewOnly&&w.dimension.status==='proposed'));assert.deepEqual(inv,proposedBefore);assert.ok(M.quantities(inv,level.buildingId).partial);

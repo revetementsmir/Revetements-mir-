@@ -30,8 +30,38 @@ const guide=build(entryFixture({beam:false,roof:false}));assert.equal(details(gu
 const noPosts=build(entryFixture({posts:false}));assert.equal(details(noPosts).filter(e=>['column','beam'].includes(e.type)).length,0);assert.equal(roofs(noPosts).length,0,'a wall capping is not a post-supported entrance');
 const noSide=entryFixture();for(const view of noSide.inventory.views.filter(v=>['right','left'].includes(v.direction)))delete noSide.images[view.id];const noSideResult=build(noSide);assert.equal(details(noSideResult).filter(e=>['beam','column'].includes(e.type)).length,0);assert.equal(roofs(noSideResult).length,0);
 const oneSide=build(entryFixture({left:false}));assert.equal(details(oneSide).filter(e=>e.type==='beam').length,2,'an unobserved return is never mirrored');assert.equal(roofs(oneSide).length,1);
+// An observed side-level conflict cannot be discarded just because the
+// opposite side agrees. The shortened foot is visible, not an occlusion.
+const sideLevelSource=entryFixture(),sideImage=sideLevelSource.images['synthetic-entry-left'];
+for(let y=651;y<=705;y++)for(let x=497;x<=513;x++)sideImage.data.set([255,255,255,255],(y*sideImage.width+x)*4);
+const sideLevelBefore=structuredClone(sideLevelSource),sideLevelConflict=build(sideLevelSource);
+assert.equal(details(sideLevelConflict).filter(e=>['column','beam'].includes(e.type)).length,0,'no dependent column or beam survives an observed side-level contradiction');assert.equal(roofs(sideLevelConflict).length,0);
+assert.ok(sideLevelConflict.issues.includes('COLUMN_LEVEL_CONFLICT'));
+const retainedConflict=sideLevelConflict.byLevel.flatMap(l=>l.conflicts||[]).find(c=>c.reason==='COLUMN_LEVEL_CONFLICT');
+assert.ok(retainedConflict);assert.equal(retainedConflict.status,'conflict');assert.equal(retainedConflict.sourceViewId,'synthetic-entry-left');assert.equal(retainedConflict.sourceBox[0],500);assert.equal(retainedConflict.sourceBox[2],10);assert.equal(retainedConflict.sourceBox[1]+retainedConflict.sourceBox[3],650,'the conflicting observed foot stays at its source position');
+close(retainedConflict.observation.base,.5,.001);assert.ok(retainedConflict.frontObservations.every(o=>o.base===0));assert.deepEqual(sideLevelSource,sideLevelBefore,'conflict inspection leaves source rasters, frames, inventory and proposals unchanged');
+// The same truncated pixels under a real source mask are unknown evidence;
+// the independent visible side remains usable, without claiming the mask.
+const maskedSide=structuredClone(sideLevelSource);maskedSide.proposal.views.find(v=>v.direction==='left').envelope.occlusions=[[490,635,40,90]];
+const maskedSideResult=build(maskedSide);assert.equal(details(maskedSideResult).filter(e=>e.type==='column').length,2);assert.equal(roofs(maskedSideResult).length,1);
+assert.ok(maskedSideResult.issues.includes('COLUMN_SOURCE_OCCLUDED'));assert.ok(!maskedSideResult.issues.includes('COLUMN_LEVEL_CONFLICT'));
+assert.ok(details(maskedSideResult).filter(e=>e.type==='column').every(e=>!e.provenance.sourceViewIds.includes('synthetic-entry-left')),'a masked side is not claimed as column measurement evidence');
+const landing=entryFixture(),landingWall=landing.levels.find(l=>l.sourceLevel==='ground').contours[0];landingWall.base.value=-.5;landingWall.height.value=3.5;
+const landingColumns=details(build(landing)).filter(e=>e.type==='column');assert.equal(landingColumns.length,2,'an observed landing can be above the parent wall foundation');for(const post of landingColumns)close(post.origin[2],0,.001);
+const outsideLevel=entryFixture(),wrongParent=outsideLevel.levels.find(l=>l.sourceLevel==='ground').contours[0];wrongParent.base.value=1;wrongParent.height.value=2;
+assert.equal(details(build(outsideLevel)).filter(e=>e.type==='column').length,0,'a post spanning below the parent wall is not assigned to that level');
 const conflict=build(entryFixture({sideRoofRise:80}));assert.equal(roofs(conflict).length,0,'incompatible lateral roof height cannot be replaced by the front assumption');assert.ok(conflict.issues.includes('ENTRY_ROOF_GEOMETRY_UNRESOLVED'));
 const masked=build(entryFixture({mask:[290,330,70,390]}));assert.equal(roofs(masked).length,0);assert.equal(details(masked).filter(e=>e.type==='beam').length,0,'occluded support prevents full entry assembly');
+const footMaskedSource=entryFixture({mask:[295,650,25,80]});
+for(let y=676;y<=710;y++)for(let x=295;x<=315;x++)footMaskedSource.images[footMaskedSource.front.id].data.set([255,255,255,255],(y*1000+x)*4);
+const footMasked=build(footMaskedSource),visiblePost=details(footMasked).filter(e=>e.type==='column');
+assert.equal(visiblePost.length,1,'an occluded post foot never becomes a mirrored complete column');
+assert.ok(visiblePost[0].origin[0]>5,'only the fully observed right post survives');
+assert.equal(roofs(footMasked).length,1,'a lower annotation does not erase independent complete front and side roof profiles');
+assert.equal(roofs(footMasked)[0].entryAssembly.supportStatus,'partial-unresolved');
+assert.ok(footMasked.issues.includes('ENTRY_ASSEMBLY_SUPPORT_PARTIAL'));assert.ok(footMasked.issues.includes('COLUMN_SECTION_UNRESOLVED'));
+for(const level of footMaskedSource.levels){const generated=footMasked.byLevel.find(r=>r.levelId===level.id);Object.assign(level,{exteriorElements:generated.exteriorElements,wallZones:generated.wallZones,reconstructedRoofs:generated.reconstructedRoofs});assert.deepEqual(X.proposalIssues(level,footMaskedSource.inventory),[]);}
+const annotatedFoot=build(entryFixture({mask:[295,650,25,80]}));assert.equal(details(annotatedFoot).filter(e=>e.type==='column').length,1);assert.equal(roofs(annotatedFoot).length,1);assert.ok(annotatedFoot.issues.includes('COLUMN_SOURCE_OCCLUDED'));
 // A narrower nearer volume can cover the assembly while leaving both posts
 // visible. Post-only occlusion checks are insufficient for the beam/roof.
 const hidden=entryFixture(),nearer={id:'house:nearer-entry-volume',buildingId:'house',sourceLevel:null,contours:[],reconstruction:{status:'automatic-proposal'},observedPlanes:[]};
