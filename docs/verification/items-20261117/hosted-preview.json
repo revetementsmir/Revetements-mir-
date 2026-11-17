@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-11-17T15:42:08.469Z",
+  "deployment": {
+    "id": "dpl_CdvwbMExFhCyLHRTzYBtpEW8Cdym",
+    "url": "https://mir-studio-test-pxsntgep8-desk17.vercel.app",
+    "state": "READY",
+    "target": null,
+    "protected": true,
+    "sourceRevision": "e72328c371f86c5f388fb25f08476d35dbbb8cc0"
+  },
+  "checks": [
+    {
+      "path": "/test/mir-test-environment.json",
+      "status": 200,
+      "success": true,
+      "noindex": "noindex, nofollow",
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+      "guardInjected": null,
+      "manifest": {
+        "environment": "test",
+        "projectRef": "hxtztkmbfpmzrieccwsg",
+        "revision": "e72328c371f86c5f388fb25f08476d35dbbb8cc0"
+      }
+    },
+    {
+      "path": "/test/items-20261117.html",
+      "status": 200,
+      "success": true,
+      "noindex": "noindex, nofollow",
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+      "guardInjected": true
+    },
+    {
+      "path": "/test/produit.html?id=mir-request-mac-screws",
+      "status": 200,
+      "success": true,
+      "noindex": "noindex, nofollow",
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+      "guardInjected": true
+    },
+    {
+      "path": "/test/magasin-revue.html",
+      "status": 200,
+      "success": true,
+      "noindex": "noindex, nofollow",
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+      "guardInjected": true
+    },
+    {
+      "path": "/test/commerce.js",
+      "status": 200,
+      "success": true,
+      "noindex": "noindex, nofollow",
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
+      "guardInjected": null,
+      "confirmedPhotoExceptionPresent": true
+    }
+  ],
+  "method": "Read-only authenticated HTTP checks. Functional, responsive and language tests performed locally on the same application source. Employee screenshots use a simulated snapshot; no production employee catalogue publication.",
+  "productionPublished": false,
+  "externalWrites": false,
+  "realSubmissions": false
+}

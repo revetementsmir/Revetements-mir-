@@ -1,5 +1,13 @@
 # MIR — premier lot de produits transmis le 17 novembre 2026
 
+## Aperçu final livré
+
+- [Vis MAC 1½ po, boîte de 500 — fiche interactive TEST](https://mir-studio-test-pxsntgep8-desk17.vercel.app/test/produit.html?id=mir-request-mac-screws)
+- [Les trois articles et 12 captures PC/téléphone](https://mir-studio-test-pxsntgep8-desk17.vercel.app/test/items-20261117.html)
+- [Revue locale du magasin employés](https://mir-studio-test-pxsntgep8-desk17.vercel.app/test/magasin-revue.html)
+
+Déploiement Vercel Preview `dpl_CdvwbMExFhCyLHRTzYBtpEW8Cdym`, READY, source exacte `e72328c371f86c5f388fb25f08476d35dbbb8cc0`. Cinq lectures HTTP 200; manifeste TEST, révision, garde, CSP locale et noindex vérifiés. L’exception d’ajout sans photo pour la référence MIR confirmée est présente dans le script hébergé. Preuves : `hosted-preview.json`. Protection Vercel conservée; connexion autorisée potentiellement nécessaire. Aucun déploiement de production ni publication dans le catalogue serveur employé.
+
 ## Portée réalisée sur TEST
 
 Source de départ : `1104e2e`, branche `codex/client-prestige-20261117`. Cinq images reçues dans la conversation, puis identification explicite par MIR de la première : « vis pour mac ».
@@ -26,7 +34,7 @@ Les données sont partagées avec le modèle et la revue locale du magasin. Le m
 
 Les tests de catalogue Phase 9, de quantités client, de traduction et les 16 contrats de réconciliation magasin ont été exécutés avec succès. Le test ciblé du lot et les résultats navigateur sont consignés séparément dans ce dossier. Les requêtes externes sont bloquées dans les essais navigateur; aucun envoi, courriel, paiement ou écriture Supabase.
 
-- `inventory-review.md` : 7 contrôles ciblés réussis, dont données et photos PRIME inchangées, absence de doublons et blocage des références incomplètes.
+- `inventory-review.md` : 8 contrôles ciblés finaux réussis, dont données et photos PRIME inchangées, absence de doublons, ajout de la référence MAC confirmée et blocage des autres références incomplètes.
 - `qa-browser-audit.json` : 30 contrôles et 24 captures après, PC 1440 et téléphone 390; boutique FR/EN, revue magasin et véritable écran terrain alimenté par une fixture locale.
 - `qa-final-captures.json` : 8 vues client renouvelées après les dernières corrections de légende et de traduction; aucune erreur JavaScript ni débordement. Le libellé `boxes` conserve la valeur métier `boîtes`; l’ancien panier garde ses 3 boîtes et ajoute 2 boîtes sans perte.
 - `qa-read-only-audit.md` : méthodes et distinction entre catalogue local, fixture et instantané serveur connecté.
