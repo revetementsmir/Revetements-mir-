@@ -5,6 +5,9 @@ on:
     branches: [codex/pliage-harmonie-20261117]
     paths:
       - 'dist/**'
+      # Mobile-only footer styles have their own focused browser comparison.
+      - '!dist/mir-prestige.css'
+      - '!dist/mir-client-pliage.css'
       - 'tests/mir-client-colours-browser.cjs'
       - 'docs/verification/pliage-harmonie-20261117/colour-cutout-qa/**'
       - 'docs/verification/pliage-harmonie-20261117/palettes-completees/**'
