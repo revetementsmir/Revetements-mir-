@@ -99,6 +99,31 @@ for(const axis of ['horizontal','vertical']){
 }
 const shifted=fixture(),shiftedDimension=dimension(shifted,{anchors:[[260,180],[760,180]],value:5});
 assert.equal(overall(shifted,[shiftedDimension]).length,0,'equal span alone does not prove the same endpoints');
+
+// A dimension may end at the centreline of a thick source wall. Preserve
+// that reading only when the additional offset is entirely inside the same
+// observed stroke, including both endpoints, not merely close to its bounds.
+for(const axis of ['horizontal','vertical']){
+ const s=fixture(),anchors=axis==='horizontal'?[[246,180],[734,180]]:[[160,266],[160,654]];
+ for(let offset=0;offset<=7;offset++){
+  if(axis==='horizontal'){line(s.image,[240+offset,260],[240+offset,660]);line(s.image,[740-offset,260],[740-offset,660]);}
+  else{line(s.image,[240,260+offset],[740,260+offset]);line(s.image,[240,660-offset],[740,660-offset]);}
+ }
+ const d=dimension(s,{anchors,value:axis==='horizontal'?4.88:3.88}),before=s.image.data.slice(),references=overall(s,[d]);
+ assert.equal(references.length,1,`${axis}: an observed thick wall stroke explains the endpoint offset`);
+ assert.ok(references[0].extentEvidence.endpoints.every(e=>e.method==='observed-wall-stroke-band'&&e.support===1));
+ assertSourceKept(references[0],d);assert.deepEqual(s.image.data,before);
+ const alternative={...structuredClone(d),value:d.value*1.1,scale:d.scale*1.1,textBox:d.textBox.map((v,i)=>i%2?v-40:v)};
+ alternative.text=alternative.label=String(alternative.value*1000)+' mm';
+ const alternatives=overall(s,[d,alternative]);assert.equal(alternatives.length,2,'wall stroke evidence cannot choose between contradictory written values');
+ assert.equal(require('../dist/plan-reconstruction-pipeline.js').resolveReference(alternatives).status,'conflict');
+ const detached=fixture(),detachedDimension=dimension(detached,{anchors,value:d.value});
+ assert.equal(R.floorExtentEvidence(detachedDimension,detached.outline,detached.image),null,'endpoint witnesses alone do not fill the white gap to a thin outer wall');
+ const excessive={...d,anchors:axis==='horizontal'?[[249,180],[731,180]]:[[160,269],[160,651]]};
+ assert.equal(R.floorExtentEvidence(excessive,s.outline,s.image),null,'even solid ink cannot expand the bounded endpoint search');
+ if(axis==='horizontal')erase(s.image,239,400,10,20);else erase(s.image,400,259,20,10);
+ assert.equal(R.floorExtentEvidence(d,s.outline,s.image),null,'a disconnected band cannot explain the endpoint offset');
+}
 for(const confidence of [0,69]){
  const s=fixture(),d=dimension(s,{anchors:[[240,180],[740,180]],value:5,confidence});assert.equal(overall(s,[d]).length,0,'weak OCR cannot supply an overall calibration');
  const pair=partialPair();pair.b.confidence=confidence;assert.equal(partial(pair,[pair.a,pair.b]).references.length,0,'weak OCR cannot corroborate a partial calibration');

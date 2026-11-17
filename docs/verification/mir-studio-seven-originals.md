@@ -93,6 +93,30 @@ frozen revision. Its provenance must distinguish the import revision from the
 conversion revision; it is not a fresh PDF re-import. Previous refined readings,
 reconstruction results and scenes are not conversion inputs.
 
+### First conversion-only result
+
+Revision `a5f5f408abe92ea48705e9047478a8bf6b078eb6` completed all seven new
+conversion calls from the initial `f766cec` imports. All source inventories
+were unchanged before/after; 176 targeted regions returned 173 OCR lines.
+One dossier, D02, produced a partial scene: 15 walls, 13 openings, two main
+roofs and one flat entrance roof over three proposed levels. Both exterior
+source checks passed against the original and refined inventories. No column,
+beam or confirmed quantity was produced. This is not a browser save proof.
+
+D04 reached `HEIGHT_UNKNOWN` after its scale was recovered; the secondary
+building still lacks an associated floor source. The other five dossiers
+retained their previous contour or reference conflicts. Inspection of D02's
+production renders found a missing garage opening, simplified entrance door,
+and absent entrance steps, visible foundation and basement openings. The
+scene therefore does not establish complete source fidelity.
+
+That revision's browser CI passed import/persistence and S2 contour checks,
+then failed the unchanged contradictory-reference review test because the
+new extent tolerance excluded the centreline of a thick wall stroke. Its
+Node and SQL results do not substitute for a passing browser run. The
+source-supported stroke-band correction described below requires a new
+exact-revision browser and original-conversion pass.
+
 ### Flat entrance footprint and fascia
 
 The flat-roof path can use a fully closed observed footprint, or observed rear
@@ -155,6 +179,14 @@ strokes connect both endpoints to the observed floor contour. Full-span checks
 require both endpoints to match the contour extremes within raster precision;
 partial spans retain the independent-inscription requirement. Missing, coloured,
 interrupted or foreign-source witnesses do not create that association.
+
+The first exact-commit browser run of this stricter endpoint check found a
+regression: dimension marks at a thick wall's centreline were discarded even
+though they described the same wall. The corrected check can retain a bounded
+offset only when the complete band between that mark and the contour edge is
+observed wall ink. A nearby thin line or white gap is insufficient. Contradictory
+captions both remain available for explicit reference review. The synthetic
+browser test remains unchanged and must pass on the corrected revision.
 
 Two distinct reliable partial inscriptions can calibrate their own floor view.
 They do not become the whole building width. Duplicate OCR of one caption,

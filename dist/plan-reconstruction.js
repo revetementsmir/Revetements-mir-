@@ -40,17 +40,38 @@
   }
   return {method:'observed-dimension-witnesses-to-floor',sourceViewId:view.id,sourceFrame:M.clone(view.frame),connections,confirmationRequired:true};
  }
+ function floorExtentEvidence(dimension,outline,image){
+  const bounds=outline?.sourceBounds,anchors=dimension?.anchors,points=outline?.points;
+  if(!Array.isArray(bounds)||bounds.length!==4||!bounds.every(Number.isFinite)||bounds[2]<=0||bounds[3]<=0||anchors?.length!==2||!anchors.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))||!points?.length||!points.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)))return null;
+  const axis=Math.abs(anchors[0][0]-anchors[1][0])<=2?1:Math.abs(anchors[0][1]-anchors[1][1])<=2?0:null;if(axis===null||M.distance(...anchors)<20)return null;
+  const positions=anchors.map(p=>p[axis]).sort((a,b)=>a-b),ends=[bounds[axis],bounds[axis]+bounds[axis+2]],evidence=[],other=1-axis;let ink=null;
+  for(let side=0;side<2;side++){
+   const position=positions[side],extreme=ends[side],difference=Math.abs(position-extreme);
+   if(difference<=3){evidence.push({method:'raster-endpoint-tolerance',differencePixels:difference,tolerancePx:3});continue;}
+   // Thick source strokes have an outer edge distinct from the dimension's
+   // centreline. A larger offset is allowed only inside the SAME observed
+   // wall stroke, never from a percentage of the building's overall width.
+   if(!image?.data||difference>8||side===0&&position<extreme||side===1&&position>extreme)return null;
+   ink||=V.monochrome(image);let supported=null;
+   for(let i=0;i<points.length;i++){
+    const a=points[i],b=points[(i+1)%points.length],edge=(a[axis]+b[axis])/2;
+    if(Math.abs(a[axis]-b[axis])>2||Math.abs(edge-extreme)>3||Math.abs(position-edge)>8)continue;
+    const length=Math.abs(a[other]-b[other]),trim=Math.min(8,length*.1),start=Math.ceil(Math.min(a[other],b[other])+trim),end=Math.floor(Math.max(a[other],b[other])-trim);if(end-start<20)continue;
+    const lo=Math.round(Math.min(edge,position)),hi=Math.round(Math.max(edge,position));let hits=0,gap=0,maxGap=0;
+    for(let n=start;n<=end;n++){let hit=true;for(let u=lo;u<=hi;u++){const x=axis===0?u:n,y=axis===0?n:u;if(x<0||x>=image.width||y<0||y>=image.height||!ink[y*image.width+x]){hit=false;break;}}if(hit){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}
+    const support=hits/(end-start+1);if(support>=.85&&maxGap<=Math.max(4,Math.min(10,length*.03))){supported={method:'observed-wall-stroke-band',contourEdgeIndex:i,position,sourceEdgePosition:edge,along:[start,end],support,maxGap,differencePixels:difference,maxOffsetPx:8};break;}
+   }
+   if(!supported)return null;evidence.push(supported);
+  }
+  return {axis:axis===0?'x':'y',sourceBounds:M.clone(bounds),endpoints:evidence,confirmationRequired:true};
+ }
  function overallScaleReferences(view,dimensions,outline,image){
   const bounds=outline?.sourceBounds,references=[];
   if(!Array.isArray(bounds)||bounds.length!==4||!bounds.every(Number.isFinite)||bounds[2]<=0||bounds[3]<=0)return references;
   for(const d of dimensions||[]){
    if(d.sourceViewId!==view.id||d.kind!=='written'||!Number.isFinite(d.value)||d.value<=0||d.anchors?.length!==2||!d.anchors.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))||d.source!=='pdf-text'&&(d.confidence??0)<70)continue;
-   const axis=Math.abs(d.anchors[0][0]-d.anchors[1][0])<=2?1:Math.abs(d.anchors[0][1]-d.anchors[1][1])<=2?0:null;if(axis===null)continue;
-   const start=Math.min(...d.anchors.map(p=>p[axis])),end=Math.max(...d.anchors.map(p=>p[axis]));
-   // A near-full span can still describe an interior offset. Each observed
-   // endpoint must reach the actual contour extreme within raster precision.
-   if(Math.abs(start-bounds[axis])>3||Math.abs(end-bounds[axis]-bounds[axis+2])>3)continue;
-   const association=floorDimensionAssociation(view,d,outline,image);if(association)references.push({...M.clone(d),association:'observed-overall-floor-dimension',sourceAssociation:association,confirmationRequired:true});
+   const extentEvidence=floorExtentEvidence(d,outline,image);if(!extentEvidence)continue;
+   const association=floorDimensionAssociation(view,d,outline,image);if(association)references.push({...M.clone(d),association:'observed-overall-floor-dimension',sourceAssociation:association,extentEvidence,confirmationRequired:true});
   }return references;
  }
  function partialScaleReferences(view,dimensions,bounds,{outline=null,image=null}={}){
@@ -158,7 +179,7 @@
   for(const v of elevations){const im=images[v.id];if(!im)continue;const facing=faceSpan(outline.points,v.direction),expected=facing.length,envelope=V.wallEnvelope(im,expected,{sourceViewId:v.id,frame:v.frame,occlusions:V.legendBoxes(im,readings(v)),rows:readings(v)}),refs=references(v,im),guides=envelope.status==='proposed'?floorGuide(v,im,envelope):[];
    const support=envelope.status==='proposed'?wallSupport(v,im,envelope):null;views.push({viewId:v.id,direction:v.direction,facing,envelope,supportY:support?.y??envelope.box?.[1],supportEvidence:support,roofProfile:V.roofProfile(im,envelope,readings(v)),references:refs,guides});
   }
-  const dimensions=contourDimensions(floor,image),direct=[...references(floor,image).filter(r=>Math.abs(Math.min(...r.anchors.map(p=>p[0]))-bounds[0])<=3&&Math.abs(Math.max(...r.anchors.map(p=>p[0]))-bounds[0]-bounds[2])<=3),...overallScaleReferences(floor,dimensions,outline,image)];
+  const dimensions=contourDimensions(floor,image),direct=[...references(floor,image).flatMap(r=>{const extentEvidence=floorExtentEvidence(r,outline,image);return extentEvidence?[{...r,extentEvidence}]:[];}),...overallScaleReferences(floor,dimensions,outline,image)];
   // Transferring a written elevation span to a plan is itself an estimated
   // correspondence, never a second written dimension on the floor plan.
   const transferred=views.filter(v=>v.envelope.status==='proposed').flatMap(v=>v.references.filter(r=>Math.abs(r.spanPx/v.envelope.box[2]-1)<.05).map(r=>{
@@ -444,5 +465,5 @@
   if(next.roofProposal?.status==='proposed'){const roof=next.roofProposal;roof.profiles.x=roof.profiles.x.map(([x,z])=>[nx[0]+(x-old.x[0])*rx,nz[0]+(z-old.z[0])*rz]);roof.profiles.y=roof.profiles.y.map(([y,z])=>[ny[0]+(y-old.y[0])*ry,nz[0]+(z-old.z[0])*rz]);roof.fasciaBottom=nz[1];roof.userMeasurementCorrections={width:w,depth:d,height:h,originalBounds:M.clone(old)};}
   return next;
  }
- return Object.freeze({version:1,floorDimensionAssociation,overallScaleReferences,partialScaleReferences,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,openingsFor,lowerPlanes,faceSpan,references,floorGuide,size,readings});
+ return Object.freeze({version:1,floorExtentEvidence,floorDimensionAssociation,overallScaleReferences,partialScaleReferences,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,openingsFor,lowerPlanes,faceSpan,references,floorGuide,size,readings});
 });
