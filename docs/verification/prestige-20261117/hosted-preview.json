@@ -1,0 +1,38 @@
+{
+  "deploymentId": "dpl_HoADMeRYkQ38Bk3ioVqeDTvJSbNV",
+  "url": "https://mir-studio-test-fwqa4a49f-desk17.vercel.app/test/index.html",
+  "gallery": "https://mir-studio-test-fwqa4a49f-desk17.vercel.app/test/prestige-captures.html",
+  "archive": "https://mir-studio-test-fwqa4a49f-desk17.vercel.app/test/prestige-captures.tar.gz",
+  "target": "preview",
+  "state": "READY",
+  "sourceRevision": "35e4335fe92be8bfac45f62002bf9c0fdf8552f0",
+  "authentication": "Existing Vercel Authentication retained",
+  "httpChecks": [
+    {
+      "file": "index.html",
+      "status": 200
+    },
+    {
+      "file": "boutique.html",
+      "status": 200
+    },
+    {
+      "file": "studio-public.html",
+      "status": 200
+    },
+    {
+      "file": "prestige-captures.html",
+      "status": 200
+    },
+    {
+      "file": "mir-test-environment.json",
+      "status": 200
+    }
+  ],
+  "captures": 112,
+  "environment": "test",
+  "productionPublished": false,
+  "externalRequests": false,
+  "productionWrites": false,
+  "publicShareSevenDays": "Rejected by automatic approval review; not created. Protected access retained."
+}

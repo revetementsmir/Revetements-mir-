@@ -39,6 +39,8 @@ Les rapports et scripts de recette sont joints au dossier. La matrice principale
 
 ## Aperçu et captures
 
+Aperçu hébergé prêt : [ouvrir le site TEST](https://mir-studio-test-fwqa4a49f-desk17.vercel.app/test/index.html), [voir les 112 captures](https://mir-studio-test-fwqa4a49f-desk17.vercel.app/test/prestige-captures.html), [télécharger l’archive](https://mir-studio-test-fwqa4a49f-desk17.vercel.app/test/prestige-captures.tar.gz). Accès Vercel protégé conservé. Source de l’aperçu : `35e4335fe92be8bfac45f62002bf9c0fdf8552f0`. Les réponses hébergées et le manifeste TEST ont été vérifiés; voir `hosted-preview.json`.
+
 `node scripts/build-prestige-preview.cjs` produit `.prestige-preview/test/`. Le site utilise le vrai code et les vrais fichiers du projet. La protection de cet aperçu bloque les services externes et conserve les données locales dans l’espace TEST; connexion et envois y sont désactivés. La galerie `prestige-captures.html` présente des captures de navigateur, avec un lien vers chaque page. Les comptes, commandes et confirmations simulés sont explicitement étiquetés.
 
 Voir [GALLERY.md](GALLERY.md) pour régénérer la galerie et l’archive. Le HTML autonome est une galerie d’images consultable hors ligne, pas une simulation des fonctions serveur.
