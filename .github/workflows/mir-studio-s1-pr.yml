@@ -59,6 +59,7 @@ jobs:
           node tests/mir-studio-s1.cjs
           node tests/mir-studio-s2.cjs
           node tests/mir-studio-reconstruction.cjs
+          node tests/mir-studio-grid-registration.cjs
           node tests/mir-studio-automatic.cjs
           node tests/mir-studio-automatic-originals-harness.cjs
           node tests/mir-studio-legend-occlusion.cjs
