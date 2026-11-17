@@ -1,0 +1,609 @@
+{
+  "sourceRoot": "/workspace/mir-prestige/dist",
+  "capturedAt": "2026-11-17T15:23:47.017Z",
+  "captures": [
+    {
+      "file": "qa-boutique-prime20031-1440.png",
+      "surface": "boutique",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-hardie-colorplus-1440.png",
+      "surface": "boutique",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-vis-mac-1440.png",
+      "surface": "boutique",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-prime20031-en-1440.png",
+      "surface": "boutique",
+      "language": "en-CA",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-hardie-colorplus-en-1440.png",
+      "surface": "boutique",
+      "language": "en-CA",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-vis-mac-en-1440.png",
+      "surface": "boutique",
+      "language": "en-CA",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-revue-prime20031-1440.png",
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-revue-hardie-colorplus-1440.png",
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-revue-vis-mac-1440.png",
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "qa-chantier-fixture-prime20031-1440.png",
+      "surface": "chantier-terrain",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    },
+    {
+      "file": "qa-chantier-fixture-hardie-colorplus-1440.png",
+      "surface": "chantier-terrain",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    },
+    {
+      "file": "qa-chantier-fixture-vis-mac-1440.png",
+      "surface": "chantier-terrain",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-prime20031-390.png",
+      "surface": "boutique",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-hardie-colorplus-390.png",
+      "surface": "boutique",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-vis-mac-390.png",
+      "surface": "boutique",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-prime20031-en-390.png",
+      "surface": "boutique",
+      "language": "en-CA",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-hardie-colorplus-en-390.png",
+      "surface": "boutique",
+      "language": "en-CA",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-vis-mac-en-390.png",
+      "surface": "boutique",
+      "language": "en-CA",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-revue-prime20031-390.png",
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-revue-hardie-colorplus-390.png",
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "qa-magasin-revue-vis-mac-390.png",
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "qa-chantier-fixture-prime20031-390.png",
+      "surface": "chantier-terrain",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    },
+    {
+      "file": "qa-chantier-fixture-hardie-colorplus-390.png",
+      "surface": "chantier-terrain",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    },
+    {
+      "file": "qa-chantier-fixture-vis-mac-390.png",
+      "surface": "chantier-terrain",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    }
+  ],
+  "checks": [
+    {
+      "surface": "boutique-search",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "query": "20031",
+      "found": true
+    },
+    {
+      "surface": "boutique",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "enabled": true,
+      "label": "Ajouter au panier\n＋",
+      "photo": "http://127.0.0.1:33159/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "colors": 0,
+      "localCart": [
+        {
+          "materialId": "prime-paper-strip-20031",
+          "quantity": 3,
+          "unit": "boîtes"
+        },
+        {
+          "materialId": "prime-paper-strip-20031",
+          "quantity": 2,
+          "unit": "boîtes"
+        }
+      ],
+      "legacyQuantityPreserved": 3,
+      "addedQuantity": 2
+    },
+    {
+      "surface": "boutique-search",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "query": "Blackwater",
+      "found": true
+    },
+    {
+      "surface": "boutique",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "enabled": false,
+      "label": "Ajout indisponible · fiche à compléter",
+      "photo": "http://127.0.0.1:33159/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "colors": 2
+    },
+    {
+      "surface": "boutique-search",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "query": "vis MAC",
+      "found": true
+    },
+    {
+      "surface": "boutique",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "enabled": false,
+      "label": "Ajout indisponible · fiche à compléter",
+      "photo": null,
+      "colors": 0
+    },
+    {
+      "surface": "boutique-en",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "title": "PRIME 20031 — 3¼ in strip common nails · 34°",
+      "button": "Add to cart\n＋",
+      "disabled": false,
+      "visibleText": "PRIME / Premier Outils Pro →\nPRIME 20031 — 3¼ in strip common nails · 34°\n\nPaper-collated smooth-shank common nails, bright finish. Length 3¼ in, diameter 0.120 in, 34° collation. Box of 2,000 nails, according to the Prime label.\n\nImage supplied by MIR · select a length\n\nPrice on request\n\nRequested quantity\nRequired unit\nboîtes\n\n2,000 items per box. box of 2,000 nails\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR."
+    },
+    {
+      "surface": "boutique-en",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "title": "ColorPlus — Touch-up kit",
+      "button": "Ajout indisponible · fiche à compléter",
+      "disabled": true,
+      "visibleText": "James Hardie →\nColorPlus — Touch-up kit\n\nTouch-up kit for James Hardie ColorPlus siding and trim. Documented box: Midnight Black 4960831 / Blackwater 4100703. MIR pricing and availability to be confirmed.\n\nProduct range image · colour in the chart\n\nPrice on request\n\nColour: Noir minuit (Midnight Black)\nManufacturer colour chart →\nNoir minuit (Midnight Black)\nÉtain vieilli (Aged Pewter)\nRequested quantity\nRequired unit\nkits\n\nQuantités entières. kit — référence Canada, teinte et unité MIR à confirmer.\n\nAjout indisponible · fiche à compléter\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR."
+    },
+    {
+      "surface": "boutique-en",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "title": "Screws for MAC siding — reference to be confirmed",
+      "button": "Ajout indisponible · fiche à compléter",
+      "disabled": true,
+      "visibleText": "À confirmer →\nScrews for MAC siding — reference to be confirmed\n\nScrews for MAC siding, as requested by MIR. The photo shows a square-drive head. Length, gauge, coating and package quantity still need to be confirmed.\n\nManufacturer image to be added\n\nPhoto non disponible · visuel de remplacement\n\nRéférence exacte à confirmer avant sélection\n\nRequested quantity\nRequired unit\npieces\n\nQuantités entières. À confirmer.\n\nAjout indisponible · fiche à compléter\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR."
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "photo": "http://127.0.0.1:33159/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "cartLines": 1,
+      "localRejection": []
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "photo": "http://127.0.0.1:33159/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "cartLines": 1,
+      "localRejection": [
+        "Prix, disponibilité et conditionnement de vente MIR à confirmer; photo de cette référence à intégrer."
+      ]
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "photo": null,
+      "cartLines": 1,
+      "localRejection": [
+        "Longueur, calibre, référence fournisseur et conditionnement à préciser avant sélection."
+      ]
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "photo": "http://127.0.0.1:33159/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "toast": "Article ajouté à votre demande.",
+      "fixtureCalls": []
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "photo": "http://127.0.0.1:33159/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "toast": "Prix, disponibilité et conditionnement de vente MIR à confirmer; photo de cette référence à intégrer.",
+      "fixtureCalls": []
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 1440,
+      "id": "mir-request-mac-screws",
+      "photo": null,
+      "toast": "Longueur, calibre, référence fournisseur et conditionnement à préciser avant sélection.",
+      "fixtureCalls": []
+    },
+    {
+      "surface": "boutique-search",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "query": "20031",
+      "found": true
+    },
+    {
+      "surface": "boutique",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "enabled": true,
+      "label": "Ajouter au panier\n＋",
+      "photo": "http://127.0.0.1:33159/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "colors": 0,
+      "localCart": [
+        {
+          "materialId": "prime-paper-strip-20031",
+          "quantity": 3,
+          "unit": "boîtes"
+        },
+        {
+          "materialId": "prime-paper-strip-20031",
+          "quantity": 2,
+          "unit": "boîtes"
+        }
+      ],
+      "legacyQuantityPreserved": 3,
+      "addedQuantity": 2
+    },
+    {
+      "surface": "boutique-search",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "query": "Blackwater",
+      "found": true
+    },
+    {
+      "surface": "boutique",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "enabled": false,
+      "label": "Ajout indisponible · fiche à compléter",
+      "photo": "http://127.0.0.1:33159/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "colors": 2
+    },
+    {
+      "surface": "boutique-search",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "query": "vis MAC",
+      "found": true
+    },
+    {
+      "surface": "boutique",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "enabled": false,
+      "label": "Ajout indisponible · fiche à compléter",
+      "photo": null,
+      "colors": 0
+    },
+    {
+      "surface": "boutique-en",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "title": "PRIME 20031 — 3¼ in strip common nails · 34°",
+      "button": "Add to cart\n＋",
+      "disabled": false,
+      "visibleText": "PRIME / Premier Outils Pro →\nPRIME 20031 — 3¼ in strip common nails · 34°\n\nPaper-collated smooth-shank common nails, bright finish. Length 3¼ in, diameter 0.120 in, 34° collation. Box of 2,000 nails, according to the Prime label.\n\nImage supplied by MIR · select a length\n\nPrice on request\n\nRequested quantity\nRequired unit\nboîtes\n\n2,000 items per box. box of 2,000 nails\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR."
+    },
+    {
+      "surface": "boutique-en",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "title": "ColorPlus — Touch-up kit",
+      "button": "Ajout indisponible · fiche à compléter",
+      "disabled": true,
+      "visibleText": "James Hardie →\nColorPlus — Touch-up kit\n\nTouch-up kit for James Hardie ColorPlus siding and trim. Documented box: Midnight Black 4960831 / Blackwater 4100703. MIR pricing and availability to be confirmed.\n\nProduct range image · colour in the chart\n\nPrice on request\n\nColour: Noir minuit (Midnight Black)\nNoir minuit (Midnight Black)\nÉtain vieilli (Aged Pewter)\nRequested quantity\nRequired unit\nkits\n\nQuantités entières. kit — référence Canada, teinte et unité MIR à confirmer.\n\nAjout indisponible · fiche à compléter\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR."
+    },
+    {
+      "surface": "boutique-en",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "title": "Screws for MAC siding — reference to be confirmed",
+      "button": "Ajout indisponible · fiche à compléter",
+      "disabled": true,
+      "visibleText": "À confirmer →\nScrews for MAC siding — reference to be confirmed\n\nScrews for MAC siding, as requested by MIR. The photo shows a square-drive head. Length, gauge, coating and package quantity still need to be confirmed.\n\nManufacturer image to be added\n\nPhoto non disponible · visuel de remplacement\n\nRéférence exacte à confirmer avant sélection\n\nRequested quantity\nRequired unit\npieces\n\nQuantités entières. À confirmer.\n\nAjout indisponible · fiche à compléter\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR."
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "photo": "http://127.0.0.1:33159/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "cartLines": 1,
+      "localRejection": []
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "photo": "http://127.0.0.1:33159/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "cartLines": 1,
+      "localRejection": [
+        "Prix, disponibilité et conditionnement de vente MIR à confirmer; photo de cette référence à intégrer."
+      ]
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "photo": null,
+      "cartLines": 1,
+      "localRejection": [
+        "Longueur, calibre, référence fournisseur et conditionnement à préciser avant sélection."
+      ]
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "photo": "http://127.0.0.1:33159/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "toast": "Article ajouté à votre demande.",
+      "fixtureCalls": []
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "photo": "http://127.0.0.1:33159/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "toast": "Prix, disponibilité et conditionnement de vente MIR à confirmer; photo de cette référence à intégrer.",
+      "fixtureCalls": []
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 390,
+      "id": "mir-request-mac-screws",
+      "photo": null,
+      "toast": "Longueur, calibre, référence fournisseur et conditionnement à préciser avant sélection.",
+      "fixtureCalls": []
+    }
+  ],
+  "blockedNetworkAttempts": [
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    }
+  ],
+  "externalRequestsTransmitted": 0,
+  "realSubmissions": 0,
+  "limitations": [
+    "The actual chantier demo query is deliberately disabled; no gate was bypassed in application files.",
+    "Employee UI screenshots marked fixture use the existing local test snapshot, not a server catalogue.",
+    "Connected availability/publication is not certified without an authorized backend snapshot."
+  ]
+}

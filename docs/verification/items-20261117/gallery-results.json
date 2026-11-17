@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-17T15:26:40.207Z",
+  "checks": [
+    {
+      "width": 1440,
+      "decodedImages": 12,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 834,
+      "decodedImages": 12,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 390,
+      "decodedImages": 12,
+      "overflow": false,
+      "errors": []
+    }
+  ]
+}

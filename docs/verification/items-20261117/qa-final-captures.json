@@ -1,0 +1,137 @@
+{
+  "capturedAt": "2026-11-17T15:26:14.206Z",
+  "results": [
+    {
+      "file": "qa-boutique-hardie-colorplus-1440.png",
+      "id": "hardie-colorplus-touch-up-kit",
+      "width": 1440,
+      "language": "fr-CA",
+      "note": "Visuel de gamme · couleur au nuancier",
+      "colourCount": 2,
+      "sameImageAcrossColours": true,
+      "addDisabled": true,
+      "visibleText": "James Hardie →\nColorPlus — Kit de retouche\n\nKit de retouche pour parements et moulures James Hardie ColorPlus. Boîte documentée : Midnight Black 4960831 / Blackwater 4100703. Prix et disponibilité MIR à confirmer.\n\nVisuel de gamme · couleur au nuancier\n\nPrix sur demande\n\nCouleur : Noir minuit (Midnight Black)\nNuancier fabricant →\nNoir minuit (Midnight Black)\nÉtain vieilli (Aged Pewter)\nQuantité souhaitée\nUnité du besoin\nkits\n\nQuantités entières. kit — référence Canada, teinte et unité MIR à confirmer.\n\nAjout indisponible · fiche à compléter\n\nVotre sélection est conservée sur cet appareil. Les quantités, le conditionnement et la couleur seront confirmés avec MIR.",
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-hardie-colorplus-en-1440.png",
+      "id": "hardie-colorplus-touch-up-kit",
+      "width": 1440,
+      "language": "en-CA",
+      "note": "Product range image · colour in the chart",
+      "colourCount": 2,
+      "sameImageAcrossColours": true,
+      "addDisabled": true,
+      "visibleText": "James Hardie →\nColorPlus — Touch-up kit\n\nTouch-up kit for James Hardie ColorPlus siding and trim. Documented box: Midnight Black 4960831 / Blackwater 4100703. MIR pricing and availability to be confirmed.\n\nProduct range image · colour in the chart\n\nPrice on request\n\nColour: Noir minuit (Midnight Black)\nManufacturer colour chart →\nNoir minuit (Midnight Black)\nÉtain vieilli (Aged Pewter)\nRequested quantity\nRequired unit\nkits\n\nWhole quantities only. Kit — Canadian reference, colour and MIR sales unit to be confirmed.\n\nUnavailable to add · details pending\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-prime20031-en-1440.png",
+      "id": "prime-paper-strip-20031",
+      "width": 1440,
+      "language": "en-CA",
+      "note": "Image supplied by MIR · select a length",
+      "colourCount": 0,
+      "sameImageAcrossColours": null,
+      "addDisabled": false,
+      "visibleText": "PRIME / Premier Outils Pro →\nPRIME 20031 — 3¼ in strip common nails · 34°\n\nPaper-collated smooth-shank common nails, bright finish. Length 3¼ in, diameter 0.120 in, 34° collation. Box of 2,000 nails, according to the Prime label.\n\nImage supplied by MIR · select a length\n\nPrice on request\n\nRequested quantity\nRequired unit\nboxes\n\n2,000 items per box. box of 2,000 nails\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "overflow": false,
+      "unit": {
+        "value": "boîtes",
+        "label": "boxes"
+      },
+      "preservedCart": [
+        {
+          "materialId": "prime-paper-strip-20031",
+          "quantity": 3,
+          "unit": "boîtes"
+        },
+        {
+          "materialId": "prime-paper-strip-20031",
+          "quantity": 2,
+          "unit": "boîtes"
+        }
+      ]
+    },
+    {
+      "file": "qa-boutique-vis-mac-en-1440.png",
+      "id": "mir-request-mac-screws",
+      "width": 1440,
+      "language": "en-CA",
+      "note": "Photo unavailable · placeholder image",
+      "colourCount": 0,
+      "sameImageAcrossColours": null,
+      "addDisabled": true,
+      "visibleText": "To confirm →\nScrews for MAC siding — reference to be confirmed\n\nScrews for MAC siding, as requested by MIR. The photo shows a square-drive head. Length, gauge, coating and package quantity still need to be confirmed.\n\nManufacturer image to be added\n\nPhoto unavailable · placeholder image\n\nConfirm the exact reference before selecting\n\nRequested quantity\nRequired unit\npieces\n\nWhole quantities only. To be confirmed.\n\nUnavailable to add · details pending\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-hardie-colorplus-390.png",
+      "id": "hardie-colorplus-touch-up-kit",
+      "width": 390,
+      "language": "fr-CA",
+      "note": "Visuel de gamme · couleur au nuancier",
+      "colourCount": 2,
+      "sameImageAcrossColours": true,
+      "addDisabled": true,
+      "visibleText": "James Hardie →\nColorPlus — Kit de retouche\n\nKit de retouche pour parements et moulures James Hardie ColorPlus. Boîte documentée : Midnight Black 4960831 / Blackwater 4100703. Prix et disponibilité MIR à confirmer.\n\nVisuel de gamme · couleur au nuancier\n\nPrix sur demande\n\nCouleur : Noir minuit (Midnight Black)\nNoir minuit (Midnight Black)\nÉtain vieilli (Aged Pewter)\nQuantité souhaitée\nUnité du besoin\nkits\n\nQuantités entières. kit — référence Canada, teinte et unité MIR à confirmer.\n\nAjout indisponible · fiche à compléter\n\nVotre sélection est conservée sur cet appareil. Les quantités, le conditionnement et la couleur seront confirmés avec MIR.",
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-hardie-colorplus-en-390.png",
+      "id": "hardie-colorplus-touch-up-kit",
+      "width": 390,
+      "language": "en-CA",
+      "note": "Product range image · colour in the chart",
+      "colourCount": 2,
+      "sameImageAcrossColours": true,
+      "addDisabled": true,
+      "visibleText": "James Hardie →\nColorPlus — Touch-up kit\n\nTouch-up kit for James Hardie ColorPlus siding and trim. Documented box: Midnight Black 4960831 / Blackwater 4100703. MIR pricing and availability to be confirmed.\n\nProduct range image · colour in the chart\n\nPrice on request\n\nColour: Noir minuit (Midnight Black)\nNoir minuit (Midnight Black)\nÉtain vieilli (Aged Pewter)\nRequested quantity\nRequired unit\nkits\n\nWhole quantities only. Kit — Canadian reference, colour and MIR sales unit to be confirmed.\n\nUnavailable to add · details pending\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "overflow": false
+    },
+    {
+      "file": "qa-boutique-prime20031-en-390.png",
+      "id": "prime-paper-strip-20031",
+      "width": 390,
+      "language": "en-CA",
+      "note": "Image supplied by MIR · select a length",
+      "colourCount": 0,
+      "sameImageAcrossColours": null,
+      "addDisabled": false,
+      "visibleText": "PRIME / Premier Outils Pro →\nPRIME 20031 — 3¼ in strip common nails · 34°\n\nPaper-collated smooth-shank common nails, bright finish. Length 3¼ in, diameter 0.120 in, 34° collation. Box of 2,000 nails, according to the Prime label.\n\nImage supplied by MIR · select a length\n\nPrice on request\n\nRequested quantity\nRequired unit\nboxes\n\n2,000 items per box. box of 2,000 nails\n\nAdd to cart\n＋\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "overflow": false,
+      "unit": {
+        "value": "boîtes",
+        "label": "boxes"
+      },
+      "preservedCart": [
+        {
+          "materialId": "prime-paper-strip-20031",
+          "quantity": 3,
+          "unit": "boîtes"
+        },
+        {
+          "materialId": "prime-paper-strip-20031",
+          "quantity": 2,
+          "unit": "boîtes"
+        }
+      ]
+    },
+    {
+      "file": "qa-boutique-vis-mac-en-390.png",
+      "id": "mir-request-mac-screws",
+      "width": 390,
+      "language": "en-CA",
+      "note": "Photo unavailable · placeholder image",
+      "colourCount": 0,
+      "sameImageAcrossColours": null,
+      "addDisabled": true,
+      "visibleText": "To confirm →\nScrews for MAC siding — reference to be confirmed\n\nScrews for MAC siding, as requested by MIR. The photo shows a square-drive head. Length, gauge, coating and package quantity still need to be confirmed.\n\nManufacturer image to be added\n\nPhoto unavailable · placeholder image\n\nConfirm the exact reference before selecting\n\nRequested quantity\nRequired unit\npieces\n\nWhole quantities only. To be confirmed.\n\nUnavailable to add · details pending\n\nYour selection is saved on this device. Quantities, packaging and colour will be confirmed with MIR.",
+      "overflow": false
+    }
+  ],
+  "pageerrors": [],
+  "blockedAttempts": 8,
+  "externalRequestsTransmitted": 0,
+  "realSubmissions": 0
+}

@@ -1,0 +1,299 @@
+{
+  "sourceRoot": "/tmp/mir-items-before-20261117/dist",
+  "capturedAt": "2026-11-17T15:22:19.011Z",
+  "captures": [
+    {
+      "file": "avant-boutique-prime20031-1440.png",
+      "surface": "boutique",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "avant-boutique-hardie-colorplus-1440.png",
+      "surface": "boutique",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "avant-magasin-revue-prime20031-1440.png",
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "avant-magasin-revue-hardie-colorplus-1440.png",
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "avant-chantier-demo-refuse-1440.png",
+      "surface": "chantier",
+      "width": 1440,
+      "simulated": false,
+      "state": "Mode démo retiré par le code existant, portail fermé",
+      "overflow": false
+    },
+    {
+      "file": "avant-chantier-fixture-prime20031-1440.png",
+      "surface": "chantier-terrain",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    },
+    {
+      "file": "avant-chantier-fixture-hardie-colorplus-1440.png",
+      "surface": "chantier-terrain",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    },
+    {
+      "file": "avant-boutique-prime20031-390.png",
+      "surface": "boutique",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "avant-boutique-hardie-colorplus-390.png",
+      "surface": "boutique",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": false,
+      "overflow": false
+    },
+    {
+      "file": "avant-magasin-revue-prime20031-390.png",
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "avant-magasin-revue-hardie-colorplus-390.png",
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": true,
+      "state": "Catalogue local et panier d’essai",
+      "overflow": false
+    },
+    {
+      "file": "avant-chantier-demo-refuse-390.png",
+      "surface": "chantier",
+      "width": 390,
+      "simulated": false,
+      "state": "Mode démo retiré par le code existant, portail fermé",
+      "overflow": false
+    },
+    {
+      "file": "avant-chantier-fixture-prime20031-390.png",
+      "surface": "chantier-terrain",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    },
+    {
+      "file": "avant-chantier-fixture-hardie-colorplus-390.png",
+      "surface": "chantier-terrain",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "simulated": true,
+      "state": "Vrai écran, snapshot fixture local; aucune connexion réelle",
+      "overflow": false
+    }
+  ],
+  "checks": [
+    {
+      "surface": "boutique",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "enabled": true,
+      "label": "Ajouter au panier\n＋",
+      "photo": "http://127.0.0.1:36935/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "colors": 0,
+      "localCart": [
+        {
+          "materialId": "prime-paper-strip-20031",
+          "quantity": 2,
+          "unit": "boîtes"
+        }
+      ]
+    },
+    {
+      "surface": "boutique",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "enabled": false,
+      "label": "Ajout indisponible · fiche à compléter",
+      "photo": "http://127.0.0.1:36935/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "colors": 1
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "photo": "http://127.0.0.1:36935/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "cartLines": 1,
+      "localRejection": []
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "photo": "http://127.0.0.1:36935/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "cartLines": 1,
+      "localRejection": [
+        "Référence de commande/couleur, prix et offre MIR à valider; aucune donnée inventée."
+      ]
+    },
+    {
+      "surface": "chantier-demo-entry",
+      "width": 1440,
+      "urlQuery": "",
+      "fieldHeader": 0,
+      "state": "connected gate; no demo enabled"
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 1440,
+      "id": "prime-paper-strip-20031",
+      "photo": "http://127.0.0.1:36935/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "toast": "Article ajouté à votre demande.",
+      "fixtureCalls": []
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 1440,
+      "id": "hardie-colorplus-touch-up-kit",
+      "photo": "http://127.0.0.1:36935/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "toast": "Référence de commande/couleur, prix et offre MIR à valider; aucune donnée inventée.",
+      "fixtureCalls": []
+    },
+    {
+      "surface": "boutique",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "enabled": true,
+      "label": "Ajouter au panier\n＋",
+      "photo": "http://127.0.0.1:36935/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "colors": 0,
+      "localCart": [
+        {
+          "materialId": "prime-paper-strip-20031",
+          "quantity": 2,
+          "unit": "boîtes"
+        }
+      ]
+    },
+    {
+      "surface": "boutique",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "enabled": false,
+      "label": "Ajout indisponible · fiche à compléter",
+      "photo": "http://127.0.0.1:36935/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "colors": 1
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "photo": "http://127.0.0.1:36935/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "cartLines": 1,
+      "localRejection": []
+    },
+    {
+      "surface": "magasin-revue",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "photo": "http://127.0.0.1:36935/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "cartLines": 1,
+      "localRejection": [
+        "Référence de commande/couleur, prix et offre MIR à valider; aucune donnée inventée."
+      ]
+    },
+    {
+      "surface": "chantier-demo-entry",
+      "width": 390,
+      "urlQuery": "",
+      "fieldHeader": 0,
+      "state": "connected gate; no demo enabled"
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 390,
+      "id": "prime-paper-strip-20031",
+      "photo": "http://127.0.0.1:36935/assets/products/mir-provided-20261111/prime-20031-strips.webp",
+      "toast": "Article ajouté à votre demande.",
+      "fixtureCalls": []
+    },
+    {
+      "surface": "chantier-terrain-fixture",
+      "width": 390,
+      "id": "hardie-colorplus-touch-up-kit",
+      "photo": "http://127.0.0.1:36935/assets/products/hardie-colorplus-touch-up-kit.jpg",
+      "toast": "Référence de commande/couleur, prix et offre MIR à valider; aucune donnée inventée.",
+      "fixtureCalls": []
+    }
+  ],
+  "blockedNetworkAttempts": [
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "gccltmaulvrnthrbnrpd.supabase.co",
+      "path": "/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "method": "GET"
+    }
+  ],
+  "externalRequestsTransmitted": 0,
+  "realSubmissions": 0,
+  "limitations": [
+    "The actual chantier demo query is deliberately disabled; no gate was bypassed in application files.",
+    "Employee UI screenshots marked fixture use the existing local test snapshot, not a server catalogue.",
+    "Connected availability/publication is not certified without an authorized backend snapshot."
+  ]
+}

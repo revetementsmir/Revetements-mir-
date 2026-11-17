@@ -448,7 +448,7 @@
       }
       if(m.keepProductPhoto||m.screwPreview){
         const note=$('#product-photo-note');
-        note.textContent=m.paintPotIndices?(paintPotIndex(m,activeColor)===null?'Photo du contenant · teinte non représentée':'Pot CanExel · '+(activeColor?.name||'couleur sélectionnée')+' · couleur du couvercle indicative.') : m.keepProductPhoto?'Photo du produit. L’échantillon de teinte est dans le nuancier.':
+        note.textContent=m.paintPotIndices?(paintPotIndex(m,activeColor)===null?'Photo du contenant · teinte non représentée':'Pot CanExel · '+(activeColor?.name||'couleur sélectionnée')+' · couleur du couvercle indicative.') : m.keepProductPhoto?(im?.matchScope==='range'?'Visuel de gamme. La couleur choisie est représentée dans le nuancier.':'Photo du produit. L’échantillon de teinte est dans le nuancier.'):
           m.screwPreview==='fascia-2po'?'Illustration de la vis · aperçu de la teinte sur la tête.':
           activeColor?.swatchUrl||activeColor?.hex?'Aperçu de la teinte sur la tête de la vis.':'Photo de référence de la vis. Teinte à préciser.';
         return;
@@ -499,7 +499,7 @@
       const input=document.createElement('input');input.type='search';search.append(input);picker.before(search);
       input.addEventListener('input',()=>{const query=norm(input.value.trim());for(const option of picker.querySelectorAll('[data-color]'))option.hidden=!norm(option.getAttribute('aria-label')).includes(query);});
     }
-    const technical=$('#product-technical');technical.append(photos,$('#color-note'));const sampleNote=document.createElement('p');sampleNote.className='mir-sample-note';sampleNote.textContent=m.stableSidingPreview?'Échantillon MIR · rendu écran indicatif':m.paintPotIndices?'Pot CanExel · tache de peinture sèche, teinte indicative':m.keepProductPhoto?'Photo du produit · teinte au nuancier':
+    const technical=$('#product-technical');technical.append(photos,$('#color-note'));const sampleNote=document.createElement('p');sampleNote.className='mir-sample-note';sampleNote.textContent=m.stableSidingPreview?'Échantillon MIR · rendu écran indicatif':m.paintPotIndices?'Pot CanExel · tache de peinture sèche, teinte indicative':m.keepProductPhoto?(im?.matchScope==='range'?'Visuel de gamme · couleur au nuancier':'Photo du produit · teinte au nuancier'):
       m.screwPreview?(m.screwPreview==='fascia-2po'?'Illustration · teinte indicative':'Aperçu de la teinte sur la tête'):
       im?.assetKind?.startsWith('MIR_user_provided_')?'Visuel fourni par MIR · longueur à sélectionner':
       im||cs.some(c=>c.swatchUrl)?'Visuel indicatif · référence fabricant':'Photo non disponible · visuel de remplacement';gallery.append(sampleNote);for(const a of [...$('.product-actions-main').querySelectorAll('a.quiet-button')])technical.append(a);
@@ -616,8 +616,12 @@
       const source='https://www.jameshardie.com/product-catalog/accessories-siding-products/hardie-colorplus-touch-up-kits/touch-up-kit/';
       hardieKit.keepProductPhoto=true;
       hardieKit.documents=[...hardieKit.documents,{kind:'technical',title:'James Hardie — kit de retouche ColorPlus',url:source,verified:true}];
-      hardieKit.colors=[{...hardieColor,name:'Étain vieilli (Aged Pewter)',
-        availabilityNote:'Teinte de référence. Disponibilité du kit dans cette teinte à confirmer avec MIR.'}];
+      // Keep documented kit colours and their packaging references. The existing
+      // Aged Pewter range reference remains available without duplicating an ID.
+      if(!(hardieKit.colors||[]).some(color=>color.id===hardieColor.id)){
+        hardieKit.colors=[...(hardieKit.colors||[]),{...hardieColor,name:'Étain vieilli (Aged Pewter)',
+          availabilityNote:'Teinte de référence. Disponibilité du kit dans cette teinte à confirmer avec MIR.'}];
+      }
     }
     const canexelPaint=materials.find(m=>m.id==='canexel-touch-up-284ml');
     if(canexelPaint){

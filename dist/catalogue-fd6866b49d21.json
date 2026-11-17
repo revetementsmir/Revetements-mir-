@@ -23339,10 +23339,47 @@
         "turn158view1",
         "turn157search0"
       ],
-      "colors": [],
-      "colorStatus": "exact_product_color_to_confirm",
+      "colors": [
+        {
+          "id": "hardie-noir-minuit",
+          "name": "Noir minuit (Midnight Black)",
+          "hex": null,
+          "sourceUrl": "https://www.jameshardie.ca/JamesHardieNorthAmerica/media/Canada-Product-Catalog/james-hardie-product-catalog-canada-eastern-canada-french.pdf#page=8",
+          "collection": "ColorPlus — référence de retouche photographiée",
+          "verified": true,
+          "availabilityNote": "Étiquette fournie : Midnight Black 4960831 / Blackwater 4100703. Même kit de retouche; prix et disponibilité MIR à confirmer.",
+          "pdfImageXref": 178,
+          "pdfPage": 8,
+          "verifiedRegion": "Québec",
+          "swatchUrl": "./assets/hardie-swatches/noir-minuit.jpeg",
+          "assetKind": "original_embedded_pdf_swatch",
+          "swatchUse": "color_reference",
+          "swatchTextureNote": "Échantillon de couleur du nuancier; le contenant photographié ne change pas de couleur.",
+          "code": "4960831",
+          "commercialName": "Midnight Black",
+          "packagingAliases": [
+            {
+              "name": "Midnight Black",
+              "code": "4960831"
+            },
+            {
+              "name": "Blackwater",
+              "code": "4100703"
+            }
+          ],
+          "evidence": {
+            "kind": "MIR_user_provided_packaging_photo",
+            "receivedOn": "2026-11-17",
+            "messageImagePosition": 3,
+            "packagingCode": "LLA0531",
+            "upc": "856296003436",
+            "originalFileAvailable": false
+          }
+        }
+      ],
+      "colorStatus": "documented_packaging_colour",
       "orderable": false,
-      "orderableReason": "Référence de commande/couleur, prix et offre MIR à valider; aucune donnée inventée.",
+      "orderableReason": "Prix, disponibilité et conditionnement de vente MIR à confirmer; photo de cette référence à intégrer.",
       "packaging": {
         "unit": "kit",
         "contents": [
@@ -23364,11 +23401,15 @@
       "colorAvailability": {
         "selectionMode": "match_existing_colorplus",
         "exactSkuPerColorConfirmed": false,
-        "regionalAvailability": "La page officielle limite la disponibilité selon le lieu; conditionnement et référence Canada/Québec à confirmer."
+        "regionalAvailability": "La page officielle limite la disponibilité selon le lieu; conditionnement et référence Canada/Québec à confirmer.",
+        "documentedPackagingColours": [
+          "hardie-noir-minuit"
+        ]
       },
       "notes": [
         "La composition du kit est confirmée par la page fabricant; aucun SKU par couleur n’y est publié.",
-        "Ne pas copier automatiquement toutes les couleurs de la palette du revêtement comme variantes disponibles du kit."
+        "Ne pas copier automatiquement toutes les couleurs de la palette du revêtement comme variantes disponibles du kit.",
+        "Photo transmise par MIR le 17 novembre 2026 : Midnight Black 4960831 et Blackwater 4100703 figurent sur le même kit LLA0531, UPC 856296003436. Ces codes ne sont pas un SKU MIR."
       ],
       "documents": [
         {
@@ -23392,7 +23433,8 @@
       "catalogueScope": "manufacturer_reference_not_confirmed_MIR_SKU",
       "researchedOn": "2026-11-03",
       "gaps": [
-        "Référence de commande, couleur, disponibilité, prix et unité de vente MIR à confirmer."
+        "Prix, disponibilité et conditionnement de vente MIR à confirmer.",
+        "Photo originale de la boîte à intégrer; le visuel actuel représente la gamme."
       ],
       "specifications": [
         {
@@ -23406,9 +23448,21 @@
         {
           "label": "Région",
           "value": "Référence Canada/Québec et volume commercial local à confirmer"
+        },
+        {
+          "label": "Teinte documentée",
+          "value": "Midnight Black 4960831 / Blackwater 4100703 — même kit"
+        },
+        {
+          "label": "Code sur la boîte",
+          "value": "LLA0531"
+        },
+        {
+          "label": "UPC de la boîte",
+          "value": "856296003436"
         }
       ],
-      "description": "Kit de retouche officiel pour parements et moulures James Hardie avec finition ColorPlus. Le contenu et la disponibilité de la référence locale doivent être confirmés pour le Canada.",
+      "description": "Kit de retouche pour parements et moulures James Hardie ColorPlus. Boîte documentée : Midnight Black 4960831 / Blackwater 4100703. Prix et disponibilité MIR à confirmer.",
       "unit": "kit — référence Canada, teinte et unité MIR à confirmer",
       "images": [
         {
@@ -35478,6 +35532,54 @@
         }
       ],
       "primaryImage": "./assets/products/mir-provided-20261111/mir-joint-fibro-8.webp"
+    },
+    {
+      "id": "mir-request-mac-screws",
+      "brand": "À confirmer",
+      "name": "Vis pour revêtement MAC — référence à préciser",
+      "manufacturerCode": null,
+      "sku": null,
+      "family": "Fixation",
+      "applications": [
+        "fastener",
+        "accessory"
+      ],
+      "description": "Vis pour revêtement MAC, selon la demande MIR. La photo montre une tête à empreinte carrée. Longueur, calibre, protection et quantité par emballage restent à préciser.",
+      "sourceUrl": null,
+      "documents": [],
+      "colors": [],
+      "colorStatus": "not_applicable",
+      "dimensions": {},
+      "packaging": {},
+      "unit": "À confirmer",
+      "status": "pending_identity",
+      "commercialStatus": "identity_incomplete_not_orderable",
+      "orderable": false,
+      "orderableReason": "Longueur, calibre, référence fournisseur et conditionnement à préciser avant sélection.",
+      "images": [],
+      "primaryImage": null,
+      "imageStatus": "missing_original_user_photo",
+      "renderPattern": "plain",
+      "allowedPatterns": [],
+      "allowedOrientations": [],
+      "catalogueScope": "MIR_requested_product_identity_incomplete",
+      "researchedOn": "2026-11-17",
+      "notes": [
+        "Utilisation indiquée par MIR : « vis pour mac ». Le fabricant de la vis et la compatibilité exacte ne sont pas encore documentés.",
+        "Ne pas substituer une vis Light Trim Phillips/Torx ni attribuer une référence Kaycan à partir de cette photo."
+      ],
+      "gaps": [
+        "Longueur, calibre, protection, fournisseur et quantité par emballage à préciser.",
+        "Prix et stock MIR à confirmer.",
+        "Photo originale transmise dans le message à intégrer."
+      ],
+      "sourceEvidence": {
+        "kind": "MIR_user_provided_photo_and_text",
+        "receivedOn": "2026-11-17",
+        "messageImagePosition": 1,
+        "userIdentification": "vis pour mac",
+        "originalFileAvailable": false
+      }
     }
   ],
   "schemaVersion": "5.2",
