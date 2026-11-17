@@ -43,18 +43,19 @@
     if (options.bareMetricMm && /^\d{3,6}$/.test(text)) return { valueFt: +text / 304.8, text: original, normalized: text, units: 'mm', corrected, pageUnitRequired: true };
     return null;
   }
-  function wordsToLabels(words) {
+  function wordsToLabels(words, options = {}) {
     const clean = words.filter(w => w && typeof w.text === 'string' && Array.isArray(w.box) && w.box.every(finite) && w.box[2] > w.box[0] && w.box[3] > w.box[1]);
     const labels = [...clean];
     // Merge adjacent words, because 22' - 0" may be split into three OCR tokens.
     for (const w of clean) {
       const h = w.box[3] - w.box[1], cy = (w.box[1] + w.box[3]) / 2;
       const line = clean.filter(q => q !== w && q.box[0] >= w.box[2] - 2 && q.box[0] - w.box[2] < h * 4 && Math.abs((q.box[1] + q.box[3]) / 2 - cy) < h * .7).sort((a, b) => a.box[0] - b.box[0]);
-      let text = w.text, end = w.box[2], box = w.box.slice(), conf = w.confidence;
+      let text = w.text, end = w.box[2], box = w.box.slice(), conf = w.confidence; const parts = [w];
       for (const q of line.slice(0, 3)) {
         if (q.box[0] - end > h * 1.9) break;
         text += ' ' + q.text; end = q.box[2]; box = [box[0], Math.min(box[1], q.box[1]), end, Math.max(box[3], q.box[3])]; conf = Math.min(conf ?? 80, q.confidence ?? 80);
-        labels.push({ text, box: box.slice(), confidence: conf, source: w.source || 'ocr', joined: true });
+        parts.push(q);
+        labels.push({ text, box: box.slice(), confidence: conf, source: w.source || 'ocr', joined: true, ...(options.includeProvenance ? { readingParts: JSON.parse(JSON.stringify(parts)) } : {}) });
       }
     }
     return labels;
@@ -117,9 +118,78 @@
     for (const hit of hits) { const last = clustered[clustered.length - 1]; if (last && hit.x - last.right <= 5) { last.right = hit.x; last.slash ||= hit.slash; if (hit.markerStrength > last.markerStrength || hit.markerStrength === last.markerStrength && hit.strength > last.strength) { last.x = hit.x; last.strength = hit.strength; last.markerStrength = hit.markerStrength; } } else clustered.push({ ...hit, right: hit.x }); }
     return clustered;
   }
+  function interruptedDimensionLine(mask, label, options) {
+    const [x0, y0, x1, y1] = label.box, fh = Math.max(8, y1 - y0), cx = (x0 + x1) / 2;
+    const { width: w, height: h, data } = mask, candidates = [], margin = Math.ceil(fh * 1.5);
+    const ink = (x, y) => x >= 0 && x < w && y >= 0 && y < h && data[y * w + x];
+    // A diagonal slash alone can be a glyph or an object corner. Its witness
+    // must continue beyond the slash on at least one side of the line.
+    const witnesses = (x, y) => {
+      const reach = Math.ceil(fh * 3), radius = Math.max(4, Math.min(6, Math.round(fh * .4))), result = [];
+      for (const direction of [-1, 1]) {
+        let last = radius, misses = 0;
+        for (let d = radius + 1; d <= reach; d++) {
+          if (ink(x - 1, y + direction * d) || ink(x, y + direction * d) || ink(x + 1, y + direction * d)) { last = d; misses = 0; }
+          else if (++misses > 1) break;
+        }
+        if (last - radius >= Math.max(6, Math.ceil(fh * .6))) result.push([[x, y], [x, y + direction * last]]);
+      }
+      return result;
+    };
+    for (let y = Math.max(2, Math.ceil(y0)); y <= Math.min(h - 3, Math.floor(y1)); y++) {
+      let leftSeed = null, rightSeed = null;
+      for (let d = 1; d <= margin && (leftSeed === null || rightSeed === null); d++) {
+        if (leftSeed === null && ink(Math.floor(x0) - d, y)) leftSeed = Math.floor(x0) - d;
+        if (rightSeed === null && ink(Math.ceil(x1) + d, y)) rightSeed = Math.ceil(x1) + d;
+      }
+      if (leftSeed === null || rightSeed === null) continue;
+      const left = lineRun(mask, y, leftSeed, 2, Math.max(12, fh)), right = lineRun(mask, y, rightSeed, 2, Math.max(12, fh));
+      if (!left || !right || left.right >= x0 || right.left <= x1 || left.right >= right.left) continue;
+      const gap = right.left - left.right;
+      if (gap > x1 - x0 + fh * 3 || x0 - left.right > margin || right.left - x1 > margin) continue;
+      const support = run => { let count = 0; for (let x = run.left; x <= run.right; x++) count += ink(x, y) ? 1 : 0; return count / (run.right - run.left + 1); };
+      const density = [support(left), support(right)];
+      // Both arms must occupy this same source row. The neighbouring-row
+      // tolerance in lineRun must not join two offset object edges.
+      if (density.some(n => n < .85)) continue;
+      const markers = run => intersections(mask, run, fh, true).filter(t => t.slash && t.markerStrength > 0).map(t => ({ ...t, witnesses: witnesses(t.x, y) }));
+      const leftMarks = markers(left), rightMarks = markers(right);
+      // Do not jump over a second tick to obtain a better-looking span.
+      if (leftMarks.length !== 1 || rightMarks.length !== 1 || !leftMarks[0].witnesses.length || !rightMarks[0].witnesses.length) continue;
+      const a = leftMarks[0].x, b = rightMarks[0].x, span = b - a;
+      if (a >= left.right - fh || b <= right.left + fh || span < Math.max(options.minSpanPx ?? 55, (x1 - x0) * 1.3) || gap > span * .4) continue;
+      const centered = Math.abs((a + b) / 2 - cx) / span;
+      if (centered > .15) continue;
+      candidates.push({ anchors: [[a, y], [b, y]], spanPx: span, score: .5 * (1 - centered / .2) + .3 + .2 * Math.min(...density),
+        lineEvidence: { kind: 'caption-interrupted-dimension-line', captionBox: label.box.slice(),
+          segments: [[[a, y], [left.right, y]], [[right.left, y], [b, y]]], gap: [[left.right, y], [right.left, y]],
+          markers: [leftMarks[0], rightMarks[0]].map(t => ({ point: [t.x, y], kind: 'diagonal-tick', witnesses: t.witnesses })), pixelSupport: density } });
+    }
+    if (!candidates.length) return { candidate: null, ambiguous: false };
+    const tolerance = Math.max(2, Math.min(4, Math.ceil(fh * .3))), groups = [];
+    for (const c of candidates) {
+      let group = groups.find(g => g.every(q => q.anchors.every((p, i) => p.every((n, axis) => Math.abs(n - c.anchors[i][axis]) <= tolerance))));
+      if (!group) groups.push(group = []);
+      group.push(c);
+    }
+    // Two distinct interrupted lines sharing a caption are unresolved. This
+    // path never uses a majority of pixels to choose the measured objects.
+    return groups.length === 1 ? { candidate: candidates.sort((a, b) => b.score - a.score)[0], ambiguous: false } : { candidate: null, ambiguous: true };
+  }
   function matchDimensionLines(image, labels, options = {}) {
     const mask = inkMask(image), results = [], seen = new Set();
-    for (const label of wordsToLabels(labels)) {
+    const sameReading = (a, b) => {
+      if (Math.abs(a.referenceFt - b.referenceFt) > 1e-9 || a.axis !== b.axis) return false;
+      if (![b.anchors, b.anchors.slice().reverse()].some(points => a.anchors.every((p, i) => Math.hypot(p[0] - points[i][0], p[1] - points[i][1]) <= 2))) return false;
+      const ar = a.sourceReading, br = b.sourceReading, av = ar?.sourceViewId || ar?.retry?.sourceViewId, bv = br?.sourceViewId || br?.retry?.sourceViewId;
+      if (av && bv && av !== bv) return false;
+      const af = ar?.sourceFrame || ar?.retry?.sourceFrame, bf = br?.sourceFrame || br?.retry?.sourceFrame;
+      if (af && bf && JSON.stringify(af) !== JSON.stringify(bf)) return false;
+      const x = a.textBox, y = b.textBox, area = p => (p[2] - p[0]) * (p[3] - p[1]), overlap = Math.max(0, Math.min(x[2], y[2]) - Math.max(x[0], y[0])) * Math.max(0, Math.min(x[3], y[3]) - Math.max(x[1], y[1]));
+      return overlap / Math.min(area(x), area(y)) > .65;
+    };
+    const reliability = c => ({ trusted: ['pdf-text', 'manual-correction'].includes(c.source), confidence: Number.isFinite(c.sourceReading?.confidence) ? c.sourceReading.confidence : 0 });
+    for (const label of wordsToLabels(labels, { includeProvenance: !!options.preferReliableReadings })) {
       const dim = parseDimension(label.text, { ocr: label.source !== 'pdf-text', bareMetricMm: options.bareMetricMm });
       if (!dim) continue;
       const [x0, y0, x1, y1] = label.box, cx = (x0 + x1) / 2, fh = Math.max(8, y1 - y0);
@@ -148,9 +218,29 @@
           if (!best || score > best.score) best = { text: dim.text, normalized: dim.normalized, referenceFt: dim.valueFt, anchors: [[a, y], [b, y]], spanPx: span, feetPerPixel: dim.valueFt / span, score, confidence: label.confidence ?? 100, source: label.source || 'ocr', textBox: label.box.slice(), corrected: dim.corrected, axis: options.axis || 'x' };
         }
       }
+      // Opt-in only: the import path keeps its existing line association.
+      // A caption on the line needs observed arms, ticks and witnesses; no
+      // source pixels are painted across the missing text interval.
+      if (options.allowTextGap) {
+        const interrupted = interruptedDimensionLine(mask, label, options), c = interrupted.candidate;
+        const tolerance = Math.max(2, Math.min(4, Math.ceil(fh * .3)));
+        const mixedAmbiguity = c && best && !best.anchors.every((p, i) => p.every((n, axis) => Math.abs(n - c.anchors[i][axis]) <= tolerance));
+        if (interrupted.ambiguous || mixedAmbiguity) best = null;
+        else if (c) best = { text: dim.text, normalized: dim.normalized, referenceFt: dim.valueFt, ...c, feetPerPixel: dim.valueFt / c.spanPx, confidence: label.confidence ?? 100, source: label.source || 'ocr', textBox: label.box.slice(), corrected: dim.corrected, axis: options.axis || 'x' };
+      }
       if (best && best.feetPerPixel >= .00005 && best.feetPerPixel <= 10) {
-        const fingerprint = `${Math.round(best.anchors[0][0] / 6)}:${Math.round(best.anchors[1][0] / 6)}:${Math.round(best.anchors[0][1] / 6)}:${best.referenceFt}`;
-        if (!seen.has(fingerprint)) { seen.add(fingerprint); results.push(best); }
+        if (options.preferReliableReadings) {
+          // A retry of this same inscription may improve its reading. Keep
+          // the entire winning observation, not its confidence on old anchors.
+          // Independent captions and contradictory values remain separate.
+          best.sourceReading = JSON.parse(JSON.stringify(label));
+          const index = results.findIndex(c => sameReading(c, best));
+          if (index < 0) results.push(best);
+          else { const previous = reliability(results[index]), next = reliability(best); if (Number(next.trusted) > Number(previous.trusted) || next.trusted === previous.trusted && next.confidence > previous.confidence) results[index] = best; }
+        } else {
+          const fingerprint = `${Math.round(best.anchors[0][0] / 6)}:${Math.round(best.anchors[1][0] / 6)}:${Math.round(best.anchors[0][1] / 6)}:${best.referenceFt}`;
+          if (!seen.has(fingerprint)) { seen.add(fingerprint); results.push(best); }
+        }
       }
     }
     return results.sort((a, b) => b.score - a.score);
@@ -186,8 +276,13 @@
   }
   function unrotateCandidate(c, originalWidth, originalHeight, direction = 'ccw') {
     const map = direction === 'cw' ? p => [p[1], originalHeight - p[0]] : p => [originalWidth - p[1], p[0]];
+    const mapBox = box => { const p = [map([box[0], box[1]]), map([box[2], box[3]])]; return [Math.min(p[0][0], p[1][0]), Math.min(p[0][1], p[1][1]), Math.max(p[0][0], p[1][0]), Math.max(p[0][1], p[1][1])]; };
+    const mapReading = r => ({ ...r, box: mapBox(r.box), ...(r.readingParts ? { readingParts: r.readingParts.map(mapReading) } : {}) });
     const q = [map([c.textBox[0], c.textBox[1]]), map([c.textBox[2], c.textBox[3]])];
-    return { ...c, anchors: c.anchors.map(map), textBox: [Math.min(q[0][0], q[1][0]), Math.min(q[0][1], q[1][1]), Math.max(q[0][0], q[1][0]), Math.max(q[0][1], q[1][1])], axis: 'y' };
+    const result = { ...c, anchors: c.anchors.map(map), textBox: [Math.min(q[0][0], q[1][0]), Math.min(q[0][1], q[1][1]), Math.max(q[0][0], q[1][0]), Math.max(q[0][1], q[1][1])], axis: 'y' };
+    if (c.sourceReading) result.sourceReading = mapReading(c.sourceReading);
+    if (c.lineEvidence?.kind === 'caption-interrupted-dimension-line') result.lineEvidence = { ...c.lineEvidence, captionBox: result.textBox.slice(), segments: c.lineEvidence.segments.map(s => s.map(map)), gap: c.lineEvidence.gap.map(map), markers: c.lineEvidence.markers.map(m => ({ ...m, point: map(m.point), witnesses: m.witnesses.map(s => s.map(map)) })) };
+    return result;
   }
   function simplify(poly, tolerance = 2) {
     if (poly.length < 5) return poly;

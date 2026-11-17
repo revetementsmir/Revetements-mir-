@@ -6,16 +6,54 @@
  function contourDimensions(view,image){
   const rows=readings(view),vertical=view.payload.drawingReadings?.verticalRows||[],masks=V.legendBoxes(image,rows);
   const clean=rs=>rs.filter(r=>r.box?.length===4&&r.text.length<25&&r.box[0]<image.width*.81&&!masks.some(([x,y,w,h])=>(r.box[0]+r.box[2])/2>=x&&(r.box[0]+r.box[2])/2<=x+w&&(r.box[1]+r.box[3])/2>=y&&(r.box[1]+r.box[3])/2<=y+h)).map(r=>({...r,originalText:r.text,text:r.text.replace(/(\d)\s+[|Il](?=\s*['’′])/g,(_,d)=>d+'1').replace(/[*°]$/,'"').replace(/^(\d{1,2})[−-](\d{1,2})"?$/,`$1'$2"`)}));
-  const labels=clean(rows),results=A.matchDimensionLines(image,labels,{minSpanPx:20,shortTicks:true});
+  const labels=clean(rows),results=A.matchDimensionLines(image,labels,{minSpanPx:20,shortTicks:true,allowTextGap:true,preferReliableReadings:true});
   if(vertical.length){
    const turned={width:image.height,height:image.width,data:new Uint8ClampedArray(image.data.length)};
    for(let y=0;y<image.height;y++)for(let x=0;x<image.width;x++){const to=((image.width-1-x)*turned.width+y)*4,from=(y*image.width+x)*4;for(let c=0;c<4;c++)turned.data[to+c]=image.data[from+c];}
    const original=clean(vertical),rotated=original.map(r=>({...r,box:[r.box[1],image.width-r.box[2],r.box[3],image.width-r.box[0]]}));
-   results.push(...A.matchDimensionLines(turned,rotated,{minSpanPx:20,shortTicks:true}).map(c=>A.unrotateCandidate(c,image.width,image.height)));
+   results.push(...A.matchDimensionLines(turned,rotated,{minSpanPx:20,shortTicks:true,allowTextGap:true,preferReliableReadings:true}).map(c=>A.unrotateCandidate(c,image.width,image.height)));
   }
   return results.map(r=>({...r,id:view.id+':dimension:'+r.anchors.flat().join('-')+':'+r.referenceFt,value:r.referenceFt*.3048,kind:'written',status:'proposed',sourceViewId:view.id,sourceFrame:M.clone(view.frame),label:r.text,scale:r.feetPerPixel*.3048,confirmationRequired:true}));
  }
- function partialScaleReferences(view,dimensions,bounds){
+ function floorDimensionAssociation(view,dimension,outline,image){
+  const point=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite);
+  if(!image?.data||!outline?.points?.length||!outline.points.every(point)||outline.sourceBounds?.length!==4||!outline.sourceBounds.every(Number.isFinite)||outline.sourceBounds[2]<=0||outline.sourceBounds[3]<=0||dimension.sourceViewId!==view.id||dimension.anchors?.length!==2||!dimension.anchors.every(point)||M.distance(...dimension.anchors)<20||view.frame&&JSON.stringify(dimension.sourceFrame)!==JSON.stringify(view.frame))return null;
+  if(outline.sourceViewId&&outline.sourceViewId!==view.id||outline.sourceFrame&&JSON.stringify(outline.sourceFrame)!==JSON.stringify(view.frame))return null;
+  for(const axis of [0,1]){const values=outline.points.map(p=>p[axis]);if(Math.abs(Math.min(...values)-outline.sourceBounds[axis])>3||Math.abs(Math.max(...values)-outline.sourceBounds[axis]-outline.sourceBounds[axis+2])>3)return null;}
+  const points=outline.points,anchors=dimension.anchors,axis=Math.abs(anchors[0][0]-anchors[1][0])<=2?1:Math.abs(anchors[0][1]-anchors[1][1])<=2?0:null;
+  if(axis===null)return null;
+  const normalAxis=1-axis,ink=V.monochrome(image),w=image.width,h=image.height,pad=Math.max(1,Math.min(2,Math.round(w/1050))),bounds=outline.sourceBounds,reach=Math.max(20,Math.min(bounds[2],bounds[3])*.35),connections=[];
+  for(const anchor of anchors){
+   const candidates=[];
+   for(let i=0;i<points.length;i++){
+    const a=points[i],b=points[(i+1)%points.length];if(Math.abs(a[normalAxis]-b[normalAxis])>2||anchor[axis]<Math.min(a[axis],b[axis])-2||anchor[axis]>Math.max(a[axis],b[axis])+2)continue;
+    const to=anchor.slice();to[normalAxis]=(a[normalAxis]+b[normalAxis])/2;const length=M.distance(anchor,to);if(length>reach)continue;
+    let hits=0,gap=0,maxGap=0;const steps=Math.max(1,Math.ceil(length));
+    for(let n=0;n<=steps;n++){
+     const p=anchor.map((v,j)=>v+(to[j]-v)*n/steps);let hit=false;
+     for(let d=-pad;d<=pad;d++){const q=p.slice();q[axis]+=d;const x=Math.round(q[0]),y=Math.round(q[1]);if(x>=0&&x<w&&y>=0&&y<h)hit||=!!ink[y*w+x];}
+     if(hit){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);
+    }
+    const support=hits/(steps+1);if(support>=.82&&maxGap<=Math.max(3,pad*3))candidates.push({anchors:[anchor.slice(),to],contourEdgeIndex:i,support,maxGap,tolerancePx:pad,lengthPixels:length});
+   }
+   candidates.sort((a,b)=>a.lengthPixels-b.lengthPixels);if(!candidates.length)return null;connections.push(candidates[0]);
+  }
+  return {method:'observed-dimension-witnesses-to-floor',sourceViewId:view.id,sourceFrame:M.clone(view.frame),connections,confirmationRequired:true};
+ }
+ function overallScaleReferences(view,dimensions,outline,image){
+  const bounds=outline?.sourceBounds,references=[];
+  if(!Array.isArray(bounds)||bounds.length!==4||!bounds.every(Number.isFinite)||bounds[2]<=0||bounds[3]<=0)return references;
+  for(const d of dimensions||[]){
+   if(d.sourceViewId!==view.id||d.kind!=='written'||!Number.isFinite(d.value)||d.value<=0||d.anchors?.length!==2||!d.anchors.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))||d.source!=='pdf-text'&&(d.confidence??0)<70)continue;
+   const axis=Math.abs(d.anchors[0][0]-d.anchors[1][0])<=2?1:Math.abs(d.anchors[0][1]-d.anchors[1][1])<=2?0:null;if(axis===null)continue;
+   const start=Math.min(...d.anchors.map(p=>p[axis])),end=Math.max(...d.anchors.map(p=>p[axis]));
+   // A near-full span can still describe an interior offset. Each observed
+   // endpoint must reach the actual contour extreme within raster precision.
+   if(Math.abs(start-bounds[axis])>3||Math.abs(end-bounds[axis]-bounds[axis+2])>3)continue;
+   const association=floorDimensionAssociation(view,d,outline,image);if(association)references.push({...M.clone(d),association:'observed-overall-floor-dimension',sourceAssociation:association,confirmationRequired:true});
+  }return references;
+ }
+ function partialScaleReferences(view,dimensions,bounds,{outline=null,image=null}={}){
   // Short written dimensions calibrate a view, not an entire wall.
   // Two distinct inscriptions must corroborate one common scale.
   if(!Array.isArray(bounds)||bounds.length!==4||!bounds.every(Number.isFinite)||bounds[2]<=0||bounds[3]<=0)return {references:[],conflict:false};
@@ -24,9 +62,10 @@
    if(d.sourceViewId!==view.id||d.kind!=='written'||!Number.isFinite(d.value)||d.value<=0||!Array.isArray(d.anchors)||d.anchors.length!==2||!d.anchors.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)))continue;
    if(d.source!=='pdf-text'&&d.confidence!=null&&d.confidence<70)continue;
    const span=M.distance(...d.anchors);if(span<20||span>Math.max(w,h)*1.1)continue;
-   if(!d.anchors.every(p=>p[0]>=x-pad&&p[0]<=x+w+pad&&p[1]>=y-pad&&p[1]<=y+h+pad))continue;
+   const nearby=d.anchors.every(p=>p[0]>=x-pad&&p[0]<=x+w+pad&&p[1]>=y-pad&&p[1]<=y+h+pad),association=nearby?null:floorDimensionAssociation(view,d,outline,image);
+   if(!nearby&&!association)continue;
    if(observed.some(previous=>Math.min(M.distance(previous.anchors[0],d.anchors[0])+M.distance(previous.anchors[1],d.anchors[1]),M.distance(previous.anchors[0],d.anchors[1])+M.distance(previous.anchors[1],d.anchors[0]))<4&&Math.abs(previous.value-d.value)<.001))continue;
-   observed.push(d);
+   observed.push(association?{...d,sourceAssociation:association}:d);
   }
   const captions=[];
   for(const d of observed){const box=d.textBox,duplicate=box?.length===4&&captions.some(previous=>{const p=previous.textBox;if(p?.length!==4)return false;const overlap=Math.max(0,Math.min(p[2],box[2])-Math.max(p[0],box[0]))*Math.max(0,Math.min(p[3],box[3])-Math.max(p[1],box[1]));return overlap/Math.min((p[2]-p[0])*(p[3]-p[1]),(box[2]-box[0])*(box[3]-box[1]))>.65;});if(!duplicate)captions.push(d);}
@@ -90,7 +129,7 @@
  function references(view,image){
   const masks=V.legendBoxes(image,readings(view)),rows=readings(view).filter(r=>r.box?.length===4&&r.text.length<50&&r.box[0]<image.width*.81&&!masks.some(([x,y,w,h])=>(r.box[0]+r.box[2])/2>=x&&(r.box[0]+r.box[2])/2<=x+w&&(r.box[1]+r.box[3])/2>=y&&(r.box[1]+r.box[3])/2<=y+h));
   const labels=rows.map(r=>{const rewrite=r.text.replace(/^(\d{1,2})[−-](\d{1,2})\"?$/,`$1'$2"`);return {...r,text:rewrite,originalText:r.text,punctuationReview:rewrite!==r.text};});
-  return A.matchDimensionLines(image,labels,{shortTicks:true}).filter(r=>r.referenceFt>=9&&r.spanPx>image.width*.18&&r.confidence>=0).map(r=>{
+  return A.matchDimensionLines(image,labels,{shortTicks:true,allowTextGap:true,preferReliableReadings:true}).filter(r=>r.referenceFt>=9&&r.spanPx>image.width*.18&&r.confidence>=0).map(r=>{
    const original=labels.find(l=>l.box.every((n,i)=>Math.abs(n-r.textBox[i])<2)&&l.text===r.text);
    return {...r,value:r.referenceFt*.3048,kind:'written',status:'proposed',sourceViewId:view.id,sourceFrame:M.clone(view.frame),label:original?.originalText||r.text,punctuationReview:!!original?.punctuationReview,transcriptionReviewRequired:r.confidence<50||!!original?.punctuationReview,scale:r.feetPerPixel*.3048,confirmationRequired:true};
   });
@@ -119,14 +158,14 @@
   for(const v of elevations){const im=images[v.id];if(!im)continue;const facing=faceSpan(outline.points,v.direction),expected=facing.length,envelope=V.wallEnvelope(im,expected,{sourceViewId:v.id,frame:v.frame,occlusions:V.legendBoxes(im,readings(v)),rows:readings(v)}),refs=references(v,im),guides=envelope.status==='proposed'?floorGuide(v,im,envelope):[];
    const support=envelope.status==='proposed'?wallSupport(v,im,envelope):null;views.push({viewId:v.id,direction:v.direction,facing,envelope,supportY:support?.y??envelope.box?.[1],supportEvidence:support,roofProfile:V.roofProfile(im,envelope,readings(v)),references:refs,guides});
   }
-  const direct=references(floor,image).filter(r=>Math.abs(r.spanPx/bounds[2]-1)<.04&&Math.abs(Math.min(...r.anchors.map(p=>p[0]))-bounds[0])<bounds[2]*.05);
+  const dimensions=contourDimensions(floor,image),direct=[...references(floor,image).filter(r=>Math.abs(Math.min(...r.anchors.map(p=>p[0]))-bounds[0])<=3&&Math.abs(Math.max(...r.anchors.map(p=>p[0]))-bounds[0]-bounds[2])<=3),...overallScaleReferences(floor,dimensions,outline,image)];
   // Transferring a written elevation span to a plan is itself an estimated
   // correspondence, never a second written dimension on the floor plan.
   const transferred=views.filter(v=>v.envelope.status==='proposed').flatMap(v=>v.references.filter(r=>Math.abs(r.spanPx/v.envelope.box[2]-1)<.05).map(r=>{
    const axis=v.facing.axis,anchors=axis===0?[[v.facing.min,bounds[1]],[v.facing.max,bounds[1]]]:[[bounds[0],v.facing.min],[bounds[0],v.facing.max]];
    return {...r,kind:'estimated-calibrated',sourceViewId:floor.id,sourceFrame:M.clone(floor.frame),anchors,scale:r.value/M.distance(...anchors),sourceReference:M.clone(r),relationship:{kind:'floor-to-elevation-span',sourceViewId:v.viewId,direction:v.direction,status:'proposed',confirmationRequired:true}};
   }));
-  const partial=partialScaleReferences(floor,contourDimensions(floor,image),bounds);
+  const partial=partialScaleReferences(floor,dimensions,bounds,{outline,image});
   const candidates=[...direct,...partial.references,...transferred].sort((a,b)=>Number(String(b.normalized||'').includes("'"))-Number(String(a.normalized||'').includes("'"))||Number(a.kind!=='written')-Number(b.kind!=='written')||(b.confidence||0)-(a.confidence||0)||(b.score||0)-(a.score||0)),reference=candidates[0];
   const draft=M.draftFor(floor,level);draft.points=outline.points.map((xy,i)=>({id:'auto-'+floor.id+'-p'+i,xy}));draft.proposal={...outline,points:undefined};draft.alignment={origin:[bounds[0],bounds[1]+bounds[3]],offset:[0,0],rotationDegrees:0,status:'proposed',kind:'source-orientation-review'};
   if(reference)draft.reference={...M.clone(reference),controlReferences:[],assessment:{status:'review-required'},status:'proposed'};
@@ -138,7 +177,7 @@
   const spread=list=>list.length?Math.max(...list)/Math.min(...list)-1:0,scaleConflict=partial.conflict||spread(candidates.map(r=>r.scale))>.05;
   if(scaleConflict&&reference){draft.reference={...draft.reference,value:null,label:'',suggestedScale:reference.scale,suggestedValue:reference.value,conflict:true};}
 
-  return {version:1,status:'proposed',buildingId,levelId:level.id,sourceViewId:floor.id,draft,referenceCandidates:candidates,heightCandidates:heights,views,sourceOpeningGaps:V.floorOpenings(image,outline.points),contourDimensions:contourDimensions(floor,image),openingSizeCandidates:floorOpeningSizes(floor,outline.points,V.floorOpenings(image,outline.points)),scaleConflict,heightConflict:spread(heights.map(h=>h.value))>.05,confirmationRequired:true,complete:false};
+  return {version:1,status:'proposed',buildingId,levelId:level.id,sourceViewId:floor.id,draft,referenceCandidates:candidates,heightCandidates:heights,views,sourceOpeningGaps:V.floorOpenings(image,outline.points),contourDimensions:dimensions,openingSizeCandidates:floorOpeningSizes(floor,outline.points,V.floorOpenings(image,outline.points)),scaleConflict,heightConflict:spread(heights.map(h=>h.value))>.05,confirmationRequired:true,complete:false};
  }
  function openingsFor(proposal,inventory,images,draft=proposal.draft){
   if(!M.scale(draft)||!(draft.height.value>0)||M.validatePolygon(M.modelPoints(draft)).length)return [];
@@ -405,5 +444,5 @@
   if(next.roofProposal?.status==='proposed'){const roof=next.roofProposal;roof.profiles.x=roof.profiles.x.map(([x,z])=>[nx[0]+(x-old.x[0])*rx,nz[0]+(z-old.z[0])*rz]);roof.profiles.y=roof.profiles.y.map(([y,z])=>[ny[0]+(y-old.y[0])*ry,nz[0]+(z-old.z[0])*rz]);roof.fasciaBottom=nz[1];roof.userMeasurementCorrections={width:w,depth:d,height:h,originalBounds:M.clone(old)};}
   return next;
  }
- return Object.freeze({version:1,partialScaleReferences,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,openingsFor,lowerPlanes,faceSpan,references,floorGuide,size,readings});
+ return Object.freeze({version:1,floorDimensionAssociation,overallScaleReferences,partialScaleReferences,propose,foundationGuide,constrainProposal,contourDimensions,constrainContour,openingSize,floorOpeningSizes,wallSupport,assignOpeningSurfaces,distinctOpeningFrames,joinRoofReturn,commonRidge,roofExtensions,assembleRoofProfiles,recoupRegistrations,reviseVolume,volumeRoof,observedOpenings,secondaryVolumes,elevationRegistration,roofProposal,openingsFor,lowerPlanes,faceSpan,references,floorGuide,size,readings});
 });

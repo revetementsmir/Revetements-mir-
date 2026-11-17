@@ -62,6 +62,37 @@ browser CI remains a separate, exact-commit gate.
 
 ## Corrections supported by the original-source investigation
 
+### Full production conversion checkpoint
+
+Revision `f766cecf70edacc01a1e2ca7af4b04374e109381` reran all seven original
+PDF imports and then the production targeted-reading pass followed by `P.build`.
+All seven runs completed: 48 pages, 46 views, eight building candidates,
+151 targeted regions and 148 returned OCR lines. **Zero of seven dossiers
+produced a nonempty model on this stricter full conversion pass.** The older
+direct-build baseline above must not be reused as a current success count.
+
+| Private case | Full conversion at this checkpoint |
+| --- | --- |
+| D01 | Wall support, contour complexity and unsupported contour edges |
+| D02 | Scale transcription uncertain; one draft without geometry |
+| D03 | Unsupported contour edges |
+| D04 | House scale unknown; secondary building has no associated floor source |
+| D05 | Wall support unresolved; source excluded from calibration |
+| D06 | Unsupported contour edges |
+| D07 | Contradictory scale readings; one draft without geometry |
+
+All scenes and confirmed quantities were empty. Empty exterior validation gates
+do not prove geometric persistence. No final-model render was produced for this
+checkpoint. Its exact-commit synthetic CI passed 32 Node suites, disposable SQL
+contracts and the existing client browser contracts, including entrance finish
+selection and reopen. Those synthetic successes do not validate the originals.
+
+The next source pass reuses only these initial imported inventories and their
+unchanged source JPEGs. It reruns targeted readings and reconstruction on a new
+frozen revision. Its provenance must distinguish the import revision from the
+conversion revision; it is not a fresh PDF re-import. Previous refined readings,
+reconstruction results and scenes are not conversion inputs.
+
 ### Flat entrance footprint and fascia
 
 The flat-roof path can use a fully closed observed footprint, or observed rear
@@ -101,6 +132,29 @@ Short detail dimension lines use their requested span threshold while retaining
 the endpoint and inscription checks. A two-sided diagonal drafting tick takes
 priority over a nearby long appliance or wall line; an ordinary thick crossing
 does not acquire a fabricated tick.
+
+Reconstruction can also match a dimension line interrupted by its own caption.
+This opt-in path requires both observed collinear arms, bounded caption spacing,
+two diagonal endpoint marks and perpendicular witnesses. Competing interrupted
+or continuous associations remain unresolved. No source pixels are painted
+across the text gap, and the historical importer keeps its default matcher.
+
+A better reading of the same caption replaces the complete lower-quality
+observation only when the value, caption position, source frame and endpoints
+agree. Contradictory values remain separate. Rotated dimensions retain their
+original-frame text boxes, line segments and endpoint witnesses.
+
+Essential scale and level captions across contributing views receive the bounded
+targeted-OCR budget before opening details. A split caption can be reread as a
+whole only from its observed constituent words. Reliable readings are not
+reread merely to manufacture consensus. The retry keeps its crop, source frame,
+original text and confidence.
+
+Marginal floor dimensions may establish scale when their actual source witness
+strokes connect both endpoints to the observed floor contour. Full-span checks
+require both endpoints to match the contour extremes within raster precision;
+partial spans retain the independent-inscription requirement. Missing, coloured,
+interrupted or foreign-source witnesses do not create that association.
 
 Two distinct reliable partial inscriptions can calibrate their own floor view.
 They do not become the whole building width. Duplicate OCR of one caption,

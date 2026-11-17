@@ -23,6 +23,7 @@ on:
       - 'docs/verification/mir-studio-s1-import.md'
       - 'tests/mir-studio-*.cjs'
       - 'tests/mir-plan-dimension-ticks.cjs'
+      - 'tests/mir-plan-interrupted-dimensions.cjs'
       - 'tests/helpers/mir-studio-s2-model.cjs'
       - 'tests/helpers/mir-studio-entry-fixture.cjs'
       - 'tests/helpers/mir-studio-flat-entry-fixture.cjs'
@@ -68,8 +69,11 @@ jobs:
           node tests/mir-studio-entry-profile-vision.cjs
           node tests/mir-studio-floor-thin-lines.cjs
           node tests/mir-studio-wall-contrast.cjs
+          node tests/mir-studio-reading-priority.cjs
+          node tests/mir-studio-source-scale.cjs
           node tests/mir-studio-partial-scale.cjs
           node tests/mir-plan-dimension-ticks.cjs
+          node tests/mir-plan-interrupted-dimensions.cjs
           node tests/mir-studio-flat-entry-roofs.cjs
           node tests/mir-studio-preview.cjs
           node tests/mir-studio-cotation.cjs
