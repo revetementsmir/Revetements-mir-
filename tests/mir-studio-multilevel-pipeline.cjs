@@ -3,6 +3,7 @@
 // seam. Calibration, XYZ registration, model validation, opening/roof extraction
 // and wall rendering below are the production implementations, without mocks.
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const Exterior=require('../dist/plan-reconstructed-exterior.js');
 const M=require('../dist/plan-level-model.js'),R=require('../dist/plan-reconstruction.js'),Grid=require('../dist/plan-grid-registration.js'),Roof=require('../dist/plan-reconstructed-roofs.js'),X=require('../dist/studio-exterior-model.js');
 const clone=value=>JSON.parse(JSON.stringify(value)),near=(actual,expected)=>assert.ok(Math.abs(actual-expected)<1e-9,`${actual} differs from ${expected}`);
 function floor(n,s=1,{omit=[]}={}){
@@ -30,12 +31,12 @@ function fixture({omitAxis=false,missingZ=false,conflictingZ=false}={}){
  return {inventory,proposals,images};
 }
 function pipeline(f){
- const calls={propose:[],roof:[],lower:0,secondary:0,exterior:0};
+ const calls={propose:[],roof:[],lower:0,secondary:0,exterior:0,wallZones:0};
  const window={MIRLevelModel:M,MIRPlanReconstruction:{...R,
   propose:(inventory,buildingId,images,{levelId})=>{assert.equal(inventory,f.inventory);assert.equal(buildingId,'house');assert.equal(images,f.images);calls.propose.push(levelId);return clone(f.proposals[levelId]);},
   roofProposal:(...args)=>{calls.roof.push(args[0].levelId);return R.roofProposal(...args);},
   lowerPlanes:(...args)=>{calls.lower++;return R.lowerPlanes(...args);},
-  secondaryVolumes:(...args)=>{calls.secondary++;return R.secondaryVolumes(...args);}},MIRGridRegistration:Grid,MIRReconstructedRoofs:Roof,MIRReconstructedExterior:{build:()=>{calls.exterior++;throw Error('unregistered exterior assembly cannot be cloned onto every level');}}};
+  secondaryVolumes:(...args)=>{calls.secondary++;return R.secondaryVolumes(...args);}},MIRGridRegistration:Grid,MIRReconstructedRoofs:Roof,MIRReconstructedExterior:{...Exterior,buildRegisteredWallZones:(...args)=>{calls.wallZones++;return Exterior.buildRegisteredWallZones(...args);},build:()=>{calls.exterior++;throw Error('unregistered exterior assembly cannot be cloned onto every level');}}};
  vm.runInNewContext(fs.readFileSync(require.resolve('../dist/plan-reconstruction-pipeline.js'),'utf8'),{window});
  return {api:window.MIRReconstructionPipeline,calls};
 }
@@ -64,4 +65,11 @@ const saved=clone(reconstructed),wall=scene.walls[0];saved.levels.find(l=>l.id==
 const mixed=fixture();mixed.inventory.levels[0]=clone(result.levels[0]);mixed.inventory.levels[0].wallFinishes={[scene.walls[0].id]:{materialId:'synthetic-saved-finish'}};const mixedBefore=clone(mixed.inventory.levels[0]),mixedPipeline=pipeline(mixed),mixedResult=mixedPipeline.api.build(mixed.inventory,'house',mixed.images);
 assert.deepEqual(mixed.inventory.levels[0],mixedBefore);assert.equal(mixedResult.reports.find(r=>r.levelId==='house:level-0').status,'preserved');
 for(const level of mixedResult.levels){assert.equal(level.contours?.length||0,0,'new floors cannot silently choose a new coordinate zero over a saved level');assert.ok(level.contourDraft,'an unresolved relation to a saved frame retains the proposed source contour');assert.ok(mixedResult.reports.find(r=>r.levelId===level.id).issues.includes('LEVEL_ALIGNMENT_REQUIRED'));assert.ok(mixedResult.reports.find(r=>r.levelId===level.id).issues.includes('EXISTING_LEVEL_FRAME_REQUIRED'));}
+// Actual masonry source pixels enter the same fully registered pipeline.
+// The surface pass must run once across levels without opening the existing
+// guard for unregistered balconies, columns, foundations or entry roofs.
+const cladding=fixture(),front=cladding.inventory.views.find(v=>v.id==='elevation-front'),im=cladding.images[front.id];front.payload.drawingReadings={rows:[{text:'BRIQUE',confidence:100,source:'pdf-text',box:[800,300,880,312]}]};
+const ink=(x,y)=>im.data.set([50,50,50,255],(y*im.width+x)*4);for(let row=0;row<=40;row++){const y=350+row*15;for(let x=400;x<=650;x++)ink(x,y);if(row<40)for(let x=400+(row%2?15:0);x<=650;x+=30)for(let yy=y;yy<=y+15;yy++)ink(x,yy);}
+const cladPipeline=pipeline(cladding),cladResult=cladPipeline.api.build(cladding.inventory,'house',cladding.images);assert.equal(cladPipeline.calls.wallZones,1);assert.equal(cladPipeline.calls.exterior,0);assert.equal(cladResult.levels.length,4);
+for(const l of cladResult.levels){assert.ok(l.wallZones.length>0,'each registered level keeps nonempty source cladding');assert.ok(l.wallZones.every(z=>z.levelId===l.id&&z.buildingId==='house'));assert.deepEqual(X.proposalIssues(l,cladding.inventory),[]);const report=cladResult.reports.find(r=>r.levelId===l.id);assert.equal(report.exterior.zones,l.wallZones.length);assert.ok(report.issues.includes('EXTERIOR_ASSEMBLY_LEVEL_MATCH_REQUIRED'));assert.equal(l.exteriorElements?.length||0,0);}
 console.log('PASS multilevel pipeline: source-local scales, metric XYZ, nonempty stable walls, per-level openings, one top roof, explicit missing data and preserved saved projects');

@@ -57,7 +57,21 @@
  const series=points=>{let hits=0,gap=0,maxGap=0;for(const p of points){if(hit(...p)){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:hits/points.length,maxGap};};
  const line=(n0,v0,n1,v1)=>{const len=Math.hypot(n1-n0,v1-v0),points=Array.from({length:Math.max(2,Math.ceil(len)+1)},(_,i)=>[n0+(n1-n0)*i/(Math.ceil(len)),v0+(v1-v0)*i/Math.ceil(len)]);return series(points);};
  const wallSupport=(n0,n1,depth)=>{let hits=0,gap=0,maxGap=0;const count=Math.max(1,Math.ceil(n1-n0));for(let i=0;i<=count;i++){const [x,y]=point(n0+(n1-n0)*i/count,depth).map(Math.round),hit=x>=0&&x<w&&y>=0&&y<h&&ink[y*w+x];if(hit){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:hits/(count+1),maxGap};};
- const adjacentWallPair=(left,right,radius)=>{for(let depth=-k;depth<=k;depth++){const before=wallSupport(left-radius,left-k,depth),after=wallSupport(right+k,right+radius,depth);if(before.support>=.9&&after.support>=.9&&before.maxGap<=2&&after.maxGap<=2)return {before,after,depth};}return null;};
+ const adjacentWallCache=new Map();
+ const adjacentWallPair=(left,right,radius)=>{
+  const cacheKey=left+":"+right;if(adjacentWallCache.has(cacheKey))return adjacentWallCache.get(cacheKey);
+  const side=(hinge,direction,depth)=>{
+   const ordered=(a,b)=>wallSupport(Math.min(a,b),Math.max(a,b),depth),full=ordered(hinge+direction*k,hinge+direction*radius);
+   if(full.support>=.9&&full.maxGap<=2)return full;
+   for(let span=k*4;span<radius-k;span++){
+    const corner=hinge+direction*span,near=ordered(hinge+direction*k,corner);if(near.support<.9||near.maxGap>2)continue;
+    const beyond=ordered(corner+direction*k,corner+direction*k*3);if(beyond.support>.35||beyond.maxGap<Math.max(3,tolerance+1))continue;
+    for(const turn of [-1,1]){let hits=0,gap=0,maxGap=0;for(let n=0;n<=k*4;n++){const [x,y]=point(corner,depth+turn*n).map(Math.round),present=x>=0&&x<w&&y>=0&&y<h&&ink[y*w+x];if(present){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}const support=hits/(k*4+1);if(support>=.9&&maxGap<=2)return {...near,termination:{kind:'observed-perpendicular-wall-return',anchors:[point(corner,depth),point(corner,depth+turn*k*4)],support,maxGap,beyond}};}
+   }
+   return null;
+  };
+  for(let depth=-k;depth<=k;depth++){const before=side(left,-1,depth),after=side(right,1,depth);if(before&&after){const value={before,after,depth};adjacentWallCache.set(cacheKey,value);return value;}}adjacentWallCache.set(cacheKey,null);return null;
+ };
  const gapWidth=run.to-run.from,maxWidth=Math.min(w*.07,length*.2,Math.max(k*8,gapWidth*4)),search=Math.ceil(Math.min(maxWidth,gapWidth*2)),jambs=[];
  for(let n=Math.floor(run.from-search);n<=Math.ceil(run.to+search);n++){if(n<k*3||n>length-k*3||n>run.from-tolerance&&n<run.to+tolerance)continue;for(let depth=k;depth<=k*6;depth++){const p=line(n,0,n,depth);if(p.support>=.85&&p.maxGap<=2)jambs.push({n,depth});}}
  const candidates=[];
@@ -237,6 +251,58 @@
   // Source partitions in both directions distinguish a wall network from a
   // pair of frames, isolated furniture, or a dimension diagram.
   if(!['x','y'].every(axis=>segments[axis].some(s=>s.at>(axis==='x'?by:bx)+maximumBand&&s.at<(axis==='x'?by+bh:bx+bw)-maximumBand&&s.end-s.start>(axis==='x'?bw:bh)*.15)))return null;
+  // Some window frames project beyond the wall skins. Their box cannot be
+  // mistaken for the wall plane: retain both observed wall skins and require
+  // three rails, finite jambs and source contact at both neighbouring walls.
+  function offsetFrame(axis,a,b){
+   const candidates=[],nearSupport=(at,before,depth,source=thick)=>Array.from({length:depth+1},(_,i)=>i+k).some(d=>{const start=before?a.end-d-k*2:b.start+d;const stats=support(source,axis,start,start+k*2,at);return stats.support>=.9&&stats.maxGap<=tolerance;});
+   for(let at=Math.round((a.at+b.at)/2)-tolerance;at<=Math.round((a.at+b.at)/2)+tolerance;at++)for(const side of [-1,1])for(let depth=k+1;depth<=maximumBand;depth++){
+    const other=at+side*depth;if(!nearSupport(at,true,depth)||!nearSupport(at,false,depth)||!nearSupport(other,true,depth,ink)||!nearSupport(other,false,depth,ink))continue;
+    const low=Math.min(at,other),high=Math.max(at,other),rails=[];
+    for(let pos=low-depth;pos<=high+depth;pos++){const stats=support(ink,axis,a.end,b.start,pos);if(stats.support>=.95&&stats.maxGap<=tolerance)rails.push({at:pos,...stats});}
+    for(const first of rails)for(const last of rails){if(first.at>low+tolerance||last.at<high-tolerance||last.at-first.at<depth||last.at-first.at>maximumBand*2)continue;
+     if(Math.abs(first.at-low)<=tolerance&&Math.abs(last.at-high)<=tolerance)continue;
+     const middle=rails.find(r=>r.at>=first.at+k&&r.at<=last.at-k);if(!middle)continue;
+     const cap=n=>{let hits=0;for(let d=first.at;d<=last.at;d++)if(Array.from({length:radius*2+1},(_,i)=>i-radius).some(i=>pixel(ink,axis,n+i,d)))hits++;return hits/(last.at-first.at+1);};
+     const extension=(n,start,end)=>{let hits=0,gap=0,maxGap=0;for(let d=start;d<=end;d++){if(Array.from({length:radius*2+1},(_,i)=>i-radius).some(i=>pixel(ink,axis,n+i,d))){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {support:hits/(end-start+1),maxGap};};
+     const jamb=atN=>Array.from({length:k*2+1},(_,i)=>atN+i-k).sort((a,b)=>Math.abs(a-atN)-Math.abs(b-atN)).map(n=>({n,support:cap(n),before:extension(n,first.at-k*3,first.at-k),after:extension(n,last.at+k,last.at+k*3)})).find(j=>j.support>=.9&&j.before.support<.6&&j.after.support<.6&&j.before.maxGap>=Math.max(3,tolerance+1)&&j.after.maxGap>=Math.max(3,tolerance+1));
+     const left=jamb(a.end),right=jamb(b.start);if(!left||!right)continue;
+     candidates.push({axis,from:Math.min(left.n,a.end),to:Math.max(right.n,b.start),at,side,depth,outer:first,parallel:last,centralRail:middle,jambs:[left,right].map(j=>({anchors:[point(axis,j.n,first.at),point(axis,j.n,last.at)],support:j.support,extensions:{before:j.before,after:j.after}})),wallSkinAnchors:[[point(axis,left.n,at),point(axis,right.n,at)],[point(axis,left.n,other),point(axis,right.n,other)]],method:'offset-source-frame-with-finite-jambs-and-wall-skin-contact'});
+    }
+   }
+   candidates.sort((a,b)=>(a.parallel.at-a.outer.at)-(b.parallel.at-b.outer.at)||a.depth-b.depth);const unique=[];for(const c of candidates)if(!unique.some(q=>Math.abs(q.at-c.at)<=tolerance&&q.side===c.side&&Math.abs(q.depth-c.depth)<=tolerance))unique.push(c);return unique.length?{...unique[0],alternatives:unique.slice(1)}:null;
+  }
+  const swingCache=new Map(),legacySign=Math.sign(legacy.points.reduce((s,a,i)=>{const b=legacy.points[(i+1)%legacy.points.length];return s+a[0]*b[1]-b[0]*a[1];},0));
+  function swingFrame(axis,a,b){
+   const width=b.start-a.end;if(width<k*6||width>w*.08)return null;
+   const cross=axis==='x'?1:0,along=1-cross,legacyEdges=legacy.points.flatMap((p,i)=>{const q=legacy.points[(i+1)%legacy.points.length];return Math.abs(p[cross]-q[cross])<.01&&Math.abs(p[cross]-a.at)<=maximumBand&&Math.min(p[along],q[along])-k<=a.end&&Math.max(p[along],q[along])+k>=b.start?[{p,q}]:[];});if(!legacyEdges.length)return null;
+   const sides=[...new Set(legacyEdges.map(({p,q})=>legacySign*Math.sign(q[along]-p[along])*(axis==='x'?1:-1)))],origin=axis==='x'?bx:by,extent=axis==='x'?bw:bh,near=(at,before)=>{const start=before?a.end-k*4:b.start+k;return support(ink,axis,start,start+k*3,at).support>=.9;};
+   if(support(thick,axis,a.end+k,b.start-k,(a.at+b.at)/2).support>.2)return null;
+   for(let at=Math.round((a.at+b.at)/2)-tolerance;at<=Math.round((a.at+b.at)/2)+tolerance;at++)for(const side of sides){
+    const gap=support(ink,axis,a.end+k,b.start-k,at);if(gap.support>.35||gap.maxGap<k*2)continue;
+    const contacts=[];
+    for(let depth=k+1;depth<=maximumBand;depth++){
+     const other=at+side*depth;if(!near(other,true)||!near(other,false))continue;
+     const cap=n=>{let hits=0;for(let d=0;d<=depth;d++)if(Array.from({length:radius*2+1},(_,i)=>i-radius).some(i=>pixel(ink,axis,n+i,at+side*d)))hits++;return hits/(depth+1);};
+     const jamb=n=>Array.from({length:k*4+1},(_,i)=>n+i-k*2).sort((a,b)=>Math.abs(a-n)-Math.abs(b-n)).find(j=>cap(j)>=.9),left=jamb(a.end),right=jamb(b.start);if(left===undefined||right===undefined||right<=left)continue;
+     contacts.push({left,right,depth,other,cap});
+    }
+    if(!contacts.length)continue;
+    const start=point(axis,origin,at),end=point(axis,origin+extent,at),inside=axis==='x'?[0,side]:[side,0],run={from:a.end-origin+tolerance+1,to:b.start-origin-tolerance-1,inside};if(run.to<=run.from)continue;
+    const cacheKey=[axis,at,side,run.from,run.to].join(':');if(!swingCache.has(cacheKey)){swingCache.set(cacheKey,floorDoorEvidence(image,start,end,run,ink));}const door=swingCache.get(cacheKey);if(!door||Math.abs(origin+door.from-a.end)>k*2||Math.abs(origin+door.to-b.start)>k*2)continue;
+    const left=origin+door.from,right=origin+door.to,contact=contacts.find(c=>c.cap(left)>=.9&&c.cap(right)>=.9);if(!contact)continue;const {depth,other,cap}=contact;
+    return {axis,from:Math.min(left,a.end),to:Math.max(right,b.start),at,side,depth,doorSwing:door,jambs:[left,right].map(n=>({anchors:[point(axis,n,at),point(axis,n,other)],support:cap(n)})),wallSkinAnchors:[[point(axis,left,at),point(axis,right,at)],[point(axis,left,other),point(axis,right,other)]],method:'observed-swing-and-paired-wall-skin-contact'};
+   }
+   return null;
+  }
+  function extendObservedSkinPair(link){
+   if(!link.wallSkinAnchors)return;
+   const at=link.at,other=link.at+link.side*link.depth,limit=link.axis==='x'?[bx-k*2,bx+bw+k*2]:[by-k*2,by+bh+k*2];
+   const hit=n=>[at,other].every(d=>Array.from({length:radius*2+1},(_,i)=>i-radius).some(q=>pixel(ink,link.axis,n,d+q)));
+   const extend=(start,direction)=>{let last=start,gap=0,hits=0,total=0;for(let n=Math.round(start)+direction;n>=limit[0]&&n<=limit[1];n+=direction){total++;if(hit(n)){last=n;hits++;gap=0;}else if(++gap>tolerance)break;}return {end:last,support:hits/Math.max(1,total-gap),length:Math.abs(last-start)};};
+   const before=extend(link.from,-1),after=extend(link.to,1);link.sourceWallBandExtensions=[];
+   for(const [from,to,e]of [[before.end,link.from,before],[link.to,after.end,after]])if(e.length>=k*4&&e.support>=.9){fill(link.axis,from,to,at,other);link.sourceWallBandExtensions.push({anchors:[point(link.axis,from,at),point(link.axis,to,at)],parallelAnchors:[point(link.axis,from,other),point(link.axis,to,other)],support:e.support,method:'continuous-source-paired-wall-skins'});}
+  }
   const links=[];
   for(const axis of ['x','y'])for(const a of segments[axis])for(const b of segments[axis]){
    if(b.start-a.end<k*2.5||b.start-a.end>w*.2||Math.abs(a.at-b.at)>tolerance)continue;
@@ -252,7 +318,8 @@
      found={axis,from:Math.min(left,a.end),to:Math.max(right,b.start),at,side,depth,outer,parallel,jambs:[left,right].map(n=>({anchors:[point(axis,n,at),point(axis,n,at+side*depth)],support:cap(n)})),method:'paired-source-frame-and-adjacent-wall-strokes'};
     }
    }
-   if(found){links.push(found);fill(axis,found.from,found.to,found.at,found.at+found.side*found.depth);}
+   if(!found)found=offsetFrame(axis,a,b)||swingFrame(axis,a,b);
+   if(found){for(const proof of [found,...(found.alternatives||[])]){const {alternatives,...link}=proof;links.push(link);fill(axis,link.from,link.to,link.at,link.at+link.side*link.depth);extendObservedSkinPair(link);}}
    if(links.length>256)return null;
   }
   if(!links.length)return null;
@@ -276,13 +343,36 @@
    }
    if(!fixed)break;
   }
+  // Filling two observed wall bands can leave an inside corner-shaped notch
+  // where one of the skins turns. Recover only the actual source outer L,
+  // with a separate observed parallel inner L in the building quadrant.
+  const cornerPixel=p=>{const [x,y]=p.map(Math.round);for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++)if(x+dx>=0&&x+dx<w&&y+dy>=0&&y+dy<h&&ink[(y+dy)*w+x+dx])return true;return false;};
+  const cornerLine=(a,b)=>{const len=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.ceil(len);let hits=0,gap=0,maxGap=0;for(let i=0;i<=n;i++){if(cornerPixel(a.map((v,j)=>v+(b[j]-v)*i/n))){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}return {anchors:[a,b],support:hits/(n+1),maxGap};};
+  for(let pass=0;pass<12;pass++){
+   let changed=false;const orientation=Math.sign(points.reduce((s,p,i)=>{const q=points[(i+1)%points.length];return s+p[0]*q[1]-q[0]*p[1];},0));
+   for(let i=0;i<points.length;i++){
+    const a=points[(i+points.length-1)%points.length],b=points[i],c=points[(i+1)%points.length],u=[b[0]-a[0],b[1]-a[1]],v=[c[0]-b[0],c[1]-b[1]],l1=Math.hypot(...u),l2=Math.hypot(...v);if(Math.min(l1,l2)<1||Math.max(l1,l2)>maximumBand||Math.abs(u[0]*v[0]+u[1]*v[1])>.01||orientation*(u[0]*v[1]-u[1]*v[0])>=0)continue;
+    const d=[a[0]+c[0]-b[0],a[1]+c[1]-b[1]],ua=a.map((x,j)=>(x-d[j])/l2),uc=c.map((x,j)=>(x-d[j])/l1),reach=k*4,outer=[ua,uc].map(axis=>cornerLine(d,d.map((n,j)=>n+axis[j]*reach)));if(outer.some(e=>e.support<.94||e.maxGap>1))continue;
+    let inner=null;for(let x=k+1;x<=maximumBand&&!inner;x++)for(let y=k+1;y<=maximumBand;y++){const p=d.map((n,j)=>n+ua[j]*x+uc[j]*y),edges=[ua,uc].map(axis=>cornerLine(p,p.map((n,j)=>n+axis[j]*reach)));if(edges.every(e=>e.support>=.94&&e.maxGap<=1)){inner={point:p,edges};break;}}
+    if(!inner)continue;junctions.push({removed:[a,b,c],point:d,outer,inner,method:'paired-source-outer-and-inner-wall-corner'});points[i]=d;points=removeStraight(points);changed=true;break;
+   }if(!changed)break;
+  }
   if(points.length<4||points.length>40||points.some((a,i)=>{const b=points[(i+1)%points.length];return Math.min(Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]))>.01;}))return null;
   for(let i=0;i<points.length;i++)for(let j=i+1;j<points.length;j++){
    if(j===i+1||i===0&&j===points.length-1)continue;
    const a=points[i],b=points[(i+1)%points.length],c=points[j],d=points[(j+1)%points.length];
    if(Math.max(Math.min(a[0],b[0]),Math.min(c[0],d[0]))<=Math.min(Math.max(a[0],b[0]),Math.max(c[0],d[0]))+.01&&Math.max(Math.min(a[1],b[1]),Math.min(c[1],d[1]))<=Math.min(Math.max(a[1],b[1]),Math.max(c[1],d[1]))+.01)return null;
   }
-  const evidence=floorBoundaryEvidence(image,points,ink);if(evidence.some(e=>e.status!=='proposed'||e.support<.94))return null;
+  const evidence=floorBoundaryEvidence(image,points,ink).map(e=>{
+   if(e.status==='proposed'&&e.support>=.94)return e;
+   const a=points[e.edgeIndex],b=points[(e.edgeIndex+1)%points.length],length=Math.hypot(b[0]-a[0],b[1]-a[1]),u=b.map((n,i)=>(n-a[i])/length),axis=Math.abs(u[0])>.99?'x':Math.abs(u[1])>.99?'y':null;if(!axis)return e;
+   const normal=axis==='x'?1:0,along=1-normal,matching=links.filter(l=>l.axis===axis&&l.wallSkinAnchors?.some(pair=>pair.every(p=>Math.abs(p[normal]-a[normal])<=tolerance))&&Math.min(l.to,Math.max(a[along],b[along]))-Math.max(l.from,Math.min(a[along],b[along]))>0),ranges=matching.map(l=>{const from=(l.from-a[along])*u[along],to=(l.to-a[along])*u[along];return {from:Math.min(from,to),to:Math.max(from,to),link:l};});
+   if(!ranges.length)return e;let hits=0,gap=0,maxGap=0;
+   for(let n=0;n<=length;n++){let observed=false;for(let d=-e.tolerancePx;d<=e.tolerancePx;d++){const x=Math.round(a[0]+u[0]*n-u[1]*d),y=Math.round(a[1]+u[1]*n+u[0]*d);if(x>=0&&x<w&&y>=0&&y<h&&ink[y*w+x])observed=true;}if(observed||ranges.some(r=>n>=r.from&&n<=r.to)){hits++;gap=0;}else maxGap=Math.max(maxGap,++gap);}
+   const provenSupport=hits/(Math.floor(length)+1),status=provenSupport>=.94&&maxGap<=Math.max(4,k*2)?'proposed':'unresolved',doors=ranges.filter(r=>r.link.doorSwing).map(r=>({...r.link.doorSwing,from:r.from,to:r.to,edgeIndex:e.edgeIndex,sourceWallSkinAnchors:r.link.wallSkinAnchors}));
+   return {...e,status,provenSupport,unexplainedMaxGap:maxGap,method:'source-strokes-and-independently-proven-wall-opening',openingEvidence:[...(e.openingEvidence||[]),...doors],sourceFrameEvidence:ranges.map(r=>({from:r.from,to:r.to,evidence:r.link}))};
+  });if(evidence.some(e=>e.status!=='proposed'||(e.provenSupport??e.support)<.94))return null;
+
   // A small accepted island is not the whole building that failed above.
   const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),bounds=[Math.min(...xs),Math.min(...ys),Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys)];
   if(bounds.some((value,i)=>Math.abs(value-legacy.sourceBounds[i])>maximumBand)||documentLabelsInside(rows,bounds[0],bounds[1],bounds[0]+bounds[2],bounds[1]+bounds[3]))return null;
@@ -690,6 +780,21 @@
   if(b.highX-a.highX>8){let support=0,count=0;for(let x=Math.ceil(a.highX+2);x<=Math.floor(b.highX-2);x++){let hit=false;for(let dy=-3;dy<=3;dy++)if(ridgeY+dy>=0&&ridgeY+dy<h)hit||=!!ink[(ridgeY+dy)*w+x];support+=Number(hit);count++;}if(support/(count||1)<.7)return {status:'unresolved',reason:'ROOF_RIDGE_OCCLUDED',base,slopes:[a,b],ridgeSupport:support/(count||1)};}
   return {status:'proposed',method:'source-eaves-and-two-supported-slopes',points:[[a.eaveX,a.eaveJunction?a.eaveY:base.y],[a.highX,ridgeY],[b.highX,ridgeY],[b.eaveX,b.eaveJunction?b.eaveY:base.y]],base,slopes:[a,b],sourceViewId:envelope.sourceViewId,sourceFrame:envelope.sourceFrame,confirmationRequired:true};
  }
+ function closedCellNeighborhood(image,box){
+  // A closed white cell can be a pane or a drawing texture. The latter is
+  // ambiguous only when its observed neutral cell network continues outside
+  // the candidate on several sides. This does not identify any material.
+  if(!image?.data||box?.length!==4||!box.every(Number.isFinite)||box[2]<=0||box[3]<=0)return null;
+  const unit=Math.max(.5,image.width/2100),pad=Math.max(box[2],box[3])*3,x0=Math.max(0,Math.floor(box[0]-pad)),y0=Math.max(0,Math.floor(box[1]-pad)),w=Math.min(image.width-x0,Math.ceil(box[2]+pad*2)),h=Math.min(image.height-y0,Math.ceil(box[3]+pad*2));if(w<1||h<1||w*h>1000000)return null;
+  const mask=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=((y+y0)*image.width+x+x0)*4,r=image.data[i],g=image.data[i+1],b=image.data[i+2];mask[y*w+x]=Number(!(image.data[i+3]>160&&Math.max(r,g,b)-Math.min(r,g,b)<35&&(r+g+b)/3<205));}
+  const cells=components(mask,w,h).filter(c=>c.box[0]>0&&c.box[1]>0&&c.box[0]+c.box[2]<w&&c.box[1]+c.box[3]<h&&c.box[2]>=4*unit&&c.box[3]>=3*unit&&c.area>=20*unit*unit&&c.area/(c.box[2]*c.box[3])>.6&&Math.max(c.box[2]/c.box[3],c.box[3]/c.box[2])<12).map(c=>({box:[c.box[0]+x0,c.box[1]+y0,c.box[2],c.box[3]],interiorPixels:c.area}));if(cells.length<8||cells.length>1000)return null;
+  const overlap=(a,b)=>Math.max(0,Math.min(a[0]+a[2],b[0]+b[2])-Math.max(a[0],b[0]))*Math.max(0,Math.min(a[1]+a[3],b[1]+b[3])-Math.max(a[1],b[1])),targets=cells.filter(c=>overlap(c.box,box)>c.box[2]*c.box[3]*.8);if(!targets.length||targets.reduce((n,c)=>n+c.interiorPixels,0)<box[2]*box[3]*.35)return null;
+  const queue=targets.slice(),seen=new Set(queue),group=[];while(queue.length){const a=queue.pop();group.push(a);for(const b of cells){if(seen.has(b))continue;const dx=Math.max(a.box[0]-b.box[0]-b.box[2],b.box[0]-a.box[0]-a.box[2],0),dy=Math.max(a.box[1]-b.box[1]-b.box[3],b.box[1]-a.box[1]-a.box[3],0);if(dx<=4*unit&&dy<=4*unit){seen.add(b);queue.push(b);}}}
+  const [x,y,bw,bh]=box,outside=group.filter(c=>c.box[0]+c.box[2]<=x||c.box[0]>=x+bw||c.box[1]+c.box[3]<=y||c.box[1]>=y+bh),sides={left:outside.filter(c=>c.box[0]+c.box[2]<=x).length,right:outside.filter(c=>c.box[0]>=x+bw).length,above:outside.filter(c=>c.box[1]+c.box[3]<=y).length,below:outside.filter(c=>c.box[1]>=y+bh).length};
+  if(group.length<8||outside.length<4||Object.values(sides).filter(n=>n>=2).length<2)return null;
+  const quantile=(values,q)=>values.slice().sort((a,b)=>a-b)[Math.floor((values.length-1)*q)],variation=axis=>quantile(group.map(c=>c.box[axis]),.8)/quantile(group.map(c=>c.box[axis]),.2),widthVariation=variation(2),heightVariation=variation(3);if(widthVariation<1.4||heightVariation<1.4)return null;
+  return {status:'unresolved',reason:'OPENING_TEXTURE_AMBIGUOUS',method:'candidate-belongs-to-variable-closed-cell-network',sourceBox:box.slice(),sourceRegion:[x0,y0,w,h],cells:group,exteriorCells:outside.length,sides,widthVariation,heightVariation,maximumCellGapPixels:4*unit,material:null,confirmationRequired:true};
+ }
  function coherentPaneGroup(image,box,{bandHeight=box[3]}={}){
   // Wall joints and the mullions of separate windows can close a large white
   // rectangle. Require one coherent group of actual neutral pane components
@@ -886,5 +991,5 @@
   }
   candidates.sort((a,b)=>b.score-a.score);return candidates[0]||{status:'unresolved',reason:'ENTRY_ROOF_SIDE_PROFILE_UNRESOLVED'};
  }
- return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,floorSlidingFrameEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,roofEaveJunctions,roofCeilingBand,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,coherentPaneGroup,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
+ return Object.freeze({version:1,floorEnvelope,floorBoundaryEvidence,floorDoorEvidence,floorSlidingFrameEvidence,componentAxisSegments,wallEnvelope,canopyEnvelope,canopySide,entryBands,entrySideRoof,secondaryEnvelope,secondarySide,roofProfile,roofEaveJunctions,roofCeilingBand,legendBoxes,floorOpenings,elevationOpenings,glazingFrames,closedCellNeighborhood,coherentPaneGroup,grayDoorFrames,occludedFrameAtSeed,frameAtSeed,monochrome,structuralInk,rectangleFilter,opening,closing,components,fillHoles,outline,simplify,alignOutline,removeStraight,consolidateAxes});
 });

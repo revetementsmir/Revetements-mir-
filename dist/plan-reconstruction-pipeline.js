@@ -74,6 +74,7 @@
    if(proposal.status==='proposed'&&grid)proposal.gridAlignment=copy(grid);
    if(proposal.status!=='proposed'){report.issues.push(proposal.reason);if(proposal.outlineRecovery)report.outlineRecovery=copy(proposal.outlineRecovery);continue;}
    const {resolution,draft,constrained,errors}=preparedLevel;
+   if(proposal.unresolvedScaleReferences?.some(r=>r.reason==='DIMENSION_ENDPOINT_PRECISION_REQUIRED'))report.issues.push('DIMENSION_ENDPOINT_PRECISION_REQUIRED');
    if(!resolution.reference){report.issues.push(resolution.status==='conflict'?'REFERENCE_CONFLICT':resolution.status==='low_confidence'?'SCALE_TRANSCRIPTION_UNCERTAIN':'SCALE_UNKNOWN');if(requiresLevelAlignment)report.issues.push('LEVEL_ALIGNMENT_REQUIRED');levels.push({...copy(current),contourDraft:draft,reconstructionDraft:proposal});continue;}
    if(constrained.dimensionAdjustment?.evidence.some(e=>e.reason==='DIMENSION_TRANSCRIPTION_UNCERTAIN'))report.issues.push('DIMENSION_TRANSCRIPTION_UNCERTAIN');
    if(constrained.height?.axisScaleComparison?.status==='review-required')report.issues.push('VERTICAL_AXIS_SCALE_REVIEW');
@@ -89,7 +90,8 @@
    }
    proposal=R.recoupRegistrations(proposal,inventory,images,constrained);proposal.draft=copy(constrained);
    const next={...copy(current),contours:[constrained],wallOpenings:[],openingsReviewed:false,reconstruction:{version:1,status:'automatic-proposal',proposal,sourceRasterRequiredForRendering:false}};
-   next.openingProposals=R.openingsFor(proposal,inventory,images,constrained);
+   const unresolvedOpeningCandidates=[];next.openingProposals=R.openingsFor(proposal,inventory,images,constrained,{unresolvedCandidates:unresolvedOpeningCandidates});
+   if(unresolvedOpeningCandidates.length){next.reconstruction.openingObservations={unresolvedCandidates:copy(unresolvedOpeningCandidates),complete:false};report.issues.push(...new Set(unresolvedOpeningCandidates.map(o=>o.reason)));}
    if(next.openingProposals.some(o=>o.floorCorrespondence?.status==='unresolved'))report.issues.push('OPENING_FLOOR_MATCH_UNRESOLVED');
    let lower=hasGroundPlan||requiresLevelAlignment?{status:'unresolved',reason:'GROUND_PLAN_TAKES_PRECEDENCE'}:R.lowerPlanes(proposal,inventory,constrained,images);
    const roofHost=!requiresLevelAlignment||topOrdinal!==null&&ordinal(current.sourceLevel)===topOrdinal,volumes=requiresLevelAlignment?[]:R.secondaryVolumes(proposal,inventory,images,constrained),roof=roofHost?R.roofProposal(proposal,inventory,constrained,{images}):{status:'not-applicable',reason:'ROOF_BELONGS_TO_TOP_LEVEL'};
@@ -113,6 +115,18 @@
    if(requiresLevelAlignment)report.issues.push('EXTERIOR_ASSEMBLY_LEVEL_MATCH_REQUIRED');
    if(lower.status!=='proposed'&&!hasGroundPlan&&!requiresLevelAlignment)report.issues.push(lower.reason);
    report.status='partial-proposal';report.confirmationRequired=true;report.measurements='written and calibrated estimates remain proposed';
+  }
+  if(requiresLevelAlignment&&Exterior?.buildRegisteredWallZones&&levels.some(l=>l.reconstruction?.status==='automatic-proposal')){
+   // Registered wall bands can carry source cladding before every balcony,
+   // foundation or entrance has its own established level and depth. Keep
+   // those assemblies unresolved; they do not enter this surface-only pass.
+   const exterior=Exterior.buildRegisteredWallZones(inventory,buildingId,images,levels);
+   for(const detail of exterior.byLevel||[]){const target=levels.find(l=>l.id===detail.levelId),report=reports.find(r=>r.levelId===detail.levelId);if(!target||!report)throw Error('EXTERIOR_LEVEL_MISMATCH');
+    if((detail.exteriorElements||[]).length||(detail.reconstructedRoofs||[]).length)throw Error('REGISTERED_WALL_ZONES_ONLY');
+    if(target.reconstruction?.status!=='automatic-proposal')continue;
+    target.wallZones=[...(target.wallZones||[]),...copy(detail.wallZones||[])];target.reconstruction.exterior={version:exterior.version,issues:copy(detail.issues||[]),conflicts:copy(detail.conflicts||[]),complete:false};
+    report.issues=[...new Set([...report.issues,...(detail.issues||[])])];report.exterior={elements:0,roofs:0,zones:target.wallZones.length,conflicts:(detail.conflicts||[]).length,complete:false};
+   }
   }
   if(!reports.length)reports.push({status:'unresolved',issues:[inventory.views.some(v=>v.buildingId===buildingId&&v.kind==='floor')?'FLOOR_LEVEL_REQUIRED':'FLOOR_SOURCE_REQUIRED']});
   return {version:1,buildingId,status:reports.some(r=>r.status==='partial-proposal')?'partial-proposal':reports.every(r=>r.status==='preserved')?'preserved':'unresolved',levels,reports,complete:false};

@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict'),E=require('../dist/plan-reconstructed-exterior.js');
+const view=text=>({id:'synthetic-elevation',frame:{rasterSize:[600,400]},payload:{drawingReadings:{rows:[{text,source:'pdf-text',confidence:100,box:[20,30,250,45]}]}}});
+for(const text of ['SUR BASE DE PIERRE | 5" X 18"','SUR BASE DE PIERRE 18" X18"','PIERRE 18"×18"','STONE 18 in by 18 in','Pierre format 4 po','Socle de pierre 8 po','Stone pedestal 10 in','Colonne en maçonnerie 10 po','Maçonnerie de poteaux 8 po']){
+ const source=view(text),before=structuredClone(source),result=E.thickness(source,'masonry',true);assert.equal(result.status,'proposed',text);assert.equal(result.kind,'user-rule');assert.equal(result.value,.1016);assert.deepEqual(result.writtenCandidates,[],text+' is not a wall-thickness observation');assert.deepEqual(source,before,'The original section/format reading remains intact.');
+}
+for(const text of ['PIERRE ±4"','Épaisseur pierre 4 po','Stone veneer 4 in']){const result=E.thickness(view(text),'masonry',true);assert.equal(result.status,'proposed');assert.equal(result.writtenCandidates.length,1,text);assert.equal(result.writtenCandidates[0].kind,'written');assert.equal(result.writtenCandidates[0].value,.1016);assert.equal(result.writtenCandidates[0].confirmationRequired,true);}
+const conflict=E.thickness(view('Maçonnerie épaisseur 6 po'),'masonry',true);assert.equal(conflict.status,'conflict');assert.equal(conflict.value,null);assert.ok(Math.abs(conflict.writtenCandidates[0].value-.1524)<1e-10);
+assert.equal(E.thickness(view('Mur de fondation 12 po'),'foundation',true).status,'conflict','A real foundation-thickness conflict remains visible.');
+for(const text of ['COULEUR: PIERRE DES CHAMPS','Revêtement de fibrociment couleur pierre des champs','Fibrociment pierre des champs','Fibre-ciment pierre des champs','Fiber cement stone grey','Panneau imitation pierre','Panneau imit. pierre','Faux stone panel','Colour: stone grey','Color similar to masonry','Teinte brique rouge','SANS PIERRE','Without masonry'])assert.equal(E.materialLabels(view(text)).length,0,text+' is not a masonry material specification');
+for(const text of ['PIERRE, COULEUR GRIS','Maçonnerie pleine','Stone veneer colour grey','Brique de maçonnerie','PIERRE + fibrociment','Placage de pierre'])assert.equal(E.materialLabels(view(text)).length,1,text);
+for(const text of ['Fibrociment pierre 4 po','Panneau imitation pierre 4 po'])assert.deepEqual(E.writtenThickness(view(text),'masonry'),[],'A non-masonry material cannot provide a written masonry thickness.');
+console.log('PASS masonry reading scope: column/base/format sections and colour names never become wall thickness or material; genuine written conflicts preserved');

@@ -155,4 +155,18 @@ for(const anchors of [[[300,180],[300,180]],[[300,180],[301,181]],[[NaN,180],[74
  for(const mutate of [c=>c.confidence=54,c=>c.sourceViewId='other',c=>c.sourceFrame={units:'pixels'},c=>c.lineEvidence.status='unresolved',c=>c.textBox=part.textBox,c=>c.anchors=[[250,140],[730,140]]]){const bad=structuredClone(whole);mutate(bad);assert.equal(R.partialScaleReferences(s.view,[part],s.outline.sourceBounds,{...options,controlReferences:[bad]}).references.length,0,'weak, duplicate, foreign or unproved overall captions cannot corroborate a lone partial span');}
  const contrary={...structuredClone(whole),value:5.5,scale:5.5/500,text:'5500 mm',label:'5500 mm'},conflict=R.partialScaleReferences(s.view,[part],s.outline.sourceBounds,{...options,controlReferences:[contrary]});assert.equal(conflict.conflict,true);assert.equal(conflict.references.length,1);assert.equal(P.resolveReference([contrary,...conflict.references]).status,'conflict','a conflicting overall reading is retained, not silently replaced by the strong partial');
 }
-console.log('PASS source scale: horizontal/vertical overall spans, bounded endpoint uncertainty, observed partial margin witnesses and unchanged source transcription; missing/coloured/interrupted/foreign/detail/weak/degenerate evidence and merely similar overall spans refused.');
+// Small spans cannot claim a scale more precise than their actual marker
+// search. Retain the written value for a higher-resolution source check.
+{
+ const A=require('../dist/plan-import-core.js'),s=fixture(),short=dimension(s,{anchors:[[300,380],[360,380]],value:.6,box:[310,360,350,375]}),whole=dimension(s,{anchors:[[240,180],[740,180]],value:5,box:[450,160,510,175]});
+ whole.lineEvidence=A.dimensionLineEvidence(s.image,whole);
+ const result=R.partialScaleReferences(s.view,[short],s.outline.sourceBounds,{outline:s.outline,image:s.image,controlReferences:[whole]});
+ assert.equal(result.references.length,0);assert.equal(result.conflict,false);assert.equal(result.unresolvedReferences.length,1);const observation=result.unresolvedReferences[0];assert.equal(observation.reason,'DIMENSION_ENDPOINT_PRECISION_REQUIRED');assert.equal(observation.value,.6);assert.deepEqual(observation.anchors,short.anchors);assert.ok(observation.precision.relativeSpanUncertainty>.05);assert.equal(observation.confirmationRequired,true);
+ const contrary={...short,value:1.2,referenceFt:1.2/.3048,scale:1.2/60,text:'1200 mm',label:'1200 mm'},bad=R.partialScaleReferences(s.view,[contrary],s.outline.sourceBounds,{outline:s.outline,image:s.image,controlReferences:[whole]});assert.equal(bad.references.length,1);assert.equal(bad.conflict,true,'a discrepancy outside the actual endpoint bounds remains a genuine conflict; coarse pixels cannot excuse any value');
+}
+// Complete and token-level OCR of one caption are a single observation.
+{
+ const s=partialPair(),whole={...s.a,text:'6\' 6 1/2"',label:'6\' 6 1/2"'},suffix={...structuredClone(whole),text:'1/2"',label:'1/2"',value:.0127,referenceFt:1/24,scale:.0127/200,textBox:[400,160,420,175]},result=partial(s,[whole,suffix,s.b]);
+ assert.equal(result.references.length,2);assert.ok(!result.references.some(d=>d.text==='1/2"'));assert.equal(result.unresolvedReferences.find(d=>d.text==='1/2"').reason,'DIMENSION_CAPTION_FRAGMENT');assert.equal(result.unresolvedReferences.find(d=>d.text==='1/2"').value,.0127);
+}
+console.log('PASS source scale: associated whole/partial dimensions, endpoint precision retained, OCR fragments excluded as independent references; real conflicts and all source guards preserved.');

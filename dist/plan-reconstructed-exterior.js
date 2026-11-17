@@ -13,6 +13,7 @@
  const area=b=>b[2]*b[3];
  const sourceKey=box=>box.map(n=>Math.round(n*10)/10).join('-');
  const median=values=>{const a=values.slice().sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:null;};
+ const nonMasonryPrefix=text=>/\b(?:couleurs?|colors?|colours?|teintes?|fibro[ -]?ciment|fibre[ -]?ciment|fiber[ -]?cement|fibre[ -]?cement|imitation|imit\.?|simili|faux)\b/.test(text);
  function subtractBoxes(box,masks){
   let parts=[box.slice()];
   for(const mask of masks.filter(validBox)){
@@ -22,7 +23,10 @@
   return parts;
  }
  function materialLabels(view){
-  return R.readings(view).filter(row=>row.box?.length===4&&(row.source==='pdf-text'||row.confidence>=40)&&/\b(?:briques?|maconnerie|masonry|brick(?:work)?|pierres?|stone)\b/.test(normal(row.text))&&!/\b(?:sans|aucun[e]?|no|without)\s+(?:de\s+)?(?:briques?|maconnerie|masonry|brick(?:work)?|pierres?|stone)\b/.test(normal(row.text)));
+  return R.readings(view).filter(row=>{const text=normal(row.text),hit=/\b(?:briques?|maconnerie|masonry|brick(?:work)?|pierres?|stone)\b/.exec(text);
+   return row.box?.length===4&&(row.source==='pdf-text'||row.confidence>=40)&&hit&&!/\b(?:sans|aucun[e]?|no|without)\s+(?:de\s+)?$/.test(text.slice(0,hit.index))&&
+    !nonMasonryPrefix(text.slice(0,hit.index));
+  });
  }
  function writtenThickness(view,type){
   const subject=type==='foundation'?/\b(?:fondations?|solage|foundation(?:\s+walls?)?)\b/:/\b(?:briques?|maconnerie|masonry|brick(?:work)?|pierres?|stone)\b/;
@@ -31,8 +35,13 @@
    if(!row.box?.every(finite)||row.box.length!==4||row.source!=='pdf-text'&&!(row.confidence>=40))continue;
    const text=normal(row.text).replace(/''/g,'"'),hit=subject.exec(text);if(!hit)continue;
    if(/\b(?:sans|aucun[e]?|no|without)\s+(?:de\s+)?$/.test(text.slice(0,hit.index)))continue;
+   // A post base/stone unit format is an element section, not wall thickness.
+   // Keep uncertain OCR as an unassociated reading instead of turning its
+   // first number into a conflicting wall dimension.
+   if(type==='masonry'&&(/\b(?:bases?|socles?|piedestals?|pedestals?|colonnes?|columns?|poteaux|posts?|formats?|dimensions?)\b/.test(text)||nonMasonryPrefix(text.slice(0,hit.index))))continue;
    const rest=text.slice(hit.index+hit[0].length),match=rest.match(/^[^\d]{0,28}(\d+(?:[.,]\d+)?(?:\s+\d+\s*\/\s*\d+)?\s*(?:"|po\b|pouces?\b|in(?:ches)?\b|mm\b|cm\b))/);
    if(!match)continue;
+   if(/^\s*(?:x|×|par\b|by\b)\s*\d/i.test(rest.slice(match[0].length)))continue;
    const measured=A.parseDimension(match[1].replace(/pouces?/g,'po').replace(/inches/g,'in'),{ocr:row.source==='ocr'});
    if(!measured||measured.corrected)continue;
    const value=measured.valueFt*.3048;if(!(value>.01&&value<1.5))continue;
@@ -484,10 +493,10 @@
   entranceDetails({proposal,inventory,images,front,source,fr,canopy,sideCandidates,columns:accepted,owners,byLevel,hints,frontMasks});
   report.issues.push('BALCONY_SLAB_EXTENT_UNRESOLVED');
  }
- function build(proposal,inventory,images,reviewed,generatedLevels=[]){
+ function build(proposal,inventory,images,reviewed,generatedLevels=[],options={}){
   const byLevel=[],issues=[],stoneByView=new Map();
   const targets=generatedLevels.filter(l=>l.buildingId===proposal.buildingId&&generated(l));
-  const allWalls=targets.flatMap(l=>M.wallsFor(l,inventory,{includeProposed:true}));
+  const context=(options.occlusionLevels||targets).filter(l=>l.buildingId===proposal.buildingId),allWalls=context.flatMap(l=>M.wallsFor(l,inventory,{includeProposed:true}));
   for(const level of targets){
    const result={levelId:level.id,exteriorElements:[],reconstructedRoofs:[],wallZones:[],issues:[]};byLevel.push(result);
    const walls=M.wallsFor(level,inventory,{includeProposed:true});
@@ -498,9 +507,10 @@
     if(sourceSize.some((n,i)=>n!=null&&n!==[image.width,image.height][i])){result.issues.push('EXTERIOR_SOURCE_FRAME_MISMATCH');continue;}
     const registration=R.elevationRegistration(info,reviewed,inventory);
     if(!registration||![registration.sx,registration.sz].every(n=>finite(n)&&n>0)){result.issues.push('EXTERIOR_REGISTRATION_UNRESOLVED');continue;}
+    if(options.wallZonesOnly&&(!registration.levelBand||registration.levelBand.levelId!==level.id||registration.levelBand.sourceViewId!==view.id)){result.issues.push('EXTERIOR_LEVEL_BAND_UNRESOLVED');continue;}
     const masks=sourceMasks(info,view,image),labels=materialLabels(view);
     if(labels.length&&!stoneByView.has(view.id)){
-     const openings=targets.flatMap(l=>M.wallsFor(l,inventory,{includeProposed:true}).filter(w=>dot(w.normal,frame.n)>.999).flatMap(w=>projectedOpeningBoxes(w,l,registration,frame)));
+     const openings=context.flatMap(l=>M.wallsFor(l,inventory,{includeProposed:true}).filter(w=>dot(w.normal,frame.n)>.999).flatMap(w=>projectedOpeningBoxes(w,l,registration,frame)));
      stoneByView.set(view.id,irregularMasonry(image,info.envelope.box,R.readings(view),{masks:[...masks,...openings]}));
     }
     for(const wall of walls.filter(w=>dot(w.normal,frame.n)>.999)){
@@ -533,7 +543,9 @@
       if(observed.length>80){observed.splice(regularZones.length);result.issues.push('MASONRY_REGION_COMPLEXITY');}
       if(!observed.length)result.issues.push('MASONRY_EXTENT_UNRESOLVED');
      }
+     if(options.wallZonesOnly)for(const zone of observed)zone.provenance.levelBand={...copy(registration.levelBand),contourId:reviewed.contourId,floorSourceViewId:reviewed.sourceViewId,base:copy(reviewed.base),alignment:copy(reviewed.alignment)};
      result.wallZones.push(...observed);
+     if(options.wallZonesOnly)continue;
      const foundation=foundationCandidate(view,info,registration,wall,image);
      if(!foundation){if(wall.base===Math.min(...walls.filter(w=>dot(w.normal,frame.n)>.999).map(w=>w.base)))result.issues.push('FOUNDATION_VISIBLE_BAND_UNRESOLVED');continue;}
      const expected=registration.pixelZ(wall.base),difference=Math.abs(foundation.box[1]-expected);
@@ -550,12 +562,43 @@
     }
    }
   }
-  canopyColumns(proposal,inventory,images,reviewed,targets,byLevel);
-  const flat=FlatRoofs?.build(proposal,inventory,images,reviewed,targets);
+  if(!options.wallZonesOnly)canopyColumns(proposal,inventory,images,reviewed,targets,byLevel);
+  const flat=!options.wallZonesOnly&&FlatRoofs?.build(proposal,inventory,images,reviewed,targets);
   for(const detail of flat?.byLevel||[]){const target=byLevel.find(l=>l.levelId===detail.levelId);if(!target)throw Error('FLAT_ENTRY_LEVEL_MISMATCH');target.reconstructedRoofs.push(...detail.reconstructedRoofs);target.exteriorElements.push(...detail.exteriorElements);target.issues.push(...detail.issues);}
   issues.push(...(flat?.issues||[]));
   for(const result of byLevel){physicalDuplicates(result);result.roofProposals=result.reconstructedRoofs;result.issues=[...new Set(result.issues)];issues.push(...result.issues);}
   return {version:1,byLevel,issues:[...new Set(issues)],complete:false,status:byLevel.some(l=>l.exteriorElements.length||l.wallZones.length||l.reconstructedRoofs.length)?'partial-proposal':'unresolved'};
  }
- return Object.freeze({version:1,build,entryBeamFace,entryRoofStroke,subtractBoxes,masonryHatches,irregularMasonry,stonePolygons,materialLabels,writtenThickness,thickness});
+ // Multi-level cladding consumes the registered contours, never a whole-house
+ // height copied onto each storey. Assemblies need their own level/depth match
+ // and deliberately do not enter this path. Call before the first save only.
+ function buildRegisteredWallZones(inventory,buildingId,images,generatedLevels=[]){
+  const byLevel=[],eligible=[],issues=[],same=(a,b)=>JSON.stringify(a)===JSON.stringify(b),known=inventory.levels.filter(l=>l.buildingId===buildingId);
+  const source=(id,kind)=>inventory.views.find(v=>v.id===id&&v.buildingId===buildingId&&(!kind||v.kind===kind));
+  for(const level of generatedLevels.filter(l=>l.buildingId===buildingId)){
+   const result={levelId:level.id,exteriorElements:[],reconstructedRoofs:[],wallZones:[],issues:[]};byLevel.push(result);
+   if(level.geometryRevision||level.wallZones?.length||Object.keys(level.wallFinishes||{}).length||(level.contours||[]).some(c=>c.status==='confirmed')){result.issues.push('EXTERIOR_EXISTING_LEVEL_PRESERVED');continue;}
+   if(!generated(level)){result.issues.push('EXTERIOR_LEVEL_REGISTRATION_UNRESOLVED');continue;}
+   const contour=level.contours?.length===1&&level.contours[0],proposal=level.reconstruction?.proposal,reg=contour?.levelRegistration,a=contour?.alignment,b=contour?.base;
+   const original=known.find(l=>l.id===level.id),floor=contour&&source(contour.sourceViewId,'floor'),reference=source(reg?.xy?.referenceSourceViewId,'floor');
+   const valid=original?.sourceLevel===level.sourceLevel&&floor?.levelId===level.sourceLevel&&reference&&reg?.status==='proposed'&&reg.sourceLevel===level.sourceLevel&&reg.xy?.status==='proposed'&&reg.z?.status==='proposed'&&
+    reg.xy.sourceViewId===contour.sourceViewId&&a?.sourceViewId===contour.sourceViewId&&a.referenceSourceViewId===reference.id&&a.kind==='source-labelled-grid-registration'&&
+    same(a,reg.alignment)&&same(a,reg.xy.alignment)&&same(b,reg.base)&&same(b,reg.z.base)&&finite(reg.xy.scaleUsed)&&Math.abs(reg.xy.scaleUsed-M.scale(contour))<1e-9&&
+    known.some(l=>l.id===b.referenceLevelId)&&b.references?.length&&b.references.every(r=>source(r.sourceViewId,'elevation')&&same(r.sourceFrame,source(r.sourceViewId).frame))&&
+    proposal?.levelId===level.id&&proposal.buildingId===buildingId&&proposal.draft&&['points','reference','height','base','alignment'].every(key=>same(proposal.draft[key],contour[key]))&&
+    !M.validateDraft(contour,inventory,level).length;
+   if(!valid){result.issues.push('EXTERIOR_LEVEL_REGISTRATION_UNRESOLVED');continue;}
+   eligible.push({level,contour,proposal,result,frame:[reference.id,b.referenceLevelId].join('|')});
+  }
+  // Never project a wall from an unrelated XY/Z origin as an occluder. A
+  // disagreement keeps every affected source region unresolved, not blended.
+  if(new Set(eligible.map(e=>e.frame)).size>1)for(const e of eligible)e.result.issues.push('EXTERIOR_LEVEL_FRAME_CONFLICT');
+  else for(const e of eligible){
+   const output=build(e.proposal,inventory,images,e.contour,[e.level],{wallZonesOnly:true,occlusionLevels:eligible.map(item=>item.level)}),detail=output.byLevel.find(l=>l.levelId===e.level.id);
+   if(detail)Object.assign(e.result,detail);
+  }
+  for(const result of byLevel)issues.push(...result.issues);
+  return {version:1,byLevel,issues:[...new Set(issues)],complete:false,status:byLevel.some(l=>l.wallZones.length)?'partial-proposal':'unresolved'};
+ }
+ return Object.freeze({version:1,build,buildRegisteredWallZones,entryBeamFace,entryRoofStroke,subtractBoxes,masonryHatches,irregularMasonry,stonePolygons,materialLabels,writtenThickness,thickness});
 });

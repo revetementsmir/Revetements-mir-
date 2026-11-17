@@ -74,6 +74,7 @@ jobs:
           node tests/mir-studio-native-line-consumer.cjs
           node tests/mir-studio-elevation-grid.cjs
           node tests/mir-studio-level-datum-scale.cjs
+          node tests/mir-studio-local-datum-calibration.cjs
           node tests/mir-studio-datum-frame.cjs
           node tests/mir-studio-metric-registration.cjs
           node tests/mir-studio-multilevel-pipeline.cjs
@@ -88,16 +89,23 @@ jobs:
           node tests/mir-studio-exterior-reconstruction.cjs
           node tests/mir-studio-exterior-integration.cjs
           node tests/mir-studio-irregular-masonry.cjs
+          node tests/mir-studio-registered-wall-zones.cjs
+          node tests/mir-studio-masonry-reading-scope.cjs
           node tests/mir-studio-entry-elements.cjs
           node tests/mir-studio-entry-assemblies.cjs
           node tests/mir-studio-entry-profile-vision.cjs
           node tests/mir-studio-floor-thin-lines.cjs
           node tests/mir-studio-door-boundary.cjs
+          node tests/mir-studio-door-corner.cjs
           node tests/mir-studio-sliding-boundary.cjs
           node tests/mir-studio-framed-wall-network.cjs
+          node tests/mir-studio-offset-wall-network.cjs
           node tests/mir-studio-floor-opening-evidence.cjs
           node tests/mir-studio-opening-pane-evidence.cjs
+          node tests/mir-studio-opening-cell-context.cjs
+          node tests/mir-studio-source-opening-type.cjs
           node tests/mir-studio-wall-contrast.cjs
+          node tests/mir-studio-wall-top-guide.cjs
           node tests/mir-studio-elevation-document-frame.cjs
           node tests/mir-studio-fragmented-openings.cjs
           node tests/mir-studio-reading-priority.cjs

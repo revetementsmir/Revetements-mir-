@@ -582,3 +582,44 @@ now reports an explicit failure when an observed running conversion returns to
 idle without a persisted terminal report; it cannot turn that state into a
 successful conversion. A fresh original-source run is still required after
 these corrections.
+
+## Seven fresh imports — 202d4f1, rejected C7 regression
+
+All seven originals were imported again through the real form using immutable
+runtime `202d4f180082e86db13883a78a7f3fcfed377807`. All 48 pages and 46 views
+were imported. The native-reading transaction failure is corrected, but the
+result is still **zero certified complete models, two partial models and five
+empty scenes**. C7 regresses from its earlier partial model to no model. This
+checkpoint is not accepted as a faithful reconstruction delivery.
+
+| Case | Pages / views | Walls / openings / root roofs | Actual outcome | Seconds |
+| --- | --- | --- | --- | ---: |
+| C1 | 5 / 5 | 0 / 0 / 0 | Boundary support unresolved; reserved from rule tuning | 89.635 |
+| C2 | 5 / 5 | 0 / 0 / 0 | Scale recovered; false wall-top association creates a height conflict | 96.398 |
+| C3 | 5 / 5 | 15 / 15 / 3 | Partial, ten source masonry regions; workflow passes | 145.475 |
+| C4 | 5 / 5 | 8 / 15 / 1 | Partial; two wall-texture cells misclassified as windows; workflow passes | 137.071 |
+| C5 | 5 / 5 | 0 / 0 / 0 | Boundary support unresolved | 112.714 |
+| C6 | 6 / 10 | 0 / 0 / 0 | House height unknown; shed remains separate | 96.833 |
+| C7 | 17 / 11 | 0 / 0 / 0 | Regression: reference conflicts on levels 0/2, vertical datum conflicts on levels 1/3 | 583.832 |
+
+C3 and C4 pass four angles, finish selection/confirmation, unchanged geometry
+and choices after reopen, and six FR/EN viewports. Those renders were opened
+and compared with the original source views. C3 masonry remains fragmentary;
+foundation and steps are absent, and roof junctions still require comparison.
+C4 lacks its entrance roof, has an isolated column, and retains false opening
+proposals. Its upper-only source never becomes a confirmed supplied ground
+floor. These are incomplete models despite the successful persistence tests.
+
+C7 imports in 461.287 seconds and converts in 122.205 seconds. Its visible
+refusal capture was opened. No C7 rotation, finish or reopen success is claimed
+on this head; the empty model fails the unchanged recipe requirements. The
+earlier `dd63c82` C7 workflow remains a historical partial result only.
+
+Both runs serve the 392 assets matching this exact commit. All 46 persisted
+JPEG exports pass byte-hash, MIME, dimension, frame and permission checks.
+Private visual review opens all four angles and six viewports of C3/C4 and the
+failed cases' terminal captures. No physical-device certification is implied.
+All 16 GitHub workflows succeed, including [Studio run 44113627273](https://github.com/revetementsmir/Revetements-mir-/actions/runs/44113627273).
+That green CI does not override the real C7 regression or the visible geometry
+errors. Subsequent diagnostic replays are recorded privately and must not be
+substituted for a new form-import recipe.
