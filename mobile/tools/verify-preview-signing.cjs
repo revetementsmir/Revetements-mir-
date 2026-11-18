@@ -13,11 +13,17 @@ function readSigner(output, expected) {
   return fingerprint(digests[0][1]);
 }
 function readPackage(output, expectedCode, instrumentation = false) {
-  const match = output.match(/^package: name='([^']+)' versionCode='(\d+)' versionName='([^']*)'/m);
+  // AAPT emits an empty versionCode when an instrumentation manifest has none.
+  // Keep that absence explicit; it must never pass as a user-facing APK version.
+  const match = output.match(/^package: name='([^']+)' versionCode='(\d*)' versionName='([^']*)'/m);
   const expectedId = APPLICATION_ID + (instrumentation ? '.test' : '');
-  if (!match || match[1] !== expectedId || (expectedCode !== null && Number(match[2]) !== expectedCode)) throw Error('Identité ou version de l’APK MIR Aperçu inattendue.');
+  const versionCode = match && match[2] !== '' ? Number(match[2]) : null;
+  if (!match || match[1] !== expectedId || (!instrumentation && versionCode === null) || (expectedCode !== null && versionCode !== expectedCode)) {
+    const observed = match ? match[1] + ', versionCode=' + (match[2] || '(absent)') : 'en-tête AAPT non reconnu';
+    throw Error('Identité ou version de l’APK MIR Aperçu inattendue : attendu ' + expectedId + (expectedCode === null ? '' : ', versionCode=' + expectedCode) + '; reçu ' + observed + '.');
+  }
   if (!instrumentation && !/^application-label:'MIR TEST Aperçu'\s*$/m.test(output)) throw Error('Nom du lanceur MIR TEST Aperçu absent.');
-  return {applicationId: match[1], versionCode: Number(match[2]), versionName: match[3]};
+  return {applicationId: match[1], versionCode, versionName: match[3]};
 }
 function verifyOne(file, expectedCode, expected, tools, instrumentation = false) {
   const signature = spawnSync(path.join(tools, 'apksigner'), ['verify', '--verbose', '--print-certs', file], {encoding: 'utf8'});
@@ -25,7 +31,9 @@ function verifyOne(file, expectedCode, expected, tools, instrumentation = false)
   const certificateSha256 = readSigner(signature.stdout, expected);
   const manifest = spawnSync(path.join(tools, 'aapt'), ['dump', 'badging', file], {encoding: 'utf8'});
   if (manifest.status !== 0) throw Error('Lecture du manifeste de l’APK MIR Aperçu refusée.');
-  const identity = readPackage(manifest.stdout, expectedCode, instrumentation);
+  let identity;
+  try { identity = readPackage(manifest.stdout, expectedCode, instrumentation); }
+  catch (error) { throw Error(path.basename(file) + ' : ' + error.message); }
   return {...identity, file: path.basename(file), certificateSha256, apkSha256: crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'), cryptographicVerification: true};
 }
 function verify(env, args) {

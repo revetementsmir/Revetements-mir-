@@ -45,6 +45,17 @@ test('the delivery package cannot be confused with the previous installation or 
   assert.throws(() => readPackage(instrumentation, 130006));
 });
 
+test('an unversioned instrumentation APK is valid while delivery APKs still require their exact version', () => {
+  const output = "package: name='" + appId + ".test' versionCode='' versionName='' platformBuildVersionName='16'\n";
+  assert.deepEqual(readPackage(output, null, true), {applicationId: appId + '.test', versionCode: null, versionName: ''});
+  assert.throws(() => readPackage(output, 130006));
+  const unversionedApp = output.replace(appId + '.test', appId) + "application-label:'MIR TEST Aperçu'\n";
+  assert.throws(() => readPackage(unversionedApp, 130006));
+  assert.throws(() => readPackage(unversionedApp, null));
+  assert.throws(() => readPackage(output.replace("versionCode=''", "versionCode='not-a-number'"), null, true));
+  assert.throws(() => readPackage(output.replace(appId + '.test', 'ca.revetementsmir.equipe.test.test'), null, true));
+});
+
 test('cleanup is restricted to the private signing directory of this runner', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'mir-preview-cleanup-test-'));
   try {
