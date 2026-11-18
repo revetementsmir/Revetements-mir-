@@ -1,0 +1,310 @@
+{
+  "generatedAt": "2026-11-18T13:12:42.226Z",
+  "testSha256": "1296b1a192e26413fbf10e3e784279c70418ae73121db426e1741066adb88b8f",
+  "checks": [
+    {
+      "width": 1440,
+      "passed": true,
+      "input": "Native mouse click",
+      "svgCandidateCount": 623,
+      "svg": {
+        "before": {
+          "kind": "zone",
+          "id": "pignon_gauche"
+        },
+        "after": {
+          "kind": "zone",
+          "id": "pignon_droit"
+        },
+        "point": {
+          "id": "pignon_droit",
+          "x": 877.546875,
+          "y": 245,
+          "source": [
+            1618.5896832191784,
+            425.5479452054794
+          ]
+        },
+        "camera": {
+          "angle": 28,
+          "elevation": 22,
+          "zoom": 1
+        },
+        "geometrySha256": "87d9b2e07e0789003b0bde531048610f30846222af355442fb0948e0886a7fb9",
+        "capture": "svg-zone-1440.png"
+      },
+      "canvas": {
+        "before": {
+          "kind": "zone",
+          "id": "pignon_droit"
+        },
+        "after": {
+          "kind": "zone",
+          "id": "pignon_gauche"
+        },
+        "point": {
+          "id": "pignon_gauche",
+          "x": 621.473664856857,
+          "y": 254.55113292583613,
+          "source": [
+            592.2198202054797,
+            425.5479452054794
+          ],
+          "hit": {
+            "surfaceId": "front-left",
+            "type": "wall",
+            "role": null,
+            "view": "front",
+            "screenPoint": [
+              586.9669270920247,
+              84.55113292583613
+            ],
+            "renderId": 3,
+            "uv": [
+              0.12340323543801118,
+              0.07430845124019408
+            ],
+            "sourcePoint": [
+              592.21982020548,
+              425.5479452054793
+            ]
+          }
+        },
+        "camera": {
+          "angle": 28,
+          "elevation": 22,
+          "zoom": 1
+        },
+        "geometrySha256": "87d9b2e07e0789003b0bde531048610f30846222af355442fb0948e0886a7fb9",
+        "capture": "canvas-zone-1440.png"
+      },
+      "allOtherStateUnchanged": true,
+      "zoneSelectSynchronized": true,
+      "canvasIdentityPreserved": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "mouse",
+          "x": 877.546875,
+          "y": 245,
+          "target": "pignon_droit"
+        },
+        {
+          "type": "pointerup",
+          "trusted": true,
+          "pointerType": "mouse",
+          "x": 877.546875,
+          "y": 245,
+          "target": "pignon_droit"
+        },
+        {
+          "type": "click",
+          "trusted": true,
+          "pointerType": "mouse",
+          "x": 877,
+          "y": 245,
+          "target": "pignon_droit"
+        },
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "mouse",
+          "x": 621.4736938476562,
+          "y": 254.55113220214844,
+          "target": "three-canvas"
+        },
+        {
+          "type": "pointerup",
+          "trusted": true,
+          "pointerType": "mouse",
+          "x": 621.4736938476562,
+          "y": 254.55113220214844,
+          "target": "three-canvas"
+        },
+        {
+          "type": "click",
+          "trusted": true,
+          "pointerType": "mouse",
+          "x": 621,
+          "y": 254,
+          "target": "three-canvas"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "passed": true,
+      "input": "Native CDP touch, 70 ms contact",
+      "svgCandidateCount": 1192,
+      "svg": {
+        "before": {
+          "kind": "zone",
+          "id": "pignon_gauche"
+        },
+        "after": {
+          "kind": "zone",
+          "id": "pignon_droit"
+        },
+        "point": {
+          "id": "pignon_droit",
+          "x": 302,
+          "y": 380.9375,
+          "source": [
+            1631.447204968944,
+            421.304347826087
+          ]
+        },
+        "camera": {
+          "angle": 28,
+          "elevation": 22,
+          "zoom": 1
+        },
+        "geometrySha256": "87d9b2e07e0789003b0bde531048610f30846222af355442fb0948e0886a7fb9",
+        "capture": "svg-zone-390.png"
+      },
+      "canvas": {
+        "before": {
+          "kind": "zone",
+          "id": "pignon_droit"
+        },
+        "after": {
+          "kind": "zone",
+          "id": "pignon_gauche"
+        },
+        "point": {
+          "id": "pignon_gauche",
+          "x": 134.0173926574484,
+          "y": 388.35940876884956,
+          "source": [
+            587.9689440993789,
+            421.304347826087
+          ],
+          "hit": {
+            "surfaceId": "front-left",
+            "type": "wall",
+            "role": null,
+            "view": "front",
+            "screenPoint": [
+              120.0173926574484,
+              95.42190876884956
+            ],
+            "renderId": 3,
+            "uv": [
+              0.12042643144214213,
+              0.06931144099844329
+            ],
+            "sourcePoint": [
+              587.968944099379,
+              421.30434782608705
+            ]
+          }
+        },
+        "camera": {
+          "angle": 28,
+          "elevation": 22,
+          "zoom": 1
+        },
+        "geometrySha256": "87d9b2e07e0789003b0bde531048610f30846222af355442fb0948e0886a7fb9",
+        "capture": "canvas-zone-390.png"
+      },
+      "allOtherStateUnchanged": true,
+      "zoneSelectSynchronized": true,
+      "canvasIdentityPreserved": true,
+      "events": [
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "touch",
+          "x": 302,
+          "y": 380.9375,
+          "target": "pignon_droit"
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "pointerType": null,
+          "x": 302,
+          "y": 380.9375,
+          "target": "pignon_droit"
+        },
+        {
+          "type": "pointerup",
+          "trusted": true,
+          "pointerType": "touch",
+          "x": 302,
+          "y": 380.9375,
+          "target": "pignon_droit"
+        },
+        {
+          "type": "touchend",
+          "trusted": true,
+          "pointerType": null,
+          "x": 302,
+          "y": 380.9375,
+          "target": "pignon_droit"
+        },
+        {
+          "type": "click",
+          "trusted": true,
+          "pointerType": "touch",
+          "x": 302,
+          "y": 381,
+          "target": "pignon_droit"
+        },
+        {
+          "type": "pointerdown",
+          "trusted": true,
+          "pointerType": "touch",
+          "x": 134.01739501953125,
+          "y": 388.3594055175781,
+          "target": "three-canvas"
+        },
+        {
+          "type": "touchstart",
+          "trusted": true,
+          "pointerType": null,
+          "x": 134.01739501953125,
+          "y": 388.3594055175781,
+          "target": "three-canvas"
+        },
+        {
+          "type": "pointerup",
+          "trusted": true,
+          "pointerType": "touch",
+          "x": 134.01739501953125,
+          "y": 388.3594055175781,
+          "target": "three-canvas"
+        },
+        {
+          "type": "touchend",
+          "trusted": true,
+          "pointerType": null,
+          "x": 134.01739501953125,
+          "y": 388.3594055175781,
+          "target": "three-canvas"
+        },
+        {
+          "type": "click",
+          "trusted": true,
+          "pointerType": "touch",
+          "x": 134,
+          "y": 388,
+          "target": "three-canvas"
+        }
+      ]
+    }
+  ],
+  "blocked": [],
+  "errors": [],
+  "httpErrors": [],
+  "browser": "155.0.8059.79",
+  "sourceSha256": {
+    "mir-studio-03.js": "79905d9d42691035bc1eee735e63a5a6c7d99719669156ca537ef41b04cc5714",
+    "mir-studio-03.css": "1098693b3f10c204bbf47ee8597b827071982826476176c012df5feffbf49d8b",
+    "plan-app.js": "b951bc6e51a77db3d5545734ffed7686ab784dd05fd2f5c6d8df2e938390ff6c",
+    "plan-3d.js": "d8381fc28350bd2990c26be787f9ff2cc1d3462a04d6d53dae3296ddfcbbf5ad",
+    "studio-features.js": "0cde88ec3cca705229b3822a09a7a850f7f845e096db7f7b969fc7e876ec1259"
+  },
+  "passed": true
+}

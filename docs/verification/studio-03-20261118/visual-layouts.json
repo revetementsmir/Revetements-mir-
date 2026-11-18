@@ -1,0 +1,1152 @@
+[
+  {
+    "width": 1440,
+    "height": 900,
+    "lang": "fr-CA",
+    "filename": "/tmp/mir-studio03-1440-fr-CA.png",
+    "errors": [],
+    "scroll": [
+      1440,
+      900
+    ],
+    "rects": {
+      ".studio-intro": {
+        "x": 34.546875,
+        "y": 78,
+        "w": 1370.90625,
+        "h": 50,
+        "display": "flex"
+      },
+      ".part-nav": {
+        "x": 34.546875,
+        "y": 128,
+        "w": 1370.90625,
+        "h": 42,
+        "display": "grid"
+      },
+      "#stage": {
+        "x": 34.546875,
+        "y": 170,
+        "w": 1370.90625,
+        "h": 370,
+        "display": "block"
+      },
+      "#three-canvas": {
+        "x": 34.546875,
+        "y": 170,
+        "w": 1370.90625,
+        "h": 370,
+        "display": "block"
+      },
+      ".mir-studio-03-view-tools": {
+        "x": 34.546875,
+        "y": 540,
+        "w": 1370.90625,
+        "h": 36,
+        "display": "flex"
+      },
+      ".mir-studio-03-view-info": {
+        "x": 34.546875,
+        "y": 576,
+        "w": 1370.90625,
+        "h": 32,
+        "display": "flex"
+      },
+      ".mir-studio-03-band": {
+        "x": 34.546875,
+        "y": 608,
+        "w": 1370.90625,
+        "h": 189.390625,
+        "display": "grid"
+      },
+      "#mir-studio-03-zone-group": {
+        "x": 34.546875,
+        "y": 620,
+        "w": 325.625,
+        "h": 122.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-product-group": {
+        "x": 384.171875,
+        "y": 620,
+        "w": 427.40625,
+        "h": 128.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-palette-group": {
+        "x": 835.578125,
+        "y": 620,
+        "w": 569.875,
+        "h": 119.59375,
+        "display": "block"
+      },
+      ".mir-studio-03-actions": {
+        "x": 1012.671875,
+        "y": 797.390625,
+        "w": 392.78125,
+        "h": 56,
+        "display": "flex"
+      },
+      "#mir-studio-03-advanced": {
+        "x": 34.546875,
+        "y": 806.09375,
+        "w": 978.125,
+        "h": 38.59375,
+        "display": "block"
+      },
+      ".mir-signature-footer": {
+        "x": 34.546875,
+        "y": 853.390625,
+        "w": 1370.875,
+        "h": 46,
+        "display": "grid"
+      }
+    },
+    "labels": [
+      {
+        "text": "Fabricant",
+        "color": "rgb(198, 195, 186)"
+      },
+      {
+        "text": "Gamme et profil",
+        "color": "rgb(198, 195, 186)"
+      }
+    ],
+    "canvas": true
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "lang": "en-CA",
+    "filename": "/tmp/mir-studio03-1440-en-CA.png",
+    "errors": [],
+    "scroll": [
+      1440,
+      900
+    ],
+    "rects": {
+      ".studio-intro": {
+        "x": 34.546875,
+        "y": 78,
+        "w": 1370.90625,
+        "h": 50,
+        "display": "flex"
+      },
+      ".part-nav": {
+        "x": 34.546875,
+        "y": 128,
+        "w": 1370.90625,
+        "h": 42,
+        "display": "grid"
+      },
+      "#stage": {
+        "x": 34.546875,
+        "y": 170,
+        "w": 1370.90625,
+        "h": 370,
+        "display": "block"
+      },
+      "#three-canvas": {
+        "x": 34.546875,
+        "y": 170,
+        "w": 1370.90625,
+        "h": 370,
+        "display": "block"
+      },
+      ".mir-studio-03-view-tools": {
+        "x": 34.546875,
+        "y": 540,
+        "w": 1370.90625,
+        "h": 36,
+        "display": "flex"
+      },
+      ".mir-studio-03-view-info": {
+        "x": 34.546875,
+        "y": 576,
+        "w": 1370.90625,
+        "h": 32,
+        "display": "flex"
+      },
+      ".mir-studio-03-band": {
+        "x": 34.546875,
+        "y": 608,
+        "w": 1370.90625,
+        "h": 189.390625,
+        "display": "grid"
+      },
+      "#mir-studio-03-zone-group": {
+        "x": 34.546875,
+        "y": 620,
+        "w": 325.625,
+        "h": 122.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-product-group": {
+        "x": 384.171875,
+        "y": 620,
+        "w": 427.40625,
+        "h": 128.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-palette-group": {
+        "x": 835.578125,
+        "y": 620,
+        "w": 569.875,
+        "h": 119.59375,
+        "display": "block"
+      },
+      ".mir-studio-03-actions": {
+        "x": 1045.703125,
+        "y": 797.390625,
+        "w": 359.75,
+        "h": 56,
+        "display": "flex"
+      },
+      "#mir-studio-03-advanced": {
+        "x": 34.546875,
+        "y": 806.09375,
+        "w": 1011.15625,
+        "h": 38.59375,
+        "display": "block"
+      },
+      ".mir-signature-footer": {
+        "x": 34.546875,
+        "y": 853.390625,
+        "w": 1370.875,
+        "h": 46,
+        "display": "grid"
+      }
+    },
+    "labels": [
+      {
+        "text": "Manufacturer",
+        "color": "rgb(198, 195, 186)"
+      },
+      {
+        "text": "Product line and profile",
+        "color": "rgb(198, 195, 186)"
+      }
+    ],
+    "canvas": true
+  },
+  {
+    "width": 1280,
+    "height": 800,
+    "lang": "fr-CA",
+    "filename": "/tmp/mir-studio03-1280-fr-CA.png",
+    "errors": [],
+    "scroll": [
+      1280,
+      889
+    ],
+    "rects": {
+      ".studio-intro": {
+        "x": 30.71875,
+        "y": 78,
+        "w": 1218.5625,
+        "h": 50,
+        "display": "flex"
+      },
+      ".part-nav": {
+        "x": 30.71875,
+        "y": 128,
+        "w": 1218.5625,
+        "h": 42,
+        "display": "grid"
+      },
+      "#stage": {
+        "x": 30.71875,
+        "y": 170,
+        "w": 1218.5625,
+        "h": 360,
+        "display": "block"
+      },
+      "#three-canvas": {
+        "x": 30.71875,
+        "y": 170,
+        "w": 1218.5625,
+        "h": 360,
+        "display": "block"
+      },
+      ".mir-studio-03-view-tools": {
+        "x": 30.71875,
+        "y": 530,
+        "w": 1218.5625,
+        "h": 36,
+        "display": "flex"
+      },
+      ".mir-studio-03-view-info": {
+        "x": 30.71875,
+        "y": 566,
+        "w": 1218.5625,
+        "h": 32,
+        "display": "flex"
+      },
+      ".mir-studio-03-band": {
+        "x": 30.71875,
+        "y": 598,
+        "w": 1218.5625,
+        "h": 189.390625,
+        "display": "grid"
+      },
+      "#mir-studio-03-zone-group": {
+        "x": 30.71875,
+        "y": 610,
+        "w": 288.125,
+        "h": 122.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-product-group": {
+        "x": 342.84375,
+        "y": 610,
+        "w": 378.1875,
+        "h": 128.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-palette-group": {
+        "x": 745.03125,
+        "y": 610,
+        "w": 504.234375,
+        "h": 119.59375,
+        "display": "block"
+      },
+      ".mir-studio-03-actions": {
+        "x": 856.5,
+        "y": 787.390625,
+        "w": 392.78125,
+        "h": 56,
+        "display": "flex"
+      },
+      "#mir-studio-03-advanced": {
+        "x": 30.71875,
+        "y": 796.09375,
+        "w": 825.78125,
+        "h": 38.59375,
+        "display": "block"
+      },
+      ".mir-signature-footer": {
+        "x": 30.71875,
+        "y": 843.390625,
+        "w": 1218.546875,
+        "h": 46,
+        "display": "grid"
+      }
+    },
+    "labels": [
+      {
+        "text": "Fabricant",
+        "color": "rgb(198, 195, 186)"
+      },
+      {
+        "text": "Gamme et profil",
+        "color": "rgb(198, 195, 186)"
+      }
+    ],
+    "canvas": true
+  },
+  {
+    "width": 1280,
+    "height": 800,
+    "lang": "en-CA",
+    "filename": "/tmp/mir-studio03-1280-en-CA.png",
+    "errors": [],
+    "scroll": [
+      1280,
+      889
+    ],
+    "rects": {
+      ".studio-intro": {
+        "x": 30.71875,
+        "y": 78,
+        "w": 1218.5625,
+        "h": 50,
+        "display": "flex"
+      },
+      ".part-nav": {
+        "x": 30.71875,
+        "y": 128,
+        "w": 1218.5625,
+        "h": 42,
+        "display": "grid"
+      },
+      "#stage": {
+        "x": 30.71875,
+        "y": 170,
+        "w": 1218.5625,
+        "h": 360,
+        "display": "block"
+      },
+      "#three-canvas": {
+        "x": 30.71875,
+        "y": 170,
+        "w": 1218.5625,
+        "h": 360,
+        "display": "block"
+      },
+      ".mir-studio-03-view-tools": {
+        "x": 30.71875,
+        "y": 530,
+        "w": 1218.5625,
+        "h": 36,
+        "display": "flex"
+      },
+      ".mir-studio-03-view-info": {
+        "x": 30.71875,
+        "y": 566,
+        "w": 1218.5625,
+        "h": 32,
+        "display": "flex"
+      },
+      ".mir-studio-03-band": {
+        "x": 30.71875,
+        "y": 598,
+        "w": 1218.5625,
+        "h": 189.390625,
+        "display": "grid"
+      },
+      "#mir-studio-03-zone-group": {
+        "x": 30.71875,
+        "y": 610,
+        "w": 288.125,
+        "h": 122.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-product-group": {
+        "x": 342.84375,
+        "y": 610,
+        "w": 378.1875,
+        "h": 128.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-palette-group": {
+        "x": 745.03125,
+        "y": 610,
+        "w": 504.234375,
+        "h": 119.59375,
+        "display": "block"
+      },
+      ".mir-studio-03-actions": {
+        "x": 889.53125,
+        "y": 787.390625,
+        "w": 359.75,
+        "h": 56,
+        "display": "flex"
+      },
+      "#mir-studio-03-advanced": {
+        "x": 30.71875,
+        "y": 796.09375,
+        "w": 858.8125,
+        "h": 38.59375,
+        "display": "block"
+      },
+      ".mir-signature-footer": {
+        "x": 30.71875,
+        "y": 843.390625,
+        "w": 1218.546875,
+        "h": 46,
+        "display": "grid"
+      }
+    },
+    "labels": [
+      {
+        "text": "Manufacturer",
+        "color": "rgb(198, 195, 186)"
+      },
+      {
+        "text": "Product line and profile",
+        "color": "rgb(198, 195, 186)"
+      }
+    ],
+    "canvas": true
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "lang": "fr-CA",
+    "filename": "/tmp/mir-studio03-1920-fr-CA.png",
+    "errors": [],
+    "scroll": [
+      1920,
+      1080
+    ],
+    "rects": {
+      ".studio-intro": {
+        "x": 46,
+        "y": 78,
+        "w": 1828,
+        "h": 50,
+        "display": "flex"
+      },
+      ".part-nav": {
+        "x": 46,
+        "y": 128,
+        "w": 1828,
+        "h": 42,
+        "display": "grid"
+      },
+      "#stage": {
+        "x": 46,
+        "y": 170,
+        "w": 1828,
+        "h": 496,
+        "display": "block"
+      },
+      "#three-canvas": {
+        "x": 46,
+        "y": 170,
+        "w": 1828,
+        "h": 496,
+        "display": "block"
+      },
+      ".mir-studio-03-view-tools": {
+        "x": 46,
+        "y": 666,
+        "w": 1828,
+        "h": 36,
+        "display": "flex"
+      },
+      ".mir-studio-03-view-info": {
+        "x": 46,
+        "y": 702,
+        "w": 1828,
+        "h": 32,
+        "display": "flex"
+      },
+      ".mir-studio-03-band": {
+        "x": 46,
+        "y": 734,
+        "w": 1828,
+        "h": 189.390625,
+        "display": "grid"
+      },
+      "#mir-studio-03-zone-group": {
+        "x": 46,
+        "y": 746,
+        "w": 438.140625,
+        "h": 122.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-product-group": {
+        "x": 508.140625,
+        "y": 746,
+        "w": 575.078125,
+        "h": 128.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-palette-group": {
+        "x": 1107.21875,
+        "y": 746,
+        "w": 766.78125,
+        "h": 109.59375,
+        "display": "block"
+      },
+      ".mir-studio-03-actions": {
+        "x": 1481.21875,
+        "y": 923.390625,
+        "w": 392.78125,
+        "h": 56,
+        "display": "flex"
+      },
+      "#mir-studio-03-advanced": {
+        "x": 46,
+        "y": 932.09375,
+        "w": 1435.21875,
+        "h": 38.59375,
+        "display": "block"
+      },
+      ".mir-signature-footer": {
+        "x": 46,
+        "y": 979.390625,
+        "w": 1828,
+        "h": 46,
+        "display": "grid"
+      }
+    },
+    "labels": [
+      {
+        "text": "Fabricant",
+        "color": "rgb(198, 195, 186)"
+      },
+      {
+        "text": "Gamme et profil",
+        "color": "rgb(198, 195, 186)"
+      }
+    ],
+    "canvas": true
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "lang": "en-CA",
+    "filename": "/tmp/mir-studio03-1920-en-CA.png",
+    "errors": [],
+    "scroll": [
+      1920,
+      1080
+    ],
+    "rects": {
+      ".studio-intro": {
+        "x": 46,
+        "y": 78,
+        "w": 1828,
+        "h": 50,
+        "display": "flex"
+      },
+      ".part-nav": {
+        "x": 46,
+        "y": 128,
+        "w": 1828,
+        "h": 42,
+        "display": "grid"
+      },
+      "#stage": {
+        "x": 46,
+        "y": 170,
+        "w": 1828,
+        "h": 496,
+        "display": "block"
+      },
+      "#three-canvas": {
+        "x": 46,
+        "y": 170,
+        "w": 1828,
+        "h": 496,
+        "display": "block"
+      },
+      ".mir-studio-03-view-tools": {
+        "x": 46,
+        "y": 666,
+        "w": 1828,
+        "h": 36,
+        "display": "flex"
+      },
+      ".mir-studio-03-view-info": {
+        "x": 46,
+        "y": 702,
+        "w": 1828,
+        "h": 32,
+        "display": "flex"
+      },
+      ".mir-studio-03-band": {
+        "x": 46,
+        "y": 734,
+        "w": 1828,
+        "h": 189.390625,
+        "display": "grid"
+      },
+      "#mir-studio-03-zone-group": {
+        "x": 46,
+        "y": 746,
+        "w": 438.140625,
+        "h": 122.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-product-group": {
+        "x": 508.140625,
+        "y": 746,
+        "w": 575.078125,
+        "h": 128.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-palette-group": {
+        "x": 1107.21875,
+        "y": 746,
+        "w": 766.78125,
+        "h": 109.59375,
+        "display": "block"
+      },
+      ".mir-studio-03-actions": {
+        "x": 1514.25,
+        "y": 923.390625,
+        "w": 359.75,
+        "h": 56,
+        "display": "flex"
+      },
+      "#mir-studio-03-advanced": {
+        "x": 46,
+        "y": 932.09375,
+        "w": 1468.25,
+        "h": 38.59375,
+        "display": "block"
+      },
+      ".mir-signature-footer": {
+        "x": 46,
+        "y": 979.390625,
+        "w": 1828,
+        "h": 46,
+        "display": "grid"
+      }
+    },
+    "labels": [
+      {
+        "text": "Manufacturer",
+        "color": "rgb(198, 195, 186)"
+      },
+      {
+        "text": "Product line and profile",
+        "color": "rgb(198, 195, 186)"
+      }
+    ],
+    "canvas": true
+  },
+  {
+    "width": 834,
+    "height": 1112,
+    "lang": "fr-CA",
+    "filename": "/tmp/mir-studio03-834-fr-CA.png",
+    "errors": [],
+    "scroll": [
+      834,
+      1243
+    ],
+    "rects": {
+      ".studio-intro": {
+        "x": 20,
+        "y": 64,
+        "w": 794,
+        "h": 85.9375,
+        "display": "flex"
+      },
+      ".part-nav": {
+        "x": 20,
+        "y": 149.9375,
+        "w": 794,
+        "h": 44,
+        "display": "grid"
+      },
+      "#stage": {
+        "x": 20,
+        "y": 193.9375,
+        "w": 794,
+        "h": 380,
+        "display": "block"
+      },
+      "#three-canvas": {
+        "x": 20,
+        "y": 193.9375,
+        "w": 794,
+        "h": 380,
+        "display": "block"
+      },
+      ".mir-studio-03-view-tools": {
+        "x": 20,
+        "y": 573.9375,
+        "w": 794,
+        "h": 85,
+        "display": "flex"
+      },
+      ".mir-studio-03-view-info": {
+        "x": 20,
+        "y": 658.9375,
+        "w": 794,
+        "h": 35,
+        "display": "flex"
+      },
+      ".mir-studio-03-band": {
+        "x": 20,
+        "y": 693.9375,
+        "w": 794,
+        "h": 446.78125,
+        "display": "grid"
+      },
+      "#mir-studio-03-zone-group": {
+        "x": 20,
+        "y": 711.9375,
+        "w": 308.796875,
+        "h": 122.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-product-group": {
+        "x": 350.796875,
+        "y": 711.9375,
+        "w": 463.1875,
+        "h": 137.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-palette-group": {
+        "x": 20,
+        "y": 928.328125,
+        "w": 793.984375,
+        "h": 132.59375,
+        "display": "block"
+      },
+      ".mir-studio-03-actions": {
+        "x": 421.21875,
+        "y": 1140.71875,
+        "w": 392.78125,
+        "h": 56,
+        "display": "flex"
+      },
+      "#mir-studio-03-advanced": {
+        "x": 20,
+        "y": 1149.421875,
+        "w": 401.21875,
+        "h": 38.59375,
+        "display": "block"
+      },
+      ".mir-signature-footer": {
+        "x": 20,
+        "y": 1196.71875,
+        "w": 794,
+        "h": 46,
+        "display": "grid"
+      }
+    },
+    "labels": [
+      {
+        "text": "Fabricant",
+        "color": "rgb(198, 195, 186)"
+      },
+      {
+        "text": "Gamme et profil",
+        "color": "rgb(198, 195, 186)"
+      }
+    ],
+    "canvas": true
+  },
+  {
+    "width": 834,
+    "height": 1112,
+    "lang": "en-CA",
+    "filename": "/tmp/mir-studio03-834-en-CA.png",
+    "errors": [],
+    "scroll": [
+      834,
+      1243
+    ],
+    "rects": {
+      ".studio-intro": {
+        "x": 20,
+        "y": 64,
+        "w": 794,
+        "h": 85.9375,
+        "display": "flex"
+      },
+      ".part-nav": {
+        "x": 20,
+        "y": 149.9375,
+        "w": 794,
+        "h": 44,
+        "display": "grid"
+      },
+      "#stage": {
+        "x": 20,
+        "y": 193.9375,
+        "w": 794,
+        "h": 380,
+        "display": "block"
+      },
+      "#three-canvas": {
+        "x": 20,
+        "y": 193.9375,
+        "w": 794,
+        "h": 380,
+        "display": "block"
+      },
+      ".mir-studio-03-view-tools": {
+        "x": 20,
+        "y": 573.9375,
+        "w": 794,
+        "h": 85,
+        "display": "flex"
+      },
+      ".mir-studio-03-view-info": {
+        "x": 20,
+        "y": 658.9375,
+        "w": 794,
+        "h": 35,
+        "display": "flex"
+      },
+      ".mir-studio-03-band": {
+        "x": 20,
+        "y": 693.9375,
+        "w": 794,
+        "h": 446.78125,
+        "display": "grid"
+      },
+      "#mir-studio-03-zone-group": {
+        "x": 20,
+        "y": 711.9375,
+        "w": 308.796875,
+        "h": 122.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-product-group": {
+        "x": 350.796875,
+        "y": 711.9375,
+        "w": 463.1875,
+        "h": 137.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-palette-group": {
+        "x": 20,
+        "y": 928.328125,
+        "w": 793.984375,
+        "h": 132.59375,
+        "display": "block"
+      },
+      ".mir-studio-03-actions": {
+        "x": 454.25,
+        "y": 1140.71875,
+        "w": 359.75,
+        "h": 56,
+        "display": "flex"
+      },
+      "#mir-studio-03-advanced": {
+        "x": 20,
+        "y": 1149.421875,
+        "w": 434.25,
+        "h": 38.59375,
+        "display": "block"
+      },
+      ".mir-signature-footer": {
+        "x": 20,
+        "y": 1196.71875,
+        "w": 794,
+        "h": 46,
+        "display": "grid"
+      }
+    },
+    "labels": [
+      {
+        "text": "Manufacturer",
+        "color": "rgb(198, 195, 186)"
+      },
+      {
+        "text": "Product line and profile",
+        "color": "rgb(198, 195, 186)"
+      }
+    ],
+    "canvas": true
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "lang": "fr-CA",
+    "filename": "/tmp/mir-studio03-390-fr-CA.png",
+    "errors": [],
+    "scroll": [
+      390,
+      1738
+    ],
+    "rects": {
+      ".studio-intro": {
+        "x": 14,
+        "y": 64,
+        "w": 362,
+        "h": 141.9375,
+        "display": "block"
+      },
+      ".part-nav": {
+        "x": 14,
+        "y": 205.9375,
+        "w": 362,
+        "h": 87,
+        "display": "grid"
+      },
+      "#stage": {
+        "x": 14,
+        "y": 292.9375,
+        "w": 362,
+        "h": 320,
+        "display": "block"
+      },
+      "#three-canvas": {
+        "x": 14,
+        "y": 292.9375,
+        "w": 362,
+        "h": 320,
+        "display": "block"
+      },
+      ".mir-studio-03-view-tools": {
+        "x": 14,
+        "y": 612.9375,
+        "w": 362,
+        "h": 166.59375,
+        "display": "flex"
+      },
+      ".mir-studio-03-view-info": {
+        "x": 14,
+        "y": 779.53125,
+        "w": 362,
+        "h": 51.59375,
+        "display": "flex"
+      },
+      ".mir-studio-03-band": {
+        "x": 14,
+        "y": 885.125,
+        "w": 362,
+        "h": 682.375,
+        "display": "grid"
+      },
+      "#mir-studio-03-zone-group": {
+        "x": 14,
+        "y": 903.125,
+        "w": 362,
+        "h": 122.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-product-group": {
+        "x": 14,
+        "y": 1043.71875,
+        "w": 362,
+        "h": 141.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-palette-group": {
+        "x": 14,
+        "y": 1203.3125,
+        "w": 362,
+        "h": 223.59375,
+        "display": "block"
+      },
+      ".mir-studio-03-actions": {
+        "x": 14,
+        "y": 1567.5,
+        "w": 362,
+        "h": 67.59375,
+        "display": "flex"
+      },
+      "#mir-studio-03-advanced": {
+        "x": 14,
+        "y": 1635.09375,
+        "w": 362,
+        "h": 38.59375,
+        "display": "block"
+      },
+      ".mir-signature-footer": {
+        "x": 14,
+        "y": 1673.6875,
+        "w": 362,
+        "h": 64,
+        "display": "grid"
+      }
+    },
+    "labels": [
+      {
+        "text": "Fabricant",
+        "color": "rgb(198, 195, 186)"
+      },
+      {
+        "text": "Gamme et profil",
+        "color": "rgb(198, 195, 186)"
+      }
+    ],
+    "canvas": true
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "lang": "en-CA",
+    "filename": "/tmp/mir-studio03-390-en-CA.png",
+    "errors": [],
+    "scroll": [
+      390,
+      1732
+    ],
+    "rects": {
+      ".studio-intro": {
+        "x": 14,
+        "y": 64,
+        "w": 362,
+        "h": 141.9375,
+        "display": "block"
+      },
+      ".part-nav": {
+        "x": 14,
+        "y": 205.9375,
+        "w": 362,
+        "h": 91.375,
+        "display": "grid"
+      },
+      "#stage": {
+        "x": 14,
+        "y": 297.3125,
+        "w": 362,
+        "h": 320,
+        "display": "block"
+      },
+      "#three-canvas": {
+        "x": 14,
+        "y": 297.3125,
+        "w": 362,
+        "h": 320,
+        "display": "block"
+      },
+      ".mir-studio-03-view-tools": {
+        "x": 14,
+        "y": 617.3125,
+        "w": 362,
+        "h": 166.59375,
+        "display": "flex"
+      },
+      ".mir-studio-03-view-info": {
+        "x": 14,
+        "y": 783.90625,
+        "w": 362,
+        "h": 51.59375,
+        "display": "flex"
+      },
+      ".mir-studio-03-band": {
+        "x": 14,
+        "y": 889.5,
+        "w": 362,
+        "h": 682.375,
+        "display": "grid"
+      },
+      "#mir-studio-03-zone-group": {
+        "x": 14,
+        "y": 907.5,
+        "w": 362,
+        "h": 122.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-product-group": {
+        "x": 14,
+        "y": 1048.09375,
+        "w": 362,
+        "h": 141.59375,
+        "display": "grid"
+      },
+      ".mir-studio-03-palette-group": {
+        "x": 14,
+        "y": 1207.6875,
+        "w": 362,
+        "h": 223.59375,
+        "display": "block"
+      },
+      ".mir-studio-03-actions": {
+        "x": 14,
+        "y": 1571.875,
+        "w": 362,
+        "h": 58,
+        "display": "flex"
+      },
+      "#mir-studio-03-advanced": {
+        "x": 14,
+        "y": 1629.875,
+        "w": 362,
+        "h": 38.59375,
+        "display": "block"
+      },
+      ".mir-signature-footer": {
+        "x": 14,
+        "y": 1668.46875,
+        "w": 362,
+        "h": 64,
+        "display": "grid"
+      }
+    },
+    "labels": [
+      {
+        "text": "Manufacturer",
+        "color": "rgb(198, 195, 186)"
+      },
+      {
+        "text": "Product line and profile",
+        "color": "rgb(198, 195, 186)"
+      }
+    ],
+    "canvas": true
+  }
+]

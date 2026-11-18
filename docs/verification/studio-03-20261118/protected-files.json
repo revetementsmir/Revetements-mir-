@@ -1,0 +1,16 @@
+{
+  "baseline": "3d0eb311fc929b35fb97b4466ede2308633e141b",
+  "protectedFiles": 1651,
+  "permittedExistingFiles": [
+    "dist/plan.html",
+    "dist/mir-client-workspaces.js"
+  ],
+  "engines": {
+    "plan-app.js": "b951bc6e51a77db3d5545734ffed7686ab784dd05fd2f5c6d8df2e938390ff6c",
+    "plan-3d.js": "d8381fc28350bd2990c26be787f9ff2cc1d3462a04d6d53dae3296ddfcbbf5ad",
+    "plan-import.js": "7358cc1686b20921d96ba5fcff1a0efaae9d576f86c180282455e692921af0a9",
+    "project-store.js": "0b473afaad7ea73ad9aa0d5aec5630e5b7d5e2dcbd335419725fcc240f7ca539",
+    "studio-features.js": "0cde88ec3cca705229b3822a09a7a850f7f845e096db7f7b969fc7e876ec1259"
+  },
+  "productionChanges": false
+}

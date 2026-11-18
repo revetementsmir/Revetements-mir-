@@ -1,0 +1,42 @@
+{
+  "baseRevision": "3d0eb311fc929b35fb97b4466ede2308633e141b",
+  "cssSha256": "1098693b3f10c204bbf47ee8597b827071982826476176c012df5feffbf49d8b",
+  "cssFrozen": true,
+  "changeAfterFirstFreeze": {
+    "line": 95,
+    "before": "max-height:min(30svh,250px)",
+    "after": "max-height:clamp(120px,30svh,250px)",
+    "reason": "At 360×225 CSS pixels, the expanded colour palette was too short to fully show a focused colour tile. The minimum scrollable height now keeps the tile fully visible; normal page scrolling stays available."
+  },
+  "captureMetrics": "/tmp/mir-studio03-visual.json",
+  "visualInspections": [
+    "/tmp/mir-studio03-1440-en-CA.png",
+    "/tmp/mir-studio03-1280-fr-CA.png",
+    "/tmp/mir-studio03-1920-en-CA.png",
+    "/tmp/mir-studio03-834-en-CA.png",
+    "/tmp/mir-studio03-390-fr-CA.png",
+    "/tmp/mir-studio03-390-en-CA.png",
+    "/tmp/mir-studio03-phone-short-window-search.png",
+    "/tmp/mir-studio03-reflow-equivalent-400-percent-fixed-palette-focus.png"
+  ],
+  "findings": [
+    "Anthracite body and neutral grey stage; no side panels. Original rendered 3D model remains visible.",
+    "Manufacturer above product/profile; labels visible; original swatches preserve image, name and selected checkmark.",
+    "1440×900 fits the complete default view including footer; 1920×1080 also fits.",
+    "1280×800 content is 889 CSS pixels high and uses normal vertical scrolling, as accepted by root. Tablet and phone also use natural vertical scrolling.",
+    "No horizontal overflow or JavaScript errors in ten FR/EN viewport runs.",
+    "English interface labels visible. Official manufacturer colour/product names and stored zone names remain unchanged intentionally.",
+    "Phone 390×460: colour search, focused swatch, three export controls and estimate remain reachable. Nothing was submitted or exported.",
+    "640×450 reflow equivalent passes. 360×225 failed before the minimal height correction and passes afterwards; focus, entire tile, search and commands are reachable."
+  ],
+  "limitations": [
+    "Reduced CSS viewport tests approximate reflow at 200%/400%; browser chrome zoom was not exercised.",
+    "390×460 simulates space left by an on-screen keyboard; no physical Android keyboard was tested.",
+    "Visual review covers default facade state; functional QA of other categories and flows is owned by cart_estimate.",
+    "Screenshots predate only the final palette min-height correction, which affects expanded palettes below400px window height and does not change the ten default closed-palette views."
+  ],
+  "proofs": {
+    "beforeAccess": "/tmp/mir-studio03-access.json",
+    "afterSmallWindow": "/tmp/mir-studio03-access-fixed.json"
+  }
+}

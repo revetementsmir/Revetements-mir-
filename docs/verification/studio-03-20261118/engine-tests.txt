@@ -1,0 +1,27 @@
+MIR PDF : titres, cadrages multiples, cotes traçables et conflits vérifiés
+PASS Solage visible repéré sur deux élévations indépendantes
+✔ tests/mir-plan-sheet-detection.cjs (114.21192ms)
+MIR terrain, marches béton et repères PDF : 12 contrôles vérifiés
+✔ tests/mir-studio-grounds.cjs (49.818885ms)
+MIR interface plein écran, zoom tactile, terrain et caméra : contrôles réussis
+✔ tests/mir-studio-interactions.cjs (35.247443ms)
+PASS Le soubassement est tiré du polygone de maçonnerie du relevé MIR
+PASS Seuls les retours invisibles de face sont détachés
+PASS La hauteur des retours correspond au mur, sans translation Z
+PASS Deux sections détachées avec une brique à la même altitude
+PASS Aucune vue détachée si les retours de mur n’existent pas
+PASS Les vues originales avant et arrière ne sont pas remplacées
+PASS Les calculs d’affichage ne mutent ni plan, ni modèle, ni pièces
+PASS Une zone haute ou un petit accent ne crée pas un soubassement automatique
+PASS Les coupes d’onglet sont communes aux rives de pignon et à leurs retours
+PASS Corniches uniquement aux pieds des pignons et solin au joint du toit bas
+MIR Studio murs détachés: 10 scénarios vérifiés
+✔ tests/mir-studio-wall-sections.cjs (57.487993ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 268.846852

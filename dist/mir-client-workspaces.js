@@ -4,6 +4,8 @@
  'use strict';
  const file=location.pathname.split('/').pop(),params=new URLSearchParams(location.search);
  if(!['chantier.html','plan.html'].includes(file))return;
+ // The dedicated client Studio layout owns presentation only; other contexts retain this pager.
+ if(file==='plan.html'&&document.body.dataset.mirStudioLayout==='materials-bottom')return;
  if(file==='plan.html'&&(params.has('embed')||document.body.classList.contains('embed-studio')))return;
  const $=(selector,root=document)=>root.querySelector(selector);
  const all=(selector,root=document)=>Array.from(root.querySelectorAll(selector));

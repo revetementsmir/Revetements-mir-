@@ -1,0 +1,52 @@
+[
+  {
+    "name": "reflow-equivalent-400-percent-fixed",
+    "width": 360,
+    "height": 225,
+    "errors": [],
+    "focused": {
+      "selector": "mir-studio-03-palette-search",
+      "visible": true,
+      "rect": {
+        "x": 103.703125,
+        "y": 14.28125,
+        "w": 242.296875,
+        "h": 40
+      }
+    },
+    "swatch": {
+      "name": "Noir minuit",
+      "focused": true,
+      "visible": true,
+      "insidePalette": true,
+      "paletteHeight": 118,
+      "paletteScrollHeight": 590,
+      "paletteScrollTop": 472
+    },
+    "access": [
+      {
+        "text": "Project JSON",
+        "visible": true
+      },
+      {
+        "text": "SVG view ↗",
+        "visible": true
+      },
+      {
+        "text": "PDF of four elevations ↗",
+        "visible": true
+      }
+    ],
+    "scrollWidth": 360,
+    "viewport": 360,
+    "documentHeight": 1712,
+    "estimateFocused": true,
+    "estimateRect": {
+      "x": 204,
+      "y": 61.875,
+      "w": 142,
+      "h": 53.59375
+    },
+    "limitations": "Reduced CSS viewport / reflow simulation, not a physical Android keyboard and not browser-chrome zoom. No request, import or export was submitted."
+  }
+]

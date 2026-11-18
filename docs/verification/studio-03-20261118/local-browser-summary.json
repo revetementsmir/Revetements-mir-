@@ -1,0 +1,27 @@
+{
+  "baseline": "3d0eb311fc929b35fb97b4466ede2308633e141b",
+  "browser": "155.0.8059.79",
+  "applicationFiles": {
+    "plan.html": "0a2dd6f6768f551041de403db8e4e0efbf2e004d635f416fc5932c7e6161f953",
+    "mir-client-workspaces.js": "418e6be7ba96577e96828a68b1cb43d9eef669f7dbee04cb09a0d7c3ef0382f7",
+    "mir-studio-03.js": "79905d9d42691035bc1eee735e63a5a6c7d99719669156ca537ef41b04cc5714",
+    "mir-studio-03.css": "1098693b3f10c204bbf47ee8597b827071982826476176c012df5feffbf49d8b"
+  },
+  "fullRun": {
+    "report": "browser-after-initial.json",
+    "groupsPassed": 15,
+    "groupsTotal": 16,
+    "failure": "synthetic-import-resume-390: test read an asynchronous IndexedDB draft before save finished; app files unchanged"
+  },
+  "followup": {
+    "report": "browser-import390-followup.json",
+    "group": "synthetic-import-resume-390",
+    "passed": true,
+    "change": "Wait for the complete original draft record atomically in the test harness."
+  },
+  "errors": [],
+  "consoleErrors": [],
+  "httpErrors": [],
+  "blockedRequests": [],
+  "ci": "The complete matrix will run again for the final commit in GitHub Actions; its result is reported separately."
+}
