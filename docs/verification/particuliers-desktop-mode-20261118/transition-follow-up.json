@@ -1,0 +1,54 @@
+{
+  "baseline": "8760134",
+  "generatedAt": "2026-11-18T10:42:36.970Z",
+  "checks": [
+    {
+      "name": "responsive-transition-960-959-980",
+      "passed": true,
+      "detail": [
+        {
+          "width": 959,
+          "language": "fr-CA",
+          "menuOpenedAndLanguageClicked": true
+        },
+        {
+          "width": 980,
+          "language": "en-CA",
+          "directLanguageClick": true
+        }
+      ]
+    }
+  ],
+  "captures": [
+    {
+      "file": "after-transition-960-959-980-en-CA.png",
+      "sha256": "c5f60d5c2fc652100219a4e393d8a5417cfa45c837e77a1119682bf1fe73cd83"
+    }
+  ],
+  "blocked": [],
+  "errors": [],
+  "browser": "155.0.8059.79",
+  "sourceSha256": {
+    "maison.html": {
+      "before": "516b0a5ab06be59e4bc4c68a7b523f5ab7db90549a16770cee56d39079785a4e",
+      "after": "516b0a5ab06be59e4bc4c68a7b523f5ab7db90549a16770cee56d39079785a4e"
+    },
+    "mir-particuliers-pc.css": {
+      "before": "619dd402aaeb3ba593592bcf96effc9f8d4588d76e078c82091f04916d8152c1",
+      "after": "ae941d5f6f50ea71ca15fadec8311c3ececdd780af2ebeeb8618b24c9f5eb837"
+    },
+    "mir-prestige.js": {
+      "before": "fac30e8073c1ff64e02abc8a546292fd8755239d8019b2ca23a4cf4876141165",
+      "after": "fac30e8073c1ff64e02abc8a546292fd8755239d8019b2ca23a4cf4876141165"
+    },
+    "mir-client-i18n.js": {
+      "before": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf",
+      "after": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+    },
+    "assets/mir-particuliers-maison-approuvee.webp": {
+      "before": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b",
+      "after": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b"
+    }
+  },
+  "passed": true
+}

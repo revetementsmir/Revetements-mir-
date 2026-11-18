@@ -1,0 +1,2408 @@
+{
+  "generatedAt": "2026-11-18T10:43:28.417447+00:00",
+  "baseline": "8760134",
+  "passed": true,
+  "uniqueChecks": 27,
+  "captures": [
+    {
+      "file": "before-maison-fr-CA-980x1768.png",
+      "sha256": "de745a90f8b88a34868bf949673e580fae6ff39a178d3ae8c79aee1b574d8bc0"
+    },
+    {
+      "file": "before-maison-en-CA-980x1768.png",
+      "sha256": "e78646a7016ffd698b9dab4007082e74728548624a78713547b293fb74003fda"
+    },
+    {
+      "file": "after-maison-fr-CA-960x1768.png",
+      "sha256": "1b0c5b9cd1343c2d196071e8a0c1d9782f9bd0a73cb61a45b20869d7067dd8da"
+    },
+    {
+      "file": "after-maison-en-CA-960x1768.png",
+      "sha256": "c27efdfa36192a27ef9234c318579180f70ef7e26a71f8fbf0a7acd8a4588303"
+    },
+    {
+      "file": "after-maison-fr-CA-980x1768.png",
+      "sha256": "35f689325bae6dccde0ade4953b1c88f9a82083ef61e708d220981e780b270dd"
+    },
+    {
+      "file": "after-maison-en-CA-980x1768.png",
+      "sha256": "c5f60d5c2fc652100219a4e393d8a5417cfa45c837e77a1119682bf1fe73cd83"
+    },
+    {
+      "file": "after-maison-fr-CA-1024x1768.png",
+      "sha256": "69d5a39f348d46c002dd85f0629ba762ba65488544ebfb8645b8727190cd0aac"
+    },
+    {
+      "file": "after-maison-en-CA-1024x1768.png",
+      "sha256": "dbf0dd7689015c75b747bd62b501e376ea5fb32a1cb4f40eff7441c074032463"
+    },
+    {
+      "file": "after-maison-fr-CA-1100x1768.png",
+      "sha256": "ee9cbfa60a0518a888fea39076744bdad48abac1133e92572dbd2904b50fbb99"
+    },
+    {
+      "file": "after-maison-en-CA-1100x1768.png",
+      "sha256": "5009d616323b9c4c5990bb614633d932746a56cf4c6a8cbfb9d972937280aa07"
+    },
+    {
+      "file": "before-unchanged-fr-CA-390x844.png",
+      "sha256": "7129a2e7e5c0b4ea90e94bb01b5cb089cc2afff5aab57cbed35f736cf46b4281"
+    },
+    {
+      "file": "after-unchanged-fr-CA-390x844.png",
+      "sha256": "7129a2e7e5c0b4ea90e94bb01b5cb089cc2afff5aab57cbed35f736cf46b4281"
+    },
+    {
+      "file": "before-unchanged-en-CA-390x844.png",
+      "sha256": "ce07ab9beae0838e912eae853cd8d56b9d0cd0975d2aa43844b3cd1177d40f08"
+    },
+    {
+      "file": "after-unchanged-en-CA-390x844.png",
+      "sha256": "ce07ab9beae0838e912eae853cd8d56b9d0cd0975d2aa43844b3cd1177d40f08"
+    },
+    {
+      "file": "before-unchanged-fr-CA-768x1024.png",
+      "sha256": "a1d940ad330673d3f8b634869f3f6fb32b10002cd6c274f522a1979a80c6c26f"
+    },
+    {
+      "file": "after-unchanged-fr-CA-768x1024.png",
+      "sha256": "a1d940ad330673d3f8b634869f3f6fb32b10002cd6c274f522a1979a80c6c26f"
+    },
+    {
+      "file": "before-unchanged-en-CA-768x1024.png",
+      "sha256": "8abe378fc06e03494e9f009021aa66b765ef715d1ad68e8cdc0a9c90a2f3ba17"
+    },
+    {
+      "file": "after-unchanged-en-CA-768x1024.png",
+      "sha256": "8abe378fc06e03494e9f009021aa66b765ef715d1ad68e8cdc0a9c90a2f3ba17"
+    },
+    {
+      "file": "before-unchanged-fr-CA-1280x800.png",
+      "sha256": "81c99b07cb252369367590ef3a4c49a8b52c607bc5cfc4503128a8f3b0dc7f5d"
+    },
+    {
+      "file": "after-unchanged-fr-CA-1280x800.png",
+      "sha256": "81c99b07cb252369367590ef3a4c49a8b52c607bc5cfc4503128a8f3b0dc7f5d"
+    },
+    {
+      "file": "before-unchanged-en-CA-1280x800.png",
+      "sha256": "2ee14d5b3ea9b0478e9072fe9bb1dcf11c97342423cec473718c01769f179708"
+    },
+    {
+      "file": "after-unchanged-en-CA-1280x800.png",
+      "sha256": "2ee14d5b3ea9b0478e9072fe9bb1dcf11c97342423cec473718c01769f179708"
+    },
+    {
+      "file": "before-unchanged-fr-CA-1440x900.png",
+      "sha256": "2187d6180f16ea3ada5d7d347b73744279fe9b53ec889e4f49e3e114474cd244"
+    },
+    {
+      "file": "after-unchanged-fr-CA-1440x900.png",
+      "sha256": "2187d6180f16ea3ada5d7d347b73744279fe9b53ec889e4f49e3e114474cd244"
+    },
+    {
+      "file": "before-unchanged-en-CA-1440x900.png",
+      "sha256": "472d99ee0eebdacc70eb9447c5bd7e11ca6df7a814fcbed6df3a36ea6287cc19"
+    },
+    {
+      "file": "after-unchanged-en-CA-1440x900.png",
+      "sha256": "472d99ee0eebdacc70eb9447c5bd7e11ca6df7a814fcbed6df3a36ea6287cc19"
+    },
+    {
+      "file": "before-unchanged-fr-CA-1920x1080.png",
+      "sha256": "bd86c039ba172c644ea85d178a4c9fc502ec2b10f026c1c7cdce60c40449a3b6"
+    },
+    {
+      "file": "after-unchanged-fr-CA-1920x1080.png",
+      "sha256": "bd86c039ba172c644ea85d178a4c9fc502ec2b10f026c1c7cdce60c40449a3b6"
+    },
+    {
+      "file": "before-unchanged-en-CA-1920x1080.png",
+      "sha256": "05664b9bf74b88517d98bd512cc99820db0e6d458696f9d83882718663e7d365"
+    },
+    {
+      "file": "after-unchanged-en-CA-1920x1080.png",
+      "sha256": "05664b9bf74b88517d98bd512cc99820db0e6d458696f9d83882718663e7d365"
+    },
+    {
+      "file": "after-transition-960-959-980-en-CA.png",
+      "sha256": "c5f60d5c2fc652100219a4e393d8a5417cfa45c837e77a1119682bf1fe73cd83"
+    }
+  ],
+  "checks": [
+    {
+      "name": "desktop-layout-960-fr-CA",
+      "passed": true,
+      "detail": {
+        "visual": {
+          "x": 0,
+          "y": 90,
+          "width": 595.1875,
+          "height": 520,
+          "right": 595.1875,
+          "bottom": 610
+        },
+        "pane": {
+          "x": 595.1875,
+          "y": 90,
+          "width": 364.8125,
+          "height": 520,
+          "right": 960,
+          "bottom": 610
+        },
+        "viewport": {
+          "width": 960,
+          "height": 1768
+        },
+        "scrollWidth": 960,
+        "actions": [
+          {
+            "label": "Trouver mon inspiration",
+            "rect": {
+              "x": 619.1875,
+              "y": 188.53125,
+              "width": 316.8125,
+              "height": 88,
+              "right": 936,
+              "bottom": 276.53125
+            }
+          },
+          {
+            "label": "Choisir mes matériaux",
+            "rect": {
+              "x": 619.1875,
+              "y": 276.53125,
+              "width": 316.8125,
+              "height": 88,
+              "right": 936,
+              "bottom": 364.53125
+            }
+          },
+          {
+            "label": "Visualiser mon projet en 3D",
+            "rect": {
+              "x": 619.1875,
+              "y": 364.53125,
+              "width": 316.8125,
+              "height": 88,
+              "right": 936,
+              "bottom": 452.53125
+            }
+          },
+          {
+            "label": "Demander une estimation",
+            "rect": {
+              "x": 619.1875,
+              "y": 452.53125,
+              "width": 316.8125,
+              "height": 92.765625,
+              "right": 936,
+              "bottom": 545.296875
+            }
+          }
+        ],
+        "header": [
+          {
+            "selector": ".mir-prestige-search",
+            "rect": {
+              "x": 623.8125,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 667.8125,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-cart",
+            "rect": {
+              "x": 689.8125,
+              "y": 23,
+              "width": 85.1875,
+              "height": 44,
+              "right": 775,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"fr-CA\"]",
+            "rect": {
+              "x": 797,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 831,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"en-CA\"]",
+            "rect": {
+              "x": 832,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 866,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-account-avatar",
+            "rect": {
+              "x": 888,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 932,
+              "bottom": 67
+            }
+          }
+        ],
+        "text": [
+          {
+            "text": "ESPACE PARTICULIERS",
+            "inside": true
+          },
+          {
+            "text": "Un revêtement",
+            "inside": true
+          },
+          {
+            "text": "qui vous",
+            "inside": true
+          },
+          {
+            "text": "ressemble.",
+            "inside": true
+          },
+          {
+            "text": "Des idées, des matériaux et un accompagnement pour votre projet.",
+            "inside": true
+          },
+          {
+            "text": "Des idées, des matériaux et un accompagnement pour votre projet.",
+            "inside": true
+          },
+          {
+            "text": "Trouver mon inspiration",
+            "inside": true
+          },
+          {
+            "text": "Styles et idées pour votre maison.",
+            "inside": true
+          },
+          {
+            "text": "Bientôt",
+            "inside": true
+          },
+          {
+            "text": "Choisir mes matériaux",
+            "inside": true
+          },
+          {
+            "text": "Revêtements, textures et couleurs.",
+            "inside": true
+          },
+          {
+            "text": "Visualiser mon projet en 3D",
+            "inside": true
+          },
+          {
+            "text": "Imaginez votre façade en 3D.",
+            "inside": true
+          },
+          {
+            "text": "Demander une estimation",
+            "inside": true
+          },
+          {
+            "text": "Décrivez votre projet. Ajoutez vos photos ou vos plans.",
+            "inside": true
+          },
+          {
+            "text": "Décrivez votre projet. Ajoutez vos photos ou vos plans.",
+            "inside": true
+          },
+          {
+            "text": "Image d’inspiration · Illustration",
+            "inside": true
+          }
+        ],
+        "navHidden": true,
+        "navDisplay": "contents",
+        "localeDisplay": "flex",
+        "languageNames": [
+          {
+            "lang": "fr-CA",
+            "name": "Français canadien, sélectionné"
+          },
+          {
+            "lang": "en-CA",
+            "name": "Anglais canadien"
+          }
+        ]
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-interactions-960-fr-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "Français canadien, sélectionné",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "Anglais canadien",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Rechercher un produit",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Panier",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "Mon compte",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "fr-CA",
+          "sendDisabled": true
+        }
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-layout-960-en-CA",
+      "passed": true,
+      "detail": {
+        "visual": {
+          "x": 0,
+          "y": 90,
+          "width": 595.1875,
+          "height": 520,
+          "right": 595.1875,
+          "bottom": 610
+        },
+        "pane": {
+          "x": 595.1875,
+          "y": 90,
+          "width": 364.8125,
+          "height": 520,
+          "right": 960,
+          "bottom": 610
+        },
+        "viewport": {
+          "width": 960,
+          "height": 1768
+        },
+        "scrollWidth": 960,
+        "actions": [
+          {
+            "label": "Find my inspiration",
+            "rect": {
+              "x": 619.1875,
+              "y": 177.34375,
+              "width": 316.8125,
+              "height": 88,
+              "right": 936,
+              "bottom": 265.34375
+            }
+          },
+          {
+            "label": "Choose my materials",
+            "rect": {
+              "x": 619.1875,
+              "y": 265.34375,
+              "width": 316.8125,
+              "height": 88,
+              "right": 936,
+              "bottom": 353.34375
+            }
+          },
+          {
+            "label": "Visualize my project in 3D",
+            "rect": {
+              "x": 619.1875,
+              "y": 353.34375,
+              "width": 316.8125,
+              "height": 88,
+              "right": 936,
+              "bottom": 441.34375
+            }
+          },
+          {
+            "label": "Request an estimate",
+            "rect": {
+              "x": 619.1875,
+              "y": 441.34375,
+              "width": 316.8125,
+              "height": 92.765625,
+              "right": 936,
+              "bottom": 534.109375
+            }
+          }
+        ],
+        "header": [
+          {
+            "selector": ".mir-prestige-search",
+            "rect": {
+              "x": 634.59375,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 678.59375,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-cart",
+            "rect": {
+              "x": 700.59375,
+              "y": 23,
+              "width": 74.40625,
+              "height": 44,
+              "right": 775,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"fr-CA\"]",
+            "rect": {
+              "x": 797,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 831,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"en-CA\"]",
+            "rect": {
+              "x": 832,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 866,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-account-avatar",
+            "rect": {
+              "x": 888,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 932,
+              "bottom": 67
+            }
+          }
+        ],
+        "text": [
+          {
+            "text": "FOR HOMEOWNERS",
+            "inside": true
+          },
+          {
+            "text": "Siding that",
+            "inside": true
+          },
+          {
+            "text": "feels like home.",
+            "inside": true
+          },
+          {
+            "text": "Ideas, materials and guidance for your project.",
+            "inside": true
+          },
+          {
+            "text": "Find my inspiration",
+            "inside": true
+          },
+          {
+            "text": "Styles and ideas for your home.",
+            "inside": true
+          },
+          {
+            "text": "Coming soon",
+            "inside": true
+          },
+          {
+            "text": "Choose my materials",
+            "inside": true
+          },
+          {
+            "text": "Siding, textures and colours.",
+            "inside": true
+          },
+          {
+            "text": "Visualize my project in 3D",
+            "inside": true
+          },
+          {
+            "text": "Picture your exterior in 3D.",
+            "inside": true
+          },
+          {
+            "text": "Request an estimate",
+            "inside": true
+          },
+          {
+            "text": "Describe your project. Add your photos or plans.",
+            "inside": true
+          },
+          {
+            "text": "Describe your project. Add your photos or plans.",
+            "inside": true
+          },
+          {
+            "text": "Inspirational image · Illustration",
+            "inside": true
+          }
+        ],
+        "navHidden": true,
+        "navDisplay": "contents",
+        "localeDisplay": "flex",
+        "languageNames": [
+          {
+            "lang": "fr-CA",
+            "name": "French (Canada)"
+          },
+          {
+            "lang": "en-CA",
+            "name": "English (Canada), selected"
+          }
+        ]
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-interactions-960-en-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "French (Canada)",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "English (Canada), selected",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Search for a product",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Cart",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "My account",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "en-CA",
+          "sendDisabled": true
+        }
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-layout-980-fr-CA",
+      "passed": true,
+      "detail": {
+        "visual": {
+          "x": 0,
+          "y": 90,
+          "width": 607.59375,
+          "height": 520,
+          "right": 607.59375,
+          "bottom": 610
+        },
+        "pane": {
+          "x": 607.59375,
+          "y": 90,
+          "width": 372.40625,
+          "height": 520,
+          "right": 980,
+          "bottom": 610
+        },
+        "viewport": {
+          "width": 980,
+          "height": 1768
+        },
+        "scrollWidth": 980,
+        "actions": [
+          {
+            "label": "Trouver mon inspiration",
+            "rect": {
+              "x": 631.59375,
+              "y": 188.53125,
+              "width": 324.40625,
+              "height": 88,
+              "right": 956,
+              "bottom": 276.53125
+            }
+          },
+          {
+            "label": "Choisir mes matériaux",
+            "rect": {
+              "x": 631.59375,
+              "y": 276.53125,
+              "width": 324.40625,
+              "height": 88,
+              "right": 956,
+              "bottom": 364.53125
+            }
+          },
+          {
+            "label": "Visualiser mon projet en 3D",
+            "rect": {
+              "x": 631.59375,
+              "y": 364.53125,
+              "width": 324.40625,
+              "height": 88,
+              "right": 956,
+              "bottom": 452.53125
+            }
+          },
+          {
+            "label": "Demander une estimation",
+            "rect": {
+              "x": 631.59375,
+              "y": 452.53125,
+              "width": 324.40625,
+              "height": 92.765625,
+              "right": 956,
+              "bottom": 545.296875
+            }
+          }
+        ],
+        "header": [
+          {
+            "selector": ".mir-prestige-search",
+            "rect": {
+              "x": 643.8125,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 687.8125,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-cart",
+            "rect": {
+              "x": 709.8125,
+              "y": 23,
+              "width": 85.1875,
+              "height": 44,
+              "right": 795,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"fr-CA\"]",
+            "rect": {
+              "x": 817,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 851,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"en-CA\"]",
+            "rect": {
+              "x": 852,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 886,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-account-avatar",
+            "rect": {
+              "x": 908,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 952,
+              "bottom": 67
+            }
+          }
+        ],
+        "text": [
+          {
+            "text": "ESPACE PARTICULIERS",
+            "inside": true
+          },
+          {
+            "text": "Un revêtement",
+            "inside": true
+          },
+          {
+            "text": "qui vous",
+            "inside": true
+          },
+          {
+            "text": "ressemble.",
+            "inside": true
+          },
+          {
+            "text": "Des idées, des matériaux et un accompagnement pour votre projet.",
+            "inside": true
+          },
+          {
+            "text": "Des idées, des matériaux et un accompagnement pour votre projet.",
+            "inside": true
+          },
+          {
+            "text": "Trouver mon inspiration",
+            "inside": true
+          },
+          {
+            "text": "Styles et idées pour votre maison.",
+            "inside": true
+          },
+          {
+            "text": "Bientôt",
+            "inside": true
+          },
+          {
+            "text": "Choisir mes matériaux",
+            "inside": true
+          },
+          {
+            "text": "Revêtements, textures et couleurs.",
+            "inside": true
+          },
+          {
+            "text": "Visualiser mon projet en 3D",
+            "inside": true
+          },
+          {
+            "text": "Imaginez votre façade en 3D.",
+            "inside": true
+          },
+          {
+            "text": "Demander une estimation",
+            "inside": true
+          },
+          {
+            "text": "Décrivez votre projet. Ajoutez vos photos ou vos plans.",
+            "inside": true
+          },
+          {
+            "text": "Décrivez votre projet. Ajoutez vos photos ou vos plans.",
+            "inside": true
+          },
+          {
+            "text": "Image d’inspiration · Illustration",
+            "inside": true
+          }
+        ],
+        "navHidden": true,
+        "navDisplay": "contents",
+        "localeDisplay": "flex",
+        "languageNames": [
+          {
+            "lang": "fr-CA",
+            "name": "Français canadien, sélectionné"
+          },
+          {
+            "lang": "en-CA",
+            "name": "Anglais canadien"
+          }
+        ]
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-interactions-980-fr-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "Français canadien, sélectionné",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "Anglais canadien",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Rechercher un produit",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Panier",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "Mon compte",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "fr-CA",
+          "sendDisabled": true
+        }
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-layout-980-en-CA",
+      "passed": true,
+      "detail": {
+        "visual": {
+          "x": 0,
+          "y": 90,
+          "width": 607.59375,
+          "height": 520,
+          "right": 607.59375,
+          "bottom": 610
+        },
+        "pane": {
+          "x": 607.59375,
+          "y": 90,
+          "width": 372.40625,
+          "height": 520,
+          "right": 980,
+          "bottom": 610
+        },
+        "viewport": {
+          "width": 980,
+          "height": 1768
+        },
+        "scrollWidth": 980,
+        "actions": [
+          {
+            "label": "Find my inspiration",
+            "rect": {
+              "x": 631.59375,
+              "y": 177.34375,
+              "width": 324.40625,
+              "height": 88,
+              "right": 956,
+              "bottom": 265.34375
+            }
+          },
+          {
+            "label": "Choose my materials",
+            "rect": {
+              "x": 631.59375,
+              "y": 265.34375,
+              "width": 324.40625,
+              "height": 88,
+              "right": 956,
+              "bottom": 353.34375
+            }
+          },
+          {
+            "label": "Visualize my project in 3D",
+            "rect": {
+              "x": 631.59375,
+              "y": 353.34375,
+              "width": 324.40625,
+              "height": 88,
+              "right": 956,
+              "bottom": 441.34375
+            }
+          },
+          {
+            "label": "Request an estimate",
+            "rect": {
+              "x": 631.59375,
+              "y": 441.34375,
+              "width": 324.40625,
+              "height": 92.765625,
+              "right": 956,
+              "bottom": 534.109375
+            }
+          }
+        ],
+        "header": [
+          {
+            "selector": ".mir-prestige-search",
+            "rect": {
+              "x": 654.59375,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 698.59375,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-cart",
+            "rect": {
+              "x": 720.59375,
+              "y": 23,
+              "width": 74.40625,
+              "height": 44,
+              "right": 795,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"fr-CA\"]",
+            "rect": {
+              "x": 817,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 851,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"en-CA\"]",
+            "rect": {
+              "x": 852,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 886,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-account-avatar",
+            "rect": {
+              "x": 908,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 952,
+              "bottom": 67
+            }
+          }
+        ],
+        "text": [
+          {
+            "text": "FOR HOMEOWNERS",
+            "inside": true
+          },
+          {
+            "text": "Siding that",
+            "inside": true
+          },
+          {
+            "text": "feels like home.",
+            "inside": true
+          },
+          {
+            "text": "Ideas, materials and guidance for your project.",
+            "inside": true
+          },
+          {
+            "text": "Find my inspiration",
+            "inside": true
+          },
+          {
+            "text": "Styles and ideas for your home.",
+            "inside": true
+          },
+          {
+            "text": "Coming soon",
+            "inside": true
+          },
+          {
+            "text": "Choose my materials",
+            "inside": true
+          },
+          {
+            "text": "Siding, textures and colours.",
+            "inside": true
+          },
+          {
+            "text": "Visualize my project in 3D",
+            "inside": true
+          },
+          {
+            "text": "Picture your exterior in 3D.",
+            "inside": true
+          },
+          {
+            "text": "Request an estimate",
+            "inside": true
+          },
+          {
+            "text": "Describe your project. Add your photos or plans.",
+            "inside": true
+          },
+          {
+            "text": "Describe your project. Add your photos or plans.",
+            "inside": true
+          },
+          {
+            "text": "Inspirational image · Illustration",
+            "inside": true
+          }
+        ],
+        "navHidden": true,
+        "navDisplay": "contents",
+        "localeDisplay": "flex",
+        "languageNames": [
+          {
+            "lang": "fr-CA",
+            "name": "French (Canada)"
+          },
+          {
+            "lang": "en-CA",
+            "name": "English (Canada), selected"
+          }
+        ]
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-interactions-980-en-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "French (Canada)",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "English (Canada), selected",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Search for a product",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Cart",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "My account",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "en-CA",
+          "sendDisabled": true
+        }
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-layout-1024-fr-CA",
+      "passed": true,
+      "detail": {
+        "visual": {
+          "x": 0,
+          "y": 90,
+          "width": 634.875,
+          "height": 542.71875,
+          "right": 634.875,
+          "bottom": 632.71875
+        },
+        "pane": {
+          "x": 634.875,
+          "y": 90,
+          "width": 389.125,
+          "height": 542.71875,
+          "right": 1024,
+          "bottom": 632.71875
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1768
+        },
+        "scrollWidth": 1024,
+        "actions": [
+          {
+            "label": "Trouver mon inspiration",
+            "rect": {
+              "x": 658.875,
+              "y": 199.890625,
+              "width": 341.125,
+              "height": 88,
+              "right": 1000,
+              "bottom": 287.890625
+            }
+          },
+          {
+            "label": "Choisir mes matériaux",
+            "rect": {
+              "x": 658.875,
+              "y": 287.890625,
+              "width": 341.125,
+              "height": 88,
+              "right": 1000,
+              "bottom": 375.890625
+            }
+          },
+          {
+            "label": "Visualiser mon projet en 3D",
+            "rect": {
+              "x": 658.875,
+              "y": 375.890625,
+              "width": 341.125,
+              "height": 88,
+              "right": 1000,
+              "bottom": 463.890625
+            }
+          },
+          {
+            "label": "Demander une estimation",
+            "rect": {
+              "x": 658.875,
+              "y": 463.890625,
+              "width": 341.125,
+              "height": 92.765625,
+              "right": 1000,
+              "bottom": 556.65625
+            }
+          }
+        ],
+        "header": [
+          {
+            "selector": ".mir-prestige-search",
+            "rect": {
+              "x": 687.8125,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 731.8125,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-cart",
+            "rect": {
+              "x": 753.8125,
+              "y": 23,
+              "width": 85.1875,
+              "height": 44,
+              "right": 839,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"fr-CA\"]",
+            "rect": {
+              "x": 861,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 895,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"en-CA\"]",
+            "rect": {
+              "x": 896,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 930,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-account-avatar",
+            "rect": {
+              "x": 952,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 996,
+              "bottom": 67
+            }
+          }
+        ],
+        "text": [
+          {
+            "text": "ESPACE PARTICULIERS",
+            "inside": true
+          },
+          {
+            "text": "Un revêtement",
+            "inside": true
+          },
+          {
+            "text": "qui vous",
+            "inside": true
+          },
+          {
+            "text": "ressemble.",
+            "inside": true
+          },
+          {
+            "text": "Des idées, des matériaux et un accompagnement pour votre projet.",
+            "inside": true
+          },
+          {
+            "text": "Des idées, des matériaux et un accompagnement pour votre projet.",
+            "inside": true
+          },
+          {
+            "text": "Trouver mon inspiration",
+            "inside": true
+          },
+          {
+            "text": "Styles et idées pour votre maison.",
+            "inside": true
+          },
+          {
+            "text": "Bientôt",
+            "inside": true
+          },
+          {
+            "text": "Choisir mes matériaux",
+            "inside": true
+          },
+          {
+            "text": "Revêtements, textures et couleurs.",
+            "inside": true
+          },
+          {
+            "text": "Visualiser mon projet en 3D",
+            "inside": true
+          },
+          {
+            "text": "Imaginez votre façade en 3D.",
+            "inside": true
+          },
+          {
+            "text": "Demander une estimation",
+            "inside": true
+          },
+          {
+            "text": "Décrivez votre projet. Ajoutez vos photos ou vos plans.",
+            "inside": true
+          },
+          {
+            "text": "Décrivez votre projet. Ajoutez vos photos ou vos plans.",
+            "inside": true
+          },
+          {
+            "text": "Image d’inspiration · Illustration",
+            "inside": true
+          }
+        ],
+        "navHidden": true,
+        "navDisplay": "contents",
+        "localeDisplay": "flex",
+        "languageNames": [
+          {
+            "lang": "fr-CA",
+            "name": "Français canadien, sélectionné"
+          },
+          {
+            "lang": "en-CA",
+            "name": "Anglais canadien"
+          }
+        ]
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-interactions-1024-fr-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "Français canadien, sélectionné",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "Anglais canadien",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Rechercher un produit",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Panier",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "Mon compte",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "fr-CA",
+          "sendDisabled": true
+        }
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-layout-1024-en-CA",
+      "passed": true,
+      "detail": {
+        "visual": {
+          "x": 0,
+          "y": 90,
+          "width": 634.875,
+          "height": 542.71875,
+          "right": 634.875,
+          "bottom": 632.71875
+        },
+        "pane": {
+          "x": 634.875,
+          "y": 90,
+          "width": 389.125,
+          "height": 542.71875,
+          "right": 1024,
+          "bottom": 632.71875
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1768
+        },
+        "scrollWidth": 1024,
+        "actions": [
+          {
+            "label": "Find my inspiration",
+            "rect": {
+              "x": 658.875,
+              "y": 191.078125,
+              "width": 341.125,
+              "height": 88,
+              "right": 1000,
+              "bottom": 279.078125
+            }
+          },
+          {
+            "label": "Choose my materials",
+            "rect": {
+              "x": 658.875,
+              "y": 279.078125,
+              "width": 341.125,
+              "height": 88,
+              "right": 1000,
+              "bottom": 367.078125
+            }
+          },
+          {
+            "label": "Visualize my project in 3D",
+            "rect": {
+              "x": 658.875,
+              "y": 367.078125,
+              "width": 341.125,
+              "height": 88,
+              "right": 1000,
+              "bottom": 455.078125
+            }
+          },
+          {
+            "label": "Request an estimate",
+            "rect": {
+              "x": 658.875,
+              "y": 455.078125,
+              "width": 341.125,
+              "height": 88,
+              "right": 1000,
+              "bottom": 543.078125
+            }
+          }
+        ],
+        "header": [
+          {
+            "selector": ".mir-prestige-search",
+            "rect": {
+              "x": 698.59375,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 742.59375,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-cart",
+            "rect": {
+              "x": 764.59375,
+              "y": 23,
+              "width": 74.40625,
+              "height": 44,
+              "right": 839,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"fr-CA\"]",
+            "rect": {
+              "x": 861,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 895,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"en-CA\"]",
+            "rect": {
+              "x": 896,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 930,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-account-avatar",
+            "rect": {
+              "x": 952,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 996,
+              "bottom": 67
+            }
+          }
+        ],
+        "text": [
+          {
+            "text": "FOR HOMEOWNERS",
+            "inside": true
+          },
+          {
+            "text": "Siding that",
+            "inside": true
+          },
+          {
+            "text": "feels like home.",
+            "inside": true
+          },
+          {
+            "text": "Ideas, materials and guidance for your project.",
+            "inside": true
+          },
+          {
+            "text": "Find my inspiration",
+            "inside": true
+          },
+          {
+            "text": "Styles and ideas for your home.",
+            "inside": true
+          },
+          {
+            "text": "Coming soon",
+            "inside": true
+          },
+          {
+            "text": "Choose my materials",
+            "inside": true
+          },
+          {
+            "text": "Siding, textures and colours.",
+            "inside": true
+          },
+          {
+            "text": "Visualize my project in 3D",
+            "inside": true
+          },
+          {
+            "text": "Picture your exterior in 3D.",
+            "inside": true
+          },
+          {
+            "text": "Request an estimate",
+            "inside": true
+          },
+          {
+            "text": "Describe your project. Add your photos or plans.",
+            "inside": true
+          },
+          {
+            "text": "Inspirational image · Illustration",
+            "inside": true
+          }
+        ],
+        "navHidden": true,
+        "navDisplay": "contents",
+        "localeDisplay": "flex",
+        "languageNames": [
+          {
+            "lang": "fr-CA",
+            "name": "French (Canada)"
+          },
+          {
+            "lang": "en-CA",
+            "name": "English (Canada), selected"
+          }
+        ]
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-interactions-1024-en-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "French (Canada)",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "English (Canada), selected",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Search for a product",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Cart",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "My account",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "en-CA",
+          "sendDisabled": true
+        }
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-layout-1100-fr-CA",
+      "passed": true,
+      "detail": {
+        "visual": {
+          "x": 0,
+          "y": 90,
+          "width": 682,
+          "height": 583,
+          "right": 682,
+          "bottom": 673
+        },
+        "pane": {
+          "x": 682,
+          "y": 90,
+          "width": 418,
+          "height": 583,
+          "right": 1100,
+          "bottom": 673
+        },
+        "viewport": {
+          "width": 1100,
+          "height": 1768
+        },
+        "scrollWidth": 1100,
+        "actions": [
+          {
+            "label": "Trouver mon inspiration",
+            "rect": {
+              "x": 706,
+              "y": 222.421875,
+              "width": 370,
+              "height": 88,
+              "right": 1076,
+              "bottom": 310.421875
+            }
+          },
+          {
+            "label": "Choisir mes matériaux",
+            "rect": {
+              "x": 706,
+              "y": 310.421875,
+              "width": 370,
+              "height": 88,
+              "right": 1076,
+              "bottom": 398.421875
+            }
+          },
+          {
+            "label": "Visualiser mon projet en 3D",
+            "rect": {
+              "x": 706,
+              "y": 398.421875,
+              "width": 370,
+              "height": 88,
+              "right": 1076,
+              "bottom": 486.421875
+            }
+          },
+          {
+            "label": "Demander une estimation",
+            "rect": {
+              "x": 706,
+              "y": 486.421875,
+              "width": 370,
+              "height": 88,
+              "right": 1076,
+              "bottom": 574.421875
+            }
+          }
+        ],
+        "header": [
+          {
+            "selector": ".mir-prestige-search",
+            "rect": {
+              "x": 763.8125,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 807.8125,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-cart",
+            "rect": {
+              "x": 829.8125,
+              "y": 23,
+              "width": 85.1875,
+              "height": 44,
+              "right": 915,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"fr-CA\"]",
+            "rect": {
+              "x": 937,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 971,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"en-CA\"]",
+            "rect": {
+              "x": 972,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 1006,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-account-avatar",
+            "rect": {
+              "x": 1028,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 1072,
+              "bottom": 67
+            }
+          }
+        ],
+        "text": [
+          {
+            "text": "ESPACE PARTICULIERS",
+            "inside": true
+          },
+          {
+            "text": "Un revêtement",
+            "inside": true
+          },
+          {
+            "text": "qui vous",
+            "inside": true
+          },
+          {
+            "text": "ressemble.",
+            "inside": true
+          },
+          {
+            "text": "Des idées, des matériaux et un accompagnement pour votre projet.",
+            "inside": true
+          },
+          {
+            "text": "Des idées, des matériaux et un accompagnement pour votre projet.",
+            "inside": true
+          },
+          {
+            "text": "Trouver mon inspiration",
+            "inside": true
+          },
+          {
+            "text": "Styles et idées pour votre maison.",
+            "inside": true
+          },
+          {
+            "text": "Bientôt",
+            "inside": true
+          },
+          {
+            "text": "Choisir mes matériaux",
+            "inside": true
+          },
+          {
+            "text": "Revêtements, textures et couleurs.",
+            "inside": true
+          },
+          {
+            "text": "Visualiser mon projet en 3D",
+            "inside": true
+          },
+          {
+            "text": "Imaginez votre façade en 3D.",
+            "inside": true
+          },
+          {
+            "text": "Demander une estimation",
+            "inside": true
+          },
+          {
+            "text": "Décrivez votre projet. Ajoutez vos photos ou vos plans.",
+            "inside": true
+          },
+          {
+            "text": "Image d’inspiration · Illustration",
+            "inside": true
+          }
+        ],
+        "navHidden": true,
+        "navDisplay": "contents",
+        "localeDisplay": "flex",
+        "languageNames": [
+          {
+            "lang": "fr-CA",
+            "name": "Français canadien, sélectionné"
+          },
+          {
+            "lang": "en-CA",
+            "name": "Anglais canadien"
+          }
+        ]
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-interactions-1100-fr-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "Français canadien, sélectionné",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "Anglais canadien",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Rechercher un produit",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Panier",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "Mon compte",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "fr-CA",
+          "sendDisabled": true
+        }
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-layout-1100-en-CA",
+      "passed": true,
+      "detail": {
+        "visual": {
+          "x": 0,
+          "y": 90,
+          "width": 682,
+          "height": 583,
+          "right": 682,
+          "bottom": 673
+        },
+        "pane": {
+          "x": 682,
+          "y": 90,
+          "width": 418,
+          "height": 583,
+          "right": 1100,
+          "bottom": 673
+        },
+        "viewport": {
+          "width": 1100,
+          "height": 1768
+        },
+        "scrollWidth": 1100,
+        "actions": [
+          {
+            "label": "Find my inspiration",
+            "rect": {
+              "x": 706,
+              "y": 211.21875,
+              "width": 370,
+              "height": 88,
+              "right": 1076,
+              "bottom": 299.21875
+            }
+          },
+          {
+            "label": "Choose my materials",
+            "rect": {
+              "x": 706,
+              "y": 299.21875,
+              "width": 370,
+              "height": 88,
+              "right": 1076,
+              "bottom": 387.21875
+            }
+          },
+          {
+            "label": "Visualize my project in 3D",
+            "rect": {
+              "x": 706,
+              "y": 387.21875,
+              "width": 370,
+              "height": 88,
+              "right": 1076,
+              "bottom": 475.21875
+            }
+          },
+          {
+            "label": "Request an estimate",
+            "rect": {
+              "x": 706,
+              "y": 475.21875,
+              "width": 370,
+              "height": 88,
+              "right": 1076,
+              "bottom": 563.21875
+            }
+          }
+        ],
+        "header": [
+          {
+            "selector": ".mir-prestige-search",
+            "rect": {
+              "x": 774.59375,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 818.59375,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-cart",
+            "rect": {
+              "x": 840.59375,
+              "y": 23,
+              "width": 74.40625,
+              "height": 44,
+              "right": 915,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"fr-CA\"]",
+            "rect": {
+              "x": 937,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 971,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-client-locale-switch button[lang=\"en-CA\"]",
+            "rect": {
+              "x": 972,
+              "y": 23,
+              "width": 34,
+              "height": 44,
+              "right": 1006,
+              "bottom": 67
+            }
+          },
+          {
+            "selector": ".mir-public-account-avatar",
+            "rect": {
+              "x": 1028,
+              "y": 23,
+              "width": 44,
+              "height": 44,
+              "right": 1072,
+              "bottom": 67
+            }
+          }
+        ],
+        "text": [
+          {
+            "text": "FOR HOMEOWNERS",
+            "inside": true
+          },
+          {
+            "text": "Siding that",
+            "inside": true
+          },
+          {
+            "text": "feels like home.",
+            "inside": true
+          },
+          {
+            "text": "Ideas, materials and guidance for your project.",
+            "inside": true
+          },
+          {
+            "text": "Find my inspiration",
+            "inside": true
+          },
+          {
+            "text": "Styles and ideas for your home.",
+            "inside": true
+          },
+          {
+            "text": "Coming soon",
+            "inside": true
+          },
+          {
+            "text": "Choose my materials",
+            "inside": true
+          },
+          {
+            "text": "Siding, textures and colours.",
+            "inside": true
+          },
+          {
+            "text": "Visualize my project in 3D",
+            "inside": true
+          },
+          {
+            "text": "Picture your exterior in 3D.",
+            "inside": true
+          },
+          {
+            "text": "Request an estimate",
+            "inside": true
+          },
+          {
+            "text": "Describe your project. Add your photos or plans.",
+            "inside": true
+          },
+          {
+            "text": "Inspirational image · Illustration",
+            "inside": true
+          }
+        ],
+        "navHidden": true,
+        "navDisplay": "contents",
+        "localeDisplay": "flex",
+        "languageNames": [
+          {
+            "lang": "fr-CA",
+            "name": "French (Canada)"
+          },
+          {
+            "lang": "en-CA",
+            "name": "English (Canada), selected"
+          }
+        ]
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "desktop-interactions-1100-en-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "French (Canada)",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "English (Canada), selected",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Search for a product",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Cart",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "My account",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "en-CA",
+          "sendDisabled": true
+        }
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "responsive-transition-960-959-980",
+      "passed": true,
+      "detail": [
+        {
+          "width": 959,
+          "language": "fr-CA",
+          "menuOpenedAndLanguageClicked": true
+        },
+        {
+          "width": 980,
+          "language": "en-CA",
+          "directLanguageClick": true
+        }
+      ],
+      "evidence": "transition-follow-up.json"
+    },
+    {
+      "name": "unchanged-pixels-390-fr-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 329160
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "unchanged-pixels-390-en-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 329160
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "unchanged-pixels-768-fr-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 786432
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "unchanged-pixels-768-en-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 786432
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "unchanged-pixels-1280-fr-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 1024000
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "unchanged-pixels-1280-en-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 1024000
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "unchanged-pixels-1440-fr-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 1296000
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "unchanged-pixels-1440-en-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 1296000
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "unchanged-pixels-1920-fr-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 2073600
+      },
+      "evidence": "results.json"
+    },
+    {
+      "name": "unchanged-pixels-1920-en-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 2073600
+      },
+      "evidence": "results.json"
+    }
+  ],
+  "sourceSha256": {
+    "maison.html": {
+      "before": "516b0a5ab06be59e4bc4c68a7b523f5ab7db90549a16770cee56d39079785a4e",
+      "after": "516b0a5ab06be59e4bc4c68a7b523f5ab7db90549a16770cee56d39079785a4e"
+    },
+    "mir-particuliers-pc.css": {
+      "before": "619dd402aaeb3ba593592bcf96effc9f8d4588d76e078c82091f04916d8152c1",
+      "after": "ae941d5f6f50ea71ca15fadec8311c3ececdd780af2ebeeb8618b24c9f5eb837"
+    },
+    "mir-prestige.js": {
+      "before": "fac30e8073c1ff64e02abc8a546292fd8755239d8019b2ca23a4cf4876141165",
+      "after": "fac30e8073c1ff64e02abc8a546292fd8755239d8019b2ca23a4cf4876141165"
+    },
+    "mir-client-i18n.js": {
+      "before": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf",
+      "after": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+    },
+    "assets/mir-particuliers-maison-approuvee.webp": {
+      "before": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b",
+      "after": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b"
+    }
+  },
+  "testSha256": "19157031d0fbc92da544f8be187e0ef152eb6151b65b966a927be4ca0a691ad3",
+  "errors": [],
+  "blocked": [],
+  "method": "Local Chromium touch-capable desktop layout viewport; no physical Android device claim. Only local GET permitted.",
+  "history": "Initial accessible-name assumption corrected in the harness. Final matrix 26/27 passed; transition expectedNavHidden corrected to false for a menu actually left open at 959. Targeted follow-up passed; application CSS unchanged across runs."
+}

@@ -79,4 +79,31 @@ body.mir-particuliers-page .mir-pc-footer-disabled{opacity:.57}
  body.mir-particuliers-page .mir-pc-action-copy strong{font-size:20px}
  body.mir-particuliers-page .mir-pc-footer-links{justify-content:flex-start}
 }
+/* Android Chrome's desktop mode commonly uses a 980px layout viewport.
+   Keep the desktop composition at this width without changing the shared shell
+   or stretching the photo to a portrait phone's virtual viewport height. */
+@media(min-width:960px) and (max-width:1100px){
+ body.mir-particuliers-page .mir-pc-hero{grid-template-columns:minmax(0,62fr) minmax(0,38fr);min-height:clamp(520px,53vw,584px)}
+ body.mir-particuliers-page .mir-pc-visual{height:clamp(520px,53vw,584px)}
+ body.mir-particuliers-page .mir-pc-photo{object-position:35% 52%}
+ body.mir-particuliers-page .mir-pc-actions-pane{padding:24px}
+ body.mir-particuliers-page .mir-pc-visual-copy{bottom:36px}
+ body.mir-particuliers-page .mir-pc-intro{font:400 14px/1.6 "DM Sans",Arial,sans-serif;letter-spacing:0;text-transform:none;margin-bottom:20px}
+ body.mir-particuliers-page .mir-pc-action{min-height:88px;padding:12px 0}
+ body.mir-particuliers-page .mir-pc-illustration-note{margin-top:16px}
+ body.mir-particuliers-page #mir-prestige-header{display:flex!important;min-height:90px!important;padding:20px 28px!important;gap:22px!important}
+ body.mir-particuliers-page #mir-prestige-header>.mir-client-brand{width:166px!important;margin:0 auto 0 0!important}
+ body.mir-particuliers-page #mir-prestige-header .mir-prestige-actions,
+ body.mir-particuliers-page #mir-prestige-header>nav.mir-prestige-nav,
+ body.mir-particuliers-page #mir-prestige-header.mir-client-menu-open>nav.mir-prestige-nav,
+ body.mir-particuliers-page #mir-prestige-header>nav.mir-prestige-nav[hidden]{display:contents!important}
+ body.mir-particuliers-page #mir-prestige-header>nav.mir-prestige-nav>a,
+ body.mir-particuliers-page #mir-prestige-header .mir-client-menu-button{display:none!important}
+ body.mir-particuliers-page #mir-prestige-header .mir-prestige-search{display:inline-flex!important;order:1!important}
+ body.mir-particuliers-page #mir-prestige-header .mir-public-cart{order:2!important}
+ body.mir-particuliers-page #mir-prestige-header .mir-cart-word{display:inline!important}
+ body.mir-particuliers-page #mir-prestige-header .mir-client-locale-switch{order:3!important;margin:0!important;padding:0!important;background:transparent!important;border:0!important;border-radius:0!important;gap:1px!important;width:auto!important}
+ body.mir-particuliers-page #mir-prestige-header .mir-public-account-avatar{order:4!important}
+ body.mir-particuliers-page .mir-pc-footer{min-height:64px;margin:0!important}
+}
 @media(prefers-reduced-motion:reduce){body.mir-particuliers-page .mir-pc-action{transition:none}}

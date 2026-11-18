@@ -1,0 +1,744 @@
+{
+  "baseline": "8760134",
+  "generatedAt": "2026-11-18T10:41:12.576Z",
+  "checks": [
+    {
+      "name": "desktop-layout-960-fr-CA",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at layout (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:82:10)\n    at async check (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:52:22)\n    at async main (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:150:7)"
+    },
+    {
+      "name": "desktop-interactions-960-fr-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "Français canadien, sélectionné",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "Anglais canadien",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Rechercher un produit",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Panier",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "Mon compte",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "fr-CA",
+          "sendDisabled": true
+        }
+      }
+    },
+    {
+      "name": "desktop-layout-960-en-CA",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at layout (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:82:10)\n    at async check (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:52:22)\n    at async main (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:150:7)"
+    },
+    {
+      "name": "desktop-interactions-960-en-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "French (Canada)",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "English (Canada), selected",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Search for a product",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Cart",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "My account",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "en-CA",
+          "sendDisabled": true
+        }
+      }
+    },
+    {
+      "name": "desktop-layout-980-fr-CA",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at layout (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:82:10)\n    at async check (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:52:22)\n    at async main (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:150:7)"
+    },
+    {
+      "name": "desktop-interactions-980-fr-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "Français canadien, sélectionné",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "Anglais canadien",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Rechercher un produit",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Panier",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "Mon compte",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "fr-CA",
+          "sendDisabled": true
+        }
+      }
+    },
+    {
+      "name": "desktop-layout-980-en-CA",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at layout (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:82:10)\n    at async check (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:52:22)\n    at async main (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:150:7)"
+    },
+    {
+      "name": "desktop-interactions-980-en-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "French (Canada)",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "English (Canada), selected",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Search for a product",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Cart",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "My account",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "en-CA",
+          "sendDisabled": true
+        }
+      }
+    },
+    {
+      "name": "desktop-layout-1024-fr-CA",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at layout (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:82:10)\n    at async check (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:52:22)\n    at async main (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:150:7)"
+    },
+    {
+      "name": "desktop-interactions-1024-fr-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "Français canadien, sélectionné",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "Anglais canadien",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Rechercher un produit",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Panier",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "Mon compte",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "fr-CA",
+          "sendDisabled": true
+        }
+      }
+    },
+    {
+      "name": "desktop-layout-1024-en-CA",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at layout (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:82:10)\n    at async check (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:52:22)\n    at async main (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:150:7)"
+    },
+    {
+      "name": "desktop-interactions-1024-en-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "French (Canada)",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "English (Canada), selected",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Search for a product",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Cart",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "My account",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "en-CA",
+          "sendDisabled": true
+        }
+      }
+    },
+    {
+      "name": "desktop-layout-1100-fr-CA",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at layout (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:82:10)\n    at async check (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:52:22)\n    at async main (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:150:7)"
+    },
+    {
+      "name": "desktop-interactions-1100-fr-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "Français canadien, sélectionné",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "Anglais canadien",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Rechercher un produit",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Panier",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "Mon compte",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "fr-CA",
+          "sendDisabled": true
+        }
+      }
+    },
+    {
+      "name": "desktop-layout-1100-en-CA",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at layout (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:82:10)\n    at async check (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:52:22)\n    at async main (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:150:7)"
+    },
+    {
+      "name": "desktop-interactions-1100-en-CA",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 2,
+            "tag": "BUTTON",
+            "label": "French (Canada)",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 3,
+            "tag": "BUTTON",
+            "label": "English (Canada), selected",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 0,
+            "tag": "A",
+            "label": "Search for a product",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 1,
+            "tag": "A",
+            "label": "Cart",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          },
+          {
+            "index": 4,
+            "tag": "A",
+            "label": "My account",
+            "focusVisible": true,
+            "outline": "solid",
+            "outlineWidth": "3px",
+            "shadow": "none"
+          }
+        ],
+        "estimate": {
+          "path": "/estimation.html",
+          "lang": "en-CA",
+          "sendDisabled": true
+        }
+      }
+    },
+    {
+      "name": "responsive-transition-960-959-980",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at layout (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:81:10)\n    at async transition (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:128:5)\n    at async check (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:52:22)\n    at async main (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:154:5)"
+    },
+    {
+      "name": "unchanged-pixels-390-fr-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 329160
+      }
+    },
+    {
+      "name": "unchanged-pixels-390-en-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 329160
+      }
+    },
+    {
+      "name": "unchanged-pixels-768-fr-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 786432
+      }
+    },
+    {
+      "name": "unchanged-pixels-768-en-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 786432
+      }
+    },
+    {
+      "name": "unchanged-pixels-1280-fr-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 1024000
+      }
+    },
+    {
+      "name": "unchanged-pixels-1280-en-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 1024000
+      }
+    },
+    {
+      "name": "unchanged-pixels-1440-fr-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 1296000
+      }
+    },
+    {
+      "name": "unchanged-pixels-1440-en-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 1296000
+      }
+    },
+    {
+      "name": "unchanged-pixels-1920-fr-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 2073600
+      }
+    },
+    {
+      "name": "unchanged-pixels-1920-en-CA",
+      "passed": true,
+      "detail": {
+        "changedPixels": 0,
+        "totalPixels": 2073600
+      }
+    }
+  ],
+  "captures": [
+    {
+      "file": "before-maison-fr-CA-980x1768.png",
+      "sha256": "de745a90f8b88a34868bf949673e580fae6ff39a178d3ae8c79aee1b574d8bc0"
+    },
+    {
+      "file": "before-maison-en-CA-980x1768.png",
+      "sha256": "e78646a7016ffd698b9dab4007082e74728548624a78713547b293fb74003fda"
+    },
+    {
+      "file": "after-maison-fr-CA-960x1768.png",
+      "sha256": "1b0c5b9cd1343c2d196071e8a0c1d9782f9bd0a73cb61a45b20869d7067dd8da"
+    },
+    {
+      "file": "after-maison-en-CA-960x1768.png",
+      "sha256": "c27efdfa36192a27ef9234c318579180f70ef7e26a71f8fbf0a7acd8a4588303"
+    },
+    {
+      "file": "after-maison-fr-CA-980x1768.png",
+      "sha256": "35f689325bae6dccde0ade4953b1c88f9a82083ef61e708d220981e780b270dd"
+    },
+    {
+      "file": "after-maison-en-CA-980x1768.png",
+      "sha256": "c5f60d5c2fc652100219a4e393d8a5417cfa45c837e77a1119682bf1fe73cd83"
+    },
+    {
+      "file": "after-maison-fr-CA-1024x1768.png",
+      "sha256": "69d5a39f348d46c002dd85f0629ba762ba65488544ebfb8645b8727190cd0aac"
+    },
+    {
+      "file": "after-maison-en-CA-1024x1768.png",
+      "sha256": "dbf0dd7689015c75b747bd62b501e376ea5fb32a1cb4f40eff7441c074032463"
+    },
+    {
+      "file": "after-maison-fr-CA-1100x1768.png",
+      "sha256": "ee9cbfa60a0518a888fea39076744bdad48abac1133e92572dbd2904b50fbb99"
+    },
+    {
+      "file": "after-maison-en-CA-1100x1768.png",
+      "sha256": "5009d616323b9c4c5990bb614633d932746a56cf4c6a8cbfb9d972937280aa07"
+    },
+    {
+      "file": "before-unchanged-fr-CA-390x844.png",
+      "sha256": "7129a2e7e5c0b4ea90e94bb01b5cb089cc2afff5aab57cbed35f736cf46b4281"
+    },
+    {
+      "file": "after-unchanged-fr-CA-390x844.png",
+      "sha256": "7129a2e7e5c0b4ea90e94bb01b5cb089cc2afff5aab57cbed35f736cf46b4281"
+    },
+    {
+      "file": "before-unchanged-en-CA-390x844.png",
+      "sha256": "ce07ab9beae0838e912eae853cd8d56b9d0cd0975d2aa43844b3cd1177d40f08"
+    },
+    {
+      "file": "after-unchanged-en-CA-390x844.png",
+      "sha256": "ce07ab9beae0838e912eae853cd8d56b9d0cd0975d2aa43844b3cd1177d40f08"
+    },
+    {
+      "file": "before-unchanged-fr-CA-768x1024.png",
+      "sha256": "a1d940ad330673d3f8b634869f3f6fb32b10002cd6c274f522a1979a80c6c26f"
+    },
+    {
+      "file": "after-unchanged-fr-CA-768x1024.png",
+      "sha256": "a1d940ad330673d3f8b634869f3f6fb32b10002cd6c274f522a1979a80c6c26f"
+    },
+    {
+      "file": "before-unchanged-en-CA-768x1024.png",
+      "sha256": "8abe378fc06e03494e9f009021aa66b765ef715d1ad68e8cdc0a9c90a2f3ba17"
+    },
+    {
+      "file": "after-unchanged-en-CA-768x1024.png",
+      "sha256": "8abe378fc06e03494e9f009021aa66b765ef715d1ad68e8cdc0a9c90a2f3ba17"
+    },
+    {
+      "file": "before-unchanged-fr-CA-1280x800.png",
+      "sha256": "81c99b07cb252369367590ef3a4c49a8b52c607bc5cfc4503128a8f3b0dc7f5d"
+    },
+    {
+      "file": "after-unchanged-fr-CA-1280x800.png",
+      "sha256": "81c99b07cb252369367590ef3a4c49a8b52c607bc5cfc4503128a8f3b0dc7f5d"
+    },
+    {
+      "file": "before-unchanged-en-CA-1280x800.png",
+      "sha256": "2ee14d5b3ea9b0478e9072fe9bb1dcf11c97342423cec473718c01769f179708"
+    },
+    {
+      "file": "after-unchanged-en-CA-1280x800.png",
+      "sha256": "2ee14d5b3ea9b0478e9072fe9bb1dcf11c97342423cec473718c01769f179708"
+    },
+    {
+      "file": "before-unchanged-fr-CA-1440x900.png",
+      "sha256": "2187d6180f16ea3ada5d7d347b73744279fe9b53ec889e4f49e3e114474cd244"
+    },
+    {
+      "file": "after-unchanged-fr-CA-1440x900.png",
+      "sha256": "2187d6180f16ea3ada5d7d347b73744279fe9b53ec889e4f49e3e114474cd244"
+    },
+    {
+      "file": "before-unchanged-en-CA-1440x900.png",
+      "sha256": "472d99ee0eebdacc70eb9447c5bd7e11ca6df7a814fcbed6df3a36ea6287cc19"
+    },
+    {
+      "file": "after-unchanged-en-CA-1440x900.png",
+      "sha256": "472d99ee0eebdacc70eb9447c5bd7e11ca6df7a814fcbed6df3a36ea6287cc19"
+    },
+    {
+      "file": "before-unchanged-fr-CA-1920x1080.png",
+      "sha256": "bd86c039ba172c644ea85d178a4c9fc502ec2b10f026c1c7cdce60c40449a3b6"
+    },
+    {
+      "file": "after-unchanged-fr-CA-1920x1080.png",
+      "sha256": "bd86c039ba172c644ea85d178a4c9fc502ec2b10f026c1c7cdce60c40449a3b6"
+    },
+    {
+      "file": "before-unchanged-en-CA-1920x1080.png",
+      "sha256": "05664b9bf74b88517d98bd512cc99820db0e6d458696f9d83882718663e7d365"
+    },
+    {
+      "file": "after-unchanged-en-CA-1920x1080.png",
+      "sha256": "05664b9bf74b88517d98bd512cc99820db0e6d458696f9d83882718663e7d365"
+    }
+  ],
+  "blocked": [],
+  "errors": [],
+  "browser": "155.0.8059.79",
+  "beforeStacked": true,
+  "sourceSha256": {
+    "maison.html": {
+      "before": "516b0a5ab06be59e4bc4c68a7b523f5ab7db90549a16770cee56d39079785a4e",
+      "after": "516b0a5ab06be59e4bc4c68a7b523f5ab7db90549a16770cee56d39079785a4e"
+    },
+    "mir-particuliers-pc.css": {
+      "before": "619dd402aaeb3ba593592bcf96effc9f8d4588d76e078c82091f04916d8152c1",
+      "after": "ae941d5f6f50ea71ca15fadec8311c3ececdd780af2ebeeb8618b24c9f5eb837"
+    },
+    "mir-prestige.js": {
+      "before": "fac30e8073c1ff64e02abc8a546292fd8755239d8019b2ca23a4cf4876141165",
+      "after": "fac30e8073c1ff64e02abc8a546292fd8755239d8019b2ca23a4cf4876141165"
+    },
+    "mir-client-i18n.js": {
+      "before": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf",
+      "after": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+    },
+    "assets/mir-particuliers-maison-approuvee.webp": {
+      "before": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b",
+      "after": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b"
+    }
+  },
+  "passed": false
+}

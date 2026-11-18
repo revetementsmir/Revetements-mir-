@@ -1,0 +1,64 @@
+FAIL desktop-layout-960-fr-CA: Expected values to be strictly equal:
+
+0 !== 1
+
+PASS desktop-interactions-960-fr-CA
+FAIL desktop-layout-960-en-CA: Expected values to be strictly equal:
+
+0 !== 1
+
+PASS desktop-interactions-960-en-CA
+FAIL desktop-layout-980-fr-CA: Expected values to be strictly equal:
+
+0 !== 1
+
+PASS desktop-interactions-980-fr-CA
+FAIL desktop-layout-980-en-CA: Expected values to be strictly equal:
+
+0 !== 1
+
+PASS desktop-interactions-980-en-CA
+FAIL desktop-layout-1024-fr-CA: Expected values to be strictly equal:
+
+0 !== 1
+
+PASS desktop-interactions-1024-fr-CA
+FAIL desktop-layout-1024-en-CA: Expected values to be strictly equal:
+
+0 !== 1
+
+PASS desktop-interactions-1024-en-CA
+FAIL desktop-layout-1100-fr-CA: Expected values to be strictly equal:
+
+0 !== 1
+
+PASS desktop-interactions-1100-fr-CA
+FAIL desktop-layout-1100-en-CA: Expected values to be strictly equal:
+
+0 !== 1
+
+PASS desktop-interactions-1100-en-CA
+FAIL responsive-transition-960-959-980: Expected values to be strictly equal:
+
+false !== true
+
+PASS unchanged-pixels-390-fr-CA
+PASS unchanged-pixels-390-en-CA
+PASS unchanged-pixels-768-fr-CA
+PASS unchanged-pixels-768-en-CA
+PASS unchanged-pixels-1280-fr-CA
+PASS unchanged-pixels-1280-en-CA
+PASS unchanged-pixels-1440-fr-CA
+PASS unchanged-pixels-1440-en-CA
+PASS unchanged-pixels-1920-fr-CA
+PASS unchanged-pixels-1920-en-CA
+AssertionError [ERR_ASSERTION]: inspect results.json
+    at main (/workspace/mir-particuliers-finition/tests/mir-particuliers-desktop-mode-browser.cjs:169:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
