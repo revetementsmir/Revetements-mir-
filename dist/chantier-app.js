@@ -1259,14 +1259,20 @@
     if(!terrainRole())return;
     const nav=$('#portal-navigation.field-bottom');if(!nav?.clientWidth)return;
     nav.style.setProperty('--field-nav-label-scale','1');
-    let scale=1;
-    for(const button of nav.querySelectorAll(':scope > button')){
-      const label=button.querySelector(':scope > span');if(!label)continue;
-      const range=document.createRange();range.selectNodeContents(label);
-      const width=range.getBoundingClientRect().width,available=Math.max(1,button.clientWidth-8);
-      if(width>available)scale=Math.min(scale,available/width);
-    }
-    nav.style.setProperty('--field-nav-label-scale',String(Math.floor(scale*1000)/1000));
+    nav.style.setProperty('--field-nav-label-fit','1');
+    const measuredFit=()=>{
+      let scale=1;
+      for(const button of nav.querySelectorAll(':scope > button')){
+        const label=button.querySelector(':scope > span');if(!label)continue;
+        const range=document.createRange();range.selectNodeContents(label);
+        const width=range.getBoundingClientRect().width,available=Math.max(1,button.clientWidth-8);
+        if(width>available)scale=Math.min(scale,available/width);
+      }
+      return String(Math.floor(scale*1000)/1000);
+    };
+    nav.style.setProperty('--field-nav-label-scale',measuredFit());
+    // WebView may clamp the font size after native zoom; fit only its rendered label.
+    nav.style.setProperty('--field-nav-label-fit',measuredFit());
   }
   function renderFieldShell(){
     document.body.dataset.fieldView=view;

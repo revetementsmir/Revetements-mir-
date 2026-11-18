@@ -233,7 +233,7 @@ body[data-field-shell=true][data-field-design=home-test] .mir-app-order-actions{
 body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom button,
 body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom button>span{white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;font-size:clamp(.6875rem,3vw,.8rem)!important}
 /* Measure the rendered labels after native text zoom; keep all five hit areas. */
-body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom button>span{font-size:calc(clamp(.6875rem,3vw,.8rem) * var(--field-nav-label-scale,1))!important}
+body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom button>span{font-size:calc(clamp(.6875rem,3vw,.8rem) * var(--field-nav-label-scale,1))!important;flex:none;align-self:center;width:max-content;max-width:none!important;transform:scale(var(--field-nav-label-fit,1));transform-origin:center}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-image-missing{display:block;width:28px;height:28px;color:#776e5f}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-quick:not([open])>div{display:none!important}
 
