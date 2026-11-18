@@ -1,5 +1,7 @@
 # Estimation 04 — actifs photographiques
 
+> Historique du premier lot. Les images Maison et Rénovation ont ensuite été remplacées à la demande de Frederick sur `codex/estimation-04-photos-20261118`. Leurs nouvelles provenances et empreintes figurent dans [le manifeste de remplacement](../estimation-04-photos-20261118/assets.json). Les descriptions et poids ci-dessous documentent la version initiale.
+
 Date : 2026-11-18. Branche de travail isolée ; aucun fichier source de l’accueil, de Particuliers ou de la galerie Inspiration n’est modifié.
 
 Les quatre cartes utilisent des illustrations architecturales. Aucun visuel ne constitue une preuve de réalisation MIR. Les images ne viennent pas d’un découpage de capture de maquette.

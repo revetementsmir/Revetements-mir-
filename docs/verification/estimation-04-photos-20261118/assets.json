@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-18",
+  "base": "febceb210936a1fbdf250ef5c874883892abcbb2",
+  "branch": "codex/estimation-04-photos-20261118",
+  "method": {
+    "moon": "1.3.11",
+    "checkedAt": "2026-11-18T12:20:28.811Z",
+    "boss": "GOD MODE",
+    "experts": [
+      "graphic-designer",
+      "visual-harmonization",
+      "quality-testing"
+    ]
+  },
+  "assets": [
+    {
+      "name": "maison",
+      "source": "/workspace/generated_images/exec-525ad6c8-60bd-4f0f-bddf-08df98af4142.png",
+      "prompt": "Create ONE original photorealistic architectural photograph, SQUARE 1:1 composition, for the Maison card in a premium Quebec exterior cladding website. A believable DETACHED TWO-STOREY contemporary Quebec family home, distinctly NOT a single-storey black farmhouse with wood gables. A refined two-storey house with asymmetric intersecting moderate pitched charcoal shingle roofs, warm LIGHT GREIGE horizontal lap siding on the upper storey, ivory-grey brick at ground level, black framed real windows, a warm oak recessed front door, a restrained vertical natural wood feature at the entrance. No huge front-facing black timber gable. Full house from street height, subtle three-quarter view, straight vertical lines, moderate 35mm architectural lens. Show ENTIRE roof, foundations, side edges and grounded entry inside central 80 percent of square with generous margins. Realistically sized windows with consistent floor levels. Entry reached by three broad low concrete steps with coherent landing, a finished asphalt driveway visible at right, attractive Quebec hydrangeas, grasses, a maple tree and spruce backdrop, summer morning natural light, no tropical plants. Premium editorial photograph, very realistic textures, restrained warm neutral palette, tasteful established suburb. House about 65 percent image width and 65 percent height so it reads well at 170px square. No people, cars, addresses, signs, words, logos, watermark, collage, before/after, UI or diagram. It is an original architectural illustration, not a real MIR project. The house must be obviously different from an existing dark single-storey house with large wood-framed front gable.",
+      "path": "dist/assets/estimation-04/maison.webp",
+      "sourceSha256": "e022a1034a6d719df04c67701bc4465e55ebae6782d0203beb97bb30a60ac921",
+      "sha256": "49f470b00938cf550e28305c0c74916f00c25b8b8c9c4aac342c8691e8075fac",
+      "bytes": 374324,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "previousSha256": "13cd57fb6444270b0336f772913aa7170543e47a217af905232d87e3fa59124c"
+    },
+    {
+      "name": "renovation",
+      "source": "/workspace/generated_images/exec-32a2d745-448f-4ffb-a831-0538791b4774.png",
+      "prompt": "Create ONE original premium photorealistic architectural DETAIL photograph, square 1:1 composition, for a Quebec exterior-siding renovation selection card. Show a clearly recognizable well-finished portion of a recently renovated contemporary Quebec house exterior, NOT a whole house and NOT an abstract extreme close-up. A refined combination of warm medium-grey horizontal lap siding with subtle real wood-grain texture, a large black-framed rectangular window visible on the LEFT or middle-left with believable dark glass reflecting softly blurred Quebec trees, crisp anthracite folded-metal corner and window flashings, and a narrow accent of warm natural tan wood at the RIGHT near a sheltered entry recess. Include a modest plausible soffit/roof overhang near the upper edge with coherent flashing and shadows; the window, siding courses, vertical trim and small wood section must all read clearly together. Front three-quarter architectural view with straight verticals, realistic construction joints, even consistent siding exposure, detailed but calm composition. Camera close enough to see texture and precise finishing, far enough to recognize the window and exterior facade corner. The main dark window frame and siding intersection should occupy the central square, readable as a 170px website thumbnail. Soft neutral daylight, tasteful warm restrained palette, realistic premium architecture-magazine photography, no oversaturation and no dramatic night scene. No people, workers, tools, ladders, scaffold, signs, address numbers, text, logo, watermark, collage, before/after comparison, mockup UI or schematic panels. This is an original architectural inspiration illustration, not documentation of a MIR project. No product brands or claimed material certifications.",
+      "path": "dist/assets/estimation-04/renovation.webp",
+      "sourceSha256": "a5fcb447258672ff6619e737221557b48ef5aef8b0ee13607a8a5d0f662e4df6",
+      "sha256": "ae0d70c99527b058785547c90f637a67223d1ee104314f0b0466b9a255550f22",
+      "bytes": 223846,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "previousSha256": "864478f53ca3857743bde67a9bf4678347c6e5e71d2b3e35ce7ec390fb3843c9"
+    }
+  ],
+  "generationTool": "image_gen",
+  "editing": "None. Original square PNG images encoded to WebP quality84/method6 with ImageMagick. No crop, retouch, resize or changes to CSS.",
+  "claims": "Original architectural illustrations. Not documented MIR completed projects, material or supplier certifications.",
+  "seoGeo": "Non applicable à cette publication TEST protégée/noindex. Aucun changement des URL, permissions ou règles d’indexation."
+}

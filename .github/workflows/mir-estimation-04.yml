@@ -1,7 +1,7 @@
 name: MIR — Estimation 04 TEST
 on:
   push:
-    branches: [codex/estimation-04-images-20261118]
+    branches: [codex/estimation-04-images-20261118, codex/estimation-04-photos-20261118]
   pull_request:
     paths:
       - 'dist/estimation.html'
