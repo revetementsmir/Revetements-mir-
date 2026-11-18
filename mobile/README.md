@@ -69,6 +69,10 @@ La recette native capture et mesure la vraie barre Android au lancement, en pays
 
 Les deux callbacks exacts du tableau Aperçu ont été enregistrés dans les Redirect URLs de Supabase MIR TEST. Le fournisseur Google reste désactivé : Client IDs et Client Secret sont vides. Google Cloud affiche « Site indisponible » dans le navigateur de configuration, y compris après une recharge. Aucun client OAuth créé ni login Google réussi n’est revendiqué. Le bouton reste honnête sur cette capacité et l’accès par courriel demeure disponible. La récupération par courriel conserve sa limite TEST existante.
 
+Le workflow `.github/workflows/mir-phase11-android-pr.yml` transmet la variable de dépôt `MIR_TEST_GOOGLE_ENABLED` aux deux compilations, Chromium et Android ; sa valeur par défaut est la chaîne `false`. Dans chaque job, `npm run sync` appelle `npm run web`, puis `tools/build-web.cjs`, qui inscrit cette capacité dans les ressources embarquées et n’accepte que les chaînes `true` ou `false`.
+
+Passer cette variable à `true` uniquement après configuration du fournisseur Google dans Supabase MIR TEST et vérification du retour `mirtestpreview://auth/callback?flow=google`. Ce réglage de compilation n’active aucun fournisseur. Un nouvel APK doit ensuite être construit avec cette valeur et le parcours Google complet doit être vérifié avec un compte équipe autorisé ; modifier la variable ou réussir les recettes simulées ne prouve pas une connexion réelle. La récupération et les invitations gardent leurs réglages existants.
+
 ## Historique — identités et preuves antérieures
 
 Les versions et preuves des paragraphes suivants sont historiques. Le paquet personnel Samsung S25 (`ca.revetementsmir.equipe.recette.s25`) possède sa propre identité et sa propre signature; cette compilation standard ne prétend pas le remplacer.

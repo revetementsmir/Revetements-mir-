@@ -4,6 +4,8 @@ on:
     paths: ['mobile/**', 'dist/**', 'tests/**', 'docs/verification/phase11-android/**', '.github/workflows/mir-phase11-android-pr.yml']
 permissions:
   contents: read
+env:
+  MIR_TEST_GOOGLE_ENABLED: ${{ vars.MIR_TEST_GOOGLE_ENABLED || 'false' }}
 jobs:
   chromium-and-regressions:
     runs-on: ubuntu-latest

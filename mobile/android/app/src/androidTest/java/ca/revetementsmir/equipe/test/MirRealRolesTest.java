@@ -78,21 +78,28 @@ public class MirRealRolesTest extends MirDeviceSetup {
   android.graphics.Bitmap bitmap=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(bitmap);try{return saveScreenshot(name,bitmap,null);}finally{bitmap.recycle();}
  }
  private boolean injectDeliberateNativeTap(int x,int y){
-  // A WebView <dialog> can receive a very short UIAutomator down/up without
-  // synthesizing its HTML button click. Deliver one genuine touchscreen
-  // press/release (not a DOM click or a retry) with a stable 130 ms hold.
+  // Use an actual finger tool, not obtain(x,y)'s TOOL_TYPE_UNKNOWN. The latter
+  // reached Chromium with an empty pointerType in the failed Punch close proof.
+  // One short native press/release only: no DOM click and no retry on failure.
   final android.app.UiAutomation automation=InstrumentationRegistry.getInstrumentation().getUiAutomation();
+  final android.view.MotionEvent.PointerProperties finger=new android.view.MotionEvent.PointerProperties();
+  finger.id=0;finger.toolType=android.view.MotionEvent.TOOL_TYPE_FINGER;
+  final android.view.MotionEvent.PointerCoords contact=new android.view.MotionEvent.PointerCoords();
+  contact.x=x;contact.y=y;contact.pressure=1f;contact.size=1f;
+  final android.view.MotionEvent.PointerProperties[] fingers={finger};
+  final android.view.MotionEvent.PointerCoords[] contacts={contact};
   final long downTime=SystemClock.uptimeMillis();
   final android.view.MotionEvent down=android.view.MotionEvent.obtain(downTime,downTime,
-      android.view.MotionEvent.ACTION_DOWN,(float)x,(float)y,0);
-  down.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
+      android.view.MotionEvent.ACTION_DOWN,1,fingers,contacts,0,0,1f,1f,0,0,
+      android.view.InputDevice.SOURCE_TOUCHSCREEN,0);
   boolean downDelivered;
   try{downDelivered=automation.injectInputEvent(down,true);}finally{down.recycle();}
   if(!downDelivered)return false;
-  SystemClock.sleep(130); // less than long-press timeout; fixed, single touch
+  SystemClock.sleep(50);
+  contact.pressure=0f;
   final android.view.MotionEvent up=android.view.MotionEvent.obtain(downTime,SystemClock.uptimeMillis(),
-      android.view.MotionEvent.ACTION_UP,(float)x,(float)y,0);
-  up.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
+      android.view.MotionEvent.ACTION_UP,1,fingers,contacts,0,0,1f,1f,0,0,
+      android.view.InputDevice.SOURCE_TOUCHSCREEN,0);
   try{return automation.injectInputEvent(up,true);}finally{up.recycle();}
  }
  private void tap(ActivityScenario<MainActivity>s,String selector)throws Exception{
@@ -107,10 +114,10 @@ public class MirRealRolesTest extends MirDeviceSetup {
   assertTrue("Native tap delivered",closeButton?injectDeliberateNativeTap(x,y):
       androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).click(x,y));
   if(closeButton){
-    // Keep the original real-click requirement, and additionally require
-    // the actual <dialog> to be closed after the native event sequence.
+    // Verify the real touchscreen sequence and the actual <dialog> closure.
+    // A long press, cancellation or programmatic click cannot pass this gate.
     waitFor(s,"native click closes portal dialog: "+js(s,"JSON.stringify(window.nativeLastTap)"),
-        "window.nativeLastTap.events.some(e=>e.type==='click'&&e.close) && !window.nativeLastTap.events.some(e=>e.type==='pointercancel') && document.querySelector('#portal-dialog')?.open===false");
+        "['pointerdown','pointerup'].every(type=>window.nativeLastTap.events.some(e=>e.type===type&&e.pointerType==='touch'&&e.isTrusted&&e.sameInitialTarget)) && window.nativeLastTap.events.some(e=>e.type==='click'&&e.close&&e.isTrusted) && !window.nativeLastTap.events.some(e=>e.type==='pointercancel'||e.type==='contextmenu') && document.querySelector('#portal-dialog')?.open===false");
   }
  }
  private String drawingTargetExpression(String selector){
