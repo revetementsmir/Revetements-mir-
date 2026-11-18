@@ -68,6 +68,7 @@ jobs:
           mir_check() { "$@" || { mir_check_status=1; printf 'MIR_CHECK_FAILED %s\n' "$*"; }; }
           mir_check node mobile/tools/test-contracts.cjs
           mir_check node mobile/tools/test-native-screen-proofs.cjs
+          mir_check node --test mobile/tools/test-preview-signing.cjs
           mir_check node mobile/tools/test-native-readiness.cjs
           mir_check node mobile/tools/test-native-drawing-target.cjs
           mir_check node mobile/tools/test-android-ci-environment.cjs
@@ -126,6 +127,17 @@ jobs:
             artifacts/mir-responsive-atelier/
             artifacts/mir-annotations/
   android-test:
+    # Delivery gate for this exact reviewed revision, not a boundary against a
+    # collaborator who is allowed to change the workflow itself.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      vars.MIR_PREVIEW_SIGNING_APPROVED_SHA != '' &&
+      github.event.pull_request.head.sha == vars.MIR_PREVIEW_SIGNING_APPROVED_SHA
+    env:
+      MIR_PREVIEW_SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+      MIR_PREVIEW_SOURCE_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      MIR_PREVIEW_SIGNING_APPROVED_SHA: ${{ vars.MIR_PREVIEW_SIGNING_APPROVED_SHA }}
+      MIR_PREVIEW_CERT_SHA256: ${{ vars.MIR_PREVIEW_CERT_SHA256 }}
     # All PRs share exactly two MIR TEST QA logins: serialize remote fixtures.
     concurrency:
       group: mir-native-qa-shared-${{ github.repository }}
@@ -160,19 +172,34 @@ jobs:
           node tools/prepare-android-tests.cjs
           node tools/test-contracts.cjs
           node tools/test-activity-lifecycle.cjs
+      - name: Importer la clé durable de MIR TEST Aperçu pour le SHA revu
+        env:
+          MIR_PREVIEW_KEYSTORE_BASE64: ${{ secrets.MIR_PREVIEW_KEYSTORE_BASE64 }}
+          MIR_PREVIEW_KEYSTORE_PASSWORD: ${{ secrets.MIR_PREVIEW_KEYSTORE_PASSWORD }}
+          MIR_PREVIEW_KEY_ALIAS: ${{ secrets.MIR_PREVIEW_KEY_ALIAS }}
+          MIR_PREVIEW_KEY_PASSWORD: ${{ secrets.MIR_PREVIEW_KEY_PASSWORD }}
+        run: node mobile/tools/preview-signing.cjs import
       - name: Compiler APK, tests et analyse Android stricte
+        env:
+          MIR_PREVIEW_KEYSTORE_PASSWORD: ${{ secrets.MIR_PREVIEW_KEYSTORE_PASSWORD }}
+          MIR_PREVIEW_KEY_ALIAS: ${{ secrets.MIR_PREVIEW_KEY_ALIAS }}
+          MIR_PREVIEW_KEY_PASSWORD: ${{ secrets.MIR_PREVIEW_KEY_PASSWORD }}
         working-directory: mobile/android
         run: |
-          ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon
+          ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon --no-configuration-cache
           cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/mir-version-130005.apk"
-          MIR_ANDROID_VERSION_CODE=130006 ./gradlew :app:assembleDebug --no-daemon
+          MIR_ANDROID_VERSION_CODE=130006 ./gradlew :app:assembleDebug --no-daemon --no-configuration-cache
           mkdir -p ../../artifacts/phase11
-          cp app/build/outputs/apk/debug/app-debug.apk ../../artifacts/phase11/MIR-TEST-debug.apk
           cd ../..
-          sha256sum artifacts/phase11/MIR-TEST-debug.apk > artifacts/phase11/SHA256SUMS
+          node mobile/tools/verify-preview-signing.cjs "$RUNNER_TEMP/mir-version-130005.apk" mobile/android/app/build/outputs/apk/debug/app-debug.apk mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk artifacts/phase11/preview-signing.json
+          cp mobile/android/app/build/outputs/apk/debug/app-debug.apk artifacts/phase11/MIR-TEST-Apercu.apk
+          sha256sum artifacts/phase11/MIR-TEST-Apercu.apk > artifacts/phase11/SHA256SUMS
           git rev-parse HEAD > artifacts/phase11/source-sha.txt
           echo '${{ github.event.pull_request.head.sha }}' > artifacts/phase11/pr-head-sha.txt
           echo '${{ github.event.pull_request.base.sha }}' > artifacts/phase11/base-sha.txt
+      - name: Retirer la clé privée avant la recette et les archives
+        if: always()
+        run: node mobile/tools/preview-signing.cjs clean
       - name: Permettre KVM au runner éphémère
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -216,7 +243,7 @@ jobs:
           node mobile/tools/prepare-real-roles.cjs
           mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#prepareUpdate'
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-prepare.txt
-          adb install -r artifacts/phase11/MIR-TEST-debug.apk
+          adb install -r artifacts/phase11/MIR-TEST-Apercu.apk
           mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirUpgradeTest#verifyUpdate'
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/upgrade-verify.txt
           # Allocate new TEST-only UUIDs/lease AFTER upgrades, just before dependent tests.
@@ -225,7 +252,7 @@ jobs:
           node mobile/tools/verify-pr39-native-fixture.cjs
           mobile/tools/run-instrumentation.sh 'ca.revetementsmir.equipe.test.MirRealRolesTest'
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/real-roles.txt
-          adb pull /sdcard/Android/data/ca.revetementsmir.equipe.test/files/phase11-proof artifacts/phase11/
+          adb pull /sdcard/Android/data/ca.revetementsmir.equipe.test.preview/files/phase11-proof artifacts/phase11/
       - name: Garantie de nettoyage MIR TEST après réussite, refus ou échec
         if: always()
         env:
@@ -235,7 +262,7 @@ jobs:
           MIR_SANDBOX_BOSS_EMAIL: ${{ secrets.MIR_SANDBOX_BOSS_EMAIL }}
           MIR_SANDBOX_BOSS_PASSWORD: ${{ secrets.MIR_SANDBOX_BOSS_PASSWORD }}
         run: node mobile/tools/native-qa-fixture.cjs finish
-      - name: Empreinte de l’APK de recette — signature debug uniquement
+      - name: Empreinte de l’APK Aperçu — signature durable vérifiée
         run: |
           sha256sum -c artifacts/phase11/SHA256SUMS
           cat artifacts/phase11/SHA256SUMS

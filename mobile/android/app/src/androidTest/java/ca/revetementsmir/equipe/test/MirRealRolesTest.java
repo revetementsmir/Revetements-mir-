@@ -1,4 +1,5 @@
 package ca.revetementsmir.equipe.test;
+import android.content.Context;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -186,7 +187,8 @@ public class MirRealRolesTest extends MirDeviceSetup {
  }
  private void writeFieldProof(String role,java.util.Map<String,JSONObject> tabs,JSONObject home,JSONObject menu,JSONObject fixture)throws Exception{
   java.util.Set<String> pngs=new java.util.HashSet<>(),contents=new java.util.HashSet<>();JSONObject screens=new JSONObject();for(java.util.Map.Entry<String,JSONObject> entry:tabs.entrySet()){assertTrue("Five distinct PNGs",pngs.add(entry.getValue().getString("sha256")));assertTrue("Five distinct body pixel frames",contents.add(entry.getValue().getString("contentSha256")));screens.put(entry.getKey(),entry.getValue());}assertEquals(5,screens.length());assertNotEquals("Account panel differs from home PNG",home.getString("sha256"),menu.getString("sha256"));assertNotEquals("Account panel differs from home content",home.getString("contentSha256"),menu.getString("contentSha256"));
-  JSONObject report=new JSONObject().put("role",role).put("capture","Android system UiAutomation").put("physicalDevice",false).put("versionCode",InstrumentationRegistry.getInstrumentation().getTargetContext().getPackageManager().getPackageInfo("ca.revetementsmir.equipe.test",0).getLongVersionCode()).put("fixture",fixture).put("screens",screens).put("home",home).put("menu",menu);File file=new File(proofDirectory(),"v130006-"+role+"-screens.json");assertFalse("Never overwrite screen manifest",file.exists());java.nio.file.Files.write(file.toPath(),report.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+  Context target=InstrumentationRegistry.getInstrumentation().getTargetContext();
+  JSONObject report=new JSONObject().put("role",role).put("capture","Android system UiAutomation").put("physicalDevice",false).put("applicationId",target.getPackageName()).put("versionCode",target.getPackageManager().getPackageInfo(target.getPackageName(),0).getLongVersionCode()).put("fixture",fixture).put("screens",screens).put("home",home).put("menu",menu);File file=new File(proofDirectory(),"v130006-"+role+"-screens.json");assertFalse("Never overwrite screen manifest",file.exists());java.nio.file.Files.write(file.toPath(),report.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));
  }
  private void inspectMenu(ActivityScenario<MainActivity>s,String role)throws Exception{
   boolean field=role.equals("employe")||role.equals("chef_equipe");

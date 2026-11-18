@@ -1,10 +1,20 @@
 apply plugin: 'com.android.application'
 
+// This separate TEST lineage must never fall back to a runner-generated key.
+def previewSigningValues = [
+    'MIR_PREVIEW_KEYSTORE_PATH', 'MIR_PREVIEW_KEYSTORE_PASSWORD',
+    'MIR_PREVIEW_KEY_ALIAS', 'MIR_PREVIEW_KEY_PASSWORD', 'MIR_PREVIEW_CERT_SHA256'
+].collectEntries { name -> [(name): System.getenv(name)] }
+if (previewSigningValues.values().any { value -> value == null || value.isEmpty() }
+        || !file(previewSigningValues['MIR_PREVIEW_KEYSTORE_PATH']).isFile()) {
+    throw new GradleException('MIR TEST Aperçu exige sa signature durable configurée ; aucune clé debug de remplacement.')
+}
+
 android {
     namespace = "ca.revetementsmir.equipe.test"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "ca.revetementsmir.equipe.test"
+        applicationId "ca.revetementsmir.equipe.test.preview"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode Integer.parseInt(System.getenv('MIR_ANDROID_VERSION_CODE') ?: '130005')
@@ -16,8 +26,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        preview {
+            storeFile file(previewSigningValues['MIR_PREVIEW_KEYSTORE_PATH'])
+            storeType 'PKCS12'
+            storePassword previewSigningValues['MIR_PREVIEW_KEYSTORE_PASSWORD']
+            keyAlias previewSigningValues['MIR_PREVIEW_KEY_ALIAS']
+            keyPassword previewSigningValues['MIR_PREVIEW_KEY_PASSWORD']
+            enableV1Signing true
+            enableV2Signing true
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.preview
+        }
         release {
+            signingConfig signingConfigs.preview
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

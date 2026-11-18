@@ -1,12 +1,75 @@
-Connexion mobile 08 — version candidate **0.13.3-test**, codes **130005 → 130006** pour la recette de mise à jour dans un même runner. Logo MIR de 245 px (+75 % par rapport à la proposition de 140 px), titre « Connexion équipe MIR » retiré de la connexion normale, formulaire courriel/mot de passe directement visible, bouton Google et palette anthracite/champagne approuvés. Le bouton Google respecte la capacité réellement configurée du fournisseur ; son affichage ne prouve pas une authentification Google réussie. La récupération conserve son propre titre et explique son indisponibilité lorsque le transport TEST est désactivé. La candidate doit être compilée et vérifiée sur son SHA exact avant remise.
+# MIR TEST Aperçu — connexion mobile 08
 
-L’identifiant reste `ca.revetementsmir.equipe.test`, les ressources `dist/` restent embarquées et le backend reste MIR TEST. Le menu commun **Accueil · Commande · Punch · Messages · Plus**, les accueils, le Punch et le parcours Pliage existants sont conservés.
+Version candidate **0.13.3-test**, codes **130005 → 130006** pour la recette de mise à jour. Logo MIR de 245 px (+75 % par rapport à la proposition de 140 px), titre « Connexion équipe MIR » retiré de la connexion normale, formulaire courriel/mot de passe directement visible, bouton Google et palette anthracite/champagne approuvés. Google respecte la capacité réellement configurée ; l’affichage du bouton ne prouve pas une authentification réussie. La récupération conserve son titre et explique son indisponibilité lorsque le transport TEST est désactivé.
 
-## Signature et portée de la mise à jour candidate
+## Installation séparée autorisée
 
-La recette **130005 → 130006** utilise la même clé debug dans une seule exécution CI. Elle ne démontre pas une mise à jour compatible avec l’APK **130004** précédemment remis à Frederick. Ce dernier porte le certificat SHA-256 `d62841b88fd0b0194ef871c5fcc03a2b1e0bc43fc5895308fddf35e9d0a94842` ; aucune clé privée correspondante n’a été trouvée dans le workspace ni dans l’artefact de livraison audité.
+Frederick a autorisé une application TEST installée **à côté de l’ancienne**, sans la désinstaller ni effacer ses données.
 
-Le workflow ne crée aucune nouvelle identité de paquet ni stratégie de signature durable. Avant de remettre la candidate comme mise à jour de l’installation existante, il faut disposer de la clé d’origine et vérifier le certificat. À défaut, le choix d’une identité TEST distincte reste à convenir : une nouvelle clé ne rend pas une mise à jour compatible rétroactivement. Ne pas désinstaller l’ancienne application ni effacer ses données pour contourner un conflit de signature.
+| Identité | Nouvelle lignée Aperçu |
+| --- | --- |
+| Nom Android | `MIR TEST Aperçu` |
+| Application ID | `ca.revetementsmir.equipe.test.preview` |
+| Namespace et classes Java conservés | `ca.revetementsmir.equipe.test` |
+| Callback OAuth | `mirtestpreview://auth/callback` |
+| Callback Google exact | `mirtestpreview://auth/callback?flow=google` |
+| Callback récupération exact | `mirtestpreview://auth/callback?flow=recovery` |
+| Backend exclusif | `hxtztkmbfpmzrieccwsg.supabase.co` |
+| APK vérifié à remettre | `MIR-TEST-Apercu.apk` |
+
+L’ancien paquet `ca.revetementsmir.equipe.test` conserve son stockage et son callback `mirtest`. Aperçu possède son propre stockage Android, coffre de session et FileProvider ; aucune migration de données ni reprise automatique de session n’est effectuée. Les assertions natives vérifient l’identité réellement installée et que l’ancien callback ne résout pas dans Aperçu. Cette recette sur émulateur ne constitue pas une observation du téléphone de Frederick.
+
+Les ressources `dist/` restent embarquées. Le menu **Accueil · Commande · Punch · Messages · Plus**, les accueils, le Punch et le parcours Pliage restent ceux de la version approuvée.
+
+## Signature durable et garde de livraison
+
+La nouvelle lignée doit utiliser une **clé PKCS12 durable détenue par MIR**. Aucun outil de ce dépôt ne crée de clé. Gradle refuse de construire sans configuration de signature ; aucun repli sur une clé debug générée par le runner n’est permis. Le type de build reste `debug` pour les recettes natives ; ce n’est pas une livraison de production.
+
+Configuration GitHub Actions à fournir par un accès autorisé, sans placer de valeur privée dans Git, les journaux ou les artefacts :
+
+| Type | Nom | Usage |
+| --- | --- | --- |
+| Secret | `MIR_PREVIEW_KEYSTORE_BASE64` | Keystore PKCS12 durable, base64 sur une ligne |
+| Secret | `MIR_PREVIEW_KEYSTORE_PASSWORD` | Mot de passe du keystore |
+| Secret | `MIR_PREVIEW_KEY_ALIAS` | Alias de la clé |
+| Secret | `MIR_PREVIEW_KEY_PASSWORD` | Mot de passe de la clé |
+| Variable publique | `MIR_PREVIEW_CERT_SHA256` | Empreinte SHA-256 attendue du certificat, obligatoire |
+| Variable publique | `MIR_PREVIEW_SIGNING_APPROVED_SHA` | SHA exact de la source revue, 40 caractères |
+
+Le 18 novembre 2026, Frederick a explicitement autorisé l’enregistrement d’une clé durable. Une clé PKCS12 RSA 3072 / SHA256withRSA a été créée, puis le keystore et ses paramètres privés ont été enregistrés dans les quatre secrets chiffrés GitHub Actions ci-dessus, dans `revetementsmir/Revetements-mir-`. Leur présence a été confirmée dans l’interface GitHub. La clé privée et les mots de passe ne sont ni dans ce dépôt, ni dans les preuves, ni dans l’APK.
+
+Empreinte publique SHA-256 à conserver pour cette lignée : `a9a24e149a0076935952fd683c272072232e10d7f7e8e2d8f847fec34291417e`. Aucun autre certificat ne doit être utilisé pour une future mise à jour d’Aperçu. La présence des secrets ne constitue pas à elle seule une compilation signée réussie ; la recette ci-dessous vérifie leur utilisation réelle.
+
+Le job Android ne démarre que pour une PR provenant du même dépôt et dont le HEAD correspond exactement à `MIR_PREVIEW_SIGNING_APPROVED_SHA`. L’import relit aussi le HEAD réellement extrait. Une révision différente ou une variable absente entraîne un job ignoré, **pas une recette réussie**. Après chaque modification, la nouvelle révision doit être revue et la variable ajustée par une personne autorisée avant de relancer le workflow. Ce verrou est une garde de livraison ; il ne protège pas contre un collaborateur qui peut lui-même modifier les workflows ou leurs secrets.
+
+`tools/preview-signing.cjs import` place uniquement le keystore dans un sous-répertoire privé du `RUNNER_TEMP`, permissions `0700/0600`. `GITHUB_ENV` reçoit seulement les chemins ; les mots de passe restent limités aux étapes d’import et de compilation. Les caches de configuration Gradle sont désactivés. Une étape `always()` supprime ce fichier avant les tests natifs et les archives.
+
+`tools/verify-preview-signing.cjs` exécute **apksigner verify** sur les APK 130005, 130006 et l’APK d’instrumentation. Il exige une signature v2 valide, un seul signataire, l’empreinte publique attendue et les identités Android prévues. L’APK final n’est copié vers les artefacts qu’après cette vérification. `preview-signing.json` ne contient que des métadonnées publiques, empreintes et résultats. Le rapport natif final recoupe cette preuve avec le SHA du fichier effectivement remis.
+
+La recette **130005 → 130006** vérifie le maintien du stockage de la nouvelle application Aperçu. Elle reste exécutée dans un seul runner et ne prouve pas une mise à jour de l’ancien APK **130004**, dont l’identifiant est différent. Le certificat historique est `d62841b88fd0b0194ef871c5fcc03a2b1e0bc43fc5895308fddf35e9d0a94842` ; aucune clé privée correspondante n’a été trouvée lors de l’audit. Aucun remplacement, effacement ou désinstallation de cet ancien paquet n’est prévu.
+
+Pour compiler localement avec une clé déjà provisionnée de façon privée, fournir `MIR_PREVIEW_KEYSTORE_PATH`, `MIR_PREVIEW_KEYSTORE_PASSWORD`, `MIR_PREVIEW_KEY_ALIAS`, `MIR_PREVIEW_KEY_PASSWORD` et `MIR_PREVIEW_CERT_SHA256` dans l’environnement. Ne pas inscrire leurs valeurs dans une commande conservée, le dépôt ou un fichier de preuve. Exécuter la vérification cryptographique avant toute remise. Le pipeline CI constitue la voie de livraison contrôlée.
+
+Installation de la nouvelle application :
+
+```sh
+adb install MIR-TEST-Apercu.apk
+adb shell am start -n ca.revetementsmir.equipe.test.preview/ca.revetementsmir.equipe.test.MainActivity
+```
+
+Une future mise à jour **d’Aperçu uniquement** conserve son applicationId et sa clé durable, augmente le code de version et utilise `adb install -r`. L’application de test d’instrumentation n’est jamais remise comme application utilisateur.
+
+## Barre système Android anthracite
+
+Le fond natif de fenêtre et de lancement utilise `#242522`. `SystemBars` conserve les barres visibles et impose des icônes claires sur ce fond. La gestion Capacitor des marges, des encoches et du clavier reste active ; aucune fausse heure ou batterie n’est dessinée dans la page.
+
+La recette native capture et mesure la vraie barre Android au lancement, en paysage, après recréation, clavier ouvert et après reprise. Elle exige une barre visible, des icônes claires, le contenu sous la barre et un fond anthracite majoritaire. Ces nouvelles preuves doivent être obtenues dans la CI du SHA livré ; aucun essai physique sur le téléphone de Frederick n’est revendiqué.
+
+## Configuration Google — état du 18 novembre 2026
+
+Les deux callbacks exacts du tableau Aperçu ont été enregistrés dans les Redirect URLs de Supabase MIR TEST. Le fournisseur Google reste désactivé : Client IDs et Client Secret sont vides. Google Cloud affiche « Site indisponible » dans le navigateur de configuration, y compris après une recharge. Aucun client OAuth créé ni login Google réussi n’est revendiqué. Le bouton reste honnête sur cette capacité et l’accès par courriel demeure disponible. La récupération par courriel conserve sa limite TEST existante.
+
+## Historique — identités et preuves antérieures
 
 Les versions et preuves des paragraphes suivants sont historiques. Le paquet personnel Samsung S25 (`ca.revetementsmir.equipe.recette.s25`) possède sa propre identité et sa propre signature; cette compilation standard ne prétend pas le remplacer.
 

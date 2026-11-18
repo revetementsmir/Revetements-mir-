@@ -3,6 +3,9 @@ package ca.revetementsmir.equipe.test;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.SystemClock;
 import android.graphics.Bitmap;
 import androidx.test.core.app.ActivityScenario;
@@ -32,6 +35,24 @@ public class MirAndroidTest extends MirDeviceSetup {
   while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(scenario,expression)))return;SystemClock.sleep(150);}
   screenshot("failed-wait");fail("Condition Android WebView non satisfaite : "+expression+"; état PDF="+js(scenario,"JSON.stringify({status:document.querySelector('#status')?.textContent,error:window.mirNativeDiagnostic,save:window.saveProof,visibility:document.visibilityState,field:document.querySelector('#android-recipe-input')?.getBoundingClientRect().toJSON(),height:innerHeight,viewport:window.visualViewport?{height:visualViewport.height,top:visualViewport.offsetTop}:null})"));
  }
+ private void assertPreviewIdentity()throws Exception{
+  Context target=InstrumentationRegistry.getInstrumentation().getTargetContext();
+  String applicationId=target.getPackageName();PackageManager manager=target.getPackageManager();
+  String appName=manager.getApplicationLabel(target.getApplicationInfo()).toString();
+  Intent callback=new Intent(Intent.ACTION_VIEW,Uri.parse("mirtestpreview://auth/callback")).addCategory(Intent.CATEGORY_BROWSABLE).setPackage(applicationId);
+  Intent legacyCallback=new Intent(Intent.ACTION_VIEW,Uri.parse("mirtest://auth/callback")).addCategory(Intent.CATEGORY_BROWSABLE).setPackage(applicationId);
+  ResolveInfo resolved=manager.resolveActivity(callback,PackageManager.MATCH_DEFAULT_ONLY);
+  ResolveInfo legacyResolved=manager.resolveActivity(legacyCallback,PackageManager.MATCH_DEFAULT_ONLY);
+  org.json.JSONObject proof=new org.json.JSONObject().put("applicationId",applicationId).put("appName",appName).put("callback",callback.getDataString()).put("resolvedPackage",resolved==null?org.json.JSONObject.NULL:resolved.activityInfo.packageName).put("resolvedActivity",resolved==null?org.json.JSONObject.NULL:resolved.activityInfo.name).put("legacyCallback",legacyCallback.getDataString()).put("legacyCallbackResolved",legacyResolved!=null);
+  File dir=new File(target.getExternalFilesDir(null),"phase11-proof");assertTrue(dir.isDirectory()||dir.mkdirs());
+  java.nio.file.Files.write(new File(dir,"android-preview-identity.json").toPath(),proof.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+  assertEquals("Preview has a distinct application ID","ca.revetementsmir.equipe.test.preview",applicationId);
+  assertEquals("Launcher identifies the separate preview","MIR TEST Aperçu",appName);
+  assertNotNull("Preview callback resolves inside its own package",resolved);
+  assertEquals("Preview callback package",applicationId,resolved.activityInfo.packageName);
+  assertEquals("Preview callback reaches the existing MainActivity",MainActivity.class.getName(),resolved.activityInfo.name);
+  assertNull("Preview does not claim the previous app callback",legacyResolved);
+ }
  private void assertNativeSignInTheme(ActivityScenario<MainActivity>s)throws Exception{
   waitFor(s,"document.fonts.status==='loaded' && !!document.querySelector('body>#mir-native-state') && !!document.querySelector('.auth-grid .auth-card #auth-email')");
   org.json.JSONObject theme=(org.json.JSONObject)js(s,"(()=>{const style=q=>{const n=document.querySelector(q),c=getComputedStyle(n);return{background:c.backgroundColor,color:c.color,font:c.fontFamily,visible:n.getClientRects().length>0};};return{body:style('body'),card:style('#auth-signin-form'),input:style('#auth-email'),action:style('#auth-signin-form button[type=submit]'),headingPresent:!!document.querySelector('.auth-intro h1'),fontLoaded:document.fonts.check('16px \"DM Sans\"')};})()");
@@ -45,6 +66,46 @@ public class MirAndroidTest extends MirDeviceSetup {
   assertEquals("Native sign-in dark action label","rgb(36, 37, 34)",theme.getJSONObject("action").getString("color"));
   for(String element:new String[]{"body","input","action"}){assertTrue("Native sign-in visible "+element,theme.getJSONObject(element).getBoolean("visible"));assertTrue("Native sign-in DM Sans "+element,theme.getJSONObject(element).getString("font").contains("DM Sans"));}
   assertFalse("Normal sign-in has no redundant title",theme.getBoolean("headingPresent"));assertTrue("Native sign-in font resource loaded",theme.getBoolean("fontLoaded"));
+ }
+ private void assertNativeSystemBars(ActivityScenario<MainActivity>s,String stage)throws Exception{
+  String name="android-system-bars-"+stage;
+  screenshot(s,name);
+  org.json.JSONObject proof=new org.json.JSONObject().put("stage",stage).put("physicalDevice",false);
+  int[] bounds=new int[5];
+  s.onActivity(a->{
+   android.view.View decor=a.getWindow().getDecorView();
+   androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(decor);
+   assertNotNull("Android supplies actual system bar insets",insets);
+   androidx.core.graphics.Insets status=insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.statusBars());
+   decor.getLocationOnScreen(bounds);bounds[2]=decor.getWidth();bounds[3]=status.top;
+   int[] webPosition=new int[2];a.getBridge().getWebView().getLocationOnScreen(webPosition);bounds[4]=webPosition[1];
+   boolean visible=insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.statusBars());
+   boolean darkIcons=androidx.core.view.WindowCompat.getInsetsController(a.getWindow(),decor).isAppearanceLightStatusBars();
+   boolean fullscreen=(a.getWindow().getAttributes().flags&android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)!=0;
+   try{proof.put("statusBarVisible",visible).put("darkStatusBarIcons",darkIcons).put("fullscreen",fullscreen).put("statusBarHeightPx",status.top).put("windowTopPx",bounds[1]).put("webViewTopPx",webPosition[1]).put("sdk",android.os.Build.VERSION.SDK_INT);}catch(org.json.JSONException e){throw new RuntimeException(e);}
+   assertTrue("Real Android status information stays visible",visible);
+   assertFalse("Status icons stay light on anthracite",darkIcons);
+   assertFalse("No fullscreen mode hides the Android status bar",fullscreen);
+   assertTrue("Status bar occupies a real native area",status.top>0);
+   assertTrue("Web content stays below the system status information",webPosition[1]>=bounds[1]+status.top);
+  });
+  Bitmap screen=InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();assertNotNull(screen);
+  try{
+   int left=Math.max(0,bounds[0]),right=Math.min(screen.getWidth(),bounds[0]+bounds[2]);
+   int top=Math.max(0,bounds[1]),bottom=Math.min(screen.getHeight(),bounds[1]+bounds[3]);
+   int samples=0,anthracite=0,lightLeft=0,lightRight=0;
+   for(int y=top;y<bottom;y++)for(int x=left;x<right;x++){
+    int pixel=screen.getPixel(x,y),r=android.graphics.Color.red(pixel),g=android.graphics.Color.green(pixel),b=android.graphics.Color.blue(pixel);samples++;
+    if(Math.abs(r-36)<=3&&Math.abs(g-37)<=3&&Math.abs(b-34)<=3)anthracite++;
+    if(r>=170&&g>=170&&b>=170){if(x<(left+right)/2)lightLeft++;else lightRight++;}
+   }
+   double coverage=samples==0?0:anthracite/(double)samples;
+   proof.put("anthraciteCoverage",coverage).put("lightPixelsLeft",lightLeft).put("lightPixelsRight",lightRight);
+   File dir=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null),"phase11-proof");assertTrue(dir.isDirectory()||dir.mkdirs());
+   java.nio.file.Files.write(new File(dir,name+".json").toPath(),proof.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+   assertTrue("Native status bar background is anthracite: "+coverage,coverage>.80);
+   assertTrue("Light system information is rendered on both sides of the status bar",lightLeft>0&&lightRight>0);
+  }finally{screen.recycle();}
  }
  private void assertNativeSignInLayout(ActivityScenario<MainActivity>s,String stage)throws Exception{
   waitFor(s,"document.fonts.status==='loaded' && !!document.querySelector('.mir-native-auth-brand img') && !!document.querySelector('#auth-signin-form') && !document.querySelector('#auth-signin-form').hidden");
@@ -141,6 +202,7 @@ public class MirAndroidTest extends MirDeviceSetup {
   }
  }
  @Test public void launchRotationAndRestartUseBundledPortal()throws Exception{
+  assertPreviewIdentity();
   try(ActivityScenario<MainActivity> s=ActivityScenario.launch(MainActivity.class)){
    waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");
    assertEquals("https://localhost",js(s,"location.origin"));
@@ -150,6 +212,7 @@ public class MirAndroidTest extends MirDeviceSetup {
    assertEquals(Boolean.FALSE,js(s,"document.querySelector('#auth-signin-form').hidden"));
    assertNativeSignInTheme(s);
    assertNativeSignInLayout(s,"initial");
+   assertNativeSystemBars(s,"initial");
    assertEquals(Boolean.FALSE,js(s,"document.querySelector('[data-auth-screen=forgot]').disabled"));
    js(s,"document.querySelector('[data-auth-screen=forgot]').click();true");
    waitFor(s,"!!document.querySelector('#auth-reset-form') && document.querySelector('.auth-intro h1')?.textContent.trim()==='Mot de passe oublié'");
@@ -169,8 +232,9 @@ public class MirAndroidTest extends MirDeviceSetup {
    assertEquals(Boolean.FALSE,js(s,"MIRAndroid.Policy.allowedRoute('https://localhost/boutique.html')"));
    assertEquals("dark",js(s,"document.documentElement.dataset.mirTheme"));assertEquals("large",js(s,"document.documentElement.dataset.mirText"));assertEquals("reduced",js(s,"document.documentElement.dataset.mirMotion"));assertEquals("high",js(s,"document.documentElement.dataset.mirContrast"));assertEquals(Boolean.TRUE,js(s,"document.documentElement.scrollWidth<=innerWidth+2"));screenshot(s,"android-dark-large-contrast");
    s.onActivity(a->a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
-   waitFor(s,"innerWidth>innerHeight");assertEquals("recette-phase11@example.invalid",js(s,"document.querySelector('#auth-email').value"));screenshot(s,"android-signin-landscape");
+   waitFor(s,"innerWidth>innerHeight");assertEquals("recette-phase11@example.invalid",js(s,"document.querySelector('#auth-email').value"));screenshot(s,"android-signin-landscape");assertNativeSystemBars(s,"landscape");
    s.recreate();waitFor(s,"!!document.querySelector('#auth-signin-form') && document.hasFocus()");assertEquals("retained",js(s,"localStorage.getItem('mir_phase11_probe')"));
+   assertNativeSystemBars(s,"recreated");
    assertEquals(Boolean.TRUE,js(s,"document.documentElement.scrollWidth<=innerWidth+2"));
    s.onActivity(a->a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));waitFor(s,"innerHeight>innerWidth");
   }
@@ -213,11 +277,12 @@ public class MirAndroidTest extends MirDeviceSetup {
    long end=SystemClock.uptimeMillis()+5000;java.util.concurrent.atomic.AtomicBoolean keyboard=new java.util.concurrent.atomic.AtomicBoolean(false);
    while(SystemClock.uptimeMillis()<end){s.onActivity(a->{androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(a.getBridge().getWebView());keyboard.set(insets!=null&&insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime()));});if(keyboard.get())break;SystemClock.sleep(100);}
    if(!keyboard.get())try{recordKeyboardFailure(s);}catch(Exception e){System.err.println("MIR keyboard diagnostics incomplete: "+e.getClass().getSimpleName());}
-   assertTrue("Clavier Android visible",keyboard.get());screenshot(s,"android-keyboard");
+   assertTrue("Clavier Android visible",keyboard.get());screenshot(s,"android-keyboard");assertNativeSystemBars(s,"keyboard");
    waitFor(s,"document.querySelector('#android-recipe-input').getBoundingClientRect().bottom<=innerHeight");
    device.pressBack();device.pressBack();
    androidx.test.uiautomator.UiObject2 cancel=device.wait(androidx.test.uiautomator.Until.findObject(androidx.test.uiautomator.By.res("android:id/button2")),5000);assertNotNull("Confirmation avant abandon",cancel);cancel.click();assertEquals("RECETTE-PHASE11-LOCAL",js(s,"document.querySelector('#android-recipe-input').value"));
    device.pressHome();Context target=InstrumentationRegistry.getInstrumentation().getTargetContext();Intent intent=target.getPackageManager().getLaunchIntentForPackage(target.getPackageName());intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);target.startActivity(intent);waitFor(s,"document.visibilityState==='visible'");assertEquals("RECETTE-PHASE11-LOCAL",js(s,"document.querySelector('#android-recipe-input').value"));
+   assertNativeSystemBars(s,"resumed");
    try{device.executeShellCommand("svc wifi disable");device.executeShellCommand("svc data disable");waitFor(s,"document.querySelector('#mir-native-state').textContent.includes('Hors ligne')");screenshot(s,"android-offline");}
    finally{device.executeShellCommand("svc wifi enable");device.executeShellCommand("svc data enable");}
    waitFor(s,"document.querySelector('#mir-native-state').textContent.includes('actualisation')");assertEquals("RECETTE-PHASE11-LOCAL",js(s,"document.querySelector('#android-recipe-input').value"));
