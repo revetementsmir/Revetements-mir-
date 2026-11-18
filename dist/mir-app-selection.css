@@ -2,12 +2,13 @@
  * Reference: mir-prestige-editorial.css and mir-home-desktop-locked.css.
  * Existing Accueil and Punch intentionally keep their approved presentation.
  */
-body[data-field-shell=true][data-field-design=home-test]{
-  --field-bg:#242522;--field-surface:#2d2e2a;--field-soft:#353630;
-  --field-text:#f4f1ea;--field-muted:#c8c5bd;--field-border:#55554d;
-  --field-accent:#bda889;--field-action-text:#242522;
-  --mir-page:#242522;--mir-surface:#2d2e2a;--mir-text:#f4f1ea;
-  --mir-muted:#c8c5bd;--mir-border:#55554d;--mir-accent-strong:#bda889;
+html:root body[data-field-shell=true][data-field-design=home-test]{
+  --field-bg:#242522!important;--field-surface:#2d2e2a!important;--field-soft:#353630!important;
+  --field-text:#f4f1ea!important;--field-muted:#c8c5bd!important;--field-border:#55554d!important;
+  --field-accent:#bda889!important;--field-action-text:#242522!important;
+  --field-focus:#dbc7a9!important;--field-selection:#454236!important;
+  --mir-page:#242522!important;--mir-surface:#2d2e2a!important;--mir-text:#f4f1ea!important;
+  --mir-muted:#c8c5bd!important;--mir-border:#55554d!important;--mir-accent-strong:#bda889!important;
   background:var(--field-bg)!important;color:var(--field-text)!important;
   font-family:"DM Sans",Arial,Helvetica,sans-serif!important;
   font-weight:400;letter-spacing:0;line-height:1.45;

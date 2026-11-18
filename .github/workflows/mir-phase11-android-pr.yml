@@ -15,7 +15,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Adapter web embarqué et non-régressions sans serveur
+      - name: Préparer les ressources embarquées et la référence visuelle
+        id: web-adapter
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
           NODE_PATH: ./mobile/node_modules
@@ -26,9 +27,24 @@ jobs:
           if ! git cat-file -e "${MIR_APP_REFERENCE_SHA}^{commit}" 2>/dev/null; then
             git fetch --no-tags --depth=1 origin "$MIR_APP_REFERENCE_SHA"
           fi
-          node tests/mir-app-selection-browser.cjs
-          node tests/mir-pliage03-field-browser.cjs
-          node tests/mir-pliage03-field-contract.cjs
+      - name: Refonte de l’application et parcours Pliage en navigateur
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ./mobile/node_modules
+          MIR_APP_REFERENCE_SHA: dd5bf49701aea2c3ac5fa46712b9fc94a1acd89e
+          MIR_FIELD_PLIAGE_OUT: ${{ github.workspace }}/artifacts/pliage03-field
+        run: |
+          result=0
+          node tests/mir-app-selection-browser.cjs || result=1
+          node tests/mir-pliage03-field-browser.cjs || result=1
+          node tests/mir-pliage03-field-contract.cjs || result=1
+          exit "$result"
+      - name: Non-régressions existantes sans serveur
+        if: ${{ !cancelled() && steps.web-adapter.outcome == 'success' }}
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ./mobile/node_modules
+        run: |
           node mobile/tools/test-contracts.cjs
           node mobile/tools/test-native-screen-proofs.cjs
           node mobile/tools/test-native-readiness.cjs

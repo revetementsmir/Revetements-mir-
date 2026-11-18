@@ -95,6 +95,12 @@ async function seedMessages(page){await page.evaluate(()=>{const x=__fieldFixtur
     await nav(page,'more');await page.locator('.mir-app-p10').waitFor();for(const text of ['Mes heures','Banque d’heures','Congés et absences','Dépenses et reçus','Bris d’outil','Chantiers et documents','Avis','Préférences','Aide et contact du bureau'])assert.ok(await page.locator('.mir-app-p10').getByRole('button',{name:new RegExp(text)}).isVisible(),text);
     assert.equal(await page.locator('.mir-app-p10 [data-view="lead-team"]').count(),chef?1:0);await layout(page,role+' '+width+' P10');await screenshot(page,`${role}-p10-${width}.png`);pass(role+' '+width+' P10 permitted menu');
     assert.deepEqual(errors,[],role+' '+width+' JavaScript errors');
+   }catch(error){
+    const failure={role,width,error:String(error.stack||error),pageErrors:errors.slice(),screenshot:null};
+    try{failure.metrics=await page.evaluate(()=>{const body=document.body,s=getComputedStyle(body),nav=document.querySelector('#portal-navigation'),rect=nav?.getBoundingClientRect();return{url:location.href,viewport:{width:innerWidth,height:innerHeight,devicePixelRatio,visual:visualViewport?{width:visualViewport.width,height:visualViewport.height,offsetTop:visualViewport.offsetTop,offsetLeft:visualViewport.offsetLeft}:null},document:{scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight},body:{className:body.className,dataset:{...body.dataset},background:s.backgroundColor,color:s.color,font:s.fontFamily,fontSize:s.fontSize,lineHeight:s.lineHeight,overflow:s.overflow,variables:Object.fromEntries(['--field-bg','--field-surface','--field-text','--field-muted','--field-border','--field-accent'].map(key=>[key,s.getPropertyValue(key).trim()]))},navigation:rect?{top:rect.top,bottom:rect.bottom,left:rect.left,right:rect.right}:null,headings:Array.from(document.querySelectorAll('h1')).map(e=>e.textContent.trim())};});}catch(diagnosticError){failure.metricsError=String(diagnosticError);}
+    try{const name=`${role}-failure-${width}.png`;await screenshot(page,name);failure.screenshot=name;}catch(screenshotError){failure.screenshotError=String(screenshotError);}
+    (results.failures||(results.failures=[])).push(failure);
+    throw error;
    }finally{await page.close();}
   }
   results.status='passed';results.count=checks;console.log(`MIR app selection: ${checks} checks passed, ${results.screens.length} genuine Chromium screenshots.`);

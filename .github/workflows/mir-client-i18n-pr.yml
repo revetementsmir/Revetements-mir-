@@ -20,6 +20,7 @@ on:
       - 'tests/mir-client-i18n*.cjs'
       - 'tests/mir-client-qa-isolation.cjs'
       - 'tests/mir-client-pr42-isolation.cjs'
+      - 'tests/mir-client-field-isolation.cjs'
       - 'mobile/tools/verify-pr39-native-fixture.cjs'
       - 'supabase/test-only/fixtures/pr41-android-native-*.sql'
       - 'tests/mir-client-account-isolation.cjs'
@@ -62,10 +63,17 @@ jobs:
             # PR42 has its own explicit, SHA-pinned allow-list for an independent
             # Android QA repair; ALL published client/staff/Auth/APK bytes must
             # remain identical to the base. Never use this path for other PRs.
-            if [ "${{ github.event.pull_request.number }}" = "42" ]; then
+            if [ "${{ github.event.pull_request.number }}" = "46" ]; then
+              # This authorized field-app delivery preserves the approved client,
+              # Auth/backend, historic TEST fixtures and native routing separately.
+              MIR_CLIENT_BASE_SHA="$base" node tests/mir-client-field-isolation.cjs
+            elif [ "${{ github.event.pull_request.number }}" = "42" ]; then
               MIR_CLIENT_BASE_SHA="$base" node tests/mir-client-pr42-isolation.cjs
-            else
+            elif [ "${{ github.event.pull_request.number }}" = "41" ]; then
               MIR_CLIENT_BASE_SHA="$base" node tests/mir-client-qa-isolation.cjs
+            else
+              echo "Unexpected staff/backend changes outside the reviewed bilingual or field delivery scope."
+              exit 1
             fi
           fi
           node --check dist/mir-client-i18n.js
@@ -75,6 +83,7 @@ jobs:
           node --check tests/mir-client-i18n.cjs
           node --check tests/mir-client-qa-isolation.cjs
           node --check tests/mir-client-pr42-isolation.cjs
+          node --check tests/mir-client-field-isolation.cjs
           node --check tests/mir-client-i18n-static.cjs
           node --check tests/mir-client-account-isolation.cjs
           node --check tests/mir-client-account-en-browser.cjs
@@ -95,7 +104,7 @@ jobs:
         run: |
           node tests/mir-client-i18n.cjs
           node tests/mir-client-i18n-static.cjs
-          MIR_CLIENT_BASE_SHA="${{ github.event.pull_request.base.sha }}" node tests/mir-client-account-isolation.cjs
+          MIR_CLIENT_BASE_SHA="${{ github.event.pull_request.base.sha }}" MIR_CLIENT_FIELD_PR="${{ github.event.pull_request.number }}" node tests/mir-client-account-isolation.cjs
           node tests/mir-client-pdf-bilingual.cjs
           MIR_CLIENT_BASE_SHA="${{ github.event.pull_request.base.sha }}" node tests/mir-client-email-boundary.cjs
           node --test tests/mir-estimate-presentation.cjs
