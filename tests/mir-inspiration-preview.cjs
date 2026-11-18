@@ -38,7 +38,7 @@ async function main() {
     page.on('pageerror', error => report.pageErrors.push(error.message));
     page.on('console', message => { if (message.type() === 'error') report.consoleErrors.push(message.text()); });
     await page.goto(server.base + '/test/maison.html');
-    await page.locator('.mir-pc-actions a[href="inspiration.html"]').click();
+    await page.locator('.mir-pc-actions a[href*="inspiration.html"]').click();
     await page.waitForURL(url => url.pathname === '/test/inspiration.html');
     await page.waitForFunction(() => !!window.MIRInspirationData);
     report.fromMaison = true;
@@ -64,10 +64,10 @@ async function main() {
     await page.waitForFunction(() => document.documentElement.lang === 'en-CA');
     assert.match(await page.locator('h1').innerText(), /Your next inspiration/);
     report.guards = await page.evaluate(async () => {
-      const cases = [() => fetch('https://example.invalid/mir-proof'), () => fetch('./inspiration.html', { method: 'POST', body: 'blocked-test' })];
+      const cases = [() => fetch('https://example.invalid/mir-proof'), () => fetch('/outside-test'), () => fetch('./inspiration.html', { method: 'POST', body: 'blocked-test' })];
       return Promise.all(cases.map(async run => { try { await run(); return 'UNEXPECTED_TRANSPORT'; } catch (error) { return error.message; } }));
     });
-    assert.deepEqual(report.guards, ['PREVIEW_EXTERNAL_REQUEST_DISABLED', 'PREVIEW_EXTERNAL_REQUEST_DISABLED']);
+    assert.deepEqual(report.guards, ['TEST_ENDPOINT_DENIED', 'PREVIEW_EXTERNAL_REQUEST_DISABLED', 'PREVIEW_EXTERNAL_REQUEST_DISABLED']);
     const sourceFiles = ['mir-inspiration.js', 'mir-inspiration-data.js', 'mir-inspiration.css'];
     report.sourceHashes = Object.fromEntries(sourceFiles.map(file => {
       const source = sha(fs.readFileSync(path.join(repo, 'dist', file)));
