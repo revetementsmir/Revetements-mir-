@@ -1,0 +1,158 @@
+{
+  "reviewedAt": "2026-11-18T10:15:52.423Z",
+  "base": "http://127.0.0.1:8819",
+  "results": [
+    {
+      "name": "Every generated HTML has the restrictive policy and early guard",
+      "passed": true,
+      "detail": {
+        "htmlFiles": 58,
+        "archiveAvailable": true
+      }
+    },
+    {
+      "name": "TEST navigation, cart and locale stay under the preview prefix",
+      "passed": true,
+      "detail": {
+        "links": 13,
+        "language": "en-CA",
+        "storage": "TEST namespace"
+      }
+    },
+    {
+      "name": "Fetch, XHR, sockets, beacon and same-origin writes are blocked before transfer",
+      "passed": true,
+      "detail": {
+        "external": true,
+        "localWrite": true,
+        "outsidePreview": true,
+        "xhr": true,
+        "socket": true,
+        "events": true,
+        "beacon": true,
+        "localRead": true
+      }
+    },
+    {
+      "name": "CSP blocks non-fetch external resources on normal and public Studio pages",
+      "passed": true,
+      "detail": [
+        {
+          "route": "aide.html",
+          "blocked": [
+            "script-src-elem",
+            "img-src",
+            "frame-src"
+          ]
+        },
+        {
+          "route": "studio-public.html",
+          "blocked": [
+            "script-src-elem",
+            "img-src",
+            "frame-src"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Known submission forms stop before business handlers and native submit",
+      "passed": true,
+      "detail": {
+        "blocked": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "businessCalls": 0
+      }
+    },
+    {
+      "name": "Outgoing links are blocked while local PDF and JSON downloads remain usable",
+      "passed": true,
+      "detail": {
+        "externalLinksBlocked": 3,
+        "downloads": [
+          "JSON Blob",
+          "PDF Blob"
+        ]
+      }
+    },
+    {
+      "name": "Account preview clearly labels disabled authentication without signing in",
+      "passed": true,
+      "detail": {
+        "noteFR": true,
+        "noteEN": true,
+        "realAuth": false
+      }
+    },
+    {
+      "name": "Preview guard preserves local material and multiple-fold additions to the common cart",
+      "passed": false,
+      "error": "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#product-add') to be visible\u001b[22m\n\u001b[2m    21 × locator resolved to hidden <button type=\"button\" id=\"product-add\" class=\"mir-button\">…</button>\u001b[22m\n"
+    },
+    {
+      "name": "Internal production routes retain their original presentation",
+      "passed": true,
+      "detail": [
+        {
+          "route": "production.html",
+          "prestige": false,
+          "tools": null
+        },
+        {
+          "route": "production.html?mode=client&source=store",
+          "prestige": false,
+          "tools": null
+        }
+      ]
+    },
+    {
+      "name": "Account shell excludes invitations and staff (isolated presentation fixture)",
+      "passed": true,
+      "detail": [
+        {
+          "query": "?clientLocale=1&invite=synthetic",
+          "excluded": true
+        },
+        {
+          "query": "?clientLocale=1&invitation=synthetic",
+          "excluded": true
+        },
+        {
+          "query": "?clientLocale=1&token=synthetic",
+          "excluded": true
+        },
+        {
+          "query": "?clientLocale=1",
+          "excluded": true
+        },
+        {
+          "query": "",
+          "excluded": true
+        },
+        {
+          "dynamicStaffMode": "boss",
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "name": "No request escaped the preview guards during review",
+      "passed": true,
+      "detail": {
+        "networkFallbackAborts": 0
+      }
+    }
+  ],
+  "attempts": [],
+  "limitations": [
+    "Local Chromium only; no real Auth, invitation, email, estimate, payment or Google request.",
+    "PDF→3D engine not recertified; this review covers preview perimeter and presentation only.",
+    "Worker response CSP is configured in vercel.json and must be checked on the deployed response; the local Python server does not apply host headers."
+  ]
+}

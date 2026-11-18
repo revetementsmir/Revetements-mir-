@@ -1,0 +1,32 @@
+CAPTURE after maison fr-CA 1280x800
+CAPTURE after maison en-CA 1280x800
+CAPTURE after maison fr-CA 1440x900
+CAPTURE after maison en-CA 1440x900
+CAPTURE after maison fr-CA 1920x1080
+CAPTURE after maison en-CA 1920x1080
+CAPTURE after accueil fr-CA 1280x800
+CAPTURE after accueil en-CA 1280x800
+CAPTURE after accueil fr-CA 1440x900
+CAPTURE after accueil en-CA 1440x900
+CAPTURE after accueil fr-CA 1920x1080
+CAPTURE after accueil en-CA 1920x1080
+FAIL navigation-and-locale-fr-CA: locator.click: Timeout 20000ms exceeded.
+Call log:
+[2m  - waiting for locator('.mir-pc-actions a[href^="boutique.html"]')[22m
+
+FAIL navigation-and-locale-en-CA: locator.click: Timeout 20000ms exceeded.
+Call log:
+[2m  - waiting for locator('.mir-pc-actions a[href^="boutique.html"]')[22m
+
+AssertionError [ERR_ASSERTION]: independent QA failed; inspect report
+
+2 !== 0
+
+    at main (/workspace/mir-particuliers-finition/tests/mir-particuliers-pc-finition-browser.cjs:28:2106) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 2,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

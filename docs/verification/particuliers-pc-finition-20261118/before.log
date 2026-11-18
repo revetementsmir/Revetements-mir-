@@ -1,0 +1,13 @@
+CAPTURE before maison fr-CA 1280x800
+CAPTURE before maison en-CA 1280x800
+CAPTURE before maison fr-CA 1440x900
+CAPTURE before maison en-CA 1440x900
+CAPTURE before maison fr-CA 1920x1080
+CAPTURE before maison en-CA 1920x1080
+CAPTURE before accueil fr-CA 1280x800
+CAPTURE before accueil en-CA 1280x800
+CAPTURE before accueil fr-CA 1440x900
+CAPTURE before accueil en-CA 1440x900
+CAPTURE before accueil fr-CA 1920x1080
+CAPTURE before accueil en-CA 1920x1080
+PASS before captures: 12 real screens; local GET only.

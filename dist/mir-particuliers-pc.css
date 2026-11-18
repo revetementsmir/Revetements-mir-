@@ -25,10 +25,12 @@ body.mir-particuliers-page .mir-pc-actions{border-top:1px solid var(--mir-pc-lin
 body.mir-particuliers-page .mir-pc-action{display:flex;align-items:center;justify-content:space-between;gap:18px;min-width:0;min-height:105px;padding:15px 0;border-bottom:1px solid var(--mir-pc-line);color:var(--mir-pc-cream);text-decoration:none;background:transparent;transition:color .18s ease}
 body.mir-particuliers-page a.mir-pc-action:hover,body.mir-particuliers-page a.mir-pc-action:focus-visible{color:var(--mir-pc-champagne)}
 body.mir-particuliers-page a.mir-pc-action:focus-visible{outline:2px solid var(--mir-pc-champagne);outline-offset:4px}
+body.mir-particuliers-page .mir-pc-pending:focus-visible{outline:2px solid var(--mir-pc-champagne);outline-offset:4px}
 body.mir-particuliers-page .mir-pc-action-copy{display:block;min-width:0;max-width:100%}
 body.mir-particuliers-page .mir-pc-action-copy strong{display:block;font:400 clamp(20px,1.7vw,27px)/1.17 "DM Sans",Arial,sans-serif;letter-spacing:-.02em;color:inherit}
 body.mir-particuliers-page .mir-pc-action-copy small{display:block;margin-top:8px;font:400 13px/1.4 "DM Sans",Arial,sans-serif;color:var(--mir-pc-muted)}
 body.mir-particuliers-page .mir-pc-arrow{flex:none;font:400 26px/1 Georgia,serif;color:var(--mir-pc-champagne)}
+body.mir-particuliers-page .mir-pc-arrow svg{display:block;width:20px;height:20px}
 body.mir-particuliers-page .mir-pc-pending{color:#c3c1b7}
 body.mir-particuliers-page .mir-pc-coming{flex:none;color:var(--mir-pc-champagne);font:500 10px/1.5 "DM Sans",Arial,sans-serif;letter-spacing:.06em}
 body.mir-particuliers-page .mir-pc-action-highlight .mir-pc-action-copy strong{color:var(--mir-pc-champagne)}
@@ -40,6 +42,11 @@ body.mir-particuliers-page .mir-pc-footer-links a:hover{text-decoration:underlin
 body.mir-particuliers-page .mir-pc-footer-disabled{opacity:.57}
 @media(min-width:1101px){
  body.mir-particuliers-page{min-height:100svh;display:flex;flex-direction:column}
+ /* Keep both gables and the whole timber entrance in frame. The approved
+    photograph is unchanged; these desktop-only rules widen its visible area. */
+ body.mir-particuliers-page .mir-pc-hero{grid-template-columns:minmax(0,62fr) minmax(0,38fr)}
+ body.mir-particuliers-page .mir-pc-photo{object-position:35% 52%}
+ body.mir-particuliers-page .mir-pc-intro{max-width:350px;font:400 14px/1.6 "DM Sans",Arial,sans-serif;letter-spacing:0;text-transform:none;margin-bottom:26px}
  body.mir-particuliers-page #mir-prestige-header{min-height:90px!important;height:90px!important;flex:0 0 90px;padding-top:20px!important;padding-bottom:0!important;grid-template-columns:1fr auto!important}
  body.mir-particuliers-page #mir-prestige-header>.mir-client-brand{width:166px!important;margin-bottom:20px!important}
  body.mir-particuliers-page #mir-prestige-header .mir-prestige-actions{margin-bottom:20px!important}

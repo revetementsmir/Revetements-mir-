@@ -1,0 +1,14 @@
+{
+  "base": "7c4e1fe4860b465e9c2db6caeed99b7dec442dc5",
+  "home": "16cf0f8bf197011cade4d5b5fdb7b6b3d2fc0e9e",
+  "applicationChanges": [
+    "dist/maison.html",
+    "dist/mir-particuliers-pc.css"
+  ],
+  "homepageChanged": "",
+  "photoSha256": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b",
+  "sourceFiles": {
+    "dist/maison.html": "516b0a5ab06be59e4bc4c68a7b523f5ab7db90549a16770cee56d39079785a4e",
+    "dist/mir-particuliers-pc.css": "619dd402aaeb3ba593592bcf96effc9f8d4588d76e078c82091f04916d8152c1"
+  }
+}

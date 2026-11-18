@@ -1,0 +1,8 @@
+{
+  "dist/maison.html": "516b0a5ab06be59e4bc4c68a7b523f5ab7db90549a16770cee56d39079785a4e",
+  "dist/mir-particuliers-pc.css": "619dd402aaeb3ba593592bcf96effc9f8d4588d76e078c82091f04916d8152c1",
+  "dist/assets/mir-particuliers-maison-approuvee.webp": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b",
+  "dist/assets/mir-home-hero-20261105.avif": "40bc16dc6afe44a009a90597f6ae325f4ca002e60788eda73df3e4d141b6bd15",
+  "dist/assets/mir-home-hero-20261105.webp": "53ee16ea323d72363a867e8218e66e569ff4603835612fee253041028cf40e1a",
+  "tests/mir-particuliers-pc-finition-browser.cjs": "cdade2d12eb1065e4365fa1401bdde944f9683fcddb4f58bdeb1506717e01b38"
+}

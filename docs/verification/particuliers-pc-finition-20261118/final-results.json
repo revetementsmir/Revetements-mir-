@@ -1,0 +1,1861 @@
+{
+  "generatedAt": "2026-11-18T10:20:49.903193+00:00",
+  "maisonReference": "7c4e1fe",
+  "homeReference": "16cf0f8",
+  "finalPassed": true,
+  "uniqueChecksPassed": 21,
+  "checks": [
+    {
+      "name": "layout-fr-CA-1280",
+      "passed": true,
+      "detail": {
+        "layout": {
+          "lang": "fr-CA",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "scroll": {
+            "width": 1280,
+            "height": 800
+          },
+          "heading": "Un revêtement\nqui vous ressemble.",
+          "header": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 90,
+            "bottom": 90,
+            "right": 1280
+          },
+          "photo": {
+            "x": 0,
+            "y": 90,
+            "width": 793.59375,
+            "height": 646,
+            "bottom": 736,
+            "right": 793.59375
+          },
+          "actions": [
+            {
+              "text": "Trouver mon inspiration\nStyles et idées pour votre maison.\nBientôt",
+              "href": null,
+              "disabled": "true",
+              "rect": {
+                "x": 851.1875,
+                "y": 220.921875,
+                "width": 371.21875,
+                "height": 105,
+                "bottom": 325.921875,
+                "right": 1222.40625
+              }
+            },
+            {
+              "text": "Choisir mes matériaux\nRevêtements, textures et couleurs.",
+              "href": "/boutique.html",
+              "disabled": null,
+              "rect": {
+                "x": 851.1875,
+                "y": 325.921875,
+                "width": 371.21875,
+                "height": 105,
+                "bottom": 430.921875,
+                "right": 1222.40625
+              }
+            },
+            {
+              "text": "Visualiser mon projet en 3D\nImaginez votre façade en 3D.",
+              "href": "/plan.html",
+              "disabled": null,
+              "rect": {
+                "x": 851.1875,
+                "y": 430.921875,
+                "width": 371.21875,
+                "height": 105,
+                "bottom": 535.921875,
+                "right": 1222.40625
+              }
+            },
+            {
+              "text": "Demander une estimation\nDécrivez votre projet. Ajoutez vos photos ou vos plans.",
+              "href": "/estimation.html",
+              "disabled": null,
+              "rect": {
+                "x": 851.1875,
+                "y": 535.921875,
+                "width": 371.21875,
+                "height": 105,
+                "bottom": 640.921875,
+                "right": 1222.40625
+              }
+            }
+          ],
+          "footer": {
+            "x": 0,
+            "y": 736,
+            "width": 1280,
+            "height": 64,
+            "bottom": 800,
+            "right": 1280
+          }
+        },
+        "visibleTextRuns": 20,
+        "alt": "Illustration d’une maison contemporaine entourée d’arbres, avec revêtements foncés, pierre claire et touches de bois"
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "interactions-fr-CA-1280",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 0,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 851.1875,
+              "y": 220.921875,
+              "bottom": 325.921875,
+              "right": 1222.40625
+            }
+          },
+          {
+            "index": 1,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 851.1875,
+              "y": 325.921875,
+              "bottom": 430.921875,
+              "right": 1222.40625
+            }
+          },
+          {
+            "index": 2,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 851.1875,
+              "y": 430.921875,
+              "bottom": 535.921875,
+              "right": 1222.40625
+            }
+          },
+          {
+            "index": 3,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 851.1875,
+              "y": 535.921875,
+              "bottom": 640.921875,
+              "right": 1222.40625
+            }
+          }
+        ],
+        "hover": [
+          {
+            "text": "Choisir mes matériaux",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Visualiser mon projet en 3D",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Demander une estimation",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          }
+        ]
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "layout-en-CA-1280",
+      "passed": true,
+      "detail": {
+        "layout": {
+          "lang": "en-CA",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          },
+          "scroll": {
+            "width": 1280,
+            "height": 800
+          },
+          "heading": "Siding that\nfeels like home.",
+          "header": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 90,
+            "bottom": 90,
+            "right": 1280
+          },
+          "photo": {
+            "x": 0,
+            "y": 90,
+            "width": 793.59375,
+            "height": 646,
+            "bottom": 736,
+            "right": 793.59375
+          },
+          "actions": [
+            {
+              "text": "Find my inspiration\nStyles and ideas for your home.\nComing soon",
+              "href": null,
+              "disabled": "true",
+              "rect": {
+                "x": 851.1875,
+                "y": 209.71875,
+                "width": 371.21875,
+                "height": 105,
+                "bottom": 314.71875,
+                "right": 1222.40625
+              }
+            },
+            {
+              "text": "Choose my materials\nSiding, textures and colours.",
+              "href": "/boutique.html",
+              "disabled": null,
+              "rect": {
+                "x": 851.1875,
+                "y": 314.71875,
+                "width": 371.21875,
+                "height": 105,
+                "bottom": 419.71875,
+                "right": 1222.40625
+              }
+            },
+            {
+              "text": "Visualize my project in 3D\nPicture your exterior in 3D.",
+              "href": "/plan.html",
+              "disabled": null,
+              "rect": {
+                "x": 851.1875,
+                "y": 419.71875,
+                "width": 371.21875,
+                "height": 105,
+                "bottom": 524.71875,
+                "right": 1222.40625
+              }
+            },
+            {
+              "text": "Request an estimate\nDescribe your project. Add your photos or plans.",
+              "href": "/estimation.html",
+              "disabled": null,
+              "rect": {
+                "x": 851.1875,
+                "y": 524.71875,
+                "width": 371.21875,
+                "height": 105,
+                "bottom": 629.71875,
+                "right": 1222.40625
+              }
+            }
+          ],
+          "footer": {
+            "x": 0,
+            "y": 736,
+            "width": 1280,
+            "height": 64,
+            "bottom": 800,
+            "right": 1280
+          }
+        },
+        "visibleTextRuns": 18,
+        "alt": "Illustration of a contemporary house surrounded by trees, with dark siding, light stone and wood accents"
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "interactions-en-CA-1280",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 0,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 851.1875,
+              "y": 209.71875,
+              "bottom": 314.71875,
+              "right": 1222.40625
+            }
+          },
+          {
+            "index": 1,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 851.1875,
+              "y": 314.71875,
+              "bottom": 419.71875,
+              "right": 1222.40625
+            }
+          },
+          {
+            "index": 2,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 851.1875,
+              "y": 419.71875,
+              "bottom": 524.71875,
+              "right": 1222.40625
+            }
+          },
+          {
+            "index": 3,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 851.1875,
+              "y": 524.71875,
+              "bottom": 629.71875,
+              "right": 1222.40625
+            }
+          }
+        ],
+        "hover": [
+          {
+            "text": "Choose my materials",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Visualize my project in 3D",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Request an estimate",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          }
+        ]
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "layout-fr-CA-1440",
+      "passed": true,
+      "detail": {
+        "layout": {
+          "lang": "fr-CA",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "scroll": {
+            "width": 1440,
+            "height": 900
+          },
+          "heading": "Un revêtement\nqui vous ressemble.",
+          "header": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 90,
+            "bottom": 90,
+            "right": 1440
+          },
+          "photo": {
+            "x": 0,
+            "y": 90,
+            "width": 892.796875,
+            "height": 746,
+            "bottom": 836,
+            "right": 892.796875
+          },
+          "actions": [
+            {
+              "text": "Trouver mon inspiration\nStyles et idées pour votre maison.\nBientôt",
+              "href": null,
+              "disabled": "true",
+              "rect": {
+                "x": 957.59375,
+                "y": 270.921875,
+                "width": 417.609375,
+                "height": 105,
+                "bottom": 375.921875,
+                "right": 1375.203125
+              }
+            },
+            {
+              "text": "Choisir mes matériaux\nRevêtements, textures et couleurs.",
+              "href": "/boutique.html",
+              "disabled": null,
+              "rect": {
+                "x": 957.59375,
+                "y": 375.921875,
+                "width": 417.609375,
+                "height": 105,
+                "bottom": 480.921875,
+                "right": 1375.203125
+              }
+            },
+            {
+              "text": "Visualiser mon projet en 3D\nImaginez votre façade en 3D.",
+              "href": "/plan.html",
+              "disabled": null,
+              "rect": {
+                "x": 957.59375,
+                "y": 480.921875,
+                "width": 417.609375,
+                "height": 105,
+                "bottom": 585.921875,
+                "right": 1375.203125
+              }
+            },
+            {
+              "text": "Demander une estimation\nDécrivez votre projet. Ajoutez vos photos ou vos plans.",
+              "href": "/estimation.html",
+              "disabled": null,
+              "rect": {
+                "x": 957.59375,
+                "y": 585.921875,
+                "width": 417.609375,
+                "height": 105,
+                "bottom": 690.921875,
+                "right": 1375.203125
+              }
+            }
+          ],
+          "footer": {
+            "x": 0,
+            "y": 836,
+            "width": 1440,
+            "height": 64,
+            "bottom": 900,
+            "right": 1440
+          }
+        },
+        "visibleTextRuns": 20,
+        "alt": "Illustration d’une maison contemporaine entourée d’arbres, avec revêtements foncés, pierre claire et touches de bois"
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "interactions-fr-CA-1440",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 0,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 957.59375,
+              "y": 270.921875,
+              "bottom": 375.921875,
+              "right": 1375.203125
+            }
+          },
+          {
+            "index": 1,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 957.59375,
+              "y": 375.921875,
+              "bottom": 480.921875,
+              "right": 1375.203125
+            }
+          },
+          {
+            "index": 2,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 957.59375,
+              "y": 480.921875,
+              "bottom": 585.921875,
+              "right": 1375.203125
+            }
+          },
+          {
+            "index": 3,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 957.59375,
+              "y": 585.921875,
+              "bottom": 690.921875,
+              "right": 1375.203125
+            }
+          }
+        ],
+        "hover": [
+          {
+            "text": "Choisir mes matériaux",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Visualiser mon projet en 3D",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Demander une estimation",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          }
+        ]
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "layout-en-CA-1440",
+      "passed": true,
+      "detail": {
+        "layout": {
+          "lang": "en-CA",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "scroll": {
+            "width": 1440,
+            "height": 900
+          },
+          "heading": "Siding that\nfeels like home.",
+          "header": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 90,
+            "bottom": 90,
+            "right": 1440
+          },
+          "photo": {
+            "x": 0,
+            "y": 90,
+            "width": 892.796875,
+            "height": 746,
+            "bottom": 836,
+            "right": 892.796875
+          },
+          "actions": [
+            {
+              "text": "Find my inspiration\nStyles and ideas for your home.\nComing soon",
+              "href": null,
+              "disabled": "true",
+              "rect": {
+                "x": 957.59375,
+                "y": 259.71875,
+                "width": 417.609375,
+                "height": 105,
+                "bottom": 364.71875,
+                "right": 1375.203125
+              }
+            },
+            {
+              "text": "Choose my materials\nSiding, textures and colours.",
+              "href": "/boutique.html",
+              "disabled": null,
+              "rect": {
+                "x": 957.59375,
+                "y": 364.71875,
+                "width": 417.609375,
+                "height": 105,
+                "bottom": 469.71875,
+                "right": 1375.203125
+              }
+            },
+            {
+              "text": "Visualize my project in 3D\nPicture your exterior in 3D.",
+              "href": "/plan.html",
+              "disabled": null,
+              "rect": {
+                "x": 957.59375,
+                "y": 469.71875,
+                "width": 417.609375,
+                "height": 105,
+                "bottom": 574.71875,
+                "right": 1375.203125
+              }
+            },
+            {
+              "text": "Request an estimate\nDescribe your project. Add your photos or plans.",
+              "href": "/estimation.html",
+              "disabled": null,
+              "rect": {
+                "x": 957.59375,
+                "y": 574.71875,
+                "width": 417.609375,
+                "height": 105,
+                "bottom": 679.71875,
+                "right": 1375.203125
+              }
+            }
+          ],
+          "footer": {
+            "x": 0,
+            "y": 836,
+            "width": 1440,
+            "height": 64,
+            "bottom": 900,
+            "right": 1440
+          }
+        },
+        "visibleTextRuns": 18,
+        "alt": "Illustration of a contemporary house surrounded by trees, with dark siding, light stone and wood accents"
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "interactions-en-CA-1440",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 0,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 957.59375,
+              "y": 259.71875,
+              "bottom": 364.71875,
+              "right": 1375.203125
+            }
+          },
+          {
+            "index": 1,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 957.59375,
+              "y": 364.71875,
+              "bottom": 469.71875,
+              "right": 1375.203125
+            }
+          },
+          {
+            "index": 2,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 957.59375,
+              "y": 469.71875,
+              "bottom": 574.71875,
+              "right": 1375.203125
+            }
+          },
+          {
+            "index": 3,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 957.59375,
+              "y": 574.71875,
+              "bottom": 679.71875,
+              "right": 1375.203125
+            }
+          }
+        ],
+        "hover": [
+          {
+            "text": "Choose my materials",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Visualize my project in 3D",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Request an estimate",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          }
+        ]
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "layout-fr-CA-1920",
+      "passed": true,
+      "detail": {
+        "layout": {
+          "lang": "fr-CA",
+          "viewport": {
+            "width": 1920,
+            "height": 1080
+          },
+          "scroll": {
+            "width": 1920,
+            "height": 1080
+          },
+          "heading": "Un revêtement\nqui vous ressemble.",
+          "header": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 90,
+            "bottom": 90,
+            "right": 1920
+          },
+          "photo": {
+            "x": 0,
+            "y": 90,
+            "width": 1190.390625,
+            "height": 926,
+            "bottom": 1016,
+            "right": 1190.390625
+          },
+          "actions": [
+            {
+              "text": "Trouver mon inspiration\nStyles et idées pour votre maison.\nBientôt",
+              "href": null,
+              "disabled": "true",
+              "rect": {
+                "x": 1268.390625,
+                "y": 360.921875,
+                "width": 573.609375,
+                "height": 105,
+                "bottom": 465.921875,
+                "right": 1842
+              }
+            },
+            {
+              "text": "Choisir mes matériaux\nRevêtements, textures et couleurs.",
+              "href": "/boutique.html",
+              "disabled": null,
+              "rect": {
+                "x": 1268.390625,
+                "y": 465.921875,
+                "width": 573.609375,
+                "height": 105,
+                "bottom": 570.921875,
+                "right": 1842
+              }
+            },
+            {
+              "text": "Visualiser mon projet en 3D\nImaginez votre façade en 3D.",
+              "href": "/plan.html",
+              "disabled": null,
+              "rect": {
+                "x": 1268.390625,
+                "y": 570.921875,
+                "width": 573.609375,
+                "height": 105,
+                "bottom": 675.921875,
+                "right": 1842
+              }
+            },
+            {
+              "text": "Demander une estimation\nDécrivez votre projet. Ajoutez vos photos ou vos plans.",
+              "href": "/estimation.html",
+              "disabled": null,
+              "rect": {
+                "x": 1268.390625,
+                "y": 675.921875,
+                "width": 573.609375,
+                "height": 105,
+                "bottom": 780.921875,
+                "right": 1842
+              }
+            }
+          ],
+          "footer": {
+            "x": 0,
+            "y": 1016,
+            "width": 1920,
+            "height": 64,
+            "bottom": 1080,
+            "right": 1920
+          }
+        },
+        "visibleTextRuns": 20,
+        "alt": "Illustration d’une maison contemporaine entourée d’arbres, avec revêtements foncés, pierre claire et touches de bois"
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "interactions-fr-CA-1920",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 0,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 1268.390625,
+              "y": 360.921875,
+              "bottom": 465.921875,
+              "right": 1842
+            }
+          },
+          {
+            "index": 1,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 1268.390625,
+              "y": 465.921875,
+              "bottom": 570.921875,
+              "right": 1842
+            }
+          },
+          {
+            "index": 2,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 1268.390625,
+              "y": 570.921875,
+              "bottom": 675.921875,
+              "right": 1842
+            }
+          },
+          {
+            "index": 3,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 1268.390625,
+              "y": 675.921875,
+              "bottom": 780.921875,
+              "right": 1842
+            }
+          }
+        ],
+        "hover": [
+          {
+            "text": "Choisir mes matériaux",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Visualiser mon projet en 3D",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Demander une estimation",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          }
+        ]
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "layout-en-CA-1920",
+      "passed": true,
+      "detail": {
+        "layout": {
+          "lang": "en-CA",
+          "viewport": {
+            "width": 1920,
+            "height": 1080
+          },
+          "scroll": {
+            "width": 1920,
+            "height": 1080
+          },
+          "heading": "Siding that\nfeels like home.",
+          "header": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 90,
+            "bottom": 90,
+            "right": 1920
+          },
+          "photo": {
+            "x": 0,
+            "y": 90,
+            "width": 1190.390625,
+            "height": 926,
+            "bottom": 1016,
+            "right": 1190.390625
+          },
+          "actions": [
+            {
+              "text": "Find my inspiration\nStyles and ideas for your home.\nComing soon",
+              "href": null,
+              "disabled": "true",
+              "rect": {
+                "x": 1268.390625,
+                "y": 349.71875,
+                "width": 573.609375,
+                "height": 105,
+                "bottom": 454.71875,
+                "right": 1842
+              }
+            },
+            {
+              "text": "Choose my materials\nSiding, textures and colours.",
+              "href": "/boutique.html",
+              "disabled": null,
+              "rect": {
+                "x": 1268.390625,
+                "y": 454.71875,
+                "width": 573.609375,
+                "height": 105,
+                "bottom": 559.71875,
+                "right": 1842
+              }
+            },
+            {
+              "text": "Visualize my project in 3D\nPicture your exterior in 3D.",
+              "href": "/plan.html",
+              "disabled": null,
+              "rect": {
+                "x": 1268.390625,
+                "y": 559.71875,
+                "width": 573.609375,
+                "height": 105,
+                "bottom": 664.71875,
+                "right": 1842
+              }
+            },
+            {
+              "text": "Request an estimate\nDescribe your project. Add your photos or plans.",
+              "href": "/estimation.html",
+              "disabled": null,
+              "rect": {
+                "x": 1268.390625,
+                "y": 664.71875,
+                "width": 573.609375,
+                "height": 105,
+                "bottom": 769.71875,
+                "right": 1842
+              }
+            }
+          ],
+          "footer": {
+            "x": 0,
+            "y": 1016,
+            "width": 1920,
+            "height": 64,
+            "bottom": 1080,
+            "right": 1920
+          }
+        },
+        "visibleTextRuns": 18,
+        "alt": "Illustration of a contemporary house surrounded by trees, with dark siding, light stone and wood accents"
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "interactions-en-CA-1920",
+      "passed": true,
+      "detail": {
+        "keyboard": [
+          {
+            "index": 0,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 1268.390625,
+              "y": 349.71875,
+              "bottom": 454.71875,
+              "right": 1842
+            }
+          },
+          {
+            "index": 1,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 1268.390625,
+              "y": 454.71875,
+              "bottom": 559.71875,
+              "right": 1842
+            }
+          },
+          {
+            "index": 2,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 1268.390625,
+              "y": 559.71875,
+              "bottom": 664.71875,
+              "right": 1842
+            }
+          },
+          {
+            "index": 3,
+            "focusVisible": true,
+            "outline": "solid",
+            "width": 2,
+            "shadow": "none",
+            "rect": {
+              "x": 1268.390625,
+              "y": 664.71875,
+              "bottom": 769.71875,
+              "right": 1842
+            }
+          }
+        ],
+        "hover": [
+          {
+            "text": "Choose my materials",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Visualize my project in 3D",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          },
+          {
+            "text": "Request an estimate",
+            "normal": {
+              "color": "rgb(244, 241, 234)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "active": {
+              "color": "rgb(189, 168, 137)",
+              "background": "rgba(0, 0, 0, 0)",
+              "transform": "none",
+              "decoration": "none",
+              "arrow": "none",
+              "arrowColor": "rgb(189, 168, 137)"
+            },
+            "changed": true
+          }
+        ]
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "accueil-strict-reference",
+      "passed": true,
+      "detail": {
+        "comparisons": [
+          {
+            "locale": "fr-CA",
+            "size": {
+              "width": 1280,
+              "height": 800
+            },
+            "changedPixels": 0,
+            "totalPixels": 1024000,
+            "strictlyIdentical": true
+          },
+          {
+            "locale": "en-CA",
+            "size": {
+              "width": 1280,
+              "height": 800
+            },
+            "changedPixels": 0,
+            "totalPixels": 1024000,
+            "strictlyIdentical": true
+          },
+          {
+            "locale": "fr-CA",
+            "size": {
+              "width": 1440,
+              "height": 900
+            },
+            "changedPixels": 0,
+            "totalPixels": 1296000,
+            "strictlyIdentical": true
+          },
+          {
+            "locale": "en-CA",
+            "size": {
+              "width": 1440,
+              "height": 900
+            },
+            "changedPixels": 0,
+            "totalPixels": 1296000,
+            "strictlyIdentical": true
+          },
+          {
+            "locale": "fr-CA",
+            "size": {
+              "width": 1920,
+              "height": 1080
+            },
+            "changedPixels": 0,
+            "totalPixels": 2073600,
+            "strictlyIdentical": true
+          },
+          {
+            "locale": "en-CA",
+            "size": {
+              "width": 1920,
+              "height": 1080
+            },
+            "changedPixels": 0,
+            "totalPixels": 2073600,
+            "strictlyIdentical": true
+          }
+        ],
+        "hashes": [
+          {
+            "file": "index.html",
+            "before": "a5746fb8decf5218ef35dd2cdf1c8c72e73b086c701b6b9a74190f22db3afcac",
+            "after": "a5746fb8decf5218ef35dd2cdf1c8c72e73b086c701b6b9a74190f22db3afcac"
+          },
+          {
+            "file": "style.css",
+            "before": "7a9b04b2bf17c4c82c0d5639d367fd08544fbbaed0f5070bb88e4c0848445065",
+            "after": "7a9b04b2bf17c4c82c0d5639d367fd08544fbbaed0f5070bb88e4c0848445065"
+          },
+          {
+            "file": "mir-v4.css",
+            "before": "547e0a3708072650aff08c83f859750560a15f4220c9b590263bd567b0ee3da0",
+            "after": "547e0a3708072650aff08c83f859750560a15f4220c9b590263bd567b0ee3da0"
+          },
+          {
+            "file": "mir-home-premium.css",
+            "before": "abf242b04f7175b32a0cc365adaf7480c8dd0886fad36ce5eface3d82d7e7851",
+            "after": "abf242b04f7175b32a0cc365adaf7480c8dd0886fad36ce5eface3d82d7e7851"
+          },
+          {
+            "file": "mir-public-menu.css",
+            "before": "1ef60e057b3b524cf85c3f3513c41f53c712521fdeee184b02e06f08f2ddb33f",
+            "after": "1ef60e057b3b524cf85c3f3513c41f53c712521fdeee184b02e06f08f2ddb33f"
+          },
+          {
+            "file": "mir-client-i18n.css",
+            "before": "819fe27d34fe97265b8ecce47377d1898db288a52c5f7cd8b6097789b2d3c2ca",
+            "after": "819fe27d34fe97265b8ecce47377d1898db288a52c5f7cd8b6097789b2d3c2ca"
+          },
+          {
+            "file": "mir-prestige-editorial.css",
+            "before": "753ab7a2a7b4851ca626d88dbdc2dd54b04743002591df454012082c8da9f22a",
+            "after": "753ab7a2a7b4851ca626d88dbdc2dd54b04743002591df454012082c8da9f22a"
+          },
+          {
+            "file": "mir-prestige.css",
+            "before": "467e53a77cd61024135750c43f1cd4ca6515cf34249c46f9c64721b5d5e1d108",
+            "after": "467e53a77cd61024135750c43f1cd4ca6515cf34249c46f9c64721b5d5e1d108"
+          },
+          {
+            "file": "mir-home-desktop-locked.css",
+            "before": "3b4634e25ab66c32360e987bfed3c16bb7e0c1b6fc095f223ff758734ec85473",
+            "after": "3b4634e25ab66c32360e987bfed3c16bb7e0c1b6fc095f223ff758734ec85473"
+          },
+          {
+            "file": "mir-home-approved.css",
+            "before": "865d2816f1f71012fc70dbfd569e816b566ee089baa0f326b9d2a7780cf35766",
+            "after": "865d2816f1f71012fc70dbfd569e816b566ee089baa0f326b9d2a7780cf35766"
+          },
+          {
+            "file": "assets/mir-home-hero-20261105.avif",
+            "before": "40bc16dc6afe44a009a90597f6ae325f4ca002e60788eda73df3e4d141b6bd15",
+            "after": "40bc16dc6afe44a009a90597f6ae325f4ca002e60788eda73df3e4d141b6bd15"
+          },
+          {
+            "file": "assets/MIR-logo-officiel-original.svg",
+            "before": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c",
+            "after": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c"
+          },
+          {
+            "file": "mir-client-pages.css",
+            "before": "6144f0c930670a64f9622d45264df9847255c8019afca6aece0e3a2ce37ca3a1",
+            "after": "6144f0c930670a64f9622d45264df9847255c8019afca6aece0e3a2ce37ca3a1"
+          },
+          {
+            "file": "mir-public-menu.js",
+            "before": "9690f28345f85e1190eb87fbda487ad05e8dadb96e85c0f75cdd6c7190873e63",
+            "after": "9690f28345f85e1190eb87fbda487ad05e8dadb96e85c0f75cdd6c7190873e63"
+          },
+          {
+            "file": "mir-client-en-ca.js",
+            "before": "cbd2c2575d2015da25a7b968b8e5c1f77dbb3b6ca46390f51d60fe80fd04cee7",
+            "after": "cbd2c2575d2015da25a7b968b8e5c1f77dbb3b6ca46390f51d60fe80fd04cee7"
+          },
+          {
+            "file": "mir-client-i18n.js",
+            "before": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf",
+            "after": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+          },
+          {
+            "file": "mir-prestige.js",
+            "before": "fac30e8073c1ff64e02abc8a546292fd8755239d8019b2ca23a4cf4876141165",
+            "after": "fac30e8073c1ff64e02abc8a546292fd8755239d8019b2ca23a4cf4876141165"
+          },
+          {
+            "file": "mir-home-approved.js",
+            "before": "ae740ea08b7fa6ce36a1399afeca4eb4457e4cfb3f3c6d787f4ffb3f880f3343",
+            "after": "ae740ea08b7fa6ce36a1399afeca4eb4457e4cfb3f3c6d787f4ffb3f880f3343"
+          },
+          {
+            "file": "assets/mir-home-card-revetement-20261105.webp",
+            "before": "864478f53ca3857743bde67a9bf4678347c6e5e71d2b3e35ce7ec390fb3843c9",
+            "after": "864478f53ca3857743bde67a9bf4678347c6e5e71d2b3e35ce7ec390fb3843c9"
+          },
+          {
+            "file": "assets/mir-home-card-pliage-20261105.webp",
+            "before": "ae035ed042ea87b56db7bc8425fcd6b9a670ac59d258b3b769963b68bbf84ee2",
+            "after": "ae035ed042ea87b56db7bc8425fcd6b9a670ac59d258b3b769963b68bbf84ee2"
+          },
+          {
+            "file": "assets/mir-home-card-studio-20261105.webp",
+            "before": "3accaf7f62cb00b025592b98996e1a1f001dbcc04d41e9894bd64c27da8f9fca",
+            "after": "3accaf7f62cb00b025592b98996e1a1f001dbcc04d41e9894bd64c27da8f9fca"
+          },
+          {
+            "file": "assets/fonts/dm-sans-variable.ttf",
+            "before": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d",
+            "after": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d"
+          }
+        ],
+        "photosUnchanged": true
+      },
+      "evidence": "after-captures.json"
+    },
+    {
+      "name": "navigation-and-locale-fr-CA",
+      "passed": true,
+      "detail": [
+        {
+          "kind": "boutique",
+          "path": "/boutique.html",
+          "locale": "en-CA"
+        },
+        {
+          "kind": "studio-test-local",
+          "path": "/plan.html",
+          "locale": "en-CA",
+          "engineReady": true,
+          "publicConstruction": false,
+          "title": "Imagine your exterior."
+        },
+        {
+          "kind": "estimation-directe",
+          "path": "/estimation.html",
+          "locale": "en-CA",
+          "acceptedFiles": ".pdf,application/pdf",
+          "sendDisabled": true
+        }
+      ],
+      "evidence": "after-follow-up.json"
+    },
+    {
+      "name": "zoom200-fr-CA-1280",
+      "passed": true,
+      "detail": {
+        "method": "CSS viewport halved with DPR 2, equivalent desktop 200% reflow; not a physical browser zoom claim",
+        "physical": {
+          "width": 1280,
+          "height": 800
+        },
+        "cssViewport": {
+          "width": 640,
+          "height": 400
+        },
+        "reachable": [
+          {
+            "text": "Trouver mon inspiration\nStyles et idées pour votre maison.\nBientôt",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Choisir mes matériaux\nRevêtements, textures et couleurs.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Visualiser mon projet en 3D\nImaginez votre façade en 3D.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Demander une estimation\nDécrivez votre projet. Ajoutez vos photos ou vos plans.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          }
+        ]
+      },
+      "evidence": "after-follow-up.json"
+    },
+    {
+      "name": "zoom200-fr-CA-1440",
+      "passed": true,
+      "detail": {
+        "method": "CSS viewport halved with DPR 2, equivalent desktop 200% reflow; not a physical browser zoom claim",
+        "physical": {
+          "width": 1440,
+          "height": 900
+        },
+        "cssViewport": {
+          "width": 720,
+          "height": 450
+        },
+        "reachable": [
+          {
+            "text": "Trouver mon inspiration\nStyles et idées pour votre maison.\nBientôt",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Choisir mes matériaux\nRevêtements, textures et couleurs.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Visualiser mon projet en 3D\nImaginez votre façade en 3D.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Demander une estimation\nDécrivez votre projet. Ajoutez vos photos ou vos plans.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          }
+        ]
+      },
+      "evidence": "after-follow-up.json"
+    },
+    {
+      "name": "zoom200-fr-CA-1920",
+      "passed": true,
+      "detail": {
+        "method": "CSS viewport halved with DPR 2, equivalent desktop 200% reflow; not a physical browser zoom claim",
+        "physical": {
+          "width": 1920,
+          "height": 1080
+        },
+        "cssViewport": {
+          "width": 960,
+          "height": 540
+        },
+        "reachable": [
+          {
+            "text": "Trouver mon inspiration\nStyles et idées pour votre maison.\nBientôt",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Choisir mes matériaux\nRevêtements, textures et couleurs.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Visualiser mon projet en 3D\nImaginez votre façade en 3D.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Demander une estimation\nDécrivez votre projet. Ajoutez vos photos ou vos plans.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          }
+        ]
+      },
+      "evidence": "after-follow-up.json"
+    },
+    {
+      "name": "navigation-and-locale-en-CA",
+      "passed": true,
+      "detail": [
+        {
+          "kind": "boutique",
+          "path": "/boutique.html",
+          "locale": "fr-CA"
+        },
+        {
+          "kind": "studio-test-local",
+          "path": "/plan.html",
+          "locale": "fr-CA",
+          "engineReady": true,
+          "publicConstruction": false,
+          "title": "Imaginez votre façade."
+        },
+        {
+          "kind": "estimation-directe",
+          "path": "/estimation.html",
+          "locale": "fr-CA",
+          "acceptedFiles": ".pdf,application/pdf",
+          "sendDisabled": true
+        }
+      ],
+      "evidence": "after-follow-up.json"
+    },
+    {
+      "name": "zoom200-en-CA-1280",
+      "passed": true,
+      "detail": {
+        "method": "CSS viewport halved with DPR 2, equivalent desktop 200% reflow; not a physical browser zoom claim",
+        "physical": {
+          "width": 1280,
+          "height": 800
+        },
+        "cssViewport": {
+          "width": 640,
+          "height": 400
+        },
+        "reachable": [
+          {
+            "text": "Find my inspiration\nStyles and ideas for your home.\nComing soon",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Choose my materials\nSiding, textures and colours.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Visualize my project in 3D\nPicture your exterior in 3D.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Request an estimate\nDescribe your project. Add your photos or plans.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          }
+        ]
+      },
+      "evidence": "after-follow-up.json"
+    },
+    {
+      "name": "zoom200-en-CA-1440",
+      "passed": true,
+      "detail": {
+        "method": "CSS viewport halved with DPR 2, equivalent desktop 200% reflow; not a physical browser zoom claim",
+        "physical": {
+          "width": 1440,
+          "height": 900
+        },
+        "cssViewport": {
+          "width": 720,
+          "height": 450
+        },
+        "reachable": [
+          {
+            "text": "Find my inspiration\nStyles and ideas for your home.\nComing soon",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Choose my materials\nSiding, textures and colours.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Visualize my project in 3D\nPicture your exterior in 3D.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Request an estimate\nDescribe your project. Add your photos or plans.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          }
+        ]
+      },
+      "evidence": "after-follow-up.json"
+    },
+    {
+      "name": "zoom200-en-CA-1920",
+      "passed": true,
+      "detail": {
+        "method": "CSS viewport halved with DPR 2, equivalent desktop 200% reflow; not a physical browser zoom claim",
+        "physical": {
+          "width": 1920,
+          "height": 1080
+        },
+        "cssViewport": {
+          "width": 960,
+          "height": 540
+        },
+        "reachable": [
+          {
+            "text": "Find my inspiration\nStyles and ideas for your home.\nComing soon",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Choose my materials\nSiding, textures and colours.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Visualize my project in 3D\nPicture your exterior in 3D.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          },
+          {
+            "text": "Request an estimate\nDescribe your project. Add your photos or plans.",
+            "hit": true,
+            "visible": true,
+            "focus": true
+          }
+        ]
+      },
+      "evidence": "after-follow-up.json"
+    }
+  ],
+  "primaryScreensBefore": 12,
+  "primaryScreensAfter": 12,
+  "appSourcesMatchCapturedSources": true,
+  "sourceSha256": {
+    "dist/maison.html": "516b0a5ab06be59e4bc4c68a7b523f5ab7db90549a16770cee56d39079785a4e",
+    "dist/mir-particuliers-pc.css": "619dd402aaeb3ba593592bcf96effc9f8d4588d76e078c82091f04916d8152c1",
+    "dist/assets/mir-particuliers-maison-approuvee.webp": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b",
+    "dist/assets/mir-home-hero-20261105.avif": "40bc16dc6afe44a009a90597f6ae325f4ca002e60788eda73df3e4d141b6bd15",
+    "dist/assets/mir-home-hero-20261105.webp": "53ee16ea323d72363a867e8218e66e569ff4603835612fee253041028cf40e1a",
+    "tests/mir-particuliers-pc-finition-browser.cjs": "cdade2d12eb1065e4365fa1401bdde944f9683fcddb4f58bdeb1506717e01b38"
+  },
+  "blockedRequests": [
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    }
+  ],
+  "networkPolicy": "Only local GET allowed. External or non-GET requests aborted before network. No form submitted.",
+  "historicalFailures": {
+    "file": "after-captures.json",
+    "count": 2,
+    "reason": "Harness used href starts-with boutique.html, but client navigation normalizes /boutique.html?lang=... . Corrected to exact accessible role/name; both navigation paths pass in after-follow-up.json."
+  },
+  "limitations": [
+    "200% tested as equivalent reflow: CSS viewport halved and DPR 2, not physical browser zoom.",
+    "Existing estimation upload accepts PDF only, despite approved photos/plans entry text. No form submission or upload performed.",
+    "Existing TEST-source studio initialization verified; no PDF import or conversion capability certified."
+  ]
+}

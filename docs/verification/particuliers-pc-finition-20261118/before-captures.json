@@ -1,0 +1,1059 @@
+{
+  "phase": "before",
+  "maisonRef": "7c4e1fe",
+  "homeRef": "16cf0f8",
+  "browser": "155.0.8059.79",
+  "generatedAt": "2026-11-18T10:10:02.511Z",
+  "originHouse": "http://127.0.0.1:37101",
+  "originHome": "http://127.0.0.1:39221",
+  "blocked": [],
+  "pages": [
+    {
+      "kind": "maison",
+      "locale": "fr-CA",
+      "size": {
+        "width": 1280,
+        "height": 800
+      },
+      "capture": {
+        "file": "before-maison-fr-CA-1280x800.png",
+        "sha256": "45f5723396fb14acee6751c2fdd5ccb3f6b2201345994b3bf506f35683ea80af"
+      },
+      "geometry": {
+        "lang": "fr-CA",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scroll": {
+          "width": 1280,
+          "height": 800
+        },
+        "heading": "Un revêtement\nqui vous ressemble.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 90,
+          "bottom": 90,
+          "right": 1280
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 684.640625,
+          "height": 646,
+          "bottom": 736,
+          "right": 684.640625
+        },
+        "actions": [
+          {
+            "text": "Trouver mon inspiration\nStyles et idées pour votre maison.\nBientôt",
+            "href": null,
+            "disabled": "true",
+            "rect": {
+              "x": 742.234375,
+              "y": 209.28125,
+              "width": 480.15625,
+              "height": 105,
+              "bottom": 314.28125,
+              "right": 1222.390625
+            }
+          },
+          {
+            "text": "Consulter nos matériaux\nRevêtements, textures et couleurs.\n↗",
+            "href": "/boutique.html",
+            "disabled": null,
+            "rect": {
+              "x": 742.234375,
+              "y": 314.28125,
+              "width": 480.15625,
+              "height": 105,
+              "bottom": 419.28125,
+              "right": 1222.390625
+            }
+          },
+          {
+            "text": "Visualiser mon projet en 3D\nImaginez votre façade en 3D.\n↗",
+            "href": "/plan.html",
+            "disabled": null,
+            "rect": {
+              "x": 742.234375,
+              "y": 419.28125,
+              "width": 480.15625,
+              "height": 105,
+              "bottom": 524.28125,
+              "right": 1222.390625
+            }
+          },
+          {
+            "text": "Demander une estimation\nAjoutez vos photos, plans ou PDF.\n↗",
+            "href": "/estimation.html",
+            "disabled": null,
+            "rect": {
+              "x": 742.234375,
+              "y": 524.28125,
+              "width": 480.15625,
+              "height": 105,
+              "bottom": 629.28125,
+              "right": 1222.390625
+            }
+          }
+        ],
+        "footer": {
+          "x": 0,
+          "y": 736,
+          "width": 1280,
+          "height": 64,
+          "bottom": 800,
+          "right": 1280
+        }
+      }
+    },
+    {
+      "kind": "maison",
+      "locale": "en-CA",
+      "size": {
+        "width": 1280,
+        "height": 800
+      },
+      "capture": {
+        "file": "before-maison-en-CA-1280x800.png",
+        "sha256": "1d9a6e1bf7a22f4ba5eba1eb347e6b5d1a60a8b098c8935fa639ca526c1ee168"
+      },
+      "geometry": {
+        "lang": "en-CA",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scroll": {
+          "width": 1280,
+          "height": 800
+        },
+        "heading": "Siding that\nfeels like home.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 90,
+          "bottom": 90,
+          "right": 1280
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 684.640625,
+          "height": 646,
+          "bottom": 736,
+          "right": 684.640625
+        },
+        "actions": [
+          {
+            "text": "Find my inspiration\nStyles and ideas for your home.\nComing soon",
+            "href": null,
+            "disabled": "true",
+            "rect": {
+              "x": 742.234375,
+              "y": 209.28125,
+              "width": 480.15625,
+              "height": 105,
+              "bottom": 314.28125,
+              "right": 1222.390625
+            }
+          },
+          {
+            "text": "Explore our materials\nSiding, textures and colours.\n↗",
+            "href": "/boutique.html",
+            "disabled": null,
+            "rect": {
+              "x": 742.234375,
+              "y": 314.28125,
+              "width": 480.15625,
+              "height": 105,
+              "bottom": 419.28125,
+              "right": 1222.390625
+            }
+          },
+          {
+            "text": "Visualize my project in 3D\nVisualize your home's exterior.\n↗",
+            "href": "/plan.html",
+            "disabled": null,
+            "rect": {
+              "x": 742.234375,
+              "y": 419.28125,
+              "width": 480.15625,
+              "height": 105,
+              "bottom": 524.28125,
+              "right": 1222.390625
+            }
+          },
+          {
+            "text": "Request an estimate\nAttach photos, plans or PDFs.\n↗",
+            "href": "/estimation.html",
+            "disabled": null,
+            "rect": {
+              "x": 742.234375,
+              "y": 524.28125,
+              "width": 480.15625,
+              "height": 105,
+              "bottom": 629.28125,
+              "right": 1222.390625
+            }
+          }
+        ],
+        "footer": {
+          "x": 0,
+          "y": 736,
+          "width": 1280,
+          "height": 64,
+          "bottom": 800,
+          "right": 1280
+        }
+      }
+    },
+    {
+      "kind": "maison",
+      "locale": "fr-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "capture": {
+        "file": "before-maison-fr-CA-1440x900.png",
+        "sha256": "8795768eedb6b331832986a79990370b46b446a7a298fbc15f3797d4e6f1d3ca"
+      },
+      "geometry": {
+        "lang": "fr-CA",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "scroll": {
+          "width": 1440,
+          "height": 900
+        },
+        "heading": "Un revêtement\nqui vous ressemble.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 90,
+          "bottom": 90,
+          "right": 1440
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 770.21875,
+          "height": 746,
+          "bottom": 836,
+          "right": 770.21875
+        },
+        "actions": [
+          {
+            "text": "Trouver mon inspiration\nStyles et idées pour votre maison.\nBientôt",
+            "href": null,
+            "disabled": "true",
+            "rect": {
+              "x": 835.015625,
+              "y": 259.28125,
+              "width": 540.171875,
+              "height": 105,
+              "bottom": 364.28125,
+              "right": 1375.1875
+            }
+          },
+          {
+            "text": "Consulter nos matériaux\nRevêtements, textures et couleurs.\n↗",
+            "href": "/boutique.html",
+            "disabled": null,
+            "rect": {
+              "x": 835.015625,
+              "y": 364.28125,
+              "width": 540.171875,
+              "height": 105,
+              "bottom": 469.28125,
+              "right": 1375.1875
+            }
+          },
+          {
+            "text": "Visualiser mon projet en 3D\nImaginez votre façade en 3D.\n↗",
+            "href": "/plan.html",
+            "disabled": null,
+            "rect": {
+              "x": 835.015625,
+              "y": 469.28125,
+              "width": 540.171875,
+              "height": 105,
+              "bottom": 574.28125,
+              "right": 1375.1875
+            }
+          },
+          {
+            "text": "Demander une estimation\nAjoutez vos photos, plans ou PDF.\n↗",
+            "href": "/estimation.html",
+            "disabled": null,
+            "rect": {
+              "x": 835.015625,
+              "y": 574.28125,
+              "width": 540.171875,
+              "height": 105,
+              "bottom": 679.28125,
+              "right": 1375.1875
+            }
+          }
+        ],
+        "footer": {
+          "x": 0,
+          "y": 836,
+          "width": 1440,
+          "height": 64,
+          "bottom": 900,
+          "right": 1440
+        }
+      }
+    },
+    {
+      "kind": "maison",
+      "locale": "en-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "capture": {
+        "file": "before-maison-en-CA-1440x900.png",
+        "sha256": "b580a3161266992f6d3629dab1ed2760cc5aa78fea3cb4ff42b4b300a42b67f2"
+      },
+      "geometry": {
+        "lang": "en-CA",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "scroll": {
+          "width": 1440,
+          "height": 900
+        },
+        "heading": "Siding that\nfeels like home.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 90,
+          "bottom": 90,
+          "right": 1440
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 770.21875,
+          "height": 746,
+          "bottom": 836,
+          "right": 770.21875
+        },
+        "actions": [
+          {
+            "text": "Find my inspiration\nStyles and ideas for your home.\nComing soon",
+            "href": null,
+            "disabled": "true",
+            "rect": {
+              "x": 835.015625,
+              "y": 259.28125,
+              "width": 540.171875,
+              "height": 105,
+              "bottom": 364.28125,
+              "right": 1375.1875
+            }
+          },
+          {
+            "text": "Explore our materials\nSiding, textures and colours.\n↗",
+            "href": "/boutique.html",
+            "disabled": null,
+            "rect": {
+              "x": 835.015625,
+              "y": 364.28125,
+              "width": 540.171875,
+              "height": 105,
+              "bottom": 469.28125,
+              "right": 1375.1875
+            }
+          },
+          {
+            "text": "Visualize my project in 3D\nVisualize your home's exterior.\n↗",
+            "href": "/plan.html",
+            "disabled": null,
+            "rect": {
+              "x": 835.015625,
+              "y": 469.28125,
+              "width": 540.171875,
+              "height": 105,
+              "bottom": 574.28125,
+              "right": 1375.1875
+            }
+          },
+          {
+            "text": "Request an estimate\nAttach photos, plans or PDFs.\n↗",
+            "href": "/estimation.html",
+            "disabled": null,
+            "rect": {
+              "x": 835.015625,
+              "y": 574.28125,
+              "width": 540.171875,
+              "height": 105,
+              "bottom": 679.28125,
+              "right": 1375.1875
+            }
+          }
+        ],
+        "footer": {
+          "x": 0,
+          "y": 836,
+          "width": 1440,
+          "height": 64,
+          "bottom": 900,
+          "right": 1440
+        }
+      }
+    },
+    {
+      "kind": "maison",
+      "locale": "fr-CA",
+      "size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "capture": {
+        "file": "before-maison-fr-CA-1920x1080.png",
+        "sha256": "2090b7056f93830040e1557b0c7654d136af2e3d317e2fce407342b547d4edee"
+      },
+      "geometry": {
+        "lang": "fr-CA",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "scroll": {
+          "width": 1920,
+          "height": 1080
+        },
+        "heading": "Un revêtement\nqui vous ressemble.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 90,
+          "bottom": 90,
+          "right": 1920
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 1026.96875,
+          "height": 926,
+          "bottom": 1016,
+          "right": 1026.96875
+        },
+        "actions": [
+          {
+            "text": "Trouver mon inspiration\nStyles et idées pour votre maison.\nBientôt",
+            "href": null,
+            "disabled": "true",
+            "rect": {
+              "x": 1178.46875,
+              "y": 349.28125,
+              "width": 590,
+              "height": 105,
+              "bottom": 454.28125,
+              "right": 1768.46875
+            }
+          },
+          {
+            "text": "Consulter nos matériaux\nRevêtements, textures et couleurs.\n↗",
+            "href": "/boutique.html",
+            "disabled": null,
+            "rect": {
+              "x": 1178.46875,
+              "y": 454.28125,
+              "width": 590,
+              "height": 105,
+              "bottom": 559.28125,
+              "right": 1768.46875
+            }
+          },
+          {
+            "text": "Visualiser mon projet en 3D\nImaginez votre façade en 3D.\n↗",
+            "href": "/plan.html",
+            "disabled": null,
+            "rect": {
+              "x": 1178.46875,
+              "y": 559.28125,
+              "width": 590,
+              "height": 105,
+              "bottom": 664.28125,
+              "right": 1768.46875
+            }
+          },
+          {
+            "text": "Demander une estimation\nAjoutez vos photos, plans ou PDF.\n↗",
+            "href": "/estimation.html",
+            "disabled": null,
+            "rect": {
+              "x": 1178.46875,
+              "y": 664.28125,
+              "width": 590,
+              "height": 105,
+              "bottom": 769.28125,
+              "right": 1768.46875
+            }
+          }
+        ],
+        "footer": {
+          "x": 0,
+          "y": 1016,
+          "width": 1920,
+          "height": 64,
+          "bottom": 1080,
+          "right": 1920
+        }
+      }
+    },
+    {
+      "kind": "maison",
+      "locale": "en-CA",
+      "size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "capture": {
+        "file": "before-maison-en-CA-1920x1080.png",
+        "sha256": "938f896b0434bb845aee2494c4f16d659c9f4b820fc53f5e86d63c44aa39bb07"
+      },
+      "geometry": {
+        "lang": "en-CA",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "scroll": {
+          "width": 1920,
+          "height": 1080
+        },
+        "heading": "Siding that\nfeels like home.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 90,
+          "bottom": 90,
+          "right": 1920
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 1026.96875,
+          "height": 926,
+          "bottom": 1016,
+          "right": 1026.96875
+        },
+        "actions": [
+          {
+            "text": "Find my inspiration\nStyles and ideas for your home.\nComing soon",
+            "href": null,
+            "disabled": "true",
+            "rect": {
+              "x": 1178.46875,
+              "y": 349.28125,
+              "width": 590,
+              "height": 105,
+              "bottom": 454.28125,
+              "right": 1768.46875
+            }
+          },
+          {
+            "text": "Explore our materials\nSiding, textures and colours.\n↗",
+            "href": "/boutique.html",
+            "disabled": null,
+            "rect": {
+              "x": 1178.46875,
+              "y": 454.28125,
+              "width": 590,
+              "height": 105,
+              "bottom": 559.28125,
+              "right": 1768.46875
+            }
+          },
+          {
+            "text": "Visualize my project in 3D\nVisualize your home's exterior.\n↗",
+            "href": "/plan.html",
+            "disabled": null,
+            "rect": {
+              "x": 1178.46875,
+              "y": 559.28125,
+              "width": 590,
+              "height": 105,
+              "bottom": 664.28125,
+              "right": 1768.46875
+            }
+          },
+          {
+            "text": "Request an estimate\nAttach photos, plans or PDFs.\n↗",
+            "href": "/estimation.html",
+            "disabled": null,
+            "rect": {
+              "x": 1178.46875,
+              "y": 664.28125,
+              "width": 590,
+              "height": 105,
+              "bottom": 769.28125,
+              "right": 1768.46875
+            }
+          }
+        ],
+        "footer": {
+          "x": 0,
+          "y": 1016,
+          "width": 1920,
+          "height": 64,
+          "bottom": 1080,
+          "right": 1920
+        }
+      }
+    },
+    {
+      "kind": "accueil",
+      "locale": "fr-CA",
+      "size": {
+        "width": 1280,
+        "height": 800
+      },
+      "capture": {
+        "file": "before-accueil-fr-CA-1280x800.png",
+        "sha256": "959252d3af044724ae6330fc1e6f61188524a68317117056b5d093aa1627dbb4"
+      },
+      "geometry": {
+        "lang": "fr-CA",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scroll": {
+          "width": 1280,
+          "height": 1295
+        },
+        "heading": "Votre projet\ncommence ici.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 90,
+          "bottom": 90,
+          "right": 1280
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 684.640625,
+          "height": 676.90625,
+          "bottom": 766.90625,
+          "right": 684.640625
+        },
+        "actions": [],
+        "footer": null
+      }
+    },
+    {
+      "kind": "accueil",
+      "locale": "en-CA",
+      "size": {
+        "width": 1280,
+        "height": 800
+      },
+      "capture": {
+        "file": "before-accueil-en-CA-1280x800.png",
+        "sha256": "298f92a25fce1cb9a2a6a452d539b4657b892c82b587ec12c5c80ab2d302a72b"
+      },
+      "geometry": {
+        "lang": "en-CA",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scroll": {
+          "width": 1280,
+          "height": 1295
+        },
+        "heading": "Your project\nstarts here.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 90,
+          "bottom": 90,
+          "right": 1280
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 684.640625,
+          "height": 676.90625,
+          "bottom": 766.90625,
+          "right": 684.640625
+        },
+        "actions": [],
+        "footer": null
+      }
+    },
+    {
+      "kind": "accueil",
+      "locale": "fr-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "capture": {
+        "file": "before-accueil-fr-CA-1440x900.png",
+        "sha256": "41b94548e0ea780583b509401aceb394c2193e83a59c8861db6f6e982a13cf75"
+      },
+      "geometry": {
+        "lang": "fr-CA",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "scroll": {
+          "width": 1440,
+          "height": 1403
+        },
+        "heading": "Votre projet\ncommence ici.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 90,
+          "bottom": 90,
+          "right": 1440
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 770.21875,
+          "height": 692.8125,
+          "bottom": 782.8125,
+          "right": 770.21875
+        },
+        "actions": [],
+        "footer": null
+      }
+    },
+    {
+      "kind": "accueil",
+      "locale": "en-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "capture": {
+        "file": "before-accueil-en-CA-1440x900.png",
+        "sha256": "df54cb4161cf7b4593964b6ab3b5ebe9b74fb1c11522b634f810fb374a0238ce"
+      },
+      "geometry": {
+        "lang": "en-CA",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "scroll": {
+          "width": 1440,
+          "height": 1403
+        },
+        "heading": "Your project\nstarts here.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 90,
+          "bottom": 90,
+          "right": 1440
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 770.21875,
+          "height": 692.8125,
+          "bottom": 782.8125,
+          "right": 770.21875
+        },
+        "actions": [],
+        "footer": null
+      }
+    },
+    {
+      "kind": "accueil",
+      "locale": "fr-CA",
+      "size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "capture": {
+        "file": "before-accueil-fr-CA-1920x1080.png",
+        "sha256": "267b8b23815045aa48efbc16a60279749583625819be9c35b5e70c01a4299eac"
+      },
+      "geometry": {
+        "lang": "fr-CA",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "scroll": {
+          "width": 1920,
+          "height": 1446
+        },
+        "heading": "Votre projet\ncommence ici.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 90,
+          "bottom": 90,
+          "right": 1920
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 1047.265625,
+          "height": 735.5,
+          "bottom": 825.5,
+          "right": 1047.265625
+        },
+        "actions": [],
+        "footer": null
+      }
+    },
+    {
+      "kind": "accueil",
+      "locale": "en-CA",
+      "size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "capture": {
+        "file": "before-accueil-en-CA-1920x1080.png",
+        "sha256": "646dfec5ef3a414e39c2e7b467c51dea22f47b416bcb151937ce49e126f5356d"
+      },
+      "geometry": {
+        "lang": "en-CA",
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "scroll": {
+          "width": 1920,
+          "height": 1446
+        },
+        "heading": "Your project\nstarts here.",
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 90,
+          "bottom": 90,
+          "right": 1920
+        },
+        "photo": {
+          "x": 0,
+          "y": 90,
+          "width": 1047.265625,
+          "height": 735.5,
+          "bottom": 825.5,
+          "right": 1047.265625
+        },
+        "actions": [],
+        "footer": null
+      }
+    }
+  ],
+  "errors": [],
+  "resources": {
+    "maison": [
+      {
+        "file": "maison.html",
+        "sha256": "88d49d3a6e4e54ea827ddc20f9c36b6a69a859e6d807661ef28b66d8c0b9666d"
+      },
+      {
+        "file": "style.css",
+        "sha256": "7a9b04b2bf17c4c82c0d5639d367fd08544fbbaed0f5070bb88e4c0848445065"
+      },
+      {
+        "file": "mir-client-header.css",
+        "sha256": "05f381a887e743d277eee4936f2f3edf3526ec4cff266dc706aeec0d3f8b410d"
+      },
+      {
+        "file": "mir-v4.css",
+        "sha256": "547e0a3708072650aff08c83f859750560a15f4220c9b590263bd567b0ee3da0"
+      },
+      {
+        "file": "mir-home-premium.css",
+        "sha256": "abf242b04f7175b32a0cc365adaf7480c8dd0886fad36ce5eface3d82d7e7851"
+      },
+      {
+        "file": "mir-client-signature.css",
+        "sha256": "d347ff921a059a371a3763f93910dd801c85a1c0c5e07c083bcab0449abb05e2"
+      },
+      {
+        "file": "mir-public-menu.css",
+        "sha256": "1ef60e057b3b524cf85c3f3513c41f53c712521fdeee184b02e06f08f2ddb33f"
+      },
+      {
+        "file": "mir-public-shell.css",
+        "sha256": "1858b664dc53fbc0b3bb1a03dbc5ec52ee9deb3e6de0c6912295d8e6b26ab1b6"
+      },
+      {
+        "file": "mir-prestige-editorial.css",
+        "sha256": "753ab7a2a7b4851ca626d88dbdc2dd54b04743002591df454012082c8da9f22a"
+      },
+      {
+        "file": "mir-client-pages.css",
+        "sha256": "6144f0c930670a64f9622d45264df9847255c8019afca6aece0e3a2ce37ca3a1"
+      },
+      {
+        "file": "mir-particuliers-pc.css",
+        "sha256": "3cfa40e908e4f68dd37b6f792a52f302da5b6a90d39f7f75eb67cba4af438f17"
+      },
+      {
+        "file": "mir-prestige.css",
+        "sha256": "467e53a77cd61024135750c43f1cd4ca6515cf34249c46f9c64721b5d5e1d108"
+      },
+      {
+        "file": "mir-public-audit.css",
+        "sha256": "146c210ac9109ea8a5eb55057e79978739bd0736fd10306ae94ae4bcd7271b29"
+      },
+      {
+        "file": "assets/MIR-logo-officiel-original.svg",
+        "sha256": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c"
+      },
+      {
+        "file": "mir-public-menu.js",
+        "sha256": "9690f28345f85e1190eb87fbda487ad05e8dadb96e85c0f75cdd6c7190873e63"
+      },
+      {
+        "file": "mir-client-en-ca.js",
+        "sha256": "cbd2c2575d2015da25a7b968b8e5c1f77dbb3b6ca46390f51d60fe80fd04cee7"
+      },
+      {
+        "file": "mir-client-i18n.js",
+        "sha256": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+      },
+      {
+        "file": "assets/mir-particuliers-maison-approuvee.webp",
+        "sha256": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b"
+      },
+      {
+        "file": "mir-client-i18n.css",
+        "sha256": "819fe27d34fe97265b8ecce47377d1898db288a52c5f7cd8b6097789b2d3c2ca"
+      },
+      {
+        "file": "mir-prestige.js",
+        "sha256": "fac30e8073c1ff64e02abc8a546292fd8755239d8019b2ca23a4cf4876141165"
+      },
+      {
+        "file": "mir-client-pages.js",
+        "sha256": "c9ab984df7382d6fac731aca85f87aa0e2c640400d0079a8657883a5cc25e6b4"
+      },
+      {
+        "file": "assets/fonts/dm-sans-variable.ttf",
+        "sha256": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d"
+      }
+    ],
+    "accueil": [
+      {
+        "file": "index.html",
+        "sha256": "a5746fb8decf5218ef35dd2cdf1c8c72e73b086c701b6b9a74190f22db3afcac"
+      },
+      {
+        "file": "style.css",
+        "sha256": "7a9b04b2bf17c4c82c0d5639d367fd08544fbbaed0f5070bb88e4c0848445065"
+      },
+      {
+        "file": "mir-v4.css",
+        "sha256": "547e0a3708072650aff08c83f859750560a15f4220c9b590263bd567b0ee3da0"
+      },
+      {
+        "file": "mir-home-premium.css",
+        "sha256": "abf242b04f7175b32a0cc365adaf7480c8dd0886fad36ce5eface3d82d7e7851"
+      },
+      {
+        "file": "mir-public-menu.css",
+        "sha256": "1ef60e057b3b524cf85c3f3513c41f53c712521fdeee184b02e06f08f2ddb33f"
+      },
+      {
+        "file": "mir-client-i18n.css",
+        "sha256": "819fe27d34fe97265b8ecce47377d1898db288a52c5f7cd8b6097789b2d3c2ca"
+      },
+      {
+        "file": "mir-prestige-editorial.css",
+        "sha256": "753ab7a2a7b4851ca626d88dbdc2dd54b04743002591df454012082c8da9f22a"
+      },
+      {
+        "file": "mir-prestige.css",
+        "sha256": "467e53a77cd61024135750c43f1cd4ca6515cf34249c46f9c64721b5d5e1d108"
+      },
+      {
+        "file": "mir-home-desktop-locked.css",
+        "sha256": "3b4634e25ab66c32360e987bfed3c16bb7e0c1b6fc095f223ff758734ec85473"
+      },
+      {
+        "file": "mir-home-approved.css",
+        "sha256": "865d2816f1f71012fc70dbfd569e816b566ee089baa0f326b9d2a7780cf35766"
+      },
+      {
+        "file": "assets/mir-home-hero-20261105.avif",
+        "sha256": "40bc16dc6afe44a009a90597f6ae325f4ca002e60788eda73df3e4d141b6bd15"
+      },
+      {
+        "file": "assets/MIR-logo-officiel-original.svg",
+        "sha256": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c"
+      },
+      {
+        "file": "mir-client-pages.css",
+        "sha256": "6144f0c930670a64f9622d45264df9847255c8019afca6aece0e3a2ce37ca3a1"
+      },
+      {
+        "file": "mir-public-menu.js",
+        "sha256": "9690f28345f85e1190eb87fbda487ad05e8dadb96e85c0f75cdd6c7190873e63"
+      },
+      {
+        "file": "mir-client-en-ca.js",
+        "sha256": "cbd2c2575d2015da25a7b968b8e5c1f77dbb3b6ca46390f51d60fe80fd04cee7"
+      },
+      {
+        "file": "mir-client-i18n.js",
+        "sha256": "f0bf20b65c827d7e9a6de5f56339d052b339d0d297a0447d0040c235ab4bd2bf"
+      },
+      {
+        "file": "mir-prestige.js",
+        "sha256": "fac30e8073c1ff64e02abc8a546292fd8755239d8019b2ca23a4cf4876141165"
+      },
+      {
+        "file": "mir-home-approved.js",
+        "sha256": "ae740ea08b7fa6ce36a1399afeca4eb4457e4cfb3f3c6d787f4ffb3f880f3343"
+      },
+      {
+        "file": "assets/mir-home-card-revetement-20261105.webp",
+        "sha256": "864478f53ca3857743bde67a9bf4678347c6e5e71d2b3e35ce7ec390fb3843c9"
+      },
+      {
+        "file": "assets/mir-home-card-pliage-20261105.webp",
+        "sha256": "ae035ed042ea87b56db7bc8425fcd6b9a670ac59d258b3b769963b68bbf84ee2"
+      },
+      {
+        "file": "assets/mir-home-card-studio-20261105.webp",
+        "sha256": "3accaf7f62cb00b025592b98996e1a1f001dbcc04d41e9894bd64c27da8f9fca"
+      },
+      {
+        "file": "assets/fonts/dm-sans-variable.ttf",
+        "sha256": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d"
+      }
+    ]
+  }
+}
