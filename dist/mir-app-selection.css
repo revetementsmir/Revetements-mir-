@@ -46,6 +46,8 @@ body[data-field-shell=true][data-field-design=home-test] :is(.absence-row,.notif
 body[data-field-shell=true][data-field-design=home-test] :is(.notification-card.is-read,.settings-transport,.mg-metric,.mg-status,.mg-finance-total,.mir-help-side,.field-form-context){background:var(--field-soft)!important;color:var(--field-text)!important;border-color:var(--field-border)!important}
 body[data-field-shell=true][data-field-design=home-test] :is(.notification-status,.notification-card small,.notification-card time,.notification-footer p,.punch-totals span,.punch-days span,.material-list small,.mg-list span,.mg-metric span,.mg-empty,.mir-help-state,.absence-help){color:var(--field-muted)!important}
 body[data-field-shell=true][data-field-design=home-test] :is(.punch-totals strong,.mg-metric strong,.mg-empty strong,.portal-empty h2,.portal-empty h3){color:var(--field-text)!important}
+body[data-field-shell=true][data-field-design=home-test] :is(.portal-empty,.cart-empty,.mg-empty) svg{color:var(--field-accent)!important}
+body[data-field-shell=true][data-field-design=home-test] .employee-tabs{background:var(--field-soft)!important;border:1px solid var(--field-border)!important;border-radius:6px!important}
 body[data-field-shell=true][data-field-design=home-test] :is(.notification-toolbar button,.employee-tabs button,.lead-team-list button,.lead-row button,.mir-help-close,.mir-help-categories button,.mir-choice-close,.mir-choice-clear){background:var(--field-soft)!important;color:var(--field-text)!important;border:1px solid var(--field-border)!important;border-radius:4px!important}
 body[data-field-shell=true][data-field-design=home-test] :is(.notification-toolbar button[aria-selected=true],.employee-tabs button[aria-selected=true],.mir-help-categories button[aria-pressed=true]){background:var(--field-selection)!important;color:var(--field-text)!important;border-color:var(--field-accent)!important}
 body[data-field-shell=true][data-field-design=home-test] .notification-marker{border-color:var(--field-muted)!important}
@@ -230,5 +232,12 @@ body[data-field-shell=true][data-field-design=home-test] .mir-app-order-actions{
 /* Keep the longest navigation label on one line on narrow phones. */
 body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom button,
 body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom button>span{white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;font-size:clamp(.6875rem,3vw,.8rem)!important}
+/* Measure the rendered labels after native text zoom; keep all five hit areas. */
+body[data-field-shell=true][data-field-design=home-test] #portal-navigation.field-bottom button>span{font-size:calc(clamp(.6875rem,3vw,.8rem) * var(--field-nav-label-scale,1))!important}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-image-missing{display:block;width:28px;height:28px;color:#776e5f}
 body[data-field-shell=true][data-field-design=home-test] .mir-app-quick:not([open])>div{display:none!important}
+
+/* Large Android text needs document scrolling around the bounded article list. */
+body[data-field-shell=true][data-field-design=home-test][data-field-dense=true] .mir-app-c02{height:auto!important;min-height:var(--field-available-height)}
+body[data-field-shell=true][data-field-design=home-test][data-field-dense=true] .mir-app-c02 #employee-browse{flex:0 0 auto}
+body[data-field-shell=true][data-field-design=home-test][data-field-dense=true] .mir-app-c02 .field-store-results{flex:0 0 auto;min-height:120px;max-height:clamp(160px,40dvh,420px)}
