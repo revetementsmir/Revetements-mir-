@@ -1,4 +1,12 @@
-Refonte anthracite de toutes les pages Employé/Chef — version standard **0.13.2-test**, codes **130003 → 130004** pour la recette de mise à jour. Même identifiant `ca.revetementsmir.equipe.test`, ressources `dist/` embarquées et environnement MIR TEST. La palette et les polices viennent de l’accueil PC TEST ; le menu commun est **Accueil · Commande · Punch · Messages · Plus**. La composition et les fonctions de l’accueil et du Punch existants sont conservées, avec le nouveau thème. Commande, Messages et Plus reprennent les choix C02 / M08 / P10. La nouvelle APK doit être validée sur son SHA exact avant remise.
+Connexion mobile 08 — version candidate **0.13.3-test**, codes **130005 → 130006** pour la recette de mise à jour dans un même runner. Petit logo MIR, formulaire courriel/mot de passe directement visible, bouton Google et palette anthracite/champagne approuvés. Le bouton Google respecte la capacité réellement configurée du fournisseur ; son affichage ne prouve pas une authentification Google réussie. La récupération conserve son propre titre et explique son indisponibilité lorsque le transport TEST est désactivé. La candidate doit être compilée et vérifiée sur son SHA exact avant remise.
+
+L’identifiant reste `ca.revetementsmir.equipe.test`, les ressources `dist/` restent embarquées et le backend reste MIR TEST. Le menu commun **Accueil · Commande · Punch · Messages · Plus**, les accueils, le Punch et le parcours Pliage existants sont conservés.
+
+## Signature et portée de la mise à jour candidate
+
+La recette **130005 → 130006** utilise la même clé debug dans une seule exécution CI. Elle ne démontre pas une mise à jour compatible avec l’APK **130004** précédemment remis à Frederick. Ce dernier porte le certificat SHA-256 `d62841b88fd0b0194ef871c5fcc03a2b1e0bc43fc5895308fddf35e9d0a94842` ; aucune clé privée correspondante n’a été trouvée dans le workspace ni dans l’artefact de livraison audité.
+
+Le workflow ne crée aucune nouvelle identité de paquet ni stratégie de signature durable. Avant de remettre la candidate comme mise à jour de l’installation existante, il faut disposer de la clé d’origine et vérifier le certificat. À défaut, le choix d’une identité TEST distincte reste à convenir : une nouvelle clé ne rend pas une mise à jour compatible rétroactivement. Ne pas désinstaller l’ancienne application ni effacer ses données pour contourner un conflit de signature.
 
 Les versions et preuves des paragraphes suivants sont historiques. Le paquet personnel Samsung S25 (`ca.revetementsmir.equipe.recette.s25`) possède sa propre identité et sa propre signature; cette compilation standard ne prétend pas le remplacer.
 

@@ -27,6 +27,17 @@ jobs:
           if ! git cat-file -e "${MIR_APP_REFERENCE_SHA}^{commit}" 2>/dev/null; then
             git fetch --no-tags --depth=1 origin "$MIR_APP_REFERENCE_SHA"
           fi
+      - name: Connexion native 08 — formulaire, Google et récupération
+        env:
+          MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+          NODE_PATH: ./mobile/node_modules
+        run: node mobile/tools/test-web.cjs
+      - name: Conserver les captures de la connexion
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase11-login08-proof
+          path: artifacts/phase11/web/
       - name: Refonte de l’application et parcours Pliage en navigateur
         env:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
@@ -88,7 +99,6 @@ jobs:
           mir_check node tests/mir-team-invitation-email.cjs
           mir_check node mobile/tools/test-invitation-email-web.cjs
           mir_check node mobile/tools/test-compat.cjs
-          mir_check node mobile/tools/test-web.cjs
           mir_check node mobile/tools/test-pdf-web.cjs
           mir_check node mobile/tools/test-device-checks.cjs
           mir_check node tests/mir-phase10-bending.cjs
@@ -154,8 +164,8 @@ jobs:
         working-directory: mobile/android
         run: |
           ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon
-          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/mir-version-130003.apk"
-          MIR_ANDROID_VERSION_CODE=130004 ./gradlew :app:assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/mir-version-130005.apk"
+          MIR_ANDROID_VERSION_CODE=130006 ./gradlew :app:assembleDebug --no-daemon
           mkdir -p ../../artifacts/phase11
           cp app/build/outputs/apk/debug/app-debug.apk ../../artifacts/phase11/MIR-TEST-debug.apk
           cd ../..
@@ -199,7 +209,7 @@ jobs:
           }
           trap finish EXIT
           timeout --foreground 180s mobile/tools/android-ci-environment.sh start
-          adb install "$RUNNER_TEMP/mir-version-130003.apk"
+          adb install "$RUNNER_TEMP/mir-version-130005.apk"
           adb install mobile/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
           mobile/tools/run-instrumentation.sh
           cp artifacts/phase11/instrumentation.txt artifacts/phase11/webview-tests.txt

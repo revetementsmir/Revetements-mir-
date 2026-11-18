@@ -35,6 +35,9 @@
   return nav;
  }
  function accountEligible(){
+  // Android owns a single, complete sign-in screen; keep this client pager
+  // only on the website, without changing Studio or authenticated navigation.
+  if(document.documentElement.dataset.mirNative==='true')return false;
   if(['invite','invitation','token'].some(key=>params.has(key))||$('[data-mir-invitation="true"]'))return false;
   return ['login','client','loading'].includes(document.body.dataset.portalMode||'login')&&!!$('.auth-grid');
  }

@@ -51,10 +51,131 @@ body, html body:has(#mir-harmony-header #portal-navigation) { padding-bottom: ca
 
 #mir-device-lock{position:fixed;inset:0;z-index:2147483647;display:grid;place-content:center;background:var(--mir-surface,#fff)}
 html[data-mir-device-locked] body>*:not(#mir-device-lock){visibility:hidden!important;pointer-events:none!important}
-#mir-email-toggle{margin-block:12px}#auth-signin-form[hidden]{display:none!important}
+#auth-signin-form[hidden]{display:none!important}
 .google-official{width:20px;height:20px;vertical-align:middle;margin-inline-end:10px}
 
 html body[data-field-shell=true]{padding-top:calc(64px + env(safe-area-inset-top,0px))!important;padding-bottom:calc(var(--field-nav-height,74px) + env(safe-area-inset-bottom,0px))!important}
 body[data-field-shell=true] #mir-native-state{position:static!important;min-height:0!important;padding:4px 16px;font-size:11px}
 body[data-field-shell=true] #mir-device-lock-option{display:none}
 body[data-field-shell=true] #portal-content:has(#harmony-settings-form) #mir-device-lock-option{display:block}
+
+/* Approved native connection 08. The same live forms and Auth handlers are
+   retained; the client website's account layout does not receive this class. */
+html:root body.mir-native-auth {
+  background:#242522!important;color:#f4f1ea!important;
+  font-family:"DM Sans",Arial,Helvetica,sans-serif!important;
+  padding-top:env(safe-area-inset-top,0px)!important;
+  padding-bottom:env(safe-area-inset-bottom,0px)!important;
+  min-height:100dvh;
+}
+html:root[data-mir-harmony] body.mir-native-auth :is(#mir-harmony-header,.portal-header,.portal-sidebar,.portal-footer,.mir-prestige-account-support) {display:none!important}
+html:root body.mir-native-auth #mir-native-state {
+  position:static!important;min-height:0;padding:5px 16px;
+  background:#2d2e2a!important;color:#c8c5bd!important;font:12px/1.4 "DM Sans",Arial,sans-serif;
+}
+html:root body.mir-native-auth :is(.portal-shell,.portal-shell.auth-shell) {
+  display:block!important;width:calc(100% - 40px)!important;max-width:430px!important;
+  min-height:0!important;margin:0 auto!important;padding:28px 0 24px!important;
+}
+html:root body.mir-native-auth #portal-main,
+html:root body.mir-native-auth #portal-content {min-width:0!important;padding:0!important;margin:0!important}
+html:root body.mir-native-auth #portal-content .auth-grid {
+  display:flex!important;flex-direction:column;align-items:stretch;gap:22px!important;
+  width:100%;max-width:none;margin:0;padding:0;
+}
+html:root body.mir-native-auth #portal-content .auth-intro {max-width:none;padding:0!important;text-align:center}
+html:root body.mir-native-auth #portal-content .mir-native-auth-brand {display:flex;justify-content:center;margin:0 0 15px}
+html:root body.mir-native-auth #portal-content .mir-native-auth-brand img {width:140px!important;max-width:100%;height:auto!important;object-fit:contain}
+html:root body.mir-native-auth #portal-content .portal-eyebrow {
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  margin:0!important;color:#c8c5bd!important;font-size:.6875rem!important;
+  font-weight:600;line-height:1.5;letter-spacing:.18em;
+}
+html:root body.mir-native-auth #portal-content .portal-eyebrow::before,
+html:root body.mir-native-auth #portal-content .portal-eyebrow::after {content:"";width:32px;height:1px;background:#bda889;flex:none}
+html:root body.mir-native-auth #portal-content .auth-intro h1 {
+  font-family:Arial,Helvetica,sans-serif!important;font-size:1.625rem!important;
+  font-weight:600!important;line-height:1.2!important;letter-spacing:-.025em!important;
+  color:#f4f1ea!important;margin:22px 0 0!important;text-wrap:balance;
+}
+html:root body.mir-native-auth #portal-content .auth-intro>p:not(.portal-eyebrow) {font-size:.9375rem!important;line-height:1.55!important;margin:12px 0 0!important;color:#c8c5bd!important}
+html:root body.mir-native-auth #portal-content .auth-card {
+  display:flex!important;flex-direction:column;gap:0;width:100%;max-width:none;
+  padding:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;color:#f4f1ea!important;
+}
+html:root body.mir-native-auth #portal-content .auth-card>* {order:0!important}
+html:root body.mir-native-auth #portal-content .auth-card form {
+  display:grid;gap:16px;background:#2d2e2a!important;border:1px solid #55554d;
+  border-radius:16px;padding:20px;margin:0;min-width:0;
+}
+html:root body.mir-native-auth #portal-content .auth-card label {
+  margin:0!important;gap:8px!important;color:#f4f1ea!important;
+  font-size:1rem!important;font-weight:600!important;line-height:1.4!important;min-width:0;
+}
+html:root body.mir-native-auth #portal-content .auth-card .mir-native-auth-field {position:relative;display:block;min-width:0}
+html:root body.mir-native-auth #portal-content .auth-card input:not([type=checkbox]) {
+  background:#353630!important;color:#f4f1ea!important;border:1px solid #737267!important;
+  border-radius:10px!important;min-height:52px!important;width:100%;min-width:0;
+  padding:12px 14px!important;font:400 1rem/1.5 "DM Sans",Arial,sans-serif!important;box-shadow:none!important;
+}
+html:root body.mir-native-auth #portal-content .auth-card #auth-email {padding-left:48px!important}
+html:root body.mir-native-auth #portal-content .auth-card #auth-password {padding-right:60px!important}
+html:root body.mir-native-auth #portal-content .auth-card input::placeholder {color:#c8c5bd!important;opacity:1}
+html:root body.mir-native-auth #portal-content .mir-native-auth-mail {position:absolute;left:14px;top:50%;transform:translateY(-50%);width:22px;height:22px;pointer-events:none;color:#f4f1ea}
+html:root body.mir-native-auth #portal-content .mir-native-auth-mail svg {display:block;width:100%;height:100%}
+html:root body.mir-native-auth #portal-content #mir-native-password-toggle {
+  position:absolute;inset-block:4px;right:4px;width:48px;min-height:44px!important;
+  display:grid;place-items:center;padding:8px!important;border:0!important;
+  background:transparent!important;color:#f4f1ea!important;border-radius:8px!important;
+}
+html:root body.mir-native-auth #portal-content #mir-native-password-toggle svg {width:24px;height:24px;pointer-events:none}
+html:root body.mir-native-auth #portal-content .auth-card .button {
+  min-height:52px!important;padding:12px 16px!important;font-size:1rem!important;
+  line-height:1.4!important;font-weight:600!important;border-radius:10px!important;
+  white-space:normal;overflow-wrap:anywhere;letter-spacing:0;
+}
+html:root body.mir-native-auth #portal-content .auth-card .button:not(.secondary):not(.quiet) {
+  color:#242522!important;background:#bda889!important;border-color:#bda889!important;
+}
+html:root body.mir-native-auth #portal-content #auth-signin-form {gap:0;padding:0;overflow:hidden}
+html:root body.mir-native-auth #portal-content #auth-signin-form>label[for] {padding:18px 18px 20px}
+html:root body.mir-native-auth #portal-content #auth-signin-form>label[for=auth-password] {border-top:1px solid #55554d}
+html:root body.mir-native-auth #portal-content #auth-signin-form>button[type=submit] {
+  width:100%;min-height:56px!important;border:0!important;border-radius:0!important;margin:0;
+}
+html:root body.mir-native-auth #portal-content .auth-text-button,
+html:root body.mir-native-auth #portal-content .auth-card .quiet {
+  min-height:48px!important;display:block;align-self:center;width:auto;
+  margin:10px 0 0!important;padding:12px 8px!important;background:transparent!important;
+  border:0!important;color:#f4f1ea!important;font-size:.9375rem!important;line-height:1.4!important;
+  text-decoration:underline;text-underline-offset:4px;border-radius:6px!important;
+}
+html:root body.mir-native-auth #portal-content .auth-divider {
+  display:flex!important;align-items:center;gap:12px;margin:12px 0 18px!important;
+  color:#c8c5bd!important;font-size:.9375rem!important;line-height:1.4;
+}
+html:root body.mir-native-auth #portal-content .auth-divider::before,
+html:root body.mir-native-auth #portal-content .auth-divider::after {content:"";height:1px;flex:1;background:#737267!important}
+html:root body.mir-native-auth #portal-content #auth-google {
+  display:flex!important;align-items:center;justify-content:center;gap:12px;margin:0!important;
+  min-height:52px!important;background:#2d2e2a!important;color:#f4f1ea!important;
+  border:1px solid #c8c5bd!important;border-radius:12px!important;
+}
+html:root body.mir-native-auth #portal-content #auth-google img {width:22px;height:22px;flex:none}
+html:root body.mir-native-auth #portal-content .auth-card .auth-footnote {font-size:.8125rem!important;line-height:1.5!important;color:#c8c5bd!important;margin:10px 0 0!important}
+html:root body.mir-native-auth #portal-content #mir-native-auth-help {margin:0!important;color:#c8c5bd!important;text-decoration:none}
+html:root body.mir-native-auth #portal-content .auth-card .auth-error {color:#ffb4a8!important;background:#3a2525!important;border:1px solid #c76e61!important;border-radius:10px!important;padding:12px!important;margin:14px 0 0!important;font-size:.9375rem!important;line-height:1.5!important}
+html:root body.mir-native-auth #portal-content .auth-card .auth-message {color:#f4f1ea!important;background:#353630!important;border:1px solid #bda889!important;border-radius:10px!important;padding:12px!important;margin:14px 0 0!important;font-size:.9375rem!important;line-height:1.5!important}
+html:root body.mir-native-auth #portal-content .auth-card :disabled {background:#353630!important;color:#c8c5bd!important;border-color:#737267!important;opacity:1!important}
+html:root body.mir-native-auth #portal-content #auth-google:disabled {color:#c8c5bd!important;border-color:#737267!important}
+html:root body.mir-native-auth #portal-content :focus-visible {outline:3px solid #e0c39b!important;outline-offset:3px}
+html:root body.mir-native-auth #portal-content #auth-signin-form>button[type=submit]:focus-visible {outline-offset:-5px}
+html:root body.mir-native-auth #portal-content [hidden] {display:none!important}
+@media(max-width:359px) {
+  html:root body.mir-native-auth :is(.portal-shell,.portal-shell.auth-shell) {width:calc(100% - 28px)!important;padding-top:20px!important}
+  html:root body.mir-native-auth #portal-content #auth-signin-form>label[for] {padding-inline:14px}
+}
+@media(max-height:560px) {
+  html:root body.mir-native-auth :is(.portal-shell,.portal-shell.auth-shell) {padding-top:16px!important}
+}

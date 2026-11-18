@@ -4,6 +4,9 @@ import {Geolocation} from '@capacitor/geolocation';
 import Policy from './policy.cjs';
 const Native=registerPlugin('MIRNative');
 window.MIRAndroid=Object.freeze({Native,App,Geolocation,Policy});
+// Present before deferred client scripts run: the native sign-in is one page,
+// so the public account workspace must not divide its controls into a pager.
+document.documentElement.dataset.mirNative='true';
 const origin=location.origin;
 const rawFetch=window.fetch.bind(window);
 window.fetch=(input,options)=>{const url=input instanceof Request?input.url:input;if(!Policy.allowedRequest(url,origin))return Promise.reject(new Error('Service refusé : application MIR TEST uniquement.'));return rawFetch(input,options);};
@@ -35,18 +38,66 @@ document.addEventListener('input',rememberAbsence,true);document.addEventListene
 for(const name of ['submit','reset'])document.addEventListener(name,event=>{if(event.target.id==='absence-draft-form')absenceDraft=null;},true);
 function showError(error){if(document.body.dataset.fieldShell==='true'||document.getElementById('mir-device-lock')){let alert=document.getElementById('mir-native-error');if(!alert){alert=document.createElement('div');alert.id='mir-native-error';alert.setAttribute('role','alert');const text=document.createElement('span'),close=document.createElement('button');close.type='button';close.textContent='Fermer';close.onclick=()=>alert.remove();alert.append(text,close);(document.getElementById('mir-device-lock')||document.querySelector('#portal-main'))?.prepend(alert);}const host=document.getElementById('mir-device-lock')||document.querySelector('#portal-main');if(host&&alert.parentElement!==host)host.prepend(alert);alert.querySelector('span').textContent=error?.message||'Action indisponible. Rien n’a été envoyé.';return;}const node=document.getElementById('mir-native-state');if(node){node.textContent=error?.message||'Action indisponible. Rien n’a été envoyé.';node.setAttribute('role','alert');}}
 function networkState(){const node=document.getElementById('mir-native-state');if(node)node.textContent=navigator.onLine?'MIR TEST · Notifications par actualisation':'MIR TEST · Hors ligne — les enregistrements serveur restent à confirmer';}
+function nativeAuthLayout(){
+ const grid=document.querySelector('.auth-grid'),signin=grid?.querySelector('#auth-signin-form');
+ document.body.classList.toggle('mir-native-auth',!!grid);
+ document.body.classList.toggle('mir-native-signin',!!signin);
+ if(!grid||grid.dataset.mirNativeAuth==='08')return;
+ const intro=grid.querySelector('.auth-intro'),card=grid.querySelector('.auth-card');
+ if(!intro||!card)return;
+ grid.dataset.mirNativeAuth='08';
+ const brand=document.createElement('div'),logo=document.createElement('img');
+ brand.className='mir-native-auth-brand';logo.src='assets/MIR-logo-officiel-original.svg';logo.alt='Les Revêtements MIR';logo.width=140;logo.height=35;brand.append(logo);intro.prepend(brand);
+ const eyebrow=intro.querySelector('.portal-eyebrow');if(eyebrow)eyebrow.textContent='ESPACE ÉQUIPE';
+ for(const el of grid.querySelectorAll('[data-auth-screen="signup"],.auth-cart-return'))el.hidden=true;
+ document.querySelector('#mir-email-toggle')?.remove();
+ if(signin){
+  signin.hidden=false;
+  if(!grid.matches('[data-mir-invitation="true"]')){
+   const title=intro.querySelector('h1');if(title)title.textContent='Connexion équipe MIR';
+   const description=intro.querySelector('p:not(.portal-eyebrow)');if(description)description.hidden=true;
+  }
+  const submit=signin.querySelector('button[type="submit"]');if(submit?.textContent==='Me connecter')submit.textContent='Se connecter';
+  const forgot=grid.querySelector('[data-auth-screen="forgot"]'),divider=grid.querySelector('.auth-divider'),google=grid.querySelector('#auth-google');
+  const googleNote=google?.nextElementSibling?.matches('.auth-footnote')?google.nextElementSibling:null;
+  if(forgot){forgot.hidden=false;forgot.disabled=false;forgot.removeAttribute('title');}
+  if(divider){divider.hidden=false;divider.querySelector('span').textContent='ou';}
+  if(google){google.hidden=false;if(googleNote){googleNote.id='mir-native-google-note';google.setAttribute('aria-describedby',googleNote.id);}}
+  // Move the original controls, retaining the existing submit/click handlers.
+  const feedback=Array.from(card.querySelectorAll(':scope > .auth-error,:scope > .auth-message'));
+  card.append(signin,...feedback,...[forgot,divider,google,googleNote].filter(Boolean));
+ }
+ const email=grid.querySelector('#auth-email');
+ if(email){email.placeholder='Votre courriel';email.autocapitalize='none';email.spellcheck=false;}
+ for(const input of grid.querySelectorAll('#auth-email,#auth-password')){
+  const field=document.createElement('span');field.className='mir-native-auth-field';input.before(field);field.append(input);
+  if(input.id==='auth-email'){
+   const mark=document.createElement('span');mark.className='mir-native-auth-mail';mark.setAttribute('aria-hidden','true');
+   mark.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>';field.prepend(mark);
+  }else{
+   input.placeholder='Votre mot de passe';
+   const checkbox=grid.querySelector('#auth-show-password'),toggle=document.createElement('button');
+   checkbox?.closest('.auth-show-password')?.setAttribute('hidden','');
+   toggle.type='button';toggle.id='mir-native-password-toggle';toggle.setAttribute('aria-controls','auth-password');toggle.setAttribute('aria-pressed','false');toggle.setAttribute('aria-label','Afficher le mot de passe');
+   toggle.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s3.7-7 10-7 10 7 10 7-3.7 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+   toggle.onclick=()=>{const visible=input.type==='password';if(checkbox){checkbox.checked=visible;checkbox.dispatchEvent(new Event('change',{bubbles:true}));}else input.type=visible?'text':'password';toggle.setAttribute('aria-pressed',String(visible));toggle.setAttribute('aria-label',visible?'Masquer le mot de passe':'Afficher le mot de passe');};field.append(toggle);
+  }
+ }
+ const reset=grid.querySelector('#auth-reset-form');
+ if(reset&&!window.MIRTeamTestConfig?.recoveryEnabled){
+  const description=intro.querySelector('p:not(.portal-eyebrow)');if(description)description.textContent='Contactez votre responsable MIR pour récupérer votre accès.';
+  const submit=reset.querySelector('button[type="submit"]');if(submit)submit.disabled=true;
+  const note=document.createElement('p');note.className='auth-footnote';note.id='mir-native-recovery-note';note.textContent='La récupération par courriel n’est pas encore activée dans MIR TEST. Contactez votre responsable MIR.';reset.after(note);submit?.setAttribute('aria-describedby',note.id);
+ }
+ const help=document.createElement('button');help.type='button';help.id='mir-native-auth-help';help.className='auth-text-button';help.textContent='Besoin d’aide ?';
+ help.onclick=()=>{const launch=document.querySelector('.mir-help-launch');if(launch)launch.click();else showError(new Error('Le Centre d’aide est indisponible. Contactez votre responsable MIR.'));};grid.append(help);
+}
 function mount(){
  const style=document.createElement('style');style.textContent='body{padding-top:calc(env(safe-area-inset-top) + 30px)!important;padding-bottom:env(safe-area-inset-bottom)}#mir-native-state{position:fixed;top:0;left:0;right:0;z-index:10000;background:var(--mir-surface-soft,#e9eee7);color:var(--mir-text,#24422e);padding:5px 10px;font:13px system-ui;min-height:20px}button,input,select{scroll-margin-bottom:100px}.mir-native-signin .mir-help-launch{position:static!important;transform:none!important;pointer-events:auto!important;display:block;margin:16px}';document.head.append(style);
  const banner=document.createElement('div');banner.id='mir-native-state';banner.setAttribute('role','status');document.body.prepend(banner);networkState();
  const observer=new MutationObserver(()=>{
   restoreAbsence();
-  document.body.classList.toggle('mir-native-signin',!!document.querySelector('#auth-signin-form'));
-  for(const el of document.querySelectorAll('[data-auth-screen="signup"],.auth-divider,.auth-cart-return,.auth-card>.auth-footnote'))el.hidden=true;
-  const google=document.querySelector('#auth-google');if(google)google.hidden=false;
-  const signin=document.querySelector('#auth-signin-form');
-  if(signin&&!document.querySelector('#mir-email-toggle')){const button=document.createElement('button');button.type='button';button.id='mir-email-toggle';button.className='button secondary full';button.textContent='Se connecter par courriel';button.setAttribute('aria-controls','auth-signin-form');button.setAttribute('aria-expanded','false');signin.before(button);signin.hidden=true;button.onclick=()=>{signin.hidden=!signin.hidden;button.setAttribute('aria-expanded',String(!signin.hidden));if(!signin.hidden)signin.querySelector('input')?.focus();};}
-  const forgot=document.querySelector('[data-auth-screen="forgot"]');if(forgot){forgot.hidden=false;forgot.disabled=!window.MIRTeamTestConfig?.recoveryEnabled;forgot.title=forgot.disabled?'Récupération MIR TEST en attente de configuration':'';}
-  const intro=document.querySelector('.auth-intro');if(intro&&!intro.closest('[data-mir-invitation]')){const title=intro.querySelector('h1');if(title&&title.textContent!=='Connexion équipe MIR')title.textContent='Connexion équipe MIR';const text=intro.querySelector('p:not(.portal-eyebrow)');if(text&&text.textContent!=='Connectez-vous avec votre compte équipe. Environnement TEST.')text.textContent='Connectez-vous avec votre compte équipe. Environnement TEST.';}
+  nativeAuthLayout();
   // Harmony moves/inserts links after login. Keep permitted internal links.
   for(const link of document.querySelectorAll('a[href]')){
    const url=new URL(link.href,location.href);
@@ -59,6 +110,7 @@ function mount(){
   }else businessHelp?.remove();
   const qr=document.querySelector('#wh-camera-start');if(qr)qr.hidden=false;
  });observer.observe(document.body,{childList:true,subtree:true});
+ nativeAuthLayout();
 }
 document.addEventListener('DOMContentLoaded',mount,{once:true});
 addEventListener('offline',networkState);addEventListener('online',networkState);
