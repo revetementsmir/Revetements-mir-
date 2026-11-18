@@ -47,14 +47,14 @@ function nativeAuthLayout(){
  if(!intro||!card)return;
  grid.dataset.mirNativeAuth='08';
  const brand=document.createElement('div'),logo=document.createElement('img');
- brand.className='mir-native-auth-brand';logo.src='assets/MIR-logo-officiel-original.svg';logo.alt='Les Revêtements MIR';logo.width=140;logo.height=35;brand.append(logo);intro.prepend(brand);
+ brand.className='mir-native-auth-brand';logo.src='assets/MIR-logo-officiel-original.svg';logo.alt='Les Revêtements MIR';logo.width=245;logo.height=61;brand.append(logo);intro.prepend(brand);
  const eyebrow=intro.querySelector('.portal-eyebrow');if(eyebrow)eyebrow.textContent='ESPACE ÉQUIPE';
  for(const el of grid.querySelectorAll('[data-auth-screen="signup"],.auth-cart-return'))el.hidden=true;
  document.querySelector('#mir-email-toggle')?.remove();
  if(signin){
   signin.hidden=false;
   if(!grid.matches('[data-mir-invitation="true"]')){
-   const title=intro.querySelector('h1');if(title)title.textContent='Connexion équipe MIR';
+   intro.querySelector('h1')?.remove();
    const description=intro.querySelector('p:not(.portal-eyebrow)');if(description)description.hidden=true;
   }
   const submit=signin.querySelector('button[type="submit"]');if(submit?.textContent==='Me connecter')submit.textContent='Se connecter';

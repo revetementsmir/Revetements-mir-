@@ -85,7 +85,7 @@ html:root body.mir-native-auth #portal-content .auth-grid {
 }
 html:root body.mir-native-auth #portal-content .auth-intro {max-width:none;padding:0!important;text-align:center}
 html:root body.mir-native-auth #portal-content .mir-native-auth-brand {display:flex;justify-content:center;margin:0 0 15px}
-html:root body.mir-native-auth #portal-content .mir-native-auth-brand img {width:140px!important;max-width:100%;height:auto!important;object-fit:contain}
+html:root body.mir-native-auth #portal-content .mir-native-auth-brand img {width:245px!important;max-width:100%;height:auto!important;object-fit:contain}
 html:root body.mir-native-auth #portal-content .portal-eyebrow {
   display:flex;align-items:center;justify-content:center;gap:12px;
   margin:0!important;color:#c8c5bd!important;font-size:.6875rem!important;

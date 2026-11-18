@@ -19,7 +19,8 @@ async function loginReady(page){
 }
 async function authSnapshot(page,name){
  const state=await page.evaluate(()=>{
-  const selectors=['.mir-native-auth-brand img','.auth-intro h1','#auth-email','#auth-password','#mir-native-password-toggle','#auth-signin-form button[type=submit]','[data-auth-screen=forgot]','.auth-divider','#auth-google','#mir-native-auth-help'];
+  const selectors=['.mir-native-auth-brand img','#auth-email','#auth-password','#mir-native-password-toggle','#auth-signin-form button[type=submit]','[data-auth-screen=forgot]','.auth-divider','#auth-google','#mir-native-auth-help'];
+  if(document.querySelector('.auth-intro h1'))selectors.splice(1,0,'.auth-intro h1');
   const elements=selectors.map(selector=>{const el=document.querySelector(selector);if(!el)return{selector,missing:true};const rect=el.getBoundingClientRect(),style=getComputedStyle(el);return{selector,visible:rect.width>0&&rect.height>0&&style.visibility!=='hidden',rect:rect.toJSON(),font:style.fontFamily,fontSize:style.fontSize,background:style.backgroundColor,disabled:el.disabled===true};});
   return{width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,bodyFont:getComputedStyle(document.body).fontSize,bodyBackground:getComputedStyle(document.body).backgroundColor,bodyFamily:getComputedStyle(document.body).fontFamily,elements};
  });
@@ -28,6 +29,8 @@ async function authSnapshot(page,name){
 async function assertLoginSurface(page,name,{simultaneous=false}={}){
  await loginReady(page);
  assert.equal(await page.locator('#mir-email-toggle,#mir-account-workspace-pages').count(),0,name+': no extra step hides the login controls');
+ assert.equal(await page.getByText('Connexion équipe MIR',{exact:true}).count(),0,name+': approved sign-in title removed');
+ assert.equal(await page.locator('.auth-intro h1').count(),0,name+': normal sign-in has no redundant heading');
  assert.equal(await page.locator('#auth-signin-form').count(),1);assert.equal(await page.locator('#auth-email').count(),1);assert.equal(await page.locator('#auth-password').count(),1);
  assert.equal(await page.locator('#auth-signin-form button[type=submit]').innerText(),'Se connecter');
  assert.equal(await page.locator('#auth-password').getAttribute('autocomplete'),'current-password');
@@ -39,7 +42,7 @@ async function assertLoginSurface(page,name,{simultaneous=false}={}){
  assert.equal(state.bodyBackground,'rgb(36, 37, 34)');assert.match(state.bodyFamily,/DM Sans/);
  assert.ok(state.scrollWidth<=state.width+2,name+': no horizontal overflow');
  for(const item of state.elements){assert.equal(item.missing,undefined,name+': '+item.selector+' exists');assert.equal(item.visible,true,name+': '+item.selector+' is rendered');assert.ok(item.rect.left>=-1&&item.rect.right<=state.width+1,name+': '+item.selector+' fits horizontally');if(simultaneous)assert.ok(item.rect.top>=0&&item.rect.bottom<=state.height+1,name+': '+item.selector+' is visible without changing page or scrolling');}
- const logo=by('.mir-native-auth-brand img').rect;assert.ok(logo.width>=130&&logo.width<=150,name+': original logo stays approximately 140 CSS px');assert.ok(Math.abs(logo.left+logo.width/2-state.width/2)<=2,name+': logo centered');
+ const logo=by('.mir-native-auth-brand img').rect;assert.ok(logo.width>=244&&logo.width<=246,name+': original logo is 245 CSS px, 75% larger than 140');assert.ok(Math.abs(logo.left+logo.width/2-state.width/2)<=2,name+': logo centered');
  const order=['#auth-email','#auth-password','#auth-signin-form button[type=submit]','[data-auth-screen=forgot]','.auth-divider','#auth-google'];for(let i=1;i<order.length;i++)assert.ok(by(order[i]).rect.top>=by(order[i-1]).rect.bottom-1,name+': login order and non-overlap '+order[i]);
  for(const selector of ['#auth-email','#auth-password','#mir-native-password-toggle','#auth-signin-form button[type=submit]','#auth-google'])assert.ok(by(selector).rect.height>=44,name+': touch height '+selector);
  const flags=await page.evaluate(()=>({google:!!MIRPortalConfig.googleEnabled,recovery:!!MIRTeamTestConfig.recoveryEnabled}));
