@@ -1,7 +1,7 @@
 {
   "phase": "after",
   "baseline": "febceb210936a1fbdf250ef5c874883892abcbb2",
-  "generatedAt": "2026-11-18T12:23:43.701Z",
+  "generatedAt": "2026-11-18T12:29:12.868Z",
   "captures": [
     {
       "file": "after/after-accueil-fr-CA-1280x800.png",
@@ -61,7 +61,7 @@
         "width": 1280,
         "height": 800
       },
-      "sha256": "ee155c416671402edf517050b6ca61e374e4a703faac74a2afd3f362cd5df96c",
+      "sha256": "c5ccd35ef44114e454a8243f2442d557b4aa4118d06757c14e8fc1c5ecbff0c3",
       "state": {
         "lang": "fr-CA",
         "viewport": {
@@ -139,7 +139,7 @@
         "width": 1280,
         "height": 800
       },
-      "sha256": "60d2a2a80c2d8fdd2c17211eacf809cd63a48301a384ad70fefa440f2209ac85",
+      "sha256": "555be0cbb8a4f127790eb3d8ec8bfbaaec988bb90f1076f8502bb5b8f32dc8ce",
       "state": {
         "lang": "en-CA",
         "viewport": {
@@ -217,7 +217,7 @@
         "width": 1440,
         "height": 900
       },
-      "sha256": "d0be385cd5d8eff46d893e4db75c31a6b79e7585c59088635a2bd89e9ec8ae7b",
+      "sha256": "ab69331029df5ce94f25a5c17e0bdce169df66874443fcb1a0d956ebfd8999cd",
       "state": {
         "lang": "fr-CA",
         "viewport": {
@@ -295,7 +295,7 @@
         "width": 1440,
         "height": 900
       },
-      "sha256": "d7bbe705a7369c114b2dc9516505f28fcf696b6ee37e8b64a763d8c0dafc3dd0",
+      "sha256": "1150556f998548c3dd8a6714ce081ac386b8ed6a9a2804946b6696c3665bf319",
       "state": {
         "lang": "en-CA",
         "viewport": {
@@ -373,7 +373,7 @@
         "width": 1920,
         "height": 1080
       },
-      "sha256": "e9181cccdcf95224e56fc2a34fdd5acef91d204edd389011352974b20cbec2a9",
+      "sha256": "cdf25d6a918b1458f68a86e749b3f1172022a43ae1a163074c5195ace4a3f9bc",
       "state": {
         "lang": "fr-CA",
         "viewport": {
@@ -451,7 +451,7 @@
         "width": 1920,
         "height": 1080
       },
-      "sha256": "c16ee1eee84774e1e8203eaff990710a6ea57d6e62bcbbda00339ab6305c8547",
+      "sha256": "580025a1bb2ed649d8c34a112f06b7c1589891dfffc0fe8ed6f64df35e0c0d2c",
       "state": {
         "lang": "en-CA",
         "viewport": {
@@ -529,7 +529,7 @@
         "width": 834,
         "height": 1194
       },
-      "sha256": "f17f448719a3e3522ddb3c5b7cfa233641fb1d2ce3cc6b415d2dbbd8634fa3af",
+      "sha256": "d725ebf8004a0d5050026453cef73da9817e946272f60376f84670b332640f21",
       "state": {
         "lang": "fr-CA",
         "viewport": {
@@ -551,7 +551,7 @@
     },
     {
       "file": "after/after-estimation-fr-CA-834x1194-full.png",
-      "sha256": "129bbacfd6f5828630335e12b54e77f3651097d964ccde89bf5882fad3cdd868",
+      "sha256": "23530d8431306d6bf4759eb3a55326a8506a2596aea1e6cd9e6ac7856fce3c9a",
       "page": "estimation.html",
       "locale": "fr-CA",
       "size": {
@@ -618,7 +618,7 @@
         "width": 834,
         "height": 1194
       },
-      "sha256": "e6268e35207b65aa06eb95dbc92ac55fa422b5dfb70628fec6e8aaea05b4f3c5",
+      "sha256": "dccb41150c762a695691510d6096520903a7fa0437bd04b240157370c1e8edfa",
       "state": {
         "lang": "en-CA",
         "viewport": {
@@ -640,7 +640,7 @@
     },
     {
       "file": "after/after-estimation-en-CA-834x1194-full.png",
-      "sha256": "d627309ab47c756ce82ce004bd98ce41439a92974ba56a18a9831a6fa5e49485",
+      "sha256": "111f76dda315a2df9f5e9f584269db1bf31368a29083395be2626fcd023fdba7",
       "page": "estimation.html",
       "locale": "en-CA",
       "size": {
@@ -707,7 +707,7 @@
         "width": 390,
         "height": 844
       },
-      "sha256": "26921ce85773ed49baece15e686337a8be4eda33f663d38fab37f927b25f9a4f",
+      "sha256": "964177f739b09af4554bbbb1d7122da273f76f48336d6be3819d2a264594281f",
       "state": {
         "lang": "fr-CA",
         "viewport": {
@@ -729,7 +729,7 @@
     },
     {
       "file": "after/after-estimation-fr-CA-390x844-full.png",
-      "sha256": "2c3da001e9a22350b3eb306d5aa9fac2c5255e79764fcbf27f39cd7109f69147",
+      "sha256": "0296ddcf8c0fa56c0b6fcec7139c8c2e5460017320c0df44dc314bc1a06c0085",
       "page": "estimation.html",
       "locale": "fr-CA",
       "size": {
@@ -796,7 +796,7 @@
         "width": 390,
         "height": 844
       },
-      "sha256": "3f50c9e242d7c81c845cea68eba90cd6b3ca4befabef2d4f9fb4ba2c3116fd58",
+      "sha256": "a40e436f5e6cf69f629c33304d3986a603625553fcb98f022d48cbdf81afdcbe",
       "state": {
         "lang": "en-CA",
         "viewport": {
@@ -818,7 +818,7 @@
     },
     {
       "file": "after/after-estimation-en-CA-390x844-full.png",
-      "sha256": "667908875e966467895e0b9ca177923f2e03098c0202a63b6efcb3cf84003ddd",
+      "sha256": "229cab42bbf165ee97cc7d68b2582324e3d510310af9f2836675e7a084ea5963",
       "page": "estimation.html",
       "locale": "en-CA",
       "size": {
@@ -3818,7 +3818,7 @@
     {
       "previous": "before/before-estimation-fr-CA-1280x800.png",
       "current": "after/after-estimation-fr-CA-1280x800.png",
-      "changedPixels": 132956,
+      "changedPixels": 132959,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -3852,7 +3852,7 @@
     {
       "previous": "before/before-estimation-en-CA-1280x800.png",
       "current": "after/after-estimation-en-CA-1280x800.png",
-      "changedPixels": 132956,
+      "changedPixels": 132959,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -3886,7 +3886,7 @@
     {
       "previous": "before/before-estimation-fr-CA-1440x900.png",
       "current": "after/after-estimation-fr-CA-1440x900.png",
-      "changedPixels": 197189,
+      "changedPixels": 197187,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -3920,7 +3920,7 @@
     {
       "previous": "before/before-estimation-en-CA-1440x900.png",
       "current": "after/after-estimation-en-CA-1440x900.png",
-      "changedPixels": 197189,
+      "changedPixels": 197187,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -3954,7 +3954,7 @@
     {
       "previous": "before/before-estimation-fr-CA-1920x1080.png",
       "current": "after/after-estimation-fr-CA-1920x1080.png",
-      "changedPixels": 359541,
+      "changedPixels": 359544,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -3988,7 +3988,7 @@
     {
       "previous": "before/before-estimation-en-CA-1920x1080.png",
       "current": "after/after-estimation-en-CA-1920x1080.png",
-      "changedPixels": 359541,
+      "changedPixels": 359544,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -4022,7 +4022,7 @@
     {
       "previous": "before/before-estimation-fr-CA-834x1194.png",
       "current": "after/after-estimation-fr-CA-834x1194.png",
-      "changedPixels": 217538,
+      "changedPixels": 217548,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -4042,7 +4042,7 @@
     {
       "previous": "before/before-estimation-fr-CA-834x1194-full.png",
       "current": "after/after-estimation-fr-CA-834x1194-full.png",
-      "changedPixels": 217538,
+      "changedPixels": 217548,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -4076,7 +4076,7 @@
     {
       "previous": "before/before-estimation-en-CA-834x1194.png",
       "current": "after/after-estimation-en-CA-834x1194.png",
-      "changedPixels": 217538,
+      "changedPixels": 217548,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -4096,7 +4096,7 @@
     {
       "previous": "before/before-estimation-en-CA-834x1194-full.png",
       "current": "after/after-estimation-en-CA-834x1194-full.png",
-      "changedPixels": 217538,
+      "changedPixels": 217548,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -4130,7 +4130,7 @@
     {
       "previous": "before/before-estimation-fr-CA-390x844.png",
       "current": "after/after-estimation-fr-CA-390x844.png",
-      "changedPixels": 54448,
+      "changedPixels": 54450,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -4150,7 +4150,7 @@
     {
       "previous": "before/before-estimation-fr-CA-390x844-full.png",
       "current": "after/after-estimation-fr-CA-390x844-full.png",
-      "changedPixels": 54448,
+      "changedPixels": 54450,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -4184,7 +4184,7 @@
     {
       "previous": "before/before-estimation-en-CA-390x844.png",
       "current": "after/after-estimation-en-CA-390x844.png",
-      "changedPixels": 54448,
+      "changedPixels": 54450,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -4204,7 +4204,7 @@
     {
       "previous": "before/before-estimation-en-CA-390x844-full.png",
       "current": "after/after-estimation-en-CA-390x844-full.png",
-      "changedPixels": 54448,
+      "changedPixels": 54450,
       "changedOutsideImages": 0,
       "rasterBounds": [
         {
@@ -4226,13 +4226,13 @@
     "index.html": "a5746fb8decf5218ef35dd2cdf1c8c72e73b086c701b6b9a74190f22db3afcac",
     "style.css": "7a9b04b2bf17c4c82c0d5639d367fd08544fbbaed0f5070bb88e4c0848445065",
     "mir-v4.css": "547e0a3708072650aff08c83f859750560a15f4220c9b590263bd567b0ee3da0",
+    "mir-prestige-editorial.css": "753ab7a2a7b4851ca626d88dbdc2dd54b04743002591df454012082c8da9f22a",
     "mir-home-premium.css": "abf242b04f7175b32a0cc365adaf7480c8dd0886fad36ce5eface3d82d7e7851",
     "mir-public-menu.css": "1ef60e057b3b524cf85c3f3513c41f53c712521fdeee184b02e06f08f2ddb33f",
     "mir-client-i18n.css": "819fe27d34fe97265b8ecce47377d1898db288a52c5f7cd8b6097789b2d3c2ca",
-    "mir-client-pages.css": "6144f0c930670a64f9622d45264df9847255c8019afca6aece0e3a2ce37ca3a1",
-    "mir-prestige-editorial.css": "753ab7a2a7b4851ca626d88dbdc2dd54b04743002591df454012082c8da9f22a",
-    "mir-home-desktop-locked.css": "3b4634e25ab66c32360e987bfed3c16bb7e0c1b6fc095f223ff758734ec85473",
     "mir-prestige.css": "467e53a77cd61024135750c43f1cd4ca6515cf34249c46f9c64721b5d5e1d108",
+    "mir-client-pages.css": "6144f0c930670a64f9622d45264df9847255c8019afca6aece0e3a2ce37ca3a1",
+    "mir-home-desktop-locked.css": "3b4634e25ab66c32360e987bfed3c16bb7e0c1b6fc095f223ff758734ec85473",
     "mir-home-approved.css": "865d2816f1f71012fc70dbfd569e816b566ee089baa0f326b9d2a7780cf35766",
     "assets/mir-home-hero-20261105.avif": "40bc16dc6afe44a009a90597f6ae325f4ca002e60788eda73df3e4d141b6bd15",
     "assets/MIR-logo-officiel-original.svg": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c",
@@ -4246,10 +4246,10 @@
     "assets/mir-home-card-studio-20261105.webp": "3accaf7f62cb00b025592b98996e1a1f001dbcc04d41e9894bd64c27da8f9fca",
     "assets/fonts/dm-sans-variable.ttf": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d",
     "maison.html": "732c02bb0bb179bd8a2400778c6a25f33b564809ec437ab867736ce4023eb395",
+    "mir-public-audit.css": "146c210ac9109ea8a5eb55057e79978739bd0736fd10306ae94ae4bcd7271b29",
     "mir-client-header.css": "05f381a887e743d277eee4936f2f3edf3526ec4cff266dc706aeec0d3f8b410d",
     "mir-client-signature.css": "d347ff921a059a371a3763f93910dd801c85a1c0c5e07c083bcab0449abb05e2",
     "mir-public-shell.css": "1858b664dc53fbc0b3bb1a03dbc5ec52ee9deb3e6de0c6912295d8e6b26ab1b6",
-    "mir-public-audit.css": "146c210ac9109ea8a5eb55057e79978739bd0736fd10306ae94ae4bcd7271b29",
     "mir-particuliers-pc.css": "ae941d5f6f50ea71ca15fadec8311c3ececdd780af2ebeeb8618b24c9f5eb837",
     "assets/mir-particuliers-maison-approuvee.webp": "89f112fbbbd43a3cf16bf113a37b80b3af9646929d5759e86dce321bf669da5b",
     "mir-client-pages.js": "c9ab984df7382d6fac731aca85f87aa0e2c640400d0079a8657883a5cc25e6b4",
@@ -4264,10 +4264,10 @@
     "mir-estimate.js": "e8cf75925b8f758b6d6437416792d743fc90d427a9c39dd758307f4ce1a4e867",
     "mir-estimation-04.js": "87887b0919332aa22141472502cd721a1c7e8cef80ce74531a512a7f1f5999b9",
     "mir-prestige-checkout.js": "9ad00644b2a9e3596847bac66fa168ae9a993f030e2ee12d9080a5fc2bcb3e36",
-    "assets/estimation-04/maison.webp": "49f470b00938cf550e28305c0c74916f00c25b8b8c9c4aac342c8691e8075fac",
+    "assets/estimation-04/maison.webp": "5a08dd732ddee20f79fff43874344ab6034f9d341c5d6bf0fe54e496cf9e390e",
     "assets/estimation-04/chalet.webp": "e89e66af619d1450dd16e7f75eb92b2fdf76526f32411a7f49075997516c95ec",
     "assets/estimation-04/multilogement.webp": "de99f05de9a3c0f26261b36e29b8770ed9371f16efd9c7f8b01dec6888fcff0a",
-    "assets/estimation-04/renovation.webp": "ae0d70c99527b058785547c90f637a67223d1ee104314f0b0466b9a255550f22"
+    "assets/estimation-04/renovation.webp": "0361837846be3d894673f998b9e83f1de4d18691c053a981f4802308989bd3cd"
   },
   "resourceChecks": [
     {
@@ -4478,7 +4478,7 @@
     {
       "file": "assets/estimation-04/maison.webp",
       "before": "13cd57fb6444270b0336f772913aa7170543e47a217af905232d87e3fa59124c",
-      "after": "49f470b00938cf550e28305c0c74916f00c25b8b8c9c4aac342c8691e8075fac",
+      "after": "5a08dd732ddee20f79fff43874344ab6034f9d341c5d6bf0fe54e496cf9e390e",
       "expectedChange": true
     },
     {
@@ -4494,7 +4494,7 @@
     {
       "file": "assets/estimation-04/renovation.webp",
       "before": "864478f53ca3857743bde67a9bf4678347c6e5e71d2b3e35ce7ec390fb3843c9",
-      "after": "ae0d70c99527b058785547c90f637a67223d1ee104314f0b0466b9a255550f22",
+      "after": "0361837846be3d894673f998b9e83f1de4d18691c053a981f4802308989bd3cd",
       "expectedChange": true
     }
   ],

@@ -1,0 +1,14 @@
+{
+  "requested": "Agrandir le garage de la maison",
+  "source": "/workspace/generated_images/exec-525ad6c8-60bd-4f0f-bddf-08df98af4142.png",
+  "output": "/workspace/generated_images/exec-ecd2e3d7-66f6-4c4e-ac53-c4e15afedccb.png",
+  "prompt": "Edit this exact architectural photograph. The user explicitly says the garage is much too narrow. Enlarge the garage substantially into a realistic spacious attached TWO-CAR GARAGE on the RIGHT of this same house. Give it one broad dark charcoal double garage door approximately 16 to 18 feet wide and 8 feet high, credible proportions roughly TWO TIMES AS WIDE AS IT IS HIGH. The actual garage building volume must be equally wider, NOT just stretch a small door or paint a door across a wall. Make the right garage wing single-storey, projecting plausibly from the existing two-storey main house, with its own lower coherent hipped charcoal shingle roof, proper supporting side walls, light stone front matching the ground floor, greige siding side wall. Keep the main house identity: two storeys, light greige upper lap siding, pale grey brick below, black-framed windows and oak recessed front door with vertical wood accent and three steps. Preserve realistic roof connections, no upper floor suspended over nothing, no windows intersecting roof. Extend the asphalt driveway to the full double garage width with logical paved approach. Reframe slightly wider / step camera back as needed so the whole expanded house, complete double garage roof and door, landscaping and driveway remain visible inside the SQUARE 1:1 image. Keep premium natural daylight, Quebec trees and hydrangeas, realistic textures and straight architectural verticals. The double garage must visibly read as large even at a 170px website thumbnail. Do not change to another house style, do not add another house, no people/cars/text/logo/UI/collage. A visually plausible architecture illustration, not a technical plan.",
+  "moonFreshness": {
+    "protocol": 1,
+    "source": "atelier",
+    "methodVersion": "1.3.11",
+    "checkedAt": "2026-11-18T12:25:59.044Z",
+    "refresh": "each-request",
+    "failureMode": "stop-moon-coordination"
+  }
+}

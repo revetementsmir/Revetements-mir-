@@ -4,9 +4,9 @@ Demande de Frederick du 18 novembre 2026 : remplacer la maison déjà utilisée 
 
 ## Résultat
 
-- Maison : nouvelle illustration originale d’une maison québécoise claire à deux étages, entrée bois et maçonnerie, différente de la maison de Particuliers.
-- Rénovation : nouvelle illustration de clin gris chaud, fenêtre noire, finitions de coin anthracite et entrée bois.
-- Deux WebP carrés de 1254 × 1254. Conversion de format uniquement, sans retouche ni recadrage du fichier généré. Provenance, prompts et SHA-256 dans `assets.json`.
+- Maison : nouvelle illustration originale d’une maison québécoise claire à deux étages, entrée bois, maçonnerie et garage double élargi à sa demande, différente de la maison de Particuliers.
+- Rénovation : nouvelle illustration d’une maison en cours de remplacement du revêtement extérieur : partie neuve anthracite, membrane et fourrures apparentes, ancien parement, échafaudage et matériaux sur l’entrée.
+- Deux WebP carrés de 1254 × 1254. Maison retouchée avec image_gen pour agrandir le garage. Les deux résultats finaux sont seulement encodés en WebP, sans recadrage ni redimensionnement local. Provenance, prompts et SHA-256 dans `assets.json`.
 - Aucun HTML, CSS, JavaScript, service ou formulaire modifié. Chalet, Multilogement, Accueil, Particuliers et espaces employés restent intacts. Le workflow existant inclut la nouvelle branche, sans retrait ni modification de contrôle.
 
 ## Vérifications exécutées avant le commit
@@ -17,7 +17,7 @@ Chromium 155.0.8059.79 : 1280×800, 1440×900, 1920×1080, 834×1194 et 390×844
 - 34 comparaisons : zéro pixel différent hors des rectangles des deux images volontairement remplacées. Les 20 captures Accueil/Particuliers sont strictement identiques, sans masque.
 - Les 43 autres ressources chargées sont identiques octet pour octet. Seuls les deux fichiers image diffèrent parmi les 45 ressources contrôlées.
 - Aucune erreur JavaScript, console ou HTTP, ni transport réel.
-- Inspection réelle des captures PC et téléphone : maison identifiable en entier, détail Rénovation lisible. Le `object-fit` existant recadre légèrement les carrés à 1280 px et sur tablette; les détails utiles restent visibles. Aucun changement de géométrie n’a été introduit.
+- Inspection réelle des captures PC et téléphone : maison et garage double identifiables, chantier de Rénovation lisible. Le `object-fit` existant recadre légèrement les carrés à 1280 px et sur tablette; les détails utiles restent visibles. Aucun changement de géométrie n’a été introduit.
 
 Les tests et captures du build TEST exact ainsi que le reçu READY sont livrés séparément après le commit, pour conserver son SHA exact. Les résultats locaux ne sont pas présentés comme un test Chromium sur Vercel.
 
