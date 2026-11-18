@@ -1,0 +1,41 @@
+{
+  "baseline": "e58964cd8937766d2457904d2d7d625d1bc7df5e",
+  "checks": [],
+  "captures": [],
+  "comparisons": [],
+  "blockedExternal": [],
+  "blockedNonGET": [],
+  "pageErrors": [],
+  "httpErrors": [],
+  "consoleErrors": [],
+  "files": {
+    "baseline": 1660,
+    "current": 1666,
+    "protected": 1653,
+    "identical": 1653,
+    "allowedModified": [
+      "mir-estimate.js",
+      "mir-unified-client-dossier.js",
+      "pliage.html",
+      "production-app.js",
+      "production-model.js",
+      "production.html",
+      "selection.html"
+    ],
+    "allowedNew": [
+      "mir-pliage-documents.js",
+      "mir-pliage-surfaces.js",
+      "mir-pliage03-en-ca.js",
+      "mir-pliage03.css",
+      "mir-pliage03.js"
+    ],
+    "missing": [],
+    "unexpectedChanged": [],
+    "unexpectedNew": [
+      "prestige-captures.tar.gz"
+    ]
+  },
+  "passed": false,
+  "error": "AssertionError [ERR_ASSERTION]: no unrelated new dist files\n+ actual - expected\n\n+ [\n+   'prestige-captures.tar.gz'\n+ ]\n- []\n\n    at boundaries (/workspace/mir-pliage03/tests/mir-pliage03-boundaries.cjs:44:164)\n    at main (/workspace/mir-pliage03/tests/mir-pliage03-boundaries.cjs:103:3)\n    at Object.<anonymous> (/workspace/mir-pliage03/tests/mir-pliage03-boundaries.cjs:121:1)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47",
+  "testSha256": "440e0c788fb1554ffeeb07870d2c7109aa4727ef88ae9dc428760f072d10dfef"
+}

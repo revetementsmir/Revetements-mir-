@@ -1,0 +1,409 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "checks": [
+    {
+      "name": "landing",
+      "passed": true,
+      "pairs": 1
+    },
+    {
+      "name": "choice",
+      "passed": true,
+      "pairs": 2
+    },
+    {
+      "name": "models",
+      "passed": true,
+      "pairs": 1
+    },
+    {
+      "name": "measurements",
+      "passed": true,
+      "pairs": 3
+    },
+    {
+      "name": "finish",
+      "passed": true,
+      "pairs": 2
+    },
+    {
+      "name": "official-colour-labels",
+      "passed": true,
+      "count": 20
+    },
+    {
+      "name": "official-colour-accessible-names",
+      "passed": true,
+      "detail": [
+        {
+          "locale": "en-CA",
+          "colours": [
+            {
+              "id": "royal-302",
+              "ariaLabel": null,
+              "references": [
+                {
+                  "id": "pliage-colour-name-royal-302",
+                  "text": "Ivoire",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                },
+                {
+                  "id": "pliage-colour-code-royal-302",
+                  "text": "302",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                }
+              ]
+            },
+            {
+              "id": "royal-920",
+              "ariaLabel": null,
+              "references": [
+                {
+                  "id": "pliage-colour-name-royal-920",
+                  "text": "Sable",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                },
+                {
+                  "id": "pliage-colour-code-royal-920",
+                  "text": "920",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "locale": "fr-CA",
+          "colours": [
+            {
+              "id": "royal-302",
+              "ariaLabel": null,
+              "references": [
+                {
+                  "id": "pliage-colour-name-royal-302",
+                  "text": "Ivoire",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                },
+                {
+                  "id": "pliage-colour-code-royal-302",
+                  "text": "302",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                }
+              ]
+            },
+            {
+              "id": "royal-920",
+              "ariaLabel": null,
+              "references": [
+                {
+                  "id": "pliage-colour-name-royal-920",
+                  "text": "Sable",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                },
+                {
+                  "id": "pliage-colour-code-royal-920",
+                  "text": "920",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "locale": "en-CA",
+          "colours": [
+            {
+              "id": "royal-302",
+              "ariaLabel": null,
+              "references": [
+                {
+                  "id": "pliage-colour-name-royal-302",
+                  "text": "Ivoire",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                },
+                {
+                  "id": "pliage-colour-code-royal-302",
+                  "text": "302",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                }
+              ]
+            },
+            {
+              "id": "royal-920",
+              "ariaLabel": null,
+              "references": [
+                {
+                  "id": "pliage-colour-name-royal-920",
+                  "text": "Sable",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                },
+                {
+                  "id": "pliage-colour-code-royal-920",
+                  "text": "920",
+                  "protected": true,
+                  "inside": true,
+                  "unique": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "review",
+      "passed": true,
+      "pairs": 2
+    },
+    {
+      "name": "added",
+      "passed": true,
+      "pairs": 2
+    },
+    {
+      "name": "draw",
+      "passed": true,
+      "pairs": 3
+    },
+    {
+      "name": "cart-pdf-fixed-labels-and-protected-notes",
+      "passed": true,
+      "detail": {
+        "labels": [
+          "Painted face: Face 1 — side marked by the blue line",
+          "Painted face: Face 2 — side marked by the blue line",
+          "Painted face: Face 1 — side marked by",
+          "Painted face: Face 2 — side marked by",
+          "the blue line",
+          "Product:",
+          "Product reference:"
+        ],
+        "translated": {
+          "filename": "proof-en-CA.pdf",
+          "title": "Trim piece added",
+          "faces": [
+            {
+              "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 60\"><path d=\"M1 2L30 40\"/><text x=\"2\" y=\"4\">Painted face: Face 1 — side marked by</text><text x=\"2\" y=\"8\">the blue line</text><text x=\"2\" y=\"12\"><tspan>Product:</tspan><tspan>Gentek — Feuille peinte aluminium 3037, 24po×98,5pi</tspan></text><text x=\"2\" y=\"16\"><tspan>Product reference:</tspan><tspan>gentek-coil-3037</tspan></text></svg>"
+            }
+          ],
+          "locale": "en-CA"
+        },
+        "protectedOutput": {
+          "filename": "proof-en-CA.pdf",
+          "title": "Trim piece added",
+          "faces": [
+            {
+              "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 60\"><path d=\"M1 2L30 40\"/><text x=\"2\" y=\"4\">Painted face: Face 1 — side marked by</text><text x=\"2\" y=\"8\">le liseré bleu</text><text x=\"2\" y=\"12\"><tspan>Produit :</tspan><tspan>Gentek — Feuille peinte aluminium 3037, 24po×98,5pi</tspan></text><text x=\"2\" y=\"16\"><tspan>Référence produit :</tspan><tspan>gentek-coil-3037</tspan></text></svg>"
+            }
+          ],
+          "locale": "en-CA"
+        },
+        "unchanged": true
+      }
+    },
+    {
+      "name": "cart-pdf-real-product-and-reference",
+      "passed": true,
+      "detail": {
+        "material": {
+          "type": "aluminium",
+          "name": "Westlake Royal · AlumiPro — Rouleau aluminium régulier 132419",
+          "productRef": "royal-alumipro-coil-132419",
+          "thickness": "",
+          "thicknessUnit": "in",
+          "gauge": ""
+        },
+        "states": [
+          {
+            "locale": "fr-CA",
+            "svgText": "DOSSIER DE PLIAGE M001 · Pliage en L Commande : À préciser · Chantier : À préciser · Chef : À préciser · Date : 2026-11-18 · Révision : A A · 3 1/2 po B · 2 1/4 po MATÉRIAU / FINI Aluminium Westlake Royal Noir Code 30 QUANTITÉ / LONGUEUR 2 pièce(s) 120 po COTES FINIES ET POINTS À VALIDER Produit : Westlake Royal · AlumiPro — Rouleau aluminium régulier 132419 Référence produit : royal-alumipro-coil-132419 A = 3 1/2 po Pli A–B = 90° B = 2 1/4 po Développé total = 5 3/4 po (nominal) Face colorée : Face 1 — côté indiqué par le liseré bleu",
+            "summary": "Produit : Westlake Royal · AlumiPro — Rouleau aluminium régulier 132419 Référence produit : royal-alumipro-coil-132419 A = 3 1/2 po Pli A–B = 90° B = 2 1/4 po Développé total = 5 3/4 po (nominal) Face colorée : Face 1 — côté indiqué par le liseré bleu"
+          },
+          {
+            "locale": "en-CA",
+            "svgText": "CUSTOM BENDING FILE M001 · Pliage en L Commande : À préciser · Chantier : À préciser · Chef : À préciser · Date : 2026-11-18 · Révision : A A · 3 1/2 in. B · 2 1/4 in. MATERIAL / FINISH Aluminum Westlake Royal Noir Code 30 QUANTITY / LENGTH 2 pieces 120 in. FINISHED DIMENSIONS AND ITEMS TO VERIFY Product: Westlake Royal · AlumiPro — Rouleau aluminium régulier 132419 Product reference: royal-alumipro-coil-132419 A = 3 1/2 in. Bend A–B = 90° B = 2 1/4 in. Developed length = 5 3/4 in. (nominal) Painted face: Face 1 — side marked by the blue line",
+            "summary": "Product: Westlake Royal · AlumiPro — Rouleau aluminium régulier 132419 Product reference: royal-alumipro-coil-132419 A = 3 1/2 in. Bend A–B = 90° B = 2 1/4 in. Developed length = 5 3/4 in. (nominal) Painted face: Face 1 — side marked by the blue line"
+          }
+        ],
+        "unchanged": true
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "method": "GET",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "method": "GET",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "method": "POST",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    }
+  ],
+  "pageErrors": [],
+  "files": {
+    "pliage.html": "9d124fb10f2b283aab3a3f8df087a70d10f1556713363e21e31dd5911f36df97",
+    "style.css": "7a9b04b2bf17c4c82c0d5639d367fd08544fbbaed0f5070bb88e4c0848445065",
+    "mir-v4.css": "547e0a3708072650aff08c83f859750560a15f4220c9b590263bd567b0ee3da0",
+    "pliage.css": "9beedcb9eb6bd6b7cab96f3b9937cc7e99c054c444513f0e9e8bcb2de6d9f3be",
+    "custom-model-cards.css": "8fa0a8316b4a8688dbf1b2661f0af4534f6c6f6360bdb86f59d1955c5eb21862",
+    "mir-home-premium.css": "abf242b04f7175b32a0cc365adaf7480c8dd0886fad36ce5eface3d82d7e7851",
+    "mir-client-header.css": "05f381a887e743d277eee4936f2f3edf3526ec4cff266dc706aeec0d3f8b410d",
+    "mir-client-signature.css": "d347ff921a059a371a3763f93910dd801c85a1c0c5e07c083bcab0449abb05e2",
+    "mir-public-menu.css": "1ef60e057b3b524cf85c3f3513c41f53c712521fdeee184b02e06f08f2ddb33f",
+    "mir-client-pliage.css": "c5da97c0ba02e3d3ac6ad70be671bc7fce387699bd34085f1d04ef738a4df347",
+    "mir-public-shell.css": "1858b664dc53fbc0b3bb1a03dbc5ec52ee9deb3e6de0c6912295d8e6b26ab1b6",
+    "mir-harmony.css": "1798aed84b7436aca078a962d8fcaab8ad5229e47be9afd0e1c8d9a70d41a2da",
+    "mir-public-audit.css": "146c210ac9109ea8a5eb55057e79978739bd0736fd10306ae94ae4bcd7271b29",
+    "mir-client-i18n.css": "819fe27d34fe97265b8ecce47377d1898db288a52c5f7cd8b6097789b2d3c2ca",
+    "mir-prestige-tools.css": "8172c011788c64df45d2ee9103f18be0be60b0b7ceb2466b076182b2fc6a67ec",
+    "mir-prestige.css": "467e53a77cd61024135750c43f1cd4ca6515cf34249c46f9c64721b5d5e1d108",
+    "mir-client-pages.css": "6144f0c930670a64f9622d45264df9847255c8019afca6aece0e3a2ce37ca3a1",
+    "mir-pliage03.css": "a96c97a46ff0ca5befe5f235e49a532ac555385e9dd87a427bb95ee1b3f44268",
+    "assets/MIR-logo-officiel-original.svg": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c",
+    "production-model.js": "6287271575a9c164e2dc068f961e97794126fd1b148731174d4cb755ad36e980",
+    "custom-model-cards.js": "15dea475bdccaebc56899b2cf1b7b8f6bea9a6b628a066b04dbe2149e4c8413e",
+    "annotated-pdf.js": "473d7515a257e8e1c669bf3480b9d08a2a2ee7b5f172b7aa1a2a0973190b6413",
+    "mir-bending-lengths.js": "ab17953f00eb1e80ace2bf6c307173b0917d61c5058adafec5b2cd44ec51281f",
+    "mir-catalogue-policy.js": "db9f4071676a01a342e99cc9a2f2ffcdb6295aabab9b6e81473a6c18624169de",
+    "pliage.js": "2ea4cd20afe32763e9517a5bb461aedea34157e4a89a5a84f4276ba0374fdac9",
+    "mir-public-menu.js": "9690f28345f85e1190eb87fbda487ad05e8dadb96e85c0f75cdd6c7190873e63",
+    "mir-client-en-ca.js": "cbd2c2575d2015da25a7b968b8e5c1f77dbb3b6ca46390f51d60fe80fd04cee7",
+    "mir-pliage03-en-ca.js": "9de88cbbe3855d6aed0eccfcc4594f812d3a6319cac044d6a7838cdefaf44a10",
+    "mir-client-i18n.js": "5ba9620f0215fd93cadadc588b9104def54878a05f31a84adc39a51510538536",
+    "mir-prestige-tools.js": "ad43460af8cb82be282ce7d58d26db77b7cd6ee364f90c08d9354d18dfea0158",
+    "mir-prestige.js": "d9c99fe3df0d70e918369492e69b13558517ca8c98b300a923f3ccf6fd72d82f",
+    "catalogue-fd6866b49d21.json": "4fb95308c21b11f97ec8bf8871899c2356df73f19fe6c0dfef4f9e6d8e10bde5",
+    "assets/fonts/dm-sans-variable.ttf": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d",
+    "production.html": "1cab4ddbdd399ce37d7544fca1eac8c852f727fb75c31dfcbef704f385b558b3",
+    "mir-settings.css": "1ec301ca0d875f4971360b702ef188f8c941c5c2234a224808281577e5592086",
+    "production.css": "bebe7996232f3bd200353fc84b82d93807cf6aca0fa547d954b1eafa7d2a8809",
+    "production-admin-v4.css": "2ce03600a6e2b422f8cedd7d9530950b725016e9f10ff4c79320564a49007c8f",
+    "mir-procurement.css": "be9a3bd3e19689448b8b8ca8e30589614c54101803fe1af5ddf70b9c2b54f2ae",
+    "mir-freeform-workshop.css": "863de27882b0184fed97a9a9d99469551653892f5d7818500dda126d350bb1cb",
+    "mir-settings.js": "f3d807c99d4f84475b89f14dd38934ab6b3050d7031aa9de507a90c19746c042",
+    "mir-panel-admin.css": "2ca1b1c857dcf8e560c8b4e72549059f51a001e53afff478fb13e7d09f51489f",
+    "mir-panel-workbench.css": "547f8e5d69d90d010a375dab8e3e5c776163555459f22fef63ed2ba4c5206243",
+    "mir-production-signature.css": "d02732c5880dee97fbfa7b756083303101851443bb3991bb991eb46ddf2dfdb8",
+    "studio-capture.mjs": "e27c886d266b60fddcbab3f6c1de8a6dd2f49437823befe169fd9bc8fe20a516",
+    "mir-production-client-nav.css": "af81ec78ad1836f154f7f097e8458153d244a3bdc078ad861d088751c6908ab6",
+    "mir-workspace.css": "d78467e205e3fe14c368af99577f049db5a3eb53545879c33886087102ea3f2e",
+    "mir-estimate.css": "789fe7f7c43000c9a5a1e8b567e1a806c9b431d4b481e87bca26c917e3c7d880",
+    "mir-pliage-journey.css": "babae37d6d67c620912003e2ee9a5841b65e87defc453e98b928a268e0a66158",
+    "mir-production-client-nav.js": "70f49447788469893c0f83464276e7eac4b4178edde35731bb8cc641bd2127e6",
+    "mir-panel-roof.js": "d88a5d39a9c8eb47cfed25d9bc7424d8d5f712c1ed2b1c918b9e8980c162a3c9",
+    "mir-panel-sketch.js": "3dae860af9363a9a946b4adc75a7fbc0fd11bcf5a0ca5db0da2c16a374c73e3c",
+    "mir-bend-pricing.js": "016febc7cc68ba74a6e49c59a909dd03758d8d1ea1a47e097f0f3b19017bdfcf",
+    "production-volume.js": "c8e58d92c9513456025840e1b7d64db3b7a2fc00f04e79d527d0f8ff10453a40",
+    "mir-po-workflow.js": "9991c7913cf9fb773238b00b95e9a4cdbb17b8822259beabbacfee7358e2e3b3",
+    "vendor/polygon-clipping/polygon-clipping.umd.min.js": "7f8619e84a86ce8dd400c9b50430e9c8cf8f26027b19eeb479f109f5c1a9d688",
+    "unico-data.js": "21057a0823ab2e9fcf5a012b9dcb59efc3c67c59633ac91fe4dd6d2d668058b7",
+    "mir-panel-po-pdf.js": "380b90ee029d88516736f0f1a07cf82591b83f16c49ca34ce175dc5da4f27e5d",
+    "architectural-wall-geometry.js": "a2cc3d91ca3afeaec32744b0da60ee8c5ce76db5ea02b7ee0b776e0cce2e67c0",
+    "panel-layout-engine.js": "cb03689f691d59224f7794679e9a95d41c234393c6028509a3c620d4407cfb41",
+    "panel-layout-output.js": "8875c3ba29c4637577338b568fb69a16405fffc76623c7b2a5989720d4051c7d",
+    "atelier-essai/mir-calepinage-extension.js": "c3966ad5becc006cd0fe1225976188bd194580e0105d25766898d046acc916c7",
+    "profile-production-transfer.js": "557b26e5cf8b5111629098d92ec13cd112b124b714843c93ddb7eacc775953bc",
+    "mir-bending-presets.js": "073d3ae55d01a131ff12f29b81d874219b46f14cc89293866dfd36fa3659bc23",
+    "model-measure-defaults.js": "73c9084f3e9f87fbaa04c963f1a5acc39e286eb8a1924af8acf36b5cbafad6bf",
+    "template-library-backup.js": "75e3ec68f302f0880f1550e8a233c188ad258625b90591954acb17405c624b42",
+    "kaycan-flat-preview.js": "45a8ba6ec0a434bb832124d687266c6cde3a2fa2a629a2cb07f21126f5f14d36",
+    "mir-miniature.js": "afcf61c8ae9b2cc76023607b2b45351039b8766dd175ce429f77fd9c826bc524",
+    "mir-bending-finishes.js": "859793c39ec457db5f542a04a7f540ac4fe62c64b4e02787efcd55f8752a235e",
+    "shared-config.js": "0d06f91657ebb4b904461b9b62dc4aca6976ddde882b8af4355b30caf22b3e7d",
+    "mir-shared-client.js": "4eab28e9fd56e63e3de93fce236b54bdd53191984cfa1afa5dab5d9ac845f1cf",
+    "mir-direct-model-save.js": "9a769a1aa543628eef732f3e134fd9df3d5ac4486f3bc1a464aab1ec88fe630a",
+    "mir-store-color-policy.js": "5e57e8e53910f5a0633e666ba7888efe86d8f2b1ef9f06b49b13417bd267eace",
+    "mir-profile-recognition.js": "98f9ecc343eeb901c8b0b1a20e0fe8e77895ba383704a585d35760881469deda",
+    "mir-unified-order-cart.js": "ce2f48a455bd891577fd228a3933a50242926f6c6566e32ec68308e02116ade0",
+    "mir-pliage-surfaces.js": "f1afd80400e7ce4f9473366ebe4733332b7844024a8d6e57bef9e795933dcda2",
+    "mir-pliage-documents.js": "af46b5c9d2d625b38afe217333acb695e61cda59b11a7118396fc845ad10b9c8",
+    "mir-pliage03.js": "a52bb3c76a2e510d89a4c6b0e27b4f1159d4b5ef0fb52d404aba2d8f5590b64a",
+    "production-app.js": "780c4337be5fb9846630a33890a6595a12ea763409dd9540744cd799bbb8d2ba",
+    "mir-client-pliage-viewport.js": "b8e4624a8acd178fee13f7814d40b3621b6c257a3dea2d7ef400c81d6b6dfbac",
+    "production-admin-v4.js": "48e463c9b61edf1504f249e035c91fee6840b9cb1c9eaa3182fe63817f9da67d",
+    "mir-panel-workbench.js": "6281d645ccc156a51aac83de2478a13c490b8f4bac2e1dab100a3d40c3c25fb7",
+    "mir-procurement.js": "5af4b736257fe5ba5e235ba20ea04447899d40ee9e21a831f2f48a8cbcae6101",
+    "mir-admin-live3d.js": "ca81b16fc1a5579fe5c193553995ad3428af9a8edf0f7df261bb94f04dd8f58b",
+    "mir-freeform-workshop.js": "57074c1537103d385299b6f97ecc0c7a855f2f13a9710b409c65afd534849119",
+    "mir-harmony.js": "320025bb12ecbb764c79eb6f70d528b8b24fb78c6980dee381c484358b18621a",
+    "mir-workspace.js": "8cc72a07676928d4acc17e52e5b7ffc4a2ba942129a6dd31c09c6e152f891e94",
+    "mir-estimate-config.js": "c310322f51e949f4f77ce3fbcf31c72030d3be46a913d7a80450d42f829537e3",
+    "mir-estimate-drafts.js": "808d69fb5ec4108516a393d3137a5a1988ade79140b33e92ea6b34df6b62a3f7",
+    "portal-config.js": "599798194b9b570ddeccc6d9c9a74c0f6c2b4a8db07347cacf12ca95c4acc0f4",
+    "vendor/supabase-client.js": "b843abf0e28ccd705e3cf04f9fdd935d85a3173b86c8946de7574ec7f1181035",
+    "mir-estimate-upload.js": "1891f7786af1c510e97def7751e7c26ebd846572816bc57319a6ee6810e8fd61",
+    "mir-estimate.js": "1382f36cc7ef7bc28b53392cdd7b50067523dc36b10e7afd35f0fa28d69870a0",
+    "mir-client-pages.js": "c9ab984df7382d6fac731aca85f87aa0e2c640400d0079a8657883a5cc25e6b4",
+    "ral-classic.json": "4d5b5c7edca669d40dbbb536758c9d9eae0fe7c1c52412704d7e84beb55c5b85",
+    "selection.html": "7f1501a606a18940265e573a64ba689e4370afaea90ac1b8c658cae4c827f862",
+    "commerce.css": "fa5742df7f2496a72f7c3a2ddaf826726dc12ce9acc023b04692857e06625e35",
+    "mir-unified-dossier.css": "5e3c7c63843b2034e1ab6c2382cf3e781a9247371c592b56c9fe153fb15c31a3",
+    "mir-catalogue-photo.css": "12a82c55446e63b3a4e34da508073ac44a53d05c9e54177b2ebd16ddc82e4d4d",
+    "mir-account.css": "1261c0a7425e2b994610c64d4d8a171e3e1637d1247a816979255dbe827f306d",
+    "mir-commerce-approved.css": "99f6c55e5913ed514242f9d9a98c02bad36e1349c5536da6951d5523290b5c37",
+    "mir-prestige-checkout.css": "fed857b3284929efb7ca0579329cbf868fa53ca8c8ef1ef7f5e20a1764f67c4e",
+    "mir-prestige-colours.css": "010a5ebadcadabe0cafa0b9dc864bf8ec911ce58261e709431483545bdf6b62d",
+    "mir-selection-pdf.js": "ea7366db440853a1a56d283e9119f6e154769662492b2c70540030e82601924c",
+    "catalogue-order.js": "dfe24ba46da0ca282820d2cf9c37dc81d5ec7a38fdf4b78c18ec48e6a233a5ac",
+    "material-preview.js": "def40cbfdd80fdabd49d3896352e35191ec3f1c701a12fef9bc9943dc02ca3e7",
+    "material-coverage.js": "91c5a30ef374d6f085145d39d3320815d1ed772ad96b2c0bd1cbb7c99b094eed",
+    "mir-commerce-quantity.js": "2afc56d18b91e03256adcf448981a392156b08740a77086a2b6ad37ee733f94f",
+    "mir-boutique-pricing.js": "d35517d96eabf324b473e10ef4b60ff2ea2bbc0ad2ad88e4c7fd8a5a590a6b59",
+    "mir-client-siding-previews.js": "470532fa67b59d33a63aeab86f0143984f7c04d33b96f78f7a8c5c3d45c49ef0",
+    "commerce.js": "32f41b12595b997ea7886ede09e96930e4c283c3e122e3668688f0634898fe0b",
+    "mir-unified-client-dossier.js": "075853986b3d7508d20ec504926e4df7e8948219a1291fa9f45871620a2c5142",
+    "mir-account-flow.js": "001297374b94097a77037919699393c61e7b944702bfabf8b3a85778669f5ef7",
+    "mir-client-return.js": "bf64106a6532af5898a45b6ef39be4d40b7b4141c153a1882ac0d2e767905b2a",
+    "mir-prestige-checkout.js": "9ad00644b2a9e3596847bac66fa168ae9a993f030e2ee12d9080a5fc2bcb3e36",
+    "boutique-visibilite.json": "7230ae3c35ea23c4f10743e997585a256e05fa9976d2b237b4f5b5199a320009",
+    "catalogue-adseal-4580.json": "b854f353d89c9b3e25e5b794b2e335de170ba2876e6324a981d9ecf59b610ef5",
+    "assets/products/mir-screws/kaycan-fascia-colours.json": "17329fbecf6fbb05eab44993b40fa4cb3ac195995f03772c00269ceb7bcdc5da",
+    "mir-regional-pricing-20261110.json": "4d5f2eb1d487e8c1cefc527340885825038d42e50c5d22190ee2d4bc8b0e39c2",
+    "mir-client-colour-palettes.json": "1fc525861a8de01b08fec043c4c9b626015735f2808dd05e111dc93e0d2ac7f7",
+    "assets/products/hardieplank-cedarmill.png": "09097a6f2f8bf2c8dce9247597b8a5a82d2deaf1339410feb6bbb0396187f19e",
+    "assets/hardie-swatches/noir-minuit.jpeg": "323bbfbe40e6fa8f985264cc0b6c2a6ee5dc452e72471beadd1996227baea38f",
+    "assets/hardie-swatches/blanc-arctique.jpeg": "2cb7a3fec183b9e651c8f3fcae3baed71e7ff180bcf16080052181c142bb96a7",
+    "assets/hardie-swatches/pierre-des-champs.jpeg": "29b22ae4a8a8e92e5f13f7068e3ba6cc2d6a5fc00c635131beb01d8dae5b3a1f",
+    "assets/hardie-swatches/beige-navajo.jpeg": "d06e78974cd384b0cf069f41445890b49672a3082b5e242357547a21b30e4565",
+    "assets/hardie-swatches/brun-kaki.jpeg": "8d8113686b5c6d9c7fd0a8c3c45cf5c0345860da71e91823039817556e7694a7",
+    "assets/hardie-swatches/taupe-monterey.jpeg": "9ac8c39432fc20ed919656de84ec74f4a3695af1a7301a83fe3605af940fe558",
+    "assets/hardie-swatches/ecorce.jpeg": "3f7fc711b49251a9f705189e76b9ff9cd11cc6c2b2d7abc61eeb40e1e9d3ba96",
+    "assets/hardie-swatches/espresso.jpeg": "fbb2b7cbcb3ec969367881597e3f6c285572e89de76864b7d2a6bd196ec375cf",
+    "assets/hardie-swatches/sauge.jpeg": "842b870f4b792020c3fd4a5b231d40ad23d8c0959948a2b9c65139329d82badb",
+    "assets/hardie-swatches/gris-ardoise.jpeg": "74a67113893e21ca503f7afe4fbc91c8270133e3ab0edd1b90cd8822badebc6a",
+    "assets/hardie-swatches/bleu-acier.jpeg": "4c858dd618c00154777b62d25b5af8bdc4ae54613e360dbde20136f3f340b7dd",
+    "assets/hardie-swatches/brume-legere.jpeg": "72f269b86a53237a3b42cf2ad98d057bfc1e89d26c526650fe74cc6dcd32f771"
+  },
+  "testSha256": "919f372dda57da4796d02457e6892255b452cef902f6ee7d7f2d6ca18db5c0e9",
+  "browser": "155.0.8059.79",
+  "passed": true
+}

@@ -1,0 +1,16 @@
+CAPTURE landing-fr-CA-1440.png
+CAPTURE models-fr-CA-1440.png
+CAPTURE measurements-fr-CA-1440.png
+CAPTURE finish-ready-fr-CA-1440.png
+CAPTURE quantity-empty-fr-CA-1440.png
+FAIL client-1440-fr-CA: page.waitForFunction: Timeout 20000ms exceeded.
+AssertionError [ERR_ASSERTION]: see report
+    at main (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:88:337)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

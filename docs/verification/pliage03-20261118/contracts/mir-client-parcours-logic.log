@@ -1,0 +1,16 @@
+PASS production parser accepts fractions from the approved UI
+PASS all ten canonical models retain original bends and show every side and angle
+PASS incomplete measurements preserve exact selected-model preview geometry
+PASS editing a builtin L angle preserves every entered dimension and the immutable source
+PASS an oblique source keeps its signed winding and restores the precise original angle
+PASS model hems remain a single 180-degree hem under direct angle input
+PASS canonical angle customization retains canonical dimension validation
+PASS material, colour and painted face are stage 3; quantity blocks only stage 4
+PASS edited angles become an order snapshot variant and the admin source stays unchanged
+PASS editing a saved piece records another revision and preserves angle defaults
+PASS canonical field identities and locks survive the order snapshot and reopening
+PASS J nailing rule remains active after angle edits and profile metadata restoration
+PASS an edited builtin angle is visible even before the first dimension is entered
+PASS public finish shows the real source image or recorded hex, never the legacy flat fallback
+PASS public inch/mm round trips preserve business precision while the legacy conversion is unchanged
+{"passed":true,"checks":15,"scope":"Actual production-app functions + unchanged production model/presets/stock lengths; no browser geometry claim"}

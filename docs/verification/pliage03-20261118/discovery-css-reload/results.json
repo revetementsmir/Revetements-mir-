@@ -1,0 +1,3775 @@
+{
+  "phase": "after",
+  "baseline": "e58964cd8937766d2457904d2d7d625d1bc7df5e",
+  "checks": [
+    {
+      "name": "client-1440-fr-CA",
+      "passed": true,
+      "detail": {
+        "palette": {
+          "product": "kaycan-coil-0721-30m",
+          "palette": [
+            {
+              "id": "kaycan-noir",
+              "label": "Noir"
+            },
+            {
+              "id": "kaycan-urbanix-noir-lg",
+              "label": "Noir LG"
+            },
+            {
+              "id": "kaycan-noir-sg",
+              "label": "Noir SG"
+            },
+            {
+              "id": "kaycan-urbanix-noir-charbon",
+              "label": "Noir Charbon"
+            },
+            {
+              "id": "kaycan-reference-28",
+              "label": "Blanc Polaire"
+            },
+            {
+              "id": "kaycan-reference-37",
+              "label": "Blanc"
+            },
+            {
+              "id": "kaycan-reference-38",
+              "label": "Blanc LG"
+            },
+            {
+              "id": "kaycan-blanc-sg",
+              "label": "Blanc SG"
+            },
+            {
+              "id": "kaycan-blanc-loup",
+              "label": "Blanc Loup"
+            },
+            {
+              "id": "kaycan-urbanix-etain-bruni",
+              "label": "Étain Bruni"
+            },
+            {
+              "id": "kaycan-cactus",
+              "label": "Cactus"
+            },
+            {
+              "id": "kaycan-charbon",
+              "label": "Charbon"
+            },
+            {
+              "id": "kaycan-brun-chocolat",
+              "label": "Brun Chocolat"
+            },
+            {
+              "id": "kaycan-reference-9",
+              "label": "Brun Chocolat LG"
+            },
+            {
+              "id": "kaycan-brun-chocolat-sg",
+              "label": "Brun Chocolat SG"
+            },
+            {
+              "id": "kaycan-reference-11",
+              "label": "Chocolat SG"
+            },
+            {
+              "id": "kaycan-reference-12",
+              "label": "Rouge Colonial"
+            },
+            {
+              "id": "kaycan-brun-commercial",
+              "label": "Brun Commercial"
+            },
+            {
+              "id": "kaycan-vert-foret",
+              "label": "Vert Forêt"
+            },
+            {
+              "id": "kaycan-urbanix-gris-gothique",
+              "label": "Gris Gothique"
+            },
+            {
+              "id": "kaycan-urbanix-gris-grafton",
+              "label": "Gris Grafton"
+            },
+            {
+              "id": "kaycan-urbanix-recolte-de-cedre",
+              "label": "Récolte de Cèdre"
+            },
+            {
+              "id": "kaycan-ivoire",
+              "label": "Ivoire"
+            },
+            {
+              "id": "kaycan-reference-19",
+              "label": "Ivoire LG"
+            },
+            {
+              "id": "kaycan-ivoire-sg",
+              "label": "Ivoire SG"
+            },
+            {
+              "id": "kaycan-reference-21",
+              "label": "Vert Lierre"
+            },
+            {
+              "id": "kaycan-kaki",
+              "label": "Kaki"
+            },
+            {
+              "id": "kaycan-reference-23",
+              "label": "Lin"
+            },
+            {
+              "id": "kaycan-beige-mc",
+              "label": "Beige MC"
+            },
+            {
+              "id": "kaycan-reference-25",
+              "label": "Santal MC"
+            },
+            {
+              "id": "kaycan-mocha",
+              "label": "Mocha"
+            },
+            {
+              "id": "kaycan-gris-perle",
+              "label": "Gris Perle"
+            },
+            {
+              "id": "kaycan-beige-prestige",
+              "label": "Beige Prestige"
+            },
+            {
+              "id": "kaycan-urbanix-rockwood",
+              "label": "Rockwood"
+            },
+            {
+              "id": "kaycan-granite-rustique",
+              "label": "Granite Rustique"
+            },
+            {
+              "id": "kaycan-sable",
+              "label": "Sable"
+            },
+            {
+              "id": "kaycan-reference-33",
+              "label": "Santal"
+            },
+            {
+              "id": "kaycan-urbanix-gris-argente",
+              "label": "Gris Argenté"
+            },
+            {
+              "id": "kaycan-reference-35",
+              "label": "Gris Ardoise"
+            },
+            {
+              "id": "kaycan-urbanix-gris-soho",
+              "label": "Gris Soho"
+            },
+            {
+              "id": "kaycan-osier",
+              "label": "Osier"
+            }
+          ],
+          "contrast": [
+            {
+              "id": "material-type",
+              "foreground": "rgb(244, 241, 234)",
+              "background": "rgb(52, 53, 47)",
+              "ratio": 10.974961266546082,
+              "dark": true
+            },
+            {
+              "id": "production-material",
+              "foreground": "rgb(244, 241, 234)",
+              "background": "rgb(52, 53, 47)",
+              "ratio": 10.974961266546082,
+              "dark": true
+            },
+            {
+              "id": "color-system",
+              "foreground": "rgb(244, 241, 234)",
+              "background": "rgb(52, 53, 47)",
+              "ratio": 10.974961266546082,
+              "dark": true
+            }
+          ],
+          "selectedColours": [
+            {
+              "manufacturer": "Kaycan",
+              "name": "Ivoire",
+              "code": "Ivoire",
+              "system": "Nuancier Kaycan",
+              "selectionType": "manufacturer",
+              "special": false,
+              "hex": null
+            },
+            {
+              "manufacturer": "Kaycan",
+              "name": "Sable",
+              "code": "Sable",
+              "system": "Nuancier Kaycan",
+              "selectionType": "manufacturer",
+              "special": false,
+              "hex": null
+            }
+          ],
+          "resetProduct": "royal-alumipro-coil-132419",
+          "selected": {
+            "manufacturer": "Kaycan",
+            "name": "Sable",
+            "code": "Sable",
+            "system": "Nuancier Kaycan",
+            "selectionType": "manufacturer",
+            "special": false,
+            "hex": null
+          }
+        },
+        "sides": [
+          {
+            "geometry": {
+              "pointsMM": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  88.9,
+                  0
+                ],
+                [
+                  88.9,
+                  57.15
+                ]
+              ],
+              "segments": [
+                {
+                  "label": "A",
+                  "lengthMM": 88.89999999999999
+                },
+                {
+                  "label": "B",
+                  "lengthMM": 57.15
+                }
+              ],
+              "bends": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left",
+                  "turnDeg": 90,
+                  "label": "90° intérieur · gauche",
+                  "at": [
+                    88.9,
+                    0
+                  ],
+                  "from": "A",
+                  "to": "B"
+                }
+              ],
+              "lengthMM": 3048
+            },
+            "drawing": {
+              "base": [
+                "M135.5556 425 L664.4444 425 L664.4444 85"
+              ],
+              "surfaces": [
+                {
+                  "side": "left",
+                  "d": "M135.5555556 419 L658.4444444 419 L658.4444444 85"
+                }
+              ]
+            },
+            "side": "left"
+          },
+          {
+            "geometry": {
+              "pointsMM": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  88.9,
+                  0
+                ],
+                [
+                  88.9,
+                  57.15
+                ]
+              ],
+              "segments": [
+                {
+                  "label": "A",
+                  "lengthMM": 88.89999999999999
+                },
+                {
+                  "label": "B",
+                  "lengthMM": 57.15
+                }
+              ],
+              "bends": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left",
+                  "turnDeg": 90,
+                  "label": "90° intérieur · gauche",
+                  "at": [
+                    88.9,
+                    0
+                  ],
+                  "from": "A",
+                  "to": "B"
+                }
+              ],
+              "lengthMM": 3048
+            },
+            "drawing": {
+              "base": [
+                "M135.5556 425 L664.4444 425 L664.4444 85"
+              ],
+              "surfaces": [
+                {
+                  "side": "right",
+                  "d": "M135.5555556 431 L664.4444444 431 A6 6 0 0 0 670.4444444 425 L670.4444444 85"
+                }
+              ]
+            },
+            "side": "right"
+          }
+        ],
+        "physical": {
+          "pointsMM": [
+            [
+              0,
+              0
+            ],
+            [
+              88.9,
+              0
+            ],
+            [
+              88.9,
+              57.15
+            ]
+          ],
+          "segments": [
+            {
+              "label": "A",
+              "lengthMM": 88.89999999999999
+            },
+            {
+              "label": "B",
+              "lengthMM": 57.15
+            }
+          ],
+          "bends": [
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left",
+              "turnDeg": 90,
+              "label": "90° intérieur · gauche",
+              "at": [
+                88.9,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            }
+          ],
+          "lengthMM": 3048
+        },
+        "traced": {
+          "pointsMM": [
+            [
+              0,
+              0
+            ],
+            [
+              88.9,
+              0
+            ],
+            [
+              88.9,
+              57.15
+            ],
+            [
+              126.9996346192,
+              95.2496346192
+            ]
+          ],
+          "segments": [
+            {
+              "label": "A",
+              "lengthMM": 88.89999999999999
+            },
+            {
+              "label": "B",
+              "lengthMM": 57.15
+            },
+            {
+              "label": "C",
+              "lengthMM": 53.88102
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": 90,
+              "turnDeg": 90,
+              "label": "Rotation 90°",
+              "at": [
+                88.9,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "signed",
+              "angle": -45,
+              "turnDeg": -45,
+              "label": "Rotation -45°",
+              "at": [
+                88.9,
+                57.15
+              ],
+              "from": "B",
+              "to": "C"
+            }
+          ],
+          "lengthMM": 3048
+        },
+        "saved": {
+          "id": "M001",
+          "editableTrace": true,
+          "clientAngleDefaults": [
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left"
+            }
+          ],
+          "clientSourceTemplate": {
+            "id": "mir-standard-profile-l",
+            "version": 1,
+            "fingerprint": "b6f764da"
+          },
+          "clientProfileMetadata": {
+            "mirProfileId": "",
+            "mirTemplateVersion": null,
+            "mirCanonicalPhase10": false,
+            "mirLockedFields": [],
+            "segmentFields": [
+              {
+                "label": "A",
+                "mirFieldId": null
+              },
+              {
+                "label": "B",
+                "mirFieldId": null
+              }
+            ]
+          },
+          "kind": "profile",
+          "spec": {
+            "kind": "profile",
+            "id": "M001",
+            "unit": "in",
+            "length": "120",
+            "quantity": 2,
+            "material": {
+              "type": "aluminium",
+              "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+              "productRef": "kaycan-coil-0721-30m",
+              "thickness": "",
+              "thicknessUnit": "in",
+              "gauge": ""
+            },
+            "finish": {
+              "manufacturer": "Kaycan",
+              "selectionType": "manufacturer",
+              "hex": null,
+              "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+              "swatchImage": null,
+              "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+              "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+              "displayOnly": false,
+              "system": "Nuancier Kaycan",
+              "name": "Sable",
+              "code": "Sable"
+            },
+            "location": "",
+            "note": "",
+            "perforation": {},
+            "mirrorX": false,
+            "template": "custom",
+            "startAngle": 0,
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left"
+              }
+            ],
+            "segments": [
+              {
+                "label": "A",
+                "name": "Aile A",
+                "length": "3.5"
+              },
+              {
+                "label": "B",
+                "name": "Aile B",
+                "length": "2.25"
+              }
+            ],
+            "coloredFace": {
+              "side": "right",
+              "segmentId": "A"
+            },
+            "name": "Pliage en L"
+          },
+          "snapshot": {
+            "schema": "mir-production-instance-1",
+            "id": "M001",
+            "templateId": "mir-standard-profile-l",
+            "templateVersion": 1,
+            "templateSnapshot": {
+              "schema": "mir-production-template-1",
+              "id": "mir-standard-profile-l",
+              "name": "Pliage en L",
+              "version": 1,
+              "description": "Modèle standard MIR; cotes de fabrication à renseigner.",
+              "kind": "profile",
+              "topology": {
+                "kind": "profile",
+                "segments": [
+                  {
+                    "label": "A",
+                    "name": "Aile A"
+                  },
+                  {
+                    "label": "B",
+                    "name": "Aile B"
+                  }
+                ],
+                "bends": [
+                  {
+                    "mode": "interior",
+                    "angle": 90,
+                    "direction": "left"
+                  }
+                ],
+                "startAngle": 0,
+                "coloredFace": {
+                  "side": "left",
+                  "segmentId": "A"
+                }
+              },
+              "fields": [
+                {
+                  "key": "A",
+                  "label": "A · Aile A",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                },
+                {
+                  "key": "B",
+                  "label": "B · Aile B",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                },
+                {
+                  "key": "length",
+                  "label": "Longueur de la pièce",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                }
+              ],
+              "previewProportions": {
+                "illustrative": true,
+                "unitless": true,
+                "segmentRatios": [
+                  1,
+                  0.6666666666666667
+                ]
+              },
+              "clientDefaults": {},
+              "measurementDefaults": null,
+              "referenceUnit": null,
+              "previousVersion": null,
+              "fingerprint": "b6f764da"
+            },
+            "modelVersion": "1.0.0",
+            "revision": 1,
+            "previousRevisionId": null,
+            "values": {
+              "id": "M001",
+              "instanceId": "M001",
+              "name": "Pliage en L",
+              "unit": "in",
+              "measurements": {
+                "A": "3.5",
+                "B": "2.25",
+                "length": "120"
+              },
+              "clientSourceTemplate": {
+                "id": "mir-standard-profile-l",
+                "version": 1,
+                "fingerprint": "b6f764da"
+              },
+              "clientProfileMetadata": {
+                "mirProfileId": "",
+                "mirTemplateVersion": null,
+                "mirCanonicalPhase10": false,
+                "mirLockedFields": [],
+                "segmentFields": [
+                  {
+                    "label": "A",
+                    "mirFieldId": null
+                  },
+                  {
+                    "label": "B",
+                    "mirFieldId": null
+                  }
+                ]
+              },
+              "clientAngleDefaults": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left"
+                }
+              ],
+              "quantity": 2,
+              "material": {
+                "type": "aluminium",
+                "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                "productRef": "kaycan-coil-0721-30m",
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {
+                "manufacturer": "Kaycan",
+                "selectionType": "manufacturer",
+                "hex": null,
+                "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                "swatchImage": null,
+                "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                "displayOnly": false,
+                "system": "Nuancier Kaycan",
+                "name": "Sable",
+                "code": "Sable"
+              },
+              "length": "120",
+              "coloredFace": {
+                "side": "right",
+                "segmentId": "A"
+              },
+              "mirrorX": false,
+              "perforation": {},
+              "lips": {},
+              "location": "",
+              "note": ""
+            },
+            "spec": {
+              "kind": "profile",
+              "id": "M001",
+              "unit": "in",
+              "length": "120",
+              "quantity": 2,
+              "material": {
+                "type": "aluminium",
+                "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                "productRef": "kaycan-coil-0721-30m",
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {
+                "manufacturer": "Kaycan",
+                "selectionType": "manufacturer",
+                "hex": null,
+                "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                "swatchImage": null,
+                "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                "displayOnly": false,
+                "system": "Nuancier Kaycan",
+                "name": "Sable",
+                "code": "Sable"
+              },
+              "location": "",
+              "note": "",
+              "perforation": {},
+              "mirrorX": false,
+              "template": "custom",
+              "startAngle": 0,
+              "bends": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left"
+                }
+              ],
+              "segments": [
+                {
+                  "label": "A",
+                  "name": "Aile A",
+                  "length": "3.5"
+                },
+                {
+                  "label": "B",
+                  "name": "Aile B",
+                  "length": "2.25"
+                }
+              ],
+              "coloredFace": {
+                "side": "right",
+                "segmentId": "A"
+              },
+              "name": "Pliage en L"
+            },
+            "measurements": {
+              "A": "3.5",
+              "B": "2.25",
+              "length": "120"
+            },
+            "geometry": {
+              "kind": "profile",
+              "pointsMM": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  88.9,
+                  0
+                ],
+                [
+                  88.9,
+                  57.15
+                ]
+              ],
+              "segments": [
+                {
+                  "id": "A",
+                  "label": "A",
+                  "name": "Aile A",
+                  "lengthMM": 88.89999999999999,
+                  "start": [
+                    0,
+                    0
+                  ],
+                  "end": [
+                    88.9,
+                    0
+                  ],
+                  "headingDeg": 0
+                },
+                {
+                  "id": "B",
+                  "label": "B",
+                  "name": "Aile B",
+                  "lengthMM": 57.15,
+                  "start": [
+                    88.9,
+                    0
+                  ],
+                  "end": [
+                    88.9,
+                    57.15
+                  ],
+                  "headingDeg": 90
+                }
+              ],
+              "bends": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left",
+                  "turnDeg": 90,
+                  "label": "90° intérieur · gauche",
+                  "at": [
+                    88.9,
+                    0
+                  ],
+                  "from": "A",
+                  "to": "B"
+                }
+              ],
+              "coloredFace": {
+                "side": "right",
+                "segmentId": "A"
+              }
+            },
+            "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Pliage en L · coupe et cotes finies\"><title>Pliage en L · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M001 · Pliage en L</text><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"right\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"279,419.7143 284.8779,434.6241 300.8743,435.6069 288.5106,445.8045 292.5191,461.3217 279,452.7143 265.4809,461.3217 269.4894,445.8045 257.1257,435.6069 273.1221,434.6241\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-measure-leader\" data-segment-index=\"0\" d=\"M303,350.7143L279,382.7143\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"279\" data-anchor-y=\"382.7143\" data-segment-start-x=\"50\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"382.7143\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(303,350.7143) rotate(0)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 3 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,382.7143L476,382.7143 M508,88.2857L476,88.2857 M476,382.7143L476,88.2857\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"508\" data-anchor-y=\"235.5\" data-segment-start-x=\"508\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"88.2857\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(476,235.5) rotate(90)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 1/4 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 3 1/2 po · Aile A</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 90°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 1/4 po · Aile B</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 5 3/4 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 2 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+            "status": "specified",
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Prix sur demande",
+              "selectionType": "manufacturer",
+              "status": "price_unconfigured"
+            },
+            "pricing": {
+              "schema": "mir-piece-pricing-1",
+              "status": "on_request",
+              "requiresQuote": false,
+              "automaticPricingAllowed": false,
+              "currency": "CAD",
+              "rate": null,
+              "rateUnit": "in2",
+              "rateCents": null,
+              "areaSqIn": null,
+              "unitAmount": null,
+              "unitCents": null,
+              "quantity": 2,
+              "lineAmount": null,
+              "lineCents": null,
+              "basis": "projected_outer_area_including_lips",
+              "tariffId": null,
+              "taxIncluded": null,
+              "taxStatus": "not_calculated",
+              "shippingStatus": "not_calculated",
+              "label": "Prix sur demande",
+              "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+              "sourceKind": "user_instruction",
+              "geometryErrors": [],
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Prix sur demande",
+                "selectionType": "manufacturer",
+                "status": "price_unconfigured"
+              }
+            },
+            "workshopValidationRequired": true,
+            "revisionId": "M001-r1-91d37891"
+          },
+          "history": [],
+          "selection": {
+            "materialId": "kaycan-coil-0721-30m",
+            "colorSystem": "manufacturer",
+            "colorId": "kaycan-sable",
+            "storeColorMode": "employee"
+          },
+          "savedAt": "2026-11-18T14:56:46.754Z"
+        },
+        "edited": {
+          "id": "M001",
+          "editableTrace": true,
+          "clientAngleDefaults": [
+            {
+              "mode": "interior",
+              "angle": 90,
+              "direction": "left"
+            }
+          ],
+          "clientSourceTemplate": {
+            "id": "mir-standard-profile-l",
+            "version": 1,
+            "fingerprint": "b6f764da"
+          },
+          "clientProfileMetadata": {
+            "mirProfileId": "",
+            "mirTemplateVersion": null,
+            "mirCanonicalPhase10": false,
+            "mirLockedFields": [],
+            "segmentFields": [
+              {
+                "label": "A",
+                "mirFieldId": null
+              },
+              {
+                "label": "B",
+                "mirFieldId": null
+              }
+            ]
+          },
+          "kind": "profile",
+          "spec": {
+            "kind": "profile",
+            "id": "M001",
+            "unit": "in",
+            "length": "120",
+            "quantity": 4,
+            "material": {
+              "type": "aluminium",
+              "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+              "productRef": "kaycan-coil-0721-30m",
+              "thickness": "",
+              "thicknessUnit": "in",
+              "gauge": ""
+            },
+            "finish": {
+              "manufacturer": "Kaycan",
+              "selectionType": "manufacturer",
+              "hex": null,
+              "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+              "swatchImage": null,
+              "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+              "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+              "displayOnly": false,
+              "system": "Nuancier Kaycan",
+              "name": "Sable",
+              "code": "Sable"
+            },
+            "location": "",
+            "note": "",
+            "perforation": {},
+            "mirrorX": false,
+            "template": "custom",
+            "startAngle": 0,
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left"
+              }
+            ],
+            "segments": [
+              {
+                "label": "A",
+                "name": "Aile A",
+                "length": "3.5"
+              },
+              {
+                "label": "B",
+                "name": "Aile B",
+                "length": "2.25"
+              }
+            ],
+            "coloredFace": {
+              "side": "right",
+              "segmentId": "A"
+            },
+            "name": "Pliage en L"
+          },
+          "snapshot": {
+            "schema": "mir-production-instance-1",
+            "id": "M001",
+            "templateId": "mir-standard-profile-l",
+            "templateVersion": 2,
+            "templateSnapshot": {
+              "schema": "mir-production-template-1",
+              "id": "mir-standard-profile-l",
+              "name": "Pliage en L",
+              "version": 2,
+              "description": "Modèle standard MIR; cotes de fabrication à renseigner.",
+              "kind": "profile",
+              "topology": {
+                "kind": "profile",
+                "segments": [
+                  {
+                    "label": "A",
+                    "name": "Aile A"
+                  },
+                  {
+                    "label": "B",
+                    "name": "Aile B"
+                  }
+                ],
+                "bends": [
+                  {
+                    "mode": "interior",
+                    "angle": 90,
+                    "direction": "left"
+                  }
+                ],
+                "startAngle": 0,
+                "coloredFace": {
+                  "side": "right",
+                  "segmentId": "A"
+                }
+              },
+              "fields": [
+                {
+                  "key": "A",
+                  "label": "A · Aile A",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                },
+                {
+                  "key": "B",
+                  "label": "B · Aile B",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                },
+                {
+                  "key": "length",
+                  "label": "Longueur de la pièce",
+                  "type": "measure",
+                  "value": null,
+                  "required": true
+                }
+              ],
+              "previewProportions": {
+                "illustrative": true,
+                "unitless": true,
+                "segmentRatios": [
+                  1,
+                  0.6428571428571429
+                ]
+              },
+              "clientDefaults": {},
+              "measurementDefaults": null,
+              "referenceUnit": null,
+              "previousVersion": 1,
+              "fingerprint": "ad3ea812"
+            },
+            "modelVersion": "1.0.0",
+            "revision": 2,
+            "previousRevisionId": "M001-r1-91d37891",
+            "values": {
+              "id": "M001",
+              "instanceId": "M001",
+              "name": "Pliage en L",
+              "unit": "in",
+              "measurements": {
+                "A": "3.5",
+                "B": "2.25",
+                "length": "120"
+              },
+              "clientSourceTemplate": {
+                "id": "mir-standard-profile-l",
+                "version": 1,
+                "fingerprint": "b6f764da"
+              },
+              "clientProfileMetadata": {
+                "mirProfileId": "",
+                "mirTemplateVersion": null,
+                "mirCanonicalPhase10": false,
+                "mirLockedFields": [],
+                "segmentFields": [
+                  {
+                    "label": "A",
+                    "mirFieldId": null
+                  },
+                  {
+                    "label": "B",
+                    "mirFieldId": null
+                  }
+                ]
+              },
+              "clientAngleDefaults": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left"
+                }
+              ],
+              "quantity": 4,
+              "material": {
+                "type": "aluminium",
+                "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                "productRef": "kaycan-coil-0721-30m",
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {
+                "manufacturer": "Kaycan",
+                "selectionType": "manufacturer",
+                "hex": null,
+                "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                "swatchImage": null,
+                "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                "displayOnly": false,
+                "system": "Nuancier Kaycan",
+                "name": "Sable",
+                "code": "Sable"
+              },
+              "length": "120",
+              "coloredFace": {
+                "side": "right",
+                "segmentId": "A"
+              },
+              "mirrorX": false,
+              "perforation": {},
+              "lips": {},
+              "location": "",
+              "note": ""
+            },
+            "spec": {
+              "kind": "profile",
+              "id": "M001",
+              "unit": "in",
+              "length": "120",
+              "quantity": 4,
+              "material": {
+                "type": "aluminium",
+                "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                "productRef": "kaycan-coil-0721-30m",
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {
+                "manufacturer": "Kaycan",
+                "selectionType": "manufacturer",
+                "hex": null,
+                "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                "swatchImage": null,
+                "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                "displayOnly": false,
+                "system": "Nuancier Kaycan",
+                "name": "Sable",
+                "code": "Sable"
+              },
+              "location": "",
+              "note": "",
+              "perforation": {},
+              "mirrorX": false,
+              "template": "custom",
+              "startAngle": 0,
+              "bends": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left"
+                }
+              ],
+              "segments": [
+                {
+                  "label": "A",
+                  "name": "Aile A",
+                  "length": "3.5"
+                },
+                {
+                  "label": "B",
+                  "name": "Aile B",
+                  "length": "2.25"
+                }
+              ],
+              "coloredFace": {
+                "side": "right",
+                "segmentId": "A"
+              },
+              "name": "Pliage en L"
+            },
+            "measurements": {
+              "A": "3.5",
+              "B": "2.25",
+              "length": "120"
+            },
+            "geometry": {
+              "kind": "profile",
+              "pointsMM": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  88.9,
+                  0
+                ],
+                [
+                  88.9,
+                  57.15
+                ]
+              ],
+              "segments": [
+                {
+                  "id": "A",
+                  "label": "A",
+                  "name": "Aile A",
+                  "lengthMM": 88.89999999999999,
+                  "start": [
+                    0,
+                    0
+                  ],
+                  "end": [
+                    88.9,
+                    0
+                  ],
+                  "headingDeg": 0
+                },
+                {
+                  "id": "B",
+                  "label": "B",
+                  "name": "Aile B",
+                  "lengthMM": 57.15,
+                  "start": [
+                    88.9,
+                    0
+                  ],
+                  "end": [
+                    88.9,
+                    57.15
+                  ],
+                  "headingDeg": 90
+                }
+              ],
+              "bends": [
+                {
+                  "mode": "interior",
+                  "angle": 90,
+                  "direction": "left",
+                  "turnDeg": 90,
+                  "label": "90° intérieur · gauche",
+                  "at": [
+                    88.9,
+                    0
+                  ],
+                  "from": "A",
+                  "to": "B"
+                }
+              ],
+              "coloredFace": {
+                "side": "right",
+                "segmentId": "A"
+              }
+            },
+            "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Pliage en L · coupe et cotes finies\"><title>Pliage en L · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M001 · Pliage en L</text><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"right\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"279,419.7143 284.8779,434.6241 300.8743,435.6069 288.5106,445.8045 292.5191,461.3217 279,452.7143 265.4809,461.3217 269.4894,445.8045 257.1257,435.6069 273.1221,434.6241\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-measure-leader\" data-segment-index=\"0\" d=\"M303,350.7143L279,382.7143\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"279\" data-anchor-y=\"382.7143\" data-segment-start-x=\"50\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"382.7143\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(303,350.7143) rotate(0)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 3 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,382.7143L476,382.7143 M508,88.2857L476,88.2857 M476,382.7143L476,88.2857\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"508\" data-anchor-y=\"235.5\" data-segment-start-x=\"508\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"88.2857\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(476,235.5) rotate(90)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 1/4 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 3 1/2 po · Aile A</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 90°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 1/4 po · Aile B</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 5 3/4 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 2 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+            "status": "specified",
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Prix sur demande",
+              "selectionType": "manufacturer",
+              "status": "price_unconfigured"
+            },
+            "pricing": {
+              "schema": "mir-piece-pricing-1",
+              "status": "on_request",
+              "requiresQuote": false,
+              "automaticPricingAllowed": false,
+              "currency": "CAD",
+              "rate": null,
+              "rateUnit": "in2",
+              "rateCents": null,
+              "areaSqIn": null,
+              "unitAmount": null,
+              "unitCents": null,
+              "quantity": 4,
+              "lineAmount": null,
+              "lineCents": null,
+              "basis": "projected_outer_area_including_lips",
+              "tariffId": null,
+              "taxIncluded": null,
+              "taxStatus": "not_calculated",
+              "shippingStatus": "not_calculated",
+              "label": "Prix sur demande",
+              "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+              "sourceKind": "user_instruction",
+              "geometryErrors": [],
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Prix sur demande",
+                "selectionType": "manufacturer",
+                "status": "price_unconfigured"
+              }
+            },
+            "workshopValidationRequired": true,
+            "revisionId": "M001-r2-fa4c1e7b"
+          },
+          "history": [
+            {
+              "schema": "mir-production-instance-1",
+              "id": "M001",
+              "templateId": "mir-standard-profile-l",
+              "templateVersion": 1,
+              "templateSnapshot": {
+                "schema": "mir-production-template-1",
+                "id": "mir-standard-profile-l",
+                "name": "Pliage en L",
+                "version": 1,
+                "description": "Modèle standard MIR; cotes de fabrication à renseigner.",
+                "kind": "profile",
+                "topology": {
+                  "kind": "profile",
+                  "segments": [
+                    {
+                      "label": "A",
+                      "name": "Aile A"
+                    },
+                    {
+                      "label": "B",
+                      "name": "Aile B"
+                    }
+                  ],
+                  "bends": [
+                    {
+                      "mode": "interior",
+                      "angle": 90,
+                      "direction": "left"
+                    }
+                  ],
+                  "startAngle": 0,
+                  "coloredFace": {
+                    "side": "left",
+                    "segmentId": "A"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": "A",
+                    "label": "A · Aile A",
+                    "type": "measure",
+                    "value": null,
+                    "required": true
+                  },
+                  {
+                    "key": "B",
+                    "label": "B · Aile B",
+                    "type": "measure",
+                    "value": null,
+                    "required": true
+                  },
+                  {
+                    "key": "length",
+                    "label": "Longueur de la pièce",
+                    "type": "measure",
+                    "value": null,
+                    "required": true
+                  }
+                ],
+                "previewProportions": {
+                  "illustrative": true,
+                  "unitless": true,
+                  "segmentRatios": [
+                    1,
+                    0.6666666666666667
+                  ]
+                },
+                "clientDefaults": {},
+                "measurementDefaults": null,
+                "referenceUnit": null,
+                "previousVersion": null,
+                "fingerprint": "b6f764da"
+              },
+              "modelVersion": "1.0.0",
+              "revision": 1,
+              "previousRevisionId": null,
+              "values": {
+                "id": "M001",
+                "instanceId": "M001",
+                "name": "Pliage en L",
+                "unit": "in",
+                "measurements": {
+                  "A": "3.5",
+                  "B": "2.25",
+                  "length": "120"
+                },
+                "clientSourceTemplate": {
+                  "id": "mir-standard-profile-l",
+                  "version": 1,
+                  "fingerprint": "b6f764da"
+                },
+                "clientProfileMetadata": {
+                  "mirProfileId": "",
+                  "mirTemplateVersion": null,
+                  "mirCanonicalPhase10": false,
+                  "mirLockedFields": [],
+                  "segmentFields": [
+                    {
+                      "label": "A",
+                      "mirFieldId": null
+                    },
+                    {
+                      "label": "B",
+                      "mirFieldId": null
+                    }
+                  ]
+                },
+                "clientAngleDefaults": [
+                  {
+                    "mode": "interior",
+                    "angle": 90,
+                    "direction": "left"
+                  }
+                ],
+                "quantity": 2,
+                "material": {
+                  "type": "aluminium",
+                  "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                  "productRef": "kaycan-coil-0721-30m",
+                  "thickness": "",
+                  "thicknessUnit": "in",
+                  "gauge": ""
+                },
+                "finish": {
+                  "manufacturer": "Kaycan",
+                  "selectionType": "manufacturer",
+                  "hex": null,
+                  "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                  "swatchImage": null,
+                  "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                  "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                  "displayOnly": false,
+                  "system": "Nuancier Kaycan",
+                  "name": "Sable",
+                  "code": "Sable"
+                },
+                "length": "120",
+                "coloredFace": {
+                  "side": "right",
+                  "segmentId": "A"
+                },
+                "mirrorX": false,
+                "perforation": {},
+                "lips": {},
+                "location": "",
+                "note": ""
+              },
+              "spec": {
+                "kind": "profile",
+                "id": "M001",
+                "unit": "in",
+                "length": "120",
+                "quantity": 2,
+                "material": {
+                  "type": "aluminium",
+                  "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                  "productRef": "kaycan-coil-0721-30m",
+                  "thickness": "",
+                  "thicknessUnit": "in",
+                  "gauge": ""
+                },
+                "finish": {
+                  "manufacturer": "Kaycan",
+                  "selectionType": "manufacturer",
+                  "hex": null,
+                  "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                  "swatchImage": null,
+                  "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                  "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                  "displayOnly": false,
+                  "system": "Nuancier Kaycan",
+                  "name": "Sable",
+                  "code": "Sable"
+                },
+                "location": "",
+                "note": "",
+                "perforation": {},
+                "mirrorX": false,
+                "template": "custom",
+                "startAngle": 0,
+                "bends": [
+                  {
+                    "mode": "interior",
+                    "angle": 90,
+                    "direction": "left"
+                  }
+                ],
+                "segments": [
+                  {
+                    "label": "A",
+                    "name": "Aile A",
+                    "length": "3.5"
+                  },
+                  {
+                    "label": "B",
+                    "name": "Aile B",
+                    "length": "2.25"
+                  }
+                ],
+                "coloredFace": {
+                  "side": "right",
+                  "segmentId": "A"
+                },
+                "name": "Pliage en L"
+              },
+              "measurements": {
+                "A": "3.5",
+                "B": "2.25",
+                "length": "120"
+              },
+              "geometry": {
+                "kind": "profile",
+                "pointsMM": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    88.9,
+                    0
+                  ],
+                  [
+                    88.9,
+                    57.15
+                  ]
+                ],
+                "segments": [
+                  {
+                    "id": "A",
+                    "label": "A",
+                    "name": "Aile A",
+                    "lengthMM": 88.89999999999999,
+                    "start": [
+                      0,
+                      0
+                    ],
+                    "end": [
+                      88.9,
+                      0
+                    ],
+                    "headingDeg": 0
+                  },
+                  {
+                    "id": "B",
+                    "label": "B",
+                    "name": "Aile B",
+                    "lengthMM": 57.15,
+                    "start": [
+                      88.9,
+                      0
+                    ],
+                    "end": [
+                      88.9,
+                      57.15
+                    ],
+                    "headingDeg": 90
+                  }
+                ],
+                "bends": [
+                  {
+                    "mode": "interior",
+                    "angle": 90,
+                    "direction": "left",
+                    "turnDeg": 90,
+                    "label": "90° intérieur · gauche",
+                    "at": [
+                      88.9,
+                      0
+                    ],
+                    "from": "A",
+                    "to": "B"
+                  }
+                ],
+                "coloredFace": {
+                  "side": "right",
+                  "segmentId": "A"
+                }
+              },
+              "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Pliage en L · coupe et cotes finies\"><title>Pliage en L · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M001 · Pliage en L</text><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"right\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"279,419.7143 284.8779,434.6241 300.8743,435.6069 288.5106,445.8045 292.5191,461.3217 279,452.7143 265.4809,461.3217 269.4894,445.8045 257.1257,435.6069 273.1221,434.6241\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-measure-leader\" data-segment-index=\"0\" d=\"M303,350.7143L279,382.7143\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"279\" data-anchor-y=\"382.7143\" data-segment-start-x=\"50\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"382.7143\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(303,350.7143) rotate(0)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 3 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,382.7143L476,382.7143 M508,88.2857L476,88.2857 M476,382.7143L476,88.2857\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"508\" data-anchor-y=\"235.5\" data-segment-start-x=\"508\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"88.2857\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(476,235.5) rotate(90)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 1/4 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 3 1/2 po · Aile A</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 90°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 1/4 po · Aile B</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 5 3/4 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 2 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+              "status": "specified",
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Prix sur demande",
+                "selectionType": "manufacturer",
+                "status": "price_unconfigured"
+              },
+              "pricing": {
+                "schema": "mir-piece-pricing-1",
+                "status": "on_request",
+                "requiresQuote": false,
+                "automaticPricingAllowed": false,
+                "currency": "CAD",
+                "rate": null,
+                "rateUnit": "in2",
+                "rateCents": null,
+                "areaSqIn": null,
+                "unitAmount": null,
+                "unitCents": null,
+                "quantity": 2,
+                "lineAmount": null,
+                "lineCents": null,
+                "basis": "projected_outer_area_including_lips",
+                "tariffId": null,
+                "taxIncluded": null,
+                "taxStatus": "not_calculated",
+                "shippingStatus": "not_calculated",
+                "label": "Prix sur demande",
+                "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+                "sourceKind": "user_instruction",
+                "geometryErrors": [],
+                "quotePolicy": {
+                  "version": "mir-color-quote-1",
+                  "required": false,
+                  "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                  "automaticPricingAllowed": false,
+                  "customColor": false,
+                  "label": "Prix sur demande",
+                  "selectionType": "manufacturer",
+                  "status": "price_unconfigured"
+                }
+              },
+              "workshopValidationRequired": true,
+              "revisionId": "M001-r1-91d37891"
+            }
+          ],
+          "selection": {
+            "materialId": "kaycan-coil-0721-30m",
+            "colorSystem": "manufacturer",
+            "colorId": "kaycan-sable",
+            "storeColorMode": "employee"
+          },
+          "savedAt": "2026-11-18T14:56:48.967Z"
+        },
+        "cart": [
+          {
+            "id": "fold:M001",
+            "kind": "fold",
+            "quantity": 4,
+            "snapshot": {
+              "schema": "mir-production-instance-1",
+              "id": "M001",
+              "templateId": "mir-standard-profile-l",
+              "templateVersion": 2,
+              "templateSnapshot": {
+                "schema": "mir-production-template-1",
+                "id": "mir-standard-profile-l",
+                "name": "Pliage en L",
+                "version": 2,
+                "description": "Modèle standard MIR; cotes de fabrication à renseigner.",
+                "kind": "profile",
+                "topology": {
+                  "kind": "profile",
+                  "segments": [
+                    {
+                      "label": "A",
+                      "name": "Aile A"
+                    },
+                    {
+                      "label": "B",
+                      "name": "Aile B"
+                    }
+                  ],
+                  "bends": [
+                    {
+                      "mode": "interior",
+                      "angle": 90,
+                      "direction": "left"
+                    }
+                  ],
+                  "startAngle": 0,
+                  "coloredFace": {
+                    "side": "right",
+                    "segmentId": "A"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": "A",
+                    "label": "A · Aile A",
+                    "type": "measure",
+                    "value": null,
+                    "required": true
+                  },
+                  {
+                    "key": "B",
+                    "label": "B · Aile B",
+                    "type": "measure",
+                    "value": null,
+                    "required": true
+                  },
+                  {
+                    "key": "length",
+                    "label": "Longueur de la pièce",
+                    "type": "measure",
+                    "value": null,
+                    "required": true
+                  }
+                ],
+                "previewProportions": {
+                  "illustrative": true,
+                  "unitless": true,
+                  "segmentRatios": [
+                    1,
+                    0.6428571428571429
+                  ]
+                },
+                "clientDefaults": {},
+                "measurementDefaults": null,
+                "referenceUnit": null,
+                "previousVersion": 1,
+                "fingerprint": "ad3ea812"
+              },
+              "modelVersion": "1.0.0",
+              "revision": 2,
+              "previousRevisionId": "M001-r1-91d37891",
+              "values": {
+                "id": "M001",
+                "instanceId": "M001",
+                "name": "Pliage en L",
+                "unit": "in",
+                "measurements": {
+                  "A": "3.5",
+                  "B": "2.25",
+                  "length": "120"
+                },
+                "clientSourceTemplate": {
+                  "id": "mir-standard-profile-l",
+                  "version": 1,
+                  "fingerprint": "b6f764da"
+                },
+                "clientProfileMetadata": {
+                  "mirProfileId": "",
+                  "mirTemplateVersion": null,
+                  "mirCanonicalPhase10": false,
+                  "mirLockedFields": [],
+                  "segmentFields": [
+                    {
+                      "label": "A",
+                      "mirFieldId": null
+                    },
+                    {
+                      "label": "B",
+                      "mirFieldId": null
+                    }
+                  ]
+                },
+                "clientAngleDefaults": [
+                  {
+                    "mode": "interior",
+                    "angle": 90,
+                    "direction": "left"
+                  }
+                ],
+                "quantity": 4,
+                "material": {
+                  "type": "aluminium",
+                  "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                  "productRef": "kaycan-coil-0721-30m",
+                  "thickness": "",
+                  "thicknessUnit": "in",
+                  "gauge": ""
+                },
+                "finish": {
+                  "manufacturer": "Kaycan",
+                  "selectionType": "manufacturer",
+                  "hex": null,
+                  "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                  "swatchImage": null,
+                  "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                  "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                  "displayOnly": false,
+                  "system": "Nuancier Kaycan",
+                  "name": "Sable",
+                  "code": "Sable"
+                },
+                "length": "120",
+                "coloredFace": {
+                  "side": "right",
+                  "segmentId": "A"
+                },
+                "mirrorX": false,
+                "perforation": {},
+                "lips": {},
+                "location": "",
+                "note": ""
+              },
+              "spec": {
+                "kind": "profile",
+                "id": "M001",
+                "unit": "in",
+                "length": "120",
+                "quantity": 4,
+                "material": {
+                  "type": "aluminium",
+                  "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                  "productRef": "kaycan-coil-0721-30m",
+                  "thickness": "",
+                  "thicknessUnit": "in",
+                  "gauge": ""
+                },
+                "finish": {
+                  "manufacturer": "Kaycan",
+                  "selectionType": "manufacturer",
+                  "hex": null,
+                  "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                  "swatchImage": null,
+                  "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                  "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                  "displayOnly": false,
+                  "system": "Nuancier Kaycan",
+                  "name": "Sable",
+                  "code": "Sable"
+                },
+                "location": "",
+                "note": "",
+                "perforation": {},
+                "mirrorX": false,
+                "template": "custom",
+                "startAngle": 0,
+                "bends": [
+                  {
+                    "mode": "interior",
+                    "angle": 90,
+                    "direction": "left"
+                  }
+                ],
+                "segments": [
+                  {
+                    "label": "A",
+                    "name": "Aile A",
+                    "length": "3.5"
+                  },
+                  {
+                    "label": "B",
+                    "name": "Aile B",
+                    "length": "2.25"
+                  }
+                ],
+                "coloredFace": {
+                  "side": "right",
+                  "segmentId": "A"
+                },
+                "name": "Pliage en L"
+              },
+              "measurements": {
+                "A": "3.5",
+                "B": "2.25",
+                "length": "120"
+              },
+              "geometry": {
+                "kind": "profile",
+                "pointsMM": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    88.9,
+                    0
+                  ],
+                  [
+                    88.9,
+                    57.15
+                  ]
+                ],
+                "segments": [
+                  {
+                    "id": "A",
+                    "label": "A",
+                    "name": "Aile A",
+                    "lengthMM": 88.89999999999999,
+                    "start": [
+                      0,
+                      0
+                    ],
+                    "end": [
+                      88.9,
+                      0
+                    ],
+                    "headingDeg": 0
+                  },
+                  {
+                    "id": "B",
+                    "label": "B",
+                    "name": "Aile B",
+                    "lengthMM": 57.15,
+                    "start": [
+                      88.9,
+                      0
+                    ],
+                    "end": [
+                      88.9,
+                      57.15
+                    ],
+                    "headingDeg": 90
+                  }
+                ],
+                "bends": [
+                  {
+                    "mode": "interior",
+                    "angle": 90,
+                    "direction": "left",
+                    "turnDeg": 90,
+                    "label": "90° intérieur · gauche",
+                    "at": [
+                      88.9,
+                      0
+                    ],
+                    "from": "A",
+                    "to": "B"
+                  }
+                ],
+                "coloredFace": {
+                  "side": "right",
+                  "segmentId": "A"
+                }
+              },
+              "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Pliage en L · coupe et cotes finies\"><title>Pliage en L · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M001 · Pliage en L</text><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"right\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"279,419.7143 284.8779,434.6241 300.8743,435.6069 288.5106,445.8045 292.5191,461.3217 279,452.7143 265.4809,461.3217 269.4894,445.8045 257.1257,435.6069 273.1221,434.6241\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-measure-leader\" data-segment-index=\"0\" d=\"M303,350.7143L279,382.7143\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"279\" data-anchor-y=\"382.7143\" data-segment-start-x=\"50\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"382.7143\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(303,350.7143) rotate(0)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 3 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,382.7143L476,382.7143 M508,88.2857L476,88.2857 M476,382.7143L476,88.2857\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"508\" data-anchor-y=\"235.5\" data-segment-start-x=\"508\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"88.2857\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(476,235.5) rotate(90)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 1/4 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 3 1/2 po · Aile A</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 90°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 1/4 po · Aile B</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 5 3/4 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 2 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+              "status": "specified",
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Prix sur demande",
+                "selectionType": "manufacturer",
+                "status": "price_unconfigured"
+              },
+              "pricing": {
+                "schema": "mir-piece-pricing-1",
+                "status": "on_request",
+                "requiresQuote": false,
+                "automaticPricingAllowed": false,
+                "currency": "CAD",
+                "rate": null,
+                "rateUnit": "in2",
+                "rateCents": null,
+                "areaSqIn": null,
+                "unitAmount": null,
+                "unitCents": null,
+                "quantity": 4,
+                "lineAmount": null,
+                "lineCents": null,
+                "basis": "projected_outer_area_including_lips",
+                "tariffId": null,
+                "taxIncluded": null,
+                "taxStatus": "not_calculated",
+                "shippingStatus": "not_calculated",
+                "label": "Prix sur demande",
+                "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+                "sourceKind": "user_instruction",
+                "geometryErrors": [],
+                "quotePolicy": {
+                  "version": "mir-color-quote-1",
+                  "required": false,
+                  "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                  "automaticPricingAllowed": false,
+                  "customColor": false,
+                  "label": "Prix sur demande",
+                  "selectionType": "manufacturer",
+                  "status": "price_unconfigured"
+                }
+              },
+              "workshopValidationRequired": true,
+              "revisionId": "M001-r2-fa4c1e7b"
+            },
+            "line": {
+              "itemId": "mir-standard-profile-l",
+              "name": "Pliage en L",
+              "brand": "Atelier MIR",
+              "unit": "pièce",
+              "quantity": 4,
+              "dimensionsIn": {
+                "A": "3.5",
+                "B": "2.25",
+                "length": "120"
+              },
+              "colorId": "Sable",
+              "specification": {
+                "kind": "fold",
+                "templateSnapshot": {
+                  "schema": "mir-production-template-1",
+                  "id": "mir-standard-profile-l",
+                  "name": "Pliage en L",
+                  "version": 2,
+                  "description": "Modèle standard MIR; cotes de fabrication à renseigner.",
+                  "kind": "profile",
+                  "topology": {
+                    "kind": "profile",
+                    "segments": [
+                      {
+                        "label": "A",
+                        "name": "Aile A"
+                      },
+                      {
+                        "label": "B",
+                        "name": "Aile B"
+                      }
+                    ],
+                    "bends": [
+                      {
+                        "mode": "interior",
+                        "angle": 90,
+                        "direction": "left"
+                      }
+                    ],
+                    "startAngle": 0,
+                    "coloredFace": {
+                      "side": "right",
+                      "segmentId": "A"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": "A",
+                      "label": "A · Aile A",
+                      "type": "measure",
+                      "value": null,
+                      "required": true
+                    },
+                    {
+                      "key": "B",
+                      "label": "B · Aile B",
+                      "type": "measure",
+                      "value": null,
+                      "required": true
+                    },
+                    {
+                      "key": "length",
+                      "label": "Longueur de la pièce",
+                      "type": "measure",
+                      "value": null,
+                      "required": true
+                    }
+                  ],
+                  "previewProportions": {
+                    "illustrative": true,
+                    "unitless": true,
+                    "segmentRatios": [
+                      1,
+                      0.6428571428571429
+                    ]
+                  },
+                  "clientDefaults": {},
+                  "measurementDefaults": null,
+                  "referenceUnit": null,
+                  "previousVersion": 1,
+                  "fingerprint": "ad3ea812"
+                },
+                "instanceSnapshot": {
+                  "schema": "mir-production-instance-1",
+                  "id": "M001",
+                  "templateId": "mir-standard-profile-l",
+                  "templateVersion": 2,
+                  "templateSnapshot": {
+                    "schema": "mir-production-template-1",
+                    "id": "mir-standard-profile-l",
+                    "name": "Pliage en L",
+                    "version": 2,
+                    "description": "Modèle standard MIR; cotes de fabrication à renseigner.",
+                    "kind": "profile",
+                    "topology": {
+                      "kind": "profile",
+                      "segments": [
+                        {
+                          "label": "A",
+                          "name": "Aile A"
+                        },
+                        {
+                          "label": "B",
+                          "name": "Aile B"
+                        }
+                      ],
+                      "bends": [
+                        {
+                          "mode": "interior",
+                          "angle": 90,
+                          "direction": "left"
+                        }
+                      ],
+                      "startAngle": 0,
+                      "coloredFace": {
+                        "side": "right",
+                        "segmentId": "A"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": "A",
+                        "label": "A · Aile A",
+                        "type": "measure",
+                        "value": null,
+                        "required": true
+                      },
+                      {
+                        "key": "B",
+                        "label": "B · Aile B",
+                        "type": "measure",
+                        "value": null,
+                        "required": true
+                      },
+                      {
+                        "key": "length",
+                        "label": "Longueur de la pièce",
+                        "type": "measure",
+                        "value": null,
+                        "required": true
+                      }
+                    ],
+                    "previewProportions": {
+                      "illustrative": true,
+                      "unitless": true,
+                      "segmentRatios": [
+                        1,
+                        0.6428571428571429
+                      ]
+                    },
+                    "clientDefaults": {},
+                    "measurementDefaults": null,
+                    "referenceUnit": null,
+                    "previousVersion": 1,
+                    "fingerprint": "ad3ea812"
+                  },
+                  "modelVersion": "1.0.0",
+                  "revision": 2,
+                  "previousRevisionId": "M001-r1-91d37891",
+                  "values": {
+                    "id": "M001",
+                    "instanceId": "M001",
+                    "name": "Pliage en L",
+                    "unit": "in",
+                    "measurements": {
+                      "A": "3.5",
+                      "B": "2.25",
+                      "length": "120"
+                    },
+                    "clientSourceTemplate": {
+                      "id": "mir-standard-profile-l",
+                      "version": 1,
+                      "fingerprint": "b6f764da"
+                    },
+                    "clientProfileMetadata": {
+                      "mirProfileId": "",
+                      "mirTemplateVersion": null,
+                      "mirCanonicalPhase10": false,
+                      "mirLockedFields": [],
+                      "segmentFields": [
+                        {
+                          "label": "A",
+                          "mirFieldId": null
+                        },
+                        {
+                          "label": "B",
+                          "mirFieldId": null
+                        }
+                      ]
+                    },
+                    "clientAngleDefaults": [
+                      {
+                        "mode": "interior",
+                        "angle": 90,
+                        "direction": "left"
+                      }
+                    ],
+                    "quantity": 4,
+                    "material": {
+                      "type": "aluminium",
+                      "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                      "productRef": "kaycan-coil-0721-30m",
+                      "thickness": "",
+                      "thicknessUnit": "in",
+                      "gauge": ""
+                    },
+                    "finish": {
+                      "manufacturer": "Kaycan",
+                      "selectionType": "manufacturer",
+                      "hex": null,
+                      "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                      "swatchImage": null,
+                      "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                      "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                      "displayOnly": false,
+                      "system": "Nuancier Kaycan",
+                      "name": "Sable",
+                      "code": "Sable"
+                    },
+                    "length": "120",
+                    "coloredFace": {
+                      "side": "right",
+                      "segmentId": "A"
+                    },
+                    "mirrorX": false,
+                    "perforation": {},
+                    "lips": {},
+                    "location": "",
+                    "note": ""
+                  },
+                  "spec": {
+                    "kind": "profile",
+                    "id": "M001",
+                    "unit": "in",
+                    "length": "120",
+                    "quantity": 4,
+                    "material": {
+                      "type": "aluminium",
+                      "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                      "productRef": "kaycan-coil-0721-30m",
+                      "thickness": "",
+                      "thicknessUnit": "in",
+                      "gauge": ""
+                    },
+                    "finish": {
+                      "manufacturer": "Kaycan",
+                      "selectionType": "manufacturer",
+                      "hex": null,
+                      "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                      "swatchImage": null,
+                      "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                      "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                      "displayOnly": false,
+                      "system": "Nuancier Kaycan",
+                      "name": "Sable",
+                      "code": "Sable"
+                    },
+                    "location": "",
+                    "note": "",
+                    "perforation": {},
+                    "mirrorX": false,
+                    "template": "custom",
+                    "startAngle": 0,
+                    "bends": [
+                      {
+                        "mode": "interior",
+                        "angle": 90,
+                        "direction": "left"
+                      }
+                    ],
+                    "segments": [
+                      {
+                        "label": "A",
+                        "name": "Aile A",
+                        "length": "3.5"
+                      },
+                      {
+                        "label": "B",
+                        "name": "Aile B",
+                        "length": "2.25"
+                      }
+                    ],
+                    "coloredFace": {
+                      "side": "right",
+                      "segmentId": "A"
+                    },
+                    "name": "Pliage en L"
+                  },
+                  "measurements": {
+                    "A": "3.5",
+                    "B": "2.25",
+                    "length": "120"
+                  },
+                  "geometry": {
+                    "kind": "profile",
+                    "pointsMM": [
+                      [
+                        0,
+                        0
+                      ],
+                      [
+                        88.9,
+                        0
+                      ],
+                      [
+                        88.9,
+                        57.15
+                      ]
+                    ],
+                    "segments": [
+                      {
+                        "id": "A",
+                        "label": "A",
+                        "name": "Aile A",
+                        "lengthMM": 88.89999999999999,
+                        "start": [
+                          0,
+                          0
+                        ],
+                        "end": [
+                          88.9,
+                          0
+                        ],
+                        "headingDeg": 0
+                      },
+                      {
+                        "id": "B",
+                        "label": "B",
+                        "name": "Aile B",
+                        "lengthMM": 57.15,
+                        "start": [
+                          88.9,
+                          0
+                        ],
+                        "end": [
+                          88.9,
+                          57.15
+                        ],
+                        "headingDeg": 90
+                      }
+                    ],
+                    "bends": [
+                      {
+                        "mode": "interior",
+                        "angle": 90,
+                        "direction": "left",
+                        "turnDeg": 90,
+                        "label": "90° intérieur · gauche",
+                        "at": [
+                          88.9,
+                          0
+                        ],
+                        "from": "A",
+                        "to": "B"
+                      }
+                    ],
+                    "coloredFace": {
+                      "side": "right",
+                      "segmentId": "A"
+                    }
+                  },
+                  "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Pliage en L · coupe et cotes finies\"><title>Pliage en L · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M001 · Pliage en L</text><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M50 382.7143 L508 382.7143 L508 88.2857\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"right\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"279,419.7143 284.8779,434.6241 300.8743,435.6069 288.5106,445.8045 292.5191,461.3217 279,452.7143 265.4809,461.3217 269.4894,445.8045 257.1257,435.6069 273.1221,434.6241\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-measure-leader\" data-segment-index=\"0\" d=\"M303,350.7143L279,382.7143\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"279\" data-anchor-y=\"382.7143\" data-segment-start-x=\"50\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"382.7143\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(303,350.7143) rotate(0)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 3 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M508,382.7143L476,382.7143 M508,88.2857L476,88.2857 M476,382.7143L476,88.2857\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"508\" data-anchor-y=\"235.5\" data-segment-start-x=\"508\" data-segment-start-y=\"382.7143\" data-segment-end-x=\"508\" data-segment-end-y=\"88.2857\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(476,235.5) rotate(90)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 1/4 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 3 1/2 po · Aile A</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 90°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 1/4 po · Aile B</text><text x=\"578\" y=\"149\" font-size=\"15\">Développé total = 5 3/4 po (nominal)</text><text x=\"578\" y=\"170\" font-size=\"15\">Face colorée : Face 2 — côté indiqué</text><text x=\"578\" y=\"191\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"212\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"233\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+                  "status": "specified",
+                  "quotePolicy": {
+                    "version": "mir-color-quote-1",
+                    "required": false,
+                    "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                    "automaticPricingAllowed": false,
+                    "customColor": false,
+                    "label": "Prix sur demande",
+                    "selectionType": "manufacturer",
+                    "status": "price_unconfigured"
+                  },
+                  "pricing": {
+                    "schema": "mir-piece-pricing-1",
+                    "status": "on_request",
+                    "requiresQuote": false,
+                    "automaticPricingAllowed": false,
+                    "currency": "CAD",
+                    "rate": null,
+                    "rateUnit": "in2",
+                    "rateCents": null,
+                    "areaSqIn": null,
+                    "unitAmount": null,
+                    "unitCents": null,
+                    "quantity": 4,
+                    "lineAmount": null,
+                    "lineCents": null,
+                    "basis": "projected_outer_area_including_lips",
+                    "tariffId": null,
+                    "taxIncluded": null,
+                    "taxStatus": "not_calculated",
+                    "shippingStatus": "not_calculated",
+                    "label": "Prix sur demande",
+                    "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+                    "sourceKind": "user_instruction",
+                    "geometryErrors": [],
+                    "quotePolicy": {
+                      "version": "mir-color-quote-1",
+                      "required": false,
+                      "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                      "automaticPricingAllowed": false,
+                      "customColor": false,
+                      "label": "Prix sur demande",
+                      "selectionType": "manufacturer",
+                      "status": "price_unconfigured"
+                    }
+                  },
+                  "workshopValidationRequired": true,
+                  "revisionId": "M001-r2-fa4c1e7b"
+                }
+              }
+            },
+            "updatedAt": "2026-11-18T14:56:48.968Z"
+          },
+          {
+            "id": "fold:M002",
+            "kind": "fold",
+            "quantity": 3,
+            "snapshot": {
+              "schema": "mir-production-instance-1",
+              "id": "M002",
+              "templateId": "modele-piece-M002-7fe1460f-40d5-4b8c-be36-aba16053a2bc",
+              "templateVersion": 1,
+              "templateSnapshot": {
+                "schema": "mir-production-template-1",
+                "id": "modele-piece-M002-7fe1460f-40d5-4b8c-be36-aba16053a2bc",
+                "name": "Profil dessiné",
+                "version": 1,
+                "description": "",
+                "kind": "profile",
+                "topology": {
+                  "kind": "profile",
+                  "segments": [
+                    {
+                      "label": "A",
+                      "name": ""
+                    },
+                    {
+                      "label": "B",
+                      "name": ""
+                    },
+                    {
+                      "label": "C",
+                      "name": ""
+                    }
+                  ],
+                  "bends": [
+                    {
+                      "mode": "signed",
+                      "angle": 135
+                    },
+                    {
+                      "mode": "signed",
+                      "angle": -89.75
+                    }
+                  ],
+                  "startAngle": 0,
+                  "coloredFace": {
+                    "side": "right",
+                    "segmentId": "A"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": "A",
+                    "label": "A",
+                    "type": "measure",
+                    "value": null,
+                    "required": true
+                  },
+                  {
+                    "key": "B",
+                    "label": "B",
+                    "type": "measure",
+                    "value": null,
+                    "required": true
+                  },
+                  {
+                    "key": "C",
+                    "label": "C",
+                    "type": "measure",
+                    "value": null,
+                    "required": true
+                  },
+                  {
+                    "key": "length",
+                    "label": "Longueur de la pièce",
+                    "type": "measure",
+                    "value": null,
+                    "required": true
+                  }
+                ],
+                "previewProportions": {
+                  "illustrative": true,
+                  "unitless": true,
+                  "segmentRatios": [
+                    1,
+                    0.6428571428571429,
+                    0.6060857142857143
+                  ]
+                },
+                "clientDefaults": {},
+                "measurementDefaults": null,
+                "referenceUnit": null,
+                "previousVersion": null,
+                "fingerprint": "066a80f9"
+              },
+              "modelVersion": "1.0.0",
+              "revision": 1,
+              "previousRevisionId": null,
+              "values": {
+                "id": "M002",
+                "instanceId": "M002",
+                "name": "Profil dessiné",
+                "unit": "in",
+                "measurements": {
+                  "A": "3.5",
+                  "B": "2.25",
+                  "C": "2.1213",
+                  "length": 120
+                },
+                "clientSourceTemplate": null,
+                "clientProfileMetadata": {
+                  "mirProfileId": "",
+                  "mirTemplateVersion": null,
+                  "mirCanonicalPhase10": false,
+                  "mirLockedFields": [],
+                  "segmentFields": [
+                    {
+                      "label": "A",
+                      "mirFieldId": null
+                    },
+                    {
+                      "label": "B",
+                      "mirFieldId": null
+                    },
+                    {
+                      "label": "C",
+                      "mirFieldId": null
+                    }
+                  ]
+                },
+                "clientAngleDefaults": [
+                  {
+                    "mode": "signed",
+                    "angle": 90
+                  },
+                  {
+                    "mode": "signed",
+                    "angle": -45
+                  }
+                ],
+                "quantity": 3,
+                "material": {
+                  "type": "aluminium",
+                  "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                  "productRef": "kaycan-coil-0721-30m",
+                  "thickness": "",
+                  "thicknessUnit": "in",
+                  "gauge": ""
+                },
+                "finish": {
+                  "manufacturer": "Kaycan",
+                  "selectionType": "manufacturer",
+                  "hex": null,
+                  "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                  "swatchImage": null,
+                  "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                  "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                  "displayOnly": false,
+                  "system": "Nuancier Kaycan",
+                  "name": "Sable",
+                  "code": "Sable"
+                },
+                "length": 120,
+                "coloredFace": {
+                  "side": "right",
+                  "segmentId": "A"
+                },
+                "mirrorX": false,
+                "perforation": {},
+                "lips": {},
+                "location": "",
+                "note": ""
+              },
+              "spec": {
+                "kind": "profile",
+                "id": "M002",
+                "unit": "in",
+                "length": 120,
+                "quantity": 3,
+                "material": {
+                  "type": "aluminium",
+                  "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                  "productRef": "kaycan-coil-0721-30m",
+                  "thickness": "",
+                  "thicknessUnit": "in",
+                  "gauge": ""
+                },
+                "finish": {
+                  "manufacturer": "Kaycan",
+                  "selectionType": "manufacturer",
+                  "hex": null,
+                  "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                  "swatchImage": null,
+                  "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                  "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                  "displayOnly": false,
+                  "system": "Nuancier Kaycan",
+                  "name": "Sable",
+                  "code": "Sable"
+                },
+                "location": "",
+                "note": "",
+                "perforation": {},
+                "mirrorX": false,
+                "template": "custom",
+                "startAngle": 0,
+                "bends": [
+                  {
+                    "mode": "signed",
+                    "angle": 135
+                  },
+                  {
+                    "mode": "signed",
+                    "angle": -89.75
+                  }
+                ],
+                "segments": [
+                  {
+                    "label": "A",
+                    "name": "",
+                    "length": "3.5"
+                  },
+                  {
+                    "label": "B",
+                    "name": "",
+                    "length": "2.25"
+                  },
+                  {
+                    "label": "C",
+                    "name": "",
+                    "length": "2.1213"
+                  }
+                ],
+                "coloredFace": {
+                  "side": "right",
+                  "segmentId": "A"
+                },
+                "name": "Profil dessiné"
+              },
+              "measurements": {
+                "A": "3.5",
+                "B": "2.25",
+                "C": "2.1213",
+                "length": 120
+              },
+              "geometry": {
+                "kind": "profile",
+                "pointsMM": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    88.9,
+                    0
+                  ],
+                  [
+                    48.4888474552,
+                    40.4111525448
+                  ],
+                  [
+                    86.4218789039,
+                    78.6766649725
+                  ]
+                ],
+                "segments": [
+                  {
+                    "id": "A",
+                    "label": "A",
+                    "name": "",
+                    "lengthMM": 88.89999999999999,
+                    "start": [
+                      0,
+                      0
+                    ],
+                    "end": [
+                      88.9,
+                      0
+                    ],
+                    "headingDeg": 0
+                  },
+                  {
+                    "id": "B",
+                    "label": "B",
+                    "name": "",
+                    "lengthMM": 57.15,
+                    "start": [
+                      88.9,
+                      0
+                    ],
+                    "end": [
+                      48.4888474552,
+                      40.4111525448
+                    ],
+                    "headingDeg": 135
+                  },
+                  {
+                    "id": "C",
+                    "label": "C",
+                    "name": "",
+                    "lengthMM": 53.88102,
+                    "start": [
+                      48.4888474552,
+                      40.4111525448
+                    ],
+                    "end": [
+                      86.4218789039,
+                      78.6766649725
+                    ],
+                    "headingDeg": 45.25
+                  }
+                ],
+                "bends": [
+                  {
+                    "mode": "signed",
+                    "angle": 135,
+                    "turnDeg": 135,
+                    "label": "Rotation 135°",
+                    "at": [
+                      88.9,
+                      0
+                    ],
+                    "from": "A",
+                    "to": "B"
+                  },
+                  {
+                    "mode": "signed",
+                    "angle": -89.75,
+                    "turnDeg": -89.75,
+                    "label": "Rotation -89.75°",
+                    "at": [
+                      48.4888474552,
+                      40.4111525448
+                    ],
+                    "from": "B",
+                    "to": "C"
+                  }
+                ],
+                "coloredFace": {
+                  "side": "right",
+                  "segmentId": "A"
+                }
+              },
+              "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Profil dessiné · coupe et cotes finies\"><title>Profil dessiné · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M002 · Profil dessiné</text><path d=\"M106.684 388 L451.316 388 L294.6571 231.3411 L441.7093 83\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M106.684 388 L451.316 388 L294.6571 231.3411 L441.7093 83\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"right\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"279,425 284.8779,439.9098 300.8743,440.8926 288.5106,451.0902 292.5191,466.6074 279,458 265.4809,466.6074 269.4894,451.0902 257.1257,440.8926 273.1221,439.9098\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M106.684,388L106.684,356 M451.316,388L451.316,356 M106.684,356L451.316,356\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"279\" data-anchor-y=\"388\" data-segment-start-x=\"106.684\" data-segment-start-y=\"388\" data-segment-end-x=\"451.316\" data-segment-end-y=\"388\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(279,356) rotate(0)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 3 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M451.316,388L507.8846,331.4315 M294.6571,231.3411L351.2256,174.7725 M507.8846,331.4315L351.2256,174.7725\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"372.9866\" data-anchor-y=\"309.6705\" data-segment-start-x=\"451.316\" data-segment-start-y=\"388\" data-segment-end-x=\"294.6571\" data-segment-end-y=\"231.3411\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(429.5551,253.102) rotate(45)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 1/4 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"2\" d=\"M294.6571,231.3411L237.8423,175.0199 M441.7093,83L384.8944,26.6788 M237.8423,175.0199L384.8944,26.6788\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"C\" data-segment-index=\"2\" data-anchor-x=\"368.1832\" data-anchor-y=\"157.1705\" data-segment-start-x=\"294.6571\" data-segment-start-y=\"231.3411\" data-segment-end-x=\"441.7093\" data-segment-end-y=\"83\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(311.3684,100.8494) rotate(-45.25)\"><rect x=\"-54.75\" y=\"-12\" width=\"109.5\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">C · 2.1213 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 3 1/2 po</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 135°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 1/4 po</text><text x=\"578\" y=\"149\" font-size=\"15\">Pli B–C = 89.75°</text><text x=\"578\" y=\"170\" font-size=\"15\">C = 2.1213 po</text><text x=\"578\" y=\"191\" font-size=\"15\">Développé total = 7.8713 po (nominal)</text><text x=\"578\" y=\"212\" font-size=\"15\">Face colorée : Face 2 — côté indiqué</text><text x=\"578\" y=\"233\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"254\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"275\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+              "status": "specified",
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Prix sur demande",
+                "selectionType": "manufacturer",
+                "status": "price_unconfigured"
+              },
+              "pricing": {
+                "schema": "mir-piece-pricing-1",
+                "status": "on_request",
+                "requiresQuote": false,
+                "automaticPricingAllowed": false,
+                "currency": "CAD",
+                "rate": null,
+                "rateUnit": "in2",
+                "rateCents": null,
+                "areaSqIn": null,
+                "unitAmount": null,
+                "unitCents": null,
+                "quantity": 3,
+                "lineAmount": null,
+                "lineCents": null,
+                "basis": "projected_outer_area_including_lips",
+                "tariffId": null,
+                "taxIncluded": null,
+                "taxStatus": "not_calculated",
+                "shippingStatus": "not_calculated",
+                "label": "Prix sur demande",
+                "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+                "sourceKind": "user_instruction",
+                "geometryErrors": [],
+                "quotePolicy": {
+                  "version": "mir-color-quote-1",
+                  "required": false,
+                  "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                  "automaticPricingAllowed": false,
+                  "customColor": false,
+                  "label": "Prix sur demande",
+                  "selectionType": "manufacturer",
+                  "status": "price_unconfigured"
+                }
+              },
+              "workshopValidationRequired": true,
+              "revisionId": "M002-r1-490d1260"
+            },
+            "line": {
+              "itemId": "modele-piece-M002-7fe1460f-40d5-4b8c-be36-aba16053a2bc",
+              "name": "Profil dessiné",
+              "brand": "Atelier MIR",
+              "unit": "pièce",
+              "quantity": 3,
+              "dimensionsIn": {
+                "A": "3.5",
+                "B": "2.25",
+                "C": "2.1213",
+                "length": 120
+              },
+              "colorId": "Sable",
+              "specification": {
+                "kind": "fold",
+                "templateSnapshot": {
+                  "schema": "mir-production-template-1",
+                  "id": "modele-piece-M002-7fe1460f-40d5-4b8c-be36-aba16053a2bc",
+                  "name": "Profil dessiné",
+                  "version": 1,
+                  "description": "",
+                  "kind": "profile",
+                  "topology": {
+                    "kind": "profile",
+                    "segments": [
+                      {
+                        "label": "A",
+                        "name": ""
+                      },
+                      {
+                        "label": "B",
+                        "name": ""
+                      },
+                      {
+                        "label": "C",
+                        "name": ""
+                      }
+                    ],
+                    "bends": [
+                      {
+                        "mode": "signed",
+                        "angle": 135
+                      },
+                      {
+                        "mode": "signed",
+                        "angle": -89.75
+                      }
+                    ],
+                    "startAngle": 0,
+                    "coloredFace": {
+                      "side": "right",
+                      "segmentId": "A"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": "A",
+                      "label": "A",
+                      "type": "measure",
+                      "value": null,
+                      "required": true
+                    },
+                    {
+                      "key": "B",
+                      "label": "B",
+                      "type": "measure",
+                      "value": null,
+                      "required": true
+                    },
+                    {
+                      "key": "C",
+                      "label": "C",
+                      "type": "measure",
+                      "value": null,
+                      "required": true
+                    },
+                    {
+                      "key": "length",
+                      "label": "Longueur de la pièce",
+                      "type": "measure",
+                      "value": null,
+                      "required": true
+                    }
+                  ],
+                  "previewProportions": {
+                    "illustrative": true,
+                    "unitless": true,
+                    "segmentRatios": [
+                      1,
+                      0.6428571428571429,
+                      0.6060857142857143
+                    ]
+                  },
+                  "clientDefaults": {},
+                  "measurementDefaults": null,
+                  "referenceUnit": null,
+                  "previousVersion": null,
+                  "fingerprint": "066a80f9"
+                },
+                "instanceSnapshot": {
+                  "schema": "mir-production-instance-1",
+                  "id": "M002",
+                  "templateId": "modele-piece-M002-7fe1460f-40d5-4b8c-be36-aba16053a2bc",
+                  "templateVersion": 1,
+                  "templateSnapshot": {
+                    "schema": "mir-production-template-1",
+                    "id": "modele-piece-M002-7fe1460f-40d5-4b8c-be36-aba16053a2bc",
+                    "name": "Profil dessiné",
+                    "version": 1,
+                    "description": "",
+                    "kind": "profile",
+                    "topology": {
+                      "kind": "profile",
+                      "segments": [
+                        {
+                          "label": "A",
+                          "name": ""
+                        },
+                        {
+                          "label": "B",
+                          "name": ""
+                        },
+                        {
+                          "label": "C",
+                          "name": ""
+                        }
+                      ],
+                      "bends": [
+                        {
+                          "mode": "signed",
+                          "angle": 135
+                        },
+                        {
+                          "mode": "signed",
+                          "angle": -89.75
+                        }
+                      ],
+                      "startAngle": 0,
+                      "coloredFace": {
+                        "side": "right",
+                        "segmentId": "A"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": "A",
+                        "label": "A",
+                        "type": "measure",
+                        "value": null,
+                        "required": true
+                      },
+                      {
+                        "key": "B",
+                        "label": "B",
+                        "type": "measure",
+                        "value": null,
+                        "required": true
+                      },
+                      {
+                        "key": "C",
+                        "label": "C",
+                        "type": "measure",
+                        "value": null,
+                        "required": true
+                      },
+                      {
+                        "key": "length",
+                        "label": "Longueur de la pièce",
+                        "type": "measure",
+                        "value": null,
+                        "required": true
+                      }
+                    ],
+                    "previewProportions": {
+                      "illustrative": true,
+                      "unitless": true,
+                      "segmentRatios": [
+                        1,
+                        0.6428571428571429,
+                        0.6060857142857143
+                      ]
+                    },
+                    "clientDefaults": {},
+                    "measurementDefaults": null,
+                    "referenceUnit": null,
+                    "previousVersion": null,
+                    "fingerprint": "066a80f9"
+                  },
+                  "modelVersion": "1.0.0",
+                  "revision": 1,
+                  "previousRevisionId": null,
+                  "values": {
+                    "id": "M002",
+                    "instanceId": "M002",
+                    "name": "Profil dessiné",
+                    "unit": "in",
+                    "measurements": {
+                      "A": "3.5",
+                      "B": "2.25",
+                      "C": "2.1213",
+                      "length": 120
+                    },
+                    "clientSourceTemplate": null,
+                    "clientProfileMetadata": {
+                      "mirProfileId": "",
+                      "mirTemplateVersion": null,
+                      "mirCanonicalPhase10": false,
+                      "mirLockedFields": [],
+                      "segmentFields": [
+                        {
+                          "label": "A",
+                          "mirFieldId": null
+                        },
+                        {
+                          "label": "B",
+                          "mirFieldId": null
+                        },
+                        {
+                          "label": "C",
+                          "mirFieldId": null
+                        }
+                      ]
+                    },
+                    "clientAngleDefaults": [
+                      {
+                        "mode": "signed",
+                        "angle": 90
+                      },
+                      {
+                        "mode": "signed",
+                        "angle": -45
+                      }
+                    ],
+                    "quantity": 3,
+                    "material": {
+                      "type": "aluminium",
+                      "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                      "productRef": "kaycan-coil-0721-30m",
+                      "thickness": "",
+                      "thicknessUnit": "in",
+                      "gauge": ""
+                    },
+                    "finish": {
+                      "manufacturer": "Kaycan",
+                      "selectionType": "manufacturer",
+                      "hex": null,
+                      "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                      "swatchImage": null,
+                      "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                      "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                      "displayOnly": false,
+                      "system": "Nuancier Kaycan",
+                      "name": "Sable",
+                      "code": "Sable"
+                    },
+                    "length": 120,
+                    "coloredFace": {
+                      "side": "right",
+                      "segmentId": "A"
+                    },
+                    "mirrorX": false,
+                    "perforation": {},
+                    "lips": {},
+                    "location": "",
+                    "note": ""
+                  },
+                  "spec": {
+                    "kind": "profile",
+                    "id": "M002",
+                    "unit": "in",
+                    "length": 120,
+                    "quantity": 3,
+                    "material": {
+                      "type": "aluminium",
+                      "name": "Kaycan · Rouleau aluminium 0721 · références de couleur à confirmer",
+                      "productRef": "kaycan-coil-0721-30m",
+                      "thickness": "",
+                      "thicknessUnit": "in",
+                      "gauge": ""
+                    },
+                    "finish": {
+                      "manufacturer": "Kaycan",
+                      "selectionType": "manufacturer",
+                      "hex": null,
+                      "swatchUrl": "./assets/catalogue-swatches/kaycan-sable-7f8541ca.webp",
+                      "swatchImage": null,
+                      "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+                      "availabilityNote": "Teinte du nuancier aluminium Kaycan. Disponibilité du rouleau 0721 à confirmer auprès du distributeur.",
+                      "displayOnly": false,
+                      "system": "Nuancier Kaycan",
+                      "name": "Sable",
+                      "code": "Sable"
+                    },
+                    "location": "",
+                    "note": "",
+                    "perforation": {},
+                    "mirrorX": false,
+                    "template": "custom",
+                    "startAngle": 0,
+                    "bends": [
+                      {
+                        "mode": "signed",
+                        "angle": 135
+                      },
+                      {
+                        "mode": "signed",
+                        "angle": -89.75
+                      }
+                    ],
+                    "segments": [
+                      {
+                        "label": "A",
+                        "name": "",
+                        "length": "3.5"
+                      },
+                      {
+                        "label": "B",
+                        "name": "",
+                        "length": "2.25"
+                      },
+                      {
+                        "label": "C",
+                        "name": "",
+                        "length": "2.1213"
+                      }
+                    ],
+                    "coloredFace": {
+                      "side": "right",
+                      "segmentId": "A"
+                    },
+                    "name": "Profil dessiné"
+                  },
+                  "measurements": {
+                    "A": "3.5",
+                    "B": "2.25",
+                    "C": "2.1213",
+                    "length": 120
+                  },
+                  "geometry": {
+                    "kind": "profile",
+                    "pointsMM": [
+                      [
+                        0,
+                        0
+                      ],
+                      [
+                        88.9,
+                        0
+                      ],
+                      [
+                        48.4888474552,
+                        40.4111525448
+                      ],
+                      [
+                        86.4218789039,
+                        78.6766649725
+                      ]
+                    ],
+                    "segments": [
+                      {
+                        "id": "A",
+                        "label": "A",
+                        "name": "",
+                        "lengthMM": 88.89999999999999,
+                        "start": [
+                          0,
+                          0
+                        ],
+                        "end": [
+                          88.9,
+                          0
+                        ],
+                        "headingDeg": 0
+                      },
+                      {
+                        "id": "B",
+                        "label": "B",
+                        "name": "",
+                        "lengthMM": 57.15,
+                        "start": [
+                          88.9,
+                          0
+                        ],
+                        "end": [
+                          48.4888474552,
+                          40.4111525448
+                        ],
+                        "headingDeg": 135
+                      },
+                      {
+                        "id": "C",
+                        "label": "C",
+                        "name": "",
+                        "lengthMM": 53.88102,
+                        "start": [
+                          48.4888474552,
+                          40.4111525448
+                        ],
+                        "end": [
+                          86.4218789039,
+                          78.6766649725
+                        ],
+                        "headingDeg": 45.25
+                      }
+                    ],
+                    "bends": [
+                      {
+                        "mode": "signed",
+                        "angle": 135,
+                        "turnDeg": 135,
+                        "label": "Rotation 135°",
+                        "at": [
+                          88.9,
+                          0
+                        ],
+                        "from": "A",
+                        "to": "B"
+                      },
+                      {
+                        "mode": "signed",
+                        "angle": -89.75,
+                        "turnDeg": -89.75,
+                        "label": "Rotation -89.75°",
+                        "at": [
+                          48.4888474552,
+                          40.4111525448
+                        ],
+                        "from": "B",
+                        "to": "C"
+                      }
+                    ],
+                    "coloredFace": {
+                      "side": "right",
+                      "segmentId": "A"
+                    }
+                  },
+                  "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"Profil dessiné · coupe et cotes finies\"><title>Profil dessiné · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M002 · Profil dessiné</text><path d=\"M106.684 388 L451.316 388 L294.6571 231.3411 L441.7093 83\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M106.684 388 L451.316 388 L294.6571 231.3411 L441.7093 83\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"right\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"279,425 284.8779,439.9098 300.8743,440.8926 288.5106,451.0902 292.5191,466.6074 279,458 265.4809,466.6074 269.4894,451.0902 257.1257,440.8926 273.1221,439.9098\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M106.684,388L106.684,356 M451.316,388L451.316,356 M106.684,356L451.316,356\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"279\" data-anchor-y=\"388\" data-segment-start-x=\"106.684\" data-segment-start-y=\"388\" data-segment-end-x=\"451.316\" data-segment-end-y=\"388\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(279,356) rotate(0)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 3 1/2 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M451.316,388L507.8846,331.4315 M294.6571,231.3411L351.2256,174.7725 M507.8846,331.4315L351.2256,174.7725\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"372.9866\" data-anchor-y=\"309.6705\" data-segment-start-x=\"451.316\" data-segment-start-y=\"388\" data-segment-end-x=\"294.6571\" data-segment-end-y=\"231.3411\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(429.5551,253.102) rotate(45)\"><rect x=\"-51\" y=\"-12\" width=\"102\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 2 1/4 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"2\" d=\"M294.6571,231.3411L237.8423,175.0199 M441.7093,83L384.8944,26.6788 M237.8423,175.0199L384.8944,26.6788\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"C\" data-segment-index=\"2\" data-anchor-x=\"368.1832\" data-anchor-y=\"157.1705\" data-segment-start-x=\"294.6571\" data-segment-start-y=\"231.3411\" data-segment-end-x=\"441.7093\" data-segment-end-y=\"83\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(311.3684,100.8494) rotate(-45.25)\"><rect x=\"-54.75\" y=\"-12\" width=\"109.5\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">C · 2.1213 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 3 1/2 po</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 135°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 2 1/4 po</text><text x=\"578\" y=\"149\" font-size=\"15\">Pli B–C = 89.75°</text><text x=\"578\" y=\"170\" font-size=\"15\">C = 2.1213 po</text><text x=\"578\" y=\"191\" font-size=\"15\">Développé total = 7.8713 po (nominal)</text><text x=\"578\" y=\"212\" font-size=\"15\">Face colorée : Face 2 — côté indiqué</text><text x=\"578\" y=\"233\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"254\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"275\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+                  "status": "specified",
+                  "quotePolicy": {
+                    "version": "mir-color-quote-1",
+                    "required": false,
+                    "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                    "automaticPricingAllowed": false,
+                    "customColor": false,
+                    "label": "Prix sur demande",
+                    "selectionType": "manufacturer",
+                    "status": "price_unconfigured"
+                  },
+                  "pricing": {
+                    "schema": "mir-piece-pricing-1",
+                    "status": "on_request",
+                    "requiresQuote": false,
+                    "automaticPricingAllowed": false,
+                    "currency": "CAD",
+                    "rate": null,
+                    "rateUnit": "in2",
+                    "rateCents": null,
+                    "areaSqIn": null,
+                    "unitAmount": null,
+                    "unitCents": null,
+                    "quantity": 3,
+                    "lineAmount": null,
+                    "lineCents": null,
+                    "basis": "projected_outer_area_including_lips",
+                    "tariffId": null,
+                    "taxIncluded": null,
+                    "taxStatus": "not_calculated",
+                    "shippingStatus": "not_calculated",
+                    "label": "Prix sur demande",
+                    "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+                    "sourceKind": "user_instruction",
+                    "geometryErrors": [],
+                    "quotePolicy": {
+                      "version": "mir-color-quote-1",
+                      "required": false,
+                      "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                      "automaticPricingAllowed": false,
+                      "customColor": false,
+                      "label": "Prix sur demande",
+                      "selectionType": "manufacturer",
+                      "status": "price_unconfigured"
+                    }
+                  },
+                  "workshopValidationRequired": true,
+                  "revisionId": "M002-r1-490d1260"
+                }
+              }
+            },
+            "updatedAt": "2026-11-18T14:56:48.434Z"
+          }
+        ],
+        "externalTransport": "blocked; no submission attempted"
+      }
+    },
+    {
+      "name": "client-1440-en-CA",
+      "passed": false,
+      "error": "locator.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('[data-client-bend-angle=\"0\"]')\u001b[22m\n\u001b[2m    - locator resolved to <input max=\"180\" step=\"any\" value=\"90\" min=\"0.001\" type=\"number\" data-client-bend-angle=\"0\" aria-label=\"Inside angle A–B in degrees\"/>\u001b[22m\n\u001b[2m    - fill(\"90\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n\n    at clientJourney (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:85:15)\n    at async check (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:97:129)\n    at async main (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:100:207)"
+    },
+    {
+      "name": "client-834-fr-CA",
+      "passed": false,
+      "error": "browserContext.newPage: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> /usr/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --user-data-dir=/tmp/playwright_chromiumdev_profile-CubXxY --remote-debugging-pipe --no-startup-window\n<launched> pid=89662\n[pid=89662][err] [89662:89692:1118/145642.067289:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[pid=89662][err] [89662:89692:1118/145642.067577:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[pid=89662][err] [89662:89692:1118/145642.067601:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[pid=89662][err] [89662:89692:1118/145642.067612:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[pid=89662][err] [89662:89692:1118/145642.067621:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[pid=89662][err] [89662:89692:1118/145642.067625:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[pid=89662][err] [89662:89692:1118/145642.067673:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[pid=89662][err] [89662:89692:1118/145642.333483:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[pid=89662][err] [89662:89662:1118/145642.362865:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[pid=89662][err] [89662:89662:1118/145642.362957:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[pid=89662][err] [89662:89692:1118/145642.362983:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[pid=89662][err] [89662:89692:1118/145642.364074:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[pid=89662][err] [89662:89662:1118/145642.369792:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[pid=89662][err] [89662:89692:1118/145642.369893:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[pid=89662][err] [89662:89662:1118/145642.371341:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[pid=89662][err] [89662:89692:1118/145642.371482:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[pid=89662][err] [89662:89692:1118/145642.371529:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[pid=89662][err] [89662:89662:1118/145642.371575:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[pid=89662][err] [89662:89692:1118/145642.371685:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[pid=89662][err] [89662:89662:1118/145642.372381:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[pid=89662][err] [89662:89662:1118/145642.372920:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: unknown error type: \n[pid=89662][err] [89662:89662:1118/145642.372939:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[pid=89662][err] [89662:89692:1118/145642.373173:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[pid=89662][err] [89662:89662:1118/145642.375137:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[pid=89662][err] [89662:89692:1118/145642.375203:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[pid=89662][err] [89662:89662:1118/145642.375643:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[pid=89662] <gracefully close start>\n    at open (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:19:24)\n    at async clientJourney (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:78:20)\n    at async check (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:97:129)\n    at async main (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:100:207)"
+    },
+    {
+      "name": "client-834-en-CA",
+      "passed": false,
+      "error": "browser.newContext: Target page, context or browser has been closed\n    at async open (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:16:16)\n    at async clientJourney (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:78:20)\n    at async check (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:97:129)\n    at async main (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:100:207)"
+    },
+    {
+      "name": "client-390-fr-CA",
+      "passed": false,
+      "error": "browser.newContext: Target page, context or browser has been closed\n    at async open (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:16:16)\n    at async clientJourney (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:78:20)\n    at async check (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:97:129)\n    at async main (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:100:207)"
+    },
+    {
+      "name": "client-390-en-CA",
+      "passed": false,
+      "error": "browser.newContext: Target page, context or browser has been closed\n    at async open (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:16:16)\n    at async clientJourney (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:78:20)\n    at async check (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:97:129)\n    at async main (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:100:207)"
+    },
+    {
+      "name": "excluded-contexts",
+      "passed": false,
+      "error": "browser.newContext: Target page, context or browser has been closed\n    at async open (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:16:16)\n    at async guards (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:95:219)\n    at async check (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:97:129)\n    at async main (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:100:291)"
+    }
+  ],
+  "captures": [
+    {
+      "file": "after/landing-fr-CA-1440.png",
+      "sha256": "82eb3f106ec34cb1cc7f3c8540f44012239d6641e68546500f17d1e23fb29d95",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "fullPage": false,
+      "url": "/pliage.html"
+    },
+    {
+      "file": "after/models-fr-CA-1440.png",
+      "sha256": "3d064edc8d79c14fd7d5a14932899b74fa21925ebe24fd8762d4daafcb217d60",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "fullPage": false,
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "after/measurements-fr-CA-1440.png",
+      "sha256": "8786b4019ff83a3c07a5a8e51909466479ed8e5216c9ff15f9cd5cff011ba0a9",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "fullPage": false,
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "after/finish-ready-fr-CA-1440.png",
+      "sha256": "b36b8ded7e87999a4d998cb91e139e5aefc1aaa71ff3c525fd749df040cb1237",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "fullPage": false,
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "after/quantity-empty-fr-CA-1440.png",
+      "sha256": "68bc290c9e6697cc100a5c45b4e0a046234cd52d3f14c488c1143ca73be82820",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "fullPage": false,
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "after/quantity-ready-fr-CA-1440.png",
+      "sha256": "60efc4a9fa5a7aca728caf6a46ee3cf9439a17b6c6dadf8c0dad0352301c4b98",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "fullPage": false,
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "after/added-fr-CA-1440.png",
+      "sha256": "21ec003f99bd5904f01b9e65ee44eb7bdd1c0e5f50c76ab061a76e2d4469db82",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "fullPage": false,
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "after/custom-drawing-fr-CA-1440.png",
+      "sha256": "8d3321975738f8233afa7ef874c5a373ae886f529aef27fd42b6a57c7efef742",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "fullPage": false,
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "after/custom-measurements-fr-CA-1440.png",
+      "sha256": "56ee7fa3d9c33a2b69fc816a3b527c0a5b4eed6c7e7a37d6fbca693ef7871d2c",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "fullPage": false,
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "after/cart-fr-CA-1440.png",
+      "sha256": "2ae277d8f276a1c3b1c19e3d05599d232589398b3b02061bf8e580d8414d3cf1",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "fullPage": false,
+      "url": "/selection.html"
+    },
+    {
+      "file": "after/landing-en-CA-1440.png",
+      "sha256": "49224e90d0ea4ef17cf20fd36f43cccfde9ee946d43aa8856dfde96379a0e648",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "fullPage": false,
+      "url": "/pliage.html"
+    },
+    {
+      "file": "after/models-en-CA-1440.png",
+      "sha256": "5993d8a768db2822acf057f555a562c7c52b165e37a4a97768c136a46420081e",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "fullPage": false,
+      "url": "/production.html?mode=client&kind=profile"
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "httpErrors": [],
+  "blocked": [],
+  "expectedBlocked": [
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices",
+      "method": "POST"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET"
+    }
+  ],
+  "expectedNetworkConsoleErrors": [
+    {
+      "lang": "fr-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "message": "Failed to load resource: net::ERR_FAILED",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "lang": "fr-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "message": "Failed to load resource: net::ERR_FAILED",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "lang": "fr-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "message": "Failed to load resource: net::ERR_FAILED",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "lang": "fr-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "message": "Failed to load resource: net::ERR_FAILED",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "lang": "fr-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "message": "Failed to load resource: net::ERR_FAILED",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "lang": "fr-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "message": "Failed to load resource: net::ERR_FAILED",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_boutique_prices"
+    },
+    {
+      "lang": "en-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "message": "Failed to load resource: net::ERR_FAILED",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    }
+  ],
+  "browser": "155.0.8059.79",
+  "server": "http://127.0.0.1:43795",
+  "resourceSha256": {
+    "pliage.html": "9d124fb10f2b283aab3a3f8df087a70d10f1556713363e21e31dd5911f36df97",
+    "style.css": "7a9b04b2bf17c4c82c0d5639d367fd08544fbbaed0f5070bb88e4c0848445065",
+    "custom-model-cards.css": "8fa0a8316b4a8688dbf1b2661f0af4534f6c6f6360bdb86f59d1955c5eb21862",
+    "mir-v4.css": "547e0a3708072650aff08c83f859750560a15f4220c9b590263bd567b0ee3da0",
+    "mir-public-menu.css": "1ef60e057b3b524cf85c3f3513c41f53c712521fdeee184b02e06f08f2ddb33f",
+    "mir-harmony.css": "1798aed84b7436aca078a962d8fcaab8ad5229e47be9afd0e1c8d9a70d41a2da",
+    "pliage.css": "9beedcb9eb6bd6b7cab96f3b9937cc7e99c054c444513f0e9e8bcb2de6d9f3be",
+    "mir-client-pliage.css": "c5da97c0ba02e3d3ac6ad70be671bc7fce387699bd34085f1d04ef738a4df347",
+    "mir-public-shell.css": "1858b664dc53fbc0b3bb1a03dbc5ec52ee9deb3e6de0c6912295d8e6b26ab1b6",
+    "mir-public-audit.css": "146c210ac9109ea8a5eb55057e79978739bd0736fd10306ae94ae4bcd7271b29",
+    "mir-home-premium.css": "abf242b04f7175b32a0cc365adaf7480c8dd0886fad36ce5eface3d82d7e7851",
+    "mir-client-i18n.css": "819fe27d34fe97265b8ecce47377d1898db288a52c5f7cd8b6097789b2d3c2ca",
+    "mir-client-header.css": "05f381a887e743d277eee4936f2f3edf3526ec4cff266dc706aeec0d3f8b410d",
+    "mir-client-signature.css": "d347ff921a059a371a3763f93910dd801c85a1c0c5e07c083bcab0449abb05e2",
+    "mir-prestige-tools.css": "8172c011788c64df45d2ee9103f18be0be60b0b7ceb2466b076182b2fc6a67ec",
+    "mir-prestige.css": "467e53a77cd61024135750c43f1cd4ca6515cf34249c46f9c64721b5d5e1d108",
+    "mir-client-pages.css": "6144f0c930670a64f9622d45264df9847255c8019afca6aece0e3a2ce37ca3a1",
+    "mir-pliage03.css": "a96c97a46ff0ca5befe5f235e49a532ac555385e9dd87a427bb95ee1b3f44268",
+    "assets/MIR-logo-officiel-original.svg": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c",
+    "production-model.js": "a5989ba04e0e70f4f64083edecfd59514ae69c1c1e3f337e6d24af41c88e6ce1",
+    "custom-model-cards.js": "15dea475bdccaebc56899b2cf1b7b8f6bea9a6b628a066b04dbe2149e4c8413e",
+    "annotated-pdf.js": "473d7515a257e8e1c669bf3480b9d08a2a2ee7b5f172b7aa1a2a0973190b6413",
+    "mir-bending-lengths.js": "ab17953f00eb1e80ace2bf6c307173b0917d61c5058adafec5b2cd44ec51281f",
+    "mir-catalogue-policy.js": "db9f4071676a01a342e99cc9a2f2ffcdb6295aabab9b6e81473a6c18624169de",
+    "pliage.js": "2ea4cd20afe32763e9517a5bb461aedea34157e4a89a5a84f4276ba0374fdac9",
+    "mir-public-menu.js": "9690f28345f85e1190eb87fbda487ad05e8dadb96e85c0f75cdd6c7190873e63",
+    "mir-client-en-ca.js": "cbd2c2575d2015da25a7b968b8e5c1f77dbb3b6ca46390f51d60fe80fd04cee7",
+    "mir-pliage03-en-ca.js": "31fc37f682716e4dd1af454b9752b4075745e36644034aa4ba383e21d1a812a0",
+    "mir-client-i18n.js": "5ba9620f0215fd93cadadc588b9104def54878a05f31a84adc39a51510538536",
+    "mir-prestige-tools.js": "ad43460af8cb82be282ce7d58d26db77b7cd6ee364f90c08d9354d18dfea0158",
+    "mir-prestige.js": "d9c99fe3df0d70e918369492e69b13558517ca8c98b300a923f3ccf6fd72d82f",
+    "catalogue-fd6866b49d21.json": "4fb95308c21b11f97ec8bf8871899c2356df73f19fe6c0dfef4f9e6d8e10bde5",
+    "assets/fonts/dm-sans-variable.ttf": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d",
+    "production.html": "1cab4ddbdd399ce37d7544fca1eac8c852f727fb75c31dfcbef704f385b558b3",
+    "mir-settings.js": "f3d807c99d4f84475b89f14dd38934ab6b3050d7031aa9de507a90c19746c042",
+    "mir-settings.css": "1ec301ca0d875f4971360b702ef188f8c941c5c2234a224808281577e5592086",
+    "production.css": "bebe7996232f3bd200353fc84b82d93807cf6aca0fa547d954b1eafa7d2a8809",
+    "production-admin-v4.css": "2ce03600a6e2b422f8cedd7d9530950b725016e9f10ff4c79320564a49007c8f",
+    "mir-procurement.css": "be9a3bd3e19689448b8b8ca8e30589614c54101803fe1af5ddf70b9c2b54f2ae",
+    "mir-freeform-workshop.css": "863de27882b0184fed97a9a9d99469551653892f5d7818500dda126d350bb1cb",
+    "mir-panel-admin.css": "2ca1b1c857dcf8e560c8b4e72549059f51a001e53afff478fb13e7d09f51489f",
+    "mir-panel-workbench.css": "547f8e5d69d90d010a375dab8e3e5c776163555459f22fef63ed2ba4c5206243",
+    "mir-production-signature.css": "d02732c5880dee97fbfa7b756083303101851443bb3991bb991eb46ddf2dfdb8",
+    "mir-production-client-nav.css": "af81ec78ad1836f154f7f097e8458153d244a3bdc078ad861d088751c6908ab6",
+    "mir-workspace.css": "d78467e205e3fe14c368af99577f049db5a3eb53545879c33886087102ea3f2e",
+    "mir-estimate.css": "789fe7f7c43000c9a5a1e8b567e1a806c9b431d4b481e87bca26c917e3c7d880",
+    "mir-pliage-journey.css": "babae37d6d67c620912003e2ee9a5841b65e87defc453e98b928a268e0a66158",
+    "studio-capture.mjs": "e27c886d266b60fddcbab3f6c1de8a6dd2f49437823befe169fd9bc8fe20a516",
+    "mir-production-client-nav.js": "70f49447788469893c0f83464276e7eac4b4178edde35731bb8cc641bd2127e6",
+    "mir-panel-roof.js": "d88a5d39a9c8eb47cfed25d9bc7424d8d5f712c1ed2b1c918b9e8980c162a3c9",
+    "mir-panel-sketch.js": "3dae860af9363a9a946b4adc75a7fbc0fd11bcf5a0ca5db0da2c16a374c73e3c",
+    "mir-bend-pricing.js": "016febc7cc68ba74a6e49c59a909dd03758d8d1ea1a47e097f0f3b19017bdfcf",
+    "production-volume.js": "c8e58d92c9513456025840e1b7d64db3b7a2fc00f04e79d527d0f8ff10453a40",
+    "unico-data.js": "21057a0823ab2e9fcf5a012b9dcb59efc3c67c59633ac91fe4dd6d2d668058b7",
+    "mir-po-workflow.js": "9991c7913cf9fb773238b00b95e9a4cdbb17b8822259beabbacfee7358e2e3b3",
+    "mir-panel-po-pdf.js": "380b90ee029d88516736f0f1a07cf82591b83f16c49ca34ce175dc5da4f27e5d",
+    "panel-layout-output.js": "8875c3ba29c4637577338b568fb69a16405fffc76623c7b2a5989720d4051c7d",
+    "panel-layout-engine.js": "cb03689f691d59224f7794679e9a95d41c234393c6028509a3c620d4407cfb41",
+    "architectural-wall-geometry.js": "a2cc3d91ca3afeaec32744b0da60ee8c5ce76db5ea02b7ee0b776e0cce2e67c0",
+    "vendor/polygon-clipping/polygon-clipping.umd.min.js": "7f8619e84a86ce8dd400c9b50430e9c8cf8f26027b19eeb479f109f5c1a9d688",
+    "atelier-essai/mir-calepinage-extension.js": "c3966ad5becc006cd0fe1225976188bd194580e0105d25766898d046acc916c7",
+    "profile-production-transfer.js": "557b26e5cf8b5111629098d92ec13cd112b124b714843c93ddb7eacc775953bc",
+    "mir-bending-presets.js": "073d3ae55d01a131ff12f29b81d874219b46f14cc89293866dfd36fa3659bc23",
+    "model-measure-defaults.js": "73c9084f3e9f87fbaa04c963f1a5acc39e286eb8a1924af8acf36b5cbafad6bf",
+    "shared-config.js": "0d06f91657ebb4b904461b9b62dc4aca6976ddde882b8af4355b30caf22b3e7d",
+    "template-library-backup.js": "75e3ec68f302f0880f1550e8a233c188ad258625b90591954acb17405c624b42",
+    "kaycan-flat-preview.js": "45a8ba6ec0a434bb832124d687266c6cde3a2fa2a629a2cb07f21126f5f14d36",
+    "mir-miniature.js": "afcf61c8ae9b2cc76023607b2b45351039b8766dd175ce429f77fd9c826bc524",
+    "mir-bending-finishes.js": "859793c39ec457db5f542a04a7f540ac4fe62c64b4e02787efcd55f8752a235e",
+    "mir-shared-client.js": "4eab28e9fd56e63e3de93fce236b54bdd53191984cfa1afa5dab5d9ac845f1cf",
+    "mir-direct-model-save.js": "9a769a1aa543628eef732f3e134fd9df3d5ac4486f3bc1a464aab1ec88fe630a",
+    "mir-store-color-policy.js": "5e57e8e53910f5a0633e666ba7888efe86d8f2b1ef9f06b49b13417bd267eace",
+    "mir-profile-recognition.js": "98f9ecc343eeb901c8b0b1a20e0fe8e77895ba383704a585d35760881469deda",
+    "mir-unified-order-cart.js": "ce2f48a455bd891577fd228a3933a50242926f6c6566e32ec68308e02116ade0",
+    "mir-pliage-surfaces.js": "f1afd80400e7ce4f9473366ebe4733332b7844024a8d6e57bef9e795933dcda2",
+    "mir-pliage-documents.js": "af46b5c9d2d625b38afe217333acb695e61cda59b11a7118396fc845ad10b9c8",
+    "mir-pliage03.js": "515fcfca21a7c1c0d33026e5365cabb2c62bd086eaf676fc0e6d70df49d8df78",
+    "production-app.js": "3421fbf60540356495caf76a260772555199fc7fd9ffc774765f3613a1010a89",
+    "mir-client-pliage-viewport.js": "b8e4624a8acd178fee13f7814d40b3621b6c257a3dea2d7ef400c81d6b6dfbac",
+    "production-admin-v4.js": "48e463c9b61edf1504f249e035c91fee6840b9cb1c9eaa3182fe63817f9da67d",
+    "mir-panel-workbench.js": "6281d645ccc156a51aac83de2478a13c490b8f4bac2e1dab100a3d40c3c25fb7",
+    "mir-procurement.js": "5af4b736257fe5ba5e235ba20ea04447899d40ee9e21a831f2f48a8cbcae6101",
+    "mir-admin-live3d.js": "ca81b16fc1a5579fe5c193553995ad3428af9a8edf0f7df261bb94f04dd8f58b",
+    "mir-freeform-workshop.js": "57074c1537103d385299b6f97ecc0c7a855f2f13a9710b409c65afd534849119",
+    "mir-harmony.js": "320025bb12ecbb764c79eb6f70d528b8b24fb78c6980dee381c484358b18621a",
+    "mir-workspace.js": "8cc72a07676928d4acc17e52e5b7ffc4a2ba942129a6dd31c09c6e152f891e94",
+    "mir-estimate-config.js": "c310322f51e949f4f77ce3fbcf31c72030d3be46a913d7a80450d42f829537e3",
+    "mir-estimate-drafts.js": "808d69fb5ec4108516a393d3137a5a1988ade79140b33e92ea6b34df6b62a3f7",
+    "portal-config.js": "599798194b9b570ddeccc6d9c9a74c0f6c2b4a8db07347cacf12ca95c4acc0f4",
+    "vendor/supabase-client.js": "b843abf0e28ccd705e3cf04f9fdd935d85a3173b86c8946de7574ec7f1181035",
+    "mir-estimate-upload.js": "1891f7786af1c510e97def7751e7c26ebd846572816bc57319a6ee6810e8fd61",
+    "mir-estimate.js": "1382f36cc7ef7bc28b53392cdd7b50067523dc36b10e7afd35f0fa28d69870a0",
+    "mir-client-pages.js": "c9ab984df7382d6fac731aca85f87aa0e2c640400d0079a8657883a5cc25e6b4",
+    "ral-classic.json": "4d5b5c7edca669d40dbbb536758c9d9eae0fe7c1c52412704d7e84beb55c5b85",
+    "assets/catalogue-swatches/kaycan-noir-fe7547a6.webp": "119d60468b0b34fbfa1f6ec4e76b138523e3ce9ab8f549224f487b93ff038515",
+    "assets/catalogue-swatches/kaycan-urbanix-noir-lg-7cf28fd4.webp": "3541b3bf5276c2e2646c82e604d57a6e9c37b177b2554886199b2b991afab8fa",
+    "assets/catalogue-swatches/kaycan-noir-sg-6908ba64.webp": "32939314dbd344675d8a0555b10bf982fbcb7686587720f82eab6c41a7f544a9",
+    "assets/catalogue-swatches/kaycan-urbanix-noir-charbon-9554f260.webp": "4b3344e5937ded54fc5b7ad455e586f931e9e9f6eb8b7bdd5ae488fbe78e2ea3",
+    "assets/catalogue-swatches/kaycan-blanc-sg-50691694.webp": "bd614a71a0b69e9ec29da15d5172397886e1b557a81b1f39022c95b37eee66c7",
+    "assets/catalogue-swatches/kaycan-blanc-loup-17459fe5.webp": "bbbaa2735fbebe1ff6037c43f830c204f106d126f3116677a7d3a4da4a31c042",
+    "assets/catalogue-swatches/kaycan-urbanix-etain-bruni-4792751f.webp": "65c9ae2b540013dfe5e98299b08fc7ee87aad6be9047fc6508383ab658ea1ebc",
+    "assets/catalogue-swatches/kaycan-cactus-5775cdb2.webp": "0112eed6a7cc051893a4195ffa363892d84e7acc27b11c1bcf132a10ec17d723",
+    "assets/catalogue-swatches/kaycan-charbon-c1b33d29.webp": "1bf5ac6305c9325028c6234fb7c8e8be4979ca240650616d621b55e2f0b4c738",
+    "assets/catalogue-swatches/kaycan-brun-chocolat-5f83a4c0.webp": "3870da8c38b9b05d8b4d7621377f0680bbaa319feaa473e636603809b8a63d01",
+    "assets/catalogue-swatches/kaycan-brun-chocolat-sg-9b95d4a4.webp": "6b7339d9004ba11390beff9c99b61373649a4a412d01fca565e9b0f0ae8096c9",
+    "assets/catalogue-swatches/kaycan-brun-commercial-e6023af8.webp": "79d2cc84e8c556f6ba0d825dda11369a6714a8379ea5057ce03996ee16c9e8b0",
+    "assets/catalogue-swatches/kaycan-vert-foret-517f76a0.webp": "b6cfcd257d7d81ee87dd5c0ebc6142a778bd03f3ef93a68977090d50d480dd35",
+    "assets/catalogue-swatches/kaycan-urbanix-gris-gothique-9cd4e9f8.webp": "ae1b369794d3c1474b577d63cbfcd326e8bc490f986863a8a977b960f325779d",
+    "assets/catalogue-swatches/kaycan-urbanix-gris-grafton-21bce724.webp": "6190df5a6944f0f0b1266f8f6a6bb630c558a4aff0d6e8b5cfa0e63314c1ab17",
+    "assets/catalogue-swatches/kaycan-urbanix-recolte-de-cedre-27d78710.webp": "7710d18a15ad2ed803586fdd525e3103c1ccb7cbf60e4356c775c36e65b6b2be",
+    "assets/catalogue-swatches/kaycan-ivoire-47760e6f.webp": "3886ef28ff5d512e7791c6774e02c525a8eca51da72e49b895d252e5589fdf22",
+    "assets/catalogue-swatches/kaycan-ivoire-sg-413044ca.webp": "b4ceb686153b6a91f9761f7ef0c2839c8364dff4c50711f38f459549df29b1b0",
+    "assets/catalogue-swatches/kaycan-kaki-171a52d9.webp": "73d56fcb301de853f8bdcecfbf41b866a17ba5d9d7ea794aa32fcb419b760c05",
+    "assets/catalogue-swatches/kaycan-beige-mc-f4114fe0.webp": "267b4360af6bd8c6b345433a10bf989842bfc12cec8fa4a05bd8034d09315959",
+    "assets/catalogue-swatches/kaycan-mocha-88107239.webp": "ebbecf99d14236235eb0c74113b299547e89870dac53b481a88ff02b97a1c6f2",
+    "assets/catalogue-swatches/kaycan-gris-perle-8b641725.webp": "65c6a495d359e49f9c2de2899e74e0c0b782e30fac098e06226932f09027a52e",
+    "assets/catalogue-swatches/kaycan-beige-prestige-8dd28c6d.webp": "a6fe7b9f74ff28623b0673bf2caba784a51db508f637f60e059b9d89b317c668",
+    "assets/catalogue-swatches/kaycan-urbanix-rockwood-fd907034.webp": "1dba6e64cfe211eae6e87c74ff54dc3a7a9b3bc3ae92577d4a2d8611014e1f2b",
+    "assets/catalogue-swatches/kaycan-granite-rustique-be79b344.webp": "c34ed5a86c6241242e00796f891155d1e207a0226a4357e50480ffff2262f045",
+    "assets/catalogue-swatches/kaycan-sable-7f8541ca.webp": "e29f23efd04e4ec57d73002dafbb406ba8f14628cee340e025ec0ece91292168",
+    "assets/catalogue-swatches/kaycan-urbanix-gris-argente-3c7ca7a4.webp": "96d89295a962336b26a765f132c54363a90758fd895ff65b49f4f39925807354",
+    "assets/catalogue-swatches/kaycan-urbanix-gris-soho-e2ba4d94.webp": "b824bdfa0549fb6843925a5d8c1a4bcda085bfe43c7c6095a54387936edab48d",
+    "assets/catalogue-swatches/kaycan-osier-c4c0f6f3.webp": "988b05e96460baa4cde64cd071132cfabae2bb065f3406ac40e2d103dd0c1bd6",
+    "selection.html": "7f1501a606a18940265e573a64ba689e4370afaea90ac1b8c658cae4c827f862",
+    "commerce.css": "fa5742df7f2496a72f7c3a2ddaf826726dc12ce9acc023b04692857e06625e35",
+    "mir-unified-dossier.css": "5e3c7c63843b2034e1ab6c2382cf3e781a9247371c592b56c9fe153fb15c31a3",
+    "mir-catalogue-photo.css": "12a82c55446e63b3a4e34da508073ac44a53d05c9e54177b2ebd16ddc82e4d4d",
+    "mir-account.css": "1261c0a7425e2b994610c64d4d8a171e3e1637d1247a816979255dbe827f306d",
+    "mir-commerce-approved.css": "99f6c55e5913ed514242f9d9a98c02bad36e1349c5536da6951d5523290b5c37",
+    "mir-prestige-checkout.css": "fed857b3284929efb7ca0579329cbf868fa53ca8c8ef1ef7f5e20a1764f67c4e",
+    "mir-prestige-colours.css": "010a5ebadcadabe0cafa0b9dc864bf8ec911ce58261e709431483545bdf6b62d",
+    "mir-selection-pdf.js": "ea7366db440853a1a56d283e9119f6e154769662492b2c70540030e82601924c",
+    "catalogue-order.js": "dfe24ba46da0ca282820d2cf9c37dc81d5ec7a38fdf4b78c18ec48e6a233a5ac",
+    "material-preview.js": "def40cbfdd80fdabd49d3896352e35191ec3f1c701a12fef9bc9943dc02ca3e7",
+    "material-coverage.js": "91c5a30ef374d6f085145d39d3320815d1ed772ad96b2c0bd1cbb7c99b094eed",
+    "mir-commerce-quantity.js": "2afc56d18b91e03256adcf448981a392156b08740a77086a2b6ad37ee733f94f",
+    "mir-boutique-pricing.js": "d35517d96eabf324b473e10ef4b60ff2ea2bbc0ad2ad88e4c7fd8a5a590a6b59",
+    "mir-client-siding-previews.js": "470532fa67b59d33a63aeab86f0143984f7c04d33b96f78f7a8c5c3d45c49ef0",
+    "commerce.js": "32f41b12595b997ea7886ede09e96930e4c283c3e122e3668688f0634898fe0b",
+    "mir-unified-client-dossier.js": "075853986b3d7508d20ec504926e4df7e8948219a1291fa9f45871620a2c5142",
+    "mir-account-flow.js": "001297374b94097a77037919699393c61e7b944702bfabf8b3a85778669f5ef7",
+    "mir-client-return.js": "bf64106a6532af5898a45b6ef39be4d40b7b4141c153a1882ac0d2e767905b2a",
+    "mir-prestige-checkout.js": "9ad00644b2a9e3596847bac66fa168ae9a993f030e2ee12d9080a5fc2bcb3e36",
+    "boutique-visibilite.json": "7230ae3c35ea23c4f10743e997585a256e05fa9976d2b237b4f5b5199a320009",
+    "catalogue-adseal-4580.json": "b854f353d89c9b3e25e5b794b2e335de170ba2876e6324a981d9ecf59b610ef5",
+    "assets/products/mir-screws/kaycan-fascia-colours.json": "17329fbecf6fbb05eab44993b40fa4cb3ac195995f03772c00269ceb7bcdc5da",
+    "mir-regional-pricing-20261110.json": "4d5f2eb1d487e8c1cefc527340885825038d42e50c5d22190ee2d4bc8b0e39c2",
+    "mir-client-colour-palettes.json": "1fc525861a8de01b08fec043c4c9b626015735f2808dd05e111dc93e0d2ac7f7",
+    "assets/products/hardieplank-cedarmill.png": "09097a6f2f8bf2c8dce9247597b8a5a82d2deaf1339410feb6bbb0396187f19e",
+    "assets/hardie-swatches/noir-minuit.jpeg": "323bbfbe40e6fa8f985264cc0b6c2a6ee5dc452e72471beadd1996227baea38f",
+    "assets/hardie-swatches/blanc-arctique.jpeg": "2cb7a3fec183b9e651c8f3fcae3baed71e7ff180bcf16080052181c142bb96a7",
+    "assets/hardie-swatches/pierre-des-champs.jpeg": "29b22ae4a8a8e92e5f13f7068e3ba6cc2d6a5fc00c635131beb01d8dae5b3a1f",
+    "assets/hardie-swatches/beige-navajo.jpeg": "d06e78974cd384b0cf069f41445890b49672a3082b5e242357547a21b30e4565",
+    "assets/hardie-swatches/brun-kaki.jpeg": "8d8113686b5c6d9c7fd0a8c3c45cf5c0345860da71e91823039817556e7694a7",
+    "assets/hardie-swatches/taupe-monterey.jpeg": "9ac8c39432fc20ed919656de84ec74f4a3695af1a7301a83fe3605af940fe558",
+    "assets/hardie-swatches/ecorce.jpeg": "3f7fc711b49251a9f705189e76b9ff9cd11cc6c2b2d7abc61eeb40e1e9d3ba96",
+    "assets/hardie-swatches/espresso.jpeg": "fbb2b7cbcb3ec969367881597e3f6c285572e89de76864b7d2a6bd196ec375cf",
+    "assets/hardie-swatches/sauge.jpeg": "842b870f4b792020c3fd4a5b231d40ad23d8c0959948a2b9c65139329d82badb",
+    "assets/hardie-swatches/gris-ardoise.jpeg": "74a67113893e21ca503f7afe4fbc91c8270133e3ab0edd1b90cd8822badebc6a",
+    "assets/hardie-swatches/bleu-acier.jpeg": "4c858dd618c00154777b62d25b5af8bdc4ae54613e360dbde20136f3f340b7dd",
+    "assets/hardie-swatches/brume-legere.jpeg": "72f269b86a53237a3b42cf2ad98d057bfc1e89d26c526650fe74cc6dcd32f771",
+    "assets/hardie-swatches/gris-perle.jpeg": "bf619fbf834a22b913132debecca69827abfbf3732f19892c4e13ddc16f78ab7",
+    "assets/hardie-swatches/etain-vieilli.jpeg": "56047107b502942987204fbb073405b0c7666cd23feacd7629c3cc7f8a5df323",
+    "assets/hardie-swatches/gris-nocturne.jpeg": "60ec3126b755115c4c6c9a95dd4d635329682fc02fdab7d7c0cd2ac10edb0cb9",
+    "assets/hardie-swatches/bleu-de-soiree.jpeg": "0d4dab5558726235c63b344775c42f0100d3ee90228fd7fd9290c828d474a686",
+    "assets/hardie-swatches/bleu-ocean.jpeg": "c2c8caecdb8bf02ae5c817ae4d8d4e78cccdc4f6cecccdb2d9e900800ff669af",
+    "assets/hardie-swatches/gris-fer.jpeg": "4bbbb8178f1bf97fda410598b9cebefb8adb17cc256a6bcf55b3f909d215ddbf",
+    "assets/hardie-swatches/rouge-campagnard.jpeg": "110083acb9668c376fd82783ae86ab58c4514831b23b729a41d58795601a033e",
+    "assets/products/hardiepanel-smooth.png": "72d0d3a99b343619042ef7e294d25badf17dd380a9f3a68f5f94d82d9c2b6c33",
+    "assets/products/mir-ridgewood-d5/base-ridgewood-d5-v2.webp": "2cb026b6236aca5dd7a0ab2f5c1d304721c66821b6c708df741e6163d93ac04d",
+    "assets/catalogue-swatches/canexel-noir-dcbeff24.webp": "2a7df0c6edc30c9224ed989171095a64f5df061a3fbf50064ca42815c5327cc9",
+    "assets/catalogue-swatches/canexel-blanc-c0350ff7.webp": "299372a57606abb3ae6b0fed666f597c238722fea823a86572ffba972aa14f3f",
+    "assets/catalogue-swatches/canexel-charbon-e24a0ad4.webp": "eb43b96ade7d6f2d3e7137e15c49b694f696deaa3eaaa46a035348b03eadcda5",
+    "assets/catalogue-swatches/canexel-moka-fonce-83096018.webp": "b6b701dfeb5c03efbb48226bf226dcf5811094497ad4b1af4f4bddd369cd64c1",
+    "assets/catalogue-swatches/canexel-scandinave-a55af7e1.webp": "d68f58bdd0adb0eaa1651cedc579f3aa9326d7731dd8baae357263d0407fa307",
+    "assets/catalogue-swatches/canexel-bois-de-santal-ed686b4e.webp": "bc4bc8bc777e3d4a037d5d0e4b9ba4bebc0bcf3bfa3c71e4aad346c1240ad66f",
+    "assets/catalogue-swatches/canexel-acadia-eddfef2f.webp": "a91ecd3242696e2eb4c0a1014c381dc9154a1652deb3c7bd46822a71155ee7cb",
+    "assets/catalogue-swatches/canexel-sierra-a5bc536d.webp": "958d210844fe55addc153ac0267ef128db5225d41e8925cbca2899ff44e2cadf",
+    "assets/catalogue-swatches/canexel-barista-835894eb.webp": "71148c1d6a9d071a8a72636db2d349207fc39c5ed66f3958bff20e031a3e926e",
+    "assets/catalogue-swatches/canexel-falaise-137a0aa9.webp": "f694079b59edfb40404d8f46af6d0d437eaabf731a00a265ebce6abfcef042bb",
+    "assets/catalogue-swatches/canexel-loup-gris-60bb65cc.webp": "c61c4885b2211fe07a274e1ff579e97402ff86e61ff79ce2f279d0a171d4b5b8",
+    "assets/catalogue-swatches/canexel-toundra-c2a94af3.webp": "ef3240a47c9b2e2e241f2d124f354ee3b0cab35adb4d123d322cebbe853598fa",
+    "assets/catalogue-swatches/canexel-gris-brume-d36e9fa7.webp": "37abb054d51fe95c975f802dc4dfe0dd2a0f112c964047cced393d5161b98e2d",
+    "assets/catalogue-swatches/canexel-sable-3ba7351c.webp": "8abf0d9fd8ab9fd93185f494bc32bd4ae07b1ffe64a383ec01c845cf02bf95a6",
+    "assets/catalogue-swatches/canexel-bleu-minuit-7c79429a.webp": "f4579741adbe9c35e67502d49413726c4ccc17cab8028724f2d22a724e77c5a6",
+    "assets/catalogue-swatches/canexel-granit-2fdd8742.webp": "1aa439d5ea35954f11d3fe3cea796b7f0b0c0464fd38a54c34c67d1160dc195b",
+    "assets/catalogue-swatches/jdp-gris-antique-c790727e.png": "fe8e94c2d92a66100dc12aae856df09b0150e91e750937e90d6dd6fa05c3e3e7",
+    "assets/catalogue-swatches/jdp-blanc-arctique-c88462e4.webp": "3c7d2ae7538ae3122a1a4fddf9b0cf316661ec0b72cf6f771ce9c82b7d4b015e",
+    "assets/catalogue-swatches/jdp-portobello-97b06584.webp": "6b1506d457bb8ea39f71d509f451bff637bc68144be99020352d374f0a4c4bae",
+    "assets/catalogue-swatches/jdp-bois-d-epave-239690d0.webp": "8d2d29a06ca624b181fbc71ffe598a79f6e7e255de91026a34bc46a6cc8f4887",
+    "assets/catalogue-swatches/jdp-cedre-445a3f39.webp": "41d28281612a9884a4f2b12da0d88065ec7238fd4d1c1a3c1e8fe3e1490bd243",
+    "assets/catalogue-swatches/jdp-platine-01f8446f.png": "833e5f6c3c1c05436cf943f77f4a9e952479781245b140ea623c9b63c653eaa4",
+    "assets/catalogue-swatches/jdp-erable-dda419ba.jpeg": "5f71c2de198246f9430ce8435a2bf12ddad29f357a142c7259fcc371ee038da0",
+    "assets/catalogue-swatches/jdp-birmanie-bdf1d438.jpeg": "d9cfd1f84df7bd6b2a095e8db91d3a8b4dd92da5c5272aa313d211f3c41d2ec4",
+    "assets/catalogue-swatches/jdp-macchiato-325b7af9.jpeg": "26895a9d8c5686128e27e9389bb1ca13b3b7acdc01de3b993e3e3f5fe945a890",
+    "assets/products/rialux-bosco.webp": "be4785d0144ea11420831f4e8346dc387a40d48bef58bfb0601da87138788063",
+    "assets/catalogue-swatches/rialux-bosco-noir-absolu-06bb9483.webp": "14dd130e220c4779e92f80bb8990d6104ae67e0062861c127793a15b6b3b7f70",
+    "assets/catalogue-swatches/rialux-bosco-blanc-alpin-61d596c6.webp": "1225be1e175c4bc2100bcc213ef2a667b4fe7dd2e0bc1e019136212b67577a8d",
+    "assets/catalogue-swatches/rialux-bosco-beige-dune-7a2706c3.webp": "c751a050462c992812e264a65ef749c0e2c7c9c3c12bee774ca0f40f5611eab0",
+    "assets/catalogue-swatches/rialux-bosco-brun-terra-3a2f6eb9.webp": "7ba72d387421075a4d6143487fdf5488c4a651ee185a7c4782bba4c684c244c5",
+    "assets/catalogue-swatches/rialux-bosco-gris-galet-d61c4c58.webp": "7c4c7300cc69c0b19422beaea1ced5c979c7cdcac66663380b99e124835aa613",
+    "assets/products/mir-siding-625/base-hardieplank.png": "fbac51096734e027e5ecbedd3dc90dbb14ace614fdae06a83378c096d3223344",
+    "assets/products/hardieplank-smooth.png": "96a8d4450e1016836afca0e3fb7827723bba31d70f9d90c793ed0f5168f89bdb",
+    "assets/products/hardiepanel-cedarmill.png": "fe963b68510538ce519e8adfe64b4259cd45727fada1fc1b22629ff47431d786",
+    "assets/products/hardieshingle-straight.png": "04878ef07c2ba722f7b5941068b7822a99e28b9a5afbf2bbdb8dec987794067b",
+    "assets/products/hardieshingle-staggered.png": "61a330235d4fa10f071b9f29c8768696bc88ac9a773f446bdbc12e788c0106cc",
+    "assets/catalogue-swatches/st-laurent-noir-7859d6b3.jpeg": "022897b2c759faf3c3cadd63f21d39c7763f09bc62621c754e86817dfa2b2504",
+    "assets/catalogue-swatches/st-laurent-blanc-9f5fd19e.jpeg": "14d9119787d2bac7d17e90b8f3b5cc2e14ac69ea3c725ed75e8907e3555574fd",
+    "assets/catalogue-swatches/st-laurent-lin-96feffcb.jpeg": "4c761adbc107589765d3d6e49ae3ac65bd5738f3932a11fd1ce299dbaf25ca05",
+    "assets/catalogue-swatches/st-laurent-argent-c73797c0.jpeg": "a7613ecb04f6b04a3d7e411c6824e4d480e32716438c1d7a9f8798bf659887fe",
+    "assets/catalogue-swatches/st-laurent-aspen-08609c2c.jpeg": "98421bd627f7a44920e913e199da6898512ee2c2b9c7a9a5c5fa45b830e2d2bd",
+    "assets/catalogue-swatches/st-laurent-bouleau-2cb8c8a4.jpeg": "29953c3932ab2c3814d12a2f00e007330b21b6afc12e5b3489f1ce7d9efd189d",
+    "assets/catalogue-swatches/st-laurent-eucalyptus-98e5bf93.jpeg": "bfb7bc70f25f5f41a12361cc7a348cd66a47d4edcc438a61b3bd80acabe960f3",
+    "assets/catalogue-swatches/st-laurent-gris-cendre-4d875855.jpeg": "dd343005e3d0e888200584d32d40d27487d54937047ad768db0cb2d84b25dccb",
+    "assets/catalogue-swatches/st-laurent-saule-argente-d12be8f2.jpeg": "20e3c975e518a86eef7ad348f0a20332959b93b841422c2ffe81bfeae3a51f1a",
+    "assets/catalogue-swatches/st-laurent-frene-1315408a.jpeg": "2781696cb9481d9cef02eade731fc58dece3236f0943c9c1142830de03672e0a",
+    "assets/catalogue-swatches/st-laurent-bois-de-greve-433c5e68.jpeg": "b707e40e9e1e09bff399209dc80a6e4e71ea475d763daa357188e7dd5044dc29",
+    "assets/catalogue-swatches/st-laurent-bois-d-erable-6c1615c7.jpeg": "6726bd51686c49090e4f3f8a7baabab05b10a66120703e5e70b546c3f800ffba",
+    "assets/catalogue-swatches/st-laurent-miel-naturel-b6212416.jpeg": "333fda57c992c5720afb280b44a9b265a784b24c745ec196c4d61e8812b5a256",
+    "assets/catalogue-swatches/st-laurent-ipe-eaf7416d.jpeg": "089e1c3f8ff6e6aee5f2576ed95742c5aedfa8fca83e2de44defd7c2a377cc3e",
+    "assets/catalogue-swatches/st-laurent-bois-de-chene-d65256ff.jpeg": "36a0e9c9afcc981ae9ecc1d219fd5062db9bc4669f3ee2ca8d3a55497997d952",
+    "assets/catalogue-swatches/st-laurent-peuplier-5419710e.jpeg": "879a63c0750c28d44538705b056d3cda6ecb4f76baeb2593fea3f1807017c02f",
+    "assets/catalogue-swatches/st-laurent-noisetier-75d84231.jpeg": "7ed8040a431951d084670e716b151d710a8efffd1cc27a95da0951e73bc7e630",
+    "assets/catalogue-swatches/st-laurent-pruche-vieillie-c84dac05.jpeg": "d820706d0b2512383b40ebc9ad20b2d4dac831ff5681267b4d65e89b7fac0bf6",
+    "assets/catalogue-swatches/st-laurent-ecorce-52270f0a.jpeg": "58bf0087cdbb375507bf196fa8f59e0c89c67804f6ea1368687a0c0e1bb3e8e5",
+    "assets/catalogue-swatches/st-laurent-torrefie-a4f427ae.jpeg": "3e677da85e74e6cb4fd00d55070cbd6e1077060304033a146d15d3fbcd105270",
+    "assets/catalogue-swatches/st-laurent-espresso-46cec358.jpeg": "023e8afd732081448a572eb3c9ac8d6112aeb28cb052eafddd99d1bc216d4164",
+    "assets/catalogue-swatches/st-laurent-kingwood-3bb512a8.jpeg": "6fa08cda3ca909694ff57480fe143b2f257f3c6b91cee001e67ff5a3a6f2f5df",
+    "assets/catalogue-swatches/st-laurent-charbon-de-bois-61df8a08.jpeg": "8706e0115560209a86ff7bbed358e0c30a81fd949d1a0f73d9110772b45b80db",
+    "assets/catalogue-swatches/st-laurent-ebene-e89ea570.jpeg": "656cd7fa344ad1b0e42e71a81732ef5972fa8b2e9512bd1b6354798079f93325",
+    "assets/products/st-vgroove-9.jpg": "b6398481a985e98cd670c6afbbbd078495d54719d57ac6f4141068b0d134f11c",
+    "assets/products/canexel-2.webp": "6005c12f9f9d6b9e4e5edce068482790fb8fe3ab720fd8191f346477fa92a2b4",
+    "assets/products/canexel-4.webp": "8116ef52f997fd0ddeebe1a960a691734b42206435952601e4b342bc65edc78f",
+    "assets/products/canexel-1.webp": "8cb28d052af23e8b39e3ea3e09fb4e5df37c592d64f4f29ad8e1655244eed877",
+    "assets/products/jdp-bluhouss-307.webp": "5d0b5795fb9d20d6fcc198b4447503b60773487e9103187b8316be79c848689c",
+    "assets/products/st-board-9.jpg": "57aaa24ff880860ab0a3802170b1a3ec1220207eb48a7b9368375ac196491101"
+  },
+  "testSha256": "2a551818efd05e0c81e864d2bb23bcc885502d6599ce05d736c9921184599955",
+  "passed": false
+}

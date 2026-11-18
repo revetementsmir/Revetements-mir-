@@ -1,0 +1,67 @@
+CAPTURE landing-fr-CA-1440.png
+CAPTURE models-fr-CA-1440.png
+CAPTURE measurements-fr-CA-1440.png
+CAPTURE finish-ready-fr-CA-1440.png
+CAPTURE quantity-empty-fr-CA-1440.png
+CAPTURE quantity-ready-fr-CA-1440.png
+CAPTURE added-fr-CA-1440.png
+CAPTURE custom-drawing-fr-CA-1440.png
+CAPTURE custom-measurements-fr-CA-1440.png
+CAPTURE cart-fr-CA-1440.png
+PASS client-1440-fr-CA
+CAPTURE landing-en-CA-1440.png
+CAPTURE models-en-CA-1440.png
+FAIL client-1440-en-CA: locator.fill: Target page, context or browser has been closed
+Call log:
+[2m  - waiting for locator('[data-client-bend-angle="0"]')[22m
+[2m    - locator resolved to <input max="180" step="any" value="90" min="0.001" type="number" data-client-bend-angle="0" aria-label="Inside angle A–B in degrees"/>[22m
+[2m    - fill("90")[22m
+[2m  - attempting fill action[22m
+[2m    - waiting for element to be visible, enabled and editable[22m
+
+FAIL client-834-fr-CA: browserContext.newPage: Target page, context or browser has been closed
+Browser logs:
+
+<launching> /usr/bin/chromium --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --user-data-dir=/tmp/playwright_chromiumdev_profile-CubXxY --remote-debugging-pipe --no-startup-window
+<launched> pid=89662
+[pid=89662][err] [89662:89692:1118/145642.067289:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=89662][err] [89662:89692:1118/145642.067577:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=89662][err] [89662:89692:1118/145642.067601:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=89662][err] [89662:89692:1118/145642.067612:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=89662][err] [89662:89692:1118/145642.067621:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=89662][err] [89662:89692:1118/145642.067625:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=89662][err] [89662:89692:1118/145642.067673:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=89662][err] [89662:89692:1118/145642.333483:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=89662][err] [89662:89662:1118/145642.362865:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[pid=89662][err] [89662:89662:1118/145642.362957:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[pid=89662][err] [89662:89692:1118/145642.362983:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=89662][err] [89662:89692:1118/145642.364074:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=89662][err] [89662:89662:1118/145642.369792:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[pid=89662][err] [89662:89692:1118/145642.369893:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=89662][err] [89662:89662:1118/145642.371341:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[pid=89662][err] [89662:89692:1118/145642.371482:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=89662][err] [89662:89692:1118/145642.371529:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+[pid=89662][err] [89662:89662:1118/145642.371575:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[pid=89662][err] [89662:89692:1118/145642.371685:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=89662][err] [89662:89662:1118/145642.372381:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[pid=89662][err] [89662:89662:1118/145642.372920:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: unknown error type:
+[pid=89662][err] [89662:89662:1118/145642.372939:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[pid=89662][err] [89662:89692:1118/145642.373173:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=89662][err] [89662:89662:1118/145642.375137:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[pid=89662][err] [89662:89692:1118/145642.375203:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+[pid=89662][err] [89662:89662:1118/145642.375643:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type:
+[pid=89662] <gracefully close start>
+FAIL client-834-en-CA: browser.newContext: Target page, context or browser has been closed
+FAIL client-390-fr-CA: browser.newContext: Target page, context or browser has been closed
+FAIL client-390-en-CA: browser.newContext: Target page, context or browser has been closed
+FAIL excluded-contexts: browser.newContext: Target page, context or browser has been closed
+AssertionError [ERR_ASSERTION]: see report
+    at main (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:102:337)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

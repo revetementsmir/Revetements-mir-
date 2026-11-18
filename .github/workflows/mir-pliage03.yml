@@ -1,0 +1,58 @@
+name: MIR — Pliage 03 TEST
+on:
+  push:
+    branches: [codex/pliage-03-etapes-gauche-20261118]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MIR_CHROMIUM_BIN: /usr/bin/google-chrome
+      MIR_PLIAGE03_OUT: /tmp/mir-pliage03-proof
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install isolated browser tools
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.58.2 pngjs@7
+      - name: Existing business rules and opt-in geometry
+        run: |
+          node --check dist/production-app.js
+          node --check dist/production-model.js
+          node tests/mir-pliage03-boundaries.cjs
+          node tests/mir-pliage-surfaces.cjs
+          node tests/mir-client-parcours-logic.cjs
+          node tests/mir-pliage03-documents.cjs
+          node tests/mir-pliage03-i18n.cjs
+          node tests/mir-bending-lengths.cjs
+          node tests/mir-phase10-bending.cjs
+          node tests/mir-unified-dossier.cjs
+          node tests/mir-pliage-harmonie-geometry.cjs
+      - name: Real client journey, both languages and three viewports
+        run: MIR_PLIAGE03_PHASE=after node tests/mir-pliage03-browser.cjs
+      - name: FR/EN roundtrips preserve business values
+        run: node tests/mir-pliage03-i18n-browser.cjs
+      - name: Download the native client PDF locally
+        run: node tests/mir-pliage03-pdf-browser.cjs
+      - name: Build guarded TEST preview
+        run: node scripts/build-prestige-preview.cjs
+      - name: Verify guarded preview
+        run: MIR_PLIAGE03_PHASE=preview node tests/mir-pliage03-browser.cjs
+      - name: Preserve browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-pliage03-proof-${{ github.sha }}
+          path: |
+            /tmp/mir-pliage03-proof/
+            docs/verification/pliage03-20261118/i18n-browser-results.json
+            docs/verification/pliage03-20261118/pdf/
+          retention-days: 14
+          if-no-files-found: error

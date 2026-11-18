@@ -1,0 +1,79 @@
+{
+  "passed": true,
+  "fixture": true,
+  "customerData": false,
+  "tool": "PyMuPDF",
+  "version": "1.26.6",
+  "pageCount": 2,
+  "pages": [
+    {
+      "page": 1,
+      "size": [
+        0.0,
+        0.0,
+        612.0,
+        792.0
+      ],
+      "text": "18 nov. 2026\nDOSSIER DE PLIAGE\nQA-LOCAL-2-FACES · QA fictif — contrôle PDF local\nA · 5 po\nB · 3 po\nC · 2 po\nMATÉRIAU / FINI\nAluminium\nGentek Canada\nBlanc Pur 30\nCode 431\nQUANTITÉ / LONGUEUR\n2 pièce(s)\n120 po\nCOTES FINIES ET POINTS À VALIDER\nProduit : Gentek — Feuille peinte\naluminium 3037, 24 po × 98,5 pi\nRéférence produit : gentek-coil-3037\nA = 5 po\nPli A–B = 150°\nB = 3 po\nPli B–C = 90°\nC = 2 po\nDéveloppé total = 10 po (nominal)\nFace colorée : Face 1 — côté indiqué par\nle liseré bleu\nEmplacement : Recette locale seulement\nFixture fictive. Aucun dossier\nutilisateur, aucune commande, aucun envoi.\nNotes : Deux pièces fictives pour recette\nuniquement. Aucun stock ou prix MIR\nconfirmé.\nM001 · QA fictif — oblique face 1\nCommande : QA-LOCAL-2-FACES · Chantier : QA fictif — contrôle PDF local · Chef : Personne fictive · Date : 2026-11-18 · Révision : A\nDemande de soumission · validation MIR requise avant fabrication.\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n1 / 2\n",
+      "checkedText": [
+        "Gentek Canada",
+        "Blanc Pur 30",
+        "Code 431",
+        "Produit : Gentek — Feuille peinte aluminium 3037, 24 po × 98,5 pi",
+        "Référence produit : gentek-coil-3037",
+        "2 pièce(s)",
+        "120 po",
+        "A = 5 po",
+        "B = 3 po",
+        "C = 2 po",
+        "Pli A–B = 150°",
+        "Pli B–C = 90°",
+        "Face colorée : Face 1 — côté indiqué par le liseré bleu",
+        "Fixture fictive. Aucun dossier utilisateur, aucune commande, aucun envoi.",
+        "Aucun stock ou prix MIR confirmé.",
+        "M001 · QA fictif — oblique face 1"
+      ],
+      "bluePaths": 1,
+      "continuousBluePath": true,
+      "bluePathSegments": 4,
+      "firstSegmentSideOffsetPt": -3.88800048828125,
+      "image": "page-1.png",
+      "productIdPrinted": true
+    },
+    {
+      "page": 2,
+      "size": [
+        0.0,
+        0.0,
+        612.0,
+        792.0
+      ],
+      "text": "18 nov. 2026\nDOSSIER DE PLIAGE\nQA-LOCAL-2-FACES · QA fictif — contrôle PDF local\nA · 5 po\nB · 3 po\nC · 2 po\nMATÉRIAU / FINI\nAluminium\nGentek Canada\nAmande\nCode 432\nQUANTITÉ / LONGUEUR\n3 pièce(s)\n120 po\nCOTES FINIES ET POINTS À VALIDER\nProduit : Gentek — Feuille peinte\naluminium 3037, 24 po × 98,5 pi\nRéférence produit : gentek-coil-3037\nA = 5 po\nPli A–B = 134.5°\nB = 3 po\nPli B–C = 112.75°\nC = 2 po\nDéveloppé total = 10 po (nominal)\nFace colorée : Face 2 — côté indiqué par\nle liseré bleu\nEmplacement : Recette locale seulement\nFixture fictive. Aucun dossier\nutilisateur, aucune commande, aucun envoi.\nNotes : Deux pièces fictives pour recette\nuniquement. Aucun stock ou prix MIR\nconfirmé.\nM002 · QA fictif — oblique face 2\nCommande : QA-LOCAL-2-FACES · Chantier : QA fictif — contrôle PDF local · Chef : Personne fictive · Date : 2026-11-18 · Révision : A\nDemande de soumission · validation MIR requise avant fabrication.\nCotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.\n2 / 2\n",
+      "checkedText": [
+        "Gentek Canada",
+        "Amande",
+        "Code 432",
+        "Produit : Gentek — Feuille peinte aluminium 3037, 24 po × 98,5 pi",
+        "Référence produit : gentek-coil-3037",
+        "3 pièce(s)",
+        "120 po",
+        "A = 5 po",
+        "B = 3 po",
+        "C = 2 po",
+        "Pli A–B = 134.5°",
+        "Pli B–C = 112.75°",
+        "Face colorée : Face 2 — côté indiqué par le liseré bleu",
+        "Fixture fictive. Aucun dossier utilisateur, aucune commande, aucun envoi.",
+        "Aucun stock ou prix MIR confirmé.",
+        "M002 · QA fictif — oblique face 2"
+      ],
+      "bluePaths": 1,
+      "continuousBluePath": true,
+      "bluePathSegments": 4,
+      "firstSegmentSideOffsetPt": 3.88800048828125,
+      "image": "page-2.png",
+      "productIdPrinted": true
+    }
+  ],
+  "productReferences": "Original product name and internal product reference are printed in paginated details; the product ID is not presented as a manufacturer code."
+}

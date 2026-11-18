@@ -1,0 +1,78 @@
+{
+  "fixture": true,
+  "customerData": false,
+  "submitted": false,
+  "externalRequestsCompleted": 0,
+  "blocked": [
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET",
+      "knownTariffRead": true
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [
+    {
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    }
+  ],
+  "httpErrors": [],
+  "browser": "155.0.8059.79",
+  "presentedPages": [
+    {
+      "name": "M001 · QA fictif — oblique face 1",
+      "summary": [
+        "Produit : Gentek — Feuille peinte aluminium 3037, 24 po × 98,5 pi",
+        "Référence produit : gentek-coil-3037",
+        "A = 5 po",
+        "Pli A–B = 150°",
+        "B = 3 po",
+        "Pli B–C = 90°",
+        "C = 2 po",
+        "Développé total = 10 po (nominal)",
+        "Face colorée : Face 1 — côté indiqué par le liseré bleu",
+        "Emplacement : Recette locale seulement",
+        "Fixture fictive. Aucun dossier utilisateur, aucune commande, aucun envoi.",
+        "Notes : Deux pièces fictives pour recette uniquement. Aucun stock ou prix MIR confirmé."
+      ],
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"850\" height=\"1100\" viewBox=\"0 0 850 1100\" role=\"img\" aria-label=\"Pièce cotée M001\"><title>Pièce cotée M001</title><rect width=\"850\" height=\"1100\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"40\" y=\"91\" font-size=\"12\" font-weight=\"700\" fill=\"#52634f\">DOSSIER DE PLIAGE</text><text x=\"40\" y=\"121\" font-size=\"18\" font-weight=\"700\">M001 · QA fictif — oblique face 1</text><text x=\"40\" y=\"154\" font-size=\"12\">Commande : QA-LOCAL-2-FACES · Chantier : QA fictif — contrôle PDF local · Chef : Personne</text><text x=\"40\" y=\"172\" font-size=\"12\">fictive · Date : 2026-11-18 · Révision : A</text><rect x=\"40\" y=\"230\" width=\"770\" height=\"345\" fill=\"#fafbf8\" stroke=\"#d7ded2\"/><g transform=\"translate(65 235) scale(.9)\"><path d=\"M110 147.234 L447.2848 147.234 L622.543 248.4194 L690 131.5806\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M110 147.234 L447.2848 147.234 L622.543 248.4194 L690 131.5806\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M110,147.234L110,115.234 M447.2848,147.234L447.2848,115.234 M110,115.234L447.2848,115.234\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"278.6424\" data-anchor-y=\"147.234\" data-segment-start-x=\"110\" data-segment-start-y=\"147.234\" data-segment-end-x=\"447.2848\" data-segment-end-y=\"147.234\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(278.6424,115.234) rotate(0)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 5 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M447.2848,147.234L479.2848,91.8084 M622.543,248.4194L654.543,192.9938 M479.2848,91.8084L654.543,192.9938\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"534.9139\" data-anchor-y=\"197.8267\" data-segment-start-x=\"447.2848\" data-segment-start-y=\"147.234\" data-segment-end-x=\"622.543\" data-segment-end-y=\"248.4194\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(566.9139,142.4011) rotate(30)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 3 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"2\" d=\"M622.543,248.4194L677.9687,280.4194 M690,131.5806L745.4256,163.5806 M677.9687,280.4194L745.4256,163.5806\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"C\" data-segment-index=\"2\" data-anchor-x=\"656.2715\" data-anchor-y=\"190\" data-segment-start-x=\"622.543\" data-segment-start-y=\"248.4194\" data-segment-end-x=\"690\" data-segment-end-y=\"131.5806\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(711.6972,222) rotate(-60)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">C · 2 po</text></g></g><path class=\"mir-pliage-painted-surface\" data-painted-side=\"left\" d=\"M110 141.2340071 L447.2847517 141.2340071 A6 6 0 0 1 450.2847517 142.0378547 L620.3468972 240.2232802 L684.8038476 128.5805673\" fill=\"none\" stroke=\"#175b94\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\" pointer-events=\"none\" aria-hidden=\"true\"/></g><text x=\"40\" y=\"603\" font-size=\"12\" font-weight=\"700\" fill=\"#52634f\">MATÉRIAU / FINI</text><text x=\"40\" y=\"628\" font-size=\"15\">Aluminium</text><text x=\"40\" y=\"649\" font-size=\"15\">Gentek Canada</text><text x=\"40\" y=\"670\" font-size=\"15\">Blanc Pur 30</text><text x=\"40\" y=\"691\" font-size=\"15\">Code 431</text><text x=\"500\" y=\"603\" font-size=\"12\" font-weight=\"700\" fill=\"#52634f\">QUANTITÉ / LONGUEUR</text><text x=\"500\" y=\"633\" font-size=\"22\" font-weight=\"700\">2 pièce(s)</text><text x=\"500\" y=\"662\" font-size=\"18\">120 po</text><text x=\"40\" y=\"764\" font-size=\"12\" font-weight=\"700\" fill=\"#52634f\">COTES FINIES ET POINTS À VALIDER</text><text x=\"40\" y=\"790\" font-size=\"13\">Produit : Gentek — Feuille peinte</text><text x=\"40\" y=\"808\" font-size=\"13\">aluminium 3037, 24 po × 98,5 pi</text><text x=\"40\" y=\"826\" font-size=\"13\">Référence produit : gentek-coil-3037</text><text x=\"40\" y=\"844\" font-size=\"13\">A = 5 po</text><text x=\"40\" y=\"862\" font-size=\"13\">Pli A–B = 150°</text><text x=\"40\" y=\"880\" font-size=\"13\">B = 3 po</text><text x=\"40\" y=\"898\" font-size=\"13\">Pli B–C = 90°</text><text x=\"40\" y=\"916\" font-size=\"13\">C = 2 po</text><text x=\"40\" y=\"934\" font-size=\"13\">Développé total = 10 po (nominal)</text><text x=\"430\" y=\"790\" font-size=\"13\">Face colorée : Face 1 — côté indiqué par</text><text x=\"430\" y=\"808\" font-size=\"13\">le liseré bleu</text><text x=\"430\" y=\"826\" font-size=\"13\">Emplacement : Recette locale seulement</text><text x=\"430\" y=\"844\" font-size=\"13\">Fixture fictive. Aucun dossier</text><text x=\"430\" y=\"862\" font-size=\"13\">utilisateur, aucune commande, aucun envoi.</text><text x=\"430\" y=\"880\" font-size=\"13\">Notes : Deux pièces fictives pour recette</text><text x=\"430\" y=\"898\" font-size=\"13\">uniquement. Aucun stock ou prix MIR</text><text x=\"430\" y=\"916\" font-size=\"13\">confirmé.</text></g></svg>"
+    },
+    {
+      "name": "M002 · QA fictif — oblique face 2",
+      "summary": [
+        "Produit : Gentek — Feuille peinte aluminium 3037, 24 po × 98,5 pi",
+        "Référence produit : gentek-coil-3037",
+        "A = 5 po",
+        "Pli A–B = 134.5°",
+        "B = 3 po",
+        "Pli B–C = 112.75°",
+        "C = 2 po",
+        "Développé total = 10 po (nominal)",
+        "Face colorée : Face 2 — côté indiqué par le liseré bleu",
+        "Emplacement : Recette locale seulement",
+        "Fixture fictive. Aucun dossier utilisateur, aucune commande, aucun envoi.",
+        "Notes : Deux pièces fictives pour recette uniquement. Aucun stock ou prix MIR confirmé."
+      ],
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"850\" height=\"1100\" viewBox=\"0 0 850 1100\" role=\"img\" aria-label=\"Pièce cotée M002\"><title>Pièce cotée M002</title><rect width=\"850\" height=\"1100\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"40\" y=\"91\" font-size=\"12\" font-weight=\"700\" fill=\"#52634f\">DOSSIER DE PLIAGE</text><text x=\"40\" y=\"121\" font-size=\"18\" font-weight=\"700\">M002 · QA fictif — oblique face 2</text><text x=\"40\" y=\"154\" font-size=\"12\">Commande : QA-LOCAL-2-FACES · Chantier : QA fictif — contrôle PDF local · Chef : Personne</text><text x=\"40\" y=\"172\" font-size=\"12\">fictive · Date : 2026-11-18 · Révision : A</text><rect x=\"40\" y=\"230\" width=\"770\" height=\"345\" fill=\"#fafbf8\" stroke=\"#d7ded2\"/><g transform=\"translate(65 235) scale(.9)\"><path d=\"M110 259.2527 L433.6482 259.2527 L569.757 120.7473 L690 168.7194\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M110 259.2527 L433.6482 259.2527 L569.757 120.7473 L690 168.7194\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M110,259.2527L110,291.2527 M433.6482,259.2527L433.6482,291.2527 M110,291.2527L433.6482,291.2527\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"271.8241\" data-anchor-y=\"259.2527\" data-segment-start-x=\"110\" data-segment-start-y=\"259.2527\" data-segment-end-x=\"433.6482\" data-segment-end-y=\"259.2527\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(271.8241,291.2527) rotate(0)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 5 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M433.6482,259.2527L479.2962,304.1109 M569.757,120.7473L615.405,165.6055 M479.2962,304.1109L615.405,165.6055\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"501.7026\" data-anchor-y=\"190\" data-segment-start-x=\"433.6482\" data-segment-start-y=\"259.2527\" data-segment-end-x=\"569.757\" data-segment-end-y=\"120.7473\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(547.3506,234.8582) rotate(-45.5)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 3 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"2\" d=\"M569.757,120.7473L587.5437,76.1645 M690,168.7194L707.7868,124.1366 M587.5437,76.1645L707.7868,124.1366\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"C\" data-segment-index=\"2\" data-anchor-x=\"629.8785\" data-anchor-y=\"144.7334\" data-segment-start-x=\"569.757\" data-segment-start-y=\"120.7473\" data-segment-end-x=\"690\" data-segment-end-y=\"168.7194\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(647.6653,100.1505) rotate(21.75)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">C · 2 po</text></g></g><path class=\"mir-pliage-painted-surface\" data-painted-side=\"right\" d=\"M110 265.2526637 L433.6481838 265.2526637 A6 6 0 0 0 437.9276865 263.4581193 L571.239749 127.798779 L687.7766554 174.2922902\" fill=\"none\" stroke=\"#175b94\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\" pointer-events=\"none\" aria-hidden=\"true\"/></g><text x=\"40\" y=\"603\" font-size=\"12\" font-weight=\"700\" fill=\"#52634f\">MATÉRIAU / FINI</text><text x=\"40\" y=\"628\" font-size=\"15\">Aluminium</text><text x=\"40\" y=\"649\" font-size=\"15\">Gentek Canada</text><text x=\"40\" y=\"670\" font-size=\"15\">Amande</text><text x=\"40\" y=\"691\" font-size=\"15\">Code 432</text><text x=\"500\" y=\"603\" font-size=\"12\" font-weight=\"700\" fill=\"#52634f\">QUANTITÉ / LONGUEUR</text><text x=\"500\" y=\"633\" font-size=\"22\" font-weight=\"700\">3 pièce(s)</text><text x=\"500\" y=\"662\" font-size=\"18\">120 po</text><text x=\"40\" y=\"764\" font-size=\"12\" font-weight=\"700\" fill=\"#52634f\">COTES FINIES ET POINTS À VALIDER</text><text x=\"40\" y=\"790\" font-size=\"13\">Produit : Gentek — Feuille peinte</text><text x=\"40\" y=\"808\" font-size=\"13\">aluminium 3037, 24 po × 98,5 pi</text><text x=\"40\" y=\"826\" font-size=\"13\">Référence produit : gentek-coil-3037</text><text x=\"40\" y=\"844\" font-size=\"13\">A = 5 po</text><text x=\"40\" y=\"862\" font-size=\"13\">Pli A–B = 134.5°</text><text x=\"40\" y=\"880\" font-size=\"13\">B = 3 po</text><text x=\"40\" y=\"898\" font-size=\"13\">Pli B–C = 112.75°</text><text x=\"40\" y=\"916\" font-size=\"13\">C = 2 po</text><text x=\"40\" y=\"934\" font-size=\"13\">Développé total = 10 po (nominal)</text><text x=\"430\" y=\"790\" font-size=\"13\">Face colorée : Face 2 — côté indiqué par</text><text x=\"430\" y=\"808\" font-size=\"13\">le liseré bleu</text><text x=\"430\" y=\"826\" font-size=\"13\">Emplacement : Recette locale seulement</text><text x=\"430\" y=\"844\" font-size=\"13\">Fixture fictive. Aucun dossier</text><text x=\"430\" y=\"862\" font-size=\"13\">utilisateur, aucune commande, aucun envoi.</text><text x=\"430\" y=\"880\" font-size=\"13\">Notes : Deux pièces fictives pour recette</text><text x=\"430\" y=\"898\" font-size=\"13\">uniquement. Aucun stock ou prix MIR</text><text x=\"430\" y=\"916\" font-size=\"13\">confirmé.</text></g></svg>"
+    }
+  ],
+  "download": {
+    "file": "MIR-QA-local-deux-faces.pdf",
+    "suggestedFilename": "MIR-demande-pliage-QA-LOCAL-2-FACES.pdf",
+    "bytes": 57909,
+    "sha256": "18c77716bc58594f8e4b3ca3030b33ea736053dac5ca41062c68dad48268b92e",
+    "nativeButton": "#production-pdf",
+    "nativeLink": "#mir-pdf-ready a[download]"
+  },
+  "savedOrderUnchanged": true,
+  "sourceSha256": {
+    "production-app.js": "780c4337be5fb9846630a33890a6595a12ea763409dd9540744cd799bbb8d2ba",
+    "production-model.js": "6287271575a9c164e2dc068f961e97794126fd1b148731174d4cb755ad36e980",
+    "mir-pliage-documents.js": "af46b5c9d2d625b38afe217333acb695e61cda59b11a7118396fc845ad10b9c8",
+    "mir-pliage-surfaces.js": "f1afd80400e7ce4f9473366ebe4733332b7844024a8d6e57bef9e795933dcda2",
+    "annotated-pdf.js": "473d7515a257e8e1c669bf3480b9d08a2a2ee7b5f172b7aa1a2a0973190b6413",
+    "mir-dossier-pdf.js": "5060ecb6432239db132629686ce4e1c281023c003f912edb8009a9e2a1643503"
+  },
+  "passed": true
+}

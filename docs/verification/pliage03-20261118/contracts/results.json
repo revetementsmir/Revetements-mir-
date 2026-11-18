@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "tests": [
+    {
+      "test": "mir-pliage-surfaces",
+      "exitCode": 0
+    },
+    {
+      "test": "mir-client-parcours-logic",
+      "exitCode": 0
+    },
+    {
+      "test": "mir-pliage03-documents",
+      "exitCode": 0
+    },
+    {
+      "test": "mir-pliage03-i18n",
+      "exitCode": 0
+    },
+    {
+      "test": "mir-bending-lengths",
+      "exitCode": 0
+    },
+    {
+      "test": "mir-phase10-bending",
+      "exitCode": 0
+    },
+    {
+      "test": "mir-unified-dossier",
+      "exitCode": 0
+    },
+    {
+      "test": "mir-pliage-harmonie-geometry",
+      "exitCode": 0
+    }
+  ]
+}

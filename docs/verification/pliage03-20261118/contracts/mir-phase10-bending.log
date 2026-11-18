@@ -1,0 +1,15 @@
+PASS liste nominale exacte des dix modèles
+PASS tous les modèles portent une version, des lettres uniques et des plis complets
+PASS les seules cotes verrouillées par les sources restent non modifiables
+PASS quantité vide, zéro et fractionnaire refusées; quantité entière acceptée
+PASS fractions de pouce conservées sans arrondi destructif
+PASS Face 1 et Face 2 ciblent automatiquement le segment le plus long
+PASS rendu commun : toutes les lettres, aucune surbrillance verte et étoile PDF
+PASS Fascia certifié : A 6, pli 90, B 1 1/4, retour écrasé, C 3/4, développé 8
+PASS règle du Coin avec J préservée avec correction ou exception explicite
+PASS instantané immuable et révision sans écrasement
+PASS développé Fascia conservé dans commande et révision
+PASS un profil unique produit une page complète, quatre profils quatre pages
+PASS aucun test Phase 10 neutralisé
+PASS Boss et Adjointe conservent la gestion technique interne
+Phase 10 : 14/14 contrôles réussis.

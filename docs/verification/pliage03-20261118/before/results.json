@@ -1,0 +1,1669 @@
+{
+  "phase": "before",
+  "baseline": "e58964cd8937766d2457904d2d7d625d1bc7df5e",
+  "checks": [
+    {
+      "name": "baseline-client-fr-CA",
+      "passed": true,
+      "detail": {
+        "measured": {
+          "model": {
+            "version": "1.0.0",
+            "kind": "profile",
+            "id": "",
+            "name": "Pliage en L",
+            "template": "l",
+            "unit": "in",
+            "spec": {
+              "kind": "profile",
+              "unit": "in",
+              "quantity": "",
+              "material": {
+                "type": "",
+                "name": "",
+                "productRef": null,
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {},
+              "coloredFace": {
+                "side": "",
+                "segmentId": "A"
+              },
+              "location": "",
+              "note": "",
+              "template": "l",
+              "name": "Pliage en L",
+              "dimensions": {
+                "A": "3.5",
+                "B": "2.25"
+              },
+              "length": "120",
+              "mirrorX": false
+            },
+            "segments": [
+              {
+                "id": "A",
+                "label": "A",
+                "name": "Aile A",
+                "lengthMM": 88.89999999999999,
+                "start": [
+                  0,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  0
+                ],
+                "headingDeg": 0
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "name": "Aile B",
+                "lengthMM": 57.15,
+                "start": [
+                  88.9,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  57.15
+                ],
+                "headingDeg": 90
+              }
+            ],
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left",
+                "turnDeg": 90,
+                "label": "90° intérieur · gauche",
+                "at": [
+                  88.9,
+                  0
+                ],
+                "from": "A",
+                "to": "B"
+              }
+            ],
+            "pointsMM": [
+              [
+                0,
+                0
+              ],
+              [
+                88.9,
+                0
+              ],
+              [
+                88.9,
+                57.15
+              ]
+            ],
+            "bbox": {
+              "minX": 0,
+              "maxX": 88.9,
+              "minY": 0,
+              "maxY": 57.15
+            },
+            "coloredFace": {
+              "side": null,
+              "segmentId": "A"
+            },
+            "quantity": null,
+            "material": {
+              "type": "",
+              "name": "",
+              "productRef": null,
+              "gauge": "",
+              "thicknessMM": null
+            },
+            "finish": {
+              "manufacturer": "",
+              "name": "",
+              "code": "",
+              "system": "",
+              "selectionType": null,
+              "special": false,
+              "hex": null
+            },
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Choisissez une référence de couleur avant de demander le prix.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Couleur à préciser",
+              "selectionType": "unspecified",
+              "status": "finish_required"
+            },
+            "lengthMM": 3048,
+            "location": "",
+            "note": "",
+            "finishedSegmentSumMM": 146.04999999999998,
+            "developedWidthMM": null,
+            "developedWidth": null,
+            "developmentStatus": "requires_workshop_bend_parameters",
+            "validation": {
+              "valid": true,
+              "geometryComplete": true,
+              "specificationComplete": false,
+              "productionReady": false,
+              "errors": [],
+              "pending": [
+                {
+                  "code": "QUANTITY_REQUIRED",
+                  "path": "quantity",
+                  "message": "Quantité entière à préciser."
+                },
+                {
+                  "code": "MATERIAL_REQUIRED",
+                  "path": "material.type",
+                  "message": "Matière à préciser."
+                },
+                {
+                  "code": "COLOR_SOURCE_REQUIRED",
+                  "path": "finish",
+                  "message": "Précisez le fabricant ou le nuancier de la couleur."
+                },
+                {
+                  "code": "COLOR_CODE_REQUIRED",
+                  "path": "finish.code",
+                  "message": "Référence de couleur à préciser."
+                },
+                {
+                  "code": "COLORED_FACE_REQUIRED",
+                  "path": "coloredFace.side",
+                  "message": "Indiquez le côté coloré, gauche ou droit en suivant A vers les segments suivants."
+                }
+              ],
+              "warnings": [],
+              "workshopValidationRequired": true
+            },
+            "valid": true,
+            "complete": false,
+            "productionReady": false,
+            "pricing": {
+              "schema": "mir-piece-pricing-1",
+              "status": "on_request",
+              "requiresQuote": false,
+              "automaticPricingAllowed": false,
+              "currency": "CAD",
+              "rate": null,
+              "rateUnit": "in2",
+              "rateCents": null,
+              "areaSqIn": null,
+              "unitAmount": null,
+              "unitCents": null,
+              "quantity": null,
+              "lineAmount": null,
+              "lineCents": null,
+              "basis": "projected_outer_area_including_lips",
+              "tariffId": null,
+              "taxIncluded": null,
+              "taxStatus": "not_calculated",
+              "shippingStatus": "not_calculated",
+              "label": "Prix sur demande",
+              "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+              "sourceKind": "user_instruction",
+              "geometryErrors": [],
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Choisissez une référence de couleur avant de demander le prix.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Couleur à préciser",
+                "selectionType": "unspecified",
+                "status": "finish_required"
+              }
+            }
+          },
+          "tool": "select",
+          "kind": "profile",
+          "authoring": false,
+          "editingItemId": null,
+          "preview": "face",
+          "zoom": 1,
+          "pan": {
+            "x": 0,
+            "y": 0
+          },
+          "drawPointsMM": [],
+          "canUndo": false,
+          "canRedo": false
+        },
+        "face": {
+          "model": {
+            "version": "1.0.0",
+            "kind": "profile",
+            "id": "",
+            "name": "Pliage en L",
+            "template": "l",
+            "unit": "in",
+            "spec": {
+              "kind": "profile",
+              "unit": "in",
+              "quantity": "",
+              "material": {
+                "type": "",
+                "name": "",
+                "productRef": null,
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {},
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "A"
+              },
+              "location": "",
+              "note": "",
+              "template": "l",
+              "name": "Pliage en L",
+              "dimensions": {
+                "A": "3.5",
+                "B": "2.25"
+              },
+              "length": "120",
+              "mirrorX": false
+            },
+            "segments": [
+              {
+                "id": "A",
+                "label": "A",
+                "name": "Aile A",
+                "lengthMM": 88.89999999999999,
+                "start": [
+                  0,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  0
+                ],
+                "headingDeg": 0
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "name": "Aile B",
+                "lengthMM": 57.15,
+                "start": [
+                  88.9,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  57.15
+                ],
+                "headingDeg": 90
+              }
+            ],
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left",
+                "turnDeg": 90,
+                "label": "90° intérieur · gauche",
+                "at": [
+                  88.9,
+                  0
+                ],
+                "from": "A",
+                "to": "B"
+              }
+            ],
+            "pointsMM": [
+              [
+                0,
+                0
+              ],
+              [
+                88.9,
+                0
+              ],
+              [
+                88.9,
+                57.15
+              ]
+            ],
+            "bbox": {
+              "minX": 0,
+              "maxX": 88.9,
+              "minY": 0,
+              "maxY": 57.15
+            },
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            },
+            "quantity": null,
+            "material": {
+              "type": "",
+              "name": "",
+              "productRef": null,
+              "gauge": "",
+              "thicknessMM": null
+            },
+            "finish": {
+              "manufacturer": "",
+              "name": "",
+              "code": "",
+              "system": "",
+              "selectionType": null,
+              "special": false,
+              "hex": null
+            },
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Choisissez une référence de couleur avant de demander le prix.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Couleur à préciser",
+              "selectionType": "unspecified",
+              "status": "finish_required"
+            },
+            "lengthMM": 3048,
+            "location": "",
+            "note": "",
+            "finishedSegmentSumMM": 146.04999999999998,
+            "developedWidthMM": null,
+            "developedWidth": null,
+            "developmentStatus": "requires_workshop_bend_parameters",
+            "validation": {
+              "valid": true,
+              "geometryComplete": true,
+              "specificationComplete": false,
+              "productionReady": false,
+              "errors": [],
+              "pending": [
+                {
+                  "code": "QUANTITY_REQUIRED",
+                  "path": "quantity",
+                  "message": "Quantité entière à préciser."
+                },
+                {
+                  "code": "MATERIAL_REQUIRED",
+                  "path": "material.type",
+                  "message": "Matière à préciser."
+                },
+                {
+                  "code": "COLOR_SOURCE_REQUIRED",
+                  "path": "finish",
+                  "message": "Précisez le fabricant ou le nuancier de la couleur."
+                },
+                {
+                  "code": "COLOR_CODE_REQUIRED",
+                  "path": "finish.code",
+                  "message": "Référence de couleur à préciser."
+                }
+              ],
+              "warnings": [],
+              "workshopValidationRequired": true
+            },
+            "valid": true,
+            "complete": false,
+            "productionReady": false,
+            "pricing": {
+              "schema": "mir-piece-pricing-1",
+              "status": "on_request",
+              "requiresQuote": false,
+              "automaticPricingAllowed": false,
+              "currency": "CAD",
+              "rate": null,
+              "rateUnit": "in2",
+              "rateCents": null,
+              "areaSqIn": null,
+              "unitAmount": null,
+              "unitCents": null,
+              "quantity": null,
+              "lineAmount": null,
+              "lineCents": null,
+              "basis": "projected_outer_area_including_lips",
+              "tariffId": null,
+              "taxIncluded": null,
+              "taxStatus": "not_calculated",
+              "shippingStatus": "not_calculated",
+              "label": "Prix sur demande",
+              "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+              "sourceKind": "user_instruction",
+              "geometryErrors": [],
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Choisissez une référence de couleur avant de demander le prix.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Couleur à préciser",
+                "selectionType": "unspecified",
+                "status": "finish_required"
+              }
+            }
+          },
+          "tool": "select",
+          "kind": "profile",
+          "authoring": false,
+          "editingItemId": null,
+          "preview": "face",
+          "zoom": 1,
+          "pan": {
+            "x": 0,
+            "y": 0
+          },
+          "drawPointsMM": [],
+          "canUndo": false,
+          "canRedo": false
+        },
+        "configured": {
+          "model": {
+            "version": "1.0.0",
+            "kind": "profile",
+            "id": "",
+            "name": "Pliage en L",
+            "template": "l",
+            "unit": "in",
+            "spec": {
+              "kind": "profile",
+              "unit": "in",
+              "quantity": 2,
+              "material": {
+                "type": "aluminium",
+                "name": "",
+                "productRef": null,
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {
+                "selectionType": "manufacturer",
+                "system": "Nuancier Westlake Royal",
+                "manufacturer": "Westlake Royal",
+                "name": "Noir",
+                "code": "30",
+                "hex": null,
+                "swatchUrl": null,
+                "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+                "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR."
+              },
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "A"
+              },
+              "location": "",
+              "note": "",
+              "template": "l",
+              "name": "Pliage en L",
+              "dimensions": {
+                "A": "3.5",
+                "B": "2.25"
+              },
+              "length": "120",
+              "mirrorX": false
+            },
+            "segments": [
+              {
+                "id": "A",
+                "label": "A",
+                "name": "Aile A",
+                "lengthMM": 88.89999999999999,
+                "start": [
+                  0,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  0
+                ],
+                "headingDeg": 0
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "name": "Aile B",
+                "lengthMM": 57.15,
+                "start": [
+                  88.9,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  57.15
+                ],
+                "headingDeg": 90
+              }
+            ],
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left",
+                "turnDeg": 90,
+                "label": "90° intérieur · gauche",
+                "at": [
+                  88.9,
+                  0
+                ],
+                "from": "A",
+                "to": "B"
+              }
+            ],
+            "pointsMM": [
+              [
+                0,
+                0
+              ],
+              [
+                88.9,
+                0
+              ],
+              [
+                88.9,
+                57.15
+              ]
+            ],
+            "bbox": {
+              "minX": 0,
+              "maxX": 88.9,
+              "minY": 0,
+              "maxY": 57.15
+            },
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            },
+            "quantity": 2,
+            "material": {
+              "type": "aluminium",
+              "name": "",
+              "productRef": null,
+              "gauge": "",
+              "thicknessMM": null
+            },
+            "finish": {
+              "manufacturer": "Westlake Royal",
+              "name": "Noir",
+              "code": "30",
+              "system": "Nuancier Westlake Royal",
+              "selectionType": "manufacturer",
+              "special": false,
+              "hex": null
+            },
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Prix sur demande",
+              "selectionType": "manufacturer",
+              "status": "price_unconfigured"
+            },
+            "lengthMM": 3048,
+            "location": "",
+            "note": "",
+            "finishedSegmentSumMM": 146.04999999999998,
+            "developedWidthMM": null,
+            "developedWidth": null,
+            "developmentStatus": "requires_workshop_bend_parameters",
+            "validation": {
+              "valid": true,
+              "geometryComplete": true,
+              "specificationComplete": true,
+              "productionReady": true,
+              "errors": [],
+              "pending": [],
+              "warnings": [],
+              "workshopValidationRequired": true
+            },
+            "valid": true,
+            "complete": true,
+            "productionReady": true,
+            "pricing": {
+              "schema": "mir-piece-pricing-1",
+              "status": "on_request",
+              "requiresQuote": false,
+              "automaticPricingAllowed": false,
+              "currency": "CAD",
+              "rate": null,
+              "rateUnit": "in2",
+              "rateCents": null,
+              "areaSqIn": null,
+              "unitAmount": null,
+              "unitCents": null,
+              "quantity": 2,
+              "lineAmount": null,
+              "lineCents": null,
+              "basis": "projected_outer_area_including_lips",
+              "tariffId": null,
+              "taxIncluded": null,
+              "taxStatus": "not_calculated",
+              "shippingStatus": "not_calculated",
+              "label": "Prix sur demande",
+              "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+              "sourceKind": "user_instruction",
+              "geometryErrors": [],
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Prix sur demande",
+                "selectionType": "manufacturer",
+                "status": "price_unconfigured"
+              }
+            }
+          },
+          "tool": "select",
+          "kind": "profile",
+          "authoring": false,
+          "editingItemId": null,
+          "preview": "face",
+          "zoom": 1,
+          "pan": {
+            "x": 0,
+            "y": 0
+          },
+          "drawPointsMM": [],
+          "canUndo": false,
+          "canRedo": false
+        },
+        "cartUnchanged": true
+      }
+    },
+    {
+      "name": "baseline-client-en-CA",
+      "passed": true,
+      "detail": {
+        "measured": {
+          "model": {
+            "version": "1.0.0",
+            "kind": "profile",
+            "id": "",
+            "name": "Pliage en L",
+            "template": "l",
+            "unit": "in",
+            "spec": {
+              "kind": "profile",
+              "unit": "in",
+              "quantity": "",
+              "material": {
+                "type": "",
+                "name": "",
+                "productRef": null,
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {},
+              "coloredFace": {
+                "side": "",
+                "segmentId": "A"
+              },
+              "location": "",
+              "note": "",
+              "template": "l",
+              "name": "Pliage en L",
+              "dimensions": {
+                "A": "3.5",
+                "B": "2.25"
+              },
+              "length": "120",
+              "mirrorX": false
+            },
+            "segments": [
+              {
+                "id": "A",
+                "label": "A",
+                "name": "Aile A",
+                "lengthMM": 88.89999999999999,
+                "start": [
+                  0,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  0
+                ],
+                "headingDeg": 0
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "name": "Aile B",
+                "lengthMM": 57.15,
+                "start": [
+                  88.9,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  57.15
+                ],
+                "headingDeg": 90
+              }
+            ],
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left",
+                "turnDeg": 90,
+                "label": "90° intérieur · gauche",
+                "at": [
+                  88.9,
+                  0
+                ],
+                "from": "A",
+                "to": "B"
+              }
+            ],
+            "pointsMM": [
+              [
+                0,
+                0
+              ],
+              [
+                88.9,
+                0
+              ],
+              [
+                88.9,
+                57.15
+              ]
+            ],
+            "bbox": {
+              "minX": 0,
+              "maxX": 88.9,
+              "minY": 0,
+              "maxY": 57.15
+            },
+            "coloredFace": {
+              "side": null,
+              "segmentId": "A"
+            },
+            "quantity": null,
+            "material": {
+              "type": "",
+              "name": "",
+              "productRef": null,
+              "gauge": "",
+              "thicknessMM": null
+            },
+            "finish": {
+              "manufacturer": "",
+              "name": "",
+              "code": "",
+              "system": "",
+              "selectionType": null,
+              "special": false,
+              "hex": null
+            },
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Choisissez une référence de couleur avant de demander le prix.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Couleur à préciser",
+              "selectionType": "unspecified",
+              "status": "finish_required"
+            },
+            "lengthMM": 3048,
+            "location": "",
+            "note": "",
+            "finishedSegmentSumMM": 146.04999999999998,
+            "developedWidthMM": null,
+            "developedWidth": null,
+            "developmentStatus": "requires_workshop_bend_parameters",
+            "validation": {
+              "valid": true,
+              "geometryComplete": true,
+              "specificationComplete": false,
+              "productionReady": false,
+              "errors": [],
+              "pending": [
+                {
+                  "code": "QUANTITY_REQUIRED",
+                  "path": "quantity",
+                  "message": "Quantité entière à préciser."
+                },
+                {
+                  "code": "MATERIAL_REQUIRED",
+                  "path": "material.type",
+                  "message": "Matière à préciser."
+                },
+                {
+                  "code": "COLOR_SOURCE_REQUIRED",
+                  "path": "finish",
+                  "message": "Précisez le fabricant ou le nuancier de la couleur."
+                },
+                {
+                  "code": "COLOR_CODE_REQUIRED",
+                  "path": "finish.code",
+                  "message": "Référence de couleur à préciser."
+                },
+                {
+                  "code": "COLORED_FACE_REQUIRED",
+                  "path": "coloredFace.side",
+                  "message": "Indiquez le côté coloré, gauche ou droit en suivant A vers les segments suivants."
+                }
+              ],
+              "warnings": [],
+              "workshopValidationRequired": true
+            },
+            "valid": true,
+            "complete": false,
+            "productionReady": false,
+            "pricing": {
+              "schema": "mir-piece-pricing-1",
+              "status": "on_request",
+              "requiresQuote": false,
+              "automaticPricingAllowed": false,
+              "currency": "CAD",
+              "rate": null,
+              "rateUnit": "in2",
+              "rateCents": null,
+              "areaSqIn": null,
+              "unitAmount": null,
+              "unitCents": null,
+              "quantity": null,
+              "lineAmount": null,
+              "lineCents": null,
+              "basis": "projected_outer_area_including_lips",
+              "tariffId": null,
+              "taxIncluded": null,
+              "taxStatus": "not_calculated",
+              "shippingStatus": "not_calculated",
+              "label": "Prix sur demande",
+              "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+              "sourceKind": "user_instruction",
+              "geometryErrors": [],
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Choisissez une référence de couleur avant de demander le prix.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Couleur à préciser",
+                "selectionType": "unspecified",
+                "status": "finish_required"
+              }
+            }
+          },
+          "tool": "select",
+          "kind": "profile",
+          "authoring": false,
+          "editingItemId": null,
+          "preview": "face",
+          "zoom": 1,
+          "pan": {
+            "x": 0,
+            "y": 0
+          },
+          "drawPointsMM": [],
+          "canUndo": false,
+          "canRedo": false
+        },
+        "face": {
+          "model": {
+            "version": "1.0.0",
+            "kind": "profile",
+            "id": "",
+            "name": "Pliage en L",
+            "template": "l",
+            "unit": "in",
+            "spec": {
+              "kind": "profile",
+              "unit": "in",
+              "quantity": "",
+              "material": {
+                "type": "",
+                "name": "",
+                "productRef": null,
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {},
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "A"
+              },
+              "location": "",
+              "note": "",
+              "template": "l",
+              "name": "Pliage en L",
+              "dimensions": {
+                "A": "3.5",
+                "B": "2.25"
+              },
+              "length": "120",
+              "mirrorX": false
+            },
+            "segments": [
+              {
+                "id": "A",
+                "label": "A",
+                "name": "Aile A",
+                "lengthMM": 88.89999999999999,
+                "start": [
+                  0,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  0
+                ],
+                "headingDeg": 0
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "name": "Aile B",
+                "lengthMM": 57.15,
+                "start": [
+                  88.9,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  57.15
+                ],
+                "headingDeg": 90
+              }
+            ],
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left",
+                "turnDeg": 90,
+                "label": "90° intérieur · gauche",
+                "at": [
+                  88.9,
+                  0
+                ],
+                "from": "A",
+                "to": "B"
+              }
+            ],
+            "pointsMM": [
+              [
+                0,
+                0
+              ],
+              [
+                88.9,
+                0
+              ],
+              [
+                88.9,
+                57.15
+              ]
+            ],
+            "bbox": {
+              "minX": 0,
+              "maxX": 88.9,
+              "minY": 0,
+              "maxY": 57.15
+            },
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            },
+            "quantity": null,
+            "material": {
+              "type": "",
+              "name": "",
+              "productRef": null,
+              "gauge": "",
+              "thicknessMM": null
+            },
+            "finish": {
+              "manufacturer": "",
+              "name": "",
+              "code": "",
+              "system": "",
+              "selectionType": null,
+              "special": false,
+              "hex": null
+            },
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Choisissez une référence de couleur avant de demander le prix.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Couleur à préciser",
+              "selectionType": "unspecified",
+              "status": "finish_required"
+            },
+            "lengthMM": 3048,
+            "location": "",
+            "note": "",
+            "finishedSegmentSumMM": 146.04999999999998,
+            "developedWidthMM": null,
+            "developedWidth": null,
+            "developmentStatus": "requires_workshop_bend_parameters",
+            "validation": {
+              "valid": true,
+              "geometryComplete": true,
+              "specificationComplete": false,
+              "productionReady": false,
+              "errors": [],
+              "pending": [
+                {
+                  "code": "QUANTITY_REQUIRED",
+                  "path": "quantity",
+                  "message": "Quantité entière à préciser."
+                },
+                {
+                  "code": "MATERIAL_REQUIRED",
+                  "path": "material.type",
+                  "message": "Matière à préciser."
+                },
+                {
+                  "code": "COLOR_SOURCE_REQUIRED",
+                  "path": "finish",
+                  "message": "Précisez le fabricant ou le nuancier de la couleur."
+                },
+                {
+                  "code": "COLOR_CODE_REQUIRED",
+                  "path": "finish.code",
+                  "message": "Référence de couleur à préciser."
+                }
+              ],
+              "warnings": [],
+              "workshopValidationRequired": true
+            },
+            "valid": true,
+            "complete": false,
+            "productionReady": false,
+            "pricing": {
+              "schema": "mir-piece-pricing-1",
+              "status": "on_request",
+              "requiresQuote": false,
+              "automaticPricingAllowed": false,
+              "currency": "CAD",
+              "rate": null,
+              "rateUnit": "in2",
+              "rateCents": null,
+              "areaSqIn": null,
+              "unitAmount": null,
+              "unitCents": null,
+              "quantity": null,
+              "lineAmount": null,
+              "lineCents": null,
+              "basis": "projected_outer_area_including_lips",
+              "tariffId": null,
+              "taxIncluded": null,
+              "taxStatus": "not_calculated",
+              "shippingStatus": "not_calculated",
+              "label": "Prix sur demande",
+              "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+              "sourceKind": "user_instruction",
+              "geometryErrors": [],
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Choisissez une référence de couleur avant de demander le prix.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Couleur à préciser",
+                "selectionType": "unspecified",
+                "status": "finish_required"
+              }
+            }
+          },
+          "tool": "select",
+          "kind": "profile",
+          "authoring": false,
+          "editingItemId": null,
+          "preview": "face",
+          "zoom": 1,
+          "pan": {
+            "x": 0,
+            "y": 0
+          },
+          "drawPointsMM": [],
+          "canUndo": false,
+          "canRedo": false
+        },
+        "configured": {
+          "model": {
+            "version": "1.0.0",
+            "kind": "profile",
+            "id": "",
+            "name": "Pliage en L",
+            "template": "l",
+            "unit": "in",
+            "spec": {
+              "kind": "profile",
+              "unit": "in",
+              "quantity": 2,
+              "material": {
+                "type": "aluminium",
+                "name": "",
+                "productRef": null,
+                "thickness": "",
+                "thicknessUnit": "in",
+                "gauge": ""
+              },
+              "finish": {
+                "selectionType": "manufacturer",
+                "system": "Nuancier Westlake Royal",
+                "manufacturer": "Westlake Royal",
+                "name": "Noir",
+                "code": "30",
+                "hex": null,
+                "swatchUrl": null,
+                "source": "https://aluminumassociates.com/s/2026-ROYAL-PRODUCT-GUIDE-CDN.pdf#page=133",
+                "availabilityNote": "Échantillon physique, stock et prix à confirmer avec MIR."
+              },
+              "coloredFace": {
+                "side": "left",
+                "segmentId": "A"
+              },
+              "location": "",
+              "note": "",
+              "template": "l",
+              "name": "Pliage en L",
+              "dimensions": {
+                "A": "3.5",
+                "B": "2.25"
+              },
+              "length": "120",
+              "mirrorX": false
+            },
+            "segments": [
+              {
+                "id": "A",
+                "label": "A",
+                "name": "Aile A",
+                "lengthMM": 88.89999999999999,
+                "start": [
+                  0,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  0
+                ],
+                "headingDeg": 0
+              },
+              {
+                "id": "B",
+                "label": "B",
+                "name": "Aile B",
+                "lengthMM": 57.15,
+                "start": [
+                  88.9,
+                  0
+                ],
+                "end": [
+                  88.9,
+                  57.15
+                ],
+                "headingDeg": 90
+              }
+            ],
+            "bends": [
+              {
+                "mode": "interior",
+                "angle": 90,
+                "direction": "left",
+                "turnDeg": 90,
+                "label": "90° intérieur · gauche",
+                "at": [
+                  88.9,
+                  0
+                ],
+                "from": "A",
+                "to": "B"
+              }
+            ],
+            "pointsMM": [
+              [
+                0,
+                0
+              ],
+              [
+                88.9,
+                0
+              ],
+              [
+                88.9,
+                57.15
+              ]
+            ],
+            "bbox": {
+              "minX": 0,
+              "maxX": 88.9,
+              "minY": 0,
+              "maxY": 57.15
+            },
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            },
+            "quantity": 2,
+            "material": {
+              "type": "aluminium",
+              "name": "",
+              "productRef": null,
+              "gauge": "",
+              "thicknessMM": null
+            },
+            "finish": {
+              "manufacturer": "Westlake Royal",
+              "name": "Noir",
+              "code": "30",
+              "system": "Nuancier Westlake Royal",
+              "selectionType": "manufacturer",
+              "special": false,
+              "hex": null
+            },
+            "quotePolicy": {
+              "version": "mir-color-quote-1",
+              "required": false,
+              "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+              "automaticPricingAllowed": false,
+              "customColor": false,
+              "label": "Prix sur demande",
+              "selectionType": "manufacturer",
+              "status": "price_unconfigured"
+            },
+            "lengthMM": 3048,
+            "location": "",
+            "note": "",
+            "finishedSegmentSumMM": 146.04999999999998,
+            "developedWidthMM": null,
+            "developedWidth": null,
+            "developmentStatus": "requires_workshop_bend_parameters",
+            "validation": {
+              "valid": true,
+              "geometryComplete": true,
+              "specificationComplete": true,
+              "productionReady": true,
+              "errors": [],
+              "pending": [],
+              "warnings": [],
+              "workshopValidationRequired": true
+            },
+            "valid": true,
+            "complete": true,
+            "productionReady": true,
+            "pricing": {
+              "schema": "mir-piece-pricing-1",
+              "status": "on_request",
+              "requiresQuote": false,
+              "automaticPricingAllowed": false,
+              "currency": "CAD",
+              "rate": null,
+              "rateUnit": "in2",
+              "rateCents": null,
+              "areaSqIn": null,
+              "unitAmount": null,
+              "unitCents": null,
+              "quantity": 2,
+              "lineAmount": null,
+              "lineCents": null,
+              "basis": "projected_outer_area_including_lips",
+              "tariffId": null,
+              "taxIncluded": null,
+              "taxStatus": "not_calculated",
+              "shippingStatus": "not_calculated",
+              "label": "Prix sur demande",
+              "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+              "sourceKind": "user_instruction",
+              "geometryErrors": [],
+              "quotePolicy": {
+                "version": "mir-color-quote-1",
+                "required": false,
+                "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+                "automaticPricingAllowed": false,
+                "customColor": false,
+                "label": "Prix sur demande",
+                "selectionType": "manufacturer",
+                "status": "price_unconfigured"
+              }
+            }
+          },
+          "tool": "select",
+          "kind": "profile",
+          "authoring": false,
+          "editingItemId": null,
+          "preview": "face",
+          "zoom": 1,
+          "pan": {
+            "x": 0,
+            "y": 0
+          },
+          "drawPointsMM": [],
+          "canUndo": false,
+          "canRedo": false
+        },
+        "cartUnchanged": true
+      }
+    }
+  ],
+  "captures": [
+    {
+      "file": "before/landing-fr-CA-1440.png",
+      "sha256": "93c9c38d365f48cdb9d086493217e103f3a0102dc336bcc7bd8bcada3b9c494a",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "url": "/pliage.html"
+    },
+    {
+      "file": "before/choice-fr-CA-1440.png",
+      "sha256": "102ae2561c7877b8cc7bd894e90ec7fef0e3d1ed9a48a401993bea7577c317a5",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/models-fr-CA-1440.png",
+      "sha256": "19d1ea3ffbaaa54c9150de71766970818ba3055e45d5af3891d6747de74dcb70",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/measurements-fr-CA-1440.png",
+      "sha256": "2285eb95b53157635e6a24a26af17f397d68aae9539e50e01ede5f34012fdcb3",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/painted-face-fr-CA-1440.png",
+      "sha256": "a95c38d2b79ee1c3e9d4810de73e152bb195a8bb805a454a3b405201c2eb5fd5",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/finish-empty-fr-CA-1440.png",
+      "sha256": "a95c38d2b79ee1c3e9d4810de73e152bb195a8bb805a454a3b405201c2eb5fd5",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/finish-ready-fr-CA-1440.png",
+      "sha256": "8b0d003e1b5915dc9b07d91892c5aa6a48777b3be521549c93699589bf605eb3",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/quantity-empty-fr-CA-1440.png",
+      "sha256": "79306ab988abfe271296ae053de65805def8034e26bc96c4b4c53808ec1f0fc3",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/quantity-ready-fr-CA-1440.png",
+      "sha256": "9e76a981566d177536eb12de8452db686f238d676522339ea2f69c7f95f0b8f8",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "fr-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/landing-en-CA-1440.png",
+      "sha256": "9da50ce2467b79b16264ed3dd1bd24d1803e7116fa5781ed1ca25a0d08049558",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "url": "/pliage.html"
+    },
+    {
+      "file": "before/choice-en-CA-1440.png",
+      "sha256": "a49eddcbb164dace01637834073af0f2991201463693d45d49c71cbeb651fe0a",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/models-en-CA-1440.png",
+      "sha256": "dd9e32218a65ea26e9875b450cf3b26e162990d3c6f8824deda392f03c08c05a",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/measurements-en-CA-1440.png",
+      "sha256": "5dd5a335750e8841247797d487c6d3150fdbc5431101d6d757d599523010ea0a",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/painted-face-en-CA-1440.png",
+      "sha256": "4b009594cc60c828cc827e3f14d59a88a435c25d1429d4760aa9cb34a481778b",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/finish-empty-en-CA-1440.png",
+      "sha256": "4b009594cc60c828cc827e3f14d59a88a435c25d1429d4760aa9cb34a481778b",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/finish-ready-en-CA-1440.png",
+      "sha256": "08fcaef39b108fe6978e766b6a4839c480bf52f2b4779675a3414d0148a2038f",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/quantity-empty-en-CA-1440.png",
+      "sha256": "598f0fcaaa01a00bc05850f3efcb58bc0ca459ac338585bf58380af38ce4fe0e",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    },
+    {
+      "file": "before/quantity-ready-en-CA-1440.png",
+      "sha256": "6721d3d323748d2d970d4853b045412de3fe8ad941c5572ba91d2df571991191",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "lang": "en-CA",
+      "url": "/production.html?mode=client&kind=profile"
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "httpErrors": [],
+  "blocked": [],
+  "expectedBlocked": [
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET"
+    },
+    {
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff",
+      "method": "GET"
+    }
+  ],
+  "expectedNetworkConsoleErrors": [
+    {
+      "lang": "fr-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "message": "Failed to load resource: net::ERR_FAILED",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "lang": "en-CA",
+      "size": {
+        "width": 1440,
+        "height": 900
+      },
+      "message": "Failed to load resource: net::ERR_FAILED",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    }
+  ],
+  "browser": "155.0.8059.79",
+  "server": "http://127.0.0.1:39843",
+  "resourceSha256": {
+    "pliage.html": "3a552b4f712f2b309dcd8bb759baea592c3ded8b1bfa6d0e050592f13dedd1e0",
+    "style.css": "7a9b04b2bf17c4c82c0d5639d367fd08544fbbaed0f5070bb88e4c0848445065",
+    "mir-client-signature.css": "d347ff921a059a371a3763f93910dd801c85a1c0c5e07c083bcab0449abb05e2",
+    "mir-v4.css": "547e0a3708072650aff08c83f859750560a15f4220c9b590263bd567b0ee3da0",
+    "mir-public-menu.css": "1ef60e057b3b524cf85c3f3513c41f53c712521fdeee184b02e06f08f2ddb33f",
+    "pliage.css": "9beedcb9eb6bd6b7cab96f3b9937cc7e99c054c444513f0e9e8bcb2de6d9f3be",
+    "mir-client-pliage.css": "c5da97c0ba02e3d3ac6ad70be671bc7fce387699bd34085f1d04ef738a4df347",
+    "mir-public-shell.css": "1858b664dc53fbc0b3bb1a03dbc5ec52ee9deb3e6de0c6912295d8e6b26ab1b6",
+    "mir-harmony.css": "1798aed84b7436aca078a962d8fcaab8ad5229e47be9afd0e1c8d9a70d41a2da",
+    "custom-model-cards.css": "8fa0a8316b4a8688dbf1b2661f0af4534f6c6f6360bdb86f59d1955c5eb21862",
+    "mir-public-audit.css": "146c210ac9109ea8a5eb55057e79978739bd0736fd10306ae94ae4bcd7271b29",
+    "mir-client-i18n.css": "819fe27d34fe97265b8ecce47377d1898db288a52c5f7cd8b6097789b2d3c2ca",
+    "mir-prestige-tools.css": "8172c011788c64df45d2ee9103f18be0be60b0b7ceb2466b076182b2fc6a67ec",
+    "mir-home-premium.css": "abf242b04f7175b32a0cc365adaf7480c8dd0886fad36ce5eface3d82d7e7851",
+    "mir-client-pages.css": "6144f0c930670a64f9622d45264df9847255c8019afca6aece0e3a2ce37ca3a1",
+    "assets/MIR-logo-officiel-original.svg": "7e9426e426351853f0956551270fae114de831e06aa3af9188711a18a6e5696c",
+    "production-model.js": "ae3d15fe991cca10d4cf92457a95b21d3be879b9225c5bcd33b603aa32cc77fe",
+    "custom-model-cards.js": "15dea475bdccaebc56899b2cf1b7b8f6bea9a6b628a066b04dbe2149e4c8413e",
+    "mir-prestige.css": "467e53a77cd61024135750c43f1cd4ca6515cf34249c46f9c64721b5d5e1d108",
+    "mir-client-header.css": "05f381a887e743d277eee4936f2f3edf3526ec4cff266dc706aeec0d3f8b410d",
+    "annotated-pdf.js": "473d7515a257e8e1c669bf3480b9d08a2a2ee7b5f172b7aa1a2a0973190b6413",
+    "mir-bending-lengths.js": "ab17953f00eb1e80ace2bf6c307173b0917d61c5058adafec5b2cd44ec51281f",
+    "mir-catalogue-policy.js": "db9f4071676a01a342e99cc9a2f2ffcdb6295aabab9b6e81473a6c18624169de",
+    "pliage.js": "2ea4cd20afe32763e9517a5bb461aedea34157e4a89a5a84f4276ba0374fdac9",
+    "mir-public-menu.js": "9690f28345f85e1190eb87fbda487ad05e8dadb96e85c0f75cdd6c7190873e63",
+    "mir-client-en-ca.js": "cbd2c2575d2015da25a7b968b8e5c1f77dbb3b6ca46390f51d60fe80fd04cee7",
+    "mir-client-i18n.js": "5ba9620f0215fd93cadadc588b9104def54878a05f31a84adc39a51510538536",
+    "mir-prestige-tools.js": "ad43460af8cb82be282ce7d58d26db77b7cd6ee364f90c08d9354d18dfea0158",
+    "mir-prestige.js": "d9c99fe3df0d70e918369492e69b13558517ca8c98b300a923f3ccf6fd72d82f",
+    "mir-client-pages.js": "c9ab984df7382d6fac731aca85f87aa0e2c640400d0079a8657883a5cc25e6b4",
+    "catalogue-fd6866b49d21.json": "4fb95308c21b11f97ec8bf8871899c2356df73f19fe6c0dfef4f9e6d8e10bde5",
+    "assets/fonts/dm-sans-variable.ttf": "8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d",
+    "production.html": "9019df0510dbfec1ecf5c2e4cf75c4e0df4e343f5c130cdfa5efa1865d1e39cd",
+    "mir-settings.js": "f3d807c99d4f84475b89f14dd38934ab6b3050d7031aa9de507a90c19746c042",
+    "mir-settings.css": "1ec301ca0d875f4971360b702ef188f8c941c5c2234a224808281577e5592086",
+    "production.css": "bebe7996232f3bd200353fc84b82d93807cf6aca0fa547d954b1eafa7d2a8809",
+    "production-admin-v4.css": "2ce03600a6e2b422f8cedd7d9530950b725016e9f10ff4c79320564a49007c8f",
+    "mir-procurement.css": "be9a3bd3e19689448b8b8ca8e30589614c54101803fe1af5ddf70b9c2b54f2ae",
+    "mir-freeform-workshop.css": "863de27882b0184fed97a9a9d99469551653892f5d7818500dda126d350bb1cb",
+    "mir-panel-admin.css": "2ca1b1c857dcf8e560c8b4e72549059f51a001e53afff478fb13e7d09f51489f",
+    "mir-panel-workbench.css": "547f8e5d69d90d010a375dab8e3e5c776163555459f22fef63ed2ba4c5206243",
+    "mir-production-signature.css": "d02732c5880dee97fbfa7b756083303101851443bb3991bb991eb46ddf2dfdb8",
+    "mir-production-client-nav.css": "af81ec78ad1836f154f7f097e8458153d244a3bdc078ad861d088751c6908ab6",
+    "studio-capture.mjs": "e27c886d266b60fddcbab3f6c1de8a6dd2f49437823befe169fd9bc8fe20a516",
+    "mir-workspace.css": "d78467e205e3fe14c368af99577f049db5a3eb53545879c33886087102ea3f2e",
+    "mir-estimate.css": "789fe7f7c43000c9a5a1e8b567e1a806c9b431d4b481e87bca26c917e3c7d880",
+    "mir-pliage-journey.css": "babae37d6d67c620912003e2ee9a5841b65e87defc453e98b928a268e0a66158",
+    "mir-panel-sketch.js": "3dae860af9363a9a946b4adc75a7fbc0fd11bcf5a0ca5db0da2c16a374c73e3c",
+    "mir-panel-roof.js": "d88a5d39a9c8eb47cfed25d9bc7424d8d5f712c1ed2b1c918b9e8980c162a3c9",
+    "mir-production-client-nav.js": "70f49447788469893c0f83464276e7eac4b4178edde35731bb8cc641bd2127e6",
+    "mir-bend-pricing.js": "016febc7cc68ba74a6e49c59a909dd03758d8d1ea1a47e097f0f3b19017bdfcf",
+    "production-volume.js": "c8e58d92c9513456025840e1b7d64db3b7a2fc00f04e79d527d0f8ff10453a40",
+    "unico-data.js": "21057a0823ab2e9fcf5a012b9dcb59efc3c67c59633ac91fe4dd6d2d668058b7",
+    "mir-panel-po-pdf.js": "380b90ee029d88516736f0f1a07cf82591b83f16c49ca34ce175dc5da4f27e5d",
+    "mir-po-workflow.js": "9991c7913cf9fb773238b00b95e9a4cdbb17b8822259beabbacfee7358e2e3b3",
+    "vendor/polygon-clipping/polygon-clipping.umd.min.js": "7f8619e84a86ce8dd400c9b50430e9c8cf8f26027b19eeb479f109f5c1a9d688",
+    "architectural-wall-geometry.js": "a2cc3d91ca3afeaec32744b0da60ee8c5ce76db5ea02b7ee0b776e0cce2e67c0",
+    "panel-layout-output.js": "8875c3ba29c4637577338b568fb69a16405fffc76623c7b2a5989720d4051c7d",
+    "panel-layout-engine.js": "cb03689f691d59224f7794679e9a95d41c234393c6028509a3c620d4407cfb41",
+    "atelier-essai/mir-calepinage-extension.js": "c3966ad5becc006cd0fe1225976188bd194580e0105d25766898d046acc916c7",
+    "profile-production-transfer.js": "557b26e5cf8b5111629098d92ec13cd112b124b714843c93ddb7eacc775953bc",
+    "mir-bending-presets.js": "073d3ae55d01a131ff12f29b81d874219b46f14cc89293866dfd36fa3659bc23",
+    "model-measure-defaults.js": "73c9084f3e9f87fbaa04c963f1a5acc39e286eb8a1924af8acf36b5cbafad6bf",
+    "template-library-backup.js": "75e3ec68f302f0880f1550e8a233c188ad258625b90591954acb17405c624b42",
+    "kaycan-flat-preview.js": "45a8ba6ec0a434bb832124d687266c6cde3a2fa2a629a2cb07f21126f5f14d36",
+    "mir-miniature.js": "afcf61c8ae9b2cc76023607b2b45351039b8766dd175ce429f77fd9c826bc524",
+    "mir-bending-finishes.js": "859793c39ec457db5f542a04a7f540ac4fe62c64b4e02787efcd55f8752a235e",
+    "shared-config.js": "0d06f91657ebb4b904461b9b62dc4aca6976ddde882b8af4355b30caf22b3e7d",
+    "mir-shared-client.js": "4eab28e9fd56e63e3de93fce236b54bdd53191984cfa1afa5dab5d9ac845f1cf",
+    "mir-direct-model-save.js": "9a769a1aa543628eef732f3e134fd9df3d5ac4486f3bc1a464aab1ec88fe630a",
+    "mir-store-color-policy.js": "5e57e8e53910f5a0633e666ba7888efe86d8f2b1ef9f06b49b13417bd267eace",
+    "production-app.js": "822769b75d1653ef996cfe5098ccead38cbfafc2c57b4ca610aff0dad9d5d80b",
+    "mir-client-pliage-viewport.js": "b8e4624a8acd178fee13f7814d40b3621b6c257a3dea2d7ef400c81d6b6dfbac",
+    "production-admin-v4.js": "48e463c9b61edf1504f249e035c91fee6840b9cb1c9eaa3182fe63817f9da67d",
+    "mir-profile-recognition.js": "98f9ecc343eeb901c8b0b1a20e0fe8e77895ba383704a585d35760881469deda",
+    "mir-unified-order-cart.js": "ce2f48a455bd891577fd228a3933a50242926f6c6566e32ec68308e02116ade0",
+    "mir-panel-workbench.js": "6281d645ccc156a51aac83de2478a13c490b8f4bac2e1dab100a3d40c3c25fb7",
+    "mir-procurement.js": "5af4b736257fe5ba5e235ba20ea04447899d40ee9e21a831f2f48a8cbcae6101",
+    "mir-admin-live3d.js": "ca81b16fc1a5579fe5c193553995ad3428af9a8edf0f7df261bb94f04dd8f58b",
+    "mir-freeform-workshop.js": "57074c1537103d385299b6f97ecc0c7a855f2f13a9710b409c65afd534849119",
+    "mir-harmony.js": "320025bb12ecbb764c79eb6f70d528b8b24fb78c6980dee381c484358b18621a",
+    "mir-estimate-config.js": "c310322f51e949f4f77ce3fbcf31c72030d3be46a913d7a80450d42f829537e3",
+    "mir-estimate-drafts.js": "808d69fb5ec4108516a393d3137a5a1988ade79140b33e92ea6b34df6b62a3f7",
+    "portal-config.js": "599798194b9b570ddeccc6d9c9a74c0f6c2b4a8db07347cacf12ca95c4acc0f4",
+    "vendor/supabase-client.js": "b843abf0e28ccd705e3cf04f9fdd935d85a3173b86c8946de7574ec7f1181035",
+    "mir-workspace.js": "8cc72a07676928d4acc17e52e5b7ffc4a2ba942129a6dd31c09c6e152f891e94",
+    "mir-estimate.js": "e8cf75925b8f758b6d6437416792d743fc90d427a9c39dd758307f4ce1a4e867",
+    "mir-estimate-upload.js": "1891f7786af1c510e97def7751e7c26ebd846572816bc57319a6ee6810e8fd61",
+    "ral-classic.json": "4d5b5c7edca669d40dbbb536758c9d9eae0fe7c1c52412704d7e84beb55c5b85"
+  },
+  "testSha256": "8e9be96e1dcbdbe31ab57619e5eadbfd70714bb249fd46d64eef8b737c8ee3ab",
+  "passed": true
+}

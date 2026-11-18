@@ -1,0 +1,10 @@
+PASS Une lecture commune ne crée pas de troisième sauvegarde ni ne modifie les données
+PASS Une sauvegarde JSON conserve les cotes, le modèle versionné et le refus d’envoi
+PASS Le PDF reprend les pages des moteurs existants, jamais de nouveaux faux développés
+PASS Deux projets nommés différemment ne sont jamais fusionnés automatiquement
+PASS Une association autorisée ne change que le nom du dossier existant
+PASS Une sélection non nommée propose un nom, sans modification automatique
+PASS Une référence masquée ne rejoint pas un export à partir de l’écran sélection
+PASS L’ancien formulaire rapide bloque un faux dossier complet sans effacer son historique
+PASS Données illisibles, inconnues et dossiers vides : aucune perte silencieuse
+MIR dossier commun : 9/9 contrats réussis

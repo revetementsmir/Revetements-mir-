@@ -1,0 +1,838 @@
+{
+  "id": "QA-PLIAGE03-PDF-LOCAL",
+  "project": "QA fictif — contrôle PDF local",
+  "poNumber": "QA-LOCAL-2-FACES",
+  "foreman": "Personne fictive",
+  "date": "2026-11-18",
+  "revision": "A",
+  "notes": "Deux pièces fictives pour recette uniquement. Aucun stock ou prix MIR confirmé.",
+  "nextNumber": 3,
+  "items": [
+    {
+      "id": "M001",
+      "kind": "profile",
+      "editableTrace": true,
+      "spec": {
+        "kind": "profile",
+        "unit": "in",
+        "length": 120,
+        "quantity": 2,
+        "material": {
+          "type": "aluminium",
+          "name": "Gentek — Feuille peinte aluminium 3037, 24 po × 98,5 pi",
+          "productRef": "gentek-coil-3037",
+          "thickness": "",
+          "gauge": ""
+        },
+        "finish": {
+          "selectionType": "manufacturer",
+          "manufacturer": "Gentek Canada",
+          "system": "Nuancier Gentek Canada",
+          "name": "Blanc Pur 30",
+          "code": "431",
+          "swatchUrl": "./assets/catalogue-swatches/gentek-blanc-pur-30-ef9f11cf.png",
+          "source": "https://www.gentek.ca/wp-content/uploads/sites/2/2023/08/Gentek-Product-Directory-ENG-March2026.pdf#page=60",
+          "availabilityNote": "Teinte indiquée pour le rouleau 3037 dans le guide Gentek 2026. Stock et fini à confirmer avec MIR."
+        },
+        "location": "Recette locale seulement",
+        "note": "Fixture fictive. Aucun dossier utilisateur, aucune commande, aucun envoi.",
+        "template": "custom",
+        "startAngle": 0,
+        "bends": [
+          {
+            "mode": "signed",
+            "angle": -30
+          },
+          {
+            "mode": "signed",
+            "angle": 90
+          }
+        ],
+        "segments": [
+          {
+            "label": "A",
+            "name": "",
+            "length": 5
+          },
+          {
+            "label": "B",
+            "name": "",
+            "length": 3
+          },
+          {
+            "label": "C",
+            "name": "",
+            "length": 2
+          }
+        ],
+        "coloredFace": {
+          "side": "left",
+          "segmentId": "A"
+        },
+        "name": "QA fictif — oblique face 1",
+        "id": "M001"
+      },
+      "snapshot": {
+        "schema": "mir-production-instance-1",
+        "id": "M001",
+        "templateId": "pliage03-pdf-fixture-0",
+        "templateVersion": 1,
+        "templateSnapshot": {
+          "schema": "mir-production-template-1",
+          "id": "pliage03-pdf-fixture-0",
+          "name": "QA fictif — oblique face 1",
+          "version": 1,
+          "description": "",
+          "kind": "profile",
+          "topology": {
+            "kind": "profile",
+            "segments": [
+              {
+                "label": "A",
+                "name": ""
+              },
+              {
+                "label": "B",
+                "name": ""
+              },
+              {
+                "label": "C",
+                "name": ""
+              }
+            ],
+            "bends": [
+              {
+                "mode": "signed",
+                "angle": -30
+              },
+              {
+                "mode": "signed",
+                "angle": 90
+              }
+            ],
+            "startAngle": 0,
+            "coloredFace": {
+              "side": "left",
+              "segmentId": "A"
+            }
+          },
+          "fields": [
+            {
+              "key": "A",
+              "label": "A",
+              "type": "measure",
+              "value": null,
+              "required": true
+            },
+            {
+              "key": "B",
+              "label": "B",
+              "type": "measure",
+              "value": null,
+              "required": true
+            },
+            {
+              "key": "C",
+              "label": "C",
+              "type": "measure",
+              "value": null,
+              "required": true
+            },
+            {
+              "key": "length",
+              "label": "Longueur de la pièce",
+              "type": "measure",
+              "value": null,
+              "required": true
+            }
+          ],
+          "previewProportions": {
+            "illustrative": true,
+            "unitless": true,
+            "segmentRatios": [
+              1,
+              0.5999999999999999,
+              0.39999999999999997
+            ]
+          },
+          "clientDefaults": {},
+          "measurementDefaults": null,
+          "referenceUnit": null,
+          "previousVersion": null,
+          "fingerprint": "8b23d20f"
+        },
+        "modelVersion": "1.0.0",
+        "revision": 1,
+        "previousRevisionId": null,
+        "values": {
+          "instanceId": "M001",
+          "name": "QA fictif — oblique face 1",
+          "unit": "in",
+          "measurements": {
+            "A": 5,
+            "B": 3,
+            "C": 2,
+            "length": 120
+          },
+          "length": 120,
+          "quantity": 2,
+          "material": {
+            "type": "aluminium",
+            "name": "Gentek — Feuille peinte aluminium 3037, 24 po × 98,5 pi",
+            "productRef": "gentek-coil-3037",
+            "thickness": "",
+            "gauge": ""
+          },
+          "finish": {
+            "selectionType": "manufacturer",
+            "manufacturer": "Gentek Canada",
+            "system": "Nuancier Gentek Canada",
+            "name": "Blanc Pur 30",
+            "code": "431",
+            "swatchUrl": "./assets/catalogue-swatches/gentek-blanc-pur-30-ef9f11cf.png",
+            "source": "https://www.gentek.ca/wp-content/uploads/sites/2/2023/08/Gentek-Product-Directory-ENG-March2026.pdf#page=60",
+            "availabilityNote": "Teinte indiquée pour le rouleau 3037 dans le guide Gentek 2026. Stock et fini à confirmer avec MIR."
+          },
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "A"
+          },
+          "location": "Recette locale seulement",
+          "note": "Fixture fictive. Aucun dossier utilisateur, aucune commande, aucun envoi."
+        },
+        "spec": {
+          "kind": "profile",
+          "unit": "in",
+          "length": 120,
+          "quantity": 2,
+          "material": {
+            "type": "aluminium",
+            "name": "Gentek — Feuille peinte aluminium 3037, 24 po × 98,5 pi",
+            "productRef": "gentek-coil-3037",
+            "thickness": "",
+            "gauge": ""
+          },
+          "finish": {
+            "selectionType": "manufacturer",
+            "manufacturer": "Gentek Canada",
+            "system": "Nuancier Gentek Canada",
+            "name": "Blanc Pur 30",
+            "code": "431",
+            "swatchUrl": "./assets/catalogue-swatches/gentek-blanc-pur-30-ef9f11cf.png",
+            "source": "https://www.gentek.ca/wp-content/uploads/sites/2/2023/08/Gentek-Product-Directory-ENG-March2026.pdf#page=60",
+            "availabilityNote": "Teinte indiquée pour le rouleau 3037 dans le guide Gentek 2026. Stock et fini à confirmer avec MIR."
+          },
+          "location": "Recette locale seulement",
+          "note": "Fixture fictive. Aucun dossier utilisateur, aucune commande, aucun envoi.",
+          "template": "custom",
+          "startAngle": 0,
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": -30
+            },
+            {
+              "mode": "signed",
+              "angle": 90
+            }
+          ],
+          "segments": [
+            {
+              "label": "A",
+              "name": "",
+              "length": 5
+            },
+            {
+              "label": "B",
+              "name": "",
+              "length": 3
+            },
+            {
+              "label": "C",
+              "name": "",
+              "length": 2
+            }
+          ],
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "A"
+          },
+          "name": "QA fictif — oblique face 1",
+          "id": "M001"
+        },
+        "measurements": {
+          "A": 5,
+          "B": 3,
+          "C": 2,
+          "length": 120
+        },
+        "geometry": {
+          "kind": "profile",
+          "pointsMM": [
+            [
+              0,
+              0
+            ],
+            [
+              127,
+              0
+            ],
+            [
+              192.9911357684,
+              -38.1
+            ],
+            [
+              218.3911357684,
+              5.8940905122
+            ]
+          ],
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 127,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                127,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 76.19999999999999,
+              "start": [
+                127,
+                0
+              ],
+              "end": [
+                192.9911357684,
+                -38.1
+              ],
+              "headingDeg": -30
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                192.9911357684,
+                -38.1
+              ],
+              "end": [
+                218.3911357684,
+                5.8940905122
+              ],
+              "headingDeg": 60
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": -30,
+              "turnDeg": -30,
+              "label": "Rotation -30°",
+              "at": [
+                127,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "signed",
+              "angle": 90,
+              "turnDeg": 90,
+              "label": "Rotation 90°",
+              "at": [
+                192.9911357684,
+                -38.1
+              ],
+              "from": "B",
+              "to": "C"
+            }
+          ],
+          "coloredFace": {
+            "side": "left",
+            "segmentId": "A"
+          }
+        },
+        "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"QA fictif — oblique face 1 · coupe et cotes finies\"><title>QA fictif — oblique face 1 · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M001 · QA fictif — oblique face 1</text><path d=\"M50 201.7296 L316.3386 201.7296 L454.7323 281.6312 L508 189.3688\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M50 201.7296 L316.3386 201.7296 L454.7323 281.6312 L508 189.3688\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"left\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"183.1693,102.7296 189.0472,117.6394 205.0436,118.6222 192.6799,128.8198 196.6884,144.337 183.1693,135.7296 169.6503,144.337 173.6588,128.8198 161.295,118.6222 177.2915,117.6394\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M50,201.7296L50,169.7296 M316.3386,201.7296L316.3386,169.7296 M50,169.7296L316.3386,169.7296\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"183.1693\" data-anchor-y=\"201.7296\" data-segment-start-x=\"50\" data-segment-start-y=\"201.7296\" data-segment-end-x=\"316.3386\" data-segment-end-y=\"201.7296\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(183.1693,169.7296) rotate(0)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 5 po</text></g></g><path class=\"profile-measure-leader\" data-segment-index=\"1\" d=\"M438.3201,198.2548L385.5355,241.6804\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"385.5355\" data-anchor-y=\"241.6804\" data-segment-start-x=\"316.3386\" data-segment-start-y=\"201.7296\" data-segment-end-x=\"454.7323\" data-segment-end-y=\"281.6312\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(438.3201,198.2548) rotate(30)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 3 po</text></g></g><path class=\"profile-measure-leader\" data-segment-index=\"2\" d=\"M512.7918,309.0692L481.3661,235.5\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"C\" data-segment-index=\"2\" data-anchor-x=\"481.3661\" data-anchor-y=\"235.5\" data-segment-start-x=\"454.7323\" data-segment-start-y=\"281.6312\" data-segment-end-x=\"508\" data-segment-end-y=\"189.3688\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(512.7918,309.0692) rotate(-60)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">C · 2 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 5 po</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 30°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 3 po</text><text x=\"578\" y=\"149\" font-size=\"15\">Pli B–C = 90°</text><text x=\"578\" y=\"170\" font-size=\"15\">C = 2 po</text><text x=\"578\" y=\"191\" font-size=\"15\">Développé total = 10 po (nominal)</text><text x=\"578\" y=\"212\" font-size=\"15\">Face colorée : Face 1 — côté indiqué</text><text x=\"578\" y=\"233\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"254\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"275\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+        "status": "specified",
+        "quotePolicy": {
+          "version": "mir-color-quote-1",
+          "required": false,
+          "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+          "automaticPricingAllowed": false,
+          "customColor": false,
+          "label": "Prix sur demande",
+          "selectionType": "manufacturer",
+          "status": "price_unconfigured"
+        },
+        "pricing": {
+          "schema": "mir-piece-pricing-1",
+          "status": "on_request",
+          "requiresQuote": false,
+          "automaticPricingAllowed": false,
+          "currency": "CAD",
+          "rate": null,
+          "rateUnit": "in2",
+          "rateCents": null,
+          "areaSqIn": null,
+          "unitAmount": null,
+          "unitCents": null,
+          "quantity": 2,
+          "lineAmount": null,
+          "lineCents": null,
+          "basis": "projected_outer_area_including_lips",
+          "tariffId": null,
+          "taxIncluded": null,
+          "taxStatus": "not_calculated",
+          "shippingStatus": "not_calculated",
+          "label": "Prix sur demande",
+          "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+          "sourceKind": "user_instruction",
+          "geometryErrors": [],
+          "quotePolicy": {
+            "version": "mir-color-quote-1",
+            "required": false,
+            "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+            "automaticPricingAllowed": false,
+            "customColor": false,
+            "label": "Prix sur demande",
+            "selectionType": "manufacturer",
+            "status": "price_unconfigured"
+          }
+        },
+        "workshopValidationRequired": true,
+        "revisionId": "M001-r1-5ab50007"
+      },
+      "history": [],
+      "selection": {
+        "materialId": "gentek-coil-3037",
+        "colorSystem": "manufacturer",
+        "colorId": "gentek-blanc-pur-30"
+      }
+    },
+    {
+      "id": "M002",
+      "kind": "profile",
+      "editableTrace": true,
+      "spec": {
+        "kind": "profile",
+        "unit": "in",
+        "length": 120,
+        "quantity": 3,
+        "material": {
+          "type": "aluminium",
+          "name": "Gentek — Feuille peinte aluminium 3037, 24 po × 98,5 pi",
+          "productRef": "gentek-coil-3037",
+          "thickness": "",
+          "gauge": ""
+        },
+        "finish": {
+          "selectionType": "manufacturer",
+          "manufacturer": "Gentek Canada",
+          "system": "Nuancier Gentek Canada",
+          "name": "Amande",
+          "code": "432",
+          "swatchUrl": "./assets/catalogue-swatches/gentek-amande-6352526a.png",
+          "source": "https://www.gentek.ca/wp-content/uploads/sites/2/2023/08/Gentek-Product-Directory-ENG-March2026.pdf#page=60",
+          "availabilityNote": "Teinte indiquée pour le rouleau 3037 dans le guide Gentek 2026. Stock et fini à confirmer avec MIR."
+        },
+        "location": "Recette locale seulement",
+        "note": "Fixture fictive. Aucun dossier utilisateur, aucune commande, aucun envoi.",
+        "template": "custom",
+        "startAngle": 0,
+        "bends": [
+          {
+            "mode": "signed",
+            "angle": 45.5
+          },
+          {
+            "mode": "signed",
+            "angle": -67.25
+          }
+        ],
+        "segments": [
+          {
+            "label": "A",
+            "name": "",
+            "length": 5
+          },
+          {
+            "label": "B",
+            "name": "",
+            "length": 3
+          },
+          {
+            "label": "C",
+            "name": "",
+            "length": 2
+          }
+        ],
+        "coloredFace": {
+          "side": "right",
+          "segmentId": "A"
+        },
+        "name": "QA fictif — oblique face 2",
+        "id": "M002"
+      },
+      "snapshot": {
+        "schema": "mir-production-instance-1",
+        "id": "M002",
+        "templateId": "pliage03-pdf-fixture-1",
+        "templateVersion": 1,
+        "templateSnapshot": {
+          "schema": "mir-production-template-1",
+          "id": "pliage03-pdf-fixture-1",
+          "name": "QA fictif — oblique face 2",
+          "version": 1,
+          "description": "",
+          "kind": "profile",
+          "topology": {
+            "kind": "profile",
+            "segments": [
+              {
+                "label": "A",
+                "name": ""
+              },
+              {
+                "label": "B",
+                "name": ""
+              },
+              {
+                "label": "C",
+                "name": ""
+              }
+            ],
+            "bends": [
+              {
+                "mode": "signed",
+                "angle": 45.5
+              },
+              {
+                "mode": "signed",
+                "angle": -67.25
+              }
+            ],
+            "startAngle": 0,
+            "coloredFace": {
+              "side": "right",
+              "segmentId": "A"
+            }
+          },
+          "fields": [
+            {
+              "key": "A",
+              "label": "A",
+              "type": "measure",
+              "value": null,
+              "required": true
+            },
+            {
+              "key": "B",
+              "label": "B",
+              "type": "measure",
+              "value": null,
+              "required": true
+            },
+            {
+              "key": "C",
+              "label": "C",
+              "type": "measure",
+              "value": null,
+              "required": true
+            },
+            {
+              "key": "length",
+              "label": "Longueur de la pièce",
+              "type": "measure",
+              "value": null,
+              "required": true
+            }
+          ],
+          "previewProportions": {
+            "illustrative": true,
+            "unitless": true,
+            "segmentRatios": [
+              1,
+              0.5999999999999999,
+              0.39999999999999997
+            ]
+          },
+          "clientDefaults": {},
+          "measurementDefaults": null,
+          "referenceUnit": null,
+          "previousVersion": null,
+          "fingerprint": "19669230"
+        },
+        "modelVersion": "1.0.0",
+        "revision": 1,
+        "previousRevisionId": null,
+        "values": {
+          "instanceId": "M002",
+          "name": "QA fictif — oblique face 2",
+          "unit": "in",
+          "measurements": {
+            "A": 5,
+            "B": 3,
+            "C": 2,
+            "length": 120
+          },
+          "length": 120,
+          "quantity": 3,
+          "material": {
+            "type": "aluminium",
+            "name": "Gentek — Feuille peinte aluminium 3037, 24 po × 98,5 pi",
+            "productRef": "gentek-coil-3037",
+            "thickness": "",
+            "gauge": ""
+          },
+          "finish": {
+            "selectionType": "manufacturer",
+            "manufacturer": "Gentek Canada",
+            "system": "Nuancier Gentek Canada",
+            "name": "Amande",
+            "code": "432",
+            "swatchUrl": "./assets/catalogue-swatches/gentek-amande-6352526a.png",
+            "source": "https://www.gentek.ca/wp-content/uploads/sites/2/2023/08/Gentek-Product-Directory-ENG-March2026.pdf#page=60",
+            "availabilityNote": "Teinte indiquée pour le rouleau 3037 dans le guide Gentek 2026. Stock et fini à confirmer avec MIR."
+          },
+          "coloredFace": {
+            "side": "right",
+            "segmentId": "A"
+          },
+          "location": "Recette locale seulement",
+          "note": "Fixture fictive. Aucun dossier utilisateur, aucune commande, aucun envoi."
+        },
+        "spec": {
+          "kind": "profile",
+          "unit": "in",
+          "length": 120,
+          "quantity": 3,
+          "material": {
+            "type": "aluminium",
+            "name": "Gentek — Feuille peinte aluminium 3037, 24 po × 98,5 pi",
+            "productRef": "gentek-coil-3037",
+            "thickness": "",
+            "gauge": ""
+          },
+          "finish": {
+            "selectionType": "manufacturer",
+            "manufacturer": "Gentek Canada",
+            "system": "Nuancier Gentek Canada",
+            "name": "Amande",
+            "code": "432",
+            "swatchUrl": "./assets/catalogue-swatches/gentek-amande-6352526a.png",
+            "source": "https://www.gentek.ca/wp-content/uploads/sites/2/2023/08/Gentek-Product-Directory-ENG-March2026.pdf#page=60",
+            "availabilityNote": "Teinte indiquée pour le rouleau 3037 dans le guide Gentek 2026. Stock et fini à confirmer avec MIR."
+          },
+          "location": "Recette locale seulement",
+          "note": "Fixture fictive. Aucun dossier utilisateur, aucune commande, aucun envoi.",
+          "template": "custom",
+          "startAngle": 0,
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": 45.5
+            },
+            {
+              "mode": "signed",
+              "angle": -67.25
+            }
+          ],
+          "segments": [
+            {
+              "label": "A",
+              "name": "",
+              "length": 5
+            },
+            {
+              "label": "B",
+              "name": "",
+              "length": 3
+            },
+            {
+              "label": "C",
+              "name": "",
+              "length": 2
+            }
+          ],
+          "coloredFace": {
+            "side": "right",
+            "segmentId": "A"
+          },
+          "name": "QA fictif — oblique face 2",
+          "id": "M002"
+        },
+        "measurements": {
+          "A": 5,
+          "B": 3,
+          "C": 2,
+          "length": 120
+        },
+        "geometry": {
+          "kind": "profile",
+          "pointsMM": [
+            [
+              0,
+              0
+            ],
+            [
+              127,
+              0
+            ],
+            [
+              180.4092859396,
+              54.3496842255
+            ],
+            [
+              227.5928112255,
+              35.5253664
+            ]
+          ],
+          "segments": [
+            {
+              "id": "A",
+              "label": "A",
+              "name": "",
+              "lengthMM": 127,
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                127,
+                0
+              ],
+              "headingDeg": 0
+            },
+            {
+              "id": "B",
+              "label": "B",
+              "name": "",
+              "lengthMM": 76.19999999999999,
+              "start": [
+                127,
+                0
+              ],
+              "end": [
+                180.4092859396,
+                54.3496842255
+              ],
+              "headingDeg": 45.5
+            },
+            {
+              "id": "C",
+              "label": "C",
+              "name": "",
+              "lengthMM": 50.8,
+              "start": [
+                180.4092859396,
+                54.3496842255
+              ],
+              "end": [
+                227.5928112255,
+                35.5253664
+              ],
+              "headingDeg": -21.75
+            }
+          ],
+          "bends": [
+            {
+              "mode": "signed",
+              "angle": 45.5,
+              "turnDeg": 45.5,
+              "label": "Rotation 45.5°",
+              "at": [
+                127,
+                0
+              ],
+              "from": "A",
+              "to": "B"
+            },
+            {
+              "mode": "signed",
+              "angle": -67.25,
+              "turnDeg": -67.25,
+              "label": "Rotation -67.25°",
+              "at": [
+                180.4092859396,
+                54.3496842255
+              ],
+              "from": "B",
+              "to": "C"
+            }
+          ],
+          "coloredFace": {
+            "side": "right",
+            "segmentId": "A"
+          }
+        },
+        "drawingSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"480\" viewBox=\"0 0 900 480\" role=\"img\" aria-label=\"QA fictif — oblique face 2 · coupe et cotes finies\"><title>QA fictif — oblique face 2 · coupe et cotes finies</title><rect width=\"900\" height=\"480\" fill=\"#fff\"/><g font-family=\"Arial,sans-serif\" fill=\"#26332b\"><text x=\"24\" y=\"34\" font-size=\"23\" font-weight=\"700\">M002 · QA fictif — oblique face 2</text><path d=\"M50 290.1857 L305.5705 290.1857 L413.0495 180.8143 L508 218.6957\" fill=\"none\" stroke=\"#304b3d\" stroke-width=\"9\" stroke-linejoin=\"miter\"/><path d=\"M50 290.1857 L305.5705 290.1857 L413.0495 180.8143 L508 218.6957\" fill=\"none\" stroke=\"#dfe8e3\" stroke-width=\"4\" stroke-linejoin=\"miter\"/><g data-painted-side=\"right\" data-painted-segment=\"A\"><polygon class=\"profile-painted-star\" points=\"177.7852,343.1857 183.6631,358.0956 199.6595,359.0783 187.2958,369.2759 191.3043,384.7931 177.7852,376.1857 164.2662,384.7931 168.2747,369.2759 155.9109,359.0783 171.9074,358.0956\" fill=\"#ffcf4d\" stroke=\"#202e29\" stroke-width=\"4\" stroke-linejoin=\"round\"/></g><path class=\"profile-dimension-line\" data-segment-index=\"0\" d=\"M50,290.1857L50,322.1857 M305.5705,290.1857L305.5705,322.1857 M50,322.1857L305.5705,322.1857\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"A\" data-segment-index=\"0\" data-anchor-x=\"177.7852\" data-anchor-y=\"290.1857\" data-segment-start-x=\"50\" data-segment-start-y=\"290.1857\" data-segment-end-x=\"305.5705\" data-segment-end-y=\"290.1857\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(177.7852,322.1857) rotate(0)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">A · 5 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"1\" d=\"M305.5705,290.1857L351.2185,335.0439 M413.0495,180.8143L458.6975,225.6725 M351.2185,335.0439L458.6975,225.6725\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"B\" data-segment-index=\"1\" data-anchor-x=\"359.31\" data-anchor-y=\"235.5\" data-segment-start-x=\"305.5705\" data-segment-start-y=\"290.1857\" data-segment-end-x=\"413.0495\" data-segment-end-y=\"180.8143\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(404.958,280.3582) rotate(-45.5)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">B · 3 po</text></g></g><path class=\"profile-dimension-line\" data-segment-index=\"2\" d=\"M413.0495,180.8143L430.8362,136.2314 M508,218.6957L525.7868,174.1128 M430.8362,136.2314L525.7868,174.1128\" fill=\"none\" stroke=\"#667e60\" stroke-width=\"1.3\"/><g class=\"profile-side-marker\" data-marker-label=\"C\" data-segment-index=\"2\" data-anchor-x=\"460.5247\" data-anchor-y=\"199.755\" data-segment-start-x=\"413.0495\" data-segment-start-y=\"180.8143\" data-segment-end-x=\"508\" data-segment-end-y=\"218.6957\" pointer-events=\"none\" aria-hidden=\"true\"><g transform=\"translate(478.3115,155.1721) rotate(21.75)\"><rect x=\"-36\" y=\"-12\" width=\"72\" height=\"24\" rx=\"3\" fill=\"white\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-size=\"15\" fill=\"#263d30\">C · 2 po</text></g></g><line x1=\"558\" y1=\"62\" x2=\"558\" y2=\"424\" stroke=\"#dde4d7\"/><text x=\"578\" y=\"86\" font-size=\"15\">A = 5 po</text><text x=\"578\" y=\"107\" font-size=\"15\">Pli A–B = 45.5°</text><text x=\"578\" y=\"128\" font-size=\"15\">B = 3 po</text><text x=\"578\" y=\"149\" font-size=\"15\">Pli B–C = 67.25°</text><text x=\"578\" y=\"170\" font-size=\"15\">C = 2 po</text><text x=\"578\" y=\"191\" font-size=\"15\">Développé total = 10 po (nominal)</text><text x=\"578\" y=\"212\" font-size=\"15\">Face colorée : Face 2 — côté indiqué</text><text x=\"578\" y=\"233\" font-size=\"15\">par l’étoile</text><text x=\"578\" y=\"254\" font-size=\"15\">Développé de tôle : à valider par</text><text x=\"578\" y=\"275\" font-size=\"15\">l’atelier.</text><text x=\"24\" y=\"441\" font-size=\"14\" fill=\"#5c685e\">L = 120 po · coupe à rayon nul pour la cotation</text><text x=\"24\" y=\"463\" font-size=\"13\" fill=\"#5c685e\">Pièce finie. Rayons, épaisseur réelle et compensation de pliage : atelier.</text></g></svg>",
+        "status": "specified",
+        "quotePolicy": {
+          "version": "mir-color-quote-1",
+          "required": false,
+          "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+          "automaticPricingAllowed": false,
+          "customColor": false,
+          "label": "Prix sur demande",
+          "selectionType": "manufacturer",
+          "status": "price_unconfigured"
+        },
+        "pricing": {
+          "schema": "mir-piece-pricing-1",
+          "status": "on_request",
+          "requiresQuote": false,
+          "automaticPricingAllowed": false,
+          "currency": "CAD",
+          "rate": null,
+          "rateUnit": "in2",
+          "rateCents": null,
+          "areaSqIn": null,
+          "unitAmount": null,
+          "unitCents": null,
+          "quantity": 3,
+          "lineAmount": null,
+          "lineCents": null,
+          "basis": "projected_outer_area_including_lips",
+          "tariffId": null,
+          "taxIncluded": null,
+          "taxStatus": "not_calculated",
+          "shippingStatus": "not_calculated",
+          "label": "Prix sur demande",
+          "note": "Aucun tarif automatique n’est configuré pour cette pièce.",
+          "sourceKind": "user_instruction",
+          "geometryErrors": [],
+          "quotePolicy": {
+            "version": "mir-color-quote-1",
+            "required": false,
+            "reason": "Le tarif et la disponibilité de cette référence fabricant restent à confirmer.",
+            "automaticPricingAllowed": false,
+            "customColor": false,
+            "label": "Prix sur demande",
+            "selectionType": "manufacturer",
+            "status": "price_unconfigured"
+          }
+        },
+        "workshopValidationRequired": true,
+        "revisionId": "M002-r1-e6b8b539"
+      },
+      "history": [],
+      "selection": {
+        "materialId": "gentek-coil-3037",
+        "colorSystem": "manufacturer",
+        "colorId": "gentek-amande"
+      }
+    }
+  ]
+}

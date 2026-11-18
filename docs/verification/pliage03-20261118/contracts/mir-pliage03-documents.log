@@ -1,0 +1,11 @@
+PASS sans opt-in, géométrie et sorties client/atelier identiques au commit e58964c
+PASS callback ignoré par les documents atelier, y compris la fiche de pliage
+PASS garde publique : panier et configurateur client seulement, aucun embed/employé/atelier
+PASS faces PDF opposées et continues, même section réelle, toutes cotes et métadonnées conservées
+PASS instantanés, angles décimaux et réédition restent inchangés par le rendu PDF
+PASS rotation signée −30° affichée comme intérieur150°, ±90° inchangés, sans convertir les données ni les notes
+PASS continuations, panneaux et absence de face conservent leurs informations
+PASS panier combiné transmet le renderer sans réécrire les sauvegardes ni les matériaux
+PASS contexte estimation pliage appelle le vrai renderer sur le dossier figé, sans transport
+PASS produit et référence source sont paginés sans troncature, préfixes FR/EN seulement, legacy inchangé
+MIR Pliage 03 documents : 10/10 groupes réussis. Aucun réseau.

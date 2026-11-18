@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "groups": 7,
+  "captures": 84,
+  "resourceCount": 236,
+  "mismatches": [],
+  "testSha256": "26ebe797ff43ea1932f616f68d1681344b3d594d6667a1724767cf9e761874e0",
+  "testMatchesCurrent": true,
+  "pageErrors": 0,
+  "unexpectedConsoleErrors": 0,
+  "httpErrors": 0,
+  "unexpectedBlocked": 0,
+  "pricingRequestsBlocked": 37,
+  "hashes": {
+    "production-app.js": "780c4337be5fb9846630a33890a6595a12ea763409dd9540744cd799bbb8d2ba",
+    "production-model.js": "6287271575a9c164e2dc068f961e97794126fd1b148731174d4cb755ad36e980",
+    "mir-pliage03.js": "a52bb3c76a2e510d89a4c6b0e27b4f1159d4b5ef0fb52d404aba2d8f5590b64a",
+    "mir-pliage03.css": "a96c97a46ff0ca5befe5f235e49a532ac555385e9dd87a427bb95ee1b3f44268",
+    "mir-pliage03-en-ca.js": "9de88cbbe3855d6aed0eccfcc4594f812d3a6319cac044d6a7838cdefaf44a10",
+    "mir-pliage-surfaces.js": "f1afd80400e7ce4f9473366ebe4733332b7844024a8d6e57bef9e795933dcda2",
+    "mir-pliage-documents.js": "af46b5c9d2d625b38afe217333acb695e61cda59b11a7118396fc845ad10b9c8"
+  }
+}

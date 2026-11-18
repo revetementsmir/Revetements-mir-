@@ -681,13 +681,22 @@
       'Ligne × ' + price.quantity + ' = ' + priceText(price.lineCents)
     ] : [];
   }
-  function productionDetailLines(item) {
+  function productionDetailLines(item, { interiorAngles = false, productReferences = false } = {}) {
     if (item.kind === 'profile') {
       const lines = [];
+      if(productReferences){
+        const material=item.spec?.material||item.material||{};
+        if(typeof material.name==='string'&&material.name.trim())lines.push('Produit : '+material.name);
+        if(typeof material.productRef==='string'&&material.productRef.trim())lines.push('Référence produit : '+material.productRef);
+      }
       item.segments.forEach((segment, index) => {
         lines.push(segment.label + ' = ' + formatMeasurement(segment.lengthMM, item.unit));
         const bend = item.bends[index];
-        if (bend) lines.push('Pli ' + bend.from + '–' + bend.to + ' = ' + fabricationBendLabel(bend));
+        if (bend) {
+          const label=interiorAngles&&bend.mode==='signed'&&Number.isFinite(bend.angle)
+            ?decimal(180-Math.abs(bend.angle))+'°':fabricationBendLabel(bend);
+          lines.push('Pli ' + bend.from + '–' + bend.to + ' = ' + label);
+        }
       });
       if (Number.isFinite(item.finishedSegmentSumMM)) lines.push('Développé total = ' + formatMeasurement(item.finishedSegmentSumMM, item.unit) + ' (nominal)');
       lines.push('Face colorée : ' + paintedFaceLabel(item.coloredFace.side));
@@ -851,8 +860,8 @@ function profileSideMarkers(section,model,handles,annotationBounds,[left,right]=
  return segments.map((_,index)=>rendered.get(index)).join('');
 }
 
-function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, verticalBounds, angleOverlay, paintedMarker='stripe', highContrast=false,starPosition=0}={}){
- const section=profileDrawingSection(mapped,bends);
+function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=true, markerModel=model, handles=[], illustrative=false, togglePaintedFace=false, horizontalBounds, verticalBounds, angleOverlay, paintedMarker='stripe', highContrast=false,starPosition=0,section:explicitSection}={}){
+ const section=explicitSection||profileDrawingSection(mapped,bends);
  let output=`<path d="${section.path}" fill="none" stroke="${highContrast?'#304b3d':'#97a68b'}" stroke-width="9" stroke-linejoin="miter"/><path d="${section.path}" fill="none" stroke="${highContrast?'#dfe8e3':'#dbe3d4'}" stroke-width="4" stroke-linejoin="miter"/>`;
  const reserved=[...handles];
  section.segments.forEach(([a,b],i)=>{
@@ -895,7 +904,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
  const annotationBounds=angleOverlay?[]:null;
  if(markers)try{output+=profileSideMarkers(section,illustrative?{...markerModel,segments:markerModel.segments?.map(({label})=>({label}))}:markerModel,reserved,annotationBounds,horizontalBounds,verticalBounds,paintedMarker==='star'?reserved.slice(handles.length):[]);}catch(error){
   if(paintedMarker!=='star'||!model.coloredFace?.side||starPosition>=11)throw error;
-  return profileDiagramContent(model,mapped,{bends,markers,markerModel,handles,illustrative,togglePaintedFace,horizontalBounds,verticalBounds,angleOverlay,paintedMarker,highContrast,starPosition:starPosition+1});
+  return profileDiagramContent(model,mapped,{bends,markers,markerModel,handles,illustrative,togglePaintedFace,horizontalBounds,verticalBounds,angleOverlay,paintedMarker,highContrast,starPosition:starPosition+1,section:explicitSection});
  }
  if(angleOverlay)output+=angleOverlay(section,annotationBounds,reserved);
  return output;
@@ -1041,7 +1050,7 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       return {name:'Mise en production · '+(index+1)+'/'+pages.length,svg:svg+svgClose,layout:'bending-sheet'};
     });
   }
-  function clientDossierPages(order,{production=false}={}){
+  function clientDossierPages(order,{production=false,profileSurfaceRenderer}={}){
     const pages=[];
     // Translate this fixed workshop warning BEFORE the established SVG wrapping.
     // Scope is strictly client; never modify the underlying quote policy,
@@ -1050,13 +1059,29 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
       window.MIRClientLocale?.getLocale?.()==='en-CA'&&
       window.MIRClientLocale?.isClient?.(window.location.pathname,window.location.search)===true;
     for(const item of order.items){
+      let surface=null;
+      if(item.kind==='profile'&&item.valid&&typeof profileSurfaceRenderer==='function'){
+        const map=projection(item.pointsMM,{x:110,y:85,w:580,h:210}),mapped=item.pointsMM.map(map),section=profileSectionPath(mapped,item.bends);
+        const annotation=profileSurfaceRenderer(item,mapped,section);
+        if(annotation!=null&&typeof annotation!=='string')throw new TypeError('Le repère de face doit être une annotation SVG.');
+        if(typeof annotation==='string'&&annotation.trim())surface={mapped,section,annotation};
+      }
       const warning=item.quotePolicy.required?'Soumission obligatoire : '+item.quotePolicy.reason:null;
       const original='Soumission obligatoire : Toute couleur personnalisée, y compris RAL, exige une soumission. Aucun prix automatique.';
       const visibleWarning=clientEnglish&&warning===original
         ?'Quote required: All custom colours, including RAL, require a quote. No automatic pricing.'
         :warning;
       const clientFinishLines=finishLines(item).map(label=>clientEnglish&&label==='Soumission obligatoire'?'Quote required':label);
-      const details=[...productionDetailLines(item),...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(visibleWarning?[visibleWarning]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>line===visibleWarning?[line]:wrapLines(line,87));
+      const clientPresentation=typeof profileSurfaceRenderer==='function';
+      const technicalDetails=productionDetailLines(item,{interiorAngles:clientPresentation,productReferences:clientPresentation}).map(line=>{
+        if(surface&&line==='Face colorée : '+paintedFaceLabel(item.coloredFace?.side))return line.replace('côté indiqué par l’étoile','côté indiqué par le liseré bleu');
+        if(clientPresentation&&clientEnglish){
+          if(line.startsWith('Produit : '))return 'Product: '+line.slice('Produit : '.length);
+          if(line.startsWith('Référence produit : '))return 'Product reference: '+line.slice('Référence produit : '.length);
+        }
+        return line;
+      });
+      const details=[...technicalDetails,...(item.location?['Emplacement : '+item.location]:[]),...(item.note?[item.note]:[]),...item.validation.errors.map(v=>v.message),...item.validation.pending.map(v=>v.message),...(visibleWarning?[visibleWarning]:[]),...(order.notes?['Notes : '+order.notes]:[])].flatMap(line=>line===visibleWarning?[line]:wrapLines(line,87));
       // Fit dimensioned client text by ACTUAL wrapped SVG lines, not by the
       // number of business rows. Reserve a clear gutter before the PDF
       // footer; spill all remaining lines onto an existing continuation sheet.
@@ -1081,7 +1106,12 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
         svg+=multiline(40,121,[item.id+' · '+item.name],{width:75,lineHeight:23,attrs:'font-size="18" font-weight="700"'}).svg;
         svg+=multiline(40,154,[['Commande : '+(order.poNumber||'À préciser'),'Chantier : '+(order.project||'À préciser'),'Chef : '+(order.foreman||'À préciser'),'Date : '+(order.date||'À préciser'),'Révision : '+(order.revision||'À préciser')].join(' · ')],{width:95,lineHeight:18,attrs:'font-size="12"'}).svg;
         svg+='<rect x="40" y="230" width="770" height="345" fill="#fafbf8" stroke="#d7ded2"/>';
-        if(item.kind==='profile'&&item.valid){const map=projection(item.pointsMM,{x:110,y:85,w:580,h:210});svg+='<g transform="translate(65 235) scale(.9)">'+profileDiagramContent(item,item.pointsMM.map(map),{paintedMarker:'star',highContrast:true,markerModel:item,verticalBounds:[20,365]})+'</g>';}
+        if(item.kind==='profile'&&item.valid){
+          const map=projection(item.pointsMM,{x:110,y:85,w:580,h:210}),mapped=item.pointsMM.map(map);
+          // Presentation only: the immutable source face and all measurements remain intact.
+          const drawingModel=surface?{...item,coloredFace:{...item.coloredFace,side:null}}:item;
+          svg+='<g transform="translate(65 235) scale(.9)">'+profileDiagramContent(drawingModel,surface?.mapped||mapped,{paintedMarker:'star',highContrast:true,markerModel:item,verticalBounds:[20,365],...(surface?{section:surface.section}: {})})+(surface?.annotation||'')+'</g>';
+        }
         else if(item.kind==='panel')svg+=placeSVG(panelSVG(item,{width:710,height:325,legend:false,header:false,notes:false}),70,240);
         else svg+=svgText(65,380,'Croquis à compléter','font-size="20"');
         svg+=svgText(40,603,'MATÉRIAU / FINI','font-size="12" font-weight="700" fill="#52634f"');
@@ -1109,11 +1139,11 @@ function profileDiagramContent(model, mapped, {bends=model.bends||[], markers=tr
     }
     return pages;
   }
-  function productionPages(input = {}, {layout, profileGroups, document, bendTariff} = {}) {
+  function productionPages(input = {}, {layout, profileGroups, document, bendTariff, profileSurfaceRenderer} = {}) {
     const order = buildOrder(input, { bendTariff: document === 'client-request' ? bendTariff : undefined }), fragments = [];
     if (document !== 'client-request' && layout === 'bending-sheet' && !order.requiresQuote && order.items.length && order.items.every(item => item.kind === 'profile')) return clientDossierPages(order,{production:true});
     const clientRequest = document === 'client-request';
-    if(clientRequest)return clientDossierPages({...order,dossierReference:input.poNumber||input.id});
+    if(clientRequest)return clientDossierPages({...order,dossierReference:input.poNumber||input.id},{profileSurfaceRenderer});
     const pricedProfiles = clientRequest && order.automaticPricingAllowed && order.items.every(item => item.kind === 'profile');
     const documentTitle = order.requiresQuote ? 'Demande de soumission' :
       pricedProfiles ? 'Récapitulatif de pliage' :

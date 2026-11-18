@@ -1,0 +1,56 @@
+CAPTURE landing-fr-CA-1440.png
+CAPTURE choice-fr-CA-1440.png
+CAPTURE models-fr-CA-1440.png
+CAPTURE measurements-fr-CA-1440.png
+CAPTURE painted-face-fr-CA-1440.png
+FAIL baseline-client-fr-CA: locator.click: Timeout 20000ms exceeded.
+Call log:
+[2m  - waiting for locator('#client-step-next')[22m
+[2m    - locator resolved to <button disabled type="button" id="client-step-next" class="primary-button" aria-describedby="client-step-status">…</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m    39 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is not enabled[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+
+CAPTURE landing-en-CA-1440.png
+CAPTURE choice-en-CA-1440.png
+CAPTURE models-en-CA-1440.png
+CAPTURE measurements-en-CA-1440.png
+CAPTURE painted-face-en-CA-1440.png
+FAIL baseline-client-en-CA: locator.click: Timeout 20000ms exceeded.
+Call log:
+[2m  - waiting for locator('#client-step-next')[22m
+[2m    - locator resolved to <button disabled type="button" id="client-step-next" class="primary-button" aria-describedby="client-step-status">…</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m    38 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is not enabled[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+
+AssertionError [ERR_ASSERTION]: see report
+    at main (/workspace/mir-pliage03/tests/mir-pliage03-browser.cjs:40:337)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

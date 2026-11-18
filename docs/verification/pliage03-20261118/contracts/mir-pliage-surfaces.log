@@ -1,0 +1,12 @@
+PASS physical left/right use the same Y-down projection, without mirroring the profile
+PASS 45°, 90°, obtuse, shallow and zigzag joins remain continuous and finite
+PASS the normal distance is exact along each untrimmed directed side, at all quadrants
+PASS opposite collinear sides have no unbounded miter and explicitly report unresolved thickness
+PASS real existing hem section supplies both continuous curved surfaces without changing source cotes
+PASS tight hems reduce the common display offset explicitly, never create a negative radius
+PASS near-opposite acute joins cannot grow spikes beyond the declared miter limit
+PASS very short sides retain their forward direction by reducing the common offset
+PASS all ten existing canonical profiles keep their cotes and hems through a surface projection
+PASS invalid and degenerate geometry is rejected rather than emitting NaN SVG
+PASS blue marks are annotations only: no finish, colour, template or snapshot is inferred
+{"passed":true,"checks":11,"scope":"Pure projected surface geometry; original fabrication model and staff renderers unchanged"}

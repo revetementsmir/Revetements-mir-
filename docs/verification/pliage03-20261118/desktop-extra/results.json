@@ -1,0 +1,970 @@
+{
+  "sourceBase": "e58964cd8937766d2457904d2d7d625d1bc7df5e",
+  "cssSha256": "a96c97a46ff0ca5befe5f235e49a532ac555385e9dd87a427bb95ee1b3f44268",
+  "cases": [
+    {
+      "spec": {
+        "width": 980,
+        "height": 900,
+        "hasTouch": true
+      },
+      "checks": [
+        {
+          "selector": "[data-measure=\"A\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 692,
+          "y": 416.734375,
+          "width": 117.5,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "[data-measure=\"B\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 838.5,
+          "y": 416.734375,
+          "width": 117.5,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "[data-client-bend-angle=\"0\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 720,
+          "y": 540.421875,
+          "width": 89.5,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#client-step-next",
+          "focused": true,
+          "enabled": true,
+          "x": 768.421875,
+          "y": 689.421875,
+          "width": 187.578125,
+          "height": 63.78125,
+          "insideViewport": true
+        },
+        {
+          "selector": "#material-type",
+          "focused": true,
+          "enabled": true,
+          "x": 675,
+          "y": 356.1875,
+          "width": 281,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#production-material",
+          "focused": true,
+          "enabled": true,
+          "x": 675,
+          "y": 434.6875,
+          "width": 281,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#client-step-next",
+          "focused": true,
+          "enabled": true,
+          "x": 768.421875,
+          "y": 748.390625,
+          "width": 187.578125,
+          "height": 44.890625,
+          "insideViewport": true
+        }
+      ],
+      "captures": [
+        {
+          "file": "measures-fr-CA-980x900.png",
+          "sha256": "ca281926c11aed37ae9f4ffe60e15dc5ae7dcdee44cf1519deea5a570b81efef"
+        },
+        {
+          "file": "finish-fr-CA-980x900.png",
+          "sha256": "3fcc449629f71bd191e244b067a82b4344196a9fad4b56f103ce254693d870f4"
+        },
+        {
+          "file": "finish-colours-keyboard-fr-CA-980x900.png",
+          "sha256": "92db819c6a08a1bb852d8e4df4f477f661f35038f27b00d91d855ae9395bab06"
+        }
+      ],
+      "measures": {
+        "viewport": {
+          "width": 980,
+          "height": 900
+        },
+        "scrollWidth": 980,
+        "pageHeight": 900,
+        "columns": "142px 454px 300px",
+        "nav": {
+          "x": 24,
+          "y": 158,
+          "width": 142,
+          "height": 301,
+          "right": 166,
+          "bottom": 459
+        },
+        "drawing": {
+          "x": 184,
+          "y": 158,
+          "width": 454,
+          "height": 398,
+          "right": 638,
+          "bottom": 556
+        },
+        "configuration": {
+          "x": 656,
+          "y": 158,
+          "width": 300,
+          "height": 595.203125,
+          "right": 956,
+          "bottom": 753.203125
+        },
+        "stepButtons": [
+          {
+            "x": 24,
+            "y": 158,
+            "width": 142,
+            "height": 64,
+            "right": 166,
+            "bottom": 222
+          },
+          {
+            "x": 24,
+            "y": 237,
+            "width": 142,
+            "height": 64,
+            "right": 166,
+            "bottom": 301
+          },
+          {
+            "x": 24,
+            "y": 316,
+            "width": 142,
+            "height": 64,
+            "right": 166,
+            "bottom": 380
+          },
+          {
+            "x": 24,
+            "y": 395,
+            "width": 142,
+            "height": 64,
+            "right": 166,
+            "bottom": 459
+          }
+        ]
+      },
+      "finish": {
+        "viewport": {
+          "width": 980,
+          "height": 900
+        },
+        "scrollWidth": 980,
+        "pageHeight": 1333,
+        "columns": "142px 454px 300px",
+        "nav": {
+          "x": 24,
+          "y": 158,
+          "width": 142,
+          "height": 301,
+          "right": 166,
+          "bottom": 459
+        },
+        "drawing": {
+          "x": 184,
+          "y": 158,
+          "width": 454,
+          "height": 483.890625,
+          "right": 638,
+          "bottom": 641.890625
+        },
+        "configuration": {
+          "x": 656,
+          "y": 158,
+          "width": 300,
+          "height": 1068.28125,
+          "right": 956,
+          "bottom": 1226.28125
+        },
+        "stepButtons": [
+          {
+            "x": 24,
+            "y": 158,
+            "width": 142,
+            "height": 64,
+            "right": 166,
+            "bottom": 222
+          },
+          {
+            "x": 24,
+            "y": 237,
+            "width": 142,
+            "height": 64,
+            "right": 166,
+            "bottom": 301
+          },
+          {
+            "x": 24,
+            "y": 316,
+            "width": 142,
+            "height": 64,
+            "right": 166,
+            "bottom": 380
+          },
+          {
+            "x": 24,
+            "y": 395,
+            "width": 142,
+            "height": 64,
+            "right": 166,
+            "bottom": 459
+          }
+        ]
+      },
+      "paletteKeyboard": {
+        "lastFocused": true,
+        "insideScrollablePalette": true,
+        "insideViewport": true,
+        "scrollTop": 410
+      },
+      "colourCount": 13,
+      "passed": true
+    },
+    {
+      "spec": {
+        "width": 1280,
+        "height": 800
+      },
+      "checks": [
+        {
+          "selector": "[data-measure=\"A\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 925.203125,
+          "y": 471.609375,
+          "width": 143.703125,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "[data-measure=\"B\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 1097.90625,
+          "y": 471.609375,
+          "width": 143.703125,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "[data-client-bend-angle=\"0\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 953.203125,
+          "y": 595.296875,
+          "width": 115.703125,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#client-step-next",
+          "focused": true,
+          "enabled": true,
+          "x": 1001.625,
+          "y": 744.296875,
+          "width": 239.984375,
+          "height": 44.890625,
+          "insideViewport": true
+        },
+        {
+          "selector": "#material-type",
+          "focused": true,
+          "enabled": true,
+          "x": 908.203125,
+          "y": 389.375,
+          "width": 333.40625,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#production-material",
+          "focused": true,
+          "enabled": true,
+          "x": 908.203125,
+          "y": 467.875,
+          "width": 333.40625,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#client-step-next",
+          "focused": true,
+          "enabled": true,
+          "x": 1001.625,
+          "y": 642.484375,
+          "width": 239.984375,
+          "height": 44.890625,
+          "insideViewport": true
+        }
+      ],
+      "captures": [
+        {
+          "file": "measures-fr-CA-1280x800.png",
+          "sha256": "73655d0eee79acbdc71fde252804a653a48cff44759242a2e5977d2488da1102"
+        },
+        {
+          "file": "finish-fr-CA-1280x800.png",
+          "sha256": "2624dbdf32543b088e979a00506b61f3ebcc1b14bf580b11457205027511b2fa"
+        },
+        {
+          "file": "finish-colours-keyboard-fr-CA-1280x800.png",
+          "sha256": "e2839096c7c72523cc5ff35f506a18e52f36e1a07decd33f10f079e526cf481a"
+        }
+      ],
+      "measures": {
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scrollWidth": 1280,
+        "pageHeight": 902,
+        "columns": "168px 624.031px 360px",
+        "nav": {
+          "x": 38.390625,
+          "y": 211,
+          "width": 168,
+          "height": 301,
+          "right": 206.390625,
+          "bottom": 512
+        },
+        "drawing": {
+          "x": 231.984375,
+          "y": 211,
+          "width": 624.03125,
+          "height": 360,
+          "right": 856.015625,
+          "bottom": 571
+        },
+        "configuration": {
+          "x": 881.609375,
+          "y": 211,
+          "width": 360,
+          "height": 578.1875,
+          "right": 1241.609375,
+          "bottom": 789.1875
+        },
+        "stepButtons": [
+          {
+            "x": 38.390625,
+            "y": 211,
+            "width": 168,
+            "height": 64,
+            "right": 206.390625,
+            "bottom": 275
+          },
+          {
+            "x": 38.390625,
+            "y": 290,
+            "width": 168,
+            "height": 64,
+            "right": 206.390625,
+            "bottom": 354
+          },
+          {
+            "x": 38.390625,
+            "y": 369,
+            "width": 168,
+            "height": 64,
+            "right": 206.390625,
+            "bottom": 433
+          },
+          {
+            "x": 38.390625,
+            "y": 448,
+            "width": 168,
+            "height": 64,
+            "right": 206.390625,
+            "bottom": 512
+          }
+        ]
+      },
+      "finish": {
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "scrollWidth": 1280,
+        "pageHeight": 1334,
+        "columns": "168px 624.031px 360px",
+        "nav": {
+          "x": 38.390625,
+          "y": 211,
+          "width": 168,
+          "height": 301,
+          "right": 206.390625,
+          "bottom": 512
+        },
+        "drawing": {
+          "x": 231.984375,
+          "y": 211,
+          "width": 624.03125,
+          "height": 455.890625,
+          "right": 856.015625,
+          "bottom": 666.890625
+        },
+        "configuration": {
+          "x": 881.609375,
+          "y": 211,
+          "width": 360,
+          "height": 1010.375,
+          "right": 1241.609375,
+          "bottom": 1221.375
+        },
+        "stepButtons": [
+          {
+            "x": 38.390625,
+            "y": 211,
+            "width": 168,
+            "height": 64,
+            "right": 206.390625,
+            "bottom": 275
+          },
+          {
+            "x": 38.390625,
+            "y": 290,
+            "width": 168,
+            "height": 64,
+            "right": 206.390625,
+            "bottom": 354
+          },
+          {
+            "x": 38.390625,
+            "y": 369,
+            "width": 168,
+            "height": 64,
+            "right": 206.390625,
+            "bottom": 433
+          },
+          {
+            "x": 38.390625,
+            "y": 448,
+            "width": 168,
+            "height": 64,
+            "right": 206.390625,
+            "bottom": 512
+          }
+        ]
+      },
+      "paletteKeyboard": {
+        "lastFocused": true,
+        "insideScrollablePalette": true,
+        "insideViewport": true,
+        "scrollTop": 410
+      },
+      "colourCount": 13,
+      "passed": true
+    },
+    {
+      "spec": {
+        "width": 1920,
+        "height": 1080
+      },
+      "checks": [
+        {
+          "selector": "[data-measure=\"A\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 1448,
+          "y": 476.8125,
+          "width": 170.5,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "[data-measure=\"B\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 1647.5,
+          "y": 476.8125,
+          "width": 170.5,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "[data-client-bend-angle=\"0\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 1476,
+          "y": 600.5,
+          "width": 142.5,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#client-step-next",
+          "focused": true,
+          "enabled": true,
+          "x": 1524.421875,
+          "y": 749.5,
+          "width": 293.578125,
+          "height": 44.890625,
+          "insideViewport": true
+        },
+        {
+          "selector": "#material-type",
+          "focused": true,
+          "enabled": true,
+          "x": 1431,
+          "y": 394.578125,
+          "width": 387,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#production-material",
+          "focused": true,
+          "enabled": true,
+          "x": 1431,
+          "y": 473.078125,
+          "width": 387,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#client-step-next",
+          "focused": true,
+          "enabled": true,
+          "x": 1524.421875,
+          "y": 921.6875,
+          "width": 293.578125,
+          "height": 44.890625,
+          "insideViewport": true
+        }
+      ],
+      "captures": [
+        {
+          "file": "measures-fr-CA-1920x1080.png",
+          "sha256": "82df0d709e76e49b5ec77bdc01d3fbbc0119b20f4a91eaedd4a7a983b5e8615e"
+        },
+        {
+          "file": "finish-fr-CA-1920x1080.png",
+          "sha256": "6261693e8a8bafbf525df6c5cdc74c9ac763f45f76fa3e9a9559bfcd9fe3fb45"
+        },
+        {
+          "file": "finish-colours-keyboard-fr-CA-1920x1080.png",
+          "sha256": "a8cd710d56541d7af2f9213dd3a52ceb99602005398b5b1407e295af9a9188a9"
+        }
+      ],
+      "measures": {
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "scrollWidth": 1920,
+        "pageHeight": 1080,
+        "columns": "190px 1042px 420px",
+        "nav": {
+          "x": 102,
+          "y": 211,
+          "width": 190,
+          "height": 325,
+          "right": 292,
+          "bottom": 536
+        },
+        "drawing": {
+          "x": 324,
+          "y": 211,
+          "width": 1042,
+          "height": 477.1875,
+          "right": 1366,
+          "bottom": 688.1875
+        },
+        "configuration": {
+          "x": 1398,
+          "y": 211,
+          "width": 420,
+          "height": 583.390625,
+          "right": 1818,
+          "bottom": 794.390625
+        },
+        "stepButtons": [
+          {
+            "x": 102,
+            "y": 211,
+            "width": 190,
+            "height": 70,
+            "right": 292,
+            "bottom": 281
+          },
+          {
+            "x": 102,
+            "y": 296,
+            "width": 190,
+            "height": 70,
+            "right": 292,
+            "bottom": 366
+          },
+          {
+            "x": 102,
+            "y": 381,
+            "width": 190,
+            "height": 70,
+            "right": 292,
+            "bottom": 451
+          },
+          {
+            "x": 102,
+            "y": 466,
+            "width": 190,
+            "height": 70,
+            "right": 292,
+            "bottom": 536
+          }
+        ]
+      },
+      "finish": {
+        "viewport": {
+          "width": 1920,
+          "height": 1080
+        },
+        "scrollWidth": 1920,
+        "pageHeight": 1340,
+        "columns": "190px 1042px 420px",
+        "nav": {
+          "x": 102,
+          "y": 211,
+          "width": 190,
+          "height": 325,
+          "right": 292,
+          "bottom": 536
+        },
+        "drawing": {
+          "x": 324,
+          "y": 211,
+          "width": 1042,
+          "height": 511.890625,
+          "right": 1366,
+          "bottom": 722.890625
+        },
+        "configuration": {
+          "x": 1398,
+          "y": 211,
+          "width": 420,
+          "height": 1015.578125,
+          "right": 1818,
+          "bottom": 1226.578125
+        },
+        "stepButtons": [
+          {
+            "x": 102,
+            "y": 211,
+            "width": 190,
+            "height": 70,
+            "right": 292,
+            "bottom": 281
+          },
+          {
+            "x": 102,
+            "y": 296,
+            "width": 190,
+            "height": 70,
+            "right": 292,
+            "bottom": 366
+          },
+          {
+            "x": 102,
+            "y": 381,
+            "width": 190,
+            "height": 70,
+            "right": 292,
+            "bottom": 451
+          },
+          {
+            "x": 102,
+            "y": 466,
+            "width": 190,
+            "height": 70,
+            "right": 292,
+            "bottom": 536
+          }
+        ]
+      },
+      "paletteKeyboard": {
+        "lastFocused": true,
+        "insideScrollablePalette": true,
+        "insideViewport": true,
+        "scrollTop": 410
+      },
+      "colourCount": 13,
+      "passed": true
+    },
+    {
+      "spec": {
+        "width": 640,
+        "height": 400,
+        "zoomEquivalent": "200% of 1280×800"
+      },
+      "checks": [
+        {
+          "selector": "[data-measure=\"A\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 41,
+          "y": 189.734375,
+          "width": 172.328125,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "[data-measure=\"B\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 242.328125,
+          "y": 189.734375,
+          "width": 172.328125,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "[data-client-bend-angle=\"0\"]",
+          "focused": true,
+          "enabled": true,
+          "x": 69,
+          "y": 313.421875,
+          "width": 144.328125,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#client-step-next",
+          "focused": true,
+          "enabled": true,
+          "x": 117.421875,
+          "y": 246.421875,
+          "width": 498.578125,
+          "height": 44.890625,
+          "insideViewport": true
+        },
+        {
+          "selector": "#material-type",
+          "focused": true,
+          "enabled": true,
+          "x": 24,
+          "y": 190.390625,
+          "width": 592,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#production-material",
+          "focused": true,
+          "enabled": true,
+          "x": 24,
+          "y": 268.890625,
+          "width": 592,
+          "height": 44,
+          "insideViewport": true
+        },
+        {
+          "selector": "#client-step-next",
+          "focused": true,
+          "enabled": true,
+          "x": 117.421875,
+          "y": 245.90625,
+          "width": 498.578125,
+          "height": 44.890625,
+          "insideViewport": true
+        }
+      ],
+      "captures": [
+        {
+          "file": "measures-fr-CA-640x400.png",
+          "sha256": "e6b4ebcd0dad3deaf45ce6ce401540f8fecbd04033e6dd988ee0e3ef3c0a68b0"
+        },
+        {
+          "file": "finish-fr-CA-640x400.png",
+          "sha256": "3ef219fc903ba298ff8436be6a822fe0f212e52d73c6a773cdafe200a0d68140"
+        },
+        {
+          "file": "finish-colours-keyboard-fr-CA-640x400.png",
+          "sha256": "43d7f0e353b55dcb3162e3ebd65c1af5ff8151676058a6293c94ab4764861303"
+        }
+      ],
+      "measures": {
+        "viewport": {
+          "width": 640,
+          "height": 400
+        },
+        "scrollWidth": 640,
+        "pageHeight": 1349,
+        "columns": "592px",
+        "nav": {
+          "x": 24,
+          "y": 160,
+          "width": 592,
+          "height": 77,
+          "right": 616,
+          "bottom": 237
+        },
+        "drawing": {
+          "x": 24,
+          "y": 257,
+          "width": 592,
+          "height": 360,
+          "right": 616,
+          "bottom": 617
+        },
+        "configuration": {
+          "x": 24,
+          "y": 637,
+          "width": 592,
+          "height": 603.3125,
+          "right": 616,
+          "bottom": 1240.3125
+        },
+        "stepButtons": [
+          {
+            "x": 24,
+            "y": 160,
+            "width": 142,
+            "height": 58,
+            "right": 166,
+            "bottom": 218
+          },
+          {
+            "x": 174,
+            "y": 160,
+            "width": 142,
+            "height": 58,
+            "right": 316,
+            "bottom": 218
+          },
+          {
+            "x": 324,
+            "y": 160,
+            "width": 142,
+            "height": 58,
+            "right": 466,
+            "bottom": 218
+          },
+          {
+            "x": 474,
+            "y": 160,
+            "width": 142,
+            "height": 58,
+            "right": 616,
+            "bottom": 218
+          }
+        ]
+      },
+      "finish": {
+        "viewport": {
+          "width": 640,
+          "height": 400
+        },
+        "scrollWidth": 640,
+        "pageHeight": 1815,
+        "columns": "592px",
+        "nav": {
+          "x": 24,
+          "y": 160,
+          "width": 592,
+          "height": 77,
+          "right": 616,
+          "bottom": 237
+        },
+        "drawing": {
+          "x": 24,
+          "y": 257,
+          "width": 592,
+          "height": 411.890625,
+          "right": 616,
+          "bottom": 668.890625
+        },
+        "configuration": {
+          "x": 24,
+          "y": 688.890625,
+          "width": 592,
+          "height": 1016.90625,
+          "right": 616,
+          "bottom": 1705.796875
+        },
+        "stepButtons": [
+          {
+            "x": 24,
+            "y": 160,
+            "width": 142,
+            "height": 58,
+            "right": 166,
+            "bottom": 218
+          },
+          {
+            "x": 174,
+            "y": 160,
+            "width": 142,
+            "height": 58,
+            "right": 316,
+            "bottom": 218
+          },
+          {
+            "x": 324,
+            "y": 160,
+            "width": 142,
+            "height": 58,
+            "right": 466,
+            "bottom": 218
+          },
+          {
+            "x": 474,
+            "y": 160,
+            "width": 142,
+            "height": 58,
+            "right": 616,
+            "bottom": 218
+          }
+        ]
+      },
+      "paletteKeyboard": {
+        "lastFocused": true,
+        "insideScrollablePalette": true,
+        "insideViewport": true,
+        "scrollTop": 410
+      },
+      "colourCount": 13,
+      "passed": true
+    }
+  ],
+  "blocked": [
+    {
+      "method": "GET",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "method": "GET",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "method": "GET",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    },
+    {
+      "method": "GET",
+      "url": "https://gccltmaulvrnthrbnrpd.supabase.co/rest/v1/rpc/mir_public_bend_tariff"
+    }
+  ],
+  "errors": [],
+  "notes": [
+    "640×400 is the CSS viewport equivalent of 1280×800 at 200% zoom; it is not a hardware keyboard or Android Chrome test.",
+    "The 980×900 case enables touch in Chromium and checks the desktop composition selected by the CSS breakpoint.",
+    "No real estimate, order, upload, email or remote write is sent."
+  ],
+  "browser": "155.0.8059.79",
+  "passed": true
+}

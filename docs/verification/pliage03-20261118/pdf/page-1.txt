@@ -1,0 +1,37 @@
+18 nov. 2026
+DOSSIER DE PLIAGE
+QA-LOCAL-2-FACES · QA fictif — contrôle PDF local
+A · 5 po
+B · 3 po
+C · 2 po
+MATÉRIAU / FINI
+Aluminium
+Gentek Canada
+Blanc Pur 30
+Code 431
+QUANTITÉ / LONGUEUR
+2 pièce(s)
+120 po
+COTES FINIES ET POINTS À VALIDER
+Produit : Gentek — Feuille peinte
+aluminium 3037, 24 po × 98,5 pi
+Référence produit : gentek-coil-3037
+A = 5 po
+Pli A–B = 150°
+B = 3 po
+Pli B–C = 90°
+C = 2 po
+Développé total = 10 po (nominal)
+Face colorée : Face 1 — côté indiqué par
+le liseré bleu
+Emplacement : Recette locale seulement
+Fixture fictive. Aucun dossier
+utilisateur, aucune commande, aucun envoi.
+Notes : Deux pièces fictives pour recette
+uniquement. Aucun stock ou prix MIR
+confirmé.
+M001 · QA fictif — oblique face 1
+Commande : QA-LOCAL-2-FACES · Chantier : QA fictif — contrôle PDF local · Chef : Personne fictive · Date : 2026-11-18 · Révision : A
+Demande de soumission · validation MIR requise avant fabrication.
+Cotes exactes indiquées. Ne pas mesurer sur le dessin imprimé.
+1 / 2

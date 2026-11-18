@@ -1,0 +1,343 @@
+/* Public profile journey 03. The adapter opts in only outside store, panel and staff contexts.
+   Drawings, manufacturer swatches and all fabrication values retain their native rendering. */
+html body.mir-pliage03.mir-prestige{
+ --p03-bg:#242522;--p03-panel:#30312c;--p03-input:#34352f;--p03-text:#f4f1ea;
+ --p03-muted:#c6c3ba;--p03-sand:#bda889;--p03-line:#626258;--p03-drawing:#292a26;
+ --p03-gap:clamp(20px,2vw,32px);background:var(--p03-bg)!important;color:var(--p03-text)!important;color-scheme:dark;
+ font-family:"DM Sans",Arial,sans-serif;
+}
+html body.mir-pliage03.mir-prestige[data-client-entry] [hidden]{display:none!important}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(button,a,input,select,textarea,summary):focus-visible{outline:2px solid var(--p03-sand);outline-offset:4px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-main{--mir-ink:var(--p03-text);--mir-muted:var(--p03-muted);--mir-line:var(--p03-line);--tool-ink:var(--p03-text);--tool-muted:var(--p03-muted);width:100%;max-width:1820px;padding:26px clamp(20px,3vw,52px) 36px;margin:0 auto;min-width:0}
+html body.mir-pliage03.mir-prestige[data-client-entry] .production-workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--p03-gap);align-items:start;width:100%;max-width:none;height:auto;min-height:0;margin:0;overflow:visible}
+html body.mir-pliage03.mir-prestige[data-client-entry] .production-workspace>*{min-width:0}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 28px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-heading>.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-heading>a{display:inline-flex;align-items:center;gap:12px;min-height:44px;color:var(--p03-text);font-size:13px;text-decoration:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-heading h1{font-size:clamp(30px,3vw,44px);line-height:1.12;font-weight:400;letter-spacing:-.035em;margin:0 0 9px;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-heading em{font-family:Georgia,serif;font-weight:400;color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-heading p{margin:0;color:var(--p03-muted);font-size:15px;line-height:1.55}
+
+/* The original four step buttons retain their disabled/current/completed states. */
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-production-steps{display:block;margin:0;padding:0;background:transparent;border:0;box-shadow:none;min-width:0}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0;padding:0;list-style:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list li{min-width:0;display:block;margin:0;padding:0;border:0}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list li::before,
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list li::after{content:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:11px;width:100%;min-height:58px;padding:10px 8px;text-align:left;border:1px solid transparent;border-radius:3px;background:transparent;color:var(--p03-muted);font:400 14px/1.35 "DM Sans",Arial,sans-serif;white-space:normal;opacity:1}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button>span:first-child{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;margin:0;border:1px solid var(--p03-line);border-radius:50%;background:transparent;color:inherit;font-size:13px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button[aria-current=step]{background:var(--p03-panel);border-color:var(--p03-sand);color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button[aria-current=step]>span:first-child{color:var(--p03-bg);border-color:var(--p03-sand);background:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button.is-complete>span:first-child{border-color:var(--p03-sand);color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button:disabled{color:#a7a79d;cursor:default}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-production-steps>p{margin:22px 8px 0;color:var(--p03-muted);font-size:12px;line-height:1.6;max-width:250px}
+
+/* Entry and model bank use the actual available profile illustrations. */
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-entry{padding:0;max-width:none;min-width:0;margin:0}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-entry h1{color:var(--p03-text);max-width:850px;font-size:clamp(28px,3vw,42px);line-height:1.15;font-weight:400;margin:9px 0 14px;letter-spacing:-.035em}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-entry>.eyebrow{color:var(--p03-sand);font-size:12px;margin:12px 0 6px;letter-spacing:.09em}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-entry-intro{font-size:16px;line-height:1.6;color:var(--p03-muted);margin:0 0 24px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-entry .client-entry-return{color:var(--p03-muted);font-size:13px;min-height:44px;margin:0 0 8px;padding:5px 0}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin:28px 0}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards>:is(button,a){display:grid;grid-template-columns:45px minmax(0,1fr) 22px;gap:18px;min-height:200px;padding:28px;border:1px solid var(--p03-line);border-radius:3px;background:var(--p03-panel);color:var(--p03-text);box-shadow:none;text-align:left;white-space:normal}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards>:is(button,a):hover{background:#393a33;border-color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards strong{font-size:22px;line-height:1.35;font-weight:500;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards small{display:block;font-size:14px;line-height:1.6;color:var(--p03-muted);margin-top:10px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-icon{color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry=models] #client-model-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:24px}
+html body.mir-pliage03.mir-prestige[data-client-entry=models] .template-button:not(.client-viewport-off-page){display:flex;flex-direction:column;gap:10px;width:100%;min-width:0;height:auto;min-height:160px;padding:18px 14px;color:var(--p03-text);background:var(--p03-panel);border:1px solid var(--p03-line);border-radius:3px;font-size:15px;line-height:1.4}
+html body.mir-pliage03.mir-prestige[data-client-entry=models] .template-button[aria-pressed=true]{border:2px solid var(--p03-sand);padding:17px 13px;background:#3a3932}
+html body.mir-pliage03.mir-prestige[data-client-entry=models] .template-button svg{display:block;width:100%;height:82px;max-height:82px;margin:0;border-radius:2px;background:var(--p03-drawing);color:#30312c}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-viewport-pages{gap:14px;margin:18px 0;font-size:14px;color:var(--p03-muted)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-viewport-pages button{color:var(--p03-text);border:1px solid var(--p03-line);background:var(--p03-panel)}
+
+/* Dark presentation of known screen SVG ink only; geometry and PDF export remain native. */
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-preview{position:static;order:0;min-width:0;overflow:visible;padding:0;background:transparent;border:0;border-radius:3px;box-shadow:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 0 16px;margin:0;border:0;background:transparent}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-head .eyebrow{font-size:11px;letter-spacing:.1em;color:var(--p03-sand);margin:0 0 6px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-head h2{font-size:22px;line-height:1.2;font-weight:400;color:var(--p03-text);margin:0}
+html body.mir-pliage03.mir-prestige[data-client-entry] .view-switch{display:flex;gap:3px;flex:none;background:var(--p03-panel);padding:3px;border:1px solid var(--p03-line);border-radius:3px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .view-switch button{min-height:38px;padding:7px 11px;background:transparent;border:0;border-radius:2px;color:var(--p03-muted);font-size:12px;white-space:nowrap}
+html body.mir-pliage03.mir-prestige[data-client-entry] .view-switch button[aria-pressed=true]{color:var(--p03-text);background:#46463c;box-shadow:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] .view-3d-tag{border-color:var(--p03-line);color:inherit;background:transparent}
+html body.mir-pliage03.mir-prestige[data-client-entry]:not(.mobile-trace) #production-preview>.mir-panel-synced-views{display:block!important;min-width:0}
+html body.mir-pliage03.mir-prestige[data-client-entry]:not(.mobile-trace) #production-drawing{display:grid;place-items:center;position:relative;min-width:0;min-height:360px;background:var(--p03-drawing);border:1px solid var(--p03-line);border-radius:3px;overflow:hidden;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry]:not(.mobile-trace) #production-drawing>svg{display:block;width:100%;max-width:100%;height:clamp(340px,44vh,500px);min-height:0;max-height:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-tools{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:0 0 12px;background:transparent;border:0;color:var(--p03-muted)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-tools :is(button,label){font-size:12px;color:var(--p03-muted)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-tools button{min-height:38px;padding:7px 10px;border:1px solid var(--p03-line);border-radius:3px;background:var(--p03-panel)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-tools button[aria-pressed=true]{color:var(--p03-text);border-color:var(--p03-sand);background:#454238}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-tools input[type=checkbox]{accent-color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-navigation{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border:0;color:var(--p03-muted);background:transparent}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-navigation>span{font-size:12px;line-height:1.4}
+html body.mir-pliage03.mir-prestige[data-client-entry] .zoom-controls{border-color:var(--p03-line);background:transparent;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .zoom-controls button{min-height:36px;min-width:36px;background:var(--p03-panel);color:var(--p03-text);border-color:var(--p03-line)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-legend{display:flex;flex-wrap:wrap;gap:8px 20px;padding:12px 0 0;color:var(--p03-muted);background:transparent;border:0;font-size:12px;line-height:1.5}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-legend>span:last-child{font-size:12px;margin:0;padding:0}
+html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-note{padding:0;margin:10px 0;color:var(--p03-muted);font-size:12px;line-height:1.55}
+html body.mir-pliage03.mir-prestige[data-client-entry] .production-validation{padding:0;font-size:13px;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .validation-group{border-color:#927e5f;background:#343127;color:#eadbc2;border-radius:3px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .validation-group.error{background:#3c2d28;border-color:#bc8771;color:#f2c9b8}
+html body.mir-pliage03.mir-prestige[data-client-entry] .validation-group.good{background:var(--p03-panel);border-color:var(--p03-line);color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .validation-group :is(ul,summary){font-size:12px;line-height:1.6}
+
+/* Configuration: readable values, genuine fractions and angles, normal page scrolling. */
+html body.mir-pliage03.mir-prestige[data-client-entry] .config-card{display:flex;flex-direction:column;min-width:0;margin:0;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-scroll{display:block;width:100%;min-width:0;height:auto;max-height:none;padding:0;overflow:visible;scrollbar-gutter:auto;scroll-padding:24px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-count{float:none;text-align:left;margin:0 0 8px;color:var(--p03-sand);font-size:12px;line-height:1.5;letter-spacing:.08em}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-title{margin:0;font-size:clamp(24px,2vw,30px);font-weight:400;line-height:1.18;letter-spacing:-.025em;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-hint{font-size:14px;line-height:1.55;color:var(--p03-muted);margin:12px 0 18px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-local-save{margin:8px 0 14px;text-align:left;color:var(--p03-muted);font-size:12px;line-height:1.5}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-scroll>.section-heading{display:flex;float:none;align-items:center;justify-content:flex-end;position:static;width:auto;min-height:0;margin:16px 0 10px;padding:0;border:0;background:transparent}
+html body.mir-pliage03.mir-prestige[data-client-entry] .unit-field{max-width:150px;width:150px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-scroll>.section-heading select{min-height:40px;padding:8px 10px;font-size:14px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #measure-hint{display:block;min-height:0;margin:10px 0;font-size:12px;line-height:1.55;color:var(--p03-muted)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .config-card :is(label,.field-hint){color:var(--p03-muted);font-size:13px;line-height:1.5}
+html body.mir-pliage03.mir-prestige[data-client-entry] .config-card :is(input,select,textarea){width:100%;min-width:0;max-width:100%;min-height:44px;padding:10px 11px;border:1px solid var(--p03-line);border-radius:3px;background:var(--p03-input);color:var(--p03-text);font-family:inherit;font-size:16px;line-height:1.35;scroll-margin-block:24px;box-shadow:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] .config-card input[type=checkbox]{width:18px;height:18px;min-height:18px;accent-color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .config-card :is(input,textarea)::placeholder{color:#b5b4aa;opacity:1}
+html body.mir-pliage03.mir-prestige[data-client-entry] .config-card input[readonly]{background:#2c2d28;color:var(--p03-muted);border-style:dashed}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dimensions :is(.client-measures-grid,.client-angles-grid){display:grid;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px;margin:14px 0}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dimensions :is(.client-measure-field,.client-angle-field){color:var(--p03-text);font-size:14px;min-width:0}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dimensions :is(input,select){min-height:44px;height:44px;background:var(--p03-input);color:var(--p03-text);border-color:var(--p03-line);font-size:16px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dimensions :is(h3,h4){font-size:14px;font-weight:500;margin:18px 0 8px;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-measure-field>.letter-label{color:var(--p03-text);flex:0 0 20px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-measure-field>.letter-label b{font-size:15px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dimensions .client-angle-field>label{color:var(--p03-text);font-size:13px;gap:7px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-angle-field>label>span{font-size:12px;max-width:38px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-reset-model-angles{min-height:40px;padding:7px 9px;font-size:12px;color:var(--p03-muted);border:1px solid var(--p03-line);background:transparent}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-angle-heading{gap:10px;margin-top:18px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-length{margin:16px 0;font-size:13px;line-height:1.55;color:var(--p03-muted)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-length input{min-height:44px;font-size:16px;padding:10px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-length .mir-profile-stock-note{font-size:12px;line-height:1.6;padding:8px 0;color:var(--p03-muted)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-profile-options .mir-developed-total{font-size:12px;line-height:1.6;color:var(--p03-muted);margin:12px 0}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-actions{position:static;inset:auto;padding:20px 0 0;margin:20px 0 0;background:transparent;border:0;border-top:1px solid var(--p03-line);border-radius:0;box-shadow:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-status{color:#e9cda6;font-size:13px;line-height:1.55;margin:0 0 12px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-status:empty{display:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-step-buttons{display:flex;justify-content:space-between;gap:12px}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(.primary-button,.secondary-button){min-height:46px;padding:12px 18px;border:1px solid var(--p03-sand);border-radius:3px;font:500 14px/1.35 "DM Sans",Arial,sans-serif;text-decoration:none;white-space:normal;box-shadow:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] .primary-button{background:var(--p03-sand);color:#242522}
+html body.mir-pliage03.mir-prestige[data-client-entry] .primary-button:hover:not(:disabled){background:#d1bd9e;border-color:#d1bd9e}
+html body.mir-pliage03.mir-prestige[data-client-entry] .secondary-button{background:transparent;color:var(--p03-text);border-color:var(--p03-line)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .secondary-button:hover:not(:disabled){border-color:var(--p03-sand);background:#33342e}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(.primary-button,.secondary-button):disabled{background:#3c3d35;color:#a7a79c;border-color:#626258;opacity:1;cursor:not-allowed}
+html body.mir-pliage03.mir-prestige[data-client-entry] .plain-button{color:var(--p03-muted);font-size:13px;min-height:44px}
+
+/* Genuine face illustrations and manufacturer colour choices. */
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] .piece-finish{padding:0;margin:0;border:0;background:transparent}
+html body.mir-pliage03.mir-prestige[data-client-entry] .piece-finish>summary{font-size:16px;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] .finish-fields{display:grid;gap:12px;padding-top:8px}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] :is(.finish-fields,.color-source-field) label{color:var(--p03-muted);font-size:13px;line-height:1.5}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] .color-source-field:has(#production-material){display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] .color-source-field:has(#production-material)>:is(label,#production-color-grid){grid-column:auto;grid-row:auto}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-painted-face{margin:20px 0;font-size:15px;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(.client-face-choices,.mir-pliage03-faces){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:14px 0}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(.client-face-choices button,.mir-pliage03-face-card){position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;min-width:0;min-height:150px;padding:14px;border:1px solid var(--p03-line);border-radius:3px;background:var(--p03-panel);color:var(--p03-text);font-size:15px;line-height:1.35}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(.client-face-choices button,.mir-pliage03-face-card)[aria-pressed=true]{background:#36362e;border:2px solid var(--p03-sand);padding:13px;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(.client-face-choices button,.mir-pliage03-face-card)[aria-pressed=true]::after{content:'✓';position:absolute;top:8px;right:8px;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--p03-sand);color:#242522;font-size:14px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-face-choices svg{display:block;width:100%;max-width:100%;height:110px;min-height:0;max-height:none;background:var(--p03-drawing);border-radius:2px;color:#242522}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-painted-face>.field-hint{color:var(--p03-muted);font-size:13px;line-height:1.5;margin:10px 0}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-face-card :is(img,svg){display:block;width:100%;max-width:100%;height:125px;object-fit:contain;background:var(--p03-drawing);color:#242522}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-color-grid{max-height:none;overflow:visible;padding:0;margin:0}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-palette{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0;min-width:0}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-swatch{position:relative;display:flex;flex-direction:column;align-items:stretch;min-width:0;min-height:112px;padding:5px;border:1px solid var(--p03-line);border-radius:3px;background:var(--p03-panel);color:var(--p03-text);text-align:left;font-family:inherit}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-swatch:hover{border-color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-swatch[aria-pressed=true]{border:2px solid var(--p03-sand);padding:4px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-swatch[aria-pressed=true]::after{content:'✓';position:absolute;top:9px;right:9px;display:grid;place-items:center;width:23px;height:23px;border:1px solid #242522;border-radius:50%;background:var(--p03-sand);color:#242522;font-size:14px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-swatch :is(.image,[data-swatch-image]){display:block;width:100%;height:58px;min-height:58px;border-radius:1px;overflow:hidden}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-swatch img{display:block;width:100%;height:58px;object-fit:cover}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-swatch .name{display:block;margin:8px 4px 2px;font-size:12px;font-weight:500;line-height:1.4;overflow-wrap:anywhere}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-swatch .code{display:block;margin:0 4px 5px;color:var(--p03-muted);font-size:12px;line-height:1.35;overflow-wrap:anywhere}
+html body.mir-pliage03.mir-prestige[data-client-entry] #selected-finish{margin:0;padding:13px 0;border:0;border-top:1px solid var(--p03-line);border-radius:0;background:transparent;color:var(--p03-text);font-size:13px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #selected-finish :is(p,a){color:var(--p03-muted);font-size:12px;line-height:1.55}
+html body.mir-pliage03.mir-prestige[data-client-entry] #selected-finish strong{font-size:14px;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-optional-metal{margin:12px 0;padding:12px 0;border-top:1px solid var(--p03-line);color:var(--p03-muted)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-optional-metal summary{min-height:44px;padding:10px 0;font-size:14px;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-optional-metal :is(p,label){font-size:13px;line-height:1.55}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-optional-metal textarea{min-height:90px;height:auto}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"]:has(#client-optional-metal[open]) .finish-fields>:not(#client-optional-metal):not([hidden]),
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"]:has(#client-optional-metal[open]) #production-profile-options:not([hidden]){display:revert!important}
+
+/* Quantity, authentic recap and post-add confirmation. */
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#client-piece-recap,.mir-pliage03-recap){padding:18px 0;margin:0;color:var(--p03-text);font-size:14px;line-height:1.55}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#client-piece-recap,.mir-pliage03-recap) h3{font-size:20px;line-height:1.3;font-weight:400;margin:0 0 18px;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(.client-recap-measures,.client-recap-angles){display:flex;flex-wrap:wrap;gap:10px 18px;margin:8px 0;color:var(--p03-text);font-size:14px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-piece-recap dl{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin:20px 0 0}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#client-piece-recap,.mir-pliage03-recap) dl>div{display:grid;grid-template-columns:minmax(90px,.8fr) minmax(0,1.2fr);gap:14px;padding:12px 0;border-top:1px solid var(--p03-line)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-piece-recap dt{font-size:13px;color:var(--p03-muted)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-piece-recap dd{font-size:14px;line-height:1.5;margin:0;overflow-wrap:anywhere;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="4"] #client-step-scroll>.config-section{margin:12px 0;padding:0;border:0}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="4"] #production-quantity{width:150px;max-width:100%;font-size:18px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added{width:min(850px,100%);margin:0 auto;padding:38px 0;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added h1{margin:0 0 14px;font-size:clamp(30px,3.5vw,46px);line-height:1.14;font-weight:400;letter-spacing:-.03em}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added>p{font-size:16px;line-height:1.6;color:var(--p03-muted)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added-preview{display:grid;grid-template-columns:minmax(180px,.8fr) minmax(0,1.2fr);gap:30px;align-items:center;margin:28px 0;padding:24px 0;border-block:1px solid var(--p03-line)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added-preview svg{width:100%;height:210px;background:var(--p03-drawing);color:#242522;border-radius:3px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added-actions :is(a,button){flex:1 1 auto}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-signature-footer{padding:18px clamp(20px,3vw,52px);background:var(--p03-bg);color:var(--p03-muted);border-top:1px solid var(--p03-line);font-size:12px}
+
+/* Only diagram hosts are targeted: swatch images and exported documents are excluded. */
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#production-drawing,#mir-pliage03-faces,#client-model-options) svg [stroke="#304b3d"],
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#production-drawing,#mir-pliage03-faces,#client-model-options) svg [stroke="#97a68b"]{stroke:#f4f1ea}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#production-drawing,#mir-pliage03-faces,#client-model-options) svg [stroke="#dfe8e3"],
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#production-drawing,#mir-pliage03-faces,#client-model-options) svg [stroke="#dbe3d4"]{stroke:#bda889}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#production-drawing,#mir-pliage03-faces,#client-model-options) svg :is([stroke="#667e60"],[stroke="#8a8b80"]){stroke:#aaa99e}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#production-drawing,#mir-pliage03-faces) svg :is(.profile-painted-stripe,[stroke="#175b94"]){stroke:#76bce5}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#production-drawing,#mir-pliage03-faces) svg :is(.profile-side-marker,.client-compact-side) rect{fill:#292a26}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#production-drawing,#mir-pliage03-faces) svg :is(.profile-side-marker,.client-compact-side) text{fill:#f4f1ea}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"]:not(.mobile-trace) #production-drawing{min-height:200px}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"]:not(.mobile-trace) #production-drawing>svg{height:220px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #mir-pliage03-faces .client-face-choices svg{height:180px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-face-card .face-check{position:absolute;top:8px;right:8px;display:grid;place-items:center;width:22px;height:22px;border:1px solid var(--p03-line);border-radius:50%;font-size:14px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-face-card[aria-pressed=true] .face-check{border-color:var(--p03-sand);background:var(--p03-sand);color:#242522}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-face-card[aria-pressed=true]::after{content:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-palette{max-height:330px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:5px;scroll-padding:8px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-recap-edit{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-recap-edit button{min-height:44px;color:var(--p03-sand);background:transparent;border:0;padding:8px 0;font-size:13px;text-decoration:underline;text-underline-offset:4px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-angle-nudges{display:flex;gap:6px;margin:6px 0 0;justify-content:flex-end}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-angle-nudges button{min-width:34px;min-height:32px;border:1px solid var(--p03-line);border-radius:3px;background:var(--p03-panel);color:var(--p03-text);font-size:12px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-angle-field.is-selected{outline:1px solid var(--p03-sand);outline-offset:5px;border-radius:2px}
+
+/* Override the old public wizard's show/hide layout, never its active-stage fields. */
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-production-steps{display:block!important}
+html body.mir-pliage03.mir-prestige[data-client-entry] .view-switch{display:none!important}
+html body.mir-pliage03.mir-prestige[data-client-entry="measures"] #production-preview{display:block!important}
+html body.mir-pliage03.mir-prestige:is([data-client-entry="choice"],[data-client-entry="models"]) :is(#production-preview,.config-card){display:none!important}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button>span:not(:first-child){display:block;flex:1 1 auto;width:auto;height:auto;margin:0;border:0;border-radius:0;background:transparent;color:inherit;font-weight:400;line-height:1.35}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] .finish-fields{grid-template-columns:minmax(0,1fr)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #selected-finish :is(p,a){display:block}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-entry .client-entry-cards>.client-viewport-off-page{display:grid!important}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-entry .client-entry-cards>:is(button,a){text-decoration:none}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] #contenu{width:100%;max-width:1820px;padding:26px clamp(20px,3vw,52px) 36px;margin:0 auto;min-height:calc(100svh - 160px)}
+html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-icon svg{width:100%;height:72px;max-width:110px}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] .client-entry-cards>a{grid-template-columns:minmax(0,1fr) 22px;grid-template-rows:80px auto auto}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] .client-entry-cards>a .client-entry-icon{grid-column:1/-1}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] .client-entry-cards>a strong{grid-column:1;grid-row:2}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] .client-entry-cards>a small{grid-column:1;grid-row:3;margin-top:0}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] .client-entry-cards>a>span:last-child{grid-column:2;grid-row:2;align-self:center;color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] #client-entry>p{color:var(--p03-muted);font-size:16px;line-height:1.6}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] #client-entry h1 em{font-family:Georgia,serif;color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] #client-step-list li>span{display:flex;align-items:center;min-height:64px;padding:12px;color:var(--p03-muted);font-size:14px;border:1px solid transparent;border-radius:3px}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] #client-step-list li>span[aria-current=step]{background:var(--p03-panel);border-color:var(--p03-sand);color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] .client-bend-quick{color:var(--p03-muted);background:transparent;border:0;border-top:1px solid var(--p03-line);margin-top:30px}
+html body.mir-pliage03.mir-prestige.mir-pliage03-landing[data-client-entry] .client-bend-quick>summary{color:var(--p03-muted);background:transparent;min-height:50px;font-size:13px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-main .config-card :is(input,select,textarea){background:var(--p03-input)!important;color:var(--p03-text)!important;border-color:var(--p03-line)!important}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-actions .primary-button{background:var(--p03-sand)!important;color:#242522!important;border-color:var(--p03-sand)!important}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-actions .secondary-button{background:transparent!important;color:var(--p03-text)!important;border-color:var(--p03-line)!important}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-actions button:disabled{background:#3c3d35!important;color:#b7b6ab!important;border-color:var(--p03-line)!important}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(#production-drawing,#mir-pliage03-faces) svg text{fill:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-main :is(.eyebrow,#client-step-count){color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #drawing-gesture-hint{color:var(--p03-muted);font-size:12px}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] #production-color-grid.mir-pliage03-palette{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-height:290px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:5px;scroll-padding:8px}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-swatch .swatch-check{display:none}
+html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-swatch .missing-swatch{display:grid;place-items:center;height:100%;padding:5px;background:#3d3e37;color:var(--p03-muted);font-size:11px;line-height:1.3;text-align:center}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] #production-preview>:is(.mir-panel-synced-views,#production-drawing,#profile-dimension-list,#drawing-navigation,.drawing-legend,.drawing-note){display:none!important}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] #mir-pliage03-faces .client-painted-face{margin-top:14px}
+html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] #mir-pliage03-faces .client-face-choices svg{height:clamp(180px,28vh,280px)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-drawing .mir-angle-annotation path{stroke:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-drawing .mir-angle-annotation text{fill:var(--p03-text);stroke:var(--p03-drawing)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-drawing .mir-angle-annotation.is-selected path{stroke:#76bce5}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-drawing[data-tool=draw] svg rect:is([fill="#fff"],[fill="#fcfcf8"]){fill:var(--p03-drawing)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-drawing[data-tool=draw] svg path:is([stroke="#a8b5ad"],[stroke="#c3cebc"]){stroke:#54564d}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-drawing[data-tool=draw] svg path[stroke="#71877c"]{stroke:#7e8073}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-color-grid.mir-pliage03-palette{grid-auto-rows:minmax(132px,auto);align-content:start}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-color-grid>.mir-pliage03-swatch{height:auto;min-height:132px;overflow:visible;justify-content:flex-start}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-color-grid>.mir-pliage03-swatch .image{flex:0 0 58px}
+html body.mir-pliage03.mir-prestige[data-client-entry="draw"] .config-card{display:none!important}
+html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #production-preview{display:grid;grid-template-columns:minmax(0,1fr) 220px;grid-template-areas:"canvas actions";gap:22px}
+html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #production-drawing{height:460px;max-height:none;aspect-ratio:auto}
+html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #production-drawing>svg{height:100%;min-height:0}
+html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #drawing-tools{display:flex;flex-direction:column;align-items:stretch;gap:12px;margin:0;padding:18px;background:var(--p03-panel);border:1px solid var(--p03-line);border-radius:3px;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #drawing-tools :is(h2,p,label){color:var(--p03-muted);font-size:13px;line-height:1.55}
+html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #drawing-tools .draw-primary{background:var(--p03-sand);color:#242522;border-color:var(--p03-sand)}
+html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #drawing-tools .draw-primary:disabled{background:#3c3d35;color:#b7b6ab;border-color:var(--p03-line);opacity:1}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dialog.mir-pliage03-added{width:560px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 48px);padding:32px;background:var(--p03-bg);border:1px solid var(--p03-sand);border-radius:4px;color:var(--p03-text);box-shadow:0 20px 90px #0009}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dialog.mir-pliage03-added :is(.dialog-heading,.dialog-intro){color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dialog.mir-pliage03-added .dialog-heading{font:400 30px/1.2 "DM Sans",Arial,sans-serif;margin:8px 24px 16px 0}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dialog.mir-pliage03-added .dialog-intro{font-size:15px;line-height:1.6;color:var(--p03-muted)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dialog.mir-pliage03-added .dialog-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:24px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dialog.mir-pliage03-added .dialog-close{width:38px;min-height:38px;border:1px solid var(--p03-line);border-radius:50%;background:var(--p03-panel);color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-dialog.mir-pliage03-added .eyebrow{color:var(--p03-muted);font-size:12px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #production-toast{background:var(--p03-panel);color:var(--p03-text);border:1px solid var(--p03-sand);border-radius:3px;font-size:13px;line-height:1.5}
+html body.mir-pliage03.mir-prestige[data-client-entry] #client-viewport-dossier{color:var(--p03-sand);background:transparent;border-color:var(--p03-line);font-size:14px;min-height:44px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #drawing-tools :is(input,select,textarea){min-width:0;max-width:100%;min-height:44px;padding:10px;background:var(--p03-input)!important;color:var(--p03-text)!important;border:1px solid var(--p03-line);border-radius:3px;font-size:16px}
+html body.mir-pliage03.mir-prestige[data-client-entry] #drawing-tools summary{min-height:44px;font-size:13px;line-height:1.55;color:var(--p03-text)}
+html body.mir-pliage03.mir-prestige[data-client-entry] :is(.eyebrow,#client-step-count){color:var(--p03-sand)!important}
+
+@media(min-width:960px){
+ html body.mir-pliage03.mir-prestige[data-client-entry] .production-workspace{grid-template-columns:168px minmax(0,1fr) minmax(300px,360px);gap:var(--p03-gap)}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-production-steps{grid-column:1;grid-row:1;position:sticky;top:24px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list{grid-template-columns:minmax(0,1fr);gap:15px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button{min-height:64px;padding:11px 10px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-entry{grid-column:2 / -1;grid-row:1}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #production-preview{grid-column:2;grid-row:1}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .config-card{grid-column:3;grid-row:1;border-left:1px solid var(--p03-line);padding-left:var(--p03-gap)}
+ html body.mir-pliage03.mir-prestige[data-client-entry="draw"] .mir-production-steps{grid-row:1 / span 2}
+ html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #production-preview{grid-column:2 / -1;grid-row:2}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added{grid-column:2 / -1;grid-row:1}
+}
+@media(min-width:1600px){
+ html body.mir-pliage03.mir-prestige[data-client-entry] .production-workspace{grid-template-columns:190px minmax(0,1fr) minmax(360px,420px)}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button{font-size:15px;min-height:70px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-palette{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(min-width:960px) and (max-width:1199px){
+ html body.mir-pliage03.mir-prestige{--p03-gap:18px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #production-main{padding:22px 24px 30px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .production-workspace{grid-template-columns:142px minmax(0,1fr) 300px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button{gap:8px;padding:9px 7px;font-size:13px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-head{flex-wrap:wrap;gap:10px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards>:is(button,a){padding:22px 18px;grid-template-columns:30px minmax(0,1fr) 18px;gap:12px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards strong{font-size:20px}
+}
+@media(max-width:959px){
+ html body.mir-pliage03.mir-prestige[data-client-entry] #production-main{padding:24px 24px 32px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-production-steps{border-bottom:1px solid var(--p03-line);padding-bottom:18px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-production-steps>p{max-width:none;margin:12px 8px 0;font-size:12px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .config-card{padding:24px 0 0;border-top:1px solid var(--p03-line)}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-scroll{display:block}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #production-dimensions :is(.client-measures-grid,.client-angles-grid){grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-palette{grid-template-columns:repeat(5,minmax(0,1fr))}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .client-face-choices svg{height:150px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-actions{margin-top:22px;padding-top:20px}
+ html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #production-preview{grid-template-columns:minmax(0,1fr);grid-template-areas:"canvas" "actions"}
+ html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #drawing-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #drawing-tools :is(h2,.client-trace-help){grid-column:1/-1}
+}
+@media(max-width:599px){
+ html body.mir-pliage03.mir-prestige{--p03-gap:22px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #production-main{padding:18px 18px 30px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-heading{margin-bottom:22px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button{min-height:54px;padding:8px 7px;font-size:12px;gap:9px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-list button>span:first-child{flex-basis:26px;width:26px;height:26px;font-size:12px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-entry h1{font-size:30px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-entry-intro{font-size:15px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards{grid-template-columns:minmax(0,1fr);gap:16px;margin:22px 0}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards>:is(button,a){padding:22px;min-height:148px;grid-template-columns:32px minmax(0,1fr) 18px;gap:14px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards strong{font-size:19px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .client-entry-cards small{font-size:13px;line-height:1.5}
+ html body.mir-pliage03.mir-prestige[data-client-entry=models] #client-model-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ html body.mir-pliage03.mir-prestige[data-client-entry=models] .template-button:not(.client-viewport-off-page){min-height:135px;padding:13px 10px;font-size:13px}
+ html body.mir-pliage03.mir-prestige[data-client-entry=models] .template-button svg{height:70px;max-height:70px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-head{gap:12px;flex-wrap:wrap}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .drawing-head h2{font-size:22px}
+ html body.mir-pliage03.mir-prestige[data-client-entry]:not(.mobile-trace) #production-drawing{min-height:270px}
+ html body.mir-pliage03.mir-prestige[data-client-entry]:not(.mobile-trace) #production-drawing>svg{height:300px;min-height:0}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #production-dimensions :is(.client-measures-grid,.client-angles-grid){grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-count{font-size:12px;line-height:1.5;float:none;margin:0 0 8px;text-align:left}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-title{font-size:26px;line-height:1.2}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-step-hint{font-size:14px;line-height:1.55;margin:12px 0 18px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] #client-local-save{font-size:12px;line-height:1.5;text-align:left;margin:10px 0}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .client-step-buttons button{flex:1 1 0;padding:12px;font-size:14px;min-height:48px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-palette{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .client-face-choices svg{height:105px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] :is(.client-face-choices button,.mir-pliage03-face-card){min-height:148px;padding:10px;font-size:14px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added{padding:12px 0}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added-preview{grid-template-columns:minmax(0,1fr);gap:20px}
+ html body.mir-pliage03.mir-prestige[data-client-entry] .mir-pliage03-added-actions{display:grid;grid-template-columns:minmax(0,1fr)}
+ html body.mir-pliage03.mir-prestige[data-client-entry="draw"] #production-drawing{height:300px;min-height:270px}
+ html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] #mir-pliage03-faces .client-face-choices svg{height:140px}
+ html body.mir-pliage03.mir-prestige[data-client-entry][data-client-stage="3"] #mir-pliage03-faces .mir-pliage03-face-card{min-height:190px}
+}

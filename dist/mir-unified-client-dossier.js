@@ -84,7 +84,7 @@
    notes:['Dossier de préparation uniquement. Aucun paiement, commande ou envoi.',
     'Prix, stock, couleurs, dimensions et règles de fabrication à confirmer par MIR.']};
  }
- function pdfOptions(state,{selectionPDF,production,bendTariff}={}){
+ function pdfOptions(state,{selectionPDF,production,bendTariff,profileSurfaceRenderer}={}){
   if(!state.ready)throw Error('Vérifiez les noms de projet et les éléments enregistrés avant export.');
   const faces=[];
   if(state.materials.length){
@@ -95,7 +95,7 @@
    if(!production?.productionPages)throw Error('Moteur de fiches cotées indisponible.');
    faces.push(...production.productionPages({
     ...state.order,items:state.pieces.map(item=>item.snapshot||item.spec)
-   },{document:'client-request',bendTariff}));
+   },{document:'client-request',bendTariff,...(typeof profileSurfaceRenderer==='function'?{profileSurfaceRenderer}: {})}));
   }
   if(!faces.length)throw Error('Aucune pièce ou aucun matériau à exporter.');
   return {title:'MIR — Dossier matériaux et pièces sur mesure',
@@ -203,7 +203,7 @@
    busy=true;pdf.disabled=true;json.disabled=true;
    status.textContent='Préparation des pages matériaux et des croquis cotés…';
    try{
-    const state=render(),options=pdfOptions(state,{selectionPDF:win.MIRSelectionPDF,production:win.MIRProduction,bendTariff});
+    const state=render(),options=pdfOptions(state,{selectionPDF:win.MIRSelectionPDF,production:win.MIRProduction,bendTariff,profileSurfaceRenderer:win.MIRPliageDocuments?.clientRenderer(win)});
     if(!win.MIRPDF?.exportPlan)throw Error('Moteur PDF indisponible.');
     const result=await win.MIRPDF.exportPlan(options);
     status.textContent=en()?'Complete project file ready · '+result.pages+' '+(result.pages===1?'page':'pages')+'. Use Download in the panel.':'Dossier complet prêt · '+result.pages+' page'+(result.pages===1?'':'s')+'. Utilisez Télécharger dans le panneau.';

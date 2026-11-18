@@ -1,0 +1,299 @@
+{
+  "sourceCommit": "e58964cd8937766d2457904d2d7d625d1bc7df5e",
+  "note": "SHA256 of JSON.stringify output from the unchanged historical engine, generated locally without network.",
+  "order": {
+    "id": "DOS-CONTROLE",
+    "project": "Projet Québec",
+    "poNumber": "TEST-LOCAL",
+    "foreman": "Personne fictive",
+    "date": "2026-11-18",
+    "revision": "A",
+    "notes": "Vérification locale uniquement. "
+  },
+  "cases": [
+    {
+      "name": "l",
+      "spec": {
+        "kind": "profile",
+        "id": "M001",
+        "name": "Pièce de contrôle",
+        "unit": "in",
+        "length": 120,
+        "quantity": 3,
+        "material": {
+          "type": "aluminium",
+          "thickness": "0.019"
+        },
+        "finish": {
+          "selectionType": "manufacturer",
+          "manufacturer": "Kaycan",
+          "system": "Nuancier Kaycan",
+          "name": "Noir",
+          "code": "NOIR",
+          "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+          "availabilityNote": "Disponibilité à confirmer."
+        },
+        "coloredFace": {
+          "side": "left",
+          "segmentId": "A"
+        },
+        "location": "Façade conservée",
+        "note": "Note client exacte : accès arrière — ne pas modifier.",
+        "template": "l",
+        "dimensions": {
+          "A": 4,
+          "B": 3
+        }
+      },
+      "baseline": {
+        "model": "c8dde95060b03dcbb36ee390a63fd8d7bf5b3c39b9e38636e4915a00cdec3a88",
+        "client": "fd1ea89de66f08820eb07608f271b3cf28ef6bba42b216b09c0e41e16661b448",
+        "staff": "ee8adc6d018df7527d1bb87df13ba45087987f7af7754e7e0f7fe8625c1e58ad",
+        "bendingSheet": "3a15e0c035e54439d3888fe4117a64d359868332ef5715c146987e6314c81b61",
+        "profileSVG": "0d89a88f4d01f45dec387536be236f6faca2160f34947344078a30573671be2c"
+      }
+    },
+    {
+      "name": "decimal-z",
+      "spec": {
+        "kind": "profile",
+        "id": "M001",
+        "name": "Pièce de contrôle",
+        "unit": "in",
+        "length": 120,
+        "quantity": 3,
+        "material": {
+          "type": "aluminium",
+          "thickness": "0.019"
+        },
+        "finish": {
+          "selectionType": "manufacturer",
+          "manufacturer": "Kaycan",
+          "system": "Nuancier Kaycan",
+          "name": "Noir",
+          "code": "NOIR",
+          "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+          "availabilityNote": "Disponibilité à confirmer."
+        },
+        "coloredFace": {
+          "side": "left",
+          "segmentId": "A"
+        },
+        "location": "Façade conservée",
+        "note": "Note client exacte : accès arrière — ne pas modifier.",
+        "template": "custom",
+        "startAngle": 0,
+        "segments": [
+          {
+            "label": "A",
+            "length": 5
+          },
+          {
+            "label": "B",
+            "length": 3
+          },
+          {
+            "label": "C",
+            "length": 2
+          }
+        ],
+        "bends": [
+          {
+            "mode": "interior",
+            "angle": 112.5,
+            "direction": "left"
+          },
+          {
+            "mode": "interior",
+            "angle": 67.25,
+            "direction": "right"
+          }
+        ]
+      },
+      "baseline": {
+        "model": "b2bd16b57ebc1fb68c556e14dcd1f10bf25c58b4904263688e802cfbe81e9538",
+        "client": "9aa05d37c0f2eb30117fbb7f36cc677a4a1eb5b1a36b9fba4e97c1509e6ff9a0",
+        "staff": "00394d4363cad2cef5135e1ac6e6b92fd2af287e7ee2f4ec1d25b42ef078a317",
+        "bendingSheet": "1c02be1cc01c7e84bcfce8b9b1727dc987820923b2e98e003409bbd428afbfa3",
+        "profileSVG": "f595377ced4d22fd487f251968a3794f0d4ccf2bd02f40d6ecf4c1fab8c2e311"
+      }
+    },
+    {
+      "name": "hem",
+      "spec": {
+        "kind": "profile",
+        "id": "M001",
+        "name": "Pièce de contrôle",
+        "unit": "in",
+        "length": 120,
+        "quantity": 3,
+        "material": {
+          "type": "aluminium",
+          "thickness": "0.019"
+        },
+        "finish": {
+          "selectionType": "manufacturer",
+          "manufacturer": "Kaycan",
+          "system": "Nuancier Kaycan",
+          "name": "Noir",
+          "code": "NOIR",
+          "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+          "availabilityNote": "Disponibilité à confirmer."
+        },
+        "coloredFace": {
+          "side": "left",
+          "segmentId": "A"
+        },
+        "location": "Façade conservée",
+        "note": "Note client exacte : accès arrière — ne pas modifier.",
+        "template": "custom",
+        "startAngle": 0,
+        "segments": [
+          {
+            "label": "A",
+            "length": 4
+          },
+          {
+            "label": "B",
+            "length": 0.75
+          },
+          {
+            "label": "C",
+            "length": 3
+          }
+        ],
+        "bends": [
+          {
+            "mode": "hem",
+            "angle": 180,
+            "direction": "left"
+          },
+          {
+            "mode": "interior",
+            "angle": 90,
+            "direction": "right"
+          }
+        ]
+      },
+      "baseline": {
+        "model": "8ecee9c8fc764649839843ae1b45cd663588abfed0525e62b86c7cfc3ac3551e",
+        "client": "3deb62ec695e1befcd1cf2960881413f022564f8f8b171abbe6e7962ea5d00d0",
+        "staff": "7a2934653d8ef13573107f02f3257d53bba7908209345bdcb3f38634e363904a",
+        "bendingSheet": "baf9dc977a740b4b907d1eceb45bb5625a31c76297f298f37dbb1061d97ae902",
+        "profileSVG": "7ee89a1cccf928f0c66d1337b8bd32ca82663ca332ec4240981fe6beff8b5540"
+      }
+    },
+    {
+      "name": "concave",
+      "spec": {
+        "kind": "profile",
+        "id": "M001",
+        "name": "Pièce de contrôle",
+        "unit": "in",
+        "length": 120,
+        "quantity": 3,
+        "material": {
+          "type": "aluminium",
+          "thickness": "0.019"
+        },
+        "finish": {
+          "selectionType": "manufacturer",
+          "manufacturer": "Kaycan",
+          "system": "Nuancier Kaycan",
+          "name": "Noir",
+          "code": "NOIR",
+          "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+          "availabilityNote": "Disponibilité à confirmer."
+        },
+        "coloredFace": {
+          "side": "left",
+          "segmentId": "A"
+        },
+        "location": "Façade conservée",
+        "note": "Note client exacte : accès arrière — ne pas modifier.",
+        "template": "custom",
+        "startAngle": 25,
+        "segments": [
+          {
+            "label": "A",
+            "length": 5
+          },
+          {
+            "label": "B",
+            "length": 2
+          },
+          {
+            "label": "C",
+            "length": 3
+          },
+          {
+            "label": "D",
+            "length": 4
+          }
+        ],
+        "bends": [
+          {
+            "mode": "signed",
+            "angle": 72.5
+          },
+          {
+            "mode": "signed",
+            "angle": -93.75
+          },
+          {
+            "mode": "signed",
+            "angle": 121.25
+          }
+        ]
+      },
+      "baseline": {
+        "model": "701c36c618fd0f5d8274d7a106bff45a8c69df67a8cb06b381476f2f6b4475c8",
+        "client": "4154aa9e540c247c0909fc47c429db196822c016cb1d0ba5925c79a9a325c89c",
+        "staff": "91f3c782c9d0c23621113a7fc976a64a7b2ee2be67e891be9bd65693f52d939c",
+        "bendingSheet": "6f17a6ffa21534fc4e63e4be7ab37006064c19fc2fad0fe0f42457175861374a",
+        "profileSVG": "c41f4947dc53617155d11f7431bbce6be54a19f213bbed46db34ddc77458bd53"
+      }
+    },
+    {
+      "name": "panel",
+      "spec": {
+        "kind": "panel",
+        "id": "M001",
+        "name": "Pièce de contrôle",
+        "unit": "in",
+        "length": 120,
+        "quantity": 3,
+        "material": {
+          "type": "aluminium",
+          "thickness": "0.019"
+        },
+        "finish": {
+          "selectionType": "manufacturer",
+          "manufacturer": "Kaycan",
+          "system": "Nuancier Kaycan",
+          "name": "Noir",
+          "code": "NOIR",
+          "source": "https://www.kaycan.com/product/aluminum/aluminum-siding/acm/",
+          "availabilityNote": "Disponibilité à confirmer."
+        },
+        "coloredFace": {
+          "side": "left",
+          "segmentId": "A"
+        },
+        "location": "Façade conservée",
+        "note": "Note client exacte : accès arrière — ne pas modifier.",
+        "shape": "rectangle",
+        "width": 20,
+        "height": 12,
+        "relief": 0,
+        "bottomEdgeId": "bottom"
+      },
+      "baseline": {
+        "model": "60c79b4f8988ecf527c771ae5b8d171259009ce6f211ac3bb0fa96ef9571d9ab",
+        "client": "be3033e32d8587a32a4c3e25016af3ce7dad3b0ac6b4f6302a2721141b558550",
+        "staff": "bd383708c4b94d4685ff3d18868dc1e97bbb2fd039ba1036a1132b552d16a71b",
+        "bendingSheet": "bd383708c4b94d4685ff3d18868dc1e97bbb2fd039ba1036a1132b552d16a71b"
+      }
+    }
+  ]
+}

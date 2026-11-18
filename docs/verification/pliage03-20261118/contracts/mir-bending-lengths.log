@@ -1,0 +1,20 @@
+PASS Une moulure standard est livrée en 120 po
+PASS Le J générique est de 10 pi
+PASS Un coin J intégré ne reçoit pas par erreur le 12 pi
+PASS Seul le J à soffite identifié est en 144 po
+PASS La longueur exacte 120 est admise sur une nouvelle commande
+PASS La longueur exacte 144 du J soffite est admise
+PASS La longueur 144 est refusée sur le J générique
+PASS Les longueurs 96, 100 et 0 sont refusées sur les nouvelles commandes
+PASS Les millimètres après conversion respectent les deux formats
+PASS L ancienne pièce 96 peut être révisée sans changer la longueur
+PASS Une longueur historique changée ne bénéficie pas de l exception
+PASS Un modèle préexistant reste valide pour lecture et PDF
+PASS Le configurateur principal charge le moteur avant son application
+PASS Le configurateur standalone réutilise la même règle
+PASS L identifiant J soffite est distinct dans le configurateur
+PASS Les modifications historiques restent séparées des snapshots
+PASS Le transfert de profil applique la même longueur fixe que le configurateur
+PASS Le transfert refuse une quantité invalide sans toucher à la géométrie
+PASS La dérogation J reste figée au transfert et ne permet pas le 12 pi
+MIR longueurs: 19 tests réussis.
