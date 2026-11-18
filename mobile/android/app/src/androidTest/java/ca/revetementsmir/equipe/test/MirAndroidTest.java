@@ -32,6 +32,20 @@ public class MirAndroidTest extends MirDeviceSetup {
   while(SystemClock.uptimeMillis()<end){if(Boolean.TRUE.equals(js(scenario,expression)))return;SystemClock.sleep(150);}
   screenshot("failed-wait");fail("Condition Android WebView non satisfaite : "+expression+"; état PDF="+js(scenario,"JSON.stringify({status:document.querySelector('#status')?.textContent,error:window.mirNativeDiagnostic,save:window.saveProof,visibility:document.visibilityState,field:document.querySelector('#android-recipe-input')?.getBoundingClientRect().toJSON(),height:innerHeight,viewport:window.visualViewport?{height:visualViewport.height,top:visualViewport.offsetTop}:null})"));
  }
+ private void assertNativeSignInTheme(ActivityScenario<MainActivity>s)throws Exception{
+  waitFor(s,"document.fonts.status==='loaded' && !!document.querySelector('body>#mir-native-state') && !!document.querySelector('.auth-grid .auth-card #auth-email')");
+  org.json.JSONObject theme=(org.json.JSONObject)js(s,"(()=>{const style=q=>{const n=document.querySelector(q),c=getComputedStyle(n);return{background:c.backgroundColor,color:c.color,font:c.fontFamily,visible:n.getClientRects().length>0};};return{body:style('body'),card:style('.auth-card'),input:style('#auth-email'),action:style('#auth-signin-form button[type=submit]'),heading:style('.auth-intro h1'),fontLoaded:document.fonts.check('16px \"DM Sans\"')};})()");
+  File dir=new File(InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null),"phase11-proof");assertTrue(dir.isDirectory()||dir.mkdirs());
+  java.nio.file.Files.write(new File(dir,"android-signin-theme.json").toPath(),theme.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+  assertEquals("Native sign-in anthracite background","rgb(36, 37, 34)",theme.getJSONObject("body").getString("background"));
+  assertEquals("Native sign-in light text","rgb(244, 241, 234)",theme.getJSONObject("body").getString("color"));
+  assertEquals("Native sign-in card surface","rgb(45, 46, 42)",theme.getJSONObject("card").getString("background"));
+  assertEquals("Native sign-in input surface","rgb(53, 54, 48)",theme.getJSONObject("input").getString("background"));
+  assertEquals("Native sign-in sand action","rgb(189, 168, 137)",theme.getJSONObject("action").getString("background"));
+  assertEquals("Native sign-in dark action label","rgb(36, 37, 34)",theme.getJSONObject("action").getString("color"));
+  for(String element:new String[]{"body","input","action"}){assertTrue("Native sign-in visible "+element,theme.getJSONObject(element).getBoolean("visible"));assertTrue("Native sign-in DM Sans "+element,theme.getJSONObject(element).getString("font").contains("DM Sans"));}
+  assertTrue("Native sign-in Arial heading",theme.getJSONObject("heading").getString("font").startsWith("Arial"));assertTrue("Native sign-in font resource loaded",theme.getBoolean("fontLoaded"));
+ }
  private void screenshot(ActivityScenario<MainActivity>s,String name)throws Exception{
   CountDownLatch drawn=new CountDownLatch(1);
   s.onActivity(a->a.getBridge().getWebView().postVisualStateCallback(1,new android.webkit.WebView.VisualStateCallback(){@Override public void onComplete(long id){drawn.countDown();}}));
@@ -109,6 +123,7 @@ public class MirAndroidTest extends MirDeviceSetup {
    assertEquals(Boolean.TRUE,js(s,"document.querySelector('#auth-signin-form').hidden"));
    js(s,"document.querySelector('#mir-email-toggle').click();true");
    assertEquals(Boolean.FALSE,js(s,"document.querySelector('#auth-signin-form').hidden"));
+   assertNativeSignInTheme(s);
    js(s,"document.querySelector('#auth-email').value='recette-phase11@example.invalid';localStorage.setItem('mir_phase11_probe','retained');true");
    screenshot(s,"android-signin-portrait");
    js(s,"MIRHarmonySettings.store({theme:'dark',textSize:'large',reducedMotion:'on',highContrast:true});true");

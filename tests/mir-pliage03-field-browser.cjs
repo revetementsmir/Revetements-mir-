@@ -16,7 +16,20 @@ async function state(frame){return frame.evaluate(()=>MIRProductionWorkspace.get
 async function stage(frame,n){await frame.waitForFunction(n=>document.body.dataset.clientStage===String(n),n);}
 async function layout(frame){const info=await frame.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth}));assert.ok(info.scroll<=info.width+1&&info.body<=info.width+1,'no horizontal overflow '+JSON.stringify(info));return info;}
 async function shot(page,name){await page.screenshot({path:path.join(out,name+'.png'),animations:'disabled',caret:'hide'});report.captures.push(name+'.png');}
-async function chooseModel(frame){await frame.locator('#client-choose-model').click();await frame.locator('[data-client-profile="l"]').click();await stage(frame,2);await frame.locator('[data-measure="A"]').fill('3.5');await frame.locator('[data-measure="B"]').fill('2.25');await frame.locator('[data-client-bend-angle="0"]').fill('112.5');}
+function contrast(a,b){
+ const luminance=colour=>{const rgb=colour.match(/[\d.]+/g);assert.ok(rgb&&rgb.length>=3,'computed RGB colour: '+colour);return rgb.slice(0,3).map(Number).map(v=>{const c=v/255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);};
+ const x=luminance(a),y=luminance(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05);
+}
+async function bankContrast(frame){
+ const cards=await frame.locator('#client-model-options [data-client-profile]:visible').evaluateAll(nodes=>nodes.map(button=>{
+  const svg=button.querySelector('svg'),line=svg.querySelector('[stroke="currentColor"]'),card=getComputedStyle(button),ink=getComputedStyle(svg);
+  return{id:button.dataset.clientProfile,text:card.color,background:card.backgroundColor,ink:ink.color,canvas:ink.backgroundColor,stroke:line&&getComputedStyle(line).stroke};
+ }));
+ assert.ok(cards.length,'visible bank models');
+ for(const card of cards){assert.equal(card.ink,card.text,card.id+' uses the app text ink');assert.equal(card.stroke,card.ink,card.id+' renders its actual currentColor path');assert.ok(contrast(card.stroke,card.canvas)>=3,card.id+' profile contrast');assert.ok(contrast(card.text,card.background)>=4.5,card.id+' title contrast');}
+ return{models:cards.length,minProfileContrast:Math.min(...cards.map(c=>contrast(c.stroke,c.canvas))),minTextContrast:Math.min(...cards.map(c=>contrast(c.text,c.background))),ink:cards[0].ink,canvas:cards[0].canvas};
+}
+async function chooseModel(frame){await frame.locator('#client-choose-model').click();const bank=await bankContrast(frame);await frame.locator('[data-client-profile="l"]').click();await stage(frame,2);await frame.locator('[data-measure="A"]').fill('3.5');await frame.locator('[data-measure="B"]').fill('2.25');await frame.locator('[data-client-bend-angle="0"]').fill('112.5');return bank;}
 async function finish(frame){
  await frame.locator('#client-step-next').click();await stage(frame,3);
  await frame.locator('#material-type').selectOption('aluminium');
@@ -71,7 +84,7 @@ async function main(){
   for(const button of await frame.locator('#client-step-list button').all())assert.equal(await button.isVisible(),true,'all four steps visible');
   await stage(frame,1);await untouched(frame);await layout(frame);await shot(page,'field-choice-390');
   const keyA=await frame.evaluate(()=>MIRProductionWorkspace.storageKeys.activeProfile);assert.notEqual(keyA,publicKey);
-  await chooseModel(frame);await layout(frame);await shot(page,'field-measures-390');
+  const bank390=await chooseModel(frame);await layout(frame);await shot(page,'field-measures-390');
   const finishProof=await finish(frame);await layout(frame);await shot(page,'field-finish-390');
   await frame.locator('#client-step-next').click();await stage(frame,4);
   assert.equal(await frame.locator('#production-quantity').inputValue(),'');
@@ -99,7 +112,7 @@ async function main(){
   await stage(frame,2);await frame.locator('#client-step-next').click();await frame.locator('#client-step-next').click();await stage(frame,4);assert.equal(await frame.locator('#production-quantity').inputValue(),'6');await frame.locator('#production-quantity').fill('4');await frame.locator('#client-step-next').click();
   const revised=await frame.evaluate(()=>({order:MIRProductionWorkspace.getEstimationDossier(),cart:MIRUnifiedOrderCart.list()}));assert.equal(revised.order.items.length,1);assert.equal(revised.cart.length,1);assert.equal(revised.cart[0].quantity,4);assert.deepEqual(revised.order.items[0].snapshot.geometry,saved.order.items[0].snapshot.geometry);assert.ok(revised.order.items[0].history.length);
   assert.equal(await frame.evaluate(()=>MIRProductionWorkspace.editFieldOrderItem('other-worker-item')),false);assert.equal(await frame.evaluate(()=>MIRProductionWorkspace.newPurchaseOrder()),false);assert.equal(await frame.evaluate(()=>MIRProductionWorkspace.openModelFromCurrent()),false);
-  report.checks.push({name:'full-personal-journey-isolation-reload-edit-cart',passed:true,finish:finishProof,keys:{actorJob:keyA,unassigned:unassignedKey}});
+  report.checks.push({name:'full-personal-journey-isolation-reload-edit-cart',passed:true,bankContrast:bank390,finish:finishProof,keys:{actorJob:keyA,unassigned:unassignedKey}});
   const removed=await frame.evaluate(id=>{
    MIRUnifiedOrderCart.upsert({id:'qa-other-worker-line',kind:'fold',ownerId:'worker-b',jobId:'job-a',quantity:3,line:{itemId:'qa-other',quantity:3},snapshot:{id:'OTHER'}});
    MIRUnifiedOrderCart.upsert({id:'qa-client-line',kind:'fold',quantity:5,line:{itemId:'qa-client',quantity:5},snapshot:{id:'CLIENT'}});
@@ -122,7 +135,17 @@ async function main(){
   await page.goto(srv.base+'/production.html?mode=client&source=store&kind=profile',{waitUntil:'networkidle'});await ready(page);assert.equal(await page.locator('body.mir-pliage03').count(),0);
   report.checks.push({name:'non-opted-in-store-and-empty-actor-remain-excluded',passed:true});
   await page.setViewportSize({width:834,height:1112});frame=await open(contextData('chef-qa','job-chef',{entry:'models',entryRequestId:'chef-bank'}));await stage(frame,1);await layout(frame);await shot(page,'field-models-834');assert.equal(await frame.locator('#client-step-list button').count(),4);await untouched(frame);
-  report.checks.push({name:'chef-parent-contract-tablet-model-bank',passed:true});
+  const bank834=await bankContrast(frame),model=frame.locator('#client-model-options [data-client-profile="l"]');
+  const initialBackground=await model.evaluate(el=>getComputedStyle(el).backgroundColor);
+  await model.focus();await model.press('Tab');await page.keyboard.press('Shift+Tab');
+  const focus=await model.evaluate(el=>{const s=getComputedStyle(el);return{visible:el.matches(':focus-visible'),width:parseFloat(s.outlineWidth),style:s.outlineStyle,ink:s.outlineColor,background:getComputedStyle(document.body).backgroundColor};});
+  assert.ok(focus.visible&&focus.width>=2&&focus.style==='solid','keyboard focus is visibly outlined');assert.ok(contrast(focus.ink,focus.background)>=3,'focus ring contrasts with the app background');
+  await model.click();await stage(frame,2);await frame.locator('#client-step-back').click();await stage(frame,1);await frame.locator('#client-choose-model').click();
+  assert.equal(await model.getAttribute('aria-pressed'),'true','returning to the bank preserves the selected model');
+  const selected=await model.evaluate(el=>{const s=getComputedStyle(el);return{width:parseFloat(s.borderTopWidth),ink:s.borderTopColor,background:s.backgroundColor};});
+  assert.ok(selected.width>=2);assert.notEqual(selected.background,initialBackground);assert.ok(contrast(selected.ink,selected.background)>=3,'selected border contrasts with its card');
+  const selectedBank=await bankContrast(frame);await shot(page,'field-models-selected-834');
+  report.checks.push({name:'chef-parent-contract-tablet-model-bank',passed:true,bankContrast:bank834,focus,selected,selectedBankContrast:selectedBank});
   assert.deepEqual(report.pageErrors,[]);report.passed=true;
  }catch(e){report.passed=false;report.error=e.stack;await shot(page,'field-failure').catch(()=>{});throw e;}
  finally{fs.writeFileSync(path.join(out,'results.json'),JSON.stringify(report,null,2)+'\n');await context.close();await browser.close();await srv.close();}

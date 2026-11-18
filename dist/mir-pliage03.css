@@ -70,6 +70,8 @@ html body.mir-pliage03.mir-prestige[data-client-entry=models] #client-model-opti
 html body.mir-pliage03.mir-prestige[data-client-entry=models] .template-button:not(.client-viewport-off-page){display:flex;flex-direction:column;gap:10px;width:100%;min-width:0;height:auto;min-height:160px;padding:18px 14px;color:var(--p03-text);background:var(--p03-panel);border:1px solid var(--p03-line);border-radius:3px;font-size:15px;line-height:1.4}
 html body.mir-pliage03.mir-prestige[data-client-entry=models] .template-button[aria-pressed=true]{border:2px solid var(--p03-sand);padding:17px 13px;background:#3a3932}
 html body.mir-pliage03.mir-prestige[data-client-entry=models] .template-button svg{display:block;width:100%;height:82px;max-height:82px;margin:0;border-radius:2px;background:var(--p03-drawing);color:#30312c}
+/* The field app's model icons use currentColor on an anthracite canvas. */
+html[data-field-pliage03=true] body.mir-pliage03.mir-prestige[data-client-entry=models] .template-button svg{color:var(--p03-text)}
 html body.mir-pliage03.mir-prestige[data-client-entry] .client-viewport-pages{gap:14px;margin:18px 0;font-size:14px;color:var(--p03-muted)}
 html body.mir-pliage03.mir-prestige[data-client-entry] .client-viewport-pages button{color:var(--p03-text);border:1px solid var(--p03-line);background:var(--p03-panel)}
 

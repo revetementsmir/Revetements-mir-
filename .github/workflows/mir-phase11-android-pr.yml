@@ -45,51 +45,54 @@ jobs:
           MIR_CHROMIUM_BIN: /usr/bin/google-chrome
           NODE_PATH: ./mobile/node_modules
         run: |
-          node mobile/tools/test-contracts.cjs
-          node mobile/tools/test-native-screen-proofs.cjs
-          node mobile/tools/test-native-readiness.cjs
-          node mobile/tools/test-native-drawing-target.cjs
-          node mobile/tools/test-android-ci-environment.cjs
-          node --test mobile/tools/test-auth-flow.cjs tests/mir-team-enrollment-service.cjs tests/mir-team-session-queue.cjs
+          mir_check_status=0
+          mir_check() { "$@" || { mir_check_status=1; printf 'MIR_CHECK_FAILED %s\n' "$*"; }; }
+          mir_check node mobile/tools/test-contracts.cjs
+          mir_check node mobile/tools/test-native-screen-proofs.cjs
+          mir_check node mobile/tools/test-native-readiness.cjs
+          mir_check node mobile/tools/test-native-drawing-target.cjs
+          mir_check node mobile/tools/test-android-ci-environment.cjs
+          mir_check node --test mobile/tools/test-auth-flow.cjs tests/mir-team-enrollment-service.cjs tests/mir-team-session-queue.cjs
           npm ci --prefix tools/database
-          node tests/mir-team-invitations-postgres.cjs
-          node tests/mir-field-postgres.cjs
-          node tests/mir-field-cart.cjs
-          node tests/mir-field-profile.cjs
-          node tests/mir-field-redesign-browser.cjs
-          node --test tests/mir-samsung-contracts.cjs
-          node tests/mir-samsung-fixture.cjs
-          node tests/mir-pr39-native-fixture.cjs
-          node tests/mir-pr39-native-chef-fixture.cjs
-          node --check mobile/tools/prepare-real-qa-manifest.cjs
-          node --test mobile/tools/test-pr39-native-fixture.cjs mobile/tools/test-native-qa-fixture.cjs
-          node tests/mir-native-qa-sql-guards.cjs
-          node tests/mir-punch-receipts-postgres.cjs
-          node tests/mir-punch-receipts-client.cjs
-          node tests/mir-teams-hours-postgres.cjs
-          node tests/mir-teams-hours-client.cjs
-          node tests/mir-teams-hours-browser.cjs
-          node tests/mir-samsung-ui.cjs
-          node tests/mir-punch-approved-browser.cjs
-          node tests/mir-field-choice-refresh-browser.cjs
-          node tests/mir-field-drawing-refresh-browser.cjs
-          node tests/mir-team-enrollment-integration.cjs
-          node mobile/tools/test-enrollment-web.cjs
-          node tests/mir-team-invitation-email.cjs
-          node mobile/tools/test-invitation-email-web.cjs
-          node mobile/tools/test-compat.cjs
-          node mobile/tools/test-web.cjs
-          node mobile/tools/test-pdf-web.cjs
-          node mobile/tools/test-device-checks.cjs
-          node tests/mir-phase10-bending.cjs
-          node tests/mir-phase10-management.cjs
-          node tests/mir-technical-dimensions.cjs
-          node tests/mir-account-session.cjs
-          node tests/mir-test-environment.cjs
-          node tests/mir-test-production-browser.cjs
-          node tests/mir-responsive-atelier-browser.cjs
-          node tests/mir-annotation-browser.cjs
-          git diff --check
+          mir_check node tests/mir-team-invitations-postgres.cjs
+          mir_check node tests/mir-field-postgres.cjs
+          mir_check node tests/mir-field-cart.cjs
+          mir_check node tests/mir-field-profile.cjs
+          mir_check node tests/mir-field-redesign-browser.cjs
+          mir_check node --test tests/mir-samsung-contracts.cjs
+          mir_check node tests/mir-samsung-fixture.cjs
+          mir_check node tests/mir-pr39-native-fixture.cjs
+          mir_check node tests/mir-pr39-native-chef-fixture.cjs
+          mir_check node --check mobile/tools/prepare-real-qa-manifest.cjs
+          mir_check node --test mobile/tools/test-pr39-native-fixture.cjs mobile/tools/test-native-qa-fixture.cjs
+          mir_check node tests/mir-native-qa-sql-guards.cjs
+          mir_check node tests/mir-punch-receipts-postgres.cjs
+          mir_check node tests/mir-punch-receipts-client.cjs
+          mir_check node tests/mir-teams-hours-postgres.cjs
+          mir_check node tests/mir-teams-hours-client.cjs
+          mir_check node tests/mir-teams-hours-browser.cjs
+          mir_check node tests/mir-samsung-ui.cjs
+          mir_check node tests/mir-punch-approved-browser.cjs
+          mir_check node tests/mir-field-choice-refresh-browser.cjs
+          mir_check node tests/mir-field-drawing-refresh-browser.cjs
+          mir_check node tests/mir-team-enrollment-integration.cjs
+          mir_check node mobile/tools/test-enrollment-web.cjs
+          mir_check node tests/mir-team-invitation-email.cjs
+          mir_check node mobile/tools/test-invitation-email-web.cjs
+          mir_check node mobile/tools/test-compat.cjs
+          mir_check node mobile/tools/test-web.cjs
+          mir_check node mobile/tools/test-pdf-web.cjs
+          mir_check node mobile/tools/test-device-checks.cjs
+          mir_check node tests/mir-phase10-bending.cjs
+          mir_check node tests/mir-phase10-management.cjs
+          mir_check node tests/mir-technical-dimensions.cjs
+          mir_check node tests/mir-account-session.cjs
+          mir_check node tests/mir-test-environment.cjs
+          mir_check node tests/mir-test-production-browser.cjs
+          mir_check node tests/mir-responsive-atelier-browser.cjs
+          mir_check node tests/mir-annotation-browser.cjs
+          mir_check git diff --check
+          exit "$mir_check_status"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
